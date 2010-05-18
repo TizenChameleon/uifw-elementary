@@ -1,0 +1,118 @@
+AUTOMAKE_OPTIONS     = 1.4 foreign
+
+MAINTAINERCLEANFILES = Makefile.in
+
+AM_CPPFLAGS = \
+-I$(top_srcdir) \
+-I$(top_srcdir)/src/lib \
+-I$(top_builddir)/src/lib \
+-I$(top_srcdir)/src/bin \
+-DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
+@ELEMENTARY_CFLAGS@ \
+@ELEMENTARY_X_CFLAGS@ \
+@ELEMENTARY_FB_CFLAGS@ \
+@ELEMENTARY_WIN32_CFLAGS@ \
+@ELEMENTARY_WINCE_CFLAGS@ \
+@ELEMENTARY_EDBUS_CFLAGS@ \
+@ELEMENTARY_EFREET_CFLAGS@ \
+@ELEMENTARY_EWEATHER_CFLAGS@ \
+@ELEMENTARY_ETHUMB_CFLAGS@
+
+if ELEMENTARY_WINDOWS_BUILD
+AM_CPPFLAGS += -DELEMENTARY_BUILD
+endif
+
+bin_PROGRAMS = elementary_test elementary_config
+if BUILD_QUICKLAUNCH
+bin_PROGRAMS += elementary_quicklaunch elementary_run elementary_testql
+endif
+
+elementary_test_SOURCES = \
+test.c \
+test_bg.c \
+test_icon.c \
+test_box.c \
+test_button.c \
+test_fileselector_button.c \
+test_toggle.c \
+test_table.c \
+test_grid.c \
+test_clock.c \
+test_layout.c \
+test_hover.c \
+test_entry.c \
+test_notepad.c \
+test_anchorview.c \
+test_anchorblock.c \
+test_toolbar.c \
+test_hoversel.c \
+test_list.c \
+test_carousel.c \
+test_inwin.c \
+test_scaling.c \
+test_slider.c \
+test_genlist.c \
+test_check.c \
+test_pager.c \
+test_radio.c \
+test_win_state.c \
+test_progressbar.c \
+test_fileselector.c \
+test_separator.c \
+test_scroller.c \
+test_spinner.c \
+test_index.c \
+test_photocam.c \
+test_photo.c \
+test_thumb.c \
+test_icon_desktops.c \
+test_notify.c \
+test_slideshow.c \
+test_menu.c \
+test_panel.c \
+test_map.c \
+test_weather.c \
+test_flip.c \
+test_label.c \
+test_conform.c \
+test_multi.c \
+test_floating.c \
+test_launcher.c \
+test_anim.c
+
+elementary_test_LDADD = $(top_builddir)/src/lib/libelementary.la @ELEMENTARY_EWEATHER_LIBS@
+elementary_test_LDFLAGS =
+
+elementary_config_SOURCES = \
+config.c
+
+elementary_config_LDADD = $(top_builddir)/src/lib/libelementary.la @ELEMENTARY_EWEATHER_LIBS@
+elementary_config_LDFLAGS =
+
+if BUILD_QUICKLAUNCH
+elementary_quicklaunch_SOURCES = quicklaunch.c
+elementary_quicklaunch_LDADD = $(top_builddir)/src/lib/libelementary.la @ELEMENTARY_EWEATHER_LIBS@
+elementary_quicklaunch_LDFLAGS =
+
+if BUILD_RUN
+elementary_run_SOURCES = run.c
+elementary_run_LDADD =
+elementary_run_LDFLAGS =
+endif
+
+## This is how to build a quicklanch capable app
+# build the shared lib version - libtool produces a .a and .la file as well
+# as a .so - these get put in libdir ($PREIFX/lib) as elementary_testql.so
+# etc. - this is where elementary will expect to find the .so's for
+# quicklaunch apps.
+elementary_testqldir = $(libdir)
+elementary_testql_LTLIBRARIES = elementary_testql.la
+elementary_testql_la_SOURCES = $(elementary_test_SOURCES)
+elementary_testql_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
+elementary_testql_la_CFLAGS =
+elementary_testql_la_LDFLAGS = -module -avoid-version -no-undefined
+elementary_testql_SOURCES = $(elementary_test_SOURCES)
+elementary_testql_LDADD = $(top_builddir)/src/lib/libelementary.la
+elementary_testql_CFLAGS = -DELM_LIB_QUICKLAUNCH=1
+elementary_testql_LDFLAGS =
+endif
