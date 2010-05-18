@@ -1,0 +1,428 @@
+elementary (0.4.0+svn20100304slp2+18) unstable; urgency=low
+
+  * tab bug fix, add animator and transit
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+18
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 06 May 2010 10:13:42 +0900
+
+elementary (0.4.0+svn20100304slp2+17) unstable; urgency=low
+
+  * Repackaging.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+17
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Mon, 26 Apr 2010 11:59:26 +0900
+
+elementary (0.4.0+svn20100304slp2+16) unstable; urgency=low
+
+  * fix elm_button , add dependency efreet-dev
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+16
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Sun, 25 Apr 2010 13:21:19 +0900
+
+elementary (0.4.0+svn20100304slp2+15) unstable; urgency=low
+
+  * debian/control changed.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+15
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Sat, 24 Apr 2010 18:56:03 +0900
+
+elementary (0.4.0+svn20100304slp2+14) unstable; urgency=low
+
+  * Packaging.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+14
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Fri, 23 Apr 2010 19:36:42 +0900
+
+elementary (0.4.0+svn20100304slp2+13) unstable; urgency=low
+
+  * Updated package version due to tag
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+13
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Thu, 16 Apr 2010 11:38:00 +0900
+
+elementary (0.4.0+svn20100304slp2+12) unstable; urgency=low
+
+  * Updated package version due to tag
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+12
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Thu, 15 Apr 2010 20:35:00 +0900
+
+elementary (0.4.0+svn20100304slp2+11) unstable; urgency=low
+
+  * Bug fix - entry cursor position
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+11
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Thu, 15 Apr 2010 19:53:00 +0900
+
+elementary (0.4.0+svn20100304slp2+10) unstable; urgency=low
+
+  * Support autocapitalization
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+10
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Wed, 14 Apr 2010 18:12:14 +0900
+
+elementary (0.4.0+svn20100304slp2+9) unstable; urgency=low
+
+  * Hor_scroller : Patch for horizontal scroller from jinny.yoon@samsung.com.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+9
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Wed, 14 Apr 2010 17:11:34 +0900
+
+elementary (0.4.0+svn20100304slp2+8) unstable; urgency=low
+
+  * elm genlist main stream item queue handler rollback (by Mr.Govi)
+  * Tag: elementary_0.4.0+svn20100304slp2+8
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Tue, 14 Apr 2010 15:11:00 +0900
+
+elementary (0.4.0+svn20100304slp2+7) unstable; urgency=low
+
+  * elm_tab, elm_colorpicker bug fix
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+7
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 13 Apr 2010 17:03:54 +0900
+ 
+elementary (0.4.0+svn20100304slp2+6) unstable; urgency=low
+
+  * Patch for horizontal scroller.
+  * Genlist : Group header support added.
+  * Popup : Popup widget added.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+6
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Fri, 09 Apr 2010 20:08:33 +0900
+
+elementary (0.4.0+svn20100304slp2+5) unstable; urgency=low
+
+  * Repackaging.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+5
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Mon, 05 Apr 2010 20:45:51 +0900
+
+elementary (0.4.0+svn20100304slp2+4) unstable; urgency=low
+
+  * Patch for horizontal scroller.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL
+  * Tag: elementary_0.4.0+svn20100304slp2+4
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Mon, 05 Apr 2010 20:28:33 +0900
+
+elementary (0.4.0+svn20100304slp2+3) unstable; urgency=low
+
+  * rollback - elm_entry : removed <br> related bug fix
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Sat, 27 Mar 2010 18:35:00 +0900
+
+elementary (0.4.0+svn20100304slp2+2) unstable; urgency=low
+
+  * elm_genlist rollback
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Fri, 26 Mar 2010 21:42:43 +0900
+
+elementary (0.4.0+svn20100304slp2+1) unstable; urgency=low
+
+  * change package version
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 25 Mar 2010 14:57:50 +0900
+
+elementary (0.4.0+svn20100304-5) unstable; urgency=low
+
+  * Genlist "selected", "longpressed" callback bug fix.
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Wed, 24 Mar 2010 18:01:12 +0900
+
+elementary (0.4.0+svn20100304-4) unstable; urgency=low
+
+  * softkey bug fix - reported by myfile
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 23 Mar 2010 15:55:40 +0900
+
+elementary (0.4.0+svn20100304-3) unsyable; urgency=low
+
+  * Editfield Bug is fixed
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Fri, 19 Mar 2010 23:53:20 +0900
+
+elementary (0.4.0+svn20100304-2) unstable; urgency=low
+
+  * tab API add, diskcontroller bug fix, genlist bug fix etc.
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Fri, 19 Mar 2010 13:36:57 +0900
+
+elementary (0.4.0+svn20100304-1) unstable; urgency=low
+
+  * EFL_update_revision_46864
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Wed, 10 Mar 2010 16:06:40 +0900
+
+elementary (0.4.0+svn20100203-19) unstable; urgency=low
+
+  * Merge source (based on svn rev.46421)
+
+ -- Doyoun Kang <doyoun.kang@samsung.com>  Thu, 04 Mar 2010 12:11:40 +0900
+
+elementary (0.4.0+svn20100203-18) unstable; urgency=low
+
+  * updated ctxpopup
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Wed, 03 Mar 2010 20:40:38 +0900
+
+elementary (0.4.0+svn20100203-17) unstable; urgency=low
+
+  * diskcontroller bug fix
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Wed, 03 Mar 2010 19:28:34 +0900
+
+elementary (0.4.0+svn20100203-16) unstable; urgency=low
+
+  * updated picker, tab..
+
+ -- Chuneon.park <chuneon.park@samsung.com>  Tue, 02 Mar 2010 14:56:28 +0900
+
+elementary (0.4.0+svn20100203-15) unstable; urgency=low
+
+  * updated elm_tab
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Fri, 19 Feb 2010 21:10:31 +0900
+
+elementary (0.4.0+svn20100203-14) unstable; urgency=low
+
+  * Repackaging (previous one is not uploaded well)
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Thu, 18 Feb 2010 23:31:33 +0900
+
+elementary (0.4.0+svn20100203-13) unstable; urgency=low
+
+  * Updated
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Thu, 18 Feb 2010 20:12:49 +0900
+
+elementary (0.4.0+svn20100203-12) unstable; urgency=low
+
+  * table API added (clear, unpack), elm_object_focus: steal focus
+
+ -- Wonguk Jeong <wonguk.jeong@samsung.com>  Wed, 17 Feb 2010 15:58:01 +0900
+
+elementary (0.4.0+svn20100203-11) unstable; urgency=low
+
+  * Updated ctxpopup.
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Fri, 12 Feb 2010 21:00:39 +0900
+
+elementary (0.4.0+svn20100203-10) unstable; urgency=low
+
+  * Updated ctxpopup positioning. 
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Fri, 12 Feb 2010 13:27:23 +0900
+
+elementary (0.4.0+svn20100203-9) unstable; urgency=low
+
+  * Updated ctxpopup 
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Fri, 12 Feb 2010 11:39:15 +0900
+
+elementary (0.4.0+svn20100203-8) unstable; urgency=low
+
+  * elm_win_transperent apply
+
+ -- Jaehwan <jae.hwan.kim@samsung.com>  Thu, 11 Feb 2010 15:44:46 +0900
+
+elementary (0.4.0+svn20100203-7) unstable; urgency=low
+
+  * bug-fixed - timepicker (time is not same between am_pm mode and mmilitary mode when mode is changed by elm_timepicker_show_am_pm_set() (wonguk.jeong)
+    disccontroller - first item is not called (Jaehwan Kim)
+
+ -- Wonguk Jeong <wonguk.jeong@samsung.com>  Tue, 09 Feb 2010 19:21:43 +0900
+
+elementary (0.4.0+svn20100203-6) unstable; urgency=low
+
+  * add rotate with resize (elm_win) - by Sangjin Lee
+
+ -- Wonguk Jeong <wonguk.jeong@samsung.com>  Mon, 08 Feb 2010 14:43:22 +0900
+
+elementary (0.4.0+svn20100203-5) unstable; urgency=low
+
+  * add debug package
+
+ -- Wonguk Jeong <wonguk.jeong@samsung.com>  Mon, 08 Feb 2010 14:07:21 +0900
+
+elementary (0.4.0+svn20100203-4) unstable; urgency=low
+
+  * [diskcontroller] bug fix
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Sat, 06 Feb 2010 02:59:21 +0900
+
+elementary (0.4.0+svn20100203-3) unstable; urgency=low
+
+  * [elm_ctxpopup.c] removed arrow image and modified for multi-resolution.
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Fri, 05 Feb 2010 14:06:59 +0900
+
+elementary (0.4.0+svn20100203-2) unstable; urgency=low
+
+  * repack
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 04 Feb 2010 20:36:22 +0900
+
+elementary (0.4.0+svn20100203-1) unstable; urgency=low
+
+  * EFL_update_revision_45828
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Wed, 03 Feb 2010 16:39:25 +0900
+
+elementary (0.4.0+svn20100119-11) unstable; urgency=low
+
+  * [elm_ctxpopup.c] added "ctxpopup,hide" smart callback
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Thu, 28 Jan 2010 20:22:46 +0900
+
+elementary (0.4.0+svn20100119-10) unstable; urgency=low
+
+  * [elm_softkey.c] added elm_softkey_item_callback_set() 
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Thu, 28 Jan 2010 19:28:46 +0900
+
+elementary (0.4.0+svn20100119-9) unstable; urgency=low
+
+  * [elm_ctxpopup.c] added doxygen code. 
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Mon, 25 Jan 2010 17:14:04 +0900
+
+elementary (0.4.0+svn20100119-8) unstable; urgency=low
+
+  * [default.edc] changed entry cursor shape to vertical bar
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Sun, 24 Jan 2010 20:58:00 +0900
+
+elementary (0.4.0+svn20100119-7) unstable; urgency=low
+
+  * [elm_ctxpopup.c] added invalidation function 
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Sun, 24 Jan 2010 19:19:56 +0900
+
+elementary (0.4.0+svn20100119-6) unstable; urgency=low
+
+  * all winset font change
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Sun, 24 Jan 2010 00:40:10 +0900
+
+elementary (0.4.0+svn20100119-5) unstable; urgency=low
+
+  * [elm_ctxpopup.c] added elm_ctxpopup_item_icon_get() func
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Fri, 22 Jan 2010 20:56:00 +0900
+
+elementary (0.4.0+svn20100119-4) unstable; urgency=low
+
+  * [elm_ctxpopup.c] Added elm_ctxpopup_item_label_get() func.
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Fri, 22 Jan 2010 20:45:33 +0900
+
+elementary (0.4.0+svn20100119-3) unstable; urgency=low
+
+  * [elm_ctxpopup.c] fixed internal bug
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Fri, 22 Jan 2010 19:39:48 +0900
+
+elementary (0.4.0+svn20100119-2) unstable; urgency=low
+
+  * build config
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Fri, 22 Jan 2010 10:03:02 +0900
+
+elementary (0.4.0+svn20100119-1) unstable; urgency=low
+
+  * EFL_update_revision_45322
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Tue, 19 Jan 2010 20:44:52 +0900
+
+elementary (0.4.0+svn20100118-1) unstable; urgency=low
+
+  * Added elm_ctxpopup.c in Makefile.am to build it. 
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Mon, 18 Jan 2010 18:47:56 +0900
+
+elementary (0.4.0+svn20100114-1) unstable; urgency=low
+
+  * support disable mode in softkey
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Thu, 14 Jan 2010 19:15:21 +0900
+
+elementary (0.4.0+svn20100108-1) unstable; urgency=low
+
+  * change the enumeration of actionslider
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Fri, 08 Jan 2010 08:57:25 +0900
+
+elementary (0.4.0+svn20100107-1) unstable; urgency=low
+
+  * Add aquila winset in Elementary
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 07 Jan 2010 17:56:00 +0900
+
+elementary (0.4.0+svn20100105-1) unstable; urgency=low
+
+  * modify actionslider enum types
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 05 Jan 2010 15:27:25 +0900
+
+elementary (0.4.0+svn20100104-1) unstable; urgency=low
+
+  * add winset APIs
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Mon, 04 Jan 2010 18:04:56 +0900
+
+elementary (0.4.0+svn20091229-1) unstable; urgency=low
+
+  * update EFL
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 29 Dec 2009 14:27:07 +0900
+
+elementary (0.4.0+svn20091112-5) unstable; urgency=low
+
+  * i386 build
+
+ -- youmin.ha <sangho.g.park@samsung.com>  Mon, 30 Nov 2009 09:50:47 +0900
+
+elementary (0.4.0+svn20091112-4) unstable; urgency=low
+
+  * add dependency libefreet-dev to dev
+
+ -- sangho.g.park <sangho.g.park@samsung.com>  Fri, 13 Nov 2009 14:17:37 +0900
+
+elementary (0.4.0+svn20091112-3) unstable; urgency=low
+
+  * add dependency libefreet-dev
+
+ -- sangho.g.park <sangho.g.park@samsung.com>  Fri, 13 Nov 2009 14:10:37 +0900
+
+elementary (0.4.0+svn20091112-2) unstable; urgency=low
+
+  * add dependency libedbus-dev
+
+ -- sangho.g.park <sangho.g.park@samsung.com>  Fri, 13 Nov 2009 11:41:37 +0900
+
+
+elementary (0.4.0+svn20091112-1) unstable; urgency=low
+
+  * a SVN release.
+
+ -- sangho.g.park <sangho.g.park@samsung.com>  Fri, 13 Nov 2009 09:42:37 +0900
+
+elementary (0.4.0+svnYYYYMMDD-1) unstable; urgency=low
+
+  * a SVN release.
+
+ -- quaker <quaker66@gmail.com>  Fri, 23 May 2009 15:52:37 +0100
