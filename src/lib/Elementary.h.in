@@ -1503,7 +1503,27 @@ extern "C" {
    EAPI Eina_Bool    elm_mapbuf_smooth_get(const Evas_Object *obj);
    EAPI void         elm_mapbuf_alpha_set(Evas_Object *obj, Eina_Bool alpha);
    EAPI Eina_Bool    elm_mapbuf_alpha_get(const Evas_Object *obj);
-       
+
+   /* SearchBar */
+   EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent);
+   EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry);
+   EAPI const char *elm_searchbar_text_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj);
+   EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag);
+
+   /* Toolbar 2 */
+   typedef struct _Elm_Toolbar2_Item Elm_Toolbar2_Item;
+   EAPI Evas_Object *elm_toolbar2_add(Evas_Object *parent);
+   EAPI void elm_toolbar2_icon_size_set(Evas_Object *obj, int icon_size);
+   EAPI int elm_toolbar2_icon_size_get(Evas_Object *obj);
+   EAPI Elm_Toolbar2_Item *elm_toolbar2_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI Evas_Object *elm_toolbar2_item_icon_get(Elm_Toolbar2_Item *item);
+   EAPI void elm_toolbar2_item_del(Elm_Toolbar2_Item *it);
+   EAPI void elm_toolbar2_item_del_cb_set(Elm_Toolbar2_Item *it, void (*func)(void *data, Evas_Object *obj, void *event_info));
+   EAPI void elm_toolbar2_scrollable_set(Evas_Object *obj, Eina_Bool scrollable);
+   EAPI void elm_toolbar2_homogenous_set(Evas_Object *obj, Eina_Bool homogenous);
+   EAPI void elm_toolbar2_align_set(Evas_Object *obj, double align);
+
 #ifdef __cplusplus
 }
 #endif
