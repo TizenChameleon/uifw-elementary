@@ -1505,6 +1505,82 @@ extern "C" {
    EAPI void         elm_mapbuf_alpha_set(Evas_Object *obj, Eina_Bool alpha);
    EAPI Eina_Bool    elm_mapbuf_alpha_get(const Evas_Object *obj);
 
+
+/* Tab */
+   typedef enum _Elm_Tab_Move_Type
+     {
+	ELM_TAB_MOVE_LEFT = 0,
+	ELM_TAB_MOVE_RIGHT = 1
+     } Elm_Tab_Move_Type;
+
+   typedef enum _Elm_Tab_Mode_Type
+     {
+	ELM_TAB_PORTRAIT_2 = 2,
+	ELM_TAB_PORTRAIT_3 = 3,
+	ELM_TAB_PORTRAIT_4 = 4,
+	ELM_TAB_LANDSCAPE_2 = 12,
+	ELM_TAB_LANDSCAPE_3 = 13,
+	ELM_TAB_LANDSCAPE_4 = 14,
+	ELM_TAB_LANDSCAPE_5 = 15,
+     } Elm_Tab_Mode_Type;
+
+   typedef struct _Elm_Tab_Item Elm_Tab_Item;
+
+   EAPI Evas_Object *elm_tab_add(Evas_Object *parent);
+   EAPI void elm_tab_set(Evas_Object *obj, int mode);
+   EAPI Elm_Tab_Item *elm_tab_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI void elm_tab_item_del(Elm_Tab_Item *item);
+   EAPI void elm_tab_item_select(Elm_Tab_Item *item);
+   EAPI Evas_Object *elm_tab_item_icon_get(Elm_Tab_Item *item);
+   EAPI const char *elm_tab_item_label_get(Elm_Tab_Item *item);
+   EAPI void elm_tab_item_label_set(Elm_Tab_Item *item, const char *label);
+   EAPI void elm_tab_item_badge_set(Elm_Tab_Item *item, const int badge);   
+   EAPI Elm_Tab_Item *elm_tab_selected_item_get(Evas_Object *obj);   
+   EAPI Elm_Tab_Item *elm_tab_first_item_get(Evas_Object *obj);   
+   EAPI Elm_Tab_Item *elm_tab_last_item_get(Evas_Object *obj);   
+   EAPI Eina_List *elm_tab_items_get(Evas_Object *obj);   
+   EAPI Elm_Tab_Item *elm_tab_item_prev(Elm_Tab_Item *item);   
+   EAPI Elm_Tab_Item *elm_tab_item_next(Elm_Tab_Item *item);   
+   EAPI void elm_tab_move(Evas_Object *obj, int direction);
+   EAPI void elm_tab_edit_disable_set(Evas_Object *obj, Eina_Bool disable);
+   EAPI Eina_Bool elm_tab_edit_disable_get(Evas_Object *obj);
+
+   /* Tab Bar */
+   #define TAB_BAR_SYSTEM_ICON_CONTACT "elm/icon/tabbar_contact/default" 
+   #define TAB_BAR_SYSTEM_ICON_GROUP "elm/icon/tabbar_group/default" 
+   #define TAB_BAR_SYSTEM_ICON_SONG "elm/icon/tabbar_song/default" 
+   #define TAB_BAR_SYSTEM_ICON_FAVORITES "elm/icon/tabbar_favorites/default" 
+   #define TAB_BAR_SYSTEM_ICON_SEARCH "elm/icon/tabbar_search/default" 
+   #define TAB_BAR_SYSTEM_ICON_MESSAGE "elm/icon/tabbar_message/default" 
+   #define TAB_BAR_SYSTEM_ICON_SETTING "elm/icon/tabbar_setting/default" 
+
+   EAPI Evas_Object *elm_tabbar_add(Evas_Object *parent);
+   EAPI Elm_Tab_Item *elm_tabbar_item_add(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
+   EAPI Evas_Object *elm_tabbar_item_icon_get(Elm_Tab_Item *it);
+   EAPI const char *elm_tabbar_item_label_get(Elm_Tab_Item *it);
+   EAPI void elm_tabbar_item_label_set(Elm_Tab_Item *it, const char *label);
+   EAPI void elm_tabbar_item_select(Elm_Tab_Item *it);
+   EAPI void elm_tabbar_edit_start(Evas_Object *obj);
+   EAPI void elm_tabbar_item_visible_set(Elm_Tab_Item *it, Eina_Bool bar);
+
+  /* smart callbacks called:
+   * "clicked" - when item clicked
+    */
+
+  /* diskcontroller */
+  typedef struct _Elm_Diskcontroller_Item Elm_Diskcontroller_Item;
+
+   EAPI Evas_Object *elm_diskcontroller_add(Evas_Object *parent);
+   EAPI void elm_diskcontroller_round_set(Evas_Object *obj, Eina_Bool round);
+   EAPI Elm_Diskcontroller_Item *elm_diskcontroller_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI void elm_diskcontroller_item_del(Elm_Diskcontroller_Item *it);
+   EAPI const char *elm_diskcontroller_item_label_get(Elm_Diskcontroller_Item *it);
+   EAPI void elm_diskcontroller_item_label_set(Elm_Diskcontroller_Item *it, const char *label);
+   EAPI void elm_diskcontroller_item_focus_set(Elm_Diskcontroller_Item *it);
+   /* smart callbacks called:
+    * "stop" - when scroller stop
+    */
+
    /* SearchBar */
    EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent);
    EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry);
