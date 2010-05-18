@@ -53,6 +53,8 @@ elm_entry.c \
 elm_bubble.c \
 elm_photo.c \
 elm_toolbar.c \
+elm_toolbar2.c \
+elm_searchbar.c \
 elm_list.c \
 elm_carousel.c \
 elm_slider.c \
