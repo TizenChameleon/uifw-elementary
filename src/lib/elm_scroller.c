@@ -651,3 +651,20 @@ elm_scroller_region_bring_in(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_
    if (wd->scr)
      elm_smart_scroller_region_bring_in(wd->scr, x, y, w, h);
 }
+
+/**
+ * Set scroll only one page
+ *
+ * @param obj The scroller object
+ * @param set Flag
+ *
+ * @ingroup Scroller
+ */
+EAPI void
+elm_scroller_page_move_set(Evas_Object *obj, Eina_Bool set)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   elm_smart_scroller_page_move_set(wd->scr, set);
+}

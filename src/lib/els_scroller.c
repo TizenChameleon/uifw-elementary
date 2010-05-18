@@ -86,7 +86,7 @@ struct _Smart_Data
 
    double pagerel_h, pagerel_v;
    Evas_Coord pagesize_h, pagesize_v;
-
+   Eina_Bool one_page :1;
    unsigned char hbar_visible : 1;
    unsigned char vbar_visible : 1;
    unsigned char extern_pan : 1;
@@ -423,11 +423,13 @@ static Evas_Coord
 _smart_page_x_get(Smart_Data *sd, int offset)
 {
    Evas_Coord x, y, w, h, cw, ch;
+   Evas_Coord t;
 
    elm_smart_scroller_child_pos_get(sd->smart_obj, &x, &y);
    elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &w, &h);
    sd->pan_func.child_size_get(sd->pan_obj, &cw, &ch);
 
+   t = x;
    x += offset;
 
    if (sd->pagerel_h > 0.0)
@@ -435,12 +437,38 @@ _smart_page_x_get(Smart_Data *sd, int offset)
         x = x + (w * sd->pagerel_h * 0.5);
         x = x / (w * sd->pagerel_h);
         x = x * (w * sd->pagerel_h);
+
+	if(sd->one_page){
+		if(offset == 0){
+			if(t > x) x = x + (w * sd->pagerel_h);
+			if(t < x) x = x - (w * sd->pagerel_h);
+	  	}
+	   	if(offset > 0){
+			if(t > x) x = x + (w * sd->pagerel_h);
+	   	}
+	   	if(offset < 0){
+			if(t < x) x = x - (w * sd->pagerel_h);
+	   	}
+	   }		
      }
    else if (sd->pagesize_h > 0)
      {
         x = x + (sd->pagesize_h * 0.5);
         x = x / (sd->pagesize_h);
         x = x * (sd->pagesize_h);
+
+	if(sd->one_page){
+		if(offset == 0){
+			if(t > x) x = x + (sd->pagesize_h);
+			if(t < x) x = x - (sd->pagesize_h);
+	  	}
+	   	if(offset > 0){
+			if(t > x) x = x + (sd->pagesize_h);
+	   	}
+	   	if(offset < 0){
+			if(t < x) x = x - (sd->pagesize_h);
+	   	}
+	   }
      }
    if (x < 0) x = 0;
    else if ((x + w) > cw) x = cw - w;
@@ -1039,6 +1067,13 @@ elm_smart_scroller_paging_set(Evas_Object *obj, double pagerel_h, double pagerel
 }
 
 void
+elm_smart_scroller_page_move_set(Evas_Object *obj, Eina_Bool set)
+{
+   API_ENTRY return;
+   sd->one_page = set;
+}
+
+void
 elm_smart_scroller_region_bring_in(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
 {
    Evas_Coord mx = 0, my = 0, cw = 0, ch = 0, px = 0, py = 0, nx, ny;
@@ -1491,9 +1526,17 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                        at *= 4.0;
                        dx = ev->canvas.x - ax;
                        dy = ev->canvas.y - ay;
+                       if(sd->one_page) at = 0.4;
+
                        if (at > 0)
                          {
                             vel = sqrt((dx * dx) + (dy * dy)) / at;
+
+                            if(sd->one_page) {
+                                 if(vel < _elm_config->thumbscroll_momentum_threshhold)
+                                      vel = _elm_config->thumbscroll_momentum_threshhold +1;
+                            }
+
                             if ((_elm_config->thumbscroll_friction > 0.0) &&
                                 (vel > _elm_config->thumbscroll_momentum_threshhold) &&
                                 (!sd->freeze))
