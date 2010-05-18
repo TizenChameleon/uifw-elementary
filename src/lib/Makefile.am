@@ -80,6 +80,9 @@ elm_config.c \
 elm_diskcontroller.c \
 elm_tab.c \
 elm_tabbar.c \
+elm_editfield.c \
+elm_colorpicker.c \
+elm_colorpalette.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
