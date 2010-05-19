@@ -77,6 +77,8 @@ am_libelementary_la_OBJECTS = libelementary_la-elm_main.lo \
 	libelementary_la-elm_carousel.lo \
 	libelementary_la-elm_slider.lo libelementary_la-elm_genlist.lo \
 	libelementary_la-elm_check.lo libelementary_la-elm_radio.lo \
+	libelementary_la-elm_segment_control.lo \
+	libelementary_la-elm_pagecontrol.lo \
 	libelementary_la-elm_pager.lo \
 	libelementary_la-elm_progressbar.lo \
 	libelementary_la-elm_separator.lo \
@@ -86,8 +88,13 @@ am_libelementary_la_OBJECTS = libelementary_la-elm_main.lo \
 	libelementary_la-elm_slideshow.lo libelementary_la-elm_menu.lo \
 	libelementary_la-elm_panel.lo libelementary_la-elm_map.lo \
 	libelementary_la-elm_flip.lo libelementary_la-elm_conform.lo \
-	libelementary_la-elm_mapbuf.lo libelementary_la-elm_thumb.lo \
-	libelementary_la-elm_config.lo \
+	libelementary_la-elm_mapbuf.lo libelementary_la-elm_picker.lo \
+	libelementary_la-elm_picker2.lo \
+	libelementary_la-elm_timepicker.lo \
+	libelementary_la-elm_datepicker.lo \
+	libelementary_la-elm_datepicker2.lo \
+	libelementary_la-elm_thumb.lo libelementary_la-elm_config.lo \
+	libelementary_la-elm_titlebar.lo libelementary_la-elm_popup.lo \
 	libelementary_la-elm_diskcontroller.lo \
 	libelementary_la-elm_tab.lo \
 	libelementary_la-elm_navigationbar.lo \
@@ -97,6 +104,9 @@ am_libelementary_la_OBJECTS = libelementary_la-elm_main.lo \
 	libelementary_la-elm_colorpicker.lo \
 	libelementary_la-elm_colorpalette.lo \
 	libelementary_la-elm_ctxpopup.lo \
+	libelementary_la-elm_actionsheet.lo \
+	libelementary_la-elm_gridbox.lo \
+	libelementary_la-elm_softkey.lo \
 	libelementary_la-elc_anchorblock.lo \
 	libelementary_la-elc_anchorview.lo \
 	libelementary_la-elc_fileselector.lo \
@@ -129,14 +139,14 @@ HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary/missing --run aclocal-1.10
+ACLOCAL = ${SHELL} /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary/missing --run aclocal-1.10
 ALLOCA = 
-AMTAR = ${SHELL} /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary/missing --run tar
+AMTAR = ${SHELL} /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary/missing --run tar
 AR = ar
 AS = as
-AUTOCONF = ${SHELL} /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary/missing --run automake-1.10
+AUTOCONF = ${SHELL} /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary/missing --run automake-1.10
 AWK = gawk
 CC = cc
 CCDEPMODE = depmode=none
@@ -158,12 +168,14 @@ ELEMENTARY_EDBUS_CFLAGS = -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I
 ELEMENTARY_EDBUS_LIBS = -ledbus -lehal  
 ELEMENTARY_EFREET_CFLAGS = -I/usr/include/efreet -I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include  
 ELEMENTARY_EFREET_LIBS = -lefreet -lefreet_mime -lefreet_trash  
-ELEMENTARY_ETHUMB_CFLAGS = 
-ELEMENTARY_ETHUMB_LIBS = 
+ELEMENTARY_ETHUMB_CFLAGS = -I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/fribidi -I/usr/include/freetype2 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include  
+ELEMENTARY_ETHUMB_LIBS = -lethumb_client -lethumb -ledbus -leina -levas -lecore -lecore_evas -lecore_file -ledje  
 ELEMENTARY_EWEATHER_CFLAGS = 
 ELEMENTARY_EWEATHER_LIBS = 
 ELEMENTARY_FB_CFLAGS = -I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include  
 ELEMENTARY_FB_LIBS = -lecore_fb  
+ELEMENTARY_IMF_CFLAGS = -I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include  
+ELEMENTARY_IMF_LIBS = -lecore_imf  
 ELEMENTARY_LIBS = -leina -leet -levas -lecore -lecore_evas -lecore_file -ledje  
 ELEMENTARY_SDL_CFLAGS = 
 ELEMENTARY_SDL_LIBS = 
@@ -176,8 +188,9 @@ ELEMENTARY_X_LIBS = -lecore_x
 ELM_ALLOCA_H_DEF = #define
 ELM_EDBUS_DEF = #define
 ELM_EFREET_DEF = #define
-ELM_ETHUMB_DEF = #undef
+ELM_ETHUMB_DEF = #define
 ELM_EWEATHER_DEF = #undef
+ELM_IMF_DEF = #define
 ELM_LIBINTL_H_DEF = #define
 ELM_UNIX_DEF = #define
 ELM_WIN32_DEF = #undef
@@ -200,7 +213,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary/missing --run makeinfo
 MKDIR_P = /scratchbox/tools/bin/mkdir -p
 MODULE_ARCH = linux-gnu-i686-ver-pre-svn-05
 NM = /scratchbox/compilers/bin/nm -B
@@ -223,10 +236,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.6.0.063
-abs_builddir = /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary/src/lib
-abs_srcdir = /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary/src/lib
-abs_top_builddir = /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary
-abs_top_srcdir = /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary
+abs_builddir = /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary/src/lib
+abs_srcdir = /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary/src/lib
+abs_top_builddir = /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary
+abs_top_srcdir = /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary
 ac_ct_CC = cc
 ac_ct_DUMPBIN = 
 am__include = include
@@ -259,7 +272,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${prefix}/share/info
-install_sh = $(SHELL) /home/hermet/slp2/EFL/slp2-efl-upgrade-tools/efl-git/elementary/install-sh
+install_sh = $(SHELL) /home/rajeev/git_repo/efl_git/slp2-efl-upgrade-tools/efl-git/elementary/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${prefix}/lib/elementary
 localedir = ${datarootdir}/locale
@@ -276,7 +289,7 @@ prefix = /usr
 program_transform_name = s,x,x,
 psdir = ${docdir}
 release_info = -release ver-pre-svn-05
-requirement_elm = efreet efreet-mime efreet-trash ehal edbus ecore-fb ecore-x edje ecore-file ecore-evas ecore evas eet eina-0 
+requirement_elm = ecore-imf ethumb efreet efreet-mime efreet-trash ehal edbus ecore-fb ecore-x edje ecore-file ecore-evas ecore evas eet eina-0 
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 srcdir = .
@@ -294,8 +307,8 @@ AM_CPPFLAGS = -I. -I$(top_builddir) -I$(top_srcdir) \
 	-I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include   -I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include   \
 	  \
 	 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/eina-0 -I/usr/include/eina-0/eina   \
-	-I/usr/include/efreet -I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include    \
-	$(am__append_1)
+	-I/usr/include/efreet -I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include   -I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/fribidi -I/usr/include/freetype2 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include   \
+	-I/usr/include/eina-0 -I/usr/include/eina-0/eina -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include   $(am__append_1)
 lib_LTLIBRARIES = libelementary.la
 include_HEADERS = Elementary.h
 libelementary_la_SOURCES = \
@@ -332,6 +345,8 @@ elm_slider.c \
 elm_genlist.c \
 elm_check.c \
 elm_radio.c \
+elm_segment_control.c \
+elm_pagecontrol.c \
 elm_pager.c \
 elm_progressbar.c \
 elm_separator.c \
@@ -346,8 +361,15 @@ elm_map.c \
 elm_flip.c \
 elm_conform.c \
 elm_mapbuf.c \
+elm_picker.c \
+elm_picker2.c \
+elm_timepicker.c \
+elm_datepicker.c \
+elm_datepicker2.c \
 elm_thumb.c \
 elm_config.c \
+elm_titlebar.c \
+elm_popup.c \
 elm_diskcontroller.c \
 elm_tab.c \
 elm_navigationbar.c \
@@ -358,6 +380,9 @@ elm_editfield.c \
 elm_colorpicker.c \
 elm_colorpalette.c \
 elm_ctxpopup.c \
+elm_actionsheet.c \
+elm_gridbox.c \
+elm_softkey.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
@@ -377,7 +402,7 @@ els_icon.c \
 els_icon.h
 
 libelementary_la_CFLAGS = 
-libelementary_la_LIBADD = -lm -ldl -leina -leet -levas -lecore -lecore_evas -lecore_file -ledje   -lecore_x   -lecore_fb      -ledbus -lehal   -lefreet -lefreet_mime -lefreet_trash   
+libelementary_la_LIBADD = -lm -ldl -leina -leet -levas -lecore -lecore_evas -lecore_file -ledje   -lecore_x   -lecore_fb      -ledbus -lehal   -lefreet -lefreet_mime -lefreet_trash   -lethumb_client -lethumb -ledbus -leina -levas -lecore -lecore_evas -lecore_file -ledje   -lecore_imf  
 libelementary_la_LDFLAGS = -no-undefined  -version-info 6:0:6 -release ver-pre-svn-05
 all: all-am
 
@@ -457,6 +482,7 @@ distclean-compile:
 #include ./$(DEPDIR)/libelementary_la-elc_hoversel.Plo
 #include ./$(DEPDIR)/libelementary_la-elc_notepad.Plo
 #include ./$(DEPDIR)/libelementary_la-elc_scrolled_entry.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_actionsheet.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_animator.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_bg.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_box.Plo
@@ -470,12 +496,15 @@ distclean-compile:
 #include ./$(DEPDIR)/libelementary_la-elm_config.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_conform.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_ctxpopup.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_datepicker.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_datepicker2.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_diskcontroller.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_editfield.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_entry.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_flip.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_frame.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_genlist.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_gridbox.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_hover.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_icon.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_image.Plo
@@ -490,24 +519,32 @@ distclean-compile:
 #include ./$(DEPDIR)/libelementary_la-elm_module.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_navigationbar.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_notify.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_pagecontrol.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_pager.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_panel.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_photo.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_photocam.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_picker.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_picker2.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_popup.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_progressbar.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_radio.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_scrolled_grid.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_scroller.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_searchbar.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_segment_control.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_separator.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_slider.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_slideshow.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_softkey.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_spinner.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_tab.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_tabbar.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_table.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_theme.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_thumb.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_timepicker.Plo
+#include ./$(DEPDIR)/libelementary_la-elm_titlebar.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_toggle.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_toolbar.Plo
 #include ./$(DEPDIR)/libelementary_la-elm_toolbar2.Plo
@@ -757,6 +794,20 @@ libelementary_la-elm_radio.lo: elm_radio.c
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_radio.lo `test -f 'elm_radio.c' || echo '$(srcdir)/'`elm_radio.c
 
+libelementary_la-elm_segment_control.lo: elm_segment_control.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_segment_control.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_segment_control.Tpo -c -o libelementary_la-elm_segment_control.lo `test -f 'elm_segment_control.c' || echo '$(srcdir)/'`elm_segment_control.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_segment_control.Tpo $(DEPDIR)/libelementary_la-elm_segment_control.Plo
+#	source='elm_segment_control.c' object='libelementary_la-elm_segment_control.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_segment_control.lo `test -f 'elm_segment_control.c' || echo '$(srcdir)/'`elm_segment_control.c
+
+libelementary_la-elm_pagecontrol.lo: elm_pagecontrol.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_pagecontrol.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_pagecontrol.Tpo -c -o libelementary_la-elm_pagecontrol.lo `test -f 'elm_pagecontrol.c' || echo '$(srcdir)/'`elm_pagecontrol.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_pagecontrol.Tpo $(DEPDIR)/libelementary_la-elm_pagecontrol.Plo
+#	source='elm_pagecontrol.c' object='libelementary_la-elm_pagecontrol.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_pagecontrol.lo `test -f 'elm_pagecontrol.c' || echo '$(srcdir)/'`elm_pagecontrol.c
+
 libelementary_la-elm_pager.lo: elm_pager.c
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_pager.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_pager.Tpo -c -o libelementary_la-elm_pager.lo `test -f 'elm_pager.c' || echo '$(srcdir)/'`elm_pager.c
 #	mv -f $(DEPDIR)/libelementary_la-elm_pager.Tpo $(DEPDIR)/libelementary_la-elm_pager.Plo
@@ -855,6 +906,41 @@ libelementary_la-elm_mapbuf.lo: elm_mapbuf.c
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_mapbuf.lo `test -f 'elm_mapbuf.c' || echo '$(srcdir)/'`elm_mapbuf.c
 
+libelementary_la-elm_picker.lo: elm_picker.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_picker.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_picker.Tpo -c -o libelementary_la-elm_picker.lo `test -f 'elm_picker.c' || echo '$(srcdir)/'`elm_picker.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_picker.Tpo $(DEPDIR)/libelementary_la-elm_picker.Plo
+#	source='elm_picker.c' object='libelementary_la-elm_picker.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_picker.lo `test -f 'elm_picker.c' || echo '$(srcdir)/'`elm_picker.c
+
+libelementary_la-elm_picker2.lo: elm_picker2.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_picker2.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_picker2.Tpo -c -o libelementary_la-elm_picker2.lo `test -f 'elm_picker2.c' || echo '$(srcdir)/'`elm_picker2.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_picker2.Tpo $(DEPDIR)/libelementary_la-elm_picker2.Plo
+#	source='elm_picker2.c' object='libelementary_la-elm_picker2.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_picker2.lo `test -f 'elm_picker2.c' || echo '$(srcdir)/'`elm_picker2.c
+
+libelementary_la-elm_timepicker.lo: elm_timepicker.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_timepicker.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_timepicker.Tpo -c -o libelementary_la-elm_timepicker.lo `test -f 'elm_timepicker.c' || echo '$(srcdir)/'`elm_timepicker.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_timepicker.Tpo $(DEPDIR)/libelementary_la-elm_timepicker.Plo
+#	source='elm_timepicker.c' object='libelementary_la-elm_timepicker.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_timepicker.lo `test -f 'elm_timepicker.c' || echo '$(srcdir)/'`elm_timepicker.c
+
+libelementary_la-elm_datepicker.lo: elm_datepicker.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_datepicker.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_datepicker.Tpo -c -o libelementary_la-elm_datepicker.lo `test -f 'elm_datepicker.c' || echo '$(srcdir)/'`elm_datepicker.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_datepicker.Tpo $(DEPDIR)/libelementary_la-elm_datepicker.Plo
+#	source='elm_datepicker.c' object='libelementary_la-elm_datepicker.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_datepicker.lo `test -f 'elm_datepicker.c' || echo '$(srcdir)/'`elm_datepicker.c
+
+libelementary_la-elm_datepicker2.lo: elm_datepicker2.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_datepicker2.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_datepicker2.Tpo -c -o libelementary_la-elm_datepicker2.lo `test -f 'elm_datepicker2.c' || echo '$(srcdir)/'`elm_datepicker2.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_datepicker2.Tpo $(DEPDIR)/libelementary_la-elm_datepicker2.Plo
+#	source='elm_datepicker2.c' object='libelementary_la-elm_datepicker2.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_datepicker2.lo `test -f 'elm_datepicker2.c' || echo '$(srcdir)/'`elm_datepicker2.c
+
 libelementary_la-elm_thumb.lo: elm_thumb.c
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_thumb.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_thumb.Tpo -c -o libelementary_la-elm_thumb.lo `test -f 'elm_thumb.c' || echo '$(srcdir)/'`elm_thumb.c
 #	mv -f $(DEPDIR)/libelementary_la-elm_thumb.Tpo $(DEPDIR)/libelementary_la-elm_thumb.Plo
@@ -868,6 +954,20 @@ libelementary_la-elm_config.lo: elm_config.c
 #	source='elm_config.c' object='libelementary_la-elm_config.lo' libtool=yes 
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_config.lo `test -f 'elm_config.c' || echo '$(srcdir)/'`elm_config.c
+
+libelementary_la-elm_titlebar.lo: elm_titlebar.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_titlebar.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_titlebar.Tpo -c -o libelementary_la-elm_titlebar.lo `test -f 'elm_titlebar.c' || echo '$(srcdir)/'`elm_titlebar.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_titlebar.Tpo $(DEPDIR)/libelementary_la-elm_titlebar.Plo
+#	source='elm_titlebar.c' object='libelementary_la-elm_titlebar.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_titlebar.lo `test -f 'elm_titlebar.c' || echo '$(srcdir)/'`elm_titlebar.c
+
+libelementary_la-elm_popup.lo: elm_popup.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_popup.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_popup.Tpo -c -o libelementary_la-elm_popup.lo `test -f 'elm_popup.c' || echo '$(srcdir)/'`elm_popup.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_popup.Tpo $(DEPDIR)/libelementary_la-elm_popup.Plo
+#	source='elm_popup.c' object='libelementary_la-elm_popup.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_popup.lo `test -f 'elm_popup.c' || echo '$(srcdir)/'`elm_popup.c
 
 libelementary_la-elm_diskcontroller.lo: elm_diskcontroller.c
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_diskcontroller.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_diskcontroller.Tpo -c -o libelementary_la-elm_diskcontroller.lo `test -f 'elm_diskcontroller.c' || echo '$(srcdir)/'`elm_diskcontroller.c
@@ -938,6 +1038,27 @@ libelementary_la-elm_ctxpopup.lo: elm_ctxpopup.c
 #	source='elm_ctxpopup.c' object='libelementary_la-elm_ctxpopup.lo' libtool=yes 
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_ctxpopup.lo `test -f 'elm_ctxpopup.c' || echo '$(srcdir)/'`elm_ctxpopup.c
+
+libelementary_la-elm_actionsheet.lo: elm_actionsheet.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_actionsheet.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_actionsheet.Tpo -c -o libelementary_la-elm_actionsheet.lo `test -f 'elm_actionsheet.c' || echo '$(srcdir)/'`elm_actionsheet.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_actionsheet.Tpo $(DEPDIR)/libelementary_la-elm_actionsheet.Plo
+#	source='elm_actionsheet.c' object='libelementary_la-elm_actionsheet.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_actionsheet.lo `test -f 'elm_actionsheet.c' || echo '$(srcdir)/'`elm_actionsheet.c
+
+libelementary_la-elm_gridbox.lo: elm_gridbox.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_gridbox.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_gridbox.Tpo -c -o libelementary_la-elm_gridbox.lo `test -f 'elm_gridbox.c' || echo '$(srcdir)/'`elm_gridbox.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_gridbox.Tpo $(DEPDIR)/libelementary_la-elm_gridbox.Plo
+#	source='elm_gridbox.c' object='libelementary_la-elm_gridbox.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_gridbox.lo `test -f 'elm_gridbox.c' || echo '$(srcdir)/'`elm_gridbox.c
+
+libelementary_la-elm_softkey.lo: elm_softkey.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elm_softkey.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elm_softkey.Tpo -c -o libelementary_la-elm_softkey.lo `test -f 'elm_softkey.c' || echo '$(srcdir)/'`elm_softkey.c
+#	mv -f $(DEPDIR)/libelementary_la-elm_softkey.Tpo $(DEPDIR)/libelementary_la-elm_softkey.Plo
+#	source='elm_softkey.c' object='libelementary_la-elm_softkey.lo' libtool=yes 
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) 
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -c -o libelementary_la-elm_softkey.lo `test -f 'elm_softkey.c' || echo '$(srcdir)/'`elm_softkey.c
 
 libelementary_la-elc_anchorblock.lo: elc_anchorblock.c
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libelementary_la_CFLAGS) $(CFLAGS) -MT libelementary_la-elc_anchorblock.lo -MD -MP -MF $(DEPDIR)/libelementary_la-elc_anchorblock.Tpo -c -o libelementary_la-elc_anchorblock.lo `test -f 'elc_anchorblock.c' || echo '$(srcdir)/'`elc_anchorblock.c

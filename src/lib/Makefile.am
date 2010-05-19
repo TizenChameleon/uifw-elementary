@@ -98,6 +98,8 @@ elm_colorpicker.c \
 elm_colorpalette.c \
 elm_ctxpopup.c \
 elm_actionsheet.c \
+elm_gridbox.c \
+elm_softkey.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \

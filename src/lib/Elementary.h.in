@@ -1989,7 +1989,49 @@ extern "C" {
    EAPI Eina_Bool elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon);
    EAPI Evas_Object *elm_editfield_lett_icon_get(Evas_Object *obj);
    EAPI void elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
+
+ /* softkey */
+   typedef enum {
+		ELM_SK_LEFT_BTN,
+		ELM_SK_RIGHT_BTN,
+   } Elm_Softkey_Type;
+
+   /* softkey */
+   typedef struct _Elm_Softkey_Item Elm_Softkey_Item;
+   EAPI Evas_Object *elm_softkey_add(Evas_Object *parent);
+   EAPI Elm_Softkey_Item *elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI void         elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type);
+   EAPI void         elm_softkey_button_show(Evas_Object *obj, Elm_Softkey_Type type);
+   EAPI void         elm_softkey_button_hide(Evas_Object *obj, Elm_Softkey_Type type);
+
+   EAPI Elm_Softkey_Item *elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI int          elm_softkey_panel_del(Evas_Object *obj);
+   EAPI int          elm_softkey_panel_close(Evas_Object *obj);
+   EAPI int          elm_softkey_panel_open(Evas_Object *obj);
+
+   EAPI void         elm_softkey_item_icon_set(Elm_Softkey_Item *item, Evas_Object *icon);
+   EAPI Evas_Object *elm_softkey_item_icon_get(Elm_Softkey_Item * item);
+   EAPI void         elm_softkey_item_label_set(Elm_Softkey_Item *item, const char *label);
+   EAPI const char  *elm_softkey_item_label_get(Elm_Softkey_Item * item);
+   EAPI Eina_Bool    elm_softkey_item_disabled_get(Elm_Softkey_Item *item);
+   EAPI void         elm_softkey_item_disabled_set(Elm_Softkey_Item *item, Eina_Bool disabled);
+   EAPI void         elm_softkey_item_callback_set(Elm_Softkey_Item* item, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data );
+   /* smart callback called: 
+    * "clicked" - the user clicked the button, event_info: Softkey item
+    * "press"   - the user press the button, event_info: Softkey item
+    * "panel,show" - when the panel is shown
+	* "panel,hide" - when the panel is hidden
+    */
        
+   /* gridbox */
+   EAPI Evas_Object *elm_gridbox_add(Evas_Object *parent);
+   EAPI void elm_gridbox_padding_set(Evas_Object *obj, Evas_Coord horizontal, Evas_Coord vertical);
+   EAPI void elm_gridbox_item_size_set(Evas_Object *obj, Evas_Coord h_itemsize, Evas_Coord v_itemsize);
+   EAPI void elm_gridbox_pack(Evas_Object *obj, Evas_Object *subobj);
+   EAPI Eina_Bool elm_gridbox_unpack(Evas_Object *obj, Evas_Object *subobj);
+   EAPI Eina_List *elm_gridbox_children_get(Evas_Object *obj);
+   EAPI void elm_gridbox_homogenous_padding_set(Evas_Object *obj, Eina_Bool homogenous);
+
 
 #ifdef __cplusplus
 }
