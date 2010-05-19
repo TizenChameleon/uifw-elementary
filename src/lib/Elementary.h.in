@@ -1648,8 +1648,8 @@ extern "C" {
    typedef enum { ELM_FX_WIPE_TYPE_HIDE, ELM_FX_WIPE_TYPE_SHOW } Elm_Fx_Wipe_Type;
    EAPI Elm_Effect* elm_fx_wipe_add( Evas_Object* obj, Elm_Fx_Wipe_Type type,  Elm_Fx_Wipe_Dir dir );
 
-   /*ScalableFlip Fx*/
-   EAPI Elm_Effect* elm_fx_scalable_flip_add( Evas_Object* front, Evas_Object* back, const Elm_Fx_Flip_Axis axis, const Eina_Bool cw, float from_rate, float to_rate );
+   /*ResizableFlip Fx*/
+   EAPI Elm_Effect* elm_fx_resizable_flip_add( Evas_Object* front, Evas_Object* back, const Elm_Fx_Flip_Axis axis, const Eina_Bool cw );
    
    /*Transform Fx*/
    typedef struct _elm_fx_matrix {

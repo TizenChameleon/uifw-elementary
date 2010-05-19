@@ -749,7 +749,7 @@ static void _separator_obj_add( Evas_Object* ctxpopup )
 
 	evas_object_size_hint_weight_set( item->obj, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND ) ;
 	evas_object_size_hint_fill_set( item->obj, EVAS_HINT_FILL, EVAS_HINT_FILL );
-	_elm_theme_set( NULL, item->obj, "ctxpopup", "separator", elm_widget_style_get( ctxpopup ) ) ;
+	_elm_theme_object_set( ctxpopup, item->obj, "ctxpopup", "separator", elm_widget_style_get( ctxpopup ) ) ;
 
 	if( wd->horizontal == EINA_TRUE ) {
 		edje_object_signal_emit( item->obj, "elm,state,horizontal", "elm" );
@@ -1155,7 +1155,7 @@ static void _get_obj_size( Evas_Object* ctxpopup, double scale  )
 	}
 
 	Evas_Object* data_info = edje_object_add( evas_object_evas_get( wd->location ) );
-	_elm_theme_set( NULL, data_info, "ctxpopup", "data_info", elm_widget_style_get( ctxpopup ) );
+	_elm_theme_object_set( ctxpopup, data_info, "ctxpopup", "data_info", elm_widget_style_get( ctxpopup ) );
 
 #ifdef ENABLE_ARROW
 	//Arrow
@@ -1297,7 +1297,7 @@ static void _theme_hook( Evas_Object* obj )
 
 			if( item->separator == EINA_TRUE ) {
 
-				_elm_theme_set( NULL, 
+				_elm_theme_object_set( obj, 
 						item->obj,
 						"ctxpopup",
 						"separator",
@@ -1312,7 +1312,7 @@ static void _theme_hook( Evas_Object* obj )
 
 			}else {
 
-				_elm_theme_set( NULL,
+				_elm_theme_object_set( obj,
 						item->obj,
 					"ctxpopup",
 					"item",
@@ -1366,7 +1366,7 @@ static void _theme_hook( Evas_Object* obj )
 	elm_object_style_set( wd->hover, "ctxpopup");
 
 #ifdef ENABLE_ARROW
-	_elm_theme_set( NULL, wd->arrow, "ctxpopup", "arrow", elm_widget_style_get( obj ) );
+	_elm_theme_object_set( obj,  wd->arrow, "ctxpopup", "arrow", elm_widget_style_get( obj ) );
 #endif
 
 	_get_obj_size( obj, edje_scale_get() );
@@ -1496,7 +1496,7 @@ static void _arrow_obj_add( Evas_Object* ctxpopup )
 	wd->arrow = edje_object_add( evas_object_evas_get( wd->location) );
 
 	evas_object_size_hint_weight_set( wd->arrow, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND );
-	_elm_theme_set( NULL, wd->arrow, "ctxpopup", "arrow", elm_widget_style_get( ctxpopup ) );
+	_elm_theme_object_set( ctxpopup, wd->arrow, "ctxpopup", "arrow", elm_widget_style_get( ctxpopup ) );
 	edje_object_signal_emit( wd->arrow, "elm,bottom_arrow,show", "elm" );
 
 
@@ -1516,7 +1516,7 @@ static void _item_obj_create( Elm_Ctxpopup_Item* item )
 
 	evas_object_size_hint_weight_set( item->obj, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND );
 	evas_object_size_hint_fill_set( item->obj, EVAS_HINT_FILL, EVAS_HINT_FILL );
-	_elm_theme_set( NULL, item->obj, "ctxpopup", "item", elm_widget_style_get( item->ctxpopup ) );
+	_elm_theme_object_set( item->ctxpopup, item->obj, "ctxpopup", "item", elm_widget_style_get( item->ctxpopup ) );
 
 	edje_object_signal_callback_add(
 			item->obj,

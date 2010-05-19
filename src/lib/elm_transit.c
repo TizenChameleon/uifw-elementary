@@ -1277,43 +1277,93 @@ EAPI Elm_Effect* elm_fx_flip_add( Evas_Object* front,
 
 
 /////////////////////////////////////////////////////////////////////////////////////
-//ScalableFlip FX
+//ResizableFlip FX
 /////////////////////////////////////////////////////////////////////////////////////
-typedef struct _scalable_flip Elm_Fx_ScalableFlip;
-static void _elm_fx_scalable_flip_op( void* data, Elm_Animator* animator, const double frame );
+typedef struct _resizable_flip Elm_Fx_ResizableFlip;
+static void _elm_fx_resizable_flip_op( void* data, Elm_Animator* animator, const double frame );
 
-struct _scalable_flip {
+struct _resizable_flip {
 	Evas_Object* 	  front;
 	Evas_Object*      back;
  	Elm_Fx_Flip_Axis  axis; 	
-	float 		  from, to;
+
+	struct _vector2d {
+		float x, y;
+	} from_pos, from_size, to_pos, to_size;
+
 	Eina_Bool    	  cw : 1;
 };
 
-static void _elm_fx_scalable_flip_begin( void* data, const Eina_Bool reverse, const unsigned int repeat )
+static void _elm_fx_resizable_flip_begin( void* data, const Eina_Bool reverse, const unsigned int repeat )
 {
-	Elm_Fx_ScalableFlip* scalable_flip = data;
-	evas_object_show( scalable_flip->front );
+	Elm_Fx_ResizableFlip* resizable_flip = data;
+	evas_object_show( resizable_flip->front );
 
-	_elm_fx_scalable_flip_op( data, NULL, 0 );
+	_elm_fx_resizable_flip_op( data, NULL, 0 );
 		
 }
 
 
 
-static void _elm_fx_scalable_flip_end( void* data,
+static void _elm_fx_resizable_flip_end( void* data,
 				     const Eina_Bool auto_reverse,
 				     const unsigned int repeat_cnt )
 {
-	Elm_Fx_ScalableFlip* scalable_flip = data;
-	evas_object_map_enable_set( scalable_flip->front, EINA_FALSE );
-	evas_object_map_enable_set( scalable_flip->back, EINA_FALSE );
+	Elm_Fx_ResizableFlip* resizable_flip = data;
+	evas_object_map_enable_set( resizable_flip->front, EINA_FALSE );
+	evas_object_map_enable_set( resizable_flip->back, EINA_FALSE );
 }
 
 
-static void _elm_fx_scalable_flip_op( void* data, Elm_Animator* animator, const double frame )
+inline static void _set_image_uv_by_axis_y( Evas_Map* map, 
+		                            Elm_Fx_ResizableFlip* flip, 
+					    float degree )
 {
-	Elm_Fx_ScalableFlip* scalable_flip = data;
+	if( degree >= 90 || degree <= -90 ) {
+		evas_map_point_image_uv_set( map, 0, flip->from_size.x * 2+ flip->to_size.x, 
+				                     0 );
+		evas_map_point_image_uv_set( map, 1, 0,
+				                     0 );
+		evas_map_point_image_uv_set( map, 2, 0, 
+				                     flip->from_size.y * 2 + flip->to_size.y );
+		evas_map_point_image_uv_set( map, 3, flip->from_size.x * 2 + flip->to_size.x, 
+				                     flip->from_size.y * 2 + flip->to_size.y );
+	}else {
+		evas_map_point_image_uv_set( map, 0, 0,	0 );
+		evas_map_point_image_uv_set( map, 1, flip->from_size.x, 0 );
+		evas_map_point_image_uv_set( map, 2, flip->from_size.x, flip->from_size.y );
+		evas_map_point_image_uv_set( map, 3, 0, flip->to_size.y );
+	}
+}
+
+inline static void _set_image_uv_by_axis_x( Evas_Map* map, 
+					    Elm_Fx_ResizableFlip* flip, 
+					    float degree )
+{
+	if( degree >= 90 || degree <= -90 ) {
+
+		evas_map_point_image_uv_set( map, 0, 0, 
+				                     flip->from_size.y * 2 + flip->to_size.y );
+		evas_map_point_image_uv_set( map, 1, flip->from_size.x * 2 + flip->to_size.x, 
+				                     flip->from_size.y * 2 + flip->to_size.y );
+		evas_map_point_image_uv_set( map, 2, flip->from_size.x * 2 + flip->to_size.x, 
+						     0 );
+		evas_map_point_image_uv_set( map, 3, 0,
+						     0 );
+	}else {
+		evas_map_point_image_uv_set( map, 0, 0, 0 );
+		evas_map_point_image_uv_set( map, 1, flip->from_size.x, 0 );
+		evas_map_point_image_uv_set( map, 2, flip->from_size.x, flip->from_size.y );
+		evas_map_point_image_uv_set( map, 3, 0, flip->to_size.y );
+	}
+
+}
+
+
+
+static void _elm_fx_resizable_flip_op( void* data, Elm_Animator* animator, const double frame )
+{
+	Elm_Fx_ResizableFlip* resizable_flip = data;
 
 	Evas_Map* map = evas_map_new( 4 );
 
@@ -1323,7 +1373,7 @@ static void _elm_fx_scalable_flip_op( void* data, Elm_Animator* animator, const 
 
 	float degree;
 	
-	if( scalable_flip->cw == EINA_TRUE ) {
+	if( resizable_flip->cw == EINA_TRUE ) {
 		degree = (float) ( frame * 180 );
 	}else {
 		degree = (float) ( frame * -180 );
@@ -1332,49 +1382,42 @@ static void _elm_fx_scalable_flip_op( void* data, Elm_Animator* animator, const 
 	Evas_Object* obj;
 
 	if( degree < 90 && degree > -90 ) {
-		obj = scalable_flip->front;
-		evas_object_hide( scalable_flip->back );
-		evas_object_show( scalable_flip->front );
+		obj = resizable_flip->front;
+		evas_object_hide( resizable_flip->back );
+		evas_object_show( resizable_flip->front );
 	}else {
-		obj = scalable_flip->back;
-		evas_object_hide( scalable_flip->front );
-		evas_object_show( scalable_flip->back );
+		obj = resizable_flip->back;
+		evas_object_hide( resizable_flip->front );
+		evas_object_show( resizable_flip->back );
 	}
 	
 	evas_map_smooth_set( map, EINA_TRUE );
-	evas_map_util_points_populate_from_object_full( map, obj, scalable_flip->from + frame * scalable_flip->to );
 
-	Evas_Coord x, y, w, h;
-	evas_object_geometry_get( obj, &x, &y, &w, &h );
+	float x = resizable_flip->from_pos.x + resizable_flip->to_pos.x * frame; 
+	float y = resizable_flip->from_pos.y + resizable_flip->to_pos.y * frame;
+	float w = resizable_flip->from_size.y + resizable_flip->to_size.x * frame;
+	float h = resizable_flip->from_size.x + resizable_flip->to_size.y * frame;
 
-	Evas_Coord half_w = w / 2;
-	Evas_Coord half_h = h / 2;
+	evas_map_point_coord_set( map, 0, x, y, 0 ); 
+	evas_map_point_coord_set( map, 1, x + w, y, 0 );
+	evas_map_point_coord_set( map, 2, x + w, y + h, 0 );
+	evas_map_point_coord_set( map, 3, x, y + h, 0 );
 
-	if( scalable_flip->axis == ELM_FX_FLIP_AXIS_Y ) {
-		if( degree >= 90 || degree <= -90 ) {
-			evas_map_point_image_uv_set( map, 0, w, 0 );
-			evas_map_point_image_uv_set( map, 1, 0, 0 );
-			evas_map_point_image_uv_set( map, 2, 0, h );
-			evas_map_point_image_uv_set( map, 3, w, h );
-		}
-		evas_map_util_3d_rotate( map, 0, degree, 0, x + half_w, y + half_h, 
-				   scalable_flip->from+ frame * scalable_flip->to );
+	Evas_Coord half_w = (Evas_Coord) ( w / 2 );
+	Evas_Coord half_h = (Evas_Coord) ( h / 2 );
+
+	if( resizable_flip->axis == ELM_FX_FLIP_AXIS_Y ) {
+		_set_image_uv_by_axis_y( map, resizable_flip, degree );
+		evas_map_util_3d_rotate( map, 0, degree, 0, x + half_w, y + half_h, 0 );
 	}else {
-		if( degree >= 90 || degree <= -90 ) {
-			evas_map_point_image_uv_set( map, 0, 0, h );
-			evas_map_point_image_uv_set( map, 1, w, h );
-			evas_map_point_image_uv_set( map, 2, w, 0 );
-			evas_map_point_image_uv_set( map, 3, 0, 0 );
-		}
-
-		evas_map_util_3d_rotate( map, degree, 0, 0, x + half_w, y + half_h, 
-				   scalable_flip->from + frame * scalable_flip->to );
+		_set_image_uv_by_axis_x( map, resizable_flip, degree );
+		evas_map_util_3d_rotate( map, degree, 0, 0, x + half_w, y + half_h, 0 );
 	}
 
 	evas_map_util_3d_perspective( map, x + half_w, y + half_h, 0, 10000 );
 
-	evas_object_map_enable_set( scalable_flip->front, EINA_TRUE );
-	evas_object_map_enable_set( scalable_flip->back, EINA_TRUE );
+	evas_object_map_enable_set( resizable_flip->front, EINA_TRUE );
+	evas_object_map_enable_set( resizable_flip->back, EINA_TRUE );
 	evas_object_map_set( obj, map );
 	evas_map_free( map );
 
@@ -1387,27 +1430,21 @@ static void _elm_fx_scalable_flip_op( void* data, Elm_Animator* animator, const 
 /**
  * @ingroup Transit 
  *
- * Add ScalableFlip effect.  
+ * Add ResizbleFlip effect.  
  *
  * @param  front         Front surface object 
  * @param  back          Back surface object
  * @param  axis          Flipping Axis. X or Y  
  * @param  cw            Flipping Direction. EINA_TRUE is clock-wise
- * @param  from_rate     Scale rate when the effect begin (1 is current rate) 
- * @param  to_rate       Scale rate to be 
  * @return 		 Flip effect 
  */
-EAPI Elm_Effect* elm_fx_scalable_flip_add( Evas_Object* front, 
+EAPI Elm_Effect* elm_fx_resizable_flip_add( Evas_Object* front, 
 					  Evas_Object* back, 
 					  const Elm_Fx_Flip_Axis axis, 
-					  const Eina_Bool cw,
-					  float from_rate, 
-					  float to_rate )
+					  const Eina_Bool cw )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( front || back, NULL );
-	if( from_rate <= 0 ) from_rate = 0.001;
-	if( to_rate <= 0 ) to_rate = 0.001;
 #endif
 		
 	Elm_Effect* effect = calloc( 1, sizeof( Elm_Effect ) );
@@ -1417,25 +1454,39 @@ EAPI Elm_Effect* elm_fx_scalable_flip_add( Evas_Object* front,
 		return NULL;
 	}
 	
-	Elm_Fx_ScalableFlip* scalable_flip = calloc( 1, sizeof( Elm_Fx_ScalableFlip ) );
+	Elm_Fx_ResizableFlip* resizable_flip = calloc( 1, sizeof( Elm_Fx_ResizableFlip ) );
 
-	if( scalable_flip == NULL ) {
+	if( resizable_flip == NULL ) {
 		fprintf( stderr, "Failed to allocate Elm_Effect!\n" );
 		free( effect );
 		return NULL;
 	}
 
-	scalable_flip->front = front;
-	scalable_flip->back = back;
-	scalable_flip->cw = cw;
-	scalable_flip->axis = axis;
-	scalable_flip->from = ( 10000 - from_rate * 10000 ) * ( 1 / from_rate );
-	scalable_flip->to = (10000 - to_rate * 10000 ) * ( 1 / to_rate ) - scalable_flip->from;
+	resizable_flip->front = front;
+	resizable_flip->back = back;
+	resizable_flip->cw = cw;
+	resizable_flip->axis = axis;
 
-	effect->begin_op = _elm_fx_scalable_flip_begin;
-	effect->end_op = _elm_fx_scalable_flip_end;
-	effect->animation_op = _elm_fx_scalable_flip_op;
-	effect->user_data = scalable_flip;
+	Evas_Coord front_x, front_y, front_w, front_h;
+	evas_object_geometry_get( resizable_flip->front, &front_x, &front_y, &front_w, &front_h );
+
+	Evas_Coord back_x, back_y, back_w, back_h;
+	evas_object_geometry_get( resizable_flip->back, &back_x, &back_y, &back_w, &back_h );
+
+	resizable_flip->from_pos.x = front_x;
+	resizable_flip->from_pos.y = front_y;
+	resizable_flip->to_pos.x = back_x - front_x;
+	resizable_flip->to_pos.y = back_y - front_y;
+
+	resizable_flip->from_size.x = front_w;
+	resizable_flip->from_size.y = front_h;
+	resizable_flip->to_size.x = back_w - front_w;
+	resizable_flip->to_size.y = back_h - front_h;
+
+	effect->begin_op = _elm_fx_resizable_flip_begin;
+	effect->end_op = _elm_fx_resizable_flip_end;
+	effect->animation_op = _elm_fx_resizable_flip_op;
+	effect->user_data = resizable_flip;
 
 	return effect;
 }
