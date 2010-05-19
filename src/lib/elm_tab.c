@@ -26,7 +26,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-#include "elm_tab.h"
 #include "applog.h"
 
 #ifndef EAPI
