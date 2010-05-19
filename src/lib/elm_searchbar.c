@@ -38,12 +38,7 @@ static void _theme_hook(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 
-	/* Temp */
-	Elm_Theme *th = NULL;
-	th = elm_theme_new();
-
-
-	_elm_theme_set(th, wd->base, "searchbar", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->base, "searchbar", "base", elm_widget_style_get(obj));
 
 	if (wd->eb)
 		edje_object_part_swallow(wd->base, "btn_text", wd->eb);
@@ -163,11 +158,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
 	wd->base = edje_object_add(e);
 	if (wd->base == NULL) return NULL;
 
-	/* Temp */
-	Elm_Theme *th = NULL;
-	th = elm_theme_new();
-
-	_elm_theme_set(th, wd->base, "searchbar", "base", "default");
+	_elm_theme_object_set(obj, wd->base, "searchbar", "base", "default");
 
 //	evas_object_size_hint_weight_set(wd->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 //	evas_object_size_hint_align_set(wd->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
