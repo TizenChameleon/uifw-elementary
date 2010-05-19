@@ -391,6 +391,35 @@ if test "x$want_elementary_ethumb" = "xyes" -a "x$have_elementary_ethumb" = "xno
 fi
 AC_SUBST(ELM_ETHUMB_DEF)
 
+ELM_IMF_DEF="#undef"
+have_elementary_imf="no"
+want_elementary_imf="auto"
+AC_ARG_ENABLE([imf],
+   [AC_HELP_STRING([--disable-imf], [disable imf support. @<:@default=detect@:>@])],
+   [want_elementary_imf=$enableval], [])
+
+if test "x$want_elementary_imf" != "xno"; then
+    PKG_CHECK_MODULES([ELEMENTARY_IMF],
+       [
+        ecore-imf
+       ],
+       [
+        AC_DEFINE(HAVE_ELEMENTARY_IMF, 1, [Input Method Framework support for Elementary])
+        have_elementary_imf="yes"
+        ELM_IMF_DEF="#define"
+        requirement_elm="ecore-imf ${requirement_elm}"
+       ],
+       [have_elementary_imf="no"]
+    )
+else
+    have_elementary_imf="no"
+fi
+if test "x$want_elementary_imf" = "xyes" -a "x$have_elementary_imf" = "xno"; then
+    AC_MSG_ERROR([IMF support requested, but no ecore-imf found by pkg-config.])
+fi
+AC_SUBST(ELM_IMF_DEF)
+
+
 ELM_ALLOCA_H_DEF="#undef"
 AC_CHECK_HEADER(alloca.h, [ELM_ALLOCA_H_DEF="#define"])
 AC_SUBST(ELM_ALLOCA_H_DEF)
@@ -465,6 +494,7 @@ echo "    EDBus..............: ${have_elementary_edbus}"
 echo "    EFreet.............: ${have_elementary_efreet}"
 echo "    EWeather...........: ${have_elementary_eweather}"
 echo "    Ethumb.............: ${have_elementary_ethumb}"
+echo "    IMF................: ${have_elementary_imf}"
 echo
 echo "  edje_cc..............: ${edje_cc}"
 echo
