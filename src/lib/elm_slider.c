@@ -327,6 +327,8 @@ _drag_down(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSE
    edje_object_part_drag_step(wd->slider, "elm.dragable.slider", 0.05, 0.05);
 }
 
+static const char*widtype = NULL;
+
 /**
  * Add a new slider to the parent
  *
