@@ -1534,6 +1534,107 @@ extern "C" {
    EAPI void         elm_mapbuf_alpha_set(Evas_Object *obj, Eina_Bool alpha);
    EAPI Eina_Bool    elm_mapbuf_alpha_get(const Evas_Object *obj);
 
+   typedef struct _Picker_Item Elm_Picker_Item;
+   EAPI Evas_Object     *elm_picker_add(Evas_Object *parent);
+   EAPI void            elm_picker_next(Evas_Object *obj);
+   EAPI void            elm_picker_prev(Evas_Object *obj);
+   EAPI Elm_Picker_Item *elm_picker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Picker_Item *elm_picker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI const Eina_List *elm_picker_items_get(Evas_Object *obj);
+   EAPI Elm_Picker_Item *elm_picker_first_item_get(Evas_Object *obj);
+   EAPI Elm_Picker_Item *elm_picker_last_item_get(Evas_Object *obj);
+   EAPI Elm_Picker_Item *elm_picker_selected_item_get(Evas_Object *obj);
+   EAPI void             elm_picker_item_selected_set(Elm_Picker_Item *item);
+   EAPI void             elm_picker_item_del(Elm_Picker_Item *item);
+   EAPI const char      *elm_picker_item_label_get(Elm_Picker_Item *item);
+   EAPI void             elm_picker_item_label_set(Elm_Picker_Item *item, const char *label);
+   EAPI Elm_Picker_Item *elm_picker_item_prev(Elm_Picker_Item *item);
+   EAPI Elm_Picker_Item *elm_picker_item_next(Elm_Picker_Item *item);
+   /* smart callback called:
+    * "changed" - when picker selected item is changed
+    * "overflowed" - when picker item is changed to first item from last item
+    * "underflowed" - when picker item is changed to last item from first item.
+    */
+   /* available styles:
+    * default
+    * no_button
+    * timepicker/ampm
+    */
+
+   typedef struct _Picker2_Item Elm_Picker2_Item;
+   EAPI Evas_Object     *elm_picker2_add(Evas_Object *parent);
+   EAPI void		elm_picker2_row_height_set(Evas_Object *obj, unsigned int row_height);
+   EAPI void            elm_picker2_next(Evas_Object *obj);
+   EAPI void            elm_picker2_prev(Evas_Object *obj);
+   EAPI Elm_Picker2_Item *elm_picker2_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Picker2_Item *elm_picker2_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI const Eina_List *elm_picker2_items_get(Evas_Object *obj);
+   EAPI Elm_Picker2_Item *elm_picker2_first_item_get(Evas_Object *obj);
+   EAPI Elm_Picker2_Item *elm_picker2_last_item_get(Evas_Object *obj);
+   EAPI Elm_Picker2_Item *elm_picker2_selected_item_get(Evas_Object *obj);
+   EAPI void             elm_picker2_item_selected_set(Elm_Picker2_Item *item);
+   EAPI void             elm_picker2_item_del(Elm_Picker2_Item *item);
+   EAPI const char      *elm_picker2_item_label_get(Elm_Picker2_Item *item);
+   EAPI void             elm_picker2_item_label_set(Elm_Picker2_Item *item, const char *label);
+   EAPI Elm_Picker2_Item *elm_picker2_item_prev(Elm_Picker2_Item *item);
+   EAPI Elm_Picker2_Item *elm_picker2_item_next(Elm_Picker2_Item *item);
+   EAPI void             *elm_picker2_item_data_get(Elm_Picker2_Item *item);
+   EAPI void              elm_picker2_item_data_set(Elm_Picker2_Item *item, void *data);
+   EAPI Eina_Bool         elm_picker2_item_disabled_get(Elm_Picker2_Item *item);
+   EAPI void              elm_picker2_item_disabled_set(Elm_Picker2_Item *item, Eina_Bool disabled);
+    /* smart callback called:
+    * "selected" - when picker selected item is changed
+    * "overflowed" - when picker item is changed to first item from last item
+    * "underflowed" - when picker item is changed to last item from first item.
+    */
+   /* available styles:
+    * default
+    */
+
+   EAPI Evas_Object *elm_timepicker_add(Evas_Object *parent);
+   EAPI void         elm_timepicker_time_set(Evas_Object *obj, int hrs, int min, int sec);
+   EAPI void         elm_timepicker_time_get(Evas_Object *obj, int *hrs, int *min, int *sec);
+   EAPI void         elm_timepicker_show_am_pm_set(Evas_Object *obj, Eina_Bool am_pm);
+   EAPI void         elm_timepicker_show_seconds_set(Evas_Object *obj, Eina_Bool seconds);
+   /* smart callback called:
+    * "changed" - when timepicker selected item is changed
+    */
+   /* available styles:
+    * default
+    */
+
+   EAPI Evas_Object *elm_datepicker_add(Evas_Object *parent);
+   EAPI void         elm_datepicker_date_set(Evas_Object *obj, int year, int month, int day);
+   EAPI void         elm_datepicker_date_get(Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker_date_min_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
+   EAPI void         elm_datepicker_date_min_get(Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker_date_max_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
+   EAPI void         elm_datepicker_date_max_get(Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker_date_format_set(Evas_Object *obj, const char *fmt);
+   EAPI const char  *elm_datepicker_date_format_get(Evas_Object *obj);
+   /* smart callback called:
+    * "changed" - when datepicker selected item is changed
+    */
+   /* available styles:
+    * default
+    */
+
+   EAPI Evas_Object *elm_datepicker2_add(Evas_Object *parent);
+   EAPI void         elm_datepicker2_date_set(Evas_Object *obj, int year, int month, int day);
+   EAPI void         elm_datepicker2_date_get(Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker2_date_min_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
+   EAPI void         elm_datepicker2_date_min_get(Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker2_date_max_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
+   EAPI void         elm_datepicker2_date_max_get(Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker2_date_format_set(Evas_Object *obj, const char *fmt);
+   EAPI const char  *elm_datepicker2_date_format_get(Evas_Object *obj);
+   /* smart callback called:
+    * "changed" - when datepicker selected item is changed
+    */
+   /* available styles:
+    * default
+    */
+    
 
    /* Contextual Popup */
    typedef struct _Ctx_Popup_Item Elm_Ctxpopup_Item;
@@ -1689,8 +1790,6 @@ extern "C" {
    EAPI void elm_fx_transform_rotate( Elm_Fx_Matrix* m, const float rad_x, const float rad_y, const float rad_z );
    EAPI void elm_fx_transform_multiply( Elm_Fx_Matrix* m, Elm_Fx_Matrix* m1, Elm_Fx_Matrix* m2 );
    */
-
-
 
    /* NavigationBar */
    EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);

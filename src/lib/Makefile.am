@@ -76,6 +76,11 @@ elm_map.c \
 elm_flip.c \
 elm_conform.c \
 elm_mapbuf.c \
+elm_picker.c \
+elm_picker2.c \
+elm_timepicker.c \
+elm_datepicker.c \
+elm_datepicker2.c \
 elm_thumb.c \
 elm_config.c \
 elm_diskcontroller.c \
