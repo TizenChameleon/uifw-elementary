@@ -1538,9 +1538,15 @@ EAPI Eina_Bool elm_tab_edit_disable_get(Evas_Object *obj)
 {
 	Widget_Data *wd;
 
-	retvm_if(obj == NULL, -1, "Invalid argument: tab object is NULL\n");
+	if(obj == NULL) {
+		printf("Invalid argument: tab object is NULL\n");
+		return -1;
+	}
 	wd = elm_widget_data_get(obj);
-	retvm_if(wd == NULL, -1, "Cannot get smart data\n");
+	if(wd == NULL) {
+		printf("Cannot get smart data\n");
+		return -1;
+	}
 
 	return wd->edit_disable;
 }

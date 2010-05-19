@@ -26,8 +26,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-#include "applog.h"
-
 #ifndef EAPI
 #define EAPI __attribute__ ((visibility("default")))
 #endif
@@ -260,7 +258,8 @@ EAPI Evas_Object *elm_tab_add(Evas_Object *parent) {
 	// initialization
 	// edit box
 	wd->ebx = edje_object_add(wd->evas);
-	retv_if(wd->ebx == NULL, NULL);
+	if(wd->ebx == NULL)
+		return NULL;
 	_elm_theme_object_set(obj, wd->ebx, "tab", "dim", "default");
 	evas_object_resize(wd->ebx, wd->w, wd->h);
 	evas_object_move(wd->ebx, wd->x, wd->y);
@@ -388,21 +387,33 @@ EAPI Elm_Tab_Item *elm_tab_item_add(Evas_Object *obj, Evas_Object *icon, const c
 	Elm_Tab_Item *it;
 	Widget_Data *wd;
 
-	retvm_if(obj == NULL, NULL, "Invalid argument: tab object is NULL\n");
+	if(obj == NULL) {
+		printf("Invalid argument: tab object is NULL\n");
+		return NULL;
+	}
 	wd = elm_widget_data_get(obj);
-	retvm_if(wd == NULL, NULL, "Cannot get smart data\n");
+	if(wd == NULL) {
+		printf("Cannot get smart data\n");
+		return NULL;
+	}
 
 	it = ELM_NEW(Elm_Tab_Item);
-    retvm_if(it == NULL, NULL, "Cannot add item");
-    wd->items = eina_list_append(wd->items, it);
-    it->obj = obj;
-    it->label = eina_stringshare_add(label);
-    it->icon = icon;
-    it->badge = 0;
-    it->func = func;
-    it->data = data;
+	if(it == NULL) {
+		printf("Cannot add item");
+		return NULL;
+	}
+	wd->items = eina_list_append(wd->items, it);
+	it->obj = obj;
+	it->label = eina_stringshare_add(label);
+	it->icon = icon;
+	it->badge = 0;
+	it->func = func;
+	it->data = data;
 	it->base = edje_object_add(evas_object_evas_get(obj));
-	retvm_if(it->base == NULL, NULL, "Cannot load bg edj\n");
+	if(it->base == NULL) {
+		printf("Cannot load bg edj\n");
+		return NULL;
+	}
 	_elm_theme_object_set(obj, it->base, "tab", "item", elm_widget_style_get(obj));
 	elm_widget_sub_object_add(obj, it->base);
 
@@ -413,9 +424,9 @@ EAPI Elm_Tab_Item *elm_tab_item_add(Evas_Object *obj, Evas_Object *icon, const c
 	}
 
 	if (it->icon){
-//		int ms = 0;
+		//		int ms = 0;
 
-//		ms = ((double)wd->icon_size * _elm_config->scale);
+		//		ms = ((double)wd->icon_size * _elm_config->scale);
 		evas_object_size_hint_min_set(it->icon, 24, 24);
 		evas_object_size_hint_max_set(it->icon, 40, 40);
 		edje_object_part_swallow(it->base, "elm.swallow.icon", it->icon);
@@ -761,9 +772,16 @@ EAPI Eina_Bool elm_tab_edit_disable_get(Evas_Object *obj)
 {
 	Widget_Data *wd;
 
-	retvm_if(obj == NULL, -1, "Invalid argument: tab object is NULL\n");
+	if(obj == NULL) {
+		printf("Invalid argument: tab object is NULL\n");
+		return -1;
+	}
+
 	wd = elm_widget_data_get(obj);
-	retvm_if(wd == NULL, -1, "Cannot get smart data\n");
+	if(wd == NULL) {
+		printf("Cannot get smart data\n");
+		return -1;
+	}
 
 	return wd->edit_disable;
 }
