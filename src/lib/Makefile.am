@@ -88,7 +88,7 @@ elm_editfield.c \
 elm_colorpicker.c \
 elm_colorpalette.c \
 elm_ctxpopup.c \
-elm_actiosheet.c \
+elm_actionsheet.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
