@@ -83,6 +83,8 @@ elm_datepicker.c \
 elm_datepicker2.c \
 elm_thumb.c \
 elm_config.c \
+elm_titlebar.c \
+elm_popup.c \
 elm_diskcontroller.c \
 elm_tab.c \
 elm_navigationbar.c \
