@@ -316,10 +316,15 @@ EAPI void elm_tab_set(Evas_Object *obj, int mode)
 	const Eina_List *l;
 	Elm_Tab_Item *item;
 
-	retm_if(obj == NULL, "Invalid argument: tab object is NULL\n");
+	if(obj == NULL) {
+		printf("Invalid argument: tab object is NULL\n");
+		return;
+	}
 	wd = elm_widget_data_get(obj);
-	retm_if(wd == NULL, "Cannot get smart data\n");
-
+	if(wd == NULL) {
+		printf("Cannot get smart data\n");
+		return;
+	}
 
 	EINA_LIST_FOREACH(wd->items, l, item){
 		edje_object_part_unswallow(wd->edje, item->base);
@@ -337,7 +342,11 @@ EAPI void elm_tab_set(Evas_Object *obj, int mode)
 		snprintf(buf, sizeof(buf), "bg_landscape_%d", mode - LANDSCAPE_GAP);
 	}
 	wd->edje = edje_object_add(wd->evas);
-	retm_if(wd->edje == NULL, "Cannot load bg edj\n");
+	if(wd->edje == NULL) {
+		printf("Cannot load bg edj\n");
+		return;
+	}
+
 	_elm_theme_object_set(obj, wd->edje, "tab", buf, elm_widget_style_get(obj));
 
 	evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_MOUSE_DOWN,  press_down_cb, wd);
@@ -464,9 +473,15 @@ EAPI void elm_tab_item_del(Elm_Tab_Item *it)
 	const Eina_List *l;
 	Elm_Tab_Item *item;
 
-	retm_if(it->obj == NULL, "Invalid argument: tab object is NULL\n");
+	if(it->obj == NULL) {
+		printf("Invalid argument: tab object is NULL\n");
+		return;
+	}
 	wd = elm_widget_data_get(it->obj);
-	retm_if(wd == NULL, "Cannot get smart data\n");
+	if(wd == NULL) {
+		printf("Cannot get smart data\n");
+		return;
+	}
 
 	edje_object_part_unswallow(wd->edje, it->base);
 
@@ -730,9 +745,15 @@ EAPI void elm_tab_move(Evas_Object *obj, int direction)
 {
 	Widget_Data *wd;
 
-	retm_if(obj == NULL, "Invalid argument: tab object is NULL\n");
+	if(obj == NULL) {
+		printf("Invalid argument: tab object is NULL\n");
+		return;
+	}
 	wd = elm_widget_data_get(obj);
-	retm_if(wd == NULL, "Cannot get smart data\n");
+	if(wd == NULL) {
+		printf("Cannot get smart data\n");
+		return;
+	}
 
 	if(direction == ELM_TAB_MOVE_LEFT){
 		_move_obj_to_left(wd);
@@ -753,9 +774,15 @@ EAPI void elm_tab_edit_disable_set(Evas_Object *obj, Eina_Bool disable)
 {
 	Widget_Data *wd;
 
-	retm_if(obj == NULL, "Invalid argument: tab object is NULL\n");
+	if(obj == NULL) {
+		printf("Invalid argument: tab object is NULL\n");
+		return;
+	}
 	wd = elm_widget_data_get(obj);
-	retm_if(wd == NULL, "Cannot get smart data\n");
+	if(wd == NULL) {
+		printf("Cannot get smart data\n");
+		return;
+	}
 
 	wd->edit_disable = disable;
 }
