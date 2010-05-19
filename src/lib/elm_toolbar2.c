@@ -271,7 +271,7 @@ EAPI Evas_Object *elm_toolbar2_add(Evas_Object *parent)
 
    wd->scr = elm_smart_scroller_add(e);
    elm_smart_scroller_bounce_allow_set(wd->scr, 0, 0);
-   elm_smart_scroller_theme_set(wd->scr, "toolbar2", "base", "default");
+   elm_smart_scroller_object_theme_set(obj, wd->scr, "toolbar2", "base", "default");
    elm_widget_resize_object_set(obj, wd->scr);
    elm_smart_scroller_policy_set(wd->scr,
 				 ELM_SMART_SCROLLER_POLICY_AUTO,
