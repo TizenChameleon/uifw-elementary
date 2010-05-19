@@ -1218,9 +1218,11 @@ static void press_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_in
 void tab_item_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
 	Elm_Tab_Item *it = (Elm_Tab_Item *)data;
-	ret_if(it->obj == NULL);
+	if(it->obj == NULL)
+		return;
 	Widget_Data *wd = elm_widget_data_get(it->obj);
-	ret_if(wd == NULL);
+	if(wd == NULL)
+		return;
 
 	if(wd->time > KEYDOWN_INTERVAL) return;
 	_selected_box(it);
