@@ -12,14 +12,14 @@
  * Elementary API.
  */
 
-@ELM_UNIX_DEF@ ELM_UNIX
-@ELM_WIN32_DEF@ ELM_WIN32
-@ELM_WINCE_DEF@ ELM_WINCE
-@ELM_EDBUS_DEF@ ELM_EDBUS
-@ELM_EFREET_DEF@ ELM_EFREET
-@ELM_ETHUMB_DEF@ ELM_ETHUMB
-@ELM_ALLOCA_H_DEF@ ELM_ALLOCA_H
-@ELM_LIBINTL_H_DEF@ ELM_LIBINTL_H
+#define ELM_UNIX
+#undef ELM_WIN32
+#undef ELM_WINCE
+#define ELM_EDBUS
+#define ELM_EFREET
+#define ELM_ETHUMB
+#define ELM_ALLOCA_H
+#define ELM_LIBINTL_H
 
 /* Standard headers for standard system calls etc. */
 #include <stdio.h>
