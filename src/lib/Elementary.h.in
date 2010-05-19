@@ -335,6 +335,8 @@ extern "C" {
    EAPI void         elm_win_quickpanel_priority_minor_set(Evas_Object *obj, int priority);
    EAPI int          elm_win_quickpanel_priority_minor_get(const Evas_Object *obj);
    EAPI void         elm_win_quickpanel_zone_set(Evas_Object *obj, int zone);
+   EAPI void         elm_win_indicator_state_set(Evas_Object *obj, int show_state);
+   EAPI int          elm_win_indicator_state_get(Evas_Object *obj);
 
    /*...
     * ecore_x_icccm_hints_set -> accepts_focus (add to ecore_evas)
