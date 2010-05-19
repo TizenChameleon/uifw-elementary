@@ -33,14 +33,19 @@
 #define EAPI __attribute__ ((visibility("default")))
 #endif
 
+#define MAX_ITEM 8
+#define BASIC_SLOT_NUMBER 3
+#define KEYDOWN_INTERVAL	0.6
+
 #define PORTRAIT		0
 #define LANDSCAPE		1
-
 #define LANDSCAPE_GAP   10
 
 #define MAX_ARGS	512
 
 #define _EDJ(x) (Evas_Object *)elm_layout_edje_get(x)
+#define ELM_MAX(v1, v2)    (((v1) > (v2)) ? (v1) : (v2))
+
 
 // internal data structure of tab object
 typedef struct _Widget_Data Widget_Data;
