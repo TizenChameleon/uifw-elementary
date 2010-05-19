@@ -86,7 +86,7 @@ _theme_hook(Evas_Object *obj)
 	if (!wd)
 		return;
 
-	_elm_theme_set(wd->lay, "colorpalette", "bg", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->lay, "colorpalette", "bg", elm_widget_style_get(obj));
 	_color_table_update(obj, wd->row, wd->col, wd->num, wd->color);
 	_sizing_eval(obj);
 
@@ -333,7 +333,7 @@ static void _color_table_update(Evas_Object *obj, int row, int col, int color_nu
 
 				if (count < color_num){
 					cr =  edje_object_add(e);
-					_elm_theme_set(cr, "colorpalette", "base", "color");
+					_elm_theme_object_set(obj, cr, "colorpalette", "base", "color");
 					evas_object_color_set(cr, color[count].r, color[count].g, color[count].b, 255);
 					evas_object_size_hint_weight_set(cr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 					evas_object_size_hint_align_set(cr, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -387,7 +387,7 @@ EAPI Evas_Object *elm_colorpalette_add(Evas_Object *parent)
 	wd->parent = parent;
 	/* load background edj */
 	wd->lay = edje_object_add(e);
-	 _elm_theme_set(wd->lay, "colorpalette", "bg", "default");
+	 _elm_theme_object_set(obj, wd->lay, "colorpalette", "bg", "default");
 
 	evas_object_size_hint_weight_set(wd->lay, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	if(wd->lay == NULL) {

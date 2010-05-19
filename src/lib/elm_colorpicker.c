@@ -120,7 +120,7 @@ _theme_hook(Evas_Object *obj)
 		return;
 	}
 
-	_elm_theme_set(wd->lay, "colorpicker", "bg", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->lay, "colorpicker", "bg", elm_widget_style_get(obj));
 
 	for( i=0 ; i<3 ; i++)
 	{
@@ -694,7 +694,7 @@ static void _add_colorbar(Evas_Object* obj)
 
 		/* load colorbar area */
 		wd->cp[i]->colorbar =  edje_object_add(e);
-		_elm_theme_set(wd->cp[i]->colorbar, "colorpicker", "base", "default");
+		_elm_theme_object_set(obj, wd->cp[i]->colorbar, "colorpicker", "base", "default");
 		snprintf(colorbar_name, sizeof(colorbar_name), "colorbar_%d", i);
 		edje_object_signal_callback_add(wd->cp[i]->colorbar, "drag", "*", _arrow_cb, wd->cp[i]);
 		edje_object_part_swallow(wd->lay, colorbar_name, wd->cp[i]->colorbar);
@@ -702,7 +702,7 @@ static void _add_colorbar(Evas_Object* obj)
 
 		/* load colorbar image */
 		wd->cp[i]->bar = edje_object_add(e);
-		_elm_theme_set(wd->cp[i]->bar, "colorpicker", "image", colorbar_name);
+		_elm_theme_object_set(obj, wd->cp[i]->bar, "colorpicker", "image", colorbar_name);
 		evas_object_show(wd->cp[i]->bar);
 		edje_object_part_swallow(wd->cp[i]->colorbar, "bar", wd->cp[i]->bar);
 
@@ -723,7 +723,7 @@ static void _add_colorbar(Evas_Object* obj)
 		}
 		/* load arrow image, pointing the colorbar */
 		wd->cp[i]->arrow = edje_object_add(e);
-		_elm_theme_set(wd->cp[i]->arrow, "colorpicker", "image", "updown");
+		_elm_theme_object_set(obj, wd->cp[i]->arrow, "colorpicker", "image", "updown");
 		evas_object_show(wd->cp[i]->arrow);
 		edje_object_part_swallow(wd->cp[i]->colorbar, "arrow", wd->cp[i]->arrow);
 
@@ -734,7 +734,7 @@ static void _add_colorbar(Evas_Object* obj)
 
 		/* load left button */
 		wd->cp[i]->lbt = edje_object_add(e);
-		_elm_theme_set(wd->cp[i]->lbt, "colorpicker", "button", "left");
+		_elm_theme_object_set(obj, wd->cp[i]->lbt, "colorpicker", "button", "left");
 		evas_object_event_callback_add(wd->cp[i]->lbt, EVAS_CALLBACK_MOUSE_DOWN, _left_button_down_cb, wd->cp[i]);
 		evas_object_event_callback_add(wd->cp[i]->lbt, EVAS_CALLBACK_MOUSE_UP, _left_button_up_cb, wd->cp[i]);
 		evas_object_show(wd->cp[i]->lbt);
@@ -742,7 +742,7 @@ static void _add_colorbar(Evas_Object* obj)
 
 		/* load right button */
 		wd->cp[i]->rbt = edje_object_add(e);
-		_elm_theme_set(wd->cp[i]->rbt, "colorpicker", "button", "right");
+		_elm_theme_object_set(obj, wd->cp[i]->rbt, "colorpicker", "button", "right");
 		evas_object_event_callback_add(wd->cp[i]->rbt, EVAS_CALLBACK_MOUSE_DOWN, _right_button_down_cb, wd->cp[i]);
 		evas_object_event_callback_add(wd->cp[i]->rbt, EVAS_CALLBACK_MOUSE_UP, _right_button_up_cb, wd->cp[i]);
 		evas_object_show( wd->cp[i]->rbt);
@@ -778,7 +778,7 @@ EAPI Evas_Object *elm_colorpicker_add(Evas_Object *parent)
 
 	/* load background edj */
 	wd->lay = edje_object_add(e);
-	_elm_theme_set(wd->lay, "colorpicker", "bg", "default");
+	_elm_theme_object_set(obj, wd->lay, "colorpicker", "bg", "default");
 
 	evas_object_size_hint_weight_set(wd->lay, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	if(wd->lay == NULL) {
