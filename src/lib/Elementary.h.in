@@ -18,6 +18,7 @@
 @ELM_EDBUS_DEF@ ELM_EDBUS
 @ELM_EFREET_DEF@ ELM_EFREET
 @ELM_ETHUMB_DEF@ ELM_ETHUMB
+@ELM_IMF_DEF@ ELM_IMF
 @ELM_ALLOCA_H_DEF@ ELM_ALLOCA_H
 @ELM_LIBINTL_H_DEF@ ELM_LIBINTL_H
 
@@ -85,6 +86,11 @@
 #ifdef ELM_ETHUMB
 # include <Ethumb_Client.h>
 #endif
+
+#ifdef ELM_IMF
+# include <Ecore_IMF.h>
+#endif
+
 
 #ifdef EAPI
 # undef EAPI
@@ -329,6 +335,8 @@ extern "C" {
    EAPI void         elm_win_quickpanel_priority_minor_set(Evas_Object *obj, int priority);
    EAPI int          elm_win_quickpanel_priority_minor_get(const Evas_Object *obj);
    EAPI void         elm_win_quickpanel_zone_set(Evas_Object *obj, int zone);
+   EAPI void         elm_win_indicator_state_set(Evas_Object *obj, int show_state);
+   EAPI int          elm_win_indicator_state_get(Evas_Object *obj);
 
    /*...
     * ecore_x_icccm_hints_set -> accepts_focus (add to ecore_evas)
@@ -506,6 +514,11 @@ extern "C" {
    EAPI Eina_Bool    elm_label_line_wrap_get(const Evas_Object *obj);
    EAPI void         elm_label_wrap_width_set(Evas_Object *obj, Evas_Coord w);
    EAPI Evas_Coord   elm_label_wrap_width_get(const Evas_Object *obj);
+   EAPI void         elm_label_fontsize_set(Evas_Object *obj, const int fontsize);
+   EAPI void         elm_label_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
+   EAPI void         elm_label_text_align_set(Evas_Object *obj, char *alignmode);
+   EAPI void         elm_label_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
+   EAPI void         elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis);
    /* available styles:
     * default
     * marker
@@ -733,6 +746,15 @@ extern "C" {
    EAPI void         elm_entry_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data);
    EAPI char        *elm_entry_markup_to_utf8(const char *s);
    EAPI char        *elm_entry_utf8_to_markup(const char *s);
+
+   EAPI void	     elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on);
+   EAPI void	     elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
+#ifdef ELM_IMF
+   EAPI const Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj);
+#else
+   EAPI void        *elm_entry_imf_context_get(Evas_Object *obj);
+#endif
+
    /* smart callbacks called:
     * "changed" - the text content changed
     * "selection,start" - the user started selecting text
@@ -1158,7 +1180,8 @@ extern "C" {
    EAPI void         elm_pager_content_promote(Evas_Object *obj, Evas_Object *content);
    EAPI Evas_Object *elm_pager_content_bottom_get(const Evas_Object *obj);
    EAPI Evas_Object *elm_pager_content_top_get(const Evas_Object *obj);
-   /* available item styles:
+   EAPI void         elm_pager_animation_set(Evas_Object *obj, Eina_Bool animation);
+  /* available item styles:
     * default
     * fade
     * fade_translucide

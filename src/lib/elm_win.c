@@ -1563,6 +1563,52 @@ elm_win_quickpanel_zone_set(Evas_Object *obj, int zone)
 #endif
 }
 
+EAPI void
+elm_win_indicator_state_set(Evas_Object *obj, int show_state)
+{
+   Elm_Win *win;
+   if (strcmp(elm_widget_type_get(obj), "win")) return;
+   win = elm_widget_data_get(obj);
+   if (!win) return;
+   _elm_win_xwindow_get(win);
+#ifdef HAVE_ELEMENTARY_X
+   if (win->xwin)
+      return ecore_x_window_prop_property_set (win->xwin,
+                   ECORE_X_ATOM_E_ILLUME_INDICATOR_STATE, ECORE_X_ATOM_CARDINAL, 32, &show_state, 1);
+#endif
+   return;
+}
+
+EAPI int
+elm_win_indicator_state_get(Evas_Object *obj)
+{
+   Elm_Win *win;
+   if (strcmp(elm_widget_type_get(obj), "win")) return -1;
+   win = elm_widget_data_get(obj);
+   if (!win) return -1;
+   _elm_win_xwindow_get(win);
+#ifdef HAVE_ELEMENTARY_X
+   if (win->xwin)
+     {
+        int ret;
+        int count;
+        int show = -1;
+        unsigned int *prop_data = NULL;
+
+        ret = ecore_x_window_prop_property_get (win->xwin,
+                    ECORE_X_ATOM_E_ILLUME_INDICATOR_STATE, ECORE_X_ATOM_CARDINAL, 32, &prop_data, &count);
+        if( ret && prop_data )
+           memcpy (&show, prop_data, sizeof (int));
+
+        if (prop_data) free (prop_data);
+
+        return show;
+     }
+#endif
+   return -1;
+}
+
+
 typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
