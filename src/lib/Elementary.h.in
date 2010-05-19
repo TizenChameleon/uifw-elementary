@@ -1751,6 +1751,18 @@ extern "C" {
    EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj);
    EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag);
 
+   /* actionsheet */
+   typedef enum _Elm_Actionsheet_Button_Type {
+      ELM_ACTIONSHEET_BT_NORMAL = 0,
+      ELM_ACTIONSHEET_BT_CANCEL,
+      ELM_ACTIONSHEET_BT_DESTRUCTIVE
+   } Elm_Actionsheet_Button_Type;
+
+   EAPI Evas_Object *elm_actionsheet_add(Evas_Object *parent);
+   EAPI void elm_actionsheet_title_set(Evas_Object *obj, const char *title);
+   EAPI void elm_actionsheet_button_add(Evas_Object *obj, const Elm_Actionsheet_Button_Type type, const char *title, void (*button_clicked_cb) (void *data, Evas_Object *obj, void *event_info), void *event_info);
+   EAPI int elm_actionsheet_button_title_get(Evas_Object *obj, const int index, char **title);
+
    /* Toolbar 2 */
    typedef struct _Elm_Toolbar2_Item Elm_Toolbar2_Item;
    EAPI Evas_Object *elm_toolbar2_add(Evas_Object *parent);
