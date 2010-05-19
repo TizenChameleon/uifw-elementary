@@ -100,6 +100,7 @@ elm_ctxpopup.c \
 elm_actionsheet.c \
 elm_gridbox.c \
 elm_softkey.c \
+elm_actionslider.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \

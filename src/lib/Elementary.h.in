@@ -2032,7 +2032,36 @@ extern "C" {
    EAPI Eina_List *elm_gridbox_children_get(Evas_Object *obj);
    EAPI void elm_gridbox_homogenous_padding_set(Evas_Object *obj, Eina_Bool homogenous);
 
+   /* actionslider */                        
+   typedef enum _Elm_Actionslider_Indicator_Pos  
+   {                                         
+      ELM_ACTIONSLIDER_INDICATOR_LEFT,
+      ELM_ACTIONSLIDER_INDICATOR_RIGHT,
+      ELM_ACTIONSLIDER_INDICATOR_CENTER
+   } Elm_Actionslider_Indicator_Pos; 
+   typedef enum _Elm_Actionslider_Magnet_Pos
+   {
+      ELM_ACTIONSLIDER_MAGNET_LEFT,
+      ELM_ACTIONSLIDER_MAGNET_RIGHT,
+      ELM_ACTIONSLIDER_MAGNET_BOTH,
+      ELM_ACTIONSLIDER_MAGNET_CENTER
+   } Elm_Actionslider_Magnet_Pos;
+   typedef enum _Elm_Actionslider_Label_Pos
+   {
+      ELM_ACTIONSLIDER_LABEL_LEFT,
+      ELM_ACTIONSLIDER_LABEL_RIGHT,
+      ELM_ACTIONSLIDER_LABEL_CENTER
+   } Elm_Actionslider_Label_Pos;
 
+   EAPI Evas_Object *elm_actionslider_add(Evas_Object *parent);
+   EAPI void elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_Pos pos);
+   EAPI void elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos pos);
+   EAPI int elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, const char *label);
+   EAPI int elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag);
+   /* smart callbacks called:
+    * "indicator,position" - when a button reaches to the special position like "left", "right" and "center".
+    */
+ 
 #ifdef __cplusplus
 }
 #endif
