@@ -62,6 +62,8 @@ elm_slider.c \
 elm_genlist.c \
 elm_check.c \
 elm_radio.c \
+elm_segment_control.c \
+elm_pagecontrol.c \
 elm_pager.c \
 elm_progressbar.c \
 elm_separator.c \

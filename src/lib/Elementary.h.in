@@ -428,10 +428,19 @@ extern "C" {
    EAPI void         elm_box_unpack_all(Evas_Object *obj);
    /* smart callbacks called:
     */
+	typedef enum {
+	   UIControlStateDefault,
+	   UIControlStateHighlighted,
+	   UIControlStateDisabled,
+	   UIControlStateFocused,
+	   UIControlStateReserved
+	}UIControlState;
 
    EAPI Evas_Object *elm_button_add(Evas_Object *parent);
    EAPI void         elm_button_label_set(Evas_Object *obj, const char *label);
+   EAPI void         elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlState state);
    EAPI const char  *elm_button_label_get(const Evas_Object *obj);
+   EAPI const char  *elm_button_label_get_for_state(const Evas_Object *obj, UIControlState state);
    EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon);
    EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj);
    EAPI void         elm_button_autorepeat_set(Evas_Object *obj, Eina_Bool on);
@@ -1173,7 +1182,22 @@ extern "C" {
    EAPI void         elm_radio_value_set(Evas_Object *obj, int value);
    EAPI int          elm_radio_value_get(const Evas_Object *obj);
    EAPI void         elm_radio_value_pointer_set(Evas_Object *obj, int *valuep);
+   typedef struct _Elm_Segment_Item Elm_Segment_Item;
+   EAPI Evas_Object *elm_segment_control_add(Evas_Object *parent);
+   EAPI Elm_Segment_Item * elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate);
+   EAPI void		 elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate);
+   EAPI Evas_Object *elm_segment_control_get_segment_at(Evas_Object *obj, unsigned int index);
+   EAPI void		 elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate);
+   EAPI void		 elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate);
+   EAPI const char  *elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index);
+   EAPI Evas_Object *elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index);
+   EAPI Elm_Segment_Item *elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value);
+   EAPI int         elm_segment_control_get_segment_count(Evas_Object *obj);
 
+   EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
+   EAPI void		elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count);
+   EAPI	void 		elm_page_control_page_id_set(Evas_Object *obj, unsigned int page_id);
+   EAPI unsigned int elm_page_control_page_id_get(Evas_Object *obj);
    EAPI Evas_Object *elm_pager_add(Evas_Object *parent);
    EAPI void         elm_pager_content_push(Evas_Object *obj, Evas_Object *content);
    EAPI void         elm_pager_content_pop(Evas_Object *obj);
