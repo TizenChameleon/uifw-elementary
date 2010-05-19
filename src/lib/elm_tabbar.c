@@ -260,10 +260,10 @@ _theme_hook(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 
-	_elm_theme_set(wd->edje, "tab", buf, elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->edje, "tab", buf, elm_widget_style_get(obj));
 
 	EINA_LIST_FOREACH(wd->items, l, item){
-		_elm_theme_set(item->base, "tab", "item", elm_widget_style_get(item->obj));
+		_elm_theme_object_set(obj, item->base, "tab", "item", elm_widget_style_get(item->obj));
 		if (item->label){
 			edje_object_part_text_set(item->base, "elm.text", item->label);
 		}
@@ -1075,7 +1075,7 @@ EAPI Evas_Object *elm_tabbar_add(Evas_Object *parent) {
 	wd->edit_mode = EINA_FALSE;
 
 	wd->view = edje_object_add(wd->evas);
-	_elm_theme_set(wd->view, "tabbar", "view", "default");
+	_elm_theme_object_set(obj, wd->view, "tabbar", "view", "default");
 	if(wd->view == NULL) {
 		printf("Cannot load bg edj\n");
 		return NULL;
@@ -1084,7 +1084,7 @@ EAPI Evas_Object *elm_tabbar_add(Evas_Object *parent) {
 
 	// edit box
 	wd->edit_box = edje_object_add(wd->evas);
-	_elm_theme_set(wd->edit_box, "tabbar", "edit_box", "default");
+	_elm_theme_object_set(obj, wd->edit_box, "tabbar", "edit_box", "default");
 	if(wd->edit_box == NULL) {
 		printf("Cannot load bg edj\n");
 		return NULL;
@@ -1104,7 +1104,7 @@ EAPI Evas_Object *elm_tabbar_add(Evas_Object *parent) {
 	/* load background edj */
 	wd->edje = edje_object_add(wd->evas);
 //	snprintf(buf, sizeof(buf), "bg_portrait_%d", wd->view_slot_num);
-	_elm_theme_set(wd->edje, "tabbar", "base", "default");
+	_elm_theme_object_set(obj, wd->edje, "tabbar", "base", "default");
 	if(wd->edje == NULL) {
 		printf("Cannot load bg edj\n");
 		return NULL;
