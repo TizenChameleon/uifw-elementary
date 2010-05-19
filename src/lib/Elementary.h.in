@@ -1512,6 +1512,25 @@ extern "C" {
    EAPI Eina_Bool    elm_mapbuf_alpha_get(const Evas_Object *obj);
 
 
+   /* Contextual Popup */
+   typedef struct _Ctx_Popup_Item Elm_Ctxpopup_Item;
+
+   EAPI Evas_Object* elm_ctxpopup_add(Evas_Object* parent);
+   EAPI void elm_ctxpopup_horizontal_set(Evas_Object* obj, Eina_Bool horizontal);
+   EAPI Eina_Bool elm_ctxpopup_horizontal_get(Evas_Object* obj);
+   EAPI void elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item* item, Evas_Object* icon);
+   EAPI void elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item* item, const char* label);
+   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_icon_add( Evas_Object* obj, Evas_Object* icon, void (*func ) (void* data, Evas_Object* obj, void* event_info ),	const void* data ); 
+   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_label_add( Evas_Object* obj, const char* label,	void (*func ) (void* data, Evas_Object* obj, void* event_info ), const void* data );
+   EAPI void elm_ctxpopup_item_del(Elm_Ctxpopup_Item* item);
+   EAPI void elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item* item, Eina_Bool disabled);
+   EAPI void elm_ctxpopup_clear(Evas_Object* obj);
+   EAPI const char* elm_ctxpopup_item_label_get( Elm_Ctxpopup_Item* item );	
+   EAPI Evas_Object* elm_ctxpopup_item_icon_get( Elm_Ctxpopup_Item* item ); 
+   EAPI void elm_ctxpopup_scroller_disabled_set(Evas_Object* obj, Eina_Bool disabled );
+
+
+
 /* Tab */
    typedef enum _Elm_Tab_Move_Type
      {
@@ -1552,6 +1571,29 @@ extern "C" {
    EAPI Eina_Bool elm_tab_edit_disable_get(Evas_Object *obj);
 
 
+   /* animator */
+   typedef struct _animator Elm_Animator;
+
+   typedef enum { ELM_ANIMATOR_CURVE_LINEAR, ELM_ANIMATOR_CURVE_IN_OUT, ELM_ANIMATOR_CURVE_IN, ELM_ANIMATOR_CURVE_OUT } Elm_Animator_Curve_Style; 
+
+   EAPI Elm_Animator* elm_animator_add( Evas_Object* parent );
+   EAPI void elm_animator_del( Elm_Animator* animator );
+   EAPI void elm_animator_duration_set( Elm_Animator* animator, const double duration );
+   EAPI void elm_animator_operation_callback_set( Elm_Animator* animator, void (*op)(void*, Elm_Animator*, const double), void* data ); 
+   EAPI void elm_animator_completion_callback_set( Elm_Animator* animator, void (*op)(void*), void* data );
+   EAPI void elm_animator_operation_set( Elm_Animator* animator, void (*op)(void*, Elm_Animator*, const double), void* data ) __attribute__((deprecated));
+   EAPI void elm_animator_completion_set( Elm_Animator* animator, void (*op)(void*), void* data ) __attribute__((deprecated));
+   EAPI void elm_animator_stop( Elm_Animator* animator );
+   EAPI void elm_animator_repeat_set( Elm_Animator* animator, const unsigned int repeat_cnt );
+   EAPI void elm_animator_animate( Elm_Animator* animator );
+   EAPI void elm_animator_curve_style_set( Elm_Animator* animator, Elm_Animator_Curve_Style cs );
+   EAPI void elm_animator_auto_reverse_set( Elm_Animator* animator, Eina_Bool reverse );
+   EAPI Eina_Bool elm_animator_auto_reverse_get( Elm_Animator* animator );
+   EAPI Eina_Bool elm_animator_operating_get( Elm_Animator* animator );
+   EAPI unsigned int elm_animator_repeat_get( Elm_Animator* animator );
+
+   
+
   /*tansit*/
    typedef struct _transit Elm_Transit;
    typedef struct _effect Elm_Effect;
@@ -1571,6 +1613,60 @@ extern "C" {
    EAPI Eina_Bool elm_transit_fx_insert( Elm_Transit* transit, Elm_Effect* effect );
    EAPI void elm_transit_fx_clear( Elm_Transit* transit );
    EAPI Eina_Bool elm_transit_event_block_disabled_get( Elm_Transit* transit );
+
+   /*Translation FX*/  
+   EAPI Elm_Effect* elm_fx_translation_add( Evas_Object* obj, const Evas_Coord from_x, const Evas_Coord from_y, const Evas_Coord to_x,  const Evas_Coord to_y );
+
+   /*Transfer FX*/  
+   //Please Use Translation FX
+   EAPI Elm_Effect* elm_fx_transfer_add( Evas_Object* obj, const Evas_Coord from_x, const Evas_Coord from_y, const Evas_Coord to_x,  const Evas_Coord to_y ) __attribute__((deprecated));
+
+   /*Resizing FX*/  
+   EAPI Elm_Effect* elm_fx_resizing_add( Evas_Object* obj, const Evas_Coord from_w, const Evas_Coord from_h, const Evas_Coord to_w,  const Evas_Coord to_h );
+
+   /*Zoom Fx*/  
+   EAPI Elm_Effect* elm_fx_zoom_add( Evas_Object* obj, float from_rate, float to_rate );
+
+   /*Flip Fx*/
+   typedef enum { ELM_FX_FLIP_AXIS_X, ELM_FX_FLIP_AXIS_Y } Elm_Fx_Flip_Axis;
+   EAPI Elm_Effect* elm_fx_flip_add( Evas_Object* front, Evas_Object* back, const Elm_Fx_Flip_Axis axis, const Eina_Bool cw );
+
+   /*Blend Fx*/
+   EAPI Elm_Effect* elm_fx_blend_add( Evas_Object* before, Evas_Object* after );
+
+   /*Fade Fx*/
+   EAPI Elm_Effect* elm_fx_fade_add( Evas_Object* before, Evas_Object* after );
+    
+   /*Rotation Fx*/
+   EAPI Elm_Effect* elm_fx_rotation_add( Evas_Object* obj, const float from_degree, const float to_degree, const Eina_Bool cw );
+
+   /*Color Fx*/
+   EAPI Elm_Effect* elm_fx_color_add( Evas_Object* obj, const unsigned int from_r, const unsigned int from_g, const unsigned int from_b, const unsigned int from_a,  const unsigned int to_r ,const unsigned int to_g, const unsigned int to_b, const unsigned int to_a );
+
+   /*Wipe Fx*/
+   typedef enum { ELM_FX_WIPE_DIR_LEFT, ELM_FX_WIPE_DIR_RIGHT, ELM_FX_WIPE_DIR_UP, ELM_FX_WIPE_DIR_DOWN } Elm_Fx_Wipe_Dir;
+   typedef enum { ELM_FX_WIPE_TYPE_HIDE, ELM_FX_WIPE_TYPE_SHOW } Elm_Fx_Wipe_Type;
+   EAPI Elm_Effect* elm_fx_wipe_add( Evas_Object* obj, Elm_Fx_Wipe_Type type,  Elm_Fx_Wipe_Dir dir );
+
+   /*ScalableFlip Fx*/
+   EAPI Elm_Effect* elm_fx_scalable_flip_add( Evas_Object* front, Evas_Object* back, const Elm_Fx_Flip_Axis axis, const Eina_Bool cw, float from_rate, float to_rate );
+   
+   /*Transform Fx*/
+   typedef struct _elm_fx_matrix {
+	float _11, _12, _13, _14;
+	float _21, _22, _23, _24;
+	float _31, _32, _33, _34;
+	float _41, _42, _43, _44;
+   } Elm_Fx_Matrix;
+/*
+   EAPI Elm_Effect* elm_fx_transform_add( Evas_Object* obj, Elm_Fx_Matrix* from, Elm_Fx_Matrix* to ); 
+   EAPI void elm_fx_transform_identity_set( Elm_Fx_Matrix* m );
+   EAPI void elm_fx_transform_translate( Elm_Fx_Matrix* m, const float pos_x, const float pos_y, const float pos_z );
+   EAPI void elm_fx_transform_scale( Elm_Fx_Matrix* m, const float scale_x, const float scale_y, const float scale_z );
+   EAPI void elm_fx_transform_rotate( Elm_Fx_Matrix* m, const float rad_x, const float rad_y, const float rad_z );
+   EAPI void elm_fx_transform_multiply( Elm_Fx_Matrix* m, Elm_Fx_Matrix* m1, Elm_Fx_Matrix* m2 );
+   */
+
 
 
    /* NavigationBar */

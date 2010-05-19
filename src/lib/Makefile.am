@@ -82,9 +82,11 @@ elm_tab.c \
 elm_navigationbar.c \
 elm_tabbar.c \
 elm_transit.c \
+elm_animator.c \
 elm_editfield.c \
 elm_colorpicker.c \
 elm_colorpalette.c \
+elm_ctxpopup.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \

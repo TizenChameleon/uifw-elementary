@@ -2125,7 +2125,7 @@ static void _elm_fx_rotation_op( void* data, Elm_Animator* animator, const doubl
 	float half_h = (float) h * 0.5;
 
 	evas_map_util_3d_rotate( map, 0, 0, degree, x + half_w, y + half_h, 0 );
-	evas_map_util_3d_perspective( map, x + half_w, y + half_h, 0, w * 10 );
+	evas_map_util_3d_perspective( map, x + half_w, y + half_h, 0, 10000 );
 	
 	evas_object_map_enable_set( rotation->obj, EINA_TRUE );
 	evas_object_map_set( rotation->obj, map );
