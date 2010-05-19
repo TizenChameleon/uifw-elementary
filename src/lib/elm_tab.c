@@ -156,10 +156,10 @@ _theme_hook(Evas_Object *obj)
 	}else if(wd->mode == LANDSCAPE){
 		snprintf(buf, sizeof(buf), "bg_landscape_%d", wd->view_slot_num);
 	}
-	_elm_theme_set(wd->edje, "tab", buf, elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->edje, "tab", buf, elm_widget_style_get(obj));
 
 	EINA_LIST_FOREACH(wd->items, l, item){
-		_elm_theme_set(item->base, "tab", "item", elm_widget_style_get(item->obj));
+		_elm_theme_object_set(obj, item->base, "tab", "item", elm_widget_style_get(item->obj));
 		if (item->label){
 			edje_object_part_text_set(item->base, "elm.text", item->label);
 		}
@@ -257,7 +257,7 @@ EAPI Evas_Object *elm_tab_add(Evas_Object *parent) {
 	// edit box
 	wd->ebx = edje_object_add(wd->evas);
 	retv_if(wd->ebx == NULL, NULL);
-	_elm_theme_set(wd->ebx, "tab", "dim", "default");
+	_elm_theme_object_set(obj, wd->ebx, "tab", "dim", "default");
 	evas_object_resize(wd->ebx, wd->w, wd->h);
 	evas_object_move(wd->ebx, wd->x, wd->y);
 	evas_object_hide(wd->ebx);
@@ -267,7 +267,7 @@ EAPI Evas_Object *elm_tab_add(Evas_Object *parent) {
 	/* load background edj */
 	wd->edje = edje_object_add(wd->evas);
 	snprintf(buf, sizeof(buf), "bg_portrait_%d", wd->view_slot_num);
-	_elm_theme_set(wd->edje, "tab", buf, "default");
+	_elm_theme_object_set(obj, wd->edje, "tab", buf, "default");
 	if(wd->edje == NULL) {
 		printf("Cannot load bg edj\n");
 		return NULL;
@@ -335,7 +335,7 @@ EAPI void elm_tab_set(Evas_Object *obj, int mode)
 	}
 	wd->edje = edje_object_add(wd->evas);
 	retm_if(wd->edje == NULL, "Cannot load bg edj\n");
-	_elm_theme_set(wd->edje, "tab", buf, elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->edje, "tab", buf, elm_widget_style_get(obj));
 
 	evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_MOUSE_DOWN,  press_down_cb, wd);
 	evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_MOUSE_UP,  press_up_cb, wd);
@@ -399,7 +399,7 @@ EAPI Elm_Tab_Item *elm_tab_item_add(Evas_Object *obj, Evas_Object *icon, const c
     it->data = data;
 	it->base = edje_object_add(evas_object_evas_get(obj));
 	retvm_if(it->base == NULL, NULL, "Cannot load bg edj\n");
-	_elm_theme_set(it->base, "tab", "item", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, it->base, "tab", "item", elm_widget_style_get(obj));
 	elm_widget_sub_object_add(obj, it->base);
 
 	edje_object_signal_callback_add(it->base, "elm,action,click", "elm", tab_item_cb, (void *)it);

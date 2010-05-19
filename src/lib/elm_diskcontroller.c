@@ -125,7 +125,7 @@ _theme_hook(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 
-	_elm_theme_set(wd->edje, "diskcontroller", "bg", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->edje, "diskcontroller", "bg", elm_widget_style_get(obj));
 
 	if(wd->round){
 		EINA_LIST_FOREACH(wd->r_items, l, it) {
@@ -500,7 +500,7 @@ EAPI Evas_Object *elm_diskcontroller_add(Evas_Object *parent)
 
 	/* load background edj */
 	wd->edje = edje_object_add(e);
-	_elm_theme_set(wd->edje, "diskcontroller", "bg", "default");
+	_elm_theme_object_set(obj, wd->edje, "diskcontroller", "bg", "default");
 	if(wd->edje == NULL) {
 		printf("Cannot load bg edj\n");
 		return NULL;
