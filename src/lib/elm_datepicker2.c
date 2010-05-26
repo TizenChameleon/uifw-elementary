@@ -88,7 +88,7 @@ _theme_hook(Evas_Object *obj)
 	if (!wd) return;
 
 	_pickers_del(obj);
-	_elm_theme_set(obj, wd->base, "datepicker2", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->base, "datepicker2", "base", elm_widget_style_get(obj));
 	_pickers_add(obj);
 	_i18n(obj);
 
@@ -459,7 +459,7 @@ elm_datepicker2_add(Evas_Object *parent)
 	elm_widget_disable_hook_set(obj, _disable_hook);
 
 	wd->base = edje_object_add(e);
-	_elm_theme_set(obj, wd->base, "datepicker2", "base", "default");
+	_elm_theme_object_set(obj, wd->base, "datepicker2", "base", "default");
 	elm_widget_resize_object_set(obj, wd->base);
 
 	wd->y_max = YEAR_MAX;

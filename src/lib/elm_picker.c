@@ -66,7 +66,7 @@ _theme_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
-	_elm_theme_set(obj, wd->base, "picker", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->base, "picker", "base", elm_widget_style_get(obj));
 	_flick_init(obj);
 	_update_picker(obj);
 	_sizing_eval(obj);
@@ -335,7 +335,7 @@ elm_picker_add(Evas_Object *parent)
 	elm_widget_theme_hook_set(obj, _theme_hook);
 
 	wd->base = edje_object_add(e);
-	_elm_theme_set(obj, wd->base, "picker", "base", "default");
+	_elm_theme_object_set(obj, wd->base, "picker", "base", "default");
 	elm_widget_resize_object_set(obj, wd->base);
 
 	edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "elm.rect.button.up", _up_pressed, obj);
