@@ -1704,8 +1704,9 @@ extern "C" {
 	EAPI Evas_Object *elm_popup_add(Evas_Object *parent);
 	EAPI void elm_popup_desc_set(Evas_Object *obj, const char *text);
 	EAPI const char* elm_popup_desc_get(Evas_Object *obj);
-	EAPI void elm_popup_title_set(Evas_Object *obj, const char *text);
-	EAPI const char* elm_popup_title_get(Evas_Object *obj);
+   EAPI void elm_popup_title_label_set(Evas_Object *obj, const char *text);
+   EAPI const char* elm_popup_title_label_get(Evas_Object *obj);
+   EAPI void elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon);
 	EAPI void elm_popup_content_set(Evas_Object *obj, Evas_Object *content);
 	EAPI Evas_Object* elm_popup_content_get(Evas_Object *obj);
 	EAPI void elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_text,  ...);

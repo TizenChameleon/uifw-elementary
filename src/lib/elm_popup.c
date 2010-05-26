@@ -15,6 +15,7 @@ struct _Widget_Data
 	Evas_Object 	*notify;
 	Evas_Object	*layout;
 	Evas_Object 	*title_area;
+	Evas_Object    *title_icon;
 	Evas_Object 	*content_area;
 	Evas_Object 	*action_area;	
 	Evas_Object *parent;
@@ -87,14 +88,10 @@ static void
 _theme_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-//	char buf[1024];
 	if (!wd) return;
-
-	elm_layout_theme_set(wd->layout, "popup", "notify", elm_widget_style_get(obj));
-
-//	snprintf(buf, sizeof(buf), "titlebar/%s", elm_widget_style_get(obj));
-//	elm_object_style_set(wd->label, buf);
-
+	elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
+	elm_notify_orient_set(wd->notify, ELM_NOTIFY_ORIENT_CENTER);
+	edje_object_message_signal_process( elm_layout_edje_get(wd->layout));
 	_sizing_eval(obj);
 }
 
@@ -127,7 +124,7 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	Widget_Data *wd = elm_widget_data_get(obj);   
 	 if(wd->parent)
  	  evas_object_show(wd->parent); 	
-	elm_layout_theme_set(wd->layout, "popup", "base", "default");	
+	elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
 	_sizing_eval(obj);
 	evas_object_show(obj); 	 	
 
@@ -171,7 +168,6 @@ elm_popup_add(Evas_Object *parent_app)
 		}
 	evas_object_resize(parent, w, h);
 	evas_object_move(parent, x, y);
-	evas_object_show(parent);			
 
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
@@ -193,7 +189,7 @@ elm_popup_add(Evas_Object *parent_app)
 	evas_object_size_hint_weight_set(wd->notify, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_size_hint_align_set(wd->notify, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
-	wd->layout = elm_layout_add(obj);
+	wd->layout = elm_layout_add(parent);
 	evas_object_size_hint_weight_set(wd->layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_size_hint_align_set(wd->layout , EVAS_HINT_FILL, EVAS_HINT_FILL);
 	
@@ -233,7 +229,7 @@ elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int
 		}
 	if(title)
 		{
-			elm_popup_title_set(popup, title);
+			elm_popup_title_label_set(popup, title);
 		}
 	if(first_button_text)
 		{
@@ -328,7 +324,7 @@ elm_popup_desc_get(Evas_Object *obj)
  * @ingroup Popup
  */
 EAPI void 
-elm_popup_title_set(Evas_Object *obj, const char *text)
+elm_popup_title_label_set(Evas_Object *obj, const char *text)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	char buf[255];
@@ -349,6 +345,10 @@ elm_popup_title_set(Evas_Object *obj, const char *text)
 		{
 			edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,title,visible", "elm");
 		}
+	if(wd->title_icon)
+		{
+			edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,title,icon,visible", "elm");
+		}
 		
 	_sizing_eval(obj);
 }
@@ -362,12 +362,56 @@ elm_popup_title_set(Evas_Object *obj, const char *text)
  * @ingroup Popup
  */
 EAPI const char* 
-elm_popup_title_get(Evas_Object *obj)
+elm_popup_title_label_get(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
 	return elm_label_label_get(wd->title_area);
+}
+
+/**
+ * Set the icon in the title area of Popup
+ *
+ * @param obj The popup object
+ * @param label The title icon
+ *
+ * @ingroup Popup
+ */
+EAPI void 
+elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	char buf[255];
+	if (!wd) return;
+
+	if(wd->title_icon)
+		{
+			evas_object_del(wd->title_icon);
+			wd->title_icon=NULL;
+		}
+		
+	wd->title_icon= icon;	
+	elm_layout_content_set(wd->layout, "elm.swallow.title.icon", wd->title_icon);		
+	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,title,icon,visible", "elm");	
+	_sizing_eval(obj);
+}
+/**
+ * Get the title icon of Popup object
+ *
+ * @param obj The Popup object
+ * @return icon title
+ *
+ * @ingroup Popup
+ */
+ 
+EAPI Evas_Object* 
+elm_popup_title_icon_get(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return NULL;
+
+	return wd->title_icon;
 }
 
 /**
