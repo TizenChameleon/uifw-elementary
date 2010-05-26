@@ -357,10 +357,6 @@ EAPI Elm_Toolbar2_Item *elm_toolbar2_item_add(Evas_Object *obj, Evas_Object *ico
 	it->data = data;
 	it->base = edje_object_add(evas_object_evas_get(obj));
 
-	/* Temp */
-	Elm_Theme *th = NULL;
-	th = elm_theme_new();
-
 	_elm_theme_object_set(obj, it->base, "toolbar2", "item", elm_widget_style_get(obj));
 
 	evas_object_event_callback_add(it->icon, EVAS_CALLBACK_MOUSE_DOWN,  press_down_cb, it);
