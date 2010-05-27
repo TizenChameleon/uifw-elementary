@@ -161,6 +161,19 @@ elm_modapi_shutdown(void *m)
    return 1; // succeed always
 }
 
+// module fucns for the specific module type
+EAPI void
+obj_hook(Evas_Object *obj)
+{
+  	
+}
+
+EAPI void
+obj_unhook(Evas_Object *obj)
+{
+   
+}
+
 EAPI void
 obj_longpress(Evas_Object *obj)
 {
