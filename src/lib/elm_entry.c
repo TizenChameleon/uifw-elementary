@@ -94,6 +94,8 @@ typedef struct _Elm_Entry_Item_Provider Elm_Entry_Item_Provider;
 struct _Widget_Data
 {
    Evas_Object *ent;
+   Evas_Object *popup;/*copy paste UI - elm_popup*/
+   Evas_Object *ctxpopup;/*copy paste UI - elm_ctxpopup*/
    Evas_Object *hoversel;
    Ecore_Job *deferred_recalc_job;
    Ecore_Event_Handler *sel_notify_handler;
@@ -107,11 +109,13 @@ struct _Widget_Data
    Eina_List *items;
    Eina_List *item_providers;
    Mod_Api *api; // module api if supplied
+   int max_no_of_bytes;
    Eina_Bool changed : 1;
    Eina_Bool linewrap : 1;
    Eina_Bool char_linewrap : 1;
    Eina_Bool single_line : 1;
    Eina_Bool password : 1;
+   Eina_Bool show_last_character : 1;
    Eina_Bool editable : 1;
    Eina_Bool selection_asked : 1;
    Eina_Bool have_selection : 1;
@@ -155,6 +159,8 @@ static void _signal_entry_paste_request(void *data, Evas_Object *obj, const char
 static void _signal_entry_copy_notify(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_entry_cut_notify(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_cursor_changed(void *data, Evas_Object *obj, const char *emission, const char *source);
+static int restrict_function(void *input_data,void *output_data);
+
 
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_ACTIVATED[] = "activated";
@@ -199,6 +205,7 @@ struct _Mod_Api
    void (*obj_hook) (Evas_Object *obj);
    void (*obj_unhook) (Evas_Object *obj);
    void (*obj_longpress) (Evas_Object *obj);
+	void (*obj_mouseup) (Evas_Object *obj);
 };
 
 static Mod_Api *
@@ -216,6 +223,8 @@ _module(Evas_Object *obj __UNUSED__)
      _elm_module_symbol_get(m, "obj_unhook");
    ((Mod_Api *)(m->api)      )->obj_longpress = // called on long press menu
      _elm_module_symbol_get(m, "obj_longpress");
+    ((Mod_Api *)(m->api)      )->obj_mouseup = // called on mouseup
+   _elm_module_symbol_get(m, "obj_mouseup");
    ok: // ok - return api
    return m->api;
 }
@@ -376,6 +385,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    else
      {
 	edje_object_signal_emit(wd->ent, "elm,action,unfocus", "elm");
+	edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", "");
 	evas_object_focus_set(wd->ent, 0);
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
 	evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
@@ -633,11 +643,18 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    Evas_Event_Mouse_Up *ev = event_info;
    if (!wd) return;
    if (ev->button != 1) return;
+	if ((wd->api) && (wd->api->obj_mouseup))
+	{
+		wd->api->obj_mouseup(data);
+	}
+	else
+	{
    if (wd->longpress_timer)
      {
 	ecore_timer_del(wd->longpress_timer);
 	wd->longpress_timer = NULL;
      }
+	}
 }
 
 static void
@@ -698,7 +715,8 @@ _getbase(Evas_Object *obj)
    if (!wd) return "base";
    if (wd->editable)
      {
-	if (wd->password) return "base-password";
+	if((wd->password)&&(wd->show_last_character)) return "custom-password";	
+	else if(wd->password) return "base-password";
 	else
 	  {
 	     if (wd->single_line) return "base-single";
@@ -712,7 +730,8 @@ _getbase(Evas_Object *obj)
      }
    else
      {
-	if (wd->password) return "base-password";
+	if((wd->password)&&(wd->show_last_character)) return "custom-password";	
+	else if(wd->password) return "base-password";
 	else
 	  {
 	     if (wd->single_line) return "base-single-noedit";
@@ -750,6 +769,27 @@ _str_append(char *str, const char *txt, int *len, int *alloc)
 }
 
 static char *
+_strncpy(char* dest, const char* src, size_t count)
+{
+	if (!dest) 
+	{
+		ERR( "dest is NULL" );
+		return NULL;
+	}
+	if (!src) 
+	{
+		ERR( "src is NULL" );
+		return NULL;
+	}
+	if (count < 0)
+	{
+		ERR( "count is smaller than 0" );
+		return NULL;
+	}
+
+	return strncpy( dest, src, count );
+}
+static char *
 _mkup_to_text(const char *mkup)
 {
    char *str = NULL;
@@ -758,12 +798,13 @@ _mkup_to_text(const char *mkup)
    char *tag_start, *tag_end, *esc_start, *esc_end, *ts;
 
    if (!mkup) return NULL;
+   s=p=NULL;
    tag_start = tag_end = esc_start = esc_end = NULL;
    p = (char *)mkup;
    s = p;
    for (;;)
      {
-	if ((*p == 0) ||
+	if (((p!=NULL)&&(*p == 0)) ||
 	    (tag_end) || (esc_end) ||
 	    (tag_start) || (esc_start))
 	  {
@@ -774,7 +815,7 @@ _mkup_to_text(const char *mkup)
 		  ttag = malloc(tag_end - tag_start);
 		  if (ttag)
 		    {
-		       strncpy(ttag, tag_start + 1, tag_end - tag_start - 1);
+		       _strncpy(ttag, tag_start + 1, tag_end - tag_start - 1);
 		       ttag[tag_end - tag_start - 1] = 0;
 		       if (!strcmp(ttag, "br"))
 			 str = _str_append(str, "\n", &str_len, &str_alloc);
@@ -796,7 +837,7 @@ _mkup_to_text(const char *mkup)
 		  if (ts)
 		    {
 		       const char *esc;
-		       strncpy(ts, esc_start, esc_end - esc_start);
+		       _strncpy(ts, esc_start, esc_end - esc_start);
 		       ts[esc_end - esc_start] = 0;
 		       esc = evas_textblock_escape_string_get(ts);
 		       if (esc)
@@ -805,12 +846,12 @@ _mkup_to_text(const char *mkup)
 		    }
 		  esc_start = esc_end = NULL;
 	       }
-	     else if (*p == 0)
+	     else if ((p!=NULL)&&(*p == 0))
 	       {
 		  ts = malloc(p - s + 1);
 		  if (ts)
 		    {
-		       strncpy(ts, s, p - s);
+		       _strncpy(ts, s, p - s);
 		       ts[p - s] = 0;
 		       str = _str_append(str, ts, &str_len, &str_alloc);
 		       free(ts);
@@ -818,7 +859,7 @@ _mkup_to_text(const char *mkup)
                   break;
 	       }
 	  }
-	if (*p == '<')
+	if ((p!=NULL)&&(*p == '<'))
 	  {
 	     if (!esc_start)
 	       {
@@ -827,7 +868,7 @@ _mkup_to_text(const char *mkup)
 		  ts = malloc(p - s + 1);
 		  if (ts)
 		    {
-		       strncpy(ts, s, p - s);
+		       _strncpy(ts, s, p - s);
 		       ts[p - s] = 0;
 		       str = _str_append(str, ts, &str_len, &str_alloc);
 		       free(ts);
@@ -835,7 +876,7 @@ _mkup_to_text(const char *mkup)
 		  s = NULL;
 	       }
 	  }
-	else if (*p == '>')
+	else if ((p!=NULL)&&(*p == '>'))
 	  {
 	     if (tag_start)
 	       {
@@ -843,7 +884,7 @@ _mkup_to_text(const char *mkup)
 		  s = p + 1;
 	       }
 	  }
-	else if (*p == '&')
+	else if ((p!=NULL)&&(*p == '&'))
 	  {
 	     if (!tag_start)
 	       {
@@ -852,7 +893,7 @@ _mkup_to_text(const char *mkup)
 		  ts = malloc(p - s + 1);
 		  if (ts)
 		    {
-		       strncpy(ts, s, p - s);
+		       _strncpy(ts, s, p - s);
 		       ts[p - s] = 0;
 		       str = _str_append(str, ts, &str_len, &str_alloc);
 		       free(ts);
@@ -860,7 +901,7 @@ _mkup_to_text(const char *mkup)
 		  s = NULL;
 	       }
 	  }
-	else if (*p == ';')
+	else if ((p!=NULL)&&(*p == ';'))
 	  {
 	     if (esc_start)
 	       {
@@ -916,7 +957,7 @@ _text_to_mkup(const char *text)
 	  {
 	     char tstr[16];
 
-	     strncpy(tstr, text + pos, pos2 - pos);
+	     _strncpy(tstr, text + pos, pos2 - pos);
 	     tstr[pos2 - pos] = 0;
 	     str = _str_append(str, tstr, &str_len, &str_alloc);
 	  }
@@ -1289,6 +1330,44 @@ _get_item(void *data, Evas_Object *edje, const char *part, const char *item)
    return o;
 }
 
+static int restrict_function(void *input_data,void *output_data)
+{	
+	 /*calculate character count*/
+	Widget_Data *wd = elm_widget_data_get(input_data);	
+	char buf[10]="\0";
+	size_t byte_len;
+	size_t len=0, bytes_per_char=0,insert_text_len=0;
+	char *text = elm_entry_entry_get((Evas_Object *)input_data);
+
+	/* entry_entry_get does not give exact text use the below function, but this adds <br> hence +4 has to be assumed*/
+	//char *text = edje_object_part_text_get(wd->ent, "elm.text");	
+	char *insert_text;  
+	size_t remain_bytes;
+	if(text!=NULL)
+		{		
+			byte_len = strlen(text);/*no of bytes*/
+			remain_bytes = wd->max_no_of_bytes-byte_len;
+			sprintf(buf,"%d",remain_bytes);	
+			edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);		
+			if(output_data)
+				{
+					insert_text =  (char *)output_data;
+					insert_text_len = strlen(insert_text);	
+					if(remain_bytes<insert_text_len)
+						{			
+							evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+							return EINA_TRUE;
+						}			
+					if(byte_len>=wd->max_no_of_bytes)
+						{
+							evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+							return EINA_TRUE;
+						}			
+				}		
+		}
+	return EINA_FALSE;  		
+}
+
 /**
  * This adds an entry to @p parent object.
  *
@@ -1448,6 +1527,25 @@ elm_entry_single_line_get(const Evas_Object *obj)
 }
 
 /**
+ * This API set's the maximum byte count
+ *
+ * @param obj The entry object
+ * @param max_no_of_bytes Maximum number of bytes entry can have
+ * 
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   wd->max_no_of_bytes = max_no_of_bytes;
+   edje_object_signal_emit(wd->ent, "elm,state,remain,bytes,show", "elm");
+   edje_object_part_text_restrict_fun(wd->ent, "elm.text", restrict_function,obj);
+ }
+
+
+/**
  * This sets the entry object to password mode.  All text entered
  * and/or displayed within the widget will be replaced with asterisks (*).
  *
@@ -1465,6 +1563,7 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    if (!wd) return;
    if (wd->password == password) return;
    wd->password = password;
+   wd->show_last_character = EINA_FALSE;
    wd->single_line = EINA_TRUE;
    wd->linewrap = EINA_FALSE;
    wd->char_linewrap = EINA_FALSE;
@@ -1475,6 +1574,33 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    _sizing_eval(obj);
 }
 
+/**
+ * Whether the character to use when masking entry contents (in "password mode").
+ * shows last character to user while password is being typed.
+ * @param obj The entry object
+ * @param password The password flag (1 for "password mode" to show the user
+ * how many characters have been typed, 0 for default)
+ *
+ * @ingroup Entry
+ */
+EAPI void         
+elm_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool show_last_character)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   const char *t;
+   if (!wd) return;
+   if ((wd->password == show_last_character)&&(wd->show_last_character ==show_last_character))  return;
+   wd->show_last_character = show_last_character;
+   wd->password = show_last_character;
+   wd->single_line = EINA_TRUE;
+   wd->linewrap = EINA_FALSE;
+   wd->char_linewrap = EINA_FALSE;
+   t = eina_stringshare_add(elm_entry_entry_get(obj));
+    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
+   elm_entry_entry_set(obj, t);
+   eina_stringshare_del(t);
+   _sizing_eval(obj);
+}
 
 /**
  * This returns whether password mode is enabled.
@@ -1510,6 +1636,15 @@ elm_entry_entry_set(Evas_Object *obj, const char *entry)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (!entry) entry = "";
+	if(wd->max_no_of_bytes)
+		{
+			int len = strlen(entry);
+			if(len > wd->max_no_of_bytes)
+				{
+					ERR("[ERROR]the length of the text set is more than max no of bytes, text cannot be set");
+					return;
+				}
+		}
    edje_object_part_text_set(wd->ent, "elm.text", entry);
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;

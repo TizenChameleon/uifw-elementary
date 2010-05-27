@@ -720,6 +720,8 @@ extern "C" {
    EAPI Eina_Bool    elm_entry_single_line_get(const Evas_Object *obj);
    EAPI void         elm_entry_password_set(Evas_Object *obj, Eina_Bool password);
    EAPI Eina_Bool    elm_entry_password_get(const Evas_Object *obj);
+   EAPI void         elm_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool show_last_character);
+
    EAPI void         elm_entry_entry_set(Evas_Object *obj, const char *entry);
    EAPI const char  *elm_entry_entry_get(const Evas_Object *obj);
    EAPI const char  *elm_entry_selection_get(const Evas_Object *obj);
@@ -763,6 +765,7 @@ extern "C" {
 #else
    EAPI void        *elm_entry_imf_context_get(Evas_Object *obj);
 #endif
+   EAPI void 		elm_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
 
    /* smart callbacks called:
     * "changed" - the text content changed
@@ -1545,6 +1548,7 @@ extern "C" {
    EAPI Eina_Bool    elm_scrolled_entry_context_menu_disabled_get(const Evas_Object *obj);
    EAPI void         elm_scrolled_entry_scrollbar_policy_set(Evas_Object *obj, Elm_Scroller_Policy h, Elm_Scroller_Policy v);
    EAPI void         elm_scrolled_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
+   EAPI void			  elm_scrolled_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
 
    EAPI Evas_Object *elm_conformant_add(Evas_Object *parent);
    EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content);
