@@ -720,6 +720,8 @@ extern "C" {
    EAPI Eina_Bool    elm_entry_single_line_get(const Evas_Object *obj);
    EAPI void         elm_entry_password_set(Evas_Object *obj, Eina_Bool password);
    EAPI Eina_Bool    elm_entry_password_get(const Evas_Object *obj);
+   EAPI void         elm_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool show_last_character);
+
    EAPI void         elm_entry_entry_set(Evas_Object *obj, const char *entry);
    EAPI const char  *elm_entry_entry_get(const Evas_Object *obj);
    EAPI const char  *elm_entry_selection_get(const Evas_Object *obj);
@@ -763,6 +765,7 @@ extern "C" {
 #else
    EAPI void        *elm_entry_imf_context_get(Evas_Object *obj);
 #endif
+   EAPI void 		elm_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
 
    /* smart callbacks called:
     * "changed" - the text content changed
@@ -1562,6 +1565,7 @@ extern "C" {
    EAPI Eina_Bool    elm_scrolled_entry_context_menu_disabled_get(const Evas_Object *obj);
    EAPI void         elm_scrolled_entry_scrollbar_policy_set(Evas_Object *obj, Elm_Scroller_Policy h, Elm_Scroller_Policy v);
    EAPI void         elm_scrolled_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
+   EAPI void			  elm_scrolled_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
 
    EAPI Evas_Object *elm_conformant_add(Evas_Object *parent);
    EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content);
@@ -1721,8 +1725,9 @@ extern "C" {
 	EAPI Evas_Object *elm_popup_add(Evas_Object *parent);
 	EAPI void elm_popup_desc_set(Evas_Object *obj, const char *text);
 	EAPI const char* elm_popup_desc_get(Evas_Object *obj);
-	EAPI void elm_popup_title_set(Evas_Object *obj, const char *text);
-	EAPI const char* elm_popup_title_get(Evas_Object *obj);
+   EAPI void elm_popup_title_label_set(Evas_Object *obj, const char *text);
+   EAPI const char* elm_popup_title_label_get(Evas_Object *obj);
+   EAPI void elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon);
 	EAPI void elm_popup_content_set(Evas_Object *obj, Evas_Object *content);
 	EAPI Evas_Object* elm_popup_content_get(Evas_Object *obj);
 	EAPI void elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_text,  ...);
@@ -2006,8 +2011,79 @@ extern "C" {
    EAPI Eina_Bool elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon);
    EAPI Evas_Object *elm_editfield_lett_icon_get(Evas_Object *obj);
    EAPI void elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
-       
 
+ /* softkey */
+   typedef enum {
+		ELM_SK_LEFT_BTN,
+		ELM_SK_RIGHT_BTN,
+   } Elm_Softkey_Type;
+
+   /* softkey */
+   typedef struct _Elm_Softkey_Item Elm_Softkey_Item;
+   EAPI Evas_Object *elm_softkey_add(Evas_Object *parent);
+   EAPI Elm_Softkey_Item *elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI void         elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type);
+   EAPI void         elm_softkey_button_show(Evas_Object *obj, Elm_Softkey_Type type);
+   EAPI void         elm_softkey_button_hide(Evas_Object *obj, Elm_Softkey_Type type);
+
+   EAPI Elm_Softkey_Item *elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI int          elm_softkey_panel_del(Evas_Object *obj);
+   EAPI int          elm_softkey_panel_close(Evas_Object *obj);
+   EAPI int          elm_softkey_panel_open(Evas_Object *obj);
+
+   EAPI void         elm_softkey_item_icon_set(Elm_Softkey_Item *item, Evas_Object *icon);
+   EAPI Evas_Object *elm_softkey_item_icon_get(Elm_Softkey_Item * item);
+   EAPI void         elm_softkey_item_label_set(Elm_Softkey_Item *item, const char *label);
+   EAPI const char  *elm_softkey_item_label_get(Elm_Softkey_Item * item);
+   EAPI Eina_Bool    elm_softkey_item_disabled_get(Elm_Softkey_Item *item);
+   EAPI void         elm_softkey_item_disabled_set(Elm_Softkey_Item *item, Eina_Bool disabled);
+   EAPI void         elm_softkey_item_callback_set(Elm_Softkey_Item* item, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data );
+   /* smart callback called: 
+    * "clicked" - the user clicked the button, event_info: Softkey item
+    * "press"   - the user press the button, event_info: Softkey item
+    * "panel,show" - when the panel is shown
+	* "panel,hide" - when the panel is hidden
+    */
+       
+   /* gridbox */
+   EAPI Evas_Object *elm_gridbox_add(Evas_Object *parent);
+   EAPI void elm_gridbox_padding_set(Evas_Object *obj, Evas_Coord horizontal, Evas_Coord vertical);
+   EAPI void elm_gridbox_item_size_set(Evas_Object *obj, Evas_Coord h_itemsize, Evas_Coord v_itemsize);
+   EAPI void elm_gridbox_pack(Evas_Object *obj, Evas_Object *subobj);
+   EAPI Eina_Bool elm_gridbox_unpack(Evas_Object *obj, Evas_Object *subobj);
+   EAPI Eina_List *elm_gridbox_children_get(Evas_Object *obj);
+   EAPI void elm_gridbox_homogenous_padding_set(Evas_Object *obj, Eina_Bool homogenous);
+
+   /* actionslider */                        
+   typedef enum _Elm_Actionslider_Indicator_Pos  
+   {                                         
+      ELM_ACTIONSLIDER_INDICATOR_LEFT,
+      ELM_ACTIONSLIDER_INDICATOR_RIGHT,
+      ELM_ACTIONSLIDER_INDICATOR_CENTER
+   } Elm_Actionslider_Indicator_Pos; 
+   typedef enum _Elm_Actionslider_Magnet_Pos
+   {
+      ELM_ACTIONSLIDER_MAGNET_LEFT,
+      ELM_ACTIONSLIDER_MAGNET_RIGHT,
+      ELM_ACTIONSLIDER_MAGNET_BOTH,
+      ELM_ACTIONSLIDER_MAGNET_CENTER
+   } Elm_Actionslider_Magnet_Pos;
+   typedef enum _Elm_Actionslider_Label_Pos
+   {
+      ELM_ACTIONSLIDER_LABEL_LEFT,
+      ELM_ACTIONSLIDER_LABEL_RIGHT,
+      ELM_ACTIONSLIDER_LABEL_CENTER
+   } Elm_Actionslider_Label_Pos;
+
+   EAPI Evas_Object *elm_actionslider_add(Evas_Object *parent);
+   EAPI void elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_Pos pos);
+   EAPI void elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos pos);
+   EAPI int elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, const char *label);
+   EAPI int elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag);
+   /* smart callbacks called:
+    * "indicator,position" - when a button reaches to the special position like "left", "right" and "center".
+    */
+ 
 #ifdef __cplusplus
 }
 #endif

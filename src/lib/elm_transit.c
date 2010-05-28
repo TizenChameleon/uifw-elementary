@@ -910,52 +910,6 @@ static void _elm_fx_transfer_op( void* data, Elm_Animator* animator, const doubl
 }
 
 
-/*
-static void _elm_fx_transfer_op( void* data, Elm_Animator* animator, const double frame )
-{
-	Elm_Fx_Transfer* transfer = data;
-
-	Evas_Map* map = evas_map_new( 4 );
-
-	if( map == NULL ) {
-		return ;
-	}
-
-	evas_map_smooth_set( map, EINA_TRUE );
-
-	Evas_Coord x, y, w, h;
-	evas_object_geometry_get( transfer->obj, &x, &y, &w, &h );
-
-	evas_map_point_coord_set( map, 0, (transfer->from.x + transfer->to.x * frame),
-					  (transfer->from.y + transfer->to.y * frame),
-					  0 );
-
-	evas_map_point_coord_set( map, 1, (transfer->from.x + transfer->to.x * frame) + w,
-					  (transfer->from.y + transfer->to.y * frame),
-					  0 );
-
-	evas_map_point_coord_set( map, 2, (transfer->from.x + transfer->to.x * frame) + w,
-					  (transfer->from.y + transfer->to.y * frame) + h,
-					  0 );
-
-	evas_map_point_coord_set( map, 3, (transfer->from.x + transfer->to.x * frame),
-					  (transfer->from.y + transfer->to.y * frame) + h,
-					  0 );
-
-	evas_map_point_image_uv_set( map, 0, 0, 0 );
-	evas_map_point_image_uv_set( map, 1, w, 0 );
-	evas_map_point_image_uv_set( map, 2, w, h );
-	evas_map_point_image_uv_set( map, 3, 0, h );
-
-	evas_map_util_3d_perspective( map, x + w / 2, y + h / 2, 0, 10000 );
-
-	evas_object_map_enable_set( transfer->obj, EINA_TRUE );
-	evas_object_map_set( transfer->obj, map );
-	evas_map_free( map );
-
-}
-*/
-
 
 
 /**
@@ -1036,21 +990,11 @@ static void _elm_fx_zoom_begin( void* data, const Eina_Bool reverse, const unsig
 }
 
 
-
-
-
-
-
 static void _elm_fx_zoom_end( void* data, const Eina_Bool reverse, const unsigned int repeat )
 {
 	Elm_Fx_Zoom* zoom = data;
 	evas_object_map_enable_set( zoom->obj, EINA_FALSE );
 }
-
-
-
-
-
 
 
 
@@ -1145,11 +1089,9 @@ struct _flip {
 
 };
 
-
-
-inline static void _elm_fx_flip_end( void* data,
-				     const Eina_Bool auto_reverse,
-				     const unsigned int repeat_cnt )
+static void _elm_fx_flip_end( void* data,
+			      const Eina_Bool auto_reverse,
+			      const unsigned int repeat_cnt )
 {
 	Elm_Fx_Flip* flip = data;
 	evas_object_map_enable_set( flip->front, EINA_FALSE );
@@ -1395,8 +1337,8 @@ static void _elm_fx_resizable_flip_op( void* data, Elm_Animator* animator, const
 
 	float x = resizable_flip->from_pos.x + resizable_flip->to_pos.x * frame; 
 	float y = resizable_flip->from_pos.y + resizable_flip->to_pos.y * frame;
-	float w = resizable_flip->from_size.y + resizable_flip->to_size.x * frame;
-	float h = resizable_flip->from_size.x + resizable_flip->to_size.y * frame;
+	float w = resizable_flip->from_size.x + resizable_flip->to_size.x * frame;
+	float h = resizable_flip->from_size.y + resizable_flip->to_size.y * frame;
 
 	evas_map_point_coord_set( map, 0, x, y, 0 ); 
 	evas_map_point_coord_set( map, 1, x + w, y, 0 );
@@ -2506,6 +2448,53 @@ EAPI void elm_fx_transform_multiply( Elm_Fx_Matrix* m, Elm_Fx_Matrix* m1, Elm_Fx
 
 
 
+/////////////////////////////////////////////////////////////////////////////////////
+// ImageAnimation FX
+/////////////////////////////////////////////////////////////////////////////////////
+typedef struct _image_animation Elm_Fx_Image_Animation;
+
+struct _image_animation {
+	Evas_Object** images;
+};
+
+/**
+ * @ingroup Transit 
+ *
+ * Add ImageAnimation effect.  
+ *
+ * @param  images        Images for animation.
+ * @return 		 ImageAnimation Effect.
+ */
+EAPI Elm_Effect* elm_fx_imageanimation_add( Evas_Object* images[])
+{
+#ifdef ELM_FX_EXCEPTION_ENABLE
+	ELM_FX_NULL_CHECK_WITH_RET( images, NULL );
+#endif
+		
+	Elm_Effect* effect = calloc( 1, sizeof( Elm_Effect ) );
+
+	if( effect == NULL ) {
+		fprintf( stderr, "Failed to allocate Elm_Effect!\n" );
+		return NULL;
+	}
+	
+	Elm_Fx_Image_Animation* image_animation = calloc( 1, sizeof( Elm_Fx_Image_Animation) );
+
+	if( image_animation == NULL ) {
+		fprintf( stderr, "Failed to allocate Elm_Effect!\n" );
+		free( effect );
+		return NULL;
+	}
+
+	image_animation->images = images;
+
+	effect->begin_op = NULL;
+	effect->end_op = NULL;
+	effect->animation_op = NULL;
+	effect->user_data = image_animation ;
+
+	return effect;
+}
 
 
 
