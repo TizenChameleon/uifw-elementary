@@ -35,6 +35,7 @@ struct _Widget_Data
    int items_count;
    double scale_factor;
    const char *special_char;
+   int min_1st_level_obj_height;
 };
 
 struct _Item
@@ -168,7 +169,10 @@ _item_new(Evas_Object *obj, const char *letter, const void *item)
    it->obj = obj;
    it->data = item;
    it->level = wd->level;
+   if(wd->level == 0)
    it->size =  wd->min_obj_height;
+   else
+	   it->size =  wd->min_1st_level_obj_height;
    if(letter)
    {
 		it->letter = eina_stringshare_add(letter);
@@ -233,7 +237,7 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
           _elm_theme_object_set(obj, o, "index", "item_odd/vertical", "default");
         else
           _elm_theme_object_set(obj, o, "index", "item/vertical", "default");
-        edje_object_part_text_set(o, "elm.text", it->letter);
+
         edje_object_size_min_restricted_calc(o, &mw, &mh, 0, 0);
         evas_object_size_hint_weight_set(o, 1.0, 1.0);
         evas_object_size_hint_align_set(o, -1.0, -1.0);
@@ -320,7 +324,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
         it_closest  = NULL;
         dist = 0x7fffffff;
         evas_object_geometry_get(wd->bx[i], &bx, &by, &bw, &bh);
-		dmin = (double)(wd->min_obj_height*wd->tot_items_count[1])/(2*(double)bh);
+		dmin = (double)(wd->min_1st_level_obj_height*wd->tot_items_count[1])/(2*(double)bh);
 		dmax = 1-dmin;
         EINA_LIST_FOREACH(wd->items, l, it)
           {
@@ -374,6 +378,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
                   const char *stacking, *selectraise;
 
                   it = it_last;
+                  if(wd->level == it->level)
                   edje_object_signal_emit(it->base, "elm,state,inactive", "elm");
                   stacking = edje_object_data_get(it->base, "stacking");
                   selectraise = edje_object_data_get(it->base, "selectraise");
@@ -388,6 +393,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
                   const char *selectraise;
 
                   it = it_closest;
+                  if(wd->level == it->level)
                   edje_object_signal_emit(it->base, "elm,state,active", "elm");
                   selectraise = edje_object_data_get(it->base, "selectraise");
                   if ((selectraise) && (!strcmp(selectraise, "on")))
@@ -417,15 +423,12 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
      }
    if (!label) label = strdup("");
    if (!last) last = strdup("");
-   if(wd->level_active[1])
-   {
+
 	   if(wd->level == 0)
 	   {
 		   if(last)
 		   {
 			   edje_object_part_text_set(wd->base, "elm.text.body", last);
-			   edje_object_signal_emit(wd->base, "color_changed", "");
-			   edje_object_part_text_set(wd->base, "elm.text.last", "_");
 			   edje_object_signal_emit(wd->base, "hide_2nd_level", "");
 		   }
 	   }
@@ -433,15 +436,8 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
 	   {
 	   edje_object_part_text_set(wd->base, "elm.text", last);
 		   edje_object_signal_emit(wd->base, "hide_first_level", "");
-		   edje_object_signal_emit(wd->base, "revert_back", "");
-	   }
    }
-   else
-   {
-	   edje_object_part_text_set(wd->base, "elm.text.body", last);
-	   edje_object_signal_emit(wd->base, "color_changed", "");
-	   edje_object_part_text_set(wd->base, "elm.text", last);
-   }
+
    free(label);
    free(last);
 }
@@ -479,12 +475,18 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *event
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Up *ev = event_info;
    void *d;
+   Item *it;
+   Eina_List *l;
    if (!wd) return;
    if (ev->button != 1) return;
    if (wd->level == 1 && wd->delay) ecore_timer_del(wd->delay);
    wd->delay = NULL;
    wd->down = 0;
    d = (void *)elm_index_item_selected_get(data, wd->level);
+   EINA_LIST_FOREACH(wd->items, l, it)
+   {
+	   edje_object_signal_emit(it->base, "elm,state,inactive", "elm");
+   }
    if (d) evas_object_smart_callback_call(data, "selected", d);
    elm_index_active_set(data, 0);
    edje_object_signal_emit(wd->base, "elm,state,level,0", "elm");
@@ -559,7 +561,7 @@ _index_box_refill_job(void *data)
 	if(string)
 	wd->min_obj_height = (int) (atoi(string))*wd->scale_factor;
 	else
-	wd->min_obj_height == MIN_OBJ_HEIGHT*wd->scale_factor;
+	wd->min_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
 	if(!wd->min_obj_height)
 		return;
 	wd->max_grp_size = wd->min_obj_height - 2*MIN_GRP_SIZE;
@@ -668,7 +670,17 @@ elm_index_add(Evas_Object *parent)
         edje_object_part_swallow(wd->base, "elm.swallow.index.1", wd->bx[1]);
         evas_object_show(wd->bx[1]);
      }
+	const char *string;
 
+	wd->scale_factor = elm_scale_get();
+	if ( wd->scale_factor == 0.0 ) {
+			wd->scale_factor = 1.0;
+	}
+	string = edje_object_data_get(wd->base, "min_1st_level_obj_height");
+	if(string)
+		wd->min_1st_level_obj_height = (int) (atoi(string))*wd->scale_factor;
+	else
+		wd->min_1st_level_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
    _sizing_eval(obj);
    return obj;
 }
