@@ -14,7 +14,8 @@
 #define PANEL_ANIMATOR_MAX	1
 typedef struct _Widget_Data Widget_Data;
 
-struct _Widget_Data {
+struct _Widget_Data
+{
 	Evas_Object *lay;
 	Evas_Object *button[2];
 	Evas_Object *bg_rect;
@@ -37,7 +38,8 @@ struct _Widget_Data {
 	Eina_Bool panel_suppported;
 };
 
-struct _Elm_Softkey_Item {
+struct _Elm_Softkey_Item
+{
 	Evas_Object *obj;
 	Evas_Object *base;
 	Evas_Object *icon;
@@ -56,22 +58,15 @@ static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 /*
  * callback functions
  */
-static void _softkey_down_cb(void *data, Evas_Object *obj,
-		const char *emission, const char *source);
-static void _softkey_up_cb(void *data, Evas_Object *obj, const char *emission,
-		const char *source);
+static void _softkey_down_cb(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _softkey_up_cb(void *data, Evas_Object *obj, const char *emission, const char *source);
 
-static void _panel_down_cb(void *data, Evas *e, Evas_Object *obj,
-		void *event_info);
-static void _panel_up_cb(void *data, Evas *e, Evas_Object *obj,
-		void *event_info);
+static void _panel_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _panel_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
-static void _more_btn_click_cb(void *data, Evas_Object *obj,
-		const char *emission, const char *source);
-static void _close_btn_click_cb(void *data, Evas_Object *obj,
-		const char *emission, const char *source);
-static void _bg_click_cb(void *data, Evas *e, Evas_Object *obj,
-		void *event_info);
+static void _more_btn_click_cb(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _close_btn_click_cb(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _bg_click_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static int _show_button_animator_cb(void *data);
 static int _hide_button_animator_cb(void *data);
@@ -82,19 +77,16 @@ static int _panel_down_animator_cb(void *data);
  * internal function
  */
 static int
-		_show_button(Evas_Object *obj, Elm_Softkey_Type type, Eina_Bool show);
+_show_button(Evas_Object *obj, Elm_Softkey_Type type, Eina_Bool show);
 static int _delete_button(Evas_Object *obj);
 
-static void _softkey_object_move(void *data, Evas *e, Evas_Object *obj,
-		void *event_info);
-static void _softkey_object_resize(void *data, Evas *e, Evas_Object *obj,
-		void *event_info);
-static void _softkey_object_show(void *data, Evas *e, Evas_Object *obj,
-		void *event_info);
-static void _softkey_object_hide(void *data, Evas *e, Evas_Object *obj,
-		void *event_info);
-
-static void _icon_disable(Evas_Object *icon, Eina_Bool disabled) {
+static void _softkey_object_move(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _softkey_object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _softkey_object_show(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _softkey_object_hide(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _softkey_horizontal_set(Evas_Object *obj, Eina_Bool horizontal_mode);
+static void _icon_disable(Evas_Object *icon, Eina_Bool disabled)
+{
 	Evas_Object *edj;
 
 	if (!icon)
@@ -104,19 +96,23 @@ static void _icon_disable(Evas_Object *icon, Eina_Bool disabled) {
 	if (disabled) {
 		if (!edj) {
 			edje_object_signal_emit(icon, "elm,state,disabled", "elm");
-		} else {
+		}
+		else {
 			edje_object_signal_emit(edj, "elm,state,disabled", "elm");
 		}
-	} else {
+	}
+	else {
 		if (!edj) {
 			edje_object_signal_emit(icon, "elm,state,enabled", "elm");
-		} else {
+		}
+		else {
 			edje_object_signal_emit(edj, "elm,state,enabled", "elm");
 		}
 	}
 }
 
-static void _item_disable(Elm_Softkey_Item *it, Eina_Bool disabled) {
+static void _item_disable(Elm_Softkey_Item *it, Eina_Bool disabled)
+{
 	Widget_Data *wd = elm_widget_data_get(it->obj);
 	if (!wd)
 		return;
@@ -125,14 +121,16 @@ static void _item_disable(Elm_Softkey_Item *it, Eina_Bool disabled) {
 	it->disabled = disabled;
 	if (it->disabled) {
 		edje_object_signal_emit(it->base, "elm,state,disabled", "elm");
-	} else {
+	}
+	else {
 		edje_object_signal_emit(it->base, "elm,state,enabled", "elm");
 	}
 
 	_icon_disable(it->icon, disabled);
 }
 
-static void _del_hook(Evas_Object *obj) {
+static void _del_hook(Evas_Object *obj)
+{
 	int i;
 	Evas_Object *btn;
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -181,7 +179,8 @@ static void _del_hook(Evas_Object *obj) {
 	free(wd);
 }
 
-static void _theme_hook(Evas_Object *obj) {
+static void _theme_hook(Evas_Object *obj)
+{
 	Elm_Softkey_Item* item;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Elm_Softkey_Item *it;
@@ -190,15 +189,13 @@ static void _theme_hook(Evas_Object *obj) {
 	if (!wd) {
 		return;
 	}
-	_elm_theme_object_set(obj, wd->lay, "softkey", "bg", elm_widget_style_get(
-			obj));
+	_elm_theme_object_set(obj, wd->lay, "softkey", "bg", elm_widget_style_get(obj));
 	_elm_theme_object_set(obj, wd->glow_obj, "softkey", "glow", "default");
 
 	if (wd->button[ELM_SK_LEFT_BTN]) {
 
 		item = evas_object_data_get(wd->button[ELM_SK_LEFT_BTN], "item_data");
-		_elm_theme_object_set(obj, wd->button[ELM_SK_LEFT_BTN], "softkey",
-				"button_left", elm_widget_style_get(obj));
+		_elm_theme_object_set(obj, wd->button[ELM_SK_LEFT_BTN], "softkey", "button_left", elm_widget_style_get(obj));
 
 		elm_softkey_item_label_set(item, item->label);
 
@@ -208,16 +205,14 @@ static void _theme_hook(Evas_Object *obj) {
 
 		item = evas_object_data_get(wd->button[ELM_SK_RIGHT_BTN], "item_data");
 
-		_elm_theme_object_set(obj, wd->button[ELM_SK_RIGHT_BTN], "softkey",
-				"button_right", elm_widget_style_get(obj));
+		_elm_theme_object_set(obj, wd->button[ELM_SK_RIGHT_BTN], "softkey", "button_right", elm_widget_style_get(obj));
 
 		elm_softkey_item_label_set(item, item->label);
 
 	}
 
 	if (wd->panel) {
-		_elm_theme_object_set(obj, wd->panel, "softkey", "panel",
-				elm_widget_style_get(obj));
+		_elm_theme_object_set(obj, wd->panel, "softkey", "panel", elm_widget_style_get(obj));
 		if (wd->panel_btn_idx > 0) {
 			//show more button 
 			edje_object_signal_emit(wd->lay, "more_btn_show", "");
@@ -234,7 +229,8 @@ EINA_LIST_FOREACH		(wd->items, l, it)
 _sizing_eval( obj );
 }
 
-static void _sub_del(void *data, Evas_Object *obj, void *event_info) {
+static void _sub_del(void *data, Evas_Object *obj, void *event_info)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Object *sub = event_info;
 	const Eina_List *l;
@@ -251,7 +247,8 @@ EINA_LIST_FOREACH(wd->items, l, it)
 }
 }
 
-static void _sizing_eval(Evas_Object *obj) {
+static void _sizing_eval(Evas_Object *obj)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 
 	if (!wd)
@@ -261,7 +258,8 @@ static void _sizing_eval(Evas_Object *obj) {
 	_softkey_object_resize(obj, NULL, obj, NULL);
 }
 
-static int _panel_up_animator_cb(void *data) {
+static int _panel_up_animator_cb(void *data)
+{
 	int max = PANEL_ANIMATOR_MAX;
 	static int progress = 0;
 	Widget_Data *wd;
@@ -287,13 +285,14 @@ static int _panel_up_animator_cb(void *data) {
 	/* move up panel */
 	if (wd->panel) {
 		ypos = wd->win_h - (wd->panel_height * progress / max);
-		evas_object_move(wd->panel, 0, ypos);
+		evas_object_move(wd->panel, wd->x, ypos);
 	}
 
 	return 1;
 }
 
-static int _panel_down_animator_cb(void *data) {
+static int _panel_down_animator_cb(void *data)
+{
 	int max = PANEL_ANIMATOR_MAX;
 	static int progress = 0;
 	Widget_Data *wd;
@@ -322,15 +321,15 @@ static int _panel_down_animator_cb(void *data) {
 
 	/* move down panel */
 	if (wd->panel) {
-		ypos = wd->win_h - wd->panel_height + (wd->panel_height * progress
-				/ max);
-		evas_object_move(wd->panel, 0, ypos);
+		ypos = wd->win_h - wd->panel_height + (wd->panel_height * progress / max);
+		evas_object_move(wd->panel, wd->x, ypos);
 	}
 
 	return 1;
 }
 
-static int _hide_button_animator_cb(void *data) {
+static int _hide_button_animator_cb(void *data)
+{
 	int max = BTN_ANIMATOR_MAX;
 	static int progress = 0;
 	Widget_Data *wd;
@@ -355,26 +354,25 @@ static int _hide_button_animator_cb(void *data) {
 
 	/* move left button */
 	if (wd->button[ELM_SK_LEFT_BTN]) {
-		edje_object_part_geometry_get(wd->button[ELM_SK_LEFT_BTN],
-				"button_rect", NULL, NULL, &btn_w, NULL);
+		edje_object_part_geometry_get(wd->button[ELM_SK_LEFT_BTN], "button_rect", NULL, NULL, &btn_w, NULL);
 
-		xpos = -1 * btn_w * progress / max;
+		xpos = wd->x + -1 * btn_w * progress / max;
 		evas_object_move(wd->button[ELM_SK_LEFT_BTN], xpos, wd->y);
 	}
 
 	/* move right button */
 	if (wd->button[ELM_SK_RIGHT_BTN]) {
-		edje_object_part_geometry_get(wd->button[ELM_SK_RIGHT_BTN],
-				"button_rect", NULL, NULL, &btn_w, NULL);
+		edje_object_part_geometry_get(wd->button[ELM_SK_RIGHT_BTN], "button_rect", NULL, NULL, &btn_w, NULL);
 
-		xpos = (wd->w - btn_w) + (btn_w * progress / max);
+		xpos = (wd->x + wd->w - btn_w) + (btn_w * progress / max);
 		evas_object_move(wd->button[ELM_SK_RIGHT_BTN], xpos, wd->y);
 	}
 
 	return 1;
 }
 
-static int _show_button_animator_cb(void *data) {
+static int _show_button_animator_cb(void *data)
+{
 	int max = BTN_ANIMATOR_MAX;
 	static int progress = 0;
 	Widget_Data *wd;
@@ -399,27 +397,25 @@ static int _show_button_animator_cb(void *data) {
 
 	/* move left button */
 	if (wd->button[ELM_SK_LEFT_BTN]) {
-		edje_object_part_geometry_get(wd->button[ELM_SK_LEFT_BTN],
-				"button_rect", NULL, NULL, &btn_w, NULL);
+		edje_object_part_geometry_get(wd->button[ELM_SK_LEFT_BTN], "button_rect", NULL, NULL, &btn_w, NULL);
 
-		xpos = (-1 * btn_w) + (btn_w * progress / max);
+		xpos = wd->x + (-1 * btn_w) + (btn_w * progress / max);
 		evas_object_move(wd->button[ELM_SK_LEFT_BTN], xpos, wd->y);
 	}
 
 	/* move right button */
 	if (wd->button[ELM_SK_RIGHT_BTN]) {
-		edje_object_part_geometry_get(wd->button[ELM_SK_RIGHT_BTN],
-				"button_rect", NULL, NULL, &btn_w, NULL);
+		edje_object_part_geometry_get(wd->button[ELM_SK_RIGHT_BTN], "button_rect", NULL, NULL, &btn_w, NULL);
 
-		xpos = wd->w - (btn_w * progress / max);
+		xpos = wd->x + wd->w - (btn_w * progress / max);
 		evas_object_move(wd->button[ELM_SK_RIGHT_BTN], xpos, wd->y);
 	}
 
 	return 1;
 }
 
-static void _more_btn_click_cb(void *data, Evas_Object *obj,
-		const char *emission, const char *source) {
+static void _more_btn_click_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
 	Widget_Data *wd;
 	wd = elm_widget_data_get(data);
 	if (!wd)
@@ -440,7 +436,8 @@ static void _more_btn_click_cb(void *data, Evas_Object *obj,
 	}
 }
 
-static void _close_panel(Evas_Object *obj) {
+static void _close_panel(Evas_Object *obj)
+{
 	Widget_Data *wd;
 	wd = elm_widget_data_get(obj);
 	if (!wd)
@@ -458,17 +455,18 @@ static void _close_panel(Evas_Object *obj) {
 	}
 }
 
-static void _bg_click_cb(void *data, Evas *e, Evas_Object *obj,
-		void *event_info) {
+static void _bg_click_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
 	_close_panel(data);
 }
 
-static void _close_btn_click_cb(void *data, Evas_Object *obj,
-		const char *emission, const char *source) {
+static void _close_btn_click_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
 	_close_panel(data);
 }
 
-static int _show_button(Evas_Object *obj, Elm_Softkey_Type type, Eina_Bool show) {
+static int _show_button(Evas_Object *obj, Elm_Softkey_Type type, Eina_Bool show)
+{
 	if (!obj)
 		return -1;
 
@@ -481,7 +479,8 @@ static int _show_button(Evas_Object *obj, Elm_Softkey_Type type, Eina_Bool show)
 	if (show) {
 		wd->button_show[type] = EINA_TRUE;
 		evas_object_show(btn);
-	} else {
+	}
+	else {
 		wd->button_show[type] = EINA_FALSE;
 		evas_object_hide(btn);
 	}
@@ -489,7 +488,8 @@ static int _show_button(Evas_Object *obj, Elm_Softkey_Type type, Eina_Bool show)
 	return 0;
 }
 
-static int _arrange_button(Evas_Object *obj, Elm_Softkey_Type type) {
+static int _arrange_button(Evas_Object *obj, Elm_Softkey_Type type)
+{
 	Widget_Data *wd;
 	Evas_Coord btn_w = 0;
 	Evas_Object *btn;
@@ -504,14 +504,14 @@ static int _arrange_button(Evas_Object *obj, Elm_Softkey_Type type) {
 	if (!btn)
 		return -1;
 
-	switch (type) {
+	switch (type)
+	{
 	case ELM_SK_LEFT_BTN:
 		evas_object_move(btn, wd->x, wd->y);
 		break;
 	case ELM_SK_RIGHT_BTN:
-		edje_object_part_geometry_get(btn, "button_rect", NULL, NULL, &btn_w,
-				NULL);
-		evas_object_move(btn, wd->w - btn_w, wd->y);
+		edje_object_part_geometry_get(btn, "button_rect", NULL, NULL, &btn_w, NULL);
+		evas_object_move(btn, wd->x + wd->w - btn_w, wd->y);
 		break;
 	default:
 		break;
@@ -520,8 +520,8 @@ static int _arrange_button(Evas_Object *obj, Elm_Softkey_Type type) {
 	return 0;
 }
 
-static void _softkey_up_cb(void *data, Evas_Object *obj, const char *emission,
-		const char *source) {
+static void _softkey_up_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
 	Evas_Object *edj;
 
 	Elm_Softkey_Item *it = (Elm_Softkey_Item *) data;
@@ -539,8 +539,8 @@ static void _softkey_up_cb(void *data, Evas_Object *obj, const char *emission,
 	edje_object_signal_emit(edj, "elm,state,unselected", "elm");
 }
 
-static void _softkey_down_cb(void *data, Evas_Object *obj,
-		const char *emission, const char *source) {
+static void _softkey_down_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
 	Evas_Object *edj;
 
 	Elm_Softkey_Item *it = (Elm_Softkey_Item *) data;
@@ -555,8 +555,8 @@ static void _softkey_down_cb(void *data, Evas_Object *obj,
 	edje_object_signal_emit(edj, "elm,state,selected", "elm");
 }
 
-static void _panel_up_cb(void *data, Evas *e, Evas_Object *obj,
-		void *event_info) {
+static void _panel_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
 	Elm_Softkey_Item *it = (Elm_Softkey_Item *) data;
 
 	Widget_Data *wd;
@@ -575,8 +575,8 @@ static void _panel_up_cb(void *data, Evas *e, Evas_Object *obj,
 	evas_object_smart_callback_call(it->obj, "clicked", it);
 }
 
-static void _panel_down_cb(void *data, Evas *e, Evas_Object *obj,
-		void *event_info) {
+static void _panel_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
 	Evas_Coord glow_x, glow_y;
 	Widget_Data *wd;
 
@@ -598,7 +598,8 @@ static void _panel_down_cb(void *data, Evas *e, Evas_Object *obj,
 	evas_object_smart_callback_call(it->obj, "press", it);
 }
 
-static int _delete_button(Evas_Object *obj) {
+static int _delete_button(Evas_Object *obj)
+{
 	if (!obj)
 		return -1;
 
@@ -610,22 +611,25 @@ static int _delete_button(Evas_Object *obj) {
 	return 0;
 }
 
-static void _calc_win_height(Widget_Data *wd) {
+static void _calc_win_height(Widget_Data *wd)
+{
 	wd->win_h = wd->y + wd->h;
 
 	if (wd->bg_rect) {
 		evas_object_resize(wd->bg_rect, wd->w, wd->win_h);
+		evas_object_move(wd->bg_rect, wd->x, 0);
 	}
 
 	if (wd->show_panel) {
 		evas_object_move(wd->panel, wd->x, (wd->win_h - wd->panel_height));
-	} else {
+	}
+	else {
 		evas_object_move(wd->panel, wd->x, wd->win_h);
 	}
 }
 
-static void _softkey_object_move(void *data, Evas *e, Evas_Object *obj,
-		void *event_info) {
+static void _softkey_object_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
 	Widget_Data *wd;
 	int i;
 	Evas_Coord x, y;
@@ -641,7 +645,7 @@ static void _softkey_object_move(void *data, Evas *e, Evas_Object *obj,
 	wd->x = x;
 	wd->y = y;
 
-	//	evas_object_move(wd->lay, x, y);
+	evas_object_move(wd->lay, x, y);
 
 	for (i = 0; i < 2; i++) {
 		_arrange_button((Evas_Object *) data, i);
@@ -650,8 +654,8 @@ static void _softkey_object_move(void *data, Evas *e, Evas_Object *obj,
 	_calc_win_height(wd);
 }
 
-static void _softkey_object_resize(void *data, Evas *e, Evas_Object *obj,
-		void *event_info) {
+static void _softkey_object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
 	Widget_Data *wd;
 	Evas_Object *btn;
 	int i;
@@ -677,8 +681,7 @@ static void _softkey_object_resize(void *data, Evas *e, Evas_Object *obj,
 	for (i = 0; i < 2; i++) {
 		btn = wd->button[i];
 		if (btn != NULL) {
-			edje_object_part_geometry_get(btn, "button_rect", NULL, NULL,
-					&btn_w, NULL);
+			edje_object_part_geometry_get(btn, "button_rect", NULL, NULL, &btn_w, NULL);
 			evas_object_resize(btn, btn_w, h);
 			_arrange_button((Evas_Object *) data, i);
 		}
@@ -686,14 +689,15 @@ static void _softkey_object_resize(void *data, Evas *e, Evas_Object *obj,
 
 	if (wd->w >= wd->win_h) {
 		_softkey_horizontal_set(data, EINA_TRUE);
-	} else {
+	}
+	else {
 		_softkey_horizontal_set(data, EINA_FALSE);
 	}
 	_calc_win_height(wd);
 }
 
-static void _softkey_object_show(void *data, Evas *e, Evas_Object *obj,
-		void *event_info) {
+static void _softkey_object_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
 	Widget_Data *wd = NULL;
 	Evas_Object *btn;
 	int i;
@@ -721,8 +725,8 @@ static void _softkey_object_show(void *data, Evas *e, Evas_Object *obj,
 	}
 }
 
-static void _softkey_object_hide(void *data, Evas *e, Evas_Object *obj,
-		void *event_info) {
+static void _softkey_object_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
 	Widget_Data *wd = NULL;
 	Evas_Object *btn;
 	int i;
@@ -759,7 +763,8 @@ static void _softkey_object_hide(void *data, Evas *e, Evas_Object *obj,
  * @ingroup		Softkey 
  */
 EAPI Evas_Object *
-elm_softkey_add(Evas_Object *parent) {
+elm_softkey_add(Evas_Object *parent)
+{
 	Evas_Object *obj = NULL;
 	Widget_Data *wd = NULL;
 	Evas *e;
@@ -783,17 +788,12 @@ elm_softkey_add(Evas_Object *parent) {
 		return NULL;
 	}
 	elm_widget_resize_object_set(obj, wd->lay);
-	edje_object_signal_callback_add(wd->lay, "clicked", "more_btn",
-			_more_btn_click_cb, obj);
+	edje_object_signal_callback_add(wd->lay, "clicked", "more_btn", _more_btn_click_cb, obj);
 
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE,
-			_softkey_object_resize, obj);
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE,
-			_softkey_object_move, obj);
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW,
-			_softkey_object_show, obj);
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE,
-			_softkey_object_hide, obj);
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _softkey_object_resize, obj);
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _softkey_object_move, obj);
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _softkey_object_show, obj);
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _softkey_object_hide, obj);
 	wd->is_horizontal = EINA_FALSE;
 	wd->panel_suppported = EINA_TRUE;
 	wd->scale_factor = elm_scale_get();
@@ -815,7 +815,8 @@ elm_softkey_add(Evas_Object *parent) {
 	return obj;
 }
 
-EAPI void _softkey_horizontal_set(Evas_Object *obj, Eina_Bool horizontal_mode) {
+static void _softkey_horizontal_set(Evas_Object *obj, Eina_Bool horizontal_mode)
+{
 	Widget_Data *wd;
 	char buff[32];
 	if (!obj)
@@ -827,29 +828,24 @@ EAPI void _softkey_horizontal_set(Evas_Object *obj, Eina_Bool horizontal_mode) {
 	if (wd->panel) {
 		if ((edje_object_data_get(wd->panel, "max_item_count") == NULL)
 				|| (edje_object_data_get(wd->panel, "panel_height") == NULL)
-				|| (edje_object_data_get(wd->panel, "panel_height_horizontal")
-						== NULL)) {
+				|| (edje_object_data_get(wd->panel, "panel_height_horizontal") == NULL)) {
 			wd->panel_suppported = EINA_FALSE;
-		} else
+		}
+		else
 			wd->panel_suppported = EINA_TRUE;
 		if (wd->panel_suppported == EINA_TRUE) {
 			if (wd->is_horizontal == EINA_TRUE) {
 				sprintf(buff, "button_%d", (wd->panel_btn_idx + wd->max_button));
 				edje_object_signal_emit(wd->panel, buff, "panel_rect");
-				wd->panel_height = (int) (atoi(edje_object_data_get(wd->panel,
-						buff)) * wd->scale_factor);
-				evas_object_resize(
-						wd->panel,
-						wd->w,
-						((int) (atoi(edje_object_data_get(wd->panel,
-								"panel_height_horizontal")) * wd->scale_factor)));
-			} else {
+				wd->panel_height = (int) (atoi(edje_object_data_get(wd->panel, buff)) * wd->scale_factor);
+				evas_object_resize(wd->panel, wd->w, ((int) (atoi(edje_object_data_get(wd->panel, "panel_height_horizontal"))
+						* wd->scale_factor)));
+			}
+			else {
 				sprintf(buff, "button_%d", (wd->panel_btn_idx));
 				edje_object_signal_emit(wd->panel, buff, "panel_rect");
-				wd->panel_height = (int) (atoi(edje_object_data_get(wd->panel,
-						buff)) * wd->scale_factor);
-				evas_object_resize(wd->panel, wd->w, ((int) (atoi(
-						edje_object_data_get(wd->panel, "panel_height"))
+				wd->panel_height = (int) (atoi(edje_object_data_get(wd->panel, buff)) * wd->scale_factor);
+				evas_object_resize(wd->panel, wd->w, ((int) (atoi(edje_object_data_get(wd->panel, "panel_height"))
 						* wd->scale_factor)));
 			}
 		}
@@ -871,9 +867,8 @@ EAPI void _softkey_horizontal_set(Evas_Object *obj, Eina_Bool horizontal_mode) {
  * @ingroup	Softkey  
  */
 EAPI Elm_Softkey_Item *
-elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type,
-		Evas_Object *icon, const char *label, void(*func)(void *data,
-				Evas_Object *obj, void *event_info), const void *data) {
+elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type, Evas_Object *icon, const char *label, void(*func)(void *data, Evas_Object *obj, void *event_info), const void *data)
+{
 	Widget_Data *wd;
 	Evas* evas;
 	char button_type[64];
@@ -905,15 +900,15 @@ elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type,
 	if (wd->button[type] == NULL) {
 		if (type == ELM_SK_LEFT_BTN) {
 			strcpy(button_type, "button_left");
-		} else {
+		}
+		else {
 			strcpy(button_type, "button_right");
 		}
 
 		it->base = wd->button[type] = edje_object_add(evas);
 		if (!wd->button[type])
 			return NULL;
-		_elm_theme_object_set(obj, wd->button[type], "softkey", button_type,
-				elm_widget_style_get(obj));
+		_elm_theme_object_set(obj, wd->button[type], "softkey", button_type, elm_widget_style_get(obj));
 
 		wd->button_show[type] = EINA_TRUE;
 		if (evas_object_visible_get(obj)) {
@@ -921,10 +916,8 @@ elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type,
 		}
 		evas_object_smart_member_add(wd->button[type], obj);
 
-		edje_object_signal_callback_add(wd->button[type], "elm,action,down",
-				"", _softkey_down_cb, it);
-		edje_object_signal_callback_add(wd->button[type], "elm,action,click",
-				"", _softkey_up_cb, it);
+		edje_object_signal_callback_add(wd->button[type], "elm,action,down", "", _softkey_down_cb, it);
+		edje_object_signal_callback_add(wd->button[type], "elm,action,click", "", _softkey_up_cb, it);
 
 		evas_object_clip_set(wd->button[type], evas_object_clip_get(obj));
 		if (wd->panel)
@@ -948,7 +941,8 @@ elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type,
  * 
  * @ingroup	Softkey  
  */
-EAPI void elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type) {
+EAPI void elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type)
+{
 	Widget_Data *wd;
 	Elm_Softkey_Item *it;
 	Evas_Object *btn;
@@ -981,7 +975,8 @@ EAPI void elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type) {
  *
  * @ingroup	Softkey  
  */
-EAPI void elm_softkey_button_show(Evas_Object *obj, Elm_Softkey_Type type) {
+EAPI void elm_softkey_button_show(Evas_Object *obj, Elm_Softkey_Type type)
+{
 	_show_button(obj, type, EINA_TRUE);
 }
 
@@ -992,7 +987,8 @@ EAPI void elm_softkey_button_show(Evas_Object *obj, Elm_Softkey_Type type) {
  *
  * @ingroup	Softkey  
  */
-EAPI void elm_softkey_button_hide(Evas_Object *obj, Elm_Softkey_Type type) {
+EAPI void elm_softkey_button_hide(Evas_Object *obj, Elm_Softkey_Type type)
+{
 	_show_button(obj, type, EINA_FALSE);
 }
 
@@ -1008,9 +1004,8 @@ EAPI void elm_softkey_button_hide(Evas_Object *obj, Elm_Softkey_Type type) {
  * @ingroup	Softkey  
  */
 EAPI Elm_Softkey_Item *
-elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon,
-		const char *label, void(*func)(void *data, Evas_Object *obj,
-				void *event_info), const void *data) {
+elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void(*func)(void *data, Evas_Object *obj, void *event_info), const void *data)
+{
 	Widget_Data *wd;
 	Evas *evas;
 	char button_name[32];
@@ -1048,20 +1043,17 @@ elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon,
 
 		if (wd->bg_rect) {
 			evas_object_resize(wd->bg_rect, wd->w, wd->win_h);
-			evas_object_event_callback_add(wd->bg_rect, EVAS_CALLBACK_MOUSE_UP,
-					_bg_click_cb, obj);
+			evas_object_event_callback_add(wd->bg_rect, EVAS_CALLBACK_MOUSE_UP, _bg_click_cb, obj);
 			evas_object_smart_member_add(wd->bg_rect, obj);
 		}
 
 		wd->panel = edje_object_add(evas);
 		if (!wd->panel)
 			return NULL;
-		_elm_theme_object_set(obj, wd->panel, "softkey", "panel",
-				elm_widget_style_get(obj));
+		_elm_theme_object_set(obj, wd->panel, "softkey", "panel", elm_widget_style_get(obj));
 
 		evas_object_move(wd->panel, 0, wd->win_h);
-		edje_object_signal_callback_add(wd->panel, "clicked", "close_btn",
-				_close_btn_click_cb, obj);
+		edje_object_signal_callback_add(wd->panel, "clicked", "close_btn", _close_btn_click_cb, obj);
 		evas_object_smart_member_add(wd->panel, obj);
 		if (evas_object_visible_get(obj)) {
 			evas_object_show(wd->panel);
@@ -1069,8 +1061,7 @@ elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon,
 		wd->panel_height = 0;
 		if ((edje_object_data_get(wd->panel, "max_item_count") == NULL)
 				|| (edje_object_data_get(wd->panel, "panel_height") == NULL)
-				|| (edje_object_data_get(wd->panel, "panel_height_horizontal")
-						== NULL)) {
+				|| (edje_object_data_get(wd->panel, "panel_height_horizontal") == NULL)) {
 			//If this key is not found in data section, then it means the panel won't come.
 			wd->max_button = 0;
 			// delete panel 
@@ -1079,18 +1070,15 @@ elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon,
 			}
 			wd->panel_suppported = EINA_FALSE;
 			return NULL;
-		} else {
-			wd->max_button = (int) (atoi(edje_object_data_get(wd->panel,
-					"max_item_count")));
+		}
+		else {
+			wd->max_button = (int) (atoi(edje_object_data_get(wd->panel, "max_item_count")));
 			if (wd->is_horizontal) {
-				evas_object_resize(
-						wd->panel,
-						wd->w,
-						((int) (atoi(edje_object_data_get(wd->panel,
-								"panel_height_horizontal")) * wd->scale_factor)));
-			} else {
-				evas_object_resize(wd->panel, wd->w, ((int) (atoi(
-						edje_object_data_get(wd->panel, "panel_height"))
+				evas_object_resize(wd->panel, wd->w, ((int) (atoi(edje_object_data_get(wd->panel, "panel_height_horizontal"))
+						* wd->scale_factor)));
+			}
+			else {
+				evas_object_resize(wd->panel, wd->w, ((int) (atoi(edje_object_data_get(wd->panel, "panel_height"))
 						* wd->scale_factor)));
 			}
 		}
@@ -1112,16 +1100,13 @@ elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon,
 	it->base = btn = edje_object_add(evas);
 	if (!btn)
 		return NULL;
-	_elm_theme_object_set(obj, btn, "softkey", "panel_button",
-			elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, btn, "softkey", "panel_button", elm_widget_style_get(obj));
 
 	edje_object_part_text_set(btn, "elm.text", label); /* set text */
 	edje_object_message_signal_process(btn);
 
-	evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_DOWN,
-			_panel_down_cb, it);
-	evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_UP, _panel_up_cb,
-			it);
+	evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_DOWN, _panel_down_cb, it);
+	evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_UP, _panel_up_cb, it);
 
 	/* swallow button */
 	sprintf(button_name, "panel_button_area_%d", wd->panel_btn_idx);
@@ -1129,13 +1114,12 @@ elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon,
 	if (wd->is_horizontal) {
 		sprintf(buff, "button_%d", wd->max_button + wd->panel_btn_idx);
 		edje_object_signal_emit(wd->panel, buff, "panel_rect");
-		wd->panel_height = (int) (atoi(edje_object_data_get(wd->panel, buff))
-				* wd->scale_factor);
-	} else {
+		wd->panel_height = (int) (atoi(edje_object_data_get(wd->panel, buff)) * wd->scale_factor);
+	}
+	else {
 		sprintf(buff, "button_%d", wd->panel_btn_idx);
 		edje_object_signal_emit(wd->panel, buff, "panel_rect");
-		wd->panel_height = (int) (atoi(edje_object_data_get(wd->panel, buff))
-				* wd->scale_factor);
+		wd->panel_height = (int) (atoi(edje_object_data_get(wd->panel, buff)) * wd->scale_factor);
 	}
 
 	return it;
@@ -1149,7 +1133,8 @@ elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon,
  *
  * @ingroup Softkey
  */
-EAPI int elm_softkey_panel_del(Evas_Object *obj) {
+EAPI int elm_softkey_panel_del(Evas_Object *obj)
+{
 	Widget_Data *wd;
 	char button_name[32];
 	Evas_Object *btn;
@@ -1201,7 +1186,8 @@ EAPI int elm_softkey_panel_del(Evas_Object *obj) {
  *
  * @ingroup Softkey
  */
-EAPI int elm_softkey_panel_open(Evas_Object *obj) {
+EAPI int elm_softkey_panel_open(Evas_Object *obj)
+{
 	Widget_Data *wd;
 	wd = elm_widget_data_get(obj);
 
@@ -1225,7 +1211,8 @@ EAPI int elm_softkey_panel_open(Evas_Object *obj) {
  *
  * @ingroup Softkey
  */
-EAPI int elm_softkey_panel_close(Evas_Object *obj) {
+EAPI int elm_softkey_panel_close(Evas_Object *obj)
+{
 	Widget_Data *wd;
 	wd = elm_widget_data_get(obj);
 	if (!wd)
@@ -1249,7 +1236,8 @@ EAPI int elm_softkey_panel_close(Evas_Object *obj) {
  *
  * @ingroup Softkey
  */
-EAPI void elm_softkey_item_icon_set(Elm_Softkey_Item *it, Evas_Object *icon) {
+EAPI void elm_softkey_item_icon_set(Elm_Softkey_Item *it, Evas_Object *icon)
+{
 	if (!it)
 		return;
 
@@ -1265,7 +1253,8 @@ EAPI void elm_softkey_item_icon_set(Elm_Softkey_Item *it, Evas_Object *icon) {
 		edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
 		edje_object_message_signal_process(it->base);
 		_sizing_eval(it->obj);
-	} else
+	}
+	else
 		it->icon = icon;
 }
 
@@ -1278,7 +1267,8 @@ EAPI void elm_softkey_item_icon_set(Elm_Softkey_Item *it, Evas_Object *icon) {
  * @ingroup Softkey
  */
 EAPI Evas_Object *
-elm_softkey_item_icon_get(Elm_Softkey_Item *it) {
+elm_softkey_item_icon_get(Elm_Softkey_Item *it)
+{
 	if (!it)
 		return NULL;
 	return it->icon;
@@ -1292,7 +1282,8 @@ elm_softkey_item_icon_get(Elm_Softkey_Item *it) {
  *
  * @ingroup Softkey
  */
-EAPI void elm_softkey_item_label_set(Elm_Softkey_Item *it, const char *label) {
+EAPI void elm_softkey_item_label_set(Elm_Softkey_Item *it, const char *label)
+{
 	if (!it)
 		return;
 	if (it->label)
@@ -1303,9 +1294,9 @@ EAPI void elm_softkey_item_label_set(Elm_Softkey_Item *it, const char *label) {
 		edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
 
 		/* set text */
-		edje_object_part_text_set(it->base, "elm.text", label == NULL ? ""
-				: label);
-	} else {
+		edje_object_part_text_set(it->base, "elm.text", label == NULL ? "" : label);
+	}
+	else {
 		it->label = NULL;
 		edje_object_signal_emit(it->base, "elm,state,text,hidden", "elm");
 	}
@@ -1321,8 +1312,8 @@ EAPI void elm_softkey_item_label_set(Elm_Softkey_Item *it, const char *label) {
  *
  * @ingroup Softkey
  */
-EAPI void elm_softkey_item_callback_set(Elm_Softkey_Item* item, void(*func)(
-		void *data, Evas_Object *obj, void *event_info), const void *data) {
+EAPI void elm_softkey_item_callback_set(Elm_Softkey_Item* item, void(*func)(void *data, Evas_Object *obj, void *event_info), const void *data)
+{
 	if (!item)
 		return;
 
@@ -1340,20 +1331,22 @@ EAPI void elm_softkey_item_callback_set(Elm_Softkey_Item* item, void(*func)(
  * @ingroup Softkey
  */
 EAPI const char *
-elm_softkey_item_label_get(Elm_Softkey_Item *it) {
+elm_softkey_item_label_get(Elm_Softkey_Item *it)
+{
 	if (!it)
 		return NULL;
 	return it->label;
 }
 
-EAPI Eina_Bool elm_softkey_item_disabled_get(Elm_Softkey_Item *it) {
+EAPI Eina_Bool elm_softkey_item_disabled_get(Elm_Softkey_Item *it)
+{
 	if (!it)
 		return EINA_FALSE;
 	return it->disabled;
 }
 
-EAPI void elm_softkey_item_disabled_set(Elm_Softkey_Item *it,
-		Eina_Bool disabled) {
+EAPI void elm_softkey_item_disabled_set(Elm_Softkey_Item *it, Eina_Bool disabled)
+{
 	if (!it)
 		return;
 	_item_disable(it, disabled);
