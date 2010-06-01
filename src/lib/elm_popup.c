@@ -19,6 +19,8 @@ struct _Widget_Data
 	Evas_Object 	*content_area;
 	Evas_Object 	*action_area;	
 	Evas_Object *parent;
+	Evas_Object *parent_app;
+	int rot_angle;
 	Ecore_Job    *del_job;
 	Eina_Bool      delete_me : 1;
 };
@@ -39,6 +41,7 @@ static void _action_area_clicked( void *data, Evas_Object *obj, void *event_info
 static void _block_clicked_cb( void *data, Evas_Object *obj, void *event_info );
 static void _show(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _hide(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _resize_parent(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static void
 _del_parent(void *data, Evas *e, Evas_Object *obj, void *evet_info)
@@ -80,8 +83,11 @@ _del_hook(Evas_Object *obj)
 static void
 _del_pre_hook(Evas_Object *obj)
 {
-	evas_object_event_callback_del_full(obj, EVAS_CALLBACK_SHOW, _show, obj);
-	evas_object_event_callback_del_full(obj, EVAS_CALLBACK_HIDE, _hide, obj);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	evas_object_event_callback_del_full(obj, EVAS_CALLBACK_SHOW, _show, NULL);
+	evas_object_event_callback_del_full(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
+	if(wd->parent_app)
+	evas_object_event_callback_del_full(wd->parent_app, EVAS_CALLBACK_RESIZE, _resize_parent, obj);
 }
 
 static void
@@ -144,10 +150,20 @@ static void
 _resize_parent(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
 	Widget_Data *wd = elm_widget_data_get(data);
+	int rot_angle;
 	if(!wd)
 		return;
-	elm_win_rotation_with_resize_set(wd->parent,  elm_win_rotation_get(obj));
+	if(wd->parent)
+	{
+		rot_angle = elm_win_rotation_get(obj);
+		if(wd->rot_angle!=rot_angle)
+		{
+			elm_win_rotation_with_resize_set(wd->parent,  rot_angle);
+			wd->rot_angle = rot_angle;
+		}
+	}
 }
+
 /**
  * Add a new Popup object
  *
@@ -165,24 +181,41 @@ elm_popup_add(Evas_Object *parent_app)
 	Evas_Object *parent;
 	Evas_Coord x,y,w,h;
 	int rotation=-1;
+	int count;
+	unsigned int *prop_data = NULL;
+	int ret;
 
 	//FIXME: Keep this window always on top
 	parent = elm_win_add(parent_app,"popup",ELM_WIN_DIALOG_BASIC);
 	elm_win_alpha_set(parent, EINA_TRUE);	
 	elm_win_raise(parent);	
-	ecore_x_window_geometry_get(ecore_x_window_root_get(ecore_x_window_focus_get()),&x, &y, &w, &h);	
+
 	if(parent_app)
 		{
 			evas_object_geometry_get(parent_app, &x, &y, &w, &h);
 			rotation = elm_win_rotation_get(parent_app);
+			evas_object_resize(parent, w, h);
+			evas_object_move(parent, x, y);
+			if(rotation!=-1)
+			{
+				elm_win_rotation_set(parent, rotation);
+			}				
 		}
-	evas_object_resize(parent, w, h);
-	evas_object_move(parent, x, y);
-	if(rotation!=-1)
+	else
 		{
-			elm_win_rotation_set(parent, rotation);
-		}
+			ecore_x_window_geometry_get(ecore_x_window_root_get(ecore_x_window_focus_get()),&x, &y, &w, &h);	
+			ret  = ecore_x_window_prop_property_get (ecore_x_window_root_get(ecore_x_window_focus_get()), ECORE_X_ATOM_E_ILLUME_ROTATE_ROOT_ANGLE, ECORE_X_ATOM_CARDINAL, 32, &prop_data, &count);
+			if( ret && prop_data )
+			memcpy (&rotation, prop_data, sizeof (int));
 
+			if (prop_data) free (prop_data);
+			evas_object_resize(parent, w, h);
+			evas_object_move(parent, x, y);
+			if(rotation!=-1)
+			{
+			elm_win_rotation_with_resize_set(parent, rotation);
+			}				
+		}
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
 	obj = elm_widget_add(e);
@@ -193,10 +226,12 @@ elm_popup_add(Evas_Object *parent_app)
 	elm_widget_del_hook_set(obj, _del_hook);
 	elm_widget_theme_hook_set(obj, _theme_hook);
 	wd->parent = parent;
+	wd->rot_angle = rotation;
 
 	evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _del_parent, obj);
 	if(parent_app)
 	evas_object_event_callback_add(parent_app, EVAS_CALLBACK_RESIZE, _resize_parent, obj);
+	wd->parent_app = parent_app;
 
 	wd->notify= elm_notify_add(parent);		
 	elm_widget_resize_object_set(obj, wd->notify);
@@ -212,8 +247,8 @@ elm_popup_add(Evas_Object *parent_app)
 	elm_layout_theme_set(wd->layout, "popup", "base", "default");
 	elm_notify_content_set(wd->notify, wd->layout);
 
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, obj);
-    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, obj);
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, NULL);
+    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
 		
 	_sizing_eval(obj);
 
