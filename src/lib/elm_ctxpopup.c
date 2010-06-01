@@ -723,7 +723,6 @@ static void _separator_obj_add( Evas_Object* ctxpopup )
 
 	evas_object_size_hint_weight_set( item->obj, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND ) ;
 	evas_object_size_hint_fill_set( item->obj, EVAS_HINT_FILL, EVAS_HINT_FILL );
-//	_elm_theme_set( item->obj, "ctxpopup", "separator", elm_widget_style_get( ctxpopup ) ) ;
 	_elm_theme_object_set( ctxpopup, item->obj, "ctxpopup", "seperator", elm_widget_style_get( ctxpopup ) );
 
 
@@ -1100,6 +1099,7 @@ static void _update_arrow_obj( Evas_Object* obj, Arrow_Direction arrow_dir )
 		{
 			if( wd->last_arrow_dir != Left_Arrow ) {
 				_arrow_obj_add( obj, "left_arrow" );
+				_elm_theme_object_set( obj, wd->arrow, "ctxpopup", "left_arrow", elm_widget_style_get( obj ) );
 				wd->last_arrow_dir = Left_Arrow;
 			}
 			arrow_y = _adjust_arrow_pos_y( wd );
@@ -1110,6 +1110,7 @@ static void _update_arrow_obj( Evas_Object* obj, Arrow_Direction arrow_dir )
 		{
 			if( wd->last_arrow_dir != Right_Arrow ) {
 				_arrow_obj_add( obj, "right_arrow" );
+				_elm_theme_object_set( obj, wd->arrow, "ctxpopup", "right_arrow", elm_widget_style_get( obj ) );
 				wd->last_arrow_dir = Right_Arrow;
 			}
 			arrow_y = _adjust_arrow_pos_y( wd );
@@ -1121,6 +1122,7 @@ static void _update_arrow_obj( Evas_Object* obj, Arrow_Direction arrow_dir )
 		{
 			if( wd->last_arrow_dir != Top_Arrow ) {
 				_arrow_obj_add( obj, "top_arrow" ); 
+				_elm_theme_object_set( obj, wd->arrow, "ctxpopup", "top_arrow", elm_widget_style_get( obj ) );
 				wd->last_arrow_dir = Top_Arrow;
 			}
 			arrow_x = _adjust_arrow_pos_x( wd );
@@ -1131,6 +1133,7 @@ static void _update_arrow_obj( Evas_Object* obj, Arrow_Direction arrow_dir )
 		{
 			if( wd->last_arrow_dir != Bottom_Arrow ) { 
 				_arrow_obj_add( obj, "bottom_arrow" ); 
+				_elm_theme_object_set( obj, wd->arrow, "ctxpopup", "bottom_arrow", elm_widget_style_get( obj ) );
 				wd->last_arrow_dir = Bottom_Arrow;
 			}
 			arrow_x = _adjust_arrow_pos_x( wd );
@@ -1157,7 +1160,6 @@ static void _get_obj_size( Evas_Object* ctxpopup, double scale  )
 	}
 
 	Evas_Object* data_info = edje_object_add( evas_object_evas_get( wd->location ) );
-	//_elm_theme_set( data_info, "ctxpopup", "data_info", elm_widget_style_get( ctxpopup ) );
 	_elm_theme_object_set( ctxpopup, data_info, "ctxpopup", "data_info", elm_widget_style_get( ctxpopup ) );
 
 	//Hover
@@ -1260,11 +1262,6 @@ static void _theme_hook( Evas_Object* obj )
 
 			if( item->separator == EINA_TRUE ) {
 
-/*				_elm_theme_set( item->obj,
-						"ctxpopup",
-						"separator",
-						elm_widget_style_get( obj ) ); */
-
 				_elm_theme_object_set( obj,
 						item->obj,
 						"ctxpopup",
@@ -1272,19 +1269,11 @@ static void _theme_hook( Evas_Object* obj )
 						elm_widget_style_get( obj ) );
 
 				if( wd->horizontal == EINA_TRUE ) {
-					edje_object_signal_emit( item->obj, "elm,state,horizontal", "elm" );				}else {
+					edje_object_signal_emit( item->obj, "elm,state,horizontal", "elm" );
+				}else {
 					edje_object_signal_emit( item->obj, "elm,state,vertical", "elm" );
- 				 }
-
-
-
+ 				}
 			}else {
-
-/*				_elm_theme_set( item->obj,
-					"ctxpopup",
-					"item",
-					elm_widget_style_get( obj ) ); */
-
 				_elm_theme_object_set( obj,
 						item->obj,
 						"ctxpopup",
@@ -1337,8 +1326,6 @@ static void _theme_hook( Evas_Object* obj )
 	}
 
 	elm_object_style_set( wd->hover, "ctxpopup");
-
-	//_elm_theme_set( wd->arrow, "ctxpopup", "arrow", elm_widget_style_get( obj ) );
 	_elm_theme_object_set( obj, wd->arrow, "ctxpopup", "arrow", elm_widget_style_get( obj ) );
 
 	_get_obj_size( obj, edje_scale_get() );
@@ -1464,9 +1451,7 @@ static void _arrow_obj_add( Evas_Object* ctxpopup, const char* group_name )
 	elm_widget_sub_object_add( ctxpopup, wd->arrow );
 
 	evas_object_size_hint_weight_set( wd->arrow, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND );
-	//_elm_theme_set( wd->arrow, "ctxpopup", group_name, elm_widget_style_get( ctxpopup ) );
-	_elm_theme_object_set( ctxpopup, wd->arrow, "ctxpopup", "arrow", elm_widget_style_get( ctxpopup ) );
-
+	
 	if( evas_object_visible_get( ctxpopup ) == EINA_TRUE ) {
 		evas_object_show( wd->arrow );
 	}
