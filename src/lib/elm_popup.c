@@ -140,6 +140,14 @@ _hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
 }
 
+static void
+_resize_parent(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+	if(!wd)
+		return;
+	elm_win_rotation_with_resize_set(wd->parent,  elm_win_rotation_get(obj));
+}
 /**
  * Add a new Popup object
  *
@@ -156,18 +164,24 @@ elm_popup_add(Evas_Object *parent_app)
 	Widget_Data *wd;
 	Evas_Object *parent;
 	Evas_Coord x,y,w,h;
+	int rotation=-1;
 
 	//FIXME: Keep this window always on top
 	parent = elm_win_add(parent_app,"popup",ELM_WIN_DIALOG_BASIC);
 	elm_win_alpha_set(parent, EINA_TRUE);	
 	elm_win_raise(parent);	
-	ecore_x_window_geometry_get(NULL,&x, &y, &w, &h);	
+	ecore_x_window_geometry_get(ecore_x_window_root_get(ecore_x_window_focus_get()),&x, &y, &w, &h);	
 	if(parent_app)
 		{
 			evas_object_geometry_get(parent_app, &x, &y, &w, &h);
+			rotation = elm_win_rotation_get(parent_app);
 		}
 	evas_object_resize(parent, w, h);
 	evas_object_move(parent, x, y);
+	if(rotation!=-1)
+		{
+			elm_win_rotation_set(parent, rotation);
+		}
 
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
@@ -181,6 +195,8 @@ elm_popup_add(Evas_Object *parent_app)
 	wd->parent = parent;
 
 	evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _del_parent, obj);
+	if(parent_app)
+	evas_object_event_callback_add(parent_app, EVAS_CALLBACK_RESIZE, _resize_parent, obj);
 
 	wd->notify= elm_notify_add(parent);		
 	elm_widget_resize_object_set(obj, wd->notify);

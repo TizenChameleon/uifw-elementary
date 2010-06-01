@@ -91,10 +91,6 @@ static void _theme_hook(Evas_Object *obj)
    int ms = 0;
    int scale = 0;
 
-   /* Temp */
-   Elm_Theme *th = NULL;
-   th = elm_theme_new();
-
    if (!wd) return;
    scale = (elm_widget_scale_get(obj) * _elm_config->scale);
    edje_object_scale_set(wd->scr, scale);
@@ -360,10 +356,6 @@ EAPI Elm_Toolbar2_Item *elm_toolbar2_item_add(Evas_Object *obj, Evas_Object *ico
 	it->func = func;
 	it->data = data;
 	it->base = edje_object_add(evas_object_evas_get(obj));
-
-	/* Temp */
-	Elm_Theme *th = NULL;
-	th = elm_theme_new();
 
 	_elm_theme_object_set(obj, it->base, "toolbar2", "item", elm_widget_style_get(obj));
 

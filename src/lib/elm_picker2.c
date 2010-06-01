@@ -117,7 +117,7 @@ _theme_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
-	_elm_theme_set(obj, wd->base, "picker2", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->base, "picker2", "base", elm_widget_style_get(obj));
 	_flick_init(obj);
 	_update_picker(obj);
 	_sizing_eval(obj);
@@ -224,7 +224,7 @@ _view_init(Evas_Object *obj)
 	// create cell list
 	for(i=0; i<wd->cell_cnt; i++){
 		txt = edje_object_add(evas_object_evas_get(obj));
-		_elm_theme_set(obj, txt, "picker2/item", "base", elm_widget_style_get(obj));
+		_elm_theme_object_set(obj, txt, "picker2/item", "base", elm_widget_style_get(obj));
 		evas_object_resize(txt, wd->w, wd->row_h);
 		evas_object_clip_set(txt, wd->clip);
 		elm_widget_sub_object_add(obj, txt);
@@ -711,14 +711,14 @@ elm_picker2_add(Evas_Object *parent)
 	elm_widget_resize_object_set(obj, wd->clip);
 
 	wd->base = edje_object_add(e);
-	_elm_theme_set(obj, wd->base, "picker2", "base", "default");
+	_elm_theme_object_set(obj, wd->base, "picker2", "base", "default");
 	elm_widget_hover_object_set(obj, wd->base);
 	evas_object_clip_set(wd->base, wd->clip);
 	evas_object_show(wd->base);
 
 	wd->indi = edje_object_add(e);
 	elm_widget_sub_object_add(obj, wd->indi);
-	_elm_theme_set(obj, wd->indi, "picker2/indicator", "base", "default");
+	_elm_theme_object_set(obj, wd->indi, "picker2/indicator", "base", "default");
 	evas_object_clip_set(wd->indi, wd->clip);
 	evas_object_pass_events_set(wd->indi, EINA_TRUE);
 	evas_object_show(wd->indi);
