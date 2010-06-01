@@ -101,6 +101,7 @@ elm_actionsheet.c \
 elm_gridbox.c \
 elm_softkey.c \
 elm_actionslider.c \
+elm_hor_scroller.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
@@ -114,6 +115,8 @@ els_pan.c \
 els_pan.h \
 els_scroller.c \
 els_scroller.h \
+els_hor_scroller.c \
+els_hor_scroller.h \
 els_box.c \
 els_box.h \
 els_icon.c \
