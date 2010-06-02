@@ -182,6 +182,7 @@ _timer_cb(void *data)
    if (!wd) return 0;
    wd->timer = NULL;
    evas_object_hide(obj);
+   evas_object_smart_callback_call(data, "notify,timeout", NULL);
    return 0;
 }
 
