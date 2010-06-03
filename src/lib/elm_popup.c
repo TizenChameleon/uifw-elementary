@@ -302,7 +302,6 @@ elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int
 			 va_end (args);			
 		}
 	_sizing_eval(popup);
-	evas_object_show(popup);
 	return popup;
 	
 }
