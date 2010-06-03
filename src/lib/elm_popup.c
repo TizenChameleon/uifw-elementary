@@ -36,7 +36,7 @@ static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _elm_popup_buttons_add_valist(Evas_Object *obj,const char *first_button_text,va_list args);
-static Evas_Object* _elm_popup_add_button(Evas_Object *obj,char *text,int response_id);
+static Evas_Object* _elm_popup_add_button(Evas_Object *obj,const char *text,int response_id);
 static void _action_area_clicked( void *data, Evas_Object *obj, void *event_info );
 static void _block_clicked_cb( void *data, Evas_Object *obj, void *event_info );
 static void _show(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -121,7 +121,7 @@ _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
 static void _block_clicked_cb( void *data, Evas_Object *obj, void *event_info )
 {	
 	evas_object_hide((Evas_Object*)data);	
-	evas_object_smart_callback_call((Evas_Object *)data, "response", ELM_POPUP_RESPONSE_NONE);		
+	evas_object_smart_callback_call((Evas_Object *)data, "response", (void *)ELM_POPUP_RESPONSE_NONE);		
 }
 
 static void
@@ -164,8 +164,67 @@ _resize_parent(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	}
 }
 
+static void _action_area_clicked( void *data, Evas_Object *obj, void *event_info )
+{
+	Action_Area_Data *adata = (Action_Area_Data *)data;
+	if (!adata) return;	
+	evas_object_smart_callback_call(adata->obj, "response", (void *)adata->response_id);	
+	evas_object_hide(adata->obj);
+}
+
+static Evas_Object* _elm_popup_add_button(Evas_Object *obj,const char *text,int response_id)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return NULL;
+	Evas_Object *btn;
+	Action_Area_Data *adata = malloc(sizeof(Action_Area_Data));	
+	btn = elm_button_add(obj);
+	elm_object_style_set(btn, "circulargrey");
+	elm_button_label_set(btn,text);
+	adata->response_id = response_id;
+	adata->obj = obj;
+	evas_object_smart_callback_add(btn, "clicked", _action_area_clicked, adata);	
+	return btn;
+}
+
+static void _elm_popup_buttons_add_valist(Evas_Object *obj,const char *first_button_text,va_list args)
+{
+	const char *text;	
+	char buf[50];
+	int response=0;
+	int index=0;
+	if(first_button_text==NULL)
+		return;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return;
+	text = first_button_text;	
+	response = va_arg (args, int);
+	Evas_Object *btn;
+	 while (text != NULL)
+	 	{
+	 		btn = _elm_popup_add_button(obj,text,response);
+			++index;			
+			snprintf(buf,50,"actionbtn%d",index);				
+			elm_layout_content_set(wd->action_area,buf,btn);
+			evas_object_event_callback_add(wd->action_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+				       _changed_size_hints, obj);
+			
+			text = va_arg (args, char*);
+			if (text == NULL)
+				break;
+			response = va_arg (args, int);
+	 	}		 
+}
+
+static void _elm_popup_timeout( void *data, Evas_Object *obj, void *event_info )
+{	
+	evas_object_hide((Evas_Object*)data);	
+	evas_object_smart_callback_call((Evas_Object *)data, "response", (void *)ELM_POPUP_RESPONSE_TIMEOUT);		
+}
+
+
 /**
- * Add a new Popup object
+ * Add a new Popup object.
  *
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
@@ -182,7 +241,7 @@ elm_popup_add(Evas_Object *parent_app)
 	Evas_Coord x,y,w,h;
 	int rotation=-1;
 	int count;
-	unsigned int *prop_data = NULL;
+	unsigned char *prop_data = NULL;
 	int ret;
 
 	//FIXME: Keep this window always on top
@@ -248,7 +307,7 @@ elm_popup_add(Evas_Object *parent_app)
 	elm_notify_content_set(wd->notify, wd->layout);
 
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, NULL);
-    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
 		
 	_sizing_eval(obj);
 
@@ -256,13 +315,14 @@ elm_popup_add(Evas_Object *parent_app)
 }
 
 /**
- * Add a new Popup object
+ * Add a new Popup object.
  *
  * @param parent The parent object
- * @param title The parent object
- * @param desc_text The parent object
- * @param first_button_text The parent object
- * @Varargs response ID for first button, then additional buttons, ending with NULL
+ * @param title text to be displayed in title area.
+ * @param desc_text text to be displayed in description area.
+ * @param no_of_buttons Number of buttons to be packed in action area.
+ * @param first_button_text button text
+ * @Varargs response ID for first button, then additional buttons followed by response id's ending with NULL
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Popup
@@ -307,10 +367,9 @@ elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int
 }
 
 /**
- * Set the desc of Popup
+ * Set the description text in content area of Popup widget.
  *
- * @param obj The popup object
- * @param label The label text
+ * @param text description text.
  *
  * @ingroup Popup
  */
@@ -319,7 +378,6 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Object *label;
-	char buf[255];
 	if (!wd) return;
 
 	if(wd->content_area)
@@ -349,10 +407,10 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
 }
 
 /**
- * Get the label used on the Popup object
+ * Get the description text packed in content area of popup object.
  *
  * @param obj The Popup object
- * @return label text
+ * @return  description text.
  *
  * @ingroup Popup
  */
@@ -366,10 +424,10 @@ elm_popup_desc_get(Evas_Object *obj)
 }
 
 /**
- * Set the title of Popup
+ * Set's the title label of popup object.
  *
  * @param obj The popup object
- * @param label The title text
+ * @param text The title text
  *
  * @ingroup Popup
  */
@@ -377,7 +435,6 @@ EAPI void
 elm_popup_title_label_set(Evas_Object *obj, const char *text)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	char buf[255];
 	if (!wd) return;
 
 	if(wd->title_area)
@@ -404,7 +461,7 @@ elm_popup_title_label_set(Evas_Object *obj, const char *text)
 }
 
 /**
- * Get the title of Popup object
+ * Get's the title label of popup object.
  *
  * @param obj The Popup object
  * @return title text
@@ -421,10 +478,10 @@ elm_popup_title_label_get(Evas_Object *obj)
 }
 
 /**
- * Set the icon in the title area of Popup
+ * Set the icon in the title area of Popup object.
  *
  * @param obj The popup object
- * @param label The title icon
+ * @param icon The title icon
  *
  * @ingroup Popup
  */
@@ -432,7 +489,6 @@ EAPI void
 elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	char buf[255];
 	if (!wd) return;
 
 	if(wd->title_icon)
@@ -446,15 +502,15 @@ elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon)
 	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,title,icon,visible", "elm");	
 	_sizing_eval(obj);
 }
+
 /**
- * Get the title icon of Popup object
+ * Get the title icon of Popup object.
  *
  * @param obj The Popup object
- * @return icon title
+ * @return title icon
  *
  * @ingroup Popup
  */
- 
 EAPI Evas_Object* 
 elm_popup_title_icon_get(Evas_Object *obj)
 {
@@ -465,7 +521,7 @@ elm_popup_title_icon_get(Evas_Object *obj)
 }
 
 /**
- * Set the content of Popup
+ * Set the content of Popup object.
  *
  * @param obj The popup object
  * @param content The content widget
@@ -491,7 +547,7 @@ elm_popup_content_set(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
- * Get the content of Popup object
+ * Get the content of Popup object.
  *
  * @param obj The Popup object
  * @return content packed in popup widget
@@ -507,71 +563,13 @@ elm_popup_content_get(Evas_Object *obj)
 	return wd->content_area;
 }
 
-static void _action_area_clicked( void *data, Evas_Object *obj, void *event_info )
-{
-	Action_Area_Data *adata = (Action_Area_Data *)data;
-	if (!adata) return;	
-	evas_object_smart_callback_call(adata->obj, "response", adata->response_id);	
-	evas_object_hide(adata->obj);
-}
-
-static Evas_Object* _elm_popup_add_button(Evas_Object *obj,char *text,int response_id)
-{
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	Evas_Object *btn;
-	Action_Area_Data *adata = malloc(sizeof(Action_Area_Data));	
-	btn = elm_button_add(obj);
-	elm_object_style_set(btn, "circulargrey");
-	elm_button_label_set(btn,text);
-	adata->response_id = response_id;
-	adata->obj = obj;
-	evas_object_smart_callback_add(btn, "clicked", _action_area_clicked, adata);	
-	return btn;
-}
-
-static void _elm_popup_buttons_add_valist(Evas_Object *obj,const char *first_button_text,va_list args)
-{
-	const char *text;	
-	char buf[50];
-	int response=0;
-	int index=0;
-	if(first_button_text==NULL)
-		return;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	text = first_button_text;	
-	response = va_arg (args, int);
-	Evas_Object *btn;
-	 while (text != NULL)
-	 	{
-	 		btn = _elm_popup_add_button(obj,text,response);
-			++index;			
-			snprintf(buf,50,"actionbtn%d",index);				
-			elm_layout_content_set(wd->action_area,buf,btn);
-			evas_object_event_callback_add(wd->action_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				       _changed_size_hints, obj);
-			
-			text = va_arg (args, char*);
-			if (text == NULL)
-				break;
-			response = va_arg (args, int);
-	 	}		 
-}
-
-static void _elm_popup_timeout( void *data, Evas_Object *obj, void *event_info )
-{	
-	Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
-	evas_object_hide((Evas_Object*)data);	
-	evas_object_smart_callback_call((Evas_Object *)data, "response", ELM_POPUP_RESPONSE_TIMEOUT);		
-}
-
 /**
- * Set the content of Popup
+ * Adds the buttons in to the action area of popup object.
  *
  * @param obj The popup object
- * @param content The content widget
- *
+ * @param no_of_buttons Number of buttons that has to be packed in action area.
+ * @param first_button_text 	Label of first button
+ * @param Varargs	 Response ID(Elm_Popup_Response/ any integer value) for first button, then additional buttons along with their response id ending with NULL.
  * @ingroup Popup
  */
 EAPI void 
@@ -613,7 +611,7 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
 }
 
 /**
- * Set the time before the popup window is hidden. <br>
+ * Set the time before the popup window is hidden. 
  *
  * @param obj The popup object
  * @param timeout The timeout
@@ -621,17 +619,17 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
  * @ingroup Popup
  */
 EAPI void 
-elm_popup_timeout_set(Evas_Object *popup, int timeout)
+elm_popup_timeout_set(Evas_Object *obj, int timeout)
 {	
-	Widget_Data *wd = elm_widget_data_get(popup);
+	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) 	return;	
 	elm_notify_timeout_set(wd->notify, timeout);
-	evas_object_smart_callback_add(wd->notify, "notify,timeout", _elm_popup_timeout, popup);
+	evas_object_smart_callback_add(wd->notify, "notify,timeout", _elm_popup_timeout, obj);
 }
 
 /**
- * Set the mode of popup, by default ELM_POPUP_TYPE_NONE is set i.e, popup <br> 
- * will not close when clicked outside. if ELM_POPUP_TYPE_ALERT is set, popup will close<br> 
+ * Set the mode of popup, by default ELM_POPUP_TYPE_NONE is set i.e, popup  
+ * will not close when clicked outside. if ELM_POPUP_TYPE_ALERT is set, popup will close
  * when clicked outside, and ELM_POPUP_RESPONSE_NONE is sent along with response signal.
  *
  * @param obj The popup object
@@ -640,11 +638,11 @@ elm_popup_timeout_set(Evas_Object *popup, int timeout)
  * @ingroup Popup
  */
  
-EAPI void elm_popup_set_mode(Evas_Object *popup, Elm_Popup_Mode mode)
+EAPI void elm_popup_set_mode(Evas_Object *obj, Elm_Popup_Mode mode)
 {
-	Widget_Data *wd = elm_widget_data_get(popup);
+	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) 	return;	
-	evas_object_smart_callback_add(wd->notify, "block,clicked", _block_clicked_cb, popup);
+	evas_object_smart_callback_add(wd->notify, "block,clicked", _block_clicked_cb, obj);
 }
 
 /**
@@ -653,29 +651,27 @@ EAPI void elm_popup_set_mode(Evas_Object *popup, Elm_Popup_Mode mode)
  * @param response_id  response ID of the signal to be emitted along with response signal
  *
  * @ingroup Popup
- */
- 
-EAPI void elm_popup_response(Evas_Object *popup, int  response_id)
+ */ 
+EAPI void elm_popup_response(Evas_Object *obj, int  response_id)
 {
-	Widget_Data *wd = elm_widget_data_get(popup);
+	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) 	return;	
-	evas_object_hide(popup);	
-	evas_object_smart_callback_call((Evas_Object *)popup, "response", response_id);	
+	evas_object_hide(obj);	
+	evas_object_smart_callback_call((Evas_Object *)obj, "response", (void *)response_id);	
 }
 
 /**
  * the direction from which popup will appear as well as the location of popup can be controlled by this API
  * @param obj The popup object
- * @param Elm_Popup_Orient  the orientation of the popup
+ * @param orient  the orientation of the popup
  *
  * @ingroup Popup
  */
- 
-EAPI void elm_popup_orient_set(Evas_Object *popup, Elm_Popup_Orient orient)
+ EAPI void elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient)
 {
-	Widget_Data *wd = elm_widget_data_get(popup);
+	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) 	return;	
-	Elm_Notify_Orient notify_orient;
+	Elm_Notify_Orient notify_orient=-1;
 	switch (orient)
      {
 			case ELM_POPUP_ORIENT_TOP:
