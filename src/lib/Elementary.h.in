@@ -1737,7 +1737,7 @@ extern "C" {
 	EAPI void elm_popup_response(Evas_Object *popup, int  response_id);
 	EAPI void elm_popup_orient_set(Evas_Object *popup, Elm_Popup_Orient orient);
    /* Contextual Popup */
-   typedef struct _Ctx_Popup_Item Elm_Ctxpopup_Item;
+   typedef struct _Ctxpopup_Item Elm_Ctxpopup_Item;
 
    EAPI Evas_Object* elm_ctxpopup_add(Evas_Object* parent);
    EAPI void elm_ctxpopup_horizontal_set(Evas_Object* obj, Eina_Bool horizontal);
