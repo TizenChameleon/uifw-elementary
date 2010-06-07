@@ -12,7 +12,6 @@
 #define MIN_PIXEL_VALUE 1 //Min pixel value is highly dependent on touch sensitivity support.
 #define MIN_OBJ_HEIGHT 24 //should be taken from .edc file.
 typedef struct _Widget_Data Widget_Data;
-typedef struct _Item Item;
 typedef struct _PlacementPart PlacementPart;
 
 struct _Widget_Data
@@ -38,7 +37,7 @@ struct _Widget_Data
    int min_1st_level_obj_height;
 };
 
-struct _Item
+struct _Elm_Index_Item
 {
    Evas_Object *obj;
    const char *letter;
@@ -61,14 +60,14 @@ static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level);
 static void _index_box_clear(Evas_Object *obj, Evas_Object *box, int level);
-static void _item_free(Item *it);
+static void _item_free(Elm_Index_Item *it);
 static void _index_process(Evas_Object *obj);
 
 static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it;
+   Elm_Index_Item *it;
    Eina_List *l, *clear = NULL;
    if (!wd) return;
    _index_box_clear(obj, wd->bx[wd->level], wd->level);
@@ -158,13 +157,13 @@ _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_max_set(obj, maxw, maxh);
 }
 
-static Item *
+static Elm_Index_Item *
 _item_new(Evas_Object *obj, const char *letter, const void *item)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it;
+   Elm_Index_Item *it;
    if (!wd) return NULL;
-   it = calloc(1, sizeof(Item));
+   it = calloc(1, sizeof(Elm_Index_Item));
    if (!it) return NULL;
    it->obj = obj;
    it->data = item;
@@ -185,12 +184,12 @@ _item_new(Evas_Object *obj, const char *letter, const void *item)
    return it;
 }
 
-static Item *
+static Elm_Index_Item *
 _item_find(Evas_Object *obj, const void *item)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_List *l;
-   Item *it;
+   Elm_Index_Item *it;
    if (!wd) return NULL;
    EINA_LIST_FOREACH(wd->items, l, it)
      if (it->data == item) return it;
@@ -198,7 +197,7 @@ _item_find(Evas_Object *obj, const void *item)
 }
 
 static void
-_item_free(Item *it)
+_item_free(Elm_Index_Item *it)
 {
    Widget_Data *wd = elm_widget_data_get(it->obj);
    if (!wd) return;
@@ -215,7 +214,7 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_List *l;
-   Item *it;
+   Elm_Index_Item *it;
    Evas_Coord mw, mh, w, h;
    int i = 0;
    if (!wd) return;
@@ -277,7 +276,7 @@ _index_box_clear(Evas_Object *obj, Evas_Object *box __UNUSED__, int level)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_List *l;
-   Item *it;
+   Elm_Index_Item *it;
    if (!wd) return;
    if (!wd->level_active[level]) return;
    EINA_LIST_FOREACH(wd->items, l, it)
@@ -306,7 +305,7 @@ static void
 _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it, *it_closest, *it_last;
+   Elm_Index_Item *it, *it_closest, *it_last;
    Eina_List *l;
    Evas_Coord x, y, w, h, bx, by, bw, bh, xx, yy;
    double cdv = 0.5;
@@ -314,7 +313,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
    double dmax = 0.0;
    double dmin = 0.0;
    Evas_Coord dist;
-   Eina_Bool change = 0;
+   Eina_Bool change = EINA_FALSE;
    char *label = NULL, *last = NULL;
    int i;
    if (!wd) return;
@@ -861,7 +860,7 @@ elm_index_item_selected_get(const Evas_Object *obj, int level)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_List *l;
-   Item *it;
+   Elm_Index_Item *it;
    if (!wd) return NULL;
    EINA_LIST_FOREACH(wd->items, l, it)
      if ((it->selected) && (it->level == level)) return it->data;
@@ -882,7 +881,7 @@ elm_index_item_append(Evas_Object *obj, const char *letter, const void *item)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it;
+   Elm_Index_Item *it;
    if (!wd) return;
    it = _item_new(obj, letter, item);
    if (!it) return;
@@ -905,7 +904,7 @@ elm_index_item_prepend(Evas_Object *obj, const char *letter, const void *item)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it;
+   Elm_Index_Item *it;
 
    if (!wd) return;
    it = _item_new(obj, letter, item);
@@ -930,7 +929,7 @@ elm_index_item_append_relative(Evas_Object *obj, const char *letter, const void 
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it, *it_rel;
+   Elm_Index_Item *it, *it_rel;
    if (!wd) return;
    if (!relative)
      {
@@ -967,7 +966,7 @@ elm_index_item_prepend_relative(Evas_Object *obj, const char *letter, const void
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it, *it_rel;
+   Elm_Index_Item *it, *it_rel;
    if (!wd) return;
    if (!relative)
      {
@@ -990,6 +989,65 @@ elm_index_item_prepend_relative(Evas_Object *obj, const char *letter, const void
 }
 
 /**
+ * Insert a new @p item into the sorted index @p obj in @p letter.
+ *
+ * @param obj The index object
+ * @param letter Letter under which the item should be indexed
+ * @param item The item to put in the index
+ * @param cmp_func The function called for the sort of index items.
+ * @param cmp_data_func The function called for the sort of the data. It will
+ * be used when cmp_func return 0. It means the index item already exists.
+ * So, to decide which data item should be pointed by the index item, a function
+ * to compare them is needed. If this function is not provided, index items
+ * will be duplicated. If cmp_data_func returns a non-negative value, the
+ * previous index item data will be replaced by the inserted @p item. So
+ * if the previous data need to be free, it should be done in this function,
+ * because the reference will be lost.
+ *
+ * @ingroup Index
+ */
+EAPI void
+elm_index_item_sorted_insert(Evas_Object *obj, const char *letter, const void *item, Eina_Compare_Cb cmp_func, Eina_Compare_Cb cmp_data_func)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_List *lnear;
+   Elm_Index_Item *it;
+   int cmp;
+
+   if (!wd) return;
+   if (!(wd->items))
+     {
+        elm_index_item_append(obj, letter, item);
+        return;
+     }
+
+   it = _item_new(obj, letter, item);
+   if (!it) return;
+
+   lnear = eina_list_search_sorted_near_list(wd->items, cmp_func, it, &cmp);
+   if (cmp < 0)
+     wd->items =  eina_list_append_relative_list(wd->items, it, lnear);
+   else if (cmp > 0)
+     wd->items = eina_list_prepend_relative_list(wd->items, it, lnear);
+   else
+     {
+	/* If cmp_data_func is not provided, append a duplicated item */
+	if (!cmp_data_func)
+	  wd->items =  eina_list_append_relative_list(wd->items, it, lnear);
+	else
+	  {
+	     Elm_Index_Item *p_it = eina_list_data_get(lnear);
+	     if (cmp_data_func(p_it->data, it->data) >= 0)
+	       p_it->data = it->data;
+	     _item_free(it);
+	  }
+     }
+
+   _index_box_clear(obj, wd->bx[wd->level], wd->level);
+}
+
+/**
  * Remove an item from the index.
  *
  * @param obj The index object
@@ -1002,13 +1060,31 @@ elm_index_item_del(Evas_Object *obj, const void *item)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it;
+   Elm_Index_Item *it;
    if (!wd) return;
    it = _item_find(obj, item);
    if (!it) return;
    _item_free(it);
    wd->tot_items_count[wd->level]--;
    _index_box_clear(obj, wd->bx[wd->level], wd->level);
+}
+
+/**
+ * Find an index item using item data.
+ *
+ * @param obj The index object
+ * @param item The item pointed by index item
+ * @return The index item pointing to @p item
+ *
+ * @ingroup Index
+ */
+EAPI Elm_Index_Item *
+elm_index_item_find(Evas_Object *obj, const void *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return _item_find(obj, item);
 }
 
 /**
@@ -1023,7 +1099,7 @@ elm_index_item_clear(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it;
+   Elm_Index_Item *it;
    Eina_List *l, *clear = NULL;
    if (!wd) return;
    _index_box_clear(obj, wd->bx[wd->level], wd->level);
@@ -1054,3 +1130,51 @@ elm_index_item_go(Evas_Object *obj, int level __UNUSED__)
    _index_box_auto_fill(obj, wd->bx[0], 0);
    if (wd->level == 1) _index_box_auto_fill(obj, wd->bx[1], 1);
 }
+
+/**
+ * Returns the data associated with the item.
+ *
+ * @param it The list item
+ * @return The data associated with @p it
+ *
+ * @ingroup Index
+ */
+EAPI void *
+elm_index_item_data_get(const Elm_Index_Item *it)
+{
+   if (!it) return NULL;
+   return (void *)it->data;
+}
+
+/**
+ * Set the data item from the index item
+ *
+ * This set a new data value.
+ *
+ * @param it The item
+ * @param data The new data pointer to set
+ *
+ * @ingroup Index
+ */
+EAPI void
+elm_index_item_data_set(Elm_Index_Item *it, const void *data)
+{
+   if (!it) return;
+   it->data = data;
+}
+
+/**
+ * Gets the letter of the item.
+ *
+ * @param it The list item
+ * @return The letter of @p it
+ *
+ * @ingroup Index
+ */
+EAPI const char *
+elm_index_item_letter_get(const Elm_Index_Item *it)
+{
+   if (!it) return NULL;
+   return it->letter;
+}
+

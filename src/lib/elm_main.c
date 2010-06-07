@@ -19,6 +19,9 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
+static Elm_Version _version = { VMAJ, VMIN, VMIC, VREV };
+EAPI Elm_Version *elm_version = &_version;
+
 /**
  * @defgroup Start Getting Started
  *
@@ -260,9 +263,6 @@ myapp_CFLAGS =
  */
 
 static int _elm_signal_exit(void *data, int ev_type, void *ev);
-#ifdef HAVE_ELEMENTARY_X
-static int _elm_window_property_change(void *data, int ev_type, void *ev);
-#endif
 
 char *_elm_appname = NULL;
 const char *_elm_data_dir = NULL;
@@ -328,7 +328,7 @@ elm_shutdown(void)
 }
 
 #ifdef ELM_EDBUS
-static Eina_Bool _elm_need_e_dbus = 0;
+static Eina_Bool _elm_need_e_dbus = EINA_FALSE;
 #endif
 EAPI void
 elm_need_e_dbus(void)
@@ -355,7 +355,7 @@ _elm_unneed_e_dbus(void)
 }
 
 #ifdef ELM_EFREET
-static Eina_Bool _elm_need_efreet = 0;
+static Eina_Bool _elm_need_efreet = EINA_FALSE;
 #endif
 EAPI void
 elm_need_efreet(void)
@@ -422,6 +422,7 @@ elm_quicklaunch_init(int argc, char **argv)
    evas_init();
    edje_init();
    ecore_evas_init(); // FIXME: check errors
+   ecore_imf_init();
    _elm_module_init();
 
    _elm_exit_handler = ecore_event_handler_add(ECORE_EVENT_SIGNAL_EXIT, _elm_signal_exit, NULL);
@@ -550,6 +551,7 @@ elm_quicklaunch_shutdown(void)
    _elm_unneed_e_dbus();
    _elm_unneed_ethumb();
    _elm_module_shutdown();
+   ecore_imf_shutdown();
    ecore_evas_shutdown();
    edje_shutdown();
    evas_shutdown();
@@ -1174,9 +1176,24 @@ elm_coords_finger_size_adjust(int times_w, Evas_Coord *w, int times_h, Evas_Coor
  */
 
 /**
+ * Get the focus of the object
+ *
+ * This gets the focused property of the object.
+ *
+ * @param obj The object
+ * @return 1 if the object is focused, 0 if not.
+ * @ingroup Focus
+ */
+EAPI Eina_Bool
+elm_object_focus_get(Evas_Object *obj)
+{
+   return elm_widget_focus_get(obj);
+}
+
+/**
  * Set the focus to the object
  *
- * This sets the focus target forkeyboard input to be the object indicated.
+ * This sets the focus target for keyboard input to be the object indicated.
  *
  * @param obj The object
  * @ingroup Focus
@@ -1189,9 +1206,10 @@ elm_object_focus(Evas_Object *obj)
 }
 
 /**
- * Set the focus to the object
+ * Remove the focus from the object
  *
- * This sets the focus target forkeyboard input to be the object indicated.
+ * This removes the focus target for keyboard input from be the object
+ * indicated.
  *
  * @param obj The object
  * @ingroup Focus
