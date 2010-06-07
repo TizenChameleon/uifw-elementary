@@ -1527,7 +1527,7 @@ elm_entry_single_line_get(const Evas_Object *obj)
 }
 
 /**
- * This API set's the maximum byte count
+ * This set's the maximum bytes that can be added in entry.
  *
  * @param obj The entry object
  * @param max_no_of_bytes Maximum number of bytes entry can have

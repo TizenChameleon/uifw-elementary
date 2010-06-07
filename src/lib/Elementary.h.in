@@ -1566,6 +1566,7 @@ extern "C" {
    EAPI void         elm_scrolled_entry_scrollbar_policy_set(Evas_Object *obj, Elm_Scroller_Policy h, Elm_Scroller_Policy v);
    EAPI void         elm_scrolled_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
    EAPI void			  elm_scrolled_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
+   EAPI void			elm_scrolled_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool show_last_character);
 
    EAPI Evas_Object *elm_conformant_add(Evas_Object *parent);
    EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content);
@@ -1732,10 +1733,10 @@ extern "C" {
 	EAPI Evas_Object* elm_popup_content_get(Evas_Object *obj);
 	EAPI void elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_text,  ...);
 	Evas_Object* elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... );
-	EAPI void elm_popup_timeout_set(Evas_Object *popup, int timeout);
-	EAPI void elm_popup_set_mode(Evas_Object *popup, Elm_Popup_Mode mode);
-	EAPI void elm_popup_response(Evas_Object *popup, int  response_id);
-	EAPI void elm_popup_orient_set(Evas_Object *popup, Elm_Popup_Orient orient);
+	EAPI void elm_popup_timeout_set(Evas_Object *obj, int timeout);
+	EAPI void elm_popup_set_mode(Evas_Object *obj, Elm_Popup_Mode mode);
+	EAPI void elm_popup_response(Evas_Object *obj, int  response_id);
+	EAPI void elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
    /* Contextual Popup */
    typedef struct _Ctxpopup_Item Elm_Ctxpopup_Item;
 

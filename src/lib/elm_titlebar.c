@@ -4,7 +4,7 @@
 /**
  * @addtogroup Titlebar Titlebar
  *
- * This is a titlebar. It can contain a simple label and icon objects.
+ * This is a titlebar. It can contain simple label and icon objects.
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -97,7 +97,7 @@ elm_titlebar_add(Evas_Object *parent)
 }
 
 /**
- * Set the label of titlebar
+ * Set the label of titlebar object
  *
  * @param obj The titlebar object
  * @param label The label text
