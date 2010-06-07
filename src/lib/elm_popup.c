@@ -130,7 +130,8 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	Widget_Data *wd = elm_widget_data_get(obj);   
 	 if(wd->parent)
  	  evas_object_show(wd->parent); 	
-	elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
+    elm_layout_theme_set(wd->layout, "popup", "base",
+			 elm_widget_style_get(obj));
 	_sizing_eval(obj);
 	evas_object_show(obj); 	 	
 
@@ -378,6 +379,7 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Object *label;
+	int w;			
 	if (!wd) return;
 
 	if(wd->content_area)
@@ -385,24 +387,20 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
 			evas_object_del(wd->content_area);
 			wd->content_area=NULL;
 		}
-	else
-		{
-			int w;			
-			label = elm_label_add(obj);
-			elm_object_style_set(label, "popup/description");		
-			wd->content_area = elm_scroller_add(obj);
-			elm_label_line_wrap_set(label, EINA_TRUE);
-			edje_object_part_geometry_get((Evas_Object *)elm_layout_edje_get(wd->layout), "elm.swallow.content", NULL, NULL, &w, NULL);
-			elm_label_wrap_width_set(label, w);
-			elm_scroller_content_set(wd->content_area,label);
-			elm_scroller_policy_set(wd->content_area, ELM_SCROLLER_POLICY_OFF,ELM_SCROLLER_POLICY_AUTO);
-			elm_scroller_bounce_set(wd->content_area, EINA_FALSE, EINA_FALSE);		
-			elm_label_label_set(label, text);
-			evas_object_show(label);			
-			elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);			
-			evas_object_event_callback_add(wd->content_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				       _changed_size_hints, obj);
-		}		
+		label = elm_label_add(obj);
+		elm_object_style_set(label, "popup/description");		
+		wd->content_area = elm_scroller_add(obj);
+		elm_label_line_wrap_set(label, EINA_TRUE);
+		edje_object_part_geometry_get((Evas_Object *)elm_layout_edje_get(wd->layout), "elm.swallow.content", NULL, NULL, &w, NULL);
+		elm_label_wrap_width_set(label, w);
+		elm_scroller_content_set(wd->content_area,label);
+		elm_scroller_policy_set(wd->content_area, ELM_SCROLLER_POLICY_OFF,ELM_SCROLLER_POLICY_AUTO);
+		elm_scroller_bounce_set(wd->content_area, EINA_FALSE, EINA_FALSE);		
+		elm_label_label_set(label, text);
+		evas_object_show(label);			
+		elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);			
+		evas_object_event_callback_add(wd->content_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+			       _changed_size_hints, obj);
 	_sizing_eval(obj);
 }
 
@@ -705,3 +703,23 @@ EAPI void elm_popup_response(Evas_Object *obj, int  response_id)
 	elm_notify_orient_set(wd->notify, notify_orient);
 }
 
+/**
+ * Applications which do not pass any window to popup need to take care of rotation, only when popup is already shown.
+ * @param obj The popup object
+ * @param rot_angle  the angle to which popup has to be rotated.
+ *
+ * @ingroup Popup
+ */
+ EAPI void elm_popup_rotation_set(Evas_Object *obj, int rot_angle)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) 	return;	
+	if(wd->parent)
+	{
+		if(wd->rot_angle!=rot_angle)
+		{
+			elm_win_rotation_with_resize_set(wd->parent,  rot_angle);
+			wd->rot_angle = rot_angle;
+		}
+	}
+}
