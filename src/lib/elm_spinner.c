@@ -60,6 +60,7 @@ _del_hook(Evas_Object *obj)
    if (!wd) return;
    if (wd->label) eina_stringshare_del(wd->label);
    if (wd->delay) ecore_timer_del(wd->delay);
+   if (wd->spin) ecore_timer_del(wd->spin);
    if (wd->special_values)
        EINA_LIST_FREE(wd->special_values, sv)
        {
@@ -208,14 +209,14 @@ _value_set(Evas_Object *obj, double delta)
           new_val = wd->val_max;
      }
 
-   if (new_val == wd->val) return 0;
+   if (new_val == wd->val) return EINA_FALSE;
    wd->val = new_val;
 
    evas_object_smart_callback_call(obj, "changed", NULL);
    if (wd->delay) ecore_timer_del(wd->delay);
    wd->delay = ecore_timer_add(0.2, _delay_change, obj);
 
-   return 1;
+   return EINA_TRUE;
 }
 
 static void

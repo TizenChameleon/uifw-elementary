@@ -12,22 +12,22 @@
  * widget.
  *
  * Signals that you can add callbacks for are:
- * "changed" - The text within the entry was changed
- * "activated" - The entry has received focus and the cursor
- * "press" - The entry has been clicked
- * "longpressed" - The entry has been clicked for a couple seconds
- * "clicked" - The entry has been clicked
- * "clicked,double" - The entry has been double clicked
- * "focused" - The entry has received focus
- * "unfocused" - The entry has lost focus
- * "selection,paste" - A paste action has occurred
- * "selection,copy" - A copy action has occurred
- * "selection,cut" - A cut action has occurred
- * "selection,start" - A selection has begun
- * "selection,changed" - The selection has changed
- * "selection,cleared" - The selection has been cleared
- * "cursor,changed" - The cursor has changed
- * "anchor,clicked" - The anchor has been clicked
+ * - "changed" - The text within the entry was changed
+ * - "activated" - The entry has received focus and the cursor
+ * - "press" - The entry has been clicked
+ * - "longpressed" - The entry has been clicked for a couple seconds
+ * - "clicked" - The entry has been clicked
+ * - "clicked,double" - The entry has been double clicked
+ * - "focused" - The entry has received focus
+ * - "unfocused" - The entry has lost focus
+ * - "selection,paste" - A paste action has occurred
+ * - "selection,copy" - A copy action has occurred
+ * - "selection,cut" - A cut action has occurred
+ * - "selection,start" - A selection has begun
+ * - "selection,changed" - The selection has changed
+ * - "selection,cleared" - The selection has been cleared
+ * - "cursor,changed" - The cursor has changed
+ * - "anchor,clicked" - The anchor has been clicked
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -571,9 +571,9 @@ elm_scrolled_entry_select_all(Evas_Object *obj)
 EAPI Eina_Bool
 elm_scrolled_entry_cursor_next(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return 0;
+   if (!wd) return EINA_FALSE;
    return elm_entry_cursor_next(wd->entry);
 }
 
@@ -588,9 +588,9 @@ elm_scrolled_entry_cursor_next(Evas_Object *obj)
 EAPI Eina_Bool
 elm_scrolled_entry_cursor_prev(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return 0;
+   if (!wd) return EINA_FALSE;
    return elm_entry_cursor_prev(wd->entry);
 }
 
@@ -605,9 +605,9 @@ elm_scrolled_entry_cursor_prev(Evas_Object *obj)
 EAPI Eina_Bool
 elm_scrolled_entry_cursor_up(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return 0;
+   if (!wd) return EINA_FALSE;
    return elm_entry_cursor_up(wd->entry);
 }
 
@@ -622,9 +622,9 @@ elm_scrolled_entry_cursor_up(Evas_Object *obj)
 EAPI Eina_Bool
 elm_scrolled_entry_cursor_down(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return 0;
+   if (!wd) return EINA_FALSE;
    return elm_entry_cursor_down(wd->entry);
 }
 
@@ -737,9 +737,9 @@ elm_scrolled_entry_cursor_selection_end(Evas_Object *obj)
 EAPI Eina_Bool
 elm_scrolled_entry_cursor_is_format_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return 0;
+   if (!wd) return EINA_FALSE;
    return elm_entry_cursor_is_format_get(wd->entry);
 }
 
@@ -754,9 +754,9 @@ elm_scrolled_entry_cursor_is_format_get(const Evas_Object *obj)
 EAPI Eina_Bool
 elm_scrolled_entry_cursor_is_visible_format_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return 0;
+   if (!wd) return EINA_FALSE;
    return elm_entry_cursor_is_visible_format_get(wd->entry);
 }
 
@@ -890,9 +890,9 @@ elm_scrolled_entry_context_menu_disabled_set(Evas_Object *obj, Eina_Bool disable
 EAPI Eina_Bool
 elm_scrolled_entry_context_menu_disabled_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return 0;
+   if (!wd) return EINA_FALSE;
    return elm_entry_context_menu_disabled_get(wd->entry);
 }
 
