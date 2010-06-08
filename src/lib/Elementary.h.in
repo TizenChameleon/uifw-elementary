@@ -743,6 +743,8 @@ extern "C" {
    EAPI void         elm_entry_entry_insert(Evas_Object *obj, const char *entry);
    EAPI void         elm_entry_line_wrap_set(Evas_Object *obj, Eina_Bool wrap);
    EAPI void         elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap);
+   EAPI void         elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w);
+   EAPI Evas_Coord   elm_entry_wrap_width_get(const Evas_Object *obj);
    EAPI void         elm_entry_editable_set(Evas_Object *obj, Eina_Bool editable);
    EAPI Eina_Bool    elm_entry_editable_get(const Evas_Object *obj);
    EAPI void         elm_entry_select_none(Evas_Object *obj);
@@ -772,6 +774,11 @@ extern "C" {
    EAPI void         elm_entry_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data);
    EAPI char        *elm_entry_markup_to_utf8(const char *s);
    EAPI char        *elm_entry_utf8_to_markup(const char *s);
+   EAPI void         elm_entry_fontsize_set(Evas_Object *obj, const int fontsize);
+   EAPI void         elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
+   EAPI void         elm_entry_text_align_set(Evas_Object *obj, char *alignmode);
+   EAPI void         elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
+   EAPI void         elm_entry_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis);
 
    EAPI void	     elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on);
    EAPI void	     elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
