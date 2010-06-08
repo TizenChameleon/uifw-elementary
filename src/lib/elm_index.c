@@ -12,6 +12,7 @@
 #define MIN_PIXEL_VALUE 1 //Min pixel value is highly dependent on touch sensitivity support.
 #define MIN_OBJ_HEIGHT 24 //should be taken from .edc file.
 typedef struct _Widget_Data Widget_Data;
+
 typedef struct _PlacementPart PlacementPart;
 
 struct _Widget_Data
@@ -474,7 +475,7 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *event
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Up *ev = event_info;
    void *d;
-   Item *it;
+   Elm_Index_Item *it;
    Eina_List *l;
    if (!wd) return;
    if (ev->button != 1) return;
@@ -710,7 +711,7 @@ _index_process(Evas_Object *obj)
 	int extraIndex;
 	int j,i, group_count;
 	Eina_List *l;
-	Item *it;
+	Elm_Index_Item *it;
 	int count;
 	int n;
 	Widget_Data *wd = elm_widget_data_get(obj);
