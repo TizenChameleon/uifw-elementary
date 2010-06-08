@@ -79,7 +79,7 @@ elm_flip.c \
 elm_conform.c \
 elm_mapbuf.c \
 elm_picker.c \
-elm_picker2.c \
+elm_discpicker.c \
 elm_timepicker.c \
 elm_datepicker.c \
 elm_datepicker2.c \

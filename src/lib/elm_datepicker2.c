@@ -158,7 +158,7 @@ _picker_item_add(Evas_Object *eo, int min, int max, const char *fmt)
 	char buf[8];
 	for (; min <= max; min++) {
 		snprintf(buf, 8, fmt, min);
-		elm_picker2_item_append(eo, buf, NULL, NULL);
+		elm_discpicker_item_append(eo, buf, NULL, NULL);
 	}
 }
 
@@ -166,10 +166,10 @@ static void
 _picker_item_del(Evas_Object *eo)
 {
 	Elm_Picker_Item *item;
-	item = elm_picker2_first_item_get(eo);
+	item = elm_discpicker_first_item_get(eo);
 	while (item) {
-		elm_picker2_item_del(item);
-		item = elm_picker2_first_item_get(eo);
+		elm_discpicker_item_del(item);
+		item = elm_discpicker_first_item_get(eo);
 	}
 }
 
@@ -177,7 +177,7 @@ static Evas_Object *
 _picker_add(Evas_Object *ly, const char *part, int min, int max, const char *fmt)
 {
 	Evas_Object *eo;
-	eo = elm_picker2_add(ly);
+	eo = elm_discpicker_add(ly);
 	_picker_item_add(eo, min, max, fmt);
 	evas_object_data_set(eo, "freeze", 0);
 	if (part)
@@ -193,14 +193,14 @@ _picker_month_add(Evas_Object *ly, const char *part, const char *fmt)
 	struct tm tm = {0, };
 	
 	Evas_Object *eo;
-	Elm_Picker2_Item *it;
-	eo = elm_picker2_add(ly);
+	Elm_Discpicker_Item *it;
+	eo = elm_discpicker_add(ly);
 
 	for (i = 0; i < 12; i++) {
 		tm.tm_mon = i;
 		strftime(buf, 32, fmt, &tm);
-		it = elm_picker2_item_append(eo, buf, NULL, NULL);
-		elm_picker2_item_data_set(it, (void *)(i + 1));
+		it = elm_discpicker_item_append(eo, buf, NULL, NULL);
+		elm_discpicker_item_data_set(it, (void *)(i + 1));
 	}
 
 	if (part)
@@ -237,20 +237,20 @@ _update_day_of_month(Evas_Object *obj, int month)
 	}
 
 	if (tmp == wd->day_of_month) return;
-	item = elm_picker2_last_item_get(wd->pickers[PICKER_DAY]);
+	item = elm_discpicker_last_item_get(wd->pickers[PICKER_DAY]);
 
 	if (tmp > wd->day_of_month) {
-		selected_item = elm_picker2_selected_item_get(wd->pickers[PICKER_DAY]);
+		selected_item = elm_discpicker_selected_item_get(wd->pickers[PICKER_DAY]);
 		for (; tmp > wd->day_of_month; tmp--) {
-			elm_picker2_item_disabled_set(item, EINA_TRUE);
+			elm_discpicker_item_disabled_set(item, EINA_TRUE);
 			if (selected_item == item) need_move = 1;
-			item = elm_picker2_item_prev(item);
+			item = elm_discpicker_item_prev(item);
 		}
-		if (need_move) elm_picker2_prev(wd->pickers[PICKER_DAY]);
+		if (need_move) elm_discpicker_prev(wd->pickers[PICKER_DAY]);
 	} else {
-		while (item && elm_picker2_item_disabled_get(item)) {
-			elm_picker2_item_disabled_set(item, EINA_FALSE);
-			item = elm_picker2_item_prev(item);
+		while (item && elm_discpicker_item_disabled_get(item)) {
+			elm_discpicker_item_disabled_set(item, EINA_FALSE);
+			item = elm_discpicker_item_prev(item);
 		}
 	}
 }
@@ -261,14 +261,14 @@ _update_picker(Evas_Object *picker, int nth)
 	const Eina_List *l;
 	Elm_Picker_Item *item;
 	int i;
-	l = elm_picker2_items_get(picker);
+	l = elm_discpicker_items_get(picker);
 	for (i = 0; i < nth; i++) {
 		l = l->next;
 		if (!l) break;
 	}
 	item = eina_list_data_get(l);
 	evas_object_data_set(picker, "freeze", 1);
-	elm_picker2_item_selected_set(item);
+	elm_discpicker_item_selected_set(item);
 }
 
 static void
@@ -301,7 +301,7 @@ _overflow_cb(void *data, Evas_Object *obj, void *event_info)
 	}
 
 	if (eo) {
-		elm_picker2_next(eo);
+		elm_discpicker_next(eo);
 		evas_object_data_set(obj, "carryon", (void *)1);
 	}
 }
@@ -321,7 +321,7 @@ _underflow_cb(void *data, Evas_Object *obj, void *event_info)
 	}
 
 	if (eo) {
-		elm_picker2_prev(eo);
+		elm_discpicker_prev(eo);
 		evas_object_data_set(obj, "carryon", (void *)-1);
 	}
 
@@ -329,8 +329,8 @@ _underflow_cb(void *data, Evas_Object *obj, void *event_info)
 		Elm_Picker_Item *item;
 		_update_day_of_month(data, wd->month - 1);
 		wd->day = wd->day_of_month;
-		item = elm_picker2_last_item_get(obj);
-		elm_picker2_item_selected_set(item);
+		item = elm_discpicker_last_item_get(obj);
+		elm_discpicker_item_selected_set(item);
 	}
 }
 
@@ -342,7 +342,7 @@ _year_changed_cb(void *data, Evas_Object *obj, void *event_info)
 	Evas_Object *child;
 	if (!wd) return;
 
-	year = elm_picker2_item_label_get(event_info);
+	year = elm_discpicker_item_label_get(event_info);
 	wd->year = atoi(year);
 
 	if (wd->month == 2)
@@ -359,7 +359,7 @@ _month_changed_cb(void *data, Evas_Object *obj, void *event_info)
 	Evas_Object *child;
 	if (!wd) return;
 
-	wd->month = (int)elm_picker2_item_data_get(event_info);
+	wd->month = (int)elm_discpicker_item_data_get(event_info);
 
 	_update_day_of_month(data, wd->month);
 	child = evas_object_data_get(obj, "child");
@@ -374,11 +374,11 @@ _day_changed_cb(void *data, Evas_Object *obj, void *event_info)
 	Evas_Object *child;
 	if (!wd) return;
 
-	day = elm_picker2_item_label_get(event_info);
+	day = elm_discpicker_item_label_get(event_info);
 	wd->day = atoi(day);
 
-	if (elm_picker2_item_disabled_get(event_info) == EINA_TRUE) {
-		elm_picker2_prev(obj);
+	if (elm_discpicker_item_disabled_get(event_info) == EINA_TRUE) {
+		elm_discpicker_prev(obj);
 	} else {
 		child = evas_object_data_get(obj, "child");
 		_changed(obj, child, data);
