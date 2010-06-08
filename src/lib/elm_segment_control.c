@@ -297,7 +297,7 @@ static void _update_list(Evas_Object *obj)
 
 		edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
 		edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
-		if(wd->cur_seg_id == i)
+		if(wd->cur_seg_id == it->segment_id)
 		{
 			edje_object_signal_emit(it->base, "elm,state,segment,on", "elm");
 			edje_object_signal_emit(it->base, "elm,state,text,change", "elm");
@@ -447,6 +447,7 @@ _animator_animate_del_cb(Evas_Object *obj)
 		 wd->ani = NULL;
 		 wd->ani_it = NULL;
 		_update_list(obj);
+		wd->id = eina_list_count(wd->seg_ctrl);
 			return ECORE_CALLBACK_CANCEL;
 	 }
 }
@@ -480,25 +481,21 @@ elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char 
 		return;
 
 	wd->seg_ctrl = eina_list_append(wd->seg_ctrl, it);
+	wd->id = eina_list_count(wd->seg_ctrl);
 
 	_update_list(obj);
 
 	  edje_object_signal_callback_add(it->base, "elm,action,segment,click", "elm", _signal_segment_on, it);
-		++wd->id;
+//		++wd->id;
+	  wd->insert_index = 0;
+	  wd->del_index = 0;
 	   _refresh_segment_ids(obj);
 
-	if(animate && it->segment_id)
+	if(animate && it->segment_id && wd->ani_it == NULL)
 	   {
-			if(wd->ani_it == NULL)
-			{
 				evas_object_resize(it->base, 1, wd->height);
 				wd->ani_it = it;
 				wd->ani = ecore_animator_add( _animator_animate_add_cb, obj );
-			}
-			else
-			{
-				wd->queue = eina_list_append(wd->queue, it);
-			}
 	   }
 	   else
 	      _state_value_set(obj);
@@ -573,24 +570,18 @@ elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const
    }
 	edje_object_signal_callback_add(it->base, "elm,action,segment,click", "elm", _signal_segment_on, it);
    wd->insert_index = index;
-	++wd->id;
+//	++wd->id;
+   wd->id = eina_list_count(wd->seg_ctrl);
    _refresh_segment_ids(obj);
 
 	_update_list(obj);
 
 
-	if(animate && it->segment_id)
+	if(animate && it->segment_id && wd->ani_it == NULL)
    {
-		if(wd->ani_it == NULL)
-		{
 			wd->ani_it = it;
 			evas_object_resize(it->base, 1, wd->height);
 			wd->ani = ecore_animator_add( _animator_animate_add_cb, obj );
-		}
-		else
-		{
-			wd->queue = eina_list_append(wd->queue, it);
-		}
    }
    else
       _state_value_set(obj);
@@ -627,18 +618,11 @@ elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Ein
    	return;
    wd->del_index = it->segment_id;
 
-	if(animate && it->segment_id)
+	if(animate && it->segment_id && wd->ani_it == NULL)
 	{
-		if(wd->ani_it == NULL)
-		{
 			it->delete_me = EINA_TRUE;
 			wd->ani_it = it;
 			wd->ani = ecore_animator_add( _animator_animate_del_cb, obj );
-		}
-		else
-		{
-			wd->queue = eina_list_append(wd->queue, it);
-		}
 	}
 	else
 	{
@@ -649,7 +633,8 @@ elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Ein
 		_state_value_set(obj);
 		_update_list(obj);
 	}
-	--wd->id;
+//	--wd->id;
+	wd->id = eina_list_count(wd->seg_ctrl);
    return;
 }
 
@@ -667,7 +652,7 @@ elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Ein
    	return;
 
    wd->del_index = index;
-	--wd->id;
+
 	if(animate && it->segment_id)
 		{
 			if(wd->ani_it == NULL)
@@ -688,9 +673,11 @@ elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Ein
 			_item_free(obj, it);
 		   _refresh_segment_ids(obj);
 			_state_value_set(obj);
+			_update_list(obj);
 		}
 
-	_update_list(obj);
+//	--wd->id;
+	wd->id = eina_list_count(wd->seg_ctrl);
    return;
 }
 
