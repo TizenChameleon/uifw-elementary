@@ -5704,9 +5704,8 @@ collections {
            visible: 1;
            rel1 { relative: 0 0; to: "elm.text"; }
            rel2 { relative: 1 1; to: "elm.text"; }
-                }
+            }
         }
-      }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;
