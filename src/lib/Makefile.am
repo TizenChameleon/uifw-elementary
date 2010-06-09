@@ -116,6 +116,7 @@ elm_chronometer.c \
 elm_dialoguegroup.c \
 elm_animatedicon.c \
 elm_coverflow.c \
+elm_cabinet.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \

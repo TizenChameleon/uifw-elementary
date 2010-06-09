@@ -2310,6 +2310,34 @@ extern "C" {
    EAPI Elm_Coverflow_Item* elm_coverflow_item_append( Evas_Object* obj, Elm_Coverflow_Item_Class* cic, void* data, void (*func)(void* data, Evas_Object* obj, void* event_info ), void* func_data );
    EAPI void elm_coverflow_clear( Evas_Object* obj );			
 
+   /* Cabinet */
+   typedef struct _Cabinet_Item Elm_Cabinet_Item;
+   EAPI Evas_Object        *elm_cabinet_add(Evas_Object *parent);
+   EAPI void                elm_cabinet_next(Evas_Object *obj);
+   EAPI void                elm_cabinet_prev(Evas_Object *obj);
+   EAPI Eina_Bool           elm_cabinet_bounce_get(Evas_Object *obj);
+   EAPI void                elm_cabinet_bounce_set(Evas_Object *obj, Eina_Bool bounce);
+   EAPI Elm_Cabinet_Item   *elm_cabinet_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Cabinet_Item   *elm_cabinet_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI const Eina_List    *elm_cabinet_items_get(Evas_Object *obj);
+   EAPI Elm_Cabinet_Item   *elm_cabinet_first_item_get(Evas_Object *obj);
+   EAPI Elm_Cabinet_Item   *elm_cabinet_last_item_get(Evas_Object *obj);
+   EAPI Elm_Cabinet_Item   *elm_cabinet_selected_item_get(Evas_Object *obj);
+   EAPI void                elm_cabinet_item_selected_set(Elm_Cabinet_Item *item);
+   EAPI void                elm_cabinet_item_del(Elm_Cabinet_Item *item);
+   EAPI const char         *elm_cabinet_item_label_get(Elm_Cabinet_Item *item);
+   EAPI void                elm_cabinet_item_label_set(Elm_Cabinet_Item *item, const char *label);
+   EAPI const char         *elm_cabinet_item_sub_info_get(Elm_Cabinet_Item *item);
+   EAPI void                elm_cabinet_item_sub_info_set(Elm_Cabinet_Item *item, const char *sub_info);
+   EAPI Elm_Cabinet_Item   *elm_cabinet_item_prev(Elm_Cabinet_Item *item);
+   EAPI Elm_Cabinet_Item   *elm_cabinet_item_next(Elm_Cabinet_Item *item);
+   EAPI void               *elm_cabinet_item_data_get(Elm_Cabinet_Item *item);
+   EAPI void                elm_cabinet_item_data_set(Elm_Cabinet_Item *item, void *data);
+   EAPI Eina_Bool           elm_cabinet_item_del_btn_disabled_get(Elm_Cabinet_Item *item);
+   EAPI void                elm_cabinet_item_del_btn_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled);
+   EAPI Eina_Bool           elm_cabinet_item_sub_info_disabled_get(Elm_Cabinet_Item *item);
+   EAPI void                elm_cabinet_item_sub_info_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled);
+
 #ifdef __cplusplus
 }
 #endif
