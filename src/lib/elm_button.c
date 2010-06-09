@@ -266,7 +266,6 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
 		_set_label(data, wd->statelabel[DEFAULT]);
 	else
 		 _set_label(data, wd->label);
-   evas_object_smart_callback_call(data, "unpressed", NULL);
 
    if (wd->timer)
      {
