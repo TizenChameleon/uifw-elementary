@@ -1923,6 +1923,9 @@ extern "C" {
    EAPI void elm_fx_transform_multiply( Elm_Fx_Matrix* m, Elm_Fx_Matrix* m1, Elm_Fx_Matrix* m2 );
    */
 
+   /* ImageAnimation Fx */
+   EAPI Elm_Effect* elm_fx_imageanimation_add( const Evas_Object* icon, const char** images, const unsigned int max_num );
+
    /* NavigationBar */
    EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);
    EAPI void elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *left_btn, Evas_Object *right_btn, Evas_Object *content, Eina_Bool animation);
