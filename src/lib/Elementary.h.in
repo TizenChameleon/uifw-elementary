@@ -2055,8 +2055,8 @@ extern "C" {
 
   /* colorpicker */
    EAPI Evas_Object *elm_colorpicker_add(Evas_Object *parent);
-   EAPI void elm_colorpicker_color_set(Evas_Object *obj, unsigned int r, unsigned int g , unsigned int b);
-   EAPI void elm_colorpicker_color_get(Evas_Object *obj, unsigned int *r, unsigned int *g , unsigned int *b);
+   EAPI void elm_colorpicker_color_set(Evas_Object *obj, int r, int g , int b);
+   EAPI void elm_colorpicker_color_get(Evas_Object *obj, int *r, int *g , int *b);
     /* smart callbacks called:
     * "clicked" - when bar or button is clicked
     */
@@ -2258,6 +2258,15 @@ extern "C" {
    EAPI void elm_chronometer_time_get(const Evas_Object *obj, int *hrs, int *min, int *sec);
    EAPI void elm_chronometer_format_set(Evas_Object *obj, Eina_Bool format);
    EAPI void elm_chronometer_format_get(Evas_Object *obj, Eina_Bool *format);
+
+   /* dialoguegroup */
+   EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent);
+   EAPI void elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj);   
+   EAPI void elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj);   
+   EAPI void elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Evas_Object *after);   
+   EAPI void elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Evas_Object *before);   
+   EAPI void elm_dialoguegroup_remove(Evas_Object *obj, Evas_Object *subobj);
+   EAPI void elm_dialoguegroup_remove_all(Evas_Object *obj);
   
 #ifdef __cplusplus
 }

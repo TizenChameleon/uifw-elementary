@@ -110,6 +110,7 @@ elm_slidingdrawer.c \
 elm_wipercontrol.c \
 elm_ratingbar.c \
 elm_chronometer.c \
+elm_dialoguegroup.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
