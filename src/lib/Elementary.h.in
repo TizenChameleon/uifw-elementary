@@ -2298,6 +2298,17 @@ extern "C" {
    EAPI void elm_animatedicon_animation_start(Evas_Object *obj);
    EAPI void elm_animatedicon_repeat_set(Evas_Object *obj, const unsigned int repeat, const double interval);
 
+   /* coverflow */
+   typedef struct _Coverflow_Item Elm_Coverflow_Item;
+   typedef struct _Coverflow_Item_Class {  
+        void (*CoverflowItemGenFunc)(const void* data, Evas_Object* obj );
+        void (*CoverflowItemDelFunc)(const void* data, Evas_Object* obj ); 
+   } Elm_Coverflow_Item_Class;
+  
+   EAPI Evas_Object* elm_coverflow_add( Evas_Object* parent );
+   EAPI Elm_Coverflow_Item* elm_coverflow_item_append( Evas_Object* obj, Elm_Coverflow_Item_Class* cic, void* data, void (*func)(void* data, Evas_Object* obj, void* event_info ), void* func_data );
+   EAPI void elm_coverflow_clear( Evas_Object* obj );			
+
 #ifdef __cplusplus
 }
 #endif
