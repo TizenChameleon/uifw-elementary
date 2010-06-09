@@ -103,6 +103,7 @@ elm_softkey.c \
 elm_actionslider.c \
 elm_hor_scroller.c \
 elm_zoomcontrols.c \
+elm_controlbar.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
