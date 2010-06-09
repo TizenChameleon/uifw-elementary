@@ -397,7 +397,7 @@ elm_viewflipper_add(Evas_Object * parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
    
     wd->viewflipper = edje_object_add(evas_object_evas_get(obj));
-    _elm_theme_set(wd->viewflipper,  "viewflipper", "base", "default");
+    _elm_theme_object_set(obj,wd->viewflipper,  "viewflipper", "base", "default");
 
 
 //   evas_object_resize(wd->viewflipper, LAYOUT_x, LAYOUT_y);

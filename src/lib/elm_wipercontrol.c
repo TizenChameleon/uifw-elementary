@@ -38,7 +38,7 @@ _theme_hook(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 
-	_elm_theme_set(wd->sd, "wipercontrol", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj,wd->sd, "wipercontrol", "base", elm_widget_style_get(obj));
 
 	_sizing_eval(obj);
 
@@ -98,7 +98,7 @@ elm_wipercontrol_add(Evas_Object *parent)
 
 	wd->sd = edje_object_add(e);
 
-	_elm_theme_set(wd->sd, "wipercontrol", "base", "default");
+	_elm_theme_object_set(obj,wd->sd, "wipercontrol", "base", "default");
 
 	elm_widget_resize_object_set(obj, wd->sd);
 
