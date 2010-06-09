@@ -108,6 +108,7 @@ elm_viewflipper.c \
 elm_gallery.c \
 elm_slidingdrawer.c \ 
 elm_wipercontrol.c \
+elm_ratingbar.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
