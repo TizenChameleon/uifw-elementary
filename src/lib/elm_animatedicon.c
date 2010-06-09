@@ -138,6 +138,15 @@ elm_animatedicon_add(Evas_Object *parent)
 	return obj;
 }
 
+/**
+ * Set image files for animation. 
+ *
+ * @param obj animatedicon object. 
+ * @param images the image files to be animated.
+ * @param item_num the number of images.
+ *
+ * @ingroup Animatedicon 
+ */
 EAPI void 
 elm_animatedicon_file_set(Evas_Object *obj, const char **images, const int item_num)
 {
@@ -153,6 +162,14 @@ elm_animatedicon_file_set(Evas_Object *obj, const char **images, const int item_
 	elm_icon_file_set(wd->icon, wd->images[0], NULL);
 }
 
+/**
+ * Set animation duration time. 
+ *
+ * @param obj animatedicon object. 
+ * @param duration duration time. 
+ *
+ * @ingroup Animatedicon 
+ */
 EAPI void
 elm_animatedicon_duration_set(Evas_Object *obj, const double duration)
 {
@@ -162,6 +179,13 @@ elm_animatedicon_duration_set(Evas_Object *obj, const double duration)
 	wd->duration = duration;
 }
 
+/**
+ * Start animatedicon animation. 
+ *
+ * @param obj animatedicon object. 
+ *
+ * @ingroup Animatedicon 
+ */
 EAPI void
 elm_animatedicon_animation_start(Evas_Object *obj)
 {
@@ -191,6 +215,15 @@ elm_animatedicon_animation_start(Evas_Object *obj)
 	*/
 }
 
+/**
+ * Set the repeat count and interval. 
+ *
+ * @param obj animatedicon object.
+ * @param repeat repeat count.
+ * @param interval repeat interval. 
+ *
+ * @ingroup Animatedicon 
+ */
 EAPI void
 elm_animatedicon_repeat_set(Evas_Object *obj, const unsigned int repeat, const double interval)
 {
