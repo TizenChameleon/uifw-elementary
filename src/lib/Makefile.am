@@ -108,6 +108,7 @@ elm_viewflipper.c \
 elm_gallery.c \
 elm_slidingdrawer.c \ 
 elm_wipercontrol.c \
+elm_analogclock.c \
 elm_ratingbar.c \
 elm_chronometer.c \
 \

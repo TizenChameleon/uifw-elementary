@@ -2239,6 +2239,9 @@ extern "C" {
    	EAPI void elm_wipercontrol_above_content_set (Evas_Object *obj, Evas_Object *content);
    	EAPI Evas_Object * elm_wipercontrol_add(Evas_Object *parent);
 
+	/* AnalogClock */
+	EAPI Evas_Object *elm_analogclock_add(Evas_Object *parent);
+
     /* ratingbar */
    EAPI Evas_Object *elm_ratingbar_add(Evas_Object *parent);
    EAPI void elm_ratingbar_rating_set(Evas_Object *obj, int rating);
