@@ -114,6 +114,8 @@ elm_analogclock.c \
 elm_ratingbar.c \
 elm_chronometer.c \
 elm_dialoguegroup.c \
+elm_animatedicon.c \
+elm_coverflow.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
