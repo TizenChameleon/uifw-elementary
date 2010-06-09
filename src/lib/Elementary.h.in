@@ -1704,6 +1704,18 @@ extern "C" {
     * default
     */
 
+   EAPI Evas_Object *elm_timepicker3_add(Evas_Object *parent);
+   EAPI void         elm_timepicker3_time_set(Evas_Object *obj, int hrs, int min, int sec);
+   EAPI void         elm_timepicker3_time_get(Evas_Object *obj, int *hrs, int *min, int *sec);
+   EAPI void         elm_timepicker3_show_am_pm_set(Evas_Object *obj, Eina_Bool am_pm);
+   EAPI void         elm_timepicker3_show_seconds_set(Evas_Object *obj, Eina_Bool seconds);
+   /* smart callback called:
+    * "changed" - when timepicker3 selected item is changed
+    */
+   /* available styles:
+    * default
+    */
+
    EAPI Evas_Object *elm_datepicker_add(Evas_Object *parent);
    EAPI void         elm_datepicker_date_set(Evas_Object *obj, int year, int month, int day);
    EAPI void         elm_datepicker_date_get(Evas_Object *obj, int *year, int *month, int *day);
@@ -1736,6 +1748,22 @@ extern "C" {
     * default
     */
     
+   EAPI Evas_Object *elm_datepicker3_add(Evas_Object *parent);
+   EAPI void         elm_datepicker3_date_set(Evas_Object *obj, int year, int month, int day);
+   EAPI void         elm_datepicker3_date_get(Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker3_date_min_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
+   EAPI void         elm_datepicker3_date_min_get(Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker3_date_max_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
+   EAPI void         elm_datepicker3_date_max_get(Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker3_date_format_set(Evas_Object *obj, const char *fmt);
+   EAPI const char  *elm_datepicker3_date_format_get(Evas_Object *obj);
+   /* smart callback called:
+    * "changed" - when datepicker3 selected item is changed
+    */
+   /* available styles:
+    * default
+    */
+
     /* titlebar */
    EAPI Evas_Object *elm_titlebar_add(Evas_Object *parent);
    EAPI void         elm_titlebar_label_set(Evas_Object *obj, const char *label);

@@ -82,8 +82,10 @@ elm_picker.c \
 elm_discpicker.c \
 elm_buttonpicker.c \
 elm_timepicker.c \
+elm_timepicker3.c \
 elm_datepicker.c \
 elm_datepicker2.c \
+elm_datepicker3.c \
 elm_thumb.c \
 elm_config.c \
 elm_titlebar.c \
