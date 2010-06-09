@@ -6,8 +6,8 @@
 
 //#define LAYOUT_x 240
 //#define LAYOUT_y 400
-#define LAYOUT_x 480
-#define LAYOUT_y 800
+//#define LAYOUT_x 480
+//#define LAYOUT_y 800
 
 typedef struct _Widget_Data Widget_Data;
 
@@ -106,6 +106,7 @@ _theme_hook(Evas_Object *obj)
    if (!wd) return;
 
    _sizing_eval(obj);
+   evas_object_show(wd->viewflipper);
 }
 static void
 _sizing_eval(Evas_Object *obj)
@@ -399,9 +400,9 @@ elm_viewflipper_add(Evas_Object * parent)
     _elm_theme_set(wd->viewflipper,  "viewflipper", "base", "default");
 
 
-   evas_object_resize(wd->viewflipper, LAYOUT_x, LAYOUT_y);
-   evas_object_move(wd->viewflipper,0,0);
-   evas_object_show(wd->viewflipper);
+//   evas_object_resize(wd->viewflipper, LAYOUT_x, LAYOUT_y);
+//   evas_object_move(wd->viewflipper,0,0);
+//   evas_object_show(wd->viewflipper);
   
     evas_object_event_callback_add(wd->viewflipper, EVAS_CALLBACK_MOUSE_DOWN,
                                   _mouse_down, obj);
@@ -419,6 +420,9 @@ elm_viewflipper_add(Evas_Object * parent)
    
     _set_this(wd);
     _get_this()->is_can_move=TRUE;
+
+   elm_widget_resize_object_set(obj, wd->viewflipper);
+   _sizing_eval(obj);
 
    printf("create_viewflipper\n");
    return obj;
