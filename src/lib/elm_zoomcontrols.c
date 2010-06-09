@@ -77,7 +77,7 @@ _theme_hook(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 
-	_elm_theme_set(wd->base, "zoomcontrols", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->base, "zoomcontrols", "base", elm_widget_style_get(obj));
 	edje_object_message_signal_process(wd->base);
 	edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
 	_sizing_eval(obj);
@@ -384,7 +384,7 @@ elm_zoomcontrols_add(Evas_Object *parent)
 
    
    wd->base = edje_object_add(e);
-   _elm_theme_set(wd->base, "zoomcontrols", "base", "default");
+   _elm_theme_object_set(obj, wd->base, "zoomcontrols", "base", "default");
 
    //memset(wd->label, 0x00, sizeof(wd->label));
    
