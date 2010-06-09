@@ -2249,7 +2249,16 @@ extern "C" {
    /* available styles:
     * default
     */
-   
+ 
+   /*chronometer*/
+   EAPI Evas_Object *elm_chronometer_add(Evas_Object *parent);
+   EAPI void elm_chronometer_start(Evas_Object *obj);
+   EAPI void elm_chronometer_stop(Evas_Object *obj);
+   EAPI void elm_chronometer_time_set(Evas_Object *obj, int hrs, int min, int sec);
+   EAPI void elm_chronometer_time_get(const Evas_Object *obj, int *hrs, int *min, int *sec);
+   EAPI void elm_chronometer_format_set(Evas_Object *obj, Eina_Bool format);
+   EAPI void elm_chronometer_format_get(Evas_Object *obj, Eina_Bool *format);
+  
 #ifdef __cplusplus
 }
 #endif

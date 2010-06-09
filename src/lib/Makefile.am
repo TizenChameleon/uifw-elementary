@@ -109,6 +109,7 @@ elm_gallery.c \
 elm_slidingdrawer.c \ 
 elm_wipercontrol.c \
 elm_ratingbar.c \
+elm_chronometer.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
