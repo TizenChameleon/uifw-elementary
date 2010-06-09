@@ -2165,6 +2165,76 @@ extern "C" {
    // down_clicked
    //         
 
+       /*viewflipper*/
+	typedef enum _Elm_Viewflipper_Policy
+	{
+		 ERROR_0  = -1,    //can not find wanted value
+		 SUCCESS =0,
+		 FLIP_RANGE_X =30, 
+		 ERROR_1  =1001,	//confrim parameter is layout or not
+		 ERROR_2 ,	//confrim memory check
+		 ERROR_3 ,	//data is empty
+		 ERROR_4 ,	//check the range
+		 ERROR_5 ,	//Non need operation
+		 ERROR_6 ,	//waiting gui
+		 ERROR_7 ,	//timer second is not setup or can not time setup
+		 DIR_LEFT ,
+		 DIR_RIGHT ,
+		 EACH_LAST 
+	 }Elm_Viewflipper_Policy;
+	 EAPI Evas_Object * elm_viewflipper_add(Evas_Object * parent);
+	 EAPI  int elm_viewflipper_isFlipbutton();
+	 EAPI int elm_viewflipper_isAutoStart();
+	 EAPI int elm_viewflipper_isValidPos(int pos);
+	 EAPI int elm_viewflipper_addChild(Evas_Object * child_layout);
+	 EAPI int elm_viewflipper_removeChild(Evas_Object * child_layout);
+	 EAPI int elm_viewflipper_removeChildAt(int pos);
+	 EAPI int elm_viewflipper_getPositionChild(Evas_Object * child_layout);
+	 EAPI Evas_Object * elm_viewflipper_getChildAt(int pos);
+	 EAPI int elm_viewflipper_getCountChild();
+	 EAPI int elm_viewflipper_setDisplayedChild(int pos);
+	 EAPI int elm_viewflipper_setNowView();
+	 EAPI int elm_viewflipper_setNextView();
+	 EAPI  int elm_viewflipper_setPreviousView();
+	 EAPI int elm_viewflipper_setFlipInterval(int milliseconds); 
+	 EAPI int elm_viewflipper_setFlipbutton(int showbutton);
+	 EAPI int elm_viewflipper_startAutoFlippingWithOption(int drection,int pos);
+	 EAPI int elm_viewflipper_startAutoFlipping(); 
+	 EAPI int elm_viewflipper_stopAutoFlipping();
+	   
+	/*gallery*/
+	struct _Elm_Gallery_Item {
+		Evas_Object *parent;
+		Evas_Object *ly;
+		Evas_Object *obj;
+		const char *path;
+		int index;
+		Evas_Coord x, y, w, h;
+		Evas_Coord mw, mh;	
+		Eina_Bool on_hold : 1;
+		Eina_Bool on_show : 1;
+		Eina_Bool on_highquality : 1;		
+	};
+	typedef struct _Elm_Gallery_Item Elm_Gallery_Item;
+	EAPI Evas_Object *elm_gallery_add(Evas_Object *parent);
+	EAPI Eina_Bool elm_gallery_data_set(Evas_Object *obj, Eina_List *list);
+	EAPI Elm_Gallery_Item *elm_gallery_item_append(Evas_Object *obj, const char *photo_file);
+	EAPI Elm_Gallery_Item *elm_gallery_item_prepend(Evas_Object *obj, const char *photo_file);
+	EAPI void elm_gallery_item_del(Elm_Gallery_Item *it);
+	EAPI const char *elm_gallery_item_file_get(Elm_Gallery_Item *it);
+	EAPI void elm_gallery_item_show(Elm_Gallery_Item *it);
+	EAPI Eina_List *elm_gallery_item_list_get(Evas_Object *obj);
+	EAPI void elm_gallery_set_type(Evas_Object *obj,int type);
+	EAPI void elm_gallery_set_max_count(Evas_Object *obj,int max_value);
+
+	/* Sliding Drawer */
+	EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
+	EAPI void elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
+
+	/*wipercontrol*/
+   	EAPI void elm_wipercontrol_below_content_set (Evas_Object *obj, Evas_Object *content);
+   	EAPI void elm_wipercontrol_above_content_set (Evas_Object *obj, Evas_Object *content);
+   	EAPI Evas_Object * elm_wipercontrol_add(Evas_Object *parent);
    
 #ifdef __cplusplus
 }

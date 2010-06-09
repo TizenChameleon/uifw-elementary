@@ -104,6 +104,10 @@ elm_actionslider.c \
 elm_hor_scroller.c \
 elm_zoomcontrols.c \
 elm_controlbar.c \
+elm_viewflipper.c \
+elm_gallery.c \
+elm_slidingdrawer.c \ 
+elm_wipercontrol.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
