@@ -288,7 +288,7 @@ static void
 _item_del(Elm_Buttonpicker_Item *item)
 {
 	Eina_List *l;
-	Elm_Discpicker_Item *_item;
+	Elm_Buttonpicker_Item *_item;
 	Widget_Data *wd;
 
 	wd = elm_widget_data_get(item->buttonpicker);
