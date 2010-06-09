@@ -1667,6 +1667,31 @@ extern "C" {
     * default
     */
 
+   typedef struct _Buttonpicker_Item Elm_Buttonpicker_Item;
+   EAPI Evas_Object     *elm_buttonpicker_add(Evas_Object *parent);
+   EAPI void            elm_buttonpicker_next(Evas_Object *obj);
+   EAPI void            elm_buttonpicker_prev(Evas_Object *obj);
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI const Eina_List *elm_buttonpicker_items_get(Evas_Object *obj);
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_first_item_get(Evas_Object *obj);
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_last_item_get(Evas_Object *obj);
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_selected_item_get(Evas_Object *obj);
+   EAPI void             elm_buttonpicker_item_selected_set(Elm_Buttonpicker_Item *item);
+   EAPI void             elm_buttonpicker_item_del(Elm_Buttonpicker_Item *item);
+   EAPI const char      *elm_buttonpicker_item_label_get(Elm_Buttonpicker_Item *item);
+   EAPI void             elm_buttonpicker_item_label_set(Elm_Buttonpicker_Item *item, const char *label);
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_prev(Elm_Buttonpicker_Item *item);
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_next(Elm_Buttonpicker_Item *item);
+   /* smart callback called:
+    * "changed" - when buttonpicker selected item is changed
+    * "overflowed" - when buttonpicker item is changed to first item from last item
+    * "underflowed" - when buttonpicker item is changed to last item from first item.
+    */
+   /* available styles:
+    * default
+    */
+
    EAPI Evas_Object *elm_timepicker_add(Evas_Object *parent);
    EAPI void         elm_timepicker_time_set(Evas_Object *obj, int hrs, int min, int sec);
    EAPI void         elm_timepicker_time_get(Evas_Object *obj, int *hrs, int *min, int *sec);
