@@ -104,11 +104,11 @@
  * details.
  *
  * An item in the genlist world can have 0 or more text labels (they can be
- * regular text or textblock – that's up to the style to determine), 0 or
+ * regular text or textblock ??that's up to the style to determine), 0 or
  * more icons (which are simply objects swallowed into the genlist item) and
  * 0 or more boolean states that can be used for check, radio or other
  * indicators by the edje theme style. An item may be one of several styles
- * (Elementary provides 2 by default - “default” and “double_label”, but this
+ * (Elementary provides 2 by default - ?�default??and ?�double_label?? but this
  * can be extended by system or application custom themes/overlays/extensions).
  *
  * In order to implement the ability to add and delete items on the fly,
@@ -116,12 +116,12 @@
  * a structure with information about that type of item (genlist may contain
  * multiple different items with different classes, states and styles).
  * Genlist will call the functions in this struct (methods) when an item is
- * “realized” (that is created dynamically while scrolling). All objects will
+ * ?�realized??(that is created dynamically while scrolling). All objects will
  * simply be deleted  when no longer needed with evas_object_del(). The
  * Elm_Genlist_Item_Class structure contains the following members:
  *
  * item_style - This is a constant string and simply defines the name of the
- * item style. It must be specified and the default should be “default”.
+ * item style. It must be specified and the default should be ?�default??
  *
  * func.label_get - This function is called when an actual item object is
  * created. The data parameter is the data parameter passed to
@@ -146,7 +146,7 @@
  * parameter is the genlist object and the part parameter is the string name
  * of the state part in the edje design that is listed as one of the possible
  * states that can be set. Return 0 for false or 1 for true. Genlist will
- * emit a signal to the edje object with “elm,state,XXX,active” “elm” when
+ * emit a signal to the edje object with ?�elm,state,XXX,active???�elm??when
  * true (the default is false), where XXX is the name of the part.
  *
  * func.del - This is called when elm_genlist_item_del() is called on an
@@ -226,7 +226,7 @@
  * viewport of the scroller. If it is ELM_LIST_LIMIT, Items will be expanded
  * to the viewport width and limited to that size. This can be combined with
  * a different style that uses edjes' ellipsis feature (cutting text off like
- * this: “tex...”).
+ * this: ?�tex...??.
  *
  * Items will only call their selection func and callback when first becoming
  * selected. Any further clicks will do nothing, unless you enable always
@@ -257,7 +257,7 @@ struct _Widget_Data
    Evas_Coord pan_x, pan_y, minw, minh;
    Ecore_Job *calc_job, *update_job;
    Ecore_Idler *queue_idler;
-   Eina_List *queue, *selected;
+   Eina_List *queue, *selected, *menuopened;
    Elm_Genlist_Item *show_item;
    Elm_List_Mode mode;
    Eina_Bool on_hold : 1;
@@ -275,6 +275,14 @@ struct _Widget_Data
    int edit_mode;
    Eina_Bool animate_edit_controls :1;
    Edit_Data *ed;
+
+   Evas_Coord td1_x, td1_y, tu1_x, tu1_y;
+   Evas_Coord td2_x, td2_y, tu2_x, tu2_y;
+   Evas_Coord d1_x, d1_y, d2_x, d2_y;
+   Evas_Coord acc_x1, acc_y1, acc_x2, acc_y2;
+   Evas_Coord prev_multi_x, prev_multi_y;
+   Eina_Bool multi_down : 1;
+   Eina_Bool multi_touch : 1;
 };
 struct _Edit_Data
 {
@@ -344,6 +352,7 @@ struct _Elm_Genlist_Item
    Eina_Bool dragging : 1;
    Eina_Bool updateme : 1;
    Eina_Bool reordering : 1;
+   Eina_Bool menuopened : 1;
 
    int pad_left, pad_right;
 };
@@ -490,7 +499,8 @@ _item_hilight(Elm_Genlist_Item *it)
 
    if ((it->wd->no_select) || (it->delete_me) || (it->hilighted) ||
          (it->wd->edit_mode != ELM_GENLIST_EDIT_MODE_NONE)) return;
-   edje_object_signal_emit(it->base, "elm,state,selected", "elm");
+   if( !it->menuopened )
+   	edje_object_signal_emit(it->base, "elm,state,selected", "elm");
    selectraise = edje_object_data_get(it->base, "selectraise");
    if ((selectraise) && (!strcmp(selectraise, "on")))
    {
@@ -618,7 +628,8 @@ _item_unselect(Elm_Genlist_Item *it)
    const char *stacking, *selectraise;
 
    if ((it->delete_me) || (!it->hilighted)) return;
-   edje_object_signal_emit(it->base, "elm,state,unselected", "elm");
+   if( !it->menuopened )
+   	edje_object_signal_emit(it->base, "elm,state,unselected", "elm");
    stacking = edje_object_data_get(it->base, "stacking");
    selectraise = edje_object_data_get(it->base, "selectraise");
    if ((selectraise) && (!strcmp(selectraise, "on")))
@@ -636,11 +647,54 @@ _item_unselect(Elm_Genlist_Item *it)
 }
 
 static void
+_slide_item(Elm_Genlist_Item *it, bool slide_to_left)
+{
+	const Eina_List *l, *l_next;
+	Elm_Genlist_Item *it2;
+	const char *allow_slide;
+
+	allow_slide = edje_object_data_get(it->base, "allow_slide");
+	if( !allow_slide )
+		return;
+
+	if ( atoi(allow_slide) != 1 )
+		return;
+
+
+	if( slide_to_left )
+	{
+		if( !it->menuopened )
+			edje_object_signal_emit(it->base, "elm,state,slide,left", "elm");
+		it->wd->menuopened = eina_list_append(it->wd->menuopened, it);
+
+		EINA_LIST_FOREACH(it->wd->menuopened, l, it2)
+		{
+			if (it2 != it) 
+			{
+				it2->menuopened = 0;
+	  			edje_object_signal_emit(it2->base, "elm,state,slide,right", "elm");
+				it2->wd->menuopened = eina_list_remove(it2->wd->menuopened, it2);
+			}
+		}
+	}
+	else
+	{
+		if( it->menuopened )
+	  		edje_object_signal_emit(it->base, "elm,state,slide,right", "elm");
+		it->wd->menuopened = eina_list_remove(it->wd->menuopened, it);
+	}
+	
+	it->menuopened = slide_to_left;
+
+}
+
+static void
 _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Elm_Genlist_Item *it = data;
    Evas_Event_Mouse_Move *ev = event_info;
    Evas_Coord minw = 0, minh = 0, x, y, dx, dy, adx, ady;
+   Evas_Coord acc_x, acc_y;
 
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
      {
@@ -669,6 +723,24 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
           }
         return;
      }
+
+   if (it->wd->multi_down)
+     {
+	acc_x = ev->prev.canvas.x - ev->cur.canvas.x;	
+	if (acc_x < 0)
+	  it->wd->acc_x1 = it->wd->acc_x1 - acc_x;
+	else
+	  it->wd->acc_x1 = it->wd->acc_x1 + acc_x;
+
+	acc_y = ev->prev.canvas.y - ev->cur.canvas.y;	
+	if (acc_y < 0)
+	  it->wd->acc_y1 = it->wd->acc_y1 - acc_y;
+	else
+	  it->wd->acc_y1 = it->wd->acc_y1 + acc_y;
+
+	return;
+     }
+   
    if (!it->display_only)
      elm_coords_finger_size_adjust(1, &minw, 1, &minh);
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
@@ -700,11 +772,17 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
              else
                {
                   if (dx < 0)
-                    evas_object_smart_callback_call(it->wd->obj, 
+				  {
+                    evas_object_smart_callback_call(it->wd->obj,
                                                     "drag,start,left", it);
+					_slide_item( it, 1 );
+				  }
                   else
-                    evas_object_smart_callback_call(it->wd->obj, 
+				  {
+                    evas_object_smart_callback_call(it->wd->obj,
                                                     "drag,start,right", it);
+					_slide_item( it, 0 );
+				  }
                }
           }
         else
@@ -715,11 +793,17 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
              else
                {
                   if (dx < 0)
-                    evas_object_smart_callback_call(it->wd->obj, 
+				  {
+                    evas_object_smart_callback_call(it->wd->obj,
                                                     "drag,start,left", it);
+					_slide_item( it, 1 );
+				  }
                   else
-                    evas_object_smart_callback_call(it->wd->obj, 
+				  {
+                    evas_object_smart_callback_call(it->wd->obj,
                                                     "drag,start,right", it);
+					_slide_item( it, 0 );
+				  }
                }
           }
      }
@@ -738,6 +822,147 @@ _long_press(void *data)
 }
 
 static void
+_multi_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
+{
+   Elm_Genlist_Item *it = data;
+   Evas_Event_Multi_Down *ev = event_info;
+   Evas_Coord dx, dy, adx, ady;
+
+   if (it->long_timer)
+   {
+        ecore_timer_del(it->long_timer);
+        it->long_timer = NULL;
+   }
+
+   dx = it->wd->td1_x - ev->canvas.x;
+   adx = dx;
+   if (adx < 0) adx = -dx;
+   dy = it->wd->td1_y - ev->canvas.y;
+   ady = dy;
+   if (ady < 0) ady = -dy;
+
+   if (adx < 60 && ady < 60)
+     return;
+   
+   it->wd->multi_down = 1;
+   it->wd->td2_x = ev->canvas.x;
+   it->wd->td2_y = ev->canvas.y;
+
+   fprintf(stderr, "\n MULTI_DOWN - BUTTON ID = %d, x= %d, y= %d\n", ev->device, it->wd->td2_x, it->wd->td2_y);
+}
+
+static void
+_multi_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
+{
+   Elm_Genlist_Item *it = data;
+   Evas_Event_Multi_Up *ev = event_info;
+   Evas_Coord x, y, dy, uy, ady, auy;
+
+   fprintf(stderr, "\n MULTI_UP - x= %d, y= %d down= %d multi_down= %d\n", ev->canvas.x, ev->canvas.y, it->down, it->wd->multi_down);
+
+   if (!it->wd->multi_down)
+     return;
+
+   it->wd->multi_down = 0;
+   it->wd->tu2_x = ev->canvas.x;
+   it->wd->tu2_y = ev->canvas.y;
+   it->wd->d2_x = ev->canvas.x - it->wd->td2_x;
+   it->wd->d2_y = ev->canvas.y - it->wd->td2_y;
+
+   if (it->down)
+   {
+	it->wd->multi_touch = EINA_TRUE;
+   }
+   else
+   {
+        fprintf(stderr, "CHECK d1_x= %d, d2_x= %d, d1_y= %d, d2_y= %d\n", it->wd->d1_x, it->wd->d2_x, it->wd->d1_y, it->wd->d2_y);
+
+	if ( (it->wd->d1_x > 180) && (it->wd->d2_x > 180) )
+	{
+	   // Two finger : Left -> Right
+	   fprintf(stderr, "L->R acc_y1= %d, acc_y2= %d\n", it->wd->acc_y1, it->wd->acc_y2);
+	   if (it->wd->acc_y1 < 200 && it->wd->acc_y2 < 200)
+		evas_object_smart_callback_call(it->wd->obj, "multi_touch,left,right", it);
+	}
+	else if ( (it->wd->d1_y > 180) && (it->wd->d2_y > 180) )
+	{
+	   // Two finger : Top -> Bottom
+	   fprintf(stderr, "T->B acc_x1= %d, acc_x2= %d\n", it->wd->acc_x1, it->wd->acc_x2);
+	   if (it->wd->acc_x1 < 200 && it->wd->acc_x2 < 200)
+		evas_object_smart_callback_call(it->wd->obj, "multi_touch,top,bottom", it);
+	}
+	else
+	{
+	   dy = it->wd->td1_y - it->wd->td2_y;
+	   if (dy < 0)
+	     ady = -dy;
+	   else
+	     ady = dy;
+
+	  uy = it->wd->tu1_y - it->wd->tu2_y;
+	  if (uy < 0)
+	    auy = -uy;
+	  else
+	    auy = uy;
+
+	  if (auy < ady)
+	  {
+		if (auy < ady*0.4)
+		{
+		  // Two finger : Pinch Out
+		  evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,out", it);
+		}
+	  }
+	  else
+	  {
+		if (ady < auy*0.4)
+		{
+		  // Two finger : Pinch In
+		  evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,in", it);
+		}
+	  }
+	}
+	
+	it->wd->acc_x1 = 0;
+	it->wd->acc_y1 = 0;
+	it->wd->acc_x2 = 0;
+	it->wd->acc_y2 = 0;
+	it->wd->prev_multi_x = 0;
+	it->wd->prev_multi_y = 0;
+   }
+}
+
+static void
+_multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
+{
+   Elm_Genlist_Item *it = data;
+   Evas_Event_Multi_Move *ev = event_info;
+   Evas_Coord acc_x, acc_y;
+
+   if (it->wd->prev_multi_x == 0)
+   {
+     it->wd->prev_multi_x = ev->cur.canvas.x;
+     it->wd->prev_multi_y = ev->cur.canvas.y;
+     return;
+   }
+   
+   acc_x = it->wd->prev_multi_x - ev->cur.canvas.x;	
+   if (acc_x < 0)
+	it->wd->acc_x2 = it->wd->acc_x2 - acc_x;
+   else
+	it->wd->acc_x2 = it->wd->acc_x2 + acc_x;
+
+   acc_y = it->wd->prev_multi_y - ev->cur.canvas.y;	
+   if (acc_y < 0)
+	it->wd->acc_y2 = it->wd->acc_y2 - acc_y;
+   else
+	it->wd->acc_y2 = it->wd->acc_y2 + acc_y;
+
+   it->wd->prev_multi_x = ev->cur.canvas.x;
+   it->wd->prev_multi_y = ev->cur.canvas.y;
+}
+
+static void
 _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Elm_Genlist_Item *it = data;
@@ -752,6 +977,8 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
    it->dx = ev->canvas.x - x;
    it->dy = ev->canvas.y - y;
+   it->wd->td1_x = ev->canvas.x;
+   it->wd->td1_y = ev->canvas.y; 
    it->wd->longpressed = EINA_FALSE;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) it->wd->on_hold = EINA_TRUE;
    else it->wd->on_hold = EINA_FALSE;
@@ -772,9 +999,78 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    Elm_Genlist_Item *it = data;
    Evas_Event_Mouse_Up *ev = event_info;
    Eina_Bool dragged = EINA_FALSE;
+   Evas_Coord x, y, dy, uy, ady, auy;
 
    if (ev->button != 1) return;
    it->down = 0;
+   it->wd->acc_x1 = 0;
+   it->wd->acc_y1 = 0;
+   
+   it->wd->tu1_x = ev->canvas.x;
+   it->wd->tu1_y = ev->canvas.y;
+   it->wd->d1_x = ev->canvas.x - it->wd->td1_x;
+   it->wd->d1_y = ev->canvas.y - it->wd->td1_y;
+
+   if (it->wd->multi_down == 0 && it->wd->multi_touch == EINA_TRUE)
+   {
+	if ( (it->wd->d1_x > 180) && (it->wd->d2_x > 180) )
+	{
+	   // Two finger : Left -> Right
+	   fprintf(stderr, "L->R acc_y1= %d, acc_y2= %d\n", it->wd->acc_y1, it->wd->acc_y2);
+	   if (it->wd->acc_y1 < 200 && it->wd->acc_y2 < 200)
+		evas_object_smart_callback_call(it->wd->obj, "multi_touch,left,right", it);
+	}
+	else if ( (it->wd->d1_y > 180) && (it->wd->d2_y > 180) )
+	{
+	   // Two finger : Top -> Bottom
+	   fprintf(stderr, "T->B acc_x1= %d, acc_x2= %d\n", it->wd->acc_x1, it->wd->acc_x2);
+	   if (it->wd->acc_x1 < 200 && it->wd->acc_x2 < 200)
+		evas_object_smart_callback_call(it->wd->obj, "multi_touch,top,bottom", it);
+	}
+	else
+	{
+	   dy = it->wd->td1_y - it->wd->td2_y;
+	   if (dy < 0)
+	     ady = -dy;
+	   else
+	     ady = dy;
+
+	  uy = it->wd->tu1_y - it->wd->tu2_y;
+	  if (uy < 0)
+	    auy = -uy;
+	  else
+	    auy = uy;
+
+	  if (auy < ady)
+	  {
+		if (auy < ady*0.4)
+		{
+		  // Two finger : Pinch Out
+		  evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,out", it);
+		}
+	  }
+	  else
+	  {
+		if (ady < auy*0.4)
+		{
+		  // Two finger : Pinch In
+		  evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,in", it);
+		}
+	  }
+
+	}
+
+	it->wd->acc_x1 = 0;
+	it->wd->acc_y1 = 0;
+	it->wd->acc_x2 = 0;
+	it->wd->acc_y2 = 0;
+	it->wd->prev_multi_x = 0;
+	it->wd->prev_multi_y = 0;
+	it->wd->multi_down = 0;
+   }
+
+   it->wd->multi_touch = EINA_FALSE;
+
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) it->wd->on_hold = EINA_TRUE;
    else it->wd->on_hold = EINA_FALSE;
    if (it->long_timer)
@@ -1086,7 +1382,13 @@ _item_realize(Elm_Genlist_Item *it, int in, int calc)
 				       _mouse_up, it);
 	evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_MOVE,
 				       _mouse_move, it);
-	if (it->selected)
+	evas_object_event_callback_add(it->base, EVAS_CALLBACK_MULTI_DOWN,
+				       _multi_down, it);
+	evas_object_event_callback_add(it->base, EVAS_CALLBACK_MULTI_UP,
+				       _multi_up, it);
+	evas_object_event_callback_add(it->base, EVAS_CALLBACK_MULTI_MOVE,
+				       _multi_move, it);
+	if (it->selected && !it->menuopened)
 	  edje_object_signal_emit(it->base, "elm,state,selected", "elm");
 	if (it->disabled)
 	  edje_object_signal_emit(it->base, "elm,state,disabled", "elm");
@@ -1366,6 +1668,13 @@ _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *
   Elm_Genlist_Item *it = data;
   if(_edit_mode_reset( it->wd ))
      return;
+  
+  if( it->wd->ed->del_confirm_state )
+    {
+	it->wd->ed->del_confirm_state = 0;
+	edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,enable", "elm");
+	return;
+    }
 
   it->wd->ed->del_confirm_state = 1;
   it->wd->ed->del_item = it;
@@ -1396,14 +1705,16 @@ _insert_new_item_cb(void *data, Evas_Object *obj, const char *emission, const ch
 
 static Eina_Bool
 _edit_mode_reset(Widget_Data *wd)
-{
+{  
+   /*
   if(wd->ed->del_confirm_state)
   {
-       edje_object_signal_emit(wd->ed->del_item->edit_obj, "elm,state,delete", "elm");
-       wd->ed->del_confirm_state = 0;
-       wd->ed->del_item = NULL;
+       //edje_object_signal_emit(wd->ed->del_item->edit_obj, "elm,state,delete", "elm");
+       //wd->ed->del_confirm_state = 0;
+       //wd->ed->del_item = NULL;
        return EINA_TRUE;
   }
+  */
   return EINA_FALSE;
 }
 
