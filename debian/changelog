@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+1) unstable; urgency=low
+
+  * Packaging.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL-pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+1
+
+ -- Daniel Juyung Seo <juyung.seo@smasung.net>  Thu, 10 Jun 2010 20:45:23 +0900
+
 elementary (0.4.0+svn.49550slp2+0) unstable; urgency=low
 
   * Update opensource EFL from SVN
