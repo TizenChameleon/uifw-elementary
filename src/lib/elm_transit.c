@@ -43,8 +43,7 @@ struct _transit {
 	Elm_Animator*           animator;
 	Eina_List*              effect_list;
 	Evas_Object*     	block_rect;
-	void 			(*completion_op)(void*);	
-	void 			(*completion_op2)(void*, Elm_Transit*);
+	void 			(*completion_op)(void*, Elm_Transit*);
 	void* 			completion_arg;
 	Eina_Bool 		reserved_del : 1;
 };
@@ -142,11 +141,7 @@ static void _transit_complete_cb( void* data )
 	}
 	
 	if( transit->completion_op ) {
-		transit->completion_op( transit->completion_arg );
-	}
-
-	if( transit->completion_op2 ) {
-		transit->completion_op2( transit->completion_arg, transit );
+		transit->completion_op( transit->completion_arg, transit );
 	}
 
 	if( transit->reserved_del == EINA_TRUE ) {
@@ -333,35 +328,10 @@ EAPI void elm_transit_completion_callback_set( Elm_Transit* transit, void (*op)(
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK( transit );
 #endif
-	transit->completion_op2 = op;
-	transit->completion_arg = data;
-}
-
-
-
-
-
-/**
- * @ingroup Transit 
- *
- * Set the user-callback function when the transit is done. (deprecated) 
- * 
- * @param  transit	Transit object
- * @param  op           Callback function pointer
- * @param  data         Callback funtion user argument
- */
-
-EAPI void elm_transit_completion_set( Elm_Transit* transit, void (*op)(void*), void* data )
-{
-#ifdef ELM_FX_EXCEPTION_ENABLE
-	ELM_FX_NULL_CHECK( transit );
-#endif
 	transit->completion_op = op;
 	transit->completion_arg = data;
-
-	fprintf( stderr, "elm_transit_completion_set is deprecated! Try use elm_transit_completion_callback_set!\n" );
-
 }
+
 
 
 
@@ -723,7 +693,6 @@ static void _elm_fx_translation_begin( void* data,
 
 	evas_object_show( translation->obj );
 	evas_object_move( translation->obj, translation->from.x, translation->from.y );
-//	_elm_fx_translation_op( data, NULL, 0 );
 
 }
 
@@ -735,7 +704,6 @@ static void _elm_fx_translation_end( void* data,
 {
 	Elm_Fx_Translation* translation = data;
 
-//	evas_object_map_enable_set( translation->obj, EINA_FALSE );
 	evas_object_move( translation->obj, translation->from.x + translation->to.x,
 				           translation->from.y + translation->to.y );
 }
@@ -754,52 +722,6 @@ static void _elm_fx_translation_op( void* data, Elm_Animator* animator, const do
 	evas_object_move( translation->obj, x, y );
 }
 
-
-/*
-static void _elm_fx_translation_op( void* data, Elm_Animator* animator, const double frame )
-{
-	Elm_Fx_Transfer* translation = data;
-
-	Evas_Map* map = evas_map_new( 4 );
-
-	if( map == NULL ) {
-		return ;
-	}
-
-	evas_map_smooth_set( map, EINA_TRUE );
-
-	Evas_Coord x, y, w, h;
-	evas_object_geometry_get( translation->obj, &x, &y, &w, &h );
-
-	evas_map_point_coord_set( map, 0, (translation->from.x + transition->to.x * frame),
-					  (translation->from.y + transition->to.y * frame),
-					  0 );
-
-	evas_map_point_coord_set( map, 1, (translation->from.x + translation->to.x * frame) + w,
-					  (translation->from.y + translation->to.y * frame),
-					  0 );
-
-	evas_map_point_coord_set( map, 2, (translation->from.x + translation->to.x * frame) + w,
-					  (translation->from.y + translation->to.y * frame) + h,
-					  0 );
-
-	evas_map_point_coord_set( map, 3, (translation->from.x + translation->to.x * frame),
-					  (translation->from.y + translation->to.y * frame) + h,
-					  0 );
-
-	evas_map_point_image_uv_set( map, 0, 0, 0 );
-	evas_map_point_image_uv_set( map, 1, w, 0 );
-	evas_map_point_image_uv_set( map, 2, w, h );
-	evas_map_point_image_uv_set( map, 3, 0, h );
-
-	evas_map_util_3d_perspective( map, x + w / 2, y + h / 2, 0, 10000 );
-
-	evas_object_map_enable_set( translation->obj, EINA_TRUE );
-	evas_object_map_set( translation->obj, map );
-	evas_map_free( map );
-
-}
-*/
 
 /**
  * @ingroup Transit 
@@ -855,115 +777,8 @@ EAPI Elm_Effect* elm_fx_translation_add( Evas_Object* obj,
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////
-//Transfer FX
-/////////////////////////////////////////////////////////////////////////////////////
-typedef struct _transfer Elm_Fx_Transfer;
-static void _elm_fx_transfer_op( void* data, Elm_Animator* animator, const double frame );
-
-struct _transfer {
-
-	Evas_Object* obj;
-
-	struct _point from, to;
-	
-};
 
 
-static void _elm_fx_transfer_begin( void* data, 
-				   const Eina_Bool auto_reverse, 
-				   const unsigned int repeat_cnt )
-{
-	Elm_Fx_Transfer* transfer = data;
-
-	evas_object_show( transfer->obj );
-	evas_object_move( transfer->obj, transfer->from.x, transfer->from.y );
-//	_elm_fx_transfer_op( data, NULL, 0 );
-
-}
-
-
-
-static void _elm_fx_transfer_end( void* data,
-				  const Eina_Bool auto_reverse,
-				  const unsigned int repeat_cnt )
-{
-	Elm_Fx_Transfer* transfer = data;
-
-//	evas_object_map_enable_set( transfer->obj, EINA_FALSE );
-	evas_object_move( transfer->obj, transfer->from.x + transfer->to.x,
-				         transfer->from.y + transfer->to.y );
-}
-
-
-
-static void _elm_fx_transfer_op( void* data, Elm_Animator* animator, const double frame )
-{
-	Elm_Fx_Transfer* transfer = data;
-
-	Evas_Coord x, y;
-	
-	x = transfer->from.x + (Evas_Coord)( (float) transfer->to.x * (float) frame);
-	y = transfer->from.y + (Evas_Coord)( (float) transfer->to.y * (float) frame);
-
-	evas_object_move( transfer->obj, x, y );
-}
-
-
-
-
-/**
- * @ingroup Transit 
- *
- * Add transfer effect. (deprecated. please use translation.) 
- *
- * @param  obj           Evas_Object that effect is applying to
- * @param  from_x        Position X when effect begin
- * @param  from_y        Position Y whene effect begin
- * @param  to_x          Position X to be 
- * @param  to_y          Position Y to be
- * @return 		 Transfer effect 
- */
-EAPI Elm_Effect* elm_fx_transfer_add( Evas_Object* obj, 
-		                       const Evas_Coord from_x, 
-				       const Evas_Coord from_y, 
-				       const Evas_Coord to_x,
-				       const Evas_Coord to_y )
-{
-#ifdef ELM_FX_EXCEPTION_ENABLE
-	ELM_FX_NULL_CHECK_WITH_RET( obj, NULL );
-#endif
-		
-	Elm_Effect* effect = calloc( 1, sizeof( Elm_Effect ) );
-
-	if( effect == NULL ) {
-		fprintf( stderr, "Failed to allocate Elm_Effect!\n" );
-		return NULL;
-	}
-	
-	Elm_Fx_Transfer* transfer = calloc( 1, sizeof( Elm_Fx_Transfer ) );
-
-	if( transfer == NULL ) {
-		fprintf( stderr, "Failed to allocate Elm_Effect!\n" );
-		free( effect );
-		return NULL;
-	}
-
-	transfer->obj = obj;
-	transfer->from.x = from_x;
-	transfer->from.y = from_y;
-	transfer->to.x = to_x - from_x;
-	transfer->to.y = to_y - from_y;
-
-	effect->begin_op = _elm_fx_transfer_begin;
-	effect->end_op = _elm_fx_transfer_end;
-	effect->animation_op = _elm_fx_transfer_op;
-	effect->user_data = transfer;
-
-	fprintf( stderr, "elm_fx_transfer_add is deprecated! Try use elm_fx_translation!\n" );
-
-	return effect;
-}
 
 /////////////////////////////////////////////////////////////////////////////////////
 //Zoom FX
@@ -2446,42 +2261,16 @@ EAPI void elm_fx_transform_multiply( Elm_Fx_Matrix* m, Elm_Fx_Matrix* m1, Elm_Fx
 }
 
 
+
+
 /////////////////////////////////////////////////////////////////////////////////////
 // ImageAnimation FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _image_animation Elm_Fx_Image_Animation;
 
 struct _image_animation {
-	Evas_Object* icon;
-	char** images;
-	int count;
-	int item_num;
+	Evas_Object** images;
 };
-
-static void _elm_fx_imageanimation_begin( void* data,
-	 			           const Eina_Bool auto_reverse, 
-					   const unsigned int repeat_cnt )
-{
-}
-
-static void _elm_fx_imageanimation_end( void* data,
-				  const Eina_Bool auto_reverse,
-				  const unsigned int repeat_cnt )
-{
-}
-
-void _elm_fx_imageanimation_op( void* data, Elm_Animator* animator, const double frame )
-{
-	Elm_Fx_Image_Animation* image_animation = (Elm_Fx_Image_Animation *)data;
-
-	if ( image_animation->icon == NULL ) {
-		return;
-	}
-			
-	image_animation->count = floor( frame * image_animation->item_num );
-
-	elm_icon_file_set( image_animation->icon, image_animation->images[image_animation->count], NULL );
-}
 
 /**
  * @ingroup Transit 
@@ -2491,7 +2280,7 @@ void _elm_fx_imageanimation_op( void* data, Elm_Animator* animator, const double
  * @param  images        Images for animation.
  * @return 		 ImageAnimation Effect.
  */
-EAPI Elm_Effect* elm_fx_imageanimation_add( const Evas_Object* icon, const char** images, const unsigned int item_num )
+EAPI Elm_Effect* elm_fx_imageanimation_add( Evas_Object* images[])
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( images, NULL );
@@ -2504,11 +2293,6 @@ EAPI Elm_Effect* elm_fx_imageanimation_add( const Evas_Object* icon, const char*
 		return NULL;
 	}
 	
-	if( images == NULL || *images == NULL ) {
-		fprintf( stderr, "Failed to load NULL images!\n" );
-		return NULL;
-	}
-
 	Elm_Fx_Image_Animation* image_animation = calloc( 1, sizeof( Elm_Fx_Image_Animation) );
 
 	if( image_animation == NULL ) {
@@ -2517,16 +2301,15 @@ EAPI Elm_Effect* elm_fx_imageanimation_add( const Evas_Object* icon, const char*
 		return NULL;
 	}
 
-	image_animation->icon = icon;
 	image_animation->images = images;
-	image_animation->count = 0;
-	image_animation->item_num = item_num;
 
-	effect->begin_op = _elm_fx_imageanimation_begin;
-	effect->end_op = _elm_fx_imageanimation_end;
-	effect->animation_op = _elm_fx_imageanimation_op;
+	effect->begin_op = NULL;
+	effect->end_op = NULL;
+	effect->animation_op = NULL;
 	effect->user_data = image_animation ;
 
 	return effect;
 }
+
+
 
