@@ -139,7 +139,6 @@ static void _del_hook(Evas_Object *obj)
 		return;
 
 	if (wd->lay) {
-		evas_object_smart_member_del(wd->lay);
 		evas_object_del(wd->lay);
 		wd->lay = NULL;
 	}
@@ -148,14 +147,12 @@ static void _del_hook(Evas_Object *obj)
 	for (i = 0; i < 2; i++) {
 		btn = wd->button[i];
 		if (btn != NULL) {
-			evas_object_smart_member_del(btn);
 			_delete_button(btn);
 		}
 	}
 
 	/* delete background */
 	if (wd->bg_rect) {
-		evas_object_smart_member_del(wd->bg_rect);
 		evas_object_del(wd->bg_rect);
 		wd->bg_rect = NULL;
 	}
@@ -164,8 +161,7 @@ static void _del_hook(Evas_Object *obj)
 	if (wd->panel) {
 		elm_softkey_panel_del(obj);
 		//<Commenting as clean up for panel is being done in method elm_softkey_panel_del()
-		/*evas_object_smart_member_del(wd->panel);
-		 evas_object_del(wd->panel);
+		/*evas_object_del(wd->panel);
 		 wd->panel = NULL;*/
 		//<Commenting as clean up for panel is being done in method elm_softkey_panel_del()
 	}
@@ -962,8 +958,6 @@ EAPI void elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type)
 
 	it = evas_object_data_get(btn, "item_data");
 	free(it);
-
-	evas_object_smart_member_del(btn);
 	_delete_button(btn);
 	wd->button[type] = NULL;
 }
@@ -1169,7 +1163,6 @@ EAPI int elm_softkey_panel_del(Evas_Object *obj)
 		evas_object_move(wd->panel, 0, wd->win_h);
 		evas_object_clip_unset(wd->panel);
 		//<Added to delete the panel completely>
-		evas_object_smart_member_del(wd->panel);
 		evas_object_del(wd->panel);
 		wd->panel = NULL;
 		//<Added to delete the panel completely>
