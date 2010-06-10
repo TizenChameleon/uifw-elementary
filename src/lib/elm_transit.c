@@ -2000,7 +2000,7 @@ EAPI Elm_Effect* elm_fx_rotation_add( Evas_Object* obj,
 //Transform FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _transform Elm_Fx_Transform;
-
+/*
 struct _transform {
 	Evas_Object* obj;
 	Elm_Fx_Matrix from, to;
@@ -2186,7 +2186,7 @@ EAPI void elm_fx_transform_rotate( Elm_Fx_Matrix* m,
 #endif
 
 	fprintf( stderr, "Sorry, It does not support yet!\n" );
-/*
+
 	//Current rotation is Euler way. 
 	//But how about change to Quarterion way?
 	Elm_Fx_Matrix temp;
@@ -2227,7 +2227,7 @@ EAPI void elm_fx_transform_rotate( Elm_Fx_Matrix* m,
 		m->_42 = -temp._41 * sin(rad_z) + temp._42 * cos(rad_z);
 	}
 
-*/
+
 }
 
 
@@ -2259,7 +2259,7 @@ EAPI void elm_fx_transform_multiply( Elm_Fx_Matrix* m, Elm_Fx_Matrix* m1, Elm_Fx
 	m->_44 = m1->_41 * m2->_14 + m1->_42 * m2->_24 + m1->_43 * m2->_34 + m1->_44 * m2->_44;
 
 }
-
+*/
 
 /////////////////////////////////////////////////////////////////////////////////////
 // ImageAnimation FX
