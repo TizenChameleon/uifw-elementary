@@ -1961,7 +1961,7 @@ extern "C" {
 
    /*ResizableFlip Fx*/
    EAPI Elm_Effect* elm_fx_resizable_flip_add( Evas_Object* front, Evas_Object* back, const Elm_Fx_Flip_Axis axis, const Eina_Bool cw );
-   
+  
    /*Transform Fx*/
    typedef struct _elm_fx_matrix {
 	float _11, _12, _13, _14;
@@ -1979,7 +1979,7 @@ extern "C" {
    */
 
    /* ImageAnimation Fx */
-   EAPI Elm_Effect* elm_fx_imageanimation_add( const Evas_Object* icon, const char** images, const unsigned int max_num );
+   EAPI Elm_Effect* elm_fx_imageanimation_add( const Evas_Object* icon, const char** images, const unsigned int item_num );
 
    /* NavigationBar */
    EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);

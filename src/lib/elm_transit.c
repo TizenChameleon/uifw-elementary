@@ -2261,16 +2261,42 @@ EAPI void elm_fx_transform_multiply( Elm_Fx_Matrix* m, Elm_Fx_Matrix* m1, Elm_Fx
 }
 
 
-
-
 /////////////////////////////////////////////////////////////////////////////////////
 // ImageAnimation FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _image_animation Elm_Fx_Image_Animation;
 
 struct _image_animation {
-	Evas_Object** images;
+	Evas_Object* icon;
+	char** images;
+	int count;
+	int item_num;
 };
+
+static void _elm_fx_imageanimation_begin( void* data,
+	 			           const Eina_Bool auto_reverse, 
+					   const unsigned int repeat_cnt )
+{
+}
+
+static void _elm_fx_imageanimation_end( void* data,
+				  const Eina_Bool auto_reverse,
+				  const unsigned int repeat_cnt )
+{
+}
+
+void _elm_fx_imageanimation_op( void* data, Elm_Animator* animator, const double frame )
+{
+	Elm_Fx_Image_Animation* image_animation = (Elm_Fx_Image_Animation *)data;
+
+	if ( image_animation->icon == NULL ) {
+		return;
+	}
+			
+	image_animation->count = floor( frame * image_animation->item_num );
+
+	elm_icon_file_set( image_animation->icon, image_animation->images[image_animation->count], NULL );
+}
 
 /**
  * @ingroup Transit 
@@ -2280,7 +2306,7 @@ struct _image_animation {
  * @param  images        Images for animation.
  * @return 		 ImageAnimation Effect.
  */
-EAPI Elm_Effect* elm_fx_imageanimation_add( Evas_Object* images[])
+EAPI Elm_Effect* elm_fx_imageanimation_add( const Evas_Object* icon, const char** images, const unsigned int item_num )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( images, NULL );
@@ -2293,6 +2319,11 @@ EAPI Elm_Effect* elm_fx_imageanimation_add( Evas_Object* images[])
 		return NULL;
 	}
 	
+	if( images == NULL || *images == NULL ) {
+		fprintf( stderr, "Failed to load NULL images!\n" );
+		return NULL;
+	}
+
 	Elm_Fx_Image_Animation* image_animation = calloc( 1, sizeof( Elm_Fx_Image_Animation) );
 
 	if( image_animation == NULL ) {
@@ -2301,15 +2332,16 @@ EAPI Elm_Effect* elm_fx_imageanimation_add( Evas_Object* images[])
 		return NULL;
 	}
 
+	image_animation->icon = icon;
 	image_animation->images = images;
+	image_animation->count = 0;
+	image_animation->item_num = item_num;
 
-	effect->begin_op = NULL;
-	effect->end_op = NULL;
-	effect->animation_op = NULL;
+	effect->begin_op = _elm_fx_imageanimation_begin;
+	effect->end_op = _elm_fx_imageanimation_end;
+	effect->animation_op = _elm_fx_imageanimation_op;
 	effect->user_data = image_animation ;
 
 	return effect;
 }
-
-
 
