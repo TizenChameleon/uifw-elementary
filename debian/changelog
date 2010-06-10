@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+0) unstable; urgency=low
+
+  * Update opensource EFL from SVN
+  * SVN revision: 49550 (Total EFL revision: 49550)
+  * Tag: 0.4.0+svn.49550slp2+0
+
+ -- Daniel Juyung Seo <juyung.seo@smasung.net>  Thu, 10 Jun 2010 15:50:42 +0900
+
 elementary (0.4.0+svn20100304slp2+18) unstable; urgency=low
 
   * tab bug fix, add animator and transit
