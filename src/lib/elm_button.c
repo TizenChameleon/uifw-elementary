@@ -155,7 +155,7 @@ _sizing_eval(Evas_Object *obj)
 
    evas_object_size_hint_min_get(obj, &w, &h);
    if (w > minw) minw = w;
-   if (h > minw) minh = h;
+   if (h > minh) minh = h;
 
    evas_object_size_hint_min_set(obj, minw, minh);
    evas_object_size_hint_max_set(obj, maxw, maxh);
