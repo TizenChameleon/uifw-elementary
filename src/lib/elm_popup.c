@@ -323,7 +323,7 @@ elm_popup_add(Evas_Object *parent_app)
  * @param desc_text text to be displayed in description area.
  * @param no_of_buttons Number of buttons to be packed in action area.
  * @param first_button_text button text
- * @Varargs response ID for first button, then additional buttons followed by response id's ending with NULL
+ * @param Varargs response ID for first button, then additional buttons followed by response id's ending with NULL
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Popup
