@@ -63,7 +63,7 @@ typedef struct _Button_Cb_Data_Wrapper
  * hooks
  */
 void
-_really_del(void *data)
+_really_del(void *data, Elm_Transit* transit)
 {
 	Widget_Data *wd = (Widget_Data *) data;
 
@@ -134,8 +134,8 @@ _del_hook(Evas_Object *obj)
 
 	// do animation	
 	Elm_Transit * transit = elm_transit_add(wd->layout);
-	elm_transit_fx_insert(transit, elm_fx_transfer_add(wd->layout, wd->show_x, wd->show_y, wd->hide_x, wd->hide_y));
-	elm_transit_completion_set(transit, _really_del, wd);
+	elm_transit_fx_insert(transit, elm_fx_translation_add(wd->layout, wd->show_x, wd->show_y, wd->hide_x, wd->hide_y));
+	elm_transit_completion_callback_set(transit, _really_del, wd);
 	elm_transit_curve_style_set(transit, ELM_ANIMATOR_CURVE_IN);
 	elm_transit_run(transit, ANIMATION_TIME-0.1);
 	elm_transit_del(transit);
@@ -213,7 +213,7 @@ _move_layout(Widget_Data *wd, const int until, const int offset)
 }
 
 static void
-_show_animation_end_cb(void *data)
+_show_animation_end_cb(void *data, Elm_Transit* transit)
 {
 	Widget_Data *wd = (Widget_Data *)data;
 	// unblock event 
@@ -258,8 +258,8 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	//ecore_timer_add(0.033, _show_layout, wd);
 	
 	Elm_Transit * transit = elm_transit_add(wd->layout);
-	elm_transit_fx_insert(transit, elm_fx_transfer_add(wd->layout, wd->hide_x, wd->hide_y, wd->show_x, wd->show_y));
-	elm_transit_completion_set(transit, _show_animation_end_cb, wd);
+	elm_transit_fx_insert(transit, elm_fx_translation_add(wd->layout, wd->hide_x, wd->hide_y, wd->show_x, wd->show_y));
+	elm_transit_completion_callback_set(transit, _show_animation_end_cb, wd);
 	elm_transit_curve_style_set(transit, ELM_ANIMATOR_CURVE_OUT);
 	elm_transit_run(transit, ANIMATION_TIME);
 	elm_transit_del(transit);

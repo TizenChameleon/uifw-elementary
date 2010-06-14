@@ -3,9 +3,9 @@
 #include <math.h>
 
 /**
- * @addtogroup Picker Picker
+ * @addtogroup Discpicker Discpicker
  *
- * This is a picker2.
+ * This is a discpicker.
  */
 
 #define FPS 50			// frame per second
@@ -21,13 +21,15 @@ typedef enum {
 	ANIMATION_TYPE_MAX
 } _Animation_Type;
 
-struct _Picker2_Item {
-	Evas_Object *picker;
+struct _Discpicker_Item {
+	Evas_Object *discpicker;
 	const char *label;
 	void (*func)(void *data, Evas_Object *obj, void *event_info);
 	void *data;
 	void *priv_data;
 	int disabled : 1;
+	int walking;
+  int delete_me : 1;
 };
 
 struct _Event_Info {
@@ -67,7 +69,7 @@ struct _Widget_Data {
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _update_picker(Evas_Object *obj);
+static void _update_discpicker(Evas_Object *obj);
 static void _changed(Evas_Object *obj);
 static void _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event);
 static void _move_cb(void *data, Evas *evas, Evas_Object *obj, void *event);
@@ -88,13 +90,14 @@ static void _determine_data(_Animation_Type animation_type, int distance, int ro
 static Eina_List * _determine_current(Evas_Object *obj, _Animation_Type animation_type, Eina_List *items, int nitems, Eina_List *current, double v, int p_old, int p_new);
 static Eina_List * _determine_vitems(_Animation_Type animation_type, Eina_List *items, Eina_List *current, int cell_cnt, int p_int);
 static void _redraw_cells(_Animation_Type animation_type, Eina_List *cells, Eina_List *items, Eina_List *cur_cell, int x, int cell_y, int row_h, int cell_cnt, double p);
+static void _item_del(Elm_Discpicker_Item *item);
 
 
 static void
 _del_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Elm_Picker2_Item *item;
+	Elm_Discpicker_Item *item;
 	Evas_Object *txt;
 
 	if (!wd) return;
@@ -117,9 +120,9 @@ _theme_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
-	_elm_theme_object_set(obj, wd->base, "picker2", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->base, "discpicker", "base", elm_widget_style_get(obj));
 	_flick_init(obj);
-	_update_picker(obj);
+	_update_discpicker(obj);
 	_sizing_eval(obj);
 }
 
@@ -141,15 +144,23 @@ static void
 _changed(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Elm_Picker2_Item *item;
-
+	Elm_Discpicker_Item *item;
 	if (!wd || !wd->current) return;
 
-	evas_object_smart_callback_call(obj, "selected", eina_list_data_get(wd->current));
-
 	item = eina_list_data_get(wd->current);
+	if (!item) return;
+
+	item->walking++;
+
 	if (item->func)
-		item->func(item->data, obj, item);
+	  item->func(item->data, obj, item);
+	if (!item->delete_me) 
+	  evas_object_smart_callback_call(obj, "selected", eina_list_data_get(wd->current));
+
+	item->walking--;
+
+	if (!item->walking && item->delete_me)
+	  _item_del(item);
 }
 
 static double 
@@ -224,7 +235,7 @@ _view_init(Evas_Object *obj)
 	// create cell list
 	for(i=0; i<wd->cell_cnt; i++){
 		txt = edje_object_add(evas_object_evas_get(obj));
-		_elm_theme_object_set(obj, txt, "picker2/item", "base", elm_widget_style_get(obj));
+		_elm_theme_object_set(obj, txt, "discpicker/item", "base", elm_widget_style_get(obj));
 		evas_object_resize(txt, wd->w, wd->row_h);
 		evas_object_clip_set(txt, wd->clip);
 		elm_widget_sub_object_add(obj, txt);
@@ -345,7 +356,7 @@ static Eina_List * _determine_vitems(_Animation_Type animation_type, Eina_List *
 {
 	int gap = cell_cnt>>1;
 	Eina_List *tmp = NULL;
-	Elm_Picker2_Item *item = NULL;
+	Elm_Discpicker_Item *item = NULL;
 	Eina_List *ptr = NULL;
 
 
@@ -402,7 +413,7 @@ static void _redraw_cells(_Animation_Type animation_type, Eina_List *cells, Eina
 {
 	Eina_List *l;
 	Evas_Object *txt;
-	Elm_Picker2_Item *item = NULL;
+	Elm_Discpicker_Item *item = NULL;
 	int nitems = eina_list_count(items);
 	int p_int = (int)(p);
 	double	p_odd = p - p_int;
@@ -490,7 +501,7 @@ _data_loop(Evas_Object *obj, int distance)
 static void 
 _view_loop(Evas_Object *obj)
 {
-	Elm_Picker2_Item *item = NULL;
+	Elm_Discpicker_Item *item = NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd || !wd->items) return;
 
@@ -675,23 +686,50 @@ _move_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 }
 
 static void
-_update_picker(Evas_Object *obj)
+_update_discpicker(Evas_Object *obj)
 {
 	_data_init(obj);
 	_view_init(obj);
 	_sizing_eval(obj);
 }
 
+static void
+_item_del(Elm_Discpicker_Item *item)
+{
+	Eina_List *l;
+	Elm_Discpicker_Item *_item;
+	Widget_Data *wd;
+
+	wd = elm_widget_data_get(item->discpicker);
+	if (!wd) return;
+
+	EINA_LIST_FOREACH(wd->items, l, _item) {
+		if (_item == item) {
+			wd->items = eina_list_remove(wd->items, _item);
+			if (!wd->current)
+				wd->current = wd->items;
+
+			wd->animation_type = eina_list_count(wd->items) >= (wd->cell_cnt - 2) ? ANIMATION_TYPE_SPIN : ANIMATION_TYPE_SCROLL;
+			_data_loop(item->discpicker, 0);
+			_view_loop(item->discpicker);
+
+			free(_item);
+			break;
+		}
+	}
+}
+
+
 /**
- * Add a new picker to the parent
+ * Add a new discpicker to the parent
  *
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI Evas_Object *
-elm_picker2_add(Evas_Object *parent)
+elm_discpicker_add(Evas_Object *parent)
 {
 	Evas_Object *obj;
 	Evas *e;
@@ -700,7 +738,7 @@ elm_picker2_add(Evas_Object *parent)
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
 	obj = elm_widget_add(e);
-	elm_widget_type_set(obj, "picker2");
+	elm_widget_type_set(obj, "discpicker");
 	elm_widget_sub_object_add(parent, obj);
 	elm_widget_data_set(obj, wd);
 
@@ -711,14 +749,14 @@ elm_picker2_add(Evas_Object *parent)
 	elm_widget_resize_object_set(obj, wd->clip);
 
 	wd->base = edje_object_add(e);
-	_elm_theme_object_set(obj, wd->base, "picker2", "base", "default");
+	_elm_theme_object_set(obj, wd->base, "discpicker", "base", "default");
 	elm_widget_hover_object_set(obj, wd->base);
 	evas_object_clip_set(wd->base, wd->clip);
 	evas_object_show(wd->base);
 
 	wd->indi = edje_object_add(e);
 	elm_widget_sub_object_add(obj, wd->indi);
-	_elm_theme_object_set(obj, wd->indi, "picker2/indicator", "base", "default");
+	_elm_theme_object_set(obj, wd->indi, "discpicker/indicator", "base", "default");
 	evas_object_clip_set(wd->indi, wd->clip);
 	evas_object_pass_events_set(wd->indi, EINA_TRUE);
 	evas_object_show(wd->indi);
@@ -729,7 +767,7 @@ elm_picker2_add(Evas_Object *parent)
 	wd->row_h = ROW_H;
 
 	_flick_init(obj);
-	_update_picker(obj);
+	_update_discpicker(obj);
 
 	return obj;
 }
@@ -737,13 +775,13 @@ elm_picker2_add(Evas_Object *parent)
 /**
  * Set the height of row
  *
- * @param obj The picker object
+ * @param obj The discpicker object
  * @param row_height The height of row
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI void
-elm_picker2_row_height_set(Evas_Object *obj, unsigned int row_height)
+elm_discpicker_row_height_set(Evas_Object *obj, unsigned int row_height)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int y_mid;
@@ -763,60 +801,60 @@ elm_picker2_row_height_set(Evas_Object *obj, unsigned int row_height)
 }
 
 /**
- * Select next item of picker
+ * Select next item of discpicker
  *
- * @param obj The picker object
+ * @param obj The discpicker object
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI void
-elm_picker2_next(Evas_Object *obj)
+elm_discpicker_next(Evas_Object *obj)
 {
 	_scroll_start(obj, V_MIN);
 }
 
 /**
- * Select previous item of picker
+ * Select previous item of discpicker
  *
- * @param obj The picker object
+ * @param obj The discpicker object
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI void
-elm_picker2_prev(Evas_Object *obj)
+elm_discpicker_prev(Evas_Object *obj)
 {
 	_scroll_start(obj, -V_MIN);
 }
 
 /**
- * Append item to the end of picker
+ * Append item to the end of discpicker
  *
- * @param obj The picker object
+ * @param obj The discpicker object
  * @param label The label of new item
  * @param func Convenience function called when item selected
  * @param data Data passed to @p func above
  * @return A handle to the item added or NULL if not possible
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
-EAPI Elm_Picker2_Item *
-elm_picker2_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data)
+EAPI Elm_Discpicker_Item *
+elm_discpicker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data)
 {
-	Elm_Picker2_Item *item;
+	Elm_Discpicker_Item *item;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
-	item = ELM_NEW(Elm_Picker2_Item);
+	item = ELM_NEW(Elm_Discpicker_Item);
 	if (item) {
 		if (label)
 			item->label = eina_stringshare_add(label);
 		item->func = func;
 		item->data = data;
-		item->picker = obj;
+		item->discpicker = obj;
 		wd->items = eina_list_append(wd->items, item);
 		if (!wd->current) {
 			wd->current = wd->items;
-			_update_picker(obj);
+			_update_discpicker(obj);
 		}
 		_view_loop(obj);
 	}
@@ -824,34 +862,34 @@ elm_picker2_item_append(Evas_Object *obj, const char *label, void (*func)(void *
 }
 
 /**
- * Prepend item at start of picker
+ * Prepend item at start of discpicker
  *
- * @param obj The picker object
+ * @param obj The discpicker object
  * @param label The label of new item
  * @param func Convenience function called when item selected
  * @param data Data passed to @p func above
  * @return A handle to the item added or NULL if not possible
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
-EAPI Elm_Picker2_Item *
-elm_picker2_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data)
+EAPI Elm_Discpicker_Item *
+elm_discpicker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data)
 {
-	Elm_Picker2_Item *item;
+	Elm_Discpicker_Item *item;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
-	item = ELM_NEW(Elm_Picker2_Item);
+	item = ELM_NEW(Elm_Discpicker_Item);
 	if (item) {
 		if (label)
 			item->label = eina_stringshare_add(label);
 		item->func = func;
 		item->data = data;
-		item->picker = obj;
+		item->discpicker = obj;
 		wd->items = eina_list_prepend(wd->items, item);
 		if (!wd->current) {
 			wd->current = wd->items;
-			_update_picker(obj);
+			_update_discpicker(obj);
 		}
 		_view_loop(obj);
 	}
@@ -859,15 +897,15 @@ elm_picker2_item_prepend(Evas_Object *obj, const char *label, void (*func)(void 
 }
 
 /**
- * Get a list of items in the picker
+ * Get a list of items in the discpicker
  *
- * @param obj The picker object
+ * @param obj The discpicker object
  * @return The list of items, or NULL if none
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI const Eina_List *
-elm_picker2_items_get(Evas_Object *obj)
+elm_discpicker_items_get(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
@@ -875,15 +913,15 @@ elm_picker2_items_get(Evas_Object *obj)
 }
 
 /**
- * Get the first item in the picker
+ * Get the first item in the discpicker
  *
- * @param obj The picker object
+ * @param obj The discpicker object
  * @return The first item, or NULL if none
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
-EAPI Elm_Picker2_Item *
-elm_picker2_first_item_get(Evas_Object *obj)
+EAPI Elm_Discpicker_Item *
+elm_discpicker_first_item_get(Evas_Object *obj)
 {
 	Widget_Data *wd;
 	if (!obj) return NULL;
@@ -893,15 +931,15 @@ elm_picker2_first_item_get(Evas_Object *obj)
 }
 
 /**
- * Get the last item in the picker
+ * Get the last item in the discpicker
  *
- * @param obj The picker object
+ * @param obj The discpicker object
  * @return The last item, or NULL if none
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
-EAPI Elm_Picker2_Item *
-elm_picker2_last_item_get(Evas_Object *obj)
+EAPI Elm_Discpicker_Item *
+elm_discpicker_last_item_get(Evas_Object *obj)
 {
 	Widget_Data *wd;
 	if (!obj) return NULL;
@@ -911,15 +949,15 @@ elm_picker2_last_item_get(Evas_Object *obj)
 }
 
 /**
- * Get the selected item in the picker
+ * Get the selected item in the discpicker
  *
- * @param obj The picker object
+ * @param obj The discpicker object
  * @return The selected item, or NULL if none
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
-EAPI Elm_Picker2_Item *
-elm_picker2_selected_item_get(Evas_Object *obj)
+EAPI Elm_Discpicker_Item *
+elm_discpicker_selected_item_get(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd || !wd->current) return NULL;
@@ -931,25 +969,25 @@ elm_picker2_selected_item_get(Evas_Object *obj)
  *
  * @param item The item
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI void
-elm_picker2_item_selected_set(Elm_Picker2_Item *item)
+elm_discpicker_item_selected_set(Elm_Discpicker_Item *item)
 {
 	Widget_Data *wd;
 	Eina_List *l;
-	Elm_Picker2_Item *_item;
+	Elm_Discpicker_Item *_item;
 	int cnt = 0;
 
 	if (!item) return;
-	wd = elm_widget_data_get(item->picker);
+	wd = elm_widget_data_get(item->discpicker);
 	if (!wd) return;
 
 	EINA_LIST_FOREACH(wd->items, l, _item) {
 		if (_item == item) {
-			_data_loop(item->picker, (double)(cnt - wd->p)*wd->row_h);
-			_view_loop(item->picker);
-			_changed(item->picker);
+			_data_loop(item->discpicker, (double)(cnt - wd->p)*wd->row_h);
+			_view_loop(item->discpicker);
+			_changed(item->discpicker);
 		}
 		cnt++;
 	}
@@ -960,33 +998,16 @@ elm_picker2_item_selected_set(Elm_Picker2_Item *item)
  *
  * @param item The item
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI void
-elm_picker2_item_del(Elm_Picker2_Item *item)
+elm_discpicker_item_del(Elm_Discpicker_Item *item)
 {
-	Widget_Data *wd;
-	Eina_List *l;
-	Elm_Picker2_Item *_item;
-
 	if (!item) return;
-	wd = elm_widget_data_get(item->picker);
-	if (!wd) return;
-
-	EINA_LIST_FOREACH(wd->items, l, _item) {
-		if (_item == item) {
-			wd->items = eina_list_remove(wd->items, _item);
-			if (!wd->current)
-				wd->current = wd->items;
-
-			wd->animation_type = eina_list_count(wd->items) >= (wd->cell_cnt - 2) ? ANIMATION_TYPE_SPIN : ANIMATION_TYPE_SCROLL;
-			_data_loop(item->picker, 0);
-			_view_loop(item->picker);
-
-			free(_item);
-			break;
-		}
-	}
+	if (item->walking > 0)
+	  item->delete_me = EINA_TRUE;
+	else
+	  _item_del(item);
 }
 
 /**
@@ -995,17 +1016,17 @@ elm_picker2_item_del(Elm_Picker2_Item *item)
  * @param item The item
  * @return The label of a given item, or NULL if none
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI const char *
-elm_picker2_item_label_get(Elm_Picker2_Item *item)
+elm_discpicker_item_label_get(Elm_Discpicker_Item *item)
 {
 	Widget_Data *wd;
 	Eina_List *l;
-	Elm_Picker2_Item *_item;
+	Elm_Discpicker_Item *_item;
 
 	if (!item) return NULL;
-	wd = elm_widget_data_get(item->picker);
+	wd = elm_widget_data_get(item->discpicker);
 	if (!wd || !wd->items) return NULL;
 
 	EINA_LIST_FOREACH(wd->items, l, _item)
@@ -1021,44 +1042,44 @@ elm_picker2_item_label_get(Elm_Picker2_Item *item)
  * @param item The item
  * @param label The text label string in UTF-8
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI void
-elm_picker2_item_label_set(Elm_Picker2_Item *item, const char *label)
+elm_discpicker_item_label_set(Elm_Discpicker_Item *item, const char *label)
 {
 	Widget_Data *wd;
 	Eina_List *l;
-	Elm_Picker2_Item *_item;
+	Elm_Discpicker_Item *_item;
 
 	if (!item || !label) return;
-	wd = elm_widget_data_get(item->picker);
+	wd = elm_widget_data_get(item->discpicker);
 	if (!wd || !wd->items) return;
 
 	EINA_LIST_FOREACH(wd->items, l, _item)
 		if (_item == item) {
 			eina_stringshare_del(item->label);
 			item->label = eina_stringshare_add(label);
-			_view_loop(item->picker);
+			_view_loop(item->discpicker);
 		}
 }
 
 /**
- * Get the previous item in the picker
+ * Get the previous item in the discpicker
  *
  * @param item The item
  * @return The item before the item @p item
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
-EAPI Elm_Picker2_Item *
-elm_picker2_item_prev(Elm_Picker2_Item *item)
+EAPI Elm_Discpicker_Item *
+elm_discpicker_item_prev(Elm_Discpicker_Item *item)
 {
 	Widget_Data *wd;
 	Eina_List *l;
-	Elm_Picker2_Item *_item;
+	Elm_Discpicker_Item *_item;
 
 	if (!item) return NULL;
-	wd = elm_widget_data_get(item->picker);
+	wd = elm_widget_data_get(item->discpicker);
 	if (!wd || !wd->items) return NULL;
 
 	EINA_LIST_FOREACH(wd->items, l, _item)
@@ -1071,22 +1092,22 @@ elm_picker2_item_prev(Elm_Picker2_Item *item)
 }
 
 /**
- * Get the next item in the picker
+ * Get the next item in the discpicker
  *
  * @param item The item
  * @return The item after the item @p item
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
-EAPI Elm_Picker2_Item *
-elm_picker2_item_next(Elm_Picker2_Item *item)
+EAPI Elm_Discpicker_Item *
+elm_discpicker_item_next(Elm_Discpicker_Item *item)
 {
 	Widget_Data *wd;
 	Eina_List *l;
-	Elm_Picker2_Item *_item;
+	Elm_Discpicker_Item *_item;
 
 	if (!item) return NULL;
-	wd = elm_widget_data_get(item->picker);
+	wd = elm_widget_data_get(item->discpicker);
 	if (!wd || !wd->items) return NULL;
 
 	EINA_LIST_FOREACH(wd->items, l, _item)
@@ -1104,10 +1125,10 @@ elm_picker2_item_next(Elm_Picker2_Item *item)
  * @param item The item
  * @return Private data of the item @p item
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI void *
-elm_picker2_item_data_get(Elm_Picker2_Item *item)
+elm_discpicker_item_data_get(Elm_Discpicker_Item *item)
 {
 	if (!item) return NULL;
 	return item->priv_data;
@@ -1119,10 +1140,10 @@ elm_picker2_item_data_get(Elm_Picker2_Item *item)
  * @param item The item
  * @param data data
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI void
-elm_picker2_item_data_set(Elm_Picker2_Item *item, void *data)
+elm_discpicker_item_data_set(Elm_Discpicker_Item *item, void *data)
 {
 	if (!item) return;
 	item->priv_data = data;
@@ -1134,10 +1155,10 @@ elm_picker2_item_data_set(Elm_Picker2_Item *item, void *data)
  * @param item The item
  * @return disabled flag
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI Eina_Bool
-elm_picker2_item_disabled_get(Elm_Picker2_Item *item)
+elm_discpicker_item_disabled_get(Elm_Discpicker_Item *item)
 {
 	if (!item) return EINA_FALSE;
 	return item->disabled ? EINA_TRUE : EINA_FALSE;
@@ -1149,12 +1170,12 @@ elm_picker2_item_disabled_get(Elm_Picker2_Item *item)
  * @param item The item
  * @param disabled  disabled flag
  *
- * @ingroup Picker
+ * @ingroup Discpicker
  */
 EAPI void
-elm_picker2_item_disabled_set(Elm_Picker2_Item *item, Eina_Bool disabled)
+elm_discpicker_item_disabled_set(Elm_Discpicker_Item *item, Eina_Bool disabled)
 {
 	if (!item) return;
 	item->disabled = disabled ? 1 : 0;
-	_view_loop(item->picker);
+	_view_loop(item->discpicker);
 }

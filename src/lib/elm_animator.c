@@ -187,7 +187,10 @@ static int _animator_animate_cb( void* data )
 
 		animator->on_animating = EINA_FALSE;
 		_delete_timer( animator );
-		animator->completion_op( animator->completion_arg );
+
+		if( animator->completion_op ) {
+			animator->completion_op( animator->completion_arg );
+		}
 
 		return ECORE_CALLBACK_CANCEL;	
 	}
@@ -361,24 +364,6 @@ inline EAPI void elm_animator_operation_callback_set( Elm_Animator* animator, vo
 
 
 
-/**
- * @ingroup Animator
- *
- * Set the callback function for animator operation. (deprecated. Try use elm_animator_operation_callback_set) 
- *
- * @param     animator 		Animator object
- * @param     op      		Callback function pointer 
- * @param     data              Callback function user argument 
- */
-inline EAPI void elm_animator_operation_set( Elm_Animator* animator, void (*op)(void*, Elm_Animator*, const double), void* data ) 
-{
-	fprintf( stderr, "elm_animator_operation_set is deprecated!, Try use elm_animator_operation_callback_set!\n" );
-
-	elm_animator_operation_callback_set( animator, op, data );
-}
-
-
-
 
 
 /**
@@ -476,23 +461,6 @@ EAPI void elm_animator_completion_callback_set( Elm_Animator* animator, void (*o
 
 
 
-
-
-/**
- * @ingroup Animator
- *
- * Set the callback function for the animator end. (deprecated. Please try use elm_animator_completion_callback_set) 
- *
- * @param    animator   Animator object 
- * @param    op         Callback function pointer
- * @param    data       Callback function user argument 
- */
-EAPI void elm_animator_completion_set( Elm_Animator* animator, void (*op)(void*), void* data )
-{
-	fprintf( stderr, "elm_animator_completion_set is deprecated!, Try use elm_animator_completion_callback_set!\n" );
-
-	elm_animator_completion_callback_set( animator, op, data );
-}
 
 
 

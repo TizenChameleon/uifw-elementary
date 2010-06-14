@@ -5698,6 +5698,14 @@ collections {
 //         item: context_menu_orientation "horizontal";
       }
       parts {
+     part { name: "entry.swallow.background";
+        type: SWALLOW;
+        description { state: "default" 0.0;
+           visible: 1;
+           rel1 { relative: 0 0; to: "elm.text"; }
+           rel2 { relative: 1 1; to: "elm.text"; }
+            }
+        }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;
@@ -5772,6 +5780,14 @@ collections {
 	   }
 	}
       parts {
+     part { name: "entry.swallow.background";
+        type: SWALLOW;
+        description { state: "default" 0.0;
+           visible: 1;
+           rel1 { relative: 0 0; to: "elm.text"; }
+           rel2 { relative: 1 1; to: "elm.text"; }
+            }
+        }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;
@@ -5826,6 +5842,14 @@ collections {
 
    group { name: "elm/entry/base-nowrap/default";
       parts {
+     part { name: "entry.swallow.background";
+        type: SWALLOW;
+        description { state: "default" 0.0;
+           visible: 1;
+           rel1 { relative: 0 0; to: "elm.text"; }
+           rel2 { relative: 1 1; to: "elm.text"; }
+            }
+        }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;
@@ -5926,6 +5950,14 @@ collections {
 	   }
 	}
       parts {
+     part { name: "entry.swallow.background";
+        type: SWALLOW;
+        description { state: "default" 0.0;
+           visible: 1;
+           rel1 { relative: 0 0; to: "elm.text"; }
+           rel2 { relative: 1 1; to: "elm.text"; }
+            }
+        }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;
@@ -5975,6 +6007,14 @@ collections {
 
    group { name: "elm/entry/base-single-noedit/default";
       parts {
+     part { name: "entry.swallow.background";
+        type: SWALLOW;
+        description { state: "default" 0.0;
+           visible: 1;
+           rel1 { relative: 0 0; to: "elm.text"; }
+           rel2 { relative: 1 1; to: "elm.text"; }
+            }
+        }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;
@@ -6023,6 +6063,14 @@ collections {
 
    group { name: "elm/entry/base-noedit/default";
       parts {
+     part { name: "entry.swallow.background";
+        type: SWALLOW;
+        description { state: "default" 0.0;
+           visible: 1;
+           rel1 { relative: 0 0; to: "elm.text"; }
+           rel2 { relative: 1 1; to: "elm.text"; }
+            }
+        }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;
@@ -6071,6 +6119,14 @@ collections {
 
    group { name: "elm/entry/base-noedit-charwrap/default";
       parts {
+     part { name: "entry.swallow.background";
+        type: SWALLOW;
+        description { state: "default" 0.0;
+           visible: 1;
+           rel1 { relative: 0 0; to: "elm.text"; }
+           rel2 { relative: 1 1; to: "elm.text"; }
+            }
+        }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;
@@ -6119,6 +6175,14 @@ collections {
 
    group { name: "elm/entry/base-nowrap-noedit/default";
       parts {
+     part { name: "entry.swallow.background";
+        type: SWALLOW;
+        description { state: "default" 0.0;
+           visible: 1;
+           rel1 { relative: 0 0; to: "elm.text"; }
+           rel2 { relative: 1 1; to: "elm.text"; }
+            }
+        }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;
@@ -6166,6 +6230,14 @@ collections {
 
   group { name: "elm/entry/base-password/default";
       parts {
+     part { name: "entry.swallow.background";
+        type: SWALLOW;
+        description { state: "default" 0.0;
+           visible: 1;
+           rel1 { relative: 0 0; to: "elm.text"; }
+           rel2 { relative: 1 1; to: "elm.text"; }
+            }
+        }
 	 part { name: "elm.text";
 	    type: TEXTBLOCK;
 	    mouse_events: 1;

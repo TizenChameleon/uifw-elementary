@@ -7,6 +7,8 @@
  * This is a editfield. It can contain a simple label and icon objects.
  */
 
+#define ERASER_PADDING (10)
+
 typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
@@ -15,11 +17,15 @@ struct _Widget_Data
 	Evas_Object *entry;
 	Evas_Object *ricon;
 	Evas_Object *licon;
+	Evas_Object *eraser;
 	const char *label;
 	const char *guide_text;
 	Eina_Bool needs_size_calc:1;
 	Eina_Bool show_guide_text:1;
 	Eina_Bool editing:1;
+	Eina_Bool single_line : 1;
+	Eina_Bool eraser_visible : 1;
+	Evas_Event_Mouse_Down down_ev;
 };
 
 static void _del_hook(Evas_Object *obj);
@@ -29,6 +35,10 @@ static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _on_focus_hook(void *data, Evas_Object *obj);
 static Eina_Bool _empty_entry(Evas_Object *entry);
+static void _eraser_drag_end(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _eraser_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _eraser_mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _eraser_init(Evas_Object *obj);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -44,8 +54,6 @@ _on_focus_hook(void *data, Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	const char* text;
-	const char* str_text;
-
 	if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)) ) {	
 		
 		wd->editing = EINA_FALSE;
@@ -81,6 +89,10 @@ _theme_hook(Evas_Object *obj)
 		edje_object_part_swallow(wd->base, "right_icon", wd->ricon);
 	if(wd->licon)
 		edje_object_part_swallow(wd->base, "left_icon", wd->licon);	
+
+	if(wd->eraser)
+		edje_object_part_swallow(wd->base, "eraser", wd->eraser);
+	
 	_sizing_eval(obj);
 }
 
@@ -218,6 +230,86 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
 		wd->editing = EINA_TRUE;
 	}
 }
+
+static void
+_resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
+{
+	Widget_Data *wd = elm_widget_data_get(data);	
+	Evas_Coord w, h;
+	if (!wd) return;
+
+	evas_object_geometry_get(obj, NULL, NULL, NULL, &h);
+	evas_object_geometry_get(wd->eraser, NULL, NULL, &w, NULL);
+
+	evas_object_size_hint_min_set(wd->eraser, w, h - ERASER_PADDING);
+	evas_object_resize(wd->eraser, w, h - ERASER_PADDING);
+}
+
+static void
+_eraser_drag_end(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+	if (!wd || !wd->entry) return;
+	elm_entry_entry_set(wd->entry, "");
+}
+
+static void
+_eraser_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+	if (!wd) return;	
+	memcpy(&wd->down_ev, event_info, sizeof(Evas_Event_Mouse_Down));
+}
+
+static void
+_eraser_mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+	Evas_Event_Mouse_Up *ev = event_info;
+	unsigned int dur;
+	Evas_Coord distance;
+	double pos = 0.0;
+	if (!wd) return;
+
+	edje_object_part_drag_value_get(wd->base, "eraser", &pos, NULL);
+	if(pos == 1.0){
+		edje_object_signal_emit(wd->base, "elm,state,eraser,flick", "elm");
+		return;
+	}
+
+	dur = ev->timestamp - wd->down_ev.timestamp;
+	distance = wd->down_ev.canvas.x - ev->canvas.x;
+	
+	if ((dur && dur > 1000) || (distance < 10 && distance > -10)) {
+		edje_object_signal_emit(wd->base, "elm,state,eraser,drag", "elm");
+		return;
+	}
+
+	if(((float)distance / dur) > 0.5)	
+		edje_object_signal_emit(wd->base, "elm,state,eraser,flick", "elm");
+	else
+		edje_object_signal_emit(wd->base, "elm,state,eraser,drag", "elm");
+}
+
+static void
+_eraser_init(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Evas_Object *eraser;
+	if (!wd) return;
+
+	wd->single_line = EINA_TRUE;
+	wd->eraser_visible = EINA_TRUE;
+	wd->eraser = edje_object_add(evas_object_evas_get(obj));
+	elm_widget_sub_object_add(obj, wd->eraser);
+	_elm_theme_object_set(obj, wd->eraser, "editfield/eraser", "base", "default");
+	edje_object_part_swallow(wd->base, "eraser", wd->eraser);
+
+	evas_object_event_callback_add(wd->eraser, EVAS_CALLBACK_MOUSE_DOWN, _eraser_mouse_down, obj);
+	evas_object_event_callback_add(wd->eraser, EVAS_CALLBACK_MOUSE_UP, _eraser_mouse_up, obj);
+	edje_object_signal_callback_add(wd->base, "drag", "end", _eraser_drag_end, obj);
+}
+
 /**
  * Add a new editfield object
  *
@@ -263,7 +355,9 @@ elm_editfield_add(Evas_Object *parent)
 	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
 
 	evas_object_smart_callback_add(wd->entry, "changed", _entry_changed_cb, obj);
+	evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
 
+	_eraser_init(obj);
 	_sizing_eval(obj);
 
 	return obj;
@@ -489,7 +583,26 @@ EAPI void
 elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return NULL;
+	if (!wd) return;
+	wd->single_line = single_line;
 	elm_entry_single_line_set(wd->entry, single_line);
+
+	if(wd->single_line && wd->eraser_visible)
+		edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
+	else
+		edje_object_signal_emit(wd->base, "elm,state,eraser,hide", "elm");
+}
+
+EAPI void
+elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return;
+	wd->eraser_visible = visible;
+
+	if(wd->single_line && wd->eraser_visible)
+		edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
+	else
+		edje_object_signal_emit(wd->base, "elm,state,eraser,hide", "elm");
 }
 

@@ -4,9 +4,9 @@
 #include <string.h>
 
 /**
- * @addtogroup Datepicker Datepicker
+ * @addtogroup Datepicker3 Datepicker3
  *
- * This is a date picker.
+ * This is a date picker3.
  */
 
 enum {
@@ -88,7 +88,7 @@ _theme_hook(Evas_Object *obj)
 	if (!wd) return;
 
 	_pickers_del(obj);
-	_elm_theme_object_set(obj, wd->base, "datepicker2", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->base, "datepicker3", "base", elm_widget_style_get(obj));
 	_pickers_add(obj);
 	_i18n(obj);
 
@@ -158,18 +158,18 @@ _picker_item_add(Evas_Object *eo, int min, int max, const char *fmt)
 	char buf[8];
 	for (; min <= max; min++) {
 		snprintf(buf, 8, fmt, min);
-		elm_discpicker_item_append(eo, buf, NULL, NULL);
+		elm_buttonpicker_item_append(eo, buf, NULL, NULL);
 	}
 }
 
 static void
 _picker_item_del(Evas_Object *eo)
 {
-	Elm_Picker_Item *item;
-	item = elm_discpicker_first_item_get(eo);
+	Elm_Buttonpicker_Item *item;
+	item = elm_buttonpicker_first_item_get(eo);
 	while (item) {
-		elm_discpicker_item_del(item);
-		item = elm_discpicker_first_item_get(eo);
+		elm_buttonpicker_item_del(item);
+		item = elm_buttonpicker_first_item_get(eo);
 	}
 }
 
@@ -177,32 +177,8 @@ static Evas_Object *
 _picker_add(Evas_Object *ly, const char *part, int min, int max, const char *fmt)
 {
 	Evas_Object *eo;
-	eo = elm_discpicker_add(ly);
+	eo = elm_buttonpicker_add(ly);
 	_picker_item_add(eo, min, max, fmt);
-	evas_object_data_set(eo, "freeze", 0);
-	if (part)
-		edje_object_part_swallow(ly, part, eo);
-	return eo;
-}
-
-static Evas_Object *
-_picker_month_add(Evas_Object *ly, const char *part, const char *fmt)
-{
-	int i;
-	char buf[32];
-	struct tm tm = {0, };
-	
-	Evas_Object *eo;
-	Elm_Discpicker_Item *it;
-	eo = elm_discpicker_add(ly);
-
-	for (i = 0; i < 12; i++) {
-		tm.tm_mon = i;
-		strftime(buf, 32, fmt, &tm);
-		it = elm_discpicker_item_append(eo, buf, NULL, NULL);
-		elm_discpicker_item_data_set(it, (void *)(i + 1));
-	}
-
 	if (part)
 		edje_object_part_swallow(ly, part, eo);
 	return eo;
@@ -211,8 +187,8 @@ _picker_month_add(Evas_Object *ly, const char *part, const char *fmt)
 static void
 _update_day_of_month(Evas_Object *obj, int month)
 {
-	int tmp, need_move = 0;
-	Elm_Picker_Item *item, *selected_item;
+	int tmp;
+	Elm_Buttonpicker_Item *item;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 
@@ -237,20 +213,17 @@ _update_day_of_month(Evas_Object *obj, int month)
 	}
 
 	if (tmp == wd->day_of_month) return;
-	item = elm_discpicker_last_item_get(wd->pickers[PICKER_DAY]);
-
 	if (tmp > wd->day_of_month) {
-		selected_item = elm_discpicker_selected_item_get(wd->pickers[PICKER_DAY]);
 		for (; tmp > wd->day_of_month; tmp--) {
-			elm_discpicker_item_disabled_set(item, EINA_TRUE);
-			if (selected_item == item) need_move = 1;
-			item = elm_discpicker_item_prev(item);
+			item = elm_buttonpicker_last_item_get(wd->pickers[PICKER_DAY]);
+			elm_buttonpicker_item_del(item);
 		}
-		if (need_move) elm_discpicker_prev(wd->pickers[PICKER_DAY]);
 	} else {
-		while (item && elm_discpicker_item_disabled_get(item)) {
-			elm_discpicker_item_disabled_set(item, EINA_FALSE);
-			item = elm_discpicker_item_prev(item);
+		char buf[8];
+		tmp++;
+		for (; tmp <= wd->day_of_month; tmp++) {
+			snprintf(buf, 8, "%2d", tmp);
+			elm_buttonpicker_item_append(wd->pickers[PICKER_DAY], buf, NULL, NULL);
 		}
 	}
 }
@@ -259,16 +232,15 @@ static void
 _update_picker(Evas_Object *picker, int nth)
 {
 	const Eina_List *l;
-	Elm_Picker_Item *item;
+	Elm_Buttonpicker_Item *item;
 	int i;
-	l = elm_discpicker_items_get(picker);
+	l = elm_buttonpicker_items_get(picker);
 	for (i = 0; i < nth; i++) {
 		l = l->next;
 		if (!l) break;
 	}
 	item = eina_list_data_get(l);
-	evas_object_data_set(picker, "freeze", 1);
-	elm_discpicker_item_selected_set(item);
+	elm_buttonpicker_item_selected_set(item);
 }
 
 static void
@@ -284,24 +256,16 @@ _changed(Evas_Object *picker, Evas_Object *child, Evas_Object *obj)
 	}
 
 	if (!c1 && !c2)
-		evas_object_smart_callback_call(obj, "selected", NULL);
+		evas_object_smart_callback_call(obj, "changed", NULL);
 }
 
 static void
 _overflow_cb(void *data, Evas_Object *obj, void *event_info)
 {
-	int freeze;
 	Evas_Object *eo;
 	eo = evas_object_data_get(obj, "parent");
-	
-	freeze = (int)evas_object_data_get(obj, "freeze");
-	if (freeze) {
-		evas_object_data_set(obj, "freeze", 0);
-		return;
-	}
-
 	if (eo) {
-		elm_discpicker_next(eo);
+		elm_buttonpicker_next(eo);
 		evas_object_data_set(obj, "carryon", (void *)1);
 	}
 }
@@ -309,28 +273,21 @@ _overflow_cb(void *data, Evas_Object *obj, void *event_info)
 static void
 _underflow_cb(void *data, Evas_Object *obj, void *event_info)
 {
-	int freeze;
 	Evas_Object *eo;
 	eo = evas_object_data_get(obj, "parent");
 	Widget_Data *wd = elm_widget_data_get(data);
 
-	freeze = (int)evas_object_data_get(obj, "freeze");
-	if (freeze) {
-		evas_object_data_set(obj, "freeze", 0);
-		return;
-	}
-
 	if (eo) {
-		elm_discpicker_prev(eo);
+		elm_buttonpicker_prev(eo);
 		evas_object_data_set(obj, "carryon", (void *)-1);
 	}
 
 	if (obj == wd->pickers[PICKER_DAY]) {
-		Elm_Picker_Item *item;
+		Elm_Buttonpicker_Item *item;
 		_update_day_of_month(data, wd->month - 1);
 		wd->day = wd->day_of_month;
-		item = elm_discpicker_last_item_get(obj);
-		elm_discpicker_item_selected_set(item);
+		item = elm_buttonpicker_last_item_get(obj);
+		elm_buttonpicker_item_selected_set(item);
 	}
 }
 
@@ -342,7 +299,7 @@ _year_changed_cb(void *data, Evas_Object *obj, void *event_info)
 	Evas_Object *child;
 	if (!wd) return;
 
-	year = elm_discpicker_item_label_get(event_info);
+	year = elm_buttonpicker_item_label_get(event_info);
 	wd->year = atoi(year);
 
 	if (wd->month == 2)
@@ -359,7 +316,33 @@ _month_changed_cb(void *data, Evas_Object *obj, void *event_info)
 	Evas_Object *child;
 	if (!wd) return;
 
-	wd->month = (int)elm_discpicker_item_data_get(event_info);
+	month = elm_buttonpicker_item_label_get(event_info);
+	//wd->month = atoi(month);
+
+	if(strcmp(month, "Jan")==0)
+		wd->month = 1;
+	else if(strcmp(month, "Feb")==0)
+		wd->month = 2;
+	else if(strcmp(month, "Mar")==0)
+		wd->month = 3;
+	else if(strcmp(month, "Apr")==0)
+		wd->month = 4;
+	else if(strcmp(month, "May")==0)
+		wd->month = 5;
+	else if(strcmp(month, "Jun")==0)
+		wd->month = 6;
+	else if(strcmp(month, "Jul")==0)
+		wd->month = 7;
+	else if(strcmp(month, "Aug")==0)
+		wd->month = 8;
+	else if(strcmp(month, "Sep")==0)
+		wd->month = 9;
+	else if(strcmp(month, "Oct")==0)
+		wd->month = 10;
+	else if(strcmp(month, "Nov")==0)
+		wd->month = 11;
+	else if(strcmp(month, "Dec")==0)
+		wd->month = 12;
 
 	_update_day_of_month(data, wd->month);
 	child = evas_object_data_get(obj, "child");
@@ -374,15 +357,33 @@ _day_changed_cb(void *data, Evas_Object *obj, void *event_info)
 	Evas_Object *child;
 	if (!wd) return;
 
-	day = elm_discpicker_item_label_get(event_info);
+	day = elm_buttonpicker_item_label_get(event_info);
 	wd->day = atoi(day);
 
-	if (elm_discpicker_item_disabled_get(event_info) == EINA_TRUE) {
-		elm_discpicker_prev(obj);
-	} else {
-		child = evas_object_data_get(obj, "child");
-		_changed(obj, child, data);
+	child = evas_object_data_get(obj, "child");
+	_changed(obj, child, data);
+}
+
+static Evas_Object *
+_picker_month_add(Evas_Object *ly, const char *part, const char *fmt)
+{
+	int i;
+	char buf[32];
+	struct tm tm = {0, };
+	
+	Evas_Object *eo;
+	Elm_Buttonpicker_Item *it;
+	eo = elm_buttonpicker_add(ly);
+
+	for (i = 0; i < 12; i++) {
+		tm.tm_mon = i;
+		strftime(buf, 32, fmt, &tm);
+		it = elm_buttonpicker_item_append(eo, buf, NULL, NULL);
 	}
+
+	if (part)
+		edje_object_part_swallow(ly, part, eo);
+	return eo;
 }
 
 static void
@@ -392,7 +393,7 @@ _pickers_add(Evas_Object *obj)
 	if (!wd) return;
 
 	wd->pickers[PICKER_YEAR] = _picker_add(wd->base, "elm.swallow.year", wd->y_min, wd->y_max, "%04d");
-	wd->pickers[PICKER_MON] = _picker_month_add(wd->base, "elm.swallow.mon", "%B");
+	wd->pickers[PICKER_MON] = _picker_month_add(wd->base, "elm.swallow.mon", "%b");
 	wd->pickers[PICKER_DAY] = _picker_add(wd->base, "elm.swallow.day", 1, wd->day_of_month, "%02d");
 	_callback_init(obj);
 }
@@ -427,21 +428,21 @@ _callback_init(Evas_Object *obj)
 	evas_object_smart_callback_add(wd->pickers[PICKER_DAY], "overflowed", _overflow_cb, obj);
 	evas_object_smart_callback_add(wd->pickers[PICKER_DAY], "underflowed", _underflow_cb, obj);
 
-	evas_object_smart_callback_add(wd->pickers[PICKER_YEAR], "selected", _year_changed_cb, obj);
-	evas_object_smart_callback_add(wd->pickers[PICKER_MON], "selected", _month_changed_cb, obj);
-	evas_object_smart_callback_add(wd->pickers[PICKER_DAY], "selected", _day_changed_cb, obj);
+	evas_object_smart_callback_add(wd->pickers[PICKER_YEAR], "changed", _year_changed_cb, obj);
+	evas_object_smart_callback_add(wd->pickers[PICKER_MON], "changed", _month_changed_cb, obj);
+	evas_object_smart_callback_add(wd->pickers[PICKER_DAY], "changed", _day_changed_cb, obj);
 }
 
 /**
- * Add a new datepicker to the parent
+ * Add a new datepicker3 to the parent
  *
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker3
  */
 EAPI Evas_Object *
-elm_datepicker2_add(Evas_Object *parent)
+elm_datepicker3_add(Evas_Object *parent)
 {
 	Evas_Object *obj;
 	Evas *e;
@@ -450,7 +451,7 @@ elm_datepicker2_add(Evas_Object *parent)
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
 	obj = elm_widget_add(e);
-	elm_widget_type_set(obj, "datepicker2");
+	elm_widget_type_set(obj, "datepicker3");
 	elm_widget_sub_object_add(parent, obj);
 	elm_widget_data_set(obj, wd);
 
@@ -459,7 +460,7 @@ elm_datepicker2_add(Evas_Object *parent)
 	elm_widget_disable_hook_set(obj, _disable_hook);
 
 	wd->base = edje_object_add(e);
-	_elm_theme_object_set(obj, wd->base, "datepicker2", "base", "default");
+	_elm_theme_object_set(obj, wd->base, "datepicker3", "base", "default");
 	elm_widget_resize_object_set(obj, wd->base);
 
 	wd->y_max = YEAR_MAX;
@@ -483,17 +484,17 @@ elm_datepicker2_add(Evas_Object *parent)
 }
 
 /**
- * Set selected date of the datepicker
+ * Set selected date of the datepicker3
  *
- * @param obj The datepicker object
+ * @param obj The datepicker3 object
  * @param year The year to set
  * @param month The month to set
  * @param day The day to set
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker3
  */
 EAPI void
-elm_datepicker2_date_set(Evas_Object *obj, int year, int month, int day)
+elm_datepicker3_date_set(Evas_Object *obj, int year, int month, int day)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
@@ -511,17 +512,17 @@ elm_datepicker2_date_set(Evas_Object *obj, int year, int month, int day)
 }
 
 /**
- * Get selected date of the datepicker
+ * Get selected date of the datepicker3
  *
- * @param obj The datepicker object
+ * @param obj The datepicker3 object
  * @param year The pointer to the variable get the selected year
  * @param month The pointer to the variable get the selected month
  * @param day The pointer to the variable get the selected day
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker3
  */
 EAPI void
-elm_datepicker2_date_get(Evas_Object *obj, int *year, int *month, int *day)
+elm_datepicker3_date_get(Evas_Object *obj, int *year, int *month, int *day)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
@@ -534,33 +535,33 @@ elm_datepicker2_date_get(Evas_Object *obj, int *year, int *month, int *day)
 }
 
 /**
- * Set upper bound of the datepicker
+ * Set upper bound of the datepicker3
  *
- * @param obj The datepicker object
+ * @param obj The datepicker3 object
  * @param year The year to set
  * @param month The month to set
  * @param day The day to set
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker3
  */
 EAPI void
-elm_datepicker2_date_min_set(Evas_Object *obj, int year, int month, int day)
+elm_datepicker3_date_min_set(Evas_Object *obj, int year, int month, int day)
 {
 	// TODO
 }
 
 /**
- * Get lower bound of the datepicker
+ * Get lower bound of the datepicker3
  *
- * @param obj The datepicker object
+ * @param obj The datepicker3 object
  * @param year The pointer to the variable get the minimum year
  * @param month The pointer to the variable get the minimum month
  * @param day The pointer to the variable get the minimum day
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker3
  */
 EAPI void
-elm_datepicker2_date_min_get(Evas_Object *obj, int *year, int *month, int *day)
+elm_datepicker3_date_min_get(Evas_Object *obj, int *year, int *month, int *day)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
@@ -573,33 +574,33 @@ elm_datepicker2_date_min_get(Evas_Object *obj, int *year, int *month, int *day)
 }
 
 /**
- * Set lower bound of the datepicker
+ * Set lower bound of the datepicker3
  *
- * @param obj The datepicker object
+ * @param obj The datepicker3 object
  * @param year The year to set
  * @param month The month to set
  * @param day The day to set
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker3
  */
 EAPI void
-elm_datepicker2_date_max_set(Evas_Object *obj, int year, int month, int day)
+elm_datepicker3_date_max_set(Evas_Object *obj, int year, int month, int day)
 {
 	// TODO
 }
 
 /**
- * Get upper bound of the datepicker
+ * Get upper bound of the datepicker3
  *
- * @param obj The datepicker object
+ * @param obj The datepicker3 object
  * @param year The pointer to the variable get the maximum year
  * @param month The pointer to the variable get the maximum month
  * @param day The pointer to the variable get the maximum day
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker3
  */
 EAPI void
-elm_datepicker2_date_max_get(Evas_Object *obj, int *year, int *month, int *day)
+elm_datepicker3_date_max_get(Evas_Object *obj, int *year, int *month, int *day)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
@@ -612,15 +613,15 @@ elm_datepicker2_date_max_get(Evas_Object *obj, int *year, int *month, int *day)
 }
 
 /**
- * Set date format of datepicker
+ * Set date format of datepicker3
  *
- * @param obj The datepicker object
+ * @param obj The datepicker3 object
  * @param fmt The date format, ex) yymmdd
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker3
  */
 EAPI void
-elm_datepicker2_date_format_set(Evas_Object *obj, const char *fmt)
+elm_datepicker3_date_format_set(Evas_Object *obj, const char *fmt)
 {
 	char sig[32] = "elm,state,";
 	int i = 0, j;
@@ -637,15 +638,15 @@ elm_datepicker2_date_format_set(Evas_Object *obj, const char *fmt)
 }
 
 /**
- * Get date format of datepicker
+ * Get date format of datepicker3
  *
- * @param obj The datepicker object
- * @return The date format of given datepicker
+ * @param obj The datepicker3 object
+ * @return The date format of given datepicker3
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker3
  */
 EAPI const char *
-elm_datepicker2_date_format_get(Evas_Object *obj)
+elm_datepicker3_date_format_get(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;

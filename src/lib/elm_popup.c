@@ -379,28 +379,25 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Object *label;
-	int w;			
+	int w;		
 	if (!wd) return;
 
 	if(wd->content_area)
 		{
 			evas_object_del(wd->content_area);
 			wd->content_area=NULL;
-		}
-		label = elm_label_add(obj);
-		elm_object_style_set(label, "popup/description");		
-		wd->content_area = elm_scroller_add(obj);
-		elm_label_line_wrap_set(label, EINA_TRUE);
-		edje_object_part_geometry_get((Evas_Object *)elm_layout_edje_get(wd->layout), "elm.swallow.content", NULL, NULL, &w, NULL);
-		elm_label_wrap_width_set(label, w);
-		elm_scroller_content_set(wd->content_area,label);
-		elm_scroller_policy_set(wd->content_area, ELM_SCROLLER_POLICY_OFF,ELM_SCROLLER_POLICY_AUTO);
-		elm_scroller_bounce_set(wd->content_area, EINA_FALSE, EINA_FALSE);		
-		elm_label_label_set(label, text);
-		evas_object_show(label);			
-		elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);			
-		evas_object_event_callback_add(wd->content_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-			       _changed_size_hints, obj);
+		}	
+	label = elm_label_add(obj);
+	elm_object_style_set(label, "popup/description");		
+	elm_label_line_wrap_set(label, EINA_TRUE);
+	edje_object_part_geometry_get((Evas_Object *)elm_layout_edje_get(wd->layout), "elm.swallow.content", NULL, NULL, &w, NULL);
+	elm_label_wrap_width_set(label, w);
+	elm_label_label_set(label, text);
+	evas_object_show(label);		
+	wd->content_area = label;
+	elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);			
+	evas_object_event_callback_add(wd->content_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+		       _changed_size_hints, obj);
 	_sizing_eval(obj);
 }
 

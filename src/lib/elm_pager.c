@@ -139,9 +139,9 @@ _eval_top(Evas_Object *obj)
 	     if (wd->top->popme) pop = EINA_TRUE;
 	     if (ani) 
 	     	{
-	     	  if (pop) elm_transit_fx_insert( transit, elm_fx_transfer_add(o , 0, y, w, y));
-	     	  else elm_transit_fx_insert( transit, elm_fx_transfer_add(o , 0, y, -w, y));
-		  elm_transit_completion_set( transit, _complete_cb, it);
+	     	  if (pop) elm_transit_fx_insert( transit, elm_fx_translation_add(o , 0, y, w, y));
+	     	  else elm_transit_fx_insert( transit, elm_fx_translation_add(o , 0, y, -w, y));
+		  elm_transit_completion_callback_set( transit, _complete_cb, it);
 	     	}
 	     else 
 	     	{
@@ -162,8 +162,8 @@ _eval_top(Evas_Object *obj)
 	//add show/hide transition direction & animation on/off. 10.04.14 sohyun
 	if (ani && o) 
 	  {
-	    if (pop) elm_transit_fx_insert( transit, elm_fx_transfer_add(prev_o, -w, y, 0, y));
-	    else elm_transit_fx_insert( transit, elm_fx_transfer_add(prev_o, w, y, 0, y));
+	    if (pop) elm_transit_fx_insert( transit, elm_fx_translation_add(prev_o, -w, y, 0, y));
+	    else elm_transit_fx_insert( transit, elm_fx_translation_add(prev_o, w, y, 0, y));
 	    elm_transit_run( transit, 0.3 );
 	  }
 	elm_transit_del( transit ); 
@@ -365,8 +365,8 @@ elm_pager_content_pop(Evas_Object *obj)
       
 	          transit = elm_transit_add(obj);
 		  evas_object_geometry_get(obj, NULL, &y, &w, NULL);
-		  elm_transit_fx_insert(transit, elm_fx_transfer_add(o , 0, y, w, y));
-		  elm_transit_completion_set(transit, _complete_cb, it);
+		  elm_transit_fx_insert(transit, elm_fx_translation_add(o , 0, y, w, y));
+		  elm_transit_completion_callback_set(transit, _complete_cb, it);
 		  elm_transit_run(transit, 0.3 );
 		  elm_transit_del(transit); 
 	     	}
@@ -386,6 +386,52 @@ elm_pager_content_pop(Evas_Object *obj)
 	     elm_pager_content_promote(obj, it->content);
 	  }
      }
+}
+
+/**
+ * Pop to the object that is on the stack
+ *
+ * This pops the objects that are on the stack, makes them
+ * disappear, then deletes the objects. The content will become visible.
+ *
+ * @param obj The pager object
+ * @param content The object to show
+ *
+ * @ingroup Pager
+ */
+EAPI void
+elm_pager_to_content_pop(Evas_Object *obj, Evas_Object *content)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_List *ll;
+   Item *it;
+   if (!wd) return;
+   if (!wd->stack) return;
+   it = eina_list_last(wd->stack)->data;
+   it->popme = EINA_TRUE;
+   ll = eina_list_last(wd->stack);
+   if (ll)
+     {
+       EINA_LIST_FOREACH(wd->stack, ll, it)
+	  {
+	    if (it->content == content)
+	      {
+	      	 ll = eina_list_last(wd->stack);
+		 while (ll = ll->prev)
+		 {
+		   if (ll->data == it) break;
+		   else 
+		   {
+		     Item *itdel = ll->data;
+		     evas_object_del(itdel->content);
+		   }
+		 }
+		 elm_pager_content_promote(obj, content);   
+		 return;
+	      }
+          }
+      }
 }
 
 /**
