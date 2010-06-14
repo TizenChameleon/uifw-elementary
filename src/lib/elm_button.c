@@ -307,7 +307,7 @@ elm_button_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
-   elm_widget_can_focus_set(obj, 1 );                 
+   elm_widget_can_focus_set(obj, 1 );
 
    wd->btn = edje_object_add(e);
    _elm_theme_object_set(obj, wd->btn, "button", "base", "default");
@@ -412,6 +412,14 @@ elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlSta
    }
 }
 
+/**
+ * Get the label of button
+ *
+ * @param obj The button object
+ * @return The title of button
+ *
+ * @ingroup Button
+ */
 EAPI const char *
 elm_button_label_get(const Evas_Object *obj)
 {
@@ -421,7 +429,7 @@ elm_button_label_get(const Evas_Object *obj)
    return wd->label;
 }
 /**
- * get the label of button for each state
+ * Get the label of button for each state
  *
  * @param obj The button object
  * @param state The state of button
@@ -549,7 +557,7 @@ elm_button_autorepeat_initial_timeout_set(Evas_Object *obj, double t)
  *
  * @ingroup Button
  */
-EAPI void         
+EAPI void
 elm_button_autorepeat_gap_timeout_set(Evas_Object *obj, double t)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
