@@ -1,6 +1,14 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
+/**
+ * @defgroup PageControl PageControl
+ *
+ *  A page control is a succession of dots centered in the control.
+ *  Each dot corresponds to a page in the application’s document (or other data-model entity),
+ *  with the white dot indicating the currently viewed page.
+ */
+
 #define PADDING 9
 
 typedef struct _Widget_Data Widget_Data;
@@ -202,6 +210,14 @@ static void _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 	return;
 }
 
+/**
+ * Add a new pagecontrol to the parent
+ * @param parent The parent object
+ * @return The new object or NULL if it cannot be created
+ *
+ * @ingroup PageControl
+ */
+
 EAPI Evas_Object *
 elm_page_control_add(Evas_Object *parent)
 {
@@ -257,7 +273,14 @@ elm_page_control_add(Evas_Object *parent)
 	return obj;
 }
 
-EAPI void elm_page_control_page_count_set(Evas_Object *obj,	unsigned int page_count)
+/**
+ * The number of pages for the pagecontrol to show as dots.
+ * @param obj The pagecontrol object
+ * @param page_count  Number of pages
+ *
+ * @ingroup PageControl
+ */
+EAPI void elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd)
@@ -294,6 +317,13 @@ EAPI void elm_page_control_page_count_set(Evas_Object *obj,	unsigned int page_co
 	wd->page_count = page_count;
 }
 
+/**
+ * Set current/displayed page to given page number or id.
+ * @param obj The pagecontrol object
+ * @param page_id  Page number or Page Id
+ *
+ * @ingroup PageControl
+ */
 EAPI
 void elm_page_control_page_id_set(Evas_Object *obj, unsigned int page_id)
 {
@@ -317,6 +347,13 @@ void elm_page_control_page_id_set(Evas_Object *obj, unsigned int page_id)
 	edje_object_part_drag_value_set(wd->base, "elm.drag.part", cur_position,0);
 }
 
+/**
+ * Get current/displayed page number or id.
+ * @param obj The pagecontrol object
+ * @return The current/displayed page id/number.
+ *
+ * @ingroup PageControl
+ */
 EAPI
 unsigned int elm_page_control_page_id_get(Evas_Object *obj)
 {

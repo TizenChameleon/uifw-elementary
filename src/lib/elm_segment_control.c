@@ -4,11 +4,11 @@
 /**
  * @addtogroup SegmentControl SegmentControl
  *
- * The SegmentControl button allows for 1 or more selectors to be created to select 1
- * of a set of options.
- *
- * Signals that you can add callbacks for are:
- *
+ * SegmentControl object is a horizontal control made of multiple segments,
+ * each segment functioning as a discrete button. A segmented control affords a compact means to group together a number of controls.
+ * A segmented control can display a title or an image. The UISegmentedControl object automatically resizes segments to fit proportionally
+ * within their superview unless they have a specific width set. When you add and remove segments,
+ * you can request that the action be animated with sliding and fading effects.
  */
 typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
@@ -163,6 +163,13 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
    return;
 }
 
+/**
+ * Add a new segmentcontrol to the parent
+ * @param parent The parent object
+ * @return The new object or NULL if it cannot be created
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
 EAPI Evas_Object *
 elm_segment_control_add(Evas_Object *parent)
 {
@@ -467,6 +474,17 @@ static void _queue_list(Evas_Object *obj)
 	wd->count = eina_list_count(wd->seg_ctrl);
 }
 
+/**
+ * Add a new segment to segmentcontrol
+ * @param obj The SegmentControl object
+ * @param icon The icon object for added segment
+ * @param label The label for added segment
+ * @param animate If 1 the action be animated with sliding effects default 0.
+ * @return The new segment or NULL if it cannot be created
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
+
 EAPI Elm_Segment_Item *
 elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)
 {
@@ -549,6 +567,17 @@ _item_search(Evas_Object *obj, Elm_Segment_Item *item)
 	return NULL;
 }
 
+/**
+ * Insert a new segment to segmentcontrol
+ * @param obj The SegmentControl object
+ * @param icon The icon object for added segment
+ * @param label The label for added segment
+ * @param index The position at which segment to be inserted
+ * @param animate If 1 the action be animated with sliding effects default 0.
+ * @return The new segment or NULL if it cannot be created
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
 EAPI void
 elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate)
 {
@@ -602,7 +631,14 @@ elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const
    return;
 }
 
-
+/**
+ * Delete a segment to segmentcontrol
+ * @param obj The SegmentControl object
+ * @param item The Segment to be deleted
+ * @param animate If 1 the action be animated with sliding effects default 0.
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
 EAPI void
 elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate)
 {
@@ -638,6 +674,14 @@ elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Ein
    return;
 }
 
+/**
+ * Delete a segment to segmentcontrol
+ * @param obj The SegmentControl object
+ * @param index The position at which segment to be deleted
+ * @param animate If 1 the action be animated with sliding effects default 0.
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
 
 EAPI void
 elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate)
@@ -681,7 +725,14 @@ elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Ein
    return;
 }
 
-
+/**
+ * Get the label of a segment of segmentcontrol
+ * @param obj The SegmentControl object
+ * @param index The index of the segment
+ * @return The label
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
 
 EAPI const char *
 elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index)
@@ -698,6 +749,14 @@ elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index)
    return NULL;
 }
 
+/**
+ * Get the icon of a segment of segmentcontrol
+ * @param obj The SegmentControl object
+ * @param index The index of the segment
+ * @return The icon object
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
 
 EAPI Evas_Object *
 elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index)
@@ -713,6 +772,15 @@ elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index)
 
    return NULL;
 }
+
+/**
+ * Get the currently selected segment of segmentcontrol
+ * @param obj The SegmentControl object
+ * @param value The current segment id
+ * @return The selected Segment
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
 
 EAPI Elm_Segment_Item *
 elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value)
@@ -733,6 +801,14 @@ elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value)
 	}
 	return NULL;
 }
+
+/**
+ * Get the count of segments of segmentcontrol
+ * @param obj The SegmentControl object
+ * @return The count of Segments
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
 
 EAPI int
 elm_segment_control_get_segment_count(Evas_Object *obj)
