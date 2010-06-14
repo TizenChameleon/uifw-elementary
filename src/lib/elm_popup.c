@@ -368,7 +368,7 @@ elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int
 }
 
 /**
- * Set the description text in content area of Popup widget.
+ * This Set's the description text in content area of Popup widget.
  *
  * @param text description text.
  *
@@ -402,7 +402,7 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
 }
 
 /**
- * Get the description text packed in content area of popup object.
+ * This Get's the description text packed in content area of popup object.
  *
  * @param obj The Popup object
  * @return  description text.
@@ -419,7 +419,7 @@ elm_popup_desc_get(Evas_Object *obj)
 }
 
 /**
- * Set's the title label of popup object.
+ * This Set's the title text in title area of popup object.
  *
  * @param obj The popup object
  * @param text The title text
@@ -456,7 +456,7 @@ elm_popup_title_label_set(Evas_Object *obj, const char *text)
 }
 
 /**
- * Get's the title label of popup object.
+ * This Get's the title text packed in title area of popup object.
  *
  * @param obj The Popup object
  * @return title text
@@ -473,7 +473,7 @@ elm_popup_title_label_get(Evas_Object *obj)
 }
 
 /**
- * Set the icon in the title area of Popup object.
+ * This Set's the icon in the title area of Popup object.
  *
  * @param obj The popup object
  * @param icon The title icon
@@ -499,7 +499,7 @@ elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon)
 }
 
 /**
- * Get the title icon of Popup object.
+ * This Get's the icon packed in title area of Popup object.
  *
  * @param obj The Popup object
  * @return title icon
@@ -516,7 +516,7 @@ elm_popup_title_icon_get(Evas_Object *obj)
 }
 
 /**
- * Set the content of Popup object.
+ * This Set's the content widget in content area of Popup object.
  *
  * @param obj The popup object
  * @param content The content widget
@@ -542,7 +542,7 @@ elm_popup_content_set(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
- * Get the content of Popup object.
+ * This Get's the content widget packed in content area of Popup object.
  *
  * @param obj The Popup object
  * @return content packed in popup widget
@@ -606,10 +606,11 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
 }
 
 /**
- * Set the time before the popup window is hidden. 
+ * This Set's the time before the popup window is hidden, 
+ * and ELM_POPUP_RESPONSE_TIMEOUT is sent along with response signal.
  *
  * @param obj The popup object
- * @param timeout The timeout
+ * @param timeout The timeout value in seconds.
  *
  * @ingroup Popup
  */
@@ -623,7 +624,7 @@ elm_popup_timeout_set(Evas_Object *obj, int timeout)
 }
 
 /**
- * Set the mode of popup, by default ELM_POPUP_TYPE_NONE is set i.e, popup  
+ * This Set's the mode of popup, by default ELM_POPUP_TYPE_NONE is set i.e, popup  
  * will not close when clicked outside. if ELM_POPUP_TYPE_ALERT is set, popup will close
  * when clicked outside, and ELM_POPUP_RESPONSE_NONE is sent along with response signal.
  *
@@ -632,7 +633,6 @@ elm_popup_timeout_set(Evas_Object *obj, int timeout)
  *
  * @ingroup Popup
  */
- 
 EAPI void elm_popup_set_mode(Evas_Object *obj, Elm_Popup_Mode mode)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -641,7 +641,8 @@ EAPI void elm_popup_set_mode(Evas_Object *obj, Elm_Popup_Mode mode)
 }
 
 /**
- * Hides the popup by emitting response signal
+ * This Hides the popup by emitting response signal.
+ *
  * @param obj The popup object
  * @param response_id  response ID of the signal to be emitted along with response signal
  *
@@ -656,7 +657,7 @@ EAPI void elm_popup_response(Evas_Object *obj, int  response_id)
 }
 
 /**
- * the direction from which popup will appear as well as the location of popup can be controlled by this API
+ * This API controls the direction from which popup will appear and location of popup.
  * @param obj The popup object
  * @param orient  the orientation of the popup
  *

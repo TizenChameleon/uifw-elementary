@@ -375,6 +375,8 @@ elm_notify_parent_set(Evas_Object *obj, Evas_Object *parent)
  *
  * @param obj The notify object
  * @param orient The new orientation
+ *
+ * @ingroup Notify
  */
 EAPI void
 elm_notify_orient_set(Evas_Object *obj, Elm_Notify_Orient orient)
@@ -422,6 +424,8 @@ elm_notify_orient_set(Evas_Object *obj, Elm_Notify_Orient orient)
  *
  * @param obj The notify object
  * @param time the new timeout
+ *
+ * @ingroup Notify
  */
 EAPI void
 elm_notify_timeout_set(Evas_Object *obj, int timeout)
@@ -434,8 +438,10 @@ elm_notify_timeout_set(Evas_Object *obj, int timeout)
 }
 
 /**
- * Re-init the timer
+ * Re-initialize the timer
  * @param obj The notify object
+ *
+ * @ingroup Notify
  */
 EAPI void
 elm_notify_timer_init(Evas_Object *obj)
@@ -451,13 +457,15 @@ elm_notify_timer_init(Evas_Object *obj)
 
 /**
  * When true if the user clicks outside the window the events will be
- * catch by the others widgets, else the events are block and the signal
- * dismiss will be sent when the user click outside the window.
+ * caught by other widgets, else the events are blocked and the signal
+ * block,clicked will be sent when the user click's outside the window.
  *
  * @note The default value is EINA_TRUE.
  *
  * @param obj The notify object
- * @param repeats EINA_TRUE Events are repeats, else no
+ * @param repeats EINA_TRUE Events are repeated else The events are blocked.
+ *
+ * @ingroup Notify
  */
 EAPI void
 elm_notify_repeat_events_set(Evas_Object *obj, Eina_Bool repeat)

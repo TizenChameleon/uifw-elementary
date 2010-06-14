@@ -934,10 +934,10 @@ elm_scrolled_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_
    elm_scroller_bounce_set(wd->scroller, h_bounce, v_bounce);
 }
 /**
- * This set's the maximum bytes that can be added in entry.
+ * This set's the maximum bytes that can be added in to scrolled entry.
  *
- * @param obj The entry object
- * @param max_no_of_bytes Maximum number of bytes entry can have
+ * @param obj The  scrolled entry object
+ * @param max_no_of_bytes Maximum number of bytes scrolled entry can have.
  * 
  * @ingroup Scrolled_Entry
  */
@@ -951,11 +951,12 @@ elm_scrolled_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes)
 }
 
 /**
- * Whether the character to use when masking entry contents (in "password mode").
- * shows last character to user while password is being typed.
- * @param obj The entry object
- * @param password The password flag (1 for "password mode" to show the user
- * how many characters have been typed, 0 for default)
+ * This set's the scrolled entry in password mode with out masking the last character entered by user,
+ * and later masking the character after 2 seconds.
+ *
+ * @param obj The scrolled entry object
+ * @param show_last_character The show_last_character flag (1 for "password mode along with showing last character" 
+ * 0 for default)
  *
  * @ingroup Scrolled_Entry
  */

@@ -57,7 +57,7 @@ _sizing_eval(Evas_Object *obj)
 }
 
 /**
- * Add a new titlebar object
+ * Add a new titlebar object.
  *
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
@@ -97,7 +97,7 @@ elm_titlebar_add(Evas_Object *parent)
 }
 
 /**
- * Set the label of titlebar object
+ * This set's the label in titlebar object.
  *
  * @param obj The titlebar object
  * @param label The label text
@@ -117,7 +117,7 @@ elm_titlebar_label_set(Evas_Object *obj, const char *label)
 }
 
 /**
- * Get the label used on the titlebar object
+ * This get's the label packed in titlebar object.
  *
  * @param obj The titlebar object
  * @return label text
@@ -134,7 +134,7 @@ elm_titlebar_label_get(Evas_Object *obj)
 }
 
 /**
- * Set the icon object of the titlebar object
+ * This set's the icon object in titlebar object.
  *
  * @param obj The titlebar object
  * @param icon The icon object
@@ -166,7 +166,7 @@ elm_titlebar_icon_set(Evas_Object *obj, Evas_Object *icon)
 }
 
 /**
- * Get the icon object of the titlebar object
+ * This get's the icon object packed in titlebar object.
  *
  * @param obj The titlebar object
  * @return The icon object
@@ -183,7 +183,7 @@ elm_titlebar_icon_get(Evas_Object *obj)
 }
 
 /**
- * Set the end object of the titlebar object
+ * This set's the end object in titlebar object.
  *
  * @param obj The titlebar object
  * @param end The end object
@@ -214,7 +214,7 @@ elm_titlebar_end_set(Evas_Object *obj, Evas_Object *end)
 }
 
 /**
- * Get the end object of the titlebar object
+ * This get's the end object packed in titlebar object.
  *
  * @param obj The titlebar object
  * @return The icon object

@@ -1815,7 +1815,7 @@ elm_entry_single_line_get(const Evas_Object *obj)
  * This set's the maximum bytes that can be added in entry.
  *
  * @param obj The entry object
- * @param max_no_of_bytes Maximum number of bytes entry can have
+ * @param max_no_of_bytes Maximum number of bytes entry can have.
  * 
  * @ingroup Entry
  */
@@ -1860,11 +1860,12 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
 }
 
 /**
- * Whether the character to use when masking entry contents (in "password mode").
- * shows last character to user while password is being typed.
+ * This set's the entry in password mode with out masking the last character entered by user,
+ * and later masking the character after 2 seconds.
+ 
  * @param obj The entry object
- * @param password The password flag (1 for "password mode" to show the user
- * how many characters have been typed, 0 for default)
+ * @param show_last_character The show_last_character flag (1 for "password mode along with showing last character" 
+ * 0 for default).
  *
  * @ingroup Entry
  */

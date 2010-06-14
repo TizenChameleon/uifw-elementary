@@ -213,10 +213,10 @@ elm_autocompleteview_add(Evas_Object *parent)
 
 
 /**
- * Get the entry of the Autocompleteview object
+ * This Get's the entry object of Autocompleteview object.
  *
- * @param obj The Autocompleteview object
- * @return entry object
+ * @param obj The Autocompleteview object.
+ * @return the entry object.
  *
  * @ingroup Autocompleteview
  */
@@ -232,10 +232,10 @@ elm_autocompleteview_entry_get(Evas_Object *obj)
 }
 
 /**
- * Get the editfiled of the Autocompleteview object
+ * This Get's the editfield object of the Autocompleteview object.
  *
- * @param obj The Autocompleteview object
- * @return editfield object
+ * @param obj The Autocompleteview object.
+ * @return The Editfield object.
  *
  * @ingroup Autocompleteview
  */
@@ -252,8 +252,8 @@ elm_autocompleteview_editfield_get(Evas_Object *obj)
 
 
 /**
- * Specifies the minimum number of characters the user has to type in the editfield 
- * before the drop down list is shown.When threshold is less than or equals 0, a threshold of 1 is applied.
+ * This Specifies the minimum number of characters the user has to type in the editfield 
+ * before the drop down list is shown.When threshold is less than or equals 0, a threshold of 1 is applied by default.
  *
  * @param obj The Autocompleteview object
  * @param threshold the number of characters to type before the drop down is shown
@@ -279,10 +279,10 @@ elm_autocompleteview_threshold_set(Evas_Object *obj, int threshold)
 
 
 /**
- * Returns the number of characters the user must type before the drop down list is shown.
+ * This Returns the number of characters the user must type before the drop down list is shown.
  *
- * @param obj The Autocompleteview object
- * @return The threshold value
+ * @param obj The Autocompleteview object.
+ * @return The threshold value.
  *
  * @ingroup Autocompleteview
  */
@@ -299,11 +299,10 @@ elm_autocompleteview_threshold_get(Evas_Object *obj)
 
 
 /**
- * Specifies the list of strings which has to be searched to get the completion strings.
- *
+ * This Specifies the list of strings which has to be searched to get the list of completion strings.
  *
  * @param obj The Autocompleteview object
- * @param data_list the list of static strings, which has to be searched to get the completion string.
+ * @param data_list the list of static strings, which has to be searched to get the completion strings.
  *
  * @ingroup Autocompleteview
  */
@@ -323,12 +322,12 @@ elm_autocompleteview_data_set(Evas_Object *obj, Eina_List *data_list)
 
 
 /**
- * Registers the callback function that would be called whenever text is entered in to the entry..
- *
+ * This Registers the callback function that would be called whenever text is entered in to the entry.
  *
  * @param obj The Autocompleteview object
  * @param elmautocompleteview_matchfunction completion function which list's the completion strings.
  * @param data userdata that would be passed whenever the callback function is called.
+ *
  * @ingroup Autocompleteview
  */
 EAPI void
@@ -342,12 +341,13 @@ elm_autocompleteview_match_func_set(Evas_Object *obj, elmautocompleteview_matchf
 	wd->func = func;
 	wd->data = data;
 }
+
 /**
- * updates the text in to autocomplete view.
- *
+ * This updates the text in to autocomplete view.
  *
  * @param obj The Autocompleteview object
- * @param text the text to be updated in to entry of autocompleteview.
+ * @param text the text to be updated in to the entry of autocompleteview.
+ *
  * @ingroup Autocompleteview
  */
 EAPI void
