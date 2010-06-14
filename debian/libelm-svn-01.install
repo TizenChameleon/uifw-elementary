@@ -5,3 +5,4 @@ debian/tmp/usr/share/elementary/images/*
 debian/tmp/usr/share/elementary/objects/*
 debian/tmp/usr/share/elementary/themes/*
 debian/tmp/usr/share/icons/elementary.png
+debian/tmp/usr/lib/elementary/*
