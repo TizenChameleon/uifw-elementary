@@ -250,12 +250,12 @@ _icon_animation(void *data)
 }
 
 /**
- * @ingroup Actionslider
- *
  * Add a new actionslider to the parent.
  *
  * @param parent The parent object
  * @return The new actionslider object or NULL if it cannot be created
+ *
+ * @ingroup Actionslider
  */
 EAPI Evas_Object *
 elm_actionslider_add(Evas_Object *parent)
@@ -328,6 +328,16 @@ elm_actionslider_add_with_set(Evas_Object *parent, Elm_Actionslider_Icon_Pos pos
 }
 */
 
+/**
+ * Set actionslider indicator position. 
+ *
+ * @param obj The actionslider object. 
+ * @param pos The position of the indicator.
+ * (ELM_ACTIONSLIDER_INDICATOR_LEFT, ELM_ACTIONSLIDER_INDICATOR_RIGHT,
+ *  ELM_ACTIONSLIDER_INDICATOR_CENTER)
+ *
+ * @ingroup Actionslider
+ */
 EAPI void
 elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_Pos pos)
 {
@@ -347,6 +357,16 @@ elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_
 	edje_object_part_drag_value_set(wd->as, "elm.swallow.icon", position, 0.5);
 }
 
+/**
+ * Set actionslider magnet position. 
+ *
+ * @param obj The actionslider object. 
+ * @param pos The position of the magnet.
+ * (ELM_ACTIONSLIDER_MAGNET_LEFT, ELM_ACTIONSLIDER_MAGNET_RIGHT,
+ *  ELM_ACTIONSLIDER_MAGNET_BOTH, ELM_ACTIONSLIDER_MAGNET_CENTER)
+ *
+ * @ingroup Actionslider
+ */
 EAPI void
 elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos pos)
 {
@@ -356,15 +376,14 @@ elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos po
 }
 
 /**
- * @ingroup Actionslider
+ * Set actionslider label.
  *
- * Set elm_actionslider label.
- *
- * @param obj The elm_actionslider object
- * @param pos The position of the label. (ELM_ACTIONSLIDER_LEFT_LABEL, ELM_ACTIONSLIDER_RIGHT_LABEL)
+ * @param obj The actionslider object
+ * @param pos The position of the label.
+ * (ELM_ACTIONSLIDER_LABEL_LEFT, ELM_ACTIONSLIDER_LABEL_RIGHT)
  * @param label The label which is going to be set.
- * @param color The label color.
- * @return 0 (SUCCESS) or -1 (FAIL)
+ *
+ * @ingroup Actionslider
  */
 EAPI int
 elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, const char *label)
@@ -399,12 +418,13 @@ elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, con
 }
 
 /**
- * @ingroup Actionslider
- *
  * Hold actionslider object movement.
  *
  * @param obj The actionslider object
- * @return 0 (SUCCESS) or -1 (FAIL)
+ * @param flag Actionslider hold/release
+ * (EINA_TURE = hold/EIN_FALSE = release)
+ *
+ * @ingroup Actionslider
  */
 EAPI int
 elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag)
