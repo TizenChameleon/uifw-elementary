@@ -9,6 +9,7 @@ struct _Widget_Data
    Evas_Object *ent;
    Evas_Object *popup;/*copy paste UI - elm_popup*/
    Evas_Object *ctxpopup;/*copy paste UI - elm_ctxpopup*/
+   Evas_Object *bg;   
    Evas_Object *hoversel;
    Ecore_Job *deferred_recalc_job;
    Ecore_Event_Handler *sel_notify_handler;
@@ -16,6 +17,7 @@ struct _Widget_Data
    Ecore_Timer *longpress_timer;
    const char *cut_sel;
    const char *text;
+   Evas_Coord wrap_w;
    Evas_Coord lastw;
    Evas_Coord downx, downy;
    Evas_Coord cx, cy, cw, ch;
@@ -36,6 +38,8 @@ struct _Widget_Data
    Eina_Bool deferred_cur : 1;
    Eina_Bool disabled : 1;
    Eina_Bool context_menu : 1;
+   Eina_Bool bgcolor : 1;
+   Eina_Bool ellipsis : 1;
    Eina_Bool autoreturnkey : 1;
 };
 
