@@ -2736,10 +2736,7 @@ _item_idler(void *data)
 static void
 _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
 {
-   if (it->queued) return;
-   it->queued = EINA_TRUE;
-   wd->queue = eina_list_append(wd->queue, it);
-   while ((wd->queue) && ((!wd->blocks) || (!wd->blocks->next)))
+  while ((wd->queue) && ((!wd->blocks) || (!wd->blocks->next)))
      {
         if (wd->queue_idler)
           {
@@ -2748,7 +2745,11 @@ _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
           }
         _queue_proecess(wd, 0);
      }
+
+   if (it->queued) return;
    if (!wd->queue_idler) wd->queue_idler = ecore_idler_add(_item_idler, wd);
+   it->queued = EINA_TRUE;
+   wd->queue = eina_list_append(wd->queue, it);
 }
 #else
 
