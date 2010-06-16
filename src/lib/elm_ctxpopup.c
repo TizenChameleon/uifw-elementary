@@ -478,6 +478,7 @@ _sizing_eval(Evas_Object* obj)
 	evas_object_resize(wd->location, rect.w, rect.h);
 	evas_object_move(wd->hover, rect.x, rect.y);
 	evas_object_resize(wd->hover, rect.w, rect.h);
+
 }
 
 static void 
