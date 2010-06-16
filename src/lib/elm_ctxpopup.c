@@ -65,6 +65,7 @@ static Evas_Coord  _adjust_arrow_pos_y(Widget_Data* wd);
 static void _scale_shrinked_set(Elm_Ctxpopup_Item* item);
 static void _item_scale_shrinked_set(Widget_Data* wd, Elm_Ctxpopup_Item* add_item);
 static void _item_scale_normal_set(Widget_Data* wd);
+static void _shift_geometry_by_arrow(Evas_Object* arrow, Arrow_Direction arrow_dir, Evas_Coord_Rectangle* rect);
 
 static void 
 _changed_size_hints(void* data, Evas* evas, Evas_Object* obj, void* event_info)
@@ -303,22 +304,22 @@ _calc_best_geometry(Widget_Data* wd, Evas_Coord_Rectangle* rect)
 		{
 			case Bottom_Arrow:
 					ADJUST_POS_X();
-					y = wd->y - box_h -arrow_size_h - finger_size;
+					y = wd->y - box_h - finger_size;
 					arrow_dir = Bottom_Arrow;
 				break;
 			case Right_Arrow:
 					ADJUST_POS_Y();
-					x = wd->x - box_w - arrow_size_w - finger_size;
+					x = wd->x - box_w - finger_size;
 					arrow_dir = Right_Arrow;
 				break;
 			case Left_Arrow:
 					ADJUST_POS_Y();
-					x = wd->x + arrow_size_w + finger_size;
+					x = wd->x + finger_size;
 					arrow_dir = Left_Arrow;
 				break;
 			case Top_Arrow:
 					ADJUST_POS_X();
-					y = wd->y + arrow_size_h + finger_size;
+					y = wd->y + finger_size;
 					arrow_dir = Top_Arrow;
 				break;
 			default:
@@ -471,12 +472,35 @@ _sizing_eval(Evas_Object* obj)
 
 	Arrow_Direction arrow_dir = _calc_best_geometry(wd, &rect);
 	_update_arrow_obj(obj,	arrow_dir);
+	_shift_geometry_by_arrow(wd->arrow, arrow_dir, &rect);
+
 	evas_object_move(wd->location, rect.x, rect.y);
 	evas_object_resize(wd->location, rect.w, rect.h);
 	evas_object_move(wd->hover, rect.x, rect.y);
 	evas_object_resize(wd->hover, rect.w, rect.h);
 }
 
+static void 
+_shift_geometry_by_arrow(Evas_Object* arrow, Arrow_Direction arrow_dir, Evas_Coord_Rectangle* rect)
+{
+	Evas_Coord arrow_size_w, arrow_size_h;	
+	edje_object_size_min_calc(arrow, &arrow_size_w, &arrow_size_h);
+
+	switch(arrow_dir) {
+		case Left_Arrow:
+			rect->x += arrow_size_w;
+			break;
+		case Right_Arrow:
+			rect->x -= arrow_size_w;
+			break;
+		case Top_Arrow:
+			rect->y += arrow_size_h;
+			break;
+		case Bottom_Arrow:
+			rect->y -= arrow_size_h;
+			break;
+	}
+}
 
 static void 
 _del_pre_hook(Evas_Object* obj)
