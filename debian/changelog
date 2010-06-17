@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build08) unstable; urgency=low
+
+  * Applied titlebar changes.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL-pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build08
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Thu, 17 Jun 2010 11:38:34 +0900
+
 elementary (0.4.0+svn.49550slp2+3build07) unstable; urgency=low
 
   * Contextual Popup bug fixed.
