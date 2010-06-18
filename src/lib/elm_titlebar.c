@@ -71,12 +71,12 @@ _sub_del(void *data __UNUSED__, Evas_Object * obj, void *event_info)
    Evas_Object *sub = event_info;
    if (!wd) return;
    evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                 _changed_size_hints, obj);
+				       _changed_size_hints, obj);
    if (sub == wd->icon)
      {
-         edje_object_signal_emit(wd->tbar, "elm,state,icon,hidden", "elm");
-         wd->icon = NULL;
-         edje_object_message_signal_process(wd->tbar);
+	edje_object_signal_emit(wd->tbar, "elm,state,icon,hidden", "elm");
+	wd->icon = NULL;
+	edje_object_message_signal_process(wd->tbar);
      }
    else if (sub == wd->end) wd->end = NULL;
    _sizing_eval(obj);
@@ -172,12 +172,12 @@ elm_titlebar_icon_set(Evas_Object * obj, Evas_Object * icon)
    wd->icon = icon;
    if (icon)
      {
-         elm_widget_sub_object_add(obj, icon);
-         edje_object_part_swallow(wd->tbar, "elm.swallow.icon", icon);
-         evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                 _changed_size_hints, obj);
-         edje_object_signal_emit(wd->tbar, "elm,state,icon,visible", "elm");
-         edje_object_message_signal_process(wd->tbar);
+	elm_widget_sub_object_add(obj, icon);
+	edje_object_part_swallow(wd->tbar, "elm.swallow.icon", icon);
+	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+				       _changed_size_hints, obj);
+	edje_object_signal_emit(wd->tbar, "elm,state,icon,visible", "elm");
+	edje_object_message_signal_process(wd->tbar);
      }
    _sizing_eval(obj);
 }
@@ -218,10 +218,10 @@ elm_titlebar_end_set(Evas_Object * obj, Evas_Object * end)
    wd->end = end;
    if (end)
      {
-         elm_widget_sub_object_add(obj, end);
-         evas_object_event_callback_add(end, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                 _changed_size_hints, obj);
-         edje_object_part_swallow(wd->tbar, "elm.swallow.end", end);
+	elm_widget_sub_object_add(obj, end);
+	evas_object_event_callback_add(end, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+				       _changed_size_hints, obj);
+	edje_object_part_swallow(wd->tbar, "elm.swallow.end", end);
      }
    _sizing_eval(obj);
 }
