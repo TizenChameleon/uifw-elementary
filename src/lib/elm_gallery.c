@@ -1,3 +1,12 @@
+/**
+  *
+  * @addtogroup Gallery
+  *
+  * This is an gallery.
+  *
+  */
+
+
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -834,6 +843,14 @@ static void _gallery_move_left_cb(Evas_Object *obj, int index)
 	}
 }
 
+
+/**
+  * This function  makes a new gallery object
+  * @param parent The parent object
+  * @return  new gallery object 
+  *
+  * @ingroup Gallery
+  */
 EAPI Evas_Object *elm_gallery_add(Evas_Object *parent)
 {
 	Evas_Object *obj;
@@ -855,6 +872,15 @@ EAPI Evas_Object *elm_gallery_add(Evas_Object *parent)
 	return obj;
 }
 
+
+/**
+  * The function appends an item and return the item class.
+  * @param obj The gallery object
+  * @param photo_file image file name
+  * @return new Elm_Gallery_Item
+  *
+  * @ingroup Gallery
+  */
 EAPI Elm_Gallery_Item *elm_gallery_item_append(Evas_Object *obj, const char *photo_file)
 {
 	Widget_Data *wd;
@@ -877,6 +903,15 @@ EAPI Elm_Gallery_Item *elm_gallery_item_append(Evas_Object *obj, const char *pho
 	return it;
 }
 
+
+/**
+  * The function prepends an item and return the item class.
+  * @param obj The gallery object
+  * @param photo_file image file name
+  * @return new Elm_Gallery_Item
+  *
+  * @ingroup Gallery
+  */
 EAPI Elm_Gallery_Item *elm_gallery_item_prepend(Evas_Object *obj, const char *photo_file)
 {
 	Widget_Data *wd;
@@ -899,6 +934,13 @@ EAPI Elm_Gallery_Item *elm_gallery_item_prepend(Evas_Object *obj, const char *ph
 	return it;
 }
 
+
+/**
+  * The function deletes the item
+  * @param it Elm_Gallery_Item
+  *
+  * @ingroup Gallery
+  */
 EAPI void elm_gallery_item_del(Elm_Gallery_Item *it)
 {
 	Widget_Data *wd;
@@ -913,6 +955,14 @@ EAPI void elm_gallery_item_del(Elm_Gallery_Item *it)
 	_resize_gallery(wd->obj);
 }
 
+
+/**
+  * The function gets the file name of certain item using it's item class
+  * @param it Elm_Gallery_Item
+  * @return (char*) file name path
+  *
+  * @ingroup Gallery
+  */
 EAPI const char *elm_gallery_item_file_get(Elm_Gallery_Item *it)
 {
 	if (!it) {
@@ -922,6 +972,7 @@ EAPI const char *elm_gallery_item_file_get(Elm_Gallery_Item *it)
 	
 	return it->path;
 }
+
 
 EAPI void elm_gallery_item_show(Elm_Gallery_Item *it)
 {
@@ -955,6 +1006,14 @@ EAPI void elm_gallery_item_show(Elm_Gallery_Item *it)
 	wd->eidler = ecore_idler_add(_gallery_idle_handler_cb, wd); 	
 }
 
+
+/**
+  * The function gets the list of item class
+  * @param obj The gallery object
+  * @return new Eina_List of All item
+  *
+  * @ingroup Gallery
+  */
 EAPI Eina_List *elm_gallery_item_list_get(Evas_Object *obj)
 {
 	Widget_Data *wd;
@@ -964,6 +1023,15 @@ EAPI Eina_List *elm_gallery_item_list_get(Evas_Object *obj)
 	return wd->list;
 }
 
+
+
+/**
+  * The function set the type value 
+  * @param parent The parent object
+  * @param type Type 1 : image swticher type Type 2 : gallery type
+  *
+  * @ingroup Gallery
+  */
 EAPI void elm_gallery_set_type(Evas_Object *obj,int type)
 {
 	Widget_Data *wd;
@@ -975,6 +1043,15 @@ EAPI void elm_gallery_set_type(Evas_Object *obj,int type)
 	_gallery_set_all_status(obj,type);
 }
 
+
+
+/**
+  *The function determines a max number of images to be shown in a row
+  * @param parent The parent object
+  * @param max_value the value of max
+  *
+  * @ingroup Gallery
+  */  
 EAPI void elm_gallery_set_max_count(Evas_Object *obj,int max_value)
 {
 	Widget_Data *wd;
