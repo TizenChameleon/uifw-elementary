@@ -1,11 +1,10 @@
 /*
+ * @addgroup SlidingDrawer
  *
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ * This is a slidingdrawer.
  */
 #include <Elementary.h>
 #include "elm_priv.h"
-
-#define dbg(fmt,args...) printf("[%s:%d] "fmt"\n", __FILE__, __LINE__, ##args); 
 
 typedef struct _Widget_Data Widget_Data;
 
@@ -13,7 +12,6 @@ struct _Widget_Data
 {
 	Evas_Object *sd;
 };
-
 
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
@@ -27,7 +25,6 @@ _del_hook(Evas_Object *obj)
 	if (!wd) return;
 	free(wd);
 }
-
 
 /*
  * FIXME:
@@ -51,22 +48,28 @@ _sizing_eval(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 }
 
+/**
+ * Set content to the slidingdrawer
+ *
+ * @param[in] obj Slidingdrawer object
+ * @param[in] content Custom object
+ * @ingroup SlidingDrawer
+ */
 EAPI void
 elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
-
 	if (!content) return;
 
 	edje_object_part_swallow (wd->sd, "content.swallow", content);
 }
 
 /**
- * Add a new analog clock to the parent
+ * Add a new slidingdrawer to the parent
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
- *
+ * @ingroup SlidingDrawer
  */
 EAPI Evas_Object *
 elm_slidingdrawer_add(Evas_Object *parent)
