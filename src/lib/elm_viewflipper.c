@@ -1,13 +1,26 @@
+/**
+  *
+  * @addtogroup Viewflipper
+  *
+  * This is an viewflipper.
+  * viewflipper api can retrun the following values 
+  *  	ERROR_0  = -1,    //can not find wanted value
+  *   SUCCESS =0,		
+  *	ERROR_1  =1001,	//confrim parameter is layout or not
+  *	ERROR_2 ,	//confrim memory check
+  *	ERROR_3 ,	//data is empty
+  *	ERROR_4 ,	//check the range
+  *	ERROR_5 ,	//Non need operation
+  *	ERROR_6 ,	//waiting gui
+  *	ERROR_7 ,	//timer second is not setup or can not time setup
+  */
+
+
 #include <Elementary.h>
 #include "elm_priv.h"
 
 #define TRUE   1
 #define FALSE 0
-
-//#define LAYOUT_x 240
-//#define LAYOUT_y 400
-//#define LAYOUT_x 480
-//#define LAYOUT_y 800
 
 typedef struct _Widget_Data Widget_Data;
 
@@ -376,7 +389,13 @@ _setup_button_show_left_right()
 	}
 }
 
-
+/**
+  * This function  makes a new viewflipper object
+  * @param parent The parent object
+  * @return  new viewflipper object 
+  *
+  * @ingroup Viewflipper
+  */
 EAPI Evas_Object * 
 elm_viewflipper_add(Evas_Object * parent)
 {
@@ -399,11 +418,6 @@ elm_viewflipper_add(Evas_Object * parent)
     wd->viewflipper = edje_object_add(evas_object_evas_get(obj));
     _elm_theme_object_set(obj,wd->viewflipper,  "viewflipper", "base", "default");
 
-
-//   evas_object_resize(wd->viewflipper, LAYOUT_x, LAYOUT_y);
-//   evas_object_move(wd->viewflipper,0,0);
-//   evas_object_show(wd->viewflipper);
-  
     evas_object_event_callback_add(wd->viewflipper, EVAS_CALLBACK_MOUSE_DOWN,
                                   _mouse_down, obj);
     evas_object_event_callback_add(wd->viewflipper, EVAS_CALLBACK_MOUSE_UP,
@@ -428,17 +442,43 @@ elm_viewflipper_add(Evas_Object * parent)
    return obj;
 }
 
-
+/**
+  * This function returns the value of button show setting
+  *
+  * @return  the value of button show setting (TRUE,FALSE)
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_isFlipbutton()
 {
 	return _get_this()->is_show_button;
 }
+
+
+
+/**
+  * This function checks if auto sliding is in use
+  *
+  * @return  the value of auto sliding is in use (TRUE,FALSE)
+  *
+  * @ingroup Viewflipper
+  */
 EAPI 
 int elm_viewflipper_isAutoStart()
 {
 	return _get_this()->is_auto_start;
 }
+
+
+
+/**
+  * This function checks if the index is valid
+  * @param pos index of layout
+  * @return  TRUE , FALSE 
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_isValidPos(int pos)
 {
@@ -450,6 +490,16 @@ elm_viewflipper_isValidPos(int pos)
 
 	return TRUE;	
 }
+
+
+
+/**
+  * This function appends(adds) a layout to viewflipper
+  * @param child_layout  the item(layout)
+  * @return  SUCCESS , ERROR_1 ,ERROR_2
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_addChild(Evas_Object * child_layout)
 {
@@ -460,10 +510,18 @@ elm_viewflipper_addChild(Evas_Object * child_layout)
 		return ERROR_1;
 	
 	_get_this()->view_list = eina_list_append(_get_this()->view_list, child_layout);
-  printf("addChild\n");
+ 	 printf("addChild\n");
 	return SUCCESS;
 }
 
+
+/**
+  * This function removes a child layout from the viewflipper
+  * @param child_layout  the item(layout)
+  * @return  SUCCESS ,ERROR_0, ERROR_1 ,ERROR_2 
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_removeChild(Evas_Object * child_layout)
 {
@@ -489,6 +547,15 @@ elm_viewflipper_removeChild(Evas_Object * child_layout)
     	 }   
 	 return ERROR_0;  
 }
+
+
+/**
+  * This function removes a child a layout using it's index
+  * @param pos index of layout
+  * @return  SUCCESS ,ERROR_0,ERROR_2,ERROR_4
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_removeChildAt(int pos)
 {
@@ -518,6 +585,14 @@ elm_viewflipper_removeChildAt(int pos)
 	 return ERROR_0;  
 }
 
+
+/**
+  * This function gets the index of  layout
+  * @param child_layout the item(layout)
+  * @return  index, ERROR_0,ERROR_1,ERROR_2
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_getPositionChild(Evas_Object * child_layout)
 {
@@ -541,6 +616,14 @@ elm_viewflipper_getPositionChild(Evas_Object * child_layout)
     	 }   
 	 return ERROR_0;  
 }
+
+/**
+  * This function gets the layout using index
+  * @param pos index of layout
+  * @return  NULL, layout object 
+  *
+  * @ingroup Viewflipper
+  */
 EAPI Evas_Object * 
 elm_viewflipper_getChildAt(int pos)//start 0
 {
@@ -563,6 +646,14 @@ elm_viewflipper_getChildAt(int pos)//start 0
    } 
    return NULL;
 }
+
+/**
+  * This function gets the count of layouts in a viewflipper
+  *
+  * @return  Count Number  , ERROR_2
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_getCountChild()
 {
@@ -572,6 +663,14 @@ elm_viewflipper_getCountChild()
 	return eina_list_count(_get_this()->view_list);
 }
 
+
+/**
+  * This function slides to given index from current one
+  * @param pos index of layout
+  * @return  SUCCESS ,ERROR_4,ERROR_5
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_setDisplayedChild(int pos)
 {
@@ -591,14 +690,33 @@ elm_viewflipper_setDisplayedChild(int pos)
 	{
 		elm_viewflipper_startAutoFlippingWithOption(DIR_RIGHT,pos);
 	}
+	return SUCCESS
 	
 }
 
+
+/**
+  * This function show the viewflipper
+  *
+  * @return  SUCCESS , ERROR_3
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_setNowView()
 {
 	return _setView();	
 }
+
+
+
+/**
+  * This function show the next layout
+  *
+  * @return  SUCCESS ,ERROR_5, ERROR_6
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_setNextView()
 {
@@ -613,7 +731,19 @@ elm_viewflipper_setNextView()
 	
 	edje_object_signal_emit(_get_this()->viewflipper, "moving_left_pos", "elm");
 	printf("elm_viewflipper_setNextView\n");
+	return SUCCESS
 }
+
+
+
+
+/**
+  * This function show the previous layout
+  *
+  * @return  SUCCESS , ERROR_5, ERROR_6
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_setPreviousView()
 {
@@ -628,8 +758,18 @@ elm_viewflipper_setPreviousView()
 	
 	edje_object_signal_emit(_get_this()->viewflipper, "moving_right_pos", "elm");	
 	printf("elm_viewflipper_setPreviousView\n");
+	return SUCCESS
 }
 
+
+
+/**
+  * This function sets the value of sliding interval time
+  * @param milliseconds milliseconds(interval time)
+  * @return  SUCCESS , ERROR_7
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_setFlipInterval(int milliseconds) 
 {
@@ -637,10 +777,18 @@ elm_viewflipper_setFlipInterval(int milliseconds)
 		return ERROR_7;
 
 	_get_this()->time_sec=milliseconds;
+	return SUCCESS
 }
 
 
 
+/**
+  * This function sets the option of showing buttons or not
+  * @param showbutton TRUE,FALSE
+  * @return  SUCCESS 
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_setFlipbutton(int showbutton)
 {
@@ -654,6 +802,7 @@ elm_viewflipper_setFlipbutton(int showbutton)
 		_get_this()->is_show_button=FALSE;
 		edje_object_signal_emit(_get_this()->viewflipper, "button_hide", "elm");	
 	}
+	return SUCCESS
 }
 
 
@@ -674,8 +823,17 @@ elm_viewflipper_startAutoFlippingWithOption(int drection,int pos)
 
 	_get_this()->auto_timer=  ecore_timer_add(_get_this()->time_sec , _flipping_timer_cb, NULL);
 	_get_this()->is_auto_start=TRUE;
-       	printf("elm_viewflipper_startAutoFlippingWithOption\n");
+       printf("elm_viewflipper_startAutoFlippingWithOption\n");
+	   return SUCCESS
 }
+
+/**
+  * This function  starts the auto sliding
+  *
+  * @return  ERROR_7 , SUCCESS
+  *
+  * @ingroup Viewflipper
+  */
 EAPI int 
 elm_viewflipper_startAutoFlipping() 
 {
@@ -691,7 +849,17 @@ elm_viewflipper_startAutoFlipping()
 	_get_this()->auto_timer=  ecore_timer_add(_get_this()->time_sec , _flipping_timer_cb, NULL);
 	_get_this()->is_auto_start=TRUE;
 	printf("elm_viewflipper_startAutoFlipping\n");
+	return SUCCESS
 }
+
+/**
+  * This function steps the auto sliding.
+  *
+  * @return  ERROR_5 , SUCCESS
+  *
+  * @ingroup Viewflipper
+  */
+
 EAPI int 
 elm_viewflipper_stopAutoFlipping()
 {	
@@ -705,6 +873,7 @@ elm_viewflipper_stopAutoFlipping()
 	_get_this()->request_direction= 0;
 	_get_this()->request_pos = 0;	
         printf("elm_viewflipper_stopAutoFlipping\n");
+	return SUCCESS
 }
 
 
