@@ -95,12 +95,12 @@ static float _size_rate = 1;
 static int _item_cnt = 0;
 
 /**
- * @ingroup Quickcontactbadge
- *
  * Get the icon object for the given item.
  *
- * @param item 		Quickcontactbadge item
+ * @param item 	Quickcontactbadge item
  * @return 		Icon object or NULL if the item does not have icon
+ *
+ * @ingroup Quickcontactbadge
  */
 EAPI Evas_Object* elm_quickcontactbadge_item_icon_get( Elm_Quickcontactbadge_Item* item )
 {
@@ -111,14 +111,13 @@ EAPI Evas_Object* elm_quickcontactbadge_item_icon_get( Elm_Quickcontactbadge_Ite
 	return item->content;
 }
 
-
 /**
- * @ingroup Quickcontactbadge
- *
  * Add a new Quickcontactbadge object to the parent.
  *
- * @param parent 	Parent object
+ * @param parent    Parent object
  * @return 		New object or NULL if it cannot be created
+ * 
+ * @ingroup Quickcontactbadge 
  */
 EAPI Evas_Object* elm_quickcontactbadge_add( Evas_Object* parent )
 {
@@ -193,13 +192,12 @@ EAPI Evas_Object* elm_quickcontactbadge_add( Evas_Object* parent )
 	return obj;
 }
 
-
 /**
- * @ingroup Quickcontactbadge
- *
  * Clear all items in given Quickcontactbadge object.
  *
  * @param obj 		Quickcontactbadge object
+ *
+ * @ingroup Quickcontactbadge
  */
 EAPI void elm_quickcontactbadge_clear( Evas_Object* obj )
 {
@@ -229,6 +227,14 @@ EAPI void elm_quickcontactbadge_clear( Evas_Object* obj )
 	evas_object_hide( wd->layout );	
 }
 
+/**
+ * Change the mode to horizontal or vertical.
+ *
+ * @param obj   	Quickcontactbadge object
+ * @param horizontal 	EINA_TRUE - horizontal mode, EINA_FALSE - vertical mode
+ *
+ * @ingroup Quickcontactbadge
+ */
 EAPI void elm_quickcontactbadge_horizontal_set( Evas_Object* obj, Eina_Bool horizontal )
 {
 	Widget_Data* wd = (Widget_Data*) elm_widget_data_get( obj );
@@ -254,12 +260,12 @@ EAPI void elm_quickcontactbadge_horizontal_set( Evas_Object* obj, Eina_Bool hori
 
 
 /**
- * @ingroup Quickcontactbadge
- *
  * reset the icon on the given item. This function is only for icon item.
  *
  * @param obj 	 	Quickcontactbadge item
  * @param icon		Icon object to be set
+ *
+ * @ingroup Quickcontactbadge
  */
 EAPI void elm_quickcontactbadge_item_icon_set( Elm_Quickcontactbadge_Item* item, Evas_Object* icon )
 {
@@ -301,18 +307,16 @@ EAPI void elm_quickcontactbadge_item_icon_set( Elm_Quickcontactbadge_Item* item,
 
 }
 
-
-
 /**
- * @ingroup Quickcontactbadge
- *
- * Add a new item as an icon in given Quickcontactbadge object.
+ * Add a new item as an icon in given quickcontactbadge object.
  *
  * @param obj 	 	Quickcontactbadge object
  * @param icon		Icon to be set
  * @param func		Callback function to call when this item click is clicked
  * @param data          User data for callback function
- * @return 		Added Quickcontactbadge item
+ * @return 		Added quickcontactbadge item
+ * 
+ * @ingroup Quickcontactbadge
  */
 EAPI Elm_Quickcontactbadge_Item* elm_quickcontactbadge_icon_add(
 		Evas_Object* obj,
@@ -360,11 +364,11 @@ EAPI Elm_Quickcontactbadge_Item* elm_quickcontactbadge_icon_add(
 
 
 /**
- * @ingroup Quickcontactbadge
- *
- * Delete the given item in Quickcontactbadge object.
+ * Delete the given item in quickcontactbadge object.
  *
  * @param item 	 	Quickcontactbadge item to be deleted
+ *
+ * @ingroup Quickcontactbade
  */
 EAPI void elm_quickcontactbadge_item_del( Elm_Quickcontactbadge_Item* item )
 {
