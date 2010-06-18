@@ -690,7 +690,7 @@ elm_viewflipper_setDisplayedChild(int pos)
 	{
 		elm_viewflipper_startAutoFlippingWithOption(DIR_RIGHT,pos);
 	}
-	return SUCCESS
+	return SUCCESS;
 	
 }
 
@@ -731,7 +731,7 @@ elm_viewflipper_setNextView()
 	
 	edje_object_signal_emit(_get_this()->viewflipper, "moving_left_pos", "elm");
 	printf("elm_viewflipper_setNextView\n");
-	return SUCCESS
+	return SUCCESS;
 }
 
 
@@ -758,7 +758,7 @@ elm_viewflipper_setPreviousView()
 	
 	edje_object_signal_emit(_get_this()->viewflipper, "moving_right_pos", "elm");	
 	printf("elm_viewflipper_setPreviousView\n");
-	return SUCCESS
+	return SUCCESS;
 }
 
 
@@ -777,7 +777,7 @@ elm_viewflipper_setFlipInterval(int milliseconds)
 		return ERROR_7;
 
 	_get_this()->time_sec=milliseconds;
-	return SUCCESS
+	return SUCCESS;
 }
 
 
@@ -802,7 +802,7 @@ elm_viewflipper_setFlipbutton(int showbutton)
 		_get_this()->is_show_button=FALSE;
 		edje_object_signal_emit(_get_this()->viewflipper, "button_hide", "elm");	
 	}
-	return SUCCESS
+	return SUCCESS;
 }
 
 
@@ -824,7 +824,7 @@ elm_viewflipper_startAutoFlippingWithOption(int drection,int pos)
 	_get_this()->auto_timer=  ecore_timer_add(_get_this()->time_sec , _flipping_timer_cb, NULL);
 	_get_this()->is_auto_start=TRUE;
        printf("elm_viewflipper_startAutoFlippingWithOption\n");
-	   return SUCCESS
+	   return SUCCESS;
 }
 
 /**
@@ -849,7 +849,7 @@ elm_viewflipper_startAutoFlipping()
 	_get_this()->auto_timer=  ecore_timer_add(_get_this()->time_sec , _flipping_timer_cb, NULL);
 	_get_this()->is_auto_start=TRUE;
 	printf("elm_viewflipper_startAutoFlipping\n");
-	return SUCCESS
+	return SUCCESS;
 }
 
 /**
@@ -873,7 +873,7 @@ elm_viewflipper_stopAutoFlipping()
 	_get_this()->request_direction= 0;
 	_get_this()->request_pos = 0;	
         printf("elm_viewflipper_stopAutoFlipping\n");
-	return SUCCESS
+	return SUCCESS;
 }
 
 
