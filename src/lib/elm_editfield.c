@@ -593,6 +593,15 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 		edje_object_signal_emit(wd->base, "elm,state,eraser,hide", "elm");
 }
 
+/**
+ * Set enable user to clean all of text.
+ *
+ * @param obj The editfield object  
+ * @param visible If true, the eraser is visible and user can clean all of text by using eraser.  
+ * If false, the eraser is invisible.
+ *
+ * @ingroup Editfield
+ */
 EAPI void
 elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
 {
