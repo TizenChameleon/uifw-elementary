@@ -70,6 +70,7 @@ struct _Widget_Data
 	Ecore_Idler *idler;
 	Ecore_Idler *check_idler;
 	Eina_Bool flag;
+	Eina_Bool init;
 
 	Ecore_Event_Handler *move_event;
 	Ecore_Event_Handler *up_event;
@@ -99,22 +100,35 @@ static void
 _del_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
+	Elm_Diskcontroller_Item *item;
 
 	if (!wd) return;
 
 	if (wd->main_box) {
-		evas_object_smart_member_del(wd->main_box);
 		evas_object_del(wd->main_box);
 		wd->main_box = NULL;
 	}
 
+	if (wd->scroller) {
+		evas_object_del(wd->scroller);
+		wd->scroller = NULL;
+	}
+
 	if (wd->edje) {
-		evas_object_smart_member_del(wd->edje);
 		evas_object_del(wd->edje);
 		wd->edje = NULL;
 	}
 
+	EINA_LIST_FREE(wd->items, item){
+		eina_stringshare_del(item->label);
+		if(item->icon) evas_object_del(item->icon);
+		if(item->base) evas_object_del(item->base);
+		free(item);
+		item = NULL;
+	}
+
 	free(wd);
+	wd = NULL;
 }
 
 static void
@@ -223,10 +237,11 @@ static int check_string(void *data)
 	Eina_List *list;
 
 	if(wd->w <= 0) return EXIT_FAILURE;
+	if(!wd->init) return EXIT_FAILURE;
 
 	if(!wd->round) list = wd->items;
 	else list = wd->r_items;
-
+	
 	EINA_LIST_FOREACH(list, l, it) {
 		evas_object_geometry_get(it->base, &x, &y, &w, &h);
 		mid = (int)(x + w/2);
@@ -264,12 +279,16 @@ static void scroller_move_cb(void *data, Evas_Object *obj, void *event_info)
 {
 	Evas_Coord x, y, w, h;
 	Widget_Data *wd = (Widget_Data *)data;
-
+	
 	check_string(wd);
 
 	if(wd->round) {
 		elm_scroller_region_get(wd->scroller, &x, &y, &w, &h);
 
+		if(x > 100000 || x < -100000){
+			elm_scroller_region_show(wd->scroller, 0, y, w, h);
+			return;
+		}
 		if(x > wd->w*SCROLLED_DISTANCE/STANDARD_W*(wd->item_num+1)){
 			elm_scroller_region_show(wd->scroller, x-wd->w*SCROLLED_DISTANCE/STANDARD_W*wd->item_num, y, w, h);
 		}else if(x < wd->w*SCROLLED_DISTANCE/STANDARD_W*(1)){
@@ -310,7 +329,7 @@ static int move_scroller(void *data)
 	Widget_Data *wd = (Widget_Data *)data;
 	Eina_List *l;
 	Elm_Diskcontroller_Item *dit;
-	Evas_Coord x, y, w, h;
+	Evas_Coord x, y, w, h;	
 	int i;
 
 	if(wd->round) i = 1;
@@ -332,8 +351,12 @@ static int move_scroller(void *data)
 
 	select_item(dit);
 
-	ecore_idler_del(wd->idler);
-	wd->idler = NULL;
+	if(wd->idler){
+		ecore_idler_del(wd->idler);
+		wd->idler = NULL;
+	}
+
+	wd->init = EINA_TRUE;
 
 	check_string(wd);
 
@@ -366,7 +389,7 @@ static Elm_Diskcontroller_Item *item_new(Evas_Object *obj, Evas_Object *icon, co
 	elm_widget_sub_object_add(obj, it->base);
 
 	if (it->label){
-		string_signal_emit(it);
+		//string_signal_emit(it);
 		edje_object_part_text_set(_EDJ(it->base), "elm.text", it->label);
 	}
 
@@ -496,7 +519,7 @@ EAPI Evas_Object *elm_diskcontroller_add(Evas_Object *parent)
 	wd->item_num = 0;
 	wd->round = 0;
 	wd->stop = 0;
-	//wd->init = 0;
+	wd->init = EINA_FALSE;
 
 	/* load background edj */
 	wd->edje = edje_object_add(e);
@@ -794,7 +817,6 @@ EAPI void elm_diskcontroller_item_focus_set(Elm_Diskcontroller_Item *it)
 
 	if(wd->idler == NULL) ecore_idler_add(move_scroller, wd);
 }
-
 
 
 ///////////////////////////////////////////////////////////////////

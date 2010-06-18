@@ -2217,12 +2217,14 @@ extern "C" {
    /* smart callbacks called:
     * "indicator,position" - when a button reaches to the special position like "left", "right" and "center".
     */
+   
    /*zoomcontrols*/
    EAPI Evas_Object *elm_zoomcontrols_add(Evas_Object *parent);
    EAPI void elm_zoomcontrols_range_set(Evas_Object *obj, int range);
-   // up_clicked 
-   // down_clicked
-   //         
+   /* smart callbacks called:
+    * "up_clicked" - when up button of zoomcontrols is clicked 
+    * "down_clicked" - when down button of zoomcontrols is clicked
+    */         
 
        /*viewflipper*/
 	typedef enum _Elm_Viewflipper_Policy

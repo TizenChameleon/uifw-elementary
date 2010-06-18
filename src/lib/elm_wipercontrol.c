@@ -1,11 +1,11 @@
 /*
+ * @addgroup WiperControl
  *
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ * This is a wipercontrol.
  */
+
 #include <Elementary.h>
 #include "elm_priv.h"
-
-#define dbg(fmt,args...) printf("[%s:%d] "fmt"\n", __FILE__, __LINE__, ##args); 
 
 typedef struct _Widget_Data Widget_Data;
 
@@ -13,7 +13,6 @@ struct _Widget_Data
 {
 	Evas_Object *sd;
 };
-
 
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
@@ -51,33 +50,45 @@ _sizing_eval(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 }
 
+/**
+ * Set below content to the wipercontrol
+ *
+ * @param[in] obj Wipercontrol object
+ * @param[in] content Custom object
+ * @ingroup WiperControl
+ */
 EAPI void
 elm_wipercontrol_below_content_set (Evas_Object *obj, Evas_Object *content)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
-
 	if (!content) return;
 
 	edje_object_part_swallow (wd->sd, "content.below.swallow", content);
 }
 
+/**
+ * Set above content to the wipercontrol
+ *
+ * @param[in] obj Wipercontrol object
+ * @param[in] content Custom object
+ * @ingroup WiperControl
+ */
 EAPI void
 elm_wipercontrol_above_content_set (Evas_Object *obj, Evas_Object *content)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
-
 	if (!content) return;
 
 	edje_object_part_swallow (wd->sd, "content.above.swallow", content);
 }
 
 /**
- * Add a new analog clock to the parent
+ * Add a new wipercontrol to the parent
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
- *
+ * @ingroup WiperControl
  */
 EAPI Evas_Object *
 elm_wipercontrol_add(Evas_Object *parent)
@@ -106,4 +117,3 @@ elm_wipercontrol_add(Evas_Object *parent)
 
 	return obj;
 }
-
