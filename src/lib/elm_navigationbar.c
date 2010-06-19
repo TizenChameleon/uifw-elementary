@@ -112,9 +112,12 @@ _theme_hook(Evas_Object *obj)
 
 	 EINA_LIST_FOREACH(wd->stack, ll, it)
 	{
-		elm_object_style_set(it->left_btn, "custom/darkblue");
-		elm_object_style_set(it->right_btn, "custom/darkblue");
-		elm_object_style_set(it->back_btn, "backkey");
+		//elm_object_style_set(it->left_btn, "custom/darkblue");
+		elm_object_style_set(it->left_btn, "navigationbar/normal");
+		//elm_object_style_set(it->right_btn, "custom/darkblue");
+		elm_object_style_set(it->right_btn, "navigationbar/normal");
+		//elm_object_style_set(it->back_btn, "backkey");
+		elm_object_style_set(it->back_btn, "navigationbar/back");
 	}
 
 	_sizing_eval(obj);
