@@ -58,7 +58,6 @@ _theme_hook(Evas_Object *obj)
    edje_object_scale_set(wd->lay, elm_widget_scale_get(obj) *
                          _elm_config->scale);
    _sizing_eval(obj);
-   printf("theme hook ----\n");
 }
 
 static void
