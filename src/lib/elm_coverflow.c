@@ -987,7 +987,8 @@ EAPI Evas_Object* elm_coverflow_add( Evas_Object* parent )
 		return NULL;
 	}
 
-	elm_win_resize_object_add( parent, obj );
+//	elm_win_resize_object_add( parent, obj );
+	elm_widget_resize_object_set( parent, obj );
 
 	elm_widget_type_set( obj, "coverflow" );
 	elm_widget_sub_object_add( parent, obj );
