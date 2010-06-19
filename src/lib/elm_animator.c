@@ -1,16 +1,3 @@
-/*
- * SLP
- * Copyright (c) 2010 Samsung Electronics, Inc.
- * All rights reserved.
- *
- * This software is a confidential and proprietary information
- * of Samsung Electronics, Inc. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with Samsung Electronics.
- */
-
-
 /**
  *
  * @addtogroup Animator
@@ -298,7 +285,6 @@ EAPI void elm_animator_curve_style_set( Elm_Animator* animator, Elm_Animator_Cur
 			animator->curve_op = _animator_curve_out;
 			break;
 		default:
-			fprintf( stderr, "What Animation Curve Style?!\n" );
 			animator->curve_op = _animator_curve_linear;
 			break;
 
