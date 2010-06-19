@@ -97,7 +97,7 @@ _repeat_animation_cb(void *data)
 }
 
 /**
- * Add a new animatedicon to the parent
+ * Add a new animatedicon to the parent.
  *
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
