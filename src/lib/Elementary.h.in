@@ -1890,7 +1890,7 @@ extern "C" {
 
 
    /* animator */
-   typedef struct _animator Elm_Animator;
+   typedef struct _Animator Elm_Animator;
 
    typedef enum { ELM_ANIMATOR_CURVE_LINEAR, ELM_ANIMATOR_CURVE_IN_OUT, ELM_ANIMATOR_CURVE_IN, ELM_ANIMATOR_CURVE_OUT } Elm_Animator_Curve_Style; 
 
