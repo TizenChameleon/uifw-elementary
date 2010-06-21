@@ -822,11 +822,10 @@ static void _elm_fx_zoom_op( void* data, Elm_Animator* animator, const double fr
 	if( map == NULL ) {
 		return ;
 	}
-
 	
 	Evas_Coord x, y, w, h;
 	evas_object_geometry_get( zoom->obj, &x, &y, &w, &h );
-	
+
 	evas_map_smooth_set( map, EINA_TRUE );
 
 	evas_map_util_points_populate_from_object_full( map, 
@@ -834,8 +833,8 @@ static void _elm_fx_zoom_op( void* data, Elm_Animator* animator, const double fr
 
 	evas_map_util_3d_perspective( map, x + w / 2, y + h / 2, 0, 10000 );
 
-	evas_object_map_enable_set( zoom->obj, EINA_TRUE );
 	evas_object_map_set( zoom->obj, map );
+	evas_object_map_enable_set( zoom->obj, EINA_TRUE );
 	evas_map_free( map );
 
 
