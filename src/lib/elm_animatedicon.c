@@ -11,7 +11,8 @@
  */
 
 /**
- * @addtogroup Animatedicon Animatedicon 
+ * @defgroup Animatedicon Animatedicon 
+ * @ingroup Elementary
  *
  * This is an animatedicon.
  */

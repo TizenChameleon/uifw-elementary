@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Picker Picker
+ * @defgroup Picker Picker
+ * @ingroup Elementary
  *
  * This is a picker.
  */

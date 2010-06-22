@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Anchorview Anchorview
+ * @ingroup Elementary
  *
  * This is just like the Anchorblock object, but provides a scroller to hold
  * the text automatically.

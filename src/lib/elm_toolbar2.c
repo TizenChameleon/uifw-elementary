@@ -5,9 +5,9 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Toolbar Toolbar
+ * @defgroup Toolbar Toolbar
+ * @ingroup Elementary
  *
- * @addtogroup Toolbar Toolbar
  * For listing a selection of items in a list within a "bar", each item having an icon and label.
  * This is more or less intended for use when selecting different modes - much like a tab widget,
  * but this is just the bar piece.

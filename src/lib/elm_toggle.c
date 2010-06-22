@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @defgroup Toggle
+ * @defgroup Toggle Toggle
+ * @ingroup Elementary
  *
  * A toggle is a slider which can be used to toggle between
  * two values.  It has two states: on and off.

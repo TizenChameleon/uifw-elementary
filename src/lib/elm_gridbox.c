@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Gridbox
+ * @defgroup Gridbox Gridbox
+ * @ingroup Elementary
  *
  * This is a gridbox
  */

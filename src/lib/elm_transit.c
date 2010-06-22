@@ -13,7 +13,8 @@
 
 /**
  *
- * @addtogroup Transit
+ * @defgroup Transit Transit
+ * @ingroup Elementary
  *
  * Transit 
 */

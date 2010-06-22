@@ -3,7 +3,8 @@
 #include <math.h>
 
 /**
- * @addtogroup Discpicker Discpicker
+ * @defgroup Discpicker Discpicker
+ * @ingroup Elementary
  *
  * This is a discpicker.
  */

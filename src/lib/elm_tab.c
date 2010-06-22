@@ -13,6 +13,7 @@
 
 /**
  * @addtogroup Tab Tab
+ * @ingroup Elementary
  *
  * This is a Tab. It can contain label and icon objects.
  * You can change the location of items.

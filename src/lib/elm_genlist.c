@@ -7,6 +7,7 @@
 
 /**
  * @defgroup Genlist Genlist
+ * @ingroup Elementary
  *
  * The aim was to have  more expansive list that the simple list in
  * Elementary that could have more flexible items and allow many more entries

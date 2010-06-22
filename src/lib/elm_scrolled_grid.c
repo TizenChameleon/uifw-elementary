@@ -6,6 +6,7 @@
 
 /**
  * @defgroup Grid Scrolled Grid
+ * @ingroup Elementary
  *
  * This widget aims to position objects in a grid layout while actually
  * building only the visible ones, using the same idea as genlist: the user

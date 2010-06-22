@@ -1,5 +1,6 @@
 /**
  * @defgroup Fileselector Fileselector
+ * @ingroup Elementary
  *
  * A fileselector is a widget that allows a user to navigate through a tree
  * of files.  It contains buttons for Home(~) and Up(..) as well as cancel/ok

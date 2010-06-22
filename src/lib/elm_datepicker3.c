@@ -4,7 +4,8 @@
 #include <string.h>
 
 /**
- * @addtogroup Datepicker3 Datepicker3
+ * @defgroup Datepicker3 Datepicker3
+ * @ingroup Elementary
  *
  * This is a date picker3.
  */

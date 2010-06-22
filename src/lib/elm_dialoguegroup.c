@@ -3,7 +3,8 @@
 #include <Ecore.h>
 
 /**
- * @addtogroup DialogueGroup DialogueGroup 
+ * @defgroup DialogueGroup DialogueGroup 
+ * @ingroup Elementary
  *
  * Using dialoguegroup, you can make a dialogue group.
  */

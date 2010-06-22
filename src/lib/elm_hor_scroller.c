@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Scroller Scroller
+ * @defgroup Scroller Scroller
+ * @ingroup Elementary
  *
  * A scroller holds a single object and "scrolls it around". This means that
  * it allows the user to use a scrollbar (or a finger) to drag the viewable

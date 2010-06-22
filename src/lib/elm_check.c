@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Check Check
+ * @ingroup Elementary
  *
  * The check widget allows for toggling a value between true or false (1 or 0).
  *

@@ -16,7 +16,8 @@
 //#define SCALE_DOWN_FACTOR (0.125)
 
 /**
- * @addtogroup Cabinet Cabinet
+ * @defgroup Cabinet Cabinet
+ * @ingroup Elementary
  *
  * This is a cabinet.
  */

@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Conformant Conformant
+ * @ingroup Elementary
  * 
  * The aim is to provide a widget that can be used in elementary apps to 
  * account for space taken up by the indicator & softkey windows when running 

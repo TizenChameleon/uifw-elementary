@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @defgroup Theme
+ * @defgroup Theme Theme
+ * @ingroup Elementary
  *
  * Functions to modify the theme in the currently running app.
  */

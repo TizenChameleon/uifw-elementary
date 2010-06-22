@@ -7,7 +7,8 @@
 
 #define ZC_DEFAULT_RANGE 5
 /**
- * @addtogroup ZoomControls
+ * @defgroup ZoomControls ZoomControls
+ * @ingroup Elementary
  *
  * This is a zoomcontrols. Press it and run some function.
  */

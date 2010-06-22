@@ -3,7 +3,7 @@
 
 /**
  * @defgroup NavigationBar NavigationBar
- * @ingroup [Elementary]
+ * @ingroup Elementary
  *
  * The Navigationbar is an object that manages the presentation of hierarchical data in your application.
  * It covers whole content region with a bar, typically displayed at the top of the screen, 

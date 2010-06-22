@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Softkey Softkey
+ * @defgroup Softkey Softkey
+ * @ingroup Elementary
  *
  * This is a softkey
  */

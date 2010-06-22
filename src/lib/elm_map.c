@@ -7,6 +7,7 @@
 
 /**
  * @defgroup Map Map
+ * @ingroup Elementary
  *
  * This is a widget specifically for displaying the free map OpenStreetMap.
  *

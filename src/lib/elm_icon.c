@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Icon Icon
+ * @ingroup Elementary
  *
  * A standard icon that may be provided by the theme (delete, edit,
  * arrows etc.) or a custom file (PNG, JPG, EDJE etc.) used for an

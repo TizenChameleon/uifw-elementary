@@ -4,6 +4,7 @@
 
 /**
  * @defgroup Popup Popup
+ * @ingroup Elementary
  *
  * This is a popup widget. it can be used to display information/ get information from user.
  */

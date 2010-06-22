@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Ctxpopup
+ * @defgroup Ctxpopup Ctxpopup
+ * @ingroup Elementary
  *
  * Contextual popup.
  */

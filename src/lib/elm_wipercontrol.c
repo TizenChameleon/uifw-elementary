@@ -1,5 +1,6 @@
 /*
- * @addgroup WiperControl
+ * @defgroup WiperControl WiperControl
+ * @ingroup Elementary
  *
  * This is a wipercontrol.
  */

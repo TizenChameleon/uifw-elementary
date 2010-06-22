@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @defgroup Hoversel
+ * @defgroup Hoversel Hoversel
+ * @ingroup Elementary
  *
  * A hoversel is a button that pops up a list of items (automatically
  * choosing the direction to display) that have a lable and/or an icon to

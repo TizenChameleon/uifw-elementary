@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Mapbuf Mapbuf
+ * @ingroup Elementary
  *
  * This holds 1 content object and uses an Evas Map to move/resize etc. it.
  */

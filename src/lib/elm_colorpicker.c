@@ -3,7 +3,8 @@
 #include <Ecore.h>
 
 /**
- * @addtogroup Colorpicker Colorpicker
+ * @defgroup Colorpicker Colorpicker
+ * @ingroup Elementary
  *
  * By using colorpicker, you can select a color.
  * Colorpicker made a color using HSV/HSB mode.

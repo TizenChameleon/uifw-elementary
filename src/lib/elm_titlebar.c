@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Titlebar Titlebar
+ * @defgroup Titlebar Titlebar
+ * @ingroup Elementary
  *
  * This is a titlebar widget. It can contain simple label,icon 
  * and other objects.

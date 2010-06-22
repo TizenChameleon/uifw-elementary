@@ -5,6 +5,7 @@
 
 /**
  * @defgroup Bg Bg
+ * @ingroup Elementary
  *
  * The bg object is used for setting a solid background to a window or packing
  * into any container object.

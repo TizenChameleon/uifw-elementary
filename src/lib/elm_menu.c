@@ -6,6 +6,7 @@
 
 /**
  * @defgroup Menu Menu
+ * @ingroup Elementary
  *
  * A menu is a list of items displayed above the window. Each item can
  * have a sub-menu. The menu object can be used to display a menu on right

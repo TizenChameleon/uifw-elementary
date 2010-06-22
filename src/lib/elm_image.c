@@ -6,6 +6,7 @@
 
 /**
  * @defgroup Image Image
+ * @ingroup Elementary
  *
  * A standard image that may be provided by the theme (delete, edit,
  * arrows etc.) or a custom file (PNG, JPG, EDJE etc.) used for an

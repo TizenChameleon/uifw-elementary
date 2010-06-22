@@ -12,7 +12,8 @@
 
 /**
  *
- * @addtogroup Actionslider Actionslider
+ * @defgroup Actionslider Actionslider
+ * @ingroup Elementary
  *
  * This is an actionslider.
  */

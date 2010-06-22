@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Entry Entry
+ * @ingroup Elementary
  *
  * An entry is a convenience widget which shows
  * a box that the user can enter text into.  Unlike a

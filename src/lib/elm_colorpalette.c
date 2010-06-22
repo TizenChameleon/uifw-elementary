@@ -3,7 +3,8 @@
 #include <Ecore.h>
 
 /**
- * @addtogroup Colorpalette Colorpalette
+ * @defgroup Colorpalette Colorpalette
+ * @ingroup Elementary
  *
  * Using colorpalette, you can select a color by clicking
  * a color rectangle on the colorpalette.

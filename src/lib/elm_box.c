@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Box Box
+ * @ingroup Elementary
  *
  * A box object arranges objects in a single row within a box. Sub objects can
  * be added at the start, end or before or after any existing object in the

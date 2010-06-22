@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Radio Radio
+ * @ingroup Elementary
  *
  * The radio button allows for 1 or more selectors to be created to select 1
  * of a set of options.

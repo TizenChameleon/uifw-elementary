@@ -7,6 +7,7 @@
 
 /**
  * @defgroup Button Button
+ * @ingroup Elementary
  *
  * This is a push-button. Press it and run some function. It can contain
  * a simple label and icon object.

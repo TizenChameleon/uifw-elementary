@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Bubble Bubble
+ * @ingroup Elementary
  *
  * The Bubble is an widget used to show a text in a frame as speech is
  * represented in comics.

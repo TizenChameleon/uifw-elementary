@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Index Index
+ * @ingroup Elementary
  *
  * An index object is a type of list that categorizes items in it
  * by letter.

@@ -2,6 +2,7 @@
 #include "elm_priv.h"
 /**
  * @defgroup Notepad Notepad
+ * @ingroup Elementary
  *
  * The notepad is an object for quickly loading a text file, displaying it,
  * allowing editing of it and saving of changes back to the file loaded.

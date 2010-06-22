@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Timepicker3 Timepicker3
+ * @defgroup Timepicker3 Timepicker3
+ * @ingroup Elementary
  *
  * This is a time picker3.
  */

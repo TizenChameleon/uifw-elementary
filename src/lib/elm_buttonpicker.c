@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Buttonpicker Buttonpicker
+ * @defgroup Buttonpicker Buttonpicker
+ * @ingroup Elementary
  *
  * This is a buttonpicker.
  */

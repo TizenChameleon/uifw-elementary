@@ -6,6 +6,7 @@
 
 /**
  * @defgroup Toolbar Toolbar
+ * @ingroup Elementary
  *
  * A toolbar is a widget that displays a list of buttons inside
  * a box.  It is scrollable, and only one item can be selected at a time.
