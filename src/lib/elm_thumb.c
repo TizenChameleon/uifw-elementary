@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Thumb Thumb
+ * @ingroup Elementary
  *
  * A thumb object is used for displaying the thumbnail of an image or video.
  * You must have compiled Elementary with Ethumb_Client support and the DBus

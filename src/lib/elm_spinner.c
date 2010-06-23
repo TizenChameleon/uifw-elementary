@@ -3,7 +3,8 @@
 #include <ctype.h>
 
 /**
- * @defgroup Spinner
+ * @defgroup Spinner Spinner
+ * @ingroup Elementary
  *
  * A spinner is a widget which allows the user to increase or decrease
  * numeric values. By default the spinner will not wrap and has a label

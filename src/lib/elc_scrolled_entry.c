@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Scrolled_Entry Scrolled_Entry
+ * @ingroup Elementary
  *
  * A scrolled entry is a convenience widget which shows
  * a box that the user can enter text into.  Unlike an

@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Pager Pager
+ * @ingroup Elementary
  *
  * The pager is an object that allows flipping (with animation) between 1 or
  * more ?œpages??of objects, much like a stack of windows within the window.

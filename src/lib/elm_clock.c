@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Clock Clock
+ * @ingroup Elementary
  *
  * It's a widget to show clock with animation. The update of time is
  * shown in an animation like the flip of a sheet.

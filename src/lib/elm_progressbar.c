@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Progressbar Progressbar
+ * @ingroup Elementary
  *
  * The progressbar adds a widget for representing current progress
  * of a job status

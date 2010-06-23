@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Hover Hover
+ * @ingroup Elementary
  *
  * A Hover object will over over the @p Parent object at the @p Target
  * location.  Anything in the background will be given a darker coloring

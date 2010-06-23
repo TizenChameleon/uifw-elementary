@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Label Label
+ * @defgroup Label Label
+ * @ingroup Elementary
  *
  * Display text, with simple html-like markup. The theme of course
  * can invent new markup tags and style them any way it likes

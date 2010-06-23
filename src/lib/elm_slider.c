@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Slider Slider
+ * @ingroup Elementary
  *
  * The slider adds a dragable “slider” widget for selecting the value of
  * something within a range.

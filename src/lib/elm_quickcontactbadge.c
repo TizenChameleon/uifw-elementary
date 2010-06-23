@@ -12,7 +12,8 @@
 
 /**
  *
- * @addtogroup QuickContactBadge
+ * @defgroup QuickContactBadge QuickContactBadge
+ * @ingroup Elementary
  *
  * This is an quickcontactbadge.
  */

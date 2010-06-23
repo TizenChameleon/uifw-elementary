@@ -7,6 +7,7 @@
 
 /**
  * @defgroup Notify notify
+ * @ingroup Elementary
  *
  * Display a window in a particular region of the application (top, bottom ...).
  * A timeout can be set to automatically close the window.

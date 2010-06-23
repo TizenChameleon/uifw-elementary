@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Photo Photo
+ * @ingroup Elementary
  *
  * For displaying the photo of a person (contact). Simple yet
  * with a very specific purpose. 

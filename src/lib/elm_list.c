@@ -3,6 +3,7 @@
 
 /**
  * @defgroup List List
+ * @ingroup Elementary
  *
  * A list is a very simple type of list widget.  For more robust
  * lists, @ref Genlist should probably be used.

@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Layout Layout
+ * @ingroup Elementary
  *
  * This takes a standard Edje design file and wraps it very thinly
  * in a widget and handles swallowing widgets into swallow regions

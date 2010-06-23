@@ -4,7 +4,8 @@
 #include <errno.h>
 
 /**
- * @addtogroup ActionSheet ActionSheet
+ * @defgroup ActionSheet ActionSheet
+ * @ingroup Elementary
  *
  * Display an action sheet
  *

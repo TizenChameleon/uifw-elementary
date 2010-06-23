@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Frame Frame
+ * @ingroup Elementary
  *
  * This holds some content and has a title. Looks like a frame, but
  * supports styles so multple frames are avaible

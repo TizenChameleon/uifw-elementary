@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup SegmentControl SegmentControl
+ * @defgroup SegmentControl SegmentControl
+ * @ingroup Elementary
  *
  * SegmentControl object is a horizontal control made of multiple segments,
  * each segment functioning as a discrete button. A segmented control affords a compact means to group together a number of controls.

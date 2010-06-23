@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Anchorblock Anchorblock
+ * @ingroup Elementary
  *
  * Anchorblock is for displaying tet that contains markup with anchors like:
  * \<a href=1234\>something\</\> in it. These will be drawn differently and will

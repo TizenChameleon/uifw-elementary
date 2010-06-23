@@ -4,7 +4,8 @@
 #include <string.h>
 
 /**
- * @addtogroup Datepicker Datepicker
+ * @defgroup Datepicker2 Datepicker2
+ * @ingroup Elementary
  *
  * This is a date picker.
  */
@@ -438,7 +439,7 @@ _callback_init(Evas_Object *obj)
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker2
  */
 EAPI Evas_Object *
 elm_datepicker2_add(Evas_Object *parent)
@@ -490,7 +491,7 @@ elm_datepicker2_add(Evas_Object *parent)
  * @param month The month to set
  * @param day The day to set
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker2
  */
 EAPI void
 elm_datepicker2_date_set(Evas_Object *obj, int year, int month, int day)
@@ -518,7 +519,7 @@ elm_datepicker2_date_set(Evas_Object *obj, int year, int month, int day)
  * @param month The pointer to the variable get the selected month
  * @param day The pointer to the variable get the selected day
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker2
  */
 EAPI void
 elm_datepicker2_date_get(Evas_Object *obj, int *year, int *month, int *day)
@@ -541,7 +542,7 @@ elm_datepicker2_date_get(Evas_Object *obj, int *year, int *month, int *day)
  * @param month The month to set
  * @param day The day to set
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker2
  */
 EAPI void
 elm_datepicker2_date_min_set(Evas_Object *obj, int year, int month, int day)
@@ -557,7 +558,7 @@ elm_datepicker2_date_min_set(Evas_Object *obj, int year, int month, int day)
  * @param month The pointer to the variable get the minimum month
  * @param day The pointer to the variable get the minimum day
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker2
  */
 EAPI void
 elm_datepicker2_date_min_get(Evas_Object *obj, int *year, int *month, int *day)
@@ -580,7 +581,7 @@ elm_datepicker2_date_min_get(Evas_Object *obj, int *year, int *month, int *day)
  * @param month The month to set
  * @param day The day to set
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker2
  */
 EAPI void
 elm_datepicker2_date_max_set(Evas_Object *obj, int year, int month, int day)
@@ -596,7 +597,7 @@ elm_datepicker2_date_max_set(Evas_Object *obj, int year, int month, int day)
  * @param month The pointer to the variable get the maximum month
  * @param day The pointer to the variable get the maximum day
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker2
  */
 EAPI void
 elm_datepicker2_date_max_get(Evas_Object *obj, int *year, int *month, int *day)
@@ -617,7 +618,7 @@ elm_datepicker2_date_max_get(Evas_Object *obj, int *year, int *month, int *day)
  * @param obj The datepicker object
  * @param fmt The date format, ex) yymmdd
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker2
  */
 EAPI void
 elm_datepicker2_date_format_set(Evas_Object *obj, const char *fmt)
@@ -642,7 +643,7 @@ elm_datepicker2_date_format_set(Evas_Object *obj, const char *fmt)
  * @param obj The datepicker object
  * @return The date format of given datepicker
  *
- * @ingroup Datepicker
+ * @ingroup Datepicker2
  */
 EAPI const char *
 elm_datepicker2_date_format_get(Evas_Object *obj)

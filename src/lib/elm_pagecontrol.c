@@ -3,6 +3,7 @@
 
 /**
  * @defgroup PageControl PageControl
+ * @ingroup Elementary
  *
  *  A page control is a succession of dots centered in the control.
  *  Each dot corresponds to a page in the application’s document (or other data-model entity),

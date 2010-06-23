@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Editfield Editfield
+ * @defgroup Editfield Editfield
+ * @ingroup Elementary
  *
  * This is a editfield. It can contain a simple label and icon objects.
  */

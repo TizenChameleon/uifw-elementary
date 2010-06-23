@@ -1,6 +1,7 @@
 /**
   *
-  * @addtogroup Gallery
+  * @defgroup Gallery
+  * @ingroup Elementary
   *
   * This is an gallery.
   *

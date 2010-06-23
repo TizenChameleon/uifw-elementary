@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Panel Panel
+ * @ingroup Elementary
  *
  * A panel is a type of animated container that contains subobjects.  It
  * can be expanded or contracted.

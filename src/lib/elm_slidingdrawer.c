@@ -1,5 +1,6 @@
 /*
- * @addgroup SlidingDrawer
+ * @defgroup SlidingDrawer SlidingDrawer
+ * @ingroup Elementary
  *
  * This is a slidingdrawer.
  */

@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Table Table
+ * @ingroup Elementary
  *
  * Arranges widgets in a table where items can also span multiple
  * columns or rows - even overlap (and then be raised or lowered

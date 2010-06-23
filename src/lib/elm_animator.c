@@ -1,7 +1,8 @@
 #include <Elementary.h>
 
 /**
- * @addtogroup Animator Animator
+ * @defgroup Animator Animator
+ * @ingroup Elementary
  *
  * Support basic animation functions for Evas_Object 
 */

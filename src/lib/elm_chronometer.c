@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Chronometer Chronometer
+ * @defgroup Chronometer Chronometer
+ * @ingroup Elementary
  *
  * It's a widget to show chronometer. 
  *

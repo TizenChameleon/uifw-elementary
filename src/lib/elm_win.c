@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Win Win
+ * @ingroup Elementary
  *
  * The window class of Elementary.  Contains functions to manipulate
  * windows.

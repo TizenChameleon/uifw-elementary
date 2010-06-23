@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Autocompleteview Autocompleteview
+ * @ingroup Elementary
  *
  * This widget show's the completed strings in a dropdown list 
  * based on the initial few characters entered by the user.

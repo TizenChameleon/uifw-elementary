@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Ratingbar Ratingbar
+ * @defgroup Ratingbar Ratingbar
+ * @ingroup Elementary
  *
  * This is a ratingbar.
  */

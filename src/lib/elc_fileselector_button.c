@@ -3,6 +3,7 @@
 
  /**
  * @defgroup File_Selector_Button File Selector Button
+ * @ingroup Elementary
  *
  * A button that, when clicked, creates an Elementary window (or inner
  * window) with an Elementary File Selector within. When a file is

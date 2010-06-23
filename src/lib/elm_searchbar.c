@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Searchbar 
+ * @defgroup Searchbar Searchbar
+ * @ingroup Elementary
  *
  * This is Searchbar. 
  * It can contain a simple entry and button object.

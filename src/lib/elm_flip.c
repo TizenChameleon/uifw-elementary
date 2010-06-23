@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Flip Flip
+ * @ingroup Elementary
  *
  * This holds 2 content objects: one on the front and one on the back. It
  * allows you to flip from front to back and vice-versa using various effects.

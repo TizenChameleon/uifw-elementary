@@ -1,5 +1,6 @@
 /**
- * @addtogroup Controlbar Controlbar
+ * @defgroup Controlbar Controlbar
+ * @ingroup Elementary
  *
  * This is a Controlbar. It can contain label and icon objects.
  * In edit mode, you can change the location of items.

@@ -12,7 +12,8 @@
 
 
 /**
- * @addtogroup Diskcontroller Diskcontroller
+ * @defgroup Diskcontroller Diskcontroller
+ * @ingroup Elementary
  *
  * This is a Diskcontroller. It can contain label and icon objects.
  */

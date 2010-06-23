@@ -1,6 +1,7 @@
 /**
   *
-  * @addtogroup Viewflipper
+  * @defgroup Viewflipper Viewflipper
+  * @ingroup Elementary
   *
   * This is an viewflipper.
   * viewflipper api can retrun the following values 
