@@ -650,6 +650,21 @@ item_change_in_bar(Elm_Controlbar_Item * it)
 }
 
 static void
+object_color_set(Evas_Object *ly, const char *color_part, const char *obj_part)
+{
+	Evas_Object *color;
+	int r, g, b, a;
+
+	color =
+		 (Evas_Object *) edje_object_part_object_get(_EDJ(ly), color_part);
+	if (color)
+	   evas_object_color_get(color, &r, &g, &b, &a);
+	color =
+	   edje_object_part_swallow_get(_EDJ(ly), obj_part);
+	evas_object_color_set(color, r, g, b, a);
+}
+
+static void
 clicked_box_cb(void *data, Evas_Object * obj, const char *emission,
 	       const char *source) 
 {
@@ -665,7 +680,7 @@ clicked_box_cb(void *data, Evas_Object * obj, const char *emission,
    {
       if (item->style == TOOLBAR)
 	{
-	   evas_object_color_set(item->base, 255, 255, 255, 255);
+	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
 	}
       if (_EDJ(item->base) == obj)
 	{
@@ -686,7 +701,7 @@ unfocused_box_cb(void *data, int type, void *event_info)
    {
       if (item->style == TOOLBAR)
 	{
-	   evas_object_color_set(item->base, 255, 255, 255, 255);
+	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
 	}
    }
    if (wd->bar_up_event != NULL)
@@ -694,7 +709,7 @@ unfocused_box_cb(void *data, int type, void *event_info)
 	ecore_event_handler_del(wd->bar_up_event);
 	wd->bar_up_event = NULL;
      }
-   return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
 	
 static int
@@ -718,6 +733,7 @@ selected_box(Elm_Controlbar_Item * it)
 	   if (it->style == TABBAR)
 	     {
 		it->selected = EINA_TRUE;
+	/*
 		color =
 		   (Evas_Object *) edje_object_part_object_get(_EDJ(it->base),
 							       "elm.tabbar.selected.color");
@@ -727,6 +743,8 @@ selected_box(Elm_Controlbar_Item * it)
 		   edje_object_part_swallow_get(_EDJ(it->base),
 						"elm.swallow.icon");
 		evas_object_color_set(color, r, g, b, a);
+	*/
+		object_color_set(it->base, "elm.tabbar.selected.color", "elm.swallow.icon");
 		edje_object_signal_emit(_EDJ(it->base), "elm,state,selected",
 					  "elm");
 		edje_object_part_swallow(wd->view, "elm.swallow.view",
@@ -735,12 +753,16 @@ selected_box(Elm_Controlbar_Item * it)
 	     }
 	   else if (it->style == TOOLBAR)
 	     {
+		/*
 		color =
 		   (Evas_Object *) edje_object_part_object_get(_EDJ(it->base),
 							       "elm.toolbar.pressed.color");
 		if (color)
 		   evas_object_color_get(color, &r, &g, &b, &a);
+
 		evas_object_color_set(it->base, r, g, b, a);
+		*/
+		object_color_set(it->base, "elm.toolbar.pressed.color", "elm.swallow.icon");
 		wd->bar_up_event =
 		   ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_UP,
 					   unfocused_box_cb, (void *)wd);
@@ -750,16 +772,24 @@ selected_box(Elm_Controlbar_Item * it)
       else
 	{
 	   if (item->style != OBJECT)
-	      evas_object_color_set(item->base, 255, 255, 255, 255);
-	   if (it->style == TABBAR)
+		 {
+/*		color =
+		   (Evas_Object *) edje_object_part_object_get(_EDJ(item->base),
+							       "elm.tabbar.default.color");
+		if (color)
+		   evas_object_color_get(color, &r, &g, &b, &a);
+		color =
+		   edje_object_part_swallow_get(_EDJ(item->base),
+						"elm.swallow.icon");
+		evas_object_color_set(color, r, g, b, a);
+*/
+			 object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
+		}
+	   if (item->style == TABBAR)
 	     {
 		item->selected = EINA_FALSE;
 		if (item->style != OBJECT)
 		  {
-		     color =
-			edje_object_part_swallow_get(_EDJ(item->base),
-						     "elm.swallow.icon");
-		     evas_object_color_set(color, 255, 255, 255, 255);
 		     edje_object_signal_emit(_EDJ(item->base),
 					       "elm,state,unselected", "elm");
 		     edje_object_part_unswallow(wd->view, item->view);
@@ -1420,19 +1450,19 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
    evas_object_show(wd->edit_box);
    
       //instead of navigationbar
-      r_button = elm_button_add(wd->edit_box);
+  /*    r_button = elm_button_add(wd->edit_box);
    elm_button_label_set(r_button, "Done");
    evas_object_smart_callback_add(r_button, "clicked", done_button_cb, wd);
    edje_object_part_swallow(wd->edit_box, "elm.swallow.navigation", r_button);
-   
-      /* navigationbar will contribution. but not yet
-       * wd->navigation = elm_navigationbar_add(wd->edit_box);
-       * r_button = elm_button_add(wd->navigation);
-       * elm_button_label_set(r_button, "Done");
-       * evas_object_smart_callback_add(r_button, "clicked", done_button_cb, wd);
-       * elm_navigationbar_push(wd->navigation, "Configure", NULL, r_button, NULL, EINA_FALSE);
-       * edje_object_part_swallow(wd->edit_box, "elm.swallow.navigation", wd->navigation);
-       */ 
+   */
+	// navigationbar will contribution. but not yet
+	wd->navigation = elm_navigationbar_add(wd->edit_box);
+	r_button = elm_button_add(wd->navigation);
+	elm_button_label_set(r_button, "Done");
+	evas_object_smart_callback_add(r_button, "clicked", done_button_cb, wd);
+	elm_navigationbar_push(wd->navigation, "Configure", NULL, r_button, NULL, EINA_FALSE);
+	edje_object_part_swallow(wd->edit_box, "elm.swallow.navigation", wd->navigation);
+        
       wd->edit_table = elm_table_add(wd->edit_box);
    elm_table_homogenous_set(wd->edit_table, EINA_TRUE);
    edje_object_part_swallow(wd->edit_box, "elm.swallow.table", wd->edit_table);
@@ -1450,7 +1480,7 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
    evas_object_show(wd->edje);
    
       // initialization
-      evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_RESIZE,
+   evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_RESIZE,
 				     _controlbar_object_resize, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE,
 				   _controlbar_object_move, obj);
@@ -1460,7 +1490,7 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
 				   _controlbar_object_hide, obj);
    
       // items container
-      wd->box = elm_table_add(wd->edje);
+   wd->box = elm_table_add(wd->edje);
    elm_table_homogenous_set(wd->box, EINA_TRUE);
    evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND,
 				     EVAS_HINT_EXPAND);
@@ -1470,12 +1500,12 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
    
       //FIXME
       //      evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-      evas_object_smart_member_add(wd->view, obj);
+   evas_object_smart_member_add(wd->view, obj);
    evas_object_smart_member_add(wd->edit_box, obj);
    elm_widget_resize_object_set(obj, wd->edje);
    
       // initialization
-      _sizing_eval(obj);
+   _sizing_eval(obj);
    return obj;
 }
 
