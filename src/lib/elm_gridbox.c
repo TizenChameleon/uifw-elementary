@@ -5,11 +5,12 @@
  * @defgroup Gridbox Gridbox
  * @ingroup Elementary
  *
- * This is a gridbox
+ * This is a gridbox widget to show multiple objects in a grid
  */
 
 typedef struct _Widget_Data Widget_Data;
-struct _Widget_Data {
+struct _Widget_Data
+{
 	Evas_Object *tbl, *scr;
 	Evas_Coord itemsize_h, itemsize_v;
 	Evas_Coord minw, minh;
@@ -20,30 +21,29 @@ struct _Widget_Data {
 
 static void _del_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj, int mode);
-static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj,
-		void *event_info);
-static void _changed_size_min(void *data, Evas *e, Evas_Object *obj,
-		void *event_info);
+static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _changed_size_min(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 static void _show_event(void *data, Evas_Object *obj, void *event_info);
 
-static void _del_pre_hook(Evas_Object *obj) {
+static void _del_pre_hook(Evas_Object *obj)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 
-	evas_object_event_callback_del_full(wd->tbl,
-			EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	evas_object_event_callback_del_full(wd->tbl, EVAS_CALLBACK_RESIZE,
-			_changed_size_min, obj);
+	evas_object_event_callback_del_full(wd->tbl, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+	evas_object_event_callback_del_full(wd->tbl, EVAS_CALLBACK_RESIZE, _changed_size_min, obj);
 	evas_object_del(wd->tbl);
 	evas_object_del(wd->scr);
 }
 
-static void _del_hook(Evas_Object *obj) {
+static void _del_hook(Evas_Object *obj)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 	free(wd);
 }
 
-static Eina_Bool _arrange_table(Evas_Object *obj) {
+static Eina_Bool _arrange_table(Evas_Object *obj)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List* l, *l_temp = NULL;
 	Evas_Object* item;
@@ -51,28 +51,27 @@ static Eina_Bool _arrange_table(Evas_Object *obj) {
 
 	if (wd) {
 		if (wd->tbl) {
-			int index =
-					eina_list_count(evas_object_table_children_get(wd->tbl));
+			int index = eina_list_count(evas_object_table_children_get(wd->tbl));
 			if (!index)
 				return EINA_FALSE;
 
 			elm_gridbox_item_size_set(obj, wd->itemsize_h, wd->itemsize_v);
 			l = evas_object_table_children_get(wd->tbl);
 
-EINA_LIST_FOREACH		(l, l_temp, item)
-		{
-			evas_object_table_unpack(wd->tbl, item);
-			elm_widget_sub_object_del(wd->tbl, item);
-			evas_object_table_pack(wd->tbl, item, i%wd->x , i/wd->x, 1, 1);
-			i++;
+			EINA_LIST_FOREACH (l, l_temp, item) {
+				evas_object_table_unpack(wd->tbl, item);
+				elm_widget_sub_object_del(wd->tbl, item);
+				evas_object_table_pack(wd->tbl, item, i % wd->x, i / wd->x, 1, 1);
+				i++;
+			}
 		}
 	}
+
+	return EINA_TRUE;
 }
 
-return EINA_TRUE;
-}
-
-static void _sizing_eval(Evas_Object *obj, int mode) {
+static void _sizing_eval(Evas_Object *obj, int mode)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
 	Evas_Coord w, h;
@@ -81,7 +80,6 @@ static void _sizing_eval(Evas_Object *obj, int mode) {
 	evas_object_size_hint_max_get(wd->scr, &maxw, &maxh);
 	evas_object_size_hint_min_set(obj, minw, minh);
 	evas_object_size_hint_max_set(obj, maxw, maxh);
-	//   evas_object_geometry_get(obj, NULL, NULL, &w, &h);
 	evas_object_geometry_get(wd->scr, NULL, NULL, &w, &h);
 
 	if (w < minw)
@@ -109,25 +107,28 @@ static void _sizing_eval(Evas_Object *obj, int mode) {
 		_arrange_table(obj);
 }
 
-static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj,
-		void *event_info) {
+static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
 	_sizing_eval(data, 0);
 }
 
-static void _changed_size_min(void *data, Evas *e, Evas_Object *obj,
-		void *event_info) {
+static void _changed_size_min(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
 	_sizing_eval(data, 0);
 }
 
-static void _sub_del(void *data, Evas_Object *obj, void *event_info) {
+static void _sub_del(void *data, Evas_Object *obj, void *event_info)
+{
 	_sizing_eval(obj, 1);
 }
 
-static void _show_event(void *data, Evas_Object *obj, void *event_info) {
+static void _show_event(void *data, Evas_Object *obj, void *event_info)
+{
 	_sizing_eval(data, 0);
 }
 
-static void _freeze_on(void *data, Evas_Object *obj, void *event_info) {
+static void _freeze_on(void *data, Evas_Object *obj, void *event_info)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 
 	if (!wd)
@@ -135,7 +136,8 @@ static void _freeze_on(void *data, Evas_Object *obj, void *event_info) {
 	evas_object_smart_callback_call(wd->scr, "scroll-freeze-on", NULL);
 }
 
-static void _freeze_off(void *data, Evas_Object *obj, void *event_info) {
+static void _freeze_off(void *data, Evas_Object *obj, void *event_info)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 
 	if (!wd)
@@ -152,7 +154,8 @@ static void _freeze_off(void *data, Evas_Object *obj, void *event_info) {
  * @ingroup Gridbox
  */
 EAPI Evas_Object *
-elm_gridbox_add(Evas_Object *parent) {
+elm_gridbox_add(Evas_Object *parent)
+{
 	Evas_Object *obj;
 	Evas *e;
 	Widget_Data *wd;
@@ -171,18 +174,13 @@ elm_gridbox_add(Evas_Object *parent) {
 	elm_scroller_bounce_set(wd->scr, 0, 1);
 
 	wd->tbl = evas_object_table_add(e);
-	//evas_object_size_hint_weight_set(wd->tbl, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_size_hint_weight_set(wd->tbl, 0.0, 0.0);
-	//evas_object_size_hint_weight_set(wd->tbl, EVAS_HINT_EXPAND, 0.0);
 	elm_scroller_content_set(wd->scr, wd->tbl);
 	evas_object_show(wd->tbl);
 
-	evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-			_changed_size_hints, obj);
-	evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_RESIZE,
-			_changed_size_min, obj);
-	evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_SHOW, _show_event,
-			obj);
+	evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+	evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_RESIZE, _changed_size_min, obj);
+	evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_SHOW, _show_event, obj);
 
 	evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 	evas_object_smart_callback_add(obj, "scroll-freeze-on", _freeze_on, obj);
@@ -202,8 +200,8 @@ elm_gridbox_add(Evas_Object *parent) {
  *
  * @ingroup Gridbox
  */
-EAPI void elm_gridbox_padding_set(Evas_Object *obj, Evas_Coord horizontal,
-		Evas_Coord vertical) {
+EAPI void elm_gridbox_padding_set(Evas_Object *obj, Evas_Coord horizontal, Evas_Coord vertical)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 
 	wd->horizontal = horizontal;
@@ -222,8 +220,8 @@ EAPI void elm_gridbox_padding_set(Evas_Object *obj, Evas_Coord horizontal,
  *
  * @ingroup Gridbox
  */
-EAPI void elm_gridbox_item_size_set(Evas_Object *obj, Evas_Coord h_itemsize,
-		Evas_Coord v_itemsize) {
+EAPI void elm_gridbox_item_size_set(Evas_Object *obj, Evas_Coord h_itemsize, Evas_Coord v_itemsize)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Coord minw = -1, minh = -1;
 	Evas_Coord w, h;
@@ -256,7 +254,8 @@ EAPI void elm_gridbox_item_size_set(Evas_Object *obj, Evas_Coord h_itemsize,
  *
  * @ingroup Gridbox
  */
-EAPI void elm_gridbox_pack(Evas_Object *obj, Evas_Object *subobj) {
+EAPI void elm_gridbox_pack(Evas_Object *obj, Evas_Object *subobj)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int index = eina_list_count(evas_object_table_children_get(wd->tbl));
 	evas_object_size_hint_min_set(subobj, wd->itemsize_h, wd->itemsize_v);
@@ -273,7 +272,8 @@ EAPI void elm_gridbox_pack(Evas_Object *obj, Evas_Object *subobj) {
  *
  * @ingroup Gridbox
  */
-EAPI Eina_Bool elm_gridbox_unpack(Evas_Object *obj, Evas_Object *subobj) {
+EAPI Eina_Bool elm_gridbox_unpack(Evas_Object *obj, Evas_Object *subobj)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_Bool ret = 0;
 
@@ -293,7 +293,8 @@ EAPI Eina_Bool elm_gridbox_unpack(Evas_Object *obj, Evas_Object *subobj) {
  * @ingroup Gridbox
  */
 EAPI Eina_List *
-elm_gridbox_children_get(Evas_Object *obj) {
+elm_gridbox_children_get(Evas_Object *obj)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *new_list = NULL;
 
@@ -310,8 +311,8 @@ elm_gridbox_children_get(Evas_Object *obj) {
  *
  * @ingroup Gridbox
  */
-EAPI void elm_gridbox_homogenous_padding_set(Evas_Object *obj,
-		Eina_Bool homogenous) {
+EAPI void elm_gridbox_homogenous_padding_set(Evas_Object *obj, Eina_Bool homogenous)
+{
 	Widget_Data *wd = elm_widget_data_get(obj);
 	wd->homogeneous = homogenous;
 }
