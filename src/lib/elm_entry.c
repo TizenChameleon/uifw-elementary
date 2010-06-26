@@ -168,7 +168,7 @@ static int _get_value_in_key_string(char *oldstring, char *key, char *value);
 static int _string_key_value_replace(char *oldstring, char *key, char *value, char *tagstring);
 static int _is_width_over(Evas_Object *obj);
 static void _ellipsis_entry_to_width(Evas_Object *obj);
-static int _textinput_control_function(void *data,void *input_data)
+static int _textinput_control_function(void *data,void *input_data);
 
 #define MIN_ENTRY_FONT_SIZE 8
 #define MAX_ENTRY_FONT_SIZE 60
