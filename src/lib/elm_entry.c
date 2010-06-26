@@ -168,7 +168,7 @@ static int _get_value_in_key_string(char *oldstring, char *key, char *value);
 static int _string_key_value_replace(char *oldstring, char *key, char *value, char *tagstring);
 static int _is_width_over(Evas_Object *obj);
 static void _ellipsis_entry_to_width(Evas_Object *obj);
-static int restrict_function(void *input_data,void *output_data);
+static int _textinput_control_function(void *data,void *input_data)
 
 #define MIN_ENTRY_FONT_SIZE 8
 #define MAX_ENTRY_FONT_SIZE 60
@@ -1612,17 +1612,14 @@ _ellipsis_entry_to_width(Evas_Object *obj)
    _sizing_eval(obj);
 }
 
-static int restrict_function(void *input_data,void *output_data)
+static int _textinput_control_function(void *data,void *input_data)
 {	
 	 /*calculate character count*/
-	Widget_Data *wd = elm_widget_data_get(input_data);	
+	Widget_Data *wd = elm_widget_data_get(data);	
 	char buf[10]="\0";
 	size_t byte_len;
 	size_t len=0, bytes_per_char=0,insert_text_len=0;
-	char *text = elm_entry_entry_get((Evas_Object *)input_data);
-
-	/* entry_entry_get does not give exact text use the below function, but this adds <br> hence +4 has to be assumed*/
-	//char *text = edje_object_part_text_get(wd->ent, "elm.text");	
+	char *text = edje_object_part_text_get(wd->ent, "elm.text");	
 	char *insert_text;  
 	size_t remain_bytes;
 	if(text!=NULL)
@@ -1631,9 +1628,9 @@ static int restrict_function(void *input_data,void *output_data)
 			remain_bytes = wd->max_no_of_bytes-byte_len;
 			sprintf(buf,"%d",remain_bytes);	
 			edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);		
-			if(output_data)
+			if(input_data)
 				{
-					insert_text =  (char *)output_data;
+					insert_text =  (char *)input_data;
 					insert_text_len = strlen(insert_text);	
 					if(remain_bytes<insert_text_len)
 						{			
@@ -1827,7 +1824,7 @@ elm_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes)
 
    wd->max_no_of_bytes = max_no_of_bytes;
    edje_object_signal_emit(wd->ent, "elm,state,remain,bytes,show", "elm");
-   edje_object_part_text_restrict_fun(wd->ent, "elm.text", restrict_function,obj);
+   edje_object_part_textinput_callback_set(wd->ent, "elm.text", _textinput_control_function,obj);
  }
 
 
