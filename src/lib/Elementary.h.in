@@ -782,11 +782,7 @@ extern "C" {
 
    EAPI void	     elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on);
    EAPI void	     elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
-#ifdef ELM_IMF
-   EAPI const Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj);
-#else
-   EAPI void        *elm_entry_imf_context_get(Evas_Object *obj);
-#endif
+   EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj);
    EAPI void 		elm_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
 
    /* smart callbacks called:
