@@ -1,8 +1,7 @@
 #include <Elementary.h>
 
 /**
- * @defgroup Animator Animator
- * @ingroup Elementary
+ * @addtogroup Animator Animator
  *
  * Support basic animation functions for Evas_Object 
 */
@@ -46,7 +45,7 @@ static const float _out_table[181] = {
 
 struct _Animator {
 	Evas_Object* parent;
-	Ecore_Timer* timer;
+	Ecore_Animator* animator;
 	double begin_time;
 	double cur_time;
 	double duration;
@@ -61,58 +60,58 @@ struct _Animator {
 	Eina_Bool on_animating : 1;
 };
 
-inline static double _animator_curve_linear(const double frame);
-inline static double _animator_curve_in_out(const double frame);
-inline static double _animator_curve_in(const double frame);
-inline static double _animator_curve_out(const double frame);
-inline static unsigned int _animator_compute_reverse_repeat_count(unsigned int cnt);
-inline static unsigned int _animator_compute_no_reverse_repeat_count(unsigned int cnt);
+static double _animator_curve_linear(const double frame);
+static double _animator_curve_in_out(const double frame);
+static double _animator_curve_in(const double frame);
+static double _animator_curve_out(const double frame);
+static unsigned int _animator_compute_reverse_repeat_count(unsigned int cnt);
+static unsigned int _animator_compute_no_reverse_repeat_count(unsigned int cnt);
 static int _animator_animate_cb(void* data);
-inline static void _delete_timer(Elm_Animator* animator);
+static void _delete_animator(Elm_Animator* animator);
 
-inline static unsigned int 
+static unsigned int 
 _animator_compute_reverse_repeat_count(unsigned int cnt) 
 {
 	return ( ( cnt  + 1 ) * 2 ) - 1;
 }
 
-inline static unsigned int 
+static unsigned int 
 _animator_compute_no_reverse_repeat_count(unsigned int cnt)
 {
 	return cnt / 2;
 }
 
-inline static double
+static double
 _animator_curve_linear(const double frame)
 {
 	return frame;
 }
 
-inline static double 
+static double 
 _animator_curve_in_out(const double frame)
 {
 	return _in_out_table[ (int) (frame*180) ];
 }
 
-inline static double 
+static double 
 _animator_curve_in(const double frame)
 {
 	return  _in_table[ (int) (frame*180) ];
 }
 
-inline static double 
+static double 
 _animator_curve_out(const double frame)
 {
 	return  _out_table[ (int) (frame * 180) ];
 }
 
-inline static void 
-_delete_timer(Elm_Animator* animator)
+static void 
+_delete_animator(Elm_Animator* animator)
 {
-	if(animator->timer) 
+	if(animator->animator) 
 	{
-		ecore_timer_del(animator->timer);
-		animator->timer = NULL;
+		ecore_animator_del(animator->animator);
+		animator->animator = NULL;
 	}
 }
 
@@ -120,7 +119,8 @@ static int
 _animator_animate_cb(void* data) 
 {
 	Elm_Animator* animator = (Elm_Animator*) data;		
-	animator->cur_time = ecore_time_get(); 
+	//animator->cur_time = ecore_time_get(); 
+	animator->cur_time = ecore_loop_time_get();
 	double elapsed_time = animator->cur_time - animator->begin_time;
 
 	//TODO: HOW TO MAKE IT PRECIOUS TIME? -> Use Interpolation!!
@@ -144,14 +144,15 @@ _animator_animate_cb(void* data)
 	if(animator->cur_repeat_cnt == 0) 
 	{
 		animator->on_animating = EINA_FALSE;
-		_delete_timer( animator );
+		_delete_animator( animator );
 		if(animator->completion_op) animator->completion_op(animator->completion_arg);
 		return ECORE_CALLBACK_CANCEL;	
 	}
 	
 	//Repeat Case
 	--animator->cur_repeat_cnt;
-	animator->begin_time = ecore_time_get();
+//	animator->begin_time = ecore_time_get();
+	animator->begin_time = ecore_loop_time_get();
 
 	return ECORE_CALLBACK_RENEW;
 }
@@ -235,7 +236,6 @@ EAPI void elm_animator_curve_style_set(Elm_Animator* animator, Elm_Animator_Curv
 	}
 }
 
-
 /**
  * Set the operation duration.  
  *
@@ -310,8 +310,8 @@ EAPI Eina_Bool elm_animator_operating_get(Elm_Animator* animator)
  */
 EAPI void elm_animator_del(Elm_Animator* animator)
 {
-	if(!animator) return NULL;
-	_delete_timer(animator);
+	if(!animator) return;
+	_delete_animator(animator);
 	free(animator);
 }
 
@@ -343,7 +343,7 @@ EAPI void elm_animator_stop(Elm_Animator* animator)
 {
 	if(!animator) return NULL;
 	animator->on_animating = EINA_FALSE;
-	_delete_timer(animator);
+	_delete_animator(animator);
 }
 
 /**
@@ -374,13 +374,13 @@ EAPI void elm_animator_animate(Elm_Animator* animator)
 {
 	if(!animator) return NULL;
 	if(!animator->animator_op) return NULL;
-	animator->begin_time = ecore_time_get();
+	//animator->begin_time = ecore_time_get();
+	animator->begin_time = ecore_loop_time_get();
 	animator->on_animating = EINA_TRUE;
 	animator->cur_repeat_cnt = animator->repeat_cnt;
-	_delete_timer(animator);
-	animator->timer = ecore_timer_add( 0.0016, _animator_animate_cb, animator );
-	ecore_timer_interval_set( animator->timer, 0.0016 ); 
-	if(!animator->timer) animator->on_animating = EINA_FALSE;
+//	_delete_animator(animator);
+	animator->animator = ecore_animator_add( _animator_animate_cb, animator );
+	if(!animator->animator) animator->on_animating = EINA_FALSE;
 }
 
 
