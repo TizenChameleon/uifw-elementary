@@ -2,6 +2,7 @@
 
 /**
  * @addtogroup Animator Animator
+ * @ingroup Elementary
  *
  * Support basic animation functions for Evas_Object 
 */
