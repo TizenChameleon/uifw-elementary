@@ -2,7 +2,6 @@
 
 /**
  * @addtogroup Animator Animator
- * @ingroup Elementary
  *
  * Support basic animation functions for Evas_Object 
 */
@@ -109,6 +108,7 @@ _animator_curve_out(const double frame)
 {
 	return 1 - sqrt(1 - pow(frame, 2));
 }
+
 
 static void 
 _delete_animator(Elm_Animator* animator)
