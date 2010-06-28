@@ -5,7 +5,7 @@
  *
  * Support basic animation functions for Evas_Object 
 */
-
+/*
 static const float _in_out_table[181] = { 
 0, 3.08652e-05, 0.000123472, 0.000277855, 0.000494071, 0.000772201, 0.00111235, 0.00151464, 0.00197923, 0.00250628, 0.00309601, 0.00374862, 0.00446438, 0.00524354, 0.00608643, 0.00699335, 0.00796467,
 0.00900077, 0.0101021, 0.011269, 0.012502, 0.0138016, 0.0151684, 0.0166028, 0.0181056, 0.0196773, 0.0213187, 0.0230304, 0.0248132, 0.026668, 0.0285955, 0.0305966, 0.0326724, 0.0348238, 0.0370519,
@@ -42,6 +42,7 @@ static const float _out_table[181] = {
 0.946664, 0.948537, 0.950374, 0.952174, 0.953939, 0.955669, 0.957363, 0.959021, 0.960645, 0.962234, 0.963789, 0.965309, 0.966794, 0.968246, 0.969663, 0.971047, 0.972397, 0.973713, 0.974996, 0.976246,
 0.977462, 0.978645, 0.979796, 0.980914, 0.981998, 0.983051, 0.984071, 0.985058, 0.986013, 0.986936, 0.987827,0.988686, 0.989513, 0.990308, 0.991071, 0.991803, 0.992503, 0.993171, 0.993808, 0.994413,
 0.994987, 0.99553, 0.996042, 0.996522, 0.996971, 0.997389, 0.997775, 0.998131, 0.998456,  0.998749, 0.999012, 0.999244, 0.999444, 0.999614, 0.999753, 0.999861, 0.999938, 0.999985, 1 }; 
+*/
 
 struct _Animator {
 	Evas_Object* parent;
@@ -90,19 +91,22 @@ _animator_curve_linear(const double frame)
 static double 
 _animator_curve_in_out(const double frame)
 {
-	return _in_out_table[ (int) (frame*180) ];
+	if(frame < 0.5) 
+		return _animator_curve_out(frame * 2) * 0.5;
+	else 
+		return _animator_curve_in(frame * 2 - 1) * 0.5 + 0.5;
 }
 
 static double 
 _animator_curve_in(const double frame)
 {
-	return  _in_table[ (int) (frame*180) ];
+	return sqrt(1 - pow(frame - 1, 2));
 }
 
 static double 
 _animator_curve_out(const double frame)
 {
-	return  _out_table[ (int) (frame * 180) ];
+	return 1 - sqrt(1 - pow(frame, 2));
 }
 
 static void 
@@ -119,7 +123,6 @@ static int
 _animator_animate_cb(void* data) 
 {
 	Elm_Animator* animator = (Elm_Animator*) data;		
-	//animator->cur_time = ecore_time_get(); 
 	animator->cur_time = ecore_loop_time_get();
 	double elapsed_time = animator->cur_time - animator->begin_time;
 
@@ -151,7 +154,6 @@ _animator_animate_cb(void* data)
 	
 	//Repeat Case
 	--animator->cur_repeat_cnt;
-//	animator->begin_time = ecore_time_get();
 	animator->begin_time = ecore_loop_time_get();
 
 	return ECORE_CALLBACK_RENEW;
@@ -374,12 +376,11 @@ EAPI void elm_animator_animate(Elm_Animator* animator)
 {
 	if(!animator) return NULL;
 	if(!animator->animator_op) return NULL;
-	//animator->begin_time = ecore_time_get();
 	animator->begin_time = ecore_loop_time_get();
 	animator->on_animating = EINA_TRUE;
 	animator->cur_repeat_cnt = animator->repeat_cnt;
-//	_delete_animator(animator);
-	animator->animator = ecore_animator_add( _animator_animate_cb, animator );
+	if(!animator->animator) 
+		animator->animator = ecore_animator_add( _animator_animate_cb, animator );
 	if(!animator->animator) animator->on_animating = EINA_FALSE;
 }
 
