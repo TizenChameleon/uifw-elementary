@@ -44,7 +44,6 @@ static const float _out_table[181] = {
 
 struct _Animator
 {
-   Evas_Object *parent;
    Ecore_Animator *animator;
    double begin_time;
    double cur_time;
@@ -75,6 +74,8 @@ static unsigned int _animator_compute_no_reverse_repeat_count(unsigned int cnt);
 static int _animator_animate_cb(void *data);
 
 static void _delete_animator(Elm_Animator * animator);
+
+static void _animator_parent_del(void *data);
 
 static unsigned int
 _animator_compute_reverse_repeat_count(unsigned int cnt)
@@ -168,6 +169,13 @@ _animator_animate_cb(void *data)
    animator->begin_time = ecore_loop_time_get();
 
    return ECORE_CALLBACK_RENEW;
+}
+
+static void
+_animator_parent_del(void *data)
+{
+   elm_animator_stop(data);
+   elm_animator_del(data);
 }
 
 /**
@@ -312,15 +320,17 @@ elm_animator_operation_callback_set(Elm_Animator * animator,
 EAPI Elm_Animator *
 elm_animator_add(Evas_Object * parent)
 {
-   if (!parent)
-      return NULL;
    Elm_Animator *animator = calloc(1, sizeof(Elm_Animator));
 
    if (!animator)
       return NULL;
-   animator->parent = parent;
    elm_animator_auto_reverse_set(animator, EINA_FALSE);
    elm_animator_curve_style_set(animator, ELM_ANIMATOR_CURVE_LINEAR);
+
+   if (parent)
+      evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL,
+				     _animator_parent_del, animator);
+
    return animator;
 }
 
