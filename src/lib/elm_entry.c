@@ -367,23 +367,17 @@ _check_enable_returnkey(Evas_Object *obj)
     Widget_Data *wd = elm_widget_data_get(obj);
     if (!wd) return;
 
-#ifdef HAVE_ELEMENTARY_IMF
     Ecore_IMF_Context *ic = elm_entry_imf_context_get(obj);
     if (!ic) return;
 
-    if (!wd->autoreturnkey) 
-    {
-        ecore_imf_context_ise_set_disable_key(ic, 1, ISE_KEY_ENTER, EINA_FALSE);		
-        return;
-    }
+   if (!wd->autoreturnkey) return;
 
-    if (_entry_length_get(obj) == 0) {
-        ecore_imf_context_ise_set_disable_key(ic, 1, ISE_KEY_ENTER, EINA_TRUE);
+   if (_entry_length_get(obj) == 0) {
+        ecore_imf_context_ise_set_disable_key(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_TRUE);
     }
     else {
-        ecore_imf_context_ise_set_disable_key(ic, 1, ISE_KEY_ENTER, EINA_FALSE);		
+        ecore_imf_context_ise_set_disable_key(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_FALSE);
     }
-#endif
 }
 
 static void
@@ -399,7 +393,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	edje_object_signal_emit(wd->ent, "elm,action,focus", "elm");
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
 	evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
-    _check_enable_returnkey(obj);
+	_check_enable_returnkey(obj);
      }
    else
      {
@@ -2654,20 +2648,13 @@ elm_entry_utf8_to_markup(const char *s)
    return ss;
 }
 
-#ifdef HAVE_ELEMENTARY_IMF
-EAPI const Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
+EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->ent) return NULL;
   
    return edje_object_part_text_imf_context_get(wd->ent, "elm.text");
 }
-#else
-EAPI const Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
-{
-   return NULL;
-}
-#endif
 
 EAPI void 
 elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
