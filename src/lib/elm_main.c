@@ -1327,13 +1327,6 @@ elm_object_scroll_freeze_pop(Evas_Object *obj)
    elm_widget_scroll_freeze_pop(obj);
 }
 
-/**
- * @defgroup WidgetNavigation Widget Tree Navigation.
- *
- * How to check if an Evas Object is an Elementary widget? How to get
- * the first elementary widget that is parent of the given object?
- * These are all covered in widget tree navigation.
- */
 
 /**
  * Check if the given Evas Object is an Elementary widget.
