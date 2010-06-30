@@ -6,16 +6,7 @@
  * of files.  It contains buttons for Home(~) and Up(..) as well as cancel/ok
  * buttons to confirm/cancel a selection.  This widget is currently very much
  * in progress.
- *
- * TODO
- * userdefined icon/label cb
- * show/hide/add buttons ???
- * need a background ???
- * show/Hide hidden files
- * double click to choose a file
- * multiselection
- * make variable/function names that are sensible
- *
+ 
  * Signals that you can add callbacks for are:
  *
  * "selected" - the user clicks on a file

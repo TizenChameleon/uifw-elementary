@@ -1677,6 +1677,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 
 /**
  * @defgroup Inwin Inwin
+ * @ingroup  Win
  *
  * An inwin is a window inside a window that is useful for a quick popup.  It does not hover.
  */
