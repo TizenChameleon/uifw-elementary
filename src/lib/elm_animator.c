@@ -4,7 +4,7 @@
  * @addtogroup Animator Animator
  * @ingroup Elementary
  *
- * Support basic animation functions for Evas_Object 
+ * Support basic animation functions for Evas_Object
 */
 
 struct _Animator
@@ -15,10 +15,10 @@ struct _Animator
    double duration;
    unsigned int repeat_cnt;
    unsigned int cur_repeat_cnt;
-   double (*curve_op) (double);
-   void (*animator_op) (void *, Elm_Animator *, double);
+   double (*curve_op) (double frame);
+   void (*animator_op) (void *data, Elm_Animator *animator, double frame);
    void *animator_arg;
-   void (*completion_op) (void *);
+   void (*completion_op) (void *data);
    void *completion_arg;
    Eina_Bool auto_reverse:1;
    Eina_Bool on_animating:1;
@@ -38,7 +38,7 @@ static unsigned int _animator_compute_no_reverse_repeat_count(unsigned int cnt);
 
 static int _animator_animate_cb(void *data);
 
-static void _delete_animator(Elm_Animator * animator);
+static void _delete_animator(Elm_Animator *animator);
 
 static void _animator_parent_del(void *data);
 
@@ -254,7 +254,8 @@ elm_animator_duration_set(Elm_Animator *animator, double duration)
 
 /**
  * Set the callback function for animator operation.  
- *
+ * The range of callback function frame data is to 0 ~ 1
+ * User can refer this frame value for one's animation frame data. 
  * @param animator Animator object
  * @param op Callback function pointer 
  * @param data Callback function user argument 
@@ -263,8 +264,9 @@ elm_animator_duration_set(Elm_Animator *animator, double duration)
  */
 EAPI void
 elm_animator_operation_callback_set(Elm_Animator *animator,
-				    void (*func) (void *data, Elm_Animator *animator,
-						double frame), void *data)
+				    void (*func) (void *data,
+						  Elm_Animator *animator,
+						  double frame), void *data)
 {
    if (!animator)
       return;
