@@ -26,21 +26,13 @@ struct _Animator
 };
 
 static double _animator_curve_linear(double frame);
-
 static double _animator_curve_in_out(double frame);
-
 static double _animator_curve_in(double frame);
-
 static double _animator_curve_out(double frame);
-
 static unsigned int _animator_compute_reverse_repeat_count(unsigned int cnt);
-
 static unsigned int _animator_compute_no_reverse_repeat_count(unsigned int cnt);
-
 static int _animator_animate_cb(void *data);
-
 static void _delete_animator(Elm_Animator *animator);
-
 static void _animator_parent_del(void *data);
 
 static unsigned int
