@@ -13,25 +13,25 @@ typedef enum {BOTTOM_ARROW, RIGHT_ARROW, LEFT_ARROW, TOP_ARROW, NONE_ARROW} Arro
 
 struct _Ctxpopup_Item
 {
-    Evas_Object* ctxpopup;
-    Evas_Object* obj;
-    const char* label;
-    Evas_Object* content;
-    void (*func) (void* data, Evas_Object* obj, void* event_info);
-	const void* data;
+    Evas_Object *ctxpopup;
+    Evas_Object *obj;
+    const char *label;
+    Evas_Object *content;
+    void (*func) (void *data, Evas_Object *obj, void *event_info);
+	const void *data;
 	Eina_Bool disabled : 1;
 	Eina_Bool separator : 1;
 };
 
 struct _Widget_Data
 {
-	Evas_Object* parent;
-	Evas_Object* location;
-	Evas_Object* hover;
-	Evas_Object* box;
-	Evas_Object* arrow;
-	Evas_Object* scroller;
-	Eina_List* items;
+	Evas_Object *parent;
+	Evas_Object *location;
+	Evas_Object *hover;
+	Evas_Object *box;
+	Evas_Object *arrow;
+	Evas_Object *scroller;
+	Eina_List *items;
 	Evas_Coord x, y;
 	Arrow_Direction last_arrow_dir;
 	Evas_Coord max_width_size;
