@@ -4,7 +4,7 @@
  * @addtogroup Animator Animator
  * @ingroup Elementary
  *
- * Support basic animation functions for Evas_Object
+ * Support normalized frame value for animation.  
 */
 
 struct _Animator
@@ -79,7 +79,7 @@ _delete_animator(Elm_Animator *animator)
 {
    if (animator->animator)
      {
-    ecore_animator_del(animator->animator);
+    	ecore_animator_del(animator->animator);
 	animator->animator = NULL;
      }
 }
@@ -92,7 +92,6 @@ _animator_animate_cb(void *data)
    animator->cur_time = ecore_loop_time_get();
    double elapsed_time = animator->cur_time - animator->begin_time;
 
-   //TODO: HOW TO MAKE IT PRECIOUS TIME? -> Use Interpolation!!
    if (elapsed_time > animator->duration)
       elapsed_time = animator->duration;
 
@@ -404,7 +403,7 @@ elm_animator_animate(Elm_Animator *animator)
    animator->on_animating = EINA_TRUE;
    animator->cur_repeat_cnt = animator->repeat_cnt;
    if (!animator->animator) 
-	  animator->animator = ecore_animator_add(_animator_animate_cb, animator);
+      animator->animator = ecore_animator_add(_animator_animate_cb, animator);
    if (!animator->animator)
       animator->on_animating = EINA_FALSE;
 }
