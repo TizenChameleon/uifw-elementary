@@ -1086,10 +1086,12 @@ extern "C" {
    EAPI Eina_Bool    elm_slider_inverted_get(const Evas_Object *obj);
 
    // added for supporting aqua feature
-   EAPI Eina_Bool       elm_slider_right_icon_set(Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object *	elm_slider_right_icon_get(Evas_Object *obj);
+   EAPI Eina_Bool       elm_slider_end_icon_set(Evas_Object *obj, Evas_Object *icon);
+   EAPI Evas_Object *	elm_slider_end_icon_get(Evas_Object *obj);
    EAPI void		elm_slider_indicator_show_set(Evas_Object *obj, Eina_Bool show);
    EAPI void		elm_slider_value_animated_set(Evas_Object *obj, double val);
+   EAPI void         elm_slider_end_label_set(Evas_Object *obj, const char *label);
+   EAPI const char  *elm_slider_end_label_get(const Evas_Object *obj);
 
    typedef enum _Elm_Genlist_Item_Flags
      {
