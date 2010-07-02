@@ -990,6 +990,8 @@ _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
    evas_object_smart_callback_call(data, SIG_CHANGED, NULL);
+   
+   _check_enable_returnkey(data);
 }
 
 static void

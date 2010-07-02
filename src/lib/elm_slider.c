@@ -48,6 +48,7 @@ struct _Widget_Data
 	Evas_Object *icon;	
 	Evas_Object *spacer;
 	const char *label;
+	const char *e_label;
 	const char *units;
 	const char *indicator;
 	const char *(*indicator_format_func)(double val);
@@ -58,7 +59,7 @@ struct _Widget_Data
 	Evas_Coord size;
 	/* for supporting aqua feature */
 	Ecore_Timer *mv_timer;
-	Evas_Object *r_icon;
+	Evas_Object *e_icon;
 	double src_val;
 	double des_val;
 	double mv_step;
@@ -95,6 +96,7 @@ _del_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (wd->label) eina_stringshare_del(wd->label);
+   if (wd->e_label) eina_stringshare_del(wd->label);
    if (wd->indicator) eina_stringshare_del(wd->units);
    if (wd->delay) ecore_timer_del(wd->delay);
    free(wd);
@@ -117,15 +119,20 @@ _theme_hook(Evas_Object *obj)
      edje_object_signal_emit(wd->slider, "elm,state,icon,visible", "elm");
    else
      edje_object_signal_emit(wd->slider, "elm,state,icon,hidden", "elm");
-   if (wd->r_icon)
-		edje_object_signal_emit(wd->slider, "elm,state,ricon,visible", "elm");
-	else
-		edje_object_signal_emit(wd->slider, "elm,state,ricon,hidden", "elm");
+   if (wd->e_icon)
+     edje_object_signal_emit(wd->slider, "elm,state,eicon,visible", "elm");
+   else
+     edje_object_signal_emit(wd->slider, "elm,state,eicon,hidden", "elm");
    if (wd->label)
      edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
    else
      edje_object_signal_emit(wd->slider, "elm,state,text,hidden", "elm");
    edje_object_part_text_set(wd->slider, "elm.text", wd->label);
+   if (wd->e_label)
+     edje_object_signal_emit(wd->slider, "elm,state,units,visible", "elm");
+   else
+     edje_object_signal_emit(wd->slider, "elm,state,units,hidden", "elm");
+   edje_object_part_text_set(wd->slider, "elm.text", wd->e_label);
    if (wd->units)
      edje_object_signal_emit(wd->slider, "elm,state,units,visible", "elm");
    else
@@ -162,7 +169,7 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *even
 
    // if (obj != wd->icon) return;
   /*supporting aqua feature*/
-   if (obj != wd->icon && obj != wd->r_icon) return;
+   if (obj != wd->icon && obj != wd->e_icon) return;
 
    _sizing_eval(data);
 }
@@ -182,12 +189,12 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 	_sizing_eval(obj);
      }
     /*supporting aqua feature*/
-    if (sub == wd->r_icon)
+    if (sub == wd->e_icon)
     {
-        edje_object_signal_emit(wd->slider, "elm,state,ricon,hidden", "elm");
+        edje_object_signal_emit(wd->slider, "elm,state,eicon,hidden", "elm");
         evas_object_event_callback_del_full
  	 (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	 wd->r_icon = NULL;
+	 wd->e_icon = NULL;
 	_sizing_eval(obj);
     }
 }
@@ -251,6 +258,8 @@ _units_set(Evas_Object *obj)
 	snprintf(buf, sizeof(buf), wd->units, wd->val);
 	edje_object_part_text_set(wd->slider, "elm.units", buf);
      }
+   else if (wd->e_label)
+     edje_object_part_text_set(wd->slider, "elm.units", wd->e_label);
    else
      edje_object_part_text_set(wd->slider, "elm.units", NULL);
 }
@@ -841,7 +850,7 @@ elm_slider_indicator_format_function_set(Evas_Object *obj, const char *(*func)(d
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////  supporting aqua feature  ///////////////////////////////////////////////////
+////////////////////////  supporting beat feature  ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -862,22 +871,22 @@ elm_slider_indicator_format_function_set(Evas_Object *obj, const char *(*func)(d
  * @ingroup Slider
  */
 EAPI Eina_Bool 
-elm_slider_right_icon_set(Evas_Object *obj, Evas_Object *icon)
+elm_slider_end_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	
-	if ((wd->r_icon != icon) && (wd->r_icon))
-		elm_widget_sub_object_del(obj, wd->r_icon);
+	if ((wd->e_icon != icon) && (wd->e_icon))
+		elm_widget_sub_object_del(obj, wd->e_icon);
 	
 	if (icon)
 	{
-		if ( !(edje_object_part_swallow(wd->slider, "right_icon", icon)) )
+		if ( !(edje_object_part_swallow(wd->slider, "end_icon", icon)) )
 			return EINA_FALSE;		
-		wd->r_icon = icon;
+		wd->e_icon = icon;
 		elm_widget_sub_object_add(obj, icon);
 		evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				_changed_size_hints, obj);
-		edje_object_signal_emit(wd->slider, "elm,state,ricon,visible", "elm");
+		edje_object_signal_emit(wd->slider, "elm,state,eicon,visible", "elm");
 		_sizing_eval(obj);
 	}
 	
@@ -894,11 +903,11 @@ elm_slider_right_icon_set(Evas_Object *obj, Evas_Object *icon)
  * @ingroup Slider
  */
 EAPI Evas_Object *
-elm_slider_right_icon_get(Evas_Object *obj)
+elm_slider_end_icon_get(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
-	return wd->r_icon;
+	return wd->e_icon;
 }
 
 
@@ -987,3 +996,50 @@ elm_slider_value_animated_set(Evas_Object *obj, double val)
 }
 
 
+/**
+ * Set the label of the slider
+ *
+ * @param obj The slider object
+ * @param label The text label string in UTF-8
+ *
+ * @ingroup Slider
+ */
+EAPI void
+elm_slider_end_label_set(Evas_Object *obj, const char *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   eina_stringshare_replace(&wd->e_label, label);
+   if (label)
+     {
+	edje_object_signal_emit(wd->slider, "elm,state,units,visible", "elm");
+	edje_object_message_signal_process(wd->slider);
+     }
+   else
+     {
+	edje_object_signal_emit(wd->slider, "elm,state,units,hidden", "elm");
+	edje_object_message_signal_process(wd->slider);
+     }
+   edje_object_part_text_set(wd->slider, "elm.units", label);
+   if(wd->units)
+	   wd->units = NULL;
+   _sizing_eval(obj);
+}
+
+/**
+ * Get the label of the slider
+ *
+ * @param obj The slider object
+ * @return The text label string in UTF-8
+ *
+ * @ingroup Slider
+ */
+EAPI const char *
+elm_slider_end_label_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->e_label;
+}
