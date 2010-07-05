@@ -1978,26 +1978,28 @@ extern "C" {
    /* ImageAnimation Fx */
    EAPI Elm_Effect* elm_fx_imageanimation_add( const Evas_Object* icon, const char** images, const unsigned int item_num );
 
-   /* NavigationBar */
+  /* NavigationBar */
+   typedef enum {
+		ELM_NAVIGATIONBAR_FUNCTION_BUTTON1,
+		ELM_NAVIGATIONBAR_FUNCTION_BUTTON2,
+		ELM_NAVIGATIONBAR_FUNCTION_BUTTON3,
+		ELM_NAVIGATIONBAR_BACK_BUTTON
+   } Elm_Navi_Button_Type;
+   
    EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);
-   EAPI void elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *left_btn, Evas_Object *right_btn, Evas_Object *content, Eina_Bool animation);
+   EAPI void elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1, Evas_Object *fn_btn2, Evas_Object *fn_btn3, Evas_Object *content, Eina_Bool animation);
    EAPI void elm_navigationbar_pop(Evas_Object *obj, Eina_Bool animation);
    EAPI void elm_navigationbar_to_content_pop(Evas_Object *obj, Evas_Object *content, Eina_Bool animation);
-   EAPI void elm_navigationbar_title_set(Evas_Object *obj, Evas_Object *content, const char *title);
-   EAPI const char *elm_navigationbar_title_get(Evas_Object *obj, Evas_Object *content);
+   EAPI void elm_navigationbar_title_label_set(Evas_Object *obj, Evas_Object *content, const char *title);
+   EAPI const char *elm_navigationbar_title_label_get(Evas_Object *obj, Evas_Object *content);
    EAPI void elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_Object *title_obj);
    EAPI Eina_List *elm_navigationbar_title_object_list_get(Evas_Object *obj, Evas_Object *content);
-   EAPI void elm_navigationbar_back_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
-   EAPI Evas_Object *elm_navigationbar_back_button_get(Evas_Object *obj, Evas_Object *content);
-   EAPI void elm_navigationbar_left_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
-   EAPI Evas_Object *elm_navigationbar_left_button_get(Evas_Object *obj, Evas_Object *content);
-   EAPI void elm_navigationbar_right_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
-   EAPI Evas_Object *elm_navigationbar_right_button_get(Evas_Object *obj, Evas_Object *content);
    EAPI Evas_Object *elm_navigationbar_content_top_get(Evas_Object *obj);
-   EAPI Evas_Object *elm_navigationbar_content_root_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_navigationbar_content_bottom_get(Evas_Object *obj);
    EAPI void elm_navigationbar_hidden_set(Evas_Object *obj, Eina_Bool hidden, Eina_Bool animation);
+   EAPI void elm_navigationbar_title_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Elm_Navi_Button_Type button_type, Eina_Bool animation);
+   EAPI Evas_Object *elm_navigationbar_title_button_get(Evas_Object *obj, Evas_Object *content, Elm_Navi_Button_Type button_type);
    
-
    /* Tab Bar */
    #define TAB_BAR_SYSTEM_ICON_CONTACT "elm/icon/tabbar_contact/default" 
    #define TAB_BAR_SYSTEM_ICON_GROUP "elm/icon/tabbar_group/default" 
