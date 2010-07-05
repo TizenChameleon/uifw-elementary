@@ -1821,19 +1821,19 @@ extern "C" {
    /* Contextual Popup */
    typedef struct _Ctxpopup_Item Elm_Ctxpopup_Item;
 
-   EAPI Evas_Object* elm_ctxpopup_add(Evas_Object* parent);
-   EAPI void elm_ctxpopup_horizontal_set(Evas_Object* obj, Eina_Bool horizontal);
-   EAPI Eina_Bool elm_ctxpopup_horizontal_get(Evas_Object* obj);
-   EAPI void elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item* item, Evas_Object* icon);
-   EAPI void elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item* item, const char* label);
-   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_icon_add( Evas_Object* obj, Evas_Object* icon, void (*func ) (void* data, Evas_Object* obj, void* event_info ),	const void* data ); 
-   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_label_add( Evas_Object* obj, const char* label,	void (*func ) (void* data, Evas_Object* obj, void* event_info ), const void* data );
-   EAPI void elm_ctxpopup_item_del(Elm_Ctxpopup_Item* item);
-   EAPI void elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item* item, Eina_Bool disabled);
-   EAPI void elm_ctxpopup_clear(Evas_Object* obj);
-   EAPI const char* elm_ctxpopup_item_label_get( Elm_Ctxpopup_Item* item );	
-   EAPI Evas_Object* elm_ctxpopup_item_icon_get( Elm_Ctxpopup_Item* item ); 
-   EAPI void elm_ctxpopup_scroller_disabled_set(Evas_Object* obj, Eina_Bool disabled );
+   EAPI Evas_Object *elm_ctxpopup_add(Evas_Object *parent);
+   EAPI void elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal);
+   EAPI Eina_Bool elm_ctxpopup_horizontal_get(Evas_Object *obj);
+   EAPI void elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon);
+   EAPI void elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label);
+   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_icon_add( Evas_Object *obj, Evas_Object *icon, void (*func) (void *data, Evas_Object *obj, void *event_info ),	const void *data); 
+   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_label_add( Evas_Object *obj, const char *label,	void (*func) (void *data, Evas_Object *obj, void *event_info ), const void* data);
+   EAPI void elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item);
+   EAPI void elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item *item, Eina_Bool disabled);
+   EAPI void elm_ctxpopup_clear(Evas_Object *obj);
+   EAPI const char *elm_ctxpopup_item_label_get(Elm_Ctxpopup_Item *item);	
+   EAPI Evas_Object *elm_ctxpopup_item_icon_get(Elm_Ctxpopup_Item *item); 
+   EAPI void elm_ctxpopup_scroller_disabled_set(Evas_Object *obj, Eina_Bool disabled);
 
    /* QuickContactBadge */
    typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;
