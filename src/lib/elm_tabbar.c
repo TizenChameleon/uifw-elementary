@@ -1096,7 +1096,7 @@ EAPI Evas_Object *elm_tabbar_add(Evas_Object *parent) {
 	r_button = elm_button_add(wd->navigation);
 	elm_button_label_set(r_button, "Done");
 	evas_object_smart_callback_add(r_button, "clicked", done_button_cb, wd);
-	elm_navigationbar_push(wd->navigation, "Configure", NULL, r_button, NULL, EINA_FALSE);
+	elm_navigationbar_push(wd->navigation, "Configure", NULL, r_button, NULL, NULL, EINA_FALSE);
 	edje_object_part_swallow(wd->edit_box, "elm.swallow.navigation", wd->navigation);
 	
 	wd->edit_table = elm_table_add(wd->edit_box);

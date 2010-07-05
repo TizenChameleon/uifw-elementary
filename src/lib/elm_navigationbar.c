@@ -2,12 +2,22 @@
 #include "elm_priv.h"
 
 /**
- * @defgroup NavigationBar NavigationBar
- * @ingroup Elementary
+ * @addtogroup NavigationBar NavigationBar
  *
- * The Navigationbar is an object that manages the presentation of hierarchical data in your application.
- * It covers whole content region with a bar, typically displayed at the top of the screen, 
- * containing buttons for navigating up and down a hierarchy.
+ * The pager is an object that allows flipping (with animation) between 1 or
+ * more of objects, much like a stack of windows within the window.
+ *
+ * Objects can be pushed or popped from he stack or deleted as normal.
+ * Pushes and pops will animate (and a pop will delete the object once the
+ * animation is finished). Any object in the pager can be promoted to the top
+ * (from its current stacking position) as well. Objects are pushed to the
+ * top with elm_pager_content_push() and when the top item is no longer
+ * wanted, simply pop it with elm_pager_content_pop() and it will also be
+ * deleted. Any object you wish to promote to the top that is already in the
+ * pager, simply use elm_pager_content_promote(). If an object is no longer
+ * needed and is not the top item, just delete it as normal. You can query
+ * which objects are the top and bottom with elm_pager_content_bottom_get()
+ * and elm_pager_content_top_get().
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -24,15 +34,17 @@ struct _Widget_Data
 struct _Item
 {
 	Evas_Object *obj;
- 	Evas_Object *title;
+	const char *title;
 	Evas_Object *title_obj;
 	Eina_List *title_list;
-	Evas_Object *left_btn;
-	Evas_Object *right_btn;
+	Evas_Object *fn_btn1;
+	Evas_Object *fn_btn2;
+	Evas_Object *fn_btn3;
 	Evas_Object *back_btn;
 	Evas_Object *content;
-	int left_btn_w;
-	int right_btn_w;
+	int fn_btn1_w;
+	int fn_btn2_w;
+	int fn_btn3_w;
 	int title_w;
 	Eina_Bool ani;
 };
@@ -44,14 +56,7 @@ struct _Transit_Cb_Data
 	Eina_Bool pop;
 };
 
-#define MINIMUM_WIDTH	70
-#define MAXIMUM_WIDTH	200
-#define EFFECT_WIDTH	160
-
-#define CHAR_WIDTH		14
-#define BACK_BTN_PADDING 10
-#define ICON_PADDING	10
-#define FONT_SIZE		28
+static const char *widtype = NULL;
 
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
@@ -60,32 +65,33 @@ static void _move(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _item_sizing_eval(Item *it);
 static void _delete_item(Item *it);
-
 static void _back_button_clicked(void *data, Evas_Object *obj, void *event_info);
-static int _get_button_width(Evas_Object *obj, Eina_Bool back_btn);
+static int _set_button_width(Evas_Object *obj);
 static Eina_Bool _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_Bool back_btn);
-static const char *_title_string_get(Evas_Object *title);
 static void _label_set(Evas_Object* label, const char* title);
 static Evas_Object *_multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, int width);
 static Item *_check_item_is_added(Evas_Object *obj, Evas_Object *content);
-
 static void _transition_complete_cb(void *data);
 static Elm_Transit *_transition_set(Item* prev_it, Item *it, Evas_Coord y, Eina_Bool pop);
+static void _elm_navigationbar_back_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
+static Evas_Object *_elm_navigationbar_back_button_get(Evas_Object *obj, Evas_Object *content);
+static void _elm_navigationbar_function_button1_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
+static Evas_Object *_elm_navigationbar_function_button1_get(Evas_Object *obj, Evas_Object *content);
+static void _elm_navigationbar_function_button2_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
+static Evas_Object *_elm_navigationbar_function_button2_get(Evas_Object *obj, Evas_Object *content);
+static void _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
+static Evas_Object *_elm_navigationbar_function_button3_get(Evas_Object *obj, Evas_Object *content);
 
 static void
 _del_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Eina_List *ll;
+	Eina_List *list;
 	Item *it;
 
-	 EINA_LIST_FOREACH(wd->stack, ll, it)
+	 EINA_LIST_FOREACH(wd->stack, list, it)
 		_delete_item(it);
-
 	eina_list_free(wd->stack);
-	evas_object_del(wd->pager);
-	evas_object_del(wd->base);
-
 	free(wd);
 }
 
@@ -93,23 +99,22 @@ static void
 _theme_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Eina_List *ll;
-	Item *it;
-
-	_elm_theme_object_set(obj, wd->base, "navigationbar", "base", "default");
-
+	Eina_List *list=NULL;
+	Item *it=NULL;
+	char buf_fn[4096];
+	char buf_bk[4096];
+	if (!wd) return;
+	_elm_theme_object_set(obj, wd->base, "navigationbar", "base", elm_widget_style_get(obj));
 	edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
-
-	 EINA_LIST_FOREACH(wd->stack, ll, it)
+	 EINA_LIST_FOREACH(wd->stack, list, it)
 	{
-		//elm_object_style_set(it->left_btn, "custom/darkblue");
-		elm_object_style_set(it->left_btn, "navigationbar/normal");
-		//elm_object_style_set(it->right_btn, "custom/darkblue");
-		elm_object_style_set(it->right_btn, "navigationbar/normal");
-		//elm_object_style_set(it->back_btn, "backkey");
-		elm_object_style_set(it->back_btn, "navigationbar/back");
+		snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
+		elm_object_style_set(it->fn_btn1, buf_fn);
+		elm_object_style_set(it->fn_btn2, buf_fn);
+		elm_object_style_set(it->fn_btn3, buf_fn);
+		snprintf(buf_bk, sizeof(buf_bk), "navigationbar_backbutton/%s", elm_widget_style_get(obj));
+		elm_object_style_set(it->back_btn, buf_bk);
 	}
-
 	_sizing_eval(obj);
 }
 
@@ -119,16 +124,14 @@ _delete_item(Item *it)
 	Eina_List *ll;
 	Evas_Object *list_obj;
 	
-	evas_object_del(it->left_btn);
+	evas_object_del(it->fn_btn1);
 	evas_object_del(it->back_btn);
-	evas_object_del(it->right_btn);
-	evas_object_del(it->title_obj);
-	evas_object_del(it->title);	
-
+	evas_object_del(it->fn_btn2);
+	evas_object_del(it->fn_btn3);
+	if (it->title) eina_stringshare_del(it->title);
 	EINA_LIST_FOREACH(it->title_list, ll, list_obj)
 		evas_object_del(list_obj);
 	eina_list_free(it->title_list);
-
 	free(it);	
 }
 
@@ -138,7 +141,7 @@ _sizing_eval(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Coord minw = -1, minh = -1;
 	Evas_Coord w = -1, h = -1;
-	Eina_List *ll;
+	Eina_List *list;
 
 	edje_object_size_min_calc(wd->base, &minw, &minh);
 	evas_object_size_hint_min_get(obj, &w, &h);
@@ -148,10 +151,10 @@ _sizing_eval(Evas_Object *obj)
 	evas_object_size_hint_min_set(obj, minw, minh);
 	evas_object_size_hint_max_set(obj, -1, -1);
 
-	ll = eina_list_last(wd->stack);
-	if (ll)
+	list = eina_list_last(wd->stack);
+	if (list)
 	{
-		Item *it = ll->data;
+		Item *it = list->data;
 		_item_sizing_eval(it);
 	}
 }
@@ -172,60 +175,32 @@ _item_sizing_eval(Item *it)
 	edje_object_part_geometry_get(wd->base, "elm.rect.pad1", NULL, NULL, &pad, NULL);
 	edje_object_part_geometry_get(wd->base, "elm.swallow.title", NULL, NULL, NULL, &height);
 
-	if (it->left_btn) 
+	if (it->fn_btn1) 
 	{
-		it->left_btn_w = _get_button_width(it->left_btn, FALSE);
-		evas_object_resize(it->left_btn, it->left_btn_w , height);
-		evas_object_size_hint_min_set(it->left_btn, it->left_btn_w , height);
+		it->fn_btn1_w = _set_button_width(it->fn_btn1);
 		pad_count++;
 	}
 	else if (it->back_btn)
 	{
-		it->left_btn_w = _get_button_width(it->back_btn, TRUE);
-		evas_object_resize(it->back_btn, it->left_btn_w, height);
-		evas_object_size_hint_min_set(it->back_btn, it->left_btn_w, height);
+		it->fn_btn1_w = _set_button_width(it->back_btn);
 		pad_count++;
-	}
-	
-	if (it->right_btn)
+	}	
+	if (it->fn_btn2)
 	{
-		it->right_btn_w = _get_button_width(it->right_btn, FALSE);
-		evas_object_resize(it->right_btn, it->right_btn_w, height);
-		evas_object_size_hint_min_set(it->right_btn, it->right_btn_w, height);
+		it->fn_btn2_w = _set_button_width(it->fn_btn2);
 		pad_count++;
 	}
-
+	if (it->fn_btn3)
+	{
+		it->fn_btn3_w = _set_button_width(it->fn_btn3);
+		pad_count++;
+	}
 	if (it->title_list)
 	{	
-		it->title_w = w - it->left_btn_w - it->right_btn_w - pad_count * pad;
+		it->title_w = w - it->fn_btn1_w - it->fn_btn2_w -it->fn_btn3_w - pad_count * pad;
 		it->title_obj = _multiple_object_set(it->obj, it->title_obj, it->title_list, it->title_w);
 		evas_object_resize(it->title_obj, it->title_w, height);
 		evas_object_size_hint_min_set(it->title_obj, it->title_w, height);
-	}
-	else if (it->title) 
-	{
-		const char *str = NULL;
-
-		it->title_w = w - it->left_btn_w - it->right_btn_w - pad_count * pad;
-		evas_object_resize(it->title, it->title_w, height);
-		evas_object_size_hint_min_set(it->title, it->title_w, height);
-		
-		str = _title_string_get(it->title);
-		if (str) 
-		{
-			double align;
-			const char align_str[7] = {0,};
-			int diff = 0;
-
-			diff = it->left_btn_w - it->right_btn_w;
-			if (it->left_btn_w) diff += pad;
-			if (it->right_btn_w) diff -= pad;
-
-			align = 0.5 - diff / (double)w;
-			if (align < 0.0) align = 0.0;
-			sprintf(align_str, "%lf", align);
-			elm_label_text_align_set(it->title, align_str);
-		}
 	}
 }
 
@@ -260,19 +235,18 @@ _transition_complete_cb(void *data)
 	}
 	else if (prev_it)
 	{
-	 	evas_object_hide(prev_it->left_btn);
+	 	evas_object_hide(prev_it->fn_btn1);
 		evas_object_hide(prev_it->back_btn);
 		evas_object_hide(prev_it->title_obj);
-		evas_object_hide(prev_it->title);
-		evas_object_hide(prev_it->right_btn);
+		evas_object_hide(prev_it->fn_btn2);
+		evas_object_hide(prev_it->fn_btn3);
 	}
-
 	if (it)
 	{
-		if (it->left_btn) 
+		if (it->fn_btn1) 
 		{
 			edje_object_signal_emit(wd->base, "elm,state,item,add,leftpad", "elm");
-			edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->left_btn);
+			edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->fn_btn1);
 		}
 		else if (it->back_btn) 
 		{
@@ -282,23 +256,35 @@ _transition_complete_cb(void *data)
 		else
 			edje_object_signal_emit(wd->base, "elm,state,item,reset,leftpad", "elm");
 			
-		if (it->right_btn) 
+		if (it->fn_btn2) 
 		{
 			edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad", "elm");
-			edje_object_part_swallow(wd->base, "elm.swallow.btn2", it->right_btn);
+			edje_object_part_swallow(wd->base, "elm.swallow.btn2", it->fn_btn2);
 		}
 		else
 			edje_object_signal_emit(wd->base, "elm,state,item,reset,rightpad", "elm");
-
+		
+		if(it->fn_btn3) 
+		{
+			edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
+			edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
+			edje_object_part_swallow(wd->base, "elm.swallow.btn3", it->fn_btn3);
+		}
+		else
+			edje_object_signal_emit(wd->base, "elm,state,item,reset,rightpad2", "elm");
+		
 		if (it->title_obj) edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
-		else if (it->title) edje_object_part_swallow(wd->base, "elm.swallow.title", it->title);
+		if (it->title) edje_object_part_text_set(wd->base, "elm.text", it->title);
+		if((it->title_obj)&&(it->title))
+		{
+			edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
+		}
 	}
-
 	free(cb);
-
 	evas_object_smart_callback_call(it->obj, "updated", it->content);
 }
 
+#if 0
 static Elm_Transit *
 _transition_set(Item* prev_it, Item *it, Evas_Coord y, Eina_Bool pop)
 {
@@ -318,10 +304,10 @@ _transition_set(Item* prev_it, Item *it, Evas_Coord y, Eina_Bool pop)
 	if (prev_it)
 	{
 		pad_count = 1;
-		if (prev_it->left_btn) 
+		if (prev_it->fn_btn1) 
 		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->left_btn, pad, y, pad-num*EFFECT_WIDTH/4, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->left_btn, 255, 255, 255, 255, 0, 0, 0, 0));
+			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->fn_btn1, pad, y, pad-num*EFFECT_WIDTH/4, y));
+			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->fn_btn1, 255, 255, 255, 255, 0, 0, 0, 0));
 			pad_count++;
 		}
 		else if (prev_it->back_btn)
@@ -332,18 +318,18 @@ _transition_set(Item* prev_it, Item *it, Evas_Coord y, Eina_Bool pop)
 		}
 		if (prev_it->title_obj)
 		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->title_obj, prev_it->left_btn_w+pad_count*pad, y, prev_it->left_btn_w+pad_count*pad-num*EFFECT_WIDTH, y));
+			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->title_obj, prev_it->fn_btn1_w+pad_count*pad, y, prev_it->fn_btn1_w+pad_count*pad-num*EFFECT_WIDTH, y));
 			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->title_obj, 255, 255, 255, 255, 0, 0, 0, 0));
 		}
 		else if (prev_it->title)
 		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->title, prev_it->left_btn_w+pad_count*pad, y, prev_it->left_btn_w+pad_count*pad-num*EFFECT_WIDTH, y));
+			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->title, prev_it->fn_btn1_w+pad_count*pad, y, prev_it->fn_btn1_w+pad_count*pad-num*EFFECT_WIDTH, y));
 			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->title, 255, 255, 255, 255, 0, 0, 0, 0));
 		}
-		if (prev_it->right_btn)
+		if (prev_it->fn_btn2)
 		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->right_btn, w-pad-prev_it->right_btn_w, y, w-pad-prev_it->right_btn_w-num*EFFECT_WIDTH/4, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->right_btn, 255, 255, 255, 255, 0, 0, 0, 0));
+			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->fn_btn2, w-pad-prev_it->fn_btn2_w, y, w-pad-prev_it->fn_btn2_w-num*EFFECT_WIDTH/4, y));
+			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->fn_btn2, 255, 255, 255, 255, 0, 0, 0, 0));
 		}
 	}
 
@@ -351,10 +337,10 @@ _transition_set(Item* prev_it, Item *it, Evas_Coord y, Eina_Bool pop)
 	if (it)
 	{
 		pad_count = 1;
-		if (it->left_btn)
+		if (it->fn_btn1)
 		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(it->left_btn, pad+num*EFFECT_WIDTH/4, y, pad, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(it->left_btn, 0, 0, 0, 0, 255, 255, 255, 255));
+			elm_transit_fx_insert(transit, elm_fx_translation_add(it->fn_btn1, pad+num*EFFECT_WIDTH/4, y, pad, y));
+			elm_transit_fx_insert(transit, elm_fx_color_add(it->fn_btn1, 0, 0, 0, 0, 255, 255, 255, 255));
 			pad_count++;
 		}
 		else if (it->back_btn)
@@ -365,106 +351,77 @@ _transition_set(Item* prev_it, Item *it, Evas_Coord y, Eina_Bool pop)
 		}
 		if (it->title_obj)
 		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(it->title_obj, it->left_btn_w+pad_count*pad+num*EFFECT_WIDTH, y, it->left_btn_w+pad_count*pad, y));
+			elm_transit_fx_insert(transit, elm_fx_translation_add(it->title_obj, it->fn_btn1_w+pad_count*pad+num*EFFECT_WIDTH, y, it->fn_btn1_w+pad_count*pad, y));
 			elm_transit_fx_insert(transit, elm_fx_color_add(it->title_obj, 0, 0, 0, 0, 255, 255, 255, 255));
 		}
 		else if (it->title)
 		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(it->title, it->left_btn_w+pad_count*pad+num*EFFECT_WIDTH, y, it->left_btn_w+pad_count*pad, y));
+			elm_transit_fx_insert(transit, elm_fx_translation_add(it->title, it->fn_btn1_w+pad_count*pad+num*EFFECT_WIDTH, y, it->fn_btn1_w+pad_count*pad, y));
 			elm_transit_fx_insert(transit, elm_fx_color_add(it->title, 0, 0, 0, 0, 255, 255, 255, 255));
 		}
-		if (it->right_btn)
+		if (it->fn_btn2)
 		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(it->right_btn, w-pad-it->right_btn_w+num*EFFECT_WIDTH/4, y, w-pad-it->right_btn_w, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(it->right_btn, 0, 0, 0, 0, 255, 255, 255, 255));
+			elm_transit_fx_insert(transit, elm_fx_translation_add(it->fn_btn2, w-pad-it->fn_btn2_w+num*EFFECT_WIDTH/4, y, w-pad-it->fn_btn2_w, y));
+			elm_transit_fx_insert(transit, elm_fx_color_add(it->fn_btn2, 0, 0, 0, 0, 255, 255, 255, 255));
 		}
 	}
-
 	return transit;
 }
+#endif
 
 static void 
 _back_button_clicked(void *data, Evas_Object *obj, void *event_info)
 {
-	Item *it = data;
-	
+	Item *it = data;	
 	elm_navigationbar_pop(it->obj, it->ani);
 }
 
-
 static int
-_get_button_width(Evas_Object *obj, Eina_Bool back_btn)
+_set_button_width(Evas_Object *obj)
 {
-	int len = 0;
-	char *label;
-	int btn_len = 0;
+	Evas_Coord minw, minh, maxw, maxh;
+	Evas_Coord w, h;
 
-	//if (back_btn) btn_len = BACK_BTN_PADDING;
+	evas_object_size_hint_min_get(obj, &minw, &minh);
+	evas_object_size_hint_max_get(obj, &maxw, &maxh);
+	evas_object_geometry_get(obj, NULL, NULL, &w, &h);
 
-	evas_object_geometry_get(elm_button_icon_get(obj), NULL, NULL, &len, NULL);
-	if (len > 0) 
-	{
-		btn_len += len+2*ICON_PADDING;
-		return btn_len;
-	}
-
-	label = elm_button_label_get(obj);
-	if (label) 	len = strlen(label);
-	if (len > 0) btn_len += len*CHAR_WIDTH;	
-
-	if (btn_len < MINIMUM_WIDTH) return MINIMUM_WIDTH;
-	else if (btn_len > MAXIMUM_WIDTH) return MAXIMUM_WIDTH;
-	else return btn_len;
-
-	return 0;
+   if (w < minw) w = minw;
+   if (h < minh) h = minh;
+   if ((maxw >= 0) && (w > maxw)) w = maxw;
+   if ((maxh >= 0) && (h > maxh)) h = maxh;
+	
+	evas_object_resize(obj, w, h);
+	return w;
 }
 
 static Eina_Bool 
 _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_Bool back_btn)
 {
 	Eina_Bool changed = FALSE;
+	char buf[4096];
 	
 	if ((prev_btn) && (prev_btn != new_btn)) 
 	{
 		elm_widget_sub_object_del(obj, prev_btn);
 		evas_object_del(prev_btn);
 	}
-
 	if ((new_btn) && (prev_btn != new_btn)) 
 	{
-		if (back_btn) elm_object_style_set( new_btn, "navigationbar/back" );
-		else elm_object_style_set(new_btn, "navigationbar/normal");
+		if (back_btn) 
+			{
+				snprintf(buf, sizeof(buf), "navigationbar_backbutton/%s", elm_widget_style_get(obj));
+				elm_object_style_set(new_btn, buf);
+			}
+		else 
+			{
+				snprintf(buf, sizeof(buf), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
+				elm_object_style_set(new_btn, buf);
+			}
 		elm_widget_sub_object_add(obj, new_btn);
 		changed = TRUE;
 	}
-
 	return changed;
-}
-
-static const char *
-_title_string_get(Evas_Object *title)
-{
-	if (!title) return NULL;
-	
-	const char *str = NULL;
-
-	str = elm_label_label_get(title);
-	while (str && (*str == '<')) 
-	{
-		str = strstr(str, ">");
-		str += 1;
-	}
-	return str;
-}
-
-static void
-_label_set(Evas_Object* label, const char* title)
-{
-	if (!label) return;
-	
-	elm_label_label_set(label, title);
-	elm_label_fontsize_set(label, FONT_SIZE);
-	elm_label_text_color_set(label, 255, 255, 255, 255);
 }
 
 static Item *
@@ -497,7 +454,6 @@ _multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, in
 
 	edje_object_part_geometry_get(wd->base, "elm.rect.pad1", NULL, NULL, &pad, NULL);
 	edje_object_part_geometry_get(wd->base, "elm.swallow.title", NULL, NULL, NULL, &height);
-
 	if (!sub_obj)
 	{
 		new_obj = elm_layout_add(obj);
@@ -506,7 +462,6 @@ _multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, in
 	}
 	else 
 		new_obj = sub_obj;
-
 	count = eina_list_count(list);
 	EINA_LIST_FOREACH(list, ll, list_obj)
 	{	
@@ -521,7 +476,6 @@ _multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, in
 		sprintf(buf, "elm.swallow.title%d", num++);
 		elm_layout_content_set(new_obj, buf, list_obj);
 	}
-
 	return new_obj;
 }
 
@@ -543,6 +497,7 @@ elm_navigationbar_add(Evas_Object *parent)
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
 	obj = elm_widget_add(e);
+	ELM_SET_WIDTYPE(widtype, "navigationbar");
 	elm_widget_type_set(obj, "navigationbar");
 	elm_widget_sub_object_add(parent, obj);
 	elm_widget_data_set(obj, wd);
@@ -570,8 +525,8 @@ elm_navigationbar_add(Evas_Object *parent)
  *
  * @param[in] obj The NavigationBar object
  * @param[in] title The title string
- * @param[in] left_btn The left button
- * @param[in] right_btn The right button
+ * @param[in] fn_btn1 The left button
+ * @param[in] fn_btn2 The right button
  * @param[in] content The object to push
  * @param[in] animation transition when this content becomes the top
  *
@@ -580,11 +535,13 @@ elm_navigationbar_add(Evas_Object *parent)
 EAPI void
 elm_navigationbar_push(Evas_Object *obj, 
 						const char *title,
-						Evas_Object *left_btn, 
-						Evas_Object *right_btn, 
+						Evas_Object *fn_btn1, 
+						Evas_Object *fn_btn2, 
+						Evas_Object *fn_btn3, 
 						Evas_Object *content,
 						Eina_Bool animation)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
@@ -597,8 +554,9 @@ elm_navigationbar_push(Evas_Object *obj,
 	if (!it) return;
 	
 	// add and set new items		
-	_button_set(obj, NULL, left_btn, EINA_FALSE);
-	_button_set(obj, NULL, right_btn, EINA_FALSE);
+	_button_set(obj, NULL, fn_btn1, EINA_FALSE);
+	_button_set(obj, NULL, fn_btn2, EINA_FALSE);
+	_button_set(obj, NULL, fn_btn3, EINA_FALSE);
 	
 	ll = eina_list_last(wd->stack);
 	while (ll) 
@@ -610,35 +568,41 @@ elm_navigationbar_push(Evas_Object *obj,
 	}
 
 	it->obj = obj;
-	it->left_btn = left_btn;
-	it->right_btn = right_btn;
+	it->fn_btn1 = fn_btn1;
+	it->fn_btn2 = fn_btn2;
+	it->fn_btn3 = fn_btn3;
 	it->content = content;
 	it->ani = animation;
 
-	if (!left_btn && prev_it)
+	if (!fn_btn1 && prev_it)
 	{
 		char *prev_title;
 		char *buf = NULL;
 		int len = 0;
 
 		it->back_btn = elm_button_add(obj);
-		prev_title = _title_string_get(prev_it->title);
-		if (prev_title) len = strlen(prev_title);
-		if (len > 0) buf = calloc(len+3, sizeof(char));
-		if (buf) 
+		prev_title = prev_it->title;
+		if(prev_title)
 		{
-			sprintf(buf, "< %s", prev_title);
-			elm_button_label_set(it->back_btn, buf);
-			free(buf);
+			if (prev_title) len = strlen(prev_title);
+			if (len > 0) buf = calloc(len+3, sizeof(char));
+			if (buf) 
+			{
+				sprintf(buf, "< %s", prev_title);
+				elm_button_label_set(it->back_btn, buf);
+				free(buf);
+			}
+		}
+		else
+		{
+			elm_button_label_set(it->back_btn, "< Prev.");
 		}
 		evas_object_smart_callback_add(it->back_btn, "clicked", _back_button_clicked, it); 
 		_button_set(obj, NULL, it->back_btn, EINA_TRUE);
 	}
-
-	it->title = elm_label_add(obj);
-	elm_widget_sub_object_add(obj, it->title);
-	if (title) _label_set(it->title, title);
 	
+	eina_stringshare_replace(&it->title, title);
+	edje_object_part_text_set(wd->base, "elm.text", title);
 	_item_sizing_eval(it);
 
 	// unswallow items and start transition
@@ -655,9 +619,10 @@ elm_navigationbar_push(Evas_Object *obj,
 
 		if (prev_it->title_obj) edje_object_part_unswallow(wd->base, prev_it->title_obj);
 		else if (prev_it->title) edje_object_part_unswallow(wd->base, prev_it->title);
- 		if (prev_it->left_btn) edje_object_part_unswallow(wd->base, prev_it->left_btn);
+ 		if (prev_it->fn_btn1) edje_object_part_unswallow(wd->base, prev_it->fn_btn1);
 		else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
-		if (prev_it->right_btn) edje_object_part_unswallow(wd->base, prev_it->right_btn);
+		if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
+		if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
 
 		/*if (it->ani) 
 		{
@@ -675,7 +640,6 @@ elm_navigationbar_push(Evas_Object *obj,
 	else  
 	{
 		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
-
 		cb->prev_it = NULL;
 		cb->it = it;
 		cb->pop = EINA_FALSE;
@@ -700,6 +664,7 @@ elm_navigationbar_push(Evas_Object *obj,
 			}
 	 	}
 	}
+	_sizing_eval(obj);
 }
 
 /**
@@ -716,6 +681,7 @@ EAPI void
 elm_navigationbar_pop(Evas_Object *obj, 
 						Eina_Bool animation)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it = NULL;
@@ -749,11 +715,10 @@ elm_navigationbar_pop(Evas_Object *obj,
 		else evas_object_geometry_get(prev_it->title, NULL, &y, NULL, NULL);
 
 		if (prev_it->title_obj) edje_object_part_unswallow(wd->base, prev_it->title_obj);
-		else if (prev_it->title) edje_object_part_unswallow(wd->base, prev_it->title);
-		if (prev_it->left_btn) edje_object_part_unswallow(wd->base, prev_it->left_btn);
+		if (prev_it->fn_btn1) edje_object_part_unswallow(wd->base, prev_it->fn_btn1);
 		else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
-		if (prev_it->right_btn) edje_object_part_unswallow(wd->base, prev_it->right_btn);
-
+		if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
+		if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
 		_item_sizing_eval(it);
 
 		/*if (animation) 
@@ -804,6 +769,7 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 										Evas_Object *content,
 										Eina_Bool animation)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it = NULL;
@@ -852,10 +818,10 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 
 		if (prev_it->title_obj) edje_object_part_unswallow(wd->base, prev_it->title_obj);
 		else if (prev_it->title) edje_object_part_unswallow(wd->base, prev_it->title);
-		if (prev_it->left_btn) edje_object_part_unswallow(wd->base, prev_it->left_btn);
+		if (prev_it->fn_btn1) edje_object_part_unswallow(wd->base, prev_it->fn_btn1);
 		else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
-		if (prev_it->right_btn) edje_object_part_unswallow(wd->base, prev_it->right_btn);
-
+		if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
+		if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
 		_item_sizing_eval(it);
 
 		/*if (animation) 
@@ -888,10 +854,11 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
  * @ingroup NavigationBar
  */
 EAPI void
-elm_navigationbar_title_set(Evas_Object *obj, 
+elm_navigationbar_title_label_set(Evas_Object *obj, 
 							Evas_Object *content, 
 							const char *title)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
@@ -902,7 +869,8 @@ elm_navigationbar_title_set(Evas_Object *obj,
 	{
 		if (it->content == content) 
 		{
-			_label_set(it->title, title);
+		   eina_stringshare_replace(&it->title, title);
+   			edje_object_part_text_set(wd->base, "elm.text", title);
 			_item_sizing_eval(it);
 			break;
 		}
@@ -919,9 +887,10 @@ elm_navigationbar_title_set(Evas_Object *obj,
  * @ingroup NavigationBar
  */
 EAPI const char *
-elm_navigationbar_title_get(Evas_Object *obj, 
+elm_navigationbar_title_label_get(Evas_Object *obj, 
 							Evas_Object *content)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
@@ -931,7 +900,7 @@ elm_navigationbar_title_get(Evas_Object *obj,
 	 EINA_LIST_FOREACH(wd->stack, ll, it)
 	{
 		if (it->content == content) 
-			return _title_string_get(it->title);
+			return it->title;
 	}
 	return NULL;
 }
@@ -952,6 +921,7 @@ elm_navigationbar_title_object_add(Evas_Object *obj,
 									Evas_Object *content,
 									Evas_Object *title_obj)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
@@ -985,6 +955,10 @@ elm_navigationbar_title_object_add(Evas_Object *obj,
 				evas_object_hide(swallow);
 			}
 			edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
+			if((it->title_obj)&&(it->title))
+			{
+				edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
+			}
 		}
 	}
 }
@@ -1002,12 +976,12 @@ EAPI Eina_List *
 elm_navigationbar_title_object_list_get(Evas_Object *obj,
 										Evas_Object *content)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
 
 	if (!wd) return NULL;
-
 	EINA_LIST_FOREACH(wd->stack, ll, it)
 	{
 		if (it->content == content)	
@@ -1016,20 +990,8 @@ elm_navigationbar_title_object_list_get(Evas_Object *obj,
 	return NULL;
 }
 
-/**
- * Set the back button object for the pushed content
- * If the content is at the top of the navigation stack, update the back button
- * If the left button is already set, back button is not created
- *
- * @param[in] obj The NavigationBar object
- * @param[in] content The object to push or pushed
- * @param[in] button The back button
- * @param[in] animation transition when this button becomes the top item
- *
- * @ingroup NavigationBar
- */
-EAPI void
-elm_navigationbar_back_button_set(Evas_Object *obj, 
+static void
+_elm_navigationbar_back_button_set(Evas_Object *obj, 
 									Evas_Object *content, 
 									Evas_Object *button, 
 									Eina_Bool animation)
@@ -1057,7 +1019,7 @@ elm_navigationbar_back_button_set(Evas_Object *obj,
 	if (ll) 
 	{
 		it = ll->data;
-		if (changed && (it->content == content) && (!it->left_btn)) 
+		if (changed && (it->content == content) && (!it->fn_btn1)) 
 		{
 			edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->back_btn);	
 			evas_object_smart_callback_add(it->back_btn, "clicked", _back_button_clicked, it); 
@@ -1065,17 +1027,8 @@ elm_navigationbar_back_button_set(Evas_Object *obj,
 	}
 }
 
-/**
- * Return the back button object of the pushed content
- *
- * @param[in] obj The NavigationBar object
- * @param[in] content The object to push or pushed
- * @return The back button object or NULL if none
- *
- * @ingroup NavigationBar
- */
-EAPI Evas_Object *
-elm_navigationbar_back_button_get(Evas_Object *obj, 
+static Evas_Object *
+_elm_navigationbar_back_button_get(Evas_Object *obj, 
 									Evas_Object *content)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -1092,19 +1045,8 @@ elm_navigationbar_back_button_get(Evas_Object *obj,
 	return NULL;
 }
 
-/**
- * Set the left button object for the pushed content
- * If the content is at the top of the navigation stack, update the left button
- *
- * @param[in] obj The NavigationBar object
- * @param[in] content The object to push or pushed
- * @param[in] button The left button
- * @param[in] animation transition when this button becomes the top item 
- *
- * @ingroup NavigationBar
- */
-EAPI void
-elm_navigationbar_left_button_set(Evas_Object *obj, 
+static void
+_elm_navigationbar_function_button1_set(Evas_Object *obj, 
 									Evas_Object *content, 
 									Evas_Object *button, 
 									Eina_Bool animation)
@@ -1120,8 +1062,8 @@ elm_navigationbar_left_button_set(Evas_Object *obj,
 	{
 		if (it->content == content) 
 		{
-			changed = _button_set(obj, it->left_btn, button, EINA_FALSE);
-			it->left_btn = button;
+			changed = _button_set(obj, it->fn_btn1, button, EINA_FALSE);
+			it->fn_btn1 = button;
 			_item_sizing_eval(it);
 			break;
 		}
@@ -1139,22 +1081,13 @@ elm_navigationbar_left_button_set(Evas_Object *obj,
 				edje_object_part_unswallow(wd->base, it->back_btn);
 				evas_object_hide(it->back_btn);
 			}
-			edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->left_btn);
+			edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->fn_btn1);
 		}
 	}
 }
 
-/**
- * Return the left button object of the pushed content
- *
- * @param[in] obj The NavigationBar object
- * @param[in] content The object to push or pushed
- * @return The left button object or NULL if none
- *
- * @ingroup NavigationBar
- */
-EAPI Evas_Object *
-elm_navigationbar_left_button_get(Evas_Object *obj, 	
+static Evas_Object *
+_elm_navigationbar_function_button1_get(Evas_Object *obj, 	
 									Evas_Object *content)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -1166,23 +1099,64 @@ elm_navigationbar_left_button_get(Evas_Object *obj,
 	 EINA_LIST_FOREACH(wd->stack, ll, it)
 	{
 		if (it->content == content) 
-			return it->left_btn;
+			return it->fn_btn1;
 	}	
 	return NULL;
 }
 
-/**
- * set the right button object for the pushed content
- *
- * @param[in] obj The NavigationBar object
- * @param[in] content The object to push or pushed
- * @param[in] button The right button
- * @param[in] animation transition when this button becomes the top item
- *
- * @ingroup NavigationBar
- */
-EAPI void
-elm_navigationbar_right_button_set(Evas_Object *obj, 
+static void
+_elm_navigationbar_function_button2_set(Evas_Object *obj, 
+										Evas_Object *content, 
+										Evas_Object *button, 
+										Eina_Bool animation)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *ll;
+	Item *it;
+	Eina_Bool changed;
+
+	if (!wd) return;
+	 EINA_LIST_FOREACH(wd->stack, ll, it)
+		{
+			if (it->content == content) 
+			{
+				changed = _button_set(obj, it->fn_btn2, button, EINA_FALSE);
+				it->fn_btn2 = button;
+				_item_sizing_eval(it);
+				break;
+			}
+		 }	
+	 
+	//update if the content is the top item
+	ll = eina_list_last(wd->stack);
+	if (ll) 
+		{
+			it = ll->data;
+			if (changed && (it->content == content)) 
+				edje_object_part_swallow(wd->base, "elm.swallow.btn2", it->fn_btn2);
+		}
+}
+
+static Evas_Object *
+_elm_navigationbar_function_button2_get(Evas_Object *obj, 
+										Evas_Object *content)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *ll;
+	Item *it;
+
+	if (!wd) return NULL;
+
+	 EINA_LIST_FOREACH(wd->stack, ll, it)
+	{
+		if (it->content == content) 
+			return it->fn_btn2;
+	}
+	return NULL;
+}
+
+static void
+_elm_navigationbar_function_button3_set(Evas_Object *obj, 
 										Evas_Object *content, 
 										Evas_Object *button, 
 										Eina_Bool animation)
@@ -1198,8 +1172,8 @@ elm_navigationbar_right_button_set(Evas_Object *obj,
 	{
 		if (it->content == content) 
 		{
-			changed = _button_set(obj, it->right_btn, button, EINA_FALSE);
-			it->right_btn = button;
+			changed = _button_set(obj, it->fn_btn3, button, EINA_FALSE);
+			it->fn_btn3 = button;
 			_item_sizing_eval(it);
 			break;
 		}
@@ -1211,21 +1185,12 @@ elm_navigationbar_right_button_set(Evas_Object *obj,
 	{
 		it = ll->data;
 		if (changed && (it->content == content)) 
-			edje_object_part_swallow(wd->base, "elm.swallow.btn2", it->right_btn);
+			edje_object_part_swallow(wd->base, "elm.swallow.btn3", it->fn_btn3);
 	}
 }
 
-/**
- * Return the right button of the pushed content
- *
- * @param[in] obj The NavigationBar object
- * @param[in] content The object to push or pushed
- * @return The right button object or NULL if none
- *
- * @ingroup NavigationBar
- */
-EAPI Evas_Object *
-elm_navigationbar_right_button_get(Evas_Object *obj, 
+static Evas_Object *
+_elm_navigationbar_function_button3_get(Evas_Object *obj, 
 										Evas_Object *content)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -1237,7 +1202,7 @@ elm_navigationbar_right_button_get(Evas_Object *obj,
 	 EINA_LIST_FOREACH(wd->stack, ll, it)
 	{
 		if (it->content == content) 
-			return it->right_btn;
+			return it->fn_btn3;
 	}
 	return NULL;
 }
@@ -1253,6 +1218,7 @@ elm_navigationbar_right_button_get(Evas_Object *obj,
 EAPI Evas_Object *
 elm_navigationbar_content_top_get(Evas_Object *obj)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
@@ -1260,7 +1226,7 @@ elm_navigationbar_content_top_get(Evas_Object *obj)
 }
 
 /**
- * Return the content object at the top of the pager stack
+ * Return the content object at the bottom of the pager stack
  *
  * @param[in] obj The NavigationBar object
  * @return The root content object or NULL if none
@@ -1268,8 +1234,9 @@ elm_navigationbar_content_top_get(Evas_Object *obj)
  * @ingroup NavigationBar
  */
 EAPI Evas_Object *
-elm_navigationbar_content_root_get(Evas_Object *obj)
+elm_navigationbar_content_bottom_get(Evas_Object *obj)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
@@ -1290,10 +1257,90 @@ elm_navigationbar_hidden_set(Evas_Object *obj,
 								Eina_Bool hidden, 
 								Eina_Bool animation)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 
 	if (hidden) edje_object_signal_emit(wd->base, "elm,state,item,moveup", "elm");
 	else edje_object_signal_emit(wd->base, "elm,state,item,movedown", "elm");
 }
+
+/**
+ * Set the button object of the pushed content
+ * If the content is at the top of the navigation stack, update the button
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] content The object to push or pushed
+ * @param[in] button The button
+ * @param[in] button_type Indicates the position
+ * @param[in] animation transition when this button becomes the top item 
+ *
+ * @ingroup NavigationBar
+ */
+ EAPI void
+elm_navigationbar_title_button_set(Evas_Object *obj, 
+										Evas_Object *content, 
+										Evas_Object *button, 
+										Elm_Navi_Button_Type button_type,
+										Eina_Bool animation)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	if(!content || !button || !obj) return;
+	switch(button_type)
+	{
+		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON1:
+			_elm_navigationbar_function_button1_set(obj, content, button,animation);
+			break;
+		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON2:
+			_elm_navigationbar_function_button2_set(obj, content, button,animation);
+			break;
+		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON3:
+			_elm_navigationbar_function_button3_set(obj, content, button,animation);
+			break;
+		case ELM_NAVIGATIONBAR_BACK_BUTTON:
+			_elm_navigationbar_back_button_set(obj, content, button,animation);
+			break;
+		default: 
+			break;
+	}			
+	_sizing_eval(obj);
+}
+
+/**
+ * Return the button object of the pushed content
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] content The object to push or pushed
+ * @param[in] button_type Indicates the position
+ * @return The button object or NULL if none
+ *
+ * @ingroup NavigationBar
+ */
+EAPI Evas_Object *
+elm_navigationbar_title_button_get(Evas_Object *obj, 	
+									Evas_Object *content,Elm_Navi_Button_Type button_type)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Evas_Object *button=NULL;
+	if(!content || !obj) return;	
+	switch(button_type)
+	{
+		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON1:
+			button  = _elm_navigationbar_function_button1_get(obj, content);
+			break;
+		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON2:
+			button = _elm_navigationbar_function_button2_get(obj, content);
+			break;
+		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON3:
+			button  = _elm_navigationbar_function_button3_get(obj, content);
+			break;
+		case ELM_NAVIGATIONBAR_BACK_BUTTON:
+			button = _elm_navigationbar_back_button_get(obj, content);
+			break;
+		default: 
+			break;
+	}	
+	return button;
+}
+
 
