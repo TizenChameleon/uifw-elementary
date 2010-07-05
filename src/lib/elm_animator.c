@@ -400,10 +400,9 @@ elm_animator_animate(Elm_Animator *animator)
    if (!animator->animator_op)
       return;
    animator->begin_time = ecore_loop_time_get();
-   animator->on_animating = EINA_TRUE;
    animator->cur_repeat_cnt = animator->repeat_cnt;
    if (!animator->animator) 
       animator->animator = ecore_animator_add(_animator_animate_cb, animator);
-   if (!animator->animator)
-      animator->on_animating = EINA_FALSE;
+   if (animator->animator)
+      animator->on_animating = EINA_TRUE;
 }
