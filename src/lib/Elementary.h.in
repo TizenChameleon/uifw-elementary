@@ -2327,6 +2327,8 @@ extern "C" {
    EAPI void elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Evas_Object *before);   
    EAPI void elm_dialoguegroup_remove(Evas_Object *obj, Evas_Object *subobj);
    EAPI void elm_dialoguegroup_remove_all(Evas_Object *obj);
+   EAPI void elm_dialoguegroup_title_set(Evas_Object *obj, const char *title);
+   EAPI const char *elm_dialoguegroup_title_get(Evas_Object *obj);
   
 	/* AutoCompleteView */
 	typedef Eina_Bool (*elmautocompleteview_matchfunction) (Evas_Object *obj,char *text,Evas_Object *list,void *data);
