@@ -176,12 +176,14 @@ static void _action_area_clicked( void *data, Evas_Object *obj, void *event_info
 
 static Evas_Object* _elm_popup_add_button(Evas_Object *obj,const char *text,int response_id)
 {
+	char buf[4096];
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 	Evas_Object *btn;
 	Action_Area_Data *adata = malloc(sizeof(Action_Area_Data));	
 	btn = elm_button_add(obj);
-	elm_object_style_set(btn, "circulargrey");
+	snprintf(buf, sizeof(buf), "popup_actionbutton/%s", elm_widget_style_get(obj));
+	elm_object_style_set(btn, buf);
 	elm_button_label_set(btn,text);
 	adata->response_id = response_id;
 	adata->obj = obj;
