@@ -2023,11 +2023,15 @@ extern "C" {
     */
 
      /* Control Bar */
-   #define TAB_SYSTEM_ICON_ALBUMS "tab_albums" 
-   #define TAB_SYSTEM_ICON_ARTISTS "tab_artists" 
-   #define TAB_SYSTEM_ICON_SONGS "tab_songs" 
-   #define TAB_SYSTEM_ICON_PLAYLIST "tab_playlist" 
-   #define TAB_SYSTEM_ICON_MORE "tab_more" 
+   #define CONTROLBAR_SYSTEM_ICON_ALBUMS "controlbar_albums" 
+   #define CONTROLBAR_SYSTEM_ICON_ARTISTS "controlbar_artists" 
+   #define CONTROLBAR_SYSTEM_ICON_SONGS "controlbar_songs" 
+   #define CONTROLBAR_SYSTEM_ICON_PLAYLIST "controlbar_playlist" 
+   #define CONTROLBAR_SYSTEM_ICON_MORE "controlbar_more" 
+   #define CONTROLBAR_SYSTEM_ICON_CONTACTS "controlbar_contacts" 
+   #define CONTROLBAR_SYSTEM_ICON_DIALER "controlbar_dialer" 
+   #define CONTROLBAR_SYSTEM_ICON_FAVORITES "controlbar_favorites" 
+   #define CONTROLBAR_SYSTEM_ICON_LOGS "controlbar_logs" 
 
    typedef struct _Elm_Controlbar_Item Elm_Controlbar_Item;
 
@@ -2327,6 +2331,8 @@ extern "C" {
    EAPI void elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Evas_Object *before);   
    EAPI void elm_dialoguegroup_remove(Evas_Object *obj, Evas_Object *subobj);
    EAPI void elm_dialoguegroup_remove_all(Evas_Object *obj);
+   EAPI void elm_dialoguegroup_title_set(Evas_Object *obj, const char *title);
+   EAPI const char *elm_dialoguegroup_title_get(Evas_Object *obj);
   
 	/* AutoCompleteView */
 	typedef Eina_Bool (*elmautocompleteview_matchfunction) (Evas_Object *obj,char *text,Evas_Object *list,void *data);

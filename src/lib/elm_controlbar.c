@@ -681,11 +681,13 @@ clicked_box_cb(void *data, Evas_Object * obj, const char *emission,
       if (item->style == TOOLBAR)
 	{
 	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
-	}
-      if (_EDJ(item->base) == obj)
-	{
-	   if (item->func)
-	      item->func(item->data, item->obj, item);
+	   edje_object_signal_emit(_EDJ(item->base), "elm,state,text_unselected", "elm");
+		
+		  if (_EDJ(item->base) == obj)
+		{
+		   if (item->func)
+			  item->func(item->data, item->obj, item);
+		}
 	}
    }
 }
@@ -702,6 +704,7 @@ unfocused_box_cb(void *data, int type, void *event_info)
       if (item->style == TOOLBAR)
 	{
 	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
+	   edje_object_signal_emit(_EDJ(item->base), "elm,state,text_unselected", "elm");
 	}
    }
    if (wd->bar_up_event != NULL)
@@ -763,6 +766,8 @@ selected_box(Elm_Controlbar_Item * it)
 		evas_object_color_set(it->base, r, g, b, a);
 		*/
 		object_color_set(it->base, "elm.toolbar.pressed.color", "elm.swallow.icon");
+		edje_object_signal_emit(_EDJ(it->base), "elm,state,text_selected",
+					  "elm");
 		wd->bar_up_event =
 		   ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_UP,
 					   unfocused_box_cb, (void *)wd);
