@@ -89,8 +89,14 @@ _dayselector_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 static void 
 _check_clicked(void *data, Evas_Object *obj, void *event_info)
 {
-	fprintf( stderr, "clicked!\n");
-	evas_object_smart_callback_call(data, "dayselector,clicked", NULL);
+	Widget_Data* wd = (Widget_Data*) elm_widget_data_get(data);
+	int idx;
+	for(idx = 0; idx< 7; ++idx) {
+		if(obj==wd->check[idx]) {
+			evas_object_smart_callback_call(data, "dayselector,changed", (void *)idx);
+			return ;
+		}
+	}
 }
 
 

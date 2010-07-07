@@ -119,7 +119,6 @@ elm_dialoguegroup.c \
 elm_animatedicon.c \
 elm_coverflow.c \
 elm_cabinet.c \
-elm_dayselector.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
