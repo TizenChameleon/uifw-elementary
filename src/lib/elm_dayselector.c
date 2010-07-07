@@ -16,6 +16,7 @@ struct _Widget_Data
    Evas_Object *parent;
 	Evas_Object *frame;
 	Evas_Object *base;
+	Evas_Object *title;
 	Evas_Object *check[7];
 };
 
@@ -106,6 +107,15 @@ _theme_hook(Evas_Object *obj)
 
 }
 
+EAPI void
+elm_dayselector_title_set(Evas_Object* obj, const char* title)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data* wd = (Widget_Data*) elm_widget_data_get(obj);
+   edje_object_part_text_set(wd->title, "elm.text", title);
+
+}
+
 EAPI Eina_Bool 
 elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day)
 {
@@ -124,6 +134,7 @@ elm_dayselector_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 	int idx;
+	Evas_Coord w, h;
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
@@ -146,9 +157,12 @@ elm_dayselector_add(Evas_Object *parent)
 	//Content
 	wd->base = edje_object_add(e);
 	_elm_theme_object_set(obj, wd->base, "dayselector", "base", elm_widget_style_get(obj));
-	evas_object_size_hint_weight_set(wd->base, EVAS_HINT_EXPAND, 0);
-	evas_object_size_hint_align_set(wd->base, EVAS_HINT_FILL, 0);
 	elm_frame_content_set(wd->frame, wd->base);
+
+	//Title
+	wd->title = edje_object_add(e);
+	_elm_theme_object_set(obj, wd->title, "label", "dayselector", "default");
+	edje_object_part_swallow(wd->base, "title", wd->title); 
 
 	//Buttons
  	for(idx=0; idx<7; ++idx) 
@@ -180,6 +194,9 @@ elm_dayselector_add(Evas_Object *parent)
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _dayselector_hide, wd);
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _dayselector_move, wd);
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _dayselector_resize, wd);
+
+	edje_object_size_min_get(wd->base, &w, &h);
+	evas_object_resize(obj, w, h);
 
    return obj;
 }
