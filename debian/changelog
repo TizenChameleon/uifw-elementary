@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build13) unstable; urgency=low
+
+  * Add APIs related to input panel.
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL-pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build13
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Thu, 08 Jul 2010 17:50:35 +0900
+
 elementary (0.4.0+svn.49550slp2+3build12) unstable; urgency=low
 
   * Packaging.

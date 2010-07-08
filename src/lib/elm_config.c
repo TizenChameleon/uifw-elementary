@@ -24,7 +24,7 @@ static void _env_get(void);
 #ifdef HAVE_ELEMENTARY_X
 static Ecore_Event_Handler *_prop_change_handler = NULL;
 static Ecore_X_Window _root_1st = 0;
-#define ATOM_COUNT 5
+#define ATOM_COUNT 6
 static Ecore_X_Atom _atom[ATOM_COUNT];
 static Ecore_X_Atom _atom_config = 0;
 static Ecore_X_Atom _atom_config_specific = 0;
@@ -34,13 +34,15 @@ static const char *_atom_names[ATOM_COUNT] =
      "ENLIGHTENMENT_FINGER_SIZE",
      "ENLIGHTENMENT_THEME",
      "ENLIGHTENMENT_PROFILE",
-     "ENLIGHTENMENT_CONFIG"
+     "ENLIGHTENMENT_CONFIG",
+     "ENLIGHTENMENT_INPUT_PANEL"
 };
 #define ATOM_E_SCALE 0
 #define ATOM_E_FINGER_SIZE 1
 #define ATOM_E_THEME 2
 #define ATOM_E_PROFILE 3
 #define ATOM_E_CONFIG 4
+#define ATOM_E_INPUT_PANEL 5
 
 static Eina_Bool _prop_config_get(void);
 static int _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev);
@@ -170,6 +172,17 @@ _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev)
           {
              _prop_config_get();
           }
+	else if (event->atom == _atom[ATOM_E_INPUT_PANEL])
+	  {
+	     unsigned int val = 0;
+
+	     if (ecore_x_window_prop_card32_get(event->win,
+						event->atom,
+						&val, 1) > 0)
+	       {
+	       	edje_input_panel_enabled_set(val);
+	       }
+	  }
      }
    return 1;
 }
@@ -304,6 +317,7 @@ _config_apply(void)
    ecore_animator_frametime_set(1.0 / _elm_config->fps);
    edje_frametime_set(1.0 / _elm_config->fps);
    edje_scale_set(_elm_config->scale);
+   edje_input_panel_enabled_set(_elm_config->input_panel_enable);
 }
 
 static void
@@ -359,6 +373,7 @@ _config_load(void)
    _elm_config->fps = 60.0;
    _elm_config->theme = eina_stringshare_add("default");
    _elm_config->modules = NULL;
+   _elm_config->input_panel_enable = 0;
 }
 
 static void
@@ -503,6 +518,9 @@ _env_get(void)
 
    s = getenv("ELM_MODULES");
    if (s) eina_stringshare_replace(&_elm_config->modules, s);
+
+   s = getenv("ELM_INPUT_PANEL");
+   if (s) _elm_config->input_panel_enable = atoi(s);
 }
 
 void
@@ -601,6 +619,19 @@ _elm_config_sub_init(void)
                   if (changed) _prop_config_get();
 	       }
 	  }
+	if (!getenv("ELM_INPUT_PANEL"))
+	  {
+	     if (ecore_x_window_prop_card32_get(_root_1st,
+						_atom[ATOM_E_INPUT_PANEL],
+						&val, 1) > 0)
+	       {
+		  if (val > 0)
+		    {
+		       _elm_config->input_panel_enable = val;
+		    }
+	       }
+	  }
+	
 #endif
       }
 }

@@ -2814,3 +2814,36 @@ elm_entry_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
    wd->changed = 1;
    _sizing_eval(obj);
 }
+
+/**
+ * enable to show the input panel automatically.
+ *
+ * @param obj The entry object
+ * @param enabled If true, the input panel is enabled
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", enabled);
+}
+
+/**
+ * Set the input panel layout of the entry
+ *
+ * @param obj The entry object
+ * @param layout the layout to set
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Ecore_IMF_Context *ic = elm_entry_imf_context_get(obj);
+   if (!ic) return;
+   
+   ecore_imf_context_input_panel_layout_set(ic, (Ecore_IMF_Input_Panel_Layout)layout);
+}

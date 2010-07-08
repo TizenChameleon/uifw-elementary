@@ -74,6 +74,7 @@ struct _Elm_Config
    double fps;
    const char *theme;
    const char *modules;
+   int input_panel_enable;
 };
 
 typedef struct _Elm_Module Elm_Module;

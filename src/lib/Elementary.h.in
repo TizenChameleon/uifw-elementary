@@ -729,6 +729,17 @@ extern "C" {
 	  ELM_ICON_STANDARD
      } Elm_Icon_Type;
    typedef struct _Elm_Hoversel_Item Elm_Hoversel_Item;
+
+   typedef enum _Elm_Input_Panel_Layout
+     {
+	  ELM_INPUT_PANEL_LAYOUT_NORMAL,
+	  ELM_INPUT_PANEL_LAYOUT_NUMBER,	  
+	  ELM_INPUT_PANEL_LAYOUT_EMAIL,	  
+	  ELM_INPUT_PANEL_LAYOUT_URL,
+	  ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,	  	  
+	  ELM_INPUT_PANEL_LAYOUT_IP,
+     } Elm_Input_Panel_Layout;
+   
    EAPI Evas_Object *elm_entry_add(Evas_Object *parent);
    EAPI void         elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
    EAPI Eina_Bool    elm_entry_single_line_get(const Evas_Object *obj);
@@ -779,10 +790,12 @@ extern "C" {
    EAPI void         elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
    EAPI void         elm_entry_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis);
 
-   EAPI void	     elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on);
-   EAPI void	     elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
+   EAPI void         elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on);
+   EAPI void         elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
+   EAPI void         elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled);
+   EAPI void         elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
    EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj);
-   EAPI void 		elm_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
+   EAPI void         elm_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
 
    /* smart callbacks called:
     * "changed" - the text content changed
