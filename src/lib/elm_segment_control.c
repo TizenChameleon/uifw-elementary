@@ -42,7 +42,6 @@ struct _Elm_Segment_Item
 
 static void _sizing_eval(Evas_Object *obj);
 static void _signal_segment_on(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _sizing_eval(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _item_free(Evas_Object *obj, Elm_Segment_Item *it);
 static void _del_hook(Evas_Object *obj);
@@ -112,7 +111,7 @@ static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   _elm_theme_object_set(obj, obj, "segmented-control", "base", "default");
+   _elm_theme_object_set(obj, obj, "segmented-control", "base", elm_widget_style_get(obj));
 
    return;
 }
@@ -164,6 +163,24 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
    return;
 }
 
+static void _object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Widget_Data *wd;
+	if(!data) return;
+	wd = elm_widget_data_get((Evas_Object *)data);
+	if(!wd) return;
+
+	Evas_Coord w = 0, h = 0;
+
+	evas_object_geometry_get(wd->base, NULL, NULL, &w, &h);
+
+	if(wd->item_width != w && wd->height !=h)
+	{
+	  wd->item_width = wd->width = w;
+	  wd->height = h;
+	}
+}
+
 /**
  * Add a new segmentcontrol to the parent
  * @param parent The parent object
@@ -177,7 +194,7 @@ elm_segment_control_add(Evas_Object *parent)
 	Evas_Object *obj;
 	Evas *e;
 	Widget_Data *wd;
-	Evas_Coord w, h, x, y;
+	Evas_Coord w = 0, h = 0;
 
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
@@ -198,9 +215,7 @@ elm_segment_control_add(Evas_Object *parent)
 	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->box);
 	evas_object_show(wd->box);
 
-	edje_object_part_geometry_get(wd->base, "layout", &x, &y, &w, &h);
-	wd->item_width = wd->width = w;
-	wd->height = h;
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _object_resize, obj);
 	wd->id = 0;
 	wd->del_index = 0;
 	wd->insert_index = 0;
@@ -358,7 +373,6 @@ static void _state_value_set(Evas_Object *obj)
 
 	if(count > 0)
 		wd->item_width = wd->width/count;
-
 
 	if(wd->ani_it)
 	{
@@ -818,4 +832,25 @@ elm_segment_control_get_segment_count(Evas_Object *obj)
    if(!wd) return 0;
 
    return wd->id;
+}
+
+/**
+ * set the size of segmentcontrol
+ * @param obj The SegmentControl object
+ * @param width width of segment control
+ * @param height height of segment control
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
+
+EAPI void
+elm_segment_control_set_size(Evas_Object *obj, int width, int height)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if(!wd) return 0;
+
+   wd->item_width = wd->width = width;
+   wd->height = height;
+
+   return;
 }

@@ -1246,6 +1246,7 @@ extern "C" {
    EAPI Evas_Object *elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index);
    EAPI Elm_Segment_Item *elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value);
    EAPI int         elm_segment_control_get_segment_count(Evas_Object *obj);
+   EAPI void        elm_segment_control_set_size(Evas_Object *obj, int width, int height);
 
    EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
    EAPI void		elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count);
