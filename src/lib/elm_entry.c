@@ -1,6 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
-
+#include "elm_module_priv.h"
 /**
  * @defgroup Entry Entry
  * @ingroup Elementary
@@ -89,7 +89,6 @@
 typedef struct _Mod_Api Mod_Api;
 
 typedef struct _Widget_Data Widget_Data;
-typedef struct _Elm_Entry_Context_Menu_Item Elm_Entry_Context_Menu_Item;
 typedef struct _Elm_Entry_Item_Provider Elm_Entry_Item_Provider;
 
 struct _Widget_Data
@@ -129,17 +128,6 @@ struct _Widget_Data
    Eina_Bool bgcolor : 1;
    Eina_Bool ellipsis : 1;
    Eina_Bool autoreturnkey : 1;
-};
-
-struct _Elm_Entry_Context_Menu_Item
-{
-   Evas_Object *obj;
-   const char *label;
-   const char *icon_file;
-   const char *icon_group;
-   Elm_Icon_Type icon_type;
-   Evas_Smart_Cb func;
-   void *data;
 };
 
 struct _Elm_Entry_Item_Provider
@@ -661,15 +649,12 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
 	if ((wd->api) && (wd->api->obj_mouseup))
 	{
 		wd->api->obj_mouseup(data);
-	}
-	else
-	{
+	} 
    if (wd->longpress_timer)
      {
 	ecore_timer_del(wd->longpress_timer);
 	wd->longpress_timer = NULL;
-     }
-	}
+     }	
 }
 
 static void
@@ -1757,6 +1742,25 @@ elm_entry_add(Evas_Object *parent)
    return obj;
 }
 
+EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extension_data *ext_mod)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return;
+	ext_mod->cancel = _cancel;
+	ext_mod->copy = _copy;
+	ext_mod->cut = _cut;
+	ext_mod->paste = _paste;
+	ext_mod->select = _select;
+	ext_mod->selectall = NULL; /* to be implemented*/
+	ext_mod->ent = wd->ent;
+	ext_mod->items = wd->items;
+	ext_mod->longpress_timer = wd->longpress_timer;
+	ext_mod->editable = wd->editable;
+	ext_mod->have_selection = wd->have_selection;
+	ext_mod->password = wd->password;
+	ext_mod->selmode = wd->selmode;
+}
 
 /**
  * This sets the entry object not to line wrap.  All input will
