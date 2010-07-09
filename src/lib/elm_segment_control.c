@@ -59,6 +59,35 @@ static Elm_Segment_Item *_item_find(Evas_Object *obj, unsigned int index);
 static int * _animator_animate_add_cb(Evas_Object *obj);
 static int * _animator_animate_del_cb(Evas_Object *obj);
 
+static void
+_on_focus_hook(void *data, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+	Elm_Segment_Item *it;
+	Eina_List *l;
+
+   if (elm_widget_focus_get(obj))
+     {
+	   edje_object_signal_emit(wd->seg_ctrl, "elm,action,focus", "elm");
+	   evas_object_focus_set(wd->seg_ctrl, 1);
+	   printf("\n _on_focus_hook :: elm,action,focus \n");
+     }
+   else
+     {
+	   edje_object_signal_emit(wd->seg_ctrl, "elm,action,unfocus", "elm");
+	   evas_object_focus_set(wd->seg_ctrl, 0);
+	   	EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
+	   	{
+	   		if (it->segment_id == wd->cur_seg_id) {
+	   			edje_object_signal_emit(it->base, "elm,state,segment,off", "elm");
+	   			edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
+	   			 break;
+	   		}
+	   	}
+	   printf("\n _on_focus_hook :: elm,action,unfocus \n");
+     }
+}
 
 static void
 _signal_segment_on(void *data, Evas_Object *obj, const char *emission, const char *source)
@@ -202,6 +231,7 @@ elm_segment_control_add(Evas_Object *parent)
 	obj = elm_widget_add(e);
 	elm_widget_type_set(obj, "segmented-control");
 	elm_widget_sub_object_add(parent, obj);
+	elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
 	elm_widget_data_set(obj, wd);
 	elm_widget_del_hook_set(obj, _del_hook);
 	elm_widget_theme_hook_set(obj, _theme_hook);
@@ -321,7 +351,7 @@ static void _update_list(Evas_Object *obj)
 
 		edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
 		edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
-		if(wd->cur_seg_id == it->segment_id)
+		if(wd->cur_seg_id == it->segment_id && elm_widget_focus_get(obj))
 		{
 			edje_object_signal_emit(it->base, "elm,state,segment,on", "elm");
 			edje_object_signal_emit(it->base, "elm,state,text,change", "elm");
