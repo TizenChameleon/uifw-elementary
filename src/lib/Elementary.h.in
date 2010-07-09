@@ -1606,8 +1606,12 @@ extern "C" {
    EAPI Eina_Bool    elm_scrolled_entry_context_menu_disabled_get(const Evas_Object *obj);
    EAPI void         elm_scrolled_entry_scrollbar_policy_set(Evas_Object *obj, Elm_Scroller_Policy h, Elm_Scroller_Policy v);
    EAPI void         elm_scrolled_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
-   EAPI void			  elm_scrolled_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
-   EAPI void			elm_scrolled_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool show_last_character);
+   EAPI void         elm_scrolled_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes);
+   EAPI void         elm_scrolled_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool show_last_character);
+
+   EAPI void         elm_scrolled_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled);
+   EAPI void         elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
+   EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj);
 
    EAPI Evas_Object *elm_conformant_add(Evas_Object *parent);
    EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content);
