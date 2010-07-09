@@ -9,7 +9,7 @@
  *
  * Signals that you can add callbacks for are:
  *
- * dayselector, changed - This is called whenever the user changes the state of one of the check object. 
+ * dayselector,changed - This is called whenever the user changes the state of one of the check object. 
  * 
  */
 

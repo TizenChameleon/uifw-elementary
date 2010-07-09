@@ -1852,6 +1852,7 @@ extern "C" {
    EAPI const char *elm_ctxpopup_item_label_get(Elm_Ctxpopup_Item *item);	
    EAPI Evas_Object *elm_ctxpopup_item_icon_get(Elm_Ctxpopup_Item *item); 
    EAPI void elm_ctxpopup_scroller_disabled_set(Evas_Object *obj, Eina_Bool disabled);
+	EAPI void elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled);
 
    /* QuickContactBadge */
    typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;
