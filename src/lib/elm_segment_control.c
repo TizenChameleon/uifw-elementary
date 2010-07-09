@@ -69,7 +69,6 @@ _on_focus_hook(void *data, Evas_Object *obj)
      {
 	   edje_object_signal_emit((Evas_Object *)wd->seg_ctrl, "elm,action,focus", "elm");
 	   evas_object_focus_set((Evas_Object *)wd->seg_ctrl, 1);
-	   printf("\n _on_focus_hook :: elm,action,focus \n");
      }
    else
      {
@@ -83,7 +82,6 @@ _on_focus_hook(void *data, Evas_Object *obj)
 	   			 break;
 	   		}
 	   	}
-	   printf("\n _on_focus_hook :: elm,action,unfocus \n");
      }
 }
 
