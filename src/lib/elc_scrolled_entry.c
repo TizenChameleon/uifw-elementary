@@ -970,3 +970,48 @@ elm_scrolled_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool 
    elm_entry_password_show_last_character_set(wd->entry, show_last_character);
 }
 
+EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd || !wd->entry) return NULL;
+  
+   return elm_entry_imf_context_get(wd->entry);
+}
+
+/**
+ * enable to show the input panel automatically.
+ *
+ * @param obj The scrolled entry object
+ * @param enabled If true, the input panel is enabled
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_scrolled_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd || !wd->entry) return;
+
+   elm_entry_input_panel_enabled_set(wd->entry, enabled);
+}
+
+/**
+ * Set the input panel layout of the scrolled entry
+ *
+ * @param obj The scrolled entry object
+ * @param layout the layout to set
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd || !wd->entry) return;
+
+   elm_entry_input_panel_layout_set(wd->entry, layout);
+}
+
