@@ -103,25 +103,6 @@ elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day)
 	return elm_check_state_get(wd->check[day]);
 }
 
-static void
-_sizing_eval(Evas_Object* obj)
-{
-	Evas_Coord w, h;
-	Evas_Coord min_w, min_h, max_h;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-
-	evas_object_geometry_get(obj, NULL, NULL, &w, &h);
-	edje_object_size_min_get(wd->base, &min_w, &min_h);
-	edje_object_size_max_get(wd->base, NULL, &max_h);
-
-	fprintf( stderr, "%d %d\n", w, h );
-	if(w < min_w) w = min_w;
-	if(h < min_h) h = min_h;
-	else if(h > max_h) h = max_h;
-
-	evas_object_resize(wd->frame, w, h);  
-}
 
 /**
  * Add the dayselector.
