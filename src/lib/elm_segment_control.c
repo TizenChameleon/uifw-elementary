@@ -28,6 +28,7 @@ struct _Widget_Data
    unsigned int insert_index;
    unsigned int del_index;
    unsigned int cur_seg_id;
+   double scale_factor;
 };
 
 struct _Elm_Segment_Item
@@ -849,8 +850,13 @@ elm_segment_control_set_size(Evas_Object *obj, int width, int height)
    Widget_Data *wd = elm_widget_data_get(obj);
    if(!wd) return 0;
 
-   wd->item_width = wd->width = width;
-   wd->height = height;
+   wd->scale_factor = elm_scale_get();
+   	if ( wd->scale_factor == 0.0 ) {
+   			wd->scale_factor = 1.0;
+   	}
+
+   wd->item_width = wd->width = width*wd->scale_factor;
+   wd->height = height*wd->scale_factor;
 
    return;
 }
