@@ -128,6 +128,7 @@ struct _Widget_Data
    Eina_Bool bgcolor : 1;
    Eina_Bool ellipsis : 1;
    Eina_Bool autoreturnkey : 1;
+   Eina_Bool input_panel_enable : 1;
 };
 
 struct _Elm_Entry_Item_Provider
@@ -271,6 +272,8 @@ _theme_hook(Evas_Object *obj)
    elm_entry_entry_set(obj, t);
    eina_stringshare_del(t);
    edje_object_scale_set(wd->ent, elm_widget_scale_get(obj) * _elm_config->scale);
+   edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", wd->input_panel_enable);
+
    _sizing_eval(obj);
 }
 
@@ -1716,6 +1719,8 @@ elm_entry_add(Evas_Object *parent)
    elm_widget_resize_object_set(obj, wd->ent);
    _sizing_eval(obj);
 
+   wd->input_panel_enable = edje_object_part_text_input_panel_enabled_get(wd->ent, "elm.text");
+
 #ifdef HAVE_ELEMENTARY_X
    top = elm_widget_top_get(obj);
    if ((top) && (elm_win_xwindow_get(top)))
@@ -2827,6 +2832,7 @@ EAPI void
 elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   wd->input_panel_enable = enabled;
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", enabled);
 }
 
