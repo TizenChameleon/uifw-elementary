@@ -15,12 +15,14 @@ struct _Widget_Data
 {
 	Evas_Object 	*notify;
 	Evas_Object	*layout;
+	Evas_Object *parent;
+	Evas_Object *parent_app;
 	Evas_Object 	*title_area;
 	Evas_Object    *title_icon;
 	Evas_Object 	*content_area;
+	Evas_Object 	*desc_label;
 	Evas_Object 	*action_area;	
-	Evas_Object *parent;
-	Evas_Object *parent_app;
+	Eina_List 			*button_list;
 	int rot_angle;
 	Ecore_Job    *del_job;
 	Eina_Bool      delete_me : 1;
@@ -89,16 +91,44 @@ _del_pre_hook(Evas_Object *obj)
 	evas_object_event_callback_del_full(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
 	if(wd->parent_app)
 	evas_object_event_callback_del_full(wd->parent_app, EVAS_CALLBACK_RESIZE, _resize_parent, obj);
+	eina_list_free(wd->button_list);
 }
 
 static void
 _theme_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
+	char buf[4096];
+	Eina_List *list=NULL;
+	Evas_Object *btn_obj;
 	if (!wd) return;
+	
 	elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
 	elm_notify_orient_set(wd->notify, ELM_NOTIFY_ORIENT_CENTER);
 	edje_object_message_signal_process( elm_layout_edje_get(wd->layout));
+	if(wd->title_area)
+		{
+			snprintf(buf, sizeof(buf), "popup_title/%s", elm_widget_style_get(obj));
+			elm_object_style_set(wd->title_area,buf);
+		}
+	if(wd->action_area)
+		{
+			 EINA_LIST_FOREACH(wd->button_list, list, btn_obj)
+				{
+					snprintf(buf, sizeof(buf), "popup_button/%s", elm_widget_style_get(obj));
+					elm_object_style_set(btn_obj, buf);
+				}
+		}
+	if(wd->content_area)
+		{
+			elm_layout_theme_set(wd->content_area,"popup","content",elm_widget_style_get(obj));
+			if(wd->desc_label)
+				{
+					snprintf(buf, sizeof(buf), "popup_description/%s", elm_widget_style_get(obj));
+					printf("\nstyle applied=%s\n",buf);
+					elm_object_style_set(wd->desc_label,buf);
+				}
+		}		
 	_sizing_eval(obj);
 }
 
@@ -182,9 +212,10 @@ static Evas_Object* _elm_popup_add_button(Evas_Object *obj,const char *text,int 
 	Evas_Object *btn;
 	Action_Area_Data *adata = malloc(sizeof(Action_Area_Data));	
 	btn = elm_button_add(obj);
-	snprintf(buf, sizeof(buf), "popup_actionbutton/%s", elm_widget_style_get(obj));
+	snprintf(buf, sizeof(buf), "popup_button/%s", elm_widget_style_get(obj));
 	elm_object_style_set(btn, buf);
 	elm_button_label_set(btn,text);
+	wd->button_list = eina_list_append(wd->button_list, btn);
 	adata->response_id = response_id;
 	adata->obj = obj;
 	evas_object_smart_callback_add(btn, "clicked", _action_area_clicked, adata);	
@@ -275,9 +306,9 @@ elm_popup_add(Evas_Object *parent_app)
 			evas_object_resize(parent, w, h);
 			evas_object_move(parent, x, y);
 			if(rotation!=-1)
-			{
-			elm_win_rotation_with_resize_set(parent, rotation);
-			}				
+				{
+					elm_win_rotation_with_resize_set(parent, rotation);
+				}				
 		}
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
@@ -353,7 +384,7 @@ elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int
 			wd->action_area= elm_layout_add(popup);							
 			elm_layout_content_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);		
 	 		snprintf(buf,50,"buttons%d",no_of_buttons);	
-	 		elm_layout_theme_set(wd->action_area,"popup","action_area",buf);
+	 		elm_layout_theme_set(wd->action_area,"popup",buf,elm_widget_style_get(popup));
 
 			edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,visible", "elm");
 			if(wd->title_area)
@@ -381,8 +412,8 @@ EAPI void
 elm_popup_desc_set(Evas_Object *obj, const char *text)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Object *label;
 	int w;		
+	char buf[4096];
 	if (!wd) return;
 
 	if(wd->content_area)
@@ -390,14 +421,17 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
 			evas_object_del(wd->content_area);
 			wd->content_area=NULL;
 		}	
-	label = elm_label_add(obj);
-	elm_object_style_set(label, "popup/description");		
-	elm_label_line_wrap_set(label, EINA_TRUE);
-	edje_object_part_geometry_get((Evas_Object *)elm_layout_edje_get(wd->layout), "elm.swallow.content", NULL, NULL, &w, NULL);
-	elm_label_wrap_width_set(label, w);
-	elm_label_label_set(label, text);
-	evas_object_show(label);		
-	wd->content_area = label;
+	wd->content_area = elm_layout_add(obj);
+	elm_layout_theme_set(wd->content_area,"popup","content",elm_widget_style_get(obj));
+	wd->desc_label = elm_label_add(obj);
+	snprintf(buf, sizeof(buf), "popup_description/%s", elm_widget_style_get(obj));
+	elm_object_style_set(wd->desc_label,buf);
+	elm_label_line_wrap_set(wd->desc_label, EINA_TRUE);
+	elm_label_label_set(wd->desc_label, text);
+	evas_object_size_hint_weight_set(wd->desc_label, EVAS_HINT_EXPAND, 0.0);
+	evas_object_size_hint_align_set(wd->desc_label, EVAS_HINT_FILL, EVAS_HINT_FILL);
+	evas_object_show(wd->desc_label);		
+	elm_layout_content_set(wd->content_area, "elm.swallow.content", wd->desc_label);		
 	elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);			
 	evas_object_event_callback_add(wd->content_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 		       _changed_size_hints, obj);
@@ -418,7 +452,7 @@ elm_popup_desc_get(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
-	return elm_label_label_get(wd->content_area);
+	return elm_label_label_get(wd->desc_label);
 }
 
 /**
@@ -433,6 +467,7 @@ EAPI void
 elm_popup_title_label_set(Evas_Object *obj, const char *text)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
+	char buf[4096];
 	if (!wd) return;
 
 	if(wd->title_area)
@@ -442,8 +477,11 @@ elm_popup_title_label_set(Evas_Object *obj, const char *text)
 		}
 		
 	wd->title_area= elm_label_add(obj);	
-	elm_object_style_set(wd->title_area,"popup/title");
+	snprintf(buf, sizeof(buf), "popup_title/%s", elm_widget_style_get(obj));
+	elm_object_style_set(wd->title_area,buf);
 	elm_label_label_set(wd->title_area, text);
+	evas_object_size_hint_weight_set(wd->title_area, EVAS_HINT_EXPAND, 0.0);
+	evas_object_size_hint_align_set(wd->title_area, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	elm_layout_content_set(wd->layout, "elm.swallow.title", wd->title_area);		
 	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,title,visible", "elm");
 	if(wd->action_area)
@@ -453,8 +491,7 @@ elm_popup_title_label_set(Evas_Object *obj, const char *text)
 	if(wd->title_icon)
 		{
 			edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,title,icon,visible", "elm");
-		}
-		
+		}		
 	_sizing_eval(obj);
 }
 
@@ -537,8 +574,10 @@ elm_popup_content_set(Evas_Object *obj, Evas_Object *content)
 			evas_object_del(wd->content_area);
 			wd->content_area=NULL;
 		}			
-	wd->content_area= content;							
-	elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);	
+	wd->content_area = elm_layout_add(obj);
+	elm_layout_theme_set(wd->content_area,"popup","content",elm_widget_style_get(obj));
+	elm_layout_content_set(wd->content_area, "elm.swallow.content", content);		
+	elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);		
 	evas_object_event_callback_add(wd->content_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				       _changed_size_hints, obj);
 	_sizing_eval(obj);
@@ -575,7 +614,7 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
 
 {
 	Widget_Data *wd = elm_widget_data_get(obj);	
-	char buf[50];
+	char buf[4096];
 	if (!wd) return;	
 	va_list args;	
 
@@ -590,9 +629,8 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
 	elm_layout_content_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);		
 	evas_object_size_hint_weight_set(wd->action_area, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_size_hint_align_set(wd->action_area, EVAS_HINT_FILL, EVAS_HINT_FILL);
-	 snprintf(buf,50,"buttons%d",no_of_buttons);	
-	 elm_layout_theme_set(wd->action_area,"popup","action_area",buf);
-		
+	snprintf(buf,sizeof(buf),"buttons%d",no_of_buttons);	
+	elm_layout_theme_set(wd->action_area,"popup",buf,elm_widget_style_get(obj));		
 	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,visible", "elm");
 
 	if(wd->title_area)
@@ -724,3 +762,5 @@ EAPI void elm_popup_response(Evas_Object *obj, int  response_id)
 		}
 	}
 }
+
+
