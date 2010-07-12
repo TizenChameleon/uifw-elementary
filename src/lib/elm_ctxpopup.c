@@ -891,7 +891,7 @@ elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
 	elm_widget_sub_object_del(item->base, item->content);
      }
    item->content = icon;
-   elm_icon_scale_set(icon, EINA_TRUE, EINA_TRUE);
+//   elm_icon_scale_set(icon, EINA_TRUE, EINA_TRUE);
    edje_object_part_swallow(item->base, "elm.swallow.content", item->content);
    edje_object_signal_emit(item->base, "elm,state,enable_icon", "elm");
    edje_object_message_signal_process(item->base);

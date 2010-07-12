@@ -28,7 +28,7 @@ static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _del_pre_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
-static void _sizing_eval(Evas_Object* obj);
+//static void _sizing_eval(Evas_Object* obj);
 //static void _dayselector_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 //static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
@@ -203,12 +203,12 @@ elm_dayselector_add(Evas_Object *parent)
 	edje_object_part_swallow(wd->base, "fri", wd->check[5]);
 	elm_check_label_set(wd->check[ELM_DAYSELECTOR_SAT], "S");
 	edje_object_part_swallow(wd->base, "sat", wd->check[6]);
+/*
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _dayselector_resize, wd);
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
 
-	//evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _dayselector_resize, wd);
-	//evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-
-	//_sizing_eval(obj);
-
+	_sizing_eval(obj);
+*/
    return obj;
 }
 
