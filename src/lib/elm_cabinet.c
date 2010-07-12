@@ -572,8 +572,9 @@ _ani_item_del_done_cb(void *data)
 	_cells_update(obj);
 	if (wd->cur == NULL) {
 		evas_object_smart_callback_call(obj, "item,deleted,all", NULL);
+	} else {
+		_bounce(obj);
 	}
-	_bounce(obj);
 }
 
 static void
