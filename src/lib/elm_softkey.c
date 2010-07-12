@@ -526,17 +526,16 @@ static void _softkey_up_cb(void *data, Evas_Object *obj, const char *emission, c
 
 	Elm_Softkey_Item *it = (Elm_Softkey_Item *) data;
 	elm_softkey_panel_close(it->obj);
-	evas_object_smart_callback_call(it->obj, "clicked", it);
-
 	if (it->icon)
 	{
-	   edj = elm_layout_edje_get(it->icon);
-	   if (!edj)
-		return;
-	   edje_object_signal_emit(edj, "elm,state,unselected", "elm");
+	     edj = elm_layout_edje_get(it->icon);
+	     if (!edj)
+	        return;
+	     edje_object_signal_emit(edj, "elm,state,unselected", "elm");
 	}
 	if (it->func)
-	        it->func((void *) (it->data), it->obj, it);
+		it->func((void *) (it->data), it->obj, it);
+	evas_object_smart_callback_call(it->obj, "clicked", it);
 }
 
 static void _softkey_down_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
@@ -570,9 +569,9 @@ static void _panel_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info
 	}
 
 	elm_softkey_panel_close(it->obj);
-	evas_object_smart_callback_call(it->obj, "clicked", it);
 	if (it->func)
 		it->func((void *) (it->data), it->obj, it);
+	evas_object_smart_callback_call(it->obj, "clicked", it);
 }
 
 static void _panel_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
