@@ -128,6 +128,7 @@ struct _Widget_Data
    Eina_Bool bgcolor : 1;
    Eina_Bool ellipsis : 1;
    Eina_Bool autoreturnkey : 1;
+   Eina_Bool input_panel_enable : 1;
 };
 
 struct _Elm_Entry_Item_Provider
@@ -157,6 +158,7 @@ static int _string_key_value_replace(char *oldstring, char *key, char *value, ch
 static int _is_width_over(Evas_Object *obj);
 static void _ellipsis_entry_to_width(Evas_Object *obj);
 static int _textinput_control_function(void *data,void *input_data);
+static int _entry_length_get(Evas_Object *obj);
 
 #define MIN_ENTRY_FONT_SIZE 8
 #define MAX_ENTRY_FONT_SIZE 60
@@ -271,6 +273,8 @@ _theme_hook(Evas_Object *obj)
    elm_entry_entry_set(obj, t);
    eina_stringshare_del(t);
    edje_object_scale_set(wd->ent, elm_widget_scale_get(obj) * _elm_config->scale);
+   edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", wd->input_panel_enable);
+
    _sizing_eval(obj);
 }
 
@@ -361,10 +365,10 @@ _check_enable_returnkey(Evas_Object *obj)
    if (!wd->autoreturnkey) return;
 
    if (_entry_length_get(obj) == 0) {
-        ecore_imf_context_ise_set_disable_key(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_TRUE);
+        ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_TRUE);
     }
     else {
-        ecore_imf_context_ise_set_disable_key(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_FALSE);
+        ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_FALSE);
     }
 }
 
@@ -914,7 +918,7 @@ _mkup_to_text(const char *mkup)
    return str;
 }
 
-int
+static int
 _entry_length_get(Evas_Object *obj)
 {
 	int len;
@@ -1507,7 +1511,7 @@ _ellipsis_entry_to_width(Evas_Object *obj)
 	char *oldstring, *value, *textlocater, *entrystring;
 	char *string, fontbuf[16];
 
-	if (!wd) return NULL;
+	if (!wd) return;
 
 	entrystring = edje_object_part_text_get(wd->ent, "elm.text");
 
@@ -1715,6 +1719,8 @@ elm_entry_add(Evas_Object *parent)
    edje_object_part_text_set(wd->ent, "elm.text", "");
    elm_widget_resize_object_set(obj, wd->ent);
    _sizing_eval(obj);
+
+   wd->input_panel_enable = edje_object_part_text_input_panel_enabled_get(wd->ent, "elm.text");
 
 #ifdef HAVE_ELEMENTARY_X
    top = elm_widget_top_get(obj);
@@ -2656,6 +2662,7 @@ elm_entry_utf8_to_markup(const char *s)
 
 EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->ent) return NULL;
   
@@ -2665,16 +2672,21 @@ EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
 EAPI void 
 elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
 {
-    Widget_Data *wd = elm_widget_data_get(obj);
-    wd->autoreturnkey = on;
-    _check_enable_returnkey(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->autoreturnkey = on;
+   _check_enable_returnkey(obj);
 }
 
 EAPI void 
 elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Eina_Bool autocap = on;
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
 
    if (!wd->password)
        autocap = EINA_FALSE;
@@ -2695,6 +2707,7 @@ elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on)
 EAPI void
 elm_entry_fontsize_set(Evas_Object *obj, const int fontsize)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    char *string, fontvalue[16], *entrystring;
    int len;
@@ -2724,6 +2737,7 @@ elm_entry_fontsize_set(Evas_Object *obj, const int fontsize)
 EAPI void
 elm_entry_text_align_set(Evas_Object *obj, char *alignmode)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    char *string, *entrystring;
    int len;
@@ -2755,6 +2769,7 @@ elm_entry_text_align_set(Evas_Object *obj, char *alignmode)
 EAPI void
 elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    char *string, *entrystring, colorstring[16];
    int len;
@@ -2787,6 +2802,7 @@ elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsig
 EAPI void
 elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    evas_object_color_set(wd->bg, r, g, b, a);
 
@@ -2807,6 +2823,7 @@ elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g,
 EAPI void
 elm_entry_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *t;
    if (wd->ellipsis == ellipsis) return;
@@ -2826,7 +2843,11 @@ elm_entry_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
 EAPI void
 elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->input_panel_enable = enabled;
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", enabled);
 }
 
@@ -2841,7 +2862,7 @@ elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
 EAPI void
 elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Ecore_IMF_Context *ic = elm_entry_imf_context_get(obj);
    if (!ic) return;
    

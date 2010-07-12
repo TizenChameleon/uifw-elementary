@@ -100,7 +100,8 @@ struct _Animation_Data
 
 
 // prototype
-static int selected_box(Elm_Controlbar_Item * it);
+static void selected_box(Elm_Controlbar_Item * it);
+static int pressed_box(Elm_Controlbar_Item * it);
 
 
 ///////////////////////////////////////////////////////////////////
@@ -556,6 +557,8 @@ item_delete_in_bar(Elm_Controlbar_Item * it)
 	   if (item->order > i)
 	     {
 		item->order--;
+		elm_table_unpack(wd->box, item->base);
+		elm_table_pack(wd->box, item->base, item->order - 1, 0, 1, 1);
 	     }
 	}
      }
@@ -664,6 +667,28 @@ object_color_set(Evas_Object *ly, const char *color_part, const char *obj_part)
 	evas_object_color_set(color, r, g, b, a);
 }
 
+static void 
+selected_box(Elm_Controlbar_Item * it) 
+{
+   Widget_Data * wd = elm_widget_data_get(it->obj);
+
+   if(it->style == TABBAR){
+	   it->selected = EINA_TRUE;
+	   object_color_set(it->base, "elm.tabbar.selected.color", "elm.swallow.icon");
+	   edje_object_signal_emit(_EDJ(it->base), "elm,state,selected",
+					  "elm");
+	   edje_object_part_swallow(wd->view, "elm.swallow.view",
+					  it->view);
+	   evas_object_show(it->view);
+
+   }else if(it->style == TOOLBAR){
+		if (it->func)
+			  it->func(it->data, it->obj, it);
+   }
+
+   evas_object_smart_callback_call(it->obj, "clicked", it);
+}
+
 static void
 clicked_box_cb(void *data, Evas_Object * obj, const char *emission,
 	       const char *source) 
@@ -678,17 +703,22 @@ clicked_box_cb(void *data, Evas_Object * obj, const char *emission,
       return;
    EINA_LIST_FOREACH(wd->items, l, item)
    {
-      if (item->style == TOOLBAR)
+      if (item->style == TABBAR)
 	{
 	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
+	   edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
 	   edje_object_signal_emit(_EDJ(item->base), "elm,state,text_unselected", "elm");
-		
+	}
 		  if (_EDJ(item->base) == obj)
 		{
-		   if (item->func)
-			  item->func(item->data, item->obj, item);
+		   selected_box(item);
 		}
-	}
+		  else
+		{
+			item->selected = EINA_FALSE;
+			edje_object_part_unswallow(wd->view, item->view);
+		    evas_object_hide(item->view);
+		}
    }
 }
 
@@ -701,7 +731,19 @@ unfocused_box_cb(void *data, int type, void *event_info)
    Elm_Controlbar_Item * item;
    EINA_LIST_FOREACH(wd->items, l, item)
    {
-      if (item->style == TOOLBAR)
+	  if (item->style == TABBAR)
+	  {
+		  if(item->selected){
+			object_color_set(item->base, "elm.tabbar.selected.color", "elm.swallow.icon");
+			edje_object_signal_emit(_EDJ(item->base), "elm,state,selected", "elm");
+		  }
+		  else
+		  {
+			object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
+			edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
+		  }
+	  }
+	  else if (item->style == TOOLBAR)
 	{
 	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
 	   edje_object_signal_emit(_EDJ(item->base), "elm,state,text_unselected", "elm");
@@ -714,20 +756,14 @@ unfocused_box_cb(void *data, int type, void *event_info)
      }
 	return EXIT_SUCCESS;
 }
-	
+
 static int
-selected_box(Elm_Controlbar_Item * it) 
+pressed_box(Elm_Controlbar_Item * it) 
 {
    Widget_Data * wd = elm_widget_data_get(it->obj);
-   int i = 1;
-
    int check = 0;
-
    const Eina_List *l;
-
    Elm_Controlbar_Item * item;
-   Evas_Object * color;
-   int r, g, b, a;
 
    EINA_LIST_FOREACH(wd->items, l, item)
    {
@@ -735,78 +771,27 @@ selected_box(Elm_Controlbar_Item * it)
 	{
 	   if (it->style == TABBAR)
 	     {
-		it->selected = EINA_TRUE;
-	/*
-		color =
-		   (Evas_Object *) edje_object_part_object_get(_EDJ(it->base),
-							       "elm.tabbar.selected.color");
-		if (color)
-		   evas_object_color_get(color, &r, &g, &b, &a);
-		color =
-		   edje_object_part_swallow_get(_EDJ(it->base),
-						"elm.swallow.icon");
-		evas_object_color_set(color, r, g, b, a);
-	*/
+
 		object_color_set(it->base, "elm.tabbar.selected.color", "elm.swallow.icon");
-		edje_object_signal_emit(_EDJ(it->base), "elm,state,selected",
+		edje_object_signal_emit(_EDJ(it->base), "elm,state,pressed",
 					  "elm");
-		edje_object_part_swallow(wd->view, "elm.swallow.view",
-					  it->view);
-		evas_object_show(it->view);
 	     }
 	   else if (it->style == TOOLBAR)
 	     {
-		/*
-		color =
-		   (Evas_Object *) edje_object_part_object_get(_EDJ(it->base),
-							       "elm.toolbar.pressed.color");
-		if (color)
-		   evas_object_color_get(color, &r, &g, &b, &a);
-
-		evas_object_color_set(it->base, r, g, b, a);
-		*/
+	
 		object_color_set(it->base, "elm.toolbar.pressed.color", "elm.swallow.icon");
 		edje_object_signal_emit(_EDJ(it->base), "elm,state,text_selected",
 					  "elm");
-		wd->bar_up_event =
+		}
+	   wd->bar_up_event =
 		   ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_UP,
 					   unfocused_box_cb, (void *)wd);
-	     }
-	   check = 1;
+	   check = EINA_TRUE;
 	}
-      else
-	{
-	   if (item->style != OBJECT)
-		 {
-/*		color =
-		   (Evas_Object *) edje_object_part_object_get(_EDJ(item->base),
-							       "elm.tabbar.default.color");
-		if (color)
-		   evas_object_color_get(color, &r, &g, &b, &a);
-		color =
-		   edje_object_part_swallow_get(_EDJ(item->base),
-						"elm.swallow.icon");
-		evas_object_color_set(color, r, g, b, a);
-*/
-			 object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
-		}
-	   if (item->style == TABBAR)
-	     {
-		item->selected = EINA_FALSE;
-		if (item->style != OBJECT)
-		  {
-		     edje_object_signal_emit(_EDJ(item->base),
-					       "elm,state,unselected", "elm");
-		     edje_object_part_unswallow(wd->view, item->view);
-		     evas_object_hide(item->view);
-		  }
-	     }
-	}
-      i++;
    }
    if (!check)
       return EXIT_FAILURE;
-   evas_object_smart_callback_call(it->obj, "clicked", it);
+
    return EXIT_SUCCESS;
 }
 
@@ -1211,7 +1196,7 @@ bar_item_down_cb(void *data, Evas * evas, Evas_Object * obj, void *event_info)
      }
    else
      {
-	selected_box(item);
+	pressed_box(item);
      }
 }
 
@@ -1247,6 +1232,8 @@ create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
    it->base = create_item_layout(wd->edje, it);
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN,
 				   bar_item_down_cb, wd);
+   edje_object_signal_callback_add(_EDJ(it->base), "elm,action,click", "elm",
+				    clicked_box_cb, wd);
    evas_object_show(it->base);
    it->edit_item = create_item_layout(wd->edje, it);
    evas_object_event_callback_add(it->edit_item, EVAS_CALLBACK_MOUSE_DOWN,

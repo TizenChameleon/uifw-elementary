@@ -41,7 +41,6 @@ struct _Elm_Segment_Item
    int segment_id;
 };
 
-static void _sizing_eval(Evas_Object *obj);
 static void _signal_segment_on(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _theme_hook(Evas_Object *obj);
 static void _item_free(Evas_Object *obj, Elm_Segment_Item *it);
@@ -51,7 +50,6 @@ static Elm_Segment_Item * _item_find(Evas_Object *obj, unsigned int index);
 static void _update_list(Evas_Object *obj);
 static void _refresh_segment_ids(Evas_Object *obj);
 static void _state_value_set(Evas_Object *obj);
-static void _queue_list(Evas_Object *obj);
 
 static Elm_Segment_Item* _item_new(Evas_Object *obj, const char *label, Evas_Object *icon);
 static Elm_Segment_Item *_item_find(Evas_Object *obj, unsigned int index);
@@ -59,6 +57,33 @@ static Elm_Segment_Item *_item_find(Evas_Object *obj, unsigned int index);
 static int * _animator_animate_add_cb(Evas_Object *obj);
 static int * _animator_animate_del_cb(Evas_Object *obj);
 
+static void
+_on_focus_hook(void *data, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+	Elm_Segment_Item *it;
+	Eina_List *l;
+
+   if (elm_widget_focus_get(obj))
+     {
+	   edje_object_signal_emit((Evas_Object *)wd->seg_ctrl, "elm,action,focus", "elm");
+	   evas_object_focus_set((Evas_Object *)wd->seg_ctrl, 1);
+     }
+   else
+     {
+	   edje_object_signal_emit((Evas_Object *)wd->seg_ctrl, "elm,action,unfocus", "elm");
+	   evas_object_focus_set((Evas_Object *)wd->seg_ctrl, 0);
+	   	EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
+	   	{
+	   		if (it->segment_id == wd->cur_seg_id) {
+	   			edje_object_signal_emit(it->base, "elm,state,segment,off", "elm");
+	   			edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
+	   			 break;
+	   		}
+	   	}
+     }
+}
 
 static void
 _signal_segment_on(void *data, Evas_Object *obj, const char *emission, const char *source)
@@ -78,7 +103,6 @@ _signal_segment_on(void *data, Evas_Object *obj, const char *emission, const cha
 		wd->cur_seg_id = item->segment_id;
 		return;
 	}
-	int i = 0;
 	EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
 	{
 		if (it->segment_id == wd->cur_seg_id) {
@@ -91,27 +115,9 @@ _signal_segment_on(void *data, Evas_Object *obj, const char *emission, const cha
    evas_object_smart_callback_call(item->obj, "changed", (void*)wd->cur_seg_id);
 }
 
-
-static void
-_sizing_eval(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
-   if (!wd) return;
-   elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-   elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-
-	evas_object_size_hint_weight_set(wd->base, 1.0, -1.0);
-	evas_object_size_hint_align_set(wd->base, 1.0, -1.0);
-   evas_object_size_hint_min_set(wd->base, -1, -1);
-	evas_object_size_hint_max_set(wd->base, maxw, maxh);
-   return;
-}
-
 static void
 _theme_hook(Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
    _elm_theme_object_set(obj, obj, "segmented-control", "base", elm_widget_style_get(obj));
 
    return;
@@ -195,13 +201,13 @@ elm_segment_control_add(Evas_Object *parent)
 	Evas_Object *obj;
 	Evas *e;
 	Widget_Data *wd;
-	Evas_Coord w = 0, h = 0;
 
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
 	obj = elm_widget_add(e);
 	elm_widget_type_set(obj, "segmented-control");
 	elm_widget_sub_object_add(parent, obj);
+	elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
 	elm_widget_data_set(obj, wd);
 	elm_widget_del_hook_set(obj, _del_hook);
 	elm_widget_theme_hook_set(obj, _theme_hook);
@@ -220,6 +226,7 @@ elm_segment_control_add(Evas_Object *parent)
 	wd->id = 0;
 	wd->del_index = 0;
 	wd->insert_index = 0;
+	wd->cur_seg_id = -1;
 
 	return obj;
 }
@@ -233,7 +240,6 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
    Elm_Segment_Item *it;
    it = calloc(1, sizeof(   Elm_Segment_Item));
    if (!it) return NULL;
-	Evas_Coord mw, mh;
 
    if(obj) it->obj = obj;
    it->delete_me = EINA_FALSE;
@@ -321,11 +327,7 @@ static void _update_list(Evas_Object *obj)
 
 		edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
 		edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
-		if(wd->cur_seg_id == it->segment_id)
-		{
-			edje_object_signal_emit(it->base, "elm,state,segment,on", "elm");
-			edje_object_signal_emit(it->base, "elm,state,text,change", "elm");
-		}
+
 		i++;
 	}
 }
@@ -366,7 +368,7 @@ static void _state_value_set(Evas_Object *obj)
 
 	Elm_Segment_Item *it;
 	Eina_List *l;
-   Evas_Coord w, h, mw, mh, x, y, xx, yy;
+   Evas_Coord mw, mh, x, y;
    int w1=0, w2;
 
 
@@ -475,21 +477,6 @@ _animator_animate_del_cb(Evas_Object *obj)
 	 }
 }
 
-static void _queue_list(Evas_Object *obj)
-{
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-
-	Elm_Segment_Item *it;
-	Eina_List *l;
-	int i = 0;
-	EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
-	{
-		i++;
-	}
-	wd->count = eina_list_count(wd->seg_ctrl);
-}
-
 /**
  * Add a new segment to segmentcontrol
  * @param obj The SegmentControl object
@@ -505,14 +492,14 @@ EAPI Elm_Segment_Item *
 elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if(!wd) return;
+   if(!wd) return NULL;
 
    Evas_Object *seg;
    Elm_Segment_Item *it;
 
    it = _item_new(obj, label, icon);
 	if(!it)
-		return;
+		return NULL;
 
 	wd->seg_ctrl = eina_list_append(wd->seg_ctrl, it);
 	wd->id = eina_list_count(wd->seg_ctrl);
@@ -858,5 +845,5 @@ elm_segment_control_set_size(Evas_Object *obj, int width, int height)
    wd->item_width = wd->width = width*wd->scale_factor;
    wd->height = height*wd->scale_factor;
 
-   return;
+   return 0;
 }

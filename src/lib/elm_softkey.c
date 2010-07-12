@@ -271,6 +271,7 @@ static int _panel_up_animator_cb(void *data)
 		if (!wd->animator)
 			return 0;
 		ecore_animator_del(wd->animator);
+		wd->animator = NULL;
 		wd->animating = EINA_FALSE;
 		wd->show_panel = EINA_TRUE;
 		progress = 0;
@@ -304,8 +305,9 @@ static int _panel_down_animator_cb(void *data)
 		if (!wd->animator)
 			return 0;
 		ecore_animator_del(wd->animator);
+		wd->animator = NULL;
 		wd->animating = EINA_FALSE;
-		wd->animator = ecore_animator_add(_show_button_animator_cb, data);
+		//wd->animator = ecore_animator_add(_show_button_animator_cb, data);
 		wd->show_panel = EINA_FALSE;
 		progress = 0;
 
@@ -426,8 +428,11 @@ static void _more_btn_click_cb(void *data, Evas_Object *obj, const char *emissio
 		evas_object_show(wd->bg_rect);
 	}
 
-	if (wd->animating == EINA_FALSE) {
+	/*if (wd->animating == EINA_FALSE) {
 		wd->animator = ecore_animator_add(_hide_button_animator_cb, data);
+	}*/
+	if (wd->animating == EINA_FALSE) {
+	        wd->animator = ecore_animator_add(_panel_up_animator_cb, data);
 	}
 }
 
@@ -1170,6 +1175,11 @@ EAPI int elm_softkey_panel_del(Evas_Object *obj)
 		return -1;
 	if (wd->panel == NULL)
 		return -1;
+	if(wd->animator) {
+	   ecore_animator_del(wd->animator);
+	   wd->animator = NULL;
+	   wd->animating=EINA_FALSE;
+	}
 
 	for (i = 1; i <= wd->panel_btn_idx; i++) {
 		sprintf(button_name, "panel_button_area_%d", i);
