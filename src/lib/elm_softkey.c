@@ -211,7 +211,7 @@ static void _theme_hook(Evas_Object *obj)
 	if (wd->panel) {
 		_elm_theme_object_set(obj, wd->panel, "softkey", "panel", elm_widget_style_get(obj));
 		if (wd->panel_btn_idx > 0) {
-			//show more button 
+			//show more button
 			edje_object_signal_emit(wd->lay, "more_btn_show", "");
 			EINA_LIST_FOREACH (wd->items, l, it) {
 				_elm_theme_object_set(obj, it->base, "softkey", "panel_button", elm_widget_style_get(obj));
@@ -526,17 +526,17 @@ static void _softkey_up_cb(void *data, Evas_Object *obj, const char *emission, c
 
 	Elm_Softkey_Item *it = (Elm_Softkey_Item *) data;
 	elm_softkey_panel_close(it->obj);
-	if (it->func)
-		it->func((void *) (it->data), it->obj, it);
 	evas_object_smart_callback_call(it->obj, "clicked", it);
 
-	if (!it->icon)
+	if (it->icon)
+	{
+	   edj = elm_layout_edje_get(it->icon);
+	   if (!edj)
 		return;
-	edj = elm_layout_edje_get(it->icon);
-	if (!edj)
-		return;
-
-	edje_object_signal_emit(edj, "elm,state,unselected", "elm");
+	   edje_object_signal_emit(edj, "elm,state,unselected", "elm");
+	}
+	if (it->func)
+	        it->func((void *) (it->data), it->obj, it);
 }
 
 static void _softkey_down_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
@@ -570,9 +570,9 @@ static void _panel_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info
 	}
 
 	elm_softkey_panel_close(it->obj);
+	evas_object_smart_callback_call(it->obj, "clicked", it);
 	if (it->func)
 		it->func((void *) (it->data), it->obj, it);
-	evas_object_smart_callback_call(it->obj, "clicked", it);
 }
 
 static void _panel_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
@@ -1056,7 +1056,7 @@ elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon, const char *labe
 		if ((edje_object_data_get(wd->panel, "max_item_count") == NULL) || (edje_object_data_get(wd->panel, "panel_height") == NULL) || (edje_object_data_get(wd->panel, "panel_height_horizontal") == NULL)) {
 			//If this key is not found in data section, then it means the panel won't come.
 			wd->max_button = 0;
-			// delete panel 
+			// delete panel
 			if (wd->panel) {
 				elm_softkey_panel_del(obj);
 			}
