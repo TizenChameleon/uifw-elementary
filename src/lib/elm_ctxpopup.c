@@ -877,10 +877,6 @@ elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
 
    if ((!item) || (!icon))
       return;
-   if (item->label)
-     {
-	return;
-     }
    wd = (Widget_Data *) elm_widget_data_get(item->ctxpopup);
    if (!wd)
       return;
@@ -891,7 +887,6 @@ elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
 	elm_widget_sub_object_del(item->base, item->content);
      }
    item->content = icon;
-//   elm_icon_scale_set(icon, EINA_TRUE, EINA_TRUE);
    edje_object_part_swallow(item->base, "elm.swallow.content", item->content);
    edje_object_signal_emit(item->base, "elm,state,enable_icon", "elm");
    edje_object_message_signal_process(item->base);
@@ -916,8 +911,6 @@ elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label)
 	if ((!item) || (!label))
       return;
 
-   if (item->content)
-      fprintf(stderr, "You cannot add label in icon item! - %p\n", item);
    if (item->label)
       eina_stringshare_del(item->label);
    if (label)
@@ -939,6 +932,49 @@ elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label)
 		_sizing_eval(item->ctxpopup);
 }
 
+
+/**
+ * Add a new item in given ctxpopup object.
+ *
+ * @param obj 	 	Ctxpopup object
+ * @param icon		Icon to be set
+ * @param label   Label to be set
+ * @param func		Callback function to call when this item click is clicked
+ * @param data    User data for callback function
+ * @return 		Added ctxpopup item
+ * 
+ * @ingroup Ctxpopup
+ */
+EAPI Elm_Ctxpopup_Item *
+elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, void (*func) (void *data, Evas_Object *obj, void *event_info), void* data)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Elm_Ctxpopup_Item *item;
+
+   Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+
+   if (!wd)
+      return NULL;
+
+   _separator_obj_add(obj);
+
+   item = calloc(1, sizeof(Elm_Ctxpopup_Item));
+   if (!item)
+      return NULL;
+
+   item->func = func;
+   item->data = data;
+   item->ctxpopup = obj;
+   item->separator = EINA_FALSE;
+   _item_obj_create(item);
+   wd->items = eina_list_append(wd->items, item);
+   elm_box_pack_end(wd->box, item->base);
+   elm_ctxpopup_item_icon_set(item, icon);
+	elm_ctxpopup_item_label_set(item, label);
+
+	return item;
+}
+
 /**
  * Add a new item as an icon in given ctxpopup object.
  *
@@ -953,7 +989,7 @@ elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label)
 EAPI Elm_Ctxpopup_Item *
 elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon,
 		      void (*func) (void *data, Evas_Object *obj,
-				    void *event_info), const void *data)
+				    void *event_info), void *data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Elm_Ctxpopup_Item *item;
@@ -994,7 +1030,7 @@ elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon,
 EAPI Elm_Ctxpopup_Item *
 elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
 		       void (*func) (void *data, Evas_Object *obj,
-				     void *event_info), const void *data)
+				     void *event_info), void *data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Elm_Ctxpopup_Item *item;
