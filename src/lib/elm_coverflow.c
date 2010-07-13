@@ -928,18 +928,16 @@ static void _mouse_up_ev( void* data, Evas* evas, Evas_Object* obj, void* event_
 	wd->base_ani_data.from = wd->cur_pos.x;
 	wd->sliding_vector = wd->ti_queue.tail->pos - wd->ti_queue.head->pos;
 
+	//TODO:Please check animator in direct_bouce and update_rotation_degree, bounce_to_left..
+
 	//Rotation 
 	if( wd->sliding_vector > 0 ) {
 		wd->stack_raise = EINA_FALSE;
-		fprintf( stderr, "update roatation degree first!\n" );
 		_update_rotation_degree( wd, 180 - ROTATION_DEGREE );
 	}else {
 		wd->stack_raise = EINA_TRUE;
-		fprintf( stderr, "update roatation degree second!\n" );
 		_update_rotation_degree( wd, ROTATION_DEGREE );
 	}
-
-	fprintf( stderr, "up!\n" );
 
 	//Check Bouncing
 	Evas_Coord w;
@@ -947,18 +945,15 @@ static void _mouse_up_ev( void* data, Evas* evas, Evas_Object* obj, void* event_
 	
 	//bounce to left directly  
 	if( wd->cur_pos.x > 0 ) {
-			  fprintf( stderr, "_direct_bounce! first\n" );
 		_direct_bounce( wd, 0 );
 		return ;
 	//bounce to right directly
 	}else if( wd->cur_pos.x + (Evas_Coord) wd->valid_item_length < w ) {
-			  fprintf( stderr, "_direct_bounce! second\n" );
 		_direct_bounce( wd, w - (Evas_Coord) wd->valid_item_length );
 		return ;
 	}
 
 	if( _bounce_to_left( wd ) == EINA_TRUE ) {
-			  fprintf( stderr, "_bounce_to_left!\n" );
 		return ;
 	}
 /*

@@ -286,10 +286,10 @@ elm_animator_add(Evas_Object *parent)
    elm_animator_auto_reverse_set(animator, EINA_FALSE);
    elm_animator_curve_style_set(animator, ELM_ANIMATOR_CURVE_LINEAR);
 
-   if (parent) {
-      evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL,
-				     _animator_parent_del, animator);
-	}
+//   if (parent) {
+  //    evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL,
+//				     _animator_parent_del, animator);
+//	}
 
    animator->parent = parent;
 
