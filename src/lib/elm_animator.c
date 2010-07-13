@@ -131,7 +131,7 @@ _animator_animate_cb(void *data)
 static void
 _animator_parent_del(void *data)
 {
-	Elm_Animator* animator = data; //
+	Elm_Animator* animator = data; 
 	//elm_animator_del(data);
 }
 
@@ -328,7 +328,7 @@ elm_animator_del(Elm_Animator *animator)
 	_delete_animator(animator);
 
    if(animator->parent) {
-   	evas_object_event_callback_del(animator->parent, EVAS_CALLBACK_DEL, _animator_parent_del);
+//   	evas_object_event_callback_del(animator->parent, EVAS_CALLBACK_DEL, _animator_parent_del);
 	}
 
    free(animator);
