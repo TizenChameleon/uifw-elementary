@@ -57,30 +57,30 @@ static double
 _animator_curve_in_out(double frame)
 {
    if (frame < 0.5)
-      return _animator_curve_out(frame * 2) * 0.5;
+      return _animator_curve_in(frame * 2) * 0.5;
    else
-      return (_animator_curve_in(frame * 2 - 1) * 0.5) + 0.5;
+      return (_animator_curve_out(frame * 2 - 1) * 0.5) + 0.5;
 }
 
 static double
 _animator_curve_in(double frame)
 {
-   return sqrt(1 - pow(frame - 1, 2));
+   return 1 - sqrt(1 - pow(frame, 2));
 }
 
 static double
 _animator_curve_out(double frame)
 {
-   return 1 - sqrt(1 - pow(frame, 2));
+   return sqrt(1 - pow(frame - 1, 2));
 }
 
 static void
 _delete_animator(Elm_Animator *animator)
 {
-   if (animator->animator)
+	if (animator->animator)
      {
-    	ecore_animator_del(animator->animator);
-	animator->animator = NULL;
+		 ecore_animator_del(animator->animator);
+		animator->animator = NULL;
      }
 }
 
@@ -131,7 +131,8 @@ _animator_animate_cb(void *data)
 static void
 _animator_parent_del(void *data)
 {
-   elm_animator_del(data);
+	Elm_Animator* animator = data; //
+	//elm_animator_del(data);
 }
 
 /**
@@ -285,9 +286,10 @@ elm_animator_add(Evas_Object *parent)
    elm_animator_auto_reverse_set(animator, EINA_FALSE);
    elm_animator_curve_style_set(animator, ELM_ANIMATOR_CURVE_LINEAR);
 
-   if (parent)
+   if (parent) {
       evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL,
 				     _animator_parent_del, animator);
+	}
 
    animator->parent = parent;
 
@@ -322,10 +324,13 @@ elm_animator_del(Elm_Animator *animator)
 {
    if (!animator)
       return;
-   _delete_animator(animator);
-   
-   if(animator->parent) 
+
+	_delete_animator(animator);
+
+   if(animator->parent) {
    	evas_object_event_callback_del(animator->parent, EVAS_CALLBACK_DEL, _animator_parent_del);
+	}
+
    free(animator);
 }
 
@@ -363,7 +368,7 @@ elm_animator_stop(Elm_Animator *animator)
    if (!animator)
       return;
    animator->on_animating = EINA_FALSE;
-   _delete_animator(animator);
+	_delete_animator(animator);
 }
 
 /**
@@ -401,8 +406,9 @@ elm_animator_animate(Elm_Animator *animator)
       return;
    animator->begin_time = ecore_loop_time_get();
    animator->cur_repeat_cnt = animator->repeat_cnt;
-   if (!animator->animator) 
+   if (!animator->animator) {
       animator->animator = ecore_animator_add(_animator_animate_cb, animator);
+	}
    if (animator->animator)
       animator->on_animating = EINA_TRUE;
 }

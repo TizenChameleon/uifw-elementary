@@ -516,7 +516,8 @@ static void _render_visible_items( Widget_Data* wd )
 static void _mouse_down_ev( void* data, Evas* evas, Evas_Object* obj, void* event_info )
 {
 	Widget_Data* wd = (Widget_Data*) data;
-	
+
+	fprintf( stderr, "down!\n");
 	if( wd->base_ani_data.animator ) {
 		elm_animator_stop( wd->base_ani_data.animator );
 		elm_animator_del( wd->base_ani_data.animator );
@@ -930,27 +931,34 @@ static void _mouse_up_ev( void* data, Evas* evas, Evas_Object* obj, void* event_
 	//Rotation 
 	if( wd->sliding_vector > 0 ) {
 		wd->stack_raise = EINA_FALSE;
+		fprintf( stderr, "update roatation degree first!\n" );
 		_update_rotation_degree( wd, 180 - ROTATION_DEGREE );
 	}else {
 		wd->stack_raise = EINA_TRUE;
+		fprintf( stderr, "update roatation degree second!\n" );
 		_update_rotation_degree( wd, ROTATION_DEGREE );
 	}
-	
+
+	fprintf( stderr, "up!\n" );
+
 	//Check Bouncing
 	Evas_Coord w;
 	evas_object_geometry_get( obj, NULL, NULL, &w, NULL );
 	
 	//bounce to left directly  
 	if( wd->cur_pos.x > 0 ) {
+			  fprintf( stderr, "_direct_bounce! first\n" );
 		_direct_bounce( wd, 0 );
 		return ;
 	//bounce to right directly
 	}else if( wd->cur_pos.x + (Evas_Coord) wd->valid_item_length < w ) {
+			  fprintf( stderr, "_direct_bounce! second\n" );
 		_direct_bounce( wd, w - (Evas_Coord) wd->valid_item_length );
 		return ;
 	}
 
 	if( _bounce_to_left( wd ) == EINA_TRUE ) {
+			  fprintf( stderr, "_bounce_to_left!\n" );
 		return ;
 	}
 /*
@@ -1226,7 +1234,6 @@ inline static void _zoom_in( Widget_Data* wd )
 	elm_animator_completion_callback_set( wd->base_ani_data.animator,
 			                     _zoom_in_completion_cb, wd );
 	elm_animator_animate( wd->base_ani_data.animator );
-
 }
 
 

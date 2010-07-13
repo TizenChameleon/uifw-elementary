@@ -344,7 +344,7 @@ _update_arrow_obj(Evas_Object *obj, Arrow_Direction arrow_dir)
      default:
 	break;
      }
-  
+ 
 	evas_object_move(wd->arrow, arrow_x, arrow_y);
 }
 
@@ -370,9 +370,9 @@ _sizing_eval(Evas_Object *obj)
 	if((!wd->arrow_disabled) && (arrow_dir!=NONE_ARROW)) 
 	{
 		_update_arrow_obj(obj, arrow_dir);
-   	_shift_base_by_arrow(wd->arrow, arrow_dir, &rect);
+		_shift_base_by_arrow(wd->arrow, arrow_dir, &rect);
 	}
-   
+ 
 	evas_object_move(wd->scroller, rect.x, rect.y);
    evas_object_resize(wd->scroller, rect.w, rect.h);
    evas_object_move(wd->base, rect.x, rect.y);
@@ -1161,4 +1161,6 @@ elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 
 	wd->screen_dimmed_disabled = disabled;
 }
+
+
 

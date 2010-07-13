@@ -129,7 +129,7 @@ _eval_top(Evas_Object *obj)
      	Evas_Coord w, y;
      	Elm_Transit *transit;
 
-	transit = elm_transit_add(obj);
+//	transit = elm_transit_add(obj);
 	evas_object_geometry_get( obj, NULL, &y, &w, NULL );
 
 	if (wd->top)
@@ -140,9 +140,10 @@ _eval_top(Evas_Object *obj)
 	     if (wd->top->popme) pop = EINA_TRUE;
 	     if (ani) 
 	     	{
-	     	  if (pop) elm_transit_fx_insert( transit, elm_fx_translation_add(o , 0, y, w, y));
-	     	  else elm_transit_fx_insert( transit, elm_fx_translation_add(o , 0, y, -w, y));
-		  elm_transit_completion_callback_set( transit, _complete_cb, it);
+	     	  if (pop) evas_object_move( o, w, y );//elm_transit_fx_insert( transit, elm_fx_translation_add(o , 0, y, w, y));
+	     	  else evas_object_move(o, -w, y);//elm_transit_fx_insert( transit, elm_fx_translation_add(o , 0, y, -w, y));
+		  //elm_transit_completion_callback_set( transit, _complete_cb, it);
+		  _complete_cb( it );
 	     	}
 	     else 
 	     	{
@@ -163,11 +164,11 @@ _eval_top(Evas_Object *obj)
 	//add show/hide transition direction & animation on/off. 10.04.14 sohyun
 	if (ani && o) 
 	  {
-	    if (pop) elm_transit_fx_insert( transit, elm_fx_translation_add(prev_o, -w, y, 0, y));
-	    else elm_transit_fx_insert( transit, elm_fx_translation_add(prev_o, w, y, 0, y));
-	    elm_transit_run( transit, 0.3 );
+	    if (pop) evas_object_move(prev_o, 0, y );//elm_transit_fx_insert( transit, elm_fx_translation_add(prev_o, -w, y, 0, y));
+	    else evas_object_move( prev_o, 0, y );//elm_transit_fx_insert( transit, elm_fx_translation_add(prev_o, w, y, 0, y));
+	    //elm_transit_run( transit, 0.3 );
 	  }
-	elm_transit_del( transit ); 
+	//elm_transit_del( transit ); 
 
 	onshow = edje_object_data_get(prev_o, "onshow");
 	if (onshow)
@@ -363,13 +364,17 @@ elm_pager_content_pop(Evas_Object *obj)
 	       {
 		  Elm_Effect *transit;
 		  Evas_Coord w, y;
-      
+/*      
 	          transit = elm_transit_add(obj);
 		  evas_object_geometry_get(obj, NULL, &y, &w, NULL);
 		  elm_transit_fx_insert(transit, elm_fx_translation_add(o , 0, y, w, y));
 		  elm_transit_completion_callback_set(transit, _complete_cb, it);
 		  elm_transit_run(transit, 0.3 );
-		  elm_transit_del(transit); 
+		  elm_transit_del(transit);  */
+		  evas_object_move( o, w, y );
+		  _complete_cb( it );
+		  
+		  
 	     	}
 	     else _signal_hide_finished(wd->top, o, "elm,action,hide,finished", "");
 

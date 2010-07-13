@@ -2,7 +2,7 @@ elementary (0.4.0+svn.49550slp2+3build16) unstable; urgency=low
 
   * repackaging.
   * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL-pkgs/elementary
-  * Tag: elementary_0.4.0+svn.49550slp2+3build15
+  * Tag: elementary_0.4.0+svn.49550slp2+3build16
 
  -- ChunEon Park <chuneon.park@samsung.com>  Mon, 12 Jul 2010 19:51:42 +0900
 
