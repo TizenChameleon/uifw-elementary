@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build18) unstable; urgency=low
+
+  * [animator] prevent critical a bug.  
+  * Git: 165.213.180.234:/git/slp2.0/slp2.0-pkgs/EFL-pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build18
+
+ -- ChunEon Park <juyung.seo@samsung.com>  Tue, 13 Jul 2010 23:07:03 +0900
+
 elementary (0.4.0+svn.49550slp2+3build17) unstable; urgency=low
 
   * [softkey] Indentation using Ecliplse Ecoding style for Eclipse.
