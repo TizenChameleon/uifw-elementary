@@ -743,34 +743,30 @@ static void _mouse_move_ev( void* data, Evas* evas, Evas_Object* obj, void* even
 	skip_count = 0;
 #endif 
 
-
 	Evas_Coord vector; 
 
 	//horizontal mode
 	vector =  ev->cur.output.x - ev->prev.output.x; 
 	wd->cur_pos.x += vector;
 
-	if( vector > 0 ) {
-		
+	if( wd->rot_ani_data.cur > (180-ROTATION_DEGREE)/2+ROTATION_DEGREE) {
 		wd->stack_raise = EINA_FALSE;
-		_update_items(wd, Shift_Right, wd->stack_raise );
+	}else {
+		wd->stack_raise = EINA_TRUE;
+	}
 
+	if( vector > 0 ) {
+		_update_items(wd, Shift_Right, wd->stack_raise );
 		wd->rot_ani_data.cur += 3;
-		
 		if( wd->rot_ani_data.cur > 180 - ROTATION_DEGREE ) {
 			wd->rot_ani_data.cur = 180 - ROTATION_DEGREE;
 		}
-				
 	}else {
-		wd->stack_raise = EINA_TRUE;
 		_update_items(wd, Shift_Left, wd->stack_raise );
-	
 		wd->rot_ani_data.cur -= 3;
-	
 		if( wd->rot_ani_data.cur < ROTATION_DEGREE ) {
 			wd->rot_ani_data.cur = ROTATION_DEGREE;
 		}
-			
 	}
 
 	//TODO: if Drag Direction is changed, let's clear queue!
@@ -870,7 +866,6 @@ static Eina_Bool _bounce_to_right( Widget_Data* wd )
 	Evas_Coord bounce_pos  = (right_outside_length + sliding_length) / 2;
 	
 	wd->sliding_vector = bounce_pos - right_outside_length;
-	fprintf( stderr, "%d\n", wd->sliding_vector );
 
 	wd->base_ani_data.animator = elm_animator_add( wd->obj );
 	elm_animator_duration_set( wd->base_ani_data.animator, SLIDING_DURATION * 0.5 );

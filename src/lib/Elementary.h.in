@@ -2375,8 +2375,8 @@ extern "C" {
    /* coverflow */
    typedef struct _Coverflow_Item Elm_Coverflow_Item;
    typedef struct _Coverflow_Item_Class {  
-        void (*CoverflowItemGenFunc)(const void* data, Evas_Object* obj );
-        void (*CoverflowItemDelFunc)(const void* data, Evas_Object* obj ); 
+        void (*CoverflowItemGenFunc)(void* data, Evas_Object* obj );
+        void (*CoverflowItemDelFunc)(void* data, Evas_Object* obj ); 
    } Elm_Coverflow_Item_Class;
   
    EAPI Evas_Object* elm_coverflow_add( Evas_Object* parent );
