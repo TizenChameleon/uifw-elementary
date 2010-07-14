@@ -102,7 +102,7 @@ struct _Animation_Data
 // prototype
 static void selected_box(Elm_Controlbar_Item * it);
 static int pressed_box(Elm_Controlbar_Item * it);
-
+static void object_color_set(Evas_Object *ly, const char *color_part, const char *obj_part);
 
 ///////////////////////////////////////////////////////////////////
 //
@@ -267,6 +267,7 @@ _theme_hook(Evas_Object * obj)
 	{
 	   elm_layout_theme_set(item->base, "controlbar", "item",
 				 elm_widget_style_get(obj));
+	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
 	   elm_layout_theme_set(item->edit_item, "controlbar", "item",
 				  elm_widget_style_get(obj));
 	   if (!item->editable)
@@ -1234,6 +1235,7 @@ create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
 				   bar_item_down_cb, wd);
    edje_object_signal_callback_add(_EDJ(it->base), "elm,action,click", "elm",
 				    clicked_box_cb, wd);
+   object_color_set(it->base, "elm.tabbar.default.color", "elm.swallow.icon");
    evas_object_show(it->base);
    it->edit_item = create_item_layout(wd->edje, it);
    evas_object_event_callback_add(it->edit_item, EVAS_CALLBACK_MOUSE_DOWN,
@@ -1278,6 +1280,7 @@ create_tool_item(Evas_Object * obj, const char *icon_path, const char *label,
 				   bar_item_down_cb, wd);
    edje_object_signal_callback_add(_EDJ(it->base), "elm,action,click", "elm",
 				    clicked_box_cb, wd);
+   object_color_set(it->base, "elm.tabbar.default.color", "elm.swallow.icon");
    evas_object_show(it->base);
    it->edit_item = create_item_layout(wd->edje, it);
    evas_object_event_callback_add(it->edit_item, EVAS_CALLBACK_MOUSE_DOWN,
