@@ -166,14 +166,15 @@ elm_dayselector_add(Evas_Object *parent)
 
 	//Frame
 	wd->frame = elm_frame_add(obj);
-	elm_widget_resize_object_set(obj, wd->frame);
+	elm_object_style_set(wd->frame, "dayselector");
+	elm_widget_resize_object_set(obj, wd->frame); 
 
 	//Base
 	wd->base = edje_object_add(e);
 	_elm_theme_object_set(obj, wd->base, "dayselector", "base", elm_widget_style_get(obj));
-	elm_widget_sub_object_add(obj, wd->base);
+	elm_object_style_set(wd->base, "dayselector");
 	elm_frame_content_set(wd->frame, wd->base);
-
+	
 	//Title
 	wd->title = edje_object_add(e);
 	elm_widget_sub_object_add(obj, wd->title);
