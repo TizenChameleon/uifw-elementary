@@ -2344,15 +2344,20 @@ extern "C" {
    EAPI void elm_chronometer_format_get(Evas_Object *obj, Eina_Bool *format);
 
    /* dialoguegroup */
+   
+   typedef struct _Dialogue_Item Dialogue_Item;
+   
    EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent);
-   EAPI void elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj);   
-   EAPI void elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj);   
-   EAPI void elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Evas_Object *after);   
-   EAPI void elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Evas_Object *before);   
-   EAPI void elm_dialoguegroup_remove(Evas_Object *obj, Evas_Object *subobj);
+   EAPI Dialogue_Item *elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj);   
+   EAPI Dialogue_Item *elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj);   
+   EAPI Dialogue_Item *elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *after);   
+   EAPI Dialogue_Item *elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *before);   
+   EAPI void elm_dialoguegroup_remove(Dialogue_Item *item);
    EAPI void elm_dialoguegroup_remove_all(Evas_Object *obj);
    EAPI void elm_dialoguegroup_title_set(Evas_Object *obj, const char *title);
    EAPI const char *elm_dialoguegroup_title_get(Evas_Object *obj);
+   EAPI void elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press);
+   EAPI Eina_Bool elm_dialoguegroup_press_effect_get(Dialogue_Item *item);
   
 	/* AutoCompleteView */
 	typedef Eina_Bool (*elmautocompleteview_matchfunction) (Evas_Object *obj,char *text,Evas_Object *list,void *data);

@@ -9,12 +9,12 @@
  * Using dialoguegroup, you can make a dialogue group.
  */
 
-typedef struct _Dialogue_Item Dialogue_Item;
 struct _Dialogue_Item
 {
 	Evas_Object *parent;
 	Evas_Object *bg_layout;
-	Evas_Object *content_layout;
+	Evas_Object *content;
+	Eina_Bool press;
 };
 
 
@@ -108,9 +108,9 @@ static void _remove_all(Evas_Object *obj)
 	
 	if (wd->items) {
 		EINA_LIST_FREE(wd->items, item) {
-			if (item->content_layout){
-				evas_object_del(item->content_layout);
-				item->content_layout = NULL;
+			if (item->content){
+				evas_object_del(item->content);
+				item->content = NULL;
 			}
 			if (item->bg_layout){
 				evas_object_del(item->bg_layout);
@@ -127,7 +127,11 @@ static void _change_item_bg(Dialogue_Item *item, const char *style)
 	
 	elm_layout_theme_set(item->bg_layout, "dialoguegroup", "bg", style);
 	elm_object_style_set(item->bg_layout, style);
-	elm_layout_content_set(item->bg_layout, "swallow", item->content_layout);
+	elm_layout_content_set(item->bg_layout, "swallow", item->content);
+	if(item->press == EINA_TRUE)
+		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
+	else
+		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");	
 }
 
 static Dialogue_Item* _create_item(Evas_Object *obj, Evas_Object *subobj, const char *style)
@@ -139,7 +143,8 @@ static Dialogue_Item* _create_item(Evas_Object *obj, Evas_Object *subobj, const 
 	
 	item = ELM_NEW(Dialogue_Item);
 	item->parent = obj;
-	item->content_layout = subobj; 
+	item->content = subobj; 
+	item->press = EINA_TRUE;
 	
 	item->bg_layout = elm_layout_add(wd->parent);
 	elm_layout_theme_set(item->bg_layout, "dialoguegroup", "bg", style );
@@ -148,7 +153,7 @@ static Dialogue_Item* _create_item(Evas_Object *obj, Evas_Object *subobj, const 
 	evas_object_size_hint_align_set(item->bg_layout, EVAS_HINT_FILL, 0.0);
 	evas_object_show(item->bg_layout);	
 
-	elm_layout_content_set(item->bg_layout, "swallow", item->content_layout);
+	elm_layout_content_set(item->bg_layout, "swallow", item->content);
 
 	return item;
 }
@@ -199,17 +204,18 @@ EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent)
  *
  * @param obj dialoguegroup object 
  * @param subobj item
- *
+ * @return Dialogue_Item pointer, just made by this function
+ * 
  * @ingroup DialogueGroup
  */
-EAPI void
+EAPI Dialogue_Item *
 elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype);
+   	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Dialogue_Item *item;
 	
-	if (!wd || !subobj) return;
+	if (!wd || !subobj) return NULL;
 	
 	if (!wd->items) {
 		item = _create_item(obj, subobj, "default");	
@@ -233,6 +239,7 @@ elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj)
 
 	wd->num++;
 	_sizing_eval(obj);
+	return item;
 }
 
 
@@ -241,17 +248,18 @@ elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj)
  *
  * @param obj dialoguegroup object 
  * @param subobj item
+ * @return Dialogue_Item pointer, just made by this function
  *
  * @ingroup DialogueGroup
  */
-EAPI void
+EAPI Dialogue_Item *
 elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype);
+   	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Dialogue_Item *item;
 	
-	if (!wd || !subobj) return;
+	if (!wd || !subobj) return NULL;
 	
 	if (!wd->items) {
 		item = _create_item(obj, subobj, "default");	
@@ -281,6 +289,7 @@ elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj)
 
 	wd->num++;
 	_sizing_eval(obj);
+	return item;
 }
 
 /**
@@ -289,22 +298,23 @@ elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj)
  * @param obj dialoguegroup object 
  * @param subobj item
  * @param after specified item existing in the dialogue group
+ * @return Dialogue_Item pointer, just made by this function
  *
  * @ingroup DialogueGroup
  */
-EAPI void
-elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Evas_Object *after)
+EAPI Dialogue_Item * 
+elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *after)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype);
+   	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Dialogue_Item *after_item, *item;
 	Eina_List *l;
 	const char *style;
 
-	if (!wd || !subobj || !after || !wd->items) return ;
+	if (!wd || !subobj || !after || !wd->items) return NULL;
 
 	EINA_LIST_FOREACH(wd->items, l, after_item) {
-		if( after == after_item->content_layout ) {
+		if(after == after_item) {
 			style = elm_object_style_get(after_item->bg_layout);
 			
 			if( !strcmp(style, "default") ) {
@@ -324,8 +334,8 @@ elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Evas_Objec
 	}
 		
 	wd->num++;
-
 	_sizing_eval(obj);
+	return item;
 }
 
 /**
@@ -334,22 +344,23 @@ elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Evas_Objec
  * @param obj dialoguegroup object 
  * @param subobj item
  * @param before specified item existing in the dialogue group
+ * @return Dialogue_Item pointer, just made by this function
  *
  * @ingroup DialogueGroup
  */
-EAPI void
-elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Evas_Object *before)
+EAPI Dialogue_Item *
+elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *before)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype);
+   	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Dialogue_Item *before_item, *item;
 	Eina_List *l;
 	const char *style;
 	
-	if (!wd || !subobj || !before || !wd->items) return ;
+	if (!wd || !subobj || !before || !wd->items) return NULL;
 
 	EINA_LIST_FOREACH(wd->items, l, before_item) {
-		if( before == before_item->content_layout ) {
+		if(before == before_item) {
 			style = elm_object_style_get(before_item->bg_layout);
 			
 			if( !strcmp(style, "default") ) {
@@ -371,8 +382,8 @@ elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Evas_Obje
 	}
 		
 	wd->num++;
-
 	_sizing_eval(obj);	
+	return item;
 }
 
 /**
@@ -384,27 +395,27 @@ elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Evas_Obje
  * @ingroup DialogueGroup
  */
 EAPI void
-elm_dialoguegroup_remove(Evas_Object *obj, Evas_Object *subobj)
+elm_dialoguegroup_remove(Dialogue_Item *item)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *item;
+   	ELM_CHECK_WIDTYPE(item->parent, widtype) ;
+	Dialogue_Item *current_item;
+	Widget_Data *wd = elm_widget_data_get(item->parent);
 	Eina_List *l;
 	
-	if (!wd || !subobj || !wd->items) return ;
+	if (!wd || !wd->items || !item) return ;
 	
-	EINA_LIST_FOREACH(wd->items, l, item) {
-		if (subobj == item->content_layout) {
-			if (item->content_layout){
-				evas_object_del(item->content_layout);
-				item->content_layout = NULL;
+	EINA_LIST_FOREACH(wd->items, l, current_item) {
+		if (current_item == item) {
+			if (current_item->content){
+				evas_object_del(current_item->content);
+				current_item->content = NULL;
 			}
-			if (item->bg_layout){
-				evas_object_del(item->bg_layout);
-				item->bg_layout = NULL;
+			if (current_item->bg_layout){
+				evas_object_del(current_item->bg_layout);
+				current_item->bg_layout = NULL;
 			}
-			elm_box_unpack(wd->box, item->bg_layout);			
-			wd->items = eina_list_remove(wd->items, item);
+			elm_box_unpack(wd->box, current_item->bg_layout);			
+			wd->items = eina_list_remove(wd->items, current_item);
 		}
 	}
 		
@@ -413,18 +424,18 @@ elm_dialoguegroup_remove(Evas_Object *obj, Evas_Object *subobj)
 	if (wd->num == 0) return;
 	
 	if (wd->num == 1) {
-		item = eina_list_data_get(wd->items);
-		_change_item_bg(item, "default");
+		current_item = eina_list_data_get(wd->items);
+		_change_item_bg(current_item, "default");
 	}
 
 	else {		
-		item = eina_list_data_get(wd->items);
-		_change_item_bg(item, "top");
-		item = eina_list_data_get( eina_list_last(wd->items) );
-		_change_item_bg(item, "bottom");		
+		current_item = eina_list_data_get(wd->items);
+		_change_item_bg(current_item, "top");
+		current_item = eina_list_data_get( eina_list_last(wd->items) );
+		_change_item_bg(current_item, "bottom");		
 	}
 
-	_sizing_eval(obj);	
+	_sizing_eval(item->parent);	
 }
 
 /**
@@ -481,7 +492,7 @@ elm_dialoguegroup_title_set(Evas_Object *obj, const char *title)
  * @param obj The dialoguegroup object
  * @return The text title string in UTF-8
  *
- * @ingroup Slider
+ * @ingroup DialogueGroup
  */
 EAPI const char *
 elm_dialoguegroup_title_get(Evas_Object *obj)
@@ -491,4 +502,45 @@ elm_dialoguegroup_title_get(Evas_Object *obj)
    if (!wd) return NULL;
    return wd->title;
 }
+
+/**
+ * Set whether the press effect will be shown or not
+ *
+ * @param obj The dialoguegroup object
+ * @param item Dialogue_Item pointer
+ * @param press If set as 1, press effect will be shown 
+ *
+ * @ingroup DialogueGroup 
+ */
+EAPI void 
+elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press)
+{
+   ELM_CHECK_WIDTYPE(item->parent, widtype) ;
+   if(!item) return;
+   
+   item->press = press;
+   if(press == EINA_TRUE)
+	   edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
+   else
+	   edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");	
+}
+
+/**
+ * Get the press effect state
+ *
+ * @param obj The dialoguegroup object
+ * @param item Dialogue_Item pointer
+ * @return 1 if press effect on, 0 if press effect off 
+ *
+ * @ingroup DialogueGroup 
+ */
+EAPI Eina_Bool
+elm_dialoguegroup_press_effect_get(Dialogue_Item *item)
+{
+   ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
+   if(!item) return EINA_FALSE;
+   
+   return item->press;
+}
+
 
