@@ -527,6 +527,9 @@ collections {
 
 ///////////////////////////////////////////////////////////////////////////////
    group { name: "elm/label/base/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       styles
 	{
 	   style { name: "textblock_style";
@@ -562,6 +565,9 @@ collections {
    }
 
    group { name: "elm/label/base_wrap/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       parts {
 	 part { name: "label.swallow.background";
 	    type: SWALLOW;
@@ -587,6 +593,9 @@ collections {
    }
 
    group { name: "elm/label/base/marker";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       styles
 	{
 	   style { name: "textblock_style2";
@@ -622,6 +631,9 @@ collections {
    }
 
    group { name: "elm/label/base_wrap/marker";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       parts {
 	 part { name: "label.swallow.background";
 	    type: SWALLOW;
