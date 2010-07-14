@@ -18,7 +18,6 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *parent;
-	Evas_Object *frame;
 	Evas_Object *base;
 	Evas_Object *title;
 	Evas_Object *check[7];
@@ -134,7 +133,7 @@ _sizing_eval(Evas_Object* obj)
 	if(h < min_h) h = min_h;
 	else if(h > max_h) h = max_h;
 
-	evas_object_resize(wd->frame, w, h);  
+	evas_object_resize(wd->base, w, h);  
 }
 */
 /**
@@ -164,17 +163,12 @@ elm_dayselector_add(Evas_Object *parent)
 
 	wd->parent = parent;
 
-	//Frame
-	wd->frame = elm_frame_add(obj);
-	elm_object_style_set(wd->frame, "dayselector");
-	elm_widget_resize_object_set(obj, wd->frame); 
-
 	//Base
 	wd->base = edje_object_add(e);
 	_elm_theme_object_set(obj, wd->base, "dayselector", "base", elm_widget_style_get(obj));
 	elm_object_style_set(wd->base, "dayselector");
-	elm_frame_content_set(wd->frame, wd->base);
-	
+	elm_widget_resize_object_set(obj, wd->base); 
+
 	//Title
 	wd->title = edje_object_add(e);
 	elm_widget_sub_object_add(obj, wd->title);
