@@ -66,15 +66,21 @@ elm_modapi_shutdown(void *m)
 EAPI void
 obj_hook(Evas_Object *obj)
 {
-	ext_mod = ELM_NEW(Elm_Entry_Extension_data);
-  	elm_entry_extension_module_data_get(obj,ext_mod);
+	if(!ext_mod)
+		{
+			ext_mod = ELM_NEW(Elm_Entry_Extension_data);
+  		elm_entry_extension_module_data_get(obj,ext_mod);
+		}
 }
 
 EAPI void
 obj_unhook(Evas_Object *obj)
 {
    if(ext_mod)
-	 	free(ext_mod);
+   	{
+		 	free(ext_mod);
+			ext_mod = NULL;
+   	}
 }
 
 EAPI void
