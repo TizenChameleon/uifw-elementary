@@ -204,7 +204,7 @@ _theme_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Elm_List_Item *it;
    Eina_List *n;
-   
+
    if (!wd) return;
    if (wd->scr)
      {
@@ -261,7 +261,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
                   if (it->icon == sub) it->icon = NULL;
                   if (it->end == sub) it->end = NULL;
                   evas_object_event_callback_del_full
-                    (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, 
+                    (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints,
                      obj);
                   if (!wd->walking)
                     {
@@ -937,7 +937,7 @@ elm_list_clear(Evas_Object *obj)
    if (wd->walking > 0)
      {
 	Eina_List *n;
-        
+
 	EINA_LIST_FOREACH(wd->items, n, it)
 	  {
 	     if (it->deleted) continue;
@@ -1516,6 +1516,5 @@ elm_list_scrollbar_handler_set(Evas_Object *obj, Eina_Bool set)
    if (!wd) return;
    if(!set) return;
 
-   elm_scroller_bounce_set(wd->scr, 0, 0);
    elm_scroller_scrollbar_handler_set(wd->scr, set);
 }
