@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build21) unstable; urgency=low
+
+  * Repackaging
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build21
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Thu, 15 Jul 2010 14:48:43 +0900
+
 elementary (0.4.0+svn.49550slp2+3build20) unstable; urgency=low
 
   * Repackaging
