@@ -326,7 +326,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
         dist = 0x7fffffff;
         evas_object_geometry_get(wd->bx[i], &bx, &by, &bw, &bh);
 		dmin = (double)(wd->min_1st_level_obj_height*wd->tot_items_count[1])/(2*(double)bh);
-		dmax = 1-dmin;
+		dmax = 1.0-dmin-0.08;
         EINA_LIST_FOREACH(wd->items, l, it)
           {
              if (!((it->level == i) && (it->base))) continue;

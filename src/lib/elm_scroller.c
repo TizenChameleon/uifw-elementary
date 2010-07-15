@@ -669,3 +669,21 @@ elm_scroller_page_move_set(Evas_Object *obj, Eina_Bool set)
 
    elm_smart_scroller_page_move_set(wd->scr, set);
 }
+
+/**
+ * Set scrollbar handler
+ *
+ * @param obj The scroller object
+ * @param set Flag
+ *
+ * @ingroup Scroller
+ */
+EAPI void
+elm_scroller_scrollbar_handler_set(Evas_Object *obj, Eina_Bool set)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if(!set) return;
+   elm_smart_scroller_handler_set(wd->scr);
+}

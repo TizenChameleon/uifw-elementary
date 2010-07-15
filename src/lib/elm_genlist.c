@@ -4410,3 +4410,25 @@ elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
     if (wd->calc_job) ecore_job_del(wd->calc_job);
     wd->calc_job = ecore_job_add(_calc_job, wd);
 }
+
+/**
+ * Set Scrollbar Handler mode
+ *
+ * This will activate the scrollbar handler mode for the genlist.
+ *
+ * @param obj The genlist object
+ * @param set if EINA_TRUE, activate handler.
+ *
+ * @ingroup Genlist
+ */
+
+EAPI void
+elm_genlist_scrollbar_handler_set(Evas_Object *obj, Eina_Bool set)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if(!set) return;
+   elm_smart_scroller_bounce_allow_set(wd->scr, 0, 0);
+   elm_smart_scroller_handler_set(wd->scr);
+}

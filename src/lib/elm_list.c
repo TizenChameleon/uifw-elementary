@@ -1497,3 +1497,25 @@ elm_list_scroller_policy_get(const Evas_Object *obj, Elm_Scroller_Policy *policy
    if (wd->scr)
      elm_scroller_policy_get(wd->scr, policy_h, policy_v);
 }
+
+/**
+ * Set Scrollbar Handler mode
+ *
+ * This will activate the scrollbar handler mode for the list.
+ *
+ * @param obj The list object
+ * @param set if EINA_TRUE, activate handler.
+ *
+ * @ingroup Genlist
+ */
+EAPI void
+elm_list_scrollbar_handler_set(Evas_Object *obj, Eina_Bool set)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if(!set) return;
+
+   elm_scroller_bounce_set(wd->scr, 0, 0);
+   elm_scroller_scrollbar_handler_set(wd->scr, set);
+}

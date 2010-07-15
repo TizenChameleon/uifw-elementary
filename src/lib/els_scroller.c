@@ -20,7 +20,7 @@ struct _Smart_Data
    Evas_Object *event_obj;
 
    Evas_Object *widget;
-   
+
    Elm_Smart_Scroller_Policy hbar_flags, vbar_flags;
 
    struct {
@@ -1157,6 +1157,22 @@ elm_smart_scroller_widget_set(Evas_Object *obj, Evas_Object *wid)
    sd->widget = wid;
 }
 
+EAPI void
+elm_smart_scroller_handler_set(Evas_Object *obj)
+{
+   API_ENTRY return;
+   Elm_Smart_Scroller_Policy *policy_h, *policy_v;
+   policy_h = ELM_SMART_SCROLLER_POLICY_OFF;
+   policy_v = ELM_SMART_SCROLLER_POLICY_OFF;
+
+   elm_smart_scroller_policy_get(obj, &policy_h, &policy_v);
+
+   if(policy_v != ELM_SMART_SCROLLER_POLICY_ON)
+	   elm_smart_scroller_policy_set(obj, ELM_SMART_SCROLLER_POLICY_OFF, ELM_SMART_SCROLLER_POLICY_AUTO);
+
+   edje_object_signal_emit(sd->edje_obj, "elm,activate,handler", "elm");
+}
+
 /* local subsystem functions */
 static void
 _smart_edje_drag_v_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
@@ -1472,6 +1488,7 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
    sd = data;
    ev = event_info;
    sd->down.hold_parent = 0;
+
 //   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return ;
    evas_post_event_callback_push(e, _smart_event_post_up, sd);
    // FIXME: respect elm_widget_scroll_hold_get of parent container
@@ -1749,6 +1766,7 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *
 
    sd = data;
    ev = event_info;
+
 //   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return ;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) sd->down.hold_parent = 1;
    evas_post_event_callback_push(e, _smart_event_post_move, sd);
