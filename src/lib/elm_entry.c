@@ -2666,6 +2666,14 @@ elm_entry_utf8_to_markup(const char *s)
    return ss;
 }
 
+/**
+ * Get the input method context in the entry widget
+ *
+ * @param obj The entry object
+ * @return The input method context
+ *
+ * @ingroup Entry
+ */
 EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -2675,6 +2683,14 @@ EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
    return edje_object_part_text_imf_context_get(wd->ent, "elm.text");
 }
 
+/**
+ * Set whether entry should enable the return key on soft keyboard automatically
+ *
+ * @param obj The entry object
+ * @param on If true, entry enables the return key on soft keyboard automatically.
+ *
+ * @ingroup Entry
+ */
 EAPI void 
 elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
 {
@@ -2686,6 +2702,14 @@ elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
    _check_enable_returnkey(obj);
 }
 
+/**
+ * Set whether entry should support auto capitalization
+ *
+ * @param obj The entry object
+ * @param on If true, entry suports auto capitalization.
+ *
+ * @ingroup Entry
+ */
 EAPI void 
 elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on)
 {
