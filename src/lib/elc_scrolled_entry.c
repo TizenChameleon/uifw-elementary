@@ -1,3 +1,6 @@
+/*
+ * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ */
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -970,6 +973,14 @@ elm_scrolled_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool 
    elm_entry_password_show_last_character_set(wd->entry, show_last_character);
 }
 
+/**
+ * Get the input method context in the scrolled entry widget
+ *
+ * @param obj The scrolled entry object
+ * @return The input method context
+ *
+ * @ingroup Scrolled_Entry
+ */
 EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -985,7 +996,7 @@ EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj)
  * @param obj The scrolled entry object
  * @param enabled If true, the input panel is enabled
  *
- * @ingroup Entry
+ * @ingroup Scrolled_Entry
  */
 EAPI void
 elm_scrolled_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
@@ -1003,7 +1014,7 @@ elm_scrolled_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
  * @param obj The scrolled entry object
  * @param layout the layout to set
  *
- * @ingroup Entry
+ * @ingroup Scrolled_Entry
  */
 EAPI void
 elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout)
