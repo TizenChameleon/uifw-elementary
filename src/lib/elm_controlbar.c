@@ -42,6 +42,7 @@ struct _Widget_Data
    Evas_Object * navigation;
    Evas_Object * edje;
    Evas_Object * box;
+   Evas_Object * event_box;
    
       //Evas_Object *center_box;
    Evas_Object * rect;
@@ -103,6 +104,10 @@ struct _Animation_Data
 static void selected_box(Elm_Controlbar_Item * it);
 static int pressed_box(Elm_Controlbar_Item * it);
 static void object_color_set(Evas_Object *ly, const char *color_part, const char *obj_part);
+static void edit_item_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info);
+static void edit_item_move_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info);
+static void bar_item_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info);
+static void bar_item_move_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info);
 
 ///////////////////////////////////////////////////////////////////
 //
@@ -127,6 +132,7 @@ _controlbar_move(void *data, Evas_Object * obj)
    evas_object_move(wd->view, x, y);
    evas_object_geometry_get(wd->parent, &x, &y, NULL, NULL);
    evas_object_move(wd->edit_box, x, y);
+   evas_object_move(wd->event_box, x, y);
 }
 
 static void
@@ -148,8 +154,8 @@ _controlbar_resize(void *data, Evas_Object * obj)
    evas_object_resize(wd->view, w, h - height + 1);
    evas_object_geometry_get(wd->parent, NULL, &y_, NULL, NULL);
    evas_object_resize(wd->edit_box, w, h + y - y_);
+   evas_object_resize(wd->event_box, w, h + y - y_);
 }
-
 
 static void
 _controlbar_object_move(void *data, Evas * e, Evas_Object * obj,
@@ -178,6 +184,7 @@ _controlbar_object_show(void *data, Evas * e, Evas_Object * obj,
    evas_object_show(wd->view);
    evas_object_show(wd->edit_box);
    evas_object_show(wd->edje);
+   evas_object_show(wd->event_box);
 }
 
 static void
@@ -193,6 +200,7 @@ _controlbar_object_hide(void *data, Evas * e, Evas_Object * obj,
    evas_object_hide(wd->view);
    evas_object_hide(wd->edit_box);
    evas_object_hide(wd->edje);
+   evas_object_hide(wd->event_box);
 }
 
 static void 
@@ -226,6 +234,11 @@ _del_hook(Evas_Object * obj)
      {
 	evas_object_del(wd->box);
 	wd->box = NULL;
+     }
+   if (wd->event_box)
+     {
+	evas_object_del(wd->event_box);
+	wd->event_box = NULL;
      }
    EINA_LIST_FREE(wd->items, item)
    {
@@ -724,7 +737,7 @@ clicked_box_cb(void *data, Evas_Object * obj, const char *emission,
 }
 
 static int
-unfocused_box_cb(void *data, int type, void *event_info) 
+unfocused_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info) 
 {
    Widget_Data * wd = (Widget_Data *) data;
    const Eina_List *l;
@@ -750,11 +763,8 @@ unfocused_box_cb(void *data, int type, void *event_info)
 	   edje_object_signal_emit(_EDJ(item->base), "elm,state,text_unselected", "elm");
 	}
    }
-   if (wd->bar_up_event != NULL)
-     {
-	ecore_event_handler_del(wd->bar_up_event);
-	wd->bar_up_event = NULL;
-     }
+   evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unfocused_box_cb);
+
 	return EXIT_SUCCESS;
 }
 
@@ -784,9 +794,8 @@ pressed_box(Elm_Controlbar_Item * it)
 		edje_object_signal_emit(_EDJ(it->base), "elm,state,text_selected",
 					  "elm");
 		}
-	   wd->bar_up_event =
-		   ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_UP,
-					   unfocused_box_cb, (void *)wd);
+	   evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unfocused_box_cb, (void *)wd);
+	 
 	   check = EINA_TRUE;
 	}
    }
@@ -853,16 +862,10 @@ edit_item_return_cb(void *data, Evas_Object * obj)
    Widget_Data * wd = (Widget_Data *) data;
    evas_object_geometry_get(wd->moving_item->edit_item, &x, &y, &w, &h);
    set_evas_map(obj, x, y, 0, 0);
-   if (wd->move_event != NULL)
-     {
-	ecore_event_handler_del(wd->move_event);
-	wd->move_event = NULL;
-     }
-   if (wd->up_event != NULL)
-     {
-	ecore_event_handler_del(wd->up_event);
-	wd->up_event = NULL;
-     }
+
+   evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, edit_item_up_cb);
+   evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, edit_item_move_cb);
+
    evas_object_data_set(wd->moving_obj, "returning", 0);
    wd->animating--;
    if (wd->animating < 0)
@@ -872,13 +875,12 @@ edit_item_return_cb(void *data, Evas_Object * obj)
      }
 }
 
-static int
-edit_item_move_cb(void *data, int type, void *event_info) 
+static void 
+edit_item_move_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
+   Evas_Event_Mouse_Move * ev = event_info;
    const Eina_List *l;
-
    Elm_Controlbar_Item * item;
-   Ecore_Event_Mouse_Move * ev = event_info;
    Evas_Coord x, y, w, h;
    Widget_Data * wd = (Widget_Data *) data;
    if (wd->animating)
@@ -886,15 +888,16 @@ edit_item_move_cb(void *data, int type, void *event_info)
    evas_object_geometry_get(wd->moving_obj, &x, &y, &w, &h);
    w *= 2.0;
    h *= 2.0;
-   x = ev->x - w / 2;
-   y = ev->y - h;
+   x = ev->cur.output.x - w / 2;
+   y = ev->cur.output.y - h;
    set_evas_map(wd->moving_obj, x, y, w, h);
+
    EINA_LIST_FOREACH(wd->items, l, item)
    {
       if (wd->moving_item->edit_item == item->edit_item || item->style == OBJECT)
 	 continue;
       evas_object_geometry_get(item->base, &x, &y, &w, &h);
-      if (ev->x > x && ev->x < x + w && ev->y > y && ev->y < y + h
+      if (ev->cur.output.x > x && ev->cur.output.x < x + w && ev->cur.output.y > y && ev->cur.output.y < y + h
 	   && item->editable)
 	{
 	   edje_object_signal_emit(_EDJ(item->base), "elm,state,show,glow",
@@ -909,14 +912,13 @@ edit_item_move_cb(void *data, int type, void *event_info)
    return EXIT_SUCCESS;
 }
 
-static int
-edit_item_up_cb(void *data, int type, void *event_info) 
+static void 
+edit_item_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
-   Ecore_Event_Mouse_Button * ev = event_info;
+   Evas_Event_Mouse_Up * ev = event_info;
    Evas_Coord x, y, w, h;
    Evas_Coord x_, y_, w_, h_;
    const Eina_List *l;
-
    Elm_Controlbar_Item * item;
    Widget_Data * wd = (Widget_Data *) data;
    if (wd->moving_obj)
@@ -932,7 +934,7 @@ edit_item_up_cb(void *data, int type, void *event_info)
       if (item->order <= 0)
 	 continue;
       evas_object_geometry_get(item->base, &x, &y, &w, &h);
-      if (ev->x > x && ev->x < x + w && ev->y > y && ev->y < y + h
+      if (ev->output.x > x && ev->output.x < x + w && ev->output.y > y && ev->output.y < y + h
 	   && item->style != OBJECT && item->editable)
 	{
 	   edje_object_signal_emit(_EDJ(item->base), "elm,state,hide,glow",
@@ -950,16 +952,8 @@ edit_item_up_cb(void *data, int type, void *event_info)
 	  {
 	     item_change_in_bar(item);
 	  }
-	if (wd->move_event != NULL)
-	  {
-	     ecore_event_handler_del(wd->move_event);
-	     wd->move_event = NULL;
-	  }
-	if (wd->up_event != NULL)
-	  {
-	     ecore_event_handler_del(wd->up_event);
-	     wd->up_event = NULL;
-	  }
+		evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, edit_item_up_cb);
+		evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, edit_item_move_cb);
      }
    else
      {
@@ -970,13 +964,14 @@ edit_item_up_cb(void *data, int type, void *event_info)
 	evas_object_geometry_get(wd->moving_obj, &x, &y, &w, &h);
 	w *= 2.0;
 	h *= 2.0;
-	x = ev->x - w / 2;
-	y = ev->y - h;
+	x = ev->output.x - w / 2;
+	y = ev->output.y - h;
 	evas_object_data_set(wd->moving_obj, "returning", (void *)1);
 	wd->animating++;
 	move_object_with_animation(wd->moving_obj, x, y, w, h, x_, y_, w_, h_,
 				    0.25, edit_item_return_cb, wd);
-     } return EXIT_SUCCESS;
+     } 
+   return EXIT_SUCCESS;
 }
 
 static void
@@ -1004,14 +999,10 @@ edit_item_down_cb(void *data, Evas * evas, Evas_Object * obj,
       return;
    if (!item->editable)
       return;
-   if (wd->up_event == NULL)
-      wd->up_event =
-	 ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_UP, edit_item_up_cb,
-				 (void *)wd);
-   if (wd->move_event == NULL)
-      wd->move_event =
-	 ecore_event_handler_add(ECORE_EVENT_MOUSE_MOVE, edit_item_move_cb,
-				 (void *)wd);
+   
+   evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_UP, edit_item_up_cb, (void *)wd);
+   evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, edit_item_move_cb, (void *)wd);
+
    wd->moving_item = item;
    color =
       (Evas_Object *)
@@ -1082,26 +1073,17 @@ bar_item_animation_end_check(void *data)
 	wd->empty_num = 0;
 	wd->moving_obj = NULL;
      }
-   if (wd->bar_move_event != NULL)
-     {
-	ecore_event_handler_del(wd->bar_move_event);
-	wd->bar_move_event = NULL;
-     }
-   if (wd->bar_up_event != NULL)
-     {
-	ecore_event_handler_del(wd->bar_up_event);
-	wd->bar_up_event = NULL;
-     }
+   evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, bar_item_up_cb);
+   evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, bar_item_move_cb);
    return EXIT_SUCCESS;
 }
 
-static int
-bar_item_move_cb(void *data, int type, void *event_info) 
+static void 
+bar_item_move_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
+   Evas_Event_Mouse_Move * ev = event_info;
    const Eina_List *l;
-
    Elm_Controlbar_Item * item, *it;
-   Ecore_Event_Mouse_Move * ev = event_info;
    Widget_Data * wd = (Widget_Data *) data;
    Evas_Coord x, y, w, h, x_, y_, w_, h_;
    int tmp;
@@ -1112,7 +1094,7 @@ bar_item_move_cb(void *data, int type, void *event_info)
 	return EXIT_FAILURE;
      }
    evas_object_geometry_get(wd->moving_obj, &x, &y, &w, &h);
-   x = ev->x - w / 2;
+   x = ev->cur.output.x - w / 2;
    set_evas_map(wd->moving_obj, x, y, w, h);
    EINA_LIST_FOREACH(wd->items, l, item)
    {
@@ -1124,7 +1106,7 @@ bar_item_move_cb(void *data, int type, void *event_info)
       if ((int)evas_object_data_get(item->base, "animating") == 1)
 	 continue;
       evas_object_geometry_get(item->base, &x, &y, &w, &h);
-      if (ev->x > x && ev->x < x + w && item->editable)
+      if (ev->cur.output.x > x && ev->cur.output.x < x + w && item->editable)
 	{
 	   break;
 	}
@@ -1148,14 +1130,14 @@ bar_item_move_cb(void *data, int type, void *event_info)
    return EXIT_SUCCESS;
 }
 
-static int
-bar_item_up_cb(void *data, int type, void *event_info) 
+static void 
+bar_item_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
+   Evas_Event_Mouse_Up * ev = event_info;
    Evas_Coord tx, x, y, w, h;
-   Ecore_Event_Mouse_Button * ev = event_info;
    Widget_Data * wd = (Widget_Data *) data;
    evas_object_geometry_get(wd->moving_obj, &x, &y, &w, &h);
-   tx = ev->x - w / 2;
+   tx = ev->output.x - w / 2;
    move_object_with_animation(wd->moving_obj, tx, y, w, h, x, y, w, h, 0.25,
 			       NULL, NULL);
    ecore_timer_add(0.1, bar_item_animation_end_check, wd);
@@ -1167,7 +1149,6 @@ bar_item_down_cb(void *data, Evas * evas, Evas_Object * obj, void *event_info)
 {
    Widget_Data * wd = (Widget_Data *) data;
    const Eina_List *l;
-
    Elm_Controlbar_Item * item;
    if (wd->animating)
       return;
@@ -1182,18 +1163,11 @@ bar_item_down_cb(void *data, Evas * evas, Evas_Object * obj, void *event_info)
      {
 	if (!item->editable)
 	   return;
-	if (wd->bar_up_event != NULL || wd->bar_move_event != NULL)
-	   return;
+
 	wd->moving_obj = obj;
 	wd->empty_num = item->order;
-	if (wd->bar_up_event == NULL)
-	   wd->bar_up_event =
-	      ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_UP,
-				      bar_item_up_cb, (void *)wd);
-	if (wd->bar_move_event == NULL)
-	   wd->bar_move_event =
-	      ecore_event_handler_add(ECORE_EVENT_MOUSE_MOVE, bar_item_move_cb,
-				      (void *)wd);
+	evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_UP, bar_item_up_cb, (void *)wd);
+    evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, bar_item_move_cb, (void *)wd);
      }
    else
      {
@@ -1414,7 +1388,7 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
    elm_widget_theme_hook_set(obj, _theme_hook);
    
       // initialization
-      wd->parent = parent;
+   wd->parent = parent;
    evas_object_geometry_get(parent, &x, &y, &w, &h);
    wd->object = obj;
    wd->x = x;
@@ -1443,6 +1417,11 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
 	return NULL;
      }
    evas_object_show(wd->edit_box);
+
+   wd->event_box = evas_object_rectangle_add(wd->evas);
+   evas_object_color_set(wd->event_box, 255, 255, 255, 0);
+   evas_object_repeat_events_set(wd->event_box, EINA_TRUE);
+   evas_object_show(wd->event_box);
    
       //instead of navigationbar
   /*    r_button = elm_button_add(wd->edit_box);
@@ -1508,10 +1487,9 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
  * Append new tab item
  *
  * @param	obj The controlbar object
- * @param	icon The icon of item
+ * @param	icon_path The icon path of item
  * @param	label The label of item
- * @param	func Callback function of item
- * @param	data The data of callback function
+ * @param	view The view of item
  * @return	The item of controlbar
  *
  * @ingroup Controlbar
@@ -1541,10 +1519,9 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
  * Prepend new tab item
  *
  * @param	obj The controlbar object
- * @param	icon The icon of item
+ * @param	icon_path The icon path of item
  * @param	label The label of item
- * @param	func Callback function of item
- * @param	data The data of callback function
+ * @param	view The view of item
  * @return	The item of controlbar
  *
  * @ingroup Controlbar
@@ -1579,10 +1556,9 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
  *
  * @param	obj The controlbar object
  * @param	before The given item
- * @param	icon The icon of item
+ * @param	icon_path The icon path of item
  * @param	label The label of item
- * @param	func Callback function of item
- * @param	data The data of callback function
+ * @param	view The view of item
  * @return	The item of controlbar
  *
  * @ingroup Controlbar
@@ -1614,10 +1590,9 @@ elm_controlbar_tab_item_insert_before(Evas_Object * obj,
  *
  * @param	obj The controlbar object
  * @param	after The given item
- * @param	icon The icon of item
+ * @param	icon_path The icon path of item
  * @param	label The label of item
- * @param	func Callback function of item
- * @param	data The data of callback function
+ * @param	view The view of item
  * @return	The item of controlbar
  *
  * @ingroup Controlbar
@@ -1650,7 +1625,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
  * Append new tool item
  *
  * @param	obj The controlbar object
- * @param	icon The icon of item
+ * @param	icon_path The icon path of item
  * @param	label The label of item
  * @param	func Callback function of item
  * @param	data The data of callback function
@@ -1689,7 +1664,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
  * Prepend new tool item
  *
  * @param	obj The controlbar object
- * @param	icon The icon of item
+ * @param	icon_path The icon path of item
  * @param	label The label of item
  * @param	func Callback function of item
  * @param	data The data of callback function
@@ -1732,7 +1707,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
  *
  * @param	obj The controlbar object
  * @param	before The given item	
- * @param	icon The icon of item
+ * @param	icon_path The icon path of item
  * @param	label The label of item
  * @param	func Callback function of item
  * @param	data The data of callback function
@@ -1769,7 +1744,7 @@ elm_controlbar_tool_item_insert_before(Evas_Object * obj,
  *
  * @param	obj The controlbar object
  * @param	after The given item	
- * @param	icon The icon of item
+ * @param	icon_path The icon path of item
  * @param	label The label of item
  * @param	func Callback function of item
  * @param	data The data of callback function
@@ -1924,7 +1899,7 @@ elm_controlbar_object_item_insert_after(Evas_Object * obj,
 }
 
 /**
- * Delete item from controlbar by index
+ * Delete item from controlbar
  *
  * @param	it The item of controlbar
 
@@ -2070,7 +2045,7 @@ elm_controlbar_item_select(Elm_Controlbar_Item * it)
  * Get the label of item
  *
  * @param	it The item of controlbar
- * @return the label of item
+ * @return The label of item
  *
  * @ingroup Controlbar
  */ 
@@ -2100,6 +2075,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  * Get the selected item.
  *
  * @param	obj The controlbar object
+ * @return		The item of controlbar
  *
  * @ingroup Controlbar
  */ 
@@ -2126,6 +2102,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  * Get the first item.
  *
  * @param	obj The controlbar object
+ * @return		The item of controlbar
  *
  * @ingroup Controlbar
  */ 
@@ -2143,6 +2120,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  * Get the last item.
  *
  * @param	obj The controlbar object
+ * @return		The item of controlbar
  *
  * @ingroup Controlbar
  */ 
@@ -2160,6 +2138,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  * Get the items.
  *
  * @param	obj The controlbar object
+ * @return  The list of the items
  *
  * @ingroup Controlbar
  */ 
@@ -2314,10 +2293,10 @@ elm_controlbar_item_editable_set(Elm_Controlbar_Item * it, Eina_Bool editable)
 }
 
 /**
- * Set item in bar
+ * Set the default view
  *
- * @param	it The item of controlbar
- * @param	bar true or false
+ * @param	obj The controlbar object
+ * @param	view The default view
  *
  * @ingroup Controlbar
  */ 
