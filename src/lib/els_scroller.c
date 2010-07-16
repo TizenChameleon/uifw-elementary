@@ -796,9 +796,9 @@ elm_smart_scroller_child_pos_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
      }
 
    if (sd->freeze_bounce == EINA_FALSE)
-   {
-	   sd->pan_func.set(sd->pan_obj, x, y);
-   }
+     {
+	sd->pan_func.set(sd->pan_obj, x, y);
+     }
    if ((px != x) || (py != y))
      edje_object_signal_emit(sd->edje_obj, "elm,action,scroll", "elm");
    if (!sd->down.bounce_x_animator)
@@ -1165,15 +1165,8 @@ EAPI void
 elm_smart_scroller_handler_set(Evas_Object *obj)
 {
    API_ENTRY return;
-   Elm_Smart_Scroller_Policy *policy_h, *policy_v;
-   policy_h = ELM_SMART_SCROLLER_POLICY_OFF;
-   policy_v = ELM_SMART_SCROLLER_POLICY_OFF;
 
-   elm_smart_scroller_policy_get(obj, &policy_h, &policy_v);
-
-   if(policy_v != ELM_SMART_SCROLLER_POLICY_ON)
-	   elm_smart_scroller_policy_set(obj, ELM_SMART_SCROLLER_POLICY_OFF, ELM_SMART_SCROLLER_POLICY_AUTO);
-
+   elm_smart_scroller_policy_set(obj, ELM_SMART_SCROLLER_POLICY_OFF, ELM_SMART_SCROLLER_POLICY_AUTO);
    edje_object_signal_emit(sd->edje_obj, "elm,activate,handler", "elm");
 }
 
@@ -1475,7 +1468,7 @@ _smart_event_post_up(void *data, Evas *e)
      {
         if (sd->down.dragged)
           {
-        	 sd->freeze_bounce = EINA_FALSE;
+             sd->freeze_bounce = EINA_FALSE;
              elm_widget_drag_lock_x_set(sd->widget, 0);
              elm_widget_drag_lock_y_set(sd->widget, 0);
           }

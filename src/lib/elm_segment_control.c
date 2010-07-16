@@ -170,6 +170,21 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
    return;
 }
 
+static void
+_segment_resizing(void *data)
+{
+	Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
+	if (!wd) return;
+	Evas_Coord w = 0, h = 0;
+
+	evas_object_geometry_get(wd->base, NULL, NULL, &w, &h);
+
+	wd->item_width = wd->width = w;
+	wd->height = h;
+
+	_state_value_set((Evas_Object *)data);
+}
+
 static void _object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
 	Widget_Data *wd;
@@ -177,15 +192,7 @@ static void _object_resize(void *data, Evas *e, Evas_Object *obj, void *event_in
 	wd = elm_widget_data_get((Evas_Object *)data);
 	if(!wd) return;
 
-	Evas_Coord w = 0, h = 0;
-
-	evas_object_geometry_get(wd->base, NULL, NULL, &w, &h);
-
-	if(wd->item_width != w && wd->height !=h)
-	{
-	  wd->item_width = wd->width = w;
-	  wd->height = h;
-	}
+	ecore_job_add(_segment_resizing, (Evas_Object *)data);
 }
 
 /**
