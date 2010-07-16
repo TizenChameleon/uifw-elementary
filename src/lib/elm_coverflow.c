@@ -510,14 +510,10 @@ static void _render_visible_items( Widget_Data* wd )
 
 }
 
-
-
-
 static void _mouse_down_ev( void* data, Evas* evas, Evas_Object* obj, void* event_info )
 {
 	Widget_Data* wd = (Widget_Data*) data;
 
-	fprintf( stderr, "down!\n");
 	if( wd->base_ani_data.animator ) {
 		elm_animator_stop( wd->base_ani_data.animator );
 		elm_animator_del( wd->base_ani_data.animator );

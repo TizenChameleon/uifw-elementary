@@ -40,11 +40,13 @@ struct _Widget_Data
    Evas_Object *scroller;
 	Evas_Object *bg;
    Eina_List *items;
+   double align_x, align_y;
    Eina_Bool scroller_disabled:1;
    Eina_Bool horizontal:1;
 	Eina_Bool arrow_disabled:1;
 	Eina_Bool visible:1;
 	Eina_Bool screen_dimmed_disabled:1;
+
 };
 
 static const char *widtype = NULL;
@@ -59,7 +61,7 @@ static void _ctxpopup_show(void *data, Evas *e, Evas_Object *obj, void *event_in
 static void _ctxpopup_hide(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _ctxpopup_move(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _ctxpopup_scroller_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _item_obj_create(Elm_Ctxpopup_Item *item);
+static void _item_obj_create(Elm_Ctxpopup_Item *item, char *group_name);
 static void _item_sizing_eval(Elm_Ctxpopup_Item *item);
 static void _ctxpopup_item_select(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _separator_obj_add(Evas_Object *obj); 
@@ -203,8 +205,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    evas_object_geometry_get(wd->box, NULL, NULL, &box_w, &box_h);
 	
 	edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
-  	max_width_size *= elm_scale_get();
-	max_height_size *= elm_scale_get();
 
    if (box_h > max_height_size)
       box_h = max_height_size;
@@ -215,7 +215,10 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    finger_size = elm_finger_size_get();
 
 	if (!wd->arrow_disabled)
-	   edje_object_size_min_calc(wd->arrow, &arrow_w, &arrow_h);
+	{
+			edje_object_part_geometry_get( wd->arrow, "ctxpopup_arrow", NULL, NULL, &arrow_w, &arrow_h);
+			evas_object_resize( wd->arrow, arrow_w, arrow_h );
+	}
 
 	if((box_h == 0) || (box_w == 0))
 		return NONE_ARROW;
@@ -307,11 +310,9 @@ _update_arrow_obj(Evas_Object *obj, Arrow_Direction arrow_dir)
       return;
 
 	evas_object_geometry_get(obj, &x, &y, NULL, NULL);
+	evas_object_geometry_get(wd->arrow, NULL, NULL, &arrow_w, &arrow_h );
 
-	edje_object_size_min_calc(wd->arrow, &arrow_w, &arrow_h);
-	evas_object_resize( wd->arrow, arrow_w, arrow_h );
-
-   switch (arrow_dir)
+	switch (arrow_dir)
      {
      case LEFT_ARROW:
 	{
@@ -384,7 +385,7 @@ _shift_base_by_arrow(Evas_Object *arrow, Arrow_Direction arrow_dir,
 			 Evas_Coord_Rectangle *rect)
 {
    Evas_Coord arrow_w, arrow_h;
-   edje_object_size_min_calc(arrow, &arrow_w, &arrow_h);
+   evas_object_geometry_get( arrow, NULL, NULL, &arrow_w, &arrow_h );
 
 	switch (arrow_dir)
      {
@@ -621,14 +622,14 @@ _arrow_obj_add(Evas_Object *obj, const char *group_name)
 }
 
 static void
-_item_obj_create(Elm_Ctxpopup_Item *item)
+_item_obj_create(Elm_Ctxpopup_Item *item,  char *group_name)
 {
    Widget_Data *wd = (Widget_Data *) elm_widget_data_get(item->ctxpopup);
 
    if (!wd)
       return;
    item->base = edje_object_add(evas_object_evas_get(wd->base));
-   _elm_theme_object_set(item->ctxpopup, item->base, "ctxpopup", "item",
+   _elm_theme_object_set(item->ctxpopup, item->base, "ctxpopup", group_name,
 			 elm_widget_style_get(item->ctxpopup));
    edje_object_signal_callback_add(item->base, "elm,action,click", "",
 				   _ctxpopup_item_select, item);
@@ -723,6 +724,8 @@ elm_ctxpopup_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
 
 	wd->parent = parent;
+	wd->align_x = 0.5;
+	wd->align_y = 0.5;
 
 	//Background
 	wd->bg = edje_object_add(e);
@@ -814,7 +817,9 @@ elm_ctxpopup_clear(Evas_Object *obj)
 EAPI void
 elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 {
-   Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+	Eina_List *elist;
+	Elm_Ctxpopup_Item *item;
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
 
    ELM_CHECK_WIDTYPE(obj, widtype);
    if (!wd)
@@ -830,6 +835,8 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 	elm_scroller_bounce_set(wd->scroller, EINA_FALSE, EINA_TRUE);
 	elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_ON,
 				ELM_SCROLLER_POLICY_OFF);
+	EINA_LIST_FOREACH(wd->items, elist, item)
+		edje_object_signal_emit(item->base, "elm,state,vertical", "elm");
      }
    else
      {
@@ -838,6 +845,8 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 	elm_scroller_bounce_set(wd->scroller, EINA_TRUE, EINA_FALSE);
 	elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_ON,
 				ELM_SCROLLER_POLICY_OFF);
+	EINA_LIST_FOREACH(wd->items, elist, item)
+		edje_object_signal_emit(item->base, "elm,state,horizontal", "elm");
      }
 }
 
@@ -875,8 +884,7 @@ elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
 {
    Widget_Data *wd;
 
-   if ((!item) || (!icon))
-      return;
+   if (!item) return;
    wd = (Widget_Data *) elm_widget_data_get(item->ctxpopup);
    if (!wd)
       return;
@@ -885,10 +893,10 @@ elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
    if (item->content)
      {
 	elm_widget_sub_object_del(item->base, item->content);
+	evas_object_del( item->content );
      }
    item->content = icon;
-   edje_object_part_swallow(item->base, "elm.swallow.content", item->content);
-   edje_object_signal_emit(item->base, "elm,state,enable_icon", "elm");
+   edje_object_part_swallow(item->base, "elm.swallow.icon", item->content);
    edje_object_message_signal_process(item->base);
 
 	if(wd->visible) 
@@ -908,27 +916,21 @@ elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label)
 {
 	Widget_Data* wd; 
 		  
-	if ((!item) || (!label))
+	if (!item)
       return;
 
-   if (item->label)
-      eina_stringshare_del(item->label);
-   if (label)
-     {
-	item->label = eina_stringshare_add(label);
-	edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
-     }
-   else
-     {
-	item->label = NULL;
-	edje_object_signal_emit(item->base, "elm,state,text,hidden", "elm");
-     }
+   if (item->label) {
+	   eina_stringshare_del(item->label);
+	   item->label = NULL;
+   }
+
+   item->label = eina_stringshare_add(label);
    edje_object_message_signal_process(item->base);
    edje_object_part_text_set(item->base, "elm.text", label);
 
 	wd = elm_widget_data_get(item->ctxpopup);
 	if(!wd) return;
-	if(wd->visible) 
+	if(wd->visible)
 		_sizing_eval(item->ctxpopup);
 }
 
@@ -966,11 +968,13 @@ elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, vo
    item->data = data;
    item->ctxpopup = obj;
    item->separator = EINA_FALSE;
-   _item_obj_create(item);
+
+   _item_obj_create(item, "icon_text_style_item");
+   evas_object_size_hint_align_set( item->base, wd->align_x, wd->align_y );
    wd->items = eina_list_append(wd->items, item);
    elm_box_pack_end(wd->box, item->base);
    elm_ctxpopup_item_icon_set(item, icon);
-	elm_ctxpopup_item_label_set(item, label);
+   elm_ctxpopup_item_label_set(item, label);
 
 	return item;
 }
@@ -1009,7 +1013,8 @@ elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon,
    item->data = data;
    item->ctxpopup = obj;
    item->separator = EINA_FALSE;
-   _item_obj_create(item);
+   _item_obj_create(item, "icon_style_item");
+   evas_object_size_hint_align_set( item->base, wd->align_x, wd->align_y );
    wd->items = eina_list_append(wd->items, item);
    elm_box_pack_end(wd->box, item->base);
    elm_ctxpopup_item_icon_set(item, icon);
@@ -1049,11 +1054,14 @@ elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
    item->data = data;
    item->ctxpopup = obj;
    item->separator = EINA_FALSE;
-   _item_obj_create(item);
+   _item_obj_create(item, "text_style_item");
+   evas_object_size_hint_align_set( item->base, wd->align_x, wd->align_y );
    wd->items = eina_list_append(wd->items, item);
    elm_box_pack_end(wd->box, item->base);
    elm_ctxpopup_item_label_set(item, label);
-   
+
+
+
 	return item;
 }
 
@@ -1160,6 +1168,35 @@ elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 	if(!wd) return;
 
 	wd->screen_dimmed_disabled = disabled;
+}
+
+EAPI void
+elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y)
+{
+	Eina_List *elist;
+	Elm_Ctxpopup_Item *item;
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+	if(!wd) return;
+
+	EINA_LIST_FOREACH(wd->items, elist, item)
+	   {
+			if(!item->separator)
+				evas_object_size_hint_align_set( item->base, align_x, align_y );
+	   }
+
+	wd->align_x = align_x;
+	wd->align_y = align_y;
+}
+
+
+EAPI void
+elm_ctxpopup_align_get(const Evas_Object *obj, double *align_x, double *align_y)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+	if(!wd) return;
+	if( align_x ) *align_x = wd->align_x;
+	if( align_y ) *align_y = wd->align_y;
 }
 
 
