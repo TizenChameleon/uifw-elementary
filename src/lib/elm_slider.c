@@ -132,7 +132,7 @@ _theme_hook(Evas_Object *obj)
      edje_object_signal_emit(wd->slider, "elm,state,units,visible", "elm");
    else
      edje_object_signal_emit(wd->slider, "elm,state,units,hidden", "elm");
-   edje_object_part_text_set(wd->slider, "elm.text", wd->e_label);
+   edje_object_part_text_set(wd->slider, "elm.units", wd->e_label);
    if (wd->units)
      edje_object_signal_emit(wd->slider, "elm,state,units,visible", "elm");
    else

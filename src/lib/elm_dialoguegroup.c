@@ -14,6 +14,7 @@ struct _Dialogue_Item
 	Evas_Object *parent;
 	Evas_Object *bg_layout;
 	Evas_Object *content;
+	const char *style;
 	Eina_Bool press;
 };
 
@@ -74,7 +75,7 @@ _theme_hook(Evas_Object *obj)
 		edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", wd->title);
 	}
 	EINA_LIST_FOREACH(wd->items, l, item) 
-		_change_item_bg( item, elm_widget_style_get(item->bg_layout) );	
+		_change_item_bg( item, item->style );	
 	_sizing_eval(obj);
 }
 
@@ -116,6 +117,8 @@ static void _remove_all(Evas_Object *obj)
 				evas_object_del(item->bg_layout);
 				item->bg_layout = NULL;
 			}
+			if (item->style)
+				eina_stringshare_del(item->style);
 			free(item);
 		}
 	}
@@ -125,8 +128,8 @@ static void _change_item_bg(Dialogue_Item *item, const char *style)
 {
 	if (!item) return;
 	
+	eina_stringshare_replace(&item->style, style);
 	elm_layout_theme_set(item->bg_layout, "dialoguegroup", "bg", style);
-	elm_object_style_set(item->bg_layout, style);
 	elm_layout_content_set(item->bg_layout, "swallow", item->content);
 	if(item->press == EINA_TRUE)
 		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
@@ -143,12 +146,12 @@ static Dialogue_Item* _create_item(Evas_Object *obj, Evas_Object *subobj, const 
 	
 	item = ELM_NEW(Dialogue_Item);
 	item->parent = obj;
-	item->content = subobj; 
+	item->content = subobj;
 	item->press = EINA_TRUE;
+	eina_stringshare_replace(&item->style, style);
 	
 	item->bg_layout = elm_layout_add(wd->parent);
 	elm_layout_theme_set(item->bg_layout, "dialoguegroup", "bg", style );
-	elm_object_style_set(item->bg_layout, style);
 	evas_object_size_hint_weight_set(item->bg_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_size_hint_align_set(item->bg_layout, EVAS_HINT_FILL, 0.0);
 	evas_object_show(item->bg_layout);	
@@ -309,21 +312,18 @@ elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_I
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Dialogue_Item *after_item, *item;
 	Eina_List *l;
-	const char *style;
 
 	if (!wd || !subobj || !after || !wd->items) return NULL;
 
 	EINA_LIST_FOREACH(wd->items, l, after_item) {
 		if(after == after_item) {
-			style = elm_object_style_get(after_item->bg_layout);
-			
-			if( !strcmp(style, "default") ) {
+			if( !strcmp(item->style, "default") ) {
 				_change_item_bg(after_item, "top");
 				item = _create_item(obj, subobj, "bottom");
 			}			
-			else if( !strcmp(style, "top") || !strcmp(style, "middle") )	
+			else if( !strcmp(item->style, "top") || !strcmp(item->style, "middle") )	
 				item = _create_item(obj, subobj, "middle");		
-			else if( !strcmp(style, "bottom") ) {
+			else if( !strcmp(item->style, "bottom") ) {
 				_change_item_bg(after_item, "middle");
 				item = _create_item(obj, subobj, "bottom");		
 			}
@@ -355,25 +355,22 @@ elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Dialogue_Item *before_item, *item;
 	Eina_List *l;
-	const char *style;
 	
 	if (!wd || !subobj || !before || !wd->items) return NULL;
 
 	EINA_LIST_FOREACH(wd->items, l, before_item) {
 		if(before == before_item) {
-			style = elm_object_style_get(before_item->bg_layout);
-			
-			if( !strcmp(style, "default") ) {
+			if( !strcmp(item->style, "default") ) {
 				_change_item_bg(before_item, "bottom");
 				item = _create_item(obj, subobj, "top");
 			}
 				
-			else if( !strcmp(style, "top") ) {
+			else if( !strcmp(item->style, "top") ) {
 				_change_item_bg(before_item, "middle");
 				item = _create_item(obj, subobj, "top");			
 			}
 
-			else if( !strcmp(style, "middle") || !strcmp(style, "bottom") )		
+			else if( !strcmp(item->style, "middle") || !strcmp(item->style, "bottom") )		
 				item = _create_item(obj, subobj, "middle");
 
 			elm_box_pack_before(wd->box, item->bg_layout, before_item->bg_layout);
