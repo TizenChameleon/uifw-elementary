@@ -1,3 +1,6 @@
+/*
+ * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ */
 #include <Elementary.h>
 #include "elm_priv.h"
 #include "elm_module_priv.h"
@@ -364,12 +367,14 @@ _check_enable_returnkey(Evas_Object *obj)
 
    if (!wd->autoreturnkey) return;
 
-   if (_entry_length_get(obj) == 0) {
-        ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_TRUE);
-    }
-    else {
-        ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_FALSE);
-    }
+   if (_entry_length_get(obj) == 0) 
+     {
+	ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_TRUE);
+     }
+   else 
+     {
+	ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_FALSE);
+     }
 }
 
 static void
@@ -650,10 +655,10 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    Evas_Event_Mouse_Up *ev = event_info;
    if (!wd) return;
    if (ev->button != 1) return;
-	if ((wd->api) && (wd->api->obj_mouseup))
-	{
-		wd->api->obj_mouseup(data);
-	} 
+   if ((wd->api) && (wd->api->obj_mouseup))
+     {
+	wd->api->obj_mouseup(data);
+     } 
    if (wd->longpress_timer)
      {
 	ecore_timer_del(wd->longpress_timer);
@@ -775,24 +780,25 @@ _str_append(char *str, const char *txt, int *len, int *alloc)
 static char *
 _strncpy(char* dest, const char* src, size_t count)
 {
-	if (!dest) 
-	{
-		ERR( "dest is NULL" );
-		return NULL;
-	}
-	if (!src) 
-	{
-		ERR( "src is NULL" );
-		return NULL;
-	}
-	if (count < 0)
-	{
-		ERR( "count is smaller than 0" );
-		return NULL;
-	}
+   if (!dest) 
+     {
+	ERR( "dest is NULL" );
+	return NULL;
+     }
+   if (!src) 
+     {
+	ERR( "src is NULL" );
+	return NULL;
+     }
+   if (count < 0)
+     {
+	ERR( "count is smaller than 0" );
+	return NULL;
+     }
 
-	return strncpy( dest, src, count );
+   return strncpy( dest, src, count );
 }
+
 static char *
 _mkup_to_text(const char *mkup)
 {
@@ -921,17 +927,17 @@ _mkup_to_text(const char *mkup)
 static int
 _entry_length_get(Evas_Object *obj)
 {
-	int len;
-	char *str = elm_entry_entry_get(obj);
-	if (!str) return 0;
+   int len;
+   char *str = elm_entry_entry_get(obj);
+   if (!str) return 0;
 
-	char *plain_str = _mkup_to_text(str);
-	if (!plain_str) return 0;
+   char *plain_str = _mkup_to_text(str);
+   if (!plain_str) return 0;
 
-	len = strlen(plain_str);
-	free(plain_str);
+   len = strlen(plain_str);
+   free(plain_str);
 
-	return len;
+   return len;
 }
 
 static char *
@@ -1340,63 +1346,63 @@ _get_item(void *data, Evas_Object *edje, const char *part, const char *item)
 static int
 _get_value_in_key_string(char *oldstring, char *key, char *value)
 {
-	char *curlocater, *starttag, *endtag;
-	int firstindex = 0, foundflag = -1;
+   char *curlocater, *starttag, *endtag;
+   int firstindex = 0, foundflag = -1;
 
    curlocater = strstr(oldstring, key);
    if (curlocater == NULL)
-   {
-	   foundflag = 0;
-   }
+     {
+	foundflag = 0;
+     }
    else
-   {
-	   starttag = curlocater;
-	   endtag = curlocater + strlen(key);
-	   if (*endtag != '=')
-		   foundflag = 0;
+     {
+	starttag = curlocater;
+	endtag = curlocater + strlen(key);
+	if (*endtag != '=')
+	  foundflag = 0;
 
-	   firstindex = abs(oldstring - curlocater);
-	   firstindex += strlen(key)+1; // strlen("font_size") + strlen("=")
-	   value = oldstring + firstindex;
+	firstindex = abs(oldstring - curlocater);
+	firstindex += strlen(key)+1; // strlen("font_size") + strlen("=")
+	value = oldstring + firstindex;
 
-	   while (oldstring != starttag)
-	   {
-		   if (*starttag == '>')
-		   {
-			   foundflag = 0;
-			   break;
-		   }
-		   if (*starttag == '<')
-			   break;
-		   else
-			   starttag--;
-		   if (starttag == NULL)
-			   break;
-	   }
+	while (oldstring != starttag)
+	  {
+	     if (*starttag == '>')
+	       {
+		  foundflag = 0;
+		  break;
+	       }
+	     if (*starttag == '<')
+	       break;
+	     else
+	       starttag--;
+	     if (starttag == NULL)
+	       break;
+	  }
 
-	   while (NULL != *endtag)
-	   {
-		   if (*endtag == '<')
-		   {
-			   foundflag = 0;
-			   break;
-		   }
-		   if (*endtag == '>')
-			   break;
-		   else
-			   endtag++;
-		   if (endtag == NULL)
-			   break;
-	   }
+	while (NULL != *endtag)
+	  {
+	     if (*endtag == '<')
+	       {
+		  foundflag = 0;
+		  break;
+	       }
+	     if (*endtag == '>')
+	       break;
+	     else
+	       endtag++;
+	     if (endtag == NULL)
+	       break;
+	  }
 
-	   if (foundflag != 0 && *starttag == '<' && *endtag == '>')
-		   foundflag = 1;
-	   else
-   		   foundflag = 0;
-   }
+	if (foundflag != 0 && *starttag == '<' && *endtag == '>')
+	  foundflag = 1;
+	else
+	  foundflag = 0;
+     }
 
    if (foundflag == 1)
-	   return 0;
+     return 0;
 
    return -1;
 }
@@ -1405,78 +1411,78 @@ _get_value_in_key_string(char *oldstring, char *key, char *value)
 static int
 _string_key_value_replace(char *oldstring, char *key, char *value, char *tagstring)
 {
-	char *curlocater, *starttag, *endtag;
-	int firstindex = 0, insertflag = 0;
+   char *curlocater, *starttag, *endtag;
+   int firstindex = 0, insertflag = 0;
 
    curlocater = strstr(oldstring, key);
    if (curlocater == NULL)
-   {
-	   insertflag = 1;
-   }
+     {
+	insertflag = 1;
+     }
    else
-   {
-	   starttag = curlocater - 1;
-	   endtag = curlocater + strlen(key);
-	   if (*endtag != '=')
-		   insertflag = 1;
+     {
+	starttag = curlocater - 1;
+	endtag = curlocater + strlen(key);
+	if (*endtag != '=')
+	  insertflag = 1;
 
-	   firstindex = abs(oldstring - curlocater);
-	   firstindex += strlen(key)+1; // strlen("font_size") + strlen("=")
-	   strncpy(tagstring, oldstring, firstindex);
-	   tagstring[firstindex] = '\0';
-	   sprintf(&tagstring[firstindex], "%s", value);
+	firstindex = abs(oldstring - curlocater);
+	firstindex += strlen(key)+1; // strlen("font_size") + strlen("=")
+	strncpy(tagstring, oldstring, firstindex);
+	tagstring[firstindex] = '\0';
+	sprintf(&tagstring[firstindex], "%s", value);
 
-	   while (curlocater != NULL)
-	   {
-		   if (*curlocater == ' ' || *curlocater == '>')
-			   break;
-		   curlocater++;
-	   }
-	   strcat(tagstring, curlocater);
+	while (curlocater != NULL)
+	  {
+	     if (*curlocater == ' ' || *curlocater == '>')
+	       break;
+	     curlocater++;
+	  }
+	strcat(tagstring, curlocater);
 
-	   while (oldstring != starttag)
-	   {
-		   if (*starttag == '>')
-		   {
-			   insertflag = 1;
-			   break;
-		   }
-		   if (*starttag == '<')
-			   break;
-		   else
-			   starttag--;
-		   if (starttag == NULL)
-			   break;
-	   }
+	while (oldstring != starttag)
+	  {
+	     if (*starttag == '>')
+	       {
+		  insertflag = 1;
+		  break;
+	       }
+	     if (*starttag == '<')
+	       break;
+	     else
+	       starttag--;
+	     if (starttag == NULL)
+	       break;
+	  }
 
-	   while (NULL != *endtag)
-	   {
-		   if (*endtag == '<')
-		   {
-			   insertflag = 1;
-			   break;
-		   }
-		   if (*endtag == '>')
-			   break;
-		   else
-			   endtag++;
-		   if (endtag == NULL)
-			   break;
-	   }
+	while (NULL != *endtag)
+	  {
+	     if (*endtag == '<')
+	       {
+		  insertflag = 1;
+		  break;
+	       }
+	     if (*endtag == '>')
+	       break;
+	     else
+	       endtag++;
+	     if (endtag == NULL)
+	       break;
+	  }
 
-	   if (insertflag == 0 && *starttag == '<' && *endtag == '>')
-		   return 0; 
-	   else
-   		   insertflag = 1;
+	if (insertflag == 0 && *starttag == '<' && *endtag == '>')
+	  return 0; 
+	else
+	  insertflag = 1;
 
-   }
+     }
 
    if (insertflag == 1)
-   {
-	   sprintf(tagstring, "<%s=%s>", key, value);
-	   strcat(tagstring, oldstring);
-	   return 0;
-   }
+     {
+	sprintf(tagstring, "<%s=%s>", key, value);
+	strcat(tagstring, oldstring);
+	return 0;
+     }
 
    return -1;
 }
@@ -1506,130 +1512,130 @@ _is_width_over(Evas_Object *obj)
 static void
 _ellipsis_entry_to_width(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	int cur_fontsize = 0, len, jumpcount, i, tagend;
-	char *oldstring, *value, *textlocater, *entrystring;
-	char *string, fontbuf[16];
+   Widget_Data *wd = elm_widget_data_get(obj);
+   int cur_fontsize = 0, len, jumpcount, i, tagend;
+   char *oldstring, *value, *textlocater, *entrystring;
+   char *string, fontbuf[16];
 
-	if (!wd) return;
+   if (!wd) return;
 
-	entrystring = edje_object_part_text_get(wd->ent, "elm.text");
+   entrystring = edje_object_part_text_get(wd->ent, "elm.text");
 
-	len = strlen(entrystring);
-	oldstring = malloc(sizeof(char)*(len+32));
-	strcpy(oldstring, entrystring);
+   len = strlen(entrystring);
+   oldstring = malloc(sizeof(char)*(len+32));
+   strcpy(oldstring, entrystring);
 
-	if (_get_value_in_key_string(oldstring, "font_size", value) == 0 
-		&& value != NULL)
-	{
-		cur_fontsize = atoi(value);
-	}
+   if (_get_value_in_key_string(oldstring, "font_size", value) == 0 
+	 && value != NULL)
+     {
+	cur_fontsize = atoi(value);
+     }
+   else
+     cur_fontsize = 24; /* default size in aqua.edc */
+
+   free(oldstring);
+   oldstring = NULL;
+
+   while (_is_width_over(obj) == 1)
+     {
+	if (cur_fontsize > MIN_ENTRY_FONT_SIZE)
+	  {
+	     cur_fontsize--;
+	     entrystring = edje_object_part_text_get(wd->ent, "elm.text");
+	     len = strlen(entrystring);
+	     if (len <= 0) return;
+	     string = malloc(sizeof(char)*(len+32));
+	     oldstring = malloc(sizeof(char)*(len+32));
+	     sprintf(fontbuf, "%d", cur_fontsize);
+
+	     strcpy(oldstring, entrystring);
+	     _string_key_value_replace(oldstring, "font_size", fontbuf, string);
+
+	     edje_object_part_text_set(wd->ent, "elm.text", string);
+	     if (wd->text) eina_stringshare_del(wd->text);
+	     wd->text = NULL;
+	     edje_object_part_text_cursor_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
+
+	     free(string);
+	     free(oldstring);
+	  }
 	else
-		cur_fontsize = 24; /* default size in aqua.edc */
+	  {
+	     entrystring = edje_object_part_text_get(wd->ent, "elm.text");
+	     len = strlen(entrystring) - 1;
+	     tagend = 0;
+	     for (i = 0; i <= len; i++)
+	       {
+		  if (entrystring[i] == '>' && entrystring[i+1] != NULL &&
+			entrystring[i+1] != '<')
+		    {
+		       tagend = i;
+		       break;
+		    }
+	       }
+	     oldstring = elm_entry_markup_to_utf8(entrystring);
+	     jumpcount = 0;
+	     string = malloc(sizeof(char)*(len+32));
+	     while (jumpcount < len-3)
+	       {
+		  strncpy(string, entrystring, tagend+1);
+		  string[tagend+1] = '\0';
+		  strcat(string, "...");
+		  strcat(string, &oldstring[jumpcount]);
 
-	free(oldstring);
-	oldstring = NULL;
+		  edje_object_part_text_set(wd->ent, "elm.text", string);
+		  if (wd->text) eina_stringshare_del(wd->text);
+		  wd->text = NULL;
+		  edje_object_part_text_cursor_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 
-	while (_is_width_over(obj) == 1)
-	{
-		if (cur_fontsize > MIN_ENTRY_FONT_SIZE)
-		{
-			cur_fontsize--;
-			entrystring = edje_object_part_text_get(wd->ent, "elm.text");
-			len = strlen(entrystring);
-			if (len <= 0) return;
-			string = malloc(sizeof(char)*(len+32));
-			oldstring = malloc(sizeof(char)*(len+32));
-			sprintf(fontbuf, "%d", cur_fontsize);
+		  if (_is_width_over(obj) == 1)
+		    jumpcount++;
+		  else
+		    break;
 
-			strcpy(oldstring, entrystring);
-			_string_key_value_replace(oldstring, "font_size", fontbuf, string);
-
-			edje_object_part_text_set(wd->ent, "elm.text", string);
-			if (wd->text) eina_stringshare_del(wd->text);
-			wd->text = NULL;
-			edje_object_part_text_cursor_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
-
-			free(string);
-			free(oldstring);
-		}
-		else
-		{
-			entrystring = edje_object_part_text_get(wd->ent, "elm.text");
-			len = strlen(entrystring) - 1;
-			tagend = 0;
-			for (i = 0; i <= len; i++)
-			{
-				if (entrystring[i] == '>' && entrystring[i+1] != NULL &&
-					entrystring[i+1] != '<')
-				{
-					tagend = i;
-					break;
-				}
-			}
-			oldstring = elm_entry_markup_to_utf8(entrystring);
-			jumpcount = 0;
-			string = malloc(sizeof(char)*(len+32));
-			while (jumpcount < len-3)
-			{
-				strncpy(string, entrystring, tagend+1);
-				string[tagend+1] = '\0';
-				strcat(string, "...");
-				strcat(string, &oldstring[jumpcount]);
-
-				edje_object_part_text_set(wd->ent, "elm.text", string);
-				if (wd->text) eina_stringshare_del(wd->text);
-				wd->text = NULL;
-				edje_object_part_text_cursor_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
-
-				if (_is_width_over(obj) == 1)
-					jumpcount++;
-				else
-					break;
-
-				entrystring = edje_object_part_text_get(wd->ent, "elm.text");
-			}
-			free(string);
-			free(oldstring);
-		}
-	}
+		  entrystring = edje_object_part_text_get(wd->ent, "elm.text");
+	       }
+	     free(string);
+	     free(oldstring);
+	  }
+     }
    wd->changed = 1;
    _sizing_eval(obj);
 }
 
 static int _textinput_control_function(void *data,void *input_data)
 {	
-	 /*calculate character count*/
-	Widget_Data *wd = elm_widget_data_get(data);	
-	char buf[10]="\0";
-	size_t byte_len;
-	size_t len=0, bytes_per_char=0,insert_text_len=0;
-	char *text = edje_object_part_text_get(wd->ent, "elm.text");	
-	char *insert_text;  
-	size_t remain_bytes;
-	if(text!=NULL)
-		{		
-			byte_len = strlen(text);/*no of bytes*/
-			remain_bytes = wd->max_no_of_bytes-byte_len;
-			sprintf(buf,"%d",remain_bytes);	
-			edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);		
-			if(input_data)
-				{
-					insert_text =  (char *)input_data;
-					insert_text_len = strlen(insert_text);	
-					if(remain_bytes<insert_text_len)
-						{			
-							evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
-							return EINA_TRUE;
-						}			
-					if(byte_len>=wd->max_no_of_bytes)
-						{
-							evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
-							return EINA_TRUE;
-						}			
-				}		
-		}
-	return EINA_FALSE;  		
+   /*calculate character count*/
+   Widget_Data *wd = elm_widget_data_get(data);	
+   char buf[10]="\0";
+   size_t byte_len;
+   size_t len=0, bytes_per_char=0,insert_text_len=0;
+   char *text = edje_object_part_text_get(wd->ent, "elm.text");	
+   char *insert_text;  
+   size_t remain_bytes;
+   if(text!=NULL)
+     {		
+	byte_len = strlen(text);/*no of bytes*/
+	remain_bytes = wd->max_no_of_bytes-byte_len;
+	sprintf(buf,"%d",remain_bytes);	
+	edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);		
+	if(input_data)
+	  {
+	     insert_text =  (char *)input_data;
+	     insert_text_len = strlen(insert_text);	
+	     if(remain_bytes<insert_text_len)
+	       {			
+		  evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+		  return EINA_TRUE;
+	       }			
+	     if(byte_len>=wd->max_no_of_bytes)
+	       {
+		  evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+		  return EINA_TRUE;
+	       }			
+	  }		
+     }
+   return EINA_FALSE;  		
 }
 
 /**
@@ -1750,22 +1756,22 @@ elm_entry_add(Evas_Object *parent)
 
 EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extension_data *ext_mod)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	ext_mod->cancel = _cancel;
-	ext_mod->copy = _copy;
-	ext_mod->cut = _cut;
-	ext_mod->paste = _paste;
-	ext_mod->select = _select;
-	ext_mod->selectall = NULL; /* to be implemented*/
-	ext_mod->ent = wd->ent;
-	ext_mod->items = wd->items;
-	ext_mod->longpress_timer = wd->longpress_timer;
-	ext_mod->editable = wd->editable;
-	ext_mod->have_selection = wd->have_selection;
-	ext_mod->password = wd->password;
-	ext_mod->selmode = wd->selmode;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   ext_mod->cancel = _cancel;
+   ext_mod->copy = _copy;
+   ext_mod->cut = _cut;
+   ext_mod->paste = _paste;
+   ext_mod->select = _select;
+   ext_mod->selectall = NULL; /* to be implemented*/
+   ext_mod->ent = wd->ent;
+   ext_mod->items = wd->items;
+   ext_mod->longpress_timer = wd->longpress_timer;
+   ext_mod->editable = wd->editable;
+   ext_mod->have_selection = wd->have_selection;
+   ext_mod->password = wd->password;
+   ext_mod->selmode = wd->selmode;
 }
 
 /**
@@ -1926,15 +1932,15 @@ elm_entry_entry_set(Evas_Object *obj, const char *entry)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (!entry) entry = "";
-	if(wd->max_no_of_bytes)
-		{
-			int len = strlen(entry);
-			if(len > wd->max_no_of_bytes)
-				{
-					ERR("[ERROR]the length of the text set is more than max no of bytes, text cannot be set");
-					return;
-				}
-		}
+   if(wd->max_no_of_bytes)
+     {
+	int len = strlen(entry);
+	if(len > wd->max_no_of_bytes)
+	  {
+	     ERR("[ERROR]the length of the text set is more than max no of bytes, text cannot be set");
+	     return;
+	  }
+     }
    edje_object_part_text_set(wd->ent, "elm.text", entry);
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
@@ -2660,6 +2666,14 @@ elm_entry_utf8_to_markup(const char *s)
    return ss;
 }
 
+/**
+ * Get the input method context in the entry widget
+ *
+ * @param obj The entry object
+ * @return The input method context
+ *
+ * @ingroup Entry
+ */
 EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -2669,6 +2683,14 @@ EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
    return edje_object_part_text_imf_context_get(wd->ent, "elm.text");
 }
 
+/**
+ * Set whether entry should enable the return key on soft keyboard automatically
+ *
+ * @param obj The entry object
+ * @param on If true, entry enables the return key on soft keyboard automatically.
+ *
+ * @ingroup Entry
+ */
 EAPI void 
 elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
 {
@@ -2680,6 +2702,14 @@ elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
    _check_enable_returnkey(obj);
 }
 
+/**
+ * Set whether entry should support auto capitalization
+ *
+ * @param obj The entry object
+ * @param on If true, entry suports auto capitalization.
+ *
+ * @ingroup Entry
+ */
 EAPI void 
 elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on)
 {
@@ -2721,9 +2751,9 @@ elm_entry_fontsize_set(Evas_Object *obj, const int fontsize)
    sprintf(fontvalue, "%d", fontsize);
 
    if (_string_key_value_replace(entrystring, "font_size", fontvalue, string) == 0)
-   {
-     elm_entry_entry_set(obj, string);
-   }
+     {
+	elm_entry_entry_set(obj, string);
+     }
 }
 
 /**
@@ -2783,9 +2813,9 @@ elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsig
 
    sprintf(colorstring, "#%02X%02X%02X%02X", r, g, b, a);
    if (_string_key_value_replace(entrystring, "color", colorstring, string) == 0)
-   {
-     elm_entry_entry_set(obj, string);
-   }
+     {
+	elm_entry_entry_set(obj, string);
+     }
 }
 
 
@@ -2808,8 +2838,8 @@ elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g,
 
    if (wd->bgcolor == EINA_FALSE)
      {
-        wd->bgcolor = 1;
-		edje_object_part_swallow(wd->ent, "entry.swallow.background", wd->bg);
+	wd->bgcolor = 1;
+	edje_object_part_swallow(wd->ent, "entry.swallow.background", wd->bg);
      }
 }
 

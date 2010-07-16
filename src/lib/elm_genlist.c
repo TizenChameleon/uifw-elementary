@@ -4429,6 +4429,6 @@ elm_genlist_scrollbar_handler_set(Evas_Object *obj, Eina_Bool set)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if(!set) return;
-   elm_smart_scroller_bounce_allow_set(wd->scr, 0, 0);
+
    elm_smart_scroller_handler_set(wd->scr);
 }

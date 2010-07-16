@@ -120,6 +120,7 @@ elm_animatedicon.c \
 elm_coverflow.c \
 elm_cabinet.c \
 elm_dayselector.c \
+elm_cnp_helper.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \

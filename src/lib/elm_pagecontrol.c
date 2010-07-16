@@ -172,6 +172,30 @@ static void _indicator_click_right(void *data, Evas_Object *obj, const char *emi
 
 }
 
+static void _indicator_clicked_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+	Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
+	if (!wd)
+		return;
+
+	Page_Item *it;
+	Eina_List *l;
+	
+	int i = 0;
+	EINA_LIST_FOREACH(wd->page_list, l, it)
+	{
+		if (it->base == obj)
+		{
+			edje_object_signal_emit(it->base, "elm,state,indicator,on", "elm");
+			wd->cur_page_id = it->page_id;
+			evas_object_smart_callback_call(it->obj, "changed", (void*)wd->cur_page_id);
+		}
+		else
+			edje_object_signal_emit(it->base, "elm,state,indicator,off", "elm");
+		i++;
+	}	
+} // Added by jh0506.yun for BEAT UX v3.0
+
 static Page_Item*
 _create_item(Evas_Object *obj, unsigned int page_id)
 {
@@ -198,6 +222,9 @@ _create_item(Evas_Object *obj, unsigned int page_id)
 	evas_object_size_hint_min_set(it->base, mw, mh);
 	evas_object_size_hint_max_set(it->base, mw, mh);
 
+	// Added by jh0506.yun for BEAT UX v3.0
+	edje_object_signal_callback_add(it->base, "clicked", "indicator_clicked", _indicator_clicked_cb, obj);
+	
 	return it;
 }
 
@@ -242,7 +269,7 @@ elm_page_control_add(Evas_Object *parent)
 
 	edje_object_signal_callback_add(wd->base, "elm,state,indicator,click,left",	"elm", _indicator_click_left, obj);
 	edje_object_signal_callback_add(wd->base, "elm,state,indicator,click,right",	"elm", _indicator_click_right, obj);
-
+	
 	wd->scale_factor = elm_scale_get();
 	if ( wd->scale_factor == 0.0 ) {
 			wd->scale_factor = 1.0;
