@@ -46,7 +46,6 @@ struct _Item
 	int fn_btn2_w;
 	int fn_btn3_w;
 	int title_w;
-	Eina_Bool ani;
 };
 
 struct _Transit_Cb_Data
@@ -73,13 +72,13 @@ static Evas_Object *_multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj,
 static Item *_check_item_is_added(Evas_Object *obj, Evas_Object *content);
 static void _transition_complete_cb(void *data);
 static Elm_Transit *_transition_set(Item* prev_it, Item *it, Evas_Coord y, Eina_Bool pop);
-static void _elm_navigationbar_back_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
+static void _elm_navigationbar_back_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button);
 static Evas_Object *_elm_navigationbar_back_button_get(Evas_Object *obj, Evas_Object *content);
-static void _elm_navigationbar_function_button1_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
+static void _elm_navigationbar_function_button1_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button);
 static Evas_Object *_elm_navigationbar_function_button1_get(Evas_Object *obj, Evas_Object *content);
-static void _elm_navigationbar_function_button2_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
+static void _elm_navigationbar_function_button2_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button);
 static Evas_Object *_elm_navigationbar_function_button2_get(Evas_Object *obj, Evas_Object *content);
-static void _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Eina_Bool animation);
+static void _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button);
 static Evas_Object *_elm_navigationbar_function_button3_get(Evas_Object *obj, Evas_Object *content);
 
 static void
@@ -373,7 +372,7 @@ static void
 _back_button_clicked(void *data, Evas_Object *obj, void *event_info)
 {
 	Item *it = data;	
-	elm_navigationbar_pop(it->obj, it->ani);
+	elm_navigationbar_pop(it->obj);
 }
 
 static int
@@ -538,8 +537,7 @@ elm_navigationbar_push(Evas_Object *obj,
 						Evas_Object *fn_btn1, 
 						Evas_Object *fn_btn2, 
 						Evas_Object *fn_btn3, 
-						Evas_Object *content,
-						Eina_Bool animation)
+						Evas_Object *content)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -572,7 +570,6 @@ elm_navigationbar_push(Evas_Object *obj,
 	it->fn_btn2 = fn_btn2;
 	it->fn_btn3 = fn_btn3;
 	it->content = content;
-	it->ani = animation;
 
 	if (!fn_btn1 && prev_it)
 	{
@@ -647,7 +644,7 @@ elm_navigationbar_push(Evas_Object *obj,
 	}
 
 	//push content to pager
-	elm_pager_animation_set(wd->pager, it->ani);
+	elm_pager_animation_set(wd->pager, EINA_TRUE);
 	elm_pager_content_push(wd->pager, it->content);	
 
 	//push item into the stack. it should be always the tail
@@ -678,8 +675,7 @@ elm_navigationbar_push(Evas_Object *obj,
  * @ingroup NavigationBar
  */
 EAPI void
-elm_navigationbar_pop(Evas_Object *obj, 
-						Eina_Bool animation)
+elm_navigationbar_pop(Evas_Object *obj)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -735,7 +731,7 @@ elm_navigationbar_pop(Evas_Object *obj,
 		}
 
 		//pop content from pager
-		elm_pager_animation_set(wd->pager, animation);
+		elm_pager_animation_set(wd->pager, EINA_TRUE);
 		elm_pager_content_pop(wd->pager);
 	}
 	else if (prev_it)
@@ -766,8 +762,7 @@ elm_navigationbar_pop(Evas_Object *obj,
  */
 EAPI void
 elm_navigationbar_to_content_pop(Evas_Object *obj,
-										Evas_Object *content,
-										Eina_Bool animation)
+										Evas_Object *content)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -838,7 +833,7 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 		}
 
 		//pop content from pager
-		elm_pager_animation_set(wd->pager, animation);
+		elm_pager_animation_set(wd->pager, EINA_TRUE);
 		elm_pager_to_content_pop(wd->pager, content);
 	}
 	}
@@ -993,8 +988,7 @@ elm_navigationbar_title_object_list_get(Evas_Object *obj,
 static void
 _elm_navigationbar_back_button_set(Evas_Object *obj, 
 									Evas_Object *content, 
-									Evas_Object *button, 
-									Eina_Bool animation)
+									Evas_Object *button)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
@@ -1048,8 +1042,7 @@ _elm_navigationbar_back_button_get(Evas_Object *obj,
 static void
 _elm_navigationbar_function_button1_set(Evas_Object *obj, 
 									Evas_Object *content, 
-									Evas_Object *button, 
-									Eina_Bool animation)
+									Evas_Object *button)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
@@ -1107,8 +1100,7 @@ _elm_navigationbar_function_button1_get(Evas_Object *obj,
 static void
 _elm_navigationbar_function_button2_set(Evas_Object *obj, 
 										Evas_Object *content, 
-										Evas_Object *button, 
-										Eina_Bool animation)
+										Evas_Object *button)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
@@ -1158,8 +1150,7 @@ _elm_navigationbar_function_button2_get(Evas_Object *obj,
 static void
 _elm_navigationbar_function_button3_set(Evas_Object *obj, 
 										Evas_Object *content, 
-										Evas_Object *button, 
-										Eina_Bool animation)
+										Evas_Object *button)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
@@ -1254,8 +1245,7 @@ elm_navigationbar_content_bottom_get(Evas_Object *obj)
  */
 EAPI void
 elm_navigationbar_hidden_set(Evas_Object *obj, 
-								Eina_Bool hidden, 
-								Eina_Bool animation)
+								Eina_Bool hidden)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -1281,24 +1271,23 @@ elm_navigationbar_hidden_set(Evas_Object *obj,
 elm_navigationbar_title_button_set(Evas_Object *obj, 
 										Evas_Object *content, 
 										Evas_Object *button, 
-										Elm_Navi_Button_Type button_type,
-										Eina_Bool animation)
+										Elm_Navi_Button_Type button_type)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	if(!content || !button || !obj) return;
 	switch(button_type)
 	{
 		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON1:
-			_elm_navigationbar_function_button1_set(obj, content, button,animation);
+			_elm_navigationbar_function_button1_set(obj, content, button);
 			break;
 		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON2:
-			_elm_navigationbar_function_button2_set(obj, content, button,animation);
+			_elm_navigationbar_function_button2_set(obj, content, button);
 			break;
 		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON3:
-			_elm_navigationbar_function_button3_set(obj, content, button,animation);
+			_elm_navigationbar_function_button3_set(obj, content, button);
 			break;
 		case ELM_NAVIGATIONBAR_BACK_BUTTON:
-			_elm_navigationbar_back_button_set(obj, content, button,animation);
+			_elm_navigationbar_back_button_set(obj, content, button);
 			break;
 		default: 
 			break;
