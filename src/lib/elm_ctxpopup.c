@@ -34,11 +34,12 @@ struct _Ctxpopup_Item
 struct _Widget_Data
 {
    Evas_Object *parent;
-	Evas_Object *base;
+   Evas_Object *base;
    Evas_Object *box;
    Evas_Object *arrow;
    Evas_Object *scroller;
-	Evas_Object *bg;
+   Evas_Object *bg;
+   Evas_Object *btn_layout;
    Eina_List *items;
    double align_x, align_y;
    Eina_Bool scroller_disabled:1;
@@ -70,7 +71,7 @@ static Arrow_Direction _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangl
 static void _arrow_obj_add(Evas_Object *obj, const char *group_name);
 static void _update_arrow_obj(Evas_Object *obj, Arrow_Direction arrow_dir);
 static void _shift_base_by_arrow(Evas_Object *arrow, Arrow_Direction arrow_dir, Evas_Coord_Rectangle *rect);
-
+static void _btn_layout_create(Evas_Object *obj);
 static void
 _separator_obj_del(Widget_Data *wd, Elm_Ctxpopup_Item *remove_item)
 {
@@ -93,6 +94,18 @@ _separator_obj_del(Widget_Data *wd, Elm_Ctxpopup_Item *remove_item)
    wd->items = eina_list_remove(wd->items, separator);
    evas_object_del(separator->base);
    free(separator);
+}
+
+static void
+_btn_layout_create(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+
+	wd->btn_layout = elm_layout_add(wd->base);
+	evas_object_size_hint_weight_set(wd->btn_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	evas_object_size_hint_align_set(wd->btn_layout, EVAS_HINT_FILL, EVAS_HINT_FILL);
+	elm_layout_theme_set(wd->btn_layout, "ctxpopup", "buttons1", elm_widget_style_get(obj));
+	edje_object_part_swallow(wd->base, "elm.swallow.btns", wd->btn_layout);
 }
 
 static void
@@ -1190,7 +1203,7 @@ elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y)
 
 
 EAPI void
-elm_ctxpopup_align_get(const Evas_Object *obj, double *align_x, double *align_y)
+elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
@@ -1200,4 +1213,14 @@ elm_ctxpopup_align_get(const Evas_Object *obj, double *align_x, double *align_y)
 }
 
 
+EAPI void
+elm_ctxpopup_button_append(Evas_Object *obj, const char *label)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+	if(!wd) return;
+
+//	if(!wd->btn_layout)
+	//	wd->btn_layout = _btn_layout_create(obj);
+}
 
