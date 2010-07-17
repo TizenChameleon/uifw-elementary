@@ -242,6 +242,16 @@ _transition_complete_cb(void *data)
 	}
 	if (it)
 	{
+		if (it->title_obj) 
+			{
+				edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
+				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+			}
+		if (it->title) 
+			{
+				edje_object_part_text_set(wd->base, "elm.text", it->title);
+				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+			}
 		if (it->fn_btn1) 
 		{
 			edje_object_signal_emit(wd->base, "elm,state,item,add,leftpad", "elm");
@@ -272,16 +282,7 @@ _transition_complete_cb(void *data)
 		else
 			edje_object_signal_emit(wd->base, "elm,state,item,reset,rightpad2", "elm");
 		
-		if (it->title_obj) 
-			{
-				edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
-				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
-			}
-		if (it->title) 
-			{
-				edje_object_part_text_set(wd->base, "elm.text", it->title);
-				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
-			}
+		
 		if((it->title_obj)&&(it->title))
 		{
 			edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
