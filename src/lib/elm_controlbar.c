@@ -688,6 +688,7 @@ selected_box(Elm_Controlbar_Item * it)
 
    if(it->style == TABBAR){
 	   it->selected = EINA_TRUE;
+	   evas_object_smart_callback_call(it->obj, "view,change,before", it);
 	   object_color_set(it->base, "elm.tabbar.selected.color", "elm.swallow.icon");
 	   edje_object_signal_emit(_EDJ(it->base), "elm,state,selected",
 					  "elm");
@@ -2318,4 +2319,20 @@ elm_controlbar_view_set(Evas_Object * obj, Evas_Object * view)
    wd->view_content = view;
    edje_object_part_swallow(wd->view, "elm.swallow.view", wd->view_content);
 }
+
+
+/**
+ * Set the view of the item
+ *
+ * @param	it The item of controlbar
+ * @param	view The view for the item
+ *
+ * @ingroup Controlbar
+ */ 
+   EAPI void
+elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view) 
+{
+	it->view = view; 
+}
+
 
