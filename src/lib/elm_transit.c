@@ -40,27 +40,27 @@
 
 
 struct _transit {
-	Evas_Object* 		parent;
-	Elm_Animator*           animator;
-	Eina_List*              effect_list;
-	Evas_Object*     	block_rect;
-	void 			(*completion_op)(void*, Elm_Transit*);
-	void* 			completion_arg;
+	Evas_Object		*parent;
+	Elm_Animator		*animator;
+	Eina_List		*effect_list;
+	Evas_Object		*block_rect;
+	void 			(*completion_op)(void *, Elm_Transit *);
+	void			*completion_arg;
 	Eina_Bool 		reserved_del : 1;
 };
 
 
 struct _effect {
 
-	void  (*animation_op)( void*, Elm_Animator*, const double );
-	void  (*begin_op)( void*, const Eina_Bool, const unsigned int );
-	void  (*end_op)( void*, const Eina_Bool, const unsigned int );
+	void  (*animation_op)(void *, Elm_Animator *, double);
+	void  (*begin_op)( void *, Eina_Bool, unsigned int );
+	void  (*end_op)( void *, Eina_Bool, unsigned int );
 	unsigned int shared_cnt;
-	void* user_data;
+	void  *user_data;
 };
 
 
-inline static Evas_Object* _create_block_rect( Evas_Object* parent )
+inline static Evas_Object *_create_block_rect(Evas_Object *parent)
 {
 	Evas_Object* rect = evas_object_rectangle_add( evas_object_evas_get( parent ) );
 
@@ -76,7 +76,7 @@ inline static Evas_Object* _create_block_rect( Evas_Object* parent )
 
 
 
-static void _transit_animate_cb( void* data, Elm_Animator* animator, const double frame )
+static void _transit_animate_cb( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Transit* transit = data;
 	Eina_List* elist;
@@ -491,7 +491,7 @@ EAPI Eina_Bool elm_transit_fx_insert( Elm_Transit* transit, Elm_Effect* effect )
  * @param  transit       Transit object 
  * @param  repeat        Repeat count 
  */
-EAPI void elm_transit_repeat_set( Elm_Transit* transit, const unsigned int repeat )
+EAPI void elm_transit_repeat_set( Elm_Transit* transit, unsigned int repeat )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK( transit );
@@ -531,7 +531,7 @@ EAPI void elm_transit_stop( Elm_Transit* transit )
  * @param  transit       Transit object 
  * @param  duration 	 Transit time in second
  */
-EAPI void elm_transit_run( Elm_Transit* transit, const double duration )
+EAPI void elm_transit_run( Elm_Transit* transit, double duration )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK( transit );
@@ -564,7 +564,7 @@ EAPI void elm_transit_run( Elm_Transit* transit, const double duration )
 //Resizing FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _resizing Elm_Fx_Resizing;
-static void _elm_fx_resizing_op( void* data, Elm_Animator* animator, const double frame );
+static void _elm_fx_resizing_op( void* data, Elm_Animator* animator, double frame );
 
 struct _resizing {
 
@@ -578,8 +578,8 @@ struct _resizing {
 
 
 static void _elm_fx_resizing_begin( void* data, 
-				   const Eina_Bool auto_reverse, 
-				   const unsigned int repeat_cnt )
+				    Eina_Bool auto_reverse, 
+				    unsigned int repeat_cnt )
 {
 	Elm_Fx_Resizing* resizing = data;
 
@@ -591,8 +591,8 @@ static void _elm_fx_resizing_begin( void* data,
 
 
 static void _elm_fx_resizing_end( void* data,
-				  const Eina_Bool auto_reverse,
-				  const unsigned int repeat_cnt )
+				  Eina_Bool auto_reverse,
+				  unsigned int repeat_cnt )
 {
 	Elm_Fx_Resizing* resizing = data;
 	evas_object_move( resizing->obj, resizing->from.w + resizing->to.w,
@@ -602,7 +602,7 @@ static void _elm_fx_resizing_end( void* data,
 
 
 
-static void _elm_fx_resizing_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_resizing_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_Resizing* resizing = data;
 
@@ -629,10 +629,10 @@ static void _elm_fx_resizing_op( void* data, Elm_Animator* animator, const doubl
  * @return 		 Resizing effect 
  */
 EAPI Elm_Effect* elm_fx_resizing_add( Evas_Object* obj, 
-		                       const Evas_Coord from_w, 
-				       const Evas_Coord from_h, 
-				       const Evas_Coord to_w,
-				       const Evas_Coord to_h )
+		                       Evas_Coord from_w, 
+				       Evas_Coord from_h, 
+				       Evas_Coord to_w,
+				       Evas_Coord to_h )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( obj, NULL );
@@ -673,7 +673,7 @@ EAPI Elm_Effect* elm_fx_resizing_add( Evas_Object* obj,
 //Translation FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _translation Elm_Fx_Translation;
-static void _elm_fx_translation_op( void* data, Elm_Animator* animator, const double frame );
+static void _elm_fx_translation_op( void* data, Elm_Animator* animator, double frame );
 
 struct _translation {
 
@@ -687,8 +687,8 @@ struct _translation {
 
 
 static void _elm_fx_translation_begin( void* data, 
-				   const Eina_Bool auto_reverse, 
-				   const unsigned int repeat_cnt )
+				   Eina_Bool auto_reverse, 
+				   unsigned int repeat_cnt )
 {
 	Elm_Fx_Translation* translation = data;
 
@@ -700,8 +700,8 @@ static void _elm_fx_translation_begin( void* data,
 
 
 static void _elm_fx_translation_end( void* data,
-				  const Eina_Bool auto_reverse,
-				  const unsigned int repeat_cnt )
+				     Eina_Bool auto_reverse,
+				     unsigned int repeat_cnt )
 {
 	Elm_Fx_Translation* translation = data;
 
@@ -711,7 +711,7 @@ static void _elm_fx_translation_end( void* data,
 
 
 
-static void _elm_fx_translation_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_translation_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_Translation* translation = data;
 
@@ -737,10 +737,10 @@ static void _elm_fx_translation_op( void* data, Elm_Animator* animator, const do
  * @return 		 Translation effect 
  */
 EAPI Elm_Effect* elm_fx_translation_add( Evas_Object* obj, 
-		                       const Evas_Coord from_x, 
-				       const Evas_Coord from_y, 
-				       const Evas_Coord to_x,
-				       const Evas_Coord to_y )
+		                         Evas_Coord from_x, 
+				         Evas_Coord from_y, 
+				         Evas_Coord to_x,
+				         Evas_Coord to_y )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( obj, NULL );
@@ -786,7 +786,7 @@ EAPI Elm_Effect* elm_fx_translation_add( Evas_Object* obj,
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _zoom Elm_Fx_Zoom;
 
-static void _elm_fx_zoom_op( void* data, Elm_Animator* animator, const double frame );
+static void _elm_fx_zoom_op( void* data, Elm_Animator* animator, double frame);
 
 struct _zoom {
 
@@ -796,7 +796,7 @@ struct _zoom {
 
 
 
-static void _elm_fx_zoom_begin( void* data, const Eina_Bool reverse, const unsigned int repeat )
+static void _elm_fx_zoom_begin( void* data, Eina_Bool reverse, unsigned int repeat)
 {
 	Elm_Fx_Zoom* zoom = data;
 	evas_object_show( zoom->obj );
@@ -806,7 +806,7 @@ static void _elm_fx_zoom_begin( void* data, const Eina_Bool reverse, const unsig
 }
 
 
-static void _elm_fx_zoom_end( void* data, const Eina_Bool reverse, const unsigned int repeat )
+static void _elm_fx_zoom_end( void* data, Eina_Bool reverse, unsigned int repeat)
 {
 	Elm_Fx_Zoom* zoom = data;
 	evas_object_map_enable_set( zoom->obj, EINA_FALSE );
@@ -814,7 +814,7 @@ static void _elm_fx_zoom_end( void* data, const Eina_Bool reverse, const unsigne
 
 
 
-static void _elm_fx_zoom_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_zoom_op( void* data, Elm_Animator* animator, double frame)
 {
 	Elm_Fx_Zoom* zoom = data;
 
@@ -905,8 +905,8 @@ struct _flip {
 };
 
 static void _elm_fx_flip_end( void* data,
-			      const Eina_Bool auto_reverse,
-			      const unsigned int repeat_cnt )
+			      Eina_Bool auto_reverse,
+			      unsigned int repeat_cnt )
 {
 	Elm_Fx_Flip* flip = data;
 	evas_object_map_enable_set( flip->front, EINA_FALSE );
@@ -914,7 +914,7 @@ static void _elm_fx_flip_end( void* data,
 }
 
 
-static void _elm_fx_flip_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_flip_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_Flip* flip = data;
 
@@ -996,8 +996,8 @@ static void _elm_fx_flip_op( void* data, Elm_Animator* animator, const double fr
  */
 EAPI Elm_Effect* elm_fx_flip_add( Evas_Object* front, 
 				  Evas_Object* back, 
-				  const Elm_Fx_Flip_Axis axis, 
-				  const Eina_Bool cw )
+				  Elm_Fx_Flip_Axis axis, 
+				  Eina_Bool cw )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( front || back, NULL );
@@ -1037,7 +1037,7 @@ EAPI Elm_Effect* elm_fx_flip_add( Evas_Object* front,
 //ResizableFlip FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _resizable_flip Elm_Fx_ResizableFlip;
-static void _elm_fx_resizable_flip_op( void* data, Elm_Animator* animator, const double frame );
+static void _elm_fx_resizable_flip_op( void* data, Elm_Animator* animator, double frame );
 
 struct _resizable_flip {
 	Evas_Object* 	  front;
@@ -1051,7 +1051,7 @@ struct _resizable_flip {
 	Eina_Bool    	  cw : 1;
 };
 
-static void _elm_fx_resizable_flip_begin( void* data, const Eina_Bool reverse, const unsigned int repeat )
+static void _elm_fx_resizable_flip_begin( void* data, Eina_Bool reverse, unsigned int repeat )
 {
 	Elm_Fx_ResizableFlip* resizable_flip = data;
 	evas_object_show( resizable_flip->front );
@@ -1063,8 +1063,8 @@ static void _elm_fx_resizable_flip_begin( void* data, const Eina_Bool reverse, c
 
 
 static void _elm_fx_resizable_flip_end( void* data,
-				     const Eina_Bool auto_reverse,
-				     const unsigned int repeat_cnt )
+				        Eina_Bool auto_reverse,
+				        unsigned int repeat_cnt )
 {
 	Elm_Fx_ResizableFlip* resizable_flip = data;
 	evas_object_map_enable_set( resizable_flip->front, EINA_FALSE );
@@ -1118,7 +1118,7 @@ inline static void _set_image_uv_by_axis_x( Evas_Map* map,
 
 
 
-static void _elm_fx_resizable_flip_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_resizable_flip_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_ResizableFlip* resizable_flip = data;
 
@@ -1197,8 +1197,8 @@ static void _elm_fx_resizable_flip_op( void* data, Elm_Animator* animator, const
  */
 EAPI Elm_Effect* elm_fx_resizable_flip_add( Evas_Object* front, 
 					  Evas_Object* back, 
-					  const Elm_Fx_Flip_Axis axis, 
-					  const Eina_Bool cw )
+					  Elm_Fx_Flip_Axis axis, 
+					  Eina_Bool cw )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( front || back, NULL );
@@ -1255,7 +1255,7 @@ EAPI Elm_Effect* elm_fx_resizable_flip_add( Evas_Object* front,
 //Wipe FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _wipe Elm_Fx_Wipe;
-static void _elm_fx_wipe_op( void* data, Elm_Animator* animator, const double frame );
+static void _elm_fx_wipe_op( void* data, Elm_Animator* animator, double frame );
 
 struct _wipe {
 	Evas_Object* obj;
@@ -1265,8 +1265,8 @@ struct _wipe {
 
 
 static void _elm_fx_wipe_begin( void* data, 
-		                const Eina_Bool auto_repeat, 
-				const unsigned int repeat_cnt ) 
+		                Eina_Bool auto_repeat, 
+				unsigned int repeat_cnt ) 
 {
 	Elm_Fx_Wipe* wipe = data;
 	evas_object_show( wipe->obj );
@@ -1276,8 +1276,8 @@ static void _elm_fx_wipe_begin( void* data,
 
 
 static void _elm_fx_wipe_end( void* data, 
-		              const Eina_Bool auto_repeat, 
-			      const unsigned int repeat_cnt ) 
+		              Eina_Bool auto_repeat, 
+			      unsigned int repeat_cnt ) 
 {
 	Elm_Fx_Wipe* wipe = data;
 	evas_object_map_enable_set( wipe->obj, EINA_FALSE );
@@ -1413,7 +1413,7 @@ static void _elm_fx_wipe_show( Evas_Map* map,
 
 }
 
-static void _elm_fx_wipe_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_wipe_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_Wipe* wipe = data;
 	
@@ -1507,15 +1507,15 @@ struct _color {
 
 
 static void _elm_fx_color_begin( void* data,
-				 const Eina_Bool auto_reverse,
-				 const unsigned int repeat_cnt )
+				 Eina_Bool auto_reverse,
+				 unsigned int repeat_cnt )
 {
 	Elm_Fx_Color* color = data;
 	evas_object_show( color->obj );
 }
 
 
-static void _elm_fx_color_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_color_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_Color* color = data;
 
@@ -1558,14 +1558,14 @@ static void _elm_fx_color_op( void* data, Elm_Animator* animator, const double f
  * @return               Color Effect
  */
 EAPI Elm_Effect* elm_fx_color_add( Evas_Object* obj,
-				   const unsigned int from_r, 
-				   const unsigned int from_g,
-				   const unsigned int from_b,
-				   const unsigned int from_a, 
-				   const unsigned int to_r,
-				   const unsigned int to_g,
-				   const unsigned int to_b,
-				   const unsigned int to_a )
+				   unsigned int from_r, 
+				   unsigned int from_g,
+				   unsigned int from_b,
+				   unsigned int from_a, 
+				   unsigned int to_r,
+				   unsigned int to_g,
+				   unsigned int to_b,
+				   unsigned int to_a )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( obj, NULL );
@@ -1627,8 +1627,8 @@ struct _fade {
 
 
 static void _elm_fx_fade_begin( void* data,
-				const Eina_Bool auto_reverse,
-				const unsigned int repeat_cnt )
+				Eina_Bool auto_reverse,
+				unsigned int repeat_cnt )
 {
 	Elm_Fx_Fade* fade = data;
 	fade->inversed = EINA_FALSE;
@@ -1636,8 +1636,8 @@ static void _elm_fx_fade_begin( void* data,
 
 
 static void _elm_fx_fade_end( void* data, 
-			      const Eina_Bool auto_reverse,
-			      const unsigned int repeat_cnt )
+			      Eina_Bool auto_reverse,
+			      unsigned int repeat_cnt )
 {
 	Elm_Fx_Fade* fade = data;
 
@@ -1654,7 +1654,7 @@ static void _elm_fx_fade_end( void* data,
 				fade->after_color.a );
 }
 
-static void _elm_fx_fade_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_fade_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_Fade* fade = data;
 
@@ -1772,8 +1772,8 @@ struct _blend {
 };
 
 static void _elm_fx_blend_begin( void* data,
-				 const Eina_Bool auto_reverse,
-				 const unsigned int repeat_cnt )
+				 Eina_Bool auto_reverse,
+				 unsigned int repeat_cnt )
 {
 	Elm_Fx_Blend* blend = data;
 	evas_object_show( blend->before );
@@ -1781,8 +1781,8 @@ static void _elm_fx_blend_begin( void* data,
 
 
 static void _elm_fx_blend_end( void* data,
-			       const Eina_Bool auto_reverse,
-			       const unsigned int repeat_cnt )
+			       Eina_Bool auto_reverse,
+			       unsigned int repeat_cnt )
 {
 	Elm_Fx_Blend* blend = data;
 
@@ -1807,7 +1807,7 @@ static void _elm_fx_blend_end( void* data,
 
 
 
-static void _elm_fx_blend_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_blend_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_Blend* blend = data;
 
@@ -1887,8 +1887,8 @@ struct _rotation {
 };
 
 static void _elm_fx_rotation_begin( void* data,
- 			            const Eina_Bool auto_reverse, 
-				    const unsigned int repeat_cnt )
+ 			            Eina_Bool auto_reverse, 
+				    unsigned int repeat_cnt )
 {
 	Elm_Fx_Rotation* rotation = data;
 	evas_object_show( rotation->obj );
@@ -1897,8 +1897,8 @@ static void _elm_fx_rotation_begin( void* data,
 
 
 static void _elm_fx_rotation_end( void* data,
-				  const Eina_Bool auto_reverse,
-				  const unsigned int repeat_cnt )
+				  Eina_Bool auto_reverse,
+				  unsigned int repeat_cnt )
 {
 	Elm_Fx_Rotation* rotation = data;
 	evas_object_map_enable_set( rotation->obj, EINA_FALSE );
@@ -1907,7 +1907,7 @@ static void _elm_fx_rotation_end( void* data,
 
 
 
-static void _elm_fx_rotation_op( void* data, Elm_Animator* animator, const double frame )
+static void _elm_fx_rotation_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_Rotation* rotation = data;
 
@@ -1956,9 +1956,9 @@ static void _elm_fx_rotation_op( void* data, Elm_Animator* animator, const doubl
  * @return               Rotation effect
  */
 EAPI Elm_Effect* elm_fx_rotation_add( Evas_Object* obj, 
-				  const float from_degree, 
-				  const float to_degree,
-				  const Eina_Bool cw )
+				      float from_degree, 
+				      float to_degree,
+				      Eina_Bool cw )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( obj, NULL );
@@ -2274,18 +2274,18 @@ struct _image_animation {
 };
 
 static void _elm_fx_imageanimation_begin( void* data,
-	 			           const Eina_Bool auto_reverse, 
-					   const unsigned int repeat_cnt )
+	 			          Eina_Bool auto_reverse, 
+					  unsigned int repeat_cnt )
 {
 }
 
 static void _elm_fx_imageanimation_end( void* data,
-				  const Eina_Bool auto_reverse,
-				  const unsigned int repeat_cnt )
+				        Eina_Bool auto_reverse,
+				        unsigned int repeat_cnt )
 {
 }
 
-void _elm_fx_imageanimation_op( void* data, Elm_Animator* animator, const double frame )
+void _elm_fx_imageanimation_op( void* data, Elm_Animator* animator, double frame )
 {
 	Elm_Fx_Image_Animation* image_animation = (Elm_Fx_Image_Animation *)data;
 
@@ -2306,7 +2306,7 @@ void _elm_fx_imageanimation_op( void* data, Elm_Animator* animator, const double
  * @param  images        Images for animation.
  * @return 		 ImageAnimation Effect.
  */
-EAPI Elm_Effect* elm_fx_imageanimation_add( const Evas_Object* icon, const char** images, const unsigned int item_num )
+EAPI Elm_Effect* elm_fx_imageanimation_add( Evas_Object* icon, const char** images, unsigned int item_num )
 {
 #ifdef ELM_FX_EXCEPTION_ENABLE
 	ELM_FX_NULL_CHECK_WITH_RET( images, NULL );
