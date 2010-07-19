@@ -1248,8 +1248,8 @@ extern "C" {
    EAPI const char  *elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index);
    EAPI Evas_Object *elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index);
    EAPI Elm_Segment_Item *elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value);
-   EAPI int         elm_segment_control_get_segment_count(Evas_Object *obj);
-   EAPI void        elm_segment_control_set_size(Evas_Object *obj, int width, int height);
+   EAPI int          elm_segment_control_get_segment_count(Evas_Object *obj);
+   EAPI void         elm_segment_control_set_size(Evas_Object *obj, int width, int height);
 
    EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
    EAPI void         elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count);
@@ -1630,8 +1630,8 @@ extern "C" {
 
    typedef struct _Picker_Item Elm_Picker_Item;
    EAPI Evas_Object     *elm_picker_add(Evas_Object *parent);
-   EAPI void            elm_picker_next(Evas_Object *obj);
-   EAPI void            elm_picker_prev(Evas_Object *obj);
+   EAPI void             elm_picker_next(Evas_Object *obj);
+   EAPI void             elm_picker_prev(Evas_Object *obj);
    EAPI Elm_Picker_Item *elm_picker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
    EAPI Elm_Picker_Item *elm_picker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
    EAPI const Eina_List *elm_picker_items_get(Evas_Object *obj);
@@ -1687,8 +1687,8 @@ extern "C" {
 
    typedef struct _Buttonpicker_Item Elm_Buttonpicker_Item;
    EAPI Evas_Object     *elm_buttonpicker_add(Evas_Object *parent);
-   EAPI void            elm_buttonpicker_next(Evas_Object *obj);
-   EAPI void            elm_buttonpicker_prev(Evas_Object *obj);
+   EAPI void             elm_buttonpicker_next(Evas_Object *obj);
+   EAPI void             elm_buttonpicker_prev(Evas_Object *obj);
    EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
    EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
    EAPI const Eina_List *elm_buttonpicker_items_get(Evas_Object *obj);
@@ -2321,7 +2321,7 @@ extern "C" {
 
    /* Sliding Drawer */
    EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
-   EAPI void elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
+   EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
 
    /*wipercontrol*/
    EAPI Evas_Object *elm_wipercontrol_add(Evas_Object *parent);
