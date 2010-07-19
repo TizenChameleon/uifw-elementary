@@ -1859,7 +1859,9 @@ extern "C" {
    EAPI void         elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled);
    EAPI void         elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y);
    EAPI void         elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y);
+//   EAPI void         elm_ctxpopup_button_append(Evas_Object *obj, const char *label);
 
+   
    /* QuickContactBadge */
    typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;
 
