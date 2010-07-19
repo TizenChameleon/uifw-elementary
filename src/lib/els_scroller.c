@@ -1161,15 +1161,6 @@ elm_smart_scroller_widget_set(Evas_Object *obj, Evas_Object *wid)
    sd->widget = wid;
 }
 
-EAPI void
-elm_smart_scroller_handler_set(Evas_Object *obj)
-{
-   API_ENTRY return;
-
-   elm_smart_scroller_policy_set(obj, ELM_SMART_SCROLLER_POLICY_OFF, ELM_SMART_SCROLLER_POLICY_AUTO);
-   edje_object_signal_emit(sd->edje_obj, "elm,activate,handler", "elm");
-}
-
 /* local subsystem functions */
 static void
 _smart_edje_drag_v_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)

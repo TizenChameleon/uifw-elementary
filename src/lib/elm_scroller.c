@@ -76,7 +76,7 @@ static const Evas_Smart_Cb_Description _signals[] = {
 static void
 _del_hook(Evas_Object *obj)
 {
-   
+
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    free(wd);
@@ -89,7 +89,7 @@ _theme_hook(Evas_Object *obj)
    if (!wd) return;
    if (wd->scr)
      {
-        elm_smart_scroller_object_theme_set(obj, wd->scr, 
+        elm_smart_scroller_object_theme_set(obj, wd->scr,
                                             wd->widget_name, wd->widget_base,
                                             elm_widget_style_get(obj));
 //        edje_object_scale_set(wd->scr, elm_widget_scale_get(obj) * _elm_config->scale);
@@ -100,7 +100,7 @@ _theme_hook(Evas_Object *obj)
 static void
 _show_region_hook(void *data, Evas_Object *obj)
 {
-   
+
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord x, y, w, h;
    if (!wd) return;
@@ -112,7 +112,7 @@ _show_region_hook(void *data, Evas_Object *obj)
 static void
 _sizing_eval(Evas_Object *obj)
 {
-   
+
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord  vw, vh, minw, minh, maxw, maxh, w, h, vmw, vmh;
    double xw, yw;
@@ -155,7 +155,7 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
 static void
 _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 {
-   
+
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *sub = event_info;
 
@@ -175,7 +175,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 static void
 _hold_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-   
+
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
@@ -186,7 +186,7 @@ _hold_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 static void
 _hold_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-   
+
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
@@ -197,7 +197,7 @@ _hold_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 static void
 _freeze_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-   
+
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
@@ -208,7 +208,7 @@ _freeze_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 static void
 _freeze_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-   
+
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
@@ -304,10 +304,10 @@ elm_scroller_add(Evas_Object *parent)
 
    wd->widget_name = eina_stringshare_add("scroller");
    wd->widget_base = eina_stringshare_add("base");
-   
+
    wd->scr = elm_smart_scroller_add(e);
    elm_smart_scroller_widget_set(wd->scr, obj);
-   elm_smart_scroller_object_theme_set(obj, wd->scr, 
+   elm_smart_scroller_object_theme_set(obj, wd->scr,
                                        wd->widget_name, wd->widget_base,
                                        elm_widget_style_get(obj));
    elm_widget_resize_object_set(obj, wd->scr);
@@ -376,7 +376,7 @@ elm_scroller_content_set(Evas_Object *obj, Evas_Object *content)
 
 /**
  * Set custom theme elements for the scroller
- * 
+ *
  * @param obj The scroller object
  * @param widget The widget name to use (default is "scroller")
  * @param base The base name to use (default is "base")
@@ -668,22 +668,4 @@ elm_scroller_page_move_set(Evas_Object *obj, Eina_Bool set)
    if (!wd) return;
 
    elm_smart_scroller_page_move_set(wd->scr, set);
-}
-
-/**
- * Set scrollbar handler
- *
- * @param obj The scroller object
- * @param set Flag
- *
- * @ingroup Scroller
- */
-EAPI void
-elm_scroller_scrollbar_handler_set(Evas_Object *obj, Eina_Bool set)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if(!set) return;
-   elm_smart_scroller_handler_set(wd->scr);
 }

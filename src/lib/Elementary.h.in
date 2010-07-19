@@ -517,7 +517,7 @@ extern "C" {
    EAPI void         elm_scroller_page_size_set(Evas_Object *obj, Evas_Coord h_pagesize, Evas_Coord v_pagesize);
    EAPI void         elm_scroller_region_bring_in(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
    EAPI void         elm_scroller_page_move_set(Evas_Object *obj, Eina_Bool set);
-   EAPI void         elm_scroller_scrollbar_handler_set(Evas_Object *obj, Eina_Bool set);
+
    /* smart callbacks called:
     * "edge,left"
     * "edge,right"
@@ -1065,7 +1065,7 @@ extern "C" {
    EAPI void             elm_list_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
    EAPI void             elm_list_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, Elm_Scroller_Policy policy_v);
    EAPI void             elm_list_scroller_policy_get(const Evas_Object *obj, Elm_Scroller_Policy *policy_h, Elm_Scroller_Policy *policy_v);
-   EAPI void             elm_list_scrollbar_handler_set(Evas_Object *obj, Eina_Bool set);
+
    /* smart callbacks called:
     * "clicked" - when the user double-clicked an item
     * "selected" - when the user selected an item
@@ -1217,7 +1217,6 @@ extern "C" {
    EAPI void              elm_genlist_block_count_set(Evas_Object *obj, int n);
    EAPI void              elm_genlist_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, Elm_Scroller_Policy policy_v);
    EAPI void              elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
-   EAPI void              elm_genlist_scrollbar_handler_set(Evas_Object *obj, Eina_Bool set);
 
    EAPI Evas_Object *elm_check_add(Evas_Object *parent);
    EAPI void         elm_check_label_set(Evas_Object *obj, const char *label);
