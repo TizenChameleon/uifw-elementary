@@ -991,10 +991,10 @@ EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj)
 }
 
 /**
- * enable to show the input panel automatically.
+ * This sets the attribute to show the input panel automatically.
  *
  * @param obj The scrolled entry object
- * @param enabled If true, the input panel is enabled
+ * @param enabled If true, the input panel is appeared when entry is clicked or has a focus
  *
  * @ingroup Scrolled_Entry
  */

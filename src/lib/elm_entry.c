@@ -2863,10 +2863,10 @@ elm_entry_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
 }
 
 /**
- * enable to show the input panel automatically.
+ * This sets the attribute to show the input panel automatically.
  *
  * @param obj The entry object
- * @param enabled If true, the input panel is enabled
+ * @param enabled If true, the input panel is appeared when entry is clicked or has a focus
  *
  * @ingroup Entry
  */
