@@ -125,7 +125,6 @@ _theme_hook(Evas_Object *obj)
 			if(wd->desc_label)
 				{
 					snprintf(buf, sizeof(buf), "popup_description/%s", elm_widget_style_get(obj));
-					printf("\nstyle applied=%s\n",buf);
 					elm_object_style_set(wd->desc_label,buf);
 				}
 		}		
@@ -225,7 +224,7 @@ static Evas_Object* _elm_popup_add_button(Evas_Object *obj,const char *text,int 
 static void _elm_popup_buttons_add_valist(Evas_Object *obj,const char *first_button_text,va_list args)
 {
 	const char *text;	
-	char buf[50];
+	char buf[4096];
 	int response=0;
 	int index=0;
 	if(first_button_text==NULL)
@@ -239,7 +238,7 @@ static void _elm_popup_buttons_add_valist(Evas_Object *obj,const char *first_but
 	 	{
 	 		btn = _elm_popup_add_button(obj,text,response);
 			++index;			
-			snprintf(buf,50,"actionbtn%d",index);				
+			snprintf(buf,sizeof(buf),"actionbtn%d",index);				
 			elm_layout_content_set(wd->action_area,buf,btn);
 			evas_object_event_callback_add(wd->action_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				       _changed_size_hints, obj);
@@ -368,7 +367,7 @@ elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int
 	Evas_Object *popup;
 	popup = elm_popup_add(parent);
 	Widget_Data *wd = elm_widget_data_get(popup);
-	char buf[255];
+	char buf[4096];
 	if(desc_text)
 		{
 			elm_popup_desc_set(popup, desc_text);
@@ -383,7 +382,7 @@ elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int
 			va_start (args, first_button_text);	
 			wd->action_area= elm_layout_add(popup);							
 			elm_layout_content_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);		
-	 		snprintf(buf,50,"buttons%d",no_of_buttons);	
+	 		snprintf(buf,sizeof(buf),"buttons%d",no_of_buttons);	
 	 		elm_layout_theme_set(wd->action_area,"popup",buf,elm_widget_style_get(popup));
 
 			edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,visible", "elm");

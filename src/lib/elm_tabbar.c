@@ -147,25 +147,23 @@ static void _tab_object_resize(void *data, Evas *e, Evas_Object *obj, void *even
 	DBG("%s", __func__);
 
 	Widget_Data *wd;
-	Evas_Coord w, h, height;
+    Evas_Coord y, y_, w, h, height;
 
 	if(!data) return;
 	wd = elm_widget_data_get((Evas_Object *)data);
 	if(!wd) return;
 
-	evas_object_geometry_get(wd->edje, NULL, NULL, &w, &h);
+	evas_object_geometry_get(wd->edje, NULL, &y, &w, &h);
 
 	wd->w = w;
 	wd->h = h;
 
 	evas_object_resize(wd->edje, w, h);
-//	evas_object_resize(wd->box, w, h);
 
 	evas_object_geometry_get(edje_object_part_object_get(wd->edje, "bg_image"), NULL, NULL, NULL, &height);
 	evas_object_resize(wd->view, w, h - height + 1);
-
-	evas_object_geometry_get(wd->parent, NULL, NULL, &w, &h);
-	evas_object_resize(wd->edit_box, w, h);
+	evas_object_geometry_get(wd->parent, NULL, &y_, NULL, NULL);
+	evas_object_resize(wd->edit_box, w, h + y - y_);
 }
 
 
