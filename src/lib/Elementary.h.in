@@ -2367,7 +2367,7 @@ extern "C" {
    EAPI Dialogue_Item *elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);   
    EAPI Dialogue_Item *elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);   
    EAPI Dialogue_Item *elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *after, Elm_Dialoguegroup_Item_Style style);   
-   EAPI Dialogue_Item *elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *beforei, Elm_Dialoguegroup_Item_Style style);   
+   EAPI Dialogue_Item *elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *before, Elm_Dialoguegroup_Item_Style style);   
    EAPI void         elm_dialoguegroup_remove(Dialogue_Item *item);
    EAPI void         elm_dialoguegroup_remove_all(Evas_Object *obj);
    EAPI void         elm_dialoguegroup_title_set(Evas_Object *obj, const char *title);
