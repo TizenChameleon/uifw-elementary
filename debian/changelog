@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build23) unstable; urgency=low
+
+  * elm_dialoguegroup API change
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build23
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Tue, 20 Jul 2010 16:59:38 +0900
+
 elementary (0.4.0+svn.49550slp2+3build22) unstable; urgency=low
 
   * Repackaging
