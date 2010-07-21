@@ -36,15 +36,16 @@ _select(void *data, Evas_Object *obj, void *event_info)
 static void
 _paste(void *data, Evas_Object *obj, void *event_info)
 {
- 	ext_mod->paste(data,obj,event_info);
-   evas_object_hide(obj);
+	ext_mod->paste(data,obj,event_info);
+	evas_object_hide(obj);
 }
 
 static void
 _cut(void *data, Evas_Object *obj, void *event_info)
 {
-   ext_mod->cut(data,obj,event_info);
+	ext_mod->cut(data,obj,event_info);
 	evas_object_hide(obj);
+	elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_FALSE);
 }
 
 static void
@@ -52,13 +53,15 @@ _copy(void *data, Evas_Object *obj, void *event_info)
 {
 	ext_mod->copy(data,obj,event_info);
 	evas_object_hide(obj);
+	elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_FALSE);
 }
 
 static void
 _cancel(void *data, Evas_Object *obj, void *event_info)
 {
 	ext_mod->cancel(data,obj,event_info);
-   evas_object_hide(obj);
+	evas_object_hide(obj);
+	elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_FALSE);
 }
 
 static void

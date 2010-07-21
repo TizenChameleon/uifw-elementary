@@ -928,7 +928,7 @@ static int
 _entry_length_get(Evas_Object *obj)
 {
    int len;
-   char *str = elm_entry_entry_get(obj);
+   const char *str = elm_entry_entry_get(obj);
    if (!str) return 0;
 
    char *plain_str = _mkup_to_text(str);
@@ -1609,7 +1609,7 @@ static int _textinput_control_function(void *data,void *input_data)
    Widget_Data *wd = elm_widget_data_get(data);	
    char buf[10]="\0";
    size_t byte_len;
-   size_t len=0, bytes_per_char=0,insert_text_len=0;
+   size_t insert_text_len=0;
    char *text = edje_object_part_text_get(wd->ent, "elm.text");	
    char *insert_text;  
    size_t remain_bytes;
