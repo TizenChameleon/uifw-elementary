@@ -2439,7 +2439,7 @@ extern "C" {
 
    EAPI Evas_Object *elm_dayselector_add(Evas_Object *parent);
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
-   EAPI void		 elm_dayselector_title_set(Evas_Object *parent, const char *title);
+   EAPI void         elm_dayselector_title_set(Evas_Object *parent, const char *title);
    
 #ifdef __cplusplus
 }
