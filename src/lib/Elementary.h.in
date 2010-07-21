@@ -155,21 +155,21 @@ extern "C" {
    typedef enum _Elm_Win_Keyboard_Mode
      {
 	ELM_WIN_KEYBOARD_UNKNOWN,
-	  ELM_WIN_KEYBOARD_OFF,
-	  ELM_WIN_KEYBOARD_ON,
-	  ELM_WIN_KEYBOARD_ALPHA,
-	  ELM_WIN_KEYBOARD_NUMERIC,
-	  ELM_WIN_KEYBOARD_PIN,
-	  ELM_WIN_KEYBOARD_PHONE_NUMBER,
-	  ELM_WIN_KEYBOARD_HEX,
-	  ELM_WIN_KEYBOARD_TERMINAL,
-	  ELM_WIN_KEYBOARD_PASSWORD,
-	  ELM_WIN_KEYBOARD_IP,
-	  ELM_WIN_KEYBOARD_HOST,
-	  ELM_WIN_KEYBOARD_FILE,
-	  ELM_WIN_KEYBOARD_URL,
-	  ELM_WIN_KEYBOARD_KEYPAD,
-	  ELM_WIN_KEYBOARD_J2ME
+	ELM_WIN_KEYBOARD_OFF,
+	ELM_WIN_KEYBOARD_ON,
+	ELM_WIN_KEYBOARD_ALPHA,
+	ELM_WIN_KEYBOARD_NUMERIC,
+	ELM_WIN_KEYBOARD_PIN,
+	ELM_WIN_KEYBOARD_PHONE_NUMBER,
+	ELM_WIN_KEYBOARD_HEX,
+	ELM_WIN_KEYBOARD_TERMINAL,
+	ELM_WIN_KEYBOARD_PASSWORD,
+	ELM_WIN_KEYBOARD_IP,
+	ELM_WIN_KEYBOARD_HOST,
+	ELM_WIN_KEYBOARD_FILE,
+	ELM_WIN_KEYBOARD_URL,
+	ELM_WIN_KEYBOARD_KEYPAD,
+	ELM_WIN_KEYBOARD_J2ME
      } Elm_Win_Keyboard_Mode;
 
   /**
@@ -441,13 +441,14 @@ extern "C" {
    EAPI void         elm_box_unpack_all(Evas_Object *obj);
    /* smart callbacks called:
     */
-	typedef enum {
-	   UIControlStateDefault,
-	   UIControlStateHighlighted,
-	   UIControlStateDisabled,
-	   UIControlStateFocused,
-	   UIControlStateReserved
-	}UIControlState;
+   typedef enum 
+     {
+	UIControlStateDefault,
+	UIControlStateHighlighted,
+	UIControlStateDisabled,
+	UIControlStateFocused,
+	UIControlStateReserved
+     } UIControlState;
 
    EAPI Evas_Object *elm_button_add(Evas_Object *parent);
    EAPI void         elm_button_label_set(Evas_Object *obj, const char *label);
@@ -695,9 +696,9 @@ extern "C" {
    typedef enum _Elm_Hover_Axis
      {
 	ELM_HOVER_AXIS_NONE,
-	  ELM_HOVER_AXIS_HORIZONTAL,
-	  ELM_HOVER_AXIS_VERTICAL,
-	  ELM_HOVER_AXIS_BOTH
+	ELM_HOVER_AXIS_HORIZONTAL,
+	ELM_HOVER_AXIS_VERTICAL,
+	ELM_HOVER_AXIS_BOTH
      } Elm_Hover_Axis;
    EAPI Evas_Object *elm_hover_add(Evas_Object *parent);
    EAPI void         elm_hover_target_set(Evas_Object *obj, Evas_Object *target);
@@ -726,8 +727,8 @@ extern "C" {
    typedef enum _Elm_Icon_Type
      {
 	ELM_ICON_NONE,
-	  ELM_ICON_FILE,
-	  ELM_ICON_STANDARD
+	ELM_ICON_FILE,
+	ELM_ICON_STANDARD
      } Elm_Icon_Type;
    typedef struct _Elm_Hoversel_Item Elm_Hoversel_Item;
 
@@ -1117,13 +1118,13 @@ extern "C" {
 	ELM_GENLIST_ITEM_NONE = 0,
 	ELM_GENLIST_ITEM_SUBITEMS = (1 << 0)
      } Elm_Genlist_Item_Flags;
-     typedef enum _Elm_Genlist_Edit_Mode
-    {
-      ELM_GENLIST_EDIT_MODE_NONE    = 0,
-      ELM_GENLIST_EDIT_MODE_REORDER = (1 << 0),
-      ELM_GENLIST_EDIT_MODE_INSERT  = (1 << 1),
-      ELM_GENLIST_EDIT_MODE_DELETE  = (1 << 2)
-    }Elm_Genlist_Edit_Mode;
+   typedef enum _Elm_Genlist_Edit_Mode
+     {
+	ELM_GENLIST_EDIT_MODE_NONE    = 0,
+	ELM_GENLIST_EDIT_MODE_REORDER = (1 << 0),
+	ELM_GENLIST_EDIT_MODE_INSERT  = (1 << 1),
+	ELM_GENLIST_EDIT_MODE_DELETE  = (1 << 2)
+     }Elm_Genlist_Edit_Mode;
    typedef struct _Elm_Genlist_Item_Class Elm_Genlist_Item_Class;
    typedef struct _Elm_Genlist_Item       Elm_Genlist_Item;
    typedef struct _Elm_Genlist_GroupItem       Elm_Genlist_GroupItem;
@@ -1539,10 +1540,10 @@ extern "C" {
 
    typedef enum _Elm_Panel_Orient
      {
-        ELM_PANEL_ORIENT_TOP,
-          ELM_PANEL_ORIENT_BOTTOM,
-          ELM_PANEL_ORIENT_LEFT,
-          ELM_PANEL_ORIENT_RIGHT,
+	ELM_PANEL_ORIENT_TOP,
+	ELM_PANEL_ORIENT_BOTTOM,
+	ELM_PANEL_ORIENT_LEFT,
+	ELM_PANEL_ORIENT_RIGHT,
      } Elm_Panel_Orient;
    EAPI Evas_Object          *elm_panel_add(Evas_Object *parent);
    EAPI void                  elm_panel_orient_set(Evas_Object *obj, Elm_Panel_Orient orient);
@@ -1554,12 +1555,12 @@ extern "C" {
 
    typedef enum _Elm_Flip_Mode
      {
-        ELM_FLIP_ROTATE_Y_CENTER_AXIS,
-          ELM_FLIP_ROTATE_X_CENTER_AXIS,
-          ELM_FLIP_ROTATE_XZ_CENTER_AXIS,
-          ELM_FLIP_ROTATE_YZ_CENTER_AXIS
+	ELM_FLIP_ROTATE_Y_CENTER_AXIS,
+	ELM_FLIP_ROTATE_X_CENTER_AXIS,
+	ELM_FLIP_ROTATE_XZ_CENTER_AXIS,
+	ELM_FLIP_ROTATE_YZ_CENTER_AXIS
      } Elm_Flip_Mode;
-   
+
    EAPI Evas_Object *elm_flip_add(Evas_Object *parent);
    EAPI void         elm_flip_content_front_set(Evas_Object *obj, Evas_Object *content);
    EAPI void         elm_flip_content_back_set(Evas_Object *obj, Evas_Object *content);
@@ -1820,7 +1821,7 @@ extern "C" {
 	ELM_POPUP_ORIENT_BOTTOM_RIGHT
      } Elm_Popup_Orient;
 
-	 /* smart callbacks called:
+   /* smart callbacks called:
     * "response" - when ever popup is closed, this signal is sent with appropriate response id.".
     */
 
@@ -1873,7 +1874,7 @@ extern "C" {
    EAPI void         elm_quickcontactbadge_horizontal_set( Evas_Object* obj, Eina_Bool horizontal );
    EAPI Evas_Object *elm_quickcontactbadge_item_icon_get( Elm_Quickcontactbadge_Item* item ); 
 
-/* Tab */
+   /* Tab */
    typedef enum _Elm_Tab_Move_Type
      {
 	ELM_TAB_MOVE_LEFT = 0,
@@ -1916,7 +1917,13 @@ extern "C" {
    /* animator */
    typedef struct _Animator Elm_Animator;
 
-   typedef enum {ELM_ANIMATOR_CURVE_LINEAR, ELM_ANIMATOR_CURVE_IN_OUT, ELM_ANIMATOR_CURVE_IN, ELM_ANIMATOR_CURVE_OUT} Elm_Animator_Curve_Style; 
+   typedef enum 
+     {
+	ELM_ANIMATOR_CURVE_LINEAR, 
+	ELM_ANIMATOR_CURVE_IN_OUT, 
+	ELM_ANIMATOR_CURVE_IN, 
+	ELM_ANIMATOR_CURVE_OUT
+     } Elm_Animator_Curve_Style; 
 
    EAPI Elm_Animator* elm_animator_add(Evas_Object *parent);
    EAPI void          elm_animator_del(Elm_Animator *animator);
@@ -1932,7 +1939,7 @@ extern "C" {
    EAPI Eina_Bool     elm_animator_operating_get(Elm_Animator *animator);
    EAPI unsigned int  elm_animator_repeat_get(Elm_Animator *animator);
 
-  /*tansit*/
+  /* tansit */
    typedef struct _transit Elm_Transit;
    typedef struct _effect Elm_Effect;
 
@@ -1977,8 +1984,18 @@ extern "C" {
    EAPI Elm_Effect  *elm_fx_color_add(Evas_Object* obj, unsigned int from_r, unsigned int from_g, unsigned int from_b, unsigned int from_a, unsigned int to_r, unsigned int to_g, unsigned int to_b, unsigned int to_a);
 
    /*Wipe Fx*/
-   typedef enum {ELM_FX_WIPE_DIR_LEFT, ELM_FX_WIPE_DIR_RIGHT, ELM_FX_WIPE_DIR_UP, ELM_FX_WIPE_DIR_DOWN} Elm_Fx_Wipe_Dir;
-   typedef enum {ELM_FX_WIPE_TYPE_HIDE, ELM_FX_WIPE_TYPE_SHOW} Elm_Fx_Wipe_Type;
+   typedef enum 
+     {
+	ELM_FX_WIPE_DIR_LEFT, 
+	ELM_FX_WIPE_DIR_RIGHT, 
+	ELM_FX_WIPE_DIR_UP, 
+	ELM_FX_WIPE_DIR_DOWN
+     } Elm_Fx_Wipe_Dir;
+   typedef enum 
+     {
+	ELM_FX_WIPE_TYPE_HIDE, 
+	ELM_FX_WIPE_TYPE_SHOW
+     } Elm_Fx_Wipe_Type;
    EAPI Elm_Effect  *elm_fx_wipe_add(Evas_Object* obj, Elm_Fx_Wipe_Type type, Elm_Fx_Wipe_Dir dir);
 
    /*ResizableFlip Fx*/
@@ -2004,14 +2021,15 @@ extern "C" {
    /* ImageAnimation Fx */
    EAPI Elm_Effect  *elm_fx_imageanimation_add(Evas_Object* icon, const char** images, unsigned int item_num);
 
-  /* NavigationBar */
-   typedef enum {
+   /* NavigationBar */
+   typedef enum 
+     {
 	ELM_NAVIGATIONBAR_FUNCTION_BUTTON1,
 	ELM_NAVIGATIONBAR_FUNCTION_BUTTON2,
 	ELM_NAVIGATIONBAR_FUNCTION_BUTTON3,
 	ELM_NAVIGATIONBAR_BACK_BUTTON
-   } Elm_Navi_Button_Type;
-   
+     } Elm_Navi_Button_Type;
+
    EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);
    EAPI void         elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1, Evas_Object *fn_btn2, Evas_Object *fn_btn3, Evas_Object *content);
    EAPI void         elm_navigationbar_pop(Evas_Object *obj);
@@ -2044,11 +2062,11 @@ extern "C" {
    EAPI void         elm_tabbar_edit_start(Evas_Object *obj);
    EAPI void         elm_tabbar_item_visible_set(Elm_Tab_Item *it, Eina_Bool bar);
 
-  /* smart callbacks called:
-   * "clicked" - when item clicked
+   /* smart callbacks called:
+    * "clicked" - when item clicked
     */
 
-     /* Control Bar */
+   /* Control Bar */
    #define CONTROLBAR_SYSTEM_ICON_ALBUMS "controlbar_albums" 
    #define CONTROLBAR_SYSTEM_ICON_ARTISTS "controlbar_artists" 
    #define CONTROLBAR_SYSTEM_ICON_SONGS "controlbar_songs" 
@@ -2113,11 +2131,12 @@ extern "C" {
    EAPI void         elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag);
 
    /* actionsheet */
-   typedef enum _Elm_Actionsheet_Button_Type {
-      ELM_ACTIONSHEET_BT_NORMAL = 0,
-      ELM_ACTIONSHEET_BT_CANCEL,
-      ELM_ACTIONSHEET_BT_DESTRUCTIVE
-   } Elm_Actionsheet_Button_Type;
+   typedef enum _Elm_Actionsheet_Button_Type 
+     {
+	ELM_ACTIONSHEET_BT_NORMAL = 0,
+	ELM_ACTIONSHEET_BT_CANCEL,
+	ELM_ACTIONSHEET_BT_DESTRUCTIVE
+     } Elm_Actionsheet_Button_Type;
 
    EAPI Evas_Object *elm_actionsheet_add(Evas_Object *parent);
    EAPI void         elm_actionsheet_title_set(Evas_Object *obj, const char *title);
@@ -2137,16 +2156,16 @@ extern "C" {
    EAPI void         elm_toolbar2_homogenous_set(Evas_Object *obj, Eina_Bool homogenous);
    EAPI void         elm_toolbar2_align_set(Evas_Object *obj, double align);
 
-  /* colorpicker */
+   /* colorpicker */
    EAPI Evas_Object *elm_colorpicker_add(Evas_Object *parent);
    EAPI void         elm_colorpicker_color_set(Evas_Object *obj, int r, int g , int b);
    EAPI void         elm_colorpicker_color_get(Evas_Object *obj, int *r, int *g , int *b);
-    /* smart callbacks called:
+   /* smart callbacks called:
     * "clicked" - when bar or button is clicked
     */
 
 
- /* colorpalette */
+   /* colorpalette */
     typedef struct _Colorpalette_Color Elm_Colorpalette_Color; 
 
     struct _Colorpalette_Color 
@@ -2158,8 +2177,8 @@ extern "C" {
     EAPI void         elm_colorpalette_color_set(Evas_Object *obj, int color_num, Elm_Colorpalette_Color *color);
     EAPI void         elm_colorpalette_row_column_set(Evas_Object *obj, int row, int col);
     /* smart callbacks called:
-    * "clicked" - when image clicked
-    */
+     * "clicked" - when image clicked
+     */
 
    /* editfield */
    EAPI Evas_Object *elm_editfield_add(Evas_Object *parent);
@@ -2176,11 +2195,12 @@ extern "C" {
    EAPI void         elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
    EAPI void         elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible);
 
- /* softkey */
-   typedef enum {
-		ELM_SK_LEFT_BTN,
-		ELM_SK_RIGHT_BTN,
-   } Elm_Softkey_Type;
+   /* softkey */
+   typedef enum 
+     {
+	ELM_SK_LEFT_BTN,
+	ELM_SK_RIGHT_BTN,
+     } Elm_Softkey_Type;
 
    /* softkey */
    typedef struct _Elm_Softkey_Item Elm_Softkey_Item;
@@ -2206,7 +2226,7 @@ extern "C" {
     * "clicked" - the user clicked the button, event_info: Softkey item
     * "press"   - the user press the button, event_info: Softkey item
     * "panel,show" - when the panel is shown
-	* "panel,hide" - when the panel is hidden
+    * "panel,hide" - when the panel is hidden
     */
        
    /* gridbox */
@@ -2250,7 +2270,7 @@ extern "C" {
     * "indicator,position" - when a button reaches to the special position like "left", "right" and "center".
     */
    
-   /*zoomcontrols*/
+   /* zoomcontrols */
    EAPI Evas_Object *elm_zoomcontrols_add(Evas_Object *parent);
    EAPI void elm_zoomcontrols_range_set(Evas_Object *obj, int range);
    /* smart callbacks called:
@@ -2295,7 +2315,7 @@ extern "C" {
    EAPI int          elm_viewflipper_startAutoFlipping(); 
    EAPI int          elm_viewflipper_stopAutoFlipping();
 	   
-   /*gallery*/
+   /* gallery */
    struct _Elm_Gallery_Item 
      {
 	Evas_Object *parent;
@@ -2325,7 +2345,7 @@ extern "C" {
    EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
    EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
 
-   /*wipercontrol*/
+   /* wipercontrol*/
    EAPI Evas_Object *elm_wipercontrol_add(Evas_Object *parent);
    EAPI void         elm_wipercontrol_below_content_set (Evas_Object *obj, Evas_Object *content);
    EAPI void         elm_wipercontrol_above_content_set (Evas_Object *obj, Evas_Object *content);
@@ -2344,7 +2364,7 @@ extern "C" {
     * default
     */
  
-   /*chronometer*/
+   /* chronometer */
    EAPI Evas_Object *elm_chronometer_add(Evas_Object *parent);
    EAPI void         elm_chronometer_start(Evas_Object *obj);
    EAPI void         elm_chronometer_stop(Evas_Object *obj);
@@ -2354,14 +2374,13 @@ extern "C" {
    EAPI void         elm_chronometer_format_get(Evas_Object *obj, Eina_Bool *format);
 
    /* dialoguegroup */
-   
    typedef struct _Dialogue_Item Dialogue_Item;
    
    typedef enum _Elm_Dialoguegourp_Item_Style
-    {
-      ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT = 0,
-      ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0)
-    }Elm_Dialoguegroup_Item_Style;
+     {
+	ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT = 0,
+	ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0)
+     } Elm_Dialoguegroup_Item_Style;
 
    EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent);
    EAPI Dialogue_Item *elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);   
@@ -2434,8 +2453,17 @@ extern "C" {
    EAPI Eina_Bool           elm_cabinet_item_sub_info_disabled_get(Elm_Cabinet_Item *item);
    EAPI void                elm_cabinet_item_sub_info_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled);
 
-	/*Dayselector*/
-   typedef enum { ELM_DAYSELECTOR_SUN, ELM_DAYSELECTOR_MON, ELM_DAYSELECTOR_TUE, ELM_DAYSELECTOR_WED, ELM_DAYSELECTOR_THU, ELM_DAYSELECTOR_FRI, ELM_DAYSELECTOR_SAT } Elm_DaySelector_Day;
+   /*Dayselector*/
+   typedef enum 
+     { 
+	ELM_DAYSELECTOR_SUN, 
+	ELM_DAYSELECTOR_MON, 
+	ELM_DAYSELECTOR_TUE, 
+	ELM_DAYSELECTOR_WED, 
+	ELM_DAYSELECTOR_THU, 
+	ELM_DAYSELECTOR_FRI, 
+	ELM_DAYSELECTOR_SAT 
+     } Elm_DaySelector_Day;
 
    EAPI Evas_Object *elm_dayselector_add(Evas_Object *parent);
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);

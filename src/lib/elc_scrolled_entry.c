@@ -983,7 +983,7 @@ elm_scrolled_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool 
  */
 EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->entry) return NULL;
   
