@@ -1,3 +1,24 @@
+elementary (0.4.0+svn.49550slp2+3build24) unstable; urgency=low
+
+  * [els_touch] commit initial els_touch file which will be used by elm_webview
+  * [popup]: standardization for contribution
+  * [elm_slider] hold scroller during draging
+  * [elm_main] Temporary set ELM_MODULES.
+  * [actionslider] fix formatting
+  * [elm_ctxpopup.c] fixed computation size problem.
+  * [controlbar, searchbar, slider] fix formatting
+  * [editfield] fix formatting
+  * [scrolled_entry] remove warning
+  * [ScrollBar (Handler)] Modified to smooth handler movement.
+  * [elm_dialoguegroup] modified for editfield design, fixing bugs
+  * [entry copypaste]- not scrolling issue after copy paste resolved.
+  * [entry] remove unused variable
+  * [Elementary.h.in] fix formatting
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build24
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Thu, 22 Jul 2010 21:10:18 +0900
+
 elementary (0.4.0+svn.49550slp2+3build23) unstable; urgency=low
 
   * elm_dialoguegroup API change
