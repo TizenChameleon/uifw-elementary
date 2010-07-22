@@ -313,6 +313,7 @@ _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUS
 	ecore_timer_del(wd->mv_timer);
 	wd->mv_timer = NULL;
      }
+   elm_widget_scroll_hold_push(data);
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_START, NULL);
    _units_set(data);
@@ -322,6 +323,7 @@ _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUS
 static void
 _drag_stop(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+   elm_widget_scroll_hold_pop(data);
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_STOP, NULL);
    _units_set(data);
