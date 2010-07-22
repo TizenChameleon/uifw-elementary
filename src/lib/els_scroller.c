@@ -1180,6 +1180,15 @@ _smart_edje_drag_v_stop(void *data, Evas_Object *obj __UNUSED__, const char *emi
    sd = data;
    _smart_scrollbar_read(sd);
    _smart_drag_stop(sd->smart_obj);
+   if (sd->down.momentum_animator)
+   	  {
+		 ecore_animator_del(sd->down.momentum_animator);
+		 sd->down.momentum_animator = NULL;
+		 sd->down.bounce_x_hold = 0;
+		 sd->down.bounce_y_hold = 0;
+		 sd->down.ax = 0;
+		 sd->down.ay = 0;
+   	  }
 }
 
 static void
