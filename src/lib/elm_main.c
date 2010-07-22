@@ -289,7 +289,7 @@ _elm_rescale(void)
    _elm_win_rescale();
 }
 
-void                                                                             
+static void                                                                             
 _set_elm_module()                                                                
 {                                                                                
    char *buf = NULL;
