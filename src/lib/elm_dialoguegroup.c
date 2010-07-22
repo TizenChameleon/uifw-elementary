@@ -253,13 +253,12 @@ elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegrou
 {
    	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *item, *new_item;	
+	Dialogue_Item *item = NULL, *new_item = NULL;	
 	
 	if (!wd || !subobj) return NULL;
 	
 	if (!wd->items) 
-		new_item = _create_item(obj, subobj, style, "default");	
-
+		new_item = _create_item(obj, subobj, style, "default");
 	else {
 	       	if (wd->num == 1) {	
 			item = eina_list_data_get(wd->items);
@@ -294,13 +293,12 @@ elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegro
 {
    	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *item, *new_item;
+	Dialogue_Item *item = NULL, *new_item = NULL;
 	
 	if (!wd || !subobj) return NULL;
 	
-	if (!wd->items) 
+	if (!wd->items)
 		new_item = _create_item(obj, subobj, style, "default");	
-
 	else {
 	       	if (wd->num == 1) {	
 			item = eina_list_data_get(wd->items);
@@ -314,13 +312,13 @@ elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegro
 		_set_line_show(new_item, item);
 	}
 	if(wd->title_layout)
-		elm_box_pack_after(wd->box, item->bg_layout, wd->title_layout);	
+		elm_box_pack_after(wd->box, new_item->bg_layout, wd->title_layout);	
 	else			
-		elm_box_pack_start(wd->box, item->bg_layout);		
-	wd->items = eina_list_prepend(wd->items, item);		
+		elm_box_pack_start(wd->box, new_item->bg_layout);		
+	wd->items = eina_list_prepend(wd->items, new_item);		
 	wd->num++;
 	_sizing_eval(obj);
-	return item;
+	return new_item;
 }
 
 /**
@@ -338,27 +336,27 @@ elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_I
 {
    	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *after_item, *item = NULL;
+	Dialogue_Item *after_item = NULL, *item = NULL;
 	Eina_List *l;
 
 	if (!wd || !subobj || !after || !wd->items) return NULL;
 
 	EINA_LIST_FOREACH(wd->items, l, after_item) {
 		if(after == after_item) {
-			if( !strcmp(item->location, "default") ) {
+			if( !strcmp(after_item->location, "default") ) {
 				_change_item_bg(after_item, "top");
 				item = _create_item(obj, subobj, style, "bottom");
 			}			
-			else if( !strcmp(item->location, "top") || !strcmp(item->location, "middle") )	
+			else if( !strcmp(after_item->location, "top") || !strcmp(after_item->location, "middle") )	
 				item = _create_item(obj, subobj, style, "middle");		
-			else if( !strcmp(item->location, "bottom") ) {
+			else if( !strcmp(after_item->location, "bottom") ) {
 				_change_item_bg(after_item, "middle");
 				item = _create_item(obj, subobj, style, "bottom");		
 			}
 
 			elm_box_pack_after(wd->box, item->bg_layout, after_item->bg_layout);
 			wd->items = eina_list_append_relative(wd->items, item, after_item);
-			_set_line_show(item, after);
+			_set_line_show(after, item);
 		}		
 	}
 		
@@ -382,29 +380,31 @@ elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_
 {
    	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *before_item, *item = NULL;
+	Dialogue_Item *before_item = NULL, *item = NULL;
 	Eina_List *l;
+	Eina_List *prev;
 	
 	if (!wd || !subobj || !before || !wd->items) return NULL;
 
 	EINA_LIST_FOREACH(wd->items, l, before_item) {
 		if(before == before_item) {
-			if( !strcmp(item->location, "default") ) {
+			if( !strcmp(before_item->location, "default") ) {
 				_change_item_bg(before_item, "bottom");
 				item = _create_item(obj, subobj, style, "top");
 			}
 				
-			else if( !strcmp(item->location, "top") ) {
+			else if( !strcmp(before_item->location, "top") ) {
 				_change_item_bg(before_item, "middle");
 				item = _create_item(obj, subobj, style, "top");			
 			}
 
-			else if( !strcmp(item->location, "middle") || !strcmp(item->location, "bottom") )
+			else if( !strcmp(before_item->location, "middle") || !strcmp(before_item->location, "bottom") ) {
 				item = _create_item(obj, subobj, style, "middle");
-
+				prev = eina_list_prev(l);
+				_set_line_show(prev->data, item);
+			}
 			elm_box_pack_before(wd->box, item->bg_layout, before_item->bg_layout);
 			wd->items = eina_list_prepend_relative(wd->items, item, before_item);
-			_set_line_show(before, item);
 		}		
 	}
 		
