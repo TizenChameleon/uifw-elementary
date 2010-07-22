@@ -2480,6 +2480,14 @@ extern "C" {
    
    /* WebView */
    EAPI Evas_Object *elm_webview_add(Evas_Object *parent);
+   EAPI Evas_Object *elm_webview_widget_get(Evas_Object *obj);
+   EAPI void         elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed);
+   EAPI void         elm_webview_events_feed_get(Evas_Object *obj);
+   EAPI void         elm_webview_auto_fitting_set(Eina_Bool enable);
+   EAPI Eina_Bool    elm_webview_auto_fitting_get();
+   EAPI Evas_Object *elm_webview_minimap_get(Evas_Object *obj);
+   EAPI void         elm_webview_uri_set(Evas_Object *obj, const char *uri);
+
 
 #ifdef __cplusplus
 }

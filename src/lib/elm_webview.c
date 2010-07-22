@@ -105,3 +105,43 @@ elm_webview_add(Evas_Object *parent)
    return NULL;
 #endif
 }
+
+EAPI Evas_Object *
+elm_webview_widget_get(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   return wd->webkit;
+}
+
+EAPI void
+elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed)
+{
+}
+
+EAPI void
+elm_webview_events_feed_get(Evas_Object *obj)
+{
+}
+
+EAPI void
+elm_webview_auto_fitting_set(Eina_Bool enable)
+{
+}
+
+EAPI Eina_Bool
+elm_webview_auto_fitting_get()
+{
+   return EINA_FALSE;
+}
+
+EAPI Evas_Object *
+elm_webview_minimap_get(Evas_Object *obj)
+{
+   return NULL;
+}
+
+EAPI void
+elm_webview_uri_set(Evas_Object *obj, const char *uri)
+{
+}
