@@ -18,6 +18,7 @@
 #include "els_box.h"
 #include "els_icon.h"
 #include "els_hor_scroller.h"
+#include "els_webview.h"
 
 // FIXME: totally disorganised. clean this up!
 // 
