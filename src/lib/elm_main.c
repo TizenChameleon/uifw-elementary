@@ -289,6 +289,16 @@ _elm_rescale(void)
    _elm_win_rescale();
 }
 
+void                                                                             
+_set_elm_module()                                                                
+{                                                                                
+   char *buf = NULL;
+
+   buf = getenv("ELM_THEME");
+   if (buf != NULL && ((!strcmp(buf, "beat") || !strcmp(buf, "kessler"))))
+      setenv("ELM_MODULES","ctxpopup_copypasteUI>entry/api",1);
+}
+
 /**
  * @defgroup General General
  */
@@ -305,6 +315,7 @@ elm_init(int argc, char **argv)
 {
    _elm_init_count++;
    if (_elm_init_count != 1) return;
+   _set_elm_module();
    elm_quicklaunch_init(argc, argv);
    elm_quicklaunch_sub_init(argc, argv);
 }
@@ -348,7 +359,7 @@ _elm_unneed_e_dbus(void)
    if (_elm_need_e_dbus)
      {
         _elm_need_e_dbus = 0;
-	e_hal_shutdown();
+   e_hal_shutdown();
         e_dbus_shutdown();
      }
 #endif   
@@ -406,8 +417,8 @@ elm_quicklaunch_init(int argc, char **argv)
    _elm_log_dom = eina_log_domain_register("elementary", EINA_COLOR_LIGHTBLUE);
    if (!_elm_log_dom)
      {
-	EINA_LOG_ERR("could not register elementary log domain.");
-	_elm_log_dom = EINA_LOG_DOMAIN_GLOBAL;
+   EINA_LOG_ERR("could not register elementary log domain.");
+   _elm_log_dom = EINA_LOG_DOMAIN_GLOBAL;
      }
 
    eet_init();
@@ -431,44 +442,44 @@ elm_quicklaunch_init(int argc, char **argv)
 
    if (!_elm_data_dir)
      {
-	s = getenv("ELM_DATA_DIR");
-	_elm_data_dir = eina_stringshare_add(s);
+   s = getenv("ELM_DATA_DIR");
+   _elm_data_dir = eina_stringshare_add(s);
      }
    if (!_elm_data_dir)
      {
-	s = getenv("ELM_PREFIX");
-	if (s)
-	  {
-	     snprintf(buf, sizeof(buf), "%s/share/elementary", s);
-	     _elm_data_dir = eina_stringshare_add(buf);
-	  }
+   s = getenv("ELM_PREFIX");
+   if (s)
+     {
+        snprintf(buf, sizeof(buf), "%s/share/elementary", s);
+        _elm_data_dir = eina_stringshare_add(buf);
+     }
      }
    if (!_elm_lib_dir)
      {
-	s = getenv("ELM_LIB_DIR");
-	_elm_lib_dir = eina_stringshare_add(s);
+   s = getenv("ELM_LIB_DIR");
+   _elm_lib_dir = eina_stringshare_add(s);
      }
    if (!_elm_lib_dir)
      {
-	s = getenv("ELM_PREFIX");
-	if (s)
-	  {
-	     snprintf(buf, sizeof(buf), "%s/lib", s);
-	     _elm_lib_dir = eina_stringshare_add(buf);
-	  }
+   s = getenv("ELM_PREFIX");
+   if (s)
+     {
+        snprintf(buf, sizeof(buf), "%s/lib", s);
+        _elm_lib_dir = eina_stringshare_add(buf);
+     }
      }
 #ifdef HAVE_DLADDR
    if ((!_elm_data_dir) || (!_elm_lib_dir))
      {
-	Dl_info elementary_dl;
-	// libelementary.so/../../share/elementary/
-	if (dladdr(elm_init, &elementary_dl))
-	  {
-	     char *dir, *dir2;
+   Dl_info elementary_dl;
+   // libelementary.so/../../share/elementary/
+   if (dladdr(elm_init, &elementary_dl))
+     {
+        char *dir, *dir2;
 
-	     dir = ecore_file_dir_get(elementary_dl.dli_fname);
-	     if (dir)
-	       {
+        dir = ecore_file_dir_get(elementary_dl.dli_fname);
+        if (dir)
+          {
                   if (!_elm_lib_dir)
                     {
                        if (ecore_file_is_dir(dir))
@@ -485,9 +496,9 @@ elm_quicklaunch_init(int argc, char **argv)
                             free(dir2);
                          }
                     }
-		  free(dir);
-	       }
-	  }
+        free(dir);
+          }
+     }
      }
 #endif
    if (!_elm_data_dir)
@@ -524,9 +535,9 @@ elm_quicklaunch_sub_shutdown(void)
        (_elm_config->engine == ELM_SOFTWARE_16_WINCE))
      {
 #ifdef HAVE_ELEMENTARY_X
-	ecore_x_disconnect();
+   ecore_x_disconnect();
 #endif
-	evas_cserve_disconnect();
+   evas_cserve_disconnect();
      }
 }
 
@@ -561,8 +572,8 @@ elm_quicklaunch_shutdown(void)
 
    if ((_elm_log_dom > -1) && (_elm_log_dom != EINA_LOG_DOMAIN_GLOBAL))
      {
-	eina_log_domain_unregister(_elm_log_dom);
-	_elm_log_dom = -1;
+   eina_log_domain_unregister(_elm_log_dom);
+   _elm_log_dom = -1;
      }
 
    eina_shutdown();
@@ -589,7 +600,7 @@ elm_quicklaunch_seed(void)
        (_elm_config->engine == ELM_OPENGL_X11))
      {
 #ifdef HAVE_ELEMENTARY_X
-	ecore_x_sync();
+   ecore_x_sync();
 #endif
       }
    ecore_main_loop_iterate();
@@ -605,40 +616,40 @@ elm_quicklaunch_prepare(int argc __UNUSED__, char **argv)
    char *exe = elm_quicklaunch_exe_path_get(argv[0]);
    if (!exe)
      {
-	ERR("requested quicklaunch binary '%s' does not exist\n", argv[0]);
-	return EINA_FALSE;
+   ERR("requested quicklaunch binary '%s' does not exist\n", argv[0]);
+   return EINA_FALSE;
      }
    else
      {
-	char *exe2, *p;
-	char *exename;
+   char *exe2, *p;
+   char *exename;
 
-	exe2 = malloc(strlen(exe) + 1 + 10);
-	strcpy(exe2, exe);
-	p = strrchr(exe2, '/');
-	if (p) p++;
-	else p = exe2;
-	exename = alloca(strlen(p) + 1);
-	strcpy(exename, p);
-	*p = 0;
-	strcat(p, "../lib/");
-	strcat(p, exename);
-	strcat(p, ".so");
-	if (access(exe2, R_OK | X_OK) == 0)
-	  {
-	     free(exe);
-	     exe = exe2;
-	  }
-	else
-	  free(exe2);
+   exe2 = malloc(strlen(exe) + 1 + 10);
+   strcpy(exe2, exe);
+   p = strrchr(exe2, '/');
+   if (p) p++;
+   else p = exe2;
+   exename = alloca(strlen(p) + 1);
+   strcpy(exename, p);
+   *p = 0;
+   strcat(p, "../lib/");
+   strcat(p, exename);
+   strcat(p, ".so");
+   if (access(exe2, R_OK | X_OK) == 0)
+     {
+        free(exe);
+        exe = exe2;
+     }
+   else
+     free(exe2);
      }
    qr_handle = dlopen(exe, RTLD_NOW | RTLD_GLOBAL);
    if (!qr_handle)
      {
         fprintf(stderr, "dlerr: %s\n", dlerror());
-	WRN("dlopen('%s') failed: %s", exe, dlerror());
-	free(exe);
-	return EINA_FALSE;
+   WRN("dlopen('%s') failed: %s", exe, dlerror());
+   free(exe);
+   return EINA_FALSE;
      }
    INF("dlopen('%s') = %p", exe, qr_handle);
    free(exe);
@@ -646,10 +657,10 @@ elm_quicklaunch_prepare(int argc __UNUSED__, char **argv)
    INF("dlsym(%p, 'elm_main') = %p", qr_handle, qr_main);
    if (!qr_main)
      {
-	WRN("not quicklauncher capable: no elm_main in '%s'", exe);
-	dlclose(qr_handle);
-	qr_handle = NULL;
-	return EINA_FALSE;
+   WRN("not quicklauncher capable: no elm_main in '%s'", exe);
+   dlclose(qr_handle);
+   qr_handle = NULL;
+   return EINA_FALSE;
      }
    return EINA_TRUE;
 #else
@@ -694,33 +705,33 @@ elm_quicklaunch_fork(int argc, char **argv, char *cwd, void (postfork_func) (voi
    // need to accept current environment from elementary_run
    if (!qr_main)
      {
-	int i;
-	char **args;
+   int i;
+   char **args;
 
-	child = fork();
-	if (child > 0) return EINA_TRUE;
-	else if (child < 0)
-	  {
-	     perror("could not fork");
-	     return EINA_FALSE;
-	  }
-	setsid();
-	if (chdir(cwd) != 0)
-	  perror("could not chdir");
-	args = alloca((argc + 1) * sizeof(char *));
-	for (i = 0; i < argc; i++) args[i] = argv[i];
-	args[argc] = NULL;
-	WRN("%s not quicklaunch capable, fallback...", argv[0]);
-	execvp(argv[0], args);
-	ERR("failed to execute '%s': %s", argv[0], strerror(errno));
-	exit(-1);
+   child = fork();
+   if (child > 0) return EINA_TRUE;
+   else if (child < 0)
+     {
+        perror("could not fork");
+        return EINA_FALSE;
+     }
+   setsid();
+   if (chdir(cwd) != 0)
+     perror("could not chdir");
+   args = alloca((argc + 1) * sizeof(char *));
+   for (i = 0; i < argc; i++) args[i] = argv[i];
+   args[argc] = NULL;
+   WRN("%s not quicklaunch capable, fallback...", argv[0]);
+   execvp(argv[0], args);
+   ERR("failed to execute '%s': %s", argv[0], strerror(errno));
+   exit(-1);
      }
    child = fork();
    if (child > 0) return EINA_TRUE;
    else if (child < 0)
      {
-	perror("could not fork");
-	return EINA_FALSE;
+   perror("could not fork");
+   return EINA_FALSE;
      }
    if (postfork_func) postfork_func(postfork_data);
 
@@ -733,12 +744,12 @@ elm_quicklaunch_fork(int argc, char **argv, char *cwd, void (postfork_func) (voi
    save_env();
    if (argv)
      {
-	char *lastarg, *p;
+   char *lastarg, *p;
 
-	ecore_app_args_get(&real_argc, &real_argv);
-	lastarg = real_argv[real_argc - 1] + strlen(real_argv[real_argc - 1]);
-	for (p = real_argv[0]; p < lastarg; p++) *p = 0;
-	strcpy(real_argv[0], argv[0]);
+   ecore_app_args_get(&real_argc, &real_argv);
+   lastarg = real_argv[real_argc - 1] + strlen(real_argv[real_argc - 1]);
+   for (p = real_argv[0]; p < lastarg; p++) *p = 0;
+   strcpy(real_argv[0], argv[0]);
      }
    ecore_app_args_set(argc, (const char **)argv);
    ret = qr_main(argc, argv);
@@ -755,9 +766,9 @@ elm_quicklaunch_cleanup(void)
 #ifdef HAVE_FORK
    if (qr_handle)
      {
-	dlclose(qr_handle);
-	qr_handle = NULL;
-	qr_main = NULL;
+   dlclose(qr_handle);
+   qr_handle = NULL;
+   qr_main = NULL;
      }
 #endif
 }
@@ -787,37 +798,37 @@ elm_quicklaunch_exe_path_get(const char *exe)
    if ((exe[0] == '.') && (exe[1] == '.') && (exe[2] == '/')) return strdup(exe);
    if (!path)
      {
-	const char *p, *pp;
-	char *buf2;
-	path = getenv("PATH");
-	buf2 = alloca(strlen(path) + 1);
-	p = path;
-	pp = p;
-	for (;;)
-	  {
-	     if ((*p == ':') || (*p == 0))
-	       {
-		  int len;
+   const char *p, *pp;
+   char *buf2;
+   path = getenv("PATH");
+   buf2 = alloca(strlen(path) + 1);
+   p = path;
+   pp = p;
+   for (;;)
+     {
+        if ((*p == ':') || (*p == 0))
+          {
+        int len;
 
-		  len = p - pp;
-		  strncpy(buf2, pp, len);
-		  buf2[len] = 0;
-		  pathlist = eina_list_append(pathlist, eina_stringshare_add(buf2));
-		  if (*p == 0) break;
-		  p++;
-		  pp = p;
-	       }
-	     else
-	       {
-		  if (*p == 0) break;
-		  p++;
-	       }
-	  }
+        len = p - pp;
+        strncpy(buf2, pp, len);
+        buf2[len] = 0;
+        pathlist = eina_list_append(pathlist, eina_stringshare_add(buf2));
+        if (*p == 0) break;
+        p++;
+        pp = p;
+          }
+        else
+          {
+        if (*p == 0) break;
+        p++;
+          }
+     }
      }
    EINA_LIST_FOREACH(pathlist, l, pathitr)
      {
-	snprintf(buf, sizeof(buf), "%s/%s", pathitr, exe);
-	if (access(buf, R_OK | X_OK) == 0) return strdup(buf);
+   snprintf(buf, sizeof(buf), "%s/%s", pathitr, exe);
+   if (access(buf, R_OK | X_OK) == 0) return strdup(buf);
      }
    return NULL;
 }
