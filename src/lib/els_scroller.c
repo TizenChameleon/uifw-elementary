@@ -1170,6 +1170,7 @@ _smart_edje_drag_v_start(void *data, Evas_Object *obj __UNUSED__, const char *em
    sd = data;
    _smart_scrollbar_read(sd);
    _smart_drag_start(sd->smart_obj);
+   sd->freeze_bounce = EINA_TRUE;
 }
 
 static void
@@ -1180,15 +1181,8 @@ _smart_edje_drag_v_stop(void *data, Evas_Object *obj __UNUSED__, const char *emi
    sd = data;
    _smart_scrollbar_read(sd);
    _smart_drag_stop(sd->smart_obj);
-   if (sd->down.momentum_animator)
-   	  {
-		 ecore_animator_del(sd->down.momentum_animator);
-		 sd->down.momentum_animator = NULL;
-		 sd->down.bounce_x_hold = 0;
-		 sd->down.bounce_y_hold = 0;
-		 sd->down.ax = 0;
-		 sd->down.ay = 0;
-   	  }
+   sd->freeze_bounce = EINA_FALSE;
+
 }
 
 static void
@@ -1468,7 +1462,6 @@ _smart_event_post_up(void *data, Evas *e)
      {
         if (sd->down.dragged)
           {
-             sd->freeze_bounce = EINA_FALSE;
              elm_widget_drag_lock_x_set(sd->widget, 0);
              elm_widget_drag_lock_y_set(sd->widget, 0);
           }
@@ -1560,22 +1553,22 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj , void *event_info)
                                  sd->down.dy = ((double)dy / at);
                                  ox = -sd->down.dx;
                                  oy = -sd->down.dy;
-                                 if (!_smart_do_page(sd))
-                                   {
-                                      if (!sd->down.momentum_animator)
-                                        {
-                                           sd->down.momentum_animator = ecore_animator_add(_smart_momentum_animator, sd);
-                                           _smart_anim_start(sd->smart_obj);
-                                        }
-                                      sd->down.anim_start = ecore_loop_time_get();
-                                      elm_smart_scroller_child_pos_get(sd->smart_obj, &x, &y);
-                                      sd->down.sx = x;
-                                      sd->down.sy = y;
-                                      sd->down.b0x = 0;
-                                      sd->down.b0y = 0;
-                                   }
-                              }
-                         }
+			            if (!_smart_do_page(sd) && sd->freeze_bounce == EINA_FALSE)
+			              {
+				         if (!sd->down.momentum_animator)
+				           {
+					      sd->down.momentum_animator = ecore_animator_add(_smart_momentum_animator, sd);
+					      _smart_anim_start(sd->smart_obj);
+					   }
+					 sd->down.anim_start = ecore_loop_time_get();
+					 elm_smart_scroller_child_pos_get(sd->smart_obj, &x, &y);
+					 sd->down.sx = x;
+					 sd->down.sy = y;
+					 sd->down.b0x = 0;
+					 sd->down.b0y = 0;
+				      }
+                           }
+			 }
                        if (sd->down.hold_animator)
                          {
                             ecore_animator_del(sd->down.hold_animator);
@@ -2077,7 +2070,6 @@ _smart_scrollbar_read(Smart_Data *sd)
    sd->pan_func.get(sd->pan_obj, &px, &py);
 
    sd->pan_func.set(sd->pan_obj, x, y);
-   sd->freeze_bounce = EINA_TRUE;
 
    if ((px != x) || (py != y))
      edje_object_signal_emit(sd->edje_obj, "elm,action,scroll", "elm");
