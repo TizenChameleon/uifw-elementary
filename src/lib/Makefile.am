@@ -17,7 +17,8 @@ AM_CPPFLAGS = \
 @ELEMENTARY_WINCE_CFLAGS@ \
 @ELEMENTARY_EDBUS_CFLAGS@ \
 @ELEMENTARY_EFREET_CFLAGS@ \
-@ELEMENTARY_ETHUMB_CFLAGS@
+@ELEMENTARY_ETHUMB_CFLAGS@ \
+@ELEMENTARY_EWEBKIT_CFLAGS@
 
 if ELEMENTARY_WINDOWS_BUILD
 AM_CPPFLAGS += -DELEMENTARY_BUILD
@@ -122,6 +123,7 @@ elm_coverflow.c \
 elm_cabinet.c \
 elm_dayselector.c \
 elm_cnp_helper.c \
+elm_webview.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
@@ -142,7 +144,8 @@ els_box.h \
 els_icon.c \
 els_icon.h \
 els_touch.c \
-els_touch.h
+els_touch.h \
+els_webview.c
 
 
 libelementary_la_CFLAGS =

@@ -18,6 +18,7 @@
 @ELM_EDBUS_DEF@ ELM_EDBUS
 @ELM_EFREET_DEF@ ELM_EFREET
 @ELM_ETHUMB_DEF@ ELM_ETHUMB
+@ELM_EWEBKIT_DEF@ ELM_EWEBKIT
 @ELM_ALLOCA_H_DEF@ ELM_ALLOCA_H
 @ELM_LIBINTL_H_DEF@ ELM_LIBINTL_H
 
@@ -2477,6 +2478,9 @@ extern "C" {
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
    EAPI void         elm_dayselector_title_set(Evas_Object *parent, const char *title);
    
+   /* WebView */
+   EAPI Evas_Object *elm_webview_add(Evas_Object *parent);
+
 #ifdef __cplusplus
 }
 #endif
