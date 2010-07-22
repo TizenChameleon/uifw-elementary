@@ -70,6 +70,7 @@ elm_spinner.c \
 elm_index.c \
 elm_photocam.c \
 elm_notify.c \
+elm_selectioninfo.c \
 elm_slideshow.c \
 elm_menu.c \
 elm_panel.c \
