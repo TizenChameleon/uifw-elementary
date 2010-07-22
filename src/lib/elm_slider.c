@@ -1,3 +1,6 @@
+/*
+ * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ */
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -44,25 +47,25 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
 {
-	Evas_Object *slider;
-	Evas_Object *icon;	
-	Evas_Object *spacer;
-	const char *label;
-	const char *e_label;
-	const char *units;
-	const char *indicator;
-	const char *(*indicator_format_func)(double val);
-	Eina_Bool horizontal : 1;
-	Eina_Bool inverted : 1;
-	double val, val_min, val_max;
-	Ecore_Timer *delay;
-	Evas_Coord size;
-	/* for supporting aqua feature */
-	Ecore_Timer *mv_timer;
-	Evas_Object *e_icon;
-	double src_val;
-	double des_val;
-	double mv_step;
+   Evas_Object *slider;
+   Evas_Object *icon;	
+   Evas_Object *spacer;
+   const char *label;
+   const char *e_label;
+   const char *units;
+   const char *indicator;
+   const char *(*indicator_format_func)(double val);
+   Eina_Bool horizontal : 1;
+   Eina_Bool inverted : 1;
+   double val, val_min, val_max;
+   Ecore_Timer *delay;
+   Evas_Coord size;
+   /* for supporting aqua feature */
+   Ecore_Timer *mv_timer;
+   Evas_Object *e_icon;
+   double src_val;
+   double des_val;
+   double mv_step;
 };
 
 #define SLIDER_THUMB_MOVE_STEP 100
@@ -181,22 +184,22 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    Evas_Object *sub = event_info;
    if (!wd) return;
    if (sub == wd->icon)
-    {
+     {
 	edje_object_signal_emit(wd->slider, "elm,state,icon,hidden", "elm");
 	evas_object_event_callback_del_full
-	  (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+	   (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
 	wd->icon = NULL;
 	_sizing_eval(obj);
      }
-    /*supporting aqua feature*/
-    if (sub == wd->e_icon)
-    {
-        edje_object_signal_emit(wd->slider, "elm,state,eicon,hidden", "elm");
-        evas_object_event_callback_del_full
- 	 (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	 wd->e_icon = NULL;
+   /*supporting aqua feature*/
+   if (sub == wd->e_icon)
+     {
+	edje_object_signal_emit(wd->slider, "elm,state,eicon,hidden", "elm");
+	evas_object_event_callback_del_full
+	   (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+	wd->e_icon = NULL;
 	_sizing_eval(obj);
-    }
+     }
 }
 
 static int
@@ -290,24 +293,26 @@ _drag(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, 
 {
     Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
     /* supporting aqua feature : delete thumb move timer when drag event occured to the moving thumb */
-    if(wd->mv_timer){
-        ecore_timer_del(wd->mv_timer);
-	  wd->mv_timer = NULL;
-    }
-   _val_fetch(data);
-   _units_set(data);
-   _indicator_set(data);
+    if(wd->mv_timer)
+      {
+	 ecore_timer_del(wd->mv_timer);
+	 wd->mv_timer = NULL;
+      }
+    _val_fetch(data);
+    _units_set(data);
+    _indicator_set(data);
 }
 
 static void
 _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-	Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
-	/* supporting aqua feature : delete thumb move timer when drag event occured to the moving thumb */
-	if(wd->mv_timer){
-		ecore_timer_del(wd->mv_timer);
-		wd->mv_timer = NULL;
-	}
+   Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
+   /* supporting aqua feature : delete thumb move timer when drag event occured to the moving thumb */
+   if(wd->mv_timer)
+     {
+	ecore_timer_del(wd->mv_timer);
+	wd->mv_timer = NULL;
+     }
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_START, NULL);
    _units_set(data);
@@ -707,8 +712,8 @@ elm_slider_min_max_set(Evas_Object *obj, double min, double max)
    wd->val_min = min;
    wd->val_max = max;
 
-	/* supporting aqua feature */
-	wd->mv_step = (double)((wd->val_max - wd->val_min) / (double)SLIDER_THUMB_MOVE_STEP);
+   /* supporting aqua feature */
+   wd->mv_step = (double)((wd->val_max - wd->val_min) / (double)SLIDER_THUMB_MOVE_STEP);
 
    if (wd->val < wd->val_min) wd->val = wd->val_min;
    if (wd->val > wd->val_max) wd->val = wd->val_max;
@@ -873,24 +878,24 @@ elm_slider_indicator_format_function_set(Evas_Object *obj, const char *(*func)(d
 EAPI Eina_Bool 
 elm_slider_end_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	
-	if ((wd->e_icon != icon) && (wd->e_icon))
-		elm_widget_sub_object_del(obj, wd->e_icon);
-	
-	if (icon)
-	{
-		if ( !(edje_object_part_swallow(wd->slider, "end_icon", icon)) )
-			return EINA_FALSE;		
-		wd->e_icon = icon;
-		elm_widget_sub_object_add(obj, icon);
-		evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				_changed_size_hints, obj);
-		edje_object_signal_emit(wd->slider, "elm,state,eicon,visible", "elm");
-		_sizing_eval(obj);
-	}
-	
-	return EINA_TRUE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if ((wd->e_icon != icon) && (wd->e_icon))
+     elm_widget_sub_object_del(obj, wd->e_icon);
+
+   if (icon)
+     {
+	if ( !(edje_object_part_swallow(wd->slider, "end_icon", icon)) )
+	  return EINA_FALSE;		
+	wd->e_icon = icon;
+	elm_widget_sub_object_add(obj, icon);
+	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+	      _changed_size_hints, obj);
+	edje_object_signal_emit(wd->slider, "elm,state,eicon,visible", "elm");
+	_sizing_eval(obj);
+     }
+
+   return EINA_TRUE;
 }
 
 
@@ -905,9 +910,9 @@ elm_slider_end_icon_set(Evas_Object *obj, Evas_Object *icon)
 EAPI Evas_Object *
 elm_slider_end_icon_get(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return NULL;
-	return wd->e_icon;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->e_icon;
 }
 
 
@@ -922,46 +927,47 @@ elm_slider_end_icon_get(Evas_Object *obj)
 EAPI void
 elm_slider_indicator_show_set(Evas_Object *obj, Eina_Bool show)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if(show)
-		edje_object_signal_emit(wd->slider, "elm,state,val,show", "elm");
-	else
-		edje_object_signal_emit(wd->slider, "elm,state,val,hide", "elm");			
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if(show)
+     edje_object_signal_emit(wd->slider, "elm,state,val,show", "elm");
+   else
+     edje_object_signal_emit(wd->slider, "elm,state,val,hide", "elm");			
 }
-
-
 
 static _mv_timer_cb(void *data)
 {
-	Evas_Object* obj = (Evas_Object*)data;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	
-	if (!wd) return EINA_TRUE;
-	
-	if(wd->src_val < wd->des_val) {
-		wd->src_val += wd->mv_step;
-		if(wd-> src_val > wd->des_val) 	
-			wd->src_val = wd->des_val;
-	}	
-	
-	else if (wd->src_val > wd->des_val) {
-		wd->src_val -= wd->mv_step;
-		if(wd->src_val < wd->des_val) 	
-			wd->src_val = wd->des_val;
-	}	
-		
-	elm_slider_value_set(obj, wd->src_val);
-	evas_object_smart_callback_call(obj, "changed", NULL);
+   Evas_Object* obj = (Evas_Object*)data;
+   Widget_Data *wd = elm_widget_data_get(obj);
 
-	if (wd->val == wd->des_val ) {
-		if(wd->mv_timer){
-			ecore_timer_del(wd->mv_timer);
-			wd->mv_timer = NULL;
-		}	
-		return EINA_FALSE;
-	}
-	else
-		return EINA_TRUE;
+   if (!wd) return EINA_TRUE;
+
+   if(wd->src_val < wd->des_val) 
+     {
+	wd->src_val += wd->mv_step;
+	if(wd-> src_val > wd->des_val) 	
+	  wd->src_val = wd->des_val;
+     }	
+   else if (wd->src_val > wd->des_val) 
+     {
+	wd->src_val -= wd->mv_step;
+	if(wd->src_val < wd->des_val) 	
+	  wd->src_val = wd->des_val;
+     }	
+
+   elm_slider_value_set(obj, wd->src_val);
+   evas_object_smart_callback_call(obj, "changed", NULL);
+
+   if (wd->val == wd->des_val) 
+     {
+	if(wd->mv_timer)
+	  {
+	     ecore_timer_del(wd->mv_timer);
+	     wd->mv_timer = NULL;
+	  }	
+	return EINA_FALSE;
+     }
+   else
+     return EINA_TRUE;
 }
 
 
@@ -978,21 +984,22 @@ static _mv_timer_cb(void *data)
 EAPI void
 elm_slider_value_animated_set(Evas_Object *obj, double val)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	
-	if (wd->val == val) return;
-	
-	wd->src_val = wd->val;
-	wd->des_val = val;
-	if (wd->des_val < wd->val_min) wd->des_val = wd->val_min;	
-	if (wd->des_val > wd->val_max) wd->des_val = wd->val_max;
+   Widget_Data *wd = elm_widget_data_get(obj);
 
-	if(wd->mv_timer){
-		ecore_timer_del(wd->mv_timer);
-		wd->mv_timer = NULL;
-	}
-	
-	wd->mv_timer = ecore_timer_add(0.005, _mv_timer_cb, obj);	
+   if (wd->val == val) return;
+
+   wd->src_val = wd->val;
+   wd->des_val = val;
+   if (wd->des_val < wd->val_min) wd->des_val = wd->val_min;	
+   if (wd->des_val > wd->val_max) wd->des_val = wd->val_max;
+
+   if(wd->mv_timer)
+     {
+	ecore_timer_del(wd->mv_timer);
+	wd->mv_timer = NULL;
+     }
+
+   wd->mv_timer = ecore_timer_add(0.005, _mv_timer_cb, obj);	
 }
 
 
@@ -1023,7 +1030,7 @@ elm_slider_end_label_set(Evas_Object *obj, const char *label)
      }
    edje_object_part_text_set(wd->slider, "elm.units", label);
    if(wd->units)
-	   wd->units = NULL;
+     wd->units = NULL;
    _sizing_eval(obj);
 }
 

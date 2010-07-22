@@ -1,3 +1,6 @@
+/*
+ * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ */
 /**
  * @defgroup Controlbar Controlbar
  * @ingroup Elementary
@@ -241,17 +244,17 @@ _del_hook(Evas_Object * obj)
 	wd->event_box = NULL;
      }
    EINA_LIST_FREE(wd->items, item)
-   {
-      eina_stringshare_del(item->label);
-      if (item->icon)
-	 evas_object_del(item->icon);
-      if (item->base)
-	 evas_object_del(item->base);
-      if (item->edit_item)
-	 evas_object_del(item->edit_item);
-      free(item);
-      item = NULL;
-   }
+     {
+	eina_stringshare_del(item->label);
+	if (item->icon)
+	  evas_object_del(item->icon);
+	if (item->base)
+	  evas_object_del(item->base);
+	if (item->edit_item)
+	  evas_object_del(item->edit_item);
+	free(item);
+	item = NULL;
+     }
    free(wd);
    wd = NULL;
 }
@@ -275,44 +278,44 @@ _theme_hook(Evas_Object * obj)
    _elm_theme_object_set(obj, wd->edit_box, "controlbar", "edit_box",
 			  elm_widget_style_get(obj));
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (item->style != OBJECT)
-	{
-	   elm_layout_theme_set(item->base, "controlbar", "item",
-				 elm_widget_style_get(obj));
-	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
-	   elm_layout_theme_set(item->edit_item, "controlbar", "item",
-				  elm_widget_style_get(obj));
-	   if (!item->editable)
-	     {
-		color =
-		   (Evas_Object *)
-		   edje_object_part_object_get(_EDJ(item->edit_item),
-					       "elm.edit.item.color");
-		if (color)
-		   evas_object_color_get(color, &r, &g, &b, &a);
-		evas_object_color_set(item->edit_item, r, g, b, a);
-	     }
-	   if (item->label)
-	     {
-		edje_object_part_text_set(_EDJ(item->base), "elm.text",
-					   item->label);
-		edje_object_part_text_set(_EDJ(item->edit_item), "elm.text",
-					   item->label);
-	     }
-	   if (item->label && item->icon)
-	     {
-		edje_object_signal_emit(_EDJ(item->base),
-					 "elm,state,icon_text", "elm");
-		edje_object_signal_emit(_EDJ(item->edit_item),
-					 "elm,state,icon_text", "elm");
-	     }
-	   if (item->selected)
-	     {
-		selected_box(item);
-	     }
-	}
-   }
+     {
+	if (item->style != OBJECT)
+	  {
+	     elm_layout_theme_set(item->base, "controlbar", "item",
+		   elm_widget_style_get(obj));
+	     object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
+	     elm_layout_theme_set(item->edit_item, "controlbar", "item",
+		   elm_widget_style_get(obj));
+	     if (!item->editable)
+	       {
+		  color =
+		     (Evas_Object *)
+		     edje_object_part_object_get(_EDJ(item->edit_item),
+			   "elm.edit.item.color");
+		  if (color)
+		    evas_object_color_get(color, &r, &g, &b, &a);
+		  evas_object_color_set(item->edit_item, r, g, b, a);
+	       }
+	     if (item->label)
+	       {
+		  edje_object_part_text_set(_EDJ(item->base), "elm.text",
+			item->label);
+		  edje_object_part_text_set(_EDJ(item->edit_item), "elm.text",
+			item->label);
+	       }
+	     if (item->label && item->icon)
+	       {
+		  edje_object_signal_emit(_EDJ(item->base),
+			"elm,state,icon_text", "elm");
+		  edje_object_signal_emit(_EDJ(item->edit_item),
+			"elm,state,icon_text", "elm");
+	       }
+	     if (item->selected)
+	       {
+		  selected_box(item);
+	       }
+	  }
+     }
 }
 
 static void 
@@ -366,13 +369,11 @@ static void
 set_evas_map(Evas_Object * obj, Evas_Coord x, Evas_Coord y, Evas_Coord w,
 	     Evas_Coord h) 
 {
-   if (obj == NULL)
-     {
-	return;
-     }
+   if (!obj) return;
+   
    Evas_Map * map = evas_map_new(4);
-   if (map == NULL)
-      return;
+   if (!map) return;
+   
    evas_map_smooth_set(map, EINA_TRUE);
    evas_map_util_points_populate_from_object_full(map, obj, 0);
    evas_object_map_enable_set(obj, EINA_TRUE);
@@ -518,27 +519,27 @@ item_insert_in_bar(Elm_Controlbar_Item * it, int order)
    int check = 0;
 
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (item->order == order && item != it)
-	 check = 1;
-   }
+     {
+	if (item->order == order && item != it)
+	  check = 1;
+     }
    if (check)
      {
 	EINA_LIST_FOREACH(wd->items, l, item)
-	{
-	   if (item->order > 0)
-	      elm_table_unpack(wd->box, item->base);
-	}
+	  {
+	     if (item->order > 0)
+	       elm_table_unpack(wd->box, item->base);
+	  }
 	EINA_LIST_FOREACH(wd->items, l, item)
-	{
-	   if (item->order > 0)
-	     {
-		if (item->order >= order)
-		   item->order += 1;
-		elm_table_pack(wd->box, item->base, item->order - 1, 0, 1, 1);
-		evas_object_show(item->base);
-	     }
-	}
+	  {
+	     if (item->order > 0)
+	       {
+		  if (item->order >= order)
+		    item->order += 1;
+		  elm_table_pack(wd->box, item->base, item->order - 1, 0, 1, 1);
+		  evas_object_show(item->base);
+	       }
+	  }
      }
    it->order = order;
    elm_table_pack(wd->box, it->base, order - 1, 0, 1, 1);
@@ -555,26 +556,26 @@ item_delete_in_bar(Elm_Controlbar_Item * it)
    int i = 0;
 
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (item == it)
-	{
-	   i = it->order;
-	   it->order = 0;
-	   elm_table_unpack(wd->box, it->base);
-	   evas_object_hide(it->base);
-	}
-   }
+     {
+	if (item == it)
+	  {
+	     i = it->order;
+	     it->order = 0;
+	     elm_table_unpack(wd->box, it->base);
+	     evas_object_hide(it->base);
+	  }
+     }
    if (i)
      {
 	EINA_LIST_FOREACH(wd->items, l, item)
-	{
-	   if (item->order > i)
-	     {
-		item->order--;
-		elm_table_unpack(wd->box, item->base);
-		elm_table_pack(wd->box, item->base, item->order - 1, 0, 1, 1);
-	     }
-	}
+	  {
+	     if (item->order > i)
+	       {
+		  item->order--;
+		  elm_table_unpack(wd->box, item->base);
+		  elm_table_pack(wd->box, item->base, item->order - 1, 0, 1, 1);
+	       }
+	  }
      }
 }
 
@@ -669,16 +670,16 @@ item_change_in_bar(Elm_Controlbar_Item * it)
 static void
 object_color_set(Evas_Object *ly, const char *color_part, const char *obj_part)
 {
-	Evas_Object *color;
-	int r, g, b, a;
+   Evas_Object *color;
+   int r, g, b, a;
 
-	color =
-		 (Evas_Object *) edje_object_part_object_get(_EDJ(ly), color_part);
-	if (color)
-	   evas_object_color_get(color, &r, &g, &b, &a);
-	color =
-	   edje_object_part_swallow_get(_EDJ(ly), obj_part);
-	evas_object_color_set(color, r, g, b, a);
+   color =
+      (Evas_Object *) edje_object_part_object_get(_EDJ(ly), color_part);
+   if (color)
+     evas_object_color_get(color, &r, &g, &b, &a);
+   color =
+      edje_object_part_swallow_get(_EDJ(ly), obj_part);
+   evas_object_color_set(color, r, g, b, a);
 }
 
 static void 
@@ -686,20 +687,23 @@ selected_box(Elm_Controlbar_Item * it)
 {
    Widget_Data * wd = elm_widget_data_get(it->obj);
 
-   if(it->style == TABBAR){
-	   it->selected = EINA_TRUE;
-	   evas_object_smart_callback_call(it->obj, "view,change,before", it);
-	   object_color_set(it->base, "elm.tabbar.selected.color", "elm.swallow.icon");
-	   edje_object_signal_emit(_EDJ(it->base), "elm,state,selected",
-					  "elm");
-	   edje_object_part_swallow(wd->view, "elm.swallow.view",
-					  it->view);
-	   evas_object_show(it->view);
+   if(it->style == TABBAR)
+     {
+	it->selected = EINA_TRUE;
+	evas_object_smart_callback_call(it->obj, "view,change,before", it);
+	object_color_set(it->base, "elm.tabbar.selected.color", "elm.swallow.icon");
+	edje_object_signal_emit(_EDJ(it->base), "elm,state,selected",
+	      "elm");
+	edje_object_part_swallow(wd->view, "elm.swallow.view",
+	      it->view);
+	evas_object_show(it->view);
 
-   }else if(it->style == TOOLBAR){
-		if (it->func)
-			  it->func(it->data, it->obj, it);
-   }
+     }
+   else if(it->style == TOOLBAR)
+     {
+	if (it->func)
+	  it->func(it->data, it->obj, it);
+     }
 
    evas_object_smart_callback_call(it->obj, "clicked", it);
 }
@@ -717,24 +721,24 @@ clicked_box_cb(void *data, Evas_Object * obj, const char *emission,
    if (wd->edit_mode)
       return;
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (item->style == TABBAR)
-	{
-	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
-	   edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
-	   edje_object_signal_emit(_EDJ(item->base), "elm,state,text_unselected", "elm");
-	}
-		  if (_EDJ(item->base) == obj)
-		{
-		   selected_box(item);
-		}
-		  else
-		{
-			item->selected = EINA_FALSE;
-			edje_object_part_unswallow(wd->view, item->view);
-		    evas_object_hide(item->view);
-		}
-   }
+     {
+	if (item->style == TABBAR)
+	  {
+	     object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
+	     edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
+	     edje_object_signal_emit(_EDJ(item->base), "elm,state,text_unselected", "elm");
+	  }
+	if (_EDJ(item->base) == obj)
+	  {
+	     selected_box(item);
+	  }
+	else
+	  {
+	     item->selected = EINA_FALSE;
+	     edje_object_part_unswallow(wd->view, item->view);
+	     evas_object_hide(item->view);
+	  }
+     }
 }
 
 static int
@@ -745,28 +749,28 @@ unfocused_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 
    Elm_Controlbar_Item * item;
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-	  if (item->style == TABBAR)
+     {
+	if (item->style == TABBAR)
 	  {
-		  if(item->selected){
-			object_color_set(item->base, "elm.tabbar.selected.color", "elm.swallow.icon");
-			edje_object_signal_emit(_EDJ(item->base), "elm,state,selected", "elm");
-		  }
-		  else
-		  {
-			object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
-			edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
-		  }
+	     if(item->selected){
+		  object_color_set(item->base, "elm.tabbar.selected.color", "elm.swallow.icon");
+		  edje_object_signal_emit(_EDJ(item->base), "elm,state,selected", "elm");
+	     }
+	     else
+	       {
+		  object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
+		  edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
+	       }
 	  }
-	  else if (item->style == TOOLBAR)
-	{
-	   object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
-	   edje_object_signal_emit(_EDJ(item->base), "elm,state,text_unselected", "elm");
-	}
-   }
+	else if (item->style == TOOLBAR)
+	  {
+	     object_color_set(item->base, "elm.tabbar.default.color", "elm.swallow.icon");
+	     edje_object_signal_emit(_EDJ(item->base), "elm,state,text_unselected", "elm");
+	  }
+     }
    evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unfocused_box_cb);
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 static int
@@ -778,28 +782,26 @@ pressed_box(Elm_Controlbar_Item * it)
    Elm_Controlbar_Item * item;
 
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (it == item)
-	{
-	   if (it->style == TABBAR)
-	     {
+     {
+	if (it == item)
+	  {
+	     if (it->style == TABBAR)
+	       {
+		  object_color_set(it->base, "elm.tabbar.selected.color", "elm.swallow.icon");
+		  edje_object_signal_emit(_EDJ(it->base), "elm,state,pressed",
+			"elm");
+	       }
+	     else if (it->style == TOOLBAR)
+	       {
+		  object_color_set(it->base, "elm.toolbar.pressed.color", "elm.swallow.icon");
+		  edje_object_signal_emit(_EDJ(it->base), "elm,state,text_selected",
+			"elm");
+	       }
+	     evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unfocused_box_cb, (void *)wd);
 
-		object_color_set(it->base, "elm.tabbar.selected.color", "elm.swallow.icon");
-		edje_object_signal_emit(_EDJ(it->base), "elm,state,pressed",
-					  "elm");
-	     }
-	   else if (it->style == TOOLBAR)
-	     {
-	
-		object_color_set(it->base, "elm.toolbar.pressed.color", "elm.swallow.icon");
-		edje_object_signal_emit(_EDJ(it->base), "elm,state,text_selected",
-					  "elm");
-		}
-	   evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unfocused_box_cb, (void *)wd);
-	 
-	   check = EINA_TRUE;
-	}
-   }
+	     check = EINA_TRUE;
+	  }
+     }
    if (!check)
       return EXIT_FAILURE;
 
@@ -894,22 +896,22 @@ edit_item_move_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    set_evas_map(wd->moving_obj, x, y, w, h);
 
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (wd->moving_item->edit_item == item->edit_item || item->style == OBJECT)
-	 continue;
-      evas_object_geometry_get(item->base, &x, &y, &w, &h);
-      if (ev->cur.output.x > x && ev->cur.output.x < x + w && ev->cur.output.y > y && ev->cur.output.y < y + h
-	   && item->editable)
-	{
-	   edje_object_signal_emit(_EDJ(item->base), "elm,state,show,glow",
-				    "elm");
-	}
-      else
-	{
-	   edje_object_signal_emit(_EDJ(item->base), "elm,state,hide,glow",
-				    "elm");
-	}
-   }
+     {
+	if (wd->moving_item->edit_item == item->edit_item || item->style == OBJECT)
+	  continue;
+	evas_object_geometry_get(item->base, &x, &y, &w, &h);
+	if (ev->cur.output.x > x && ev->cur.output.x < x + w && ev->cur.output.y > y && ev->cur.output.y < y + h
+	      && item->editable)
+	  {
+	     edje_object_signal_emit(_EDJ(item->base), "elm,state,show,glow",
+		   "elm");
+	  }
+	else
+	  {
+	     edje_object_signal_emit(_EDJ(item->base), "elm,state,hide,glow",
+		   "elm");
+	  }
+     }
    return EXIT_SUCCESS;
 }
 
@@ -927,22 +929,22 @@ edit_item_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 	 return EXIT_FAILURE;
    evas_object_color_set(wd->moving_item->edit_item, 255, 255, 255, 255);
    
-      // check which change or not
-      EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (wd->moving_item->edit_item == item->edit_item)
-	 continue;
-      if (item->order <= 0)
-	 continue;
-      evas_object_geometry_get(item->base, &x, &y, &w, &h);
-      if (ev->output.x > x && ev->output.x < x + w && ev->output.y > y && ev->output.y < y + h
-	   && item->style != OBJECT && item->editable)
-	{
-	   edje_object_signal_emit(_EDJ(item->base), "elm,state,hide,glow",
-				    "elm");
-	   break;
-	}
-   }
+   // check which change or not
+   EINA_LIST_FOREACH(wd->items, l, item)
+     {
+	if (wd->moving_item->edit_item == item->edit_item)
+	  continue;
+	if (item->order <= 0)
+	  continue;
+	evas_object_geometry_get(item->base, &x, &y, &w, &h);
+	if (ev->output.x > x && ev->output.x < x + w && ev->output.y > y && ev->output.y < y + h
+	      && item->style != OBJECT && item->editable)
+	  {
+	     edje_object_signal_emit(_EDJ(item->base), "elm,state,hide,glow",
+		   "elm");
+	     break;
+	  }
+     }
    if (item != NULL)
      {
 	if (wd->moving_item->order > 0)
@@ -953,15 +955,15 @@ edit_item_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 	  {
 	     item_change_in_bar(item);
 	  }
-		evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, edit_item_up_cb);
-		evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, edit_item_move_cb);
+	evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, edit_item_up_cb);
+	evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, edit_item_move_cb);
      }
    else
      {
-	
-	   // return moving object to original location
-	   evas_object_geometry_get(wd->moving_item->edit_item, &x_, &y_, &w_,
-				    &h_);
+
+	// return moving object to original location
+	evas_object_geometry_get(wd->moving_item->edit_item, &x_, &y_, &w_,
+	      &h_);
 	evas_object_geometry_get(wd->moving_obj, &x, &y, &w, &h);
 	w *= 2.0;
 	h *= 2.0;
@@ -970,7 +972,7 @@ edit_item_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 	evas_object_data_set(wd->moving_obj, "returning", (void *)1);
 	wd->animating++;
 	move_object_with_animation(wd->moving_obj, x, y, w, h, x_, y_, w_, h_,
-				    0.25, edit_item_return_cb, wd);
+	      0.25, edit_item_return_cb, wd);
      } 
    return EXIT_SUCCESS;
 }
@@ -992,15 +994,15 @@ edit_item_down_cb(void *data, Evas * evas, Evas_Object * obj,
    if (wd->animating)
       return;
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (item->edit_item == obj)
-	 break;
-   }
+     {
+	if (item->edit_item == obj)
+	  break;
+     }
    if (item == NULL)
-      return;
+     return;
    if (!item->editable)
-      return;
-   
+     return;
+
    evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_UP, edit_item_up_cb, (void *)wd);
    evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, edit_item_move_cb, (void *)wd);
 
@@ -1008,12 +1010,12 @@ edit_item_down_cb(void *data, Evas * evas, Evas_Object * obj,
    color =
       (Evas_Object *)
       edje_object_part_object_get(_EDJ(wd->moving_item->edit_item),
-				  "elm.edit.item.color");
+	    "elm.edit.item.color");
    if (color)
-      evas_object_color_get(color, &r, &g, &b, &a);
+     evas_object_color_get(color, &r, &g, &b, &a);
    evas_object_color_set(item->edit_item, r, g, b, a);
    if (wd->moving_obj)
-      evas_object_del(wd->moving_obj);
+     evas_object_del(wd->moving_obj);
    wd->moving_obj = NULL;
    wd->moving_obj = create_item_layout(obj, item);
    evas_object_geometry_get(obj, &x, &y, &w, &h);
@@ -1037,10 +1039,10 @@ bar_item_move_end_cb(void *data, Evas_Object * obj)
 
    Elm_Controlbar_Item * item;
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (item->base == obj)
-	 break;
-   }
+     {
+	if (item->base == obj)
+	  break;
+     }
    wd->animating--;
    if (wd->animating < 0)
      {
@@ -1058,12 +1060,12 @@ bar_item_animation_end_check(void *data)
    Elm_Controlbar_Item * item;
    Widget_Data * wd = (Widget_Data *) data;
    if (wd->animating)
-      return EXIT_FAILURE;
+     return EXIT_FAILURE;
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (item->base == wd->moving_obj)
-	 break;
-   }
+     {
+	if (item->base == wd->moving_obj)
+	  break;
+     }
    if (item == NULL)
      {
 	printf("item is NULL\n");
@@ -1098,20 +1100,20 @@ bar_item_move_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    x = ev->cur.output.x - w / 2;
    set_evas_map(wd->moving_obj, x, y, w, h);
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (item->base == wd->moving_obj)
-	{
-	   it = item;
-	   continue;
-	}
-      if ((int)evas_object_data_get(item->base, "animating") == 1)
-	 continue;
-      evas_object_geometry_get(item->base, &x, &y, &w, &h);
-      if (ev->cur.output.x > x && ev->cur.output.x < x + w && item->editable)
-	{
-	   break;
-	}
-   }
+     {
+	if (item->base == wd->moving_obj)
+	  {
+	     it = item;
+	     continue;
+	  }
+	if ((int)evas_object_data_get(item->base, "animating") == 1)
+	  continue;
+	evas_object_geometry_get(item->base, &x, &y, &w, &h);
+	if (ev->cur.output.x > x && ev->cur.output.x < x + w && item->editable)
+	  {
+	     break;
+	  }
+     }
    if (item)
      {
 	evas_object_geometry_get(wd->moving_obj, &x_, &y_, &w_, &h_);
@@ -1126,7 +1128,7 @@ bar_item_move_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 	wd->animating++;
 	evas_object_data_set(item->base, "animating", (void *)1);
 	move_object_with_animation(item->base, x, y, w, h, x_, y_, w_, h_,
-				    0.25, bar_item_move_end_cb, wd);
+	      0.25, bar_item_move_end_cb, wd);
      }
    return EXIT_SUCCESS;
 }
@@ -1154,21 +1156,21 @@ bar_item_down_cb(void *data, Evas * evas, Evas_Object * obj, void *event_info)
    if (wd->animating)
       return;
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (item->base == obj)
-	 break;
-   }
+     {
+	if (item->base == obj)
+	  break;
+     }
    if (item == NULL)
-      return;
+     return;
    if (wd->edit_mode)
      {
 	if (!item->editable)
-	   return;
+	  return;
 
 	wd->moving_obj = obj;
 	wd->empty_num = item->order;
 	evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_UP, bar_item_up_cb, (void *)wd);
-    evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, bar_item_move_cb, (void *)wd);
+	evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_MOVE, bar_item_move_cb, (void *)wd);
      }
    else
      {
@@ -1369,7 +1371,7 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
+EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
 {
    Evas_Object * obj = NULL;
    Widget_Data * wd = NULL;
@@ -1407,11 +1409,11 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
 	return NULL;
      }
    evas_object_show(wd->view);
-   
-      // edit box
-      wd->edit_box = edje_object_add(wd->evas);
+
+   // edit box
+   wd->edit_box = edje_object_add(wd->evas);
    _elm_theme_object_set(obj, wd->edit_box, "controlbar", "edit_box",
-			  "default");
+	 "default");
    if (wd->edit_box == NULL)
      {
 	printf("Cannot load bg edj\n");
@@ -1430,31 +1432,31 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
    evas_object_smart_callback_add(r_button, "clicked", done_button_cb, wd);
    edje_object_part_swallow(wd->edit_box, "elm.swallow.navigation", r_button);
    */
-	// navigationbar will contribution. but not yet
-	wd->navigation = elm_navigationbar_add(wd->edit_box);
-	r_button = elm_button_add(wd->navigation);
-	elm_button_label_set(r_button, "Done");
-	evas_object_smart_callback_add(r_button, "clicked", done_button_cb, wd);
-	elm_navigationbar_push(wd->navigation, "Configure", NULL, r_button, NULL, NULL);
-	edje_object_part_swallow(wd->edit_box, "elm.swallow.navigation", wd->navigation);
-        
-      wd->edit_table = elm_table_add(wd->edit_box);
+   // navigationbar will contribution. but not yet
+   wd->navigation = elm_navigationbar_add(wd->edit_box);
+   r_button = elm_button_add(wd->navigation);
+   elm_button_label_set(r_button, "Done");
+   evas_object_smart_callback_add(r_button, "clicked", done_button_cb, wd);
+   elm_navigationbar_push(wd->navigation, "Configure", NULL, r_button, NULL, NULL);
+   edje_object_part_swallow(wd->edit_box, "elm.swallow.navigation", wd->navigation);
+
+   wd->edit_table = elm_table_add(wd->edit_box);
    elm_table_homogenous_set(wd->edit_table, EINA_TRUE);
    edje_object_part_swallow(wd->edit_box, "elm.swallow.table", wd->edit_table);
-   
-      /* load background edj */ 
-      wd->edje = edje_object_add(wd->evas);
-   
-//      snprintf(buf, sizeof(buf), "bg_portrait_%d", wd->view_slot_num);
-      _elm_theme_object_set(obj, wd->edje, "controlbar", "base", "default");
+
+   /* load background edj */ 
+   wd->edje = edje_object_add(wd->evas);
+
+   //      snprintf(buf, sizeof(buf), "bg_portrait_%d", wd->view_slot_num);
+   _elm_theme_object_set(obj, wd->edje, "controlbar", "base", "default");
    if (wd->edje == NULL)
      {
 	printf("Cannot load bg edj\n");
 	return NULL;
      }
    evas_object_show(wd->edje);
-   
-      // initialization
+
+   // initialization
    evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_RESIZE,
 				     _controlbar_object_resize, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE,
@@ -1464,22 +1466,22 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE,
 				   _controlbar_object_hide, obj);
    
-      // items container
+   // items container
    wd->box = elm_table_add(wd->edje);
    elm_table_homogenous_set(wd->box, EINA_TRUE);
    evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND,
-				     EVAS_HINT_EXPAND);
+	 EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
    edje_object_part_swallow(wd->edje, "elm.swallow.items", wd->box);
    elm_widget_sub_object_add(obj, wd->box);
-   
-      //FIXME
-      //      evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
+
+   //FIXME
+   //      evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    evas_object_smart_member_add(wd->view, obj);
    evas_object_smart_member_add(wd->edit_box, obj);
    elm_widget_resize_object_set(obj, wd->edje);
-   
-      // initialization
+
+   // initialization
    _sizing_eval(obj);
    return obj;
 }
@@ -1495,7 +1497,7 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_append(Evas_Object * obj,
+EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_append(Evas_Object * obj,
 							     const char
 							     *icon_path,
 							     const char *label,
@@ -1506,12 +1508,12 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
    Widget_Data * wd;
    it = create_tab_item(obj, icon_path, label, view);
    if (it == NULL)
-      return NULL;
+     return NULL;
    wd = elm_widget_data_get(obj);
    set_items_position(obj, it, NULL);
    wd->items = eina_list_append(wd->items, it);
    if (wd->num == 1)
-      selected_box(it);
+     selected_box(it);
    _sizing_eval(obj);
    return it;
 }
@@ -1527,7 +1529,7 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_prepend(Evas_Object *
+EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_prepend(Evas_Object *
 							      obj,
 							      const char
 							      *icon_path,
@@ -1564,7 +1566,7 @@ set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item *
+EAPI Elm_Controlbar_Item *
 elm_controlbar_tab_item_insert_before(Evas_Object * obj,
 				      Elm_Controlbar_Item * before,
 				      const char *icon_path,
@@ -1598,7 +1600,7 @@ elm_controlbar_tab_item_insert_before(Evas_Object * obj,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item *
+EAPI Elm_Controlbar_Item *
 elm_controlbar_tab_item_insert_after(Evas_Object * obj,
 				     Elm_Controlbar_Item * after,
 				     const char *icon_path, const char *label,
@@ -1634,7 +1636,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_tool_item_append(Evas_Object *
+EAPI Elm_Controlbar_Item * elm_controlbar_tool_item_append(Evas_Object *
 							      obj,
 							      const char
 							      *icon_path,
@@ -1673,7 +1675,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_tool_item_prepend(Evas_Object *
+EAPI Elm_Controlbar_Item * elm_controlbar_tool_item_prepend(Evas_Object *
 							       obj,
 							       const char
 							       *icon_path,
@@ -1716,7 +1718,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item *
+EAPI Elm_Controlbar_Item *
 elm_controlbar_tool_item_insert_before(Evas_Object * obj,
 				       Elm_Controlbar_Item * before,
 				       const char *icon_path,
@@ -1753,7 +1755,7 @@ elm_controlbar_tool_item_insert_before(Evas_Object * obj,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item *
+EAPI Elm_Controlbar_Item *
 elm_controlbar_tool_item_insert_after(Evas_Object * obj,
 				      Elm_Controlbar_Item * after,
 				      const char *icon_path,
@@ -1789,7 +1791,7 @@ elm_controlbar_tool_item_insert_after(Evas_Object * obj,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_object_item_append(Evas_Object *
+EAPI Elm_Controlbar_Item * elm_controlbar_object_item_append(Evas_Object *
 								obj,
 								Evas_Object *
 								obj_item,
@@ -1848,7 +1850,7 @@ elm_controlbar_tool_item_insert_after(Evas_Object * obj,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item *
+EAPI Elm_Controlbar_Item *
 elm_controlbar_object_item_insert_before(Evas_Object * obj,
 					 Elm_Controlbar_Item * before,
 					 Evas_Object * obj_item, const int sel)
@@ -1878,7 +1880,7 @@ elm_controlbar_object_item_insert_before(Evas_Object * obj,
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item *
+EAPI Elm_Controlbar_Item *
 elm_controlbar_object_item_insert_after(Evas_Object * obj,
 					Elm_Controlbar_Item * after,
 					Evas_Object * obj_item, const int sel)
@@ -1906,7 +1908,7 @@ elm_controlbar_object_item_insert_after(Evas_Object * obj,
 
  * @ingroup Controlbar
  */ 
-   EAPI void
+EAPI void
 elm_controlbar_item_del(Elm_Controlbar_Item * it) 
 {
    Evas_Object * obj;
@@ -1933,68 +1935,68 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
 	return;
      }
    
-      // delete base item
-      if (it->order > 0)
+   // delete base item
+   if (it->order > 0)
      {
 	elm_table_unpack(wd->box, it->base);
 	sel = it->sel;
 	EINA_LIST_FOREACH(wd->items, l, item)
-	{
-	   if (it != item)
-	     {
-		if (item->order > it->order)
-		  {
-		     elm_table_unpack(wd->box, item->base);
-		     item->order -= sel;
-		     elm_table_pack(wd->box, item->base, item->order - 1, 0,
-				     item->sel, 1);
-		  }
-	     }
-	   if (it == item)
-	     {
-		check = 1;
-	     }
-	}
+	  {
+	     if (it != item)
+	       {
+		  if (item->order > it->order)
+		    {
+		       elm_table_unpack(wd->box, item->base);
+		       item->order -= sel;
+		       elm_table_pack(wd->box, item->base, item->order - 1, 0,
+			     item->sel, 1);
+		    }
+	       }
+	     if (it == item)
+	       {
+		  check = 1;
+	       }
+	  }
      }
-   
-      // delete edit item
-      check = 0;
+
+   // delete edit item
+   check = 0;
    if (it->edit_item != NULL)
      {
 	elm_table_unpack(wd->edit_table, it->edit_item);
 	EINA_LIST_FOREACH(wd->items, l, item)
-	{
-	   if (check)
-	     {
-		if (item->edit_item != NULL)
-		  {
-		     elm_table_unpack(wd->edit_table, item->edit_item);
-		     elm_table_pack(wd->edit_table, item->edit_item,
-				     (i - 1) % 4, (i - 1) / 4, 1, 1);
-		  }
-	     }
-	   if (it == item && item->style != OBJECT)
-	     {
-		check = 1;
-		i--;
-	     }
-	   if (item->style != OBJECT)
-	      i++;
-	}
+	  {
+	     if (check)
+	       {
+		  if (item->edit_item != NULL)
+		    {
+		       elm_table_unpack(wd->edit_table, item->edit_item);
+		       elm_table_pack(wd->edit_table, item->edit_item,
+			     (i - 1) % 4, (i - 1) / 4, 1, 1);
+		    }
+	       }
+	     if (it == item && item->style != OBJECT)
+	       {
+		  check = 1;
+		  i--;
+	       }
+	     if (item->style != OBJECT)
+	       i++;
+	  }
      }
-   
-      // delete item in list
-      if (it->label)
-      eina_stringshare_del(it->label);
+
+   // delete item in list
+   if (it->label)
+     eina_stringshare_del(it->label);
    if (it->icon)
-      evas_object_del(it->icon);
+     evas_object_del(it->icon);
    if (it->base)
      {
 	if (it->style != OBJECT)
-	   evas_object_del(it->base);
-	
+	  evas_object_del(it->base);
+
 	else
-	   evas_object_hide(it->base);
+	  evas_object_hide(it->base);
      }
    if (it->view)
      {
@@ -2002,7 +2004,7 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
 	evas_object_hide(it->view);
      }
    if (it->edit_item)
-      evas_object_del(it->edit_item);
+     evas_object_del(it->edit_item);
    wd->items = eina_list_remove(wd->items, it);
    wd->num = wd->num - 1;
    _sizing_eval(obj);
@@ -2015,7 +2017,7 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
 
  * @ingroup Controlbar
  */ 
-   EAPI void
+EAPI void
 elm_controlbar_item_select(Elm_Controlbar_Item * it) 
 {
    if (it->obj == NULL)
@@ -2037,7 +2039,7 @@ elm_controlbar_item_select(Elm_Controlbar_Item * it)
  *
  * @ingroup Controlbar
  */ 
-   EAPI Evas_Object * elm_controlbar_item_icon_get(Elm_Controlbar_Item * it) 
+EAPI Evas_Object * elm_controlbar_item_icon_get(Elm_Controlbar_Item * it) 
 {
    return it->icon;
 }
@@ -2064,7 +2066,7 @@ elm_controlbar_item_label_get(Elm_Controlbar_Item * it)
  *
  * @ingroup Controlbar
  */ 
-   EAPI void
+EAPI void
 elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label) 
 {
    if (!it->base)
@@ -2080,7 +2082,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_selected_item_get(Evas_Object *
+EAPI Elm_Controlbar_Item * elm_controlbar_selected_item_get(Evas_Object *
 							       obj) 
 {
    const Eina_List *l;
@@ -2107,7 +2109,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_first_item_get(Evas_Object * obj) 
+EAPI Elm_Controlbar_Item * elm_controlbar_first_item_get(Evas_Object * obj) 
 {
    if (obj == NULL)
       return NULL;
@@ -2125,7 +2127,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_last_item_get(Evas_Object * obj) 
+EAPI Elm_Controlbar_Item * elm_controlbar_last_item_get(Evas_Object * obj) 
 {
    if (obj == NULL)
       return NULL;
@@ -2143,7 +2145,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  *
  * @ingroup Controlbar
  */ 
-   EAPI Eina_List * elm_controlbar_items_get(Evas_Object * obj) 
+EAPI Eina_List * elm_controlbar_items_get(Evas_Object * obj) 
 {
    if (obj == NULL)
       return NULL;
@@ -2161,7 +2163,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_item_prev(Elm_Controlbar_Item *
+EAPI Elm_Controlbar_Item * elm_controlbar_item_prev(Elm_Controlbar_Item *
 						       it) 
 {
    const Eina_List *l;
@@ -2171,17 +2173,17 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
       return NULL;
    Widget_Data * wd = elm_widget_data_get(it->obj);
    if (!wd || !wd->items)
-      return NULL;
+     return NULL;
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (it == item)
-	{
-	   l = eina_list_prev(l);
-	   if (!l)
-	      return NULL;
-	   return eina_list_data_get(l);
-	}
-   }
+     {
+	if (it == item)
+	  {
+	     l = eina_list_prev(l);
+	     if (!l)
+	       return NULL;
+	     return eina_list_data_get(l);
+	  }
+     }
    return NULL;
 }
 
@@ -2193,7 +2195,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  *
  * @ingroup Controlbar
  */ 
-   EAPI Elm_Controlbar_Item * elm_controlbar_item_next(Elm_Controlbar_Item *
+EAPI Elm_Controlbar_Item * elm_controlbar_item_next(Elm_Controlbar_Item *
 						       it) 
 {
    const Eina_List *l;
@@ -2203,17 +2205,17 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
       return NULL;
    Widget_Data * wd = elm_widget_data_get(it->obj);
    if (!wd || !wd->items)
-      return NULL;
+     return NULL;
    EINA_LIST_FOREACH(wd->items, l, item)
-   {
-      if (it == item)
-	{
-	   l = eina_list_next(l);
-	   if (!l)
-	      return NULL;
-	   return eina_list_data_get(l);
-	}
-   }
+     {
+	if (it == item)
+	  {
+	     l = eina_list_next(l);
+	     if (!l)
+	       return NULL;
+	     return eina_list_data_get(l);
+	  }
+     }
    return NULL;
 }
 
@@ -2224,7 +2226,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
 
  * @ingroup Controlbar
  */ 
-   EAPI void
+EAPI void
 elm_controlbar_edit_start(Evas_Object * obj) 
 {
    Widget_Data * wd;
@@ -2251,14 +2253,14 @@ elm_controlbar_edit_start(Evas_Object * obj)
  *
  * @ingroup Controlbar
  */ 
-   EAPI void
+EAPI void
 elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool bar) 
 {
    Eina_Bool check = EINA_TRUE;
    if (it->order <= 0)
-      check = EINA_FALSE;
+     check = EINA_FALSE;
    if (check == bar)
-      return;
+     return;
    if (bar)
      {
 	item_insert_in_bar(it, 0);
@@ -2278,7 +2280,7 @@ elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool bar)
  *
  * @ingroup Controlbar
  */ 
-   EAPI void
+EAPI void
 elm_controlbar_item_editable_set(Elm_Controlbar_Item * it, Eina_Bool editable) 
 {
    Evas_Object * color;
@@ -2301,7 +2303,7 @@ elm_controlbar_item_editable_set(Elm_Controlbar_Item * it, Eina_Bool editable)
  *
  * @ingroup Controlbar
  */ 
-   EAPI void
+EAPI void
 elm_controlbar_view_set(Evas_Object * obj, Evas_Object * view) 
 {
    Widget_Data * wd;
@@ -2329,10 +2331,9 @@ elm_controlbar_view_set(Evas_Object * obj, Evas_Object * view)
  *
  * @ingroup Controlbar
  */ 
-   EAPI void
+EAPI void
 elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view) 
 {
-	it->view = view; 
+   it->view = view; 
 }
-
 
