@@ -103,7 +103,8 @@ _btn_layout_create(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	wd->btn_layout = edje_object_add(evas_object_evas_get(obj));
 	elm_widget_sub_object_add(obj, wd->btn_layout);
-
+	edje_object_signal_emit(wd->base, "elm,state,buttons,enable", "elm");
+	edje_object_part_swallow(wd->base, "elm.swallow.btns", wd->btn_layout);
 }
 
 static void
@@ -372,7 +373,9 @@ _sizing_eval(Evas_Object *obj)
    Elm_Ctxpopup_Item *item;
    Evas_Coord_Rectangle rect = {0,0,1,1};
    Evas_Coord x, y, w, h;
+   Arrow_Direction arrow_dir;
    wd = (Widget_Data *) elm_widget_data_get(obj);
+   char buf[256];
 
    if ((!wd) || (!wd->parent))
       return;
@@ -382,26 +385,30 @@ _sizing_eval(Evas_Object *obj)
       _item_sizing_eval(item);
    }
 
-   Arrow_Direction arrow_dir = _calc_base_geometry(obj, &rect);
+   //button layout
+	sprintf(buf, "actionbtn%d", wd->btn_cnt);
+	edje_object_part_geometry_get( wd->btn_layout,  buf, 0, 0, &w, &h );
+	evas_object_size_hint_min_set( wd->btn_layout, w, h );
+
+	//base
+   arrow_dir = _calc_base_geometry(obj, &rect);
 
 	if((!wd->arrow_disabled) && (arrow_dir!=NONE_ARROW)) 
 	{
 		_update_arrow_obj(obj, arrow_dir);
 		_shift_base_by_arrow(wd->arrow, arrow_dir, &rect);
 	}
-/*
-	if(wd->btn_layout) {
-		Evas_Coord temp;
-		edje_object_part_geometry_get(wd->base, "ctxpopup_list", &x, &y, &w, &h);
-		fprintf( stderr, "%d %d %d %d\n", x, y, w, h );
-		evas_object_resize(wd->scroller, w, h+(y*2));
-	}else{ */
-		evas_object_resize(wd->scroller, rect.w, rect.h);
-	//}
 
-	evas_object_move(wd->scroller, rect.x, rect.y);
 	evas_object_resize(wd->base, rect.w, rect.h);
 	evas_object_move(wd->base, rect.x, rect.y);
+
+	//scroller
+	edje_object_part_geometry_get(wd->base, "ctxpopup_frame", NULL, &y, &w, &h);
+	edje_object_part_geometry_get(wd->base, "ctxpopup_list", NULL, &y, NULL, &h );
+	evas_object_resize(wd->scroller, w, h+(y*2));
+	evas_object_move(wd->scroller, rect.x, rect.y);
+
+
 }
 
 static void
@@ -1204,14 +1211,13 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label)
 	char buf[ 256 ];
 	int idx;
 	Evas_Object *btn;
+	Evas_Coord w, h;
+
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
 	if(!wd) return;
 
 	if(!wd->btn_layout) {
 		_btn_layout_create(obj);
-		edje_object_signal_emit(wd->base, "elm,state,buttons,enable", "elm");
-	}else {
-		//TODO: Change Theme,
 	}
 
 	++wd->btn_cnt;
@@ -1224,15 +1230,10 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label)
 		elm_button_label_set(btn, label);
 		sprintf(buf, "actionbtn%d", wd->btn_cnt);
 		edje_object_part_swallow(wd->btn_layout,  buf, btn);
-		Evas_Coord w, h;
-		edje_object_part_geometry_get( wd->btn_layout, "actionbtn1", 0, 0, &w, &h );
-		evas_object_size_hint_min_set( wd->btn_layout, w, h );
 	}
 
-	edje_object_part_swallow(wd->base, "elm.swallow.btns", wd->btn_layout);
+	if(wd->visible)
 	_sizing_eval(obj);
-
-
 
 }
 
