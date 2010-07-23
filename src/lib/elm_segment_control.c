@@ -248,6 +248,8 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
    it = calloc(1, sizeof(   Elm_Segment_Item));
    if (!it) return NULL;
 
+   Evas_Coord mw, mh;
+
    if(obj) it->obj = obj;
    it->delete_me = EINA_FALSE;
    it->segment_id = wd->id;
@@ -282,7 +284,11 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
 		evas_object_size_hint_max_set(it->base, maxw, maxh);
 	 }
 
-	   return it;
+	edje_object_size_min_restricted_calc(obj, &mw, &mh, 0, 0);
+	evas_object_size_hint_weight_set(obj, 1.0, 1.0);
+	evas_object_size_hint_align_set(obj, -1.0, -1.0);
+
+	return it;
 }
 
 
