@@ -6,7 +6,7 @@
 
 
 /**
- * @defgroup Notify notify
+ * @defgroup Notify Notify
  * @ingroup Elementary
  *
  * Display a window in a particular region of the application (top, bottom ...).

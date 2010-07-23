@@ -2281,7 +2281,7 @@ extern "C" {
    
    /* zoomcontrols */
    EAPI Evas_Object *elm_zoomcontrols_add(Evas_Object *parent);
-   EAPI void elm_zoomcontrols_range_set(Evas_Object *obj, int range);
+   EAPI void         elm_zoomcontrols_range_set(Evas_Object *obj, int range);
    /* smart callbacks called:
     * "up_clicked" - when up button of zoomcontrols is clicked 
     * "down_clicked" - when down button of zoomcontrols is clicked
