@@ -1857,9 +1857,9 @@ extern "C" {
    EAPI Eina_Bool    elm_ctxpopup_horizontal_get(Evas_Object *obj);
    EAPI void         elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon);
    EAPI void         elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label);
-   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon, void (*func) (void *data, Evas_Object *obj, void *event_info),	void *data); 
-   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_label_add(Evas_Object *obj, const char *label,	void (*func) (void *data, Evas_Object *obj, void *event_info), void* data);
+   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, Evas_Smart_Cb func, const void *data);
+   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon, Evas_Smart_Cb func, const void *data); 
+   EAPI Elm_Ctxpopup_Item* elm_ctxpopup_label_add(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data);
    EAPI void         elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item);
    EAPI void         elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item *item, Eina_Bool disabled);
    EAPI void         elm_ctxpopup_clear(Evas_Object *obj);
@@ -1869,7 +1869,7 @@ extern "C" {
    EAPI void         elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled);
    EAPI void         elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y);
    EAPI void         elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y);
-//   EAPI void         elm_ctxpopup_button_append(Evas_Object *obj, const char *label);
+   EAPI void         elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data);
 
    
    /* QuickContactBadge */
