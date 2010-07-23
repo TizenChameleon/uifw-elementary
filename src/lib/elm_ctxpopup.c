@@ -374,7 +374,7 @@ _sizing_eval(Evas_Object *obj)
    Eina_List *elist;
    Elm_Ctxpopup_Item *item;
    Evas_Coord_Rectangle rect = {0,0,1,1};
-   Evas_Coord x, y, w, h;
+   Evas_Coord  y, w, h;
    Arrow_Direction arrow_dir;
    wd = (Widget_Data *) elm_widget_data_get(obj);
    char buf[256];
@@ -387,10 +387,6 @@ _sizing_eval(Evas_Object *obj)
       _item_sizing_eval(item);
    }
 
-   //button layout
-	sprintf(buf, "actionbtn%d", wd->btn_cnt);
-	edje_object_part_geometry_get( wd->btn_layout,  buf, 0, 0, &w, &h );
-	evas_object_size_hint_min_set( wd->btn_layout, w, h );
 
 	//base
    arrow_dir = _calc_base_geometry(obj, &rect);
@@ -541,10 +537,10 @@ _bg_clicked_cb(void *data, Evas_Object *obj, const char *emission, const char *s
 static void 
 _parent_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-   Widget_Data *wd = (Widget_Data *) data;
+	Evas_Coord x, y;
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(data);
    if (!wd) return;
 
-	Evas_Coord x, y;
 	evas_object_geometry_get(obj, &x, &y, NULL, NULL);
 	evas_object_move(wd->bg, x, y);
 	_sizing_eval(data);
@@ -553,10 +549,10 @@ _parent_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
 static void
 _parent_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-   Widget_Data *wd = (Widget_Data *) data;
+	Evas_Coord w, h;
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(data);
    if (!wd) return;
 
-	Evas_Coord w, h;
 	evas_object_geometry_get(obj, NULL, NULL, &w, &h);
 	evas_object_resize(wd->bg, w, h);
 	_sizing_eval(data);
@@ -772,7 +768,7 @@ elm_ctxpopup_add(Evas_Object *parent)
 
 	//Background
 	wd->bg = edje_object_add(e);
-	elm_widget_sub_object_add(obj, wd->bg);
+	//elm_widget_sub_object_add(obj, wd->bg);
 	_elm_theme_object_set(obj, wd->bg, "ctxpopup", "bg",
 						 elm_widget_style_get(obj));
 	evas_object_geometry_get(parent, &x, &y, &w, &h);
@@ -811,7 +807,7 @@ elm_ctxpopup_add(Evas_Object *parent)
 				      elm_widget_style_get(obj));
 
 	evas_object_event_callback_add(parent, EVAS_CALLBACK_MOVE, _parent_move, obj);
-   evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _parent_resize,
+	evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _parent_resize,
 				  obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _ctxpopup_show, wd);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _ctxpopup_hide, wd);
@@ -1236,6 +1232,11 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb fu
 		evas_object_smart_callback_add(btn, "clicked", func, data);
 		sprintf(buf, "actionbtn%d", wd->btn_cnt);
 		edje_object_part_swallow(wd->btn_layout,  buf, btn);
+
+		//button layout
+		sprintf(buf, "actionbtn%d", wd->btn_cnt);
+		edje_object_part_geometry_get( wd->btn_layout,  buf, 0, 0, &w, &h );
+		evas_object_size_hint_min_set( wd->btn_layout, w, h );
 	}
 
 	if(wd->visible)
@@ -1244,7 +1245,6 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb fu
 }
 
 
-/*
 EAPI void
 elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y)
 {
@@ -1273,7 +1273,5 @@ elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y)
 	if( align_x ) *align_x = wd->align_x;
 	if( align_y ) *align_y = wd->align_y;
 }
-
-*/
 
 
