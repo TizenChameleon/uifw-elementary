@@ -9,7 +9,7 @@
  *
  *Signals that you can add callbacks for are:
  *
- * ctxpopup,hide - This is called whenever the ctxpopup is hided.
+ * hide - This is called whenever the ctxpopup is hided.
  *
  */
 
@@ -73,6 +73,8 @@ static void _arrow_obj_add(Evas_Object *obj, const char *group_name);
 static void _update_arrow_obj(Evas_Object *obj, Arrow_Direction arrow_dir);
 static void _shift_base_by_arrow(Evas_Object *arrow, Arrow_Direction arrow_dir, Evas_Coord_Rectangle *rect);
 static void _btn_layout_create(Evas_Object *obj);
+static void _btn_clicked(void *data, Evas_Object *obj, void *event_info);
+
 static void
 _separator_obj_del(Widget_Data *wd, Elm_Ctxpopup_Item *remove_item)
 {
@@ -534,7 +536,7 @@ _theme_hook(Evas_Object *obj)
 static void
 _bg_clicked_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-	evas_object_smart_callback_call(data, "ctxpopup,hide", NULL);
+	evas_object_smart_callback_call(data, "hide", NULL);
 	evas_object_hide(data);
 }
 
@@ -624,13 +626,13 @@ _ctxpopup_item_select(void *data, Evas_Object *obj, const char *emission,
 		      const char *source)
 {
    Elm_Ctxpopup_Item *item = (Elm_Ctxpopup_Item *) data;
-
    if (!item)
       return;
    if (item->disabled)
       return;
-   if (item->func)
-      item->func((void *)(item->data), item->ctxpopup, item);
+   if (item->func) {
+      item->func(item->data, item->ctxpopup, item);
+   }
 }
 
 static void
@@ -669,6 +671,15 @@ _item_obj_create(Elm_Ctxpopup_Item *item,  char *group_name)
 	evas_object_size_hint_align_set(item->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(item->base);
 }
+
+
+static void
+_btn_clicked(void *data, Evas_Object *obj, void *event_info)
+{
+	evas_object_smart_callback_call(data, "response", data);
+}
+
+
 
 /**
  * Get the icon object for the given item.
@@ -984,7 +995,7 @@ elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label)
  * @ingroup Ctxpopup
  */
 EAPI Elm_Ctxpopup_Item *
-elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, void (*func) (void *data, Evas_Object *obj, void *event_info), void* data)
+elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, Evas_Smart_Cb func, const void *data)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Elm_Ctxpopup_Item *item;
@@ -1027,8 +1038,7 @@ elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, vo
  */
 EAPI Elm_Ctxpopup_Item *
 elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon,
-		      void (*func) (void *data, Evas_Object *obj,
-				    void *event_info), void *data)
+		      Evas_Smart_Cb func, const void *data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Elm_Ctxpopup_Item *item;
@@ -1068,8 +1078,7 @@ elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon,
  */
 EAPI Elm_Ctxpopup_Item *
 elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
-		       void (*func) (void *data, Evas_Object *obj,
-				     void *event_info), void *data)
+		       Evas_Smart_Cb func, const void *data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Elm_Ctxpopup_Item *item;
@@ -1092,8 +1101,6 @@ elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
       wd->items = eina_list_append(wd->items, item);
    elm_box_pack_end(wd->box, item->base);
    elm_ctxpopup_item_label_set(item, label);
-
-
 
 	return item;
 }
@@ -1204,7 +1211,7 @@ elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 }
 
 EAPI void
-elm_ctxpopup_button_append(Evas_Object *obj, const char *label)
+elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 
@@ -1228,6 +1235,7 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label)
 		btn = elm_button_add(obj);
 		elm_object_style_set(btn, "text_only/style1");
 		elm_button_label_set(btn, label);
+		evas_object_smart_callback_add(btn, "clicked", func, data);
 		sprintf(buf, "actionbtn%d", wd->btn_cnt);
 		edje_object_part_swallow(wd->btn_layout,  buf, btn);
 	}
