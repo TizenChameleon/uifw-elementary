@@ -407,14 +407,8 @@ _sizing_eval(Evas_Object *obj)
 	//scroller
 	edje_object_part_geometry_get(wd->base, "ctxpopup_frame", NULL, &y, &w, &h);
 	edje_object_part_geometry_get(wd->base, "ctxpopup_list", NULL, &y, NULL, &h );
-if(wd->btn_layout) {
-	evas_object_resize(wd->scroller, w, h+(y*2)); }else {
-		//TODO: Remove!!
-	evas_object_resize(wd->scroller, rect.w, rect.h);
-	}
+	evas_object_resize(wd->scroller, w, h+(y*2));
 	evas_object_move(wd->scroller, rect.x, rect.y);
-
-
 }
 
 static void
