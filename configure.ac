@@ -402,9 +402,7 @@ AC_ARG_ENABLE([ewebkit],
 if test "x$want_elementary_ewebkit" != "xno"; then
     PKG_CHECK_MODULES([ELEMENTARY_EWEBKIT],
        [
-        glib-2.0
-        gobject-2.0
-        gthread-2.0
+        ewebkit
        ],
        [
         AC_DEFINE(HAVE_ELEMENTARY_EWEBKIT, 1, [EWebKit support for Elementary])
@@ -414,7 +412,16 @@ if test "x$want_elementary_ewebkit" != "xno"; then
        ],
        [have_elementary_ewebkit="no"]
     )
-#ewebkit
+    PKG_CHECK_MODULES([ELEMENTARY_EWEBKIT_SUPPORT],
+       [
+        glib-2.0
+        gobject-2.0
+        gthread-2.0
+       ],
+       [],
+       [have_elementary_ewebkit="no"]
+    )
+
 else
     have_elementary_ewebkit="no"
 fi
@@ -527,6 +534,7 @@ echo "    EDBus..............: ${have_elementary_edbus}"
 echo "    EFreet.............: ${have_elementary_efreet}"
 echo "    EWeather...........: ${have_elementary_eweather}"
 echo "    Ethumb.............: ${have_elementary_ethumb}"
+echo "    EWebKit............: ${have_elementary_ewebkit}"
 echo
 echo "  edje_cc..............: ${edje_cc}"
 echo

@@ -1,3 +1,7 @@
+/*
+ *
+ * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ */
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -12,6 +16,7 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *webkit;
+   Eina_Bool auto_fitting:1;
 };
 
 static const char *widtype = NULL;
@@ -93,7 +98,7 @@ elm_webview_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
 
-   wd->webkit = _els_webview_add(obj, EINA_TRUE);
+   wd->webkit = _els_webview_add(obj, EINA_FALSE);
    //TODO:evas_object_box_layout_set(wd->box, _layout, wd, NULL);
    evas_object_event_callback_add(wd->webkit, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				  _changed_size_hints, obj);

@@ -7,9 +7,6 @@ test_webkit(void *data, Evas_Object *obj, void *event_info)
 #ifdef ELM_EWEBKIT
    Evas_Object *win, *bg, *wv, *ic;
 
-   g_type_init();
-   g_thread_init(0);
-
    printf("#### test_webkit\n");
    win = elm_win_add(NULL, "box-horiz", ELM_WIN_BASIC);
    elm_win_title_set(win, "Box Horiz");
