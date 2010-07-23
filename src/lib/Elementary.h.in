@@ -795,9 +795,9 @@ extern "C" {
    EAPI void         elm_entry_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data);
    EAPI char        *elm_entry_markup_to_utf8(const char *s);
    EAPI char        *elm_entry_utf8_to_markup(const char *s);
-   EAPI void         elm_entry_fontsize_set(Evas_Object *obj, const int fontsize);
+   EAPI void         elm_entry_fontsize_set(Evas_Object *obj, int fontsize);
    EAPI void         elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
-   EAPI void         elm_entry_text_align_set(Evas_Object *obj, char *alignmode);
+   EAPI void         elm_entry_text_align_set(Evas_Object *obj, const char *alignmode);
    EAPI void         elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
    EAPI void         elm_entry_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis);
 

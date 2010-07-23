@@ -5685,6 +5685,9 @@ collections {
         "emo-wtf.png"; } } } }
 //------------------------------------------------------------
    group { name: "elm/entry/base/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       styles
 	{
 	   style { name: "entry_textblock_style";
@@ -5770,6 +5773,9 @@ collections {
    }
 
     group { name: "elm/entry/base-charwrap/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       styles
 	{
 	   style { name: "entry_textblock_style_charwrap";
@@ -5853,6 +5859,9 @@ collections {
 
 
    group { name: "elm/entry/base-nowrap/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       parts {
      part { name: "entry.swallow.background";
         type: SWALLOW;
@@ -5940,6 +5949,9 @@ collections {
    }
 
    group { name: "elm/entry/base-single/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       styles
 	{
 	   style { name: "entry_single_textblock_style";
@@ -6018,6 +6030,9 @@ collections {
    }
 
    group { name: "elm/entry/base-single-noedit/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       parts {
      part { name: "entry.swallow.background";
         type: SWALLOW;
@@ -6074,6 +6089,9 @@ collections {
    }
 
    group { name: "elm/entry/base-noedit/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       parts {
      part { name: "entry.swallow.background";
         type: SWALLOW;
@@ -6130,6 +6148,9 @@ collections {
    }
 
    group { name: "elm/entry/base-noedit-charwrap/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       parts {
      part { name: "entry.swallow.background";
         type: SWALLOW;
@@ -6186,6 +6207,9 @@ collections {
    }
 
    group { name: "elm/entry/base-nowrap-noedit/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       parts {
      part { name: "entry.swallow.background";
         type: SWALLOW;
@@ -6241,6 +6265,9 @@ collections {
    }
 
   group { name: "elm/entry/base-password/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       parts {
      part { name: "entry.swallow.background";
         type: SWALLOW;
@@ -6299,6 +6326,9 @@ collections {
    }
 
    group { name: "elm/entry/cursor/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
       images {
 	 image: "cur_box.png" COMP;
 	 image: "cur_hi.png" COMP;

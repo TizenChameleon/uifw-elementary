@@ -360,7 +360,7 @@ _ellipsis_label_to_width(Evas_Object *obj)
    txtbuf = eina_strbuf_new();
    eina_strbuf_append(txtbuf, wd->label);
 
-   while (_is_width_over(obj) == 1)
+   while (_is_width_over(obj))
      {
        if (cur_fontsize > minfontsize)
          {
@@ -395,7 +395,7 @@ _ellipsis_label_to_width(Evas_Object *obj)
                eina_strbuf_append(txtbuf, ellipsis_string);
                edje_object_part_text_set(wd->lbl, "elm.text", eina_strbuf_string_get(txtbuf));
 
-               if (_is_width_over(obj) == 1) 
+               if (_is_width_over(obj)) 
                  showcount--;
                else 
                  break;
