@@ -294,6 +294,7 @@ elm_popup_add(Evas_Object *parent_app)
 
    //FIXME: Keep this window always on top
    parent = elm_win_add(parent_app, "popup", ELM_WIN_DIALOG_BASIC);
+   elm_win_borderless_set(parent, EINA_TRUE);
    elm_win_alpha_set(parent, EINA_TRUE);  
    elm_win_raise(parent);  
    if (parent_app)
@@ -303,9 +304,7 @@ elm_popup_add(Evas_Object *parent_app)
 	evas_object_resize(parent, w, h);
 	evas_object_move(parent, x, y);
 	if (rotation != -1)
-	  {
-	     elm_win_rotation_set(parent, rotation);
-	  }
+	  elm_win_rotation_set(parent, rotation);
      }
    else
      {
