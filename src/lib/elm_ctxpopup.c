@@ -223,6 +223,8 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	base_h += box_h ;
 
 	edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
+	max_width_size *= elm_scale_get();
+	max_height_size *= elm_scale_get();
 
    if (base_h > max_height_size)
       base_h = max_height_size;
@@ -377,7 +379,6 @@ _sizing_eval(Evas_Object *obj)
    Evas_Coord  y, w, h;
    Arrow_Direction arrow_dir;
    wd = (Widget_Data *) elm_widget_data_get(obj);
-   char buf[256];
 
    if ((!wd) || (!wd->parent))
       return;
@@ -386,7 +387,6 @@ _sizing_eval(Evas_Object *obj)
    {
       _item_sizing_eval(item);
    }
-
 
 	//base
    arrow_dir = _calc_base_geometry(obj, &rect);
