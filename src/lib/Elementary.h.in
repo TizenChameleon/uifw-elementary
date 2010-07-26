@@ -1852,6 +1852,15 @@ extern "C" {
 
    /* Contextual Popup */
    typedef struct _Ctxpopup_Item Elm_Ctxpopup_Item;
+   
+   typedef enum _Ctxpopup_Arrow_Direction
+{
+  	ELM_CTXPOPUP_ARROW_DOWN,
+  	ELM_CTXPOPUP_ARROW_RIGHT,
+  	ELM_CTXPOPUP_ARROW_LEFT,
+  	ELM_CTXPOPUP_ARROW_UP,
+} Elm_Ctxpopup_Arrow;
+   
 
    EAPI Evas_Object *elm_ctxpopup_add(Evas_Object *parent);
    EAPI void         elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal);
@@ -1871,7 +1880,7 @@ extern "C" {
    EAPI void         elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y);
    EAPI void         elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y);
    EAPI void         elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data);
-
+	EAPI void		elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first, Elm_Ctxpopup_Arrow second, Elm_Ctxpopup_Arrow third, Elm_Ctxpopup_Arrow fourth);
    
    /* QuickContactBadge */
    typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;

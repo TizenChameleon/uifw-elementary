@@ -15,9 +15,7 @@
 
 typedef struct _Widget_Data Widget_Data;
 
-typedef enum
-{ BOTTOM_ARROW, RIGHT_ARROW, LEFT_ARROW, TOP_ARROW,
-      NONE_ARROW } Arrow_Direction;
+
 
 struct _Ctxpopup_Item
 {
@@ -25,7 +23,7 @@ struct _Ctxpopup_Item
    Evas_Object *base;
    const char *label;
    Evas_Object *content;
-   void (*func) (void *data, Evas_Object *obj, void *event_info);
+   void (*func) ( void *data, Evas_Object *obj, void *event_info);
    const void *data;
    Eina_Bool disabled:1;
    Eina_Bool separator:1;
@@ -43,12 +41,12 @@ struct _Widget_Data
    Eina_List *items;
    double align_x, align_y;
    int btn_cnt;
+   Elm_Ctxpopup_Arrow arrow_priority[4];
    Eina_Bool scroller_disabled:1;
    Eina_Bool horizontal:1;
-	Eina_Bool arrow_disabled:1;
+   Eina_Bool arrow_disabled:1;
 	Eina_Bool visible:1;
 	Eina_Bool screen_dimmed_disabled:1;
-
 };
 
 static const char *widtype = NULL;
@@ -68,10 +66,10 @@ static void _item_sizing_eval(Elm_Ctxpopup_Item *item);
 static void _ctxpopup_item_select(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _separator_obj_add(Evas_Object *obj); 
 static void _separator_obj_del(Widget_Data *wd, Elm_Ctxpopup_Item *remove_item);
-static Arrow_Direction _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect);
+static Elm_Ctxpopup_Arrow _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect);
 static void _arrow_obj_add(Evas_Object *obj, const char *group_name);
-static void _update_arrow_obj(Evas_Object *obj, Arrow_Direction arrow_dir);
-static void _shift_base_by_arrow(Evas_Object *arrow, Arrow_Direction arrow_dir, Evas_Coord_Rectangle *rect);
+static void _update_arrow_obj(Evas_Object *obj, Elm_Ctxpopup_Arrow arrow_dir);
+static void _shift_base_by_arrow(Evas_Object *arrow, Elm_Ctxpopup_Arrow arrow_dir, Evas_Coord_Rectangle *rect);
 static void _btn_layout_create(Evas_Object *obj);
 static void _btn_clicked(void *data, Evas_Object *obj, void *event_info);
 
@@ -192,7 +190,7 @@ _item_sizing_eval(Elm_Ctxpopup_Item *item)
 		}    \
 	}while(0)
 
-static Arrow_Direction
+static Elm_Ctxpopup_Arrow
 _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 {
 	Widget_Data *wd;
@@ -200,7 +198,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    Evas_Coord parent_x, parent_y, parent_w, parent_h;
    Evas_Coord box_w, box_h;
    Evas_Coord base_w = 0, base_h = 0;
-   Arrow_Direction arrow_dir;
+   Elm_Ctxpopup_Arrow arrow;
    Evas_Coord x1, x2, y1, y2;
    int idx;
    Evas_Coord finger_size;
@@ -210,8 +208,9 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 
 	wd = elm_widget_data_get(obj);
 
-   if ((!wd) || (!rect))
-      return NONE_ARROW;
+   if ((!wd) || (!rect)) {
+      return ELM_CTXPOPUP_ARROW_DOWN;
+   }
 
 	evas_object_geometry_get(obj, &x, &y, NULL, NULL);
 	evas_object_geometry_get(wd->parent, &parent_x, &parent_y, &parent_w,
@@ -234,8 +233,9 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 
    finger_size = elm_finger_size_get();
 
-	if((base_h == 0) || (base_w == 0))
-		return NONE_ARROW;
+	if((base_h == 0) || (base_w == 0)) {
+		return ELM_CTXPOPUP_ARROW_DOWN;
+	}
 
 	if (!wd->arrow_disabled)
 		{
@@ -243,85 +243,85 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 				evas_object_resize( wd->arrow, arrow_w, arrow_h );
 		}
 
-   //Phase 1: Define x, y Segments and find invalidated direction.
-   //Left
-   x1 = x - base_w;
-   if ((x1 - arrow_w - finger_size) < parent_x)
-     {
-	x1 = parent_x;
-	available_direction[RIGHT_ARROW] = 0;
-     }
+	//Define x, y Segments and find invalidated direction.
+	//After that, adjust base geometry.
+	for (idx = 0; idx < 4; ++idx)
+	{
+		switch (wd->arrow_priority[idx])
+		  {
+		  case ELM_CTXPOPUP_ARROW_DOWN:
+			   y1 = y - base_h;
+			   if (y1 - arrow_h - finger_size > parent_y) continue;
+				y1 = parent_y;
+				available_direction[idx] = 0;
+		     break;
+		  case ELM_CTXPOPUP_ARROW_RIGHT:
+			   x1 = x - base_w;
+			   if ((x1 - arrow_w - finger_size) > parent_x) continue;
+				x1 = parent_x;
+				available_direction[idx] = 0;
+		     break;
+		  case ELM_CTXPOPUP_ARROW_LEFT:
+			   x2 = x + base_w;
+			   if (x2 + arrow_w + finger_size < WORLD_PARENT_W) continue;
+				x2 = WORLD_PARENT_W - base_w;
+				available_direction[idx] = 0;
+		     break;
+		  case ELM_CTXPOPUP_ARROW_UP:
+			   y2 = y + base_h;
+			   if (y2 + arrow_h + finger_size < WORLD_PARENT_H) continue;
+				y2 = WORLD_PARENT_H - base_h;
+				available_direction[idx] = 0;
+		     break;
+		  default:
+			  break;
+		  }
+	}
 
-   //Right
-   x2 = x + base_w;
-   if (x2 + arrow_w + finger_size > WORLD_PARENT_W)
-     {
-	x2 = WORLD_PARENT_W - base_w;
-	available_direction[LEFT_ARROW] = 0;
-     }
-
-   //Top
-   y1 = y - base_h;
-   if (y1 - arrow_h - finger_size < parent_y)
-     {
-	y1 = parent_y;
-	available_direction[BOTTOM_ARROW] = 0;
-     }
-   //Bottom
-   y2 = y + base_h;
-   if (y2 + arrow_h + finger_size > WORLD_PARENT_H)
-     {
-	y2 = WORLD_PARENT_H - base_h;
-	available_direction[TOP_ARROW] = 0;
-     }
-
-//ADDITIONAL OPTION: Phase 2: Determine Direction Priority ?
-
-//Phase 3: adjust base geometry.
    for (idx = 0; idx < 4; ++idx)
      {
 	if (available_direction[idx] == 0)
 	   continue;
 
 	//Find the Nearest point to center of box.
-	switch (idx)
+	switch (wd->arrow_priority[idx])
 	  {
-	  case BOTTOM_ARROW:
+	  case ELM_CTXPOPUP_ARROW_DOWN:
 	     ADJUST_POS_X(x);
 	     y -= (base_h + finger_size);
-	     arrow_dir = BOTTOM_ARROW;
+	     arrow = ELM_CTXPOPUP_ARROW_DOWN;
 	     break;
-	  case RIGHT_ARROW:
+	  case ELM_CTXPOPUP_ARROW_RIGHT:
 	     ADJUST_POS_Y(y);
 	     x -= (base_w + finger_size);
-	     arrow_dir = RIGHT_ARROW;
+	     arrow = ELM_CTXPOPUP_ARROW_RIGHT;
 	     break;
-	  case LEFT_ARROW:
+	  case ELM_CTXPOPUP_ARROW_LEFT:
 	     ADJUST_POS_Y(y);
 	     x += finger_size;
-	     arrow_dir = LEFT_ARROW;
+	     arrow = ELM_CTXPOPUP_ARROW_LEFT;
 	     break;
-	  case TOP_ARROW:
+	  case ELM_CTXPOPUP_ARROW_UP:
 	     ADJUST_POS_X(x);
 	     y += finger_size;
-	     arrow_dir = TOP_ARROW;
+	     arrow = ELM_CTXPOPUP_ARROW_UP;
 	     break;
 	  default:
-	     fprintf(stderr, "Not Enough space to show contextual popup!! \n");
+		  break;
 	  }
-	break;
+		break;
      }
    rect->x = x;
    rect->y = y;
    rect->w = base_w;
    rect->h = base_h;
 
-   return arrow_dir;
+   return arrow;
 }
 
 
 static void
-_update_arrow_obj(Evas_Object *obj, Arrow_Direction arrow_dir)
+_update_arrow_obj(Evas_Object *obj, Elm_Ctxpopup_Arrow arrow_dir)
 {
   	Evas_Coord x, y;
 	Evas_Coord arrow_x, arrow_y, arrow_w, arrow_h;
@@ -335,28 +335,28 @@ _update_arrow_obj(Evas_Object *obj, Arrow_Direction arrow_dir)
 
 	switch (arrow_dir)
      {
-     case LEFT_ARROW:
+     case ELM_CTXPOPUP_ARROW_LEFT:
 	{
 		edje_object_signal_emit(wd->arrow, "elm,state,left", "elm");
 	   arrow_y = (y - (arrow_h*0.5));
 	   arrow_x = (x + elm_finger_size_get());
 	   break;
 	}
-     case RIGHT_ARROW:
+     case ELM_CTXPOPUP_ARROW_RIGHT:
 	{
 		edje_object_signal_emit(wd->arrow, "elm,state,right", "elm");
 	   arrow_y = (y - (arrow_h*0.5));
 		arrow_x = (x - elm_finger_size_get() - arrow_w);
 	   break;
 	}
-     case TOP_ARROW:
+     case ELM_CTXPOPUP_ARROW_UP:
 	{
 		edje_object_signal_emit(wd->arrow, "elm,state,top", "elm");
 	   arrow_x = (x - (arrow_w*0.5));
 	   arrow_y = (y + elm_finger_size_get());
 	   break;
 	}
-     case BOTTOM_ARROW:
+     case ELM_CTXPOPUP_ARROW_DOWN:
 	{
 		edje_object_signal_emit(wd->arrow, "elm,state,bottom", "elm");
 		arrow_x = (x - (arrow_w*0.5));
@@ -377,7 +377,7 @@ _sizing_eval(Evas_Object *obj)
    Elm_Ctxpopup_Item *item;
    Evas_Coord_Rectangle rect = {0,0,1,1};
    Evas_Coord  y, w, h;
-   Arrow_Direction arrow_dir;
+   Elm_Ctxpopup_Arrow arrow;
    wd = (Widget_Data *) elm_widget_data_get(obj);
 
    if ((!wd) || (!wd->parent))
@@ -389,12 +389,12 @@ _sizing_eval(Evas_Object *obj)
    }
 
 	//base
-   arrow_dir = _calc_base_geometry(obj, &rect);
+   arrow = _calc_base_geometry(obj, &rect);
 
-	if((!wd->arrow_disabled) && (arrow_dir!=NONE_ARROW)) 
+	if(!wd->arrow_disabled)
 	{
-		_update_arrow_obj(obj, arrow_dir);
-		_shift_base_by_arrow(wd->arrow, arrow_dir, &rect);
+		_update_arrow_obj(obj, arrow);
+		_shift_base_by_arrow(wd->arrow, arrow, &rect);
 	}
 
 	evas_object_resize(wd->base, rect.w, rect.h);
@@ -408,7 +408,7 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void
-_shift_base_by_arrow(Evas_Object *arrow, Arrow_Direction arrow_dir,
+_shift_base_by_arrow(Evas_Object *arrow, Elm_Ctxpopup_Arrow arrow_dir,
 			 Evas_Coord_Rectangle *rect)
 {
    Evas_Coord arrow_w, arrow_h;
@@ -416,20 +416,20 @@ _shift_base_by_arrow(Evas_Object *arrow, Arrow_Direction arrow_dir,
 
 	switch (arrow_dir)
      {
-     case LEFT_ARROW:
+     case ELM_CTXPOPUP_ARROW_LEFT:
 	rect->x += arrow_w;
 	break;
-     case RIGHT_ARROW:
+     case ELM_CTXPOPUP_ARROW_RIGHT:
 	rect->x -= arrow_w;
 	break;
-     case TOP_ARROW:
+     case ELM_CTXPOPUP_ARROW_UP:
 	rect->y += arrow_h;
 	break;
-     case BOTTOM_ARROW:
+     case ELM_CTXPOPUP_ARROW_DOWN:
 	rect->y -= arrow_h;
 	break;
-     case NONE_ARROW:
-	break;
+    default:
+    	 break;
      }
 }
 
@@ -763,12 +763,10 @@ elm_ctxpopup_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
 
 	wd->parent = parent;
-	wd->align_x = 0.5;
-	wd->align_y = 0.5;
 
 	//Background
 	wd->bg = edje_object_add(e);
-	//elm_widget_sub_object_add(obj, wd->bg);
+	elm_widget_sub_object_add(obj, wd->bg);
 	_elm_theme_object_set(obj, wd->bg, "ctxpopup", "bg",
 						 elm_widget_style_get(obj));
 	evas_object_geometry_get(parent, &x, &y, &w, &h);
@@ -805,6 +803,11 @@ elm_ctxpopup_add(Evas_Object *parent)
 	elm_widget_sub_object_add(obj, wd->arrow);
 	_elm_theme_object_set(obj, wd->arrow, "ctxpopup", "arrow",
 				      elm_widget_style_get(obj));
+
+	wd->arrow_priority[0] = ELM_CTXPOPUP_ARROW_DOWN;
+	wd->arrow_priority[1] = ELM_CTXPOPUP_ARROW_RIGHT;
+	wd->arrow_priority[2] = ELM_CTXPOPUP_ARROW_LEFT;
+	wd->arrow_priority[3] = ELM_CTXPOPUP_ARROW_UP;
 
 	evas_object_event_callback_add(parent, EVAS_CALLBACK_MOVE, _parent_move, obj);
 	evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _parent_resize,
@@ -1204,6 +1207,15 @@ elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 	wd->screen_dimmed_disabled = disabled;
 }
 
+/**
+ * Append additional button in ctxpoppup bottom layout.
+ * @param obj		Ctxpopup object
+ * @param label  Button label
+ * @param func   Button clicked event callback function
+ * @param data   Button clicked event callback function data
+ *
+ * @ingroup Ctxpopup
+ */
 EAPI void
 elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data)
 {
@@ -1244,7 +1256,17 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb fu
 
 }
 
-
+/**
+ * Sets the size align control hint for the items
+ *
+ *  Please refer the evas_object_size_hint_align_set function
+ *
+ * @param obj		Ctxpopup object
+ * @param align_x Double (0.0..1.0 or -1.0) to use as align x hint
+ * @param align_y Double (0.0..1.0 or -1.0) to use as align y hint
+ *
+ * @ingroup Ctxpopup
+ */
 EAPI void
 elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y)
 {
@@ -1263,7 +1285,17 @@ elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y)
 	wd->align_y = align_y;
 }
 
-
+/**
+ * Retrieves the size align control hint
+ *
+ *  Please refer the evas_object_size_hint_align_get function
+ *
+ * @param obj		Ctxpopup object
+ * @param align_x Pointer to a double in which to store the align x.
+ * @param align_y Pointer to a double in which to store the align y.
+ *
+ * @ingroup Ctxpopup
+ */
 EAPI void
 elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y)
 {
@@ -1273,5 +1305,24 @@ elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y)
 	if( align_x ) *align_x = wd->align_x;
 	if( align_y ) *align_y = wd->align_y;
 }
+
+
+
+
+EAPI void
+elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first, Elm_Ctxpopup_Arrow second, Elm_Ctxpopup_Arrow third, Elm_Ctxpopup_Arrow fourth)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+	if(!wd) return;
+	wd->arrow_priority[0] = first;
+	wd->arrow_priority[1] = second;
+	wd->arrow_priority[2] = third;
+	wd->arrow_priority[3] = fourth;
+}
+
+
+
+
 
 
