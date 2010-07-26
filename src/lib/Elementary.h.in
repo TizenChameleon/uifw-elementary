@@ -1273,7 +1273,7 @@ extern "C" {
    EAPI Evas_Object *elm_pager_content_bottom_get(const Evas_Object *obj);
    EAPI Evas_Object *elm_pager_content_top_get(const Evas_Object *obj);
    EAPI void         elm_pager_animation_set(Evas_Object *obj, Eina_Bool animation);
-  /* available item styles:
+   /* available item styles:
     * default
     * fade
     * fade_translucide
@@ -1792,7 +1792,7 @@ extern "C" {
     * default
     */
 
-    /* titlebar */
+   /* titlebar */
    EAPI Evas_Object *elm_titlebar_add(Evas_Object *parent);
    EAPI void         elm_titlebar_label_set(Evas_Object *obj, const char *label);
    EAPI const char  *elm_titlebar_label_get(Evas_Object *obj);
@@ -1849,8 +1849,18 @@ extern "C" {
    EAPI void         elm_popup_response(Evas_Object *obj, int  response_id);
    EAPI void         elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
    EAPI void         elm_popup_rotation_set(Evas_Object *obj, int rot_angle);
+
    /* Contextual Popup */
    typedef struct _Ctxpopup_Item Elm_Ctxpopup_Item;
+   
+   typedef enum _Ctxpopup_Arrow_Direction
+{
+  	ELM_CTXPOPUP_ARROW_DOWN,
+  	ELM_CTXPOPUP_ARROW_RIGHT,
+  	ELM_CTXPOPUP_ARROW_LEFT,
+  	ELM_CTXPOPUP_ARROW_UP,
+} Elm_Ctxpopup_Arrow;
+   
 
    EAPI Evas_Object *elm_ctxpopup_add(Evas_Object *parent);
    EAPI void         elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal);
@@ -1870,7 +1880,7 @@ extern "C" {
    EAPI void         elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y);
    EAPI void         elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y);
    EAPI void         elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data);
-
+	EAPI void		elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first, Elm_Ctxpopup_Arrow second, Elm_Ctxpopup_Arrow third, Elm_Ctxpopup_Arrow fourth);
    
    /* QuickContactBadge */
    typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;
@@ -1948,7 +1958,7 @@ extern "C" {
    EAPI Eina_Bool     elm_animator_operating_get(Elm_Animator *animator);
    EAPI unsigned int  elm_animator_repeat_get(Elm_Animator *animator);
 
-  /* tansit */
+   /* tansit */
    typedef struct _transit Elm_Transit;
    typedef struct _effect Elm_Effect;
 
@@ -1967,32 +1977,32 @@ extern "C" {
    EAPI void         elm_transit_fx_clear(Elm_Transit* transit);
    EAPI Eina_Bool    elm_transit_event_block_disabled_get(Elm_Transit* transit);
 
-   /*Translation FX*/  
+   /* Translation FX */
    EAPI Elm_Effect  *elm_fx_translation_add(Evas_Object* obj, Evas_Coord from_x, Evas_Coord from_y, Evas_Coord to_x, Evas_Coord to_y);
 
-   /*Resizing FX*/  
+   /* Resizing FX */
    EAPI Elm_Effect  *elm_fx_resizing_add(Evas_Object* obj, Evas_Coord from_w, Evas_Coord from_h, Evas_Coord to_w, Evas_Coord to_h);
 
-   /*Zoom Fx*/  
+   /* Zoom Fx */
    EAPI Elm_Effect  *elm_fx_zoom_add(Evas_Object* obj, float from_rate, float to_rate);
 
-   /*Flip Fx*/
+   /* Flip Fx */
    typedef enum {ELM_FX_FLIP_AXIS_X, ELM_FX_FLIP_AXIS_Y} Elm_Fx_Flip_Axis;
    EAPI Elm_Effect  *elm_fx_flip_add( Evas_Object* front, Evas_Object* back, Elm_Fx_Flip_Axis axis, Eina_Bool cw);
 
-   /*Blend Fx*/
+   /* Blend Fx */
    EAPI Elm_Effect  *elm_fx_blend_add(Evas_Object* before, Evas_Object* after);
 
-   /*Fade Fx*/
+   /* Fade Fx */
    EAPI Elm_Effect  *elm_fx_fade_add(Evas_Object* before, Evas_Object* after);
     
-   /*Rotation Fx*/
+   /* Rotation Fx */
    EAPI Elm_Effect  *elm_fx_rotation_add(Evas_Object* obj, float from_degree, float to_degree, Eina_Bool cw);
 
-   /*Color Fx*/
+   /* Color Fx */
    EAPI Elm_Effect  *elm_fx_color_add(Evas_Object* obj, unsigned int from_r, unsigned int from_g, unsigned int from_b, unsigned int from_a, unsigned int to_r, unsigned int to_g, unsigned int to_b, unsigned int to_a);
 
-   /*Wipe Fx*/
+   /* Wipe Fx */
    typedef enum 
      {
 	ELM_FX_WIPE_DIR_LEFT, 
@@ -2007,7 +2017,7 @@ extern "C" {
      } Elm_Fx_Wipe_Type;
    EAPI Elm_Effect  *elm_fx_wipe_add(Evas_Object* obj, Elm_Fx_Wipe_Type type, Elm_Fx_Wipe_Dir dir);
 
-   /*ResizableFlip Fx*/
+   /* ResizableFlip Fx */
    EAPI Elm_Effect  *elm_fx_resizable_flip_add(Evas_Object* front, Evas_Object* back, Elm_Fx_Flip_Axis axis, Eina_Bool cw);
   
    /*Transform Fx*/
@@ -2086,6 +2096,12 @@ extern "C" {
    #define CONTROLBAR_SYSTEM_ICON_FAVORITES "controlbar_favorites" 
    #define CONTROLBAR_SYSTEM_ICON_LOGS "controlbar_logs" 
 
+   typedef enum _Elm_Controlbar_Mode_Type{
+	ELM_CONTROLBAR_MODE_DEFAULT = 0,
+	ELM_CONTROLBAR_MODE_LARGE,
+	ELM_CONTROLBAR_MODE_SMALL
+   } Elm_Controlbar_Mode_Type;
+
    typedef struct _Elm_Controlbar_Item Elm_Controlbar_Item;
 
    EAPI Evas_Object *elm_controlbar_add(Evas_Object *parent);
@@ -2116,6 +2132,8 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_edit_start(Evas_Object *obj);
    EAPI void         elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
+   EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
+   EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
 
 
   /* diskcontroller */
@@ -2175,19 +2193,19 @@ extern "C" {
 
 
    /* colorpalette */
-    typedef struct _Colorpalette_Color Elm_Colorpalette_Color; 
+   typedef struct _Colorpalette_Color Elm_Colorpalette_Color; 
 
-    struct _Colorpalette_Color 
-      {
-	 unsigned int r, g, b;
-      };
+   struct _Colorpalette_Color 
+     {
+	unsigned int r, g, b;
+     };
 
-    EAPI Evas_Object *elm_colorpalette_add(Evas_Object *parent);
-    EAPI void         elm_colorpalette_color_set(Evas_Object *obj, int color_num, Elm_Colorpalette_Color *color);
-    EAPI void         elm_colorpalette_row_column_set(Evas_Object *obj, int row, int col);
-    /* smart callbacks called:
-     * "clicked" - when image clicked
-     */
+   EAPI Evas_Object *elm_colorpalette_add(Evas_Object *parent);
+   EAPI void         elm_colorpalette_color_set(Evas_Object *obj, int color_num, Elm_Colorpalette_Color *color);
+   EAPI void         elm_colorpalette_row_column_set(Evas_Object *obj, int row, int col);
+   /* smart callbacks called:
+    * "clicked" - when image clicked
+    */
 
    /* editfield */
    EAPI Evas_Object *elm_editfield_add(Evas_Object *parent);
@@ -2287,7 +2305,7 @@ extern "C" {
     * "down_clicked" - when down button of zoomcontrols is clicked
     */         
 
-   /*viewflipper*/
+   /* viewflipper */
    typedef enum _Elm_Viewflipper_Policy
      {
 	ERROR_0  = -1,    //can not find wanted value
@@ -2362,7 +2380,7 @@ extern "C" {
    /* AnalogClock */
    EAPI Evas_Object *elm_analogclock_add(Evas_Object *parent);
 
-    /* ratingbar */
+   /* ratingbar */
    EAPI Evas_Object *elm_ratingbar_add(Evas_Object *parent);
    EAPI void         elm_ratingbar_rating_set(Evas_Object *obj, int rating);
    EAPI int          elm_ratingbar_rating_get(Evas_Object *obj);
@@ -2462,7 +2480,7 @@ extern "C" {
    EAPI Eina_Bool           elm_cabinet_item_sub_info_disabled_get(Elm_Cabinet_Item *item);
    EAPI void                elm_cabinet_item_sub_info_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled);
 
-   /*Dayselector*/
+   /* Dayselector */
    typedef enum 
      { 
 	ELM_DAYSELECTOR_SUN, 
