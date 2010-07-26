@@ -2096,6 +2096,12 @@ extern "C" {
    #define CONTROLBAR_SYSTEM_ICON_FAVORITES "controlbar_favorites" 
    #define CONTROLBAR_SYSTEM_ICON_LOGS "controlbar_logs" 
 
+   typedef enum _Elm_Controlbar_Mode_Type{
+	ELM_CONTROLBAR_MODE_DEFAULT = 0,
+	ELM_CONTROLBAR_MODE_LARGE,
+	ELM_CONTROLBAR_MODE_SMALL
+   } Elm_Controlbar_Mode_Type;
+
    typedef struct _Elm_Controlbar_Item Elm_Controlbar_Item;
 
    EAPI Evas_Object *elm_controlbar_add(Evas_Object *parent);
@@ -2126,6 +2132,8 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_edit_start(Evas_Object *obj);
    EAPI void         elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
+   EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
+   EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
 
 
   /* diskcontroller */
