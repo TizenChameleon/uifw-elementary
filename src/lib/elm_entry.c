@@ -1702,6 +1702,8 @@ _ellipsis_entry_to_width(Evas_Object *obj)
            jumpcount = 0;
            while (jumpcount < len-strlen(ellipsis_string))
              {
+               cur_str = edje_object_part_text_get(wd->ent, "elm.text");
+
                if (txtbuf != NULL)
                  {
                    eina_strbuf_free(txtbuf);
