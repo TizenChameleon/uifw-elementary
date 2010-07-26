@@ -1308,7 +1308,19 @@ elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y)
 
 
 
-
+/**
+ * Set the priority of arrow direction
+ *
+ *  This functions gives user to set the priority of ctxpopup box showing position.
+ *
+ * @param obj		Ctxpopup object
+ * @param first    1st priority of arrow direction
+ * @param second 2nd priority of arrow direction
+ * @param third   3th priority of arrow direction
+ * @param fourth 4th priority of arrow direction
+ *
+ * @ingroup Ctxpopup
+ */
 EAPI void
 elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first, Elm_Ctxpopup_Arrow second, Elm_Ctxpopup_Arrow third, Elm_Ctxpopup_Arrow fourth)
 {
