@@ -2,7 +2,8 @@ elementary (0.4.0+svn.49550slp2+3build25) unstable; urgency=low
 
   * [Segment Control] Resizing issue fixed.
   * [elm_ctxpopup.c]
-
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build25
 
  -- ChunEon Park <chuneon.park@samsung.com>  Mon, 26 Jul 2010 09:41:13 +0900
 
