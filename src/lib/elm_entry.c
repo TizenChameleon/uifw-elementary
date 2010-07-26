@@ -108,6 +108,7 @@ struct _Widget_Data
    const char *cut_sel;
    const char *text;
    Evas_Coord wrap_w;
+   int ellipsis_threshold;
    Evas_Coord lastw;
    Evas_Coord downx, downy;
    Evas_Coord cx, cy, cw, ch;
@@ -161,6 +162,7 @@ static int _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char 
 static int _stringshare_key_value_replace(const char **srcstring, char *key, const char *value, int deleteflag);
 static int _is_width_over(Evas_Object *obj);
 static void _ellipsis_entry_to_width(Evas_Object *obj);
+static void _reverse_ellipsis_entry(Evas_Object *obj);
 static int _textinput_control_function(void *data,void *input_data);
 static int _entry_length_get(Evas_Object *obj);
 
@@ -349,6 +351,8 @@ _sizing_eval(Evas_Object *obj)
           {
             if (_is_width_over(obj))
               _ellipsis_entry_to_width(obj);
+			else if (wd->ellipsis_threshold > 1 && _entry_length_get(obj) < wd->ellipsis_threshold)
+              _reverse_ellipsis_entry(obj);
           }
      }
 }
@@ -1442,21 +1446,23 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int
            eina_strbuf_append_n(repbuf, starttag, tagtxtlen);
            srcstring = eina_strbuf_string_get(repbuf);
            curlocater = strstr(srcstring, key);
+
            if (curlocater != NULL)
              {
                replocater = curlocater + strlen(key) + 1;
-               while (*replocater != '=' && replocater != NULL)
+
+               while (*replocater == ' ' || *replocater == '=')
+			   {
                  replocater++;
-               if (replocater != NULL)
-                 {
-                   replocater++;
-                   while (*replocater != ' ' && *replocater != '>' && replocater == NULL)
-                     replocater++;
-                 }
-               if (replocater != NULL)
+			   }
+
+                while (*replocater != NULL && *replocater != ' ' && *replocater != '>')
+                  replocater++;
+
+               if (replocater-curlocater > strlen(key)+1)
                  {
                    replocater--;
-                   eina_strbuf_append_n(diffbuf, curlocater, replocater-curlocater);
+                   eina_strbuf_append_n(diffbuf, curlocater, replocater-curlocater+1);
                  }
                else
                  insertflag = 1;
@@ -1540,10 +1546,10 @@ _is_width_over(Evas_Object *obj)
 }
 
 static void
-_ellipsis_entry_to_width(Evas_Object *obj)
+_reverse_ellipsis_entry(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   int cur_fontsize = 0, len, showcount;
+   int cur_fontsize = 0, len;
    Eina_Strbuf *fontbuf = NULL, *txtbuf = NULL;
    char **kvalue = NULL;
    const char *minfont, *deffont, *maxfont;
@@ -1561,18 +1567,108 @@ _ellipsis_entry_to_width(Evas_Object *obj)
    if (deffont) cur_fontsize = atoi(deffont);
    else cur_fontsize = 1;
    if (minfontsize == maxfontsize || cur_fontsize == 1) return; // theme is not ready for ellipsis
-   if (strlen(elm_entry_entry_get(obj)) <= 0) return;
+   if (strlen(edje_object_part_text_get(wd->ent, "elm.text")) <= 0) return;
 
-   if (_get_value_in_key_string(elm_entry_entry_get(obj), "font_size", &kvalue) == 0)
+   if (_get_value_in_key_string(edje_object_part_text_get(wd->ent, "elm.text"), "font_size", &kvalue) == 0)
      {
        if (*kvalue != NULL) cur_fontsize = atoi((char*)kvalue);
      }
 
    txtbuf = eina_strbuf_new();
-   eina_strbuf_append(txtbuf, elm_entry_entry_get(obj));
+   eina_strbuf_append(txtbuf, edje_object_part_text_get(wd->ent, "elm.text"));
+
+   if (cur_fontsize >= atoi(deffont))
+     {
+       if (txtbuf) eina_strbuf_free(txtbuf);
+       return;
+     }
+
+   if (_is_width_over(obj) != 1)
+     {
+       int rev_fontsize = cur_fontsize;
+  
+       do {
+           rev_fontsize++;
+           if (rev_fontsize > atoi(deffont))
+             break;
+
+           if (fontbuf != NULL)
+             {
+               eina_strbuf_free(fontbuf);
+               fontbuf = NULL;
+             }
+           fontbuf = eina_strbuf_new();
+           eina_strbuf_append_printf(fontbuf, "%d", rev_fontsize);
+           _strbuf_key_value_replace(txtbuf, "font_size", eina_strbuf_string_get(fontbuf), 0);
+           edje_object_part_text_set(wd->ent, "elm.text", eina_strbuf_string_get(txtbuf));
+
+           eina_strbuf_free(fontbuf);
+           fontbuf = NULL;
+         } while (_is_width_over(obj) != 1);
+
+       while (_is_width_over(obj))
+         {
+           rev_fontsize--;
+           if (rev_fontsize < atoi(deffont))
+             break;
+
+           if (fontbuf != NULL)
+             {
+               eina_strbuf_free(fontbuf);
+               fontbuf = NULL;
+             }
+           fontbuf = eina_strbuf_new();
+           eina_strbuf_append_printf(fontbuf, "%d", rev_fontsize);
+           _strbuf_key_value_replace(txtbuf, "font_size", eina_strbuf_string_get(fontbuf), 0);
+           edje_object_part_text_set(wd->ent, "elm.text", eina_strbuf_string_get(txtbuf));
+           eina_strbuf_free(fontbuf);
+           fontbuf = NULL;
+         }
+     }
+
+   if (txtbuf) eina_strbuf_free(txtbuf);
+   wd->changed = 1;
+   _sizing_eval(obj);
+}
+
+static void
+_ellipsis_entry_to_width(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   int cur_fontsize = 0, len, jumpcount;
+   Eina_Strbuf *fontbuf = NULL, *txtbuf = NULL;
+   char **kvalue = NULL;
+   const char *minfont, *deffont, *maxfont;
+   const char *ellipsis_string = "...";
+   int minfontsize, maxfontsize, minshowcount;
+   int i, tagend, cur_len;
+   char *cur_str;
+
+   minshowcount = strlen(ellipsis_string) + 1;
+   minfont = edje_object_data_get(wd->ent, "min_font_size");
+   if (minfont) minfontsize = atoi(minfont);
+   else minfontsize = 1;
+   maxfont = edje_object_data_get(wd->ent, "max_font_size");
+   if (maxfont) maxfontsize = atoi(maxfont);
+   else maxfontsize = 1;
+   deffont = edje_object_data_get(wd->ent, "default_font_size");
+   if (deffont) cur_fontsize = atoi(deffont);
+   else cur_fontsize = 1;
+   if (minfontsize == maxfontsize || cur_fontsize == 1) return; // theme is not ready for ellipsis
+   if (strlen(edje_object_part_text_get(wd->ent, "elm.text")) <= 0) return;
+
+   if (_get_value_in_key_string(edje_object_part_text_get(wd->ent, "elm.text"), "font_size", &kvalue) == 0)
+     {
+       if (*kvalue != NULL) cur_fontsize = atoi((char*)kvalue);
+     }
+
+   txtbuf = eina_strbuf_new();
+   eina_strbuf_append(txtbuf, edje_object_part_text_get(wd->ent, "elm.text"));
 
    while (_is_width_over(obj))
      {
+       if (wd->ellipsis_threshold == 0)
+         wd->ellipsis_threshold = _entry_length_get(obj);
        if (cur_fontsize > minfontsize)
          {
            cur_fontsize--;
@@ -1587,27 +1683,40 @@ _ellipsis_entry_to_width(Evas_Object *obj)
            edje_object_part_text_set(wd->ent, "elm.text", eina_strbuf_string_get(txtbuf));
            eina_strbuf_free(fontbuf);
            fontbuf = NULL;
+		   edje_object_part_text_cursor_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
          }
        else
          {
-           if (txtbuf != NULL)
+           len = _entry_length_get(obj);
+           cur_str = edje_object_part_text_get(wd->ent, "elm.text");
+           cur_len = strlen(cur_str);
+           tagend = 0;
+           for (i = 0; i < len; i++)
              {
-               eina_strbuf_free(txtbuf);
-               txtbuf = NULL;
+               if(cur_str[i] == '>' && cur_str[i+1] != NULL && 
+                  cur_str[i+1] != '<')
+                 {
+                   tagend = i;
+                   break;
+                 }
              }
-           txtbuf = eina_strbuf_new();
-           eina_strbuf_append_printf(txtbuf, "%s", edje_object_part_text_get(wd->ent, "elm.text"));
-           len = eina_strbuf_length_get(txtbuf);
-           showcount = len - 1;
-           while (showcount > minshowcount)
+           jumpcount = 0;
+           while (jumpcount < len-strlen(ellipsis_string))
              {
-               len = eina_strbuf_length_get(txtbuf);
-               eina_strbuf_remove(txtbuf, len - minshowcount, len);
+               if (txtbuf != NULL)
+                 {
+                   eina_strbuf_free(txtbuf);
+                   txtbuf = NULL;
+                 }
+               txtbuf = eina_strbuf_new();
+               eina_strbuf_append_n(txtbuf, cur_str, tagend+1);
                eina_strbuf_append(txtbuf, ellipsis_string);
+               eina_strbuf_append(txtbuf, cur_str+tagend+jumpcount+1);
                edje_object_part_text_set(wd->ent, "elm.text", eina_strbuf_string_get(txtbuf));
+               edje_object_part_text_cursor_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 
                if (_is_width_over(obj)) 
-                 showcount--;
+                 jumpcount++;
                else 
                  break;
              }
@@ -1620,38 +1729,38 @@ _ellipsis_entry_to_width(Evas_Object *obj)
 }
 
 static int _textinput_control_function(void *data,void *input_data)
-{	
+{
    /*calculate character count*/
-   Widget_Data *wd = elm_widget_data_get(data);	
+   Widget_Data *wd = elm_widget_data_get(data);
    char buf[10]="\0";
    size_t byte_len;
    size_t insert_text_len=0;
-   char *text = edje_object_part_text_get(wd->ent, "elm.text");	
+   char *text = edje_object_part_text_get(wd->ent, "elm.text");
    char *insert_text;  
    size_t remain_bytes;
    if(text!=NULL)
-     {		
-	byte_len = strlen(text);/*no of bytes*/
-	remain_bytes = wd->max_no_of_bytes-byte_len;
-	sprintf(buf,"%d",remain_bytes);	
-	edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);		
-	if(input_data)
-	  {
-	     insert_text =  (char *)input_data;
-	     insert_text_len = strlen(insert_text);	
-	     if(remain_bytes<insert_text_len)
-	       {			
-		  evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
-		  return EINA_TRUE;
-	       }			
-	     if(byte_len>=wd->max_no_of_bytes)
-	       {
-		  evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
-		  return EINA_TRUE;
-	       }			
-	  }		
+     {
+byte_len = strlen(text);/*no of bytes*/
+remain_bytes = wd->max_no_of_bytes-byte_len;
+sprintf(buf,"%d",remain_bytes);
+edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);
+if(input_data)
+  {
+     insert_text =  (char *)input_data;
+     insert_text_len = strlen(insert_text);
+     if(remain_bytes<insert_text_len)
+       {
+  evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+  return EINA_TRUE;
+       }
+     if(byte_len>=wd->max_no_of_bytes)
+       {
+  evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+  return EINA_TRUE;
+       }
+  }
      }
-   return EINA_FALSE;  		
+   return EINA_FALSE;  
 }
 
 /**
@@ -1691,6 +1800,8 @@ elm_entry_add(Evas_Object *parent)
    wd->editable     = EINA_TRUE;
    wd->disabled     = EINA_FALSE;
    wd->context_menu = EINA_TRUE;
+
+   wd->ellipsis_threshold = 0;
 
    wd->ent = edje_object_add(e);
    edje_object_item_provider_set(wd->ent, _get_item, obj);
@@ -1748,12 +1859,12 @@ elm_entry_add(Evas_Object *parent)
    top = elm_widget_top_get(obj);
    if ((top) && (elm_win_xwindow_get(top)))
      {
-	wd->sel_notify_handler =
-	  ecore_event_handler_add(ECORE_X_EVENT_SELECTION_NOTIFY,
-				  _event_selection_notify, obj);
-	wd->sel_clear_handler =
-	  ecore_event_handler_add(ECORE_X_EVENT_SELECTION_CLEAR,
-				  _event_selection_clear, obj);
+wd->sel_notify_handler =
+  ecore_event_handler_add(ECORE_X_EVENT_SELECTION_NOTIFY,
+  _event_selection_notify, obj);
+wd->sel_clear_handler =
+  ecore_event_handler_add(ECORE_X_EVENT_SELECTION_CLEAR,
+  _event_selection_clear, obj);
      }
 #endif
 
@@ -1950,12 +2061,12 @@ elm_entry_entry_set(Evas_Object *obj, const char *entry)
    if (!entry) entry = "";
    if(wd->max_no_of_bytes)
      {
-	int len = strlen(entry);
-	if(len > wd->max_no_of_bytes)
-	  {
-	     ERR("[ERROR]the length of the text set is more than max no of bytes, text cannot be set");
-	     return;
-	  }
+int len = strlen(entry);
+if(len > wd->max_no_of_bytes)
+  {
+     ERR("[ERROR]the length of the text set is more than max no of bytes, text cannot be set");
+     return;
+  }
      }
    edje_object_part_text_set(wd->ent, "elm.text", entry);
    if (wd->text) eina_stringshare_del(wd->text);
@@ -1984,8 +2095,8 @@ elm_entry_entry_get(const Evas_Object *obj)
    text = edje_object_part_text_get(wd->ent, "elm.text");
    if (!text)
      {
-	ERR("text=NULL for edje %p, part 'elm.text'", wd->ent);
-	return NULL;
+ERR("text=NULL for edje %p, part 'elm.text'", wd->ent);
+return NULL;
      }
    eina_stringshare_replace(&wd->text, text);
    return wd->text;
@@ -2178,9 +2289,9 @@ elm_entry_select_none(Evas_Object *obj)
    if (!wd) return;
    if (wd->selmode)
      {
-	wd->selmode = EINA_FALSE;
-	edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
-	edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
+wd->selmode = EINA_FALSE;
+edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
      }
    wd->have_selection = EINA_FALSE;
    edje_object_part_text_select_none(wd->ent, "elm.text");
@@ -2201,9 +2312,9 @@ elm_entry_select_all(Evas_Object *obj)
    if (!wd) return;
    if (wd->selmode)
      {
-	wd->selmode = EINA_FALSE;
-	edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
-	edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
+wd->selmode = EINA_FALSE;
+edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
      }
    wd->have_selection = EINA_TRUE;
    edje_object_part_text_select_all(wd->ent, "elm.text");
@@ -2770,7 +2881,7 @@ elm_entry_fontsize_set(Evas_Object *obj, int fontsize)
 
    if (_stringshare_key_value_replace(&t, "font_size", eina_strbuf_string_get(fontbuf), removeflag) == 0)
      {
-	   elm_entry_entry_set(obj, t);
+   elm_entry_entry_set(obj, t);
        wd->changed = 1;
        _sizing_eval(obj);
      }
@@ -2864,8 +2975,8 @@ elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g,
 
    if (wd->bgcolor == EINA_FALSE)
      {
-	wd->bgcolor = 1;
-	edje_object_part_swallow(wd->ent, "entry.swallow.background", wd->bg);
+       wd->bgcolor = 1;
+       edje_object_part_swallow(wd->ent, "entry.swallow.background", wd->bg);
      }
 }
 
