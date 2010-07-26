@@ -1407,7 +1407,6 @@ _get_value_in_key_string(const char *oldstring, char *key, char **value)
    return -1;
 }
 
-
 static int
 _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int deleteflag)
 {

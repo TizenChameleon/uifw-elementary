@@ -192,7 +192,6 @@ _get_value_in_key_string(const char *oldstring, char *key, char **value)
    return -1;
 }
 
-
 static int
 _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int deleteflag)
 {
@@ -231,21 +230,23 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int
            eina_strbuf_append_n(repbuf, starttag, tagtxtlen);
            srcstring = eina_strbuf_string_get(repbuf);
            curlocater = strstr(srcstring, key);
+
            if (curlocater != NULL)
              {
                replocater = curlocater + strlen(key) + 1;
-               while (*replocater != '=' && replocater != NULL)
+
+               while (*replocater == ' ' || *replocater == '=')
+			   {
                  replocater++;
-               if (replocater != NULL)
-                 {
-                   replocater++;
-                   while (*replocater != ' ' && *replocater != '>' && replocater == NULL)
-                     replocater++;
-                 }
-               if (replocater != NULL)
+			   }
+
+                while (*replocater != NULL && *replocater != ' ' && *replocater != '>')
+                  replocater++;
+
+               if (replocater-curlocater > strlen(key)+1)
                  {
                    replocater--;
-                   eina_strbuf_append_n(diffbuf, curlocater, replocater-curlocater);
+                   eina_strbuf_append_n(diffbuf, curlocater, replocater-curlocater+1);
                  }
                else
                  insertflag = 1;
