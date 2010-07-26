@@ -1740,25 +1740,25 @@ static int _textinput_control_function(void *data,void *input_data)
    size_t remain_bytes;
    if(text!=NULL)
      {
-byte_len = strlen(text);/*no of bytes*/
-remain_bytes = wd->max_no_of_bytes-byte_len;
-sprintf(buf,"%d",remain_bytes);
-edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);
-if(input_data)
-  {
-     insert_text =  (char *)input_data;
-     insert_text_len = strlen(insert_text);
-     if(remain_bytes<insert_text_len)
-       {
-  evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
-  return EINA_TRUE;
-       }
-     if(byte_len>=wd->max_no_of_bytes)
-       {
-  evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
-  return EINA_TRUE;
-       }
-  }
+       byte_len = strlen(text);/*no of bytes*/
+       remain_bytes = wd->max_no_of_bytes-byte_len;
+       sprintf(buf,"%d",remain_bytes);
+       edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);
+       if(input_data)
+         {
+           insert_text =  (char *)input_data;
+           insert_text_len = strlen(insert_text);
+           if(remain_bytes<insert_text_len)
+             {
+               evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+               return EINA_TRUE;
+             }
+           if(byte_len>=wd->max_no_of_bytes)
+             {
+               evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+               return EINA_TRUE;
+             }
+         }
      }
    return EINA_FALSE;  
 }
@@ -1859,12 +1859,12 @@ elm_entry_add(Evas_Object *parent)
    top = elm_widget_top_get(obj);
    if ((top) && (elm_win_xwindow_get(top)))
      {
-wd->sel_notify_handler =
-  ecore_event_handler_add(ECORE_X_EVENT_SELECTION_NOTIFY,
-  _event_selection_notify, obj);
-wd->sel_clear_handler =
-  ecore_event_handler_add(ECORE_X_EVENT_SELECTION_CLEAR,
-  _event_selection_clear, obj);
+       wd->sel_notify_handler =
+         ecore_event_handler_add(ECORE_X_EVENT_SELECTION_NOTIFY,
+         _event_selection_notify, obj);
+       wd->sel_clear_handler =
+         ecore_event_handler_add(ECORE_X_EVENT_SELECTION_CLEAR,
+         _event_selection_clear, obj);
      }
 #endif
 
@@ -2061,12 +2061,12 @@ elm_entry_entry_set(Evas_Object *obj, const char *entry)
    if (!entry) entry = "";
    if(wd->max_no_of_bytes)
      {
-int len = strlen(entry);
-if(len > wd->max_no_of_bytes)
-  {
-     ERR("[ERROR]the length of the text set is more than max no of bytes, text cannot be set");
-     return;
-  }
+       int len = strlen(entry);
+       if(len > wd->max_no_of_bytes)
+       {
+         ERR("[ERROR]the length of the text set is more than max no of bytes, text cannot be set");
+         return;
+       }
      }
    edje_object_part_text_set(wd->ent, "elm.text", entry);
    if (wd->text) eina_stringshare_del(wd->text);
@@ -2289,9 +2289,9 @@ elm_entry_select_none(Evas_Object *obj)
    if (!wd) return;
    if (wd->selmode)
      {
-wd->selmode = EINA_FALSE;
-edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
-edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
+       wd->selmode = EINA_FALSE;
+       edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+       edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
      }
    wd->have_selection = EINA_FALSE;
    edje_object_part_text_select_none(wd->ent, "elm.text");
@@ -2312,9 +2312,9 @@ elm_entry_select_all(Evas_Object *obj)
    if (!wd) return;
    if (wd->selmode)
      {
-wd->selmode = EINA_FALSE;
-edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
-edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
+       wd->selmode = EINA_FALSE;
+       edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+       edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
      }
    wd->have_selection = EINA_TRUE;
    edje_object_part_text_select_all(wd->ent, "elm.text");
@@ -2881,7 +2881,7 @@ elm_entry_fontsize_set(Evas_Object *obj, int fontsize)
 
    if (_stringshare_key_value_replace(&t, "font_size", eina_strbuf_string_get(fontbuf), removeflag) == 0)
      {
-   elm_entry_entry_set(obj, t);
+       elm_entry_entry_set(obj, t);
        wd->changed = 1;
        _sizing_eval(obj);
      }
