@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build25) unstable; urgency=low
+
+  * [Segment Control] Resizing issue fixed.
+  * [elm_ctxpopup.c]
+
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Mon, 26 Jul 2010 09:41:13 +0900
+
 elementary (0.4.0+svn.49550slp2+3build24) unstable; urgency=low
 
   * [els_touch] commit initial els_touch file which will be used by elm_webview
