@@ -125,7 +125,8 @@ obj_longpress(Evas_Object *obj)
 	top = elm_widget_top_get(obj);
 	if(top)
 		ext_mod->popup = elm_ctxpopup_add(top);
-	elm_object_style_set(ext_mod->popup,"entry");
+	/*currently below theme not used,when guideline comes a new theme can be created if required*/
+	//elm_object_style_set(ext_mod->popup,"entry");
 	elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_TRUE);
 	context_menu_orientation = edje_object_data_get
 	(ext_mod->ent, "context_menu_orientation");
