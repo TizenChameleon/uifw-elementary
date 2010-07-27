@@ -209,7 +209,7 @@ struct _Mod_Api
    void (*obj_hook) (Evas_Object *obj);
    void (*obj_unhook) (Evas_Object *obj);
    void (*obj_longpress) (Evas_Object *obj);
-	void (*obj_mouseup) (Evas_Object *obj);
+   void (*obj_mouseup) (Evas_Object *obj);
 };
 
 static Mod_Api *
@@ -1548,7 +1548,7 @@ static void
 _reverse_ellipsis_entry(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   int cur_fontsize = 0, len;
+   int cur_fontsize = 0;
    Eina_Strbuf *fontbuf = NULL, *txtbuf = NULL;
    char **kvalue = NULL;
    const char *minfont, *deffont, *maxfont;
