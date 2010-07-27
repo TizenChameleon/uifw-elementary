@@ -2497,6 +2497,7 @@ extern "C" {
    EAPI void         elm_dayselector_title_set(Evas_Object *parent, const char *title);
    
    /* WebView */
+   /* commented out until it is completed
    EAPI Evas_Object *elm_webview_add(Evas_Object *parent);
    EAPI Evas_Object *elm_webview_widget_get(Evas_Object *obj);
    EAPI void         elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed);
@@ -2505,6 +2506,7 @@ extern "C" {
    EAPI Eina_Bool    elm_webview_auto_fitting_get();
    EAPI Evas_Object *elm_webview_minimap_get(Evas_Object *obj);
    EAPI void         elm_webview_uri_set(Evas_Object *obj, const char *uri);
+   */
 
 
 #ifdef __cplusplus
