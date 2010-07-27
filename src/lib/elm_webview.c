@@ -73,6 +73,7 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
    if (!wd) return;
    //_els_box_layout(o, priv, wd->horizontal, wd->homogeneous);
 }
+
 /**
  * Add a new box to the parent
  *
@@ -81,10 +82,10 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
  *
  * @ingroup Box
  */
+#ifdef ELM_EWEBKIT
 EAPI Evas_Object *
 elm_webview_add(Evas_Object *parent)
 {
-#ifdef ELM_EWEBKIT
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
@@ -102,13 +103,10 @@ elm_webview_add(Evas_Object *parent)
    //TODO:evas_object_box_layout_set(wd->box, _layout, wd, NULL);
    evas_object_event_callback_add(wd->webkit, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				  _changed_size_hints, obj);
+
    elm_widget_resize_object_set(obj, wd->webkit);
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-   printf("elm_webview_add is called\n");
    return obj;
-#else
-   return NULL;
-#endif
 }
 
 EAPI Evas_Object *
@@ -150,3 +148,4 @@ EAPI void
 elm_webview_uri_set(Evas_Object *obj, const char *uri)
 {
 }
+#endif
