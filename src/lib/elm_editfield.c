@@ -57,17 +57,19 @@ static void
 _on_focus_hook(void *data, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   const char* text;
    if (!wd || !wd->base)
      return ;	
    if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)) ) 
      {
 	wd->editing = EINA_FALSE;
+	edje_object_signal_emit(wd->base, "elm,state,text,fix", "elm");	
+/*
 	edje_object_signal_emit(wd->base, "elm,action,unfocus", "elm");
 	edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");		
 	text = elm_entry_entry_get(wd->entry);
 	edje_object_part_text_set(wd->base, "elm.content.no.edit", text);
 	edje_object_signal_emit(wd->base, "elm,action,no,edit", "elm");		
+*/
 	if(_empty_entry(wd->entry)) 
 	  {
 	     if(wd->guide_text) 
@@ -88,12 +90,25 @@ _theme_hook(Evas_Object *obj)
      return;
    _elm_theme_object_set(obj, wd->base, "editfield", "base", elm_widget_style_get(obj));
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
+   if(!wd->editing)
+     edje_object_signal_emit(wd->base, "elm,state,text,fix", "elm");	
+   if(wd->show_guide_text)
+     {
+	if(_empty_entry(wd->entry)) 
+	  {
+	     if(wd->guide_text) 
+	       {
+		  edje_object_part_text_set(wd->base, "elm.guidetext", wd->guide_text);
+		  edje_object_signal_emit(wd->base, "elm,state,guidetext,visible", "elm");
+	       }
+	  }
+     }     
    if(wd->ricon)	
      edje_object_part_swallow(wd->base, "right_icon", wd->ricon);
    if(wd->licon)
      edje_object_part_swallow(wd->base, "left_icon", wd->licon);
-   if(wd->eraser)
-     edje_object_part_swallow(wd->base, "eraser", wd->eraser);	
+//   if(wd->eraser)
+//   edje_object_part_swallow(wd->base, "eraser", wd->eraser);	
    _sizing_eval(obj);
 }
 
@@ -146,7 +161,7 @@ _empty_entry(Evas_Object *entry)
    char *strip_text;
    int len = 0;
 
-   text = elm_entry_entry_get(entry);
+   text = elm_scrolled_entry_entry_get(entry);
    if(!text) return EINA_FALSE;
    strip_text = elm_entry_markup_to_utf8(text);
    if (strip_text) {
@@ -170,8 +185,8 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
 
    if(!_empty_entry(wd->entry)) 
      {
-	text = elm_entry_entry_get(wd->entry);
-	edje_object_part_text_set(wd->base, "elm.content.no.edit", text);		
+//	text = elm_entry_entry_get(wd->entry);
+//	edje_object_part_text_set(wd->base, "elm.content.no.edit", text);		
 	if(wd->guide_text) 
 	  {
 	     edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
@@ -186,15 +201,14 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
    Widget_Data *wd = elm_widget_data_get(data);
    if(!wd || !wd->base) return;
 
-   if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "over_change_bg"))
+   if(strcmp(source, "left_icon") && strcmp(source, "right_icon")) // && strcmp(source, "over_change_bg"))
      {
-	edje_object_signal_emit(wd->base, "elm,action,focus", "elm");	
-	edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
-	edje_object_signal_emit(wd->base, "elm,action,edit", "elm");	
+	edje_object_signal_emit(wd->base, "elm,state,text,edit", "elm");
+//	edje_object_signal_emit(wd->base, "elm,action,focus", "elm");	
+//	edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
+//	edje_object_signal_emit(wd->base, "elm,action,edit", "elm");	
 	elm_widget_focus_set(wd->entry, EINA_TRUE);			
-
-	if(wd->editing == EINA_FALSE)
-	  elm_entry_cursor_end_set(wd->entry);
+	elm_scrolled_entry_cursor_end_set(wd->entry);
 	
 	if(!_empty_entry(wd->entry)) 
 	  {
@@ -208,6 +222,7 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
 	wd->editing = EINA_TRUE;
      }
 }
+
 
 static void
 _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
@@ -227,7 +242,7 @@ _eraser_drag_end(void *data, Evas_Object *obj, const char *emission, const char 
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd || !wd->base || !wd->entry) 
      return;
-   elm_entry_entry_set(wd->entry, "");
+   elm_scrolled_entry_entry_set(wd->entry, "");
    edje_object_part_text_set(wd->base, "elm.content.no.edit", "");
 }
 
@@ -321,11 +336,13 @@ elm_editfield_add(Evas_Object *parent)
 	 _signal_mouse_clicked, obj);
    evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
 
-   wd->editing = EINA_FALSE;
-   wd->single_line = EINA_FALSE;
-   wd->eraser_visible = EINA_FALSE;
+   wd->show_guide_text = EINA_FALSE;
+   wd->single_line = EINA_TRUE;
+//   wd->editing = EINA_FALSE;
+//   wd->eraser_visible = EINA_FALSE;
 
-   wd->entry = elm_entry_add(obj);
+   wd->entry = elm_scrolled_entry_add(obj);
+   elm_scrolled_entry_single_line_set(wd->entry, EINA_TRUE);
    elm_object_style_set(wd->entry, "editfield");
    evas_object_size_hint_weight_set(wd->entry, 0, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->entry, 0, EVAS_HINT_FILL);
@@ -574,11 +591,12 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    if (!wd || !wd->base) 
      return;
    wd->single_line = single_line;
-   elm_entry_single_line_set(wd->entry, single_line);
-   if(wd->single_line && wd->eraser_visible)
-     edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
+   elm_scrolled_entry_single_line_set(wd->entry, single_line);
+/*   if(wd->single_line && wd->eraser_visible)
+   edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
    else
      edje_object_signal_emit(wd->base, "elm,state,eraser,hide", "elm");
+*/
 }
 
 /**
