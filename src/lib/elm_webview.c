@@ -99,7 +99,7 @@ elm_webview_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
 
-   wd->webkit = _els_webview_add(obj, EINA_FALSE);
+   wd->webkit = _elm_smart_webview_add(obj, EINA_FALSE);
    //TODO:evas_object_box_layout_set(wd->box, _layout, wd, NULL);
    evas_object_event_callback_add(wd->webkit, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				  _changed_size_hints, obj);
