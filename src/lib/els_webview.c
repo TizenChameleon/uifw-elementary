@@ -282,7 +282,7 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	  ewk_init = (int (*)())dlsym(ewk_handle, "ewk_init");
 	ewk_init();
 
-	if (ewk_dnet_open)
+	if (!ewk_dnet_open)
 	  ewk_dnet_open = (void (*)())dlsym(ewk_handle, "ewk_dnet_open");
 	ewk_dnet_open();
 
@@ -298,7 +298,7 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	       ewk_view_tiled_smart_set(&_parent_sc);
 
 	  } else {
-	       if (ewk_view_single_smart_set)
+	       if (!ewk_view_single_smart_set)
 		 ewk_view_single_smart_set = (Eina_Bool (*)(Ewk_View_Smart_Class *))dlsym(ewk_handle, "ewk_view_single_smart_set");
 	       ewk_view_single_smart_set(&_api);
 	       if (EINA_UNLIKELY(!_parent_sc.sc.add))
@@ -714,7 +714,7 @@ _smart_contents_size_changed(void* data, Evas_Object* frame, void* arg)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
 
-   if (sd->ewk_frame_view_get)
+   if (!(sd->ewk_frame_view_get))
      sd->ewk_frame_view_get = (Evas_Object * (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_frame_view_get");
 
    Evas_Object* webview = sd->ewk_frame_view_get(frame);
@@ -730,7 +730,7 @@ _smart_contents_size_changed(void* data, Evas_Object* frame, void* arg)
    if (sd->zoom.min_zoom_rate < MIN_ZOOM_RATIO)
      sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
 
-   if (sd->ewk_view_zoom_range_set)
+   if (!sd->ewk_view_zoom_range_set)
      sd->ewk_view_zoom_range_set = (void (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
    sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
 }
@@ -836,7 +836,7 @@ _smart_add(Evas_Object* obj)
 
    evas_object_smart_callback_add(obj, "webview,created", _smart_cb_view_created, sd); // I need to consider more
 
-   if (sd->ewk_view_frame_main_get)
+   if (!(sd->ewk_view_frame_main_get))
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
    evas_object_smart_callback_add(sd->ewk_view_frame_main_get(obj), "contents,size,changed",
 	 _smart_contents_size_changed, sd);
@@ -1043,9 +1043,9 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
    if (sd->text_selection_on == EINA_TRUE) return;
 
    evas_object_focus_set(webview, EINA_TRUE);
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-   if (sd->ewk_frame_feed_focus_in)
+   if (!sd->ewk_frame_feed_focus_in)
      sd->ewk_frame_feed_focus_in = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_frame_feed_focus_in");
    sd->ewk_frame_feed_focus_in(sd->ewk_view_frame_main_get(webview));
    _parent_sc.mouse_down((Ewk_View_Smart_Data*)sd, &sd->mouse_down_copy);
@@ -1081,7 +1081,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
    Eina_Bool have_link = EINA_FALSE;
    Eina_Bool have_image = EINA_FALSE;
    char *link_url = NULL, *link_text = NULL, *image_url = NULL;
-   if (sd->ewk_page_check_point)
+   if (!sd->ewk_page_check_point)
      sd->ewk_page_check_point = (Eina_Bool (*)(Evas_Object *, int, int, Evas_Event_Mouse_Down *, Eina_Bool *, Eina_Bool *, char **, char **, char **))dlsym(ewk_handle, "ewk_page_check_point");
    sd->ewk_page_check_point(webview, ewk_x, ewk_y, &sd->mouse_down_copy,
 	 &have_link, &have_image, &link_url, &link_text, &image_url);
@@ -1094,9 +1094,9 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
    _unzoom_position(webview, point->x, point->y, &x, &y);
 
    // check for input field
-   if (sd->ewk_page_check_point_for_keyboard)
+   if (!sd->ewk_page_check_point_for_keyboard)
      sd->ewk_page_check_point_for_keyboard = (char * (*)(Evas_Object *, int, int, Eina_Bool *))dlsym(ewk_handle, "ewk_page_check_point_for_keyboard");
-   if (sd->ewk_page_dropdown_get_options)
+   if (!sd->ewk_page_dropdown_get_options)
      sd->ewk_page_dropdown_get_options = (char ** (*)(Evas_Object *, int, int, int *, int *))dlsym(ewk_handle, "ewk_page_dropdown_get_options");
 
    Eina_Bool have_input_field;
@@ -1151,7 +1151,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
 			 }
 		    }
 		  printf("<< selected [%d | %s] >>\n", selected_index, selected_label);
-		  if (sd->ewk_page_dropdown_set_current_index)
+		  if (!sd->ewk_page_dropdown_set_current_index)
 		    sd->ewk_page_dropdown_set_current_index = (Eina_Bool (*)(Evas_Object *, int, int, int))dlsym(ewk_handle, "ewk_page_dropdown_set_current_index");
 		  sd->ewk_page_dropdown_set_current_index(webview, x, y, selected_index);
 		  //evas_object_del(obj);
@@ -1188,12 +1188,12 @@ _smart_cb_pan_start(void* data, Evas_Object* webview, void* ev)
 
    if (sd->tiled)
      {
-	if (sd->ewk_view_pre_render_cancel)
+	if (!sd->ewk_view_pre_render_cancel)
 	  sd->ewk_view_pre_render_cancel = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_pre_render_cancel");
 	sd->ewk_view_pre_render_cancel(webview);
      }
 
-   if (sd->ewk_view_suspend_request)
+   if (!sd->ewk_view_suspend_request)
      sd->ewk_view_suspend_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_suspend_request");
    sd->ewk_view_suspend_request(webview); // suspend network loading
 
@@ -1250,24 +1250,24 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 	return;
      }
 
-   if (sd->ewk_frame_scroll_pos_get)
+   if (!sd->ewk_frame_scroll_pos_get)
      sd->ewk_frame_scroll_pos_get = (Eina_Bool (*)(const Evas_Object *, int *, int *))dlsym(ewk_handle, "ewk_frame_scroll_pos_get");
 
    int dx = sd->pan_s.x - point->x;
    int dy = sd->pan_s.y - point->y;
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
 
    int old_x, old_y;
    sd->ewk_frame_scroll_pos_get(sd->ewk_view_frame_main_get(webview), &old_x, &old_y);
 
-   if (sd->ewk_frame_contents_size_get)
+   if (!sd->ewk_frame_contents_size_get)
      sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
 
    int content_w, content_h;
    sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(webview), &content_w, &content_h);
-   if (sd->ewk_view_zoom_get)
+   if (!sd->ewk_view_zoom_get)
      sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
    float zoom = sd->ewk_view_zoom_get(webview);
    content_w *= zoom;
@@ -1316,9 +1316,9 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 
    if (locked) return;
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-   if (sd->ewk_frame_scroll_add)
+   if (!sd->ewk_frame_scroll_add)
      sd->ewk_frame_scroll_add = (Eina_Bool (*)(Evas_Object *, int, int))dlsym(ewk_handle, "ewk_frame_scroll_add");
    sd->ewk_frame_scroll_add(sd->ewk_view_frame_main_get(webview), dx, dy);
 
@@ -1367,11 +1367,11 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 
    if (sd->tiled)
      {
-	if (sd->ewk_view_tiled_unused_cache_get)
+	if (!sd->ewk_view_tiled_unused_cache_get)
 	  sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
-	if (sd->ewk_tile_unused_cache_used_get)
+	if (!sd->ewk_tile_unused_cache_used_get)
 	  sd->ewk_tile_unused_cache_used_get = (size_t (*)(const Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_used_get");
-	if (sd->ewk_tile_unused_cache_max_get)
+	if (!sd->ewk_tile_unused_cache_max_get)
 	  sd->ewk_tile_unused_cache_max_get = (size_t (*)(const Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_max_get");
 	Ewk_Tile_Unused_Cache *tuc = sd->ewk_view_tiled_unused_cache_get(webview);
 	size_t used = sd->ewk_tile_unused_cache_used_get(tuc);
@@ -1379,7 +1379,7 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	DBG("[%s] max = %d  used = %d \n", __func__, max, used);
 	if (used > max)
 	  {
-	     if (sd->ewk_tile_unused_cache_auto_flush)
+	     if (!sd->ewk_tile_unused_cache_auto_flush)
 	       sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
 	     sd->ewk_tile_unused_cache_auto_flush(tuc);
 	  }
@@ -1387,7 +1387,7 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	      (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
      }
 
-   if (sd->ewk_view_resume_request)
+   if (!sd->ewk_view_resume_request)
      sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
    sd->ewk_view_resume_request(webview); // resume network loading
 
@@ -1415,9 +1415,9 @@ _smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev)
    int x, y;
    _coords_evas_to_ewk(webview, point->x, point->y, &x, &y);
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-   if (sd->ewk_frame_select_closest_word)
+   if (!sd->ewk_frame_select_closest_word)
      sd->ewk_frame_select_closest_word = (Eina_Bool (*)(Evas_Object *, int, int, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_select_closest_word");
    int tx, ty, th, bx, by, bh;
    Eina_Bool ret = sd->ewk_frame_select_closest_word(sd->ewk_view_frame_main_get(webview), x, y,
@@ -1443,7 +1443,7 @@ _smart_cb_unselect_closest_word(void* data, Evas_Object* webview, void* ev)
    if (sd->text_selection_on == EINA_TRUE)
      {
 	_text_selection_hide(sd);
-	if (sd->ewk_view_select_none)
+	if (!sd->ewk_view_select_none)
 	  sd->ewk_view_select_none = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_select_none");
 	sd->ewk_view_select_none(webview);
 	sd->text_selection_on = EINA_FALSE;
@@ -1470,26 +1470,26 @@ _suspend_all(Smart_Data *sd)
 {
    Evas_Object *webview = sd->base.self;
 
-   if (sd->ewk_view_disable_render)
+   if (!sd->ewk_view_disable_render)
      sd->ewk_view_disable_render = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_disable_render");
    sd->ewk_view_disable_render(webview);
 
-   if (sd->ewk_view_setting_enable_plugins_get)
+   if (!sd->ewk_view_setting_enable_plugins_get)
      sd->ewk_view_setting_enable_plugins_get = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_setting_enable_plugins_get");
    if (sd->ewk_view_setting_enable_plugins_get(webview))
      {
-	if (sd->ewk_view_pause_and_or_hide_plugins)
+	if (!sd->ewk_view_pause_and_or_hide_plugins)
 	  sd->ewk_view_pause_and_or_hide_plugins = (void (*)(Evas_Object *, Eina_Bool, Eina_Bool))dlsym(ewk_handle, "ewk_view_pause_and_or_hide_plugins");
 	sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, EINA_TRUE);
      }
    if (sd->tiled)
      {
-	if (sd->ewk_view_pre_render_cancel)
+	if (!sd->ewk_view_pre_render_cancel)
 	  sd->ewk_view_pre_render_cancel = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_pre_render_cancel");
 	sd->ewk_view_pre_render_cancel(webview);
      }
 
-   if (sd->ewk_view_suspend_request)
+   if (!sd->ewk_view_suspend_request)
      sd->ewk_view_suspend_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_suspend_request");
    sd->ewk_view_suspend_request(webview); // suspend network loading
 
@@ -1502,15 +1502,15 @@ _resume_all(Smart_Data *sd)
 
    if (sd->tiled)
      {
-	if (sd->ewk_view_enable_render)
+	if (!sd->ewk_view_enable_render)
 	  sd->ewk_view_enable_render = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_enable_render");
 	sd->ewk_view_enable_render(webview);
      }
-   if (sd->ewk_view_pause_and_or_hide_plugins)
+   if (!sd->ewk_view_pause_and_or_hide_plugins)
      sd->ewk_view_pause_and_or_hide_plugins = (void (*)(Evas_Object *, Eina_Bool, Eina_Bool))dlsym(ewk_handle, "ewk_view_pause_and_or_hide_plugins");
    sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, EINA_TRUE);
 
-   if (sd->ewk_view_resume_request)
+   if (!sd->ewk_view_resume_request)
      sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
    sd->ewk_view_resume_request(webview);
 }
@@ -1524,7 +1524,7 @@ _zoom_start(Smart_Data* sd, int centerX, int centerY, int distance)
    sd->zoom.finger_distance = distance;
    sd->zoom.zooming_level = 0;
    sd->on_zooming = EINA_TRUE;
-   if (sd->ewk_view_zoom_get)
+   if (!sd->ewk_view_zoom_get)
      sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
    sd->zoom.zoom_rate_at_start = sd->ewk_view_zoom_get(sd->base.self);
 
@@ -1555,7 +1555,7 @@ _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance)
 	sd->zoom.zooming_rate = zoom_ratio;
 
 	//printf("new zoom : %f, (%d, %d)\n", zoom_ratio, centerX, centerY);
-	if (sd->ewk_view_zoom_weak_set)
+	if (!sd->ewk_view_zoom_weak_set)
 	  sd->ewk_view_zoom_weak_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_weak_set");
 	sd->ewk_view_zoom_weak_set(sd->base.self, zoom_ratio, sd->zoom.basis.x, sd->zoom.basis.y);
      }
@@ -1568,16 +1568,16 @@ _zoom_stop(Smart_Data* sd)
    DBG("%s ( %d )\n", __func__, sd->zoom.zooming_level);
    if (sd->zoom.zooming_level == 0) return;
 
-   if (sd->ewk_view_zoom_set)
+   if (!sd->ewk_view_zoom_set)
      sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
    sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zooming_rate, sd->zoom.basis.x, sd->zoom.basis.y);
 
    if (sd->tiled)
      {
-	if (sd->ewk_view_tiled_unused_cache_get)
+	if (!sd->ewk_view_tiled_unused_cache_get)
 	  sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
 	Ewk_Tile_Unused_Cache* ewk_tile_cache = sd->ewk_view_tiled_unused_cache_get(sd->base.self);
-	if (sd->ewk_tile_unused_cache_auto_flush)
+	if (!sd->ewk_tile_unused_cache_auto_flush)
 	  sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
 	sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
 	_directional_pre_render(sd->base.self, 0, 0);
@@ -1587,9 +1587,9 @@ _zoom_stop(Smart_Data* sd)
 
    if (sd->text_selection_on == EINA_TRUE)
      {
-	if (sd->ewk_view_frame_main_get)
+	if (!sd->ewk_view_frame_main_get)
 	  sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-	if (sd->ewk_frame_selection_handlers_get)
+	if (!sd->ewk_frame_selection_handlers_get)
 	  sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
 	int tx, ty, th, bx, by, bh;
 	sd->ewk_frame_selection_handlers_get(sd->ewk_view_frame_main_get(sd->base.self), &tx, &ty, &th, &bx, &by, &bh);
@@ -1611,17 +1611,17 @@ _adjust_to_contents_boundary(Evas_Object* obj, int* to_x, int* to_y,
    evas_object_geometry_get(obj, &view_x, &view_y, &view_w, &view_h);
 
    // get contentsSize
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-   if (sd->ewk_frame_contents_size_get)
+   if (!sd->ewk_frame_contents_size_get)
      sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
 
    int contents_w, contents_h;
    sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(obj), &contents_w, &contents_h);
-   if (sd->ewk_view_zoom_get)
+   if (!sd->ewk_view_zoom_get)
      sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
    float current_zoom_rate = sd->ewk_view_zoom_get(obj);
-   if (sd->ewk_view_zoom_cairo_scaling_get)
+   if (!sd->ewk_view_zoom_cairo_scaling_get)
      sd->ewk_view_zoom_cairo_scaling_get = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_cairo_scaling_get");
    if (sd->ewk_view_zoom_cairo_scaling_get(obj))
      {
@@ -1656,13 +1656,13 @@ _smart_zoom_animator(void* data)
 {
    Smart_Data* sd = (Smart_Data*)data;
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
 
    // stop
    if (smart_zoom_index < 0)
      {
-	if (sd->ewk_view_zoom_set)
+	if (!sd->ewk_view_zoom_set)
 	  sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
 	sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set,
 	      sd->zoom.basis.x, sd->zoom.basis.y);
@@ -1678,7 +1678,7 @@ _smart_zoom_animator(void* data)
 
 	if (sd->text_selection_on == EINA_TRUE)
 	  {
-	     if (sd->ewk_frame_selection_handlers_get)
+	     if (!sd->ewk_frame_selection_handlers_get)
 	       sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
 	     int tx, ty, th, bx, by, bh;
 	     sd->ewk_frame_selection_handlers_get(sd->ewk_view_frame_main_get(sd->base.self),
@@ -1698,11 +1698,11 @@ _smart_zoom_animator(void* data)
 	// weak zoom
 	float zoom_rate = sd->zoom.zoom_rate_at_start
 	   + ((sd->zoom.zoom_rate_to_set - sd->zoom.zoom_rate_at_start) * cosine[smart_zoom_index]);
-	if (sd->ewk_view_zoom_weak_set)
+	if (!sd->ewk_view_zoom_weak_set)
 	  sd->ewk_view_zoom_weak_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_weak_set");
 	sd->ewk_view_zoom_weak_set(sd->base.self, zoom_rate, sd->zoom.basis.x, sd->zoom.basis.y);
      } else {
-	  if (sd->ewk_frame_scroll_pos_get)
+	  if (!sd->ewk_frame_scroll_pos_get)
 	    sd->ewk_frame_scroll_pos_get = (Eina_Bool (*)(const Evas_Object *, int *, int *))dlsym(ewk_handle, "ewk_frame_scroll_pos_get");
 	  // save old scroll positions
 	  int current_scroll_x, current_scroll_y;
@@ -1714,7 +1714,7 @@ _smart_zoom_animator(void* data)
 	  int to_set_y = sd->zoom.scroll_at_start.y
 	     + (sd->zoom.scroll_to_set.y - sd->zoom.scroll_at_start.y) * cosine[smart_zoom_index];
 
-	  if (sd->ewk_frame_scroll_add)
+	  if (!sd->ewk_frame_scroll_add)
 	    sd->ewk_frame_scroll_add = (Eina_Bool (*)(Evas_Object *, int, int))dlsym(ewk_handle, "ewk_frame_scroll_add");
 	  // scroll
 	  sd->ewk_frame_scroll_add(sd->ewk_view_frame_main_get(sd->base.self),
@@ -1769,19 +1769,19 @@ _smart_cb_pinch_zoom_stop(void* data, Evas_Object* webview, void* event_info)
 
    if (sd->tiled)
      {
-	if (sd->ewk_view_tiled_unused_cache_get)
+	if (!sd->ewk_view_tiled_unused_cache_get)
 	  sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
 	Ewk_Tile_Unused_Cache *tuc = sd->ewk_view_tiled_unused_cache_get(webview);
-	if (sd->ewk_tile_unused_cache_used_get)
+	if (!sd->ewk_tile_unused_cache_used_get)
 	  sd->ewk_tile_unused_cache_used_get = (size_t (*)(const Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_used_get");
 	size_t used = sd->ewk_tile_unused_cache_used_get(tuc);
-	if (sd->ewk_tile_unused_cache_max_get)
+	if (!sd->ewk_tile_unused_cache_max_get)
 	  sd->ewk_tile_unused_cache_max_get = (size_t (*)(const Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_max_get");
 	size_t max = sd->ewk_tile_unused_cache_max_get(tuc);
 	DBG("[%s] max = %d  used = %d \n", __func__, max, used);
 	if (used > max)
 	  {
-	     if (sd->ewk_tile_unused_cache_auto_flush)
+	     if (!sd->ewk_tile_unused_cache_auto_flush)
 	       sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
 	     sd->ewk_tile_unused_cache_auto_flush(tuc);
 	  }
@@ -1839,7 +1839,7 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    if (!sd) return;
    Evas_Point* point = (Evas_Point*)event_info;
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
 
    // feed double tap
@@ -1847,9 +1847,9 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
      {
 	Evas_Event_Mouse_Down mouse_double_down = sd->mouse_down_copy;
 	mouse_double_down.flags |= EVAS_BUTTON_DOUBLE_CLICK;
-	if (sd->ewk_frame_feed_mouse_down)
+	if (!sd->ewk_frame_feed_mouse_down)
 	  sd->ewk_frame_feed_mouse_down = (Eina_Bool (*)(Evas_Object *, const Evas_Event_Mouse_Down *))dlsym(ewk_handle, "ewk_frame_feed_mouse_down");
-	if (sd->ewk_frame_feed_mouse_up)
+	if (!sd->ewk_frame_feed_mouse_up)
 	  sd->ewk_frame_feed_mouse_up = (Eina_Bool (*)(Evas_Object *, const Evas_Event_Mouse_Up *))dlsym(ewk_handle, "ewk_frame_feed_mouse_up");
 	sd->ewk_frame_feed_mouse_down(sd->ewk_view_frame_main_get(sd->base.self), &mouse_double_down);
 	sd->ewk_frame_feed_mouse_up(sd->ewk_view_frame_main_get(sd->base.self), &sd->mouse_up_copy);
@@ -1862,14 +1862,14 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    int ewk_x = 0, ewk_y = 0;
    Eina_Rectangle rect;
    _coords_evas_to_ewk(webview, point->x, point->y, &ewk_x, &ewk_y);
-   if (sd->ewk_view_get_smart_zoom_rect)
+   if (!sd->ewk_view_get_smart_zoom_rect)
      sd->ewk_view_get_smart_zoom_rect = (Eina_Bool (*)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *))dlsym(ewk_handle, "ewk_view_get_smart_zoom_rect");
    sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect);
 
    // calculate zoom_rate and center of rect
    int view_x, view_y, view_w, view_h;
    evas_object_geometry_get(webview, &view_x, &view_y, &view_w, &view_h);
-   if (sd->ewk_view_zoom_get)
+   if (!sd->ewk_view_zoom_get)
      sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
    float current_zoom_rate = sd->ewk_view_zoom_get(webview);
    float zoom_rate;
@@ -1928,12 +1928,12 @@ _zoom_to_rect(Smart_Data *sd, int x, int y)
    DBG("%s\n", __func__);
    Evas_Object *webview = sd->base.self;
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
 
    // performing a hit test
    _coords_evas_to_ewk(webview, x, y, &x, &y);
-   if (sd->ewk_frame_hit_test_new)
+   if (!sd->ewk_frame_hit_test_new)
      sd->ewk_frame_hit_test_new = (Ewk_Hit_Test * (*)(const Evas_Object *, int, int))dlsym(ewk_handle, "ewk_frame_hit_test_new");
    Ewk_Hit_Test *hit_test = sd->ewk_frame_hit_test_new(sd->ewk_view_frame_main_get(webview), x, y);
 
@@ -1942,7 +1942,7 @@ _zoom_to_rect(Smart_Data *sd, int x, int y)
      {
 	// set zooming data
 	float zoom_rate = INPUT_ZOOM_RATIO;
-	if (sd->ewk_view_zoom_get)
+	if (!sd->ewk_view_zoom_get)
 	  sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
 	float current_zoom_rate = sd->ewk_view_zoom_get(webview);
 	float zoom_step = zoom_rate / current_zoom_rate;
@@ -1967,7 +1967,7 @@ _zoom_to_rect(Smart_Data *sd, int x, int y)
 	sd->zoom.basis.y = (to_y - zoom_step * from_y) / (1 - zoom_step) - view_y;
 	sd->zoom.zoom_rate_at_start = current_zoom_rate;
 	sd->zoom.zoom_rate_to_set = zoom_rate;
-	if (sd->ewk_frame_scroll_pos_get)
+	if (!sd->ewk_frame_scroll_pos_get)
 	  sd->ewk_frame_scroll_pos_get = (Eina_Bool (*)(const Evas_Object *, int *, int *))dlsym(ewk_handle, "ewk_frame_scroll_pos_get");
 	sd->ewk_frame_scroll_pos_get(sd->ewk_view_frame_main_get(webview),
 	      &sd->zoom.scroll_at_start.x, &sd->zoom.scroll_at_start.y);
@@ -1982,7 +1982,7 @@ _zoom_to_rect(Smart_Data *sd, int x, int y)
 	sd->smart_zoom_animator = ecore_animator_add(_smart_zoom_animator, sd);
      }
 
-   if (sd->ewk_frame_hit_test_free)
+   if (!sd->ewk_frame_hit_test_free)
      sd->ewk_frame_hit_test_free = (void (*)(Ewk_Hit_Test *))dlsym(ewk_handle, "ewk_frame_hit_test_free");
    sd->ewk_frame_hit_test_free(hit_test);
 }
@@ -2184,7 +2184,7 @@ _text_selection_update_position(Smart_Data *sd, int x, int y)
    Evas_Coord_Rectangle* front = &(sd->text_selection.front);
    Evas_Coord_Rectangle* back = &(sd->text_selection.back);
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
 
    // set selected region with front handle
@@ -2199,7 +2199,7 @@ _text_selection_update_position(Smart_Data *sd, int x, int y)
 	if (y > back->y)
 	  y = back->y - back->h / 2;
 
-	if (sd->ewk_frame_selection_left_set)
+	if (!sd->ewk_frame_selection_left_set)
 	  sd->ewk_frame_selection_left_set = (Eina_Bool (*)(Evas_Object *, int, int, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_left_set");
 	int ewkX, ewkY;
 	_coords_evas_to_ewk(webview, x, y, &ewkX, &ewkY);
@@ -2222,7 +2222,7 @@ _text_selection_update_position(Smart_Data *sd, int x, int y)
 	if (y < front->y)
 	  y = front->y + front->h / 2;
 
-	if (sd->ewk_frame_selection_right_set)
+	if (!sd->ewk_frame_selection_right_set)
 	  sd->ewk_frame_selection_right_set = (Eina_Bool (*)(Evas_Object *, int, int, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_right_set");
 	int ewkX, ewkY;
 	_coords_evas_to_ewk(webview, x, y, &ewkX, &ewkY);
@@ -2253,9 +2253,9 @@ _minimap_update_detail(Evas_Object* minimap, Smart_Data *sd, cairo_surface_t* sr
    cairo_surface_t* dest;
    cairo_status_t status;
 
-   if (sd->cairo_surface_status)
+   if (!sd->cairo_surface_status)
      sd->cairo_surface_status = (cairo_status_t (*)(cairo_surface_t *))dlsym(cairo_handle, "cairo_surface_status");
-   if (sd->cairo_image_surface_create_for_data)
+   if (!sd->cairo_image_surface_create_for_data)
      sd->cairo_image_surface_create_for_data = (cairo_surface_t * (*)(unsigned char *, cairo_format_t, int, int, int))dlsym(cairo_handle, "cairo_image_surface_create_for_data");
 
    //TODO: check which one is faster
@@ -2275,7 +2275,7 @@ _minimap_update_detail(Evas_Object* minimap, Smart_Data *sd, cairo_surface_t* sr
 	goto error_cairo_surface;
      }
 
-   if (sd->cairo_create)
+   if (!sd->cairo_create)
      sd->cairo_create = (cairo_t * (*)(cairo_surface_t *))dlsym(cairo_handle, "cairo_create");
    cr = sd->cairo_create(dest);
    status = sd->cairo_surface_status(dest);
@@ -2285,19 +2285,19 @@ _minimap_update_detail(Evas_Object* minimap, Smart_Data *sd, cairo_surface_t* sr
 	goto error_cairo;
      }
 
-   if (sd->cairo_set_source_surface)
+   if (!sd->cairo_set_source_surface)
      sd->cairo_set_source_surface = (void (*)(cairo_t *, cairo_surface_t *, double, double))dlsym(cairo_handle, "cairo_set_source_surface");
-   if (sd->cairo_paint)
+   if (!sd->cairo_paint)
      sd->cairo_paint = (void (*)(cairo_t *))dlsym(cairo_handle, "cairo_paint");
-   if (sd->cairo_set_source_rgb)
+   if (!sd->cairo_set_source_rgb)
      sd->cairo_set_source_rgb = (void (*)(cairo_t *, double, double, double))dlsym(cairo_handle, "cairo_set_source_rgb");
-   if (sd->cairo_rectangle)
+   if (!sd->cairo_rectangle)
      sd->cairo_rectangle = (void (*)(cairo_t *, double, double, double, double))dlsym(cairo_handle, "cairo_rectangle");
-   if (sd->cairo_set_line_width)
+   if (!sd->cairo_set_line_width)
      sd->cairo_set_line_width = (void (*)(cairo_t *, double))dlsym(cairo_handle, "cairo_set_line_width");
-   if (sd->cairo_stroke)
+   if (!sd->cairo_stroke)
      sd->cairo_stroke = (void (*)(cairo_t *cr))dlsym(cairo_handle, "cairo_stroke"); 
-   if (sd->cairo_set_antialias)
+   if (!sd->cairo_set_antialias)
      sd->cairo_set_antialias = (void (*)(cairo_t *, cairo_antialias_t))dlsym(cairo_handle, "cairo_set_antialias");
 
    sd->cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
@@ -2309,12 +2309,12 @@ _minimap_update_detail(Evas_Object* minimap, Smart_Data *sd, cairo_surface_t* sr
 	 visibleRect->x, visibleRect->y, visibleRect->w, visibleRect->h);
    sd->cairo_stroke(cr);
 
-   if (sd->cairo_destroy)
+   if (!sd->cairo_destroy)
      sd->cairo_destroy = (void (*)(cairo_t *))dlsym(cairo_handle, "cairo_destroy");
    sd->cairo_destroy(cr);
 
 error_cairo:
-   if (sd->cairo_surface_destroy)
+   if (!sd->cairo_surface_destroy)
      sd->cairo_surface_destroy = (void (*)(cairo_surface_t *))dlsym(cairo_handle, "cairo_surface_destroy");
    sd->cairo_surface_destroy(dest);
 error_cairo_surface:
@@ -2328,16 +2328,16 @@ _minimap_update(Evas_Object* minimap, Smart_Data *sd, cairo_surface_t* src, int 
    if (minimap == NULL || src == NULL) return;
    Evas_Object *webview = sd->base.self;
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
 
-   if (sd->ewk_frame_contents_size_get)
+   if (!sd->ewk_frame_contents_size_get)
      sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
    int cw, ch;
    sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(webview), &cw, &ch);
    if (cw == 0 || ch == 0) return;
 
-   if (sd->ewk_frame_visible_content_geometry_get)
+   if (!sd->ewk_frame_visible_content_geometry_get)
      sd->ewk_frame_visible_content_geometry_get = (Eina_Bool (*)(const Evas_Object *, Eina_Bool, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_visible_content_geometry_get");
    int x, y, w, h;
    sd->ewk_frame_visible_content_geometry_get(
@@ -2358,10 +2358,10 @@ _image_clone_get(Smart_Data *sd, int* minimap_w, int* minimap_h)
    Evas_Object *webview = sd->base.self;
    EWK_VIEW_PRIV_GET_OR_RETURN(sd, priv, NULL);
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
 
-   if (sd->ewk_frame_contents_size_get)
+   if (!sd->ewk_frame_contents_size_get)
      sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
    int w, h;
    sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(webview), &w, &h);
@@ -2384,19 +2384,19 @@ _image_clone_get(Smart_Data *sd, int* minimap_w, int* minimap_h)
      }
    printf(" minimap w,h : (%d, %d)\n", *minimap_w, *minimap_h);
 
-   if (sd->ewk_view_paint_contents)
+   if (!sd->ewk_view_paint_contents)
      sd->ewk_view_paint_contents = (Eina_Bool (*)(Ewk_View_Private_Data *, cairo_t *, const Eina_Rectangle *))dlsym(ewk_handle, "ewk_view_paint_contents");
-   if (sd->cairo_image_surface_create)
+   if (!sd->cairo_image_surface_create)
      sd->cairo_image_surface_create = (cairo_surface_t * (*)(cairo_format_t, int, int))dlsym(cairo_handle, "cairo_image_surface_create");
-   if (sd->cairo_create)
+   if (!sd->cairo_create)
      sd->cairo_create = (cairo_t * (*)(cairo_surface_t *))dlsym(cairo_handle, "cairo_create");
-   if (sd->cairo_destroy)
+   if (!sd->cairo_destroy)
      sd->cairo_destroy = (void (*)(cairo_t *))dlsym(cairo_handle, "cairo_destroy");
-   if (sd->cairo_scale)
+   if (!sd->cairo_scale)
      sd->cairo_scale = (void (*)(cairo_t *, double, double))dlsym(cairo_handle, "cairo_scale");
-   if (sd->cairo_surface_write_to_png)
+   if (!sd->cairo_surface_write_to_png)
      sd->cairo_surface_write_to_png = (cairo_status_t (*)(cairo_surface_t *, const char *))dlsym(cairo_handle, "cairo_surface_write_to_png");
-   if (sd->cairo_set_antialias)
+   if (!sd->cairo_set_antialias)
      sd->cairo_set_antialias = (void (*)(cairo_t *, cairo_antialias_t))dlsym(cairo_handle, "cairo_set_antialias");
 
    cairo_surface_t* ret = sd->cairo_image_surface_create(CAIRO_FORMAT_RGB24, *minimap_w, *minimap_h);
@@ -2419,7 +2419,7 @@ _unzoom_position(Evas_Object* obj, int x, int y, int* ux, int* uy)
    int viewY;
    evas_object_geometry_get(obj, NULL, &viewY, NULL, NULL);
 
-   if (sd->ewk_view_zoom_get)
+   if (!sd->ewk_view_zoom_get)
      sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
    float zoomRatio = sd->ewk_view_zoom_get(obj);
    if (zoomRatio)
@@ -2434,10 +2434,10 @@ _coords_evas_to_ewk(Evas_Object* obj, int x, int y, int* ux, int* uy)
 {
    INTERNAL_ENTRY;
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
 
-   if (sd->ewk_frame_scroll_pos_get)
+   if (!sd->ewk_frame_scroll_pos_get)
      sd->ewk_frame_scroll_pos_get = (Eina_Bool (*)(const Evas_Object *, int *, int *))dlsym(ewk_handle, "ewk_frame_scroll_pos_get");
 
    int scrollX, scrollY, viewY;
@@ -2452,10 +2452,10 @@ _coords_ewk_to_evas(Evas_Object* obj, int x, int y, int* ux, int* uy)
 {
    INTERNAL_ENTRY;
 
-   if (sd->ewk_view_frame_main_get)
+   if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
 
-   if (sd->ewk_frame_scroll_pos_get)
+   if (!sd->ewk_frame_scroll_pos_get)
      sd->ewk_frame_scroll_pos_get = (Eina_Bool (*)(const Evas_Object *, int *, int *))dlsym(ewk_handle, "ewk_frame_scroll_pos_get");
 
    int scrollX, scrollY, viewY;
