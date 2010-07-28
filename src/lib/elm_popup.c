@@ -162,7 +162,8 @@ _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
    _sizing_eval(data);
 }
 
-static void _block_clicked_cb( void *data, Evas_Object *obj, void *event_info )
+static void 
+_block_clicked_cb( void *data, Evas_Object *obj, void *event_info )
 {  
    evas_object_hide((Evas_Object*)data);  
    evas_object_smart_callback_call((Evas_Object *)data, "response", (void *)ELM_POPUP_RESPONSE_NONE);    
@@ -208,7 +209,8 @@ _resize_parent(void *data, Evas *e, Evas_Object *obj, void *event_info)
      }
 }
 
-static void _action_area_clicked( void *data, Evas_Object *obj, void *event_info )
+static void 
+_action_area_clicked( void *data, Evas_Object *obj, void *event_info )
 {
    Action_Area_Data *adata = (Action_Area_Data *)data;
    
@@ -217,7 +219,8 @@ static void _action_area_clicked( void *data, Evas_Object *obj, void *event_info
    evas_object_hide(adata->obj);
 }
 
-static Evas_Object* _elm_popup_add_button(Evas_Object *obj, const char *text, int response_id)
+static Evas_Object* 
+_elm_popup_add_button(Evas_Object *obj, const char *text, int response_id)
 {
    char buf[4096];
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -237,7 +240,8 @@ static Evas_Object* _elm_popup_add_button(Evas_Object *obj, const char *text, in
    return btn;
 }
 
-static void _elm_popup_buttons_add_valist(Evas_Object *obj, const char *first_button_text, va_list args)
+static void 
+_elm_popup_buttons_add_valist(Evas_Object *obj, const char *first_button_text, va_list args)
 {
    const char *text = NULL; 
    char buf[4096];
@@ -264,12 +268,31 @@ static void _elm_popup_buttons_add_valist(Evas_Object *obj, const char *first_bu
       }      
 }
 
-static void _elm_popup_timeout( void *data, Evas_Object *obj, void *event_info )
+static void 
+_elm_popup_timeout( void *data, Evas_Object *obj, void *event_info )
 {  
    evas_object_hide((Evas_Object*)data);  
    evas_object_smart_callback_call((Evas_Object *)data, "response", (void *)ELM_POPUP_RESPONSE_TIMEOUT);    
 }
 
+static int
+_elm_signal_exit(void *data __UNUSED__, int ev_type __UNUSED__, void *ev __UNUSED__)
+{
+   int res_id  =  ELM_POPUP_RESPONSE_NONE;
+   int *id = (int *)data;
+   *id = res_id;
+   ecore_main_loop_quit();
+   return EINA_TRUE;
+}
+
+static void 
+response_cb( void *data, Evas_Object *obj, void *event_info )
+{
+   int res_id = (int) event_info;
+   int *id = (int *)data;
+   *id = res_id;
+   ecore_main_loop_quit();
+}
 
 /**
  * Add a new Popup object.
@@ -685,13 +708,17 @@ elm_popup_timeout_set(Evas_Object *obj, int timeout)
  *
  * @ingroup Popup
  */
-EAPI void elm_popup_set_mode(Evas_Object *obj, Elm_Popup_Mode mode)
+EAPI void 
+elm_popup_mode_set(Evas_Object *obj, Elm_Popup_Mode mode)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    
-   if (!wd) return;  
-   evas_object_smart_callback_add(wd->notify, "block,clicked", _block_clicked_cb, obj);
+   if (!wd) return; 
+   if(mode == ELM_POPUP_TYPE_ALERT)
+     evas_object_smart_callback_add(wd->notify, "block,clicked", _block_clicked_cb, obj);
+   else
+     evas_object_smart_callback_del(wd->notify, "block,clicked", _block_clicked_cb);
 }
 
 /**
@@ -702,7 +729,8 @@ EAPI void elm_popup_set_mode(Evas_Object *obj, Elm_Popup_Mode mode)
  *
  * @ingroup Popup
  */ 
-EAPI void elm_popup_response(Evas_Object *obj, int  response_id)
+EAPI void 
+elm_popup_response(Evas_Object *obj, int  response_id)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -719,7 +747,8 @@ EAPI void elm_popup_response(Evas_Object *obj, int  response_id)
  *
  * @ingroup Popup
  */
-EAPI void elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient)
+EAPI void 
+elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -766,7 +795,8 @@ EAPI void elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient)
  *
  * @ingroup Popup
  */
-EAPI void elm_popup_rotation_set(Evas_Object *obj, int rot_angle)
+EAPI void 
+elm_popup_rotation_set(Evas_Object *obj, int rot_angle)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -780,6 +810,29 @@ EAPI void elm_popup_rotation_set(Evas_Object *obj, int rot_angle)
 	     wd->rot_angle = rot_angle;
 	  }
      }
+}
+
+/**
+ * Blocks in a main loop until responded/deleted.
+ * @param obj The popup object
+ *
+ * @ingroup Popup
+ */
+EAPI int 
+elm_popup_run(Evas_Object *obj)
+{
+   int response_id=0;
+   Ecore_Event_Handler *_elm_exit_handler = NULL;
+   evas_object_show(obj);
+   evas_object_smart_callback_add(obj, "response", response_cb, &response_id);	
+   _elm_exit_handler = ecore_event_handler_add(ECORE_EVENT_SIGNAL_EXIT, _elm_signal_exit, &response_id);
+   ecore_main_loop_begin();
+   if(_elm_exit_handler)
+     {
+	ecore_event_handler_del(_elm_exit_handler);
+	_elm_exit_handler = NULL; 
+     }
+   return response_id;
 }
 
 
