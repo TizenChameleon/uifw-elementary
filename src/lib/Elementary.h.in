@@ -667,6 +667,7 @@ extern "C" {
    EAPI Eina_Bool    elm_layout_file_set(Evas_Object *obj, const char *file, const char *group);
    EAPI Eina_Bool    elm_layout_theme_set(Evas_Object *obj, const char *clas, const char *group, const char *style);
    EAPI void         elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *content);
+   EAPI Evas_Object *elm_layout_content_unset(Evas_Object *obj, const char *swallow);
    EAPI Evas_Object *elm_layout_edje_get(const Evas_Object *obj);
    EAPI void         elm_layout_sizing_eval(Evas_Object *obj);
    /* smart callbacks called:

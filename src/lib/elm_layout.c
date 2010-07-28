@@ -257,6 +257,40 @@ elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *conte
 }
 
 /**
+ * Unset the layout content
+ *
+ * Unparent and return the content object which was set for this widget
+ *
+ * @param obj The layout object
+ * @param swallow The swallow group name in the edje file
+ * @return The content that was being used
+ *
+ * @ingroup Layout
+ */
+EAPI Evas_Object *
+elm_layout_content_unset(Evas_Object *obj, const char *swallow)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Subinfo *si;
+   const Eina_List *l;
+   if (!wd) return NULL;
+   EINA_LIST_FOREACH(wd->subs, l, si)
+     {
+	if (!strcmp(swallow, si->swallow))
+	  {
+	     Evas_Object *content;
+	     if (!si->obj) return NULL;
+	     content = si->obj; /* si will die in _sub_del due elm_widget_sub_object_del() */
+	     elm_widget_sub_object_del(obj, content);
+	     edje_object_part_unswallow(wd->lay, content);
+	     return content;
+	  }
+     }
+   return NULL;
+}
+
+/**
  * Get the edje layout
  *
  * @param obj The layout object
