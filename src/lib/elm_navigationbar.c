@@ -60,18 +60,15 @@ static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _move(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _item_sizing_eval(Item *it);
 static void _delete_item(Item *it);
 static void _back_button_clicked(void *data, Evas_Object *obj, void *event_info);
 static int _set_button_width(Evas_Object *obj);
 static Eina_Bool _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_Bool back_btn);
-static void _label_set(Evas_Object* label, const char* title);
 static Evas_Object *_multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, int width);
 static Item *_check_item_is_added(Evas_Object *obj, Evas_Object *content);
 static void _transition_complete_cb(void *data);
-static Elm_Transit *_transition_set(Item* prev_it, Item *it, Evas_Coord y, Eina_Bool pop);
 static void _elm_navigationbar_back_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button);
 static Evas_Object *_elm_navigationbar_back_button_get(Evas_Object *obj, Evas_Object *content);
 static void _elm_navigationbar_function_button1_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button);
@@ -107,13 +104,57 @@ _theme_hook(Evas_Object *obj)
 	edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
 	 EINA_LIST_FOREACH(wd->stack, list, it)
 	{
-		snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
-		elm_object_style_set(it->fn_btn1, buf_fn);
-		elm_object_style_set(it->fn_btn2, buf_fn);
-		elm_object_style_set(it->fn_btn3, buf_fn);
+		const char *text = NULL;
+		Evas_Object *ic = NULL;
+		if(it->fn_btn1)
+			{
+			text = elm_button_label_get(it->fn_btn1);
+			ic =  elm_button_icon_get(it->fn_btn1);
+			if(text)
+				{
+					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/text_only/%s", elm_widget_style_get(obj));
+					elm_object_style_set(it->fn_btn1, buf_fn);	
+				}
+			else if(ic)
+				{
+					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/icon_only/%s", elm_widget_style_get(obj));
+					elm_object_style_set(it->fn_btn1, buf_fn);	
+				}
+			}
+		if(it->fn_btn2)
+			{
+			text = elm_button_label_get(it->fn_btn2);
+			ic =  elm_button_icon_get(it->fn_btn2);
+			if(text)
+				{
+					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/text_only/%s", elm_widget_style_get(obj));
+					elm_object_style_set(it->fn_btn2, buf_fn);	
+				}
+			else if(ic)
+				{
+					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/icon_only/%s", elm_widget_style_get(obj));
+					elm_object_style_set(it->fn_btn2, buf_fn);	
+				}
+			}
+		if(it->fn_btn3)
+			{
+			text = elm_button_label_get(it->fn_btn3);
+			ic =  elm_button_icon_get(it->fn_btn3);
+			if(text)
+				{
+					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/text_only/%s", elm_widget_style_get(obj));
+					elm_object_style_set(it->fn_btn3, buf_fn);	
+				}
+			else if(ic)
+				{
+					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/icon_only/%s", elm_widget_style_get(obj));
+					elm_object_style_set(it->fn_btn3, buf_fn);	
+				}
+			}
 		snprintf(buf_bk, sizeof(buf_bk), "navigationbar_backbutton/%s", elm_widget_style_get(obj));
 		elm_object_style_set(it->back_btn, buf_bk);
 	}
+	  edje_object_message_signal_process(wd->base);
 	_sizing_eval(obj);
 }
 
@@ -215,7 +256,7 @@ _transition_complete_cb(void *data)
 	Transit_Cb_Data *cb = data;
 	if (!cb) return;
 
-	Widget_Data *wd;
+	Widget_Data *wd = NULL;
 	Item *prev_it = cb->prev_it;
 	Item *it = cb->it;
 
@@ -288,94 +329,10 @@ _transition_complete_cb(void *data)
 			edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
 		}
 	}
+	edje_object_message_signal_process(wd->base);
 	free(cb);
 	evas_object_smart_callback_call(it->obj, "updated", it->content);
 }
-
-#if 0
-static Elm_Transit *
-_transition_set(Item* prev_it, Item *it, Evas_Coord y, Eina_Bool pop)
-{
-	Widget_Data *wd = elm_widget_data_get(it->obj);
-	Evas_Coord pad, w;
-	Elm_Transit *transit;
-	int num = 1;
-	int pad_count;
-
-	transit = elm_transit_add(it->obj);
-	edje_object_part_geometry_get(wd->base, "elm.rect.pad1", NULL, NULL, &pad, NULL);
-	evas_object_geometry_get(wd->base, NULL, NULL, &w, NULL);
-
-	if (pop) num = -1;
-
-	// hide prev item
-	if (prev_it)
-	{
-		pad_count = 1;
-		if (prev_it->fn_btn1) 
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->fn_btn1, pad, y, pad-num*EFFECT_WIDTH/4, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->fn_btn1, 255, 255, 255, 255, 0, 0, 0, 0));
-			pad_count++;
-		}
-		else if (prev_it->back_btn)
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->back_btn, pad, y, pad-num*EFFECT_WIDTH/4, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->back_btn, 255, 255, 255, 255, 0, 0, 0, 0));
-			pad_count++;
-		}
-		if (prev_it->title_obj)
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->title_obj, prev_it->fn_btn1_w+pad_count*pad, y, prev_it->fn_btn1_w+pad_count*pad-num*EFFECT_WIDTH, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->title_obj, 255, 255, 255, 255, 0, 0, 0, 0));
-		}
-		else if (prev_it->title)
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->title, prev_it->fn_btn1_w+pad_count*pad, y, prev_it->fn_btn1_w+pad_count*pad-num*EFFECT_WIDTH, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->title, 255, 255, 255, 255, 0, 0, 0, 0));
-		}
-		if (prev_it->fn_btn2)
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(prev_it->fn_btn2, w-pad-prev_it->fn_btn2_w, y, w-pad-prev_it->fn_btn2_w-num*EFFECT_WIDTH/4, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(prev_it->fn_btn2, 255, 255, 255, 255, 0, 0, 0, 0));
-		}
-	}
-
-	// show new item
-	if (it)
-	{
-		pad_count = 1;
-		if (it->fn_btn1)
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(it->fn_btn1, pad+num*EFFECT_WIDTH/4, y, pad, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(it->fn_btn1, 0, 0, 0, 0, 255, 255, 255, 255));
-			pad_count++;
-		}
-		else if (it->back_btn)
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(it->back_btn, pad+num*EFFECT_WIDTH/4, y, pad, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(it->back_btn, 0, 0, 0, 0, 255, 255, 255, 255));
-			pad_count++;
-		}
-		if (it->title_obj)
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(it->title_obj, it->fn_btn1_w+pad_count*pad+num*EFFECT_WIDTH, y, it->fn_btn1_w+pad_count*pad, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(it->title_obj, 0, 0, 0, 0, 255, 255, 255, 255));
-		}
-		else if (it->title)
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(it->title, it->fn_btn1_w+pad_count*pad+num*EFFECT_WIDTH, y, it->fn_btn1_w+pad_count*pad, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(it->title, 0, 0, 0, 0, 255, 255, 255, 255));
-		}
-		if (it->fn_btn2)
-		{
-			elm_transit_fx_insert(transit, elm_fx_translation_add(it->fn_btn2, w-pad-it->fn_btn2_w+num*EFFECT_WIDTH/4, y, w-pad-it->fn_btn2_w, y));
-			elm_transit_fx_insert(transit, elm_fx_color_add(it->fn_btn2, 0, 0, 0, 0, 255, 255, 255, 255));
-		}
-	}
-	return transit;
-}
-#endif
 
 static void 
 _back_button_clicked(void *data, Evas_Object *obj, void *event_info)
@@ -387,8 +344,8 @@ _back_button_clicked(void *data, Evas_Object *obj, void *event_info)
 static int
 _set_button_width(Evas_Object *obj)
 {
-	Evas_Coord minw, minh, maxw, maxh;
-	Evas_Coord w, h;
+	Evas_Coord minw = -1, minh = -1, maxw= -1, maxh = -1;
+	Evas_Coord w = 0, h = 0;
 
 	evas_object_size_hint_min_get(obj, &minw, &minh);
 	evas_object_size_hint_max_get(obj, &maxw, &maxh);
@@ -423,8 +380,20 @@ _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_
 			}
 		else 
 			{
-				snprintf(buf, sizeof(buf), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
-				elm_object_style_set(new_btn, buf);
+				const char *text = NULL;
+				Evas_Object *ic = NULL;
+				text = elm_button_label_get(new_btn);
+				ic =  elm_button_icon_get(new_btn);
+				if (text)
+					{
+						snprintf(buf, sizeof(buf), "navigationbar_functionbutton/text_only/%s", elm_widget_style_get(obj));
+						elm_object_style_set(new_btn, buf);
+					}
+				else if (ic)
+					{
+						snprintf(buf, sizeof(buf), "navigationbar_functionbutton/icon_only/%s", elm_widget_style_get(obj));
+						elm_object_style_set(new_btn, buf);
+					}
 			}
 		elm_widget_sub_object_add(obj, new_btn);
 		changed = TRUE;
@@ -582,12 +551,12 @@ elm_navigationbar_push(Evas_Object *obj,
 
 	if (!fn_btn1 && prev_it)
 	{
-		char *prev_title;
+		char *prev_title = NULL;
 		char *buf = NULL;
 		int len = 0;
 
 		it->back_btn = elm_button_add(obj);
-		prev_title = prev_it->title;
+		prev_title = (char *)prev_it->title;
 		if(prev_title)
 		{
 			if (prev_title) len = strlen(prev_title);
@@ -614,34 +583,17 @@ elm_navigationbar_push(Evas_Object *obj,
 	// unswallow items and start transition
 	if (prev_it)
 	{
-		Evas_Coord y;
 		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
 				
 		cb->prev_it = prev_it;
 		cb->it = it;
 		cb->pop = EINA_FALSE;
-		if (prev_it->title_obj) evas_object_geometry_get(prev_it->title_obj, NULL, &y, NULL, NULL);
-		else evas_object_geometry_get(prev_it->title, NULL, &y, NULL, NULL);
-
 		if (prev_it->title_obj) edje_object_part_unswallow(wd->base, prev_it->title_obj);
-		else if (prev_it->title) edje_object_part_unswallow(wd->base, prev_it->title);
  		if (prev_it->fn_btn1) edje_object_part_unswallow(wd->base, prev_it->fn_btn1);
 		else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
 		if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
 		if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
-
-		/*if (it->ani) 
-		{
-			Elm_Transit* transit;
-			transit = _transition_set(prev_it, it, y, EINA_FALSE);
-			elm_transit_completion_callback_set(transit, _transition_complete_cb, cb);
-			elm_transit_run(transit, 0.3);
-			elm_transit_del(transit); 
-		}
-		else*/ 
-		{
-			_transition_complete_cb(cb);
-		}
+		_transition_complete_cb(cb);
 	}
 	else  
 	{
@@ -653,7 +605,6 @@ elm_navigationbar_push(Evas_Object *obj,
 	}
 
 	//push content to pager
-	elm_pager_animation_set(wd->pager, EINA_TRUE);
 	elm_pager_content_push(wd->pager, it->content);	
 
 	//push item into the stack. it should be always the tail
@@ -699,48 +650,34 @@ elm_navigationbar_pop(Evas_Object *obj)
 	if (ll)
 	{
 		prev_it = ll->data;
-		while (ll = ll->prev) 
+		ll = ll->prev;
+		while (ll) 
 		{
 			it = ll->data;
 			if (it->obj) break;  
 			it = NULL;
+			ll = ll->prev;
 		}
 	}
 
 	if (prev_it && it) 
 	{
 		//unswallow items and start trasition
-		Evas_Coord y;
 		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
 
 		cb->prev_it = prev_it;
 		cb->it = it;
 		cb->pop = EINA_TRUE;
-		if (prev_it->title_obj) evas_object_geometry_get(prev_it->title_obj, NULL, &y, NULL, NULL);
-		else evas_object_geometry_get(prev_it->title, NULL, &y, NULL, NULL);
-
+	
 		if (prev_it->title_obj) edje_object_part_unswallow(wd->base, prev_it->title_obj);
 		if (prev_it->fn_btn1) edje_object_part_unswallow(wd->base, prev_it->fn_btn1);
 		else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
 		if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
 		if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
 		_item_sizing_eval(it);
-
-		/*if (animation) 
-		{
-			Elm_Transit* transit;
-			transit = _transition_set(prev_it, it, y, EINA_TRUE);
-			elm_transit_completion_callback_set(transit, _transition_complete_cb, cb);
-			elm_transit_run(transit, 0.3);
-			elm_transit_del(transit); 
-		}
-		else*/
-		{
-			_transition_complete_cb(cb);
-		}
-
+		_transition_complete_cb(cb);
+		
 		//pop content from pager
-		elm_pager_animation_set(wd->pager, EINA_TRUE);
 		elm_pager_content_pop(wd->pager);
 	}
 	else if (prev_it)
@@ -753,7 +690,6 @@ elm_navigationbar_pop(Evas_Object *obj)
 		_transition_complete_cb(cb);
 
 		//pop content from pager
-		elm_pager_animation_set(wd->pager, EINA_FALSE);
 		elm_pager_content_pop(wd->pager);
 	}
 }
@@ -786,14 +722,15 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 	if (ll)
 	{
 		prev_it = ll->data;
-		while (ll = ll->prev) 
+		ll = ll->prev;
+		while (ll) 
 		{
 			it = ll->data;
 			if (it->obj && (it->content == content)) 
 			{
 				//delete contents between the top and the inputted content
 				ll = eina_list_last(wd->stack);
-				while (ll = ll->prev)
+				while (ll)
 				{
 					if (ll->data == it) break;
 					else 
@@ -801,6 +738,7 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 						_delete_item(ll->data);
 						wd->stack = eina_list_remove_list(wd->stack, ll);
 					}
+				ll =  ll->prev;
 				}
 				break;
 			}
@@ -811,38 +749,18 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 	if (prev_it && it) 
 	{
 		//unswallow items and start trasition
-		Evas_Coord y;
 		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
-
 		cb->prev_it = prev_it;
 		cb->it = it;
 		cb->pop = EINA_TRUE;
-		if (prev_it->title_obj) evas_object_geometry_get(prev_it->title_obj, NULL, &y, NULL, NULL);
-		else evas_object_geometry_get(prev_it->title, NULL, &y, NULL, NULL);
-
 		if (prev_it->title_obj) edje_object_part_unswallow(wd->base, prev_it->title_obj);
-		else if (prev_it->title) edje_object_part_unswallow(wd->base, prev_it->title);
 		if (prev_it->fn_btn1) edje_object_part_unswallow(wd->base, prev_it->fn_btn1);
 		else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
 		if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
 		if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
 		_item_sizing_eval(it);
-
-		/*if (animation) 
-		{
-			Elm_Transit* transit;
-			transit = _transition_set(prev_it, it, y, EINA_TRUE);
-			elm_transit_completion_callback_set(transit, _transition_complete_cb, cb);
-			elm_transit_run(transit, 0.3);
-			elm_transit_del(transit); 
-		}
-		else*/
-		{
-			_transition_complete_cb(cb);
-		}
-
+		_transition_complete_cb(cb);
 		//pop content from pager
-		elm_pager_animation_set(wd->pager, EINA_TRUE);
 		elm_pager_to_content_pop(wd->pager, content);
 	}
 	}
@@ -894,7 +812,7 @@ EAPI const char *
 elm_navigationbar_title_label_get(Evas_Object *obj, 
 							Evas_Object *content)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
@@ -980,7 +898,7 @@ EAPI Eina_List *
 elm_navigationbar_title_object_list_get(Evas_Object *obj,
 										Evas_Object *content)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
@@ -1218,7 +1136,7 @@ _elm_navigationbar_function_button3_get(Evas_Object *obj,
 EAPI Evas_Object *
 elm_navigationbar_content_top_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
@@ -1236,7 +1154,7 @@ elm_navigationbar_content_top_get(Evas_Object *obj)
 EAPI Evas_Object *
 elm_navigationbar_content_bottom_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
@@ -1318,9 +1236,9 @@ EAPI Evas_Object *
 elm_navigationbar_title_button_get(Evas_Object *obj, 	
 									Evas_Object *content,Elm_Navi_Button_Type button_type)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Evas_Object *button=NULL;
-	if(!content || !obj) return;	
+	if(!content || !obj) return NULL;	
 	switch(button_type)
 	{
 		case ELM_NAVIGATIONBAR_FUNCTION_BUTTON1:

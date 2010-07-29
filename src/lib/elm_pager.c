@@ -38,14 +38,12 @@ struct _Item
    Eina_Bool popme : 1;
 };
 
-static Eina_Bool ani = EINA_TRUE;
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
-static void _signal_hide_finished(void *data, Evas_Object *obj, const char *emission, const char *source);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -98,57 +96,23 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
    _sizing_eval(it->obj);
 }
 
-static void 
-_complete_cb( void* data )
-{
-	Item *it = data;
-	Evas_Object *obj = it->obj;
-
-	evas_object_hide(it->base);
-	edje_object_signal_emit(it->base, "elm,action,reset", "elm");
-	evas_object_smart_callback_call(obj, "hide,finished", it->content);
-	edje_object_message_signal_process(it->base);
-	if (it->popme) evas_object_del(it->content);
-	_sizing_eval(obj);
-}
-
 static void
 _eval_top(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it, *ittop;
-
+   Item *ittop;
    if (!wd) return;
    if (!wd->stack) return;
    ittop = eina_list_last(wd->stack)->data;
    if (ittop != wd->top)
      {
-	Evas_Object *o= NULL, *prev_o = NULL;
+	Evas_Object *o;
 	const char *onshow, *onhide;
-	Eina_Bool pop = EINA_FALSE;
-     	Evas_Coord w, y;
-     	Elm_Transit *transit;
-
-	transit = elm_transit_add(obj);
-	evas_object_geometry_get( obj, NULL, &y, &w, NULL );
 
 	if (wd->top)
 	  {
-	     it = wd->top;
 	     o = wd->top->base;
-
-	     if (wd->top->popme) pop = EINA_TRUE;
-	     if (ani) 
-	     	{
-	     	  if (pop) elm_transit_fx_insert( transit, elm_fx_translation_add(o , 0, y, w, y));
-	     	  else elm_transit_fx_insert( transit, elm_fx_translation_add(o , 0, y, -w, y));
-		  elm_transit_completion_callback_set( transit, _complete_cb, it);
-	     	}
-	     else 
-	     	{
-		  _signal_hide_finished(wd->top, o, "elm,action,hide,finished", "");
-	     	}	
-		 
+	     edje_object_signal_emit(o, "elm,action,hide", "elm");
 	     onhide = edje_object_data_get(o, "onhide");
 	     if (onhide)
 	       {
@@ -157,23 +121,14 @@ _eval_top(Evas_Object *obj)
 	       }
 	  }
 	wd->top = ittop;
-	prev_o = wd->top->base;
-	evas_object_show(prev_o);
-	
-	//add show/hide transition direction & animation on/off. 10.04.14 sohyun
-	if (ani && o) 
-	  {
-	    if (pop) elm_transit_fx_insert( transit, elm_fx_translation_add(prev_o, -w, y, 0, y));
-	    else elm_transit_fx_insert( transit, elm_fx_translation_add(prev_o, w, y, 0, y));
-	    elm_transit_run( transit, 0.3 );
-	  }
-	elm_transit_del( transit ); 
-
-	onshow = edje_object_data_get(prev_o, "onshow");
+	o = wd->top->base;
+	evas_object_show(o);
+	edje_object_signal_emit(o, "elm,action,show", "elm");
+	onshow = edje_object_data_get(o, "onshow");
 	if (onshow)
 	  {
-	     if (!strcmp(onshow, "raise")) evas_object_raise(prev_o);
-	     else if (!strcmp(onshow, "lower")) evas_object_lower(prev_o);
+	     if (!strcmp(onshow, "raise")) evas_object_raise(o);
+	     else if (!strcmp(onshow, "lower")) evas_object_lower(o);
 	  }
      }
 }
@@ -311,7 +266,7 @@ elm_pager_content_push(Evas_Object *obj, Evas_Object *content)
    evas_object_resize(it->base, w, h);
    evas_object_clip_set(it->base, wd->clip);
    elm_widget_sub_object_add(obj, it->base);
-   if (it->content) elm_widget_sub_object_add(obj, it->content);
+   elm_widget_sub_object_add(obj, it->content);
    _elm_theme_object_set(obj, it->base,  "pager", "base", elm_widget_style_get(obj));
    edje_object_signal_callback_add(it->base, "elm,action,hide,finished", "", 
                                    _signal_hide_finished, it);
@@ -359,20 +314,7 @@ elm_pager_content_pop(Evas_Object *obj)
 
 	     wd->top = it;
 	     o = wd->top->base;
-	     if (ani) 
-	       {
-		  Elm_Effect *transit;
-		  Evas_Coord w, y;
-      
-	          transit = elm_transit_add(obj);
-		  evas_object_geometry_get(obj, NULL, &y, &w, NULL);
-		  elm_transit_fx_insert(transit, elm_fx_translation_add(o , 0, y, w, y));
-		  elm_transit_completion_callback_set(transit, _complete_cb, it);
-		  elm_transit_run(transit, 0.3 );
-		  elm_transit_del(transit);  
-	     	}
-	     else _signal_hide_finished(wd->top, o, "elm,action,hide,finished", "");
-
+	     edje_object_signal_emit(o, "elm,action,hide", "elm");
 	     onhide = edje_object_data_get(o, "onhide");
 	     if (onhide)
 	       {
@@ -505,19 +447,5 @@ elm_pager_content_top_get(const Evas_Object *obj)
    if (!wd->stack) return NULL;
    it = eina_list_last(wd->stack)->data;
    return it->content;
-}
-
-/**
- * set animation on/off for content transition effect
- *
- * @param obj The pager object
- * @param animation transition when contents are changed (default value : TRUE)
- *
- * @ingroup Pager
- */
-EAPI void
-elm_pager_animation_set(Evas_Object *obj, Eina_Bool animation)
-{
-	ani = animation;
 }
 
