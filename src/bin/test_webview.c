@@ -78,7 +78,7 @@ void
 test_webview(void *data, Evas_Object *obj, void *event_info)
 {
 #ifdef ELM_EWEBKIT
-   Evas_Object *win, *bg, *sc, *wv;
+   Evas_Object *win, *bg, *wv;
 
    win = elm_win_add(NULL, "webview", ELM_WIN_BASIC);
    elm_win_title_set(win, "webview");
@@ -91,15 +91,9 @@ test_webview(void *data, Evas_Object *obj, void *event_info)
 
    wv = elm_webview_add(win);
    evas_object_size_hint_weight_set(wv, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_webview_uri_set(obj, "file:///a.html");
-
-   sc = elm_scroller_add(win);
-   evas_object_size_hint_weight_set(sc, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, sc);
-
-   elm_scroller_content_set(sc, wv);
+   elm_win_resize_object_add(win, wv);
+   elm_webview_uri_set(wv, "http://www.google.com");
    evas_object_show(wv);
-   evas_object_show(sc);
 
    evas_object_resize(win, 320, 300);
    elm_object_focus(win);

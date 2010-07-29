@@ -100,6 +100,7 @@ elm_webview_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
 
    wd->webkit = _elm_smart_webview_add(e, EINA_FALSE);
+   _elm_smart_webview_widget_set(wd->webkit, obj);
    //TODO:evas_object_box_layout_set(wd->box, _layout, wd, NULL);
    evas_object_event_callback_add(wd->webkit, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				  _changed_size_hints, obj);
@@ -147,6 +148,8 @@ elm_webview_minimap_get(Evas_Object *obj)
 EAPI void
 elm_webview_uri_set(Evas_Object *obj, const char *uri)
 {
-   _elm_smart_webview_uri_set(obj, uri);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_uri_set(wd->webkit, uri);
 }
 #endif
