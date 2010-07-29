@@ -133,6 +133,8 @@ struct _Widget_Data
    Eina_Bool ellipsis : 1;
    Eina_Bool autoreturnkey : 1;
    Eina_Bool input_panel_enable : 1;
+   Eina_Bool autocapitalize : 1;
+   Elm_Input_Panel_Layout input_panel_layout;
 };
 
 struct _Elm_Entry_Item_Provider
@@ -271,13 +273,21 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *t;
+   Ecore_IMF_Context *ic;
 
    t = eina_stringshare_add(elm_entry_entry_get(obj));
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
    eina_stringshare_del(t);
    edje_object_scale_set(wd->ent, elm_widget_scale_get(obj) * _elm_config->scale);
+   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", wd->input_panel_enable);
+
+   ic = edje_object_part_text_imf_context_get(wd->ent, "elm.text");
+   if (ic)
+     {
+	ecore_imf_context_input_panel_layout_set(ic, (Ecore_IMF_Input_Panel_Layout)wd->input_panel_layout);
+     }
 
    _sizing_eval(obj);
 }
@@ -2842,16 +2852,15 @@ EAPI void
 elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
-   Eina_Bool autocap = on;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   if (!wd->password)
-       autocap = EINA_FALSE;
+   if (wd->password)
+       wd->autocapitalize = EINA_FALSE;
    else
-       autocap = on;
+       wd->autocapitalize = on;
 
-   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", autocap);
+   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
 }
 
 /**
@@ -3030,8 +3039,13 @@ EAPI void
 elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   
    Ecore_IMF_Context *ic = elm_entry_imf_context_get(obj);
    if (!ic) return;
+
+   wd->input_panel_layout = layout;
    
    ecore_imf_context_input_panel_layout_set(ic, (Ecore_IMF_Input_Panel_Layout)layout);
 }
