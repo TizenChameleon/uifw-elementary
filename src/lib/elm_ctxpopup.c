@@ -224,15 +224,22 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
    evas_object_geometry_get(wd->parent, &parent_x, &parent_y, &parent_w,
 			    &parent_h);
+   fprintf(stderr, "PARENT %d %d %d %d\n", parent_x, parent_y, parent_w, parent_h);
    evas_object_geometry_get(wd->box, NULL, NULL, &box_w, &box_h);
+   fprintf( stderr, "BOX SIZE %d %d\n", box_w, box_h );
    edje_object_part_geometry_get(wd->base, "ctxpopup_btns_frame", NULL, NULL,
 				 &base_w, &base_h);
+
+   fprintf(stderr, "BTNS FRAME SIZE %d %d\n", base_w, base_h );
 
    if (box_w > base_w)
       base_w = box_w;
    base_h += box_h;
 
    edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
+
+   fprintf(stderr, "MAX SIZE %d %d\n", max_width_size, max_height_size );
+
    max_width_size *= elm_scale_get();
    max_height_size *= elm_scale_get();
 
@@ -253,6 +260,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
      {
 	edje_object_part_geometry_get(wd->arrow, "ctxpopup_arrow", NULL, NULL,
 				      &arrow_w, &arrow_h);
+
 	evas_object_resize(wd->arrow, arrow_w, arrow_h);
      }
 
@@ -326,7 +334,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	  default:
 	     break;
 	  }
-	break;
      }
    rect->x = x;
    rect->y = y;
@@ -389,9 +396,7 @@ static void
 _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd;
-
    Eina_List *elist;
-
    Elm_Ctxpopup_Item *item;
    Evas_Coord_Rectangle rect = { 0, 0, 1, 1 };
    Evas_Coord y, w, h;
@@ -572,7 +577,7 @@ _parent_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
    evas_object_move(wd->bg, x, y);
-   _sizing_eval(data);
+   if(wd->visible) _sizing_eval(data);
 }
 
 static void
@@ -584,9 +589,11 @@ _parent_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
    if (!wd)
       return;
 
+	   fprintf(stderr, "parent resize\n" );
+
    evas_object_geometry_get(obj, NULL, NULL, &w, &h);
    evas_object_resize(wd->bg, w, h);
-   _sizing_eval(data);
+   if(wd->visible) _sizing_eval(data);
 }
 
 static void
