@@ -84,7 +84,7 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
  */
 #ifdef ELM_EWEBKIT
 EAPI Evas_Object *
-elm_webview_add(Evas_Object *parent)
+elm_webview_add(Evas_Object *parent, Eina_Bool tiled)
 {
    Evas_Object *obj;
    Evas *e;
@@ -99,7 +99,7 @@ elm_webview_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
 
-   wd->webkit = _elm_smart_webview_add(e, EINA_FALSE);
+   wd->webkit = _elm_smart_webview_add(e, tiled);
    _elm_smart_webview_widget_set(wd->webkit, obj);
    //TODO:evas_object_box_layout_set(wd->box, _layout, wd, NULL);
    evas_object_event_callback_add(wd->webkit, EVAS_CALLBACK_CHANGED_SIZE_HINTS,

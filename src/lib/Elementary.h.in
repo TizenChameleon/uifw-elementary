@@ -2498,7 +2498,7 @@ extern "C" {
    
    /* WebView */
    /* commented out until it is completed
-   EAPI Evas_Object *elm_webview_add(Evas_Object *parent);
+   EAPI Evas_Object *elm_webview_add(Evas_Object *parent, Eina_Bool tiled);
    EAPI Evas_Object *elm_webview_widget_get(Evas_Object *obj);
    EAPI void         elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed);
    EAPI void         elm_webview_events_feed_get(Evas_Object *obj);

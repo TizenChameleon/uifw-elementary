@@ -50,7 +50,7 @@ test_webview_in_scroller(void *data, Evas_Object *obj, void *event_info)
      }
 
    //create webview
-   wv = elm_webview_add(win);
+   wv = elm_webview_add(win, EINA_TRUE);
    evas_object_size_hint_weight_set(wv, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_min_set(wv, 480, 400);
    elm_box_pack_end(bx, wv);
@@ -89,7 +89,7 @@ test_webview(void *data, Evas_Object *obj, void *event_info)
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-   wv = elm_webview_add(win);
+   wv = elm_webview_add(win, EINA_TRUE);
    evas_object_size_hint_weight_set(wv, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, wv);
    elm_webview_uri_set(wv, "http://www.google.com");

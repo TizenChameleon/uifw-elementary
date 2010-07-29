@@ -31,7 +31,7 @@
 #define MINIMAP_HEIGHT 200
 #define MAX_TUC 1024*1024*10
 #define MAX_URI 512
-#define MOBILE_DEFAULT_WIDTH 320
+#define MOBILE_DEFAULT_ZOOM_RATIO 1.5f
 
 #define WEBVIEW_EDJ "/usr/share/edje/ewebview.edj"
 #define WEBKIT_EDJ "/usr/share/edje/webkit.edj"
@@ -57,6 +57,7 @@ struct _Smart_Data {
      Evas_Object *(*ewk_view_frame_main_get)(const Evas_Object *);
      Eina_Bool (*ewk_view_uri_set)(Evas_Object *, const char *);
      float (*ewk_view_zoom_get)(const Evas_Object *);
+     const char * (*ewk_view_uri_get)(const Evas_Object *o);
      Eina_Bool (*ewk_view_zoom_set)(Evas_Object *, float, Evas_Coord, Evas_Coord);
      Eina_Bool (*ewk_view_zoom_weak_set)(Evas_Object *, float, Evas_Coord, Evas_Coord);
      Eina_Bool (*ewk_view_zoom_text_only_set)(Evas_Object *, Eina_Bool);
@@ -94,7 +95,6 @@ struct _Smart_Data {
      Eina_Bool (*ewk_frame_feed_mouse_up)(Evas_Object *, const Evas_Event_Mouse_Up *);
      Eina_Bool (*ewk_frame_visible_content_geometry_get)(const Evas_Object *, Eina_Bool, int *, int *, int *, int *);
      Eina_Bool (*ewk_frame_scroll_pos_get)(const Evas_Object *, int *, int *);
-     Evas_Object * (*ewk_frame_view_get)(const Evas_Object *);
      void (*ewk_frame_hit_test_free)(Ewk_Hit_Test *);
      Eina_Bool (*ewk_frame_contents_set)(Evas_Object *, const char *, size_t, const char *, const char *, const char *);
      Eina_Bool (*ewk_frame_select_closest_word)(Evas_Object *, int, int, int *, int *, int *, int *, int *, int *);
@@ -205,6 +205,7 @@ static void      _smart_load_started(void* data, Evas_Object* webview, void* err
 static void      _smart_load_finished(void* data, Evas_Object* webview, void* arg);
 static void      _smart_load_error(void* data, Evas_Object* webview, void* arg);
 static void      _smart_viewport_changed(void* data, Evas_Object* webview, void* arg);
+static void      _smart_page_layout_info_set(Smart_Data *sd, float init_zoom_rate, float min_zoom_rate, float max_zoom_rate, Eina_Bool scalable);
 static void      _smart_contents_size_changed(void* data, Evas_Object* frame, void* arg);
 static void      _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg);
 static void      _smart_cb_view_created(void* data, Evas_Object* webview, void* arg);
@@ -587,6 +588,11 @@ _smart_load_started(void* data, Evas_Object* webview, void* error)
    Smart_Data *sd = (Smart_Data *)data;
    if (!sd) return;
 
+   if (!sd->ewk_view_zoom_range_set)
+     sd->ewk_view_zoom_range_set = (void (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
+   if (!sd->ewk_view_user_scalable_set)
+     sd->ewk_view_user_scalable_set = (void (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_user_scalable_set");
+
    // set default layout and zoom level
    sd->is_mobile_page = EINA_FALSE;
    sd->layout.w = sd->layout.default_w;
@@ -594,6 +600,8 @@ _smart_load_started(void* data, Evas_Object* webview, void* error)
    sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
    sd->zoom.max_zoom_rate = MAX_ZOOM_RATIO;
    sd->zoom.scalable = EINA_TRUE;
+   sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
+   sd->ewk_view_user_scalable_set(webview, EINA_TRUE);
 }
 
 static void
@@ -698,14 +706,38 @@ _smart_viewport_changed(void* data, Evas_Object* webview, void* arg)
 	return;
      }
 
+   // if there is no layout_w, it is the desktop site.
+   if (layout_w <= 0) return;
+
    // set data for mobile page
    sd->is_mobile_page = EINA_TRUE;
-   sd->layout.w = (layout_w <= 0) ? MOBILE_DEFAULT_WIDTH : layout_w;
-   sd->zoom.init_zoom_rate = (float)object_w / sd->layout.w;
-   sd->zoom.min_zoom_rate = (min_zoom_rate <= 0) ? MIN_ZOOM_RATIO : min_zoom_rate;
-   sd->zoom.max_zoom_rate = (max_zoom_rate <= 0) ? MAX_ZOOM_RATIO : max_zoom_rate;
-   sd->layout.h = (layout_h <= 0) ? (object_h / sd->zoom.init_zoom_rate) : layout_h;
+   _smart_page_layout_info_set(sd, MOBILE_DEFAULT_ZOOM_RATIO, min_zoom_rate, max_zoom_rate, scalable);
+}
+
+static void _smart_page_layout_info_set(Smart_Data *sd, float init_zoom_rate, float min_zoom_rate, float max_zoom_rate, Eina_Bool scalable)
+{
+   Evas_Object* webview = sd->base.self;
+
+   int object_w, object_h;
+   evas_object_geometry_get(webview, NULL, NULL, &object_w, &object_h);
+   object_w = (object_w % 10) ? (object_w / 10 * 10 + 10) : object_w;
+
+   sd->zoom.init_zoom_rate = init_zoom_rate;
+   sd->layout.w = object_w / sd->zoom.init_zoom_rate;
+   sd->layout.h = object_h / sd->zoom.init_zoom_rate;
    sd->zoom.scalable = scalable;
+   if (scalable)
+     {
+	sd->zoom.min_zoom_rate = (min_zoom_rate <= init_zoom_rate) ? init_zoom_rate : min_zoom_rate;
+	sd->zoom.max_zoom_rate = (max_zoom_rate <= init_zoom_rate) ? init_zoom_rate : max_zoom_rate;
+	if (max_zoom_rate < min_zoom_rate)
+	  max_zoom_rate = min_zoom_rate;
+     }
+   else
+     {
+	sd->zoom.min_zoom_rate = init_zoom_rate;
+	sd->zoom.max_zoom_rate = init_zoom_rate;
+     }
 }
 
 static void
@@ -714,10 +746,7 @@ _smart_contents_size_changed(void* data, Evas_Object* frame, void* arg)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
 
-   if (!(sd->ewk_frame_view_get))
-     sd->ewk_frame_view_get = (Evas_Object * (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_frame_view_get");
-
-   Evas_Object* webview = sd->ewk_frame_view_get(frame);
+   Evas_Object* webview = sd->base.self;
 
    Evas_Coord* size = (Evas_Coord*)arg;
    if (!size || size[0] == 0)
@@ -742,44 +771,51 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
 
-   if (!sd->ewk_frame_view_get)
-     sd->ewk_frame_view_get = (Evas_Object * (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_frame_view_get");
-   Evas_Object* webview = sd->ewk_frame_view_get(frame);
-
-   if (!sd->ewk_frame_contents_size_get)
-     sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
-   int content_w, content_h;
-   sd->ewk_frame_contents_size_get(frame, &content_w, &content_h);
+   Evas_Object* webview = sd->base.self;
 
    if (!sd->ewk_view_user_scalable_set)
      sd->ewk_view_user_scalable_set = (void (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_user_scalable_set");
-
-   sd->ewk_view_user_scalable_set(webview, EINA_TRUE);
-
    if (!sd->ewk_view_zoom_range_set)
      sd->ewk_view_zoom_range_set = (void (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
    if (!sd->ewk_view_fixed_layout_size_set)
      sd->ewk_view_fixed_layout_size_set = (void (*)(Evas_Object *, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_fixed_layout_size_set");
+
+   sd->ewk_view_user_scalable_set(webview, EINA_TRUE);
 
    // set zoom and layout
    if (sd->is_mobile_page)
      {
 	if (!sd->ewk_view_zoom_set)
 	  sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
-	sd->ewk_view_zoom_set(webview, sd->zoom.init_zoom_rate, 0, 0);
-	sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
+	if (!sd->ewk_frame_contents_size_get)
+	  sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
+	if (!sd->ewk_view_uri_get)
+	  sd->ewk_view_uri_get = (const char * (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_uri_get");
 
+	sd->ewk_view_zoom_set(webview, sd->zoom.init_zoom_rate, 0, 0);
 	sd->ewk_view_fixed_layout_size_set(webview, sd->layout.w, sd->layout.h);
+
+	int content_w;
+	sd->ewk_frame_contents_size_get(frame, &content_w, NULL);
+
+	const char *url = sd->ewk_view_uri_get(webview);
+	if (content_w > sd->layout.w && !strstr(url, "docs.google.com"))
+	  {
+	     // set page layout info, zoom and layout again
+	     _smart_page_layout_info_set(sd, 1.0f, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate, sd->zoom.scalable);
+	     sd->ewk_view_zoom_set(webview, sd->zoom.init_zoom_rate, 0, 0);
+	     sd->ewk_view_fixed_layout_size_set(webview, sd->layout.w, sd->layout.h);
+	  }
 
      } else {
 	  evas_object_geometry_get(webview, NULL, NULL, NULL, &sd->layout.h);
 	  if (!sd->ewk_view_zoom_set)
 	    sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
 	  sd->ewk_view_zoom_set(webview, sd->zoom.init_zoom_rate, 0, 0);
-	  sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
 	  sd->ewk_view_fixed_layout_size_set(webview, sd->layout.w, sd->layout.h);
      }
 
+   sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
    sd->ewk_view_user_scalable_set(webview, sd->zoom.scalable);
 }
 
