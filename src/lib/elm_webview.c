@@ -147,6 +147,8 @@ elm_webview_minimap_get(Evas_Object *obj)
 EAPI void
 elm_webview_uri_set(Evas_Object *obj, const char *uri)
 {
-   _elm_smart_webview_uri_set(obj, uri);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_uri_set(wd->webkit, uri);
 }
 #endif
