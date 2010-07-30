@@ -220,7 +220,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
      {
 	return ELM_CTXPOPUP_ARROW_DOWN;
      }
-
+fprintf(stderr, "\n\n=======================================\n");
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
    evas_object_geometry_get(wd->parent, &parent_x, &parent_y, &parent_w,
 			    &parent_h);
@@ -334,6 +334,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	  default:
 	     break;
 	  }
+	break;
      }
    rect->x = x;
    rect->y = y;
