@@ -813,9 +813,34 @@ elm_popup_rotation_set(Evas_Object *obj, int rot_angle)
 }
 
 /**
- * Blocks in a main loop until responded/deleted.
+ * Blocks in a main loop until popup either emits response signal or is exited due
+ * to exit signal, when exit signal is received dialog responds with ELM_POPUP_RESPONSE_NONE
+ * response ID else returns the response ID from response signal emission.
+ * before entering the main loop popup calls evas_object_show on the popup for you.
+ * you can force popup to return at any time by calling elm_popup_responsec to emit the 
+ * response signal. destroying the popup during elm_popup_run is a very bad idea.
+ * typical usage of this function may be
+ * int result = elm_popup_run(popup);
+ * switch(result)
+ * {
+ * case ELM_POPUP_RESPONSE_OK:
+ * do_something_specific_to_app();
+ * evas_object_del(popup);
+ * break;
+ * case ELM_POPUP_RESPONSE_CANCEL:
+ * do_nothing_popup_was_cancelled();
+ * evas_object_del(popup);
+ * break;
+ * case ELM_POPUP_RESPONSE_NONE:
+ * default:
+ * evas_object_del(popup);
+ * elm_exit();
+ * }
+ * do not run elm_popup_run in a timer/idler callback.
+ * when popup returns with signal ELM_POPUP_RESPONSE_NONE, then exit the application using elm_exit
+ * by calling any post exit application code.
+ * 
  * @param obj The popup object
- *
  * @ingroup Popup
  */
 EAPI int 
@@ -823,6 +848,8 @@ elm_popup_run(Evas_Object *obj)
 {
    int response_id=0;
    Ecore_Event_Handler *_elm_exit_handler = NULL;
+   /*Finger waggle warning*/
+   /*_elm_dangerous_call_check(__FUNCTION__);*/
    evas_object_show(obj);
    evas_object_smart_callback_add(obj, "response", response_cb, &response_id);	
    _elm_exit_handler = ecore_event_handler_add(ECORE_EVENT_SIGNAL_EXIT, _elm_signal_exit, &response_id);
