@@ -220,25 +220,18 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
      {
 	return ELM_CTXPOPUP_ARROW_DOWN;
      }
-fprintf(stderr, "\n\n=======================================\n");
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
    evas_object_geometry_get(wd->parent, &parent_x, &parent_y, &parent_w,
 			    &parent_h);
-   fprintf(stderr, "PARENT %d %d %d %d\n", parent_x, parent_y, parent_w, parent_h);
    evas_object_geometry_get(wd->box, NULL, NULL, &box_w, &box_h);
-   fprintf( stderr, "BOX SIZE %d %d\n", box_w, box_h );
    edje_object_part_geometry_get(wd->base, "ctxpopup_btns_frame", NULL, NULL,
 				 &base_w, &base_h);
-
-   fprintf(stderr, "BTNS FRAME SIZE %d %d\n", base_w, base_h );
 
    if (box_w > base_w)
       base_w = box_w;
    base_h += box_h;
 
    edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
-
-   fprintf(stderr, "MAX SIZE %d %d\n", max_width_size, max_height_size );
 
    max_width_size *= elm_scale_get();
    max_height_size *= elm_scale_get();
@@ -400,7 +393,7 @@ _sizing_eval(Evas_Object *obj)
    Eina_List *elist;
    Elm_Ctxpopup_Item *item;
    Evas_Coord_Rectangle rect = { 0, 0, 1, 1 };
-   Evas_Coord y, w, h;
+   Evas_Coord w, h;
 
    Elm_Ctxpopup_Arrow arrow;
 
@@ -427,9 +420,9 @@ _sizing_eval(Evas_Object *obj)
    evas_object_move(wd->base, rect.x, rect.y);
 
    //scroller
-   edje_object_part_geometry_get(wd->base, "ctxpopup_frame", NULL, &y, &w, &h);
-   edje_object_part_geometry_get(wd->base, "ctxpopup_list", NULL, &y, NULL, &h);
-   evas_object_resize(wd->scroller, w, h + (y * 2));
+   edje_object_part_geometry_get(wd->base, "ctxpopup_frame", NULL, NULL, &w, NULL);
+   edje_object_part_geometry_get(wd->base, "ctxpopup_list", NULL, NULL, NULL, &h);
+   evas_object_resize(wd->scroller, w, h );
    evas_object_move(wd->scroller, rect.x, rect.y);
 }
 
@@ -589,8 +582,6 @@ _parent_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
    if (!wd)
       return;
-
-	   fprintf(stderr, "parent resize\n" );
 
    evas_object_geometry_get(obj, NULL, NULL, &w, &h);
    evas_object_resize(wd->bg, w, h);
