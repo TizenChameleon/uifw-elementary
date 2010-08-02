@@ -25,7 +25,7 @@ static Eina_Bool init_flag = EINA_FALSE;
 void _get_clipboard_window();
 void _search_clipboard_window(Ecore_X_Window w);
 int _send_clipboard_events(char *cmd);
-int get_clipboard_data(Atom datom);
+int get_clipboard_data(Atom datom, char **datomptr);
 
 void _get_clipboard_window()
 {
@@ -71,20 +71,23 @@ void _search_clipboard_window(Ecore_X_Window w)
 	}
 
     // Recurse into child windows.
-	Window    wRoot;
-	Window    wParent;
-	Window   *wChild;
-	unsigned  nChildren;
+	Window wroot;
+	Window wparent;
+	Window *wchild;
+	unsigned nchildren;
 	int i;
-	if(0 != XQueryTree(cbhm_disp, w, &wRoot, &wParent, &wChild, &nChildren))
+	if(0 != XQueryTree(cbhm_disp, w, &wroot, &wparent, &wchild, &nchildren))
 	{
-		for(i = 0; i < nChildren; i++)
-			_search_clipboard_window(wChild[i]);
+		for(i = 0; i < nchildren; i++)
+			_search_clipboard_window(wchild[i]);
 	}
 }
 
 int _send_clipboard_events(char *cmd)
 {
+	if (cmd == NULL)
+		return -1;
+
 	Atom atomCBHM_MSG = XInternAtom(cbhm_disp, "CBHM_MSG", False);
 
 	XClientMessageEvent m;
@@ -101,23 +104,22 @@ int _send_clipboard_events(char *cmd)
 	return 0;
 }
 
-int get_clipboard_data(Atom datom)
+int get_clipboard_data(Atom datom, char **datomptr)
 {
 	Atom atomUTF8String = XInternAtom(cbhm_disp, "UTF8_STRING", False);
-
 	Atom type;
 	int format;
 	unsigned long nitems;
 	unsigned long nsize;
-	unsigned char *propName = NULL;
+	unsigned char *propname = NULL;
 
 	// FIXME : is it really needed?
-	XSync(cbhm_disp, 0);
+	XSync(cbhm_disp, EINA_FALSE);
 
 	if (Success == 
 		XGetWindowProperty(cbhm_disp, self_win, datom, 0, 0, False,
-						   AnyPropertyType, &type, &format, &nitems, &nsize, &propName))
-		XFree(propName);
+						   AnyPropertyType, &type, &format, &nitems, &nsize, &propname))
+		XFree(propname);
 	else
 		return -1;
 
@@ -129,24 +131,35 @@ int get_clipboard_data(Atom datom)
 
 	if (Success == 
 		XGetWindowProperty(cbhm_disp, self_win, datom, 0, (long)nsize, False,
-						   AnyPropertyType, &type, &format, &nitems, &nsize, &propName))
+						   AnyPropertyType, &type, &format, &nitems, &nsize, &propname))
 	{
 		if (nsize != 0)
 			XGetWindowProperty(cbhm_disp, self_win, datom, 0, (long)nsize, False,
-							   AnyPropertyType, &type, &format, &nitems, &nsize, &propName);
+							   AnyPropertyType, &type, &format, &nitems, &nsize, &propname);
 
-		if(propName != NULL)
+		if(propname != NULL)
 		{
-			fprintf(stderr, "## get data : %s\n", propName);
-			fprintf(stderr, "## nsize = %d\n", nsize);
-			XFree(propName);
+//			fprintf(stderr, "## get data : %s\n", propName);
+			fprintf(stderr, "## after nsize = %d\n", nsize);
+			*datomptr = propname;
+//			XFree(propName);
 		}
 
 		XDeleteProperty(cbhm_disp, self_win, datom);
 		XFlush(cbhm_disp);
 	}
-	else
-		return -1;
+
+	if (propname != NULL)
+		return 0;
+
+	*datomptr = NULL;
+	return -1;
+}
+
+
+void free_clipboard_data(char *dptr)
+{
+	return XFree(dptr);
 }
 
 
@@ -161,21 +174,21 @@ int get_clipboard_data(Atom datom)
 EAPI Eina_Bool 
 elm_cbhm_helper_init(Evas_Object *self)
 {
-   init_flag = EINA_FALSE;
+	init_flag = EINA_FALSE;
 
-   cbhm_disp = ecore_x_display_get();
-   if (cbhm_disp == NULL)
-	   return init_flag;
+	cbhm_disp = ecore_x_display_get();
+	if (cbhm_disp == NULL)
+		return init_flag;
 
-   _get_clipboard_window();
-   if (cbhm_win == None)
-	   _search_clipboard_window(DefaultRootWindow(cbhm_disp));
-   self_win = ecore_evas_software_x11_window_get(ecore_evas_ecore_evas_get(evas_object_evas_get(self)));
+	_get_clipboard_window();
+	if (cbhm_win == None)
+		_search_clipboard_window(DefaultRootWindow(cbhm_disp));
+	self_win = ecore_evas_software_x11_window_get(ecore_evas_ecore_evas_get(evas_object_evas_get(self)));
    
-   if (cbhm_disp && cbhm_win && self_win)
-	   init_flag = EINA_TRUE;
+	if (cbhm_disp && cbhm_win && self_win)
+		init_flag = EINA_TRUE;
 
-   return init_flag;
+	return init_flag;
 }
 
 /**
@@ -191,11 +204,21 @@ elm_cbhm_get_count()
 	if (init_flag == EINA_FALSE)
 		return -1;
 
+	char *retptr = NULL;
+
 	_send_clipboard_events("get count");
 
 	Atom atomCBHM_cCOUNT = XInternAtom(cbhm_disp, "CBHM_cCOUNT", False);
 
-	get_clipboard_data(atomCBHM_cCOUNT);
+	get_clipboard_data(atomCBHM_cCOUNT, &retptr);
+
+	if (retptr != NULL)
+	{
+		fprintf(stderr, "## c get retptr : %s\n", retptr);
+
+		free_clipboard_data(retptr);
+		retptr = NULL;
+	}
 
 	return 0;
 }
@@ -213,9 +236,21 @@ elm_cbhm_get_raw_data()
 	if (init_flag == EINA_FALSE)
 		return -1;
 
+	char *retptr = NULL;
+
 	_send_clipboard_events("get raw");
 
-   return 0;
+	Atom atomCBHM_cRAW = XInternAtom(cbhm_disp, "CBHM_cRAW", False);
+
+	get_clipboard_data(atomCBHM_cRAW, &retptr);
+
+	if (retptr != NULL)
+	{
+		free_clipboard_data(retptr);
+		retptr = NULL;
+	}
+
+	return 0;
 }
 
 /**
@@ -233,6 +268,7 @@ elm_cbhm_get_data_by_position(int pos)
 		return -1;
 
 	char reqbuf[16];
+	char *retptr = NULL;
 	sprintf(reqbuf, "get #%d", pos);
 
 	_send_clipboard_events(reqbuf);
@@ -241,7 +277,15 @@ elm_cbhm_get_data_by_position(int pos)
 
 	Atom atomCBHM_cPOS = XInternAtom(cbhm_disp, reqbuf, False);
 
-	get_clipboard_data(atomCBHM_cPOS);
+	get_clipboard_data(atomCBHM_cPOS, &retptr);
+
+	if (retptr != NULL)
+	{
+		fprintf(stderr, "## d get retptr : %s\n", retptr);
+
+		free_clipboard_data(retptr);
+		retptr = NULL;
+	}
 
 	return 0;
 }
