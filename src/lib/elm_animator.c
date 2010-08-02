@@ -33,7 +33,7 @@ static unsigned int _animator_compute_reverse_repeat_count(unsigned int cnt);
 static unsigned int _animator_compute_no_reverse_repeat_count(unsigned int cnt);
 static int _animator_animate_cb(void *data);
 static void _delete_animator(Elm_Animator *animator);
-static void _animator_parent_del(void *data);
+//static void _animator_parent_del(void *data);
 
 static unsigned int
 _animator_compute_reverse_repeat_count(unsigned int cnt)
@@ -127,14 +127,14 @@ _animator_animate_cb(void *data)
 
    return ECORE_CALLBACK_RENEW;
 }
-
+/*
 static void
 _animator_parent_del(void *data)
 {
-	Elm_Animator* animator = data; 
-	//elm_animator_del(data);
+	Elm_Animator *animator = data; 
+	elm_animator_del(data);
 }
-
+*/
 /**
  * Get the value of reverse mode. 
  *
@@ -286,10 +286,10 @@ elm_animator_add(Evas_Object *parent)
    elm_animator_auto_reverse_set(animator, EINA_FALSE);
    elm_animator_curve_style_set(animator, ELM_ANIMATOR_CURVE_LINEAR);
 
-//   if (parent) {
-  //    evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL,
-//				     _animator_parent_del, animator);
-//	}
+/* if (parent) {
+		evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL,
+				     _animator_parent_del, animator);
+	} */
 
    animator->parent = parent;
 
@@ -327,9 +327,9 @@ elm_animator_del(Elm_Animator *animator)
 
 	_delete_animator(animator);
 
-   if(animator->parent) {
-//   	evas_object_event_callback_del(animator->parent, EVAS_CALLBACK_DEL, _animator_parent_del);
-	}
+/*   if(animator->parent) {
+   	evas_object_event_callback_del(animator->parent, EVAS_CALLBACK_DEL, _animator_parent_del);
+	} */
 
    free(animator);
 }

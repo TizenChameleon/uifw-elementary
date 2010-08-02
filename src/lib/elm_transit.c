@@ -37,6 +37,16 @@ static void _transit_fx_begin(Elm_Transit *transit);
 static void _transit_fx_end(Elm_Transit *transit);
 static void _transit_complete_cb(void *data);
 static void _transit_fx_del(Elm_Effect *effect);
+//static void _transit_parent_del(void *data); 
+
+/*
+static void
+_animator_parent_del(void *data)
+{
+	Elm_Transit *transit = data; 
+	elm_transit_del(data);
+}
+*/
 
 static Evas_Object *
 _create_block_rect(Evas_Object *parent)
@@ -309,6 +319,11 @@ elm_transit_del(Elm_Transit *transit)
    elm_animator_del(transit->animator);
    elm_transit_fx_clear(transit);
 
+//	if(transit->parent) 
+//	{
+//		evas_object_event_callback_del(transit->parent, EVAS_CALLBACK_DEL, _transit_parent_del);
+//	}
+
    free(transit);
 }
 
@@ -327,6 +342,7 @@ elm_transit_curve_style_set(Elm_Transit *transit, Elm_Animator_Curve_Style cs)
       return;
    elm_animator_curve_style_set(transit->animator, cs);
 }
+
 
 /**
  * Add new transit. 
@@ -358,7 +374,13 @@ elm_transit_add(Evas_Object *parent)
    elm_animator_completion_callback_set(transit->animator, _transit_complete_cb,
 					transit);
    elm_transit_event_block_disabled_set(transit, EINA_FALSE);
-
+/*
+	if(parent)
+	{
+		evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _transit_parent_del, 
+							 transit);
+	}
+*/
    return transit;
 }
 
@@ -479,8 +501,6 @@ static void _elm_fx_resizing_op(void *data, Elm_Animator *animator,
 				double frame);
 static void _elm_fx_resizing_begin(void *data, Eina_Bool auto_reverse, 
 				unsigned int repeat_cnt);
-static void _elm_fx_resizing_end(void *data, Eina_Bool auto_reverse, 
-				unsigned int repeat_cnt);
 
 struct _resizing
 {
@@ -499,16 +519,6 @@ _elm_fx_resizing_begin(void *data, Eina_Bool auto_reverse,
 
    evas_object_show(resizing->obj);
    evas_object_resize(resizing->obj, resizing->from.w, resizing->from.h);
-}
-
-static void
-_elm_fx_resizing_end(void *data, Eina_Bool auto_reverse,
-		     unsigned int repeat_cnt)
-{
-   Elm_Fx_Resizing *resizing = data;
-
-   evas_object_move(resizing->obj, resizing->from.w + resizing->to.w,
-		    resizing->from.h + resizing->to.h);
 }
 
 static void
@@ -1891,7 +1901,6 @@ elm_fx_imageanimation_add(Evas_Object *obj, const char **images,
 			  unsigned int img_cnt)
 {
    Elm_Effect *effect;
-
    Elm_Fx_Image_Animation *image_animation;
 
    if (!images || !(*images))
@@ -1911,7 +1920,7 @@ elm_fx_imageanimation_add(Evas_Object *obj, const char **images,
 
    image_animation->obj = obj;
    image_animation->images = (char **) images;
-   image_animation->count = 0;
+	image_animation->count = 0;
    image_animation->img_cnt = img_cnt;
 
    effect->animation_op = _elm_fx_imageanimation_op;
