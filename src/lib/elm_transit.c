@@ -6,9 +6,9 @@
  * @ingroup Elementary
  *
  * Transit is designed to set the various effects for the Evas_Object such like translation, 
- * rotation, etc. For using Effects, Create transit and add the some of effects which are 
- * interested. Each effects has the type of Elm_Effect and those can be added into transit. 
- * Once effects are added into transit, it will manage the effects (ex deleting). 
+ * rotation, etc. For using Effects, Create transit and insert the some of effects which are 
+ * interested. Each effects has the type of Elm_Effect and those can be inserted into transit. 
+ * Once effects are inserted into transit, transit will manage those effects.(ex) deleting). 
 */
 struct _transit
 {
@@ -147,20 +147,20 @@ _transit_fx_del(Elm_Effect *effect)
 }
 
 /**
+ * Set the event blocked when transit is operating.  
+ *
+ * @param transit Transit object
+ * @param disabled Disable or enable
+ *
  * @ingroup Transit 
- *
- * Set the event block when the transit is operating.  
- *
- * @param transit	Transit object
- * @param disable 	Disable or enable
  */
 EAPI void
-elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool disable)
+elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool disabled)
 {
    if (!transit)
       return;
 
-   if (disable)
+   if (disabled)
      {
 	if (transit->block_rect)
 	  {
@@ -176,12 +176,12 @@ elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool disable)
 }
 
 /**
+ * Get the value of event blockd status.
+ *
+ * @param transit Transit
+ * @return EINA_TRUE, when event block is disabled
+ *
  * @ingroup Transit 
- *
- * Get the event block setting status.  
- *
- * @param  transit	Transit object
- * @return  		EINA_TRUE when the event block is disabled
  */
 EAPI Eina_Bool
 elm_transit_event_block_disabled_get(Elm_Transit *transit)
@@ -192,14 +192,14 @@ elm_transit_event_block_disabled_get(Elm_Transit *transit)
 }
 
 /**
- * @ingroup Transit 
- *
  * Remove effect from transit.  
  *
- * @param  transit	Transit object
- * @param  effect       effect that should be removed
- * @return  EINA_TRUE, if the effect is removed
- * @warning  If the effect is not inserted in any transit, it will be deleted
+ * @param transit	Transit
+ * @param effect Effect to be removed
+ * @return EINA_TRUE, if the effect is removed
+ * @warning If removed effect does not inserted in any transit, it will be deleted. 
+ *
+ * @ingroup Transit 
  */
 EAPI Eina_Bool
 elm_transit_fx_remove(Elm_Transit *transit, Elm_Effect *effect)
@@ -225,11 +225,11 @@ elm_transit_fx_remove(Elm_Transit *transit, Elm_Effect *effect)
 }
 
 /**
+ * Remove all current inserted effects. 
+ *
+ * @param transit	Transit 
+ *
  * @ingroup Transit 
- *
- * Remove all current inseted effects. 
- *
- * @param  transit	Transit object 
  */
 EAPI void
 elm_transit_fx_clear(Elm_Transit *transit)
@@ -249,12 +249,12 @@ elm_transit_fx_clear(Elm_Transit *transit)
 }
 
 /**
+ * Get the list of current inseted effects. 
+ *
+ * @param transit	Transit
+ * @return Effect list 
+ *
  * @ingroup Transit 
- *
- * Remove all current inseted effects. 
- *
- * @param  transit	Transit object 
- * @return 		Effect list 
  */
 EAPI const Eina_List *
 elm_transit_fx_get(Elm_Transit *transit)
@@ -265,13 +265,13 @@ elm_transit_fx_get(Elm_Transit *transit)
 }
 
 /**
+ * Set the user-callback function when the transit operation is done. 
+ *
+ * @param transit	Transit
+ * @param op Callback function pointer
+ * @param data Callback funtion user data
+ *
  * @ingroup Transit 
- *
- * Set the user-callback function when the transit is done. 
- *
- * @param  transit	Transit object
- * @param  op           Callback function pointer
- * @param  data         Callback funtion user argument
  */
 EAPI void
 elm_transit_completion_callback_set(Elm_Transit *transit,
@@ -286,11 +286,11 @@ elm_transit_completion_callback_set(Elm_Transit *transit,
 }
 
 /**
+ * Delete transit. 
+ *
+ * @param transit	Transit to be deleted
+ *
  * @ingroup Transit 
- *
- * Delete transit object. 
- *
- * @param  transit	Transit object
  */
 EAPI void
 elm_transit_del(Elm_Transit *transit)
@@ -313,12 +313,12 @@ elm_transit_del(Elm_Transit *transit)
 }
 
 /**
+ * Set the transit animation acceleration style. 
+ *
+ * @param transit	Transit
+ * @param cs Curve style(Please refer elm_animator_curve_style_set)
+ *
  * @ingroup Transit 
- *
- * Set the animation acceleration style. 
- *
- * @param  transit	Transit object
- * @param  cs           Curve style
  */
 EAPI void
 elm_transit_curve_style_set(Elm_Transit *transit, Elm_Animator_Curve_Style cs)
@@ -329,12 +329,12 @@ elm_transit_curve_style_set(Elm_Transit *transit, Elm_Animator_Curve_Style cs)
 }
 
 /**
+ * Add new transit. 
+ *
+ * @param parent Parent object
+ * @return transit 
+ *
  * @ingroup Transit 
- *
- * Add a new transit. 
- *
- * @param  parent       Given canvas of parent object will be blocked
- * @return 		Transit object 
  */
 EAPI Elm_Transit *
 elm_transit_add(Evas_Object *parent)
@@ -363,12 +363,12 @@ elm_transit_add(Evas_Object *parent)
 }
 
 /**
+ * Set reverse effect automatically.  
+ *
+ * @param transit Transit  
+ * @param reverse EINA_TRUE is reverse.
+ *
  * @ingroup Transit 
- *
- * Set auto reverse function.  
- *
- * @param  transit 	 Transit object  
- * @param  reverse 	 Reverse or not
  */
 EAPI void
 elm_transit_auto_reverse_set(Elm_Transit *transit, Eina_Bool reverse)
@@ -379,13 +379,13 @@ elm_transit_auto_reverse_set(Elm_Transit *transit, Eina_Bool reverse)
 }
 
 /**
+ * Insert an effect into the transit. 
+ *
+ * @param transit Transit
+ * @param effect Effect to be inserted
+ * @return EINA_TRUE is success
+ *
  * @ingroup Transit 
- *
- * Insert an effect in given transit. 
- *
- * @param  transit       Transit object.  
- * @param  effect        Effect
- * @return 		 EINA_TRUE is success
  */
 EAPI Eina_Bool
 elm_transit_fx_insert(Elm_Transit *transit, Elm_Effect *effect)
@@ -410,12 +410,12 @@ elm_transit_fx_insert(Elm_Transit *transit, Elm_Effect *effect)
 }
 
 /**
- * @ingroup Transit 
- *
  * Set the transit repeat count. Effect will be repeated by repeat count.
  *
- * @param  transit       Transit object 
- * @param  repeat        Repeat count 
+ * @param transit Transit 
+ * @param repeat Repeat count 
+ *
+ * @ingroup Transit 
  */
 EAPI void
 elm_transit_repeat_set(Elm_Transit *transit, unsigned int repeat)
@@ -426,11 +426,11 @@ elm_transit_repeat_set(Elm_Transit *transit, unsigned int repeat)
 }
 
 /**
+ * Stop the current transit, if the transit is operating. 
+ *
+ * @param transit Transit 
+ *
  * @ingroup Transit 
- *
- * Stop the current transit effect if transit is operating. 
- *
- * @param  transit       Transit object 
  */
 EAPI void
 elm_transit_stop(Elm_Transit *transit)
@@ -441,12 +441,12 @@ elm_transit_stop(Elm_Transit *transit)
 }
 
 /**
- * @ingroup Transit 
- *
  * Run the all the inserted effects.  
  *
- * @param  transit       Transit object 
- * @param  duration 	 Transit time in second
+ * @param transit Transit
+ * @param duration Transit time in seconds
+ *
+ * @ingroup Transit 
  */
 EAPI void
 elm_transit_run(Elm_Transit *transit, double duration)
@@ -524,16 +524,16 @@ _elm_fx_resizing_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
+ * Add Resizing effect.  
+ *
+ * @param obj Evas_Object that effect is applying to
+ * @param from_w Object width size when effect begins
+ * @param from_h Object height size when effect begins
+ * @param to_w Object width size when effect ends
+ * @param to_h Object height size when effect ends
+ * @return Resizing effect 
+ *
  * @ingroup Transit 
- *
- * Add resizing effect.  
- *
- * @param  obj           Evas_Object that effect is applying to
- * @param  from_w        Width size when effect begin
- * @param  from_h        Height size whene effect begin
- * @param  to_w          Width size to be 
- * @param  to_h          Height size to be
- * @return 		 Resizing effect 
  */
 EAPI Elm_Effect *
 elm_fx_resizing_add(Evas_Object *obj, Evas_Coord from_w, Evas_Coord from_h,
@@ -625,16 +625,16 @@ _elm_fx_translation_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
+ * Add Translation effect.  
+ *
+ * @param obj Evas_Object that effect is applying to
+ * @param from_x Position X when effect begins
+ * @param from_y Position Y when effect begins
+ * @param to_x Position X when effect ends
+ * @param to_y Position Y when effect ends
+ * @return Translation effect 
+ *
  * @ingroup Transit 
- *
- * Add translation effect.  
- *
- * @param  obj           Evas_Object that effect is applying to
- * @param  from_x        Position X when effect begin
- * @param  from_y        Position Y whene effect begin
- * @param  to_x          Position X to be 
- * @param  to_y          Position Y to be
- * @return 		 Translation effect 
  */
 EAPI Elm_Effect *
 elm_fx_translation_add(Evas_Object *obj, Evas_Coord from_x, Evas_Coord from_y,
@@ -733,14 +733,14 @@ _elm_fx_zoom_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
- * @ingroup Transit 
- *
  * Add Zoom effect.  
  *
- * @param  obj           Evas_Object that effect is applying to
- * @param  from_rate     Scale rate when the effect begin (1 is current rate) 
- * @param  to_rate       Scale rate to be 
- * @return 		 Zoom effect 
+ * @param obj Evas_Object that effect is applying to
+ * @param from_rate Scale rate when effect begins (1 is current rate) 
+ * @param to_rate Scale rate when effect ends
+ * @return Zoom effect 
+ *
+ * @ingroup Transit 
  */
 EAPI Elm_Effect *
 elm_fx_zoom_add(Evas_Object *obj, float from_rate, float to_rate)
@@ -875,15 +875,15 @@ _elm_fx_flip_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
- * @ingroup Transit 
- *
  * Add Flip effect.  
  *
- * @param  front         Front surface object 
- * @param  back          Back surface object
- * @param  axis          Flipping Axis. X or Y  
- * @param  cw            Flipping Direction. EINA_TRUE is clock-wise 
- * @return 		 Flip effect 
+ * @param front Front surface object 
+ * @param back Back surface object
+ * @param axis Flipping Axis(X or Y)
+ * @param cw Flipping Direction. EINA_TRUE is clock-wise 
+ * @return Flip effect 
+ * 
+ * @ingroup Transit 
  */
 EAPI Elm_Effect *
 elm_fx_flip_add(Evas_Object *front, Evas_Object *back, Elm_Fx_Flip_Axis axis,
@@ -1089,15 +1089,15 @@ _elm_fx_resizable_flip_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
+ * Add ResizbleFlip effect. the size of each surface objects are interpolated automatically.
+ *
+ * @param front Front surface object 
+ * @param back Back surface object
+ * @param axis Flipping Axis.(X or Y)  
+ * @param cw Flipping Direction. EINA_TRUE is clock-wise
+ * @return Flip effect 
+ *
  * @ingroup Transit 
- *
- * Add ResizbleFlip effect.  
- *
- * @param  front         Front surface object 
- * @param  back          Back surface object
- * @param  axis          Flipping Axis. X or Y  
- * @param  cw            Flipping Direction. EINA_TRUE is clock-wise
- * @return 		 Flip effect 
  */
 EAPI Elm_Effect *
 elm_fx_resizable_flip_add(Evas_Object *front, Evas_Object *back,
@@ -1347,14 +1347,14 @@ _elm_fx_wipe_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
- * @ingroup Transit 
- *
  * Add Wipe effect.  
  *
- * @param  obj           Evas_Object that effect is applying to
- * @param  type 	 Wipe type. Hide or show
- * @param  dir           Wipe Direction
- * @return               Wipe Effect
+ * @param obj Evas_Object that effect is applying to
+ * @param type Wipe type. Hide or show
+ * @param dir Wipe Direction
+ * @return Wipe effect
+ *
+ * @ingroup Transit 
  */
 EAPI Elm_Effect *
 elm_fx_wipe_add(Evas_Object *obj, Elm_Fx_Wipe_Type type, Elm_Fx_Wipe_Dir dir)
@@ -1433,20 +1433,20 @@ _elm_fx_color_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
- * @ingroup Transit 
- *
  * Add Color effect.  
  *
  * @param  obj           Evas_Object that effect is applying to
- * @param  from_r        RGB R when the effect begins
- * @param  from_g        RGB G when the effect begins 
- * @param  from_b        RGB B when the effect begins
- * @param  from_a        RGB A when the effect begins
- * @param  to_r          RGB R to be
- * @param  to_g          RGB G to be 
- * @param  to_b          RGB B to be
- * @param  to_a          RGB A to be 
+ * @param  from_r        RGB R when effect begins
+ * @param  from_g        RGB G when effect begins 
+ * @param  from_b        RGB B when effect begins
+ * @param  from_a        RGB A when effect begins
+ * @param  to_r          RGB R when effect ends
+ * @param  to_g          RGB G when effect ends
+ * @param  to_b          RGB B when effect ends
+ * @param  to_a          RGB A when effect ends
  * @return               Color Effect
+ *
+ * @ingroup Transit 
  */
 EAPI Elm_Effect *
 elm_fx_color_add(Evas_Object *obj, unsigned int from_r, unsigned int from_g,
@@ -1576,13 +1576,13 @@ _elm_fx_fade_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
+ * Add Fade effect  
+ *
+ * @param before Evas Object before fade in 
+ * @param after Evas Object after fade out 
+ * @return Fade effect
+ * 
  * @ingroup Transit 
- *
- * Add Fade Effect  
- *
- * @param  before        Evas Object before fade in 
- * @param  after         Evas Object after fade out 
- * @return               Fade Effect
  */
 EAPI Elm_Effect *
 elm_fx_fade_add(Evas_Object *before, Evas_Object *after)
@@ -1681,13 +1681,13 @@ _elm_fx_blend_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
+ * Add Blend effect  
+ *
+ * @param before Evas Object before blending
+ * @param after Evas Object after blending 
+ * @return Blend effect
+ *
  * @ingroup Transit 
- *
- * Add Blend Effect  
- *
- * @param  before        Evas Object before blending
- * @param  after         Evas Object after blending 
- * @return               Blend Effect
  */
 EAPI Elm_Effect *
 elm_fx_blend_add(Evas_Object *before, Evas_Object *after)
@@ -1801,15 +1801,15 @@ _elm_fx_rotation_op(void *data, Elm_Animator *animator, double frame)
 }
 
 /**
+ * Add Rotation effect
+ *
+ * @param obj Evas_Object that effect is applying to 
+ * @param from degree Degree when effect begins
+ * @param to_degree Degree when effect is ends
+ * @param cw Rotation direction. EINA_TRUE is clock wise
+ * @return Rotation effect
+ *
  * @ingroup Transit 
- *
- * Add Rotation Effect
- *
- * @param  obj           Evas_Object that effect is applying to 
- * @param  from degree   Degree when effect begins
- * @param  to_degree     Degree when effect is done
- * @param  cw            Rotation Direction. EINA_TRUE is clock wise 
- * @return               Rotation effect
  */
 EAPI Elm_Effect *
 elm_fx_rotation_add(Evas_Object *obj, float from_degree, float to_degree,
@@ -1861,7 +1861,7 @@ struct _image_animation
    Evas_Object *obj;
    char **images;
    int count;
-   int item_num;
+   int img_cnt;
 };
 
 static void
@@ -1871,22 +1871,24 @@ _elm_fx_imageanimation_op(void *data, Elm_Animator *animator, double frame)
 
    if (!image_animation->obj)
       return;
-   image_animation->count = floor(frame * image_animation->item_num);
+   image_animation->count = floor(frame * image_animation->img_cnt);
    elm_icon_file_set(image_animation->obj,
 		     image_animation->images[image_animation->count], NULL);
 }
 
 /**
- * @ingroup Transit 
- *
  * Add ImageAnimation effect.  
  *
- * @param  images        Images for animation.
- * @return 		 ImageAnimation Effect.
+ * @param obj Icon object
+ * @param images Array of image file path. 
+ * @param img_cnt Count of image. 
+ * @return ImageAnimation effect.
+ *
+ * @ingroup Transit 
  */
 EAPI Elm_Effect *
 elm_fx_imageanimation_add(Evas_Object *obj, const char **images,
-			  unsigned int item_num)
+			  unsigned int img_cnt)
 {
    Elm_Effect *effect;
 
@@ -1908,9 +1910,9 @@ elm_fx_imageanimation_add(Evas_Object *obj, const char **images,
      }
 
    image_animation->obj = obj;
-   image_animation->images = (char **)images;
+   image_animation->images = (char **) images;
    image_animation->count = 0;
-   image_animation->item_num = item_num;
+   image_animation->img_cnt = img_cnt;
 
    effect->animation_op = _elm_fx_imageanimation_op;
    effect->user_data = image_animation;
