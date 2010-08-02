@@ -7,7 +7,6 @@
  *
  * Transit 
 */
-
 struct _transit 
 {
 	Evas_Object		*parent;
@@ -30,8 +29,10 @@ struct _effect
 
 static Evas_Object *_create_block_rect(Evas_Object *parent)
 {
-	Evas_Object* rect = evas_object_rectangle_add(evas_object_evas_get(parent));
+	Evas_Object* rect;	
 	Evas_Coord w, h;
+
+	rect = evas_object_rectangle_add(evas_object_evas_get(parent));
 	evas_output_size_get(evas_object_evas_get(parent), &w, &h);
 	evas_object_resize(rect, w, h); 
 	evas_object_color_set(rect, 0, 0, 0, 0);
@@ -40,9 +41,9 @@ static Evas_Object *_create_block_rect(Evas_Object *parent)
 
 static void _transit_animate_cb(void *data, Elm_Animator *animator, double frame)
 {
-	Elm_Transit *transit = data;
 	Eina_List *elist;
 	Elm_Effect *effect;
+	Elm_Transit *transit = data;
 
 	EINA_LIST_FOREACH(transit->effect_list, elist, effect) 
 	{
@@ -52,10 +53,13 @@ static void _transit_animate_cb(void *data, Elm_Animator *animator, double frame
 
 static void _transit_fx_begin(Elm_Transit *transit)
 {
-	Eina_List* elist;
-	Elm_Effect* effect;
-	Eina_Bool auto_reverse = elm_animator_auto_reverse_get(transit->animator);
-	unsigned int repeat_cnt = elm_animator_repeat_get(transit->animator); 
+	Eina_List *elist;
+	Elm_Effect *effect;
+	Eina_Bool auto_reverse;
+	unsigned int repeat_cnt;
+
+	auto_reverse = elm_animator_auto_reverse_get(transit->animator);
+	repeat_cnt  = elm_animator_repeat_get(transit->animator); 
 
 	EINA_LIST_FOREACH(transit->effect_list, elist, effect) 
 	{
@@ -66,10 +70,13 @@ static void _transit_fx_begin(Elm_Transit *transit)
 
 static void _transit_fx_end(Elm_Transit *transit)
 {
-	Eina_List* elist;
-	Elm_Effect* effect;
-	Eina_Bool  auto_reverse = elm_animator_auto_reverse_get(transit->animator);
-	unsigned int repeat_cnt = elm_animator_repeat_get(transit->animator); 
+	Eina_List *elist;
+	Elm_Effect *effect;
+	Eina_Bool auto_reverse;
+	unsigned int repeat_cnt;
+
+	auto_reverse = elm_animator_auto_reverse_get(transit->animator);
+	repeat_cnt = elm_animator_repeat_get(transit->animator); 
 
 	EINA_LIST_FOREACH(transit->effect_list, elist, effect) 
 	{
@@ -92,7 +99,7 @@ static void _transit_complete_cb(void *data)
 	if(transit->completion_op) 
 		transit->completion_op(transit->completion_arg, transit);
 
-	if(transit->reserved_del == EINA_TRUE)
+	if(transit->reserved_del)
 	{
 		transit->reserved_del = EINA_FALSE;
 		elm_transit_del(transit);
@@ -105,7 +112,7 @@ static void _transit_fx_del(Elm_Effect *effect)
 	
 	--effect->shared_cnt;
 
-	if(effect->shared_cnt > 0) return ;
+	if(effect->shared_cnt > 0) return;
 	if(effect->user_data) free(effect->user_data);
 	free(effect);
 }
@@ -122,7 +129,7 @@ EAPI void elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool d
 {
 	if(!transit) return;
 
-	if(disable == EINA_TRUE) 
+	if(disable) 
 	{
 		if(transit->block_rect) 
 		{
@@ -162,10 +169,10 @@ EAPI Eina_Bool elm_transit_event_block_disabled_get(Elm_Transit *transit)
  */
 EAPI Eina_Bool elm_transit_fx_remove(Elm_Transit *transit, Elm_Effect *effect)
 {
-	if(!transit) return EINA_FALSE;
-
 	Eina_List *elist;
 	Elm_Effect *_effect;
+
+	if(!transit) return EINA_FALSE;
 
 	EINA_LIST_FOREACH(transit->effect_list, elist, _effect) 
 	{
@@ -188,10 +195,10 @@ EAPI Eina_Bool elm_transit_fx_remove(Elm_Transit *transit, Elm_Effect *effect)
  */
 EAPI void elm_transit_fx_clear(Elm_Transit *transit)
 {
-	if(!transit) return;
+	Eina_List *elist;
+	Elm_Effect *effect;
 
-	Eina_List* elist;
-	Elm_Effect* effect;
+	if(!transit) return;
 
 	EINA_LIST_FOREACH(transit->effect_list, elist, effect) 
 	{
@@ -208,7 +215,7 @@ EAPI void elm_transit_fx_clear(Elm_Transit *transit)
  * @param  transit	Transit object 
  * @return 		Effect list 
  */
-EAPI const Eina_List* elm_transit_fx_get(Elm_Transit *transit)
+EAPI const Eina_List *elm_transit_fx_get(Elm_Transit *transit)
 {
 	if(!transit) return NULL;
 	return transit->effect_list;
@@ -240,7 +247,7 @@ EAPI void elm_transit_completion_callback_set(Elm_Transit *transit, void (*op)(v
 EAPI void elm_transit_del(Elm_Transit *transit)
 {
 	if(!transit) return;
-	if(elm_animator_operating_get(transit->animator) == EINA_TRUE) 
+	if(elm_animator_operating_get(transit->animator)) 
 	{
 		transit->reserved_del = EINA_TRUE;
 		return ;
@@ -249,7 +256,6 @@ EAPI void elm_transit_del(Elm_Transit *transit)
 	if(transit->block_rect) 
 		evas_object_del( transit->block_rect );
 
-	//TODO: if usr call stop and del directly?
 	elm_animator_del(transit->animator);
 	elm_transit_fx_clear(transit);
 
@@ -293,7 +299,7 @@ EAPI Elm_Transit *elm_transit_add(Evas_Object *parent)
 
 	if(!transit->animator) 
 	{ 
-		free( transit );
+		free(transit);
 		return NULL;
 	}
 
@@ -330,9 +336,10 @@ EAPI void elm_transit_auto_reverse_set(Elm_Transit *transit, Eina_Bool reverse)
  */
 EAPI Eina_Bool elm_transit_fx_insert(Elm_Transit *transit, Elm_Effect *effect)
 {
-	if(!transit) return EINA_FALSE;
 	Eina_List *elist;
 	Elm_Effect *_effect;
+
+	if(!transit) return EINA_FALSE;
 
 	EINA_LIST_FOREACH(transit->effect_list, elist, _effect) 
 	{
@@ -388,15 +395,15 @@ EAPI void elm_transit_run(Elm_Transit *transit, double duration)
 
 	//Block to Top
 	if(transit->block_rect) 
-		evas_object_show( transit->block_rect );
+		evas_object_show(transit->block_rect);
 
 	elm_animator_animate(transit->animator);	
 
 	//If failed to animate.  
-	if(elm_animator_operating_get(transit->animator) == EINA_FALSE) 
+	if(!elm_animator_operating_get(transit->animator)) 
 	{
 		if(transit->block_rect) 
-			evas_object_hide( transit->block_rect );
+			evas_object_hide(transit->block_rect);
 		_transit_fx_end(transit);	
 	}
 }
@@ -410,7 +417,6 @@ static void _elm_fx_resizing_op(void *data, Elm_Animator *animator, double frame
 struct _resizing 
 {
 	Evas_Object *obj;
-	
 	struct _size 
 	{ 
 		 Evas_Coord w, h;
@@ -432,9 +438,8 @@ static void _elm_fx_resizing_end(void *data, Eina_Bool auto_reverse, unsigned in
 
 static void _elm_fx_resizing_op(void *data, Elm_Animator *animator, double frame)
 {
-	Elm_Fx_Resizing *resizing = data;
-
 	Evas_Coord w, h;
+	Elm_Fx_Resizing *resizing = data;
 	w = resizing->from.w + (Evas_Coord)((float) resizing->to.h * (float) frame);
 	h = resizing->from.h + (Evas_Coord)((float) resizing->to.w * (float) frame);
 	evas_object_resize(resizing->obj, w, h);
@@ -454,14 +459,14 @@ static void _elm_fx_resizing_op(void *data, Elm_Animator *animator, double frame
  */
 EAPI Elm_Effect *elm_fx_resizing_add(Evas_Object* obj, Evas_Coord from_w, Evas_Coord from_h, Evas_Coord to_w, Evas_Coord to_h)
 {
+	Elm_Effect *effect; 
+	Elm_Fx_Resizing *resizing;
 	if(!obj) return NULL;
 
-	Elm_Effect* effect = calloc(1, sizeof(Elm_Effect));
-
+	effect = calloc(1, sizeof(Elm_Effect));
 	if(!effect) return NULL;
 	
-	Elm_Fx_Resizing *resizing = calloc(1, sizeof(Elm_Fx_Resizing));
-
+	resizing = calloc(1, sizeof(Elm_Fx_Resizing));
 	if(!resizing) 
 	{
 		free(effect);
@@ -485,7 +490,7 @@ EAPI Elm_Effect *elm_fx_resizing_add(Evas_Object* obj, Evas_Coord from_w, Evas_C
 //Translation FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _translation Elm_Fx_Translation;
-static void _elm_fx_translation_op(void *data, Elm_Animator* animator, double frame);
+static void _elm_fx_translation_op(void *data, Elm_Animator *animator, double frame);
 
 struct _translation 
 {
@@ -511,8 +516,8 @@ static void _elm_fx_translation_end(void *data, Eina_Bool auto_reverse, unsigned
 
 static void _elm_fx_translation_op(void *data, Elm_Animator *animator, double frame)
 {
-	Elm_Fx_Translation *translation = data;
 	Evas_Coord x, y;
+	Elm_Fx_Translation *translation = data;
 	x = translation->from.x + (Evas_Coord)((float) translation->to.x * (float) frame);
 	y = translation->from.y + (Evas_Coord)((float) translation->to.y * (float) frame);
 	evas_object_move(translation->obj, x, y);
@@ -532,10 +537,15 @@ static void _elm_fx_translation_op(void *data, Elm_Animator *animator, double fr
  */
 EAPI Elm_Effect *elm_fx_translation_add(Evas_Object *obj, Evas_Coord from_x, Evas_Coord from_y, Evas_Coord to_x, Evas_Coord to_y)
 {
+	Elm_Effect *effect;
+	Elm_Fx_Translation *translation;
+		  
 	if(!obj) return NULL;
-	Elm_Effect *effect = calloc(1, sizeof(Elm_Effect));
+	
+	effect = calloc(1, sizeof(Elm_Effect));
 	if(!effect) return NULL;
-	Elm_Fx_Translation *translation = calloc(1, sizeof(Elm_Fx_Translation));
+	
+	translation = calloc(1, sizeof(Elm_Fx_Translation));
 
 	if(!translation) 
 	{
@@ -568,8 +578,6 @@ struct _zoom
 	float from, to;
 };
 
-
-
 static void _elm_fx_zoom_begin(void *data, Eina_Bool reverse, unsigned int repeat)
 {
 	Elm_Fx_Zoom *zoom = data;
@@ -595,8 +603,8 @@ static void _elm_fx_zoom_op(void *data, Elm_Animator *animator, double frame)
 	zoom = data;
 	evas_object_geometry_get(zoom->obj, &x, &y, &w, &h);
 	evas_map_smooth_set(map, EINA_TRUE);
-	evas_map_util_points_populate_from_object_full(map, zoom->obj, zoom->from + frame * zoom->to);
-	evas_map_util_3d_perspective(map, x + w / 2, y + h / 2, 0, 10000);
+	evas_map_util_points_populate_from_object_full(map, zoom->obj, zoom->from + (frame * zoom->to));
+	evas_map_util_3d_perspective(map, x + (w / 2), y + (h / 2), 0, 10000);
 	evas_object_map_set(zoom->obj, map);
 	evas_object_map_enable_set(zoom->obj, EINA_TRUE);
 	evas_map_free(map);
@@ -736,10 +744,10 @@ static void _elm_fx_flip_op(void *data, Elm_Animator *animator, double frame)
  */
 EAPI Elm_Effect *elm_fx_flip_add(Evas_Object *front, Evas_Object *back, Elm_Fx_Flip_Axis axis, Eina_Bool cw)
 {
-	if(!front||!back) return NULL;
-		
 	Elm_Effect* effect;
 	Elm_Fx_Flip *flip;
+
+	if((!front)||(!back)) return NULL;
 
 	effect = calloc(1, sizeof(Elm_Effect));
 	if(!effect) return NULL;
@@ -839,10 +847,11 @@ static void _elm_fx_resizable_flip_op(void *data, Elm_Animator *animator, double
 	float x, y, w, h;
 	Evas_Coord half_w, half_h;
 
-	resizable_flip = data;
 	map = evas_map_new(4);
 	if(!map) return;
-	
+
+	resizable_flip = data;
+
 	if(resizable_flip->cw) degree = (float) (frame * 180);
 	else degree = (float) (frame * -180);
 	
@@ -851,7 +860,8 @@ static void _elm_fx_resizable_flip_op(void *data, Elm_Animator *animator, double
 		obj = resizable_flip->front;
 		evas_object_hide(resizable_flip->back);
 		evas_object_show(resizable_flip->front);
-	}else 
+	}
+	else 
 	{
 		obj = resizable_flip->back;
 		evas_object_hide(resizable_flip->front);
@@ -876,7 +886,8 @@ static void _elm_fx_resizable_flip_op(void *data, Elm_Animator *animator, double
 	{
 		_set_image_uv_by_axis_y(map, resizable_flip, degree);
 		evas_map_util_3d_rotate(map, 0, degree, 0, x + half_w, y + half_h, 0);
-	}else 
+	}
+	else 
 	{
 		_set_image_uv_by_axis_x(map, resizable_flip, degree);
 		evas_map_util_3d_rotate(map, degree, 0, 0, x + half_w, y + half_h, 0);
@@ -902,8 +913,8 @@ static void _elm_fx_resizable_flip_op(void *data, Elm_Animator *animator, double
  */
 EAPI Elm_Effect *elm_fx_resizable_flip_add(Evas_Object *front, Evas_Object *back, Elm_Fx_Flip_Axis axis, Eina_Bool cw)
 {
-	Elm_Fx_ResizableFlip* resizable_flip;
-	Elm_Effect* effect;
+	Elm_Fx_ResizableFlip *resizable_flip;
+	Elm_Effect *effect;
 	Evas_Coord front_x, front_y, front_w, front_h;
 	Evas_Coord back_x, back_y, back_w, back_h;
 
@@ -913,6 +924,7 @@ EAPI Elm_Effect *elm_fx_resizable_flip_add(Evas_Object *front, Evas_Object *back
 	if(!effect) return NULL;
 	
 	resizable_flip = calloc(1, sizeof(Elm_Fx_ResizableFlip));
+	
 	if(!resizable_flip) 
 	{
 		free(effect);
@@ -1096,8 +1108,8 @@ static void _elm_fx_wipe_show(Evas_Map *map, Elm_Fx_Wipe_Dir dir, float x, float
 
 static void _elm_fx_wipe_op(void *data, Elm_Animator *animator, double frame)
 {
-	Elm_Fx_Wipe* wipe;
-	Evas_Map* map;
+	Elm_Fx_Wipe *wipe;
+	Evas_Map *map;
 	Evas_Coord _x, _y, _w, _h;
 
 	map = evas_map_new(4);
@@ -1129,8 +1141,8 @@ static void _elm_fx_wipe_op(void *data, Elm_Animator *animator, double frame)
  */
 EAPI Elm_Effect *elm_fx_wipe_add(Evas_Object *obj, Elm_Fx_Wipe_Type type, Elm_Fx_Wipe_Dir dir)
 {
-	Elm_Effect* effect;
-	Elm_Fx_Wipe* wipe;
+	Elm_Effect *effect;
+	Elm_Fx_Wipe *wipe;
 
 	if(!obj) return NULL;
 		  
@@ -1207,16 +1219,16 @@ static void _elm_fx_color_op(void *data, Elm_Animator *animator, double frame)
  * @param  to_a          RGB A to be 
  * @return               Color Effect
  */
-EAPI Elm_Effect* elm_fx_color_add( Evas_Object* obj, unsigned int from_r, unsigned int from_g, unsigned int from_b, unsigned int from_a, unsigned int to_r, unsigned int to_g, unsigned int to_b, unsigned int to_a)
+EAPI Elm_Effect* elm_fx_color_add(Evas_Object *obj, unsigned int from_r, unsigned int from_g, unsigned int from_b, unsigned int from_a, unsigned int to_r, unsigned int to_g, unsigned int to_b, unsigned int to_a)
 {
-	Elm_Effect* effect;
-	Elm_Fx_Color* color;
+	Elm_Effect *effect;
+	Elm_Fx_Color *color;
 	if(!obj) return NULL;
 		  
 	effect = calloc(1, sizeof(Elm_Effect));
 	if(!effect) return NULL; 
 	
-	color = calloc(1, sizeof( Elm_Fx_Color ));
+	color = calloc(1, sizeof(Elm_Fx_Color));
 	if(!color) 
 	{
 		free(effect);
@@ -1284,7 +1296,7 @@ static void _elm_fx_fade_op(void *data, Elm_Animator *animator, double frame)
 			fade->inversed = EINA_TRUE; 
 		}
 
-		_frame = 1 - (frame * 2);
+		_frame = (1 - (frame * 2));
 		
 		evas_object_color_set( fade->before, fade->before_color.r * _frame, fade->before_color.g * _frame, fade->before_color.b * _frame, fade->before_color.a + fade->before_alpha * (1-_frame));
 	}else 
@@ -1296,7 +1308,7 @@ static void _elm_fx_fade_op(void *data, Elm_Animator *animator, double frame)
 			fade->inversed = EINA_FALSE; 
 		}
 
-		_frame = (frame - 0.5) * 2;
+		_frame = ((frame - 0.5) * 2);
 			
 		evas_object_color_set(fade->after, fade->after_color.r * _frame, fade->after_color.g * _frame, fade->after_color.b * _frame, fade->after_color.a + fade->after_alpha * (1 -_frame));
 	}
@@ -1315,8 +1327,8 @@ static void _elm_fx_fade_op(void *data, Elm_Animator *animator, double frame)
  */
 EAPI Elm_Effect *elm_fx_fade_add(Evas_Object *before, Evas_Object *after)
 {
-	Elm_Effect* effect;
-	Elm_Fx_Fade* fade;
+	Elm_Effect *effect;
+	Elm_Fx_Fade *fade;
 		  	
 	if((!before) && (!after)) return NULL;
 	
@@ -1396,7 +1408,7 @@ static void _elm_fx_blend_op(void *data, Elm_Animator *animator, double frame)
 EAPI Elm_Effect *elm_fx_blend_add(Evas_Object *before, Evas_Object *after)
 {
 	Elm_Effect *effect;
-	Elm_Fx_Blend* blend;
+	Elm_Fx_Blend *blend;
 
 	if((!before) && (!after)) return NULL;
 
@@ -1537,7 +1549,7 @@ struct _image_animation
 
 static void _elm_fx_imageanimation_op(void *data, Elm_Animator *animator, double frame)
 {
-	Elm_Fx_Image_Animation* image_animation = (Elm_Fx_Image_Animation *) data;
+	Elm_Fx_Image_Animation *image_animation = (Elm_Fx_Image_Animation *) data;
 	if(!image_animation->icon) return;
 	image_animation->count = floor(frame * image_animation->item_num);
 	elm_icon_file_set(image_animation->icon, image_animation->images[image_animation->count], NULL);
