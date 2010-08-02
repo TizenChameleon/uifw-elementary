@@ -1316,7 +1316,6 @@ static void _tab_object_show(void *data, Evas *e, Evas_Object *obj, void *event_
 	if(!wd) return;
 
 	evas_object_show(wd->edje);
-	evas_object_show(wd->ebx);
 }
 
 
