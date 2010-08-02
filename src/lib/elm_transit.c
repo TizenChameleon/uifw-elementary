@@ -5,7 +5,10 @@
  * @defgroup Transit Transit
  * @ingroup Elementary
  *
- * Transit 
+ * Transit is designed to set the various effects for the Evas_Object such like translation, 
+ * rotation, etc. For using Effects, Create transit and add the some of effects which are 
+ * interested. Each effects has the type of Elm_Effect and those can be added into transit. 
+ * Once effects are added into transit, it will manage the effects (ex deleting). 
 */
 struct _transit
 {
@@ -26,6 +29,13 @@ struct _effect
    unsigned int shared_cnt;
    void *user_data;
 };
+
+static Evas_Object *_create_block_rect(Evas_Object *parent);
+static void _transit_animate_cb(void *data, Elm_Animator *animator, double frame);
+static void _transit_fx_begin(Elm_Transit *transit);
+static void _transit_fx_end(Elm_Transit *transit);
+static void _transit_complete_cb(void *data);
+static void _transit_fx_del(Elm_Effect *effect);
 
 static Evas_Object *
 _create_block_rect(Evas_Object *parent)
@@ -464,9 +474,9 @@ elm_transit_run(Elm_Transit *transit, double duration)
 //Resizing FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _resizing Elm_Fx_Resizing;
-
-static void _elm_fx_resizing_op(void *data, Elm_Animator *animator,
-				double frame);
+static void _elm_fx_resizing_op(void *data, Elm_Animator *animator, double frame);
+static void _elm_fx_resizing_begin(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+static void _elm_fx_resizing_end(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
 
 struct _resizing
 {
@@ -560,9 +570,10 @@ elm_fx_resizing_add(Evas_Object *obj, Evas_Coord from_w, Evas_Coord from_h,
 //Translation FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _translation Elm_Fx_Translation;
+static void _elm_fx_translation_op(void *data, Elm_Animator *animator, double frame);
+static void _elm_fx_translation_begin(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+static void _elm_fx_translation_end(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
 
-static void _elm_fx_translation_op(void *data, Elm_Animator *animator,
-				   double frame);
 
 struct _translation
 {
@@ -660,8 +671,9 @@ elm_fx_translation_add(Evas_Object *obj, Evas_Coord from_x, Evas_Coord from_y,
 //Zoom FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _zoom Elm_Fx_Zoom;
-
 static void _elm_fx_zoom_op(void *data, Elm_Animator * animator, double frame);
+static void _elm_fx_zoom_begin(void *data, Eina_Bool reverse, unsigned int repeat);
+static void _elm_fx_zoom_end(void *data, Eina_Bool reverse, unsigned int repeat);
 
 struct _zoom
 {
@@ -758,6 +770,8 @@ elm_fx_zoom_add(Evas_Object *obj, float from_rate, float to_rate)
 //Flip FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _flip Elm_Fx_Flip;
+static void _elm_fx_flip_op(void *data, Elm_Animator *animator, double frame);
+static void _elm_fx_flip_end(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
 
 struct _flip
 {
@@ -898,9 +912,12 @@ elm_fx_flip_add(Evas_Object *front, Evas_Object *back, Elm_Fx_Flip_Axis axis,
 //ResizableFlip FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _resizable_flip Elm_Fx_ResizableFlip;
-
+static void _elm_fx_resizable_flip_begin(void *data, Eina_Bool reverse, unsigned int repeat);
+static void _elm_fx_resizable_flip_end(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
 static void _elm_fx_resizable_flip_op(void *data, Elm_Animator *animator,
 				      double frame);
+static void _set_image_uv_by_axis_y(Evas_Map *map, Elm_Fx_ResizableFlip *flip, float degree);
+static void _set_image_uv_by_axis_x(Evas_Map *map, Elm_Fx_ResizableFlip *flip, float degree);
 
 struct _resizable_flip
 {
@@ -1126,8 +1143,11 @@ elm_fx_resizable_flip_add(Evas_Object *front, Evas_Object *back,
 //Wipe FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _wipe Elm_Fx_Wipe;
-
 static void _elm_fx_wipe_op(void *data, Elm_Animator *animator, double frame);
+static void _elm_fx_wipe_begin(void *data, Eina_Bool auto_repeat, unsigned int repeat_cnt);
+static void _elm_fx_wipe_end(void *data, Eina_Bool auto_repeat, unsigned int repeat_cnt);
+static void _elm_fx_wipe_hide(Evas_Map * map, Elm_Fx_Wipe_Dir dir, float x, float y, float w, float h, float frame);
+static void _elm_fx_wipe_show(Evas_Map *map, Elm_Fx_Wipe_Dir dir, float x, float y, float w, float h, float frame);
 
 struct _wipe
 {
@@ -1352,6 +1372,8 @@ elm_fx_wipe_add(Evas_Object *obj, Elm_Fx_Wipe_Type type, Elm_Fx_Wipe_Dir dir)
 //Color FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _color Elm_Fx_Color;
+static void _elm_fx_color_begin(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+static void _elm_fx_color_op(void *data, Elm_Animator *animator, double frame);
 
 struct _color
 {
@@ -1450,6 +1472,9 @@ elm_fx_color_add(Evas_Object *obj, unsigned int from_r, unsigned int from_g,
 //Fade FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _fade Elm_Fx_Fade;
+static void _elm_fx_fade_begin(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+static void _elm_fx_fade_end(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+static void _elm_fx_fade_op(void *data, Elm_Animator *animator, double frame);
 
 struct _fade
 {
@@ -1580,6 +1605,9 @@ elm_fx_fade_add(Evas_Object *before, Evas_Object *after)
 //Blend FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _blend Elm_Fx_Blend;
+static void _elm_fx_blend_begin(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+static void _elm_fx_blend_end(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+static void _elm_fx_blend_op(void *data, Elm_Animator *animator, double frame);
 
 struct _blend
 {
@@ -1675,6 +1703,9 @@ elm_fx_blend_add(Evas_Object *before, Evas_Object *after)
 //Rotation FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _rotation Elm_Fx_Rotation;
+static void _elm_fx_rotation_begin(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+static void _elm_fx_rotation_end(void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+static void _elm_fx_rotation_op(void *data, Elm_Animator *animator, double frame);
 
 struct _rotation
 {
@@ -1791,6 +1822,8 @@ elm_fx_rotation_add(Evas_Object *obj, float from_degree, float to_degree,
 // ImageAnimation FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _image_animation Elm_Fx_Image_Animation;
+static void _elm_fx_imageanimation_op(void *data, Elm_Animator *animator, double frame);
+EAPI Elm_Effect *elm_fx_imageanimation_add(Evas_Object *obj, const char **images, unsigned int item_num);
 
 struct _image_animation
 {

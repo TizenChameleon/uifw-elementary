@@ -7,7 +7,7 @@
  *
  * Contextual popup.
  *
- *Signals that you can add callbacks for are:
+ * Signals that you can add callbacks for are:
  *
  * hide - This is called whenever the ctxpopup is hided.
  *
