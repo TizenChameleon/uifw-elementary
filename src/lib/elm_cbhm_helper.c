@@ -25,6 +25,7 @@ static Eina_Bool init_flag = EINA_FALSE;
 void _get_clipboard_window();
 void _search_clipboard_window(Ecore_X_Window w);
 int _send_clipboard_events(char *cmd);
+int get_clipboard_data(Atom datom);
 
 void _get_clipboard_window()
 {
@@ -50,8 +51,8 @@ void _search_clipboard_window(Ecore_X_Window w)
     // Get the PID for the current Window.
 	Atom atomWMName = XInternAtom(cbhm_disp, "_NET_WM_NAME", False);
 	Atom atomUTF8String = XInternAtom(cbhm_disp, "UTF8_STRING", False);
-	Atom          type;
-	int           format;
+	Atom type;
+	int format;
 	unsigned long nitems;
 	unsigned long bytes_after;
 	unsigned long nsize;
@@ -100,26 +101,21 @@ int _send_clipboard_events(char *cmd)
 	return 0;
 }
 
-int get_clipboard_data(int mode)
+int get_clipboard_data(Atom datom)
 {
 	Atom atomUTF8String = XInternAtom(cbhm_disp, "UTF8_STRING", False);
-	Atom atomlist[5];
-	Atom atomCBHM_C = XInternAtom(cbhm_disp, "CBHM_C", False);
-	Atom atomCBHM_0 = XInternAtom(cbhm_disp, "CBHM_0", False);
 
-	Atom           type;
-	int            format;
-	unsigned long  nitems;
+	Atom type;
+	int format;
+	unsigned long nitems;
 	unsigned long nsize;
 	unsigned char *propName = NULL;
 
-	if (mode == 0)
-		atomlist[0] = atomCBHM_C;
-	else
-		atomlist[0] = atomCBHM_0;
+	// FIXME : is it really needed?
+	XSync(cbhm_disp, 0);
 
 	if (Success == 
-		XGetWindowProperty(cbhm_disp, self_win, atomlist[0], 0, 0, False,
+		XGetWindowProperty(cbhm_disp, self_win, datom, 0, 0, False,
 						   AnyPropertyType, &type, &format, &nitems, &nsize, &propName))
 		XFree(propName);
 	else
@@ -128,18 +124,26 @@ int get_clipboard_data(int mode)
 	fprintf(stderr, "## format = %d\n", format);
 	fprintf(stderr, "## nsize = %d\n", nsize);
 
+	if (format != 8)
+		return -1;
+
 	if (Success == 
-		XGetWindowProperty(cbhm_disp, self_win, atomlist[0], 0, (long)nsize, False,
+		XGetWindowProperty(cbhm_disp, self_win, datom, 0, (long)nsize, False,
 						   AnyPropertyType, &type, &format, &nitems, &nsize, &propName))
 	{
-//		XDeleteProperty(cbhm_disp, self_win, atomCBHM_0);
+		if (nsize != 0)
+			XGetWindowProperty(cbhm_disp, self_win, datom, 0, (long)nsize, False,
+							   AnyPropertyType, &type, &format, &nitems, &nsize, &propName);
 
 		if(propName != NULL)
 		{
-			fprintf(stderr, "## get 0 : %s\n", propName);
-		fprintf(stderr, "## nsize = %d\n", nsize);
+			fprintf(stderr, "## get data : %s\n", propName);
+			fprintf(stderr, "## nsize = %d\n", nsize);
 			XFree(propName);
 		}
+
+		XDeleteProperty(cbhm_disp, self_win, datom);
+		XFlush(cbhm_disp);
 	}
 	else
 		return -1;
@@ -189,9 +193,11 @@ elm_cbhm_get_count()
 
 	_send_clipboard_events("get count");
 
-	get_clipboard_data(0);
+	Atom atomCBHM_cCOUNT = XInternAtom(cbhm_disp, "CBHM_cCOUNT", False);
 
-   return 0;
+	get_clipboard_data(atomCBHM_cCOUNT);
+
+	return 0;
 }
 
 /**
@@ -226,9 +232,16 @@ elm_cbhm_get_data_by_position(int pos)
 	if (init_flag == EINA_FALSE)
 		return -1;
 
-	_send_clipboard_events("get #0");
+	char reqbuf[16];
+	sprintf(reqbuf, "get #%d", pos);
 
-	get_clipboard_data(1);
+	_send_clipboard_events(reqbuf);
 
-   return 0;
+	sprintf(reqbuf, "CBHM_c%d", pos);
+
+	Atom atomCBHM_cPOS = XInternAtom(cbhm_disp, reqbuf, False);
+
+	get_clipboard_data(atomCBHM_cPOS);
+
+	return 0;
 }
