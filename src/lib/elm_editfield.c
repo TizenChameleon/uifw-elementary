@@ -11,7 +11,7 @@
  * This is a editfield. It can contain a simple label and icon objects.
  */
 
-#define ERASER_PADDING (10)
+//#define ERASER_PADDING (10)
 
 typedef struct _Widget_Data Widget_Data;
 
@@ -21,15 +21,12 @@ struct _Widget_Data
    Evas_Object *entry;
    Evas_Object *ricon;
    Evas_Object *licon;
-   Evas_Object *eraser;
    const char *label;
    const char *guide_text;
    Eina_Bool needs_size_calc:1;
    Eina_Bool show_guide_text:1;
    Eina_Bool editing:1;
    Eina_Bool single_line : 1;
-   Eina_Bool eraser_visible : 1;
-   Evas_Event_Mouse_Down down_ev;
 };
 
 static const char *widtype = NULL;
@@ -39,10 +36,6 @@ static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _on_focus_hook(void *data, Evas_Object *obj);
 static Eina_Bool _empty_entry(Evas_Object *entry);
-static void _eraser_drag_end(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _eraser_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _eraser_mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _eraser_init(Evas_Object *obj);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -88,12 +81,23 @@ _theme_hook(Evas_Object *obj)
      return;
    _elm_theme_object_set(obj, wd->base, "editfield", "base", elm_widget_style_get(obj));
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
+   if(!wd->editing)
+     edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");	
+   if(wd->show_guide_text)
+     {
+	if(_empty_entry(wd->entry)) 
+	  {
+	     if(wd->guide_text) 
+	       {
+		  edje_object_part_text_set(wd->base, "elm.guidetext", wd->guide_text);
+		  edje_object_signal_emit(wd->base, "elm,state,guidetext,visible", "elm");
+	       }
+	  }
+     }     
    if(wd->ricon)	
      edje_object_part_swallow(wd->base, "right_icon", wd->ricon);
    if(wd->licon)
      edje_object_part_swallow(wd->base, "left_icon", wd->licon);
-   if(wd->eraser)
-     edje_object_part_swallow(wd->base, "eraser", wd->eraser);	
    _sizing_eval(obj);
 }
 
@@ -196,14 +200,14 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
 	if(wd->editing == EINA_FALSE)
 	  elm_entry_cursor_end_set(wd->entry);
 	
-	if(!_empty_entry(wd->entry)) 
-	  {
+//	if(!_empty_entry(wd->entry)) 
+//	  {
 	     if(wd->guide_text) 
 	       {
 		  edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
 		  wd->show_guide_text = EINA_FALSE;
 	       }
-	  }
+//	  }
 	evas_object_smart_callback_call(data, "clicked", NULL);
 	wd->editing = EINA_TRUE;
      }
@@ -216,72 +220,6 @@ _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
    Evas_Coord w, h;
    if (!wd || !wd->base) return;
    evas_object_geometry_get(obj, NULL, NULL, NULL, &h);
-   evas_object_geometry_get(wd->eraser, NULL, NULL, &w, NULL);
-   evas_object_size_hint_min_set(wd->eraser, w, h - ERASER_PADDING);
-   evas_object_resize(wd->eraser, w, h - ERASER_PADDING);
-}
-
-static void
-_eraser_drag_end(void *data, Evas_Object *obj, const char *emission, const char *source)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd || !wd->base || !wd->entry) 
-     return;
-   elm_entry_entry_set(wd->entry, "");
-   edje_object_part_text_set(wd->base, "elm.content.no.edit", "");
-}
-
-static void
-_eraser_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-	Widget_Data *wd = elm_widget_data_get(data);
-	if (!wd || !wd->base) 
-		return;	
-	memcpy(&wd->down_ev, event_info, sizeof(Evas_Event_Mouse_Down));
-}
-
-static void
-_eraser_mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Event_Mouse_Up *ev = event_info;
-   Evas_Coord distance;
-   unsigned int dur;
-   double pos = 0.0;
-   if (!wd || !wd->base) 
-     return;
-   edje_object_part_drag_value_get(wd->base, "eraser", &pos, NULL);
-   if (pos == 1.0) 
-     {
-	edje_object_signal_emit(wd->base, "elm,state,eraser,flick", "elm");
-	return;
-     }
-   dur = ev->timestamp - wd->down_ev.timestamp;
-   distance = wd->down_ev.canvas.x - ev->canvas.x;	
-   if ((dur && dur > 1000) || (distance < 10 && distance > -10)) 
-     {
-	edje_object_signal_emit(wd->base, "elm,state,eraser,drag", "elm");
-	return;
-     }
-   if(((float)distance / dur) > 0.5)	
-     edje_object_signal_emit(wd->base, "elm,state,eraser,flick", "elm");
-   else
-     edje_object_signal_emit(wd->base, "elm,state,eraser,drag", "elm");
-}
-
-static void
-_eraser_init(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd || !wd->base)
-     return;
-   wd->eraser = edje_object_add(evas_object_evas_get(obj));
-   elm_widget_sub_object_add(obj, wd->eraser);
-   _elm_theme_object_set(obj, wd->eraser, "editfield/eraser", "base", "default");
-   edje_object_part_swallow(wd->base, "eraser", wd->eraser);
-   evas_object_event_callback_add(wd->eraser, EVAS_CALLBACK_MOUSE_DOWN, _eraser_mouse_down, obj);
-   evas_object_event_callback_add(wd->eraser, EVAS_CALLBACK_MOUSE_UP, _eraser_mouse_up, obj);
-   edje_object_signal_callback_add(wd->base, "drag", "end", _eraser_drag_end, obj);
 }
 
 /**
@@ -323,7 +261,6 @@ elm_editfield_add(Evas_Object *parent)
 
    wd->editing = EINA_FALSE;
    wd->single_line = EINA_FALSE;
-   wd->eraser_visible = EINA_FALSE;
 
    wd->entry = elm_entry_add(obj);
    elm_object_style_set(wd->entry, "editfield");
@@ -575,10 +512,6 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
      return;
    wd->single_line = single_line;
    elm_entry_single_line_set(wd->entry, single_line);
-   if(wd->single_line && wd->eraser_visible)
-     edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
-   else
-     edje_object_signal_emit(wd->base, "elm,state,eraser,hide", "elm");
 }
 
 /**
@@ -597,10 +530,6 @@ elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
    ELM_CHECK_WIDTYPE(obj, widtype);	
    if (!wd || !wd->base)
      return;
-   wd->eraser_visible = visible;
-   _eraser_init(obj);	
-   if(wd->single_line && wd->eraser_visible)
-     edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
-   else
-     edje_object_signal_emit(wd->base, "elm,state,eraser,hide", "elm");
+
+   return; // design is not supported
 }
