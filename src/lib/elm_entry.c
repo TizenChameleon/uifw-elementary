@@ -2882,8 +2882,6 @@ elm_entry_fontsize_set(Evas_Object *obj, int fontsize)
 
    if (!wd) return;
    t = eina_stringshare_add(elm_entry_entry_get(obj));
-   len = strlen(t);
-   if (len <= 0) return;
    fontbuf = eina_strbuf_new();
    eina_strbuf_append_printf(fontbuf, "%d", fontsize);
 
