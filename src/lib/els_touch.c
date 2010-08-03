@@ -341,8 +341,6 @@ _smart_mouse_down(void *data, Evas *e, Evas_Object *obj, void *ev)
      {
       case TOUCH_STATE_NONE:
       case TOUCH_STATE_DRAG:
-	 _smart_stop_animator_move(sd);
-	 _smart_stop_animator_flick(sd);
 	 mouse_data.x = event->canvas.x;
 	 mouse_data.y = event->canvas.y;
 	 mouse_data.time = event->timestamp;
@@ -384,6 +382,8 @@ _smart_mouse_up(void *data, Evas *e, Evas_Object *obj, void *ev)
    switch (sd->state)
      {
       case TOUCH_STATE_DOWN:
+	 _smart_stop_animator_move(sd);
+	 _smart_stop_animator_flick(sd);
 	 _smart_enter_down_up(sd, (event->timestamp - sd->last_down[0].time), event->timestamp);
 	 break;
 
@@ -476,6 +476,16 @@ _smart_mouse_move(void *data, Evas *e, Evas_Object *obj, void *ev)
 
 	 if ((abs(dx) > DRAG_THRESHOLD) || (abs(dy) > DRAG_THRESHOLD))
 	   {
+	      if (sd->animator_move)
+		{
+		   ecore_animator_del(sd->animator_move);
+		   sd->animator_move = NULL;
+		}
+	      if (sd->animator_flick)
+		{
+		   ecore_animator_del(sd->animator_flick);
+		   sd->animator_flick = NULL;
+		}
 	      _smart_set_last_drag(sd, 0, &mouse_data);
 	      _smart_save_move_history(sd, mouse_data.x, mouse_data.y, dx, dy);
 	   }
