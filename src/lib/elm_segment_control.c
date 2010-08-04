@@ -65,31 +65,11 @@ _on_focus_hook(void *data, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   Elm_Segment_Item *it;
-   Eina_List *l;
 
    if (elm_widget_focus_get(obj))
-     {
-        edje_object_signal_emit((Evas_Object *)wd->seg_ctrl, "elm,action,focus", "elm");
-	evas_object_focus_set((Evas_Object *)wd->seg_ctrl, 1);
-     }
+     evas_object_focus_set((Evas_Object *)wd->seg_ctrl, 1);
    else
-     {
-	edje_object_signal_emit((Evas_Object *)wd->seg_ctrl, "elm,action,unfocus", "elm");
-	evas_object_focus_set((Evas_Object *)wd->seg_ctrl, 0);
-	wd->selected = EINA_FALSE;
-
-	EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
-	  {
-	     if (it->segment_id == wd->cur_seg_id) {
-	        edje_object_signal_emit(it->base, "elm,action,unfocus", "elm");
-	   	edje_object_signal_emit(it->base, "elm,state,segment,off", "elm");
-	   	edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
-	   	break;
-	     }
-	  }
-	wd->cur_seg_id = -1;
-     }
+     evas_object_focus_set((Evas_Object *)wd->seg_ctrl, 0);
 }
 
 static void
@@ -179,7 +159,7 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
 
    if (item->long_timer) ecore_timer_del(item->long_timer);
-   item->long_timer = ecore_timer_add(0.5, _signal_segment_on, item);
+   item->long_timer = ecore_timer_add(0.3, _signal_segment_on, item);
 }
 
 static void
