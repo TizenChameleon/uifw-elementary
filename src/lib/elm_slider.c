@@ -60,7 +60,6 @@ struct _Widget_Data
    double val, val_min, val_max;
    Ecore_Timer *delay;
    Evas_Coord size;
-   /* for supporting aqua feature */
    Ecore_Timer *mv_timer;
    Evas_Object *e_icon;
    double src_val;
@@ -77,9 +76,10 @@ static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *eve
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 static void _units_set(Evas_Object *obj);
 static void _indicator_set(Evas_Object *obj);
+static void _spacer_cb(void *data, Evas * e, Evas_Object * obj, void *event_info);
 
-/* supporting aqua feature */
-static _mv_timer_cb(void *data);
+
+static Eina_Bool _mv_timer_cb(void *data);
 
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_DELAY_CHANGED[] = "delay,changed";
@@ -170,8 +170,6 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *even
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
-   // if (obj != wd->icon) return;
-  /*supporting aqua feature*/
    if (obj != wd->icon && obj != wd->e_icon) return;
 
    _sizing_eval(data);
@@ -191,7 +189,6 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 	wd->icon = NULL;
 	_sizing_eval(obj);
      }
-   /*supporting aqua feature*/
    if (sub == wd->e_icon)
      {
 	edje_object_signal_emit(wd->slider, "elm,state,eicon,hidden", "elm");
@@ -292,7 +289,7 @@ static void
 _drag(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
     Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
-    /* supporting aqua feature : delete thumb move timer when drag event occured to the moving thumb */
+    /* delete thumb move timer when drag event occured to the moving thumb */
     if(wd->mv_timer)
       {
 	 ecore_timer_del(wd->mv_timer);
@@ -307,7 +304,7 @@ static void
 _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
-   /* supporting aqua feature : delete thumb move timer when drag event occured to the moving thumb */
+   /*  delete thumb move timer when drag event occured to the moving thumb */
    if(wd->mv_timer)
      {
 	ecore_timer_del(wd->mv_timer);
@@ -344,6 +341,36 @@ _drag_down(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSE
    edje_object_part_drag_step(wd->slider, "elm.dragable.slider", 0.05, 0.05);
 }
 
+static void
+_spacer_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Event_Mouse_Down *ev = event_info;
+   Evas_Coord x, y, w, h;
+   double button_x, button_y;
+
+   evas_object_geometry_get(wd->spacer, &x, &y, &w, &h);
+   edje_object_part_drag_value_get(wd->slider, "elm.dragable.slider", &button_x, &button_y);
+   if(wd->horizontal){
+     button_x = ((double)ev->output.x - (double)x) / (double)w;
+     if (button_x > 1)
+       button_x = 1;
+     if (button_x < 0)
+       button_x = 0;
+   }
+   else {
+     button_y = ((double)ev->output.y - (double)y) / (double)h;
+     if (button_y > 1)
+       button_y = 1;
+     if (button_y < 0)
+       button_y = 0;
+   }
+   edje_object_part_drag_value_set(wd->slider, "elm.dragable.slider", button_x, button_y);
+//   evas_object_smart_callback_call(cp->parent, "clicked", NULL);
+   evas_event_feed_mouse_cancel(e, 0, NULL);
+   evas_event_feed_mouse_down(e, 1, EVAS_BUTTON_NONE, 0, NULL);
+}
+
 static const char*widtype = NULL;
 
 /**
@@ -376,7 +403,6 @@ elm_slider_add(Evas_Object *parent)
    wd->val_min = 0.0;
    wd->val_max = 1.0;
 
-    /* supporting aqua feature */
     wd->mv_step = (double)((wd->val_max - wd->val_min) / (double)SLIDER_THUMB_MOVE_STEP);
 
    wd->slider = edje_object_add(e);
@@ -397,6 +423,7 @@ elm_slider_add(Evas_Object *parent)
    evas_object_pass_events_set(wd->spacer, 1);
    elm_widget_sub_object_add(obj, wd->spacer);
    edje_object_part_swallow(wd->slider, "elm.swallow.bar", wd->spacer);
+   evas_object_event_callback_add(wd->spacer, EVAS_CALLBACK_MOUSE_DOWN, _spacer_cb, obj);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
@@ -714,7 +741,6 @@ elm_slider_min_max_set(Evas_Object *obj, double min, double max)
    wd->val_min = min;
    wd->val_max = max;
 
-   /* supporting aqua feature */
    wd->mv_step = (double)((wd->val_max - wd->val_min) / (double)SLIDER_THUMB_MOVE_STEP);
 
    if (wd->val < wd->val_min) wd->val = wd->val_min;
@@ -936,7 +962,7 @@ elm_slider_indicator_show_set(Evas_Object *obj, Eina_Bool show)
      edje_object_signal_emit(wd->slider, "elm,state,val,hide", "elm");			
 }
 
-static _mv_timer_cb(void *data)
+static Eina_Bool _mv_timer_cb(void *data)
 {
    Evas_Object* obj = (Evas_Object*)data;
    Widget_Data *wd = elm_widget_data_get(obj);
