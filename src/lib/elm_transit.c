@@ -154,7 +154,7 @@ _transit_fx_del(Elm_Effect *effect)
       return;
 
    if(effect->del_op)
-	   (*effect->del_op)(effect);
+	   (*effect->del_op)(effect->user_data);
 
    if (effect->user_data)
       free(effect->user_data);
@@ -1901,7 +1901,14 @@ _elm_fx_image_animation_op(void *data, Elm_Animator *animator, double frame)
 static void
 _elm_fx_image_animation_del(void *data)
 {
-	fprintf(stderr, "image animation del!");
+	int idx;
+	Elm_Fx_Image_Animation *image_animation = data;
+
+	for(idx = 0; idx < image_animation->img_cnt; ++idx ) {
+		eina_stringshare_del(image_animation->images[ idx ]);
+	}
+
+	free(image_animation->images);
 }
 
 /**
@@ -1920,6 +1927,7 @@ elm_fx_image_animation_add(Evas_Object *obj, const char **images,
 {
    Elm_Effect *effect;
    Elm_Fx_Image_Animation *image_animation;
+   int idx;
 
    if ((!obj) || !images || !(*images))
       return NULL;
@@ -1937,7 +1945,10 @@ elm_fx_image_animation_add(Evas_Object *obj, const char **images,
      }
 
    image_animation->obj = obj;
-   image_animation->images = (char **) images;
+   image_animation->images = calloc( img_cnt, sizeof(char*));
+   for(idx = 0; idx < img_cnt; ++idx )
+	   image_animation->images[ idx ] = eina_stringshare_add( images[ idx ] );
+
    image_animation->img_cnt = img_cnt;
 
    effect->begin_op = _elm_fx_image_animation_begin;
