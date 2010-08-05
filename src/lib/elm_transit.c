@@ -26,6 +26,7 @@ struct _effect
    void (*animation_op) (void *data, Elm_Animator *animator, double frame);
    void (*begin_op) (void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
    void (*end_op) (void *data, Eina_Bool auto_reverse, unsigned int repeat_cnt);
+   void (*del_op) (void* data);
    unsigned int shared_cnt;
    void *user_data;
 };
@@ -151,6 +152,10 @@ _transit_fx_del(Elm_Effect *effect)
 
    if (effect->shared_cnt > 0)
       return;
+
+   if(effect->del_op)
+	   (*effect->del_op)(effect);
+
    if (effect->user_data)
       free(effect->user_data);
    free(effect);
@@ -1861,33 +1866,46 @@ elm_fx_rotation_add(Evas_Object *obj, float from_degree, float to_degree,
 // ImageAnimation FX
 /////////////////////////////////////////////////////////////////////////////////////
 typedef struct _image_animation Elm_Fx_Image_Animation;
-static void _elm_fx_imageanimation_op(void *data, Elm_Animator *animator, 
+static void _elm_fx_image_animation_begin(void *data, Eina_Bool auto_reverse,
+		       unsigned int repeat_cnt);
+static void _elm_fx_image_animation_op(void *data, Elm_Animator *animator, 
 				double frame);
-EAPI Elm_Effect *elm_fx_imageanimation_add(Evas_Object *obj, const char **images, 
+EAPI Elm_Effect *elm_fx_image_animation_add(Evas_Object *obj, const char **images, 
 				unsigned int item_num);
 
 struct _image_animation
 {
    Evas_Object *obj;
    char **images;
-   int count;
    int img_cnt;
 };
 
+
 static void
-_elm_fx_imageanimation_op(void *data, Elm_Animator *animator, double frame)
+_elm_fx_image_animation_begin(void *data, Eina_Bool auto_reverse,
+		       unsigned int repeat_cnt)
+{
+   Elm_Fx_Image_Animation *image_animation = data;
+   evas_object_show(image_animation->obj);
+}
+
+
+static void
+_elm_fx_image_animation_op(void *data, Elm_Animator *animator, double frame)
 {
    Elm_Fx_Image_Animation *image_animation = (Elm_Fx_Image_Animation *) data;
-
-   if (!image_animation->obj)
-      return;
-   image_animation->count = floor(frame * image_animation->img_cnt);
    elm_icon_file_set(image_animation->obj,
-		     image_animation->images[image_animation->count], NULL);
+		     image_animation->images[ (int) floor(frame * image_animation->img_cnt) ], NULL);
+}
+
+static void
+_elm_fx_image_animation_del(void *data)
+{
+	fprintf(stderr, "image animation del!");
 }
 
 /**
- * Add ImageAnimation effect.  
+ * Add image_animation effect.  
  *
  * @param obj Icon object
  * @param images Array of image file path. 
@@ -1897,13 +1915,13 @@ _elm_fx_imageanimation_op(void *data, Elm_Animator *animator, double frame)
  * @ingroup Transit 
  */
 EAPI Elm_Effect *
-elm_fx_imageanimation_add(Evas_Object *obj, const char **images,
+elm_fx_image_animation_add(Evas_Object *obj, const char **images,
 			  unsigned int img_cnt)
 {
    Elm_Effect *effect;
    Elm_Fx_Image_Animation *image_animation;
 
-   if (!images || !(*images))
+   if ((!obj) || !images || !(*images))
       return NULL;
 
    effect = calloc(1, sizeof(Elm_Effect));
@@ -1920,10 +1938,11 @@ elm_fx_imageanimation_add(Evas_Object *obj, const char **images,
 
    image_animation->obj = obj;
    image_animation->images = (char **) images;
-	image_animation->count = 0;
    image_animation->img_cnt = img_cnt;
 
-   effect->animation_op = _elm_fx_imageanimation_op;
+   effect->begin_op = _elm_fx_image_animation_begin;
+   effect->animation_op = _elm_fx_image_animation_op;
+   effect->del_op = _elm_fx_image_animation_del;
    effect->user_data = image_animation;
 
    return effect;

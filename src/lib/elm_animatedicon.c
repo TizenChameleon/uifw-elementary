@@ -1,14 +1,5 @@
-/*
- * SLP
- * Copyright (c) 2009 Samsung Electronics, Inc.
- * All rights reserved.
- *
- * This software is a confidential and proprietary information
- * of Samsung Electronics, Inc. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with Samsung Electronics.
- */
+#include <Elementary.h>
+#include "elm_priv.h"
 
 /**
  * @defgroup Animatedicon Animatedicon 
@@ -17,31 +8,30 @@
  * This is an animatedicon.
  */
 
-#include <Elementary.h>
-#include "elm_priv.h"
-
 /**
  * internal data structure of animated icon object
  */
 typedef struct _Widget_Data Widget_Data;
-struct _Widget_Data {
+
+struct _Widget_Data
+{
 	Evas_Object *base;
 	Evas_Object *parent;
 	Elm_Transit *transit;
 	Evas_Object *icon;
 	Ecore_Timer *timer;
-
 	char** images;
-	int item_num;
+	int img_cnt;
 	double duration;
 	unsigned int repeat;
 	double interval;
 };
 
+static const char *widtype = NULL;
+
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-
 static void _resize_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
@@ -144,12 +134,12 @@ elm_animatedicon_add(Evas_Object *parent)
  *
  * @param obj animatedicon object. 
  * @param images the image files to be animated.
- * @param item_num the number of images.
+ * @param img_cnt the number of images.
  *
  * @ingroup Animatedicon 
  */
 EAPI void 
-elm_animatedicon_file_set(Evas_Object *obj, const char **images, const int item_num)
+elm_animatedicon_file_set(Evas_Object *obj, const char **images, const int img_cnt)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
@@ -159,7 +149,7 @@ elm_animatedicon_file_set(Evas_Object *obj, const char **images, const int item_
 	}
 
 	wd->images = (char **)images;
-	wd->item_num = item_num;
+	wd->img_cnt = img_cnt;
 	elm_icon_file_set(wd->icon, wd->images[0], NULL);
 }
 
@@ -194,7 +184,7 @@ elm_animatedicon_animation_start(Evas_Object *obj)
 	if (!wd) return;
 
 	wd->transit = elm_transit_add(wd->parent);
-	elm_transit_fx_insert(wd->transit, elm_fx_imageanimation_add(wd->icon, wd->images, wd->item_num));
+	elm_transit_fx_insert(wd->transit, elm_fx_image_animation_add(wd->icon, wd->images, wd->img_cnt));
 	elm_transit_event_block_disabled_set(wd->transit, EINA_FALSE);
 	if (wd->repeat >= 0) {
 		elm_transit_repeat_set(wd->transit, wd->repeat);
