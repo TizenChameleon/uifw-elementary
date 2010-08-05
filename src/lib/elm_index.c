@@ -51,12 +51,14 @@ struct _Elm_Index_Item
    const char *vis_letter;
 };
 
-static const char *widtype = NULL;
 struct _PlacementPart
 {
-	int start;
-	int count;
+   int start;
+   int count;
 };
+
+static const char *widtype = NULL;
+
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
@@ -105,8 +107,8 @@ _theme_hook(Evas_Object *obj)
      {
         if (!wd->bx[1])
           {
-	     wd->bx[1] = evas_object_box_add(evas_object_evas_get(wd->base));
-	     evas_object_box_layout_set(wd->bx[1], _layout, wd, NULL);
+             wd->bx[1] = evas_object_box_add(evas_object_evas_get(wd->base));
+             evas_object_box_layout_set(wd->bx[1], _layout, wd, NULL);
              elm_widget_sub_object_add(obj, wd->bx[1]);
           }
         edje_object_part_swallow(wd->base, "elm.swallow.index.1", wd->bx[1]);
@@ -171,18 +173,16 @@ _item_new(Evas_Object *obj, const char *letter, const void *item)
    it->data = item;
    it->level = wd->level;
    if(wd->level == 0)
-   it->size =  wd->min_obj_height;
+     it->size =  wd->min_obj_height;
    else
-	   it->size =  wd->min_1st_level_obj_height;
+     it->size =  wd->min_1st_level_obj_height;
    if(letter)
-   {
-		it->letter = eina_stringshare_add(letter);
-		it->vis_letter = eina_stringshare_add(letter);
-   }
+     {
+         it->letter = eina_stringshare_add(letter);
+         it->vis_letter = eina_stringshare_add(letter);
+     }
    else
-   {
-   	return NULL;
-   }
+     return NULL;
    return it;
 }
 
@@ -228,10 +228,8 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
         const char *stacking;
 
         if (it->level != level) continue;
-		if(i > wd->max_supp_items_count)
-		{
-			break;
-		}
+	if(i > wd->max_supp_items_count) break;
+
         o = edje_object_add(evas_object_evas_get(obj));
         it->base = o;
         if (i & 0x1)
@@ -242,10 +240,10 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
         edje_object_size_min_restricted_calc(o, &mw, &mh, 0, 0);
         evas_object_size_hint_weight_set(o, 1.0, 1.0);
         evas_object_size_hint_align_set(o, -1.0, -1.0);
-		edje_object_part_text_set(o, "elm.text", it->vis_letter);
-		evas_object_resize(o, mw, it->size);
-		evas_object_size_hint_min_set(o, mw, it->size);
-		evas_object_size_hint_max_set(o, mw, it->size);
+        edje_object_part_text_set(o, "elm.text", it->vis_letter);
+        evas_object_resize(o, mw, it->size);
+        evas_object_size_hint_min_set(o, mw, it->size);
+        evas_object_size_hint_max_set(o, mw, it->size);
         elm_widget_sub_object_add(obj, o);
         evas_object_box_append(box, o);
         stacking = edje_object_data_get(o, "stacking");
@@ -325,8 +323,8 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
         it_closest  = NULL;
         dist = 0x7fffffff;
         evas_object_geometry_get(wd->bx[i], &bx, &by, &bw, &bh);
-		dmin = (double)(wd->min_1st_level_obj_height*wd->tot_items_count[1])/(2*(double)bh);
-		dmax = 1.0-dmin-0.08;
+        dmin = (double)(wd->min_1st_level_obj_height*wd->tot_items_count[1])/(2*(double)bh);
+        dmax = 1.0-dmin-0.08;
         EINA_LIST_FOREACH(wd->items, l, it)
           {
              if (!((it->level == i) && (it->base))) continue;
@@ -351,25 +349,25 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
                   dist = x;
                }
           }
-        if ((i == 0) && (wd->level == 0))
-        {
-			if(cdv > dmax || cdv < dmin)
-			{
-				if(cdv > dmax)
-				{
-					cdvv = dmax;
-				}
-				else
-				{
-					cdvv = dmin;
-				}
-				edje_object_part_drag_value_set(wd->base, "elm.dragable.index.1", cdv, cdvv);
-			}
-			else
-			{
-				edje_object_part_drag_value_set(wd->base, "elm.dragable.index.1", cdv, cdv);
-			}
-		}
+          if ((i == 0) && (wd->level == 0))
+            {
+               if(cdv > dmax || cdv < dmin)
+                 {
+                    if(cdv > dmax)
+                      {
+                          cdvv = dmax;
+                      }
+                    else
+                      {
+                          cdvv = dmin;
+                      }
+                    edje_object_part_drag_value_set(wd->base, "elm.dragable.index.1", cdv, cdvv);
+                 }
+               else
+                 {
+                    edje_object_part_drag_value_set(wd->base, "elm.dragable.index.1", cdv, cdv);
+                 }
+            }
         if (it_closest) it_closest->selected = 1;
         if (it_closest != it_last)
           {
@@ -425,19 +423,19 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
    if (!label) label = strdup("");
    if (!last) last = strdup("");
 
-	   if(wd->level == 0)
-	   {
-		   if(last)
-		   {
-			   edje_object_part_text_set(wd->base, "elm.text.body", last);
-			   edje_object_signal_emit(wd->base, "hide_2nd_level", "");
-		   }
-	   }
-	   if( wd->level == 1)
-	   {
-	   edje_object_part_text_set(wd->base, "elm.text", last);
-		   edje_object_signal_emit(wd->base, "hide_first_level", "");
+   if(wd->level == 0)
+   {
+     if(last)
+       {
+           edje_object_part_text_set(wd->base, "elm.text.body", last);
+           edje_object_signal_emit(wd->base, "hide_2nd_level", "");
+       }
    }
+   if( wd->level == 1)
+     {
+         edje_object_part_text_set(wd->base, "elm.text", last);
+         edje_object_signal_emit(wd->base, "hide_first_level", "");
+     }
 
    free(label);
    free(last);
@@ -466,8 +464,7 @@ _mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *eve
    wd->dy = ev->canvas.y - y;
    elm_index_active_set(data, 1);
    _sel_eval(data, ev->canvas.x, ev->canvas.y);
-   edje_object_part_drag_value_set(wd->base, "elm.dragable.pointer",
-                                   wd->dx, wd->dy);
+   edje_object_part_drag_value_set(wd->base, "elm.dragable.pointer", wd->dx, wd->dy);
 }
 
 static void
@@ -485,9 +482,9 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *event
    wd->down = 0;
    d = (void *)elm_index_item_selected_get(data, wd->level);
    EINA_LIST_FOREACH(wd->items, l, it)
-   {
-	   edje_object_signal_emit(it->base, "elm,state,inactive", "elm");
-   }
+     {
+         edje_object_signal_emit(it->base, "elm,state,inactive", "elm");
+     }
    if (d) evas_object_smart_callback_call(data, "selected", d);
    elm_index_active_set(data, 0);
    edje_object_signal_emit(wd->base, "elm,state,level,0", "elm");
@@ -537,9 +534,9 @@ _mouse_move(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *eve
                   snprintf(buf, sizeof(buf), "elm,state,level,%i", wd->level);
                   edje_object_signal_emit(wd->base, buf, "elm");
                   d = (void *)elm_index_item_selected_get(data, wd->level);
-				   evas_object_smart_callback_call(data, "changed", d);
-				   if (wd->delay) ecore_timer_del(wd->delay);
-				   wd->delay = ecore_timer_add(0.2, _delay_change, data);
+                  evas_object_smart_callback_call(data, "changed", d);
+                  if (wd->delay) ecore_timer_del(wd->delay);
+                  wd->delay = ecore_timer_add(0.2, _delay_change, data);
                   evas_object_smart_callback_call(data, "level,down", NULL);
                }
           }
@@ -549,46 +546,50 @@ _mouse_move(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *eve
 static void
 _index_box_refill_job(void *data)
 {
-	Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
-	if (!wd) return;
-	const char *string;
-	Evas_Coord pw, ph;
-	evas_object_geometry_get(wd->base, NULL, NULL, &pw, &ph);
-	wd->scale_factor = elm_scale_get();
-	if ( wd->scale_factor == 0.0 ) {
-			wd->scale_factor = 1.0;
-	}
-	string = edje_object_data_get(wd->base, "min_obj_height");
-	if(string)
-	wd->min_obj_height = (int) (atoi(string))*wd->scale_factor;
-	else
-	wd->min_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
-	if(!wd->min_obj_height)
-		return;
-	wd->max_grp_size = wd->min_obj_height - 2*MIN_GRP_SIZE;
-	wd->items_count =    ph/wd->min_obj_height;
-	wd->max_supp_items_count = wd->max_grp_size*(int)((wd->items_count-1)*0.5)+wd->items_count;
-	if(pw != wd->pwidth && ph != wd->pheight)
-	{
-		if(wd->down == 1)
-		{
-			wd->active = 0;
-			elm_index_active_set(data, 1);
-		}
-		_index_box_clear((Evas_Object *)data, wd->bx[0], 0);
-		evas_object_smart_calculate( wd->bx[0]);
-		elm_index_item_go((Evas_Object *)data, wd->level);
-		wd->pwidth = pw;
-		wd->pheight = ph;
-	}
+   Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
+   if (!wd) return;
+
+   const char *string;
+   Evas_Coord pw, ph;
+
+   evas_object_geometry_get(wd->base, NULL, NULL, &pw, &ph);
+   wd->scale_factor = elm_scale_get();
+   if ( wd->scale_factor == 0.0 ) {
+     wd->scale_factor = 1.0;
+   }
+   string = edje_object_data_get(wd->base, "min_obj_height");
+   if(string)
+     wd->min_obj_height = (int) (atoi(string))*wd->scale_factor;
+   else
+     wd->min_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
+   if(!wd->min_obj_height) return;
+
+   wd->max_grp_size = wd->min_obj_height - 2*MIN_GRP_SIZE;
+   wd->items_count = ph/wd->min_obj_height;
+   wd->max_supp_items_count = wd->max_grp_size*(int)((wd->items_count-1)*0.5)+wd->items_count;
+
+   if(pw != wd->pwidth && ph != wd->pheight)
+     {
+         if(wd->down == 1)
+           {
+               wd->active = 0;
+               elm_index_active_set(data, 1);
+           }
+       _index_box_clear((Evas_Object *)data, wd->bx[0], 0);
+       evas_object_smart_calculate( wd->bx[0]);
+       elm_index_item_go((Evas_Object *)data, wd->level);
+       wd->pwidth = pw;
+       wd->pheight = ph;
+     }
 }
+
 static void _index_object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-	Widget_Data *wd;
-	if(!data) return;
-	wd = elm_widget_data_get((Evas_Object *)data);
-	if(!wd) return;
-	ecore_job_add(_index_box_refill_job, (Evas_Object *)data);
+   Widget_Data *wd;
+   if(!data) return;
+   wd = elm_widget_data_get((Evas_Object *)data);
+   if(!wd) return;
+   ecore_job_add(_index_box_refill_job, (Evas_Object *)data);
 }
 
 /**
@@ -626,8 +627,7 @@ elm_index_add(Evas_Object *parent)
    wd->tot_items_count[0] = 0;
    wd->tot_items_count[1] = 0;
    wd->special_char = edje_object_data_get(wd->base, "special_char");
-  	if(wd->special_char == NULL);
-  		wd->special_char = eina_stringshare_add("*");
+   if(wd->special_char == NULL)  wd->special_char = eina_stringshare_add("*");
 
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "index", "base/vertical", "default");
@@ -671,17 +671,17 @@ elm_index_add(Evas_Object *parent)
         edje_object_part_swallow(wd->base, "elm.swallow.index.1", wd->bx[1]);
         evas_object_show(wd->bx[1]);
      }
-	const char *string;
+     const char *string;
 
-	wd->scale_factor = elm_scale_get();
-	if ( wd->scale_factor == 0.0 ) {
-			wd->scale_factor = 1.0;
-	}
-	string = edje_object_data_get(wd->base, "min_1st_level_obj_height");
-	if(string)
-		wd->min_1st_level_obj_height = (int) (atoi(string))*wd->scale_factor;
-	else
-		wd->min_1st_level_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
+     wd->scale_factor = elm_scale_get();
+     if ( wd->scale_factor == 0.0 ) {
+                     wd->scale_factor = 1.0;
+     }
+     string = edje_object_data_get(wd->base, "min_1st_level_obj_height");
+     if(string)
+       wd->min_1st_level_obj_height = (int) (atoi(string))*wd->scale_factor;
+     else
+       wd->min_1st_level_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
    _sizing_eval(obj);
    return obj;
 }
@@ -689,102 +689,105 @@ elm_index_add(Evas_Object *parent)
 static int
 _group_count(Evas_Object *obj, int extraIndex, int adj_pos, int vis_pos)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	   if (!wd) return;
-	int group_count = MIN_GRP_SIZE;
-	while(group_count <= wd->max_grp_size)
-	{
-		if(extraIndex <= wd->max_grp_size*adj_pos)
-		{
-			if(group_count*adj_pos>=extraIndex)
-				return group_count;
-		}
-		else
-		{
-			return wd->max_grp_size;
-		}
-		group_count+=MIN_GRP_SIZE;
-	}
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   int group_count = MIN_GRP_SIZE;
+   while(group_count <= wd->max_grp_size)
+     {
+        if(extraIndex <= wd->max_grp_size*adj_pos)
+          if(group_count*adj_pos>=extraIndex) return group_count;
+       else
+         return wd->max_grp_size;
+
+       group_count+=MIN_GRP_SIZE;
+     }
 }
 static void
 _index_process(Evas_Object *obj)
 {
-	int extraIndex;
-	int j,i, group_count;
-	Eina_List *l;
-	Elm_Index_Item *it;
-	int count;
-	int n;
-	Widget_Data *wd = elm_widget_data_get(obj);
+   int extraIndex;
+   int j,i, group_count;
+   Eina_List *l;
+   Elm_Index_Item *it;
+   int count;
+   int n;
+
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+
    if(wd->items_count == 0) return;
-    const int adj_pos = (wd->items_count-1)*0.5;
-	if(wd->tot_items_count[wd->level] <= wd->max_supp_items_count)
-		n = wd->tot_items_count[wd->level];
-	else
-		n = wd->max_supp_items_count;
-	group_count = MIN_GRP_SIZE;
-	int indx[n];
-	const int minh = wd->min_obj_height;
-	EINA_LIST_FOREACH(wd->items, l, it)
-	{
-		it->vis_letter = eina_stringshare_add(it->letter);
-		it->size =  minh;
-	}
-	int remainder;
-	int numberofparts;
-	int N = wd->items_count;
-	for(i=0;i<n;i++)
-	{
-		indx[i] = minh;
-	}
-	extraIndex=n-N;
-	if(extraIndex < 0) return;
-	group_count = _group_count(obj, extraIndex, adj_pos, N);
-	if(group_count <= 0) return;
-	PlacementPart place[adj_pos];
-	remainder = extraIndex%group_count;
-	numberofparts=(extraIndex/group_count)+(remainder == 0? 0: 1);
-	for(i=0;i<numberofparts; i++)
-	{
-		place[i].count=group_count+1;
-		count = (int)(((float)(i+1)/(float)(numberofparts+1))*N);
-		place[i].start= count +i*group_count-1;
-	}
-	if (remainder)
-	{
-		place[numberofparts-1].count=remainder+1;
-	}
-	for(i=0;i<numberofparts;i++)
-	{
-		for(j=0;j<place[i].count; j++)
-		{
-			indx[((place[i].start)+j)]= MIN_PIXEL_VALUE;
-		}
-		indx[(place[i].start+(place[i].count)/2)] = minh-place[i].count+1;
-	}
-	 count = 0;
-	 EINA_LIST_FOREACH(wd->items, l, it)
-	 {
-		 int size = indx[count];
-		count++;
-		 if(size == minh)
-		 {
-			 it->vis_letter = eina_stringshare_add(it->letter);
-			 continue;
-		 }
-		 else if(size == 1)
-		{
-			 eina_stringshare_del(it->vis_letter);
-			 it->vis_letter = eina_stringshare_add("");
-		 }
-		 else
-		 {
-			 eina_stringshare_del(it->vis_letter);
-			 it->vis_letter = eina_stringshare_add(wd->special_char);
-		 }
-		 it->size = size*wd->scale_factor;
-	 }
+
+   const int adj_pos = (wd->items_count-1)*0.5;
+   if(wd->tot_items_count[wd->level] <= wd->max_supp_items_count)
+      n = wd->tot_items_count[wd->level];
+   else
+      n = wd->max_supp_items_count;
+   group_count = MIN_GRP_SIZE;
+   int indx[n];
+
+   const int minh = wd->min_obj_height;
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+         it->vis_letter = eina_stringshare_add(it->letter);
+         it->size =  minh;
+     }
+   int remainder;
+   int numberofparts;
+   int N = wd->items_count;
+
+   for(i=0;i<n;i++)
+   {
+       indx[i] = minh;
+   }
+   extraIndex=n-N;
+   if(extraIndex < 0) return;
+
+   group_count = _group_count(obj, extraIndex, adj_pos, N);
+   if(group_count <= 0) return;
+
+   PlacementPart place[adj_pos];
+   remainder = extraIndex%group_count;
+   numberofparts=(extraIndex/group_count)+(remainder == 0? 0: 1);
+
+   for(i=0;i<numberofparts; i++)
+     {
+         place[i].count=group_count+1;
+         count = (int)(((float)(i+1)/(float)(numberofparts+1))*N);
+         place[i].start= count +i*group_count-1;
+     }
+   if (remainder)
+     place[numberofparts-1].count=remainder+1;
+
+   for(i=0;i<numberofparts;i++)
+     {
+         for(j=0;j<place[i].count; j++)
+           {
+               indx[((place[i].start)+j)]= MIN_PIXEL_VALUE;
+           }
+       indx[(place[i].start+(place[i].count)/2)] = minh-place[i].count+1;
+     }
+   count = 0;
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+         int size = indx[count];
+         count++;
+         if(size == minh)
+           {
+               it->vis_letter = eina_stringshare_add(it->letter);
+               continue;
+           }
+      else if(size == 1)
+        {
+            eina_stringshare_del(it->vis_letter);
+            it->vis_letter = eina_stringshare_add("");
+        }
+      else
+        {
+           eina_stringshare_del(it->vis_letter);
+           it->vis_letter = eina_stringshare_add(wd->special_char);
+        }
+      it->size = size*wd->scale_factor;
+     }
 }
 /**
  * Set the active state of the index programatically
@@ -806,7 +809,7 @@ elm_index_active_set(Evas_Object *obj, Eina_Bool active)
    if (wd->active)
      {
         _index_box_clear(obj, wd->bx[1], 1);
-	   _index_process(obj);
+	_index_process(obj);
         _index_box_auto_fill(obj, wd->bx[0], 0);
         edje_object_signal_emit(wd->base, "elm,state,active", "elm");
      }

@@ -82,9 +82,9 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
    if(wd->selected == EINA_TRUE)
      {
-	    wd->selected = EINA_FALSE;
-	    return;
-	 }
+         wd->selected = EINA_FALSE;
+         return;
+     }
 
    if(wd->longpressed == EINA_FALSE)
      {
@@ -96,7 +96,6 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
        ecore_timer_del(item->long_timer);
        item->long_timer = NULL;
      }
-
 }
 
 static void
@@ -151,8 +150,8 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 
    if (item->segment_id == wd->cur_seg_id)
      {
-	   wd->selected = EINA_TRUE;
-	   return;
+        wd->selected = EINA_TRUE;
+        return;
      }
 
    edje_object_signal_emit(item->base, "elm,action,focus", "elm");
@@ -177,7 +176,7 @@ _item_free(Evas_Object *obj, Elm_Segment_Item *it)
    if (!wd) return;
 
    if(wd->seg_ctrl)
-   	wd->seg_ctrl = eina_list_remove(wd->seg_ctrl, it);
+     wd->seg_ctrl = eina_list_remove(wd->seg_ctrl, it);
 
    if(it->icon) evas_object_del(it->icon);
    if(it->base) evas_object_del(it->base);
@@ -185,7 +184,7 @@ _item_free(Evas_Object *obj, Elm_Segment_Item *it)
    if (it->long_timer) ecore_timer_del(it->long_timer);
 
    if(it)
-      free(it);
+     free(it);
    it = NULL;
    return;
 }
@@ -309,7 +308,7 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
      }
    else
      {
-        it->label = NULL;
+         it->label = NULL;
      }
 
    if ((it->icon != icon) && (it->icon))
