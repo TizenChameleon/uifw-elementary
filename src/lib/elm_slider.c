@@ -793,6 +793,7 @@ elm_slider_value_set(Evas_Object *obj, double val)
    wd->val = val;
    if (wd->val < wd->val_min) wd->val = wd->val_min;
    if (wd->val > wd->val_max) wd->val = wd->val_max;
+   edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
    _val_set(obj);
    _units_set(obj);
    _indicator_set(obj);
