@@ -2415,11 +2415,12 @@ extern "C" {
    EAPI void         elm_autocompleteview_text_update(Evas_Object *obj, char *text);
 
    /* animatedicon */
-   EAPI Evas_Object *elm_animatedicon_add(Evas_Object *parent);
+/*   EAPI Evas_Object *elm_animatedicon_add(Evas_Object *parent);
    EAPI void         elm_animatedicon_file_set(Evas_Object *obj, const char **images, const int item_num);
    EAPI void         elm_animatedicon_duration_set(Evas_Object *obj, const double duration);
    EAPI void         elm_animatedicon_animation_start(Evas_Object *obj);
-   EAPI void         elm_animatedicon_repeat_set(Evas_Object *obj, const unsigned int repeat, const double interval);
+   EAPI void         elm_animatedicon_repeat_set(Evas_Object *obj, const unsigned int repeat, const double interval); 
+   */
 
    /* coverflow */
    typedef struct _Coverflow_Item Elm_Coverflow_Item;
