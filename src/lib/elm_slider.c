@@ -295,6 +295,8 @@ _drag(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, 
 	 ecore_timer_del(wd->mv_timer);
 	 wd->mv_timer = NULL;
       }
+    edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
+    edje_object_message_signal_process(wd->slider);
     _val_fetch(data);
     _units_set(data);
     _indicator_set(data);
@@ -313,6 +315,8 @@ _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUS
    elm_widget_scroll_hold_push(data);
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_START, NULL);
+   edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
+    edje_object_message_signal_process(wd->slider); 
    _units_set(data);
    _indicator_set(data);
 }

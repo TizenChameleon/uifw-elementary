@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup NavigationBar NavigationBar
+ * @defgroup NavigationBar NavigationBar
+ * @ingroup Elementary
  *
  * The pager is an object that allows flipping (with animation) between 1 or
  * more of objects, much like a stack of windows within the window.
