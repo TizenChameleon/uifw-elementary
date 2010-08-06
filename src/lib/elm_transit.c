@@ -498,6 +498,75 @@ elm_transit_run(Elm_Transit *transit, double duration)
      }
 }
 
+/**
+ * Pause the transit
+ *
+ * @param  transit Transit
+ *
+ * @ingroup Transit
+ */
+EAPI void
+elm_transit_pause(Elm_Transit *transit)
+{
+	if(!transit)
+		return;
+
+	elm_animator_pause(transit->animator);
+}
+
+/**
+ * Resume the transit
+ *
+ * @param  transit Transit
+ *
+ * @ingroup Transit
+ */
+EAPI void
+elm_transit_resume(Elm_Transit *transit)
+{
+	if(!transit)
+		return;
+
+	elm_animator_resume(transit->animator);
+}
+
+/**
+ * Get the current frame position
+ *
+ * @param  transit Transit
+ * @return current frame position (range: 0~1)
+ *
+ * @ingroup Transit
+ */
+EAPI void
+elm_transit_frame_pos_set(Elm_Transit *transit, double pos)
+{
+	if(!transit)
+		return;
+
+	elm_animator_frame_pos_set(transit->animator, pos);
+}
+
+/**
+ * Get the current frame position
+ *
+ * @param  transit Transit
+ * @return current frame position
+ *
+ * @ingroup Transit
+ */
+EAPI double
+elm_transit_frame_pos_get(Elm_Transit *transit )
+{
+	if(!transit)
+		return 0;
+
+	return elm_animator_frame_pos_get(transit->animator);
+}
+
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////
 //Resizing FX
 /////////////////////////////////////////////////////////////////////////////////////

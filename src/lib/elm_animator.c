@@ -13,6 +13,7 @@ struct _Animator
    Ecore_Animator *animator;
    double begin_time;
    double cur_time;
+   double prev_time;
    double duration;
    unsigned int repeat_cnt;
    unsigned int cur_repeat_cnt;
@@ -88,14 +89,20 @@ static int
 _animator_animate_cb(void *data)
 {
    Elm_Animator *animator = (Elm_Animator *) data;
+   double elapsed_time, frame, cur_time;
 
-   animator->cur_time = ecore_loop_time_get();
-   double elapsed_time = animator->cur_time - animator->begin_time;
+   cur_time = ecore_loop_time_get();
 
-   if (elapsed_time > animator->duration)
-      elapsed_time = animator->duration;
+   animator->cur_time += (cur_time - animator->prev_time);
+   animator->prev_time = cur_time;
 
-   double frame = animator->curve_op(elapsed_time / animator->duration);
+   if(animator->cur_time > (animator->begin_time+animator->duration) ) {
+	   animator->cur_time = animator->begin_time+animator->duration;
+   }
+
+   elapsed_time = animator->cur_time - animator->begin_time;
+
+   frame = animator->curve_op(elapsed_time / animator->duration);
 
    //Reverse?
    if (animator->auto_reverse)
@@ -356,6 +363,89 @@ elm_animator_completion_callback_set(Elm_Animator *animator,
 }
 
 /**
+ * Pause the animator.
+ *
+ * @param  animator Animator object
+ *
+ * @ingroup Animator
+ */
+EAPI void
+elm_animator_pause(Elm_Animator *animator)
+{
+	if(!animator)
+		return;
+
+	if(!animator->on_animating)
+		return;
+
+	ecore_animator_freeze(animator->animator);
+}
+
+/**
+ * Resume the animator.
+ *
+ * @param  animator Animator object
+ *
+ * @ingroup Animator
+ */
+EAPI void
+elm_animator_resume(Elm_Animator *animator)
+{
+	if(!animator)
+		return;
+
+	if(!animator->on_animating)
+		return;
+
+	ecore_animator_thaw(animator->animator);
+}
+
+/**
+ * Set the frame position
+ *
+ * @param  animator Animator object
+ * @param frame_pos frame position (range:0 ~ 1)
+ *
+ * @ingroup Animator
+ */
+EAPI void
+elm_animator_frame_pos_set(Elm_Animator *animator, double pos)
+{
+	double cur_time;
+
+	if(!animator)
+		return;
+
+	if(!animator->on_animating)
+		return ;
+
+	cur_time = animator->begin_time + (pos * animator->duration);
+
+	if(cur_time < animator->begin_time)
+		cur_time = animator->begin_time;
+
+	animator->prev_time = animator->cur_time = cur_time;
+	_animator_animate_cb(animator);
+}
+
+/**
+ * Get the current frame position
+ *
+ * @param  animator Animator object
+ * @return current frame position
+ *
+ * @ingroup Animator
+ */
+EAPI double
+elm_animator_frame_pos_get(Elm_Animator* animator)
+{
+	if(!animator)
+		return 0;
+
+	return ((animator->cur_time - animator->begin_time) / animator->duration);
+}
+
+/**
  * Stop animator.
  *
  * @param animator Animator object 
@@ -404,7 +494,7 @@ elm_animator_animate(Elm_Animator *animator)
       return;
    if (!animator->animator_op)
       return;
-   animator->begin_time = ecore_loop_time_get();
+   animator->prev_time = animator->cur_time = animator->begin_time = ecore_loop_time_get();
    animator->cur_repeat_cnt = animator->repeat_cnt;
    if (!animator->animator) {
       animator->animator = ecore_animator_add(_animator_animate_cb, animator);
