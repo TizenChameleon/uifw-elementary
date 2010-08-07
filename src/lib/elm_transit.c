@@ -498,6 +498,40 @@ elm_transit_run(Elm_Transit *transit, double duration)
      }
 }
 
+/**
+ * Pause the transit
+ *
+ * @param  transit Transit
+ *
+ * @ingroup Transit
+ */
+EAPI void
+elm_transit_pause(Elm_Transit *transit)
+{
+	if(!transit)
+		return;
+
+	elm_animator_pause(transit->animator);
+}
+
+/**
+ * Resume the transit
+ *
+ * @param  transit Transit
+ *
+ * @ingroup Transit
+ */
+EAPI void
+elm_transit_resume(Elm_Transit *transit)
+{
+	if(!transit)
+		return;
+
+	elm_animator_resume(transit->animator);
+}
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////
 //Resizing FX
 /////////////////////////////////////////////////////////////////////////////////////

@@ -1957,6 +1957,9 @@ extern "C" {
    EAPI Eina_Bool     elm_animator_auto_reverse_get(Elm_Animator *animator);
    EAPI Eina_Bool     elm_animator_operating_get(Elm_Animator *animator);
    EAPI unsigned int  elm_animator_repeat_get(Elm_Animator *animator);
+   EAPI void 		elm_animator_pause(Elm_Animator *animator);
+   EAPI void 		elm_animator_resume(Elm_Animator *animator);
+  
 
    /* tansit */
    typedef struct _transit Elm_Transit;
@@ -1973,7 +1976,9 @@ extern "C" {
    EAPI void         elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool disabled);
    EAPI Eina_Bool    elm_transit_fx_insert(Elm_Transit *transit, Elm_Effect *effect);
    EAPI void         elm_transit_fx_clear(Elm_Transit *transit);
-   EAPI Eina_Bool    elm_transit_event_block_disabled_get(Elm_Transit *transit);
+   EAPI Eina_Bool    elm_transit_event_block_disabled_get(Elm_Transit *transit);  
+   EAPI void 		elm_transit_pause(Elm_Transit *transit);
+   EAPI void			elm_transit_resume(Elm_Transit *transit);
 
    /* Translation FX */
    EAPI Elm_Effect  *elm_fx_translation_add(Evas_Object *obj, Evas_Coord from_x, Evas_Coord from_y, Evas_Coord to_x, Evas_Coord to_y);

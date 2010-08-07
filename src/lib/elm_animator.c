@@ -88,14 +88,16 @@ static int
 _animator_animate_cb(void *data)
 {
    Elm_Animator *animator = (Elm_Animator *) data;
+   double elapsed_time, frame, cur_time;
 
    animator->cur_time = ecore_loop_time_get();
-   double elapsed_time = animator->cur_time - animator->begin_time;
 
-   if (elapsed_time > animator->duration)
-      elapsed_time = animator->duration;
+   elapsed_time = animator->cur_time - animator->begin_time;
 
-   double frame = animator->curve_op(elapsed_time / animator->duration);
+   if(elapsed_time > animator->duration)
+	   elapsed_time = animator->duration;
+
+   frame = animator->curve_op(elapsed_time / animator->duration);
 
    //Reverse?
    if (animator->auto_reverse)
@@ -353,6 +355,44 @@ elm_animator_completion_callback_set(Elm_Animator *animator,
       return;
    animator->completion_op = func;
    animator->completion_arg = data;
+}
+
+/**
+ * Pause the animator.
+ *
+ * @param  animator Animator object
+ *
+ * @ingroup Animator
+ */
+EAPI void
+elm_animator_pause(Elm_Animator *animator)
+{
+	if(!animator)
+		return;
+
+	if(!animator->on_animating)
+		return;
+
+	ecore_animator_freeze(animator->animator);
+}
+
+/**
+ * Resume the animator.
+ *
+ * @param  animator Animator object
+ *
+ * @ingroup Animator
+ */
+EAPI void
+elm_animator_resume(Elm_Animator *animator)
+{
+	if(!animator)
+		return;
+
+	if(!animator->on_animating)
+		return;
+
+	ecore_animator_thaw(animator->animator);
 }
 
 /**
