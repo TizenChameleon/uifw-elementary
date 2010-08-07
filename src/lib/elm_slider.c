@@ -988,7 +988,7 @@ static Eina_Bool _mv_timer_cb(void *data)
      }	
 
    elm_slider_value_set(obj, wd->src_val);
-   evas_object_smart_callback_call(obj, "changed", NULL);
+   evas_object_smart_callback_call(obj, SIG_CHANGED , NULL);
 
    if (wd->val == wd->des_val) 
      {
