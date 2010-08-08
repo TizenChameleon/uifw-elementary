@@ -447,7 +447,11 @@ _item_realize(Elm_Gengrid_Item *item)
 			 _elm_config->scale);
    evas_object_smart_member_add(item->base, item->wd->pan_smart);
    elm_widget_sub_object_add(item->wd->self, item->base);
-   _elm_theme_object_set(item->wd->self, item->base, "gengrid", "item/default",
+
+   strncpy(buf, "item/", sizeof(buf));
+   strncat(buf, item->gic->item_style, sizeof(buf) - strlen(buf));
+   
+   _elm_theme_object_set(item->wd->self, item->base, "gengrid", buf,
                          elm_widget_style_get(item->wd->self));
    item->spacer = evas_object_rectangle_add(evas_object_evas_get(item->wd->self));
    evas_object_color_set(item->spacer, 0, 0, 0, 0);
