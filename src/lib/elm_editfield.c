@@ -1,6 +1,3 @@
-/*
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
- */
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -26,7 +23,7 @@ struct _Widget_Data
    Eina_Bool needs_size_calc:1;
    Eina_Bool show_guide_text:1;
    Eina_Bool editing:1;
-   Eina_Bool single_line : 1;
+   Eina_Bool single_line:1;
 };
 
 static const char *widtype = NULL;
@@ -56,11 +53,7 @@ _on_focus_hook(void *data, Evas_Object *obj)
    if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)) ) 
      {
 	wd->editing = EINA_FALSE;
-	edje_object_signal_emit(wd->base, "elm,action,unfocus", "elm");
 	edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");		
-	text = elm_entry_entry_get(wd->entry);
-	edje_object_part_text_set(wd->base, "elm.content.no.edit", text);
-	edje_object_signal_emit(wd->base, "elm,action,no,edit", "elm");		
 	if(_empty_entry(wd->entry)) 
 	  {
 	     if(wd->guide_text) 
@@ -174,8 +167,6 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
 
    if(!_empty_entry(wd->entry)) 
      {
-	text = elm_entry_entry_get(wd->entry);
-	edje_object_part_text_set(wd->base, "elm.content.no.edit", text);		
 	if(wd->guide_text) 
 	  {
 	     edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
@@ -190,24 +181,23 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
    Widget_Data *wd = elm_widget_data_get(data);
    if(!wd || !wd->base) return;
 
-   if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "over_change_bg"))
+   if(!strcmp(source, "eraser"))
      {
-	edje_object_signal_emit(wd->base, "elm,action,focus", "elm");	
+	elm_entry_entry_set(wd->entry, "");			   
+     } 	   
+   else if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "eraser"))
+     {
 	edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
-	edje_object_signal_emit(wd->base, "elm,action,edit", "elm");	
 	elm_widget_focus_set(wd->entry, EINA_TRUE);			
 
 	if(wd->editing == EINA_FALSE)
 	  elm_entry_cursor_end_set(wd->entry);
 	
-//	if(!_empty_entry(wd->entry)) 
-//	  {
-	     if(wd->guide_text) 
-	       {
+	if(wd->guide_text) 
+	   {
 		  edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
 		  wd->show_guide_text = EINA_FALSE;
-	       }
-//	  }
+	   }
 	evas_object_smart_callback_call(data, "clicked", NULL);
 	wd->editing = EINA_TRUE;
      }
@@ -531,5 +521,10 @@ elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
    if (!wd || !wd->base)
      return;
 
-   return; // design is not supported
+   if (visible) 
+	edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
+   else 
+	edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
+   
+   return; 
 }
