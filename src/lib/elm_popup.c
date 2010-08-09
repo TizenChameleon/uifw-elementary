@@ -169,6 +169,31 @@ _block_clicked_cb( void *data, Evas_Object *obj, void *event_info )
    evas_object_smart_callback_call((Evas_Object *)data, "response", (void *)ELM_POPUP_RESPONSE_NONE);    
 }
 
+static Ecore_Event_Handler* _elm_wnd_map_handler = NULL;
+
+static int
+_wnd_map_notify(void *data, int type, void *event)
+{
+   Evas* e = NULL;
+   Evas_Object* obj = (Evas_Object*)data;
+
+   if (obj && _elm_wnd_map_handler)
+     {
+        e = evas_object_evas_get(obj);
+
+        if (e)
+          {
+             /* Render given object again, previous frame was discarded. */
+             evas_render(e);
+             ecore_event_handler_del(_elm_wnd_map_handler);
+             _elm_wnd_map_handler = NULL;
+             return 1;
+          }
+     }
+
+   return 0;
+}
+
 static void
 _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {  
@@ -179,6 +204,19 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
    elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
    _sizing_eval(obj);
    evas_object_show(obj);     
+   if (e && !_elm_wnd_map_handler)
+     {
+        int curr_rmethod = 0;
+        int gl_rmethod = 0;
+
+        curr_rmethod = evas_output_method_get(e);
+        gl_rmethod = evas_render_method_lookup("gl_x11");
+
+        if (!curr_rmethod) return;
+        if (!gl_rmethod) return;
+        if (curr_rmethod == gl_rmethod)
+          _elm_wnd_map_handler = ecore_event_handler_add(ECORE_X_EVENT_WINDOW_SHOW, _wnd_map_notify, obj);
+     }
 }
 
 static void
