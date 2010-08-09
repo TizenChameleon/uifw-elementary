@@ -19,6 +19,7 @@ struct _Widget_Data
    Evas_Coord lastw;
    Ecore_Job *deferred_recalc_job;
    Evas_Coord wrap_w;
+   Evas_Coord wrap_h;
    Eina_Bool linewrap : 1;
    Eina_Bool changed : 1;
    Eina_Bool bgcolor : 1;
@@ -32,15 +33,15 @@ static void _sizing_eval(Evas_Object *obj);
 static int _get_value_in_key_string(const char *oldstring, char *key, char **value);
 static int _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int deleteflag);
 static int _stringshare_key_value_replace(const char **srcstring, char *key, const char *value, int deleteflag);
-static int _is_width_over(Evas_Object *obj);
-static void _ellipsis_label_to_width(Evas_Object *obj);
+static int _is_width_over(Evas_Object *obj, int linemode);
+static void _ellipsis_label_to_width(Evas_Object *obj, int linemode);
 
 static void
 _elm_win_recalc_job(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord minw = -1, minh = -1, maxh = -1;
-   Evas_Coord resw, resh, minminw;
+   Evas_Coord resw, resh, minminw, minminh;
    if (!wd) return;
    wd->deferred_recalc_job = NULL;
    evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
@@ -48,6 +49,7 @@ _elm_win_recalc_job(void *data)
    minminw = 0;
    edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, 0, 0);
    minminw = minw;
+   minminh = minh;
    if (wd->wrap_w >= resw) 
      {
         resw = wd->wrap_w;
@@ -60,6 +62,10 @@ _elm_win_recalc_job(void *data)
         edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, resw, 0);
         evas_object_size_hint_min_set(data, minminw, minh);
      }
+
+   if (wd->ellipsis && wd->wrap_h > 0 && _is_width_over(data, 1) == 1) 
+     _ellipsis_label_to_width(data, 1);
+
    maxh = minh;
    evas_object_size_hint_max_set(data, -1, maxh);
 }
@@ -116,8 +122,8 @@ _sizing_eval(Evas_Object *obj)
         maxh = minh;
         evas_object_size_hint_max_set(obj, maxw, maxh);
 
-        if (wd->ellipsis && _is_width_over(obj) == 1) 
-          _ellipsis_label_to_width(obj);
+        if (wd->ellipsis && _is_width_over(obj, 0) == 1) 
+          _ellipsis_label_to_width(obj, 0);
      }
 }
 
@@ -309,7 +315,7 @@ _stringshare_key_value_replace(const char **srcstring, char *key, const char *va
 }
 
 static int
-_is_width_over(Evas_Object *obj)
+_is_width_over(Evas_Object *obj, int linemode)
 {
    Evas_Coord x, y, w, h;
    Evas_Coord vx, vy, vw, vh;
@@ -323,15 +329,22 @@ _is_width_over(Evas_Object *obj)
 
    evas_object_geometry_get (obj, &vx,&vy,&vw,&vh);
 
-   if (x >= 0 && y >= 0) return 0;
+   if (linemode == 0) // single line
+     {
+       if (x >= 0 && y >= 0) return 0;
 
-   if (ellen < wd->wrap_w && w > wd->wrap_w) return 1;
+       if (ellen < wd->wrap_w && w > wd->wrap_w) return 1;
+     }
+   else // multiline
+     {
+       if (vy > h && h > wd->wrap_h) return 1;
+     }
 
    return 0;
 }
 
 static void
-_ellipsis_label_to_width(Evas_Object *obj)
+_ellipsis_label_to_width(Evas_Object *obj, int linemode)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    int cur_fontsize = 0, len, showcount;
@@ -362,7 +375,7 @@ _ellipsis_label_to_width(Evas_Object *obj)
    txtbuf = eina_strbuf_new();
    eina_strbuf_append(txtbuf, wd->label);
 
-   while (_is_width_over(obj))
+   while (_is_width_over(obj, linemode))
      {
        if (cur_fontsize > minfontsize)
          {
@@ -397,7 +410,7 @@ _ellipsis_label_to_width(Evas_Object *obj)
                eina_strbuf_append(txtbuf, ellipsis_string);
                edje_object_part_text_set(wd->lbl, "elm.text", eina_strbuf_string_get(txtbuf));
 
-               if (_is_width_over(obj)) 
+               if (_is_width_over(obj, linemode)) 
                  showcount--;
                else 
                  break;
@@ -441,6 +454,8 @@ elm_label_add(Evas_Object *parent)
    wd->linewrap = EINA_FALSE;
    wd->bgcolor = EINA_FALSE;
    wd->ellipsis = EINA_FALSE;
+   wd->wrap_w = 0;
+   wd->wrap_h = 0;
 
    wd->lbl = edje_object_add(e);
    _elm_theme_object_set(obj, wd->lbl, "label", "base", "default");
@@ -567,6 +582,40 @@ elm_label_wrap_width_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return 0;
    return wd->wrap_w;
+}
+
+/**
+ * Set wrap height of the label
+ *
+ * @param obj The label object
+ * @param w The wrap width in pixels at a minimum where words need to wrap
+ * @ingroup Label
+ */
+EAPI void
+elm_label_wrap_height_set(Evas_Object *obj, Evas_Coord h)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->wrap_h == h) return;
+   wd->wrap_h = h;
+   _sizing_eval(obj);
+}
+
+/**
+ * get wrap width of the label
+ *
+ * @param obj The label object
+ * @return The wrap height in pixels at a minimum where words need to wrap
+ * @ingroup Label
+ */
+EAPI Evas_Coord
+elm_label_wrap_height_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return 0;
+   return wd->wrap_h;
 }
 
 /**
