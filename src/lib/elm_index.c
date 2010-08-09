@@ -431,7 +431,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
            edje_object_signal_emit(wd->base, "hide_2nd_level", "");
        }
    }
-   if( wd->level == 1)
+   if( wd->level == 1 && wd->level_active[1])
      {
          edje_object_part_text_set(wd->base, "elm.text", last);
          edje_object_signal_emit(wd->base, "hide_first_level", "");
