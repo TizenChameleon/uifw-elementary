@@ -611,24 +611,24 @@ extern "C" {
      };
 
    EAPI Evas_Object *elm_gengrid_add(Evas_Object *parent);
-   EAPI void	     elm_gengrid_item_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h);
-   EAPI void	     elm_gengrid_item_size_get(const Evas_Object *obj, Evas_Coord *w, Evas_Coord *h);
+   EAPI void         elm_gengrid_item_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h);
+   EAPI void         elm_gengrid_item_size_get(const Evas_Object *obj, Evas_Coord *w, Evas_Coord *h);
    EAPI void         elm_gengrid_align_set(Evas_Object *obj, double align_x, double align_y);
    EAPI void         elm_gengrid_align_get(const Evas_Object *obj, double *align_x, double *align_y);
-   EAPI void	     elm_gengrid_item_del(Elm_Gengrid_Item *item);
-   EAPI void	     elm_gengrid_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select);
+   EAPI void         elm_gengrid_item_del(Elm_Gengrid_Item *item);
+   EAPI void         elm_gengrid_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select);
    EAPI Eina_Bool    elm_gengrid_always_select_mode_get(const Evas_Object *obj);
-   EAPI void	     elm_gengrid_no_select_mode_set(Evas_Object *obj, Eina_Bool no_select);
+   EAPI void         elm_gengrid_no_select_mode_set(Evas_Object *obj, Eina_Bool no_select);
    EAPI Eina_Bool    elm_gengrid_no_select_mode_get(const Evas_Object *obj);
-   EAPI void	     elm_gengrid_multi_select_set(Evas_Object *obj, Eina_Bool multi);
+   EAPI void         elm_gengrid_multi_select_set(Evas_Object *obj, Eina_Bool multi);
    EAPI Eina_Bool    elm_gengrid_multi_select_get(const Evas_Object *obj);
-   EAPI void	     elm_gengrid_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
-   EAPI void	     elm_gengrid_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce);
-   EAPI void	     elm_gengrid_horizontal_set(Evas_Object *obj, Eina_Bool setting);
-   EAPI void	     elm_gengrid_clear(Evas_Object *obj);
-   EAPI void	    *elm_gengrid_item_data_get(Elm_Gengrid_Item *item);
-   EAPI void	     elm_gengrid_item_pos_get(const Elm_Gengrid_Item *item, unsigned int *x, unsigned int *y);
-   EAPI void	     elm_gengrid_item_selected_set(Elm_Gengrid_Item *item, Eina_Bool selected);
+   EAPI void         elm_gengrid_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
+   EAPI void         elm_gengrid_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce);
+   EAPI void         elm_gengrid_horizontal_set(Evas_Object *obj, Eina_Bool setting);
+   EAPI void         elm_gengrid_clear(Evas_Object *obj);
+   EAPI void        *elm_gengrid_item_data_get(Elm_Gengrid_Item *item);
+   EAPI void         elm_gengrid_item_pos_get(const Elm_Gengrid_Item *item, unsigned int *x, unsigned int *y);
+   EAPI void         elm_gengrid_item_selected_set(Elm_Gengrid_Item *item, Eina_Bool selected);
    EAPI Eina_Bool    elm_gengrid_item_selected_get(const Elm_Gengrid_Item *item);
    EAPI const Evas_Object *elm_gengrid_item_object_get(Elm_Gengrid_Item *item);
    EAPI const Eina_List *elm_gengrid_selected_items_get(const Evas_Object *obj);
@@ -689,11 +689,11 @@ extern "C" {
      } Elm_Notify_Orient;
    EAPI Evas_Object *elm_notify_add(Evas_Object *parent);
    EAPI void         elm_notify_content_set(Evas_Object *obj, Evas_Object *content);
-   EAPI void	     elm_notify_parent_set(Evas_Object *obj, Evas_Object *parent);
-   EAPI void	     elm_notify_orient_set(Evas_Object *obj, Elm_Notify_Orient orient);
+   EAPI void         elm_notify_parent_set(Evas_Object *obj, Evas_Object *parent);
+   EAPI void         elm_notify_orient_set(Evas_Object *obj, Elm_Notify_Orient orient);
    EAPI void         elm_notify_timeout_set(Evas_Object *obj, int timeout);
-   EAPI void	     elm_notify_timer_init(Evas_Object *obj);
-   EAPI void	     elm_notify_repeat_events_set(Evas_Object *obj, Eina_Bool repeat);
+   EAPI void         elm_notify_timer_init(Evas_Object *obj);
+   EAPI void         elm_notify_repeat_events_set(Evas_Object *obj, Eina_Bool repeat);
    /* smart callbacks called:
     */
   
@@ -746,12 +746,12 @@ extern "C" {
 
    typedef enum _Elm_Input_Panel_Layout
      {
-	  ELM_INPUT_PANEL_LAYOUT_NORMAL,
-	  ELM_INPUT_PANEL_LAYOUT_NUMBER,	  
-	  ELM_INPUT_PANEL_LAYOUT_EMAIL,	  
-	  ELM_INPUT_PANEL_LAYOUT_URL,
-	  ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,	  	  
-	  ELM_INPUT_PANEL_LAYOUT_IP,
+	ELM_INPUT_PANEL_LAYOUT_NORMAL,
+	ELM_INPUT_PANEL_LAYOUT_NUMBER,	  
+	ELM_INPUT_PANEL_LAYOUT_EMAIL,	  
+	ELM_INPUT_PANEL_LAYOUT_URL,
+	ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,	  	  
+	ELM_INPUT_PANEL_LAYOUT_IP,
      } Elm_Input_Panel_Layout;
    
    EAPI Evas_Object *elm_entry_add(Evas_Object *parent);
@@ -1056,7 +1056,7 @@ extern "C" {
    EAPI void             elm_list_horizontal_mode_set(Evas_Object *obj, Elm_List_Mode mode);
    EAPI Elm_List_Mode    elm_list_horizontal_mode_get(const Evas_Object *obj);
    EAPI void             elm_list_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select);
-   EAPI Eina_Bool	     elm_list_always_select_mode_get(const Evas_Object *obj);
+   EAPI Eina_Bool        elm_list_always_select_mode_get(const Evas_Object *obj);
    EAPI const Eina_List *elm_list_items_get(const Evas_Object *obj);
    EAPI Elm_List_Item   *elm_list_selected_item_get(const Evas_Object *obj);
    EAPI const Eina_List *elm_list_selected_items_get(const Evas_Object *obj);
@@ -1295,24 +1295,24 @@ extern "C" {
 	} func;
      };
 
-   EAPI Evas_Object *	elm_slideshow_add(Evas_Object *parent);
+   EAPI Evas_Object *elm_slideshow_add(Evas_Object *parent);
    EAPI Elm_Slideshow_Item* elm_slideshow_item_add(Evas_Object *obj, const Elm_Slideshow_Item_Class *itc, const void *data);
-   EAPI void		elm_slideshow_show(Elm_Slideshow_Item *item);
-   EAPI void		elm_slideshow_next(Evas_Object *obj);
-   EAPI void		elm_slideshow_previous(Evas_Object *obj);
+   EAPI void         elm_slideshow_show(Elm_Slideshow_Item *item);
+   EAPI void         elm_slideshow_next(Evas_Object *obj);
+   EAPI void         elm_slideshow_previous(Evas_Object *obj);
    EAPI const Eina_List *elm_slideshow_transitions_get(const Evas_Object *obj);
-   EAPI void	        elm_slideshow_transition_set(Evas_Object *obj, const char *);
-   EAPI const char     *elm_slideshow_transition_get(const Evas_Object *obj);
-   EAPI void            elm_slideshow_timeout_set(Evas_Object *obj ,int timeout);
-   EAPI int		elm_slideshow_timeout_get(const Evas_Object *obj);
-   EAPI void		elm_slideshow_loop_set(Evas_Object *obj, Eina_Bool loop);
-   EAPI Eina_Bool	elm_slideshow_loop_get(const Evas_Object *obj);
-   EAPI void		elm_slideshow_clear(Evas_Object *obj);
+   EAPI void         elm_slideshow_transition_set(Evas_Object *obj, const char *);
+   EAPI const char  *elm_slideshow_transition_get(const Evas_Object *obj);
+   EAPI void         elm_slideshow_timeout_set(Evas_Object *obj ,int timeout);
+   EAPI int          elm_slideshow_timeout_get(const Evas_Object *obj);
+   EAPI void         elm_slideshow_loop_set(Evas_Object *obj, Eina_Bool loop);
+   EAPI Eina_Bool    elm_slideshow_loop_get(const Evas_Object *obj);
+   EAPI void	     elm_slideshow_clear(Evas_Object *obj);
    EAPI const Eina_List *elm_slideshow_items_get(const Evas_Object *obj);
-   EAPI void		elm_slideshow_item_del(Elm_Slideshow_Item *item);
-   EAPI void *		elm_slideshow_item_data_get(Elm_Slideshow_Item *item);
+   EAPI void         elm_slideshow_item_del(Elm_Slideshow_Item *item);
+   EAPI void *       elm_slideshow_item_data_get(Elm_Slideshow_Item *item);
    EAPI Elm_Slideshow_Item* elm_slideshow_item_current_get(const Evas_Object *obj);
-   EAPI Evas_Object*	elm_slideshow_item_object_get(Elm_Slideshow_Item* item);
+   EAPI Evas_Object* elm_slideshow_item_object_get(Elm_Slideshow_Item* item);
 
 
    EAPI Evas_Object *elm_fileselector_add(Evas_Object *parent);
@@ -1851,17 +1851,17 @@ extern "C" {
    EAPI void         elm_popup_response(Evas_Object *obj, int  response_id);
    EAPI void         elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
    EAPI void         elm_popup_rotation_set(Evas_Object *obj, int rot_angle);
-   EAPI int	     elm_popup_run(Evas_Object *obj);
+   EAPI int          elm_popup_run(Evas_Object *obj);
    /* Contextual Popup */
    typedef struct _Ctxpopup_Item Elm_Ctxpopup_Item;
    
    typedef enum _Ctxpopup_Arrow_Direction
-		{
-  	ELM_CTXPOPUP_ARROW_DOWN,
-  	ELM_CTXPOPUP_ARROW_RIGHT,
-  	ELM_CTXPOPUP_ARROW_LEFT,
-  	ELM_CTXPOPUP_ARROW_UP,
-		} Elm_Ctxpopup_Arrow;
+     {
+	ELM_CTXPOPUP_ARROW_DOWN,
+	ELM_CTXPOPUP_ARROW_RIGHT,
+	ELM_CTXPOPUP_ARROW_LEFT,
+	ELM_CTXPOPUP_ARROW_UP,
+     } Elm_Ctxpopup_Arrow;
    
 
    EAPI Evas_Object *elm_ctxpopup_add(Evas_Object *parent);
@@ -1959,8 +1959,8 @@ extern "C" {
    EAPI Eina_Bool     elm_animator_auto_reverse_get(Elm_Animator *animator);
    EAPI Eina_Bool     elm_animator_operating_get(Elm_Animator *animator);
    EAPI unsigned int  elm_animator_repeat_get(Elm_Animator *animator);
-   EAPI void 		elm_animator_pause(Elm_Animator *animator);
-   EAPI void 		elm_animator_resume(Elm_Animator *animator);
+   EAPI void          elm_animator_pause(Elm_Animator *animator);
+   EAPI void          elm_animator_resume(Elm_Animator *animator);
   
 
    /* tansit */
@@ -1979,8 +1979,8 @@ extern "C" {
    EAPI Eina_Bool    elm_transit_fx_insert(Elm_Transit *transit, Elm_Effect *effect);
    EAPI void         elm_transit_fx_clear(Elm_Transit *transit);
    EAPI Eina_Bool    elm_transit_event_block_disabled_get(Elm_Transit *transit);  
-   EAPI void 		elm_transit_pause(Elm_Transit *transit);
-   EAPI void			elm_transit_resume(Elm_Transit *transit);
+   EAPI void         elm_transit_pause(Elm_Transit *transit);
+   EAPI void         elm_transit_resume(Elm_Transit *transit);
 
    /* Translation FX */
    EAPI Elm_Effect  *elm_fx_translation_add(Evas_Object *obj, Evas_Coord from_x, Evas_Coord from_y, Evas_Coord to_x, Evas_Coord to_y);
@@ -2495,7 +2495,6 @@ extern "C" {
    EAPI Evas_Object *elm_webview_minimap_get(Evas_Object *obj);
    EAPI void         elm_webview_uri_set(Evas_Object *obj, const char *uri);
    */
-
 
 #ifdef __cplusplus
 }

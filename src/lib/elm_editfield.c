@@ -207,7 +207,7 @@ static void
 _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 {
    Widget_Data *wd = elm_widget_data_get(data);	
-   Evas_Coord w, h;
+   Evas_Coord h;
    if (!wd || !wd->base) return;
    evas_object_geometry_get(obj, NULL, NULL, NULL, &h);
 }

@@ -15,12 +15,14 @@
 
 typedef struct _Widget_Data Widget_Data;
 
-enum{
-	DEFAULT = 0,
-	HIGHLIGHTED,
-	FOCUSED,
-	DISABLED,
+enum
+{
+   DEFAULT = 0,
+   HIGHLIGHTED,
+   FOCUSED,
+   DISABLED,
 };
+
 struct _Widget_Data
 {
    Evas_Object *btn, *icon;
@@ -79,19 +81,20 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_focus_get(obj))
      {
-      if(wd->statelabel[FOCUSED])
-      {
-          _set_label(obj, wd->statelabel[FOCUSED]);
-      }
+	if(wd->statelabel[FOCUSED])
+	  {
+	     _set_label(obj, wd->statelabel[FOCUSED]);
+	  }
 	edje_object_signal_emit(wd->btn, "elm,action,focus", "elm");
 	evas_object_focus_set(wd->btn, 1);
      }
    else
      {
-   	if(wd->statelabel[DEFAULT])
-   	  _set_label(obj, wd->statelabel[DEFAULT]);
-   	else
-   		 _set_label(obj, wd->label);
+	if(wd->statelabel[DEFAULT])
+	  _set_label(obj, wd->statelabel[DEFAULT]);
+	else
+	  _set_label(obj, wd->label);
+
 	edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
 	evas_object_focus_set(wd->btn, 0);
      }
@@ -103,16 +106,20 @@ _theme_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    _elm_theme_object_set(obj, wd->btn, "button", "base", elm_widget_style_get(obj));
+
    if (wd->icon)
      edje_object_part_swallow(wd->btn, "elm.swallow.content", wd->icon);
+   
    if (wd->label)
      edje_object_signal_emit(wd->btn, "elm,state,text,visible", "elm");
    else
      edje_object_signal_emit(wd->btn, "elm,state,text,hidden", "elm");
+   
    if (wd->icon)
      edje_object_signal_emit(wd->btn, "elm,state,icon,visible", "elm");
    else
      edje_object_signal_emit(wd->btn, "elm,state,icon,hidden", "elm");
+
    edje_object_part_text_set(wd->btn, "elm.text", wd->label);
    edje_object_message_signal_process(wd->btn);
    edje_object_scale_set(wd->btn, elm_widget_scale_get(obj) * _elm_config->scale);
@@ -125,21 +132,21 @@ _disable_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (elm_widget_disabled_get(obj))
-   {
-       if(wd->statelabel[DISABLED] )
+     {
+	if(wd->statelabel[DISABLED] )
 	  {
-         _set_label(obj, wd->statelabel[DISABLED]);
+	     _set_label(obj, wd->statelabel[DISABLED]);
 	  }
-     edje_object_signal_emit(wd->btn, "elm,state,disabled", "elm");
-   }
+	edje_object_signal_emit(wd->btn, "elm,state,disabled", "elm");
+     }
    else
-   {
-       if(wd->statelabel[DEFAULT])
-         _set_label(obj, wd->statelabel[DEFAULT]);
-   	else
-   		 _set_label(obj, wd->label);
-     edje_object_signal_emit(wd->btn, "elm,state,enabled", "elm");
-   }
+     {
+	if(wd->statelabel[DEFAULT])
+	  _set_label(obj, wd->statelabel[DEFAULT]);
+	else
+	  _set_label(obj, wd->label);
+	edje_object_signal_emit(wd->btn, "elm,state,enabled", "elm");
+     }
 }
 
 static void
@@ -240,9 +247,9 @@ _signal_pressed(void *data, Evas_Object *obj __UNUSED__, const char *emission __
    if (!wd) return;
 
    if(wd->statelabel[HIGHLIGHTED])
-	{
-     _set_label(data, wd->statelabel[HIGHLIGHTED]);
-	}
+     {
+	_set_label(data, wd->statelabel[HIGHLIGHTED]);
+     }
    if (wd->autorepeat && !wd->repeating)
      {
 	if (wd->ar_threshold <= 0.0)
@@ -255,13 +262,13 @@ _signal_pressed(void *data, Evas_Object *obj __UNUSED__, const char *emission __
 static void
 _signal_default_text_set(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-	Widget_Data *wd = elm_widget_data_get(data);
-	   if (!wd) return;
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
    if(wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
-		else
-			 _set_label(data, wd->label);
-		return;
+   else
+     _set_label(data, wd->label);
+   return;
 }
 
 static void
@@ -269,10 +276,10 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-	if(wd->statelabel[DEFAULT])
-		_set_label(data, wd->statelabel[DEFAULT]);
-	else
-		 _set_label(data, wd->label);
+   if(wd->statelabel[DEFAULT])
+     _set_label(data, wd->statelabel[DEFAULT]);
+   else
+     _set_label(data, wd->label);
 
    if (wd->timer)
      {
@@ -382,35 +389,34 @@ EAPI void
 elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlState state)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Coord mw, mh;
 
    if (!wd) return;
    if(label == NULL) return;
 
    if(state == UIControlStateDefault)
-	{
-       wd->statetype[DEFAULT] = UIControlStateDefault;
-       eina_stringshare_replace(&wd->statelabel[DEFAULT], label);
-       return;
-   }
+     {
+	wd->statetype[DEFAULT] = UIControlStateDefault;
+	eina_stringshare_replace(&wd->statelabel[DEFAULT], label);
+	return;
+     }
    if(state == UIControlStateHighlighted)
-   {
-       wd->statetype[HIGHLIGHTED] = UIControlStateHighlighted;
-       eina_stringshare_replace(&wd->statelabel[HIGHLIGHTED], label);
-   	return;
-   }
+     {
+	wd->statetype[HIGHLIGHTED] = UIControlStateHighlighted;
+	eina_stringshare_replace(&wd->statelabel[HIGHLIGHTED], label);
+	return;
+     }
    if(state == UIControlStateFocused)
-   {
-       wd->statetype[FOCUSED] = UIControlStateFocused;
-       eina_stringshare_replace(&wd->statelabel[FOCUSED], label);
-   	return;
-   }
+     {
+	wd->statetype[FOCUSED] = UIControlStateFocused;
+	eina_stringshare_replace(&wd->statelabel[FOCUSED], label);
+	return;
+     }
    if(state == UIControlStateDisabled)
-	{
-       wd->statetype[DISABLED] = UIControlStateDisabled;
-       eina_stringshare_replace(&wd->statelabel[DISABLED], label);
-   	return;
-   }
+     {
+	wd->statetype[DISABLED] = UIControlStateDisabled;
+	eina_stringshare_replace(&wd->statelabel[DISABLED], label);
+	return;
+     }
 }
 
 /**
@@ -453,7 +459,7 @@ elm_button_label_get_for_state(const Evas_Object *obj, UIControlState state)
    else if(state == UIControlStateDisabled)
      return wd->statelabel[DISABLED];
    else
-   	return NULL;
+     return NULL;
 }
 
 /**
