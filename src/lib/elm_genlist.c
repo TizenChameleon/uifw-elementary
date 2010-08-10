@@ -361,25 +361,25 @@ struct _Elm_Genlist_Item
 
 struct _Elm_Genlist_GroupItem
 {
-      EINA_INLIST;
-      Widget_Data *wd;
-      Eina_List *items;
-      Evas_Coord x, y, w, h, minw, minh;
-      const Elm_Genlist_Item_Class *itc;
-      const void *data;
-      struct
-      {
-        Evas_Smart_Cb func;
-        const void *data;
-      } func;
+   EINA_INLIST;
+   Widget_Data *wd;
+   Eina_List *items;
+   Evas_Coord x, y, w, h, minw, minh;
+   const Elm_Genlist_Item_Class *itc;
+   const void *data;
+   struct
+     {
+	Evas_Smart_Cb func;
+	const void *data;
+     } func;
 
-      Evas_Object *base;
-      Eina_List *labels, *icons, *states, *icon_objs;
-      int align;
-      Eina_Bool realized : 1;
-      Eina_Bool delete_me : 1;
-      Eina_Bool visible : 1;
-      Eina_Bool mincalcd : 1;
+   Evas_Object *base;
+   Eina_List *labels, *icons, *states, *icon_objs;
+   int align;
+   Eina_Bool realized : 1;
+   Eina_Bool delete_me : 1;
+   Eina_Bool visible : 1;
+   Eina_Bool mincalcd : 1;
 };
 
 struct _Pan
@@ -504,11 +504,11 @@ _item_hilight(Elm_Genlist_Item *it)
    	edje_object_signal_emit(it->base, "elm,state,selected", "elm");
    selectraise = edje_object_data_get(it->base, "selectraise");
    if ((selectraise) && (!strcmp(selectraise, "on")))
-   {
-     evas_object_raise(it->base);
-     if( it->group_item && it->group_item->realized )
-       evas_object_raise(it->group_item->base);
-   }
+     {
+	evas_object_raise(it->base);
+	if( it->group_item && it->group_item->realized )
+	  evas_object_raise(it->group_item->base);
+     }
    it->hilighted = EINA_TRUE;
 }
 
@@ -594,9 +594,9 @@ _item_del(Elm_Genlist_Item *it)
      it->parent->items = eina_list_remove(it->parent->items, it);
    if (it->long_timer) ecore_timer_del(it->long_timer);
    if( it->group_item )
-   {
-       it->group_item->items = eina_list_remove(it->group_item->items,it);
-   }
+     {
+	it->group_item->items = eina_list_remove(it->group_item->items,it);
+     }
    free(it);
 }
 
@@ -650,42 +650,41 @@ _item_unselect(Elm_Genlist_Item *it)
 static void
 _slide_item(Elm_Genlist_Item *it, bool slide_to_left)
 {
-	const Eina_List *l, *l_next;
-	Elm_Genlist_Item *it2;
-	const char *allow_slide;
+   const Eina_List *l, *l_next;
+   Elm_Genlist_Item *it2;
+   const char *allow_slide;
 
-	allow_slide = edje_object_data_get(it->base, "allow_slide");
-	if( !allow_slide )
-		return;
+   allow_slide = edje_object_data_get(it->base, "allow_slide");
+   if( !allow_slide )
+     return;
 
-	if ( atoi(allow_slide) != 1 )
-		return;
+   if ( atoi(allow_slide) != 1 )
+     return;
 
+   if( slide_to_left )
+     {
+	if( !it->menuopened )
+	  edje_object_signal_emit(it->base, "elm,state,slide,left", "elm");
+	it->wd->menuopened = eina_list_append(it->wd->menuopened, it);
 
-	if( slide_to_left )
-	{
-		if( !it->menuopened )
-			edje_object_signal_emit(it->base, "elm,state,slide,left", "elm");
-		it->wd->menuopened = eina_list_append(it->wd->menuopened, it);
+	EINA_LIST_FOREACH(it->wd->menuopened, l, it2)
+	  {
+	     if (it2 != it)
+	       {
+		  it2->menuopened = 0;
+		  edje_object_signal_emit(it2->base, "elm,state,slide,right", "elm");
+		  it2->wd->menuopened = eina_list_remove(it2->wd->menuopened, it2);
+	       }
+	  }
+     }
+   else
+     {
+	if( it->menuopened )
+	  edje_object_signal_emit(it->base, "elm,state,slide,right", "elm");
+	it->wd->menuopened = eina_list_remove(it->wd->menuopened, it);
+     }
 
-		EINA_LIST_FOREACH(it->wd->menuopened, l, it2)
-		{
-			if (it2 != it)
-			{
-				it2->menuopened = 0;
-	  			edje_object_signal_emit(it2->base, "elm,state,slide,right", "elm");
-				it2->wd->menuopened = eina_list_remove(it2->wd->menuopened, it2);
-			}
-		}
-	}
-	else
-	{
-		if( it->menuopened )
-	  		edje_object_signal_emit(it->base, "elm,state,slide,right", "elm");
-		it->wd->menuopened = eina_list_remove(it->wd->menuopened, it);
-	}
-
-	it->menuopened = slide_to_left;
+   it->menuopened = slide_to_left;
 
 }
 
@@ -772,41 +771,41 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
                evas_object_smart_callback_call(it->wd->obj, "drag,start,up", it);
              else
                {
-                  if (dx < 0)
-				  {
-                    evas_object_smart_callback_call(it->wd->obj,
-                                                    "drag,start,left", it);
-					_slide_item( it, 1 );
-				  }
-                  else
-				  {
-                    evas_object_smart_callback_call(it->wd->obj,
-                                                    "drag,start,right", it);
-					_slide_item( it, 0 );
-				  }
-               }
-          }
-        else
+		  if (dx < 0)
+		    {
+		       evas_object_smart_callback_call(it->wd->obj,
+			     "drag,start,left", it);
+		       _slide_item( it, 1 );
+		    }
+		  else
+		    {
+		       evas_object_smart_callback_call(it->wd->obj,
+			     "drag,start,right", it);
+		       _slide_item( it, 0 );
+		    }
+	       }
+	  }
+	else
           {
              if (ady > adx)
                evas_object_smart_callback_call(it->wd->obj,
                                                "drag,start,down", it);
              else
                {
-                  if (dx < 0)
-				  {
-                    evas_object_smart_callback_call(it->wd->obj,
-                                                    "drag,start,left", it);
-					_slide_item( it, 1 );
-				  }
-                  else
-				  {
-                    evas_object_smart_callback_call(it->wd->obj,
-                                                    "drag,start,right", it);
-					_slide_item( it, 0 );
-				  }
-               }
-          }
+		  if (dx < 0)
+		    {
+		       evas_object_smart_callback_call(it->wd->obj,
+			     "drag,start,left", it);
+		       _slide_item( it, 1 );
+		    }
+		  else
+		    {
+		       evas_object_smart_callback_call(it->wd->obj,
+			     "drag,start,right", it);
+		       _slide_item( it, 0 );
+		    }
+	       }
+	  }
      }
 }
 
@@ -830,10 +829,10 @@ _multi_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    Evas_Coord dx, dy, adx, ady;
 
    if (it->long_timer)
-   {
-        ecore_timer_del(it->long_timer);
-        it->long_timer = NULL;
-   }
+     {
+	ecore_timer_del(it->long_timer);
+	it->long_timer = NULL;
+     }
 
    dx = it->wd->td1_x - ev->canvas.x;
    adx = dx;
@@ -857,7 +856,7 @@ _multi_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Elm_Genlist_Item *it = data;
    Evas_Event_Multi_Up *ev = event_info;
-   Evas_Coord x, y, dy, uy, ady, auy;
+   Evas_Coord dy, uy, ady, auy;
 
    fprintf(stderr, "\n MULTI_UP - x= %d, y= %d down= %d multi_down= %d\n", ev->canvas.x, ev->canvas.y, it->down, it->wd->multi_down);
 
@@ -871,58 +870,58 @@ _multi_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
    it->wd->d2_y = ev->canvas.y - it->wd->td2_y;
 
    if (it->down)
-   {
+     {
 	it->wd->multi_touch = EINA_TRUE;
-   }
+     }
    else
-   {
-        fprintf(stderr, "CHECK d1_x= %d, d2_x= %d, d1_y= %d, d2_y= %d\n", it->wd->d1_x, it->wd->d2_x, it->wd->d1_y, it->wd->d2_y);
+     {
+	fprintf(stderr, "CHECK d1_x= %d, d2_x= %d, d1_y= %d, d2_y= %d\n", it->wd->d1_x, it->wd->d2_x, it->wd->d1_y, it->wd->d2_y);
 
 	if ( (it->wd->d1_x > 180) && (it->wd->d2_x > 180) )
-	{
-	   // Two finger : Left -> Right
-	   fprintf(stderr, "L->R acc_y1= %d, acc_y2= %d\n", it->wd->acc_y1, it->wd->acc_y2);
-	   if (it->wd->acc_y1 < 200 && it->wd->acc_y2 < 200)
-		evas_object_smart_callback_call(it->wd->obj, "multi_touch,left,right", it);
-	}
+	  {
+	     // Two finger : Left -> Right
+	     fprintf(stderr, "L->R acc_y1= %d, acc_y2= %d\n", it->wd->acc_y1, it->wd->acc_y2);
+	     if (it->wd->acc_y1 < 200 && it->wd->acc_y2 < 200)
+	       evas_object_smart_callback_call(it->wd->obj, "multi_touch,left,right", it);
+	  }
 	else if ( (it->wd->d1_y > 180) && (it->wd->d2_y > 180) )
-	{
-	   // Two finger : Top -> Bottom
-	   fprintf(stderr, "T->B acc_x1= %d, acc_x2= %d\n", it->wd->acc_x1, it->wd->acc_x2);
-	   if (it->wd->acc_x1 < 200 && it->wd->acc_x2 < 200)
-		evas_object_smart_callback_call(it->wd->obj, "multi_touch,top,bottom", it);
-	}
+	  {
+	     // Two finger : Top -> Bottom
+	     fprintf(stderr, "T->B acc_x1= %d, acc_x2= %d\n", it->wd->acc_x1, it->wd->acc_x2);
+	     if (it->wd->acc_x1 < 200 && it->wd->acc_x2 < 200)
+	       evas_object_smart_callback_call(it->wd->obj, "multi_touch,top,bottom", it);
+	  }
 	else
-	{
-	   dy = it->wd->td1_y - it->wd->td2_y;
-	   if (dy < 0)
-	     ady = -dy;
-	   else
-	     ady = dy;
-
-	  uy = it->wd->tu1_y - it->wd->tu2_y;
-	  if (uy < 0)
-	    auy = -uy;
-	  else
-	    auy = uy;
-
-	  if (auy < ady)
 	  {
-		if (auy < ady*0.4)
-		{
-		  // Two finger : Pinch Out
-		  evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,out", it);
-		}
+	     dy = it->wd->td1_y - it->wd->td2_y;
+	     if (dy < 0)
+	       ady = -dy;
+	     else
+	       ady = dy;
+
+	     uy = it->wd->tu1_y - it->wd->tu2_y;
+	     if (uy < 0)
+	       auy = -uy;
+	     else
+	       auy = uy;
+
+	     if (auy < ady)
+	       {
+		  if (auy < ady*0.4)
+		    {
+		       // Two finger : Pinch Out
+		       evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,out", it);
+		    }
+	       }
+	     else
+	       {
+		  if (ady < auy*0.4)
+		    {
+		       // Two finger : Pinch In
+		       evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,in", it);
+		    }
+	       }
 	  }
-	  else
-	  {
-		if (ady < auy*0.4)
-		{
-		  // Two finger : Pinch In
-		  evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,in", it);
-		}
-	  }
-	}
 
 	it->wd->acc_x1 = 0;
 	it->wd->acc_y1 = 0;
@@ -930,7 +929,7 @@ _multi_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 	it->wd->acc_y2 = 0;
 	it->wd->prev_multi_x = 0;
 	it->wd->prev_multi_y = 0;
-   }
+     }
 }
 
 static void
@@ -941,23 +940,23 @@ _multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    Evas_Coord acc_x, acc_y;
 
    if (it->wd->prev_multi_x == 0)
-   {
-     it->wd->prev_multi_x = ev->cur.canvas.x;
-     it->wd->prev_multi_y = ev->cur.canvas.y;
-     return;
-   }
+     {
+	it->wd->prev_multi_x = ev->cur.canvas.x;
+	it->wd->prev_multi_y = ev->cur.canvas.y;
+	return;
+     }
 
    acc_x = it->wd->prev_multi_x - ev->cur.canvas.x;
    if (acc_x < 0)
-	it->wd->acc_x2 = it->wd->acc_x2 - acc_x;
+     it->wd->acc_x2 = it->wd->acc_x2 - acc_x;
    else
-	it->wd->acc_x2 = it->wd->acc_x2 + acc_x;
+     it->wd->acc_x2 = it->wd->acc_x2 + acc_x;
 
    acc_y = it->wd->prev_multi_y - ev->cur.canvas.y;
    if (acc_y < 0)
-	it->wd->acc_y2 = it->wd->acc_y2 - acc_y;
+     it->wd->acc_y2 = it->wd->acc_y2 - acc_y;
    else
-	it->wd->acc_y2 = it->wd->acc_y2 + acc_y;
+     it->wd->acc_y2 = it->wd->acc_y2 + acc_y;
 
    it->wd->prev_multi_x = ev->cur.canvas.x;
    it->wd->prev_multi_y = ev->cur.canvas.y;
@@ -1000,7 +999,7 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    Elm_Genlist_Item *it = data;
    Evas_Event_Mouse_Up *ev = event_info;
    Eina_Bool dragged = EINA_FALSE;
-   Evas_Coord x, y, dy, uy, ady, auy;
+   Evas_Coord dy, uy, ady, auy;
 
    if (ev->button != 1) return;
    it->down = 0;
@@ -1013,53 +1012,53 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    it->wd->d1_y = ev->canvas.y - it->wd->td1_y;
 
    if (it->wd->multi_down == 0 && it->wd->multi_touch == EINA_TRUE)
-   {
+     {
 	if ( (it->wd->d1_x > 180) && (it->wd->d2_x > 180) )
-	{
-	   // Two finger : Left -> Right
-	   fprintf(stderr, "L->R acc_y1= %d, acc_y2= %d\n", it->wd->acc_y1, it->wd->acc_y2);
-	   if (it->wd->acc_y1 < 200 && it->wd->acc_y2 < 200)
-		evas_object_smart_callback_call(it->wd->obj, "multi_touch,left,right", it);
-	}
+	  {
+	     // Two finger : Left -> Right
+	     fprintf(stderr, "L->R acc_y1= %d, acc_y2= %d\n", it->wd->acc_y1, it->wd->acc_y2);
+	     if (it->wd->acc_y1 < 200 && it->wd->acc_y2 < 200)
+	       evas_object_smart_callback_call(it->wd->obj, "multi_touch,left,right", it);
+	  }
 	else if ( (it->wd->d1_y > 180) && (it->wd->d2_y > 180) )
-	{
-	   // Two finger : Top -> Bottom
-	   fprintf(stderr, "T->B acc_x1= %d, acc_x2= %d\n", it->wd->acc_x1, it->wd->acc_x2);
-	   if (it->wd->acc_x1 < 200 && it->wd->acc_x2 < 200)
-		evas_object_smart_callback_call(it->wd->obj, "multi_touch,top,bottom", it);
-	}
+	  {
+	     // Two finger : Top -> Bottom
+	     fprintf(stderr, "T->B acc_x1= %d, acc_x2= %d\n", it->wd->acc_x1, it->wd->acc_x2);
+	     if (it->wd->acc_x1 < 200 && it->wd->acc_x2 < 200)
+	       evas_object_smart_callback_call(it->wd->obj, "multi_touch,top,bottom", it);
+	  }
 	else
-	{
-	   dy = it->wd->td1_y - it->wd->td2_y;
-	   if (dy < 0)
-	     ady = -dy;
-	   else
-	     ady = dy;
-
-	  uy = it->wd->tu1_y - it->wd->tu2_y;
-	  if (uy < 0)
-	    auy = -uy;
-	  else
-	    auy = uy;
-
-	  if (auy < ady)
 	  {
-		if (auy < ady*0.4)
-		{
-		  // Two finger : Pinch Out
-		  evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,out", it);
-		}
-	  }
-	  else
-	  {
-		if (ady < auy*0.4)
-		{
-		  // Two finger : Pinch In
-		  evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,in", it);
-		}
-	  }
+	     dy = it->wd->td1_y - it->wd->td2_y;
+	     if (dy < 0)
+	       ady = -dy;
+	     else
+	       ady = dy;
 
-	}
+	     uy = it->wd->tu1_y - it->wd->tu2_y;
+	     if (uy < 0)
+	       auy = -uy;
+	     else
+	       auy = uy;
+
+	     if (auy < ady)
+	       {
+		  if (auy < ady*0.4)
+		    {
+		       // Two finger : Pinch Out
+		       evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,out", it);
+		    }
+	       }
+	     else
+	       {
+		  if (ady < auy*0.4)
+		    {
+		       // Two finger : Pinch In
+		       evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,in", it);
+		    }
+	       }
+
+	  }
 
 	it->wd->acc_x1 = 0;
 	it->wd->acc_y1 = 0;
@@ -1068,7 +1067,7 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
 	it->wd->prev_multi_x = 0;
 	it->wd->prev_multi_y = 0;
 	it->wd->multi_down = 0;
-   }
+     }
 
    it->wd->multi_touch = EINA_FALSE;
 
@@ -1076,18 +1075,18 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    else it->wd->on_hold = EINA_FALSE;
    if (it->long_timer)
      {
-        ecore_timer_del(it->long_timer);
-        it->long_timer = NULL;
+	ecore_timer_del(it->long_timer);
+	it->long_timer = NULL;
      }
    if (it->dragging)
      {
-        it->dragging = 0;
-        evas_object_smart_callback_call(it->wd->obj, "drag,stop", it);
-        dragged = 1;
+	it->dragging = 0;
+	evas_object_smart_callback_call(it->wd->obj, "drag,stop", it);
+	dragged = 1;
      }
    if (it->wd->on_hold)
      {
-        it->wd->longpressed = EINA_FALSE;
+	it->wd->longpressed = EINA_FALSE;
 	it->wd->on_hold = EINA_FALSE;
 	return;
      }
@@ -1175,110 +1174,110 @@ _signal_contract(void *data, Evas_Object *obj __UNUSED__, const char *emission _
 static void
 _set_groupitem( Elm_Genlist_Item *it, Elm_Genlist_GroupItem *git)
 {
-  if(it && git )
-  {
-    it->group_item = git;
-    git->items = eina_list_append(git->items, it);
-  }
+   if(it && git )
+     {
+	it->group_item = git;
+	git->items = eina_list_append(git->items, it);
+     }
 }
 
 static void
 _groupitem_realize(Elm_Genlist_GroupItem *git)
 {
-      char buf[1024];
-      const char *align;
+   char buf[1024];
+   const char *align;
 
-      if ((git->realized) || (git->delete_me)) return;
-      git->base = edje_object_add(evas_object_evas_get(git->wd->obj));
-      edje_object_scale_set(git->base, elm_widget_scale_get(git->wd->obj) *
-                                               _elm_config->scale);
-      evas_object_smart_member_add(git->base, git->wd->pan_smart);
-      elm_widget_sub_object_add(git->wd->obj, git->base);
+   if ((git->realized) || (git->delete_me)) return;
+   git->base = edje_object_add(evas_object_evas_get(git->wd->obj));
+   edje_object_scale_set(git->base, elm_widget_scale_get(git->wd->obj) *
+	 _elm_config->scale);
+   evas_object_smart_member_add(git->base, git->wd->pan_smart);
+   elm_widget_sub_object_add(git->wd->obj, git->base);
 
-      strncpy(buf, "item/", sizeof(buf));
-      strncat(buf, git->itc->item_style, sizeof(buf) - strlen(buf));
-      _elm_theme_object_set(git->wd->obj, git->base, "genlist", buf, elm_widget_style_get(git->wd->obj));
+   strncpy(buf, "item/", sizeof(buf));
+   strncat(buf, git->itc->item_style, sizeof(buf) - strlen(buf));
+   _elm_theme_object_set(git->wd->obj, git->base, "genlist", buf, elm_widget_style_get(git->wd->obj));
 
-      align = edje_object_data_get(git->base, "orientation");
-      git->align = GROUP_ALIGN_NORTH;
-      if(align)
-      {
-          if( !strcmp(align, "top") )
-                  git->align = GROUP_ALIGN_NORTH;
-          else if( !strcmp(align, "left") )
-                  git->align = GROUP_ALIGN_WEST;
-          else git->align = GROUP_ALIGN_NORTH;
-      }
+   align = edje_object_data_get(git->base, "orientation");
+   git->align = GROUP_ALIGN_NORTH;
+   if(align)
+     {
+	if( !strcmp(align, "top") )
+	  git->align = GROUP_ALIGN_NORTH;
+	else if( !strcmp(align, "left") )
+	  git->align = GROUP_ALIGN_WEST;
+	else git->align = GROUP_ALIGN_NORTH;
+     }
 
-      if (git->itc->func.label_get)
-      {
-          const Eina_List *l;
-          const char *key;
+   if (git->itc->func.label_get)
+     {
+	const Eina_List *l;
+	const char *key;
 
-          git->labels = _elm_stringlist_get(edje_object_data_get(git->base, "labels"));
-          EINA_LIST_FOREACH(git->labels, l, key)
-          {
-                char *s = git->itc->func.label_get(git->data, git->wd->obj, l->data);
+	git->labels = _elm_stringlist_get(edje_object_data_get(git->base, "labels"));
+	EINA_LIST_FOREACH(git->labels, l, key)
+	  {
+	     char *s = git->itc->func.label_get(git->data, git->wd->obj, l->data);
 
-                if (s)
-                {
-                   edje_object_part_text_set(git->base, l->data, s);
-                   free(s);
-                }
-          }
-      }
+	     if (s)
+	       {
+		  edje_object_part_text_set(git->base, l->data, s);
+		  free(s);
+	       }
+	  }
+     }
 
-      if (git->itc->func.icon_get)
-      {
-          const Eina_List *l;
-          const char *key;
+   if (git->itc->func.icon_get)
+     {
+	const Eina_List *l;
+	const char *key;
 
-          git->icons = _elm_stringlist_get(edje_object_data_get(git->base, "icons"));
-          EINA_LIST_FOREACH(git->icons, l, key)
-          {
-                Evas_Object *ic = git->itc->func.icon_get(git->data, git->wd->obj, l->data);
+	git->icons = _elm_stringlist_get(edje_object_data_get(git->base, "icons"));
+	EINA_LIST_FOREACH(git->icons, l, key)
+	  {
+	     Evas_Object *ic = git->itc->func.icon_get(git->data, git->wd->obj, l->data);
 
-                if (ic)
-                {
-                   git->icon_objs = eina_list_append(git->icon_objs, ic);
-                   edje_object_part_swallow(git->base, key, ic);
-                   evas_object_show(ic);
-                   elm_widget_sub_object_add(git->wd->obj, ic);
-                }
-          }
+	     if (ic)
+	       {
+		  git->icon_objs = eina_list_append(git->icon_objs, ic);
+		  edje_object_part_swallow(git->base, key, ic);
+		  evas_object_show(ic);
+		  elm_widget_sub_object_add(git->wd->obj, ic);
+	       }
+	  }
 
-      }
-      if (git->itc->func.state_get)
-      {
-          const Eina_List *l;
-          const char *key;
+     }
+   if (git->itc->func.state_get)
+     {
+	const Eina_List *l;
+	const char *key;
 
-          git->states = _elm_stringlist_get(edje_object_data_get(git->base, "states"));
-          EINA_LIST_FOREACH(git->states, l, key)
-          {
-                Eina_Bool on = git->itc->func.state_get(git->data, git->wd->obj, l->data);
+	git->states = _elm_stringlist_get(edje_object_data_get(git->base, "states"));
+	EINA_LIST_FOREACH(git->states, l, key)
+	  {
+	     Eina_Bool on = git->itc->func.state_get(git->data, git->wd->obj, l->data);
 
-                if (on)
-                {
-                   snprintf(buf, sizeof(buf), "elm,state,%s,active", key);
-                   edje_object_signal_emit(git->base, buf, "elm");
-                }
-          }
-      }
-      if (!git->mincalcd)
-      {
-          Evas_Coord mw = -1, mh = -1;
+	     if (on)
+	       {
+		  snprintf(buf, sizeof(buf), "elm,state,%s,active", key);
+		  edje_object_signal_emit(git->base, buf, "elm");
+	       }
+	  }
+     }
+   if (!git->mincalcd)
+     {
+	Evas_Coord mw = -1, mh = -1;
 
-          edje_object_size_min_restricted_calc(git->base, &mw, &mh, mw, mh);
+	edje_object_size_min_restricted_calc(git->base, &mw, &mh, mw, mh);
 
-          git->w = git->minw = mw;
-          git->h = git->minh = mh;
-          git->mincalcd = EINA_TRUE;
-      }
-      git->y = git->y = -1;
-      evas_object_show(git->base);
+	git->w = git->minw = mw;
+	git->h = git->minh = mh;
+	git->mincalcd = EINA_TRUE;
+     }
+   git->y = git->y = -1;
+   evas_object_show(git->base);
 
-     git->realized = EINA_TRUE;
+   git->realized = EINA_TRUE;
 }
 
 
@@ -1747,11 +1746,9 @@ static void
 _reorder_mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
   Elm_Genlist_Item *it = data;
-  Elm_Genlist_Item *rel_it;
 
   if( it->reordering && it->wd->ed->reorder_item )
      {
-       int ox,oy;
        it->wd->ed->reorder_item->reordering = 0;
        edje_object_signal_emit(it->wd->ed->reorder_item->edit_obj, "elm,action,item,reorder_end", "elm");
        elm_smart_scroller_hold_set(it->wd->scr, EINA_FALSE);
@@ -1775,21 +1772,20 @@ _reorder_mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *e
   Evas_Event_Mouse_Move *ev = event_info;
 
   if( it->reordering && it->wd->ed->reorder_item )
-  {
-      Elm_Genlist_Item *rel_it;
-      int y = ev->cur.canvas.y - it->wd->ed->reorder_item->dy;
-      evas_object_raise(it->wd->ed->reorder_item->base);
-      evas_object_move(it->wd->ed->reorder_item->base, it->wd->ed->reorder_item->scrl_x+it->pad_left, y);
-      evas_object_show(it->wd->ed->reorder_item->base);
-      _move_edit_controls( it,it->wd->ed->reorder_item->scrl_x, y );
+    {
+       int y = ev->cur.canvas.y - it->wd->ed->reorder_item->dy;
+       evas_object_raise(it->wd->ed->reorder_item->base);
+       evas_object_move(it->wd->ed->reorder_item->base, it->wd->ed->reorder_item->scrl_x+it->pad_left, y);
+       evas_object_show(it->wd->ed->reorder_item->base);
+       _move_edit_controls( it,it->wd->ed->reorder_item->scrl_x, y );
 
-        it->block->updateme = EINA_TRUE;
+       it->block->updateme = EINA_TRUE;
 
-        if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
-         it->wd->calc_job = ecore_job_add(_calc_job, it->wd);
+       if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
+       it->wd->calc_job = ecore_job_add(_calc_job, it->wd);
 
-      return;
-  }
+       return;
+    }
 }
 
 static void
@@ -1820,155 +1816,158 @@ _edit_controls_eval( Elm_Genlist_Item *it )
      itmode &= it->wd->edit_mode;
 
      if( !it->edit_obj )
-     {
-       it->edit_obj = edje_object_add(evas_object_evas_get(it->wd->obj));
-       edje_object_scale_set(it->edit_obj, elm_widget_scale_get(it->wd->obj) *
-                            _elm_config->scale);
-       evas_object_smart_member_add(it->edit_obj, it->wd->pan_smart);
-       elm_widget_sub_object_add(it->wd->obj, it->edit_obj);
-       _elm_theme_object_set(it->wd->obj, it->edit_obj, "genlist", "item/edit_control", elm_widget_style_get(it->wd->obj));
+       {
+	  it->edit_obj = edje_object_add(evas_object_evas_get(it->wd->obj));
+	  edje_object_scale_set(it->edit_obj, elm_widget_scale_get(it->wd->obj) *
+		_elm_config->scale);
+	  evas_object_smart_member_add(it->edit_obj, it->wd->pan_smart);
+	  elm_widget_sub_object_add(it->wd->obj, it->edit_obj);
+	  _elm_theme_object_set(it->wd->obj, it->edit_obj, "genlist", "item/edit_control", elm_widget_style_get(it->wd->obj));
 
-       edje_object_signal_callback_add(it->edit_obj, "elm,action,edit,reset",
+	  edje_object_signal_callback_add(it->edit_obj, "elm,action,edit,reset",
                                              "elm", _edit_mode_reset, it);
-     }
+       }
 
        pad_str = edje_object_data_get(it->edit_obj, "icon_width");
        if (pad_str) pad = atoi(pad_str);
 
        if( (itmode & ELM_GENLIST_EDIT_MODE_INSERT) )
-       {
-           if(it->wd->animate_edit_controls)
-             edje_object_signal_emit(it->edit_obj, "elm,state,ins,animated,enable", "elm");
-           else
-             edje_object_signal_emit(it->edit_obj, "elm,state,ins,enable", "elm");
+	 {
+	    if(it->wd->animate_edit_controls)
+	      edje_object_signal_emit(it->edit_obj, "elm,state,ins,animated,enable", "elm");
+	    else
+	      edje_object_signal_emit(it->edit_obj, "elm,state,ins,enable", "elm");
 
-           edje_object_signal_callback_add(it->edit_obj, "elm,action,item,insert",
+	    edje_object_signal_callback_add(it->edit_obj, "elm,action,item,insert",
                                                 "elm", _insert_new_item_cb, it);
-           it->pad_left += pad;
-       }else
-       {
-          if(it->wd->animate_edit_controls)
-            edje_object_signal_emit(it->edit_obj, "elm,state,ins,animated,disable", "elm");
-          else
-            edje_object_signal_emit(it->edit_obj, "elm,state,ins,disable", "elm");
+	    it->pad_left += pad;
+	 }
+       else
+	 {
+	    if(it->wd->animate_edit_controls)
+	      edje_object_signal_emit(it->edit_obj, "elm,state,ins,animated,disable", "elm");
+	    else
+	      edje_object_signal_emit(it->edit_obj, "elm,state,ins,disable", "elm");
 
-          edje_object_signal_callback_del(it->edit_obj, "elm,action,item,insert",
+	    edje_object_signal_callback_del(it->edit_obj, "elm,action,item,insert",
                                             "elm", _insert_new_item_cb );
-       }
+	 }
 
        if( (itmode & ELM_GENLIST_EDIT_MODE_DELETE) )
-       {
-           if(it->wd->animate_edit_controls)
-             edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,enable", "elm");
-           else
-             edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
+	 {
+	    if(it->wd->animate_edit_controls)
+	      edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,enable", "elm");
+	    else
+	      edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
 
-           edje_object_signal_callback_add(it->edit_obj, "elm,action,item,delete",
-                                                 "elm", _remove_item_cb, it);
+	    edje_object_signal_callback_add(it->edit_obj, "elm,action,item,delete",
+		  "elm", _remove_item_cb, it);
 
-           edje_object_signal_callback_add(it->edit_obj, "elm,action,hide,del_confirm",
-                                           "elm", _hide_delete_confirm_object, it );
-           it->pad_left += pad;
-       }
+	    edje_object_signal_callback_add(it->edit_obj, "elm,action,hide,del_confirm",
+		  "elm", _hide_delete_confirm_object, it );
+	    it->pad_left += pad;
+	 }
        else
-       {
-           if(it->wd->animate_edit_controls)
-             edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,disable", "elm");
-           else
-             edje_object_signal_emit(it->edit_obj, "elm,state,del,disable", "elm");
+	 {
+	    if(it->wd->animate_edit_controls)
+	      edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,disable", "elm");
+	    else
+	      edje_object_signal_emit(it->edit_obj, "elm,state,del,disable", "elm");
 
-           edje_object_signal_callback_del(it->edit_obj, "elm,action,item,delete",
-                                                 "elm", _remove_item_cb );
-           edje_object_signal_callback_del(it->edit_obj, "elm,action,hide,del_confirm",
-                                                  "elm", _hide_delete_confirm_object );
+	    edje_object_signal_callback_del(it->edit_obj, "elm,action,item,delete",
+		  "elm", _remove_item_cb );
+	    edje_object_signal_callback_del(it->edit_obj, "elm,action,hide,del_confirm",
+		  "elm", _hide_delete_confirm_object );
 
-       }
+	 }
 
        if( (itmode & ELM_GENLIST_EDIT_MODE_REORDER) )
-       {
-           Evas_Object *reorder_icon;
-           const char* reorder_part;
+	 {
+	    Evas_Object *reorder_icon;
+	    const char* reorder_part;
 
-           if(it->wd->animate_edit_controls)
-             edje_object_signal_emit(it->edit_obj, "elm,state,reorder,animated,enable", "elm");
-           else
-             edje_object_signal_emit(it->edit_obj, "elm,state,reorder,enable", "elm");
+	    if(it->wd->animate_edit_controls)
+	      edje_object_signal_emit(it->edit_obj, "elm,state,reorder,animated,enable", "elm");
+	    else
+	      edje_object_signal_emit(it->edit_obj, "elm,state,reorder,enable", "elm");
 
-           reorder_part = edje_object_data_get(it->edit_obj, "reorder");
-           if( reorder_part && edje_object_part_exists(it->edit_obj, reorder_part ) )
-           {
-             reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part );
+	    reorder_part = edje_object_data_get(it->edit_obj, "reorder");
+	    if( reorder_part && edje_object_part_exists(it->edit_obj, reorder_part ) )
+	      {
+		 reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part );
 
-             evas_object_event_callback_add(reorder_icon, EVAS_CALLBACK_MOUSE_DOWN,
-                                         _reorder_mouse_down, it);
-             evas_object_event_callback_add(reorder_icon, EVAS_CALLBACK_MOUSE_UP,
-                                          _reorder_mouse_up, it);
-             evas_object_event_callback_add(reorder_icon, EVAS_CALLBACK_MOUSE_MOVE,
-                                          _reorder_mouse_move, it);
-           }
-           it->pad_right += pad;
-        }
+		 evas_object_event_callback_add(reorder_icon, EVAS_CALLBACK_MOUSE_DOWN,
+		       _reorder_mouse_down, it);
+		 evas_object_event_callback_add(reorder_icon, EVAS_CALLBACK_MOUSE_UP,
+		       _reorder_mouse_up, it);
+		 evas_object_event_callback_add(reorder_icon, EVAS_CALLBACK_MOUSE_MOVE,
+		       _reorder_mouse_move, it);
+	      }
+	    it->pad_right += pad;
+	 }
        else
-       {
-            Evas_Object *reorder_icon;
-            const char* reorder_part;
+	 {
+	    Evas_Object *reorder_icon;
+	    const char* reorder_part;
 
-            if(it->wd->animate_edit_controls)
-              edje_object_signal_emit(it->edit_obj, "elm,state,reorder,animated,disable", "elm");
-            else
-              edje_object_signal_emit(it->edit_obj, "elm,state,reorder,disable", "elm");
+	    if(it->wd->animate_edit_controls)
+	      edje_object_signal_emit(it->edit_obj, "elm,state,reorder,animated,disable", "elm");
+	    else
+	      edje_object_signal_emit(it->edit_obj, "elm,state,reorder,disable", "elm");
 
-            reorder_part = edje_object_data_get(it->edit_obj, "reorder");
-            if( reorder_part && edje_object_part_exists(it->edit_obj, reorder_part ) )
-            {
-              reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part );
+	    reorder_part = edje_object_data_get(it->edit_obj, "reorder");
+	    if( reorder_part && edje_object_part_exists(it->edit_obj, reorder_part ) )
+	      {
+		 reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part );
 
-              evas_object_event_callback_del(reorder_icon, EVAS_CALLBACK_MOUSE_DOWN,
-                                          _reorder_mouse_down);
-              evas_object_event_callback_del(reorder_icon, EVAS_CALLBACK_MOUSE_UP,
-                                           _reorder_mouse_up);
-              evas_object_event_callback_del(reorder_icon, EVAS_CALLBACK_MOUSE_MOVE,
-                                           _reorder_mouse_move);
-            }
-       }
+		 evas_object_event_callback_del(reorder_icon, EVAS_CALLBACK_MOUSE_DOWN,
+		       _reorder_mouse_down);
+		 evas_object_event_callback_del(reorder_icon, EVAS_CALLBACK_MOUSE_UP,
+		       _reorder_mouse_up);
+		 evas_object_event_callback_del(reorder_icon, EVAS_CALLBACK_MOUSE_MOVE,
+		       _reorder_mouse_move);
+	      }
+	 }
 
-     if( it->wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE )//Unrealize
-     {
-         evas_object_del(it->edit_obj);
-         it->edit_obj = NULL;
-         return;
-     }
-     _move_edit_controls(it,it->scrl_x, it->scrl_y );
-     evas_object_show( it->edit_obj );
+       if( it->wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE )//Unrealize
+	 {
+	    evas_object_del(it->edit_obj);
+	    it->edit_obj = NULL;
+	    return;
+	 }
+       _move_edit_controls(it,it->scrl_x, it->scrl_y );
+       evas_object_show( it->edit_obj );
 }
 
 static void
 _notify_item_position( Elm_Genlist_Item *it )
 {
    const Eina_List *l;
-    if( it->parent )
-    {
-        l = eina_list_last(it->parent->items);
+   if( it->parent )
+     {
+	l = eina_list_last(it->parent->items);
 
-        //Check if the Item is First Node or Last node of its Parent & raise signal.
-        if( it->parent->items->data != it &&  l->data != it )
-        {
-          edje_object_signal_emit(it->base, "normal_item", "elm");
-        } else {
-          if(it->parent->items->data == it )
-               edje_object_signal_emit(it->base, "first_item", "elm");
+	//Check if the Item is First Node or Last node of its Parent & raise signal.
+	if( it->parent->items->data != it &&  l->data != it )
+	  {
+	     edje_object_signal_emit(it->base, "normal_item", "elm");
+	  } 
+	else 
+	  {
+	     if(it->parent->items->data == it )
+	       edje_object_signal_emit(it->base, "first_item", "elm");
 
-          if(l->data == it )
-               edje_object_signal_emit(it->base, "last_item", "elm");
-        }
-    }
+	     if(l->data == it )
+	       edje_object_signal_emit(it->base, "last_item", "elm");
+	  }
+     }
 }
 
 
 static int
 _get_space_for_reorder_item( Elm_Genlist_Item *it )
 {
-  int top=0, bottom=0;
+  int top=0;
   Evas_Coord rox, roy, row, roh;
 
   if( !(it->wd->edit_mode & ELM_GENLIST_EDIT_MODE_REORDER ) || !it->wd->ed->reorder_item )
@@ -1980,11 +1979,11 @@ _get_space_for_reorder_item( Elm_Genlist_Item *it )
                              rox, roy+roh/2, row, 1));
 
   if( top )
-  {
-    it->wd->ed->reorder_rel = it;
-    it->scrl_y+=it->wd->ed->reorder_item->h;
-    return it->wd->ed->reorder_item->h;
-  }
+    {
+       it->wd->ed->reorder_rel = it;
+       it->scrl_y+=it->wd->ed->reorder_item->h;
+       return it->wd->ed->reorder_item->h;
+    }
 
   return 0;
 }
@@ -1996,7 +1995,7 @@ _item_block_position(Item_Block *itb, int in)
    Elm_Genlist_Item *it;
    Elm_Genlist_GroupItem *git = NULL;
    Evas_Coord y = 0, ox, oy, ow, oh, cvx, cvy, cvw, cvh;
-   int vis=0, new_mov_y = 0;
+   int vis=0;
 
    evas_object_geometry_get(itb->wd->pan_smart, &ox, &oy, &ow, &oh);
    evas_output_viewport_get(evas_object_evas_get(itb->wd->obj), &cvx, &cvy, &cvw, &cvh);
@@ -2380,21 +2379,21 @@ _pan_calculate(Evas_Object *obj)
 	in += itb->count;
      }
    EINA_INLIST_FOREACH(sd->wd->group_items, git)
-   {
-       if( git->visible )
-       {
-         evas_object_raise(git->base);
-         evas_object_resize( git->base, git->w, git->h-1 );
-         evas_object_move(git->base, git->x, git->y );
-         evas_object_show(git->base);
-       }
-       else
-         evas_object_hide(git->base);
-   }
+     {
+	if( git->visible )
+	  {
+	     evas_object_raise(git->base);
+	     evas_object_resize( git->base, git->w, git->h-1 );
+	     evas_object_move(git->base, git->x, git->y );
+	     evas_object_show(git->base);
+	  }
+	else
+	  evas_object_hide(git->base);
+     }
    if( (sd->wd->edit_mode & ELM_GENLIST_EDIT_MODE_REORDER ) && (sd->wd->ed->reorder_item ) )
-   {
-     evas_object_raise(sd->wd->ed->reorder_item->base);
-     evas_object_raise(sd->wd->ed->reorder_item->edit_obj);
+     {
+	evas_object_raise(sd->wd->ed->reorder_item->base);
+	evas_object_raise(sd->wd->ed->reorder_item->edit_obj);
      }
 }
 
@@ -2798,22 +2797,22 @@ _item_idler(void *data)
 static void
 _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
 {
-        Item_Block *itb;
+   Item_Block *itb;
 
-        // Add the initial set of Items directly to the Blocks, to show the genlist
-        // without empty screen.
-        itb = (Item_Block *)(wd->blocks);
-        if( (NULL == itb) || (itb->count < wd->max_items_per_block) )
-        {
-                _item_block_add(wd, it);
-        }
-        else
-        {
-                if (it->queued) return;
-                if (!wd->queue_idler) wd->queue_idler = ecore_idler_add(_item_idler, wd);
-                it->queued = EINA_TRUE;
-                wd->queue = eina_list_append(wd->queue, it);
-        }
+   // Add the initial set of Items directly to the Blocks, to show the genlist
+   // without empty screen.
+   itb = (Item_Block *)(wd->blocks);
+   if( (NULL == itb) || (itb->count < wd->max_items_per_block) )
+     {
+	_item_block_add(wd, it);
+     }
+   else
+     {
+	if (it->queued) return;
+	if (!wd->queue_idler) wd->queue_idler = ecore_idler_add(_item_idler, wd);
+	it->queued = EINA_TRUE;
+	wd->queue = eina_list_append(wd->queue, it);
+     }
 }
 
 #endif
@@ -2942,27 +2941,27 @@ elm_genlist_item_append_with_group(Evas_Object *obj, const Elm_Genlist_Item_Clas
     if (!wd) return NULL;
     if (!it) return NULL;
     if (!it->parent)
-    {
-      wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
-      it->rel = NULL;
-      it->before = 0;
-    }
+      {
+	 wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
+	 it->rel = NULL;
+	 it->before = 0;
+      }
     else
-    {
-      Elm_Genlist_Item *it2 = NULL;
-      Eina_List *ll = eina_list_last(it->parent->items);
-      if (ll) it2 = ll->data;
-      it->parent->items = eina_list_append(it->parent->items, it);
-      if (!it2) it2 = it->parent;
-      wd->items =
-        eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
-                                    EINA_INLIST_GET(it2));
-      if( it->parent->group_item)
-        _set_groupitem( it, it->parent->group_item );
-      it->rel = it2;
-      it->rel->relcount++;
-      it->before = 0;
-    }
+      {
+	 Elm_Genlist_Item *it2 = NULL;
+	 Eina_List *ll = eina_list_last(it->parent->items);
+	 if (ll) it2 = ll->data;
+	 it->parent->items = eina_list_append(it->parent->items, it);
+	 if (!it2) it2 = it->parent;
+	 wd->items =
+	    eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
+		  EINA_INLIST_GET(it2));
+	 if( it->parent->group_item)
+	   _set_groupitem( it, it->parent->group_item );
+	 it->rel = it2;
+	 it->rel->relcount++;
+	 it->before = 0;
+      }
     _set_groupitem( it, git );
     _item_queue(wd, it);
     return it;
@@ -3105,14 +3104,14 @@ elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after )
 
   if( after)
     {
-    it->wd->items = eina_inlist_prepend_relative(it->wd->items, EINA_INLIST_GET(it),
+       it->wd->items = eina_inlist_prepend_relative(it->wd->items, EINA_INLIST_GET(it),
                                                  EINA_INLIST_GET(after));
-     it->rel = after;
-      it->rel->relcount++;
+       it->rel = after;
+       it->rel->relcount++;
     }
   else
-  {
-      it->wd->items = eina_inlist_prepend(it->wd->items, EINA_INLIST_GET(it));
+    {
+       it->wd->items = eina_inlist_prepend(it->wd->items, EINA_INLIST_GET(it));
     }
 
     it->before = 1;
@@ -3136,10 +3135,10 @@ elm_genlist_clear(Evas_Object *obj)
    if (!wd) return;
 
    while (wd->group_items)
-   {
-     _groupitem_remove((Elm_Genlist_GroupItem *)wd->group_items, EINA_FALSE);
+     {
+	_groupitem_remove((Elm_Genlist_GroupItem *)wd->group_items, EINA_FALSE);
+     }
 
-   }
    while (wd->items)
      {
 	Elm_Genlist_Item *it = (Elm_Genlist_Item *)(wd->items);
@@ -4378,34 +4377,34 @@ elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
 
     wd->animate_edit_controls = 1;
     if( wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE)
-    {
-      if( wd->ed ) free (wd->ed);
-      wd->ed = NULL;
-    }
-    else
-    {
-      if( !wd->ed )
-        wd->ed = calloc(1, sizeof(Edit_Data));
-
-      wd->ed->ec = edit_class;
-
-      if( (wd->edit_mode & ELM_GENLIST_EDIT_MODE_DELETE) && !wd->ed->del_confirm)
       {
-          wd->ed->del_confirm = elm_button_add(wd->obj);
-          elm_button_label_set(wd->ed->del_confirm, "Delete");
-          evas_object_smart_member_add(wd->ed->del_confirm, wd->pan_smart);
-          edje_object_scale_set( wd->ed->del_confirm, elm_widget_scale_get(wd->ed->del_confirm) *
-                                                        _elm_config->scale);
-          evas_object_smart_callback_add(wd->ed->del_confirm, "clicked", _delete_confirm_cb, wd );
+	 if( wd->ed ) free (wd->ed);
+	 wd->ed = NULL;
       }
-    }
+    else
+      {
+	 if( !wd->ed )
+	   wd->ed = calloc(1, sizeof(Edit_Data));
+
+	 wd->ed->ec = edit_class;
+
+	 if( (wd->edit_mode & ELM_GENLIST_EDIT_MODE_DELETE) && !wd->ed->del_confirm)
+	   {
+	      wd->ed->del_confirm = elm_button_add(wd->obj);
+	      elm_button_label_set(wd->ed->del_confirm, "Delete");
+	      evas_object_smart_member_add(wd->ed->del_confirm, wd->pan_smart);
+	      edje_object_scale_set( wd->ed->del_confirm, elm_widget_scale_get(wd->ed->del_confirm) *
+		    _elm_config->scale);
+	      evas_object_smart_callback_add(wd->ed->del_confirm, "clicked", _delete_confirm_cb, wd );
+	   }
+      }
 
     realized_list = elm_genlist_realized_items_get(obj);
 
     EINA_LIST_FOREACH(realized_list, l, it)
-    {
-     _edit_controls_eval(it);
-    }
+      {
+	 _edit_controls_eval(it);
+      }
 
     if (wd->calc_job) ecore_job_del(wd->calc_job);
     wd->calc_job = ecore_job_add(_calc_job, wd);
