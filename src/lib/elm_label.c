@@ -405,12 +405,21 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
            showcount = len - 1;
            while (showcount > minshowcount)
              {
+               unsigned char *ltxt = eina_strbuf_string_get(txtbuf);
                len = eina_strbuf_length_get(txtbuf);
-               eina_strbuf_remove(txtbuf, len - minshowcount, len);
+               // FIXME : more reliable truncate routine is needed
+               //         it works on only EUC-KR
+               int delta = 0;
+			   if (ltxt[len-minshowcount-delta] >= 0x80)
+                 {
+                   delta = 2;
+                   showcount--;
+                 }
+               eina_strbuf_remove(txtbuf, len-minshowcount-delta, len);
                eina_strbuf_append(txtbuf, ellipsis_string);
                edje_object_part_text_set(wd->lbl, "elm.text", eina_strbuf_string_get(txtbuf));
 
-               if (_is_width_over(obj, linemode)) 
+               if (_is_width_over(obj, linemode))
                  showcount--;
                else 
                  break;
