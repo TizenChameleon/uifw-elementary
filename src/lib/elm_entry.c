@@ -2877,7 +2877,7 @@ elm_entry_fontsize_set(Evas_Object *obj, int fontsize)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_Strbuf *fontbuf = NULL;
-   int len, removeflag = 0;
+   int removeflag = 0;
    const char *t;
 
    if (!wd) return;

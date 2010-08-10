@@ -1,3 +1,6 @@
+/*
+ * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ */
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -570,12 +573,12 @@ _index_box_refill_job(void *data)
 
    if(pw != wd->pwidth && ph != wd->pheight)
      {
-         if(wd->down == 1)
-           {
-               wd->active = 0;
-               elm_index_active_set(data, 1);
-           }
-       _index_box_clear((Evas_Object *)data, wd->bx[0], 0);
+	if(wd->down == 1)
+	  {
+	     wd->active = 0;
+	     elm_index_active_set(data, 1);
+	  }
+	_index_box_clear((Evas_Object *)data, wd->bx[0], 0);
        evas_object_smart_calculate( wd->bx[0]);
        elm_index_item_go((Evas_Object *)data, wd->level);
        wd->pwidth = pw;
@@ -665,23 +668,23 @@ elm_index_add(Evas_Object *parent)
 
    if (edje_object_part_exists(wd->base, "elm.swallow.index.1"))
      {
-        wd->bx[1] = evas_object_box_add(e);
+	wd->bx[1] = evas_object_box_add(e);
 	evas_object_box_layout_set(wd->bx[1], _layout, wd, NULL);
-        elm_widget_sub_object_add(obj, wd->bx[1]);
-        edje_object_part_swallow(wd->base, "elm.swallow.index.1", wd->bx[1]);
-        evas_object_show(wd->bx[1]);
+	elm_widget_sub_object_add(obj, wd->bx[1]);
+	edje_object_part_swallow(wd->base, "elm.swallow.index.1", wd->bx[1]);
+	evas_object_show(wd->bx[1]);
      }
-     const char *string;
+   const char *string;
 
-     wd->scale_factor = elm_scale_get();
-     if ( wd->scale_factor == 0.0 ) {
-                     wd->scale_factor = 1.0;
-     }
-     string = edje_object_data_get(wd->base, "min_1st_level_obj_height");
-     if(string)
-       wd->min_1st_level_obj_height = (int) (atoi(string))*wd->scale_factor;
-     else
-       wd->min_1st_level_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
+   wd->scale_factor = elm_scale_get();
+   if ( wd->scale_factor == 0.0 ) {
+	wd->scale_factor = 1.0;
+   }
+   string = edje_object_data_get(wd->base, "min_1st_level_obj_height");
+   if(string)
+     wd->min_1st_level_obj_height = (int) (atoi(string))*wd->scale_factor;
+   else
+     wd->min_1st_level_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
    _sizing_eval(obj);
    return obj;
 }
@@ -694,12 +697,14 @@ _group_count(Evas_Object *obj, int extraIndex, int adj_pos, int vis_pos)
    int group_count = MIN_GRP_SIZE;
    while(group_count <= wd->max_grp_size)
      {
-        if(extraIndex <= wd->max_grp_size*adj_pos)
-          if(group_count*adj_pos>=extraIndex) return group_count;
-       else
-         return wd->max_grp_size;
+	if(extraIndex <= wd->max_grp_size*adj_pos)
+	  {
+	     if(group_count*adj_pos>=extraIndex) return group_count;
+	  }
+	else
+	  return wd->max_grp_size;
 
-       group_count+=MIN_GRP_SIZE;
+	group_count+=MIN_GRP_SIZE;
      }
 }
 static void
@@ -736,9 +741,9 @@ _index_process(Evas_Object *obj)
    int N = wd->items_count;
 
    for(i=0;i<n;i++)
-   {
-       indx[i] = minh;
-   }
+     {
+	indx[i] = minh;
+     }
    extraIndex=n-N;
    if(extraIndex < 0) return;
 
@@ -760,33 +765,33 @@ _index_process(Evas_Object *obj)
 
    for(i=0;i<numberofparts;i++)
      {
-         for(j=0;j<place[i].count; j++)
-           {
-               indx[((place[i].start)+j)]= MIN_PIXEL_VALUE;
-           }
-       indx[(place[i].start+(place[i].count)/2)] = minh-place[i].count+1;
+	for(j=0;j<place[i].count; j++)
+	  {
+	     indx[((place[i].start)+j)]= MIN_PIXEL_VALUE;
+	  }
+	indx[(place[i].start+(place[i].count)/2)] = minh-place[i].count+1;
      }
    count = 0;
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-         int size = indx[count];
-         count++;
-         if(size == minh)
-           {
-               it->vis_letter = eina_stringshare_add(it->letter);
-               continue;
-           }
-      else if(size == 1)
-        {
-            eina_stringshare_del(it->vis_letter);
-            it->vis_letter = eina_stringshare_add("");
-        }
-      else
-        {
-           eina_stringshare_del(it->vis_letter);
-           it->vis_letter = eina_stringshare_add(wd->special_char);
-        }
-      it->size = size*wd->scale_factor;
+	int size = indx[count];
+	count++;
+	if(size == minh)
+	  {
+	     it->vis_letter = eina_stringshare_add(it->letter);
+	     continue;
+	  }
+	else if(size == 1)
+	  {
+	     eina_stringshare_del(it->vis_letter);
+	     it->vis_letter = eina_stringshare_add("");
+	  }
+	else
+	  {
+	     eina_stringshare_del(it->vis_letter);
+	     it->vis_letter = eina_stringshare_add(wd->special_char);
+	  }
+	it->size = size*wd->scale_factor;
      }
 }
 /**
