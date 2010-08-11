@@ -213,6 +213,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    Evas_Coord max_width_size, max_height_size;
    Evas_Coord arrow_w = 0, arrow_h = 0;
    int available_direction[4] = { 1, 1, 1, 1 };
+   Evas_Coord h;
 
    wd = elm_widget_data_get(obj);
 
@@ -226,10 +227,13 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    evas_object_geometry_get(wd->box, NULL, NULL, &box_w, &box_h);
    edje_object_part_geometry_get(wd->base, "ctxpopup_btns_frame", NULL, NULL,
 				 &base_w, &base_h);
+   edje_object_part_geometry_get(wd->base, "ctxpopup_list", NULL, &h, NULL, NULL);
 
    if (box_w > base_w)
       base_w = box_w;
+
    base_h += box_h;
+   base_h += h;
 
    edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
 
@@ -416,14 +420,15 @@ _sizing_eval(Evas_Object *obj)
 	_shift_base_by_arrow(wd->arrow, arrow, &rect);
      }
 
-   evas_object_resize(wd->base, rect.w, rect.h);
    evas_object_move(wd->base, rect.x, rect.y);
+   evas_object_resize(wd->base, rect.w, rect.h);
 
    //scroller
    edje_object_part_geometry_get(wd->base, "ctxpopup_frame", NULL, NULL, &w, NULL);
    edje_object_part_geometry_get(wd->base, "ctxpopup_list", NULL, NULL, NULL, &h);
-   evas_object_resize(wd->scroller, w, h );
+
    evas_object_move(wd->scroller, rect.x, rect.y);
+   evas_object_resize(wd->scroller, w, h);
 }
 
 static void
@@ -600,8 +605,10 @@ _ctxpopup_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
    _sizing_eval(obj);
 
-   if (!wd->screen_dimmed_disabled)
+   if (!wd->screen_dimmed_disabled) {
       evas_object_show(wd->bg);
+      edje_object_signal_emit(wd->bg, "elm,state,show", "elm");
+   }
    evas_object_show(wd->base);
 
    if (!wd->arrow_disabled)
@@ -679,6 +686,8 @@ _item_obj_create(Elm_Ctxpopup_Item *item, char *group_name)
    edje_object_signal_callback_add(item->base, "elm,action,click", "",
 				   _ctxpopup_item_select, item);
    evas_object_size_hint_align_set(item->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(wd->base, EVAS_HINT_EXPAND,
+				    EVAS_HINT_EXPAND);
    evas_object_show(item->base);
 }
 
