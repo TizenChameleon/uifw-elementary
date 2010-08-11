@@ -206,7 +206,17 @@ Eina_Bool     elm_selection_set(enum _elm_sel_type selection, Evas_Object *widge
 Eina_Bool     elm_selection_clear(enum _elm_sel_type selection, Evas_Object *widget);
 Eina_Bool     elm_selection_get(enum _elm_sel_type selection, enum _elm_sel_format format, Evas_Object *widget);
 
-#define ELM_SET_WIDTYPE(widtype, type) if (!widtype) widtype = eina_stringshare_add(type)
+void              _elm_widtype_register(const char **ptr);
+
+
+#define ELM_SET_WIDTYPE(widtype, type) \
+   do { \
+      if (!widtype) { \
+         widtype = eina_stringshare_add(type); \
+         _elm_widtype_register(&widtype); \
+      } \
+   } while (0)
+
 //#define ELM_CHECK_WIDTYPE(obj, widtype) if (elm_widget_type_get(obj) != widtype) return
 #define ELM_CHECK_WIDTYPE(obj, widtype) if (!_elm_widget_type_check((obj), (widtype))) return
 
