@@ -57,6 +57,7 @@ struct _Widget_Data
    const char *(*indicator_format_func)(double val);
    Eina_Bool horizontal : 1;
    Eina_Bool inverted : 1;
+   int feed_cnt;
    double val, val_min, val_max;
    Ecore_Timer *delay;
    Evas_Coord size;
@@ -79,7 +80,7 @@ static void _indicator_set(Evas_Object *obj);
 static void _spacer_cb(void *data, Evas * e, Evas_Object * obj, void *event_info);
 
 
-static Eina_Bool _mv_timer_cb(void *data);
+static int _mv_timer_cb(void *data);
 
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_DELAY_CHANGED[] = "delay,changed";
@@ -370,9 +371,11 @@ _spacer_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
        button_y = 0;
    }
    edje_object_part_drag_value_set(wd->slider, "elm.dragable.slider", button_x, button_y);
-//   evas_object_smart_callback_call(cp->parent, "clicked", NULL);
    evas_event_feed_mouse_cancel(e, 0, NULL);
-   evas_event_feed_mouse_down(e, 1, EVAS_BUTTON_NONE, 0, NULL);
+   wd->feed_cnt ++;
+   if(wd->feed_cnt < 3)
+     evas_event_feed_mouse_down(e, 1, EVAS_BUTTON_NONE, 0, NULL);  
+   wd->feed_cnt = 0;
 }
 
 static const char*widtype = NULL;
@@ -403,6 +406,7 @@ elm_slider_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
 
    wd->horizontal = EINA_TRUE;
+   wd->feed_cnt = 0;
    wd->val = 0.0;
    wd->val_min = 0.0;
    wd->val_max = 1.0;
@@ -967,12 +971,12 @@ elm_slider_indicator_show_set(Evas_Object *obj, Eina_Bool show)
      edje_object_signal_emit(wd->slider, "elm,state,val,hide", "elm");			
 }
 
-static Eina_Bool _mv_timer_cb(void *data)
+static int _mv_timer_cb(void *data)
 {
    Evas_Object* obj = (Evas_Object*)data;
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if (!wd) return EINA_TRUE;
+   if (!wd) return 1;
 
    if(wd->src_val < wd->des_val) 
      {
@@ -997,10 +1001,10 @@ static Eina_Bool _mv_timer_cb(void *data)
 	     ecore_timer_del(wd->mv_timer);
 	     wd->mv_timer = NULL;
 	  }	
-	return EINA_FALSE;
+	return 0;
      }
    else
-     return EINA_TRUE;
+     return 1;
 }
 
 
