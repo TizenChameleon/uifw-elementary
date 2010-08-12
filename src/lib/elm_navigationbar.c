@@ -631,7 +631,6 @@ elm_navigationbar_push(Evas_Object *obj,
  * The object that was underneath it on the stack will become visible.
  *
  * @param[in] obj The NavigationBar object
- * @param[in] animation transition when this content is popped
  *
  * @ingroup NavigationBar
  */
@@ -702,7 +701,6 @@ elm_navigationbar_pop(Evas_Object *obj)
  *
  * @param[in] obj The NavigationBar object
  * @param[in] content the object to show
- * @param[in] animation transition when this content is popped
  *
  * @ingroup NavigationBar
  */
@@ -726,18 +724,20 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 		ll = ll->prev;
 		while (ll) 
 		{
-			it = ll->data;
+		  it = ll->data;
 			if (it->obj && (it->content == content)) 
 			{
 				//delete contents between the top and the inputted content
 				ll = eina_list_last(wd->stack);
+
 				while (ll)
 				{
-					if (ll->data == it) break;
+				  if (ll->data == it) break;
 					else 
 					{
 						_delete_item(ll->data);
 						wd->stack = eina_list_remove_list(wd->stack, ll);
+						break;
 					}
 				ll =  ll->prev;
 				}
@@ -749,7 +749,7 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 
 	if (prev_it && it) 
 	{
-		//unswallow items and start trasition
+	  //unswallow items and start trasition
 		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
 		cb->prev_it = prev_it;
 		cb->it = it;
@@ -764,8 +764,7 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 		//pop content from pager
 		elm_pager_to_content_pop(wd->pager, content);
 	}
-	}
-
+}
 /**
  * Set the title string for the pushed content
  * If the content is at the top of the navigation stack, update the title string
@@ -1167,7 +1166,6 @@ elm_navigationbar_content_bottom_get(Evas_Object *obj)
  *
  * @param[in] obj The NavigationBar object
  * @param[in] hidden hidden state (default value : TRUE)
- * @param[in] animation transition when this button becomes the top item (default value : TRUE)
  *
  * @ingroup NavigationBar
  */
@@ -1191,7 +1189,6 @@ elm_navigationbar_hidden_set(Evas_Object *obj,
  * @param[in] content The object to push or pushed
  * @param[in] button The button
  * @param[in] button_type Indicates the position
- * @param[in] animation transition when this button becomes the top item 
  *
  * @ingroup NavigationBar
  */

@@ -1869,8 +1869,8 @@ extern "C" {
    EAPI Eina_Bool    elm_ctxpopup_horizontal_get(Evas_Object *obj);
    EAPI void         elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon);
    EAPI void         elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label);
-   EAPI Elm_Ctxpopup_Item *elm_ctxpopup_label_add(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data);
-   EAPI Elm_Ctxpopup_Item *elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon, Evas_Smart_Cb func, const void *data);
+   EAPI Elm_Ctxpopup_Item *elm_ctxpopup_label_add(Evas_Object *obj, const char *label, Evas_Smart_Cb func, void *data);
+   EAPI Elm_Ctxpopup_Item *elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon, Evas_Smart_Cb func, void *data);
    EAPI Elm_Ctxpopup_Item *elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, Evas_Smart_Cb func, void *data);
    EAPI void         elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item);
    EAPI void         elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item *item, Eina_Bool disabled);
@@ -1879,10 +1879,10 @@ extern "C" {
    EAPI Evas_Object *elm_ctxpopup_item_icon_get(Elm_Ctxpopup_Item *item); 
    EAPI void         elm_ctxpopup_scroller_disabled_set(Evas_Object *obj, Eina_Bool disabled);
    EAPI void         elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled);
-   EAPI void         elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y);
-   EAPI void         elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y);
    EAPI void         elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data);
 	EAPI void 			elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first, Elm_Ctxpopup_Arrow second, Elm_Ctxpopup_Arrow third, Elm_Ctxpopup_Arrow fourth);
+	EAPI void		elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content);
+	EAPI void 		elm_ctxpopup_content_unset(Evas_Object *obj);
    
    /* QuickContactBadge */
    typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;
