@@ -46,10 +46,10 @@ struct _Widget_Data
    Evas_Object * edje;
    Evas_Object * box;
    Evas_Object * event_box;
-   Evas_Object * more_item;
    Evas_Object * selected_box;
    
    Evas_Object * moving_obj;
+   Elm_Controlbar_Item * more_item;
    Elm_Controlbar_Item * moving_item;
    Elm_Controlbar_Item * pre_item;
    Elm_Controlbar_Item * cur_item;
@@ -67,7 +67,7 @@ struct _Widget_Data
    Ecore_Event_Handler * bar_up_event;
    
    void (*ani_func) (const void *data, Evas_Object * obj, void *event_info);
-   void *ani_data;
+   const void *ani_data;
    Eina_Bool init_animation;
 
    Ecore_Timer *effect_timer;
@@ -108,7 +108,7 @@ struct _Animation_Data
    Evas_Coord th;
    unsigned int start_time;
    double time;
-   int (*func) (void *data, Evas_Object * obj);
+   void (*func) (void *data, Evas_Object * obj);
    void *data;
    Ecore_Animator * timer;
 };
@@ -149,7 +149,7 @@ static void
 _controlbar_move(void *data, Evas_Object * obj) 
 {
    Widget_Data * wd;
-   Evas_Object *bg;
+   const Evas_Object *bg;
    Evas_Coord x, y;
    if (!data)
       return;
@@ -173,7 +173,7 @@ static void
 _controlbar_resize(void *data, Evas_Object * obj) 
 {
    Widget_Data * wd;
-   Evas_Object *bg;
+   const Evas_Object *bg;
    Evas_Coord y, y_, w, h, height;
    if (!data)
       return;
@@ -961,12 +961,14 @@ item_change_in_bar(Elm_Controlbar_Item * it)
    set_evas_map(wd->moving_item->base, x, y, w, h);
 }
 
-static void
+static int 
 hide_selected_box(void *data)
 {
    Evas_Object *selected_box = (Evas_Object *)data;
 
    evas_object_hide(selected_box);
+
+   return EXIT_SUCCESS;
 }
 
 static void
@@ -1089,7 +1091,6 @@ selected_box(Elm_Controlbar_Item * it)
    Widget_Data * wd = elm_widget_data_get(it->obj);
    const Eina_List *l;
    Elm_Controlbar_Item * item, *fit = NULL;
-   Evas_Coord x, y, w, h;
    Evas_Object * content;
 
    if(wd->animating) return;
@@ -1208,7 +1209,7 @@ pressed_box(Elm_Controlbar_Item * it)
    const Eina_List *l;
    Elm_Controlbar_Item * item;
    
-   if(wd->animating) return;
+   if(wd->animating) return EXIT_FAILURE;
 
    EINA_LIST_FOREACH(wd->items, l, item)
    {
@@ -1856,6 +1857,7 @@ create_more_item(Widget_Data *wd)
    EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
 {
    Evas_Object * obj = NULL;
+   Evas_Object * bg = NULL;
    Widget_Data * wd = NULL;
    Evas_Coord x, y, w, h;
    Evas_Object * r_button;
@@ -1944,12 +1946,9 @@ create_more_item(Widget_Data *wd)
 				   _controlbar_object_show, obj);
    evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_HIDE,
 				   _controlbar_object_hide, obj);
-   evas_object_event_callback_add(
-	 edje_object_part_object_get(wd->edje, "bg_image"),
-	 EVAS_CALLBACK_MOVE, _controlbar_object_move, obj);
-   evas_object_event_callback_add(
-	 edje_object_part_object_get(wd->edje, "bg_image"),
-	 EVAS_CALLBACK_RESIZE, _controlbar_object_resize, obj);
+   bg = (Evas_Object *)edje_object_part_object_get(wd->edje, "bg_image");
+   evas_object_event_callback_add(bg, EVAS_CALLBACK_MOVE, _controlbar_object_move, obj);
+   evas_object_event_callback_add(bg, EVAS_CALLBACK_RESIZE, _controlbar_object_resize, obj);
 
    wd->selected_box = edje_object_add(wd->evas);
    _elm_theme_object_set(obj, wd->selected_box, "controlbar", "item_bg", "default");
@@ -2795,6 +2794,14 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
    EAPI void
 elm_controlbar_edit_start(Evas_Object * obj) 
 {
+   printf("\n==================================\n");
+   printf("%s\n", __func__);
+   printf("==================================\n");
+   printf("This API is just for test.\n");
+   printf("Please don't use it!!\n");
+   printf("Thank you.\n");
+   printf("==================================\n");
+
    Widget_Data * wd;
    if (obj == NULL)
      {
@@ -2819,15 +2826,15 @@ elm_controlbar_edit_start(Evas_Object * obj)
  *
  * @ingroup Controlbar
  */ 
-   EAPI void
+EAPI void
 elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool bar) 
 {
    Eina_Bool check = EINA_TRUE;
    if (it->obj == NULL)
-      return NULL;
+      return;
    Widget_Data * wd = elm_widget_data_get(it->obj);
    if (!wd || !wd->items)
-      return NULL;
+      return;
    if (it->order <= 0)
       check = EINA_FALSE;
    if (check == bar)
@@ -2878,6 +2885,14 @@ elm_controlbar_item_editable_set(Elm_Controlbar_Item * it, Eina_Bool editable)
    EAPI void
 elm_controlbar_view_set(Evas_Object * obj, Evas_Object * view) 
 {
+   printf("\n==================================\n");
+   printf("%s\n", __func__);
+   printf("==================================\n");
+   printf("This API is just for test.\n");
+   printf("Please don't use it!!\n");
+   printf("Thank you.\n");
+   printf("==================================\n");
+
    Widget_Data * wd;
    if (obj == NULL)
      {
@@ -2920,6 +2935,7 @@ elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view)
    EAPI void
 elm_controlbar_mode_set(Evas_Object *obj, int mode) 
 {
+
    Widget_Data * wd;
    if (obj == NULL)
      {
@@ -2983,8 +2999,16 @@ init_animation(void *data)
  * @ingroup Controlbar
  */ 
 EAPI void
-elm_controlbar_animation_set(Evas_Object *obj, void (*func) (const void *data, Evas_Object obj, void *event_info), const void *data)
+elm_controlbar_animation_set(Evas_Object *obj, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data)
 {
+   printf("\n==================================\n");
+   printf("%s\n", __func__);
+   printf("==================================\n");
+   printf("This API is just for test.\n");
+   printf("Please don't use it!!\n");
+   printf("Thank you.\n");
+   printf("==================================\n");
+
    Widget_Data * wd;
    if (obj == NULL)
      {
@@ -3020,6 +3044,14 @@ elm_controlbar_animation_set(Evas_Object *obj, void (*func) (const void *data, E
 EAPI void
 elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation)
 {
+   printf("\n==================================\n");
+   printf("%s\n", __func__);
+   printf("==================================\n");
+   printf("This API is just for test.\n");
+   printf("Please don't use it!!\n");
+   printf("Thank you.\n");
+   printf("==================================\n");
+
    Widget_Data * wd;
    if (obj == NULL)
      {

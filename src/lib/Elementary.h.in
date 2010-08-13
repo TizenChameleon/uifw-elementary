@@ -2105,23 +2105,27 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, Evas_Object *obj_item, const int sel);
-   EAPI void         elm_controlbar_item_del(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_select(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
-   EAPI void         elm_controlbar_item_editable_set(Elm_Controlbar_Item *it, Eina_Bool editable);
+   EAPI void elm_controlbar_item_del(Elm_Controlbar_Item *it);
+   EAPI void elm_controlbar_item_select(Elm_Controlbar_Item *it);
+   EAPI void elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
+   EAPI void elm_controlbar_item_editable_set(Elm_Controlbar_Item *it, Eina_Bool editable);
    EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
-   EAPI const char  *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
+   EAPI const char *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
+   EAPI void elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
    EAPI Elm_Controlbar_Item *elm_controlbar_selected_item_get(Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_first_item_get(Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_last_item_get(Evas_Object *obj);
-   EAPI Eina_List   *elm_controlbar_items_get(Evas_Object *obj);
+   EAPI Eina_List *elm_controlbar_items_get(Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_item_prev(Elm_Controlbar_Item *it);
    EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_edit_start(Evas_Object *obj);
-   EAPI void         elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
-   EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
-   EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
+   EAPI void elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
+   EAPI void elm_controlbar_mode_set(Evas_Object *obj, int mode);
+   /*======= Please don't use this APIs =======*/
+   EAPI void elm_controlbar_edit_start(Evas_Object *obj);
+   EAPI void elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
+   EAPI void elm_controlbar_animation_set(Evas_Object *obj, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI void elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
+   /*======= Just for test =======*/
 
 
   /* diskcontroller */
