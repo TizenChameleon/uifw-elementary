@@ -202,16 +202,14 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    Widget_Data *wd;
    Evas_Coord x, y;
    Evas_Coord parent_x, parent_y, parent_w, parent_h;
-   Evas_Coord box_w, box_h;
    Evas_Coord base_w = 0, base_h = 0;
-   Evas_Coord content_w, content_y, content_h;
    Elm_Ctxpopup_Arrow arrow;
    Evas_Coord x1, x2, y1, y2;
-   int idx;
    Evas_Coord finger_size;
    Evas_Coord max_width_size, max_height_size;
    Evas_Coord arrow_w = 0, arrow_h = 0;
    int available_direction[4] = { 1, 1, 1, 1 };
+   int idx;
 
    wd = elm_widget_data_get(obj);
 
@@ -222,26 +220,8 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
    evas_object_geometry_get(wd->parent, &parent_x, &parent_y, &parent_w,
 			    &parent_h);
-   edje_object_part_geometry_get(wd->base, "ctxpopup_btns_frame", NULL, NULL,
-				 &base_w, &base_h);
 
-   //TODO: if the  btn-layout lied on the right side ?
-   if(eina_list_count(wd->items) > 0 ) {
-	   evas_object_geometry_get(wd->box, NULL, NULL, &box_w, &box_h);
-	   edje_object_part_geometry_get(wd->base, "ctxpopup_list", NULL, &content_y, NULL,  NULL);
-	   if (box_w > base_w)
-	      base_w = box_w;
-	   base_h += (box_h+content_y);
-   }
-
-   if(wd->content) {
-	   edje_object_part_geometry_get(wd->base, "elm.swallow.content", NULL, NULL, &content_w, &content_h);
-	   if(content_w > base_w)
-		   base_w = content_w;
-	   fprintf( stderr, "%d %d\n", base_h, content_h);
-	   base_h += content_h;
-   }
-
+   edje_object_size_min_calc(wd->base,&base_w, &base_h);
    edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
 
    max_width_size *= elm_scale_get();
@@ -404,6 +384,7 @@ _sizing_eval(Evas_Object *obj)
    Eina_List *elist;
    Elm_Ctxpopup_Item *item;
    Evas_Coord_Rectangle rect = { 0, 0, 1, 1 };
+   Evas_Coord scr_x, scr_y;
 
    Elm_Ctxpopup_Arrow arrow;
 
@@ -419,7 +400,6 @@ _sizing_eval(Evas_Object *obj)
 
    //base
    arrow = _calc_base_geometry(obj, &rect);
-
    if (!wd->arrow_disabled)
      {
 	_update_arrow_obj(obj, arrow);
@@ -428,13 +408,16 @@ _sizing_eval(Evas_Object *obj)
 
    evas_object_move(wd->base, rect.x, rect.y);
    evas_object_resize(wd->base, rect.w, rect.h);
+   fprintf( stderr, "%d %d %d %d\n", rect.x, rect.y, rect.w, rect.h);
 
-   //scroller
-   if(eina_list_count(wd->items) > 0) {
-	   edje_object_part_geometry_get(wd->base, "elm.swallow.scroller", NULL, NULL, NULL, &rect.h);
-	   evas_object_move(wd->scroller, rect.x, rect.y);
+   //content
+   /*
+   if(wd->content) {
+	   edje_object_part_geometry_get(wd->base, "elm.swallow.scroller", &scr_x, &scr_y, &rect.w, &rect.h);
+	   evas_object_move(wd->scroller, rect.x + scr_x, rect.y + scr_y);
 	   evas_object_resize(wd->scroller, rect.w, rect.h);
    }
+*/
 }
 
 static void
@@ -621,6 +604,7 @@ _ctxpopup_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
       evas_object_show(wd->arrow);
 
    wd->visible = EINA_TRUE;
+
 }
 
 static void
@@ -817,9 +801,6 @@ elm_ctxpopup_add(Evas_Object *parent)
    //Box
    wd->box = elm_box_add(obj);
    elm_scroller_content_set(wd->scroller, wd->box);
-   evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND,
-				    EVAS_HINT_EXPAND);
 
    //Arrow
    wd->arrow = edje_object_add(e);
@@ -1183,7 +1164,7 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label,
 	//button layout
 	sprintf(buf, "actionbtn%d", wd->btn_cnt);
 	edje_object_part_geometry_get(wd->btn_layout, buf, 0, 0, &w, &h);
-	evas_object_size_hint_min_set(wd->btn_layout, w, h);
+	evas_object_size_hint_max_set(wd->btn_layout, 99999, h);
      }
 
    if (wd->visible)
