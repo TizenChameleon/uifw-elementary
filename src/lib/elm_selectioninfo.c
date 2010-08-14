@@ -4,7 +4,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-
 /**
  * @defgroup Selectioninfo selectioninfo
  * @ingroup Elementary
@@ -26,7 +25,6 @@ struct _Widget_Data
 	Evas_Object* parent;
 	Eina_Bool* check_state;
 	int check_count;
-	char label_text[128];
 };
 
 static const char *widtype = NULL;
@@ -297,39 +295,46 @@ elm_selectioninfo_check_state_set(Evas_Object *obj, Eina_Bool *state, int count)
 }
 
 /**
- * Show the selectioninfo
+ * Get the checked count
  *
  * @param obj The selectioninfo object
  *
  * @ingroup Selectioninfo
  */
+
+EAPI int
+elm_selectioninfo_checked_count_get(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return -1;
+
+	int i;
+	int count = 0;
+	for (i=0; i<wd->check_count; i++)
+	{
+		if (wd->check_state[i])
+		count++;
+	}
+
+	return count;
+}
+
+/**
+ * Set the text to the selectioninfo
+ *
+ * @param obj The selectioninfo object
+ * @param text The text
+ *
+ * @ingroup Selectioninfo
+ */
+
 EAPI void
-elm_selectioninfo_show(Evas_Object *obj)
+elm_selectioninfo_text_set(Evas_Object *obj, char* text)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 
-	int i;
-        int state_count = 0;
-        for (i=0; i<wd->check_count; i++)
-	{
-		if (wd->check_state[i])
-			state_count++;
-        }
-
-	if (state_count == 0)
-	{
-		evas_object_hide(wd->selectioninfo);
-	}
-	else
-	{
-		if (state_count == 1)
-			sprintf(wd->label_text, "%d File Selected", state_count);
-		else
-			sprintf(wd->label_text, "%d Files Selected", state_count);
-		edje_object_part_text_set(_EDJ(wd->content), "elm.text", strdup(wd->label_text));
-		evas_object_show(wd->selectioninfo);	
-	}	   
+	edje_object_part_text_set(_EDJ(wd->content), "elm.text", strdup(text));
 }
 
