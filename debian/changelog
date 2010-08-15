@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build31) unstable; urgency=low
+
+  * [controlbar] fix label bug, add animation effect
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build31
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Sun, 15 Aug 2010 14:45:47 +0900
+
 elementary (0.4.0+svn.49550slp2+3build30) unstable; urgency=low
 
   * [dialoguegroup & editfield] modified for 0.7
