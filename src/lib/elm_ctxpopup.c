@@ -325,6 +325,16 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	  }
 	break;
      }
+
+   //Not enough space to locate. In this case, just show with down arrow.
+   if( !(available_direction[0] | available_direction[1] | available_direction[2] | available_direction[3]) )
+   {
+	     y1 = parent_y;
+	     ADJUST_POS_X(x);
+	     y -= (base_h + finger_size);
+	     arrow = ELM_CTXPOPUP_ARROW_DOWN;
+   }
+
    rect->x = x;
    rect->y = y;
    rect->w = base_w;
