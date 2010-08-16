@@ -224,6 +224,9 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    edje_object_size_min_calc(wd->base,&base_w, &base_h);
    edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
 
+   fprintf( stderr, "%d %d\n", base_w, base_h);
+
+
    max_width_size *= elm_scale_get();
    max_height_size *= elm_scale_get();
 
@@ -234,11 +237,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
       base_w = max_width_size;
 
    finger_size = elm_finger_size_get();
-
-   if ((base_h == 0) || (base_w == 0))
-     {
-	return ELM_CTXPOPUP_ARROW_DOWN;
-     }
 
    if(wd->position_forced)
    {
@@ -593,7 +591,8 @@ _ctxpopup_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
    if (!wd)
       return;
-   if ((eina_list_count(wd->items) < 1) && (!wd->content))
+
+   if ((eina_list_count(wd->items) < 1) && (!wd->content) && (wd->btn_cnt < 1))
       return;
 
    _sizing_eval(obj);
@@ -1222,6 +1221,14 @@ elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
 	return elm_ctxpopup_item_add(obj, NULL, label, func, data);
 }
 
+/**
+ * Swallow the user contents
+ *
+ * @param obj		Ctxpopup object
+ * @param content 		Contents to be swallowed
+ *
+ * @ingroup Ctxpopup
+ */
 EAPI void
 elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 {
@@ -1231,25 +1238,40 @@ elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 	   edje_object_part_swallow(wd->base,  "elm.swallow.content", content);
 	   elm_widget_sub_object_add(obj, content);
 	   wd->content = content;
+	   edje_object_signal_emit(wd->base, "elm,state,content,enable", "elm");
 
 	   if(wd->visible)
 		   _sizing_eval(obj);
 }
 
-EAPI void
+/**
+ * Unswallow the user contents
+ *
+ * @param obj		Ctxpopup object
+ * @return 			The unswallowed contents
+ *
+ * @ingroup Ctxpopup
+ */
+EAPI Evas_Object *
 elm_ctxpopup_content_unset(Evas_Object *obj)
 {
 	   ELM_CHECK_WIDTYPE(obj, widtype);
 	   Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+	   Evas_Object *content;
 
-	   if(wd->content)
-		   edje_object_part_unswallow(wd->base,  wd->content);
-
-	   elm_widget_sub_object_del(obj, wd->content);
+	   content = wd->content;
 	   wd->content = NULL;
+
+	   if(content)
+		   edje_object_part_unswallow(wd->base,  content);
+
+	   elm_widget_sub_object_del(obj, content);
+	   edje_object_signal_emit(wd->base, "elm,state,content,disable", "elm");
 
 	   if(wd->visible)
 		   _sizing_eval(obj);
+
+	   return content;
 }
 
 EAPI void

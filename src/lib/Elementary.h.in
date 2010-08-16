@@ -1885,7 +1885,7 @@ extern "C" {
    EAPI void         elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y) __attribute__((deprecated));
    EAPI void  	     elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first, Elm_Ctxpopup_Arrow second, Elm_Ctxpopup_Arrow third, Elm_Ctxpopup_Arrow fourth);
    EAPI void	     elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content);
-   EAPI void 	     elm_ctxpopup_content_unset(Evas_Object *obj);
+   EAPI Evas_Object *elm_ctxpopup_content_unset(Evas_Object *obj);
    EAPI void	     elm_ctxpopup_position_forced_set(Evas_Object *obj, Eina_Bool forced);
    EAPI Eina_Bool    elm_ctxpopup_position_forced_get(Evas_Object *obj); 
    
