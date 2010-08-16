@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build33) unstable; urgency=low
+
+  * [picker] add time_date
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build33
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 17 Aug 2010 08:56:21 +0900
+
 elementary (0.4.0+svn.49550slp2+3build32) unstable; urgency=low
 
   * [segment_control] fixed click callback bug
