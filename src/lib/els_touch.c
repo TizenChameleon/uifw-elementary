@@ -461,6 +461,16 @@ _smart_mouse_move(void *data, Evas *e, Evas_Object *obj, void *ev)
 
 	 if ((abs(dx) > INIT_DRAG_THRESHOLD) || (abs(dy) > INIT_DRAG_THRESHOLD))
 	   {
+	      if (sd->animator_move)
+		{
+		   ecore_animator_del(sd->animator_move);
+		   sd->animator_move = NULL;
+		}
+	      if (sd->animator_flick)
+		{
+		   ecore_animator_del(sd->animator_flick);
+		   sd->animator_flick = NULL;
+		}
 	      _smart_set_last_drag(sd, 0, &mouse_data);
 	      // Note:
 	      // last_down - location where the drag starts
@@ -476,16 +486,6 @@ _smart_mouse_move(void *data, Evas *e, Evas_Object *obj, void *ev)
 
 	 if ((abs(dx) > DRAG_THRESHOLD) || (abs(dy) > DRAG_THRESHOLD))
 	   {
-	      if (sd->animator_move)
-		{
-		   ecore_animator_del(sd->animator_move);
-		   sd->animator_move = NULL;
-		}
-	      if (sd->animator_flick)
-		{
-		   ecore_animator_del(sd->animator_flick);
-		   sd->animator_flick = NULL;
-		}
 	      _smart_set_last_drag(sd, 0, &mouse_data);
 	      _smart_save_move_history(sd, mouse_data.x, mouse_data.y, dx, dy);
 	   }

@@ -38,7 +38,7 @@ test_webview_in_scroller(void *data, Evas_Object *obj, void *event_info)
    elm_scroller_content_set(sc, bx);
    evas_object_show(bx);
 
-   for (i = 0; i < 3; i++)
+   for (i = 0; i < 10; i++)
      {
         bt = elm_button_add(win);
         elm_button_label_set(bt, "Vertical");
@@ -55,9 +55,9 @@ test_webview_in_scroller(void *data, Evas_Object *obj, void *event_info)
    evas_object_size_hint_min_set(wv, 480, 400);
    elm_box_pack_end(bx, wv);
    evas_object_show(wv);
-   elm_webview_uri_set(obj, "file:///a.html");
+   elm_webview_uri_set(wv, "http://www.google.com");
 
-   for (i = 0; i < 3; i++)
+   for (i = 0; i < 10; i++)
      {
         bt = elm_button_add(win);
         elm_button_label_set(bt, "Vertical");
