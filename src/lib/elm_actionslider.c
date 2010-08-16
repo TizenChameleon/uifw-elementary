@@ -37,7 +37,7 @@ struct _Widget_Data
 
    // setting
    Elm_Actionslider_Magnet_Pos	magnet_position;
-   const char *text_left, *text_right, *text_center;
+   const char *text_left, *text_right, *text_center, *text_button;
 
    // status
    Eina_Bool	mouse_down;
@@ -88,6 +88,10 @@ _del_hook(Evas_Object *obj)
      {
 	eina_stringshare_del(wd->text_center);
      }
+   if (wd->text_button) 
+     {
+	eina_stringshare_del(wd->text_button);
+     }
    if(wd->as) 
      {
 	evas_object_smart_member_del(wd->as);
@@ -121,7 +125,7 @@ _theme_hook(Evas_Object *obj)
 static void
 _disable_hook(Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
+//   Widget_Data *wd = elm_widget_data_get(obj);
 /*
 	   TODO
    if (elm_widget_disabled_get(obj))
@@ -134,14 +138,14 @@ _disable_hook(Evas_Object *obj)
 static void
 _sizing_eval(Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
+//   Widget_Data *wd = elm_widget_data_get(obj);
 }
 
 static void
 _sub_del(void *data, Evas_Object *obj, void *event_info)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *sub = event_info;
+//   Widget_Data *wd = elm_widget_data_get(obj);
+//   Evas_Object *sub = event_info;
 }
 
 static void
@@ -463,6 +467,37 @@ elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, con
 	  }
 	wd->text_center = eina_stringshare_add(label);
 	edje_object_part_text_set(wd->as, "elm.text.center", label);
+     }
+   else if (pos == ELM_ACTIONSLIDER_LABEL_BUTTON)
+     {
+	if (wd->text_button)
+	  {
+	     eina_stringshare_del(wd->text_button);
+	  }
+	wd->text_button = eina_stringshare_add(label);
+	edje_object_part_text_set(wd->icon, "elm.text.button", label);
+
+	/* Resize button width */
+	Evas_Object *txt;
+	txt = (Evas_Object *)edje_object_part_object_get (wd->icon, "elm.text.button");
+	if (txt != NULL) 
+	  {
+	     evas_object_text_text_set (txt, wd->text_button);
+
+	     Evas_Coord x,y,w,h;
+	     evas_object_geometry_get (txt, &x,&y,&w,&h);
+
+	     char *data_left = NULL, *data_right = NULL;
+	     int pad_left = 0, pad_right = 0;
+
+	     data_left = (char *)edje_object_data_get (wd->icon, "left");
+	     data_right = (char *)edje_object_data_get (wd->icon, "right");
+
+	     if (data_left) pad_left = atoi(data_left);
+	     if (data_right) pad_right = atoi(data_right);
+
+	     evas_object_size_hint_min_set (wd->icon, w + pad_left + pad_right, 0);
+	  }
      }
 
    return 0;

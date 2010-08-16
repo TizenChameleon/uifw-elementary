@@ -2278,7 +2278,8 @@ extern "C" {
      {
 	ELM_ACTIONSLIDER_LABEL_LEFT,
 	ELM_ACTIONSLIDER_LABEL_RIGHT,
-	ELM_ACTIONSLIDER_LABEL_CENTER
+	ELM_ACTIONSLIDER_LABEL_CENTER,
+	ELM_ACTIONSLIDER_LABEL_BUTTON
      } Elm_Actionslider_Label_Pos;
 
    EAPI Evas_Object *elm_actionslider_add(Evas_Object *parent);
