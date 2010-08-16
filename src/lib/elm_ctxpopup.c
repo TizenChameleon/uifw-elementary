@@ -42,9 +42,9 @@ struct _Widget_Data
    Elm_Ctxpopup_Arrow arrow_priority[4];
    Eina_Bool scroller_disabled:1;
    Eina_Bool horizontal:1;
-   Eina_Bool arrow_disabled:1;
    Eina_Bool visible:1;
    Eina_Bool screen_dimmed_disabled:1;
+   Eina_Bool position_forced: 1;
 };
 
 static const char *widtype = NULL;
@@ -240,13 +240,18 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	return ELM_CTXPOPUP_ARROW_DOWN;
      }
 
-   if (!wd->arrow_disabled)
-     {
+   if(wd->position_forced)
+   {
+	   rect->x = x;
+	   rect->y = y;
+	   rect->w = base_w;
+	   rect->h = base_h;
+	   return ELM_CTXPOPUP_ARROW_DOWN;
+   }
+
 	edje_object_part_geometry_get(wd->arrow, "ctxpopup_arrow", NULL, NULL,
 				      &arrow_w, &arrow_h);
-
 	evas_object_resize(wd->arrow, arrow_w, arrow_h);
-     }
 
    //Define x, y Segments and find invalidated direction.
    for (idx = 0; idx < 4; ++idx)
@@ -384,8 +389,6 @@ _sizing_eval(Evas_Object *obj)
    Eina_List *elist;
    Elm_Ctxpopup_Item *item;
    Evas_Coord_Rectangle rect = { 0, 0, 1, 1 };
-   Evas_Coord scr_x, scr_y;
-
    Elm_Ctxpopup_Arrow arrow;
 
    wd = (Widget_Data *) elm_widget_data_get(obj);
@@ -400,7 +403,7 @@ _sizing_eval(Evas_Object *obj)
 
    //base
    arrow = _calc_base_geometry(obj, &rect);
-   if (!wd->arrow_disabled)
+   if (!wd->position_forced)
      {
 	_update_arrow_obj(obj, arrow);
 	_shift_base_by_arrow(wd->arrow, arrow, &rect);
@@ -408,16 +411,7 @@ _sizing_eval(Evas_Object *obj)
 
    evas_object_move(wd->base, rect.x, rect.y);
    evas_object_resize(wd->base, rect.w, rect.h);
-   fprintf( stderr, "%d %d %d %d\n", rect.x, rect.y, rect.w, rect.h);
 
-   //content
-   /*
-   if(wd->content) {
-	   edje_object_part_geometry_get(wd->base, "elm.swallow.scroller", &scr_x, &scr_y, &rect.w, &rect.h);
-	   evas_object_move(wd->scroller, rect.x + scr_x, rect.y + scr_y);
-	   evas_object_resize(wd->scroller, rect.w, rect.h);
-   }
-*/
 }
 
 static void
@@ -600,7 +594,7 @@ _ctxpopup_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
    }
    evas_object_show(wd->base);
 
-   if (!wd->arrow_disabled)
+   if (!wd->position_forced)
       evas_object_show(wd->arrow);
 
    wd->visible = EINA_TRUE;
@@ -1202,40 +1196,19 @@ elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first,
    wd->arrow_priority[3] = fourth;
 }
 
-/**
- * 
- * Add a new item as an icon in given ctxpopup object.
- *
- * @param obj 	 	Ctxpopup object
- * @param icon		Icon to be set
- * @param func		Callback function to call when this item click is clicked
- * @param data          User data for callback function
- * @return 		Added ctxpopup item
- * 
- * @ingroup Ctxpopup
- */
 EAPI Elm_Ctxpopup_Item *
 elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon,
 		      Evas_Smart_Cb func, void *data)
 {
+	fprintf( stderr, "elm_ctxpopup_icon_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
 	return elm_ctxpopup_item_add(obj, icon, NULL, func, data);
 }
 
-/**
- * Add a new item as an label in given ctxpopup object.
- *
- * @param obj 	 	Ctxpopup object
- * @param label		label to be set
- * @param func		Callback function to call when this item click is clicked
- * @param data    User data for callback function
- * @return 		Added ctxpopup item
- *
- * @ingroup Ctxpopup
- */
 EAPI Elm_Ctxpopup_Item *
 elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
 		       Evas_Smart_Cb func, void *data)
 {
+	fprintf( stderr, "elm_ctxpopup_label_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
 	return elm_ctxpopup_item_add(obj, NULL, label, func, data);
 }
 
@@ -1268,4 +1241,43 @@ elm_ctxpopup_content_unset(Evas_Object *obj)
 	   if(wd->visible)
 		   _sizing_eval(obj);
 }
+
+EAPI void
+elm_ctxpopup_position_forced_set(Evas_Object *obj, Eina_Bool forced)
+{
+	   ELM_CHECK_WIDTYPE(obj, widtype);
+	   Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+
+	   wd->position_forced = forced;
+
+	   if(forced)
+		   evas_object_hide(wd->arrow);
+
+	   if(wd->visible)
+		   _sizing_eval(obj);
+}
+
+EAPI Eina_Bool
+elm_ctxpopup_position_forced_get(Evas_Object *obj)
+{
+	   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+	   Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+
+	   return wd->position_forced;
+
+}
+
+EAPI void
+elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y) 
+{
+   fprintf(stderr, "elm_ctxpopup_align_set is deprecated! Sorry, it does not work anymore.\n");
+}
+
+EAPI void
+elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y)
+{
+   fprintf(stderr, "elm_ctxpopup_align_get is deprecated! Sorry, it does not work anymore.\n");
+}
+
+
 
