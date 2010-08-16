@@ -1795,6 +1795,20 @@ extern "C" {
     * default
     */
 
+   /* datefield */
+   typedef enum _Elm_Datefield_Layout
+   {
+	ELM_DATEFIELD_LAYOUT_TIME,
+	ELM_DATEFIELD_LAYOUT_DATE,
+	ELM_DATEFIELD_LAYOUT_DATEANDTIME
+   } Elm_Datefield_Layout;
+   
+   EAPI Evas_Object *elm_datefield_add(Evas_Object *parent);
+   EAPI void elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
+   EAPI void elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour, int min);
+   EAPI void elm_datefield_date_get(Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min);
+   EAPI void elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);    
+
    /* titlebar */
    EAPI Evas_Object *elm_titlebar_add(Evas_Object *parent);
    EAPI void         elm_titlebar_label_set(Evas_Object *obj, const char *label);
