@@ -702,7 +702,7 @@ extern "C" {
    EAPI void         elm_selectioninfo_parent_set(Evas_Object *obj, Evas_Object *parent);
    EAPI void         elm_selectioninfo_check_state_set(Evas_Object *obj, Eina_Bool *state, int count);
    EAPI int          elm_selectioninfo_checked_count_get(Evas_Object *obj);
-   EAPI void         elm_selectioninfo_text_set(Evas_Object *obj, char* text);
+   EAPI void         elm_selectioninfo_label_set(Evas_Object *obj, char* text);
    /* smart callbacks called:
     */
    

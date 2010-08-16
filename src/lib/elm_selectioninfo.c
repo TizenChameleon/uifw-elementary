@@ -207,7 +207,7 @@ elm_selectioninfo_add(Evas_Object *parent)
  * @param obj The selctioninfo object
  * @param content The content will be filled in this selectioninfo object
  *
- * @ingroup Notify
+ * @ingroup Selectioninfo
  */
 EAPI void
 elm_selectioninfo_content_set(Evas_Object *obj, Evas_Object *content)
@@ -329,7 +329,7 @@ elm_selectioninfo_checked_count_get(Evas_Object *obj)
  */
 
 EAPI void
-elm_selectioninfo_text_set(Evas_Object *obj, char* text)
+elm_selectioninfo_label_set(Evas_Object *obj, char* text)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
