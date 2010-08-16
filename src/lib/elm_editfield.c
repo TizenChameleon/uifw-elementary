@@ -183,9 +183,17 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
    if(!wd || !wd->base) return;
 
    if(!strcmp(source, "eraser"))
-     {
-	elm_entry_entry_set(wd->entry, "");			   
-     } 	   
+   {
+	   elm_entry_entry_set(wd->entry, "");
+	   if(wd->editing == EINA_FALSE) {
+		   if(wd->guide_text) 
+		   {
+			   edje_object_part_text_set(wd->base, "elm.guidetext", wd->guide_text);
+			   edje_object_signal_emit(wd->base, "elm,state,guidetext,visible", "elm");
+			   wd->show_guide_text = EINA_TRUE;
+		   }
+	   }
+   } 	   
    else if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "eraser"))
      {
 	edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
