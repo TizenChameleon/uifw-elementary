@@ -1029,6 +1029,9 @@ elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char *label,
    else
       _item_obj_create(item, "text_style_item");
 
+   if(eina_list_count(wd->items)==0)
+	   edje_object_signal_emit(wd->base, "elm,state,scroller,enable", "elm");
+
    wd->items = eina_list_append(wd->items, item);
    elm_box_pack_end(wd->box, item->base);
    elm_ctxpopup_item_icon_set(item, icon);
@@ -1065,12 +1068,13 @@ elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item)
 	wd->items = eina_list_remove(wd->items, item);
      }
    free(item);
-   if (eina_list_count(wd->items) < 1)
+   if (eina_list_count(wd->items) == 0)
      {
 	evas_object_hide(wd->arrow);
 	evas_object_hide(wd->base);
 	if (!wd->screen_dimmed_disabled)
 	   evas_object_hide(wd->bg);
+	edje_object_signal_emit(wd->base, "elm,state,scroller,disable", "elm");
      }
 }
 
