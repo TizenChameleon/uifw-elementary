@@ -75,10 +75,6 @@ void test_floating(void *data, Evas_Object *obj, void *event_info);
 void test_launcher(void *data, Evas_Object *obj, void *event_info);
 void test_launcher2(void *data, Evas_Object *obj, void *event_info);
 void test_anim(void *data, Evas_Object *obj, void *event_info);
-#ifdef ELM_EWEBKIT
-void test_webview(void *data, Evas_Object *obj, void *event_info);
-void test_webview_in_scroller(void *data, Evas_Object *obj, void *event_info);
-#endif
 
 
 struct elm_test
@@ -274,10 +270,6 @@ my_win_main(void)
    ADD_TEST("Launcher", test_launcher);
    ADD_TEST("Launcher 2", test_launcher2);
    ADD_TEST("Animation", test_anim);
-#ifdef ELM_EWEBKIT
-   ADD_TEST("WebKit", test_webview);
-   ADD_TEST("WebKit2", test_webview_in_scroller);
-#endif
 #undef ADD_TEST
 
    if (tests)
