@@ -73,38 +73,14 @@ _on_focus_hook(void *data, Evas_Object *obj)
 }
 
 static void
-_mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-   Elm_Segment_Item *item = (Elm_Segment_Item *) data;
-   Widget_Data *wd = elm_widget_data_get(item->obj);
-
-   if (!wd) return;
-
-   if(wd->selected == EINA_TRUE)
-     {
-         wd->selected = EINA_FALSE;
-         return;
-     }
-
-   if(wd->longpressed == EINA_FALSE)
-     {
-       edje_object_signal_emit(item->base, "elm,action,unfocus", "elm");
-       edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
-     }
-   if (item->long_timer)
-     {
-       ecore_timer_del(item->long_timer);
-       item->long_timer = NULL;
-     }
-}
-
-static void
 _signal_segment_on(void *data)
 {
    Elm_Segment_Item *item = (Elm_Segment_Item *) data;
    Widget_Data *wd = elm_widget_data_get(item->obj);
 
    if (!wd) return;
+
+   wd->selected = EINA_TRUE;
 
    if (item->long_timer)
      {
@@ -137,6 +113,67 @@ _signal_segment_on(void *data)
    wd->cur_seg_id = item->segment_id;
    evas_object_smart_callback_call(item->obj, "changed", (void*)wd->cur_seg_id);
    return;
+}
+
+static void
+_mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Elm_Segment_Item *item = (Elm_Segment_Item *) data;
+   Widget_Data *wd = elm_widget_data_get(item->obj);
+   Evas_Event_Mouse_Up * ev = event_info;
+   Evas_Coord x, y, w, h;
+
+   if (!wd) return;
+
+   evas_object_geometry_get(obj, &x, &y, &w, &h);
+   if(ev->output.x > x && ev->output.x < x+w && ev->output.y > y && ev->output.y < y+h && wd->selected == EINA_FALSE)
+     {
+	_signal_segment_on(item);
+     }
+   else
+     {
+         wd->selected = EINA_FALSE;
+         return;
+     }
+
+   if(wd->longpressed == EINA_FALSE)
+     {
+       edje_object_signal_emit(item->base, "elm,action,unfocus", "elm");
+       edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
+     }
+   if (item->long_timer)
+     {
+       ecore_timer_del(item->long_timer);
+       item->long_timer = NULL;
+     }
+}
+
+static void
+_mouse_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
+{
+   Elm_Segment_Item *item = (Elm_Segment_Item *) data;
+   Widget_Data *wd = elm_widget_data_get(item->obj);
+   Evas_Event_Mouse_Move * ev = event_info;
+   Evas_Coord x, y, w, h;
+
+   if (!wd) return;
+
+   evas_object_geometry_get(obj, &x, &y, &w, &h);
+   if(ev->cur.output.x > x && ev->cur.output.x < x+w && ev->cur.output.y > y && ev->cur.output.y < y+h)
+     {
+	return;
+     }
+
+	if(wd->longpressed == EINA_FALSE)
+     {
+       edje_object_signal_emit(item->base, "elm,action,unfocus", "elm");
+       edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
+     }
+   if (item->long_timer)
+     {
+       ecore_timer_del(item->long_timer);
+       item->long_timer = NULL;
+     }
 }
 
 static void
@@ -546,6 +583,7 @@ elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char 
    wd->id = eina_list_count(wd->seg_ctrl);
    _update_list(obj);
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down, it);
+   evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_MOVE, _mouse_move, it);
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_UP, _mouse_up, it);
    wd->insert_index = 0;
    wd->del_index = 0;

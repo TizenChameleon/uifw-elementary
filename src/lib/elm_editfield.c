@@ -16,6 +16,7 @@ struct _Widget_Data
 {
    Evas_Object *base;	
    Evas_Object *entry;
+   Evas_Object *scroller;
    Evas_Object *ricon;
    Evas_Object *licon;
    const char *label;
@@ -182,9 +183,17 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
    if(!wd || !wd->base) return;
 
    if(!strcmp(source, "eraser"))
-     {
-	elm_entry_entry_set(wd->entry, "");			   
-     } 	   
+   {
+	   elm_entry_entry_set(wd->entry, "");
+	   if(wd->editing == EINA_FALSE) {
+		   if(wd->guide_text) 
+		   {
+			   edje_object_part_text_set(wd->base, "elm.guidetext", wd->guide_text);
+			   edje_object_signal_emit(wd->base, "elm,state,guidetext,visible", "elm");
+			   wd->show_guide_text = EINA_TRUE;
+		   }
+	   }
+   } 	   
    else if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "eraser"))
      {
 	edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
@@ -497,11 +506,42 @@ EAPI void
 elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype);	
-   if (!wd || !wd->base) 
+   Evas_Object *entry;
+   ELM_CHECK_WIDTYPE(obj, widtype);	   
+   if (!wd || !wd->base || wd->single_line == single_line) 
      return;
    wd->single_line = single_line;
    elm_entry_single_line_set(wd->entry, single_line);
+   if(single_line) {
+	   if(!wd->scroller){
+		   wd->scroller = elm_scroller_add(obj);
+		   elm_scroller_bounce_set(wd->scroller, 0, 0);
+	   	   elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+		   elm_widget_sub_object_add(obj, wd->scroller);
+	   	   elm_scroller_content_min_limit(wd->scroller, 0, 1);
+	   }
+	   edje_object_part_unswallow(wd->base, wd->entry);
+	   edje_object_part_swallow(wd->base, "elm.swallow.content", wd->scroller);
+	   elm_scroller_content_set(wd->scroller, wd->entry);
+   }
+   else {
+	   entry = elm_entry_add(obj);
+	   elm_object_style_set(entry, "editfield");
+	   evas_object_size_hint_weight_set(entry, 0, EVAS_HINT_EXPAND);
+	   evas_object_size_hint_align_set(entry, 0, EVAS_HINT_FILL);
+	   evas_object_event_callback_add(entry,
+			   EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+			   _changed_size_hints, obj);
+	   edje_object_part_swallow(wd->base, "elm.swallow.content", entry);
+	   evas_object_smart_callback_add(entry, "changed", _entry_changed_cb, obj);
+	   elm_widget_sub_object_add(obj, entry);
+	   elm_entry_entry_set(entry, elm_entry_entry_get(wd->entry));
+	   if(wd->scroller)
+		   edje_object_part_unswallow(wd->base, wd->scroller);
+	   evas_object_del(wd->entry);
+	   wd->entry = entry;
+	   edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
+   }
 }
 
 /**

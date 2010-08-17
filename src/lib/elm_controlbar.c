@@ -883,6 +883,7 @@ item_exchange_animation_cb(void *data, Evas_Object * obj)
 	printf("animation error\n");
 	wd->animating = 0;
      }
+   evas_object_map_enable_set(obj, EINA_FALSE);
 }
 
 static void
@@ -924,6 +925,7 @@ item_change_animation_cb(void *data, Evas_Object * obj)
 	printf("animation error\n");
 	wd->animating = 0;
      }
+   evas_object_map_enable_set(obj, EINA_FALSE);
    evas_object_geometry_get(obj, &x, &y, &w, &h);
    set_evas_map(obj, x, y, 0, 0);
    evas_object_move(obj, -1000, -1000);
@@ -1487,6 +1489,7 @@ bar_item_move_end_cb(void *data, Evas_Object * obj)
 	wd->animating = 0;
      }
    evas_object_data_set(obj, "animating", 0);
+   evas_object_map_enable_set(obj, EINA_FALSE);
 }
 	
 static int
@@ -1578,8 +1581,10 @@ bar_item_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    Widget_Data * wd = (Widget_Data *) data;
    evas_object_geometry_get(wd->moving_obj, &x, &y, &w, &h);
    tx = ev->output.x - w / 2;
+   wd->animating++;
+   evas_object_data_set(wd->moving_obj, "animating", (void *)1);
    move_object_with_animation(wd->moving_obj, tx, y, w, h, x, y, w, h, 0.25,
-			       move_evas_map, NULL, NULL);
+			       move_evas_map, bar_item_move_end_cb, wd);
    ecore_timer_add(0.1, bar_item_animation_end_check, wd);
    return;
 }
