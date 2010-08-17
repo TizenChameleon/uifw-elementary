@@ -412,16 +412,6 @@ if test "x$want_elementary_ewebkit" != "xno"; then
        ],
        [have_elementary_ewebkit="no"]
     )
-    PKG_CHECK_MODULES([ELEMENTARY_EWEBKIT_SUPPORT],
-       [
-        glib-2.0
-        gobject-2.0
-        gthread-2.0
-       ],
-       [],
-       [have_elementary_ewebkit="no"]
-    )
-
 else
     have_elementary_ewebkit="no"
 fi

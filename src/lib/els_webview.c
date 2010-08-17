@@ -6,8 +6,6 @@
 #include "elm_priv.h"
 
 #ifdef ELM_EWEBKIT
-#include <glib.h>
-#include <glib-object.h>
 #include <EWebKit.h>
 #include <cairo.h>
 
@@ -270,13 +268,18 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 
    if (!_smart)
      {
-	// init g_thread
-	g_type_init();
-	if (!g_thread_get_initialized())
-	  g_thread_init(NULL);
-
 	ewk_handle = dlopen(EWEBKIT_PATH, RTLD_LAZY);
+	if (ewk_handle == NULL)
+	  {
+	     ERR("could not initialize ewk \n");
+	     return NULL;
+	  }
 	cairo_handle = dlopen(CAIRO_PATH, RTLD_LAZY);
+	if (cairo_handle == NULL)
+	  {
+	     ERR("could not initialize cairo \n");
+	     return NULL;
+	  }
 
 	// init ewk
 	if (!ewk_init)
