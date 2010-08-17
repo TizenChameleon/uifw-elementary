@@ -394,7 +394,7 @@ AC_SUBST(ELM_EWEATHER_DEF)
 
 ELM_EWEBKIT_DEF="#undef"
 have_elementary_ewebkit="no"
-want_elementary_ewebkit="no"
+want_elementary_ewebkit="auto"
 AC_ARG_ENABLE([ewebkit],
    [AC_HELP_STRING([--disable-ewebkit], [disable ewebkit support. @<:@default=detect@:>@])],
    [want_elementary_ewebkit=$enableval], [])
@@ -412,16 +412,6 @@ if test "x$want_elementary_ewebkit" != "xno"; then
        ],
        [have_elementary_ewebkit="no"]
     )
-    PKG_CHECK_MODULES([ELEMENTARY_EWEBKIT_SUPPORT],
-       [
-        glib-2.0
-        gobject-2.0
-        gthread-2.0
-       ],
-       [],
-       [have_elementary_ewebkit="no"]
-    )
-
 else
     have_elementary_ewebkit="no"
 fi
