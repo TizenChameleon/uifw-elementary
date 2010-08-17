@@ -138,13 +138,13 @@ obj_longpress(Evas_Object *obj)
 	if (!ext_mod->selmode)
 		{	
 			if (!ext_mod->password)
-				elm_ctxpopup_label_add(ext_mod->popup, "Select",_select, obj );
+				elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select",_select, obj );
 			if (1) // need way to detect if someone has a selection
 				{
 					if (ext_mod->editable)
-						elm_ctxpopup_label_add(ext_mod->popup, "Paste",	_paste, obj );
+						elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",	_paste, obj );
 				}
-	//		elm_ctxpopup_label_add(wd->ctxpopup, "Selectall",_select_all, obj );
+	//		elm_ctxpopup_item_add(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 		}
 	else
 		{
@@ -152,25 +152,25 @@ obj_longpress(Evas_Object *obj)
 				{
 					if (ext_mod->have_selection)
 						{
-							elm_ctxpopup_label_add(ext_mod->popup, "Copy",_copy, obj );
+							elm_ctxpopup_item_add(ext_mod->popup, NULL, "Copy",_copy, obj );
 							if (ext_mod->editable)
-								elm_ctxpopup_label_add(ext_mod->popup, "Cut",_cut, obj );							
+								elm_ctxpopup_item_add(ext_mod->popup, NULL, "Cut",_cut, obj );							
 						}
 					else
 						{
 							_cancel(obj,ext_mod->popup,NULL);		
-							elm_ctxpopup_label_add(ext_mod->popup, "Select",_select, obj );
+							elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select",_select, obj );
 							if (1) // need way to detect if someone has a selection
 								{
 									if (ext_mod->editable)
-										elm_ctxpopup_label_add(ext_mod->popup, "Paste",	_paste, obj );
+										elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",	_paste, obj );
 								}
 						}
 				}
 		}
 		EINA_LIST_FOREACH(ext_mod->items, l, it)
 		{
-			elm_ctxpopup_label_add(ext_mod->popup, it->label,_item_clicked, it );
+			elm_ctxpopup_item_add(ext_mod->popup, NULL, it->label,_item_clicked, it );
 		}
 	if (ext_mod->popup)
 		{
