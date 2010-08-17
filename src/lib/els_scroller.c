@@ -439,18 +439,22 @@ _smart_page_x_get(Smart_Data *sd, int offset)
         x = x / (w * sd->pagerel_h);
         x = x * (w * sd->pagerel_h);
 
-	if(sd->one_page){
-		if(offset == 0){
-			if(t > x) x = x + (w * sd->pagerel_h);
-			if(t < x) x = x - (w * sd->pagerel_h);
-	  	}
-	   	if(offset > 0){
-			if(t > x) x = x + (w * sd->pagerel_h);
-	   	}
-	   	if(offset < 0){
-			if(t < x) x = x - (w * sd->pagerel_h);
-	   	}
-	   }
+	if (sd->one_page)
+	  {
+	     if (offset == 0)
+	       {
+		  if(t > x) x = x + (w * sd->pagerel_h);
+		  if(t < x) x = x - (w * sd->pagerel_h);
+	       }
+	     else if (offset > 0)
+	       {
+		  if(t > x) x = x + (w * sd->pagerel_h);
+	       }
+	     else if (offset < 0)
+	       {
+		  if(t < x) x = x - (w * sd->pagerel_h);
+	       }
+	  }
      }
    else if (sd->pagesize_h > 0)
      {
@@ -458,18 +462,22 @@ _smart_page_x_get(Smart_Data *sd, int offset)
         x = x / (sd->pagesize_h);
         x = x * (sd->pagesize_h);
 
-	if(sd->one_page){
-		if(offset == 0){
-			if(t > x) x = x + (sd->pagesize_h);
-			if(t < x) x = x - (sd->pagesize_h);
-	  	}
-	   	if(offset > 0){
-			if(t > x) x = x + (sd->pagesize_h);
-	   	}
-	   	if(offset < 0){
-			if(t < x) x = x - (sd->pagesize_h);
-	   	}
-	   }
+	if(sd->one_page) 
+	  {
+	     if (offset == 0)
+	       {
+		  if(t > x) x = x + (sd->pagesize_h);
+		  if(t < x) x = x - (sd->pagesize_h);
+	       }
+	     else if (offset > 0)
+	       {
+		  if(t > x) x = x + (sd->pagesize_h);
+	       }
+	     else if (offset < 0)
+	       {
+		  if(t < x) x = x - (sd->pagesize_h);
+	       }
+	  }
      }
    if (x < 0) x = 0;
    else if ((x + w) > cw) x = cw - w;

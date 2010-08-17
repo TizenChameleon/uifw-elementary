@@ -31,4 +31,4 @@ void elm_smart_scroller_bounce_allow_get        (const Evas_Object *obj, Eina_Bo
 void elm_smart_scroller_paging_set              (Evas_Object *obj, double pagerel_h, double pagerel_v, Evas_Coord pagesize_h, Evas_Coord pagesize_v);
 void elm_smart_scroller_region_bring_in         (Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
 void elm_smart_scroller_widget_set              (Evas_Object *obj, Evas_Object *wid);
-void elm_smart_scroller_page_move_set		(Evas_Object *obj, Eina_Bool set);
+void elm_smart_scroller_page_move_set           (Evas_Object *obj, Eina_Bool set);

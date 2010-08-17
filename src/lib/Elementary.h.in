@@ -696,12 +696,13 @@ extern "C" {
    EAPI void         elm_notify_repeat_events_set(Evas_Object *obj, Eina_Bool repeat);
    /* smart callbacks called:
     */
-  
+ 
    EAPI Evas_Object *elm_selectioninfo_add(Evas_Object *parent);
    EAPI void         elm_selectioninfo_content_set(Evas_Object *obj, Evas_Object *content);
    EAPI void         elm_selectioninfo_parent_set(Evas_Object *obj, Evas_Object *parent);
    EAPI void         elm_selectioninfo_check_state_set(Evas_Object *obj, Eina_Bool *state, int count);
-   EAPI void         elm_selectioninfo_show(Evas_Object *obj);
+   EAPI int          elm_selectioninfo_checked_count_get(Evas_Object *obj);
+   EAPI void         elm_selectioninfo_label_set(Evas_Object *obj, char* text);
    /* smart callbacks called:
     */
    
@@ -1794,6 +1795,20 @@ extern "C" {
     * default
     */
 
+   /* datefield */
+   typedef enum _Elm_Datefield_Layout
+   {
+	ELM_DATEFIELD_LAYOUT_TIME,
+	ELM_DATEFIELD_LAYOUT_DATE,
+	ELM_DATEFIELD_LAYOUT_DATEANDTIME
+   } Elm_Datefield_Layout;
+   
+   EAPI Evas_Object *elm_datefield_add(Evas_Object *parent);
+   EAPI void elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
+   EAPI void elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour, int min);
+   EAPI void elm_datefield_date_get(Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min);
+   EAPI void elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);    
+
    /* titlebar */
    EAPI Evas_Object *elm_titlebar_add(Evas_Object *parent);
    EAPI void         elm_titlebar_label_set(Evas_Object *obj, const char *label);
@@ -1869,8 +1884,8 @@ extern "C" {
    EAPI Eina_Bool    elm_ctxpopup_horizontal_get(Evas_Object *obj);
    EAPI void         elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon);
    EAPI void         elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label);
-   EAPI Elm_Ctxpopup_Item *elm_ctxpopup_label_add(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data);
-   EAPI Elm_Ctxpopup_Item *elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon, Evas_Smart_Cb func, const void *data);
+   EAPI Elm_Ctxpopup_Item *elm_ctxpopup_label_add(Evas_Object *obj, const char *label, Evas_Smart_Cb func, void *data) __attribute__((deprecated));
+   EAPI Elm_Ctxpopup_Item *elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon, Evas_Smart_Cb func, void *data) __attribute__((deprecated));
    EAPI Elm_Ctxpopup_Item *elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, Evas_Smart_Cb func, void *data);
    EAPI void         elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item);
    EAPI void         elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item *item, Eina_Bool disabled);
@@ -1879,10 +1894,14 @@ extern "C" {
    EAPI Evas_Object *elm_ctxpopup_item_icon_get(Elm_Ctxpopup_Item *item); 
    EAPI void         elm_ctxpopup_scroller_disabled_set(Evas_Object *obj, Eina_Bool disabled);
    EAPI void         elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled);
-   EAPI void         elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y);
-   EAPI void         elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y);
    EAPI void         elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data);
-	EAPI void 			elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first, Elm_Ctxpopup_Arrow second, Elm_Ctxpopup_Arrow third, Elm_Ctxpopup_Arrow fourth);
+   EAPI void         elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y) __attribute__((deprecated));
+   EAPI void         elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y) __attribute__((deprecated));
+   EAPI void  	     elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first, Elm_Ctxpopup_Arrow second, Elm_Ctxpopup_Arrow third, Elm_Ctxpopup_Arrow fourth);
+   EAPI void	     elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content);
+   EAPI Evas_Object *elm_ctxpopup_content_unset(Evas_Object *obj);
+   EAPI void	     elm_ctxpopup_position_forced_set(Evas_Object *obj, Eina_Bool forced);
+   EAPI Eina_Bool    elm_ctxpopup_position_forced_get(Evas_Object *obj); 
    
    /* QuickContactBadge */
    typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;
@@ -2105,23 +2124,27 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, Evas_Object *obj_item, const int sel);
-   EAPI void         elm_controlbar_item_del(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_select(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
-   EAPI void         elm_controlbar_item_editable_set(Elm_Controlbar_Item *it, Eina_Bool editable);
+   EAPI void elm_controlbar_item_del(Elm_Controlbar_Item *it);
+   EAPI void elm_controlbar_item_select(Elm_Controlbar_Item *it);
+   EAPI void elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
+   EAPI void elm_controlbar_item_editable_set(Elm_Controlbar_Item *it, Eina_Bool editable);
    EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
-   EAPI const char  *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
+   EAPI const char *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
+   EAPI void elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
    EAPI Elm_Controlbar_Item *elm_controlbar_selected_item_get(Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_first_item_get(Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_last_item_get(Evas_Object *obj);
-   EAPI Eina_List   *elm_controlbar_items_get(Evas_Object *obj);
+   EAPI Eina_List *elm_controlbar_items_get(Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_item_prev(Elm_Controlbar_Item *it);
    EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_edit_start(Evas_Object *obj);
-   EAPI void         elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
-   EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
-   EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
+   EAPI void elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
+   EAPI void elm_controlbar_mode_set(Evas_Object *obj, int mode);
+   /*======= Please don't use this APIs =======*/
+   EAPI void elm_controlbar_edit_start(Evas_Object *obj);
+   EAPI void elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
+   EAPI void elm_controlbar_animation_set(Evas_Object *obj, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI void elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
+   /*======= Just for test =======*/
 
 
   /* diskcontroller */
@@ -2273,7 +2296,8 @@ extern "C" {
      {
 	ELM_ACTIONSLIDER_LABEL_LEFT,
 	ELM_ACTIONSLIDER_LABEL_RIGHT,
-	ELM_ACTIONSLIDER_LABEL_CENTER
+	ELM_ACTIONSLIDER_LABEL_CENTER,
+	ELM_ACTIONSLIDER_LABEL_BUTTON
      } Elm_Actionslider_Label_Pos;
 
    EAPI Evas_Object *elm_actionslider_add(Evas_Object *parent);
@@ -2485,16 +2509,21 @@ extern "C" {
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
    
    /* WebView */
-   /* commented out until it is completed
    EAPI Evas_Object *elm_webview_add(Evas_Object *parent, Eina_Bool tiled);
-   EAPI Evas_Object *elm_webview_widget_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_webview_webkit_get(Evas_Object *obj);
    EAPI void         elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed);
-   EAPI void         elm_webview_events_feed_get(Evas_Object *obj);
+   EAPI Eina_Bool    elm_webview_events_feed_get(Evas_Object *obj);
    EAPI void         elm_webview_auto_fitting_set(Eina_Bool enable);
    EAPI Eina_Bool    elm_webview_auto_fitting_get();
    EAPI Evas_Object *elm_webview_minimap_get(Evas_Object *obj);
    EAPI void         elm_webview_uri_set(Evas_Object *obj, const char *uri);
-   */
+
+   /* NoContents */
+   EAPI Evas_Object *elm_nocontents_add(Evas_Object *parent);
+   EAPI void         elm_nocontents_label_set(Evas_Object *obj, const char *label);
+   EAPI const char  *elm_nocontents_label_get(const Evas_Object *obj);
+   EAPI void         elm_nocontents_custom_set(const Evas_Object *obj, Evas_Object *custom);
+   EAPI Evas_Object *elm_nocontents_custom_get(const Evas_Object *obj);
 
 #ifdef __cplusplus
 }

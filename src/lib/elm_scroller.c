@@ -366,8 +366,8 @@ elm_scroller_content_set(Evas_Object *obj, Evas_Object *content)
      {
 	elm_widget_on_show_region_hook_set(content, _show_region_hook, obj);
 	elm_widget_sub_object_add(obj, content);
-        if (wd->scr)
-          elm_smart_scroller_child_set(wd->scr, content);
+    if (wd->scr)
+        elm_smart_scroller_child_set(wd->scr, content);
 	evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				       _changed_size_hints, obj);
 	_sizing_eval(obj);

@@ -117,7 +117,7 @@ obj_longpress(Evas_Object *obj)
 					if (ext_mod->editable)
 						elm_list_item_append(list, "Paste", NULL, NULL,_paste, obj);
 				}
-	//		elm_ctxpopup_label_add(wd->ctxpopup, "Selectall",_select_all, obj );
+	//		elm_ctxpopup_item_add(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 		}
 	else
 		{
