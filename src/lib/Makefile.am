@@ -127,6 +127,7 @@ elm_cnp_helper.c \
 elm_webview.c \
 elm_cbhm_helper.c \
 elm_datefield.c \
+elm_nocontents.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \

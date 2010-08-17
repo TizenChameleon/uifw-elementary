@@ -111,7 +111,7 @@ elm_webview_add(Evas_Object *parent, Eina_Bool tiled)
 }
 
 EAPI Evas_Object *
-elm_webview_widget_get(Evas_Object *obj)
+elm_webview_webkit_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -123,7 +123,7 @@ elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed)
 {
 }
 
-EAPI void
+EAPI Eina_Bool
 elm_webview_events_feed_get(Evas_Object *obj)
 {
 }

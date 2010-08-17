@@ -55,6 +55,7 @@ struct _Widget_Data
    Elm_Controlbar_Item * cur_item;
    Evas_Coord x, y, w, h;
    Eina_Bool edit_mode;
+   Eina_Bool more_mode;
    int mode;
    int empty_num;
    int num;
@@ -1891,6 +1892,7 @@ create_more_item(Widget_Data *wd)
    wd->num = 0;
    wd->animating = 0;
    wd->edit_mode = EINA_FALSE;
+   wd->more_mode = EINA_FALSE;
    wd->init_animation = EINA_FALSE;
    wd->selected_animation = EINA_FALSE;
    wd->view = elm_layout_add(wd->parent); //edje_object_add(wd->evas);
@@ -2013,7 +2015,7 @@ create_more_item(Widget_Data *wd)
    if (it == NULL)
       return NULL;
    wd = elm_widget_data_get(obj);
-   if(check_bar_item_number(wd) >= 5){
+   if(check_bar_item_number(wd) >= 5 && wd->more_mode){
 	if(!wd->more_item) {
 	     lit = elm_controlbar_last_item_get(obj);
 	     elm_controlbar_item_visible_set(lit, EINA_FALSE);
@@ -2061,7 +2063,7 @@ create_more_item(Widget_Data *wd)
       return NULL;
    wd = elm_widget_data_get(obj);
    item = eina_list_data_get(wd->items);
-   if(check_bar_item_number(wd) >= 5){
+   if(check_bar_item_number(wd) >= 5 && wd->more_mode){
 	if(!wd->more_item) {
 	     lit = elm_controlbar_last_item_get(obj);
 	     elm_controlbar_item_visible_set(lit, EINA_FALSE);
@@ -2108,7 +2110,7 @@ elm_controlbar_tab_item_insert_before(Evas_Object * obj,
    if (it == NULL)
       return NULL;
    wd = elm_widget_data_get(obj);
-   if(check_bar_item_number(wd) >= 5){
+   if(check_bar_item_number(wd) >= 5 && wd->more_mode){
 	if(!wd->more_item) 
 	  {
 	     lit = elm_controlbar_last_item_get(obj);
@@ -2165,7 +2167,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
       return NULL;
    wd = elm_widget_data_get(obj);
    item = elm_controlbar_item_next(after);
-   if(check_bar_item_number(wd) >= 5){
+   if(check_bar_item_number(wd) >= 5 && wd->more_mode){
 	if(!wd->more_item) 
 	  {
 	     lit = elm_controlbar_last_item_get(obj);

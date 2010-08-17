@@ -224,9 +224,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    edje_object_size_min_calc(wd->base,&base_w, &base_h);
    edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
 
-   fprintf( stderr, "%d %d\n", base_w, base_h);
-
-
    max_width_size *= elm_scale_get();
    max_height_size *= elm_scale_get();
 
@@ -236,8 +233,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    if (base_w > max_width_size)
       base_w = max_width_size;
 
-   finger_size = elm_finger_size_get();
-
    if(wd->position_forced)
    {
 	   rect->x = x;
@@ -246,6 +241,8 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	   rect->h = base_h;
 	   return ELM_CTXPOPUP_ARROW_DOWN;
    }
+
+   finger_size = elm_finger_size_get();
 
 	edje_object_part_geometry_get(wd->arrow, "ctxpopup_arrow", NULL, NULL,
 				      &arrow_w, &arrow_h);
@@ -411,6 +408,7 @@ _sizing_eval(Evas_Object *obj)
 
    //base
    arrow = _calc_base_geometry(obj, &rect);
+
    if (!wd->position_forced)
      {
 	_update_arrow_obj(obj, arrow);
@@ -419,7 +417,6 @@ _sizing_eval(Evas_Object *obj)
 
    evas_object_move(wd->base, rect.x, rect.y);
    evas_object_resize(wd->base, rect.w, rect.h);
-
 }
 
 static void
@@ -679,7 +676,7 @@ _item_obj_create(Elm_Ctxpopup_Item *item, char *group_name)
    edje_object_signal_callback_add(item->base, "elm,action,click", "",
 				   _ctxpopup_item_select, item);
    evas_object_size_hint_align_set(item->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_weight_set(wd->base, EVAS_HINT_EXPAND,
+   evas_object_size_hint_weight_set(item->base, EVAS_HINT_EXPAND,
 				    EVAS_HINT_EXPAND);
    evas_object_show(item->base);
 }
@@ -803,6 +800,8 @@ elm_ctxpopup_add(Evas_Object *parent)
 
    //Box
    wd->box = elm_box_add(obj);
+   evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_scroller_content_set(wd->scroller, wd->box);
 
    //Arrow
@@ -1137,7 +1136,6 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label,
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    char buf[256];
-   int idx;
    Evas_Object *btn;
    Evas_Coord w, h;
    Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
@@ -1155,8 +1153,6 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label,
    _elm_theme_object_set(obj, wd->btn_layout, "ctxpopup", buf,
 			 elm_widget_style_get(obj));
 
-   for (idx = 0; idx < wd->btn_cnt; ++idx)
-     {
 	btn = elm_button_add(obj);
 	elm_object_style_set(btn, "text_only/style1");
 	elm_button_label_set(btn, label);
@@ -1164,11 +1160,10 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label,
 	sprintf(buf, "actionbtn%d", wd->btn_cnt);
 	edje_object_part_swallow(wd->btn_layout, buf, btn);
 
-	//button layout
-	sprintf(buf, "actionbtn%d", wd->btn_cnt);
-	edje_object_part_geometry_get(wd->btn_layout, buf, 0, 0, &w, &h);
-	evas_object_size_hint_max_set(wd->btn_layout, 99999, h);
-     }
+    edje_object_size_max_get(wd->btn_layout, &w, &h);
+   	evas_object_size_hint_max_set(wd->btn_layout, 999999, h);
+   	edje_object_size_min_get(wd->btn_layout, &w, &h);
+   	evas_object_size_hint_min_set(wd->btn_layout, w, h);
 
    if (wd->visible)
       _sizing_eval(obj);
@@ -1205,22 +1200,6 @@ elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first,
    wd->arrow_priority[3] = fourth;
 }
 
-EAPI Elm_Ctxpopup_Item *
-elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon,
-		      Evas_Smart_Cb func, void *data)
-{
-	fprintf( stderr, "elm_ctxpopup_icon_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
-	return elm_ctxpopup_item_add(obj, icon, NULL, func, data);
-}
-
-EAPI Elm_Ctxpopup_Item *
-elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
-		       Evas_Smart_Cb func, void *data)
-{
-	fprintf( stderr, "elm_ctxpopup_label_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
-	return elm_ctxpopup_item_add(obj, NULL, label, func, data);
-}
-
 /**
  * Swallow the user contents
  *
@@ -1255,7 +1234,7 @@ elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 EAPI Evas_Object *
 elm_ctxpopup_content_unset(Evas_Object *obj)
 {
-	   ELM_CHECK_WIDTYPE(obj, widtype);
+	   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	   Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
 	   Evas_Object *content;
 
@@ -1274,6 +1253,17 @@ elm_ctxpopup_content_unset(Evas_Object *obj)
 	   return content;
 }
 
+/**
+ * Change the origin of the ctxpopup position.
+ *
+ * Basically, ctxpopup position is computed internally. When user call evas_object_move,
+ * Ctxpopup will be showed up with that position which is indicates the arrow point.
+ *
+ * @param obj		Ctxpopup object
+ * @param forced		EINA_TRUE is left-top. EINA_FALSE is indicates arrow point.
+ *
+ * @ingroup Ctxpopup
+ */
 EAPI void
 elm_ctxpopup_position_forced_set(Evas_Object *obj, Eina_Bool forced)
 {
@@ -1289,6 +1279,14 @@ elm_ctxpopup_position_forced_set(Evas_Object *obj, Eina_Bool forced)
 		   _sizing_eval(obj);
 }
 
+/**
+ * Get the status of the position forced
+ *
+ * @param obj		Ctxpopup objet
+ * @return			value of position forced
+ *
+ * @ingroup Ctxpopup
+ */
 EAPI Eina_Bool
 elm_ctxpopup_position_forced_get(Evas_Object *obj)
 {
@@ -1297,6 +1295,22 @@ elm_ctxpopup_position_forced_get(Evas_Object *obj)
 
 	   return wd->position_forced;
 
+}
+
+EAPI Elm_Ctxpopup_Item *
+elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon,
+		      Evas_Smart_Cb func, void *data)
+{
+	fprintf( stderr, "elm_ctxpopup_icon_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
+	return elm_ctxpopup_item_add(obj, icon, NULL, func, data);
+}
+
+EAPI Elm_Ctxpopup_Item *
+elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
+		       Evas_Smart_Cb func, void *data)
+{
+	fprintf( stderr, "elm_ctxpopup_label_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
+	return elm_ctxpopup_item_add(obj, NULL, label, func, data);
 }
 
 EAPI void
@@ -1310,6 +1324,7 @@ elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y)
 {
    fprintf(stderr, "elm_ctxpopup_align_get is deprecated! Sorry, it does not work anymore.\n");
 }
+
 
 
 

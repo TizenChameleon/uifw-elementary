@@ -364,7 +364,7 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
    deffont = edje_object_data_get(wd->lbl, "default_font_size");
    if (deffont) cur_fontsize = atoi(deffont);
    else cur_fontsize = 1;
-   if (minfontsize == maxfontsize || cur_fontsize == 1) return; // theme is not ready for ellipsis
+   if (minfontsize > maxfontsize || cur_fontsize == 1) return; // theme is not ready for ellipsis
    if (eina_stringshare_strlen(wd->label) <= 0) return;
 
    if (_get_value_in_key_string(wd->label, "font_size", &kvalue) == 0)
