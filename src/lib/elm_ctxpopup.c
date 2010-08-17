@@ -233,8 +233,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    if (base_w > max_width_size)
       base_w = max_width_size;
 
-   finger_size = elm_finger_size_get();
-
    if(wd->position_forced)
    {
 	   rect->x = x;
@@ -243,6 +241,8 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	   rect->h = base_h;
 	   return ELM_CTXPOPUP_ARROW_DOWN;
    }
+
+   finger_size = elm_finger_size_get();
 
 	edje_object_part_geometry_get(wd->arrow, "ctxpopup_arrow", NULL, NULL,
 				      &arrow_w, &arrow_h);
@@ -417,7 +417,6 @@ _sizing_eval(Evas_Object *obj)
 
    evas_object_move(wd->base, rect.x, rect.y);
    evas_object_resize(wd->base, rect.w, rect.h);
-
 }
 
 static void
