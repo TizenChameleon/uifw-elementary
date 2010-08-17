@@ -194,6 +194,7 @@ static Dialogue_Item* _create_item(Evas_Object *obj, Evas_Object *subobj, Elm_Di
 	evas_object_size_hint_weight_set(item->bg_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_size_hint_align_set(item->bg_layout, EVAS_HINT_FILL, 0.0);
 	evas_object_show(item->bg_layout);	
+	elm_widget_sub_object_add(obj, item->bg_layout);
 
 	elm_layout_content_set(item->bg_layout, "swallow", item->content);
 
