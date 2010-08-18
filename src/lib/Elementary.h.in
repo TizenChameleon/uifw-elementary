@@ -2419,7 +2419,8 @@ extern "C" {
      {
 	ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT = 0,
 	ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0),
-	ELM_DIALOGUEGROUP_ITEM_STYLE_TITLE = (1 << 1)
+	ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE = (1 << 1),
+	ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE = (1 << 2)
      } Elm_Dialoguegroup_Item_Style;
 
    EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent);
