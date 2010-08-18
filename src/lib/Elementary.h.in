@@ -2418,7 +2418,8 @@ extern "C" {
    typedef enum _Elm_Dialoguegourp_Item_Style
      {
 	ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT = 0,
-	ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0)
+	ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0),
+	ELM_DIALOGUEGROUP_ITEM_STYLE_TITLE = (1 << 1)
      } Elm_Dialoguegroup_Item_Style;
 
    EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent);
