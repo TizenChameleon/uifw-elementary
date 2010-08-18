@@ -135,6 +135,8 @@ static void _set_item_theme(Dialogue_Item *item, const char *location)
 		elm_layout_theme_set(item->bg_layout, "dialoguegroup", "bg", location);
 	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD)
 		elm_layout_theme_set(item->bg_layout, "dialoguegroup", "editfield", location);
+	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_TITLE)
+		elm_layout_theme_set(item->bg_layout, "dialoguegroup", "title", location);
 }
 
 /*
