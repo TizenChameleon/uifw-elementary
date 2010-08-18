@@ -38,7 +38,7 @@ struct _Widget_Data
    Evas_Object *bg;
    Evas_Object *btn_layout;
    Eina_List *items;
-   int wipe_dir;
+   Elm_Ctxpopup_Arrow arrow_dir;
    int btn_cnt;
    Elm_Ctxpopup_Arrow arrow_priority[4];
    Eina_Bool scroller_disabled:1;
@@ -216,7 +216,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 
    if ((!wd) || (!rect))
      {
-	wd->wipe_dir = ELM_FX_WIPE_DIR_UP;
 	return ELM_CTXPOPUP_ARROW_DOWN;
      }
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
@@ -241,7 +240,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	   rect->y = y;
 	   rect->w = base_w;
 	   rect->h = base_h;
-	   wd->wipe_dir = ELM_FX_WIPE_DIR_UP;
 	   return ELM_CTXPOPUP_ARROW_DOWN;
    }
 
@@ -302,25 +300,21 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	     ADJUST_POS_X(x);
 	     y -= (base_h + finger_size);
 	     arrow = ELM_CTXPOPUP_ARROW_DOWN;
-	     wd->wipe_dir = ELM_FX_WIPE_DIR_UP;
 	     break;
 	  case ELM_CTXPOPUP_ARROW_RIGHT:
 	     ADJUST_POS_Y(y);
 	     x -= (base_w + finger_size);
 	     arrow = ELM_CTXPOPUP_ARROW_RIGHT;
-	     wd->wipe_dir = ELM_FX_WIPE_DIR_LEFT;
 	     break;
 	  case ELM_CTXPOPUP_ARROW_LEFT:
 	     ADJUST_POS_Y(y);
 	     x += finger_size;
 	     arrow = ELM_CTXPOPUP_ARROW_LEFT;
-	     wd->wipe_dir = ELM_FX_WIPE_DIR_RIGHT;
 	     break;
 	  case ELM_CTXPOPUP_ARROW_UP:
 	     ADJUST_POS_X(x);
 	     y += finger_size;
 	     arrow = ELM_CTXPOPUP_ARROW_UP;
-	     wd->wipe_dir = ELM_FX_WIPE_DIR_DOWN;
 	     break;
 	  default:
 	     break;
@@ -335,7 +329,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	     ADJUST_POS_X(x);
 	     y -= (base_h + finger_size);
 	     arrow = ELM_CTXPOPUP_ARROW_DOWN;
-	     wd->wipe_dir = ELM_FX_WIPE_DIR_UP;
    }
 
    rect->x = x;
@@ -415,12 +408,12 @@ _sizing_eval(Evas_Object *obj)
    }
 
    //base
-   arrow = _calc_base_geometry(obj, &rect);
+   wd->arrow_dir = _calc_base_geometry(obj, &rect);
 
    if (!wd->position_forced)
      {
-	_update_arrow_obj(obj, arrow);
-	_shift_base_by_arrow(wd->arrow, arrow, &rect);
+	_update_arrow_obj(obj, wd->arrow_dir);
+	_shift_base_by_arrow(wd->arrow, wd->arrow_dir, &rect);
      }
 
    evas_object_move(wd->base, rect.x, rect.y);
@@ -665,7 +658,7 @@ _show_effect(Widget_Data* wd)
 
 	transit = elm_transit_add(wd->base);
 	elm_transit_fx_insert(transit, elm_fx_color_add( wd->base, 0, 0, 0, 0, 255, 255, 255, 255 ) );
-	elm_transit_fx_insert(transit, elm_fx_wipe_add( wd->base, ELM_FX_WIPE_TYPE_SHOW, wd->wipe_dir) );
+	elm_transit_fx_insert(transit, elm_fx_wipe_add( wd->base, ELM_FX_WIPE_TYPE_SHOW, wd->arrow_dir) );
 	elm_transit_curve_style_set( transit, ELM_ANIMATOR_CURVE_OUT);
 	elm_transit_completion_callback_set( transit, _show_effect_done, wd);
 	elm_transit_run(transit, 0.5 );
