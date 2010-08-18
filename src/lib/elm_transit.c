@@ -1321,8 +1321,8 @@ _elm_fx_wipe_show(Evas_Map *map, Elm_Fx_Wipe_Dir dir, float x, float y,
 	evas_map_point_image_uv_set(map, 2, w, h);
 	evas_map_point_image_uv_set(map, 3, w2, h);
 	evas_map_point_coord_set(map, 0, x + w2, y, 0);
-	evas_map_point_coord_set(map, 1, w, y, 0);
-	evas_map_point_coord_set(map, 2, w, h2, 0);
+	evas_map_point_coord_set(map, 1, x + w, y, 0);
+	evas_map_point_coord_set(map, 2, x +w, h2, 0);
 	evas_map_point_coord_set(map, 3, x + w2, h2, 0);
 	break;
      case ELM_FX_WIPE_DIR_RIGHT:
