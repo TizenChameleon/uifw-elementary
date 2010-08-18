@@ -1,3 +1,36 @@
+elementary (0.4.0+svn.49550slp2+3build34) unstable; urgency=low
+
+  * [Elemenatry.h.in]
+  * [controlbar] block more item mode
+  * [elm_datefield] bug related to imf commit signal cb
+  * [elm_datefield] ampm mouse down event bug
+  * [dialoguegroup] new style added
+  * [dialoguegroup] sub_obj_add are added for each item
+  * [editfield] bugs are fixed
+  * [elm_ctxpopup.c] on implementing a function that user content set.
+  * [elm_ctxpopup.c] added visual interaction in code temporary.
+  * [src/modules/ctxpopup_copypasteUI/copypaste.c]
+  *        removed elm_object_style_set for the ctxpopup.
+  * [modules/ctxpopup_copypasteUI/copypaste.c]
+  *        added elm_object_style_set for the ctpopup copypaste style.
+  * [ctxpopup_copypasteUI/copypaste.c]
+  *        modified elm_ctxpopup_label_add -> elm_ctxpopup_item_add
+  * [popup_copypasteUI/copypaste.c]
+  *        modified elm_ctxpopup_label_add -> elm_ctxpopup_item_add
+  * [elm_label] fixing ellipsis label to width bug
+  * [elm_label.c] added usage comment to elm_label_text_align_set.
+  * [elm_nocontents] added elm_nocontents
+  * [elm_transit.c] fixed wipe direction, fixed wipe effect bug.
+  * [elm_webview] add libwebkit-engine-dev to debian/control
+  * [elm_webview] remove webview test
+  * [elm_webview] remove glib dependency
+  * [elm_webview] modify webkit option to auto
+  * [elm_webview] enable elm_webview and correct wrong API names
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build34
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Wed, 18 Aug 2010 20:05:25 +0900
+
 elementary (0.4.0+svn.49550slp2+3build33) unstable; urgency=low
 
   * [picker] add time_date
