@@ -366,9 +366,10 @@ _imf_event_commit_cb(void *data, int type, void *event)
 	Ecore_IMF_Event_Commit *ev = (Ecore_IMF_Event_Commit *) event;
 	Evas_Object *focus_obj;
 	char str[YEAR_MAX_LENGTH+1] = {0,};
-		
-	if (!wd || !wd->base) return ECORE_CALLBACK_CANCEL;
 
+	if (!wd || !wd->base) return ECORE_CALLBACK_RENEW;
+	if(!elm_widget_focus_get(data)) return ECORE_CALLBACK_RENEW;
+	
 	focus_obj = elm_widget_focused_object_get(data);
 	if (!wd->editing) 
 	{
