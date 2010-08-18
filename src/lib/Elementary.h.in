@@ -1877,7 +1877,6 @@ extern "C" {
 	ELM_CTXPOPUP_ARROW_LEFT,
 	ELM_CTXPOPUP_ARROW_UP,
      } Elm_Ctxpopup_Arrow;
-   
 
    EAPI Evas_Object *elm_ctxpopup_add(Evas_Object *parent);
    EAPI void         elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal);
@@ -2029,11 +2028,12 @@ extern "C" {
    /* Wipe Fx */
    typedef enum 
      {
+	ELM_FX_WIPE_DIR_UP, 
 	ELM_FX_WIPE_DIR_LEFT, 
 	ELM_FX_WIPE_DIR_RIGHT, 
-	ELM_FX_WIPE_DIR_UP, 
 	ELM_FX_WIPE_DIR_DOWN
      } Elm_Fx_Wipe_Dir;
+   
    typedef enum 
      {
 	ELM_FX_WIPE_TYPE_HIDE, 
