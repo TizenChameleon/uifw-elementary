@@ -38,6 +38,7 @@ struct _Widget_Data
    Evas_Object *bg;
    Evas_Object *btn_layout;
    Eina_List *items;
+   Elm_Ctxpopup_Arrow arrow_dir;
    int btn_cnt;
    Elm_Ctxpopup_Arrow arrow_priority[4];
    Eina_Bool scroller_disabled:1;
@@ -407,12 +408,12 @@ _sizing_eval(Evas_Object *obj)
    }
 
    //base
-   arrow = _calc_base_geometry(obj, &rect);
+   wd->arrow_dir = _calc_base_geometry(obj, &rect);
 
    if (!wd->position_forced)
      {
-	_update_arrow_obj(obj, arrow);
-	_shift_base_by_arrow(wd->arrow, arrow, &rect);
+	_update_arrow_obj(obj, wd->arrow_dir);
+	_shift_base_by_arrow(wd->arrow, wd->arrow_dir, &rect);
      }
 
    evas_object_move(wd->base, rect.x, rect.y);
@@ -604,7 +605,6 @@ _ctxpopup_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
       evas_object_show(wd->arrow);
 
    wd->visible = EINA_TRUE;
-
 }
 
 static void
@@ -625,6 +625,46 @@ _ctxpopup_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
+_show_effect_done(void *data, Elm_Transit *transit)
+{
+	//TODO: THIS FUNCTION IS TEMPORARY. It should be implemented on the edje.
+	Widget_Data *wd = data;
+	elm_transit_fx_clear(transit);
+
+	if(wd->box)
+		elm_transit_fx_insert(transit, elm_fx_color_add(wd->box, 0, 0, 0, 0, 255, 255, 255, 255 ));
+	if(wd->content)
+		elm_transit_fx_insert(transit, elm_fx_color_add(wd->content, 0, 0, 0, 0, 255, 255, 255, 255 ));
+	if(wd->btn_layout)
+	elm_transit_fx_insert(transit, elm_fx_color_add(wd->btn_layout, 0, 0, 0, 0, 255, 255, 255, 255 ));
+	elm_transit_run(transit, 0.2);
+	elm_transit_completion_callback_set(transit, NULL, NULL);
+	elm_transit_del(transit);
+	edje_object_signal_emit(wd->base, "elm,state,show", "elm");
+}
+
+static void
+_show_effect(Widget_Data* wd)
+{
+	//TODO: THIS FUNCTION IS TEMPORARY. It should be implemented on the edje.
+	Elm_Transit* transit;
+
+	if(wd->box)
+		evas_object_color_set(wd->box, 0, 0, 0, 0 );
+	if(wd->content)
+		evas_object_color_set(wd->content, 0, 0, 0, 0);
+	if(wd->btn_layout)
+		evas_object_color_set(wd->btn_layout, 0, 0, 0, 0);
+
+	transit = elm_transit_add(wd->base);
+	elm_transit_fx_insert(transit, elm_fx_color_add( wd->base, 0, 0, 0, 0, 255, 255, 255, 255 ) );
+	elm_transit_fx_insert(transit, elm_fx_wipe_add( wd->base, ELM_FX_WIPE_TYPE_SHOW, wd->arrow_dir) );
+	elm_transit_curve_style_set( transit, ELM_ANIMATOR_CURVE_OUT);
+	elm_transit_completion_callback_set( transit, _show_effect_done, wd);
+	elm_transit_run(transit, 0.5 );
+}
+
+static void
 _ctxpopup_scroller_resize(void *data, Evas *e, Evas_Object * obj,
 			  void *event_info)
 {
@@ -633,8 +673,10 @@ _ctxpopup_scroller_resize(void *data, Evas *e, Evas_Object * obj,
    if (!wd)
       return;
 
-   if (wd->visible)
+   if (wd->visible) {
       _sizing_eval(data);
+      _show_effect(wd);
+   }
 }
 
 static void
@@ -1029,6 +1071,9 @@ elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char *label,
    else
       _item_obj_create(item, "text_style_item");
 
+   if(eina_list_count(wd->items)==0)
+	   edje_object_signal_emit(wd->base, "elm,state,scroller,enable", "elm");
+
    wd->items = eina_list_append(wd->items, item);
    elm_box_pack_end(wd->box, item->base);
    elm_ctxpopup_item_icon_set(item, icon);
@@ -1065,12 +1110,13 @@ elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item)
 	wd->items = eina_list_remove(wd->items, item);
      }
    free(item);
-   if (eina_list_count(wd->items) < 1)
+   if (eina_list_count(wd->items) == 0)
      {
 	evas_object_hide(wd->arrow);
 	evas_object_hide(wd->base);
 	if (!wd->screen_dimmed_disabled)
 	   evas_object_hide(wd->bg);
+	edje_object_signal_emit(wd->base, "elm,state,scroller,disable", "elm");
      }
 }
 

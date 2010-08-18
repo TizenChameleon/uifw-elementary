@@ -1877,7 +1877,6 @@ extern "C" {
 	ELM_CTXPOPUP_ARROW_LEFT,
 	ELM_CTXPOPUP_ARROW_UP,
      } Elm_Ctxpopup_Arrow;
-   
 
    EAPI Evas_Object *elm_ctxpopup_add(Evas_Object *parent);
    EAPI void         elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal);
@@ -2029,11 +2028,12 @@ extern "C" {
    /* Wipe Fx */
    typedef enum 
      {
+	ELM_FX_WIPE_DIR_UP, 
 	ELM_FX_WIPE_DIR_LEFT, 
 	ELM_FX_WIPE_DIR_RIGHT, 
-	ELM_FX_WIPE_DIR_UP, 
 	ELM_FX_WIPE_DIR_DOWN
      } Elm_Fx_Wipe_Dir;
+   
    typedef enum 
      {
 	ELM_FX_WIPE_TYPE_HIDE, 
@@ -2418,7 +2418,9 @@ extern "C" {
    typedef enum _Elm_Dialoguegourp_Item_Style
      {
 	ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT = 0,
-	ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0)
+	ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0),
+	ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE = (1 << 1),
+	ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE = (1 << 2)
      } Elm_Dialoguegroup_Item_Style;
 
    EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent);
