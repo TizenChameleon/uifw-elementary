@@ -2527,6 +2527,23 @@ extern "C" {
    EAPI void         elm_nocontents_custom_set(const Evas_Object *obj, Evas_Object *custom);
    EAPI Evas_Object *elm_nocontents_custom_get(const Evas_Object *obj);
 
+   /* Image Slider */
+   typedef struct _Imageslider_Item Elm_Imageslider_Item;   
+   typedef void (*Elm_Imageslider_Cb)(void *data, Evas_Object *obj, void *event_info);
+   EAPI Evas_Object           *elm_imageslider_add(Evas_Object *parent);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_prepend(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data);
+   EAPI void                  elm_imageslider_item_del(Elm_Imageslider_Item *it);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_selected_item_get(Evas_Object *obj);
+   EAPI Eina_Bool             elm_imageslider_item_selected_get(Elm_Imageslider_Item *it);
+   EAPI void                  elm_imageslider_item_selected_set(Elm_Imageslider_Item *it);
+   EAPI const char            *elm_imageslider_item_photo_file_get(Elm_Imageslider_Item *it);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_prev(Elm_Imageslider_Item *it);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_next(Elm_Imageslider_Item *it);
+   EAPI void                  elm_imageslider_prev(Evas_Object *obj);
+   EAPI void                  elm_imageslider_next(Evas_Object *obj);
+
+   
 #ifdef __cplusplus
 }
 #endif
