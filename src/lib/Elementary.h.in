@@ -2199,7 +2199,7 @@ extern "C" {
    EAPI void         elm_colorpicker_color_set(Evas_Object *obj, int r, int g , int b);
    EAPI void         elm_colorpicker_color_get(Evas_Object *obj, int *r, int *g , int *b);
    /* smart callbacks called:
-    * "clicked" - when bar or button is clicked
+    * "changed" - when color is changed
     */
 
 
