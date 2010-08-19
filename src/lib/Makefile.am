@@ -128,6 +128,7 @@ elm_cbhm_helper.c \
 elm_datefield.c \
 elm_nocontents.c \
 elm_imageslider.c \
+elm_buttonentry.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \

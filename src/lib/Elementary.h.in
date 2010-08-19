@@ -2403,6 +2403,17 @@ extern "C" {
     * default
     */
  
+   /* buttonentry */
+   EAPI Evas_Object	*elm_buttonentry_add(Evas_Object *parent);
+   EAPI const char		*elm_buttonentry_label_get(Evas_Object *obj);
+   EAPI void			elm_buttonentry_label_set(Evas_Object *obj, const char *label);
+   /* smart callback called:
+    * "selected"
+    */
+   /* available styles:
+    * default
+    */
+ 
    /* chronometer */
    EAPI Evas_Object *elm_chronometer_add(Evas_Object *parent);
    EAPI void         elm_chronometer_start(Evas_Object *obj);
