@@ -29,6 +29,7 @@ struct _Colorpicker_Data
    Evas_Object *touch_area;
    int colorpicker_num;
    int button_state;
+   int feed_cnt;
 };
 
 typedef struct _Widget_Data Widget_Data;
@@ -74,6 +75,11 @@ static void _color_with_lightness(void *data);
 static void _draw_rects(void *data, double x);
 static void _arrow_cb(void *data, Evas_Object * obj, const char *emission,
 		      const char *source);
+static void _drag_start(void *data, Evas_Object *obj, const char *emission, 
+		const char *source);
+static void _drag_stop(void *data, Evas_Object *obj, const char *emission, 
+		const char *source);
+
 static void _colorbar_cb(void *data, Evas * e, Evas_Object * obj,
 			 void *event_info);
 static void _arrow_resize_cb(void *data, Evas * e, Evas_Object * obj,
@@ -536,9 +542,21 @@ _arrow_cb(void *data, Evas_Object * obj, const char *emission,
 
    edje_object_part_drag_value_get(obj, "arrow", &x, &y);
    _draw_rects(data, x);
-   evas_object_smart_callback_call(cp->parent, "clicked", NULL);
+   evas_object_smart_callback_call(cp->parent, "changed", NULL);
 }
 
+static void
+_drag_start(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+   elm_widget_scroll_hold_push(data);
+}
+
+static void
+_drag_stop(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+   elm_widget_scroll_hold_pop(data);
+}
+	
 static void
 _colorbar_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
 {
@@ -556,9 +574,12 @@ _colorbar_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
       arrow_x = 0;
    edje_object_part_drag_value_set(cp->colorbar, "arrow", arrow_x, arrow_y);
    _draw_rects(data, arrow_x);
-   evas_object_smart_callback_call(cp->parent, "clicked", NULL);
+   evas_object_smart_callback_call(cp->parent, "changed", NULL);
    evas_event_feed_mouse_cancel(e, 0, NULL);
-   evas_event_feed_mouse_down(e, 1, EVAS_BUTTON_NONE, 0, NULL);
+   cp->feed_cnt ++;
+   if(cp->feed_cnt < 3)
+	evas_event_feed_mouse_down(e, 1, EVAS_BUTTON_NONE, 0, NULL);
+   cp->feed_cnt = 0;
 }
 
 static void
@@ -592,7 +613,7 @@ _mv_timer(void *data)
 	   x = 0;
 	edje_object_part_drag_value_set(cp->colorbar, "arrow", x, y);
 	_draw_rects(data, x);
-	evas_object_smart_callback_call(cp->parent, "clicked", NULL);
+	evas_object_smart_callback_call(cp->parent, "changed", NULL);
 	return 1;
      }
    else if (cp->button_state == R_BUTTON_PRESSED)
@@ -602,7 +623,7 @@ _mv_timer(void *data)
 	   x = 1;
 	edje_object_part_drag_value_set(cp->colorbar, "arrow", x, y);
 	_draw_rects(data, x);
-	evas_object_smart_callback_call(cp->parent, "clicked", NULL);
+	evas_object_smart_callback_call(cp->parent, "changed", NULL);
 	return 1;
      }
    else
@@ -656,7 +677,7 @@ _left_button_down_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
 
    edje_object_part_drag_value_set(cp->colorbar, "arrow", x, y);
    _draw_rects(data, x);
-   evas_object_smart_callback_call(cp->parent, "clicked", NULL);
+   evas_object_smart_callback_call(cp->parent, "changed", NULL);
    cp->button_state = L_BUTTON_PRESSED;
    wd->lp_timer = ecore_timer_add(1.0, _long_press_timer, cp);
 }
@@ -684,7 +705,7 @@ _right_button_down_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
 
    edje_object_part_drag_value_set(cp->colorbar, "arrow", x, y);
    _draw_rects(data, x);
-   evas_object_smart_callback_call(cp->parent, "clicked", NULL);
+   evas_object_smart_callback_call(cp->parent, "changed", NULL);
    cp->button_state = R_BUTTON_PRESSED;
    wd->lp_timer = ecore_timer_add(1.0, _long_press_timer, cp);
 }
@@ -752,6 +773,7 @@ _add_colorbar(Evas_Object * obj)
 
 	wd->cp[i]->parent = obj;
 	wd->cp[i]->colorpicker_num = i;
+	wd->cp[i]->feed_cnt = 0;
 
 	/* load colorbar area */
 	wd->cp[i]->colorbar = edje_object_add(e);
@@ -759,6 +781,10 @@ _add_colorbar(Evas_Object * obj)
 	snprintf(colorbar_name, sizeof(colorbar_name), "colorbar_%d", i);
 	edje_object_signal_callback_add(wd->cp[i]->colorbar, "drag", "*",
 					_arrow_cb, wd->cp[i]);
+     	edje_object_signal_callback_add( wd->cp[i]->colorbar, "drag,start", "*", 
+					_drag_start, obj);
+     	edje_object_signal_callback_add( wd->cp[i]->colorbar, "drag,stop", "*", 
+					_drag_stop, obj);
 	edje_object_part_swallow(wd->lay, colorbar_name, wd->cp[i]->colorbar);
 	evas_object_show(wd->cp[i]->colorbar);
 	elm_widget_sub_object_add(obj, wd->cp[i]->colorbar);

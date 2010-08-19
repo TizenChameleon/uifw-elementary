@@ -49,6 +49,9 @@ struct _Smart_Data {
      Evas_Object* widget;
      int locked_dx;
      int locked_dy;
+     unsigned char bounce_horiz : 1;
+     unsigned char bounce_vert : 1;
+     unsigned char auto_fitting : 1;
 
      /* ewk functions */
      void (*ewk_view_theme_set)(Evas_Object *, const char *);
@@ -156,7 +159,6 @@ struct _Smart_Data {
 	  int w, h;
      } layout;
 
-     Eina_Bool auto_fitting;
      Ecore_Animator* smart_zoom_animator;
 
      Evas_Point pan_s;
@@ -460,6 +462,14 @@ _elm_smart_webview_widget_set(Evas_Object *obj, Evas_Object *wid)
 {
    API_ENTRY return;
    sd->widget = wid;
+}
+
+void
+_elm_smart_webview_bounce_allow_set(Evas_Object* obj, Eina_Bool horiz, Eina_Bool vert)
+{
+   API_ENTRY return;
+   sd->bounce_horiz = horiz;
+   sd->bounce_vert = vert;
 }
 
 /* local subsystem functions */
@@ -1088,6 +1098,11 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
      sd->ewk_frame_feed_focus_in = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_frame_feed_focus_in");
    sd->ewk_frame_feed_focus_in(sd->ewk_view_frame_main_get(webview));
    _parent_sc.mouse_down((Ewk_View_Smart_Data*)sd, &sd->mouse_down_copy);
+
+   if (sd->bounce_horiz)
+     elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
+   if (sd->bounce_vert)
+     elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
 }
 
 static void
@@ -1313,6 +1328,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    content_h *= zoom;
    DBG("<< ========content [%d, %d] new pos [%d, %d] >>\n", content_w, content_h, old_x + dx, old_y + dy);
 
+#if 0
    if ((old_x + dx) >= 0 && (old_x + dx) <= content_w && !elm_widget_drag_lock_x_get(sd->widget))
      elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
    if ((old_y + dy) >= 0 && (old_y + dy) <= content_h && !elm_widget_drag_lock_y_get(sd->widget))
@@ -1352,6 +1368,43 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 	     locked = EINA_TRUE;
 	  }
      }
+#else
+   Eina_Bool locked = EINA_FALSE;
+   if (!elm_widget_drag_lock_x_get(sd->widget))
+     {
+	if ((old_x + dx) >= 0 && (old_x + dx) <=content_w)
+	  elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
+	else if ((sd->locked_dx > 0 && (sd->locked_dx + dx) <= 0)
+	      || (sd->locked_dx < 0 && (sd->locked_dx + dx) >= 0))
+	  {
+	     elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
+	     DBG("===============<< widget x lock >>\n");
+	     dx += sd->locked_dx;
+	  }
+	else
+	  {
+	     sd->locked_dx += dx;
+	     locked = EINA_TRUE;
+	  }
+     }
+   if (!elm_widget_drag_lock_y_get(sd->widget))
+     {
+	if ((old_y + dy) >= 0 && (old_y + dy) <= content_h)
+	  elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
+	else if ((sd->locked_dy > 0 && (sd->locked_dy + dy) <= 0)
+	      || (sd->locked_dy < 0 && (sd->locked_dy + dy) >= 0))
+	  {
+	     elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
+	     DBG("===============<< widget y lock >>\n");
+	     dy += sd->locked_dy;
+	  }
+	else
+	  {
+	     sd->locked_dy += dy;
+	     locked = EINA_TRUE;
+	  }
+     }
+#endif
 
    if (locked) return;
 
@@ -1371,14 +1424,16 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    if (sd->text_selection_on == EINA_TRUE)
      _text_selection_move_by(sd, old_x - new_x, old_y - new_y);
 
-   if (dx && elm_widget_drag_lock_x_get(sd->widget) && (old_x == new_x))
+   if (!sd->bounce_horiz &&
+	 (dx && elm_widget_drag_lock_x_get(sd->widget) && (old_x == new_x)))
      {
 	sd->locked_dx = dx - (old_x - new_x);
 	elm_widget_drag_lock_x_set(sd->widget, EINA_FALSE);
 	DBG("===============<< widget x unlock >>\n");
      }
 
-   if (dy && elm_widget_drag_lock_y_get(sd->widget) && (old_y == new_y))
+   if (!sd->bounce_vert &&
+	 (dy && elm_widget_drag_lock_y_get(sd->widget) && (old_y == new_y)))
      {
 	sd->locked_dy = dy - (old_y - new_y);
 	elm_widget_drag_lock_y_set(sd->widget, EINA_FALSE);
@@ -1430,13 +1485,13 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
      sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
    sd->ewk_view_resume_request(webview); // resume network loading
 
-   if (elm_widget_drag_lock_x_get(sd->widget))
+   if (!sd->bounce_horiz && elm_widget_drag_lock_x_get(sd->widget))
      {
 	DBG("==============<< widget x unlock >>\n");
 	elm_widget_drag_lock_x_set(sd->widget, EINA_FALSE);
      }
 
-   if (elm_widget_drag_lock_y_get(sd->widget))
+   if (!sd->bounce_vert && elm_widget_drag_lock_y_get(sd->widget))
      {
 	DBG("==============<< widget y unlock >>\n");
 	elm_widget_drag_lock_y_set(sd->widget, EINA_FALSE);

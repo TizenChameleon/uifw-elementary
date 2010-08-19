@@ -1260,7 +1260,6 @@ create_item_layout(Evas_Object * parent, Elm_Controlbar_Item * it)
 			 elm_widget_style_get(it->obj));
    evas_object_size_hint_weight_set(obj, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(obj, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_widget_sub_object_add(it->obj, obj);
    if (it->label)
      {
 	edje_object_part_text_set(_EDJ(obj), "elm.text", it->label);
@@ -1968,7 +1967,7 @@ create_more_item(Widget_Data *wd)
 				     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
 //   edje_object_part_swallow(wd->edje, "elm.swallow.items", wd->box);
-   elm_widget_sub_object_add(obj, wd->box);
+   //evas_object_clip_set(wd->box, wd->edje);
    evas_object_show(wd->box);
    
    wd->event_box = evas_object_rectangle_add(wd->evas);
