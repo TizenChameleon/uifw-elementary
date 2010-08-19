@@ -49,6 +49,8 @@ struct _Smart_Data {
      Evas_Object* widget;
      int locked_dx;
      int locked_dy;
+     unsigned char bounce_horiz : 1;
+     unsigned char bounce_vert : 1;
 
      /* ewk functions */
      void (*ewk_view_theme_set)(Evas_Object *, const char *);
@@ -460,6 +462,14 @@ _elm_smart_webview_widget_set(Evas_Object *obj, Evas_Object *wid)
 {
    API_ENTRY return;
    sd->widget = wid;
+}
+
+void
+_elm_smart_webview_bounce_allow_set(Evas_Object* obj, Eina_Bool horiz, Eina_Bool vert)
+{
+   API_ENTRY return;
+   sd->bounce_horiz = horiz;
+   sd->bounce_vert = vert;
 }
 
 /* local subsystem functions */
@@ -1313,6 +1323,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    content_h *= zoom;
    DBG("<< ========content [%d, %d] new pos [%d, %d] >>\n", content_w, content_h, old_x + dx, old_y + dy);
 
+#if 0
    if ((old_x + dx) >= 0 && (old_x + dx) <= content_w && !elm_widget_drag_lock_x_get(sd->widget))
      elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
    if ((old_y + dy) >= 0 && (old_y + dy) <= content_h && !elm_widget_drag_lock_y_get(sd->widget))
@@ -1352,6 +1363,50 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 	     locked = EINA_TRUE;
 	  }
      }
+#else
+   Eina_Bool locked = EINA_FALSE;
+   if (!sd->bounce_horiz)
+     {
+	if (!elm_widget_drag_lock_x_get(sd->widget))
+	  {
+	     if ((old_x + dx) >= 0 && (old_x + dx) <=content_w)
+	       elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
+	     else if ((sd->locked_dx > 0 && (sd->locked_dx + dx) <= 0)
+		   || (sd->locked_dx < 0 && (sd->locked_dx + dx) >= 0))
+	       {
+		  elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
+		  DBG("===============<< widget x lock >>\n");
+		  dx += sd->locked_dx;
+	       }
+	     else
+	       {
+		  sd->locked_dx += dx;
+		  locked = EINA_TRUE;
+	       }
+	  }
+     }
+   if (!sd->bounce_vert)
+     {
+	if (!elm_widget_drag_lock_y_get(sd->widget))
+	  {
+	     if ((old_y + dy) >= 0 && (old_y + dy) <= content_h)
+	       elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
+	     else if ((sd->locked_dy > 0 && (sd->locked_dy + dy) <= 0)
+		   || (sd->locked_dy < 0 && (sd->locked_dy + dy) >= 0))
+	       {
+		  elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
+		  DBG("===============<< widget y lock >>\n");
+		  dy += sd->locked_dy;
+
+	       }
+	     else
+	       {
+		  sd->locked_dy += dy;
+		  locked = EINA_TRUE;
+	       }
+	  }
+     }
+#endif
 
    if (locked) return;
 

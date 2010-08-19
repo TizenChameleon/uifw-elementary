@@ -152,4 +152,26 @@ elm_webview_uri_set(Evas_Object *obj, const char *uri)
    if (!wd) return;
    _elm_smart_webview_uri_set(wd->webkit, uri);
 }
+
+/**
+ * Set bouncing behavior
+ *
+ * When scrolling, the WebView may "bounce" when reaching an edge of contents
+ * This is a visual way to indicate the end has been reached. This is enabled
+ * by default for both axes. This will set if it is enabled for that axis with
+ * the boolean parameers for each axis.
+ *
+ * @param obj The WebView object
+ * @param h_bounce Will the WebView bounce horizontally or not
+ * @param v_bounce Will the WebView bounce vertically or not
+ *
+ * @ingroup WebView
+ */
+EAPI void
+elm_webview_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_bounce_allow_set(wd->webkit, h_bounce, v_bounce);
+}
 #endif
