@@ -1967,7 +1967,7 @@ create_more_item(Widget_Data *wd)
 				     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
 //   edje_object_part_swallow(wd->edje, "elm.swallow.items", wd->box);
-   evas_object_clip_set(wd->box, wd->edje);
+   //evas_object_clip_set(wd->box, wd->edje);
    evas_object_show(wd->box);
    
    wd->event_box = evas_object_rectangle_add(wd->evas);

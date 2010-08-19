@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build37) unstable; urgency=low
+
+  * [controlbar] rollback
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build37
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 19 Aug 2010 20:47:55 +0900
+
 elementary (0.4.0+svn.49550slp2+3build36) unstable; urgency=low
 
   * add clip set
