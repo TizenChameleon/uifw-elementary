@@ -16,7 +16,6 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *webkit;
-   Eina_Bool auto_fitting:1;
 };
 
 static const char *widtype = NULL;
@@ -129,20 +128,27 @@ elm_webview_events_feed_get(Evas_Object *obj)
 }
 
 EAPI void
-elm_webview_auto_fitting_set(Eina_Bool enable)
+elm_webview_auto_fitting_set(Evas_Object *obj, Eina_Bool enable)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_auto_fitting_set(wd->webkit, enable);
 }
 
 EAPI Eina_Bool
-elm_webview_auto_fitting_get()
+elm_webview_auto_fitting_get(Evas_Object *obj)
 {
-   return EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _elm_smart_webview_auto_fitting_get(wd->webkit);
 }
 
 EAPI Evas_Object *
 elm_webview_minimap_get(Evas_Object *obj)
 {
-   return NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _elm_smart_webview_minimap_get(wd->webkit);
 }
 
 EAPI void
@@ -154,7 +160,7 @@ elm_webview_uri_set(Evas_Object *obj, const char *uri)
 }
 
 /**
- * Set bouncing behavior
+ * Set bouncing behavior(Not supported yet)
  *
  * When scrolling, the WebView may "bounce" when reaching an edge of contents
  * This is a visual way to indicate the end has been reached. This is enabled
