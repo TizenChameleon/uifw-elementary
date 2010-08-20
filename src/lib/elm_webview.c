@@ -120,11 +120,17 @@ elm_webview_webkit_get(Evas_Object *obj)
 EAPI void
 elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_events_feed_set(wd->webkit, feed);
 }
 
 EAPI Eina_Bool
 elm_webview_events_feed_get(Evas_Object *obj)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _elm_smart_webview_events_feed_get(wd->webkit);
 }
 
 EAPI void
