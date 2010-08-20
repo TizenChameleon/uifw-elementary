@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build38) unstable; urgency=low
+
+  * [multibuttonentry]
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build38
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Fri, 20 Aug 2010 21:18:03 +0900
+
 elementary (0.4.0+svn.49550slp2+3build37) unstable; urgency=low
 
   * [controlbar] rollback
