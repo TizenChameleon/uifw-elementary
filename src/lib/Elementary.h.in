@@ -2419,10 +2419,10 @@ extern "C" {
     * default
     */
  
-   /* buttonentry */
-   EAPI Evas_Object	*elm_buttonentry_add(Evas_Object *parent);
-   EAPI const char		*elm_buttonentry_label_get(Evas_Object *obj);
-   EAPI void			elm_buttonentry_label_set(Evas_Object *obj, const char *label);
+   /* multibuttonentry */
+   EAPI Evas_Object	*elm_multibuttonentry_add(Evas_Object *parent);
+   EAPI const char		*elm_multibuttonentry_label_get(Evas_Object *obj);
+   EAPI void			elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
    /* smart callback called:
     * "selected"
     */

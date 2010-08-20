@@ -2,10 +2,10 @@
 #include "elm_priv.h"
 
 /**
- * @defgroup Buttonentry Buttonentry
+ * @defgroup Multibuttonentry Multibuttonentry
  * @ingroup Elementary
  *
- * This is a Buttonentry.
+ * This is a Multibuttonentry.
  */
 		
 
@@ -13,9 +13,9 @@
 #define MAX_LABEL 20	
 #define MIN_ENTRY_WIDTH 50
 
-typedef struct _Buttonentry_Item Buttonentry_Item;
-struct _Buttonentry_Item {
-	Evas_Object *buttonentry;
+typedef struct _Multibuttonentry_Item Multibuttonentry_Item;
+struct _Multibuttonentry_Item {
+	Evas_Object *multibuttonentry;
 	Evas_Object *button;
 	Evas_Object *hbox;
 	Evas_Object *row;
@@ -46,7 +46,7 @@ static void _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event);
 static void _view_init(Evas_Object *obj);
 static void _view_update(Evas_Object *obj);
 static Evas_Object* _add_row(Evas_Object *obj, const char* label);
-static Buttonentry_Item* _add_button_item(Evas_Object *obj, char *str);
+static Multibuttonentry_Item* _add_button_item(Evas_Object *obj, char *str);
 
 static void _del_row(Evas_Object *obj, Evas_Object *row);
 
@@ -73,7 +73,7 @@ _del_hook(Evas_Object *obj)
 	evas_object_box_remove_all(wd->vbox, 1);
 
 	if (wd->items) {
-		Buttonentry_Item *item;
+		Multibuttonentry_Item *item;
 		EINA_LIST_FREE(wd->items, item) {
 			free(item);
 		}
@@ -87,7 +87,7 @@ _theme_hook(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 	
-	_elm_theme_object_set(obj, wd->base, "buttonentry", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, wd->base, "multibuttonentry", "base", elm_widget_style_get(obj));
 	_view_update(obj);
 	_sizing_eval(obj);
 }
@@ -120,7 +120,7 @@ static void
 _change_current_button(Evas_Object *obj, Evas_Object *btn)
 {
 	Eina_List *l;
-	Buttonentry_Item *item;
+	Multibuttonentry_Item *item;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Object *label;
 	if (!wd) return;
@@ -169,10 +169,10 @@ _event_init(Evas_Object *obj)
 	evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
 }
 
-static Buttonentry_Item*
+static Multibuttonentry_Item*
 _add_button_item(Evas_Object *obj, char *str)
 {
-	Buttonentry_Item *item;
+	Multibuttonentry_Item *item;
 	Evas_Object *btn;
 	Evas_Object *label;
 	Evas_Coord w_label, w_btn, padding_outer, padding_inner;
@@ -181,14 +181,14 @@ _add_button_item(Evas_Object *obj, char *str)
 
 	// add button
 	btn = edje_object_add(evas_object_evas_get(obj));
-	_elm_theme_object_set(obj, btn, "buttonentry", "btn", elm_widget_style_get(obj)); 
+	_elm_theme_object_set(obj, btn, "multibuttonentry", "btn", elm_widget_style_get(obj)); 
 	evas_object_show(btn);
 
 	edje_object_signal_callback_add(btn, "clicked", "elm", _button_clicked, obj);
 
 	// add label
 	label = elm_label_add(obj);
-	elm_object_style_set(label, "extended/buttonentry");
+	elm_object_style_set(label, "extended/multibuttonentry");
 	elm_label_label_set(label, str);
 	elm_label_ellipsis_set(label, EINA_TRUE);
 	elm_label_wrap_width_set(label, 5000);
@@ -204,12 +204,12 @@ _add_button_item(Evas_Object *obj, char *str)
 	evas_object_resize(btn, w_btn, 0);
 
 	// append item list
-	item = ELM_NEW(Buttonentry_Item);
+	item = ELM_NEW(Multibuttonentry_Item);
 	if (item) {
 		item->button = btn;
 		item->w = w_btn;
 		item->rw = w_btn;
-		item->buttonentry = obj;
+		item->multibuttonentry = obj;
 		wd->items = eina_list_append(wd->items, item);
 	}
 
@@ -220,7 +220,7 @@ static void
 _del_button_item(Evas_Object *obj, Evas_Object *btn)
 {
 	Eina_List *l;
-	Buttonentry_Item *item;
+	Multibuttonentry_Item *item;
 	Evas_Object *label;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if(!wd || !btn)	return;
@@ -270,7 +270,7 @@ _add_row(Evas_Object *obj, const char* label)
 
 	// row
 	row = edje_object_add(evas_object_evas_get(obj));
-	_elm_theme_object_set(obj, row, "buttonentry", "row", elm_widget_style_get(obj));	
+	_elm_theme_object_set(obj, row, "multibuttonentry", "row", elm_widget_style_get(obj));	
 	evas_object_show(row);
 	evas_object_box_append(wd->vbox, row);
 	evas_object_box_align_set(wd->vbox, 0.0, 0.0);
@@ -342,7 +342,7 @@ _add_button(Evas_Object *obj, char *str)
 	elm_entry_entry_set(wd->entry, "");
 
 	// add button
-	Buttonentry_Item *item = _add_button_item(obj, str);
+	Multibuttonentry_Item *item = _add_button_item(obj, str);
 	btn = item->button;
 	edje_object_signal_emit(last_row,"default", "");
 
@@ -512,7 +512,7 @@ _del_button(Evas_Object *obj)
 		
 	}else{
 		Eina_List *l;
-		Buttonentry_Item *item;
+		Multibuttonentry_Item *item;
 		Eina_List *rows;
 		Evas_Object* cur_row;
 		Evas_Object* cur_box;
@@ -613,10 +613,10 @@ _evas_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info )
 
 	//printf("\n>>>>>>[%s][%d]key val = %s\n", __FUNCTION__, __LINE__, ev->keyname);
 	
-	if((strcmp(str, "") == 0) && ((strcmp(ev->keyname, "BackSpace") == 0)||(strcmp(ev->keyname, "BackSpace(") == 0))){ // for simul
+	if((strcmp(str, "") == 0) && ((strcmp(ev->keyname, "BackSpace") == 0)||(strcmp(ev->keyname, "BackSpace(") == 0))){ 
 		_del_button(data);	
 	}
-	else if((strcmp(str, "") != 0) && (strcmp(ev->keyname, "KP_Enter") == 0)){// KP_Enter
+	else if((strcmp(str, "") != 0) && (strcmp(ev->keyname, "KP_Enter") == 0 ||strcmp(ev->keyname, "Return") == 0 )){
 		_add_button(data, str);
 	}else{
 		//
@@ -663,15 +663,15 @@ _view_update(Evas_Object *obj)
 }
 
 /**
- * Add a new buttonentry to the parent
+ * Add a new multibuttonentry to the parent
  *
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
  *
- * @ingroup Buttonentry
+ * @ingroup Multibuttonentry
  */
 EAPI Evas_Object *
-elm_buttonentry_add(Evas_Object *parent)
+elm_multibuttonentry_add(Evas_Object *parent)
 {
 	Evas_Object *obj;
 	Evas *e;
@@ -680,7 +680,7 @@ elm_buttonentry_add(Evas_Object *parent)
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
 	obj = elm_widget_add(e);
-	elm_widget_type_set(obj, "buttonentry");
+	elm_widget_type_set(obj, "multibuttonentry");
 	elm_widget_sub_object_add(parent, obj);
 	elm_widget_data_set(obj, wd);
 
@@ -688,7 +688,7 @@ elm_buttonentry_add(Evas_Object *parent)
 	elm_widget_theme_hook_set(obj, _theme_hook);
 	
 	wd->base = edje_object_add(e);
-	_elm_theme_object_set(obj, wd->base, "buttonentry", "base", "default");
+	_elm_theme_object_set(obj, wd->base, "multibuttonentry", "base", "default");
 	elm_widget_resize_object_set(obj, wd->base);
 	evas_object_show(wd->base);
 	
@@ -702,14 +702,14 @@ elm_buttonentry_add(Evas_Object *parent)
 /**
  * Get the label
  *
- * @param obj The buttonentry object
+ * @param obj The multibuttonentry object
  * @return The label, or NULL if none
  *
- * @ingroup Buttonentry
+ * @ingroup Multibuttonentry
  */
 
 EAPI const char *
-elm_buttonentry_label_get(Evas_Object *obj)
+elm_multibuttonentry_label_get(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
@@ -723,13 +723,13 @@ elm_buttonentry_label_get(Evas_Object *obj)
 /**
  * Set the label
  *
- * @param obj The buttonentry object
+ * @param obj The multibuttonentry object
  * @param label The text label string in UTF-8
  *
- * @ingroup Buttonentry
+ * @ingroup Multibuttonentry
  */
 EAPI void
-elm_buttonentry_label_set(Evas_Object *obj, const char *label)
+elm_multibuttonentry_label_set(Evas_Object *obj, const char *label)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Object *row;
