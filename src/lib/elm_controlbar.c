@@ -67,12 +67,12 @@ struct _Widget_Data
    Ecore_Event_Handler * bar_move_event;
    Ecore_Event_Handler * bar_up_event;
    
-   void (*ani_func) (const void *data, Evas_Object * obj, void *event_info);
-   const void *ani_data;
+   void (*ani_func) (void *data, Evas_Object * obj, void *event_info);
+   void *ani_data;
    Eina_Bool init_animation;
 
    Ecore_Timer *effect_timer;
-   Eina_Bool *selected_animation;
+   Eina_Bool selected_animation;
 };
 
 struct _Elm_Controlbar_Item 
@@ -84,8 +84,8 @@ struct _Elm_Controlbar_Item
    Evas_Object * icon;
    const char *icon_path;
    const char *label;
-   void (*func) (const void *data, Evas_Object * obj, void *event_info);
-   const void *data;
+   void (*func) (void *data, Evas_Object * obj, void *event_info);
+   void *data;
    int order;
    int sel;
    int style;
@@ -150,7 +150,6 @@ static void
 _controlbar_move(void *data, Evas_Object * obj) 
 {
    Widget_Data * wd;
-   const Evas_Object *bg;
    Evas_Coord x, y;
    if (!data)
       return;
@@ -165,16 +164,12 @@ _controlbar_move(void *data, Evas_Object * obj)
    evas_object_geometry_get(wd->parent, &x, &y, NULL, NULL);
    evas_object_move(wd->edit_box, x, y);
    evas_object_move(wd->event_box, x, y);
-   bg = edje_object_part_object_get(wd->edje, "bg_image");
-   evas_object_geometry_get(bg, &x, &y, NULL, NULL);
-   evas_object_move(wd->box, x, y);
 }
 
 static void
 _controlbar_resize(void *data, Evas_Object * obj) 
 {
    Widget_Data * wd;
-   const Evas_Object *bg;
    Evas_Coord y, y_, w, h, height;
    if (!data)
       return;
@@ -191,9 +186,6 @@ _controlbar_resize(void *data, Evas_Object * obj)
    evas_object_geometry_get(wd->parent, NULL, &y_, NULL, NULL);
    evas_object_resize(wd->edit_box, w, h + y - y_);
    evas_object_resize(wd->event_box, w, h + y - y_);
-   bg = edje_object_part_object_get(wd->edje, "bg_image");
-   evas_object_geometry_get(bg, NULL, NULL, &w, &h);
-   evas_object_resize(wd->box, w, h);
 }
 
 static void
@@ -1666,8 +1658,8 @@ create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
 
 static Elm_Controlbar_Item *
 create_tool_item(Evas_Object * obj, const char *icon_path, const char *label,
-		 void (*func) (const void *data, Evas_Object * obj,
-				void *event_info), const void *data) 
+		 void (*func) (void *data, Evas_Object * obj,
+				void *event_info), void *data) 
 {
    Elm_Controlbar_Item * it;
    Widget_Data * wd;
@@ -1843,6 +1835,8 @@ create_more_item(Widget_Data *wd)
    elm_controlbar_item_editable_set(it, EINA_FALSE);
    
    wd->items = eina_list_sort(wd->items, eina_list_count(wd->items), sort_cb);
+
+   return it;
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -1958,6 +1952,7 @@ create_more_item(Widget_Data *wd)
 
    wd->selected_box = edje_object_add(wd->evas);
    _elm_theme_object_set(obj, wd->selected_box, "controlbar", "item_bg", "default");
+   //edje_object_part_swallow(wd->edje, "elm.swallow.panel", wd->selected_box);
    evas_object_hide(wd->selected_box);
 
       // items container
@@ -1966,8 +1961,7 @@ create_more_item(Widget_Data *wd)
    evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND,
 				     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-//   edje_object_part_swallow(wd->edje, "elm.swallow.items", wd->box);
-   //evas_object_clip_set(wd->box, wd->edje);
+   edje_object_part_swallow(wd->edje, "elm.swallow.items", wd->box);
    evas_object_show(wd->box);
    
    wd->event_box = evas_object_rectangle_add(wd->evas);
@@ -1984,7 +1978,6 @@ create_more_item(Widget_Data *wd)
    evas_object_smart_member_add(wd->box, obj);
    evas_object_smart_member_add(wd->event_box, obj);
 
-      // initialization
    _sizing_eval(obj);
    return obj;
 }
@@ -2213,12 +2206,12 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
 							      const char
 							      *label,
 							      void (*func)
-							      (const void *data,
+							      (void *data,
 							       Evas_Object *
 							       obj,
 							       void
 							       *event_info),
-							      const void *data)
+							      void *data)
    
 {
    Elm_Controlbar_Item * it;
@@ -2252,13 +2245,13 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
 							       const char
 							       *label,
 							       void (*func)
-							       (const void
+							       (void
 								*data,
 								Evas_Object *
 								obj,
 								void
 								*event_info),
-							       const void
+							       void
 							       *data)
 {
    Widget_Data * wd;
@@ -2293,10 +2286,10 @@ elm_controlbar_tool_item_insert_before(Evas_Object * obj,
 				       Elm_Controlbar_Item * before,
 				       const char *icon_path,
 				       const char *label,
-				       void (*func) (const void *data,
+				       void (*func) (void *data,
 						      Evas_Object * obj,
 						      void *event_info),
-				       const void *data)
+				       void *data)
 {
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
@@ -2330,10 +2323,10 @@ elm_controlbar_tool_item_insert_after(Evas_Object * obj,
 				      Elm_Controlbar_Item * after,
 				      const char *icon_path,
 				      const char *label,
-				      void (*func) (const void *data,
+				      void (*func) (void *data,
 						     Evas_Object * obj,
 						     void *event_info),
-				      const void *data)
+				      void *data)
 {
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
@@ -3005,7 +2998,7 @@ init_animation(void *data)
  * @ingroup Controlbar
  */ 
 EAPI void
-elm_controlbar_animation_set(Evas_Object *obj, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data)
+elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data)
 {
    printf("\n==================================\n");
    printf("%s\n", __func__);

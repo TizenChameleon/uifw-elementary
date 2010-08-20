@@ -2129,10 +2129,10 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, Evas_Object *view);
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, Evas_Object *view);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_append(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_append(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_append(Evas_Object *obj, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
@@ -2155,7 +2155,7 @@ extern "C" {
    /*======= Please don't use this APIs =======*/
    EAPI void elm_controlbar_edit_start(Evas_Object *obj);
    EAPI void elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
-   EAPI void elm_controlbar_animation_set(Evas_Object *obj, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI void elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
    EAPI void elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
    /*======= Just for test =======*/
 
