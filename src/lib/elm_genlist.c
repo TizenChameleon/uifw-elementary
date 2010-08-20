@@ -4360,9 +4360,19 @@ elm_genlist_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, 
    elm_smart_scroller_policy_set(wd->scr, map[policy_h], map[policy_v]);
 }
 
+EAPI void
+elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *edit_class)
+{
+   fprintf(stderr, "=================> Caution!!! <========================\n");
+   fprintf(stderr, "==> elm_genlist_set_edit_mode() is deprecated. <=======\n");
+   fprintf(stderr, "==> Please use elm_genlist_edit_mode_set() instead. <==\n");
+   fprintf(stderr, "=======================================================\n");
+
+	elm_genlist_edit_mode_set(obj, emode, edit_class);
+}
 
 EAPI void
-elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *edit_class )
+elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *edit_class)
 {
     Eina_List * realized_list;
     Elm_Genlist_Item *it;

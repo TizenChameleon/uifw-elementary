@@ -1242,7 +1242,8 @@ extern "C" {
    EAPI void              elm_genlist_homogeneous_set(Evas_Object *obj, Eina_Bool homogeneous);
    EAPI void              elm_genlist_block_count_set(Evas_Object *obj, int n);
    EAPI void              elm_genlist_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, Elm_Scroller_Policy policy_v);
-   EAPI void              elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
+   EAPI void              elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec) __attribute__((deprecated));
+   EAPI void              elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
 
    EAPI Evas_Object *elm_check_add(Evas_Object *parent);
    EAPI void         elm_check_label_set(Evas_Object *obj, const char *label);
