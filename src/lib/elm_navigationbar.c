@@ -36,6 +36,7 @@ struct _Item
 {
 	Evas_Object *obj;
 	const char *title;
+	const char *subtitle;
 	Evas_Object *title_obj;
 	Eina_List *title_list;
 	Evas_Object *fn_btn1;
@@ -170,6 +171,7 @@ _delete_item(Item *it)
 	evas_object_del(it->fn_btn2);
 	evas_object_del(it->fn_btn3);
 	if (it->title) eina_stringshare_del(it->title);
+	if (it->subtitle) eina_stringshare_del(it->subtitle);
 	EINA_LIST_FOREACH(it->title_list, ll, list_obj)
 		evas_object_del(list_obj);
 	eina_list_free(it->title_list);
@@ -294,6 +296,12 @@ _transition_complete_cb(void *data)
 				edje_object_part_text_set(wd->base, "elm.text", it->title);
 				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
 			}
+		if (it->subtitle) 
+			{
+				edje_object_part_text_set(wd->base, "elm.text.sub", it->subtitle);
+			}
+		else
+			edje_object_part_text_set(wd->base, "elm.text.sub", NULL);
 		if (it->fn_btn1) 
 		{
 			edje_object_signal_emit(wd->base, "elm,state,item,add,leftpad", "elm");
@@ -1242,6 +1250,68 @@ elm_navigationbar_title_button_get(Evas_Object *obj,
 			break;
 	}	
 	return button;
+}
+
+/**
+ * Set the sub title string for the pushed content
+ * If the content is at the top of the navigation stack, update the title string
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] content The object to push or pushed
+ * @param[in] title The title string
+ *
+ * @ingroup NavigationBar
+ */
+EAPI Evas_Object *
+elm_navigationbar_subtitle_label_set(Evas_Object *obj, 
+							Evas_Object *content, 
+							const char *subtitle)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *ll;
+	Item *it;
+
+	if (!wd) return;
+	
+	 EINA_LIST_FOREACH(wd->stack, ll, it)
+	{
+		if (it->content == content) 
+		{
+		   eina_stringshare_replace(&it->subtitle, subtitle);
+   			edje_object_part_text_set(wd->base, "elm.text.sub", subtitle);
+			_item_sizing_eval(it);
+			break;
+		}
+	}
+}
+
+/**
+ * Return the subtitle string of the pushed content
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] content The object to push or pushed
+ * @return The title string or NULL if none
+ *
+ * @ingroup NavigationBar
+ */
+EAPI const char *
+elm_navigationbar_subtitle_label_get(Evas_Object *obj, 
+							Evas_Object *content)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *ll;
+	Item *it;
+
+	if (!wd) return NULL;
+
+	 EINA_LIST_FOREACH(wd->stack, ll, it)
+	{
+		if (it->content == content) 
+			return it->subtitle;
+	}
+	return NULL;
 }
 
 
