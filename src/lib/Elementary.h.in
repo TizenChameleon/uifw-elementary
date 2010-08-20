@@ -753,6 +753,8 @@ extern "C" {
 	ELM_INPUT_PANEL_LAYOUT_URL,
 	ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,	  	  
 	ELM_INPUT_PANEL_LAYOUT_IP,
+	ELM_INPUT_PANEL_LAYOUT_MONTH,
+	ELM_INPUT_PANEL_LAYOUT_NUMBERPLUS,
      } Elm_Input_Panel_Layout;
    
    EAPI Evas_Object *elm_entry_add(Evas_Object *parent);
