@@ -133,10 +133,11 @@ _theme_hook(Evas_Object *obj)
 		edje_object_part_swallow(wd->base, "elm.swallow.date.day", wd->date[DATE_DAY]);
 		edje_object_part_text_set(wd->base, "elm.text.date.comma", ",");	
 
-		edje_object_signal_callback_add(wd->base, "mouse, down,1", "elm.rect.date.left.pad", _signal_rect_mouse_down, obj);
+		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.left.pad", _signal_rect_mouse_down, obj);
 		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.year.over", _signal_rect_mouse_down, obj);
 		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.month.over", _signal_rect_mouse_down, obj);
 		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.day.over", _signal_rect_mouse_down, obj);	
+		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.right.pad", _signal_rect_mouse_down, obj);
 	}
 	
 	if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
@@ -213,9 +214,9 @@ _signal_rect_mouse_down(void *data, Evas_Object *obj, const char *emission, cons
 	Widget_Data *wd = elm_widget_data_get(data);
 	if (!wd || !wd->base) return ;
 
-	if (!strcmp(source, "elm.rect.date.year.over") || !strcmp(source, "elm.rect.date.left.pad"))
+	if (!strcmp(source, "elm.rect.date.year.over") || !strcmp(source, "elm.rect.date.right.pad"))
 		elm_object_focus(wd->date[DATE_YEAR]);
-	else if (!strcmp(source, "elm.rect.date.month.over"))
+	else if (!strcmp(source, "elm.rect.date.month.over") || !strcmp(source, "elm.rect.date.left.pad"))
 		elm_object_focus(wd->date[DATE_MON]);
 	else if (!strcmp(source, "elm.rect.date.day.over"))
 		elm_object_focus(wd->date[DATE_DAY]);
@@ -626,7 +627,7 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
 	if (wd->layout != layout)
 	{
 		wd->layout = layout;
-		if (evas_object_visible_get(obj)) _datefield_show_cb(wd->base, obj, NULL);
+		if (evas_object_visible_get(obj)) _theme_hook(obj);
 	}
 }
 
