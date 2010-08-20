@@ -747,12 +747,24 @@ extern "C" {
 
    typedef enum _Elm_Input_Panel_Layout
      {
-	ELM_INPUT_PANEL_LAYOUT_NORMAL,
-	ELM_INPUT_PANEL_LAYOUT_NUMBER,	  
-	ELM_INPUT_PANEL_LAYOUT_EMAIL,	  
-	ELM_INPUT_PANEL_LAYOUT_URL,
-	ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,	  	  
-	ELM_INPUT_PANEL_LAYOUT_IP,
+	ELM_INPUT_PANEL_LAYOUT_NORMAL,          /**< Default 4x4 layout */
+	ELM_INPUT_PANEL_LAYOUT_NUMBER,          /**< Number layout */
+	ELM_INPUT_PANEL_LAYOUT_EMAIL,           /**< Email layout */
+	ELM_INPUT_PANEL_LAYOUT_URL,             /**< URL layout */
+	ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,     /**< Phone Number layout */  
+	ELM_INPUT_PANEL_LAYOUT_IP,              /**< IP layout */
+	ELM_INPUT_PANEL_LAYOUT_MONTH,           /**< Month layout */
+	ELM_INPUT_PANEL_LAYOUT_NUMBERONLY,      /**< Number Only layout */
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_1 = 100,  /* Reserved for future use */
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_2,
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_3,
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_4,
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_5,
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_6,
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_7,
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_8,
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_9,
+	ELM_INPUT_PANEL_LAYOUT_CUSTOM_10
      } Elm_Input_Panel_Layout;
    
    EAPI Evas_Object *elm_entry_add(Evas_Object *parent);
@@ -1230,7 +1242,8 @@ extern "C" {
    EAPI void              elm_genlist_homogeneous_set(Evas_Object *obj, Eina_Bool homogeneous);
    EAPI void              elm_genlist_block_count_set(Evas_Object *obj, int n);
    EAPI void              elm_genlist_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, Elm_Scroller_Policy policy_v);
-   EAPI void              elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
+   EAPI void              elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec) __attribute__((deprecated));
+   EAPI void              elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
 
    EAPI Evas_Object *elm_check_add(Evas_Object *parent);
    EAPI void         elm_check_label_set(Evas_Object *obj, const char *label);
@@ -2116,10 +2129,10 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, Evas_Object *view);
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, Evas_Object *view);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_append(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_append(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_append(Evas_Object *obj, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
@@ -2142,7 +2155,7 @@ extern "C" {
    /*======= Please don't use this APIs =======*/
    EAPI void elm_controlbar_edit_start(Evas_Object *obj);
    EAPI void elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
-   EAPI void elm_controlbar_animation_set(Evas_Object *obj, void (*func) (const void *data, Evas_Object *obj, void *event_info), const void *data);
+   EAPI void elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
    EAPI void elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
    /*======= Just for test =======*/
 
@@ -2231,7 +2244,10 @@ extern "C" {
    EAPI Eina_Bool    elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon);
    EAPI Evas_Object *elm_editfield_lett_icon_get(Evas_Object *obj);
    EAPI void         elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
+   EAPI Eina_Bool    elm_editfield_entry_single_line_get(Evas_Object *obj);
    EAPI void         elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible);
+   EAPI Eina_Bool    elm_editfield_eraser_get(Evas_Object *obj);
+
 
    /* softkey */
    typedef enum 
@@ -2398,6 +2414,17 @@ extern "C" {
    EAPI int          elm_ratingbar_rating_get(Evas_Object *obj);
    /* smart callback called:
     * "changed" - when a rating is changed
+    */
+   /* available styles:
+    * default
+    */
+ 
+   /* multibuttonentry */
+   EAPI Evas_Object	*elm_multibuttonentry_add(Evas_Object *parent);
+   EAPI const char		*elm_multibuttonentry_label_get(Evas_Object *obj);
+   EAPI void			elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
+   /* smart callback called:
+    * "selected"
     */
    /* available styles:
     * default

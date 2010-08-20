@@ -526,7 +526,9 @@ _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev)
    DBG("%s is called\n", __func__);
    Smart_Data *sd = (Smart_Data *)esd;
    sd->mouse_down_copy = *ev;
-   return _parent_sc.mouse_down(esd, ev);
+
+   return EINA_TRUE;
+   //return _parent_sc.mouse_down(esd, ev);
 }
 
 static Eina_Bool

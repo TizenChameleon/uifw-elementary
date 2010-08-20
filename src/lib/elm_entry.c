@@ -286,7 +286,7 @@ _theme_hook(Evas_Object *obj)
    ic = edje_object_part_text_imf_context_get(wd->ent, "elm.text");
    if (ic)
      {
-	ecore_imf_context_input_panel_layout_set(ic, (Ecore_IMF_Input_Panel_Layout)wd->input_panel_layout);
+        ecore_imf_context_input_panel_layout_set(ic, (Ecore_IMF_Input_Panel_Layout)wd->input_panel_layout);
      }
 
    _sizing_eval(obj);
@@ -995,9 +995,8 @@ _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    _sizing_eval(data);
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
+   _check_enable_returnkey(data);   
    evas_object_smart_callback_call(data, SIG_CHANGED, NULL);
-   
-   _check_enable_returnkey(data);
 }
 
 static void
