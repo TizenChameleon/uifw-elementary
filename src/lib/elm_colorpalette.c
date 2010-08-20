@@ -175,8 +175,7 @@ static void _colorpalette_object_resize(void *data, Evas *e, Evas_Object *obj, v
 	if (wd->items)
 		item = wd->items->data;
 
-	edje_object_part_geometry_get(elm_layout_edje_get(item->lo),"focus" ,NULL, NULL, &wd->rect_w, &wd->rect_h);
-
+	edje_object_part_geometry_get(elm_layout_edje_get(item->lo),"bg" ,NULL, NULL, &wd->rect_w, &wd->rect_h);
 
 	pad_x = ((double)wd->tab_w - (double)wd->rect_w * (double)wd->col) / (double)(wd->col - 1);
 	pad_y = ((double)wd->tab_h - (double)wd->rect_h * (double)wd->row) / (double)(wd->row - 1);
