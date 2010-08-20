@@ -12,7 +12,6 @@
 
 
 #define MAX_NUM_COLORS 30
-#define COLOR_RECT_LENGTH 66
 
 typedef struct _Colorpalette_Item Colorpalette_Item;
 struct _Colorpalette_Item
@@ -350,9 +349,7 @@ static void _color_table_update(Evas_Object *obj, int row, int col, int color_nu
 					item->g = color[count].g;
 					item->b = color[count].b;
 				}
-
 				wd->items = eina_list_append(wd->items, item);
-
 				count ++;
 			}
 		}
