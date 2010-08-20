@@ -648,44 +648,43 @@ _item_unselect(Elm_Genlist_Item *it)
 }
 
 static void
-_slide_item(Elm_Genlist_Item *it, bool slide_to_left)
+_slide_item(Elm_Genlist_Item *it, bool slide_to_right)
 {
    const Eina_List *l, *l_next;
    Elm_Genlist_Item *it2;
    const char *allow_slide;
 
    allow_slide = edje_object_data_get(it->base, "allow_slide");
-   if( !allow_slide )
+   if (!allow_slide)
      return;
 
-   if ( atoi(allow_slide) != 1 )
+   if (atoi(allow_slide) != 1)
      return;
 
-   if( slide_to_left )
+   if (slide_to_right)
      {
-	if( !it->menuopened )
-	  edje_object_signal_emit(it->base, "elm,state,slide,left", "elm");
-	it->wd->menuopened = eina_list_append(it->wd->menuopened, it);
+        if (!it->menuopened)
+          edje_object_signal_emit(it->base, "elm,state,slide,right", "elm");
+        it->wd->menuopened = eina_list_append(it->wd->menuopened, it);
 
-	EINA_LIST_FOREACH(it->wd->menuopened, l, it2)
-	  {
-	     if (it2 != it)
-	       {
-		  it2->menuopened = 0;
-		  edje_object_signal_emit(it2->base, "elm,state,slide,right", "elm");
-		  it2->wd->menuopened = eina_list_remove(it2->wd->menuopened, it2);
-	       }
-	  }
+        EINA_LIST_FOREACH(it->wd->menuopened, l, it2)
+          {
+             if (it2 != it)
+               {
+                  it2->menuopened = EINA_FALSE;
+                  edje_object_signal_emit(it2->base, "elm,state,slide,left", "elm");
+                  it2->wd->menuopened = eina_list_remove(it2->wd->menuopened, it2);
+               }
+          }
      }
    else
      {
-	if( it->menuopened )
-	  edje_object_signal_emit(it->base, "elm,state,slide,right", "elm");
-	it->wd->menuopened = eina_list_remove(it->wd->menuopened, it);
+        if (it->menuopened)
+          edje_object_signal_emit(it->base, "elm,state,slide,left", "elm");
+        it->wd->menuopened = eina_list_remove(it->wd->menuopened, it);
      }
 
-   it->menuopened = slide_to_left;
-
+   it->menuopened = EINA_TRUE;
 }
 
 static void
@@ -698,11 +697,11 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
 
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
      {
-	if (!it->wd->on_hold)
-	  {
-	     it->wd->on_hold = EINA_TRUE;
-	     _item_unselect(it);
-	  }
+        if (!it->wd->on_hold)
+          {
+             it->wd->on_hold = EINA_TRUE;
+             _item_unselect(it);
+          }
      }
    if ((it->dragging) && (it->down))
      {
@@ -726,19 +725,19 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
 
    if (it->wd->multi_down)
      {
-	acc_x = ev->prev.canvas.x - ev->cur.canvas.x;
-	if (acc_x < 0)
-	  it->wd->acc_x1 = it->wd->acc_x1 - acc_x;
-	else
-	  it->wd->acc_x1 = it->wd->acc_x1 + acc_x;
+        acc_x = ev->prev.canvas.x - ev->cur.canvas.x;
+        if (acc_x < 0)
+          it->wd->acc_x1 = it->wd->acc_x1 - acc_x;
+        else
+          it->wd->acc_x1 = it->wd->acc_x1 + acc_x;
 
-	acc_y = ev->prev.canvas.y - ev->cur.canvas.y;
-	if (acc_y < 0)
-	  it->wd->acc_y1 = it->wd->acc_y1 - acc_y;
-	else
-	  it->wd->acc_y1 = it->wd->acc_y1 + acc_y;
+        acc_y = ev->prev.canvas.y - ev->cur.canvas.y;
+        if (acc_y < 0)
+          it->wd->acc_y1 = it->wd->acc_y1 - acc_y;
+        else
+          it->wd->acc_y1 = it->wd->acc_y1 + acc_y;
 
-	return;
+        return;
      }
 
    if (!it->display_only)
@@ -771,41 +770,41 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
                evas_object_smart_callback_call(it->wd->obj, "drag,start,up", it);
              else
                {
-		  if (dx < 0)
-		    {
-		       evas_object_smart_callback_call(it->wd->obj,
-			     "drag,start,left", it);
-		       _slide_item( it, 1 );
-		    }
-		  else
-		    {
-		       evas_object_smart_callback_call(it->wd->obj,
-			     "drag,start,right", it);
-		       _slide_item( it, 0 );
-		    }
-	       }
-	  }
-	else
+                  if (dx < 0)
+                    {
+                       evas_object_smart_callback_call(it->wd->obj,
+                             "drag,start,left", it);
+                       _slide_item( it, 0 );
+                    }
+                  else
+                    {
+                       evas_object_smart_callback_call(it->wd->obj,
+                             "drag,start,right", it);
+                       _slide_item( it, 1 );
+                    }
+               }
+          }
+        else
           {
              if (ady > adx)
                evas_object_smart_callback_call(it->wd->obj,
-                                               "drag,start,down", it);
+                     "drag,start,down", it);
              else
                {
-		  if (dx < 0)
-		    {
-		       evas_object_smart_callback_call(it->wd->obj,
-			     "drag,start,left", it);
-		       _slide_item( it, 1 );
-		    }
-		  else
-		    {
-		       evas_object_smart_callback_call(it->wd->obj,
-			     "drag,start,right", it);
-		       _slide_item( it, 0 );
-		    }
-	       }
-	  }
+                  if (dx < 0)
+                    {
+                       evas_object_smart_callback_call(it->wd->obj,
+                             "drag,start,left", it);
+                       _slide_item( it, 0 );
+                    }
+                  else
+                    {
+                       evas_object_smart_callback_call(it->wd->obj,
+                             "drag,start,right", it);
+                       _slide_item( it, 1 );
+                    }
+               }
+          }
      }
 }
 
