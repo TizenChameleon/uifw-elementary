@@ -1495,10 +1495,11 @@ _item_unrealize(Elm_Genlist_Item *it)
    Evas_Object *icon;
 
    if (!it->realized) return;
+   it->wd->menuopened = eina_list_remove(it->wd->menuopened, it);
    if (it->long_timer)
      {
-	ecore_timer_del(it->long_timer);
-	it->long_timer = NULL;
+        ecore_timer_del(it->long_timer);
+        it->long_timer = NULL;
      }
    evas_object_del(it->base);
    it->base = NULL;
@@ -1514,7 +1515,7 @@ _item_unrealize(Elm_Genlist_Item *it)
    _elm_stringlist_free(it->states);
 
    EINA_LIST_FREE(it->icon_objs, icon)
-     evas_object_del(icon);
+      evas_object_del(icon);
 
    it->states = NULL;
    it->realized = EINA_FALSE;
