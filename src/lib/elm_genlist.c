@@ -648,7 +648,7 @@ _item_unselect(Elm_Genlist_Item *it)
 }
 
 static void
-_slide_item(Elm_Genlist_Item *it, bool slide_to_right)
+_item_slide(Elm_Genlist_Item *it, Eina_Bool slide_to_right)
 {
    const Eina_List *l, *l_next;
    Elm_Genlist_Item *it2;
@@ -684,7 +684,7 @@ _slide_item(Elm_Genlist_Item *it, bool slide_to_right)
         it->wd->menuopened = eina_list_remove(it->wd->menuopened, it);
      }
 
-   it->menuopened = EINA_TRUE;
+   it->menuopened = slide_to_right;
 }
 
 static void
@@ -774,13 +774,13 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
                     {
                        evas_object_smart_callback_call(it->wd->obj,
                              "drag,start,left", it);
-                       _slide_item( it, 0 );
+                       _item_slide( it, 0 );
                     }
                   else
                     {
                        evas_object_smart_callback_call(it->wd->obj,
                              "drag,start,right", it);
-                       _slide_item( it, 1 );
+                       _item_slide( it, 1 );
                     }
                }
           }
@@ -795,13 +795,13 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
                     {
                        evas_object_smart_callback_call(it->wd->obj,
                              "drag,start,left", it);
-                       _slide_item( it, 0 );
+                       _item_slide( it, 0 );
                     }
                   else
                     {
                        evas_object_smart_callback_call(it->wd->obj,
                              "drag,start,right", it);
-                       _slide_item( it, 1 );
+                       _item_slide( it, 1 );
                     }
                }
           }
@@ -1495,6 +1495,7 @@ _item_unrealize(Elm_Genlist_Item *it)
    Evas_Object *icon;
 
    if (!it->realized) return;
+   it->menuopened = EINA_FALSE;
    it->wd->menuopened = eina_list_remove(it->wd->menuopened, it);
    if (it->long_timer)
      {
@@ -4374,48 +4375,48 @@ elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
 EAPI void
 elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *edit_class)
 {
-    Eina_List * realized_list;
-    Elm_Genlist_Item *it;
-    Eina_List *l;
+   Eina_List * realized_list;
+   Elm_Genlist_Item *it;
+   Eina_List *l;
 
-    ELM_CHECK_WIDTYPE(obj, widtype);
-    Widget_Data *wd = elm_widget_data_get(obj);
-    if (!wd) return;
-    if( wd->edit_mode == emode ) return;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if( wd->edit_mode == emode ) return;
 
-    wd->edit_mode = emode;
+   wd->edit_mode = emode;
 
-    wd->animate_edit_controls = 1;
-    if( wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE)
-      {
-	 if( wd->ed ) free (wd->ed);
-	 wd->ed = NULL;
-      }
-    else
-      {
-	 if( !wd->ed )
-	   wd->ed = calloc(1, sizeof(Edit_Data));
+   wd->animate_edit_controls = 1;
+   if( wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE)
+     {
+        if( wd->ed ) free (wd->ed);
+        wd->ed = NULL;
+     }
+   else
+     {
+        if( !wd->ed )
+          wd->ed = calloc(1, sizeof(Edit_Data));
 
-	 wd->ed->ec = edit_class;
+        wd->ed->ec = edit_class;
 
-	 if( (wd->edit_mode & ELM_GENLIST_EDIT_MODE_DELETE) && !wd->ed->del_confirm)
-	   {
-	      wd->ed->del_confirm = elm_button_add(wd->obj);
-	      elm_button_label_set(wd->ed->del_confirm, "Delete");
-	      evas_object_smart_member_add(wd->ed->del_confirm, wd->pan_smart);
-	      edje_object_scale_set( wd->ed->del_confirm, elm_widget_scale_get(wd->ed->del_confirm) *
-		    _elm_config->scale);
-	      evas_object_smart_callback_add(wd->ed->del_confirm, "clicked", _delete_confirm_cb, wd );
-	   }
-      }
+        if( (wd->edit_mode & ELM_GENLIST_EDIT_MODE_DELETE) && !wd->ed->del_confirm)
+          {
+             wd->ed->del_confirm = elm_button_add(wd->obj);
+             elm_button_label_set(wd->ed->del_confirm, "Delete");
+             evas_object_smart_member_add(wd->ed->del_confirm, wd->pan_smart);
+             edje_object_scale_set( wd->ed->del_confirm, elm_widget_scale_get(wd->ed->del_confirm) *
+                   _elm_config->scale);
+             evas_object_smart_callback_add(wd->ed->del_confirm, "clicked", _delete_confirm_cb, wd );
+          }
+     }
 
-    realized_list = elm_genlist_realized_items_get(obj);
+   realized_list = elm_genlist_realized_items_get(obj);
 
-    EINA_LIST_FOREACH(realized_list, l, it)
-      {
-	 _edit_controls_eval(it);
-      }
+   EINA_LIST_FOREACH(realized_list, l, it)
+     {
+        _edit_controls_eval(it);
+     }
 
-    if (wd->calc_job) ecore_job_del(wd->calc_job);
-    wd->calc_job = ecore_job_add(_calc_job, wd);
+   if (wd->calc_job) ecore_job_del(wd->calc_job);
+   wd->calc_job = ecore_job_add(_calc_job, wd);
 }
