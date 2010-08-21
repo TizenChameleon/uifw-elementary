@@ -2238,7 +2238,7 @@ extern "C" {
    EAPI void         elm_editfield_guide_text_set(Evas_Object *obj, const char *text);
    EAPI const char  *elm_editfield_guide_text_get(Evas_Object *obj);
    EAPI Evas_Object *elm_editfield_entry_get(Evas_Object *obj);
-   EAPI Evas_Object *elm_editfield_clear_button_show(Evas_Object *obj, Eina_Bool show);
+//   EAPI Evas_Object *elm_editfield_clear_button_show(Evas_Object *obj, Eina_Bool show);
    EAPI Eina_Bool    elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon);
    EAPI Evas_Object *elm_editfield_right_icon_get(Evas_Object *obj);
    EAPI Eina_Bool    elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon);
