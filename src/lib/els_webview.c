@@ -199,6 +199,12 @@ static void      _smart_calculate(Evas_Object* obj);
 static Eina_Bool _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev);
 static Eina_Bool _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev);
 static Eina_Bool _smart_mouse_move(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Move* ev);
+static void      _smart_add_console_message(Ewk_View_Smart_Data *sd, const char *message, unsigned int lineNumber, const char *sourceID);
+static void      _smart_run_javascript_alert(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message);
+static Eina_Bool _smart_run_javascript_confirm(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message);
+static Eina_Bool _smart_run_javascript_prompt(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message, const char *defaultValue, char **value);
+static Eina_Bool _smart_should_interrupt_javascript(Ewk_View_Smart_Data *sd);
+static Eina_Bool _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_Request *request);
 static void      _view_on_mouse_down(void* data, Evas* e, Evas_Object* o, void* event_info);
 static void      _view_on_mouse_up(void* data, Evas* e, Evas_Object* o, void* event_info);
 static void      _smart_load_started(void* data, Evas_Object* webview, void* error);
@@ -323,6 +329,13 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	_api.mouse_down = _smart_mouse_down;
 	_api.mouse_up   = _smart_mouse_up  ;
 	_api.mouse_move = _smart_mouse_move;
+
+	_api.add_console_message = _smart_add_console_message;
+	_api.run_javascript_alert = _smart_run_javascript_alert;
+	_api.run_javascript_confirm = _smart_run_javascript_confirm;
+	_api.run_javascript_prompt = _smart_run_javascript_prompt;
+	_api.should_interrupt_javascript = _smart_should_interrupt_javascript;
+	//FIXME:_api.navigation_policy_decision = _smart_navigation_policy_decision;
 
 	_smart = evas_smart_class_new(&_api.sc);
 	elm_theme_overlay_add(NULL, WEBVIEW_THEME_EDJ);
@@ -571,6 +584,36 @@ _smart_mouse_move(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Move* ev)
    return EINA_TRUE;
 forward_event:
    return _parent_sc.mouse_move(esd, ev);
+}
+
+static void
+_smart_add_console_message(Ewk_View_Smart_Data *sd, const char *message, unsigned int lineNumber, const char *sourceID)
+{
+}
+
+static void
+_smart_run_javascript_alert(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message)
+{
+}
+
+static Eina_Bool
+_smart_run_javascript_confirm(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message)
+{
+}
+
+static Eina_Bool
+_smart_run_javascript_prompt(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message, const char *defaultValue, char **value)
+{
+}
+
+static Eina_Bool
+_smart_should_interrupt_javascript(Ewk_View_Smart_Data *sd)
+{
+}
+
+static Eina_Bool
+_smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_Request *request)
+{
 }
 
 #ifdef NEED_TO_REMOVE
