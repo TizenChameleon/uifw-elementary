@@ -84,6 +84,58 @@ static void _shift_base_by_arrow(Evas_Object *arrow,
 static void _btn_layout_create(Evas_Object *obj);
 
 static void
+_show_effect_done(void *data, Elm_Transit *transit)
+{
+	//TODO: THIS FUNCTION IS TEMPORARY. It should be implemented on the edje.
+	Widget_Data *wd = data;
+	elm_transit_fx_clear(transit);
+
+	if(wd->box)
+		elm_transit_fx_insert(transit, elm_fx_color_add(wd->box, 0, 0, 0, 0, 255, 255, 255, 255 ));
+	if(wd->content)
+		elm_transit_fx_insert(transit, elm_fx_color_add(wd->content, 0, 0, 0, 0, 255, 255, 255, 255 ));
+	if(wd->btn_layout)
+	elm_transit_fx_insert(transit, elm_fx_color_add(wd->btn_layout, 0, 0, 0, 0, 255, 255, 255, 255 ));
+	elm_transit_run(transit, 0.2);
+	elm_transit_completion_callback_set(transit, NULL, NULL);
+	elm_transit_del(transit);
+	edje_object_signal_emit(wd->base, "elm,state,show", "elm");
+	wd->transit = NULL;
+}
+
+static void
+_show_effect(Widget_Data* wd)
+{
+	//TODO: THIS FUNCTION IS TEMPORARY. It should be implemented in the edc
+	if(wd->transit) {
+		elm_transit_stop(wd->transit);
+		elm_transit_fx_clear(wd->transit);
+	}else {
+		wd->transit = elm_transit_add(wd->base);
+		elm_transit_curve_style_set(wd->transit, ELM_ANIMATOR_CURVE_OUT);
+		elm_transit_completion_callback_set(wd->transit, _show_effect_done, wd);
+	}
+
+	elm_transit_fx_insert(wd->transit, elm_fx_color_add( wd->base, 0, 0, 0, 0, 255, 255, 255, 255 ) );
+	elm_transit_fx_insert(wd->transit, elm_fx_wipe_add( wd->base, ELM_FX_WIPE_TYPE_SHOW, wd->arrow_dir) );
+
+	if(wd->box)
+		evas_object_color_set(wd->box, 0, 0, 0, 0 );
+	if(wd->content)
+		evas_object_color_set(wd->content, 0, 0, 0, 0);
+	if(wd->btn_layout)
+		evas_object_color_set(wd->btn_layout, 0, 0, 0, 0);
+
+	elm_transit_run(wd->transit, 0.3 );
+}
+
+
+
+
+
+
+
+static void
 _separator_obj_del(Widget_Data *wd, Elm_Ctxpopup_Item *remove_item)
 {
    Eina_List *elist, *cur_list, *prev_list;
@@ -604,7 +656,10 @@ _ctxpopup_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
    if (!wd->position_forced)
       evas_object_show(wd->arrow);
 
+	_show_effect(wd);
+   
    wd->visible = EINA_TRUE;
+
 }
 
 static void
@@ -624,46 +679,6 @@ _ctxpopup_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
    wd->visible = EINA_FALSE;
 }
 
-static void
-_show_effect_done(void *data, Elm_Transit *transit)
-{
-	//TODO: THIS FUNCTION IS TEMPORARY. It should be implemented on the edje.
-	Widget_Data *wd = data;
-	elm_transit_fx_clear(transit);
-
-	if(wd->box)
-		elm_transit_fx_insert(transit, elm_fx_color_add(wd->box, 0, 0, 0, 0, 255, 255, 255, 255 ));
-	if(wd->content)
-		elm_transit_fx_insert(transit, elm_fx_color_add(wd->content, 0, 0, 0, 0, 255, 255, 255, 255 ));
-	if(wd->btn_layout)
-	elm_transit_fx_insert(transit, elm_fx_color_add(wd->btn_layout, 0, 0, 0, 0, 255, 255, 255, 255 ));
-	elm_transit_run(transit, 0.2);
-	elm_transit_completion_callback_set(transit, NULL, NULL);
-	elm_transit_del(transit);
-	edje_object_signal_emit(wd->base, "elm,state,show", "elm");
-	wd->transit = NULL;
-}
-
-static void
-_show_effect(Widget_Data* wd)
-{
-	//TODO: THIS FUNCTION IS TEMPORARY. It should be implemented in the edc
-	if(wd->transit) return ;
-
-	if(wd->box)
-		evas_object_color_set(wd->box, 0, 0, 0, 0 );
-	if(wd->content)
-		evas_object_color_set(wd->content, 0, 0, 0, 0);
-	if(wd->btn_layout)
-		evas_object_color_set(wd->btn_layout, 0, 0, 0, 0);
-
-	wd->transit = elm_transit_add(wd->base);
-	elm_transit_fx_insert(wd->transit, elm_fx_color_add( wd->base, 0, 0, 0, 0, 255, 255, 255, 255 ) );
-	elm_transit_fx_insert(wd->transit, elm_fx_wipe_add( wd->base, ELM_FX_WIPE_TYPE_SHOW, wd->arrow_dir) );
-	elm_transit_curve_style_set(wd->transit, ELM_ANIMATOR_CURVE_OUT);
-	elm_transit_completion_callback_set(wd->transit, _show_effect_done, wd);
-	elm_transit_run(wd->transit, 0.3 );
-}
 
 static void
 _ctxpopup_scroller_resize(void *data, Evas *e, Evas_Object * obj,
@@ -675,8 +690,8 @@ _ctxpopup_scroller_resize(void *data, Evas *e, Evas_Object * obj,
       return;
 
    if (wd->visible) {
-      _sizing_eval(data);
-      _show_effect(wd);
+  	_sizing_eval(data);
+	_show_effect(wd);
    }
 }
 
@@ -829,13 +844,13 @@ elm_ctxpopup_add(Evas_Object *parent)
 				   _bg_clicked_cb, obj);
 
    //Base
-
    wd->base = edje_object_add(e);
    elm_widget_sub_object_add(obj, wd->base);
    _elm_theme_object_set(obj, wd->base, "ctxpopup", "base",
 			 elm_widget_style_get(obj));
 
    //Scroller
+
    wd->scroller = elm_scroller_add(obj);
    elm_object_style_set(wd->scroller, "ctxpopup_vbar");
    elm_scroller_content_min_limit(wd->scroller, EINA_TRUE, EINA_TRUE);
