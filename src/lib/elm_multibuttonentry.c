@@ -52,7 +52,7 @@ static void	_change_current_button(Evas_Object *obj, Evas_Object *btn);
 static void	_del_button_obj(Evas_Object *obj, Evas_Object *btn);
 static void	_button_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void	_del_button(Evas_Object *obj);
-static Elm_Multibuttonentry_Item*	_add_button_item(Evas_Object *obj, char *str, Multibuttonentry_Pos pos, const Elm_Multibuttonentry_Item *reference, void *data);
+static Elm_Multibuttonentry_Item*	_add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, const Elm_Multibuttonentry_Item *reference, void *data);
 static void	_add_button(Evas_Object *obj, char *str);
 static void	_evas_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info );
 static void	_view_init(Evas_Object *obj);
@@ -183,9 +183,6 @@ static void
 _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
 	Widget_Data *wd = elm_widget_data_get(data);
-	Elm_Multibuttonentry_Item *item;
-	Evas_Object *label;
-	const char *str = NULL;
 	if (!wd) return;
 
 	_change_current_button(data, obj);
@@ -194,8 +191,6 @@ _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *
 static void
 _del_button_obj(Evas_Object *obj, Evas_Object *btn)
 {
-	Eina_List *l;
-	Elm_Multibuttonentry_Item *item;
 	Evas_Object *label;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if(!wd || !btn)	return;
@@ -238,9 +233,6 @@ static void
 _del_button(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Object* last_row;
-	Evas_Object *hbox;
-	Evas_Object *last_btn;
 	Elm_Multibuttonentry_Item *item;
 	if(!wd || !wd->items) return;
 
@@ -257,7 +249,7 @@ _del_button(Evas_Object *obj)
 }
 
 static Elm_Multibuttonentry_Item*
-_add_button_item(Evas_Object *obj, char *str, Multibuttonentry_Pos pos, const Elm_Multibuttonentry_Item *reference, void *data)
+_add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, const Elm_Multibuttonentry_Item *reference, void *data)
 {
 	Elm_Multibuttonentry_Item *item;
 	Evas_Object *btn;
@@ -346,7 +338,7 @@ _add_button(Evas_Object *obj, char *str)
 	elm_scrolled_entry_entry_set(wd->entry, "");
 
 	// add button
-	Elm_Multibuttonentry_Item *item = _add_button_item(obj, str, MULTIBUTONENTRY_POS_END, NULL, NULL);
+	_add_button_item(obj, str, MULTIBUTONENTRY_POS_END, NULL, NULL);
 }
 
 static void
@@ -472,7 +464,6 @@ EAPI void
 elm_multibuttonentry_label_set(Evas_Object *obj, const char *label)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Object *row;
 	if (!wd) return;
 
 	_set_label(obj, label);	
@@ -661,7 +652,6 @@ elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item)
 	Widget_Data *wd;
 	Eina_List *l;
 	Elm_Multibuttonentry_Item *_item;
-	int cnt = 0;
 
 	if (!item) return;
 	wd = elm_widget_data_get(item->multibuttonentry);
