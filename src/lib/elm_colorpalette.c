@@ -12,7 +12,6 @@
 
 
 #define MAX_NUM_COLORS 30
-#define COLOR_RECT_LENGTH 66
 
 typedef struct _Colorpalette_Item Colorpalette_Item;
 struct _Colorpalette_Item
@@ -176,8 +175,7 @@ static void _colorpalette_object_resize(void *data, Evas *e, Evas_Object *obj, v
 	if (wd->items)
 		item = wd->items->data;
 
-	edje_object_part_geometry_get(elm_layout_edje_get(item->lo),"focus" ,NULL, NULL, &wd->rect_w, &wd->rect_h);
-
+	edje_object_part_geometry_get(elm_layout_edje_get(item->lo),"bg" ,NULL, NULL, &wd->rect_w, &wd->rect_h);
 
 	pad_x = ((double)wd->tab_w - (double)wd->rect_w * (double)wd->col) / (double)(wd->col - 1);
 	pad_y = ((double)wd->tab_h - (double)wd->rect_h * (double)wd->row) / (double)(wd->row - 1);
@@ -350,9 +348,7 @@ static void _color_table_update(Evas_Object *obj, int row, int col, int color_nu
 					item->g = color[count].g;
 					item->b = color[count].b;
 				}
-
 				wd->items = eina_list_append(wd->items, item);
-
 				count ++;
 			}
 		}

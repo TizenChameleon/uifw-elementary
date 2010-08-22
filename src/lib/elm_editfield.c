@@ -25,6 +25,7 @@ struct _Widget_Data
    Eina_Bool show_guide_text:1;
    Eina_Bool editing:1;
    Eina_Bool single_line:1;
+   Eina_Bool eraser_show:1;
 };
 
 static const char *widtype = NULL;
@@ -48,7 +49,6 @@ static void
 _on_focus_hook(void *data, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   const char* text;
    if (!wd || !wd->base)
      return ;	
    if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)) ) 
@@ -74,9 +74,16 @@ _theme_hook(Evas_Object *obj)
    if (!wd || !wd->base)
      return;
    _elm_theme_object_set(obj, wd->base, "editfield", "base", elm_widget_style_get(obj));
-   edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
+   if(wd->single_line)
+   	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->scroller);
+   else
+   	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
    if(!wd->editing)
      edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");	
+   if (wd->eraser_show) 
+	edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
+   else 
+	edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
    if(wd->show_guide_text)
      {
 	if(_empty_entry(wd->entry)) 
@@ -160,7 +167,6 @@ _empty_entry(Evas_Object *entry)
 static void
 _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
 {
-   const char *text;
    Evas_Object *ef_obj = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get(ef_obj);
 
@@ -263,6 +269,7 @@ elm_editfield_add(Evas_Object *parent)
 
    wd->editing = EINA_FALSE;
    wd->single_line = EINA_FALSE;
+   wd->eraser_show = EINA_FALSE;
 
    wd->entry = elm_entry_add(obj);
    elm_object_style_set(wd->entry, "editfield");
@@ -548,6 +555,24 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 }
 
 /**
+ * Get the current entry object style(single-line or multi-line)
+ *
+ * @param obj The editfield object  
+ * @return 1 if single-line , 0 if multi-line
+ *
+ * @ingroup Editfield
+ */
+EAPI Eina_Bool
+elm_editfield_entry_single_line_get(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;	
+   if (!wd || !wd->base)
+     return EINA_FALSE;
+   return wd->single_line;
+}
+
+/**
  * Set enable user to clean all of text.
  *
  * @param obj The editfield object  
@@ -563,6 +588,8 @@ elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
    ELM_CHECK_WIDTYPE(obj, widtype);	
    if (!wd || !wd->base)
      return;
+   
+   wd->eraser_show = visible;
 
    if (visible) 
 	edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
@@ -570,4 +597,22 @@ elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
 	edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
    
    return; 
+}
+
+/**
+ * Get the current state of erase (visible/invisible)
+ *
+ * @param obj The editfield object  
+ * @return 1 if visible, 0 if invisible
+ *
+ * @ingroup Editfield
+ */
+EAPI Eina_Bool
+elm_editfield_eraser_get(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;	
+   if (!wd || !wd->base)
+     return EINA_FALSE;
+   return wd->eraser_show;
 }

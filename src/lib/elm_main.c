@@ -21,9 +21,17 @@
 
 static Elm_Version _version = { VMAJ, VMIN, VMIC, VREV };
 EAPI Elm_Version *elm_version = &_version;
+/**
+ * @defgroup Main Main
+ * @ingroup Elementary
+ *
+ * This group includes functions of elm_main.c
+ */
+
 
 /**
  * @defgroup Start Getting Started
+ * @ingroup Main
  *
  * To write an Elementary app, you can get started with the following:
  *
@@ -321,6 +329,7 @@ _set_elm_module()
 
 /**
  * @defgroup General General
+ * @ingroup Main
  */
 
 /**
@@ -962,6 +971,7 @@ elm_all_flush(void)
 
 /**
  * @defgroup Scaling Selective Widget Scaling
+ * @ingroup Main
  *
  * Different widgets can be scaled independently. These functions allow you to
  * manipulate this scaling on a per-widget basis. The object and all its
@@ -999,6 +1009,7 @@ elm_object_scale_get(const Evas_Object *obj)
 
 /**
  * @defgroup Styles Styles
+ * @ingroup Main
  *
  * Widgets can have different styles of look. These generic API's set
  * styles of widgets, if they support them (and if the theme(s) do).
@@ -1120,6 +1131,7 @@ elm_scale_all_set(double scale)
 
 /**
  * @defgroup Fingers Fingers
+ * @ingroup Main
  *
  * Elementary is designed to be finger-friendly for touchscreens, and so in
  * addition to scaling for display resolution, it can also scale based on
@@ -1203,6 +1215,7 @@ elm_coords_finger_size_adjust(int times_w, Evas_Coord *w, int times_h, Evas_Coor
 
 /**
  * @defgroup Focus Focus
+ * @ingroup Main
  *
  * Objects have focus. This is what determines where the keyboard input goes to
  * within the application window.
@@ -1288,6 +1301,7 @@ elm_object_focus_allow_get(const Evas_Object *obj)
 
 /**
  * @defgroup Scrollhints Scrollhints
+ * @ingroup Main
  *
  * Objects when inside a scroller can scroll, but this may not always be
  * desireable in certain situations. This allows an object to hint to itself

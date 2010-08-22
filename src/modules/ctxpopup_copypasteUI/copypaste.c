@@ -183,6 +183,11 @@ obj_longpress(Evas_Object *obj)
 EAPI void
 obj_mouseup(Evas_Object *obj)
 {
+
+	if (!obj || !ext_mod) {
+		return;
+	}
+
 /*update*/
 	elm_entry_extension_module_data_get(obj,ext_mod);
    if (ext_mod->longpress_timer)

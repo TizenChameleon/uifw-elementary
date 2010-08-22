@@ -2,52 +2,146 @@
 #include "elm_priv.h"
 
 static void
-_smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horizontal, int homogeneous)
+_smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int extended)
 {
-   Evas_Coord minw, minh, maxw, maxh, mnw, mnh;
-   const Eina_List *l;
-   Evas_Object_Box_Option *opt;
+	Evas_Coord minw, minh, maxw, maxh, mnw, mnh, ww;
+	Evas_Coord w, h, cal_w = 0, cal_h = 0, cur_line_max_h = 0;
+	const Eina_List *l;
+	Evas_Object_Box_Option *opt;
+    double wx;
 
-   /* FIXME: need to calc max */
-   minw = 0;
-   minh = 0;
-   maxw = -1;
-   maxh = -1;
-   if (homogeneous)
-     {
-	EINA_LIST_FOREACH(priv->children, l, opt)
-	  {
-	     evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
-	     if (minh < mnh) minh = mnh;
-	     if (minw < mnw) minw = mnw;
-	  }
-	if (horizontal)
-          minw *= eina_list_count(priv->children);
+	/* FIXME: need to calc max */
+	minw = 0;
+	minh = 0;
+	maxw = -1;
+	maxh = -1;
+
+	if (homogeneous)
+	{
+		EINA_LIST_FOREACH(priv->children, l, opt)
+		{
+			evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
+			if (minh < mnh) minh = mnh;
+			if (minw < mnw) minw = mnw;
+		}
+		if (horizontal)
+			minw *= eina_list_count(priv->children);
+		else
+			minh *= eina_list_count(priv->children);
+	}
 	else
-          minh *= eina_list_count(priv->children);
-     }
-   else
-     {
-	EINA_LIST_FOREACH(priv->children, l, opt)
-	  {
-	     evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
-	     if (horizontal)
-	       {
-		  if (minh < mnh) minh = mnh;
-		  minw += mnw;
-	       }
-	     else
-	       {
-		  if (minw < mnw) minw = mnw;
-		  minh += mnh;
-	       }
-	  }
-     }
-   evas_object_size_hint_min_set(box, minw, minh);
+	{
+		if (horizontal && extended)
+		{
+			evas_object_geometry_get(box, NULL, NULL, &w, &h);
+			minw = w;
+		}
+
+		EINA_LIST_FOREACH(priv->children, l, opt)
+		{
+			evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
+			evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
+
+			if (horizontal)
+			{
+				if (extended)
+				{
+					if(wx)
+					{
+					   if (mnw != -1 && (w - cal_w) >= mnw)
+						   ww = w - cal_w;
+					   else
+						   ww = w;
+					}
+					else
+						ww = mnw;
+
+					if ((cal_w + mnw) > w)
+					{
+						minh += cur_line_max_h;
+						cal_w = 0;
+						cur_line_max_h = 0;
+					}
+					cal_w += ww;
+					if (cur_line_max_h < mnh) cur_line_max_h = mnh;
+				}
+				else
+				{
+					if (minh < mnh) minh = mnh;
+					minw += mnw;
+				}
+			}
+			else
+			{
+				if (minw < mnw) minw = mnw;
+				minh += mnh;
+			}
+		}
+
+		if(horizontal && extended)
+		{
+			minh += cur_line_max_h;
+		}
+
+	}
+	evas_object_size_hint_min_set(box, minw, minh);
 }
+
+
+static Evas_Coord
+_smart_extents_calculate_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj_index)
+{
+	Evas_Coord mnw, mnh, cal_w = 0, cur_line_max_h = 0, w, ww;
+	const Eina_List *l;
+	Evas_Object_Box_Option *opt;
+	int index = 0;
+    double wx;
+
+	evas_object_geometry_get(box, NULL, NULL, &w, NULL);
+
+	EINA_LIST_FOREACH(priv->children, l, opt)
+	{
+		evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
+		evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
+
+		if(wx)
+		{
+			if (mnw != -1 && (w - cal_w) >= mnw)
+				ww = w - cal_w;
+			else
+				ww = w;
+		}
+		else
+			ww = mnw;
+
+		if ((cal_w + ww) > w)
+		{
+			if (index > obj_index )
+			{
+				return cur_line_max_h;
+			}
+			cal_w = 0;
+			cur_line_max_h = 0;
+		}
+
+		cal_w += ww;
+		if (cur_line_max_h < mnh) cur_line_max_h = mnh;
+
+		index++;
+	}
+	
+	return cur_line_max_h;
+}
+
 
 void
 _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int homogeneous)
+{
+	_els_box_layout_ex(o, priv, horizontal, homogeneous, 0);
+}
+
+void
+_els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int extended)
 {
    Evas_Coord x, y, w, h, xx, yy;
    const Eina_List *l;
@@ -57,7 +151,7 @@ _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int 
    double ax, ay;
    Evas_Object_Box_Option *opt;
 
-   _smart_extents_calculate(o, priv, horizontal, homogeneous);
+   _smart_extents_calculate(o, priv, horizontal, homogeneous, extended);
 
    evas_object_geometry_get(o, &x, &y, &w, &h);
 
@@ -106,6 +200,9 @@ _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int 
    hdif = h - minh;
    xx = x;
    yy = y;
+
+   Evas_Coord cal_w = 0, cal_h = 0, cur_line_max_h = 0, obj_index = 0;
+
    EINA_LIST_FOREACH(priv->children, l, opt)
      {
         Evas_Coord mnw, mnh, mxw, mxh;
@@ -147,28 +244,69 @@ _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int 
 	       }
 	     else
 	       {
-		  Evas_Coord ww, hh, ow, oh;
+			   if (extended)
+			   {
+				   Evas_Coord ww, hh, ow, oh;
+				   if(wx)
+				   {
+					   if (mnw != -1 && (w - cal_w) >= mnw)
+						   ww = w - cal_w;
+					   else
+						   ww = w;
+				   }
+				   else
+					   ww = mnw;
+				   hh = _smart_extents_calculate_max_height(o, priv, obj_index);
 
-		  ww = mnw;
-		  if ((expand > 0) && (xw))
-		    {
-		       if (expand == 1) ow = wdif;
-		       else ow = (w - minw) / expand;
-		       wdif -= ow;
-		       ww += ow;
-		    }
-		  hh = h;
-		  ow = mnw;
-		  if (fw) ow = ww;
-		  if ((mxw >= 0) && (mxw < ow)) ow = mxw;
-		  oh = mnh;
-		  if (fh) oh = hh;
-		  if ((mxh >= 0) && (mxh < oh)) oh = mxh;
-		  evas_object_move(obj,
-				   xx + (Evas_Coord)(((double)(ww - ow)) * ax),
-				   yy + (Evas_Coord)(((double)(hh - oh)) * ay));
-		  evas_object_resize(obj, ow, oh);
-		  xx += ww;
+				   ow = mnw;
+				   if (fw) ow = ww;
+				   if ((mxw >= 0) && (mxw < ow)) ow = mxw;
+				   oh = mnh;
+				   if (fh) oh = hh;
+				   if ((mxh >= 0) && (mxh < oh)) oh = mxh;
+
+				   printf( "index(%d), w(%d), ww(%d), cal_w(%d), hh(%d), ow(%d), oh(%d), cur_line_max_h(%d) \n", obj_index+1, w, ww, cal_w, hh, ow, oh, cur_line_max_h );
+				   if ((cal_w + ww) > w)
+				   {
+					   cal_h += cur_line_max_h;
+
+					   cal_w = 0;
+					   cur_line_max_h = 0;
+				   }
+
+				   evas_object_move(obj,
+						   xx + cal_w + (Evas_Coord)(((double)(ww - ow)) * ax),
+						   yy + cal_h + (Evas_Coord)(((double)(hh - oh)) * ay));
+				   evas_object_resize(obj, ow, oh);
+
+				   cal_w += ww;
+				   if (cur_line_max_h < hh) cur_line_max_h = hh;
+			   }
+			   else
+			   {
+				  Evas_Coord ww, hh, ow, oh;
+
+				  ww = mnw;
+				  if ((expand > 0) && (xw))
+					{
+					   if (expand == 1) ow = wdif;
+					   else ow = (w - minw) / expand;
+					   wdif -= ow;
+					   ww += ow;
+					}
+				  hh = h;
+				  ow = mnw;
+				  if (fw) ow = ww;
+				  if ((mxw >= 0) && (mxw < ow)) ow = mxw;
+				  oh = mnh;
+				  if (fh) oh = hh;
+				  if ((mxh >= 0) && (mxh < oh)) oh = mxh;
+				  evas_object_move(obj,
+						   xx + (Evas_Coord)(((double)(ww - ow)) * ax),
+						   yy + (Evas_Coord)(((double)(hh - oh)) * ay));
+				  evas_object_resize(obj, ow, oh);
+				  xx += ww;
+			   }
 	       }
 	  }
 	else
@@ -217,6 +355,8 @@ _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int 
 		  yy += hh;
 	       }
 	  }
+
+		obj_index++;
      }
 }
 

@@ -16,7 +16,6 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *webkit;
-   Eina_Bool auto_fitting:1;
 };
 
 static const char *widtype = NULL;
@@ -121,28 +120,41 @@ elm_webview_webkit_get(Evas_Object *obj)
 EAPI void
 elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_events_feed_set(wd->webkit, feed);
 }
 
 EAPI Eina_Bool
 elm_webview_events_feed_get(Evas_Object *obj)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _elm_smart_webview_events_feed_get(wd->webkit);
 }
 
 EAPI void
-elm_webview_auto_fitting_set(Eina_Bool enable)
+elm_webview_auto_fitting_set(Evas_Object *obj, Eina_Bool enable)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_auto_fitting_set(wd->webkit, enable);
 }
 
 EAPI Eina_Bool
-elm_webview_auto_fitting_get()
+elm_webview_auto_fitting_get(Evas_Object *obj)
 {
-   return EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _elm_smart_webview_auto_fitting_get(wd->webkit);
 }
 
 EAPI Evas_Object *
 elm_webview_minimap_get(Evas_Object *obj)
 {
-   return NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _elm_smart_webview_minimap_get(wd->webkit);
 }
 
 EAPI void
@@ -151,5 +163,27 @@ elm_webview_uri_set(Evas_Object *obj, const char *uri)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    _elm_smart_webview_uri_set(wd->webkit, uri);
+}
+
+/**
+ * Set bouncing behavior(Not supported yet)
+ *
+ * When scrolling, the WebView may "bounce" when reaching an edge of contents
+ * This is a visual way to indicate the end has been reached. This is enabled
+ * by default for both axes. This will set if it is enabled for that axis with
+ * the boolean parameers for each axis.
+ *
+ * @param obj The WebView object
+ * @param h_bounce Will the WebView bounce horizontally or not
+ * @param v_bounce Will the WebView bounce vertically or not
+ *
+ * @ingroup WebView
+ */
+EAPI void
+elm_webview_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_bounce_allow_set(wd->webkit, h_bounce, v_bounce);
 }
 #endif

@@ -36,6 +36,7 @@ struct _Item
 {
 	Evas_Object *obj;
 	const char *title;
+	const char *subtitle;
 	Evas_Object *title_obj;
 	Eina_List *title_list;
 	Evas_Object *fn_btn1;
@@ -170,6 +171,7 @@ _delete_item(Item *it)
 	evas_object_del(it->fn_btn2);
 	evas_object_del(it->fn_btn3);
 	if (it->title) eina_stringshare_del(it->title);
+	if (it->subtitle) eina_stringshare_del(it->subtitle);
 	EINA_LIST_FOREACH(it->title_list, ll, list_obj)
 		evas_object_del(list_obj);
 	eina_list_free(it->title_list);
@@ -238,7 +240,7 @@ _item_sizing_eval(Item *it)
 	}
 	if (it->title_list)
 	{	
-		it->title_w = w - it->fn_btn1_w - it->fn_btn2_w -it->fn_btn3_w - pad_count * pad;
+		it->title_w = _set_button_width(it->title_obj);
 		it->title_obj = _multiple_object_set(it->obj, it->title_obj, it->title_list, it->title_w);
 		evas_object_resize(it->title_obj, it->title_w, height);
 		evas_object_size_hint_min_set(it->title_obj, it->title_w, height);
@@ -294,6 +296,12 @@ _transition_complete_cb(void *data)
 				edje_object_part_text_set(wd->base, "elm.text", it->title);
 				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
 			}
+		if (it->subtitle) 
+			{
+				edje_object_part_text_set(wd->base, "elm.text.sub", it->subtitle);
+			}
+		else
+			edje_object_part_text_set(wd->base, "elm.text.sub", NULL);
 		if (it->fn_btn1) 
 		{
 			edje_object_signal_emit(wd->base, "elm,state,item,add,leftpad", "elm");
@@ -331,7 +339,6 @@ _transition_complete_cb(void *data)
 		}
 	}
 	edje_object_message_signal_process(wd->base);
-	free(cb);
 	evas_object_smart_callback_call(it->obj, "updated", it->content);
 }
 
@@ -436,7 +443,7 @@ _multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, in
 	{
 		new_obj = elm_layout_add(obj);
 		elm_widget_sub_object_add(obj, new_obj);
-		elm_layout_theme_set(new_obj, "navigationbar", "title", "default");
+		elm_layout_theme_set(new_obj, "navigationbar", "title", elm_widget_style_get(obj));
 	}
 	else 
 		new_obj = sub_obj;
@@ -571,7 +578,7 @@ elm_navigationbar_push(Evas_Object *obj,
 		}
 		else
 		{
-			elm_button_label_set(it->back_btn, "< Prev.");
+			elm_button_label_set(it->back_btn, "< Previous");
 		}
 		evas_object_smart_callback_add(it->back_btn, "clicked", _back_button_clicked, it); 
 		_button_set(obj, NULL, it->back_btn, EINA_TRUE);
@@ -581,11 +588,10 @@ elm_navigationbar_push(Evas_Object *obj,
 	edje_object_part_text_set(wd->base, "elm.text", title);
 	_item_sizing_eval(it);
 
+	Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);		
 	// unswallow items and start transition
 	if (prev_it)
 	{
-		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
-				
 		cb->prev_it = prev_it;
 		cb->it = it;
 		cb->pop = EINA_FALSE;
@@ -594,17 +600,15 @@ elm_navigationbar_push(Evas_Object *obj,
 		else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
 		if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
 		if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
-		_transition_complete_cb(cb);
 	}
 	else  
 	{
-		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
 		cb->prev_it = NULL;
 		cb->it = it;
-		cb->pop = EINA_FALSE;
-		_transition_complete_cb(cb);
+		cb->pop = EINA_FALSE;	
 	}
-
+	_transition_complete_cb(cb);
+	free(cb);
 	//push content to pager
 	elm_pager_content_push(wd->pager, it->content);	
 
@@ -721,31 +725,22 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 	if (ll)
 	{
 		prev_it = ll->data;
-		ll = ll->prev;
+		ll =  ll->prev;	
 		while (ll) 
 		{
-		  it = ll->data;
-			if (it->obj && (it->content == content)) 
-			{
-				//delete contents between the top and the inputted content
-				ll = eina_list_last(wd->stack);
-
-				while (ll)
-				{
-				  if (ll->data == it) break;
-					else 
-					{
-						_delete_item(ll->data);
-						wd->stack = eina_list_remove_list(wd->stack, ll);
-						break;
-					}
-				ll =  ll->prev;
+			it = ll->data;		
+			if (it->obj && (it->content != content)) 
+				{ 
+					_delete_item(ll->data);
+					wd->stack = eina_list_remove_list(wd->stack, ll);
+					it = NULL;
 				}
-				break;
+			else
+				 break;
+ 
+				ll =  ll->prev;	
 			}
-			it = NULL;
 		}
-	}
 
 	if (prev_it && it) 
 	{
@@ -1255,6 +1250,68 @@ elm_navigationbar_title_button_get(Evas_Object *obj,
 			break;
 	}	
 	return button;
+}
+
+/**
+ * Set the sub title string for the pushed content
+ * If the content is at the top of the navigation stack, update the title string
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] content The object to push or pushed
+ * @param[in] title The title string
+ *
+ * @ingroup NavigationBar
+ */
+EAPI Evas_Object *
+elm_navigationbar_subtitle_label_set(Evas_Object *obj, 
+							Evas_Object *content, 
+							const char *subtitle)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *ll;
+	Item *it;
+
+	if (!wd) return;
+	
+	 EINA_LIST_FOREACH(wd->stack, ll, it)
+	{
+		if (it->content == content) 
+		{
+		   eina_stringshare_replace(&it->subtitle, subtitle);
+   			edje_object_part_text_set(wd->base, "elm.text.sub", subtitle);
+			_item_sizing_eval(it);
+			break;
+		}
+	}
+}
+
+/**
+ * Return the subtitle string of the pushed content
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] content The object to push or pushed
+ * @return The title string or NULL if none
+ *
+ * @ingroup NavigationBar
+ */
+EAPI const char *
+elm_navigationbar_subtitle_label_get(Evas_Object *obj, 
+							Evas_Object *content)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *ll;
+	Item *it;
+
+	if (!wd) return NULL;
+
+	 EINA_LIST_FOREACH(wd->stack, ll, it)
+	{
+		if (it->content == content) 
+			return it->subtitle;
+	}
+	return NULL;
 }
 
 

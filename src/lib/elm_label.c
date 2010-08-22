@@ -664,7 +664,7 @@ elm_label_fontsize_set(Evas_Object *obj, int fontsize)
  * Set the text align on the label object
  *
  * @param obj The label object
- * @param align align mode
+ * @param align align mode ("left", "center", "right")
  *
  * @ingroup Label
  */

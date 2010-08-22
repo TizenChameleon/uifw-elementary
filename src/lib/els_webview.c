@@ -49,6 +49,9 @@ struct _Smart_Data {
      Evas_Object* widget;
      int locked_dx;
      int locked_dy;
+     unsigned char bounce_horiz : 1;
+     unsigned char bounce_vert : 1;
+     unsigned char auto_fitting : 1;
 
      /* ewk functions */
      void (*ewk_view_theme_set)(Evas_Object *, const char *);
@@ -156,7 +159,6 @@ struct _Smart_Data {
 	  int w, h;
      } layout;
 
-     Eina_Bool auto_fitting;
      Ecore_Animator* smart_zoom_animator;
 
      Evas_Point pan_s;
@@ -197,6 +199,12 @@ static void      _smart_calculate(Evas_Object* obj);
 static Eina_Bool _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev);
 static Eina_Bool _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev);
 static Eina_Bool _smart_mouse_move(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Move* ev);
+static void      _smart_add_console_message(Ewk_View_Smart_Data *sd, const char *message, unsigned int lineNumber, const char *sourceID);
+static void      _smart_run_javascript_alert(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message);
+static Eina_Bool _smart_run_javascript_confirm(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message);
+static Eina_Bool _smart_run_javascript_prompt(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message, const char *defaultValue, char **value);
+static Eina_Bool _smart_should_interrupt_javascript(Ewk_View_Smart_Data *sd);
+static Eina_Bool _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_Request *request);
 static void      _view_on_mouse_down(void* data, Evas* e, Evas_Object* o, void* event_info);
 static void      _view_on_mouse_up(void* data, Evas* e, Evas_Object* o, void* event_info);
 static void      _smart_load_started(void* data, Evas_Object* webview, void* error);
@@ -321,6 +329,13 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	_api.mouse_down = _smart_mouse_down;
 	_api.mouse_up   = _smart_mouse_up  ;
 	_api.mouse_move = _smart_mouse_move;
+
+	_api.add_console_message = _smart_add_console_message;
+	_api.run_javascript_alert = _smart_run_javascript_alert;
+	_api.run_javascript_confirm = _smart_run_javascript_confirm;
+	_api.run_javascript_prompt = _smart_run_javascript_prompt;
+	_api.should_interrupt_javascript = _smart_should_interrupt_javascript;
+	//FIXME:_api.navigation_policy_decision = _smart_navigation_policy_decision;
 
 	_smart = evas_smart_class_new(&_api.sc);
 	elm_theme_overlay_add(NULL, WEBVIEW_THEME_EDJ);
@@ -462,6 +477,14 @@ _elm_smart_webview_widget_set(Evas_Object *obj, Evas_Object *wid)
    sd->widget = wid;
 }
 
+void
+_elm_smart_webview_bounce_allow_set(Evas_Object* obj, Eina_Bool horiz, Eina_Bool vert)
+{
+   API_ENTRY return;
+   sd->bounce_horiz = horiz;
+   sd->bounce_vert = vert;
+}
+
 /* local subsystem functions */
 static void
 _smart_show(Evas_Object* obj)
@@ -516,7 +539,9 @@ _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev)
    DBG("%s is called\n", __func__);
    Smart_Data *sd = (Smart_Data *)esd;
    sd->mouse_down_copy = *ev;
-   return _parent_sc.mouse_down(esd, ev);
+
+   return EINA_TRUE;
+   //return _parent_sc.mouse_down(esd, ev);
 }
 
 static Eina_Bool
@@ -559,6 +584,36 @@ _smart_mouse_move(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Move* ev)
    return EINA_TRUE;
 forward_event:
    return _parent_sc.mouse_move(esd, ev);
+}
+
+static void
+_smart_add_console_message(Ewk_View_Smart_Data *sd, const char *message, unsigned int lineNumber, const char *sourceID)
+{
+}
+
+static void
+_smart_run_javascript_alert(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message)
+{
+}
+
+static Eina_Bool
+_smart_run_javascript_confirm(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message)
+{
+}
+
+static Eina_Bool
+_smart_run_javascript_prompt(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message, const char *defaultValue, char **value)
+{
+}
+
+static Eina_Bool
+_smart_should_interrupt_javascript(Ewk_View_Smart_Data *sd)
+{
+}
+
+static Eina_Bool
+_smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_Request *request)
+{
 }
 
 #ifdef NEED_TO_REMOVE
@@ -1088,6 +1143,11 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
      sd->ewk_frame_feed_focus_in = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_frame_feed_focus_in");
    sd->ewk_frame_feed_focus_in(sd->ewk_view_frame_main_get(webview));
    _parent_sc.mouse_down((Ewk_View_Smart_Data*)sd, &sd->mouse_down_copy);
+
+   if (sd->bounce_horiz)
+     elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
+   if (sd->bounce_vert)
+     elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
 }
 
 static void
@@ -1313,6 +1373,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    content_h *= zoom;
    DBG("<< ========content [%d, %d] new pos [%d, %d] >>\n", content_w, content_h, old_x + dx, old_y + dy);
 
+#if 0
    if ((old_x + dx) >= 0 && (old_x + dx) <= content_w && !elm_widget_drag_lock_x_get(sd->widget))
      elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
    if ((old_y + dy) >= 0 && (old_y + dy) <= content_h && !elm_widget_drag_lock_y_get(sd->widget))
@@ -1352,6 +1413,43 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 	     locked = EINA_TRUE;
 	  }
      }
+#else
+   Eina_Bool locked = EINA_FALSE;
+   if (!elm_widget_drag_lock_x_get(sd->widget))
+     {
+	if ((old_x + dx) >= 0 && (old_x + dx) <=content_w)
+	  elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
+	else if ((sd->locked_dx > 0 && (sd->locked_dx + dx) <= 0)
+	      || (sd->locked_dx < 0 && (sd->locked_dx + dx) >= 0))
+	  {
+	     elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
+	     DBG("===============<< widget x lock >>\n");
+	     dx += sd->locked_dx;
+	  }
+	else
+	  {
+	     sd->locked_dx += dx;
+	     locked = EINA_TRUE;
+	  }
+     }
+   if (!elm_widget_drag_lock_y_get(sd->widget))
+     {
+	if ((old_y + dy) >= 0 && (old_y + dy) <= content_h)
+	  elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
+	else if ((sd->locked_dy > 0 && (sd->locked_dy + dy) <= 0)
+	      || (sd->locked_dy < 0 && (sd->locked_dy + dy) >= 0))
+	  {
+	     elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
+	     DBG("===============<< widget y lock >>\n");
+	     dy += sd->locked_dy;
+	  }
+	else
+	  {
+	     sd->locked_dy += dy;
+	     locked = EINA_TRUE;
+	  }
+     }
+#endif
 
    if (locked) return;
 
@@ -1371,14 +1469,16 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    if (sd->text_selection_on == EINA_TRUE)
      _text_selection_move_by(sd, old_x - new_x, old_y - new_y);
 
-   if (dx && elm_widget_drag_lock_x_get(sd->widget) && (old_x == new_x))
+   if (!sd->bounce_horiz &&
+	 (dx && elm_widget_drag_lock_x_get(sd->widget) && (old_x == new_x)))
      {
 	sd->locked_dx = dx - (old_x - new_x);
 	elm_widget_drag_lock_x_set(sd->widget, EINA_FALSE);
 	DBG("===============<< widget x unlock >>\n");
      }
 
-   if (dy && elm_widget_drag_lock_y_get(sd->widget) && (old_y == new_y))
+   if (!sd->bounce_vert &&
+	 (dy && elm_widget_drag_lock_y_get(sd->widget) && (old_y == new_y)))
      {
 	sd->locked_dy = dy - (old_y - new_y);
 	elm_widget_drag_lock_y_set(sd->widget, EINA_FALSE);
@@ -1430,13 +1530,13 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
      sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
    sd->ewk_view_resume_request(webview); // resume network loading
 
-   if (elm_widget_drag_lock_x_get(sd->widget))
+   if (!sd->bounce_horiz && elm_widget_drag_lock_x_get(sd->widget))
      {
 	DBG("==============<< widget x unlock >>\n");
 	elm_widget_drag_lock_x_set(sd->widget, EINA_FALSE);
      }
 
-   if (elm_widget_drag_lock_y_get(sd->widget))
+   if (!sd->bounce_vert && elm_widget_drag_lock_y_get(sd->widget))
      {
 	DBG("==============<< widget y unlock >>\n");
 	elm_widget_drag_lock_y_set(sd->widget, EINA_FALSE);
