@@ -4,10 +4,11 @@
 static void
 _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int extended)
 {
-	Evas_Coord minw, minh, maxw, maxh, mnw, mnh;
+	Evas_Coord minw, minh, maxw, maxh, mnw, mnh, ww;
 	Evas_Coord w, h, cal_w = 0, cal_h = 0, cur_line_max_h = 0;
 	const Eina_List *l;
 	Evas_Object_Box_Option *opt;
+    double wx;
 
 	/* FIXME: need to calc max */
 	minw = 0;
@@ -39,17 +40,29 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
 		EINA_LIST_FOREACH(priv->children, l, opt)
 		{
 			evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
+			evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
+
 			if (horizontal)
 			{
 				if (extended)
 				{
+					if(wx)
+					{
+					   if (mnw != -1 && (w - cal_w) >= mnw)
+						   ww = w - cal_w;
+					   else
+						   ww = w;
+					}
+					else
+						ww = mnw;
+
 					if ((cal_w + mnw) > w)
 					{
 						minh += cur_line_max_h;
 						cal_w = 0;
 						cur_line_max_h = 0;
 					}
-					cal_w += mnw;
+					cal_w += ww;
 					if (cur_line_max_h < mnh) cur_line_max_h = mnh;
 				}
 				else
@@ -78,18 +91,30 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
 static Evas_Coord
 _smart_extents_calculate_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj_index)
 {
-	Evas_Coord mnw, mnh, box_w, cal_w = 0, cur_line_max_h = 0;
+	Evas_Coord mnw, mnh, cal_w = 0, cur_line_max_h = 0, w, ww;
 	const Eina_List *l;
 	Evas_Object_Box_Option *opt;
 	int index = 0;
+    double wx;
 
-	evas_object_geometry_get(box, NULL, NULL, &box_w, NULL);
+	evas_object_geometry_get(box, NULL, NULL, &w, NULL);
 
 	EINA_LIST_FOREACH(priv->children, l, opt)
 	{
 		evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
+		evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
 
-		if ((cal_w + mnw) > box_w)
+		if(wx)
+		{
+			if (mnw != -1 && (w - cal_w) >= mnw)
+				ww = w - cal_w;
+			else
+				ww = w;
+		}
+		else
+			ww = mnw;
+
+		if ((cal_w + ww) > w)
 		{
 			if (index > obj_index )
 			{
@@ -99,7 +124,7 @@ _smart_extents_calculate_max_height(Evas_Object *box, Evas_Object_Box_Data *priv
 			cur_line_max_h = 0;
 		}
 
-		cal_w += mnw;
+		cal_w += ww;
 		if (cur_line_max_h < mnh) cur_line_max_h = mnh;
 
 		index++;
@@ -222,7 +247,15 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
 			   if (extended)
 			   {
 				   Evas_Coord ww, hh, ow, oh;
-				   ww = mnw;
+				   if(wx)
+				   {
+					   if (mnw != -1 && (w - cal_w) >= mnw)
+						   ww = w - cal_w;
+					   else
+						   ww = w;
+				   }
+				   else
+					   ww = mnw;
 				   hh = _smart_extents_calculate_max_height(o, priv, obj_index);
 
 				   ow = mnw;
@@ -232,6 +265,7 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
 				   if (fh) oh = hh;
 				   if ((mxh >= 0) && (mxh < oh)) oh = mxh;
 
+				   printf( "index(%d), w(%d), ww(%d), cal_w(%d), hh(%d), ow(%d), oh(%d), cur_line_max_h(%d) \n", obj_index+1, w, ww, cal_w, hh, ow, oh, cur_line_max_h );
 				   if ((cal_w + ww) > w)
 				   {
 					   cal_h += cur_line_max_h;
