@@ -356,6 +356,7 @@ struct _Elm_Genlist_Item
    Eina_Bool menuopened : 1;
 
    int pad_left, pad_right;
+   int depth;
 };
 
 
@@ -1356,6 +1357,7 @@ _item_realize(Elm_Genlist_Item *it, int in, int calc)
    evas_object_color_set(it->spacer, 0, 0, 0, 0);
    elm_widget_sub_object_add(it->wd->obj, it->spacer);
    for (it2 = it, depth = 0; it2->parent; it2 = it2->parent) depth += 1;
+   it->depth = depth;
    treesize = edje_object_data_get(it->base, "treesize");
    if (treesize) tsize = atoi(treesize);
    evas_object_size_hint_min_set(it->spacer,
@@ -2535,6 +2537,7 @@ _item_new(Widget_Data *wd, const Elm_Genlist_Item_Class *itc,
    it->flags = flags;
    it->func.func = func;
    it->func.data = func_data;
+   it->depth = 0;
    return it;
 }
 
@@ -3601,6 +3604,7 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it, Eina_Bool expanded)
 	if (it->realized)
 	  edje_object_signal_emit(it->base, "elm,state,expanded", "elm");
 	evas_object_smart_callback_call(it->wd->obj, "expanded", it);
+
      }
    else
      {
@@ -4430,4 +4434,12 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
 
    if (wd->calc_job) ecore_job_del(wd->calc_job);
    wd->calc_job = ecore_job_add(_calc_job, wd);
+}
+
+EAPI int
+elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it)
+{
+   if (!it) return;
+
+   return it->depth;
 }
