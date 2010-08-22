@@ -1606,6 +1606,7 @@ extern "C" {
    EAPI Eina_Bool    elm_scrolled_entry_password_get(const Evas_Object *obj);
    EAPI void         elm_scrolled_entry_entry_set(Evas_Object *obj, const char *entry);
    EAPI const char  *elm_scrolled_entry_entry_get(const Evas_Object *obj);
+   EAPI Evas_Object *elm_scrolled_entry_entry_object_get(const Evas_Object *obj);
    EAPI const char  *elm_scrolled_entry_selection_get(const Evas_Object *obj);
    EAPI void         elm_scrolled_entry_entry_insert(Evas_Object *obj, const char *entry);
    EAPI void         elm_scrolled_entry_line_wrap_set(Evas_Object *obj, Eina_Bool wrap);

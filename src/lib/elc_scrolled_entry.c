@@ -423,6 +423,23 @@ elm_scrolled_entry_entry_get(const Evas_Object *obj)
 }
 
 /**
+ * This returns the entry object.
+ *
+ * @param obj The scrolled entry object
+ * @return The entry object or NULL on failure
+ *
+ * @ingroup Scrolled_Entry
+ */
+EAPI Evas_Object *
+elm_scrolled_entry_entry_object_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->entry;
+}
+
+/**
  * This returns all selected text within the scrolled entry.
  *
  * @param obj The scrolled entry object
