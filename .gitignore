@@ -1,1 +1,7 @@
+*.o
+*.lo
+*.swp
+*~
 src/lib/Elementary.h
+src/lib/Makefile
+src/lib/Makefile.in
