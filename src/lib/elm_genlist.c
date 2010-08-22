@@ -4,7 +4,7 @@
  */
 #include <Elementary.h>
 #include "elm_priv.h"
-
+	
 /**
  * @defgroup Genlist Genlist
  * @ingroup Elementary
@@ -4372,6 +4372,17 @@ elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
 	elm_genlist_edit_mode_set(obj, emode, edit_class);
 }
 
+/**
+ * Set Genlist edit mode
+ *
+ * This sets Genlist edit mode.
+ *
+ * @param obj The Genlist object
+ * @param emode ELM_GENLIST_EDIT_MODE_{NONE & REORDER & INSERT & DELETE}
+ * @param edit_class Genlist edit class (Elm_Genlist_Edit_Class structure)
+ *
+ * @ingroup Genlist
+ */
 EAPI void
 elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *edit_class)
 {
