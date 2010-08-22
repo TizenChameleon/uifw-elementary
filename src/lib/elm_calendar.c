@@ -168,6 +168,9 @@ _mouse_down_cb(void* data, Evas* evas, Evas_Object* obj, void* event_info)
 	evas_object_geometry_get( obj, &x, &y, &w, &h );
 
 	text = edje_object_part_text_get( _EDJ(obj), "month_mday_text" );
+	if( text == NULL )
+		return;
+
 	day = atoi(text);
 	if( day > 0 && day < 32 )
 	{
