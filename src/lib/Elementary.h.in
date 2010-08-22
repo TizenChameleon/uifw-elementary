@@ -1822,6 +1822,13 @@ extern "C" {
    EAPI void elm_datefield_date_get(Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min);
    EAPI void elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);    
 
+      /* calendar */
+   EAPI Evas_Object *elm_calendar_add(Evas_Object *parent);
+   EAPI void elm_calendar_return_callback_set(Evas_Object* obj, void* return_cb, void* cb_data);
+   EAPI void elm_calendar_show(Evas_Object *obj);
+   EAPI void elm_calendar_hide(Evas_Object *obj);
+
+
    /* titlebar */
    EAPI Evas_Object *elm_titlebar_add(Evas_Object *parent);
    EAPI void         elm_titlebar_label_set(Evas_Object *obj, const char *label);
