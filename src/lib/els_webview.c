@@ -39,6 +39,29 @@
 #define MIN_ZOOM_RATIO 0.09f
 #define MAX_ZOOM_RATIO 4.0f
 
+#define NOT_FOUND_PAGE "<html> \
+			<head><title>Page Not Found</title></head> \
+			<body bgcolor=white text=black text-align=left> \
+			<!--<body bgcolor=#4c4c4c text=white text-align=left>--> \
+			<center> \
+			<table> \
+			<tr><td><h1>Page Not Found<br/></td></tr> \
+			<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'> \
+			<tr><td> \
+			<script type='text/javascript'> \
+			var s = window.location.href; \
+			var failingUrl = s.substring(s.indexOf(\"?\"\) + 1, s.lastIndexOf(\"?\"\)); \
+			document.write(\"<p><tr><td><h2>URL: \" + unescape(failingUrl) + \"</h2></td></tr>\"); \
+			var errorDesc = s.substring(s.lastIndexOf(\"?\") + 1, s.length); \
+			document.write(\"<tr><td><h2>Error: \" + unescape(errorDesc) + \"</h2></td></tr>\"); \
+			document.write(\"<tr><td><h3>Google: <form method=\"get\" action=\"http://www.google.com/custom\"><input type=text name=\"q\" size=15 maxlength=100 value=\\\"\"+ unescape(failingUrl)+\"\\\"> <input type=submit name=\"sa\" value=Search></form></h3></td></tr>\"); \
+			</script> \
+			</td></tr> \
+			</table> \
+			</h1> \
+			</body> \
+			</html>"
+
 #define NEED_TO_REMOVE
 
 typedef struct _Smart_Data Smart_Data;
@@ -836,7 +859,8 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
 
 	if (!sd->ewk_frame_contents_set)
 	  sd->ewk_frame_contents_set = (Eina_Bool (*)(Evas_Object *, const char *, size_t, const char *, const char *, const char *))dlsym(ewk_handle, "ewk_frame_contents_set");
-	sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szStrBuffer, 0, NULL, NULL, NULL);
+	//sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szStrBuffer, 0, NULL, NULL, NULL);
+	sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), NOT_FOUND_PAGE, 0, NULL, NULL, NULL);
 	return;
      }
 }
