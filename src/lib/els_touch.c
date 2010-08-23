@@ -1179,6 +1179,9 @@ _smart_release_timer_handler(void *data)
 static int
 _smart_press_release_timer_handler(void *data)
 {
+   static int prevent_handler = 0;
+   if (prevent_handler != 0) return ECORE_CALLBACK_CANCEL;
+   prevent_handler = 1;
    Smart_Data *sd;
 
    sd = data;
@@ -1187,6 +1190,7 @@ _smart_press_release_timer_handler(void *data)
    _smart_stop_all_timers(sd);
    _smart_enter_none(sd);
    sd->press_release_timer = NULL;
+   prevent_handler = 0;
    return ECORE_CALLBACK_CANCEL;
 }
 

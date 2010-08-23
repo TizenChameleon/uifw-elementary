@@ -623,17 +623,23 @@ static Eina_Bool
 _smart_run_javascript_confirm(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message)
 {
    Evas_Object *popup;
-   printf(" < %s > \n", __func__);
    popup = elm_popup_add(esd->self);
    evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_popup_desc_set(popup, message);
    elm_popup_buttons_add(popup, 2, "Ok", ELM_POPUP_RESPONSE_OK, "Cancel", ELM_POPUP_RESPONSE_CANCEL, NULL);
    //evas_object_smart_callback_add(popup, "response", response_cb, NULL);
 
-   printf(" [ %s ] \n", __func__);
    int ret = elm_popup_run(popup);
-   printf("check %d\n", ret);
    evas_object_del(popup);
+   switch (ret)
+     {
+      case ELM_POPUP_RESPONSE_OK:
+	 return EINA_TRUE;
+      case ELM_POPUP_RESPONSE_CANCEL:
+	 return EINA_FALSE;
+      default:
+	 elm_exit();
+     }
    return EINA_FALSE;
 }
 
