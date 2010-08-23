@@ -1245,7 +1245,7 @@ extern "C" {
    EAPI void              elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec) __attribute__((deprecated));
    EAPI void              elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
    EAPI int               elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it);
-   EAPI void              elm_genlist_selected_items_delete(Evas_Object *obj);
+   EAPI void              elm_genlist_selected_items_del(Evas_Object *obj);
 
    EAPI Evas_Object *elm_check_add(Evas_Object *parent);
    EAPI void         elm_check_label_set(Evas_Object *obj, const char *label);

@@ -4628,6 +4628,13 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
    wd->calc_job = ecore_job_add(_calc_job, wd);
 }
 
+/**
+ * Get expanded depth. 
+ *
+ * @param it The genlist item object
+ *
+ * @ingroup Genlist
+ */
 EAPI int
 elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it)
 {
@@ -4636,7 +4643,6 @@ elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it)
    return it->depth;
 }
 
-
 /**
  * Delete selected items in genlist edit mode.
  *
@@ -4644,31 +4650,24 @@ elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it)
  *
  * @ingroup Genlist
  */
-
 EAPI void
-elm_genlist_selected_items_delete(Evas_Object *obj)
+elm_genlist_selected_items_del(Evas_Object *obj)
 {
     Elm_Genlist_Item *it;
-    Eina_List *l;
+	 Eina_List *l, *realized_list;
 
-    ELM_CHECK_WIDTYPE(obj, widtype);
-    Widget_Data *wd = elm_widget_data_get(obj);
-    if (!wd) return;
+	 ELM_CHECK_WIDTYPE(obj, widtype);
+	 Widget_Data *wd = elm_widget_data_get(obj);
+	 if (!wd) return;
 
-
-    Eina_List *realized_list = elm_genlist_realized_items_get(obj);
-
-    EINA_LIST_FOREACH(realized_list, l, it)
-      {
- 		
-		if( it->select_all_item ) 
-			continue;
-	
-		if(it->delete_check)
-			elm_genlist_item_del( it );
-	 
-      }
-    if (wd->calc_job) ecore_job_del(wd->calc_job);
-    wd->calc_job = ecore_job_add(_calc_job, wd);	
-	
+	 realized_list = elm_genlist_realized_items_get(obj);
+	 EINA_LIST_FOREACH(realized_list, l, it)
+		{
+			if (it->select_all_item) 
+			  continue;
+			if (it->delete_check)
+			  elm_genlist_item_del( it );
+		}
+	 if (wd->calc_job) ecore_job_del(wd->calc_job);
+	 wd->calc_job = ecore_job_add(_calc_job, wd);	
 }
