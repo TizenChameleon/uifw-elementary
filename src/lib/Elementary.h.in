@@ -2152,6 +2152,7 @@ extern "C" {
    EAPI void elm_controlbar_item_del(Elm_Controlbar_Item *it);
    EAPI void elm_controlbar_item_select(Elm_Controlbar_Item *it);
    EAPI void elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
+   EAPI Eina_Bool elm_controlbar_item_visible_get(Elm_Controlbar_Item * it);
    EAPI void elm_controlbar_item_editable_set(Elm_Controlbar_Item *it, Eina_Bool editable);
    EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
    EAPI const char *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);

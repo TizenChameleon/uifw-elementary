@@ -250,6 +250,9 @@ _del_hook(Evas_Object * obj)
    
    EINA_LIST_FREE(wd->items, item)
    {
+      if(item == wd->more_item)
+	   if(item->view) 
+	     evas_object_del(item->view);
       eina_stringshare_del(item->label);
       if (item->icon)
 	 evas_object_del(item->icon);
@@ -809,6 +812,8 @@ item_insert_in_bar(Elm_Controlbar_Item * it, int order)
    Widget_Data * wd = elm_widget_data_get(it->obj);
    int check = 0;
 
+   if(order == 0) return;
+
    EINA_LIST_FOREACH(wd->items, l, item)
    {
       if (item->order == order && item != it)
@@ -833,7 +838,7 @@ item_insert_in_bar(Elm_Controlbar_Item * it, int order)
 	}
      }
    it->order = order;
-   elm_table_pack(wd->box, it->base, order - 1, 0, 1, 1);
+   elm_table_pack(wd->box, it->base, it->order - 1, 0, 1, 1);
    evas_object_show(it->base);
 }
 
@@ -1029,6 +1034,9 @@ move_selected_box(Widget_Data *wd, Elm_Controlbar_Item * fit, Elm_Controlbar_Ite
 	Evas_Coord fx, fy, fw, fh, tx, ty, tw, th;
 	Evas_Object *from, *to;
 
+	if(fit->order <= 0 && wd->auto_align)
+	  fit = wd->more_item;
+
 	from = (Evas_Object *)edje_object_part_object_get(_EDJ(fit->base), "bg_img");
 	evas_object_geometry_get(from, &fx, &fy, &fw, &fh);
 
@@ -1048,13 +1056,10 @@ end_selected_box(void *data, Evas_Object *obj)
 {
    Widget_Data * wd = (Widget_Data *)data;
 
-   //wd->pre_item->selected = EINA_FALSE;
-   //	elm_layout_content_unset(wd->view, "elm.swallow.view");
-   //edje_object_part_unswallow(wd->view, wd->pre_item->view);
    if(wd->pre_item) evas_object_hide(wd->pre_item->view);
 
    elm_layout_content_set(wd->view, "elm.swallow.view", obj);
-   //edje_object_part_swallow(wd->view, "elm.swallow.view", obj);
+   
    evas_object_show(obj);
 }
 
@@ -1074,9 +1079,6 @@ view_animation_down(Widget_Data *wd, Evas_Object *pre, Evas_Object *cur, void *d
    Evas_Coord x, y, w, h;
 
    evas_object_geometry_get(pre, &x, &y, &w, &h);
- //  evas_object_move(cur, x, y);
- //  evas_object_resize(cur, w, h);
- //  evas_object_show(cur);
 
    move_object_with_animation(cur, x, h, w, h, x, h, w, h, 0.5, move_evas_object, end_selected_box, wd);
    evas_object_raise(pre);
@@ -1104,8 +1106,6 @@ selected_box(Elm_Controlbar_Item * it)
 		  wd->pre_item = fit;
 	     }
 	     item->selected = EINA_FALSE;
-	     //edje_object_part_unswallow(wd->view, item->view);
-	     //evas_object_hide(item->view);
 	}
 	it->selected = EINA_TRUE;
 	evas_object_smart_callback_call(it->obj, "view,change,before", it);
@@ -1807,26 +1807,35 @@ static void
 list_clicked(void *data, Evas_Object *obj, void *event_info)
 {
    Elm_Controlbar_Item *item = (Elm_Controlbar_Item *)data;
+   Elm_Controlbar_Item *it;
+   const Eina_List *l;
    Widget_Data *wd;
    Evas_Object *content;
-   Elm_List_Item *it = (Elm_List_Item *) elm_list_selected_item_get(obj);
-   if(it == NULL) return;
+   Elm_List_Item *lit = (Elm_List_Item *) elm_list_selected_item_get(obj);
+   if(lit == NULL) return;
    
-   elm_list_item_selected_set(it, 0);
+   elm_list_item_selected_set(lit, 0);
 
    if(!item) return;
    
    wd = elm_widget_data_get(item->obj);
 
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+	it->selected = EINA_FALSE;
+     }
+
    if(item->style == TABBAR)
      {
 	content = elm_layout_content_unset(wd->view, "elm.swallow.view");
 	evas_object_hide(content);
+	item->selected = EINA_TRUE;
 	evas_object_smart_callback_call(item->obj, "view,change,before", item);
 	elm_layout_content_set(wd->view, "elm.swallow.view", item->view);
      }
 
-   if(item->style == TOOLBAR && item->func) item->func(item->data, item->obj, item);
+   if(item->style == TOOLBAR && item->func) 
+     item->func(item->data, item->obj, item);
 }
 
 static Evas_Object *
@@ -2887,8 +2896,9 @@ elm_controlbar_edit_start(Evas_Object * obj)
  * @ingroup Controlbar
  */ 
 EAPI void
-elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool bar) 
+elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool visible) 
 {
+   Elm_Controlbar_Item *item;
    Eina_Bool check = EINA_TRUE;
    if (it->obj == NULL)
       return;
@@ -2897,11 +2907,15 @@ elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool bar)
       return;
    if (it->order <= 0)
       check = EINA_FALSE;
-   if (check == bar)
+   if (check == visible)
       return;
-   if (bar)
+   if (visible)
      {
-	item_insert_in_bar(it, 0);
+	item = elm_controlbar_last_item_get(it->obj);
+	while(!elm_controlbar_item_visible_get(item)){
+	     item = elm_controlbar_item_prev(item);
+	}
+	item_insert_in_bar(it, item->order + 1);
      }
    else
      {
@@ -2909,6 +2923,30 @@ elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool bar)
      }
    wd->items = eina_list_sort(wd->items, eina_list_count(wd->items), sort_cb);
    _sizing_eval(it->obj);
+}
+
+
+/**
+ * Get the result which or not item is in bar
+ *
+ * @param	it The item of controlbar
+ * @return	true or false
+ *
+ * @ingroup Controlbar
+ */ 
+EAPI Eina_Bool
+elm_controlbar_item_visible_get(Elm_Controlbar_Item * it) 
+{
+   if (it->obj == NULL)
+      return EINA_FALSE;
+   Widget_Data * wd = elm_widget_data_get(it->obj);
+   if (!wd)
+      return EINA_FALSE;
+
+   if(it->order <= 0) 
+     return EINA_FALSE;
+
+   return EINA_TRUE;
 }
 
 /**
@@ -3034,11 +3072,12 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
 }
 
 /**
- * Set the animation of the controlbar(Don't use this API)
+ * Set auto-align mode of the controlbar(It's not prepared yet)
+ * If you set the auto-align and add items more than 5, 
+ * the "more" item will be made and the items more than 5 will be unvisible.
  *
  * @param	obj The object of the controlbar
- * @param	auto_animation The dicision that items move automatically
- * @param	selected_animation The dicision that the selected item move automatically
+ * @param	auto_align The dicision that the controlbar use the auto-align
  *
  * @ingroup Controlbar
  */ 
@@ -3046,6 +3085,9 @@ EAPI void
 elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align)
 {
    Widget_Data * wd;
+   Elm_Controlbar_Item *item;
+   const Eina_List *l;
+   int i;
    if (obj == NULL)
      {
 	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
@@ -3060,7 +3102,56 @@ elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align)
 
    if(wd->auto_align == auto_align) return;
 
-   wd->auto_align = auto_align;
+   if(auto_align)
+     {
+	if(check_bar_item_number(wd) >= 5 && !wd->more_item)
+	  {
+	     i = 0;
+	     EINA_LIST_FOREACH(wd->items, l, item)
+	       {
+		  if(elm_controlbar_item_visible_get(item))
+		    i++;
+		  if(i >= 5){
+		       item_delete_in_bar(item);
+		  }
+	       }
+	     item = elm_controlbar_last_item_get(obj);
+	     while(!elm_controlbar_item_visible_get(item)){
+		  item = elm_controlbar_item_prev(item);
+	     }
+	     create_more_item(wd, item->style);
+	  }
+     }
+   else
+     {
+	if(wd->more_item)
+	  {
+	     // delete more item
+	     if(wd->more_item->view)
+	       evas_object_del(wd->more_item->view);
+	     wd->items = eina_list_remove(wd->items, wd->more_item);
+	     eina_stringshare_del(wd->more_item->label);
+	     if (wd->more_item->icon)
+	       evas_object_del(wd->more_item->icon);
+	     if (wd->more_item->base)
+	       evas_object_del(wd->more_item->base);
+	     if (wd->more_item->edit_item)
+	       evas_object_del(wd->more_item->edit_item);
+	     free(wd->more_item);
+	     wd->more_item = NULL;
+
+	     // make all item is visible
+	     i = 1;
+	     EINA_LIST_FOREACH(wd->items, l, item)
+	       {
+		  if(!elm_controlbar_item_visible_get(item))
+		    item_insert_in_bar(item, i);
+		  i++;
+	       }
+	  }
+     }
+     wd->auto_align = auto_align;
+     _sizing_eval(obj);
 }
 
 static int
