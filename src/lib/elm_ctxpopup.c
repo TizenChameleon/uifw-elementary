@@ -1365,7 +1365,6 @@ elm_ctxpopup_position_forced_get(Evas_Object *obj)
 	   Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
 
 	   return wd->position_forced;
-
 }
 
 EAPI Elm_Ctxpopup_Item *
@@ -1383,19 +1382,3 @@ elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
 	fprintf( stderr, "elm_ctxpopup_label_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
 	return elm_ctxpopup_item_add(obj, NULL, label, func, data);
 }
-
-EAPI void
-elm_ctxpopup_align_set(Evas_Object *obj, double align_x, double align_y) 
-{
-   fprintf(stderr, "elm_ctxpopup_align_set is deprecated! Sorry, it does not work anymore.\n");
-}
-
-EAPI void
-elm_ctxpopup_align_get(Evas_Object *obj, double *align_x, double *align_y)
-{
-   fprintf(stderr, "elm_ctxpopup_align_get is deprecated! Sorry, it does not work anymore.\n");
-}
-
-
-
-
