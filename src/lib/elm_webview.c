@@ -186,4 +186,25 @@ elm_webview_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce)
    if (!wd) return;
    _elm_smart_webview_bounce_allow_set(wd->webkit, h_bounce, v_bounce);
 }
+
+/**
+ * Add callback to treat mime type
+ *
+ * When user click link, the WebView may have different action by mime type.
+ * This is a way to choose proper action each mime type.
+ *
+ * @param obj The WebView object
+ * @param mime mime type string
+ * @param mime_callback callback when user choose link which involved @mime
+ *
+ * @ingroup WebView
+ */
+EAPI void
+elm_webview_mime_callback_set(Evas_Object *obj, const char *mime, Elm_WebView_Mime_Cb func)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_mime_callback_set(wd->webkit, mime, func);
+}
+
 #endif

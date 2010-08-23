@@ -47,6 +47,7 @@ struct _Smart_Data {
      Ewk_View_Smart_Data base; //default data
 
      Evas_Object* widget;
+     Eina_Hash* mime_func_hash;
      int locked_dx;
      int locked_dy;
      unsigned char bounce_horiz : 1;
@@ -199,11 +200,12 @@ static void      _smart_calculate(Evas_Object* obj);
 static Eina_Bool _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev);
 static Eina_Bool _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev);
 static Eina_Bool _smart_mouse_move(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Move* ev);
-static void      _smart_add_console_message(Ewk_View_Smart_Data *sd, const char *message, unsigned int lineNumber, const char *sourceID);
-static void      _smart_run_javascript_alert(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message);
-static Eina_Bool _smart_run_javascript_confirm(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message);
-static Eina_Bool _smart_run_javascript_prompt(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message, const char *defaultValue, char **value);
-static Eina_Bool _smart_should_interrupt_javascript(Ewk_View_Smart_Data *sd);
+static void      _smart_add_console_message(Ewk_View_Smart_Data *esd, const char *message, unsigned int lineNumber, const char *sourceID);
+static void      _smart_run_javascript_alert(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message);
+static Eina_Bool _smart_run_javascript_confirm(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message);
+static Eina_Bool _smart_run_javascript_prompt(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message, const char *defaultValue, char **value);
+static Eina_Bool _smart_should_interrupt_javascript(Ewk_View_Smart_Data *esd);
+static Eina_Bool _smart_run_open_panel(Ewk_View_Smart_Data *esd, Evas_Object *frame, Eina_Bool allows_multiple_files, const Eina_List *suggested_filenames, Eina_List **selected_filenames);
 static Eina_Bool _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_Request *request);
 static void      _view_on_mouse_down(void* data, Evas* e, Evas_Object* o, void* event_info);
 static void      _view_on_mouse_up(void* data, Evas* e, Evas_Object* o, void* event_info);
@@ -335,7 +337,8 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	_api.run_javascript_confirm = _smart_run_javascript_confirm;
 	_api.run_javascript_prompt = _smart_run_javascript_prompt;
 	_api.should_interrupt_javascript = _smart_should_interrupt_javascript;
-	//FIXME:_api.navigation_policy_decision = _smart_navigation_policy_decision;
+	_api.run_open_panel = _smart_run_open_panel;
+	_api.navigation_policy_decision = _smart_navigation_policy_decision;
 
 	_smart = evas_smart_class_new(&_api.sc);
 	elm_theme_overlay_add(NULL, WEBVIEW_THEME_EDJ);
@@ -485,6 +488,19 @@ _elm_smart_webview_bounce_allow_set(Evas_Object* obj, Eina_Bool horiz, Eina_Bool
    sd->bounce_vert = vert;
 }
 
+void
+_elm_smart_webview_mime_callback_set(Evas_Object* obj, const char *mime, Elm_WebView_Mime_Cb func)
+{
+   API_ENTRY return;
+   if (!sd->mime_func_hash)
+     sd->mime_func_hash = eina_hash_pointer_new(NULL);
+
+   if (!func)
+     eina_hash_del(sd->mime_func_hash, mime, func);
+   else
+     eina_hash_add(sd->mime_func_hash, mime, func);
+}
+
 /* local subsystem functions */
 static void
 _smart_show(Evas_Object* obj)
@@ -589,31 +605,67 @@ forward_event:
 static void
 _smart_add_console_message(Ewk_View_Smart_Data *sd, const char *message, unsigned int lineNumber, const char *sourceID)
 {
+   //TODO
 }
 
 static void
 _smart_run_javascript_alert(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message)
 {
+   //TODO
 }
 
 static Eina_Bool
 _smart_run_javascript_confirm(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message)
 {
+   //TODO
+   return EINA_FALSE;
 }
 
 static Eina_Bool
 _smart_run_javascript_prompt(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message, const char *defaultValue, char **value)
 {
+   //TODO
+   return EINA_FALSE;
 }
 
 static Eina_Bool
 _smart_should_interrupt_javascript(Ewk_View_Smart_Data *sd)
 {
+   //TODO
+   return EINA_FALSE;
+}
+
+static Eina_Bool 
+_smart_run_open_panel(Ewk_View_Smart_Data *sd, Evas_Object *frame, Eina_Bool allows_multiple_files, const Eina_List *suggested_filenames, Eina_List **selected_filenames)
+{
+   //TODO
+   return EINA_FALSE;
 }
 
 static Eina_Bool
 _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_Request *request)
 {
+   printf("%s \n", __func__);
+   char *protocol_hack;
+   Smart_Data *sd = (Smart_Data*)esd;
+   if (!sd->mime_func_hash)
+     return EINA_FALSE;
+
+   protocol_hack = strstr(request->url, ":");
+   *protocol_hack = '\0';
+   Elm_WebView_Mime_Cb func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->mime_func_hash, request->url);
+   *protocol_hack = ':';
+
+   if (!func)
+     {
+	if (strncmp(request->url, "http", 4) == 0
+	      || strncmp(request->url, "https", 5) == 0
+	      || strncmp(request->url, "file", 4) == 0)
+	  return EINA_TRUE;
+	return EINA_FALSE;
+     }
+   else
+     return func(esd->self);
 }
 
 #ifdef NEED_TO_REMOVE

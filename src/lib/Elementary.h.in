@@ -2570,6 +2570,7 @@ extern "C" {
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
    
    /* WebView */
+   typedef void (*Elm_WebView_Mime_Cb)(Evas_Object *obj);
    EAPI Evas_Object *elm_webview_add(Evas_Object *parent, Eina_Bool tiled);
    EAPI Evas_Object *elm_webview_webkit_get(Evas_Object *obj);
    EAPI void         elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed);
@@ -2579,6 +2580,7 @@ extern "C" {
    EAPI Evas_Object *elm_webview_minimap_get(Evas_Object *obj);
    EAPI void         elm_webview_uri_set(Evas_Object *obj, const char *uri);
    EAPI void         elm_webview_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
+   EAPI void         elm_webview_mime_callback_set(Evas_Object *obj, const char *mime, Elm_WebView_Mime_Cb func);
 
    /* NoContents */
    EAPI Evas_Object *elm_nocontents_add(Evas_Object *parent);
