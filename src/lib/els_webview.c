@@ -179,6 +179,7 @@ struct _Smart_Data {
      Eina_Bool on_zooming;
      Eina_Bool is_mobile_page;
 
+     Eina_Bool use_text_selection;
      Eina_Bool text_selection_on;
      struct {
 	  Evas_Coord_Rectangle front;
@@ -976,6 +977,7 @@ _smart_add(Evas_Object* obj)
    sd->dropdown.option_cnt = 0;
    sd->animator = NULL;
    sd->event_only = EINA_FALSE;
+   sd->use_text_selection = EINA_FALSE;
    sd->text_selection_on = EINA_FALSE;
    sd->events_feed = EINA_FALSE;
    sd->event_blocked = EINA_TRUE;
@@ -1207,7 +1209,7 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
    if (!sd) return;
    //Evas_Point* point = (Evas_Point*)ev;
 
-   if (sd->text_selection_on == EINA_TRUE) return;
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE) return;
 
    evas_object_focus_set(webview, EINA_TRUE);
    if (!sd->ewk_view_frame_main_get)
@@ -1338,7 +1340,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
 	  }
      }
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	_smart_cb_unselect_closest_word(sd, webview, NULL);
 	return;
@@ -1369,7 +1371,7 @@ _smart_cb_pan_start(void* data, Evas_Object* webview, void* ev)
      sd->ewk_view_suspend_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_suspend_request");
    sd->ewk_view_suspend_request(webview); // suspend network loading
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (_text_selection_handle_pressed(sd, point->x, point->y))
 	  _elm_smart_touch_is_one_drag_mode_enable(sd->touch_obj, EINA_FALSE);
@@ -1389,7 +1391,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 
    if (sd->on_panning == EINA_FALSE) return;
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (sd->text_selection.front_handle_moving == EINA_TRUE
 	      || sd->text_selection.back_handle_moving == EINA_TRUE)
@@ -1539,7 +1541,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    int new_x, new_y;
    sd->ewk_frame_scroll_pos_get(sd->ewk_view_frame_main_get(webview), &new_x, &new_y);
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_move_by(sd, old_x - new_x, old_y - new_y);
 
    if (!sd->bounce_horiz &&
@@ -1568,7 +1570,7 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
    Evas_Point* point = (Evas_Point*)ev;
    sd->on_panning = EINA_FALSE;
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (sd->text_selection.front_handle_moving == EINA_TRUE
 	      || sd->text_selection.back_handle_moving == EINA_TRUE)
@@ -1624,6 +1626,8 @@ _smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev)
    if (!sd) return;
    Evas_Point* point = (Evas_Point*)ev;
 
+   if (sd->use_text_selection == EINA_FALSE) return;
+
    int x, y;
    _coords_evas_to_ewk(webview, point->x, point->y, &x, &y);
 
@@ -1652,7 +1656,7 @@ _smart_cb_unselect_closest_word(void* data, Evas_Object* webview, void* ev)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	_text_selection_hide(sd);
 	if (!sd->ewk_view_select_none)
@@ -1742,7 +1746,7 @@ _zoom_start(Smart_Data* sd, int centerX, int centerY, int distance)
 
    _suspend_all(sd);
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_hide(sd);
 }
 
@@ -1797,7 +1801,7 @@ _zoom_stop(Smart_Data* sd)
 
    _resume_all(sd);
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (!sd->ewk_view_frame_main_get)
 	  sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
@@ -1888,7 +1892,7 @@ _smart_zoom_animator(void* data)
 
 	_resume_all(sd);
 
-	if (sd->text_selection_on == EINA_TRUE)
+	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
 	     if (!sd->ewk_frame_selection_handlers_get)
 	       sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
@@ -2130,7 +2134,7 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    sd->smart_zoom_animator = ecore_animator_add(_smart_zoom_animator, sd);
 
    // hide textSelection handlers during zooming
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_hide(sd);
 }
 
