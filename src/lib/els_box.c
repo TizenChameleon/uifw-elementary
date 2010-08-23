@@ -265,7 +265,6 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
 				   if (fh) oh = hh;
 				   if ((mxh >= 0) && (mxh < oh)) oh = mxh;
 
-				   printf( "index(%d), w(%d), ww(%d), cal_w(%d), hh(%d), ow(%d), oh(%d), cur_line_max_h(%d) \n", obj_index+1, w, ww, cal_w, hh, ow, oh, cur_line_max_h );
 				   if ((cal_w + ww) > w)
 				   {
 					   cal_h += cur_line_max_h;

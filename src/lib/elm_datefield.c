@@ -63,7 +63,6 @@ static void _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emiss
 static void _entry_focused_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info);
 static int _imf_event_commit_cb(void *data, int type, void *event);
-static void _datefield_show_cb(void *data, Evas_Object * obj, void *event_info);
 
 static void _date_entry_add(Evas_Object *obj);
 static void _time_entry_add(Evas_Object *obj);
@@ -104,7 +103,7 @@ _theme_hook(Evas_Object *obj)
 	
 	if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
 	{
-		_elm_theme_object_set(obj, wd->base, "datefield", "base", elm_widget_style_get(obj));
+		_elm_theme_object_set(obj, wd->base, "datefield", "dateandtime", elm_widget_style_get(obj));
 
 		for (i = 0; i < DATE_MAX; i++)
 			elm_object_style_set(wd->date[i], "datefield/hybrid");
@@ -161,15 +160,10 @@ _sizing_eval(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Coord minw = -1, minh = -1;
+
 	edje_object_size_min_calc(wd->base, &minw, &minh);
 	evas_object_size_hint_min_set(obj, minw, minh);
 	evas_object_size_hint_max_set(obj, -1, -1);
-}
-
-static void
-_datefield_show_cb(void *data, Evas_Object * obj, void *event_info)
-{
-	_theme_hook(data);
 }
 
 static void
@@ -519,7 +513,6 @@ _date_entry_add(Evas_Object *obj)
 	for (i = 0; i < DATE_MAX; i++)
 	{
 		wd->date[i] = elm_entry_add(obj);
-		elm_object_style_set(wd->date[i], "datefield/hybrid");
 		elm_entry_context_menu_disabled_set(wd->date[i], EINA_TRUE);
 		elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_NUMBER);
 		evas_object_size_hint_weight_set(wd->date[i], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -546,7 +539,6 @@ _time_entry_add(Evas_Object *obj)
 	for (i = 0; i < TIME_MAX; i++)
 	{
 		wd->time[i] = elm_entry_add(obj);
-		elm_object_style_set(wd->time[i], "datefield/hybrid");	
 		elm_entry_context_menu_disabled_set(wd->time[i], EINA_TRUE);
 		elm_entry_input_panel_layout_set(wd->time[i], ELM_INPUT_PANEL_LAYOUT_NUMBER);		
 		elm_entry_maximum_bytes_set(wd->time[i], TIME_MAX_LENGTH);
@@ -601,9 +593,8 @@ elm_datefield_add(Evas_Object *parent)
 	wd->layout = ELM_DATEFIELD_LAYOUT_DATEANDTIME;
 	wd->editing = EINA_FALSE;
 	wd->time_mode = EINA_TRUE;
-  	evas_object_event_callback_add(wd->base, EVAS_CALLBACK_SHOW, _datefield_show_cb, obj);
-
-	_sizing_eval(obj);
+	
+	_theme_hook(obj);
 
    	return obj;
 }
@@ -627,7 +618,7 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
 	if (wd->layout != layout)
 	{
 		wd->layout = layout;
-		if (evas_object_visible_get(obj)) _theme_hook(obj);
+		_theme_hook(obj);
 	}
 }
 
@@ -657,7 +648,7 @@ elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
 	wd->hour = hour;
 	wd->min = min;
 
-	if (evas_object_visible_get(obj)) _date_update(obj);
+	_date_update(obj);
 }
 
 /**
