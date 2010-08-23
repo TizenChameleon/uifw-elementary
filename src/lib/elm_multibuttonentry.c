@@ -216,6 +216,7 @@ _item_del(Elm_Multibuttonentry_Item *item)
 {
 	Eina_List *l;
 	Elm_Multibuttonentry_Item *_item;
+	if(!item) return;
 	Widget_Data *wd;
 
 	wd = elm_widget_data_get(item->multibuttonentry);
@@ -225,6 +226,7 @@ _item_del(Elm_Multibuttonentry_Item *item)
 		if (_item == item) {
 			wd->items = eina_list_remove(wd->items, _item);
 			elm_box_unpack(wd->box, _item->button);
+			_sizing_eval(item->multibuttonentry);
 			_del_button_obj(_item->multibuttonentry, _item->button);
 			free(_item);
 			if(wd->current == l)	
@@ -232,7 +234,6 @@ _item_del(Elm_Multibuttonentry_Item *item)
 			break;
 		}
 	}
-	_sizing_eval(item->multibuttonentry);
 }
 
 static void

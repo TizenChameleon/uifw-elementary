@@ -833,6 +833,7 @@ _edit_long_press(void *data)
   Elm_Genlist_Item *it = data; 
   Evas_Coord x, y;
 
+  it->edit_long_timer = NULL;
   if ((it->disabled) || (it->dragging)) return 0;
   edje_object_signal_emit(it->edit_obj, "elm,action,item,reorder_start", "elm");
 
@@ -1443,6 +1444,7 @@ _item_realize(Elm_Genlist_Item *it, int in, int calc)
  	if(!strcmp(it->itc->item_style, "select_all")) {
 	  const Eina_List *l;
 	  const char *key;
+	  it->select_all_item = 1;
 			  
 	  it->labels = _elm_stringlist_get(edje_object_data_get(it->base, "labels"));
 	  EINA_LIST_FOREACH(it->labels, l, key) {
@@ -3256,23 +3258,45 @@ elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after )
 {
   if (!it) return;
 
+  if (!it) return;
+
+  int last_item_pos = (it->block->count-2) * it->h;
+  if(it->y != last_item_pos && it->y == after->y) {
+  	  if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
+  	  it->wd->calc_job = ecore_job_add(_calc_job, it->wd);	
+	 return;
+  }
+	
   it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
   _item_block_del(it);
 
-  if( after)
-    {
-       it->wd->items = eina_inlist_prepend_relative(it->wd->items, EINA_INLIST_GET(it),
-                                                 EINA_INLIST_GET(after));
-       it->rel = after;
-       it->rel->relcount++;
-    }
-  else
-    {
-       it->wd->items = eina_inlist_prepend(it->wd->items, EINA_INLIST_GET(it));
-    }
+  if(after->y == last_item_pos) {
 
-    it->before = 1;
+	  it->wd->items = eina_inlist_append_relative(it->wd->items, EINA_INLIST_GET(it),
+                                                 EINA_INLIST_GET(after));
+      it->rel = after;
+      it->rel->relcount++;
+	  it->before = 0;
+  }
+  else
+  {
+	if( after)
+	    {
+	       it->wd->items = eina_inlist_prepend_relative(it->wd->items, EINA_INLIST_GET(it),
+	                                                 EINA_INLIST_GET(after));
+	       it->rel = after;
+	       it->rel->relcount++;
+	    }
+	  else
+	    {
+	       it->wd->items = eina_inlist_prepend(it->wd->items, EINA_INLIST_GET(it));
+	    }
+
+	    it->before = 1;
+  }
+
    _item_queue(it->wd, it);
+
 }
 
 /**
