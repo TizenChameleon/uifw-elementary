@@ -110,7 +110,7 @@ _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 	Widget_Data *wd = elm_widget_data_get(data);	
 	if (!wd) return;
 	evas_object_geometry_get(wd->box, NULL, NULL, &wd->w_box, &wd->h_box);
-	_sizing_eval(obj);
+	_sizing_eval(data);
 }
 
 static void
@@ -385,7 +385,7 @@ _view_init(Evas_Object *obj)
 		elm_scrolled_entry_single_line_set(wd->entry, EINA_TRUE);
 		elm_scrolled_entry_entry_set(wd->entry, "");
 		elm_scrolled_entry_cursor_end_set(wd->entry);
-		evas_object_event_callback_add(elm_scrolled_entry_entry_object_get(wd->entry), EVAS_CALLBACK_KEY_UP, _evas_key_up_cb, obj);
+		evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_UP, _evas_key_up_cb, obj);
 		evas_object_geometry_get(wd->entry, NULL, NULL, NULL, &h_label);
 		evas_object_size_hint_min_set(wd->entry, 20, h_label);
 		evas_object_size_hint_weight_set(wd->entry, 1.0, 1.0);

@@ -265,6 +265,7 @@ elm_scrolled_entry_add(Evas_Object *parent)
    wd->scroller = elm_scroller_add(parent);
    elm_widget_resize_object_set(obj, wd->scroller);
    elm_scroller_bounce_set(wd->scroller, 0, 0);
+   elm_scroller_propagate_events_set(wd->scroller, 1);
    
    wd->entry = elm_entry_add(parent);
    evas_object_size_hint_weight_set(wd->entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -420,23 +421,6 @@ elm_scrolled_entry_entry_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    return elm_entry_entry_get(wd->entry);
-}
-
-/**
- * This returns the entry object.
- *
- * @param obj The scrolled entry object
- * @return The entry object or NULL on failure
- *
- * @ingroup Scrolled_Entry
- */
-EAPI Evas_Object *
-elm_scrolled_entry_entry_object_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->entry;
 }
 
 /**
