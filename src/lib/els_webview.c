@@ -338,7 +338,7 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	_api.run_javascript_prompt = _smart_run_javascript_prompt;
 	_api.should_interrupt_javascript = _smart_should_interrupt_javascript;
 	_api.run_open_panel = _smart_run_open_panel;
-	_api.navigation_policy_decision = _smart_navigation_policy_decision;
+	//_api.navigation_policy_decision = _smart_navigation_policy_decision;
 
 	_smart = evas_smart_class_new(&_api.sc);
 	elm_theme_overlay_add(NULL, WEBVIEW_THEME_EDJ);
