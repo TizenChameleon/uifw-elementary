@@ -630,7 +630,6 @@ _smart_run_javascript_confirm(Ewk_View_Smart_Data *esd, Evas_Object *frame, cons
    evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_popup_desc_set(popup, message);
    elm_popup_buttons_add(popup, 2, "Ok", ELM_POPUP_RESPONSE_OK, "Cancel", ELM_POPUP_RESPONSE_CANCEL, NULL);
-   //evas_object_smart_callback_add(popup, "response", response_cb, NULL);
 
    int ret = elm_popup_run(popup);
    evas_object_del(popup);
@@ -649,7 +648,37 @@ _smart_run_javascript_confirm(Ewk_View_Smart_Data *esd, Evas_Object *frame, cons
 static Eina_Bool
 _smart_run_javascript_prompt(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message, const char *defaultValue, char **value)
 {
-   //TODO
+   //FIXME: it's not work
+   Evas_Object *popup;
+   Evas_Object *box, *entry, *label;
+
+   popup = elm_popup_add(esd->self);
+   elm_object_style_set(popup, "customstyle");
+   evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_popup_buttons_add(popup, 2, "Ok", ELM_POPUP_RESPONSE_OK, "Cancel", ELM_POPUP_RESPONSE_CANCEL, NULL);
+
+   box = elm_box_add(popup);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_fill_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(box);
+
+   label = elm_label_add(box);
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_label_label_set(label, message);
+   elm_box_pack_start(box, label);
+   evas_object_show(label);
+
+   entry = elm_entry_add(box);
+   evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_entry_single_line_set(entry, EINA_TRUE);
+   elm_entry_entry_set(entry, defaultValue);
+   elm_box_pack_end(box, entry);
+   evas_object_show(entry);
+
+   int ret = elm_popup_run(popup);
+   *value = strdup("temp");
+   evas_object_del(popup);
+
    return EINA_FALSE;
 }
 
