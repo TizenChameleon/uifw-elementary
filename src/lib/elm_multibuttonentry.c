@@ -10,75 +10,74 @@
 		
 
 #define MAX_STR 256		
-#define MAX_LABEL 20	
-#define MIN_ENTRY_WIDTH 50
 
-typedef struct _Multibuttonentry_Item Multibuttonentry_Item;
+
+typedef enum _Multibuttonentry_Pos
+{
+ MULTIBUTONENTRY_POS_START,
+ MULTIBUTONENTRY_POS_END,
+ MULTIBUTONENTRY_POS_BEFORE,
+ MULTIBUTONENTRY_POS_AFTER,
+ MULTIBUTONENTRY_POS_NUM
+}Multibuttonentry_Pos;
+
 struct _Multibuttonentry_Item {
 	Evas_Object *multibuttonentry;
 	Evas_Object *button;
-	Evas_Object *hbox;
-	Evas_Object *row;
-
-	Evas_Coord rw;
-	Evas_Coord w;
+	void *data;
+	Evas_Coord vw, rw; // vw: visual width, real width
 };
 
 typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data {
 	Evas_Object *base;
-	Evas_Object *vbox;
+	Evas_Object *box;
 	Evas_Object *entry;
-	
-	char label[MAX_LABEL];
+	Evas_Object *label;
 
 	Eina_List *items;
 	Eina_List *current;
-	
-	Evas_Coord w_vbox, h_vbox;
-	Evas_Coord w_base, h_base;
+
+	Evas_Coord w_box, h_box;
 };
+
 
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event);
-static void _view_init(Evas_Object *obj);
-static void _view_update(Evas_Object *obj);
-static Evas_Object* _add_row(Evas_Object *obj, const char* label);
-static Multibuttonentry_Item* _add_button_item(Evas_Object *obj, char *str);
-
-static void _del_row(Evas_Object *obj, Evas_Object *row);
-
-
-
+static void	_event_init(Evas_Object *obj);
+static void	_set_label(Evas_Object *obj, const char* str);
+static void	_change_current_button(Evas_Object *obj, Evas_Object *btn);
+static void	_del_button_obj(Evas_Object *obj, Evas_Object *btn);
+static void	_button_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void	_del_button(Evas_Object *obj);
+static Elm_Multibuttonentry_Item*	_add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, const Elm_Multibuttonentry_Item *reference, void *data);
+static void	_add_button(Evas_Object *obj, char *str);
+static void	_evas_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info );
+static void	_view_init(Evas_Object *obj);
 
 
 static void
 _del_hook(Evas_Object *obj)
 {
-	Eina_List *rows;
-	Eina_List *l;
-	Evas_Object *cur_row;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if(!wd) return;
 
-	rows = evas_object_box_children_get(wd->vbox);
-	EINA_LIST_FOREACH(rows, l, cur_row){
-		rows = eina_list_remove(rows, cur_row);
-		if(cur_row){
-			_del_row(obj, cur_row);
-		}
+	if(wd->box){
+		elm_box_unpack_all(wd->box);
+		wd->box = NULL;
 	}
-	evas_object_box_remove_all(wd->vbox, 1);
 
 	if (wd->items) {
-		Multibuttonentry_Item *item;
+		Elm_Multibuttonentry_Item *item;
 		EINA_LIST_FREE(wd->items, item) {
+			_del_button_obj(obj, item->button);
 			free(item);
 		}
+		wd->items = NULL;
 	}
-	
+	wd->current = NULL;
 }
 
 static void
@@ -88,7 +87,6 @@ _theme_hook(Evas_Object *obj)
 	if (!wd) return;
 	
 	_elm_theme_object_set(obj, wd->base, "multibuttonentry", "base", elm_widget_style_get(obj));
-	_view_update(obj);
 	_sizing_eval(obj);
 }
 
@@ -111,16 +109,45 @@ _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 {
 	Widget_Data *wd = elm_widget_data_get(data);	
 	if (!wd) return;
-	evas_object_geometry_get(wd->base, NULL, NULL, &wd->w_base, &wd->h_base);
-	evas_object_geometry_get(wd->vbox, NULL, NULL, &wd->w_vbox, &wd->h_vbox);
-	_view_update(data);
+	evas_object_geometry_get(wd->box, NULL, NULL, &wd->w_box, &wd->h_box);
+	_sizing_eval(obj);
+}
+
+static void
+_event_init(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if(!wd || !wd->base)	return;
+
+	evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
+}
+
+static void
+_set_label(Evas_Object *obj, const char* str)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if(!wd)	return;
+
+	if(!wd->label){
+		if(!(wd->label = elm_label_add(obj))) return;
+		elm_object_style_set(wd->label, "extended/multibuttonentry");
+		elm_label_ellipsis_set(wd->label, EINA_TRUE);
+		elm_label_wrap_width_set(wd->label, 100);
+		elm_label_text_align_set(wd->label, "left");
+		evas_object_size_hint_weight_set(wd->label, 0.0, 0.0);
+		evas_object_size_hint_align_set(wd->label, EVAS_HINT_FILL, EVAS_HINT_FILL);
+		if(wd->box)	elm_box_pack_start(wd->box, wd->label);
+		evas_object_show(wd->label);
+	}
+
+	elm_label_label_set(wd->label, str);
 }
 
 static void
 _change_current_button(Evas_Object *obj, Evas_Object *btn)
 {
 	Eina_List *l;
-	Multibuttonentry_Item *item;
+	Elm_Multibuttonentry_Item *item;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Object *label;
 	if (!wd) return;
@@ -147,6 +174,8 @@ _change_current_button(Evas_Object *obj, Evas_Object *btn)
 		edje_object_signal_emit(item->button,"focused", "");
 		label = edje_object_part_swallow_get(item->button, "elm.label");
 		if(label)	elm_label_text_color_set(label, 255, 255, 255, 255);	
+
+		evas_object_smart_callback_call(obj, "selected", item);
 	}
 }
 
@@ -157,34 +186,104 @@ _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *
 	if (!wd) return;
 
 	_change_current_button(data, obj);
-	evas_object_smart_callback_call(data, "selected", "test");
 }
 
 static void
-_event_init(Evas_Object *obj)
+_del_button_obj(Evas_Object *obj, Evas_Object *btn)
 {
+	Evas_Object *label;
 	Widget_Data *wd = elm_widget_data_get(obj);
-	if(!wd || !wd->base)	return;
+	if(!wd || !btn)	return;
+	
+	if(btn){	
+		// del label
+		label = edje_object_part_swallow_get(btn, "elm.label");
+		edje_object_part_unswallow(btn, label);
+		evas_object_del(label);				
 
-	evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
+		// del button
+		evas_object_del(btn);		
+	}
 }
 
-static Multibuttonentry_Item*
-_add_button_item(Evas_Object *obj, char *str)
+static void
+_item_del(Elm_Multibuttonentry_Item *item)
 {
-	Multibuttonentry_Item *item;
+	Eina_List *l;
+	Elm_Multibuttonentry_Item *_item;
+	Widget_Data *wd;
+
+	wd = elm_widget_data_get(item->multibuttonentry);
+	if (!wd) return;
+
+	EINA_LIST_FOREACH(wd->items, l, _item) {
+		if (_item == item) {
+			wd->items = eina_list_remove(wd->items, _item);
+			elm_box_unpack(wd->box, _item->button);
+			_del_button_obj(_item->multibuttonentry, _item->button);
+			free(_item);
+			if(wd->current == l)	
+				wd->current = NULL;
+			break;
+		}
+	}
+}
+
+static void
+_del_button(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Elm_Multibuttonentry_Item *item;
+	if(!wd || !wd->items) return;
+
+	if(!wd->current){
+		// let the last button focus
+		item = eina_list_data_get(eina_list_last(wd->items));	
+		if(item->button)	_change_current_button(obj, item->button);				
+	}else{
+		item = eina_list_data_get(wd->current);
+		if(item){	
+			_item_del(item);
+		}
+	}
+}
+
+static Elm_Multibuttonentry_Item*
+_add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, const Elm_Multibuttonentry_Item *reference, void *data)
+{
+	Elm_Multibuttonentry_Item *item;
 	Evas_Object *btn;
 	Evas_Object *label;
-	Evas_Coord w_label, w_btn, padding_outer, padding_inner;
+	Evas_Coord w_label, h_label, w_btn, h_btn, padding_outer, padding_inner;
 	Widget_Data *wd = elm_widget_data_get(obj);
-	if(!wd) return NULL;
+	if(!wd || !wd->box || !wd->entry) return NULL;
 
 	// add button
 	btn = edje_object_add(evas_object_evas_get(obj));
-	_elm_theme_object_set(obj, btn, "multibuttonentry", "btn", elm_widget_style_get(obj)); 
-	evas_object_show(btn);
-
+	_elm_theme_object_set(obj, btn, "multibuttonentry", "btn", elm_widget_style_get(obj));
 	edje_object_signal_callback_add(btn, "clicked", "elm", _button_clicked, obj);
+	evas_object_size_hint_weight_set(btn, 0.0, 0.0);
+
+	switch(pos){
+		case MULTIBUTONENTRY_POS_START:
+			elm_box_pack_after(wd->box, btn, wd->label);
+			break;
+		case MULTIBUTONENTRY_POS_END:
+			elm_box_pack_before(wd->box, btn, wd->entry);
+			break;
+		case MULTIBUTONENTRY_POS_BEFORE:
+			if(reference)	elm_box_pack_before(wd->box, btn, reference->button);
+			else	elm_box_pack_before(wd->box, btn, wd->entry);
+			break;
+		case MULTIBUTONENTRY_POS_AFTER:
+			if(reference)	elm_box_pack_after(wd->box, btn, reference->button);
+			else	elm_box_pack_before(wd->box, btn, wd->entry);
+			break;
+		default:
+			break;
+	}
+
+	evas_object_show(btn);
 
 	// add label
 	label = elm_label_add(obj);
@@ -192,412 +291,54 @@ _add_button_item(Evas_Object *obj, char *str)
 	elm_label_label_set(label, str);
 	elm_label_ellipsis_set(label, EINA_TRUE);
 	elm_label_wrap_width_set(label, 5000);
-	elm_label_text_align_set(label, "middle");
 	edje_object_part_swallow(btn, "elm.label", label);
 	evas_object_show(label);
 
 	// decide the size of button
-	evas_object_size_hint_min_get(label, &w_label, NULL);
+	evas_object_size_hint_min_get(label, &w_label, &h_label);
+	edje_object_part_geometry_get(btn, "elm.base", NULL, NULL, NULL, &h_btn);
 	edje_object_part_geometry_get(btn, "left.padding", NULL, NULL, &padding_outer, NULL);
 	edje_object_part_geometry_get(btn, "left.inner.padding", NULL, NULL, &padding_inner, NULL); 	
-	w_btn = w_label + 2*padding_outer + 2*padding_inner;
-	evas_object_resize(btn, w_btn, 0);
+	w_btn = w_label + 2*padding_outer + 2*padding_inner;	
+
 
 	// append item list
-	item = ELM_NEW(Multibuttonentry_Item);
+	item = ELM_NEW(Elm_Multibuttonentry_Item);
 	if (item) {
-		item->button = btn;
-		item->w = w_btn;
-		item->rw = w_btn;
 		item->multibuttonentry = obj;
+		item->button = btn;
+		item->data = data;
+		item->rw = w_btn;
+		item->vw =(wd->w_box < w_btn) ? wd->w_box : w_btn;		
 		wd->items = eina_list_append(wd->items, item);
 	}
+
+
+	evas_object_resize(btn, item->vw, h_btn);
+
+	if(item->rw != item->vw){
+		evas_object_resize(label, item->vw - 4*padding_outer - 4*padding_inner, h_label);	
+		elm_label_wrap_width_set(label, item->vw - 4*padding_outer - 6*padding_inner ); 
+	}
+
+	evas_object_size_hint_min_set(btn, item->vw, h_btn);
+
+	evas_object_smart_callback_call(obj, "added", item);
 
 	return item;
 }
 
 static void
-_del_button_item(Evas_Object *obj, Evas_Object *btn)
-{
-	Eina_List *l;
-	Multibuttonentry_Item *item;
-	Evas_Object *label;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if(!wd || !btn)	return;
-	
-	EINA_LIST_FOREACH(wd->items, l, item) {
-		if(item->button == btn){
-			wd->items = eina_list_remove(wd->items, item);
-
-			// del label
-			label = edje_object_part_swallow_get(btn, "elm.label");
-			edje_object_part_unswallow(btn, label);
-			evas_object_del(label);				
-
-			// del button
-			evas_object_del(btn);
-
-			// del item
-			free(item);
-
-			wd->current = NULL;
-			
-			break;
-		}
-	}
-
-}
-
-
-static void
-_set_label(Evas_Object *obj, Evas_Object *row, const char* label)
-{
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if(!wd || !row)	return;
-
-	strncpy(wd->label, label, MAX_LABEL);
-	wd->label[MAX_LABEL - 1]= 0;
-	edje_object_part_text_set(row, "elm.label", wd->label);
-}
-
-static Evas_Object*
-_add_row(Evas_Object *obj, const char* label)
-{
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Object *row;
-	Evas_Object *hbox;	
-	if(!wd || !wd->base || !wd->vbox)	return NULL;
-
-	// row
-	row = edje_object_add(evas_object_evas_get(obj));
-	_elm_theme_object_set(obj, row, "multibuttonentry", "row", elm_widget_style_get(obj));	
-	evas_object_show(row);
-	evas_object_box_append(wd->vbox, row);
-	evas_object_box_align_set(wd->vbox, 0.0, 0.0);
-
-	// label
-	if(label){
-		_set_label(obj, row, label);
-	}
-
-	// hbox	
-	hbox = evas_object_box_add( evas_object_evas_get(obj));
-	evas_object_box_layout_set(hbox, evas_object_box_layout_horizontal, NULL, NULL);	
-	evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	evas_object_box_align_set(hbox, 0.0, 0.0);
-	edje_object_part_swallow(row, "elm.hbox", hbox);
-	evas_object_show(hbox);
-	
-	// add entry
-	edje_object_part_swallow(row, "elm.entry", wd->entry);
-
-	return row;
-}
-
-
-static void
-_del_row(Evas_Object *obj, Evas_Object *row)
-{
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Object *hbox;
-	Evas_Object *entry;
-	if(!wd || !wd->vbox || !row)	return;
-	
-	hbox = edje_object_part_swallow_get(row, "elm.hbox");
-	entry = edje_object_part_swallow_get(row, "elm.entry");
-
-	if(hbox){
-		evas_object_box_remove_all(hbox, 1);
-		edje_object_part_unswallow(row, hbox);
-		evas_object_del(hbox);
-	}
-
-	if(entry){
-		edje_object_part_unswallow(row, entry);
-	}
-
-	evas_object_box_remove(wd->vbox, row);
-	evas_object_del(row);
-}
-
-
-static void
 _add_button(Evas_Object *obj, char *str)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Object* last_row;
-	Evas_Object *hbox;
-	Evas_Object *last_btn;
-	Evas_Object *btn;
-	Evas_Coord x_row, w_row, x_last_btn, w_last_btn, w_new_btn;
-	Evas_Coord row_rel2, last_btn_rel2;
 	if(!wd) return;
-
-	if(!(last_row = eina_list_data_get(eina_list_last(evas_object_box_children_get(wd->vbox))))) return;
-	if(!(hbox = edje_object_part_swallow_get(last_row, "elm.hbox"))) return;
-	last_btn = eina_list_data_get(eina_list_last(evas_object_box_children_get(hbox)));
-
 
 	//remove entry text
-	elm_entry_entry_set(wd->entry, "");
+	elm_scrolled_entry_entry_set(wd->entry, "");
 
 	// add button
-	Multibuttonentry_Item *item = _add_button_item(obj, str);
-	btn = item->button;
-	edje_object_signal_emit(last_row,"default", "");
-
-	// position
-	evas_object_geometry_get(last_row, &x_row, NULL, &w_row, NULL);
-	evas_object_geometry_get(last_btn, &x_last_btn, NULL, &w_last_btn, NULL);
-	evas_object_geometry_get(btn, NULL, NULL, &w_new_btn, NULL);
-	
-	row_rel2 = x_row + w_row;
-	last_btn_rel2 = x_last_btn + w_last_btn;
-		
-
-	if((last_btn_rel2 < row_rel2) && (row_rel2 - last_btn_rel2 > w_new_btn))
-	{
-		evas_object_box_append(hbox, btn);
-		item->hbox = hbox;
-		item->row = last_row;
-	
-		if((row_rel2 - (last_btn_rel2 + w_new_btn)) < MIN_ENTRY_WIDTH){
-			edje_object_part_unswallow(last_row, wd->entry);
-			_add_row(obj, NULL);
-			_view_update(obj);
-		}
-	}
-	else if(!evas_object_box_children_get(hbox))
-	{	
-		Evas_Coord w_label, h_label;
-		edje_object_part_geometry_get(last_row, "elm.label", NULL, NULL, &w_label, &h_label);	
-		evas_object_resize(btn, w_row - w_label, 0);
-		item->rw = w_row - w_label;
-		evas_object_box_append(hbox, btn);
-		item->hbox = hbox;
-		item->row = last_row;
-
-		if(w_new_btn > w_row - w_label){
-			Evas_Coord w, h, padding_outer, padding_inner, base_w, base_h;
-			Evas_Object *label;
-
-			edje_object_part_geometry_get(btn, "elm.base", NULL, NULL, &base_w, &base_h);	
-			label = edje_object_part_swallow_get(btn, "elm.label");
-			
-			edje_object_part_geometry_get(btn, "left.padding", NULL, NULL, &padding_outer, NULL);
-			edje_object_part_geometry_get(btn, "left.inner.padding", NULL, NULL, &padding_inner, NULL); 
-			edje_object_part_geometry_get(btn, "elm.label", NULL, NULL, &w, &h); 
-
-			evas_object_resize(btn, w_row - w_label, 0);
-			item->rw = w_row - w_label;
-			evas_object_resize(label, item->rw - 4*padding_outer - 4*padding_inner, h_label); 	
-			elm_label_wrap_width_set(label, item->rw - 4*padding_outer - 6*padding_inner ); 
-		}
-
-		edje_object_part_unswallow(last_row, wd->entry);
-		_add_row(obj, NULL);
-		_view_update(obj);
-	}
-	else
-	{
-		Evas_Coord w_label, h_label;
-		Evas_Object *row;
-			
-		edje_object_part_unswallow(last_row, wd->entry);	
-		row = _add_row(obj, NULL);
-		hbox = edje_object_part_swallow_get(row, "elm.hbox");
-		edje_object_part_geometry_get(row, "elm.label", NULL, NULL, &w_label, &h_label);
-
-
-
-		if(w_new_btn > w_row - w_label){
-			Evas_Coord w, h, padding_outer, padding_inner, base_w, base_h;
-			Evas_Object *label;
-
-			edje_object_part_geometry_get(btn, "elm.base", NULL, NULL, &base_w, &base_h);	
-			label = edje_object_part_swallow_get(btn, "elm.label");
-			
-			edje_object_part_geometry_get(btn, "left.padding", NULL, NULL, &padding_outer, NULL);
-			edje_object_part_geometry_get(btn, "left.inner.padding", NULL, NULL, &padding_inner, NULL); 
-			edje_object_part_geometry_get(btn, "elm.label", NULL, NULL, &w, &h); 
-
-			evas_object_resize(btn, w_row - w_label, 0);
-			item->rw = w_row - w_label;
-			evas_object_resize(label, item->rw - 4*padding_outer - 4*padding_inner, h_label); 	
-			elm_label_wrap_width_set(label, item->rw - 4*padding_outer - 6*padding_inner ); 
-			
-			
-			edje_object_part_unswallow(last_row, wd->entry);
-			_add_row(obj, NULL);
-		}
-
-
-		evas_object_box_append(hbox, btn);
-		item->hbox = hbox;
-		item->row = row;
-			
-		_view_update(obj);
-	}	
-}
-
-static void _remove_unused_row(Evas_Object *obj)
-{
-	Eina_List *rows;
-	Eina_List *l;
-	Evas_Object *cur_row;
-	Evas_Object *last_rows;
-	Evas_Object* hbox;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if(!wd) return;
-
-
-	rows = evas_object_box_children_get(wd->vbox);
-	EINA_LIST_FOREACH(rows, l, cur_row){
-		hbox = edje_object_part_swallow_get(cur_row, "elm.hbox");
-
-		if(hbox){
-			if(rows != l && !evas_object_box_children_get(hbox)){
-				int space;
-				edje_object_part_geometry_get(eina_list_data_get(eina_list_prev(l)), "elm.space", NULL, NULL, &space, NULL);
-
-				Evas_Object *prev_row = eina_list_data_get(eina_list_prev(l));
-				hbox = edje_object_part_swallow_get(prev_row, "elm.hbox");
-				
-				if(hbox && eina_list_count(evas_object_box_children_get(hbox)) == 0){
-					edje_object_signal_emit(cur_row,"empty", "");
-					rows = eina_list_remove(rows, cur_row);
-					_del_row(obj, cur_row);
-				}else if((eina_list_data_get(eina_list_last(evas_object_box_children_get(wd->vbox))) == cur_row) && (space < MIN_ENTRY_WIDTH)){
-					break;
-				}else{
-					edje_object_signal_emit(cur_row,"empty", "");
-					rows = eina_list_remove(rows, cur_row);
-					_del_row(obj, cur_row);
-				}
-
-			}
-		}
-	}
-
-	last_rows = eina_list_data_get(eina_list_last(evas_object_box_children_get(wd->vbox)));
-	if(last_rows) edje_object_part_swallow(last_rows, "elm.entry", wd->entry);
-
-}
-
-static void
-_del_button(Evas_Object *obj)
-{
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Object* last_row;
-	Evas_Object *hbox;
-	Evas_Object *last_btn;
-	if(!wd) return;
-
-
-	if(!wd->current){
-		// let the last button focus
-		if(!(last_row = eina_list_data_get(eina_list_last(evas_object_box_children_get(wd->vbox))))) return;
-		if(!(hbox = edje_object_part_swallow_get(last_row, "elm.hbox"))) return;
-		last_btn = eina_list_data_get(eina_list_last(evas_object_box_children_get(hbox)));
-
-		if(last_btn)	{
-			_change_current_button(obj, last_btn);				
-		}else{
-			if(!(last_row = eina_list_data_get(eina_list_prev(eina_list_last(evas_object_box_children_get(wd->vbox))))) )return;
-			if(!(hbox = edje_object_part_swallow_get(last_row, "elm.hbox"))) return;
-			last_btn = eina_list_data_get(eina_list_last(evas_object_box_children_get(hbox)));
-			if(last_btn)
-				_change_current_button(obj, last_btn);		
-		}
-		
-	}else{
-		Eina_List *l;
-		Multibuttonentry_Item *item;
-		Eina_List *rows;
-		Evas_Object* cur_row;
-		Evas_Object* cur_box;
-		Evas_Coord w_entry;
-		Evas_Coord pre_space, next_space;
-		Eina_List *next;
-
-
-		if(!(rows = evas_object_box_children_get(wd->vbox))) return;
-
-
-		next = eina_list_next(wd->current);
-		item = eina_list_data_get(wd->current);
-
-		EINA_LIST_FOREACH(rows, l, cur_row){
-			if(cur_row == item->row){
-				rows = l;
-				break;
-			}
-		}				
-		
-		cur_row = item->row;
-		if(!(cur_box = edje_object_part_swallow_get(cur_row, "elm.hbox"))) return;
-		
-
-		edje_object_part_geometry_get(cur_row, "elm.space", NULL, NULL, &pre_space, NULL);	
-		edje_object_part_geometry_get(eina_list_data_get(eina_list_next(rows)), "elm.space", NULL, NULL, &next_space, NULL);	
-		
-		if(item){
-			pre_space += item->rw;
-			evas_object_box_remove(item->hbox, item->button);
-			_del_button_item(obj, item->button);
-			if(cur_box)
-				if(eina_list_count(evas_object_box_children_get(cur_box)) == 0)
-						edje_object_signal_emit(cur_row,"empty", "");
-			//_remove_unused_row(obj);
-		}
-
-	
-		l = next;
-		EINA_LIST_FOREACH(l, l, item) {	
-			if(item->hbox != cur_box){	
-				if(!cur_box) break;
-				
-				if(item->w < pre_space){	
-					next_space += item->rw;
-					evas_object_box_remove(item->hbox, item->button);
-					evas_object_resize(item->button, item->w, 0);
-					evas_object_box_append(cur_box, item->button);
-					pre_space -= item->w;
-					item->hbox = cur_box;
-					item->row = cur_row;
-				}
-				else if((eina_list_count(evas_object_box_children_get(cur_box)) == 0)){
-					next_space += item->rw;
-					evas_object_box_remove(item->hbox, item->button);
-					evas_object_resize(item->button, item->rw, 0);
-					evas_object_box_append(cur_box, item->button);
-					pre_space -= item->w;
-					item->hbox = cur_box;
-					item->row = cur_row;
-				}
-				else{
-						
-					if(!(rows = eina_list_next(rows)))	break;
-					if(!(cur_row = eina_list_data_get(rows)))	break;
-					if(!(cur_box = edje_object_part_swallow_get(cur_row, "elm.hbox"))) break;
-					
-					pre_space = next_space;
-					edje_object_part_geometry_get(eina_list_data_get(eina_list_next(rows)), "elm.space", NULL, NULL, &next_space, NULL);
-				}
-
-
-				if(cur_box)
-					if(eina_list_count(evas_object_box_children_get(cur_box)) == 0)
-						edje_object_signal_emit(cur_row,"empty", "");
-
-				
-				_remove_unused_row(obj);
-			}
-		}
-
-		_remove_unused_row(obj);
-		
-	}
+	_add_button_item(obj, str, MULTIBUTONENTRY_POS_END, NULL, NULL);
 }
 
 static void
@@ -606,17 +347,14 @@ _evas_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info )
     Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *) event_info;
 	Widget_Data *wd = elm_widget_data_get(data);
 	static char str[MAX_STR];	
-	if(!wd || !wd->base || !wd->vbox || wd->entry != obj) return;
-
-	strncpy(str, elm_entry_entry_get(wd->entry), MAX_STR);
+	if(!wd || !wd->base || !wd->box) return;
+	
+	strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
 	str[MAX_STR - 1]= 0;
 
-	//printf("\n>>>>>>[%s][%d]key val = %s\n", __FUNCTION__, __LINE__, ev->keyname);
-	
 	if((strcmp(str, "") == 0) && ((strcmp(ev->keyname, "BackSpace") == 0)||(strcmp(ev->keyname, "BackSpace(") == 0))){ 
 		_del_button(data);	
-	}
-	else if((strcmp(str, "") != 0) && (strcmp(ev->keyname, "KP_Enter") == 0 ||strcmp(ev->keyname, "Return") == 0 )){
+	}else if((strcmp(str, "") != 0) && (strcmp(ev->keyname, "KP_Enter") == 0 ||strcmp(ev->keyname, "Return") == 0 )){
 		_add_button(data, str);
 	}else{
 		//
@@ -628,38 +366,33 @@ _view_init(Evas_Object *obj)
 {	
 	Widget_Data *wd = elm_widget_data_get(obj);	
 	if (!wd) return;
+	
+	if(!wd->box){
+		if(!(wd->box = elm_box_add(obj))) return;
+		elm_box_extended_set(wd->box, EINA_TRUE);
+		elm_box_homogenous_set(wd->box, EINA_FALSE);
+		edje_object_part_swallow(wd->base, "box.swallow", wd->box);
+		evas_object_show(wd->box);
+	}
 
-	if(!wd->entry){
-		wd->entry = elm_entry_add(obj);
-		elm_entry_single_line_set(wd->entry, EINA_TRUE);
-		elm_entry_ellipsis_set(wd->entry, EINA_TRUE);
-		elm_entry_entry_set(wd->entry, "");
-		elm_entry_cursor_end_set(wd->entry);
-		//elm_entry_background_color_set(wd->entry, 255, 0, 255, 255);
-		evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_UP, _evas_key_up_cb, obj);		
+	if(!wd->label){
+		_set_label(obj, "To: ");	
 	}
 	
-	if(!wd->vbox){
-		wd->vbox = evas_object_box_add(evas_object_evas_get(obj));
-		evas_object_box_layout_set(wd->vbox, evas_object_box_layout_vertical, NULL, NULL);	
-		edje_object_part_swallow(wd->base, "vbox.swallow", wd->vbox);
-		evas_object_show(wd->vbox);
-		_add_row(obj, "To:");
+	if(!wd->entry){
+		Evas_Coord h_label;
+		if(!(wd->entry = elm_scrolled_entry_add(obj))) return;
+		elm_scrolled_entry_single_line_set(wd->entry, EINA_TRUE);
+		elm_scrolled_entry_entry_set(wd->entry, "");
+		elm_scrolled_entry_cursor_end_set(wd->entry);
+		evas_object_event_callback_add(elm_scrolled_entry_entry_object_get(wd->entry), EVAS_CALLBACK_KEY_UP, _evas_key_up_cb, obj);
+		evas_object_geometry_get(wd->entry, NULL, NULL, NULL, &h_label);
+		evas_object_size_hint_min_set(wd->entry, 20, h_label);
+		evas_object_size_hint_weight_set(wd->entry, 1.0, 1.0);
+		evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
+		elm_box_pack_end(wd->box, wd->entry);
+		evas_object_show(wd->entry);
 	}
-}
-
-static void 
-_view_update(Evas_Object *obj)
-{	
-	Widget_Data *wd = elm_widget_data_get(obj);	
-	Eina_List *l;
-	Evas_Object *item;
-	Eina_List* list;	
-	if (!wd || !wd->vbox) return;
-
-	list = evas_object_box_children_get(wd->vbox);
-	EINA_LIST_FOREACH(list, l, item)
-		evas_object_resize(item, wd->w_vbox, wd->h_vbox);
 }
 
 /**
@@ -694,7 +427,6 @@ elm_multibuttonentry_add(Evas_Object *parent)
 	
 	_event_init(obj);
 	_view_init(obj);
-	_view_update(obj);
 
 	return obj;
 }
@@ -707,15 +439,15 @@ elm_multibuttonentry_add(Evas_Object *parent)
  *
  * @ingroup Multibuttonentry
  */
-
 EAPI const char *
 elm_multibuttonentry_label_get(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
-	if(wd->label)
-		return wd->label;
+	if(wd->label){
+		return elm_label_label_get(wd->label);
+	}
 
 	return NULL;
 }
@@ -724,7 +456,7 @@ elm_multibuttonentry_label_get(Evas_Object *obj)
  * Set the label
  *
  * @param obj The multibuttonentry object
- * @param label The text label string in UTF-8
+ * @param label The text label string
  *
  * @ingroup Multibuttonentry
  */
@@ -732,11 +464,383 @@ EAPI void
 elm_multibuttonentry_label_set(Evas_Object *obj, const char *label)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Object *row;
-	if (!wd || !wd->vbox) return;
+	if (!wd) return;
 
-	if(!(row = eina_list_data_get(evas_object_box_children_get(wd->vbox)))) return;
-	_set_label(obj, row, label);	
+	_set_label(obj, label);	
 }
 
+/**
+ * Get the entry of the multibuttonentry object
+ *
+ * @param obj The multibuttonentry object
+ * @return entry object
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Evas_Object *
+elm_multibuttonentry_entry_get(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd)	return NULL;
+   
+   return wd->entry;
+}
+
+/**
+ * Prepend a new item to the multibuttonentry 
+ *
+ * @param obj The multibuttonentry object
+ * @param label The label of new item
+ * @param data The ponter to the data to be attached
+ * @return A handle to the item added or NULL if not possible
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Elm_Multibuttonentry_Item *
+elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data)
+{
+	Elm_Multibuttonentry_Item *item;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return NULL;
+
+	item = _add_button_item(obj, label, MULTIBUTONENTRY_POS_START, NULL, data);
+	return item; 
+}
+
+/**
+ * Append a new item to the multibuttonentry 
+ *
+ * @param obj The multibuttonentry object
+ * @param label The label of new item
+ * @param data The ponter to the data to be attached
+ * @return A handle to the item added or NULL if not possible
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Elm_Multibuttonentry_Item *
+elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data)
+{
+	Elm_Multibuttonentry_Item *item;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return NULL;
+
+	item = _add_button_item(obj, label, MULTIBUTONENTRY_POS_END, NULL, data);
+	return item; 
+}
+
+/**
+ * Add a new item to the multibuttonentry before the indicated object
+ *
+ * reference.
+ * @param obj The multibuttonentry object
+ * @param label The label of new item
+ * @param data The ponter to the data to be attached
+ * @return A handle to the item added or NULL if not possible
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Elm_Multibuttonentry_Item *
+elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data)
+{
+	Elm_Multibuttonentry_Item *item;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return NULL;
+
+	item = _add_button_item(obj, label, MULTIBUTONENTRY_POS_BEFORE, before, data);
+	return item; 
+}
+
+/**
+ * Add a new item to the multibuttonentry after the indicated object
+ *
+ * @param obj The multibuttonentry object
+ * @param label The label of new item
+ * @param data The ponter to the data to be attached
+ * @return A handle to the item added or NULL if not possible
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Elm_Multibuttonentry_Item *
+elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *after, void *data)
+{
+	Elm_Multibuttonentry_Item *item;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return NULL;
+
+	item = _add_button_item(obj, label, MULTIBUTONENTRY_POS_AFTER, after, data);
+	return item; 
+}
+
+/**
+ * Get a list of items in the multibuttonentry
+ *
+ * @param obj The multibuttonentry object
+ * @return The list of items, or NULL if none
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI const Eina_List *
+elm_multibuttonentry_items_get(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return NULL;
+	return wd->items;
+}
+
+/**
+ * Get the first item in the multibuttonentry
+ *
+ * @param obj The multibuttonentry object
+ * @return The first item, or NULL if none
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Elm_Multibuttonentry_Item *
+elm_multibuttonentry_item_first_get(Evas_Object *obj)
+{
+	Widget_Data *wd;
+	if (!obj) return NULL;
+	wd = elm_widget_data_get(obj);
+	if (!wd || !wd->items) return NULL;
+	return eina_list_data_get(wd->items);
+}
+
+/**
+ * Get the last item in the multibuttonentry
+ *
+ * @param obj The multibuttonentry object
+ * @return The last item, or NULL if none
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Elm_Multibuttonentry_Item *
+elm_multibuttonentry_item_last_get(Evas_Object *obj)
+{
+	Widget_Data *wd;
+	if (!obj) return NULL;
+	wd = elm_widget_data_get(obj);
+	if (!wd || !wd->items) return NULL;
+	return eina_list_data_get(eina_list_last(wd->items));
+}
+
+/**
+ * Get the selected item in the multibuttonentry
+ *
+ * @param obj The multibuttonentry object
+ * @return The selected item, or NULL if none
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Elm_Multibuttonentry_Item *
+elm_multibuttonentry_item_selected_get(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd || !wd->current) return NULL;
+	return eina_list_data_get(wd->current);
+}
+
+/**
+ * Set the selected state of an item
+ *
+ * @param item The item
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI void
+elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item)
+{
+	Widget_Data *wd;
+	Eina_List *l;
+	Elm_Multibuttonentry_Item *_item;
+
+	if (!item) return;
+	wd = elm_widget_data_get(item->multibuttonentry);
+	if (!wd) return;
+
+	EINA_LIST_FOREACH(wd->items, l, _item) {
+		if (_item == item) {
+			_change_current_button(item->multibuttonentry, item->button);
+		}
+	}
+}
+
+/**
+ * Remove all items in the multibuttonentry.
+ *
+ * @param obj The multibuttonentry object
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI void
+elm_multibuttonentry_items_del(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return;
+	
+	if (wd->items){
+		Elm_Multibuttonentry_Item *item;
+		EINA_LIST_FREE(wd->items, item) {
+			elm_box_unpack(wd->box, item->button);
+			_del_button_obj(obj, item->button);
+			free(item);
+		}
+		wd->items = NULL;
+	}
+	wd->current = NULL;
+}
+
+/**
+ * Delete a given item
+ *
+ * @param item The item
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI void
+elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item)
+{
+	if (!item) return;
+	 _item_del(item);
+}
+
+/**
+ * Get the label of a given item
+ *
+ * @param item The item
+ * @return The label of a given item, or NULL if none
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI const char *
+elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item)
+{
+	Widget_Data *wd;
+	Eina_List *l;
+	Elm_Multibuttonentry_Item *_item;
+
+	if (!item) return NULL;
+	wd = elm_widget_data_get(item->multibuttonentry);
+	if (!wd || !wd->items) return NULL;
+
+	EINA_LIST_FOREACH(wd->items, l, _item)
+		if (_item == item){
+			Evas_Object *label = edje_object_part_swallow_get(_item->button, "elm.label");
+			if(label)	return elm_label_label_get(label);
+		}
+
+	return NULL;
+}
+
+/**
+ * Set the label of a given item
+ *
+ * @param item The item
+ * @param label The text label string
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI void
+elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char *str)
+{
+	Widget_Data *wd;
+	Eina_List *l;
+	Elm_Multibuttonentry_Item *_item;
+
+	if (!item || !str) return;
+	wd = elm_widget_data_get(item->multibuttonentry);
+	if (!wd || !wd->items) return;
+
+	EINA_LIST_FOREACH(wd->items, l, _item)
+		if (_item == item) {
+			Evas_Object *label = edje_object_part_swallow_get(_item->button, "elm.label");
+			if(label)	elm_label_label_set(label, str);
+			break;
+		}
+}
+
+/**
+ * Get the previous item in the multibuttonentry
+ *
+ * @param item The item
+ * @return The item before the item @p item
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Elm_Multibuttonentry_Item *
+elm_multibuttonentry_item_prev(Elm_Multibuttonentry_Item *item)
+{
+	Widget_Data *wd;
+	Eina_List *l;
+	Elm_Multibuttonentry_Item *_item;
+
+	if (!item) return NULL;
+	wd = elm_widget_data_get(item->multibuttonentry);
+	if (!wd || !wd->items) return NULL;
+
+	EINA_LIST_FOREACH(wd->items, l, _item)
+		if (_item == item) {
+			l = eina_list_prev(l);
+			if (!l) return NULL;
+			return eina_list_data_get(l);
+		}
+	return NULL;
+}
+
+/**
+ * Get the next item in the multibuttonentry
+ *
+ * @param item The item
+ * @return The item after the item @p item
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI Elm_Multibuttonentry_Item *
+elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item)
+{
+	Widget_Data *wd;
+	Eina_List *l;
+	Elm_Multibuttonentry_Item *_item;
+
+	if (!item) return NULL;
+	wd = elm_widget_data_get(item->multibuttonentry);
+	if (!wd || !wd->items) return NULL;
+
+	EINA_LIST_FOREACH(wd->items, l, _item)
+		if (_item == item) {
+			l = eina_list_next(l);
+			if (!l) return NULL;
+			return eina_list_data_get(l);
+		}
+	return NULL;
+}
+
+/**
+ * Get private data of item
+ *
+ * @param item The item
+ * @return The data pointer stored, or NULL if none was stored
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI void *
+elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item)
+{
+	if (!item) return NULL;
+	return item->data;
+}
+
+/**
+ * Set private data of item
+ *
+ * @param item The item
+ * @param data The ponter to the data to be attached
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI void
+elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data)
+{
+	if (!item) return;
+	item->data = data;
+}
 

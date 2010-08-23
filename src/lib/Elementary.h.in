@@ -1245,6 +1245,7 @@ extern "C" {
    EAPI void              elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec) __attribute__((deprecated));
    EAPI void              elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
    EAPI int               elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it);
+   EAPI void              elm_genlist_selected_items_del(Evas_Object *obj);
 
    EAPI Evas_Object *elm_check_add(Evas_Object *parent);
    EAPI void         elm_check_label_set(Evas_Object *obj, const char *label);
@@ -2431,11 +2432,31 @@ extern "C" {
     */
  
    /* multibuttonentry */
+   typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
    EAPI Evas_Object	*elm_multibuttonentry_add(Evas_Object *parent);
    EAPI const char		*elm_multibuttonentry_label_get(Evas_Object *obj);
    EAPI void			elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
+   EAPI Evas_Object 				*elm_multibuttonentry_entry_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data);
+   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data);
+   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data);
+   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *after, void *data);
+   EAPI const Eina_List *				elm_multibuttonentry_items_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item 	*elm_multibuttonentry_item_first_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item 	*elm_multibuttonentry_item_last_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item 	*elm_multibuttonentry_item_selected_get(Evas_Object *obj);
+   EAPI void						elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item);
+   EAPI void						elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item);
+   EAPI void						elm_multibuttonentry_items_del(Evas_Object *obj);
+   EAPI const char					*elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item);
+   EAPI void						elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char *str);
+   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_prev(Elm_Multibuttonentry_Item *item);
+   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item);
+   EAPI void						*elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item);
+   EAPI void						elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data);
    /* smart callback called:
     * "selected"
+    * "added"
     */
    /* available styles:
     * default

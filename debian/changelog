@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build39) unstable; urgency=low
+
+  * Beat Winset Beta Release.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build39
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Mon, 23 Aug 2010 10:47:22 +0900
+
 elementary (0.4.0+svn.49550slp2+3build38) unstable; urgency=low
 
   * [multibuttonentry]
