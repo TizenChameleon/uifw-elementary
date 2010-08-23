@@ -39,28 +39,30 @@
 #define MIN_ZOOM_RATIO 0.09f
 #define MAX_ZOOM_RATIO 4.0f
 
-#define NOT_FOUND_PAGE "<html> \
-			<head><title>Page Not Found</title></head> \
-			<body bgcolor=white text=black text-align=left> \
-			<!--<body bgcolor=#4c4c4c text=white text-align=left>--> \
-			<center> \
-			<table> \
-			<tr><td><h1>Page Not Found<br/></td></tr> \
-			<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'> \
-			<tr><td> \
-			<script type='text/javascript'> \
-			var s = window.location.href; \
-			var failingUrl = s.substring(s.indexOf(\"?\"\) + 1, s.lastIndexOf(\"?\"\)); \
-			document.write(\"<p><tr><td><h2>URL: \" + unescape(failingUrl) + \"</h2></td></tr>\"); \
-			var errorDesc = s.substring(s.lastIndexOf(\"?\") + 1, s.length); \
-			document.write(\"<tr><td><h2>Error: \" + unescape(errorDesc) + \"</h2></td></tr>\"); \
-			document.write(\"<tr><td><h3>Google: <form method=\"get\" action=\"http://www.google.com/custom\"><input type=text name=\"q\" size=15 maxlength=100 value=\\\"\"+ unescape(failingUrl)+\"\\\"> <input type=submit name=\"sa\" value=Search></form></h3></td></tr>\"); \
-			</script> \
-			</td></tr> \
-			</table> \
-			</h1> \
-			</body> \
-			</html>"
+//			"<!--<body bgcolor=#4c4c4c text=white text-align=left>-->"
+#define NOT_FOUND_PAGE_HEADER "<html>" \
+			"<head><title>Page Not Found</title></head>" \
+			"<body bgcolor=white text=black text-align=left>" \
+			"<center>" \
+			"<table>" \
+			"<tr><td><h1>Page Not Found<br/></td></tr>" \
+			"<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>" \
+			"<tr><td>" \
+			"<script type='text/javascript'>"\
+			"var s = "
+
+#define NOT_FOUND_PAGE_FOOTER ";" \
+			"var failingUrl = s.substring(s.indexOf(\"?\"\)+1, s.lastIndexOf(\"?\"\));" \
+			"document.write(\"<p><tr><td><h2>URL: \" + unescape(failingUrl) + \"</h2></td></tr>\");" \
+			"var errorDesc = s.substring(s.lastIndexOf(\"?\")+1, s.length);" \
+			"document.write(\"<tr><td><h2>Error: \" + unescape(errorDesc) + \"</h2></td></tr>\");" \
+			"document.write(\"<tr><td><h3>Google: <form method=\'get\' action=\'http://www.google.com/custom\'><input type=text name=\'q\' size=15 maxlength=100 value=\'\"+ unescape(failingUrl)+\"\'> <input type=submit name=\'sa\' value=Search></form></h3></td></tr>\");" \
+			"</script>" \
+			"</td></tr>" \
+			"</table>" \
+			"</h1>" \
+			"</body>" \
+			"</html>"
 
 #define NEED_TO_REMOVE
 
@@ -837,6 +839,7 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
 {
    DBG("%s is called\n", __func__);
    Smart_Data* sd = (Smart_Data *)data;
+   char szBuffer[2048];
    if (!sd) return;
 
    // if error, call loadNotFoundPage
@@ -844,10 +847,10 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
    int errorCode = (error)? error->code: 0;
    if ( errorCode != 0 && errorCode != -999 )
      { // 0 ok, -999 request cancelled
-	char szStrBuffer[1024];
-	snprintf(szStrBuffer, 1024, "page not found:, [code: %d] [domain: %s] [description: %s] [failing_url: %s] \n",
-	      error->code, error->domain, error->description, error->failing_url);
-	DBG(szStrBuffer);
+	//char szStrBuffer[1024];
+	//snprintf(szStrBuffer, 1024, "page not found:, [code: %d] [domain: %s] [description: %s] [failing_url: %s] \n",
+	//      error->code, error->domain, error->description, error->failing_url);
+	//DBG(szStrBuffer);
 
 	//ecore_job_add(loadNotFoundPage, (void *)this);
 	if (!sd->ewk_view_stop)
@@ -859,8 +862,10 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
 
 	if (!sd->ewk_frame_contents_set)
 	  sd->ewk_frame_contents_set = (Eina_Bool (*)(Evas_Object *, const char *, size_t, const char *, const char *, const char *))dlsym(ewk_handle, "ewk_frame_contents_set");
+
+	snprintf(szBuffer, 2048, NOT_FOUND_PAGE_HEADER "\"?%s?%s\"" NOT_FOUND_PAGE_FOOTER, error->failing_url, error->description);
 	//sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szStrBuffer, 0, NULL, NULL, NULL);
-	sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), NOT_FOUND_PAGE, 0, NULL, NULL, NULL);
+	sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szBuffer, 0, NULL, NULL, NULL);
 	return;
      }
 }
