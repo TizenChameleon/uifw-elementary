@@ -72,6 +72,8 @@ struct _Smart_Data {
      void (*ewk_view_pre_render_cancel)(Evas_Object *);
      Eina_Bool (*ewk_view_enable_render)(const Evas_Object *);
      Eina_Bool (*ewk_view_disable_render)(const Evas_Object *);
+     void (*ewk_view_javascript_suspend)(Evas_Object *);
+     void (*ewk_view_javascript_resume)(Evas_Object *);
      void (*ewk_view_fixed_layout_size_set)(Evas_Object *, Evas_Coord, Evas_Coord);
      Eina_Bool (*ewk_view_setting_enable_plugins_get)(const Evas_Object *);
      void (*ewk_view_pause_and_or_hide_plugins)(Evas_Object *, Eina_Bool, Eina_Bool);
@@ -229,8 +231,8 @@ static void      _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_unselect_closest_word(void* data, Evas_Object* webview, void* ev);
-static void      _suspend_all(Smart_Data *sd);
-static void      _resume_all(Smart_Data *sd);
+static void      _suspend_all(Smart_Data *sd, Eina_Bool hidePlugin);
+static void      _resume_all(Smart_Data *sd, Eina_Bool hidePlugin);
 static void      _zoom_start(Smart_Data* sd, int centerX, int centerY, int distance);
 static void      _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance);
 static void      _zoom_stop(Smart_Data* sd);
@@ -1360,22 +1362,13 @@ _smart_cb_pan_start(void* data, Evas_Object* webview, void* ev)
    sd->pan_s = *point;
    sd->on_panning = EINA_TRUE;
 
-   if (sd->tiled)
-     {
-	if (!sd->ewk_view_pre_render_cancel)
-	  sd->ewk_view_pre_render_cancel = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_pre_render_cancel");
-	sd->ewk_view_pre_render_cancel(webview);
-     }
-
-   if (!sd->ewk_view_suspend_request)
-     sd->ewk_view_suspend_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_suspend_request");
-   sd->ewk_view_suspend_request(webview); // suspend network loading
-
    if (sd->use_text_selection  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (_text_selection_handle_pressed(sd, point->x, point->y))
 	  _elm_smart_touch_is_one_drag_mode_enable(sd->touch_obj, EINA_FALSE);
      }
+
+   _suspend_all(sd, EINA_FALSE);
 
    sd->locked_dx = 0;
    sd->locked_dy = 0;
@@ -1570,6 +1563,8 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
    Evas_Point* point = (Evas_Point*)ev;
    sd->on_panning = EINA_FALSE;
 
+   _resume_all(sd, EINA_FALSE);
+
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (sd->text_selection.front_handle_moving == EINA_TRUE
@@ -1600,10 +1595,6 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	_directional_pre_render(webview,
 	      (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
      }
-
-   if (!sd->ewk_view_resume_request)
-     sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
-   sd->ewk_view_resume_request(webview); // resume network loading
 
    if (!sd->bounce_horiz && elm_widget_drag_lock_x_get(sd->widget))
      {
@@ -1682,22 +1673,31 @@ static int smart_zoom_index = N_COSINE - 1;
 #define INPUT_ZOOM_RATIO 2.5
 
 static void
-_suspend_all(Smart_Data *sd)
+_suspend_all(Smart_Data *sd, Eina_Bool hidePlugin)
 {
    Evas_Object *webview = sd->base.self;
 
+   // javascript suspend
+   if (!sd->ewk_view_javascript_suspend)
+     sd->ewk_view_javascript_suspend = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_javascript_suspend");
+   sd->ewk_view_javascript_suspend(webview);
+
+   // render suspend
    if (!sd->ewk_view_disable_render)
      sd->ewk_view_disable_render = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_disable_render");
    sd->ewk_view_disable_render(webview);
 
+   // plugin suspend
    if (!sd->ewk_view_setting_enable_plugins_get)
      sd->ewk_view_setting_enable_plugins_get = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_setting_enable_plugins_get");
    if (sd->ewk_view_setting_enable_plugins_get(webview))
      {
 	if (!sd->ewk_view_pause_and_or_hide_plugins)
 	  sd->ewk_view_pause_and_or_hide_plugins = (void (*)(Evas_Object *, Eina_Bool, Eina_Bool))dlsym(ewk_handle, "ewk_view_pause_and_or_hide_plugins");
-	sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, EINA_TRUE);
+	sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, hidePlugin);
      }
+
+   // cancel pre-render
    if (sd->tiled)
      {
 	if (!sd->ewk_view_pre_render_cancel)
@@ -1705,6 +1705,7 @@ _suspend_all(Smart_Data *sd)
 	sd->ewk_view_pre_render_cancel(webview);
      }
 
+   // network suspend
    if (!sd->ewk_view_suspend_request)
      sd->ewk_view_suspend_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_suspend_request");
    sd->ewk_view_suspend_request(webview); // suspend network loading
@@ -1712,20 +1713,29 @@ _suspend_all(Smart_Data *sd)
 }
 
 static void
-_resume_all(Smart_Data *sd)
+_resume_all(Smart_Data *sd, Eina_Bool hidePlugin)
 {
    Evas_Object *webview = sd->base.self;
 
+   // js resume
+   if (!sd->ewk_view_javascript_resume)
+     sd->ewk_view_javascript_resume = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_javascript_resume");
+   sd->ewk_view_javascript_resume(webview);
+
+   // render resume
    if (sd->tiled)
      {
 	if (!sd->ewk_view_enable_render)
 	  sd->ewk_view_enable_render = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_enable_render");
 	sd->ewk_view_enable_render(webview);
      }
+
+   // plugin resume
    if (!sd->ewk_view_pause_and_or_hide_plugins)
      sd->ewk_view_pause_and_or_hide_plugins = (void (*)(Evas_Object *, Eina_Bool, Eina_Bool))dlsym(ewk_handle, "ewk_view_pause_and_or_hide_plugins");
-   sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, EINA_TRUE);
+   sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, hidePlugin);
 
+   // network resume
    if (!sd->ewk_view_resume_request)
      sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
    sd->ewk_view_resume_request(webview);
@@ -1744,7 +1754,7 @@ _zoom_start(Smart_Data* sd, int centerX, int centerY, int distance)
      sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
    sd->zoom.zoom_rate_at_start = sd->ewk_view_zoom_get(sd->base.self);
 
-   _suspend_all(sd);
+   _suspend_all(sd, EINA_TRUE);
 
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_hide(sd);
@@ -1788,6 +1798,8 @@ _zoom_stop(Smart_Data* sd)
      sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
    sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zooming_rate, sd->zoom.basis.x, sd->zoom.basis.y);
 
+   _resume_all(sd, EINA_FALSE);
+
    if (sd->tiled)
      {
 	if (!sd->ewk_view_tiled_unused_cache_get)
@@ -1798,8 +1810,6 @@ _zoom_stop(Smart_Data* sd)
 	sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
 	_directional_pre_render(sd->base.self, 0, 0);
      }
-
-   _resume_all(sd);
 
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
@@ -1890,7 +1900,7 @@ _smart_zoom_animator(void* data)
 
 	_elm_smart_touch_start(sd->touch_obj);
 
-	_resume_all(sd);
+	_resume_all(sd, EINA_FALSE);
 
 	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
@@ -2127,7 +2137,7 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    sd->zoom.zoom_rate_to_set = zoom_rate;
    smart_zoom_index = N_COSINE - 1;
 
-   _suspend_all(sd);
+   _suspend_all(sd, EINA_TRUE);
 
    // run animator
    ecore_animator_frametime_set(1.0 / ZOOM_FRAMERATE);
@@ -2191,7 +2201,7 @@ _zoom_to_rect(Smart_Data *sd, int x, int y)
 	sd->zoom.scroll_to_set.y = sd->zoom.scroll_at_start.y + (from_y - to_y);
 	smart_zoom_index = N_COSINE - 1;
 
-	_suspend_all(sd);
+	_suspend_all(sd, EINA_TRUE);
 
 	// run animator
 	ecore_animator_frametime_set(1.0 / ZOOM_FRAMERATE);
