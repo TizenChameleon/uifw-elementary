@@ -94,14 +94,21 @@ static void
 _sizing_eval(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
+	Evas_Coord minw = -1, minh = -1, minw_box = -1, minh_box = -1;
+	Evas_Coord left_padding, right_padding, top_padding, bottom_padding;
 	if (!wd) return;
+
+	evas_object_size_hint_min_get(obj, &minw, &minh);
+	evas_object_size_hint_min_get(wd->box, &minw_box, &minh_box);
+	edje_object_part_geometry_get(wd->base, "left.padding", NULL, NULL, &left_padding, NULL);
+	edje_object_part_geometry_get(wd->base, "right.padding", NULL, NULL, &right_padding, NULL);
+	edje_object_part_geometry_get(wd->base, "top.padding", NULL, NULL, NULL, &top_padding);
+	edje_object_part_geometry_get(wd->base, "bottom.padding", NULL, NULL, NULL, &bottom_padding);
 	
-	elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-	edje_object_size_min_restricted_calc(wd->base, &minw, &minh, minw, minh);
-	elm_coords_finger_size_adjust(1, &minw, 1, &minh);
+	if (minw < minw_box) minw = minw_box + left_padding + right_padding;
+	if (minh < minh_box) minh = minh_box + top_padding + bottom_padding;
 	evas_object_size_hint_min_set(obj, minw, minh);
-	evas_object_size_hint_max_set(obj, maxw, maxh);
+	evas_object_resize(obj, minw, minh);
 }
 
 static void 
@@ -110,7 +117,6 @@ _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 	Widget_Data *wd = elm_widget_data_get(data);	
 	if (!wd) return;
 	evas_object_geometry_get(wd->box, NULL, NULL, &wd->w_box, &wd->h_box);
-	_sizing_eval(data);
 }
 
 static void
@@ -118,7 +124,6 @@ _event_init(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if(!wd || !wd->base)	return;
-
 	evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
 }
 
@@ -227,6 +232,7 @@ _item_del(Elm_Multibuttonentry_Item *item)
 			break;
 		}
 	}
+	_sizing_eval(item->multibuttonentry);
 }
 
 static void
@@ -324,6 +330,8 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 	evas_object_size_hint_min_set(btn, item->vw, h_btn);
 
 	evas_object_smart_callback_call(obj, "added", item);
+
+	_sizing_eval(obj);
 
 	return item;
 }
@@ -427,6 +435,7 @@ elm_multibuttonentry_add(Evas_Object *parent)
 	
 	_event_init(obj);
 	_view_init(obj);
+	_sizing_eval(obj);
 
 	return obj;
 }
