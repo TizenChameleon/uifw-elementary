@@ -52,8 +52,7 @@ _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	if (!wd) return;
 
 	edje_object_size_min_get(wd->base, &w, &h);
-	evas_object_size_hint_min_set(obj, w, h);
-	evas_object_resize(obj, w, h);
+	evas_object_size_hint_min_set(obj, w * elm_scale_get(), h * elm_scale_get());
 }
 
 static void 
