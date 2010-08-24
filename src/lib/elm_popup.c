@@ -250,7 +250,8 @@ _resize_parent(void *data, Evas *e, Evas_Object *obj, void *event_info)
 static void 
 _action_area_clicked( void *data, Evas_Object *obj, void *event_info )
 {
-   Action_Area_Data *adata = (Action_Area_Data *)data;
+   Action_Area_Data *adata = NULL;
+   adata = (Action_Area_Data *)data;
    
    if (!adata) return;  
    evas_object_smart_callback_call(adata->obj, "response", (void *)adata->response_id);   
@@ -265,7 +266,7 @@ _elm_popup_add_button(Evas_Object *obj, const char *text, int response_id)
    Evas_Object *btn;
    
    if (!wd) return NULL;
-   Action_Area_Data *adata = malloc(sizeof(Action_Area_Data)); 
+   Action_Area_Data *adata = ELM_NEW(Action_Area_Data); 
    btn = elm_button_add(obj);
    snprintf(buf, sizeof(buf), "popup_button/%s", elm_widget_style_get(obj));
    elm_object_style_set(btn, buf);
