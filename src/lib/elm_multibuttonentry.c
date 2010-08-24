@@ -24,6 +24,7 @@ typedef enum _Multibuttonentry_Pos
 struct _Multibuttonentry_Item {
 	Evas_Object *multibuttonentry;
 	Evas_Object *button;
+	Evas_Object *label;
 	void *data;
 	Evas_Coord vw, rw; // vw: visual width, real width
 };
@@ -66,11 +67,12 @@ _del_hook(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if(!wd) return;
 
+/*
 	if(wd->box){
 		elm_box_unpack_all(wd->box);
 		wd->box = NULL;
 	}
-
+*/
 	if (wd->items) {
 		Elm_Multibuttonentry_Item *item;
 		EINA_LIST_FREE(wd->items, item) {
@@ -87,12 +89,20 @@ _theme_hook(Evas_Object *obj)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *l;
+	Elm_Multibuttonentry_Item *item;
 	if (!wd) return;
 	
 	_elm_theme_object_set(obj, wd->base, "multibuttonentry", "base", elm_widget_style_get(obj));
-	// re swallow 
-	//edje_object_scale_set(wd->btn, elm_widget_scale_get(obj) * _elm_config->scale);
-	// refer to button
+	if(wd->box)	edje_object_part_swallow(wd->base, "box.swallow", wd->box);
+	edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
+
+	EINA_LIST_FOREACH(wd->items, l, item) {
+		if(item->button)	_elm_theme_object_set(obj, item->button, "multibuttonentry", "btn", elm_widget_style_get(obj));
+		if(item->label)		edje_object_part_swallow(item->button, "elm.label", item->label);
+		edje_object_scale_set(item->button, elm_widget_scale_get(obj) * _elm_config->scale);
+	}
+
 	_sizing_eval(obj);
 }
 
@@ -333,6 +343,7 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 	if (item) {
 		item->multibuttonentry = obj;
 		item->button = btn;
+		item->label = label;
 		item->data = data;
 		item->rw = w_btn;
 		item->vw =(wd->w_box < w_btn) ? wd->w_box : w_btn;		
