@@ -663,12 +663,11 @@ elm_navigationbar_pop(Evas_Object *obj)
 			ll = ll->prev;
 		}
 	}
-
+	
+	//unswallow items and start trasition
+	Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
 	if (prev_it && it) 
 	{
-		//unswallow items and start trasition
-		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
-
 		cb->prev_it = prev_it;
 		cb->it = it;
 		cb->pop = EINA_TRUE;
@@ -679,23 +678,18 @@ elm_navigationbar_pop(Evas_Object *obj)
 		if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
 		if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
 		_item_sizing_eval(it);
-		_transition_complete_cb(cb);
 		
-		//pop content from pager
-		elm_pager_content_pop(wd->pager);
 	}
 	else if (prev_it)
 	{
-		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
-
 		cb->prev_it = prev_it;
 		cb->it = NULL;
 		cb->pop = EINA_TRUE;
-		_transition_complete_cb(cb);
-
-		//pop content from pager
-		elm_pager_content_pop(wd->pager);
 	}
+	free(cb);
+	_transition_complete_cb(cb);
+	//pop content from pager
+	elm_pager_content_pop(wd->pager);
 }
 	
 /**
