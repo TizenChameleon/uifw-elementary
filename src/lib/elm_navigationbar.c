@@ -670,8 +670,7 @@ elm_navigationbar_pop(Evas_Object *obj)
 	{
 		cb->prev_it = prev_it;
 		cb->it = it;
-		cb->pop = EINA_TRUE;
-	
+		cb->pop = EINA_TRUE;	
 		if (prev_it->title_obj) edje_object_part_unswallow(wd->base, prev_it->title_obj);
 		if (prev_it->fn_btn1) edje_object_part_unswallow(wd->base, prev_it->fn_btn1);
 		else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
@@ -686,10 +685,10 @@ elm_navigationbar_pop(Evas_Object *obj)
 		cb->it = NULL;
 		cb->pop = EINA_TRUE;
 	}
-	free(cb);
 	_transition_complete_cb(cb);
 	//pop content from pager
 	elm_pager_content_pop(wd->pager);
+	free(cb);
 }
 	
 /**
