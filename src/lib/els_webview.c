@@ -65,6 +65,8 @@
 			"</html>"
 
 #define NEED_TO_REMOVE
+//#define DBG printf
+//#define ERR printf
 
 typedef struct _Smart_Data Smart_Data;
 
@@ -78,6 +80,7 @@ struct _Smart_Data {
      unsigned char bounce_horiz : 1;
      unsigned char bounce_vert : 1;
      unsigned char auto_fitting : 1;
+     unsigned char mouse_clicked : 1;
 
      /* ewk functions */
      void (*ewk_view_theme_set)(Evas_Object *, const char *);
@@ -132,6 +135,8 @@ struct _Smart_Data {
      Eina_Bool (*ewk_frame_selection_right_set)(Evas_Object *, int, int, int *, int *, int *);
      Eina_Bool (*ewk_frame_feed_focus_in)(Evas_Object *);
      Eina_Bool (*ewk_frame_scroll_add)(Evas_Object *, int, int);
+     unsigned int (*ewk_view_imh_get)(Evas_Object *);
+     Ecore_IMF_Context* (*ewk_view_core_imContext_get)(Evas_Object *);
 
      /* cairo functions */
      cairo_t * (*cairo_create)(cairo_surface_t *);
@@ -241,6 +246,7 @@ static void      _smart_load_started(void* data, Evas_Object* webview, void* err
 static void      _smart_load_finished(void* data, Evas_Object* webview, void* arg);
 static void      _smart_load_error(void* data, Evas_Object* webview, void* arg);
 static void      _smart_viewport_changed(void* data, Evas_Object* webview, void* arg);
+static void      _smart_input_method_changed(void* data, Evas_Object* webview, void* arg);
 static void      _smart_page_layout_info_set(Smart_Data *sd, float init_zoom_rate, float min_zoom_rate, float max_zoom_rate, Eina_Bool scalable);
 static void      _smart_contents_size_changed(void* data, Evas_Object* frame, void* arg);
 static void      _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg);
@@ -583,6 +589,7 @@ _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev)
    DBG("%s is called\n", __func__);
    Smart_Data *sd = (Smart_Data *)esd;
    sd->mouse_down_copy = *ev;
+   sd->mouse_clicked = EINA_TRUE;
 
    return EINA_TRUE;
    //return _parent_sc.mouse_down(esd, ev);
@@ -610,6 +617,7 @@ _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
 	return EINA_TRUE;
      }
 
+   sd->mouse_clicked = EINA_FALSE;
    //TODO:check if use click input or textarea
 forward_event:
    //return _parent_sc.mouse_up(esd, ev);
@@ -826,12 +834,14 @@ _smart_load_finished(void* data, Evas_Object* webview, void* arg)
      }
    sd->thumbnail = _image_clone_get(sd, &(sd->minimap.cw), &(sd->minimap.ch));
 
-   if (sd->minimap.eo == NULL) return;
-   _minimap_update(sd->minimap.content, sd, sd->thumbnail,
-	 sd->minimap.cw, sd->minimap.ch);
-
    if (sd->tiled)
      _directional_pre_render(sd->base.self, 0, 0);
+
+   if (sd->minimap.eo != NULL)
+     {
+   _minimap_update(sd->minimap.content, sd, sd->thumbnail,
+	 sd->minimap.cw, sd->minimap.ch);
+     }
 }
 
 static void
@@ -905,6 +915,94 @@ _smart_viewport_changed(void* data, Evas_Object* webview, void* arg)
    sd->is_mobile_page = EINA_TRUE;
    _smart_page_layout_info_set(sd, MOBILE_DEFAULT_ZOOM_RATIO, min_zoom_rate, max_zoom_rate, scalable);
 }
+
+//#ifdef PROFUSION_INPUT_PATCH
+/**
+ * Rotaion modes
+ * @see appcore_set_rotation_cb(), appcore_get_rotation_state()
+ */
+enum appcore_rm {
+     APPCORE_RM_UNKNOWN, /**< Unknown mode */
+     APPCORE_RM_PORTRAIT_NORMAL , /**< Portrait mode */
+     APPCORE_RM_PORTRAIT_REVERSE , /**< Portrait upside down mode */
+     APPCORE_RM_LANDSCAPE_NORMAL , /**< Left handed landscape mode */
+     APPCORE_RM_LANDSCAPE_REVERSE ,  /**< Right handed landscape mode */
+};
+/*
+static void
+updateIMFOrientation( Ecore_IMF_Context *ctx )
+{
+   if ( !ctx )
+     return;
+
+   enum appcore_rm current_state = APPCORE_RM_UNKNOWN;
+   int ret = appcore_get_rotation_state(&current_state);
+
+   switch (current_state)
+     {
+      case APPCORE_RM_PORTRAIT_NORMAL:
+	ecore_imf_context_input_panel_orient_set(ctx, ECORE_IMF_INPUT_PANEL_ORIENT_NONE);
+	break;
+      case APPCORE_RM_PORTRAIT_REVERSE:
+	ecore_imf_context_input_panel_orient_set(ctx, ECORE_IMF_INPUT_PANEL_ORIENT_180);
+	break;
+      case APPCORE_RM_LANDSCAPE_NORMAL:
+	ecore_imf_context_input_panel_orient_set(ctx, ECORE_IMF_INPUT_PANEL_ORIENT_90_CW);
+	break;
+      case APPCORE_RM_LANDSCAPE_REVERSE:
+	ecore_imf_context_input_panel_orient_set(ctx, ECORE_IMF_INPUT_PANEL_ORIENT_90_CCW);
+	break;
+     }
+
+   // call to show needed
+   if ( ecore_imf_context_input_panel_state_get(ctx) == ECORE_IMF_INPUT_PANEL_STATE_SHOW )
+     ecore_imf_context_input_panel_show(ctx);
+}
+*/
+
+static void
+_smart_input_method_changed(void* data, Evas_Object* webview, void* arg)
+{
+   DBG("%s is called\n", __func__);
+   Smart_Data* sd = (Smart_Data *)data;
+   if (!sd) return;
+
+   if (sd->ewk_view_core_imContext_get == NULL)
+     sd->ewk_view_core_imContext_get = (Ecore_IMF_Context* (*)(Evas_Object *)) dlsym(ewk_handle, "ewk_view_core_imContext_get");
+
+   Ecore_IMF_Context* imContext = sd->ewk_view_core_imContext_get(webview);
+   Eina_Bool active = (Eina_Bool)arg;
+   if (active && sd->mouse_clicked)
+     {
+	static unsigned int lastImh = 0;//FIXME
+	if (sd->ewk_view_imh_get == NULL)
+	  sd->ewk_view_imh_get = (unsigned int (*)(Evas_Object *)) dlsym(ewk_handle, "ewk_view_imh_get");
+	unsigned int imh = sd->ewk_view_imh_get(webview);
+	if (ecore_imf_context_input_panel_state_get(imContext) != ECORE_IMF_INPUT_PANEL_STATE_SHOW || lastImh != imh)
+	  {
+	     lastImh = imh;
+	     //currentPage->reactToInputFieldTap(view, currentPage->getLastClickInfo().x, currentPage->getLastClickInfo().y);
+	     //updateIMFOrientation( imContext );
+	     ecore_imf_context_input_panel_reset (imContext);
+	     switch (imh)
+	       {
+		case EWK_IMH_TELEPHONE: ecore_imf_context_input_panel_layout_set(imContext, ECORE_IMF_INPUT_PANEL_LAYOUT_PHONENUMBER); break;
+		case EWK_IMH_NUMBER: ecore_imf_context_input_panel_layout_set(imContext, ECORE_IMF_INPUT_PANEL_LAYOUT_NUMBER); break;
+		case EWK_IMH_EMAIL: ecore_imf_context_input_panel_layout_set(imContext, ECORE_IMF_INPUT_PANEL_LAYOUT_EMAIL); break;
+		case EWK_IMH_URL: ecore_imf_context_input_panel_layout_set(imContext, ECORE_IMF_INPUT_PANEL_LAYOUT_URL); break;
+		default: ecore_imf_context_input_panel_layout_set(imContext, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL);
+	       }
+	     DBG("ecore_imf_context_input_panel_show");
+	     ecore_imf_context_input_panel_show (imContext);
+	  }
+     }
+   else
+     {
+	DBG("ecore_imf_context_input_panel_hide");
+	ecore_imf_context_input_panel_hide (imContext);
+     }
+}
+//#endif
 
 static void _smart_page_layout_info_set(Smart_Data *sd, float init_zoom_rate, float min_zoom_rate, float max_zoom_rate, Eina_Bool scalable)
 {
@@ -1062,6 +1160,7 @@ _smart_add(Evas_Object* obj)
    evas_object_smart_callback_add(obj, "load,finished", _smart_load_finished, sd);
    evas_object_smart_callback_add(obj, "load,error", _smart_load_error, sd);
    evas_object_smart_callback_add(obj, "viewport,changed", _smart_viewport_changed, sd);
+   evas_object_smart_callback_add(obj, "inputmethod,changed", _smart_input_method_changed, sd);
 
    evas_object_smart_callback_add(obj, "webview,created", _smart_cb_view_created, sd); // I need to consider more
 
