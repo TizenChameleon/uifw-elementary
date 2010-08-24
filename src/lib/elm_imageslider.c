@@ -10,6 +10,9 @@
 /**
 * @defgroup Imageslider Imageslider
 * @ingroup Elementary
+*
+* By flicking images on the screen, 
+* you can see the images in specific path.
 */
 
 typedef struct _Widget_Data Widget_Data;
@@ -54,6 +57,8 @@ struct _Widget_Data
 	Eina_List *cur;
 	Evas_Coord x, y, w, h;
 	Evas_Object *obj;
+	Ecore_Idler *queue_idler;
+	Ecore_Timer *anim_timer;
 
 	Evas_Coord_Point down_pos;
 	Evas_Coord move_x;
@@ -116,6 +121,16 @@ static void _del_hook(Evas_Object * obj)
 	if (wd->its) {
 		eina_list_free(wd->its);
 		wd->its = NULL;
+	}
+
+	if (wd->queue_idler) {
+		ecore_idler_del(wd->queue_idler);
+		wd->queue_idler = NULL;		
+	}
+
+	if (wd->anim_timer) {
+		ecore_timer_del(wd->anim_timer);
+		wd->anim_timer = NULL;
 	}
 
 	if (wd) free(wd);
@@ -686,7 +701,13 @@ static int _timer_cb(void *data)
 		ret = _check_drag(BLOCK_RIGHT, wd);
 		_check_zoom(wd);
 
-		ecore_idler_add(_icon_to_image, wd);
+
+		if (wd->queue_idler) {
+			ecore_idler_del(wd->queue_idler);
+			wd->queue_idler = NULL;
+		}
+
+		if (!wd->queue_idler) wd->queue_idler = ecore_idler_add(_icon_to_image, wd);
 
 		return 0;
 	}
@@ -707,7 +728,14 @@ static void _anim(Widget_Data *wd)
 
 	w = wd->move_x;
 	gettimeofday(&wd->tv, NULL);
-	ecore_timer_add(ANI_TIME, _timer_cb, wd);
+
+	if (wd->anim_timer) {
+		ecore_timer_del(wd->anim_timer);
+		wd->anim_timer = NULL;
+	}
+	
+	if (!wd->anim_timer) wd->anim_timer = ecore_timer_add(ANI_TIME, _timer_cb, wd);
+	
 }
 
 static void _imageslider_update(Widget_Data *wd)
@@ -767,10 +795,10 @@ static void _imageslider_update(Widget_Data *wd)
 
 
 /** 
-* Add imageslider widget 
+* Add an Image Slider widget 
 * 
-* @param 	obj	The parent object 
-* @return	The new object or NULL if it cannot be created 
+* @param 	parent	The parent object 
+* @return	The new Image slider object or NULL if it cannot be created 
 * 
 * @ingroup Imageslider 
 */
@@ -829,13 +857,13 @@ elm_imageslider_add(Evas_Object * parent)
 
 
 /** 
-* Append imageslider item 
+* Append an Image Slider item 
 * 
-* @param 	obj          The photoslider object 
+* @param 	obj          The Image Slider object 
 * @param	photo_file   photo file path 
 * @param	func         callback function 
 * @param	data         callback data 
-* @return	The photoslider item handle or NULL 
+* @return	The Image Slider item handle or NULL 
 * 
 * @ingroup Imageslider 
 */
@@ -867,9 +895,9 @@ elm_imageslider_item_append(Evas_Object * obj, const char * photo_file, Elm_Imag
 
 
 /** 
-* Prepend imageslider item 
+* Prepend Image Slider item 
 * 
-* @param 	obj          The imageslider object 
+* @param 	obj          The Image Slider object 
 * @param	photo_file   photo file path 
 * @param	func         callback function 
 * @param	data         callback data 
@@ -905,9 +933,9 @@ elm_imageslider_item_prepend(Evas_Object * obj, const char * photo_file, Elm_Ima
 
 
 /**
-* Delete imageslider item
+* Delete the selected Image Slider item
 *
-* @param it imageslider item handle
+* @param it		The selected Image Slider item handle
 *
 * @ingroup Imageslider
 */
@@ -937,10 +965,10 @@ elm_imageslider_item_del(Elm_Imageslider_Item * it)
 
 
 /**
-* Get selected item
+* Get the selected Image Slider item
 *
-* @param obj The imageslider object
-* @return The selected item or NULL
+* @param obj 		The Image Slider object
+* @return The selected Image Slider item or NULL
 *
 * @ingroup Imageslider
 */
@@ -960,9 +988,9 @@ elm_imageslider_selected_item_get(Evas_Object * obj)
 }
 
 /**
-* Get whether item is selected or not
+* Get whether an Image Slider item is selected or not
 *
-* @param it the item
+* @param it		 the selected Image Slider item
 * @return EINA_TRUE or EINA_FALSE
 *
 * @ingroup Imageslider
@@ -984,9 +1012,9 @@ elm_imageslider_item_selected_get(Elm_Imageslider_Item * it)
 }
 
 /**
-* Set selected item
+* Set the selected Image Slider item
 *
-* @param it the item
+* @param it 		The Imaga Slider item
 *
 * @ingroup Imageslider
 */
@@ -1023,9 +1051,9 @@ elm_imageslider_item_selected_set(Elm_Imageslider_Item * it)
 
 
 /**
-* Get photo file path of give item
+* Get the photo file path of given Image Slider item
 *
-* @param it item
+* @param it 		The Image Slider item
 * @return The photo file path or NULL;
 *
 * @ingroup Imageslider
@@ -1042,10 +1070,10 @@ elm_imageslider_item_photo_file_get(Elm_Imageslider_Item * it)
 
 
 /**
-* Get the previous imageslider item
+* Get the previous Image Slider item
 *
-* @param it 	item
-* @return The previous item or NULL
+* @param it 		The Image Slider item
+* @return The previous Image Slider item or NULL
 *
 * @ingroup Imageslider
 */
@@ -1073,10 +1101,10 @@ elm_imageslider_item_prev(Elm_Imageslider_Item * it)
 
 
 /**
-* Get the next imageslider item
+* Get the next Image Slider item
 *
-* @param it 	item
-* @return The next item or NULL
+* @param it 		The Image Slider item
+* @return The next Image Slider item or NULL
 *
 * @ingroup Imageslider
 */
@@ -1104,9 +1132,9 @@ elm_imageslider_item_next(Elm_Imageslider_Item * it)
 
 
 /**
-* Move to the previous imageslider item
+* Move to the previous Image Slider item
 *
-* @param obj imageslider object
+* @param obj 	The Image Slider object
 *
 * @ingroup Imageslider
 */
@@ -1127,9 +1155,9 @@ elm_imageslider_prev(Evas_Object * obj)
 
 
 /**
-* Move to the next imageslider item
+* Move to the next Image Slider item
 *
-* @param obj imageslider object
+* @param obj The Image Slider object
 *
 * @ingroup Imageslider
 */
