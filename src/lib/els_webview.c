@@ -667,6 +667,7 @@ _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
    DBG("%s is called\n", __func__);
    Smart_Data *sd = (Smart_Data *)esd;
    sd->mouse_up_copy = *ev;
+   sd->mouse_clicked = EINA_FALSE;
    if (sd->event_blocked == EINA_TRUE) return EINA_TRUE;
    if (sd->event_only == EINA_TRUE) goto forward_event;
 
@@ -683,7 +684,6 @@ _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
 	return EINA_TRUE;
      }
 
-   sd->mouse_clicked = EINA_FALSE;
    //TODO:check if use click input or textarea
 forward_event:
    //return _parent_sc.mouse_up(esd, ev);
