@@ -1874,7 +1874,7 @@ _smart_cb_unselect_closest_word(void* data, Evas_Object* webview, void* ev)
 
 // zoom
 static const int ZOOM_STEP_TRESHOLD = 20;
-static const float ZOOM_STEP_RATIO_STEP = 0.1f;
+static const float ZOOM_STEP_PER_PIXEL = 0.005f;
 
 #define ZOOM_FRAMERATE 60
 #define N_COSINE 18
@@ -1982,12 +1982,11 @@ _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance)
    //DBG("%s\n", __func__);
 
    int zoom_distance = distance - sd->zoom.finger_distance;
-   int new_level = zoom_distance / ZOOM_STEP_TRESHOLD;
 
-   if (new_level != sd->zoom.zooming_level)
+   if (zoom_distance != sd->zoom.zooming_level)
      {
-	sd->zoom.zooming_level = new_level;
-	float zoom_ratio = sd->zoom.zoom_rate_at_start + new_level * ZOOM_STEP_RATIO_STEP;
+	sd->zoom.zooming_level = zoom_distance;
+	float zoom_ratio = sd->zoom.zoom_rate_at_start + sd->zoom.zooming_level * ZOOM_STEP_PER_PIXEL;
 
 	if (zoom_ratio  < sd->zoom.min_zoom_rate)
 	  zoom_ratio = sd->zoom.min_zoom_rate;
