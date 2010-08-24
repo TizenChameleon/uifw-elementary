@@ -266,7 +266,7 @@ _elm_popup_add_button(Evas_Object *obj, const char *text, int response_id)
    Evas_Object *btn;
    
    if (!wd) return NULL;
-   Action_Area_Data *adata = ELM_NEW(sizeof(Action_Area_Data)); 
+   Action_Area_Data *adata = ELM_NEW(Action_Area_Data); 
    btn = elm_button_add(obj);
    snprintf(buf, sizeof(buf), "popup_button/%s", elm_widget_style_get(obj));
    elm_object_style_set(btn, buf);
