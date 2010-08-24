@@ -39,6 +39,31 @@
 #define MIN_ZOOM_RATIO 0.09f
 #define MAX_ZOOM_RATIO 4.0f
 
+//			"<!--<body bgcolor=#4c4c4c text=white text-align=left>-->"
+#define NOT_FOUND_PAGE_HEADER "<html>" \
+			"<head><title>Page Not Found</title></head>" \
+			"<body bgcolor=white text=black text-align=left>" \
+			"<center>" \
+			"<table>" \
+			"<tr><td><h1>Page Not Found<br/></td></tr>" \
+			"<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>" \
+			"<tr><td>" \
+			"<script type='text/javascript'>"\
+			"var s = "
+
+#define NOT_FOUND_PAGE_FOOTER ";" \
+			"var failingUrl = s.substring(s.indexOf(\"?\"\)+1, s.lastIndexOf(\"?\"\));" \
+			"document.write(\"<p><tr><td><h2>URL: \" + unescape(failingUrl) + \"</h2></td></tr>\");" \
+			"var errorDesc = s.substring(s.lastIndexOf(\"?\")+1, s.length);" \
+			"document.write(\"<tr><td><h2>Error: \" + unescape(errorDesc) + \"</h2></td></tr>\");" \
+			"document.write(\"<tr><td><h3>Google: <form method=\'get\' action=\'http://www.google.com/custom\'><input type=text name=\'q\' size=15 maxlength=100 value=\'\"+ unescape(failingUrl)+\"\'> <input type=submit name=\'sa\' value=Search></form></h3></td></tr>\");" \
+			"</script>" \
+			"</td></tr>" \
+			"</table>" \
+			"</h1>" \
+			"</body>" \
+			"</html>"
+
 #define NEED_TO_REMOVE
 
 typedef struct _Smart_Data Smart_Data;
@@ -72,6 +97,8 @@ struct _Smart_Data {
      void (*ewk_view_pre_render_cancel)(Evas_Object *);
      Eina_Bool (*ewk_view_enable_render)(const Evas_Object *);
      Eina_Bool (*ewk_view_disable_render)(const Evas_Object *);
+     void (*ewk_view_javascript_suspend)(Evas_Object *);
+     void (*ewk_view_javascript_resume)(Evas_Object *);
      void (*ewk_view_fixed_layout_size_set)(Evas_Object *, Evas_Coord, Evas_Coord);
      Eina_Bool (*ewk_view_setting_enable_plugins_get)(const Evas_Object *);
      void (*ewk_view_pause_and_or_hide_plugins)(Evas_Object *, Eina_Bool, Eina_Bool);
@@ -179,6 +206,7 @@ struct _Smart_Data {
      Eina_Bool on_zooming;
      Eina_Bool is_mobile_page;
 
+     Eina_Bool use_text_selection;
      Eina_Bool text_selection_on;
      struct {
 	  Evas_Coord_Rectangle front;
@@ -228,8 +256,8 @@ static void      _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_unselect_closest_word(void* data, Evas_Object* webview, void* ev);
-static void      _suspend_all(Smart_Data *sd);
-static void      _resume_all(Smart_Data *sd);
+static void      _suspend_all(Smart_Data *sd, Eina_Bool hidePlugin);
+static void      _resume_all(Smart_Data *sd, Eina_Bool hidePlugin);
 static void      _zoom_start(Smart_Data* sd, int centerX, int centerY, int distance);
 static void      _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance);
 static void      _zoom_stop(Smart_Data* sd);
@@ -603,40 +631,91 @@ forward_event:
 }
 
 static void
-_smart_add_console_message(Ewk_View_Smart_Data *sd, const char *message, unsigned int lineNumber, const char *sourceID)
+_smart_add_console_message(Ewk_View_Smart_Data *esd, const char *message, unsigned int lineNumber, const char *sourceID)
 {
    //TODO
 }
 
 static void
-_smart_run_javascript_alert(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message)
+_smart_run_javascript_alert(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message)
 {
-   //TODO
+   Evas_Object *popup;
+   popup = elm_popup_add(esd->self);
+   evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_popup_desc_set(popup, message);
+   elm_popup_buttons_add(popup, 1, "Ok", ELM_POPUP_RESPONSE_OK, NULL);
+   evas_object_show(popup);
 }
 
 static Eina_Bool
-_smart_run_javascript_confirm(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message)
+_smart_run_javascript_confirm(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message)
 {
-   //TODO
+   Evas_Object *popup;
+   popup = elm_popup_add(esd->self);
+   evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_popup_desc_set(popup, message);
+   elm_popup_buttons_add(popup, 2, "Ok", ELM_POPUP_RESPONSE_OK, "Cancel", ELM_POPUP_RESPONSE_CANCEL, NULL);
+
+   int ret = elm_popup_run(popup);
+   evas_object_del(popup);
+   switch (ret)
+     {
+      case ELM_POPUP_RESPONSE_OK:
+	 return EINA_TRUE;
+      case ELM_POPUP_RESPONSE_CANCEL:
+	 return EINA_FALSE;
+      default:
+	 elm_exit();
+     }
    return EINA_FALSE;
 }
 
 static Eina_Bool
-_smart_run_javascript_prompt(Ewk_View_Smart_Data *sd, Evas_Object *frame, const char *message, const char *defaultValue, char **value)
+_smart_run_javascript_prompt(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message, const char *defaultValue, char **value)
 {
-   //TODO
+   //FIXME: it's not work
+   Evas_Object *popup;
+   Evas_Object *box, *entry, *label;
+
+   popup = elm_popup_add(esd->self);
+   elm_object_style_set(popup, "customstyle");
+   evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_popup_buttons_add(popup, 2, "Ok", ELM_POPUP_RESPONSE_OK, "Cancel", ELM_POPUP_RESPONSE_CANCEL, NULL);
+
+   box = elm_box_add(popup);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_fill_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(box);
+
+   label = elm_label_add(box);
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_label_label_set(label, message);
+   elm_box_pack_start(box, label);
+   evas_object_show(label);
+
+   entry = elm_entry_add(box);
+   evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_entry_single_line_set(entry, EINA_TRUE);
+   elm_entry_entry_set(entry, defaultValue);
+   elm_box_pack_end(box, entry);
+   evas_object_show(entry);
+
+   int ret = elm_popup_run(popup);
+   *value = strdup("temp");
+   evas_object_del(popup);
+
    return EINA_FALSE;
 }
 
 static Eina_Bool
-_smart_should_interrupt_javascript(Ewk_View_Smart_Data *sd)
+_smart_should_interrupt_javascript(Ewk_View_Smart_Data *esd)
 {
    //TODO
    return EINA_FALSE;
 }
 
 static Eina_Bool 
-_smart_run_open_panel(Ewk_View_Smart_Data *sd, Evas_Object *frame, Eina_Bool allows_multiple_files, const Eina_List *suggested_filenames, Eina_List **selected_filenames)
+_smart_run_open_panel(Ewk_View_Smart_Data *esd, Evas_Object *frame, Eina_Bool allows_multiple_files, const Eina_List *suggested_filenames, Eina_List **selected_filenames)
 {
    //TODO
    return EINA_FALSE;
@@ -645,7 +724,6 @@ _smart_run_open_panel(Ewk_View_Smart_Data *sd, Evas_Object *frame, Eina_Bool all
 static Eina_Bool
 _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_Request *request)
 {
-   printf("%s \n", __func__);
    char *protocol_hack;
    Smart_Data *sd = (Smart_Data*)esd;
    if (!sd->mime_func_hash)
@@ -761,6 +839,7 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
 {
    DBG("%s is called\n", __func__);
    Smart_Data* sd = (Smart_Data *)data;
+   char szBuffer[2048];
    if (!sd) return;
 
    // if error, call loadNotFoundPage
@@ -768,10 +847,10 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
    int errorCode = (error)? error->code: 0;
    if ( errorCode != 0 && errorCode != -999 )
      { // 0 ok, -999 request cancelled
-	char szStrBuffer[1024];
-	snprintf(szStrBuffer, 1024, "page not found:, [code: %d] [domain: %s] [description: %s] [failing_url: %s] \n",
-	      error->code, error->domain, error->description, error->failing_url);
-	DBG(szStrBuffer);
+	//char szStrBuffer[1024];
+	//snprintf(szStrBuffer, 1024, "page not found:, [code: %d] [domain: %s] [description: %s] [failing_url: %s] \n",
+	//      error->code, error->domain, error->description, error->failing_url);
+	//DBG(szStrBuffer);
 
 	//ecore_job_add(loadNotFoundPage, (void *)this);
 	if (!sd->ewk_view_stop)
@@ -783,7 +862,10 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
 
 	if (!sd->ewk_frame_contents_set)
 	  sd->ewk_frame_contents_set = (Eina_Bool (*)(Evas_Object *, const char *, size_t, const char *, const char *, const char *))dlsym(ewk_handle, "ewk_frame_contents_set");
-	sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szStrBuffer, 0, NULL, NULL, NULL);
+
+	snprintf(szBuffer, 2048, NOT_FOUND_PAGE_HEADER "\"?%s?%s\"" NOT_FOUND_PAGE_FOOTER, error->failing_url, error->description);
+	//sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szStrBuffer, 0, NULL, NULL, NULL);
+	sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szBuffer, 0, NULL, NULL, NULL);
 	return;
      }
 }
@@ -955,6 +1037,7 @@ _smart_add(Evas_Object* obj)
    sd->dropdown.option_cnt = 0;
    sd->animator = NULL;
    sd->event_only = EINA_FALSE;
+   sd->use_text_selection = EINA_FALSE;
    sd->text_selection_on = EINA_FALSE;
    sd->events_feed = EINA_FALSE;
    sd->event_blocked = EINA_TRUE;
@@ -1186,7 +1269,7 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
    if (!sd) return;
    //Evas_Point* point = (Evas_Point*)ev;
 
-   if (sd->text_selection_on == EINA_TRUE) return;
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE) return;
 
    evas_object_focus_set(webview, EINA_TRUE);
    if (!sd->ewk_view_frame_main_get)
@@ -1317,7 +1400,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
 	  }
      }
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	_smart_cb_unselect_closest_word(sd, webview, NULL);
 	return;
@@ -1337,22 +1420,13 @@ _smart_cb_pan_start(void* data, Evas_Object* webview, void* ev)
    sd->pan_s = *point;
    sd->on_panning = EINA_TRUE;
 
-   if (sd->tiled)
-     {
-	if (!sd->ewk_view_pre_render_cancel)
-	  sd->ewk_view_pre_render_cancel = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_pre_render_cancel");
-	sd->ewk_view_pre_render_cancel(webview);
-     }
-
-   if (!sd->ewk_view_suspend_request)
-     sd->ewk_view_suspend_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_suspend_request");
-   sd->ewk_view_suspend_request(webview); // suspend network loading
-
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (_text_selection_handle_pressed(sd, point->x, point->y))
 	  _elm_smart_touch_is_one_drag_mode_enable(sd->touch_obj, EINA_FALSE);
      }
+
+   _suspend_all(sd, EINA_FALSE);
 
    sd->locked_dx = 0;
    sd->locked_dy = 0;
@@ -1368,7 +1442,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 
    if (sd->on_panning == EINA_FALSE) return;
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (sd->text_selection.front_handle_moving == EINA_TRUE
 	      || sd->text_selection.back_handle_moving == EINA_TRUE)
@@ -1518,7 +1592,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    int new_x, new_y;
    sd->ewk_frame_scroll_pos_get(sd->ewk_view_frame_main_get(webview), &new_x, &new_y);
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_move_by(sd, old_x - new_x, old_y - new_y);
 
    if (!sd->bounce_horiz &&
@@ -1547,7 +1621,9 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
    Evas_Point* point = (Evas_Point*)ev;
    sd->on_panning = EINA_FALSE;
 
-   if (sd->text_selection_on == EINA_TRUE)
+   _resume_all(sd, EINA_FALSE);
+
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (sd->text_selection.front_handle_moving == EINA_TRUE
 	      || sd->text_selection.back_handle_moving == EINA_TRUE)
@@ -1578,10 +1654,6 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	      (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
      }
 
-   if (!sd->ewk_view_resume_request)
-     sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
-   sd->ewk_view_resume_request(webview); // resume network loading
-
    if (!sd->bounce_horiz && elm_widget_drag_lock_x_get(sd->widget))
      {
 	DBG("==============<< widget x unlock >>\n");
@@ -1602,6 +1674,8 @@ _smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
    Evas_Point* point = (Evas_Point*)ev;
+
+   if (sd->use_text_selection == EINA_FALSE) return;
 
    int x, y;
    _coords_evas_to_ewk(webview, point->x, point->y, &x, &y);
@@ -1631,7 +1705,7 @@ _smart_cb_unselect_closest_word(void* data, Evas_Object* webview, void* ev)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	_text_selection_hide(sd);
 	if (!sd->ewk_view_select_none)
@@ -1657,22 +1731,31 @@ static int smart_zoom_index = N_COSINE - 1;
 #define INPUT_ZOOM_RATIO 2.5
 
 static void
-_suspend_all(Smart_Data *sd)
+_suspend_all(Smart_Data *sd, Eina_Bool hidePlugin)
 {
    Evas_Object *webview = sd->base.self;
 
+   // javascript suspend
+   if (!sd->ewk_view_javascript_suspend)
+     sd->ewk_view_javascript_suspend = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_javascript_suspend");
+   sd->ewk_view_javascript_suspend(webview);
+
+   // render suspend
    if (!sd->ewk_view_disable_render)
      sd->ewk_view_disable_render = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_disable_render");
    sd->ewk_view_disable_render(webview);
 
+   // plugin suspend
    if (!sd->ewk_view_setting_enable_plugins_get)
      sd->ewk_view_setting_enable_plugins_get = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_setting_enable_plugins_get");
    if (sd->ewk_view_setting_enable_plugins_get(webview))
      {
 	if (!sd->ewk_view_pause_and_or_hide_plugins)
 	  sd->ewk_view_pause_and_or_hide_plugins = (void (*)(Evas_Object *, Eina_Bool, Eina_Bool))dlsym(ewk_handle, "ewk_view_pause_and_or_hide_plugins");
-	sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, EINA_TRUE);
+	sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, hidePlugin);
      }
+
+   // cancel pre-render
    if (sd->tiled)
      {
 	if (!sd->ewk_view_pre_render_cancel)
@@ -1680,6 +1763,7 @@ _suspend_all(Smart_Data *sd)
 	sd->ewk_view_pre_render_cancel(webview);
      }
 
+   // network suspend
    if (!sd->ewk_view_suspend_request)
      sd->ewk_view_suspend_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_suspend_request");
    sd->ewk_view_suspend_request(webview); // suspend network loading
@@ -1687,20 +1771,29 @@ _suspend_all(Smart_Data *sd)
 }
 
 static void
-_resume_all(Smart_Data *sd)
+_resume_all(Smart_Data *sd, Eina_Bool hidePlugin)
 {
    Evas_Object *webview = sd->base.self;
 
+   // js resume
+   if (!sd->ewk_view_javascript_resume)
+     sd->ewk_view_javascript_resume = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_javascript_resume");
+   sd->ewk_view_javascript_resume(webview);
+
+   // render resume
    if (sd->tiled)
      {
 	if (!sd->ewk_view_enable_render)
 	  sd->ewk_view_enable_render = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_enable_render");
 	sd->ewk_view_enable_render(webview);
      }
+
+   // plugin resume
    if (!sd->ewk_view_pause_and_or_hide_plugins)
      sd->ewk_view_pause_and_or_hide_plugins = (void (*)(Evas_Object *, Eina_Bool, Eina_Bool))dlsym(ewk_handle, "ewk_view_pause_and_or_hide_plugins");
-   sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, EINA_TRUE);
+   sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, hidePlugin);
 
+   // network resume
    if (!sd->ewk_view_resume_request)
      sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
    sd->ewk_view_resume_request(webview);
@@ -1719,9 +1812,9 @@ _zoom_start(Smart_Data* sd, int centerX, int centerY, int distance)
      sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
    sd->zoom.zoom_rate_at_start = sd->ewk_view_zoom_get(sd->base.self);
 
-   _suspend_all(sd);
+   _suspend_all(sd, EINA_TRUE);
 
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_hide(sd);
 }
 
@@ -1763,6 +1856,8 @@ _zoom_stop(Smart_Data* sd)
      sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
    sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zooming_rate, sd->zoom.basis.x, sd->zoom.basis.y);
 
+   _resume_all(sd, EINA_FALSE);
+
    if (sd->tiled)
      {
 	if (!sd->ewk_view_tiled_unused_cache_get)
@@ -1774,9 +1869,7 @@ _zoom_stop(Smart_Data* sd)
 	_directional_pre_render(sd->base.self, 0, 0);
      }
 
-   _resume_all(sd);
-
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (!sd->ewk_view_frame_main_get)
 	  sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
@@ -1865,9 +1958,9 @@ _smart_zoom_animator(void* data)
 
 	_elm_smart_touch_start(sd->touch_obj);
 
-	_resume_all(sd);
+	_resume_all(sd, EINA_FALSE);
 
-	if (sd->text_selection_on == EINA_TRUE)
+	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
 	     if (!sd->ewk_frame_selection_handlers_get)
 	       sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
@@ -2102,14 +2195,14 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    sd->zoom.zoom_rate_to_set = zoom_rate;
    smart_zoom_index = N_COSINE - 1;
 
-   _suspend_all(sd);
+   _suspend_all(sd, EINA_TRUE);
 
    // run animator
    ecore_animator_frametime_set(1.0 / ZOOM_FRAMERATE);
    sd->smart_zoom_animator = ecore_animator_add(_smart_zoom_animator, sd);
 
    // hide textSelection handlers during zooming
-   if (sd->text_selection_on == EINA_TRUE)
+   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_hide(sd);
 }
 
@@ -2166,7 +2259,7 @@ _zoom_to_rect(Smart_Data *sd, int x, int y)
 	sd->zoom.scroll_to_set.y = sd->zoom.scroll_at_start.y + (from_y - to_y);
 	smart_zoom_index = N_COSINE - 1;
 
-	_suspend_all(sd);
+	_suspend_all(sd, EINA_TRUE);
 
 	// run animator
 	ecore_animator_frametime_set(1.0 / ZOOM_FRAMERATE);
