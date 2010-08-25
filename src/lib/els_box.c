@@ -5,7 +5,7 @@ static void
 _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int extended)
 {
 	Evas_Coord minw, minh, maxw, maxh, mnw, mnh, ww;
-	Evas_Coord w, h, cal_w = 0, cal_h = 0, cur_line_max_h = 0;
+	Evas_Coord w, h, cw = 0, ch = 0, cmaxh = 0, sumw = 0;
 	const Eina_List *l;
 	Evas_Object_Box_Option *opt;
     double wx;
@@ -34,7 +34,6 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
 		if (horizontal && extended)
 		{
 			evas_object_geometry_get(box, NULL, NULL, &w, &h);
-			minw = w;
 		}
 
 		EINA_LIST_FOREACH(priv->children, l, opt)
@@ -48,22 +47,27 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
 				{
 					if(wx)
 					{
-					   if (mnw != -1 && (w - cal_w) >= mnw)
-						   ww = w - cal_w;
+					   if (mnw != -1 && (w - cw) >= mnw)
+						   ww = w - cw;
 					   else
 						   ww = w;
 					}
 					else
 						ww = mnw;
 
-					if ((cal_w + mnw) > w)
+					if ((cw + mnw) > w)
 					{
-						minh += cur_line_max_h;
-						cal_w = 0;
-						cur_line_max_h = 0;
+						minh += cmaxh;
+						if (sumw > minw) minw = sumw;
+
+						cw = 0;
+						cmaxh = 0;
+						sumw = 0;
 					}
-					cal_w += ww;
-					if (cur_line_max_h < mnh) cur_line_max_h = mnh;
+					cw += ww;
+					if (cmaxh < mnh) cmaxh = mnh;
+
+					sumw += mnw;
 				}
 				else
 				{
@@ -80,7 +84,8 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
 
 		if(horizontal && extended)
 		{
-			minh += cur_line_max_h;
+			minh += cmaxh;
+			if (sumw > minw) minw = sumw;
 		}
 
 	}
@@ -91,7 +96,7 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
 static Evas_Coord
 _smart_extents_calculate_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj_index)
 {
-	Evas_Coord mnw, mnh, cal_w = 0, cur_line_max_h = 0, w, ww;
+	Evas_Coord mnw, mnh, cw = 0, cmaxh = 0, w, ww;
 	const Eina_List *l;
 	Evas_Object_Box_Option *opt;
 	int index = 0;
@@ -106,31 +111,31 @@ _smart_extents_calculate_max_height(Evas_Object *box, Evas_Object_Box_Data *priv
 
 		if(wx)
 		{
-			if (mnw != -1 && (w - cal_w) >= mnw)
-				ww = w - cal_w;
+			if (mnw != -1 && (w - cw) >= mnw)
+				ww = w - cw;
 			else
 				ww = w;
 		}
 		else
 			ww = mnw;
 
-		if ((cal_w + ww) > w)
+		if ((cw + ww) > w)
 		{
 			if (index > obj_index )
 			{
-				return cur_line_max_h;
+				return cmaxh;
 			}
-			cal_w = 0;
-			cur_line_max_h = 0;
+			cw = 0;
+			cmaxh = 0;
 		}
 
-		cal_w += ww;
-		if (cur_line_max_h < mnh) cur_line_max_h = mnh;
+		cw += ww;
+		if (cmaxh < mnh) cmaxh = mnh;
 
 		index++;
 	}
 	
-	return cur_line_max_h;
+	return cmaxh;
 }
 
 
@@ -201,7 +206,7 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
    xx = x;
    yy = y;
 
-   Evas_Coord cal_w = 0, cal_h = 0, cur_line_max_h = 0, obj_index = 0;
+   Evas_Coord cw = 0, ch = 0, cmaxh = 0, obj_index = 0;
 
    EINA_LIST_FOREACH(priv->children, l, opt)
      {
@@ -249,8 +254,8 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
 				   Evas_Coord ww, hh, ow, oh;
 				   if(wx)
 				   {
-					   if (mnw != -1 && (w - cal_w) >= mnw)
-						   ww = w - cal_w;
+					   if (mnw != -1 && (w - cw) >= mnw)
+						   ww = w - cw;
 					   else
 						   ww = w;
 				   }
@@ -265,21 +270,21 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
 				   if (fh) oh = hh;
 				   if ((mxh >= 0) && (mxh < oh)) oh = mxh;
 
-				   if ((cal_w + ww) > w)
+				   if ((cw + ww) > w)
 				   {
-					   cal_h += cur_line_max_h;
+					   ch += cmaxh;
 
-					   cal_w = 0;
-					   cur_line_max_h = 0;
+					   cw = 0;
+					   cmaxh = 0;
 				   }
 
 				   evas_object_move(obj,
-						   xx + cal_w + (Evas_Coord)(((double)(ww - ow)) * ax),
-						   yy + cal_h + (Evas_Coord)(((double)(hh - oh)) * ay));
+						   xx + cw + (Evas_Coord)(((double)(ww - ow)) * ax),
+						   yy + ch + (Evas_Coord)(((double)(hh - oh)) * ay));
 				   evas_object_resize(obj, ow, oh);
 
-				   cal_w += ww;
-				   if (cur_line_max_h < hh) cur_line_max_h = hh;
+				   cw += ww;
+				   if (cmaxh < hh) cmaxh = hh;
 			   }
 			   else
 			   {
