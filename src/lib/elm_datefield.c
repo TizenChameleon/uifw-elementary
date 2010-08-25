@@ -100,7 +100,7 @@ _theme_hook(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int i;
 	if (!wd || !wd->base) return;
-	
+
 	if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
 	{
 		_elm_theme_object_set(obj, wd->base, "datefield", "dateandtime", elm_widget_style_get(obj));
@@ -131,12 +131,6 @@ _theme_hook(Evas_Object *obj)
 		edje_object_part_swallow(wd->base, "elm.swallow.date.month", wd->date[DATE_MON]);
 		edje_object_part_swallow(wd->base, "elm.swallow.date.day", wd->date[DATE_DAY]);
 		edje_object_part_text_set(wd->base, "elm.text.date.comma", ",");	
-
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.left.pad", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.year.over", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.month.over", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.day.over", _signal_rect_mouse_down, obj);	
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.right.pad", _signal_rect_mouse_down, obj);
 	}
 	
 	if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
@@ -144,11 +138,6 @@ _theme_hook(Evas_Object *obj)
 		edje_object_part_swallow(wd->base, "elm.swallow.time.hour", wd->time[TIME_HOUR]);
 		edje_object_part_swallow(wd->base, "elm.swallow.time.min", wd->time[TIME_MIN]);
 		edje_object_part_text_set(wd->base, "elm.text.colon", ":");
-		
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.hour.over", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.min.over", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.ampm.over", _signal_ampm_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "elm.rect.time.ampm.over", _signal_ampm_clicked, obj);
 	}
 
 	edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
@@ -189,15 +178,21 @@ _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const c
 	Widget_Data *wd = elm_widget_data_get(data);
 	if (!wd || !wd->base) return ;	
 
+	printf("[%s][%d]\n", __FUNCTION__, __LINE__);
+
 	wd->pm = !wd->pm;
 
 	if (wd->pm)
 	{
+	printf("[%s][%d]\n", __FUNCTION__, __LINE__);
+
 		edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
 		wd->hour += HOUR_12H_MAXIMUM;
 	}
 	else
 	{
+	printf("[%s][%d]\n", __FUNCTION__, __LINE__);
+
 		edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");
 		wd->hour -= HOUR_12H_MAXIMUM;
 	}
@@ -582,6 +577,16 @@ elm_datefield_add(Evas_Object *parent)
 
 	wd->base = edje_object_add(e);
 	elm_widget_resize_object_set(obj, wd->base);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.left.pad", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.year.over", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.month.over", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.day.over", _signal_rect_mouse_down, obj);	
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.right.pad", _signal_rect_mouse_down, obj);
+
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.hour.over", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.min.over", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.ampm.over", _signal_ampm_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "elm.rect.time.ampm.over", _signal_ampm_clicked, obj);
 
 	wd->handler =  ecore_event_handler_add(ECORE_IMF_EVENT_COMMIT, _imf_event_commit_cb, obj);
 	_date_entry_add(obj);
@@ -597,7 +602,7 @@ elm_datefield_add(Evas_Object *parent)
 	wd->time_mode = EINA_TRUE;
 	
 	_theme_hook(obj);
-
+	
    	return obj;
 }
 
