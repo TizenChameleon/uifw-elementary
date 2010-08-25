@@ -1411,6 +1411,7 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
    DBG("%s\n", __func__);
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
+   if (sd->events_feed == EINA_TRUE) return;
    //Evas_Point* point = (Evas_Point*)ev;
 
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE) return;
@@ -1447,6 +1448,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
    DBG("%s\n", __func__);
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
+   if (sd->events_feed == EINA_TRUE) return;
 
    Evas_Point* point = (Evas_Point*)ev;
    DBG(" argument : (%d, %d)\n", point->x, point->y);
@@ -1558,6 +1560,8 @@ _smart_cb_pan_start(void* data, Evas_Object* webview, void* ev)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
    Evas_Point* point = (Evas_Point*)ev;
+
+   if (sd->events_feed == EINA_TRUE) return;
 
    sd->pan_s = *point;
    sd->on_panning = EINA_TRUE;
@@ -1738,6 +1742,8 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
    DBG("%s\n", __func__);
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
+   if (sd->events_feed == EINA_TRUE) return;
+
    Evas_Point* point = (Evas_Point*)ev;
    sd->on_panning = EINA_FALSE;
 
@@ -1793,6 +1799,8 @@ _smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev)
    DBG("%s\n", __func__);
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
+   if (sd->events_feed == EINA_TRUE) return;
+
    Evas_Point* point = (Evas_Point*)ev;
 
    if (sd->use_text_selection == EINA_FALSE) return;
