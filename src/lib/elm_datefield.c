@@ -150,8 +150,10 @@ _theme_hook(Evas_Object *obj)
 		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.ampm.over", _signal_ampm_mouse_down, obj);
 		edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "elm.rect.time.ampm.over", _signal_ampm_clicked, obj);
 	}
-	
-	_date_update(obj);
+
+	edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
+ 	
+	_date_update(obj);	
 	_sizing_eval(obj);
 }
 
@@ -577,7 +579,7 @@ elm_datefield_add(Evas_Object *parent)
 	elm_widget_theme_hook_set(obj, _theme_hook);
 	elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
 	elm_widget_can_focus_set(obj, EINA_TRUE);
-	
+
 	wd->base = edje_object_add(e);
 	elm_widget_resize_object_set(obj, wd->base);
 

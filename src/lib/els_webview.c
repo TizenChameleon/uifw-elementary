@@ -1259,6 +1259,13 @@ _smart_del(Evas_Object* obj)
 	evas_object_del(sd->minimap.eo);
 	sd->minimap.eo = NULL;
      }
+
+   if (sd->minimap.content != NULL)
+     {
+	evas_object_del(sd->minimap.content);
+	sd->minimap.content = NULL;
+     }
+
    _parent_sc.sc.del(obj);
 }
 
