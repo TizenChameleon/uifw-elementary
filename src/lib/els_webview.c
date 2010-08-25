@@ -79,6 +79,7 @@ struct _Smart_Data {
      int locked_dy;
      unsigned char bounce_horiz : 1;
      unsigned char bounce_vert : 1;
+     unsigned char events_feed : 1;
      unsigned char auto_fitting : 1;
      unsigned char mouse_clicked : 1;
 
@@ -200,14 +201,9 @@ struct _Smart_Data {
      Evas_Event_Mouse_Up mouse_up_copy;
 
      cairo_surface_t* thumbnail;
-     Ecore_Animator* animator;
-     int hold_counter;
      float current_zoom_level;
 
      Eina_Bool tiled;
-     Eina_Bool events_feed;
-     Eina_Bool event_blocked;
-     Eina_Bool event_only;
      Eina_Bool on_panning;
      Eina_Bool on_zooming;
      Eina_Bool is_mobile_page;
@@ -657,8 +653,8 @@ _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev)
    sd->mouse_down_copy = *ev;
    sd->mouse_clicked = EINA_TRUE;
 
-   return EINA_TRUE;
-   //return _parent_sc.mouse_down(esd, ev);
+   if (sd->events_feed) _parent_sc.mouse_down(esd, ev);
+   else return EINA_TRUE;
 }
 
 static Eina_Bool
@@ -668,40 +664,27 @@ _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
    Smart_Data *sd = (Smart_Data *)esd;
    sd->mouse_up_copy = *ev;
    sd->mouse_clicked = EINA_FALSE;
-   if (sd->event_blocked == EINA_TRUE) return EINA_TRUE;
-   if (sd->event_only == EINA_TRUE) goto forward_event;
 
-   if (sd->animator != NULL)
+   if (sd->events_feed)
      {
-	ecore_animator_del(sd->animator);
-	sd->animator = NULL;
-     }
-   sd->hold_counter = 0;
+	//check if user hold touch
+	if (ev && (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD))
+	  {
+	     return EINA_TRUE;
+	  }
 
-   //check if user hold touch
-   if (ev && (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD))
-     {
-	return EINA_TRUE;
+	_parent_sc.mouse_up(esd, ev);
      }
-
-   //TODO:check if use click input or textarea
-forward_event:
-   //return _parent_sc.mouse_up(esd, ev);
-   _smart_cb_mouse_up(NULL, esd->self, (void*)&ev->output);
-   return EINA_TRUE;
+   else
+     return EINA_TRUE;
 }
 
 static Eina_Bool
 _smart_mouse_move(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Move* ev)
 {
-   //DBG("%s is called\n", __func__);
    Smart_Data *sd = (Smart_Data *)esd;
-   if (sd->event_blocked == EINA_TRUE) return EINA_TRUE;
-   if (sd->event_only == EINA_TRUE) goto forward_event;
-
-   return EINA_TRUE;
-forward_event:
-   return _parent_sc.mouse_move(esd, ev);
+   if (sd->events_feed) _parent_sc.mouse_move(esd, ev);
+   else return EINA_TRUE;
 }
 
 static void
@@ -1192,12 +1175,9 @@ _smart_add(Evas_Object* obj)
    sd->minimap.eo = NULL;
    sd->dropdown.options = NULL;
    sd->dropdown.option_cnt = 0;
-   sd->animator = NULL;
-   sd->event_only = EINA_FALSE;
    sd->use_text_selection = EINA_FALSE;
    sd->text_selection_on = EINA_FALSE;
    sd->events_feed = EINA_FALSE;
-   sd->event_blocked = EINA_TRUE;
    sd->touch_obj = _elm_smart_touch_add(evas_object_evas_get(obj));
    sd->layout.default_w = DEFAULT_LAYOUT_WIDTH;
 
@@ -1455,12 +1435,10 @@ _smart_cb_mouse_up(void* data, Evas_Object* webview, void* ev)
    DBG("%s\n", __func__);
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
+   if (sd->events_feed == EINA_TRUE) return;
 
    Evas_Point* point = (Evas_Point*)ev;
    DBG(" argument : (%d, %d)\n", point->x, point->y);
-
-   if (sd->events_feed == EINA_TRUE)
-     _parent_sc.mouse_up((Ewk_View_Smart_Data*)sd, &sd->mouse_up_copy);
 }
 
 static void
@@ -1604,6 +1582,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    if (!sd) return;
    Evas_Point* point = (Evas_Point*)ev;
 
+   if (sd->events_feed == EINA_TRUE) return;
    if (sd->on_panning == EINA_FALSE) return;
 
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
@@ -1614,29 +1593,6 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 	     _text_selection_update_position(sd, point->x, point->y);
 	     return;
 	  }
-     }
-
-   if (sd->events_feed == EINA_TRUE)
-     {
-	Evas* evas = evas_object_evas_get(webview);
-	Evas_Modifier *modifiers = (Evas_Modifier *)evas_key_modifier_get(evas);
-	Evas_Lock *locks = (Evas_Lock *)evas_key_lock_get(evas);
-
-	Evas_Event_Mouse_Move event_move;
-	event_move.buttons = 1;
-	event_move.cur.output.x = point->x;
-	event_move.cur.output.y = point->y;
-	event_move.cur.canvas.x = point->x;
-	event_move.cur.canvas.y = point->y;
-	event_move.data = NULL;
-	event_move.modifiers = modifiers;
-	event_move.locks = locks;
-	event_move.timestamp = ecore_loop_time_get();
-	event_move.event_flags = EVAS_EVENT_FLAG_NONE;
-	event_move.dev = NULL;
-
-	_parent_sc.mouse_move((Ewk_View_Smart_Data*)sd, &event_move);
-	return;
      }
 
    if (!sd->ewk_frame_scroll_pos_get)
@@ -2286,22 +2242,10 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    if (!sd) return;
    Evas_Point* point = (Evas_Point*)event_info;
 
+   if (sd->events_feed == EINA_TRUE) return;
+
    if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-
-   // feed double tap
-   if (sd->events_feed == EINA_TRUE)
-     {
-	Evas_Event_Mouse_Down mouse_double_down = sd->mouse_down_copy;
-	mouse_double_down.flags |= EVAS_BUTTON_DOUBLE_CLICK;
-	if (!sd->ewk_frame_feed_mouse_down)
-	  sd->ewk_frame_feed_mouse_down = (Eina_Bool (*)(Evas_Object *, const Evas_Event_Mouse_Down *))dlsym(ewk_handle, "ewk_frame_feed_mouse_down");
-	if (!sd->ewk_frame_feed_mouse_up)
-	  sd->ewk_frame_feed_mouse_up = (Eina_Bool (*)(Evas_Object *, const Evas_Event_Mouse_Up *))dlsym(ewk_handle, "ewk_frame_feed_mouse_up");
-	sd->ewk_frame_feed_mouse_down(sd->ewk_view_frame_main_get(sd->base.self), &mouse_double_down);
-	sd->ewk_frame_feed_mouse_up(sd->ewk_view_frame_main_get(sd->base.self), &sd->mouse_up_copy);
-	return;
-     }
 
    _elm_smart_touch_stop(sd->touch_obj);
 
