@@ -100,7 +100,7 @@ _theme_hook(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int i;
 	if (!wd || !wd->base) return;
-	
+
 	if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
 	{
 		_elm_theme_object_set(obj, wd->base, "datefield", "dateandtime", elm_widget_style_get(obj));
@@ -131,12 +131,6 @@ _theme_hook(Evas_Object *obj)
 		edje_object_part_swallow(wd->base, "elm.swallow.date.month", wd->date[DATE_MON]);
 		edje_object_part_swallow(wd->base, "elm.swallow.date.day", wd->date[DATE_DAY]);
 		edje_object_part_text_set(wd->base, "elm.text.date.comma", ",");	
-
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.left.pad", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.year.over", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.month.over", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.day.over", _signal_rect_mouse_down, obj);	
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.right.pad", _signal_rect_mouse_down, obj);
 	}
 	
 	if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
@@ -144,11 +138,6 @@ _theme_hook(Evas_Object *obj)
 		edje_object_part_swallow(wd->base, "elm.swallow.time.hour", wd->time[TIME_HOUR]);
 		edje_object_part_swallow(wd->base, "elm.swallow.time.min", wd->time[TIME_MIN]);
 		edje_object_part_text_set(wd->base, "elm.text.colon", ":");
-		
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.hour.over", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.min.over", _signal_rect_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.ampm.over", _signal_ampm_mouse_down, obj);
-		edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "elm.rect.time.ampm.over", _signal_ampm_clicked, obj);
 	}
 
 	edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
@@ -516,7 +505,14 @@ _date_entry_add(Evas_Object *obj)
 	{
 		wd->date[i] = elm_entry_add(obj);
 		elm_entry_context_menu_disabled_set(wd->date[i], EINA_TRUE);
-		elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_NUMBER);
+        if (i == DATE_MON)
+        {
+		    elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_MONTH);
+        }
+        else
+        {
+            elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);
+        }
 		evas_object_size_hint_weight_set(wd->date[i], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->date[i], EVAS_HINT_FILL, EVAS_HINT_FILL);
     		evas_object_smart_callback_add(wd->date[i], "focused", _entry_focused_cb, obj);
@@ -542,7 +538,7 @@ _time_entry_add(Evas_Object *obj)
 	{
 		wd->time[i] = elm_entry_add(obj);
 		elm_entry_context_menu_disabled_set(wd->time[i], EINA_TRUE);
-		elm_entry_input_panel_layout_set(wd->time[i], ELM_INPUT_PANEL_LAYOUT_NUMBER);		
+		elm_entry_input_panel_layout_set(wd->time[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);		
 		elm_entry_maximum_bytes_set(wd->time[i], TIME_MAX_LENGTH);
 		evas_object_size_hint_weight_set(wd->time[i], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->time[i], EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -582,6 +578,16 @@ elm_datefield_add(Evas_Object *parent)
 
 	wd->base = edje_object_add(e);
 	elm_widget_resize_object_set(obj, wd->base);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.left.pad", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.year.over", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.month.over", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.day.over", _signal_rect_mouse_down, obj);	
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.right.pad", _signal_rect_mouse_down, obj);
+
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.hour.over", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.min.over", _signal_rect_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.ampm.over", _signal_ampm_mouse_down, obj);
+	edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "elm.rect.time.ampm.over", _signal_ampm_clicked, obj);
 
 	wd->handler =  ecore_event_handler_add(ECORE_IMF_EVENT_COMMIT, _imf_event_commit_cb, obj);
 	_date_entry_add(obj);
@@ -597,7 +603,7 @@ elm_datefield_add(Evas_Object *parent)
 	wd->time_mode = EINA_TRUE;
 	
 	_theme_hook(obj);
-
+	
    	return obj;
 }
 

@@ -243,7 +243,7 @@ _elm_smart_touch_child_set(Evas_Object *obj, Evas_Object *child)
 
 	_smart_enter_none(sd);
 
-	sd->is_one_drag_mode = EINA_TRUE;
+	sd->is_one_drag_mode = EINA_FALSE;
      }
 
    evas_object_smart_callback_call(sd->smart_obj, "changed", NULL);
@@ -726,7 +726,8 @@ _smart_animation_flick(void *data)
 	if (dx == 0 && dy == 0)
 	  {
 	     _smart_stop_animator_flick(sd);
-	     _smart_enter_none(sd);
+	     if (sd->state == TOUCH_STATE_DRAG)
+	       _smart_enter_none(sd);
 	     return ECORE_CALLBACK_CANCEL;
 	  }
 	else
