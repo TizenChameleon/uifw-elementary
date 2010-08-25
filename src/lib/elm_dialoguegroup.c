@@ -195,12 +195,11 @@ static Dialogue_Item* _create_item(Evas_Object *obj, Evas_Object *subobj, Elm_Di
 //	item->line_show = EINA_TRUE;
 	eina_stringshare_replace(&item->location, location);
 	
-	item->bg_layout = elm_layout_add(wd->parent);
+	item->bg_layout = elm_layout_add(wd->box);
 	_set_item_theme(item, location);
 	evas_object_size_hint_weight_set(item->bg_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_size_hint_align_set(item->bg_layout, EVAS_HINT_FILL, 0.0);
 	evas_object_show(item->bg_layout);	
-	elm_widget_sub_object_add(obj, item->bg_layout);
 
 	elm_layout_content_set(item->bg_layout, "swallow", item->content);
 
@@ -239,7 +238,7 @@ EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent)
 	wd->parent = parent;
 	wd->num = 0;
 	
-	wd->box = elm_box_add(parent);
+	wd->box = elm_box_add(obj);
 	evas_object_event_callback_add(wd->box, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
 	evas_object_show(wd->box);
 	elm_widget_resize_object_set(obj, wd->box);
@@ -511,8 +510,7 @@ elm_dialoguegroup_title_set(Evas_Object *obj, const char *title)
 		elm_box_unpack(wd->box, wd->title_layout);		
 	}
 	if (!wd->title_layout) {
-		wd->title_layout = elm_layout_add(wd->parent);
-		elm_widget_sub_object_add(obj, wd->title_layout);
+		wd->title_layout = elm_layout_add(wd->box);
 		elm_layout_theme_set(wd->title_layout, "dialoguegroup", "base", "title");
 		evas_object_size_hint_weight_set(wd->title_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->title_layout, EVAS_HINT_FILL, 0.0);
