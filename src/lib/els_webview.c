@@ -228,7 +228,9 @@ static void      _smart_show(Evas_Object* obj);
 static void      _smart_hide(Evas_Object* obj);
 static void      _smart_resize(Evas_Object* obj, Evas_Coord w, Evas_Coord h);
 static void      _smart_move(Evas_Object* obj, Evas_Coord x, Evas_Coord y);
+#ifdef DEBUG
 static void      _smart_calculate(Evas_Object* obj);
+#endif
 static Eina_Bool _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev);
 static Eina_Bool _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev);
 static Eina_Bool _smart_mouse_move(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Move* ev);
@@ -636,34 +638,35 @@ _smart_move(Evas_Object* obj, Evas_Coord x, Evas_Coord y)
    _parent_sc.sc.move(obj, x, y);
 }
 
-//TODO: Is it required? I just add to test
+#ifdef DEBUG
 static void
 _smart_calculate(Evas_Object* obj)
 {
-   DBG("%s\n", __func__);
    _parent_sc.sc.calculate(obj);
-   DBG("%s end\n", __func__);
 }
+#endif
 
 static Eina_Bool
 _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev)
 {
-   DBG("%s is called\n", __func__);
+   DBG("[NATIVE]%s is called\n", __func__);
    Smart_Data *sd = (Smart_Data *)esd;
    sd->mouse_down_copy = *ev;
-   sd->mouse_clicked = EINA_TRUE;
 
-   if (sd->events_feed) _parent_sc.mouse_down(esd, ev);
+   if (sd->events_feed)
+     {
+	sd->mouse_clicked = EINA_TRUE;
+	return _parent_sc.mouse_down(esd, ev);
+     }
    else return EINA_TRUE;
 }
 
 static Eina_Bool
 _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
 {
-   DBG("%s is called\n", __func__);
+   DBG("[NATIVE]%s is called\n", __func__);
    Smart_Data *sd = (Smart_Data *)esd;
    sd->mouse_up_copy = *ev;
-   sd->mouse_clicked = EINA_FALSE;
 
    if (sd->events_feed)
      {
@@ -673,7 +676,9 @@ _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
 	     return EINA_TRUE;
 	  }
 
-	_parent_sc.mouse_up(esd, ev);
+	Eina_Bool ret = _parent_sc.mouse_up(esd, ev);
+	sd->mouse_clicked = EINA_FALSE;
+	return ret;
      }
    else
      return EINA_TRUE;
@@ -1038,6 +1043,8 @@ _smart_input_method_changed(void* data, Evas_Object* webview, void* arg)
 		default: ecore_imf_context_input_panel_layout_set(imContext, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL);
 	       }
 	     DBG("ecore_imf_context_input_panel_show");
+	     ecore_imf_context_focus_in(imContext);
+	     ecore_imf_context_client_canvas_set(imContext, evas_object_evas_get(sd->base.self));
 	     ecore_imf_context_input_panel_show (imContext);
 	  }
      }
@@ -1416,12 +1423,16 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
 
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE) return;
 
+#ifdef NEED_TO_REMOVE
    evas_object_focus_set(webview, EINA_TRUE);
    if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
    if (!sd->ewk_frame_feed_focus_in)
      sd->ewk_frame_feed_focus_in = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_frame_feed_focus_in");
    sd->ewk_frame_feed_focus_in(sd->ewk_view_frame_main_get(webview));
+#endif
+
+   sd->mouse_clicked = EINA_TRUE;
    _parent_sc.mouse_down((Ewk_View_Smart_Data*)sd, &sd->mouse_down_copy);
 
 #if 0 // comment out below code until it is completed
@@ -1553,6 +1564,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
      }
 
    _parent_sc.mouse_up((Ewk_View_Smart_Data*)sd, &sd->mouse_up_copy);
+   sd->mouse_clicked = EINA_FALSE;
 }
 
 static void
