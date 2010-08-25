@@ -73,7 +73,7 @@ static void _clicked(void *data, Evas_Object *obj, const char *emission, const c
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
-   elm_entry_cursor_end_set(wd->eb);
+   elm_entry_cursor_end_set(elm_editfield_entry_get(wd->eb));
    if (wd->cancel_btn_ani_flag == EINA_TRUE)
      edje_object_signal_emit(wd->base, "CANCELIN", "PROG");
    else
@@ -88,8 +88,9 @@ static void _changed(void *data, Evas_Object *obj, const char *emission, const c
    if (!wd) return;
 
    int len = 0;
-   const char* text = elm_entry_entry_get(wd->eb);
+   const char* text = elm_entry_entry_get(elm_editfield_entry_get(wd->eb));
 
+/*
    if (text != NULL)
      {
 	len = strlen(text);
@@ -106,6 +107,7 @@ static void _changed(void *data, Evas_Object *obj, const char *emission, const c
      {
 	edje_object_signal_emit(wd->base, "RESETHIDE", "PROG");
      }
+*/
 
    evas_object_smart_callback_call(data, "changed", NULL);
 }
@@ -122,9 +124,9 @@ static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, 
 
 
    const char* text;
-   text = elm_entry_entry_get(wd->eb);
+   text = elm_entry_entry_get(elm_editfield_entry_get(wd->eb));
    if (text != NULL && strlen(text) > 0)
-     elm_entry_entry_set(wd->eb, NULL);
+     elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
 
    evas_object_smart_callback_call(data, "cancel,clicked", NULL);
 }
@@ -133,7 +135,7 @@ static void _signal_reset_clicked(void *data, Evas_Object *obj, const char *emis
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   elm_entry_entry_set(wd->eb, NULL);
+   elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
 }
 
 /**
@@ -170,10 +172,12 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    //	evas_object_size_hint_align_set(wd->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    // Add Entry
-   wd->eb = elm_entry_add(parent);
+   wd->eb = elm_editfield_add(parent);
+   elm_object_style_set(wd->eb, "searchbar");
    edje_object_part_swallow(wd->base, "btn_text", wd->eb);
-   //	elm_object_style_set(wd->eb, "search_input");
-   elm_entry_single_line_set(wd->eb, EINA_TRUE);
+//   elm_editfield_guide_text_set(di, _("Text Input"));
+   elm_editfield_entry_single_line_set(wd->eb, EINA_TRUE);
+   elm_editfield_eraser_set(wd->eb, EINA_TRUE);
    evas_object_smart_callback_add(wd->eb, "clicked", _clicked, obj);
    evas_object_smart_callback_add(wd->eb, "changed", _changed, obj);
    elm_widget_sub_object_add(obj, wd->eb);
@@ -210,7 +214,7 @@ EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   elm_entry_entry_set(wd->eb, entry);
+   elm_entry_entry_set(elm_editfield_entry_get(wd->eb), entry);
 }
 
 /**
@@ -226,7 +230,7 @@ EAPI const char* elm_searchbar_text_get(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   return elm_entry_entry_get(wd->eb);
+   return elm_entry_entry_get(elm_editfield_entry_get(wd->eb));
 }
 
 /**
@@ -242,7 +246,7 @@ EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   return wd->eb;
+   return elm_editfield_entry_get(wd->eb);
 }
 
 /**
