@@ -243,7 +243,7 @@ _elm_smart_touch_child_set(Evas_Object *obj, Evas_Object *child)
 
 	_smart_enter_none(sd);
 
-	sd->is_one_drag_mode = EINA_TRUE;
+	sd->is_one_drag_mode = EINA_FALSE;
      }
 
    evas_object_smart_callback_call(sd->smart_obj, "changed", NULL);
