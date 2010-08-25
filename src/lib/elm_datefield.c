@@ -178,21 +178,15 @@ _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const c
 	Widget_Data *wd = elm_widget_data_get(data);
 	if (!wd || !wd->base) return ;	
 
-	printf("[%s][%d]\n", __FUNCTION__, __LINE__);
-
 	wd->pm = !wd->pm;
 
 	if (wd->pm)
 	{
-	printf("[%s][%d]\n", __FUNCTION__, __LINE__);
-
 		edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
 		wd->hour += HOUR_12H_MAXIMUM;
 	}
 	else
 	{
-	printf("[%s][%d]\n", __FUNCTION__, __LINE__);
-
 		edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");
 		wd->hour -= HOUR_12H_MAXIMUM;
 	}
