@@ -178,21 +178,15 @@ _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const c
 	Widget_Data *wd = elm_widget_data_get(data);
 	if (!wd || !wd->base) return ;	
 
-	printf("[%s][%d]\n", __FUNCTION__, __LINE__);
-
 	wd->pm = !wd->pm;
 
 	if (wd->pm)
 	{
-	printf("[%s][%d]\n", __FUNCTION__, __LINE__);
-
 		edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
 		wd->hour += HOUR_12H_MAXIMUM;
 	}
 	else
 	{
-	printf("[%s][%d]\n", __FUNCTION__, __LINE__);
-
 		edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");
 		wd->hour -= HOUR_12H_MAXIMUM;
 	}
@@ -511,7 +505,14 @@ _date_entry_add(Evas_Object *obj)
 	{
 		wd->date[i] = elm_entry_add(obj);
 		elm_entry_context_menu_disabled_set(wd->date[i], EINA_TRUE);
-		elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_NUMBER);
+        if (i == DATE_MON)
+        {
+		    elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_MONTH);
+        }
+        else
+        {
+            elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);
+        }
 		evas_object_size_hint_weight_set(wd->date[i], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->date[i], EVAS_HINT_FILL, EVAS_HINT_FILL);
     		evas_object_smart_callback_add(wd->date[i], "focused", _entry_focused_cb, obj);
@@ -537,7 +538,7 @@ _time_entry_add(Evas_Object *obj)
 	{
 		wd->time[i] = elm_entry_add(obj);
 		elm_entry_context_menu_disabled_set(wd->time[i], EINA_TRUE);
-		elm_entry_input_panel_layout_set(wd->time[i], ELM_INPUT_PANEL_LAYOUT_NUMBER);		
+		elm_entry_input_panel_layout_set(wd->time[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);		
 		elm_entry_maximum_bytes_set(wd->time[i], TIME_MAX_LENGTH);
 		evas_object_size_hint_weight_set(wd->time[i], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->time[i], EVAS_HINT_FILL, EVAS_HINT_FILL);

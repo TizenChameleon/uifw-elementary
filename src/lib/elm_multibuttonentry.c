@@ -519,7 +519,7 @@ elm_multibuttonentry_label_set(Evas_Object *obj, const char *label)
  * Get the entry of the multibuttonentry object
  *
  * @param obj The multibuttonentry object
- * @return entry object
+ * @return The entry object, or NULL if none
  *
  * @ingroup Multibuttonentry
  */
@@ -583,6 +583,7 @@ elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *dat
  * reference.
  * @param obj The multibuttonentry object
  * @param label The label of new item
+ * @param before The item before which to add it
  * @param data The ponter to the data to be attached
  * @return A handle to the item added or NULL if not possible
  *
@@ -605,6 +606,7 @@ elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Mu
  *
  * @param obj The multibuttonentry object
  * @param label The label of new item
+ * @param after The item after which to add it
  * @param data The ponter to the data to be attached
  * @return A handle to the item added or NULL if not possible
  *

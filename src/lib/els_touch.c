@@ -726,7 +726,8 @@ _smart_animation_flick(void *data)
 	if (dx == 0 && dy == 0)
 	  {
 	     _smart_stop_animator_flick(sd);
-	     _smart_enter_none(sd);
+	     if (sd->state == TOUCH_STATE_DRAG)
+	       _smart_enter_none(sd);
 	     return ECORE_CALLBACK_CANCEL;
 	  }
 	else
