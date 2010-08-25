@@ -105,6 +105,7 @@ struct _Widget_Data
    Ecore_Event_Handler *sel_notify_handler;
    Ecore_Event_Handler *sel_clear_handler;
    Ecore_Timer *longpress_timer;
+   /* Only for clipboard */
    const char *cut_sel;
    const char *text;
    Evas_Coord wrap_w;
@@ -495,29 +496,23 @@ _paste(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (wd->sel_notify_handler)
      {
 #ifdef HAVE_ELEMENTARY_X
-	Evas_Object *top;
-
-	top = elm_widget_top_get(data);
-	if ((top) && (elm_win_xwindow_get(top)))
-	  {
-	     ecore_x_selection_primary_request
-	       (elm_win_xwindow_get(top),
-		ECORE_X_SELECTION_TARGET_UTF8_STRING);
-	     wd->selection_asked = EINA_TRUE;
-	  }
+        wd->selection_asked = EINA_TRUE;
+	elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_MARKUP, data);
 #endif
      }
 }
 
 static void
-_store_selection(Evas_Object *obj)
+_store_selection(enum _elm_sel_type seltype, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *sel;
 
    if (!wd) return;
    sel = edje_object_part_text_selection_get(wd->ent, "elm.text");
-   eina_stringshare_replace(&wd->cut_sel, sel);
+   elm_selection_set(seltype, obj, ELM_SEL_MARKUP, sel);
+   if (seltype == ELM_SEL_CLIPBOARD)
+	   eina_stringshare_replace(&wd->cut_sel, sel);
 }
 
 static void
@@ -525,11 +520,12 @@ _cut(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
+   /* Store it */
    wd->selmode = EINA_FALSE;
    edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
    edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
    elm_widget_scroll_hold_pop(data);
-   _store_selection(data);
+   _store_selection(ELM_SEL_CLIPBOARD, data);
    edje_object_part_text_insert(wd->ent, "elm.text", "");
    edje_object_part_text_select_none(wd->ent, "elm.text");
 }
@@ -543,8 +539,8 @@ _copy(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
    edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
    elm_widget_scroll_hold_pop(data);
-   _store_selection(data);
-   edje_object_part_text_select_none(wd->ent, "elm.text");
+   _store_selection(ELM_SEL_CLIPBOARD, data);
+//   edje_object_part_text_select_none(wd->ent, "elm.text");
 }
 
 static void
@@ -1116,9 +1112,8 @@ _signal_entry_paste_request(void *data, Evas_Object *obj __UNUSED__, const char 
 	top = elm_widget_top_get(data);
 	if ((top) && (elm_win_xwindow_get(top)))
 	  {
-	     ecore_x_selection_primary_request(elm_win_xwindow_get(top),
-                                               ECORE_X_SELECTION_TARGET_UTF8_STRING);
-	     wd->selection_asked = EINA_TRUE;
+             wd->selection_asked = EINA_TRUE;
+             elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_MARKUP, data);
 	  }
 #endif
      }
@@ -1130,18 +1125,18 @@ _signal_entry_copy_notify(void *data, Evas_Object *obj __UNUSED__, const char *e
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    evas_object_smart_callback_call(data, SIG_SELECTION_COPY, NULL);
+   elm_selection_set(ELM_SEL_CLIPBOARD, obj, ELM_SEL_MARKUP,
+			elm_entry_selection_get(data));
 }
 
 static void
 _signal_entry_cut_notify(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   char *txt;
    if (!wd) return;
    evas_object_smart_callback_call(data, SIG_SELECTION_CUT, NULL);
-   txt = _mkup_to_text(elm_entry_selection_get(data));
-   eina_stringshare_replace(&wd->cut_sel, txt);
-   if (txt) free(txt);
+   elm_selection_set(ELM_SEL_CLIPBOARD, obj, ELM_SEL_MARKUP,
+			elm_entry_selection_get(data));
    edje_object_part_text_insert(wd->ent, "elm.text", "");
    wd->changed = EINA_TRUE;
    _sizing_eval(data);
@@ -1311,12 +1306,13 @@ _event_selection_notify(void *data, int type __UNUSED__, void *event)
 	  }
 	wd->selection_asked = EINA_FALSE;
      }
-   return 1;
+   return ECORE_CALLBACK_PASS_ON;
 }
 
 static int
 _event_selection_clear(void *data, int type __UNUSED__, void *event)
 {
+/*
    Widget_Data *wd = elm_widget_data_get(data);
    Ecore_X_Event_Selection_Clear *ev = event;
    if (!wd) return 1;
@@ -1326,7 +1322,8 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
      {
 	elm_entry_select_none(data);
      }
-   return 1;
+   return 1;*/
+   return ECORE_CALLBACK_PASS_ON;
 }
 #endif
 
