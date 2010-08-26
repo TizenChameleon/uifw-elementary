@@ -76,6 +76,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
                                   _changed_size_hints, obj);
    if (sub == wd->content) wd->content = NULL;
    else if (sub == wd->icon) wd->icon = NULL;
+
    _sizing_eval(obj);
 }
 
@@ -133,6 +134,8 @@ elm_bubble_label_set(Evas_Object *obj, const char *label)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   if (label) edje_object_signal_emit(wd->bbl, "elm,state,label,add", "elm");
+   else edje_object_signal_emit(wd->bbl, "elm,state,label,add", "elm");
    eina_stringshare_replace(&wd->label, label);
    edje_object_part_text_set(wd->bbl, "elm.text", label);
    _sizing_eval(obj);
@@ -258,10 +261,13 @@ elm_bubble_icon_set(Evas_Object *obj, Evas_Object *icon)
    if (icon)
      {
 	elm_widget_sub_object_add(obj, icon);
+	edje_object_signal_emit(wd->bbl, "elm,state,icon,add", "elm");
 	edje_object_part_swallow(wd->bbl, "elm.swallow.icon", icon);
 	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				       _changed_size_hints, obj);
      }
+   else edje_object_signal_emit(wd->bbl, "elm,state,icon,del", "elm");
+   
    _sizing_eval(obj);
 }
 
