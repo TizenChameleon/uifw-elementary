@@ -201,6 +201,7 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
    elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
    _sizing_eval(obj);
    edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,show", "elm");
+   edje_object_message_signal_process(wd->layout);
    evas_object_show(obj);     
    if (e && !_elm_wnd_map_handler)
      {
@@ -224,6 +225,7 @@ _hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
    
    if (!wd) return;
    edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,hide", "elm");
+   edje_object_message_signal_process(wd->layout);
    if (wd->parent) evas_object_hide(wd->parent);  
    evas_object_hide(obj); 
 }
@@ -434,16 +436,68 @@ elm_popup_with_buttons_add(Evas_Object *parent, char *title, char *desc_text,int
 	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,visible", "elm");
 	if (wd->title_area)
 	  {
-               edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,title,visible", "elm");
+	  	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,title,visible", "elm");
 	  }
 	_elm_popup_buttons_add_valist (popup, first_button_text, args);
 	va_end(args);
      }
-   
+   edje_object_message_signal_process(wd->layout);
    _sizing_eval(popup);
    
    return popup;   
 }
+
+/**
+ * Add a new Popup object.
+ *
+ * @param parent The parent object
+ * @param title text to be displayed in title area.
+ * @param desc_text text to be displayed in description area.
+ * @param no_of_buttons Number of buttons to be packed in action area.
+ * @param first_button_text button text
+ * @param Varargs response ID for first button, then additional buttons followed by response id's ending with NULL
+ * @return The new object or NULL if it cannot be created
+ *
+ * @ingroup Popup
+ */
+EAPI Evas_Object *
+elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... )
+{
+   Evas_Object *popup;
+   popup = elm_popup_add(parent);
+   Widget_Data *wd = elm_widget_data_get(popup);
+   char buf[4096];
+   
+   if (desc_text)
+     {
+	elm_popup_desc_set(popup, desc_text);
+     }
+   if (title)
+     {
+	elm_popup_title_label_set(popup, title);
+     }
+   if (first_button_text)
+     {
+	va_list args;  
+	va_start(args, first_button_text); 
+	wd->action_area = elm_layout_add(popup);
+	elm_layout_content_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);
+	snprintf(buf,sizeof(buf), "buttons%d", no_of_buttons);
+	elm_layout_theme_set(wd->action_area, "popup", buf, elm_widget_style_get(popup));
+	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,visible", "elm");
+	if (wd->title_area)
+	  {
+	  	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,title,visible", "elm");
+	  }
+	_elm_popup_buttons_add_valist (popup, first_button_text, args);
+	va_end(args);
+     }
+   edje_object_message_signal_process(wd->layout);
+   _sizing_eval(popup);
+   
+   return popup;   
+}
+
 
 /**
  * This Set's the description text in content area of Popup widget.
@@ -536,7 +590,8 @@ elm_popup_title_label_set(Evas_Object *obj, const char *text)
    if (wd->title_icon)
      {
 	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,title,icon,visible", "elm");
-     }     
+     } 
+   edje_object_message_signal_process(wd->layout);
    _sizing_eval(obj);
 }
 
@@ -581,6 +636,7 @@ elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon)
    wd->title_icon = icon;   
    elm_layout_content_set(wd->layout, "elm.swallow.title.icon", wd->title_icon);    
    edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,title,icon,visible", "elm");   
+   edje_object_message_signal_process(wd->layout);
    _sizing_eval(obj);
 }
 
@@ -687,6 +743,7 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
      }
    _elm_popup_buttons_add_valist (obj, first_button_text, args);
    va_end(args);
+   edje_object_message_signal_process(wd->layout);
    _sizing_eval(obj);
 }
 

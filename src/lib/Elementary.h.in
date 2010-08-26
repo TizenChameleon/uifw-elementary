@@ -1884,6 +1884,7 @@ extern "C" {
    EAPI Evas_Object* elm_popup_content_get(Evas_Object *obj);
    EAPI void         elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_text,  ...);
    Evas_Object*      elm_popup_with_buttons_add(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... );
+   EINA_DEPRECATED Evas_Object*      elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... );
    EAPI void         elm_popup_timeout_set(Evas_Object *obj, int timeout);
    EAPI void         elm_popup_mode_set(Evas_Object *obj, Elm_Popup_Mode mode);
    EAPI void         elm_popup_response(Evas_Object *obj, int  response_id);
