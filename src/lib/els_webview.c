@@ -932,7 +932,7 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
 
 	snprintf(szBuffer, 2048, NOT_FOUND_PAGE_HEADER "\"?%s?%s\"" NOT_FOUND_PAGE_FOOTER, error->failing_url, error->description);
 	//sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szStrBuffer, 0, NULL, NULL, NULL);
-	sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szBuffer, 0, NULL, NULL, NULL);
+	sd->ewk_frame_contents_set(error->frame, szBuffer, 0, NULL, NULL, NULL);
 	return;
      }
 }
