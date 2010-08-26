@@ -570,8 +570,8 @@ _animator_animate_del_cb(Evas_Object *obj)
  * @ingroup SegmentControl SegmentControl
  */
 
-EAPI Elm_Segment_Item *
-elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)
+EAPI void
+elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if(!wd) return NULL;
@@ -604,7 +604,20 @@ elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char 
    evas_object_box_append(wd->box, it->base);
    evas_object_smart_calculate(wd->box);
 
-   return it;
+   return;
+}
+
+EAPI Elm_Segment_Item *
+elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)
+{ 
+   fprintf(stderr, "=================> Caution!!! <========================\n");
+   fprintf(stderr, "==> elm_segment_control_add_segment() is deprecated. <=======\n");
+   fprintf(stderr, "==> Please use elm_segment_control_item_add() instead. <==\n");
+   fprintf(stderr, "=======================================================\n");
+
+   elm_segment_control_item_add(obj, icon, label, animate);
+
+   return NULL;
 }
 
 
@@ -658,7 +671,7 @@ _item_search(Evas_Object *obj, Elm_Segment_Item *item)
  * @ingroup SegmentControl SegmentControl
  */
 EAPI void
-elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate)
+elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if(!wd) return;
@@ -707,6 +720,19 @@ elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const
    return;
 }
 
+EAPI void
+elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate)
+{
+   fprintf(stderr, "=================> Caution!!! <========================\n");
+   fprintf(stderr, "==> elm_segment_control_insert_segment_at() is deprecated. <=======\n");
+   fprintf(stderr, "==> Please use elm_segment_control_item_insert_at() instead. <==\n");
+   fprintf(stderr, "=======================================================\n");
+
+   elm_segment_control_item_insert_at(obj, icon, label, index, animate);
+
+   return;
+}
+
 /**
  * Delete a segment to segmentcontrol
  * @param obj The SegmentControl object
@@ -716,7 +742,7 @@ elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const
  * @ingroup SegmentControl SegmentControl
  */
 EAPI void
-elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate)
+elm_segment_control_item_delete(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if(!wd) return;
@@ -744,6 +770,18 @@ elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Ein
 	_update_list(obj);
      }
    wd->id = eina_list_count(wd->seg_ctrl);
+   return;
+}
+EAPI void
+elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate)
+{
+   fprintf(stderr, "=================> Caution!!! <========================\n");
+   fprintf(stderr, "==> elm_segment_control_delete_segment() is deprecated. <=======\n");
+   fprintf(stderr, "==> Please use elm_segment_control_item_delete() instead. <==\n");
+   fprintf(stderr, "=======================================================\n");
+
+   elm_segment_control_item_delete(obj, item, animate);
+
    return;
 }
 
@@ -880,5 +918,12 @@ elm_segment_control_get_segment_count(Evas_Object *obj)
    if(!wd) return 0;
 
    return wd->id;
+}
+
+EAPI Evas_Object *
+elm_segment_control_item_object_get(Elm_Segment_Item *it)
+{
+   if (!it) return NULL;
+   return it->base;
 }
 
