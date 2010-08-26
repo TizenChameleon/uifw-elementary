@@ -37,7 +37,6 @@ struct _Widget_Data
    Evas_Object *scroller;
    Evas_Object *bg;
    Evas_Object *btn_layout;
-   Evas_Coord parent_w, parent_h;
    Eina_List *items;
    Elm_Ctxpopup_Arrow arrow_dir;
    int btn_cnt;
@@ -226,8 +225,8 @@ _item_sizing_eval(Elm_Ctxpopup_Item *item)
 		      x  = x - (base_w/2); \
                       if(x < 0) {   \
 	   		      x = 0;  \
-		      }else if(x + base_w > wd->parent_w) { \
-		   	   x = wd->parent_w - base_w; \
+		      }else if(x + base_w > parent_w) { \
+		   	   x = parent_w - base_w; \
    	              } \
 	       }while(0)
 
@@ -235,9 +234,9 @@ _item_sizing_eval(Elm_Ctxpopup_Item *item)
 		y = y - (base_h/2); \
 		if(y < 0 ) {    \
 			y = 0;   \
-		}else if(y + base_h > wd->parent_h)     \
+		}else if(y + base_h > parent_h)     \
 		{     \
-			y = wd->parent_h - base_h;     \
+			y = parent_h - base_h;     \
 		}    \
 	}while(0)
 
@@ -250,6 +249,7 @@ _get_indicator_h(Evas_Object *parent)
 	xwin = elm_win_xwindow_get(parent);
 	zone = ecore_x_e_illume_zone_get(xwin);
 	ecore_x_e_illume_indicator_geometry_get(zone, NULL, NULL, NULL, &h);
+//	fprintf( stderr, "indicator h = %d\n", h);
 
 	if (h < 0)
 		h = 0;
@@ -268,6 +268,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    Evas_Coord finger_size;
    Evas_Coord max_width_size, max_height_size;
    Evas_Coord arrow_w = 0, arrow_h = 0;
+   Evas_Coord parent_w, parent_h;
    Evas_Coord indicator_h = 0;
    int available_direction[4] = { 1, 1, 1, 1 };
    int idx;
@@ -301,12 +302,13 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	   return ELM_CTXPOPUP_ARROW_DOWN;
    }
 
- //  indicator_h = _get_indicator_h(wd->parent);
+   indicator_h = _get_indicator_h(wd->parent);
    finger_size = elm_finger_size_get();
 
    	edje_object_part_geometry_get(wd->arrow, "ctxpopup_arrow", NULL, NULL,
 				      &arrow_w, &arrow_h);
 	evas_object_resize(wd->arrow, arrow_w, arrow_h);
+	evas_object_geometry_get(wd->parent, NULL, NULL, &parent_w, &parent_h);
 
 	//Define x, y Segments and find invalidated direction.
    for (idx = 0; idx < 4; ++idx)
@@ -329,16 +331,16 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	     break;
 	  case ELM_CTXPOPUP_ARROW_LEFT:
 	     x2 = (x + base_w);
-	     if ((x2 + arrow_w + finger_size) < wd->parent_w)
+	     if ((x2 + arrow_w + finger_size) < parent_w)
 		continue;
-	     x2 = (wd->parent_w - base_w);
+	     x2 = (parent_w - base_w);
 	     available_direction[idx] = 0;
 	     break;
 	  case ELM_CTXPOPUP_ARROW_UP:
 	     y2 = (y + base_h);
-	     if ((y2 + arrow_h + finger_size) <wd->parent_h)
+	     if ((y2 + arrow_h + finger_size) < parent_h)
 		continue;
-	     y2 = (wd->parent_h - base_h);
+	     y2 = (parent_h - base_h);
 	     available_direction[idx] = 0;
 	     break;
 	  default:
@@ -620,7 +622,6 @@ static void
 _parent_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
 	Evas_Coord w, h;
-    Evas_Coord x, y;
     Widget_Data *wd = (Widget_Data *) elm_widget_data_get(data);
 
    if (!wd)
@@ -629,11 +630,7 @@ _parent_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
    evas_object_geometry_get(obj, NULL, NULL, &w, &h);
    evas_object_resize(wd->bg, w, h);
 
-   evas_object_geometry_get(data, &x, &y, NULL, NULL);
-   wd->parent_w = w;
-   wd->parent_h = h;
-
-   evas_object_move(data, x+(w/wd->parent_w), y+(h/wd->parent_h));
+   evas_object_hide(data);
 }
 
 static void
@@ -833,7 +830,6 @@ elm_ctxpopup_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
 
    wd->parent = parent;
-   evas_object_geometry_get(parent, NULL, NULL, &wd->parent_w, &wd->parent_h);
 
    //Background
    wd->bg = edje_object_add(e);
