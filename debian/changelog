@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build42) unstable; urgency=low
+
+  * [bubble] elm_bubble initial release
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build42
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 26 Aug 2010 22:19:28 +0900
+
 elementary (0.4.0+svn.49550slp2+3build41) unstable; urgency=low
 
   * [elm_popup_add_with_buttons_added with EINA_DEPRECATED]
