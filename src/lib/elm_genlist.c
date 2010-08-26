@@ -1896,39 +1896,39 @@ _reorder_mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *e
 static void
 _select_all_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
-    Elm_Genlist_Item *it = data;
-    Eina_List *l;
+   Elm_Genlist_Item *it = data;
+   Eina_List *l;
 
-    Widget_Data *wd = it->wd;
-    if (!wd) return;
+   Widget_Data *wd = it->wd;
+   if (!wd) return;
 
-    Eina_List *realized_list = elm_genlist_realized_items_get(wd->obj);
+   Eina_List *realized_list = elm_genlist_realized_items_get(wd->obj);
 
-    EINA_LIST_FOREACH(realized_list, l, it)
-      {
-		if( !strcmp(it->itc->item_style, "select_all") )  
-			it->select_all_item = 1;
-		
-		if(!wd->selct_all) {
-			it->delete_check = 1;
-			it->del_confirm_state = 1;
-			edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
-			edje_object_signal_emit(it->base, "elm,state,del_confirm", "elm");
-		}
-		else {
-			it->delete_check = 0;
-			it->del_confirm_state = 0;
-			edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,enable", "elm");
-			edje_object_signal_emit(it->base, "elm,state,del,animated,enable", "elm");
-		}
-		
-      }
+   EINA_LIST_FOREACH(realized_list, l, it)
+     {
+	if( !strcmp(it->itc->item_style, "select_all") )  
+	  it->select_all_item = 1;
 
-	wd->selct_all ^= 0xFF;
+	if(!wd->selct_all) 
+	  {
+	     it->delete_check = 1;
+	     it->del_confirm_state = 1;
+	     edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
+	     edje_object_signal_emit(it->base, "elm,state,del_confirm", "elm");
+	  }
+	else 
+	  {
+	     it->delete_check = 0;
+	     it->del_confirm_state = 0;
+	     edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,enable", "elm");
+	     edje_object_signal_emit(it->base, "elm,state,del,animated,enable", "elm");
+	  }
+     }
 
-    if (wd->calc_job) ecore_job_del(wd->calc_job);
-    wd->calc_job = ecore_job_add(_calc_job, wd);	
-	
+   wd->selct_all ^= 0xFF;
+
+   if (wd->calc_job) ecore_job_del(wd->calc_job);
+   wd->calc_job = ecore_job_add(_calc_job, wd);	
 }
 
 static void
@@ -1954,127 +1954,128 @@ _edit_controls_eval( Elm_Genlist_Item *it )
     if( it->wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE && !it->edit_obj )
       return;
 
-    if( !strcmp(it->itc->item_style, "select_all") ) {
-		edje_object_signal_callback_add(it->base, "elm,action,select,press", "elm",_select_all_down, it);
-	 	return;
-    }
+    if( !strcmp(it->itc->item_style, "select_all") )
+      {
+	 edje_object_signal_callback_add(it->base, "elm,action,select,press", "elm", _select_all_down, it);
+	 return;
+      }
 
-     if( it->itc->func.editmode_get )
-       itmode = it->itc->func.editmode_get( it->data, it->wd->obj, it->wd->edit_mode );
-     itmode &= it->wd->edit_mode;
+    if( it->itc->func.editmode_get )
+      itmode = it->itc->func.editmode_get( it->data, it->wd->obj, it->wd->edit_mode );
+    itmode &= it->wd->edit_mode;
 
-     if( !it->edit_obj )
-       {
-	  it->edit_obj = edje_object_add(evas_object_evas_get(it->wd->obj));
-	  edje_object_scale_set(it->edit_obj, elm_widget_scale_get(it->wd->obj) *
-		_elm_config->scale);
-	  evas_object_smart_member_add(it->edit_obj, it->wd->pan_smart);
-	  elm_widget_sub_object_add(it->wd->obj, it->edit_obj);
-	  _elm_theme_object_set(it->wd->obj, it->edit_obj, "genlist", "item/edit_control", elm_widget_style_get(it->wd->obj));
+    if( !it->edit_obj )
+      {
+	 it->edit_obj = edje_object_add(evas_object_evas_get(it->wd->obj));
+	 edje_object_scale_set(it->edit_obj, elm_widget_scale_get(it->wd->obj) *
+	       _elm_config->scale);
+	 evas_object_smart_member_add(it->edit_obj, it->wd->pan_smart);
+	 elm_widget_sub_object_add(it->wd->obj, it->edit_obj);
+	 _elm_theme_object_set(it->wd->obj, it->edit_obj, "genlist", "item/edit_control", elm_widget_style_get(it->wd->obj));
 
-	  edje_object_signal_callback_add(it->edit_obj, "elm,action,edit,reset",
-                                             "elm", _edit_mode_reset, it);
-       }
+	 edje_object_signal_callback_add(it->edit_obj, "elm,action,edit,reset",
+	       "elm", _edit_mode_reset, it);
+      }
 
-       pad_str = edje_object_data_get(it->edit_obj, "icon_width");
-       if (pad_str) pad = atoi(pad_str);
+    pad_str = edje_object_data_get(it->edit_obj, "icon_width");
+    if (pad_str) pad = atoi(pad_str);
 
-       if( (itmode & ELM_GENLIST_EDIT_MODE_INSERT) )
-	 {
-	    if(it->wd->animate_edit_controls)
-	      edje_object_signal_emit(it->edit_obj, "elm,state,ins,animated,enable", "elm");
-	    else
-	      edje_object_signal_emit(it->edit_obj, "elm,state,ins,enable", "elm");
+    if( (itmode & ELM_GENLIST_EDIT_MODE_INSERT) )
+      {
+	 if(it->wd->animate_edit_controls)
+	   edje_object_signal_emit(it->edit_obj, "elm,state,ins,animated,enable", "elm");
+	 else
+	   edje_object_signal_emit(it->edit_obj, "elm,state,ins,enable", "elm");
 
-	    edje_object_signal_callback_add(it->edit_obj, "elm,action,item,insert",
-                                                "elm", _insert_new_item_cb, it);
-	    it->pad_left += pad;
-	 }
-       else
-	 {
-	    if(it->wd->animate_edit_controls)
-	      edje_object_signal_emit(it->edit_obj, "elm,state,ins,animated,disable", "elm");
-	    else
-	      edje_object_signal_emit(it->edit_obj, "elm,state,ins,disable", "elm");
+	 edje_object_signal_callback_add(it->edit_obj, "elm,action,item,insert",
+	       "elm", _insert_new_item_cb, it);
+	 it->pad_left += pad;
+      }
+    else
+      {
+	 if(it->wd->animate_edit_controls)
+	   edje_object_signal_emit(it->edit_obj, "elm,state,ins,animated,disable", "elm");
+	 else
+	   edje_object_signal_emit(it->edit_obj, "elm,state,ins,disable", "elm");
 
-	    edje_object_signal_callback_del(it->edit_obj, "elm,action,item,insert",
-                                            "elm", _insert_new_item_cb );
-	 }
+	 edje_object_signal_callback_del(it->edit_obj, "elm,action,item,insert",
+	       "elm", _insert_new_item_cb );
+      }
 
-       if( (itmode & ELM_GENLIST_EDIT_MODE_DELETE) )
-	 {
-	    if(it->wd->animate_edit_controls)
-	      edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,enable", "elm");
-	    else
-	      edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
+    if( (itmode & ELM_GENLIST_EDIT_MODE_DELETE) )
+      {
+	 if(it->wd->animate_edit_controls)
+	   edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,enable", "elm");
+	 else
+	   edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
 
-	    edje_object_signal_callback_add(it->edit_obj, "elm,action,item,delete",
-		  "elm", _remove_item_cb, it);
+	 edje_object_signal_callback_add(it->edit_obj, "elm,action,item,delete",
+	       "elm", _remove_item_cb, it);
 
-	    edje_object_signal_callback_add(it->edit_obj, "elm,action,hide,del_confirm",
-		  "elm", _hide_delete_confirm_object, it );
-	    it->pad_left += pad;
-	 }
-       else
-	 {
-	    if(it->wd->animate_edit_controls)
-	      edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,disable", "elm");
-	    else
-	      edje_object_signal_emit(it->edit_obj, "elm,state,del,disable", "elm");
+	 edje_object_signal_callback_add(it->edit_obj, "elm,action,hide,del_confirm",
+	       "elm", _hide_delete_confirm_object, it );
+	 it->pad_left += pad;
+      }
+    else
+      {
+	 if(it->wd->animate_edit_controls)
+	   edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,disable", "elm");
+	 else
+	   edje_object_signal_emit(it->edit_obj, "elm,state,del,disable", "elm");
 
-	    edje_object_signal_callback_del(it->edit_obj, "elm,action,item,delete",
-		  "elm", _remove_item_cb );
-	    edje_object_signal_callback_del(it->edit_obj, "elm,action,hide,del_confirm",
-		  "elm", _hide_delete_confirm_object );
+	 edje_object_signal_callback_del(it->edit_obj, "elm,action,item,delete",
+	       "elm", _remove_item_cb );
+	 edje_object_signal_callback_del(it->edit_obj, "elm,action,hide,del_confirm",
+	       "elm", _hide_delete_confirm_object );
 
-	 }
+      }
 
-       if( (itmode & ELM_GENLIST_EDIT_MODE_REORDER) )
-	 {
-	    Evas_Object *reorder_icon;
-	    const char* reorder_part;
+    if( (itmode & ELM_GENLIST_EDIT_MODE_REORDER) )
+      {
+	 Evas_Object *reorder_icon;
+	 const char* reorder_part;
 
-	    reorder_part = edje_object_data_get(it->edit_obj, "reorder");
-	    if( reorder_part && edje_object_part_exists(it->edit_obj, reorder_part ) )
-	      {
-		 reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part );
+	 reorder_part = edje_object_data_get(it->edit_obj, "reorder");
+	 if( reorder_part && edje_object_part_exists(it->edit_obj, reorder_part ) )
+	   {
+	      reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part );
 
-		 evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
-		       _reorder_mouse_down, it);
-		 evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_UP,
-		       _reorder_mouse_up, it);
-		 evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_MOVE,
-		       _reorder_mouse_move, it);
-	      }
-	  //  it->pad_right += pad;
-	 }
-       else
-	 {
-	    Evas_Object *reorder_icon;
-	    const char* reorder_part;
+	      evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
+		    _reorder_mouse_down, it);
+	      evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_UP,
+		    _reorder_mouse_up, it);
+	      evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_MOVE,
+		    _reorder_mouse_move, it);
+	   }
+	 //  it->pad_right += pad;
+      }
+    else
+      {
+	 Evas_Object *reorder_icon;
+	 const char* reorder_part;
 
-	    reorder_part = edje_object_data_get(it->edit_obj, "reorder");
-	    if( reorder_part && edje_object_part_exists(it->edit_obj, reorder_part ) )
-	      {
-		 reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part );
+	 reorder_part = edje_object_data_get(it->edit_obj, "reorder");
+	 if( reorder_part && edje_object_part_exists(it->edit_obj, reorder_part ) )
+	   {
+	      reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part );
 
-		 evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
-		       _reorder_mouse_down);
-		 evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_UP,
-		       _reorder_mouse_up);
-		 evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_MOVE,
-		       _reorder_mouse_move);
-	      }
-	 }
+	      evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
+		    _reorder_mouse_down);
+	      evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_UP,
+		    _reorder_mouse_up);
+	      evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_MOVE,
+		    _reorder_mouse_move);
+	   }
+      }
 
-       if( it->wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE )//Unrealize
-	 {
-	    evas_object_del(it->edit_obj);
-	    it->edit_obj = NULL;
-	    return;
-	 }
-       _move_edit_controls(it,it->scrl_x, it->scrl_y );
-       evas_object_show( it->edit_obj );
+    if( it->wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE )//Unrealize
+      {
+	 evas_object_del(it->edit_obj);
+	 it->edit_obj = NULL;
+	 return;
+      }
+    _move_edit_controls(it,it->scrl_x, it->scrl_y );
+    evas_object_show( it->edit_obj );
 }
 
 static void
@@ -4550,7 +4551,7 @@ elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
    fprintf(stderr, "==> Please use elm_genlist_edit_mode_set() instead. <==\n");
    fprintf(stderr, "=======================================================\n");
 
-	elm_genlist_edit_mode_set(obj, emode, edit_class);
+   elm_genlist_edit_mode_set(obj, emode, edit_class);
 }
 
 /**
@@ -4677,21 +4678,21 @@ elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it)
 EAPI void
 elm_genlist_selected_items_del(Evas_Object *obj)
 {
-    Elm_Genlist_Item *it;
-	 Eina_List *l, *realized_list;
+   Elm_Genlist_Item *it;
+   Eina_List *l, *realized_list;
 
-	 ELM_CHECK_WIDTYPE(obj, widtype);
-	 Widget_Data *wd = elm_widget_data_get(obj);
-	 if (!wd) return;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
 
-	 realized_list = elm_genlist_realized_items_get(obj);
-	 EINA_LIST_FOREACH(realized_list, l, it)
-		{
-			if (it->select_all_item) 
-			  continue;
-			if (it->delete_check)
-			  elm_genlist_item_del( it );
-		}
-	 if (wd->calc_job) ecore_job_del(wd->calc_job);
-	 wd->calc_job = ecore_job_add(_calc_job, wd);	
+   realized_list = elm_genlist_realized_items_get(obj);
+   EINA_LIST_FOREACH(realized_list, l, it)
+     {
+	if (it->select_all_item) 
+	  continue;
+	if (it->delete_check)
+	  elm_genlist_item_del( it );
+     }
+   if (wd->calc_job) ecore_job_del(wd->calc_job);
+   wd->calc_job = ecore_job_add(_calc_job, wd);	
 }
