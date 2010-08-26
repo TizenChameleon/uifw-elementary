@@ -535,6 +535,13 @@ _elm_smart_webview_mime_callback_set(Evas_Object* obj, const char *mime, Elm_Web
      eina_hash_add(sd->mime_func_hash, mime, func);
 }
 
+void
+_elm_smart_webview_default_layout_width_set(Evas_Object *obj, int width)
+{
+   API_ENTRY return;
+   sd->layout.default_w = width;
+}
+
 int
 _flush_and_pre_render(void *data)
 {
@@ -1138,7 +1145,7 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
 	  sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
 	  sd->zoom.max_zoom_rate = MAX_ZOOM_RATIO;
 	  sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
-	  sd->layout.w = DEFAULT_LAYOUT_WIDTH;
+	  sd->layout.w = sd->layout.default_w;
 	  sd->layout.h = object_h;
 
 	  if (!sd->ewk_view_zoom_set)

@@ -207,4 +207,24 @@ elm_webview_mime_callback_set(Evas_Object *obj, const char *mime, Elm_WebView_Mi
    _elm_smart_webview_mime_callback_set(wd->webkit, mime, func);
 }
 
+/**
+ * Set default layout width
+ *
+ * If you want to load webpage with specific layout width, you can set it using this API.
+ * If you do not set it, the default layout width will be 1024.
+ *
+ * @param obj Webview object
+ * @param width width size that you want to set
+ *
+ * @ingroup WebView
+ *
+ */
+EAPI void
+elm_webview_default_layout_width_set(Evas_Object *obj, int width)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_default_layout_width_set(wd->webkit, width);
+}
+
 #endif
