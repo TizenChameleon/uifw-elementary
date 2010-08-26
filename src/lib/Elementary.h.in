@@ -1685,26 +1685,26 @@ extern "C" {
     */
 
    typedef struct _Discpicker_Item Elm_Discpicker_Item;
-   EAPI Evas_Object     *elm_discpicker_add(Evas_Object *parent);
-   EAPI void             elm_discpicker_row_height_set(Evas_Object *obj, unsigned int row_height);
-   EAPI void             elm_discpicker_next(Evas_Object *obj);
-   EAPI void             elm_discpicker_prev(Evas_Object *obj);
-   EAPI Elm_Discpicker_Item *elm_discpicker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI Elm_Discpicker_Item *elm_discpicker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI const Eina_List *elm_discpicker_items_get(Evas_Object *obj);
-   EAPI Elm_Discpicker_Item *elm_discpicker_first_item_get(Evas_Object *obj);
-   EAPI Elm_Discpicker_Item *elm_discpicker_last_item_get(Evas_Object *obj);
-   EAPI Elm_Discpicker_Item *elm_discpicker_selected_item_get(Evas_Object *obj);
-   EAPI void             elm_discpicker_item_selected_set(Elm_Discpicker_Item *item);
-   EAPI void             elm_discpicker_item_del(Elm_Discpicker_Item *item);
-   EAPI const char      *elm_discpicker_item_label_get(Elm_Discpicker_Item *item);
-   EAPI void             elm_discpicker_item_label_set(Elm_Discpicker_Item *item, const char *label);
-   EAPI Elm_Discpicker_Item *elm_discpicker_item_prev(Elm_Discpicker_Item *item);
-   EAPI Elm_Discpicker_Item *elm_discpicker_item_next(Elm_Discpicker_Item *item);
-   EAPI void            *elm_discpicker_item_data_get(Elm_Discpicker_Item *item);
-   EAPI void             elm_discpicker_item_data_set(Elm_Discpicker_Item *item, void *data);
-   EAPI Eina_Bool        elm_discpicker_item_disabled_get(Elm_Discpicker_Item *item);
-   EAPI void             elm_discpicker_item_disabled_set(Elm_Discpicker_Item *item, Eina_Bool disabled);
+   EAPI Evas_Object     *elm_discpicker_add(Evas_Object *parent) __attribute__((deprecated));
+   EAPI void             elm_discpicker_row_height_set(Evas_Object *obj, unsigned int row_height) __attribute__((deprecated));
+   EAPI void             elm_discpicker_next(Evas_Object *obj) __attribute__((deprecated));
+   EAPI void             elm_discpicker_prev(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Discpicker_Item *elm_discpicker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data) __attribute__((deprecated));
+   EAPI Elm_Discpicker_Item *elm_discpicker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data) __attribute__((deprecated));
+   EAPI const Eina_List *elm_discpicker_items_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Discpicker_Item *elm_discpicker_first_item_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Discpicker_Item *elm_discpicker_last_item_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Discpicker_Item *elm_discpicker_selected_item_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI void             elm_discpicker_item_selected_set(Elm_Discpicker_Item *item) __attribute__((deprecated));
+   EAPI void             elm_discpicker_item_del(Elm_Discpicker_Item *item) __attribute__((deprecated));
+   EAPI const char      *elm_discpicker_item_label_get(Elm_Discpicker_Item *item) __attribute__((deprecated));
+   EAPI void             elm_discpicker_item_label_set(Elm_Discpicker_Item *item, const char *label) __attribute__((deprecated));
+   EAPI Elm_Discpicker_Item *elm_discpicker_item_prev(Elm_Discpicker_Item *item) __attribute__((deprecated));
+   EAPI Elm_Discpicker_Item *elm_discpicker_item_next(Elm_Discpicker_Item *item) __attribute__((deprecated));
+   EAPI void            *elm_discpicker_item_data_get(Elm_Discpicker_Item *item) __attribute__((deprecated));
+   EAPI void             elm_discpicker_item_data_set(Elm_Discpicker_Item *item, void *data) __attribute__((deprecated));
+   EAPI Eina_Bool        elm_discpicker_item_disabled_get(Elm_Discpicker_Item *item) __attribute__((deprecated));
+   EAPI void             elm_discpicker_item_disabled_set(Elm_Discpicker_Item *item, Eina_Bool disabled) __attribute__((deprecated));
     /* smart callback called:
     * "selected" - when discpicker selected item is changed
     * "overflowed" - when discpicker item is changed to first item from last item
@@ -1715,21 +1715,21 @@ extern "C" {
     */
 
    typedef struct _Buttonpicker_Item Elm_Buttonpicker_Item;
-   EAPI Evas_Object     *elm_buttonpicker_add(Evas_Object *parent);
-   EAPI void             elm_buttonpicker_next(Evas_Object *obj);
-   EAPI void             elm_buttonpicker_prev(Evas_Object *obj);
-   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI const Eina_List *elm_buttonpicker_items_get(Evas_Object *obj);
-   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_first_item_get(Evas_Object *obj);
-   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_last_item_get(Evas_Object *obj);
-   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_selected_item_get(Evas_Object *obj);
-   EAPI void             elm_buttonpicker_item_selected_set(Elm_Buttonpicker_Item *item);
-   EAPI void             elm_buttonpicker_item_del(Elm_Buttonpicker_Item *item);
-   EAPI const char      *elm_buttonpicker_item_label_get(Elm_Buttonpicker_Item *item);
-   EAPI void             elm_buttonpicker_item_label_set(Elm_Buttonpicker_Item *item, const char *label);
-   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_prev(Elm_Buttonpicker_Item *item);
-   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_next(Elm_Buttonpicker_Item *item);
+   EAPI Evas_Object     *elm_buttonpicker_add(Evas_Object *parent) __attribute__((deprecated));
+   EAPI void             elm_buttonpicker_next(Evas_Object *obj) __attribute__((deprecated));
+   EAPI void             elm_buttonpicker_prev(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data) __attribute__((deprecated));
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data) __attribute__((deprecated));
+   EAPI const Eina_List *elm_buttonpicker_items_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_first_item_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_last_item_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_selected_item_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI void             elm_buttonpicker_item_selected_set(Elm_Buttonpicker_Item *item) __attribute__((deprecated));
+   EAPI void             elm_buttonpicker_item_del(Elm_Buttonpicker_Item *item) __attribute__((deprecated));
+   EAPI const char      *elm_buttonpicker_item_label_get(Elm_Buttonpicker_Item *item) __attribute__((deprecated));
+   EAPI void             elm_buttonpicker_item_label_set(Elm_Buttonpicker_Item *item, const char *label) __attribute__((deprecated));
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_prev(Elm_Buttonpicker_Item *item) __attribute__((deprecated));
+   EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_next(Elm_Buttonpicker_Item *item) __attribute__((deprecated));
    /* smart callback called:
     * "changed" - when buttonpicker selected item is changed
     * "overflowed" - when buttonpicker item is changed to first item from last item
@@ -1751,11 +1751,11 @@ extern "C" {
     * default
     */
 
-   EAPI Evas_Object *elm_timepicker3_add(Evas_Object *parent);
-   EAPI void         elm_timepicker3_time_set(Evas_Object *obj, int hrs, int min, int sec);
-   EAPI void         elm_timepicker3_time_get(Evas_Object *obj, int *hrs, int *min, int *sec);
-   EAPI void         elm_timepicker3_show_am_pm_set(Evas_Object *obj, Eina_Bool am_pm);
-   EAPI void         elm_timepicker3_show_seconds_set(Evas_Object *obj, Eina_Bool seconds);
+   EAPI Evas_Object *elm_timepicker3_add(Evas_Object *parent) __attribute__((deprecated));
+   EAPI void         elm_timepicker3_time_set(Evas_Object *obj, int hrs, int min, int sec) __attribute__((deprecated));
+      EAPI void         elm_timepicker3_time_get(Evas_Object *obj, int *hrs, int *min, int *sec) __attribute__((deprecated));
+   EAPI void         elm_timepicker3_show_am_pm_set(Evas_Object *obj, Eina_Bool am_pm) __attribute__((deprecated));
+   EAPI void         elm_timepicker3_show_seconds_set(Evas_Object *obj, Eina_Bool seconds) __attribute__((deprecated));
    /* smart callback called:
     * "changed" - when timepicker3 selected item is changed
     */
@@ -1779,15 +1779,15 @@ extern "C" {
     * default
     */
 
-   EAPI Evas_Object *elm_datepicker2_add(Evas_Object *parent);
-   EAPI void         elm_datepicker2_date_set(Evas_Object *obj, int year, int month, int day);
-   EAPI void         elm_datepicker2_date_get(Evas_Object *obj, int *year, int *month, int *day);
-   EAPI void         elm_datepicker2_date_min_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
-   EAPI void         elm_datepicker2_date_min_get(Evas_Object *obj, int *year, int *month, int *day);
-   EAPI void         elm_datepicker2_date_max_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
-   EAPI void         elm_datepicker2_date_max_get(Evas_Object *obj, int *year, int *month, int *day);
-   EAPI void         elm_datepicker2_date_format_set(Evas_Object *obj, const char *fmt);
-   EAPI const char  *elm_datepicker2_date_format_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_datepicker2_add(Evas_Object *parent) __attribute__((deprecated));
+   EAPI void         elm_datepicker2_date_set(Evas_Object *obj, int year, int month, int day) __attribute__((deprecated));
+   EAPI void         elm_datepicker2_date_get(Evas_Object *obj, int *year, int *month, int *day) __attribute__((deprecated));
+   EAPI void         elm_datepicker2_date_min_set(Evas_Object *obj, int year, int month, int day) __attribute__((deprecated));  // Not implemented
+   EAPI void         elm_datepicker2_date_min_get(Evas_Object *obj, int *year, int *month, int *day)__attribute__((deprecated));
+   EAPI void         elm_datepicker2_date_max_set(Evas_Object *obj, int year, int month, int day) __attribute__((deprecated)); // Not implemented
+   EAPI void         elm_datepicker2_date_max_get(Evas_Object *obj, int *year, int *month, int *day) __attribute__((deprecated));
+   EAPI void         elm_datepicker2_date_format_set(Evas_Object *obj, const char *fmt) __attribute__((deprecated));
+   EAPI const char  *elm_datepicker2_date_format_get(Evas_Object *obj) __attribute__((deprecated));
    /* smart callback called:
     * "changed" - when datepicker selected item is changed
     */
@@ -1795,15 +1795,15 @@ extern "C" {
     * default
     */
     
-   EAPI Evas_Object *elm_datepicker3_add(Evas_Object *parent);
-   EAPI void         elm_datepicker3_date_set(Evas_Object *obj, int year, int month, int day);
-   EAPI void         elm_datepicker3_date_get(Evas_Object *obj, int *year, int *month, int *day);
-   EAPI void         elm_datepicker3_date_min_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
-   EAPI void         elm_datepicker3_date_min_get(Evas_Object *obj, int *year, int *month, int *day);
-   EAPI void         elm_datepicker3_date_max_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
-   EAPI void         elm_datepicker3_date_max_get(Evas_Object *obj, int *year, int *month, int *day);
-   EAPI void         elm_datepicker3_date_format_set(Evas_Object *obj, const char *fmt);
-   EAPI const char  *elm_datepicker3_date_format_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_datepicker3_add(Evas_Object *parent) __attribute__((deprecated));
+   EAPI void         elm_datepicker3_date_set(Evas_Object *obj, int year, int month, int day) __attribute__((deprecated));
+   EAPI void         elm_datepicker3_date_get(Evas_Object *obj, int *year, int *month, int *day) __attribute__((deprecated));
+   EAPI void         elm_datepicker3_date_min_set(Evas_Object *obj, int year, int month, int day) __attribute__((deprecated));  // Not implemented
+   EAPI void         elm_datepicker3_date_min_get(Evas_Object *obj, int *year, int *month, int *day) __attribute__((deprecated));
+   EAPI void         elm_datepicker3_date_max_set(Evas_Object *obj, int year, int month, int day) __attribute__((deprecated)); // Not implemented
+   EAPI void         elm_datepicker3_date_max_get(Evas_Object *obj, int *year, int *month, int *day) __attribute__((deprecated)); 
+   EAPI void         elm_datepicker3_date_format_set(Evas_Object *obj, const char *fmt) __attribute__((deprecated));
+   EAPI const char  *elm_datepicker3_date_format_get(Evas_Object *obj) __attribute__((deprecated));
    /* smart callback called:
     * "changed" - when datepicker3 selected item is changed
     */
@@ -2363,25 +2363,25 @@ extern "C" {
 	DIR_RIGHT ,
 	EACH_LAST 
      } Elm_Viewflipper_Policy;
-   EAPI Evas_Object *elm_viewflipper_add(Evas_Object * parent);
-   EAPI int          elm_viewflipper_isFlipbutton();
-   EAPI int          elm_viewflipper_isAutoStart();
-   EAPI int          elm_viewflipper_isValidPos(int pos);
-   EAPI int          elm_viewflipper_addChild(Evas_Object * child_layout);
-   EAPI int          elm_viewflipper_removeChild(Evas_Object * child_layout);
-   EAPI int          elm_viewflipper_removeChildAt(int pos);
-   EAPI int          elm_viewflipper_getPositionChild(Evas_Object * child_layout);
-   EAPI Evas_Object *elm_viewflipper_getChildAt(int pos);
-   EAPI int          elm_viewflipper_getCountChild();
-   EAPI int          elm_viewflipper_setDisplayedChild(int pos);
-   EAPI int          elm_viewflipper_setNowView();
-   EAPI int          elm_viewflipper_setNextView();
-   EAPI int          elm_viewflipper_setPreviousView();
-   EAPI int          elm_viewflipper_setFlipInterval(int milliseconds); 
-   EAPI int          elm_viewflipper_setFlipbutton(int showbutton);
-   EAPI int          elm_viewflipper_startAutoFlippingWithOption(int drection,int pos);
-   EAPI int          elm_viewflipper_startAutoFlipping(); 
-   EAPI int          elm_viewflipper_stopAutoFlipping();
+   EAPI Evas_Object *elm_viewflipper_add(Evas_Object * parent) __attribute__((deprecated));
+   EAPI int          elm_viewflipper_isFlipbutton() __attribute__((deprecated));
+   EAPI int          elm_viewflipper_isAutoStart() __attribute__((deprecated));
+   EAPI int          elm_viewflipper_isValidPos(int pos) __attribute__((deprecated));
+   EAPI int          elm_viewflipper_addChild(Evas_Object * child_layout) __attribute__((deprecated));
+   EAPI int          elm_viewflipper_removeChild(Evas_Object * child_layout) __attribute__((deprecated));
+   EAPI int          elm_viewflipper_removeChildAt(int pos) __attribute__((deprecated));
+   EAPI int          elm_viewflipper_getPositionChild(Evas_Object * child_layout) __attribute__((deprecated));
+   EAPI Evas_Object *elm_viewflipper_getChildAt(int pos) __attribute__((deprecated));
+   EAPI int          elm_viewflipper_getCountChild() __attribute__((deprecated));
+   EAPI int          elm_viewflipper_setDisplayedChild(int pos) __attribute__((deprecated));
+   EAPI int          elm_viewflipper_setNowView() __attribute__((deprecated));
+   EAPI int          elm_viewflipper_setNextView() __attribute__((deprecated));
+   EAPI int          elm_viewflipper_setPreviousView() __attribute__((deprecated));
+   EAPI int          elm_viewflipper_setFlipInterval(int milliseconds) __attribute__((deprecated));
+   EAPI int          elm_viewflipper_setFlipbutton(int showbutton) __attribute__((deprecated));
+   EAPI int          elm_viewflipper_startAutoFlippingWithOption(int drection,int pos)__attribute__((deprecated)); 
+   EAPI int          elm_viewflipper_startAutoFlipping() __attribute__((deprecated));
+   EAPI int          elm_viewflipper_stopAutoFlipping() __attribute__((deprecated));
 	   
    /* gallery */
    struct _Elm_Gallery_Item 
@@ -2508,14 +2508,6 @@ extern "C" {
    EAPI void         elm_autocompleteview_match_func_set(Evas_Object *obj, elmautocompleteview_matchfunction func,void *data);
    EAPI void         elm_autocompleteview_text_update(Evas_Object *obj, char *text);
 
-   /* animatedicon */
-/*   EAPI Evas_Object *elm_animatedicon_add(Evas_Object *parent);
-   EAPI void         elm_animatedicon_file_set(Evas_Object *obj, const char **images, const int item_num);
-   EAPI void         elm_animatedicon_duration_set(Evas_Object *obj, const double duration);
-   EAPI void         elm_animatedicon_animation_start(Evas_Object *obj);
-   EAPI void         elm_animatedicon_repeat_set(Evas_Object *obj, const unsigned int repeat, const double interval); 
-   */
-
    /* coverflow */
    typedef struct _Coverflow_Item Elm_Coverflow_Item;
    typedef struct _Coverflow_Item_Class 
@@ -2524,37 +2516,37 @@ extern "C" {
 	void (*CoverflowItemDelFunc)(void* data, Evas_Object* obj ); 
      } Elm_Coverflow_Item_Class;
   
-   EAPI Evas_Object *elm_coverflow_add( Evas_Object* parent );
-   EAPI Elm_Coverflow_Item* elm_coverflow_item_append( Evas_Object* obj, Elm_Coverflow_Item_Class* cic, void* data, void (*func)(void* data, Evas_Object* obj, void* event_info ), void* func_data );
-   EAPI void         elm_coverflow_clear( Evas_Object* obj );			
+   EAPI Evas_Object *elm_coverflow_add( Evas_Object* parent ) __attribute__((deprecated));
+   EAPI Elm_Coverflow_Item* elm_coverflow_item_append( Evas_Object* obj, Elm_Coverflow_Item_Class* cic, void* data, void (*func)(void* data, Evas_Object* obj, void* event_info ), void* func_data )__attribute__((deprecated));
+   EAPI void         elm_coverflow_clear( Evas_Object* obj )__attribute__((deprecated));
 
    /* Cabinet */
    typedef struct _Cabinet_Item Elm_Cabinet_Item;
-   EAPI Evas_Object        *elm_cabinet_add(Evas_Object *parent);
-   EAPI void                elm_cabinet_next(Evas_Object *obj);
-   EAPI void                elm_cabinet_prev(Evas_Object *obj);
-   EAPI Eina_Bool           elm_cabinet_bounce_get(Evas_Object *obj);
-   EAPI void                elm_cabinet_bounce_set(Evas_Object *obj, Eina_Bool bounce);
-   EAPI Elm_Cabinet_Item   *elm_cabinet_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI Elm_Cabinet_Item   *elm_cabinet_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI const Eina_List    *elm_cabinet_items_get(Evas_Object *obj);
-   EAPI Elm_Cabinet_Item   *elm_cabinet_first_item_get(Evas_Object *obj);
-   EAPI Elm_Cabinet_Item   *elm_cabinet_last_item_get(Evas_Object *obj);
-   EAPI Elm_Cabinet_Item   *elm_cabinet_selected_item_get(Evas_Object *obj);
-   EAPI void                elm_cabinet_item_selected_set(Elm_Cabinet_Item *item);
-   EAPI void                elm_cabinet_item_del(Elm_Cabinet_Item *item);
-   EAPI const char         *elm_cabinet_item_label_get(Elm_Cabinet_Item *item);
-   EAPI void                elm_cabinet_item_label_set(Elm_Cabinet_Item *item, const char *label);
-   EAPI const char         *elm_cabinet_item_sub_info_get(Elm_Cabinet_Item *item);
-   EAPI void                elm_cabinet_item_sub_info_set(Elm_Cabinet_Item *item, const char *sub_info);
-   EAPI Elm_Cabinet_Item   *elm_cabinet_item_prev(Elm_Cabinet_Item *item);
-   EAPI Elm_Cabinet_Item   *elm_cabinet_item_next(Elm_Cabinet_Item *item);
-   EAPI void               *elm_cabinet_item_data_get(Elm_Cabinet_Item *item);
-   EAPI void                elm_cabinet_item_data_set(Elm_Cabinet_Item *item, void *data);
-   EAPI Eina_Bool           elm_cabinet_item_del_btn_disabled_get(Elm_Cabinet_Item *item);
-   EAPI void                elm_cabinet_item_del_btn_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled);
-   EAPI Eina_Bool           elm_cabinet_item_sub_info_disabled_get(Elm_Cabinet_Item *item);
-   EAPI void                elm_cabinet_item_sub_info_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled);
+   EAPI Evas_Object        *elm_cabinet_add(Evas_Object *parent) __attribute__((deprecated));
+   EAPI void                elm_cabinet_next(Evas_Object *obj) __attribute__((deprecated));
+   EAPI void                elm_cabinet_prev(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Eina_Bool           elm_cabinet_bounce_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI void                elm_cabinet_bounce_set(Evas_Object *obj, Eina_Bool bounce) __attribute__((deprecated));
+   EAPI Elm_Cabinet_Item   *elm_cabinet_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data) __attribute__((deprecated));
+   EAPI Elm_Cabinet_Item   *elm_cabinet_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data) __attribute__((deprecated));
+   EAPI const Eina_List    *elm_cabinet_items_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Cabinet_Item   *elm_cabinet_first_item_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Cabinet_Item   *elm_cabinet_last_item_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI Elm_Cabinet_Item   *elm_cabinet_selected_item_get(Evas_Object *obj) __attribute__((deprecated));
+   EAPI void                elm_cabinet_item_selected_set(Elm_Cabinet_Item *item) __attribute__((deprecated));
+   EAPI void                elm_cabinet_item_del(Elm_Cabinet_Item *item) __attribute__((deprecated));
+   EAPI const char         *elm_cabinet_item_label_get(Elm_Cabinet_Item *item) __attribute__((deprecated));
+   EAPI void                elm_cabinet_item_label_set(Elm_Cabinet_Item *item, const char *label) __attribute__((deprecated));
+   EAPI const char         *elm_cabinet_item_sub_info_get(Elm_Cabinet_Item *item) __attribute__((deprecated));
+   EAPI void                elm_cabinet_item_sub_info_set(Elm_Cabinet_Item *item, const char *sub_info) __attribute__((deprecated));
+   EAPI Elm_Cabinet_Item   *elm_cabinet_item_prev(Elm_Cabinet_Item *item) __attribute__((deprecated));
+   EAPI Elm_Cabinet_Item   *elm_cabinet_item_next(Elm_Cabinet_Item *item) __attribute__((deprecated));
+   EAPI void               *elm_cabinet_item_data_get(Elm_Cabinet_Item *item) __attribute__((deprecated));
+   EAPI void                elm_cabinet_item_data_set(Elm_Cabinet_Item *item, void *data) __attribute__((deprecated));
+   EAPI Eina_Bool           elm_cabinet_item_del_btn_disabled_get(Elm_Cabinet_Item *item) __attribute__((deprecated));
+   EAPI void                elm_cabinet_item_del_btn_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled) __attribute__((deprecated));
+   EAPI Eina_Bool           elm_cabinet_item_sub_info_disabled_get(Elm_Cabinet_Item *item) __attribute__((deprecated));
+   EAPI void                elm_cabinet_item_sub_info_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled) __attribute__((deprecated));
 
    /* Dayselector */
    typedef enum 

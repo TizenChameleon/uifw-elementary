@@ -68,7 +68,6 @@ _check_clicked(void *data, Evas_Object *obj, void *event_info)
 	}
 }
 
-
 static void
 _theme_hook(Evas_Object *obj)
 {
@@ -82,8 +81,6 @@ _theme_hook(Evas_Object *obj)
   for(idx=0; idx<7; ++idx) 
 		elm_object_style_set(wd->check[idx], "dayselector");
 }
-
-
 
 /**
  * Get the state of given check object.
