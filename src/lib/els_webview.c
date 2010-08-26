@@ -228,7 +228,9 @@ static void      _smart_show(Evas_Object* obj);
 static void      _smart_hide(Evas_Object* obj);
 static void      _smart_resize(Evas_Object* obj, Evas_Coord w, Evas_Coord h);
 static void      _smart_move(Evas_Object* obj, Evas_Coord x, Evas_Coord y);
+#ifdef DEBUG
 static void      _smart_calculate(Evas_Object* obj);
+#endif
 static Eina_Bool _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev);
 static Eina_Bool _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev);
 static Eina_Bool _smart_mouse_move(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Move* ev);
@@ -533,6 +535,13 @@ _elm_smart_webview_mime_callback_set(Evas_Object* obj, const char *mime, Elm_Web
      eina_hash_add(sd->mime_func_hash, mime, func);
 }
 
+void
+_elm_smart_webview_default_layout_width_set(Evas_Object *obj, int width)
+{
+   API_ENTRY return;
+   sd->layout.default_w = width;
+}
+
 int
 _flush_and_pre_render(void *data)
 {
@@ -636,34 +645,35 @@ _smart_move(Evas_Object* obj, Evas_Coord x, Evas_Coord y)
    _parent_sc.sc.move(obj, x, y);
 }
 
-//TODO: Is it required? I just add to test
+#ifdef DEBUG
 static void
 _smart_calculate(Evas_Object* obj)
 {
-   DBG("%s\n", __func__);
    _parent_sc.sc.calculate(obj);
-   DBG("%s end\n", __func__);
 }
+#endif
 
 static Eina_Bool
 _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev)
 {
-   DBG("%s is called\n", __func__);
+   DBG("[NATIVE]%s is called\n", __func__);
    Smart_Data *sd = (Smart_Data *)esd;
    sd->mouse_down_copy = *ev;
-   sd->mouse_clicked = EINA_TRUE;
 
-   if (sd->events_feed) _parent_sc.mouse_down(esd, ev);
+   if (sd->events_feed)
+     {
+	sd->mouse_clicked = EINA_TRUE;
+	return _parent_sc.mouse_down(esd, ev);
+     }
    else return EINA_TRUE;
 }
 
 static Eina_Bool
 _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
 {
-   DBG("%s is called\n", __func__);
+   DBG("[NATIVE]%s is called\n", __func__);
    Smart_Data *sd = (Smart_Data *)esd;
    sd->mouse_up_copy = *ev;
-   sd->mouse_clicked = EINA_FALSE;
 
    if (sd->events_feed)
      {
@@ -673,7 +683,9 @@ _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
 	     return EINA_TRUE;
 	  }
 
-	_parent_sc.mouse_up(esd, ev);
+	Eina_Bool ret = _parent_sc.mouse_up(esd, ev);
+	sd->mouse_clicked = EINA_FALSE;
+	return ret;
      }
    else
      return EINA_TRUE;
@@ -920,7 +932,7 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
 
 	snprintf(szBuffer, 2048, NOT_FOUND_PAGE_HEADER "\"?%s?%s\"" NOT_FOUND_PAGE_FOOTER, error->failing_url, error->description);
 	//sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szStrBuffer, 0, NULL, NULL, NULL);
-	sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szBuffer, 0, NULL, NULL, NULL);
+	sd->ewk_frame_contents_set(error->frame, szBuffer, 0, NULL, NULL, NULL);
 	return;
      }
 }
@@ -1038,6 +1050,8 @@ _smart_input_method_changed(void* data, Evas_Object* webview, void* arg)
 		default: ecore_imf_context_input_panel_layout_set(imContext, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL);
 	       }
 	     DBG("ecore_imf_context_input_panel_show");
+	     ecore_imf_context_focus_in(imContext);
+	     ecore_imf_context_client_canvas_set(imContext, evas_object_evas_get(sd->base.self));
 	     ecore_imf_context_input_panel_show (imContext);
 	  }
      }
@@ -1131,7 +1145,7 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
 	  sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
 	  sd->zoom.max_zoom_rate = MAX_ZOOM_RATIO;
 	  sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
-	  sd->layout.w = DEFAULT_LAYOUT_WIDTH;
+	  sd->layout.w = sd->layout.default_w;
 	  sd->layout.h = object_h;
 
 	  if (!sd->ewk_view_zoom_set)
@@ -1416,18 +1430,24 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
 
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE) return;
 
+#ifdef NEED_TO_REMOVE
    evas_object_focus_set(webview, EINA_TRUE);
    if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
    if (!sd->ewk_frame_feed_focus_in)
      sd->ewk_frame_feed_focus_in = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_frame_feed_focus_in");
    sd->ewk_frame_feed_focus_in(sd->ewk_view_frame_main_get(webview));
+#endif
+
+   sd->mouse_clicked = EINA_TRUE;
    _parent_sc.mouse_down((Ewk_View_Smart_Data*)sd, &sd->mouse_down_copy);
 
+#if 0 // comment out below code until it is completed
    if (sd->bounce_horiz)
      elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
    if (sd->bounce_vert)
      elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
+#endif
 }
 
 static void
@@ -1551,6 +1571,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
      }
 
    _parent_sc.mouse_up((Ewk_View_Smart_Data*)sd, &sd->mouse_up_copy);
+   sd->mouse_clicked = EINA_FALSE;
 }
 
 static void
@@ -1623,47 +1644,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    content_h *= zoom;
    DBG("<< ========content [%d, %d] new pos [%d, %d] >>\n", content_w, content_h, old_x + dx, old_y + dy);
 
-#if 0
-   if ((old_x + dx) >= 0 && (old_x + dx) <= content_w && !elm_widget_drag_lock_x_get(sd->widget))
-     elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
-   if ((old_y + dy) >= 0 && (old_y + dy) <= content_h && !elm_widget_drag_lock_y_get(sd->widget))
-     elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
-
-   Eina_Bool locked = EINA_FALSE;
-   if (!elm_widget_drag_lock_x_get(sd->widget))
-     {
-	if ((sd->locked_dx > 0 && (sd->locked_dx + dx) <= 0)
-	      || (sd->locked_dx < 0 && (sd->locked_dx + dx) >= 0))
-	  {
-	     elm_widget_drag_lock_x_set(sd->widget, EINA_TRUE);
-	     DBG("===============<< widget x lock >>\n");
-	     dx += sd->locked_dx;
-
-	  }
-	else
-	  {
-	     sd->locked_dx += dx;
-	     locked = EINA_TRUE;
-	  }
-     }
-
-   if (!elm_widget_drag_lock_y_get(sd->widget))
-     {
-	if ((sd->locked_dy > 0 && (sd->locked_dy + dy) <= 0)
-	      || (sd->locked_dy < 0 && (sd->locked_dy + dy) >= 0))
-	  {
-	     elm_widget_drag_lock_y_set(sd->widget, EINA_TRUE);
-	     DBG("===============<< widget y lock >>\n");
-	     dy += sd->locked_dy;
-
-	  }
-	else
-	  {
-	     sd->locked_dy += dy;
-	     locked = EINA_TRUE;
-	  }
-     }
-#else
+#if 0 // comment out below code until it is completed
    Eina_Bool locked = EINA_FALSE;
    if (!elm_widget_drag_lock_x_get(sd->widget))
      {
@@ -1699,9 +1680,9 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 	     locked = EINA_TRUE;
 	  }
      }
-#endif
 
    if (locked) return;
+#endif
 
    if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
@@ -1719,6 +1700,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_move_by(sd, old_x - new_x, old_y - new_y);
 
+#if 0 // comment out below code until it is completed
    if (!sd->bounce_horiz &&
 	 (dx && elm_widget_drag_lock_x_get(sd->widget) && (old_x == new_x)))
      {
@@ -1734,6 +1716,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 	elm_widget_drag_lock_y_set(sd->widget, EINA_FALSE);
 	DBG("===============<< widget y unlock >>\n");
      }
+#endif
 }
 
 static void
@@ -1780,6 +1763,7 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	      (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
      }
 
+#if 0 // comment out below code until it is completed
    if (!sd->bounce_horiz && elm_widget_drag_lock_x_get(sd->widget))
      {
 	DBG("==============<< widget x unlock >>\n");
@@ -1791,6 +1775,7 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	DBG("==============<< widget y unlock >>\n");
 	elm_widget_drag_lock_y_set(sd->widget, EINA_FALSE);
      }
+#endif
 }
 
 static void
