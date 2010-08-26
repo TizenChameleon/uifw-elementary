@@ -17,7 +17,6 @@ struct _Widget_Data
    Evas_Object *notify;
    Evas_Object *layout;
    Evas_Object *parent;
-   Evas_Object *parent_app;
    Evas_Object *title_area;
    Evas_Object *title_icon;
    Evas_Object *content_area;
@@ -97,8 +96,6 @@ _del_pre_hook(Evas_Object *obj)
    if (!wd) return;
    evas_object_event_callback_del_full(obj, EVAS_CALLBACK_SHOW, _show, NULL);
    evas_object_event_callback_del_full(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
-   if (wd->parent_app)
-     evas_object_event_callback_del_full(wd->parent_app, EVAS_CALLBACK_RESIZE, _resize_parent, obj);
    EINA_LIST_FOREACH(wd->button_list, list, action_data)
      {
 	free(action_data);
@@ -203,6 +200,7 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
    if (wd->parent) evas_object_show(wd->parent);    
    elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
    _sizing_eval(obj);
+   edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,show", "elm");
    evas_object_show(obj);     
    if (e && !_elm_wnd_map_handler)
      {
@@ -225,26 +223,9 @@ _hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
    Widget_Data *wd = elm_widget_data_get(obj);
    
    if (!wd) return;
+   edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,hide", "elm");
    if (wd->parent) evas_object_hide(wd->parent);  
    evas_object_hide(obj); 
-}
-
-static void
-_resize_parent(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   int rot_angle;
-   
-   if (!wd) return;
-   if (wd->parent)
-     {
-	rot_angle = elm_win_rotation_get(obj);
-	if (wd->rot_angle != rot_angle)
-	  {
-               elm_win_rotation_with_resize_set(wd->parent,  rot_angle);
-               wd->rot_angle = rot_angle;
-	  }
-     }
 }
 
 static void 
@@ -354,22 +335,13 @@ elm_popup_add(Evas_Object *parent_app)
    unsigned char *prop_data = NULL;
    int ret;
 
-   //FIXME: Keep this window always on top
-   parent = elm_win_add(parent_app, "popup", ELM_WIN_DIALOG_BASIC);
-   elm_win_borderless_set(parent, EINA_TRUE);
-   elm_win_alpha_set(parent, EINA_TRUE);  
-   elm_win_raise(parent);  
-   if (parent_app)
+  if(!parent_app)
      {
-	evas_object_geometry_get(parent_app, &x, &y, &w, &h);
-	rotation = elm_win_rotation_get(parent_app);
-	evas_object_resize(parent, w, h);
-	evas_object_move(parent, x, y);
-	if (rotation != -1)
-	  elm_win_rotation_set(parent, rotation);
-     }
-   else
-     {
+	//FIXME: Keep this window always on top
+	parent = elm_win_add(parent_app, "popup", ELM_WIN_DIALOG_BASIC);
+	elm_win_borderless_set(parent, EINA_TRUE);
+	elm_win_alpha_set(parent, EINA_TRUE);
+	elm_win_raise(parent);  
 	ecore_x_window_geometry_get(ecore_x_window_root_get(ecore_x_window_focus_get()), &x, &y, &w, &h);
 	ret  = ecore_x_window_prop_property_get(ecore_x_window_root_get(ecore_x_window_focus_get()), ECORE_X_ATOM_E_ILLUME_ROTATE_ROOT_ANGLE, 
 						 ECORE_X_ATOM_CARDINAL, 32, &prop_data, &count);
@@ -378,9 +350,12 @@ elm_popup_add(Evas_Object *parent_app)
 	evas_object_resize(parent, w, h);
 	evas_object_move(parent, x, y);
 	if (rotation != -1) 
-	  elm_win_rotation_with_resize_set(parent, rotation);
-	  
+	  elm_win_rotation_with_resize_set(parent, rotation);	  
+	evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _del_parent, obj);
      }
+   else
+     parent = parent_app;
+	 	
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    obj = elm_widget_add(e);
@@ -391,14 +366,7 @@ elm_popup_add(Evas_Object *parent_app)
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
-   wd->parent = parent;
-   wd->rot_angle = rotation;
-
-   evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _del_parent, obj);
-   if (parent_app)
-     evas_object_event_callback_add(parent_app, EVAS_CALLBACK_RESIZE, _resize_parent, obj);
-   wd->parent_app = parent_app;
-
+  
    wd->notify = elm_notify_add(parent);    
    elm_widget_resize_object_set(obj, wd->notify);
    elm_notify_orient_set(wd->notify, ELM_NOTIFY_ORIENT_CENTER);
@@ -410,12 +378,17 @@ elm_popup_add(Evas_Object *parent_app)
    evas_object_size_hint_weight_set(wd->layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->layout, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
-   elm_layout_theme_set(wd->layout, "popup", "base", "default");
+   elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
    elm_notify_content_set(wd->notify, wd->layout);
 
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, NULL);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
-
+   
+   wd->rot_angle = rotation;
+   if(!parent_app)
+     {
+	wd->parent = parent;
+     }
    _sizing_eval(obj);
 
    return obj;
@@ -435,7 +408,7 @@ elm_popup_add(Evas_Object *parent_app)
  * @ingroup Popup
  */
 EAPI Evas_Object *
-elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... )
+elm_popup_with_buttons_add(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... )
 {
    Evas_Object *popup;
    popup = elm_popup_add(parent);
@@ -845,7 +818,7 @@ elm_popup_rotation_set(Evas_Object *obj, int rot_angle)
      {
 	if (wd->rot_angle != rot_angle)
 	  {
-	     elm_win_rotation_with_resize_set(wd->parent,  rot_angle);
+	     elm_win_rotation_with_resize_set(wd->parent,rot_angle);
 	     wd->rot_angle = rot_angle;
 	  }
      }
