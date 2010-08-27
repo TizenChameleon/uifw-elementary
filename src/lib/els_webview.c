@@ -1282,7 +1282,7 @@ _smart_add(Evas_Object* obj)
    sd->ewk_view_zoom_cairo_scaling_set = (Eina_Bool (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_zoom_cairo_scaling_set");
    sd->ewk_view_zoom_cairo_scaling_set(obj, EINA_TRUE);
    sd->flush_and_pre_render_idler = NULL;
-   sd->use_zoom_bouncing = EINA_FALSE;
+   sd->use_zoom_bouncing = EINA_TRUE;
 
 #ifdef NEED_TO_REMOVE
    // TODO: temporary add the mouse callbacks until the webkit engine can receive mouse events
