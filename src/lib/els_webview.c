@@ -256,6 +256,7 @@ static void      _smart_load_error(void* data, Evas_Object* webview, void* arg);
 static void      _smart_viewport_changed(void* data, Evas_Object* webview, void* arg);
 static void      _smart_input_method_changed(void* data, Evas_Object* webview, void* arg);
 static void      _smart_page_layout_info_set(Smart_Data *sd, float init_zoom_rate, float min_zoom_rate, float max_zoom_rate, Eina_Bool scalable);
+static void      _smart_contents_size_changed(void* data, Evas_Object* frame, void* arg);
 static void      _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg);
 static void      _smart_cb_view_created(void* data, Evas_Object* webview, void* arg);
 static void      _smart_add(Evas_Object* obj);
@@ -298,6 +299,7 @@ static cairo_surface_t* _image_clone_get(Smart_Data *sd, int* minimap_w, int* mi
 static void      _unzoom_position(Evas_Object* webview, int x, int y, int* ux, int* uy);
 static void      _coords_evas_to_ewk(Evas_Object* webview, int x, int y, int* ux, int* uy);
 static void      _coords_ewk_to_evas(Evas_Object* webview, int x, int y, int* ux, int* uy);
+static void      _update_min_zoom_rate(Evas_Object *obj);
 
 /* local subsystem globals */
 static Evas_Smart *_smart = NULL;
@@ -637,13 +639,7 @@ _resize_calc_job(void *data)
 	if (!sd->ewk_view_zoom_set)
 	  sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
 
-	// update min zoom rate
-	if (!sd->ewk_frame_contents_size_get)
-	  sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
-	int content_w;
-	sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(obj), &content_w, NULL);
-	if (content_w)
-	  sd->zoom.min_zoom_rate = (float)object_w / (float)content_w;
+	_update_min_zoom_rate(obj);
 
 	// set zoom
 	if (sd->ewk_view_zoom_get(obj) < sd->zoom.min_zoom_rate)
@@ -999,6 +995,7 @@ _smart_viewport_changed(void* data, Evas_Object* webview, void* arg)
    object_w = (object_w % 10) ? (object_w / 10 * 10 + 10) : object_w;
 
    // if layout width is bigger than object width, we regard current page to not the mobile page
+   // for bbc.co.uk
    if (layout_w > object_w)
      {
 	sd->layout.w = layout_w;
@@ -1016,7 +1013,9 @@ _smart_viewport_changed(void* data, Evas_Object* webview, void* arg)
 		    || strstr(url, ".m.") != NULL
 		    || strstr(url, "/mobile/i") != NULL))) // For www.bbc.co.uk/mobile/i site
 	  {
-	     return;
+	     min_zoom_rate = MIN_ZOOM_RATIO;
+	     max_zoom_rate = MAX_ZOOM_RATIO;
+	     scalable = 1;
 	  }
 	else
 	  {
@@ -1146,6 +1145,21 @@ static void _smart_page_layout_info_set(Smart_Data *sd, float init_zoom_rate, fl
 }
 
 static void
+_smart_contents_size_changed(void* data, Evas_Object* frame, void* arg)
+{
+   Smart_Data* sd = (Smart_Data *)data;
+   if (!sd) return;
+
+   Evas_Object* webview = sd->base.self;
+
+   Evas_Coord* size = (Evas_Coord*)arg;
+   if (!size || size[0] == 0)
+     return;
+
+   _update_min_zoom_rate(sd->base.self);
+}
+
+static void
 _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
 {
    DBG("%s is called\n", __func__);
@@ -1214,10 +1228,6 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
      } else {
 	  sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
 	  sd->zoom.max_zoom_rate = MAX_ZOOM_RATIO;
-	  if (sd->use_zoom_bouncing)
-	    sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate + ZOOM_IN_BOUNCING);
-	  else
-	    sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
 	  if (sd->layout.w <= 0) sd->layout.w = sd->layout.default_w;
 	  sd->layout.h = object_h;
 
@@ -1226,13 +1236,7 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
 	  sd->ewk_view_zoom_set(webview, sd->zoom.init_zoom_rate, 0, 0);
 	  sd->ewk_view_fixed_layout_size_set(webview, sd->layout.w, sd->layout.h);
 
-	  // update min zoom rate
-	  if (!sd->ewk_frame_contents_size_get)
-	    sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
-	  int content_w;
-	  sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(webview), &content_w, NULL);
-	  if (content_w)
-	    sd->zoom.min_zoom_rate = (float)object_w / (float)content_w;
+	  _update_min_zoom_rate(webview);
      }
 
    sd->ewk_view_user_scalable_set(webview, sd->zoom.scalable);
@@ -1296,6 +1300,8 @@ _smart_add(Evas_Object* obj)
 
    if (!(sd->ewk_view_frame_main_get))
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+   evas_object_smart_callback_add(sd->ewk_view_frame_main_get(obj), "contents,size,changed",
+	 _smart_contents_size_changed, sd);
    evas_object_smart_callback_add(sd->ewk_view_frame_main_get(obj), "load,nonemptylayout,finished",
 	 _smart_load_nonemptylayout_finished, sd);
 
@@ -2946,5 +2952,35 @@ _coords_ewk_to_evas(Evas_Object* obj, int x, int y, int* ux, int* uy)
    evas_object_geometry_get(obj, NULL, &viewY, NULL, NULL);
    *ux = x - scrollX;
    *uy = y - scrollY + viewY;
+}
+static void
+_update_min_zoom_rate(Evas_Object *obj)
+{
+   INTERNAL_ENTRY;
+
+   if (!sd->ewk_view_frame_main_get)
+     sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+   if (!sd->ewk_frame_contents_size_get)
+     sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
+   if (!sd->ewk_view_zoom_range_set)
+     sd->ewk_view_zoom_range_set = (void (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
+
+   int content_w, object_w;
+   evas_object_geometry_get(obj, NULL, NULL, &object_w, NULL);
+   sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(obj), &content_w, NULL);
+   if (content_w)
+     sd->zoom.min_zoom_rate = (float)object_w / (float)content_w;
+
+   if (sd->use_zoom_bouncing)
+     {
+	float min_zoom_rate = sd->zoom.min_zoom_rate - ZOOM_OUT_BOUNCING;
+	if (min_zoom_rate <= 0) min_zoom_rate = MIN_ZOOM_RATIO;
+	float max_zoom_rate = sd->zoom.max_zoom_rate + ZOOM_IN_BOUNCING;
+	sd->ewk_view_zoom_range_set(obj, min_zoom_rate, max_zoom_rate);
+     }
+   else
+     {
+	sd->ewk_view_zoom_range_set(obj, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
+     }
 }
 #endif
