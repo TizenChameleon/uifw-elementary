@@ -1005,8 +1005,24 @@ _smart_viewport_changed(void* data, Evas_Object* webview, void* arg)
 	return;
      }
 
-   // if there is no layout_w, it is the desktop site.
-   if (layout_w <= 0) return;
+   // if there is no layout_w and url does not have mobile keyword, it is the desktop site.
+   if (layout_w <= 0)
+     {
+	if (!sd->ewk_view_uri_get)
+	  sd->ewk_view_uri_get = (const char * (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_uri_get");
+	const char *url = sd->ewk_view_uri_get(webview);
+	if ((url && (strstr(url, "://m.") != NULL
+		    || strstr(url, "://wap.") != NULL
+		    || strstr(url, ".m.") != NULL
+		    || strstr(url, "/mobile/i") != NULL))) // For www.bbc.co.uk/mobile/i site
+	  {
+	     return;
+	  }
+	else
+	  {
+	     return;
+	  }
+     }
 
    // set data for mobile page
    sd->is_mobile_page = EINA_TRUE;
@@ -1202,7 +1218,7 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
 	    sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate + ZOOM_IN_BOUNCING);
 	  else
 	    sd->ewk_view_zoom_range_set(webview, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
-	  sd->layout.w = sd->layout.default_w;
+	  if (sd->layout.w <= 0) sd->layout.w = sd->layout.default_w;
 	  sd->layout.h = object_h;
 
 	  if (!sd->ewk_view_zoom_set)
