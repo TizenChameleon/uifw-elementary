@@ -1547,7 +1547,8 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
 	Evas* evas;
 	evas = evas_object_evas_get(webview);
 
-	// show discpicker
+	// TODO: we have to show list instead of discpicker
+	/* below code is deprecated
 	Evas_Object* discpicker = elm_discpicker_add(webview);
 	if (discpicker)
 	  {
@@ -1598,6 +1599,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
 	     evas_object_move(discpicker, 0, 400);
 	     evas_object_show(discpicker);
 	  }
+	  */
      }
 
    if (sd->use_text_selection  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
