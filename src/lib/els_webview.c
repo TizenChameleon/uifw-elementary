@@ -74,6 +74,8 @@ struct _Smart_Data {
      Ewk_View_Smart_Data base; //default data
 
      Evas_Object* widget;
+     Ecore_Job *move_calc_job;
+     Ecore_Job *resize_calc_job;
      Eina_Hash* mime_func_hash;
      int locked_dx;
      int locked_dy;
@@ -224,6 +226,8 @@ struct _Smart_Data {
 };
 
 /* local subsystem functions */
+static void      _resize_calc_job(void *data);
+static void      _move_calc_job(void *data);
 static void      _smart_show(Evas_Object* obj);
 static void      _smart_hide(Evas_Object* obj);
 static void      _smart_resize(Evas_Object* obj, Evas_Coord w, Evas_Coord h);
@@ -591,17 +595,34 @@ _smart_resize(Evas_Object* obj, Evas_Coord w, Evas_Coord h)
    DBG("%s\n", __func__);
    INTERNAL_ENTRY;
 
+   Evas_Coord ow, oh;
+   evas_object_geometry_get(obj, NULL, NULL, &ow, &oh);
+   if ((ow == w) && (oh == h)) return;
+   if (sd->resize_calc_job) ecore_job_del(sd->resize_calc_job);
+   sd->resize_calc_job = ecore_job_add(_resize_calc_job, obj);
+}
+
+static void
+_resize_calc_job(void *data)
+{
+   Evas_Object *obj = data;
+   INTERNAL_ENTRY;
+
    int object_w, object_h;
    evas_object_geometry_get(obj, NULL, NULL, &object_w, &object_h);
    object_w = (object_w % 10) ? (object_w / 10 * 10 + 10) : object_w;
 
    if (sd->is_mobile_page)
      {
+	int old_layout_w = sd->layout.w;
 	sd->layout.w = object_w / sd->zoom.init_zoom_rate;
 	sd->layout.h = object_h / sd->zoom.init_zoom_rate;
-	if (!sd->ewk_view_fixed_layout_size_set)
-	  sd->ewk_view_fixed_layout_size_set = (void (*)(Evas_Object *, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_fixed_layout_size_set");
-	sd->ewk_view_fixed_layout_size_set(obj, sd->layout.w, sd->layout.h);
+	if (old_layout_w != sd->layout.w)
+	  {
+	     if (!sd->ewk_view_fixed_layout_size_set)
+	       sd->ewk_view_fixed_layout_size_set = (void (*)(Evas_Object *, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_fixed_layout_size_set");
+	     sd->ewk_view_fixed_layout_size_set(obj, sd->layout.w, sd->layout.h);
+	  }
      }
    else
      {
@@ -633,7 +654,19 @@ _smart_resize(Evas_Object* obj, Evas_Coord w, Evas_Coord h)
 	sd->flush_and_pre_render_idler = ecore_idler_add(_flush_and_pre_render, obj);
      }
 
-   _parent_sc.sc.resize(obj, w, h);
+   sd->resize_calc_job = NULL;
+   _parent_sc.sc.resize(obj, object_w, object_h);
+}
+
+static void
+_move_calc_job(void *data)
+{
+   Evas_Object *obj = data;
+   INTERNAL_ENTRY;
+   int x, y;
+   evas_object_geometry_get(obj, &x, &y, NULL, NULL);
+   sd->move_calc_job = NULL;
+   _parent_sc.sc.move(obj, x, y);
 }
 
 static void
@@ -642,7 +675,8 @@ _smart_move(Evas_Object* obj, Evas_Coord x, Evas_Coord y)
    DBG("%s\n", __func__);
    INTERNAL_ENTRY;
 
-   _parent_sc.sc.move(obj, x, y);
+   if (sd->move_calc_job) ecore_job_del(sd->move_calc_job);
+   sd->move_calc_job = ecore_job_add(_move_calc_job, obj);
 }
 
 #ifdef DEBUG
@@ -1185,6 +1219,8 @@ _smart_add(Evas_Object* obj)
    evas_object_smart_data_set(obj, sd);
    _parent_sc.sc.add(obj);
 
+   sd->resize_calc_job = NULL;
+   sd->move_calc_job = NULL;
    sd->thumbnail = NULL;
    sd->minimap.eo = NULL;
    sd->dropdown.options = NULL;
