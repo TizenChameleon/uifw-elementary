@@ -9,8 +9,6 @@
 
 #define _EDJ(x) (Evas_Object *)elm_layout_edje_get(x)
 
-typedef void (*CalendarReturnCB)(void* cb_data, int year, int month, int day);
-
 enum
 {
 	SUN = 0x0,
@@ -28,14 +26,20 @@ struct _Widget_Data
 {
 	Evas_Object* parent;
 	Evas_Object* layout;
-	Evas_Object* bg;
 	Evas_Object* ly_title;
 	Evas_Object* ly_content;
+	Evas_Object* obj;
+	Evas_Object* focus_obj;
 
-	struct tm startTime;
+	struct tm current_time;
+	struct tm selected_time;
 	Evas_Coord x, y;
+	Evas_Coord table_x, table_y;
+	Evas_Coord table_mw, table_mh;
+	Evas_Coord ly_content_x, ly_content_y;
 
-	CalendarReturnCB return_cb;
+	Eina_Bool mouse_down;
+
 	void* cb_data;
 };
 
@@ -64,7 +68,7 @@ _sizing_eval(Evas_Object *obj)
 
 	if (!wd) return;
 	elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-	edje_object_size_min_restricted_calc(wd->bg, &minw, &minh, minw, minh);
+	//edje_object_size_min_restricted_calc(wd->bg, &minw, &minh, minw, minh);
 	elm_coords_finger_size_adjust(1, &minw, 1, &minh);
 
 	evas_object_size_hint_min_get(obj, &w, &h);
@@ -88,17 +92,26 @@ _del_hook( Evas_Object* obj )
 {
 	Widget_Data* wd = (Widget_Data*) elm_widget_data_get( obj );
 	if(!wd) return;
-	elm_ctxpopup_clear(obj);
+	
+	Evas_Object *tb;
+
+	tb = edje_object_part_swallow_get( wd->ly_content, "month/swallow/days/l" );
+	if (tb) elm_table_clear(tb, EINA_TRUE);
+	tb = edje_object_part_swallow_get( wd->ly_content, "month/swallow/days/c" );
+	if (tb) elm_table_clear(tb, EINA_TRUE);
+	tb = edje_object_part_swallow_get( wd->ly_content, "month/swallow/days/r" );
+	if (tb) elm_table_clear(tb, EINA_TRUE);
+
+	if (wd->layout) evas_object_del(wd->layout);
+	if (wd->ly_title) evas_object_del(wd->ly_title);
+	if (wd->ly_content) evas_object_del(wd->ly_content);
+
 	free( wd );
 }
 
 static void 
 _theme_hook(Evas_Object* obj)
 {
-	Eina_List* elist;
-	Eina_List* elist_child;
-	Eina_List* elist_temp;
-
 	Widget_Data* wd = (Widget_Data*) elm_widget_data_get(obj);
 
 	if(!wd)	return;
@@ -112,7 +125,7 @@ _bg_clicked_cb(void* data, Evas_Object* obj, void* event_info)
 	Widget_Data* wd = (Widget_Data*) data;
 	if (!wd) return;
 
-	edje_object_signal_emit( _EDJ(wd->layout), "calendar.hide", "hide" );
+	edje_object_signal_emit( wd->layout, "calendar.hide", "hide" );
 }
 
 static void 
@@ -128,7 +141,7 @@ _calendar_show(void* data, Evas* evas, Evas_Object* obj, void* event_info)
 	if (!wd) return;
 
 	evas_object_show(wd->layout);
-	edje_object_signal_emit( _EDJ(wd->layout), "calendar.show", "show" );
+	edje_object_signal_emit( wd->layout, "calendar.show", "show" );
 }
 
 static void 
@@ -137,7 +150,7 @@ _calendar_hide(void* data, Evas* evas, Evas_Object* obj, void* event_info)
 	Widget_Data* wd = (Widget_Data*) data;
 	if (!wd) return;
 
-	edje_object_signal_emit( _EDJ(wd->layout), "calendar.hide", "hide" );
+	edje_object_signal_emit( wd->layout, "calendar.hide", "hide" );
 }
 
 static void 
@@ -145,13 +158,90 @@ _mouse_move_cb(void* data, Evas* evas, Evas_Object* obj, void* event_info)
 {
 	Evas_Event_Mouse_Move *move = (Evas_Event_Mouse_Move *)event_info;
 
+	int i, j;	
+	char tmp[32] = {0};
 	Evas_Coord x, y, w, h;
+	Evas_Object *eo;
+
 	Widget_Data* wd = (Widget_Data*) data;
 	if(!wd) return;
-	evas_object_geometry_get( obj, &x, &y, &w, &h );
-	wd->x = x;
-	wd->y = y;
-	_sizing_eval(obj);
+
+	if( wd->mouse_down )
+	{
+		evas_object_geometry_get( obj, &x, &y, &w, &h );
+		for( i=1; i<8; i++ )
+		{
+			if( move->cur.output.x < x + wd->table_mw * i )
+			{
+				i--;
+				break;
+			}
+		}
+		for( j=1; j<7; j++ )
+		{
+			if( move->cur.output.y < y + wd->table_mh * j )
+			{
+				j--;
+				break;
+			}
+		}
+
+		if( i == 8 )
+		{
+			for( j=0; j<6; j++ )
+			{
+				snprintf( tmp, sizeof(tmp), "%d%d", j, 7 );
+				eo = evas_object_data_get( obj, tmp );
+				if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+			}
+
+			return;
+		}
+		if( j == 7 )
+		{
+			for( i=0; i<6; i++ )
+			{
+				snprintf( tmp, sizeof(tmp), "%d%d", 6, i );
+				eo = evas_object_data_get( obj, tmp );
+				if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+			}
+
+			return;
+		}
+
+		snprintf( tmp, sizeof(tmp), "%d%d", j-1, i-1 );
+		eo = evas_object_data_get( obj, tmp );
+		if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+		snprintf( tmp, sizeof(tmp), "%d%d", j-1, i );
+		eo = evas_object_data_get( obj, tmp );
+		if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+		snprintf( tmp, sizeof(tmp), "%d%d", j-1, i+1 );
+		eo = evas_object_data_get( obj, tmp );
+		if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+		snprintf( tmp, sizeof(tmp), "%d%d", j, i-1 );
+		eo = evas_object_data_get( obj, tmp );
+		if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+		snprintf( tmp, sizeof(tmp), "%d%d", j, i+1 );
+		eo = evas_object_data_get( obj, tmp );
+		if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+		snprintf( tmp, sizeof(tmp), "%d%d", j+1, i-1 );
+		eo = evas_object_data_get( obj, tmp );
+		if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+		snprintf( tmp, sizeof(tmp), "%d%d", j+1, i );
+		eo = evas_object_data_get( obj, tmp );
+		if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+		snprintf( tmp, sizeof(tmp), "%d%d", j+1, i+1 );
+		eo = evas_object_data_get( obj, tmp );
+		if( eo ) edje_object_signal_emit( _EDJ(eo), "mday.unfocus", "month" );	
+
+		snprintf( tmp, sizeof(tmp), "%d%d", j, i );
+		eo = evas_object_data_get( obj, tmp );
+		if( eo ) 
+		{
+			wd->focus_obj = eo;
+			edje_object_signal_emit( _EDJ(eo), "mday.focus", "month" );	
+		}
+	}
 }
 
 static void 
@@ -159,25 +249,45 @@ _mouse_down_cb(void* data, Evas* evas, Evas_Object* obj, void* event_info)
 {
 	Evas_Event_Mouse_Down *down = (Evas_Event_Mouse_Down *)event_info;
 
+	printf("\n DOWN !!!!!!! \n");
 	Evas_Coord x, y, w, h;
-	const char *text;
-	int day;
+	Evas_Object *eo;
+	char tmp[32] = {0};
+	int i, j;
 	Widget_Data* wd = (Widget_Data*) data;
 	if(!wd) return;
 
+	wd->mouse_down = EINA_TRUE;
+
+	if( wd->focus_obj )
+	   	edje_object_signal_emit( _EDJ(wd->focus_obj), "mday.unfocus", "month" );	
+		
 	evas_object_geometry_get( obj, &x, &y, &w, &h );
-
-	text = edje_object_part_text_get( _EDJ(obj), "month_mday_text" );
-	if( text == NULL )
-		return;
-
-	day = atoi(text);
-	if( day > 0 && day < 32 )
+	for( i=1; i<7; i++ )
 	{
-		edje_object_signal_emit( _EDJ(obj), "mday.focus", "month" );
-		wd->return_cb(wd->cb_data, wd->startTime.tm_year+1900, wd->startTime.tm_mon+1, day);
-		edje_object_signal_emit( _EDJ(wd->layout), "calendar.hide", "hide" );
+		if( down->output.x < x + wd->table_mw * i )
+		{
+			i--;
+			break;
+		}
 	}
+	for( j=1; j<6; j++ )
+	{
+		if( down->output.y < y + wd->table_mh * j )
+		{
+			j--;
+			break;
+		}
+	}
+
+	snprintf( tmp, sizeof(tmp), "%d%d", j, i );
+	eo = evas_object_data_get( obj, tmp );
+	if( eo )
+	{
+		wd->focus_obj = eo;
+	   	edje_object_signal_emit( _EDJ(eo), "mday.focus", "month" );	
+	}
+	
 }
 
 static void 
@@ -186,10 +296,43 @@ _mouse_up_cb(void* data, Evas* evas, Evas_Object* obj, void* event_info)
 	Evas_Event_Mouse_Up *up = (Evas_Event_Mouse_Up *)event_info;
 	
 	Evas_Coord x, y, w, h;
+	Evas_Object *eo;
+	int i, j, day;
+	char tmp[32] = {0};
+	const char *text;
+	struct tm time;
 	Widget_Data* wd = (Widget_Data*) data;
 	if(!wd) return;
 
+	wd->mouse_down = EINA_FALSE;
+
 	evas_object_geometry_get( obj, &x, &y, &w, &h );
+	for( i=1; i<7; i++ )
+	{
+		if( up->output.x < x + wd->table_mw * i )
+			break;
+	}
+	for( j=1; j<6; j++ )
+	{
+		if( up->output.y < y + wd->table_mh * j )
+			break;
+	}
+
+	snprintf( tmp, sizeof(tmp), "%d%d", --j, --i );
+	eo = evas_object_data_get( obj, tmp );
+	text = edje_object_part_text_get( _EDJ(eo), "month_mday_text" );
+	if( text == NULL )
+		return;
+
+	day = atoi(text);
+	if( day > 0 && day < 32 )
+	{
+		time.tm_year = wd->selected_time.tm_year + 1900;
+		time.tm_mon = wd->selected_time.tm_mon + 1;
+		time.tm_mday = day;
+
+		evas_object_smart_callback_call(wd->obj, "response", &time);
+	}
 }
 
 static int
@@ -290,21 +433,29 @@ _calendar_resize_table(Evas_Object *tb, void *data)
 {
 	int i, j;
 	char buf[32] = {0};
-	Evas_Coord mw, mh, x, y, w, h;
+	Evas_Coord x, y, w, h;
 	Evas_Object *rect, *ly;
 
-	evas_object_geometry_get( tb, &x, &y, &w, &h );
+	Widget_Data *wd = (Widget_Data *) data;
+	if (!wd) return;
+	
+	evas_object_geometry_get( wd->layout, &x, &y, &w, &h );
+	evas_object_geometry_get( wd->ly_content, &wd->ly_content_x, &wd->ly_content_y, &w, &h );
+	evas_object_geometry_get( tb, &wd->table_x, &wd->table_y, &w, &h );
+	wd->table_y = y + wd->ly_content_y + wd->table_y;
 	elm_table_clear( tb, EINA_TRUE );
 
-	mw = (int)(w / 7);
-	mh = (int)(h / 6);
+	wd->table_mw = (int)(w / 7);
+	wd->table_mh = (int)(h / 6);
 	
+	printf("\n TABLE SIZE : mw= %d, mh= %d, x= %d, y= %d y2= %d y3= %d\n", wd->table_mw, wd->table_mh, wd->table_x, wd->table_y, wd->ly_content_y, y);
+
 	for( i=0; i<6; i++ )
 	{
 		for( j=0; j<7; j++ )
 		{
 			rect = evas_object_rectangle_add( evas_object_evas_get(tb) );
-			evas_object_size_hint_min_set( rect, mw, mh );
+			evas_object_size_hint_min_set( rect, wd->table_mw, wd->table_mh );
 			evas_object_size_hint_weight_set( rect, 0.0, 0.0 );
 			evas_object_size_hint_align_set( rect, EVAS_HINT_FILL, EVAS_HINT_FILL );
 			evas_object_color_set( rect, 0, 0, 0, 255 );
@@ -322,19 +473,52 @@ _calendar_resize_table(Evas_Object *tb, void *data)
 			evas_object_data_set( tb, buf, ly );
 			evas_object_data_set( ly, "table", tb );
 
-			evas_object_event_callback_add( ly, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down_cb, data );
-			evas_object_event_callback_add( ly, EVAS_CALLBACK_MOUSE_MOVE, _mouse_move_cb, data );
-			evas_object_event_callback_add( ly, EVAS_CALLBACK_MOUSE_UP, _mouse_up_cb, data );
+			//evas_object_event_callback_add( ly, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down_cb, data );
+			//evas_object_event_callback_add( ly, EVAS_CALLBACK_MOUSE_MOVE, _mouse_move_cb, data );
+			//evas_object_event_callback_add( ly, EVAS_CALLBACK_MOUSE_UP, _mouse_up_cb, data );
 		}
 	}
+
+	evas_object_event_callback_add( tb, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down_cb, data );
+	evas_object_event_callback_add( tb, EVAS_CALLBACK_MOUSE_MOVE, _mouse_move_cb, data );
+	evas_object_event_callback_add( tb, EVAS_CALLBACK_MOUSE_UP, _mouse_up_cb, data );
 }
 
+static void
+_calendar_wday_text_set(void* data)
+{
+	struct tm stday;
+	int i;
+	char tmp[32];
+	char buf[32];
+
+	Widget_Data *wd = (Widget_Data *) data;
+	if (!wd) return;
+
+	stday.tm_wday = 0;
+	for( i=0; i<7; i++ )
+	{
+		snprintf( tmp, sizeof(tmp), "month_text_wday_%d", i );
+		strftime( buf, sizeof(buf), "%a", &stday );
+		stday.tm_wday++;
+
+		edje_object_part_text_set( wd->ly_content, tmp, buf );
+	}
+
+	edje_object_color_class_set( wd->ly_content, "cc_month_wday_0", 226, 20, 20, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
+	edje_object_color_class_set( wd->ly_content, "cc_month_wday_1", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
+	edje_object_color_class_set( wd->ly_content, "cc_month_wday_2", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
+	edje_object_color_class_set( wd->ly_content, "cc_month_wday_3", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
+	edje_object_color_class_set( wd->ly_content, "cc_month_wday_4", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
+	edje_object_color_class_set( wd->ly_content, "cc_month_wday_5", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
+	edje_object_color_class_set( wd->ly_content, "cc_month_wday_6", 47, 120, 220, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
+}
 
 static void
 _calendar_update(void* data, struct tm *st)
 {
 	Evas_Object *tb, *eo;
-	int i, wday, last_mday, wcount_f, wcount_l;
+	int wday, last_mday, wcount_f, wcount_l;
 	int today_row, today_col;
 	char tmp[32] = {0};
 	char buf[32] = {0};
@@ -344,37 +528,18 @@ _calendar_update(void* data, struct tm *st)
 	Widget_Data *wd = (Widget_Data *) data;
 	if (!wd) return;
 	
-	eo = edje_object_part_swallow_get( _EDJ(wd->layout), "elm.swallow.title" );
+	eo = edje_object_part_swallow_get( wd->layout, "elm.swallow.title" );
 	strftime(buf, sizeof(buf), "%B %Y", st);
-	edje_object_part_text_set( _EDJ(eo), "text.title", buf );
+	edje_object_part_text_set( eo, "text.title", buf );
 
-	tb = edje_object_part_swallow_get( _EDJ(wd->ly_content), "month/swallow/days/c" );
+	tb = edje_object_part_swallow_get( wd->ly_content, "month/swallow/days/c" );
 		
-	stday.tm_wday = 0;
-
-	for( i=0; i<7; i++ )
-	{
-		snprintf( tmp, sizeof(tmp), "month_text_wday_%d", i );
-		strftime( buf, sizeof(buf), "%a", &stday );
-		stday.tm_wday++;
-
-		edje_object_part_text_set( _EDJ(wd->ly_content), tmp, buf );
-	}
-
-	edje_object_color_class_set( _EDJ(wd->ly_content), "cc_month_wday_0", 226, 20, 20, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
-	edje_object_color_class_set( _EDJ(wd->ly_content), "cc_month_wday_1", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
-	edje_object_color_class_set( _EDJ(wd->ly_content), "cc_month_wday_2", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
-	edje_object_color_class_set( _EDJ(wd->ly_content), "cc_month_wday_3", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
-	edje_object_color_class_set( _EDJ(wd->ly_content), "cc_month_wday_4", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
-	edje_object_color_class_set( _EDJ(wd->ly_content), "cc_month_wday_5", 102, 102, 102, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
-	edje_object_color_class_set( _EDJ(wd->ly_content), "cc_month_wday_6", 47, 120, 220, 255, 255, 255, 255, 255, 0, 0, 0, 0  );
-	
 	wcount_f = _calendar_get_current_wcount( st->tm_year + 1900, st->tm_mon + 1, 1, 0 );
 	last_mday = _calendar_get_last_day( st->tm_year + 1900, st->tm_mon + 1 );
 	wcount_l = _calendar_get_current_wcount( st->tm_year + 1900, st->tm_mon + 1, last_mday, 0 );
 	
 	snprintf( tmp, sizeof(tmp), "month.list.wcount.%d", wcount_l - wcount_f + 1 );
-	edje_object_signal_emit( _EDJ(wd->ly_content), tmp, "month" );
+	edje_object_signal_emit( wd->ly_content, tmp, "month" );
 
 	_calendar_resize_table( tb, data );
 	_calendar_set_text_mday( tb, st->tm_year + 1900, st->tm_mon + 1, 0 );
@@ -391,15 +556,8 @@ _calendar_update(void* data, struct tm *st)
 		snprintf( tmp, sizeof(tmp), "%d%d", today_col, today_row );
 		eo = evas_object_data_get( tb, tmp );
 		edje_object_signal_emit( _EDJ(eo), "mday.today", "month" );	
+		wd->focus_obj = eo;
 	}
-}
-
-static void
-_calendar_resize_table_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-	Widget_Data *wd = (Widget_Data *) data;
-
-	_calendar_update( wd, &wd->startTime );
 }
 
 static int
@@ -410,18 +568,19 @@ _calendar_goto_prev_month(void *data)
 	time_t tt;
 	Widget_Data *wd = (Widget_Data *) data;
 	
-	tb = edje_object_part_swallow_get( _EDJ(wd->ly_content), "month/swallow/days/r" );
+	tb = edje_object_part_swallow_get( wd->ly_content, "month/swallow/days/r" );
 	if( tb )
 	{
-		edje_object_part_unswallow( _EDJ(wd->ly_content), tb );
+		edje_object_part_unswallow( wd->ly_content, tb );
 		evas_object_del( tb );
 	}
 
-	tb = edje_object_part_swallow_get( _EDJ(wd->ly_content), "month/swallow/days/c" );
-	edje_object_part_unswallow( _EDJ(wd->ly_content), tb );
+	tb = edje_object_part_swallow_get( wd->ly_content, "month/swallow/days/c" );
+	edje_object_part_unswallow( wd->ly_content, tb );
 	
-	elm_layout_content_set( wd->ly_content, "month/swallow/days/r", tb );
-	edje_object_signal_emit( _EDJ(wd->ly_content), "move.days.r.middle", "month" );
+	edje_object_part_swallow(wd->ly_content, "month/swallow/days/r", tb);
+	//elm_layout_content_set( wd->ly_content, "month/swallow/days/r", tb );
+	edje_object_signal_emit( wd->ly_content, "move.days.r.middle", "month" );
 
 	tb = elm_table_add( wd->ly_content );
 	elm_table_homogenous_set( tb, EINA_FALSE );
@@ -429,19 +588,18 @@ _calendar_goto_prev_month(void *data)
 	evas_object_size_hint_weight_set( tb, 0.0, 0.0 );
 	evas_object_size_hint_align_set( tb, EVAS_HINT_FILL, EVAS_HINT_FILL );
 	
-	wd->startTime.tm_mon--;
-	new_mday = _calendar_get_last_day( wd->startTime.tm_year + 1900, wd->startTime.tm_mon + 1 );
-	if( wd->startTime.tm_mday > new_mday )
-		wd->startTime.tm_mday = new_mday;
+	wd->selected_time.tm_mon--;
+	new_mday = _calendar_get_last_day( wd->selected_time.tm_year + 1900, wd->selected_time.tm_mon + 1 );
+	if( wd->selected_time.tm_mday > new_mday )
+		wd->selected_time.tm_mday = new_mday;
 
-	tt = mktime( &wd->startTime );
-	localtime_r( &tt, &wd->startTime );
+	tt = mktime( &wd->selected_time );
+	localtime_r( &tt, &wd->selected_time );
 
-	elm_layout_content_set( wd->ly_content, "month/swallow/days/c", tb );
-	edje_object_signal_emit( _EDJ(wd->ly_content), "move.days.c.left", "month" );
+	edje_object_part_swallow(wd->ly_content, "month/swallow/days/c", tb);
+	edje_object_signal_emit( wd->ly_content, "move.days.c.left", "month" );
 
-	//evas_object_event_callback_add( wd->table, EVAS_CALLBACK_RESIZE, _calendar_resize_table_cb, wd );
-	_calendar_update( wd, &wd->startTime );
+	_calendar_update( wd, &wd->selected_time );
 }
 
 static int
@@ -452,18 +610,18 @@ _calendar_goto_next_month(void *data)
 	time_t tt;
 	Widget_Data *wd = (Widget_Data *) data;
 	
-	tb = edje_object_part_swallow_get( _EDJ(wd->ly_content), "month/swallow/days/l" );
+	tb = edje_object_part_swallow_get( wd->ly_content, "month/swallow/days/l" );
 	if( tb )
 	{
-		edje_object_part_unswallow( _EDJ(wd->ly_content), tb );
+		edje_object_part_unswallow( wd->ly_content, tb );
 		evas_object_del( tb );
 	}
 
-	tb = edje_object_part_swallow_get( _EDJ(wd->ly_content), "month/swallow/days/c" );
-	edje_object_part_unswallow( _EDJ(wd->ly_content), tb );
+	tb = edje_object_part_swallow_get( wd->ly_content, "month/swallow/days/c" );
+	edje_object_part_unswallow( wd->ly_content, tb );
 	
-	elm_layout_content_set( wd->ly_content, "month/swallow/days/l", tb );
-	edje_object_signal_emit( _EDJ(wd->ly_content), "move.days.l.middle", "month" );
+	edje_object_part_swallow(wd->ly_content, "month/swallow/days/l", tb);
+	edje_object_signal_emit( wd->ly_content, "move.days.l.middle", "month" );
 
 	tb = elm_table_add( wd->ly_content );
 	elm_table_homogenous_set( tb, EINA_FALSE );
@@ -471,19 +629,18 @@ _calendar_goto_next_month(void *data)
 	evas_object_size_hint_weight_set( tb, 0.0, 0.0 );
 	evas_object_size_hint_align_set( tb, EVAS_HINT_FILL, EVAS_HINT_FILL );
 	
-	wd->startTime.tm_mon++;
-	new_mday = _calendar_get_last_day( wd->startTime.tm_year + 1900, wd->startTime.tm_mon + 1 );
-	if( wd->startTime.tm_mday > new_mday )
-		wd->startTime.tm_mday = new_mday;
+	wd->selected_time.tm_mon++;
+	new_mday = _calendar_get_last_day( wd->selected_time.tm_year + 1900, wd->selected_time.tm_mon + 1 );
+	if( wd->selected_time.tm_mday > new_mday )
+		wd->selected_time.tm_mday = new_mday;
 
-	tt = mktime( &wd->startTime );
-	localtime_r( &tt, &wd->startTime );
+	tt = mktime( &wd->selected_time );
+	localtime_r( &tt, &wd->selected_time );
 
-	elm_layout_content_set( wd->ly_content, "month/swallow/days/c", tb );
-	edje_object_signal_emit( _EDJ(wd->ly_content), "move.days.c.right", "month" );
+	edje_object_part_swallow(wd->ly_content, "month/swallow/days/c", tb);
+	edje_object_signal_emit( wd->ly_content, "move.days.c.right", "month" );
 
-	//evas_object_event_callback_add( wd->table, EVAS_CALLBACK_RESIZE, _calendar_resize_table_cb, wd );
-	_calendar_update( wd, &wd->startTime );
+	_calendar_update( wd, &wd->selected_time );
 }
 
 static void
@@ -492,7 +649,7 @@ _arrow_left_btn_cb(void *data, Evas_Object *obj, const char *emission, const cha
 	Widget_Data *wd = (Widget_Data *) data;
 	
 	_calendar_goto_prev_month(wd);
-	edje_object_signal_emit( _EDJ(wd->ly_content), "flick.days.prev", "month" );
+	edje_object_signal_emit( wd->ly_content, "flick.days.prev", "month" );
 }
 
 static void
@@ -501,7 +658,7 @@ _arrow_right_btn_cb(void *data, Evas_Object *obj, const char *emission, const ch
 	Widget_Data *wd = (Widget_Data *) data;
 	
 	_calendar_goto_next_month(wd);
-	edje_object_signal_emit( _EDJ(wd->ly_content), "flick.days.next", "month" );
+	edje_object_signal_emit( wd->ly_content, "flick.days.next", "month" );
 }
 
 /**
@@ -515,13 +672,11 @@ _arrow_right_btn_cb(void *data, Evas_Object *obj, const char *emission, const ch
 EAPI Evas_Object* 
 elm_calendar_add(Evas_Object* parent)
 {
-	Evas_Object* obj, *title, *table;
+	Evas_Object *obj, *table;
 	Evas* e;
 	Widget_Data* wd;
-	Evas_Coord x, y, w, h;
 	time_t tt;
 	struct tm st;
-	char buf[32] = {0};
 
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
@@ -533,47 +688,40 @@ elm_calendar_add(Evas_Object* parent)
 	elm_widget_del_hook_set(obj, _del_hook);
 	elm_widget_theme_hook_set(obj, _theme_hook);
 	wd->parent = parent;
+	wd->obj = obj;
+	wd->focus_obj = NULL;
+	wd->mouse_down = EINA_FALSE;
 
-	wd->layout = elm_layout_add( parent );
-	elm_widget_sub_object_add(obj, wd->layout);
-	elm_layout_theme_set(wd->layout, "calendar", "bg", "default");
-	evas_object_size_hint_weight_set(wd->layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	edje_object_signal_callback_add(_EDJ(wd->layout), "mouse,clicked,1", "base_temp", _bg_clicked_cb, wd);
-	
-	wd->ly_title = elm_layout_add( parent );
-	elm_layout_theme_set(wd->ly_title, "calendar", "title", "default");
-	evas_object_size_hint_weight_set(wd->ly_title, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	evas_object_size_hint_align_set(wd->ly_title, EVAS_HINT_FILL, EVAS_HINT_FILL);
-	edje_object_signal_callback_add(_EDJ(wd->ly_title), "mouse,clicked,1", "rect.arrow.left", _arrow_left_btn_cb, wd);
-	edje_object_signal_callback_add(_EDJ(wd->ly_title), "mouse,clicked,1", "rect.arrow.right", _arrow_right_btn_cb, wd);
-	elm_layout_content_set(wd->layout, "elm.swallow.title", wd->ly_title);
-	
-	wd->ly_content = elm_layout_add( parent );
-	elm_layout_theme_set(wd->ly_content, "calendar", "content", "default");
-	evas_object_size_hint_weight_set(wd->ly_content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	evas_object_size_hint_align_set(wd->ly_content, EVAS_HINT_FILL, EVAS_HINT_FILL);
-	elm_layout_content_set(wd->layout, "elm.swallow.content", wd->ly_content);
+	wd->layout = edje_object_add(e);
+	_elm_theme_object_set(obj, wd->layout, "calendar", "bg", "default");
+	elm_widget_resize_object_set(obj, wd->layout);
 
-	evas_object_geometry_get(parent, &x, &y, &w, &h);
-	evas_object_move(wd->layout, x, y);
-	evas_object_resize(wd->layout, w, h);
+	wd->ly_title = edje_object_add(e);
+	_elm_theme_object_set(obj, wd->ly_title, "calendar", "title", "default");
+	edje_object_signal_callback_add(wd->ly_title, "mouse,clicked,1", "rect.arrow.left", _arrow_left_btn_cb, wd);
+	edje_object_signal_callback_add(wd->ly_title, "mouse,clicked,1", "rect.arrow.right", _arrow_right_btn_cb, wd);
+	edje_object_part_swallow(wd->layout, "elm.swallow.title", wd->ly_title);
+
+	wd->ly_content = edje_object_add(e);
+	_elm_theme_object_set(obj, wd->ly_content, "calendar", "content", "default");
+	edje_object_part_swallow(wd->layout, "elm.swallow.content", wd->ly_content);
 
 	// Set the current date.
 	tt = time(NULL);
 	localtime_r(&tt, &st);
-	title = edje_object_part_swallow_get(_EDJ(wd->layout), "elm.swallow.title");
-	strftime(buf, sizeof(buf), "%B %Y", &st);	
-	edje_object_part_text_set(_EDJ(title), "text.title", buf);
-	wd->startTime = st;
+	wd->current_time = st;
+	wd->selected_time = st;
+
+	_calendar_wday_text_set(wd);
 
 	table = elm_table_add( wd->ly_content );
 	elm_table_homogenous_set( table, EINA_FALSE );
 	elm_table_padding_set( table, 1, 1 );
 	evas_object_size_hint_weight_set( table, 0.0, 0.0 );
 	evas_object_size_hint_align_set( table, EVAS_HINT_FILL, EVAS_HINT_FILL );
-	elm_layout_content_set( wd->ly_content, "month/swallow/days/c", table );
+	edje_object_part_swallow(wd->ly_content, "month/swallow/days/c", table);
 
-	_calendar_update( wd, &st );
+	_calendar_update( wd, &wd->selected_time );
 	//evas_object_event_callback_add( wd->table, EVAS_CALLBACK_RESIZE, _calendar_resize_table_cb, wd );
 
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _calendar_show, wd);
@@ -583,25 +731,3 @@ elm_calendar_add(Evas_Object* parent)
 	return obj;
 }
 
-EAPI void 
-elm_calendar_show(Evas_Object* obj)
-{
-	Widget_Data *wd = elm_widget_data_get(obj);
-	evas_object_show(wd->layout);
-}
-
-EAPI void 
-elm_calendar_hide(Evas_Object* obj)
-{
-	Widget_Data *wd = elm_widget_data_get(obj);
-	evas_object_hide(wd->layout);
-}
-
-EAPI void 
-elm_calendar_return_callback_set(Evas_Object* obj, void* return_cb, void* cb_data)
-{
-	Widget_Data *wd = elm_widget_data_get(obj);
-
-	wd->return_cb = return_cb;
-	wd->cb_data = cb_data;
-}
