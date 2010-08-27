@@ -126,6 +126,7 @@ elm_webview.c \
 elm_cbhm_helper.c \
 elm_datefield.c \
 elm_nocontents.c \
+elm_tickernoti.c \
 elm_imageslider.c \
 elm_multibuttonentry.c \
 \
