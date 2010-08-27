@@ -307,6 +307,9 @@ static Ewk_View_Smart_Class _parent_sc = EWK_VIEW_SMART_CLASS_INIT_NULL;
 static void *ewk_handle;
 static void *cairo_handle;
 
+static Ewk_Tile_Unused_Cache *ewk_tile_cache = NULL;
+static ewk_tile_cache_ref_count = 0;
+
 /* externally accessible functions */
 Evas_Object*
 _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
@@ -406,8 +409,7 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	sd->tiled = tiled;
 	if (sd->tiled)
 	  {
-	     static Ewk_Tile_Unused_Cache *ewk_tile_cache;
-	     if (ewk_tile_cache == NULL)
+	     if (ewk_tile_cache_ref_count == 0)
 	       {
 		  if (!sd->ewk_view_tiled_unused_cache_get)
 		    sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
@@ -421,6 +423,7 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 		      sd->ewk_view_tiled_unused_cache_set = (void (*)(Evas_Object *, Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_set");
 		    sd->ewk_view_tiled_unused_cache_set(webview, ewk_tile_cache);
 	       }
+	     ++ewk_tile_cache_ref_count;
 	     //size_t mem = ewk_tile_unused_cache_used_get(ewk_tile_cache);
 	     //DBG("%s: Used cache: %d (%dkB)", __func__, mem, (mem/1024));
 	  }
@@ -1318,6 +1321,9 @@ _smart_del(Evas_Object* obj)
      }
 
    _parent_sc.sc.del(obj);
+
+   if (--ewk_tile_cache_ref_count == 0)
+     ewk_tile_cache = NULL;
 }
 
 static void
