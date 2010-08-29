@@ -2453,6 +2453,9 @@ extern "C" {
    /* smart callback called:
     * "selected" - when the selected item of multibuttonentry is changed. 
     * "added" - when the new item of multibuttonentry is added. 
+    * "deleted" - when an item of multibuttonentry is deleted. 
+    * "expanded" - when the multibuttonentry is expanded. 
+    * "contracted" - when the multibuttonentry is contracted. 
     */
    /* available styles:
     * default
