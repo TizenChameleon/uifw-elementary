@@ -38,8 +38,9 @@
 #define DEFAULT_LAYOUT_WIDTH 1024
 #define MIN_ZOOM_RATIO 0.09f
 #define MAX_ZOOM_RATIO 4.0f
-#define ZOOM_OUT_BOUNCING 0.2f
-#define ZOOM_IN_BOUNCING 0.5f
+#define ZOOM_OUT_BOUNCING 0.85f
+#define ZOOM_IN_BOUNCING 1.25f
+#define BOUNCING_DISTANCE 400
 
 //			"<!--<body bgcolor=#4c4c4c text=white text-align=left>-->"
 #define NOT_FOUND_PAGE_HEADER "<html>" \
@@ -1215,9 +1216,9 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
 	  }
 	if (sd->use_zoom_bouncing)
 	  {
-	     float min_zoom_rate = sd->zoom.min_zoom_rate - ZOOM_OUT_BOUNCING;
+	     float min_zoom_rate = sd->zoom.min_zoom_rate * ZOOM_OUT_BOUNCING;
 	     if (min_zoom_rate <= 0) min_zoom_rate = MIN_ZOOM_RATIO;
-	     float max_zoom_rate = sd->zoom.max_zoom_rate + ZOOM_IN_BOUNCING;
+	     float max_zoom_rate = sd->zoom.max_zoom_rate * ZOOM_IN_BOUNCING;
 	     sd->ewk_view_zoom_range_set(webview, min_zoom_rate, max_zoom_rate);
 	  }
 	else
@@ -2011,6 +2012,7 @@ _zoom_start(Smart_Data* sd, int centerX, int centerY, int distance)
    if (!sd->ewk_view_zoom_get)
      sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
    sd->zoom.zoom_rate_at_start = sd->ewk_view_zoom_get(sd->base.self);
+   sd->zoom.zooming_rate = sd->zoom.zoom_rate_at_start;
 
    _suspend_all(sd, EINA_TRUE);
 
@@ -2028,14 +2030,29 @@ _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance)
 
    if (zoom_distance != sd->zoom.zooming_level)
      {
-	sd->zoom.zooming_level = zoom_distance;
-	float zoom_ratio = sd->zoom.zoom_rate_at_start + sd->zoom.zooming_level * ZOOM_STEP_PER_PIXEL;
+	float zoom_ratio;
 
 	if (sd->use_zoom_bouncing)
 	  {
-	     float min_zoom_rate = sd->zoom.min_zoom_rate - ZOOM_OUT_BOUNCING;
+	     float min_zoom_rate = sd->zoom.min_zoom_rate * ZOOM_OUT_BOUNCING;
 	     if (min_zoom_rate <= 0) min_zoom_rate = MIN_ZOOM_RATIO;
-	     float max_zoom_rate = sd->zoom.max_zoom_rate + ZOOM_IN_BOUNCING;
+	     float max_zoom_rate = sd->zoom.max_zoom_rate * ZOOM_IN_BOUNCING;
+
+	     if (sd->zoom.zooming_rate < sd->zoom.min_zoom_rate)
+	       {
+		  float step = (sd->zoom.min_zoom_rate - min_zoom_rate) / (float)BOUNCING_DISTANCE;
+		  zoom_ratio = sd->zoom.zooming_rate + (zoom_distance - sd->zoom.zooming_level) * step;
+	       }
+	     else if (sd->zoom.zooming_rate > sd->zoom.max_zoom_rate)
+	       {
+		  float step = (max_zoom_rate - sd->zoom.max_zoom_rate) / (float)BOUNCING_DISTANCE;
+		  zoom_ratio = sd->zoom.zooming_rate + (zoom_distance - sd->zoom.zooming_level) * step;
+	       }
+	     else
+	       {
+		  zoom_ratio = sd->zoom.zoom_rate_at_start + zoom_distance * ZOOM_STEP_PER_PIXEL;
+	       }
+
 	     if (zoom_ratio < min_zoom_rate)
 	       zoom_ratio = min_zoom_rate;
 	     if (zoom_ratio > max_zoom_rate)
@@ -2043,11 +2060,13 @@ _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance)
 	  }
 	else
 	  {
+	     zoom_ratio = sd->zoom.zoom_rate_at_start + zoom_distance * ZOOM_STEP_PER_PIXEL;
 	     if (zoom_ratio < sd->zoom.min_zoom_rate)
 	       zoom_ratio = sd->zoom.min_zoom_rate;
 	     if (zoom_ratio > sd->zoom.max_zoom_rate)
 	       zoom_ratio = sd->zoom.max_zoom_rate;
 	  }
+	sd->zoom.zooming_level = zoom_distance;
 	sd->zoom.zooming_rate = zoom_ratio;
 
 	//printf("new zoom : %f, (%d, %d)\n", zoom_ratio, centerX, centerY);
@@ -2065,14 +2084,25 @@ _zoom_stop(Smart_Data* sd)
    DBG("%s ( %d )\n", __func__, sd->zoom.zooming_level);
    if (sd->zoom.zooming_level == 0) return;
 
-   if (!sd->ewk_view_zoom_set)
-     sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
-
-   if (sd->zoom.zooming_rate < sd->zoom.min_zoom_rate)
-     sd->zoom.zooming_rate = sd->zoom.min_zoom_rate;
-   if (sd->zoom.zooming_rate > sd->zoom.max_zoom_rate)
-     sd->zoom.zooming_rate = sd->zoom.max_zoom_rate;
-   sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zooming_rate, sd->zoom.basis.x, sd->zoom.basis.y);
+   sd->zoom.zoom_rate_to_set = sd->zoom.zooming_rate;
+   if (sd->zoom.zoom_rate_to_set < sd->zoom.min_zoom_rate)
+     sd->zoom.zoom_rate_to_set = sd->zoom.min_zoom_rate;
+   if (sd->zoom.zoom_rate_to_set > sd->zoom.max_zoom_rate)
+     sd->zoom.zoom_rate_to_set = sd->zoom.max_zoom_rate;
+   if (sd->use_zoom_bouncing
+	 && (sd->zoom.zoom_rate_to_set != sd->zoom.zooming_rate))
+     {
+	sd->zoom.zoom_rate_at_start = sd->zoom.zooming_rate;
+	smart_zoom_index = N_COSINE - 1;
+	ecore_animator_frametime_set(1.0 / ZOOM_FRAMERATE);
+	sd->smart_zoom_animator = ecore_animator_add(_smart_zoom_animator, sd);
+     }
+   else
+     {
+	if (!sd->ewk_view_zoom_set)
+	  sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
+	sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set, sd->zoom.basis.x, sd->zoom.basis.y);
+     }
    DBG("<< zoom set [%f] >>\n", sd->zoom.zooming_rate);
 
    _resume_all(sd, EINA_FALSE);
@@ -2203,7 +2233,34 @@ _smart_zoom_animator(void* data)
 	   + ((sd->zoom.zoom_rate_to_set - sd->zoom.zoom_rate_at_start) * cosine[smart_zoom_index]);
 	if (!sd->ewk_view_zoom_weak_set)
 	  sd->ewk_view_zoom_weak_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_weak_set");
-	sd->ewk_view_zoom_weak_set(sd->base.self, zoom_rate, sd->zoom.basis.x, sd->zoom.basis.y);
+	if (zoom_rate <= sd->zoom.min_zoom_rate)
+	  {
+	     if (!sd->ewk_frame_scroll_pos_get)
+	       sd->ewk_frame_scroll_pos_get = (Eina_Bool (*)(const Evas_Object *, int *, int *))dlsym(ewk_handle, "ewk_frame_scroll_pos_get");
+	     if (!sd->ewk_view_zoom_get)
+	       sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
+	     int scroll_x, scroll_y;
+	     sd->ewk_frame_scroll_pos_get(sd->ewk_view_frame_main_get(sd->base.self), &scroll_x, &scroll_y);
+	     float current_zoom_rate = sd->ewk_view_zoom_get(sd->base.self);
+	     int center_x = (scroll_x * sd->zoom.zoom_rate_to_set * current_zoom_rate)
+		            / (current_zoom_rate - sd->zoom.zoom_rate_to_set);
+	     int center_y = (scroll_y * sd->zoom.zoom_rate_to_set * current_zoom_rate)
+		            / (current_zoom_rate - sd->zoom.zoom_rate_to_set);
+
+	     int basis_x = sd->zoom.basis.x + (center_x - sd->zoom.basis.x) * cosine[smart_zoom_index];
+	     int basis_y = sd->zoom.basis.y + (center_y - sd->zoom.basis.y) * cosine[smart_zoom_index];
+	     sd->ewk_view_zoom_weak_set(sd->base.self, zoom_rate, basis_x, basis_y);
+	     smart_zoom_index--; // in order to make zoom bouncing more faster
+	  }
+	if (zoom_rate >= sd->zoom.max_zoom_rate)
+	  {
+	     sd->ewk_view_zoom_weak_set(sd->base.self, zoom_rate, sd->zoom.basis.x, sd->zoom.basis.y);
+	     smart_zoom_index--; // in order to make zoom bouncing more faster
+	  }
+	else
+	  {
+	     sd->ewk_view_zoom_weak_set(sd->base.self, zoom_rate, sd->zoom.basis.x, sd->zoom.basis.y);
+	  }
      } else {
 	  if (!sd->ewk_frame_scroll_pos_get)
 	    sd->ewk_frame_scroll_pos_get = (Eina_Bool (*)(const Evas_Object *, int *, int *))dlsym(ewk_handle, "ewk_frame_scroll_pos_get");
@@ -2973,9 +3030,9 @@ _update_min_zoom_rate(Evas_Object *obj)
 
    if (sd->use_zoom_bouncing)
      {
-	float min_zoom_rate = sd->zoom.min_zoom_rate - ZOOM_OUT_BOUNCING;
+	float min_zoom_rate = sd->zoom.min_zoom_rate * ZOOM_OUT_BOUNCING;
 	if (min_zoom_rate <= 0) min_zoom_rate = MIN_ZOOM_RATIO;
-	float max_zoom_rate = sd->zoom.max_zoom_rate + ZOOM_IN_BOUNCING;
+	float max_zoom_rate = sd->zoom.max_zoom_rate * ZOOM_IN_BOUNCING;
 	sd->ewk_view_zoom_range_set(obj, min_zoom_rate, max_zoom_rate);
      }
    else
