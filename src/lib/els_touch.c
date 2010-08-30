@@ -299,11 +299,13 @@ _elm_smart_touch_is_one_drag_mode_enable(Evas_Object *obj, Eina_Bool is_one_drag
 /* local subsystem functions */
 /** reference from htsd://hosted.zeh.com.br/tweener/docs/en-us/misc/transitions.html
  * Easing equation function for a cubic (t^3) easing in/out: acceleration until halfway, then deceleration
- * @param                t                                        Number                Current time (in frames or seconds)
- * @param                b                                        Number                Starting value
- * @param                c                                        Number                Change needed in value
- * @param                d                                        Number                Expected easing duration (in frames or seconds)
- * @return                                                        Number                The correct value
+ * @param                t   Number                Current time (in frames or seconds)
+ * @param                b   Number                Starting value
+ * @param                c   Number                Change needed in value
+ * @param                d   Number                Expected easing duration (in frames or seconds)
+ * @param                k1  Number                first sustain value
+ * @param                k2  Number                second sustain value
+ * @return                   Number                The correct value
  public static function easeInOutCubic (t:Number, b:Number, c:Number, d:Number, p_params:Object):Number {
  if ((t/=d/2) < 1) return c/2*t*t*t + b;
  return c/2*((t-=2)*t*t + 2) + b;
@@ -312,16 +314,24 @@ _elm_smart_touch_is_one_drag_mode_enable(Evas_Object *obj, Eina_Bool is_one_drag
 static float
 _smart_velocity_easeinoutcubic(int index)
 {
-   float d = 40.0f;
+   float d = 60.0f;
    float t = d - index; // we want to get reversed value
    float c = 1.0f;
+   float k1 = 0.1f;
+   float k2 = 0.05f;
+   float velocity;
    if ((t /= (d / 2)) < 1)
      {
-	return (c / 2) * t * t * t;
-     } else {
-	  t -= 2;
-	  return (c / 2) * (t * t * t + 2);
+	velocity = (c / 2) * t * t * t;
      }
+   else
+     {
+	t -= 2;
+	velocity = (c / 2) * (t * t * t + 2);
+     }
+   if (velocity < k1 && velocity > k2) velocity = 0.1;
+   else if (velocity < k2) velocity = 0.05;
+   return velocity;
 }
 
 /* mouse callbacks */
