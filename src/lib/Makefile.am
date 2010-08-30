@@ -129,6 +129,7 @@ elm_nocontents.c \
 elm_tickernoti.c \
 elm_imageslider.c \
 elm_multibuttonentry.c \
+elm_stackedicon.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
