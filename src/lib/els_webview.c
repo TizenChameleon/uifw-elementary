@@ -27,7 +27,14 @@
 
 #define MINIMAP_WIDTH 120
 #define MINIMAP_HEIGHT 200
+
+#define USE_MAX_TUC_20MB
+
+#ifdef USE_MAX_TUC_20MB
+#define MAX_TUC 1024*1024*20
+#else
 #define MAX_TUC 1024*1024*10
+#endif
 #define MAX_URI 512
 #define MOBILE_DEFAULT_ZOOM_RATIO 1.5f
 
@@ -1365,6 +1372,12 @@ _directional_pre_render(Evas_Object* obj, int dx, int dy)
    typedef enum { up, down, left, right, up_left, up_right, down_left, down_right, undefined } Directions;
    Directions direction = undefined;
 
+#ifdef USE_MAX_TUC_20MB
+   if (!sd->ewk_view_zoom_get)
+     sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
+   float zoom = sd->ewk_view_zoom_get(obj);
+#endif
+
    if (dx == 0 && dy <  0) direction = down;
    if (dx >  0 && dy <  0) direction = down_left;
    if (dx >  0 && dy == 0) direction = left;
@@ -1374,11 +1387,19 @@ _directional_pre_render(Evas_Object* obj, int dx, int dy)
    if (dx <  0 && dy == 0) direction = right;
    if (dx <  0 && dy <  0) direction = down_right;
 
+#ifdef USE_MAX_TUC_20MB
+   const float DIRECTION_PLAIN_CX = 2.0/zoom;
+   const float DIRECTION_CROSS_CX = 1.0/zoom;
+   const float DIRECTION_UNDEFINED_CX_LEVEL_1 = 0.5/zoom;
+   const float DIRECTION_UNDEFINED_CX_LEVEL_2 = 0.8/zoom;
+#else
    const float DIRECTION_PLAIN_CX = 1.5;
    const float DIRECTION_CROSS_CX = 0.7;
    const float DIRECTION_UNDEFINED_CX_LEVEL_1 = 0.3;
    const float DIRECTION_UNDEFINED_CX_LEVEL_2 = 0.6;
    const float DIRECTION_UNDEFINED_CX_LEVEL_3 = 0.8;
+#endif
+
    int p_x = x, p_y = y, p_w = w, p_h = h;
 
    switch (direction) {
@@ -1433,9 +1454,11 @@ _directional_pre_render(Evas_Object* obj, int dx, int dy)
 	 DBG("Shouldn't happen!!");
    }
 
+#ifndef USE_MAX_TUC_20MB
    if (!sd->ewk_view_zoom_get)
      sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
    float zoom = sd->ewk_view_zoom_get(obj);
+#endif
 
    // cancel the previously scheduled pre-rendering
    // This makes sense especilaly for zooming operation - when user
@@ -1462,6 +1485,62 @@ _directional_pre_render(Evas_Object* obj, int dx, int dy)
 	//dbg_draw_scaled_area(obj, 0, 0, 0, 0, 0);
      }
 
+#ifdef USE_MAX_TUC_20MB
+   int content_w=0, content_h=0;
+   int center_x=0,center_y=0;
+   int tmp_h=0;
+
+   if (!sd->ewk_frame_contents_size_get)
+     sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
+   sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(obj), &content_w, &content_h);
+
+   p_w = content_w;
+   p_h = content_h;
+
+   size_t size = (size_t)roundf(p_w * zoom * p_h * zoom * 4);
+   Eina_Bool  toggle = EINA_FALSE;
+
+   while(size > (MAX_TUC*0.8))
+     {
+	if(toggle)
+	  {
+	     p_h = p_h -32;
+	  }
+	else
+	  {
+	     p_w = p_w - 32;
+	     if(p_w < w)
+	       {
+		  p_w = w;
+		  toggle = EINA_TRUE;
+	       }
+	  }
+	size = (size_t)roundf(p_w * zoom * p_h * zoom * 4);
+     }
+
+   center_x = (int)roundf(x + w/2);
+   center_y = (int)roundf(y + h/2);
+
+   tmp_h = p_h* DIRECTION_UNDEFINED_CX_LEVEL_1;
+   p_x = center_x - (int)roundf(p_w/2);
+   p_y = center_y - (int)roundf(tmp_h/2);
+   if(p_x < 0) p_x = 0;
+   if(p_y < 0) p_y = 0;
+   sd->ewk_view_pre_render_region(obj, p_x, p_y, p_w, tmp_h, zoom);
+
+   tmp_h = p_h* DIRECTION_UNDEFINED_CX_LEVEL_2;
+   p_x = center_x - (int)roundf(p_w/2);
+   p_y = center_y - (int)roundf(tmp_h/2);
+   if(p_x < 0) p_x = 0;
+   if(p_y < 0) p_y = 0;
+   sd->ewk_view_pre_render_region(obj, p_x, p_y, p_w, tmp_h, zoom);
+
+   p_x = center_x - (int)roundf(p_w/2);
+   p_y = center_y - (int)roundf(p_h/2);
+   if(p_x < 0) p_x = 0;
+   if(p_y < 0) p_y = 0;
+   sd->ewk_view_pre_render_region(obj, p_x, p_y, p_w, p_h, zoom);
+#else
    /* Queue tiles in a small rectangle around the viewport */
    p_x = x - w * DIRECTION_UNDEFINED_CX_LEVEL_1;
    p_y = y - h * DIRECTION_UNDEFINED_CX_LEVEL_1;
@@ -1488,6 +1567,7 @@ _directional_pre_render(Evas_Object* obj, int dx, int dy)
    DBG("pre rendering - large - content: (%d, %d, %d, %d), zoom %.3f", p_x, p_y, p_w, p_h, zoom);
    sd->ewk_view_pre_render_region(obj, p_x, p_y, p_w, p_h, zoom);
    //dbg_draw_scaled_area(obj, 3, p_x, p_y, p_w, p_h);
+#endif
 
    /* Log some statistics */
    /*
