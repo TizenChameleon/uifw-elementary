@@ -85,31 +85,8 @@ static void _clicked(void *data, Evas_Object *obj, const char *emission, const c
 static void _changed(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-	fprintf(stderr, "##changed\n");
 
    if (!wd) return;
-
-   int len = 0;
-   const char* text = elm_entry_entry_get(elm_editfield_entry_get(wd->eb));
-
-/*
-   if (text != NULL)
-     {
-	len = strlen(text);
-	if (len == 0) 
-	  {
-	     edje_object_signal_emit(wd->base, "RESETHIDE", "PROG");
-	  } 
-	else 
-	  {
-	     edje_object_signal_emit(wd->base, "RESETSHOW", "PROG");
-	  }
-     }
-   else
-     {
-	edje_object_signal_emit(wd->base, "RESETHIDE", "PROG");
-     }
-*/
 
    evas_object_smart_callback_call(data, "changed", NULL);
 }
