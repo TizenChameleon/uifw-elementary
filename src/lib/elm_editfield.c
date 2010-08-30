@@ -180,6 +180,7 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
 	     wd->show_guide_text = EINA_FALSE;
 	  }
      }
+   evas_object_smart_callback_call(data, "changed", NULL);
 }
 
 static void
