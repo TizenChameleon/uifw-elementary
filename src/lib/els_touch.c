@@ -29,7 +29,6 @@
 // for two finger
 #define MOVE_THRESHOLD      15
 #define FINGER_DISTANCE     10
-//#define STOP_DURING_DRAG    1
 
 typedef struct _Mouse_Data Mouse_Data;
 
@@ -373,7 +372,6 @@ _smart_mouse_down(void *data, Evas *e, Evas_Object *obj, void *ev)
 	 _smart_set_first_down(sd, 0, &mouse_data);
 	 _smart_set_last_down(sd, 0, &mouse_data);
 	 _smart_set_last_drag(sd, 0, &mouse_data);
-#ifdef STOP_DURING_DRAG
 	 if (sd->animator_move)
 	   {
 	      ecore_animator_del(sd->animator_move);
@@ -385,9 +383,6 @@ _smart_mouse_down(void *data, Evas *e, Evas_Object *obj, void *ev)
 	      sd->animator_flick = NULL;
 	   }
 	 _smart_enter_down_during_drag(sd);
-#else
-	 _smart_enter_down(sd);
-#endif
 	 break;
 
       case TOUCH_STATE_DOWN_UP:
@@ -607,7 +602,6 @@ _smart_multi_down(void *data, Evas *e, Evas_Object *obj, void *ev)
 	      _smart_set_first_down(sd, 1, &mouse_data);
 	      _smart_set_last_down(sd, 1, &mouse_data);
 	      _smart_set_last_drag(sd, 1, &mouse_data);
-#ifdef STOP_DURING_DRAG
 	      if (sd->animator_move)
 		{
 		   ecore_animator_del(sd->animator_move);
@@ -624,12 +618,6 @@ _smart_multi_down(void *data, Evas *e, Evas_Object *obj, void *ev)
 		   sd->animator_two_move = NULL;
 		}
 	      _smart_enter_two_down_during_drag(sd);
-#else
-	      _smart_stop_animator_move(sd);
-	      _smart_stop_animator_flick(sd);
-	      _smart_stop_animator_two_move(sd);
-	      _smart_enter_two_down(sd);
-#endif
 	   }
 	 break;
 
