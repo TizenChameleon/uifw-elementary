@@ -123,31 +123,6 @@ _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 	if (!wd) return;
 
 	evas_object_geometry_get(wd->box, NULL, NULL, &wd->w_box, &wd->h_box);	
-	//printf("\n>>>>>>[%s][%d]box: (%d, %d)\n", __FUNCTION__, __LINE__, wd->w_box, wd->h_box);
-
-	edje_object_part_geometry_get(wd->base, "left.padding", NULL, NULL, &left_padding, NULL);
-    edje_object_part_geometry_get(wd->base, "right.padding", NULL, NULL, &right_padding, NULL);
-    edje_object_part_geometry_get(wd->base, "top.padding", NULL, NULL, NULL, &top_padding);
-    edje_object_part_geometry_get(wd->base, "bottom.padding", NULL, NULL, NULL, &bottom_padding);
-
-	evas_object_geometry_get(data, NULL, NULL, &w_org, &h_org);
-	//printf("\n>>>>>>[%s][%d]obj org: (%d, %d)\n", __FUNCTION__, __LINE__, w_org, h_org);
-
-	w = wd->w_box + left_padding + right_padding;
-	h = wd->h_box + top_padding + bottom_padding;	
-
-	evas_object_size_hint_min_set(data, w, h);
-	evas_object_resize(data, w, h);
-
-	if(h > h_org)
-		evas_object_smart_callback_call(data, "expanded", NULL);
-	else if(h < h_org)
-		evas_object_smart_callback_call(data, "contracted", NULL);
-	else
-		;
-	
-	//evas_object_geometry_get(data, NULL, NULL, &w, &h);
-	//printf("\n>>>>>>[%s][%d]obj new: (%d, %d)\n", __FUNCTION__, __LINE__, w, h);
 }
 
 static void
@@ -216,7 +191,14 @@ static void
 _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
 	Widget_Data *wd = elm_widget_data_get(data);
+	static char str[MAX_STR];
 	if (!wd) return;
+
+	strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
+	str[MAX_STR - 1]= 0;
+
+	if(strlen(str))	
+		_add_button(data, str);
 
 	_change_current_button(data, obj);
 }
