@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build44) unstable; urgency=low
+
+  * repackage for sync
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build44
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Mon, 30 Aug 2010 13:05:14 +0900
+
 elementary (0.4.0+svn.49550slp2+3build43) unstable; urgency=low
 
   * [webview] discpicker deleted
