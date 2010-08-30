@@ -174,7 +174,7 @@ _separator_obj_add(Evas_Object *obj)
    if (eina_list_count(wd->items) == 0)
       return;
 
-   item = calloc(1, sizeof(Elm_Ctxpopup_Item));
+   item = ELM_NEW(Elm_Ctxpopup_Item);
    if (!item)
       return;
 
@@ -638,9 +638,6 @@ _ctxpopup_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = (Widget_Data *) data;
 
-   if (!wd)
-      return;
-
    if ((eina_list_count(wd->items) < 1) && (!wd->content) && (wd->btn_cnt < 1))
       return;
 
@@ -666,8 +663,6 @@ _ctxpopup_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = (Widget_Data *) data;
 
-   if (!wd)
-      return;
    evas_object_hide(wd->arrow);
 
    if (!wd->screen_dimmed_disabled)
@@ -685,9 +680,6 @@ _ctxpopup_scroller_resize(void *data, Evas *e, Evas_Object * obj,
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
-   if (!wd)
-      return;
-
    if (wd->visible) {
   	_sizing_eval(data);
 	_show_effect(wd);
@@ -698,9 +690,6 @@ static void
 _ctxpopup_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = (Widget_Data *) data;
-
-   if (!wd)
-      return;
 
    if( wd->visible && !wd->position_forced)
 	   evas_object_show(wd->arrow);
@@ -849,7 +838,6 @@ elm_ctxpopup_add(Evas_Object *parent)
 			 elm_widget_style_get(obj));
 
    //Scroller
-
    wd->scroller = elm_scroller_add(obj);
    elm_object_style_set(wd->scroller, "ctxpopup_vbar");
    elm_scroller_content_min_limit(wd->scroller, EINA_TRUE, EINA_TRUE);
@@ -1073,7 +1061,7 @@ elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char *label,
 
    _separator_obj_add(obj);
 
-   item = calloc(1, sizeof(Elm_Ctxpopup_Item));
+   item = ELM_NEW(Elm_Ctxpopup_Item);
    if (!item)
       return NULL;
 
