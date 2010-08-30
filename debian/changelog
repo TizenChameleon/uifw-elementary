@@ -1,3 +1,43 @@
+elementary (0.4.0+svn.49550slp2+3build44) unstable; urgency=low
+
+  * repackage for sync
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build44
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Mon, 30 Aug 2010 13:05:14 +0900
+
+elementary (0.4.0+svn.49550slp2+3build43) unstable; urgency=low
+
+  * [webview] discpicker deleted
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build43
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Fri, 27 Aug 2010 16:26:09 +0900
+
+elementary (0.4.0+svn.49550slp2+3build42) unstable; urgency=low
+
+  * [bubble] elm_bubble initial release
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build42
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 26 Aug 2010 22:19:28 +0900
+
+elementary (0.4.0+svn.49550slp2+3build41) unstable; urgency=low
+
+  * [elm_popup_add_with_buttons_added with EINA_DEPRECATED]
+    added EINA_DEPRECATED for some  aqua and android widgets. 
+    Made popup when window passed as Evas_Object and api changed to elm_popup_with _buttons_add
+    add elm_webview_default_layout_width_set API
+    [genlist] code refactoring
+    [box] make extended box min size unset in the layout function 
+    [elm_dayselector.c] added new API elm_dayselector_check_state_set
+    [elm_animatedicon] elm_animatedicon is removed
+     ...
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build41
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Thu, 26 Aug 2010 19:18:03 +0900
+
 elementary (0.4.0+svn.49550slp2+3build40) unstable; urgency=low
 
   * Beat Winset updates.

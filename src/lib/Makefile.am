@@ -118,7 +118,6 @@ elm_analogclock.c \
 elm_ratingbar.c \
 elm_chronometer.c \
 elm_dialoguegroup.c \
-elm_animatedicon.c \
 elm_coverflow.c \
 elm_cabinet.c \
 elm_dayselector.c \
@@ -126,10 +125,11 @@ elm_cnp_helper.c \
 elm_webview.c \
 elm_cbhm_helper.c \
 elm_datefield.c \
-elm_calendar.c \
 elm_nocontents.c \
+elm_tickernoti.c \
 elm_imageslider.c \
 elm_multibuttonentry.c \
+elm_stackedicon.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \

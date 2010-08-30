@@ -70,11 +70,13 @@ typedef enum _Touch_State
 {
    TOUCH_STATE_NONE,
    TOUCH_STATE_DOWN,
+   TOUCH_STATE_DOWN_DURING_DRAG,
    TOUCH_STATE_DOWN_UP,
    TOUCH_STATE_DOWN_UP_DOWN,
    TOUCH_STATE_HOLD,
    TOUCH_STATE_DRAG,
    TOUCH_STATE_TWO_DOWN,
+   TOUCH_STATE_TWO_DOWN_DURING_DRAG,
    TOUCH_STATE_TWO_DRAG,
    TOUCH_STATE_THREE_DOWN
 } Touch_State;
@@ -156,11 +158,13 @@ static int _smart_animation_two_move(void *data);
 // enter mode functions
 static void _smart_enter_none(Smart_Data *sd);
 static void _smart_enter_down(Smart_Data *sd);
+static void _smart_enter_down_during_drag(Smart_Data *sd);
 static void _smart_enter_down_up(Smart_Data *sd, int downTime, int time);
 static void _smart_enter_down_up_down(Smart_Data *sd);
 static void _smart_enter_hold(Smart_Data *sd);
 static void _smart_enter_drag(Smart_Data *sd);
 static void _smart_enter_two_down(Smart_Data *sd);
+static void _smart_enter_two_down_during_drag(Smart_Data *sd);
 static void _smart_enter_two_drag(Smart_Data *sd);
 static void _smart_enter_three_down(Smart_Data *sd);
 // emit functions
@@ -243,7 +247,7 @@ _elm_smart_touch_child_set(Evas_Object *obj, Evas_Object *child)
 
 	_smart_enter_none(sd);
 
-	sd->is_one_drag_mode = EINA_TRUE;
+	sd->is_one_drag_mode = EINA_FALSE;
      }
 
    evas_object_smart_callback_call(sd->smart_obj, "changed", NULL);
@@ -299,11 +303,13 @@ _elm_smart_touch_is_one_drag_mode_enable(Evas_Object *obj, Eina_Bool is_one_drag
 /* local subsystem functions */
 /** reference from htsd://hosted.zeh.com.br/tweener/docs/en-us/misc/transitions.html
  * Easing equation function for a cubic (t^3) easing in/out: acceleration until halfway, then deceleration
- * @param                t                                        Number                Current time (in frames or seconds)
- * @param                b                                        Number                Starting value
- * @param                c                                        Number                Change needed in value
- * @param                d                                        Number                Expected easing duration (in frames or seconds)
- * @return                                                        Number                The correct value
+ * @param                t   Number                Current time (in frames or seconds)
+ * @param                b   Number                Starting value
+ * @param                c   Number                Change needed in value
+ * @param                d   Number                Expected easing duration (in frames or seconds)
+ * @param                k1  Number                first sustain value
+ * @param                k2  Number                second sustain value
+ * @return                   Number                The correct value
  public static function easeInOutCubic (t:Number, b:Number, c:Number, d:Number, p_params:Object):Number {
  if ((t/=d/2) < 1) return c/2*t*t*t + b;
  return c/2*((t-=2)*t*t + 2) + b;
@@ -312,16 +318,24 @@ _elm_smart_touch_is_one_drag_mode_enable(Evas_Object *obj, Eina_Bool is_one_drag
 static float
 _smart_velocity_easeinoutcubic(int index)
 {
-   float d = 40.0f;
+   float d = 60.0f;
    float t = d - index; // we want to get reversed value
    float c = 1.0f;
+   float k1 = 0.1f;
+   float k2 = 0.05f;
+   float velocity;
    if ((t /= (d / 2)) < 1)
      {
-	return (c / 2) * t * t * t;
-     } else {
-	  t -= 2;
-	  return (c / 2) * (t * t * t + 2);
+	velocity = (c / 2) * t * t * t;
      }
+   else
+     {
+	t -= 2;
+	velocity = (c / 2) * (t * t * t + 2);
+     }
+   if (velocity < k1 && velocity > k2) velocity = 0.1;
+   else if (velocity < k2) velocity = 0.05;
+   return velocity;
 }
 
 /* mouse callbacks */
@@ -340,7 +354,6 @@ _smart_mouse_down(void *data, Evas *e, Evas_Object *obj, void *ev)
    switch (sd->state)
      {
       case TOUCH_STATE_NONE:
-      case TOUCH_STATE_DRAG:
 	 mouse_data.x = event->canvas.x;
 	 mouse_data.y = event->canvas.y;
 	 mouse_data.time = event->timestamp;
@@ -349,6 +362,27 @@ _smart_mouse_down(void *data, Evas *e, Evas_Object *obj, void *ev)
 	 _smart_set_last_down(sd, 0, &mouse_data);
 	 _smart_set_last_drag(sd, 0, &mouse_data);
 	 _smart_enter_down(sd);
+	 break;
+
+      case TOUCH_STATE_DRAG:
+	 mouse_data.x = event->canvas.x;
+	 mouse_data.y = event->canvas.y;
+	 mouse_data.time = event->timestamp;
+	 mouse_data.device = -1;
+	 _smart_set_first_down(sd, 0, &mouse_data);
+	 _smart_set_last_down(sd, 0, &mouse_data);
+	 _smart_set_last_drag(sd, 0, &mouse_data);
+	 if (sd->animator_move)
+	   {
+	      ecore_animator_del(sd->animator_move);
+	      sd->animator_move = NULL;
+	   }
+	 if (sd->animator_flick)
+	   {
+	      ecore_animator_del(sd->animator_flick);
+	      sd->animator_flick = NULL;
+	   }
+	 _smart_enter_down_during_drag(sd);
 	 break;
 
       case TOUCH_STATE_DOWN_UP:
@@ -387,6 +421,15 @@ _smart_mouse_up(void *data, Evas *e, Evas_Object *obj, void *ev)
 	 _smart_enter_down_up(sd, (event->timestamp - sd->last_down[0].time), event->timestamp);
 	 break;
 
+      case TOUCH_STATE_DOWN_DURING_DRAG:
+	   {
+	      Evas_Point point;
+	      point.x = sd->last_drag[0].x;
+	      point.y = sd->last_drag[0].y;
+	      evas_object_smart_callback_call(sd->child_obj, "one,move,end", &point);
+	      _smart_enter_none(sd);
+	   } break;
+
       case TOUCH_STATE_DOWN_UP_DOWN:
 	   {
 	      int dx = sd->last_down[0].x - sd->first_down[0].x;
@@ -395,7 +438,7 @@ _smart_mouse_up(void *data, Evas *e, Evas_Object *obj, void *ev)
 		_smart_emit_double_tap(sd);
 	      _smart_stop_all_timers(sd);
 	      _smart_enter_none(sd);
-	   }        break;
+	   } break;
 
       case TOUCH_STATE_HOLD:
 	 _smart_emit_release(sd);
@@ -456,6 +499,7 @@ _smart_mouse_move(void *data, Evas *e, Evas_Object *obj, void *ev)
    switch (sd->state)
      {
       case TOUCH_STATE_DOWN:
+      case TOUCH_STATE_DOWN_DURING_DRAG:
 	 dx = mouse_data.x - sd->last_drag[0].x;
 	 dy = mouse_data.y - sd->last_drag[0].y;
 
@@ -529,7 +573,6 @@ _smart_multi_down(void *data, Evas *e, Evas_Object *obj, void *ev)
    switch (sd->state)
      {
       case TOUCH_STATE_DOWN:
-      case TOUCH_STATE_DRAG:
 	 sd->numOfTouch++;
 	 if (sd->numOfTouch == 1)
 	   {
@@ -544,6 +587,37 @@ _smart_multi_down(void *data, Evas *e, Evas_Object *obj, void *ev)
 	      _smart_stop_animator_flick(sd);
 	      _smart_stop_animator_two_move(sd);
 	      _smart_enter_two_down(sd);
+	   }
+	 break;
+
+      case TOUCH_STATE_DOWN_DURING_DRAG:
+      case TOUCH_STATE_DRAG:
+	 sd->numOfTouch++;
+	 if (sd->numOfTouch == 1)
+	   {
+	      mouse_data.x = event->output.x;
+	      mouse_data.y = event->output.y;
+	      mouse_data.time = event->timestamp;
+	      mouse_data.device = event->device;
+	      _smart_set_first_down(sd, 1, &mouse_data);
+	      _smart_set_last_down(sd, 1, &mouse_data);
+	      _smart_set_last_drag(sd, 1, &mouse_data);
+	      if (sd->animator_move)
+		{
+		   ecore_animator_del(sd->animator_move);
+		   sd->animator_move = NULL;
+		}
+	      if (sd->animator_flick)
+		{
+		   ecore_animator_del(sd->animator_flick);
+		   sd->animator_flick = NULL;
+		}
+	      if (sd->animator_two_move)
+		{
+		   ecore_animator_del(sd->animator_two_move);
+		   sd->animator_two_move = NULL;
+		}
+	      _smart_enter_two_down_during_drag(sd);
 	   }
 	 break;
 
@@ -590,6 +664,17 @@ _smart_multi_up(void *data, Evas *e, Evas_Object *obj, void *ev)
 	 _smart_enter_none(sd);
 	 break;
 
+      case TOUCH_STATE_TWO_DOWN_DURING_DRAG:
+	   {
+	      Evas_Point point;
+	      point.x = sd->last_drag[0].x;
+	      point.y = sd->last_drag[0].y;
+	      evas_object_smart_callback_call(sd->child_obj, "one,move,end", &point);
+	      _smart_emit_two_tap(sd);
+	      _smart_stop_all_timers(sd);
+	      _smart_enter_none(sd);
+	   } break;
+
       case TOUCH_STATE_TWO_DRAG:
 	 _smart_stop_animator_two_move(sd);
 	 _smart_stop_all_timers(sd);
@@ -628,6 +713,7 @@ _smart_multi_move(void *data, Evas *e, Evas_Object *obj, void *ev)
    switch (sd->state)
      {
       case TOUCH_STATE_TWO_DOWN:
+      case TOUCH_STATE_TWO_DOWN_DURING_DRAG:
 	 if (sd->first_down[1].device == event->device)
 	   {
 	      _smart_set_last_drag(sd, 1, &mouse_data);
@@ -802,6 +888,16 @@ _smart_enter_down(Smart_Data *sd)
 }
 
 static void
+_smart_enter_down_during_drag(Smart_Data *sd)
+{
+   // set press timer
+   sd->press_timer = ecore_timer_add(((double)PRESS_TIME)/1000.0, _smart_press_timer_handler, sd);
+
+   sd->state = TOUCH_STATE_DOWN_DURING_DRAG;
+   DBG("\nTOUCH_STATE_DOWN_DURING_DRAG\n");
+}
+
+static void
 _smart_enter_down_up(Smart_Data *sd, int downTime, int time)
 {
    // remove sd->press_timer and set new timer
@@ -931,6 +1027,19 @@ _smart_enter_two_down(Smart_Data *sd)
      {
 	DBG("<< enter two down >>\n");
 	sd->state = TOUCH_STATE_TWO_DOWN;
+	_smart_emit_two_press(sd);
+     }
+}
+
+static void
+_smart_enter_two_down_during_drag(Smart_Data *sd)
+{
+   _smart_stop_all_timers(sd);
+
+   if (sd->child_obj)
+     {
+	DBG("<< enter two down >>\n");
+	sd->state = TOUCH_STATE_TWO_DOWN_DURING_DRAG;
 	_smart_emit_two_press(sd);
      }
 }

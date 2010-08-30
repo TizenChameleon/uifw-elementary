@@ -33,18 +33,20 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
 	{
 		if (horizontal && extended)
 		{
-			evas_object_geometry_get(box, NULL, NULL, &w, &h);
+			evas_object_geometry_get(box, NULL, NULL, &w, NULL);
+			evas_object_size_hint_min_get(box, &minw, NULL);
 		}
 
 		EINA_LIST_FOREACH(priv->children, l, opt)
 		{
 			evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
-			evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
 
 			if (horizontal)
 			{
 				if (extended)
 				{
+					evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
+
 					if(wx)
 					{
 					   if (mnw != -1 && (w - cw) >= mnw)
@@ -58,16 +60,12 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
 					if ((cw + mnw) > w)
 					{
 						minh += cmaxh;
-						if (sumw > minw) minw = sumw;
 
 						cw = 0;
 						cmaxh = 0;
-						sumw = 0;
 					}
 					cw += ww;
 					if (cmaxh < mnh) cmaxh = mnh;
-
-					sumw += mnw;
 				}
 				else
 				{
@@ -85,7 +83,6 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
 		if(horizontal && extended)
 		{
 			minh += cmaxh;
-			if (sumw > minw) minw = sumw;
 		}
 
 	}
@@ -187,7 +184,7 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
 	     if (wy > 0.0) expand++;
 	  }
      }
-   if (expand == 0)
+   if (expand == 0 && (!extended))
      {
 	evas_object_size_hint_align_get(o, &ax, &ay);
 	if (horizontal)
