@@ -111,7 +111,9 @@ static void _del_hook(Evas_Object * obj)
 	int i;
 	Widget_Data * wd;
 	wd = elm_widget_data_get(obj);
-
+	
+	fprintf( stderr, "Call imageslider del hook!\n" );
+	
 	if (!wd) return;
 
 	for (i = 0; i < BLOCK_MAX; i++) {
@@ -263,8 +265,9 @@ static void _imageslider_hide(void *data, Evas *e, Evas_Object *obj, void *event
 
 static void _imageslider_del_all(Widget_Data * wd)
 {
+   
 	int i;
-	
+
 	if (!wd) {
 		return;
 	}
@@ -597,7 +600,11 @@ static int _icon_to_image(void *data)
 	wd->moving = 0;
 	_imageslider_update(wd);
 
-	return 0;
+	if (wd->queue_idler) {
+		ecore_idler_del(wd->queue_idler);
+		wd->queue_idler = NULL;
+	}
+	return ECORE_CALLBACK_CANCEL;
 }
 
 static int _check_drag(int state, void *data)
@@ -701,20 +708,20 @@ static int _timer_cb(void *data)
 		ret = _check_drag(BLOCK_RIGHT, wd);
 		_check_zoom(wd);
 
-
-		if (wd->queue_idler) {
-			ecore_idler_del(wd->queue_idler);
-			wd->queue_idler = NULL;
-		}
-
 		if (!wd->queue_idler) wd->queue_idler = ecore_idler_add(_icon_to_image, wd);
 
-		return 0;
+		if(wd->anim_timer) {
+			ecore_timer_del(wd->anim_timer);
+			wd->anim_timer = NULL;
+		}
+
+		return ECORE_CALLBACK_CANCEL;
 	}
 
-	return 1;	
+	return ECORE_CALLBACK_RENEW;	
 }
 
+	
 static void _anim(Widget_Data *wd)
 {
 	Evas_Coord w;
@@ -729,13 +736,9 @@ static void _anim(Widget_Data *wd)
 	w = wd->move_x;
 	gettimeofday(&wd->tv, NULL);
 
-	if (wd->anim_timer) {
-		ecore_timer_del(wd->anim_timer);
-		wd->anim_timer = NULL;
-	}
-	
-	if (!wd->anim_timer) wd->anim_timer = ecore_timer_add(ANI_TIME, _timer_cb, wd);
-	
+	if (!wd->anim_timer) {
+		wd->anim_timer = ecore_timer_add(ANI_TIME, _timer_cb, wd); 
+	}	
 }
 
 static void _imageslider_update(Widget_Data *wd)
