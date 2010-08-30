@@ -106,52 +106,20 @@ _theme_hook(Evas_Object *obj)
 	edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
 	 EINA_LIST_FOREACH(wd->stack, list, it)
 	{
-		const char *text = NULL;
-		Evas_Object *ic = NULL;
 		if(it->fn_btn1)
-			{
-			text = elm_button_label_get(it->fn_btn1);
-			ic =  elm_button_icon_get(it->fn_btn1);
-			if(text)
-				{
-					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/text_only/%s", elm_widget_style_get(obj));
-					elm_object_style_set(it->fn_btn1, buf_fn);	
-				}
-			else if(ic)
-				{
-					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/icon_only/%s", elm_widget_style_get(obj));
-					elm_object_style_set(it->fn_btn1, buf_fn);	
-				}
+			{	
+				snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
+				elm_object_style_set(it->fn_btn1, buf_fn);				
 			}
 		if(it->fn_btn2)
-			{
-			text = elm_button_label_get(it->fn_btn2);
-			ic =  elm_button_icon_get(it->fn_btn2);
-			if(text)
-				{
-					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/text_only/%s", elm_widget_style_get(obj));
-					elm_object_style_set(it->fn_btn2, buf_fn);	
-				}
-			else if(ic)
-				{
-					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/icon_only/%s", elm_widget_style_get(obj));
-					elm_object_style_set(it->fn_btn2, buf_fn);	
-				}
+			{			
+				snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
+				elm_object_style_set(it->fn_btn2, buf_fn);					
 			}
 		if(it->fn_btn3)
 			{
-			text = elm_button_label_get(it->fn_btn3);
-			ic =  elm_button_icon_get(it->fn_btn3);
-			if(text)
-				{
-					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/text_only/%s", elm_widget_style_get(obj));
-					elm_object_style_set(it->fn_btn3, buf_fn);	
-				}
-			else if(ic)
-				{
-					snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/icon_only/%s", elm_widget_style_get(obj));
-					elm_object_style_set(it->fn_btn3, buf_fn);	
-				}
+				snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
+				elm_object_style_set(it->fn_btn3, buf_fn);				
 			}
 		snprintf(buf_bk, sizeof(buf_bk), "navigationbar_backbutton/%s", elm_widget_style_get(obj));
 		elm_object_style_set(it->back_btn, buf_bk);
@@ -387,21 +355,9 @@ _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_
 				elm_object_style_set(new_btn, buf);
 			}
 		else 
-			{
-				const char *text = NULL;
-				Evas_Object *ic = NULL;
-				text = elm_button_label_get(new_btn);
-				ic =  elm_button_icon_get(new_btn);
-				if (text)
-					{
-						snprintf(buf, sizeof(buf), "navigationbar_functionbutton/text_only/%s", elm_widget_style_get(obj));
-						elm_object_style_set(new_btn, buf);
-					}
-				else if (ic)
-					{
-						snprintf(buf, sizeof(buf), "navigationbar_functionbutton/icon_only/%s", elm_widget_style_get(obj));
-						elm_object_style_set(new_btn, buf);
-					}
+			{				
+				snprintf(buf, sizeof(buf), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
+				elm_object_style_set(new_btn, buf);					
 			}
 		elm_widget_sub_object_add(obj, new_btn);
 		changed = TRUE;
@@ -663,39 +619,32 @@ elm_navigationbar_pop(Evas_Object *obj)
 			ll = ll->prev;
 		}
 	}
-
+	
+	//unswallow items and start trasition
+	Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
 	if (prev_it && it) 
 	{
-		//unswallow items and start trasition
-		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
-
 		cb->prev_it = prev_it;
 		cb->it = it;
-		cb->pop = EINA_TRUE;
-	
+		cb->pop = EINA_TRUE;	
 		if (prev_it->title_obj) edje_object_part_unswallow(wd->base, prev_it->title_obj);
 		if (prev_it->fn_btn1) edje_object_part_unswallow(wd->base, prev_it->fn_btn1);
 		else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
 		if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
 		if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
 		_item_sizing_eval(it);
-		_transition_complete_cb(cb);
 		
-		//pop content from pager
-		elm_pager_content_pop(wd->pager);
 	}
 	else if (prev_it)
 	{
-		Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
-
 		cb->prev_it = prev_it;
 		cb->it = NULL;
 		cb->pop = EINA_TRUE;
-		_transition_complete_cb(cb);
-
-		//pop content from pager
-		elm_pager_content_pop(wd->pager);
 	}
+	_transition_complete_cb(cb);
+	//pop content from pager
+	elm_pager_content_pop(wd->pager);
+	free(cb);
 }
 	
 /**
@@ -1267,12 +1216,12 @@ elm_navigationbar_subtitle_label_set(Evas_Object *obj,
 							Evas_Object *content, 
 							const char *subtitle)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
 
-	if (!wd) return;
+	if (!wd) return NULL;
 	
 	 EINA_LIST_FOREACH(wd->stack, ll, it)
 	{

@@ -52,8 +52,7 @@ _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	if (!wd) return;
 
 	edje_object_size_min_get(wd->base, &w, &h);
-	evas_object_size_hint_min_set(obj, w, h);
-	evas_object_resize(obj, w, h);
+	evas_object_size_hint_min_set(obj, w * elm_scale_get(), h * elm_scale_get());
 }
 
 static void 
@@ -69,7 +68,6 @@ _check_clicked(void *data, Evas_Object *obj, void *event_info)
 	}
 }
 
-
 static void
 _theme_hook(Evas_Object *obj)
 {
@@ -84,10 +82,19 @@ _theme_hook(Evas_Object *obj)
 		elm_object_style_set(wd->check[idx], "dayselector");
 }
 
+EAPI void
+elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data* wd = (Widget_Data*) elm_widget_data_get(obj);
 
+	if(!wd) return EINA_FALSE;
+
+	elm_check_state_set(wd->check[day], checked);
+}
 
 /**
- * Get the state of given check object.
+ * 8Get the state of given check object.
  *
  * @param obj  	 	Dayselector
  * @param day        day user want to know. 
