@@ -318,7 +318,7 @@ static void _icon_map_pos(void *data, Evas_Coord x, Evas_Coord y)
 		degree = ROT_RIGHT;
 	else if ((it->index % 3) == 2)
 		degree = ROT_LEFT;
-		
+
 	m = evas_map_new(4);
 	evas_map_util_points_populate_from_geometry(m, x, y, it->w, it->h, 0);
 	evas_map_util_3d_rotate(m, 0, 0, degree, x + it->w/2, y + it->h/2, 0);
@@ -327,7 +327,7 @@ static void _icon_map_pos(void *data, Evas_Coord x, Evas_Coord y)
 	evas_map_alpha_set(m, 1);	
 	evas_object_map_set(it->ly, m);
 	evas_object_map_enable_set(it->ly, 1);
-	//evas_object_show(it->ly);
+	evas_object_show(it->ly);
 	evas_map_free(m);	
 }
 
@@ -579,7 +579,7 @@ elm_stackedicon_add(Evas_Object *parent)
  */
 EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const char *path)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Elm_Stackedicon_Item *it;
 	if (!wd) return NULL;
@@ -610,7 +610,7 @@ EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const c
  */
 EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const char *path)
 {	
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Elm_Stackedicon_Item *it;
 	if (!wd) return NULL;
@@ -656,7 +656,7 @@ EAPI void elm_stackedicon_item_del(Elm_Stackedicon_Item *it)
  */
 EAPI Eina_List *elm_stackedicon_item_list_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 	
