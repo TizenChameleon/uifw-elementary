@@ -118,8 +118,6 @@ static void
 _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 {
 	Widget_Data *wd = elm_widget_data_get(data);
-	Evas_Coord w, h, w_org, h_org;
-	Evas_Coord left_padding, right_padding, top_padding, bottom_padding;
 	if (!wd) return;
 
 	evas_object_geometry_get(wd->box, NULL, NULL, &wd->w_box, &wd->h_box);	
