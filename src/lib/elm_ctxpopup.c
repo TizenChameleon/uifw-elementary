@@ -243,18 +243,31 @@ _item_sizing_eval(Elm_Ctxpopup_Item *item)
 static int
 _get_indicator_h(Evas_Object *parent)
 {
-	int h = 0;
-	Ecore_X_Window zone, xwin;
+	Ecore_X_Window zone, xwin, root;
+	int w = 0, h = 0;
+	int rotation = -1;
+   int count;
+   unsigned char *prop_data = NULL;
+   int ret;
+
+   root = ecore_x_window_root_get(ecore_x_window_focus_get());
+   ret  = ecore_x_window_prop_property_get(root, ECORE_X_ATOM_E_ILLUME_ROTATE_ROOT_ANGLE,
+   						 ECORE_X_ATOM_CARDINAL, 32, &prop_data, &count);
+   if (ret && prop_data) memcpy(&rotation, prop_data, sizeof(int));
+   if (prop_data) free(prop_data);
 
 	xwin = elm_win_xwindow_get(parent);
 	zone = ecore_x_e_illume_zone_get(xwin);
-	ecore_x_e_illume_indicator_geometry_get(zone, NULL, NULL, NULL, &h);
-//	fprintf( stderr, "indicator h = %d\n", h);
+	ecore_x_e_illume_indicator_geometry_get(zone, NULL, NULL, &w, &h);
 
-	if (h < 0)
-		h = 0;
+	if(w< 0) w = 0;
+	if (h < 0) h = 0;
 
-	return h;
+	if( (rotation == 0) || (rotation ==180)) {
+		return h;
+	}else {
+		return w;
+	}
 }
 
 static Elm_Ctxpopup_Arrow
