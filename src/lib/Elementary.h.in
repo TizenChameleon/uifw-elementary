@@ -1158,6 +1158,7 @@ extern "C" {
    typedef struct _Elm_Genlist_Item_Class_Func Elm_Genlist_Item_Class_Func;
    typedef struct _Elm_Genlist_Edit_Class Elm_Genlist_Edit_Class;
    typedef char        *(*GenlistItemLabelGetFunc) (const void *data, Evas_Object *obj, const char *part);
+   typedef char        *(*GenlistItemLabelChangedFunc) (const void *data, Evas_Object *obj, const char *text, const int sub_text);
    typedef Evas_Object *(*GenlistItemIconGetFunc)  (const void *data, Evas_Object *obj, const char *part);
    typedef Eina_Bool    (*GenlistItemStateGetFunc) (const void *data, Evas_Object *obj, const char *part);
    typedef void         (*GenlistItemDelFunc)      (const void *data, Evas_Object *obj);
@@ -1176,6 +1177,7 @@ extern "C" {
 	     GenlistItemStateGetFunc state_get;
 	     GenlistItemDelFunc del;
 	     GenlistItemEditModeGetFunc editmode_get;
+             GenlistItemLabelChangedFunc label_changed;
 	  } func;
      };
 
