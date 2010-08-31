@@ -88,7 +88,8 @@ static void _changed(void *data, Evas_Object *obj, const char *emission, const c
 
    if (!wd) return;
 
-   evas_object_smart_callback_call(data, "changed", NULL);
+   // TODO : inform to use entry changed callback 
+//   evas_object_smart_callback_call(data, "changed", NULL);
 }
 
 static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
@@ -158,7 +159,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    elm_editfield_entry_single_line_set(wd->eb, EINA_TRUE);
    elm_editfield_eraser_set(wd->eb, EINA_TRUE);
    evas_object_smart_callback_add(wd->eb, "clicked", _clicked, obj);
-   evas_object_smart_callback_add(wd->eb, "changed", _changed, obj);
+   evas_object_smart_callback_add(elm_editfield_entry_get(wd->eb), "changed", _changed, obj);
    elm_widget_sub_object_add(obj, wd->eb);
 
    // Add Button
