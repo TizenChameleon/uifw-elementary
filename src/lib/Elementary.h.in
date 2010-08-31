@@ -2407,6 +2407,7 @@ extern "C" {
    /* Sliding Drawer */
    EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
    EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
+   EAPI Evas_Object *elm_slidingdrawer_content_get(Evas_Object *obj);
 
    /* wipercontrol*/
    EAPI Evas_Object *elm_wipercontrol_add(Evas_Object *parent);
@@ -2461,6 +2462,19 @@ extern "C" {
     * default
     */
  
+   /* stackedicon */
+   typedef struct _Stackedicon_Item Elm_Stackedicon_Item;
+   EAPI Evas_Object	*elm_stackedicon_add(Evas_Object *parent);
+   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const char *path);
+   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const char *path);
+   EAPI void elm_stackedicon_item_del(Elm_Stackedicon_Item *it);
+   EAPI Eina_List *elm_stackedicon_item_list_get(Evas_Object *obj);
+   /* smart callback called:
+    */
+   /* available styles:
+    * default
+    */
+
    /* chronometer */
    EAPI Evas_Object *elm_chronometer_add(Evas_Object *parent);
    EAPI void         elm_chronometer_start(Evas_Object *obj);

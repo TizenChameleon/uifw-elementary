@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build45) unstable; urgency=low
+
+  * repackage for slidingdrawer
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build45
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Mon, 30 Aug 2010 23:14:18 +0900
+
 elementary (0.4.0+svn.49550slp2+3build44) unstable; urgency=low
 
   * repackage for sync
