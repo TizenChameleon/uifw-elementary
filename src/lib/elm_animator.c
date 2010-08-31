@@ -1,4 +1,5 @@
 #include <Elementary.h>
+#include "elm_priv.h"
 
 /**
  * @addtogroup Animator Animator
@@ -6,6 +7,7 @@
  *
  * Support normalized frame value for animation.  
 */
+#define ANIMATOR_DOGTAG 0x38
 
 struct _Animator
 {
@@ -21,6 +23,7 @@ struct _Animator
    void *animator_arg;
    void (*completion_op) (void *data);
    void *completion_arg;
+   unsigned char dogtag;
    Eina_Bool auto_reverse:1;
    Eina_Bool on_animating:1;
 };
@@ -33,7 +36,7 @@ static unsigned int _animator_compute_reverse_repeat_count(unsigned int cnt);
 static unsigned int _animator_compute_no_reverse_repeat_count(unsigned int cnt);
 static int _animator_animate_cb(void *data);
 static void _delete_animator(Elm_Animator *animator);
-//static void _animator_parent_del(void *data);
+static void _animator_parent_del(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event __UNUSED__);
 
 static unsigned int
 _animator_compute_reverse_repeat_count(unsigned int cnt)
@@ -88,7 +91,7 @@ static int
 _animator_animate_cb(void *data)
 {
    Elm_Animator *animator = (Elm_Animator *) data;
-   double elapsed_time, frame, cur_time;
+   double elapsed_time, frame;
 
    animator->cur_time = ecore_loop_time_get();
 
@@ -129,14 +132,14 @@ _animator_animate_cb(void *data)
 
    return ECORE_CALLBACK_RENEW;
 }
-/*
+
 static void
-_animator_parent_del(void *data)
+_animator_parent_del(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
 {
 	Elm_Animator *animator = data; 
 	elm_animator_del(data);
 }
-*/
+
 /**
  * Get the value of reverse mode. 
  *
@@ -281,19 +284,21 @@ elm_animator_operation_callback_set(Elm_Animator *animator,
 EAPI Elm_Animator *
 elm_animator_add(Evas_Object *parent)
 {
-   Elm_Animator *animator = calloc(1, sizeof(Elm_Animator));
+   Elm_Animator *animator = ELM_NEW(Elm_Animator);
 
    if (!animator)
       return NULL;
+
    elm_animator_auto_reverse_set(animator, EINA_FALSE);
    elm_animator_curve_style_set(animator, ELM_ANIMATOR_CURVE_LINEAR);
 
-/* if (parent) {
+   if (parent) {
 		evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL,
 				     _animator_parent_del, animator);
-	} */
+	}
 
    animator->parent = parent;
+   animator->dogtag = ANIMATOR_DOGTAG;
 
    return animator;
 }
@@ -324,15 +329,17 @@ elm_animator_operating_get(Elm_Animator *animator)
 EAPI void
 elm_animator_del(Elm_Animator *animator)
 {
-   if (!animator)
-      return;
+   if(animator->dogtag != ANIMATOR_DOGTAG) {
+	   return;
+   }
 
 	_delete_animator(animator);
 
-/*   if(animator->parent) {
+   if(animator->parent) {
    	evas_object_event_callback_del(animator->parent, EVAS_CALLBACK_DEL, _animator_parent_del);
-	} */
+	}
 
+   memset(animator, 0x0, sizeof(Elm_Animator));
    free(animator);
 }
 
