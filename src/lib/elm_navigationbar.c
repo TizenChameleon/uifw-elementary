@@ -516,26 +516,17 @@ elm_navigationbar_push(Evas_Object *obj,
 	if (!fn_btn1 && prev_it)
 	{
 		char *prev_title = NULL;
-		char *buf = NULL;
-		int len = 0;
 
 		it->back_btn = elm_button_add(obj);
 		prev_title = (char *)prev_it->title;
 		if(prev_title)
-		{
-			if (prev_title) len = strlen(prev_title);
-			if (len > 0) buf = calloc(len+3, sizeof(char));
-			if (buf) 
 			{
-				sprintf(buf, "< %s", prev_title);
-				elm_button_label_set(it->back_btn, buf);
-				free(buf);
+				elm_button_label_set(it->back_btn, prev_title);	
 			}
-		}
 		else
-		{
-			elm_button_label_set(it->back_btn, "< Previous");
-		}
+			{
+				elm_button_label_set(it->back_btn, "Previous");
+			}
 		evas_object_smart_callback_add(it->back_btn, "clicked", _back_button_clicked, it); 
 		_button_set(obj, NULL, it->back_btn, EINA_TRUE);
 	}
