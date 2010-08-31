@@ -7,7 +7,7 @@
  *
  * Support normalized frame value for animation.  
 */
-#define ANIMATOR_DOGTAG 0x38
+#define MAGIC_OBJ_ANIMATOR 0x40777770
 
 struct _Animator
 {
@@ -23,7 +23,7 @@ struct _Animator
    void *animator_arg;
    void (*completion_op) (void *data);
    void *completion_arg;
-   unsigned char dogtag;
+   int magic;
    Eina_Bool auto_reverse:1;
    Eina_Bool on_animating:1;
 };
@@ -151,7 +151,7 @@ _animator_parent_del(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSE
 EAPI Eina_Bool
 elm_animator_auto_reverse_get(Elm_Animator *animator)
 {
-   if (!animator)
+   if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return EINA_FALSE;
    return animator->auto_reverse;
 }
@@ -167,7 +167,7 @@ elm_animator_auto_reverse_get(Elm_Animator *animator)
 EAPI unsigned int
 elm_animator_repeat_get(Elm_Animator *animator)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return EINA_FALSE;
    return animator->repeat_cnt;
 }
@@ -183,7 +183,7 @@ elm_animator_repeat_get(Elm_Animator *animator)
 EAPI void
 elm_animator_auto_reverse_set(Elm_Animator *animator, Eina_Bool reverse)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return;
    if (animator->auto_reverse == reverse)
       return;
@@ -208,7 +208,7 @@ EAPI void
 elm_animator_curve_style_set(Elm_Animator *animator,
 			     Elm_Animator_Curve_Style cs)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return;
 
    switch (cs)
@@ -242,7 +242,7 @@ elm_animator_curve_style_set(Elm_Animator *animator,
 EAPI void
 elm_animator_duration_set(Elm_Animator *animator, double duration)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return;
    if (animator->on_animating)
       return;
@@ -265,7 +265,7 @@ elm_animator_operation_callback_set(Elm_Animator *animator,
 						  Elm_Animator *animator,
 						  double frame), void *data)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return;
    if (animator->on_animating)
       return;
@@ -289,6 +289,9 @@ elm_animator_add(Evas_Object *parent)
    if (!animator)
       return NULL;
 
+   animator->parent = parent;
+   animator->magic = MAGIC_OBJ_ANIMATOR;
+
    elm_animator_auto_reverse_set(animator, EINA_FALSE);
    elm_animator_curve_style_set(animator, ELM_ANIMATOR_CURVE_LINEAR);
 
@@ -296,9 +299,6 @@ elm_animator_add(Evas_Object *parent)
 		evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL,
 				     _animator_parent_del, animator);
 	}
-
-   animator->parent = parent;
-   animator->dogtag = ANIMATOR_DOGTAG;
 
    return animator;
 }
@@ -314,7 +314,7 @@ elm_animator_add(Evas_Object *parent)
 EAPI Eina_Bool
 elm_animator_operating_get(Elm_Animator *animator)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return EINA_FALSE;
    return animator->on_animating;
 }
@@ -329,7 +329,7 @@ elm_animator_operating_get(Elm_Animator *animator)
 EAPI void
 elm_animator_del(Elm_Animator *animator)
 {
-   if(animator->dogtag != ANIMATOR_DOGTAG) {
+   if(animator->magic != MAGIC_OBJ_ANIMATOR) {
 	   return;
    }
 
@@ -356,7 +356,7 @@ EAPI void
 elm_animator_completion_callback_set(Elm_Animator *animator,
 				     void (*func) (void *data), void *data)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return;
    if (animator->on_animating)
       return;
@@ -374,7 +374,7 @@ elm_animator_completion_callback_set(Elm_Animator *animator,
 EAPI void
 elm_animator_pause(Elm_Animator *animator)
 {
-	if(!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
 		return;
 
 	if(!animator->on_animating)
@@ -393,7 +393,7 @@ elm_animator_pause(Elm_Animator *animator)
 EAPI void
 elm_animator_resume(Elm_Animator *animator)
 {
-	if(!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
 		return;
 
 	if(!animator->on_animating)
@@ -412,7 +412,7 @@ elm_animator_resume(Elm_Animator *animator)
 EAPI void
 elm_animator_stop(Elm_Animator *animator)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return;
    animator->on_animating = EINA_FALSE;
 	_delete_animator(animator);
@@ -429,7 +429,7 @@ elm_animator_stop(Elm_Animator *animator)
 EAPI void
 elm_animator_repeat_set(Elm_Animator *animator, unsigned int repeat_cnt)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return;
    if (!animator->auto_reverse)
       animator->repeat_cnt = repeat_cnt;
@@ -447,7 +447,7 @@ elm_animator_repeat_set(Elm_Animator *animator, unsigned int repeat_cnt)
 EAPI void
 elm_animator_animate(Elm_Animator *animator)
 {
-   if (!animator)
+	if (animator->magic != MAGIC_OBJ_ANIMATOR)
       return;
    if (!animator->animator_op)
       return;
