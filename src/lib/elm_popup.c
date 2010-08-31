@@ -24,6 +24,7 @@ struct _Widget_Data
    Evas_Object *action_area;
    Eina_List *button_list;
    int rot_angle;
+   Elm_Notify_Orient notify_orient;
    Ecore_Job *del_job;
    Eina_Bool delete_me : 1;
 };
@@ -114,7 +115,7 @@ _theme_hook(Evas_Object *obj)
    
    if (!wd) return;
    elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
-   elm_notify_orient_set(wd->notify, ELM_NOTIFY_ORIENT_CENTER);
+   elm_notify_orient_set(wd->notify, wd->notify_orient);
    edje_object_message_signal_process(elm_layout_edje_get(wd->layout));
    if (wd->title_area)
      {
@@ -372,6 +373,7 @@ elm_popup_add(Evas_Object *parent_app)
    wd->notify = elm_notify_add(parent);    
    elm_widget_resize_object_set(obj, wd->notify);
    elm_notify_orient_set(wd->notify, ELM_NOTIFY_ORIENT_CENTER);
+   wd->notify_orient = ELM_NOTIFY_ORIENT_CENTER;
    elm_notify_repeat_events_set(wd->notify, EINA_FALSE);
    evas_object_size_hint_weight_set(wd->notify, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->notify, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -854,6 +856,7 @@ elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient)
 	notify_orient = ELM_NOTIFY_ORIENT_BOTTOM_RIGHT;
 	break;
      }
+   wd->notify_orient = notify_orient;
    elm_notify_orient_set(wd->notify, notify_orient);
 }
 
