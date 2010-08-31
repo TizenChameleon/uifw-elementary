@@ -74,7 +74,7 @@ _theme_hook(Evas_Object *obj)
 	
 	if (!wd) return;	
 	if (wd->title) {
-		elm_layout_theme_set(wd->title_layout, "dialoguegroup", "base", "title");
+		elm_layout_theme_set(wd->title_layout, "dialoguegroup", "title", elm_widget_style_get(obj));
 		edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", wd->title);
 	}
 	EINA_LIST_FOREACH(wd->items, l, item) 
@@ -130,17 +130,19 @@ static void _remove_all(Evas_Object *obj)
 static void _set_item_theme(Dialogue_Item *item, const char *location)
 {
 	if (!item) return;
+	char buf[30];
 
-	if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT)
-		elm_layout_theme_set(item->bg_layout, "dialoguegroup", "bg", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD)
-		elm_layout_theme_set(item->bg_layout, "dialoguegroup", "editfield", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE)
-		elm_layout_theme_set(item->bg_layout, "dialoguegroup", "editfield_with_title", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE)
-		elm_layout_theme_set(item->bg_layout, "dialoguegroup", "title", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN)
-		elm_layout_theme_set(item->bg_layout, "dialoguegroup", "hidden", location);
+	if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT) 
+		snprintf(buf, sizeof(buf), "bg_%s", location);
+	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD) 
+		snprintf(buf, sizeof(buf), "editfield_%s", location);
+	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE) 
+		snprintf(buf, sizeof(buf), "editfield_with_title_%s", location);
+	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE) 
+		snprintf(buf, sizeof(buf), "edit_title_%s", location);
+	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN) 
+		snprintf(buf, sizeof(buf), "hidden_%s", location);
+	elm_layout_theme_set(item->bg_layout, "dialoguegroup", buf, elm_widget_style_get(item->parent));
 }
 
 /*
@@ -173,7 +175,7 @@ static void _change_item_bg(Dialogue_Item *item, const char *location)
 	if(item->press == EINA_TRUE)
 		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
 	else
-		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");	
+		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");
 
 /*	if(item->line_show == EINA_FALSE)
 		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,line,hide", "elm");*/
@@ -511,7 +513,7 @@ elm_dialoguegroup_title_set(Evas_Object *obj, const char *title)
 	}
 	if (!wd->title_layout) {
 		wd->title_layout = elm_layout_add(wd->box);
-		elm_layout_theme_set(wd->title_layout, "dialoguegroup", "base", "title");
+		elm_layout_theme_set(wd->title_layout, "dialoguegroup", "title", elm_widget_style_get(obj));
 		evas_object_size_hint_weight_set(wd->title_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->title_layout, EVAS_HINT_FILL, 0.0);
 		evas_object_show(wd->title_layout);	
