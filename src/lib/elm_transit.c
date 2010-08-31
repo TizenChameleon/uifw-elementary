@@ -1928,8 +1928,9 @@ static void
 _elm_fx_image_animation_op(void *data, Elm_Animator *animator, double frame)
 {
    Elm_Fx_Image_Animation *image_animation = (Elm_Fx_Image_Animation *) data;
+
    elm_icon_file_set(image_animation->obj,
-		     image_animation->images[ (int) floor(frame * image_animation->img_cnt) ], NULL);
+		     image_animation->images[ (int) floor(frame * (image_animation->img_cnt-1)) ], NULL);
 }
 
 static void
