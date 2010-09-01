@@ -14,9 +14,8 @@ struct _Widget_Data
 	Evas_Object *parent;
 	Evas_Object *base;
 	Evas_Object *handler;
+	Evas_Object *dragable_rect;
 	Elm_SlidingDrawer_Pos pos;
-	double 	max_drag_dw;
-	double  max_drag_dh;
 };
 
 static const char *widtype = NULL;
@@ -50,7 +49,7 @@ _sizing_eval(Evas_Object *obj)
 {
 	Widget_Data *wd;
 	Evas_Coord x, y, w, h;
-	Evas_Object  *part;
+	const Evas_Object  *part;
 
 	wd = elm_widget_data_get(obj);
 
@@ -68,7 +67,6 @@ _sizing_eval(Evas_Object *obj)
 
 	evas_object_size_hint_min_set(wd->handler, w, h);
 }
-
 
 EAPI Evas_Object *
 elm_slidingdrawer_content_get(Evas_Object *obj)
@@ -124,13 +122,15 @@ elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos)
 }
 
 EAPI void
-elm_slidingdrawer_drag_max_set(Evas_Object *obj, double dw,  double dh)
+elm_slidingdrawer_max_drag_set(Evas_Object *obj, double dw,  double dh)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd;
+	Evas_Coord w, h;
 
-	Widget_Data *wd = elm_widget_data_get(obj);
-	wd->max_drag_dw = dw;
-	wd->max_drag_dh = dh;
+	wd = elm_widget_data_get(obj);
+	evas_object_geometry_get(wd->parent, NULL, NULL, &w, &h);
+	evas_object_size_hint_max_set(wd->dragable_rect, ((double) w) * dw, ((double) h) * dh);
 }
 
 
@@ -143,7 +143,7 @@ elm_slidingdrawer_add(Evas_Object *parent)
 	Widget_Data *wd;
 
 	if(!parent)
-		return ;
+		return  NULL;
 
 	wd = ELM_NEW(Widget_Data);
 	if(!wd) return NULL;
@@ -193,6 +193,10 @@ elm_slidingdrawer_add(Evas_Object *parent)
 	_elm_theme_object_set(obj, wd->base, "slidingdrawer", "bottom", "default");
 	elm_widget_sub_object_add(obj, wd->base);
 	elm_widget_resize_object_set(obj, wd->base);
+
+	//dragable_rect
+	wd->dragable_rect = evas_object_rectangle_add(e);
+	edje_object_part_swallow(wd->base, "elm.swallow.dragable_rect", wd->dragable_rect);
 
 	//handler
 	wd->handler = evas_object_rectangle_add(e);
