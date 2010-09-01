@@ -1334,7 +1334,7 @@ _smart_start_flick(Smart_Data *sd)
 	int index = sd->last_move_history_index;
 	int todo = sd->move_history_count > MOVE_HISTORY_SIZE ? MOVE_HISTORY_SIZE : sd->move_history_count;
 	Mouse_Diff_Data *p;
-	double endTime = (sd->move_history + index)->time;
+	double endTime = ecore_time_get();
 	double startTime = endTime;
 	for( ; todo > 0; todo--) {
 	     p = sd->move_history + index; // get one sd->move_history
