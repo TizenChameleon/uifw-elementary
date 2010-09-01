@@ -573,6 +573,10 @@ _smart_multi_down(void *data, Evas *e, Evas_Object *obj, void *ev)
    switch (sd->state)
      {
       case TOUCH_STATE_DOWN:
+	 // add TOUCH_STATE_NONE,
+	 // because sometimes multi down is faster then mouse down
+	 // in that case, the two touch is recognized as one touch
+      case TOUCH_STATE_NONE:
 	 sd->numOfTouch++;
 	 if (sd->numOfTouch == 1)
 	   {
