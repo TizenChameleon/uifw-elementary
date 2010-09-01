@@ -151,6 +151,8 @@ struct _Smart_Data {
      Eina_Bool (*ewk_frame_scroll_add)(Evas_Object *, int, int);
      unsigned int (*ewk_view_imh_get)(Evas_Object *);
      Ecore_IMF_Context* (*ewk_view_core_imContext_get)(Evas_Object *);
+     void (*ewk_set_show_geolocation_permission_dialog_callback)(ewk_show_geolocation_permission_dialog_callback);
+     void (*ewk_set_geolocation_sharing_allowed)(void *, Eina_Bool);
 
      /* cairo functions */
      cairo_t * (*cairo_create)(cairo_surface_t *);
@@ -308,6 +310,7 @@ static void      _unzoom_position(Evas_Object* webview, int x, int y, int* ux, i
 static void      _coords_evas_to_ewk(Evas_Object* webview, int x, int y, int* ux, int* uy);
 static void      _coords_ewk_to_evas(Evas_Object* webview, int x, int y, int* ux, int* uy);
 static void      _update_min_zoom_rate(Evas_Object *obj);
+static void      _geolocation_permission_callback(void *geolocation_obj, const char* url);
 
 /* local subsystem globals */
 static Evas_Smart *_smart = NULL;
@@ -319,6 +322,8 @@ static void *cairo_handle;
 
 static Ewk_Tile_Unused_Cache *ewk_tile_cache = NULL;
 static ewk_tile_cache_ref_count = 0;
+
+static Evas_Object *obj = NULL;
 
 /* externally accessible functions */
 Evas_Object*
@@ -411,6 +416,7 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	ERR("could not create smart object for webview");
 	return NULL;
      }
+   obj = webview;
 
    // set tiled and unused cache 
    Smart_Data* sd = evas_object_smart_data_get(webview);
@@ -1284,6 +1290,10 @@ _smart_add(Evas_Object* obj)
 
    sd->ewk_view_theme_set = (void (*)(Evas_Object *, const char *))dlsym(ewk_handle, "ewk_view_theme_set");
    sd->ewk_view_theme_set(obj, WEBKIT_EDJ);
+
+   // set geolocation callback
+   sd->ewk_set_show_geolocation_permission_dialog_callback = (void (*)(ewk_show_geolocation_permission_dialog_callback))dlsym(ewk_handle, "ewk_set_show_geolocation_permission_dialog_callback");
+   sd->ewk_set_show_geolocation_permission_dialog_callback(_geolocation_permission_callback);
 
    sd->ewk_view_zoom_text_only_set = (Eina_Bool (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_zoom_text_only_set");
    sd->ewk_view_zoom_text_only_set(obj, EINA_FALSE);
@@ -3119,5 +3129,51 @@ _update_min_zoom_rate(Evas_Object *obj)
      {
 	sd->ewk_view_zoom_range_set(obj, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate);
      }
+}
+static void
+_geolocation_permission_callback(void *geolocation_obj, const char* url)
+{
+   printf("\n\n<< %s >>\n\n", __func__);
+   INTERNAL_ENTRY;
+
+   Evas_Object *popup;
+   int length;
+   char msg1[] = "The page at ";
+   char msg2[] = "<br>wants to know where you are.<br>Do you want to share location?";
+   char *msg = NULL;
+   int result;
+
+   length = strlen(msg1) + strlen(url) + strlen(msg2);
+   msg = calloc(length + 1, sizeof(char));
+   strncpy(msg, msg1, strlen(msg1));
+   strncat(msg, url, strlen(url));
+   strncat(msg, msg2, strlen(msg2));
+   msg[length] = '\0';
+
+   popup = elm_popup_add(obj);
+   evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_popup_desc_set(popup, msg);
+   elm_popup_buttons_add(popup, 2, "Share", ELM_POPUP_RESPONSE_OK,
+	                           "Don't Share", ELM_POPUP_RESPONSE_CANCEL, NULL);
+   result = elm_popup_run(popup); // modal dialog
+   switch (result)
+     {
+      case ELM_POPUP_RESPONSE_OK:
+	 if (!sd->ewk_set_geolocation_sharing_allowed)
+	   sd->ewk_set_geolocation_sharing_allowed = (void (*)(void *, Eina_Bool))dlsym(ewk_handle, "ewk_set_geolocation_sharing_allowed");
+	 sd->ewk_set_geolocation_sharing_allowed(geolocation_obj, EINA_TRUE);
+	 break;
+
+      case ELM_POPUP_RESPONSE_CANCEL:
+	 if (!sd->ewk_set_geolocation_sharing_allowed)
+	   sd->ewk_set_geolocation_sharing_allowed = (void (*)(void *, Eina_Bool))dlsym(ewk_handle, "ewk_set_geolocation_sharing_allowed");
+	 sd->ewk_set_geolocation_sharing_allowed(geolocation_obj, EINA_FALSE);
+	 break;
+
+      default:
+	 break;
+     }
+   if (msg)
+     free(msg);
 }
 #endif
