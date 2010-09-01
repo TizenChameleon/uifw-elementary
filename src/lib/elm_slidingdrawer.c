@@ -11,22 +11,17 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
 {
-	Evas_Object *win;
 	Evas_Object *parent;
 	Evas_Object *base;
-	Evas_Coord_Rectangle win_rect;
-	Evas_Coord_Rectangle base_rect;
-	Evas_Coord handler_h;
-	Evas_Coord drag;
-	Evas_Coord_Point down_pos;
+	Evas_Object *handler;
+	Evas_Object *dragable_rect;
+	Elm_SlidingDrawer_Pos pos;
 };
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _slidingdrawer_show(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _slidingdrawer_hide(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _parent_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static void
@@ -40,7 +35,7 @@ static void
 _theme_hook(Evas_Object *obj)
 {
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
-	_elm_theme_object_set(obj, wd->base, "slidingdrawer", "base", elm_widget_style_get(obj));
+	elm_slidingdrawer_pos_set(obj, wd->pos);
 }
 
 static void
@@ -50,24 +45,11 @@ _parent_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_slidingdrawer_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-	Widget_Data *wd = (Widget_Data*) data;
-	evas_object_show(wd->win);
-}
-
-static void
-_slidingdrawer_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-	Widget_Data *wd = (Widget_Data*) data;
-	evas_object_hide(wd->win);
-}
-
-static void
 _sizing_eval(Evas_Object *obj)
 {
-	Evas_Coord x, y, w, h;
 	Widget_Data *wd;
+	Evas_Coord x, y, w, h;
+	const Evas_Object  *part;
 
 	wd = elm_widget_data_get(obj);
 
@@ -75,75 +57,19 @@ _sizing_eval(Evas_Object *obj)
 	evas_object_move(obj, x, y);
 	evas_object_resize(obj, w, h);
 
-	/*
-	ecore_x_window_geometry_get(ecore_x_window_root_get(ecore_x_window_focus_get()), &wd->win_rect.x, &wd->win_rect.y, &wd->win_rect.w, &wd->win_rect.h);
-	edje_object_part_geometry_get(wd->base, "handler", NULL, NULL, NULL, &wd->handler_h);
-	evas_object_resize(wd->win, wd->win_rect.w, wd->handler_h);
-	evas_object_move(wd->win, 0, wd->win_rect.h - wd->handler_h);
-	evas_object_resize(wd->base, wd->win_rect.w, wd->handler_h);
-	wd->base_rect.y = 0;
-	wd->base_rect.h = wd->handler_h;
-	*/
-}
+	part = edje_object_part_object_get(wd->base, "elm.dragable.handler");
 
-void
-_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-	Evas_Event_Mouse_Down *ev;
-	Widget_Data *wd = (Widget_Data*) data;
+	if((wd->pos == ELM_SLIDINGDRAWER_TOP) || (wd->pos == ELM_SLIDINGDRAWER_BOTTOM)) {
+		edje_object_size_min_get(part, NULL, &h);
+	}else {
+		edje_object_size_min_get(part, &w, NULL);
+	}
 
-	ev = (Evas_Event_Mouse_Down *) event_info;
-	wd = (Widget_Data*) data;
-
-	evas_object_move(wd->win, 0, 0 );
-	evas_object_resize(wd->win, wd->win_rect.w, wd->win_rect.h);
-	evas_object_move(wd->base, 0, wd->win_rect.h - wd->base_rect.h);
-	wd->base_rect.y = wd->win_rect.h - wd->base_rect.h;
-	wd->down_pos.x = ev->output.x;
-	wd->down_pos.y = wd->win_rect.h - wd->base_rect.h + ev->output.y;
-	fprintf( stderr, "DOWN! window - %d %d %d %d\n", 0, 0, wd->win_rect.w, wd->win_rect.h);
-	fprintf( stderr, "DOWN! base - %d %d\n", 0, wd->win_rect.h - wd->base_rect.h );
-
-}
-
-void
-_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-	Evas_Event_Mouse_Move *ev;
-	Widget_Data *wd;
-
-	ev = (Evas_Event_Mouse_Move *) event_info;
-
-	if(!ev->buttons)
-			return ;
-
-	wd  = (Widget_Data*) data;
-
-	wd->drag = ev->cur.output.y - wd->down_pos.y;
-	evas_object_move(wd->base, 0, wd->base_rect.y + wd->drag );
-	evas_object_resize(wd->base, wd->win_rect.w, wd->handler_h - wd->drag );
-}
-
-void
-_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-	Evas_Event_Mouse_Up *ev;
-	Widget_Data *wd;
-	ev = (Evas_Event_Mouse_Up *) event_info;
-
-	wd = (Widget_Data *) data;
-
-	wd->base_rect.y = wd->base_rect.y + wd->drag;
-	wd->base_rect.h = wd->handler_h - wd->drag;
-	evas_object_move(wd->win, 0, wd->base_rect.y);
-	evas_object_resize(wd->win, wd->win_rect.w, wd->base_rect.h);
-	evas_object_move(wd->base, 0, 0);
-	wd->drag = 0;
-//	fprintf( stderr, "UP! window - %d %d %d %d\n", 0, wd->base_rect.y, wd->win_rect.w, wd->base_rect.h);
+	evas_object_size_hint_min_set(wd->handler, w, h);
 }
 
 EAPI Evas_Object *
-elm_slidingdrawer_content_get(Evas_Object *obj)
+elm_slidingdrawer_content_unset(Evas_Object *obj)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 
@@ -156,7 +82,6 @@ elm_slidingdrawer_content_get(Evas_Object *obj)
 	return swallow;
 }
 
-
 EAPI void
 elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content)
 {
@@ -166,6 +91,46 @@ elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content)
 	if (!content) return;
 
 	edje_object_part_swallow (wd->base, "elm.swallow.content", content);
+}
+
+EAPI void
+elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+
+	Widget_Data *wd = elm_widget_data_get(obj);
+
+	switch(pos)
+	{
+	case ELM_SLIDINGDRAWER_BOTTOM:
+		_elm_theme_object_set(obj, wd->base, "slidingdrawer", "bottom", elm_widget_style_get(obj));
+		break;
+	case ELM_SLIDINGDRAWER_LEFT:
+		_elm_theme_object_set(obj, wd->base, "slidingdrawer", "left", elm_widget_style_get(obj));
+		break;
+	case ELM_SLIDINGDRAWER_RIGHT:
+		_elm_theme_object_set(obj, wd->base, "slidingdrawer", "right", elm_widget_style_get(obj));
+		break;
+	case ELM_SLIDINGDRAWER_TOP:
+		_elm_theme_object_set(obj, wd->base, "slidingdrawer", "top", elm_widget_style_get(obj));
+		break;
+	}
+
+	edje_object_part_drag_value_set(wd->base, "elm.dragable.handler", 0, 0);
+	wd->pos = pos;
+	_sizing_eval(obj);
+}
+
+EAPI void
+elm_slidingdrawer_max_drag_set(Evas_Object *obj, double dw,  double dh)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd;
+	Evas_Coord w, h;
+
+	wd = elm_widget_data_get(obj);
+	evas_object_geometry_get(wd->parent, NULL, NULL, &w, &h);
+	evas_object_size_hint_max_set(wd->dragable_rect, ((double) w) * dw, ((double) h) * dh);
 }
 
 
@@ -178,7 +143,7 @@ elm_slidingdrawer_add(Evas_Object *parent)
 	Widget_Data *wd;
 
 	if(!parent)
-		return ;
+		return  NULL;
 
 	wd = ELM_NEW(Widget_Data);
 	if(!wd) return NULL;
@@ -225,17 +190,20 @@ elm_slidingdrawer_add(Evas_Object *parent)
 
 	//base
 	wd->base = edje_object_add(e);
-	_elm_theme_object_set(obj, wd->base, "slidingdrawer", "base", "default");
+	_elm_theme_object_set(obj, wd->base, "slidingdrawer", "bottom", "default");
 	elm_widget_sub_object_add(obj, wd->base);
 	elm_widget_resize_object_set(obj, wd->base);
 
+	//dragable_rect
+	wd->dragable_rect = evas_object_rectangle_add(e);
+	edje_object_part_swallow(wd->base, "elm.swallow.dragable_rect", wd->dragable_rect);
+
 	//handler
+	wd->handler = evas_object_rectangle_add(e);
+	evas_object_color_set(wd->handler, 0, 0, 0, 0);
+	edje_object_part_swallow(wd->base, "elm.dragable.handler", wd->handler);
+
 	evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _parent_resize, obj);
-	//evas_object_event_callback_add(handler, EVAS_CALLBACK_MOUSE_DOWN, _down, wd);
-	//evas_object_event_callback_add(handler, EVAS_CALLBACK_MOUSE_MOVE, _move, wd);
-	//evas_object_event_callback_add(handler, EVAS_CALLBACK_MOUSE_UP, _up, wd);
-	//evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _slidingdrawer_show, wd);
-	//evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _slidingdrawer_hide, wd);
 
 	_sizing_eval(obj);
 
