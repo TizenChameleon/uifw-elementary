@@ -573,6 +573,10 @@ _smart_multi_down(void *data, Evas *e, Evas_Object *obj, void *ev)
    switch (sd->state)
      {
       case TOUCH_STATE_DOWN:
+	 // add TOUCH_STATE_NONE,
+	 // because sometimes multi down is faster then mouse down
+	 // in that case, the two touch is recognized as one touch
+      case TOUCH_STATE_NONE:
 	 sd->numOfTouch++;
 	 if (sd->numOfTouch == 1)
 	   {
@@ -1334,7 +1338,7 @@ _smart_start_flick(Smart_Data *sd)
 	int index = sd->last_move_history_index;
 	int todo = sd->move_history_count > MOVE_HISTORY_SIZE ? MOVE_HISTORY_SIZE : sd->move_history_count;
 	Mouse_Diff_Data *p;
-	double endTime = (sd->move_history + index)->time;
+	double endTime = ecore_time_get();
 	double startTime = endTime;
 	for( ; todo > 0; todo--) {
 	     p = sd->move_history + index; // get one sd->move_history
