@@ -26,7 +26,6 @@ static void _sizing_eval(Evas_Object *obj);
 static void _clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _changed(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _signal_reset_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 
 static void _del_hook(Evas_Object *obj)
 {
@@ -48,8 +47,6 @@ static void _theme_hook(Evas_Object *obj)
      edje_object_part_swallow(wd->base, "search_textfield", wd->eb);
    if (wd->cancel_btn)
      edje_object_part_swallow(wd->base, "button_cancel", wd->cancel_btn);
-
-   edje_object_signal_callback_add(wd->base, "elm,action,click", "", _signal_reset_clicked, obj);
 
    edje_object_scale_set(wd->cancel_btn, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
@@ -116,13 +113,6 @@ static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, 
      elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
 
    evas_object_smart_callback_call(data, "cancel,clicked", NULL);
-}
-
-static void _signal_reset_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return;
-   elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
 }
 
 /**
