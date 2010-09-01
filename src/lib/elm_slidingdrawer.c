@@ -69,7 +69,7 @@ _sizing_eval(Evas_Object *obj)
 }
 
 EAPI Evas_Object *
-elm_slidingdrawer_content_get(Evas_Object *obj)
+elm_slidingdrawer_content_unset(Evas_Object *obj)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 
