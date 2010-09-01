@@ -23,6 +23,16 @@ enum {
 	TIME_MAX
 };
 
+enum {
+	DATE_FORMAT_YYMMDD,
+	DATE_FORMAT_YYDDMM,
+	DATE_FORMAT_MMYYDD,
+	DATE_FORMAT_MMDDYY,
+	DATE_FORMAT_DDYYMM,
+	DATE_FORMAT_DDMMYY,
+	DATE_FORMAT_MAX
+};
+
 #define YEAR_MAX_LENGTH	4
 #define MONTH_MAX_LENGTH	3
 #define DAY_MAX_LENGTH		2
@@ -45,6 +55,7 @@ struct _Widget_Data
 	int layout;
 
 	int year, month, day, hour, min;
+	int date_format;
 	Eina_Bool pm:1;
 	Eina_Bool time_mode:1;
 	Eina_Bool editing:1;
@@ -62,6 +73,7 @@ static void _signal_ampm_mouse_down(void *data, Evas_Object *obj, const char *em
 static void _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _entry_focused_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info);
+static void _entry_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info);
 static int _imf_event_commit_cb(void *data, int type, void *event);
 
 static void _date_entry_add(Evas_Object *obj);
@@ -74,8 +86,7 @@ static int _maximum_day_get(int year, int month);
 static void
 _del_hook(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
+ 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return ;	
 
 	ecore_event_handler_del(wd->handler);
@@ -86,8 +97,7 @@ _del_hook(Evas_Object *obj)
 static void
 _on_focus_hook(void *data, Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
+ 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd || !wd->base) return ;	
 
 	if (!elm_widget_focus_get(obj))
@@ -116,6 +126,9 @@ _theme_hook(Evas_Object *obj)
 
 		for (i = 0; i < DATE_MAX; i++)
 			elm_object_style_set(wd->date[i], "datefield");
+
+		for (i = 0; i < TIME_MAX; i++)
+			evas_object_hide(wd->time[i]);
 	}
 	else if (wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
 	{
@@ -123,6 +136,9 @@ _theme_hook(Evas_Object *obj)
 
 		for (i = 0; i < TIME_MAX; i++)
 			elm_object_style_set(wd->time[i], "datefield");
+
+		for (i = 0; i < DATE_MAX; i++)
+			evas_object_hide(wd->date[i]);
 	}
 
 	if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
@@ -160,8 +176,7 @@ _sizing_eval(Evas_Object *obj)
 static void
 _signal_ampm_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-	ELM_CHECK_WIDTYPE(data, widtype);
-	Widget_Data *wd = elm_widget_data_get(data);
+ 	Widget_Data *wd = elm_widget_data_get(data);
 	Evas_Object *focus_obj;
 	
 	if (!wd || !wd->base) return ;	
@@ -174,7 +189,6 @@ _signal_ampm_mouse_down(void *data, Evas_Object *obj, const char *emission, cons
 static void
 _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-	ELM_CHECK_WIDTYPE(data, widtype);
 	Widget_Data *wd = elm_widget_data_get(data);
 	if (!wd || !wd->base) return ;	
 
@@ -195,13 +209,12 @@ _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const c
 static void
 _signal_rect_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-	ELM_CHECK_WIDTYPE(data, widtype);
-	Widget_Data *wd = elm_widget_data_get(data);
-	if (!wd || !wd->base) return ;
+ 	Widget_Data *wd = elm_widget_data_get(data);
+	if (!wd) return ;
 
-	if (!strcmp(source, "elm.rect.date.year.over") || !strcmp(source, "elm.rect.date.right.pad"))
+	if (!strcmp(source, "elm.rect.date.year.over"))
 		elm_object_focus(wd->date[DATE_YEAR]);
-	else if (!strcmp(source, "elm.rect.date.month.over") || !strcmp(source, "elm.rect.date.left.pad"))
+	else if (!strcmp(source, "elm.rect.date.month.over"))
 		elm_object_focus(wd->date[DATE_MON]);
 	else if (!strcmp(source, "elm.rect.date.day.over"))
 		elm_object_focus(wd->date[DATE_DAY]);
@@ -209,15 +222,49 @@ _signal_rect_mouse_down(void *data, Evas_Object *obj, const char *emission, cons
 		elm_object_focus(wd->time[TIME_HOUR]);
 	else if (!strcmp(source, "elm.rect.time.min.over"))
 		elm_object_focus(wd->time[TIME_MIN]);
+	else if (!strcmp(source, "elm.rect.date.left.pad"))
+	{
+		switch (wd->date_format)
+		{
+			case DATE_FORMAT_YYDDMM:
+			case DATE_FORMAT_YYMMDD:
+				elm_object_focus(wd->date[DATE_YEAR]);
+				break;
+			case DATE_FORMAT_MMDDYY:
+			case DATE_FORMAT_MMYYDD:
+				elm_object_focus(wd->date[DATE_MON]);
+				break;
+			case DATE_FORMAT_DDMMYY:
+			case DATE_FORMAT_DDYYMM:
+				elm_object_focus(wd->date[DATE_DAY]);
+		}
+	}
+	else if (!strcmp(source, "elm.rect.date.right.pad"))
+	{
+		switch (wd->date_format)
+		{
+			case DATE_FORMAT_MMDDYY:
+			case DATE_FORMAT_DDMMYY:
+				elm_object_focus(wd->date[DATE_YEAR]);
+				break;
+			case DATE_FORMAT_DDYYMM:
+			case DATE_FORMAT_YYDDMM:
+				elm_object_focus(wd->date[DATE_MON]);
+				break;
+			case DATE_FORMAT_YYMMDD:
+			case DATE_FORMAT_MMYYDD:
+				elm_object_focus(wd->date[DATE_DAY]);
+		}
+	}
+
 }
 
 static void
 _entry_focused_cb(void *data, Evas_Object *obj, void *event_info)
 {
-	ELM_CHECK_WIDTYPE(data, widtype);
-	Widget_Data *wd = elm_widget_data_get(data);
-	if (!wd || !wd->base) return ;
-
+ 	Widget_Data *wd = elm_widget_data_get(data);
+	if (!wd || !wd->base) return;
+ 
 	if (elm_widget_focus_get(data))
 		edje_object_signal_emit(wd->base, "elm,state,focus,in", "elm");
 
@@ -236,14 +283,13 @@ _entry_focused_cb(void *data, Evas_Object *obj, void *event_info)
 static void
 _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 {
-	ELM_CHECK_WIDTYPE(data, widtype);
-	Widget_Data *wd = elm_widget_data_get(data);
+ 	Widget_Data *wd = elm_widget_data_get(data);
 	char str[YEAR_MAX_LENGTH+1] = {0,};
 	int num = 0;
-	
-	if (!wd || !wd->base) return ;
 
-	wd->editing = FALSE;
+	if (!wd || !wd->base) return;
+	
+ 	wd->editing = FALSE;
 
 	if (obj == wd->date[DATE_YEAR])
 	{
@@ -330,28 +376,80 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 		elm_entry_entry_set(wd->time[TIME_MIN], str);
 		wd->min = atoi(elm_entry_entry_get(wd->time[TIME_MIN]));
 		edje_object_signal_emit(wd->base, "elm,state,min,focus,out", "elm");
-		edje_object_signal_emit(wd->base, "elm,state,focus,out", "elm");
 	}
+
+	if (!elm_widget_focused_object_get(data))
+		edje_object_signal_emit(wd->base, "elm,state,focus,out", "elm");
+
 }
 
 static void 
 _entry_focus_move(Evas_Object *obj, Evas_Object *focus_obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd || !wd->base) return ;
+ 	Widget_Data *wd = elm_widget_data_get(obj);
 
+	if (!wd) return;
+ 
 	if (focus_obj == wd->date[DATE_YEAR])
 	{
-		if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
-			elm_object_focus(wd->time[TIME_HOUR]);
-		else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
-			elm_object_unfocus(wd->date[DATE_YEAR]);
+		switch (wd->date_format)
+		{
+			case DATE_FORMAT_DDMMYY:
+			case DATE_FORMAT_MMDDYY:
+				if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
+					elm_object_focus(wd->time[TIME_HOUR]);
+				else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
+					elm_object_unfocus(wd->date[DATE_YEAR]);
+				break;
+			case DATE_FORMAT_DDYYMM:
+			case DATE_FORMAT_YYMMDD:
+				elm_object_focus(wd->date[DATE_MON]);
+				break;
+			case DATE_FORMAT_MMYYDD:
+			case DATE_FORMAT_YYDDMM:
+				elm_object_focus(wd->date[DATE_DAY]);
+		}
 	}
 	else if (focus_obj == wd->date[DATE_MON])
-		elm_object_focus(wd->date[DATE_DAY]);
+	{
+		switch (wd->date_format)
+		{
+			case DATE_FORMAT_DDYYMM:
+			case DATE_FORMAT_YYDDMM:
+				if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
+					elm_object_focus(wd->time[TIME_HOUR]);
+				else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
+					elm_object_unfocus(wd->date[DATE_MON]);
+				break;
+			case DATE_FORMAT_DDMMYY:
+			case DATE_FORMAT_MMYYDD:
+				elm_object_focus(wd->date[DATE_YEAR]);
+				break;
+			case DATE_FORMAT_MMDDYY:
+			case DATE_FORMAT_YYMMDD:
+				elm_object_focus(wd->date[DATE_DAY]);
+		}
+	}
 	else if (focus_obj == wd->date[DATE_DAY])
-		elm_object_focus(wd->date[DATE_YEAR]);
+	{
+		switch (wd->date_format)
+		{
+			case DATE_FORMAT_YYMMDD:
+			case DATE_FORMAT_MMYYDD:
+				if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
+					elm_object_focus(wd->time[TIME_HOUR]);
+				else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
+					elm_object_unfocus(wd->date[DATE_DAY]);
+				break;
+			case DATE_FORMAT_DDYYMM:
+			case DATE_FORMAT_MMDDYY:
+				elm_object_focus(wd->date[DATE_YEAR]);
+				break;
+			case DATE_FORMAT_DDMMYY:
+			case DATE_FORMAT_YYDDMM:
+				elm_object_focus(wd->date[DATE_MON]);
+		}
+	}
 	else if (focus_obj == wd->time[TIME_HOUR])
 		elm_object_focus(wd->time[TIME_MIN]);
 	else if (focus_obj == wd->time[TIME_MIN])
@@ -388,9 +486,9 @@ _maximum_day_get(int year, int month)
 static Eina_Bool 
 _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd || !wd->base) return EINA_FALSE;
+ 	Widget_Data *wd = elm_widget_data_get(obj);
+
+ 	if (!wd) return EINA_FALSE;
 
 	if (focus_obj == wd->date[DATE_YEAR] && strlen == YEAR_MAX_LENGTH)
 		wd->editing = EINA_FALSE;
@@ -409,17 +507,25 @@ _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen)
 	return !wd->editing;
 }
 
+static void
+_entry_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info )
+{
+  	Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *) event_info;
+ 
+	if (!strcmp(ev->keyname, "BackSpace"))
+		elm_entry_entry_set(obj, "");
+}
+	
 static int 
 _imf_event_commit_cb(void *data, int type, void *event)
 {
-	ELM_CHECK_WIDTYPE(data, widtype);
-	Widget_Data *wd = elm_widget_data_get(data);
+ 	Widget_Data *wd = elm_widget_data_get(data);
 	Ecore_IMF_Event_Commit *ev = (Ecore_IMF_Event_Commit *) event;
 	Evas_Object *focus_obj;
 	char str[YEAR_MAX_LENGTH+1] = {0,};
-
-	if (!wd || !wd->base) return ECORE_CALLBACK_RENEW;
-	if(!elm_widget_focus_get(data)) return ECORE_CALLBACK_RENEW;
+	
+	if (!wd) return ECORE_CALLBACK_RENEW;
+ 	if(!elm_widget_focus_get(data)) return ECORE_CALLBACK_RENEW;
 	
 	focus_obj = elm_widget_focused_object_get(data);
 	if (!wd->editing) 
@@ -449,13 +555,12 @@ _imf_event_commit_cb(void *data, int type, void *event)
 static void
 _date_update(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	char str[YEAR_MAX_LENGTH+1] = {0,};
 
 	if (!wd || !wd->base) return;
-
-	sprintf(str, "%d", wd->year);
+	
+ 	sprintf(str, "%d", wd->year);
 	elm_entry_entry_set(wd->date[DATE_YEAR], str);
 
 	memset(str, 0, YEAR_MAX_LENGTH+1);
@@ -495,28 +600,24 @@ _date_update(Evas_Object *obj)
 static void 
 _date_entry_add(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int i;
-	
-	if (!wd) return ;	
 
+	if (!wd) return;	
+	
 	for (i = 0; i < DATE_MAX; i++)
 	{
 		wd->date[i] = elm_entry_add(obj);
 		elm_entry_context_menu_disabled_set(wd->date[i], EINA_TRUE);
-        if (i == DATE_MON)
-        {
-		    elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_MONTH);
-        }
-        else
-        {
-            elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);
-        }
+	        if (i == DATE_MON)
+			    elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_MONTH);
+	        else
+	            elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);
 		evas_object_size_hint_weight_set(wd->date[i], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->date[i], EVAS_HINT_FILL, EVAS_HINT_FILL);
     		evas_object_smart_callback_add(wd->date[i], "focused", _entry_focused_cb, obj);
 		evas_object_smart_callback_add(wd->date[i], "unfocused", _entry_unfocused_cb, obj);
+		//evas_object_event_callback_add(wd->date[i], EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
 		elm_widget_sub_object_add(obj, wd->date[i]);
 	}
 
@@ -528,12 +629,11 @@ _date_entry_add(Evas_Object *obj)
 static void 
 _time_entry_add(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int i;
-	
-	if (!wd) return ;	
 
+	if (!wd) return;	
+	
 	for (i = 0; i < TIME_MAX; i++)
 	{
 		wd->time[i] = elm_entry_add(obj);
@@ -544,6 +644,7 @@ _time_entry_add(Evas_Object *obj)
 		evas_object_size_hint_align_set(wd->time[i], EVAS_HINT_FILL, EVAS_HINT_FILL);
 		evas_object_smart_callback_add(wd->time[i], "focused", _entry_focused_cb, obj);
 		evas_object_smart_callback_add(wd->time[i], "unfocused", _entry_unfocused_cb, obj);
+		//evas_object_event_callback_add(wd->time[i], EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
 		elm_widget_sub_object_add(obj, wd->time[i]);
 	}
 }
@@ -601,6 +702,7 @@ elm_datefield_add(Evas_Object *parent)
 	wd->layout = ELM_DATEFIELD_LAYOUT_DATEANDTIME;
 	wd->editing = EINA_FALSE;
 	wd->time_mode = EINA_TRUE;
+	wd->date_format = DATE_FORMAT_MMDDYY;
 	
 	_theme_hook(obj);
 	
@@ -608,9 +710,9 @@ elm_datefield_add(Evas_Object *parent)
 }
 
 /**
- * Add a new datefield object
+ * set layout for the datefield
  *
- * @param parent The parent object
+ * @param obj The datefield object
  * @param layout set layout for date/time/dateandtime (default: ELM_DATEFIELD_LAYOUT_DATEANDTIME)
  *
  * @ingroup Datefield
@@ -621,7 +723,7 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	
-	if (!wd) return ;	
+	if (!wd) return;
 
 	if (wd->layout != layout)
 	{
@@ -648,7 +750,7 @@ elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	
-	if (!wd) return ;	
+	if (!wd) return;
 
 	wd->year = year;
 	wd->month = month;
@@ -662,7 +764,7 @@ elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
 /**
  * Get selected date of the datefield
  *
- * @param obj The datepicker object
+ * @param obj The datefield object
  * @param year The pointer to the variable get the selected year
  * @param month The pointer to the variable get the selected month
  * @param day The pointer to the variable get the selected day
@@ -674,7 +776,9 @@ elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
 EAPI void
 elm_datefield_date_get(Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
+	
 	if (!wd) return;
 	
 	if (year)
@@ -700,7 +804,9 @@ elm_datefield_date_get(Evas_Object *obj, int *year, int *month, int *day, int *h
 EAPI void
 elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
+	
 	if (!wd) return;
 
 	if (wd->time_mode != mode) {
@@ -709,3 +815,34 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 	}
 }
 
+/**
+ * Set date format of datefield
+ *
+ * @param obj The datefield object
+ * @param fmt The date format, ex) yymmdd. Default value is mmddyy.
+ *
+ * @ingroup Datefield
+ */
+EAPI void
+elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
+{
+	char sig[32] = "elm,state,format,";
+	int i = 0, j;
+	Widget_Data *wd = elm_widget_data_get(obj);
+
+	if (!wd || !fmt) return;
+
+	j = strlen(sig);
+	while (j < 32) {
+		sig[j++] = tolower(fmt[i++]);
+	}
+
+	edje_object_signal_emit(wd->base, sig, "elm");
+
+	if (strstr(sig, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
+	else if (strstr(sig, "yyddmm")) wd->date_format = DATE_FORMAT_YYDDMM;
+	else if (strstr(sig, "mmyydd")) wd->date_format = DATE_FORMAT_MMYYDD;
+	else if (strstr(sig, "mmddyy")) wd->date_format = DATE_FORMAT_MMDDYY;
+	else if (strstr(sig, "ddyymm")) wd->date_format = DATE_FORMAT_DDYYMM;
+	else if (strstr(sig, "ddmmyy")) wd->date_format = DATE_FORMAT_DDMMYY;
+}
