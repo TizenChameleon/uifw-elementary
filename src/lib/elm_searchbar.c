@@ -68,6 +68,13 @@ static void _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_max_set(obj, maxw, maxh);
 }
 
+static void
+_searchicon_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+	if (!strcmp(source, "search_icon"))
+		evas_object_smart_callback_call(data, "searchsymbol,clicked", NULL);
+}
+
 static void _clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -160,6 +167,8 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    elm_editfield_eraser_set(wd->eb, EINA_TRUE);
    evas_object_smart_callback_add(wd->eb, "clicked", _clicked, obj);
    evas_object_smart_callback_add(elm_editfield_entry_get(wd->eb), "changed", _changed, obj);
+   edje_object_signal_callback_add(wd->base, "mouse,up,1", "search_icon", _searchicon_clicked, obj);
+
    elm_widget_sub_object_add(obj, wd->eb);
 
    // Add Button
@@ -172,8 +181,6 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
 
    wd->cancel_btn_ani_flag = EINA_FALSE;
 
-   edje_object_signal_callback_add(wd->base, "elm,action,click", "", _signal_reset_clicked, obj);
-
    elm_widget_resize_object_set(obj, wd->base);
 
    _sizing_eval(obj);
@@ -182,12 +189,12 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
 }
 
 /**
- * get the text of entry
+ * set the text of entry
  *
- * @param obj The entry object
- * @return The title of entry
+ * @param obj The searchbar object
+ * @return void
  *
- * @ingroup entry
+ * @ingroup Searchbar
  */
 EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
 {
@@ -200,10 +207,10 @@ EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
 /**
  * get the text of entry
  *
- * @param obj The entry object
- * @return The title of entry
+ * @param obj The searchbar object
+ * @return string pointer of entry
  *
- * @ingroup entry
+ * @ingroup Searchbar
  */
 EAPI const char* elm_searchbar_text_get(Evas_Object *obj)
 {
@@ -216,10 +223,10 @@ EAPI const char* elm_searchbar_text_get(Evas_Object *obj)
 /**
  * get the pointer of entry
  *
- * @param obj The entry object
- * @return The title of entry
+ * @param obj The searchbar object
+ * @return the entry object
  *
- * @ingroup entry
+ * @ingroup Searchbar
  */
 EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
 {
@@ -230,12 +237,13 @@ EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
 }
 
 /**
- * get the pointer of entry
+ * set the cancel button animation flag
  *
- * @param obj The entry object
- * @return The title of entry
+ * @param obj The searchbar object
+ * @param cancel_btn_ani_flag The flag of animating cancen button or not
+ * @return void
  *
- * @ingroup entry
+ * @ingroup Searchbar
  */
 EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag)
 {
