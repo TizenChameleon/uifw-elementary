@@ -1273,15 +1273,25 @@ extern "C" {
 
    typedef struct _Elm_Segment_Item Elm_Segment_Item;
    EAPI Evas_Object *elm_segment_control_add(Evas_Object *parent);
-   EAPI Elm_Segment_Item * elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate);
-   EAPI void         elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate);
+   EAPI Elm_Segment_Item * elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)__attribute__((deprecated));
+   EAPI Elm_Segment_Item *elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate);
+   EAPI void         elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate)__attribute__((deprecated));
+   EAPI Elm_Segment_Item *elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate);
    EAPI Evas_Object *elm_segment_control_get_segment_at(Evas_Object *obj, unsigned int index);
-   EAPI void         elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate);
-   EAPI void         elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate);
-   EAPI const char  *elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index);
-   EAPI Evas_Object *elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index);
-   EAPI Elm_Segment_Item *elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value);
-   EAPI int          elm_segment_control_get_segment_count(Evas_Object *obj);
+   EAPI void         elm_segment_control_item_selected_set(Elm_Segment_Item *item, Eina_Bool select);
+   EAPI void         elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate)__attribute__((deprecated));
+   EAPI void         elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate);
+   EAPI void         elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate)__attribute__((deprecated));
+   EAPI void         elm_segment_control_item_del_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate);
+   EAPI const char  *elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index)__attribute__((deprecated));
+   EAPI const char  *elm_segment_control_item_label_get(Evas_Object *obj, unsigned int index);
+   EAPI Evas_Object *elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index)__attribute__((deprecated));
+   EAPI Evas_Object *elm_segment_control_item_icon_get(Evas_Object *obj, unsigned int index);
+   EAPI Elm_Segment_Item *elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value)__attribute__((deprecated));
+   EAPI Elm_Segment_Item *elm_segment_control_item_selected_get(const Evas_Object *obj);
+   EAPI int          elm_segment_control_get_segment_count(Evas_Object *obj)__attribute__((deprecated));
+   EAPI int          elm_segment_control_item_count_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_segment_control_item_object_get(Elm_Segment_Item *it);
 
    EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
    EAPI void         elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count);
@@ -2089,7 +2099,7 @@ extern "C" {
    EAPI void         elm_navigationbar_title_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Elm_Navi_Button_Type button_type);
    EAPI Evas_Object *elm_navigationbar_title_button_get(Evas_Object *obj, Evas_Object *content, Elm_Navi_Button_Type button_type);
    EAPI const char * elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content);
-	EAPI Evas_Object *elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
+   EAPI Evas_Object *elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
    
    /* Tab Bar */
    #define TAB_BAR_SYSTEM_ICON_CONTACT "elm/icon/tabbar_contact/default" 
@@ -2439,27 +2449,27 @@ extern "C" {
  
    /* multibuttonentry */
    typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
-   EAPI Evas_Object	*elm_multibuttonentry_add(Evas_Object *parent);
-   EAPI const char		*elm_multibuttonentry_label_get(Evas_Object *obj);
-   EAPI void			elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
-   EAPI Evas_Object 				*elm_multibuttonentry_entry_get(Evas_Object *obj);
-   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data);
-   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data);
-   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data);
-   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *after, void *data);
-   EAPI const Eina_List *				elm_multibuttonentry_items_get(Evas_Object *obj);
-   EAPI Elm_Multibuttonentry_Item 	*elm_multibuttonentry_item_first_get(Evas_Object *obj);
-   EAPI Elm_Multibuttonentry_Item 	*elm_multibuttonentry_item_last_get(Evas_Object *obj);
-   EAPI Elm_Multibuttonentry_Item 	*elm_multibuttonentry_item_selected_get(Evas_Object *obj);
-   EAPI void						elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item);
-   EAPI void						elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item);
-   EAPI void						elm_multibuttonentry_items_del(Evas_Object *obj);
-   EAPI const char					*elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item);
-   EAPI void						elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char *str);
-   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_prev(Elm_Multibuttonentry_Item *item);
-   EAPI Elm_Multibuttonentry_Item	*elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item);
-   EAPI void						*elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item);
-   EAPI void						elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data);
+   EAPI Evas_Object               *elm_multibuttonentry_add(Evas_Object *parent);
+   EAPI const char                *elm_multibuttonentry_label_get(Evas_Object *obj);
+   EAPI void                       elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
+   EAPI Evas_Object               *elm_multibuttonentry_entry_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *after, void *data);
+   EAPI const Eina_List           *elm_multibuttonentry_items_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_first_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_last_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_selected_get(Evas_Object *obj);
+   EAPI void                       elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item);
+   EAPI void                       elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item);
+   EAPI void                       elm_multibuttonentry_items_del(Evas_Object *obj);
+   EAPI const char	          *elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item);
+   EAPI void                       elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char *str);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_prev(Elm_Multibuttonentry_Item *item);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item);
+   EAPI void                      *elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item);
+   EAPI void                       elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data);
    /* smart callback called:
     * "selected" - when the selected item of multibuttonentry is changed. 
     * "added" - when the new item of multibuttonentry is added. 
@@ -2473,11 +2483,11 @@ extern "C" {
  
    /* stackedicon */
    typedef struct _Stackedicon_Item Elm_Stackedicon_Item;
-   EAPI Evas_Object	*elm_stackedicon_add(Evas_Object *parent);
+   EAPI Evas_Object	     *elm_stackedicon_add(Evas_Object *parent);
    EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const char *path);
    EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const char *path);
-   EAPI void elm_stackedicon_item_del(Elm_Stackedicon_Item *it);
-   EAPI Eina_List *elm_stackedicon_item_list_get(Evas_Object *obj);
+   EAPI void                  elm_stackedicon_item_del(Elm_Stackedicon_Item *it);
+   EAPI Eina_List            *elm_stackedicon_item_list_get(Evas_Object *obj);
    /* smart callback called:
     */
    /* available styles:
@@ -2505,18 +2515,18 @@ extern "C" {
 	ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN = (1 << 3)
      } Elm_Dialoguegroup_Item_Style;
 
-   EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent);
+   EAPI Evas_Object   *elm_dialoguegroup_add(Evas_Object *parent);
    EAPI Dialogue_Item *elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);   
    EAPI Dialogue_Item *elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);   
    EAPI Dialogue_Item *elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *after, Elm_Dialoguegroup_Item_Style style);   
    EAPI Dialogue_Item *elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *before, Elm_Dialoguegroup_Item_Style style);   
-   EAPI void         elm_dialoguegroup_remove(Dialogue_Item *item);
-   EAPI void         elm_dialoguegroup_remove_all(Evas_Object *obj);
-   EAPI void         elm_dialoguegroup_title_set(Evas_Object *obj, const char *title);
-   EAPI const char  *elm_dialoguegroup_title_get(Evas_Object *obj);
-   EAPI void         elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press);
-   EAPI Eina_Bool    elm_dialoguegroup_press_effect_get(Dialogue_Item *item);
-   EAPI Evas_Object *elm_dialoguegroup_item_content_get(Dialogue_Item *item);
+   EAPI void           elm_dialoguegroup_remove(Dialogue_Item *item);
+   EAPI void           elm_dialoguegroup_remove_all(Evas_Object *obj);
+   EAPI void           elm_dialoguegroup_title_set(Evas_Object *obj, const char *title);
+   EAPI const char    *elm_dialoguegroup_title_get(Evas_Object *obj);
+   EAPI void           elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press);
+   EAPI Eina_Bool      elm_dialoguegroup_press_effect_get(Dialogue_Item *item);
+   EAPI Evas_Object   *elm_dialoguegroup_item_content_get(Dialogue_Item *item);
   
    /* AutoCompleteView */
    typedef Eina_Bool (*elmautocompleteview_matchfunction) (Evas_Object *obj,char *text,Evas_Object *list,void *data);
@@ -2583,7 +2593,7 @@ extern "C" {
 
    EAPI Evas_Object *elm_dayselector_add(Evas_Object *parent);
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
-   EAPI void elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked);
+   EAPI void         elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked);
    
    /* WebView */
    typedef Eina_Bool (*Elm_WebView_Mime_Cb)(Evas_Object *obj);
@@ -2611,23 +2621,23 @@ extern "C" {
      { 
 	ELM_TICKERNOTI_DEFAULT, 
 	ELM_TICKERNOTI_DETAILVIEW
-	 } Elm_Tickernoti_Mode;
+     } Elm_Tickernoti_Mode;
 
-   EAPI Evas_Object 		*elm_tickernoti_add (Evas_Object *parent);
-   EAPI void 		 		 elm_tickernoti_icon_set (const Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object 		*elm_tickernoti_icon_get (const Evas_Object *obj);
-   EAPI void 		 		 elm_tickernoti_label_set (Evas_Object *obj, const char *label);
-   EAPI const char 			*elm_tickernoti_label_get (const Evas_Object *obj);
-   EAPI void 		 		 elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label);
-   EAPI const char 			*elm_tickernoti_detailview_label_get (const Evas_Object *obj);
-   EAPI void 		 		 elm_tickernoti_detailview_button_set (const Evas_Object *obj, Evas_Object *button);
-   EAPI Evas_Object 		*elm_tickernoti_detailview_button_get (const Evas_Object *obj);
-   EAPI void 		 		 elm_tickernoti_detailview_icon_set (const Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object 		*elm_tickernoti_detailview_icon_get (const Evas_Object *obj);
-   EAPI Evas_Object 		*elm_tickernoti_detailview_get (const Evas_Object *obj);
-   EAPI int 				 elm_tickernoti_rotation_get (const Evas_Object *obj);
-   EAPI void 		 		 elm_tickernoti_rotation_set (const Evas_Object *obj, int angle);
-   EAPI void 		 		 elm_tickernoti_mode_set (const Evas_Object *obj, Elm_Tickernoti_Mode mode);
+   EAPI Evas_Object         *elm_tickernoti_add (Evas_Object *parent);
+   EAPI void                 elm_tickernoti_icon_set (const Evas_Object *obj, Evas_Object *icon);
+   EAPI Evas_Object         *elm_tickernoti_icon_get (const Evas_Object *obj);
+   EAPI void                 elm_tickernoti_label_set (Evas_Object *obj, const char *label);
+   EAPI const char          *elm_tickernoti_label_get (const Evas_Object *obj);
+   EAPI void 	             elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label);
+   EAPI const char          *elm_tickernoti_detailview_label_get (const Evas_Object *obj);
+   EAPI void                 elm_tickernoti_detailview_button_set (const Evas_Object *obj, Evas_Object *button);
+   EAPI Evas_Object         *elm_tickernoti_detailview_button_get (const Evas_Object *obj);
+   EAPI void                 elm_tickernoti_detailview_icon_set (const Evas_Object *obj, Evas_Object *icon);
+   EAPI Evas_Object         *elm_tickernoti_detailview_icon_get (const Evas_Object *obj);
+   EAPI Evas_Object         *elm_tickernoti_detailview_get (const Evas_Object *obj);
+   EAPI int                  elm_tickernoti_rotation_get (const Evas_Object *obj);
+   EAPI void                 elm_tickernoti_rotation_set (const Evas_Object *obj, int angle);
+   EAPI void                 elm_tickernoti_mode_set (const Evas_Object *obj, Elm_Tickernoti_Mode mode);
    EAPI Elm_Tickernoti_Mode  elm_tickernoti_mode_get (const Evas_Object *obj);
 
    /* Image Slider */
@@ -2636,15 +2646,15 @@ extern "C" {
    EAPI Evas_Object           *elm_imageslider_add(Evas_Object *parent);
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data);
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_prepend(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data);
-   EAPI void                  elm_imageslider_item_del(Elm_Imageslider_Item *it);
+   EAPI void                   elm_imageslider_item_del(Elm_Imageslider_Item *it);
    EAPI Elm_Imageslider_Item  *elm_imageslider_selected_item_get(Evas_Object *obj);
-   EAPI Eina_Bool             elm_imageslider_item_selected_get(Elm_Imageslider_Item *it);
-   EAPI void                  elm_imageslider_item_selected_set(Elm_Imageslider_Item *it);
+   EAPI Eina_Bool              elm_imageslider_item_selected_get(Elm_Imageslider_Item *it);
+   EAPI void                   elm_imageslider_item_selected_set(Elm_Imageslider_Item *it);
    EAPI const char            *elm_imageslider_item_photo_file_get(Elm_Imageslider_Item *it);
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_prev(Elm_Imageslider_Item *it);
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_next(Elm_Imageslider_Item *it);
-   EAPI void                  elm_imageslider_prev(Evas_Object *obj);
-   EAPI void                  elm_imageslider_next(Evas_Object *obj);
+   EAPI void                   elm_imageslider_prev(Evas_Object *obj);
+   EAPI void                   elm_imageslider_next(Evas_Object *obj);
 
    
 #ifdef __cplusplus
