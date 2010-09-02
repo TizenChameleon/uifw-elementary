@@ -107,7 +107,7 @@ struct _Smart_Data {
      Eina_Bool (*ewk_view_zoom_cairo_scaling_get)(const Evas_Object *);
      Eina_Bool (*ewk_view_zoom_cairo_scaling_set)(Evas_Object *, Eina_Bool);
      void (*ewk_view_viewport_get)(Evas_Object *, int *, int *, float *, float *, float *, Eina_Bool *);
-     void (*ewk_view_zoom_range_set)(Evas_Object *, float, float);
+     Eina_Bool (*ewk_view_zoom_range_set)(Evas_Object *, float, float);
      void (*ewk_view_user_scalable_set)(Evas_Object *, Eina_Bool);
      Eina_Bool (*ewk_view_pre_render_region)(Evas_Object *, Evas_Coord, Evas_Coord, Evas_Coord, Evas_Coord, float);
      void (*ewk_view_pre_render_cancel)(Evas_Object *);
@@ -1187,14 +1187,11 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
    if (!sd->ewk_view_user_scalable_set)
      sd->ewk_view_user_scalable_set = (void (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_user_scalable_set");
    if (!sd->ewk_view_zoom_range_set)
-     sd->ewk_view_zoom_range_set = (void (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
+     sd->ewk_view_zoom_range_set = (Eina_Bool (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
    if (!sd->ewk_view_fixed_layout_size_set)
      sd->ewk_view_fixed_layout_size_set = (void (*)(Evas_Object *, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_fixed_layout_size_set");
 
-   if (sd->use_zoom_bouncing)
-     sd->ewk_view_zoom_range_set(webview, MIN_ZOOM_RATIO, MAX_ZOOM_RATIO + ZOOM_IN_BOUNCING);
-   else
-     sd->ewk_view_zoom_range_set(webview, MIN_ZOOM_RATIO, MAX_ZOOM_RATIO);
+   sd->ewk_view_zoom_range_set(webview, MIN_ZOOM_RATIO, MAX_ZOOM_RATIO);
 
    // set default layout size
    int object_w, object_h;
@@ -1226,6 +1223,7 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
 	  {
 	     // set page layout info, zoom and layout again
 	     _smart_page_layout_info_set(sd, 1.0f, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate, sd->zoom.scalable);
+	     sd->ewk_view_zoom_range_set(webview, MIN_ZOOM_RATIO, MAX_ZOOM_RATIO);
 	     sd->ewk_view_zoom_set(webview, sd->zoom.init_zoom_rate, 0, 0);
 	     sd->ewk_view_fixed_layout_size_set(webview, sd->layout.w, sd->layout.h);
 	  }
@@ -3133,7 +3131,7 @@ _update_min_zoom_rate(Evas_Object *obj)
    if (!sd->ewk_frame_contents_size_get)
      sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
    if (!sd->ewk_view_zoom_range_set)
-     sd->ewk_view_zoom_range_set = (void (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
+     sd->ewk_view_zoom_range_set = (Eina_Bool (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
 
    int content_w, object_w;
    evas_object_geometry_get(obj, NULL, NULL, &object_w, NULL);
