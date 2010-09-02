@@ -210,7 +210,9 @@ _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *
      }
    wd->repeating = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+#if 0
    _signal_unpressed(data, obj, emission, source); /* safe guard when the theme does not emit the 'unpress' signal */
+#endif
 }
 
 static int
