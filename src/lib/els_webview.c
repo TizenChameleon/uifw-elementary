@@ -712,6 +712,7 @@ _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev)
 
    if (sd->events_feed)
      {
+	_suspend_all(sd, EINA_FALSE);
 	sd->mouse_clicked = EINA_TRUE;
 	return _parent_sc.mouse_down(esd, ev);
      }
@@ -727,6 +728,7 @@ _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
 
    if (sd->events_feed)
      {
+	_resume_all(sd, EINA_FALSE);
 	//check if user hold touch
 	if (ev && (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD))
 	  {
@@ -1785,7 +1787,28 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    if (!sd) return;
    Evas_Point* point = (Evas_Point*)ev;
 
-   if (sd->events_feed == EINA_TRUE) return;
+   if (sd->events_feed == EINA_TRUE)
+     {
+	Evas* evas = evas_object_evas_get(webview);
+	Evas_Modifier *modifiers = (Evas_Modifier *)evas_key_modifier_get(evas);
+	Evas_Lock *locks = (Evas_Lock *)evas_key_lock_get(evas);
+
+	Evas_Event_Mouse_Move event_move;
+	event_move.buttons = 1;
+	event_move.cur.output.x = point->x;
+	event_move.cur.output.y = point->y;
+	event_move.cur.canvas.x = point->x;
+	event_move.cur.canvas.y = point->y;
+	event_move.data = NULL;
+	event_move.modifiers = modifiers;
+	event_move.locks = locks;
+	event_move.timestamp = ecore_loop_time_get();
+	event_move.event_flags = EVAS_EVENT_FLAG_NONE;
+	event_move.dev = NULL;
+
+	_parent_sc.mouse_move((Ewk_View_Smart_Data*)sd, &event_move);
+	return;
+     }
    if (sd->on_panning == EINA_FALSE) return;
 
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
@@ -1908,8 +1931,6 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
    Evas_Point* point = (Evas_Point*)ev;
    sd->on_panning = EINA_FALSE;
 
-   _resume_all(sd, EINA_FALSE);
-
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	if (sd->text_selection.front_handle_moving == EINA_TRUE
@@ -1918,6 +1939,8 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	sd->text_selection.front_handle_moving = EINA_FALSE;
 	sd->text_selection.back_handle_moving = EINA_FALSE;
      }
+
+   _resume_all(sd, EINA_FALSE);
 
    if (sd->tiled)
      {
