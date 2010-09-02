@@ -16,6 +16,8 @@ struct _Widget_Data
 	Evas_Object *handler;
 	Evas_Object *dragable_rect;
 	Elm_SlidingDrawer_Pos pos;
+	Evas_Coord max_drag_w;
+	Evas_Coord max_drag_h;
 };
 
 static const char *widtype = NULL;
@@ -57,8 +59,6 @@ _sizing_eval(Evas_Object *obj)
 	evas_object_move(obj, x, y);
 	evas_object_resize(obj, w, h);
 
-	part = edje_object_part_object_get(wd->base, "elm.dragable.handler");
-
 	if((wd->pos == ELM_SLIDINGDRAWER_TOP) || (wd->pos == ELM_SLIDINGDRAWER_BOTTOM)) {
 		edje_object_size_min_get(part, NULL, &h);
 	}else {
@@ -66,20 +66,23 @@ _sizing_eval(Evas_Object *obj)
 	}
 
 	evas_object_size_hint_min_set(wd->handler, w, h);
+
 }
 
 EAPI Evas_Object *
 elm_slidingdrawer_content_unset(Evas_Object *obj)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-
-	Evas_Object *swallow;
 	Widget_Data *wd;
+	Evas_Object *content;
 
 	wd = elm_widget_data_get(obj);
-	swallow = edje_object_part_swallow_get(wd->base, "elm.swallow.content");
-	edje_object_part_unswallow(wd->base, swallow);
-	return swallow;
+
+	content = edje_object_part_swallow_get(wd->base, "elm.swallow.content");
+	if(!content) return;
+	edje_object_part_unswallow(wd->base, content);
+	elm_widget_sub_object_del(obj, content);
+	return content;
 }
 
 EAPI void
@@ -90,6 +93,7 @@ elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!content) return;
 
+	elm_widget_sub_object_add(obj, content);
 	edje_object_part_swallow (wd->base, "elm.swallow.content", content);
 }
 
@@ -129,6 +133,10 @@ elm_slidingdrawer_max_drag_set(Evas_Object *obj, double dw,  double dh)
 	Evas_Coord w, h;
 
 	wd = elm_widget_data_get(obj);
+	wd->max_drag_w = dw;
+	wd->max_drag_h = dh;
+	_sizing_eval(obj);
+
 	evas_object_geometry_get(wd->parent, NULL, NULL, &w, &h);
 	evas_object_size_hint_max_set(wd->dragable_rect, ((double) w) * dw, ((double) h) * dh);
 }
@@ -151,6 +159,8 @@ elm_slidingdrawer_add(Evas_Object *parent)
 	ELM_SET_WIDTYPE(widtype, "slidingdrawer");
 
 	wd->parent = parent;
+	wd->max_drag_w = 1;
+	wd->max_drag_h = 1;
 
 	e = evas_object_evas_get(parent);
 

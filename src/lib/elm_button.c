@@ -92,9 +92,10 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      {
 	if(wd->statelabel[DEFAULT])
 	  _set_label(obj, wd->statelabel[DEFAULT]);
+#if 0
 	else
 	  _set_label(obj, wd->label);
-
+#endif
 	edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
 	evas_object_focus_set(wd->btn, 0);
      }
@@ -143,8 +144,10 @@ _disable_hook(Evas_Object *obj)
      {
 	if(wd->statelabel[DEFAULT])
 	  _set_label(obj, wd->statelabel[DEFAULT]);
+#if 0
 	else
 	  _set_label(obj, wd->label);
+#endif
 	edje_object_signal_emit(wd->btn, "elm,state,enabled", "elm");
      }
 }
@@ -207,7 +210,9 @@ _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *
      }
    wd->repeating = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+#if 0
    _signal_unpressed(data, obj, emission, source); /* safe guard when the theme does not emit the 'unpress' signal */
+#endif
 }
 
 static int
@@ -266,8 +271,10 @@ _signal_default_text_set(void *data, Evas_Object *obj, const char *emission, con
    if (!wd) return;
    if(wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
+#if 0
    else
      _set_label(data, wd->label);
+#endif
    return;
 }
 
@@ -278,8 +285,10 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
    if (!wd) return;
    if(wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
+#if 0
    else
      _set_label(data, wd->label);
+#endif
 
    if (wd->timer)
      {
@@ -323,6 +332,10 @@ elm_button_add(Evas_Object *parent)
    wd->statetype[HIGHLIGHTED] = 0;
    wd->statetype[FOCUSED] = 0;
    wd->statetype[DISABLED] = 0;
+   wd->statelabel[DEFAULT] = 0;
+   wd->statelabel[HIGHLIGHTED] = 0;
+   wd->statelabel[FOCUSED] = 0;
+   wd->statelabel[DISABLED] = 0;
    edje_object_signal_callback_add(wd->btn, "elm,action,click", "",
                                    _signal_clicked, obj);
    edje_object_signal_callback_add(wd->btn, "elm,action,press", "",

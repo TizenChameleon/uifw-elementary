@@ -1086,3 +1086,21 @@ elm_segment_control_item_selected_set( Elm_Segment_Item *item, Eina_Bool select)
 
 }
 
+/**
+ * Get a particular indexed segment item of segmentcontrol
+ * @param obj The Segment control object.
+ * @param index The index of the segment item.
+ * @return The corresponding Segment item.
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
+
+EAPI Elm_Segment_Item *
+elm_segment_control_item_get_at(Evas_Object *obj, unsigned int index)
+{
+   Elm_Segment_Item *it;
+   it = _item_find(obj, index);
+
+   return it;
+}
+
