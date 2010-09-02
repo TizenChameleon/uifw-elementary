@@ -63,7 +63,7 @@ _elm_win_recalc_job(void *data)
         evas_object_size_hint_min_set(data, minminw, minh);
      }
 
-   if (wd->ellipsis && wd->wrap_h > 0 && _is_width_over(data, 1) == 1) 
+   if (wd->ellipsis && wd->linewrap && wd->wrap_h > 0 && _is_width_over(data, 1) == 1) 
      _ellipsis_label_to_width(data, 1);
 
    maxh = minh;
