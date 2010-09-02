@@ -756,7 +756,8 @@ elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
 	else if (day <= 0) wd->day = 1;
 	else wd->day = day;
 	
-	if (hour > HOUR_24H_MAXIMUM || hour < 0) wd->hour = 0;
+	if (hour > HOUR_24H_MAXIMUM) wd->hour = HOUR_24H_MAXIMUM;
+	else if (hour < 0) wd->hour = 0;
 	else wd->hour = hour;
 
 	if (min > MIN_MAXIMUM) wd->min = MIN_MAXIMUM;
