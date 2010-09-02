@@ -106,7 +106,6 @@ static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, 
    else
      edje_object_signal_emit(wd->base, "CANCELHIDE", "PROG");
 
-
    const char* text;
    text = elm_entry_entry_get(elm_editfield_entry_get(wd->eb));
    if (text != NULL && strlen(text) > 0)
