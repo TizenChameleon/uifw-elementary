@@ -33,6 +33,7 @@ struct _Stackedicon_Item {
 typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data {	
 	Evas_Object *bx;
+	Evas_Object *clip;
 	double ewma;
 	int interval_x;
 	int interval_y;	
@@ -346,6 +347,7 @@ static void _add_image(Evas_Object *obj, void *data)
 	_elm_theme_object_set(obj, ly, "stackedicon", "icon", elm_widget_style_get(obj));
 	evas_object_size_hint_weight_set(ly, 1.0, 1.0);
 	elm_widget_sub_object_add(obj, ly); 
+	evas_object_clip_set(ly, wd->clip);
 	
 	ic = evas_object_image_add(evas_object_evas_get(obj));
 	evas_object_image_load_size_set(ic, wd->w/2, wd->h/2);
@@ -480,7 +482,10 @@ _resize_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	evas_object_geometry_get(obj, NULL, NULL, &w, &h);	
 	wd->w = w;
 	wd->h = h;
-	evas_object_resize(wd->bx, w, h);	
+
+	evas_object_geometry_get(elm_widget_parent_get(data), NULL, NULL, &w, &h);	
+	if(wd->clip) evas_object_resize(wd->clip, w, h);
+	
 	_update_stackedicon(data);
 }
 
@@ -494,7 +499,10 @@ _move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	evas_object_geometry_get(obj, &x, &y, NULL, NULL);	
 	wd->x = x;
 	wd->y = y;
-	evas_object_move(wd->bx, x, y);
+
+	evas_object_geometry_get(elm_widget_parent_widget_get(data), &x, &y, NULL, NULL);
+	if(wd->clip) evas_object_move(wd->clip, x, y);
+	
 	_update_stackedicon(data);	
 }
 
@@ -504,6 +512,7 @@ _show_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
 	Widget_Data *wd = elm_widget_data_get(data);
 	if (!wd) return;
 
+	evas_object_show(wd->clip);
 	_update_stackedicon(data);	
 	_show_all_image(data);
 }
@@ -514,6 +523,7 @@ _hide_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
 	Widget_Data *wd = elm_widget_data_get(data);
 	if (!wd) return;
 
+	evas_object_hide(wd->clip);
 	_hide_all_image(data);
 }
 
@@ -561,6 +571,9 @@ elm_stackedicon_add(Evas_Object *parent)
 	wd->w = 1;
 	wd->h = 1;
 	wd->on_expanded = EINA_FALSE;
+
+	wd->clip = evas_object_rectangle_add(e);
+	elm_widget_sub_object_add(obj, wd->clip);
 	
 	_event_init(obj);
 	_sizing_eval(obj);
@@ -594,7 +607,7 @@ EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const c
 	it->on_show = EINA_FALSE;	
 	wd->list = eina_list_append(wd->list, it);
 
-	//_update_stackedicon(obj);
+	_update_stackedicon(obj);
 
 	return it;
 }
@@ -625,7 +638,7 @@ EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const 
 	it->on_show = EINA_FALSE;	
 	wd->list = eina_list_prepend(wd->list, it);
 
-	//_update_stackedicon(obj);
+	_update_stackedicon(obj);
 
 	return it;
 }
