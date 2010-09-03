@@ -150,44 +150,16 @@ elm_slidingdrawer_add(Evas_Object *parent)
 	Evas *e;
 	Widget_Data *wd;
 
-	if(!parent)
-		return  NULL;
-
 	wd = ELM_NEW(Widget_Data);
 	if(!wd) return NULL;
 
 	ELM_SET_WIDTYPE(widtype, "slidingdrawer");
 
-	wd->parent = parent;
 	wd->max_drag_w = 1;
 	wd->max_drag_h = 1;
 
+	wd->parent = parent;
 	e = evas_object_evas_get(parent);
-
-	//window
-	/*
-	wd->win = elm_win_add(parent, "slidingdrawer", ELM_WIN_BASIC);
-	elm_win_autodel_set(wd->win, EINA_TRUE);
-	elm_win_borderless_set(wd->win, EINA_TRUE);
-	elm_win_alpha_set(wd->win, EINA_TRUE);
-	e = evas_object_evas_get(wd->win);
-
-	//widget
-	obj = elm_widget_add(e);
-	elm_widget_type_set(obj, "slidingdrawer");
-	elm_widget_sub_object_add(wd->win, obj);
-	elm_widget_data_set(obj, wd);
-	elm_widget_del_hook_set(obj, _del_hook);
-	elm_widget_theme_hook_set(obj, _theme_hook);
-	elm_win_resize_object_add(wd->win, obj);
-
-	//base
-	wd->base = edje_object_add(e);
-	_elm_theme_object_set(wd->win, wd->base, "slidingdrawer", "base", "default");
-	elm_widget_sub_object_add(obj, wd->base);
-	evas_object_show(wd->base);
-	elm_widget_resize_object_set(obj, wd->base);
-	*/
 
 	//widget
 	obj = elm_widget_add(e);

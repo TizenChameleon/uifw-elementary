@@ -253,6 +253,7 @@ _get_indicator_h(Evas_Object *parent)
    if(elm_win_indicator_state_get(parent) != 1) {
 	   return 0;
    }
+
    root = ecore_x_window_root_get(ecore_x_window_focus_get());
    ret  = ecore_x_window_prop_property_get(root, ECORE_X_ATOM_E_ILLUME_ROTATE_ROOT_ANGLE,
    						 ECORE_X_ATOM_CARDINAL, 32, &prop_data, &count);
@@ -622,6 +623,8 @@ _theme_hook(Evas_Object *obj)
    _elm_theme_object_set(obj, wd->arrow, "ctxpopup", "arrow",
 			 elm_widget_style_get(obj));
 
+   elm_object_style_set(wd->scroller, elm_widget_style_get(obj));
+
    _sizing_eval(obj);
 
 }
@@ -855,7 +858,7 @@ elm_ctxpopup_add(Evas_Object *parent)
 
    //Scroller
    wd->scroller = elm_scroller_add(obj);
-   elm_object_style_set(wd->scroller, "ctxpopup_vbar");
+   elm_object_style_set(wd->scroller, "vertical");
    elm_scroller_content_min_limit(wd->scroller, EINA_TRUE, EINA_TRUE);
    elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_OFF,
 			   ELM_SCROLLER_POLICY_ON);
@@ -946,7 +949,7 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
    wd->horizontal = horizontal;
    if (!horizontal)
      {
-	elm_object_style_set(wd->scroller, "ctxpopup_vbar");
+	elm_object_style_set(wd->scroller, "vertical");
 	elm_box_horizontal_set(wd->box, EINA_FALSE);
 	elm_scroller_bounce_set(wd->scroller, EINA_FALSE, EINA_TRUE);
 	elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_ON,
@@ -956,7 +959,7 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
      }
    else
      {
-	elm_object_style_set(wd->scroller, "ctxpopup_hbar");
+	elm_object_style_set(wd->scroller, "horizontal");
 	elm_box_horizontal_set(wd->box, EINA_TRUE);
 	elm_scroller_bounce_set(wd->scroller, EINA_TRUE, EINA_FALSE);
 	elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_ON,
