@@ -623,7 +623,7 @@ _theme_hook(Evas_Object *obj)
    _elm_theme_object_set(obj, wd->arrow, "ctxpopup", "arrow",
 			 elm_widget_style_get(obj));
 
-   elm_object_style_set(wd->scroller, elm_widget_style_get(obj));
+   //elm_object_style_set(wd->scroller, elm_widget_style_get(obj));
 
    _sizing_eval(obj);
 
