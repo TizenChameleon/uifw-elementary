@@ -250,6 +250,9 @@ _get_indicator_h(Evas_Object *parent)
    unsigned char *prop_data = NULL;
    int ret;
 
+   if(elm_win_indicator_state_get(parent) != 1) {
+	   return 0;
+   }
    root = ecore_x_window_root_get(ecore_x_window_focus_get());
    ret  = ecore_x_window_prop_property_get(root, ECORE_X_ATOM_E_ILLUME_ROTATE_ROOT_ANGLE,
    						 ECORE_X_ATOM_CARDINAL, 32, &prop_data, &count);
