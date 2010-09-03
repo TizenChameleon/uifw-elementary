@@ -1274,23 +1274,23 @@ extern "C" {
 
    typedef struct _Elm_Segment_Item Elm_Segment_Item;
    EAPI Evas_Object *elm_segment_control_add(Evas_Object *parent);
-   EAPI Elm_Segment_Item * elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)__attribute__((deprecated));
+   EAPI Elm_Segment_Item * elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate);
    EAPI Elm_Segment_Item *elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate);
-   EAPI void         elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate)__attribute__((deprecated));
+   EAPI void         elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate);
    EAPI Elm_Segment_Item *elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate);
    EAPI Elm_Segment_Item *elm_segment_control_item_get_at(Evas_Object *obj, unsigned int index);
    EAPI void         elm_segment_control_item_selected_set(Elm_Segment_Item *item, Eina_Bool select);
-   EAPI void         elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate)__attribute__((deprecated));
+   EAPI void         elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate);
    EAPI void         elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate);
-   EAPI void         elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate)__attribute__((deprecated));
+   EAPI void         elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate);
    EAPI void         elm_segment_control_item_del_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate);
-   EAPI const char  *elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index)__attribute__((deprecated));
+   EAPI const char  *elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index);
    EAPI const char  *elm_segment_control_item_label_get(Evas_Object *obj, unsigned int index);
-   EAPI Evas_Object *elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index)__attribute__((deprecated));
+   EAPI Evas_Object *elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index);
    EAPI Evas_Object *elm_segment_control_item_icon_get(Evas_Object *obj, unsigned int index);
-   EAPI Elm_Segment_Item *elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value)__attribute__((deprecated));
+   EAPI Elm_Segment_Item *elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value);
    EAPI Elm_Segment_Item *elm_segment_control_item_selected_get(const Evas_Object *obj);
-   EAPI int          elm_segment_control_get_segment_count(Evas_Object *obj)__attribute__((deprecated));
+   EAPI int          elm_segment_control_get_segment_count(Evas_Object *obj);
    EAPI int          elm_segment_control_item_count_get(Evas_Object *obj);
    EAPI Evas_Object *elm_segment_control_item_object_get(Elm_Segment_Item *it);
 

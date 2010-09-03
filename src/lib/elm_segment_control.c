@@ -636,8 +636,12 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
 }
 
 /**
- * API Deprecated. Please use elm_segment_control_item_add() instead.
- * @deprecated
+ * Add a new segment item to segmentcontrol
+ * @param obj The SegmentControl object
+ * @param icon The icon object for added segment item
+ * @param label The label for added segment item 
+ * @param animate If 1 the action be animated with sliding effects default 0.
+ * @return The new segment item or NULL if it cannot be created
  *
  * @ingroup SegmentControl SegmentControl
  */
@@ -645,11 +649,6 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
 EAPI Elm_Segment_Item *
 elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)
 {
-   fprintf(stderr, "=================> Caution!!! <========================\n");
-   fprintf(stderr, "==> elm_segment_control_add_segment() is deprecated. <=======\n");
-   fprintf(stderr, "==> Please use elm_segment_control_item_add() instead. <==\n");
-   fprintf(stderr, "=======================================================\n");
-
    EAPI Elm_Segment_Item * it;
    it = elm_segment_control_item_add(obj, icon, label, animate);
 
@@ -719,8 +718,12 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const ch
 }
 
 /**
- * API Deprecated. Please use elm_segment_control_item_insert_at() instead.
- * @deprecated
+ * Insert a new segment item to segmentcontrol
+ * @param obj The SegmentControl object
+ * @param icon The icon object for added segment item
+ * @param label The label for added segment item
+ * @param index The position at which segment item to be inserted
+ * @param animate If 1 the action be animated with sliding effects default 0.
  *
  * @ingroup SegmentControl SegmentControl
  */
@@ -728,11 +731,6 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const ch
 EAPI void
 elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate)
 {
-   fprintf(stderr, "=================> Caution!!! <========================\n");
-   fprintf(stderr, "==> elm_segment_control_insert_segment_at() is deprecated. <=======\n");
-   fprintf(stderr, "==> Please use elm_segment_control_item_insert_at() instead. <==\n");
-   fprintf(stderr, "=======================================================\n");
-
    Elm_Segment_Item *it;
    it = elm_segment_control_item_insert_at(obj, icon, label, index, animate);
 
@@ -780,8 +778,10 @@ elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool
 }
 
 /**
- * API Deprecated. Please use elm_segment_control_item_del() instead.
- * @deprecated
+ * Delete a segment item to segmentcontrol
+ * @param obj The SegmentControl object
+ * @param item The Segment item to be deleted
+ * @param animate If 1 the action be animated with sliding effects default 0.
  *
  * @ingroup SegmentControl SegmentControl
  */
@@ -789,11 +789,6 @@ elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool
 EAPI void
 elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate)
 {
-   fprintf(stderr, "=================> Caution!!! <========================\n");
-   fprintf(stderr, "==> elm_segment_control_delete_segment() is deprecated. <=======\n");
-   fprintf(stderr, "==> Please use elm_segment_control_item_del() instead. <==\n");
-   fprintf(stderr, "=======================================================\n");
-
    elm_segment_control_item_del(obj, item, animate);
 
    return;
@@ -843,8 +838,10 @@ elm_segment_control_item_del_at(Evas_Object *obj,  unsigned int index, Eina_Bool
 }
 
 /**
- * API Deprecated. Please use elm_segment_control_item_del_at() instead.
- * @deprecated
+ * Delete a segment item to segmentcontrol
+ * @param obj The SegmentControl object
+ * @param index The position at which segment item to be deleted
+ * @param animate If 1 the action be animated with sliding effects default 0.
  *
  * @ingroup SegmentControl SegmentControl
  */
@@ -852,11 +849,6 @@ elm_segment_control_item_del_at(Evas_Object *obj,  unsigned int index, Eina_Bool
 EAPI void
 elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate)
 {
-   fprintf(stderr, "=================> Caution!!! <========================\n");
-   fprintf(stderr, "==> elm_segment_control_delete_segment_at() is deprecated. <=======\n");
-   fprintf(stderr, "==> Please use elm_segment_control_item_del_at() instead. <==\n");
-   fprintf(stderr, "=======================================================\n");
-   
    elm_segment_control_item_del_at( obj, index, animate);
 
    return;
@@ -886,8 +878,10 @@ elm_segment_control_item_label_get(Evas_Object *obj, unsigned int index)
 }
 
 /**
- * API Deprecated. Please use elm_segment_control_item_label_get() instead.
- * @deprecated
+ * Get the label of a segment item of segmentcontrol
+ * @param obj The SegmentControl object
+ * @param index The index of the segment item
+ * @return The label of the segment item
  *
  * @ingroup SegmentControl SegmentControl
  */
@@ -895,11 +889,6 @@ elm_segment_control_item_label_get(Evas_Object *obj, unsigned int index)
 EAPI const char *
 elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index)
 {
-   fprintf(stderr, "=================> Caution!!! <========================\n");
-   fprintf(stderr, "==> elm_segment_control_get_segment_label_at() is deprecated. <=======\n");
-   fprintf(stderr, "==> Please use elm_segment_control_item_label_get() instead. <==\n");
-   fprintf(stderr, "=======================================================\n");
-
    char *label;
    label = elm_segment_control_item_label_get( obj, index);
   
@@ -930,8 +919,10 @@ elm_segment_control_item_icon_get(Evas_Object *obj, unsigned int index)
 }
 
 /**
- * API Deprecated. Please use elm_segment_control_item_icon_get() instead.
- * @deprecated
+ * Get the icon of a segment item of segmentcontrol
+ * @param obj The SegmentControl object
+ * @param index The index of the segment item
+ * @return The icon object or NULL if it is not found.
  *
  * @ingroup SegmentControl SegmentControl
  */
@@ -939,11 +930,6 @@ elm_segment_control_item_icon_get(Evas_Object *obj, unsigned int index)
 EAPI Evas_Object *
 elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index)
 {
-   fprintf(stderr, "=================> Caution!!! <========================\n");
-   fprintf(stderr, "==> elm_segment_control_get_segment_icon_at() is deprecated. <=======\n");
-   fprintf(stderr, "==> Please use elm_segment_control_item_icon_get() instead. <==\n");
-   fprintf(stderr, "=======================================================\n");
-
    Evas_Object *icon;
    icon = elm_segment_control_item_icon_get( obj, index);
 
@@ -953,7 +939,6 @@ elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index)
 /**
  * Get the currently selected segment item of segmentcontrol
  * @param obj The SegmentControl object
- * @param value The current segment item id
  * @return The selected Segment item
  *
  * @ingroup SegmentControl SegmentControl
@@ -976,8 +961,10 @@ elm_segment_control_item_selected_get(const Evas_Object *obj)
  }
 
 /**
- * API Deprecated. Please use elm_segment_control_item_selected_get() instead.
- * @deprecated
+ * Get the currently selected segment item of segmentcontrol
+ * @param obj The SegmentControl object
+ * @param value The current segment item id
+ * @return The selected Segment item
  *
  * @ingroup SegmentControl SegmentControl
  */
@@ -985,11 +972,6 @@ elm_segment_control_item_selected_get(const Evas_Object *obj)
 EAPI Elm_Segment_Item *
 elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value)
 {
-   fprintf(stderr, "=================> Caution!!! <========================\n");
-   fprintf(stderr, "==> elm_segment_control_selected_segment_get() is deprecated. <=======\n");
-   fprintf(stderr, "==> Please use elm_segment_control_item_selected_get() instead. <==\n");
-   fprintf(stderr, "=======================================================\n");
-
    Elm_Segment_Item *it;
    it = elm_segment_control_item_selected_get( obj);
    *value = it->segment_id;
@@ -1015,8 +997,9 @@ elm_segment_control_item_count_get(Evas_Object *obj)
 }
 
 /**
- * API Deprecated. Please use elm_segment_control_item_count_get() instead.
- * @deprecated
+ * Get the count of segments of segmentcontrol
+ * @param obj The SegmentControl object
+ * @return The count of Segment items
  *
  * @ingroup SegmentControl SegmentControl
  */
@@ -1024,11 +1007,6 @@ elm_segment_control_item_count_get(Evas_Object *obj)
 EAPI int
 elm_segment_control_get_segment_count(Evas_Object *obj)
 {
-   fprintf(stderr, "=================> Caution!!! <========================\n");
-   fprintf(stderr, "==> elm_segment_control_get_segment_count() is deprecated. <=======\n");
-   fprintf(stderr, "==> Please use elm_segment_control_item_count_get() instead. <==\n");
-   fprintf(stderr, "=======================================================\n");
-
    int id;
    id = elm_segment_control_item_count_get( obj);
 
