@@ -317,6 +317,8 @@ _elm_widtype_clear(void)
      }
 }
 
+// This code is just for temporary usage.
+// This needs to be included into AUL avatar.
 static void                                                                             
 _set_elm_module()                                                                
 {                                                                                
