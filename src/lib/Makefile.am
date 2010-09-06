@@ -75,6 +75,7 @@ elm_selectioninfo.c \
 elm_slideshow.c \
 elm_menu.c \
 elm_panel.c \
+elm_panes.c \
 elm_map.c \
 elm_flip.c \
 elm_conform.c \
