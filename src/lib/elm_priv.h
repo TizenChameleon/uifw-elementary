@@ -20,6 +20,7 @@
 #include "els_hor_scroller.h"
 #include "els_touch.h"
 #include "els_webview.h"
+#include "els_webview_container.h"
 
 // FIXME: totally disorganised. clean this up!
 // 

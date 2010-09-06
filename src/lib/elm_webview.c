@@ -15,6 +15,9 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
 {
+#ifdef BOUNCING_SUPPORT
+   Evas_Object *container;
+#endif
    Evas_Object *webkit;
 };
 
@@ -47,10 +50,20 @@ _del_hook(Evas_Object *obj)
 static void
 _sizing_eval(Evas_Object *obj)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord w, h;
    evas_object_geometry_get(obj, NULL, NULL, &w, &h);
    printf("sizing eval : %d, %d\n", w, h);
-   //evas_object_resize(obj, w, h);
+#ifdef BOUNCING_SUPPORT
+   evas_object_resize(wd->container, w, h);
+#endif
+   evas_object_resize(wd->webkit, w, h);
+}
+
+static void
+_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   _sizing_eval(data);
 }
 
 static void
@@ -99,12 +112,21 @@ elm_webview_add(Evas_Object *parent, Eina_Bool tiled)
    elm_widget_del_hook_set(obj, _del_hook);
 
    wd->webkit = _elm_smart_webview_add(e, tiled);
+#ifdef BOUNCING_SUPPORT
+   wd->container = elm_smart_webview_container_add(e);
+   _elm_smart_webview_container_child_set(wd->container, wd->webkit);
+   _elm_smart_webview_container_set(wd->webkit, wd->container);
+#endif
    _elm_smart_webview_widget_set(wd->webkit, obj);
-   //TODO:evas_object_box_layout_set(wd->box, _layout, wd, NULL);
    evas_object_event_callback_add(wd->webkit, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				  _changed_size_hints, obj);
 
+#ifdef BOUNCING_SUPPORT
+   elm_widget_resize_object_set(obj, wd->container);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
+#else
    elm_widget_resize_object_set(obj, wd->webkit);
+#endif
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    return obj;
 }

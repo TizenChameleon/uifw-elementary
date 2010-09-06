@@ -84,6 +84,9 @@ struct _Smart_Data {
      Ewk_View_Smart_Data base; //default data
 
      Evas_Object* widget;
+#ifdef BOUNCING_SUPPORT
+     Evas_Object* container;
+#endif
      Ecore_Job *move_calc_job;
      Ecore_Job *resize_calc_job;
      Eina_Hash* mime_func_hash;
@@ -94,6 +97,7 @@ struct _Smart_Data {
      unsigned char events_feed : 1;
      unsigned char auto_fitting : 1;
      unsigned char mouse_clicked : 1;
+     unsigned char on_flick : 1;
 
      /* ewk functions */
      void (*ewk_view_theme_set)(Evas_Object *, const char *);
@@ -567,6 +571,15 @@ _elm_smart_webview_default_layout_width_set(Evas_Object *obj, int width)
    API_ENTRY return;
    sd->layout.default_w = width;
 }
+
+#ifdef BOUNCING_SUPPORT
+void
+_elm_smart_webview_container_set(Evas_Object *obj, Evas_Object *container)
+{
+   API_ENTRY return;
+   sd->container = container;
+}
+#endif
 
 int
 _flush_and_pre_render(void *data)
@@ -1637,6 +1650,7 @@ _smart_cb_mouse_up(void* data, Evas_Object* webview, void* ev)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
    if (sd->events_feed == EINA_TRUE) return;
+   sd->on_flick = EINA_TRUE;
 
    Evas_Point* point = (Evas_Point*)ev;
    DBG(" argument : (%d, %d)\n", point->x, point->y);
@@ -1771,6 +1785,7 @@ _smart_cb_pan_start(void* data, Evas_Object* webview, void* ev)
 
    sd->pan_s = *point;
    sd->on_panning = EINA_TRUE;
+   sd->on_flick = EINA_FALSE;
 
    if (sd->use_text_selection  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
@@ -1890,6 +1905,19 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    if (locked) return;
 #endif
 
+#ifdef BOUNCING_SUPPORT
+   printf(":::::::: %s\n", __func__);
+   _elm_smart_webview_container_scroll_adjust(sd->container, &dx, &dy);
+   if (dx == 0 && dy == 0)
+     {
+	sd->pan_s = *point;
+	_elm_smart_webview_container_bounce_add(sd->container, 0, 0);
+	if (sd->on_flick)
+	  _elm_smart_touch_reset(sd->touch_obj);
+	return;
+     }
+#endif
+
    if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
    if (!sd->ewk_frame_scroll_add)
@@ -1905,6 +1933,17 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 
    if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_move_by(sd, old_x - new_x, old_y - new_y);
+
+#ifdef BOUNCING_SUPPORT
+   int bx, by;
+   bx = old_x + dx - new_x;
+   by = old_y + dy - new_y;
+   if (sd->on_flick && (bx != 0 || by != 0))
+     {
+	_elm_smart_webview_container_decelerated_flick_get(sd->container, &bx, &by);
+     }
+   _elm_smart_webview_container_bounce_add(sd->container, bx, by);
+#endif
 
 #if 0 // comment out below code until it is completed
    if (!sd->bounce_horiz &&
@@ -1968,6 +2007,9 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	_directional_pre_render(webview,
 	      (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
      }
+#ifdef BOUNCING_SUPPORT
+   _elm_smart_webview_container_mouse_up(sd->container);
+#endif
 
 #if 0 // comment out below code until it is completed
    if (!sd->bounce_horiz && elm_widget_drag_lock_x_get(sd->widget))

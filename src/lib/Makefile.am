@@ -151,7 +151,8 @@ els_icon.c \
 els_icon.h \
 els_touch.c \
 els_touch.h \
-els_webview.c
+els_webview.c \
+els_webview_container.c
 
 
 libelementary_la_CFLAGS =
