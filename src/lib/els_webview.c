@@ -877,7 +877,7 @@ _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_R
 	return EINA_FALSE;
      }
    else
-     return func(esd->self);
+     return func(esd->self, request->url);
 }
 
 #ifdef NEED_TO_REMOVE

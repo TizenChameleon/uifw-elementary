@@ -2614,7 +2614,7 @@ extern "C" {
    EAPI void         elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked);
    
    /* WebView */
-   typedef Eina_Bool (*Elm_WebView_Mime_Cb)(Evas_Object *obj);
+   typedef Eina_Bool (*Elm_WebView_Mime_Cb)(Evas_Object *obj, const char *uri);
    EAPI Evas_Object *elm_webview_add(Evas_Object *parent, Eina_Bool tiled);
    EAPI Evas_Object *elm_webview_webkit_get(Evas_Object *obj);
    EAPI void         elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed);
