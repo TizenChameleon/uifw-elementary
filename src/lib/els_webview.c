@@ -1616,7 +1616,11 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
 #endif
 
    sd->mouse_clicked = EINA_TRUE;
-   _parent_sc.mouse_down((Ewk_View_Smart_Data*)sd, &sd->mouse_down_copy);
+   Evas_Event_Mouse_Down mouse_down = sd->mouse_down_copy;
+   Evas_Point* point = (Evas_Point*)ev;
+   mouse_down.canvas.x = point->x;
+   mouse_down.canvas.y = point->y;
+   _parent_sc.mouse_down((Ewk_View_Smart_Data*)sd, &mouse_down);
 
 #if 0 // comment out below code until it is completed
    if (sd->bounce_horiz)
@@ -1748,7 +1752,10 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
 	return;
      }
 
-   _parent_sc.mouse_up((Ewk_View_Smart_Data*)sd, &sd->mouse_up_copy);
+   Evas_Event_Mouse_Up mouse_up = sd->mouse_up_copy;
+   mouse_up.canvas.x = point->x;
+   mouse_up.canvas.y = point->y;
+   _parent_sc.mouse_up((Ewk_View_Smart_Data*)sd, &mouse_up);
    sd->mouse_clicked = EINA_FALSE;
 }
 
