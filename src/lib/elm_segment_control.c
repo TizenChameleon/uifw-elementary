@@ -1057,6 +1057,7 @@ elm_segment_control_item_selected_set( Elm_Segment_Item *item, Eina_Bool select)
    else if(item->segment_id == wd->cur_seg_id)
       {
        wd->selected = EINA_FALSE;
+       wd->cur_seg_id = -1;
        _signal_segment_off(item); 
       } 
 
