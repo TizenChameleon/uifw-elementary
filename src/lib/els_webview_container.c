@@ -75,11 +75,11 @@ _elm_smart_webview_container_child_set(Evas_Object *obj, Evas_Object *child)
 Eina_Bool
 _elm_smart_webview_container_scroll_adjust(Evas_Object *obj, int *dx, int *dy)
 {
-   API_ENTRY return;
+   API_ENTRY return EINA_FALSE;
    Eina_Bool changed = EINA_FALSE;
-   printf(" [ WCSA ] %d , %d vs %d, %d\n", *dx, *dy, sd->bx, sd->by);
+   //printf(" [ WCSA ] %d , %d vs %d, %d\n", *dx, *dy, sd->bx, sd->by);
 
-   if (sd->bx != 0)
+   if (sd->bx != 0 && *dx != 0)
      {
 	int xsum = sd->bx + *dx;
         if ((*dx < 0 && sd->bx > 0 && xsum < 0) ||
@@ -93,8 +93,9 @@ _elm_smart_webview_container_scroll_adjust(Evas_Object *obj, int *dx, int *dy)
 	     sd->bx = xsum;
 	     *dx = 0;
 	  }
+	changed = EINA_TRUE;
      }
-   if (sd->by != 0)
+   if (sd->by != 0 && *dy != 0)
      {
 	int ysum = sd->by + *dy;
         if ((*dy < 0 && sd->by > 0 && ysum < 0) ||
@@ -108,6 +109,7 @@ _elm_smart_webview_container_scroll_adjust(Evas_Object *obj, int *dx, int *dy)
 	     sd->by = ysum;
 	     *dy = 0;
 	  }
+	changed = EINA_TRUE;
      }
 #if 0
    if (sd->bx > 0 && *dx < 0)
@@ -159,7 +161,7 @@ _elm_smart_webview_container_scroll_adjust(Evas_Object *obj, int *dx, int *dy)
 	changed = EINA_TRUE;
      }
 #endif
-   printf(" [ WCSA(A) ] %d , %d vs %d, %d\n", *dx, *dy, sd->bx, sd->by);
+   //printf(" [ WCSA(A) ] %d , %d vs %d, %d\n", *dx, *dy, sd->bx, sd->by);
    return changed;
 }
 
@@ -226,7 +228,6 @@ static void
 _smart_reconfigure(Smart_Data *sd)
 {
    evas_object_move(sd->child_obj, sd->x - sd->bx, sd->y - sd->by);
-   //evas_object_move(sd->child_obj, sd->x, sd->y);
 }
 
 static void

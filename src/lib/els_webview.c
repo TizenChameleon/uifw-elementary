@@ -1889,6 +1889,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 
    int dx = sd->pan_s.x - point->x;
    int dy = sd->pan_s.y - point->y;
+   if (dx == 0 && dy == 0) return;
 
    if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
@@ -1949,8 +1950,13 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 #endif
 
 #ifdef BOUNCING_SUPPORT
+   //_elm_smart_webview_container_bounce_add(sd->container, 10, 10);
+   //return;
+
    printf(":::::::: %s\n", __func__);
-   _elm_smart_webview_container_scroll_adjust(sd->container, &dx, &dy);
+
+   Eina_Bool container_scrolled;
+   container_scrolled = _elm_smart_webview_container_scroll_adjust(sd->container, &dx, &dy);
    if (dx == 0 && dy == 0)
      {
 	sd->pan_s = *point;
@@ -1978,14 +1984,16 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
      _text_selection_move_by(sd, old_x - new_x, old_y - new_y);
 
 #ifdef BOUNCING_SUPPORT
+   printf("<< ========content [%d, %d] old pos [%d, %d] new pos [%d, %d] >>(remained(%d, %d)\n",
+	 content_w, content_h,
+	 old_x, old_y,
+	 old_x + dx, old_y + dy,
+	 old_x + dx - new_x, old_y + dy - new_y);
    int bx, by;
    bx = old_x + dx - new_x;
    by = old_y + dy - new_y;
-   if (sd->on_flick && (bx != 0 || by != 0))
-     {
-	_elm_smart_webview_container_decelerated_flick_get(sd->container, &bx, &by);
-     }
-   _elm_smart_webview_container_bounce_add(sd->container, bx, by);
+   if (container_scrolled == EINA_TRUE || (bx != 0 || by != 0))
+     _elm_smart_webview_container_bounce_add(sd->container, bx, by);
 #endif
 
 #if 0 // comment out below code until it is completed
