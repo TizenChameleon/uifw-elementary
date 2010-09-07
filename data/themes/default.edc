@@ -591,6 +591,36 @@ collections {
       }
    }
 
+   group { name: "elm/label/base_wrap_ellipsis/default";
+      data.item: "default_font_size" "24";
+      data.item: "min_font_size" "8";
+      data.item: "max_font_size" "60";
+      parts {
+	 part { name: "label.swallow.background";
+	    type: SWALLOW;
+	    description { state: "default" 0.0;
+	       visible: 1;
+	       rel1 { relative: 0 0; to: "elm.text"; }
+	       rel2 { relative: 1 1; to: "elm.text"; }
+	    }
+	 }
+	 part { name: "elm.text";
+	    type: TEXTBLOCK;
+	    mouse_events: 0;
+	    scale: 1;
+	    description { state: "default" 0.0;
+               // FIXME : fixed for multiline ellipsis.
+               //         does it need to make another ellipsis style? 
+	       fixed: 0 1; 
+	       text {
+		  style: "textblock_style";
+		  min: 0 1;
+	       }
+	    }
+	 }
+      }
+   }
+
    group { name: "elm/label/base/marker";
       data.item: "default_font_size" "24";
       data.item: "min_font_size" "8";
