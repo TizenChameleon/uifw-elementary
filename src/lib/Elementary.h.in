@@ -1303,6 +1303,7 @@ extern "C" {
    EAPI Elm_Segment_Item *elm_segment_control_item_selected_get(const Evas_Object *obj);
    EAPI int          elm_segment_control_get_segment_count(Evas_Object *obj);
    EAPI int          elm_segment_control_item_count_get(Evas_Object *obj);
+   EAPI int          elm_segment_control_item_index_get(Elm_Segment_Item *item);
    EAPI Evas_Object *elm_segment_control_item_object_get(Elm_Segment_Item *it);
 
    EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
