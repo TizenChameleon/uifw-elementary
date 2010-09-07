@@ -1,3 +1,15 @@
+elementary (0.4.0+svn.49550slp2+3build50) unstable; urgency=low
+
+  * [elm_stackedicon] improve performance
+  * [genlist] Code refactoring
+  * [genlist] Added genlist APIs.
+  * [genlist] Disabled item_select when slide menu is opened.
+  * [segment_control] new API is added to elm_segment_control
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build50
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Wed, 08 Sep 2010 03:57:16 +0900
+
 elementary (0.4.0+svn.49550slp2+3build49) unstable; urgency=low
 
   * [Elementary.h.in]
