@@ -34,16 +34,30 @@ static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 
 static void
+_del_job(void *data)
+{
+	Evas_Object *obj = data;
+	evas_object_del(obj);
+}
+
+static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
+   Evas_Object *p = elm_widget_parent_get(obj);
+   if (p == wd->win_indi) {
+	   ecore_job_add (_del_job, p);
+   }
+
    evas_object_del (wd->edje_indi);
+   wd->edje_indi = NULL;
    evas_object_del (wd->edje_detail);
+   wd->edje_detail = NULL;
    evas_object_del (wd->win_detail);
-   if (obj != wd->win_indi)
-	   evas_object_del (wd->win_indi);
+   wd->win_detail = NULL;
+
    free(wd);
 }
 
