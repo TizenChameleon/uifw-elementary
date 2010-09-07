@@ -6,6 +6,7 @@
 #include "elm_priv.h"
 
 #ifdef ELM_EWEBKIT
+#define SEC_KESSLER
 #include <EWebKit.h>
 #include <cairo.h>
 
@@ -121,7 +122,8 @@ struct _Smart_Data {
      void (*ewk_view_javascript_resume)(Evas_Object *);
      void (*ewk_view_fixed_layout_size_set)(Evas_Object *, Evas_Coord, Evas_Coord);
      Eina_Bool (*ewk_view_setting_enable_plugins_get)(const Evas_Object *);
-     void (*ewk_view_pause_and_or_hide_plugins)(Evas_Object *, Eina_Bool, Eina_Bool);
+//     void (*ewk_view_pause_and_or_hide_plugins)(Evas_Object *, Eina_Bool, Eina_Bool);
+     void (*ewk_view_reduce_plugins_frame_rate)(Evas_Object *, Eina_Bool);
      Eina_Bool (*ewk_view_suspend_request)(Evas_Object *);
      Eina_Bool (*ewk_view_resume_request)(Evas_Object *);
      Eina_Bool (*ewk_view_select_none)(Evas_Object *);
@@ -284,8 +286,8 @@ static void      _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_unselect_closest_word(void* data, Evas_Object* webview, void* ev);
-static void      _suspend_all(Smart_Data *sd, Eina_Bool hidePlugin);
-static void      _resume_all(Smart_Data *sd, Eina_Bool hidePlugin);
+static void      _suspend_all(Smart_Data *sd, Eina_Bool useReduceRevertPluginsFPS);
+static void      _resume_all(Smart_Data *sd, Eina_Bool useReduceRevertPluginsFPS);
 static void      _zoom_start(Smart_Data* sd, int centerX, int centerY, int distance);
 static void      _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance);
 static void      _zoom_stop(Smart_Data* sd);
@@ -877,7 +879,7 @@ _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_R
 	return EINA_FALSE;
      }
    else
-     return func(esd->self, request->url);
+     return func(esd->self, request->url); //need to check, commented out due to compilation errors
 }
 
 #ifdef NEED_TO_REMOVE
@@ -2092,7 +2094,7 @@ static int smart_zoom_index = N_COSINE - 1;
 #define INPUT_ZOOM_RATIO 2.5
 
 static void
-_suspend_all(Smart_Data *sd, Eina_Bool hidePlugin)
+_suspend_all(Smart_Data *sd, Eina_Bool useReduceRevertPluginsFPS)
 {
    Evas_Object *webview = sd->base.self;
 
@@ -2111,9 +2113,16 @@ _suspend_all(Smart_Data *sd, Eina_Bool hidePlugin)
      sd->ewk_view_setting_enable_plugins_get = (Eina_Bool (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_setting_enable_plugins_get");
    if (sd->ewk_view_setting_enable_plugins_get(webview))
      {
+	/*
 	if (!sd->ewk_view_pause_and_or_hide_plugins)
 	  sd->ewk_view_pause_and_or_hide_plugins = (void (*)(Evas_Object *, Eina_Bool, Eina_Bool))dlsym(ewk_handle, "ewk_view_pause_and_or_hide_plugins");
 	sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, hidePlugin);
+	*/
+	if(useReduceRevertPluginsFPS) {
+		if (!sd->ewk_view_reduce_plugins_frame_rate)
+		  sd->ewk_view_reduce_plugins_frame_rate = (void (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_reduce_plugins_frame_rate");
+		sd->ewk_view_reduce_plugins_frame_rate(webview, EINA_TRUE);
+	}
      }
 
    // cancel pre-render
@@ -2132,7 +2141,7 @@ _suspend_all(Smart_Data *sd, Eina_Bool hidePlugin)
 }
 
 static void
-_resume_all(Smart_Data *sd, Eina_Bool hidePlugin)
+_resume_all(Smart_Data *sd, Eina_Bool useReduceRevertPluginsFPS)
 {
    Evas_Object *webview = sd->base.self;
 
@@ -2150,10 +2159,19 @@ _resume_all(Smart_Data *sd, Eina_Bool hidePlugin)
      }
 
    // plugin resume
+   /*
    if (!sd->ewk_view_pause_and_or_hide_plugins)
      sd->ewk_view_pause_and_or_hide_plugins = (void (*)(Evas_Object *, Eina_Bool, Eina_Bool))dlsym(ewk_handle, "ewk_view_pause_and_or_hide_plugins");
    sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, hidePlugin);
-
+   */
+   
+   // plugin reverting fps
+   if(useReduceRevertPluginsFPS) {
+	if (!sd->ewk_view_reduce_plugins_frame_rate)
+	  sd->ewk_view_reduce_plugins_frame_rate = (void (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_reduce_plugins_frame_rate");
+	sd->ewk_view_reduce_plugins_frame_rate(webview, EINA_FALSE);
+   }
+   
    // network resume
    if (!sd->ewk_view_resume_request)
      sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
@@ -2265,7 +2283,7 @@ _zoom_stop(Smart_Data* sd)
      }
    DBG("<< zoom set [%f] >>\n", sd->zoom.zooming_rate);
 
-   _resume_all(sd, EINA_FALSE);
+   _resume_all(sd, EINA_TRUE);
 
    if (sd->tiled)
      {
@@ -2367,7 +2385,7 @@ _smart_zoom_animator(void* data)
 
 	_elm_smart_touch_start(sd->touch_obj);
 
-	_resume_all(sd, EINA_FALSE);
+	_resume_all(sd, EINA_TRUE);
 
 	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
