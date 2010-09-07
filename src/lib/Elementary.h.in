@@ -1151,7 +1151,8 @@ extern "C" {
 	ELM_GENLIST_EDIT_MODE_REORDER = (1 << 0),
 	ELM_GENLIST_EDIT_MODE_INSERT  = (1 << 1),
 	ELM_GENLIST_EDIT_MODE_DELETE  = (1 << 2),
-	ELM_GENLIST_EDIT_MODE_SELECTALL  = (1 << 3)
+	ELM_GENLIST_EDIT_MODE_SELECT  = (1 << 3),
+	ELM_GENLIST_EDIT_MODE_SELECTALL  = (1 << 4)
      }Elm_Genlist_Edit_Mode;
    typedef struct _Elm_Genlist_Item_Class Elm_Genlist_Item_Class;
    typedef struct _Elm_Genlist_Item       Elm_Genlist_Item;
@@ -1159,12 +1160,13 @@ extern "C" {
    typedef struct _Elm_Genlist_Item_Class_Func Elm_Genlist_Item_Class_Func;
    typedef struct _Elm_Genlist_Edit_Class Elm_Genlist_Edit_Class;
    typedef char        *(*GenlistItemLabelGetFunc) (const void *data, Evas_Object *obj, const char *part);
-   typedef char        *(*GenlistItemLabelChangedFunc) (const void *data, Evas_Object *obj, const char *text, const int sub_text);
+      typedef char        *(*GenlistItemLabelChangedFunc) (const void *data, Elm_Genlist_Item *it, const char *text, const int sub_text );
    typedef Evas_Object *(*GenlistItemIconGetFunc)  (const void *data, Evas_Object *obj, const char *part);
    typedef Eina_Bool    (*GenlistItemStateGetFunc) (const void *data, Evas_Object *obj, const char *part);
    typedef void         (*GenlistItemDelFunc)      (const void *data, Evas_Object *obj);
    typedef int          (*GenlistItemEditModeGetFunc)  (const void *data, Evas_Object *obj, const int enabled_edit_modes);
    typedef void         (*GenlistInsertNewFunc)      (Evas_Object *genlist, Elm_Genlist_Item *rel_item);
+   typedef void         (*GenlistItemSelectedFunc) (const void *data, Evas_Object *obj);
    typedef Eina_Bool    (*GenlistMoveFunc)      ( Evas_Object *genlist, Elm_Genlist_Item *item, Elm_Genlist_Item *rel_item, Eina_Bool move_after);
    typedef Eina_Bool    (*GenlistRemoveItemFunc)     (Evas_Object *genlist, Elm_Genlist_Item *rel_item);
 
@@ -1187,6 +1189,7 @@ extern "C" {
         GenlistRemoveItemFunc remove;
         GenlistInsertNewFunc insert_new;
         GenlistMoveFunc move;
+        GenlistItemSelectedFunc item_selected;
      };
    EAPI Evas_Object      *elm_genlist_add(Evas_Object *parent);
    EAPI Elm_Genlist_Item *elm_genlist_item_append(Evas_Object *obj, const Elm_Genlist_Item_Class *itc, const void *data, Elm_Genlist_Item *parent, Elm_Genlist_Item_Flags flags, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *func_data);
@@ -1250,7 +1253,10 @@ extern "C" {
    EINA_DEPRECATED EAPI void              elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
    EAPI void              elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
    EAPI int               elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it);
-   EAPI void              elm_genlist_selected_items_del(Evas_Object *obj);
+   EAPI void              elm_genlist_edit_selected_items_del(Evas_Object *obj);
+   EAPI Eina_List *       elm_genlist_edit_selected_items_get(const Evas_Object *obj);
+   EAPI void              elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode);
+
 
    EAPI Evas_Object *elm_check_add(Evas_Object *parent);
    EAPI void         elm_check_label_set(Evas_Object *obj, const char *label);
