@@ -1070,16 +1070,12 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
 	else
 	  {
 	     dy = it->wd->td1_y - it->wd->td2_y;
-	     if (dy < 0)
-	       ady = -dy;
-	     else
-	       ady = dy;
+	     if (dy < 0) ady = -dy;
+	     else ady = dy;
 
 	     uy = it->wd->tu1_y - it->wd->tu2_y;
-	     if (uy < 0)
-	       auy = -uy;
-	     else
-	       auy = uy;
+	     if (uy < 0) auy = -uy;
+	     else auy = uy;
 
 	     if (auy < ady)
 	       {
@@ -1132,25 +1128,25 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
      }
    if (it->wd->longpressed)
      {
-        it->wd->longpressed = EINA_FALSE;
-        if (!it->wd->wasselected)
-          _item_unselect(it);
-        it->wd->wasselected = 0;
-        return;
+	it->wd->longpressed = EINA_FALSE;
+	if (!it->wd->wasselected)
+	  _item_unselect(it);
+	it->wd->wasselected = 0;
+	return;
      }
    if (dragged)
      {
-        if (it->want_unrealize)
-          {
-             _item_unrealize(it);
-             if (it->block->want_unrealize)
-               _item_block_unrealize(it->block);
-          }
+	if (it->want_unrealize)
+	  {
+	     _item_unrealize(it);
+	     if (it->block->want_unrealize)
+	       _item_block_unrealize(it->block);
+	  }
      }
    if ((it->disabled) || (dragged)) return;
    if (it->wd->multi)
      {
-	if (!it->selected)
+	if (!it->selected && !it->menuopened)
 	  {
 	     _item_hilight(it);
 	     _item_select(it);
@@ -1162,10 +1158,10 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
 	if (!it->selected)
 	  {
 	     Widget_Data *wd = it->wd;
-             if (wd)
-               {
-                  while (wd->selected) _item_unselect(wd->selected->data);
-               }
+	     if (wd)
+	       {
+		  while (wd->selected) _item_unselect(wd->selected->data);
+	       }
 	  }
 	else
 	  {
@@ -1173,12 +1169,15 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
 	     Elm_Genlist_Item *it2;
 
 	     EINA_LIST_FOREACH_SAFE(it->wd->selected, l, l_next, it2)
-	       if (it2 != it) _item_unselect(it2);
-//	     _item_hilight(it);
-//	     _item_select(it);
+		if (it2 != it) _item_unselect(it2);
+	     //	     _item_hilight(it);
+	     //	     _item_select(it);
 	  }
-        _item_hilight(it);
-        _item_select(it);
+	if (!it->menuopened)
+	  {
+	     _item_hilight(it);
+	     _item_select(it);
+	  }
      }
 }
 
