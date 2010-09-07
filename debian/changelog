@@ -1,3 +1,21 @@
+elementary (0.4.0+svn.49550slp2+3build49) unstable; urgency=low
+
+  * [Elementary.h.in]
+  * [elm_ctxpopup.c] updated scroller
+  * [elm_selectioninfo,elm_pagecontrol] Added exception handling
+  * [elm_dayselecotr.c] modified elm_dayselector clicked event_info as Elm_Event_DaySelector_Day*
+  * [label] adding multiline ellipsis style
+  * [label] refine multiline ellipsis
+  * [elm_webview]modify BOUNCE feature
+  * [els_webview]flash file support
+  * [searchbar] adding base_bg event handler
+  * [tickernoti] bugfix for del_hook
+  * [genlist] Added some genlist APIs and checked EINA_DEPRECATED for some APIs.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build49
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Tue, 07 Sep 2010 23:17:41 +0900
+
 elementary (0.4.0+svn.49550slp2+3build48) unstable; urgency=low
 
   * repackaging. Please refer the git log 
