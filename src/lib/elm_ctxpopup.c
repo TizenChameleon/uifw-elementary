@@ -889,7 +889,7 @@ elm_ctxpopup_add(Evas_Object *parent)
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _ctxpopup_show, wd);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _ctxpopup_hide, wd);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _ctxpopup_move, wd);
-
+   
    return obj;
 }
 
@@ -1190,6 +1190,12 @@ elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled)
       return;
 
    wd->screen_dimmed_disabled = disabled;
+
+   if(wd->visible) {
+	   if (!disabled) {
+	      evas_object_show(wd->bg);
+	   }
+ 	}	
 }
 
 /**
