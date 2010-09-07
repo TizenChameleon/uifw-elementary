@@ -1202,6 +1202,7 @@ extern "C" {
    EAPI Elm_Genlist_GroupItem *elm_genlist_groupitem_add(Evas_Object *obj, const Elm_Genlist_Item_Class *itc, const void *data);
    EAPI void              elm_genlist_groupitem_del( Elm_Genlist_GroupItem *git);
    EAPI void              elm_genlist_multi_select_set(Evas_Object *obj, Eina_Bool multi);
+   EAPI Eina_Bool         elm_genlist_multi_select_get(const Evas_Object *obj);
 
    EAPI Elm_Genlist_Item *elm_genlist_selected_item_get(const Evas_Object *obj);
    EAPI const Eina_List  *elm_genlist_selected_items_get(const Evas_Object *obj);
@@ -1243,17 +1244,21 @@ extern "C" {
    EAPI const Evas_Object *elm_genlist_item_object_get(const Elm_Genlist_Item *it);
    EAPI void              elm_genlist_item_update(Elm_Genlist_Item *item);
    EAPI void              elm_genlist_horizontal_mode_set(Evas_Object *obj, Elm_List_Mode mode);
+   EAPI Elm_List_Mode     elm_genlist_horizontal_mode_get(const Evas_Object *obj);
    EAPI void              elm_genlist_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select);
    EAPI void              elm_genlist_no_select_mode_set(Evas_Object *obj, Eina_Bool no_select);
    EAPI void              elm_genlist_compress_mode_set(Evas_Object *obj, Eina_Bool compress);
+   EAPI Eina_Bool         elm_genlist_compress_mode_get(const Evas_Object *obj);
    EAPI void              elm_genlist_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
+   EAPI void              elm_genlist_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce);
    EAPI void              elm_genlist_homogeneous_set(Evas_Object *obj, Eina_Bool homogeneous);
    EAPI void              elm_genlist_block_count_set(Evas_Object *obj, int n);
    EAPI void              elm_genlist_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, Elm_Scroller_Policy policy_v);
-   EINA_DEPRECATED EAPI void              elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
+   EINA_DEPRECATED EAPI void elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
    EAPI void              elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
    EAPI int               elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it);
    EAPI void              elm_genlist_edit_selected_items_del(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void elm_genlist_selected_items_del(Evas_Object *obj);
    EAPI Eina_List *       elm_genlist_edit_selected_items_get(const Evas_Object *obj);
    EAPI void              elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode);
 
