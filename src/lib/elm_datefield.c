@@ -60,6 +60,9 @@ struct _Widget_Data
 	Eina_Bool pm:1;
 	Eina_Bool time_mode:1;
 	Eina_Bool editing:1;
+
+	void (*func)(void *data, Evas_Object *obj, int value);
+	void *func_data;
 };
 
 static const char *widtype = NULL;
@@ -76,6 +79,7 @@ static void _entry_focused_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info);
 static int _imf_event_commit_cb(void *data, int type, void *event);
+static void _input_panel_event_callback(void *data, Ecore_IMF_Context *ctx, int value);
 
 static void _date_entry_add(Evas_Object *obj);
 static void _time_entry_add(Evas_Object *obj);
@@ -549,6 +553,17 @@ _imf_event_commit_cb(void *data, int type, void *event)
 	return ECORE_CALLBACK_CANCEL;
 }
 
+static void 
+_input_panel_event_callback(void *data, Ecore_IMF_Context *ctx, int value)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+
+	if (!wd) return;
+
+	if (wd->func)
+		wd->func(wd->func_data, data, value);
+}
+
 static void
 _date_update(Evas_Object *obj)
 {
@@ -852,3 +867,70 @@ elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
 	else if (strstr(sig, "ddyymm")) wd->date_format = DATE_FORMAT_DDYYMM;
 	else if (strstr(sig, "ddmmyy")) wd->date_format = DATE_FORMAT_DDMMYY;
 }
+
+/**
+ * Add a callback function for input panel state
+ *
+ * @param obj The datefield object
+ * @param func The function to be called when the event is triggered (value will be the Ecore_IMF_Input_Panel_State)
+ * @param data The data pointer to be passed to @p func 
+ *
+ * @ingroup Datefield
+ */
+EAPI void 
+elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	int i;
+
+	if (!wd) return;
+
+	if (wd->func && (wd->func != pEventCallbackFunc))
+		elm_datefield_input_panel_state_callback_del(obj, wd->func);	
+
+	if (pEventCallbackFunc)
+	{
+		wd->func = pEventCallbackFunc;
+		wd->func_data = data;
+
+		for (i = 0; i < DATE_MAX; i++)
+			ecore_imf_context_input_panel_event_callback_add(
+				elm_entry_imf_context_get(wd->date[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback, obj);
+
+		for (i = 0; i < TIME_MAX; i++)
+			ecore_imf_context_input_panel_event_callback_add(
+				elm_entry_imf_context_get(wd->time[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback, obj);
+	}		
+}
+
+/**
+ * Delete a callback function for input panel state
+ *
+ * @param obj The datefield object
+ * @param func The function to be called when the event is triggered
+ *
+ * @ingroup Datefield
+ */
+EAPI void 
+elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value))
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	int i;
+
+	if (!wd) return;
+
+	if (wd->func && wd->func == pEventCallbackFunc) 
+	{
+		for (i = 0; i < DATE_MAX; i++)
+			ecore_imf_context_input_panel_event_callback_del(
+				elm_entry_imf_context_get(wd->date[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback);
+
+		for (i = 0; i < TIME_MAX; i++)
+			ecore_imf_context_input_panel_event_callback_del(
+				elm_entry_imf_context_get(wd->time[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback);
+
+		wd->func = NULL;
+		wd->func_data = NULL;
+	}
+}
+
