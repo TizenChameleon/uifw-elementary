@@ -2062,7 +2062,11 @@ extern "C" {
    EAPI Elm_Effect  *elm_fx_zoom_add(Evas_Object *obj, float from_rate, float to_rate);
 
    /* Flip Fx */
-   typedef enum {ELM_FX_FLIP_AXIS_X, ELM_FX_FLIP_AXIS_Y} Elm_Fx_Flip_Axis;
+   typedef enum 
+     {
+	ELM_FX_FLIP_AXIS_X, 
+	ELM_FX_FLIP_AXIS_Y
+     } Elm_Fx_Flip_Axis;
    EAPI Elm_Effect  *elm_fx_flip_add( Evas_Object *front, Evas_Object *back, Elm_Fx_Flip_Axis axis, Eina_Bool cw);
 
    /* Blend Fx */
@@ -2440,12 +2444,13 @@ extern "C" {
    EAPI void         elm_gallery_set_max_count(Evas_Object *obj,int max_value);
 
    /* Sliding Drawer */
-   typedef enum _Elm_SlidingDrawer_Pos {
-   		ELM_SLIDINGDRAWER_BOTTOM,
-		ELM_SLIDINGDRAWER_LEFT,
-		ELM_SLIDINGDRAWER_RIGHT,
-		ELM_SLIDINGDRAWER_TOP
-   } Elm_SlidingDrawer_Pos;
+   typedef enum _Elm_SlidingDrawer_Pos 
+     {
+	ELM_SLIDINGDRAWER_BOTTOM,
+	ELM_SLIDINGDRAWER_LEFT,
+	ELM_SLIDINGDRAWER_RIGHT,
+	ELM_SLIDINGDRAWER_TOP
+     } Elm_SlidingDrawer_Pos;
    EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
    EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
    EAPI Evas_Object *elm_slidingdrawer_content_unset(Evas_Object *obj);
