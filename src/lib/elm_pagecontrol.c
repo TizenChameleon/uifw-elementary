@@ -198,6 +198,8 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 EAPI Evas_Object *
 elm_page_control_add(Evas_Object *parent)
 {
+	if (!parent) return NULL;
+	
 	Evas_Object *obj;
 	Evas *e;
 	Widget_Data *wd;

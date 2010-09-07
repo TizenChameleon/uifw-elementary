@@ -170,6 +170,8 @@ _parent_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *
 EAPI Evas_Object *
 elm_selectioninfo_add(Evas_Object *parent)
 {
+	if (!parent) return NULL;
+
 	Evas_Object *obj;
 	Evas *e;
 	Widget_Data *wd;
