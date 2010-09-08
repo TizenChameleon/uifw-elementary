@@ -9,15 +9,12 @@ all
 ##### Scenarios for the frameworks ######
 
 # Multimedia
-mediaplayer
-	:include:/multimedia-framework/Multimedia_M2_testscripts/player/tslist
-camcorder
-	:include:/multimedia-framework/Multimedia_M2_testscripts/camcorder/tslist
-sound
-	:include:/multimedia-framework/Multimedia_M2_testscripts/sound/tslist
-attrs
-	:include:/multimedia-framework/Multimedia_M2_testscripts/attrs/tslist
-
+elm
+        :include:/elm_ts/imageslider/tslist
+        :include:/elm_ts/colorpalette/tslist
+        :include:/elm_ts/gengrid/tslist
+        :include:/elm_ts/pagecontrol/tslist
+        :include:/elm_ts/selectioninfo/tslist
 
 #yhkim
 ch 

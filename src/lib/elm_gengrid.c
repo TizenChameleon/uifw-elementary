@@ -927,6 +927,8 @@ _scr_scroll(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__
 EAPI Evas_Object *
 elm_gengrid_add(Evas_Object *parent)
 {
+   if (!parent) return NULL;
+   
    Evas_Object *obj;
    Evas *e;
    Evas_Coord minw, minh;
@@ -1083,6 +1085,7 @@ elm_gengrid_align_get(const Evas_Object *obj, double *align_x, double *align_y)
 {
     ELM_CHECK_WIDTYPE(obj, widtype);
     Widget_Data *wd = elm_widget_data_get(obj);
+    if (!wd) return;
     if (align_x) *align_x = wd->align_x;
     if (align_y) *align_y = wd->align_y;
 }
