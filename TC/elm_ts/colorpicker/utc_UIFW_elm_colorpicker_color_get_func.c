@@ -79,7 +79,7 @@ static void cleanup(void)
 static void utc_UIFW_elm_colorpicker_color_get_func_01(void)
 {
 	int r, g, b;
-   	r = elm_colorpicker_color_get(colorpicker, &r, &g, &b);
+   	elm_colorpicker_color_get(colorpicker, &r, &g, &b);
 	tet_result(TET_PASS);
 }
 
@@ -89,6 +89,6 @@ static void utc_UIFW_elm_colorpicker_color_get_func_01(void)
 static void utc_UIFW_elm_colorpicker_color_get_func_02(void)
 {
 	int r, g, b;
-   	r = elm_colorpicker_color_get(NULL, &r, &g, &b);
+   	elm_colorpicker_color_get(NULL, &r, &g, &b);
 	tet_result(TET_PASS);
 }

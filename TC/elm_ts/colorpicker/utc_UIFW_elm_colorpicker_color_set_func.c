@@ -87,6 +87,6 @@ static void utc_UIFW_elm_colorpicker_color_set_func_01(void)
  */
 static void utc_UIFW_elm_colorpicker_color_set_func_02(void)
 {
-   	r = elm_colorpicker_color_set(NULL, 255, 255, 255);
+   	elm_colorpicker_color_set(NULL, 255, 255, 255);
 	tet_result(TET_PASS);
 }
