@@ -6,7 +6,6 @@
 #include "elm_priv.h"
 
 #ifdef ELM_EWEBKIT
-#define SEC_KESSLER
 #include <EWebKit.h>
 #include <cairo.h>
 
