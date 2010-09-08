@@ -1740,7 +1740,7 @@ _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *
 
 	   if (!it->wd->selct_all && it->wd->ed->ec->item_selected)
 	  {
-		  it->wd->ed->ec->item_selected(it->data, it->wd->obj);
+		  it->wd->ed->ec->item_selected(it->data, it, it->delete_check);
 	  }
 	  return;
   }
@@ -1752,7 +1752,7 @@ _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *
 
   if (!it->wd->selct_all && it->wd->ed->ec->item_selected)
   {
-	  it->wd->ed->ec->item_selected(it->data, it->wd->obj);
+	  it->wd->ed->ec->item_selected(it->data, it, it->delete_check);
   }
 
   del_conf_style = edje_object_data_get(it->edit_obj, "del_button_style");
@@ -1977,7 +1977,7 @@ _select_all_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *even
 
   if (wd->ed->ec->item_selected)
   {
-	  wd->ed->ec->item_selected(NULL, wd->obj);
+	  wd->ed->ec->item_selected(NULL, it, wd->selct_all);
   }
 
    if (wd->calc_job) ecore_job_del(wd->calc_job);

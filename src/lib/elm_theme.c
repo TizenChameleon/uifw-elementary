@@ -434,6 +434,7 @@ elm_theme_set(Elm_Theme *th, const char *theme)
 EAPI const char *
 elm_theme_get(Elm_Theme *th)
 {
+   if (!th) th = &(theme_default);
    if (!th->theme)
      {
         Eina_List *l;
