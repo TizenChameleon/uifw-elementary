@@ -58,12 +58,12 @@ _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
 static void 
 _check_clicked(void *data, Evas_Object *obj, void *event_info)
 {
-	static Elm_Event_DaySelector_Day day;
+	static Elm_DaySelector_Day day;
 	Widget_Data* wd = (Widget_Data*) elm_widget_data_get(data);
 	int idx;
 	for(idx = 0; idx< 7; ++idx) {
 		if(obj==wd->check[idx]) {
-			day.day = idx;
+			day = idx;
 			evas_object_smart_callback_call(data, "dayselector,changed", (void *) &day);
 			return ;
 		}
