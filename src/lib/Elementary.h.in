@@ -1168,7 +1168,7 @@ extern "C" {
    typedef void         (*GenlistItemDelFunc)      (const void *data, Evas_Object *obj);
    typedef int          (*GenlistItemEditModeGetFunc)  (const void *data, Evas_Object *obj, const int enabled_edit_modes);
    typedef void         (*GenlistInsertNewFunc)      (Evas_Object *genlist, Elm_Genlist_Item *rel_item);
-   typedef void         (*GenlistItemSelectedFunc) (const void *data, Evas_Object *obj);
+   typedef void         (*GenlistItemSelectedFunc) (const void *data, Elm_Genlist_Item *it, Eina_Bool selected);
    typedef Eina_Bool    (*GenlistMoveFunc)      ( Evas_Object *genlist, Elm_Genlist_Item *item, Elm_Genlist_Item *rel_item, Eina_Bool move_after);
    typedef Eina_Bool    (*GenlistRemoveItemFunc)     (Evas_Object *genlist, Elm_Genlist_Item *rel_item);
 
