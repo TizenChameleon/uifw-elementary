@@ -14,6 +14,7 @@ elm
         :include:/elm_ts/pagecontrol/tslist
         :include:/elm_ts/selectioninfo/tslist
 	:include:/elm_ts/button/tslist
+	:include:/elm_ts/popup/tslist
 
 
 #yhkim
