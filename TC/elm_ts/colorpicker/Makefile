@@ -1,6 +1,8 @@
 CC ?= gcc
 
 TARGETS = utc_UIFW_elm_colorpicker_add_func \
+	  utc_UIFW_elm_colorpicker_color_set_func \
+	  utc_UIFW_elm_colorpicker_color_get_func 
 
 PKGS = elementary
 
