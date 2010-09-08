@@ -1,3 +1,11 @@
+elementary (0.4.0+svn.49550slp2+3build52) unstable; urgency=low
+
+  * repackage for webview
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_0.4.0+svn.49550slp2+3build52
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 08 Sep 2010 18:15:30 +0900
+
 elementary (0.4.0+svn.49550slp2+3build51) unstable; urgency=low
 
   * [elm_theme] Added NULL check to elm_theme_get().
