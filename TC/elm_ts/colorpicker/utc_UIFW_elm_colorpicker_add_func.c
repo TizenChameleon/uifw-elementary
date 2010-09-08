@@ -1,7 +1,6 @@
 #include <tet_api.h>
 #include <Elementary.h>
 
-
 // Definitions
 // For checking the result of the positive test case.
 #define TET_CHECK_PASS(x1, y...) \
@@ -36,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_colorpalette_add_func_01(void);
-static void utc_UIFW_elm_colorpalette_add_func_02(void);
+static void utc_UIFW_elm_colorpicker_add_func_01(void);
+static void utc_UIFW_elm_colorpicker_add_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_colorpalette_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_colorpalette_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_colorpicker_add_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_colorpicker_add_func_02, NEGATIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -68,39 +67,36 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_colorpalette_add()
+ * @brief Positive test case of elm_colorpicker_add()
  */
-static void utc_UIFW_elm_colorpalette_add_func_01(void)
+static void utc_UIFW_elm_colorpicker_add_func_01(void)
 {
-	Evas_Object *colorpalette = NULL;
+	Evas_Object *colorpicker;
+   	colorpicker = elm_colorpicker_add(main_win);
 
-   	colorpalette = elm_colorpalette_add(main_win);
-
-	if (!colorpalette) {
-		tet_infoline("elm_colorpalette_add() failed in positive test case");
+	if (!colorpicker) {
+		tet_infoline("elm_colorpicker_add() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
-	evas_object_del(colorpalette);
-	colorpalette = NULL;
+	evas_object_del(colorpicker);
+	colorpicker = NULL;
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_colorpalette_add()
+ * @brief Negative test case of ug_init elm_colorpicker_add()
  */
-static void utc_UIFW_elm_colorpalette_add_func_02(void)
+static void utc_UIFW_elm_colorpicker_add_func_02(void)
 {
-	Evas_Object *colorpalette = NULL;
+	Evas_Object *colorpicker;
+   	colorpicker = elm_colorpicker_add(NULL);
 
-
-   	colorpalette = elm_colorpalette_add(NULL);
-
-	if (colorpalette) {
-		tet_infoline("elm_colorpalette_add() failed in negative test case");
+	if (colorpicker) {
+		tet_infoline("elm_colorpicker_add() failed in negative test case");
 		tet_result(TET_FAIL);
-		evas_object_del(colorpalette);
-		colorpalette = NULL;
+		evas_object_del(colorpicker);
+		colorpicker = NULL;
 		return;
 	}
 	tet_result(TET_PASS);

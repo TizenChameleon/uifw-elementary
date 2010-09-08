@@ -1,7 +1,6 @@
 CC ?= gcc
 
-TARGETS = uts_elm_imageslider_add_test \
-	  uts_elm_imageslider_add_func
+TARGETS = utc_UIFW_elm_colorpicker_add_func \
 
 PKGS = elementary
 

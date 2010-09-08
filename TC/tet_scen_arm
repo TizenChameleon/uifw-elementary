@@ -9,6 +9,7 @@ all
 elm
 	:include:/elm_ts/imageslider/tslist
 	:include:/elm_ts/colorpalette/tslist
+	:include:/elm_ts/colorpicker/tslist
 	:include:/elm_ts/gengrid/tslist
         :include:/elm_ts/pagecontrol/tslist
         :include:/elm_ts/selectioninfo/tslist
