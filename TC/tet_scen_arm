@@ -13,6 +13,7 @@ elm
 	:include:/elm_ts/gengrid/tslist
         :include:/elm_ts/pagecontrol/tslist
         :include:/elm_ts/selectioninfo/tslist
+	:include:/elm_ts/button/tslist
 
 
 #yhkim
