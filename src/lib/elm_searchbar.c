@@ -65,13 +65,6 @@ static void _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_max_set(obj, maxw, maxh);
 }
 
-static void
-_searchicon_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
-{
-	if (!strcmp(source, "search_icon"))
-		evas_object_smart_callback_call(data, "searchsymbol,clicked", NULL);
-}
-
 static void _clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -112,6 +105,18 @@ static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, 
      elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
 
    evas_object_smart_callback_call(data, "cancel,clicked", NULL);
+}
+
+static void
+_searchicon_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
+   if (!strcmp(source, "search_icon"))
+     evas_object_smart_callback_call(data, "searchsymbol,clicked", NULL);
+   else if (!strcmp(source, "base_bg"))
+     _clicked(data, obj, emission, source);
 }
 
 /**
@@ -156,7 +161,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    elm_editfield_eraser_set(wd->eb, EINA_TRUE);
    evas_object_smart_callback_add(wd->eb, "clicked", _clicked, obj);
    evas_object_smart_callback_add(elm_editfield_entry_get(wd->eb), "changed", _changed, obj);
-   edje_object_signal_callback_add(wd->base, "mouse,up,1", "search_icon", _searchicon_clicked, obj);
+   edje_object_signal_callback_add(wd->base, "mouse,up,1", "*", _searchicon_clicked, obj);
 
    elm_widget_sub_object_add(obj, wd->eb);
 

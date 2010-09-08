@@ -15,6 +15,8 @@
 #define ELM_MAX(v1, v2)    	(((v1) > (v2)) ? (v1) : (v2))
 #define ROT_RIGHT			(5)
 #define ROT_LEFT			(-5)
+#define SHOW_ITEM_NUM		3			
+
 
 struct _Stackedicon_Item {
 	Evas_Object *parent;
@@ -43,6 +45,7 @@ struct _Widget_Data {
 	Evas_Coord x, y, w, h;
 	Eina_Bool on_expanded : 1;
 	Eina_Bool visible: 1;
+	Eina_Bool move_start: 1;
 };
 
 static const char *widtype = NULL;
@@ -57,8 +60,8 @@ static void _icon_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_inf
 static void _icon_mouse_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _icon_mouse_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _icon_mouse_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _icon_move_to_zero(void *data);
-static int _icon_move_to_zero_cb(void *data);
+static void _icon_move_to_zero(Evas_Object *obj);
+static int _icon_move_to_zero_cb(Evas_Object *obj);
 static void _icon_move_map(void *data, int flag, int interval_x, int interval_y);
 static void _icon_map_pos(void *data, Evas_Coord x, Evas_Coord y);
 static void _del_image(void *data);
@@ -72,6 +75,8 @@ static void _move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _show_cb(void *data, Evas * e, Evas_Object * obj, void *event_info);
 static void _hide_cb(void *data, Evas * e, Evas_Object * obj, void *event_info);
 static void _event_init(Evas_Object *obj);
+static void _hide_hidden_image(Evas_Object *obj);
+
 
 
 
@@ -195,6 +200,15 @@ static void _icon_mouse_down_cb(void *data, Evas *e, Evas_Object *obj, void *eve
 	it->mdx = ev->output.x;
 	it->mdy = ev->output.y;
 
+	_it = NULL;
+	EINA_LIST_REVERSE_FOREACH(wd->list, l, _it) {
+		if(_it != NULL){
+			if(_it->exist == EINA_FALSE) _add_image(it->parent, _it);
+			evas_object_move(_it->ly, wd->x + wd->w/2 - _it->mw/2, wd->y + wd->h/2 - _it->mh/2);	
+			//if(wd->visible) evas_object_show(_it->ly);
+		}
+	}
+
 	EINA_LIST_REVERSE_FOREACH(wd->list, l, _it) {
 		if(_it != NULL){
 			if(_it->exist == EINA_TRUE){	
@@ -202,6 +216,8 @@ static void _icon_mouse_down_cb(void *data, Evas *e, Evas_Object *obj, void *eve
 			}
 		}
 	}
+
+	wd->move_start = TRUE;
 }
 
 static void _icon_mouse_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
@@ -211,6 +227,11 @@ static void _icon_mouse_move_cb(void *data, Evas *e, Evas_Object *obj, void *eve
 	Widget_Data *wd = elm_widget_data_get(it->parent);
 	Evas_Event_Mouse_Move *ev = event_info;
 	if(!wd || !ev->buttons) return;
+	
+	if(wd->move_start == TRUE){
+		_show_all_image(it->parent);
+		wd->move_start = FALSE;
+	}
 	
 	if(it->on_hold == EINA_TRUE){
 		it->mmx = ev->cur.output.x;
@@ -239,8 +260,9 @@ static void _icon_mouse_up_cb(void *data, Evas *e, Evas_Object *obj, void *event
 		wd->interval_y = 0;
 		
 		_icon_move_map(wd, 0, wd->x, wd->y);		
+		evas_object_smart_callback_call(it->parent, "expanded", NULL);	
+		_hide_hidden_image(it->parent);
 
-		evas_object_smart_callback_call(it->parent, "expanded", NULL);		
 	}else{		
 		wd->on_expanded= EINA_FALSE;	
 		it->on_hold = EINA_FALSE;	
@@ -254,7 +276,7 @@ static void _icon_mouse_up_cb(void *data, Evas *e, Evas_Object *obj, void *event
 			wd->animator = NULL;
 		}
 		wd->time = _current_time_get();
-		wd->animator= ecore_animator_add(_icon_move_to_zero_cb, wd);	
+		wd->animator= ecore_animator_add(_icon_move_to_zero_cb, it->parent);	
 	}	
 }
 
@@ -266,9 +288,9 @@ static unsigned int _current_time_get(void)
 	return ((timev.tv_sec * 1000) + ((timev.tv_usec) / 1000));
 }
 
-static void _icon_move_to_zero(void *data)
+static void _icon_move_to_zero(Evas_Object *obj)
 {
-	Widget_Data *wd = (Widget_Data *)data;
+	Widget_Data *wd = elm_widget_data_get(obj);
 	double t;
 	int x, y;
 	if(!wd) return;
@@ -289,14 +311,15 @@ static void _icon_move_to_zero(void *data)
 		wd->interval_x = 0;
 		wd->interval_y = 0;		
 		_icon_move_map(wd, 0, wd->x, wd->y);
+		_hide_hidden_image(obj);
 	}else{	
 		_icon_move_map(wd, 0, wd->x + wd->interval_x - x, wd->y + wd->interval_y - y);
 	}
 }
 
-static int _icon_move_to_zero_cb(void *data)
+static int _icon_move_to_zero_cb(Evas_Object *obj)
 {	
-	_icon_move_to_zero(data);
+	_icon_move_to_zero(obj);
 	
 	return EXIT_FAILURE;
 }
@@ -433,10 +456,12 @@ static void _update_stackedicon(Evas_Object *obj)
 	if (!wd || ((wd->w == 1) && (wd->h == 1))) return;
 
 	EINA_LIST_REVERSE_FOREACH(wd->list, l, it) {
+		if(it->index >= SHOW_ITEM_NUM){
+			if(it->ly) evas_object_hide(it->ly);
+			continue;
+		}
 		if(it != NULL){
-			if(it->exist == EINA_FALSE){	
-				_add_image(obj, it);
-			}
+			if(it->exist == EINA_FALSE) _add_image(obj, it);
 			evas_object_move(it->ly, wd->x + wd->w/2 - it->mw/2, wd->y + wd->h/2 - it->mh/2);	
 			if(wd->visible) evas_object_show(it->ly);
 		}
@@ -479,6 +504,33 @@ static void _hide_all_image(Evas_Object *obj)
 			}
 		}
 	}
+}
+
+static void _hide_hidden_image(Evas_Object *obj)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *l;
+	Elm_Stackedicon_Item *it = NULL;
+	if (!wd) return;
+			
+	EINA_LIST_REVERSE_FOREACH(wd->list, l, it) {
+		if(it->index >= SHOW_ITEM_NUM){
+			if(it->ly) evas_object_hide(it->ly);
+		}
+	}
+}
+
+static void
+_parent_resize_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+	Evas_Coord w, h;	
+	if (!wd) return;
+
+	evas_object_geometry_get(obj, NULL, NULL, &w, &h);	
+	if(wd->clip) evas_object_resize(wd->clip, w, h);
+	
+	//_update_stackedicon(data);
 }
 
 static void
@@ -544,6 +596,10 @@ _event_init(Evas_Object *obj)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 
+	Evas_Object *parent = elm_widget_parent_get(obj);
+	if(parent)
+		evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _parent_resize_cb, obj);
+	
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move_cb, obj);	
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show_cb, obj);
@@ -614,10 +670,12 @@ EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const c
 	it->parent = obj;
 	it->ly = NULL;
 	it->ic = NULL;
+	it->pad = NULL;
 	it->index = eina_list_count(wd->list);
 	it->exist = EINA_FALSE;	
 	wd->list = eina_list_append(wd->list, it);
 
+	if(it->index < SHOW_ITEM_NUM)
 	_update_stackedicon(obj);
 
 	return it;
@@ -645,10 +703,12 @@ EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const 
 	it->parent = obj;
 	it->ly = NULL;
 	it->ic = NULL;
+	it->pad = NULL;
 	it->index = eina_list_count(wd->list);
 	it->exist = EINA_FALSE;	
 	wd->list = eina_list_prepend(wd->list, it);
 
+	if(it->index < SHOW_ITEM_NUM)
 	_update_stackedicon(obj);
 
 	return it;

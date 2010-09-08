@@ -115,7 +115,6 @@ elm_webview_add(Evas_Object *parent, Eina_Bool tiled)
 #ifdef BOUNCING_SUPPORT
    wd->container = elm_smart_webview_container_add(e);
    _elm_smart_webview_container_child_set(wd->container, wd->webkit);
-   _elm_smart_webview_container_set(wd->webkit, wd->container);
 #endif
    _elm_smart_webview_widget_set(wd->webkit, obj);
    evas_object_event_callback_add(wd->webkit, EVAS_CALLBACK_CHANGED_SIZE_HINTS,

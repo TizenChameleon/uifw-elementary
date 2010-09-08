@@ -75,6 +75,34 @@
 			"</body>" \
 			"</html>"
 
+// for FLASH FILE SUPPORT
+#define LOCAL_FLASH_SUFFIX ".swf"
+#define FLASH_MIME_TYPE "application/x-shockwave-flash"
+#define FILE_PROTOCOL "file://"
+#define HTML_EMBED_1    "<html>" \
+			"<head>" \
+			"<script type='text/javascript'>" \
+			"var s = "
+#define HTML_EMBED_2    ";" \
+			"var url = s.substring(s.indexOf(\"?\") + 1, s.lastIndexOf(\"?\"));" \
+			"document.write(\"<title>\" + unescape(url) + \"</title>\");" \
+			"</script>" \
+			"</head>" \
+			"<body>" \
+			"<object width=\"100%\" height=\"100%\">"
+#define HTML_EMBED_3    "<script type='text/javascript'>" \
+			"var s = "
+#define HTML_EMBED_4    ";" \
+			"var url = s.substring(s.indexOf(\"?\") + 1, s.lastIndexOf(\"?\"));" \
+			"document.write(unescape(url));" \
+			"var type = s.substring(s.lastIndexOf(\"?\") + 1, s.length);" \
+			"document.write(unescape(type));" \
+			"document.write(\"<embed width=\\\"100%\\\" height=\\\"100%\\\" src=\\\"\" + unescape(url) + \"\\\" type=\\\"\" + unescape(type) + \"\\\" />\");" \
+			"</script>" \
+			"</object>" \
+			"</body>" \
+			"</html>"
+
 #define NEED_TO_REMOVE
 //#define DBG printf
 //#define ERR printf
@@ -526,6 +554,19 @@ _elm_smart_webview_uri_set(Evas_Object* obj, const char* uri)
 	     full_uri[7] = '\0';
 	     len = (len >= (MAX_URI - 7)) ? (MAX_URI - 8) : len;
 	     strncat(full_uri, uri, len);
+
+	} else if (strstr(uri, FILE_PROTOCOL) && !strcmp(LOCAL_FLASH_SUFFIX, &uri[len - strlen(LOCAL_FLASH_SUFFIX)])) {
+	     // support for local swf files
+	     if (!sd->ewk_frame_contents_set)
+	       sd->ewk_frame_contents_set = (Eina_Bool (*)(Evas_Object *, const char *, size_t, const char *, const char *, const char *))dlsym(ewk_handle, "ewk_frame_contents_set");
+	     if (!sd->ewk_view_frame_main_get)
+	       sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+	     char szBuffer[2048] = "";
+	     snprintf(szBuffer, 2048, "%s\"?%s?%s\"%s%s\"?%s?%s\"%s",
+		   HTML_EMBED_1, uri, FLASH_MIME_TYPE, HTML_EMBED_2, HTML_EMBED_3, uri, FLASH_MIME_TYPE, HTML_EMBED_4);
+	     sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(obj), szBuffer, 0, NULL, NULL, uri);
+	     return;
+
 	} else {
 	     len = (len >= MAX_URI) ? (MAX_URI - 1) : len;
 	     strncpy(full_uri, uri, len);
@@ -999,7 +1040,7 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
 
 	snprintf(szBuffer, 2048, NOT_FOUND_PAGE_HEADER "\"?%s?%s\"" NOT_FOUND_PAGE_FOOTER, error->failing_url, error->description);
 	//sd->ewk_frame_contents_set(sd->ewk_view_frame_main_get(webview), szStrBuffer, 0, NULL, NULL, NULL);
-	sd->ewk_frame_contents_set(error->frame, szBuffer, 0, NULL, NULL, NULL);
+	sd->ewk_frame_contents_set(error->frame, szBuffer, 0, NULL, NULL, error->failing_url);
 	return;
      }
 }
@@ -1848,6 +1889,7 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 
    int dx = sd->pan_s.x - point->x;
    int dy = sd->pan_s.y - point->y;
+   if (dx == 0 && dy == 0) return;
 
    if (!sd->ewk_view_frame_main_get)
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
@@ -1908,8 +1950,13 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 #endif
 
 #ifdef BOUNCING_SUPPORT
+   //_elm_smart_webview_container_bounce_add(sd->container, 10, 10);
+   //return;
+
    printf(":::::::: %s\n", __func__);
-   _elm_smart_webview_container_scroll_adjust(sd->container, &dx, &dy);
+
+   Eina_Bool container_scrolled;
+   container_scrolled = _elm_smart_webview_container_scroll_adjust(sd->container, &dx, &dy);
    if (dx == 0 && dy == 0)
      {
 	sd->pan_s = *point;
@@ -1937,14 +1984,16 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
      _text_selection_move_by(sd, old_x - new_x, old_y - new_y);
 
 #ifdef BOUNCING_SUPPORT
+   printf("<< ========content [%d, %d] old pos [%d, %d] new pos [%d, %d] >>(remained(%d, %d)\n",
+	 content_w, content_h,
+	 old_x, old_y,
+	 old_x + dx, old_y + dy,
+	 old_x + dx - new_x, old_y + dy - new_y);
    int bx, by;
    bx = old_x + dx - new_x;
    by = old_y + dy - new_y;
-   if (sd->on_flick && (bx != 0 || by != 0))
-     {
-	_elm_smart_webview_container_decelerated_flick_get(sd->container, &bx, &by);
-     }
-   _elm_smart_webview_container_bounce_add(sd->container, bx, by);
+   if (container_scrolled == EINA_TRUE || (bx != 0 || by != 0))
+     _elm_smart_webview_container_bounce_add(sd->container, bx, by);
 #endif
 
 #if 0 // comment out below code until it is completed
