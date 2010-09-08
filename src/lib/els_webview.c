@@ -430,7 +430,7 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	_api.run_javascript_prompt = _smart_run_javascript_prompt;
 	_api.should_interrupt_javascript = _smart_should_interrupt_javascript;
 	_api.run_open_panel = _smart_run_open_panel;
-	//_api.navigation_policy_decision = _smart_navigation_policy_decision;
+	_api.navigation_policy_decision = _smart_navigation_policy_decision;
 
 	_smart = evas_smart_class_new(&_api.sc);
 	elm_theme_overlay_add(NULL, WEBVIEW_THEME_EDJ);
@@ -901,14 +901,16 @@ static Eina_Bool
 _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_Request *request)
 {
    char *protocol_hack;
+   Elm_WebView_Mime_Cb func = NULL;
    Smart_Data *sd = (Smart_Data*)esd;
-   if (!sd->mime_func_hash)
-     return EINA_FALSE;
 
-   protocol_hack = strstr(request->url, ":");
-   *protocol_hack = '\0';
-   Elm_WebView_Mime_Cb func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->mime_func_hash, request->url);
-   *protocol_hack = ':';
+   if (sd->mime_func_hash)
+     {
+	protocol_hack = strstr(request->url, ":");
+	*protocol_hack = '\0';
+	func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->mime_func_hash, request->url);
+	*protocol_hack = ':';
+     }
 
    if (!func)
      {
