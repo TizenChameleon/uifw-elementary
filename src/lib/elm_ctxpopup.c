@@ -623,7 +623,10 @@ _theme_hook(Evas_Object *obj)
    _elm_theme_object_set(obj, wd->arrow, "ctxpopup", "arrow",
 			 elm_widget_style_get(obj));
 
-   elm_object_style_set(wd->scroller, "ctxpopup");
+   if( !strncmp( elm_object_style_get(obj), "default", strlen("default") * sizeof(char) ) )
+	   elm_object_style_set(wd->scroller, "ctxpopup");
+   else
+	   elm_object_style_set(wd->scroller, elm_object_style_get(obj));
 
    _sizing_eval(obj);
 
@@ -842,8 +845,7 @@ elm_ctxpopup_add(Evas_Object *parent)
    //Background
    wd->bg = edje_object_add(e);
    elm_widget_sub_object_add(obj, wd->bg);
-   _elm_theme_object_set(obj, wd->bg, "ctxpopup", "bg",
-			 elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, wd->bg, "ctxpopup", "bg", "default");
    evas_object_geometry_get(parent, &x, &y, &w, &h);
    evas_object_move(wd->bg, x, y);
    evas_object_resize(wd->bg, w, h);
@@ -853,8 +855,7 @@ elm_ctxpopup_add(Evas_Object *parent)
    //Base
    wd->base = edje_object_add(e);
    elm_widget_sub_object_add(obj, wd->base);
-   _elm_theme_object_set(obj, wd->base, "ctxpopup", "base",
-			 elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, wd->base, "ctxpopup", "base", "default");
 
    //Scroller
    wd->scroller = elm_scroller_add(obj);
@@ -876,8 +877,7 @@ elm_ctxpopup_add(Evas_Object *parent)
    //Arrow
    wd->arrow = edje_object_add(e);
    elm_widget_sub_object_add(obj, wd->arrow);
-   _elm_theme_object_set(obj, wd->arrow, "ctxpopup", "arrow",
-			 elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, wd->arrow, "ctxpopup", "arrow", "default");
 
    wd->arrow_priority[0] = ELM_CTXPOPUP_ARROW_DOWN;
    wd->arrow_priority[1] = ELM_CTXPOPUP_ARROW_RIGHT;
