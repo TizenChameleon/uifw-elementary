@@ -1,7 +1,8 @@
 CC ?= gcc
 
 TARGETS = utc_UIFW_elm_colorpalette_add_func \
-	  utc_UIFW_elm_colorpalette_color_set_func
+	  utc_UIFW_elm_colorpalette_color_set_func \
+	  utc_UIFW_elm_colorpalette_row_column_set_func
 
 PKGS = elementary
 
