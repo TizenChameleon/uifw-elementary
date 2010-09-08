@@ -233,6 +233,12 @@ _entry_unfocused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNU
    evas_object_smart_callback_call(data, SIG_UNFOCUSED, NULL);
 }
 
+static void
+_entry_maxlength_reached(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   evas_object_smart_callback_call(data, "maxlength,reached", NULL);
+}
+
 
 /**
  * This adds a scrolled entry to @p parent object.
@@ -289,6 +295,7 @@ elm_scrolled_entry_add(Evas_Object *parent)
    evas_object_smart_callback_add(wd->entry, "longpressed", _entry_longpressed, obj);
    evas_object_smart_callback_add(wd->entry, "focused", _entry_focused, obj);
    evas_object_smart_callback_add(wd->entry, "unfocused", _entry_unfocused, obj);
+   evas_object_smart_callback_add(wd->entry, "maxlength,reached", _entry_maxlength_reached, obj);
 
    _sizing_eval(obj);
 
