@@ -12,6 +12,8 @@ struct _Smart_Data
    unsigned char fill_inside : 1;
    unsigned char scale_up : 1;
    unsigned char scale_down : 1;
+   unsigned char preloading : 1;
+   unsigned char show : 1;
 };
 
 /* local subsystem functions */
@@ -53,6 +55,9 @@ _els_smart_icon_file_key_set(Evas_Object *obj, const char *file, const char *key
    if (sd->size != 0)
      evas_object_image_load_size_set(sd->obj, sd->size, sd->size);
    evas_object_image_file_set(sd->obj, file, key);
+   sd->preloading = 1;
+   evas_object_image_preload(sd->obj, EINA_FALSE);
+   evas_object_hide(sd->obj);
    if (evas_object_image_load_error_get(sd->obj) != EVAS_LOAD_ERROR_NONE)
      return EINA_FALSE;
    _smart_reconfigure(sd);
@@ -86,6 +91,15 @@ _els_smart_icon_smooth_scale_set(Evas_Object *obj, int smooth)
    if (!strcmp(evas_object_type_get(sd->obj), "edje"))
      return;
    evas_object_image_smooth_scale_set(sd->obj, smooth);
+}
+
+Evas_Object *
+_els_smart_icon_object_get(Evas_Object *obj)
+{
+   Smart_Data *sd;
+   sd = evas_object_smart_data_get(obj);
+   if (!sd) return NULL;
+   return sd->obj;
 }
 
 void
@@ -329,6 +343,16 @@ _smart_reconfigure(Smart_Data *sd)
 }
 
 static void
+_preloaded(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
+{
+   Smart_Data *sd = data;
+
+   sd->preloading = 0;
+   if(sd->show)
+     evas_object_show(sd->obj);
+}
+
+static void
 _smart_init(void)
 {
    if (_e_smart) return;
@@ -378,6 +402,7 @@ _smart_add(Evas_Object *obj)
    sd->scale = 1.0;
    evas_object_smart_member_add(sd->obj, obj);
    evas_object_smart_data_set(obj, sd);
+   evas_object_event_callback_add(sd->obj, EVAS_CALLBACK_IMAGE_PRELOADED, _preloaded, sd);
 }
 
 static void
@@ -424,7 +449,9 @@ _smart_show(Evas_Object *obj)
 
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
-   evas_object_show(sd->obj);
+   sd->show = 1;
+   if(!sd->preloading)
+	   evas_object_show(sd->obj);
 }
 
 static void
@@ -434,6 +461,7 @@ _smart_hide(Evas_Object *obj)
 
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
+   sd->show = 0;
    evas_object_hide(sd->obj);
 }
 

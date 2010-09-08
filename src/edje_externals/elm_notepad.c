@@ -1,18 +1,9 @@
 #include "private.h"
 
-typedef struct _Elm_Params_Notepad
-{
-} Elm_Params_Notepad;
 
 static void
 external_notepad_state_set(void *data __UNUSED__, Evas_Object *obj, const void *from_params, const void *to_params, float pos __UNUSED__)
 {
-   const Elm_Params_Notepad *p;
-
-   if (to_params) p = to_params;
-   else if (from_params) p = from_params;
-   else return;
-
    /* TODO: to be expanded */
 }
 
@@ -44,6 +35,13 @@ external_notepad_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__
    /* TODO: to be expanded */
 
    return NULL;
+}
+
+static Evas_Object *external_notepad_content_get(void *data __UNUSED__,
+		const Evas_Object *obj, const char *content)
+{
+	ERR("so content");
+	return NULL;
 }
 
 static void

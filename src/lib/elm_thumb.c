@@ -32,27 +32,21 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *self;
-   struct {
-	Evas_Object *frm;
-	Evas_Object *view;
-	struct {
-	     float x, y;
-	} align;
-   } children;
+   Evas_Object *frame;
+   Evas_Object *view;
    const char *file;
    const char *key;
    struct
      {
+	int id;
 	const char *file;
 	const char *key;
      } thumb;
    Ecore_Event_Handler *eeh;
-   int id;
    Elm_Thumb_Animation_Setting anim_setting;
    Eina_Bool on_hold : 1;
    Eina_Bool is_video : 1;
-   Eina_Bool is_generating : 1;
-   Eina_Bool keep_aspect : 1;
+   Eina_Bool was_video : 1;
 };
 
 static const char *widtype = NULL;
@@ -93,10 +87,16 @@ static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+
+#ifdef HAVE_ELEMENTARY_ETHUMB
+   if (wd->thumb.id >= 0)
+     ethumb_client_generate_cancel(_elm_ethumb_client, wd->thumb.id,
+                                   NULL, NULL, NULL);
+#endif
+
    eina_stringshare_del(wd->file);
    eina_stringshare_del(wd->key);
-   if (wd->eeh)
-     ecore_event_handler_del(wd->eeh);
+   if (wd->eeh) ecore_event_handler_del(wd->eeh);
    free(wd);
 }
 
@@ -104,7 +104,7 @@ static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   _elm_theme_object_set(obj, wd->children.frm, "thumb", "base", elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, wd->frame, "thumb", "base", elm_widget_style_get(obj));
 }
 
 #ifdef HAVE_ELEMENTARY_ETHUMB
@@ -120,9 +120,9 @@ _mouse_down_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
    else
      wd->on_hold = EINA_FALSE;
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-     evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, NULL);
+     evas_object_smart_callback_call(wd->self, SIG_CLICKED_DOUBLE, NULL);
    else
-     evas_object_smart_callback_call(data, SIG_PRESS, NULL);
+     evas_object_smart_callback_call(wd->self, SIG_PRESS, NULL);
 }
 
 static void
@@ -138,32 +138,41 @@ _mouse_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *
    else
      wd->on_hold = EINA_FALSE;
    if (!wd->on_hold)
-     evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+     evas_object_smart_callback_call(wd->self, SIG_CLICKED, NULL);
    wd->on_hold = EINA_FALSE;
 }
 
 static void
-_finished_thumb(Widget_Data *wd, int id, const char *thumb_path, const char *thumb_key)
+_finished_thumb(Widget_Data *wd, const char *thumb_path, const char *thumb_key)
 {
+   Eina_Bool new_view = EINA_FALSE;
    int r;
+   Evas_Coord mw, mh;
    Evas *evas;
 
    evas = evas_object_evas_get(wd->self);
-   if (wd->children.view)
-     evas_object_del(wd->children.view);
-   wd->children.view = NULL;
-   wd->id = id;
-
-   if (wd->is_video &&
-       ethumb_client_format_get(_elm_ethumb_client) == ETHUMB_THUMB_EET)
+   if ((wd->view) && (wd->is_video ^ wd->was_video))
      {
-	wd->children.view = edje_object_add(evas);
-	if (!wd->children.view)
+	evas_object_del(wd->view);
+	wd->view = NULL;
+     }
+   wd->was_video = wd->is_video;
+
+   if ((wd->is_video) &&
+       (ethumb_client_format_get(_elm_ethumb_client) == ETHUMB_THUMB_EET))
+     {
+	if (!wd->view)
 	  {
-	     ERR("could not create edje object");
-	     goto err;
+	     wd->view = edje_object_add(evas);
+	     if (!wd->view)
+	       {
+		  ERR("could not create edje object");
+		  goto err;
+	       }
+	     new_view = EINA_TRUE;
 	  }
-	if (!edje_object_file_set(wd->children.view, thumb_path, "movie/thumb"))
+
+	if (!edje_object_file_set(wd->view, thumb_path, "movie/thumb"))
 	  {
 	     ERR("could not set file=%s key=%s for %s", thumb_path, thumb_key,
 	         wd->file);
@@ -172,14 +181,19 @@ _finished_thumb(Widget_Data *wd, int id, const char *thumb_path, const char *thu
      }
    else
      {
-	wd->children.view = evas_object_image_filled_add(evas);
-	if (!wd->children.view)
+	if (!wd->view)
 	  {
-	     ERR("could not create image object");
-	     goto err;
+	     wd->view = evas_object_image_filled_add(evas);
+	     if (!wd->view)
+	       {
+		  ERR("could not create image object");
+		  goto err;
+	       }
+	     new_view = EINA_TRUE;
 	  }
-	evas_object_image_file_set(wd->children.view, thumb_path, thumb_key);
-	r = evas_object_image_load_error_get(wd->children.view);
+
+	evas_object_image_file_set(wd->view, thumb_path, thumb_key);
+	r = evas_object_image_load_error_get(wd->view);
 	if (r != EVAS_LOAD_ERROR_NONE)
 	  {
 	     ERR("%s: %s", thumb_path, evas_load_error_str(r));
@@ -187,20 +201,22 @@ _finished_thumb(Widget_Data *wd, int id, const char *thumb_path, const char *thu
 	  }
      }
 
-   elm_widget_sub_object_add(wd->self, wd->children.view);
-   edje_object_part_swallow(wd->children.frm, "elm.swallow.content",
-			    wd->children.view);
+   if (new_view) elm_widget_sub_object_add(wd->self, wd->view);
+   edje_object_part_swallow(wd->frame, "elm.swallow.content", wd->view);
+   edje_object_size_min_get(wd->frame, &mw, &mh);
+   edje_object_size_min_restricted_calc(wd->frame, &mw, &mh, mw, mh);
+   evas_object_size_hint_min_set(wd->self, mw, mh);
    eina_stringshare_replace(&(wd->thumb.file), thumb_path);
    eina_stringshare_replace(&(wd->thumb.key), thumb_key);
-   edje_object_signal_emit(wd->children.frm, EDJE_SIGNAL_GENERATE_STOP, "elm");
+   edje_object_signal_emit(wd->frame, EDJE_SIGNAL_GENERATE_STOP, "elm");
    evas_object_smart_callback_call(wd->self, SIG_GENERATE_STOP, NULL);
    return;
 
 view_err:
-   evas_object_del(wd->children.view);
-   wd->children.view = NULL;
+   evas_object_del(wd->view);
+   wd->view = NULL;
 err:
-   edje_object_signal_emit(wd->children.frm, EDJE_SIGNAL_LOAD_ERROR, "elm");
+   edje_object_signal_emit(wd->frame, EDJE_SIGNAL_LOAD_ERROR, "elm");
    evas_object_smart_callback_call(wd->self, SIG_LOAD_ERROR, NULL);
 }
 
@@ -209,17 +225,19 @@ _finished_thumb_cb(void *data, Ethumb_Client *c __UNUSED__, int id, const char *
 {
    Widget_Data *wd = data;
 
-   edje_object_signal_emit(wd->children.frm, EDJE_SIGNAL_PULSE_STOP, "elm");
-   wd->is_generating = EINA_FALSE;
+   EINA_SAFETY_ON_FALSE_RETURN(wd->thumb.id == id);
+   wd->thumb.id = -1;
+
+   edje_object_signal_emit(wd->frame, EDJE_SIGNAL_PULSE_STOP, "elm");
 
    if (success)
      {
-	_finished_thumb(wd, id, thumb_path, thumb_key);
+	_finished_thumb(wd, thumb_path, thumb_key);
 	return;
      }
 
    ERR("could not generate thumbnail for %s (key: %s)", file, key ? key : "");
-   edje_object_signal_emit(wd->children.frm, EDJE_SIGNAL_GENERATE_ERROR, "elm");
+   edje_object_signal_emit(wd->frame, EDJE_SIGNAL_GENERATE_ERROR, "elm");
    evas_object_smart_callback_call(wd->self, SIG_GENERATE_ERROR, NULL);
 }
 
@@ -230,30 +248,31 @@ _thumb_apply(Widget_Data *wd)
    if (ethumb_client_thumb_exists(_elm_ethumb_client))
      {
 	const char *thumb_path, *thumb_key;
+	wd->thumb.id = -1;
 	ethumb_client_thumb_path_get(_elm_ethumb_client, &thumb_path,
 				     &thumb_key);
-	_finished_thumb(wd, 0, thumb_path, thumb_key);
+	_finished_thumb(wd, thumb_path, thumb_key);
 	return;
      }
-   else if (ethumb_client_generate(_elm_ethumb_client, _finished_thumb_cb, wd,
-				   NULL) != -1)
+   else if ((wd->thumb.id = ethumb_client_generate
+	     (_elm_ethumb_client, _finished_thumb_cb, wd, NULL)) != -1)
      {
-	edje_object_signal_emit(wd->children.frm, EDJE_SIGNAL_PULSE_START,
+	edje_object_signal_emit(wd->frame, EDJE_SIGNAL_PULSE_START,
 				"elm");
-	edje_object_signal_emit(wd->children.frm, EDJE_SIGNAL_GENERATE_START,
+	edje_object_signal_emit(wd->frame, EDJE_SIGNAL_GENERATE_START,
 				"elm");
 	evas_object_smart_callback_call(wd->self, SIG_GENERATE_START, NULL);
      }
    else
      {
-	edje_object_signal_emit(wd->children.frm, EDJE_SIGNAL_GENERATE_ERROR,
+	wd->thumb.id = -1;
+	edje_object_signal_emit(wd->frame, EDJE_SIGNAL_GENERATE_ERROR,
 				"elm");
 	evas_object_smart_callback_call(wd->self, SIG_GENERATE_ERROR, NULL);
      }
-   wd->is_generating = EINA_FALSE;
 }
 
-static int
+static Eina_Bool
 _thumb_apply_cb(void *data, int type __UNUSED__, void *ev __UNUSED__)
 {
    _thumb_apply(data);
@@ -263,7 +282,7 @@ _thumb_apply_cb(void *data, int type __UNUSED__, void *ev __UNUSED__)
 static void
 _thumb_show(Widget_Data *wd)
 {
-   evas_object_show(wd->children.frm);
+   evas_object_show(wd->frame);
 
    if (elm_thumb_ethumb_client_connected())
      {
@@ -283,29 +302,23 @@ _thumb_show_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
 }
 
 static void
-_cancel_cb(void *data, Eina_Bool success)
-{
-   Widget_Data *wd = data;
-
-   if (success)
-     {
-	wd->is_generating = EINA_FALSE;
-	edje_object_signal_emit(wd->children.frm, EDJE_SIGNAL_GENERATE_STOP,
-				"elm");
-	evas_object_smart_callback_call(wd->self, SIG_GENERATE_STOP, NULL);
-     }
-}
-
-static void
 _thumb_hide_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = data;
 
-   evas_object_hide(wd->children.frm);
+   evas_object_hide(wd->frame);
 
-   if (wd->is_generating)
-     ethumb_client_generate_cancel(_elm_ethumb_client, wd->id, _cancel_cb, wd, NULL);
-   else if (wd->eeh)
+   if (wd->thumb.id >= 0)
+     {
+	ethumb_client_generate_cancel
+	  (_elm_ethumb_client, wd->thumb.id, NULL, NULL, NULL);
+	wd->thumb.id = -1;
+
+	edje_object_signal_emit(wd->frame, EDJE_SIGNAL_GENERATE_STOP, "elm");
+	evas_object_smart_callback_call(wd->self, SIG_GENERATE_STOP, NULL);
+     }
+
+   if (wd->eeh)
      {
 	ecore_event_handler_del(wd->eeh);
 	wd->eeh = NULL;
@@ -384,9 +397,6 @@ elm_need_ethumb(void)
  *
  * @see elm_thumb_file_set()
  * @see elm_thumb_ethumb_client_get()
- * @see elm_thumb_keep_aspect_set()
- * @see elm_thumb_align_set()
- * @see elm_thumb_align_get()
  *
  * @ingroup Thumb
  */
@@ -408,24 +418,22 @@ elm_thumb_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
 
-   wd->children.frm = edje_object_add(evas);
-   _elm_theme_object_set(obj, wd->children.frm, "thumb", "base", "default");
-   elm_widget_resize_object_set(obj, wd->children.frm);
+   wd->frame = edje_object_add(evas);
+   _elm_theme_object_set(obj, wd->frame, "thumb", "base", "default");
+   elm_widget_resize_object_set(obj, wd->frame);
 
    edje_object_size_min_calc(obj, &minw, &minh);
    evas_object_size_hint_min_set(obj, minw, minh);
 
    wd->self = obj;
-   wd->children.view = NULL;
+   wd->view = NULL;
    wd->file = NULL;
    wd->key = NULL;
    wd->eeh = NULL;
-   wd->children.align.x = 0.5;
-   wd->children.align.y = 0.5;
+   wd->thumb.id = -1;
    wd->on_hold = EINA_FALSE;
    wd->is_video = EINA_FALSE;
-   wd->is_generating = EINA_FALSE;
-   wd->keep_aspect = EINA_FALSE;
+   wd->was_video = EINA_FALSE;
 
 #ifdef HAVE_ELEMENTARY_ETHUMB
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOUSE_DOWN,
@@ -576,11 +584,11 @@ elm_thumb_animate_set(Evas_Object *obj, Elm_Thumb_Animation_Setting setting)
 
    wd->anim_setting = setting;
    if (setting == ELM_THUMB_ANIMATION_LOOP)
-     edje_object_signal_emit(wd->children.view, "animate_loop", "");
+     edje_object_signal_emit(wd->view, "animate_loop", "");
    else if (setting == ELM_THUMB_ANIMATION_START)
-     edje_object_signal_emit(wd->children.view, "animate", "");
+     edje_object_signal_emit(wd->view, "animate", "");
    else if (setting == ELM_THUMB_ANIMATION_STOP)
-     edje_object_signal_emit(wd->children.view, "animate_stop", "");
+     edje_object_signal_emit(wd->view, "animate_stop", "");
 }
 
 /**
@@ -601,98 +609,6 @@ elm_thumb_animate_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    return wd->anim_setting;
-}
-
-/**
- * Set whether the thumbnail exhibition should keep the image or video aspect.
- *
- * For positioning the image/video within the object use the function
- * elm_thumb_align_set().
- *
- * @param obj The thumb object.
- * @param setting Whether keep or not the aspect.
- *
- * @see elm_thumb_file_set()
- * @see elm_thumb_align_set()
- *
- * @ingroup Thumb
- */
-EAPI void
-elm_thumb_keep_aspect_set(Evas_Object *obj, Eina_Bool setting)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   wd->keep_aspect = setting;
-}
-
-/**
- * Get back the aspect info set with @c elm_thumb_keep_aspect_set().
- *
- * @param obj The thumb object.
- * @return Whether the thumb object keeps or not the aspect for its content.
- *
- * @see elm_thumb_file_get()
- * @see elm_thumb_align_get()
- *
- * @ingroup Thumb
- */
-EAPI Eina_Bool
-elm_thumb_keep_aspect_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   return wd->keep_aspect;
-}
-
-/**
- * Set image/video's alignment within the thumbnail.
- *
- * @param obj The thumb object.
- * @param x_align The x alignment (0 <= x <= 1).
- * @param y_align The y alignment (0 <= y <= 1).
- *
- * @see elm_thumb_keep_aspect_set()
- * @see elm_thumb_align_get()
- *
- * @ingroup Thumb
- */
-EAPI void
-elm_thumb_align_set(Evas_Object *obj, float x_align, float y_align)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-
-   if (x_align > 1.0)
-     x_align = 1.0;
-   else if (x_align < 0.0)
-     x_align = 0.0;
-   wd->children.align.x = x_align;
-
-   if (y_align > 1.0)
-     y_align = 1.0;
-   else if (y_align < 0.0)
-     y_align = 0.0;
-   wd->children.align.y = y_align;
-}
-
-/**
- * Get the alignenment set for the thumb object.
- *
- * @param obj The thumb object.
- * @param x Pointer to x alignenment.
- * @param y Pointer to y alignenment.
- *
- * @see elm_thumb_align_set()
- *
- * @ingroup Thumb
- */
-EAPI void
-elm_thumb_align_get(const Evas_Object *obj, float *x, float *y)
-{
-    ELM_CHECK_WIDTYPE(obj, widtype);
-    Widget_Data *wd = elm_widget_data_get(obj);
-    if (x) *x = wd->children.align.x;
-    if (y) *y = wd->children.align.y;
 }
 
 /**

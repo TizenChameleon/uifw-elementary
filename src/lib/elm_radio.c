@@ -42,7 +42,7 @@ struct _Group
 
 struct _Widget_Data
 {
-   Evas_Object *chk;
+   Evas_Object *radio;
    Evas_Object *icon;
    int value;
    const char *label;
@@ -83,22 +83,22 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   _elm_theme_object_set(obj, wd->chk, "radio", "base", elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, wd->radio, "radio", "base", elm_widget_style_get(obj));
    if (wd->icon)
-     edje_object_signal_emit(wd->chk, "elm,state,icon,visible", "elm");
+     edje_object_signal_emit(wd->radio, "elm,state,icon,visible", "elm");
    else
-     edje_object_signal_emit(wd->chk, "elm,state,icon,hidden", "elm");
+     edje_object_signal_emit(wd->radio, "elm,state,icon,hidden", "elm");
    if (wd->state)
-     edje_object_signal_emit(wd->chk, "elm,state,radio,on", "elm");
+     edje_object_signal_emit(wd->radio, "elm,state,radio,on", "elm");
    else
-     edje_object_signal_emit(wd->chk, "elm,state,radio,off", "elm");
+     edje_object_signal_emit(wd->radio, "elm,state,radio,off", "elm");
    if (wd->label)
-     edje_object_signal_emit(wd->chk, "elm,state,text,visible", "elm");
+     edje_object_signal_emit(wd->radio, "elm,state,text,visible", "elm");
    else
-     edje_object_signal_emit(wd->chk, "elm,state,text,hidden", "elm");
-   edje_object_part_text_set(wd->chk, "elm.text", wd->label);
-   edje_object_message_signal_process(wd->chk);
-   edje_object_scale_set(wd->chk, elm_widget_scale_get(obj) * _elm_config->scale);
+     edje_object_signal_emit(wd->radio, "elm,state,text,hidden", "elm");
+   edje_object_part_text_set(wd->radio, "elm.text", wd->label);
+   edje_object_message_signal_process(wd->radio);
+   edje_object_scale_set(wd->radio, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
 }
 
@@ -109,11 +109,11 @@ _disable_hook(Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_disabled_get(obj))
      {
-        edje_object_signal_emit(wd->chk, "elm,state,disabled", "elm");
+        edje_object_signal_emit(wd->radio, "elm,state,disabled", "elm");
         if (wd->state) _state_set(obj, 0);
      }
    else
-     edje_object_signal_emit(wd->chk, "elm,state,enabled", "elm");
+     edje_object_signal_emit(wd->radio, "elm,state,enabled", "elm");
 }
 
 static void
@@ -123,7 +123,7 @@ _sizing_eval(Evas_Object *obj)
    Evas_Coord minw = -1, minh = -1;
    if (!wd) return;
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-   edje_object_size_min_restricted_calc(wd->chk, &minw, &minh, minw, minh);
+   edje_object_size_min_restricted_calc(wd->radio, &minw, &minh, minw, minh);
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
    evas_object_size_hint_min_set(obj, minw, minh);
    evas_object_size_hint_max_set(obj, -1, -1);
@@ -146,7 +146,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (!wd) return;
    if (sub == wd->icon)
      {
-	edje_object_signal_emit(wd->chk, "elm,state,icon,hidden", "elm");
+	edje_object_signal_emit(wd->radio, "elm,state,icon,hidden", "elm");
 	evas_object_event_callback_del_full
 	  (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
 	wd->icon = NULL;
@@ -163,9 +163,9 @@ _state_set(Evas_Object *obj, Eina_Bool state)
      {
 	wd->state = state;
 	if (wd->state)
-	  edje_object_signal_emit(wd->chk, "elm,state,radio,on", "elm");
+	  edje_object_signal_emit(wd->radio, "elm,state,radio,on", "elm");
 	else
-	  edje_object_signal_emit(wd->chk, "elm,state,radio,off", "elm");
+	  edje_object_signal_emit(wd->radio, "elm,state,radio,off", "elm");
      }
 }
 
@@ -227,11 +227,11 @@ elm_radio_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
 
-   wd->chk = edje_object_add(e);
-   _elm_theme_object_set(obj, wd->chk, "radio", "base", "default");
-   edje_object_signal_callback_add(wd->chk, "elm,action,radio,on", "", _signal_radio_on, obj);
-   edje_object_signal_callback_add(wd->chk, "elm,action,radio,toggle", "", _signal_radio_on, obj);
-   elm_widget_resize_object_set(obj, wd->chk);
+   wd->radio = edje_object_add(e);
+   _elm_theme_object_set(obj, wd->radio, "radio", "base", "default");
+   edje_object_signal_callback_add(wd->radio, "elm,action,radio,on", "", _signal_radio_on, obj);
+   edje_object_signal_callback_add(wd->radio, "elm,action,radio,toggle", "", _signal_radio_on, obj);
+   elm_widget_resize_object_set(obj, wd->radio);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
@@ -264,15 +264,15 @@ elm_radio_label_set(Evas_Object *obj, const char *label)
    eina_stringshare_replace(&wd->label, label);
    if (label)
      {
-	edje_object_signal_emit(wd->chk, "elm,state,text,visible", "elm");
-	edje_object_message_signal_process(wd->chk);
+	edje_object_signal_emit(wd->radio, "elm,state,text,visible", "elm");
+	edje_object_message_signal_process(wd->radio);
      }
    else
      {
-	edje_object_signal_emit(wd->chk, "elm,state,text,hidden", "elm");
-	edje_object_message_signal_process(wd->chk);
+	edje_object_signal_emit(wd->radio, "elm,state,text,hidden", "elm");
+	edje_object_message_signal_process(wd->radio);
      }
-   edje_object_part_text_set(wd->chk, "elm.text", label);
+   edje_object_part_text_set(wd->radio, "elm.text", label);
    _sizing_eval(obj);
 }
 
@@ -296,10 +296,7 @@ elm_radio_label_get(const Evas_Object *obj)
 /**
  * Set the icon object of the radio object
  *
- * Once the icon object is set, it will become a child of the radio object and
- * be deleted when the radio object is deleted. If another icon object is set
- * then the previous one becomes orophaned and will no longer be deleted along
- * with the radio.
+ * Once the icon object is set, a previously set one will be deleted.
  *
  * @param obj The radio object
  * @param icon The icon object
@@ -312,18 +309,19 @@ elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if ((wd->icon != icon) && (wd->icon))
-     elm_widget_sub_object_del(obj, wd->icon);
+   if (wd->icon == icon) return;
+   if (wd->icon) evas_object_del(wd->icon);
    wd->icon = icon;
    if (icon)
      {
 	elm_widget_sub_object_add(obj, icon);
 	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				       _changed_size_hints, obj);
-	edje_object_part_swallow(wd->chk, "elm.swallow.content", icon);
-	edje_object_signal_emit(wd->chk, "elm,state,icon,visible", "elm");
-	_sizing_eval(obj);
+	edje_object_part_swallow(wd->radio, "elm.swallow.content", icon);
+	edje_object_signal_emit(wd->radio, "elm,state,icon,visible", "elm");
+	edje_object_message_signal_process(wd->radio);
      }
+   _sizing_eval(obj);
 }
 
 /**

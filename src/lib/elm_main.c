@@ -22,6 +22,32 @@
 static Elm_Version _version = { VMAJ, VMIN, VMIC, VREV };
 EAPI Elm_Version *elm_version = &_version;
 
+Eina_Bool
+_elm_dangerous_call_check(const char *call)
+{
+   char buf[256];
+   const char *eval;
+   
+   snprintf(buf, sizeof(buf), "%i.%i.%i.%i", VMAJ, VMIN, VMIC, VREV);
+   eval = getenv("ELM_NO_FINGER_WAGGLING");
+   if ((eval) && (!strcmp(eval, buf)))
+     return 0;
+   printf("ELEMENTARY FINGER WAGGLE!!!!!!!!!!\n"
+          "\n"
+          "  %s() used.\n"
+          "PLEASE see the API documentation for this function. This call\n"
+          "should almost never be used. Only in very special cases.\n"
+          "\n"
+          "To remove this warning please set the environment variable:\n"
+          "  ELM_NO_FINGER_WAGGLING\n"
+          "To the value of the Elementary version + revision number. e.g.:\n"
+          "  1.2.5.40295\n"
+          "\n"
+          ,
+          call);
+   return 1;
+}
+
 /**
  * @defgroup Start Getting Started
  *
@@ -256,13 +282,13 @@ myapp_CFLAGS =
  * applications. It is up to you to decide what is best for you. If you just
  * follow the template above, you can do it both ways and can decide at build
  * time. The more advanced of you may suggest making it a configure option.
- * That is perfectly valid, bu has been left out here for simplicity, as our
+ * That is perfectly valid, but has been left out here for simplicity, as our
  * aim to have an Elementary (and EFL) tutorial, not an autoconf & automake
  * document.
  *
  */
 
-static int _elm_signal_exit(void *data, int ev_type, void *ev);
+static Eina_Bool _elm_signal_exit(void *data, int ev_type, void *ev);
 
 char *_elm_appname = NULL;
 const char *_elm_data_dir = NULL;
@@ -275,11 +301,11 @@ static int _elm_init_count = 0;
 static int _elm_policies[ELM_POLICY_LAST];
 static Ecore_Event_Handler *_elm_exit_handler = NULL;
 
-static int
+static Eina_Bool
 _elm_signal_exit(void *data __UNUSED__, int ev_type __UNUSED__, void *ev __UNUSED__)
 {
    elm_exit();
-   return 1;
+   return ECORE_CALLBACK_PASS_ON;
 }
 
 void
@@ -287,6 +313,26 @@ _elm_rescale(void)
 {
    edje_scale_set(_elm_config->scale);
    _elm_win_rescale();
+}
+
+static Eina_List *widtypes = NULL;
+
+void
+_elm_widtype_register(const char **ptr)
+{
+   widtypes = eina_list_append(widtypes, (void *)ptr);
+}
+
+static void
+_elm_widtype_clear(void)
+{
+   const char **ptr;
+   
+   EINA_LIST_FREE(widtypes, ptr)
+     {
+        eina_stringshare_del(*ptr);
+        *ptr = NULL;
+     }
 }
 
 /**
@@ -565,6 +611,8 @@ elm_quicklaunch_shutdown(void)
 	_elm_log_dom = -1;
      }
 
+   _elm_widtype_clear();
+   
    eina_shutdown();
 }
 
@@ -1313,6 +1361,66 @@ elm_object_scroll_freeze_push(Evas_Object *obj)
 }
 
 /**
+ * Lock the scrolling of the given widget (and thus all parents)
+ *
+ * This locks the given object from scrolling in the X axis (and implicitly
+ * also locks all parent scrollers too from doing the same).
+ *
+ * @param obj The object
+ * @param lock The lock state (1 == locked, 0 == unlocked)
+ * @ingroup Scrollhints
+ */
+EAPI void
+elm_object_scroll_lock_x_set(Evas_Object *obj, Eina_Bool lock)
+{
+   elm_widget_drag_lock_x_set(obj, lock);
+}
+
+/**
+ * Lock the scrolling of the given widget (and thus all parents)
+ *
+ * This locks the given object from scrolling in the Y axis (and implicitly
+ * also locks all parent scrollers too from doing the same).
+ *
+ * @param obj The object
+ * @param lock The lock state (1 == locked, 0 == unlocked)
+ * @ingroup Scrollhints
+ */
+EAPI void
+elm_object_scroll_lock_y_set(Evas_Object *obj, Eina_Bool lock)
+{
+   elm_widget_drag_lock_y_set(obj, lock);
+}
+
+/**
+ * Get the scrolling lock of the given widget
+ *
+ * This gets the lock for X axis scrolling.
+ *
+ * @param obj The object
+ * @ingroup Scrollhints
+ */
+EAPI Eina_Bool
+elm_object_scroll_lock_x_get(const Evas_Object *obj)
+{
+   return elm_widget_drag_lock_x_get(obj);
+}
+
+/**
+ * Get the scrolling lock of the given widget
+ *
+ * This gets the lock for X axis scrolling.
+ *
+ * @param obj The object
+ * @ingroup Scrollhints
+ */
+EAPI Eina_Bool
+elm_object_scroll_lock_y_get(const Evas_Object *obj)
+{
+   return elm_widget_drag_lock_y_get(obj);
+}
+
+/**
  * Pop the scroll freeze by 1
  *
  * This decrements the scroll freeze count by one. If it is more than 0 it will
@@ -1362,6 +1470,19 @@ elm_object_parent_widget_get(const Evas_Object *obj)
 }
 
 /**
+ * Get the top level parent of an Elementary widget.
+ *
+ * @param obj The object to query.
+ * @return The top level Elementary widget, or @c NULL if parent cannot be
+ * found.
+ */
+EAPI Evas_Object *
+elm_object_top_widget_get(const Evas_Object *obj)
+{
+   return elm_widget_top_get(obj);
+}
+
+/**
  * Get the string that represents this Elementary widget.
  *
  * @note Elementary is weird and exposes itself as a single
@@ -1378,4 +1499,63 @@ EAPI const char *
 elm_object_widget_type_get(const Evas_Object *obj)
 {
    return elm_widget_type_get(obj);
+}
+
+/**
+ * Send a signal to the widget edje object.
+ *
+ * This function sends a signal to the edje object of the obj. An edje program
+ * can respond to a signal by specifying matching 'signal' and
+ * 'source' fields.
+ *
+ * @param obj The object
+ * @param emission The signal's name.
+ * @param source The signal's source.
+ * @ingroup General
+ */
+EAPI void elm_object_signal_emit(Evas_Object *obj, const char *emission, const char *source)
+{
+    elm_widget_signal_emit(obj, emission, source);
+}
+
+/**
+ * Add a callback for a signal emitted by widget edje object.
+ *
+ * This function connects a callback function to a signal emitted by the
+ * edje object of the obj.
+ * Globs can occur in either the emission or source name.
+ *
+ * @param obj The object
+ * @param emission The signal's name.
+ * @param source The signal's source.
+ * @param func The callback function to be executed when the signal is
+ * emitted.
+ * @param data A pointer to data to pass in to the callback function.
+ * @ingroup General
+ */
+EAPI void elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+{
+    elm_widget_signal_callback_add(obj, emission, source, func, data);
+}
+
+/**
+ * Remove a signal-triggered callback from an widget edje object.
+ *
+ * This function removes a callback, previoulsy attached to a signal emitted
+ * by the edje object of the obj.
+ * The parameters emission, source and func must match exactly those passed to
+ * a previous call to elm_object_signal_callback_add(). The data pointer that
+ * was passed to this call will be returned.
+ *
+ * @param obj The object
+ * @param emission The signal's name.
+ * @param source The signal's source.
+ * @param func The callback function to be executed when the signal is
+ * emitted.
+ * @return The data pointer
+ * @ingroup General
+ */
+EAPI void *elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source))
+{
+    return elm_widget_signal_callback_del(obj, emission, source, func);
 }

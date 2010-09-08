@@ -211,6 +211,10 @@ elm_layout_theme_set(Evas_Object *obj, const char *clas, const char *group, cons
 /**
  * Set the layout content
  *
+ * Once the content object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_layout_content_unset() function.
+ *
  * @param obj The layout object
  * @param swallow The swallow group name in the edje file
  * @param content The content will be filled in this layout object
@@ -230,7 +234,7 @@ elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *conte
 	if (!strcmp(swallow, si->swallow))
 	  {
 	     if (content == si->obj) return;
-	     elm_widget_sub_object_del(obj, si->obj);
+	     evas_object_del(si->obj);
 	     break;
 	  }
      }
@@ -245,8 +249,42 @@ elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *conte
 	si->swallow = eina_stringshare_add(swallow);
 	si->obj = content;
 	wd->subs = eina_list_append(wd->subs, si);
-	_request_sizing_eval(obj);
      }
+   _request_sizing_eval(obj);
+}
+
+/**
+ * Unset the layout content
+ *
+ * Unparent and return the content object which was set for this widget
+ *
+ * @param obj The layout object
+ * @param swallow The swallow group name in the edje file
+ * @return The content that was being used
+ *
+ * @ingroup Layout
+ */
+EAPI Evas_Object *
+elm_layout_content_unset(Evas_Object *obj, const char *swallow)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Subinfo *si;
+   const Eina_List *l;
+   if (!wd) return NULL;
+   EINA_LIST_FOREACH(wd->subs, l, si)
+     {
+	if (!strcmp(swallow, si->swallow))
+	  {
+	     Evas_Object *content;
+	     if (!si->obj) return NULL;
+	     content = si->obj; /* si will die in _sub_del due elm_widget_sub_object_del() */
+	     elm_widget_sub_object_del(obj, content);
+	     edje_object_part_unswallow(wd->lay, content);
+	     return content;
+	  }
+     }
+   return NULL;
 }
 
 /**

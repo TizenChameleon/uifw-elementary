@@ -1,7 +1,3 @@
-/*
- *
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
- */
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -18,7 +14,6 @@ struct _Widget_Data
 {
    Evas_Object *btn, *icon;
    const char *label;
-
    Eina_Bool autorepeat;
    Eina_Bool repeating;
    double ar_threshold;
@@ -162,7 +157,7 @@ _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *
    _signal_unpressed(data, obj, emission, source); /* safe guard when the theme does not emit the 'unpress' signal */
 }
 
-static int
+static Eina_Bool
 _autorepeat_send(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -178,7 +173,7 @@ _autorepeat_send(void *data)
    return ECORE_CALLBACK_RENEW;
 }
 
-static int
+static Eina_Bool
 _autorepeat_initial_send(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -305,8 +300,10 @@ elm_button_label_get(const Evas_Object *obj)
 /**
  * Set the icon used for the button
  *
+ * Once the icon object is set, a previously set one will be deleted
+ *
  * @param obj The button object
- * @param icon  The image for the button
+ * @param icon The image for the button
  *
  * @ingroup Button
  */
@@ -316,21 +313,19 @@ elm_button_icon_set(Evas_Object *obj, Evas_Object *icon)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if ((wd->icon != icon) && (wd->icon))
-     elm_widget_sub_object_del(obj, wd->icon);
-   if ((icon) && (wd->icon != icon))
+   if (wd->icon == icon) return;
+   if (wd->icon) evas_object_del(wd->icon);
+   wd->icon = icon;
+   if (icon)
      {
-	wd->icon = icon;
 	elm_widget_sub_object_add(obj, icon);
 	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				       _changed_size_hints, obj);
 	edje_object_part_swallow(wd->btn, "elm.swallow.content", icon);
 	edje_object_signal_emit(wd->btn, "elm,state,icon,visible", "elm");
 	edje_object_message_signal_process(wd->btn);
-	_sizing_eval(obj);
      }
-   else
-     wd->icon = icon;
+   _sizing_eval(obj);
 }
 
 /**

@@ -1,6 +1,3 @@
-/*
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
- */
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -36,7 +33,7 @@ struct _Elm_Toolbar_Item
    Eina_Bool selected : 1;
    Eina_Bool disabled : 1;
    Eina_Bool separator : 1;
-   Eina_Bool menu;
+   Eina_Bool menu : 1;
    Evas_Object *o_menu;
 };
 
@@ -645,6 +642,7 @@ elm_toolbar_scrollable_set(Evas_Object *obj, Eina_Bool scrollable)
 
    if (!wd) return;
    wd->scrollable = scrollable;
+   elm_smart_scroller_bounce_allow_set(wd->scr, wd->scrollable, 0);
    _sizing_eval(obj);
 }
 

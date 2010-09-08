@@ -30,7 +30,7 @@ struct _Widget_Data
    Evas_Object *spinner, *ent;
    const char *label;
    double val, val_min, val_max, orig_val, step;
-   double drag_start_pos, spin_speed, interval;
+   double drag_start_pos, spin_speed, interval, first_interval;
    Ecore_Timer *delay, *spin;
    Eina_List *special_values;
    Eina_Bool wrap : 1;
@@ -82,6 +82,32 @@ _disable_hook(Evas_Object *obj)
 }
 
 static void
+_signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_signal_emit(wd->spinner, emission, source);
+}
+
+static void
+_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_signal_callback_add(wd->spinner, emission,
+	 source, func_cb, data);
+}
+
+static void *
+_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source))
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return edje_object_signal_callback_del(wd->spinner, emission, source,
+	 func_cb);
+}
+
+static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -109,14 +135,14 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      edje_object_signal_emit(wd->spinner, "elm,action,unfocus", "elm");
 }
 
-static int
+static Eina_Bool
 _delay_change(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return 0;
+   if (!wd) return ECORE_CALLBACK_CANCEL;
    wd->delay = NULL;
    evas_object_smart_callback_call(data, "delay,changed", NULL);
-   return 0;
+   return ECORE_CALLBACK_CANCEL;
 }
 
 static void
@@ -199,7 +225,7 @@ _value_set(Evas_Object *obj, double delta)
         while (new_val < wd->val_min)
           new_val = wd->val_max + new_val + 1 - wd->val_min;
         while (new_val > wd->val_max)
-          new_val = wd->val_min + new_val - wd->val_max;
+          new_val = wd->val_min + new_val - wd->val_max - 1;
      }
    else
      {
@@ -349,7 +375,7 @@ _toggle_entry(void *data, Evas_Object *obj __UNUSED__, const char *emission __UN
      }
 }
 
-static int
+static Eina_Bool
 _spin_value(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -365,7 +391,7 @@ _val_inc_start(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   wd->interval = 0.85;
+   wd->interval = wd->first_interval;
    wd->spin_speed = wd->step;
    if (wd->spin) ecore_timer_del(wd->spin);
    wd->spin = ecore_timer_add(wd->interval, _spin_value, obj);
@@ -377,7 +403,7 @@ _val_inc_stop(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   wd->interval = 0.85;
+   wd->interval = wd->first_interval;
    wd->spin_speed = 0;
    if (wd->spin) ecore_timer_del(wd->spin);
    wd->spin = NULL;
@@ -388,7 +414,7 @@ _val_dec_start(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   wd->interval = 0.85;
+   wd->interval = wd->first_interval;
    wd->spin_speed = -wd->step;
    if (wd->spin) ecore_timer_del(wd->spin);
    wd->spin = ecore_timer_add(wd->interval, _spin_value, obj);
@@ -400,7 +426,7 @@ _val_dec_stop(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   wd->interval = 0.85;
+   wd->interval = wd->first_interval;
    wd->spin_speed = 0;
    if (wd->spin) ecore_timer_del(wd->spin);
    wd->spin = NULL;
@@ -508,12 +534,16 @@ elm_spinner_add(Evas_Object *parent)
    elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
+   elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
+   elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
+   elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
 
    wd->val = 0.0;
    wd->val_min = 0.0;
    wd->val_max = 100.0;
    wd->wrap = 0;
    wd->step = 1.0;
+   wd->first_interval = 0.85;
    wd->entry_visible = 0;
    wd->editable = EINA_TRUE;
 
@@ -812,4 +842,46 @@ elm_spinner_editable_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
    return wd->editable;
+}
+
+/**
+ * Set the interval for the spinner
+ *
+ * @param obj The spinner object
+ * @param interval The interval value in seconds
+ *
+ * The interval value is decreased while the user increments or decrements
+ * the spinner value. The next interval value is the previous interval / 1.05,
+ * so it speed up a bit. Default value is 0.85 seconds.
+ *
+ * @ingroup Spinner
+ */
+EAPI void
+elm_spinner_interval_set(Evas_Object *obj, double interval)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->first_interval = interval;
+}
+
+/**
+ * Get the interval of the spinner
+ *
+ * @param obj The spinner object
+ * @return The value of the first interval in seconds
+ *
+ * The interval value is decreased while the user increments or decrements
+ * the spinner value. The next interval value is the previous interval / 1.05,
+ * so it speed up a bit. Default value is 0.85 seconds.
+ *
+ * @ingroup Spinner
+ */
+EAPI double
+elm_spinner_interval_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0.0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return 0.0;
+   return wd->first_interval;
 }

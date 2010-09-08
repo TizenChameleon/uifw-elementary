@@ -93,6 +93,22 @@ struct _Elm_Module
    int references;
 };
 
+
+enum _elm_sel_type {
+   ELM_SEL_PRIMARY,
+   ELM_SEL_SECONDARY,
+   ELM_SEL_CLIPBOARD,
+
+   ELM_SEL_MAX,
+};
+
+enum _elm_sel_format {
+   ELM_SEL_MARKUP	= 0x01,
+   ELM_SEL_IMAGE	= 0x02,
+};
+
+
+
 #define ELM_NEW(t) calloc(1, sizeof(t))
 
 void _elm_win_shutdown(void);
@@ -122,6 +138,9 @@ EAPI void         elm_widget_activate_hook_set(Evas_Object *obj, void (*func) (E
 EAPI void         elm_widget_disable_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
 EAPI void         elm_widget_theme_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
 EAPI void         elm_widget_changed_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
+EAPI void         elm_widget_signal_emit_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source));
+EAPI void         elm_widget_signal_callback_add_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data));
+EAPI void         elm_widget_signal_callback_del_hook_set(Evas_Object *obj, void *(*func) (Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source)));
 EAPI void         elm_widget_theme(Evas_Object *obj);
 EAPI void         elm_widget_on_focus_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
 EAPI void         elm_widget_on_change_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
@@ -132,6 +151,9 @@ EAPI void         elm_widget_sub_object_add(Evas_Object *obj, Evas_Object *sobj)
 EAPI void         elm_widget_sub_object_del(Evas_Object *obj, Evas_Object *sobj);
 EAPI void         elm_widget_resize_object_set(Evas_Object *obj, Evas_Object *sobj);
 EAPI void         elm_widget_hover_object_set(Evas_Object *obj, Evas_Object *sobj);
+EAPI void         elm_widget_signal_emit(Evas_Object *obj, const char *emission, const char *source);
+EAPI void         elm_widget_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data);
+EAPI void         *elm_widget_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source));
 EAPI void         elm_widget_can_focus_set(Evas_Object *obj, int can_focus);
 EAPI int          elm_widget_can_focus_get(const Evas_Object *obj);
 EAPI int          elm_widget_focus_get(const Evas_Object *obj);
@@ -164,10 +186,10 @@ EAPI void         elm_widget_type_set(Evas_Object *obj, const char *type);
 EAPI const char  *elm_widget_type_get(const Evas_Object *obj);
 EAPI void         elm_widget_drag_lock_x_set(Evas_Object *obj, Eina_Bool lock);
 EAPI void         elm_widget_drag_lock_y_set(Evas_Object *obj, Eina_Bool lock);
-EAPI Eina_Bool    elm_widget_drag_lock_x_get(Evas_Object *obj);
-EAPI Eina_Bool    elm_widget_drag_lock_y_get(Evas_Object *obj);
-EAPI int          elm_widget_drag_child_locked_x_get(Evas_Object *obj);
-EAPI int          elm_widget_drag_child_locked_y_get(Evas_Object *obj);
+EAPI Eina_Bool    elm_widget_drag_lock_x_get(const Evas_Object *obj);
+EAPI Eina_Bool    elm_widget_drag_lock_y_get(const Evas_Object *obj);
+EAPI int          elm_widget_drag_child_locked_x_get(const Evas_Object *obj);
+EAPI int          elm_widget_drag_child_locked_y_get(const Evas_Object *obj);
     
 EAPI Eina_Bool    elm_widget_is(const Evas_Object *obj);
 EAPI Evas_Object *elm_widget_parent_widget_get(const Evas_Object *obj);
@@ -185,7 +207,23 @@ void              _elm_config_init(void);
 void              _elm_config_sub_init(void);
 void              _elm_config_shutdown(void);
 
-#define ELM_SET_WIDTYPE(widtype, type) if (!widtype) widtype = eina_stringshare_add(type)
+Eina_Bool	  elm_selection_set(enum _elm_sel_type selection, Evas_Object *widget, enum _elm_sel_format format, const char *buf);
+Eina_Bool	  elm_selection_clear(enum _elm_sel_type selection, Evas_Object *widget);
+Eina_Bool	  elm_selection_get(enum _elm_sel_type selection, enum _elm_sel_format format, Evas_Object *widget);
+
+Eina_Bool         _elm_dangerous_call_check(const char *call);
+
+void              _elm_widtype_register(const char **ptr);
+
+
+#define ELM_SET_WIDTYPE(widtype, type) \
+   do { \
+      if (!widtype) { \
+         widtype = eina_stringshare_add(type); \
+         _elm_widtype_register(&widtype); \
+      } \
+   } while (0)
+
 //#define ELM_CHECK_WIDTYPE(obj, widtype) if (elm_widget_type_get(obj) != widtype) return
 #define ELM_CHECK_WIDTYPE(obj, widtype) if (!_elm_widget_type_check((obj), (widtype))) return
 

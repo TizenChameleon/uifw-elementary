@@ -240,7 +240,7 @@ _parent_hide(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   if (wd) evas_object_hide(wd->cov);
+   evas_object_hide(wd->cov);
 }
 
 static void
@@ -307,6 +307,8 @@ elm_hover_add(Evas_Object *parent)
    edje_object_part_swallow(wd->cov, "elm.swallow.size", wd->size);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
+
+   elm_hover_parent_set(obj, parent);
 
    _sizing_eval(obj);
    return obj;
@@ -426,6 +428,10 @@ elm_hover_parent_get(Evas_Object *obj)
  * Sets the content of the hover object and the direction in which
  * it will pop out.
  *
+ * Once the content object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_hover_content_unset() function.
+ *
  * @param obj The hover object
  * @param swallow The direction that the object will display in. Multiple
  * objects can have the same swallow location. Objects placed in the same
@@ -451,7 +457,8 @@ elm_hover_content_set(Evas_Object *obj, const char *swallow, Evas_Object *conten
 	if (!strcmp(buf, si->swallow))
 	  {
 	     if (content == si->obj) return;
-	     elm_widget_sub_object_del(obj, si->obj);
+	     evas_object_del(si->obj);
+	     si->obj = NULL;
 	     break;
 	  }
      }
@@ -463,8 +470,49 @@ elm_hover_content_set(Evas_Object *obj, const char *swallow, Evas_Object *conten
 	si->swallow = eina_stringshare_add(buf);
 	si->obj = content;
 	wd->subs = eina_list_append(wd->subs, si);
-	_sizing_eval(obj);
      }
+   _sizing_eval(obj);
+}
+
+/**
+ * Unset the content of the hover object
+ *
+ * Unparent and return the content object which was set for this widget
+ *
+ * @param obj The hover object
+ * @param swallow The direction that the object will display in. Multiple
+ * objects can have the same swallow location. Objects placed in the same
+ * swallow will be placed starting at the middle of the hover and ending
+ * farther from the middle.
+ * Accepted values are "left" "right" "top" "bottom" "middle"
+ * @return The content that was being used
+ *
+ * @ingroup Hover
+ */
+EAPI Evas_Object *
+elm_hover_content_unset(Evas_Object *obj, const char *swallow)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Subinfo *si;
+   const Eina_List *l;
+   char buf[1024];
+   if (!wd) return NULL;
+   snprintf(buf, sizeof(buf), "elm.swallow.slot.%s", swallow);
+   EINA_LIST_FOREACH(wd->subs, l, si)
+     {
+	if (!strcmp(buf, si->swallow))
+	  {
+	     Evas_Object *content;
+	     if (!si->obj) return NULL;
+	     content = si->obj;
+	     elm_widget_sub_object_del(obj, si->obj);
+	     edje_object_part_unswallow(wd->cov, si->obj);
+	     si->obj = NULL;
+	     return content;
+	  }
+     }
+   return NULL;
 }
 
 /**
