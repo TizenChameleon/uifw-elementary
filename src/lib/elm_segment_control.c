@@ -132,27 +132,23 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    Elm_Segment_Item *item = (Elm_Segment_Item *) data;
    Widget_Data *wd = elm_widget_data_get(item->obj);
-   Evas_Event_Mouse_Up * ev = event_info;
-   Evas_Coord x, y, w, h;
-
    if (!wd) return;
 
-   evas_object_geometry_get(obj, &x, &y, &w, &h);
-   if(ev->output.x > x && ev->output.x < x+w && ev->output.y > y && ev->output.y < y+h && wd->selected == EINA_FALSE)
+   if (item->segment_id == wd->cur_seg_id)
      {
-	_signal_segment_on(item);
+       wd->selected = EINA_TRUE;
+       return;
      }
-   else
-     {
-         wd->selected = EINA_FALSE;
-         return;
-     }
+    _signal_segment_on(item);
+     wd->selected = EINA_FALSE;
+     return;
 
-  // if(wd->longpressed == EINA_FALSE)
+  /*if(wd->longpressed == EINA_FALSE)
      {
        edje_object_signal_emit(item->base, "elm,action,unfocus", "elm");
        edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
-     }
+       edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
+      }*/
   /* if (item->long_timer)
      {
        ecore_timer_del(item->long_timer);
@@ -167,20 +163,10 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    Widget_Data *wd = elm_widget_data_get(item->obj);
 
    if (!wd) return;
-   //wd->longpressed = EINA_FALSE;
-
-   if (item->segment_id == wd->cur_seg_id)
-     {
-        wd->selected = EINA_TRUE;
-        return;
-     }
 
    edje_object_signal_emit(item->base, "elm,action,focus", "elm");
-   edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
 
-   _signal_segment_on(item);
-
-/*   if (item->long_timer) ecore_timer_del(item->long_timer);
+/* if (item->long_timer) ecore_timer_del(item->long_timer);
    item->long_timer = ecore_timer_add(0.3, _signal_segment_on, item);*/
 }
 
