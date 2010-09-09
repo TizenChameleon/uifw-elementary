@@ -1202,7 +1202,8 @@ _smart_input_method_changed(void* data, Evas_Object* webview, void* arg)
 
    Ecore_IMF_Context* imContext = sd->ewk_view_core_imContext_get(webview);
    Eina_Bool active = (Eina_Bool)arg;
-   if (active && sd->mouse_clicked)
+   if(!sd->mouse_clicked) return;
+   if (active)
      {
 	static unsigned int lastImh = 0;//FIXME
 	if (sd->ewk_view_imh_get == NULL)
@@ -1227,6 +1228,7 @@ _smart_input_method_changed(void* data, Evas_Object* webview, void* arg)
 	     ecore_imf_context_client_canvas_set(imContext, evas_object_evas_get(sd->base.self));
 	     ecore_imf_context_input_panel_show (imContext);
 	  }
+	sd->mouse_clicked = EINA_FALSE;
      }
    else
      {
