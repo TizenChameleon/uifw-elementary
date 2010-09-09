@@ -11,11 +11,11 @@
 
 
 #define MAX_ITEM_NUM		(9)
-#define MAX_MOVE_INTERVAL	(1.8)
+#define MAX_MOVE_INTERVAL	(0.2)
 #define ELM_MAX(v1, v2)    	(((v1) > (v2)) ? (v1) : (v2))
 #define ROT_RIGHT			(5)
 #define ROT_LEFT			(-5)
-#define SHOW_ITEM_NUM		3			
+#define SHOW_ITEM_NUM		(3)			
 
 
 struct _Stackedicon_Item {
@@ -43,7 +43,6 @@ struct _Widget_Data {
 	Ecore_Animator *animator;		
 	Eina_List *list;
 	Evas_Coord x, y, w, h;
-	Eina_Bool on_expanded : 1;
 	Eina_Bool visible: 1;
 	Eina_Bool move_start: 1;
 };
@@ -62,10 +61,11 @@ static void _icon_mouse_move_cb(void *data, Evas *e, Evas_Object *obj, void *eve
 static void _icon_mouse_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _icon_move_to_zero(Evas_Object *obj);
 static int _icon_move_to_zero_cb(Evas_Object *obj);
-static void _icon_move_map(void *data, int flag, int interval_x, int interval_y);
+static void _icon_move_map(void *data, int interval_x, int interval_y);
 static void _icon_map_pos(void *data, Evas_Coord x, Evas_Coord y);
 static void _del_image(void *data);
 static void _del_all_image(void *data);
+static void _calc_item_size(int w, int h, int iw, int ih, int *res_w, int *res_h);
 static void _add_image(Evas_Object *obj, void *data);
 static void _show_all_image(Evas_Object *obj);
 static void _hide_all_image(Evas_Object *obj);
@@ -237,10 +237,10 @@ static void _icon_mouse_move_cb(void *data, Evas *e, Evas_Object *obj, void *eve
 		it->mmx = ev->cur.output.x;
 		it->mmy = ev->cur.output.y;
 
-		wd->interval_x = 1.5*(it->mmx - it->mdx);
-		wd->interval_y = 1.5*(it->mmy - it->mdy);		
+		wd->interval_x = it->mmx - it->mdx;
+		wd->interval_y = it->mmy - it->mdy; 	
 
-		_icon_move_map(wd, 1, wd->x + wd->interval_x, wd->y +  wd->interval_y);
+		_icon_move_map(wd, wd->x + wd->interval_x, wd->y +  wd->interval_y);
 	}	
 }
 
@@ -254,17 +254,14 @@ static void _icon_mouse_up_cb(void *data, Evas *e, Evas_Object *obj, void *event
 
 	interval = sqrt(wd->interval_x*wd->interval_x + wd->interval_y*wd->interval_y);
 	
-	if(((double)(interval/it->h) > MAX_MOVE_INTERVAL) && (wd->on_expanded == EINA_FALSE)){
-		wd->on_expanded = EINA_TRUE;
+	if(((double)(interval/it->h) > MAX_MOVE_INTERVAL)){
 		wd->interval_x = 0;
 		wd->interval_y = 0;
 		
-		_icon_move_map(wd, 0, wd->x, wd->y);		
-		evas_object_smart_callback_call(it->parent, "expanded", NULL);	
+		_icon_move_map(wd, wd->x, wd->y);		
 		_hide_hidden_image(it->parent);
-
+		evas_object_smart_callback_call(it->parent, "expanded", NULL);	
 	}else{		
-		wd->on_expanded= EINA_FALSE;	
 		it->on_hold = EINA_FALSE;	
 		it->mdx = 0;
 		it->mdy = 0;
@@ -310,10 +307,11 @@ static void _icon_move_to_zero(Evas_Object *obj)
 		wd->animator = NULL;
 		wd->interval_x = 0;
 		wd->interval_y = 0;		
-		_icon_move_map(wd, 0, wd->x, wd->y);
+		_icon_move_map(wd, wd->x, wd->y);
 		_hide_hidden_image(obj);
+		evas_object_smart_callback_call(obj, "clicked", NULL);
 	}else{	
-		_icon_move_map(wd, 0, wd->x + wd->interval_x - x, wd->y + wd->interval_y - y);
+		_icon_move_map(wd, wd->x + wd->interval_x - x, wd->y + wd->interval_y - y);
 	}
 }
 
@@ -324,7 +322,7 @@ static int _icon_move_to_zero_cb(Evas_Object *obj)
 	return EXIT_FAILURE;
 }
 
-static void _icon_move_map(void *data, int flag, int interval_x, int interval_y)
+static void _icon_move_map(void *data, int interval_x, int interval_y)
 {
 	Widget_Data *wd = (Widget_Data *)data;
 	int i = 0;
@@ -367,13 +365,34 @@ static void _icon_map_pos(void *data, Evas_Coord x, Evas_Coord y)
 	evas_map_free(m);	
 }
 
+static void _calc_item_size(int w, int h, int iw, int ih, int *res_w, int *res_h)
+{
+	if(iw>ih){
+		if(w*ih/iw > h){
+			*res_w = h*iw/ih;
+			*res_h = h;						
+		}else{
+			*res_w = w;
+			*res_h = w*ih/iw;						
+		}		
+	}else{
+		if(h*iw/ih > w){
+			*res_w = w;
+			*res_h = w*h/(h*iw/ih);		
+		}else{
+			*res_w = h*iw/ih;
+			*res_h = h;				
+		}
+	}
+}
+
 static void _add_image(Evas_Object *obj, void *data)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Object *ly = NULL;
 	Evas_Object *ic = NULL;
 	Evas_Object *pad = NULL;	
-	int w, h;
+	int iw, ih;
 	if (!wd) return;
 
 	Elm_Stackedicon_Item *it = (Elm_Stackedicon_Item *)data;
@@ -387,41 +406,14 @@ static void _add_image(Evas_Object *obj, void *data)
 	ic = evas_object_image_add(evas_object_evas_get(obj));
 	evas_object_image_load_size_set(ic, wd->w/2, wd->h/2);
 	evas_object_image_file_set(ic, it->path, NULL);
-	evas_object_image_size_get(ic, &w, &h);
+	evas_object_image_size_get(ic, &iw, &ih);
 
-	if(w>h){
-		if((wd->w -2)*h/w > wd->h -2){
-			evas_object_image_fill_set(ic, 0, 0, (wd->h -2)*w/h, wd->h -2);
-			evas_object_size_hint_min_set(ly, (wd->h -2)*w/h, wd->h -2);
-			evas_object_resize(ly, (wd->h -2)*w/h, wd->h -2);	
+	_calc_item_size(wd->w - 2, wd->h - 2, iw, ih, &it->w, &it->h);
 
-			it->w = (wd->h -2)*w/h;
-			it->h = wd->h -2;			
-		}else{
-			evas_object_image_fill_set(ic, 0, 0, wd->w -2, (wd->w -2)*h/w);
-			evas_object_size_hint_min_set(ly, wd->w-2, (wd->w -2)*h/w);
-			evas_object_resize(ly, wd->w-2, (wd->w -2)*h/w);	
+	evas_object_image_fill_set(ic, 0, 0, it->w, it->h);
+	evas_object_size_hint_min_set(ly, it->w, it->h);
+	evas_object_resize(ly, it->w, it->h);
 
-			it->w = wd->w-2;
-			it->h = (wd->w -2)*h/w;						
-		}		
-	}else{
-		if((wd->h -2)*w/h > wd->w -2){
-			evas_object_image_fill_set(ic, 0, 0, wd->w -2, (wd->w -2)*(wd->h -2)/((wd->h -2)*w/h));
-			evas_object_size_hint_min_set(ly, wd->w -2, (wd->w -2)*(wd->h -2)/((wd->h -2)*w/h));
-			evas_object_resize(ly, wd->w -2, (wd->w -2)*(wd->h -2)/((wd->h -2)*w/h));
-
-			it->w = wd->w-2;
-			it->h = (wd->w -2)*(wd->h -2)/((wd->h -2)*w/h);				
-		}else{
-			evas_object_image_fill_set(ic, 0, 0, (wd->h -2)*w/h, wd->h -2);
-			evas_object_size_hint_min_set(ly, (wd->h -2)*w/h, wd->h -2);
-			evas_object_resize(ly, (wd->h -2)*w/h, wd->h -2);	
-
-			it->w = (wd->h -2)*w/h;
-			it->h = wd->h -2;				
-		}
-	}
 	evas_object_image_filled_set(ic, 1);
 	edje_object_part_swallow(ly, "contents", ic);
 	
@@ -637,7 +629,6 @@ elm_stackedicon_add(Evas_Object *parent)
 	evas_object_size_hint_weight_set(wd->bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	wd->w = 1;
 	wd->h = 1;
-	wd->on_expanded = EINA_FALSE;
 
 	wd->clip = evas_object_rectangle_add(e);
 	elm_widget_sub_object_add(obj, wd->clip);
