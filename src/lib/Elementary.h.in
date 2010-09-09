@@ -1192,6 +1192,8 @@ extern "C" {
         GenlistInsertNewFunc insert_new;
         GenlistMoveFunc move;
         GenlistItemSelectedFunc item_selected;
+        const char *item_style;
+        const char *select_all_item_style;
      };
    EAPI Evas_Object      *elm_genlist_add(Evas_Object *parent);
    EAPI Elm_Genlist_Item *elm_genlist_item_append(Evas_Object *obj, const Elm_Genlist_Item_Class *itc, const void *data, Elm_Genlist_Item *parent, Elm_Genlist_Item_Flags flags, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *func_data);
