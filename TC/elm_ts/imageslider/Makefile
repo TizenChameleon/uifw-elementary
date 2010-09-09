@@ -1,7 +1,18 @@
 CC ?= gcc
 
-TARGETS = uts_elm_imageslider_add_test \
-	  uts_elm_imageslider_add_func
+TARGETS = utc_UIFW_elm_imageslider_add_func \
+	  utc_UIFW_elm_imageslider_item_append_func \
+	  utc_UIFW_elm_imageslider_item_prepend_func \
+	  utc_UIFW_elm_imageslider_item_del_func \
+	  utc_UIFW_elm_imageslider_selected_item_get_func \
+	  utc_UIFW_elm_imageslider_item_selected_get_func \
+	  utc_UIFW_elm_imageslider_item_selected_set_func \
+	  utc_UIFW_elm_imageslider_photo_file_get_func \
+	  utc_UIFW_elm_imageslider_item_prev_func \
+	  utc_UIFW_elm_imageslider_item_next_func \
+	  utc_UIFW_elm_imageslider_prev_func \
+	  utc_UIFW_elm_imageslider_next_func 
+	  
 
 PKGS = elementary
 
@@ -20,4 +31,4 @@ $(TARGET): %: %.c
 	$(CC) -o $@ $< $(CFLAGS) $(LDFLAGS)
 
 clean:
-	rm -f $(TARGETS)
+	rm -f *~ *.o tet_captured tet_lock $(TARGETS)

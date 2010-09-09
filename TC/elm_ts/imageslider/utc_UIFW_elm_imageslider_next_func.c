@@ -1,6 +1,7 @@
 #include <tet_api.h>
 #include <Elementary.h>
 
+
 // Definitions
 // For checking the result of the positive test case.
 #define TET_CHECK_PASS(x1, y...) \
@@ -32,8 +33,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_imageslider_add_func_01(void);
-static void utc_UIFW_elm_imageslider_add_func_02(void);
+static void utc_UIFW_elm_imageslider_next_func_01(void);
+static void utc_UIFW_elm_imageslider_next_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -41,25 +42,20 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_imageslider_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_imageslider_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_imageslider_next_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_imageslider_next_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0}
 };
 
 // Declare the global variables
 Evas_Object *main_win, *main_bg;
 Evas_Object *test_win, *test_bg;
-Evas_Object *test_eo = NULL;
+Evas_Object *test_eo;
+
 // Declare internal functions
 void _elm_precondition(void);
 static void _win_del(void *data, Evas_Object *obj, void *event_info);
-
-
-// Delete main window
-static void _win_del(void *data, Evas_Object *obj, void *event_info)
-{
-	elm_exit();
-}
+static void _test_cb(void * data, Evas_Object * obj, void * event_info);
 
 // Do precondition.
 void _elm_precondition(void)
@@ -82,6 +78,24 @@ void _elm_precondition(void)
 	//elm_run();
 }
 
+// Delete main window
+static void _win_del(void *data, Evas_Object *obj, void *event_info)
+{
+	elm_exit();
+}
+
+// Callback function
+static void _test_cb(void *data, Evas_Object *obj, void *event_info)
+{
+	Elm_Imageslider_Item *it = event_info;
+	Elm_Imageslider_Item *sel = elm_imageslider_selected_item_get(obj);
+
+	printf("[[[ DEBUG ]]]::==================================================\n");
+	printf("[[[ DEBUG ]]]::%p %p\n", it, sel);
+	printf("[[[ DEBUG ]]]::PHOTO FILE: %s\n", elm_imageslider_item_photo_file_get(it));
+	printf("[[[ DEBUG ]]]::--------------------------------------------------------\n");
+
+}
 
 // Start up function for each test purpose
 static void
@@ -104,6 +118,9 @@ startup()
 
 	evas_object_resize(test_win, 480, 800);
 	evas_object_show(test_win);
+
+	// Add an Image Slider Widget.
+	test_eo = elm_imageslider_add(test_win);
 
 	tet_infoline("[[ TET_MSG ]]:: Completing startup");
 }
@@ -143,29 +160,30 @@ cleanup()
 	// clean up and shut down
 	elm_shutdown(); ;
 
-	tet_infoline("[[ TET_MSG ]]:: ========= TC COMPLETE  ========== ");
+	tet_infoline("[[ TET_MSG ]]:: ============ TC COMPLETE  ============ ");
+}
+
+
+/**
+ * @brief Positive test case of elm_imageslider_next()
+ */
+static void utc_UIFW_elm_imageslider_next_func_01(void)
+{
+	// Current return type is "Void", but will change to Bool.
+	elm_imageslider_next(test_eo);
+
+	tet_result(TET_PASS);
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Moving to the next Image Slider item has succeed.");
 }
 
 /**
- * @brief Positive test case of elm_imageslider_add()
+ * @brief Negative test case of ug_init elm_imageslider_next()
  */
-static void utc_UIFW_elm_imageslider_add_func_01(void)
+static void utc_UIFW_elm_imageslider_next_func_02(void)
 {
-	test_eo = elm_imageslider_add(test_win);
-	TET_CHECK_PASS(NULL, test_eo);
+	// Current return type is "Void", but will change to Bool.
+	elm_imageslider_next(NULL);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, An Image Slider is added successfully.");
-}
-
-/**
- * @brief Negative test case of ug_init elm_imageslider_add()
- */
-static void utc_UIFW_elm_imageslider_add_func_02(void)
-{
-	test_eo = elm_imageslider_add(NULL);
-	TET_CHECK_FAIL(NULL, test_eo);
-
-	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Adding an Image Slider has failed.");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Moving to the next Image Slider item has failed.");
 }
