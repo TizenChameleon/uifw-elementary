@@ -14,16 +14,17 @@ AM_CPPFLAGS = \
 @ELEMENTARY_WIN32_CFLAGS@ \
 @ELEMENTARY_WINCE_CFLAGS@ \
 @ELEMENTARY_EDBUS_CFLAGS@ \
-@ELEMENTARY_EFREET_CFLAGS@
+@ELEMENTARY_EFREET_CFLAGS@ \
+@ELEMENTARY_ETHUMB_CFLAGS@
 
 if ELEMENTARY_WINDOWS_BUILD
 AM_CPPFLAGS += -DELEMENTARY_BUILD
 endif
 
-pkgdir = $(libdir)/edje
-pkg_LTLIBRARIES = elm.la
+pkgdir = $(libdir)/edje/modules/elm/$(MODULE_EDJE)
+pkg_LTLIBRARIES = module.la
 
-elm_la_SOURCES = private.h \
+module_la_SOURCES = private.h \
 modules.inc \
 elm.c \
 elm_anchorblock.c \
@@ -48,7 +49,9 @@ elm_slideshow.c \
 elm_spinner.c \
 elm_thumb.c \
 elm_toggle.c \
-elm_toolbar.c
+elm_toolbar.c \
+elm_notify.c \
+elm_panes.c
 
-elm_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
-elm_la_LDFLAGS = $(all_libraries) -no-undefined @lt_enable_auto_import@ -module -avoid-version -shared -fPIC
+module_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
+module_la_LDFLAGS = -no-undefined -module -avoid-version -shared -fPIC

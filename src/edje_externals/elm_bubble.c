@@ -39,11 +39,9 @@ external_bubble_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Ex
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
 	  {
 	     Evas_Object *icon = external_common_param_icon_get(obj, param);
-	     if (icon)
-	       {
-		  elm_bubble_icon_set(obj, icon);
-		  return EINA_TRUE;
-	       }
+	     if ((strcmp(param->s, "")) && (!icon)) return EINA_FALSE;
+	     elm_bubble_icon_set(obj, icon);
+	     return EINA_TRUE;
 	  }
      }
    else if (!strcmp(param->name, "info"))
@@ -59,12 +57,10 @@ external_bubble_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Ex
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
 	  {
 	     Evas_Object *content = \
-	       external_common_param_edje_object_get(obj, param);
-	     if (content)
-	       {
-		  elm_bubble_content_set(obj, content);
-		  return EINA_TRUE;
-	       }
+		    external_common_param_edje_object_get(obj, param);
+	     if ((strcmp(param->s, "")) && (!content)) return EINA_FALSE;
+	     elm_bubble_content_set(obj, content);
+	     return EINA_TRUE;
 	  }
      }
 
@@ -134,15 +130,18 @@ external_bubble_params_parse(void *data, Evas_Object *obj, const Eina_List *para
    return mem;
 }
 
- static void
+static Evas_Object *external_bubble_content_get(void *data __UNUSED__,
+		const Evas_Object *obj, const char *content)
+{
+	ERR("so content");
+	return NULL;
+}
+
+static void
 external_bubble_params_free(void *params)
 {
    Elm_Params_Bubble *mem = params;
 
-   if (mem->icon)
-     evas_object_del(mem->icon);
-   if (mem->content)
-     evas_object_del(mem->content);
    if (mem->info)
      eina_stringshare_del(mem->info);
    external_common_params_free(params);

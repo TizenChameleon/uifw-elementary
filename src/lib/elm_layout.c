@@ -222,6 +222,10 @@ elm_layout_theme_set(Evas_Object *obj, const char *clas, const char *group, cons
 /**
  * Set the layout content
  *
+ * Once the content object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_layout_content_unset() function.
+ *
  * @param obj The layout object
  * @param swallow The swallow group name in the edje file
  * @param content The content will be filled in this layout object
@@ -241,7 +245,7 @@ elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *conte
 	if (!strcmp(swallow, si->swallow))
 	  {
 	     if (content == si->obj) return;
-	     elm_widget_sub_object_del(obj, si->obj);
+	     evas_object_del(si->obj);
 	     break;
 	  }
      }
@@ -256,8 +260,8 @@ elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *conte
 	si->swallow = eina_stringshare_add(swallow);
 	si->obj = content;
 	wd->subs = eina_list_append(wd->subs, si);
-	_request_sizing_eval(obj);
      }
+   _request_sizing_eval(obj);
 }
 
 /**

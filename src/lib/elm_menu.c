@@ -1,6 +1,3 @@
-/*
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
- */
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -81,7 +78,6 @@ _del_hook(Evas_Object *obj)
 	     ll = eina_list_append(ll, item->items);
 	     if (item->del_cb) item->del_cb((void*)item->data, item->o, item);
 	     if (item->label) eina_stringshare_del(item->label);
-	     if (item->icon) evas_object_del(item->icon);
 	     if (item->hv) evas_object_del(item->hv);
 	     if (item->location) evas_object_del(item->location);
 	     free(item);
@@ -598,6 +594,8 @@ elm_menu_item_label_get(Elm_Menu_Item *item)
 /**
  * Set the icon of a menu item
  *
+ * Once the icon object is set, a previously set one will be deleted.
+ *
  * @param it The menu item object.
  * @param icon The icon object to set for @p item
  *
@@ -606,23 +604,20 @@ elm_menu_item_label_get(Elm_Menu_Item *item)
 EAPI void
 elm_menu_item_icon_set(Elm_Menu_Item *item, Evas_Object *icon)
 {
-   if ((item->icon != icon) && (item->icon))
-     elm_widget_sub_object_del(item->menu, item->icon);
-   if ((icon) && (item->icon != icon))
+   if(item->icon == icon) return;
+   if (item->icon) evas_object_del(item->icon);
+   item->icon = icon;
+   if (icon)
      {
-	item->icon = icon;
 	elm_widget_sub_object_add(item->menu, icon);
 	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, item->menu);
+				        _changed_size_hints, item->menu);
 	edje_object_part_swallow(item->o, "elm.swallow.content", icon);
 	edje_object_signal_emit(item->o, "elm,state,icon,visible", "elm");
 	edje_object_message_signal_process(item->o);
-	_sizing_eval(item->menu);
      }
-   else
-     item->icon = icon;
+   _sizing_eval(item->menu);
 }
-
 
 /**
  * Set the disabled state of @p item.

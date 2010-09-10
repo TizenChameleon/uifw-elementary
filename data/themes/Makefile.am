@@ -140,6 +140,7 @@ busy-7.png \
 busy-8.png \
 busy-9.png \
 arrow_right.png \
+arrow_left.png \
 bt_spinner_up.png \
 bt_spinner_down.png \
 bt_spinner_hilight.png \
@@ -184,7 +185,11 @@ emo-very-sorry.png \
 emo-what.png \
 emo-wink.png \
 emo-worried.png \
-emo-wtf.png
+emo-wtf.png \
+map_item.png \
+map_item_2.png \
+shadow.png \
+black.png
 
 default.edj: Makefile $(EXTRA_DIST)
 	$(EDJE_CC) $(EDJE_FLAGS) \

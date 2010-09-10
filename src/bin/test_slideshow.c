@@ -1,6 +1,3 @@
-/*
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
- */
 #include <Elementary.h>
 #ifndef ELM_LIB_QUICKLAUNCH
 
@@ -13,6 +10,8 @@ static char *img4 = PACKAGE_DATA_DIR"/images/rock_02.jpg";
 static char *img5 = PACKAGE_DATA_DIR"/images/sky_01.jpg";
 static char *img6 = PACKAGE_DATA_DIR"/images/sky_04.jpg";
 static char *img7 = PACKAGE_DATA_DIR"/images/wood_01.jpg";
+static char *img8 = PACKAGE_DATA_DIR"/images/mystrale.jpg";
+static char *img9 = PACKAGE_DATA_DIR"/images/mystrale_2.jpg";
 
 static void
 _notify_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
@@ -54,6 +53,13 @@ _hv_select(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
+_layout_select(void *data, Evas_Object *obj, void *event_info)
+{
+   elm_slideshow_layout_set(slideshow, data);
+   elm_hoversel_label_set(obj, data);
+}
+
+static void
 _start(void *data, Evas_Object *obj, void *event_info)
 {
    elm_slideshow_timeout_set(slideshow, (int)elm_spinner_value_get(data));
@@ -80,9 +86,15 @@ _spin(void *data, Evas_Object *obj, void *event_info)
 static Evas_Object *
 _get(void *data, Evas_Object *obj)
 {
-   Evas_Object *photo = elm_photocam_add(obj);
-   elm_photocam_file_set(photo, data);
-   elm_photocam_zoom_mode_set(photo, ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT);
+   //Evas_Object *photo = elm_photocam_add(obj);
+   //elm_photocam_file_set(photo, data);
+   //elm_photocam_zoom_mode_set(photo, ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT);
+
+   Evas_Object *photo = elm_photo_add(obj);
+   elm_photo_file_set(photo, data);
+   elm_photo_fill_inside_set(photo, EINA_TRUE);
+   elm_widget_style_set(photo, "shadow");
+
    return photo;
 }
 
@@ -93,7 +105,7 @@ test_slideshow(void *data, Evas_Object *obj, void *event_info)
 {
    Evas_Object *win, *bg, *notify, *bx, *bt, *hv, *spin;
    const Eina_List *l;
-   const char *transition;
+   const char *transition, *layout;
 
    win = elm_win_add(NULL, "Slideshow", ELM_WIN_BASIC);
    elm_win_title_set(win, "Slideshow");
@@ -117,9 +129,11 @@ test_slideshow(void *data, Evas_Object *obj, void *event_info)
    elm_slideshow_item_add(slideshow, &itc, img2);
    elm_slideshow_item_add(slideshow, &itc, img3);
    elm_slideshow_item_add(slideshow, &itc, img4);
+   elm_slideshow_item_add(slideshow, &itc, img9);
    elm_slideshow_item_add(slideshow, &itc, img5);
    elm_slideshow_item_add(slideshow, &itc, img6);
    elm_slideshow_item_add(slideshow, &itc, img7);
+   elm_slideshow_item_add(slideshow, &itc, img8);
 
    notify = elm_notify_add(win);
    elm_notify_orient_set(notify, ELM_NOTIFY_ORIENT_BOTTOM);
@@ -154,6 +168,14 @@ test_slideshow(void *data, Evas_Object *obj, void *event_info)
    elm_hoversel_label_set(hv, eina_list_data_get(elm_slideshow_transitions_get(slideshow)));
    evas_object_show(hv);
 
+   hv = elm_hoversel_add(win);
+   elm_box_pack_end(bx, hv);
+   elm_hoversel_hover_parent_set(hv, win);
+   EINA_LIST_FOREACH(elm_slideshow_layouts_get(slideshow), l, layout)
+       elm_hoversel_item_add(hv, layout,  NULL, 0, _layout_select, layout);
+   elm_hoversel_label_set(hv, elm_slideshow_layout_get(slideshow));
+   evas_object_show(hv);
+
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "%2.0f secs.");
    evas_object_smart_callback_add(spin, "changed", _spin, spin);
@@ -182,7 +204,7 @@ test_slideshow(void *data, Evas_Object *obj, void *event_info)
    evas_object_event_callback_add(slideshow, EVAS_CALLBACK_MOUSE_UP, _notify_show, notify);
    evas_object_event_callback_add(slideshow, EVAS_CALLBACK_MOUSE_MOVE, _notify_show, notify);
 
-   evas_object_resize(win, 350, 200);
+   evas_object_resize(win, 500, 400);
    evas_object_show(win);
 }
 

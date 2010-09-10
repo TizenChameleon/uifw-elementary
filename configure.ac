@@ -3,12 +3,12 @@
 m4_define([v_maj], [0])
 m4_define([v_min], [7])
 m4_define([v_mic], [0])
-m4_define([v_rev], m4_esyscmd([(svnversion . | grep -v exported || echo 0) | awk -F : '{printf("%s\n", $1);}' | tr -d ' :MSP\n']))
+m4_define([v_rev], m4_esyscmd([(svnversion "${SVN_REPO_PATH:-.}" | grep -v export || echo 0) | awk -F : '{printf("%s\n", $1);}' | tr -d ' :MSP\n']))
 m4_if(v_rev, [0], [m4_define([v_rev], m4_esyscmd([git log 2> /dev/null | (grep -m1 git-svn-id || echo 0) | sed -e 's/.*@\([0-9]*\).*/\1/' | tr -d '\n']))])
 ##--   When released, remove the dnl on the below line
 dnl m4_undefine([v_rev])
 ##--   When doing snapshots - change soname. remove dnl on below line
-m4_define([relname], [ver-pre-svn-06])
+m4_define([relname], [ver-pre-svn-07])
 m4_define([v_rel], [-release relname])
 ##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##
 m4_ifdef([v_rev], [m4_define([v_ver], [v_maj.v_min.v_mic.v_rev])],
@@ -30,8 +30,6 @@ AM_INIT_AUTOMAKE([1.6 dist-bzip2])
 AM_CONFIG_HEADER([elementary_config.h])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-AC_CANONICAL_BUILD
-AC_CANONICAL_HOST
 AC_C_BIGENDIAN
 AC_ISC_POSIX
 AC_PROG_CC
@@ -65,17 +63,23 @@ VMIN=v_min
 AC_SUBST(VMAJ)
 AC_SUBST(VMIN)
 
+EDJE_VERSION="1.0.0"
+
 case "$host_os" in
   mingw32ce* | cegcc*)
     MODULE_ARCH="$host_os-$host_cpu"
+    MODULE_EDJE="$host_os-$host_cpu"
     ;;
   *)
-    MODULE_ARCH="$host_os-$host_cpu-relname"
+    MODULE_ARCH="$host_os-$host_cpu-v_maj.v_min.v_mic"
+    MODULE_EDJE="$host_os-$host_cpu-${EDJE_VERSION}"
     ;;
 esac
 AC_SUBST(release_info)
 AC_SUBST(MODULE_ARCH)
 AC_DEFINE_UNQUOTED(MODULE_ARCH, "$MODULE_ARCH", "Module architecture")
+AC_SUBST(MODULE_EDJE)
+AC_DEFINE_UNQUOTED(MODULE_EDJE, "$MODULE_EDJE", "Edje module architecture")
 
 EFL_SHARED_EXTENSION="${shrext_cmds}"
 AC_DEFINE_UNQUOTED(EFL_SHARED_EXTENSION, "${EFL_SHARED_EXTENSION}", "Shared extension")
@@ -165,14 +169,14 @@ AM_CONDITIONAL([ELEMENTARY_WINDOWS_BUILD], [test "x${have_windows}" = "xyes"])
 
 PKG_CHECK_MODULES([ELEMENTARY],
    [
-    eina-0 >= 0.0.1
-    eet >= 1.2.3
-    evas >= 0.9.9
-    ecore >= 0.9.9
-    ecore-evas >= 0.9.9
-    ecore-file >= 0.9.9
-    ecore-imf >= 0.9.9
-    edje >= 0.9.9
+    eina >= 1.0.0
+    eet >= 1.4.0
+    evas >= 1.0.0
+    ecore >= 1.0.0
+    ecore-evas >= 1.0.0
+    ecore-file >= 1.0.0
+    ecore-imf >= 1.0.0
+    edje >= ${EDJE_VERSION}
    ]
 )
 
@@ -187,7 +191,7 @@ AC_ARG_WITH(eet-eet,
 ])
 AC_SUBST(eet_eet)
         
-requirement_elm="edje ecore-file ecore-evas ecore evas eet eina-0 ${requirement_elm}"
+requirement_elm="edje >= ${EDJE_VERSION} ecore-file >= 1.0.0 ecore-evas >= 1.0.0 ecore >= 1.0.0 evas >= 1.0.0 eet >= 1.4.0 eina >= 1.0.0 ${requirement_elm}"
 
 have_elementary_x="no"
 want_elementary_x="auto"
@@ -197,11 +201,11 @@ AC_ARG_ENABLE([ecore-x],
 
 if test "x$want_elementary_x" != "xno"; then
    PKG_CHECK_MODULES([ELEMENTARY_X],
-      [ecore-x],
+      [ecore-x >= 1.0.0],
       [
        AC_DEFINE(HAVE_ELEMENTARY_X, 1, [X11 support for Elementary])
        have_elementary_x="yes"
-       requirement_elm="ecore-x ${requirement_elm}"
+       requirement_elm="ecore-x >= 1.0.0 ${requirement_elm}"
       ],
       [have_elementary_x="no"]
    )
@@ -221,11 +225,11 @@ AC_ARG_ENABLE([ecore-fb],
 
 if test "x$want_elementary_fb" != "xno"; then
    PKG_CHECK_MODULES([ELEMENTARY_FB],
-      [ecore-fb],
+      [ecore-fb >= 1.0.0],
       [
        AC_DEFINE(HAVE_ELEMENTARY_FB, 1, [FB support for Elementary])
        have_elementary_fb="yes"
-       requirement_elm="ecore-fb ${requirement_elm}"
+       requirement_elm="ecore-fb >= 1.0.0 ${requirement_elm}"
       ],
       [have_elementary_fb="no"]
    )
@@ -244,11 +248,11 @@ AC_ARG_ENABLE([ecore-sdl],
 
 if test "x$want_elementary_sdl" != "xno"; then
    PKG_CHECK_MODULES([ELEMENTARY_SDL],
-      [ecore-sdl],
+      [ecore-sdl >= 1.0.0],
       [
        AC_DEFINE(HAVE_ELEMENTARY_SDL, 1, [SDL support for Elementary])
        have_elementary_sdl="yes"
-       requirement_elm="ecore-sdl ${requirement_elm}"
+       requirement_elm="ecore-sdl >= 1.0.0 ${requirement_elm}"
       ],
       [have_elementary_sdl="no"]
    )
@@ -267,11 +271,11 @@ AC_ARG_ENABLE([ecore-win32],
 
 if test "x$want_elementary_win32" != "xno"; then
    PKG_CHECK_MODULES([ELEMENTARY_WIN32],
-      [ecore-win32],
+      [ecore-win32 >= 1.0.0],
       [
        AC_DEFINE(HAVE_ELEMENTARY_WIN32, 1, [Windows XP support for Elementary])
        have_elementary_win32="yes"
-       requirement_elm="ecore-win32 ${requirement_elm}"
+       requirement_elm="ecore-win32 >= 1.0.0 ${requirement_elm}"
       ],
       [have_elementary_win32="no"]
    )
@@ -290,11 +294,11 @@ AC_ARG_ENABLE([ecore-wince],
 
 if test "x$want_elementary_wince" != "xno"; then
    PKG_CHECK_MODULES([ELEMENTARY_WINCE],
-      [ecore-wince],
+      [ecore-wince >= 1.0.0],
       [
        AC_DEFINE(HAVE_ELEMENTARY_WINCE, 1, [Windows CE support for Elementary])
        have_elementary_wince="yes"
-       requirement_elm="ecore-wince ${requirement_elm}"
+       requirement_elm="ecore-wince >= 1.0.0 ${requirement_elm}"
       ],
       [have_elementary_wince="no"]
    )
@@ -315,14 +319,14 @@ AC_ARG_ENABLE([edbus],
 if test "x$want_elementary_edbus" != "xno"; then
     PKG_CHECK_MODULES([ELEMENTARY_EDBUS],
        [
-        edbus
-        ehal
+        edbus >= 1.0.0
+        ehal >= 1.0.0
        ],
        [
         AC_DEFINE(HAVE_ELEMENTARY_EDBUS, 1, [EDBus support for Elementary])
         have_elementary_edbus="yes"
         ELM_EDBUS_DEF="#define"
-        requirement_elm="ehal edbus ${requirement_elm}"
+        requirement_elm="ehal >= 1.0.0 edbus >= 1.0.0 ${requirement_elm}"
        ],
        [have_elementary_edbus="no"]
     )
@@ -344,15 +348,15 @@ AC_ARG_ENABLE([efreet],
 if test "x$want_elementary_efreet" != "xno"; then
     PKG_CHECK_MODULES([ELEMENTARY_EFREET],
        [
-        efreet
-        efreet-mime
-        efreet-trash
+        efreet >= 1.0.0
+        efreet-mime >= 1.0.0
+        efreet-trash >= 1.0.0
        ],
        [
         AC_DEFINE(HAVE_ELEMENTARY_EFREET, 1, [Efreet support for Elementary])
         have_elementary_efreet="yes"
         ELM_EFREET_DEF="#define"
-        requirement_elm="efreet efreet-mime efreet-trash ${requirement_elm}"
+        requirement_elm="efreet >= 1.0.0 efreet-mime >= 1.0.0 efreet-trash >= 1.0.0 ${requirement_elm}"
        ],
        [have_elementary_efreet="no"]
     )
@@ -436,7 +440,7 @@ if test "x$want_elementary_ethumb" != "xno"; then
         AC_DEFINE(HAVE_ELEMENTARY_ETHUMB, 1, [Ethumb support for Elementary])
         have_elementary_ethumb="yes"
         ELM_ETHUMB_DEF="#define"
-        requirement_elm="ethumb ${requirement_elm}"
+        requirement_elm="ethumb_client ${requirement_elm}"
        ],
        [have_elementary_ethumb="no"]
     )

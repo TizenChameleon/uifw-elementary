@@ -1,7 +1,3 @@
-/*
- *
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
- */
 #include <Elementary.h>
 #include "elm_priv.h"
 	
@@ -271,11 +267,12 @@ struct _Widget_Data
    Eina_Bool bring_in : 1;
    Eina_Bool compress : 1;
    Eina_Bool homogeneous : 1;
-   Eina_Bool selct_all : 1;
-
+   Eina_Bool clear_me : 1;
+   int walking;
    int item_width;
    int item_height;
    int max_items_per_block;
+   double longpress_timeout;
    int edit_mode;
    Eina_Bool animate_edit_controls :1;
    Edit_Data *ed;
@@ -288,6 +285,7 @@ struct _Widget_Data
    Eina_Bool multi_down : 1;
    Eina_Bool multi_touch : 1;
    Eina_List *edit_field;
+   Eina_Bool selct_all : 1;
 };
 struct _Edit_Data
 {
@@ -591,6 +589,7 @@ static void
 _item_del(Elm_Genlist_Item *it)
 {
    elm_genlist_item_subitems_clear(it);
+   it->wd->walking -= it->walking;
    if (it->wd->show_item == it) it->wd->show_item = NULL;
    if (it->selected) it->wd->selected = eina_list_remove(it->wd->selected, it);
    if (it->realized) _item_unrealize(it);
@@ -624,13 +623,20 @@ _item_select(Elm_Genlist_Item *it)
    it->wd->selected = eina_list_append(it->wd->selected, it);
    call:
    it->walking++;
+   it->wd->walking++;
    if (it->func.func) it->func.func((void *)it->func.data, it->wd->obj, it);
    if (!it->delete_me)
      evas_object_smart_callback_call(it->wd->obj, "selected", it);
    it->walking--;
-   if ((it->walking == 0) && (it->delete_me))
+   it->wd->walking--;
+   if ((it->wd->clear_me) && (it->wd->walking == 0))
+      elm_genlist_clear(it->wd->obj);
+   else
      {
-        if (it->relcount == 0) _item_del(it);
+        if ((it->walking == 0) && (it->delete_me))
+          {
+             if (it->relcount == 0) _item_del(it);
+          }
      }
 }
 
@@ -711,6 +717,7 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
         if (!it->wd->on_hold)
           {
              it->wd->on_hold = EINA_TRUE;
+             if (!it->wd->wasselected)
              _item_unselect(it);
           }
      }
@@ -774,7 +781,6 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
           }
         if (!it->wd->wasselected)
           _item_unselect(it);
-        it->wd->wasselected = 0;
         if (dy < 0)
           {
              if (ady > adx)
@@ -819,16 +825,16 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
      }
 }
 
-static int
+static Eina_Bool
 _long_press(void *data)
 {
    Elm_Genlist_Item *it = data;
 
    it->long_timer = NULL;
-   if ((it->disabled) || (it->dragging)) return 0;
+   if ((it->disabled) || (it->dragging)) return ECORE_CALLBACK_CANCEL;
    it->wd->longpressed = EINA_TRUE;
    evas_object_smart_callback_call(it->wd->obj, "longpressed", it);
-   return 0;
+   return ECORE_CALLBACK_CANCEL;
 }
 
 static int
@@ -1028,7 +1034,7 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
      evas_object_smart_callback_call(it->wd->obj, "clicked", it);
    if (it->long_timer) ecore_timer_del(it->long_timer);
    if (it->realized)
-     it->long_timer = ecore_timer_add(1.0, _long_press, it);
+     it->long_timer = ecore_timer_add(it->wd->longpress_timeout, _long_press, it);
    else
      it->long_timer = NULL;
 }
@@ -1740,7 +1746,7 @@ _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *
 
 	   if (!it->wd->selct_all && it->wd->ed->ec->item_selected)
 	  {
-		  it->wd->ed->ec->item_selected(it->data, it->wd->obj);
+		  it->wd->ed->ec->item_selected(it->data, it, it->delete_check);
 	  }
 	  return;
   }
@@ -1752,7 +1758,7 @@ _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *
 
   if (!it->wd->selct_all && it->wd->ed->ec->item_selected)
   {
-	  it->wd->ed->ec->item_selected(it->data, it->wd->obj);
+	  it->wd->ed->ec->item_selected(it->data, it, it->delete_check);
   }
 
   del_conf_style = edje_object_data_get(it->edit_obj, "del_button_style");
@@ -1977,7 +1983,7 @@ _select_all_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *even
 
   if (wd->ed->ec->item_selected)
   {
-	  wd->ed->ec->item_selected(NULL, wd->obj);
+	  wd->ed->ec->item_selected(NULL, it, wd->selct_all);
   }
 
    if (wd->calc_job) ecore_job_del(wd->calc_job);
@@ -2750,6 +2756,7 @@ elm_genlist_add(Evas_Object *parent)
    wd->obj = obj;
    wd->mode = ELM_LIST_SCROLL;
    wd->max_items_per_block = 32;
+   wd->longpress_timeout = 1.0;
 
    evas_object_smart_callback_add(obj, "scroll-hold-on", _hold_on, obj);
    evas_object_smart_callback_add(obj, "scroll-hold-off", _hold_off, obj);
@@ -2995,7 +3002,7 @@ _queue_proecess(Widget_Data *wd, int norender)
    return n;
 }
 
-static int
+static Eina_Bool
 _item_idler(void *data)
 {
    Widget_Data *wd = data;
@@ -3008,9 +3015,9 @@ _item_idler(void *data)
    if (!wd->queue)
      {
 	wd->queue_idler = NULL;
-	return 0;
+	return ECORE_CALLBACK_CANCEL;
      }
-   return 1;
+   return ECORE_CALLBACK_RENEW;
 }
 
 static void
@@ -3447,6 +3454,19 @@ elm_genlist_clear(Evas_Object *obj)
      {
 	_groupitem_remove((Elm_Genlist_GroupItem *)wd->group_items, EINA_FALSE);
      }
+
+   if (wd->walking > 0)
+     {
+	Elm_Genlist_Item *it;
+        
+        wd->clear_me = 1;
+        EINA_INLIST_FOREACH(wd->items, it)
+          {
+             it->delete_me = 1;
+          }
+	return;
+     }
+   wd->clear_me = 0;
 
    while (wd->items)
      {
@@ -5033,4 +5053,38 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
      {
 	it->wd->edit_mode = 0;
      }
+}
+
+/**
+ * Set the timeout in seconds for the longpress event
+ * 
+ * @param obj The genlist object
+ * @param timeout timeout in seconds
+ * 
+ * @ingroup Genlist
+ */
+EAPI void
+elm_genlist_longpress_timeout_set(const Evas_Object *obj, double timeout)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->longpress_timeout = timeout;
+}
+
+/**
+ * Get the timeout in seconds for the longpress event
+ * 
+ * @param obj The genlist object
+ * @return timeout in seconds
+ * 
+ * @ingroup Genlist
+ */
+EAPI double
+elm_genlist_longpress_timeout_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return 0;
+   return wd->longpress_timeout;
 }

@@ -115,6 +115,7 @@ struct _Widget_Data
    Evas_Coord cx, cy, cw, ch;
    Eina_List *items;
    Eina_List *item_providers;
+   Ecore_Job *hovdeljob;
    Mod_Api *api; // module api if supplied
    int max_no_of_bytes;
    Eina_Bool changed : 1;
@@ -243,6 +244,7 @@ _del_hook(Evas_Object *obj)
    Elm_Entry_Context_Menu_Item *it;
    Elm_Entry_Item_Provider *ip;
 
+   if (wd->hovdeljob) ecore_job_del(wd->hovdeljob);
    if ((wd->api) && (wd->api->obj_unhook)) wd->api->obj_unhook(obj); // module - unhook
 
    entries = eina_list_remove(entries, obj);
@@ -415,6 +417,14 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 }
 
 static void
+_signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_signal_emit(wd->ent, emission, source);
+}
+
+static void
 _hoversel_position(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -461,10 +471,24 @@ _resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event
 }
 
 static void
-_dismissed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_hover_del(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
+   
+   if (wd->hoversel)
+     {
+        evas_object_del(wd->hoversel);
+        wd->hoversel = NULL;
+     }
+   wd->hovdeljob = NULL;
+}
+
+static void
+_dismissed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return; 
    if (wd->hoversel) evas_object_hide(wd->hoversel);
    if (wd->selmode)
      {
@@ -472,6 +496,8 @@ _dismissed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
           edje_object_part_text_select_allow_set(wd->ent, "elm.text", 1);
      }
    elm_widget_scroll_freeze_pop(data);
+   if (wd->hovdeljob) ecore_job_del(wd->hovdeljob);
+   wd->hovdeljob = ecore_job_add(_hover_del, data);
 }
 
 static void
@@ -563,14 +589,14 @@ _item_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED
    if (it->func) it->func(it->data, obj2, NULL);
 }
 
-static int
+static Eina_Bool
 _long_press(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Object *top;
    const Eina_List *l;
    const Elm_Entry_Context_Menu_Item *it;
-   if (!wd) return 0;
+   if (!wd) return ECORE_CALLBACK_CANCEL;
    if ((wd->api) && (wd->api->obj_longpress))
      {
         wd->api->obj_longpress(data);
@@ -637,7 +663,7 @@ _long_press(void *data)
      }
    wd->longpress_timer = NULL;
    evas_object_smart_callback_call(data, SIG_LONGPRESSED, NULL);
-   return 0;
+   return ECORE_CALLBACK_CANCEL;
 }
 
 static void
@@ -784,6 +810,10 @@ _str_append(char *str, const char *txt, int *len, int *alloc)
    return str;
 }
 
+/*FIXME: Sholud be implemented somewhere else, it really depends on the context
+ * because some markups can be implemented otherwise according to style.
+ * probably doing it in textblock and making it translate according to it's
+ * style is correct. */
 static char *
 _strncpy(char* dest, const char* src, size_t count)
 {
@@ -844,6 +874,8 @@ _mkup_to_text(const char *mkup)
 			 str = _str_append(str, "\t", &str_len, &str_alloc);
 		       else if (!strcmp(ttag, "\\t"))
 			 str = _str_append(str, "\t", &str_len, &str_alloc);
+		       else if (!strcmp(ttag, "ps")) /* Unicode paragraph separator */
+			 str = _str_append(str, "\xE2\x80\xA9", &str_len, &str_alloc);
 		       free(ttag);
 		    }
 		  tag_start = tag_end = NULL;
@@ -1008,23 +1040,17 @@ _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emi
      }
    wd->have_selection = EINA_TRUE;
    evas_object_smart_callback_call(data, SIG_SELECTION_START, NULL);
+#ifdef HAVE_ELEMENTARY_X
    if (wd->sel_notify_handler)
      {
-	char *txt = _mkup_to_text(elm_entry_selection_get(data));
+	const char *txt = elm_entry_selection_get(data);
+	Evas_Object *top;
 
-	if (txt)
-	  {
-#ifdef HAVE_ELEMENTARY_X
-	     Evas_Object *top;
-
-	     top = elm_widget_top_get(data);
-	     if ((top) && (elm_win_xwindow_get(top)))
-	       ecore_x_selection_primary_set(elm_win_xwindow_get(top), txt,
-                                             strlen(txt));
-#endif
-	     free(txt);
-	  }
+	top = elm_widget_top_get(data);
+	if ((top) && (elm_win_xwindow_get(top)))
+	     elm_selection_set(ELM_SEL_PRIMARY, data, ELM_SEL_MARKUP, txt);
      }
+#endif
 }
 
 static void
@@ -1034,23 +1060,8 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
    if (!wd) return;
    wd->have_selection = EINA_TRUE;
    evas_object_smart_callback_call(data, SIG_SELECTION_CHANGED, NULL);
-   if (wd->sel_notify_handler)
-     {
-	char *txt = _mkup_to_text(elm_entry_selection_get(data));
-
-	if (txt)
-	  {
-#ifdef HAVE_ELEMENTARY_X
-	     Evas_Object *top;
-
-	     top = elm_widget_top_get(data);
-	     if ((top) && (elm_win_xwindow_get(top)))
-	       ecore_x_selection_primary_set(elm_win_xwindow_get(top), txt,
-                                             strlen(txt));
-#endif
-	     free(txt);
-	  }
-     }
+   elm_selection_set(ELM_SEL_PRIMARY, obj, ELM_SEL_MARKUP,
+		   elm_entry_selection_get(data));
 }
 
 static void
@@ -1070,17 +1081,8 @@ _signal_selection_cleared(void *data, Evas_Object *obj __UNUSED__, const char *e
 
 	     top = elm_widget_top_get(data);
 	     if ((top) && (elm_win_xwindow_get(top)))
-	       {
-		  char *t;
-
-		  t = _mkup_to_text(wd->cut_sel);
-		  if (t)
-		    {
-		       ecore_x_selection_primary_set(elm_win_xwindow_get(top),
-                                                     t, strlen(t));
-		       free(t);
-		    }
-	       }
+	         elm_selection_set(ELM_SEL_PRIMARY, data, ELM_SEL_MARKUP,
+				       wd->cut_sel);
 #endif
 	     eina_stringshare_del(wd->cut_sel);
 	     wd->cut_sel = NULL;
@@ -1092,7 +1094,7 @@ _signal_selection_cleared(void *data, Evas_Object *obj __UNUSED__, const char *e
 
 	     top = elm_widget_top_get(data);
 	     if ((top) && (elm_win_xwindow_get(top)))
-	       ecore_x_selection_primary_clear();
+		elm_selection_clear(ELM_SEL_PRIMARY, data);
 #endif
 	  }
      }
@@ -1278,13 +1280,14 @@ _signal_mouse_double(void *data, Evas_Object *obj __UNUSED__, const char *emissi
 }
 
 #ifdef HAVE_ELEMENTARY_X
-static int
+static Eina_Bool
 _event_selection_notify(void *data, int type __UNUSED__, void *event)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Ecore_X_Event_Selection_Notify *ev = event;
-   if (!wd) return 1;
-   if (!wd->selection_asked) return 1;
+   if (!wd) return ECORE_CALLBACK_PASS_ON;
+   if (!wd->selection_asked) return ECORE_CALLBACK_PASS_ON;
+
    if ((ev->selection == ECORE_X_SELECTION_CLIPBOARD) ||
        (ev->selection == ECORE_X_SELECTION_PRIMARY))
      {
@@ -1309,8 +1312,8 @@ _event_selection_notify(void *data, int type __UNUSED__, void *event)
    return ECORE_CALLBACK_PASS_ON;
 }
 
-static int
-_event_selection_clear(void *data, int type __UNUSED__, void *event)
+static Eina_Bool
+_event_selection_clear(void *data __UNUSED__, int type __UNUSED__, void *event __UNUSED__)
 {
 /*
    Widget_Data *wd = elm_widget_data_get(data);
@@ -1328,7 +1331,7 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 #endif
 
 static Evas_Object *
-_get_item(void *data, Evas_Object *edje, const char *part, const char *item)
+_get_item(void *data, Evas_Object *edje __UNUSED__, const char *part __UNUSED__, const char *item)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Object *o;
@@ -1799,6 +1802,7 @@ elm_entry_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
+   elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
    elm_widget_can_focus_set(obj, 1);
 
    wd->linewrap     = EINA_TRUE;

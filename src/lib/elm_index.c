@@ -236,10 +236,11 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
         o = edje_object_add(evas_object_evas_get(obj));
         it->base = o;
         if (i & 0x1)
-          _elm_theme_object_set(obj, o, "index", "item_odd/vertical", "default");
+          _elm_theme_object_set(obj, o, "index", "item_odd/vertical", elm_widget_style_get(obj));
         else
-          _elm_theme_object_set(obj, o, "index", "item/vertical", "default");
-
+          //_elm_theme_object_set(obj, o, "index", "item/vertical", "default");
+          _elm_theme_object_set(obj, o, "index", "item/vertical", elm_widget_style_get(obj));
+        edje_object_part_text_set(o, "elm.text", it->letter);
         edje_object_size_min_restricted_calc(o, &mw, &mh, 0, 0);
         evas_object_size_hint_weight_set(o, 1.0, 1.0);
         evas_object_size_hint_align_set(o, -1.0, -1.0);
@@ -292,16 +293,16 @@ _index_box_clear(Evas_Object *obj, Evas_Object *box __UNUSED__, int level)
    wd->level_active[level] = 0;
 }
 
-static int
+static Eina_Bool
 _delay_change(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    void *d;
-   if (!wd) return 0;
+   if (!wd) return ECORE_CALLBACK_CANCEL;
    wd->delay = NULL;
    d = (void *)elm_index_item_selected_get(data, wd->level);
    if (d) evas_object_smart_callback_call(data, "delay,changed", d);
-   return 0;
+   return ECORE_CALLBACK_CANCEL;
 }
 
 static void
