@@ -338,6 +338,12 @@ elm_pager_content_pop(Evas_Object *obj)
 	  }
      }
 }
+static void
+_del_job(void *data)
+{
+   Evas_Object *obj = data;
+   evas_object_del(obj);
+}
 
 /**
  * Pop to the object that is on the stack
@@ -364,25 +370,21 @@ elm_pager_to_content_pop(Evas_Object *obj, Evas_Object *content)
    ll = eina_list_last(wd->stack);
    if (ll)
      {
-       EINA_LIST_FOREACH(wd->stack, ll, it)
-	  {
-	    if (it->content == content)
-	      {
-	      	 ll = eina_list_last(wd->stack);
-		 while (ll = ll->prev)
-		 {
-		   if (ll->data == it) break;
-		   else 
-		   {
-		     Item *itdel = ll->data;
-		     evas_object_del(itdel->content);
-		   }
-		 }
-		 elm_pager_content_promote(obj, content);   
-		 return;
-	      }
-          }
+       while(ll)
+   			{
+   				it = ll->data;
+				if(it->content != content)
+					{
+						wd->stack = eina_list_remove_list(wd->stack, ll);
+						ecore_job_add(_del_job, it->content);
+					}
+				else
+					break;
+				
+				ll = ll->prev;
+   			}
       }
+   _eval_top(it->obj);
 }
 
 /**
