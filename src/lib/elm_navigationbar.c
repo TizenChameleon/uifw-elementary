@@ -30,6 +30,7 @@ struct _Widget_Data
 	Eina_List *stack;
 	Evas_Object *base;
 	Evas_Object *pager;
+	Eina_Bool popped : 1;
  };
 
 struct _Item
@@ -321,8 +322,20 @@ static void
 _back_button_clicked(void *data, Evas_Object *obj, void *event_info)
 {
 	Item *it = data;	
-	elm_navigationbar_pop(it->obj);
+	Widget_Data *wd =  elm_widget_data_get(it->obj);
+	if(wd->popped)
+		elm_navigationbar_pop(it->obj);
+	wd->popped = EINA_FALSE;
 }
+
+static void 
+_hide_finished(void *data, Evas_Object *obj, void *event_info)
+{
+	Evas_Object *navi_bar = data;	
+	Widget_Data *wd =  elm_widget_data_get(navi_bar);
+	wd->popped = EINA_TRUE;
+}
+
 
 static void
 _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
@@ -476,7 +489,8 @@ elm_navigationbar_add(Evas_Object *parent)
 
 	wd->pager = elm_pager_add(obj);
 	elm_widget_sub_object_add(obj, wd->pager);
-	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->pager);	
+	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->pager);
+	evas_object_smart_callback_add(wd->pager, "hide,finished", _hide_finished, obj);	
 	evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
    	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);	
