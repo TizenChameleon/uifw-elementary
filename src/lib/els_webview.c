@@ -3323,23 +3323,21 @@ _geolocation_permission_callback(void *geolocation_obj, const char* url)
 
    Evas_Object *popup;
    int length;
-   char msg1[] = "The page at ";
-   char msg2[] = "<br>wants to know where you are.<br>Do you want to share location?";
    char *msg = NULL;
+   char msg2[] = " is requesting your current location.";
    int result;
 
-   length = strlen(msg1) + strlen(url) + strlen(msg2);
+   length = strlen(url) + strlen(msg2);
    msg = calloc(length + 1, sizeof(char));
-   strncpy(msg, msg1, strlen(msg1));
-   strncat(msg, url, strlen(url));
+   strncpy(msg, url, strlen(url));
    strncat(msg, msg2, strlen(msg2));
    msg[length] = '\0';
 
    popup = elm_popup_add(obj);
    evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_popup_desc_set(popup, msg);
-   elm_popup_buttons_add(popup, 2, "Share", ELM_POPUP_RESPONSE_OK,
-	                           "Don't Share", ELM_POPUP_RESPONSE_CANCEL, NULL);
+   elm_popup_buttons_add(popup, 2, "Allow", ELM_POPUP_RESPONSE_OK,
+	                           "Deny", ELM_POPUP_RESPONSE_CANCEL, NULL);
    result = elm_popup_run(popup); // modal dialog
    switch (result)
      {
