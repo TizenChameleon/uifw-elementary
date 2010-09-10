@@ -30,6 +30,7 @@ struct _Widget_Data
 	Eina_List *stack;
 	Evas_Object *base;
 	Evas_Object *pager;
+	Eina_Bool popped : 1;
  };
 
 struct _Item
@@ -226,14 +227,20 @@ _transition_complete_cb(void *data)
 	{
 	Transit_Cb_Data *cb = data;
 	if (!cb) return;
-
+	Evas_Object *navi_bar = NULL;
+	Evas_Object *content = NULL;
 	Widget_Data *wd = NULL;
 	Item *prev_it = cb->prev_it;
 	Item *it = cb->it;
 
-	if (prev_it) wd = elm_widget_data_get(prev_it->obj);
-	else if (it) wd = elm_widget_data_get(it->obj);
-
+	if (prev_it) {
+			 navi_bar = prev_it->obj;
+		}
+	else if (it){
+			navi_bar = it->obj;
+		}
+	
+	wd = elm_widget_data_get(navi_bar);
 	if (cb->pop && prev_it)
 	{
 		Eina_List *ll;
@@ -305,17 +312,48 @@ _transition_complete_cb(void *data)
 		{
 			edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
 		}
+		content = it->content;
 	}
 	edje_object_message_signal_process(wd->base);
-	evas_object_smart_callback_call(it->obj, "updated", it->content);
+	evas_object_smart_callback_call(navi_bar, "updated", content);
 }
 
 static void 
 _back_button_clicked(void *data, Evas_Object *obj, void *event_info)
 {
 	Item *it = data;	
-	elm_navigationbar_pop(it->obj);
+	Widget_Data *wd =  elm_widget_data_get(it->obj);
+	if(wd->popped)
+		elm_navigationbar_pop(it->obj);
+	wd->popped = EINA_FALSE;
 }
+
+static void 
+_hide_finished(void *data, Evas_Object *obj, void *event_info)
+{
+	Evas_Object *navi_bar = data;	
+	Widget_Data *wd =  elm_widget_data_get(navi_bar);
+	wd->popped = EINA_TRUE;
+}
+
+
+static void
+_sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Object *sub = event_info;
+   Eina_List *l;
+   Item *it;
+   if (!wd) return;
+   
+	if (wd->pager == sub)
+	  {
+	     wd->stack = eina_list_remove_list(wd->stack, l);
+	     evas_object_del(wd->base);
+	     return;
+	  }
+}
+
 
 static int
 _set_button_width(Evas_Object *obj)
@@ -451,7 +489,9 @@ elm_navigationbar_add(Evas_Object *parent)
 
 	wd->pager = elm_pager_add(obj);
 	elm_widget_sub_object_add(obj, wd->pager);
-	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->pager);	
+	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->pager);
+	evas_object_smart_callback_add(wd->pager, "hide,finished", _hide_finished, obj);	
+	evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
    	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);	
 
@@ -602,13 +642,10 @@ elm_navigationbar_pop(Evas_Object *obj)
 	{
 		prev_it = ll->data;
 		ll = ll->prev;
-		while (ll) 
-		{
-			it = ll->data;
-			if (it->obj) break;  
-			it = NULL;
-			ll = ll->prev;
-		}
+		if(ll)
+			{
+				it = ll->data;
+			}
 	}
 	
 	//unswallow items and start trasition
@@ -635,6 +672,11 @@ elm_navigationbar_pop(Evas_Object *obj)
 	_transition_complete_cb(cb);
 	//pop content from pager
 	elm_pager_content_pop(wd->pager);
+	if(prev_it && !it)
+		{
+			printf("\n\nconditions met\n");
+			evas_object_del(wd->pager);
+		}
 	free(cb);
 }
 	
@@ -726,8 +768,12 @@ elm_navigationbar_title_label_set(Evas_Object *obj,
 	{
 		if (it->content == content) 
 		{
-		   eina_stringshare_replace(&it->title, title);
-   			edje_object_part_text_set(wd->base, "elm.text", title);
+			if(!title)
+				{
+					edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+				}			
+			eina_stringshare_replace(&it->title, title);
+			edje_object_part_text_set(wd->base, "elm.text", title);
 			_item_sizing_eval(it);
 			break;
 		}
@@ -818,6 +864,7 @@ elm_navigationbar_title_object_add(Evas_Object *obj,
 			}
 		}
 	}
+	_item_sizing_eval(it);
 }
 
 /**

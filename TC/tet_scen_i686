@@ -1,0 +1,37 @@
+all
+	"Test all XO frameworks"
+
+	^mediaplayer
+	^camcorder
+	^sound
+	^attrs
+
+##### Scenarios for the frameworks ######
+
+# Multimedia
+elm
+        :include:/elm_ts/imageslider/tslist
+        :include:/elm_ts/colorpalette/tslist
+        :include:/elm_ts/gengrid/tslist
+        :include:/elm_ts/pagecontrol/tslist
+        :include:/elm_ts/selectioninfo/tslist
+        :include:/elm_ts/popup/tslist
+	
+
+#yhkim
+ch 
+	/telephony-framework/sim/unit/uts_tapi_verify_chv
+pn 
+	/telephony-framework/sim/unit/uts_tapi_change_pin1
+cn 
+	/telephony-framework/sim/unit/uts_tapi_pb_get_storage_count
+in 
+	/telephony-framework/sim/unit/uts_tapi_pb_entry_info
+ac 
+	/telephony-framework/sim/unit/uts_tapi_pb_read_access
+ma 
+	/telephony-framework/sim/unit/uts_tapi_pb_rec_modify_access
+da 
+	/telephony-framework/sim/unit/uts_tapi_pb_delete_access
+if 
+	/telephony-framework/sim/unit/uts_tapi_pb_capability_info

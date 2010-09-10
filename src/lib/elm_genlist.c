@@ -274,6 +274,7 @@ struct _Widget_Data
    int max_items_per_block;
    double longpress_timeout;
    int edit_mode;
+   int select_all_minh;
    Eina_Bool animate_edit_controls :1;
    Edit_Data *ed;
 
@@ -1542,8 +1543,13 @@ _item_realize(Elm_Genlist_Item *it, int in, int calc)
    it->want_unrealize = EINA_FALSE;
    if(it->group_item && !it->group_item->realized)
      _groupitem_realize(it->group_item);
-   if( ELM_GENLIST_EDIT_MODE_NONE != it->wd->edit_mode )
-     _edit_controls_eval(it);
+   if( ELM_GENLIST_EDIT_MODE_NONE != it->wd->edit_mode ) 
+   {
+	Evas_Object *icon;
+	EINA_LIST_FREE(it->edit_icon_objs, icon)
+	evas_object_del(icon);
+	_edit_controls_eval(it);
+   }
 }
 
 static void
@@ -1724,7 +1730,7 @@ _hide_delete_confirm_object (void *data, Evas_Object *obj, const char *emission,
 static void
 _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-  const char *del_icon_part, *del_conf_style;
+  const char *del_conf_style;
   Elm_Genlist_Item *it = data;
   if(_edit_mode_reset( it->wd ))
      return;
@@ -1848,7 +1854,6 @@ static void
 _reorder_mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
   Elm_Genlist_Item *it = data;
-  Evas_Event_Mouse_Up *ev = event_info;
   
   Item_Block *itb;
    EINA_INLIST_FOREACH(it->wd->blocks, itb)
@@ -1950,8 +1955,6 @@ _select_all_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *even
    Widget_Data *wd = it->wd;
    if (!wd) return;
 
-   Eina_List *realized_list = elm_genlist_realized_items_get(wd->obj);
-
 	if(!wd->selct_all) 
 		edje_object_signal_emit(it->base, "elm,state,del_confirm", "elm");
 	else
@@ -2010,6 +2013,8 @@ _edit_controls_eval( Elm_Genlist_Item *it )
     it->pad_left = 0;
     it->pad_right = 0;
     Evas_Object *icon;
+    char buf[1024];
+
     if( it->wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE && !it->edit_obj )
       return;
 
@@ -2028,7 +2033,21 @@ _edit_controls_eval( Elm_Genlist_Item *it )
 	       _elm_config->scale);
 	 evas_object_smart_member_add(it->edit_obj, it->wd->pan_smart);
 	 elm_widget_sub_object_add(it->wd->obj, it->edit_obj);
-	 _elm_theme_object_set(it->wd->obj, it->edit_obj, "genlist", "item/edit_control", elm_widget_style_get(it->wd->obj));
+	 if (it->flags & ELM_GENLIST_ITEM_SUBITEMS) strncpy(buf, "tree", sizeof(buf));
+	 else strncpy(buf, "item", sizeof(buf));
+	 if (it->wd->compress) strncat(buf, "_compress", sizeof(buf) - strlen(buf));
+	 // if (in & 0x1) strncat(buf, "_odd", sizeof(buf) - strlen(buf));
+	 strncat(buf, "/", sizeof(buf) - strlen(buf));
+	 
+	 if(it->wd->ed->ec->item_style && strcmp(it->wd->ed->ec->item_style, "default")) 
+	   {
+	      strncat(buf, it->wd->ed->ec->item_style, sizeof(buf) - strlen(buf));
+	      _elm_theme_object_set(it->wd->obj, it->edit_obj, "genlist", buf, elm_widget_style_get(it->wd->obj));
+	   }
+	 else
+	   {
+	      _elm_theme_object_set(it->wd->obj, it->edit_obj, "genlist", "item/edit_control", elm_widget_style_get(it->wd->obj));
+	   }
 
 	 edje_object_signal_callback_add(it->edit_obj, "elm,action,edit,reset",
 	       "elm", _edit_mode_reset, it);
@@ -2066,13 +2085,18 @@ _edit_controls_eval( Elm_Genlist_Item *it )
 	 else
 	   edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
 
+	 edje_object_signal_callback_del(it->edit_obj, "elm,action,item,delete",
+	       "elm", _remove_item_cb );
+	 edje_object_signal_callback_del(it->edit_obj, "elm,action,hide,del_confirm",
+	       "elm", _hide_delete_confirm_object );
+    
 	 edje_object_signal_callback_add(it->edit_obj, "elm,action,item,delete",
 	       "elm", _remove_item_cb, it);
 
 	 edje_object_signal_callback_add(it->edit_obj, "elm,action,hide,del_confirm",
 	       "elm", _hide_delete_confirm_object, it );
 	 it->pad_left += pad;
-    evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
+	 evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
 		    _reorder_mouse_down, it);
       }
     else
@@ -2099,6 +2123,13 @@ _edit_controls_eval( Elm_Genlist_Item *it )
 	   {
 	      reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part );
 
+	      evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
+		    _reorder_mouse_down);
+	      evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_UP,
+		    _reorder_mouse_up);
+	      evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_MOVE,
+		    _reorder_mouse_move);
+         
 	      evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
 		    _reorder_mouse_down, it);
 	      evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_UP,
@@ -2243,16 +2274,21 @@ _item_block_position(Item_Block *itb, int in)
    evas_object_geometry_get(itb->wd->pan_smart, &ox, &oy, &ow, &oh);
    evas_output_viewport_get(evas_object_evas_get(itb->wd->obj), &cvx, &cvy, &cvw, &cvh);
 
-	if(itb->wd->select_all_item) {
-		select_all_item = itb->wd->select_all_item;
+   if(itb->wd->select_all_item) 
+   {
+	select_all_item = itb->wd->select_all_item;
 		
-        evas_object_resize(select_all_item->base, itb->w,  select_all_item->h);
-		evas_object_move(select_all_item->base, 0, oy);
-		evas_object_raise(select_all_item->base);
-		evas_object_show(select_all_item->base);
-
-   	    y = select_all_item->h;
+	evas_object_resize(select_all_item->base, itb->w,  select_all_item->h);  
+	evas_object_move(select_all_item->base, 0, oy);
+	evas_object_raise(select_all_item->base);
+	evas_object_show(select_all_item->base);
+   
+	if(itb->wd->select_all_minh != itb->wd->minh) 
+	{
+            itb->wd->minh += select_all_item->h;
 	}	
+	y = select_all_item->h;
+   }
 
    EINA_LIST_FOREACH(itb->items, l, it)
      {
@@ -4772,7 +4808,10 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
 
    if (wd->edit_mode & ELM_GENLIST_EDIT_MODE_SELECTALL)
      {
-	itc.item_style = "select_all";
+      if(edit_class->select_all_item_style && strcmp(edit_class->select_all_item_style, "default"))
+         itc.item_style = edit_class->select_all_item_style;
+      else
+			itc.item_style = "select_all";
 	itc.func.label_get = NULL;
 	itc.func.icon_get = NULL;
 	itc.func.del = NULL;
@@ -4790,7 +4829,7 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
 	wd->select_all_item->selected = 0;
 	wd->select_all_item->before = 1;
 	wd->select_all_item->block = NULL;
-
+	wd->select_all_minh = wd->minh + wd->select_all_item->h;
      }
    else
      {
@@ -4834,22 +4873,32 @@ elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it)
 EAPI void
 elm_genlist_edit_selected_items_del(Evas_Object *obj)
 {
-   Elm_Genlist_Item *it;
-   Eina_List *l, *realized_list;
-   Item_Block *itb;
+  Elm_Genlist_Item *it;
+   Eina_List *l;
+   Item_Block *itb = NULL;
 
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-
+   if(!wd->blocks) return;
+   
    EINA_INLIST_FOREACH(wd->blocks, itb)
      {
-	if (itb->realized)
+	if(!wd->blocks) break;
+	
+	if (itb && itb->realized)
 	  {
 	     EINA_LIST_FOREACH(itb->items, l, it)
 	       {
 		  if (it->delete_check)
-		    elm_genlist_item_del( it );
+		    {
+             if(!wd->selct_all) 
+             {
+		       	itb->wd->minh -= it->h;
+		       	itb->wd->select_all_minh -= it->h;
+             }
+		       elm_genlist_item_del( it );
+		    }
 	       }
 	  }
      }
@@ -4935,6 +4984,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
    Evas_Object *editfield;
    Evas_Object *entry;
    int edit_field_cnt = 0;
+   Evas_Object *icon;   
 
    if (it->wd->edit_mode == ELM_GENLIST_EDIT_MODE_NONE)
      {
@@ -4988,6 +5038,8 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
 			    evas_object_del(it->edit_obj);
 			    it->edit_obj = NULL;
 			 }
+	       	EINA_LIST_FREE(it->edit_icon_objs, icon)
+				   evas_object_del(icon);
 		    }
 	       }
 	  }
@@ -5015,6 +5067,8 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
 		  it->renamed = EINA_TRUE;
 		  swallow_part_cnt = 0;
 
+	     EINA_LIST_FREE(it->edit_icon_objs, icon)
+		evas_object_del(icon);
 		  Eina_List *rename = _elm_stringlist_get(edje_object_data_get(it->edit_obj, "rename"));
 		  EINA_LIST_FOREACH(rename, l, rename_swallow_part)
 		    {

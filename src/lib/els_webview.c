@@ -6,7 +6,6 @@
 #include "elm_priv.h"
 
 #ifdef ELM_EWEBKIT
-#define SEC_KESSLER
 #include <EWebKit.h>
 #include <cairo.h>
 
@@ -50,7 +49,29 @@
 #define ZOOM_IN_BOUNCING 1.25f
 #define BOUNCING_DISTANCE 400
 
-//			"<!--<body bgcolor=#4c4c4c text=white text-align=left>-->"
+#define NETWORK_FAIL_PAGE_HEADER "<html>" \
+			"<head><title>Network Failure</title></head>" \
+			"<body bgcolor=white text=black text-align=left>" \
+			"<center>" \
+			"<table>" \
+			"<tr><td><h1>Network Failure<br/></td></tr>" \
+			"<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>" \
+			"<tr><td>" \
+			"<script type='text/javascript'>"\
+			"var s = "
+
+#define NETWORK_FAIL_PAGE_FOOTER ";" \
+			"var failingUrl = s.substring(s.indexOf(\"?\"\)+1, s.lastIndexOf(\"?\"\));" \
+			"document.write(\"<p><tr><td><h2>URL: \" + unescape(failingUrl) + \"</h2></td></tr>\");" \
+			"var errorDesc = s.substring(s.lastIndexOf(\"?\")+1, s.length);" \
+			"document.write(\"<tr><td><h2>Error: \" + unescape(errorDesc) + \"</h2></td></tr>\");" \
+			"</script>" \
+			"</td></tr>" \
+			"</table>" \
+			"</h1>" \
+			"</body>" \
+			"</html>"
+
 #define NOT_FOUND_PAGE_HEADER "<html>" \
 			"<head><title>Page Not Found</title></head>" \
 			"<body bgcolor=white text=black text-align=left>" \
@@ -118,7 +139,7 @@ struct _Smart_Data {
 #endif
      Ecore_Job *move_calc_job;
      Ecore_Job *resize_calc_job;
-     Eina_Hash* mime_func_hash;
+     Eina_Hash* scheme_func_hash;
      int locked_dx;
      int locked_dy;
      unsigned char bounce_horiz : 1;
@@ -431,7 +452,7 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
 	_api.run_javascript_prompt = _smart_run_javascript_prompt;
 	_api.should_interrupt_javascript = _smart_should_interrupt_javascript;
 	_api.run_open_panel = _smart_run_open_panel;
-	//_api.navigation_policy_decision = _smart_navigation_policy_decision;
+	_api.navigation_policy_decision = _smart_navigation_policy_decision;
 
 	_smart = evas_smart_class_new(&_api.sc);
 	elm_theme_overlay_add(NULL, WEBVIEW_THEME_EDJ);
@@ -596,16 +617,16 @@ _elm_smart_webview_bounce_allow_set(Evas_Object* obj, Eina_Bool horiz, Eina_Bool
 }
 
 void
-_elm_smart_webview_mime_callback_set(Evas_Object* obj, const char *mime, Elm_WebView_Mime_Cb func)
+_elm_smart_webview_scheme_callback_set(Evas_Object* obj, const char *scheme, Elm_WebView_Mime_Cb func)
 {
    API_ENTRY return;
-   if (!sd->mime_func_hash)
-     sd->mime_func_hash = eina_hash_pointer_new(NULL);
+   if (!sd->scheme_func_hash)
+     sd->scheme_func_hash = eina_hash_pointer_new(NULL);
 
    if (!func)
-     eina_hash_del(sd->mime_func_hash, mime, func);
+     eina_hash_del(sd->scheme_func_hash, scheme, func);
    else
-     eina_hash_add(sd->mime_func_hash, mime, func);
+     eina_hash_add(sd->scheme_func_hash, scheme, func);
 }
 
 void
@@ -902,14 +923,16 @@ static Eina_Bool
 _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_Request *request)
 {
    char *protocol_hack;
+   Elm_WebView_Mime_Cb func = NULL;
    Smart_Data *sd = (Smart_Data*)esd;
-   if (!sd->mime_func_hash)
-     return EINA_FALSE;
 
-   protocol_hack = strstr(request->url, ":");
-   *protocol_hack = '\0';
-   Elm_WebView_Mime_Cb func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->mime_func_hash, request->url);
-   *protocol_hack = ':';
+   if (sd->scheme_func_hash)
+     {
+	protocol_hack = strstr(request->url, ":");
+	*protocol_hack = '\0';
+	func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->scheme_func_hash, request->url);
+	*protocol_hack = ':';
+     }
 
    if (!func)
      {
@@ -1020,7 +1043,30 @@ _smart_load_error(void* data, Evas_Object* webview, void* arg)
    // if error, call loadNotFoundPage
    Ewk_Frame_Load_Error *error = (Ewk_Frame_Load_Error *) arg;
    int errorCode = (error)? error->code: 0;
-   if ( errorCode != 0 && errorCode != -999 )
+   DBG("<< load error [code: %d] [domain: %s] [description: %s] [failing_url: %s] >>\n",
+	 error->code, error->domain, error->description, error->failing_url);
+   if ((errorCode <= -200 && errorCode >= -172))
+     {
+	if (!sd->ewk_view_stop)
+	  sd->ewk_view_stop = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_stop");
+	sd->ewk_view_stop(webview);
+
+	if (!sd->ewk_view_frame_main_get)
+	  sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+
+	if (!sd->ewk_frame_contents_set)
+	  sd->ewk_frame_contents_set = (Eina_Bool (*)(Evas_Object *, const char *, size_t, const char *, const char *, const char *))dlsym(ewk_handle, "ewk_frame_contents_set");
+
+	snprintf(szBuffer, 2048, NETWORK_FAIL_PAGE_HEADER "\"?%s?%s\"" NETWORK_FAIL_PAGE_FOOTER, error->failing_url, error->description);
+	sd->ewk_frame_contents_set(error->frame, szBuffer, 0, NULL, NULL, error->failing_url);
+
+	Evas_Object *popup = elm_popup_add(obj);
+	evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	elm_popup_desc_set(popup, error->description);
+	elm_popup_buttons_add(popup, 1, "OK", ELM_POPUP_RESPONSE_OK, NULL);
+	evas_object_show(popup);
+     }
+   else if (errorCode != 0 && errorCode != -999)
      { // 0 ok, -999 request cancelled
 	//char szStrBuffer[1024];
 	//snprintf(szStrBuffer, 1024, "page not found:, [code: %d] [domain: %s] [description: %s] [failing_url: %s] \n",
@@ -1156,7 +1202,8 @@ _smart_input_method_changed(void* data, Evas_Object* webview, void* arg)
 
    Ecore_IMF_Context* imContext = sd->ewk_view_core_imContext_get(webview);
    Eina_Bool active = (Eina_Bool)arg;
-   if (active && sd->mouse_clicked)
+   if(!sd->mouse_clicked) return;
+   if (active)
      {
 	static unsigned int lastImh = 0;//FIXME
 	if (sd->ewk_view_imh_get == NULL)
@@ -1181,6 +1228,7 @@ _smart_input_method_changed(void* data, Evas_Object* webview, void* arg)
 	     ecore_imf_context_client_canvas_set(imContext, evas_object_evas_get(sd->base.self));
 	     ecore_imf_context_input_panel_show (imContext);
 	  }
+	sd->mouse_clicked = EINA_FALSE;
      }
    else
      {

@@ -46,6 +46,16 @@ _parent_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	_sizing_eval(data);
 }
 
+static void 
+_drag_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+	static Evas_Coord_Point pt;
+	Widget_Data *wd = elm_widget_data_get(data);
+	edje_object_part_drag_value_get(wd->base, "elm.dragable.handler", &pt.x, &pt.y);
+	evas_object_smart_callback_call(data, "slidingdrawer,drag", (void*) &pt);
+}
+
+
 static void
 _sizing_eval(Evas_Object *obj)
 {
@@ -59,6 +69,8 @@ _sizing_eval(Evas_Object *obj)
 	evas_object_move(obj, x, y);
 	evas_object_resize(obj, w, h);
 
+	part = edje_object_part_object_get(wd->base, "elm.dragable.handler");
+	
 	if((wd->pos == ELM_SLIDINGDRAWER_TOP) || (wd->pos == ELM_SLIDINGDRAWER_BOTTOM)) {
 		edje_object_size_min_get(part, NULL, &h);
 	}else {
@@ -66,7 +78,6 @@ _sizing_eval(Evas_Object *obj)
 	}
 
 	evas_object_size_hint_min_set(wd->handler, w, h);
-
 }
 
 EAPI Evas_Object *
@@ -79,7 +90,7 @@ elm_slidingdrawer_content_unset(Evas_Object *obj)
 	wd = elm_widget_data_get(obj);
 
 	content = edje_object_part_swallow_get(wd->base, "elm.swallow.content");
-	if(!content) return;
+	if(!content) return NULL;
 	edje_object_part_unswallow(wd->base, content);
 	elm_widget_sub_object_del(obj, content);
 	return content;
@@ -146,7 +157,6 @@ EAPI Evas_Object *
 elm_slidingdrawer_add(Evas_Object *parent)
 {
 	Evas_Object *obj;
-	Evas_Object *handler;
 	Evas *e;
 	Widget_Data *wd;
 
@@ -173,9 +183,10 @@ elm_slidingdrawer_add(Evas_Object *parent)
 	//base
 	wd->base = edje_object_add(e);
 	_elm_theme_object_set(obj, wd->base, "slidingdrawer", "bottom", "default");
+	edje_object_signal_callback_add(wd->base, "drag", "*", _drag_cb, obj);
 	elm_widget_sub_object_add(obj, wd->base);
 	elm_widget_resize_object_set(obj, wd->base);
-
+	
 	//dragable_rect
 	wd->dragable_rect = evas_object_rectangle_add(e);
 	edje_object_part_swallow(wd->base, "elm.swallow.dragable_rect", wd->dragable_rect);
@@ -184,9 +195,9 @@ elm_slidingdrawer_add(Evas_Object *parent)
 	wd->handler = evas_object_rectangle_add(e);
 	evas_object_color_set(wd->handler, 0, 0, 0, 0);
 	edje_object_part_swallow(wd->base, "elm.dragable.handler", wd->handler);
-
+	
 	evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _parent_resize, obj);
-
+		
 	_sizing_eval(obj);
 
 	return obj;

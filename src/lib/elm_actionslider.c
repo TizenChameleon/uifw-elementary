@@ -34,6 +34,7 @@ struct _Widget_Data
 {
    Evas_Object	*as;		// actionslider
    Evas_Object	*icon;		// an icon for a button or a bar
+   Evas_Object	*icon_fake;		// an icon for a button or a bar
 
    // setting
    Elm_Actionslider_Magnet_Pos	magnet_position;
@@ -76,6 +77,11 @@ _del_hook(Evas_Object *obj)
 	evas_object_del(wd->icon);
 	wd->icon = NULL;
      }
+   if(wd->icon_fake) 
+     {
+	evas_object_del(wd->icon_fake);
+	wd->icon_fake = NULL;
+     }
    if (wd->text_left) 
      {
 	eina_stringshare_del(wd->text_left);
@@ -110,10 +116,16 @@ _theme_hook(Evas_Object *obj)
      {
 	edje_object_part_unswallow(wd->as, wd->icon);
      }
+   if (edje_object_part_swallow_get(wd->as, "elm.swallow.space") == NULL) 
+     {
+	edje_object_part_unswallow(wd->as, wd->icon_fake);
+     }
 
    _elm_theme_object_set(obj, wd->as, "actionslider", "base", elm_widget_style_get(obj));
    _elm_theme_object_set(obj, wd->icon, "actionslider", "icon", elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, wd->icon_fake, "actionslider", "icon", elm_widget_style_get(obj));
    edje_object_part_swallow(wd->as, "elm.swallow.icon", wd->icon);
+   edje_object_part_swallow(wd->as, "elm.swallow.space", wd->icon_fake);
    edje_object_part_text_set(wd->as, "elm.text.left", wd->text_left);
    edje_object_part_text_set(wd->as, "elm.text.right", wd->text_right);
    edje_object_part_text_set(wd->as, "elm.text.center", wd->text_center);
@@ -337,6 +349,11 @@ elm_actionslider_add(Evas_Object *parent)
    _elm_theme_object_set(obj, wd->icon, "actionslider", "icon", "default");
    edje_object_part_swallow(wd->as, "elm.swallow.icon", wd->icon);
 
+   wd->icon_fake = edje_object_add(e);
+   evas_object_smart_member_add(wd->icon_fake, obj);
+   _elm_theme_object_set(obj, wd->icon_fake, "actionslider", "icon", "default");
+   edje_object_part_swallow(wd->as, "elm.swallow.space", wd->icon_fake);
+
    // event callbacks
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    evas_object_event_callback_add(wd->icon, EVAS_CALLBACK_MOUSE_DOWN, _icon_down_cb, obj);
@@ -497,6 +514,7 @@ elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, con
 	     if (data_right) pad_right = atoi(data_right);
 
 	     evas_object_size_hint_min_set (wd->icon, w + pad_left + pad_right, 0);
+	     evas_object_size_hint_min_set (wd->icon_fake, w + pad_left + pad_right, 0);
 	  }
      }
 

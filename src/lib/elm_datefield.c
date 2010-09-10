@@ -581,23 +581,28 @@ _date_update(Evas_Object *obj)
 	sprintf(str, "%d", wd->day);
 	elm_entry_entry_set(wd->date[DATE_DAY], str);
 
-	if (wd->hour >= HOUR_12H_MAXIMUM)
-	{
-		wd->pm = EINA_TRUE;
-		edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
-	}
-	else
-	{
-		wd->pm = EINA_FALSE;
-		edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");		
-	}
-
-	if (wd->time_mode && (wd->hour > HOUR_12H_MAXIMUM))
-		sprintf(str, "%d", wd->hour - HOUR_12H_MAXIMUM);
-	else if (wd->time_mode && (wd->hour == 0))
-		sprintf(str, "%d", HOUR_12H_MAXIMUM);
-	else
+	if (!wd->time_mode) //24 mode
 		sprintf(str, "%d", wd->hour);
+	else
+	{
+		if (wd->hour >= HOUR_12H_MAXIMUM)
+		{
+			wd->pm = EINA_TRUE;
+			edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
+		}
+		else
+		{
+			wd->pm = EINA_FALSE;
+			edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");		
+		}
+
+		if (wd->hour > HOUR_12H_MAXIMUM)
+			sprintf(str, "%d", wd->hour - HOUR_12H_MAXIMUM);
+		else if (wd->hour == 0)
+			sprintf(str, "%d", HOUR_12H_MAXIMUM);
+		else
+			sprintf(str, "%d", wd->hour);
+	}
 	elm_entry_entry_set(wd->time[TIME_HOUR], str);
 
 	sprintf(str, "%d", wd->min);
@@ -830,9 +835,37 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 	
 	if (!wd) return;
 
-	if (wd->time_mode != mode) {
+	if (wd->time_mode != mode) 
+	{
+		char str[YEAR_MAX_LENGTH+1];
+		
 		wd->time_mode = mode;
-		//_update_ampm(obj);
+		if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h", "elm");
+		else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
+
+		if (!wd->time_mode) //24 mode
+			sprintf(str, "%d", wd->hour);
+		else
+		{
+			if (wd->hour >= HOUR_12H_MAXIMUM)
+			{
+				wd->pm = EINA_TRUE;
+				edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
+			}
+			else
+			{
+				wd->pm = EINA_FALSE;
+				edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");		
+			}
+
+			if (wd->hour > HOUR_12H_MAXIMUM)
+				sprintf(str, "%d", wd->hour - HOUR_12H_MAXIMUM);
+			else if (wd->hour == 0)
+				sprintf(str, "%d", HOUR_12H_MAXIMUM);
+			else
+				sprintf(str, "%d", wd->hour);
+		}
+		elm_entry_entry_set(wd->time[TIME_HOUR], str);
 	}
 }
 

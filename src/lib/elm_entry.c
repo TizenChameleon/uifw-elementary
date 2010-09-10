@@ -1741,7 +1741,8 @@ _ellipsis_entry_to_width(Evas_Object *obj)
 static int _textinput_control_function(void *data,void *input_data)
 {
    /*calculate character count*/
-   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Object *entry = (Evas_Object *)data;
+   Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
    char buf[10]="\0";
    size_t byte_len;
    size_t insert_text_len=0;
@@ -1760,12 +1761,12 @@ static int _textinput_control_function(void *data,void *input_data)
            insert_text_len = strlen(insert_text);
            if(remain_bytes<insert_text_len)
              {
-               evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+               evas_object_smart_callback_call(entry, "maxlength,reached", NULL);
                return EINA_TRUE;
              }
            if(byte_len>=wd->max_no_of_bytes)
              {
-               evas_object_smart_callback_call(input_data, "maxlength,reached", NULL);
+               evas_object_smart_callback_call(entry, "maxlength,reached", NULL);
                return EINA_TRUE;
              }
          }
