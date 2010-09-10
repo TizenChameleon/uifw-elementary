@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build02) unstable; urgency=low
+
+  * efl 1.0 alpha upgrade
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build02
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Sat, 11 Sep 2010 02:13:04 +0900
+
 elementary (1.0.0+svn.51480slp2+build01) unstable; urgency=low
 
   * efl 1.0 alpha upgrade
