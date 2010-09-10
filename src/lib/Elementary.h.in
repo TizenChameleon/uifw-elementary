@@ -2652,7 +2652,7 @@ extern "C" {
    EAPI Evas_Object *elm_webview_minimap_get(Evas_Object *obj);
    EAPI void         elm_webview_uri_set(Evas_Object *obj, const char *uri);
    EAPI void         elm_webview_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
-   EAPI void         elm_webview_mime_callback_set(Evas_Object *obj, const char *mime, Elm_WebView_Mime_Cb func);
+   EAPI void         elm_webview_scheme_callback_set(Evas_Object *obj, const char *scheme, Elm_WebView_Mime_Cb func);
    EAPI void         elm_webview_default_layout_width_set(Evas_Object *obj, int width);
 
    /* NoContents */

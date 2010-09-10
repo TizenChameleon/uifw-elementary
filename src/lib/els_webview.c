@@ -139,7 +139,7 @@ struct _Smart_Data {
 #endif
      Ecore_Job *move_calc_job;
      Ecore_Job *resize_calc_job;
-     Eina_Hash* mime_func_hash;
+     Eina_Hash* scheme_func_hash;
      int locked_dx;
      int locked_dy;
      unsigned char bounce_horiz : 1;
@@ -617,16 +617,16 @@ _elm_smart_webview_bounce_allow_set(Evas_Object* obj, Eina_Bool horiz, Eina_Bool
 }
 
 void
-_elm_smart_webview_mime_callback_set(Evas_Object* obj, const char *mime, Elm_WebView_Mime_Cb func)
+_elm_smart_webview_scheme_callback_set(Evas_Object* obj, const char *scheme, Elm_WebView_Mime_Cb func)
 {
    API_ENTRY return;
-   if (!sd->mime_func_hash)
-     sd->mime_func_hash = eina_hash_pointer_new(NULL);
+   if (!sd->scheme_func_hash)
+     sd->scheme_func_hash = eina_hash_pointer_new(NULL);
 
    if (!func)
-     eina_hash_del(sd->mime_func_hash, mime, func);
+     eina_hash_del(sd->scheme_func_hash, scheme, func);
    else
-     eina_hash_add(sd->mime_func_hash, mime, func);
+     eina_hash_add(sd->scheme_func_hash, scheme, func);
 }
 
 void
@@ -926,11 +926,11 @@ _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_R
    Elm_WebView_Mime_Cb func = NULL;
    Smart_Data *sd = (Smart_Data*)esd;
 
-   if (sd->mime_func_hash)
+   if (sd->scheme_func_hash)
      {
 	protocol_hack = strstr(request->url, ":");
 	*protocol_hack = '\0';
-	func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->mime_func_hash, request->url);
+	func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->scheme_func_hash, request->url);
 	*protocol_hack = ':';
      }
 
