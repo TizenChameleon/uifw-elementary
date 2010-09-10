@@ -37,11 +37,9 @@ external_button_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Ex
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
 	  {
 	     Evas_Object *icon = external_common_param_icon_get(obj, param);
-	     if (icon)
-	       {
-		  elm_button_icon_set(obj, icon);
-		  return EINA_TRUE;
-	       }
+	     if ((strcmp(param->s, "")) && (!icon)) return EINA_FALSE;
+	     elm_button_icon_set(obj, icon);
+	     return EINA_TRUE;
 	  }
      }
 
@@ -88,13 +86,18 @@ external_button_params_parse(void *data, Evas_Object *obj, const Eina_List *para
    return mem;
 }
 
- static void
+static Evas_Object *external_button_content_get(void *data __UNUSED__,
+		const Evas_Object *obj, const char *content)
+{
+	ERR("so content");
+	return NULL;
+}
+
+static void
 external_button_params_free(void *params)
 {
    Elm_Params_Button *mem = params;
 
-   if (mem->icon)
-     evas_object_del(mem->icon);
    external_common_params_free(params);
 }
 

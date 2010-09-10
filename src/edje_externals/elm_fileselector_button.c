@@ -57,11 +57,9 @@ external_fileselector_button_param_set(void *data __UNUSED__, Evas_Object *obj, 
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
 	  {
 	     Evas_Object *icon = external_common_param_icon_get(obj, param);
-	     if (icon)
-	       {
-		  elm_fileselector_button_icon_set(obj, icon);
-		  return EINA_TRUE;
-	       }
+	     if ((strcmp(param->s, "")) && (!icon)) return EINA_FALSE;
+	     elm_fileselector_button_icon_set(obj, icon);
+	     return EINA_TRUE;
 	  }
      }
    else if (!strcmp(param->name, "path"))
@@ -217,13 +215,18 @@ external_fileselector_button_params_parse(void *data, Evas_Object *obj, const Ei
    return mem;
 }
 
+static Evas_Object *external_fileselector_button_content_get(void *data __UNUSED__,
+		const Evas_Object *obj, const char *content)
+{
+	ERR("so content");
+	return NULL;
+}
+
  static void
 external_fileselector_button_params_free(void *params)
 {
    Elm_Params_fileselector_button *mem = params;
 
-   if (mem->icon)
-     evas_object_del(mem->icon);
    if (mem->fs.path)
      eina_stringshare_del(mem->fs.path);
    external_common_params_free(params);

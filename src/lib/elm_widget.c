@@ -27,6 +27,16 @@ struct _Smart_Data
    void         (*activate_func) (Evas_Object *obj);
    void         (*disable_func) (Evas_Object *obj);
    void         (*theme_func) (Evas_Object *obj);
+   void         (*signal_func) (Evas_Object *obj, const char *emission,
+	                        const char *source);
+   void         (*callback_add_func) (Evas_Object *obj, const char *emission,
+	                        const char *source, void (*func) (void *data,
+				   Evas_Object *o, const char *emission,
+				   const char *source), void *data);
+   void         *(*callback_del_func) (Evas_Object *obj, const char *emission,
+	                          const char *source, void (*func) (void *data,
+				     Evas_Object *o, const char *emission,
+				     const char *source));
    void         (*changed_func) (Evas_Object *obj);
    void         (*on_focus_func) (void *data, Evas_Object *obj);
    void          *on_focus_data;
@@ -41,6 +51,7 @@ struct _Smart_Data
    double         scale;
    Elm_Theme     *theme;
    const char    *style;
+   unsigned int   focus_order;
    
    int            child_drag_x_locked;
    int            child_drag_y_locked;
@@ -68,8 +79,12 @@ static void _smart_calculate(Evas_Object *obj);
 static void _smart_init(void);
 static inline Eina_Bool _elm_widget_is(const Evas_Object *obj);
 
+static void _if_focused_revert(Evas_Object *obj);
+
 /* local subsystem globals */
 static Evas_Smart *_e_smart = NULL;
+
+static unsigned int focus_order = 0;
 
 static void
 _sub_obj_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
@@ -154,6 +169,27 @@ elm_widget_changed_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj))
 {
    API_ENTRY return;
    sd->changed_func = func;
+}
+
+EAPI void
+elm_widget_signal_emit_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source))
+{
+   API_ENTRY return;
+   sd->signal_func = func;
+}
+
+EAPI void
+elm_widget_signal_callback_add_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data))
+{
+   API_ENTRY return;
+   sd->callback_add_func = func;
+}
+
+EAPI void
+elm_widget_signal_callback_del_hook_set(Evas_Object *obj, void *(*func) (Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source)))
+{
+   API_ENTRY return;
+   sd->callback_del_func = func;
 }
 
 EAPI void
@@ -437,7 +473,12 @@ elm_widget_focus_jump(Evas_Object *obj, int forward)
    /* if it has a focus func its an end-point widget like a button */
    if (sd->focus_func)
      {
-	if (!sd->focused) sd->focused = 1;
+	if (!sd->focused)
+          {
+             focus_order++;
+             sd->focus_order = focus_order;
+             sd->focused = 1;
+          }
 	else sd->focused = 0;
 	if (sd->on_focus_func) sd->on_focus_func(sd->on_focus_data, obj);
 	sd->focus_func(obj);
@@ -453,8 +494,6 @@ elm_widget_focus_jump(Evas_Object *obj, int forward)
 	if (!sd->focused)
 	  {
 	     elm_widget_focus_set(obj, forward);
-	     sd->focused = 1;
-	     if (sd->on_focus_func) sd->on_focus_func(sd->on_focus_data, obj);
 	     return 1;
 	  }
 	else
@@ -585,11 +624,37 @@ elm_widget_focus_jump(Evas_Object *obj, int forward)
 }
 
 EAPI void
+elm_widget_signal_emit(Evas_Object *obj, const char *emission, const char *source)
+{
+   API_ENTRY return;
+   if (!sd->signal_func) return;
+   sd->signal_func(obj, emission, source);
+}
+
+EAPI void
+elm_widget_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+{
+   API_ENTRY return;
+   if (!sd->callback_add_func) return;
+   sd->callback_add_func(obj, emission, source, func, data);
+}
+
+EAPI void *
+elm_widget_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source))
+{
+   API_ENTRY return NULL;
+   if (!sd->callback_del_func) return NULL;
+   return sd->callback_del_func(obj, emission, source, func);
+}
+
+EAPI void
 elm_widget_focus_set(Evas_Object *obj, int first)
 {
    API_ENTRY return;
    if (!sd->focused)
      {
+        focus_order++;
+        sd->focus_order = focus_order;
 	sd->focused = 1;
 	if (sd->on_focus_func) sd->on_focus_func(sd->on_focus_data, obj);
      }
@@ -687,6 +752,8 @@ _elm_widget_parent_focus(Evas_Object *obj)
 
    if (sd->focused) return;
    if (o) _elm_widget_parent_focus(o);
+   focus_order++;
+   sd->focus_order = focus_order;
    sd->focused = 1;
    if (sd->on_focus_func) sd->on_focus_func(sd->on_focus_data, obj);
    if (sd->focus_func) sd->focus_func(obj);
@@ -907,7 +974,7 @@ EAPI double
 elm_widget_scale_get(const Evas_Object *obj)
 {
    API_ENTRY return 1.0;
-   // FIXME: save walking up the tree by storingcaching parent scale
+   // FIXME: save walking up the tree by storing/caching parent scale
    if (sd->scale == 0.0)
      {
 	if (sd->parent_obj)
@@ -1036,30 +1103,28 @@ elm_widget_drag_lock_y_set(Evas_Object *obj, Eina_Bool lock)
 }
 
 EAPI Eina_Bool
-elm_widget_drag_lock_x_get(Evas_Object *obj)
+elm_widget_drag_lock_x_get(const Evas_Object *obj)
 {
    API_ENTRY return EINA_FALSE;
-   printf("check %p x lock %i\n", obj, sd->drag_x_locked);
    return sd->drag_x_locked;
 }
 
 EAPI Eina_Bool
-elm_widget_drag_lock_y_get(Evas_Object *obj)
+elm_widget_drag_lock_y_get(const Evas_Object *obj)
 {
    API_ENTRY return EINA_FALSE;
-   printf("check %p y lock %i\n", obj, sd->drag_y_locked);
    return sd->drag_y_locked;
 }
 
 EAPI int
-elm_widget_drag_child_locked_x_get(Evas_Object *obj)
+elm_widget_drag_child_locked_x_get(const Evas_Object *obj)
 {
    API_ENTRY return 0;
    return sd->child_drag_x_locked;
 }
 
 EAPI int
-elm_widget_drag_child_locked_y_get(Evas_Object *obj)
+elm_widget_drag_child_locked_y_get(const Evas_Object *obj)
 {
    API_ENTRY return 0;
    return sd->child_drag_y_locked;
@@ -1107,6 +1172,53 @@ _smart_add(Evas_Object *obj)
    evas_object_smart_data_set(obj, sd);
 }
 
+static Evas_Object *
+_newest_focus_order_get(Evas_Object *obj, unsigned int *newest_focus_order)
+{
+   const Eina_List *l;
+   Evas_Object *child, *ret, *best;
+   
+   API_ENTRY return NULL;
+   if (!evas_object_visible_get(obj)) return NULL;
+   best = NULL;
+   if (*newest_focus_order < sd->focus_order)
+     {
+        *newest_focus_order = sd->focus_order;
+        best = obj;
+     }
+   EINA_LIST_FOREACH(sd->subobjs, l, child)
+     {
+        ret = _newest_focus_order_get(child, newest_focus_order);
+        if (!ret) continue;
+        best = ret;
+     }
+   return best;
+}
+
+static void
+_if_focused_revert(Evas_Object *obj)
+{
+   Evas_Object *top;
+   Evas_Object *newest = NULL;
+   unsigned int newest_focus_order = 0;
+   
+   INTERNAL_ENTRY;
+   
+   if (!sd->focused) return;
+   if (!sd->parent_obj) return;
+
+   top = elm_widget_top_get(sd->parent_obj);
+   if (top)
+     {
+        newest = _newest_focus_order_get(top, &newest_focus_order);
+        if (newest)
+          {
+             elm_object_unfocus(newest);
+             elm_object_focus(newest);
+          }
+     }
+}
+
 static void
 _smart_del(Evas_Object *obj)
 {
@@ -1140,6 +1252,7 @@ _smart_del(Evas_Object *obj)
    if (sd->style) eina_stringshare_del(sd->style);
    if (sd->type) eina_stringshare_del(sd->type);
    if (sd->theme) elm_theme_free(sd->theme);
+   _if_focused_revert(obj);
    free(sd);
 }
 
@@ -1173,6 +1286,7 @@ _smart_hide(Evas_Object *obj)
 {
    INTERNAL_ENTRY;
    evas_object_hide(sd->resize_obj);
+   _if_focused_revert(obj);
 }
 
 static void

@@ -39,6 +39,7 @@ struct _Elm_List_Item
    Eina_Bool deleted : 1;
    Eina_Bool even : 1;
    Eina_Bool is_even : 1;
+   Eina_Bool is_separator : 1;
    Eina_Bool fixed : 1;
    Eina_Bool selected : 1;
    Eina_Bool hilighted : 1;
@@ -368,23 +369,24 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
                   ecore_timer_del(it->long_timer);
                   it->long_timer = NULL;
                }
-	     _item_unselect(it);
+             if (!wd->wasselected)
+               _item_unselect(it);
 	  }
      }
 }
 
-static int
+static Eina_Bool
 _long_press(void *data)
 {
    Elm_List_Item *it = data;
    Widget_Data *wd = elm_widget_data_get(it->obj);
 
-   if (!wd) return 0;
+   if (!wd) return ECORE_CALLBACK_CANCEL;
    it->long_timer = NULL;
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it, 0);
    wd->longpressed = EINA_TRUE;
    evas_object_smart_callback_call(it->obj, "longpressed", it);
-   return 0;
+   return ECORE_CALLBACK_CANCEL;
 }
 
 static void
@@ -566,7 +568,9 @@ _fix_items(Evas_Object *obj)
 	  {
 	     const char *stacking;
 
-	     if (wd->mode == ELM_LIST_COMPRESS)
+	     if (it->is_separator)
+	       _elm_theme_object_set(obj, it->base, "list", "separator", style);
+	     else if (wd->mode == ELM_LIST_COMPRESS)
 	       {
 		  if (it->even)
 		    _elm_theme_object_set(obj, it->base, "list", "item_compress", style);
@@ -1142,6 +1146,32 @@ elm_list_selected_items_get(const Evas_Object *obj)
 }
 
 /**
+ * Sets if item is a separator.
+ *
+ * @param it The list item object
+ * @param setting
+ */
+EAPI void
+elm_list_item_separator_set(Elm_List_Item *it, Eina_Bool setting)
+{
+   ELM_LIST_ITEM_CHECK_DELETED_RETURN(it);
+   it->is_separator = !!setting;
+}
+
+/**
+ * Returns EINA_TRUE if Elm_List_Item is a separator.
+ *
+ * @param it The list item object
+ */
+EAPI Eina_Bool
+elm_list_item_separator_get(const Elm_List_Item *it)
+{
+   ELM_LIST_ITEM_CHECK_DELETED_RETURN(it, EINA_FALSE);
+   return it->is_separator;
+}
+
+
+/**
  * Sets the selected state of @p it.
  *
  * @param it The list item
@@ -1297,6 +1327,10 @@ elm_list_item_icon_get(const Elm_List_Item *it)
 /**
  * Sets the left side icon associated with the item.
  *
+ * Once the icon object is set, a previously set one will be deleted.
+ * You probably don't want, then, to have the <b>same</b> icon object set
+ * for more than one item of the list.
+ *
  * @param it The list item
  * @param icon The left side icon object to associate with @p it
  *
@@ -1308,12 +1342,21 @@ elm_list_item_icon_set(Elm_List_Item *it, Evas_Object *icon)
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it);
    if (it->icon == icon) return;
    if (it->dummy_icon && !icon) return;
-   if (it->dummy_icon) evas_object_del(it->icon);
+   if (it->dummy_icon)
+     {
+	evas_object_del(it->icon);
+	it->dummy_icon = EINA_FALSE;
+     }
    if (!icon)
      {
 	icon = evas_object_rectangle_add(evas_object_evas_get(it->obj));
 	evas_object_color_set(icon, 0, 0, 0, 0);
 	it->dummy_icon = EINA_TRUE;
+     }
+   if (it->icon)
+     {
+	evas_object_del(it->icon);
+	it->icon = NULL;
      }
    it->icon = icon;
    if (it->base)
@@ -1337,7 +1380,11 @@ elm_list_item_end_get(const Elm_List_Item *it)
 }
 
 /**
- * Gets the right side icon associated with the item.
+ * Sets the right side icon associated with the item.
+ *
+ * Once the icon object is set, a previously set one will be deleted.
+ * You probably don't want, then, to have the <b>same</b> icon object set
+ * for more than one item of the list.
  *
  * @param it The list item
  * @param icon The right side icon object to associate with @p it
@@ -1350,12 +1397,21 @@ elm_list_item_end_set(Elm_List_Item *it, Evas_Object *end)
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it);
    if (it->end == end) return;
    if (it->dummy_end && !end) return;
-   if (it->dummy_end) evas_object_del(it->end);
+   if (it->dummy_end)
+     {
+	evas_object_del(it->end);
+	it->dummy_icon = EINA_FALSE;
+     }
    if (!end)
      {
 	end = evas_object_rectangle_add(evas_object_evas_get(it->obj));
 	evas_object_color_set(end, 0, 0, 0, 0);
 	it->dummy_end = EINA_TRUE;
+     }
+   if (it->end)
+     {
+	evas_object_del(it->end);
+	it->end = NULL;
      }
    it->end = end;
    if (it->base)

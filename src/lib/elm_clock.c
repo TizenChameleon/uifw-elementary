@@ -15,7 +15,7 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *clk;
-   double interval;
+   double interval, first_interval;
    Eina_Bool seconds : 1;
    Eina_Bool am_pm : 1;
    Eina_Bool edit : 1;
@@ -39,9 +39,9 @@ struct _Widget_Data
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
-static int _ticker(void *data);
-static int _signal_clock_val_up(void *data);
-static int _signal_clock_val_down(void *data);
+static Eina_Bool _ticker(void *data);
+static Eina_Bool _signal_clock_val_up(void *data);
+static Eina_Bool _signal_clock_val_down(void *data);
 static void _time_update(Evas_Object *obj);
 
 static void
@@ -84,7 +84,50 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      edje_object_signal_emit(wd->clk, "elm,action,unfocus", "elm");
 }
 
-static int
+static void
+_signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   int i;
+   if (!wd) return;
+   edje_object_signal_emit(wd->clk, emission, source);
+   for (i = 0; i < 6; i++)
+     {
+	if (wd->digit[i])
+	  edje_object_signal_emit(wd->digit[i], emission, source);
+     }
+}
+
+static void
+_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   int i;
+   if (!wd) return;
+   edje_object_signal_callback_add(wd->clk, emission, source, func_cb, data);
+   for (i = 0; i < 6; i++)
+     {
+	if (wd->digit[i])
+	  edje_object_signal_callback_add(wd->digit[i], emission, source,
+		func_cb, data);
+     }
+}
+
+static void *
+_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source))
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   int i;
+   if (!wd) return NULL;
+   for (i = 0; i < 6; i++)
+     {
+	edje_object_signal_callback_del(wd->digit[i], emission, source,
+	      func_cb);
+     }
+   return edje_object_signal_callback_del(wd->clk, emission, source, func_cb);
+}
+
+static Eina_Bool
 _ticker(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -92,7 +135,7 @@ _ticker(void *data)
    struct timeval timev;
    struct tm *tm;
    time_t tt;
-   if (!wd) return 0;
+   if (!wd) return ECORE_CALLBACK_CANCEL;
    gettimeofday(&timev, NULL);
    t = ((double)(1000000 - timev.tv_usec)) / 1000000.0;
    wd->ticker = ecore_timer_add(t, _ticker, data);
@@ -109,16 +152,16 @@ _ticker(void *data)
 	     _time_update(data);
 	  }
      }
-   return 0;
+   return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _signal_clock_val_up(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return;
-   if (!wd->edit) return;
-   if (!wd->sel_obj) return;
+   if (!wd) goto clock_val_up_exit_on_error;
+   if (!wd->edit) goto clock_val_up_cancel;
+   if (!wd->sel_obj) goto clock_val_up_cancel;
    if (wd->sel_obj == wd->digit[0])
      {
 	wd->hrs = wd->hrs + 10;
@@ -159,15 +202,19 @@ _signal_clock_val_up(void *data)
    _time_update(data);
    evas_object_smart_callback_call(data, "changed", NULL);
    return ECORE_CALLBACK_RENEW;
+clock_val_up_cancel:
+   wd->spin = NULL;
+clock_val_up_exit_on_error:
+   return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _signal_clock_val_down(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return;
-   if (!wd->edit) return;
-   if (!wd->sel_obj) return;
+   if (!wd) goto clock_val_down_exit_on_error;
+   if (!wd->edit) goto clock_val_down_cancel;
+   if (!wd->sel_obj) goto clock_val_down_cancel;
    if (wd->sel_obj == wd->digit[0])
      {
 	wd->hrs = wd->hrs - 10;
@@ -208,6 +255,10 @@ _signal_clock_val_down(void *data)
    _time_update(data);
    evas_object_smart_callback_call(data, "changed", NULL);
    return ECORE_CALLBACK_RENEW;
+clock_val_down_cancel:
+   wd->spin = NULL;
+clock_val_down_exit_on_error:
+   return ECORE_CALLBACK_CANCEL;
 }
 
 static void
@@ -215,7 +266,7 @@ _signal_clock_val_up_start(void *data, Evas_Object *obj, const char *emission __
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   wd->interval = 0.85;
+   wd->interval = wd->first_interval;
    wd->sel_obj = obj;
    if (wd->spin) ecore_timer_del(wd->spin);
    wd->spin = ecore_timer_add(wd->interval, _signal_clock_val_up, data);
@@ -227,7 +278,7 @@ _signal_clock_val_down_start(void *data, Evas_Object *obj, const char *emission 
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   wd->interval = 0.85;
+   wd->interval = wd->first_interval;
    wd->sel_obj = obj;
    if (wd->spin) ecore_timer_del(wd->spin);
    wd->spin = ecore_timer_add(wd->interval, _signal_clock_val_down, data);
@@ -469,6 +520,9 @@ elm_clock_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
+   elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
+   elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
+   elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
 
    wd->clk = edje_object_add(e);
    elm_widget_resize_object_set(obj, wd->clk);
@@ -478,6 +532,7 @@ elm_clock_add(Evas_Object *parent)
    wd->cur.am_pm = EINA_TRUE;
    wd->cur.edit = EINA_TRUE;
    wd->cur.digedit = ELM_CLOCK_NONE;
+   wd->first_interval = 0.85;
 
    _time_update(obj);
    _ticker(obj);
@@ -709,4 +764,46 @@ elm_clock_show_seconds_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
    return wd->seconds;
+}
+
+/**
+ * Set the interval for the clock
+ *
+ * @param obj The clock object
+ * @param interval The interval value in seconds
+ *
+ * The interval value is decreased while the user increments or decrements
+ * the clock value. The next interval value is the previous interval / 1.05,
+ * so it speed up a bit. Default value is 0.85 seconds.
+ *
+ * @ingroup Clock
+ */
+EAPI void
+elm_clock_interval_set(Evas_Object *obj, double interval)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->first_interval = interval;
+}
+
+/**
+ * Get the interval of the clock
+ *
+ * @param obj The clock object
+ * @return The value of the first interval in seconds
+ *
+ * The interval value is decreased while the user increments or decrements
+ * the clock value. The next interval value is the previous interval / 1.05,
+ * so it speed up a bit. Default value is 0.85 seconds.
+ *
+ * @ingroup Clock
+ */
+EAPI double
+elm_clock_interval_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0.0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return 0.0;
+   return wd->first_interval;
 }
