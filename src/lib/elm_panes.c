@@ -27,6 +27,7 @@ struct _Widget_Data
 
    Eina_Bool clicked_double;
    Eina_Bool horizontal;
+   Eina_Bool fixed;
 };
 
 static const char *widtype = NULL;
@@ -277,3 +278,24 @@ elm_panes_horizontal_is(const Evas_Object *obj)
 
    return wd->horizontal;
 }
+
+EAPI void
+elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   wd->fixed = fixed;
+   if(wd->fixed == EINA_TRUE)
+      edje_object_signal_emit(wd->panes, "elm.fixed", "movement.decider");
+   else
+      edje_object_signal_emit(wd->panes, "elm.unfixed", "movement.decider");
+}
+
+EAPI Eina_Bool
+elm_panes_fixed_is(const Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   return wd->fixed;
+}
+
