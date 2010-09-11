@@ -342,8 +342,7 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Object *sub = event_info;
-   Eina_List *l;
-   Item *it;
+   Eina_List *l = NULL;
    if (!wd) return;
    
 	if (wd->pager == sub)
@@ -457,6 +456,30 @@ _multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, in
 	}
 	return new_obj;
 }
+
+static void
+_multiple_object_unset(Item *it, Eina_List **list)
+{
+	Evas_Object *list_obj = NULL;
+	Eina_List *l = NULL;
+	Evas_Object *temp_obj;
+	char buf[1024];
+	int num = 1;
+	if(it->title_obj)
+		{
+			EINA_LIST_FOREACH(it->title_list, l, list_obj)
+				{
+					memset(buf, 0, sizeof(buf));
+					sprintf(buf, "elm.swallow.title%d", num++);
+					temp_obj = elm_layout_content_unset(it->title_obj, buf);
+					*list = eina_list_append(*list, temp_obj);					
+					evas_object_hide(temp_obj);
+				}
+			eina_list_free(it->title_list);
+			it->title_list = NULL;
+		}
+}
+
 
 /**
  * Add a new navigatgationbar to the parent
@@ -674,7 +697,6 @@ elm_navigationbar_pop(Evas_Object *obj)
 	elm_pager_content_pop(wd->pager);
 	if(prev_it && !it)
 		{
-			printf("\n\nconditions met\n");
 			evas_object_del(wd->pager);
 		}
 	free(cb);
@@ -858,14 +880,63 @@ elm_navigationbar_title_object_add(Evas_Object *obj,
 				evas_object_hide(swallow);
 			}
 			edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
-			if((it->title_obj)&&(it->title))
-			{
+			if(it->fn_btn3){
+				edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
+				edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
+			}
+			if((it->title_obj)&&(it->title)){ 
 				edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
 			}
 		}
 	}
 	_item_sizing_eval(it);
 }
+
+
+EAPI void
+elm_navigationbar_title_object_list_unset(Evas_Object *obj,
+									Evas_Object *content, Eina_List **list)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *ll;
+	Item *it;
+	Item *last_it = NULL;
+	ll = eina_list_last(wd->stack);
+	if (ll) 
+	{
+		last_it = ll->data;
+	}
+	
+	if (!wd) return;
+	EINA_LIST_FOREACH(wd->stack, ll, it)
+	{
+		if (it->content == content)	
+			{
+				if (last_it->content == it->content) 
+					{
+						Evas_Object *swallow;
+						swallow = edje_object_part_swallow_get(wd->base, "elm.swallow.title");
+						if (swallow) {
+							edje_object_part_unswallow(wd->base, swallow);
+							evas_object_hide(swallow);
+						}
+					} 
+				_multiple_object_unset(it, list);	
+				evas_object_del(it->title_obj);
+				it->title_obj = NULL;				
+				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+				if(it->fn_btn3)
+					{
+						edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
+						edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
+					}
+				_item_sizing_eval(it);
+				
+			}
+	}
+}
+
 
 /**
  * Return the title string of the pushed content
@@ -1249,17 +1320,17 @@ elm_navigationbar_title_button_get(Evas_Object *obj,
  *
  * @ingroup NavigationBar
  */
-EAPI Evas_Object *
+EAPI void
 elm_navigationbar_subtitle_label_set(Evas_Object *obj, 
 							Evas_Object *content, 
 							const char *subtitle)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
 
-	if (!wd) return NULL;
+	if (!wd) return;
 	
 	 EINA_LIST_FOREACH(wd->stack, ll, it)
 	{
