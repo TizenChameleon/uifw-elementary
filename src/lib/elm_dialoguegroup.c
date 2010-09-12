@@ -256,6 +256,7 @@ EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent)
  *
  * @param obj dialoguegroup object 
  * @param subobj item
+ * @param style sytle of the item
  * @return Dialogue_Item pointer, just made by this function
  * 
  * @ingroup DialogueGroup
@@ -296,6 +297,7 @@ elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegrou
  *
  * @param obj dialoguegroup object 
  * @param subobj item
+ * @param style sytle of the item
  * @return Dialogue_Item pointer, just made by this function
  *
  * @ingroup DialogueGroup
@@ -339,6 +341,7 @@ elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegro
  * @param obj dialoguegroup object 
  * @param subobj item
  * @param after specified item existing in the dialogue group
+ * @param style sytle of the item
  * @return Dialogue_Item pointer, just made by this function
  *
  * @ingroup DialogueGroup
@@ -383,6 +386,7 @@ elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_I
  * @param obj dialoguegroup object 
  * @param subobj item
  * @param before specified item existing in the dialogue group
+ * @param style sytle of the item
  * @return Dialogue_Item pointer, just made by this function
  *
  * @ingroup DialogueGroup
@@ -436,6 +440,7 @@ elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_
 EAPI void
 elm_dialoguegroup_remove(Dialogue_Item *item)
 {
+	if (!item) return;
    	ELM_CHECK_WIDTYPE(item->parent, widtype) ;
 	Dialogue_Item *current_item;
 	Widget_Data *wd = elm_widget_data_get(item->parent);
@@ -535,10 +540,10 @@ elm_dialoguegroup_title_set(Evas_Object *obj, const char *title)
 EAPI const char *
 elm_dialoguegroup_title_get(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->title;
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return NULL;
+	return wd->title;
 }
 
 /**
@@ -553,8 +558,8 @@ elm_dialoguegroup_title_get(Evas_Object *obj)
 EAPI void 
 elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press)
 {
-   ELM_CHECK_WIDTYPE(item->parent, widtype) ;
    if(!item) return;
+   ELM_CHECK_WIDTYPE(item->parent, widtype) ;
    
    item->press = press;
    if(press == EINA_TRUE)
@@ -575,8 +580,8 @@ elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press)
 EAPI Eina_Bool
 elm_dialoguegroup_press_effect_get(Dialogue_Item *item)
 {
-   ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
    if(!item) return EINA_FALSE;
+   ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
    
    return item->press;
 }
@@ -593,8 +598,50 @@ elm_dialoguegroup_press_effect_get(Dialogue_Item *item)
 EAPI Evas_Object *
 elm_dialoguegroup_item_content_get(Dialogue_Item *item)
 {
+   if(!item) return NULL;
    ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
-   if(!item) return EINA_FALSE;
    
    return item->content;
+}
+
+/**
+ * Set the style of the item.
+ *
+ * @param item dialoguegroup item
+ * @param style sytle of the item
+ * 
+ * @ingroup DialogueGroup
+ */
+EAPI void 
+elm_dialoguegroup_item_style_set(Dialogue_Item *item, Elm_Dialoguegroup_Item_Style style)
+{
+	if(!item) return;
+   	ELM_CHECK_WIDTYPE(item->parent, widtype);
+	Widget_Data *wd = elm_widget_data_get(item->parent);
+	
+	item->style = style;
+	_change_item_bg(item, item->location);
+	
+	if (!wd) return ;
+}
+
+/**
+ * Get the style of the item.
+ *
+ * @param item dialoguegroup item
+ * @return dialoguegroup item style
+ * 
+ * @ingroup DialogueGroup
+ */
+
+EAPI Elm_Dialoguegroup_Item_Style
+elm_dialoguegroup_item_style_get(Dialogue_Item *item)
+{
+	if(!item) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
+   	ELM_CHECK_WIDTYPE(item->parent, widtype);
+	Widget_Data *wd = elm_widget_data_get(item->parent);
+	
+	if (!wd) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
+
+	return item->style;
 }

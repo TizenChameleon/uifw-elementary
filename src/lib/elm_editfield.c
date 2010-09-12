@@ -53,6 +53,7 @@ _on_focus_hook(void *data, Evas_Object *obj)
      return ;	
    if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)) ) 
      {
+	evas_object_smart_callback_call(obj, "unfocused", NULL);
 	wd->editing = EINA_FALSE;
 	edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");		
 	if(_empty_entry(wd->entry)) 

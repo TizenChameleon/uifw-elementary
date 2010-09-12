@@ -1147,14 +1147,25 @@ extern "C" {
    EAPI double       elm_slider_value_get(const Evas_Object *obj);
    EAPI void         elm_slider_inverted_set(Evas_Object *obj, Eina_Bool inverted);
    EAPI Eina_Bool    elm_slider_inverted_get(const Evas_Object *obj);
-
-   // added for supporting aqua feature
    EAPI Eina_Bool    elm_slider_end_icon_set(Evas_Object *obj, Evas_Object *icon);
    EAPI Evas_Object *elm_slider_end_icon_get(Evas_Object *obj);
    EAPI void         elm_slider_indicator_show_set(Evas_Object *obj, Eina_Bool show);
    EAPI void         elm_slider_value_animated_set(Evas_Object *obj, double val);
    EAPI void         elm_slider_end_label_set(Evas_Object *obj, const char *label);
    EAPI const char  *elm_slider_end_label_get(const Evas_Object *obj);
+   /* smart callbacks called:
+    * "clicked" - when the user clicks on a carousel item and becomes selected
+   
+    * "delay,changed" - A short time after the value is changed by the user.
+    * This will be called only when the user stops dragging for a very short
+    * period or when they release their finger/mouse, so it avoids possibly
+    * expensive reactions to the value change.
+    *
+    * "slider,drag,start" - dragging the slider indicator around has started
+    *
+    * "slider,drag,stop" - dragging the slider indicator around has stopped
+    */
+
 
    typedef enum _Elm_Genlist_Item_Flags
      {
@@ -2336,6 +2347,11 @@ extern "C" {
    EAPI Eina_Bool    elm_editfield_entry_single_line_get(Evas_Object *obj);
    EAPI void         elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible);
    EAPI Eina_Bool    elm_editfield_eraser_get(Evas_Object *obj);
+   /* smart callbacks called:
+    * "clicked" - when an editfield is clicked
+    * "unfocused" - when an editfield is unfocused
+    */
+
 
 
    /* softkey */
@@ -2589,7 +2605,8 @@ extern "C" {
         ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE = (1 << 1),
         ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE = (1 << 2),
         ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN = (1 << 3),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW = (1 << 4)
+        ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW = (1 << 4),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_LAST = (1 << 5)
      } Elm_Dialoguegroup_Item_Style;
 
    EAPI Evas_Object   *elm_dialoguegroup_add(Evas_Object *parent);
@@ -2604,6 +2621,10 @@ extern "C" {
    EAPI void           elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press);
    EAPI Eina_Bool      elm_dialoguegroup_press_effect_get(Dialogue_Item *item);
    EAPI Evas_Object   *elm_dialoguegroup_item_content_get(Dialogue_Item *item);
+   EAPI void	       elm_dialoguegroup_item_style_set(Dialogue_Item *item, Elm_Dialoguegroup_Item_Style style);
+   EAPI Elm_Dialoguegroup_Item_Style	elm_dialoguegroup_item_style_get(Dialogue_Item *item);
+
+
   
    /* AutoCompleteView */
    typedef Eina_Bool (*elmautocompleteview_matchfunction) (Evas_Object *obj,char *text,Evas_Object *list,void *data);
