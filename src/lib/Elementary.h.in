@@ -830,7 +830,8 @@ extern "C" {
    EAPI void         elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
    EAPI void         elm_entry_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis);
 
-   EAPI void         elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on);
+   EAPI void         elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
+   EAPI void         elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
    EAPI void         elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
    EAPI void         elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled);
    EAPI void         elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
@@ -1734,7 +1735,8 @@ extern "C" {
    EAPI void         elm_scrolled_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled);
    EAPI void         elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
    EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj);
-   EAPI void         elm_scrolled_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on);
+   EAPI void         elm_scrolled_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
+   EAPI void         elm_scrolled_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
 
    EAPI Evas_Object *elm_conformant_add(Evas_Object *parent);
    EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content);

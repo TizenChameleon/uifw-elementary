@@ -1063,12 +1063,30 @@ elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layo
  * @ingroup Scrolled_Entry
  */
 EAPI void 
-elm_scrolled_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on)
+elm_scrolled_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->entry) return;
 
-   elm_entry_autocapitalization_set(wd->entry, on);
+   elm_entry_autocapitalization_set(wd->entry, autocap);
+}
+
+/**
+ * Set whether scrolled entry should support auto period
+ *
+ * @param obj The entry object
+ * @param on If true, scrolled entry suports auto period.
+ *
+ * @ingroup Scrolled_Entry
+ */
+EAPI void 
+elm_scrolled_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd || !wd->entry) return;
+
+   elm_entry_autoperiod_set(wd->entry, autoperiod);
 }
 

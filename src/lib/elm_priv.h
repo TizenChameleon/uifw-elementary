@@ -78,6 +78,8 @@ struct _Elm_Config
    const char *theme;
    const char *modules;
    int input_panel_enable;
+   int autocapital;
+   int autoperiod;   
 };
 
 typedef struct _Elm_Module Elm_Module;

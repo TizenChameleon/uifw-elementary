@@ -137,6 +137,7 @@ struct _Widget_Data
    Eina_Bool input_panel_enable : 1;
    Eina_Bool autocapitalize : 1;
    Elm_Input_Panel_Layout input_panel_layout;
+   Eina_Bool autoperiod : 1;
 };
 
 struct _Elm_Entry_Item_Provider
@@ -284,6 +285,7 @@ _theme_hook(Evas_Object *obj)
    eina_stringshare_del(t);
    edje_object_scale_set(wd->ent, elm_widget_scale_get(obj) * _elm_config->scale);
    edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
+//   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", wd->input_panel_enable);
 
    ic = edje_object_part_text_imf_context_get(wd->ent, "elm.text");
@@ -1938,6 +1940,8 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    t = eina_stringshare_add(elm_entry_entry_get(obj));
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
+   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
+//   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
    ic = elm_entry_imf_context_get(obj);
    if (ic)
      {
@@ -2865,7 +2869,7 @@ elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
  * @ingroup Entry
  */
 EAPI void 
-elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on)
+elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -2874,9 +2878,32 @@ elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on)
    if (wd->password)
        wd->autocapitalize = EINA_FALSE;
    else
-       wd->autocapitalize = on;
+       wd->autocapitalize = autocap;
 
    edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
+}
+
+/**
+ * Set whether entry should support auto period
+ *
+ * @param obj The entry object
+ * @param on If true, entry suports auto period.
+ *
+ * @ingroup Entry
+ */
+EAPI void 
+elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (wd->password)
+       wd->autoperiod = EINA_FALSE;
+   else
+       wd->autoperiod = autoperiod;
+
+//   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
 }
 
 /**

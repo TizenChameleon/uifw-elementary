@@ -35,7 +35,9 @@ static const char *_atom_names[ATOM_COUNT] =
      "ENLIGHTENMENT_THEME",
      "ENLIGHTENMENT_PROFILE",
      "ENLIGHTENMENT_CONFIG",
-     "ENLIGHTENMENT_INPUT_PANEL"
+     "ENLIGHTENMENT_INPUT_PANEL",
+     "ENLIGHTENMENT_AUTOCAPITAL",
+     "ENLIGHTENMENT_AUTOPERIOD",
 };
 #define ATOM_E_SCALE 0
 #define ATOM_E_FINGER_SIZE 1
@@ -43,6 +45,8 @@ static const char *_atom_names[ATOM_COUNT] =
 #define ATOM_E_PROFILE 3
 #define ATOM_E_CONFIG 4
 #define ATOM_E_INPUT_PANEL 5
+#define ATOM_E_AUTOCAPITAL 6
+#define ATOM_E_AUTOPERIOD 7
 
 static Eina_Bool _prop_config_get(void);
 static Eina_Bool _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev);
@@ -168,11 +172,6 @@ _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev)
                     }
 	       }
           }
-	else if (((_atom_config > 0) && (event->atom == _atom_config)) ||
-                 (event->atom == _atom[ATOM_E_CONFIG]))
-          {
-             _prop_config_get();
-          }
 	else if (event->atom == _atom[ATOM_E_INPUT_PANEL])
 	  {
 	     unsigned int val = 0;
@@ -183,8 +182,36 @@ _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev)
 	       {
 	       	edje_input_panel_enabled_set(val);
 	       }
-	  }
+          }
+        else if (event->atom == _atom[ATOM_E_AUTOCAPITAL])
+          {
+             unsigned int val = 0;
+
+             if (ecore_x_window_prop_card32_get(event->win,
+                                                event->atom,
+                                                &val, 1) > 0)
+               {
+                  edje_autocapitalization_set(val);
+               }
+          }
+        else if (event->atom == _atom[ATOM_E_AUTOPERIOD])
+          {
+             unsigned int val = 0;
+
+             if (ecore_x_window_prop_card32_get(event->win,
+                                                event->atom,
+                                                &val, 1) > 0)
+               {
+                  edje_autoperiod_set(val);
+               }
+          }
+	else if (((_atom_config > 0) && (event->atom == _atom_config)) ||
+                 (event->atom == _atom[ATOM_E_CONFIG]))
+          {
+             _prop_config_get();
+          }
      }
+
    return ECORE_CALLBACK_PASS_ON;
 }
 #endif
@@ -522,6 +549,12 @@ _env_get(void)
 
    s = getenv("ELM_INPUT_PANEL");
    if (s) _elm_config->input_panel_enable = atoi(s);
+
+   s = getenv("ELM_AUTOCAPITAL");
+   if (s) _elm_config->autocapital = atoi(s);
+
+   s = getenv("ELM_AUTOPERIOD");
+   if (s) _elm_config->autoperiod = atoi(s);
 }
 
 void
@@ -620,19 +653,42 @@ _elm_config_sub_init(void)
                   if (changed) _prop_config_get();
 	       }
 	  }
-	if (!getenv("ELM_INPUT_PANEL"))
-	  {
-	     if (ecore_x_window_prop_card32_get(_root_1st,
-						_atom[ATOM_E_INPUT_PANEL],
-						&val, 1) > 0)
-	       {
-		  if (val > 0)
-		    {
-		       _elm_config->input_panel_enable = val;
-		    }
-	       }
-	  }
-	
+        if (!getenv("ELM_INPUT_PANEL"))
+          {
+             if (ecore_x_window_prop_card32_get(_root_1st,
+                                                _atom[ATOM_E_INPUT_PANEL],
+                                                &val, 1) > 0)
+               {
+                  if (val > 0)
+                    {
+                       _elm_config->input_panel_enable = val;
+                    }
+               }
+          }
+        if (!getenv("ELM_AUTOCAPITAL"))
+          {
+             if (ecore_x_window_prop_card32_get(_root_1st,
+                                                _atom[ATOM_E_AUTOCAPITAL],
+                                                &val, 1) > 0)
+               {
+                  if (val > 0)
+                    {
+                       _elm_config->autocapital = val;
+                    }
+               }
+          }
+        if (!getenv("ELM_AUTOPERIOD"))
+          {
+             if (ecore_x_window_prop_card32_get(_root_1st,
+                                                _atom[ATOM_E_AUTOPERIOD],
+                                                &val, 1) > 0)
+               {
+                  if (val > 0)
+                    {
+                       _elm_config->autoperiod = val;
+                    }
+               }
+          }
 #endif
       }
 }
@@ -663,3 +719,5 @@ _elm_config_shutdown(void)
      }
    _desc_shutdown();
 }
+
+/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/
