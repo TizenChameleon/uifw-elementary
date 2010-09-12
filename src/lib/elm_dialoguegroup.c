@@ -142,6 +142,8 @@ static void _set_item_theme(Dialogue_Item *item, const char *location)
 		snprintf(buf, sizeof(buf), "edit_title_%s", location);
 	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN) 
 		snprintf(buf, sizeof(buf), "hidden_%s", location);
+	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW) 
+		snprintf(buf, sizeof(buf), "dataview_%s", location);
 	elm_layout_theme_set(item->bg_layout, "dialoguegroup", buf, elm_widget_style_get(item->parent));
 }
 
