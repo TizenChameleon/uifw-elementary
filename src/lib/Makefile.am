@@ -132,6 +132,7 @@ elm_tickernoti.c \
 elm_imageslider.c \
 elm_multibuttonentry.c \
 elm_stackedicon.c \
+elm_calendar.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
