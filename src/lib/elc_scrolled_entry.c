@@ -1054,3 +1054,21 @@ elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layo
    elm_entry_input_panel_layout_set(wd->entry, layout);
 }
 
+/**
+ * Set whether scrolled entry should support auto capitalization
+ *
+ * @param obj The entry object
+ * @param on If true, scrolled entry suports auto capitalization.
+ *
+ * @ingroup Scrolled_Entry
+ */
+EAPI void 
+elm_scrolled_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd || !wd->entry) return;
+
+   elm_entry_autocapitalization_set(wd->entry, on);
+}
+

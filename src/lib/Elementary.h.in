@@ -1734,6 +1734,7 @@ extern "C" {
    EAPI void         elm_scrolled_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled);
    EAPI void         elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
    EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj);
+   EAPI void         elm_scrolled_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool on);
 
    EAPI Evas_Object *elm_conformant_add(Evas_Object *parent);
    EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content);

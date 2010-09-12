@@ -1929,6 +1929,7 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *t;
+   Ecore_IMF_Context *ic;
    if (!wd) return;
    if (wd->single_line == single_line) return;
    wd->single_line = single_line;
@@ -1937,6 +1938,12 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    t = eina_stringshare_add(elm_entry_entry_get(obj));
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
+   ic = elm_entry_imf_context_get(obj);
+   if (ic)
+     {
+	ecore_imf_context_input_panel_layout_set(ic, wd->input_panel_layout);
+     }
+
    eina_stringshare_del(t);
    _sizing_eval(obj);
 }
@@ -1993,6 +2000,7 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
+   Ecore_IMF_Context *ic;
    const char *t;
    if (!wd) return;
    if (wd->password == password) return;
@@ -2004,6 +2012,13 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    t = eina_stringshare_add(elm_entry_entry_get(obj));
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
+
+   ic = elm_entry_imf_context_get(obj);
+   if (ic)
+     {
+	ecore_imf_context_input_panel_layout_set(ic, wd->input_panel_layout);
+     }
+
    eina_stringshare_del(t);
    _sizing_eval(obj);
 }
