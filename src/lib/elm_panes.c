@@ -135,21 +135,6 @@ _unpress(void *data, Evas_Object *obj __UNUSED__ , const char *emission __UNUSED
      }
 }
 
-static void
-_disable_hook(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (elm_widget_disabled_get(obj))
-     {
-      edje_object_signal_emit(wd->panes, "elm.state,disabled", "elm");
-     }
-   else
-     {
-      edje_object_signal_emit(wd->panes, "elm.state,enabled", "elm");
-     }
-}
-
 /**
  * Add a new panes to the parent
  *
@@ -173,7 +158,6 @@ elm_panes_add(Evas_Object *parent)
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
-   elm_widget_disable_hook_set(obj, _disable_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
 
    wd->panes = edje_object_add(e);
@@ -293,4 +277,22 @@ elm_panes_horizontal_is(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    return wd->horizontal;
+}
+
+EAPI void
+elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   wd->fixed = fixed;
+   if(wd->fixed == EINA_TRUE)
+      edje_object_signal_emit(wd->panes, "elm.fixed", "movement.decider");
+   else
+      edje_object_signal_emit(wd->panes, "elm.unfixed", "movement.decider");
+}
+
+EAPI Eina_Bool
+elm_panes_fixed_is(const Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   return wd->fixed;
 }
