@@ -308,7 +308,7 @@ elm_panes_content_left_size_set(Evas_Object *obj, double size)
 }
 
 /**
- * Set the type of an existing pane object to horizontal
+ * Set the type of an existing pane object to horizontal/vertical
  *
  * @param obj The pane object
  * @param horizontal Boolean value. If true, then the type is set to horizontal else vertical
