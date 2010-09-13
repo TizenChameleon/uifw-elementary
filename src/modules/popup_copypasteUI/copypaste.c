@@ -89,26 +89,26 @@ obj_longpress(Evas_Object *obj)
 	if(!ext_mod) return;
 	Evas_Object *top;
 	Evas_Object *list;
-
+	
 	const Eina_List *l;
 	const Elm_Entry_Context_Menu_Item *it;
-
 	/*update*/
 	elm_entry_extension_module_data_get(obj,ext_mod);
-
-	if (ext_mod->popup) evas_object_del(ext_mod->popup);
-       else elm_widget_scroll_freeze_push(obj);
-	top = elm_widget_top_get(obj);
-	if(top)
+	if (ext_mod->context_menu)
+	{
+		if (ext_mod->popup) evas_object_del(ext_mod->popup);
+        else elm_widget_scroll_freeze_push(obj);
+		top = elm_widget_top_get(obj);
+		if(top)
 		ext_mod->popup = elm_popup_add(top);
-	elm_object_style_set(ext_mod->popup,"menustyle");
-	elm_popup_set_mode(ext_mod->popup, ELM_POPUP_TYPE_ALERT);
-	elm_popup_title_label_set(ext_mod->popup,"CopyPaste");
-	list = elm_list_add(ext_mod->popup);
-	elm_object_style_set(list,"popup");
-	elm_list_horizontal_mode_set(list, ELM_LIST_COMPRESS);
-	elm_widget_sub_object_add(obj, ext_mod->popup);
-	if (!ext_mod->selmode)
+		elm_object_style_set(ext_mod->popup,"menustyle");
+		elm_popup_set_mode(ext_mod->popup, ELM_POPUP_TYPE_ALERT);
+		elm_popup_title_label_set(ext_mod->popup,"CopyPaste");
+		list = elm_list_add(ext_mod->popup);
+		elm_object_style_set(list,"popup");
+		elm_list_horizontal_mode_set(list, ELM_LIST_COMPRESS);
+		elm_widget_sub_object_add(obj, ext_mod->popup);
+		if (!ext_mod->selmode)
 		{	
 			if (!ext_mod->password)
 				elm_list_item_append(list, "Select", NULL, NULL,_select, obj);
@@ -119,7 +119,7 @@ obj_longpress(Evas_Object *obj)
 				}
 	//		elm_ctxpopup_item_add(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 		}
-	else
+		else
 		{
 			  if (!ext_mod->password)
 				{
@@ -145,15 +145,16 @@ obj_longpress(Evas_Object *obj)
 		{
 			elm_list_item_append(list, it->label,NULL,NULL, _item_clicked, it);
 		}
-	if (ext_mod->popup)
+		if (ext_mod->popup)
 		{
 			elm_list_go(list);
 			elm_popup_content_set(ext_mod->popup, list);
 			evas_object_show(ext_mod->popup);	       
 			evas_render( evas_object_evas_get( ext_mod->popup ) );
 		}
-	ext_mod->longpress_timer = NULL;
 	}
+	ext_mod->longpress_timer = NULL;
+}
 
 EAPI void
 obj_mouseup(Evas_Object *obj)
