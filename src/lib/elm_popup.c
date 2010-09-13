@@ -391,7 +391,8 @@ elm_popup_add(Evas_Object *parent_app)
    wd->rot_angle = rotation;
    if(!parent_app)
      {
-	wd->parent = parent;
+		wd->parent = parent;
+		elm_object_style_set(wd->notify, "popup");
      }
    _sizing_eval(obj);
 
