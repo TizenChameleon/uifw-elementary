@@ -569,10 +569,10 @@ elm_tickernoti_mode_set (const Evas_Object *obj, Elm_Tickernoti_Mode mode)
 }
 
 /**
- * Get the view mode on the tickernoti object
+ * Get the detail view window(elm_win) on the tickernoti object
  *
  * @param obj The tickernotil object
- * @return The view mode
+ * @return detail view window(elm_win) object
  * @ingroup TickerNoti
  */
 EAPI Evas_Object *
