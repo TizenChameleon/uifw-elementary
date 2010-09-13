@@ -25,6 +25,9 @@ struct _Widget_Data
 	Evas_Object* parent;
 	Eina_Bool* check_state;
 	int check_count;
+
+	int timeout;
+	Ecore_Timer *timer;
 };
 
 static const char *widtype = NULL;
@@ -55,6 +58,11 @@ _del_hook(Evas_Object *obj)
 	if (!wd) return;
 	elm_selectioninfo_content_set(obj, NULL);
 	elm_selectioninfo_parent_set(obj, NULL);
+	if (wd->timer)
+	{
+	     ecore_timer_del(wd->timer);
+	     wd->timer = NULL;
+	}
 	free(wd);
 }
 
@@ -125,12 +133,32 @@ _calc(Evas_Object *obj)
 	_sizing_eval(obj);
 }
 
+static Eina_Bool
+_timer_cb(void *data)
+{
+	Evas_Object *obj = data;
+        Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return ECORE_CALLBACK_CANCEL;
+	wd->timer = NULL;
+	evas_object_hide(obj);
+	evas_object_smart_callback_call(obj, "selectioninfo,timeout", NULL);
+	return ECORE_CALLBACK_CANCEL;
+}
+
+
 static void
 _show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 	evas_object_show(wd->selectioninfo);
+	if (wd->timer)
+	{
+		ecore_timer_del(wd->timer);
+		wd->timer = NULL;
+	}
+	if (wd->timeout > 0)
+		wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
 }
 
 static void
@@ -139,6 +167,11 @@ _hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_i
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
 	evas_object_hide(wd->selectioninfo);
+	if (wd->timer)
+	{
+		ecore_timer_del(wd->timer);
+		wd->timer = NULL;
+	}
 }
 
 static void
@@ -275,6 +308,43 @@ elm_selectioninfo_parent_set(Evas_Object *obj, Evas_Object *parent)
 	}
 	
 	_calc(obj);
+}
+
+/**
+ * Set the time before the selectioninfo window is hidden. <br>
+ * Set a value < 0 to disable the timer
+ *
+ * @param obj The selectioninfo object
+ * @param time the new timeout
+ *
+ * @ingroup Selectioninfo
+ */
+EAPI void
+elm_selectioninfo_timeout_set(Evas_Object *obj, int timeout)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return;
+	wd->timeout = timeout;
+	elm_selectioninfo_timer_init(obj);
+}
+
+/**
+ * Re-init the timer
+ * @param obj The selectioninfo object
+ *
+ * @ingroup Selctioninfo
+ */
+EAPI void
+elm_selectioninfo_timer_init(Evas_Object *obj)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return;
+	if (wd->timer) ecore_timer_del(wd->timer);
+	wd->timer = NULL;
+	if (wd->timeout > 0)
+		wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
 }
 
 /**
