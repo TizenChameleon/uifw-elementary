@@ -2784,13 +2784,20 @@ extern "C" {
    EAPI void                   elm_imageslider_prev(Evas_Object *obj);
    EAPI void                   elm_imageslider_next(Evas_Object *obj);
 
+   /* Selection Info */
    EAPI Evas_Object *elm_selectioninfo_add(Evas_Object *parent);
    EAPI void         elm_selectioninfo_content_set(Evas_Object *obj, Evas_Object *content);
    EAPI void         elm_selectioninfo_parent_set(Evas_Object *obj, Evas_Object *parent);
+   EAPI void         elm_selectioninfo_timeout_set(Evas_Object *obj, int timeout);
+   EAPI void         elm_selectioninfo_timer_init(Evas_Object *obj);
    EAPI void         elm_selectioninfo_check_state_set(Evas_Object *obj, Eina_Bool *state, int count);
    EAPI int          elm_selectioninfo_checked_count_get(Evas_Object *obj);
    EAPI void         elm_selectioninfo_label_set(Evas_Object *obj, char* text);
 
+   /* smart callback called:
+    * "selectioninfo,timeout" - when time out
+    */
+   
 #ifdef __cplusplus
 }
 #endif
