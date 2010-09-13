@@ -408,7 +408,6 @@ _check_item_is_added(Evas_Object *obj, Evas_Object *content)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
-
 	EINA_LIST_FOREACH(wd->stack, ll, it)
 	{
 		if (it->content == content) 
@@ -429,7 +428,6 @@ _multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, in
 	char buf[32];
 	int num = 1;
 	int count;
-
 	edje_object_part_geometry_get(wd->base, "elm.rect.pad1", NULL, NULL, &pad, NULL);
 	edje_object_part_geometry_get(wd->base, "elm.swallow.title", NULL, NULL, NULL, &height);
 	if (!sub_obj)
@@ -853,19 +851,17 @@ elm_navigationbar_title_object_add(Evas_Object *obj,
 	Item *last_it;
 
 	if (!title_obj) return;
+	if (!content) return;
 	if (!wd) return;
-	
 	it = _check_item_is_added(obj, content);
-	if (!it) it = ELM_NEW(Item);
-	if (!it) return;
-
-	it->content = content;
-	it->title_list = eina_list_append(it->title_list, title_obj);
-	if (it->obj) _item_sizing_eval(it);
-
-	if (!_check_item_is_added(obj, content))	
-		wd->stack = eina_list_append(wd->stack, it);		
-
+	if (!it) 
+		{
+			ERR("[ERROR]Push the Item first, later add the title object");
+			return;
+		}
+	
+	it->title_list = eina_list_append(it->title_list, title_obj);	
+	if(it->obj) _item_sizing_eval(it);	
 	//update if the content is the top item
 	ll = eina_list_last(wd->stack);
 	if (ll) 
@@ -883,13 +879,13 @@ elm_navigationbar_title_object_add(Evas_Object *obj,
 			if(it->fn_btn3){
 				edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
 				edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
-			}
+			}			
 			if((it->title_obj)&&(it->title)){ 
 				edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
 			}
+			_item_sizing_eval(it);	
 		}
 	}
-	_item_sizing_eval(it);
 }
 
 
