@@ -138,8 +138,8 @@ elm_bubble_label_set(Evas_Object *obj, const char *label)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (label) edje_object_signal_emit(wd->bbl, "elm,state,label,add", "elm");
-   else edje_object_signal_emit(wd->bbl, "elm,state,label,del", "elm");
+   if (label) edje_object_signal_emit(wd->bbl, "elm,state,label,visible", "elm");
+   else edje_object_signal_emit(wd->bbl, "elm,state,label,hidden", "elm");
    eina_stringshare_replace(&wd->label, label);
    edje_object_part_text_set(wd->bbl, "elm.text", label);
    _sizing_eval(obj);

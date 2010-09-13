@@ -743,6 +743,25 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
 }
 
 /**
+ * get layout of the datefield
+ *
+ * @param obj The datefield object
+ * @return layout of the datefield
+ *
+ * @ingroup Datefield
+ */
+EAPI Elm_Datefield_Layout
+elm_datefield_layout_get(Evas_Object *obj)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	
+	if (!wd) return 0;
+
+	return wd->layout;
+}
+
+/**
  * Set selected date of the datefield
  *
  * @param obj The datefield object
@@ -870,6 +889,25 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 }
 
 /**
+ * get time mode of the datefield
+ *
+ * @param obj The datefield object
+ * @return time mode (EINA_TRUE: 12hour mode / EINA_FALSE: 24hour mode) 
+ *
+ * @ingroup Datefield
+ */
+EAPI Eina_Bool
+elm_datefield_time_mode_get(Evas_Object *obj)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	
+	if (!wd) return EINA_FALSE;
+
+	return wd->time_mode;
+}
+
+/**
  * Set date format of datefield
  *
  * @param obj The datefield object
@@ -899,6 +937,31 @@ elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
 	else if (strstr(sig, "mmddyy")) wd->date_format = DATE_FORMAT_MMDDYY;
 	else if (strstr(sig, "ddyymm")) wd->date_format = DATE_FORMAT_DDYYMM;
 	else if (strstr(sig, "ddmmyy")) wd->date_format = DATE_FORMAT_DDMMYY;
+}
+
+/**
+ * get date format of the datefield
+ *
+ * @param obj The datefield object
+ * @return date format string. ex) yymmdd
+ *
+ * @ingroup Datefield
+ */
+EAPI const char *
+elm_datefield_date_format_get(Evas_Object *obj)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+
+	switch (wd->date_format)
+	{
+		case DATE_FORMAT_YYMMDD: return "yymmdd";
+		case DATE_FORMAT_YYDDMM: return "yyddmm";
+		case DATE_FORMAT_MMYYDD: return "mmyydd";
+		case DATE_FORMAT_MMDDYY: return "mmddyy";
+		case DATE_FORMAT_DDYYMM: return "ddyymm";
+		case DATE_FORMAT_DDMMYY: return "ddmmyy";
+	}
 }
 
 /**
