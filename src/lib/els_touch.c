@@ -77,6 +77,8 @@ typedef enum _Touch_State
    TOUCH_STATE_DRAG,
    TOUCH_STATE_TWO_DOWN,
    TOUCH_STATE_TWO_DOWN_DURING_DRAG,
+   TOUCH_STATE_TWO_DOWN_UP,
+   TOUCH_STATE_TWO_DOWN_UP_DOWN,
    TOUCH_STATE_TWO_DRAG,
    TOUCH_STATE_THREE_DOWN
 } Touch_State;
@@ -135,11 +137,16 @@ struct _Smart_Data
    Ecore_Animator *animator_flick;
    Ecore_Animator *animator_two_move;
 
-   // timers
+   // one finger timers
    Ecore_Timer *press_timer;
    Ecore_Timer *long_press_timer;
    Ecore_Timer *release_timer;
    Ecore_Timer *press_release_timer;
+
+   // two finger timers
+   Ecore_Timer *two_press_timer;
+   Ecore_Timer *two_release_timer;
+   Ecore_Timer *two_press_release_timer;
 };
 
 /* local subsystem functions */
@@ -165,6 +172,8 @@ static void _smart_enter_hold(Smart_Data *sd);
 static void _smart_enter_drag(Smart_Data *sd);
 static void _smart_enter_two_down(Smart_Data *sd);
 static void _smart_enter_two_down_during_drag(Smart_Data *sd);
+static void _smart_enter_two_down_up(Smart_Data *sd, int downTime, int time);
+static void _smart_enter_two_down_up_down(Smart_Data *sd);
 static void _smart_enter_two_drag(Smart_Data *sd);
 static void _smart_enter_three_down(Smart_Data *sd);
 // emit functions
@@ -175,6 +184,7 @@ static void _smart_emit_long_hold(Smart_Data *sd);
 static void _smart_emit_release(Smart_Data *sd);
 static void _smart_emit_two_press(Smart_Data *sd);
 static void _smart_emit_two_tap(Smart_Data *sd);
+static void _smart_emit_two_double_tap(Smart_Data *sd);
 static void _smart_emit_two_move_start(Smart_Data *sd);
 static void _smart_emit_two_move(Smart_Data *sd);
 static void _smart_emit_two_move_end(Smart_Data *sd);
@@ -185,6 +195,9 @@ static int _smart_press_timer_handler(void *data);
 static int _smart_long_press_timer_handler(void *data);
 static int _smart_release_timer_handler(void *data);
 static int _smart_press_release_timer_handler(void *data);
+static int _smart_two_press_timer_handler(void *data);
+static int _smart_two_release_timer_handler(void *data);
+static int _smart_two_press_release_timer_handler(void *data);
 
 static void _smart_save_move_history(Smart_Data *sd, int x, int y, int dx, int dy);
 static void _smart_start_flick(Smart_Data *sd);
@@ -196,6 +209,8 @@ static void _smart_set_first_down(Smart_Data *sd, int index, Mouse_Data *data);
 static void _smart_set_last_down(Smart_Data *sd, int index, Mouse_Data *data);
 static void _smart_set_last_drag(Smart_Data *sd, int index, Mouse_Data *data);
 static void _smart_stop_all_timers(Smart_Data *sd);
+static void _smart_stop_all_one_timers(Smart_Data *sd);
+static void _smart_stop_all_two_timers(Smart_Data *sd);
 static void _smart_init(void);
 static void _smart_del(Evas_Object *obj);
 static void _smart_add(Evas_Object *obj);
@@ -452,10 +467,22 @@ _smart_mouse_up(void *data, Evas *e, Evas_Object *obj, void *ev)
 	 break;
 
       case TOUCH_STATE_TWO_DOWN:
-	 _smart_emit_two_tap(sd);
-	 _smart_stop_all_timers(sd);
-	 _smart_enter_none(sd);
+	 sd->numOfTouch = 0;
+	 _smart_enter_two_down_up(sd, (event->timestamp - sd->last_down[1].time), event->timestamp);
 	 break;
+
+      case TOUCH_STATE_TWO_DOWN_UP:
+	 break;
+
+      case TOUCH_STATE_TWO_DOWN_UP_DOWN:
+	   {
+	      int dx = sd->last_down[0].x - sd->first_down[0].x;
+	      int dy = sd->last_down[0].y - sd->first_down[0].y;
+	      if ((dx * dx + dy * dy) <= (DBL_TAP_DISTANCE * DBL_TAP_DISTANCE))
+		_smart_emit_two_double_tap(sd);
+	      _smart_stop_all_timers(sd);
+	      _smart_enter_none(sd);
+	   } break;
 
       case TOUCH_STATE_TWO_DRAG:
 	 _smart_stop_animator_two_move(sd);
@@ -536,13 +563,19 @@ _smart_mouse_move(void *data, Evas *e, Evas_Object *obj, void *ev)
 	 break;
 
       case TOUCH_STATE_TWO_DOWN:
-	 _smart_set_last_drag(sd, 0, &mouse_data);
+	 dx = mouse_data.x - sd->last_drag[0].x;
+	 dy = mouse_data.y - sd->last_drag[0].y;
 
-	 sd->two_drag_mode = _smart_check_two_drag_mode(sd);
-	 if (sd->two_drag_mode != TWO_DRAG_NONE)
+	 if ((abs(dx) > INIT_DRAG_THRESHOLD) || (abs(dy) > INIT_DRAG_THRESHOLD))
 	   {
-	      DBG("<< sd->two_drag_mode [%d] >>\n", sd->two_drag_mode);
-	      _smart_enter_two_drag(sd);
+	      _smart_set_last_drag(sd, 0, &mouse_data);
+
+	      sd->two_drag_mode = _smart_check_two_drag_mode(sd);
+	      if (sd->two_drag_mode != TWO_DRAG_NONE)
+		{
+		   DBG("<< sd->two_drag_mode [%d] >>\n", sd->two_drag_mode);
+		   _smart_enter_two_drag(sd);
+		}
 	   }
 	 break;
 
@@ -591,6 +624,23 @@ _smart_multi_down(void *data, Evas *e, Evas_Object *obj, void *ev)
 	      _smart_stop_animator_flick(sd);
 	      _smart_stop_animator_two_move(sd);
 	      _smart_enter_two_down(sd);
+	   }
+	 break;
+
+      case TOUCH_STATE_TWO_DOWN_UP:
+	 sd->numOfTouch++;
+	 if (sd->numOfTouch == 1)
+	   {
+	      mouse_data.x = event->output.x;
+	      mouse_data.y = event->output.y;
+	      mouse_data.time = event->timestamp;
+	      mouse_data.device = event->device;
+	      _smart_set_last_down(sd, 1, &mouse_data);
+	      _smart_set_last_drag(sd, 1, &mouse_data);
+	      _smart_stop_animator_move(sd);
+	      _smart_stop_animator_flick(sd);
+	      _smart_stop_animator_two_move(sd);
+	      _smart_enter_two_down_up_down(sd);
 	   }
 	 break;
 
@@ -663,9 +713,11 @@ _smart_multi_up(void *data, Evas *e, Evas_Object *obj, void *ev)
    switch (sd->state)
      {
       case TOUCH_STATE_TWO_DOWN:
-	 _smart_emit_two_tap(sd);
-	 _smart_stop_all_timers(sd);
-	 _smart_enter_none(sd);
+	 sd->numOfTouch = 0;
+	 _smart_enter_two_down_up(sd, (event->timestamp - sd->last_down[1].time), event->timestamp);
+	 break;
+
+      case TOUCH_STATE_TWO_DOWN_UP:
 	 break;
 
       case TOUCH_STATE_TWO_DOWN_DURING_DRAG:
@@ -720,12 +772,18 @@ _smart_multi_move(void *data, Evas *e, Evas_Object *obj, void *ev)
       case TOUCH_STATE_TWO_DOWN_DURING_DRAG:
 	 if (sd->first_down[1].device == event->device)
 	   {
-	      _smart_set_last_drag(sd, 1, &mouse_data);
-	      sd->two_drag_mode = _smart_check_two_drag_mode(sd);
-	      if (sd->two_drag_mode != TWO_DRAG_NONE)
+	      int dx = mouse_data.x - sd->last_drag[0].x;
+	      int dy = mouse_data.y - sd->last_drag[0].y;
+
+	      if ((abs(dx) > INIT_DRAG_THRESHOLD) || (abs(dy) > INIT_DRAG_THRESHOLD))
 		{
-		   DBG("<< sd->two_drag_mode [%d] >>\n", sd->two_drag_mode);
-		   _smart_enter_two_drag(sd);
+		   _smart_set_last_drag(sd, 1, &mouse_data);
+		   sd->two_drag_mode = _smart_check_two_drag_mode(sd);
+		   if (sd->two_drag_mode != TWO_DRAG_NONE)
+		     {
+			DBG("<< sd->two_drag_mode [%d] >>\n", sd->two_drag_mode);
+			_smart_enter_two_drag(sd);
+		     }
 		}
 	   }
 	 break;
@@ -1027,12 +1085,11 @@ _smart_enter_two_down(Smart_Data *sd)
 {
    _smart_stop_all_timers(sd);
 
-   if (sd->child_obj)
-     {
-	DBG("<< enter two down >>\n");
-	sd->state = TOUCH_STATE_TWO_DOWN;
-	_smart_emit_two_press(sd);
-     }
+   // set two press timer
+   sd->two_press_timer = ecore_timer_add(((double)PRESS_TIME)/1000.0, _smart_two_press_timer_handler, sd);
+
+   sd->state = TOUCH_STATE_TWO_DOWN;
+   DBG("\nTOUCH_STATE_TWO_DOWN\n");
 }
 
 static void
@@ -1040,12 +1097,53 @@ _smart_enter_two_down_during_drag(Smart_Data *sd)
 {
    _smart_stop_all_timers(sd);
 
-   if (sd->child_obj)
+   // set two press timer
+   sd->two_press_timer = ecore_timer_add(((double)PRESS_TIME)/1000.0, _smart_two_press_timer_handler, sd);
+
+   sd->state = TOUCH_STATE_TWO_DOWN_DURING_DRAG;
+   DBG("<< enter two down >>\n");
+}
+
+static void
+_smart_enter_two_down_up(Smart_Data *sd, int downTime, int time)
+{
+   // remove sd->press_timer and set new timer
+   int timerTime = RELEASE_TIME - (downTime - PRESS_TIME);
+   printf("<< time [%d] >>\n", timerTime);
+   if (sd->two_press_timer)
      {
-	DBG("<< enter two down >>\n");
-	sd->state = TOUCH_STATE_TWO_DOWN_DURING_DRAG;
-	_smart_emit_two_press(sd);
+	ecore_timer_del(sd->two_press_timer);
+	sd->two_press_timer = NULL;
+	sd->two_press_release_timer =
+	   ecore_timer_add(((double)timerTime)/1000.0, _smart_two_press_release_timer_handler, sd);
+
      }
+   else
+     {
+	sd->two_release_timer = ecore_timer_add(((double)timerTime)/1000.0, _smart_two_release_timer_handler, sd);
+     }
+
+   sd->state = TOUCH_STATE_TWO_DOWN_UP;
+   DBG("\nTOUCH_STATE_TWO_DOWN_UP\n");
+}
+
+static void
+_smart_enter_two_down_up_down(Smart_Data *sd)
+{
+   if (sd->two_press_release_timer) // remove two_press_release_timer
+     {
+	ecore_timer_del(sd->two_press_release_timer);
+	sd->two_press_release_timer = NULL;
+     }
+
+   if (sd->two_release_timer) // remove two_release_timer
+     {
+	ecore_timer_del(sd->two_release_timer);
+	sd->two_release_timer = NULL;
+     }
+
+   sd->state = TOUCH_STATE_TWO_DOWN_UP_DOWN;
+   DBG("\nTOUCH_STATE_TWO_DOWN_UP_DOWN\n");
 }
 
 static void
@@ -1173,6 +1271,22 @@ _smart_emit_two_tap(Smart_Data *sd)
 }
 
 static void
+_smart_emit_two_double_tap(Smart_Data *sd)
+{
+   if (sd->child_obj)
+     {
+	DBG("<< emit_two_double_tap >>\n");
+	Two_Mouse_Data two_mouse_data;
+	two_mouse_data.first.x = sd->last_down[0].x;
+	two_mouse_data.first.y = sd->last_down[0].y;
+	two_mouse_data.second.x = sd->last_down[1].x;
+	two_mouse_data.second.y = sd->last_down[1].y;
+	two_mouse_data.mode = sd->two_drag_mode;
+	evas_object_smart_callback_call(sd->child_obj, "two,double,tap", &two_mouse_data);
+     }
+}
+
+static void
 _smart_emit_two_move_start(Smart_Data *sd)
 {
    if (sd->child_obj)
@@ -1257,6 +1371,7 @@ _smart_emit_three_tap(Smart_Data *sd)
 static int
 _smart_press_timer_handler(void *data)
 {
+   DBG("<< %s >>\n", __func__);
    Smart_Data *sd;
 
    sd = data;
@@ -1268,6 +1383,7 @@ _smart_press_timer_handler(void *data)
 static int
 _smart_long_press_timer_handler(void *data)
 {
+   DBG("<< %s >>\n", __func__);
    Smart_Data *sd;
 
    sd = data;
@@ -1280,6 +1396,7 @@ _smart_long_press_timer_handler(void *data)
 static int
 _smart_release_timer_handler(void *data)
 {
+   DBG("<< %s >>\n", __func__);
    Smart_Data *sd;
 
    sd = data;
@@ -1293,6 +1410,7 @@ _smart_release_timer_handler(void *data)
 static int
 _smart_press_release_timer_handler(void *data)
 {
+   DBG("<< %s >>\n", __func__);
    static int prevent_handler = 0;
    if (prevent_handler != 0) return ECORE_CALLBACK_CANCEL;
    prevent_handler = 1;
@@ -1305,6 +1423,48 @@ _smart_press_release_timer_handler(void *data)
    _smart_enter_none(sd);
    sd->press_release_timer = NULL;
    prevent_handler = 0;
+   return ECORE_CALLBACK_CANCEL;
+}
+
+static int
+_smart_two_press_timer_handler(void *data)
+{
+   DBG("<< %s >>\n", __func__);
+   Smart_Data *sd;
+
+   sd = data;
+   _smart_emit_two_press(sd);
+   _smart_stop_all_one_timers(sd);
+   sd->two_press_timer = NULL;
+   return ECORE_CALLBACK_CANCEL;
+}
+
+static int
+_smart_two_release_timer_handler(void *data)
+{
+   DBG("<< %s >>\n", __func__);
+   Smart_Data *sd;
+
+   sd = data;
+   _smart_emit_two_tap(sd);
+   _smart_stop_all_timers(sd);
+   _smart_enter_none(sd);
+   sd->two_release_timer = NULL;
+   return ECORE_CALLBACK_CANCEL;
+}
+
+static int
+_smart_two_press_release_timer_handler(void *data)
+{
+   DBG("<< %s >>\n", __func__);
+   Smart_Data *sd;
+
+   sd = data;
+   _smart_emit_two_press(sd);
+   _smart_emit_two_tap(sd);
+   _smart_stop_all_timers(sd);
+   _smart_enter_none(sd);
+   sd->two_press_release_timer = NULL;
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -1586,6 +1746,13 @@ _smart_set_last_drag(Smart_Data *sd, int index, Mouse_Data *data)
 static void
 _smart_stop_all_timers(Smart_Data *sd)
 {
+   _smart_stop_all_one_timers(sd);
+   _smart_stop_all_two_timers(sd);
+}
+
+static void
+_smart_stop_all_one_timers(Smart_Data *sd)
+{
    if (sd->press_timer) // remove sd->press_timer
      {
 	ecore_timer_del(sd->press_timer);
@@ -1608,6 +1775,28 @@ _smart_stop_all_timers(Smart_Data *sd)
      {
 	ecore_timer_del(sd->press_release_timer);
 	sd->press_release_timer = NULL;
+     }
+}
+
+static void
+_smart_stop_all_two_timers(Smart_Data *sd)
+{
+   if (sd->two_press_timer)
+     {
+	ecore_timer_del(sd->two_press_timer);
+	sd->two_press_timer = NULL;
+     }
+
+   if (sd->two_release_timer)
+     {
+	ecore_timer_del(sd->two_release_timer);
+	sd->two_release_timer = NULL;
+     }
+
+   if (sd->two_press_release_timer)
+     {
+	ecore_timer_del(sd->two_press_release_timer);
+	sd->two_press_release_timer = NULL;
      }
 }
 
