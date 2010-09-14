@@ -1,1 +1,6 @@
 /elm_ts/webview/utc_UIFW_elm_webview_add_func
+/elm_ts/webview/utc_UIFW_elm_webview_webkit_get_func
+/elm_ts/webview/utc_UIFW_elm_webview_events_feed_set_func
+/elm_ts/webview/utc_UIFW_elm_webview_auto_fitting_set_func
+/elm_ts/webview/utc_UIFW_elm_webview_minimap_get_func
+/elm_ts/webview/utc_UIFW_elm_webview_default_layout_width_set_func

@@ -5,6 +5,7 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
+#ifdef ELM_EWEBKIT
 /**
  * @defgroup WebView WebView
  * @ingroup Elementary
@@ -94,7 +95,6 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
  *
  * @ingroup Box
  */
-#ifdef ELM_EWEBKIT
 EAPI Evas_Object *
 elm_webview_add(Evas_Object *parent, Eina_Bool tiled)
 {
@@ -134,7 +134,7 @@ EAPI Evas_Object *
 elm_webview_webkit_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   if (!wd) return NULL;
    return wd->webkit;
 }
 
@@ -174,7 +174,7 @@ EAPI Evas_Object *
 elm_webview_minimap_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
+   if (!wd) return NULL;
    return _elm_smart_webview_minimap_get(wd->webkit);
 }
 
