@@ -365,7 +365,6 @@ _theme_hook(Evas_Object * obj)
 	     }
 	   if (item->selected)
 	     {
-	printf("call selected_box 2\n");
 		selected_box(item);
 	     }
 	}
@@ -975,7 +974,6 @@ hide_selected_box(void *data)
 {
    Evas_Object *selected_box = (Evas_Object *)data;
 
-   printf("hide selected box\n");
    evas_object_hide(selected_box);
 
    return ECORE_CALLBACK_CANCEL;
@@ -1050,7 +1048,6 @@ move_selected_box(Widget_Data *wd, Elm_Controlbar_Item * fit, Elm_Controlbar_Ite
 	to = (Evas_Object *)edje_object_part_object_get(_EDJ(tit->base), "bg_img");
 	evas_object_geometry_get(to, &tx, &ty, &tw, &th);
 
-	printf("unselected all items\n");
 	edje_object_signal_emit(_EDJ(wd->pre_item->base), "elm,state,unselected", "elm");
 	edje_object_signal_emit(_EDJ(wd->cur_item->base), "elm,state,unselected", "elm");
 
@@ -1105,7 +1102,6 @@ selected_box(Elm_Controlbar_Item * it)
 
    wd->cur_item = it;
 
-   printf("%s selected\n", it->label);
    if(it->style == TABBAR){
 
 	content = elm_layout_content_unset(wd->view, "elm.swallow.view");
@@ -1200,7 +1196,6 @@ unpressed_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    evas_object_geometry_get(wd->pre_item->base, &x, &y, &w, &h);
    if(ev->output.x > x && ev->output.x < x+w && ev->output.y > y && ev->output.y < y+h)
      {
-	printf("call selected_box\n");
 	selected_box(wd->pre_item);
      }
 
