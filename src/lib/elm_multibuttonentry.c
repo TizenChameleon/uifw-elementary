@@ -132,9 +132,17 @@ static void
 _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 {
 	Widget_Data *wd = elm_widget_data_get(data);
+	Evas_Coord w, h;
 	if (!wd) return;
 
-	evas_object_geometry_get(wd->box, NULL, NULL, &wd->w_box, &wd->h_box);	
+	evas_object_geometry_get(wd->box, NULL, NULL, &w, &h);
+
+	if(wd->h_box < h) evas_object_smart_callback_call(data, "expanded", NULL);
+	else if(wd->h_box > h) evas_object_smart_callback_call(data, "contracted", NULL);
+	else ;
+
+	wd->w_box = w;
+	wd->h_box = h;
 }
 
 static void
@@ -252,7 +260,6 @@ _del_button_item(Elm_Multibuttonentry_Item *item)
 		if (_item == item) {
 			wd->items = eina_list_remove(wd->items, _item);
 			elm_box_unpack(wd->box, _item->button);
-			//_sizing_eval(obj);
 			_del_button_obj(obj, _item->button);
 			free(_item);
 			if(wd->current == l)	
@@ -356,8 +363,6 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 
 	evas_object_smart_callback_call(obj, "added", item);
 
-	//_sizing_eval(obj);
-
 	return item;
 }
 
@@ -453,7 +458,6 @@ elm_multibuttonentry_add(Evas_Object *parent)
 	
 	_view_init(obj);
 	_event_init(obj);
-	//_sizing_eval(obj);
 
 	return obj;
 }

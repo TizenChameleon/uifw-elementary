@@ -984,7 +984,7 @@ elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCall
 	if (wd->func && (wd->func != pEventCallbackFunc))
 		elm_datefield_input_panel_state_callback_del(obj, wd->func);	
 
-	if (pEventCallbackFunc)
+	if (wd->func != pEventCallbackFunc)
 	{
 		wd->func = pEventCallbackFunc;
 		wd->func_data = data;
