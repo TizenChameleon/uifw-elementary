@@ -119,23 +119,24 @@ obj_longpress(Evas_Object *obj)
 
 	/*update*/
 	elm_entry_extension_module_data_get(obj,ext_mod);
-
-	if (ext_mod->popup) evas_object_del(ext_mod->popup);
-       else elm_widget_scroll_freeze_push(obj);
-	top = elm_widget_top_get(obj);
-	if(top)
-		ext_mod->popup = elm_ctxpopup_add(top);
-	/*currently below theme not used,when guideline comes a new theme can be created if required*/
-	//elm_object_style_set(ext_mod->popup,"entry");
-	elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_TRUE);
-	context_menu_orientation = edje_object_data_get
-	(ext_mod->ent, "context_menu_orientation");
-	if ((context_menu_orientation) &&
-	(!strcmp(context_menu_orientation, "horizontal")))
+	if (ext_mod->context_menu)
+	{
+		if (ext_mod->popup) evas_object_del(ext_mod->popup);
+      	else elm_widget_scroll_freeze_push(obj);
+		top = elm_widget_top_get(obj);
+		if(top)
+			ext_mod->popup = elm_ctxpopup_add(top);
+		/*currently below theme not used,when guideline comes a new theme can be created if required*/
+		//elm_object_style_set(ext_mod->popup,"entry");
+		elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_TRUE);
+		context_menu_orientation = edje_object_data_get
+		(ext_mod->ent, "context_menu_orientation");
+		if ((context_menu_orientation) &&
+		(!strcmp(context_menu_orientation, "horizontal")))
 		elm_ctxpopup_horizontal_set(ext_mod->popup, EINA_TRUE);
 
-	elm_widget_sub_object_add(obj, ext_mod->popup);
-	if (!ext_mod->selmode)
+		elm_widget_sub_object_add(obj, ext_mod->popup);
+		if (!ext_mod->selmode)
 		{	
 			if (!ext_mod->password)
 				elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select",_select, obj );
@@ -146,7 +147,7 @@ obj_longpress(Evas_Object *obj)
 				}
 	//		elm_ctxpopup_item_add(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 		}
-	else
+		else
 		{
 			  if (!ext_mod->password)
 				{
@@ -172,12 +173,13 @@ obj_longpress(Evas_Object *obj)
 		{
 			elm_ctxpopup_item_add(ext_mod->popup, NULL, it->label,_item_clicked, it );
 		}
-	if (ext_mod->popup)
-		{
-			_ctxpopup_position(obj);
-			evas_object_show(ext_mod->popup);	          
+		if (ext_mod->popup)
+			{
+				_ctxpopup_position(obj);
+				evas_object_show(ext_mod->popup);	          
+			}
 		}
-		ext_mod->longpress_timer = NULL;
+	ext_mod->longpress_timer = NULL;
 	}
 
 EAPI void

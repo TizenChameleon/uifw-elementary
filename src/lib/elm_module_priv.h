@@ -21,6 +21,7 @@ struct _Elm_Entry_Extension_data
 	Eina_Bool editable :1;
 	Eina_Bool have_selection: 1;
 	Eina_Bool selmode :1;
+	Eina_Bool context_menu : 1;
 };
 
 struct _Elm_Entry_Context_Menu_Item

@@ -718,6 +718,7 @@ _smart_multi_up(void *data, Evas *e, Evas_Object *obj, void *ev)
 	 break;
 
       case TOUCH_STATE_TWO_DOWN_UP:
+      case TOUCH_STATE_TWO_DOWN_UP_DOWN:
 	 break;
 
       case TOUCH_STATE_TWO_DOWN_DURING_DRAG:
