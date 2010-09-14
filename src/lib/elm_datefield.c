@@ -918,9 +918,10 @@ elm_datefield_time_mode_get(Evas_Object *obj)
 EAPI void
 elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
 	char sig[32] = "elm,state,format,";
 	int i = 0, j;
-	Widget_Data *wd = elm_widget_data_get(obj);
 
 	if (!wd || !fmt) return;
 
@@ -976,6 +977,7 @@ elm_datefield_date_format_get(Evas_Object *obj)
 EAPI void 
 elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data)
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int i;
 
@@ -1010,6 +1012,7 @@ elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCall
 EAPI void 
 elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value))
 {
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int i;
 

@@ -9,8 +9,8 @@ TARGETS = utc_UIFW_elm_datefield_add_func \
 	  utc_UIFW_elm_datefield_time_mode_get_func \
 	  utc_UIFW_elm_datefield_date_format_set_func \
 	  utc_UIFW_elm_datefield_date_format_get_func \
-	  utc_UIFW_elm_datefield_input_panel_state_callback_add \
-	  utc_UIFW_elm_datefield_input_panel_state_callback_del
+	  utc_UIFW_elm_datefield_input_panel_state_callback_add_func \
+	  utc_UIFW_elm_datefield_input_panel_state_callback_del_func
 
 PKGS = elementary
 
