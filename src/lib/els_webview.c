@@ -118,7 +118,7 @@
 			"document.write(unescape(url));" \
 			"var type = s.substring(s.lastIndexOf(\"?\") + 1, s.length);" \
 			"document.write(unescape(type));" \
-			"document.write(\"<embed width=\\\"100%\\\" height=\\\"100%\\\" src=\\\"\" + unescape(url) + \"\\\" type=\\\"\" + unescape(type) + \"\\\" />\");" \
+			"document.write(\"<embed width=\\\"100%\\\" height=\\\"100%\\\" AllowFullScreen=\\\"true\\\" src=\\\"\" + unescape(url) + \"\\\" type=\\\"\" + unescape(type) + \"\\\" />\");" \
 			"</script>" \
 			"</object>" \
 			"</body>" \
