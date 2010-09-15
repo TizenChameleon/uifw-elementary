@@ -88,7 +88,7 @@ static void utc_UIFW_elm_datefield_date_format_get_func_01(void)
 	}
 
 	evas_object_resize(datefield, 480, 80);
-	evas_object_move(datefield, 0, 0);
+	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
 
 	tet_result(TET_PASS);
@@ -110,7 +110,7 @@ static void utc_UIFW_elm_datefield_date_format_get_func_02(void)
 		return;
 	}
 	evas_object_resize(datefield, 480, 80);
-	evas_object_move(datefield, 0, 0);
+	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
 	
 	tet_result(TET_PASS);
