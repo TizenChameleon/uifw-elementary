@@ -14,7 +14,7 @@
 
 # define ARRAYINIT(foo)  [foo]=
 
-#define DEBUGON	0
+#define DEBUGON	1
 
 #if DEBUGON
 #define cnp_debug(x...) printf(__FILE__": " x)
@@ -179,7 +179,8 @@ static struct {
    },
    [CNP_ATOM_UTF8STRING] = {
 	"UTF8_STRING",
-	ELM_SEL_MARKUP,
+//	ELM_SEL_MARKUP,
+	ELM_SEL_MARKUP | ELM_SEL_IMAGE,
 	text_converter,
 	NULL,
 	notify_handler_text,
@@ -419,6 +420,7 @@ static Eina_Bool
 selection_notify(void *udata __UNUSED__, int type __UNUSED__, void *event){
    Ecore_X_Event_Selection_Notify *ev = event;
    struct _elm_cnp_selection *sel;
+   struct _elm_cnp_selection *bufsel;
    int i;
 
    cnp_debug("selection notify callback: %d\n",ev->selection);
@@ -444,6 +446,9 @@ selection_notify(void *udata __UNUSED__, int type __UNUSED__, void *event){
 	  {
 	     if (atoms[i].notify){
 		  cnp_debug("Found something: %s\n", atoms[i].name);
+		  bufsel = selections;
+		  /* FIXME : it's maybe a bug. more overhaul it!!! */
+		  sel->selbuf = bufsel->selbuf;
 		  atoms[i].notify(sel, ev);
 	     } else {
 		  printf("Ignored: No handler!\n");
@@ -581,8 +586,13 @@ notify_handler_text(struct _elm_cnp_selection *sel,
    Ecore_X_Selection_Data *data;
    char *str;
 
-   data = notify->data;
-   str = mark_up((char*)data->data, NULL);
+   fprintf(stderr, "## notify_handler_text selbuf - %s\n", sel->selbuf);
+
+//   data = notify->data;
+//   str = mark_up((char*)data->data, NULL);
+   str = mark_up(sel->selbuf, NULL);
+   fprintf(stderr, "## notify_handler_text str - %s\n", str);
+
    elm_entry_entry_insert(sel->requestwidget, str);
    free(str);
 
@@ -650,6 +660,7 @@ text_converter(char *target __UNUSED__, void *data, int size __UNUSED__,
 
    if (sel->format == ELM_SEL_MARKUP){
 	*data_ret = remove_tags(sel->selbuf, size_ret);
+	fprintf(stderr, "## text_convert - %s\n", *data_ret);
    } else if (sel->format == ELM_SEL_IMAGE){
 	cnp_debug("Image %s\n",evas_object_type_get(sel->widget));
 	cnp_debug("Elm type: %s\n",elm_object_widget_type_get(sel->widget));
