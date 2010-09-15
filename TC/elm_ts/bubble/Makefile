@@ -1,7 +1,15 @@
 CC ?= gcc
 
-TARGETS = uts_elm_imageslider_add_test \
-	  uts_elm_imageslider_add_func
+TARGETS = utc_UIFW_elm_bubble_add_func \
+	  utc_UIFW_elm_bubble_label_set_func \
+	  utc_UIFW_elm_bubble_label_get_func \
+	  utc_UIFW_elm_bubble_info_set_func \
+	  utc_UIFW_elm_bubble_info_get_func \
+	  utc_UIFW_elm_bubble_content_set_func \
+	  utc_UIFW_elm_bubble_content_unset_func \
+	  utc_UIFW_elm_bubble_icon_set_func \
+	  utc_UIFW_elm_bubble_icon_get_func \
+	  utc_UIFW_elm_bubble_corner_set_func
 
 PKGS = elementary
 

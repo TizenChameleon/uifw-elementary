@@ -7,5 +7,8 @@ DEB_CONFIGURE_SCRIPT := ./autogen.sh
 DEB_MAKE_CLEAN_TARGET := distclean
 DEB_CONFIGURE_EXTRA_FLAGS := 
 
+CFLAGS += -fPIC
+LDFLAGS += -Wl,--hash-style=both -Wl,--as-needed
+
 clean::
 	[ ! -f Makefile ] || make distclean
