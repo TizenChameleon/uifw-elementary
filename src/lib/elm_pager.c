@@ -97,7 +97,7 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
 }
 
 static void
-_eval_top(Evas_Object *obj)
+_eval_top(Evas_Object *obj, Eina_Bool push)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_Bool animate=EINA_TRUE;
@@ -135,12 +135,24 @@ _eval_top(Evas_Object *obj)
 	wd->top = ittop;
 	o = wd->top->base;
 	evas_object_show(o);
-	if (!animate)
-		edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
-	else if (wd->oldtop && wd->oldtop->popme)
+	
+	if (wd->oldtop && wd->oldtop->popme)
 	    edje_object_signal_emit(o, "elm,action,show", "elm");
 	else
 	    edje_object_signal_emit(o, "elm,action,push", "elm");
+	if (!animate)
+		edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
+	else
+		{
+			if(push)
+				{
+					edje_object_signal_emit(o, "elm,action,show,push", "elm");
+				}
+			else
+				{
+					edje_object_signal_emit(o, "elm,action,show,pop", "elm");
+				}
+		}
 	onshow = edje_object_data_get(o, "onshow");
 	if (onshow)
 	  {
@@ -179,7 +191,7 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 	     evas_object_event_callback_del_full
                (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
 	     evas_object_del(it->base);
-	     _eval_top(it->obj);
+	     _eval_top(it->obj, EINA_FALSE);
 	     free(it);
 	     return;
 	  }
@@ -294,7 +306,7 @@ elm_pager_content_push(Evas_Object *obj, Evas_Object *content)
    edje_object_size_min_calc(it->base, &it->minw, &it->minh);
    evas_object_show(it->content);
    wd->stack = eina_list_append(wd->stack, it);
-   _eval_top(obj);
+   _eval_top(obj, EINA_TRUE);
    _sizing_eval(obj);
 }
 
@@ -393,7 +405,7 @@ elm_pager_to_content_pop(Evas_Object *obj, Evas_Object *content)
 				ll = ll->prev;
    			}
       }
-   _eval_top(it->obj);
+   _eval_top(it->obj, EINA_FALSE);
 }
 
 /**
@@ -422,7 +434,7 @@ elm_pager_content_promote(Evas_Object *obj, Evas_Object *content)
 	  {
 	     wd->stack = eina_list_remove_list(wd->stack, l);
 	     wd->stack = eina_list_append(wd->stack, it);
-	     _eval_top(obj);
+	     _eval_top(obj, EINA_FALSE);
 	     return;
 	  }
      }
