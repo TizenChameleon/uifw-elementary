@@ -1335,6 +1335,7 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 	elm_entry_select_none(data);
      }
    return 1;*/
+
 	// start for cbhm
    Evas_Object *top = elm_widget_top_get(data);
    Ecore_X_Event_Selection_Clear *ev = event;
@@ -1342,12 +1343,12 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
    if (!top)
 	   return ECORE_CALLBACK_PASS_ON;
 
-	if (ev->selection != ECORE_X_SELECTION_SECONDARY){
-			   ECORE_X_SELECTION_SECONDARY);
+	if (ev->selection != ECORE_X_SELECTION_SECONDARY)
+	{
 		return ECORE_CALLBACK_PASS_ON;
 	}
 
-	elm_selection_get(1/*ELM_SEL_SECONDARY*/,0x1/*Markup*/,data);
+	elm_selection_get(1/*ELM_SEL_SECONDARY*/,0x1/*Markup */,data);
 	// end for cbhm
    return ECORE_CALLBACK_PASS_ON;
 }
