@@ -10,11 +10,11 @@
 #include <cairo.h>
 
 #define SMART_NAME "els_webview"
-#define API_ENTRY Smart_Data *sd; sd = evas_object_smart_data_get(obj); if ((!obj) || (!sd) || (evas_object_type_get(obj) && strcmp(evas_object_type_get(obj), SMART_NAME)))
+#define API_ENTRY Smart_Data *sd; sd = evas_object_smart_data_get(obj); if (EINA_UNLIKELY((!obj) || (!sd) || (evas_object_type_get(obj) && strcmp(evas_object_type_get(obj), SMART_NAME))))
 #define INTERNAL_ENTRY Smart_Data *sd; sd = evas_object_smart_data_get(obj); if (!sd) return;
 #define EWK_VIEW_PRIV_GET_OR_RETURN(sd, ptr, ...)                   \
    Ewk_View_Private_Data* ptr = ((Ewk_View_Smart_Data*)sd)->_priv; \
-   if (!ptr) \
+   if (EINA_UNLIKELY(!ptr)) \
    {                                                     \
       ERR("no private data for object %p (%s)",               \
 	 ((Ewk_View_Smart_Data*)sd)->self,                           \
@@ -928,10 +928,17 @@ _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_R
 
    if (sd->scheme_func_hash)
      {
-	protocol_hack = strstr(request->url, ":");
-	*protocol_hack = '\0';
-	func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->scheme_func_hash, request->url);
-	*protocol_hack = ':';
+	if (!protocol_hack)
+	  {
+	     protocol_hack = "http"; //FIXME
+	     func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->scheme_func_hash, request->url);
+	  }
+	else
+	  {
+	     *protocol_hack = '\0';
+	     func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->scheme_func_hash, request->url);
+	     *protocol_hack = ':';
+	  }
      }
 
    if (!func)
