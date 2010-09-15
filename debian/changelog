@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build04) unstable; urgency=low
+
+  * add as-needed
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build04
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Wed, 15 Sep 2010 16:31:01 +0900
+
 elementary (1.0.0+svn.51480slp2+build03) unstable; urgency=low
 
   * Packaging. Please refer git log for more details.
