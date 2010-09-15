@@ -404,7 +404,14 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      {
 	evas_object_focus_set(wd->ent, 1);
 	edje_object_signal_emit(wd->ent, "elm,action,focus", "elm");
+
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
+	// start for cbhm
+	if (top) 
+	{
+		ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+	}
+	// end for cbhm
 	evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
 	_check_enable_returnkey(obj);
      }
@@ -1315,7 +1322,7 @@ _event_selection_notify(void *data, int type __UNUSED__, void *event)
 }
 
 static Eina_Bool
-_event_selection_clear(void *data __UNUSED__, int type __UNUSED__, void *event __UNUSED__)
+_event_selection_clear(void *data, int type __UNUSED__, void *event)
 {
 /*
    Widget_Data *wd = elm_widget_data_get(data);
@@ -1328,6 +1335,20 @@ _event_selection_clear(void *data __UNUSED__, int type __UNUSED__, void *event _
 	elm_entry_select_none(data);
      }
    return 1;*/
+	// start for cbhm
+   Evas_Object *top = elm_widget_top_get(data);
+   Ecore_X_Event_Selection_Clear *ev = event;
+
+   if (!top)
+	   return ECORE_CALLBACK_PASS_ON;
+
+	if (ev->selection != ECORE_X_SELECTION_SECONDARY){
+			   ECORE_X_SELECTION_SECONDARY);
+		return ECORE_CALLBACK_PASS_ON;
+	}
+
+	elm_selection_get(1/*ELM_SEL_SECONDARY*/,0x1/*Markup*/,data);
+	// end for cbhm
    return ECORE_CALLBACK_PASS_ON;
 }
 #endif
