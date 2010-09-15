@@ -205,11 +205,12 @@ elm_cbhm_helper_init(Evas_Object *self)
 	cbhm_disp = ecore_x_display_get();
 	if (cbhm_disp == NULL)
 		return init_flag;
-
-	_get_clipboard_window();
+	if (cbhm_win == None)
+		_get_clipboard_window();
 	if (cbhm_win == None)
 		_search_clipboard_window(DefaultRootWindow(cbhm_disp));
-	self_win = ecore_evas_software_x11_window_get(ecore_evas_ecore_evas_get(evas_object_evas_get(self)));
+	if (self_win == None)
+		self_win = ecore_evas_software_x11_window_get(ecore_evas_ecore_evas_get(evas_object_evas_get(self)));
    
 	if (cbhm_disp && cbhm_win && self_win)
 		init_flag = EINA_TRUE;
@@ -297,6 +298,27 @@ elm_cbhm_get_raw_data()
 	}
 
 	return 0;
+}
+
+/**
+ * sending raw command to CBHM
+ *
+ * @return void
+ *
+ * @ingroup CBHM_helper
+ */
+EAPI void
+elm_cbhm_send_raw_data(char *cmd)
+{
+	if (init_flag == EINA_FALSE)
+		return;
+
+	if (cmd == NULL)
+		return;
+
+	_send_clipboard_events(cmd);
+
+	return;
 }
 
 /**

@@ -2800,6 +2800,12 @@ extern "C" {
    /* smart callback called:
     * "selectioninfo,timeout" - when time out
     */
+
+   /* do not use except clipboard history module */
+   EAPI Eina_Bool elm_cbhm_helper_init(Evas_Object *self);
+   EAPI void elm_cbhm_send_raw_data(char *cmd);
+
+
    
 #ifdef __cplusplus
 }
