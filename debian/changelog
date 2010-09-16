@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build06) unstable; urgency=low
+
+  * Applied elm_webview, els_touch changes.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build06
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Thu, 16 Sep 2010 21:38:20 +0900
+
 elementary (1.0.0+svn.51480slp2+build05) unstable; urgency=low
 
   * Packaging. Please refer git log for more details.
