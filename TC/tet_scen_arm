@@ -20,6 +20,7 @@ elm
 	:include:/elm_ts/webview/tslist
 	:include:/elm_ts/datefield/tslist
 	:include:/elm_ts/bubble/tslist
+	:include:/elm_ts/navigationbar/tslist
 
 #yhkim
 ch 
