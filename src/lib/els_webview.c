@@ -928,6 +928,7 @@ _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_R
 
    if (sd->scheme_func_hash)
      {
+	protocol_hack = strstr(request->url, ":");
 	if (!protocol_hack)
 	  {
 	     protocol_hack = "http"; //FIXME
