@@ -600,9 +600,13 @@ _softkey_up_cb(void *data, Evas_Object *obj, const char *emission,
    elm_softkey_panel_close(it->obj);
    if (it->icon)
    {
-      edj = elm_layout_edje_get(it->icon);
-      if (!edj) return;
-      edje_object_signal_emit(edj, "elm,state,unselected", "elm");
+	   if(!strcmp(evas_object_type_get(it->icon), "edje")){
+		   edj = it->icon;
+	   }else if(!strcmp(evas_object_type_get(it->icon), "elm_widget") && !strcmp(elm_widget_type_get(it->icon), "layout")){
+		   edj = elm_layout_edje_get(it->icon);
+	   }
+	   if (edj) 
+		   edje_object_signal_emit(edj, "elm,state,unselected", "elm");
    }
    if (it->func)
       it->func((void *) (it->data), it->obj, it);
@@ -620,10 +624,14 @@ _softkey_down_cb(void *data, Evas_Object *obj, const char *emission,
    evas_object_smart_callback_call(it->obj, "press", it);
 
    if (!it->icon) return;
-   edj = elm_layout_edje_get(it->icon);
-   if (!edj) return;
-
-   edje_object_signal_emit(edj, "elm,state,selected", "elm");
+   
+   if(!strcmp(evas_object_type_get(it->icon), "edje")){
+	   edj = it->icon;
+   }else if(!strcmp(evas_object_type_get(it->icon), "elm_widget") && !strcmp(elm_widget_type_get(it->icon), "layout")){
+	   edj = elm_layout_edje_get(it->icon);
+   }
+   if (edj) 
+	   edje_object_signal_emit(edj, "elm,state,selected", "elm");
 }
 
 static void
