@@ -288,7 +288,7 @@ _theme_hook(Evas_Object *obj)
    eina_stringshare_del(t);
    edje_object_scale_set(wd->ent, elm_widget_scale_get(obj) * _elm_config->scale);
    edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
-//   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
+   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", wd->input_panel_enable);
 
    ic = edje_object_part_text_imf_context_get(wd->ent, "elm.text");
@@ -2045,7 +2045,7 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
    edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
-//   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
+   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
    ic = elm_entry_imf_context_get(obj);
    if (ic)
      {
@@ -3014,7 +3014,7 @@ elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
    else
        wd->autoperiod = autoperiod;
 
-//   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
+   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
 }
 
 /**
