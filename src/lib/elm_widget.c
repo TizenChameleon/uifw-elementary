@@ -1044,14 +1044,6 @@ elm_widget_type_get(const Evas_Object *obj)
    return "";
 }
 
-
-
-
-
-
-
-
-
 static void
 _propagate_x_drag_lock(Evas_Object *obj, int dir)
 {
@@ -1081,7 +1073,6 @@ _propagate_y_drag_lock(Evas_Object *obj, int dir)
           }
      }
 }
-
 EAPI void
 elm_widget_drag_lock_x_set(Evas_Object *obj, Eina_Bool lock)
 {
