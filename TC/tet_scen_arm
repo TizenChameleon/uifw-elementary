@@ -21,6 +21,7 @@ elm
 	:include:/elm_ts/datefield/tslist
 	:include:/elm_ts/bubble/tslist
 	:include:/elm_ts/navigationbar/tslist
+	:include:/elm_ts/calendar/tslist
 
 #yhkim
 ch 
