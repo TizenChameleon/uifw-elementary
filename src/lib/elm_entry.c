@@ -591,11 +591,10 @@ _cancel(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 }
 
 static void
-_item_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_item_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Elm_Entry_Context_Menu_Item *it = data;
    Evas_Object *obj2 = it->obj;
-   if (it->func) it->func(it->data, obj2, NULL);
 
 	// start for cbhm
 	if (!strcmp(it->label, "Menu"))
@@ -604,6 +603,8 @@ _item_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED
 		elm_cbhm_send_raw_data("show");
 	}
 	// end for cbhm
+
+   if (it->func) it->func(it->data, obj2, NULL);
 }
 
 static Eina_Bool
