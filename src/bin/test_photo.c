@@ -1,5 +1,10 @@
 #include <Elementary.h>
 #ifndef ELM_LIB_QUICKLAUNCH
+
+static void drop_cb(void *mydata, Evas_Object *obj, void *evdata);
+static void drag_stop_cb(void *mydata, Evas_Object *obj, void *evdata);
+static void drag_start_cb(void *mydata, Evas_Object *obj, void *evdata);
+
 void
 test_photo(void *data, Evas_Object *obj, void *event_info)
 {
@@ -47,6 +52,19 @@ test_photo(void *data, Evas_Object *obj, void *event_info)
              evas_object_size_hint_align_set(ph, EVAS_HINT_FILL, 
                                              EVAS_HINT_FILL);
              elm_photo_size_set(ph, 80);
+             elm_photo_file_set(ph, buf);
+	     elm_photo_editable_set(ph, 1);
+             evas_object_size_hint_weight_set(ph, EVAS_HINT_EXPAND,
+                                              EVAS_HINT_EXPAND);
+             evas_object_size_hint_align_set(ph, EVAS_HINT_FILL,
+                                             EVAS_HINT_FILL);
+	     evas_object_smart_callback_add(ph, "drop",
+                                            drop_cb, NULL);
+             evas_object_smart_callback_add(ph, "drag,start",
+                                            drag_start_cb, NULL);
+             evas_object_smart_callback_add(ph, "drag,stop",
+                                            drag_stop_cb, NULL);
+
              if(n == 2 || n == 3) {
             	 elm_photo_fill_inside_set(ph, EINA_TRUE);
             	 elm_widget_style_set(ph, "shadow");
@@ -63,8 +81,25 @@ test_photo(void *data, Evas_Object *obj, void *event_info)
    elm_scroller_content_set(sc, tb);
    evas_object_show(tb);
    evas_object_show(sc);
-   
+
    evas_object_resize(win, 300, 300);
    evas_object_show(win);
 }
+
+static void
+drop_cb(void *mydata, Evas_Object *obj, void *evdata){
+   printf("Drop on obj %p: Image: %s\n",obj,evdata);
+}
+
+static void
+drag_start_cb(void *mydata, Evas_Object *obj, void *evdata){
+   
+}
+
+static void
+drag_stop_cb(void *mydata, Evas_Object *obj, void *evdata){
+
+}
+
+/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/
 #endif

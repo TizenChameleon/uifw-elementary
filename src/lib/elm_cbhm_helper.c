@@ -317,6 +317,7 @@ elm_cbhm_send_raw_data(char *cmd)
 		return;
 
 	_send_clipboard_events(cmd);
+	fprintf(stderr, "## cbhm - send raw cmd = %s\n", cmd);
 
 	return;
 }
