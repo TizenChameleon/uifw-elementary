@@ -195,6 +195,7 @@ static int _smart_press_timer_handler(void *data);
 static int _smart_long_press_timer_handler(void *data);
 static int _smart_release_timer_handler(void *data);
 static int _smart_press_release_timer_handler(void *data);
+static int _tap_delay_timer_handler(void *data);
 static int _smart_two_press_timer_handler(void *data);
 static int _smart_two_release_timer_handler(void *data);
 static int _smart_two_press_release_timer_handler(void *data);
@@ -1419,11 +1420,25 @@ _smart_press_release_timer_handler(void *data)
 
    sd = data;
    _smart_emit_press(sd);
-   _smart_emit_tap(sd);
+   // emit tap after 10ms later
+   // because, webkit engine can not draw the focus ring,
+   // if we emit press and release at the same time
+   ecore_timer_add((double)10/1000.0, _tap_delay_timer_handler, sd);
    _smart_stop_all_timers(sd);
    _smart_enter_none(sd);
    sd->press_release_timer = NULL;
    prevent_handler = 0;
+   return ECORE_CALLBACK_CANCEL;
+}
+
+static int
+_tap_delay_timer_handler(void *data)
+{
+   DBG("<< %s >>\n", __func__);
+   Smart_Data *sd;
+
+   sd = data;
+   _smart_emit_tap(sd);
    return ECORE_CALLBACK_CANCEL;
 }
 

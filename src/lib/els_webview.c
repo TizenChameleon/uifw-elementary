@@ -623,10 +623,13 @@ _elm_smart_webview_scheme_callback_set(Evas_Object* obj, const char *scheme, Elm
    if (!sd->scheme_func_hash)
      sd->scheme_func_hash = eina_hash_pointer_new(NULL);
 
+   char *lower_scheme = strdup(scheme);
+   eina_str_tolower(&lower_scheme);
    if (!func)
-     eina_hash_del(sd->scheme_func_hash, scheme, func);
+     eina_hash_del(sd->scheme_func_hash, lower_scheme, func);
    else
-     eina_hash_add(sd->scheme_func_hash, scheme, func);
+     eina_hash_add(sd->scheme_func_hash, lower_scheme, func);
+   free(lower_scheme);
 }
 
 void
@@ -928,6 +931,7 @@ _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_R
 
    if (sd->scheme_func_hash)
      {
+	protocol_hack = strstr(request->url, ":");
 	if (!protocol_hack)
 	  {
 	     protocol_hack = "http"; //FIXME
@@ -936,8 +940,11 @@ _smart_navigation_policy_decision(Ewk_View_Smart_Data *esd, Ewk_Frame_Resource_R
 	else
 	  {
 	     *protocol_hack = '\0';
-	     func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->scheme_func_hash, request->url);
+	     char *scheme = strdup(request->url);
+	     eina_str_tolower(&scheme);
+	     func = (Elm_WebView_Mime_Cb) eina_hash_find(sd->scheme_func_hash, scheme);
 	     *protocol_hack = ':';
+	     free(scheme);
 	  }
      }
 
