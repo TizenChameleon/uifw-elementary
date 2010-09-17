@@ -12,8 +12,8 @@
  * 
  * Signals that you can add callbacks for are:
  *
- * clicked - This is called when a user has clicked the image
- * 
+ *  - clicked: This is called when a user has clicked the image
+ *  - drop: Something has been dropped on the image
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -150,7 +150,7 @@ elm_image_add(Evas_Object *parent)
  * @param file The path to file that will be used as image
  * @param group The group that the image belongs in edje file
  *
- * @return (1 = sucess, 0 = error)
+ * @return (1 = success, 0 = error)
  *
  * @ingroup Image
  */
@@ -191,6 +191,17 @@ elm_image_smooth_set(Evas_Object *obj, Eina_Bool smooth)
    _sizing_eval(obj);
 }
 
+/**
+ * Gets the current size of the image.
+ *
+ * Either width or height (or both) may be NULL.
+ *
+ * On error, neither w or h will be written too.
+ *
+ * @param obj The image object.
+ * @param w Pointer to store width, or NULL.
+ * @param h Pointer to store height, or NULL.
+ */
 EAPI void
 elm_image_object_size_get(const Evas_Object *obj, int *w, int *h)
 {
@@ -302,3 +313,25 @@ elm_image_orient_set(Evas_Object *obj, Elm_Image_Orient orient)
    if (!wd) return;
    _els_smart_icon_orient_set(wd->img, orient);
 }
+
+/**
+ * Make the image 'editable'.
+ *
+ * This means the image is a valid drag target for drag and drop, and can be
+ * cut or pasted too.
+ *
+ * @param obj Image object.
+ * @param set Turn on or off editability.
+ */
+EAPI void
+elm_image_editable_set(Evas_Object *obj, Eina_Bool set)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return;;
+   _els_smart_icon_edit_set(wd->img, set, obj);
+}
+
+
+/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/

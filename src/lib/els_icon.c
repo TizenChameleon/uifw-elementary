@@ -14,6 +14,7 @@ struct _Smart_Data
    unsigned char scale_down : 1;
    unsigned char preloading : 1;
    unsigned char show : 1;
+   unsigned char edit : 1;
 };
 
 /* local subsystem functions */
@@ -32,6 +33,7 @@ static void _smart_clip_unset(Evas_Object *obj);
 static void _els_smart_icon_flip_horizontal(Smart_Data *sd);
 static void _els_smart_icon_flip_vertical(Smart_Data *sd);
 static void _els_smart_icon_rotate_180(Smart_Data *sd);
+static Eina_Bool _els_smart_icon_dropcb(void *,Evas_Object *, Elm_Drop_Data *);
 
 /* local subsystem globals */
 static Evas_Smart *_e_smart = NULL;
@@ -101,6 +103,7 @@ Evas_Object *
 _els_smart_icon_object_get(Evas_Object *obj)
 {
    Smart_Data *sd;
+
    sd = evas_object_smart_data_get(obj);
    if (!sd) return NULL;
    return sd->obj;
@@ -191,11 +194,11 @@ _els_smart_icon_scale_set(Evas_Object *obj, double scale)
 void
 _els_smart_icon_orient_set(Evas_Object *obj, Elm_Image_Orient orient)
 {
-   Smart_Data *sd;
-   Evas_Object    *tmp;
-   unsigned int   *data, *data2, *to, *from;
-   int             x, y, w, hw, iw, ih;
-   const char     *file, *key;
+   Smart_Data   *sd;
+   Evas_Object  *tmp;
+   unsigned int *data, *data2, *to, *from;
+   int           x, y, w, hw, iw, ih;
+   const char   *file, *key;
 
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
@@ -273,11 +276,45 @@ _els_smart_icon_orient_set(Evas_Object *obj, Elm_Image_Orient orient)
    _smart_reconfigure(sd);
 }
 
+/**
+ * Turns on editing through drag and drop and copy and paste.
+ */
+void
+_els_smart_icon_edit_set(Evas_Object *obj, Eina_Bool edit, Evas_Object *parent)
+{
+   Smart_Data   *sd;
+
+   sd = evas_object_smart_data_get(obj);
+   if (!sd) return;
+
+   if (strcmp(evas_object_type_get(sd->obj), "edje")== 0)
+     {
+        printf("No editing edje objects yet (ever)\n");
+        return;
+     }
+
+   /* Unfortunately eina bool is not a bool, but a char */
+   edit = !!edit;
+   if (edit == sd->edit) return;
+
+   sd->edit = edit;
+
+   if (sd->edit)
+     {
+        elm_drop_target_add(obj, ELM_SEL_FORMAT_IMAGE, _els_smart_icon_dropcb,
+                            parent);
+     }
+   else
+     {
+        elm_drop_target_del(obj);
+     }
+
+}
+
 /* local subsystem globals */
 static void
 _smart_reconfigure(Smart_Data *sd)
 {
-   int iw, ih;
    Evas_Coord x, y, w, h;
 
    if (!sd->obj) return;
@@ -292,8 +329,8 @@ _smart_reconfigure(Smart_Data *sd)
      }
    else
      {
-	iw = 0;
-	ih = 0;
+        int iw = 0, ih = 0;
+
 	evas_object_image_size_get(sd->obj, &iw, &ih);
 
 	iw = ((double)iw) * sd->scale;
@@ -352,7 +389,7 @@ _preloaded(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    Smart_Data *sd = data;
 
    sd->preloading = 0;
-   if(sd->show)
+   if (sd->show) 
      evas_object_show(sd->obj);
 }
 
@@ -406,7 +443,8 @@ _smart_add(Evas_Object *obj)
    sd->scale = 1.0;
    evas_object_smart_member_add(sd->obj, obj);
    evas_object_smart_data_set(obj, sd);
-   evas_object_event_callback_add(sd->obj, EVAS_CALLBACK_IMAGE_PRELOADED, _preloaded, sd);
+   evas_object_event_callback_add(sd->obj, EVAS_CALLBACK_IMAGE_PRELOADED, 
+                                  _preloaded, sd);
 }
 
 static void
@@ -454,8 +492,8 @@ _smart_show(Evas_Object *obj)
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
    sd->show = 1;
-   if(!sd->preloading)
-	   evas_object_show(sd->obj);
+   if (!sd->preloading)
+     evas_object_show(sd->obj);
 }
 
 static void
@@ -584,3 +622,12 @@ _els_smart_icon_rotate_180(Smart_Data *sd)
    _smart_reconfigure(sd);
 }
 
+static Eina_Bool
+_els_smart_icon_dropcb(void *elmobj,Evas_Object *obj, Elm_Drop_Data *drop)
+{
+   _els_smart_icon_file_key_set(obj, drop->data, NULL);
+   evas_object_smart_callback_call(elmobj, "drop", drop->data);
+
+   return EINA_TRUE;
+}
+/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/
