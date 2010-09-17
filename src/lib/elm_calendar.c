@@ -1014,10 +1014,10 @@ elm_calendar_marks_draw(Evas_Object *obj)
 }
 
 /**
- * Returns a list of all the calendar marks.
+ * Set a text color - blue.
  *
  * @param obj The calendar object
- * @return An Eina_List* of the calendar marks, or NULL on failure
+ * @param pos The text position 
  *
  * @ingroup Calendar
  */
@@ -1031,9 +1031,16 @@ elm_calendar_text_saturday_color_set(const Evas_Object *obj, int pos)
    char emission[16];
    snprintf(emission, sizeof(emission), "cit_%d,saturday", pos);
    edje_object_signal_emit(wd->calendar, emission, "elm");
-   return wd->marks;
 }
 
+/**
+ * Set a text color - red.
+ *
+ * @param obj The calendar object
+ * @param pos The text position 
+ *
+ * @ingroup Calendar
+ */
 EAPI void 
 elm_calendar_text_sunday_color_set(const Evas_Object *obj, int pos)
 {
@@ -1044,9 +1051,16 @@ elm_calendar_text_sunday_color_set(const Evas_Object *obj, int pos)
    char emission[16];
    snprintf(emission, sizeof(emission), "cit_%d,sunday", pos);
    edje_object_signal_emit(wd->calendar, emission, "elm");
-   return wd->marks;
 }
 
+/**
+ * Set a text color - black.
+ *
+ * @param obj The calendar object
+ * @param pos The text position 
+ *
+ * @ingroup Calendar
+ */
 EAPI void 
 elm_calendar_text_weekday_color_set(const Evas_Object *obj, int pos)
 {
@@ -1057,5 +1071,4 @@ elm_calendar_text_weekday_color_set(const Evas_Object *obj, int pos)
    char emission[16];
    snprintf(emission, sizeof(emission), "cit_%d,weekday", pos);
    edje_object_signal_emit(wd->calendar, emission, "elm");
-   return wd->marks;
 }
