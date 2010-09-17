@@ -27,6 +27,12 @@
 // Why EAPI in a private header ?
 // EAPI is temporaty - that widget api will change, but makign it EAPI right now to indicate its bound for externalness
 
+typedef struct _Elm_Config    Elm_Config;
+typedef struct _Elm_Module    Elm_Module;
+typedef struct _Elm_Drop_Data Elm_Drop_Data;
+
+typedef Eina_Bool (*Elm_Drop_Cb) (void *d, Evas_Object *o, Elm_Drop_Data *data);
+
 struct _Elm_Theme
 {
    Eina_List *overlay;
@@ -40,19 +46,45 @@ struct _Elm_Theme
 typedef enum _Elm_Engine
 {
    ELM_SOFTWARE_X11,
-     ELM_SOFTWARE_FB,
-     ELM_SOFTWARE_DIRECTFB,
-     ELM_SOFTWARE_16_X11,
-     ELM_XRENDER_X11,
-     ELM_OPENGL_X11,
-     ELM_SOFTWARE_WIN32,
-     ELM_SOFTWARE_16_WINCE,
-     ELM_SOFTWARE_SDL,
-     ELM_SOFTWARE_16_SDL,
-     ELM_OPENGL_SDL
+   ELM_SOFTWARE_FB,
+   ELM_SOFTWARE_DIRECTFB,
+   ELM_SOFTWARE_16_X11,
+   ELM_XRENDER_X11,
+   ELM_OPENGL_X11,
+   ELM_SOFTWARE_WIN32,
+   ELM_SOFTWARE_16_WINCE,
+   ELM_SOFTWARE_SDL,
+   ELM_SOFTWARE_16_SDL,
+   ELM_OPENGL_SDL
 } Elm_Engine;
 
-typedef struct _Elm_Config Elm_Config;
+typedef enum _Elm_Sel_Type
+{
+   ELM_SEL_PRIMARY,
+   ELM_SEL_SECONDARY,
+   ELM_SEL_CLIPBOARD,
+   ELM_SEL_XDND,
+   
+   ELM_SEL_MAX,
+} Elm_Sel_Type;
+
+typedef enum _Elm_Sel_Format
+{
+   /** Plain unformated text: Used for things that don't want rich markup */
+   ELM_SEL_FORMAT_TEXT   = 0x01,
+   /** Edje textblock markup, including inline images */
+   ELM_SEL_FORMAT_MARKUP = 0x02,
+   /** Images */
+   ELM_SEL_FORMAT_IMAGE  = 0x04,
+} Elm_Sel_Format;
+
+struct _Elm_Drop_Data
+{
+   int                   x, y;
+   Elm_Sel_Format        format;
+   void                 *data;
+   int                   len;
+};
 
 struct _Elm_Config
 {
@@ -82,8 +114,6 @@ struct _Elm_Config
    int autoperiod;   
 };
 
-typedef struct _Elm_Module Elm_Module;
-
 struct _Elm_Module
 {
    int version;
@@ -99,21 +129,6 @@ struct _Elm_Module
    int (*shutdown_func) (Elm_Module *m);
    int references;
 };
-
-enum _elm_sel_type {
-   ELM_SEL_PRIMARY,
-   ELM_SEL_SECONDARY,
-   ELM_SEL_CLIPBOARD,
-
-   ELM_SEL_MAX,
-};
-
-enum _elm_sel_format {
-   ELM_SEL_MARKUP	= 0x01,
-   ELM_SEL_IMAGE	= 0x02,
-};
-
-
 
 #define ELM_NEW(t) calloc(1, sizeof(t))
 
@@ -213,9 +228,12 @@ void              _elm_config_init(void);
 void              _elm_config_sub_init(void);
 void              _elm_config_shutdown(void);
 
-Eina_Bool	  elm_selection_set(enum _elm_sel_type selection, Evas_Object *widget, enum _elm_sel_format format, const char *selbuf);
-Eina_Bool	  elm_selection_clear(enum _elm_sel_type selection, Evas_Object *widget);
-Eina_Bool	  elm_selection_get(enum _elm_sel_type selection, enum _elm_sel_format format, Evas_Object *widget);
+Eina_Bool            elm_selection_set(Elm_Sel_Type selection, Evas_Object *widget, Elm_Sel_Format format, const char *buf);
+Eina_Bool            elm_selection_clear(Elm_Sel_Type selection, Evas_Object *widget);
+Eina_Bool            elm_selection_get(Elm_Sel_Type selection, Elm_Sel_Format format, Evas_Object *widget);
+Eina_Bool            elm_drop_target_add(Evas_Object *widget, Elm_Sel_Type, Elm_Drop_Cb, void *);
+Eina_Bool            elm_drop_target_del(Evas_Object *widget);
+Eina_Bool            elm_drag_start(Evas_Object *, Elm_Sel_Format, const char *, void (*)(void *,Evas_Object*),void*);
 
 Eina_Bool         _elm_dangerous_call_check(const char *call);
 
