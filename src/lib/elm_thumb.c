@@ -48,6 +48,8 @@ struct _Widget_Data
    Eina_Bool on_hold : 1;
    Eina_Bool is_video : 1;
    Eina_Bool was_video : 1;
+   Eina_Bool edit : 1;
+
 };
 
 static const char *widtype = NULL;
@@ -77,9 +79,7 @@ static const char EDJE_SIGNAL_LOAD_ERROR[] = "elm,thumb,load,error";
 static const char EDJE_SIGNAL_PULSE_START[] = "elm,state,pulse,start";
 static const char EDJE_SIGNAL_PULSE_STOP[] = "elm,state,pulse,stop";
 
-#ifdef HAVE_ELEMENTARY_ETHUMB
-Ethumb_Client *_elm_ethumb_client = NULL;
-#endif
+struct _Ethumb_Client *_elm_ethumb_client = NULL;
 Eina_Bool _elm_ethumb_connected = EINA_FALSE;
 
 EAPI int ELM_ECORE_EVENT_ETHUMB_CONNECT = 0;
@@ -329,7 +329,7 @@ _thumb_hide_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
 #endif
 
 #ifdef ELM_ETHUMB
-static Eina_Bool _elm_need_ethumb = EINA_FALSE;
+static int _elm_need_ethumb = 0;
 
 static void _on_die_cb(void *, Ethumb_Client *);
 
@@ -360,15 +360,21 @@ void
 _elm_unneed_ethumb(void)
 {
 #ifdef ELM_ETHUMB
-   if (_elm_need_ethumb)
-     {
-	_elm_need_ethumb = 0;
-	ethumb_client_disconnect(_elm_ethumb_client);
-	_elm_ethumb_client = NULL;
-	ethumb_client_shutdown();
-	ELM_ECORE_EVENT_ETHUMB_CONNECT = 0;
-     }
+   if (-- _elm_need_ethumb != 0) return;
+
+   ethumb_client_disconnect(_elm_ethumb_client);
+   _elm_ethumb_client = NULL;
+   ethumb_client_shutdown();
+   ELM_ECORE_EVENT_ETHUMB_CONNECT = 0;
 #endif
+}
+
+static Eina_Bool
+_elm_thumb_dropcb(void *data, Evas_Object *o, Elm_Drop_Data *drop)
+{
+   if (!o || !drop || !drop->data) return EINA_FALSE;
+   elm_thumb_file_set(o,drop->data,NULL);
+   return EINA_TRUE;
 }
 
 /**
@@ -381,10 +387,8 @@ EAPI void
 elm_need_ethumb(void)
 {
 #ifdef ELM_ETHUMB
-   if (_elm_need_ethumb)
-     return;
+   if (_elm_need_ethumb ++ != 0) return;
    ELM_ECORE_EVENT_ETHUMB_CONNECT = ecore_event_type_new();
-   _elm_need_ethumb = 1;
    ethumb_client_init();
    _elm_ethumb_client = ethumb_client_connect(_connect_cb, NULL, NULL);
 #endif
@@ -655,19 +659,11 @@ elm_thumb_animate_get(const Evas_Object *obj)
  *
  * @ingroup Thumb
  */
-#ifdef ELM_ETHUMB
-EAPI Ethumb_Client *
+EAPI struct _Ethumb_Client *
 elm_thumb_ethumb_client_get(void)
 {
    return _elm_ethumb_client;
 }
-#else
-EAPI void *
-elm_thumb_ethumb_client_get(void)
-{
-   return NULL;
-}
-#endif
 
 /**
  * Get the ethumb_client connection state.
@@ -680,3 +676,35 @@ elm_thumb_ethumb_client_connected(void)
 {
    return _elm_ethumb_connected;
 }
+
+
+EAPI Eina_Bool
+elm_thumb_editable_set(Evas_Object *obj, Eina_Bool edit)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return EINA_FALSE;
+   edit = !!edit;
+   if (wd->edit == edit) return EINA_TRUE;
+
+   wd->edit = edit;
+   if (wd->edit)
+      elm_drop_target_add(obj, ELM_SEL_FORMAT_IMAGE,
+                            _elm_thumb_dropcb, obj);
+   else
+      elm_drop_target_del(obj);
+
+   return EINA_TRUE;
+}
+
+EAPI Eina_Bool
+elm_thumb_editable_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return wd->edit;
+}
+
+/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/
