@@ -532,20 +532,20 @@ _paste(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
      {
 #ifdef HAVE_ELEMENTARY_X
         wd->selection_asked = EINA_TRUE;
-	elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_MARKUP, data);
+	elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_FORMAT_MARKUP, data);
 #endif
      }
 }
 
 static void
-_store_selection(enum _elm_sel_type seltype, Evas_Object *obj)
+_store_selection(Elm_Sel_Type seltype, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *sel;
 
    if (!wd) return;
    sel = edje_object_part_text_selection_get(wd->ent, "elm.text");
-   elm_selection_set(seltype, obj, ELM_SEL_MARKUP, sel);
+   elm_selection_set(seltype, obj, ELM_SEL_FORMAT_MARKUP, sel);
    if (seltype == ELM_SEL_CLIPBOARD)
 	   eina_stringshare_replace(&wd->cut_sel, sel);
 }
@@ -1066,7 +1066,7 @@ _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emi
 
 	top = elm_widget_top_get(data);
 	if ((top) && (elm_win_xwindow_get(top)))
-	     elm_selection_set(ELM_SEL_PRIMARY, data, ELM_SEL_MARKUP, txt);
+	     elm_selection_set(ELM_SEL_PRIMARY, data, ELM_SEL_FORMAT_MARKUP, txt);
      }
 #endif
 }
@@ -1078,7 +1078,7 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
    if (!wd) return;
    wd->have_selection = EINA_TRUE;
    evas_object_smart_callback_call(data, SIG_SELECTION_CHANGED, NULL);
-   elm_selection_set(ELM_SEL_PRIMARY, obj, ELM_SEL_MARKUP,
+   elm_selection_set(ELM_SEL_PRIMARY, obj, ELM_SEL_FORMAT_MARKUP,
 		   elm_entry_selection_get(data));
 }
 
@@ -1099,7 +1099,7 @@ _signal_selection_cleared(void *data, Evas_Object *obj __UNUSED__, const char *e
 
 	     top = elm_widget_top_get(data);
 	     if ((top) && (elm_win_xwindow_get(top)))
-	         elm_selection_set(ELM_SEL_PRIMARY, data, ELM_SEL_MARKUP,
+	         elm_selection_set(ELM_SEL_PRIMARY, data, ELM_SEL_FORMAT_MARKUP,
 				       wd->cut_sel);
 #endif
 	     eina_stringshare_del(wd->cut_sel);
@@ -1133,7 +1133,7 @@ _signal_entry_paste_request(void *data, Evas_Object *obj __UNUSED__, const char 
 	if ((top) && (elm_win_xwindow_get(top)))
 	  {
              wd->selection_asked = EINA_TRUE;
-             elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_MARKUP, data);
+             elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_FORMAT_MARKUP, data);
 	  }
 #endif
      }
@@ -1145,7 +1145,7 @@ _signal_entry_copy_notify(void *data, Evas_Object *obj __UNUSED__, const char *e
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    evas_object_smart_callback_call(data, SIG_SELECTION_COPY, NULL);
-   elm_selection_set(ELM_SEL_CLIPBOARD, obj, ELM_SEL_MARKUP,
+   elm_selection_set(ELM_SEL_CLIPBOARD, obj, ELM_SEL_FORMAT_MARKUP,
 			elm_entry_selection_get(data));
 }
 
@@ -1155,7 +1155,7 @@ _signal_entry_cut_notify(void *data, Evas_Object *obj __UNUSED__, const char *em
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    evas_object_smart_callback_call(data, SIG_SELECTION_CUT, NULL);
-   elm_selection_set(ELM_SEL_CLIPBOARD, obj, ELM_SEL_MARKUP,
+   elm_selection_set(ELM_SEL_CLIPBOARD, obj, ELM_SEL_FORMAT_MARKUP,
 			elm_entry_selection_get(data));
    edje_object_part_text_insert(wd->ent, "elm.text", "");
    wd->changed = EINA_TRUE;
