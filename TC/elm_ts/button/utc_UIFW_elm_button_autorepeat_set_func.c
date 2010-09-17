@@ -35,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_button_add_func_01(void);
-static void utc_UIFW_elm_button_add_func_02(void);
+static void utc_UIFW_elm_button_autorepeat_set_func_01(void);
+static void utc_UIFW_elm_button_autorepeat_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_button_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_button_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_button_autorepeat_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_button_autorepeat_set_func_02, NEGATIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -67,42 +67,28 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_button_add()
+ * @brief Positive test case of elm_button_autorepeat_set()
  */
-static void utc_UIFW_elm_button_add_func_01(void)
+static void utc_UIFW_elm_button_autorepeat_set_func_01(void)
 {
-   Evas_Object *button = NULL;
-
    button = elm_button_add(main_win);
-   if (!button) {
-      tet_infoline("elm_button_add() failed in positive test case");
-      tet_result(TET_FAIL);
-      return;
-   }
+   elm_button_autorepeat_set(button, EINA_TRUE);
    evas_object_show(button);
    evas_object_del(button);
    button = NULL;
    tet_result(TET_PASS);
-   tet_infoline("elm_button_add() failed in positive test case");
+   tet_infoline("elm_button_autorepeat_set() failed in positive test case");
 }
 
 /**
- * @brief Negative test case of ug_init elm_button_add()
+ * @brief Negative test case of ug_init elm_button_autorepeat_set()
  */
-static void utc_UIFW_elm_button_add_func_02(void)
+static void utc_UIFW_elm_button_autorepeat_set_func_02(void)
 {
-   Evas_Object *button = NULL;
-
-
-   button = elm_button_add(NULL);
-
-   if (button) {
-          tet_infoline("elm_button_add() failed in negative test case");
-          tet_result(TET_FAIL);
-          evas_object_del(button);
-          button = NULL;
-          return;
-   }
+   button = elm_button_add(main_win);
+   elm_button_autorepeat_set(NULL, EINA_TRUE);
+   evas_object_del(button);
+   button = NULL;
    tet_result(TET_PASS);
-   tet_infoline("elm_button_add() failed in negative test case");
+   tet_infoline("elm_button_autorepeat_set() failed in negative test case");
 }
