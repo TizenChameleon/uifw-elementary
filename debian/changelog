@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build07) unstable; urgency=low
+
+  * change entry item checking to elm_entry 
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build07
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Fri, 17 Sep 2010 10:24:44 +0900
+
 elementary (1.0.0+svn.51480slp2+build06) unstable; urgency=low
 
   * Applied elm_webview, els_touch changes.
