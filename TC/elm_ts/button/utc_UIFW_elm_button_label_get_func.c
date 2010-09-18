@@ -80,12 +80,12 @@ static void utc_UIFW_elm_button_label_get_func_01(void)
       {
          tet_infoline("elm_button_label_get() failed in positive test case");
          tet_result(TET_FAIL);
+         return;
       }
    evas_object_show(button);
    evas_object_del(button);
    button = NULL;
    tet_result(TET_PASS);
-   tet_infoline("elm_button_label_get() failed in positive test case");
 }
 
 /**
@@ -104,7 +104,7 @@ static void utc_UIFW_elm_button_label_get_func_02(void)
          button = NULL;
          tet_infoline("elm_button_label_get() failed in negative test case");
          tet_result(TET_FAIL);
+         return;
       }
    tet_result(TET_PASS);
-   tet_infoline("elm_button_label_get() failed in negative test case");
 }

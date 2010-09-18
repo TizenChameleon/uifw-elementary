@@ -35,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_button_label_get_for_state_func_01(void);
-static void utc_UIFW_elm_button_label_get_for_state_func_02(void);
+static void utc_UIFW_elm_check_state_get_func_01(void);
+static void utc_UIFW_elm_check_state_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +44,9 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_button_label_get_for_state_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_button_label_get_for_state_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_check_state_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_check_state_get_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -67,44 +68,38 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_button_label_get_for_state()
+ * @brief Positive test case of elm_check_state_get()
  */
-static void utc_UIFW_elm_button_label_get_for_state_func_01(void)
+static void utc_UIFW_elm_check_state_get_func_01(void)
 {
-   Evas_Object *button = NULL;
-   char *buffer;
-   button = elm_button_add(main_win);
-   elm_button_label_set(button, _("default"), UIControlStateDefault);
-   buffer = elm_button_label_get_for_state(btn, UIControlStateDefault));
-   if(!buffer)
+   Evas_Object *check = NULL;
+   Eina_Bool state;
+
+   check = elm_check_add(main_win);
+   elm_check_state_set(check, EINA_TRUE);
+   state = elm_check_state_get(check);
+   if(state == EINA_FALSE)
       {
-         tet_infoline("elm_button_label_get() failed in positive test case");
+         evas_object_del(check);
+         tet_infoline("elm_check_state_get() failed in positive test case");
          tet_result(TET_FAIL);
          return;
       }
-   evas_object_show(button);
-   evas_object_del(button);
-   button = NULL;
+   evas_object_show(check);
+   evas_object_del(check);
+   check = NULL;
    tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_button_label_get_for_state()
+ * @brief Negative test case of ug_init elm_check_state_get()
  */
-static void utc_UIFW_elm_button_label_get_for_state_func_02(void)
+static void utc_UIFW_elm_check_state_get_func_02(void)
 {
-   Evas_Object *button = NULL;
-   char *buffer;
-   button = elm_button_add(main_win);
-   elm_button_label_set(button, _("default"), UIControlStateDefault);
-   buffer = elm_button_label_get(NULL, _("default"), UIControlStateDefault);
-   if(buffer)
-      {
-         evas_object_del(button);
-         button = NULL;
-         tet_infoline("elm_button_label_get_for_state() failed in negative test case");
-         tet_result(TET_FAIL);
-         return;
-      }
+   Evas_Object *check = NULL;
+   Eina_Bool state;
+   check = elm_check_add(main_win);
+   elm_check_state_set(check, EINA_TRUE);
+   state = elm_check_state_get(NULL);
    tet_result(TET_PASS);
 }

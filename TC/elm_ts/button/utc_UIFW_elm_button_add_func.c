@@ -83,7 +83,7 @@ static void utc_UIFW_elm_button_add_func_01(void)
    evas_object_del(button);
    button = NULL;
    tet_result(TET_PASS);
-   tet_infoline("elm_button_add() failed in positive test case");
+   tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, A Button object is added successfully.");
 }
 
 /**
@@ -98,11 +98,11 @@ static void utc_UIFW_elm_button_add_func_02(void)
 
    if (button) {
           tet_infoline("elm_button_add() failed in negative test case");
-          tet_result(TET_FAIL);
           evas_object_del(button);
           button = NULL;
+          tet_result(TET_FAIL);
           return;
    }
    tet_result(TET_PASS);
-   tet_infoline("elm_button_add() failed in negative test case");
+   tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Adding a Button object has failed.");
 }

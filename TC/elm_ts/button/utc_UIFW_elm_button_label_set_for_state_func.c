@@ -79,7 +79,6 @@ static void utc_UIFW_elm_button_label_set_for_state_func_01(void)
    evas_object_del(button);
    button = NULL;
    tet_result(TET_PASS);
-   tet_infoline("elm_button_label_set_for_state() failed in positive test case");
 }
 
 /**
@@ -92,5 +91,4 @@ static void utc_UIFW_elm_button_label_set_for_state_func_02(void)
    button = elm_button_add(main_win);
    elm_button_label_set_for_state(NULL, _("default"), UIControlStateDefault);
    tet_result(TET_PASS);
-   tet_infoline("elm_button_label_set_for_state() failed in negative test case");
 }

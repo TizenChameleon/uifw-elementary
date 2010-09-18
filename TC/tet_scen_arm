@@ -22,6 +22,7 @@ elm
 	:include:/elm_ts/bubble/tslist
 	:include:/elm_ts/navigationbar/tslist
 	:include:/elm_ts/calendar/tslist
+	:include:/elm_ts/check/tslist
 
 #yhkim
 ch 

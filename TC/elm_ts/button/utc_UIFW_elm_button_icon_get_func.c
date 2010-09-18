@@ -76,8 +76,8 @@ static void utc_UIFW_elm_button_icon_get_func_01(void)
    char buff[PATH_MAX];
    button = elm_button_add(main_win);
    icon = elm_icon_add(main_win);
-   snprintf(buf, sizeof(buff), "%s/images/logo_small.png", "/usr/share/elementary");
-   elm_icon_file_set(icon, buf, NULL);
+   snprintf(buff, sizeof(buff), "%s/images/logo_small.png", "/usr/share/elementary");
+   elm_icon_file_set(icon, buff, NULL);
    evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    elm_icon_scale_set(icon, EINA_TRUE, EINA_TRUE);
    elm_button_icon_set(button, icon);
@@ -85,12 +85,12 @@ static void utc_UIFW_elm_button_icon_get_func_01(void)
       {
          tet_infoline("elm_button_con_get() failed in positive test case");
          tet_result(TET_FAIL);
+         return;
       }
    evas_object_show(button);
    evas_object_del(button);
    button = NULL;
    tet_result(TET_PASS);
-   tet_infoline("elm_button_icon_get() failed in positive test case");
 }
 
 /**
@@ -103,8 +103,8 @@ static void utc_UIFW_elm_button_icon_get_func_02(void)
    char buff[PATH_MAX];
    button = elm_button_add(main_win);
    icon = elm_icon_add(main_win);
-   snprintf(buf, sizeof(buff), "%s/images/logo_small.png", "/usr/share/elementary");
-   elm_icon_file_set(icon, buf, NULL);
+   snprintf(buff, sizeof(buff), "%s/images/logo_small.png", "/usr/share/elementary");
+   elm_icon_file_set(icon, buff, NULL);
    evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    elm_icon_scale_set(icon, EINA_TRUE, EINA_TRUE);
    elm_button_icon_set(button, icon);
@@ -114,7 +114,7 @@ static void utc_UIFW_elm_button_icon_get_func_02(void)
         button = NULL;
         tet_infoline("elm_button_icon_get() failed in negative test case");
         tet_result(TET_FAIL);
+        return;
       }
    tet_result(TET_PASS);
-   tet_infoline("elm_button_icon_get() failed in negative test case");
 }

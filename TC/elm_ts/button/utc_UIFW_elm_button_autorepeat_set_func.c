@@ -71,13 +71,14 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_button_autorepeat_set_func_01(void)
 {
+   Evas_Object *button = NULL;
+
    button = elm_button_add(main_win);
    elm_button_autorepeat_set(button, EINA_TRUE);
    evas_object_show(button);
    evas_object_del(button);
    button = NULL;
    tet_result(TET_PASS);
-   tet_infoline("elm_button_autorepeat_set() failed in positive test case");
 }
 
 /**
@@ -85,10 +86,11 @@ static void utc_UIFW_elm_button_autorepeat_set_func_01(void)
  */
 static void utc_UIFW_elm_button_autorepeat_set_func_02(void)
 {
+   Evas_Object *button = NULL;
+
    button = elm_button_add(main_win);
    elm_button_autorepeat_set(NULL, EINA_TRUE);
    evas_object_del(button);
    button = NULL;
    tet_result(TET_PASS);
-   tet_infoline("elm_button_autorepeat_set() failed in negative test case");
 }
