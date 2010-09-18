@@ -35,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_check_add_func_01(void);
-static void utc_UIFW_elm_check_add_func_02(void);
+static void utc_UIFW_elm_radio_label_set_func_01(void);
+static void utc_UIFW_elm_radio_label_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_check_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_check_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_radio_label_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_radio_label_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -68,38 +68,28 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_check_add()
+ * @brief Positive test case of elm_radio_label_set()
  */
-static void utc_UIFW_elm_check_add_func_01(void)
+static void utc_UIFW_elm_radio_label_set_func_01(void)
 {
-   Evas_Object *check = NULL;
+   Evas_Object *radio = NULL;
 
-   check = elm_check_add(main_win);
-   if (!check) {
-      tet_infoline("elm_check_add() failed in positive test case");
-      tet_result(TET_FAIL);
-      return;
-   }
-   evas_object_show(check);
-   evas_object_del(check);
-   check = NULL;
+   radio = elm_radio_add(main_win);
+   elm_radio_label_set(radio, _("label"));
+   evas_object_show(radio);
+   evas_object_del(radio);
+   radio = NULL;
    tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_check_add()
+ * @brief Negative test case of ug_init elm_radio_label_set()
  */
-static void utc_UIFW_elm_check_add_func_02(void)
+static void utc_UIFW_elm_radio_label_set_func_02(void)
 {
-   Evas_Object *check = NULL;
+   Evas_Object *radio = NULL;
 
-   check = elm_check_add(NULL);
-
-   if (check) {
-          tet_infoline("elm_check_add() failed in negative test case");
-          evas_object_del(check);
-          check = NULL;
-          tet_result(TET_FAIL);
-   }
+   radio = elm_radio_add(main_win);
+   elm_radio_label_set(NULL, _("label"));
    tet_result(TET_PASS);
 }

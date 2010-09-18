@@ -1,13 +1,7 @@
 CC ?= gcc
 
-TARGETS = utc_UIFW_elm_check_add_func \
-		utc_UIFW_elm_check_label_set_func \
-		utc_UIFW_elm_check_label_get_func \
-		utc_UIFW_elm_check_icon_set_func \
-		utc_UIFW_elm_check_icon_get_func \
-		utc_UIFW_elm_check_state_set_func \
-		utc_UIFW_elm_check_state_get_func \
-		utc_UIFW_elm_toggle_state_pointer_set_func
+TARGETS = utc_UIFW_elm_radio_add_func \
+	  utc_UIFW_elm_radio_label_set_func
 
 PKGS = elementary
 
