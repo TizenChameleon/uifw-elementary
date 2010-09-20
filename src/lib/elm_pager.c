@@ -135,14 +135,15 @@ _eval_top(Evas_Object *obj, Eina_Bool push)
 	wd->top = ittop;
 	o = wd->top->base;
 	evas_object_show(o);
-	
-	if (wd->oldtop && wd->oldtop->popme)
+
+	if (!animate)
+		edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
+	else if (wd->oldtop && wd->oldtop->popme)
 	    edje_object_signal_emit(o, "elm,action,show", "elm");
 	else
 	    edje_object_signal_emit(o, "elm,action,push", "elm");
-	if (!animate)
-		edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
-	else
+	
+	if(animate)
 		{
 			if(push)
 				{
