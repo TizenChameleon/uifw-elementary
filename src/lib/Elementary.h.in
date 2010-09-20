@@ -1,6 +1,6 @@
 /*
  *
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ * vim:ts=8:sw=3:sts=3:expandtab:cino=>5n-2f0^-2{2(0W1st0
  */
 #ifndef ELEMENTARY_H
 #define ELEMENTARY_H
@@ -143,34 +143,34 @@ extern "C" {
    /* Objects */
    typedef enum _Elm_Win_Type
      {
-	ELM_WIN_BASIC,
-	ELM_WIN_DIALOG_BASIC,
-	ELM_WIN_DESKTOP,
-	ELM_WIN_DOCK,
-	ELM_WIN_TOOLBAR,
-	ELM_WIN_MENU,
-	ELM_WIN_UTILITY,
-	ELM_WIN_SPLASH
+        ELM_WIN_BASIC,
+        ELM_WIN_DIALOG_BASIC,
+        ELM_WIN_DESKTOP,
+        ELM_WIN_DOCK,
+        ELM_WIN_TOOLBAR,
+        ELM_WIN_MENU,
+        ELM_WIN_UTILITY,
+        ELM_WIN_SPLASH
      } Elm_Win_Type;
 
    typedef enum _Elm_Win_Keyboard_Mode
      {
-	ELM_WIN_KEYBOARD_UNKNOWN,
-	ELM_WIN_KEYBOARD_OFF,
-	ELM_WIN_KEYBOARD_ON,
-	ELM_WIN_KEYBOARD_ALPHA,
-	ELM_WIN_KEYBOARD_NUMERIC,
-	ELM_WIN_KEYBOARD_PIN,
-	ELM_WIN_KEYBOARD_PHONE_NUMBER,
-	ELM_WIN_KEYBOARD_HEX,
-	ELM_WIN_KEYBOARD_TERMINAL,
-	ELM_WIN_KEYBOARD_PASSWORD,
-	ELM_WIN_KEYBOARD_IP,
-	ELM_WIN_KEYBOARD_HOST,
-	ELM_WIN_KEYBOARD_FILE,
-	ELM_WIN_KEYBOARD_URL,
-	ELM_WIN_KEYBOARD_KEYPAD,
-	ELM_WIN_KEYBOARD_J2ME
+        ELM_WIN_KEYBOARD_UNKNOWN,
+        ELM_WIN_KEYBOARD_OFF,
+        ELM_WIN_KEYBOARD_ON,
+        ELM_WIN_KEYBOARD_ALPHA,
+        ELM_WIN_KEYBOARD_NUMERIC,
+        ELM_WIN_KEYBOARD_PIN,
+        ELM_WIN_KEYBOARD_PHONE_NUMBER,
+        ELM_WIN_KEYBOARD_HEX,
+        ELM_WIN_KEYBOARD_TERMINAL,
+        ELM_WIN_KEYBOARD_PASSWORD,
+        ELM_WIN_KEYBOARD_IP,
+        ELM_WIN_KEYBOARD_HOST,
+        ELM_WIN_KEYBOARD_FILE,
+        ELM_WIN_KEYBOARD_URL,
+        ELM_WIN_KEYBOARD_KEYPAD,
+        ELM_WIN_KEYBOARD_J2ME
      } Elm_Win_Keyboard_Mode;
 
   /**
@@ -643,8 +643,8 @@ extern "C" {
    EAPI Elm_Gengrid_Item *elm_gengrid_selected_item_get(const Evas_Object *obj);
    EAPI const Eina_List *elm_gengrid_selected_items_get(const Evas_Object *obj);
    EAPI const Eina_List *elm_gengrid_items_get(const Evas_Object *obj);
-   EAPI void elm_gengrid_item_disabled_set(Elm_Gengrid_Item *item, Eina_Bool disabled);
-   EAPI Eina_Bool elm_gengrid_item_disabled_get(const Elm_Gengrid_Item *item);
+   EAPI void         elm_gengrid_item_disabled_set(Elm_Gengrid_Item *item, Eina_Bool disabled);
+   EAPI Eina_Bool    elm_gengrid_item_disabled_get(const Elm_Gengrid_Item *item);
    EAPI Elm_Gengrid_Item *elm_gengrid_item_append(Evas_Object *obj, const Elm_Gengrid_Item_Class *gcc,  const void *data, Evas_Smart_Cb func, const void *func_data);
    /* smart callbacks called:
     *
@@ -707,23 +707,23 @@ extern "C" {
    EAPI void         elm_notify_content_set(Evas_Object *obj, Evas_Object *content);
    EAPI Evas_Object *elm_notify_content_unset(Evas_Object *obj);
    EAPI Evas_Object *elm_notify_content_get(const Evas_Object *obj);
-   EAPI void	     elm_notify_parent_set(Evas_Object *obj, Evas_Object *parent);
-   EAPI void	     elm_notify_orient_set(Evas_Object *obj, Elm_Notify_Orient orient);
-   EAPI Elm_Notify_Orient	    elm_notify_orient_get(const Evas_Object *obj);
+   EAPI void         elm_notify_parent_set(Evas_Object *obj, Evas_Object *parent);
+   EAPI void         elm_notify_orient_set(Evas_Object *obj, Elm_Notify_Orient orient);
+   EAPI Elm_Notify_Orient elm_notify_orient_get(const Evas_Object *obj);
    EAPI void         elm_notify_timeout_set(Evas_Object *obj, int timeout);
    EAPI int          elm_notify_timeout_get(const Evas_Object *obj);
-   EAPI void	     elm_notify_timer_init(Evas_Object *obj);
-   EAPI void	     elm_notify_repeat_events_set(Evas_Object *obj, Eina_Bool repeat);
+   EAPI void         elm_notify_timer_init(Evas_Object *obj);
+   EAPI void         elm_notify_repeat_events_set(Evas_Object *obj, Eina_Bool repeat);
    EAPI Eina_Bool    elm_notify_repeat_events_get(const Evas_Object *obj);
    /* smart callbacks called:
     */
 
    typedef enum _Elm_Hover_Axis
      {
-	ELM_HOVER_AXIS_NONE,
-	ELM_HOVER_AXIS_HORIZONTAL,
-	ELM_HOVER_AXIS_VERTICAL,
-	ELM_HOVER_AXIS_BOTH
+        ELM_HOVER_AXIS_NONE,
+        ELM_HOVER_AXIS_HORIZONTAL,
+        ELM_HOVER_AXIS_VERTICAL,
+        ELM_HOVER_AXIS_BOTH
      } Elm_Hover_Axis;
    EAPI Evas_Object *elm_hover_add(Evas_Object *parent);
    EAPI void         elm_hover_target_set(Evas_Object *obj, Evas_Object *target);
@@ -752,32 +752,32 @@ extern "C" {
      };
    typedef enum _Elm_Icon_Type
      {
-	ELM_ICON_NONE,
-	ELM_ICON_FILE,
-	ELM_ICON_STANDARD
+        ELM_ICON_NONE,
+        ELM_ICON_FILE,
+        ELM_ICON_STANDARD
      } Elm_Icon_Type;
    typedef struct _Elm_Hoversel_Item Elm_Hoversel_Item;
 
    typedef enum _Elm_Input_Panel_Layout
      {
-	ELM_INPUT_PANEL_LAYOUT_NORMAL,          /**< Default 4x4 layout */
-	ELM_INPUT_PANEL_LAYOUT_NUMBER,          /**< Number layout */
-	ELM_INPUT_PANEL_LAYOUT_EMAIL,           /**< Email layout */
-	ELM_INPUT_PANEL_LAYOUT_URL,             /**< URL layout */
-	ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,     /**< Phone Number layout */  
-	ELM_INPUT_PANEL_LAYOUT_IP,              /**< IP layout */
-	ELM_INPUT_PANEL_LAYOUT_MONTH,           /**< Month layout */
-	ELM_INPUT_PANEL_LAYOUT_NUMBERONLY,      /**< Number Only layout */
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_1 = 100,  /* Reserved for future use */
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_2,
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_3,
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_4,
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_5,
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_6,
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_7,
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_8,
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_9,
-	ELM_INPUT_PANEL_LAYOUT_CUSTOM_10
+        ELM_INPUT_PANEL_LAYOUT_NORMAL,          /**< Default 4x4 layout */
+        ELM_INPUT_PANEL_LAYOUT_NUMBER,          /**< Number layout */
+        ELM_INPUT_PANEL_LAYOUT_EMAIL,           /**< Email layout */
+        ELM_INPUT_PANEL_LAYOUT_URL,             /**< URL layout */
+        ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,     /**< Phone Number layout */  
+        ELM_INPUT_PANEL_LAYOUT_IP,              /**< IP layout */
+        ELM_INPUT_PANEL_LAYOUT_MONTH,           /**< Month layout */
+        ELM_INPUT_PANEL_LAYOUT_NUMBERONLY,      /**< Number Only layout */
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_1 = 100,  /* Reserved for future use */
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_2,
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_3,
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_4,
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_5,
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_6,
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_7,
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_8,
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_9,
+        ELM_INPUT_PANEL_LAYOUT_CUSTOM_10
      } Elm_Input_Panel_Layout;
    
    EAPI Evas_Object *elm_entry_add(Evas_Object *parent);
@@ -906,17 +906,17 @@ extern "C" {
    typedef struct _Elm_Entry_Anchorblock_Info Elm_Entry_Anchorblock_Info;
    struct _Elm_Entry_Anchorblock_Info
      {
-	const char *name;
-	int button;
-	Evas_Object *hover;
-	struct
+        const char *name;
+        int button;
+        Evas_Object *hover;
+        struct
           {
-	     Evas_Coord x, y, w, h;
-	  } anchor, hover_parent;
-	Eina_Bool hover_left : 1;
-	Eina_Bool hover_right : 1;
-	Eina_Bool hover_top : 1;
-	Eina_Bool hover_bottom : 1;
+             Evas_Coord x, y, w, h;
+          } anchor, hover_parent;
+        Eina_Bool hover_left : 1;
+        Eina_Bool hover_right : 1;
+        Eina_Bool hover_top : 1;
+        Eina_Bool hover_bottom : 1;
      };
    EAPI Evas_Object *elm_anchorblock_add(Evas_Object *parent);
    EAPI void         elm_anchorblock_text_set(Evas_Object *obj, const char *text);
@@ -948,7 +948,7 @@ extern "C" {
    EAPI Evas_Object *elm_photo_add(Evas_Object *parent);
    EAPI Eina_Bool    elm_photo_file_set(Evas_Object *obj, const char *file);
    EAPI void         elm_photo_size_set(Evas_Object *obj, int size);
-   EAPI void 		 elm_photo_fill_inside_set(Evas_Object *obj, Eina_Bool fill);
+   EAPI void         elm_photo_fill_inside_set(Evas_Object *obj, Eina_Bool fill);
    EAPI void         elm_photo_editable_set(Evas_Object *obj, Eina_Bool set);
    /* smart callbacks called:
     * "clicked" - the user clicked the icon
@@ -1171,17 +1171,17 @@ extern "C" {
 
    typedef enum _Elm_Genlist_Item_Flags
      {
-	   ELM_GENLIST_ITEM_NONE = 0,
-	   ELM_GENLIST_ITEM_SUBITEMS = (1 << 0)
+        ELM_GENLIST_ITEM_NONE = 0,
+        ELM_GENLIST_ITEM_SUBITEMS = (1 << 0)
      } Elm_Genlist_Item_Flags;
    typedef enum _Elm_Genlist_Edit_Mode
      {
-	   ELM_GENLIST_EDIT_MODE_NONE    = 0,
-	   ELM_GENLIST_EDIT_MODE_REORDER = (1 << 0),
-	   ELM_GENLIST_EDIT_MODE_INSERT  = (1 << 1),
-	   ELM_GENLIST_EDIT_MODE_DELETE  = (1 << 2),
-	   ELM_GENLIST_EDIT_MODE_SELECT  = (1 << 3),
-	   ELM_GENLIST_EDIT_MODE_SELECTALL  = (1 << 4)
+        ELM_GENLIST_EDIT_MODE_NONE    = 0,
+        ELM_GENLIST_EDIT_MODE_REORDER = (1 << 0),
+        ELM_GENLIST_EDIT_MODE_INSERT  = (1 << 1),
+        ELM_GENLIST_EDIT_MODE_DELETE  = (1 << 2),
+        ELM_GENLIST_EDIT_MODE_SELECT  = (1 << 3),
+        ELM_GENLIST_EDIT_MODE_SELECTALL  = (1 << 4)
      } Elm_Genlist_Edit_Mode;
    typedef struct _Elm_Genlist_Item_Class      Elm_Genlist_Item_Class;
    typedef struct _Elm_Genlist_Item            Elm_Genlist_Item;
@@ -1201,16 +1201,16 @@ extern "C" {
 
    struct _Elm_Genlist_Item_Class
      {
-	   const char *item_style;
-	   struct _Elm_Genlist_Item_Class_Func
-	     {
-		   GenlistItemLabelGetFunc label_get;
-		   GenlistItemIconGetFunc icon_get;
-		   GenlistItemStateGetFunc state_get;
-		   GenlistItemDelFunc del;
-		   GenlistItemEditModeGetFunc editmode_get;
-		   GenlistItemLabelChangedFunc label_changed;
-	     } func;
+        const char *item_style;
+        struct _Elm_Genlist_Item_Class_Func
+          {
+             GenlistItemLabelGetFunc label_get;
+             GenlistItemIconGetFunc icon_get;
+             GenlistItemStateGetFunc state_get;
+             GenlistItemDelFunc del;
+             GenlistItemEditModeGetFunc editmode_get;
+             GenlistItemLabelChangedFunc label_changed;
+          } func;
      };
 
    struct _Elm_Genlist_Edit_Class
@@ -1257,11 +1257,11 @@ extern "C" {
    EAPI Elm_Genlist_Item *elm_genlist_first_item_get(const Evas_Object *obj);
    EAPI Elm_Genlist_Item *elm_genlist_last_item_get(const Evas_Object *obj);
    /* available item styles:
-	* default
-	* default_style - The text part is a textblock
-	* double_label
-	* icon_top_text_bottom
-	*/
+    * default
+    * default_style - The text part is a textblock
+    * double_label
+    * icon_top_text_bottom
+    */
 
    /* Genlist Item operation */
    EAPI Elm_Genlist_Item *elm_genlist_item_next_get(const Elm_Genlist_Item *item);
@@ -1372,33 +1372,35 @@ extern "C" {
 
    struct _Elm_Slideshow_Item_Class
      {
-	struct _Elm_Slideshow_Item_Class_Func {
-	     SlideshowItemGetFunc get;
-	     SlideshowItemDelFunc del;
-	} func;
+        struct _Elm_Slideshow_Item_Class_Func 
+          {
+             SlideshowItemGetFunc get;
+             SlideshowItemDelFunc del;
+          } func;
      };
 
-   EAPI Evas_Object 		*elm_slideshow_add(Evas_Object *parent);
-   EAPI Elm_Slideshow_Item	*elm_slideshow_item_add(Evas_Object *obj, const Elm_Slideshow_Item_Class *itc, const void *data);
-   EAPI void				 elm_slideshow_show(Elm_Slideshow_Item *item);
-   EAPI void				 elm_slideshow_next(Evas_Object *obj);
-   EAPI void				 elm_slideshow_previous(Evas_Object *obj);
-   EAPI const Eina_List 	*elm_slideshow_transitions_get(const Evas_Object *obj);
-   EAPI void	        	 elm_slideshow_transition_set(Evas_Object *obj, const char *);
-   EAPI const char     		*elm_slideshow_transition_get(const Evas_Object *obj);
-   EAPI void            	 elm_slideshow_timeout_set(Evas_Object *obj ,int timeout);
-   EAPI int					 elm_slideshow_timeout_get(const Evas_Object *obj);
-   EAPI void				 elm_slideshow_loop_set(Evas_Object *obj, Eina_Bool loop);
-   EAPI Eina_Bool			 elm_slideshow_loop_get(const Evas_Object *obj);
-   EAPI void				 elm_slideshow_clear(Evas_Object *obj);
-   EAPI const Eina_List 	*elm_slideshow_items_get(const Evas_Object *obj);
-   EAPI void				 elm_slideshow_item_del(Elm_Slideshow_Item *item);
-   EAPI void 				*elm_slideshow_item_data_get(Elm_Slideshow_Item *item);
-   EAPI Elm_Slideshow_Item	*elm_slideshow_item_current_get(const Evas_Object *obj);
-   EAPI Evas_Object*		 elm_slideshow_item_object_get(Elm_Slideshow_Item* item);
-   EAPI const char 			*elm_slideshow_layout_get(const Evas_Object *obj);
-   EAPI void 				 elm_slideshow_layout_set(Evas_Object *obj, const char *layout);
-   EAPI const Eina_List 	*elm_slideshow_layouts_get(const Evas_Object *obj);
+   EAPI Evas_Object        *elm_slideshow_add(Evas_Object *parent);
+   EAPI Elm_Slideshow_Item *elm_slideshow_item_add(Evas_Object *obj, const Elm_Slideshow_Item_Class *itc, const void *data);
+   EAPI void                elm_slideshow_show(Elm_Slideshow_Item *item);
+   EAPI void                elm_slideshow_next(Evas_Object *obj);
+   EAPI void                elm_slideshow_previous(Evas_Object *obj);
+   EAPI const Eina_List    *elm_slideshow_transitions_get(const Evas_Object *obj);
+   EAPI void                elm_slideshow_transition_set(Evas_Object *obj, const char *);
+   EAPI const char         *elm_slideshow_transition_get(const Evas_Object *obj);
+   EAPI void                elm_slideshow_timeout_set(Evas_Object *obj ,int timeout);
+   EAPI int                 elm_slideshow_timeout_get(const Evas_Object *obj);
+   EAPI void                elm_slideshow_loop_set(Evas_Object *obj, Eina_Bool loop);
+   EAPI Eina_Bool           elm_slideshow_loop_get(const Evas_Object *obj);
+   EAPI void                elm_slideshow_clear(Evas_Object *obj);
+   EAPI const Eina_List    *elm_slideshow_items_get(const Evas_Object *obj);
+   EAPI void                elm_slideshow_item_del(Elm_Slideshow_Item *item);
+   EAPI void               *elm_slideshow_item_data_get(Elm_Slideshow_Item *item);
+   EAPI Elm_Slideshow_Item *elm_slideshow_item_current_get(const Evas_Object *obj);
+   EAPI Evas_Object*        elm_slideshow_item_object_get(Elm_Slideshow_Item* item);
+   EAPI const char         *elm_slideshow_layout_get(const Evas_Object *obj);
+   EAPI void                elm_slideshow_layout_set(Evas_Object *obj, const char *layout);
+   EAPI const Eina_List    *elm_slideshow_layouts_get(const Evas_Object *obj);
+
 
    EAPI Evas_Object *elm_fileselector_add(Evas_Object *parent);
    EAPI void         elm_fileselector_is_save_set(Evas_Object *obj, Eina_Bool is_save);
@@ -1452,21 +1454,21 @@ extern "C" {
     */
 
    EAPI Evas_Object *elm_spinner_add(Evas_Object *parent);
-   EAPI void	     elm_spinner_label_format_set(Evas_Object *obj, const char *fmt);
+   EAPI void         elm_spinner_label_format_set(Evas_Object *obj, const char *fmt);
    EAPI const char  *elm_spinner_label_format_get(const Evas_Object *obj);
    EAPI void         elm_spinner_min_max_set(Evas_Object *obj, double min, double max);
    EAPI void         elm_spinner_min_max_get(const Evas_Object *obj, double *min, double *max);
-   EAPI void	     elm_spinner_step_set(Evas_Object *obj, double step);
-   EAPI double	     elm_spinner_step_get(const Evas_Object *obj);
-   EAPI void	     elm_spinner_value_set(Evas_Object *obj, double val);
-   EAPI double	     elm_spinner_value_get(const Evas_Object *obj);
+   EAPI void         elm_spinner_step_set(Evas_Object *obj, double step);
+   EAPI double       elm_spinner_step_get(const Evas_Object *obj);
+   EAPI void         elm_spinner_value_set(Evas_Object *obj, double val);
+   EAPI double       elm_spinner_value_get(const Evas_Object *obj);
    EAPI void         elm_spinner_wrap_set(Evas_Object *obj, Eina_Bool wrap);
    EAPI Eina_Bool    elm_spinner_wrap_get(const Evas_Object *obj);
-   EAPI void	     elm_spinner_editable_set(Evas_Object *obj, Eina_Bool editable);
+   EAPI void         elm_spinner_editable_set(Evas_Object *obj, Eina_Bool editable);
    EAPI Eina_Bool    elm_spinner_editable_get(const Evas_Object *obj);
-   EAPI void	     elm_spinner_special_value_add(Evas_Object *obj, double value, const char *label);
-   EAPI void	     elm_spinner_interval_set(Evas_Object *obj, double interval);
-   EAPI double	     elm_spinner_interval_get(const Evas_Object *obj);
+   EAPI void         elm_spinner_special_value_add(Evas_Object *obj, double value, const char *label);
+   EAPI void         elm_spinner_interval_set(Evas_Object *obj, double interval);
+   EAPI double       elm_spinner_interval_get(const Evas_Object *obj);
    /* smart callbacks called:
     * "changed" - when the spinner value changes
     * "delay,changed" - when the spinner value changed, but a small time after a change (use this if you only want to respond to a change once the spinner is held still for a short while).
@@ -1502,10 +1504,10 @@ extern "C" {
 
    typedef enum _Elm_Photocam_Zoom_Mode
      {
-	ELM_PHOTOCAM_ZOOM_MODE_MANUAL = 0,
-	ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT,
-	ELM_PHOTOCAM_ZOOM_MODE_AUTO_FILL,
-	ELM_PHOTOCAM_ZOOM_MODE_LAST
+        ELM_PHOTOCAM_ZOOM_MODE_MANUAL = 0,
+        ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT,
+        ELM_PHOTOCAM_ZOOM_MODE_AUTO_FILL,
+        ELM_PHOTOCAM_ZOOM_MODE_LAST
      } Elm_Photocam_Zoom_Mode;
    EAPI Evas_Object *elm_photocam_add(Evas_Object *parent);
    EAPI int          elm_photocam_file_set(Evas_Object *obj, const char *file);
@@ -1543,26 +1545,26 @@ extern "C" {
 
    typedef enum _Elm_Map_Zoom_Mode
      {
-	ELM_MAP_ZOOM_MODE_MANUAL,
-	ELM_MAP_ZOOM_MODE_AUTO_FIT,
-	ELM_MAP_ZOOM_MODE_AUTO_FILL,
-	ELM_MAP_ZOOM_MODE_LAST
+        ELM_MAP_ZOOM_MODE_MANUAL,
+        ELM_MAP_ZOOM_MODE_AUTO_FIT,
+        ELM_MAP_ZOOM_MODE_AUTO_FILL,
+        ELM_MAP_ZOOM_MODE_LAST
      } Elm_Map_Zoom_Mode;
 
    typedef enum _Elm_Map_Sources
      {
-	ELM_MAP_SOURCE_MAPNIK,
-	ELM_MAP_SOURCE_OSMARENDER,
-	ELM_MAP_SOURCE_CYCLEMAP,
-	ELM_MAP_SOURCE_MAPLINT,
-	ELM_MAP_SOURCE_CUSTOM_1,
-	ELM_MAP_SOURCE_CUSTOM_2,
-	ELM_MAP_SOURCE_CUSTOM_3,
-	ELM_MAP_SOURCE_CUSTOM_4,
-	ELM_MAP_SOURCE_CUSTOM_5,
-	ELM_MAP_SOURCE_CUSTOM_6,
-	ELM_MAP_SOURCE_CUSTOM_7,
-	ELM_MAP_SOURCE_LAST
+        ELM_MAP_SOURCE_MAPNIK,
+        ELM_MAP_SOURCE_OSMARENDER,
+        ELM_MAP_SOURCE_CYCLEMAP,
+        ELM_MAP_SOURCE_MAPLINT,
+        ELM_MAP_SOURCE_CUSTOM_1,
+        ELM_MAP_SOURCE_CUSTOM_2,
+        ELM_MAP_SOURCE_CUSTOM_3,
+        ELM_MAP_SOURCE_CUSTOM_4,
+        ELM_MAP_SOURCE_CUSTOM_5,
+        ELM_MAP_SOURCE_CUSTOM_6,
+        ELM_MAP_SOURCE_CUSTOM_7,
+        ELM_MAP_SOURCE_LAST
      } Elm_Map_Sources;
 
    typedef struct _Elm_Map_Marker Elm_Map_Marker;
@@ -1579,31 +1581,31 @@ extern "C" {
    EAPI double       elm_map_zoom_get(const Evas_Object *obj);
    EAPI void         elm_map_zoom_mode_set(Evas_Object *obj, Elm_Map_Zoom_Mode mode);
    EAPI Elm_Map_Zoom_Mode elm_map_zoom_mode_get(const Evas_Object *obj);
-   EAPI void	     elm_map_geo_region_get(const Evas_Object *obj, double *lon, double *lat);
+   EAPI void         elm_map_geo_region_get(const Evas_Object *obj, double *lon, double *lat);
    EAPI void         elm_map_geo_region_bring_in(Evas_Object *obj, double lon, double lat);
    EAPI void         elm_map_geo_region_show(Evas_Object *obj, double lon, double lat);
    EAPI void         elm_map_paused_set(Evas_Object *obj, Eina_Bool paused);
    EAPI Eina_Bool    elm_map_paused_get(const Evas_Object *obj);
-   EAPI void	     elm_map_paused_markers_set(Evas_Object *obj, Eina_Bool paused);
+   EAPI void         elm_map_paused_markers_set(Evas_Object *obj, Eina_Bool paused);
    EAPI Eina_Bool    elm_map_paused_markers_get(const Evas_Object *obj);
-   EAPI void	     elm_map_utils_convert_coord_into_geo(int x, int y, int size, double *lon, double *lat);
+   EAPI void         elm_map_utils_convert_coord_into_geo(int x, int y, int size, double *lon, double *lat);
    EAPI void         elm_map_utils_convert_geo_into_coord(double lon, double lat, int size, int *x, int *y);
    EAPI Elm_Map_Marker *elm_map_marker_add(Evas_Object *obj, double lon, double lat, Elm_Map_Marker_Class *clas, Elm_Map_Group_Class *clas_group, void *data);
-   EAPI void	     elm_map_max_marker_per_group_set(Evas_Object *obj, int max);
-   EAPI void	     elm_map_marker_remove(Elm_Map_Marker *marker);
-   EAPI void	     elm_map_marker_bring_in(Elm_Map_Marker *marker);
-   EAPI void	     elm_map_marker_show(Elm_Map_Marker *marker);
-   EAPI void	     elm_map_markers_list_show(Eina_List *markers);
+   EAPI void         elm_map_max_marker_per_group_set(Evas_Object *obj, int max);
+   EAPI void         elm_map_marker_remove(Elm_Map_Marker *marker);
+   EAPI void         elm_map_marker_bring_in(Elm_Map_Marker *marker);
+   EAPI void         elm_map_marker_show(Elm_Map_Marker *marker);
+   EAPI void         elm_map_markers_list_show(Eina_List *markers);
    EAPI Evas_Object *elm_map_marker_object_get(Elm_Map_Marker *marker);
-   EAPI void	     elm_map_marker_update(Elm_Map_Marker *marker);
-   EAPI void	     elm_map_bubbles_close(Evas_Object *obj);
+   EAPI void         elm_map_marker_update(Elm_Map_Marker *marker);
+   EAPI void         elm_map_bubbles_close(Evas_Object *obj);
 
    EAPI Elm_Map_Group_Class * elm_map_group_class_new(Evas_Object *obj);
    EAPI void         elm_map_group_class_style_set(Elm_Map_Group_Class *clas, const char *style);
    EAPI void         elm_map_group_class_icon_cb_set(Elm_Map_Group_Class *clas, ElmMapGroupIconGetFunc icon_get);
-   EAPI void	     elm_map_group_class_data_set(Elm_Map_Group_Class *clas, void *data);
+   EAPI void         elm_map_group_class_data_set(Elm_Map_Group_Class *clas, void *data);
    EAPI void         elm_map_group_class_zoom_displayed_set(Elm_Map_Group_Class *clas, int zoom);
-   EAPI void	     elm_map_group_class_zoom_grouped_set(Elm_Map_Group_Class *clas, int zoom);
+   EAPI void         elm_map_group_class_zoom_grouped_set(Elm_Map_Group_Class *clas, int zoom);
    EAPI void         elm_map_group_class_hide_set(Evas_Object *obj, Elm_Map_Group_Class *clas, Eina_Bool hide);
 
    EAPI Elm_Map_Marker_Class * elm_map_marker_class_new(Evas_Object *obj);
@@ -1617,8 +1619,8 @@ extern "C" {
    EAPI void         elm_map_source_custom_api_set(Elm_Map_Sources source, const char *label,
 				int zoom_min, int zoom_max, ElmMapSourceURLFunc url_cb);
    EAPI int          elm_map_source_zoom_min_get(Elm_Map_Sources source);
-   EAPI int	     elm_map_source_zoom_max_get(Elm_Map_Sources source);
-   EAPI const char * elm_map_source_name_get(Elm_Map_Sources source);
+   EAPI int          elm_map_source_zoom_max_get(Elm_Map_Sources source);
+   EAPI const char  *elm_map_source_name_get(Elm_Map_Sources source);
    /* smart callbacks called:
     * "clicked" - when image clicked
     * "press" - when mouse/finger held down initially on image
@@ -1659,17 +1661,17 @@ extern "C" {
     * Update the minimun height of the bar in the theme. No minimun should be set in the vertical theme
     * Add events (move, start ...)
     */
-   EAPI Evas_Object          *elm_panes_add(Evas_Object *parent);
-   EAPI void                  elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content);
-   EAPI void                  elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content);
-   EAPI Evas_Object 		 *elm_panes_content_left_get(const Evas_Object *obj);
-   EAPI Evas_Object 		 *elm_panes_content_right_get(const Evas_Object *obj);
-   EAPI double		          elm_panes_content_left_size_get(const Evas_Object *obj);
-   EAPI void		          elm_panes_content_left_size_set(Evas_Object *obj, double size);
-   EAPI void		          elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal);
-   EAPI Eina_Bool		      elm_panes_horizontal_is(const Evas_Object *obj);
-   EAPI void                         elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed);
-   EAPI Eina_Bool                    elm_panes_fixed_is(const Evas_Object *obj);
+   EAPI Evas_Object *elm_panes_add(Evas_Object *parent);
+   EAPI void         elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content);
+   EAPI void         elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content);
+   EAPI Evas_Object *elm_panes_content_left_get(const Evas_Object *obj);
+   EAPI Evas_Object *elm_panes_content_right_get(const Evas_Object *obj);
+   EAPI double       elm_panes_content_left_size_get(const Evas_Object *obj);
+   EAPI void         elm_panes_content_left_size_set(Evas_Object *obj, double size);
+   EAPI void         elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal);
+   EAPI Eina_Bool    elm_panes_horizontal_is(const Evas_Object *obj);
+   EAPI void         elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed);
+   EAPI Eina_Bool    elm_panes_fixed_is(const Evas_Object *obj);
 
    typedef enum _Elm_Flip_Mode
      {
@@ -1754,50 +1756,62 @@ extern "C" {
    EAPI void         elm_mapbuf_alpha_set(Evas_Object *obj, Eina_Bool alpha);
    EAPI Eina_Bool    elm_mapbuf_alpha_get(const Evas_Object *obj);
 
-      /* animator */
+   /* animator */
    typedef struct _Animator Elm_Animator;
 
-   typedef enum {ELM_ANIMATOR_CURVE_LINEAR, ELM_ANIMATOR_CURVE_IN_OUT, ELM_ANIMATOR_CURVE_IN, ELM_ANIMATOR_CURVE_OUT} Elm_Animator_Curve_Style; 
+   typedef enum 
+     {
+        ELM_ANIMATOR_CURVE_LINEAR, 
+        ELM_ANIMATOR_CURVE_IN_OUT, 
+        ELM_ANIMATOR_CURVE_IN, 
+        ELM_ANIMATOR_CURVE_OUT
+     } Elm_Animator_Curve_Style; 
 
    EAPI Elm_Animator* elm_animator_add(Evas_Object *parent);
-   EAPI void elm_animator_del(Elm_Animator *animator);
-   EAPI void elm_animator_duration_set(Elm_Animator *animator, double duration);
-   EAPI void elm_animator_operation_callback_set(Elm_Animator *animator, void (*func)(void *data, Elm_Animator *animator, double frame), void *data); 
-   EAPI void elm_animator_completion_callback_set(Elm_Animator *animator, void (*func)(void *data), void *data);
-   EAPI void elm_animator_stop(Elm_Animator *animator);
-   EAPI void elm_animator_repeat_set(Elm_Animator *animator, unsigned int repeat_cnt);
-   EAPI void elm_animator_animate(Elm_Animator *animator);
-   EAPI void elm_animator_curve_style_set(Elm_Animator *animator, Elm_Animator_Curve_Style cs);
-   EAPI void elm_animator_auto_reverse_set(Elm_Animator *animator, Eina_Bool reverse);
-   EAPI Eina_Bool elm_animator_auto_reverse_get(Elm_Animator *animator);
-   EAPI Eina_Bool elm_animator_operating_get(Elm_Animator *animator);
-   EAPI unsigned int elm_animator_repeat_get(Elm_Animator *animator);
+   EAPI void          elm_animator_del(Elm_Animator *animator);
+   EAPI void          elm_animator_duration_set(Elm_Animator *animator, double duration);
+   EAPI void          elm_animator_operation_callback_set(Elm_Animator *animator, void (*func)(void *data, Elm_Animator *animator, double frame), void *data); 
+   EAPI void          elm_animator_completion_callback_set(Elm_Animator *animator, void (*func)(void *data), void *data);
+   EAPI void          elm_animator_stop(Elm_Animator *animator);
+   EAPI void          elm_animator_repeat_set(Elm_Animator *animator, unsigned int repeat_cnt);
+   EAPI void          elm_animator_animate(Elm_Animator *animator);
+   EAPI void          elm_animator_curve_style_set(Elm_Animator *animator, Elm_Animator_Curve_Style cs);
+   EAPI void          elm_animator_auto_reverse_set(Elm_Animator *animator, Eina_Bool reverse);
+   EAPI Eina_Bool     elm_animator_auto_reverse_get(Elm_Animator *animator);
+   EAPI Eina_Bool     elm_animator_operating_get(Elm_Animator *animator);
+   EAPI unsigned int  elm_animator_repeat_get(Elm_Animator *animator);
 
    /* calendar */
-   typedef enum {ELM_CALENDAR_UNIQUE, ELM_CALENDAR_DAILY, ELM_CALENDAR_WEEKLY, ELM_CALENDAR_MONTHLY, ELM_CALENDAR_ANNUALLY} Elm_Calendar_Mark_Repeat;
+   typedef enum 
+     {
+        ELM_CALENDAR_UNIQUE, 
+        ELM_CALENDAR_DAILY, 
+        ELM_CALENDAR_WEEKLY,
+        ELM_CALENDAR_MONTHLY, 
+        ELM_CALENDAR_ANNUALLY
+     } Elm_Calendar_Mark_Repeat;
    typedef struct _Elm_Calendar_Mark Elm_Calendar_Mark;
 
    EAPI Evas_Object *elm_calendar_add(Evas_Object *parent);
    EAPI const char **elm_calendar_weekdays_names_get(const Evas_Object *obj);
-   EAPI void elm_calendar_weekdays_names_set(Evas_Object *obj, const char *weekdays[]);
-   EAPI double elm_calendar_interval_get(const Evas_Object *obj);
-   EAPI void elm_calendar_interval_set(Evas_Object *obj, double interval);
-   EAPI void elm_calendar_min_max_year_get(const Evas_Object *obj, int *min, int *max);
-   EAPI void elm_calendar_min_max_year_set(Evas_Object *obj, int min, int max);
-   EAPI Eina_Bool elm_calendar_day_selection_enabled_get(const Evas_Object *obj);
-   EAPI void elm_calendar_day_selection_enabled_set(Evas_Object *obj, Eina_Bool enabled);
-   EAPI Eina_Bool elm_calendar_selected_time_get(const Evas_Object *obj, struct tm *selected_time);
-   EAPI void elm_calendar_selected_time_set(Evas_Object *obj, struct tm *selected_time);
-   EAPI void elm_calendar_format_function_set(Evas_Object *obj, char * (*format_function) (struct tm *stime));
+   EAPI void         elm_calendar_weekdays_names_set(Evas_Object *obj, const char *weekdays[]);
+   EAPI double       elm_calendar_interval_get(const Evas_Object *obj);
+   EAPI void         elm_calendar_interval_set(Evas_Object *obj, double interval);
+   EAPI void         elm_calendar_min_max_year_get(const Evas_Object *obj, int *min, int *max);
+   EAPI void         elm_calendar_min_max_year_set(Evas_Object *obj, int min, int max);
+   EAPI Eina_Bool    elm_calendar_day_selection_enabled_get(const Evas_Object *obj);
+   EAPI void         elm_calendar_day_selection_enabled_set(Evas_Object *obj, Eina_Bool enabled);
+   EAPI Eina_Bool    elm_calendar_selected_time_get(const Evas_Object *obj, struct tm *selected_time);
+   EAPI void         elm_calendar_selected_time_set(Evas_Object *obj, struct tm *selected_time);
+   EAPI void         elm_calendar_format_function_set(Evas_Object *obj, char * (*format_function) (struct tm *stime));
    EAPI Elm_Calendar_Mark *elm_calendar_mark_add(Evas_Object *obj, const char *mark_type, struct tm *mark_time, Elm_Calendar_Mark_Repeat repeat);
-   EAPI void elm_calendar_mark_del(Elm_Calendar_Mark *mark);
-
-   EAPI void elm_calendar_marks_clear(Evas_Object *obj);
+   EAPI void         elm_calendar_mark_del(Elm_Calendar_Mark *mark);
+   EAPI void         elm_calendar_marks_clear(Evas_Object *obj);
    EAPI const Eina_List *elm_calendar_marks_get(const Evas_Object *obj);
-   EAPI void elm_calendar_marks_draw(Evas_Object *obj);
-   EAPI void elm_calendar_text_weekday_color_set(const Evas_Object *obj, int pos);
-   EAPI void elm_calendar_text_saturday_color_set(const Evas_Object *obj, int pos);
-   EAPI void elm_calendar_text_sunday_color_set(const Evas_Object *obj, int pos);
+   EAPI void         elm_calendar_marks_draw(Evas_Object *obj);
+   EAPI void         elm_calendar_text_weekday_color_set(const Evas_Object *obj, int pos);
+   EAPI void         elm_calendar_text_saturday_color_set(const Evas_Object *obj, int pos);
+   EAPI void         elm_calendar_text_sunday_color_set(const Evas_Object *obj, int pos);
 
    typedef struct _Picker_Item Elm_Picker_Item;
    EAPI Evas_Object     *elm_picker_add(Evas_Object *parent);
@@ -1955,23 +1969,23 @@ extern "C" {
 
    /* datefield */
    typedef enum _Elm_Datefield_Layout
-   {
-	ELM_DATEFIELD_LAYOUT_TIME,
-	ELM_DATEFIELD_LAYOUT_DATE,
-	ELM_DATEFIELD_LAYOUT_DATEANDTIME
-   } Elm_Datefield_Layout;
+     {
+        ELM_DATEFIELD_LAYOUT_TIME,
+        ELM_DATEFIELD_LAYOUT_DATE,
+        ELM_DATEFIELD_LAYOUT_DATEANDTIME
+     } Elm_Datefield_Layout;
    
    EAPI Evas_Object *elm_datefield_add(Evas_Object *parent);
-   EAPI void elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
+   EAPI void         elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
    EAPI Elm_Datefield_Layout elm_datefield_layout_get(Evas_Object *obj);
-   EAPI void elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour, int min);
-   EAPI void elm_datefield_date_get(Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min);
-   EAPI void elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);    
-   EAPI Eina_Bool elm_datefield_time_mode_get(Evas_Object *obj);
-   EAPI void elm_datefield_date_format_set(Evas_Object *obj, const char *fmt);
-   EAPI const char *elm_datefield_date_format_get(Evas_Object *obj);
-   EAPI void elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data);
-   EAPI void elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value));
+   EAPI void         elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour, int min);
+   EAPI void         elm_datefield_date_get(Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min);
+   EAPI void         elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);    
+   EAPI Eina_Bool    elm_datefield_time_mode_get(Evas_Object *obj);
+   EAPI void         elm_datefield_date_format_set(Evas_Object *obj, const char *fmt);
+   EAPI const char  *elm_datefield_date_format_get(Evas_Object *obj);
+   EAPI void         elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data);
+   EAPI void         elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value));
 
    /* titlebar */
    EAPI Evas_Object *elm_titlebar_add(Evas_Object *parent);
@@ -2269,28 +2283,28 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, Evas_Object *obj_item, const int sel);
-   EAPI void elm_controlbar_item_del(Elm_Controlbar_Item *it);
-   EAPI void elm_controlbar_item_select(Elm_Controlbar_Item *it);
-   EAPI void elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
-   EAPI Eina_Bool elm_controlbar_item_visible_get(Elm_Controlbar_Item * it);
-   EAPI void elm_controlbar_item_editable_set(Elm_Controlbar_Item *it, Eina_Bool editable);
-   EAPI void elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable);
+   EAPI void         elm_controlbar_item_del(Elm_Controlbar_Item *it);
+   EAPI void         elm_controlbar_item_select(Elm_Controlbar_Item *it);
+   EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
+   EAPI Eina_Bool    elm_controlbar_item_visible_get(Elm_Controlbar_Item * it);
+   EAPI void         elm_controlbar_item_editable_set(Elm_Controlbar_Item *it, Eina_Bool editable);
+   EAPI void         elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable);
    EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
-   EAPI const char *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
-   EAPI void elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
+   EAPI const char  *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
+   EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
    EAPI Elm_Controlbar_Item *elm_controlbar_selected_item_get(Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_first_item_get(Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_last_item_get(Evas_Object *obj);
-   EAPI Eina_List *elm_controlbar_items_get(Evas_Object *obj);
+   EAPI Eina_List   *elm_controlbar_items_get(Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_item_prev(Elm_Controlbar_Item *it);
    EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
-   EAPI void elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
-   EAPI void elm_controlbar_mode_set(Evas_Object *obj, int mode);
+   EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
+   EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
    /*======= Please don't use this APIs =======*/
-   EAPI void elm_controlbar_edit_start(Evas_Object *obj);
-   EAPI void elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
-   EAPI void elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI void elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
+   EAPI void         elm_controlbar_edit_start(Evas_Object *obj);
+   EAPI void         elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
+   EAPI void         elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI void         elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
    /*======= Just for test =======*/
 
 

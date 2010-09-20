@@ -242,8 +242,8 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
           _elm_theme_object_set(obj, o, "index", "item/vertical", elm_widget_style_get(obj));
         edje_object_part_text_set(o, "elm.text", it->letter);
         edje_object_size_min_restricted_calc(o, &mw, &mh, 0, 0);
-        evas_object_size_hint_weight_set(o, 1.0, 1.0);
-        evas_object_size_hint_align_set(o, -1.0, -1.0);
+        evas_object_size_hint_weight_set(o, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(o, EVAS_HINT_FILL, EVAS_HINT_FILL);
         edje_object_part_text_set(o, "elm.text", it->vis_letter);
         evas_object_resize(o, mw, it->size);
         evas_object_size_hint_min_set(o, mw, it->size);
