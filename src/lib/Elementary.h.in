@@ -646,6 +646,7 @@ extern "C" {
    EAPI void         elm_gengrid_item_disabled_set(Elm_Gengrid_Item *item, Eina_Bool disabled);
    EAPI Eina_Bool    elm_gengrid_item_disabled_get(const Elm_Gengrid_Item *item);
    EAPI Elm_Gengrid_Item *elm_gengrid_item_append(Evas_Object *obj, const Elm_Gengrid_Item_Class *gcc,  const void *data, Evas_Smart_Cb func, const void *func_data);
+   EAPI void         elm_gengrid_item_update(Elm_Gengrid_Item *it);
    /* smart callbacks called:
     *
     * selected - User has selected a item.

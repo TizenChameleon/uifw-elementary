@@ -1600,3 +1600,29 @@ elm_gengrid_items_get(const Evas_Object *obj)
    if (!wd) return NULL;
    return wd->items;
 }
+
+/**
+ * Update the contents of an item
+ * 
+ * This updates an item by calling all the item class functions again to get
+ * the icons, labels and states. Use this when he original item data has
+ * changed and the changes are desired to be reflected.
+ * 
+ * @param it The item
+ * 
+ * @ingroup Gengrid
+ */
+EAPI void
+elm_gengrid_item_update(Elm_Gengrid_Item *item)
+{
+   if (item->realized)
+   {
+      _item_unrealize(item);
+      _item_realize(item);
+      evas_object_smart_callback_call(item->wd->self, "realized", it);
+
+      if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
+         item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
+   }
+}
+
