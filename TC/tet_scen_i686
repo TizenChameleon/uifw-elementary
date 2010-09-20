@@ -10,13 +10,25 @@ all
 
 # Multimedia
 elm
-        :include:/elm_ts/imageslider/tslist
-        :include:/elm_ts/colorpalette/tslist
-        :include:/elm_ts/gengrid/tslist
-        :include:/elm_ts/pagecontrol/tslist
-        :include:/elm_ts/selectioninfo/tslist
-        :include:/elm_ts/popup/tslist
-        :include:/elm_ts/webview/tslist
+    :include:/elm_ts/imageslider/tslist
+	:include:/elm_ts/colorpalette/tslist
+	:include:/elm_ts/colorpicker/tslist
+	:include:/elm_ts/gengrid/tslist
+    :include:/elm_ts/pagecontrol/tslist
+    :include:/elm_ts/selectioninfo/tslist
+	:include:/elm_ts/button/tslist
+	:include:/elm_ts/popup/tslist
+	:include:/elm_ts/label/tslist
+	:include:/elm_ts/searchbar/tslist
+	:include:/elm_ts/webview/tslist
+	:include:/elm_ts/datefield/tslist
+	:include:/elm_ts/bubble/tslist
+	:include:/elm_ts/navigationbar/tslist
+	:include:/elm_ts/calendar/tslist
+	:include:/elm_ts/check/tslist
+	:include:/elm_ts/radio/tslist
+	:include:/elm_ts/toggle/tslist
+	:include:/elm_ts/panes/tslist
 	
 
 #yhkim
