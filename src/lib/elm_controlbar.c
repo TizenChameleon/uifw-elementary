@@ -1169,8 +1169,10 @@ unpressed_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    const Eina_List *l;
    Evas_Event_Mouse_Up * ev = event_info;
    Evas_Coord x, y, w, h;
-
    Elm_Controlbar_Item * item;
+
+   evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unpressed_box_cb);
+
    EINA_LIST_FOREACH(wd->items, l, item)
      {
 	if (item->style == TABBAR)
@@ -1198,8 +1200,6 @@ unpressed_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
      {
 	selected_box(wd->pre_item);
      }
-
-   evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unpressed_box_cb);
 
    return;
 }
