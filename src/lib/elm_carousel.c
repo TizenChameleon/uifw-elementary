@@ -226,7 +226,7 @@ elm_carousel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, Ev
    edje_object_part_text_set(it->base, "elm.text", it->label);
    edje_object_size_min_calc(it->base, &mw, &mh);
    evas_object_size_hint_weight_set(it->base, 0.0, 0.0);
-   evas_object_size_hint_align_set(it->base, -1.0, -1.0);
+   evas_object_size_hint_align_set(it->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(it->base, mw, mh);
    evas_object_size_hint_max_set(it->base, 9999, mh);
    evas_object_box_append(wd->bx, it->base);
