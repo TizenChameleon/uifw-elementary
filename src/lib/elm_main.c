@@ -344,15 +344,23 @@ _elm_widtype_clear(void)
 }
 
 // This code is just for temporary usage.
-// This needs to be included into AUL avatar.
 static void                                                                             
 _set_elm_module()                                                                
 {                                                                                
    char *buf = NULL;
+   char *theme_name;
 
    buf = getenv("ELM_THEME");
-   if (buf != NULL && ((!strcmp(buf, "beat") || !strcmp(buf, "kessler"))))
-      setenv("ELM_MODULES","ctxpopup_copypasteUI>entry/api",1);
+   if (buf != NULL) {
+      theme_name = strdup(buf);
+      if (!strcmp(strtok(theme_name, ":"), "default")) {
+      	  free(theme_name);
+          return;
+      }
+      free(theme_name);
+   }
+
+   setenv("ELM_MODULES", "ctxpopup_copypasteUI>entry/api", 1);
 }
 
 /**
