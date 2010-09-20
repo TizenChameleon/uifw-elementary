@@ -55,7 +55,7 @@ _drag_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
 	Widget_Data *wd = elm_widget_data_get(data);
 	edje_object_part_drag_value_get(wd->base, "elm.dragable.handler", &wd->value.x, &wd->value.y);
-	evas_object_smart_callback_call(data, "mouse,drag", (void*) &wd->value);
+	evas_object_smart_callback_call(data, "mouse,move", (void*) &wd->value);
 }
 
 static void
