@@ -72,17 +72,25 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_panes_content_left_get_func_01(void)
 {
-	int r = 0;
+   Evas_Object *panes = NULL;
+   Evas_Object *btn = NULL;
 
-/*
-   	r = elm_panes_content_left_get(...);
-*/
-	if (!r) {
-		tet_infoline("elm_panes_content_left_get() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
+   panes = elm_panes_add(main_win);
+   btn = elm_button_add(panes);
+   elm_button_label_set(btn, "left");
+   evas_object_size_hint_weight_set(btn, 1.0, 1.0);
+   evas_object_size_hint_align_set(btn, -1.0, -1.0);
+   elm_panes_content_left_set(panes, btn);
+   if(elm_panes_content_left_get(panes) == NULL)
+      {
+         tet_infoline("elm_panes_content_left_get() failed in positive test case");
+         tet_result(TET_FAIL);
+         return;
+      }
+   evas_object_show(panes);
+   evas_object_del(panes);
+   panes = NULL;
+   tet_result(TET_PASS);
 }
 
 /**
@@ -90,15 +98,20 @@ static void utc_UIFW_elm_panes_content_left_get_func_01(void)
  */
 static void utc_UIFW_elm_panes_content_left_get_func_02(void)
 {
-	int r = 0;
+   Evas_Object *panes = NULL;
+   Evas_Object *btn = NULL;
 
-/*
-   	r = elm_panes_content_left_get(...);
-*/
-	if (r) {
-		tet_infoline("elm_panes_content_left_get() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
+   panes = elm_panes_add(main_win);
+   btn = elm_button_add(panes);
+   elm_button_label_set(btn, "left");
+   evas_object_size_hint_weight_set(btn, 1.0, 1.0);
+   evas_object_size_hint_align_set(btn, -1.0, -1.0);
+   elm_panes_content_left_set(panes, btn);
+   if(elm_panes_content_left_get(NULL) != NULL)
+      {
+         tet_infoline("elm_panes_content_left_get() failed in negative test case");
+         tet_result(TET_FAIL);
+         return;
+      }
+   tet_result(TET_PASS);
 }

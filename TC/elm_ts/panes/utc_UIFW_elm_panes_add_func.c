@@ -72,17 +72,18 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_panes_add_func_01(void)
 {
-	int r = 0;
+   Evas_Object *panes = NULL;
 
-/*
-   	r = elm_panes_add(...);
-*/
-	if (!r) {
-		tet_infoline("elm_panes_add() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
+   panes = elm_panes_add(main_win);
+   if (!panes) {
+      tet_infoline("elm_panes_add() failed in positive test case");
+      tet_result(TET_FAIL);
+      return;
+   }
+   evas_object_show(panes);
+   evas_object_del(panes);
+   panes = NULL;
+   tet_result(TET_PASS);
 }
 
 /**
@@ -90,15 +91,15 @@ static void utc_UIFW_elm_panes_add_func_01(void)
  */
 static void utc_UIFW_elm_panes_add_func_02(void)
 {
-	int r = 0;
+   Evas_Object *panes = NULL;
 
-/*
-   	r = elm_panes_add(...);
-*/
-	if (r) {
-		tet_infoline("elm_panes_add() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
+      panes = elm_panes_add(NULL);
+
+      if (panes) {
+             tet_infoline("elm_panes_add() failed in negative test case");
+             evas_object_del(panes);
+             panes = NULL;
+             tet_result(TET_FAIL);
+      }
+      tet_result(TET_PASS);
 }
