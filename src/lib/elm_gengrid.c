@@ -1619,7 +1619,7 @@ elm_gengrid_item_update(Elm_Gengrid_Item *item)
    {
       _item_unrealize(item);
       _item_realize(item);
-      evas_object_smart_callback_call(item->wd->self, "realized", it);
+      evas_object_smart_callback_call(item->wd->self, "realized", item);
 
       if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
          item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
