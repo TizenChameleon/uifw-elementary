@@ -2748,6 +2748,8 @@ extern "C" {
    EAPI Evas_Object *elm_webview_webkit_get(Evas_Object *obj);
    EAPI void         elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed);
    EAPI Eina_Bool    elm_webview_events_feed_get(Evas_Object *obj);
+   EAPI void         elm_webview_events_block_set(Evas_Object *obj, Eina_Bool block);
+   EAPI Eina_Bool    elm_webview_events_block_get(Evas_Object *obj);
    EAPI void         elm_webview_auto_fitting_set(Evas_Object *obj, Eina_Bool enable);
    EAPI Eina_Bool    elm_webview_auto_fitting_get(Evas_Object *obj);
    EAPI Evas_Object *elm_webview_minimap_get(Evas_Object *obj);

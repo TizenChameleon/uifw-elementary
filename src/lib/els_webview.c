@@ -145,6 +145,7 @@ struct _Smart_Data {
      unsigned char bounce_horiz : 1;
      unsigned char bounce_vert : 1;
      unsigned char events_feed : 1;
+     unsigned char events_block : 1;//FIXME
      unsigned char auto_fitting : 1;
      unsigned char mouse_clicked : 1;
      unsigned char on_flick : 1;
@@ -516,6 +517,22 @@ _elm_smart_webview_events_feed_get(Evas_Object* obj)
    API_ENTRY return EINA_FALSE;
    return sd->events_feed;
 }
+
+//FIXME: Is it right approach?
+void
+_elm_smart_webview_events_block_set(Evas_Object* obj, Eina_Bool block)
+{
+   API_ENTRY return;
+   sd->events_block = block;
+}
+
+Eina_Bool
+_elm_smart_webview_events_block_get(Evas_Object* obj)
+{
+   API_ENTRY return EINA_FALSE;
+   return sd->events_block;
+}
+///////////////////////////////////////////////////////////////////////////
 
 void
 _elm_smart_webview_auto_fitting_set(Evas_Object* obj, Eina_Bool enable)
@@ -1768,6 +1785,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
    if (sd->events_feed == EINA_TRUE) return;
+   if (sd->events_block == EINA_TRUE) return; //FIXME
 
    Evas_Point* point = (Evas_Point*)ev;
    DBG(" argument : (%d, %d)\n", point->x, point->y);
@@ -2484,10 +2502,12 @@ _smart_zoom_animator(void* data)
    // stop
    if (smart_zoom_index < 0)
      {
+	if (sd->events_block != EINA_TRUE) { //FIXME: It's not right way but for DEMONSTRATION
 	if (!sd->ewk_view_zoom_set)
 	  sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
 	sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set,
 	      sd->zoom.basis.x, sd->zoom.basis.y);
+	}
 	if (sd->smart_zoom_animator)
 	  {
 	     ecore_animator_del(sd->smart_zoom_animator);

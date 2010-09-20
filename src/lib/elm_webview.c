@@ -154,6 +154,24 @@ elm_webview_events_feed_get(Evas_Object *obj)
    return _elm_smart_webview_events_feed_get(wd->webkit);
 }
 
+//FIXME: Is it right approach?
+EAPI void
+elm_webview_events_block_set(Evas_Object *obj, Eina_Bool block)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_smart_webview_events_block_set(wd->webkit, block);
+}
+
+EAPI Eina_Bool
+elm_webview_events_block_get(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _elm_smart_webview_events_block_get(wd->webkit);
+}
+////////////////////////////////////////////////////////////////
+
 EAPI void
 elm_webview_auto_fitting_set(Evas_Object *obj, Eina_Bool enable)
 {
