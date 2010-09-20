@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build11) unstable; urgency=low
+
+  * removed lua 
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build11
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Tue, 21 Sep 2010 01:25:48 +0900
+
 elementary (1.0.0+svn.51480slp2+build10) unstable; urgency=low
 
   * repackaging for entry password
