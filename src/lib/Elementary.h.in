@@ -2376,7 +2376,7 @@ extern "C" {
    EAPI Eina_Bool    elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon);
    EAPI Evas_Object *elm_editfield_right_icon_get(Evas_Object *obj);
    EAPI Eina_Bool    elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object *elm_editfield_lett_icon_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_editfield_left_icon_get(Evas_Object *obj);
    EAPI void         elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
    EAPI Eina_Bool    elm_editfield_entry_single_line_get(Evas_Object *obj);
    EAPI void         elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible);
