@@ -74,7 +74,7 @@ static void utc_UIFW_elm_button_label_set_func_01(void)
    Evas_Object *button = NULL;
 
    button = elm_button_add(main_win);
-   elm_button_label_set(button, _("default"));
+   elm_button_label_set(button, "default");
    evas_object_show(button);
    evas_object_del(button);
    button = NULL;
@@ -89,6 +89,7 @@ static void utc_UIFW_elm_button_label_set_func_02(void)
    Evas_Object *button = NULL;
 
    button = elm_button_add(main_win);
-   elm_button_label_set(NULL, _("default"));
+   elm_button_label_set(NULL, "default");
    tet_result(TET_PASS);
 }
+

@@ -35,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_button_autorepeat_set_func_01(void);
-static void utc_UIFW_elm_button_autorepeat_set_func_02(void);
+static void utc_UIFW_elm_radio_label_get_func_01(void);
+static void utc_UIFW_elm_radio_label_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +44,9 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_button_autorepeat_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_button_autorepeat_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_radio_label_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_radio_label_get_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -67,31 +68,46 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_button_autorepeat_set()
+ * @brief Positive test case of elm_radio_label_get()
  */
-static void utc_UIFW_elm_button_autorepeat_set_func_01(void)
+static void utc_UIFW_elm_radio_label_get_func_01(void)
 {
-   Evas_Object *button = NULL;
-
-   button = elm_button_add(main_win);
-   elm_button_autorepeat_set(button, EINA_TRUE);
-   evas_object_show(button);
-   evas_object_del(button);
-   button = NULL;
+   Evas_Object *radio = NULL;
+   char *buffer;
+   radio = elm_radio_add(main_win);
+   radio = elm_radio_add(main_win);
+   elm_radio_label_set(radio, "label");
+   buffer = elm_radio_label_get(radio);
+   if(!buffer)
+      {
+         tet_infoline("elm_radio_label_get() failed in positive test case");
+         tet_result(TET_FAIL);
+         return;
+      }
+   evas_object_show(radio);
+   evas_object_del(radio);
+   radio = NULL;
    tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_button_autorepeat_set()
+ * @brief Negative test case of ug_init elm_radio_label_get()
  */
-static void utc_UIFW_elm_button_autorepeat_set_func_02(void)
+static void utc_UIFW_elm_radio_label_get_func_02(void)
 {
-   Evas_Object *button = NULL;
-
-   button = elm_button_add(main_win);
-   elm_button_autorepeat_set(NULL, EINA_TRUE);
-   evas_object_del(button);
-   button = NULL;
+   Evas_Object *radio = NULL;
+   char *buffer;
+   radio = elm_radio_add(main_win);
+   elm_radio_label_set(radio, "label");
+   buffer = elm_radio_label_get(NULL);
+   if(buffer)
+      {
+         evas_object_del(radio);
+         radio = NULL;
+         tet_infoline("elm_radio_label_get() failed in negative test case");
+         tet_result(TET_FAIL);
+         return;
+      }
    tet_result(TET_PASS);
+   tet_infoline("elm_radio_label_get() failed in negative test case");
 }
-

@@ -75,7 +75,7 @@ static void utc_UIFW_elm_check_label_set_func_01(void)
    Evas_Object *check = NULL;
 
    check = elm_check_add(main_win);
-   elm_check_label_set(check, _("label"));
+   elm_check_label_set(check, "label");
    evas_object_show(check);
    evas_object_del(check);
    check = NULL;
@@ -90,6 +90,6 @@ static void utc_UIFW_elm_check_label_set_func_02(void)
    Evas_Object *check = NULL;
 
    check = elm_check_add(main_win);
-   elm_check_label_set(NULL, _("label"));
+   elm_check_label_set(NULL, "label");
    tet_result(TET_PASS);
 }

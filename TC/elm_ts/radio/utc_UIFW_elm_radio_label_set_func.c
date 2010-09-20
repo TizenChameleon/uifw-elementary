@@ -75,7 +75,7 @@ static void utc_UIFW_elm_radio_label_set_func_01(void)
    Evas_Object *radio = NULL;
 
    radio = elm_radio_add(main_win);
-   elm_radio_label_set(radio, _("label"));
+   elm_radio_label_set(radio, "label");
    evas_object_show(radio);
    evas_object_del(radio);
    radio = NULL;
@@ -90,6 +90,6 @@ static void utc_UIFW_elm_radio_label_set_func_02(void)
    Evas_Object *radio = NULL;
 
    radio = elm_radio_add(main_win);
-   elm_radio_label_set(NULL, _("label"));
+   elm_radio_label_set(NULL, "label");
    tet_result(TET_PASS);
 }

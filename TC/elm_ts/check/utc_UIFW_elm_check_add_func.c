@@ -103,3 +103,4 @@ static void utc_UIFW_elm_check_add_func_02(void)
    }
    tet_result(TET_PASS);
 }
+

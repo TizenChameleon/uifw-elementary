@@ -75,8 +75,8 @@ static void utc_UIFW_elm_check_label_get_func_01(void)
    Evas_Object *check = NULL;
    char *buffer;
    check = elm_check_add(main_win);
-   elm_check_label_set(check, _("label"));
-   buffer = elm_check_label_get(check));
+   elm_check_label_set(check, "label");
+   buffer = elm_check_label_get(check);
    if(!buffer)
       {
          tet_infoline("elm_check_label_get() failed in positive test case");
@@ -97,7 +97,7 @@ static void utc_UIFW_elm_check_label_get_func_02(void)
    Evas_Object *check = NULL;
    char *buffer;
    check = elm_check_add(main_win);
-   elm_check_label_set(check, _("label"));
+   elm_check_label_set(check, "label");
    buffer = elm_check_label_get(NULL);
    if(buffer)
       {

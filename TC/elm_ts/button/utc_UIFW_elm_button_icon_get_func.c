@@ -118,3 +118,4 @@ static void utc_UIFW_elm_button_icon_get_func_02(void)
       }
    tet_result(TET_PASS);
 }
+

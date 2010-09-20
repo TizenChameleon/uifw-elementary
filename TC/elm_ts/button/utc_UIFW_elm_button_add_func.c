@@ -106,3 +106,4 @@ static void utc_UIFW_elm_button_add_func_02(void)
    tet_result(TET_PASS);
    tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Adding a Button object has failed.");
 }
+

@@ -97,3 +97,4 @@ static void utc_UIFW_elm_button_autorepeat_gap_timeout_set_func_02(void)
    button = NULL;
    tet_result(TET_PASS);
 }
+

@@ -105,3 +105,4 @@ static void utc_UIFW_elm_check_icon_set_func_02(void)
    elm_check_icon_set(NULL, icon);
    tet_result(TET_PASS);
 }
+

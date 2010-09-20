@@ -74,7 +74,7 @@ static void utc_UIFW_elm_button_label_set_for_state_func_01(void)
    Evas_Object *button = NULL;
 
    button = elm_button_add(main_win);
-   elm_button_label_set_for_state(button, _("default"), UIControlStateDefault);
+   elm_button_label_set_for_state(button, "default", UIControlStateDefault);
    evas_object_show(button);
    evas_object_del(button);
    button = NULL;
@@ -89,6 +89,7 @@ static void utc_UIFW_elm_button_label_set_for_state_func_02(void)
    Evas_Object *button = NULL;
 
    button = elm_button_add(main_win);
-   elm_button_label_set_for_state(NULL, _("default"), UIControlStateDefault);
+   elm_button_label_set_for_state(NULL, "default", UIControlStateDefault);
    tet_result(TET_PASS);
 }
+

@@ -1,7 +1,15 @@
 CC ?= gcc
 
 TARGETS = utc_UIFW_elm_radio_add_func \
-	  utc_UIFW_elm_radio_label_set_func
+	  utc_UIFW_elm_radio_label_set_func \
+	  utc_UIFW_elm_radio_label_get_func \
+	  utc_UIFW_elm_radio_icon_set_func \
+	  utc_UIFW_elm_radio_icon_get_func \
+	  utc_UIFW_elm_radio_group_add_func \
+	  utc_UIFW_elm_radio_state_value_set_func \
+	  utc_UIFW_elm_radio_value_set_func \
+	  utc_UIFW_elm_radio_value_get_func \
+	  utc_UIFW_elm_radio_value_pointer_set_func
 
 PKGS = elementary
 

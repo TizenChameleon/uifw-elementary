@@ -74,8 +74,8 @@ static void utc_UIFW_elm_button_label_get_func_01(void)
    Evas_Object *button = NULL;
    char *buffer;
    button = elm_button_add(main_win);
-   elm_button_label_set(button, _("default"));
-   buffer = elm_button_label_get(button));
+   elm_button_label_set(button, "default");
+   buffer = elm_button_label_get(button);
    if(!buffer)
       {
          tet_infoline("elm_button_label_get() failed in positive test case");
@@ -96,7 +96,7 @@ static void utc_UIFW_elm_button_label_get_func_02(void)
    Evas_Object *button = NULL;
    char *buffer;
    button = elm_button_add(main_win);
-   elm_button_label_set(button, _("default"));
+   elm_button_label_set(button, "default");
    buffer = elm_button_label_get(NULL);
    if(buffer)
       {
@@ -108,3 +108,4 @@ static void utc_UIFW_elm_button_label_get_func_02(void)
       }
    tet_result(TET_PASS);
 }
+
