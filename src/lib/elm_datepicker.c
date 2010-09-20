@@ -577,16 +577,19 @@ elm_datepicker_date_max_get(Evas_Object *obj, int *year, int *month, int *day)
 EAPI void
 elm_datepicker_date_format_set(Evas_Object *obj, const char *fmt)
 {
-	char sig[32] = "elm,state,";
-	int i = 0, j;
+	int i;
+	char sig[32];
 	Widget_Data *wd = elm_widget_data_get(obj);
 
 	if (!wd || !fmt) return;
 
-	j = strlen(sig);
-	while (j < 32) {
-		sig[j++] = tolower(fmt[i++]);
+	for (i = 0; i < sizeof(wd->fmt); i++) {
+		if (!fmt[i]) break;
+		wd->fmt[i] = tolower(fmt[i]);
 	}
+	wd->fmt[i] = '\0';
+
+	snprintf(sig, 32, "elm,state,%s", wd->fmt);
 
 	edje_object_signal_emit(wd->base, sig, "elm");
 }
