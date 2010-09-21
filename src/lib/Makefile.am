@@ -96,6 +96,7 @@ elm_popup.c \
 elm_diskcontroller.c \
 elm_tab.c \
 elm_navigationbar.c \
+elm_navigationbar_ex.c\
 elm_tabbar.c \
 elm_transit.c \
 elm_animator.c \

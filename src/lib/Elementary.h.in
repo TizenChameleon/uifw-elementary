@@ -2232,6 +2232,40 @@ extern "C" {
    EAPI const char * elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content);
    EAPI void elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
    EAPI void elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list);
+
+     /* NavigationBar */
+   typedef enum 
+     {
+    ELM_NAVIGATIONBAR_EX_BACK_BUTTON,
+	ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1,
+	ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON2,
+	ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON3,
+	ELM_NAVIGATIONBAR_EX_MAX
+     } Elm_Navi_ex_Button_Type;
+   typedef struct _Elm_Navigationbar_ex_Item Elm_Navigationbar_ex_Item;
+
+   EAPI Evas_Object *elm_navigationbar_ex_add(Evas_Object *parent);
+   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const char *item_style);
+   EAPI void         elm_navigationbar_ex_item_pop(Evas_Object *obj);
+   EAPI void 		 elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item);
+   EAPI void         elm_navigationbar_ex_title_label_set(Elm_Navigationbar_ex_Item *item, const char *title);
+   EAPI const char   *elm_navigationbar_ex_title_label_get(Elm_Navigationbar_ex_Item* item);
+   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_top_get(const Evas_Object *obj);
+   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_bottom_get(const Evas_Object *obj);
+   EAPI void 		elm_navigationbar_ex_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data);
+   EAPI void 		elm_navigationbar_ex_title_object_set(Elm_Navigationbar_ex_Item* item, Evas_Object *title_obj);
+   EAPI const char *elm_navigationbar_ex_subtitle_label_get(Elm_Navigationbar_ex_Item* item);
+   EAPI void 		elm_navigationbar_ex_subtitle_label_set( Elm_Navigationbar_ex_Item* item, const char *subtitle);
+   EAPI Evas_Object* elm_navigationbar_ex_title_object_unset(Elm_Navigationbar_ex_Item* item);
+   EAPI void 		elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char* item_style);
+   EAPI const char* elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item);
+   EAPI void 		elm_navigationbar_ex_title_hidden_set(Elm_Navigationbar_ex_Item* item, Eina_Bool hidden);
+   EAPI void 		elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item);
+   EAPI Evas_Object *elm_navigationbar_ex_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type);
+   EAPI Evas_Object *elm_navigationbar_ex_content_unset(Elm_Navigationbar_ex_Item* item);
+   EAPI Evas_Object *elm_navigationbar_ex_content_get(Elm_Navigationbar_ex_Item* item);
+   EAPI void elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop);
+   
    
    /* Tab Bar */
    #define TAB_BAR_SYSTEM_ICON_CONTACT "elm/icon/tabbar_contact/default" 
