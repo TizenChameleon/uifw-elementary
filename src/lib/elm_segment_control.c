@@ -626,6 +626,7 @@ elm_segment_control_add(Evas_Object *parent)
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if(!e) return NULL;
    obj = elm_widget_add(e);
    elm_widget_type_set(obj, "segmented-control");
    elm_widget_sub_object_add(parent, obj);
@@ -1118,6 +1119,7 @@ elm_segment_control_item_object_get(Elm_Segment_Item *it)
 EAPI void
 elm_segment_control_item_selected_set( Elm_Segment_Item *item, Eina_Bool select)
 {
+   if(!item) return;
    Widget_Data *wd = elm_widget_data_get(item->obj);
    if(!wd) return;
 
@@ -1173,6 +1175,7 @@ elm_segment_control_item_get_at(Evas_Object *obj, unsigned int index)
 EAPI int
 elm_segment_control_item_index_get(Elm_Segment_Item *item)
 {
+   if(!item) return;
    Widget_Data *wd = elm_widget_data_get(item->obj);
    if(!wd) return NULL;
 
@@ -1191,6 +1194,7 @@ elm_segment_control_item_index_get(Elm_Segment_Item *item)
 EAPI void
 elm_segment_control_label_set(Elm_Segment_Item *item, char *label)
 {
+   if(!item) return;
    Widget_Data *wd = elm_widget_data_get(item->obj);
    if(!wd) return;
    if(!label) return;
