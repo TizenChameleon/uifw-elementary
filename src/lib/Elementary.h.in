@@ -1197,6 +1197,7 @@ extern "C" {
    typedef int          (*GenlistItemEditModeGetFunc)  (const void *data, Evas_Object *obj, const int enabled_edit_modes);
    typedef void         (*GenlistInsertNewFunc)      (Evas_Object *genlist, Elm_Genlist_Item *rel_item);
    typedef void         (*GenlistItemSelectedFunc) (const void *data, Elm_Genlist_Item *it, Eina_Bool selected);
+   typedef void         (*GenlistSelectedFunc) (const void *data, Elm_Genlist_Item *it, Eina_Bool selected);   
    typedef Eina_Bool    (*GenlistMoveFunc)      ( Evas_Object *genlist, Elm_Genlist_Item *item, Elm_Genlist_Item *rel_item, Eina_Bool move_after);
    typedef Eina_Bool    (*GenlistRemoveItemFunc)     (Evas_Object *genlist, Elm_Genlist_Item *rel_item);
 
@@ -1220,6 +1221,7 @@ extern "C" {
         GenlistInsertNewFunc insert_new;
         GenlistMoveFunc move;
         GenlistItemSelectedFunc item_selected;
+        GenlistSelectedFunc selected;
         const char *item_style;
         const char *select_all_item_style;
      };
@@ -1243,6 +1245,8 @@ extern "C" {
    EAPI int               elm_genlist_block_count_get(const Evas_Object *obj);
    EAPI void              elm_genlist_longpress_timeout_set(const Evas_Object *obj, double timeout);
    EAPI double            elm_genlist_longpress_timeout_get(const Evas_Object *obj);
+   EAPI void              elm_genlist_effect_set(const Evas_Object *obj, Eina_Bool emode);
+   EAPI void              elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode);
 
 
    /* operations to add items */
