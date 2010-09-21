@@ -1345,6 +1345,7 @@ extern "C" {
    EAPI int          elm_segment_control_item_count_get(Evas_Object *obj);
    EAPI int          elm_segment_control_item_index_get(Elm_Segment_Item *item);
    EAPI Evas_Object *elm_segment_control_item_object_get(Elm_Segment_Item *it);
+   EAPI void         elm_segment_control_label_set(Elm_Segment_Item *item, char *label);
 
    EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
    EAPI void         elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count);

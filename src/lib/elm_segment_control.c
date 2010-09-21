@@ -28,7 +28,6 @@ struct _Widget_Data
    unsigned int del_index;
    unsigned int cur_seg_id;
    double scale_factor;
-//   Eina_Bool longpressed : 1;
    Eina_Bool selected : 1;
 };
 
@@ -38,9 +37,9 @@ struct _Elm_Segment_Item
    Evas_Object *base;
    Evas_Object *icon;
    const char *label;
+   Evas_Object *label_wd;
    Eina_Bool delete_me : 1;
    int segment_id;
-//   Ecore_Timer *long_timer;
 };
 
 static void _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info);
@@ -84,7 +83,14 @@ _signal_segment_off(void *data)
     
     edje_object_signal_emit(item->base, "elm,action,unfocus", "elm");
     edje_object_signal_emit(item->base, "elm,state,segment,off", "elm");
-    edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
+    if(!item->label_wd)
+      {
+         edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
+      }
+    if(item->label_wd)
+      {
+         elm_label_text_color_set(item->label_wd, 0xff,0xff, 0xff, 0xff);
+      }
 
     return;
 }
@@ -101,23 +107,17 @@ _signal_segment_on(void *data)
 
    wd->selected = EINA_TRUE;
 
- /*  if (item->long_timer)
-     {
-       ecore_timer_del(item->long_timer);
-       item->long_timer = NULL;
-     }*/
-   //wd->longpressed = EINA_TRUE;
    edje_object_signal_emit(item->base, "elm,state,segment,on", "elm");
-   edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
+   if(!item->label_wd)
+     edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
 
-   if (item->segment_id == wd->cur_seg_id)
-	return;
+   if (item->segment_id == wd->cur_seg_id) return;
 
    EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
      {
         if (it->segment_id == wd->cur_seg_id)
 	  {
-           _signal_segment_off (it);
+             _signal_segment_off (it);
 	     break;
 	  }
      }
@@ -133,6 +133,7 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
    Elm_Segment_Item *item = (Elm_Segment_Item *) data;
    Widget_Data *wd = elm_widget_data_get(item->obj);
    if (!wd) return;
+   Evas_Coord wrap_width = 0, wrap_height = 0;
 
    if (item->segment_id == wd->cur_seg_id)
      {
@@ -140,20 +141,18 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
        return;
      }
     _signal_segment_on(item);
+    if(item->label_wd) 
+      {
+         wrap_width = elm_label_wrap_width_get(item->label_wd);
+	 wrap_height = elm_label_wrap_height_get(item->label_wd);
+	 elm_label_wrap_width_set(item->label_wd, wrap_width);
+	 elm_label_wrap_height_set(item->label_wd, wrap_height);
+	 elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
+      }
+
      wd->selected = EINA_FALSE;
      return;
 
-  /*if(wd->longpressed == EINA_FALSE)
-     {
-       edje_object_signal_emit(item->base, "elm,action,unfocus", "elm");
-       edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
-       edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
-      }*/
-  /* if (item->long_timer)
-     {
-       ecore_timer_del(item->long_timer);
-       item->long_timer = NULL;
-     }*/
 }
 
 static void
@@ -163,11 +162,9 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    Widget_Data *wd = elm_widget_data_get(item->obj);
 
    if (!wd) return;
-
+   
    edje_object_signal_emit(item->base, "elm,action,focus", "elm");
 
-/* if (item->long_timer) ecore_timer_del(item->long_timer);
-   item->long_timer = ecore_timer_add(0.3, _signal_segment_on, item);*/
 }
 
 static void
@@ -188,9 +185,17 @@ _item_free(Evas_Object *obj, Elm_Segment_Item *it)
      wd->seg_ctrl = eina_list_remove(wd->seg_ctrl, it);
 
    if(it->icon) evas_object_del(it->icon);
+   if(it->label_wd) 
+     {
+        evas_object_del(it->label_wd);
+	it->label_wd = NULL;
+	if (edje_object_part_swallow_get(it->base, "elm.swallow.label.content") == NULL) 
+          {
+             edje_object_part_unswallow(it->base, it->label_wd);
+	  }
+     }
    if(it->base) evas_object_del(it->base);
    if(it->label) eina_stringshare_del(it->label);
-//   if (it->long_timer) ecore_timer_del(it->long_timer);
 
    if(it)
      free(it);
@@ -235,6 +240,7 @@ _segment_resizing(void *data)
    evas_object_geometry_get(wd->base, NULL, NULL, &w, &h);
    wd->item_width = wd->width = w;
    wd->height = h;
+   
    _state_value_set((Evas_Object *)data);
 }
 
@@ -247,6 +253,55 @@ _object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
    if(!wd) return;
 
    ecore_job_add(_segment_resizing, (Evas_Object *)data);
+}
+
+static void
+_segment_item_resizing(void *data)
+{
+   Widget_Data *wd;
+   Elm_Segment_Item *it = (Elm_Segment_Item *)data; 
+   wd = elm_widget_data_get(it->obj);
+
+   if(!wd) return;
+   Evas_Coord w = 0, h = 0, vw, vh;
+   const char *minfont, *deffont, *maxfont;
+   int minfontsize, maxfontsize, cur_fontsize = 0;
+	
+   minfont = edje_object_data_get(wd->base, "min_font_size");
+   if (minfont) minfontsize = atoi(minfont);
+   else minfontsize = 1;
+	
+   maxfont = edje_object_data_get(wd->base, "max_font_size");
+   if (maxfont) maxfontsize = atoi(maxfont);
+   else maxfontsize = 1;
+	
+   deffont = edje_object_data_get(wd->base, "default_font_size");
+   if (deffont) cur_fontsize = atoi(deffont);
+   else cur_fontsize = 1;
+   
+   _update_list(it->obj);
+   evas_object_geometry_get(it->base, NULL, NULL, &w, &h);
+   evas_object_geometry_get(it->label_wd, NULL, NULL, &vw, &vh);
+	
+   if(it->label_wd) 
+     {
+        elm_label_fontsize_set(it->label_wd, cur_fontsize);
+	elm_label_wrap_width_set(it->label_wd, w-4);
+	elm_label_wrap_height_set(it->label_wd, h-6);
+	elm_label_text_color_set(it->label_wd, 0xFF,0xFF, 0xFF, 0xff);
+	if (edje_object_part_swallow_get(it->base, "elm.swallow.label.content") == NULL)
+	  {
+	     edje_object_part_unswallow(it->base, it->label_wd);
+  	  }
+	edje_object_part_swallow(it->base, "elm.swallow.label.content", it->label_wd);
+	edje_object_signal_emit(it->base, "elm,state,label,visible", "elm");
+     }
+}
+
+static void 
+_object_item_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   ecore_job_add(_segment_item_resizing, (Evas_Object *)data);
 }
 
 static Elm_Segment_Item*
@@ -263,6 +318,7 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
    if(obj) it->obj = obj;
    it->delete_me = EINA_FALSE;
    it->segment_id = wd->id;
+   it->label_wd = NULL;
 
    it->base = edje_object_add(evas_object_evas_get(obj));
    _elm_theme_object_set(obj, it->base, "segment", "base", elm_object_style_get(it->base));
@@ -276,7 +332,6 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
      {
          it->label = NULL;
      }
-
    if ((it->icon != icon) && (it->icon))
       elm_widget_sub_object_del(obj, it->icon);
    it->icon = icon;
@@ -317,14 +372,19 @@ _update_list(Evas_Object *obj)
         it = _item_find(obj, 0);
 	_elm_theme_object_set(obj, it->base, "segment", "base", "single");
 	edje_object_signal_emit(it->base, "elm,state,segment,on", "elm");
-	edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
-	edje_object_signal_emit(it->base, "elm,state,text,change", "elm");
+	if(!it->label_wd)
+	  {
+	     edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
+     	     edje_object_signal_emit(it->base, "elm,state,text,change", "elm");
+  	  }
 	edje_object_message_signal_process(it->base);
 
-	edje_object_part_text_set(it->base, "elm.text", it->label);
-
+	if(it->label)
+	   edje_object_part_text_set(it->base, "elm.text", it->label);
+	   
 	edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
 	edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+
 	return;
      }
 
@@ -341,12 +401,17 @@ _update_list(Evas_Object *obj)
 	else
 	  {
 	     _elm_theme_object_set(obj, it->base, "segment", "base", "default");
-	  }
 
-	edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
+	  }
+	  
+	if(!it->label_wd)
+	  {
+	     edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
+  	  }
 	edje_object_message_signal_process(it->base);
 
-	edje_object_part_text_set(it->base, "elm.text", it->label);
+	if(it->label)
+          edje_object_part_text_set(it->base, "elm.text", it->label);
 
 	edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
 	edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
@@ -374,7 +439,7 @@ _refresh_segment_ids(Evas_Object *obj)
      {
         if (wd->cur_seg_id >= wd->del_index)
  	   --wd->cur_seg_id;
-	   wd->del_index =0;
+        wd->del_index =0;
      }
 
    EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
@@ -389,7 +454,8 @@ _state_value_set(Evas_Object *obj)
 {
    Elm_Segment_Item *it;
    Eina_List *l;
-   Evas_Coord mw, mh, x, y;
+   Evas_Coord mw, mh, x, y, w, h, xx = 0, yy;
+
    int w1=0, w2, i=0;
    unsigned int count ;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -403,12 +469,12 @@ _state_value_set(Evas_Object *obj)
         evas_object_geometry_get(wd->ani_it->base, &x, &y, &w1, NULL);
 	if (wd->ani_it->delete_me)
 	  {
-  	     w1-=(wd->item_width/15);
+  	     w1-=(wd->item_width/5);
 	     if( w1< 0) w1 = 0;
   	  }
 	else
 	{
-           w1+=(wd->item_width/15);
+           w1+=(wd->item_width/5);
 	   if( w1 > wd->item_width )
               w1 = wd->item_width;
 	}
@@ -416,25 +482,39 @@ _state_value_set(Evas_Object *obj)
      }
    else
       w2 = wd->item_width;
-
+	  
    EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
     {
        edje_object_size_min_restricted_calc(it->base, &mw, &mh, 0, 0);
        evas_object_size_hint_weight_set(it->base, 1.0, 1.0);
        evas_object_size_hint_align_set(it->base, -1.0, -1.0);
-
+	   evas_object_geometry_get(wd->base, &x, &y, &w, &h);
+	
+	   if(xx == 0)
+		xx = 16;
+		if(yy == 0)
+		yy= 137;
+		
        if(wd->ani_it  && it == wd->ani_it)
          {
-   	    evas_object_resize(it->base, w1, wd->height);
+            evas_object_resize(it->base, w1, wd->height);
 	    evas_object_size_hint_min_set(it->base, w1, wd->height);
 	    evas_object_size_hint_max_set(it->base, w1, wd->height);
+#if 0
+	    evas_object_move(it->base, xx, yy);
+	    xx+=w1;
+#endif	    
 	 }
        else
          {
- 	    evas_object_resize(it->base, w2, wd->height);
+	    evas_object_resize(it->base, w2, wd->height);
 	    evas_object_size_hint_min_set(it->base, w2, wd->height);
 	    evas_object_size_hint_max_set(it->base, w2, wd->height);
-	 }
+#if 0
+	    evas_object_move(it->base, xx, yy);
+	    xx+=w2;
+#endif	    
+	}
        ++i;
     }
 
@@ -504,9 +584,7 @@ _item_find(Evas_Object *obj, unsigned int index)
 
    EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
      {
-        if (i == index) {
-           return it;
-	}
+        if (i == index) return it;
 	i++;
      }
      return NULL;
@@ -564,6 +642,12 @@ elm_segment_control_add(Evas_Object *parent)
    elm_widget_sub_object_add(obj, wd->box);
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->box);
    evas_object_show(wd->box);
+#if 0   
+   wd->box = elm_layout_add(e);
+   elm_layout_theme_set(wd->box, "segmented-control", "base", "default");
+   edje_object_part_swallow(wd->base, "elm.swallow.content", wd->box);
+   evas_object_show(wd->box);
+#endif   
 
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _object_resize, obj);
    wd->id = 0;
@@ -598,9 +682,10 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
 
    wd->seg_ctrl = eina_list_append(wd->seg_ctrl, it);
    wd->id = eina_list_count(wd->seg_ctrl);
-   _update_list(obj);
+   //_update_list(obj);
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down, it);
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_UP, _mouse_up, it);
+   evas_object_event_callback_add(it->base, EVAS_CALLBACK_RESIZE, _object_item_resize, it);
    wd->insert_index = 0;
    wd->del_index = 0;
    _refresh_segment_ids(obj);
@@ -616,6 +701,9 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
    evas_object_show( it->base);
 
    evas_object_box_append(wd->box, it->base);
+#if 0
+   elm_layout_content_set(wd->box,  "elm.swallow.content",  it->base);
+#endif   
    evas_object_smart_calculate(wd->box);
 
    return it;
@@ -658,7 +746,7 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const ch
 {
    Elm_Segment_Item *it, *it_rel;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if(!wd) return;
+   if(!wd) return NULL;
 
    it = _item_new(obj, label, icon);
    it_rel = _item_find(obj, index);
@@ -668,16 +756,17 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const ch
      }
    else
      {
-        if (!it) return;
+        if (!it) return NULL;
    	wd->seg_ctrl = eina_list_prepend_relative(wd->seg_ctrl, it, it_rel);
      }
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down, it);
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_UP, _mouse_up, it);
+   evas_object_event_callback_add(it->base, EVAS_CALLBACK_RESIZE, _object_item_resize, it);
    wd->insert_index = index;
    wd->id = eina_list_count(wd->seg_ctrl);
    _refresh_segment_ids(obj);
 
-   _update_list(obj);
+   //_update_list(obj);
    if(animate && it->segment_id && wd->ani_it == NULL)
      {
         wd->ani_it = it;
@@ -754,10 +843,13 @@ elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool
      {
         evas_object_box_remove(wd->box, it->base);
 	evas_object_smart_calculate(wd->box);
+#if 0
+	 elm_layout_content_unset(wd->box, "elm.swallow.content");
+#endif
 	_item_free(obj, it);
 	_refresh_segment_ids(obj);
 	_state_value_set(obj);
-	_update_list(obj);
+	//_update_list(obj);
      }
    wd->id = eina_list_count(wd->seg_ctrl);
    return;
@@ -817,7 +909,7 @@ elm_segment_control_item_del_at(Evas_Object *obj,  unsigned int index, Eina_Bool
 	_item_free(obj, it);
 	_refresh_segment_ids(obj);
 	_state_value_set(obj);
-	_update_list(obj);
+	//_update_list(obj);
      }
    wd->id = eina_list_count(wd->seg_ctrl);
    return;
@@ -1027,16 +1119,17 @@ EAPI void
 elm_segment_control_item_selected_set( Elm_Segment_Item *item, Eina_Bool select)
 {
    Widget_Data *wd = elm_widget_data_get(item->obj);
-   if(!wd) return NULL;
+   if(!wd) return;
 
    if(select)
      {
-      if(item->segment_id == wd->cur_seg_id)
-          return;
-		   
-      edje_object_signal_emit(item->base, "elm,action,focus", "elm");
-      edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
-
+      if(item->segment_id == wd->cur_seg_id) return;
+	
+      if(!item->label_wd)
+        {	
+           edje_object_signal_emit(item->base, "elm,action,focus", "elm");
+	   edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
+	}
       _signal_segment_on(item);
 
       }
@@ -1086,3 +1179,27 @@ elm_segment_control_item_index_get(Elm_Segment_Item *item)
    return item->segment_id;
 }
 
+/**
+ * Set The Label widget to a Segment item of Segmentcontrol
+ * @param item The Segment item.
+ * @param label The Label.
+ * @return The Void.
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
+
+EAPI void
+elm_segment_control_label_set(Elm_Segment_Item *item, char *label)
+{
+   Widget_Data *wd = elm_widget_data_get(item->obj);
+   if(!wd) return;
+   if(!label) return;
+
+   item->label_wd = elm_label_add(item->obj);	
+   elm_label_label_set(item->label_wd, label);
+   elm_label_text_align_set(item->label_wd, "middle");
+   elm_label_ellipsis_set(item->label_wd, 1);
+   elm_label_line_wrap_set(item->label_wd, 1);
+
+   return;
+}
