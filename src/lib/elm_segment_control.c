@@ -1165,7 +1165,7 @@ elm_segment_control_item_get_at(Evas_Object *obj, unsigned int index)
 }
 
 /**
- * Select the index of a Segment item of Segmentcontrol
+ * Get the index of a Segment item of Segmentcontrol
  * @param item The Segment item.
  * @return The corresponding index of the Segment item.
  *
@@ -1175,7 +1175,7 @@ elm_segment_control_item_get_at(Evas_Object *obj, unsigned int index)
 EAPI int
 elm_segment_control_item_index_get(Elm_Segment_Item *item)
 {
-   if(!item) return;
+   if(!item) return -1;
    Widget_Data *wd = elm_widget_data_get(item->obj);
    if(!wd) return NULL;
 
