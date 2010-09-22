@@ -1194,10 +1194,10 @@ elm_segment_control_item_index_get(Elm_Segment_Item *item)
 EAPI Evas_Object *
 elm_segment_control_item_label_object_set(Elm_Segment_Item *item, char *label)
 {
-   if(!item) return;
+   if(!item) return NULL;
    Widget_Data *wd = elm_widget_data_get(item->obj);
-   if(!wd) return;
-   if(!label) return;
+   if(!wd) return NULL;
+   if(!label) return NULL;
 
    item->label_wd = elm_label_add(item->obj);	
    elm_label_label_set(item->label_wd, label);

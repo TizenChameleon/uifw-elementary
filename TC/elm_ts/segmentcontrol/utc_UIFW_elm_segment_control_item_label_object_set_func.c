@@ -98,11 +98,10 @@ static void utc_UIFW_elm_segment_control_item_label_object_set_func_01(void)
 static void utc_UIFW_elm_segment_control_item_label_object_set_func_02(void)
 {
         Elm_Segment_Item *item = NULL;
-	const char *label = NULL;
-	char *ch = "All";
+	Evas_Object *label = NULL;
 	item = elm_segment_control_item_add(segment_control, NULL, NULL,EINA_FALSE);
-        elm_segment_control_item_label_object_set(NULL,ch);
-	label = elm_segment_control_item_label_get(segment_control,0);
+        label = elm_segment_control_item_label_object_set(item, NULL);
+	elm_segment_control_item_label_get(segment_control,0);
 	if (label) {
 		tet_result(TET_FAIL);
 		return;
