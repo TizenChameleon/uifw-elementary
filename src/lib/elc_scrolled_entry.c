@@ -128,6 +128,17 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      elm_widget_focus_steal(wd->entry);
 }
 
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+static Evas_Object *
+_imp_region_get_hook(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_widget_imp_region_get(wd->entry, x, y, w, h);
+   return wd->scroller;
+}
+#endif
+
 static void
 _disable_hook(Evas_Object *obj)
 {
@@ -278,6 +289,9 @@ elm_scrolled_entry_add(Evas_Object *parent)
    elm_widget_can_focus_set(obj, 1);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+   elm_widget_imp_region_get_hook_set(obj, _imp_region_get_hook, NULL);
+#endif
 
    wd->scroller = elm_scroller_add(parent);
    elm_widget_resize_object_set(obj, wd->scroller);

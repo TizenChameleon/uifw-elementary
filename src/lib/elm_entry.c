@@ -190,6 +190,9 @@ static const char SIG_SELECTION_CHANGED[] = "selection,changed";
 static const char SIG_SELECTION_CLEARED[] = "selection,cleared";
 static const char SIG_CURSOR_CHANGED[] = "cursor,changed";
 static const char SIG_ANCHOR_CLICKED[] = "anchor,clicked";
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+static const char SIG_IMPREGION_CHANGED[] = "impregion,changed";
+#endif
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
   {SIG_ACTIVATED, ""},
@@ -395,6 +398,23 @@ _check_enable_returnkey(Evas_Object *obj)
 	ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_FALSE);
      }
 }
+
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+static Evas_Object *
+_imp_region_get_hook(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
+{
+   Evas_Coord cx = 0, cy = 0, cw = 0, ch = 0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text",
+                                             &cx, &cy, &cw, &ch);
+   if (x) *x = cx;
+   if (y) *y = cy;
+   if (w) *w = cw;
+   if (h) *h = ch;
+   return NULL;
+}
+#endif
 
 static void
 _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
@@ -1200,6 +1220,9 @@ _signal_cursor_changed(void *data, Evas_Object *obj __UNUSED__, const char *emis
 	wd->cw = cw;
 	wd->ch = ch;
      }
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+   evas_object_smart_callback_call(data, SIG_IMPREGION_CHANGED, NULL);
+#endif
 }
 
 static void
@@ -1908,6 +1931,9 @@ elm_entry_add(Evas_Object *parent)
    elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
    elm_widget_can_focus_set(obj, 1);
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+   elm_widget_imp_region_get_hook_set(obj, _imp_region_get_hook, NULL);
+#endif
 
    wd->linewrap     = EINA_TRUE;
    wd->ellipsis     = EINA_FALSE;

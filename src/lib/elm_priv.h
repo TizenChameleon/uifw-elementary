@@ -165,6 +165,9 @@ EAPI void         elm_widget_signal_callback_del_hook_set(Evas_Object *obj, void
 EAPI void         elm_widget_theme(Evas_Object *obj);
 EAPI void         elm_widget_on_focus_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
 EAPI void         elm_widget_on_change_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+EAPI void         elm_widget_imp_region_get_hook_set(Evas_Object *obj, Evas_Object * (*func) (const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h), void *data);
+#endif
 EAPI void         elm_widget_on_show_region_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
 EAPI void         elm_widget_data_set(Evas_Object *obj, void *data);
 EAPI void        *elm_widget_data_get(const Evas_Object *obj);
@@ -189,6 +192,9 @@ EAPI void         elm_widget_activate(Evas_Object *obj);
 EAPI void         elm_widget_change(Evas_Object *obj);
 EAPI void         elm_widget_disabled_set(Evas_Object *obj, int disabled);
 EAPI int          elm_widget_disabled_get(const Evas_Object *obj);
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+EAPI Evas_Object *elm_widget_imp_region_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h);
+#endif
 EAPI void         elm_widget_show_region_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
 EAPI void         elm_widget_show_region_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h);
 EAPI void         elm_widget_scroll_hold_push(Evas_Object *obj);

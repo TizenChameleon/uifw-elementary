@@ -16,6 +16,14 @@ struct _Widget_Data
    Evas_Object *base;
    Evas_Object *shelf, *panel;
    Evas_Object *content;
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+   Evas_Object *virtualkeypad;
+   Evas_Object *focus_obj;
+   Evas_Object *scroller;
+   Evas_Coord frelx, frely;
+   int vkeypad_height;
+   Ecore_X_Virtual_Keyboard_State vkeypad_state;
+#endif
    Ecore_Event_Handler *prop_hdl;
    struct {
       Ecore_Animator *animator; // animaton timer
@@ -31,6 +39,9 @@ static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static Eina_Bool _prop_change(void *data, int type, void *event);
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+static const char SIG_IMPREGION_CHANGED[] = "impregion,changed";
+#endif
 
 /* local functions */
 static void 
@@ -88,6 +99,144 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
      }
 }
 
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+static Evas_Object *
+_focus_object_get(const Evas_Object *obj)
+{
+   Evas_Object *parent = NULL, *foc = NULL;
+   const char * type = NULL;
+   parent = elm_widget_top_get(obj);
+   if (!parent) return NULL;
+   foc = elm_widget_focused_object_get(parent);
+   return foc;
+}
+
+static void 
+_imp_region_show(void *data, Evas_Object *obj)
+{
+   Evas_Coord x = 0, y = 0, w = 0, h = 0;
+   Evas_Object * immed_scroll = NULL;
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;   
+   if (!wd->scroller) return;
+   if (!wd->focus_obj) return;
+   immed_scroll = elm_widget_imp_region_get(wd->focus_obj, &x, &y, &w, &h);
+   if(x < 0) x = 0;
+   if(y < 0) y = 0;
+   x = x + wd->frelx;
+   y = y + wd->frely;
+   //if(wd->vkeypad_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_ON)
+   elm_scroller_region_show(wd->scroller, x, y, w, h);
+}
+
+static void
+_imp_region_changed_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   _imp_region_show(data, obj);
+}
+
+static void 
+_scroller_resize_event_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{ 
+   _imp_region_show(data, obj);
+}
+
+static bool
+_focus_object_region_calc(void *data, int *kh, bool reg_scrol_resz_evnt)
+{
+   Evas_Coord fx = 0, fy = 0, fw = 0, fh = 0;
+   Evas_Coord sx = 0, sy = 0, sw = 0, sh = 0;
+   Evas_Coord tsx = 0, tsy = 0, tsw = 0, tsh = 0;
+
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return EINA_FALSE;
+   if (!wd->scroller) return EINA_FALSE;
+   if (!wd->focus_obj) return EINA_FALSE;
+   evas_object_geometry_get(wd->focus_obj, &fx, &fy, &fw, &fh);
+   evas_object_geometry_get(wd->scroller, &sx, &sy, &sw, &sh); 
+   elm_scroller_region_get(wd->scroller, &tsx, &tsy, &tsw, &tsh);
+   if(sy > 0)
+    {
+      fy = fy - sy;
+    }
+   wd->frelx = tsx + fx;
+   wd->frely = tsy + fy;
+}
+
+static bool
+_get_scroller(void *data, Evas_Object * foc_obj, bool reg_scrol_resz_evnt)
+{
+   Evas_Coord x = 0, y = 0, w = 0, h = 0;
+   Evas_Object * parent = NULL;
+   Evas_Object * immed_scroll=NULL;
+   Evas_Object * root_scroller = NULL;
+   Evas_Object *win=NULL;
+   const char * type=NULL;
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return EINA_FALSE;
+   win = elm_widget_top_get(foc_obj);
+   if (!win) return EINA_FALSE;
+   immed_scroll = elm_widget_imp_region_get(foc_obj, &x, &y, &w, &h);
+   parent = elm_object_parent_widget_get( foc_obj );  
+   do
+    {
+      type=elm_widget_type_get(parent);
+      if(!strcmp(type,"scroller"))
+        {
+          root_scroller = parent;
+          break;
+        }
+      parent = elm_object_parent_widget_get( parent );
+    }while(parent && (parent !=win));
+   if(root_scroller)
+     wd->scroller = root_scroller;
+   else if(immed_scroll)
+     wd->scroller = immed_scroll;
+   else
+    {
+      wd->scroller = NULL;
+      return EINA_FALSE;
+    }
+   return EINA_TRUE;
+}
+
+static void
+_autoscroll_mode_enable(void *data)
+{
+   Evas_Object * focused_object=NULL;
+   bool ret = EINA_FALSE;
+   const char * type=NULL;
+   
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return EINA_FALSE;
+   focused_object=_focus_object_get(data);
+   if(focused_object)
+    {
+      wd->focus_obj = focused_object;
+      ret = _get_scroller(data, focused_object, EINA_TRUE);
+    }
+   if(ret == EINA_TRUE)
+    {
+      ret = _focus_object_region_calc(data, NULL, EINA_TRUE);
+      evas_object_event_callback_add(wd->scroller, EVAS_CALLBACK_RESIZE, 
+                                     _scroller_resize_event_cb, data);
+      evas_object_smart_callback_add(wd->focus_obj, SIG_IMPREGION_CHANGED,
+                                      _imp_region_changed_cb, data);
+   }
+}
+
+static void
+_autoscroll_mode_disable(void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return EINA_FALSE;
+   evas_object_event_callback_del(wd->scroller, EVAS_CALLBACK_RESIZE, _scroller_resize_event_cb);
+   evas_object_smart_callback_del(wd->focus_obj, SIG_IMPREGION_CHANGED, _imp_region_changed_cb);
+   wd->scroller = NULL;
+   wd->focus_obj = NULL;
+}
+#endif
+
 /* unused now - but meant to be for making sure the focused widget is always
  * visible when the vkbd comes and goes by moving the conformant obj (and thus
  * its children) to  show the focused widget (and if focus changes follow)
@@ -144,6 +293,12 @@ static Eina_Bool
 _prop_change(void *data, int type __UNUSED__, void *event) 
 {
 #ifdef HAVE_ELEMENTARY_X
+   printf("\n in prop_change \n");
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+   int indicator_height=57;
+   Ecore_X_Virtual_Keyboard_State virt_keypad_state = ECORE_X_VIRTUAL_KEYBOARD_STATE_UNKNOWN;
+   printf("\n conformant autoscroll enabled \n");
+#endif
    Ecore_X_Event_Window_Property *ev;
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return ECORE_CALLBACK_PASS_ON;
@@ -155,9 +310,21 @@ _prop_change(void *data, int type __UNUSED__, void *event)
 
         zone = ecore_x_e_illume_zone_get(ev->win);
         ecore_x_e_illume_indicator_geometry_get(zone, NULL, NULL, NULL, &sh);
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+        if (sh < 0) sh = indicator_height;
+#else
         if (sh < 0) sh = 0;
+#endif
         evas_object_size_hint_min_set(wd->shelf, -1, sh);
         evas_object_size_hint_max_set(wd->shelf, -1, sh);
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+        sh = -1;
+        zone = ecore_x_e_illume_zone_get(ev->win);
+        ecore_x_e_illume_keyboard_geometry_get(zone, NULL, NULL, NULL, &sh);
+        if (sh < 0) sh = 0;
+        evas_object_size_hint_min_set(wd->virtualkeypad, -1, sh);
+        evas_object_size_hint_max_set(wd->virtualkeypad, -1, sh);
+#endif
         sh = -1;
         ecore_x_e_illume_softkey_geometry_get(zone, NULL, NULL, NULL, &sh);
         if (sh < 0) sh = 0;
@@ -186,16 +353,39 @@ _prop_change(void *data, int type __UNUSED__, void *event)
         evas_object_size_hint_min_set(wd->panel, -1, sh);
         evas_object_size_hint_max_set(wd->panel, -1, sh);
      }
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
    else if (ev->atom == ECORE_X_ATOM_E_ILLUME_KEYBOARD_GEOMETRY) 
      {
         Ecore_X_Window zone;
-        int ky = -1;
+        int ky = -1, kh = -1;
 
         printf("Keyboard Geometry Changed\n");
         zone = ecore_x_e_illume_zone_get(ev->win);
-        ecore_x_e_illume_keyboard_geometry_get(zone, NULL, &ky, NULL, NULL);
+        ecore_x_e_illume_keyboard_geometry_get(zone, NULL, &ky, NULL, &kh);
         printf("\tGeom: %d\n", ky);
+        if (kh < 0) kh = 0;
+        if (kh == wd->vkeypad_height) return ECORE_CALLBACK_PASS_ON;
+        wd->vkeypad_height = kh;
+        evas_object_size_hint_min_set(wd->virtualkeypad, -1, kh);
+        evas_object_size_hint_max_set(wd->virtualkeypad, -1, kh);
      }
+   else if (ev->atom == ECORE_X_ATOM_E_VIRTUAL_KEYBOARD_STATE)
+     {
+        Ecore_X_Window zone;
+        zone = ecore_x_e_illume_zone_get(ev->win);
+        virt_keypad_state = ecore_x_e_virtual_keyboard_state_get(zone);
+        if (virt_keypad_state == wd->vkeypad_state)   return ECORE_CALLBACK_PASS_ON;
+        wd->vkeypad_state = virt_keypad_state;
+        if(wd->vkeypad_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_ON)
+         {
+           _autoscroll_mode_enable(data);
+         }
+        else if(wd->vkeypad_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF)
+         {
+           _autoscroll_mode_disable(data);
+     }
+     }
+#endif
 #endif
 
    return ECORE_CALLBACK_PASS_ON;
@@ -246,6 +436,20 @@ elm_conformant_add(Evas_Object *parent)
    evas_object_size_hint_min_set(wd->shelf, -1, sh);
    evas_object_size_hint_max_set(wd->shelf, -1, sh);
    edje_object_part_swallow(wd->base, "elm.swallow.shelf", wd->shelf);
+
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+   wd->scroller = NULL;
+   wd->focus_obj = NULL;
+   sh = -1;
+   ecore_x_e_illume_keyboard_geometry_get(zone, NULL, NULL, NULL, &sh);
+   if (sh < 0) sh = 0;
+   wd->virtualkeypad= evas_object_rectangle_add(evas);
+   evas_object_color_set(wd->virtualkeypad, 0, 0, 0, 0);
+   evas_object_size_hint_min_set(wd->virtualkeypad, -1, sh);
+   evas_object_size_hint_max_set(wd->virtualkeypad, -1, sh);
+   edje_object_part_swallow(wd->base, "elm.swallow.virtualkeypad", wd->virtualkeypad);
+   wd->vkeypad_state = ECORE_X_VIRTUAL_KEYBOARD_STATE_UNKNOWN;
+#endif
 
    sh = -1;
    ecore_x_e_illume_softkey_geometry_get(zone, NULL, NULL, NULL, &sh);

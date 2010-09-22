@@ -205,6 +205,28 @@ if test "x$want_elementary_x" = "xyes" -a "x$have_elementary_x" = "xno"; then
     AC_MSG_ERROR([ecore-x support requested, but not found by pkg-config.])
 fi
 
+have_conformant_autoscroll="no"
+want_conformant_autoscroll="yes"
+AC_ARG_ENABLE([ecore-x],
+   [AC_HELP_STRING([--disable-ecore-x], [disable ecore-x support. @<:@default=detect@:>@])],
+   [want_conformant_autoscroll=$enableval], [])
+
+if test "x$want_conformant_autoscroll" != "xno"; then
+   PKG_CHECK_MODULES([ELEMENTARY_X],
+      [ecore-x >= 1.0.0],
+      [
+       AC_DEFINE(HAVE_CONFORMANT_AUTOSCROLL, 1, [autoscroll with conformant])
+       have_conformant_autoscroll="yes"
+       requirement_elm="ecore-x >= 1.0.0 ${requirement_elm}"
+      ],
+      [have_conformant_autoscroll="no"]
+   )
+else
+    have_conformant_autoscroll="no"
+fi
+if test "x$want_conformant_autoscroll" = "xyes" -a "x$have_conformant_autoscroll" = "xno"; then
+    AC_MSG_ERROR([ecore-x support requested, but not found by pkg-config.])
+fi
 
 have_elementary_fb="no"
 want_elementary_fb="auto"

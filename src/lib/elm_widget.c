@@ -42,6 +42,9 @@ struct _Smart_Data
    void          *on_focus_data;
    void         (*on_change_func) (void *data, Evas_Object *obj);
    void          *on_change_data;
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+   Evas_Object * (*imp_region_get_func) (const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h); 
+#endif
    void         (*on_show_region_func) (void *data, Evas_Object *obj);
    void          *on_show_region_data;
    void          *data;
@@ -221,6 +224,15 @@ elm_widget_on_change_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_O
    sd->on_change_func = func;
    sd->on_change_data = data;
 }
+
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+EAPI void
+elm_widget_imp_region_get_hook_set(Evas_Object *obj, Evas_Object * (*func) (const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h), void *data)
+{
+   API_ENTRY return;
+   sd->imp_region_get_func = func;
+}
+#endif
 
 EAPI void
 elm_widget_on_show_region_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data)
@@ -849,6 +861,18 @@ elm_widget_disabled_get(const Evas_Object *obj)
    API_ENTRY return 0;
    return sd->disabled;
 }
+
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+EAPI Evas_Object *
+elm_widget_imp_region_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
+{
+   API_ENTRY return;
+   if (sd->imp_region_get_func)
+     return sd->imp_region_get_func(obj, x, y, w, h);
+   else
+     return NULL;
+}
+#endif
 
 EAPI void
 elm_widget_show_region_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
