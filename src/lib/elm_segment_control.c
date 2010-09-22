@@ -1186,13 +1186,13 @@ elm_segment_control_item_index_get(Elm_Segment_Item *item)
  * Set The Label widget to a Segment item of Segmentcontrol
  * @param item The Segment item.
  * @param label The Label.
- * @return The Void.
+ * @return Evas_Object The Label widget.
  *
  * @ingroup SegmentControl SegmentControl
  */
 
-EAPI void
-elm_segment_control_label_set(Elm_Segment_Item *item, char *label)
+EAPI Evas_Object *
+elm_segment_control_item_label_object_set(Elm_Segment_Item *item, char *label)
 {
    if(!item) return;
    Widget_Data *wd = elm_widget_data_get(item->obj);
@@ -1204,6 +1204,8 @@ elm_segment_control_label_set(Elm_Segment_Item *item, char *label)
    elm_label_text_align_set(item->label_wd, "middle");
    elm_label_ellipsis_set(item->label_wd, 1);
    elm_label_line_wrap_set(item->label_wd, 1);
+   eina_stringshare_replace(&item->label, label);
 
-   return;
+   return item->label_wd;
 }
+
