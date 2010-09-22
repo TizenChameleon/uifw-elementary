@@ -40,6 +40,7 @@ struct _Widget_Data
    double scale_factor;
    const char *special_char;
    int min_1st_level_obj_height;
+   Eina_Bool hide_button : 1;
 };
 
 struct _Elm_Index_Item
@@ -426,19 +427,21 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
      }
    if (!label) label = strdup("");
    if (!last) last = strdup("");
-
-   if(wd->level == 0)
-   {
-     if(last)
-       {
-           edje_object_part_text_set(wd->base, "elm.text.body", last);
-           edje_object_signal_emit(wd->base, "hide_2nd_level", "");
-       }
-   }
-   if( wd->level == 1 && wd->level_active[1])
+   if(!wd->hide_button)
      {
-         edje_object_part_text_set(wd->base, "elm.text", last);
-         edje_object_signal_emit(wd->base, "hide_first_level", "");
+        if(wd->level == 0)
+          {
+             if(last)
+               {
+                  edje_object_part_text_set(wd->base, "elm.text.body", last);
+       		  edje_object_signal_emit(wd->base, "hide_2nd_level", "");
+	       }
+       	  }
+        if( wd->level == 1 && wd->level_active[1])
+          {
+             edje_object_part_text_set(wd->base, "elm.text", last);
+    	     edje_object_signal_emit(wd->base, "hide_first_level", "");
+     	  }
      }
 
    free(label);
@@ -630,6 +633,7 @@ elm_index_add(Evas_Object *parent)
    wd->max_supp_items_count = 0;
    wd->tot_items_count[0] = 0;
    wd->tot_items_count[1] = 0;
+   wd->hide_button = 0;
    wd->special_char = edje_object_data_get(wd->base, "special_char");
    if(wd->special_char == NULL)  wd->special_char = eina_stringshare_add("*");
 
@@ -1187,5 +1191,25 @@ elm_index_item_letter_get(const Elm_Index_Item *it)
 {
    if (!it) return NULL;
    return it->letter;
+}
+
+/**
+ * Make the Central Button Image invisible.
+ *
+ * @param obj The Index.
+ * @param invisible Whether button visible or not.
+ * @return void.
+ *
+ * @ingroup Index
+ */
+EAPI void
+elm_index_button_image_invisible_set(Evas_Object *obj, Eina_Bool invisible)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   wd->hide_button = invisible;
+   
+   edje_object_signal_emit(wd->base, "elm,state,button,image,hide", "elm");
+   return;
 }
 
