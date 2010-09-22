@@ -74,7 +74,7 @@ static void utc_UIFW_elm_smart_scroller_child_viewport_size_get_func_01(void)
 {
 	Evas_Object *scroll = NULL;
 	Evas_Object *entry = NULL;	
-    Evas_Coord  w,h;
+    Evas_Coord  w = 0,h = 0;
     Evas *e;
 	e = evas_object_evas_get(main_win);
    	scroll= elm_smart_scroller_add(e);
@@ -85,8 +85,8 @@ static void utc_UIFW_elm_smart_scroller_child_viewport_size_get_func_01(void)
 	evas_object_resize(scroll,240,400);
 	evas_object_resize(entry,240,400);
     elm_smart_scroller_child_viewport_size_get(scroll,&w,&h);
-	if (w!=232&&h!=392) {		
-
+	printf("\n w = %d h = %d\n", w, h);
+	if (!w && !h) {
 		tet_infoline("elm_smart_scroller_child_viewport_size_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -112,7 +112,8 @@ static void utc_UIFW_elm_smart_scroller_child_viewport_size_get_func_02(void)
 	evas_object_resize(scroll,240,400);
 	evas_object_resize(entry,240,400);
     elm_smart_scroller_child_viewport_size_get(NULL,&w,&h);
-	if ((w)&&(h)) {
+	printf("\n w = %d h = %d\n", w, h);
+	if ((w!=0)&&(h!=0)) {
 		tet_infoline("elm_smart_scroller_child_viewport_size_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
