@@ -47,6 +47,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_segment_control_item_selected_set_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_segment_control_item_selected_set_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -107,10 +108,10 @@ static void utc_UIFW_elm_segment_control_item_selected_set_func_02(void)
 	item = elm_segment_control_item_add(segment, NULL, "All", EINA_FALSE);
 	elm_segment_control_item_selected_set( NULL, 1);
         it = elm_segment_control_item_selected_get(segment);
-	if (!it) {
-		tet_result(TET_PASS);
+	if (it) {
+		tet_infoline("elm_segment_control_item_selected_set() failed in negative test case");
+		tet_result(TET_FAIL);
 		return;
 	}
-	tet_infoline("elm_segment_control_item_selected_set() with parent as NULL failed in negative test case");
-	tet_result(TET_FAIL);
+	tet_result(TET_PASS);
 }

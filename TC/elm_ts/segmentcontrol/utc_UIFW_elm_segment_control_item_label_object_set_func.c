@@ -29,15 +29,14 @@
 
 Evas_Object *main_win, *segment_control;
 
-
 static void startup(void);
 static void cleanup(void);
 
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_segment_control_item_label_set_func_01(void);
-static void utc_UIFW_elm_segment_control_item_label_set_func_02(void);
+static void utc_UIFW_elm_segment_control_item_label_object_set_func_01(void);
+static void utc_UIFW_elm_segment_control_item_label_object_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +44,9 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_segment_control_item_label_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_segment_control_item_label_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_segment_control_item_label_object_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_segment_control_item_label_object_set_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -74,15 +74,15 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_segment_control_item_label_set()
+ * @brief Positive test case of elm_segment_control_item_label_object_set()
  */
-static void utc_UIFW_elm_segment_control_item_label_set_func_01(void)
+static void utc_UIFW_elm_segment_control_item_label_object_set_func_01(void)
 {
         Elm_Segment_Item *item = NULL;
 	const char *label = NULL;
 	char *ch = "All";
 	item = elm_segment_control_item_add(segment_control, NULL, NULL,EINA_FALSE);
-        elm_segment_control_item_label_set(item, ch);
+        elm_segment_control_item_label_object_set(item, ch);
 	label = elm_segment_control_item_label_get(segment_control,0);
 	if (!(strcmp(label,"All"))) {
 	    tet_result(TET_PASS);
@@ -93,20 +93,18 @@ static void utc_UIFW_elm_segment_control_item_label_set_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_segment_control_item_label_set()
+ * @brief Negative test case of ug_init elm_segment_control_item_label_object_set()
  */
-static void utc_UIFW_elm_segment_control_item_label_set_func_02(void)
+static void utc_UIFW_elm_segment_control_item_label_object_set_func_02(void)
 {
         Elm_Segment_Item *item = NULL;
-	const char *label = NULL;
-	char *ch = "All";
+	Evas_Object *label = NULL;
 	item = elm_segment_control_item_add(segment_control, NULL, NULL,EINA_FALSE);
-        elm_segment_control_item_label_set(NULL,ch);
-	label = elm_segment_control_item_label_get(segment_control,0);
-	if (!label) {
-	tet_result(TET_PASS);
-	return;
+        label = elm_segment_control_item_label_object_set(item, NULL);
+	elm_segment_control_item_label_get(segment_control,0);
+	if (label) {
+		tet_result(TET_FAIL);
+		return;
 	}
-	tet_infoline("elm_segment_control_item_label_set() with parent as NULL failed in negative test case");;
-	tet_result(TET_FAIL);
+	tet_result(TET_PASS);
 }
