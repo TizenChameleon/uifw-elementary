@@ -293,11 +293,9 @@ static Eina_Bool
 _prop_change(void *data, int type __UNUSED__, void *event) 
 {
 #ifdef HAVE_ELEMENTARY_X
-   printf("\n in prop_change \n");
 #ifdef HAVE_CONFORMANT_AUTOSCROLL
    int indicator_height=57;
    Ecore_X_Virtual_Keyboard_State virt_keypad_state = ECORE_X_VIRTUAL_KEYBOARD_STATE_UNKNOWN;
-   printf("\n conformant autoscroll enabled \n");
 #endif
    Ecore_X_Event_Window_Property *ev;
    Widget_Data *wd = elm_widget_data_get(data);
