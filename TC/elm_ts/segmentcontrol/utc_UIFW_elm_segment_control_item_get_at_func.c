@@ -47,6 +47,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_segment_control_item_get_at_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_segment_control_item_get_at_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -105,10 +106,10 @@ static void utc_UIFW_elm_segment_control_item_get_at_func_02(void)
 	evas_object_show(segment);
 	item = elm_segment_control_item_add(segment, NULL, "All", EINA_FALSE);
         it = elm_segment_control_item_get_at(NULL, 0);
-	if (!it) {
-		tet_result(TET_PASS);
+	if (it) {
+		tet_infoline("elm_segment_control_item_get_at() failed in negative test case");
+		tet_result(TET_FAIL);
 		return;
 	}
-	tet_infoline("elm_segment_control_item_get_at() with parent as NULL failed in negative test case");
-	tet_result(TET_FAIL);
+	tet_result(TET_PASS);
 }

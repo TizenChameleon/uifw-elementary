@@ -47,6 +47,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_segment_control_item_del_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_segment_control_item_del_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -86,12 +87,12 @@ static void utc_UIFW_elm_segment_control_item_del_func_01(void)
 	item = elm_segment_control_item_add(segment, NULL, "All", EINA_FALSE);
 	elm_segment_control_item_del(segment, item, EINA_FALSE);
         it = elm_segment_control_item_get_at(segment,0);
-	if (!it) {
-		tet_result(TET_PASS);
+	if (it) {
+		tet_infoline("elm_segment_control_item_del() failed in positive test case");
+		tet_result(TET_FAIL);
 		return;
 	}
-	tet_infoline("elm_segment_control_item_del() failed in positive test case");
-        tet_result(TET_FAIL);
+	tet_result(TET_PASS);
 }
 
 /**
@@ -107,8 +108,8 @@ static void utc_UIFW_elm_segment_control_item_del_func_02(void)
 	item = elm_segment_control_item_add(segment, NULL, "All", EINA_FALSE);
 	elm_segment_control_item_del(NULL, item, EINA_FALSE);
         it = elm_segment_control_item_get_at(segment,0);
-	if (!it) {
-		tet_infoline("elm_segment_control_item_del() with parent as NULL failed in negative test case");
+	if (it) {
+		tet_infoline("elm_segment_control_item_del() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}

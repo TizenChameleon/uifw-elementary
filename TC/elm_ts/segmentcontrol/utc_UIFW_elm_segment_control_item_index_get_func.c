@@ -47,6 +47,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_segment_control_item_index_get_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_segment_control_item_index_get_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -79,18 +80,17 @@ static void cleanup(void)
 static void utc_UIFW_elm_segment_control_item_index_get_func_01(void)
 {
         Elm_Segment_Item *item = NULL;
-	int index;
+	int index = -1;
         Evas_Object *segment = NULL;
 	segment = elm_segment_control_add(main_win);
 	evas_object_show(segment);
 	item = elm_segment_control_item_add(segment, NULL, "All", EINA_FALSE);
 	index = elm_segment_control_item_index_get(item);
-	if (index==0) {
-	tet_result(TET_PASS);
-	return;
+	if (index!=0) {
+		tet_result(TET_FAIL);
+		return;
 	}
-	tet_infoline("elm_segment_control_item_index_get() failed in positive test case");
-	tet_result(TET_FAIL);
+	tet_result(TET_PASS);
 }
 
 /**
@@ -105,10 +105,10 @@ static void utc_UIFW_elm_segment_control_item_index_get_func_02(void)
 	evas_object_show(segment);
 	item = elm_segment_control_item_add(segment, NULL, "All",EINA_FALSE);
 	index = elm_segment_control_item_index_get(NULL);
-	if (index==-1) {
-	tet_result(TET_PASS);
-	return;
+	if (index!=-1) {
+		tet_infoline("elm_segment_control_item_index_get() failed in negative test case");
+		tet_result(TET_FAIL);
+		return;
 	}
-	tet_infoline("elm_segment_control_item_index_get() with parent as NULL failed in negative test case");
-	tet_result(TET_FAIL);
+	tet_result(TET_PASS);
 }
