@@ -108,7 +108,7 @@ static void utc_UIFW_elm_segment_control_item_del_at_func_02(void)
 	item = elm_segment_control_item_add(segment, NULL, "All", EINA_FALSE);
 	elm_segment_control_item_del_at(NULL,0, EINA_FALSE);
         it = elm_segment_control_item_get_at(segment,0);
-	if (it) {
+	if (!it) {
 		tet_infoline("elm_segment_control_item_del_at() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
