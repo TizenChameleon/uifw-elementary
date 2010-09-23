@@ -84,29 +84,40 @@ char *gli_label_get(const void *data, Evas_Object *obj, const char *part)
 static void utc_UIFW_elm_index_item_prepend_func_01(void)
 {
 	Evas_Object *idx = NULL;
-	Elm_Genlist_Item *it = NULL;
+	Elm_Genlist_Item *it = NULL,*it_gl = NULL;
+	Elm_Index_Item *it_idx = NULL;
 	Evas_Object *gl = NULL;
 	int i = 0, j = 0;
+	const char  *letter = NULL;
 	
 	gl = elm_genlist_add(main_win);
-   	idx= elm_index_add(main_win);
-    evas_object_show(gl);
-	evas_object_show(idx);	
+   	idx= elm_index_add(main_win);	
+	evas_object_show(gl);
+	evas_object_show(idx);
     itci.item_style     = "default";
     itci.func.label_get = gli_label_get;
     itci.func.icon_get  = NULL;
     itci.func.state_get = NULL;
     itci.func.del       = NULL;
-    for (i = 0; i < 40; i++) {
+    for (i = 0; i <=40; i++) {
       it = elm_genlist_item_append(gl, &itci,(void *)j, NULL, ELM_GENLIST_ITEM_NONE, NULL,NULL);
       if ((j & 0xf) == 0) {
 		 char buf[32];
-         snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 4) & 0xf));
+         snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 3) & 0xf));
          elm_index_item_prepend(idx, buf, it);
         }
+		if(i == 40)
+			it_gl = it;
         j += 2;
     }	
 	elm_index_item_go(idx, 0);
+    it_idx = elm_index_item_find(idx,(void*)it_gl);	
+    letter = elm_index_item_letter_get(it_idx);
+    if((strcmp(letter,"K"))){
+		tet_infoline("elm_index_item_prepend() with argument as NULL failed in positive test case");
+		tet_result(TET_FAIL);
+		return;
+    }
 	tet_result(TET_PASS);
 }
 
@@ -116,28 +127,36 @@ static void utc_UIFW_elm_index_item_prepend_func_01(void)
 static void utc_UIFW_elm_index_item_prepend_func_02(void)
 {
 	Evas_Object *idx = NULL;
-	Elm_Genlist_Item *it = NULL;
+	Elm_Genlist_Item *it = NULL, *it_gl=NULL;
+	Elm_Index_Item *it_idx = NULL;
 	Evas_Object *gl = NULL;
 	int i = 0, j = 0;
-	
 	gl = elm_genlist_add(main_win);
    	idx= elm_index_add(main_win);
-    evas_object_show(gl);
+        evas_object_show(gl);
 	evas_object_show(idx);	
-    itci.item_style     = "default";
-    itci.func.label_get = gli_label_get;
-    itci.func.icon_get  = NULL;
-    itci.func.state_get = NULL;
-    itci.func.del       = NULL;
-    for (i = 0; i < 40; i++) {
-      it = elm_genlist_item_append(gl, &itci,(void *)j, NULL, ELM_GENLIST_ITEM_NONE, NULL,NULL);
-      if ((j & 0xf) == 0) {
-		 char buf[32];
-         snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 4) & 0xf));
-         elm_index_item_prepend(NULL, buf, it);
-        }
-        j += 2;
-    }	
+	    itci.item_style     = "default";
+	    itci.func.label_get = gli_label_get;
+	    itci.func.icon_get  = NULL;
+	    itci.func.state_get = NULL;
+	    itci.func.del       = NULL;
+	    for (i = 0; i <=40; i++) {
+        it = elm_genlist_item_append(gl, &itci,(void *)j, NULL, ELM_GENLIST_ITEM_NONE, NULL,NULL);
+        if ((j & 0xf) == 0) {
+	    char buf[32];
+            snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 3) & 0xf));
+            elm_index_item_prepend(NULL, buf, it);
+           }
+		if(i == 40)
+		 it_gl = it;
+         j += 2;
+         }	
 	elm_index_item_go(idx, 0);
-	tet_result(TET_PASS);
+	it_idx = elm_index_item_find(idx,(void*)it_gl);	
+	if(it_idx) {
+		tet_infoline("elm_index_item_prepend() failed in negative test case");	
+		tet_result(TET_FAIL);
+		return;
+     }
+	 tet_result(TET_PASS);
 }

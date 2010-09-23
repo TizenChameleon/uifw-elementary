@@ -93,7 +93,7 @@ static void utc_UIFW_elm_index_add_func_02(void)
    	idx = elm_index_add(NULL);
 	evas_object_show(idx);
 	elm_index_item_go(idx, 0);
-	if (!idx) {
+	if (idx) {
 		tet_infoline("elm_index_add() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
