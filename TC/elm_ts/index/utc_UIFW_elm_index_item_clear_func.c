@@ -92,29 +92,29 @@ static void utc_UIFW_elm_index_item_clear_func_01(void)
    	idx= elm_index_add(main_win);	
 	evas_object_show(gl);
 	evas_object_show(idx);	
-    itci.item_style     = "default";
-    itci.func.label_get = gli_label_get;
-    itci.func.icon_get  = NULL;
-    itci.func.state_get = NULL;
-    itci.func.del       = NULL;
-    for (i = 0; i <=40; i++) {
-      it = elm_genlist_item_append(gl, &itci,(void *)j, NULL, ELM_GENLIST_ITEM_NONE, NULL,NULL);
-      if ((j & 0xf) == 0) {
-		 char buf[32];
-         snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 3) & 0xf));
-         elm_index_item_append(idx, buf, it);
-        }
+    	itci.item_style     = "default";
+    	itci.func.label_get = gli_label_get;
+    	itci.func.icon_get  = NULL;
+    	itci.func.state_get = NULL;
+    	itci.func.del       = NULL;
+    	for (i = 0; i <=40; i++) {
+      		it = elm_genlist_item_append(gl, &itci,(void *)j, NULL, ELM_GENLIST_ITEM_NONE, NULL,NULL);
+      		if ((j & 0xf) == 0) {
+			char buf[32];
+         		snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 3) & 0xf));
+         		elm_index_item_append(idx, buf, it);
+        	}
 		j += 2;	
-    }
+    	}
 	elm_index_item_go(idx, 0);
-    elm_index_item_clear(idx);	
-    it_idx = elm_index_item_find(idx,(void*)it);	
-    if(it_idx){
+    	elm_index_item_clear(idx);	
+    	it_idx = elm_index_item_find(idx,(void*)it);	
+	if(it_idx){
 		tet_infoline("elm_index_item_clear() failed in positive test case");
 	  	tet_result(TET_FAIL);
 	  	return;
-     }       	  
-	 tet_result(TET_PASS);
+     	}       	  
+	tet_result(TET_PASS);
 }
 
 /**
@@ -127,31 +127,32 @@ static void utc_UIFW_elm_index_item_clear_func_02(void)
 	Elm_Genlist_Item *it = NULL;
 	Elm_Index_Item *it_idx = NULL;
 	int i = 0, j = 0;
+	
 	gl = elm_genlist_add(main_win);
    	idx= elm_index_add(main_win);
-    evas_object_show(gl);
+    	evas_object_show(gl);
 	evas_object_show(idx);		
-    itci.item_style     = "default";
-    itci.func.label_get = gli_label_get;
-    itci.func.icon_get  = NULL;
-    itci.func.state_get = NULL;
-    itci.func.del       = NULL;
-    for (i = 0; i <=40; i++) {
-      it = elm_genlist_item_append(gl, &itci,(void *)j, NULL, ELM_GENLIST_ITEM_NONE, NULL,NULL);
-      if ((j & 0xf) == 0) {
-		 char buf[32];
-         snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 3) & 0xf));
-         elm_index_item_append(idx, buf, it);
-        }
-	  j += 2;	
-    }
+	itci.item_style     = "default";
+    	itci.func.label_get = gli_label_get;
+    	itci.func.icon_get  = NULL;
+    	itci.func.state_get = NULL;
+    	itci.func.del       = NULL;
+    	for (i = 0; i <=40; i++) {
+      		it = elm_genlist_item_append(gl, &itci,(void *)j, NULL, ELM_GENLIST_ITEM_NONE, NULL,NULL);
+      		if ((j & 0xf) == 0) {
+			char buf[32];
+         		snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 3) & 0xf));
+         		elm_index_item_append(idx, buf, it);
+        	}
+	  	j += 2;	
+    	}
 	elm_index_item_go(idx, 0);
 	elm_index_item_clear(NULL);
-    it_idx = elm_index_item_find(idx,(void*)it);	
-    if(!it_idx){
+    	it_idx = elm_index_item_find(idx,(void*)it);	
+    	if(!it_idx){
 		tet_infoline("elm_index_item_clear() failed in negative test case");
   		tet_result(TET_FAIL);
   		return;
-    }
+    	}
 	tet_result(TET_PASS);
 }
