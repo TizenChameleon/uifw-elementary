@@ -153,8 +153,8 @@ _create_tickernoti_indi (Evas_Object *obj)
 
    /* tickernoti indicator height set */
    data_win_height = (char *)edje_object_data_get (wd->edje_indi, "height");
-   if (data_win_height != NULL) 
-	   wd->indicator_height = atoi(data_win_height);
+   if (data_win_height != NULL && elm_scale_get() > 0.0) 
+	   wd->indicator_height = (int)(elm_scale_get() * atoi(data_win_height));
 
    evas_object_resize (wd->win_indi, w, wd->indicator_height);
 	
