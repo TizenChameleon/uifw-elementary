@@ -37,6 +37,7 @@ struct _Widget_Data
    Evas_Object *scroller;
    Evas_Object *bg;
    Evas_Object *btn_layout;
+   Evas_Object *area_rect;
    Eina_List *items;
    Elm_Ctxpopup_Arrow arrow_dir;
    int btn_cnt;
@@ -54,6 +55,9 @@ static void _del_hook(Evas_Object *obj);
 static void _del_pre_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
+static void _area_rect_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _area_rect_move(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _area_rect_del(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _bg_clicked_cb(void *data, Evas_Object *obj, const char *emission,
 			   const char *source);
 static void _parent_resize(void *data, Evas *e, Evas_Object *obj,
@@ -81,6 +85,26 @@ static void _shift_base_by_arrow(Evas_Object *arrow,
 				 Evas_Coord_Rectangle *rect);
 static void _btn_layout_create(Evas_Object *obj);
 static int _get_indicator_h(Evas_Object *parent);
+
+
+static void
+_area_rect_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	_sizing_eval(obj);
+}
+
+static void
+_area_rect_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	_sizing_eval(obj);
+}
+
+static void
+_area_rect_del(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+	wd->area_rect = NULL;
+}
 
 static void
 _show_effect_done(void *data, Elm_Transit *transit)
@@ -223,20 +247,20 @@ _item_sizing_eval(Elm_Ctxpopup_Item *item)
 
 #define ADJUST_POS_X(x) do {   \
 		      x  = x - (base_w/2); \
-                      if(x < 0) {   \
-	   		      x = 0;  \
-		      }else if(x + base_w > parent_w) { \
-		   	   x = parent_w - base_w; \
+              if(x < area_x) {   \
+	   		      x = area_x;  \
+		      }else if((x + base_w) > (area_x+area_w)) { \
+		   	   x = (area_x+area_w) - base_w; \
    	              } \
 	       }while(0)
 
 #define ADJUST_POS_Y(y) do { \
 		y = y - (base_h/2); \
-		if(y < 0 ) {    \
-			y = 0;   \
-		}else if(y + base_h > parent_h)     \
+		if(y < area_y ) {    \
+			y = area_y;   \
+		}else if((y + base_h) > (area_y+area_h))     \
 		{     \
-			y = parent_h - base_h;     \
+			y = (area_y+area_h) - base_h;     \
 		}    \
 	}while(0)
 
@@ -279,14 +303,15 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 {
    Widget_Data *wd;
    Evas_Coord x, y;
-   Evas_Coord base_w = 0, base_h = 0;
-   Elm_Ctxpopup_Arrow arrow;
-   Evas_Coord x1, x2, y1, y2;
-   Evas_Coord finger_size;
+   Evas_Coord base_w, base_h;
    Evas_Coord max_width_size, max_height_size;
-   Evas_Coord arrow_w = 0, arrow_h = 0;
+   Evas_Coord temp_x, temp_y;
+   Evas_Coord area_x, area_y, area_w, area_h;
    Evas_Coord parent_w, parent_h;
-   Evas_Coord indicator_h = 0;
+   Evas_Coord arrow_w, arrow_h;
+   Elm_Ctxpopup_Arrow arrow;
+   Evas_Coord finger_size;
+   Evas_Coord indicator_h ;
    int available_direction[4] = { 1, 1, 1, 1 };
    int idx;
 
@@ -325,7 +350,18 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    	edje_object_part_geometry_get(wd->arrow, "ctxpopup_arrow", NULL, NULL,
 				      &arrow_w, &arrow_h);
 	evas_object_resize(wd->arrow, arrow_w, arrow_h);
-	evas_object_geometry_get(wd->parent, NULL, NULL, &parent_w, &parent_h);
+
+	if(wd->area_rect)
+		evas_object_geometry_get(wd->area_rect, &area_x, &area_y, &area_w, &area_h);
+	else {
+		evas_object_geometry_get(wd->parent, NULL, NULL, &parent_w, &parent_h);
+		area_x = 0;
+		area_y = 0;
+		area_w = parent_w;
+		area_h = parent_h;
+	}
+
+	if(area_y < indicator_h) area_y = indicator_h;
 
 	//Define x, y Segments and find invalidated direction.
    for (idx = 0; idx < 4; ++idx)
@@ -333,31 +369,28 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	switch (wd->arrow_priority[idx])
 	  {
 	  case ELM_CTXPOPUP_ARROW_DOWN:
-	     y1 = y - base_h;
-	     if ((y1 - arrow_h - finger_size) > indicator_h)
+	     temp_y = y - base_h;
+	     if ((temp_y - arrow_h - finger_size) > area_y) {
 		continue;
-	     y1 = 0;
+	     }
 	     available_direction[idx] = 0;
 	     break;
 	  case ELM_CTXPOPUP_ARROW_RIGHT:
-	     x1 = (x - base_w);
-	     if ((x1 - arrow_w - finger_size) > 0)
+	     temp_x = (x - base_w);
+	     if ((temp_x - arrow_w - finger_size) > area_x)
 		continue;
-	     x1 = 0;
 	     available_direction[idx] = 0;
 	     break;
 	  case ELM_CTXPOPUP_ARROW_LEFT:
-	     x2 = (x + base_w);
-	     if ((x2 + arrow_w + finger_size) < parent_w)
+	     temp_x = (x + base_w);
+	     if ((temp_x + arrow_w + finger_size) < (area_x + area_w))
 		continue;
-	     x2 = (parent_w - base_w);
 	     available_direction[idx] = 0;
 	     break;
 	  case ELM_CTXPOPUP_ARROW_UP:
-	     y2 = (y + base_h);
-	     if ((y2 + arrow_h + finger_size) < parent_h)
+	     temp_y = (y + base_h);
+	     if ((temp_y + arrow_h + finger_size) < (area_y +area_h))
 		continue;
-	     y2 = (parent_h - base_h);
 	     available_direction[idx] = 0;
 	     break;
 	  default:
@@ -423,6 +456,8 @@ _update_arrow_obj(Evas_Object *obj, Elm_Ctxpopup_Arrow arrow_dir)
 {
    Evas_Coord x, y;
    Evas_Coord arrow_x, arrow_y, arrow_w, arrow_h;
+   Evas_Coord area_x, area_y, area_w, area_h;
+   Evas_Coord parent_w, parent_h;
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd)
@@ -464,6 +499,32 @@ _update_arrow_obj(Evas_Object *obj, Elm_Ctxpopup_Arrow arrow_dir)
      default:
 	break;
      }
+
+    //Adjust arrow position to prevent out of area
+   if(wd->area_rect) {
+	   evas_object_geometry_get(wd->area_rect, &area_x, &area_y, &area_w, &area_h);
+   }else {
+	   evas_object_geometry_get(wd->parent, NULL, NULL, &parent_w, &parent_h);
+	   area_x = 0;
+	   area_y = 0;
+	   area_w = parent_w;
+	   area_h = parent_h;
+   }
+
+   //TODO: Temporary Code. make it more flexible
+   if((arrow_x - (arrow_w/2)) < area_x) {
+	   arrow_x = area_x + (arrow_w/2);
+   }else if((arrow_x+arrow_w) > (area_x+area_w) ) {
+	   arrow_x = (area_x+area_w) - arrow_w - (arrow_w/2);
+   }
+
+   //TODO: Temporary Code. make it more flexible
+   if((arrow_y - (arrow_h/2)) < area_y) {
+	   arrow_y = arrow_y + (arrow_h/2);
+   }else if((arrow_y+arrow_h) > (area_y+area_h) ) {
+	   arrow_y = (area_y+area_h) - arrow_h - (arrow_h/2);
+   }
+
    evas_object_move(wd->arrow, arrow_x, arrow_y);
 }
 
@@ -1393,3 +1454,23 @@ elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
 	fprintf( stderr, "elm_ctxpopup_label_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
 	return elm_ctxpopup_item_add(obj, NULL, label, func, data);
 }
+
+EAPI void
+elm_ctxpopup_area_set(Evas_Object *obj, Evas_Object *area)
+{
+	   ELM_CHECK_WIDTYPE(obj, widtype);
+	   Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+
+	   if(area) {
+		   evas_object_event_callback_add(area, EVAS_CALLBACK_DEL, _area_rect_del, obj);
+		   evas_object_event_callback_add(area, EVAS_CALLBACK_MOVE, _area_rect_move, obj);
+		   evas_object_event_callback_add(area, EVAS_CALLBACK_RESIZE, _area_rect_resize, obj);
+	   }else {
+		   if(wd->area_rect)
+			   evas_object_del(wd->area_rect);
+	   }
+
+	   wd->area_rect = area;
+}
+
+
