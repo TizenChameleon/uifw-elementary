@@ -20,6 +20,8 @@ struct _Widget_Data
    int width, height;
    int id;
    int item_width;
+   int cur_fontsize;
+   int max_height, w_pad, h_pad;
 
    Elm_Segment_Item *ani_it;
    Ecore_Animator *ani;
@@ -133,7 +135,7 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
    Elm_Segment_Item *item = (Elm_Segment_Item *) data;
    Widget_Data *wd = elm_widget_data_get(item->obj);
    if (!wd) return;
-   Evas_Coord wrap_width = 0, wrap_height = 0;
+   Evas_Coord wrap_width = 0, wrap_height = 0, w = 0, h = 0;
 
    if (item->segment_id == wd->cur_seg_id)
      {
@@ -143,11 +145,14 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
     _signal_segment_on(item);
     if(item->label_wd) 
       {
+         evas_object_geometry_get(item->base, NULL, NULL, &w, &h);
          wrap_width = elm_label_wrap_width_get(item->label_wd);
-	 wrap_height = elm_label_wrap_height_get(item->label_wd);
+         wrap_height = elm_label_wrap_height_get(item->label_wd);
+
 	 elm_label_wrap_width_set(item->label_wd, wrap_width);
 	 elm_label_wrap_height_set(item->label_wd, wrap_height);
 	 elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
+
       }
 
      wd->selected = EINA_FALSE;
@@ -264,33 +269,17 @@ _segment_item_resizing(void *data)
 
    if(!wd) return;
    Evas_Coord w = 0, h = 0;
-   const char *minfont, *deffont, *maxfont, *maxheight;
-   int minfontsize, maxfontsize, cur_fontsize = 0, max_height = 0;
-	
-   minfont = edje_object_data_get(wd->base, "min_font_size");
-   if (minfont) minfontsize = atoi(minfont);
-   else minfontsize = 1;
-	
-   maxfont = edje_object_data_get(wd->base, "max_font_size");
-   if (maxfont) maxfontsize = atoi(maxfont);
-   else maxfontsize = 1;
-	
-   deffont = edje_object_data_get(wd->base, "default_font_size");
-   if (deffont) cur_fontsize = atoi(deffont);
-   else cur_fontsize = 1;
    
    _update_list(it->obj);
    evas_object_geometry_get(it->base, NULL, NULL, &w, &h);
 
-   maxheight = edje_object_data_get(wd->base, "max_height");
-   if (maxheight) max_height = atoi(maxheight);
-   else max_height = h;
+   if(wd->max_height == 1) wd->max_height = h;
 
    if(it->label_wd) 
      {
-        elm_label_fontsize_set(it->label_wd, cur_fontsize);
-	elm_label_wrap_width_set(it->label_wd, w-4);
-	elm_label_wrap_height_set(it->label_wd, max_height-6);
+        elm_label_fontsize_set(it->label_wd, wd->cur_fontsize);
+	elm_label_wrap_width_set(it->label_wd, w-wd->w_pad);
+	elm_label_wrap_height_set(it->label_wd, wd->max_height-wd->h_pad);
 	elm_label_text_color_set(it->label_wd, 0xFF,0xFF, 0xFF, 0xff);
 	if (edje_object_part_swallow_get(it->base, "elm.swallow.label.content") == NULL)
 	  {
@@ -537,14 +526,14 @@ _animator_animate_add_cb(Evas_Object *obj)
      {
          _state_value_set(obj);
 	 evas_object_geometry_get(wd->ani_it->base, NULL, NULL, &w, NULL);
-	 return ECORE_CALLBACK_RENEW;
+	 return (int*) ECORE_CALLBACK_RENEW;
      }
    else
      {
         ecore_animator_del(wd->ani);
 	wd->ani = NULL;
 	wd->ani_it = NULL;
-	return ECORE_CALLBACK_CANCEL;
+	return (int*) ECORE_CALLBACK_CANCEL;
      }
 }
 
@@ -561,7 +550,7 @@ _animator_animate_del_cb(Evas_Object *obj)
      {
         _state_value_set(obj);
 	evas_object_geometry_get(wd->ani_it->base, NULL, NULL, &w, NULL);
-	return ECORE_CALLBACK_RENEW;
+	return (int*) ECORE_CALLBACK_RENEW;
      }
    else
      {
@@ -572,7 +561,7 @@ _animator_animate_del_cb(Evas_Object *obj)
 	wd->ani_it = NULL;
 	_update_list(obj);
 	wd->id = eina_list_count(wd->seg_ctrl);
-	return ECORE_CALLBACK_CANCEL;
+	return (int*) ECORE_CALLBACK_CANCEL;
      }
 }
 
@@ -627,6 +616,8 @@ elm_segment_control_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   const char *deffont, *maxheight, *wpad, *hpad;
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    if(!e) return NULL;
@@ -659,6 +650,22 @@ elm_segment_control_add(Evas_Object *parent)
    wd->insert_index = 0;
    wd->cur_seg_id = -1;
    wd->selected = EINA_FALSE;
+
+   deffont = edje_object_data_get(wd->base, "default_font_size");
+   if (deffont) wd->cur_fontsize = atoi(deffont);
+   else wd->cur_fontsize = 1;
+
+   maxheight = edje_object_data_get(wd->base, "max_height");
+   if (maxheight) wd->max_height = atoi(maxheight);
+   else wd->max_height = 1;
+
+   wpad = edje_object_data_get(wd->base, "w_pad");
+   if (wpad) wd->w_pad = atoi(wpad);
+   else wd->w_pad = 1;
+
+   hpad = edje_object_data_get(wd->base, "h_pad");
+   if (hpad) wd->h_pad = atoi(hpad);
+   else wd->h_pad = 1;
 
    return obj;
 }
@@ -727,7 +734,7 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
 EAPI Elm_Segment_Item *
 elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)
 {
-   EAPI Elm_Segment_Item * it;
+   Elm_Segment_Item * it;
    it = elm_segment_control_item_add(obj, icon, label, animate);
 
     return it;
@@ -1180,7 +1187,7 @@ elm_segment_control_item_index_get(Elm_Segment_Item *item)
 {
    if(!item) return -1;
    Widget_Data *wd = elm_widget_data_get(item->obj);
-   if(!wd) return NULL;
+   if(!wd) return -1;
 
    return item->segment_id;
 }
