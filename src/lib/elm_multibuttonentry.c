@@ -10,6 +10,7 @@
 		
 
 #define MAX_STR 256		
+#define MAX_W_BTN 200		
 
 
 typedef enum _Multibuttonentry_Pos
@@ -162,7 +163,7 @@ static void
 _set_label(Evas_Object *obj, const char* str)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
-	if(!wd)	return;
+	if(!wd || !str)	return;
 
 	if(!wd->label){
 		if(!(wd->label = elm_label_add(obj))) return;
@@ -185,7 +186,6 @@ _change_current_button(Evas_Object *obj, Evas_Object *btn)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *l;
 	Elm_Multibuttonentry_Item *item;
-	Evas_Object *label;
 	if (!wd) return;
 
 	// change the state of previous button to "default"
@@ -348,18 +348,17 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 		item->label = label;
 		item->data = data;
 		item->rw = w_btn;
-		item->vw =(wd->w_box < w_btn) ? wd->w_box : w_btn;		
+		item->vw =(MAX_W_BTN < w_btn) ? MAX_W_BTN : w_btn;		
 		wd->items = eina_list_append(wd->items, item);
 	}
 
+	//resize btn and label
 	evas_object_resize(btn, item->vw, h_btn);
-
-	if(item->rw != item->vw){
+	evas_object_size_hint_min_set(btn, item->vw, h_btn);
+	if((item->rw != item->vw) && (item->vw - 2*padding_outer - 4*padding_inner >=0)){
 		evas_object_resize(label, item->vw - 2*padding_outer - 2*padding_inner, h_label);	
 		elm_label_wrap_width_set(label, item->vw - 2*padding_outer - 4*padding_inner ); 
 	}
-
-	evas_object_size_hint_min_set(btn, item->vw, h_btn);
 
 	evas_object_smart_callback_call(obj, "added", item);
 
@@ -440,9 +439,11 @@ elm_multibuttonentry_add(Evas_Object *parent)
 	Evas_Object *obj;
 	Evas *e;
 	Widget_Data *wd;
+	if (!parent) return NULL;
 
 	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
+	if (!e) return NULL; 
 	obj = elm_widget_add(e);
 	ELM_SET_WIDTYPE(widtype, "multibuttonentry");
 	elm_widget_type_set(obj, "multibuttonentry");
@@ -473,7 +474,7 @@ elm_multibuttonentry_add(Evas_Object *parent)
 EAPI const char *
 elm_multibuttonentry_label_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 
@@ -497,7 +498,7 @@ elm_multibuttonentry_label_set(Evas_Object *obj, const char *label)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
+	if (!wd || !label) return;
 
 	_set_label(obj, label);	
 }
@@ -513,7 +514,7 @@ elm_multibuttonentry_label_set(Evas_Object *obj, const char *label)
 EAPI Evas_Object *
 elm_multibuttonentry_entry_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd)	return NULL;
 
@@ -533,10 +534,10 @@ elm_multibuttonentry_entry_get(Evas_Object *obj)
 EAPI Elm_Multibuttonentry_Item *
 elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Elm_Multibuttonentry_Item *item;
-	if (!wd) return NULL;
+	if (!wd || !label) return NULL;
 
 	item = _add_button_item(obj, label, MULTIBUTONENTRY_POS_START, NULL, data);
 	return item; 
@@ -555,10 +556,10 @@ elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *d
 EAPI Elm_Multibuttonentry_Item *
 elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Elm_Multibuttonentry_Item *item;
-	if (!wd) return NULL;
+	if (!wd || !label) return NULL;
 
 	item = _add_button_item(obj, label, MULTIBUTONENTRY_POS_END, NULL, data);
 	return item; 
@@ -579,10 +580,10 @@ elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *dat
 EAPI Elm_Multibuttonentry_Item *
 elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Elm_Multibuttonentry_Item *item;
-	if (!wd) return NULL;
+	if (!wd || !label) return NULL;
 
 	item = _add_button_item(obj, label, MULTIBUTONENTRY_POS_BEFORE, before, data);
 	return item; 
@@ -602,10 +603,10 @@ elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Mu
 EAPI Elm_Multibuttonentry_Item *
 elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *after, void *data)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Elm_Multibuttonentry_Item *item;
-	if (!wd) return NULL;
+	if (!wd || !label) return NULL;
 
 	item = _add_button_item(obj, label, MULTIBUTONENTRY_POS_AFTER, after, data);
 	return item; 
@@ -622,7 +623,7 @@ elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Mul
 EAPI const Eina_List *
 elm_multibuttonentry_items_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
 	return wd->items;
@@ -639,7 +640,7 @@ elm_multibuttonentry_items_get(Evas_Object *obj)
 EAPI Elm_Multibuttonentry_Item *
 elm_multibuttonentry_item_first_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd || !wd->items) return NULL;
 	return eina_list_data_get(wd->items);
@@ -656,7 +657,7 @@ elm_multibuttonentry_item_first_get(Evas_Object *obj)
 EAPI Elm_Multibuttonentry_Item *
 elm_multibuttonentry_item_last_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd || !wd->items) return NULL;
 	return eina_list_data_get(eina_list_last(wd->items));
@@ -673,7 +674,7 @@ elm_multibuttonentry_item_last_get(Evas_Object *obj)
 EAPI Elm_Multibuttonentry_Item *
 elm_multibuttonentry_item_selected_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd || !wd->current) return NULL;
 	return eina_list_data_get(wd->current);
@@ -761,7 +762,7 @@ elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item)
 	Elm_Multibuttonentry_Item *_item;
 
 	if (!item) return NULL;
-	ELM_CHECK_WIDTYPE(item->multibuttonentry, widtype);
+	ELM_CHECK_WIDTYPE(item->multibuttonentry, widtype) NULL;
 	wd = elm_widget_data_get(item->multibuttonentry);
 	if (!wd || !wd->items) return NULL;
 
@@ -818,7 +819,7 @@ elm_multibuttonentry_item_prev(Elm_Multibuttonentry_Item *item)
 	Elm_Multibuttonentry_Item *_item;
 
 	if (!item) return NULL;
-	ELM_CHECK_WIDTYPE(item->multibuttonentry, widtype);
+	ELM_CHECK_WIDTYPE(item->multibuttonentry, widtype) NULL;
 	wd = elm_widget_data_get(item->multibuttonentry);
 	if (!wd || !wd->items) return NULL;
 
@@ -847,7 +848,7 @@ elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item)
 	Elm_Multibuttonentry_Item *_item;
 
 	if (!item) return NULL;
-	ELM_CHECK_WIDTYPE(item->multibuttonentry, widtype);
+	ELM_CHECK_WIDTYPE(item->multibuttonentry, widtype) NULL;
 	wd = elm_widget_data_get(item->multibuttonentry);
 	if (!wd || !wd->items) return NULL;
 
