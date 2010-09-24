@@ -129,8 +129,10 @@ obj_longpress(Evas_Object *obj)
 						elm_list_item_append(list, "Paste", NULL, NULL,_paste, obj);
 				}
 	//		elm_ctxpopup_item_add(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
+	// start for cbhm
 			if (!ext_mod->password)
-				elm_list_item_append(list, "Select", NULL, NULL,_select, obj);
+				elm_list_item_append(list, "More", NULL, NULL,_clipboard_menu, obj);
+	// end for cbhm
 		}
 		else
 		{
