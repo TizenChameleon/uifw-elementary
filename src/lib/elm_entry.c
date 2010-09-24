@@ -432,7 +432,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	// start for cbhm
 	if (top) 
 	{
-		ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+//		ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
 	}
 	// end for cbhm
 	evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
@@ -630,18 +630,23 @@ _cancel(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 }
 
 static void
+_clipboard_menu(void *data, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
+   // start for cbhm
+   ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+   elm_cbhm_helper_init(obj);
+   elm_cbhm_send_raw_data("show");
+   // end for cbhm
+}
+
+static void
 _item_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Elm_Entry_Context_Menu_Item *it = data;
    Evas_Object *obj2 = it->obj;
-
-	// start for cbhm
-	if (!strcmp(it->label, "Menu"))
-	{
-		elm_cbhm_helper_init(obj);
-		elm_cbhm_send_raw_data("show");
-	}
-	// end for cbhm
 
    if (it->func) it->func(it->data, obj2, NULL);
 }
@@ -687,6 +692,11 @@ _long_press(void *data)
                     elm_hoversel_item_add(wd->hoversel, "Paste", NULL, ELM_ICON_NONE,
                                           _paste, data);
                }
+	// start for cbhm
+             if (!wd->password)
+               elm_hoversel_item_add(wd->hoversel, "More", NULL, ELM_ICON_NONE,
+                                     _clipboard_menu, data);
+	// end for cbhm
           }
         else
           {
@@ -702,6 +712,10 @@ _long_press(void *data)
                     }
                   elm_hoversel_item_add(wd->hoversel, "Cancel", NULL, ELM_ICON_NONE,
                                         _cancel, data);
+	// start for cbhm
+                  elm_hoversel_item_add(wd->hoversel, "More", NULL, ELM_ICON_NONE,
+                                        _clipboard_menu, data);
+	// end for cbhm
                }
           }
         EINA_LIST_FOREACH(wd->items, l, it)
@@ -1424,7 +1438,7 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 		return ECORE_CALLBACK_PASS_ON;
 	}
 
-	elm_selection_get(1/*ELM_SEL_SECONDARY*/,0x1/*Markup */,data);
+	elm_selection_get(1/*ELM_SEL_SECONDARY*/,0x1/*ELM_SEL_FORMAT_TEXT*/,data);
 	// end for cbhm
    return ECORE_CALLBACK_PASS_ON;
 }

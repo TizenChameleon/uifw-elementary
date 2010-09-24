@@ -2085,7 +2085,8 @@ extern "C" {
    EAPI void	     elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content);
    EAPI Evas_Object *elm_ctxpopup_content_unset(Evas_Object *obj);
    EAPI void	     elm_ctxpopup_position_forced_set(Evas_Object *obj, Eina_Bool forced);
-   EAPI Eina_Bool    elm_ctxpopup_position_forced_get(Evas_Object *obj); 
+   EAPI Eina_Bool    elm_ctxpopup_position_forced_get(Evas_Object *obj);
+   EAPI void elm_ctxpopup_area_set(Evas_Object *obj, Evas_Object *rect); 
    
    /* QuickContactBadge */
    typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;
