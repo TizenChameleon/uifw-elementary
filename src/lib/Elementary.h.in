@@ -2644,6 +2644,7 @@ extern "C" {
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_last_get(Evas_Object *obj);
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_selected_get(Evas_Object *obj);
    EAPI void                       elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item);
+   EAPI void                       elm_multibuttonentry_item_unselect_all(Evas_Object *obj);
    EAPI void                       elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item);
    EAPI void                       elm_multibuttonentry_items_del(Evas_Object *obj);
    EAPI const char                *elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item);

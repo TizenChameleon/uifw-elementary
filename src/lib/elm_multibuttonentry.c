@@ -22,6 +22,14 @@ typedef enum _Multibuttonentry_Pos
  MULTIBUTONENTRY_POS_NUM
 }Multibuttonentry_Pos;
 
+typedef enum _Multibuttonentry_Button_State
+{
+ MULTIBUTONENTRY_BUTTON_STATE_DEFAULT,
+ MULTIBUTONENTRY_BUTTON_STATE_SELECTED,
+ MULTIBUTONENTRY_BUTTON_STATE_NUM
+}Multibuttonentry_Button_State;
+
+
 struct _Multibuttonentry_Item {
 	Evas_Object *multibuttonentry;
 	Evas_Object *button;
@@ -181,6 +189,34 @@ _set_label(Evas_Object *obj, const char* str)
 }
 
 static void
+_change_current_button_state(Evas_Object *obj, Multibuttonentry_Button_State state)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Elm_Multibuttonentry_Item *item = NULL;
+	if (!wd) return;
+
+	if(wd->current)	
+		item = eina_list_data_get(wd->current);
+
+	if(item && item->button){
+		switch(state){
+			case MULTIBUTONENTRY_BUTTON_STATE_DEFAULT:
+				edje_object_signal_emit(item->button, "default", "");
+				wd->current = NULL;
+				break;
+			case MULTIBUTONENTRY_BUTTON_STATE_SELECTED:
+				edje_object_signal_emit(item->button, "focused", "");
+				evas_object_smart_callback_call(obj, "selected", item);
+				break;
+			default:
+				edje_object_signal_emit(item->button, "default", "");
+				wd->current = NULL;
+				break;
+		}
+	}
+}
+
+static void
 _change_current_button(Evas_Object *obj, Evas_Object *btn)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -189,10 +225,7 @@ _change_current_button(Evas_Object *obj, Evas_Object *btn)
 	if (!wd) return;
 
 	// change the state of previous button to "default"
-	if(wd->current){
-		item = eina_list_data_get(wd->current);
-		edje_object_signal_emit(item->button,"default", "");	
-	}
+	_change_current_button_state(obj, MULTIBUTONENTRY_BUTTON_STATE_DEFAULT);
 	
 	// change the current
 	EINA_LIST_FOREACH(wd->items, l, item) {
@@ -203,11 +236,8 @@ _change_current_button(Evas_Object *obj, Evas_Object *btn)
 	}
 
 	// chagne the state of current button to "focused"
-	if(wd->current){
-		item = eina_list_data_get(wd->current);
-		edje_object_signal_emit(item->button,"focused", "");
-		evas_object_smart_callback_call(obj, "selected", item);
-	}
+	_change_current_button_state(obj, MULTIBUTONENTRY_BUTTON_STATE_SELECTED);
+	
 }
 
 static void
@@ -704,6 +734,23 @@ elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item)
 			_change_current_button(item->multibuttonentry, item->button);
 		}
 	}
+}
+
+/**
+ * unselect all of items.
+ *
+ * @param obj The multibuttonentry object
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI void
+elm_multibuttonentry_item_unselect_all(Evas_Object *obj)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (!wd) return;
+
+	_change_current_button_state(obj, MULTIBUTONENTRY_BUTTON_STATE_DEFAULT);
 }
 
 /**
