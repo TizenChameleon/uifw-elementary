@@ -263,9 +263,9 @@ _segment_item_resizing(void *data)
    wd = elm_widget_data_get(it->obj);
 
    if(!wd) return;
-   Evas_Coord w = 0, h = 0, vw, vh;
-   const char *minfont, *deffont, *maxfont;
-   int minfontsize, maxfontsize, cur_fontsize = 0;
+   Evas_Coord w = 0, h = 0;
+   const char *minfont, *deffont, *maxfont, *maxheight;
+   int minfontsize, maxfontsize, cur_fontsize = 0, max_height = 0;
 	
    minfont = edje_object_data_get(wd->base, "min_font_size");
    if (minfont) minfontsize = atoi(minfont);
@@ -281,13 +281,16 @@ _segment_item_resizing(void *data)
    
    _update_list(it->obj);
    evas_object_geometry_get(it->base, NULL, NULL, &w, &h);
-   evas_object_geometry_get(it->label_wd, NULL, NULL, &vw, &vh);
-	
+
+   maxheight = edje_object_data_get(wd->base, "max_height");
+   if (maxheight) max_height = atoi(maxheight);
+   else max_height = h;
+
    if(it->label_wd) 
      {
         elm_label_fontsize_set(it->label_wd, cur_fontsize);
 	elm_label_wrap_width_set(it->label_wd, w-4);
-	elm_label_wrap_height_set(it->label_wd, h-6);
+	elm_label_wrap_height_set(it->label_wd, max_height-6);
 	elm_label_text_color_set(it->label_wd, 0xFF,0xFF, 0xFF, 0xff);
 	if (edje_object_part_swallow_get(it->base, "elm.swallow.label.content") == NULL)
 	  {
