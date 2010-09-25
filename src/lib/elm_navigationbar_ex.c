@@ -433,7 +433,7 @@ elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const cha
  * @ingroup Navigationbar_ex
  */
 EAPI void
-elm_navigationbar_ex_title_label_set( Elm_Navigationbar_ex_Item* item, 
+elm_navigationbar_ex_item_title_label_set( Elm_Navigationbar_ex_Item* item, 
 							const char *title)
 {
 	if(!item) return;
@@ -451,7 +451,7 @@ elm_navigationbar_ex_title_label_set( Elm_Navigationbar_ex_Item* item,
  * @ingroup Navigationbar_ex
  */
 EAPI const char *
-elm_navigationbar_ex_title_label_get(Elm_Navigationbar_ex_Item* item)
+elm_navigationbar_ex_item_title_label_get(Elm_Navigationbar_ex_Item* item)
 {
 	if(!item) return NULL;
 	return item->title;
@@ -466,7 +466,7 @@ elm_navigationbar_ex_title_label_get(Elm_Navigationbar_ex_Item* item)
  * @ingroup Navigationbar_ex
  */
 EAPI void 
-elm_navigationbar_ex_subtitle_label_set( Elm_Navigationbar_ex_Item* item, 
+elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item, 
 							const char *subtitle)
 {
 	if(!item) return;
@@ -484,7 +484,7 @@ elm_navigationbar_ex_subtitle_label_set( Elm_Navigationbar_ex_Item* item,
  * @ingroup Navigationbar_ex
  */
 EAPI const char *
-elm_navigationbar_ex_subtitle_label_get(Elm_Navigationbar_ex_Item* item)
+elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item)
 {
 	if(!item) return NULL;
 	return item->subtitle;
@@ -503,7 +503,7 @@ elm_navigationbar_ex_subtitle_label_get(Elm_Navigationbar_ex_Item* item)
  * @ingroup Navigationbar_ex
  */ 
  EAPI void
-elm_navigationbar_ex_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data)
+elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data)
 {
 	if(!item) return;
 	Evas_Object *btn;
@@ -546,7 +546,7 @@ elm_navigationbar_ex_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn
  * @ingroup Navigationbar_ex
  */
 EAPI Evas_Object *
-elm_navigationbar_ex_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type)
+elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type)
  	{
  		fn_button *btn_det;
 		Eina_List *bl;
@@ -567,7 +567,7 @@ elm_navigationbar_ex_title_button_get(Elm_Navigationbar_ex_Item* item, int butto
  * @ingroup Navigationbar_ex
  */
 EAPI void
-elm_navigationbar_ex_title_object_set(Elm_Navigationbar_ex_Item* item,
+elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item,
 									Evas_Object *title_obj)
 {
 	if(!item) return;
@@ -590,7 +590,7 @@ elm_navigationbar_ex_title_object_set(Elm_Navigationbar_ex_Item* item,
  */
 
 EAPI void
-elm_navigationbar_ex_title_hidden_set(Elm_Navigationbar_ex_Item* item,
+elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item,
 									Eina_Bool hidden)
 {
 	if(!item) return;
@@ -610,7 +610,7 @@ elm_navigationbar_ex_title_hidden_set(Elm_Navigationbar_ex_Item* item,
  * @ingroup Navigationbar_ex
  */
 EAPI Evas_Object*
-elm_navigationbar_ex_title_object_unset(Elm_Navigationbar_ex_Item* item)
+elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item)
 {
 	if(!item) return NULL;
 	Evas_Object *title_obj=NULL;
@@ -631,7 +631,7 @@ elm_navigationbar_ex_title_object_unset(Elm_Navigationbar_ex_Item* item)
  * @ingroup Navigationbar_ex
  */
 EAPI Evas_Object*
-elm_navigationbar_ex_title_object_get(Elm_Navigationbar_ex_Item* item)
+elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item)
 {
 	if(!item) return NULL;
 	return item->title_obj;
@@ -649,7 +649,7 @@ elm_navigationbar_ex_title_object_get(Elm_Navigationbar_ex_Item* item)
  *
  * @ingroup Navigationbar_ex
  */
-EAPI Evas_Object *elm_navigationbar_ex_content_unset(Elm_Navigationbar_ex_Item* item)
+EAPI Evas_Object *elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item)
 {
 	Evas_Object *content = _content_unset(item);
 	return content;
@@ -664,7 +664,7 @@ EAPI Evas_Object *elm_navigationbar_ex_content_unset(Elm_Navigationbar_ex_Item* 
  *
  * @ingroup Navigationbar_ex
  */
-EAPI Evas_Object *elm_navigationbar_ex_content_get(Elm_Navigationbar_ex_Item* item)
+EAPI Evas_Object *elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Item* item)
 {
 	if(!item) return NULL;
 	return item->content;
