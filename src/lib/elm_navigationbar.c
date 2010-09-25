@@ -262,6 +262,7 @@ _transition_complete_cb(void *data)
 	}
 	if (it)
 	{
+		edje_object_part_text_set(wd->base, "elm.text", it->title);
 		if(!cb->first_page)
 			{
 				if(cb->pop)
@@ -280,7 +281,6 @@ _transition_complete_cb(void *data)
 			}
 		if (it->title) 
 			{
-				edje_object_part_text_set(wd->base, "elm.text", it->title);
 				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
 			}
 		if (it->subtitle) 
