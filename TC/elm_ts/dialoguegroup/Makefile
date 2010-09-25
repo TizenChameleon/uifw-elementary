@@ -1,6 +1,7 @@
 CC ?= gcc
 
 TARGETS = utc_UIFW_elm_dialoguegroup_add_func \
+	  utc_UIFW_elm_dialoguegroup_prepend_func \
 	  utc_UIFW_elm_dialoguegroup_append_func
 
 PKGS = elementary
