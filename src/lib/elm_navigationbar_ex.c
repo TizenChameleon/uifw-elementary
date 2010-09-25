@@ -623,13 +623,29 @@ elm_navigationbar_ex_title_object_unset(Elm_Navigationbar_ex_Item* item)
 }
 
 /**
+ * Returns the title object of the pushed content.
+ *
+ * @param[in] item The Navigationbar_ex Item 
+ * @return The title object or NULL if none is set
+ *
+ * @ingroup Navigationbar_ex
+ */
+EAPI Evas_Object*
+elm_navigationbar_ex_title_object_get(Elm_Navigationbar_ex_Item* item)
+{
+	if(!item) return NULL;
+	return item->title_obj;
+}
+
+
+/**
  * unsets the content of the item, the return object has to be deleted
  * by application if not added again in to navigationbar, when the content 
  * is unset the corresponding item would be deleted, when this content is pushed again 
  * a new item would be created again.
  *
  * @param[in] item The Navigationbar_ex Item 
- * @return The title object or NULL if none is set
+ * @return The content object or NULL if none is set
  *
  * @ingroup Navigationbar_ex
  */
@@ -644,7 +660,7 @@ EAPI Evas_Object *elm_navigationbar_ex_content_unset(Elm_Navigationbar_ex_Item* 
  * returns the content of the item.
  *
  * @param[in] item The Navigationbar_ex Item 
- * @return The title object or NULL if none is set
+ * @return The content object or NULL if none is set
  *
  * @ingroup Navigationbar_ex
  */

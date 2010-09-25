@@ -65,6 +65,17 @@ _cancel(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
+_clipboard_menu(void *data, Evas_Object *obj, void *event_info)
+{
+	// start for cbhm
+	ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+	elm_cbhm_helper_init(obj);
+	elm_cbhm_send_raw_data("show");
+	evas_object_hide(obj);
+	// end for cbhm
+}
+
+static void
 _item_clicked(void *data, Evas_Object *obj, void *event_info)
 {
    Elm_Entry_Context_Menu_Item *it = data;
@@ -146,6 +157,10 @@ obj_longpress(Evas_Object *obj)
 						elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",	_paste, obj );
 				}
 	//		elm_ctxpopup_item_add(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
+	// start for cbhm
+			if (!ext_mod->password)
+				elm_ctxpopup_item_add(ext_mod->popup, NULL, "More", _clipboard_menu, obj );
+	// end for cbhm
 		}
 		else
 		{
@@ -167,6 +182,9 @@ obj_longpress(Evas_Object *obj)
 										elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",	_paste, obj );
 								}
 						}
+	// start for cbhm
+							elm_ctxpopup_item_add(ext_mod->popup, NULL, "More",_clipboard_menu, obj );
+	// end for cbhm
 				}
 		}
 		EINA_LIST_FOREACH(ext_mod->items, l, it)
