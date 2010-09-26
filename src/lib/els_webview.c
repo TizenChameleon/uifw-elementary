@@ -2632,6 +2632,7 @@ _smart_cb_pinch_zoom_stop(void* data, Evas_Object* webview, void* event_info)
    //DBG("%s\n", __func__);
    Smart_Data *sd = (Smart_Data *)data;
    if (!sd) return;
+   if (sd->events_block != EINA_TRUE) return;//FIXME
 
    _zoom_stop(sd);
    _minimap_update(sd->minimap.content, sd, sd->thumbnail, sd->minimap.cw, sd->minimap.ch);
