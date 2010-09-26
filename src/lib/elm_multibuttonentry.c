@@ -335,26 +335,6 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 	edje_object_signal_callback_add(btn, "clicked", "elm", _button_clicked, obj);
 	evas_object_size_hint_weight_set(btn, 0.0, 0.0);
 	evas_object_show(btn);
-	
-
-	switch(pos){
-		case MULTIBUTONENTRY_POS_START:
-			elm_box_pack_after(wd->box, btn, wd->label);
-			break;
-		case MULTIBUTONENTRY_POS_END:
-			elm_box_pack_before(wd->box, btn, wd->entry);
-			break;
-		case MULTIBUTONENTRY_POS_BEFORE:
-			if(reference)	elm_box_pack_before(wd->box, btn, reference->button);
-			else	elm_box_pack_before(wd->box, btn, wd->entry);
-			break;
-		case MULTIBUTONENTRY_POS_AFTER:
-			if(reference)	elm_box_pack_after(wd->box, btn, reference->button);
-			else	elm_box_pack_before(wd->box, btn, wd->entry);
-			break;
-		default:
-			break;
-	}
 
 	// add label
 	label = elm_label_add(obj);
@@ -379,7 +359,37 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 		item->data = data;
 		item->rw = w_btn;
 		item->vw =(MAX_W_BTN < w_btn) ? MAX_W_BTN : w_btn;		
-		wd->items = eina_list_append(wd->items, item);
+		
+		switch(pos){
+			case MULTIBUTONENTRY_POS_START:
+				elm_box_pack_after(wd->box, btn, wd->label);
+				wd->items = eina_list_prepend(wd->items, item);
+				break;
+			case MULTIBUTONENTRY_POS_END:
+				elm_box_pack_before(wd->box, btn, wd->entry);
+				wd->items = eina_list_append(wd->items, item);
+				break;
+			case MULTIBUTONENTRY_POS_BEFORE:
+				if(reference){	
+					elm_box_pack_before(wd->box, btn, reference->button);
+					wd->items = eina_list_prepend_relative(wd->items, item, reference);
+				}else{
+					elm_box_pack_before(wd->box, btn, wd->entry);
+					wd->items = eina_list_append(wd->items, item);
+				}
+				break;
+			case MULTIBUTONENTRY_POS_AFTER:
+				if(reference){	
+					elm_box_pack_after(wd->box, btn, reference->button);
+					wd->items = eina_list_append_relative(wd->items, item, reference);
+				}else{	
+					elm_box_pack_before(wd->box, btn, wd->entry);
+					wd->items = eina_list_append(wd->items, item);
+				}
+				break;
+			default:
+				break;
+		}
 	}
 
 	//resize btn and label
