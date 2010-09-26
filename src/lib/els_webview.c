@@ -188,7 +188,7 @@ struct _Smart_Data {
      size_t (*ewk_tile_unused_cache_flush)(Ewk_Tile_Unused_Cache *, size_t);
      void (*ewk_tile_unused_cache_auto_flush)(Ewk_Tile_Unused_Cache *);
      char * (*ewk_page_check_point_for_keyboard)(Evas_Object *, int, int, Eina_Bool *);
-     Eina_Bool (*ewk_page_check_point)(Evas_Object *, int, int, Evas_Event_Mouse_Down *, Eina_Bool *, Eina_Bool *, char **, char **, char **);
+     Eina_Bool (*ewk_page_check_point)(Evas_Object *, int, int, Evas_Event_Mouse_Down *, Eina_Bool *, Eina_Bool *, Eina_Bool *, char **, char **, char **);
      char ** (*ewk_page_dropdown_get_options)(Evas_Object *, int, int, int *, int *);
      Eina_Bool (*ewk_page_dropdown_set_current_index)(Evas_Object *, int, int, int);
      Eina_Bool (*ewk_frame_contents_size_get)(const Evas_Object *, Evas_Coord *, Evas_Coord *);
@@ -1795,11 +1795,12 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
    _coords_evas_to_ewk(webview, point->x, point->y, &ewk_x, &ewk_y);
    Eina_Bool have_link = EINA_FALSE;
    Eina_Bool have_image = EINA_FALSE;
+   Eina_Bool have_flash = EINA_FALSE;
    char *link_url = NULL, *link_text = NULL, *image_url = NULL;
    if (!sd->ewk_page_check_point)
-     sd->ewk_page_check_point = (Eina_Bool (*)(Evas_Object *, int, int, Evas_Event_Mouse_Down *, Eina_Bool *, Eina_Bool *, char **, char **, char **))dlsym(ewk_handle, "ewk_page_check_point");
+     sd->ewk_page_check_point = (Eina_Bool (*)(Evas_Object *, int, int, Evas_Event_Mouse_Down *, Eina_Bool *, Eina_Bool *, Eina_Bool *, char **, char **, char **))dlsym(ewk_handle, "ewk_page_check_point");
    sd->ewk_page_check_point(webview, ewk_x, ewk_y, &sd->mouse_down_copy,
-	 &have_link, &have_image, &link_url, &link_text, &image_url);
+	 &have_link, &have_image, &have_flash, &link_url, &link_text, &image_url);
    if (link_url) free(link_url);
    if (link_text) free(link_text);
    if (image_url) free(image_url);
