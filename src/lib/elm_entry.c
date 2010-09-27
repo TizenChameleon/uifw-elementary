@@ -1110,6 +1110,7 @@ _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emi
 	if (entry != data) elm_entry_select_none(entry);
      }
    wd->have_selection = EINA_TRUE;
+   wd->selmode = EINA_TRUE;
    evas_object_smart_callback_call(data, SIG_SELECTION_START, NULL);
 #ifdef HAVE_ELEMENTARY_X
    if (wd->sel_notify_handler)
@@ -1130,6 +1131,7 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    wd->have_selection = EINA_TRUE;
+   wd->selmode = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_SELECTION_CHANGED, NULL);
    elm_selection_set(ELM_SEL_PRIMARY, obj, ELM_SEL_FORMAT_MARKUP,
 		   elm_entry_selection_get(data));
@@ -1142,6 +1144,7 @@ _signal_selection_cleared(void *data, Evas_Object *obj __UNUSED__, const char *e
    if (!wd) return;
    if (!wd->have_selection) return;
    wd->have_selection = EINA_FALSE;
+   wd->selmode = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_SELECTION_CLEARED, NULL);
    if (wd->sel_notify_handler)
      {
@@ -1453,13 +1456,13 @@ _drag_drop_cb(void *data __UNUSED__, Evas_Object *obj, Elm_Drop_Data *drop)
    wd = elm_widget_data_get(obj);
 
    if (!wd) return EINA_FALSE;
-printf("Inserting at (%d,%d) %s\n",drop->x,drop->y,(char*)drop->data);
+//printf("Inserting at (%d,%d) %s\n",drop->x,drop->y,(char*)drop->data);
 
    edje_object_part_text_cursor_copy(wd->ent, "elm.text",
                                      EDJE_CURSOR_MAIN,/*->*/EDJE_CURSOR_USER);
    rv = edje_object_part_text_cursor_coord_set(wd->ent,"elm.text",
                                           EDJE_CURSOR_MAIN,drop->x,drop->y);
-   if (!rv) printf("Warning: Failed to position cursor: paste anyway\n");
+//   if (!rv) printf("Warning: Failed to position cursor: paste anyway\n");
    elm_entry_entry_insert(obj, drop->data);
    edje_object_part_text_cursor_copy(wd->ent, "elm.text",
                                      EDJE_CURSOR_USER,/*->*/EDJE_CURSOR_MAIN);
