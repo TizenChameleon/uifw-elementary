@@ -2567,7 +2567,6 @@ _calc_job(void *data)
 								  wd->show_item->block->w,
 								  wd->show_item->h);
 						wd->show_item = NULL;
-						showme = 0;
 					}
 			 }
 	  }
