@@ -1,7 +1,27 @@
 CC ?= gcc
 
-TARGETS = uts_elm_imageslider_add_test \
-	  uts_elm_imageslider_add_func
+TARGETS = utc_UIFW_elm_navigationbar_ex_add_func \
+	  utc_UIFW_elm_navigationbar_ex_item_push_func \
+	  utc_UIFW_elm_navigationbar_ex_item_pop_func \
+	  utc_UIFW_elm_navigationbar_ex_item_promote_func \
+	  utc_UIFW_elm_navigationbar_ex_to_item_pop_func \
+	  utc_UIFW_elm_navigationbar_ex_item_title_label_set_func \
+	  utc_UIFW_elm_navigationbar_ex_item_title_label_get_func \
+	  utc_UIFW_elm_navigationbar_ex_item_top_get_func \
+	  utc_UIFW_elm_navigationbar_ex_item_bottom_get_func \
+	  utc_UIFW_elm_navigationbar_ex_item_title_button_set_func \
+	  utc_UIFW_elm_navigationbar_ex_item_title_button_get_func \
+	  utc_UIFW_elm_navigationbar_ex_item_title_object_set_func \
+	  utc_UIFW_elm_navigationbar_ex_item_title_object_unset_func \
+	  utc_UIFW_elm_navigationbar_ex_item_title_hidden_set_func \
+	  utc_UIFW_elm_navigationbar_ex_item_title_object_get_func \
+	  utc_UIFW_elm_navigationbar_ex_item_subtitle_label_get_func \
+	  utc_UIFW_elm_navigationbar_ex_item_subtitle_label_set_func \
+	  utc_UIFW_elm_navigationbar_ex_item_style_set_func \
+	  utc_UIFW_elm_navigationbar_ex_item_style_get_func \
+	  utc_UIFW_elm_navigationbar_ex_item_content_unset_func \
+	  utc_UIFW_elm_navigationbar_ex_item_content_get_func \
+	  utc_UIFW_elm_navigationbar_ex_delete_on_pop_set_func 
 
 PKGS = elementary
 
