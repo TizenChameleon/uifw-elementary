@@ -637,14 +637,29 @@ notify_handler_text(struct _elm_cnp_selection *sel,
                     Ecore_X_Event_Selection_Notify *notify)
 {
    Ecore_X_Selection_Data *data;
+   Ecore_X_Selection_Data_Text *texts;
    char *str;
 
    data = notify->data;
-   cnp_debug("Notify handler text %d %d %p\n",data->format,data->length,data->data);
-   str = mark_up((char*)data->data, NULL);
-   cnp_debug("String is %s (from %s)\n",str,data->data);
-   elm_entry_entry_insert(sel->requestwidget, str);
-   free(str);
+   if (data->data == NULL)
+     {
+        cnp_debug("got a text type data\n");
+        texts = notify->data;
+		cnp_debug("Notify handler text %d %d %p\n",data->format,data->length,texts->text);
+		str = mark_up((char*)texts->text, NULL);
+		cnp_debug("String is %s (from %s)\n",str,texts->text);
+		elm_entry_entry_insert(sel->requestwidget, str);
+		free(str);
+	 }
+   else
+	 {
+        cnp_debug("got a non-text type data\n");
+		cnp_debug("Notify handler text %d %d %p\n",data->format,data->length,data->data);
+		str = mark_up((char*)data->data, NULL);
+		cnp_debug("String is %s (from %s)\n",str,data->data);
+		elm_entry_entry_insert(sel->requestwidget, str);
+		free(str);
+	 }
 
    return 0;
 }
@@ -804,7 +819,11 @@ text_converter(char *target __UNUSED__, void *data, int size __UNUSED__,
 	if (!*data_ret) *data_ret = strdup("No file");
 	else *data_ret = strdup(*data_ret);
 	*size_ret = strlen(*data_ret);
+   } else {
+	cnp_debug("text converter - not supported format\n");
+	*data_ret = remove_tags(sel->selbuf, size_ret);
    }
+
    return 1;
 }
 
