@@ -637,29 +637,14 @@ notify_handler_text(struct _elm_cnp_selection *sel,
                     Ecore_X_Event_Selection_Notify *notify)
 {
    Ecore_X_Selection_Data *data;
-   Ecore_X_Selection_Data_Text *texts;
    char *str;
 
    data = notify->data;
-   if (data->data == NULL)
-     {
-        cnp_debug("got a text type data\n");
-        texts = notify->data;
-		cnp_debug("Notify handler text %d %d %p\n",data->format,data->length,texts->text);
-		str = mark_up((char*)texts->text, NULL);
-		cnp_debug("String is %s (from %s)\n",str,texts->text);
-		elm_entry_entry_insert(sel->requestwidget, str);
-		free(str);
-	 }
-   else
-	 {
-        cnp_debug("got a non-text type data\n");
-		cnp_debug("Notify handler text %d %d %p\n",data->format,data->length,data->data);
-		str = mark_up((char*)data->data, NULL);
-		cnp_debug("String is %s (from %s)\n",str,data->data);
-		elm_entry_entry_insert(sel->requestwidget, str);
-		free(str);
-	 }
+   cnp_debug("Notify handler text %d %d %p\n",data->format,data->length,data->data);
+   str = mark_up((char*)data->data, NULL);
+   cnp_debug("String is %s (from %s)\n",str,data->data);
+   elm_entry_entry_insert(sel->requestwidget, str);
+   free(str);
 
    return 0;
 }
@@ -812,6 +797,9 @@ text_converter(char *target __UNUSED__, void *data, int size __UNUSED__,
 
    if (sel->format == ELM_SEL_FORMAT_MARKUP){
 	*data_ret = remove_tags(sel->selbuf, size_ret);
+   } else if (sel->format == ELM_SEL_FORMAT_TEXT){
+        *data_ret = strdup(sel->selbuf);
+        *size_ret = strlen(sel->selbuf);
    } else if (sel->format == ELM_SEL_FORMAT_IMAGE){
 	cnp_debug("Image %s\n",evas_object_type_get(sel->widget));
 	cnp_debug("Elm type: %s\n",elm_object_widget_type_get(sel->widget));
@@ -819,11 +807,7 @@ text_converter(char *target __UNUSED__, void *data, int size __UNUSED__,
 	if (!*data_ret) *data_ret = strdup("No file");
 	else *data_ret = strdup(*data_ret);
 	*size_ret = strlen(*data_ret);
-   } else {
-	cnp_debug("text converter - not supported format\n");
-	*data_ret = remove_tags(sel->selbuf, size_ret);
    }
-
    return 1;
 }
 
@@ -874,7 +858,7 @@ uri_converter(char *target __UNUSED__, void *data, int size __UNUSED__,
  * Image paste provide
  */
 
-/* FIXME: Should add provider for each pated item: Use data to store it
+/* FIXME: Should add provider for each pasted item: Use data to store it
  * much easier */
 static Evas_Object *
 image_provider(void *images __UNUSED__, Evas_Object *entry, const char *item)
@@ -1174,7 +1158,7 @@ _dnd_drop(void *data, int etype, void *ev)
    savedtypes.x = drop->position.x - x;
    savedtypes.y = drop->position.y - y;
 
-   printf("Drop position is %d,%d\n",savedtypes.x,savedtypes.y);
+   cnp_debug("Drop position is %d,%d\n",savedtypes.x,savedtypes.y);
 
    for ( ; l ; l = l->next)
      {
