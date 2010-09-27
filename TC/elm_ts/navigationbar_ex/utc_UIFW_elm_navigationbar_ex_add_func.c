@@ -72,12 +72,10 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_navigationbar_ex_add_func_01(void)
 {
-	int r = 0;
-
-/*
-   	r = elm_navigationbar_ex_add(...);
-*/
-	if (!r) {
+	Evas_Object *navigationbar_ex = NULL;
+		
+   	navigationbar_ex = elm_navigationbar_ex_add(main_win);
+	if (!navigationbar_ex) {
 		tet_infoline("elm_navigationbar_ex_add() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -90,12 +88,10 @@ static void utc_UIFW_elm_navigationbar_ex_add_func_01(void)
  */
 static void utc_UIFW_elm_navigationbar_ex_add_func_02(void)
 {
-	int r = 0;
-
-/*
-   	r = elm_navigationbar_ex_add(...);
-*/
-	if (r) {
+	Evas_Object *navigationbar_ex = NULL;
+		
+   	navigationbar_ex = elm_navigationbar_ex_add(NULL);
+	if (navigationbar_ex) {
 		tet_infoline("elm_navigationbar_ex_add() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

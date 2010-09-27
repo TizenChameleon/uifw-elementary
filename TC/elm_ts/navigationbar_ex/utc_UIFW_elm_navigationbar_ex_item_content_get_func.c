@@ -27,7 +27,10 @@
 }
 
 
-Evas_Object *main_win;
+
+Evas_Object *main_win, *navi_ex;
+Elm_Navigationbar_ex_Item* item;
+
 
 static void startup(void);
 static void cleanup(void);
@@ -55,6 +58,12 @@ static void startup(void)
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
+	navi_ex = elm_navigationbar_ex_add(main_win);
+	evas_object_show(navi_ex);	
+	Evas_Object *btn = elm_button_add(navi_ex);
+	item = elm_navigationbar_ex_item_push(navi_ex, btn, "topbar_1fn");
+	elm_navigationbar_ex_item_title_button_set(item, "button", NULL, ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1, NULL, NULL);
+	elm_win_resize_object_add(main_win, navi_ex);
 }
 
 static void cleanup(void)
@@ -72,12 +81,12 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_navigationbar_ex_item_content_get_func_01(void)
 {
-	int r = 0;
+	Evas_Object *content = NULL;
 
-/*
-   	r = elm_navigationbar_ex_item_content_get(...);
-*/
-	if (!r) {
+
+   	content = elm_navigationbar_ex_item_content_get(item);
+
+	if (!content) {
 		tet_infoline("elm_navigationbar_ex_item_content_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -90,12 +99,11 @@ static void utc_UIFW_elm_navigationbar_ex_item_content_get_func_01(void)
  */
 static void utc_UIFW_elm_navigationbar_ex_item_content_get_func_02(void)
 {
-	int r = 0;
-
-/*
-   	r = elm_navigationbar_ex_item_content_get(...);
-*/
-	if (r) {
+	
+	Evas_Object *content = NULL;	
+	content = elm_navigationbar_ex_item_content_get(NULL);
+	
+	if (content) {
 		tet_infoline("elm_navigationbar_ex_item_content_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
