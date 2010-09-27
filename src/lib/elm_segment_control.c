@@ -143,17 +143,8 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
        return;
      }
     _signal_segment_on(item);
-    if(item->label_wd) 
-      {
-         evas_object_geometry_get(item->base, NULL, NULL, &w, &h);
-         wrap_width = elm_label_wrap_width_get(item->label_wd);
-         wrap_height = elm_label_wrap_height_get(item->label_wd);
-
-	 elm_label_wrap_width_set(item->label_wd, wrap_width);
-	 elm_label_wrap_height_set(item->label_wd, wrap_height);
-	 elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
-
-      }
+    if(item->label_wd)
+       elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
 
      wd->selected = EINA_FALSE;
      return;
@@ -245,7 +236,7 @@ _segment_resizing(void *data)
    evas_object_geometry_get(wd->base, NULL, NULL, &w, &h);
    wd->item_width = wd->width = w;
    wd->height = h;
-   
+
    _state_value_set((Evas_Object *)data);
 }
 
@@ -277,16 +268,26 @@ _segment_item_resizing(void *data)
 
    if(it->label_wd) 
      {
-        elm_label_fontsize_set(it->label_wd, wd->cur_fontsize);
 	elm_label_wrap_width_set(it->label_wd, w-wd->w_pad);
 	elm_label_wrap_height_set(it->label_wd, wd->max_height-wd->h_pad);
-	elm_label_text_color_set(it->label_wd, 0xFF,0xFF, 0xFF, 0xff);
+        if (it->segment_id == wd->cur_seg_id)
+          {
+            elm_label_text_color_set(it->label_wd, 0x00,0x00, 0x00, 0xff);
+          }
+        else
+           elm_label_text_color_set(it->label_wd, 0xFF,0xFF, 0xFF, 0xff);
 	if (edje_object_part_swallow_get(it->base, "elm.swallow.label.content") == NULL)
 	  {
 	     edje_object_part_unswallow(it->base, it->label_wd);
   	  }
 	edje_object_part_swallow(it->base, "elm.swallow.label.content", it->label_wd);
 	edje_object_signal_emit(it->base, "elm,state,label,visible", "elm");
+        if (it->segment_id == wd->cur_seg_id)
+          {
+            elm_label_text_color_set(it->label_wd, 0x00,0x00, 0x00, 0xff);
+          }
+        else
+           elm_label_text_color_set(it->label_wd, 0xFF,0xFF, 0xFF, 0xff);
      }
 }
 
