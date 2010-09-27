@@ -1131,7 +1131,7 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    wd->have_selection = EINA_TRUE;
-   wd->selmode = EINA_FALSE;
+   wd->selmode = EINA_TRUE;
    evas_object_smart_callback_call(data, SIG_SELECTION_CHANGED, NULL);
    elm_selection_set(ELM_SEL_PRIMARY, obj, ELM_SEL_FORMAT_MARKUP,
 		   elm_entry_selection_get(data));
