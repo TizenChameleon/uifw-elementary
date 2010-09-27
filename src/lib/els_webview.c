@@ -809,7 +809,6 @@ _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev)
 
    if (sd->events_feed)
      {
-	_suspend_all(sd, EINA_FALSE);
 	sd->mouse_clicked = EINA_TRUE;
 	return _parent_sc.mouse_down(esd, ev);
      }
@@ -825,7 +824,6 @@ _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
 
    if (sd->events_feed)
      {
-	_resume_all(sd, EINA_FALSE);
 	//check if user hold touch
 	if (ev && (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD))
 	  {
