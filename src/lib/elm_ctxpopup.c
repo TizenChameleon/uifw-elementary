@@ -85,6 +85,17 @@ static void _shift_base_by_arrow(Evas_Object *arrow,
 				 Evas_Coord_Rectangle *rect);
 static void _btn_layout_create(Evas_Object *obj);
 static int _get_indicator_h(Evas_Object *parent);
+static void _delete_area_rect_callbacks(Widget_Data *wd);
+
+static void
+_delete_area_rect_callbacks(Widget_Data *wd)
+{
+	if(!wd->area_rect) return ;
+
+	evas_object_event_callback_del(wd->area_rect, EVAS_CALLBACK_DEL, _area_rect_del);
+	evas_object_event_callback_del(wd->area_rect, EVAS_CALLBACK_MOVE, _area_rect_move);
+	evas_object_event_callback_del(wd->area_rect, EVAS_CALLBACK_RESIZE, _area_rect_resize);
+}
 
 
 static void
@@ -600,6 +611,9 @@ _del_pre_hook(Evas_Object *obj)
       return;
    evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE,
 				       _parent_resize, obj);
+
+   _delete_area_rect_callbacks(wd);
+
 }
 
 static void
@@ -1461,16 +1475,14 @@ elm_ctxpopup_area_set(Evas_Object *obj, Evas_Object *area)
 	   ELM_CHECK_WIDTYPE(obj, widtype);
 	   Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
 
-	   if(area) {
+	   _delete_area_rect_callbacks(wd);
+	   
+	if(area) {
 		   evas_object_event_callback_add(area, EVAS_CALLBACK_DEL, _area_rect_del, obj);
 		   evas_object_event_callback_add(area, EVAS_CALLBACK_MOVE, _area_rect_move, obj);
 		   evas_object_event_callback_add(area, EVAS_CALLBACK_RESIZE, _area_rect_resize, obj);
-	   }else {
-		   if(wd->area_rect)
-			   evas_object_del(wd->area_rect);
+		   wd->area_rect = area;
 	   }
 
-	   wd->area_rect = area;
 }
-
 
