@@ -712,7 +712,8 @@ elm_navigationbar_pop(Evas_Object *obj)
 	elm_pager_content_pop(wd->pager);
 	if(prev_it && !it)
 		{
-			evas_object_del(wd->pager);
+			//evas_object_del(wd->pager);
+			edje_object_part_text_set(wd->base, "elm.text", NULL);
 		}
 	free(cb);
 }
