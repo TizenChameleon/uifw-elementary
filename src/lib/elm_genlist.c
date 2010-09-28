@@ -2364,10 +2364,12 @@ _item_block_position(Item_Block *itb, int in)
 	evas_object_raise(select_all_item->base);
 	evas_object_show(select_all_item->base);
    
+   /*
 	if(itb->wd->select_all_minh != itb->wd->minh) 
 	{
             itb->wd->minh += select_all_item->h;
 	}	
+	*/
 
 	y = select_all_item->h;
    }
