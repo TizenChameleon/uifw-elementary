@@ -348,24 +348,6 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
 	wd->popped = EINA_TRUE;
 }
 
-
-static void
-_sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Object *sub = event_info;
-   Eina_List *l = NULL;
-   if (!wd) return;
-   
-	if (wd->pager == sub)
-	  {
-	     wd->stack = eina_list_remove_list(wd->stack, l);
-	     evas_object_del(wd->base);
-	     return;
-	  }
-}
-
-
 static int
 _set_button_width(Evas_Object *obj)
 {
@@ -525,8 +507,6 @@ elm_navigationbar_add(Evas_Object *parent)
 	elm_widget_sub_object_add(obj, wd->pager);
 	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->pager);
 	evas_object_smart_callback_add(wd->pager, "hide,finished", _hide_finished, obj);	
-	evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-
    	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);	
 
 	_sizing_eval(obj);
