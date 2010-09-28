@@ -564,6 +564,7 @@ elm_navigationbar_push(Evas_Object *obj,
 	if (!wd) return;
 
 	it = _check_item_is_added(obj, content);
+	if (it) return;
 	if (!it) it = ELM_NEW(Item); 
 	if (!it) return;
 	
@@ -731,6 +732,7 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 										Evas_Object *content)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
+	if(!content) return;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it = NULL;
