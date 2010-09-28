@@ -121,7 +121,7 @@ obj_unhook(Evas_Object *obj)
 
 EAPI void
 obj_longpress(Evas_Object *obj)
-{		
+{	
 	if(!ext_mod) return;
 	Evas_Object *top;
 	const Eina_List *l;
@@ -138,7 +138,7 @@ obj_longpress(Evas_Object *obj)
 		if(top)
 			ext_mod->popup = elm_ctxpopup_add(top);
 		/*currently below theme not used,when guideline comes a new theme can be created if required*/
-		//elm_object_style_set(ext_mod->popup,"entry");
+		elm_object_style_set(ext_mod->popup,"extended/entry");
 		elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_TRUE);
 		context_menu_orientation = edje_object_data_get
 		(ext_mod->ent, "context_menu_orientation");
@@ -203,7 +203,6 @@ obj_longpress(Evas_Object *obj)
 EAPI void
 obj_mouseup(Evas_Object *obj)
 {
-
 	if (!obj || !ext_mod) {
 		return;
 	}
@@ -217,13 +216,6 @@ obj_mouseup(Evas_Object *obj)
 				_cancel(obj,ext_mod->popup,NULL);
 			}
      }     
-  else
-   {
-   		if (ext_mod->have_selection )
-   			{
-				obj_longpress( obj );
-   			}
-   }
 }
 
 

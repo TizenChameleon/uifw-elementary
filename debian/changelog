@@ -1,3 +1,28 @@
+elementary (1.0.0+svn.51480slp2+build17) unstable; urgency=low
+
+  * Repackaging.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build17
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Tue, 28 Sep 2010 17:49:21 +0900
+
+elementary (1.0.0+svn.51480slp2+build16) unstable; urgency=low
+
+  * Repackaging.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build16
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Tue, 28 Sep 2010 15:49:43 +0900
+
+elementary (1.0.0+svn.51480slp2+build15) unstable; urgency=low
+
+  * [Genlist] Pinch zoom is enhanced.
+  * [ClipBoard] Clipboard is enhanced.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build15
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Tue, 28 Sep 2010 14:46:48 +0900
+
 elementary (1.0.0+svn.51480slp2+build14) unstable; urgency=low
 
   * Repackaging.

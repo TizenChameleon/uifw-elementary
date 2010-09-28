@@ -130,6 +130,7 @@ struct _Widget_Data
    Eina_Bool selmode : 1;
    Eina_Bool deferred_cur : 1;
    Eina_Bool disabled : 1;
+   Eina_Bool double_clicked : 1;
    Eina_Bool context_menu : 1;
    Eina_Bool drag_selection_asked : 1;
    Eina_Bool bgcolor : 1;
@@ -659,6 +660,13 @@ _long_press(void *data)
    const Eina_List *l;
    const Elm_Entry_Context_Menu_Item *it;
    if (!wd) return ECORE_CALLBACK_CANCEL;
+
+   if (wd->longpress_timer)
+     {
+	ecore_timer_del(wd->longpress_timer);
+	wd->longpress_timer = NULL;
+     }	
+
    if ((wd->api) && (wd->api->obj_longpress))
      {
         wd->api->obj_longpress(data);
@@ -759,10 +767,14 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    Evas_Event_Mouse_Up *ev = event_info;
    if (!wd) return;
    if (ev->button != 1) return;
-   if ((wd->api) && (wd->api->obj_mouseup))
-     {
-	wd->api->obj_mouseup(data);
-     } 
+
+   if (!wd->double_clicked)
+   {
+	   if ((wd->api) && (wd->api->obj_mouseup))
+		 {
+		wd->api->obj_mouseup(data);
+		 }
+   }
    if (wd->longpress_timer)
      {
 	ecore_timer_del(wd->longpress_timer);
@@ -1337,6 +1349,7 @@ _signal_mouse_down(void *data, Evas_Object *obj __UNUSED__, const char *emission
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
+   wd->double_clicked = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_PRESS, NULL);
 }
 
@@ -1353,6 +1366,7 @@ _signal_mouse_double(void *data, Evas_Object *obj __UNUSED__, const char *emissi
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
+   wd->double_clicked = EINA_TRUE;
    evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, NULL);
 }
 

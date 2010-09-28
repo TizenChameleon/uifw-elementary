@@ -260,6 +260,7 @@ EAPI void
 elm_widget_sub_object_add(Evas_Object *obj, Evas_Object *sobj)
 {
    API_ENTRY return;
+   Evas_Object *o;
    double scale, pscale = elm_widget_scale_get(sobj);
    Elm_Theme *th, *pth = elm_widget_theme_get(sobj);
 
@@ -276,6 +277,17 @@ elm_widget_sub_object_add(Evas_Object *obj, Evas_Object *sobj)
 	     if (sd2->parent_obj)
                elm_widget_sub_object_del(sd2->parent_obj, sobj);
 	     sd2->parent_obj = obj;
+	     if (sd2->focused){
+		     o = sobj;
+		     for (;;)
+		     {
+			     o = elm_widget_parent_get(o);
+			     if (!o) break;
+			     sd = evas_object_smart_data_get(o);
+			     if (sd->focused) break;
+			     sd->focused = 1;
+		     }
+	     }
 	  }
      }
    evas_object_data_set(sobj, "elm-parent", obj);

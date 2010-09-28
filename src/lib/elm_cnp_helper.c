@@ -82,6 +82,7 @@ static const struct escapes {
    const char value;
 } escapes[] = {
    { "<br>",	'\n' },
+   { "<ps>",	'\n' },
    { "<\t>",	'\t' },
    { "gt;",	'>' },
    { "lt;",	'<' },
@@ -643,7 +644,7 @@ notify_handler_text(struct _elm_cnp_selection *sel,
    cnp_debug("Notify handler text %d %d %p\n",data->format,data->length,data->data);
    str = mark_up((char*)data->data, NULL);
    // FIXME: should it be cutted to fit length??
-   str[data->length] = '\0';
+//   str[data->length] = '\0';
    cnp_debug("String is %s (from %s)\n",str,data->data);
    elm_entry_entry_insert(sel->requestwidget, str);
    free(str);
