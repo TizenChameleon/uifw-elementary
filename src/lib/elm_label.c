@@ -127,7 +127,6 @@ _sizing_eval(Evas_Object *obj)
         maxh = minh;
         evas_object_size_hint_max_set(obj, maxw, maxh);
 
-		if (wd->ellipsis) edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         if (wd->ellipsis && _is_width_over(obj, 0) == 1) 
           _ellipsis_label_to_width(obj, 0);
      }
@@ -435,6 +434,7 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
 
    if (txtbuf) eina_strbuf_free(txtbuf);
    wd->changed = 1;
+   _sizing_eval(obj);
 }
 
 /**
