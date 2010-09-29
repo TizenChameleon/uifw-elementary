@@ -2379,7 +2379,7 @@ _item_block_position(Item_Block *itb, int in)
 	evas_object_geometry_get(itb->wd->pan_smart, &ox, &oy, &ow, &oh);
 	evas_output_viewport_get(evas_object_evas_get(itb->wd->obj), &cvx, &cvy, &cvw, &cvh);
 
-	if(itb->wd->select_all_item) 
+	if (itb->wd->select_all_item) 
 	  {
 		  select_all_item = itb->wd->select_all_item;
 
@@ -2430,15 +2430,15 @@ _item_block_position(Item_Block *itb, int in)
 						if( git != it->group_item )
 						  {
 							  git = it->group_item;
-							  if( git )
+							  if (git)
 								 {
 									 git->visible = EINA_TRUE; //Mark Group Item to make it visible
-									 if( git->items->data == it)
+									 if (git->items->data == it)
 										git->y = it->scrl_y;
-									 if( GROUP_ALIGN_NORTH == git->align )
+									 if (GROUP_ALIGN_NORTH == git->align)
 										{
 											git->w = itb->w;
-											if( git->items->data == it)
+											if (git->items->data == it)
 											  {
 												  it->scrl_y += git->minh;
 												  y += git->minh;
@@ -2446,14 +2446,14 @@ _item_block_position(Item_Block *itb, int in)
 										}
 								 }
 						  }
-						if( git )
+						if (git)
 						  {
 							  git->x = ox + itb->x - itb->wd->pan_x;
 
-							  if( git->y < oy   )
+							  if (git->y < oy)
 								 git->y = oy;
 
-							  if( git->align == GROUP_ALIGN_WEST )
+							  if (git->align == GROUP_ALIGN_WEST)
 								 {
 									 it->w -= git->w;
 									 it->scrl_x += git->x + git->w;
@@ -2464,47 +2464,45 @@ _item_block_position(Item_Block *itb, int in)
 											git->h = it->h;
 										}
 								 }
-							  if( git->align == GROUP_ALIGN_NORTH )
+							  if (git->align == GROUP_ALIGN_NORTH)
 								 {
 									 git->h = git->minh;
-									 if( (git->y + git->h) > (it->scrl_y + it->h) )
+									 if ((git->y + git->h) > (it->scrl_y + it->h))
 										git->y = (it->scrl_y + it->h) - git->minh;
-
 								 }
 						  }
 
 						is_reorder = _get_space_for_reorder_item( it );
 
-						if(is_reorder)
+						if (is_reorder)
 						  it->reorder_check = 1;
 						else
 						  it->reorder_check = 0;
 
-						if(it->wd->ed)
+						if (it->wd->ed)
 						  {
-							  if(it != it->wd->ed->reorder_item && is_reorder && in > 0 && in % it->wd->max_items_per_block == 0 && !itb->reoder_y) 
+							  if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && in % it->wd->max_items_per_block == 0 && !itb->reoder_y) 
 								 {
 									 itb->reoder_y -= it->h;
 									 it->scrl_y = oy + itb->y + it->y - itb->wd->pan_y + itb->reoder_y;
 								 }
-							  else if(it != it->wd->ed->reorder_item && is_reorder && in > 0 && in % it->wd->max_items_per_block  == 0 && itb->reoder_y) 
+							  else if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && in % it->wd->max_items_per_block  == 0 && itb->reoder_y) 
 								 {
 									 itb->reoder_y = 0;
 								 }
 						  }
 						y += is_reorder;
 
-
-						if(!it->reordering )
+						if (!it->reordering )
 						  {
 							  _move_edit_controls( it,it->scrl_x, it->scrl_y );
 							  evas_object_resize(it->base, it->w-(it->pad_left+it->pad_right), it->h);
 
-							  if(!it->wd->effect_mode || !it->wd->expanded_effect)
+							  if (!it->wd->effect_mode || !it->wd->expanded_effect)
 								 {
 									 evas_object_move(it->base, it->scrl_x+it->pad_left, it->scrl_y);
 
-									 if(it->delete_check)
+									 if (it->delete_check)
 										{
 											edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
 											edje_object_signal_emit(it->base, "elm,state,del_confirm", "elm");
@@ -2520,19 +2518,19 @@ _item_block_position(Item_Block *itb, int in)
 						  _item_unrealize(it);
 					}
 			 }
-		  if(!it->reordering )
+		  if (!it->reordering )
 			 y += it->h;
 
 		  in++;
 	  }
 
-	if(itb->wd->select_all_item) 
+	if (itb->wd->select_all_item) 
 	  evas_object_raise(select_all_item->base);
 
-	if( vis )
+	if (vis)
 	  {
 		  itb->wd->animate_edit_controls = 0;
-		  if(git)
+		  if (git)
 			 git->visible = EINA_TRUE;
 	  }
 }
