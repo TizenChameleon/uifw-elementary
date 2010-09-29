@@ -2748,7 +2748,9 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    _coords_evas_to_ewk(webview, point->x, point->y, &ewk_x, &ewk_y);
    if (!sd->ewk_view_get_smart_zoom_rect)
      sd->ewk_view_get_smart_zoom_rect = (Eina_Bool (*)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *))dlsym(ewk_handle, "ewk_view_get_smart_zoom_rect");
-   sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect);
+   Eina_Bool do_smart_zoom = sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect);
+   if (!do_smart_zoom)
+       return;
 
    // calculate zoom_rate and center of rect
    int view_x, view_y, view_w, view_h;
