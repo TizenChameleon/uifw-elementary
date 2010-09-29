@@ -1,3 +1,19 @@
+elementary (1.0.0+svn.51480slp2+build20) unstable; urgency=low
+
+  * Genlist fix for calllog.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build20
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Wed, 29 Sep 2010 18:24:37 +0900
+
+elementary (1.0.0+svn.51480slp2+build19) unstable; urgency=low
+
+  * Repackaging.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build19
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 29 Sep 2010 17:12:09 +0900
+
 elementary (1.0.0+svn.51480slp2+build18) unstable; urgency=low
 
   * Repackaging.

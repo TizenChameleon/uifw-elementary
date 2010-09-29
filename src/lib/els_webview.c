@@ -1007,14 +1007,19 @@ _smart_load_started(void* data, Evas_Object* webview, void* error)
 
    if (!sd->ewk_view_user_scalable_set)
      sd->ewk_view_user_scalable_set = (void (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_user_scalable_set");
+   if (!sd->ewk_view_zoom_range_set)
+     sd->ewk_view_zoom_range_set = (Eina_Bool (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
 
    // set default layout and zoom level
    sd->is_mobile_page = EINA_FALSE;
    sd->layout.w = -1;
    sd->layout.h = -1;
    sd->zoom.init_zoom_rate = 1.0f;
+   sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
+   sd->zoom.max_zoom_rate = MAX_ZOOM_RATIO;
    sd->zoom.scalable = EINA_TRUE;
    sd->ewk_view_user_scalable_set(webview, EINA_TRUE);
+   sd->ewk_view_zoom_range_set(webview, MIN_ZOOM_RATIO, MAX_ZOOM_RATIO);
 }
 
 static void
@@ -1774,6 +1779,28 @@ _smart_cb_mouse_up(void* data, Evas_Object* webview, void* ev)
 
    Evas_Point* point = (Evas_Point*)ev;
    DBG(" argument : (%d, %d)\n", point->x, point->y);
+
+   // if the target is flash, we send mouse up event to webkit
+   int ewk_x, ewk_y;
+   _coords_evas_to_ewk(webview, point->x, point->y, &ewk_x, &ewk_y);
+   Eina_Bool have_link = EINA_FALSE;
+   Eina_Bool have_image = EINA_FALSE;
+   Eina_Bool have_flash = EINA_FALSE;
+   char *link_url = NULL, *link_text = NULL, *image_url = NULL;
+   if (!sd->ewk_page_check_point)
+     sd->ewk_page_check_point = (Eina_Bool (*)(Evas_Object *, int, int, Evas_Event_Mouse_Down *, Eina_Bool *, Eina_Bool *, Eina_Bool *, char **, char **, char **))dlsym(ewk_handle, "ewk_page_check_point");
+   sd->ewk_page_check_point(webview, ewk_x, ewk_y, &sd->mouse_down_copy,
+	 &have_link, &have_image, &have_flash, &link_url, &link_text, &image_url);
+   if (link_url) free(link_url);
+   if (link_text) free(link_text);
+   if (image_url) free(image_url);
+   if (have_flash)
+     {
+	Evas_Event_Mouse_Up mouse_up = sd->mouse_up_copy;
+	mouse_up.canvas.x = point->x;
+	mouse_up.canvas.y = point->y;
+	_parent_sc.mouse_up((Ewk_View_Smart_Data*)sd, &mouse_up);
+     }
 }
 
 static void
@@ -2721,7 +2748,9 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    _coords_evas_to_ewk(webview, point->x, point->y, &ewk_x, &ewk_y);
    if (!sd->ewk_view_get_smart_zoom_rect)
      sd->ewk_view_get_smart_zoom_rect = (Eina_Bool (*)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *))dlsym(ewk_handle, "ewk_view_get_smart_zoom_rect");
-   sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect);
+   Eina_Bool do_smart_zoom = sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect);
+   if (!do_smart_zoom)
+       return;
 
    // calculate zoom_rate and center of rect
    int view_x, view_y, view_w, view_h;
