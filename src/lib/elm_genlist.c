@@ -314,8 +314,8 @@ struct _Widget_Data
 
    Eina_Bool effect_mode : 1;
    Eina_Bool pinch_zoom : 1;
-   Elm_Genlist_Item_Move_effect_Mode move_effect_mode;
-   Elm_Genlist_Item_Pinchzoom_effect_Mode pinchzoom_effect_mode;
+   int move_effect_mode;
+   int pinchzoom_effect_mode;
    int pinch_it;
    int max_num; 	
    Ecore_Animator *item_moving_effect_timer;
@@ -323,6 +323,8 @@ struct _Widget_Data
    Eina_Bool expanded_effect : 1;
    Evas_Object *alpha_bg;
    Evas_Object *point_rect;
+
+   Eina_Bool queue_exception : 1;
 };
 struct _Edit_Data
 {
@@ -3242,9 +3244,12 @@ _item_idler(void *data)
 static void
 _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
 {
-  if(wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_NONE)
+	if(!wd->queue_exception)
+  {
    wd->queue = eina_list_append(wd->queue, it);
-
+	it->queued = EINA_TRUE;
+  }
+  
   while ((wd->queue) && ((!wd->blocks) || (!wd->blocks->next)))
      {
         if (wd->queue_idler)
@@ -3257,9 +3262,12 @@ _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
 
    if (it->queued) return;
    if (!wd->queue_idler) wd->queue_idler = ecore_idler_add(_item_idler, wd);
-   it->queued = EINA_TRUE;
-   if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE)
+
+	if(wd->queue_exception)
+   {
    wd->queue = eina_list_append(wd->queue, it);
+	it->queued = EINA_TRUE;
+   }
 }
 #else
 
@@ -6012,5 +6020,14 @@ elm_genlist_effect_set(const Evas_Object *obj, Eina_Bool emode)
 	evas_object_color_set(wd->point_rect, 255, 0, 0, 130);   
    evas_object_show(wd->point_rect);
    evas_object_hide(wd->point_rect);
+}
+
+EAPI void
+elm_genlist_queue_exception_set(const Evas_Object *obj, Eina_Bool emode)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->queue_exception = emode;
 }
 
