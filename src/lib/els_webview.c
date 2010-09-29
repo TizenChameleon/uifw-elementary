@@ -1007,14 +1007,19 @@ _smart_load_started(void* data, Evas_Object* webview, void* error)
 
    if (!sd->ewk_view_user_scalable_set)
      sd->ewk_view_user_scalable_set = (void (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_user_scalable_set");
+   if (!sd->ewk_view_zoom_range_set)
+     sd->ewk_view_zoom_range_set = (Eina_Bool (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
 
    // set default layout and zoom level
    sd->is_mobile_page = EINA_FALSE;
    sd->layout.w = -1;
    sd->layout.h = -1;
    sd->zoom.init_zoom_rate = 1.0f;
+   sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
+   sd->zoom.max_zoom_rate = MAX_ZOOM_RATIO;
    sd->zoom.scalable = EINA_TRUE;
    sd->ewk_view_user_scalable_set(webview, EINA_TRUE);
+   sd->ewk_view_zoom_range_set(webview, MIN_ZOOM_RATIO, MAX_ZOOM_RATIO);
 }
 
 static void
