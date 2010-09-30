@@ -792,12 +792,13 @@ elm_navigationbar_title_label_set(Evas_Object *obj,
 	{
 		if (it->content == content) 
 		{
-			if(!title)
-				{
-					edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
-				}			
 			eina_stringshare_replace(&it->title, title);
 			edje_object_part_text_set(wd->base, "elm.text", title);
+			if((it->title_obj)&&(it->title)){ 
+				edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
+			}
+			else
+				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
 			_item_sizing_eval(it);
 			break;
 		}
