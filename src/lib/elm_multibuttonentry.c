@@ -458,7 +458,7 @@ _view_init(Evas_Object *obj)
 		elm_scrolled_entry_entry_set(wd->entry, "");
 		elm_scrolled_entry_cursor_end_set(wd->entry);
 		evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_UP, _evas_key_up_cb, obj);
-		evas_object_size_hint_weight_set(wd->entry, 1.0, 1.0);
+		evas_object_size_hint_weight_set(wd->entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
 		elm_box_pack_end(wd->box, wd->entry);
 		evas_object_show(wd->entry);

@@ -2178,6 +2178,19 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
 
+   if (password)
+     {
+        if (wd->autoperiod)
+          {
+             elm_entry_autoperiod_set(obj, EINA_FALSE);
+          }
+
+        if (wd->autocapitalize)
+          {
+             elm_entry_autocapitalization_set(obj, EINA_FALSE);
+          }
+     }
+
    ic = elm_entry_imf_context_get(obj);
    if (ic)
      {

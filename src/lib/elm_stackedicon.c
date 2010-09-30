@@ -396,7 +396,7 @@ _add_image(Evas_Object *obj, void *data)
 
 	ly = edje_object_add(evas_object_evas_get(obj));
 	_elm_theme_object_set(obj, ly, "stackedicon", "icon", elm_widget_style_get(obj));
-	evas_object_size_hint_weight_set(ly, 1.0, 1.0);
+	evas_object_size_hint_weight_set(ly, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	elm_widget_sub_object_add(obj, ly); 
 	
 	ic = evas_object_image_add(evas_object_evas_get(obj));
@@ -447,7 +447,7 @@ _add_image_to_buffer(Evas_Object *obj, Evas* e, void *data)
 
 	ly = edje_object_add(e);
 	_elm_theme_object_set(obj, ly, "stackedicon", "icon", elm_widget_style_get(obj));
-	evas_object_size_hint_weight_set(ly, 1.0, 1.0);
+	evas_object_size_hint_weight_set(ly, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
 	ic = evas_object_image_add(e);
 	evas_object_image_alpha_set(ic, EINA_TRUE);

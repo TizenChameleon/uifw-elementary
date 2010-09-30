@@ -474,7 +474,7 @@ static void _gallery_add_image(Evas_Object *obj, int index, void *data)
 	ly = edje_object_add(evas_object_evas_get(obj));
 	_elm_theme_object_set(obj,ly,  "gallery", "base", "default");
 
-	evas_object_size_hint_weight_set(ly, 1.0, 1.0);
+	evas_object_size_hint_weight_set(ly, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_show(ly);
 		
 	ic = evas_object_image_add(evas_object_evas_get(obj));
