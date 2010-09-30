@@ -1356,8 +1356,8 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
 	sd->ewk_frame_contents_size_get(frame, &content_w, NULL);
 
 	const char *url = sd->ewk_view_uri_get(webview);
-	if ((content_w > sd->layout.w && !strstr(url, "docs.google.com"))
-	      || strstr(url, "maps.google.com/maps/m"))
+	if (url && ((content_w > sd->layout.w && !strstr(url, "docs.google.com"))
+	      || strstr(url, "maps.google.com/maps/m")))
 	  {
 	     // set page layout info, zoom and layout again
 	     _smart_page_layout_info_set(sd, 1.0f, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate, sd->zoom.scalable);
@@ -1425,6 +1425,10 @@ _smart_add(Evas_Object* obj)
    sd->events_feed = EINA_FALSE;
    sd->touch_obj = _elm_smart_touch_add(evas_object_evas_get(obj));
    sd->layout.default_w = DEFAULT_LAYOUT_WIDTH;
+   sd->zoom.init_zoom_rate = 1.0f;
+   sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
+   sd->zoom.max_zoom_rate = MAX_ZOOM_RATIO;
+   sd->zoom.scalable = EINA_TRUE;
 
    sd->ewk_view_theme_set = (void (*)(Evas_Object *, const char *))dlsym(ewk_handle, "ewk_view_theme_set");
    sd->ewk_view_theme_set(obj, WEBKIT_EDJ);
