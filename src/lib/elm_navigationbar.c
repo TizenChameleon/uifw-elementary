@@ -136,10 +136,14 @@ _delete_item(Item *it)
 	Eina_List *ll;
 	Evas_Object *list_obj;
 	
-	evas_object_del(it->fn_btn1);
+	elm_object_unfocus(it->back_btn);	
 	evas_object_del(it->back_btn);
+	elm_object_unfocus(it->fn_btn1);
+	evas_object_del(it->fn_btn1);
+	elm_object_unfocus(it->fn_btn2);
 	evas_object_del(it->fn_btn2);
-	evas_object_del(it->fn_btn3);
+	elm_object_unfocus(it->fn_btn3);
+	evas_object_del(it->fn_btn3);	
 	if (it->title) eina_stringshare_del(it->title);
 	if (it->subtitle) eina_stringshare_del(it->subtitle);
 	EINA_LIST_FOREACH(it->title_list, ll, list_obj)
