@@ -2439,35 +2439,35 @@ _zoom_stop(Smart_Data* sd)
 	if (!sd->ewk_view_zoom_set)
 	  sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
 	sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set, sd->zoom.basis.x, sd->zoom.basis.y);
-     }
-   DBG("<< zoom set [%f] >>\n", sd->zoom.zooming_rate);
+	DBG("<< zoom set [%f] >>\n", sd->zoom.zooming_rate);
 
-   _resume_all(sd, EINA_TRUE);
+	_resume_all(sd, EINA_TRUE);
 
-   if (sd->tiled)
-     {
-	if (!sd->ewk_view_tiled_unused_cache_get)
-	  sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
-	Ewk_Tile_Unused_Cache* ewk_tile_cache = sd->ewk_view_tiled_unused_cache_get(sd->base.self);
-	if (!sd->ewk_tile_unused_cache_auto_flush)
-	  sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
-	sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
-	_directional_pre_render(sd->base.self, 0, 0);
-     }
+	if (sd->tiled)
+	  {
+	     if (!sd->ewk_view_tiled_unused_cache_get)
+	       sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
+	     Ewk_Tile_Unused_Cache* ewk_tile_cache = sd->ewk_view_tiled_unused_cache_get(sd->base.self);
+	     if (!sd->ewk_tile_unused_cache_auto_flush)
+	       sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
+	     sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
+	     _directional_pre_render(sd->base.self, 0, 0);
+	  }
 
-   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
-     {
-	if (!sd->ewk_view_frame_main_get)
-	  sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-	if (!sd->ewk_frame_selection_handlers_get)
-	  sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
-	int tx, ty, th, bx, by, bh;
-	sd->ewk_frame_selection_handlers_get(sd->ewk_view_frame_main_get(sd->base.self), &tx, &ty, &th, &bx, &by, &bh);
-	_coords_ewk_to_evas(sd->base.self, tx, ty, &tx, &ty);
-	_coords_ewk_to_evas(sd->base.self, bx, by, &bx, &by);
-	_text_selection_show();
-	_text_selection_set_front_info(sd, tx, ty, th);
-	_text_selection_set_back_info(sd, bx, by, bh);
+	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
+	  {
+	     if (!sd->ewk_view_frame_main_get)
+	       sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+	     if (!sd->ewk_frame_selection_handlers_get)
+	       sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
+	     int tx, ty, th, bx, by, bh;
+	     sd->ewk_frame_selection_handlers_get(sd->ewk_view_frame_main_get(sd->base.self), &tx, &ty, &th, &bx, &by, &bh);
+	     _coords_ewk_to_evas(sd->base.self, tx, ty, &tx, &ty);
+	     _coords_ewk_to_evas(sd->base.self, bx, by, &bx, &by);
+	     _text_selection_show();
+	     _text_selection_set_front_info(sd, tx, ty, th);
+	     _text_selection_set_back_info(sd, bx, by, bh);
+	  }
      }
 }
 
@@ -2547,6 +2547,17 @@ _smart_zoom_animator(void* data)
 	_elm_smart_touch_start(sd->touch_obj);
 
 	_resume_all(sd, EINA_TRUE);
+
+	if (sd->tiled)
+	  {
+	     if (!sd->ewk_view_tiled_unused_cache_get)
+	       sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
+	     Ewk_Tile_Unused_Cache* ewk_tile_cache = sd->ewk_view_tiled_unused_cache_get(sd->base.self);
+	     if (!sd->ewk_tile_unused_cache_auto_flush)
+	       sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
+	     sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
+	     _directional_pre_render(sd->base.self, 0, 0);
+	  }
 
 	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
