@@ -325,6 +325,7 @@ static void      _smart_page_layout_info_set(Smart_Data *sd, float init_zoom_rat
 static void      _smart_contents_size_changed(void* data, Evas_Object* frame, void* arg);
 static void      _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg);
 static void      _smart_cb_view_created(void* data, Evas_Object* webview, void* arg);
+static void      _smart_cb_zoom_set(void* data, Evas_Object* webview, void* arg);
 static void      _smart_add(Evas_Object* obj);
 static void      _smart_del(Evas_Object* o);
 static void      _directional_pre_render(Evas_Object* webview, int dx, int dy);
@@ -1056,9 +1057,6 @@ _smart_load_finished(void* data, Evas_Object* webview, void* arg)
      }
    sd->thumbnail = _image_clone_get(sd, &(sd->minimap.cw), &(sd->minimap.ch));
 
-   if (sd->tiled)
-     _directional_pre_render(sd->base.self, 0, 0);
-
    if (sd->minimap.eo != NULL)
      {
    _minimap_update(sd->minimap.content, sd, sd->thumbnail,
@@ -1404,6 +1402,27 @@ _smart_cb_view_created(void* data, Evas_Object* webview, void* arg)
 }
 
 static void
+_smart_cb_zoom_set(void* data, Evas_Object* webview, void* arg)
+{
+   printf("%s is called\n", __func__);
+   Smart_Data* sd = (Smart_Data *)data;
+   if (!sd) return;
+
+   _resume_all(sd, EINA_TRUE);
+
+   if (sd->tiled)
+     {
+	if (!sd->ewk_view_tiled_unused_cache_get)
+	  sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
+	Ewk_Tile_Unused_Cache* ewk_tile_cache = sd->ewk_view_tiled_unused_cache_get(sd->base.self);
+	if (!sd->ewk_tile_unused_cache_auto_flush)
+	  sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
+	sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
+	_directional_pre_render(sd->base.self, 0, 0);
+     }
+}
+
+static void
 _smart_add(Evas_Object* obj)
 {
    DBG("%s\n", __func__);
@@ -1457,6 +1476,7 @@ _smart_add(Evas_Object* obj)
    evas_object_smart_callback_add(obj, "inputmethod,changed", _smart_input_method_changed, sd);
 
    evas_object_smart_callback_add(obj, "webview,created", _smart_cb_view_created, sd); // I need to consider more
+   evas_object_smart_callback_add(obj, "zoom,set", _smart_cb_zoom_set, sd);
 
    if (!(sd->ewk_view_frame_main_get))
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
@@ -2441,19 +2461,6 @@ _zoom_stop(Smart_Data* sd)
 	sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set, sd->zoom.basis.x, sd->zoom.basis.y);
 	DBG("<< zoom set [%f] >>\n", sd->zoom.zooming_rate);
 
-	_resume_all(sd, EINA_TRUE);
-
-	if (sd->tiled)
-	  {
-	     if (!sd->ewk_view_tiled_unused_cache_get)
-	       sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
-	     Ewk_Tile_Unused_Cache* ewk_tile_cache = sd->ewk_view_tiled_unused_cache_get(sd->base.self);
-	     if (!sd->ewk_tile_unused_cache_auto_flush)
-	       sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
-	     sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
-	     _directional_pre_render(sd->base.self, 0, 0);
-	  }
-
 	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
 	     if (!sd->ewk_view_frame_main_get)
@@ -2545,19 +2552,6 @@ _smart_zoom_animator(void* data)
 	  }
 
 	_elm_smart_touch_start(sd->touch_obj);
-
-	_resume_all(sd, EINA_TRUE);
-
-	if (sd->tiled)
-	  {
-	     if (!sd->ewk_view_tiled_unused_cache_get)
-	       sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
-	     Ewk_Tile_Unused_Cache* ewk_tile_cache = sd->ewk_view_tiled_unused_cache_get(sd->base.self);
-	     if (!sd->ewk_tile_unused_cache_auto_flush)
-	       sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
-	     sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
-	     _directional_pre_render(sd->base.self, 0, 0);
-	  }
 
 	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
