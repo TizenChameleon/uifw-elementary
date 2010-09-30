@@ -497,8 +497,8 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon, Evas_Object *e
 				  _mouse_up, it);
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_MOVE,
 				  _mouse_move, it);
-   evas_object_size_hint_weight_set(it->base, 1.0, 1.0);
-   evas_object_size_hint_align_set(it->base, -1.0, -1.0);
+   evas_object_size_hint_weight_set(it->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(it->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
    if (it->icon)
      {
 	elm_widget_sub_object_add(obj, it->icon);
@@ -739,8 +739,8 @@ elm_list_add(Evas_Object *parent)
 
    wd->box = elm_box_add(parent);
    elm_box_homogenous_set(wd->box, 1);
-   evas_object_size_hint_weight_set(wd->box, 1.0, 0.0);
-   evas_object_size_hint_align_set(wd->box, -1.0, 0.0);
+   evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, 0.0);
    elm_scroller_content_set(wd->scr, wd->box);
    evas_object_show(wd->box);
 

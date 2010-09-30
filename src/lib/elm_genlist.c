@@ -6029,5 +6029,10 @@ elm_genlist_queue_exception_set(const Evas_Object *obj, Eina_Bool emode)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    wd->queue_exception = emode;
+
+   fprintf(stderr, "=================> Caution!!! <========================\n");
+   fprintf(stderr, "==> elm_genlist_queue_exception_set() is for demo. <===\n");
+   fprintf(stderr, "==> Do not use this API                             <==\n");
+   fprintf(stderr, "=======================================================\n");
 }
 

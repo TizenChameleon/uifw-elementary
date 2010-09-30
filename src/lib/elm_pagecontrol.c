@@ -164,8 +164,8 @@ _create_item(Evas_Object *obj, unsigned int page_id)
 	sprintf(pi_name, "default_%d", page_id+1);
 	_elm_theme_object_set(obj, it->base, "page", "item", pi_name);
 	edje_object_size_min_restricted_calc(it->base, &mw, &mh, 0, 0);
-	evas_object_size_hint_weight_set(it->base, 1.0, 1.0);
-	evas_object_size_hint_align_set(it->base, -1.0, -1.0);
+	evas_object_size_hint_weight_set(it->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	evas_object_size_hint_align_set(it->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
 	evas_object_resize(it->base, mw, mh);
 	evas_object_size_hint_min_set(it->base, mw, mh);

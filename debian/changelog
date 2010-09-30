@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build21) unstable; urgency=low
+
+  * Packaging to enable scale factor.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build21
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Thu, 30 Sep 2010 11:24:14 +0900
+
 elementary (1.0.0+svn.51480slp2+build20) unstable; urgency=low
 
   * Genlist fix for calllog.
