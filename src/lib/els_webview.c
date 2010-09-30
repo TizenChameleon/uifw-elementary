@@ -329,6 +329,7 @@ static void      _smart_cb_zoom_set(void* data, Evas_Object* webview, void* arg)
 static void      _smart_add(Evas_Object* obj);
 static void      _smart_del(Evas_Object* o);
 static void      _directional_pre_render(Evas_Object* webview, int dx, int dy);
+static void      _directional_pre_render_mobile(Evas_Object* obj, int dx, int dy);
 static void      _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_mouse_up(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev);
@@ -681,7 +682,10 @@ _flush_and_pre_render(void *data)
 
    Ewk_Tile_Unused_Cache *tuc = sd->ewk_view_tiled_unused_cache_get(obj);
    sd->ewk_tile_unused_cache_flush(tuc, sd->ewk_tile_unused_cache_used_get(tuc));
-   _directional_pre_render(obj, 0, 0);
+   if (sd->is_mobile_page)
+     _directional_pre_render_mobile(obj, 0, 0);
+   else
+     _directional_pre_render(obj, 0, 0);
 
    sd->flush_and_pre_render_idler = NULL;
 
@@ -1418,7 +1422,10 @@ _smart_cb_zoom_set(void* data, Evas_Object* webview, void* arg)
 	if (!sd->ewk_tile_unused_cache_auto_flush)
 	  sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
 	sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
-	_directional_pre_render(sd->base.self, 0, 0);
+    if (sd->is_mobile_page)
+      _directional_pre_render_mobile(sd->base.self, 0, 0);
+    else
+	  _directional_pre_render(sd->base.self, 0, 0);
      }
 }
 
@@ -1526,6 +1533,108 @@ _smart_del(Evas_Object* obj)
 
    if (--ewk_tile_cache_ref_count == 0)
      ewk_tile_cache = NULL;
+}
+
+void _directional_pre_render_mobile(Evas_Object* obj, int dx, int dy)
+{
+   INTERNAL_ENTRY;
+
+   if (!sd->ewk_view_frame_main_get)
+     sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+   if (!sd->ewk_frame_visible_content_geometry_get)
+     sd->ewk_frame_visible_content_geometry_get = (Eina_Bool (*)(const Evas_Object *, Eina_Bool, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_visible_content_geometry_get");
+
+   int x, y, w, h;
+
+   sd->ewk_frame_visible_content_geometry_get(sd->ewk_view_frame_main_get(obj), false, &x, &y, &w, &h);
+   DBG("visible content: (%d, %d, %d, %d)", x, y, w, h);
+
+   // cancel the previously scheduled pre-rendering
+   // This makes sense especilaly for zooming operation - when user
+   // finishes zooming, and pre-render for the previous zoom was
+   // not finished, it doesn't make sense to continue pre-rendering for the previous zoom
+   if (!sd->ewk_view_pre_render_cancel)
+     sd->ewk_view_pre_render_cancel = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_pre_render_cancel");
+   sd->ewk_view_pre_render_cancel(obj);
+
+   if (!sd->ewk_view_pre_render_region)
+     sd->ewk_view_pre_render_region = (Eina_Bool (*)(Evas_Object *, Evas_Coord, Evas_Coord, Evas_Coord, Evas_Coord, float))dlsym(ewk_handle, "ewk_view_pre_render_region");
+
+   int content_w = 0;
+   int content_h = 0;
+
+   if (!sd->ewk_frame_contents_size_get)
+     sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
+   sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(obj), &content_w, &content_h);
+
+   if (!sd->ewk_view_zoom_get)
+     sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
+   float zoom = sd->ewk_view_zoom_get(obj);
+  
+   if (!sd->ewk_view_tiled_unused_cache_get)
+     sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache (*)(const Evas_Object* o))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
+   Ewk_Tile_Unused_Cache* tuc = sd->ewk_view_tiled_unused_cache_get(obj);
+
+   if (!sd->ewk_tile_unused_cache_used_get)
+     sd->ewk_tile_unused_cache_used_get = (size_t (*)(const Ewk_Tile_Unused_Cache* tuc))dlsym(ewk_handle, "ewk_tile_unused_cache_used_get");
+   int used = sd->ewk_tile_unused_cache_used_get(tuc);
+
+   if (!sd->ewk_tile_unused_cache_max_get)
+     sd->ewk_tile_unused_cache_max_get = (size_t (*)(const Ewk_Tile_Unused_Cache* tuc))dlsym(ewk_handle, "ewk_tile_unused_cache_max_get");
+   int max = sd->ewk_tile_unused_cache_max_get(tuc);
+
+   const int step = 160;
+   int render_levels_max = (max - used) / (step * content_w * 4);
+   DBG("Render levels max: %d\n", render_levels_max);
+   
+   const int opposite_render_levels = 4;
+   const int opposite_direction_level = 2;  
+
+   if (dy >= 0) {
+       int tmp_p_y = y - step;
+       int p_y = y + h;
+       int counter = 0;
+
+       while(render_levels_max > 0 && p_y <= content_h) { 
+            sd->ewk_view_pre_render_region(obj, x, p_y, content_w, step, zoom);
+            DBG("prerendering, down: x = %d, y = %d, w = %d, h = %d\n", x, p_y, content_w, step);
+            render_levels_max--;
+            p_y += step;
+            if ((counter + 1) % opposite_render_levels == 0) {
+                if (y > 0) {
+                    int counter_opposite = 0;
+                    while(counter_opposite++ < opposite_direction_level && tmp_p_y >= 0) {
+                        sd->ewk_view_pre_render_region(obj, x, tmp_p_y, content_w, step, zoom);
+                        DBG("prerendering opposite, up: x = %d, y = %d, w = %d, h = %d\n", x, tmp_p_y, content_w, step);
+                        tmp_p_y -= step;
+                        render_levels_max--;
+                    }  
+                }
+           }
+           counter++;
+      }
+  } else {
+      int p_y = y - step;
+      int tmp_p_y = y + h;
+      int counter = 0;
+
+      while(render_levels_max > 0 && p_y >= 0) {
+        sd->ewk_view_pre_render_region(obj, x, p_y, content_w, step, zoom);
+        DBG("prerendering, up: x = %d, y = %d, w = %d, h = %d\n", x, p_y, content_w, step);
+        render_levels_max--;
+        p_y -= step;
+        if ((counter + 1) % opposite_render_levels == 0) {
+            int counter_opposite = 0;
+            while(counter_opposite++ < opposite_direction_level && tmp_p_y <= content_h) {
+                sd->ewk_view_pre_render_region(obj, x, tmp_p_y, content_w, step, zoom);
+                DBG("prerendering opposite, down: x = %d, y = %d, w = %d, h = %d\n", x, tmp_p_y, content_w, step);
+                tmp_p_y += step;
+                render_levels_max--;
+            }
+        }
+        counter++;
+      }
+   }
 }
 
 static void
@@ -2185,8 +2294,10 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	       sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
 	     sd->ewk_tile_unused_cache_auto_flush(tuc);
 	  }
-	_directional_pre_render(webview,
-	      (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
+    if (sd->is_mobile_page)
+      _directional_pre_render_mobile(webview, (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
+    else
+	  _directional_pre_render(webview, (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
      }
 #ifdef BOUNCING_SUPPORT
    _elm_smart_webview_container_mouse_up(sd->container);
