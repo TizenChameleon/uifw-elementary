@@ -346,7 +346,7 @@ static void      _zoom_start(Smart_Data* sd, int centerX, int centerY, int dista
 static void      _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance);
 static void      _zoom_stop(Smart_Data* sd);
 static void      _adjust_to_contents_boundary(Evas_Object* webview, int* to_x, int* to_y, int from_x, int from_y, float new_zoom_rate);
-static int       _smart_zoom_animator(void* data);
+static Eina_Bool _smart_zoom_animator(void* data);
 static void      _smart_cb_pinch_zoom_start(void* data, Evas_Object* webview, void* event_info);
 static void      _smart_cb_pinch_zoom_move(void* data, Evas_Object* webview, void* event_info);
 static void      _smart_cb_pinch_zoom_stop(void* data, Evas_Object* webview, void* event_info);
@@ -676,7 +676,7 @@ _elm_smart_webview_container_set(Evas_Object *obj, Evas_Object *container)
 }
 #endif
 
-int
+Eina_Bool
 _flush_and_pre_render(void *data)
 {
    Evas_Object *obj = (Evas_Object *)data;
@@ -2652,7 +2652,7 @@ _adjust_to_contents_boundary(Evas_Object* obj, int* to_x, int* to_y,
      (*to_y) += (screen_bottom - contents_bottom);
 }
 
-static int
+static Eina_Bool
 _smart_zoom_animator(void* data)
 {
    Smart_Data* sd = (Smart_Data*)data;
