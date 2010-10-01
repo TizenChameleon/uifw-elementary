@@ -138,6 +138,24 @@ elm_webview_webkit_get(Evas_Object *obj)
    return wd->webkit;
 }
 
+/**
+ * Set layout width to container geometry
+ *
+ * After setting this webview's layout width will be set to container
+ * that contains this webview. After resizing layout width will be updated.
+ *
+ * @param [in]  obj The WebView object
+ *
+ * @ingroup WebView
+ */
+EAPI void
+elm_webview_layout_width_set_to_container(Evas_Object *obj)
+{
+    Widget_Data *wd = elm_widget_data_get(obj);
+    if (!wd) return;
+        _elm_smart_webview_layout_width_set_to_container(wd->webkit);
+}
+
 EAPI void
 elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed)
 {

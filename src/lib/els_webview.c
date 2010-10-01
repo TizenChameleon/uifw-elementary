@@ -278,6 +278,8 @@ struct _Smart_Data {
      Eina_Bool on_zooming;
      Eina_Bool is_mobile_page;
 
+     Eina_Bool is_layout_width_set_to_container;
+
      Eina_Bool use_text_selection;
      Eina_Bool text_selection_on;
      struct {
@@ -504,6 +506,13 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
      }
 
    return webview;
+}
+
+void
+_elm_smart_webview_layout_width_set_to_container(Evas_Object *obj)
+{
+    API_ENTRY return;
+    sd->is_layout_width_set_to_container = EINA_TRUE;
 }
 
 void
@@ -734,6 +743,9 @@ _resize_calc_job(void *data)
 
    int object_w, object_h;
    evas_object_geometry_get(obj, NULL, NULL, &object_w, &object_h);
+   if(sd->is_layout_width_set_to_container)
+       _elm_smart_webview_default_layout_width_set(obj, object_w);
+
    object_w = (object_w % 10) ? (object_w / 10 * 10 + 10) : object_w;
 
    if (sd->is_mobile_page)
@@ -1449,6 +1461,7 @@ _smart_add(Evas_Object* obj)
    sd->use_text_selection = EINA_FALSE;
    sd->text_selection_on = EINA_FALSE;
    sd->events_feed = EINA_FALSE;
+   sd->is_layout_width_set_to_container = EINA_FALSE;
    sd->touch_obj = _elm_smart_touch_add(evas_object_evas_get(obj));
    sd->layout.default_w = DEFAULT_LAYOUT_WIDTH;
    sd->zoom.init_zoom_rate = 1.0f;
