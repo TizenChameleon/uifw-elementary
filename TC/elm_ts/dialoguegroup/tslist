@@ -3,3 +3,5 @@
 /elm_ts/dialoguegroup/utc_UIFW_elm_dialoguegroup_prepend_func
 /elm_ts/dialoguegroup/utc_UIFW_elm_dialoguegroup_insert_after_func
 /elm_ts/dialoguegroup/utc_UIFW_elm_dialoguegroup_insert_before_func
+/elm_ts/dialoguegroup/utc_UIFW_elm_dialoguegroup_remove_func
+/elm_ts/dialoguegroup/utc_UIFW_elm_dialoguegroup_remove_all_func
