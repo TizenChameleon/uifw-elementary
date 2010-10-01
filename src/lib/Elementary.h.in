@@ -2804,6 +2804,7 @@ extern "C" {
    EAPI void         elm_webview_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
    EAPI void         elm_webview_scheme_callback_set(Evas_Object *obj, const char *scheme, Elm_WebView_Mime_Cb func);
    EAPI void         elm_webview_default_layout_width_set(Evas_Object *obj, int width);
+   EAPI void         elm_webview_layout_width_set_to_container(Evas_Object *obj);
 
    /* NoContents */
    EAPI Evas_Object *elm_nocontents_add(Evas_Object *parent);
