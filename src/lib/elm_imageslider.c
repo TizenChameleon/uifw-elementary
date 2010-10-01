@@ -313,6 +313,7 @@ static Evas_Object *_imageslider_add_obj(Widget_Data *wd)
 	eo = elm_layout_add(wd->obj);
 	elm_layout_theme_set(eo, "imageslider", "base", "default");
 	elm_widget_resize_object_set(wd->obj, eo);
+	edje_object_signal_callback_add(elm_layout_edje_get(eo), "elm,photo,clicked", "", _signal_clicked, wd->obj);
 //	evas_object_smart_member_add(eo, wd->obj);
 	evas_object_event_callback_add(eo, EVAS_CALLBACK_MOUSE_DOWN, ev_imageslider_down_cb, wd);
 	evas_object_event_callback_add(eo, EVAS_CALLBACK_MOUSE_UP, ev_imageslider_up_cb, wd);
