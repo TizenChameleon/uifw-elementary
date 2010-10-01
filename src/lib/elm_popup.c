@@ -922,8 +922,7 @@ elm_popup_run(Evas_Object *obj)
    int response_id=0;
    Ecore_Event_Handler *_elm_exit_handler = NULL;
    /*Finger waggle warning*/
-   /*_elm_dangerous_call_check(__FUNCTION__);*/
-   WRN("WARNING!! Dont use this function use response signal instead, this function is only for applications using java script engine");
+   _elm_dangerous_call_check(__FUNCTION__);
    evas_object_show(obj);
    evas_object_smart_callback_add(obj, "response", response_cb, &response_id);	
    _elm_exit_handler = ecore_event_handler_add(ECORE_EVENT_SIGNAL_EXIT, _elm_signal_exit, &response_id);
