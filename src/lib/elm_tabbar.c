@@ -347,7 +347,7 @@ static void set_evas_map(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coor
 	evas_map_free( map );
 }
 
-static int move_evas_map(void *data)
+static Eina_Bool move_evas_map(void *data)
 {
 	double t;
 	int dx, dy, dw, dh;
@@ -745,7 +745,7 @@ static void edit_item_return_cb (void *data, Evas_Object *obj)
 //printf("animation end : %d\n", wd->animating);
 }
 
-static int edit_item_move_cb(void *data, int type, void *event_info)
+static Eina_Bool edit_item_move_cb(void *data, int type, void *event_info)
 {
 	const Eina_List *l;
 	Elm_Tab_Item *item;
@@ -778,7 +778,7 @@ static int edit_item_move_cb(void *data, int type, void *event_info)
 	return EXIT_SUCCESS;
 }
 
-static int edit_item_up_cb(void *data, int type, void *event_info)
+static Eina_Bool edit_item_up_cb(void *data, int type, void *event_info)
 {
 	Ecore_Event_Mouse_Button *ev = event_info;
 	Evas_Coord x, y, w, h;
@@ -902,11 +902,11 @@ static void bar_item_move_end_cb (void *data, Evas_Object *obj)
 }
 
 
-static int bar_item_animation_end_check(void *data)
+static Eina_Bool bar_item_animation_end_check(void *data)
 {
 	const Eina_List *l;
 	Elm_Tab_Item *item;
-	Evas_Coord x, y, w, h;
+//	Evas_Coord x, y, w, h;
 	Widget_Data *wd = (Widget_Data *)data;
 
 
@@ -937,7 +937,7 @@ static int bar_item_animation_end_check(void *data)
 	return EXIT_SUCCESS;
 }
 
-static int bar_item_move_cb(void *data, int type, void *event_info)
+static Eina_Bool bar_item_move_cb(void *data, int type, void *event_info)
 {
 	const Eina_List *l;
 	Elm_Tab_Item *item, *it;
@@ -985,7 +985,7 @@ static int bar_item_move_cb(void *data, int type, void *event_info)
 	return EXIT_SUCCESS;
 }
 
-static int bar_item_up_cb(void *data, int type, void *event_info)
+static Eina_Bool bar_item_up_cb(void *data, int type, void *event_info)
 {
 	Evas_Coord tx, x, y, w, h;
 	Ecore_Event_Mouse_Button *ev = event_info;
@@ -1048,7 +1048,7 @@ EAPI Evas_Object *elm_tabbar_add(Evas_Object *parent) {
 	Evas_Object *obj = NULL;
 	Widget_Data *wd = NULL;
 	Evas_Coord x, y, w, h;
-	Evas_Object *navi_item, *r_button;
+	Evas_Object *r_button;
 
 	wd = ELM_NEW(Widget_Data);
 	wd->evas = evas_object_evas_get(parent);

@@ -86,13 +86,13 @@ _close_btn_click_cb(void *data, Evas_Object *obj, const char *emission,
 static void
 _bg_click_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
-static int
+static Eina_Bool
 _show_button_animator_cb(void *data);
-static int
+static Eina_Bool
 _hide_button_animator_cb(void *data);
-static int
+static Eina_Bool
 _panel_up_animator_cb(void *data);
-static int
+static Eina_Bool
 _panel_down_animator_cb(void *data);
 
 /*
@@ -306,7 +306,7 @@ _sizing_eval(Evas_Object *obj)
    _softkey_object_resize(obj, NULL, obj, NULL);
 }
 
-static int
+static Eina_Bool
 _panel_up_animator_cb(void *data)
 {
    int max = PANEL_ANIMATOR_MAX;
@@ -341,7 +341,7 @@ _panel_up_animator_cb(void *data)
    return 1;
 }
 
-static int
+static Eina_Bool
 _panel_down_animator_cb(void *data)
 {
    int max = PANEL_ANIMATOR_MAX;
@@ -380,7 +380,7 @@ _panel_down_animator_cb(void *data)
    return 1;
 }
 
-static int
+static Eina_Bool
 _hide_button_animator_cb(void *data)
 {
    int max = BTN_ANIMATOR_MAX;
@@ -427,7 +427,7 @@ _hide_button_animator_cb(void *data)
    return 1;
 }
 
-static int
+static Eina_Bool
 _show_button_animator_cb(void *data)
 {
    int max = BTN_ANIMATOR_MAX;
