@@ -1156,7 +1156,7 @@ static void edit_mode(void *data)
 }
 
 
-static int tab_timer_cb(void* data)
+static Eina_Bool tab_timer_cb(void* data)
 {
 	Widget_Data *wd = (Widget_Data *)data;
 
