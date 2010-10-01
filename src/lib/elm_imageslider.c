@@ -115,7 +115,7 @@ static void _del_hook(Evas_Object * obj)
 	Widget_Data * wd;
 	wd = elm_widget_data_get(obj);
 	
-	fprintf( stderr, "Call imageslider del hook!\n" );
+	//fprintf( stderr, "Call imageslider del hook!\n" );
 	
 	if (!wd) return;
 
@@ -412,7 +412,7 @@ static void ev_imageslider_down_cb(void * data, Evas * e, Evas_Object * obj, voi
 //		edje_thaw();		
 	}
 
-	fprintf( stderr, "-- down! --\n" );
+	//fprintf( stderr, "-- down! --\n" );
 
 }
 
@@ -441,7 +441,7 @@ static void ev_imageslider_up_cb(void * data, Evas * e, Evas_Object * obj, void 
 		}
 	}
 
-	fprintf( stderr, "-- up! --\n" );
+	//fprintf( stderr, "-- up! --\n" );
 
 }
 
