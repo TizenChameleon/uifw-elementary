@@ -79,8 +79,9 @@ struct _Widget_Data
 	int ratio;
 };
 
-
 static const char *widtype = NULL;
+static const char SIG_CLICKED[] = "clicked";
+
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
@@ -102,9 +103,11 @@ static int _check_drag(int state, void *data);
 static void _check_zoom(void *data);
 static void _anim(Widget_Data *wd);
 static int _timer_cb(void *data);
+static void _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void ev_imageslider_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void ev_imageslider_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void ev_imageslider_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
+
 
 static void _del_hook(Evas_Object * obj)
 {
@@ -409,7 +412,7 @@ static void ev_imageslider_down_cb(void * data, Evas * e, Evas_Object * obj, voi
 //		edje_thaw();		
 	}
 
-	fprintf( stderr, "down!\n" );
+	fprintf( stderr, "-- down! --\n" );
 
 }
 
@@ -437,6 +440,8 @@ static void ev_imageslider_up_cb(void * data, Evas * e, Evas_Object * obj, void 
 			else _imageslider_obj_move(wd, step);
 		}
 	}
+
+	fprintf( stderr, "-- up! --\n" );
 
 }
 
@@ -492,6 +497,13 @@ static void ev_imageslider_move_cb(void * data, Evas * e, Evas_Object * obj, voi
 
 }
 
+
+static void
+_signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+	//fprintf(stderr, "[[[ DEBUG ]]]: (EFL) SIGNAL CLICKED!!\n");
+	evas_object_smart_callback_call(data, SIG_CLICKED, NULL);	
+}
 
 #if 0 // REMOVED about Multi-touch.
 static void ev_imageslider_multi_down_cb(void * data, Evas * e, Evas_Object * obj, void * event_info)
@@ -839,6 +851,9 @@ elm_imageslider_add(Evas_Object * parent)
 		elm_layout_theme_set(wd->ly[i], "imageslider", "base", "default");
 		elm_widget_resize_object_set(obj, wd->ly[i]);
 		evas_object_smart_member_add(wd->ly[i], obj);
+		
+		edje_object_signal_callback_add(elm_layout_edje_get(wd->ly[i]), "elm,photo,clicked", "", _signal_clicked, obj);
+		
 		evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_DOWN, ev_imageslider_down_cb, wd);
 		evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_UP, ev_imageslider_up_cb, wd);
 		evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_MOVE, ev_imageslider_move_cb, wd);
