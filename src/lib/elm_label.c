@@ -21,6 +21,7 @@ struct _Widget_Data
    Evas_Coord wrap_w;
    Evas_Coord wrap_h;
    Eina_Bool linewrap : 1;
+   Eina_Bool wrapmode : 1;
    Eina_Bool changed : 1;
    Eina_Bool bgcolor : 1;
    Eina_Bool ellipsis : 1;
@@ -82,10 +83,11 @@ _del_hook(Evas_Object *obj)
 }
 
 static void
-_theme_hook(Evas_Object *obj)
+_theme_change(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+
    if (wd->linewrap)
      {
        if (wd->ellipsis)
@@ -95,6 +97,15 @@ _theme_hook(Evas_Object *obj)
      }
    else
      _elm_theme_object_set(obj, wd->lbl, "label", "base", elm_widget_style_get(obj));
+
+}
+
+static void
+_theme_hook(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _theme_change(obj);
    edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    edje_object_scale_set(wd->lbl, elm_widget_scale_get(obj) * 
                          _elm_config->scale);
@@ -344,8 +355,7 @@ _is_width_over(Evas_Object *obj, int linemode)
 			   edje_object_size_min_calc(wd->lbl, &minw, &minh);
 
 			   if (minw < wd->wrap_w)
-			   {
-				   //fprintf(stderr, "## min insufficient\n");
+			   { // min insufficient
 				   return 0;
 			   }
 			   else
@@ -454,6 +464,26 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
    _sizing_eval(obj);
 }
 
+/*
+ * setting internal state of mulitline entry
+ * singleline doesn't need it
+ */
+
+void _label_state_change(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (wd->linewrap)
+   {
+	   if (wd->wrapmode)
+		   edje_object_signal_emit(wd->lbl, "elm,state,wordwrap", "elm");
+	   else
+		   edje_object_signal_emit(wd->lbl, "elm,state,default", "elm");
+   }
+}
+
+
 /**
  * Add a new label to the parent
  *
@@ -485,6 +515,7 @@ elm_label_add(Evas_Object *parent)
    wd->linewrap = EINA_FALSE;
    wd->bgcolor = EINA_FALSE;
    wd->ellipsis = EINA_FALSE;
+   wd->wrapmode = EINA_FALSE;
    wd->wrap_w = 0;
    wd->wrap_h = 0;
 
@@ -555,15 +586,7 @@ elm_label_line_wrap_set(Evas_Object *obj, Eina_Bool wrap)
    if (wd->linewrap == wrap) return;
    wd->linewrap = wrap;
    t = eina_stringshare_add(elm_label_label_get(obj));
-   if (wd->linewrap)
-     {
-       if (wd->ellipsis)
-         _elm_theme_object_set(obj, wd->lbl, "label", "base_wrap_ellipsis", elm_widget_style_get(obj));
-       else
-         _elm_theme_object_set(obj, wd->lbl, "label", "base_wrap", elm_widget_style_get(obj));
-     }
-   else
-     _elm_theme_object_set(obj, wd->lbl, "label", "base", elm_widget_style_get(obj));
+   _theme_change(obj);
    elm_label_label_set(obj, t);
    eina_stringshare_del(t);
    wd->changed = 1;
@@ -790,6 +813,26 @@ elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (wd->ellipsis == ellipsis) return;
    wd->ellipsis = ellipsis;
+   if (wd->linewrap) _theme_change(obj);
+   wd->changed = 1;
+   _sizing_eval(obj);
+}
+
+/**
+ * Set the wrapmode of the label
+ *
+ * @param obj The label object
+ * @param wrapmode 0 is charwrap, 1 is wordwrap
+ * @ingroup Label
+ */
+EAPI void
+elm_label_wrap_mode_set(Evas_Object *obj, Eina_Bool wrapmode)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (wd->wrapmode == wrapmode) return;
+   wd->wrapmode = wrapmode;
+   _label_state_change(obj);
    wd->changed = 1;
    _sizing_eval(obj);
 }
