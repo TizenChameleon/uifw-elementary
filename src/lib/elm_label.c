@@ -336,7 +336,24 @@ _is_width_over(Evas_Object *obj, int linemode)
 
    if (linemode == 0) // single line
      {
-       if (x >= 0 && y >= 0) return 0;
+       if ((x >= 0) && (y >= 0))
+	   {
+		   if ((wd->wrap_w > 0) && (wd->wrap_w < w))
+		   {
+			   Evas_Coord minw, minh;
+			   edje_object_size_min_calc(wd->lbl, &minw, &minh);
+
+			   if (minw < wd->wrap_w)
+			   {
+				   //fprintf(stderr, "## min insufficient\n");
+				   return 0;
+			   }
+			   else
+				   return 1;
+		   }
+		   else
+			   return 0;
+	   }
 
        if (ellen < wd->wrap_w && w > wd->wrap_w) return 1;
      }
@@ -582,7 +599,9 @@ elm_label_wrap_width_set(Evas_Object *obj, Evas_Coord w)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   if (w < 0) w = 0;
    if (wd->wrap_w == w) return;
+   if (wd->ellipsis) edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    wd->wrap_w = w;
    _sizing_eval(obj);
 }
@@ -616,7 +635,9 @@ elm_label_wrap_height_set(Evas_Object *obj, Evas_Coord h)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   if (h < 0) h = 0;
    if (wd->wrap_h == h) return;
+   if (wd->ellipsis) edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    wd->wrap_h = h;
    _sizing_eval(obj);
 }

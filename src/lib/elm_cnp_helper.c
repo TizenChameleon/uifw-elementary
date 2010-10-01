@@ -20,7 +20,7 @@
 
 # define ARRAYINIT(foo)  [foo]=
 
-#define DEBUGON	1
+#define DEBUGON	0
 
 #if DEBUGON
 #define cnp_debug(x...) printf(__FILE__": " x)
@@ -82,6 +82,7 @@ static const struct escapes {
    const char value;
 } escapes[] = {
    { "<br>",	'\n' },
+   { "<ps>",	'\n' },
    { "<\t>",	'\t' },
    { "gt;",	'>' },
    { "lt;",	'<' },
@@ -642,6 +643,8 @@ notify_handler_text(struct _elm_cnp_selection *sel,
    data = notify->data;
    cnp_debug("Notify handler text %d %d %p\n",data->format,data->length,data->data);
    str = mark_up((char*)data->data, NULL);
+   // FIXME: should it be cutted to fit length??
+//   str[data->length] = '\0';
    cnp_debug("String is %s (from %s)\n",str,data->data);
    elm_entry_entry_insert(sel->requestwidget, str);
    free(str);
@@ -797,6 +800,9 @@ text_converter(char *target __UNUSED__, void *data, int size __UNUSED__,
 
    if (sel->format == ELM_SEL_FORMAT_MARKUP){
 	*data_ret = remove_tags(sel->selbuf, size_ret);
+   } else if (sel->format == ELM_SEL_FORMAT_TEXT){
+        *data_ret = strdup(sel->selbuf);
+        *size_ret = strlen(sel->selbuf);
    } else if (sel->format == ELM_SEL_FORMAT_IMAGE){
 	cnp_debug("Image %s\n",evas_object_type_get(sel->widget));
 	cnp_debug("Elm type: %s\n",elm_object_widget_type_get(sel->widget));
@@ -855,7 +861,7 @@ uri_converter(char *target __UNUSED__, void *data, int size __UNUSED__,
  * Image paste provide
  */
 
-/* FIXME: Should add provider for each pated item: Use data to store it
+/* FIXME: Should add provider for each pasted item: Use data to store it
  * much easier */
 static Evas_Object *
 image_provider(void *images __UNUSED__, Evas_Object *entry, const char *item)
@@ -1155,7 +1161,7 @@ _dnd_drop(void *data, int etype, void *ev)
    savedtypes.x = drop->position.x - x;
    savedtypes.y = drop->position.y - y;
 
-   printf("Drop position is %d,%d\n",savedtypes.x,savedtypes.y);
+   cnp_debug("Drop position is %d,%d\n",savedtypes.x,savedtypes.y);
 
    for ( ; l ; l = l->next)
      {

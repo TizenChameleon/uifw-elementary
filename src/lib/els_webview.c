@@ -325,9 +325,11 @@ static void      _smart_page_layout_info_set(Smart_Data *sd, float init_zoom_rat
 static void      _smart_contents_size_changed(void* data, Evas_Object* frame, void* arg);
 static void      _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg);
 static void      _smart_cb_view_created(void* data, Evas_Object* webview, void* arg);
+static void      _smart_cb_zoom_set(void* data, Evas_Object* webview, void* arg);
 static void      _smart_add(Evas_Object* obj);
 static void      _smart_del(Evas_Object* o);
 static void      _directional_pre_render(Evas_Object* webview, int dx, int dy);
+static void      _directional_pre_render_mobile(Evas_Object* obj, int dx, int dy);
 static void      _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_mouse_up(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev);
@@ -680,7 +682,10 @@ _flush_and_pre_render(void *data)
 
    Ewk_Tile_Unused_Cache *tuc = sd->ewk_view_tiled_unused_cache_get(obj);
    sd->ewk_tile_unused_cache_flush(tuc, sd->ewk_tile_unused_cache_used_get(tuc));
-   _directional_pre_render(obj, 0, 0);
+   if (sd->is_mobile_page)
+     _directional_pre_render_mobile(obj, 0, 0);
+   else
+     _directional_pre_render(obj, 0, 0);
 
    sd->flush_and_pre_render_idler = NULL;
 
@@ -809,7 +814,6 @@ _smart_mouse_down(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Down* ev)
 
    if (sd->events_feed)
      {
-	_suspend_all(sd, EINA_FALSE);
 	sd->mouse_clicked = EINA_TRUE;
 	return _parent_sc.mouse_down(esd, ev);
      }
@@ -825,7 +829,6 @@ _smart_mouse_up(Ewk_View_Smart_Data *esd, const Evas_Event_Mouse_Up* ev)
 
    if (sd->events_feed)
      {
-	_resume_all(sd, EINA_FALSE);
 	//check if user hold touch
 	if (ev && (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD))
 	  {
@@ -1009,14 +1012,19 @@ _smart_load_started(void* data, Evas_Object* webview, void* error)
 
    if (!sd->ewk_view_user_scalable_set)
      sd->ewk_view_user_scalable_set = (void (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_user_scalable_set");
+   if (!sd->ewk_view_zoom_range_set)
+     sd->ewk_view_zoom_range_set = (Eina_Bool (*)(Evas_Object *, float, float))dlsym(ewk_handle, "ewk_view_zoom_range_set");
 
    // set default layout and zoom level
    sd->is_mobile_page = EINA_FALSE;
    sd->layout.w = -1;
    sd->layout.h = -1;
    sd->zoom.init_zoom_rate = 1.0f;
+   sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
+   sd->zoom.max_zoom_rate = MAX_ZOOM_RATIO;
    sd->zoom.scalable = EINA_TRUE;
    sd->ewk_view_user_scalable_set(webview, EINA_TRUE);
+   sd->ewk_view_zoom_range_set(webview, MIN_ZOOM_RATIO, MAX_ZOOM_RATIO);
 }
 
 static void
@@ -1052,9 +1060,6 @@ _smart_load_finished(void* data, Evas_Object* webview, void* arg)
 	sd->cairo_surface_destroy(sd->thumbnail);
      }
    sd->thumbnail = _image_clone_get(sd, &(sd->minimap.cw), &(sd->minimap.ch));
-
-   if (sd->tiled)
-     _directional_pre_render(sd->base.self, 0, 0);
 
    if (sd->minimap.eo != NULL)
      {
@@ -1353,8 +1358,8 @@ _smart_load_nonemptylayout_finished(void* data, Evas_Object* frame, void* arg)
 	sd->ewk_frame_contents_size_get(frame, &content_w, NULL);
 
 	const char *url = sd->ewk_view_uri_get(webview);
-	if ((content_w > sd->layout.w && !strstr(url, "docs.google.com"))
-	      || strstr(url, "maps.google.com/maps/m"))
+	if (url && ((content_w > sd->layout.w && !strstr(url, "docs.google.com"))
+	      || strstr(url, "maps.google.com/maps/m")))
 	  {
 	     // set page layout info, zoom and layout again
 	     _smart_page_layout_info_set(sd, 1.0f, sd->zoom.min_zoom_rate, sd->zoom.max_zoom_rate, sd->zoom.scalable);
@@ -1401,6 +1406,30 @@ _smart_cb_view_created(void* data, Evas_Object* webview, void* arg)
 }
 
 static void
+_smart_cb_zoom_set(void* data, Evas_Object* webview, void* arg)
+{
+   printf("%s is called\n", __func__);
+   Smart_Data* sd = (Smart_Data *)data;
+   if (!sd) return;
+
+   _resume_all(sd, EINA_TRUE);
+
+   if (sd->tiled)
+     {
+	if (!sd->ewk_view_tiled_unused_cache_get)
+	  sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
+	Ewk_Tile_Unused_Cache* ewk_tile_cache = sd->ewk_view_tiled_unused_cache_get(sd->base.self);
+	if (!sd->ewk_tile_unused_cache_auto_flush)
+	  sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
+	sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
+    if (sd->is_mobile_page)
+      _directional_pre_render_mobile(sd->base.self, 0, 0);
+    else
+	  _directional_pre_render(sd->base.self, 0, 0);
+     }
+}
+
+static void
 _smart_add(Evas_Object* obj)
 {
    DBG("%s\n", __func__);
@@ -1422,6 +1451,10 @@ _smart_add(Evas_Object* obj)
    sd->events_feed = EINA_FALSE;
    sd->touch_obj = _elm_smart_touch_add(evas_object_evas_get(obj));
    sd->layout.default_w = DEFAULT_LAYOUT_WIDTH;
+   sd->zoom.init_zoom_rate = 1.0f;
+   sd->zoom.min_zoom_rate = MIN_ZOOM_RATIO;
+   sd->zoom.max_zoom_rate = MAX_ZOOM_RATIO;
+   sd->zoom.scalable = EINA_TRUE;
 
    sd->ewk_view_theme_set = (void (*)(Evas_Object *, const char *))dlsym(ewk_handle, "ewk_view_theme_set");
    sd->ewk_view_theme_set(obj, WEBKIT_EDJ);
@@ -1450,6 +1483,7 @@ _smart_add(Evas_Object* obj)
    evas_object_smart_callback_add(obj, "inputmethod,changed", _smart_input_method_changed, sd);
 
    evas_object_smart_callback_add(obj, "webview,created", _smart_cb_view_created, sd); // I need to consider more
+   evas_object_smart_callback_add(obj, "zoom,set", _smart_cb_zoom_set, sd);
 
    if (!(sd->ewk_view_frame_main_get))
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
@@ -1499,6 +1533,108 @@ _smart_del(Evas_Object* obj)
 
    if (--ewk_tile_cache_ref_count == 0)
      ewk_tile_cache = NULL;
+}
+
+void _directional_pre_render_mobile(Evas_Object* obj, int dx, int dy)
+{
+   INTERNAL_ENTRY;
+
+   if (!sd->ewk_view_frame_main_get)
+     sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+   if (!sd->ewk_frame_visible_content_geometry_get)
+     sd->ewk_frame_visible_content_geometry_get = (Eina_Bool (*)(const Evas_Object *, Eina_Bool, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_visible_content_geometry_get");
+
+   int x, y, w, h;
+
+   sd->ewk_frame_visible_content_geometry_get(sd->ewk_view_frame_main_get(obj), false, &x, &y, &w, &h);
+   DBG("visible content: (%d, %d, %d, %d)", x, y, w, h);
+
+   // cancel the previously scheduled pre-rendering
+   // This makes sense especilaly for zooming operation - when user
+   // finishes zooming, and pre-render for the previous zoom was
+   // not finished, it doesn't make sense to continue pre-rendering for the previous zoom
+   if (!sd->ewk_view_pre_render_cancel)
+     sd->ewk_view_pre_render_cancel = (void (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_pre_render_cancel");
+   sd->ewk_view_pre_render_cancel(obj);
+
+   if (!sd->ewk_view_pre_render_region)
+     sd->ewk_view_pre_render_region = (Eina_Bool (*)(Evas_Object *, Evas_Coord, Evas_Coord, Evas_Coord, Evas_Coord, float))dlsym(ewk_handle, "ewk_view_pre_render_region");
+
+   int content_w = 0;
+   int content_h = 0;
+
+   if (!sd->ewk_frame_contents_size_get)
+     sd->ewk_frame_contents_size_get = (Eina_Bool (*)(const Evas_Object *, Evas_Coord *, Evas_Coord *))dlsym(ewk_handle, "ewk_frame_contents_size_get");
+   sd->ewk_frame_contents_size_get(sd->ewk_view_frame_main_get(obj), &content_w, &content_h);
+
+   if (!sd->ewk_view_zoom_get)
+     sd->ewk_view_zoom_get = (float (*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_zoom_get");
+   float zoom = sd->ewk_view_zoom_get(obj);
+  
+   if (!sd->ewk_view_tiled_unused_cache_get)
+     sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache (*)(const Evas_Object* o))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
+   Ewk_Tile_Unused_Cache* tuc = sd->ewk_view_tiled_unused_cache_get(obj);
+
+   if (!sd->ewk_tile_unused_cache_used_get)
+     sd->ewk_tile_unused_cache_used_get = (size_t (*)(const Ewk_Tile_Unused_Cache* tuc))dlsym(ewk_handle, "ewk_tile_unused_cache_used_get");
+   int used = sd->ewk_tile_unused_cache_used_get(tuc);
+
+   if (!sd->ewk_tile_unused_cache_max_get)
+     sd->ewk_tile_unused_cache_max_get = (size_t (*)(const Ewk_Tile_Unused_Cache* tuc))dlsym(ewk_handle, "ewk_tile_unused_cache_max_get");
+   int max = sd->ewk_tile_unused_cache_max_get(tuc);
+
+   const int step = 160;
+   int render_levels_max = (max - used) / (step * content_w * 4);
+   DBG("Render levels max: %d\n", render_levels_max);
+   
+   const int opposite_render_levels = 4;
+   const int opposite_direction_level = 2;  
+
+   if (dy >= 0) {
+       int tmp_p_y = y - step;
+       int p_y = y + h;
+       int counter = 0;
+
+       while(render_levels_max > 0 && p_y <= content_h) { 
+            sd->ewk_view_pre_render_region(obj, x, p_y, content_w, step, zoom);
+            DBG("prerendering, down: x = %d, y = %d, w = %d, h = %d\n", x, p_y, content_w, step);
+            render_levels_max--;
+            p_y += step;
+            if ((counter + 1) % opposite_render_levels == 0) {
+                if (y > 0) {
+                    int counter_opposite = 0;
+                    while(counter_opposite++ < opposite_direction_level && tmp_p_y >= 0) {
+                        sd->ewk_view_pre_render_region(obj, x, tmp_p_y, content_w, step, zoom);
+                        DBG("prerendering opposite, up: x = %d, y = %d, w = %d, h = %d\n", x, tmp_p_y, content_w, step);
+                        tmp_p_y -= step;
+                        render_levels_max--;
+                    }  
+                }
+           }
+           counter++;
+      }
+  } else {
+      int p_y = y - step;
+      int tmp_p_y = y + h;
+      int counter = 0;
+
+      while(render_levels_max > 0 && p_y >= 0) {
+        sd->ewk_view_pre_render_region(obj, x, p_y, content_w, step, zoom);
+        DBG("prerendering, up: x = %d, y = %d, w = %d, h = %d\n", x, p_y, content_w, step);
+        render_levels_max--;
+        p_y -= step;
+        if ((counter + 1) % opposite_render_levels == 0) {
+            int counter_opposite = 0;
+            while(counter_opposite++ < opposite_direction_level && tmp_p_y <= content_h) {
+                sd->ewk_view_pre_render_region(obj, x, tmp_p_y, content_w, step, zoom);
+                DBG("prerendering opposite, down: x = %d, y = %d, w = %d, h = %d\n", x, tmp_p_y, content_w, step);
+                tmp_p_y += step;
+                render_levels_max--;
+            }
+        }
+        counter++;
+      }
+   }
 }
 
 static void
@@ -1776,6 +1912,28 @@ _smart_cb_mouse_up(void* data, Evas_Object* webview, void* ev)
 
    Evas_Point* point = (Evas_Point*)ev;
    DBG(" argument : (%d, %d)\n", point->x, point->y);
+
+   // if the target is flash, we send mouse up event to webkit
+   int ewk_x, ewk_y;
+   _coords_evas_to_ewk(webview, point->x, point->y, &ewk_x, &ewk_y);
+   Eina_Bool have_link = EINA_FALSE;
+   Eina_Bool have_image = EINA_FALSE;
+   Eina_Bool have_flash = EINA_FALSE;
+   char *link_url = NULL, *link_text = NULL, *image_url = NULL;
+   if (!sd->ewk_page_check_point)
+     sd->ewk_page_check_point = (Eina_Bool (*)(Evas_Object *, int, int, Evas_Event_Mouse_Down *, Eina_Bool *, Eina_Bool *, Eina_Bool *, char **, char **, char **))dlsym(ewk_handle, "ewk_page_check_point");
+   sd->ewk_page_check_point(webview, ewk_x, ewk_y, &sd->mouse_down_copy,
+	 &have_link, &have_image, &have_flash, &link_url, &link_text, &image_url);
+   if (link_url) free(link_url);
+   if (link_text) free(link_text);
+   if (image_url) free(image_url);
+   if (have_flash)
+     {
+	Evas_Event_Mouse_Up mouse_up = sd->mouse_up_copy;
+	mouse_up.canvas.x = point->x;
+	mouse_up.canvas.y = point->y;
+	_parent_sc.mouse_up((Ewk_View_Smart_Data*)sd, &mouse_up);
+     }
 }
 
 static void
@@ -2136,8 +2294,10 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 	       sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
 	     sd->ewk_tile_unused_cache_auto_flush(tuc);
 	  }
-	_directional_pre_render(webview,
-	      (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
+    if (sd->is_mobile_page)
+      _directional_pre_render_mobile(webview, (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
+    else
+	  _directional_pre_render(webview, (sd->mouse_down_copy.canvas.x - point->x), (sd->mouse_down_copy.canvas.y - point->y));
      }
 #ifdef BOUNCING_SUPPORT
    _elm_smart_webview_container_mouse_up(sd->container);
@@ -2410,35 +2570,22 @@ _zoom_stop(Smart_Data* sd)
 	if (!sd->ewk_view_zoom_set)
 	  sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
 	sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set, sd->zoom.basis.x, sd->zoom.basis.y);
-     }
-   DBG("<< zoom set [%f] >>\n", sd->zoom.zooming_rate);
+	DBG("<< zoom set [%f] >>\n", sd->zoom.zooming_rate);
 
-   _resume_all(sd, EINA_TRUE);
-
-   if (sd->tiled)
-     {
-	if (!sd->ewk_view_tiled_unused_cache_get)
-	  sd->ewk_view_tiled_unused_cache_get = (Ewk_Tile_Unused_Cache *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_tiled_unused_cache_get");
-	Ewk_Tile_Unused_Cache* ewk_tile_cache = sd->ewk_view_tiled_unused_cache_get(sd->base.self);
-	if (!sd->ewk_tile_unused_cache_auto_flush)
-	  sd->ewk_tile_unused_cache_auto_flush = (void (*)(Ewk_Tile_Unused_Cache *))dlsym(ewk_handle, "ewk_tile_unused_cache_auto_flush");
-	sd->ewk_tile_unused_cache_auto_flush(ewk_tile_cache);
-	_directional_pre_render(sd->base.self, 0, 0);
-     }
-
-   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
-     {
-	if (!sd->ewk_view_frame_main_get)
-	  sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-	if (!sd->ewk_frame_selection_handlers_get)
-	  sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
-	int tx, ty, th, bx, by, bh;
-	sd->ewk_frame_selection_handlers_get(sd->ewk_view_frame_main_get(sd->base.self), &tx, &ty, &th, &bx, &by, &bh);
-	_coords_ewk_to_evas(sd->base.self, tx, ty, &tx, &ty);
-	_coords_ewk_to_evas(sd->base.self, bx, by, &bx, &by);
-	_text_selection_show();
-	_text_selection_set_front_info(sd, tx, ty, th);
-	_text_selection_set_back_info(sd, bx, by, bh);
+	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
+	  {
+	     if (!sd->ewk_view_frame_main_get)
+	       sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+	     if (!sd->ewk_frame_selection_handlers_get)
+	       sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
+	     int tx, ty, th, bx, by, bh;
+	     sd->ewk_frame_selection_handlers_get(sd->ewk_view_frame_main_get(sd->base.self), &tx, &ty, &th, &bx, &by, &bh);
+	     _coords_ewk_to_evas(sd->base.self, tx, ty, &tx, &ty);
+	     _coords_ewk_to_evas(sd->base.self, bx, by, &bx, &by);
+	     _text_selection_show();
+	     _text_selection_set_front_info(sd, tx, ty, th);
+	     _text_selection_set_back_info(sd, bx, by, bh);
+	  }
      }
 }
 
@@ -2516,8 +2663,6 @@ _smart_zoom_animator(void* data)
 	  }
 
 	_elm_smart_touch_start(sd->touch_obj);
-
-	_resume_all(sd, EINA_TRUE);
 
 	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
@@ -2633,7 +2778,7 @@ _smart_cb_pinch_zoom_stop(void* data, Evas_Object* webview, void* event_info)
    //DBG("%s\n", __func__);
    Smart_Data *sd = (Smart_Data *)data;
    if (!sd) return;
-   if (sd->events_block != EINA_TRUE) return;//FIXME
+   if (sd->events_block == EINA_TRUE) return;//FIXME
 
    _zoom_stop(sd);
    _minimap_update(sd->minimap.content, sd, sd->thumbnail, sd->minimap.cw, sd->minimap.ch);
@@ -2723,7 +2868,9 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    _coords_evas_to_ewk(webview, point->x, point->y, &ewk_x, &ewk_y);
    if (!sd->ewk_view_get_smart_zoom_rect)
      sd->ewk_view_get_smart_zoom_rect = (Eina_Bool (*)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *))dlsym(ewk_handle, "ewk_view_get_smart_zoom_rect");
-   sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect);
+   Eina_Bool do_smart_zoom = sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect);
+   if (!do_smart_zoom)
+       return;
 
    // calculate zoom_rate and center of rect
    int view_x, view_y, view_w, view_h;

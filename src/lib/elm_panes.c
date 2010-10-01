@@ -154,7 +154,7 @@ elm_panes_add(Evas_Object *parent)
    e = evas_object_evas_get(parent);
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "panes");
-   elm_widget_type_set(obj, "panes");
+   elm_widget_type_set(obj, widtype);
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
@@ -264,6 +264,56 @@ EAPI Evas_Object
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    return wd->contents.right;
+}
+
+/**
+ * Unset a control from a left/top content of the pane
+ *
+ * @param obj The pane object
+ * @return The content being unset
+ *
+ * @ingroup Panes
+ */
+EAPI Evas_Object *
+elm_panes_content_left_unset(Evas_Object *obj)
+{
+        ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+        Widget_Data *wd;
+        Evas_Object *content;
+
+        wd = elm_widget_data_get(obj);
+
+        content = edje_object_part_swallow_get(wd->panes, "elm.swallow.left");
+        if(!content) return NULL;
+        edje_object_part_unswallow(wd->panes, content);
+        elm_widget_sub_object_del(obj, content);
+        wd->contents.left = NULL;
+        return content;
+}
+
+/**
+ * Unset a control from a right/bottom content of the pane
+ *
+ * @param obj The pane object
+  * @return The content being unset
+ *
+ * @ingroup Panes
+ */
+EAPI Evas_Object *
+elm_panes_content_right_unset(Evas_Object *obj)
+{
+        ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+        Widget_Data *wd;
+        Evas_Object *content;
+
+        wd = elm_widget_data_get(obj);
+
+        content = edje_object_part_swallow_get(wd->panes, "elm.swallow.right");
+        if(!content) return NULL;
+        edje_object_part_unswallow(wd->panes, content);
+        elm_widget_sub_object_del(obj, content);
+        wd->contents.right = NULL;
+        return content;
 }
 
 /**

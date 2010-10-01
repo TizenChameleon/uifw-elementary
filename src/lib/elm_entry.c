@@ -130,6 +130,7 @@ struct _Widget_Data
    Eina_Bool selmode : 1;
    Eina_Bool deferred_cur : 1;
    Eina_Bool disabled : 1;
+   Eina_Bool double_clicked : 1;
    Eina_Bool context_menu : 1;
    Eina_Bool drag_selection_asked : 1;
    Eina_Bool bgcolor : 1;
@@ -659,6 +660,13 @@ _long_press(void *data)
    const Eina_List *l;
    const Elm_Entry_Context_Menu_Item *it;
    if (!wd) return ECORE_CALLBACK_CANCEL;
+
+   if (wd->longpress_timer)
+     {
+	ecore_timer_del(wd->longpress_timer);
+	wd->longpress_timer = NULL;
+     }	
+
    if ((wd->api) && (wd->api->obj_longpress))
      {
         wd->api->obj_longpress(data);
@@ -759,10 +767,14 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    Evas_Event_Mouse_Up *ev = event_info;
    if (!wd) return;
    if (ev->button != 1) return;
-   if ((wd->api) && (wd->api->obj_mouseup))
-     {
-	wd->api->obj_mouseup(data);
-     } 
+
+   if (!wd->double_clicked)
+   {
+	   if ((wd->api) && (wd->api->obj_mouseup))
+		 {
+		wd->api->obj_mouseup(data);
+		 }
+   }
    if (wd->longpress_timer)
      {
 	ecore_timer_del(wd->longpress_timer);
@@ -1110,6 +1122,7 @@ _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emi
 	if (entry != data) elm_entry_select_none(entry);
      }
    wd->have_selection = EINA_TRUE;
+   wd->selmode = EINA_TRUE;
    evas_object_smart_callback_call(data, SIG_SELECTION_START, NULL);
 #ifdef HAVE_ELEMENTARY_X
    if (wd->sel_notify_handler)
@@ -1130,6 +1143,7 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    wd->have_selection = EINA_TRUE;
+   wd->selmode = EINA_TRUE;
    evas_object_smart_callback_call(data, SIG_SELECTION_CHANGED, NULL);
    elm_selection_set(ELM_SEL_PRIMARY, obj, ELM_SEL_FORMAT_MARKUP,
 		   elm_entry_selection_get(data));
@@ -1142,6 +1156,7 @@ _signal_selection_cleared(void *data, Evas_Object *obj __UNUSED__, const char *e
    if (!wd) return;
    if (!wd->have_selection) return;
    wd->have_selection = EINA_FALSE;
+   wd->selmode = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_SELECTION_CLEARED, NULL);
    if (wd->sel_notify_handler)
      {
@@ -1334,6 +1349,7 @@ _signal_mouse_down(void *data, Evas_Object *obj __UNUSED__, const char *emission
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
+   wd->double_clicked = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_PRESS, NULL);
 }
 
@@ -1350,6 +1366,7 @@ _signal_mouse_double(void *data, Evas_Object *obj __UNUSED__, const char *emissi
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
+   wd->double_clicked = EINA_TRUE;
    evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, NULL);
 }
 
@@ -1438,7 +1455,7 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 		return ECORE_CALLBACK_PASS_ON;
 	}
 
-	elm_selection_get(1/*ELM_SEL_SECONDARY*/,0x1/*ELM_SEL_FORMAT_TEXT*/,data);
+	elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data);
 	// end for cbhm
    return ECORE_CALLBACK_PASS_ON;
 }
@@ -1453,13 +1470,13 @@ _drag_drop_cb(void *data __UNUSED__, Evas_Object *obj, Elm_Drop_Data *drop)
    wd = elm_widget_data_get(obj);
 
    if (!wd) return EINA_FALSE;
-printf("Inserting at (%d,%d) %s\n",drop->x,drop->y,(char*)drop->data);
+//printf("Inserting at (%d,%d) %s\n",drop->x,drop->y,(char*)drop->data);
 
    edje_object_part_text_cursor_copy(wd->ent, "elm.text",
                                      EDJE_CURSOR_MAIN,/*->*/EDJE_CURSOR_USER);
    rv = edje_object_part_text_cursor_coord_set(wd->ent,"elm.text",
                                           EDJE_CURSOR_MAIN,drop->x,drop->y);
-   if (!rv) printf("Warning: Failed to position cursor: paste anyway\n");
+//   if (!rv) printf("Warning: Failed to position cursor: paste anyway\n");
    elm_entry_entry_insert(obj, drop->data);
    edje_object_part_text_cursor_copy(wd->ent, "elm.text",
                                      EDJE_CURSOR_USER,/*->*/EDJE_CURSOR_MAIN);
@@ -2160,6 +2177,19 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    t = eina_stringshare_add(elm_entry_entry_get(obj));
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
+
+   if (password)
+     {
+        if (wd->autoperiod)
+          {
+             elm_entry_autoperiod_set(obj, EINA_FALSE);
+          }
+
+        if (wd->autocapitalize)
+          {
+             elm_entry_autocapitalization_set(obj, EINA_FALSE);
+          }
+     }
 
    ic = elm_entry_imf_context_get(obj);
    if (ic)

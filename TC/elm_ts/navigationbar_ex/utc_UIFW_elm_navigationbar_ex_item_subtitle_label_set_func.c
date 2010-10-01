@@ -27,7 +27,8 @@
 }
 
 
-Evas_Object *main_win;
+Evas_Object *main_win, *navi_ex;
+Elm_Navigationbar_ex_Item* item;
 
 static void startup(void);
 static void cleanup(void);
@@ -49,12 +50,26 @@ struct tet_testlist tet_testlist[] = {
 	{ NULL, 0 }
 };
 
+static void _quit_button_cb(void *data, Evas_Object *obj, void *event_info)
+{
+	cleanup();
+}
+
 static void startup(void)
 {
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
+	navi_ex = elm_navigationbar_ex_add(main_win);
+	evas_object_show(navi_ex);	
+	Evas_Object *btn = elm_button_add(navi_ex);
+	evas_object_show(btn);
+	item = elm_navigationbar_ex_item_push(navi_ex, btn, "topbar_back_1fn_2lines_facebook");
+	elm_navigationbar_ex_item_title_button_set(item, "button", NULL, ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1, NULL, NULL);
+	elm_navigationbar_ex_item_title_button_set(item, "button", NULL, ELM_NAVIGATIONBAR_EX_BACK_BUTTON, _quit_button_cb, NULL);
+	elm_navigationbar_ex_item_title_label_set(item, "title");
+	elm_win_resize_object_add(main_win, navi_ex);
 }
 
 static void cleanup(void)
@@ -72,16 +87,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_navigationbar_ex_item_subtitle_label_set_func_01(void)
 {
-	int r = 0;
-
-/*
-   	r = elm_navigationbar_ex_item_subtitle_label_set(...);
-*/
-	if (!r) {
-		tet_infoline("elm_navigationbar_ex_item_subtitle_label_set() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
+	elm_navigationbar_ex_item_subtitle_label_set(item, "subtitle");	
 	tet_result(TET_PASS);
 }
 
@@ -90,15 +96,6 @@ static void utc_UIFW_elm_navigationbar_ex_item_subtitle_label_set_func_01(void)
  */
 static void utc_UIFW_elm_navigationbar_ex_item_subtitle_label_set_func_02(void)
 {
-	int r = 0;
-
-/*
-   	r = elm_navigationbar_ex_item_subtitle_label_set(...);
-*/
-	if (r) {
-		tet_infoline("elm_navigationbar_ex_item_subtitle_label_set() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
+	elm_navigationbar_ex_item_subtitle_label_set(NULL, "subtitle"); 
 	tet_result(TET_PASS);
 }

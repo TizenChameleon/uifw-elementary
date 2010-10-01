@@ -89,11 +89,39 @@ static Evas_Smart *_e_smart = NULL;
 
 static unsigned int focus_order = 0;
 
+static void  
+_unfocus_parents(Evas_Object *obj)  
+{  
+	for (; obj; obj = elm_widget_parent_get(obj))  
+	{  
+		Smart_Data *sd = evas_object_smart_data_get(obj);  
+		if (!sd) return;  
+		if (!sd->focused) return;  
+		sd->focused = 0;  
+	}  
+}  
+
+static void  
+_focus_parents(Evas_Object *obj)  
+{  
+	for (; obj; obj = elm_widget_parent_get(obj))  
+	{  
+		Smart_Data *sd = evas_object_smart_data_get(obj);  
+		if (!sd) return;  
+		if (sd->focused) return;  
+		sd->focused = 1;  
+	}  
+}  
+
 static void
 _sub_obj_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Smart_Data *sd = data;
 
+   if (_elm_widget_is(obj))  
+      {  
+         if (elm_widget_focus_get(obj)) _unfocus_parents(sd->obj);  
+      }     
    if (obj == sd->resize_obj)
      sd->resize_obj = NULL;
    else if (obj == sd->hover_obj)
@@ -284,6 +312,10 @@ elm_widget_sub_object_add(Evas_Object *obj, Evas_Object *sobj)
    scale = elm_widget_scale_get(sobj);
    th = elm_widget_theme_get(sobj);
    if ((scale != pscale) || (th != pth)) elm_widget_theme(sobj);
+   if (_elm_widget_is(sobj))  
+      {  
+         if (elm_widget_focus_get(sobj)) _focus_parents(obj);  
+      }
 }
 
 EAPI void
@@ -316,6 +348,7 @@ elm_widget_sub_object_del(Evas_Object *obj, Evas_Object *sobj)
      {
 	Smart_Data *sd2 = evas_object_smart_data_get(sobj);
 	if (sd2) sd2->parent_obj = NULL;
+	if (elm_widget_focus_get(sobj)) _unfocus_parents(obj);
      }
    evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_DEL, _sub_obj_del, sd);
    evas_object_smart_callback_call(obj, "sub-object-del", sobj);
@@ -338,6 +371,10 @@ elm_widget_resize_object_set(Evas_Object *obj, Evas_Object *sobj)
 	evas_object_event_callback_del_full(sd->resize_obj, EVAS_CALLBACK_MOUSE_DOWN,
            _sub_obj_mouse_down, sd);
 	evas_object_smart_member_del(sd->resize_obj);
+        if (_elm_widget_is(sd->resize_obj))  
+           {  
+              if (elm_widget_focus_get(sd->resize_obj)) _unfocus_parents(obj);  
+           }
      }
    sd->resize_obj = sobj;
    if (sd->resize_obj)
@@ -355,6 +392,10 @@ elm_widget_resize_object_set(Evas_Object *obj, Evas_Object *sobj)
 	_smart_reconfigure(sd);
 	evas_object_data_set(sobj, "elm-parent", obj);
 	evas_object_smart_callback_call(obj, "sub-object-add", sobj);
+	if (_elm_widget_is(sobj))  
+           {  
+              if (elm_widget_focus_get(sobj)) _focus_parents(obj);  
+           }  			      
      }
 }
 
