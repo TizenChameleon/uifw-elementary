@@ -478,7 +478,7 @@ _multiple_object_unset(Item *it, Eina_List **list)
 
 
 /**
- * Add a new navigatgationbar to the parent
+ * Add a new navigationbar to the parent
  *
  * @param[in] parent The parent object
  * @return The new object or NULL if it cannot be created
@@ -526,8 +526,8 @@ elm_navigationbar_add(Evas_Object *parent)
  * @param[in] title The title string
  * @param[in] fn_btn1 The left button
  * @param[in] fn_btn2 The right button
+ * @param[in] fn_btn3 The button placed before right most button.
  * @param[in] content The object to push
- * @param[in] animation transition when this content becomes the top
  *
  * @ingroup NavigationBar
  */
@@ -638,9 +638,8 @@ elm_navigationbar_push(Evas_Object *obj,
 }
 
 /**
- * Pop the object that is on top of the NavigationBar stack (and update it)
  * This pops the object that is on top (visible) in the navigationbar, makes it disappear, then deletes the object. 
- * The object that was underneath it on the stack will become visible.
+ * The object that was underneath it, on the stack will become visible.
  *
  * @param[in] obj The NavigationBar object
  *
@@ -703,9 +702,7 @@ elm_navigationbar_pop(Evas_Object *obj)
 }
 	
 /**
- * Pop to the inputted content object (and update it)
- * This pops the objects that is under the inputed content on the navigationbar stack, makes them disappear, then deletes the objects. 
- * The content will become visible.
+ * This Pops to the given content object (and update it) by deleting rest of the objects in between.
  *
  * @param[in] obj The NavigationBar object
  * @param[in] content the object to show
@@ -766,9 +763,9 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 		elm_pager_to_content_pop(wd->pager, content);
 	}
 }
+
 /**
  * Set the title string for the pushed content
- * If the content is at the top of the navigation stack, update the title string
  *
  * @param[in] obj The NavigationBar object
  * @param[in] content The object to push or pushed
@@ -834,12 +831,10 @@ elm_navigationbar_title_label_get(Evas_Object *obj,
 }
 
 /**
- * Add a title object for the content 
- * If it is added before pushing the content, it will be shown when content is being pushed.
- * If the content is at the top of the navigation stack, update the title or title object.
+ * Add a title object for the content.
  *
  * @param[in] obj The NavigationBar object
- * @param[in] content The object to push or pushed
+ * @param[in] content The object pushed
  * @param[in] title_obj a title object (normally button or segment_control)
  *
  * @ingroup NavigationBar
@@ -893,7 +888,16 @@ elm_navigationbar_title_object_add(Evas_Object *obj,
 	}
 }
 
-
+/**
+ * Unset the list of title objects corresponding to given content and returns it to  
+ * the application.
+ * @param[in] obj The NavigationBar object
+ * @param[in] content The object pushed
+ * @param[in] title_obj a title object (normally button or segment_control)
+ * @param[out] list updates the list with title objects list, this list has to be freed and the
+ * objects have to be deleted by application.
+ * @ingroup NavigationBar
+ */
 EAPI void
 elm_navigationbar_title_object_list_unset(Evas_Object *obj,
 									Evas_Object *content, Eina_List **list)
@@ -940,7 +944,7 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj,
 
 
 /**
- * Return the title string of the pushed content
+ * Return the list of title objects of the pushed content.
  *
  * @param[in] obj The NavigationBar object
  * @param[in] content The object to push or pushed
@@ -1180,7 +1184,7 @@ _elm_navigationbar_function_button3_get(Evas_Object *obj,
 }
 
 /**
- * Return the content object at the top of the pager stack
+ * Return the content object at the top of the NavigationBar stack
  *
  * @param[in] obj The NavigationBar object
  * @return The top content object or NULL if none
@@ -1198,10 +1202,10 @@ elm_navigationbar_content_top_get(Evas_Object *obj)
 }
 
 /**
- * Return the content object at the bottom of the pager stack
+ * Return the content object at the bottom of the NavigationBar stack
  *
  * @param[in] obj The NavigationBar object
- * @return The root content object or NULL if none
+ * @return The bottom content object or NULL if none
  *
  * @ingroup NavigationBar
  */
@@ -1216,10 +1220,10 @@ elm_navigationbar_content_bottom_get(Evas_Object *obj)
 }
 
 /**
- * set navigationbar hidden state and update
+ * This hides the title area of navigationbar.
  *
  * @param[in] obj The NavigationBar object
- * @param[in] hidden hidden state (default value : TRUE)
+ * @param[in] hidden if EINA_TRUE the title area is hidden.
  *
  * @ingroup NavigationBar
  */
@@ -1236,8 +1240,7 @@ elm_navigationbar_hidden_set(Evas_Object *obj,
 }
 
 /**
- * Set the button object of the pushed content
- * If the content is at the top of the navigation stack, update the button
+ * Set the button object of the pushed content.
  *
  * @param[in] obj The NavigationBar object
  * @param[in] content The object to push or pushed
@@ -1312,12 +1315,11 @@ elm_navigationbar_title_button_get(Evas_Object *obj,
 }
 
 /**
- * Set the sub title string for the pushed content
- * If the content is at the top of the navigation stack, update the title string
+ * Set the sub title string for the pushed content.
  *
  * @param[in] obj The NavigationBar object
  * @param[in] content The object to push or pushed
- * @param[in] title The title string
+ * @param[in] subtitle The subtitle string
  *
  * @ingroup NavigationBar
  */
@@ -1346,11 +1348,11 @@ elm_navigationbar_subtitle_label_set(Evas_Object *obj,
 }
 
 /**
- * Return the subtitle string of the pushed content
+ * Return the subtitle string of the pushed content.
  *
  * @param[in] obj The NavigationBar object
  * @param[in] content The object to push or pushed
- * @return The title string or NULL if none
+ * @return The subtitle string or NULL if none
  *
  * @ingroup NavigationBar
  */
