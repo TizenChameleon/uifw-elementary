@@ -877,14 +877,18 @@ _elm_fx_flip_op(void *data, Elm_Animator *animator, double frame)
    if (degree < 90 && degree > -90)
      {
 	obj = flip->front;
-	evas_object_hide(flip->back);
-	evas_object_show(flip->front);
+	if(flip->back != flip->front) {
+		evas_object_hide(flip->back);
+		evas_object_show(flip->front);
+	}
      }
    else
      {
 	obj = flip->back;
-	evas_object_hide(flip->front);
-	evas_object_show(flip->back);
+	if(flip->back != flip->front) {
+		evas_object_hide(flip->front);
+		evas_object_show(flip->back);
+	}
      }
 
    evas_map_smooth_set(map, EINA_TRUE);
