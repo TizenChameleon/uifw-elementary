@@ -159,9 +159,9 @@ static void _smart_multi_down(void *data, Evas *e, Evas_Object *obj, void *ev);
 static void _smart_multi_up(void *data, Evas *e, Evas_Object *obj, void *ev);
 static void _smart_multi_move(void *data, Evas *e, Evas_Object *obj, void *ev);
 // animator callbacks
-static int _smart_animation_move(void *data);
-static int _smart_animation_flick(void *data);
-static int _smart_animation_two_move(void *data);
+static Eina_Bool _smart_animation_move(void *data);
+static Eina_Bool _smart_animation_flick(void *data);
+static Eina_Bool _smart_animation_two_move(void *data);
 // enter mode functions
 static void _smart_enter_none(Smart_Data *sd);
 static void _smart_enter_down(Smart_Data *sd);
@@ -191,14 +191,14 @@ static void _smart_emit_two_move_end(Smart_Data *sd);
 static void _smart_emit_three_press(Smart_Data *sd);
 static void _smart_emit_three_tap(Smart_Data *sd);
 // timer handlers
-static int _smart_press_timer_handler(void *data);
-static int _smart_long_press_timer_handler(void *data);
-static int _smart_release_timer_handler(void *data);
-static int _smart_press_release_timer_handler(void *data);
-static int _tap_delay_timer_handler(void *data);
-static int _smart_two_press_timer_handler(void *data);
-static int _smart_two_release_timer_handler(void *data);
-static int _smart_two_press_release_timer_handler(void *data);
+static Eina_Bool _smart_press_timer_handler(void *data);
+static Eina_Bool _smart_long_press_timer_handler(void *data);
+static Eina_Bool _smart_release_timer_handler(void *data);
+static Eina_Bool _smart_press_release_timer_handler(void *data);
+static Eina_Bool _tap_delay_timer_handler(void *data);
+static Eina_Bool _smart_two_press_timer_handler(void *data);
+static Eina_Bool _smart_two_release_timer_handler(void *data);
+static Eina_Bool _smart_two_press_release_timer_handler(void *data);
 
 static void _smart_save_move_history(Smart_Data *sd, int x, int y, int dx, int dy);
 static void _smart_start_flick(Smart_Data *sd);
@@ -814,7 +814,7 @@ _smart_multi_move(void *data, Evas *e, Evas_Object *obj, void *ev)
 }
 
 /* animators */
-static int
+static Eina_Bool
 _smart_animation_move(void *data)
 {
    Smart_Data *sd;
@@ -852,7 +852,7 @@ _smart_animation_move(void *data)
      }
 }
 
-static int
+static Eina_Bool
 _smart_animation_flick(void *data)
 {
    Smart_Data *sd;
@@ -907,7 +907,7 @@ _smart_animation_flick(void *data)
      }
 }
 
-static int
+static Eina_Bool
 _smart_animation_two_move(void *data)
 {
    Smart_Data *sd;
@@ -1370,7 +1370,7 @@ _smart_emit_three_tap(Smart_Data *sd)
 }
 
 /* timer event handling */
-static int
+static Eina_Bool
 _smart_press_timer_handler(void *data)
 {
    DBG("<< %s >>\n", __func__);
@@ -1382,7 +1382,7 @@ _smart_press_timer_handler(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _smart_long_press_timer_handler(void *data)
 {
    DBG("<< %s >>\n", __func__);
@@ -1395,7 +1395,7 @@ _smart_long_press_timer_handler(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _smart_release_timer_handler(void *data)
 {
    DBG("<< %s >>\n", __func__);
@@ -1409,7 +1409,7 @@ _smart_release_timer_handler(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _smart_press_release_timer_handler(void *data)
 {
    DBG("<< %s >>\n", __func__);
@@ -1431,7 +1431,7 @@ _smart_press_release_timer_handler(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _tap_delay_timer_handler(void *data)
 {
    DBG("<< %s >>\n", __func__);
@@ -1442,7 +1442,7 @@ _tap_delay_timer_handler(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _smart_two_press_timer_handler(void *data)
 {
    DBG("<< %s >>\n", __func__);
@@ -1455,7 +1455,7 @@ _smart_two_press_timer_handler(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _smart_two_release_timer_handler(void *data)
 {
    DBG("<< %s >>\n", __func__);
@@ -1469,7 +1469,7 @@ _smart_two_release_timer_handler(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _smart_two_press_release_timer_handler(void *data)
 {
    DBG("<< %s >>\n", __func__);
