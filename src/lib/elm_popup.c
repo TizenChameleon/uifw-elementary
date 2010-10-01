@@ -169,7 +169,7 @@ _block_clicked_cb( void *data, Evas_Object *obj, void *event_info )
 
 static Ecore_Event_Handler* _elm_wnd_map_handler = NULL;
 
-static int
+static Eina_Bool
 _wnd_map_notify(void *data, int type, void *event)
 {
    Evas* e = NULL;
@@ -298,7 +298,7 @@ _elm_popup_timeout( void *data, Evas_Object *obj, void *event_info )
    evas_object_smart_callback_call((Evas_Object *)data, "response", (void *)ELM_POPUP_RESPONSE_TIMEOUT);    
 }
 
-static int
+static Eina_Bool
 _elm_signal_exit(void *data __UNUSED__, int ev_type __UNUSED__, void *ev __UNUSED__)
 {
    int res_id  =  ELM_POPUP_RESPONSE_NONE;

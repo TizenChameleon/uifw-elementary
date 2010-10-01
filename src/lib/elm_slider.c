@@ -80,7 +80,7 @@ static void _indicator_set(Evas_Object *obj);
 static void _spacer_cb(void *data, Evas * e, Evas_Object * obj, void *event_info);
 
 
-static int _mv_timer_cb(void *data);
+static Eina_Bool _mv_timer_cb(void *data);
 
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_DELAY_CHANGED[] = "delay,changed";
@@ -970,7 +970,7 @@ elm_slider_indicator_show_set(Evas_Object *obj, Eina_Bool show)
      edje_object_signal_emit(wd->slider, "elm,state,val,hide", "elm");			
 }
 
-static int _mv_timer_cb(void *data)
+static Eina_Bool _mv_timer_cb(void *data)
 {
    Evas_Object* obj = (Evas_Object*)data;
    Widget_Data *wd = elm_widget_data_get(obj);
