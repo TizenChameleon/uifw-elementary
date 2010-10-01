@@ -98,11 +98,11 @@ static void _imageslider_update_center_pos(Widget_Data *wd, Evas_Coord x, Evas_C
 static Evas_Object *_imageslider_add_obj(Widget_Data *wd);
 static void _imageslider_obj_shift(Widget_Data *wd, Eina_Bool left);
 static void _imageslider_obj_move(Widget_Data *wd, Evas_Coord step);
-static int _icon_to_image(void *data);
+static Eina_Bool _icon_to_image(void *data);
 static int _check_drag(int state, void *data);
 static void _check_zoom(void *data);
 static void _anim(Widget_Data *wd);
-static int _timer_cb(void *data);
+static Eina_Bool _timer_cb(void *data);
 static void _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void ev_imageslider_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void ev_imageslider_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -607,7 +607,7 @@ static inline double time_get(Evas_Coord x, Evas_Coord w)
 	return time;
 }
 
-static int _icon_to_image(void *data)
+static Eina_Bool _icon_to_image(void *data)
 {
 	Widget_Data *wd = data;
 	wd->moving = 0;
@@ -680,7 +680,7 @@ static void _check_zoom(void *data)
 }
 
 
-static int _timer_cb(void *data)
+static Eina_Bool _timer_cb(void *data)
 {
 	Widget_Data *wd;
 	Elm_Imageslider_Item *it;
