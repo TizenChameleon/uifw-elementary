@@ -177,7 +177,7 @@ struct _Smart_Data {
      Eina_Bool (*ewk_view_suspend_request)(Evas_Object *);
      Eina_Bool (*ewk_view_resume_request)(Evas_Object *);
      Eina_Bool (*ewk_view_select_none)(Evas_Object *);
-     Eina_Bool (*ewk_view_get_smart_zoom_rect)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *);
+     Eina_Bool (*ewk_view_get_smart_zoom_rect)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *, Eina_Bool);
      Eina_Bool (*ewk_view_paint_contents)(Ewk_View_Private_Data *, cairo_t *, const Eina_Rectangle *);
      Eina_Bool (*ewk_view_stop)(Evas_Object *);
      Ewk_Tile_Unused_Cache *(*ewk_view_tiled_unused_cache_get)(const Evas_Object *);
@@ -2880,8 +2880,8 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    Eina_Rectangle rect;
    _coords_evas_to_ewk(webview, point->x, point->y, &ewk_x, &ewk_y);
    if (!sd->ewk_view_get_smart_zoom_rect)
-     sd->ewk_view_get_smart_zoom_rect = (Eina_Bool (*)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *))dlsym(ewk_handle, "ewk_view_get_smart_zoom_rect");
-   Eina_Bool do_smart_zoom = sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect);
+     sd->ewk_view_get_smart_zoom_rect = (Eina_Bool (*)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *, Eina_Bool))dlsym(ewk_handle, "ewk_view_get_smart_zoom_rect");
+   Eina_Bool do_smart_zoom = sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect, sd->is_layout_width_set_to_container);
    if (!do_smart_zoom)
        return;
 
