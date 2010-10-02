@@ -836,3 +836,23 @@ elm_label_wrap_mode_set(Evas_Object *obj, Eina_Bool wrapmode)
    wd->changed = 1;
    _sizing_eval(obj);
 }
+
+/**
+ * Set the text slide of the label
+ *
+ * @param obj The label object
+ * @param slide To start slide or stop
+ * @ingroup Label
+ */
+EAPI void
+elm_label_slide_set(Evas_Object *obj, Eina_Bool slide)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (slide)
+	   edje_object_signal_emit(wd->lbl, "elm,state,slide,start", "elm");
+   else
+	   edje_object_signal_emit(wd->lbl, "elm,state,slide,stop", "elm");
+}

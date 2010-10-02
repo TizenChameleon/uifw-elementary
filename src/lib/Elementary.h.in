@@ -555,6 +555,7 @@ extern "C" {
    EAPI void         elm_label_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
    EAPI void         elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis);
    EAPI void         elm_label_wrap_mode_set(Evas_Object *obj, Eina_Bool wrapmode);
+   EAPI void         elm_label_slide_set(Evas_Object *obj, Eina_Bool slide);
    /* available styles:
     * default
     * marker
