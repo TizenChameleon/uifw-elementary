@@ -22,6 +22,7 @@ struct _Widget_Data
    Evas_Coord wrap_h;
    Eina_Bool linewrap : 1;
    Eina_Bool wrapmode : 1;
+   Eina_Bool slidingmode : 1;
    Eina_Bool changed : 1;
    Eina_Bool bgcolor : 1;
    Eina_Bool ellipsis : 1;
@@ -134,6 +135,8 @@ _sizing_eval(Evas_Object *obj)
      {
         evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
         edje_object_size_min_calc(wd->lbl, &minw, &minh);
+		if (wd->wrap_w > 0 && minw > wd->wrap_w)
+			minw = wd->wrap_w;
         evas_object_size_hint_min_set(obj, minw, minh);
         maxh = minh;
         evas_object_size_hint_max_set(obj, maxw, maxh);
@@ -483,6 +486,37 @@ void _label_state_change(Evas_Object *obj)
    }
 }
 
+void _label_sliding_change(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   static Eina_Bool wasellipsis = EINA_FALSE;
+
+   if (wd->linewrap)
+   {
+	   wd->slidingmode = EINA_FALSE;
+	   fprintf(stderr, "ERR: label dosen't support multiline sliding effect!!!\n");
+   }
+
+   if (wd->slidingmode)
+   {
+	   if (wd->ellipsis)
+	   {
+		   wasellipsis = EINA_TRUE;
+		   elm_label_ellipsis_set(obj, EINA_FALSE);
+	   }
+	   edje_object_signal_emit(wd->lbl, "elm,state,slide,start", "elm");
+   }
+   else
+   {
+	   if (wasellipsis)
+	   {
+		   wasellipsis = EINA_FALSE;
+		   elm_label_ellipsis_set(obj, EINA_TRUE);
+	   }
+	   edje_object_signal_emit(wd->lbl, "elm,state,slide,stop", "elm");
+   }
+}
 
 /**
  * Add a new label to the parent
@@ -516,6 +550,7 @@ elm_label_add(Evas_Object *parent)
    wd->bgcolor = EINA_FALSE;
    wd->ellipsis = EINA_FALSE;
    wd->wrapmode = EINA_FALSE;
+   wd->slidingmode = EINA_FALSE;
    wd->wrap_w = 0;
    wd->wrap_h = 0;
 
@@ -814,6 +849,7 @@ elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
    if (wd->ellipsis == ellipsis) return;
    wd->ellipsis = ellipsis;
    if (wd->linewrap) _theme_change(obj);
+   edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    wd->changed = 1;
    _sizing_eval(obj);
 }
@@ -851,8 +887,9 @@ elm_label_slide_set(Evas_Object *obj, Eina_Bool slide)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   if (slide)
-	   edje_object_signal_emit(wd->lbl, "elm,state,slide,start", "elm");
-   else
-	   edje_object_signal_emit(wd->lbl, "elm,state,slide,stop", "elm");
+   if (wd->slidingmode == slide) return;
+   wd->slidingmode = slide;
+   _label_sliding_change(obj);
+   wd->changed = 1;
+   _sizing_eval(obj);
 }
