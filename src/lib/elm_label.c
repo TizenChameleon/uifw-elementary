@@ -23,6 +23,7 @@ struct _Widget_Data
    Eina_Bool linewrap : 1;
    Eina_Bool wrapmode : 1;
    Eina_Bool slidingmode : 1;
+   Eina_Bool slidingellipsis : 1;
    Eina_Bool changed : 1;
    Eina_Bool bgcolor : 1;
    Eina_Bool ellipsis : 1;
@@ -490,7 +491,6 @@ void _label_sliding_change(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   static Eina_Bool wasellipsis = EINA_FALSE;
 
    if (wd->linewrap)
    {
@@ -502,16 +502,16 @@ void _label_sliding_change(Evas_Object *obj)
    {
 	   if (wd->ellipsis)
 	   {
-		   wasellipsis = EINA_TRUE;
+		   wd->slidingellipsis = EINA_TRUE;
 		   elm_label_ellipsis_set(obj, EINA_FALSE);
 	   }
 	   edje_object_signal_emit(wd->lbl, "elm,state,slide,start", "elm");
    }
    else
    {
-	   if (wasellipsis)
+	   if (wd->slidingellipsis)
 	   {
-		   wasellipsis = EINA_FALSE;
+		   wd->slidingellipsis = EINA_FALSE;
 		   elm_label_ellipsis_set(obj, EINA_TRUE);
 	   }
 	   edje_object_signal_emit(wd->lbl, "elm,state,slide,stop", "elm");
@@ -551,6 +551,7 @@ elm_label_add(Evas_Object *parent)
    wd->ellipsis = EINA_FALSE;
    wd->wrapmode = EINA_FALSE;
    wd->slidingmode = EINA_FALSE;
+   wd->slidingellipsis = EINA_FALSE;
    wd->wrap_w = 0;
    wd->wrap_h = 0;
 
