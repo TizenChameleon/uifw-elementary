@@ -901,7 +901,7 @@ elm_label_slide_set(Evas_Object *obj, Eina_Bool slide)
  * get the text slide mode of the label
  *
  * @param obj The label object
- * @return slide set flag value
+ * @return slide slide mode value
  * @ingroup Label
  */
 EAPI Eina_Bool
