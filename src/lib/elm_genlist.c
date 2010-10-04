@@ -2956,6 +2956,7 @@ elm_genlist_add(Evas_Object *parent)
    Evas_Coord minw, minh;
    static Evas_Smart *smart = NULL;
 
+	if (!parent) return NULL;
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    obj = elm_widget_add(e);
