@@ -906,10 +906,11 @@ elm_colorpicker_add(Evas_Object * parent)
    Widget_Data *wd = NULL;
    Evas *e;
 
-   wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    if (e == NULL)
       return NULL;
+   wd = ELM_NEW(Widget_Data);
+   e = evas_object_evas_get(parent);
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "colorpicker");
    elm_widget_type_set(obj, "colorpicker");

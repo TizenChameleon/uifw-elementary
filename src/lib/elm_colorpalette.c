@@ -370,9 +370,9 @@ EAPI Evas_Object *elm_colorpalette_add(Evas_Object *parent)
 	Widget_Data *wd = NULL;
 	Evas *e;
 
-	wd = ELM_NEW(Widget_Data);
 	e = evas_object_evas_get(parent);
 	if (e == NULL) return NULL;
+	wd = ELM_NEW(Widget_Data);
 	obj = elm_widget_add(e);
 	elm_widget_type_set(obj, "colorpalette");
 	elm_widget_sub_object_add(parent, obj);

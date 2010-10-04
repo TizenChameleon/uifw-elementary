@@ -396,8 +396,9 @@ elm_slider_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (e == NULL) return NULL;
+   wd = ELM_NEW(Widget_Data);
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "slider");
    elm_widget_type_set(obj, "slider");
@@ -897,9 +898,9 @@ elm_slider_indicator_format_function_set(Evas_Object *obj, const char *(*func)(d
 
 
 /**
- * Set the right icon object of the slider object
+ * Set the end side icon object of the slider object
  *
- * Once the right icon object is set, it will become a child of the slider object and
+ * Once the end side icon object is set, it will become a child of the slider object and
  * be deleted when the slider object is deleted. If another icon object is set
  * then the previous one becomes orophaned and will no longer be deleted along
  * with the slider.
@@ -907,7 +908,7 @@ elm_slider_indicator_format_function_set(Evas_Object *obj, const char *(*func)(d
  * @param obj The slider object
  * @param icon The icon object
  * 
- * @return 1 if icon set succeed, 0 if there is no part for right icon 
+ * @return 1 if icon set succeed, 0 if there is no part for the end side icon 
  * 
  * @ingroup Slider
  */
@@ -936,10 +937,10 @@ elm_slider_end_icon_set(Evas_Object *obj, Evas_Object *icon)
 
 
 /**
- * Get the right icon object of the slider object
+ * Get the end side icon object of the slider object
  *
  * @param obj The slider object
- * @return The right icon object
+ * @return The end side icon object
  *
  * @ingroup Slider
  */

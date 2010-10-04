@@ -25,7 +25,6 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
 	Evas_Object *parent;
-	Evas *e;
 	Evas_Object *box;
 	Evas_Object *title_layout;
 	const char *title;
@@ -227,11 +226,12 @@ EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent)
 {
 	Evas_Object *obj = NULL;
 	Widget_Data *wd = NULL;
+	Evas *e = NULL;
 
+	e = evas_object_evas_get(parent);
+	if (e == NULL) return NULL;
 	wd = ELM_NEW(Widget_Data);
-	wd->e = evas_object_evas_get(parent);
-	if (wd->e == NULL) return NULL;
-	obj = elm_widget_add(wd->e);
+	obj = elm_widget_add(e);
 	ELM_SET_WIDTYPE(widtype, "dialoguegroup");
 	elm_widget_type_set(obj, "dialoguegroup");
 	elm_widget_sub_object_add(parent, obj);
