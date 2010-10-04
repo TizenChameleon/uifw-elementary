@@ -7,6 +7,7 @@
 
 /**
  * @defgroup CBHM_helper CBHM_helper
+ * @ingroup Elementary
  *
  * retrieving date from Clipboard History Manager
  * CBHM_helper supports to get CBHM's contents

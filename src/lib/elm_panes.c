@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Panes panes
+ * @ingroup Elementary
  *
  */
 

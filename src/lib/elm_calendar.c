@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Calendar
+ * @ingroup Elementary
  *
  * A calendar is a widget that allows the user to select a date. It has
  * support to adding check marks (holidays and checks by default). The calendar
