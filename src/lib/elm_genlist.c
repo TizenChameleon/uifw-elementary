@@ -2392,12 +2392,6 @@ _item_block_position(Item_Block *itb, int in)
 		  evas_object_move(select_all_item->base, ox, oy);
 		  evas_object_raise(select_all_item->base);
 		  evas_object_show(select_all_item->base);
-
-		  if(itb->wd->select_all_minh != itb->wd->minh) 
-			 {
-				 itb->wd->select_all_minh = itb->wd->minh + itb->wd->select_all_item->h;
-				 itb->wd->minh = itb->wd->select_all_minh;
-			 }
 		  y = select_all_item->h;
 	  }
 
@@ -2614,10 +2608,12 @@ _calc_job(void *data)
 	  }
 	evas_object_geometry_get(wd->pan_smart, NULL, NULL, &ow, &oh);
 	if (minw < ow) minw = ow;
-	if ((minw != wd->minw) || (minh != wd->minh))
+	if ((minw != wd->minw) || (minh != wd->minh) || wd->select_all_item)
 	  {
 		  wd->minw = minw;
 		  wd->minh = minh;
+		  if(wd->select_all_item)
+				 wd->minh += wd->select_all_item->h;
 		  evas_object_smart_callback_call(wd->pan_smart, "changed", NULL);
 		  _sizing_eval(wd->obj);
 	  }
@@ -2625,12 +2621,12 @@ _calc_job(void *data)
 	evas_object_smart_changed(wd->pan_smart);
 
 	if(wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_EXPAND_FINISH) 
-	{
-      wd->pinchzoom_effect_mode = ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE;
-	
-		fprintf(stderr,"ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND  FINISH   \n");
-	   elm_smart_scroller_hold_set(wd->scr, 0);
-	}
+	  {
+		  wd->pinchzoom_effect_mode = ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE;
+		  fprintf(stderr,"ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND  FINISH   \n");
+		  elm_smart_scroller_hold_set(wd->scr, 0);
+		  elm_smart_scroller_freeze_set(wd->scr, 0);
+	  }
 }
 
 static void
@@ -5746,7 +5742,10 @@ _item_pinch_recalc(Item_Block *itb, int in, int qadd, int norender, int emode)
 	  return EINA_FALSE;
 
 	if(itb->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH)
-	  elm_smart_scroller_hold_set(itb->wd->scr, 1);
+	  {
+		  elm_smart_scroller_hold_set(itb->wd->scr, 1);
+		  elm_smart_scroller_freeze_set(itb->wd->scr, 1);
+	  }
 	itb->num = in;
 	evas_object_geometry_get(itb->wd->pan_smart, &ox, &oy, &ow, &oh);
 
