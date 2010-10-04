@@ -883,6 +883,7 @@ _smart_run_javascript_alert(Ewk_View_Smart_Data *esd, Evas_Object *frame, const 
 static Eina_Bool
 _smart_run_javascript_confirm(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message)
 {
+#if 0
    Evas_Object *popup;
    popup = elm_popup_add(esd->self);
    evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -900,12 +901,14 @@ _smart_run_javascript_confirm(Ewk_View_Smart_Data *esd, Evas_Object *frame, cons
       default:
 	 elm_exit();
      }
+#endif
    return EINA_FALSE;
 }
 
 static Eina_Bool
 _smart_run_javascript_prompt(Ewk_View_Smart_Data *esd, Evas_Object *frame, const char *message, const char *defaultValue, char **value)
 {
+#if 0
    //FIXME: it's not work
    Evas_Object *popup;
    Evas_Object *box, *entry, *label;
@@ -936,7 +939,7 @@ _smart_run_javascript_prompt(Ewk_View_Smart_Data *esd, Evas_Object *frame, const
    int ret = elm_popup_run(popup);
    *value = strdup("temp");
    evas_object_del(popup);
-
+#endif
    return EINA_FALSE;
 }
 
