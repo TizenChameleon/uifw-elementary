@@ -495,7 +495,9 @@ void _label_sliding_change(Evas_Object *obj)
    if (wd->linewrap)
    {
 	   wd->slidingmode = EINA_FALSE;
-	   fprintf(stderr, "ERR: label dosen't support multiline sliding effect!!!\n");
+	   fprintf(stderr, "ERR: elm_label dosen't support multiline sliding effect!!!\n");
+	   fprintf(stderr, "ERR: elm_label dosen't support multiline sliding effect!!!\n");
+	   fprintf(stderr, "ERR: elm_label dosen't support multiline sliding effect!!!\n");
    }
 
    if (wd->slidingmode)
@@ -509,12 +511,12 @@ void _label_sliding_change(Evas_Object *obj)
    }
    else
    {
+	   edje_object_signal_emit(wd->lbl, "elm,state,slide,stop", "elm");
 	   if (wd->slidingellipsis)
 	   {
 		   wd->slidingellipsis = EINA_FALSE;
 		   elm_label_ellipsis_set(obj, EINA_TRUE);
 	   }
-	   edje_object_signal_emit(wd->lbl, "elm,state,slide,stop", "elm");
    }
 }
 
