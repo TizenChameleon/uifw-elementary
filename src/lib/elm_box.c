@@ -133,32 +133,6 @@ elm_box_add(Evas_Object *parent)
 }
 
 /**
- * Set the extended mode
- *
- * By default box object arrange their contents vertically from top to bottom.
- * By calling this and providing @p orizontal as true, the box will become
- * extended arranging contents left to right.
- *
- * @param obj The box object
- * @param extended The extended flag (1 = extended, 0 = normal)
- *
- * @ingroup Box
- */
-EAPI void
-elm_box_extended_set(Evas_Object *obj, Eina_Bool extended)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   wd->extended = !!extended;
-   if (extended)
-	   wd->horizontal = 1;	/* Do NOT support vertical extended mode */
-   evas_object_smart_calculate(wd->box);
-
-}
-
-
-/**
  * Set the horizontal orientation
  *
  * By default box object arrange their contents vertically from top to bottom.
@@ -382,3 +356,19 @@ elm_box_unpack_all(Evas_Object *obj)
    if (!wd) return;
    evas_object_box_remove_all(wd->box, 0);
 }
+
+
+EAPI void
+elm_box_extended_set(Evas_Object *obj, Eina_Bool extended)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->extended = !!extended;
+   if (extended)
+	   wd->horizontal = 1;	/* Do NOT support vertical extended mode */
+   evas_object_smart_calculate(wd->box);
+}
+
+
+
