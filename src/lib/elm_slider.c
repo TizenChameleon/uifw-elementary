@@ -1042,7 +1042,7 @@ elm_slider_value_animated_set(Evas_Object *obj, double val)
 
 
 /**
- * Set the label of the slider
+ * Set the end side label of the slider
  *
  * @param obj The slider object
  * @param label The text label string in UTF-8
@@ -1073,7 +1073,7 @@ elm_slider_end_label_set(Evas_Object *obj, const char *label)
 }
 
 /**
- * Get the label of the slider
+ * Get the end side label of the slider
  *
  * @param obj The slider object
  * @return The text label string in UTF-8
