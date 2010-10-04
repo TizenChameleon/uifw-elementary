@@ -373,7 +373,7 @@ elm_editfield_label_get(Evas_Object *obj)
 }
 
 /**
- * Get the label used on the editfield object
+ * Set the guidance text used on the editfield object
  *
  * @param obj The editfield object
  * @return label text
