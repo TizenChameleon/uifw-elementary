@@ -26,33 +26,32 @@ struct _Widget_Data
    Evas_Object *bx[2]; // 2 - for now all that's supported
    Eina_List *items; // 1 list. yes N levels, but only 2 for now and # of items will be small
    int level;
+   int max_supp_items_count;
+   int tot_items_count[2];
+   int min_obj_height, max_grp_size;
+   int min_1st_level_obj_height;
+   int items_count;
    Evas_Coord dx, dy;
+   Evas_Coord pwidth, pheight;
    Ecore_Timer *delay;
+   const char *special_char;
    Eina_Bool level_active[2];
    Eina_Bool horizontal : 1;
    Eina_Bool active : 1;
    Eina_Bool down : 1;
-   int max_supp_items_count;
-   int tot_items_count[2];
-   Evas_Coord pwidth, pheight;
-   int min_obj_height, max_grp_size;
-   int items_count;
-   double scale_factor;
-   const char *special_char;
-   int min_1st_level_obj_height;
    Eina_Bool hide_button : 1;
+   double scale_factor;
+
 };
 
 struct _Elm_Index_Item
 {
    Evas_Object *obj;
-   const char *letter;
-   const void *data;
-   int level;
    Evas_Object *base;
+   const char *letter, *vis_letter;
+   const void *data;
+   int level, size;
    Eina_Bool selected : 1;
-   int size;
-   const char *vis_letter;
 };
 
 struct _PlacementPart
@@ -71,6 +70,7 @@ static void _index_box_clear(Evas_Object *obj, Evas_Object *box, int level);
 static void _item_free(Elm_Index_Item *it);
 static void _index_process(Evas_Object *obj);
 
+/* Free a block allocated by `malloc', `realloc' or `calloc' one by one*/
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -214,7 +214,7 @@ _item_free(Elm_Index_Item *it)
    free(it);
 }
 
-// FIXME: always have index filled
+/* Automatically filling the box with index item*/
 static void
 _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
 {
@@ -444,16 +444,16 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
      	  }
      }
 
-   free(label);
-   free(last);
+   if(label)
+      free(label);
+   if(last)
+      free(last);
 }
 
 static void
 _wheel(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-//   Evas_Event_Mouse_Wheel *ev = event_info;
-//   Evas_Object *obj = o;
    if (!wd) return;
 }
 
@@ -615,6 +615,7 @@ elm_index_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
    Evas_Coord minw, minh;
+   const char *string;
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
@@ -680,7 +681,6 @@ elm_index_add(Evas_Object *parent)
 	edje_object_part_swallow(wd->base, "elm.swallow.index.1", wd->bx[1]);
 	evas_object_show(wd->bx[1]);
      }
-   const char *string;
 
    wd->scale_factor = elm_scale_get();
    if ( wd->scale_factor == 0.0 ) {

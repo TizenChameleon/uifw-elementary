@@ -17,14 +17,14 @@ struct _Widget_Data
    Evas_Object *box;
    Evas_Object *base;
    Eina_List *seg_ctrl;
+   Elm_Segment_Item *ani_it;
+   Ecore_Animator *ani;
+   void *data;
    int width, height;
    int id;
    int item_width;
    int cur_fontsize;
    int max_height, w_pad, h_pad;
-
-   Elm_Segment_Item *ani_it;
-   Ecore_Animator *ani;
    unsigned int count;
    unsigned int insert_index;
    unsigned int del_index;
@@ -38,10 +38,10 @@ struct _Elm_Segment_Item
    Evas_Object *obj;
    Evas_Object *base;
    Evas_Object *icon;
-   const char *label;
    Evas_Object *label_wd;
-   Eina_Bool delete_me : 1;
+   const char *label;
    int segment_id;
+   Eina_Bool delete_me : 1;
 };
 
 static void _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info);
@@ -110,6 +110,7 @@ _signal_segment_on(void *data)
    wd->selected = EINA_TRUE;
 
    edje_object_signal_emit(item->base, "elm,state,segment,on", "elm");
+   edje_object_signal_emit(item->base, "elm,action,focus", "elm");
    if(!item->label_wd)
      edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
 
@@ -314,7 +315,7 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
    it->label_wd = NULL;
 
    it->base = edje_object_add(evas_object_evas_get(obj));
-   _elm_theme_object_set(obj, it->base, "segment", "base", elm_object_style_get(it->base));
+   _elm_theme_object_set(obj, it->obj, "segment", "base", elm_object_style_get(it->obj));
 
    if (it->label) eina_stringshare_del(it->label);
    if (label)
@@ -370,13 +371,13 @@ _update_list(Evas_Object *obj)
 	     edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
      	     edje_object_signal_emit(it->base, "elm,state,text,change", "elm");
   	  }
-	edje_object_message_signal_process(it->base);
 
 	if(it->label)
 	   edje_object_part_text_set(it->base, "elm.text", it->label);
 	   
 	edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
 	edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+	edje_object_message_signal_process(it->base);
 
 	return;
      }
@@ -401,15 +402,20 @@ _update_list(Evas_Object *obj)
 	  {
 	     edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
   	  }
-	edje_object_message_signal_process(it->base);
 
 	if(it->label)
           edje_object_part_text_set(it->base, "elm.text", it->label);
 
 	edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
 	edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+	edje_object_message_signal_process(it->base);
 
 	i++;
+     }
+   if(wd->data && wd->selected)
+     {
+        _signal_segment_on(wd->data);
+        wd->selected = EINA_FALSE;
      }
 }
 
@@ -447,7 +453,7 @@ _state_value_set(Evas_Object *obj)
 {
    Elm_Segment_Item *it;
    Eina_List *l;
-   Evas_Coord mw, mh, x, y, w, h, xx = 0, yy;
+   Evas_Coord mw, mh, x, y;
 
    int w1=0, w2, i=0;
    unsigned int count ;
@@ -481,32 +487,19 @@ _state_value_set(Evas_Object *obj)
        edje_object_size_min_restricted_calc(it->base, &mw, &mh, 0, 0);
        evas_object_size_hint_weight_set(it->base, 1.0, 1.0);
        evas_object_size_hint_align_set(it->base, -1.0, -1.0);
-	   evas_object_geometry_get(wd->base, &x, &y, &w, &h);
 	
-	   if(xx == 0)
-		xx = 16;
-		if(yy == 0)
-		yy= 137;
 		
        if(wd->ani_it  && it == wd->ani_it)
          {
             evas_object_resize(it->base, w1, wd->height);
 	    evas_object_size_hint_min_set(it->base, w1, wd->height);
 	    evas_object_size_hint_max_set(it->base, w1, wd->height);
-#if 0
-	    evas_object_move(it->base, xx, yy);
-	    xx+=w1;
-#endif	    
 	 }
        else
          {
 	    evas_object_resize(it->base, w2, wd->height);
 	    evas_object_size_hint_min_set(it->base, w2, wd->height);
 	    evas_object_size_hint_max_set(it->base, w2, wd->height);
-#if 0
-	    evas_object_move(it->base, xx, yy);
-	    xx+=w2;
-#endif	    
 	}
        ++i;
     }
@@ -638,12 +631,6 @@ elm_segment_control_add(Evas_Object *parent)
    elm_widget_sub_object_add(obj, wd->box);
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->box);
    evas_object_show(wd->box);
-#if 0   
-   wd->box = elm_layout_add(e);
-   elm_layout_theme_set(wd->box, "segmented-control", "base", "default");
-   edje_object_part_swallow(wd->base, "elm.swallow.content", wd->box);
-   evas_object_show(wd->box);
-#endif   
 
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _object_resize, obj);
    wd->id = 0;
@@ -670,17 +657,6 @@ elm_segment_control_add(Evas_Object *parent)
 
    return obj;
 }
-
-/**
- * Add a new segment item to segmentcontrol
- * @param obj The SegmentControl object
- * @param icon The icon object for added segment item
- * @param label The label for added segment item 
- * @param animate If 1 the action be animated with sliding effects default 0.
- * @return The new segment item or NULL if it cannot be created
- *
- * @ingroup SegmentControl SegmentControl
- */
 
 EAPI Elm_Segment_Item *
 elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)
@@ -713,9 +689,6 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
    evas_object_show( it->base);
 
    evas_object_box_append(wd->box, it->base);
-#if 0
-   elm_layout_content_set(wd->box,  "elm.swallow.content",  it->base);
-#endif   
    evas_object_smart_calculate(wd->box);
 
    return it;
@@ -725,13 +698,12 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
  * Add a new segment item to segmentcontrol
  * @param obj The SegmentControl object
  * @param icon The icon object for added segment item
- * @param label The label for added segment item 
+ * @param label The label for added segment item
  * @param animate If 1 the action be animated with sliding effects default 0.
  * @return The new segment item or NULL if it cannot be created
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI Elm_Segment_Item *
 elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate)
 {
@@ -740,18 +712,6 @@ elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char 
 
     return it;
 }
-
-/**
- * Insert a new segment item to segmentcontrol
- * @param obj The SegmentControl object
- * @param icon The icon object for added segment item
- * @param label The label for added segment item
- * @param index The position at which segment item to be inserted
- * @param animate If 1 the action be animated with sliding effects default 0.
- * @return The new segment item or NULL if it cannot be created
- *
- * @ingroup SegmentControl SegmentControl
- */
 
 EAPI Elm_Segment_Item *
 elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate)
@@ -803,7 +763,6 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const ch
 
    return it ;
 }
-
 /**
  * Insert a new segment item to segmentcontrol
  * @param obj The SegmentControl object
@@ -811,10 +770,10 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const ch
  * @param label The label for added segment item
  * @param index The position at which segment item to be inserted
  * @param animate If 1 the action be animated with sliding effects default 0.
+ * @return The new segment item or NULL if it cannot be created
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI void
 elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate)
 {
@@ -824,14 +783,6 @@ elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const
    return;
 }
 
-/**
- * Delete a segment item to segmentcontrol
- * @param obj The SegmentControl object
- * @param item The Segment item to be deleted
- * @param animate If 1 the action be animated with sliding effects default 0.
- *
- * @ingroup SegmentControl SegmentControl
- */
 EAPI void
 elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate)
 {
@@ -855,9 +806,7 @@ elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool
      {
         evas_object_box_remove(wd->box, it->base);
 	evas_object_smart_calculate(wd->box);
-#if 0
-	 elm_layout_content_unset(wd->box, "elm.swallow.content");
-#endif
+
 	_item_free(obj, it);
 	_refresh_segment_ids(obj);
 	_state_value_set(obj);
@@ -870,12 +819,11 @@ elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool
 /**
  * Delete a segment item to segmentcontrol
  * @param obj The SegmentControl object
- * @param item The Segment item to be deleted
+ * @param index The position at which segment item to be deleted
  * @param animate If 1 the action be animated with sliding effects default 0.
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI void
 elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate)
 {
@@ -883,15 +831,6 @@ elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Ein
 
    return;
 }
-
-/**
- * Delete a segment item to segmentcontrol
- * @param obj The SegmentControl object
- * @param index The position at which segment item to be deleted
- * @param animate If 1 the action be animated with sliding effects default 0.
- *
- * @ingroup SegmentControl SegmentControl
- */
 
 EAPI void
 elm_segment_control_item_del_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate)
@@ -927,15 +866,6 @@ elm_segment_control_item_del_at(Evas_Object *obj,  unsigned int index, Eina_Bool
    return;
 }
 
-/**
- * Delete a segment item to segmentcontrol
- * @param obj The SegmentControl object
- * @param index The position at which segment item to be deleted
- * @param animate If 1 the action be animated with sliding effects default 0.
- *
- * @ingroup SegmentControl SegmentControl
- */
-
 EAPI void
 elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate)
 {
@@ -944,14 +874,6 @@ elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Ein
    return;
 }
 
-/**
- * Get the label of a segment item of segmentcontrol
- * @param obj The SegmentControl object
- * @param index The index of the segment item
- * @return The label of the segment item
- *
- * @ingroup SegmentControl SegmentControl
- */
 
 EAPI const char *
 elm_segment_control_item_label_get(Evas_Object *obj, unsigned int index)
@@ -975,7 +897,6 @@ elm_segment_control_item_label_get(Evas_Object *obj, unsigned int index)
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI const char *
 elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index)
 {
@@ -984,15 +905,6 @@ elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index)
   
    return label;
 }
-
-/**
- * Get the icon of a segment item of segmentcontrol
- * @param obj The SegmentControl object
- * @param index The index of the segment item
- * @return The icon object or NULL if it is not found.
- *
- * @ingroup SegmentControl SegmentControl
- */
 
 EAPI Evas_Object *
 elm_segment_control_item_icon_get(Evas_Object *obj, unsigned int index)
@@ -1016,7 +928,6 @@ elm_segment_control_item_icon_get(Evas_Object *obj, unsigned int index)
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI Evas_Object *
 elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index)
 {
@@ -1025,14 +936,6 @@ elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index)
 
    return icon;
 }
-
-/**
- * Get the currently selected segment item of segmentcontrol
- * @param obj The SegmentControl object
- * @return The selected Segment item
- *
- * @ingroup SegmentControl SegmentControl
- */
 
 EAPI Elm_Segment_Item *
 elm_segment_control_item_selected_get(const Evas_Object *obj)
@@ -1053,12 +956,10 @@ elm_segment_control_item_selected_get(const Evas_Object *obj)
 /**
  * Get the currently selected segment item of segmentcontrol
  * @param obj The SegmentControl object
- * @param value The current segment item id
  * @return The selected Segment item
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI Elm_Segment_Item *
 elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value)
 {
@@ -1069,13 +970,6 @@ elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value)
     return it;
  }
 
-/**
- * Get the count of segments of segmentcontrol
- * @param obj The SegmentControl object
- * @return The count of Segment items
- *
- * @ingroup SegmentControl SegmentControl
- */
 
 EAPI int
 elm_segment_control_item_count_get(Evas_Object *obj)
@@ -1093,7 +987,6 @@ elm_segment_control_item_count_get(Evas_Object *obj)
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI int
 elm_segment_control_get_segment_count(Evas_Object *obj)
 {
@@ -1110,7 +1003,6 @@ elm_segment_control_get_segment_count(Evas_Object *obj)
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI Evas_Object *
 elm_segment_control_item_object_get(Elm_Segment_Item *it)
 {
@@ -1126,7 +1018,6 @@ elm_segment_control_item_object_get(Elm_Segment_Item *it)
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI void
 elm_segment_control_item_selected_set( Elm_Segment_Item *item, Eina_Bool select)
 {
@@ -1137,13 +1028,13 @@ elm_segment_control_item_selected_set( Elm_Segment_Item *item, Eina_Bool select)
    if(select)
      {
       if(item->segment_id == wd->cur_seg_id) return;
-	
-      if(!item->label_wd)
+      wd->selected = EINA_TRUE;
+      if(wd->data)
         {	
-           edje_object_signal_emit(item->base, "elm,action,focus", "elm");
-	   edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
+           evas_object_del((Evas_Object *)wd->data);
+           wd->data = NULL;
 	}
-      _signal_segment_on(item);
+      wd->data = item;
 
       }
    else if(item->segment_id == wd->cur_seg_id)
@@ -1165,7 +1056,6 @@ elm_segment_control_item_selected_set( Elm_Segment_Item *item, Eina_Bool select)
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI Elm_Segment_Item *
 elm_segment_control_item_get_at(Evas_Object *obj, unsigned int index)
 {
@@ -1182,7 +1072,6 @@ elm_segment_control_item_get_at(Evas_Object *obj, unsigned int index)
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI int
 elm_segment_control_item_index_get(Elm_Segment_Item *item)
 {
@@ -1201,7 +1090,6 @@ elm_segment_control_item_index_get(Elm_Segment_Item *item)
  *
  * @ingroup SegmentControl SegmentControl
  */
-
 EAPI Evas_Object *
 elm_segment_control_item_label_object_set(Elm_Segment_Item *item, char *label)
 {
