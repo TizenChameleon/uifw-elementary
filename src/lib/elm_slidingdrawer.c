@@ -123,7 +123,12 @@ elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content)
 	if (!content) return;
 
 	elm_widget_sub_object_add(obj, content);
+
+	//TODO: Should remove previous content 
+	
 	edje_object_part_swallow (wd->base, "elm.swallow.content", content);
+
+
 }
 
 EAPI void
