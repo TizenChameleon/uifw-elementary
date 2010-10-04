@@ -177,7 +177,7 @@ struct _Smart_Data {
      Eina_Bool (*ewk_view_suspend_request)(Evas_Object *);
      Eina_Bool (*ewk_view_resume_request)(Evas_Object *);
      Eina_Bool (*ewk_view_select_none)(Evas_Object *);
-     Eina_Bool (*ewk_view_get_smart_zoom_rect)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *);
+     Eina_Bool (*ewk_view_get_smart_zoom_rect)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *, Eina_Bool);
      Eina_Bool (*ewk_view_paint_contents)(Ewk_View_Private_Data *, cairo_t *, const Eina_Rectangle *);
      Eina_Bool (*ewk_view_stop)(Evas_Object *);
      Ewk_Tile_Unused_Cache *(*ewk_view_tiled_unused_cache_get)(const Evas_Object *);
@@ -278,6 +278,8 @@ struct _Smart_Data {
      Eina_Bool on_zooming;
      Eina_Bool is_mobile_page;
 
+     Eina_Bool is_layout_width_set_to_container;
+
      Eina_Bool use_text_selection;
      Eina_Bool text_selection_on;
      struct {
@@ -344,7 +346,7 @@ static void      _zoom_start(Smart_Data* sd, int centerX, int centerY, int dista
 static void      _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance);
 static void      _zoom_stop(Smart_Data* sd);
 static void      _adjust_to_contents_boundary(Evas_Object* webview, int* to_x, int* to_y, int from_x, int from_y, float new_zoom_rate);
-static int       _smart_zoom_animator(void* data);
+static Eina_Bool _smart_zoom_animator(void* data);
 static void      _smart_cb_pinch_zoom_start(void* data, Evas_Object* webview, void* event_info);
 static void      _smart_cb_pinch_zoom_move(void* data, Evas_Object* webview, void* event_info);
 static void      _smart_cb_pinch_zoom_stop(void* data, Evas_Object* webview, void* event_info);
@@ -504,6 +506,13 @@ _elm_smart_webview_add(Evas *evas, Eina_Bool tiled)
      }
 
    return webview;
+}
+
+void
+_elm_smart_webview_layout_width_set_to_container(Evas_Object *obj)
+{
+    API_ENTRY return;
+    sd->is_layout_width_set_to_container = EINA_TRUE;
 }
 
 void
@@ -667,7 +676,7 @@ _elm_smart_webview_container_set(Evas_Object *obj, Evas_Object *container)
 }
 #endif
 
-int
+Eina_Bool
 _flush_and_pre_render(void *data)
 {
    Evas_Object *obj = (Evas_Object *)data;
@@ -734,6 +743,9 @@ _resize_calc_job(void *data)
 
    int object_w, object_h;
    evas_object_geometry_get(obj, NULL, NULL, &object_w, &object_h);
+   if(sd->is_layout_width_set_to_container)
+       _elm_smart_webview_default_layout_width_set(obj, object_w);
+
    object_w = (object_w % 10) ? (object_w / 10 * 10 + 10) : object_w;
 
    if (sd->is_mobile_page)
@@ -1449,6 +1461,7 @@ _smart_add(Evas_Object* obj)
    sd->use_text_selection = EINA_FALSE;
    sd->text_selection_on = EINA_FALSE;
    sd->events_feed = EINA_FALSE;
+   sd->is_layout_width_set_to_container = EINA_FALSE;
    sd->touch_obj = _elm_smart_touch_add(evas_object_evas_get(obj));
    sd->layout.default_w = DEFAULT_LAYOUT_WIDTH;
    sd->zoom.init_zoom_rate = 1.0f;
@@ -2639,7 +2652,7 @@ _adjust_to_contents_boundary(Evas_Object* obj, int* to_x, int* to_y,
      (*to_y) += (screen_bottom - contents_bottom);
 }
 
-static int
+static Eina_Bool
 _smart_zoom_animator(void* data)
 {
    Smart_Data* sd = (Smart_Data*)data;
@@ -2867,8 +2880,8 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    Eina_Rectangle rect;
    _coords_evas_to_ewk(webview, point->x, point->y, &ewk_x, &ewk_y);
    if (!sd->ewk_view_get_smart_zoom_rect)
-     sd->ewk_view_get_smart_zoom_rect = (Eina_Bool (*)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *))dlsym(ewk_handle, "ewk_view_get_smart_zoom_rect");
-   Eina_Bool do_smart_zoom = sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect);
+     sd->ewk_view_get_smart_zoom_rect = (Eina_Bool (*)(Evas_Object *, int, int, const Evas_Event_Mouse_Up *, Eina_Rectangle *, Eina_Bool))dlsym(ewk_handle, "ewk_view_get_smart_zoom_rect");
+   Eina_Bool do_smart_zoom = sd->ewk_view_get_smart_zoom_rect(webview, ewk_x, ewk_y, &sd->mouse_up_copy, &rect, sd->is_layout_width_set_to_container);
    if (!do_smart_zoom)
        return;
 

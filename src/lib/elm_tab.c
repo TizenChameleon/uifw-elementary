@@ -1005,7 +1005,7 @@ static void edit_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_inf
 	evas_object_hide(wd->ebx);
 }
 
-static int item_move_cb(void *data, int type, void *event_info)
+static Eina_Bool item_move_cb(void *data, int type, void *event_info)
 {
 	Evas_Object *obj;
 	Ecore_Event_Mouse_Move *ev = event_info;
@@ -1041,7 +1041,7 @@ static int sort_cb(const void *d1, const void *d2)
 	return item1->slot > item2->slot ? 1 : -1;
 }
 
-static int item_up_cb(void *data, int type, void *event_info)
+static Eina_Bool item_up_cb(void *data, int type, void *event_info)
 {
 	Evas_Object *obj;
 	Ecore_Event_Mouse_Button *ev = event_info;

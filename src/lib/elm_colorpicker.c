@@ -84,8 +84,8 @@ static void _colorbar_cb(void *data, Evas * e, Evas_Object * obj,
 			 void *event_info);
 static void _arrow_resize_cb(void *data, Evas * e, Evas_Object * obj,
 			     void *event_info);
-static int _mv_timer(void *data);
-static int _long_press_timer(void *data);
+static Eina_Bool _mv_timer(void *data);
+static Eina_Bool _long_press_timer(void *data);
 static void _left_button_down_cb(void *data, Evas * e, Evas_Object * obj,
 				 void *event_info);
 static void _right_button_down_cb(void *data, Evas * e, Evas_Object * obj,
@@ -595,7 +595,7 @@ _arrow_resize_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
    evas_object_size_hint_max_set(cp->arrow, arrow_w, arrow_h);
 }
 
-static int
+static Eina_Bool
 _mv_timer(void *data)
 {
    Colorpicker_Data *cp = (Colorpicker_Data *) data;
@@ -637,7 +637,7 @@ _mv_timer(void *data)
      }
 }
 
-static int
+static Eina_Bool
 _long_press_timer(void *data)
 {
    Colorpicker_Data *cp = (Colorpicker_Data *) data;

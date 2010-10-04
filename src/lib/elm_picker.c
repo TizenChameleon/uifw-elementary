@@ -39,7 +39,7 @@ static void _down_pressed(void *data, Evas_Object *obj, const char *emission, co
 static void _item_up(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _item_down(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _changed(void *data);
-static int _animator(void *data);
+static Eina_Bool _animator(void *data);
 static void _flick(Evas_Object *obj, float speed);
 static void _flick_init(Evas_Object *obj);
 static void _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -197,7 +197,7 @@ _changed(void *data)
 	}
 }
 
-static int
+static Eina_Bool
 _animator(void *data)
 {
 	Evas_Object *obj = data;

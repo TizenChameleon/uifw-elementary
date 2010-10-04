@@ -65,7 +65,7 @@ static void _icon_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 /*
  * internal functions
  */
-static int _icon_animation(void *data);
+static Eina_Bool _icon_animation(void *data);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -248,7 +248,7 @@ _icon_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
      }
 }
 
-static int
+static Eina_Bool
 _icon_animation(void *data)
 {
    Widget_Data *wd = (Widget_Data *)data;

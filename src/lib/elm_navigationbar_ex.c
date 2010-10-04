@@ -376,7 +376,8 @@ elm_navigationbar_ex_add(Evas_Object *parent)
  * Push an object along with its style to the top of the Navigationbar_ex stack (and show it)
  *
  * The object pushed becomes a child of the Navigationbar_ex and will be controlled
- * it will be deleted when the Navigationbar_ex is deleted.
+ * it will be deleted when the Navigationbar_ex is deleted or when content is popped(depending on del_
+ * on_pop variable).
  *
  * @param[in] obj The Navigationbar_ex object
  * @param[in] content The object to push
@@ -601,7 +602,7 @@ elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item,
 }
 
 /**
- * unsets a title object for the item, the return object has to be deleted
+ * Unsets a title object for the item, the return object has to be deleted
  * by application if not added again in to navigationbar.
  *
  * @param[in] item The Navigationbar_ex Item 
@@ -639,7 +640,7 @@ elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item)
 
 
 /**
- * unsets the content of the item, the return object has to be deleted
+ * Unsets the content of the item, the return object has to be deleted
  * by application if not added again in to navigationbar, when the content 
  * is unset the corresponding item would be deleted, when this content is pushed again 
  * a new item would be created again.
@@ -657,7 +658,7 @@ EAPI Evas_Object *elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_I
 
 
 /**
- * returns the content of the item.
+ * Returns the content of the item.
  *
  * @param[in] item The Navigationbar_ex Item 
  * @return The content object or NULL if none is set
@@ -671,7 +672,7 @@ EAPI Evas_Object *elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Ite
 }
 
 /**
- * set whether the content pushed has to be deleted on pop.
+ * Set whether the content pushed has to be deleted on pop.
  * if false the item is not deleted but only removed from the stack
  * the pointer of the content is sent along with hide,finished signal.
  *
@@ -711,7 +712,7 @@ elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char*
 }
 
 /**
- * returns the style of the item.
+ * Returns the style of the item.
  *
  * @param[in] item The Navigationbar_ex Item 
  * @return The item style.

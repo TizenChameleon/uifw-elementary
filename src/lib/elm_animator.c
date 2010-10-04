@@ -34,7 +34,7 @@ static double _animator_curve_in(double frame);
 static double _animator_curve_out(double frame);
 static unsigned int _animator_compute_reverse_repeat_count(unsigned int cnt);
 static unsigned int _animator_compute_no_reverse_repeat_count(unsigned int cnt);
-static int _animator_animate_cb(void *data);
+static Eina_Bool _animator_animate_cb(void *data);
 static void _delete_animator(Elm_Animator *animator);
 static void _animator_parent_del(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event __UNUSED__);
 
@@ -87,7 +87,7 @@ _delete_animator(Elm_Animator *animator)
      }
 }
 
-static int
+static Eina_Bool
 _animator_animate_cb(void *data)
 {
    Elm_Animator *animator = (Elm_Animator *) data;

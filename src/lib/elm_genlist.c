@@ -460,7 +460,7 @@ static void _groupitem_unrealize(Elm_Genlist_GroupItem *git);
 static Eina_Bool _edit_mode_reset(Widget_Data *wd);
 static void _edit_controls_eval( Elm_Genlist_Item *it );
 static void _move_edit_controls( Elm_Genlist_Item *it, int itx, int ity );
-static int _item_moving_effect_timer_cb(void *data);
+static Eina_Bool _item_moving_effect_timer_cb(void *data);
 static int _item_flip_effect_show(void *data);
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_VERSION;
@@ -888,7 +888,7 @@ _long_press(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static int
+static Eina_Bool
 _edit_long_press(void *data)
 {
   Elm_Genlist_Item *it = data; 
@@ -1317,12 +1317,12 @@ _set_groupitem( Elm_Genlist_Item *it, Elm_Genlist_GroupItem *git)
      }
 }
 
-static Eina_Bool
+static void
 _group_item_click_cb(Elm_Genlist_GroupItem *git)
 {
    git->wd->pinch_it = git->num+1;
    elm_genlist_pinch_zoom_mode_set(git->wd->obj, 0);   
-  return EINA_FALSE;
+  return;
 }
 
 static void
@@ -5035,8 +5035,8 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
 
 	wd->select_all_item = _item_new(wd, &itc, NULL, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
-	if (!wd) return NULL;
-	if (!wd->select_all_item) return NULL;
+	if (!wd) return;
+	if (!wd->select_all_item) return;
 
 	_item_realize(wd->select_all_item, 0, 0);
 	edje_object_signal_callback_add(wd->select_all_item->base, "elm,action,select,press", "elm", _select_all_down, wd->select_all_item);
@@ -5404,7 +5404,7 @@ elm_genlist_longpress_timeout_get(const Evas_Object *obj)
 }
 
 // added for item moving animation.
-EAPI int
+EAPI Eina_Bool
 _group_item_contract_moving_effect_timer_cb(void *data)
 {
 	Item_Block  *itb = (Item_Block *)data;
@@ -5563,7 +5563,7 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 }
 
 // added for item moving animation.
-EAPI int
+EAPI Eina_Bool
 _group_item_expand_moving_effect_timer_cb(void *data)
 {
 	Item_Block  *itb = (Item_Block *)data;
@@ -5818,9 +5818,9 @@ _item_pinch_recalc(Item_Block *itb, int in, int qadd, int norender, int emode)
 static Evas_Object*
 create_tray_alpha_bg(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   if (!wd) return NULL;
 
    Evas_Object *bg = NULL;
    Evas_Coord ox, oy, ow, oh;
@@ -5875,7 +5875,7 @@ elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode)
 
 
 // added for item moving animation.
-static int
+static Eina_Bool
 _item_moving_effect_timer_cb(void *data)
 {
    Widget_Data *wd = data;

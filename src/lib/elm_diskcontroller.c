@@ -227,7 +227,7 @@ static int check_letter(const char *str, int length)
 	return length-1;
 }
 
-static int check_string(void *data)
+static Eina_Bool check_string(void *data)
 {
 	Eina_List *l;
 	Elm_Diskcontroller_Item *it;
@@ -325,7 +325,7 @@ static void scroller_stop_cb(void *data, Evas_Object *obj, void *event_info)
 	wd->stop = 1;
 }
 
-static int move_scroller(void *data)
+static Eina_Bool move_scroller(void *data)
 {
 	Widget_Data *wd = (Widget_Data *)data;
 	Eina_List *l;
