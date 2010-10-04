@@ -894,3 +894,20 @@ elm_label_slide_set(Evas_Object *obj, Eina_Bool slide)
    wd->changed = 1;
    _sizing_eval(obj);
 }
+
+/**
+ * get the text slide mode of the label
+ *
+ * @param obj The label object
+ * @return slide set flag value
+ * @ingroup Label
+ */
+EAPI Eina_Bool
+elm_label_slide_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   return wd->slidingmode;
+}
