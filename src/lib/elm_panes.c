@@ -160,6 +160,8 @@ elm_panes_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   wd->contents.left = NULL;
+   wd->contents.right = NULL;
 
    wd->panes = edje_object_add(e);
    _elm_theme_object_set(obj, wd->panes, "panes", "vertical", "default");
@@ -234,6 +236,7 @@ EAPI void elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
 	wd->contents.right = content;
 	elm_widget_sub_object_add(obj, content);
 	edje_object_part_swallow(wd->panes, "elm.swallow.right", content);
+	edje_object_signal_emit(wd->panes, "panes_pair", "elm");
      }
 }
 
@@ -289,6 +292,7 @@ elm_panes_content_left_unset(Evas_Object *obj)
         edje_object_part_unswallow(wd->panes, content);
         elm_widget_sub_object_del(obj, content);
         wd->contents.left = NULL;
+        edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
         return content;
 }
 
@@ -314,6 +318,7 @@ elm_panes_content_right_unset(Evas_Object *obj)
         edje_object_part_unswallow(wd->panes, content);
         elm_widget_sub_object_del(obj, content);
         wd->contents.right = NULL;
+        edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
         return content;
 }
 
