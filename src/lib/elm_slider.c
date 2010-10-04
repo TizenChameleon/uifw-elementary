@@ -965,6 +965,7 @@ EAPI void
 elm_slider_indicator_show_set(Evas_Object *obj, Eina_Bool show)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   if(!wd) return;
    if(show)
      edje_object_signal_emit(wd->slider, "elm,state,val,show", "elm");
    else
