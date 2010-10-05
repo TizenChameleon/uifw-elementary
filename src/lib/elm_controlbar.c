@@ -2949,13 +2949,6 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
    return NULL;
 }
 
-/**
- * Start edit mode(Don't use this API)
- *
- * @param	The controlbar object
-
- * @ingroup Controlbar
- */ 
    EAPI void
 elm_controlbar_edit_start(Evas_Object * obj) 
 {
@@ -2996,6 +2989,8 @@ elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool visible)
 {
    Elm_Controlbar_Item *item;
    Eina_Bool check = EINA_TRUE;
+
+   if(!it) return;
    if (it->obj == NULL)
       return;
    Widget_Data * wd = elm_widget_data_get(it->obj);
@@ -3033,6 +3028,8 @@ elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool visible)
 EAPI Eina_Bool
 elm_controlbar_item_visible_get(Elm_Controlbar_Item * it) 
 {
+   if(!it) return EINA_FALSE;
+
    if (it->obj == NULL)
       return EINA_FALSE;
    Widget_Data * wd = elm_widget_data_get(it->obj);
@@ -3050,6 +3047,8 @@ elm_controlbar_item_editable_set(Elm_Controlbar_Item * it, Eina_Bool editable)
 {
    Evas_Object * color;
    int r, g, b, a;
+
+   if(!it) return;
 
    if(it->editable == editable) return;
 
@@ -3079,6 +3078,8 @@ elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
 {
    Evas_Object * color;
    int r, g, b, a;
+
+   if(!it) return;
 
    if(it->disable == disable) return;
 
