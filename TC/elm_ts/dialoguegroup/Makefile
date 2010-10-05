@@ -6,7 +6,8 @@ TARGETS = utc_UIFW_elm_dialoguegroup_add_func \
 	  utc_UIFW_elm_dialoguegroup_insert_after_func \
 	  utc_UIFW_elm_dialoguegroup_insert_before_func \
 	  utc_UIFW_elm_dialoguegroup_remove_func \
-	  utc_UIFW_elm_dialoguegroup_remove_all_func
+	  utc_UIFW_elm_dialoguegroup_remove_all_func \
+	  utc_UIFW_elm_dialoguegroup_title_set_func
 
 PKGS = elementary
 
