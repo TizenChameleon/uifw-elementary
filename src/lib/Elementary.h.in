@@ -1673,8 +1673,8 @@ extern "C" {
    EAPI void                  elm_panes_content_left_size_set(Evas_Object *obj, double size);
    EAPI void                  elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal);
    EAPI Eina_Bool             elm_panes_horizontal_get(const Evas_Object *obj);
-   EAPI void				  elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed);
-   EAPI Eina_Bool    		  elm_panes_fixed_is(const Evas_Object *obj);
+   EAPI void                  elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed);
+   EAPI Eina_Bool             elm_panes_fixed_get(const Evas_Object *obj);
 
    typedef enum _Elm_Flip_Mode
      {

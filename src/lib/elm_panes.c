@@ -392,7 +392,7 @@ elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
  * @ingroup Panes
  */
 EAPI Eina_Bool 
-elm_panes_horizontal_is(const Evas_Object *obj)
+elm_panes_horizontal_get(const Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
@@ -427,7 +427,7 @@ elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
  * @ingroup Panes
  */
 EAPI Eina_Bool
-elm_panes_fixed_is(const Evas_Object *obj)
+elm_panes_fixed_get(const Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    return wd->fixed;
