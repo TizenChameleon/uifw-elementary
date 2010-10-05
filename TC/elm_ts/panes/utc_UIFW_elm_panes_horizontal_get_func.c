@@ -35,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_panes_fixed_is_func_01(void);
-static void utc_UIFW_elm_panes_fixed_is_func_02(void);
+static void utc_UIFW_elm_panes_horizontal_get_func_01(void);
+static void utc_UIFW_elm_panes_horizontal_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_panes_fixed_is_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_panes_fixed_is_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_panes_horizontal_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_panes_horizontal_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -68,9 +68,9 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_panes_fixed_is()
+ * @brief Positive test case of elm_panes_horizontal_get()
  */
-static void utc_UIFW_elm_panes_fixed_is_func_01(void)
+static void utc_UIFW_elm_panes_horizontal_get_func_01(void)
 {
    Evas_Object *panes = NULL;
    Evas_Object *btn = NULL;
@@ -82,10 +82,10 @@ static void utc_UIFW_elm_panes_fixed_is_func_01(void)
    evas_object_size_hint_align_set(btn, -1.0, -1.0);
    elm_panes_content_left_set(panes, btn);
    elm_panes_content_left_size_set(panes, 0.4);
-   elm_panes_fixed_set(panes, EINA_TRUE);
-   if(elm_panes_fixed_is(panes) != EINA_TRUE)
+   elm_panes_horizontal_set(panes, EINA_TRUE);
+   if(elm_panes_horizontal_get(panes) != EINA_TRUE)
       {
-         tet_infoline("elm_panes_fixed_is() failed in positive test case");
+         tet_infoline("elm_panes_horizontal_get() failed in positive test case");
          tet_result(TET_FAIL);
          return;
       }
@@ -96,13 +96,13 @@ static void utc_UIFW_elm_panes_fixed_is_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_panes_fixed_is()
+ * @brief Negative test case of ug_init elm_panes_horizontal_get()
  */
-static void utc_UIFW_elm_panes_fixed_is_func_02(void)
+static void utc_UIFW_elm_panes_horizontal_get_func_02(void)
 {
    Evas_Object *panes = NULL;
    Evas_Object *btn = NULL;
-   Eina_Bool is_fixed = EINA_TRUE;
+   Eina_Bool is_horizontal = EINA_TRUE;
 
    panes = elm_panes_add(main_win);
    btn = elm_button_add(panes);
@@ -111,10 +111,10 @@ static void utc_UIFW_elm_panes_fixed_is_func_02(void)
    evas_object_size_hint_align_set(btn, -1.0, -1.0);
    elm_panes_content_left_set(panes, btn);
    elm_panes_content_left_size_set(panes, 0.4);
-   elm_panes_fixed_set(panes, is_fixed);
-   if(elm_panes_fixed_is(NULL) != is_fixed)
+   elm_panes_horizontal_set(panes, is_horizontal);
+   if(elm_panes_horizontal_get(NULL) != is_horizontal)
       {
-      tet_infoline("elm_panes_fixed_is() failed in negative test case");
+      tet_infoline("elm_panes_horizontal_get() failed in negative test case");
       tet_result(TET_FAIL);
       return;
       }
