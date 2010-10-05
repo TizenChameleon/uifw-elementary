@@ -31,7 +31,7 @@
 #define USE_MAX_TUC_20MB
 
 #ifdef USE_MAX_TUC_20MB
-#define MAX_TUC 1024*1024*20
+#define MAX_TUC 1024*1024*16
 #else
 #define MAX_TUC 1024*1024*10
 #endif
