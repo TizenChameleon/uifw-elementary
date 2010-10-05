@@ -88,12 +88,12 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 }
 
 /**
- * Add a new box to the parent
+ * Add a new webview to the parent
  *
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
  *
- * @ingroup Box
+ * @ingroup WebView
  */
 EAPI Evas_Object *
 elm_webview_add(Evas_Object *parent, Eina_Bool tiled)
@@ -130,6 +130,14 @@ elm_webview_add(Evas_Object *parent, Eina_Bool tiled)
    return obj;
 }
 
+/**
+ * Get the webkit object to control ewk api
+ *
+ * @param obj The WebView object
+ * @return The webkit object or NULL on errors
+ *
+ * @ingroup WebView
+ */
 EAPI Evas_Object *
 elm_webview_webkit_get(Evas_Object *obj)
 {
@@ -206,6 +214,14 @@ elm_webview_auto_fitting_get(Evas_Object *obj)
    return _elm_smart_webview_auto_fitting_get(wd->webkit);
 }
 
+/**
+ * Get the minimap object.
+ *
+ * @param parent The WebView object
+ * @return The minimap object or NULL on errors
+ *
+ * @ingroup WebView
+ */
 EAPI Evas_Object *
 elm_webview_minimap_get(Evas_Object *obj)
 {
@@ -214,6 +230,18 @@ elm_webview_minimap_get(Evas_Object *obj)
    return _elm_smart_webview_minimap_get(wd->webkit);
 }
 
+/**
+ * Set uri to load
+ *
+ * This will make webkit load uri. This is the same as ewk_view_uri_set except
+ * that it can call uri which doesn't contains any protocol.
+ * The default protocol is http.
+ *
+ * @param obj The WebView object
+ * @param uri uniform resource identifier to load. It can omit http:
+ *
+ * @ingroup WebView
+ */
 EAPI void
 elm_webview_uri_set(Evas_Object *obj, const char *uri)
 {
