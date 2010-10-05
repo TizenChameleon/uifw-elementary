@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE AML SYSTEM "tree2.dtd">
+<AML>
+  <Animation title="test">
+    <Scene title="first">
+      <Time start="0" end="0.2"/>
+      <Location>
+        <CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+        <CoordY standard="OBJECT" from="0" to="-20" type="DECELERATE"/>
+        <CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+        <CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+      </Location>
+      <Rotation>
+        <AngleX from="0" to="0" type="LINEAR"/>
+        <AngleY from="0" to="0" type="LINEAR"/>
+        <AngleZ from="0" to="0" type="LINEAR"/>
+        <Center x="10" y="30" z="20"/>
+      </Rotation>
+      <Color>
+        <ColorRed from="255" to="255" type="LINEAR"/>
+        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <ColorBlue from="255" to="255" type="LINEAR"/>
+        <ColorAlpha from="255" to="255" type="LINEAR"/>
+      </Color>
+	</Scene>
+	<Scene title="second">
+      <Time start="0" end="0.2"/>
+      <Location>
+        <CoordX standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordY standard="CURRENT" from="0" to="20" type="ACCELERATE"/>
+        <CoordW standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordH standard="CURRENT" from="0" to="0" type="LINEAR"/>
+      </Location>
+      <Rotation>
+        <AngleX from="0" to="0" type="LINEAR"/>
+        <AngleY from="0" to="0" type="LINEAR"/>
+        <AngleZ from="0" to="0" type="LINEAR"/>
+        <Center x="10" y="30" z="20"/>
+      </Rotation>
+      <Color>
+        <ColorRed from="255" to="255" type="LINEAR"/>
+        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <ColorBlue from="255" to="255" type="LINEAR"/>
+        <ColorAlpha from="255" to="255" type="LINEAR"/>
+      </Color>
+	</Scene>
+	<Scene title="second">
+      <Time start="0" end="0.2"/>
+      <Location>
+        <CoordX standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordY standard="CURRENT" from="0" to="-15" type="DECELERATE"/>
+        <CoordW standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordH standard="CURRENT" from="0" to="0" type="LINEAR"/>
+      </Location>
+      <Rotation>
+        <AngleX from="0" to="0" type="LINEAR"/>
+        <AngleY from="0" to="0" type="LINEAR"/>
+        <AngleZ from="0" to="0" type="LINEAR"/>
+        <Center x="10" y="30" z="20"/>
+      </Rotation>
+      <Color>
+        <ColorRed from="255" to="255" type="LINEAR"/>
+        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <ColorBlue from="255" to="255" type="LINEAR"/>
+        <ColorAlpha from="255" to="255" type="LINEAR"/>
+      </Color>
+	</Scene>
+	<Scene title="second">
+      <Time start="0" end="0.2"/>
+      <Location>
+        <CoordX standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordY standard="CURRENT" from="0" to="15" type="ACCELERATE"/>
+        <CoordW standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordH standard="CURRENT" from="0" to="0" type="LINEAR"/>
+      </Location>
+      <Rotation>
+        <AngleX from="0" to="0" type="LINEAR"/>
+        <AngleY from="0" to="0" type="LINEAR"/>
+        <AngleZ from="0" to="0" type="LINEAR"/>
+        <Center x="10" y="30" z="20"/>
+      </Rotation>
+      <Color>
+        <ColorRed from="255" to="255" type="LINEAR"/>
+        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <ColorBlue from="255" to="255" type="LINEAR"/>
+        <ColorAlpha from="255" to="255" type="LINEAR"/>
+      </Color>
+	</Scene>
+	<Scene title="second">
+      <Time start="0" end="0.2"/>
+      <Location>
+        <CoordX standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordY standard="CURRENT" from="0" to="-10" type="DECELERATE"/>
+        <CoordW standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordH standard="CURRENT" from="0" to="0" type="LINEAR"/>
+      </Location>
+      <Rotation>
+        <AngleX from="0" to="0" type="LINEAR"/>
+        <AngleY from="0" to="0" type="LINEAR"/>
+        <AngleZ from="0" to="0" type="LINEAR"/>
+        <Center x="10" y="30" z="20"/>
+      </Rotation>
+      <Color>
+        <ColorRed from="255" to="255" type="LINEAR"/>
+        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <ColorBlue from="255" to="255" type="LINEAR"/>
+        <ColorAlpha from="255" to="255" type="LINEAR"/>
+      </Color>
+	</Scene>
+	<Scene title="second">
+      <Time start="0" end="0.2"/>
+      <Location>
+        <CoordX standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordY standard="CURRENT" from="0" to="10" type="ACCELERATE"/>
+        <CoordW standard="CURRENT" from="0" to="0" type="LINEAR"/>
+        <CoordH standard="CURRENT" from="0" to="0" type="LINEAR"/>
+      </Location>
+      <Rotation>
+        <AngleX from="0" to="0" type="LINEAR"/>
+        <AngleY from="0" to="0" type="LINEAR"/>
+        <AngleZ from="0" to="0" type="LINEAR"/>
+        <Center x="10" y="30" z="20"/>
+      </Rotation>
+      <Color>
+        <ColorRed from="255" to="255" type="LINEAR"/>
+        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <ColorBlue from="255" to="255" type="LINEAR"/>
+        <ColorAlpha from="255" to="255" type="LINEAR"/>
+      </Color>
+    </Scene>
+  </Animation>
+  <Animation title="test2">
+	<Scene title="first">
+		<Time start="0" end="1.2"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="DECELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="1080" type="DECELERATE"/>
+			<AngleZ from="0" to="0" type="LINEAR"/>
+			<Center x="0.5" y="0.5" z="0"/>
+		</Rotation>
+		<Color>
+			<ColorRed from="255" to="255" type="LINEAR"/>
+			<ColorGreen from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<ColorAlpha from="255" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="test3">
+	<Scene title="first">
+		<Time start="0" end="1.2"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="DECELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="1080" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="0" to="0" type="LINEAR"/>
+			<Center x="0.5" y="0.5" z="0"/>
+		</Rotation>
+		<Color>
+			<ColorRed from="255" to="255" type="LINEAR"/>
+			<ColorGreen from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<ColorAlpha from="255" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="test4">
+	<Scene title="1">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="0" to="-25" type="DECELERATE"/>
+			<Center x="0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+	<Scene title="2">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="-25" to="0" type="DECELERATE"/>
+			<Center x="0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+	<Scene title="3">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="0" to="20" type="DECELERATE"/>
+			<Center x="1.0" y="1.0" z="0" attribute="RELATIVE"/>
+		</Rotation>
+	</Scene>
+	<Scene title="4">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="20" to="0" type="DECELERATE"/>
+			<Center x="1.0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+	<Scene title="5">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="0" to="-15" type="DECELERATE"/>
+			<Center x="0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+	<Scene title="6">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="-15" to="0" type="DECELERATE"/>
+			<Center x="0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+	<Scene title="7">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="0" to="10" type="DECELERATE"/>
+			<Center x="1.0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+	<Scene title="8">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="10" to="0" type="DECELERATE"/>
+			<Center x="1.0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+	<Scene title="9">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="0" to="-5" type="DECELERATE"/>
+			<Center x="0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+	<Scene title="10">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="-5" to="0" type="DECELERATE"/>
+			<Center x="0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+	<Scene title="11">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="0" to="5" type="DECELERATE"/>
+			<Center x="1.0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+		<Scene title="12">
+		<Time start="0" end="0.1"/>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="5" to="0" type="DECELERATE"/>
+			<Center x="1.0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+  </Animation>
+</AML>
