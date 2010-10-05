@@ -345,7 +345,7 @@ elm_tickernoti_label_get (const Evas_Object *obj)
 }
 
 /**
- * Set the label on the tickernoti object
+ * Set the detail label on the tickernoti object
  *
  * @param obj The tickernoti object
  * @param label The label will be used on the tickernoti object
@@ -365,7 +365,7 @@ elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label)
 }
 
 /**
- * Get the label used on the tickernoti object
+ * Get the detail label used on the tickernoti object
  *
  * @param obj The tickernotil object
  * @return The string inside the label
@@ -415,7 +415,7 @@ elm_tickernoti_detailview_button_get (const Evas_Object *obj)
 }
 
 /**
- * Set the icon object used on the tickernoti object
+ * Set the detail icon object used on the tickernoti object
  *
  * @param obj The tickernotil object
  * @param icon The icon object will be used on the tickernoti object
@@ -433,7 +433,7 @@ elm_tickernoti_detailview_icon_set (const Evas_Object *obj, Evas_Object *icon)
 }
 
 /**
- * Get the icon object used on the tickernoti object
+ * Get the detail icon object used on the tickernoti object
  *
  * @param obj The tickernotil object
  * @return The icon object inside the tickernoti
