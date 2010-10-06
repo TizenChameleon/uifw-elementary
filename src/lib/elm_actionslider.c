@@ -67,6 +67,9 @@ static void _icon_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
  */
 static Eina_Bool _icon_animation(void *data);
 
+static const char *widtype = NULL;
+
+
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -316,6 +319,7 @@ elm_actionslider_add(Evas_Object *parent)
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    if (e == NULL) return NULL;
+   ELM_SET_WIDTYPE(widtype, "actionslider");
    obj = elm_widget_add(e);
    elm_widget_type_set(obj, "actionslider");
    elm_widget_sub_object_add(parent, obj);
@@ -397,6 +401,8 @@ elm_actionslider_add_with_set(Evas_Object *parent, Elm_Actionslider_Icon_Pos pos
 EAPI void
 elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_Pos pos)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
    Widget_Data *wd = elm_widget_data_get(obj);
    double position = 0.0;
 
@@ -433,8 +439,8 @@ elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_
 EAPI void
 elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos pos)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-
    wd->magnet_position = pos;
 }
 
@@ -448,9 +454,10 @@ elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos po
  *
  * @ingroup Actionslider
  */
-EAPI int
+EAPI void 
 elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, const char *label)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if(label == NULL) 
@@ -518,7 +525,6 @@ elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, con
 	  }
      }
 
-   return 0;
 }
 
 /**
@@ -530,12 +536,11 @@ elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, con
  *
  * @ingroup Actionslider
  */
-EAPI int
+EAPI void
 elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    wd->mouse_hold = flag;
-
-   return 0;
 }

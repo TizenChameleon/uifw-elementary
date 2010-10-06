@@ -4,6 +4,9 @@
  *
  * This is a slidingdrawer.
  */
+
+
+
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -98,6 +101,14 @@ _sizing_eval(Evas_Object *obj)
 	evas_object_size_hint_min_set(wd->handler, w, h);
 }
 
+/**
+ * Unswallow the user content
+ *
+ * @param obj		SlidingDrawer object
+ * @return 		The unswallowed contents
+ *
+ * @ingroup SlidingDrawer
+ */
 EAPI Evas_Object *
 elm_slidingdrawer_content_unset(Evas_Object *obj)
 {
@@ -114,23 +125,43 @@ elm_slidingdrawer_content_unset(Evas_Object *obj)
 	return content;
 }
 
+/**
+ * Swallow the user contents
+ *
+ * @param obj 		SlidingDrawer object
+ * @param content       Content to be swallowed.
+ *
+ * @ingroup SlidingDrawer
+ */
 EAPI void
 elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 
 	Widget_Data *wd = elm_widget_data_get(obj);
+	Evas_Object *prev_content;
 	if (!content) return;
 
 	elm_widget_sub_object_add(obj, content);
 
-	//TODO: Should remove previous content 
+ 	prev_content = edje_object_part_swallow_get(wd->base, "elm.swallow.content");
+	if(prev_content) {
+		edje_object_part_unswallow(wd->base, prev_content);
+		elm_widget_sub_object_del(obj, prev_content);
+		evas_object_del(prev_content);
+	}
 	
 	edje_object_part_swallow (wd->base, "elm.swallow.content", content);
-
-
 }
 
+/**
+ * Set the position of SlidingDrawer
+ *
+ * @param obj 		SlidingDrawer object
+ * @param pos       	
+ *
+ * @ingroup SlidingDrawer
+ */
 EAPI void
 elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos)
 {
@@ -159,6 +190,15 @@ elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos)
 	_sizing_eval(obj);
 }
 
+/**
+ * Set the current dragable value.
+ *
+ * @param obj 		SlidingDrawer object
+ * @param dx  	        The x value (range: 0 ~ 1)
+ * @param dy            The y value (range: 0 ~ 1)
+ *
+ * @ingroup SlidingDrawer
+ */
 EAPI void
 elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy)
 {
@@ -168,6 +208,15 @@ elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy)
 	edje_object_part_drag_value_set(wd->base, "elm.dragable.handler", dx, dy);
 }
 
+/**
+ * Set the dragable max value.
+ *
+ * @param obj 		SlidingDrawer object
+ * @param dw  	        The maximum width value (range: 0 ~ 1)
+ * @param dh            The maximum height value (range: 0 ~ 1)
+ *
+ * @ingroup SlidingDrawer
+ */
 EAPI void
 elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh)
 {
@@ -185,6 +234,14 @@ elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh)
 }
 
 
+/**
+ * Add a new slidingdrawer object to the parent.
+ *
+ * @param parent 	Parent object
+ * @return 		New object or NULL if it cannot be created
+ *
+ * @ingroup SlidingDrawer
+ */
 EAPI Evas_Object *
 elm_slidingdrawer_add(Evas_Object *parent)
 {
@@ -202,6 +259,8 @@ elm_slidingdrawer_add(Evas_Object *parent)
 
 	wd->parent = parent;
 	e = evas_object_evas_get(parent);
+
+	if(!e) return NULL;
 
 	//widget
 	obj = elm_widget_add(e);

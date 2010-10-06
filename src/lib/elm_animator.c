@@ -168,7 +168,7 @@ EAPI unsigned int
 elm_animator_repeat_get(Elm_Animator *animator)
 {
 	if (animator->magic != MAGIC_OBJ_ANIMATOR)
-      return EINA_FALSE;
+      return 0;
    return animator->repeat_cnt;
 }
 
