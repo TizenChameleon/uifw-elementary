@@ -2804,107 +2804,104 @@ _pan_resize(Evas_Object *obj, Evas_Coord w, Evas_Coord h)
 static void
 _pan_calculate(Evas_Object *obj)
 {
-   Pan *sd = evas_object_smart_data_get(obj);
-   Item_Block *itb;
-   Elm_Genlist_GroupItem *git;
-   Evas_Coord ox, oy, ow, oh, cvx, cvy, cvw, cvh;
-   int in = 0;
-   static int old_minw = 0;
+	Pan *sd = evas_object_smart_data_get(obj);
+	Item_Block *itb;
+	Elm_Genlist_GroupItem *git;
+	Evas_Coord ox, oy, ow, oh, cvx, cvy, cvw, cvh;
+	int in = 0;
+	static int old_minw = 0;
 	int git_cnt = 0, git_h = 0;
 
 	evas_object_geometry_get(obj, &ox, &oy, &ow, &oh);
-   if( sd->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_EXPAND) return;
-   if( sd->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH &&  
-      ((old_minw != sd->wd->minw) || (sd->wd->mouse_down == 1)) && sd->wd->pan_y < oh+oy) 
-   {
-		old_minw = sd->wd->minw;
-       EINA_INLIST_FOREACH(sd->wd->group_items, git)
-       {
-            git_cnt++;
-            git_h = git->h;
-       }
-
-		   EINA_INLIST_FOREACH(sd->wd->group_items, git)
-		   {
-            
-			   if( git->visible )
-			   {
-				   evas_object_raise(git->base);
-				   evas_object_resize( git->base, sd->wd->minw, git->h );
-				   evas_object_move(git->base, git->x, git->y + sd->wd->pan_y * -1);
-				   evas_object_show(git->base);
-			   }
-
-		   }
-   }
-   if( sd->wd->effect_mode && sd->wd->multi_down ) return;
-   if( sd->wd->effect_mode && sd->wd->pinchzoom_effect_mode != ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE) return;
-   
-   if( sd->wd->edit_mode != ELM_GENLIST_EDIT_MODE_NONE )
-     (void)_edit_mode_reset( sd->wd );
-   EINA_INLIST_FOREACH(sd->wd->group_items, git)
-   {
-     git->visible = EINA_FALSE;
-   }
-
-
-   evas_output_viewport_get(evas_object_evas_get(obj), &cvx, &cvy, &cvw, &cvh);
-   EINA_INLIST_FOREACH(sd->wd->blocks, itb)
-     {
-	itb->w = sd->wd->minw;
-	if (ELM_RECTS_INTERSECT(itb->x - sd->wd->pan_x + ox,
-				itb->y - sd->wd->pan_y + oy,
-				itb->w, itb->h,
-				cvx, cvy, cvw, cvh))
+	if (sd->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_EXPAND) return;
+	if (sd->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH &&  
+			((old_minw != sd->wd->minw) || (sd->wd->mouse_down == 1)) && sd->wd->pan_y < oh+oy) 
 	  {
-	     if ((!itb->realized) || (itb->changed))
-               _item_block_realize(itb, in, 0);
-	     _item_block_position(itb,  in);
-	  }
-	else
-	  {
-	     if (itb->realized) _item_block_unrealize(itb);
-	  }
-	in += itb->count;
-     }
+		  old_minw = sd->wd->minw;
+		  EINA_INLIST_FOREACH(sd->wd->group_items, git)
+			 {
+				 git_cnt++;
+				 git_h = git->h;
+			 }
 
-    if(sd->wd->effect_mode && sd->wd->expanded_effect)
-    {
-	      if(sd->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
-	      	_item_flip_effect_show(sd->wd);
-         sd->wd->item_moving_effect_timer = ecore_animator_add(_item_moving_effect_timer_cb, sd->wd);
-    }
-   EINA_INLIST_FOREACH(sd->wd->group_items, git)
-     {
-	if( git->visible )
-	  {
-	     evas_object_raise(git->base);
-	     evas_object_resize( git->base, git->w, git->h-1 );
-	     evas_object_move(git->base, git->x, git->y );
-	     evas_object_show(git->base);
+		  EINA_INLIST_FOREACH(sd->wd->group_items, git)
+			 {
+				 if (git->visible)
+					{
+						evas_object_raise(git->base);
+						evas_object_resize(git->base, sd->wd->minw, git->h);
+						evas_object_move(git->base, git->x, git->y + sd->wd->pan_y * -1);
+						evas_object_show(git->base);
+					}
+			 }
 	  }
-	else
-	  evas_object_hide(git->base);
-     }
-   if( (sd->wd->edit_mode & ELM_GENLIST_EDIT_MODE_REORDER ) && (sd->wd->ed->reorder_item ) )
-     {
-	evas_object_raise(sd->wd->ed->reorder_item->base);
-	evas_object_raise(sd->wd->ed->reorder_item->edit_obj);
-     }
-   if(sd->wd->select_all_item) 
-	   evas_object_raise(sd->wd->select_all_item->base);
+	if (sd->wd->effect_mode && sd->wd->multi_down) return;
+	if (sd->wd->effect_mode && sd->wd->pinchzoom_effect_mode != ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE) return;
+
+	if (sd->wd->edit_mode != ELM_GENLIST_EDIT_MODE_NONE)
+	  (void)_edit_mode_reset(sd->wd);
+	EINA_INLIST_FOREACH(sd->wd->group_items, git)
+	  {
+		  git->visible = EINA_FALSE;
+	  }
+
+	evas_output_viewport_get(evas_object_evas_get(obj), &cvx, &cvy, &cvw, &cvh);
+	EINA_INLIST_FOREACH(sd->wd->blocks, itb)
+	  {
+		  itb->w = sd->wd->minw;
+		  if (ELM_RECTS_INTERSECT(itb->x - sd->wd->pan_x + ox,
+					  itb->y - sd->wd->pan_y + oy,
+					  itb->w, itb->h,
+					  cvx, cvy, cvw, cvh))
+			 {
+				 if ((!itb->realized) || (itb->changed))
+					_item_block_realize(itb, in, 0);
+				 _item_block_position(itb,  in);
+			 }
+		  else
+			 {
+				 if (itb->realized) _item_block_unrealize(itb);
+			 }
+		  in += itb->count;
+	  }
+
+	if (sd->wd->effect_mode && sd->wd->expanded_effect)
+	  {
+		  if (sd->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
+			 _item_flip_effect_show(sd->wd);
+		  sd->wd->item_moving_effect_timer = ecore_animator_add(_item_moving_effect_timer_cb, sd->wd);
+	  }
+	EINA_INLIST_FOREACH(sd->wd->group_items, git)
+	  {
+		  if (git->visible)
+			 {
+				 evas_object_raise(git->base);
+				 evas_object_resize(git->base, git->w, git->h - 1);
+				 evas_object_move(git->base, git->x, git->y);
+				 evas_object_show(git->base);
+			 }
+		  else
+			 evas_object_hide(git->base);
+	  }
+	if ((sd->wd->edit_mode & ELM_GENLIST_EDIT_MODE_REORDER) && (sd->wd->ed->reorder_item))
+	  {
+		  evas_object_raise(sd->wd->ed->reorder_item->base);
+		  evas_object_raise(sd->wd->ed->reorder_item->edit_obj);
+	  }
+	if(sd->wd->select_all_item) 
+	  evas_object_raise(sd->wd->select_all_item->base);
 }
 
 static void
 _pan_move(Evas_Object *obj, Evas_Coord x __UNUSED__, Evas_Coord y __UNUSED__)
 {
-   Pan *sd = evas_object_smart_data_get(obj);
+	Pan *sd = evas_object_smart_data_get(obj);
 
-   if(sd->wd->effect_mode && sd->wd->multi_down) return;
-   if(sd->wd->effect_mode && sd->wd->pinchzoom_effect_mode != ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE) return;
+	if (sd->wd->effect_mode && sd->wd->multi_down) return;
+	if (sd->wd->effect_mode && sd->wd->pinchzoom_effect_mode != ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE) return;
 
-   if (sd->wd->calc_job) ecore_job_del(sd->wd->calc_job);
-   sd->wd->calc_job = ecore_job_add(_calc_job, sd->wd);
+	if (sd->wd->calc_job) ecore_job_del(sd->wd->calc_job);
+	sd->wd->calc_job = ecore_job_add(_calc_job, sd->wd);
 }
 
 static void
