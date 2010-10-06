@@ -98,6 +98,9 @@ struct _Smart_Data
    unsigned char bounce_horiz : 1;
    unsigned char bounce_vert : 1;
    Eina_Bool freeze_bounce :1;
+
+   Eina_Bool freeze_momentum_animator :1;
+   Eina_Bool freeze_bounce_animator :1;
 };
 
 /* local subsystem functions */
@@ -743,7 +746,7 @@ bounce_eval(Smart_Data *sd)
    if ((!sd->widget) ||
        (!elm_widget_drag_child_locked_y_get(sd->widget)))
      {
-        if (!sd->down.bounce_y_animator)
+        if (!sd->down.bounce_y_animator && !sd->freeze_bounce_animator)
           {
              if (sd->bouncemey)
                {
@@ -1565,7 +1568,7 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj , void *event_info)
                                  oy = -sd->down.dy;
 			            if (!_smart_do_page(sd) && sd->freeze_bounce == EINA_FALSE)
 			              {
-				         if (!sd->down.momentum_animator)
+				         if (!sd->down.momentum_animator && !sd->freeze_momentum_animator)
 				           {
 					      sd->down.momentum_animator = ecore_animator_add(_smart_momentum_animator, sd);
 					      _smart_anim_start(sd->smart_obj);
@@ -2512,3 +2515,43 @@ _smart_init(void)
      }
 }
 
+void
+elm_smart_scroller_freeze_momentum_animator_set(Evas_Object *obj, Eina_Bool freeze)
+{
+#ifdef DEBUG_PRINT
+	fprintf(stderr,"%s : %d \n", __FUNCTION__, __LINE__);
+#endif
+
+   API_ENTRY return;
+   sd->freeze_momentum_animator = freeze;
+   if (sd->freeze_momentum_animator)
+     {
+        if (sd->down.momentum_animator)
+          {
+             ecore_animator_del(sd->down.momentum_animator);
+             sd->down.momentum_animator = NULL;
+          }
+     }
+
+}
+
+
+void
+elm_smart_scroller_freeze_bounce_animator_set(Evas_Object *obj, Eina_Bool freeze)
+{
+#ifdef DEBUG_PRINT
+	fprintf(stderr,"%s : %d \n", __FUNCTION__, __LINE__);
+#endif
+
+   API_ENTRY return;
+   sd->freeze_bounce_animator = freeze;
+   if (sd->freeze_bounce_animator)
+     {
+      if (sd->scrollto.y.animator)
+        {
+           ecore_animator_del(sd->scrollto.y.animator);
+           sd->scrollto.y.animator = NULL;
+        }
+     }
+
+}
