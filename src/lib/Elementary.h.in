@@ -277,6 +277,9 @@ extern "C" {
    EAPI void         elm_finger_size_set(Evas_Coord size);
    EAPI void         elm_finger_size_all_set(Evas_Coord size);
 
+   EAPI void         elm_autocapitalization_allow_all_set(Eina_Bool autocap);
+   EAPI void         elm_autoperiod_allow_all_set(Eina_Bool autoperiod);
+
    EAPI Eina_Bool    elm_object_focus_get(Evas_Object *obj);
    EAPI void         elm_object_focus(Evas_Object *obj);
    EAPI void         elm_object_unfocus(Evas_Object *obj);
@@ -2098,8 +2101,8 @@ extern "C" {
    /* Tab */
    typedef enum _Elm_Tab_Move_Type
      {
-	ELM_TAB_MOVE_LEFT = 0,
-	ELM_TAB_MOVE_RIGHT = 1
+        ELM_TAB_MOVE_LEFT = 0,
+        ELM_TAB_MOVE_RIGHT = 1
      } Elm_Tab_Move_Type;
 
    typedef enum _Elm_Tab_Mode_Type
@@ -2861,17 +2864,17 @@ extern "C" {
     */
 
    /* do not use except clipboard history module */
-   EAPI Eina_Bool elm_cbhm_helper_init(Evas_Object *self);
-   EAPI void      elm_cbhm_send_raw_data(char *cmd);
+   EAPI Eina_Bool    elm_cbhm_helper_init(Evas_Object *self);
+   EAPI void         elm_cbhm_send_raw_data(char *cmd);
 
    /* Xml Animator */
    typedef struct _Elm_Xml_Animator Elm_Xml_Animator;
 
-   EAPI Eina_Bool elm_xml_animator_file_set(Elm_Xml_Animator *xa, const char *file);
-   EAPI Eina_Bool elm_xml_animator_object_add(Elm_Xml_Animator *xa, Evas_Object *obj, const char *title, void (*end_func)(void *data, Evas_Object *obj), void *data);
-   EAPI void      elm_xml_animator_object_del(Elm_Xml_Animator *xa, Evas_Object *obj);
-   EAPI void      elm_xml_animator_del(Elm_Xml_Animator *xa);
-   EAPI void      elm_xml_animator_run(Elm_Xml_Animator *xa);
+   EAPI Eina_Bool    elm_xml_animator_file_set(Elm_Xml_Animator *xa, const char *file);
+   EAPI Eina_Bool    elm_xml_animator_object_add(Elm_Xml_Animator *xa, Evas_Object *obj, const char *title, void (*end_func)(void *data, Evas_Object *obj), void *data);
+   EAPI void         elm_xml_animator_object_del(Elm_Xml_Animator *xa, Evas_Object *obj);
+   EAPI void         elm_xml_animator_del(Elm_Xml_Animator *xa);
+   EAPI void         elm_xml_animator_run(Elm_Xml_Animator *xa);
    
 #ifdef __cplusplus
 }

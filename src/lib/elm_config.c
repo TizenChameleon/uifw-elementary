@@ -24,7 +24,7 @@ static void _env_get(void);
 #ifdef HAVE_ELEMENTARY_X
 static Ecore_Event_Handler *_prop_change_handler = NULL;
 static Ecore_X_Window _root_1st = 0;
-#define ATOM_COUNT 6
+#define ATOM_COUNT 8
 static Ecore_X_Atom _atom[ATOM_COUNT];
 static Ecore_X_Atom _atom_config = 0;
 static Ecore_X_Atom _atom_config_specific = 0;
@@ -36,8 +36,8 @@ static const char *_atom_names[ATOM_COUNT] =
      "ENLIGHTENMENT_PROFILE",
      "ENLIGHTENMENT_CONFIG",
      "ENLIGHTENMENT_INPUT_PANEL",
-     "ENLIGHTENMENT_AUTOCAPITAL",
-     "ENLIGHTENMENT_AUTOPERIOD",
+     "ENLIGHTENMENT_AUTOCAPITAL_ALLOW",
+     "ENLIGHTENMENT_AUTOPERIOD_ALLOW",
 };
 #define ATOM_E_SCALE 0
 #define ATOM_E_FINGER_SIZE 1
@@ -45,8 +45,8 @@ static const char *_atom_names[ATOM_COUNT] =
 #define ATOM_E_PROFILE 3
 #define ATOM_E_CONFIG 4
 #define ATOM_E_INPUT_PANEL 5
-#define ATOM_E_AUTOCAPITAL 6
-#define ATOM_E_AUTOPERIOD 7
+#define ATOM_E_AUTOCAPITAL_ALLOW 6
+#define ATOM_E_AUTOPERIOD_ALLOW 7
 
 static Eina_Bool _prop_config_get(void);
 static Eina_Bool _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev);
@@ -99,61 +99,61 @@ _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev)
 
    if (event->win == _root_1st)
      {
-	if (event->atom == _atom[ATOM_E_SCALE])
-	  {
-	     unsigned int val = 1000;
+        if (event->atom == _atom[ATOM_E_SCALE])
+          {
+             unsigned int val = 1000;
 
-	     if (ecore_x_window_prop_card32_get(event->win,
-						event->atom,
-						&val, 1) > 0)
-	       {
-		  double pscale;
+             if (ecore_x_window_prop_card32_get(event->win,
+                                                event->atom,
+                                                &val, 1) > 0)
+               {
+                  double pscale;
 
-		  pscale = _elm_config->scale;
-		  if (val > 0) _elm_config->scale = (double)val / 1000.0;
-		  if (pscale != _elm_config->scale) _elm_rescale();
-	       }
-	  }
-	else if (event->atom == _atom[ATOM_E_FINGER_SIZE])
-	  {
-	     unsigned int val = 1000;
+                  pscale = _elm_config->scale;
+                  if (val > 0) _elm_config->scale = (double)val / 1000.0;
+                  if (pscale != _elm_config->scale) _elm_rescale();
+               }
+          }
+        else if (event->atom == _atom[ATOM_E_FINGER_SIZE])
+          {
+             unsigned int val = 1000;
 
-	     if (ecore_x_window_prop_card32_get(event->win,
-						event->atom,
-						&val, 1) > 0)
-	       {
-		  int pfinger_size;
+             if (ecore_x_window_prop_card32_get(event->win,
+                                                event->atom,
+                                                &val, 1) > 0)
+               {
+                  int pfinger_size;
 
-		  pfinger_size = _elm_config->finger_size;
-		  _elm_config->finger_size = val;
-		  if (pfinger_size != _elm_config->finger_size) _elm_rescale();
-	       }
-	  }
-	else if (event->atom == _atom[ATOM_E_THEME])
-	  {
-             char *val = NULL;
-             
-             val = ecore_x_window_prop_string_get(event->win,
-                                                  event->atom);
-	     eina_stringshare_replace(&_elm_config->theme, val);
-	     if (val)
-	       {
-		  _elm_theme_parse(NULL, val);
-		  free(val);
-		  _elm_rescale();
-	       }
-	  }
-	else if (event->atom == _atom[ATOM_E_PROFILE])
+                  pfinger_size = _elm_config->finger_size;
+                  _elm_config->finger_size = val;
+                  if (pfinger_size != _elm_config->finger_size) _elm_rescale();
+               }
+          }
+        else if (event->atom == _atom[ATOM_E_THEME])
           {
              char *val = NULL;
-             
+
              val = ecore_x_window_prop_string_get(event->win,
                                                   event->atom);
-	     eina_stringshare_replace(&_elm_config->theme, val);
-	     if (val)
-	       {
+             eina_stringshare_replace(&_elm_config->theme, val);
+             if (val)
+               {
+                  _elm_theme_parse(NULL, val);
+                  free(val);
+                  _elm_rescale();
+               }
+          }
+        else if (event->atom == _atom[ATOM_E_PROFILE])
+          {
+             char *val = NULL;
+
+             val = ecore_x_window_prop_string_get(event->win,
+                                                  event->atom);
+             eina_stringshare_replace(&_elm_config->theme, val);
+             if (val)
+               {
                   int changed = 0;
-                  
+
                   if (_elm_profile)
                     {
                        if (strcmp(_elm_profile, val)) changed = 1;
@@ -170,20 +170,9 @@ _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev)
                             _elm_rescale();
                          }
                     }
-	       }
+               }
           }
-	else if (event->atom == _atom[ATOM_E_INPUT_PANEL])
-	  {
-	     unsigned int val = 0;
-
-	     if (ecore_x_window_prop_card32_get(event->win,
-						event->atom,
-						&val, 1) > 0)
-	       {
-	       	edje_input_panel_enabled_set(val);
-	       }
-          }
-        else if (event->atom == _atom[ATOM_E_AUTOCAPITAL])
+        else if (event->atom == _atom[ATOM_E_INPUT_PANEL])
           {
              unsigned int val = 0;
 
@@ -191,10 +180,17 @@ _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev)
                                                 event->atom,
                                                 &val, 1) > 0)
                {
-                  edje_autocapitalization_set(val);
+                   int input_panel_enable;
+
+                   input_panel_enable = _elm_config->input_panel_enable;
+                   _elm_config->input_panel_enable = val;
+                   if (input_panel_enable != _elm_config->input_panel_enable) 
+                     {
+                        edje_input_panel_enabled_set(_elm_config->input_panel_enable);
+                     }
                }
           }
-        else if (event->atom == _atom[ATOM_E_AUTOPERIOD])
+        else if (event->atom == _atom[ATOM_E_AUTOCAPITAL_ALLOW])
           {
              unsigned int val = 0;
 
@@ -202,10 +198,35 @@ _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev)
                                                 event->atom,
                                                 &val, 1) > 0)
                {
-                  edje_autoperiod_set(val);
+                   int autocapital_allow;
+
+                   autocapital_allow = _elm_config->autocapital_allow;
+                   _elm_config->autocapital_allow = val;
+                   if (autocapital_allow != _elm_config->autocapital_allow) 
+                     {
+                        edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
+                     }
                }
-          }
-	else if (((_atom_config > 0) && (event->atom == _atom_config)) ||
+          }		
+        else if (event->atom == _atom[ATOM_E_AUTOPERIOD_ALLOW])
+          {
+             unsigned int val = 0;
+
+             if (ecore_x_window_prop_card32_get(event->win,
+                                                event->atom,
+                                                &val, 1) > 0)
+               {
+                  int autoperiod_allow;
+
+                  autoperiod_allow = _elm_config->autoperiod_allow;
+                  _elm_config->autoperiod_allow = val;
+                  if (autoperiod_allow != _elm_config->autoperiod_allow) 
+                    {
+                       edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
+                    }
+               }
+          }				
+        else if (((_atom_config > 0) && (event->atom == _atom_config)) ||
                  (event->atom == _atom[ATOM_E_CONFIG]))
           {
              _prop_config_get();
@@ -346,6 +367,8 @@ _config_apply(void)
    edje_frametime_set(1.0 / _elm_config->fps);
    edje_scale_set(_elm_config->scale);
    edje_input_panel_enabled_set(_elm_config->input_panel_enable);
+   edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
+   edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
 }
 
 static void
@@ -402,6 +425,8 @@ _config_load(void)
    _elm_config->theme = eina_stringshare_add("default");
    _elm_config->modules = NULL;
    _elm_config->input_panel_enable = 0;
+   _elm_config->autocapital_allow = 0;
+   _elm_config->autoperiod_allow = 0;
 }
 
 static void
@@ -550,11 +575,17 @@ _env_get(void)
    s = getenv("ELM_INPUT_PANEL");
    if (s) _elm_config->input_panel_enable = atoi(s);
 
-   s = getenv("ELM_AUTOCAPITAL");
-   if (s) _elm_config->autocapital = atoi(s);
+   s = getenv("ELM_ENTRY_AUTOCAPITAL_ALLOW");
+   if (s) 
+     {
+        _elm_config->autocapital_allow = atoi(s);
+     }
 
-   s = getenv("ELM_AUTOPERIOD");
-   if (s) _elm_config->autoperiod = atoi(s);
+   s = getenv("ELM_ENTRY_AUTOPERIOD_ALLOW");
+   if (s)
+     {
+        _elm_config->autoperiod_allow = atoi(s);
+     }
 }
 
 void
@@ -662,30 +693,33 @@ _elm_config_sub_init(void)
                   if (val > 0)
                     {
                        _elm_config->input_panel_enable = val;
+                       edje_input_panel_enabled_set(_elm_config->input_panel_enable);
                     }
                }
           }
-        if (!getenv("ELM_AUTOCAPITAL"))
+        if (!getenv("ELM_ENTRY_AUTOCAPITAL_ALLOW"))
           {
              if (ecore_x_window_prop_card32_get(_root_1st,
-                                                _atom[ATOM_E_AUTOCAPITAL],
+                                                _atom[ATOM_E_AUTOCAPITAL_ALLOW],
                                                 &val, 1) > 0)
                {
                   if (val > 0)
                     {
-                       _elm_config->autocapital = val;
+                       _elm_config->autocapital_allow = val;
+                       edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
                     }
                }
           }
-        if (!getenv("ELM_AUTOPERIOD"))
+        if (!getenv("ELM_ENTRY_AUTOPERIOD_ALLOW"))
           {
              if (ecore_x_window_prop_card32_get(_root_1st,
-                                                _atom[ATOM_E_AUTOPERIOD],
+                                                _atom[ATOM_E_AUTOPERIOD_ALLOW],
                                                 &val, 1) > 0)
                {
                   if (val > 0)
                     {
-                       _elm_config->autoperiod = val;
+                       _elm_config->autoperiod_allow = val;
+                       edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
                     }
                }
           }

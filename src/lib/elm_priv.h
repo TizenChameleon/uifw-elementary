@@ -110,8 +110,8 @@ struct _Elm_Config
    const char *theme;
    const char *modules;
    int input_panel_enable;
-   int autocapital;
-   int autoperiod;   
+   int autocapital_allow;
+   int autoperiod_allow;   
 };
 
 struct _Elm_Module
