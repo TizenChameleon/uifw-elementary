@@ -136,13 +136,9 @@ _delete_item(Item *it)
 	Eina_List *ll;
 	Evas_Object *list_obj;
 	
-	elm_object_unfocus(it->back_btn);	
 	evas_object_del(it->back_btn);
-	elm_object_unfocus(it->fn_btn1);
 	evas_object_del(it->fn_btn1);
-	elm_object_unfocus(it->fn_btn2);
 	evas_object_del(it->fn_btn2);
-	elm_object_unfocus(it->fn_btn3);
 	evas_object_del(it->fn_btn3);	
 	if (it->title) eina_stringshare_del(it->title);
 	if (it->subtitle) eina_stringshare_del(it->subtitle);
@@ -577,6 +573,7 @@ elm_navigationbar_push(Evas_Object *obj,
 		char *prev_title = NULL;
 
 		it->back_btn = elm_button_add(obj);
+		elm_object_focus_allow_set(it->back_btn, EINA_FALSE);
 		prev_title = (char *)prev_it->title;
 		if(prev_title)
 			{
