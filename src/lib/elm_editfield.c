@@ -440,11 +440,10 @@ elm_editfield_entry_get(Evas_Object *obj)
  *
  * @param obj The editfield object
  * @param icon The icon object
- * @return 1 if setting is done, 0 if there is no swallow part for the icon.
  *
  * @ingroup Editfield
  */
-EAPI Eina_Bool 
+EAPI void 
 elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);	
@@ -491,23 +490,27 @@ elm_editfield_left_icon_get(Evas_Object *obj)
  *
  * @param obj The editfield object
  * @param icon The icon object
- * @return 1 if setting is done, 0 if there is no swallow part for the icon.
  *
  * @ingroup Editfield
  */
-EAPI Eina_Bool 
+EAPI void 
 elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   if (!wd || !wd->base || !icon)
+   if (!wd || !wd->base || !icon){
+	   printf(" ======= 1 =========\n");
      return EINA_FALSE;
+   }
    if ((wd->ricon != icon) && (wd->ricon))
      elm_widget_sub_object_del(obj, wd->ricon);	
    if (icon)
      {
 	if ( !(edje_object_part_swallow(wd->base, "right_icon", icon)) )
+	{
+	   printf(" ======= 2 =========\n");
 	  return EINA_FALSE;				
+	}
 	wd->ricon = icon;
 	elm_widget_sub_object_add(obj, icon);
 	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
