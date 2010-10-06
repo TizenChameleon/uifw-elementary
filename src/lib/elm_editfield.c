@@ -450,7 +450,7 @@ elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);	
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;	
-   if (!wd || !wd->base)
+   if (!wd || !wd->base || !icon)
      return EINA_FALSE;
    if ((wd->licon != icon) && (wd->licon))
      elm_widget_sub_object_del(obj, wd->licon);	
@@ -501,7 +501,7 @@ elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   if (!wd || !wd->base)
+   if (!wd || !wd->base || !icon)
      return EINA_FALSE;
    if ((wd->ricon != icon) && (wd->ricon))
      elm_widget_sub_object_del(obj, wd->ricon);	
