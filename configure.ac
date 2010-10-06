@@ -463,6 +463,34 @@ if test "x$want_elementary_ethumb" = "xyes" -a "x$have_elementary_ethumb" = "xno
 fi
 AC_SUBST(ELM_ETHUMB_DEF)
 
+ELM_LIBXML2_DEF="#undef"
+have_elementary_libxml-2.0="no"
+want_elementary_libxml-2.0="auto"
+AC_ARG_ENABLE([libxml-2.0],
+   [AC_HELP_STRING([--disable-libxml-2.0], [disable libxml-2.0 support. @<:@default=detect@:>@])],
+   [want_elementary_libxml-2.0=$enableval], [])
+
+if test "x$want_elementary_libxml-2.0" != "xno"; then
+    PKG_CHECK_MODULES([ELEMENTARY_LIBXML2],
+       [
+        libxml-2.0
+       ],
+       [
+        AC_DEFINE(HAVE_ELEMENTARY_LIBXML2, 1, [Libxml2 support for Elementary])
+        have_elementary_libxml-2.0="yes"
+        ELM_ETHUMB_DEF="#define"
+        requirement_elm="libxml-2.0 ${requirement_elm}"
+       ],
+       [have_elementary_libxml-2.0="no"]
+    )
+else
+    have_elementary_libxml-2.0="no"
+fi
+if test "x$want_elementary_libxml-2.0" = "xyes" -a "x$have_elementary_libxml-2.0" = "xno"; then
+    AC_MSG_ERROR(Libxml2 support requested, but no libxml-2.0 found by pkg-config.])
+fi
+AC_SUBST(ELM_LIBXML2_DEF)
+
 ELM_ALLOCA_H_DEF="#undef"
 AC_CHECK_HEADER(alloca.h, [ELM_ALLOCA_H_DEF="#define"])
 AC_SUBST(ELM_ALLOCA_H_DEF)
@@ -500,6 +528,7 @@ data/themes/Makefile
 data/images/Makefile
 data/objects/Makefile
 data/desktop/Makefile
+data/xmls/Makefile
 data/edje_externals/Makefile
 config/Makefile
 config/default/Makefile
@@ -532,6 +561,7 @@ echo "    EFreet.............: ${have_elementary_efreet}"
 echo "    EWeather...........: ${have_elementary_eweather}"
 echo "    Ethumb.............: ${have_elementary_ethumb}"
 echo "    EWebKit............: ${have_elementary_ewebkit}"
+echo "    Xml2...............: ${have_elementary_libxml-2.0}"
 echo
 echo "  eet..................: ${eet_eet}"
 echo "  edje_cc..............: ${edje_cc}"

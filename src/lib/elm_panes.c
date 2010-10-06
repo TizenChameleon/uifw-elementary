@@ -281,19 +281,20 @@ EAPI Evas_Object
 EAPI Evas_Object *
 elm_panes_content_left_unset(Evas_Object *obj)
 {
-        ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-        Widget_Data *wd;
-        Evas_Object *content;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd;
+   Evas_Object *content;
 
-        wd = elm_widget_data_get(obj);
+   wd = elm_widget_data_get(obj);
 
-        content = edje_object_part_swallow_get(wd->panes, "elm.swallow.left");
-        if(!content) return NULL;
-        edje_object_part_unswallow(wd->panes, content);
-        elm_widget_sub_object_del(obj, content);
-        wd->contents.left = NULL;
-        edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
-        return content;
+   content = edje_object_part_swallow_get(wd->panes, "elm.swallow.left");
+   if(!content) return NULL;
+   edje_object_part_unswallow(wd->panes, content);
+   elm_widget_sub_object_del(obj, content);
+   evas_object_hide(content);
+   wd->contents.left = NULL;
+   edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
+   return content;
 }
 
 /**
@@ -307,19 +308,20 @@ elm_panes_content_left_unset(Evas_Object *obj)
 EAPI Evas_Object *
 elm_panes_content_right_unset(Evas_Object *obj)
 {
-        ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-        Widget_Data *wd;
-        Evas_Object *content;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd;
+   Evas_Object *content;
 
-        wd = elm_widget_data_get(obj);
+   wd = elm_widget_data_get(obj);
 
-        content = edje_object_part_swallow_get(wd->panes, "elm.swallow.right");
-        if(!content) return NULL;
-        edje_object_part_unswallow(wd->panes, content);
-        elm_widget_sub_object_del(obj, content);
-        wd->contents.right = NULL;
-        edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
-        return content;
+   content = edje_object_part_swallow_get(wd->panes, "elm.swallow.right");
+   if(!content) return NULL;
+   edje_object_part_unswallow(wd->panes, content);
+   elm_widget_sub_object_del(obj, content);
+   evas_object_hide(content);
+   wd->contents.right = NULL;
+   edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
+   return content;
 }
 
 /**
@@ -390,7 +392,7 @@ elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
  * @ingroup Panes
  */
 EAPI Eina_Bool 
-elm_panes_horizontal_is(const Evas_Object *obj)
+elm_panes_horizontal_get(const Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
@@ -425,7 +427,7 @@ elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
  * @ingroup Panes
  */
 EAPI Eina_Bool
-elm_panes_fixed_is(const Evas_Object *obj)
+elm_panes_fixed_get(const Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    return wd->fixed;

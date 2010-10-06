@@ -10,9 +10,9 @@ TARGETS = utc_UIFW_elm_panes_add_func \
 	  utc_UIFW_elm_panes_content_left_size_set_func \
 	  utc_UIFW_elm_panes_content_left_size_get_func \
 	  utc_UIFW_elm_panes_horizontal_set_func \
-	  utc_UIFW_elm_panes_horizontal_is_func \
+	  utc_UIFW_elm_panes_horizontal_get_func \
 	  utc_UIFW_elm_panes_fixed_set_func \
-	  utc_UIFW_elm_panes_fixed_is_func
+	  utc_UIFW_elm_panes_fixed_get_func
 	  
 PKGS = elementary
 

@@ -866,6 +866,14 @@ elm_segment_control_item_del_at(Evas_Object *obj,  unsigned int index, Eina_Bool
    return;
 }
 
+/**
+ * Delete a segment item of given index to segmentcontrol
+ * @param obj The SegmentControl object
+ * @param index The position at which segment item to be deleted
+ * @param animate If 1 the action be animated with sliding effects default 0.
+ *
+ * @ingroup SegmentControl SegmentControl
+ */
 EAPI void
 elm_segment_control_delete_segment_at(Evas_Object *obj,  unsigned int index, Eina_Bool animate)
 {
