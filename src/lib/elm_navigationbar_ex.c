@@ -47,6 +47,7 @@ struct _Elm_Navigationbar_ex_Item
    const char *item_style;
    Eina_List *fnbtn_list;
    Evas_Object *title_obj;
+   Evas_Object *icon;
    Eina_Bool popme : 1;
 };
 
@@ -490,6 +491,24 @@ elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item)
 	if(!item) return NULL;
 	return item->subtitle;
 }
+
+
+EAPI void
+elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon)
+{
+	if(!item) return; 
+	edje_object_part_swallow(item->base, "elm.swallow.icon", icon);
+	elm_widget_sub_object_add(item->obj, icon);
+	item->icon = icon;
+}
+
+EAPI Evas_Object *
+elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item)
+{
+	if(!item) return NULL; 
+	return item->icon;
+}
+
 
 /**
  * Set the button object of the pushed content
