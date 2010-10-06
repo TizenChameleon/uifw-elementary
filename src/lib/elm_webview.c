@@ -90,7 +90,14 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 /**
  * Add a new webview to the parent
  *
+ * The basic difference between webview and webkit object is if mobile featurs
+ * are available. The webview supports panning and zooming and fitting contents
+ * and so on, but webkit object can't.
+ *
+ * If you want to use ewk api, you should get the webkit object using elm_webview_webkit_get after creating The webview object.
+ *
  * @param parent The parent object
+ * @param tiled BackingStore type. EINA_TRUE if you want to use tiled(It require more memory, but faster fanning) EINA_FALSE if you want to use single.
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup WebView
@@ -147,7 +154,7 @@ elm_webview_webkit_get(Evas_Object *obj)
 }
 
 /**
- * Set layout width to container geometry
+ * Set layout width to container geometry.
  *
  * After setting this webview's layout width will be set to container
  * that contains this webview. After resizing layout width will be updated.
@@ -164,6 +171,17 @@ elm_webview_layout_width_set_to_container(Evas_Object *obj)
         _elm_smart_webview_layout_width_set_to_container(wd->webkit);
 }
 
+/**
+ * Set the ability for the webkit object to receive events.
+ *
+ * If It was EINA_TRUE, elm_webview treate touch event like mouse event. So, panning and zooming are not allowed.
+ *
+ * @param obj The WebView object
+ * @param feed boolean pointer in which to enable feeding events to webkit
+ * object. It defaults to EINA_FALSE.
+ *
+ * @ingroup WebView
+ */
 EAPI void
 elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed)
 {
@@ -172,6 +190,14 @@ elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed)
    _elm_smart_webview_events_feed_set(wd->webkit, feed);
 }
 
+/**
+ * Get the ability for the webkit object to receive events.
+ *
+ * @param obj The WebView object
+ * @return Eina_True if feeding events are enabled, EINA_FALSE otherwise.
+ *
+ * @ingroup WebView
+ */
 EAPI Eina_Bool
 elm_webview_events_feed_get(Evas_Object *obj)
 {
@@ -180,7 +206,17 @@ elm_webview_events_feed_get(Evas_Object *obj)
    return _elm_smart_webview_events_feed_get(wd->webkit);
 }
 
-//FIXME: Is it right approach?
+/**
+ * Set the ability for the webkit object and webview object to block events.
+ *
+ * If It was EINA_TRUE, elm_webview treate touch event like mouse event. So, panning and zooming are not allowed.
+ *
+ * @param obj The WebView object
+ * @param feed boolean pointer in which to enable feeding events to webkit
+ * object. It defaults to EINA_FALSE.
+ *
+ * @ingroup WebView
+ */
 EAPI void
 elm_webview_events_block_set(Evas_Object *obj, Eina_Bool block)
 {
@@ -189,6 +225,14 @@ elm_webview_events_block_set(Evas_Object *obj, Eina_Bool block)
    _elm_smart_webview_events_block_set(wd->webkit, block);
 }
 
+/**
+ * Get the ability for the webkit object and webview object to block events.
+ *
+ * @param obj The WebView object
+ * @return Eina_True if feeding events are enabled, EINA_FALSE otherwise.
+ *
+ * @ingroup WebView
+ */
 EAPI Eina_Bool
 elm_webview_events_block_get(Evas_Object *obj)
 {
@@ -198,6 +242,15 @@ elm_webview_events_block_get(Evas_Object *obj)
 }
 ////////////////////////////////////////////////////////////////
 
+/**
+ * Set the ability for the webkit object to fit the contents after loading.
+ *
+ * @param obj The WebView object
+ * @param enable boolean pointer in which to enable auto fitting feature. It
+ * defaults to EINA_FALSE.
+ *
+ * @ingroup WebView
+ */
 EAPI void
 elm_webview_auto_fitting_set(Evas_Object *obj, Eina_Bool enable)
 {
@@ -206,6 +259,14 @@ elm_webview_auto_fitting_set(Evas_Object *obj, Eina_Bool enable)
    _elm_smart_webview_auto_fitting_set(wd->webkit, enable);
 }
 
+/**
+ * Get the ability for the webkit object to fit the contents after loading.
+ *
+ * @param parent The WebView object
+ * @return Eina_True if auto fitting feature was enabled, EINA_FALSE otherwise.
+ *
+ * @ingroup WebView
+ */
 EAPI Eina_Bool
 elm_webview_auto_fitting_get(Evas_Object *obj)
 {
@@ -273,7 +334,7 @@ elm_webview_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce)
 }
 
 /**
- * Add callback to treat scheme
+ * Add callback to treat scheme.
  *
  * When user click link, the WebView may have different action by scheme.
  * This is a way to choose proper action each scheme.
@@ -293,7 +354,7 @@ elm_webview_scheme_callback_set(Evas_Object *obj, const char *scheme, Elm_WebVie
 }
 
 /**
- * Set default layout width
+ * Set default layout width.
  *
  * If you want to load webpage with specific layout width, you can set it using this API.
  * If you do not set it, the default layout width will be 1024.
