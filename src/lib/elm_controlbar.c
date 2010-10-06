@@ -2039,6 +2039,7 @@ create_more_item(Widget_Data *wd, int style)
    wd->w = w;
    wd->h = h;
    wd->mode = ELM_CONTROLBAR_MODE_DEFAULT;
+   wd->alpha = 100;
    wd->num = 0;
    wd->animating = 0;
    wd->edit_mode = EINA_FALSE;
@@ -3197,10 +3198,12 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
 	 edje_object_signal_emit(wd->edje, "elm,state,default", "elm");
 	 break;
       case ELM_CONTROLBAR_MODE_TRANSLUCENCE: 
-	 edje_object_signal_emit(wd->edje, "elm,state,translucence", "elm");
+	 elm_controlbar_alpha_set(obj, 85);
+	 //edje_object_signal_emit(wd->edje, "elm,state,translucence", "elm");
 	 break;
-      case ELM_CONTROLBAR_MODE_TRANSPARENCY: 
-	 edje_object_signal_emit(wd->edje, "elm,state,transparency", "elm");
+      case ELM_CONTROLBAR_MODE_TRANSPARENCY:
+	 elm_controlbar_alpha_set(obj, 0);
+	 //edje_object_signal_emit(wd->edje, "elm,state,transparency", "elm");
 	 break;
       case ELM_CONTROLBAR_MODE_LARGE: 
 	 edje_object_signal_emit(wd->edje, "elm,state,large", "elm");
@@ -3218,7 +3221,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
  * Set the alpha of the controlbar
  *
  * @param	obj The object of the controlbar
- * @param	alpha The mode of the controlbar (1-100)
+ * @param	alpha The mode of the controlbar (0-100)
  *
  * @ingroup Controlbar
  */ 
@@ -3238,8 +3241,6 @@ elm_controlbar_alpha_set(Evas_Object *obj, int alpha)
 	fprintf(stderr, "Cannot get smart data\n");
 	return;
      }
-
-   if(wd->alpha == alpha) return;
 
    if(alpha < 0)
      wd->alpha = 0;
