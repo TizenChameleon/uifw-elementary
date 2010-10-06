@@ -315,21 +315,18 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
    it->label_wd = NULL;
 
    it->base = edje_object_add(evas_object_evas_get(obj));
-   _elm_theme_object_set(obj, it->obj, "segment", "base", elm_object_style_get(it->obj));
+   _elm_theme_object_set(obj, it->obj, "segment", "base/default", elm_object_style_get(it->obj));
 
    if (it->label) eina_stringshare_del(it->label);
    if (label)
      {
         it->label = eina_stringshare_add(label);
      }
-   else
-     {
-         it->label = NULL;
-     }
+
    if ((it->icon != icon) && (it->icon))
       elm_widget_sub_object_del(obj, it->icon);
    it->icon = icon;
-   if (icon)
+   if (it->icon)
      {
         elm_widget_sub_object_add(obj, icon);
 	Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
@@ -364,7 +361,7 @@ _update_list(Evas_Object *obj)
    if(wd->count == 1)
      {
         it = _item_find(obj, 0);
-	_elm_theme_object_set(obj, it->base, "segment", "base", "single");
+	_elm_theme_object_set(obj, it->base, "segment", "base/single", elm_object_style_get(it->obj));
 	edje_object_signal_emit(it->base, "elm,state,segment,on", "elm");
 	if(!it->label_wd)
 	  {
@@ -374,9 +371,11 @@ _update_list(Evas_Object *obj)
 
 	if(it->label)
 	   edje_object_part_text_set(it->base, "elm.text", it->label);
-	   
+        if (it->icon && edje_object_part_swallow_get(it->base, "elm.swallow.content") == NULL)
+          {
 	edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
 	edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+          }
 	edje_object_message_signal_process(it->base);
 
 	return;
@@ -386,15 +385,15 @@ _update_list(Evas_Object *obj)
      {
         if(i==0)
           {
-             _elm_theme_object_set(obj, it->base, "segment", "base", "first");
+             _elm_theme_object_set(obj, it->base, "segment", "base/first", elm_object_style_get(it->obj));
 	  }
 	else if(i==wd->count-1)
           {
-	     _elm_theme_object_set(obj, it->base, "segment", "base", "last");
+	     _elm_theme_object_set(obj, it->base, "segment", "base/last", elm_object_style_get(it->obj));
 	  }
 	else
 	  {
-	     _elm_theme_object_set(obj, it->base, "segment", "base", "default");
+	     _elm_theme_object_set(obj, it->base, "segment", "base/default", elm_object_style_get(it->obj));
 
 	  }
 	  
@@ -406,8 +405,11 @@ _update_list(Evas_Object *obj)
 	if(it->label)
           edje_object_part_text_set(it->base, "elm.text", it->label);
 
+        if (it->icon && edje_object_part_swallow_get(it->base, "elm.swallow.content") == NULL)
+          {
 	edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
 	edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+          }
 	edje_object_message_signal_process(it->base);
 
 	i++;
@@ -790,9 +792,9 @@ elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool
    Widget_Data *wd = elm_widget_data_get(obj);
    if(!wd) return;
 
-   if(!item) return;
 
-   it = _item_search(obj, item);
+//   it = _item_search(obj, item);
+   it = item;
    if(!it) return;
 
    wd->del_index = it->segment_id;
