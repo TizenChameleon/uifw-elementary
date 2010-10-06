@@ -7,7 +7,13 @@ TARGETS = utc_UIFW_elm_dialoguegroup_add_func \
 	  utc_UIFW_elm_dialoguegroup_insert_before_func \
 	  utc_UIFW_elm_dialoguegroup_remove_func \
 	  utc_UIFW_elm_dialoguegroup_remove_all_func \
-	  utc_UIFW_elm_dialoguegroup_title_set_func
+	  utc_UIFW_elm_dialoguegroup_title_set_func \
+	  utc_UIFW_elm_dialoguegroup_title_get_func \
+	  utc_UIFW_elm_dialoguegroup_press_effect_get_func \
+	  utc_UIFW_elm_dialoguegroup_press_effect_set_func \
+	  utc_UIFW_elm_dialoguegroup_item_content_get_func \
+	  utc_UIFW_elm_dialoguegroup_item_style_set_func \
+	  utc_UIFW_elm_dialoguegroup_item_style_get_func
 
 PKGS = elementary
 
