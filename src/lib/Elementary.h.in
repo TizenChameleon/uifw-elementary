@@ -2343,6 +2343,7 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
    EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
+   EAPI void         elm_controlbar_alpha_set(Evas_Object *obj, int alpha);
    EAPI void         elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align);
    /*======= Please don't use this APIs =======*/
    EAPI void         elm_controlbar_edit_start(Evas_Object *obj);

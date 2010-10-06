@@ -44,6 +44,7 @@ struct _Widget_Data
    Evas_Object * edit_table;
    Evas_Object * navigation;
    Evas_Object * edje;
+   Evas_Object * bg;
    Evas_Object * box;
    Evas_Object * event_box;
    Evas_Object * selected_box;
@@ -57,6 +58,7 @@ struct _Widget_Data
    Eina_Bool edit_mode;
    Eina_Bool auto_align;
    int mode;
+   int alpha;
    int empty_num;
    int num;
    Eina_List * items;
@@ -203,8 +205,10 @@ _controlbar_resize(void *data, Evas_Object * obj)
 
    EINA_LIST_FOREACH(wd->items, l, item)
      {
-	elm_label_wrap_width_set(item->label, (int)(wd->w/check_bar_item_number(wd))-20);
-	elm_label_wrap_width_set(item->edit_label, (int)(wd->w/check_bar_item_number(wd))-20);
+	if(item->label)
+	  elm_label_wrap_width_set(item->label, (int)(wd->w/check_bar_item_number(wd))-20);
+	if(item->edit_label)
+	  elm_label_wrap_width_set(item->edit_label, (int)(wd->w/check_bar_item_number(wd))-20);
      }
 }
 
@@ -301,6 +305,11 @@ _del_hook(Evas_Object * obj)
 	evas_object_del(wd->navigation);
 	wd->navigation = NULL;
      }
+   if (wd->bg)
+     {
+	evas_object_del(wd->bg);
+	wd->bg = NULL;
+     }
    if (wd->edje)
      {
 	evas_object_del(wd->edje);
@@ -350,9 +359,11 @@ _theme_hook(Evas_Object * obj)
       return;
    _elm_theme_object_set(obj, wd->edje, "controlbar", "base",
 			   elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, wd->bg, "controlbar", "background",
+			   elm_widget_style_get(obj));
+   evas_object_color_get(wd->bg, &r, &g, &b, NULL);
+   evas_object_color_set(wd->bg, r, g, b, (int)(255 * wd->alpha / 100));
    elm_layout_theme_set(wd->view, "controlbar", "view", elm_widget_style_get(obj));
-   //_elm_theme_object_set(obj, wd->view, "controlbar", "view",
-//			  elm_widget_style_get(obj));
    _elm_theme_object_set(obj, wd->edit_box, "controlbar", "edit_box",
 			  elm_widget_style_get(obj));
    EINA_LIST_FOREACH(wd->items, l, item)
@@ -2078,10 +2089,19 @@ create_more_item(Widget_Data *wd, int style)
    _elm_theme_object_set(obj, wd->edje, "controlbar", "base", "default");
    if (wd->edje == NULL)
      {
-	printf("Cannot load bg edj\n");
+	printf("Cannot load base edj\n");
 	return NULL;
      }
    evas_object_show(wd->edje);
+   
+   wd->bg = edje_object_add(wd->evas);
+   _elm_theme_object_set(obj, wd->bg, "controlbar", "background", "default");
+   if (wd->bg == NULL)
+     {
+	printf("Cannot load bg edj\n");
+	return NULL;
+     }
+   edje_object_part_swallow(wd->edje, "bg_image", wd->bg);
 
    // initialization
    evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_RESIZE,
@@ -2799,6 +2819,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
 	edje_object_signal_emit(_EDJ(it->base),
 					 "elm,state,icon_text", "elm");
 	elm_label_line_wrap_set(it->label, EINA_FALSE);
+	elm_label_wrap_mode_set(it->label, 0);
    }
 }
 
@@ -3085,14 +3106,14 @@ elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
 
    if(it->disable){
 	color =
-	   (Evas_Object *) edje_object_part_object_get(_EDJ(it->edit_item),
+	   (Evas_Object *) edje_object_part_object_get(_EDJ(it->base),
 		 "elm.item.disable.color");
 	if (color)
 	  evas_object_color_get(color, &r, &g, &b, &a);
 	evas_object_color_set(it->base_item, r, g, b, a);
    }else{
 	color =
-	   (Evas_Object *) edje_object_part_object_get(_EDJ(it->edit_item),
+	   (Evas_Object *) edje_object_part_object_get(_EDJ(it->base),
 		 "elm.item.default.color");
 	if (color)
 	  evas_object_color_get(color, &r, &g, &b, &a);
@@ -3192,6 +3213,45 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
      }
    _sizing_eval(obj);
 }
+
+/**
+ * Set the alpha of the controlbar
+ *
+ * @param	obj The object of the controlbar
+ * @param	alpha The mode of the controlbar (1-100)
+ *
+ * @ingroup Controlbar
+ */ 
+   EAPI void
+elm_controlbar_alpha_set(Evas_Object *obj, int alpha)
+{
+   int r, g, b;
+   Widget_Data * wd;
+   if (obj == NULL)
+     {
+	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
+	return;
+     }
+   wd = elm_widget_data_get(obj);
+   if (wd == NULL)
+     {
+	fprintf(stderr, "Cannot get smart data\n");
+	return;
+     }
+
+   if(wd->alpha == alpha) return;
+
+   if(alpha < 0)
+     wd->alpha = 0;
+   else if(alpha > 100)
+     wd->alpha = 100;
+   else
+     wd->alpha = alpha;
+
+   evas_object_color_get(wd->bg, &r, &g, &b, NULL);
+   evas_object_color_set(wd->bg, r, g, b, (int)(255 * wd->alpha / 100));
+}
+
 
 /**
  * Set auto-align mode of the controlbar(It's not prepared yet)
