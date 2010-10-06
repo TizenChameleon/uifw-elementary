@@ -449,13 +449,13 @@ elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
    Widget_Data *wd = elm_widget_data_get(obj);	
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;	
    if (!wd || !wd->base || !icon)
-     return EINA_FALSE;
+     return;
    if ((wd->licon != icon) && (wd->licon))
      elm_widget_sub_object_del(obj, wd->licon);	
    if (icon)
      {
 	if (!(edje_object_part_swallow(wd->base, "left_icon", icon)))
-	  return EINA_FALSE;		
+	  return;		
 	wd->licon = icon;
 	elm_widget_sub_object_add(obj, icon);
 	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
@@ -464,7 +464,7 @@ elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
 	edje_object_signal_emit(wd->base, "elm,state,text,hidden", "elm");
 	_sizing_eval(obj);
      }	
-   return EINA_TRUE;
+   return;
 }
 
 /**
@@ -498,19 +498,14 @@ elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   if (!wd || !wd->base || !icon){
-	   printf(" ======= 1 =========\n");
-     return EINA_FALSE;
-   }
+   if (!wd || !wd->base || !icon)
+     return;
    if ((wd->ricon != icon) && (wd->ricon))
      elm_widget_sub_object_del(obj, wd->ricon);	
    if (icon)
      {
 	if ( !(edje_object_part_swallow(wd->base, "right_icon", icon)) )
-	{
-	   printf(" ======= 2 =========\n");
-	  return EINA_FALSE;				
-	}
+	  return;				
 	wd->ricon = icon;
 	elm_widget_sub_object_add(obj, icon);
 	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
@@ -518,7 +513,7 @@ elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
 	edje_object_signal_emit(wd->base, "elm,state,right,icon,show", "elm");
 	_sizing_eval(obj);
      }	
-   return EINA_TRUE;
+   return;
 }
 
 /**
