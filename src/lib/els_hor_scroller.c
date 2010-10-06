@@ -132,10 +132,10 @@ static void _smart_pan_changed_hook(void *data, Evas_Object *obj, void *event_in
 static void _smart_pan_pan_changed_hook(void *data, Evas_Object *obj, void *event_info);
 static void _smart_event_wheel(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _smart_event_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static int  _smart_hold_animator(void *data);
-static int  _smart_momentum_animator(void *data);
+static Eina_Bool  _smart_hold_animator(void *data);
+static Eina_Bool  _smart_momentum_animator(void *data);
 static void _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static int  _smart_onhold_animator(void *data);
+static Eina_Bool  _smart_onhold_animator(void *data);
 static void _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _smart_event_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _smart_edje_drag_v_start(void *data, Evas_Object *obj, const char *emission, const char *source);
@@ -371,7 +371,7 @@ _smart_scrollto_x(Hor_Smart_Data *sd, double t_in, Evas_Coord pos_x)
    sd->bouncemex = 0;
 }
 
-static int
+static Eina_Bool
 _smart_scrollto_y_animator(void *data)
 {
    Hor_Smart_Data *sd = data;
@@ -542,11 +542,11 @@ _smart_page_adjust(Hor_Smart_Data *sd)
    hor_elm_smart_scroller_child_region_show(sd->smart_obj, x, y, w, h);
 }
 
-static int
+static Eina_Bool
 _smart_bounce_x_animator(void *data)
 {
    Hor_Smart_Data *sd;
-   Evas_Coord x, y, dx, dy/*, ox, oy*/;
+   Evas_Coord x, y, dx;
    double t, p, dt;
 
    sd = data;
@@ -574,11 +574,11 @@ _smart_bounce_x_animator(void *data)
    return 1;
 }
 
-static int
+static Eina_Bool
 _smart_bounce_y_animator(void *data)
 {
    Hor_Smart_Data *sd;
-   Evas_Coord x, y, dx, dy;
+   Evas_Coord x, y, dy;
    double t, p, dt;
 
    sd = data;
@@ -606,7 +606,7 @@ _smart_bounce_y_animator(void *data)
    return 1;
 }
 
-static int
+static Eina_Bool
 _smart_momentum_animator(void *data)
 {
    Hor_Smart_Data *sd;
@@ -1388,7 +1388,7 @@ _smart_event_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
      }
 }
 
-static int
+static Eina_Bool
 _smart_hold_animator(void *data)
 {
    Hor_Smart_Data *sd = data;
@@ -1540,7 +1540,7 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
      }
 }
 
-static int
+static Eina_Bool
 _smart_onhold_animator(void *data)
 {
    Hor_Smart_Data *sd;
@@ -1605,7 +1605,7 @@ get_average(void *d)
 }
 
 
-static int special_timer_cb(void *d)
+static Eina_Bool special_timer_cb(void *d)
 {
 	Hor_Smart_Data *sd = d;
 

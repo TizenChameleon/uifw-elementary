@@ -80,7 +80,7 @@ static void _ani_stop_all(Evas_Object *obj);
 static void _ani_bounce_cb(void *data, Elm_Animator *animator, double frame);
 static void _ani_bounce_done_cb(void *data);
 static void _bounce(Evas_Object *obj);
-static int _ani_scroll_cb(void *data);
+static Eina_Bool _ani_scroll_cb(void *data);
 static void _scroll(Evas_Object *obj);
 static void _ani_item_del_cb(void *data, Elm_Animator *animator, double frame);
 static void _ani_item_del_done_cb(void *data);
@@ -474,7 +474,7 @@ _bounce(Evas_Object *obj)
 	elm_animator_animate(wd->ani);
 }
 
-static int
+static Eina_Bool
 _ani_scroll_cb(void *data)
 {
 	Widget_Data *wd;

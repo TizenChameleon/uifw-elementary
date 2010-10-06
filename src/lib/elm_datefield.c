@@ -78,7 +78,7 @@ static void _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emiss
 static void _entry_focused_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info);
-static int _imf_event_commit_cb(void *data, int type, void *event);
+static Eina_Bool _imf_event_commit_cb(void *data, int type, void *event);
 static void _input_panel_event_callback(void *data, Ecore_IMF_Context *ctx, int value);
 
 static void _date_entry_add(Evas_Object *obj);
@@ -517,7 +517,7 @@ _entry_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info)
 		elm_entry_entry_set(obj, "");
 }
 
-static int 
+static Eina_Bool 
 _imf_event_commit_cb(void *data, int type, void *event)
 {
  	Widget_Data *wd = elm_widget_data_get(data);

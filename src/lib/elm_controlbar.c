@@ -1292,8 +1292,6 @@ pressed_box(Elm_Controlbar_Item * it)
 static Evas_Object *
 create_item_label(Evas_Object *obj, Elm_Controlbar_Item * it)
 {
-   Widget_Data * wd = elm_widget_data_get(it->obj);
-
    Evas_Object *label;
    label = elm_label_add(obj);
    elm_object_style_set(label, "controlbar");

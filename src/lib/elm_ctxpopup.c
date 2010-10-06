@@ -906,6 +906,9 @@ elm_ctxpopup_add(Evas_Object *parent)
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+
+   if(!e) return;
+
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "ctxpopup");
    elm_widget_type_set(obj, "ctxpopup");
@@ -1059,7 +1062,7 @@ elm_ctxpopup_horizontal_get(Evas_Object *obj)
 }
 
 /**
- * reset the icon on the given item. This function is only for icon item.
+ * reset the icon on the given item. 
  *
  * @param obj 	 	Ctxpopup item
  * @param icon		Icon object to be set
@@ -1092,7 +1095,7 @@ elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
 }
 
 /**
- * reset the label on the given item. This function is only for label item.
+ * reset the label on the given item. 
  *
  * @param obj 	 	Ctxpopup item
  * @param label		Label to be set
@@ -1346,10 +1349,10 @@ elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first,
 }
 
 /**
- * Swallow the user contents
+ * Swallow the user content
  *
  * @param obj		Ctxpopup object
- * @param content 		Contents to be swallowed
+ * @param content 	Content to be swallowed
  *
  * @ingroup Ctxpopup
  */
@@ -1379,10 +1382,10 @@ elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
- * Unswallow the user contents
+ * Unswallow the user content
  *
  * @param obj		Ctxpopup object
- * @return 			The unswallowed contents
+ * @return 		The unswallowed content
  *
  * @ingroup Ctxpopup
  */
@@ -1417,7 +1420,7 @@ elm_ctxpopup_content_unset(Evas_Object *obj)
  * Ctxpopup will be showed up with that position which is indicates the arrow point.
  *
  * @param obj		Ctxpopup object
- * @param forced		EINA_TRUE is left-top. EINA_FALSE is indicates arrow point.
+ * @param forced	EINA_TRUE is left-top. EINA_FALSE is indicates arrow point.
  *
  * @ingroup Ctxpopup
  */
@@ -1469,6 +1472,16 @@ elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
 	return elm_ctxpopup_item_add(obj, NULL, label, func, data);
 }
 
+
+/**
+ * Set the area of ctxpopup will show up. Ctxpopup will not be out of this area. 
+ * The responsibility of the area object is to user.
+ *
+ * @param obj		Ctxpopup objet
+ * @param area		area object
+ *
+ * @ingroup Ctxpopup
+ */
 EAPI void
 elm_ctxpopup_area_set(Evas_Object *obj, Evas_Object *area)
 {

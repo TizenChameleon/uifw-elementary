@@ -63,7 +63,7 @@ _ticker(void *data)
 	return 0;
 }
 
-static int
+static Eina_Bool
 _idle_draw (void *data)
 {
 	_ticker(data);

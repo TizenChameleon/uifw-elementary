@@ -84,19 +84,28 @@ _theme_hook(Evas_Object *obj)
 		elm_object_style_set(wd->check[idx], "dayselector");
 }
 
+/**
+ * Set the state of given check object.
+ *
+ * @param obj  	     Dayselector
+ * @param day        day user want to know. 
+ * @param checked    state of the day. Eina_True is checked. 
+ *
+ * @ingroup Dayselector
+ */
 EAPI void
 elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data* wd = (Widget_Data*) elm_widget_data_get(obj);
 
-	if(!wd) return EINA_FALSE;
+	if(!wd) return;
 
 	elm_check_state_set(wd->check[day], checked);
 }
 
 /**
- * 8Get the state of given check object.
+ * Get the state of given check object.
  *
  * @param obj  	 	Dayselector
  * @param day        day user want to know. 
@@ -151,6 +160,9 @@ elm_dayselector_add(Evas_Object *parent)
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+
+   if(!e) return NULL;
+
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "dayselector");
    elm_widget_type_set(obj, "dayselector");

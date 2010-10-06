@@ -355,7 +355,6 @@ _year_changed_cb(void *data, Evas_Object *obj, void *event_info)
 static void
 _month_changed_cb(void *data, Evas_Object *obj, void *event_info)
 {
-	const char *month;
 	Widget_Data *wd = elm_widget_data_get(data);
 	Evas_Object *child;
 	if (!wd) return;

@@ -238,7 +238,7 @@ _hide_layout(void *data)
 static void
 _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-	int x, y, w, h;
+	//int x, y, w, h;
 	Widget_Data *wd = elm_widget_data_get(obj);
 
 	_resize(wd, wd->e, obj, obj);
@@ -299,10 +299,9 @@ _button_cb_wrapper(void *data, Evas_Object *obj, const char *emission, const cha
 EAPI Evas_Object *
 elm_actionsheet_add (Evas_Object *parent)
 {
-	Evas_Object *obj, *win, *win_bgimg;
+	Evas_Object *obj;
 	Evas *e;
 	Widget_Data *wd;
-	Evas_Coord x,y,w,h;
 
 	/* widget data */
 	wd = ELM_NEW(Widget_Data);	// allocate memory
@@ -318,7 +317,6 @@ elm_actionsheet_add (Evas_Object *parent)
 	elm_widget_del_pre_hook_set(obj, _del_pre_hook);
 	elm_widget_del_hook_set(obj, _del_hook);
 	elm_widget_theme_hook_set(obj, _theme_hook);	
-
 
 	/* actionsheet layout */
 	wd->layout = elm_layout_add(parent);

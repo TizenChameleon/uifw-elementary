@@ -387,6 +387,7 @@ struct _Elm_Genlist_Item
    Eina_Bool selected : 1;
    Eina_Bool hilighted : 1;
    Eina_Bool expanded : 1;
+   int expanded_depth;
    Eina_Bool disabled : 1;
    Eina_Bool display_only : 1;
    Eina_Bool mincalcd : 1;
@@ -405,7 +406,6 @@ struct _Elm_Genlist_Item
    Eina_Bool renamed : 1;
 
    int pad_left, pad_right;
-   int depth;
 
    Evas_Coord old_scrl_y;
    int list_expanded;
@@ -1503,7 +1503,7 @@ _item_realize(Elm_Genlist_Item *it, int in, int calc)
    evas_object_color_set(it->spacer, 0, 0, 0, 0);
    elm_widget_sub_object_add(it->wd->obj, it->spacer);
    for (it2 = it, depth = 0; it2->parent; it2 = it2->parent) depth += 1;
-   it->depth = depth;
+   it->expanded_depth = depth;
    treesize = edje_object_data_get(it->base, "treesize");
    if (treesize) tsize = atoi(treesize);
    evas_object_size_hint_min_set(it->spacer,
@@ -3037,7 +3037,7 @@ _item_new(Widget_Data *wd, const Elm_Genlist_Item_Class *itc,
    it->flags = flags;
    it->func.func = func;
    it->func.data = func_data;
-   it->depth = 0;
+   it->expanded_depth = 0;
    return it;
 }
 
@@ -4207,6 +4207,21 @@ elm_genlist_item_expanded_get(const Elm_Genlist_Item *it)
 }
 
 /**
+ * Get the depth of expanded item
+ *
+ * @param it The genlist item object
+ * @return The depth of expanded item
+ *
+ * @ingroup Genlist
+ */
+EAPI int
+elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it)
+{
+   if (!it) return 0;
+   return it->expanded_depth;
+}
+
+/**
  * Sets the disabled state of an item.
  *
  * A disabled item cannot be selected or unselected. It will also change
@@ -5059,22 +5074,6 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
    if (wd->calc_job) ecore_job_del(wd->calc_job);
    wd->calc_job = ecore_job_add(_calc_job, wd);
 }
-
-/**
- * Get expanded depth. 
- *
- * @param it The genlist item object
- *
- * @ingroup Genlist
- */
-EAPI int
-elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it)
-{
-   if (!it) return;
-
-   return it->depth;
-}
-
 
 /**
  * Delete selected items in genlist edit mode.
