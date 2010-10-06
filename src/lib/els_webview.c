@@ -41,6 +41,7 @@
 #define WEBVIEW_EDJ "/usr/share/edje/ewebview.edj"
 #define WEBKIT_EDJ "/usr/share/edje/webkit.edj"
 #define WEBVIEW_THEME_EDJ "/usr/share/edje/ewebview-theme.edj"
+#define BEAT_THEME_EDJ "/usr/share/elementary/themes/beat.edj"
 
 #define DEFAULT_LAYOUT_WIDTH 1024
 #define MIN_ZOOM_RATIO 0.09f
@@ -147,6 +148,10 @@
 			"</body>" \
 			"</html>"
 
+#define CTXPOPUP_CLOSE_BUTTON_STRING "Close"
+#define CTXPOPUP_TEXT_SELECTION_STRING "Text selection on"
+#define CTXPOPUP_HIDE_SIGNAL "hide"
+
 #define NEED_TO_REMOVE
 //#define DBG printf
 //#define ERR printf
@@ -233,6 +238,16 @@ struct _Smart_Data {
      void (*ewk_set_show_geolocation_permission_dialog_callback)(ewk_show_geolocation_permission_dialog_callback);
      void (*ewk_set_geolocation_sharing_allowed)(void *, Eina_Bool);
 
+     Eina_Bool (*ewk_view_context_menu_forward_event)(Evas_Object *, const Evas_Event_Mouse_Down *);
+     Ewk_Context_Menu_Action (*ewk_context_menu_item_action_get)(Ewk_Context_Menu_Item*);
+     const char* (*ewk_context_menu_item_title_get) (Ewk_Context_Menu_Item*);
+     const Eina_List* (*ewk_context_menu_item_list_get) (Ewk_Context_Menu*);
+     Ewk_Context_Menu_Item_Type (*ewk_context_menu_item_type_get) (Ewk_Context_Menu_Item*);
+     Eina_Bool (*ewk_context_menu_item_enabled_get) (Ewk_Context_Menu_Item*);
+     Eina_Bool (*ewk_context_menu_item_select) (Ewk_Context_Menu*, Ewk_Context_Menu_Item*);
+     Ewk_Context_Menu* (*ewk_context_menu_item_parent_get) (Ewk_Context_Menu_Item*);
+     const char* (*ewk_context_menu_item_title_set) (Ewk_Context_Menu_Item*, const char*);
+
      /* cairo functions */
      cairo_t * (*cairo_create)(cairo_surface_t *);
      void (*cairo_destroy)(cairo_t *);
@@ -303,20 +318,20 @@ struct _Smart_Data {
 
      Eina_Bool is_layout_width_set_to_container;
 
-     Eina_Bool use_text_selection;
+     Eina_Bool text_selection_initialized;
      Eina_Bool text_selection_on;
      struct {
-	  Evas_Coord_Rectangle front;
-	  Evas_Coord_Rectangle back;
-	  Evas_Point front_handle;
-	  Evas_Point back_handle;
-	  Eina_Bool front_handle_moving;
+	  Evas_Point back_handle_pos;
+	  Evas_Point back_handle_pos_clicked_diff;
 	  Eina_Bool back_handle_moving;
      } text_selection;
      void* touch_obj;
 
      Ecore_Idler *flush_and_pre_render_idler;
      Eina_Bool use_zoom_bouncing;
+
+     Evas_Object *ctxpopup;
+     Evas_Object *back_handle_icon;
 };
 
 /* local subsystem functions */
@@ -361,7 +376,7 @@ static void      _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
 static void      _smart_cb_pan_start(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev);
-static void      _smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev);
+static void      _smart_cb_mouse_long_press(void* data, Evas_Object* webview, void* ev);
 static void      _smart_cb_unselect_closest_word(void* data, Evas_Object* webview, void* ev);
 static void      _suspend_all(Smart_Data *sd, Eina_Bool useReduceRevertPluginsFPS);
 static void      _resume_all(Smart_Data *sd, Eina_Bool useReduceRevertPluginsFPS);
@@ -378,14 +393,6 @@ static void      _smart_cb_vertical_zoom_move(void* data, Evas_Object* webview, 
 static void      _smart_cb_vertical_zoom_stop(void* data, Evas_Object* webview, void* event_info);
 static void      _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info);
 static void      _zoom_to_rect(Smart_Data *sd, int x, int y);
-static void      _text_selection_init(Evas_Object* parent);
-static void      _text_selection_show(void);
-static void      _text_selection_hide(Smart_Data *sd);
-static void      _text_selection_set_front_info(Smart_Data *sd, int x, int y, int height);
-static void      _text_selection_set_back_info(Smart_Data *sd, int x, int y, int height);
-static Eina_Bool _text_selection_handle_pressed(Smart_Data *sd, int x, int y);
-static void      _text_selection_update_position(Smart_Data *sd, int x, int y);
-static void      _text_selection_move_by(Smart_Data *sd, int dx, int dy);
 static void      _minimap_update_detail(Evas_Object* minimap, Smart_Data *sd, cairo_surface_t* src, int srcW, int srcH, Eina_Rectangle* visibleRect);
 static void      _minimap_update(Evas_Object* minimap, Smart_Data *sd, cairo_surface_t* src, int minimapW, int minimapH);
 static cairo_surface_t* _image_clone_get(Smart_Data *sd, int* minimap_w, int* minimap_h);
@@ -394,6 +401,23 @@ static void      _coords_evas_to_ewk(Evas_Object* webview, int x, int y, int* ux
 static void      _coords_ewk_to_evas(Evas_Object* webview, int x, int y, int* ux, int* uy);
 static void      _update_min_zoom_rate(Evas_Object *obj);
 static void      _geolocation_permission_callback(void *geolocation_obj, const char* url);
+static void      _create_ctxpopup_text_selection(Smart_Data *sd, int x, int y);
+static void      _smart_cb_ctxpopup(void* data, Evas_Object* obj, void* event_info);
+static void      _smart_cb_ctxpopup_button(void* data, Evas_Object* obj, void* event_info);
+static void      _smart_cb_ctxpopup_webkit(void *data, Evas_Object *obj, void *event_info);
+static void      _smart_cb_contextmenu_new(void* data, Evas_Object* webview, void* arg);
+static void      _smart_cb_contextmenu_item_appended(void* data, Evas_Object* webview, void* arg);
+static void      _smart_cb_contextmenu_customize(void* data, Evas_Object* webview, void* arg);
+static void      _smart_cb_contextmenu_show(void* data, Evas_Object* webview, void* arg);
+static void      _smart_cb_contextmenu_free(void* data, Evas_Object* webview, void* arg);
+static void      _text_selection_start(Smart_Data *sd);
+static void      _text_selection_show(Smart_Data* sd);
+static void      _text_selection_hide(Smart_Data *sd);
+static void      _text_selection_handle_init(Smart_Data *sd);
+static void      _text_selection_handle_mouse_down(void* data, Evas* e, Evas_Object* o, void* event_info);
+static void      _text_selection_handle_mouse_up(void* data, Evas* e, Evas_Object* o, void* event_info);
+static void      _text_selection_handle_mouse_move(void* data, Evas* e, Evas_Object* o, void* event_info);
+static void      _text_selection_handle_move(Smart_Data* sd, int x, int y);
 
 /* local subsystem globals */
 static Evas_Smart *_smart = NULL;
@@ -1475,7 +1499,7 @@ _smart_add(Evas_Object* obj)
    sd->minimap.eo = NULL;
    sd->dropdown.options = NULL;
    sd->dropdown.option_cnt = 0;
-   sd->use_text_selection = EINA_FALSE;
+   sd->text_selection_initialized = EINA_FALSE;
    sd->text_selection_on = EINA_FALSE;
    sd->events_feed = EINA_FALSE;
    sd->is_layout_width_set_to_container = EINA_FALSE;
@@ -1500,6 +1524,8 @@ _smart_add(Evas_Object* obj)
    sd->flush_and_pre_render_idler = NULL;
    sd->use_zoom_bouncing = EINA_TRUE;
 
+   sd->ctxpopup = NULL;
+   sd->back_handle_icon = NULL;
 #ifdef NEED_TO_REMOVE
    // TODO: temporary add the mouse callbacks until the webkit engine can receive mouse events
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOUSE_DOWN, _view_on_mouse_down, sd);
@@ -1514,6 +1540,11 @@ _smart_add(Evas_Object* obj)
 
    evas_object_smart_callback_add(obj, "webview,created", _smart_cb_view_created, sd); // I need to consider more
    evas_object_smart_callback_add(obj, "zoom,set", _smart_cb_zoom_set, sd);
+   evas_object_smart_callback_add(obj, "contextmenu,new", _smart_cb_contextmenu_new, sd);
+   evas_object_smart_callback_add(obj, "contextmenu,item,appended", _smart_cb_contextmenu_item_appended, sd);
+   evas_object_smart_callback_add(obj, "contextmenu,customize", _smart_cb_contextmenu_customize, sd);
+   evas_object_smart_callback_add(obj, "contextmenu,show", _smart_cb_contextmenu_show, sd);
+   evas_object_smart_callback_add(obj, "contextmenu,free", _smart_cb_contextmenu_free, sd);
 
    if (!(sd->ewk_view_frame_main_get))
      sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
@@ -1525,7 +1556,7 @@ _smart_add(Evas_Object* obj)
    evas_object_smart_callback_add(obj, "one,press", _smart_cb_mouse_down, sd);
    evas_object_smart_callback_add(obj, "one,release", _smart_cb_mouse_up, sd);
    evas_object_smart_callback_add(obj, "one,single,tap", _smart_cb_mouse_tap, sd);
-   evas_object_smart_callback_add(obj, "one,long,press", _smart_cb_select_closest_word, sd);
+   evas_object_smart_callback_add(obj, "one,long,press", _smart_cb_mouse_long_press, sd);
    evas_object_smart_callback_add(obj, "one,double,tap", _smart_cb_smart_zoom, sd);
    evas_object_smart_callback_add(obj, "one,move,start", _smart_cb_pan_start, sd);
    evas_object_smart_callback_add(obj, "one,move", _smart_cb_pan_by, sd);
@@ -1538,7 +1569,7 @@ _smart_add(Evas_Object* obj)
    evas_object_size_hint_align_set(obj, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    _elm_smart_touch_child_set(sd->touch_obj, obj);
-   _text_selection_init(obj);
+   _text_selection_handle_init(sd);
 }
 
 static void
@@ -1905,7 +1936,7 @@ _smart_cb_mouse_down(void* data, Evas_Object* webview, void* ev)
    if (sd->events_feed == EINA_TRUE) return;
    //Evas_Point* point = (Evas_Point*)ev;
 
-   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE) return;
+   if (sd->text_selection_initialized == EINA_TRUE && sd->text_selection_on == EINA_TRUE) return;
 
 #ifdef NEED_TO_REMOVE
    evas_object_focus_set(webview, EINA_TRUE);
@@ -2072,7 +2103,7 @@ _smart_cb_mouse_tap(void* data, Evas_Object* webview, void* ev)
 	  */
      }
 
-   if (sd->use_text_selection  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
+   if (sd->text_selection_initialized  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	_smart_cb_unselect_closest_word(sd, webview, NULL);
 	return;
@@ -2098,12 +2129,6 @@ _smart_cb_pan_start(void* data, Evas_Object* webview, void* ev)
    sd->pan_s = *point;
    sd->on_panning = EINA_TRUE;
    sd->on_flick = EINA_FALSE;
-
-   if (sd->use_text_selection  == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
-     {
-	if (_text_selection_handle_pressed(sd, point->x, point->y))
-	  _elm_smart_touch_is_one_drag_mode_enable(sd->touch_obj, EINA_FALSE);
-     }
 
    _suspend_all(sd, EINA_FALSE);
 
@@ -2142,16 +2167,6 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
 	return;
      }
    if (sd->on_panning == EINA_FALSE) return;
-
-   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
-     {
-	if (sd->text_selection.front_handle_moving == EINA_TRUE
-	      || sd->text_selection.back_handle_moving == EINA_TRUE)
-	  {
-	     _text_selection_update_position(sd, point->x, point->y);
-	     return;
-	  }
-     }
 
    if (!sd->ewk_frame_scroll_pos_get)
      sd->ewk_frame_scroll_pos_get = (Eina_Bool (*)(const Evas_Object *, int *, int *))dlsym(ewk_handle, "ewk_frame_scroll_pos_get");
@@ -2249,8 +2264,9 @@ _smart_cb_pan_by(void* data, Evas_Object* webview, void* ev)
    int new_x, new_y;
    sd->ewk_frame_scroll_pos_get(sd->ewk_view_frame_main_get(webview), &new_x, &new_y);
 
-   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
-     _text_selection_move_by(sd, old_x - new_x, old_y - new_y);
+   if (sd->text_selection_initialized == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
+	   _text_selection_handle_move(sd, sd->text_selection.back_handle_pos.x + old_x - new_x,
+			   sd->text_selection.back_handle_pos.y + old_y - new_y);
 
 #ifdef BOUNCING_SUPPORT
    printf("<< ========content [%d, %d] old pos [%d, %d] new pos [%d, %d] >>(remained(%d, %d)\n",
@@ -2294,15 +2310,6 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 
    Evas_Point* point = (Evas_Point*)ev;
    sd->on_panning = EINA_FALSE;
-
-   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
-     {
-	if (sd->text_selection.front_handle_moving == EINA_TRUE
-	      || sd->text_selection.back_handle_moving == EINA_TRUE)
-	  _elm_smart_touch_is_one_drag_mode_enable(sd->touch_obj, EINA_TRUE);
-	sd->text_selection.front_handle_moving = EINA_FALSE;
-	sd->text_selection.back_handle_moving = EINA_FALSE;
-     }
 
    _resume_all(sd, EINA_FALSE);
 
@@ -2349,7 +2356,7 @@ _smart_cb_pan_stop(void* data, Evas_Object* webview, void* ev)
 }
 
 static void
-_smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev)
+_smart_cb_mouse_long_press(void *data, Evas_Object *webview, void *ev)
 {
    DBG("%s\n", __func__);
    Smart_Data* sd = (Smart_Data *)data;
@@ -2358,27 +2365,34 @@ _smart_cb_select_closest_word(void* data, Evas_Object* webview, void* ev)
 
    Evas_Point* point = (Evas_Point*)ev;
 
-   if (sd->use_text_selection == EINA_FALSE) return;
-
    int x, y;
+
    _coords_evas_to_ewk(webview, point->x, point->y, &x, &y);
 
    if (!sd->ewk_view_frame_main_get)
-     sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-   if (!sd->ewk_frame_select_closest_word)
-     sd->ewk_frame_select_closest_word = (Eina_Bool (*)(Evas_Object *, int, int, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_select_closest_word");
-   int tx, ty, th, bx, by, bh;
-   Eina_Bool ret = sd->ewk_frame_select_closest_word(sd->ewk_view_frame_main_get(webview), x, y,
-	 &tx, &ty, &th, &bx, &by, &bh);
-   if (ret)
-     {
-	_coords_ewk_to_evas(webview, tx, ty, &tx, &ty);
-	_coords_ewk_to_evas(webview, bx, by, &bx, &by);
-	_text_selection_show();
-	_text_selection_set_front_info(sd, tx, ty, th);
-	_text_selection_set_back_info(sd, bx, by, bh);
-	sd->text_selection_on = EINA_TRUE;
-     }
+        sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+
+   if (!sd->ewk_frame_hit_test_new)
+        sd->ewk_frame_hit_test_new = (Ewk_Hit_Test * (*)(const Evas_Object *, int, int))dlsym(ewk_handle, "ewk_frame_hit_test_new");
+   Ewk_Hit_Test *hit_test = sd->ewk_frame_hit_test_new(sd->ewk_view_frame_main_get(webview), x, y);
+
+   if(hit_test->context & EWK_HIT_TEST_RESULT_CONTEXT_LINK || hit_test->context & EWK_HIT_TEST_RESULT_CONTEXT_IMAGE ||
+		   hit_test->context & EWK_HIT_TEST_RESULT_CONTEXT_MEDIA || hit_test->context & EWK_HIT_TEST_RESULT_CONTEXT_SELECTION)
+   {
+	   if (!sd->ewk_view_context_menu_forward_event)
+		   sd->ewk_view_context_menu_forward_event =
+				   (Eina_Bool (*)(Evas_Object *, const Evas_Event_Mouse_Down *))dlsym(ewk_handle, "ewk_view_context_menu_forward_event");
+
+	   sd->ewk_view_context_menu_forward_event(webview, &sd->mouse_down_copy);
+   }
+   else
+   {
+	   _create_ctxpopup_text_selection(sd, point->x, point->y);
+   }
+
+   if (!sd->ewk_frame_hit_test_free)
+       sd->ewk_frame_hit_test_free = (void (*)(Ewk_Hit_Test *))dlsym(ewk_handle, "ewk_frame_hit_test_free");
+   sd->ewk_frame_hit_test_free(hit_test);
 }
 
 static void
@@ -2388,7 +2402,7 @@ _smart_cb_unselect_closest_word(void* data, Evas_Object* webview, void* ev)
    Smart_Data* sd = (Smart_Data *)data;
    if (!sd) return;
 
-   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
+   if (sd->text_selection_initialized == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      {
 	_text_selection_hide(sd);
 	if (!sd->ewk_view_select_none)
@@ -2484,14 +2498,14 @@ _resume_all(Smart_Data *sd, Eina_Bool useReduceRevertPluginsFPS)
      sd->ewk_view_pause_and_or_hide_plugins = (void (*)(Evas_Object *, Eina_Bool, Eina_Bool))dlsym(ewk_handle, "ewk_view_pause_and_or_hide_plugins");
    sd->ewk_view_pause_and_or_hide_plugins(webview, EINA_FALSE, hidePlugin);
    */
-   
+
    // plugin reverting fps
    if(useReduceRevertPluginsFPS) {
 	if (!sd->ewk_view_reduce_plugins_frame_rate)
 	  sd->ewk_view_reduce_plugins_frame_rate = (void (*)(Evas_Object *, Eina_Bool))dlsym(ewk_handle, "ewk_view_reduce_plugins_frame_rate");
 	sd->ewk_view_reduce_plugins_frame_rate(webview, EINA_FALSE);
    }
-   
+
    // network resume
    if (!sd->ewk_view_resume_request)
      sd->ewk_view_resume_request = (Eina_Bool (*)(Evas_Object *))dlsym(ewk_handle, "ewk_view_resume_request");
@@ -2514,7 +2528,7 @@ _zoom_start(Smart_Data* sd, int centerX, int centerY, int distance)
 
    _suspend_all(sd, EINA_TRUE);
 
-   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
+   if (sd->text_selection_initialized == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_hide(sd);
 }
 
@@ -2602,7 +2616,7 @@ _zoom_stop(Smart_Data* sd)
 	sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set, sd->zoom.basis.x, sd->zoom.basis.y);
 	DBG("<< zoom set [%f] >>\n", sd->zoom.zooming_rate);
 
-	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
+	if (sd->text_selection_initialized == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
 	     if (!sd->ewk_view_frame_main_get)
 	       sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
@@ -2610,11 +2624,9 @@ _zoom_stop(Smart_Data* sd)
 	       sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
 	     int tx, ty, th, bx, by, bh;
 	     sd->ewk_frame_selection_handlers_get(sd->ewk_view_frame_main_get(sd->base.self), &tx, &ty, &th, &bx, &by, &bh);
-	     _coords_ewk_to_evas(sd->base.self, tx, ty, &tx, &ty);
 	     _coords_ewk_to_evas(sd->base.self, bx, by, &bx, &by);
-	     _text_selection_show();
-	     _text_selection_set_front_info(sd, tx, ty, th);
-	     _text_selection_set_back_info(sd, bx, by, bh);
+	     _text_selection_handle_move(sd, bx, by);
+	     _text_selection_show(sd);
 	  }
      }
 }
@@ -2694,18 +2706,16 @@ _smart_zoom_animator(void* data)
 
 	_elm_smart_touch_start(sd->touch_obj);
 
-	if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
+	if (sd->text_selection_initialized == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
 	  {
 	     if (!sd->ewk_frame_selection_handlers_get)
 	       sd->ewk_frame_selection_handlers_get = (Eina_Bool (*)(Evas_Object *, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_handlers_get");
 	     int tx, ty, th, bx, by, bh;
 	     sd->ewk_frame_selection_handlers_get(sd->ewk_view_frame_main_get(sd->base.self),
 		   &tx, &ty, &th, &bx, &by, &bh);
-	     _coords_ewk_to_evas(sd->base.self, tx, ty, &tx, &ty);
 	     _coords_ewk_to_evas(sd->base.self, bx, by, &bx, &by);
-	     _text_selection_show();
-	     _text_selection_set_front_info(sd, tx, ty, th);
-	     _text_selection_set_back_info(sd, bx, by, bh);
+	     _text_selection_handle_move(sd, bx, by);
+	     _text_selection_show(sd);
 	  }
 
 	return ECORE_CALLBACK_CANCEL;
@@ -2952,7 +2962,7 @@ _smart_cb_smart_zoom(void* data, Evas_Object* webview, void* event_info)
    sd->smart_zoom_animator = ecore_animator_add(_smart_zoom_animator, sd);
 
    // hide textSelection handlers during zooming
-   if (sd->use_text_selection == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
+   if (sd->text_selection_initialized == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
      _text_selection_hide(sd);
 }
 
@@ -3021,263 +3031,6 @@ _zoom_to_rect(Smart_Data *sd, int x, int y)
    sd->ewk_frame_hit_test_free(hit_test);
 }
 
-// text-selection
-#define BAR_WIDTH            4
-#define BAR_HEIGHT           10
-#define HANDLE_WIDTH         60
-#define HANDLE_HEIGHT        60
-#define HANDLE_PRESS_RANGE   50
-#define HANDLE_MIDDLE_LENGTH 60
-
-static Evas_Object* front_bar_icon;
-static Evas_Object* front_handle_icon;
-static Evas_Object* back_bar_icon;
-static Evas_Object* back_handle_icon;
-
-static Eina_Bool initialized = EINA_FALSE;
-
-static void
-_text_selection_init(Evas_Object* parent)
-{
-   DBG("<< %s >>\n", __FUNCTION__);
-
-   if (initialized)
-     return;
-
-   // front bar
-   front_bar_icon = (Evas_Object*)elm_icon_add(parent);
-   elm_icon_standard_set(front_bar_icon, "webview/ts_bar");
-   elm_icon_scale_set(front_bar_icon, true, true);
-   evas_object_pass_events_set(front_bar_icon, true);
-
-   // front handle
-   front_handle_icon = (Evas_Object*)elm_icon_add(parent);
-   elm_icon_standard_set(front_handle_icon, "webview/ts_handle_front");
-   elm_icon_scale_set(front_handle_icon, false, false);
-   evas_object_pass_events_set(front_handle_icon, true);
-
-   // back bar
-   back_bar_icon = (Evas_Object*)elm_icon_add(parent);
-   elm_icon_standard_set(back_bar_icon, "webview/ts_bar");
-   elm_icon_scale_set(back_bar_icon, true, true);
-   evas_object_pass_events_set(back_bar_icon, true);
-
-   // back handle
-   back_handle_icon = (Evas_Object*)elm_icon_add(parent);
-   elm_icon_standard_set(back_handle_icon, "webview/ts_handle_back");
-   elm_icon_scale_set(back_handle_icon, false, false);
-   evas_object_pass_events_set(back_handle_icon, true);
-
-   initialized = EINA_TRUE;
-}
-
-static void
-_text_selection_show(void)
-{
-   evas_object_show(front_bar_icon);
-   evas_object_show(front_handle_icon);
-   evas_object_show(back_bar_icon);
-   evas_object_show(back_handle_icon);
-}
-
-static void
-_text_selection_hide(Smart_Data *sd)
-{
-   evas_object_hide(front_bar_icon);
-   evas_object_hide(front_handle_icon);
-   evas_object_hide(back_bar_icon);
-   evas_object_hide(back_handle_icon);
-
-   sd->text_selection.front.x = -1;
-   sd->text_selection.front.y = -1;
-   sd->text_selection.front.h = -1;
-   sd->text_selection.front_handle.x = -1;
-   sd->text_selection.front_handle.y = -1;
-   sd->text_selection.back.x = -1;
-   sd->text_selection.back.y = -1;
-   sd->text_selection.back.h = -1;
-   sd->text_selection.back_handle.x = -1;
-   sd->text_selection.back_handle.y = -1;
-}
-
-static void
-_text_selection_set_front_info(Smart_Data *sd, int x, int y, int height)
-{
-   Evas_Object *webview = sd->base.self;
-
-   Evas_Coord_Rectangle* front = &(sd->text_selection.front);
-   Evas_Point* front_handle = &(sd->text_selection.front_handle);
-
-   front->h = height;
-   int front_bar_height = height + HANDLE_MIDDLE_LENGTH + HANDLE_HEIGHT;
-
-   // set size
-   evas_object_resize(front_bar_icon, BAR_WIDTH, front_bar_height);
-   evas_object_resize(front_handle_icon, HANDLE_WIDTH, HANDLE_HEIGHT);
-
-   // set location
-   front_handle->x = x - (HANDLE_WIDTH / 2);
-   int win_y, win_height, win_bottom;
-   evas_object_geometry_get(webview, NULL, &win_y, NULL, &win_height);
-   win_bottom = win_y + win_height;
-   if ((front_handle->y == -1 && (y + front_bar_height > win_bottom))
-	 || ((front_handle->y < front->y) && (y + front->h - front_bar_height > win_y))
-	 || ((front_handle->y > front->y) && (y + front_bar_height > win_bottom)))
-     { // upper handle
-	front_handle->y = y + front->h - front_bar_height + (HANDLE_HEIGHT / 2);
-	evas_object_move(front_bar_icon, x, y + front->h - front_bar_height);
-	evas_object_move(front_handle_icon, x - HANDLE_WIDTH, y + front->h - front_bar_height);
-
-     }
-   else
-     { // lower handle
-	front_handle->y = y + front_bar_height - (HANDLE_HEIGHT / 2);
-	evas_object_move(front_bar_icon, x, y);
-	evas_object_move(front_handle_icon, x - HANDLE_WIDTH, front_handle->y - (HANDLE_HEIGHT / 2));
-     }
-
-   front->x = x;
-   front->y = y;
-}
-
-static void
-_text_selection_set_back_info(Smart_Data *sd, int x, int y, int height)
-{
-   Evas_Object *webview = sd->base.self;
-
-   Evas_Coord_Rectangle* back = &(sd->text_selection.back);
-   Evas_Point* back_handle = &(sd->text_selection.back_handle);
-
-   back->h = height;
-   int back_bar_height = height + HANDLE_MIDDLE_LENGTH + HANDLE_HEIGHT;
-
-   // set size
-   evas_object_resize(back_bar_icon, BAR_WIDTH, back_bar_height);
-   evas_object_resize(back_handle_icon, HANDLE_WIDTH, HANDLE_HEIGHT);
-
-   // set location
-   back_handle->x = x + (HANDLE_WIDTH / 2);
-   int win_y, win_height, win_bottom;
-   evas_object_geometry_get(webview, NULL, &win_y, NULL, &win_height);
-   win_bottom = win_y + win_height;
-   if ((back_handle->y == -1 && (y - back->h + back_bar_height > win_bottom))
-	 || ((back_handle->y < back->y) && (y - back_bar_height > win_y))
-	 || ((back_handle->y > back->y) && (y - back->h + back_bar_height > win_bottom))) { // upper handle
-	back_handle->y = y - back->h - HANDLE_MIDDLE_LENGTH - (HANDLE_HEIGHT / 2);
-	evas_object_move(back_bar_icon, x - BAR_WIDTH, y - back_bar_height);
-	evas_object_move(back_handle_icon, x, back_handle->y - (HANDLE_HEIGHT / 2));
-
-   } else {
-	back_handle->y = y + HANDLE_MIDDLE_LENGTH + (HANDLE_HEIGHT / 2);
-	evas_object_move(back_bar_icon, x - BAR_WIDTH, y - back->h);
-	evas_object_move(back_handle_icon, x, back_handle->y - (HANDLE_HEIGHT / 2));
-   }
-
-   back->x = x;
-   back->y = y;
-}
-
-static Eina_Bool
-_text_selection_handle_pressed(Smart_Data *sd, int x, int y)
-{
-   Evas_Point front_handle = sd->text_selection.front_handle;
-   Evas_Point back_handle = sd->text_selection.back_handle;
-
-   // check front handle
-   if (x > (front_handle.x - HANDLE_PRESS_RANGE) && x < (front_handle.x + HANDLE_PRESS_RANGE)
-	 && y > (front_handle.y - HANDLE_PRESS_RANGE) && y < (front_handle.y + HANDLE_PRESS_RANGE))
-     sd->text_selection.front_handle_moving = EINA_TRUE;
-
-   // check back handle
-   if (x > (back_handle.x - HANDLE_PRESS_RANGE) && x < (back_handle.x + HANDLE_PRESS_RANGE)
-	 && y > (back_handle.y - HANDLE_PRESS_RANGE) && y < (back_handle.y + HANDLE_PRESS_RANGE))
-     {
-	if (sd->text_selection.front_handle_moving == EINA_TRUE)
-	  {
-	     if (abs(x - front_handle.x) + abs(y - front_handle.y)
-		   > abs(x - back_handle.x) + abs(y - back_handle.y))
-	       {
-		  sd->text_selection.front_handle_moving = EINA_FALSE;
-		  sd->text_selection.back_handle_moving = EINA_TRUE;
-	       }
-	  }
-	else
-	  {
-	     sd->text_selection.back_handle_moving = EINA_TRUE;
-	  }
-     }
-
-   return (sd->text_selection.front_handle_moving || sd->text_selection.back_handle_moving);
-}
-
-static void
-_text_selection_update_position(Smart_Data *sd, int x, int y)
-{
-   Evas_Object *webview = sd->base.self;
-
-   Evas_Coord_Rectangle* front = &(sd->text_selection.front);
-   Evas_Coord_Rectangle* back = &(sd->text_selection.back);
-
-   if (!sd->ewk_view_frame_main_get)
-     sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
-
-   // set selected region with front handle
-   if (sd->text_selection.front_handle_moving == EINA_TRUE)
-     {
-	x = x + (HANDLE_WIDTH >> 1);
-	if (sd->text_selection.front_handle.y < sd->text_selection.front.y)
-	  y = y + (HANDLE_HEIGHT >> 1) + HANDLE_MIDDLE_LENGTH;
-	else
-	  y = y - front->h - HANDLE_MIDDLE_LENGTH - (HANDLE_HEIGHT >> 1);
-
-	if (y > back->y)
-	  y = back->y - back->h / 2;
-
-	if (!sd->ewk_frame_selection_left_set)
-	  sd->ewk_frame_selection_left_set = (Eina_Bool (*)(Evas_Object *, int, int, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_left_set");
-	int ewkX, ewkY;
-	_coords_evas_to_ewk(webview, x, y, &ewkX, &ewkY);
-	if (sd->ewk_frame_selection_left_set(sd->ewk_view_frame_main_get(webview), ewkX, ewkY,
-		 &front->x, &front->y, &front->h)) {
-	     _coords_ewk_to_evas(webview, front->x, front->y, &front->x, &front->y);
-	     _text_selection_set_front_info(sd, front->x, front->y, front->h);
-	}
-
-	// set selected region with back handle
-     }
-   else if (sd->text_selection.back_handle_moving)
-     {
-	x = x - (HANDLE_WIDTH >> 1);
-	if (sd->text_selection.back_handle.y < sd->text_selection.back.y)
-	  y = y + (HANDLE_HEIGHT >> 1) + HANDLE_MIDDLE_LENGTH;
-	else
-	  y = y - back->h - HANDLE_MIDDLE_LENGTH - (HANDLE_HEIGHT >> 1);
-
-	if (y < front->y)
-	  y = front->y + front->h / 2;
-
-	if (!sd->ewk_frame_selection_right_set)
-	  sd->ewk_frame_selection_right_set = (Eina_Bool (*)(Evas_Object *, int, int, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_right_set");
-	int ewkX, ewkY;
-	_coords_evas_to_ewk(webview, x, y, &ewkX, &ewkY);
-	if (sd->ewk_frame_selection_right_set(sd->ewk_view_frame_main_get(webview), ewkX, ewkY,
-		 &back->x, &back->y, &back->h)) {
-	     _coords_ewk_to_evas(webview, back->x, back->y, &back->x, &back->y);
-	     _text_selection_set_back_info(sd, back->x, back->y, back->h);
-	}
-     }
-}
-
-static void
-_text_selection_move_by(Smart_Data *sd, int dx, int dy)
-{
-   _text_selection_set_front_info(sd, sd->text_selection.front.x + dx,
-	 sd->text_selection.front.y + dy,
-	 sd->text_selection.front.h);
-   _text_selection_set_back_info(sd, sd->text_selection.back.x + dx,
-	 sd->text_selection.back.y + dy,
-	 sd->text_selection.back.h);
-}
 // minimap
 static void
 _minimap_update_detail(Evas_Object* minimap, Smart_Data *sd, cairo_surface_t* src, int srcW, int srcH, Eina_Rectangle* visibleRect)
@@ -3330,7 +3083,7 @@ _minimap_update_detail(Evas_Object* minimap, Smart_Data *sd, cairo_surface_t* sr
    if (!sd->cairo_set_line_width)
      sd->cairo_set_line_width = (void (*)(cairo_t *, double))dlsym(cairo_handle, "cairo_set_line_width");
    if (!sd->cairo_stroke)
-     sd->cairo_stroke = (void (*)(cairo_t *cr))dlsym(cairo_handle, "cairo_stroke"); 
+     sd->cairo_stroke = (void (*)(cairo_t *cr))dlsym(cairo_handle, "cairo_stroke");
    if (!sd->cairo_set_antialias)
      sd->cairo_set_antialias = (void (*)(cairo_t *, cairo_antialias_t))dlsym(cairo_handle, "cairo_set_antialias");
 
@@ -3571,5 +3324,354 @@ _geolocation_permission_callback(void *geolocation_obj, const char* url)
      }
    if (msg)
      free(msg);
+}
+
+static void
+_create_ctxpopup_text_selection(Smart_Data *sd, int x, int y)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   if (!sd) return;
+
+   Evas_Object *webview = sd->base.self;
+
+   if(sd->ctxpopup)
+	   evas_object_del(sd->ctxpopup);
+
+   sd->ctxpopup = elm_ctxpopup_add(webview);
+
+   evas_object_smart_callback_add(sd->ctxpopup, CTXPOPUP_HIDE_SIGNAL, _smart_cb_ctxpopup, sd);
+   elm_ctxpopup_item_add(sd->ctxpopup, NULL, CTXPOPUP_TEXT_SELECTION_STRING, _smart_cb_ctxpopup, sd);
+   elm_ctxpopup_button_append(sd->ctxpopup, CTXPOPUP_CLOSE_BUTTON_STRING, _smart_cb_ctxpopup_button, sd);
+   evas_object_move(sd->ctxpopup, x, y);
+   evas_object_show(sd->ctxpopup);
+}
+
+static void
+_smart_cb_ctxpopup_button(void *data, Evas_Object *obj, void *event_info)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   Smart_Data* sd = (Smart_Data *)data;
+   if (!sd) return;
+
+   if (!obj) return;
+
+   evas_object_del(sd->ctxpopup);
+   sd->ctxpopup = NULL;
+}
+
+static void
+_smart_cb_ctxpopup(void *data, Evas_Object *obj, void *event_info)
+{
+   DBG("%s is called\n", __func__);
+   Smart_Data* sd = (Smart_Data *)data;
+   if (!sd) return;
+
+   if (!obj) return;
+
+   Elm_Ctxpopup_Item *ctx_item = (Elm_Ctxpopup_Item *) event_info;
+   if (!ctx_item)
+   {
+	   DBG("item %p\n", ctx_item);
+	   evas_object_del(sd->ctxpopup);
+	   sd->ctxpopup = NULL;
+	   return;
+   }
+
+   if(!strcmp(elm_ctxpopup_item_label_get(ctx_item), CTXPOPUP_TEXT_SELECTION_STRING))
+   {
+	   evas_object_del(sd->ctxpopup);
+	   sd->ctxpopup = NULL;
+	   _text_selection_start(sd);
+   }
+   else
+   {
+	   evas_object_del(sd->ctxpopup);
+	   sd->ctxpopup = NULL;
+   }
+}
+
+static void
+_smart_cb_ctxpopup_webkit(void *data, Evas_Object *obj, void *event_info)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+
+   if (!obj) return;
+   Smart_Data* sd = evas_object_data_get(obj, "sd");
+   if (!sd) return;
+
+   Elm_Ctxpopup_Item *ctx_item = (Elm_Ctxpopup_Item *) event_info;
+   if (!ctx_item)
+   {
+	   DBG("item %p\n", ctx_item);
+	   evas_object_del(sd->ctxpopup);
+	   sd->ctxpopup = NULL;
+	   return;
+   }
+
+   Ewk_Context_Menu_Item *webkit_item = (Ewk_Context_Menu_Item *) data;
+   if(!webkit_item) return;
+
+   if (!sd->ewk_context_menu_item_select)
+	   sd->ewk_context_menu_item_select =
+			   (Eina_Bool (*)(Ewk_Context_Menu *, Ewk_Context_Menu_Item *))dlsym(ewk_handle, "ewk_context_menu_item_select");
+   if (!sd->ewk_context_menu_item_parent_get)
+	   sd->ewk_context_menu_item_parent_get =
+			   (Ewk_Context_Menu* (*)(Ewk_Context_Menu_Item *))dlsym(ewk_handle, "ewk_context_menu_item_parent_get");
+
+   sd->ewk_context_menu_item_select(sd->ewk_context_menu_item_parent_get(webkit_item), webkit_item);
+   evas_object_del(sd->ctxpopup);
+   sd->ctxpopup = NULL;
+}
+
+static void
+_smart_cb_contextmenu_new(void* data, Evas_Object* webview, void* arg)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   Smart_Data* sd = (Smart_Data *)data;
+   if (!sd) return;
+
+   Ewk_Context_Menu *menu = (Ewk_Context_Menu *) arg;
+   if (!menu) return;
+
+   if(sd->ctxpopup)
+	   evas_object_del(sd->ctxpopup);
+
+   sd->ctxpopup = elm_ctxpopup_add(webview);
+   evas_object_smart_callback_add(sd->ctxpopup, CTXPOPUP_HIDE_SIGNAL, _smart_cb_ctxpopup, sd);
+}
+
+static void
+_smart_cb_contextmenu_item_appended(void* data, Evas_Object* webview, void* arg)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+}
+
+static void
+_smart_cb_contextmenu_customize(void* data, Evas_Object* webview, void* arg)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   Smart_Data* sd = (Smart_Data *)data;
+   if (!sd) return;
+
+   Eina_List *menu_items = (Eina_List *) arg;
+   if (!menu_items) return;
+
+   Eina_List *l;
+   Ewk_Context_Menu_Item *item;
+
+   if (!sd->ewk_context_menu_item_title_get)
+	   sd->ewk_context_menu_item_title_get =
+			   (const char* (*)(Ewk_Context_Menu_Item *))dlsym(ewk_handle, "ewk_context_menu_item_title_get");
+   if (!sd->ewk_context_menu_item_type_get)
+	   sd->ewk_context_menu_item_type_get =
+			   (Ewk_Context_Menu_Item_Type (*)(Ewk_Context_Menu_Item *))dlsym(ewk_handle, "ewk_context_menu_item_type_get");
+   if (!sd->ewk_context_menu_item_enabled_get)
+	   sd->ewk_context_menu_item_enabled_get =
+			   (Eina_Bool (*)(Ewk_Context_Menu_Item *))dlsym(ewk_handle, "ewk_context_menu_item_enabled_get");
+   if (!sd->ewk_context_menu_item_action_get)
+	   sd->ewk_context_menu_item_action_get =
+		   (Ewk_Context_Menu_Action (*)(Ewk_Context_Menu_Item *))dlsym(ewk_handle, "ewk_context_menu_item_action_get");
+   if (!sd->ewk_context_menu_item_title_set)
+	   sd->ewk_context_menu_item_title_set =
+			   (const char* (*)(Ewk_Context_Menu_Item *, const char *))dlsym(ewk_handle, "ewk_context_menu_item_title_set");
+
+   Eina_Bool is_open_link_tag = EINA_FALSE;
+   Eina_Bool is_search_web_tag = EINA_FALSE;
+
+   EINA_LIST_FOREACH(menu_items, l, item)
+   {
+	   if(sd->ewk_context_menu_item_enabled_get(item) && sd->ewk_context_menu_item_type_get(item) == EWK_ACTION_TYPE)
+	   {
+		   Ewk_Context_Menu_Action action = sd->ewk_context_menu_item_action_get(item);
+		   if(action == EWK_CONTEXT_MENU_ITEM_TAG_SEARCH_WEB)
+		   {
+			   elm_ctxpopup_horizontal_set(sd->ctxpopup, EINA_TRUE);
+			   is_search_web_tag = EINA_TRUE;
+			   sd->ewk_context_menu_item_title_set(item, "Search");
+		   }
+		   if(action == EWK_CONTEXT_MENU_ITEM_TAG_OPEN_LINK)
+		   {
+			   is_open_link_tag = EINA_TRUE;
+			   continue;
+		   }
+		   DBG("%s\n", sd->ewk_context_menu_item_title_get(item));
+		   elm_ctxpopup_item_add(sd->ctxpopup, NULL, sd->ewk_context_menu_item_title_get(item), _smart_cb_ctxpopup_webkit, item);
+	   }
+   }
+   if(is_open_link_tag)
+   {
+	   elm_ctxpopup_item_add(sd->ctxpopup, NULL, CTXPOPUP_TEXT_SELECTION_STRING, _smart_cb_ctxpopup, sd);
+	   elm_ctxpopup_button_append(sd->ctxpopup, CTXPOPUP_CLOSE_BUTTON_STRING, _smart_cb_ctxpopup_button, sd);
+   }
+   if(is_search_web_tag)
+   {
+	   elm_ctxpopup_item_add(sd->ctxpopup, NULL, "Translate", _smart_cb_ctxpopup, sd);
+   }
+}
+
+static void
+_smart_cb_contextmenu_show(void* data, Evas_Object* webview, void* arg)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   Smart_Data* sd = (Smart_Data *)data;
+   if (!sd) return;
+
+   Ewk_Context_Menu *menu = (Ewk_Context_Menu *) arg;
+   if (!menu) return;
+
+   Evas_Point point = sd->mouse_down_copy.output;
+
+   evas_object_data_set(sd->ctxpopup, "sd", sd);
+
+   evas_object_move(sd->ctxpopup, point.x, point.y);
+   evas_object_show(sd->ctxpopup);
+}
+
+static void
+_smart_cb_contextmenu_free(void* data, Evas_Object* webview, void* arg)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+}
+
+static void
+_text_selection_handle_init(Smart_Data *sd)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   if (sd->text_selection_initialized) return;
+
+   Evas_Object *webview = sd->base.self;
+   if(!webview) return;
+
+   sd->back_handle_icon = edje_object_add(evas_object_evas_get(webview));
+   if(!sd->back_handle_icon) return;
+   edje_object_file_set(sd->back_handle_icon, BEAT_THEME_EDJ, "elm/entry/selection/block_handle");
+
+   evas_object_event_callback_add(sd->back_handle_icon, EVAS_CALLBACK_MOUSE_DOWN, _text_selection_handle_mouse_down, sd);
+   evas_object_event_callback_add(sd->back_handle_icon, EVAS_CALLBACK_MOUSE_MOVE, _text_selection_handle_mouse_move, sd);
+   evas_object_event_callback_add(sd->back_handle_icon, EVAS_CALLBACK_MOUSE_UP, _text_selection_handle_mouse_up, sd);
+
+   sd->text_selection.back_handle_moving = EINA_FALSE;
+   sd->text_selection.back_handle_pos.x = -1;
+   sd->text_selection.back_handle_pos.y = -1;
+   sd->text_selection.back_handle_pos_clicked_diff.x = 0;
+   sd->text_selection.back_handle_pos_clicked_diff.y = 0;
+
+   int x, y, w, h;
+   edje_object_part_geometry_get(sd->back_handle_icon,"block_handle", &x, &y, &w, &h);
+   sd->text_selection.back_handle_moving = EINA_FALSE;
+
+   sd->text_selection_initialized = EINA_TRUE;
+}
+
+static void _text_selection_start(Smart_Data *sd)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   if (!sd) return;
+
+   Evas_Object *webview = sd->base.self;
+
+   if (sd->text_selection_initialized == EINA_FALSE) return;
+
+   Evas_Point point = sd->mouse_down_copy.output;
+
+   int x, y;
+   _coords_evas_to_ewk(webview, point.x, point.y, &x, &y);
+
+   if (!sd->ewk_view_frame_main_get)
+     sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+   if (!sd->ewk_frame_select_closest_word)
+     sd->ewk_frame_select_closest_word = (Eina_Bool (*)(Evas_Object *, int, int, int *, int *, int *, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_select_closest_word");
+   int tx, ty, th, bx, by, bh;
+   Eina_Bool ret = sd->ewk_frame_select_closest_word(sd->ewk_view_frame_main_get(webview), x, y,
+	 &tx, &ty, &th, &bx, &by, &bh);
+   if (ret)
+     {
+	_coords_ewk_to_evas(webview, bx, by, &bx, &by);
+	_text_selection_handle_move(sd, bx, by);
+	_text_selection_show(sd);
+	sd->text_selection_on = EINA_TRUE;
+     }
+}
+
+static void
+_text_selection_show(Smart_Data* sd)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   evas_object_show(sd->back_handle_icon);
+}
+
+static void
+_text_selection_hide(Smart_Data *sd)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   evas_object_hide(sd->back_handle_icon);
+}
+
+static void
+_text_selection_handle_mouse_down(void* data, Evas* e, Evas_Object* o, void* event_info)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   Evas_Event_Mouse_Down* ev = (Evas_Event_Mouse_Down*)event_info;
+   Smart_Data* sd = (Smart_Data *)data;
+   if(!sd) return;
+
+   int x, y, w, h;
+   evas_object_geometry_get(o, &x, &y, &w, &h);
+
+   sd->text_selection.back_handle_moving = EINA_TRUE;
+   sd->text_selection.back_handle_pos_clicked_diff.x = ev->output.x - x;
+   sd->text_selection.back_handle_pos_clicked_diff.y = ev->output.y - y;
+}
+
+static void
+_text_selection_handle_mouse_up(void* data, Evas* e, Evas_Object* o, void* event_info)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   Evas_Event_Mouse_Down* ev = (Evas_Event_Mouse_Down*)event_info;
+   Smart_Data* sd = (Smart_Data *)data;
+   if(!sd) return;
+
+   sd->text_selection.back_handle_moving = EINA_FALSE;
+}
+
+static void
+_text_selection_handle_mouse_move(void* data, Evas* e, Evas_Object* o, void* event_info)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   Evas_Event_Mouse_Down* ev = (Evas_Event_Mouse_Down*)event_info;
+   Smart_Data* sd = (Smart_Data *)data;
+   if(!sd) return;
+
+   Evas_Object *webview = sd->base.self;
+   if(!webview) return;
+
+   int x, y;//, w, h;
+   x = ev->output.x - sd->text_selection.back_handle_pos_clicked_diff.x;
+   y = ev->output.y - sd->text_selection.back_handle_pos_clicked_diff.y;
+
+   if (!sd->ewk_view_frame_main_get)
+     sd->ewk_view_frame_main_get = (Evas_Object *(*)(const Evas_Object *))dlsym(ewk_handle, "ewk_view_frame_main_get");
+
+   if (!sd->ewk_frame_selection_right_set)
+	   sd->ewk_frame_selection_right_set =
+			   (Eina_Bool (*)(Evas_Object *, int, int, int *, int *, int *))dlsym(ewk_handle, "ewk_frame_selection_right_set");
+
+   int ewkX, ewkY, new_x, new_y, new_h;
+   _coords_evas_to_ewk(webview, x, y, &ewkX, &ewkY);
+
+   if (sd->ewk_frame_selection_right_set(sd->ewk_view_frame_main_get(webview), ewkX, ewkY, &new_x, &new_y, &new_h))
+   {
+     _coords_ewk_to_evas(webview, new_x, new_y, &new_x, &new_y);
+     _text_selection_handle_move(sd, new_x, new_y);
+   }
+}
+
+static void
+_text_selection_handle_move(Smart_Data* sd, int x, int y)
+{
+   DBG("<< %s >>\n", __FUNCTION__);
+   sd->text_selection.back_handle_pos.x = x;
+   sd->text_selection.back_handle_pos.y = y;
+   evas_object_move(sd->back_handle_icon, x, y);
 }
 #endif
