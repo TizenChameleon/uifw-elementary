@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build23) unstable; urgency=low
+
+  * Add elm_autocapitalization_allow_all_set, elm_autoperiod_allow_all_set API.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build23
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Wed, 06 Oct 2010 13:25:21 +0900
+
 elementary (1.0.0+svn.51480slp2+build22) unstable; urgency=low
 
   * Packaging with lots of changes.
