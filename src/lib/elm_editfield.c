@@ -204,7 +204,6 @@ static void
 _entry_cursor_changed_cb(void *data, Evas_Object *obj, void* event_info)
 {
    Evas_Object *ef_obj = (Evas_Object *)data;
-   Widget_Data *wd = elm_widget_data_get(ef_obj);
    evas_object_smart_callback_call(ef_obj, SIG_IMPREGION_CHANGED, NULL);
 }
 #endif

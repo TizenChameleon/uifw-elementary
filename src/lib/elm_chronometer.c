@@ -26,7 +26,7 @@ struct _Widget_Data
 
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
-static int _ticker(void *data);
+static Eina_Bool _ticker(void *data);
 static void _signal_chronometer_val_changed(void *data,Evas_Object *obj,const char *emission,const char *source);
 static void _time_update(Evas_Object *obj);
 
@@ -47,7 +47,7 @@ _theme_hook(Evas_Object *obj)
    _time_update(obj);
 }
 
-static int
+static Eina_Bool
 _ticker(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);

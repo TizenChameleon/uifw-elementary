@@ -137,7 +137,7 @@ struct _Widget_Data
    Eina_Bool ellipsis : 1;
    Eina_Bool autoreturnkey : 1;
    Eina_Bool input_panel_enable : 1;
-   Eina_Bool autocapitalize : 1;
+   Eina_Bool autocapital : 1;
    Elm_Input_Panel_Layout input_panel_layout;
    Eina_Bool autoperiod : 1;
 };
@@ -291,7 +291,7 @@ _theme_hook(Evas_Object *obj)
    elm_entry_entry_set(obj, t);
    eina_stringshare_del(t);
    edje_object_scale_set(wd->ent, elm_widget_scale_get(obj) * _elm_config->scale);
-   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
+   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapital);
    edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", wd->input_panel_enable);
 
@@ -392,11 +392,11 @@ _check_enable_returnkey(Evas_Object *obj)
 
    if (_entry_length_get(obj) == 0) 
      {
-	ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_TRUE);
+        ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_TRUE);
      }
    else 
      {
-	ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_FALSE);
+        ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_FALSE);
      }
 }
 
@@ -542,7 +542,7 @@ _dismissed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (wd->selmode)
      {
         if (!wd->password)
-          edje_object_part_text_select_allow_set(wd->ent, "elm.text", 1);
+          edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
      }
    elm_widget_scroll_freeze_pop(data);
    if (wd->hovdeljob) ecore_job_del(wd->hovdeljob);
@@ -557,7 +557,7 @@ _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    wd->selmode = EINA_TRUE;
    edje_object_part_text_select_none(wd->ent, "elm.text");
    if (!wd->password)
-     edje_object_part_text_select_allow_set(wd->ent, "elm.text", 1);
+     edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
    edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
    elm_widget_scroll_hold_push(data);
 }
@@ -597,7 +597,7 @@ _cut(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 
    /* Store it */
    wd->selmode = EINA_FALSE;
-   edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+   edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
    edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
    elm_widget_scroll_hold_pop(data);
    _store_selection(ELM_SEL_CLIPBOARD, data);
@@ -611,7 +611,7 @@ _copy(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    wd->selmode = EINA_FALSE;
-   edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+   edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
    edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
    elm_widget_scroll_hold_pop(data);
    _store_selection(ELM_SEL_CLIPBOARD, data);
@@ -624,7 +624,7 @@ _cancel(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    wd->selmode = EINA_FALSE;
-   edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+   edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
    edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
    elm_widget_scroll_hold_pop(data);
    edje_object_part_text_select_none(wd->ent, "elm.text");
@@ -737,7 +737,7 @@ _long_press(void *data)
              evas_object_show(wd->hoversel);
              elm_hoversel_hover_begin(wd->hoversel);
           }
-        edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+        edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
         edje_object_part_text_select_abort(wd->ent, "elm.text");
      }
    wd->longpress_timer = NULL;
@@ -2103,7 +2103,7 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    t = eina_stringshare_add(elm_entry_entry_get(obj));
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
-   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
+   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapital);
    edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
    ic = elm_entry_imf_context_get(obj);
    if (ic)
@@ -2150,7 +2150,7 @@ elm_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes)
    wd->max_no_of_bytes = max_no_of_bytes;
    edje_object_signal_emit(wd->ent, "elm,state,remain,bytes,show", "elm");
    edje_object_part_textinput_callback_set(wd->ent, "elm.text", _textinput_control_function,obj);
- }
+}
 
 
 /**
@@ -2187,7 +2187,7 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
              elm_entry_autoperiod_set(obj, EINA_FALSE);
           }
 
-        if (wd->autocapitalize)
+        if (wd->autocapital)
           {
              elm_entry_autocapitalization_set(obj, EINA_FALSE);
           }
@@ -2196,7 +2196,7 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    ic = elm_entry_imf_context_get(obj);
    if (ic)
      {
-	ecore_imf_context_input_panel_layout_set(ic, wd->input_panel_layout);
+        ecore_imf_context_input_panel_layout_set(ic, wd->input_panel_layout);
      }
 
    eina_stringshare_del(t);
@@ -2504,7 +2504,7 @@ elm_entry_select_none(Evas_Object *obj)
    if (wd->selmode)
      {
 	wd->selmode = EINA_FALSE;
-	edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+	edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
 	edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
      }
    wd->have_selection = EINA_FALSE;
@@ -2527,7 +2527,7 @@ elm_entry_select_all(Evas_Object *obj)
    if (wd->selmode)
      {
 	wd->selmode = EINA_FALSE;
-	edje_object_part_text_select_allow_set(wd->ent, "elm.text", 0);
+	edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
 	edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
      }
    wd->have_selection = EINA_TRUE;
@@ -3059,11 +3059,15 @@ elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
    if (!wd) return;
 
    if (wd->password)
-       wd->autocapitalize = EINA_FALSE;
+       wd->autocapital = EINA_FALSE;
    else
-       wd->autocapitalize = autocap;
+       wd->autocapital = autocap;
 
-   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapitalize);
+   if (wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_URL || 
+       wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_EMAIL) 
+       wd->autocapital = EINA_FALSE;
+
+   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapital);
 }
 
 /**
@@ -3085,6 +3089,10 @@ elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
        wd->autoperiod = EINA_FALSE;
    else
        wd->autoperiod = autoperiod;
+
+   if (wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_URL || 
+       wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_EMAIL) 
+       wd->autoperiod = EINA_FALSE;
 
    edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
 }

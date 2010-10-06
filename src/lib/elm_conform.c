@@ -104,7 +104,6 @@ static Evas_Object *
 _focus_object_get(const Evas_Object *obj)
 {
    Evas_Object *parent = NULL, *foc = NULL;
-   const char * type = NULL;
    parent = elm_widget_top_get(obj);
    if (!parent) return NULL;
    foc = elm_widget_focused_object_get(parent);
@@ -205,7 +204,6 @@ _autoscroll_mode_enable(void *data)
 {
    Evas_Object * focused_object=NULL;
    bool ret = EINA_FALSE;
-   const char * type=NULL;
    
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return EINA_FALSE;

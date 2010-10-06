@@ -59,7 +59,7 @@ static void _gallery_clear_all_image(Evas_Object *obj);
 static void _gallery_add_image(Evas_Object *obj, int index, void *data);
 static void _gallery_del_image(void *data);
 static void _gallery_del_image_force(void *data);
-static int _gallery_idle_handler_cb(void* data);
+static Eina_Bool _gallery_idle_handler_cb(void* data);
 static void _gallery_auto_blight(Evas_Object *obj);
 static void _gallery_set_all_status(Evas_Object *obj,int status);
 
@@ -294,7 +294,7 @@ static void _gallery_scroller_cb(void *data, Evas_Object *obj, void *event_info)
 	}
 }
 
-static int _gallery_idle_handler_cb(void* data)
+static Eina_Bool _gallery_idle_handler_cb(void* data)
 {
 	Widget_Data *wd = (Widget_Data *)data;
 	Elm_Gallery_Item *it = NULL;
