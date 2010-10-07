@@ -63,6 +63,8 @@ VMIN=v_min
 AC_SUBST(VMAJ)
 AC_SUBST(VMIN)
 
+VERSION="1.0.0"
+
 EDJE_VERSION="1.0.0"
 
 case "$host_os" in
