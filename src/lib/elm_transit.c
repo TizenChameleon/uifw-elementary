@@ -185,7 +185,7 @@ elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool disabled)
      }
    else
      {
-	if (transit->block_rect == NULL)
+	if (!transit->block_rect)
 	   transit->block_rect = _create_block_rect(transit->parent);
      }
 }
