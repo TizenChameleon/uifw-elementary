@@ -72,7 +72,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_animator_add_func_01(void)
 {
- 	Evas_Object *obj = NULL;
+ 	Elm_Animator *obj = NULL;
 
    	obj = elm_animator_add(main_win);
 
@@ -89,7 +89,7 @@ static void utc_UIFW_elm_animator_add_func_01(void)
  */
 static void utc_UIFW_elm_animator_add_func_02(void)
 {
-	Evas_Object *obj = NULL;
+	Elm_Animator *obj = NULL;
 
   	obj = elm_animator_add(NULL);
 	

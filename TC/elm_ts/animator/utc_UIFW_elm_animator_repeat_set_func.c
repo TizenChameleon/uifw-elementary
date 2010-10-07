@@ -28,7 +28,7 @@
 
 
 Evas_Object *main_win;
-Elm_Animator *obj;
+Elm_Animator *animator;
 
 static void startup(void);
 static void cleanup(void);
@@ -36,7 +36,7 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_animator_del_func_01(void);
+static void utc_UIFW_elm_animator_repeat_set_func_01(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,7 +44,7 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_animator_del_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_animator_repeat_set_func_01, POSITIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -53,9 +53,9 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
-
-	obj = elm_animator_add(NULL);
+	evas_object_show(main_win);
+	animator = elm_animator_add(NULL);
+	
 }
 
 static void cleanup(void)
@@ -64,17 +64,17 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
+	elm_animator_del(animator);
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_animator_del()
+ * @brief Positive test case of elm_animator_repeat_set()
  */
-static void utc_UIFW_elm_animator_del_func_01(void)
+static void utc_UIFW_elm_animator_repeat_set_func_01(void)
 {
-	elm_animator_del(obj);
-
+	elm_animator_repeat_set(animator, 3);
 	tet_result(TET_PASS);
 }
 
