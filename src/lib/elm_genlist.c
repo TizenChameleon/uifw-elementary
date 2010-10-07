@@ -381,14 +381,14 @@ struct _Elm_Genlist_Item
    Elm_Genlist_Item *rel;
    int relcount;
    int walking;
-   Eina_Bool before : 1;
+   int expanded_depth;
 
+   Eina_Bool before : 1;
    Eina_Bool want_unrealize : 1;
    Eina_Bool realized : 1;
    Eina_Bool selected : 1;
    Eina_Bool hilighted : 1;
    Eina_Bool expanded : 1;
-   int expanded_depth;
    Eina_Bool disabled : 1;
    Eina_Bool display_only : 1;
    Eina_Bool mincalcd : 1;
