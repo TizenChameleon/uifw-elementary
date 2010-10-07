@@ -246,6 +246,10 @@ Eina_Bool         _elm_dangerous_call_check(const char *call);
 void              _elm_widtype_register(const char **ptr);
 
 
+/* do not use except clipboard history module */
+EAPI Eina_Bool    elm_cbhm_helper_init(Evas_Object *self);
+EAPI void         elm_cbhm_send_raw_data(char *cmd);
+
 #define ELM_SET_WIDTYPE(widtype, type) \
    do { \
       if (!widtype) { \
