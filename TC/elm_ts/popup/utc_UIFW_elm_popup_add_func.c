@@ -45,7 +45,7 @@ enum {
 
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_popup_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_popup_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_popup_add_func_02, POSITIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -85,7 +85,7 @@ static void utc_UIFW_elm_popup_add_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_popup_add()
+ * @brief Positive test case of ug_init elm_popup_add()
  */
 static void utc_UIFW_elm_popup_add_func_02(void)
 {
