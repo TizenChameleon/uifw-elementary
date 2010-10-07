@@ -28,7 +28,7 @@
 
 
 Evas_Object *main_win;
-Elm_Animator *obj;
+Elm_Animator *animator;
 
 static void startup(void);
 static void cleanup(void);
@@ -36,7 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_animator_del_func_01(void);
+static void utc_UIFW_elm_animator_operating_get_func_01(void);
+static void utc_UIFW_elm_animator_operating_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,9 +45,14 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_animator_del_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_animator_operating_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_animator_operating_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
+
+static void _op(void *data, Elm_Animator *animator, double frame)
+{
+}
 
 static void startup(void)
 {
@@ -54,8 +60,10 @@ static void startup(void)
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
-
-	obj = elm_animator_add(NULL);
+	animator = elm_animator_add(main_win);
+	elm_animator_duration_set(animator, 3);
+	elm_animator_operation_callback_set(animator, _op, NULL);
+	elm_animator_animate(animator);
 }
 
 static void cleanup(void)
@@ -69,13 +77,35 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_animator_del()
+ * @brief Positive test case of elm_animator_operating_get()
  */
-static void utc_UIFW_elm_animator_del_func_01(void)
+static void utc_UIFW_elm_animator_operating_get_func_01(void)
 {
-	elm_animator_del(obj);
+	Eina_Bool r = 0;
 
+   	r = elm_animator_operating_get(animator);
+
+	if (r == EINA_FALSE) {
+		tet_infoline("elm_animator_operating_get() failed in positive test case");
+		tet_result(TET_FAIL);
+		return;
+	}
 	tet_result(TET_PASS);
 }
 
+/**
+ * @brief Negative test case of ug_init elm_animator_operating_get()
+ */
+static void utc_UIFW_elm_animator_operating_get_func_02(void)
+{
+	Eina_Bool r = 0;
 
+   	r = elm_animator_operating_get(NULL);
+	
+	if (r == EINA_TRUE) {
+		tet_infoline("elm_animator_operating_get() failed in negative test case");
+		tet_result(TET_FAIL);
+		return;
+	}
+	tet_result(TET_PASS);
+}
