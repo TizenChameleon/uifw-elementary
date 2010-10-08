@@ -34,8 +34,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_calendar_weekdays_names_set_func_01(void);
-static void utc_UIFW_elm_calendar_weekdays_names_set_func_02(void);
+static void utc_UIFW_elm_calendar_day_selection_enabled_set_func_01(void);
+static void utc_UIFW_elm_calendar_day_selection_enabled_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -43,8 +43,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_calendar_weekdays_names_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_calendar_weekdays_names_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_calendar_day_selection_enabled_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_calendar_day_selection_enabled_set_func_02, NEGATIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -68,37 +68,29 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_calendar_weekdays_names_set()
+ * @brief Positive test case of elm_calendar_day_selection_enabled_set()
  */
-static void utc_UIFW_elm_calendar_weekdays_names_set_func_01(void)
+static void utc_UIFW_elm_calendar_day_selection_enabled_set_func_01(void)
 {
    Evas_Object *test_eo = elm_calendar_add(main_win);
-   const char *weekdays[] =
-   {
-           "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
-   };
-   elm_calendar_weekdays_names_set(test_eo, weekdays);
+   elm_calendar_day_selection_enabled_set(test_eo, EINA_TRUE);
 
    TET_CHECK_PASS(NULL, test_eo);
 
    tet_result(TET_PASS);
-   tet_infoline("elm_calendar_weekdays_names_set() passed in positive test case");
+   tet_infoline("elm_calendar_day_selection_enabled_set() passed in positive test case");
    evas_object_del(test_eo);
    test_eo = NULL;
 }
 
 /**
- * @brief Negative test case of ug_init elm_calendar_weekdays_names_set()
+ * @brief Negative test case of ug_init elm_calendar_day_selection_enabled_set()
  */
-static void utc_UIFW_elm_calendar_weekdays_names_set_func_02(void)
+static void utc_UIFW_elm_calendar_day_selection_enabled_set_func_02(void)
 {
    Evas_Object *test_eo = elm_calendar_add(main_win);
-   const char *weekdays[] =
-   {
-           "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
-   };
-   elm_calendar_weekdays_names_set(NULL, weekdays);
-   tet_infoline("elm_calendar_weekdays_names_set() passed in negative test case");
+   elm_calendar_day_selection_enabled_set(NULL, EINA_TRUE);
+   tet_infoline("elm_calendar_day_selection_enabled_set() passed in negative test case");
    evas_object_del(test_eo);
    test_eo = NULL;
    tet_result(TET_PASS);
