@@ -2789,25 +2789,6 @@ extern "C" {
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
    EAPI void         elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked);
    
-#if 0
-   /* WebView */
-   typedef Eina_Bool (*Elm_WebView_Mime_Cb)(Evas_Object *obj, const char *uri);
-   EAPI Evas_Object *elm_webview_add(Evas_Object *parent, Eina_Bool tiled);
-   EAPI Evas_Object *elm_webview_webkit_get(Evas_Object *obj);
-   EAPI void         elm_webview_events_feed_set(Evas_Object *obj, Eina_Bool feed);
-   EAPI Eina_Bool    elm_webview_events_feed_get(Evas_Object *obj);
-   EAPI void         elm_webview_events_block_set(Evas_Object *obj, Eina_Bool block);
-   EAPI Eina_Bool    elm_webview_events_block_get(Evas_Object *obj);
-   EAPI void         elm_webview_auto_fitting_set(Evas_Object *obj, Eina_Bool enable);
-   EAPI Eina_Bool    elm_webview_auto_fitting_get(Evas_Object *obj);
-   EAPI Evas_Object *elm_webview_minimap_get(Evas_Object *obj);
-   EAPI void         elm_webview_uri_set(Evas_Object *obj, const char *uri);
-   EAPI void         elm_webview_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
-   EAPI void         elm_webview_scheme_callback_set(Evas_Object *obj, const char *scheme, Elm_WebView_Mime_Cb func);
-   EAPI void         elm_webview_default_layout_width_set(Evas_Object *obj, int width);
-   EAPI void         elm_webview_layout_width_set_to_container(Evas_Object *obj);
-#endif
-
    /* NoContents */
    EAPI Evas_Object *elm_nocontents_add(Evas_Object *parent);
    EAPI void         elm_nocontents_label_set(Evas_Object *obj, const char *label);
