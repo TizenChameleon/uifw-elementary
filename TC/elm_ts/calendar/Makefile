@@ -7,7 +7,8 @@ TARGETS = utc_UIFW_elm_calendar_add_func \
 	  utc_UIFW_elm_calendar_mark_add_func \
 	  utc_UIFW_elm_calendar_marks_get_func \
 	  utc_UIFW_elm_calendar_min_max_year_get_func \
-	  utc_UIFW_elm_calendar_selected_time_get_func 
+	  utc_UIFW_elm_calendar_selected_time_get_func \
+	  utc_UIFW_elm_calendar_weekdays_names_set_func 
 
 PKGS = elementary
 

@@ -6,3 +6,4 @@
 /elm_ts/calendar/utc_UIFW_elm_calendar_selected_time_get_func
 /elm_ts/calendar/utc_UIFW_elm_calendar_mark_add_func
 /elm_ts/calendar/utc_UIFW_elm_calendar_marks_get_func
+/elm_ts/calendar/utc_UIFW_elm_calendar_weekdays_names_set_func

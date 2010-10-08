@@ -28,7 +28,6 @@
 }
 
 Evas_Object *main_win;
-Evas_Object *test_eo = NULL;
 
 static void startup(void);
 static void cleanup(void);
@@ -64,11 +63,6 @@ static void cleanup(void)
                 evas_object_del(main_win);
                 main_win = NULL;
         }
-	
-        if ( NULL != test_eo ) {
-                evas_object_del(test_eo);
-                test_eo = NULL;
-        }
 
         elm_shutdown();
         tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
@@ -79,11 +73,13 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_calendar_add_func_01(void)
 {
-   	test_eo = elm_calendar_add(main_win);
+   	Evas_Object *test_eo = elm_calendar_add(main_win);
 	TET_CHECK_PASS(NULL, test_eo);
 
 	tet_result(TET_PASS);
-	tet_infoline("elm_calendar_add() failed in positive test case");
+	tet_infoline("elm_calendar_add() passed in positive test case");
+	evas_object_del(test_eo);
+	test_eo = NULL;
 }
 
 /**
@@ -91,9 +87,9 @@ static void utc_UIFW_elm_calendar_add_func_01(void)
  */
 static void utc_UIFW_elm_calendar_add_func_02(void)
 {
-   	test_eo = elm_calendar_add(NULL);
+   	Evas_Object *test_eo = elm_calendar_add(NULL);
 	TET_CHECK_FAIL(NULL, test_eo);
 
 	tet_result(TET_PASS);
-	tet_infoline("elm_calendar_add() failed in negative test case");
+	tet_infoline("elm_calendar_add() passed in negative test case");
 }

@@ -102,7 +102,7 @@ static void utc_UIFW_elm_calendar_min_max_year_get_func_02(void)
 {
 	int min = 0, max = 0;
 
-   	elm_calendar_min_max_year_get(test_eo, &min, &max);
+   	elm_calendar_min_max_year_get(NULL, &min, &max);
 	if (min == min_year && max == max_year) {
 		tet_infoline("elm_calendar_min_max_year_get() failed in negative test case");
 		tet_result(TET_FAIL);
