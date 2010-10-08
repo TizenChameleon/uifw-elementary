@@ -1,5 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
+#include "els_scroller.h"
 
 // FIXME: this is NOT the carousel - yet!
 

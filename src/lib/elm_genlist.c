@@ -4,6 +4,7 @@
 
 #include <Elementary.h>
 #include "elm_priv.h"
+#include "els_scroller.h"
 
 /**
  * @defgroup Genlist Genlist

@@ -1,5 +1,7 @@
 #include <Elementary.h>
 #include "elm_priv.h"
+#include "els_pan.h"
+#include "els_hor_scroller.h"
 
 #define SMART_NAME "els_hor_scroller"
 #define API_ENTRY Hor_Smart_Data *sd; sd = evas_object_smart_data_get(obj); if ((!obj) || (!sd) || (evas_object_type_get(obj) && strcmp(evas_object_type_get(obj), SMART_NAME)))

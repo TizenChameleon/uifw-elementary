@@ -34,6 +34,7 @@ elm
 	:include:/elm_ts/navigationbar_ex/tslist
 	:include:/elm_ts/multibuttonentry/tslist
 	:include:/elm_ts/animator/tslist
+	:include:/elm_ts/editfield/tslist
 
 
 #yhkim

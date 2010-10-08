@@ -18,7 +18,6 @@ AM_CPPFLAGS = \
 @ELEMENTARY_EDBUS_CFLAGS@ \
 @ELEMENTARY_EFREET_CFLAGS@ \
 @ELEMENTARY_ETHUMB_CFLAGS@ \
-@ELEMENTARY_EWEBKIT_CFLAGS@ \
 @ELEMENTARY_LIBXML2_CFLAGS@
 
 if ELEMENTARY_WINDOWS_BUILD
@@ -27,7 +26,7 @@ endif
 
 lib_LTLIBRARIES = libelementary.la
 
-includes_HEADERS = Elementary.h
+includes_HEADERS = Elementary.h elm_priv.h
 includesdir = $(includedir)/elementary-@VMAJ@
 
 libelementary_la_SOURCES = \
@@ -126,7 +125,6 @@ elm_coverflow.c \
 elm_cabinet.c \
 elm_dayselector.c \
 elm_cnp_helper.c \
-elm_webview.c \
 elm_cbhm_helper.c \
 elm_datefield.c \
 elm_nocontents.c \
@@ -157,9 +155,7 @@ els_icon.c \
 els_icon.h \
 \
 els_touch.c \
-els_touch.h \
-els_webview.c \
-els_webview_container.c
+els_touch.h
 
 
 libelementary_la_CFLAGS =
