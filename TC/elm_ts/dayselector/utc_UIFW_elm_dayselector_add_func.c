@@ -72,12 +72,11 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_dayselector_add_func_01(void)
 {
-	int r = 0;
-
-/*
-   	r = elm_dayselector_add(...);
-*/
-	if (!r) {
+	Evas_Object *obj;
+	
+   	obj = elm_dayselector_add(main_win);
+	
+	if (!obj) {
 		tet_infoline("elm_dayselector_add() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -90,12 +89,11 @@ static void utc_UIFW_elm_dayselector_add_func_01(void)
  */
 static void utc_UIFW_elm_dayselector_add_func_02(void)
 {
-	int r = 0;
-
-/*
-   	r = elm_dayselector_add(...);
-*/
-	if (r) {
+	Evas_Object *obj;
+	
+   	obj = elm_dayselector_add(NULL);
+	
+	if (obj) {
 		tet_infoline("elm_dayselector_add() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

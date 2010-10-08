@@ -156,13 +156,12 @@ elm_dayselector_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-	int idx;
+   int idx;
 
-   wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
-
    if(!e) return NULL;
 
+   wd = ELM_NEW(Widget_Data);
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "dayselector");
    elm_widget_type_set(obj, "dayselector");
