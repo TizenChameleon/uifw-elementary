@@ -1,3 +1,12 @@
+elementary (1.0.0+svn.51480slp2+build25) unstable; urgency=low
+
+  * Separated webview from elementary.
+  * Refer git log for details.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build25
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Fri, 08 Oct 2010 20:51:36 +0900
+
 elementary (1.0.0+svn.51480slp2+build24) unstable; urgency=low
 
   * Enhanced genlist pinch zoom.
