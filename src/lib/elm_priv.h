@@ -13,15 +13,6 @@
 # include <Ecore_WinCE.h>
 #endif
 
-#include "els_pan.h"
-#include "els_scroller.h"
-#include "els_box.h"
-#include "els_icon.h"
-#include "els_hor_scroller.h"
-#include "els_touch.h"
-#include "els_webview.h"
-#include "els_webview_container.h"
-
 // FIXME: totally disorganised. clean this up!
 // 
 // Why EAPI in a private header ?
