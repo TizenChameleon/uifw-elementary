@@ -131,7 +131,7 @@ static int notify_handler_png(struct _elm_cnp_selection *sel,
 static int notify_handler_uri(struct _elm_cnp_selection *sel,
       Ecore_X_Event_Selection_Notify *notify);
 
-static struct pasteimage *pasteimage_alloc(const char *file);
+static struct pasteimage *pasteimage_alloc(const char *file, int pathlen);
 static bool pasteimage_append(struct pasteimage *pi, Evas_Object *entry);
 static void pasteimage_free(struct pasteimage *pi);
 
@@ -573,7 +573,7 @@ notify_handler_targets(struct _elm_cnp_selection *sel,
 	if (!(atoms[j].formats & sel->requestformat)) continue;
 	for (i = 0 ; i < targets->data.length ; i ++)
 	  {
-	     if (atoms[j].atom == atomlist[i])
+	     if (atoms[j].atom == atomlist[i] && atoms[j].notify)
 	       {
 		  cnp_debug("Atom %s matches\n",atoms[j].name);
 		  goto done;
@@ -703,7 +703,7 @@ notify_handler_uri(struct _elm_cnp_selection *sel,
 
    if (savedtypes.pi) pasteimage_free(savedtypes.pi);
 
-   pi = pasteimage_alloc(p);
+   pi = pasteimage_alloc(p, data->length);
 
    if (savedtypes.textreq)
      {
@@ -778,7 +778,7 @@ notify_handler_png(struct _elm_cnp_selection *sel __UNUSED__,
 
    /* FIXME: Add to paste image data to clean up */
 
-   pi = pasteimage_alloc(fname);
+   pi = pasteimage_alloc(fname, data->length);
    pasteimage_append(pi, sel->requestwidget);
 
    return 0;
@@ -887,11 +887,12 @@ image_provider(void *images __UNUSED__, Evas_Object *entry, const char *item)
 
 
 static struct pasteimage *
-pasteimage_alloc(const char *file)
+pasteimage_alloc(const char *file, int pathlen)
 {
    struct pasteimage *pi;
    int len;
-   char *buf;
+   char *buf, *filebuf;
+   int prefixlen = strlen("file://");
 
    pi = calloc(1,sizeof(struct pasteimage));
    if (!pi) return NULL;
@@ -909,8 +910,12 @@ pasteimage_alloc(const char *file)
 
    if (file)
      {
-        if (strstr(file,"file://")) file += strlen("file://");
-        pi->file = strdup(file);
+        if (strstr(file,"file://")) file += prefixlen;
+		filebuf = malloc(sizeof(char)*(pathlen-prefixlen+1));
+		strncpy(filebuf, file, pathlen-prefixlen);
+		filebuf[pathlen-prefixlen] = '\0';
+        pi->file = strdup(filebuf);
+		free(filebuf);
      }
 
    return pi;
