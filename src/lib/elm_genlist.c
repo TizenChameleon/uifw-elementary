@@ -3009,9 +3009,6 @@ elm_genlist_add(Evas_Object *parent)
                              &minw, &minh);
    evas_object_size_hint_min_set(obj, minw, minh);
 
-   elm_genlist_effect_set(obj, 1);
-   elm_genlist_pinch_zoom_set(obj, 1);
-
    _sizing_eval(obj);
    return obj;
 }
