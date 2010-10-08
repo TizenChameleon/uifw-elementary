@@ -1,5 +1,5 @@
 #include <tet_api.h>
-
+#include <Elementary.h>
 
 // Definitions
 // For checking the result of the positive test case.
@@ -26,7 +26,7 @@
 		} \
 }
 
-Evas_Object *main_win;
+Evas_Object *main_win = NULL;
 
 static void startup(void);
 static void cleanup(void);

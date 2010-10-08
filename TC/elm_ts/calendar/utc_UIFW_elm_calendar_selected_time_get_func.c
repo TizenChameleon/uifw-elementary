@@ -27,7 +27,7 @@
 		} \
 }
 
-Evas_Object *main_win;
+Evas_Object *main_win = NULL;
 Evas_Object *test_eo = NULL;
 struct tm selected_time;
 

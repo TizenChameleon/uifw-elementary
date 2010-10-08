@@ -12,7 +12,13 @@ TARGETS = utc_UIFW_elm_calendar_add_func \
 	  utc_UIFW_elm_calendar_interval_set_func \
 	  utc_UIFW_elm_calendar_min_max_year_set_func \
 	  utc_UIFW_elm_calendar_day_selection_enabled_set_func \
-	  utc_UIFW_elm_calendar_selected_time_set_func
+	  utc_UIFW_elm_calendar_selected_time_set_func \
+	  utc_UIFW_elm_calendar_format_function_set_func \
+	  utc_UIFW_elm_calendar_mark_del_func \
+	  utc_UIFW_elm_calendar_marks_clear_func \
+	  utc_UIFW_elm_calendar_marks_draw_func \
+	  utc_UIFW_elm_calendar_text_weekday_color_set_func \
+	  utc_UIFW_elm_calendar_text_sunday_color_set_func
 
 PKGS = elementary
 

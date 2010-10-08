@@ -27,7 +27,7 @@
 		} \
 }
 
-Evas_Object *main_win;
+Evas_Object *main_win = NULL;
 
 static void startup(void);
 static void cleanup(void);

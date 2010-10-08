@@ -1,6 +1,7 @@
 #include <tet_api.h>
 #include <Elementary.h>
 
+
 // Definitions
 // For checking the result of the positive test case.
 #define TET_CHECK_PASS(x1, y...) \
@@ -34,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_calendar_day_selection_enabled_set_func_01(void);
-static void utc_UIFW_elm_calendar_day_selection_enabled_set_func_02(void);
+static void utc_UIFW_elm_calendar_format_function_set_func_01(void);
+static void utc_UIFW_elm_calendar_format_function_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -43,8 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_calendar_day_selection_enabled_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_calendar_day_selection_enabled_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_calendar_format_function_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_calendar_format_function_set_func_02, NEGATIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -67,30 +68,40 @@ static void cleanup(void)
    tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-/**
- * @brief Positive test case of elm_calendar_day_selection_enabled_set()
- */
-static void utc_UIFW_elm_calendar_day_selection_enabled_set_func_01(void)
+static char *
+_format_month_year(struct tm *stime)
 {
-   Evas_Object *test_eo = elm_calendar_add(main_win);
-   elm_calendar_day_selection_enabled_set(test_eo, EINA_TRUE);
+   char buf[32];
+   if (!strftime(buf, sizeof(buf), "%b %y", stime)) return NULL;
+   return strdup(buf);
+}
+
+/**
+ * @brief Positive test case of elm_calendar_format_function_set()
+ */
+static void utc_UIFW_elm_calendar_format_function_set_func_01(void)
+{
+   Evas_Object *test_eo = NULL;
+   test_eo = elm_calendar_add(main_win);
+   elm_calendar_format_function_set(test_eo, _format_month_year);
 
    TET_CHECK_PASS(NULL, test_eo);
 
    tet_result(TET_PASS);
-   tet_infoline("elm_calendar_day_selection_enabled_set() passed in positive test case");
+   tet_infoline("elm_calendar_format_function_set() passed in positive test case");
    evas_object_del(test_eo);
    test_eo = NULL;
 }
 
 /**
- * @brief Negative test case of ug_init elm_calendar_day_selection_enabled_set()
+ * @brief Negative test case of ug_init elm_calendar_format_function_set()
  */
-static void utc_UIFW_elm_calendar_day_selection_enabled_set_func_02(void)
+static void utc_UIFW_elm_calendar_format_function_set_func_02(void)
 {
-   Evas_Object *test_eo = elm_calendar_add(main_win);
-   elm_calendar_day_selection_enabled_set(NULL, EINA_TRUE);
-   tet_infoline("elm_calendar_day_selection_enabled_set() passed in negative test case");
+   Evas_Object *test_eo = NULL;
+   test_eo = elm_calendar_add(main_win);
+   elm_calendar_format_function_set(NULL, _format_month_year);
+   tet_infoline("elm_calendar_format_function_set() passed in negative test case");
    evas_object_del(test_eo);
    test_eo = NULL;
    tet_result(TET_PASS);
