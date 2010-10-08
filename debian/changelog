@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build26) unstable; urgency=low
+
+  * added libxml-dev in dev pkg 
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build26
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Sat, 09 Oct 2010 00:29:44 +0900
+
 elementary (1.0.0+svn.51480slp2+build25) unstable; urgency=low
 
   * Separated webview from elementary.
