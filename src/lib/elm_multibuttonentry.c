@@ -290,11 +290,11 @@ _del_button_item(Elm_Multibuttonentry_Item *item)
 		if (_item == item) {
 			wd->items = eina_list_remove(wd->items, _item);
 			elm_box_unpack(wd->box, _item->button);
+			evas_object_smart_callback_call(obj, "deleted", _item);
 			_del_button_obj(obj, _item->button);
 			free(_item);
 			if(wd->current == l)	
 				wd->current = NULL;
-			evas_object_smart_callback_call(obj, "deleted", wd->items);
 			break;
 		}
 	}
