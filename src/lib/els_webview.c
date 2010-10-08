@@ -795,7 +795,7 @@ _resize_calc_job(void *data)
 
    object_w = (object_w % 10) ? (object_w / 10 * 10 + 10) : object_w;
 
-   if (sd->is_mobile_page)
+   if (sd->is_mobile_page || sd->is_layout_width_set_to_container)
      {
 	int old_layout_w = sd->layout.w;
 	sd->layout.w = object_w / sd->zoom.init_zoom_rate;
