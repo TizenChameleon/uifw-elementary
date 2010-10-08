@@ -24,6 +24,7 @@
 
 #include <Elementary.h>
 #include "elm_priv.h"
+#include "els_scroller.h"
 
 #ifndef EAPI
 #define EAPI __attribute__ ((visibility("default")))

@@ -2592,6 +2592,7 @@ _zoom_move(Smart_Data* sd, int centerX, int centerY, int distance)
 static void
 _zoom_stop(Smart_Data* sd)
 {
+   Eina_Bool ret;
    sd->on_zooming = EINA_FALSE;
    DBG("%s ( %d )\n", __func__, sd->zoom.zooming_level);
    if (sd->zoom.zooming_level == 0) return;
@@ -2613,7 +2614,8 @@ _zoom_stop(Smart_Data* sd)
      {
 	if (!sd->ewk_view_zoom_set)
 	  sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
-	sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set, sd->zoom.basis.x, sd->zoom.basis.y);
+	ret = sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set, sd->zoom.basis.x, sd->zoom.basis.y);
+	if ( ret == EINA_FALSE ) _resume_all(sd, EINA_TRUE);
 	DBG("<< zoom set [%f] >>\n", sd->zoom.zooming_rate);
 
 	if (sd->text_selection_initialized == EINA_TRUE && sd->text_selection_on == EINA_TRUE)
@@ -2684,6 +2686,7 @@ _adjust_to_contents_boundary(Evas_Object* obj, int* to_x, int* to_y,
 static Eina_Bool
 _smart_zoom_animator(void* data)
 {
+   Eina_Bool ret;
    Smart_Data* sd = (Smart_Data*)data;
 
    if (!sd->ewk_view_frame_main_get)
@@ -2695,8 +2698,9 @@ _smart_zoom_animator(void* data)
 	if (sd->events_block != EINA_TRUE) { //FIXME: It's not right way but for DEMONSTRATION
 	if (!sd->ewk_view_zoom_set)
 	  sd->ewk_view_zoom_set = (Eina_Bool (*)(Evas_Object *, float, Evas_Coord, Evas_Coord))dlsym(ewk_handle, "ewk_view_zoom_set");
-	sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set,
-	      sd->zoom.basis.x, sd->zoom.basis.y);
+	  ret = sd->ewk_view_zoom_set(sd->base.self, sd->zoom.zoom_rate_to_set,sd->zoom.basis.x, sd->zoom.basis.y);
+	  if ( ret == EINA_FALSE ) _resume_all(sd,EINA_TRUE);
+
 	}
 	if (sd->smart_zoom_animator)
 	  {

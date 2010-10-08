@@ -63,6 +63,8 @@ VMIN=v_min
 AC_SUBST(VMAJ)
 AC_SUBST(VMIN)
 
+VERSION="1.0.0"
+
 EDJE_VERSION="1.0.0"
 
 case "$host_os" in
@@ -406,34 +408,6 @@ if test "x$want_elementary_eweather" = "xyes" -a "x$have_elementary_eweather" = 
     AC_MSG_ERROR([Eweather support requested, but no eweather found by pkg-config.])
 fi
 AC_SUBST(ELM_EWEATHER_DEF)
-
-ELM_EWEBKIT_DEF="#undef"
-have_elementary_ewebkit="no"
-want_elementary_ewebkit="auto"
-AC_ARG_ENABLE([ewebkit],
-   [AC_HELP_STRING([--disable-ewebkit], [disable ewebkit support. @<:@default=detect@:>@])],
-   [want_elementary_ewebkit=$enableval], [])
-
-if test "x$want_elementary_ewebkit" != "xno"; then
-    PKG_CHECK_MODULES([ELEMENTARY_EWEBKIT],
-       [
-        ewebkit
-       ],
-       [
-        AC_DEFINE(HAVE_ELEMENTARY_EWEBKIT, 1, [EWebKit support for Elementary])
-        have_elementary_ewebkit="yes"
-        ELM_EWEBKIT_DEF="#define"
-        requirement_elm="ewebkit ${requirement_elm}"
-       ],
-       [have_elementary_ewebkit="no"]
-    )
-else
-    have_elementary_ewebkit="no"
-fi
-if test "x$want_elementary_ewebkit" = "xyes" -a "x$have_elementary_ewebkit" = "xno"; then
-    AC_MSG_ERROR([EWebKit support requested, but no ewebkit found by pkg-config.])
-fi
-AC_SUBST(ELM_EWEBKIT_DEF)
 
 ELM_ETHUMB_DEF="#undef"
 have_elementary_ethumb="no"

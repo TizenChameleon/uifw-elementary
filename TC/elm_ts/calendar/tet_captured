@@ -1,1 +1,1 @@
-make: `utc_UIFW_elm_calendar_marks_get_func' is up to date.
+cc -I. `pkg-config --cflags elementary` -I/scratchbox/TETware/tetware-target/inc/tet3 -Wall  `pkg-config --libs elementary` /scratchbox/TETware/tetware-target/lib/tet3/tcm_s.o -L/scratchbox/TETware/tetware-target/lib/tet3 -ltcm_s -L/scratchbox/TETware/tetware-target/lib/tet3 -lapi_s  utc_UIFW_elm_calendar_day_selection_enabled_get_func.c   -o utc_UIFW_elm_calendar_day_selection_enabled_get_func

@@ -18,7 +18,6 @@
 @ELM_EDBUS_DEF@ ELM_EDBUS
 @ELM_EFREET_DEF@ ELM_EFREET
 @ELM_ETHUMB_DEF@ ELM_ETHUMB
-@ELM_EWEBKIT_DEF@ ELM_EWEBKIT
 @ELM_ALLOCA_H_DEF@ ELM_ALLOCA_H
 @ELM_LIBINTL_H_DEF@ ELM_LIBINTL_H
 
@@ -2790,6 +2789,7 @@ extern "C" {
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
    EAPI void         elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked);
    
+#if 0
    /* WebView */
    typedef Eina_Bool (*Elm_WebView_Mime_Cb)(Evas_Object *obj, const char *uri);
    EAPI Evas_Object *elm_webview_add(Evas_Object *parent, Eina_Bool tiled);
@@ -2806,6 +2806,7 @@ extern "C" {
    EAPI void         elm_webview_scheme_callback_set(Evas_Object *obj, const char *scheme, Elm_WebView_Mime_Cb func);
    EAPI void         elm_webview_default_layout_width_set(Evas_Object *obj, int width);
    EAPI void         elm_webview_layout_width_set_to_container(Evas_Object *obj);
+#endif
 
    /* NoContents */
    EAPI Evas_Object *elm_nocontents_add(Evas_Object *parent);
@@ -2867,10 +2868,6 @@ extern "C" {
    /* smart callback called:
     * "selectioninfo,timeout" - when time out
     */
-
-   /* do not use except clipboard history module */
-   EAPI Eina_Bool    elm_cbhm_helper_init(Evas_Object *self);
-   EAPI void         elm_cbhm_send_raw_data(char *cmd);
 
    /* Xml Animator */
    typedef struct _Elm_Xml_Animator Elm_Xml_Animator;

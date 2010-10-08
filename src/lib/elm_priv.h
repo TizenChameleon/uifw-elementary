@@ -13,15 +13,6 @@
 # include <Ecore_WinCE.h>
 #endif
 
-#include "els_pan.h"
-#include "els_scroller.h"
-#include "els_box.h"
-#include "els_icon.h"
-#include "els_hor_scroller.h"
-#include "els_touch.h"
-#include "els_webview.h"
-#include "els_webview_container.h"
-
 // FIXME: totally disorganised. clean this up!
 // 
 // Why EAPI in a private header ?
@@ -245,6 +236,10 @@ Eina_Bool         _elm_dangerous_call_check(const char *call);
 
 void              _elm_widtype_register(const char **ptr);
 
+
+/* do not use except clipboard history module */
+EAPI Eina_Bool    elm_cbhm_helper_init(Evas_Object *self);
+EAPI void         elm_cbhm_send_raw_data(char *cmd);
 
 #define ELM_SET_WIDTYPE(widtype, type) \
    do { \
