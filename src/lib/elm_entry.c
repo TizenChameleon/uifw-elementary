@@ -149,6 +149,9 @@ struct _Elm_Entry_Item_Provider
 };
 
 static const char *widtype = NULL;
+// start for cbhm
+static Evas_Object *cnpwidgetdata = NULL;
+// end for cbhm
 
 static Eina_Bool _drag_drop_cb(void *data, Evas_Object *obj, Elm_Drop_Data *);
 static void _del_hook(Evas_Object *obj);
@@ -430,12 +433,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	edje_object_signal_emit(wd->ent, "elm,action,focus", "elm");
 
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
-	// start for cbhm
-	if (top) 
-	{
-//		ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
-	}
-	// end for cbhm
 	evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
 	_check_enable_returnkey(obj);
      }
@@ -638,10 +635,22 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 
    // start for cbhm
    ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+   cnpwidgetdata = data;
    elm_cbhm_helper_init(obj);
    elm_cbhm_send_raw_data("show");
    // end for cbhm
 }
+
+// start for cbhm
+static void
+_cnpinit(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   cnpwidgetdata = data;
+}
+// end for cbhm
+
 
 static void
 _item_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
@@ -1427,6 +1436,7 @@ _event_selection_notify(void *data, int type __UNUSED__, void *event)
         ecore_x_dnd_send_finished();
 
      }
+
    return ECORE_CALLBACK_PASS_ON;
 }
 
@@ -1458,6 +1468,7 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 	}
 
 	elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data);
+
 	// end for cbhm
    return ECORE_CALLBACK_PASS_ON;
 }
@@ -2074,7 +2085,7 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->editable = wd->editable;
    ext_mod->have_selection = wd->have_selection;
    ext_mod->password = wd->password;
-   ext_mod->selmode = wd->selmode;
+   ext_mod->cnpinit = _cnpinit;
    ext_mod->context_menu = wd->context_menu;
 }
 
@@ -2342,6 +2353,10 @@ elm_entry_entry_insert(Evas_Object *obj, const char *entry)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    edje_object_part_text_insert(wd->ent, "elm.text", entry);
+   // start for cbhm
+   if (cnpwidgetdata == obj)
+	   ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+   // end for cbhm
    wd->changed = EINA_TRUE;
    _sizing_eval(obj);
 }
