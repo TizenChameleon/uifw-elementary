@@ -205,7 +205,7 @@ _signal_radio_on(void *data, Evas_Object *obj __UNUSED__, const char *emission _
 /**
   * Add a new radio to the parent
   *
-  * @param parent The parent object
+  * @param[in] parent The parent object
   * @return The new object or NULL if it cannot be created
   *
   * @ingroup Radio
@@ -251,8 +251,8 @@ elm_radio_add(Evas_Object *parent)
 /**
  * Set the text label of the radio object
  *
- * @param obj The radio object
- * @param label The text label string in UTF-8
+ * @param[in] obj The radio object
+ * @param[in] label The text label string in UTF-8
  *
  * @ingroup Radio
  */
@@ -280,7 +280,7 @@ elm_radio_label_set(Evas_Object *obj, const char *label)
 /**
  * Get the text label of the radio object
  *
- * @param obj The radio object
+ * @param[in] obj The radio object
  * @return The text label string in UTF-8
  *
  * @ingroup Radio
@@ -299,8 +299,8 @@ elm_radio_label_get(const Evas_Object *obj)
  *
  * Once the icon object is set, a previously set one will be deleted.
  *
- * @param obj The radio object
- * @param icon The icon object
+ * @param[in] obj The radio object
+ * @param[in] icon The icon object
  *
  * @ingroup Radio
  */
@@ -328,7 +328,7 @@ elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon)
 /**
  * Get the icon object of the radio object
  *
- * @param obj The radio object
+ * @param[in] obj The radio object
  * @return The icon object
  *
  * @ingroup Radio
@@ -350,8 +350,8 @@ elm_radio_icon_get(const Evas_Object *obj)
  * about eacthother. This adds the given radio object to the group of which
  * the group object indicated is a member.
  *
- * @param obj The radio object
- * @param group The object whose group the object is to join
+ * @param[in] obj The radio object
+ * @param[in] group The object whose group the object is to join
  *
  * @ingroup Radio
  */
@@ -387,8 +387,8 @@ elm_radio_group_add(Evas_Object *obj, Evas_Object *group)
  *
  * This sets the value of the radio.
  *
- * @param obj The radio object
- * @param value The value to use if this radio object is selected
+ * @param[in] obj The radio object
+ * @param[in] value The value to use if this radio object is selected
  *
  * @ingroup Radio
  */
@@ -409,8 +409,8 @@ elm_radio_state_value_set(Evas_Object *obj, int value)
  * This sets the value of the radio group and will also set the value if
  * pointed to, to the value supplied, but will not call any callbacks.
  *
- * @param obj The radio object
- * @param value The value to use for the group
+ * @param[in] obj The radio object
+ * @param[in] value The value to use for the group
  *
  * @ingroup Radio
  */
@@ -429,7 +429,7 @@ elm_radio_value_set(Evas_Object *obj, int value)
 /**
  * Get the state of the radio object
  *
- * @param obj The radio object
+ * @param[in] obj The radio object
  * @return The integer state
  *
  * @ingroup Radio
@@ -453,8 +453,8 @@ elm_radio_value_get(const Evas_Object *obj)
  * reflect the value of the integer valuep points to, just like calling
  * elm_radio_value_set().
  *
- * @param obj The radio object
- * @param valuep Pointer to the integer to modify
+ * @param[in] obj The radio object
+ * @param[in] valuep Pointer to the integer to modify
  *
  * @ingroup Radio
  */

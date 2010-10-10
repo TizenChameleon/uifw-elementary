@@ -857,7 +857,7 @@ _softkey_object_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
 /**
  * Add a new softkey to the parent
 
- * @param parent the parent of the smart object
+ * @param[in] parent the parent of the smart object
  * @return		Evas_Object* pointer of softkey(evas object) or NULL
  * @ingroup		Softkey 
  */
@@ -985,12 +985,12 @@ _softkey_horizontal_set(Evas_Object *obj, Eina_Bool horizontal_mode)
 
 /**
  * add side button of softkey
- * @param	obj	softkey object 
- * @param	type softkey button type
- * @param	icon The icon object to use for the item
- * @param	label The text label to use for the item
- * @param	func Convenience function to call when this item is selected
- * @param	data Data to pass to convenience function
+ * @param[in]	obj	softkey object
+ * @param[in]	type softkey button type
+ * @param[in]	icon The icon object to use for the item
+ * @param[in]	label The text label to use for the item
+ * @param[in]	func Convenience function to call when this item is selected
+ * @param[in]	data Data to pass to convenience function
  * @return	A handle to the item added
  * 
  * @ingroup	Softkey  
@@ -1083,8 +1083,8 @@ elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type,
 
 /**
  * delete side button of softkey
- * @param	obj	softkey object 
- * @param	type softkey button type
+ * @param[in]	obj	softkey object
+ * @param[in]	type softkey button type
  * 
  * @ingroup	Softkey  
  */
@@ -1122,8 +1122,8 @@ elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type)
 
 /**
  * show button of softkey
- * @param	obj	softkey object 
- * @param	type	softkey button type
+ * @param[in]	obj	softkey object
+ * @param[in]	type	softkey button type
  *
  * @ingroup	Softkey  
  */
@@ -1135,8 +1135,8 @@ elm_softkey_button_show(Evas_Object *obj, Elm_Softkey_Type type)
 
 /**
  * hide button of softkey
- * @param	obj	softkey object 
- * @param	type	softkey button type
+ * @param[in]	obj	softkey object
+ * @param[in]	type	softkey button type
  *
  * @ingroup	Softkey  
  */
@@ -1148,11 +1148,11 @@ elm_softkey_button_hide(Evas_Object *obj, Elm_Softkey_Type type)
 
 /**
  * add item in panel
- * @param	obj	softkey object 
- * @param	icon The icon object
- * @param	label The text label to use for the item
- * @param	func Convenience function to call when this item is selected
- * @param	data Data to pass to convenience function
+ * @param[in]	obj	softkey object
+ * @param[in]	icon The icon object
+ * @param[in]	label The text label to use for the item
+ * @param[in]	func Convenience function to call when this item is selected
+ * @param[in]	data Data to pass to convenience function
  * @return	A handle to the item added
  * 
  * @ingroup	Softkey  
@@ -1341,7 +1341,7 @@ elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon,
 /**
  * delete panel
 
- * @param obj softkey object
+ * @param[in] obj softkey object
  * @return int 0 (SUCCESS) or -1 (FAIL)
  *
  * @ingroup Softkey
@@ -1415,7 +1415,7 @@ elm_softkey_panel_del(Evas_Object *obj)
 /**
  * sliding up panel if it is closed
 
- * @param obj softkey object
+ * @param[in] obj softkey object
  * @return int 0 (SUCCESS) or -1 (FAIL)
  *
  * @ingroup Softkey
@@ -1440,7 +1440,7 @@ elm_softkey_panel_open(Evas_Object *obj)
 /**
  * sliding down panel if it is opened
 
- * @param obj softkey object
+ * @param[in] obj softkey object
  * @return int 0 (SUCCESS) or -1 (FAIL)
  *
  * @ingroup Softkey
@@ -1465,8 +1465,8 @@ elm_softkey_panel_close(Evas_Object *obj)
 /**
  * Set the icon of an softkey item
  *
- * @param it The item to set the icon
- * @param icon The icon object
+ * @param[in] it The item to set the icon
+ * @param[in] icon The icon object
  *
  * @ingroup Softkey
  */
@@ -1498,7 +1498,7 @@ elm_softkey_item_icon_set(Elm_Softkey_Item *it, Evas_Object *icon)
 /**
  * Get the icon of an softkey item
  *
- * @param it The item to get the icon
+ * @param[in] it The item to get the icon
  * @return The icon object
  *
  * @ingroup Softkey
@@ -1513,8 +1513,8 @@ elm_softkey_item_icon_get(Elm_Softkey_Item *it)
 /**
  * Get the text label of an softkey item
  *
- * @param it The item to set the label
- * @param label label
+ * @param[in] it The item to set the label
+ * @param[in] label label
  *
  * @ingroup Softkey
  */
@@ -1544,9 +1544,9 @@ elm_softkey_item_label_set(Elm_Softkey_Item *it, const char *label)
 /**
  * Set the item callback function 
  *
- * @param it Item to set callback function.
- * @param func callback function pointer.
- * @param data callback function argument data.
+ * @param[in] it Item to set callback function.
+ * @param[in] func callback function pointer.
+ * @param[in] data callback function argument data.
  *
  * @ingroup Softkey
  */
@@ -1564,7 +1564,7 @@ elm_softkey_item_callback_set(Elm_Softkey_Item* item, void
 /**
  * Get the text label of an softkey item
  *
- * @param it The item to get the label
+ * @param[in] it The item to get the label
  * @return The text label of the softkey item
  *
  * @ingroup Softkey

@@ -139,7 +139,7 @@ _unpress(void *data, Evas_Object *obj __UNUSED__ , const char *emission __UNUSED
 /**
  * Add a new panes to the parent
  *
- * @param parent The parent object
+ * @param[in] parent The parent object
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Panes
@@ -190,8 +190,8 @@ elm_panes_add(Evas_Object *parent)
 /**
  * Set a control as a left/top content of the pane
  *
- * @param obj The pane object
- * @param content The object to be set as content
+ * @param[in] obj The pane object
+ * @param[in] content The object to be set as content
  *
  * @ingroup Panes
  */
@@ -216,8 +216,8 @@ EAPI void elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content)
 /**
  * Set a control as a right/bottom content of the pane
  *
- * @param obj The pane object
- * @param content The object to be set as content
+ * @param[in] obj The pane object
+ * @param[in] content The object to be set as content
  *
  * @ingroup Panes
  */
@@ -243,7 +243,7 @@ EAPI void elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
 /**
  * Get the left/top content of the pane
  *
- * @param obj The pane object
+ * @param[in] obj The pane object
  * @return The Evas Object set as a left/top content of the pane
  *
  * @ingroup Panes
@@ -258,7 +258,7 @@ EAPI Evas_Object
 /**
  * Get the right/bottom content of the pane
  *
- * @param obj The pane object
+ * @param[in] obj The pane object
  * @return The Evas Object set as a right/bottom content of the pane
  *
  * @ingroup Panes
@@ -273,7 +273,7 @@ EAPI Evas_Object
 /**
  * Unset a control from a left/top content of the pane
  *
- * @param obj The pane object
+ * @param[in] obj The pane object
  * @return The content being unset
  *
  * @ingroup Panes
@@ -300,7 +300,7 @@ elm_panes_content_left_unset(Evas_Object *obj)
 /**
  * Unset a control from a right/bottom content of the pane
  *
- * @param obj The pane object
+ * @param[in] obj The pane object
   * @return The content being unset
  *
  * @ingroup Panes
@@ -327,7 +327,7 @@ elm_panes_content_right_unset(Evas_Object *obj)
 /**
  * Get the relative normalized size of left/top content of the pane
  *
- * @param obj The pane object
+ * @param[in] obj The pane object
  * @return The value of type double in the range [0.0,1.0]
  *
  * @ingroup Panes
@@ -349,8 +349,8 @@ elm_panes_content_left_size_get(const Evas_Object *obj)
 /**
  * Set a size of the left content with a relative normalized double value
  *
- * @param obj The pane object
- * @param size The value of type double in the range [0.0,1.0]
+ * @param[in] obj The pane object
+ * @param[in] size The value of type double in the range [0.0,1.0]
  *
  * @ingroup Panes
  */
@@ -368,8 +368,8 @@ elm_panes_content_left_size_set(Evas_Object *obj, double size)
 /**
  * Set the type of an existing pane object to horizontal/vertical
  *
- * @param obj The pane object
- * @param horizontal Boolean value. If true, then the type is set to horizontal else vertical
+ * @param[in] obj The pane object
+ * @param[in] horizontal Boolean value. If true, then the type is set to horizontal else vertical
  *
  * @ingroup Panes
  */
@@ -386,7 +386,7 @@ elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 /**
  * Indicate if the type of pane object is horizontal or not
  *
- * @param obj The pane object
+ * @param[in] obj The pane object
  * @return true if it is of horizontal type else false
  *
  * @ingroup Panes
@@ -402,8 +402,8 @@ elm_panes_horizontal_get(const Evas_Object *obj)
 /**
  * Set a handler of the pane object non-movable or movable
  *
- * @param obj The pane object
- * @param fixed If set to true then the views size can't be changed using handler otherwise using handler they can be resized
+ * @param[in] obj The pane object
+ * @param[in] fixed If set to true then the views size can't be changed using handler otherwise using handler they can be resized
  *
  * @ingroup Panes
  */
@@ -421,7 +421,7 @@ elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
 /**
  * Indicate if the handler of the pane object can be moved with user interaction
  *
- * @param obj The pane object
+ * @param[in] obj The pane object
  * @return false if the views can be resized using handler else true
  *
  * @ingroup Panes

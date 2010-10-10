@@ -298,7 +298,7 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
 
 /**
  * Add a new button to the parent
- * @param parent The parent object
+ * @param[in] parent The parent object
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Button
@@ -356,8 +356,8 @@ elm_button_add(Evas_Object *parent)
 /**
  * Set the label used in the button
  *
- * @param obj The button object
- * @param label The text will be written on the button
+ * @param[in] obj The button object
+ * @param[in] label The text will be written on the button
  *
  * @ingroup Button
  */
@@ -389,9 +389,9 @@ _set_label(Evas_Object *obj, const char *label)
 /**
  * Set the label for each state of button
  *
- * @param obj The button object
- * @param label The text will be written on the button
- * @param state The state of button
+ * @param[in] obj The button object
+ * @param[in] label The text will be written on the button
+ * @param[in] state The state of button
  *
  * @ingroup Button
  */
@@ -432,7 +432,7 @@ elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlSta
 /**
  * Get the label of button
  *
- * @param obj The button object
+ * @param[in] obj The button object
  * @return The title of button
  *
  * @ingroup Button
@@ -448,8 +448,8 @@ elm_button_label_get(const Evas_Object *obj)
 /**
  * Get the label of button for each state
  *
- * @param obj The button object
- * @param state The state of button
+ * @param[in] obj The button object
+ * @param[in] state The state of button
  * @return The title of button for state
  *
  * @ingroup Button
@@ -477,8 +477,8 @@ elm_button_label_get_for_state(const Evas_Object *obj, UIControlState state)
  *
  * Once the icon object is set, a previously set one will be deleted
  *
- * @param obj The button object
- * @param icon The image for the button
+ * @param[in] obj The button object
+ * @param[in] icon The image for the button
  *
  * @ingroup Button
  */
@@ -506,7 +506,7 @@ elm_button_icon_set(Evas_Object *obj, Evas_Object *icon)
 /**
  * Get the icon used for the button
  *
- * @param obj The button object
+ * @param[in] obj The button object
  * @return The image for the button
  *
  * @ingroup Button
@@ -523,8 +523,8 @@ elm_button_icon_get(const Evas_Object *obj)
 /**
  * Turn on/off the autorepeat event generated when the user keeps pressing on the button
  *
- * @param obj The button object
- * @param on  A bool to turn on/off the event
+ * @param[in] obj The button object
+ * @param[in] on  A bool to turn on/off the event
  *
  * @ingroup Button
  */
@@ -546,8 +546,8 @@ elm_button_autorepeat_set(Evas_Object *obj, Eina_Bool on)
 /**
  * Set the initial timeout before the autorepeat event is generated
  *
- * @param obj The button object
- * @param t   Timeout
+ * @param[in] obj The button object
+ * @param[in] t   Timeout
  *
  * @ingroup Button
  */
@@ -569,8 +569,8 @@ elm_button_autorepeat_initial_timeout_set(Evas_Object *obj, double t)
 /**
  * Set the interval between each generated autorepeat event
  *
- * @param obj The button object
- * @param t   Interval
+ * @param[in] obj The button object
+ * @param[in] t   Interval
  *
  * @ingroup Button
  */

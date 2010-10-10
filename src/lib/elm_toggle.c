@@ -154,7 +154,7 @@ _signal_toggle_on(void *data, Evas_Object *obj __UNUSED__, const char *emission 
 /**
  * Add a toggle to @p parent.
  *
- * @param parent The parent object
+ * @param[in] parent The parent object
  *
  * @return The toggle object
  *
@@ -203,8 +203,8 @@ elm_toggle_add(Evas_Object *parent)
 /**
  * Sets the label to be displayed with the toggle.
  *
- * @param obj The toggle object
- * @param label The label to be displayed
+ * @param[in] obj The toggle object
+ * @param[in] label The label to be displayed
  *
  * @ingroup Toggle
  */
@@ -227,7 +227,7 @@ elm_toggle_label_set(Evas_Object *obj, const char *label)
 /**
  * Gets the label of the toggle
  *
- * @param obj The toggle object
+ * @param[in] obj The toggle object
  * @return The label of the toggle
  *
  * @ingroup Toggle
@@ -246,8 +246,8 @@ elm_toggle_label_get(const Evas_Object *obj)
  *
  * Once the icon object is set, a previously set one will be deleted.
  *
- * @param obj The toggle object
- * @param icon The icon object to be displayed
+ * @param[in] obj The toggle object
+ * @param[in] icon The icon object to be displayed
  *
  * @ingroup Toggle
  */
@@ -275,7 +275,7 @@ elm_toggle_icon_set(Evas_Object *obj, Evas_Object *icon)
 /**
  * Gets the icon of the toggle
  *
- * @param obj The toggle object
+ * @param[in] obj The toggle object
  * @return The icon object
  *
  * @ingroup Toggle
@@ -292,9 +292,9 @@ elm_toggle_icon_get(const Evas_Object *obj)
 /**
  * Sets the labels to be associated with the on and off states of the toggle.
  *
- * @param obj The toggle object
- * @param onlabel The label displayed when the toggle is in the "on" state
- * @param offlabel The label displayed when the toggle is in the "off" state
+ * @param[in] obj The toggle object
+ * @param[in] onlabel The label displayed when the toggle is in the "on" state
+ * @param[in] offlabel The label displayed when the toggle is in the "off" state
  *
  * @ingroup Toggle
  */
@@ -315,9 +315,9 @@ elm_toggle_states_labels_set(Evas_Object *obj, const char *onlabel, const char *
 /**
  * Gets the labels associated with the on and off states of the toggle.
  *
- * @param obj The toggle object
- * @param onlabel A char** to place the onlabel of @p obj into
- * @param offlabel A char** to place the offlabel of @p obj into
+ * @param[in] obj The toggle object
+ * @param[in] onlabel A char** to place the onlabel of @p obj into
+ * @param[in] offlabel A char** to place the offlabel of @p obj into
  *
  * @ingroup Toggle
  */
@@ -336,8 +336,8 @@ elm_toggle_states_labels_get(const Evas_Object *obj, const char **onlabel, const
 /**
  * Sets the state of the toggle to @p state.
  *
- * @param obj The toggle object
- * @param state The state of @p obj
+ * @param[in] obj The toggle object
+ * @param[in] state The state of @p obj
  *
  * @ingroup Toggle
  */
@@ -361,7 +361,7 @@ elm_toggle_state_set(Evas_Object *obj, Eina_Bool state)
 /**
  * Gets the state of the toggle to @p state.
  *
- * @param obj The toggle object
+ * @param[in] obj The toggle object
  * @return The state of @p obj
  *
  * @ingroup Toggle
@@ -378,8 +378,8 @@ elm_toggle_state_get(const Evas_Object *obj)
 /**
  * Sets the state pointer of the toggle to @p statep.
  *
- * @param obj The toggle object
- * @param statep The state pointer of @p obj
+ * @param[in] obj The toggle object
+ * @param[in] statep The state pointer of @p obj
  *
  * @ingroup Toggle
  */

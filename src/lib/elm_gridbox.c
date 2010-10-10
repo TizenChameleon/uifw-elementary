@@ -182,7 +182,7 @@ _freeze_off(void *data, Evas_Object * obj, void *event_info)
 /**
  * Add a new gridbox to the parent
  *
- * @param parent The parent object
+ * @param[in] parent The parent object
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Gridbox
@@ -233,9 +233,9 @@ elm_gridbox_add(Evas_Object * parent)
 /**
  * Set padding between cells.
  *
- * @param obj The layout object.
- * @param horizontal set the horizontal padding.
- * @param vertical set the vertical padding.
+ * @param[in] obj The layout object.
+ * @param[in] horizontal set the horizontal padding.
+ * @param[in] vertical set the vertical padding.
  *
  * @ingroup Gridbox
  */
@@ -257,9 +257,9 @@ elm_gridbox_padding_set(Evas_Object * obj, Evas_Coord horizontal,
 /**
  * Set gridbox item size
  *
- * @param obj The gridbox object
- * @param h_pagesize The horizontal item size
- * @param v_pagesize The vertical item size
+ * @param[in] obj The gridbox object
+ * @param[in] h_pagesize The horizontal item size
+ * @param[in] v_pagesize The vertical item size
  *
  * @ingroup Gridbox
  */
@@ -297,8 +297,8 @@ elm_gridbox_item_size_set(Evas_Object * obj, Evas_Coord h_itemsize,
 /**
  * Add a subobject on the gridbox
  *
- * @param obj The table object
- * @param subobj The subobject to be added to the gridbox
+ * @param[in] obj The table object
+ * @param[in] subobj The subobject to be added to the gridbox
  *
  * @ingroup Gridbox
  */
@@ -318,8 +318,8 @@ elm_gridbox_pack(Evas_Object * obj, Evas_Object * subobj)
 /**
  * Unpack a subobject on the gridbox
  *
- * @param obj The gribox object
- * @param subobj The subobject to be removed to the gridbox
+ * @param[in] obj The gridbox object
+ * @param[in] subobj The subobject to be removed to the gridbox
  *
  * @ingroup Gridbox
  */
@@ -341,7 +341,7 @@ elm_gridbox_unpack(Evas_Object * obj, Evas_Object * subobj)
 /**
  * Get the list of children for the gridbox.
  *
- * @param obj The gribox object
+ * @param[in] obj The gridbox object
  *
  * @ingroup Gridbox
  */
@@ -360,8 +360,8 @@ elm_gridbox_children_get(Evas_Object * obj)
 /**
  * Set homogenous paddding layout
  *
- * @param obj The gribox object
- * @param homogenous The homogenous flag (1 = on, 0 = off)
+ * @param[in] obj The gridbox object
+ * @param[in] homogenous The homogenous flag (1 = on, 0 = off)
  *
  * @ingroup Gridbox
  */

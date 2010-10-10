@@ -171,7 +171,7 @@ _signal_check_toggle(void *data, Evas_Object *obj __UNUSED__, const char *emissi
 /**
  * Add a new Check object
  *
- * @param parent The parent object
+ * @param[in] parent The parent object
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Check
@@ -217,8 +217,8 @@ elm_check_add(Evas_Object *parent)
 /**
  * Set the text label of the check object
  *
- * @param obj The check object
- * @param label The text label string in UTF-8
+ * @param[in] obj The check object
+ * @param[in] label The text label string in UTF-8
  *
  * @ingroup Check
  */
@@ -241,7 +241,7 @@ elm_check_label_set(Evas_Object *obj, const char *label)
 /**
  * Get the text label of the check object
  *
- * @param obj The check object
+ * @param[in] obj The check object
  * @return The text label string in UTF-8
  *
  * @ingroup Check
@@ -260,8 +260,8 @@ elm_check_label_get(const Evas_Object *obj)
  *
  * Once the icon object is set, a previously set one will be deleted.
  *
- * @param obj The check object
- * @param icon The icon object
+ * @param[in] obj The check object
+ * @param[in] icon The icon object
  *
  * @ingroup Check
  */
@@ -289,7 +289,7 @@ elm_check_icon_set(Evas_Object *obj, Evas_Object *icon)
 /**
  * Get the icon object of the check object
  *
- * @param obj The check object
+ * @param[in] obj The check object
  * @return The icon object
  *
  * @ingroup Check
@@ -309,8 +309,8 @@ elm_check_icon_get(const Evas_Object *obj)
  * This sets the state of the check and will also set the value if pointed to
  * to the state supplied, but will not call any callbacks.
  *
- * @param obj The check object
- * @param state The state to use (1 == on, 0 == off)
+ * @param[in] obj The check object
+ * @param[in] state The state to use (1 == on, 0 == off)
  *
  * @ingroup Check
  */
@@ -334,7 +334,7 @@ elm_check_state_set(Evas_Object *obj, Eina_Bool state)
 /**
  * Get the state of the check object
  *
- * @param obj The check object
+ * @param[in] obj The check object
  * @return The boolean state
  *
  * @ingroup Check
@@ -358,8 +358,8 @@ elm_check_state_get(const Evas_Object *obj)
  * reflect the value of the boolean statep points to, just like calling
  * elm_check_state_set().
  *
- * @param obj The check object
- * @param statep Pointer to the boolean to modify
+ * @param[in] obj The check object
+ * @param[in] statep Pointer to the boolean to modify
  *
  * @ingroup Check
  */
