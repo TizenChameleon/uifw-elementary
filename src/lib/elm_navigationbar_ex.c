@@ -333,7 +333,7 @@ _process_deletions(Widget_Data *wd)
 /**
  * Add a new navigationbar_ex to the parent
  *
- * @param parent The parent object
+ * @param[in] parent The parent object
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Navigationbar_ex
@@ -752,7 +752,7 @@ EAPI const char* elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* 
  * as if it had been pushed there. The object must already be inside the
  * Navigationbar_ex stack to work.
  *
- * @param item The Navigationbar_ex item to promote.
+ * @param[in] item The Navigationbar_ex item to promote.
  * @ingroup Navigationbar_ex
  */
 EAPI void
@@ -854,7 +854,7 @@ elm_navigationbar_ex_item_pop(Evas_Object *obj)
 /**
  * Return the item at the bottom of the Navigationbar_ex stack
  *
- * @param obj The Navigationbar_ex object
+ * @param[in] obj The Navigationbar_ex object
  * @return The bottom item or NULL if none
  *
  * @ingroup Navigationbar_ex
@@ -874,7 +874,7 @@ elm_navigationbar_ex_item_bottom_get(const Evas_Object *obj)
 /**
  * Return the item at the top of the Navigationbar_ex stack
  *
- * @param obj The Navigationbar_ex object
+ * @param[in] obj The Navigationbar_ex object
  * @return The top object or NULL if none
  *
  * @ingroup Navigationbar_ex
