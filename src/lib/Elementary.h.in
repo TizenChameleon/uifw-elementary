@@ -2046,13 +2046,12 @@ extern "C" {
    EAPI void         elm_popup_content_set(Evas_Object *obj, Evas_Object *content);
    EAPI Evas_Object* elm_popup_content_get(Evas_Object *obj);
    EAPI void         elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_text,  ...);
-   Evas_Object*      elm_popup_with_buttons_add(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... );
-   EINA_DEPRECATED Evas_Object*      elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... );
+   EAPI Evas_Object* elm_popup_with_buttons_add(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... );
    EAPI void         elm_popup_timeout_set(Evas_Object *obj, int timeout);
    EAPI void         elm_popup_mode_set(Evas_Object *obj, Elm_Popup_Mode mode);
    EAPI void         elm_popup_response(Evas_Object *obj, int  response_id);
    EAPI void         elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
-   EAPI void         elm_popup_rotation_set(Evas_Object *obj, int rot_angle);
+   EINA_DEPRECATED EAPI void         elm_popup_rotation_set(Evas_Object *obj, int rot_angle);
    EAPI int          elm_popup_run(Evas_Object *obj);
    /* Contextual Popup */
    typedef struct _Ctxpopup_Item Elm_Ctxpopup_Item;

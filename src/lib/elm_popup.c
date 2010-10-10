@@ -320,7 +320,7 @@ response_cb( void *data, Evas_Object *obj, void *event_info )
 /**
  * Add a new Popup object.
  *
- * @param parent The parent object
+ * @param[in] parent_app The parent object
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Popup
@@ -337,7 +337,7 @@ elm_popup_add(Evas_Object *parent_app)
    int count;
    unsigned char *prop_data = NULL;
    int ret;
-
+   Ecore_X_Window_Type type;
   if(!parent_app)
      {
 	//FIXME: Keep this window always on top
@@ -358,7 +358,7 @@ elm_popup_add(Evas_Object *parent_app)
      }
    else
      parent = parent_app;
-	 	
+  	
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    obj = elm_widget_add(e);
@@ -387,11 +387,16 @@ elm_popup_add(Evas_Object *parent_app)
 
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, NULL);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
-   
    wd->rot_angle = rotation;
    if(!parent_app)
      {
 		wd->parent = parent;
+		elm_object_style_set(wd->notify, "popup");
+     }
+
+   ecore_x_netwm_window_type_get(elm_win_xwindow_get(parent), &type);	 
+   if(type == ECORE_X_WINDOW_TYPE_DIALOG)
+     {
 		elm_object_style_set(wd->notify, "popup");
      }
    _sizing_eval(obj);
@@ -402,12 +407,12 @@ elm_popup_add(Evas_Object *parent_app)
 /**
  * Add a new Popup object.
  *
- * @param parent The parent object
- * @param title text to be displayed in title area.
- * @param desc_text text to be displayed in description area.
- * @param no_of_buttons Number of buttons to be packed in action area.
- * @param first_button_text button text
- * @param Varargs response ID for first button, then additional buttons followed by response id's ending with NULL
+ * @param[in] parent The parent object
+ * @param[in] title text to be displayed in title area.
+ * @param[in] desc_text text to be displayed in description area.
+ * @param[in] no_of_buttons Number of buttons to be packed in action area.
+ * @param[in] first_button_text button text
+ * @param[in] Varargs response ID for first button, then additional buttons followed by response id's ending with NULL
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Popup
@@ -450,62 +455,12 @@ elm_popup_with_buttons_add(Evas_Object *parent, char *title, char *desc_text,int
    return popup;   
 }
 
-/**
- * Add a new Popup object.
- *
- * @param parent The parent object
- * @param title text to be displayed in title area.
- * @param desc_text text to be displayed in description area.
- * @param no_of_buttons Number of buttons to be packed in action area.
- * @param first_button_text button text
- * @param Varargs response ID for first button, then additional buttons followed by response id's ending with NULL
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup Popup
- */
-EAPI Evas_Object *
-elm_popup_add_with_buttons(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ... )
-{
-   Evas_Object *popup;
-   popup = elm_popup_add(parent);
-   Widget_Data *wd = elm_widget_data_get(popup);
-   char buf[4096];
-   
-   if (desc_text)
-     {
-	elm_popup_desc_set(popup, desc_text);
-     }
-   if (title)
-     {
-	elm_popup_title_label_set(popup, title);
-     }
-   if (first_button_text)
-     {
-	va_list args;  
-	va_start(args, first_button_text); 
-	wd->action_area = elm_layout_add(popup);
-	elm_layout_content_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);
-	snprintf(buf,sizeof(buf), "buttons%d", no_of_buttons);
-	elm_layout_theme_set(wd->action_area, "popup", buf, elm_widget_style_get(popup));
-	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,visible", "elm");
-	if (wd->title_area)
-	  {
-	  	edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,button,title,visible", "elm");
-	  }
-	_elm_popup_buttons_add_valist (popup, first_button_text, args);
-	va_end(args);
-     }
-   edje_object_message_signal_process(wd->layout);
-   _sizing_eval(popup);
-   
-   return popup;   
-}
-
 
 /**
  * This Set's the description text in content area of Popup widget.
  *
- * @param text description text.
+ * @param[in] obj The Popup object
+ * @param[in] text description text.
  *
  * @ingroup Popup
  */
@@ -542,7 +497,7 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
 /**
  * This Get's the description text packed in content area of popup object.
  *
- * @param obj The Popup object
+ * @param[in] obj The Popup object
  * @return  description text.
  *
  * @ingroup Popup
@@ -560,8 +515,8 @@ elm_popup_desc_get(Evas_Object *obj)
 /**
  * This Set's the title text in title area of popup object.
  *
- * @param obj The popup object
- * @param text The title text
+ * @param[in] obj The popup object
+ * @param[in] text The title text
  *
  * @ingroup Popup
  */
@@ -601,7 +556,7 @@ elm_popup_title_label_set(Evas_Object *obj, const char *text)
 /**
  * This Get's the title text packed in title area of popup object.
  *
- * @param obj The Popup object
+ * @param[in] obj The Popup object
  * @return title text
  *
  * @ingroup Popup
@@ -619,8 +574,8 @@ elm_popup_title_label_get(Evas_Object *obj)
 /**
  * This Set's the icon in the title area of Popup object.
  *
- * @param obj The popup object
- * @param icon The title icon
+ * @param[in] obj The popup object
+ * @param[in] icon The title icon
  *
  * @ingroup Popup
  */
@@ -646,7 +601,7 @@ elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon)
 /**
  * This Get's the icon packed in title area of Popup object.
  *
- * @param obj The Popup object
+ * @param[in] obj The Popup object
  * @return title icon
  *
  * @ingroup Popup
@@ -664,8 +619,8 @@ elm_popup_title_icon_get(Evas_Object *obj)
 /**
  * This Set's the content widget in content area of Popup object.
  *
- * @param obj The popup object
- * @param content The content widget
+ * @param[in] obj The popup object
+ * @param[in] content The content widget
  *
  * @ingroup Popup
  */
@@ -693,7 +648,7 @@ elm_popup_content_set(Evas_Object *obj, Evas_Object *content)
 /**
  * This Get's the content widget packed in content area of Popup object.
  *
- * @param obj The Popup object
+ * @param[in] obj The Popup object
  * @return content packed in popup widget
  *
  * @ingroup Popup
@@ -711,10 +666,10 @@ elm_popup_content_get(Evas_Object *obj)
 /**
  * Adds the buttons in to the action area of popup object.
  *
- * @param obj The popup object
- * @param no_of_buttons Number of buttons that has to be packed in action area.
- * @param first_button_text   Label of first button
- * @param Varargs  Response ID(Elm_Popup_Response/ any integer value) for first button, then additional buttons along with their response id ending with NULL.
+ * @param[in] obj The popup object
+ * @param[in] no_of_buttons Number of buttons that has to be packed in action area.
+ * @param[in] first_button_text   Label of first button
+ * @param[in] Varargs  Response ID(Elm_Popup_Response/ any integer value) for first button, then additional buttons along with their response id ending with NULL.
  * @ingroup Popup
  */
 EAPI void 
@@ -754,8 +709,8 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
  * This Set's the time before the popup window is hidden, 
  * and ELM_POPUP_RESPONSE_TIMEOUT is sent along with response signal.
  *
- * @param obj The popup object
- * @param timeout The timeout value in seconds.
+ * @param[in] obj The popup object
+ * @param[in] timeout The timeout value in seconds.
  *
  * @ingroup Popup
  */
@@ -775,8 +730,8 @@ elm_popup_timeout_set(Evas_Object *obj, int timeout)
  * will not close when clicked outside. if ELM_POPUP_TYPE_ALERT is set, popup will close
  * when clicked outside, and ELM_POPUP_RESPONSE_NONE is sent along with response signal.
  *
- * @param obj The popup object
- * @param mode  Elm_Popup_Mode
+ * @param[in] obj The popup object
+ * @param[in] mode  Elm_Popup_Mode
  *
  * @ingroup Popup
  */
@@ -796,8 +751,8 @@ elm_popup_mode_set(Evas_Object *obj, Elm_Popup_Mode mode)
 /**
  * This Hides the popup by emitting response signal.
  *
- * @param obj The popup object
- * @param response_id  response ID of the signal to be emitted along with response signal
+ * @param[in] obj The popup object
+ * @param[in] response_id  response ID of the signal to be emitted along with response signal
  *
  * @ingroup Popup
  */ 
@@ -814,8 +769,8 @@ elm_popup_response(Evas_Object *obj, int  response_id)
 
 /**
  * This API controls the direction from which popup will appear and location of popup.
- * @param obj The popup object
- * @param orient  the orientation of the popup
+ * @param[in] obj The popup object
+ * @param[in] orient  the orientation of the popup
  *
  * @ingroup Popup
  */
@@ -913,7 +868,7 @@ elm_popup_rotation_set(Evas_Object *obj, int rot_angle)
  * when popup returns with signal ELM_POPUP_RESPONSE_NONE, then exit the application using elm_exit
  * by calling any post exit application code.
  * 
- * @param obj The popup object
+ * @param[in] obj The popup object
  * @ingroup Popup
  */
 EAPI int 
