@@ -44,6 +44,7 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
 {
 	// start for cbhm
 	ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+	ext_mod->cnpinit(data,obj,event_info);
 	elm_cbhm_helper_init(obj);
 	elm_cbhm_send_raw_data("show");
 	evas_object_hide(ext_mod->popup);

@@ -17,6 +17,7 @@ struct _Elm_Entry_Extension_data
 	cpfunc paste;
 	cpfunc cancel;
 	cpfunc selectall;
+	cpfunc cnpinit;
 	Eina_Bool password :1;
 	Eina_Bool editable :1;
 	Eina_Bool have_selection: 1;
