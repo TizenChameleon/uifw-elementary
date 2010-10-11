@@ -345,6 +345,9 @@ _is_width_over(Evas_Object *obj, int linemode)
 
    if (!wd) return 0;
 
+   if (strlen(edje_object_part_text_get(wd->lbl, "elm.text")) <= ellen)
+	   return 0;
+
    edje_object_part_geometry_get(wd->lbl,"elm.text",&x,&y,&w,&h);
 
    evas_object_geometry_get (obj, &vx,&vy,&vw,&vh);
