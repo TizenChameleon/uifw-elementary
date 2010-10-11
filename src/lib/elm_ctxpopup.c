@@ -831,7 +831,7 @@ _item_obj_create(Elm_Ctxpopup_Item *item, char *group_name)
 /**
  * Get the icon object for the given item.
  *
- * @param item 	Ctxpopup item
+ * @param[in] item 	Ctxpopup item
  * @return 		Icon object or NULL if the item does not have icon
  *
  * @ingroup Ctxpopup
@@ -847,8 +847,8 @@ elm_ctxpopup_item_icon_get(Elm_Ctxpopup_Item *item)
 /**
  * Disable or Enable the scroller for contextual popup.
  *
- * @param obj 		Ctxpopup object
- * @param disabled  disable or enable
+ * @param[in] obj 		Ctxpopup object
+ * @param[in] disabled  disable or enable
  *
  * @ingroup Ctxpopup
  */
@@ -874,7 +874,7 @@ elm_ctxpopup_scroller_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 /**
  * Get the label for the given item.
  *
- * @param item 	 	Ctxpopup item
+ * @param[in] item 	 	Ctxpopup item
  * @return 		Label or NULL if the item does not have label
  *
  * @ingroup Ctxpopup
@@ -891,7 +891,7 @@ elm_ctxpopup_item_label_get(Elm_Ctxpopup_Item *item)
 /**
  * Add a new ctxpopup object to the parent.
  *
- * @param parent 	Parent object
+ * @param[in] parent 	Parent object
  * @return 		New object or NULL if it cannot be created
  *
  * @ingroup Ctxpopup
@@ -974,7 +974,7 @@ elm_ctxpopup_add(Evas_Object *parent)
 /**
  * Clear all items in given ctxpopup object.
  *
- * @param obj 		Ctxpopup object
+ * @param[in] obj 		Ctxpopup object
  *
  * @ingroup Ctxpopup
  */
@@ -1006,7 +1006,7 @@ elm_ctxpopup_clear(Evas_Object *obj)
 /**
  * Change the mode to horizontal or vertical.
  *
- * @param obj   	Ctxpopup object
+ * @param[in] obj   	Ctxpopup object
  * @param horizontal 	EINA_TRUE - horizontal mode, EINA_FALSE - vertical mode
  *
  * @ingroup Ctxpopup
@@ -1044,7 +1044,7 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 /**
  * Get the value of current horizontal mode.
  *
- * @param obj 	 	Ctxpopup object
+ * @param[in] obj 	 	Ctxpopup object
  * @return 	 	EINA_TRUE - horizontal mode, EINA_FALSE - vertical mode.
  *
  * @ingroup Ctxpopup
@@ -1064,8 +1064,8 @@ elm_ctxpopup_horizontal_get(Evas_Object *obj)
 /**
  * reset the icon on the given item. 
  *
- * @param obj 	 	Ctxpopup item
- * @param icon		Icon object to be set
+ * @param[in] item 	 	Ctxpopup item
+ * @param[in] icon		Icon object to be set
  *
  * @ingroup Ctxpopup
  */
@@ -1097,8 +1097,8 @@ elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
 /**
  * reset the label on the given item. 
  *
- * @param obj 	 	Ctxpopup item
- * @param label		Label to be set
+ * @param[in] item 	 	Ctxpopup item
+ * @param[in] label		Label to be set
  * 
  * @ingroup Ctxpopup
  */
@@ -1130,11 +1130,11 @@ elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label)
 /**
  * Add a new item in given ctxpopup object.
  *
- * @param obj 	 	Ctxpopup object
- * @param icon		Icon to be set
- * @param label   Label to be set
- * @param func		Callback function to call when this item click is clicked
- * @param data    User data for callback function
+ * @param[in] obj 	 	Ctxpopup object
+ * @param[in] icon		Icon to be set
+ * @param[in] label   Label to be set
+ * @param[in] func		Callback function to call when this item click is clicked
+ * @param[in] data    User data for callback function
  * @return 		Added ctxpopup item
  * 
  * @ingroup Ctxpopup
@@ -1182,7 +1182,7 @@ elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char *label,
 /**
  * Delete the given item in ctxpopup object.
  *
- * @param item 	 	Ctxpopup item to be deleted
+ * @param item[in]  Ctxpopup item to be deleted
  *
  * @ingroup Ctxpopup
  */
@@ -1220,8 +1220,8 @@ elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item)
 /**
  * Disable or Enable the given item. Once an item is disabled, the click event will be never happend for the item.
  *
- * @param item		Ctxpopup item to be disabled
- * @param disabled 	EINA_TRUE - disable, EINA_FALSE - enable
+ * @param[in] item		Ctxpopup item to be disabled
+ * @param[in] disabled 	EINA_TRUE - disable, EINA_FALSE - enable
  *
  * @ingroup Ctxpopup
  */
@@ -1247,8 +1247,8 @@ elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item *item, Eina_Bool disabled)
 
 /**
  * Disable or Enable background dimmed function 
- * @param obj		Ctxpopup object
- * @param dimmed 	EINA_TRUE - disable, EINA_FALSE - enable
+ * @param[in] obj		Ctxpopup object
+ * @param[in] dimmed 	EINA_TRUE - disable, EINA_FALSE - enable
  *
  * @ingroup Ctxpopup
  */
@@ -1272,10 +1272,10 @@ elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 
 /**
  * Append additional button in ctxpoppup bottom layout.
- * @param obj		Ctxpopup object
- * @param label  Button label
- * @param func   Button clicked event callback function
- * @param data   Button clicked event callback function data
+ * @param[in] obj		Ctxpopup object
+ * @param[in] label  Button label
+ * @param[in] func   Button clicked event callback function
+ * @param[in] data   Button clicked event callback function data
  *
  * @ingroup Ctxpopup
  */
@@ -1323,11 +1323,11 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label,
  *
  *  This functions gives user to set the priority of ctxpopup box showing position.
  *
- * @param obj		Ctxpopup object
- * @param first    1st priority of arrow direction
- * @param second 2nd priority of arrow direction
- * @param third   3th priority of arrow direction
- * @param fourth 4th priority of arrow direction
+ * @param[in] obj		Ctxpopup object
+ * @param[in] first    1st priority of arrow direction
+ * @param[in] second 2nd priority of arrow direction
+ * @param[in] third   3th priority of arrow direction
+ * @param[in] fourth 4th priority of arrow direction
  *
  * @ingroup Ctxpopup
  */
@@ -1351,8 +1351,8 @@ elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first,
 /**
  * Swallow the user content
  *
- * @param obj		Ctxpopup object
- * @param content 	Content to be swallowed
+ * @param[in] obj		Ctxpopup object
+ * @param[in] content 	Content to be swallowed
  *
  * @ingroup Ctxpopup
  */
@@ -1384,7 +1384,7 @@ elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 /**
  * Unswallow the user content
  *
- * @param obj		Ctxpopup object
+ * @param[in] obj		Ctxpopup object
  * @return 		The unswallowed content
  *
  * @ingroup Ctxpopup
@@ -1419,8 +1419,8 @@ elm_ctxpopup_content_unset(Evas_Object *obj)
  * Basically, ctxpopup position is computed internally. When user call evas_object_move,
  * Ctxpopup will be showed up with that position which is indicates the arrow point.
  *
- * @param obj		Ctxpopup object
- * @param forced	EINA_TRUE is left-top. EINA_FALSE is indicates arrow point.
+ * @param[in] obj		Ctxpopup object
+ * @param[in] forced	EINA_TRUE is left-top. EINA_FALSE is indicates arrow point.
  *
  * @ingroup Ctxpopup
  */
@@ -1442,7 +1442,7 @@ elm_ctxpopup_position_forced_set(Evas_Object *obj, Eina_Bool forced)
 /**
  * Get the status of the position forced
  *
- * @param obj		Ctxpopup objet
+ * @param[in] obj		Ctxpopup objet
  * @return			value of position forced
  *
  * @ingroup Ctxpopup
@@ -1477,8 +1477,8 @@ elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
  * Set the area of ctxpopup will show up. Ctxpopup will not be out of this area. 
  * The responsibility of the area object is to user.
  *
- * @param obj		Ctxpopup objet
- * @param area		area object
+ * @param[in] obj		Ctxpopup objet
+ * @param[in] area		area object
  *
  * @ingroup Ctxpopup
  */

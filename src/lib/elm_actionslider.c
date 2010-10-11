@@ -304,7 +304,7 @@ _icon_animation(void *data)
 /**
  * Add a new actionslider to the parent.
  *
- * @param parent The parent object
+ * @param[in] parent The parent object
  * @return The new actionslider object or NULL if it cannot be created
  *
  * @ingroup Actionslider
@@ -391,8 +391,8 @@ elm_actionslider_add_with_set(Evas_Object *parent, Elm_Actionslider_Icon_Pos pos
 /**
  * Set actionslider indicator position. 
  *
- * @param obj The actionslider object. 
- * @param pos The position of the indicator.
+ * @param[in] obj The actionslider object. 
+ * @param[in] pos The position of the indicator.
  * (ELM_ACTIONSLIDER_INDICATOR_LEFT, ELM_ACTIONSLIDER_INDICATOR_RIGHT,
  *  ELM_ACTIONSLIDER_INDICATOR_CENTER)
  *
@@ -429,8 +429,8 @@ elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_
 /**
  * Set actionslider magnet position. 
  *
- * @param obj The actionslider object. 
- * @param pos The position of the magnet.
+ * @param[in] obj The actionslider object. 
+ * @param[in] pos The position of the magnet.
  * (ELM_ACTIONSLIDER_MAGNET_LEFT, ELM_ACTIONSLIDER_MAGNET_RIGHT,
  *  ELM_ACTIONSLIDER_MAGNET_BOTH, ELM_ACTIONSLIDER_MAGNET_CENTER)
  *
@@ -447,8 +447,8 @@ elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos po
 /**
  * Set actionslider label.
  *
- * @param obj The actionslider object
- * @param pos The position of the label.
+ * @param[in] obj The actionslider object
+ * @param[in] pos The position of the label.
  * (ELM_ACTIONSLIDER_LABEL_LEFT, ELM_ACTIONSLIDER_LABEL_RIGHT)
  * @param label The label which is going to be set.
  *
@@ -530,8 +530,8 @@ elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, con
 /**
  * Hold actionslider object movement.
  *
- * @param obj The actionslider object
- * @param flag Actionslider hold/release
+ * @param[in] obj The actionslider object
+ * @param[in] flag Actionslider hold/release
  * (EINA_TURE = hold/EIN_FALSE = release)
  *
  * @ingroup Actionslider

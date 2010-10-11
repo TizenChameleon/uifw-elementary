@@ -87,9 +87,9 @@ _theme_hook(Evas_Object *obj)
 /**
  * Set the state of given check object.
  *
- * @param obj  	     Dayselector
- * @param day        day user want to know. 
- * @param checked    state of the day. Eina_True is checked. 
+ * @param[in] obj  	     Dayselector
+ * @param[in] day        day user want to know. 
+ * @param[in] checked    state of the day. Eina_True is checked. 
  *
  * @ingroup Dayselector
  */
@@ -107,8 +107,8 @@ elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_
 /**
  * Get the state of given check object.
  *
- * @param obj  	 	Dayselector
- * @param day        day user want to know. 
+ * @param[in] obj  	 	Dayselector
+ * @param[in] day        day user want to know. 
  *
  * @ingroup Dayselector
  */
@@ -146,7 +146,7 @@ _sizing_eval(Evas_Object* obj)
 /**
  * Add the dayselector.
  *
- * @param item 	 	Parent object.
+ * @param[in] item 	 	Parent object.
  *
  * @ingroup Dayselector
  */
