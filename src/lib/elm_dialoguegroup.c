@@ -517,16 +517,17 @@ elm_dialoguegroup_title_set(Evas_Object *obj, const char *title)
 	if (!title) {
 	 	wd->title = NULL;      	
 		elm_box_unpack(wd->box, wd->title_layout);		
-	}
+	} 	
 	if (!wd->title_layout) {
 		wd->title_layout = elm_layout_add(wd->box);
 		elm_layout_theme_set(wd->title_layout, "dialoguegroup", "title", elm_widget_style_get(obj));
 		evas_object_size_hint_weight_set(wd->title_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->title_layout, EVAS_HINT_FILL, 0.0);
 		evas_object_show(wd->title_layout);	
+		edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", title);
+		elm_box_pack_start(wd->box, wd->title_layout);
 	}
 	edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", title);
-	elm_box_pack_start(wd->box, wd->title_layout);
 }
 
 /**

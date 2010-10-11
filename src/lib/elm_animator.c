@@ -143,7 +143,7 @@ _animator_parent_del(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSE
 /**
  * Get the value of reverse mode. 
  *
- * @param animator Animator object
+ * @param[in] animator Animator object
  * @return EINA_TRUE is reverse mode 
  *
  * @ingroup Animator 
@@ -159,7 +159,7 @@ elm_animator_auto_reverse_get(Elm_Animator *animator)
 /**
  * Get the value of repeat count.
  *
- * @param animator Animator object
+ * @param[in] animator Animator object
  * @return Repeat count
  *
  * @ingroup Animator 
@@ -175,8 +175,8 @@ elm_animator_repeat_get(Elm_Animator *animator)
 /**
  * Set auto reverse function.  
  *
- * @param animator Animator object
- * @param reverse Reverse or not
+ * @param[in] animator Animator object
+ * @param[in] reverse Reverse or not
  * 
  * @ingroup Animator 
  */
@@ -199,8 +199,8 @@ elm_animator_auto_reverse_set(Elm_Animator *animator, Eina_Bool reverse)
 /**
  * Set the animation acceleration style. 
  *
- * @param animator Animator object
- * @param cs Curve style. Default is ELM_ANIMATOR_CURVE_LINEAR 
+ * @param[in] animator Animator object
+ * @param[in] cs Curve style. Default is ELM_ANIMATOR_CURVE_LINEAR 
  *
  * @ingroup Animator
  */
@@ -234,8 +234,8 @@ elm_animator_curve_style_set(Elm_Animator *animator,
 /**
  * Set the operation duration.  
  *
- * @param animator Animator object
- * @param duration Duration in second 
+ * @param[in] animator Animator object
+ * @param[in] duration Duration in second 
  *
  * @ingroup Animator
  */
@@ -253,9 +253,9 @@ elm_animator_duration_set(Elm_Animator *animator, double duration)
  * Set the callback function for animator operation.  
  * The range of callback function frame data is to 0 ~ 1
  * User can refer this frame value for one's animation frame data. 
- * @param animator Animator object
- * @param op Callback function pointer 
- * @param data Callback function user argument 
+ * @param[in] animator Animator object
+ * @param[in] func Callback function pointer 
+ * @param[in] data Callback function user argument 
  *
  * @ingroup Animator
  */
@@ -276,7 +276,7 @@ elm_animator_operation_callback_set(Elm_Animator *animator,
 /**
  * Add new animator. 
  *
- * @param parent Parent object
+ * @param[in] parent Parent object
  * @return animator object 
  *
  * @ingroup Animator
@@ -306,7 +306,7 @@ elm_animator_add(Evas_Object *parent)
 /**
  * Get the status for the animator operation.
  *
- * @param animator Animator object 
+ * @param[in] animator Animator object 
  * @return EINA_TRUE is animator is operating. 
  *
  * @ingroup Animator
@@ -322,7 +322,7 @@ elm_animator_operating_get(Elm_Animator *animator)
 /**
  * Delete animator. 
  *
- * @param animator Animator object 
+ * @param[in] animator Animator object 
  *
  * @ingroup Animator
  */
@@ -346,9 +346,9 @@ elm_animator_del(Elm_Animator *animator)
 /**
  * Set the callback function for the animator end.  
  *
- * @param  animator Animator object 
- * @param  op Callback function pointer
- * @param  data Callback function user argument 
+ * @param[in]  animator Animator object 
+ * @param[in]  func   Callback function pointer
+ * @param[in]  data Callback function user argument 
  *
  * @ingroup Animator
  */
@@ -367,7 +367,7 @@ elm_animator_completion_callback_set(Elm_Animator *animator,
 /**
  * Pause the animator.
  *
- * @param  animator Animator object
+ * @param[in]  animator Animator object
  *
  * @ingroup Animator
  */
@@ -386,7 +386,7 @@ elm_animator_pause(Elm_Animator *animator)
 /**
  * Resume the animator.
  *
- * @param  animator Animator object
+ * @param[in]  animator Animator object
  *
  * @ingroup Animator
  */
@@ -405,7 +405,7 @@ elm_animator_resume(Elm_Animator *animator)
 /**
  * Stop animator.
  *
- * @param animator Animator object 
+ * @param[in] animator Animator object 
  *
  * @ingroup Animator
  */
@@ -421,8 +421,8 @@ elm_animator_stop(Elm_Animator *animator)
 /**
  * Set the animator repeat count.
  *
- * @param  animator Animator object
- * @param  repeat_cnt Repeat count
+ * @param[in]  animator Animator object
+ * @param[in]  repeat_cnt Repeat count
  *
  * @ingroup Animator
  */
@@ -440,7 +440,7 @@ elm_animator_repeat_set(Elm_Animator *animator, unsigned int repeat_cnt)
 /**
  * Animate now.
  *
- * @param animator Animator object
+ * @param[in] animator Animator object
  *
  * @ingroup Animator
  */

@@ -1736,7 +1736,7 @@ create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
       return NULL;
    it->obj = obj;
    it->text = eina_stringshare_add(label);
-   it->icon_path = icon_path;
+   it->icon_path = eina_stringshare_add(icon_path);
    it->selected = EINA_FALSE;
    it->editable = EINA_TRUE;
    it->badge = 0;
@@ -1779,7 +1779,7 @@ create_tool_item(Evas_Object * obj, const char *icon_path, const char *label,
       return NULL;
    it->obj = obj;
    it->text = eina_stringshare_add(label);
-   it->icon_path = icon_path;
+   it->icon_path = eina_stringshare_add(icon_path);
    it->selected = EINA_FALSE;
    it->editable = EINA_TRUE;
    it->badge = 0;
@@ -1967,7 +1967,7 @@ create_more_item(Widget_Data *wd, int style)
       return NULL;
    it->obj = wd->object;
    it->text = eina_stringshare_add("more");
-   it->icon_path = CONTROLBAR_SYSTEM_ICON_MORE;
+   it->icon_path = eina_stringshare_add(CONTROLBAR_SYSTEM_ICON_MORE);
    it->selected = EINA_FALSE;
    it->badge = 0;
    it->sel = 1;
@@ -2729,6 +2729,8 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
       eina_stringshare_del(it->text);
    if (it->label)
       evas_object_del(it->label);
+   if (it->icon_path)
+      eina_stringshare_del(it->icon_path);
    if (it->icon)
       evas_object_del(it->icon);
    if (it->base)
@@ -2774,6 +2776,43 @@ elm_controlbar_item_select(Elm_Controlbar_Item * it)
 }
 
 /**
+ * Set the icon of item
+ *
+ * @param	it The item of controlbar
+ * @param	icon_path The icon path of the item
+ * @return	The icon object
+ *
+ * @ingroup Controlbar
+ */ 
+EAPI void
+elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path) 
+{
+   if (it == NULL)
+      return;
+   it->icon_path = icon_path;
+   if(it->icon)
+     {
+	evas_object_del(it->icon);
+	it->icon = NULL;
+     }
+   it->icon = create_item_icon(it->base_item, it);
+   it->edit_icon = create_item_icon(it->edit_item, it);
+
+   if(it->label && it->icon)
+     {
+	edje_object_signal_emit(_EDJ(it->base_item), "elm,state,icon_text", "elm");
+	elm_label_line_wrap_set(it->label, EINA_FALSE);
+	elm_label_wrap_mode_set(it->label, 0);
+     }
+   if(it->edit_label && it->edit_icon)
+     {
+	edje_object_signal_emit(_EDJ(it->edit_item), "elm,state,icon_text", "elm");
+	elm_label_line_wrap_set(it->edit_label, EINA_FALSE);
+	elm_label_wrap_mode_set(it->edit_label, 0);
+     }
+}
+
+/**
  * Get the icon of item
  *
  * @param	it The item of controlbar
@@ -2781,9 +2820,40 @@ elm_controlbar_item_select(Elm_Controlbar_Item * it)
  *
  * @ingroup Controlbar
  */ 
-   EAPI Evas_Object * elm_controlbar_item_icon_get(Elm_Controlbar_Item * it) 
+EAPI Evas_Object *
+elm_controlbar_item_icon_get(Elm_Controlbar_Item * it) 
 {
    return it->icon;
+}
+
+/**
+ * Set the label of item
+ *
+ * @param	it The item of controlbar
+ * @param	label The label of item
+ *
+ * @ingroup Controlbar
+ */ 
+   EAPI void
+elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label) 
+{
+   if (it == NULL)
+      return;
+   it->text = eina_stringshare_add(label);
+   it->label = create_item_label(it->base_item, it);
+   it->edit_label = create_item_label(it->edit_item, it);
+
+   if(it->label && it->icon){
+	edje_object_signal_emit(_EDJ(it->base_item), "elm,state,icon_text", "elm");
+	elm_label_line_wrap_set(it->label, EINA_FALSE);
+	elm_label_wrap_mode_set(it->label, 0);
+   }
+   if(it->edit_label && it->edit_icon)
+     {
+	edje_object_signal_emit(_EDJ(it->edit_item), "elm,state,icon_text", "elm");
+	elm_label_line_wrap_set(it->edit_label, EINA_FALSE);
+	elm_label_wrap_mode_set(it->edit_label, 0);
+     }
 }
 
 /**
@@ -2798,30 +2868,6 @@ EAPI const char *
 elm_controlbar_item_label_get(Elm_Controlbar_Item * it) 
 {
    return it->text;
-}
-
-/**
- * Set the label of item
- *
- * @param	it The item of controlbar
- * @param	label The label of item
- *
- * @ingroup Controlbar
- */ 
-   EAPI void
-elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label) 
-{
-   if (!it->base)
-      return;
-   it->text = eina_stringshare_add(label);
-   create_item_label(it->base, it);
-   create_item_label(it->edit_item, it);
-   if(it->icon){
-	edje_object_signal_emit(_EDJ(it->base),
-					 "elm,state,icon_text", "elm");
-	elm_label_line_wrap_set(it->label, EINA_FALSE);
-	elm_label_wrap_mode_set(it->label, 0);
-   }
 }
 
 /**
@@ -3199,11 +3245,9 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
 	 break;
       case ELM_CONTROLBAR_MODE_TRANSLUCENCE: 
 	 elm_controlbar_alpha_set(obj, 85);
-	 //edje_object_signal_emit(wd->edje, "elm,state,translucence", "elm");
 	 break;
       case ELM_CONTROLBAR_MODE_TRANSPARENCY:
 	 elm_controlbar_alpha_set(obj, 0);
-	 //edje_object_signal_emit(wd->edje, "elm,state,transparency", "elm");
 	 break;
       case ELM_CONTROLBAR_MODE_LARGE: 
 	 edje_object_signal_emit(wd->edje, "elm,state,large", "elm");
