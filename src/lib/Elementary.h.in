@@ -1560,13 +1560,13 @@ extern "C" {
         ELM_MAP_SOURCE_OSMARENDER,
         ELM_MAP_SOURCE_CYCLEMAP,
         ELM_MAP_SOURCE_MAPLINT,
-        ELM_MAP_SOURCE_DECARTA,
         ELM_MAP_SOURCE_CUSTOM_1,
         ELM_MAP_SOURCE_CUSTOM_2,
         ELM_MAP_SOURCE_CUSTOM_3,
         ELM_MAP_SOURCE_CUSTOM_4,
         ELM_MAP_SOURCE_CUSTOM_5,
         ELM_MAP_SOURCE_CUSTOM_6,
+        ELM_MAP_SOURCE_CUSTOM_7,
         ELM_MAP_SOURCE_LAST
      } Elm_Map_Sources;
 
@@ -1577,7 +1577,7 @@ extern "C" {
    typedef void         (*ElmMapMarkerDelFunc)      (Evas_Object *obj, Elm_Map_Marker *marker, void *data, Evas_Object *o);
    typedef Evas_Object *(*ElmMapMarkerIconGetFunc)  (Evas_Object *obj, Elm_Map_Marker *marker, void *data);
    typedef Evas_Object *(*ElmMapGroupIconGetFunc)  (Evas_Object *obj, void *data);
-   typedef char *(*ElmMapSourceURLFunc) (void *data, int x, int y, int zoom);
+   typedef char *(*ElmMapSourceURLFunc) (int x, int y, int zoom);
 
    EAPI Evas_Object *elm_map_add(Evas_Object *parent);
    EAPI void         elm_map_zoom_set(Evas_Object *obj, int zoom);
@@ -1591,8 +1591,8 @@ extern "C" {
    EAPI Eina_Bool    elm_map_paused_get(const Evas_Object *obj);
    EAPI void         elm_map_paused_markers_set(Evas_Object *obj, Eina_Bool paused);
    EAPI Eina_Bool    elm_map_paused_markers_get(const Evas_Object *obj);
-   EAPI void         elm_map_utils_convert_coord_into_geo(const Evas_Object *obj, int x, int y, int size, double *lon, double *lat);
-   EAPI void         elm_map_utils_convert_geo_into_coord(const Evas_Object *obj, double lon, double lat, int size, int *x, int *y);
+   EAPI void         elm_map_utils_convert_coord_into_geo(int x, int y, int size, double *lon, double *lat);
+   EAPI void         elm_map_utils_convert_geo_into_coord(double lon, double lat, int size, int *x, int *y);
    EAPI Elm_Map_Marker *elm_map_marker_add(Evas_Object *obj, double lon, double lat, Elm_Map_Marker_Class *clas, Elm_Map_Group_Class *clas_group, void *data);
    EAPI void         elm_map_max_marker_per_group_set(Evas_Object *obj, int max);
    EAPI void         elm_map_marker_remove(Elm_Map_Marker *marker);
