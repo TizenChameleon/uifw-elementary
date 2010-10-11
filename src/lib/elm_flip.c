@@ -26,6 +26,7 @@ struct _Widget_Data
    Ecore_Animator *animator;
    double start, len;
    Elm_Flip_Mode mode;
+   Evas_Object *clip;
    struct {
       Evas_Object *content, *clip;
    } front, back;
@@ -115,6 +116,33 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
      }
 }
 
+static void
+flip_show_hide(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (elm_flip_front_get(obj))
+     {
+        if (wd->front.content)
+           evas_object_show(wd->front.clip);
+        else
+           evas_object_hide(wd->front.clip);
+        if (wd->back.content)
+           evas_object_hide(wd->back.clip);
+        else
+           evas_object_hide(wd->back.clip);
+     }
+   else
+     {
+        if (wd->front.content)
+           evas_object_hide(wd->front.clip);
+        else
+           evas_object_hide(wd->front.clip);
+        if (wd->back.content)
+           evas_object_show(wd->back.clip);
+        else
+           evas_object_hide(wd->back.clip);
+     }
+}
 static Eina_Bool
 _flip(Evas_Object *obj)
 {
@@ -223,7 +251,36 @@ _flip(Evas_Object *obj)
             evas_map_util_3d_rotate(mb, 0.0, deg, 0.0, cx, cy, w / 2);
           }
         break;
-    
+     case ELM_FLIP_CUBE_UP:
+        p = 1.0 - t;
+        p = 1.0 - (p * p);
+        deg = -90.0 * p;
+        if (wd->state)
+          {
+            evas_map_util_3d_rotate(mf, deg, 0.0, 0.0, cx, cy, h / 2);
+            evas_map_util_3d_rotate(mb, deg + 90, 0.0, 0.0, cx, cy, h / 2);
+          }
+        else
+          {
+            evas_map_util_3d_rotate(mf, deg + 90, 0.0, 0.0, cx, cy, h / 2);
+            evas_map_util_3d_rotate(mb, deg, 0.0, 0.0, cx, cy, h / 2);
+          }
+        break;
+     case ELM_FLIP_CUBE_DOWN:
+        p = 1.0 - t;
+        p = 1.0 - (p * p);
+        deg = 90.0 * p;
+        if (wd->state)
+          {
+            evas_map_util_3d_rotate(mf, deg, 0.0, 0.0, cx, cy, h / 2);
+            evas_map_util_3d_rotate(mb, deg - 90, 0.0, 0.0, cx, cy, h / 2);
+          }
+        else
+          {
+            evas_map_util_3d_rotate(mf, deg - 90, 0.0, 0.0, cx, cy, h / 2);
+            evas_map_util_3d_rotate(mb, deg, 0.0, 0.0, cx, cy, h / 2);
+          }
+        break;
      default:
         break;
      }
@@ -256,6 +313,11 @@ _flip(Evas_Object *obj)
      {
         evas_object_map_enable_set(wd->front.content, 0);
         evas_object_map_enable_set(wd->back.content, 0);
+// FIXME: hack around evas rendering bug (only fix makes evas bitch-slow
+        evas_object_resize(wd->front.content, 0, 0);
+        evas_object_resize(wd->back.content, 0, 0);
+        evas_smart_objects_calculate(evas_object_evas_get(obj));
+// FIXME: end hack
         wd->animator = NULL;
         wd->state = !wd->state;
         _configure(obj);
@@ -330,21 +392,32 @@ elm_flip_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
 
+   wd->clip = evas_object_rectangle_add(e);
+   evas_object_color_set(wd->clip, 255, 255, 255, 255);
+   evas_object_move(wd->clip, -49999, -49999);
+   evas_object_resize(wd->clip, 99999, 99999);
+   elm_widget_sub_object_add(obj, wd->clip);
+   evas_object_clip_set(wd->clip, evas_object_clip_get(obj));
+   evas_object_smart_member_add(wd->clip, obj);
    wd->front.clip = evas_object_rectangle_add(e);
+   evas_object_static_clip_set(wd->front.clip, 1);
+   evas_object_data_set(wd->front.clip, "_elm_leaveme", obj);
    evas_object_color_set(wd->front.clip, 255, 255, 255, 255);
    evas_object_move(wd->front.clip, -49999, -49999);
    evas_object_resize(wd->front.clip, 99999, 99999);
-   elm_widget_sub_object_add(wd->front.clip, obj);
+   elm_widget_sub_object_add(obj, wd->front.clip);
    evas_object_smart_member_add(wd->front.clip, obj);
-   evas_object_clip_set(wd->front.clip, evas_object_clip_get(obj));
+   evas_object_clip_set(wd->front.clip, wd->clip);
    
    wd->back.clip = evas_object_rectangle_add(e);
+   evas_object_static_clip_set(wd->back.clip, 1);
+   evas_object_data_set(wd->back.clip, "_elm_leaveme", obj);
    evas_object_color_set(wd->back.clip, 255, 255, 255, 255);
    evas_object_move(wd->back.clip, -49999, -49999);
    evas_object_resize(wd->back.clip, 99999, 99999);
    elm_widget_sub_object_add(wd->back.clip, obj);
-   evas_object_smart_member_add(wd->back.clip, obj);
-   evas_object_clip_set(wd->back.clip, evas_object_clip_get(obj));
+   evas_object_smart_member_add(obj, wd->back.clip);
+   evas_object_clip_set(wd->back.clip, wd->clip);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, NULL);
@@ -387,11 +460,8 @@ elm_flip_content_front_set(Evas_Object *obj, Evas_Object *content)
                                        EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				       _changed_size_hints, obj);
 	_sizing_eval(obj);
-        if (!elm_flip_front_get(obj)) evas_object_hide(wd->front.clip);
-        else evas_object_show(wd->front.clip);
      }
-   else
-     evas_object_hide(wd->front.clip);     
+   flip_show_hide(obj);
    _configure(obj);
 }
 
@@ -426,11 +496,8 @@ elm_flip_content_back_set(Evas_Object *obj, Evas_Object *content)
                                        EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				       _changed_size_hints, obj);
 	_sizing_eval(obj);
-        if (elm_flip_front_get(obj)) evas_object_hide(wd->back.clip);
-        else evas_object_show(wd->back.clip);
      }
-   else
-     evas_object_hide(wd->back.clip);
+   flip_show_hide(obj);
    _configure(obj);
 }
 
@@ -525,7 +592,9 @@ elm_flip_go(Evas_Object *obj, Elm_Flip_Mode mode)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (!wd->animator) wd->animator = ecore_animator_add(_animate, obj);
+   flip_show_hide(obj);
    wd->mode = mode;
    wd->start = ecore_loop_time_get();
    wd->len = 0.5;
+   _flip(obj);
 }

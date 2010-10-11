@@ -115,10 +115,27 @@ _configure(Evas_Object *obj)
    if (!wd) return;
    if (wd->content)
      {
-        Evas_Coord x, y, w, h;
+        Evas_Coord x, y, w, h, x2, y2;
         
         evas_object_geometry_get(obj, &x, &y, &w, &h);
-        if (!wd->enabled) evas_object_move(wd->content, x, y);
+        evas_object_geometry_get(wd->content, &x2, &y2, NULL, NULL);
+        if ((x != x2) || (y != y2))
+          {
+             if (!wd->enabled)
+                evas_object_move(wd->content, x, y);
+             else
+               {
+                  
+                  Evas *e = evas_object_evas_get(obj);
+                  evas_smart_objects_calculate(e);
+                  evas_nochange_push(e);
+//                  printf("x--------------------\n");
+                  evas_object_move(wd->content, x, y);
+                  evas_smart_objects_calculate(e);
+//                  printf("y--------------------\n");
+                  evas_nochange_pop(e);
+               }
+          }
         evas_object_resize(wd->content, w, h);
         _mapbuf(obj);
      }
