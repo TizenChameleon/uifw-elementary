@@ -343,26 +343,6 @@ _elm_widtype_clear(void)
      }
 }
 
-// This code is just for temporary usage.
-static void                                                                             
-_set_elm_module()                                                                
-{                                                                                
-   char *buf = NULL;
-   char *theme_name;
-
-   buf = getenv("ELM_THEME");
-   if (buf != NULL) {
-      theme_name = strdup(buf);
-      if (!strcmp(strtok(theme_name, ":"), "default")) {
-      	  free(theme_name);
-          return;
-      }
-      free(theme_name);
-   }
-
-   setenv("ELM_MODULES", "ctxpopup_copypasteUI>entry/api", 1);
-}
-
 /**
  * @defgroup General General
  * @ingroup Main
@@ -380,7 +360,6 @@ elm_init(int argc, char **argv)
 {
    _elm_init_count++;
    if (_elm_init_count != 1) return;
-   _set_elm_module();
    elm_quicklaunch_init(argc, argv);
    elm_quicklaunch_sub_init(argc, argv);
 }
