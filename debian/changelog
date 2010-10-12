@@ -1,6 +1,6 @@
 elementary (1.0.0+svn.51480slp2+build30) unstable; urgency=low
 
-  * add decarta map provider to elm_map
+  * Add decarta map provider to elm_map.
   * Git: 165.213.180.234:/git/slp/pkgs/elementary
   * Tag: elementary_1.0.0+svn.51480slp2+build30
 
