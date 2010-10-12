@@ -849,8 +849,11 @@ _getbase(Evas_Object *obj)
    if (!wd) return "base";
    if (wd->editable)
      {
-	if((wd->password)&&(wd->show_last_character)) return "custom-password";	
-	else if(wd->password) return "base-password";
+        if (wd->password) 
+          {
+             if (wd->show_last_character) return "custom-password";
+             else return "base-password";
+          }
 	else
 	  {
 	     if (wd->single_line) return "base-single";
@@ -864,8 +867,11 @@ _getbase(Evas_Object *obj)
      }
    else
      {
-	if((wd->password)&&(wd->show_last_character)) return "custom-password";	
-	else if(wd->password) return "base-password";
+        if (wd->password) 
+          {
+             if (wd->show_last_character) return "custom-password";
+             else return "base-password";
+          }
 	else
 	  {
 	     if (wd->single_line) return "base-single-noedit";
@@ -2183,10 +2189,11 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    if (!wd) return;
    if (wd->password == password) return;
    wd->password = password;
-   wd->show_last_character = EINA_FALSE;
    wd->single_line = EINA_TRUE;
    wd->linewrap = EINA_FALSE;
    wd->char_linewrap = EINA_FALSE;
+   if (_elm_config->password_show_last_character)
+     wd->show_last_character = EINA_TRUE;
    t = eina_stringshare_add(elm_entry_entry_get(obj));
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);

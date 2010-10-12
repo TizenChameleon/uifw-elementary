@@ -116,6 +116,7 @@ struct _Elm_Config
    int input_panel_enable;
    int autocapital_allow;
    int autoperiod_allow;   
+   int          password_show_last_character;
 };
 
 struct _Elm_Module
