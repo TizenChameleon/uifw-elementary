@@ -862,6 +862,7 @@ grid_load(Evas_Object *obj, Grid *g)
 		  snprintf(buf2, sizeof(buf2), DEST_FILE_PATH, buf, y);
                   
 		  source = map_sources_tab[wd->source].url_cb(obj, x, y, g->zoom);
+		  if(strlen(source)==0) continue;
                   
 		  eina_stringshare_replace(&gi->file, buf2);
 
