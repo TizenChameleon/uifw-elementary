@@ -382,6 +382,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 		edje_object_signal_emit(wd->base, "elm,state,min,focus,out", "elm");
 	}
 	edje_object_signal_emit(wd->base, "elm,state,focus,out", "elm");
+	evas_object_smart_callback_call(data, "changed", NULL);	
 }
 
 static void 

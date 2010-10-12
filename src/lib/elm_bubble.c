@@ -16,7 +16,12 @@ struct _Widget_Data
    Evas_Object *bbl;
    Evas_Object *content, *icon;
    const char *label, *info;
+   
+   Eina_Bool down:1;
+   Evas_Coord_Point down_point;
 };
+
+#define SWEEP_THRESHOLD	100
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
@@ -84,6 +89,35 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    _sizing_eval(obj);
 }
 
+static void
+_mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+	Evas_Event_Mouse_Down *ev = event_info;
+
+	wd->down = EINA_TRUE;
+	wd->down_point.x = ev->canvas.x;
+	wd->down_point.y = ev->canvas.y;
+}
+
+static void
+_mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+   	Evas_Event_Mouse_Up *ev = event_info;
+
+	if (!wd->down) return;
+
+	if (ev->canvas.x - wd->down_point.x > SWEEP_THRESHOLD)
+		evas_object_smart_callback_call(data, "sweep,left,right", NULL);
+	else if (wd->down_point.x - ev->canvas.x > SWEEP_THRESHOLD)
+		evas_object_smart_callback_call(data, "sweep,right,left", NULL);
+
+	wd->down = EINA_FALSE;
+	wd->down_point.x = 0;
+	wd->down_point.y = 0;	
+}
+
 /**
  * Add a new bubble to the parent
  *
@@ -116,6 +150,12 @@ elm_bubble_add(Evas_Object *parent)
    elm_widget_resize_object_set(obj, wd->bbl);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
+   evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_UP, _mouse_up, obj);
+   evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down, obj);
+
+   wd->down = EINA_FALSE;
+   wd->down_point.x = 0;
+   wd->down_point.y = 0;
 
    _sizing_eval(obj);
    return obj;
