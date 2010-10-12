@@ -907,7 +907,7 @@ elm_ctxpopup_add(Evas_Object *parent)
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
 
-   if(!e) return;
+   if(!e) return NULL;
 
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "ctxpopup");
@@ -1302,7 +1302,7 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label,
    _elm_theme_object_set(obj, wd->btn_layout, "ctxpopup", buf,
 			 elm_widget_style_get(obj));
 
-	btn = elm_button_add(obj);
+   btn = elm_button_add(obj);
 	elm_object_style_set(btn, "text_only/style1");
 	elm_button_label_set(btn, label);
 	evas_object_smart_callback_add(btn, "clicked", func, data);
@@ -1310,8 +1310,7 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label,
 	edje_object_part_swallow(wd->btn_layout, buf, btn);
 
 	edje_object_part_geometry_get(wd->btn_layout, buf, NULL, NULL, &w, &h);
-   	evas_object_size_hint_min_set(wd->btn_layout, w, h);
-   	evas_object_size_hint_max_set(wd->btn_layout, -1, h);
+	evas_object_size_hint_max_set(wd->btn_layout, -1, 60);
 
    if (wd->visible)
       _sizing_eval(obj);
