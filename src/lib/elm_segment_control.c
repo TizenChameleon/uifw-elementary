@@ -110,7 +110,6 @@ _signal_segment_on(void *data)
    wd->selected = EINA_TRUE;
 
    edje_object_signal_emit(item->base, "elm,state,segment,on", "elm");
-   edje_object_signal_emit(item->base, "elm,action,focus", "elm");
    if(!item->label_wd)
      edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
 
@@ -136,7 +135,6 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
    Elm_Segment_Item *item = (Elm_Segment_Item *) data;
    Widget_Data *wd = elm_widget_data_get(item->obj);
    if (!wd) return;
-   Evas_Coord wrap_width = 0, wrap_height = 0, w = 0, h = 0;
 
    if (item->segment_id == wd->cur_seg_id)
      {
