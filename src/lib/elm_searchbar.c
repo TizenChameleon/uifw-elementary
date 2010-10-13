@@ -163,7 +163,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
 
    // Add Entry
    wd->eb = elm_editfield_add(parent);
-   elm_object_style_set(wd->eb, "searchbar");
+   elm_object_style_set(wd->eb, "searchbar_with_bd");
    edje_object_part_swallow(wd->base, "search_textfield", wd->eb);
 //   elm_editfield_guide_text_set(wd->eb, "Search");
    elm_editfield_entry_single_line_set(wd->eb, EINA_TRUE);
@@ -330,10 +330,12 @@ EAPI void elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary)
    if (wd->boundary_mode)
    {
       _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default_with_bd");
+	  elm_object_style_set(wd->eb, "searchbar_with_bd");
    }
    else
    {
       _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default");
+	  elm_object_style_set(wd->eb, "searchbar");
    }
 
    _sizing_eval(obj);
