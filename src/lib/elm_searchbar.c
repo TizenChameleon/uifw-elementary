@@ -19,7 +19,7 @@ struct _Widget_Data
    Evas_Object *base, *eb, *cancel_btn;
    Eina_Bool cancel_btn_ani_flag;
    Eina_Bool cancel_btn_show_mode;
-   Eina_Bool background_mode;
+   Eina_Bool boundary_mode;
 };
 
 static void _del_hook(Evas_Object *obj);
@@ -184,7 +184,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
 
    wd->cancel_btn_ani_flag = EINA_FALSE;
    wd->cancel_btn_show_mode = EINA_TRUE;
-   wd->background_mode = EINA_TRUE;
+   wd->boundary_mode = EINA_TRUE;
 
    elm_widget_resize_object_set(obj, wd->base);
 
@@ -315,23 +315,23 @@ EAPI void elm_searchbar_clear(Evas_Object *obj)
  * set the searchbar background mode(with bg rect) set
  *
  * @param obj The searchbar object
- * @param bgmode The flag of background mode or not
+ * @param boundary The flag of background mode or not
  * @return void
  *
  * @ingroup Searchbar
  */
-EAPI void elm_searchbar_background_set(Evas_Object *obj, Eina_Bool bgmode)
+EAPI void elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   if (wd->background_mode == bgmode) return;
-   else wd->background_mode = bgmode;
+   if (wd->boundary_mode == boundary) return;
+   else wd->boundary_mode = boundary;
 
-   if (wd->background_mode)
+   if (wd->boundary_mode)
    {
-      _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default_with_bg");
-	  elm_object_style_set(wd->eb, "searchbar_with_bg");
+      _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default_with_bd");
+	  elm_object_style_set(wd->eb, "searchbar_with_bd");
 
    }
    else

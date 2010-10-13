@@ -2387,7 +2387,7 @@ extern "C" {
    EAPI void         elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag);
    EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible);
    EAPI void elm_searchbar_clear(Evas_Object *obj);
-   EAPI void elm_searchbar_background_set(Evas_Object *obj, Eina_Bool bgmode);
+   EAPI void elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary);
 
    /* actionsheet */
    typedef enum _Elm_Actionsheet_Button_Type 
