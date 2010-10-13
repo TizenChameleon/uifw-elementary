@@ -1364,6 +1364,7 @@ _smart_clip_unset(Evas_Object *obj)
 {
    INTERNAL_ENTRY;
    evas_object_clip_unset(sd->resize_obj);
+//   return;
 }
 
 static void

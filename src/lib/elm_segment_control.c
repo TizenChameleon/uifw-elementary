@@ -85,7 +85,7 @@ _signal_segment_off(void *data)
     
     edje_object_signal_emit(item->base, "elm,action,unfocus", "elm");
     edje_object_signal_emit(item->base, "elm,state,segment,off", "elm");
-    if(!item->label_wd)
+    if(!item->label_wd && item->label)
       {
          edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
       }
@@ -143,7 +143,7 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
        wd->selected = EINA_TRUE;
        return;
      }
-    _signal_segment_on(item);
+    _signal_segment_on((void*)item);
     if(item->label_wd)
        elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
 
@@ -363,18 +363,22 @@ _update_list(Evas_Object *obj)
         it = _item_find(obj, 0);
 	_elm_theme_object_set(obj, it->base, "segment", "base/single", elm_object_style_get(it->obj));
 	edje_object_signal_emit(it->base, "elm,state,segment,on", "elm");
-	if(!it->label_wd)
+	if(it->label && !it->label_wd)
 	  {
-	     edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
      	     edje_object_signal_emit(it->base, "elm,state,text,change", "elm");
+	     edje_object_part_text_set(it->base, "elm.text", it->label);
   	  }
-
-	if(it->label)
-	   edje_object_part_text_set(it->base, "elm.text", it->label);
+	else
+	   edje_object_signal_emit(it->base, "elm,state,text,hidden", "elm");
         if (it->icon && edje_object_part_swallow_get(it->base, "elm.swallow.content") == NULL)
           {
-	edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
-	edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+           if(it->icon)
+             {
+                edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
+                edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+             }
+           else
+              edje_object_signal_emit(it->base, "elm,state,icon,hidden", "elm");
           }
 	edje_object_message_signal_process(it->base);
 
@@ -397,18 +401,23 @@ _update_list(Evas_Object *obj)
 
 	  }
 	  
-	if(!it->label_wd)
+	if(it->label && !it->label_wd)
 	  {
 	     edje_object_signal_emit(it->base, "elm,state,text,visible", "elm");
+	     edje_object_part_text_set(it->base, "elm.text", it->label);
   	  }
-
-	if(it->label)
-          edje_object_part_text_set(it->base, "elm.text", it->label);
+        else
+           edje_object_signal_emit(it->base, "elm,state,text,hidden", "elm");
 
         if (it->icon && edje_object_part_swallow_get(it->base, "elm.swallow.content") == NULL)
           {
-	edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
-	edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+             if(it->icon)
+               {
+                  edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
+                  edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+               }
+             else
+                edje_object_signal_emit(it->base, "elm,state,icon,hidden", "elm");
           }
 	edje_object_message_signal_process(it->base);
 

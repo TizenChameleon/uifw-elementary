@@ -104,7 +104,7 @@ _sizing_eval(Evas_Object *obj)
 /**
  * Unswallow the user content
  *
- * @param obj		SlidingDrawer object
+ * @param[in] obj		SlidingDrawer object
  * @return 		The unswallowed contents
  *
  * @ingroup SlidingDrawer
@@ -128,8 +128,8 @@ elm_slidingdrawer_content_unset(Evas_Object *obj)
 /**
  * Swallow the user contents
  *
- * @param obj 		SlidingDrawer object
- * @param content       Content to be swallowed.
+ * @param[in] obj 		SlidingDrawer object
+ * @param[in] content       Content to be swallowed.
  *
  * @ingroup SlidingDrawer
  */
@@ -157,8 +157,8 @@ elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content)
 /**
  * Set the position of SlidingDrawer
  *
- * @param obj 		SlidingDrawer object
- * @param pos       	
+ * @param[in] obj 		SlidingDrawer object
+ * @param[in] pos       	
  *
  * @ingroup SlidingDrawer
  */
@@ -193,9 +193,9 @@ elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos)
 /**
  * Set the current dragable value.
  *
- * @param obj 		SlidingDrawer object
- * @param dx  	        The x value (range: 0 ~ 1)
- * @param dy            The y value (range: 0 ~ 1)
+ * @param[in] obj 		SlidingDrawer object
+ * @param[in] dx  	        The x value (range: 0 ~ 1)
+ * @param[in] dy            The y value (range: 0 ~ 1)
  *
  * @ingroup SlidingDrawer
  */
@@ -211,9 +211,9 @@ elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy)
 /**
  * Set the dragable max value.
  *
- * @param obj 		SlidingDrawer object
- * @param dw  	        The maximum width value (range: 0 ~ 1)
- * @param dh            The maximum height value (range: 0 ~ 1)
+ * @param[in] obj 		SlidingDrawer object
+ * @param[in] dw  	        The maximum width value (range: 0 ~ 1)
+ * @param[in] dh            The maximum height value (range: 0 ~ 1)
  *
  * @ingroup SlidingDrawer
  */
@@ -237,7 +237,7 @@ elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh)
 /**
  * Add a new slidingdrawer object to the parent.
  *
- * @param parent 	Parent object
+ * @param[in] parent 	Parent object
  * @return 		New object or NULL if it cannot be created
  *
  * @ingroup SlidingDrawer

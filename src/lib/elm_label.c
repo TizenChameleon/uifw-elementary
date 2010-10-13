@@ -27,6 +27,7 @@ struct _Widget_Data
    Eina_Bool changed : 1;
    Eina_Bool bgcolor : 1;
    Eina_Bool ellipsis : 1;
+   int slide_duration;
 };
 
 static const char *widtype = NULL;
@@ -510,6 +511,12 @@ void _label_sliding_change(Evas_Object *obj)
 		   wd->slidingellipsis = EINA_TRUE;
 		   elm_label_ellipsis_set(obj, EINA_FALSE);
 	   }
+	   Edje_Message_Int_Set *msg = alloca(sizeof(Edje_Message_Int_Set) + (sizeof(int)));
+	   
+	   msg->count=1;
+	   msg->val[0] = (int)wd->slide_duration;
+
+	   edje_object_message_send(wd->lbl, EDJE_MESSAGE_INT_SET, 0, msg);
 	   edje_object_signal_emit(wd->lbl, "elm,state,slide,start", "elm");
    }
    else
@@ -559,6 +566,7 @@ elm_label_add(Evas_Object *parent)
    wd->slidingellipsis = EINA_FALSE;
    wd->wrap_w = 0;
    wd->wrap_h = 0;
+   wd->slide_duration = 10;
 
    wd->lbl = edje_object_add(e);
    _elm_theme_object_set(obj, wd->lbl, "label", "base", "default");
@@ -915,4 +923,43 @@ elm_label_slide_get(Evas_Object *obj)
    if (!wd) return EINA_FALSE;
 
    return wd->slidingmode;
+}
+
+/**
+ * set the slide duration(speed) of the label
+ *
+ * @param obj The label object
+ * @return The duration time in moving text from slide begin position to slide end position
+ * @ingroup Label
+ */
+EAPI void
+elm_label_slide_duration_set(Evas_Object *obj, int duration)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Edje_Message_Int_Set *msg = alloca(sizeof(Edje_Message_Int_Set) + (sizeof(int)));
+   
+   if (!wd) return;
+   wd->slide_duration = duration;
+
+   msg->count=1;
+   msg->val[0] = (int)wd->slide_duration;
+
+   edje_object_message_send(wd->lbl, EDJE_MESSAGE_INT_SET, 0, msg);
+}
+
+/**
+ * get the slide duration(speed) of the label
+ *
+ * @param obj The label object
+ * @return The duration time in moving text from slide begin position to slide end position
+ * @ingroup Label
+ */
+EAPI int
+elm_label_slide_duration_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   return wd->slide_duration;
 }

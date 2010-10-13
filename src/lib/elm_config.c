@@ -18,7 +18,10 @@ static void _desc_shutdown(void);
 static void _profile_get(void);
 static void _config_free(void);
 static void _config_apply(void);
+static Elm_Config * _config_user_load(void);
+static Elm_Config * _config_system_load(void);
 static void _config_load(void);
+static void _config_update(void);
 static void _env_get(void);
 
 #ifdef HAVE_ELEMENTARY_X
@@ -85,6 +88,14 @@ _prop_config_get(void)
    config_data = eet_data_descriptor_decode(_config_edd, data, size);
    free(data);
    if (!config_data) return EINA_FALSE;
+ /* What do we do on version mismatch when someone changes the
+ * config in the rootwindow? */
+ /* Most obvious case, new version and we are still linked to
+ * whatever was there before, we just ignore until user restarts us */
+ if (config_data->config_version > ELM_CONFIG_VERSION)
+ return EINA_TRUE;
+/* What in the case the version is older? Do we even support those
+* cases or we only check for equality above? */
    _config_free();
    _elm_config = config_data;
    _config_apply();
@@ -149,7 +160,6 @@ _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev)
 
              val = ecore_x_window_prop_string_get(event->win,
                                                   event->atom);
-             eina_stringshare_replace(&_elm_config->theme, val);
              if (val)
                {
                   int changed = 0;
@@ -252,6 +262,7 @@ _desc_init(void)
         printf("EEEK! eet_data_descriptor_file_new() failed\n");
         return;
      }
+   EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "config_version", config_version, EET_T_INT);
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "engine", engine, EET_T_INT);
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "thumbscroll_enable", thumbscroll_enable, EET_T_INT);
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "thumbscroll_threshhold", thumbscroll_threshhold, EET_T_INT);
@@ -273,6 +284,7 @@ _desc_init(void)
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "fps", fps, EET_T_DOUBLE);
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "theme", theme, EET_T_STRING);
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "modules", modules, EET_T_STRING);
+   EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "password_show_last_character", password_show_last_character, EET_T_INT);
 }
 
 static void
@@ -371,38 +383,74 @@ _config_apply(void)
    edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
 }
 
+static Elm_Config *
+_config_user_load(void)
+{
+   Elm_Config *cfg = NULL;
+   Eet_File *ef;
+   char buf[PATH_MAX];
+   const char *home;
+
+   home = getenv("HOME");
+   if (!home) home = "";
+
+   snprintf(buf, sizeof(buf), "%s/.elementary/config/%s/base.cfg", home,
+            _elm_profile);
+   ef = eet_open(buf, EET_FILE_MODE_READ);
+   if (ef)
+     {
+        cfg = eet_data_read(ef, _config_edd, "config");
+        eet_close(ef);
+     }
+   return cfg;
+}
+
+static Elm_Config *
+_config_system_load(void)
+{
+   Elm_Config *cfg = NULL;
+   Eet_File *ef;
+   char buf[PATH_MAX];
+
+   snprintf(buf, sizeof(buf), "%s/config/%s/base.cfg", _elm_data_dir,
+            _elm_profile);
+   ef = eet_open(buf, EET_FILE_MODE_READ);
+   if (ef)
+     {
+        cfg = eet_data_read(ef, _config_edd, "config");
+        eet_close(ef);
+     }
+   return cfg;
+}
+
+
 static void
 _config_load(void)
 {
-   Eet_File *ef = NULL;
-   char buf[PATH_MAX];
-   const char *home = NULL;
+   _elm_config = _config_user_load();
    
-   home = getenv("HOME");
-   if (!home) home = "/";
    
    // user config
-   snprintf(buf, sizeof(buf), "%s/.elementary/config/%s/base.cfg", home, _elm_profile);
-   ef = eet_open(buf, EET_FILE_MODE_READ);
-   if (ef)
+   if (_elm_config)
      {
-        _elm_config = eet_data_read(ef, _config_edd, "config");
-        eet_close(ef);
+        if (_elm_config->config_version < ELM_CONFIG_VERSION)
+          _config_update();
+        return;
      }
+
+   /* no user config, fallback for system. No need to check version for
+    * this one, if it's not the right one, someone screwed up at the time
+    * of installing it */
+   _elm_config = _config_system_load();
    if (_elm_config) return;
-   
-   // system config
-   snprintf(buf, sizeof(buf), "%s/config/%s/base.cfg", _elm_data_dir, _elm_profile);
-   ef = eet_open(buf, EET_FILE_MODE_READ);
-   if (ef)
-     {
-        _elm_config = eet_data_read(ef, _config_edd, "config");
-        eet_close(ef);
-     }
-   if (_elm_config) return;
+   /* FIXME: config load could have failed because of a non-existent
+    * profile. Fallback to default before moving on */
 
    // config load fail - defaults
+   /* XXX: do these make sense? Only if it's valid to install the lib
+    * without the config, but do we want that? */
    _elm_config = ELM_NEW(Elm_Config);
+   _elm_config->config_version = ELM_CONFIG_VERSION;
    _elm_config->engine = ELM_SOFTWARE_X11;
    _elm_config->thumbscroll_enable = 1;
    _elm_config->thumbscroll_threshhold = 24;
@@ -424,9 +472,43 @@ _config_load(void)
    _elm_config->fps = 60.0;
    _elm_config->theme = eina_stringshare_add("default");
    _elm_config->modules = NULL;
-   _elm_config->input_panel_enable = 0;
-   _elm_config->autocapital_allow = 0;
-   _elm_config->autoperiod_allow = 0;
+   _elm_config->password_show_last_character = 0;
+}
+static void
+_config_update(void)
+{
+   Elm_Config *tcfg;
+   tcfg = _config_system_load();
+   if (!tcfg)
+     {
+        return;
+     }
+#define IFCFG(v) if ((_elm_config->config_version & 0xffff) < (v)) {
+#define IFCFGELSE } else {
+#define IFCFGEND }
+#define COPYVAL(x) do {_elm_config->x = tcfg->x;} while(0)
+#define COPYPTR(x) do {_elm_config->x = tcfg->x; tcfg->x = NULL; } while(0)
+#define COPYSTR(x) COPYPTR(x)
+
+   /* we also need to update for property changes in the root window
+    * if needed, but that will be dependant on new properties added
+    * with each version */
+
+   /* nothing here, just an example */
+   /*
+   IFCFG(0x0002);
+   COPYVAL(some_value);
+   IFCFGEND;
+   */
+
+#undef COPYSTR
+#undef COPYPTR
+#undef COPYVAL
+#undef IFCFGEND
+#undef IFCFGELSE
+#undef IFCFG
+
+   /* after updating user config, we must save */
 }
 
 static void
@@ -565,6 +647,8 @@ _env_get(void)
    s = getenv("ELM_FINGER_SIZE");
    if (s) _elm_config->finger_size = atoi(s);
 
+   s = getenv("ELM_PASSWORD_SHOW_LAST_CHARACTER");
+   if (s) _elm_config->password_show_last_character = atoi(s);
    s = getenv("ELM_FPS");
    if (s) _elm_config->fps = atof(s);
    if (_elm_config->fps < 1.0) _elm_config->fps = 1.0;
