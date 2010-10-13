@@ -1115,12 +1115,13 @@ elm_segment_control_item_label_object_set(Elm_Segment_Item *item, char *label)
    if(!wd) return NULL;
    if(!label) return NULL;
 
-   item->label_wd = elm_label_add(item->obj);	
+   item->label_wd = elm_label_add(item->obj);
    elm_label_label_set(item->label_wd, label);
    elm_label_text_align_set(item->label_wd, "middle");
    elm_label_ellipsis_set(item->label_wd, 1);
    elm_label_line_wrap_set(item->label_wd, 1);
    eina_stringshare_replace(&item->label, label);
+   elm_object_style_set(item->label_wd, "segment");
 
    return item->label_wd;
 }
