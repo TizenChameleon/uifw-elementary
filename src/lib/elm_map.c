@@ -1223,17 +1223,6 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
       mdevice = get_multi_device();
       if(mdevice == 0) {
          if(ev0->hold_timer == NULL){
-            if (!wd) return;
-            if (ev->button != 1) return;
-            if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) wd->on_hold = EINA_TRUE;
-            else wd->on_hold = EINA_FALSE;
-            if (wd->long_timer){
-               ecore_timer_del(wd->long_timer);
-               wd->long_timer = NULL;
-            }
-            if (!wd->on_hold)
-               evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
-            wd->on_hold = EINA_FALSE;
          }else{
             ecore_timer_del(ev0->hold_timer);
             ev0->hold_timer = NULL;
@@ -1248,16 +1237,30 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    }else{
       printf("[%d] Cannot get event0\n", __LINE__);
    }
-   
+   if (!wd) return;
+   if (ev->button != 1) return;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) wd->on_hold = EINA_TRUE;
+   else wd->on_hold = EINA_FALSE;
+   if (wd->long_timer){
+      ecore_timer_del(wd->long_timer);
+      wd->long_timer = NULL;
+   }
+   if (!wd->on_hold)
+   evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+   wd->on_hold = EINA_FALSE;
 }
 
 static void
 _mouse_multi_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-
    struct event_t *ev;
    Evas_Event_Multi_Down *down = event_info;
+
+   elm_smart_scroller_hold_set(wd->scr, 1);
+   elm_smart_scroller_freeze_set(wd->scr, 1);
+   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 1);
+   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 1);
       
    ev = get_event_object(down->device);
    if(ev) return;
@@ -1298,29 +1301,16 @@ _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    }
 
    dis_new = get_distance(ev0->prev.x, ev0->prev.y, ev->prev.x, ev->prev.y);
-   int tmp;
-   double lon, lat;
    int zoom = wd->zoom;
    
-   elm_map_geo_region_get(data, &lon, &lat);
    if(dis_old != 0) {
       if(dis_old - dis_new > 0 && ev->pinch_dis > TOUCH_HOLD_RANGE){
          --zoom;
          elm_map_zoom_set(data, zoom);
-       /*  Eina_Bool b = elm_map_paused_get(data);
-         elm_map_paused_set(data, EINA_TRUE);
-         elm_map_geo_region_show(data, lon, lat);
-         elm_map_zoom_set(data, zoom);
-         elm_map_paused_set(data, b);*/
          ev->pinch_dis = 0;
       }else if(dis_old - dis_new < 0 && ev->pinch_dis < -TOUCH_HOLD_RANGE){
          ++zoom;
          elm_map_zoom_set(data, zoom);
-         /*Eina_Bool b = elm_map_paused_get(data);
-         elm_map_paused_set(data, EINA_TRUE);
-         elm_map_geo_region_show(data, lon, lat);
-         elm_map_zoom_set(data, zoom);
-         elm_map_paused_set(data, b);*/
          ev->pinch_dis = 0;
       }
 
@@ -1333,10 +1323,14 @@ static void
 _mouse_multi_up(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-
    Evas_Event_Multi_Up *up = (Evas_Event_Multi_Up *)event_info;
    struct event_t *ev0;
    struct event_t *ev;
+
+   elm_smart_scroller_hold_set(wd->scr, 0);
+   elm_smart_scroller_freeze_set(wd->scr, 0);
+   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
+   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);
 
    ev = get_event_object(up->device);
    if(ev == NULL){
@@ -2091,7 +2085,8 @@ elm_map_zoom_set(Evas_Object *obj, int zoom)
    if (zoom < map_sources_tab[wd->source].zoom_min)
      zoom = map_sources_tab[wd->source].zoom_min;
    if (zoom == wd->zoom) return;
-   
+   if (wd->zoom_animator) return;
+
    wd->zoom = zoom;
    wd->size.ow = wd->size.w;
    wd->size.oh = wd->size.h;
