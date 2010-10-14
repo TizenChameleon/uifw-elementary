@@ -156,14 +156,14 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    wd->base = edje_object_add(e);
    if (wd->base == NULL) return NULL;
 
-   _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default_with_bd");
+   _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default");
 
    //	evas_object_size_hint_weight_set(wd->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    //	evas_object_size_hint_align_set(wd->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    // Add Entry
    wd->eb = elm_editfield_add(parent);
-   elm_object_style_set(wd->eb, "searchbar_with_bd");
+   elm_object_style_set(wd->eb, "searchbar");
    edje_object_part_swallow(wd->base, "search_textfield", wd->eb);
 //   elm_editfield_guide_text_set(wd->eb, "Search");
    elm_editfield_entry_single_line_set(wd->eb, EINA_TRUE);
@@ -311,10 +311,10 @@ EAPI void elm_searchbar_clear(Evas_Object *obj)
 }
 
 /**
- * set the searchbar background mode(with bg rect) set
+ * set the searchbar boundary rect mode(with bg rect) set
  *
  * @param obj The searchbar object
- * @param boundary The flag of background mode or not
+ * @param boundary The present flag of boundary rect or not
  * @return void
  *
  * @ingroup Searchbar
@@ -329,13 +329,11 @@ EAPI void elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary)
 
    if (wd->boundary_mode)
    {
-      _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default_with_bd");
-	  elm_object_style_set(wd->eb, "searchbar_with_bd");
+	   edje_object_signal_emit(wd->base, "BDSHOW", "PROG");
    }
    else
    {
-      _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default");
-	  elm_object_style_set(wd->eb, "searchbar");
+	   edje_object_signal_emit(wd->base, "BDHIDE", "PROG");
    }
 
    _sizing_eval(obj);
