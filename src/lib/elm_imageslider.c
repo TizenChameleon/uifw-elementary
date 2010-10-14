@@ -17,20 +17,23 @@
 
 typedef struct _Widget_Data Widget_Data;
 
-#define ANI_STEP				(14 * elm_scale_get())
-#define ANI_TIME				(0.005)
+#define ANI_STEP			(14 * elm_scale_get())
+#define ANI_TIME			(0.005)
 #define ANI_TIME_MSEC		(12)
+#define CLICK_TIME_MAX		(180)
+#define CLICK_WIDTH_MIN		(elm_finger_size_get() >> 1)
 #define FLICK_TIME_MAX		(200)
-#define FLICK_WIDTH_MIN	(elm_finger_size_get() >> 2)
+#define FLICK_WIDTH_MIN		(elm_finger_size_get() >> 2)
 #define MOVE_STEP			(3)
-#define STEP_WEIGHT_DEF	(1)
-#define STEP_WEIGHT_MAX	(2)
-#define STEP_WEIGHT_MIN	(0)
+#define STEP_WEIGHT_DEF		(1)
+#define STEP_WEIGHT_MAX		(2)
+#define STEP_WEIGHT_MIN		(0)
 #define MOVING_IMAGE_SIZE	(128)
 #define MAX_ZOOM_SIZE		(6)
 #define INTERVAL_WIDTH		(15)
 #define MULTITOUCHDEVICE	(11)
 
+// Enumeration for layout.
 enum {
 	BLOCK_LEFT = 0,
 	BLOCK_CENTER,
@@ -38,6 +41,8 @@ enum {
 	BLOCK_MAX
 };
 
+
+// Image Slider Item.
 struct _Imageslider_Item 
 {
 	Evas_Object *obj;
@@ -49,6 +54,7 @@ struct _Imageslider_Item
 	int moving : 1;
 };
 
+// Image Slider Widget Data.
 struct _Widget_Data
 {
 	Evas_Object *ly[BLOCK_MAX];
@@ -79,17 +85,17 @@ struct _Widget_Data
 	int ratio;
 };
 
+// Global value definition.
 static const char *widtype = NULL;
 static const char SIG_CLICKED[] = "clicked";
 
+// Internal function definition.
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _imageslider_del_all(Widget_Data *wd);
 static void _imageslider_move(void *data,Evas *e, Evas_Object *obj, void *event_info);
 static void _imageslider_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
-//static void _imageslider_show(Evas_Object *obj);
-//static void _imageslider_hide(Evas_Object *obj);
 static void _imageslider_show(void * data, Evas * e, Evas_Object * obj, void * event_info);
 static void _imageslider_hide(void * data, Evas * e, Evas_Object * obj, void * event_info);
 static void _imageslider_update(Widget_Data *wd);
@@ -109,13 +115,12 @@ static void ev_imageslider_up_cb(void *data, Evas *e, Evas_Object *obj, void *ev
 static void ev_imageslider_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 
+// Whenever the Image Slider item is deleted, Call this funtion.
 static void _del_hook(Evas_Object * obj)
 {
 	int i;
 	Widget_Data * wd;
 	wd = elm_widget_data_get(obj);
-	
-	//fprintf( stderr, "Call imageslider del hook!\n" );
 	
 	if (!wd) return;
 
@@ -142,6 +147,7 @@ static void _del_hook(Evas_Object * obj)
 	
 }
 
+// Whenever require processing theme, Call this function
 static void _theme_hook(Evas_Object * obj)
 {
 	int i;
@@ -162,7 +168,7 @@ static void _theme_hook(Evas_Object * obj)
 	_sizing_eval(obj);	
 }
 
-
+// Resize Image Slider item.
 static void _sizing_eval(Evas_Object * obj)
 {
 	Evas *e;
@@ -179,6 +185,7 @@ static void _sizing_eval(Evas_Object * obj)
 
 }
 
+// Whenever MOVE event occurs, Call this function.
 static void _imageslider_move(void * data, Evas * e, Evas_Object * obj, void * event_info)
 {
 	Widget_Data *wd;
@@ -202,6 +209,7 @@ static void _imageslider_move(void * data, Evas * e, Evas_Object * obj, void * e
 	
 }
 
+// Whenever RESIZE event occurs, Call this fucntion.
 static void _imageslider_resize(void * data, Evas * e, Evas_Object * obj, void * event_info)
 {
 	int i;
@@ -232,8 +240,7 @@ static void _imageslider_resize(void * data, Evas * e, Evas_Object * obj, void *
 	
 }
 
-
-//static void _imageslider_show(Evas_Object * obj)
+// Whenever SHOW event occurs, Call this function.
 static void _imageslider_show(void *data, Evas *e, Evas_Object * obj, void *event_info)
 {
 	Widget_Data *wd;
@@ -250,7 +257,7 @@ static void _imageslider_show(void *data, Evas *e, Evas_Object * obj, void *even
 	evas_object_show(wd->clip);
 }
 
-//static void _imageslider_hide(Evas_Object *obj)
+// Whenever HIDE event occurs, Call this function.
 static void _imageslider_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
 	Widget_Data *wd;
@@ -266,6 +273,7 @@ static void _imageslider_hide(void *data, Evas *e, Evas_Object *obj, void *event
 	evas_object_hide(wd->clip);
 }
 
+// Delete all Image Slider items.
 static void _imageslider_del_all(Widget_Data * wd)
 {
    
@@ -280,6 +288,7 @@ static void _imageslider_del_all(Widget_Data * wd)
 	}
 }
 
+// Update Image Slider item position.
 static void _imageslider_update_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord y, Evas_Coord w)
 {
 	evas_object_move(wd->ly[BLOCK_LEFT], x - (w + INTERVAL_WIDTH), y);
@@ -288,6 +297,7 @@ static void _imageslider_update_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord y
 	evas_render_idle_flush(evas_object_evas_get(wd->obj));
 }
 
+// Update the center position of Image Slider item.
 static void _imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord my, Evas_Coord y, Evas_Coord w)
 {
 	Evas_Object *eo;
@@ -298,15 +308,12 @@ static void _imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_
 
 	if ((ix > 0) || (ix + iw < wd->w)) {
 		edje_object_signal_emit(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "block.on", "block");
-//		edje_freeze();
-//		evas_event_feed_mouse_cancel(evas_object_evas_get(wd->obj), NULL, NULL);
-//		evas_event_feed_mouse_down(evas_object_evas_get(wd->obj), 1, EVAS_BUTTON_NONE, NULL, NULL);		
-
 		_imageslider_update_pos(wd, x, y, w);
 		wd->on_zoom = EINA_FALSE;
 	}
 }
 
+// Add previous/next Image Slider item.
 static Evas_Object *_imageslider_add_obj(Widget_Data *wd)
 {
 	Evas_Object *eo;
@@ -326,6 +333,7 @@ static Evas_Object *_imageslider_add_obj(Widget_Data *wd)
 	return eo;
 }
 
+// Shift next/previous Image Slider item in layouts.
 static void _imageslider_obj_shift(Widget_Data *wd, Eina_Bool left)
 {
 	if (!left) {
@@ -349,7 +357,7 @@ static void _imageslider_obj_shift(Widget_Data *wd, Eina_Bool left)
 	}
 }
 
-
+// Move the current Image Slider item and update.
 static void _imageslider_obj_move(Widget_Data * wd, Evas_Coord step)
 {
 	if (step > 0) {
@@ -383,6 +391,7 @@ static void _imageslider_obj_move(Widget_Data * wd, Evas_Coord step)
 	_imageslider_update(wd);
 }
 
+// Whenever MOUSE DOWN event occurs, Call this function.
 static void ev_imageslider_down_cb(void * data, Evas * e, Evas_Object * obj, void * event_info)
 {
 	Widget_Data *wd = data;
@@ -413,10 +422,9 @@ static void ev_imageslider_down_cb(void * data, Evas * e, Evas_Object * obj, voi
 //		edje_thaw();		
 	}
 
-	//fprintf( stderr, "-- down! --\n" );
-
 }
 
+// Whenever MOUSE UP event occurs, Call this function.
 static void ev_imageslider_up_cb(void * data, Evas * e, Evas_Object * obj, void * event_info)
 {
 	Widget_Data *wd = data;
@@ -430,22 +438,45 @@ static void ev_imageslider_up_cb(void * data, Evas * e, Evas_Object * obj, void 
 	} else {
 		step = wd->down_pos.x - ev->canvas.x;
 		interval = ev->timestamp - wd->timestamp;
-		if (step == 0 || interval == 0) return;
+		if (step == 0 || interval == 0) {
+		     fprintf(stderr, "[[[ DEBUG ]]]: case1: emit CLICK event\n");
+		     evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+		     return;
+		}
+		if (interval < CLICK_TIME_MAX) {
+			if (step < CLICK_WIDTH_MIN && step > CLICK_WIDTH_MIN) {
+				fprintf(stderr, "[[[ DEBUG ]]]: case2: emit CLICK event\n");
+				evas_object_smart_callback_call(data, SIG_CLICKED, NULL);			
+				return;
+			}
+		}
 
 		if (interval < FLICK_TIME_MAX) {
-			if (step < FLICK_WIDTH_MIN && step > FLICK_WIDTH_MIN) _imageslider_obj_move(wd, 0);
-			else _imageslider_obj_move(wd, step);
+		      
+			if (step < FLICK_WIDTH_MIN && step > FLICK_WIDTH_MIN) {
+			     fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-black zone (1)\n");
+			     
+			     _imageslider_obj_move(wd, 0);
+			} else {
+			     fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-black zone (2)\n");
+			     _imageslider_obj_move(wd, step);
+			}
+			
 		} else {
 			step = (wd->x - wd->move_x) << 1;
-			if (step <= wd->w && step >= -(wd->w)) _imageslider_obj_move(wd, 0);
-			else _imageslider_obj_move(wd, step);
+			if (step <= wd->w && step >= -(wd->w)) {
+			     fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-white zone (1)\n");
+			     _imageslider_obj_move(wd, 0);
+			} else {
+			     fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-white zone (2)\n");
+			     _imageslider_obj_move(wd, step);
+			}
 		}
 	}
 
-	//fprintf( stderr, "-- up! --\n" );
-
 }
 
+// Whenever MOUSE MOVE event occurs, Call this API.
 static void ev_imageslider_move_cb(void * data, Evas * e, Evas_Object * obj, void * event_info)
 {
 	int idx;
@@ -498,104 +529,15 @@ static void ev_imageslider_move_cb(void * data, Evas * e, Evas_Object * obj, voi
 
 }
 
-
+// Whenever CLICK event occurs, Call this API
+// But, DONOT emit CLICK event.
 static void
 _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-	//fprintf(stderr, "[[[ DEBUG ]]]: (EFL) SIGNAL CLICKED!!\n");
-	evas_object_smart_callback_call(data, SIG_CLICKED, NULL);	
+	fprintf(stderr, "[[[ DEBUG ]]]: Call the callback function about Click event!, But DONOT emit CLICK event in the callback function!\n");
+	//evas_object_smart_callback_call(data, SIG_CLICKED, NULL);	
 }
 
-#if 0 // REMOVED about Multi-touch.
-static void ev_imageslider_multi_down_cb(void * data, Evas * e, Evas_Object * obj, void * event_info)
-{
-	Evas_Event_Multi_Down *ev = event_info;
-	Widget_Data *wd = data;
-
-	if (ev->device == MULTITOUCHDEVICE) return;
-
-	wd->on_hold = EINA_TRUE;
-	wd->mdx = ev->canvas.x;
-	wd->mdy = ev->canvas.y;
-	wd->mmx = ev->canvas.x;
-	wd->mmy = ev->canvas.y;
-
-	wd->dratio = sqrt((wd->mx - wd->mmx)*(wd->mx - wd->mmx) + (wd->my - wd->mmy)*(wd->my - wd->mmy));
-	wd->ratio = sqrt((wd->mx - wd->mmx)*(wd->mx - wd->mmx)+ (wd->my - wd->mmy)*(wd->my - wd->mmy));
-
-	if (wd->on_zoom){
-		wd->on_zoom = EINA_FALSE;
-		edje_object_signal_emit(elm_layout_edje_get(obj), "block.on", "block");
-//		edje_freeze();
-	}
-}
-
-static void ev_imageslider_multi_up_cb(void * data, Evas * e, Evas_Object * obj, void * event_info)
-{
-	Evas_Event_Multi_Up *ev = event_info;
-	Widget_Data *wd = data;
-	Elm_Imageslider_Item *it;
-
-	if (ev->device == MULTITOUCHDEVICE) return;
-
-	it = eina_list_data_get(wd->cur);
-	it->w = (int)it->w * wd->ratio/wd->dratio;
-	it->h = (int)it->h * wd->ratio/wd->dratio;
-
-	if (it->w != it->ow) {
-		wd->on_zoom = EINA_TRUE;
-		edje_object_signal_emit(elm_layout_edje_get(obj), "block.off", "block");
-//		edje_thaw();
-	} else {
-		wd->on_zoom = EINA_FALSE;
-	}
-
-	wd->on_hold = EINA_FALSE;
-	wd->mdx = 0;
-	wd->mdy = 0;
-	wd->mmx = 0;
-	wd->mmy = 0;
-	wd->ratio = 0;
-	wd->dratio = 0;
-	
-}
-
-static void ev_imageslider_multi_move_cb(void * data, Evas * e, Evas_Object * obj, void * event_info)
-{
-	Evas_Event_Multi_Move *ev = event_info;
-	Widget_Data *wd = data;
-	Evas_Object *eo = NULL;
-	Elm_Imageslider_Item *it;
-
-	if (ev->device == MULTITOUCHDEVICE) return;
-
-	if ((wd->mdx == 0) && (wd->mdy == 0) && (wd->mmx == 0) && (wd->mmy == 0)) {
-		wd->mdx = ev->cur.canvas.x;
-		wd->mdy = ev->cur.canvas.y;
-		wd->mmx = ev->cur.canvas.x;
-		wd->mmy = ev->cur.canvas.y;
-
-		wd->dratio = sqrt((wd->dx - wd->mdx)*(wd->dx - wd->mdx) + (wd->dy - wd->mdy)*(wd->dy - wd->mdy));
-	}
-
-	wd->mmx = ev->cur.canvas.x;
-	wd->mmy = ev->cur.canvas.y;
-	wd->ratio = sqrt((wd->mx - wd->mmx)*(wd->mx - wd->mmx) + (wd->my - wd->mmy)*(wd->my - wd->mmy));
-
-	eo = edje_object_part_swallow_get(elm_layout_edje_get(obj), "swl.photo");
-
-	if (eo) {
-		it = eina_list_data_get(wd->cur);
-		if (((it->w * wd->ratio/wd->dratio)/it->ow) < MAX_ZOOM_SIZE) {
-			edje_object_part_unswallow(elm_layout_edje_get(obj), eo);
-			evas_object_resize(eo, it->w * wd->ratio/wd->dratio, it->h * wd->ratio/wd->dratio);
-			evas_object_size_hint_min_set(eo, it->w * wd->ratio/wd->dratio, it->h * wd->ratio/wd->dratio);
-			edje_object_part_swallow(elm_layout_edje_get(obj), "swl.photo", eo);
-		}
-	}	
-}
-
-#endif // about Multi-touch.
 
 static inline double time_get(Evas_Coord x, Evas_Coord w)
 {
@@ -679,7 +621,6 @@ static void _check_zoom(void *data)
 	}
 }
 
-
 static Eina_Bool _timer_cb(void *data)
 {
 	Widget_Data *wd;
@@ -734,7 +675,7 @@ static Eina_Bool _timer_cb(void *data)
 	return ECORE_CALLBACK_RENEW;	
 }
 
-	
+
 static void _anim(Widget_Data *wd)
 {
 	Evas_Coord w;
@@ -754,6 +695,7 @@ static void _anim(Widget_Data *wd)
 	}	
 }
 
+// Update Image Slider Items.
 static void _imageslider_update(Widget_Data *wd)
 {
 	int i;
@@ -910,6 +852,48 @@ elm_imageslider_item_append(Evas_Object * obj, const char * photo_file, Elm_Imag
 	_imageslider_update(wd);
 
 	return it; 
+}
+
+/**
+* Insert an Image Slider item into the Image Slider Widget by using the given index.
+*
+* @param 	obj			The Image Slider object
+* @param 	photo_file 	photo file path
+* @param 	func		callback function
+* @param 	index		required position
+* @param 	data 		callback data
+* @return 	The Image Slider item handle or NULL
+*
+* @ingroup	Imageslider
+*/
+EAPI Elm_Imageslider_Item *
+elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, unsigned int n, void *data)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+	Widget_Data *wd;
+	Elm_Imageslider_Item *it;
+
+	fprintf(stderr, "[[[ DEBUG ]]]:: New elm_imageslider_item_append_relative()\n");
+
+	if (!obj || !(wd = elm_widget_data_get(obj))) {
+		return NULL;
+	}
+
+	it = (Elm_Imageslider_Item *)calloc(1, sizeof(Elm_Imageslider_Item));
+	if (!it) return NULL;
+	
+	it->obj = obj;
+	it->photo_file = eina_stringshare_add(photo_file);
+	it->func = func;
+	it->data = data;
+
+	wd->its = eina_list_append_relative(wd->its, it, eina_list_nth(wd->its, n-2));
+
+	if (!wd->cur) wd->cur = wd->its;
+
+	_imageslider_update(wd);
+
+	return it;
 }
 
 

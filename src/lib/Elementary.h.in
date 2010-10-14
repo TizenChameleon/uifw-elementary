@@ -2838,6 +2838,7 @@ extern "C" {
    typedef void (*Elm_Imageslider_Cb)(void *data, Evas_Object *obj, void *event_info);
    EAPI Evas_Object           *elm_imageslider_add(Evas_Object *parent);
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, unsigned int n, void *data);
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_prepend(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data);
    EAPI void                   elm_imageslider_item_del(Elm_Imageslider_Item *it);
    EAPI Elm_Imageslider_Item  *elm_imageslider_selected_item_get(Evas_Object *obj);
