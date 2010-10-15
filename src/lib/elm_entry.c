@@ -2317,14 +2317,19 @@ elm_entry_entry_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *text;
    if (!wd) return NULL;
+   
+   if ((wd->text)&&(wd->password))
+   return elm_entry_markup_to_utf8(wd->text);
+	
    if (wd->text) return wd->text;
    text = edje_object_part_text_get(wd->ent, "elm.text");
    if (!text)
-     {
+	 {
 	ERR("text=NULL for edje %p, part 'elm.text'", wd->ent);
 	return NULL;
-     }
+	 }
    eina_stringshare_replace(&wd->text, text);
+   if(wd->password)return elm_entry_markup_to_utf8(wd->text);
    return wd->text;
 }
 
