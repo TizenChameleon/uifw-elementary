@@ -2091,6 +2091,7 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->editable = wd->editable;
    ext_mod->have_selection = wd->have_selection;
    ext_mod->password = wd->password;
+   ext_mod->selmode = wd->selmode;
    ext_mod->cnpinit = _cnpinit;
    ext_mod->context_menu = wd->context_menu;
 }
