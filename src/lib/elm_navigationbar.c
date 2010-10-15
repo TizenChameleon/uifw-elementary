@@ -328,7 +328,6 @@ _transition_complete_cb(void *data)
 		content = it->content;
 	}
 	edje_object_message_signal_process(wd->base);
-	evas_object_smart_callback_call(navi_bar, "updated", content);
 }
 
 static void 
@@ -346,6 +345,7 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
 {
 	Evas_Object *navi_bar = data;	
 	Widget_Data *wd =  elm_widget_data_get(navi_bar);
+	evas_object_smart_callback_call(navi_bar, "hide,finished", event_info);
 	wd->popped = EINA_TRUE;
 }
 
