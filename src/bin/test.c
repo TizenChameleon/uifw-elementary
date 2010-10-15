@@ -66,7 +66,7 @@ void test_menu(void *data, Evas_Object *obj, void *event_info);
 void test_panel(void *data, Evas_Object *obj, void *event_info);
 void test_panes(void *data, Evas_Object *obj, void *event_info);
 void test_calendar(void *data, Evas_Object *obj, void *event_info);
-void test_calendar2(void *data, Evas_Object *obj, void *event_info); 
+void test_calendar2(void *data, Evas_Object *obj, void *event_info);
 void test_map(void *data, Evas_Object *obj, void *event_info);
 void test_weather(void *data, Evas_Object *obj, void *event_info);
 void test_flip(void *data, Evas_Object *obj, void *event_info);
@@ -80,7 +80,6 @@ void test_launcher(void *data, Evas_Object *obj, void *event_info);
 void test_launcher2(void *data, Evas_Object *obj, void *event_info);
 void test_launcher3(void *data, Evas_Object *obj, void *event_info);
 void test_anim(void *data, Evas_Object *obj, void *event_info);
-
 
 struct elm_test
 {
@@ -278,7 +277,7 @@ my_win_main(void)
    ADD_TEST("Launcher 2", test_launcher2);
    ADD_TEST("Launcher 3", test_launcher3);
    ADD_TEST("Animation", test_anim);
-   ADD_TEST("Calendar", test_calendar); 
+   ADD_TEST("Calendar", test_calendar);
    ADD_TEST("Calendar 2", test_calendar2);
 #undef ADD_TEST
 
