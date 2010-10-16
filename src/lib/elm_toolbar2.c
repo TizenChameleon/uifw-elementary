@@ -56,8 +56,6 @@ static void _item_show(Elm_Toolbar2_Item *it)
    evas_object_geometry_get(wd->bx, &bx, &by, &bw, &bh);
    evas_object_geometry_get(it->base, &x, &y, &w, &h);
    elm_smart_scroller_child_region_show(wd->scr, x - bx, y - by, w, h);
-
-
 }
 
 static void _del_pre_hook(Evas_Object *obj)
@@ -96,143 +94,141 @@ static void _theme_hook(Evas_Object *obj)
    scale = (elm_widget_scale_get(obj) * _elm_config->scale);
    edje_object_scale_set(wd->scr, scale);
    EINA_LIST_FOREACH(wd->items, l, it)
-   {
-	   Evas_Coord mw, mh;
-	   Evas_Coord ic_w, ic_h;
+     {
+	//	   Evas_Coord mw, mh;
+	Evas_Coord ic_w, ic_h;
 
-	   edje_object_scale_set(it->base, scale);
+	edje_object_scale_set(it->base, scale);
 
-		
-	   _elm_theme_object_set(obj, it->base, "toolbar2", "item", style);
-	   if (it->icon)
-	   {
 
-		   evas_object_size_hint_min_get(it->icon, &ic_w, &ic_h);
+	_elm_theme_object_set(obj, it->base, "toolbar2", "item", style);
+	if (it->icon)
+	  {
+	     evas_object_size_hint_min_get(it->icon, &ic_w, &ic_h);
 
-		   ms = ((double)wd->icon_size * _elm_config->scale);
-		   if (ic_w > 0 && ic_h > 0)
-		   {
-			   if (ic_h > wd->icon_size) ic_h = wd->icon_size;
-			   evas_object_size_hint_min_set(it->icon, ic_w, ic_h);
-			   evas_object_size_hint_max_set(it->icon, ic_w, ic_h);
-		   }
-		   else {
-			   evas_object_size_hint_min_set(it->icon, ms, ms);
-			   evas_object_size_hint_max_set(it->icon, ms, ms);
-		   }
+	     ms = ((double)wd->icon_size * _elm_config->scale);
+	     if (ic_w > 0 && ic_h > 0)
+	       {
+		  if (ic_h > wd->icon_size) ic_h = wd->icon_size;
+		  evas_object_size_hint_min_set(it->icon, ic_w, ic_h);
+		  evas_object_size_hint_max_set(it->icon, ic_w, ic_h);
+	       }
+	     else 
+	       {
+		  evas_object_size_hint_min_set(it->icon, ms, ms);
+		  evas_object_size_hint_max_set(it->icon, ms, ms);
+	       }
 
-		   evas_object_size_hint_align_set(it->icon, 0.5, 0.5);
-		   edje_object_part_swallow(it->base, "elm.swallow.icon", it->icon);
-		   evas_object_show(it->icon);
-		   elm_widget_sub_object_add(obj, it->icon);
-	   }
-/*
+	     evas_object_size_hint_align_set(it->icon, 0.5, 0.5);
+	     edje_object_part_swallow(it->base, "elm.swallow.icon", it->icon);
+	     evas_object_show(it->icon);
+	     elm_widget_sub_object_add(obj, it->icon);
+	  }
+	/*
 	   mw = mh = -1;
 	   elm_coords_finger_size_adjust(1, &mw, 1, &mh);
 	   edje_object_size_min_restricted_calc(it->base, &mw, &mh, mw, mh);
 	   elm_coords_finger_size_adjust(1, &mw, 1, &mh);
-*/
-	   evas_object_size_hint_weight_set(it->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	   evas_object_size_hint_align_set(it->base, 0.5, 0.5);
+	   */
+	evas_object_size_hint_weight_set(it->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	evas_object_size_hint_align_set(it->base, 0.5, 0.5);
 
-	   if (ic_w > 0 && ic_h > 0) {
-		   evas_object_size_hint_min_set(it->base, ic_w, ic_h);
-	   }
-	   else {
-		   //		   evas_object_size_hint_min_set(it->base, mw, mh);
-		   ms = ((double)wd->icon_size * _elm_config->scale);
+	if (ic_w > 0 && ic_h > 0) 
+	  {
+	     evas_object_size_hint_min_set(it->base, ic_w, ic_h);
+	  }
+	else 
+	  {
+	     //		   evas_object_size_hint_min_set(it->base, mw, mh);
+	     ms = ((double)wd->icon_size * _elm_config->scale);
 
-		   evas_object_size_hint_min_set(it->base, ms, ms);
-	   }
-   }
+	     evas_object_size_hint_min_set(it->base, ms, ms);
+	  }
+     }
    _sizing_eval(obj);
 }
 
 static void _sizing_eval(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Coord minw = -1, minh = -1;
-	Evas_Coord vw = 0, vh = 0;
-	Evas_Coord w, h;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Coord minw = -1, minh = -1;
+   Evas_Coord vw = 0, vh = 0;
+   Evas_Coord w, h;
 
-	if (!wd) return;
+   if (!wd) return;
 
-	evas_object_smart_calculate(wd->bx);
-	edje_object_size_min_calc(elm_smart_scroller_edje_object_get(wd->scr), &minw, &minh);
-	evas_object_geometry_get(obj, NULL, NULL, &w, &h);
+   evas_object_smart_calculate(wd->bx);
+   edje_object_size_min_calc(elm_smart_scroller_edje_object_get(wd->scr), &minw, &minh);
+   evas_object_geometry_get(obj, NULL, NULL, &w, &h);
 
-	if (w < minw) w = minw;
-	if (h < minh) h = minh;
+   if (w < minw) w = minw;
+   if (h < minh) h = minh;
 
-	evas_object_resize(wd->scr, w, h);
+   evas_object_resize(wd->scr, w, h);
 
-	evas_object_size_hint_min_get(wd->bx, &minw, &minh);
-	if (w > minw) minw = w;
+   evas_object_size_hint_min_get(wd->bx, &minw, &minh);
+   if (w > minw) minw = w;
 
-	evas_object_resize(wd->bx, minw, 66);
-	if (w > minw) minw = w;
-	elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, &vh);
+   evas_object_resize(wd->bx, minw, 66);
+   if (w > minw) minw = w;
+   elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, &vh);
 
-	if (wd->scrollable)
-		minw = w - vw;
-	else
-		minw = minw + (w - vw);
+   if (wd->scrollable)
+     minw = w - vw;
+   else
+     minw = minw + (w - vw);
 
-	minh = minh + (h - vh);
+   minh = minh + (h - vh);
 
-	evas_object_size_hint_min_set(obj, vw, vh);
-	evas_object_size_hint_max_set(obj, -1, -1);
+   evas_object_size_hint_min_set(obj, vw, vh);
+   evas_object_size_hint_max_set(obj, -1, -1);
 }
 
 static void _resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-	Widget_Data *wd = elm_widget_data_get(data);
-	Evas_Coord mw, mh, vw, vh, x, y, w, h;
-	const Eina_List *l;
-	Elm_Toolbar2_Item *it;
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Coord mw, mh, vw, vh, w, h;
 
-	if (!wd) return;
+   if (!wd) return;
 
-	elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, &vh);
-	evas_object_size_hint_min_get(wd->bx, &mw, &mh);
-	evas_object_geometry_get(wd->bx, NULL, NULL, &w, &h);
+   elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, &vh);
+   evas_object_size_hint_min_get(wd->bx, &mw, &mh);
+   evas_object_geometry_get(wd->bx, NULL, NULL, &w, &h);
 
-	if (vw >= mw)
-	{
-		if (w != vw) evas_object_resize(wd->bx, vw, h);
-	}
+   if (vw >= mw)
+     {
+	if (w != vw) evas_object_resize(wd->bx, vw, h);
+     }
 }
 
 static void press_down_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
-	Evas_Event_Mouse_Down *ev = event_info;
-//	printf("\nDown %d\n", ev->flags);
-	//Evas_Event_Mouse_Down *ev = event_info;
-	Elm_Toolbar2_Item *it = (Elm_Toolbar2_Item *)data;
-	edje_object_signal_emit(it->base, "elm,state,selected", "elm");
-	_item_show(it);
+   //Evas_Event_Mouse_Down *ev = event_info;
+   //printf("\nDown %d\n", ev->flags);
+   //Evas_Event_Mouse_Down *ev = event_info;
+   Elm_Toolbar2_Item *it = (Elm_Toolbar2_Item *)data;
+   edje_object_signal_emit(it->base, "elm,state,selected", "elm");
+   _item_show(it);
 }
 
 static void press_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
+   Elm_Toolbar2_Item *it = (Elm_Toolbar2_Item *)data;
 
-	Elm_Toolbar2_Item *it = (Elm_Toolbar2_Item *)data;
+   edje_object_signal_emit(it->base, "elm,state,unselected", "elm");
 
-	edje_object_signal_emit(it->base, "elm,state,unselected", "elm");
+   Evas_Event_Mouse_Up *ev = event_info;
+   //	printf("\nUp %d\n", ev->flags);
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) 
+     {
+	//printf("\nReturn\n");
+	return;
+     }
 
-	Evas_Event_Mouse_Up *ev = event_info;
-//	printf("\nUp %d\n", ev->flags);
-	if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) {
-//		printf("\nReturn\n");
-		return;
-	}
-
-//	printf("\nSend\n");
-	if (it->func) it->func((void *)(it->data), it->obj, it);
-	evas_object_smart_callback_call(it->obj, "clicked", it);
+   //	printf("\nSend\n");
+   if (it->func) it->func((void *)(it->data), it->obj, it);
+   evas_object_smart_callback_call(it->obj, "clicked", it);
 }
-
-
 
 static void _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 {
@@ -341,80 +337,82 @@ EAPI int elm_toolbar2_icon_size_get(Evas_Object *obj)
  */
 EAPI Elm_Toolbar2_Item *elm_toolbar2_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *data)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	int ms = 0;
-	Evas_Coord mw, mh;
-	Evas_Coord ic_w, ic_h;
-	Elm_Toolbar2_Item *it;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   int ms = 0;
+   //	Evas_Coord mw, mh;
+   Evas_Coord ic_w, ic_h;
+   Elm_Toolbar2_Item *it;
 
-	if (!wd) return NULL;
-	it = ELM_NEW(Elm_Toolbar2_Item);
-	if (!it) return NULL;
-	wd->items = eina_list_append(wd->items, it);
+   if (!wd) return NULL;
+   it = ELM_NEW(Elm_Toolbar2_Item);
+   if (!it) return NULL;
+   wd->items = eina_list_append(wd->items, it);
 
-	it->obj = obj;
-	it->icon = icon;
-	it->func = func;
-	it->data = data;
-	it->base = edje_object_add(evas_object_evas_get(obj));
+   it->obj = obj;
+   it->icon = icon;
+   it->func = func;
+   it->data = data;
+   it->base = edje_object_add(evas_object_evas_get(obj));
 
-	_elm_theme_object_set(obj, it->base, "toolbar2", "item", elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, it->base, "toolbar2", "item", elm_widget_style_get(obj));
 
-	evas_object_event_callback_add(it->icon, EVAS_CALLBACK_MOUSE_DOWN,  press_down_cb, it);
-	evas_object_event_callback_add(it->icon, EVAS_CALLBACK_MOUSE_UP,  press_up_cb, it);
+   evas_object_event_callback_add(it->icon, EVAS_CALLBACK_MOUSE_DOWN,  press_down_cb, it);
+   evas_object_event_callback_add(it->icon, EVAS_CALLBACK_MOUSE_UP,  press_up_cb, it);
 
-	elm_widget_sub_object_add(obj, it->base);
+   elm_widget_sub_object_add(obj, it->base);
 
-	ic_w = 0;
-	ic_h = 0;
-	if (it->icon)
-	{
-	
-		evas_object_size_hint_min_get(it->icon, &ic_w, &ic_h);
+   ic_w = 0;
+   ic_h = 0;
+   if (it->icon)
+     {
+	evas_object_size_hint_min_get(it->icon, &ic_w, &ic_h);
 
-		if (ic_w > 0 && ic_h > 0)
-		{
-			if (ic_h > wd->icon_size) ic_h = wd->icon_size;
-			evas_object_size_hint_min_set(it->icon, ic_w, ic_h);
-			evas_object_size_hint_max_set(it->icon, ic_w, ic_h);
-		}
-		else {
-			ms = ((double)wd->icon_size * _elm_config->scale);
+	if (ic_w > 0 && ic_h > 0)
+	  {
+	     if (ic_h > wd->icon_size) ic_h = wd->icon_size;
+	     evas_object_size_hint_min_set(it->icon, ic_w, ic_h);
+	     evas_object_size_hint_max_set(it->icon, ic_w, ic_h);
+	  }
+	else 
+	  {
+	     ms = ((double)wd->icon_size * _elm_config->scale);
 
-			evas_object_size_hint_min_set(it->icon, ms, ms);
-			evas_object_size_hint_max_set(it->icon, ms, ms);
-		}
+	     evas_object_size_hint_min_set(it->icon, ms, ms);
+	     evas_object_size_hint_max_set(it->icon, ms, ms);
+	  }
 
-//		evas_object_size_hint_weight_set(it->icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-//		evas_object_size_hint_align_set(it->icon, 0.5, 0.5);
+	//evas_object_size_hint_weight_set(it->icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	//evas_object_size_hint_align_set(it->icon, 0.5, 0.5);
 
-		edje_object_part_swallow(it->base, "elm.swallow.icon", it->icon);
-		evas_object_show(it->icon);
-		elm_widget_sub_object_add(obj, it->icon);
-	}
-/*
-	mw = mh = -1;
+	edje_object_part_swallow(it->base, "elm.swallow.icon", it->icon);
+	evas_object_show(it->icon);
+	elm_widget_sub_object_add(obj, it->icon);
+     }
+   /*
+      mw = mh = -1;
 
-	elm_coords_finger_size_adjust(1, &mw, 1, &mh);
-	edje_object_size_min_restricted_calc(it->base, &mw, &mh, mw, mh);
-	elm_coords_finger_size_adjust(1, &mw, 1, &mh);
-*/
-	evas_object_size_hint_weight_set(it->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	evas_object_size_hint_align_set(it->base, 0.5, 0.5);
+      elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+      edje_object_size_min_restricted_calc(it->base, &mw, &mh, mw, mh);
+      elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+      */
+   evas_object_size_hint_weight_set(it->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(it->base, 0.5, 0.5);
 
-	if (ic_w > 0 && ic_h > 0) {
-		evas_object_size_hint_min_set(it->base, ic_w, ic_h);
-	}
-	else {
-//		evas_object_size_hint_min_set(it->base, mw, mh);
-		ms = ((double)wd->icon_size * _elm_config->scale);
+   if (ic_w > 0 && ic_h > 0) 
+     {
+	evas_object_size_hint_min_set(it->base, ic_w, ic_h);
+     }
+   else 
+     {
+	//		evas_object_size_hint_min_set(it->base, mw, mh);
+	ms = ((double)wd->icon_size * _elm_config->scale);
 
-		evas_object_size_hint_min_set(it->base, ms, ms);
-	}
-	evas_object_box_append(wd->bx, it->base);
-	evas_object_show(it->base);
-	_sizing_eval(obj);
-	return it;
+	evas_object_size_hint_min_set(it->base, ms, ms);
+     }
+   evas_object_box_append(wd->bx, it->base);
+   evas_object_show(it->base);
+   _sizing_eval(obj);
+   return it;
 }
 
 /**
@@ -430,7 +428,6 @@ EAPI Evas_Object *elm_toolbar2_item_icon_get(Elm_Toolbar2_Item *item)
    if (!item) return NULL;
    return item->icon;
 }
-
 
 /**
  * Delete the Toolbar item
@@ -485,7 +482,6 @@ EAPI void elm_toolbar2_scrollable_set(Evas_Object *obj, Eina_Bool scrollable)
    _sizing_eval(obj);
 }
 
-
 /**
  * Whether toolbar is homogenous
  *
@@ -505,7 +501,6 @@ elm_toolbar2_homogenous_set(Evas_Object *obj, Eina_Bool homogenous)
    evas_object_smart_calculate(wd->bx);
 }
 
-
 /**
  * Set if the alignment of the items.
  *
@@ -516,8 +511,6 @@ elm_toolbar2_homogenous_set(Evas_Object *obj, Eina_Bool homogenous)
  */
 EAPI void elm_toolbar2_align_set(Evas_Object *obj, double align)
 {
-   Eina_List *l;
-   Elm_Toolbar2_Item *it;
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
