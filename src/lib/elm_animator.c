@@ -136,7 +136,7 @@ _animator_animate_cb(void *data)
 static void
 _animator_parent_del(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
 {
-	Elm_Animator *animator = data; 
+//	Elm_Animator *animator = data; 
 	elm_animator_del(data);
 }
 
