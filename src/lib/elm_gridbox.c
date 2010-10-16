@@ -30,7 +30,7 @@ static void _changed_size_min(void *data, Evas * e, Evas_Object * obj,
 			      void *event_info);
 static void _sub_del(void *data, Evas_Object * obj, void *event_info);
 
-static void _show_event(void *data, Evas_Object * obj, void *event_info);
+static void _show_event(void *data, Evas *e, Evas_Object * obj, void *event_info);
 
 static void
 _del_pre_hook(Evas_Object * obj)
@@ -136,13 +136,13 @@ _sizing_eval(Evas_Object * obj, int mode)
 }
 
 static void
-_changed_size_hints(void *data, Evas * e, Evas_Object * obj, void *event_info)
+_changed_size_hints(void *data, Evas *e, Evas_Object * obj, void *event_info)
 {
    _sizing_eval(data, 0);
 }
 
 static void
-_changed_size_min(void *data, Evas * e, Evas_Object * obj, void *event_info)
+_changed_size_min(void *data, Evas *e, Evas_Object * obj, void *event_info)
 {
    _sizing_eval(data, 0);
 }
@@ -154,7 +154,7 @@ _sub_del(void *data, Evas_Object * obj, void *event_info)
 }
 
 static void
-_show_event(void *data, Evas_Object * obj, void *event_info)
+_show_event(void *data, Evas *e, Evas_Object * obj, void *event_info)
 {
    _sizing_eval(data, 0);
 }

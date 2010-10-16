@@ -149,7 +149,7 @@ static void _colorpalette_object_resize(void *data, Evas *e, Evas_Object *obj, v
 	DBG("%s", __func__);
 
 	Widget_Data *wd;
-	Colorpalette_Item *item;
+	Colorpalette_Item *item = NULL;
 	Evas_Coord w, h;
 	Evas_Coord tab_w, tab_h;
 	double pad_x, pad_y;

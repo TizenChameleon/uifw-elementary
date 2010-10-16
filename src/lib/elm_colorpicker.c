@@ -311,7 +311,7 @@ static void
 _hsl_to_rgb(void *data)
 {
    Widget_Data *wd = (Widget_Data *) data;
-   double r, g, b;
+   double r = 0.0, g = 0.0, b = 0.0;
    double _h, _s, _l;
    int i;
    double sv, vsf, f, p, q, t, v;

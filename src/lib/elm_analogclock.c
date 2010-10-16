@@ -37,7 +37,7 @@ static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _disable_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static int  _ticker(void *data);
+static Eina_Bool _ticker(void *data);
 static void _time_update(Evas_Object *obj);
 
 static void
@@ -49,7 +49,7 @@ _del_hook(Evas_Object *obj)
 	free(wd);
 }
 
-static int
+static Eina_Bool
 _ticker(void *data)
 {
 	Widget_Data *wd = elm_widget_data_get(data);

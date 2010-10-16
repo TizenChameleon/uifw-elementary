@@ -293,10 +293,12 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
 	if ((dur && dur > 1000) || (distance < 10 && distance > -10)) {
 		if (wd->ani_lock)
+        {
 			if ((int)evas_object_data_get(wd->base, "ani_cnt") < 0)
 				evas_object_data_set(wd->base, "ani_cnt", (void *)-1);
 			else
 				evas_object_data_set(wd->base, "ani_cnt", (void *)1);
+        }
 		return;
 	}
 	_flick(data, (float)distance / dur);

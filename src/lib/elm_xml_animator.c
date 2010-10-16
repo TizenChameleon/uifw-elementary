@@ -225,7 +225,7 @@ set_evas_map_disable(void *data)
 {
 	Evas_Object *obj = (Evas_Object *)data;
 	evas_object_map_enable_set(obj, EINA_FALSE);
-	evas_render_updates(obj);
+	evas_render_updates(evas_object_evas_get(obj));
 
 	return ECORE_CALLBACK_CANCEL;
 }

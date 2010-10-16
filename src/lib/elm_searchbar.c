@@ -25,9 +25,9 @@ struct _Widget_Data
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _changed(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _clicked(void *data, Evas_Object *obj, void *event_info); //const char *emission, const char *source);
+static void _changed(void *data, Evas_Object *obj, void *event_info); //const char *emission, const char *source);
+static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info); //const char *emission, const char *source);
 
 static void _del_hook(Evas_Object *obj)
 {
@@ -67,7 +67,7 @@ static void _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_max_set(obj, maxw, maxh);
 }
 
-static void _clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+static void _clicked(void *data, Evas_Object *obj, void *event_info) //const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -85,7 +85,7 @@ static void _clicked(void *data, Evas_Object *obj, const char *emission, const c
    evas_object_smart_callback_call(data, "clicked", NULL);
 }
 
-static void _changed(void *data, Evas_Object *obj, const char *emission, const char *source)
+static void _changed(void *data, Evas_Object *obj, void *event_info) //const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
@@ -95,7 +95,7 @@ static void _changed(void *data, Evas_Object *obj, const char *emission, const c
 //   evas_object_smart_callback_call(data, "changed", NULL);
 }
 
-static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info) //const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -125,7 +125,7 @@ _searchicon_clicked(void *data, Evas_Object *obj, const char *emission, const ch
    if (!strcmp(source, "search_icon"))
      evas_object_smart_callback_call(data, "searchsymbol,clicked", NULL);
    else if (!strcmp(source, "base_bg"))
-     _clicked(data, obj, emission, source);
+     _clicked(data, obj, NULL); //emission, source);
 }
 
 /**

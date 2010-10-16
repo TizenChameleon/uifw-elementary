@@ -5417,8 +5417,9 @@ elm_genlist_longpress_timeout_get(const Evas_Object *obj)
 
 // added for item moving animation.
 static Eina_Bool
-_group_item_contract_moving_effect_timer_cb(Evas_Object *obj)
+_group_item_contract_moving_effect_timer_cb(void *data)
 {
+	Evas_Object *obj = (Evas_Object *)data;
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);   
    
@@ -5603,10 +5604,11 @@ _group_item_contract_moving_effect_timer_cb(Evas_Object *obj)
 
 // added for item moving animation.
 static Eina_Bool
-_group_item_expand_moving_effect_timer_cb(Evas_Object *data)
+_group_item_expand_moving_effect_timer_cb(void *data)
 {
-	ELM_CHECK_WIDTYPE(data, widtype);
-	Widget_Data *wd = elm_widget_data_get(data);
+	Evas_Object *obj = (Evas_Object *)data;
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
 	Elm_Genlist_GroupItem *git, *tmp_git;
 	Item_Block *itb = NULL;   
 	Elm_Genlist_Item *it;

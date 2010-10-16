@@ -348,7 +348,7 @@ static void _group_bubble_content_free(Marker_Group *group);
 static void marker_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord ox, Evas_Coord oy, Evas_Coord ow, Evas_Coord oh);
 static void _bubble_sc_hits_changed_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
-static int
+static Eina_Bool
 hold_timer_cb(void *data)
 {
   struct event_t *ev0 = (struct event_t *)data;
