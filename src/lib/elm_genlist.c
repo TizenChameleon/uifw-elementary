@@ -412,6 +412,7 @@ struct _Elm_Genlist_Item
 
    Evas_Coord old_scrl_y;
    int list_expanded;
+   Eina_Bool effect_done : 1;   
 };
 
 #define ELM_GENLIST_ITEM_FROM_INLIST(item)      \
@@ -1329,7 +1330,7 @@ _set_groupitem( Elm_Genlist_Item *it, Elm_Genlist_GroupItem *git)
 static void
 _group_item_click_cb(Elm_Genlist_GroupItem *git)
 {
-   if(git->wd->pinchzoom_effect_mode = ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH)
+   if(git->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH)
    {
 	   git->wd->pinch_it = git->num+1;
 	   elm_genlist_pinch_zoom_mode_set(git->wd->obj, 0);   
@@ -4188,6 +4189,7 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it, Eina_Bool expanded)
    if (it->expanded == expanded) return;
    it->expanded = expanded;
    it->wd->expand_item = it;   
+   it->effect_done = EINA_FALSE;
    if (it->expanded)
      {
 	it->wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND;
@@ -5978,11 +5980,6 @@ _item_moving_effect_timer_cb(void *data)
 	static double added_gy =25;
 	static int count = 0;
 
-	if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
-	  added_gy -= 1;
-	else	if(count % 2 == 0)
-	  added_gy -= 1;
-
 	if(added_gy < 1)
       added_gy = 1;
 	
@@ -6090,46 +6087,42 @@ _item_flip_effect_show(void *data)
    if (!wd) return;
 
 	Elm_Genlist_Item *it;
+	Evas_Object *base ;
 	const Eina_List *l;
-	static int count = 0;
+	int count = 0;
 	int start = 0, end = 0;
 	
-   count++;
    evas_object_geometry_get(wd->pan_smart, &ox, &oy, &ow, &oh);
    evas_output_viewport_get(evas_object_evas_get(wd->pan_smart), &cvx, &cvy, &cvw, &cvh);
 
-	Elm_Transit* transit = elm_transit_add(wd->obj);
-	Evas_Object *base ;
-	Elm_Effect *effect;
-   
-   EINA_INLIST_FOREACH(wd->blocks, itb)
-   {
-	itb->w = wd->minw;
-	if (ELM_RECTS_INTERSECT(itb->x - wd->pan_x + ox,
-				itb->y - wd->pan_y + oy,
-				itb->w, itb->h,
-				cvx, cvy, cvw, cvh))
-	  {
-	    EINA_LIST_FOREACH(itb->items, l, it)
-			{
-				if(it->parent && it->wd->expand_item == it->parent)
-				  {
-					  if(!start)
-						 start = it->scrl_y;
-					  base = (Evas_Object *) it->base;
-					  effect = elm_fx_flip_add(base, base, ELM_FX_FLIP_AXIS_X, EINA_TRUE );
-					  elm_transit_fx_insert(transit, effect);
-					  end = it->scrl_y + it->h;
-				  }
-			}
-	  }
-   }
-	
-	wd->expand_item_cnt = end - start;
-	elm_transit_run(transit,1.0);
-	elm_transit_del(transit);	
 
-	return ECORE_CALLBACK_RENEW;
+	EINA_INLIST_FOREACH(wd->blocks, itb)
+	  {
+		  itb->w = wd->minw;
+		  if (ELM_RECTS_INTERSECT(itb->x - wd->pan_x + ox,
+					  itb->y - wd->pan_y + oy,
+					  itb->w, itb->h,
+					  cvx, cvy, cvw, cvh))
+			 {
+				 EINA_LIST_FOREACH(itb->items, l, it)
+					{
+						if(it->parent && it->wd->expand_item == it->parent && !it->effect_done)
+						  {
+							  if(!start)
+								 start = it->scrl_y;
+							  base = (Evas_Object *) it->base;
+							  edje_object_signal_emit(it->base, "flip_item", "");
+							  end = it->scrl_y + it->h;
+							  it->effect_done = EINA_TRUE;
+
+
+						  }
+					}
+			 }
+	  }
+
+	wd->expand_item_cnt = end - start;
+	return ECORE_CALLBACK_CANCEL;
 }
 
 EAPI void
