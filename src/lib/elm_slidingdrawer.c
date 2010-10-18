@@ -19,8 +19,8 @@ struct _Widget_Data
 	Evas_Object *handler;
 	Evas_Object *dragable_rect;
 	Elm_SlidingDrawer_Pos pos;
-	Evas_Coord max_drag_w;
-	Evas_Coord max_drag_h;
+	double max_drag_w;
+	double max_drag_h;
 	Elm_SlidingDrawer_Drag_Value value;
 };
 
