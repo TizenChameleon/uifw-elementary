@@ -37,6 +37,7 @@ static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+   evas_object_event_callback_del(wd->parent, EVAS_CALLBACK_RESIZE, _parent_resize);
    free(wd);
 }
 
