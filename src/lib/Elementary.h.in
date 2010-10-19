@@ -949,6 +949,8 @@ extern "C" {
    EAPI Evas_Object *elm_bubble_content_unset(Evas_Object *obj);
    EAPI void         elm_bubble_icon_set(Evas_Object *obj, Evas_Object *icon);
    EAPI Evas_Object *elm_bubble_icon_get(const Evas_Object *obj);
+   EAPI void 		elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep);
+   EAPI Evas_Object *elm_bubble_sweep_layout_unset(Evas_Object *obj);
    EAPI void         elm_bubble_corner_set(Evas_Object *obj, const char *corner);
    /* smart callbacks called:
     * "sweep,left,right" - when bubble is sweeped from left to right, this signal is sent.

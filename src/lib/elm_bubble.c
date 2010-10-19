@@ -14,7 +14,7 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *bbl;
-   Evas_Object *content, *icon;
+   Evas_Object *content, *icon, *sweep;
    const char *label, *info;
    
    Eina_Bool down:1;
@@ -86,6 +86,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 	wd->icon = NULL;
 	edje_object_message_signal_process(wd->bbl);
      }
+   else if (sub == wd->sweep) wd->sweep = NULL;
    _sizing_eval(obj);
 }
 
@@ -305,8 +306,8 @@ elm_bubble_content_unset(Evas_Object *obj)
    if (!wd) return NULL;
    if (!wd->content) return NULL;
    content = wd->content;
-   edje_object_part_unswallow(wd->bbl, wd->content);
-   elm_widget_sub_object_del(obj, wd->content);
+   elm_widget_sub_object_del(obj, content);
+   edje_object_part_unswallow(wd->bbl, content);
    wd->content = NULL;
    return content;
 }
@@ -360,6 +361,58 @@ elm_bubble_icon_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    return wd->icon;
+}
+
+/**
+ * Set the sweep layout
+ *
+ * @param obj The bubble object
+ * @param content The given content of the bubble
+ *
+ * This function sets the sweep layout when "sweep,left,right"signal is emitted. 
+ *
+ * @ingroup Bubble
+ */
+EAPI void
+elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->sweep == sweep) return;
+   if (wd->sweep) evas_object_del(wd->sweep);
+   wd->sweep = sweep;
+   if (sweep)
+     {
+	elm_widget_sub_object_add(obj, sweep);
+	edje_object_part_swallow(wd->bbl, "elm.swallow.sweep", sweep);
+     }
+}
+
+/**
+ * Unset the sweep layout
+ *
+ * @param obj The bubble object
+ * @param content The given content of the bubble
+ *
+ * This function sets the sweep layout when "sweep,right,left"signal is emitted. 
+ *
+ * @ingroup Bubble
+ */
+EAPI Evas_Object *
+elm_bubble_sweep_layout_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *sweep;
+   if (!wd) return NULL;
+   if (!wd->sweep) return NULL;
+   sweep = wd->sweep;
+   elm_widget_sub_object_del(obj, sweep);
+   edje_object_part_unswallow(wd->bbl, sweep);
+   evas_object_hide(sweep);
+   wd->sweep = NULL;
+   return sweep;
 }
 
 /**
