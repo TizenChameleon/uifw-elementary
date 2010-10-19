@@ -1,6 +1,7 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 #include "elm_module_priv.h"
+#include "els_scroller.h"
 
 /**
  * @defgroup Map Map
@@ -2408,9 +2409,9 @@ elm_map_geo_region_show(Evas_Object *obj, double lon, double lat)
 }
 
 /**
- * Move the map to the current coordinates.
+ * Get the current coordinates of the map.
  *
- * This move the map to the current coordinates. The map will be centered on these coordinates.
+ * This gets the current coordinates of the map object.
  *
  * @param obj The map object
  * @param lat The latitude.
