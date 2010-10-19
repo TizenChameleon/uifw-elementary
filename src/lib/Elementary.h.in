@@ -296,7 +296,7 @@ extern "C" {
        
    EAPI void         elm_object_signal_emit(Evas_Object *obj, const char *emission, const char *source);
    EAPI void         elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data);
-   EAPI void         *elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source));
+   EAPI void        *elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source));
 
    EAPI void         elm_coords_finger_size_adjust(int times_w, Evas_Coord *w, int times_h, Evas_Coord *h);
 
@@ -949,7 +949,7 @@ extern "C" {
    EAPI Evas_Object *elm_bubble_content_unset(Evas_Object *obj);
    EAPI void         elm_bubble_icon_set(Evas_Object *obj, Evas_Object *icon);
    EAPI Evas_Object *elm_bubble_icon_get(const Evas_Object *obj);
-   EAPI void 		elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep);
+   EAPI void         elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep);
    EAPI Evas_Object *elm_bubble_sweep_layout_unset(Evas_Object *obj);
    EAPI void         elm_bubble_corner_set(Evas_Object *obj, const char *corner);
    /* smart callbacks called:
@@ -1801,7 +1801,7 @@ extern "C" {
    typedef enum 
      {
         ELM_CALENDAR_UNIQUE, 
-        ELM_CALENDAR_DAILY, 
+        ELM_CALENDAR_DAILY,
         ELM_CALENDAR_WEEKLY,
         ELM_CALENDAR_MONTHLY, 
         ELM_CALENDAR_ANNUALLY
@@ -1877,7 +1877,7 @@ extern "C" {
    EAPI void             elm_discpicker_item_data_set(Elm_Discpicker_Item *item, void *data);
    EAPI Eina_Bool        elm_discpicker_item_disabled_get(Elm_Discpicker_Item *item);
    EAPI void             elm_discpicker_item_disabled_set(Elm_Discpicker_Item *item, Eina_Bool disabled);
-    /* smart callback called:
+    /* smart callbacks called:
     * "selected" - when discpicker selected item is changed
     * "overflowed" - when discpicker item is changed to first item from last item
     * "underflowed" - when discpicker item is changed to last item from first item.
