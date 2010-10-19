@@ -153,7 +153,7 @@ static const char *widtype = NULL;
 static Evas_Object *cnpwidgetdata = NULL;
 // end for cbhm
 
-static Eina_Bool _drag_drop_cb(void *data, Evas_Object *obj, Elm_Drop_Data *);
+static Eina_Bool _drag_drop_cb(void *data, Evas_Object *obj, Elm_Selection_Data *);
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _disable_hook(Evas_Object *obj);
@@ -569,7 +569,7 @@ _paste(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
      {
 #ifdef HAVE_ELEMENTARY_X
         wd->selection_asked = EINA_TRUE;
-	elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_FORMAT_MARKUP, data);
+        elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_FORMAT_MARKUP, data, NULL, NULL);
 #endif
      }
 }
@@ -1218,7 +1218,7 @@ _signal_entry_paste_request(void *data, Evas_Object *obj __UNUSED__, const char 
 	if ((top) && (elm_win_xwindow_get(top)))
 	  {
              wd->selection_asked = EINA_TRUE;
-             elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_FORMAT_MARKUP, data);
+             elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_FORMAT_MARKUP, data, NULL, NULL);
 	  }
 #endif
      }
@@ -1473,7 +1473,7 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 		return ECORE_CALLBACK_PASS_ON;
 	}
 
-	elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data);
+	elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data,NULL,NULL);
 
 	// end for cbhm
    return ECORE_CALLBACK_PASS_ON;
@@ -1481,7 +1481,7 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 
 
 static Eina_Bool
-_drag_drop_cb(void *data __UNUSED__, Evas_Object *obj, Elm_Drop_Data *drop)
+_drag_drop_cb(void *data __UNUSED__, Evas_Object *obj, Elm_Selection_Data *drop)
 {
    Widget_Data *wd;
    Eina_Bool rv;
