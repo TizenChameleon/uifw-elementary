@@ -232,6 +232,7 @@ struct _Widget_Data
    Eina_Bool on_hold : 1;
    Eina_Bool paused : 1;
    Eina_Bool paused_markers : 1;
+   Eina_Bool pinch_zoom : 1;
    
    struct {
       Eina_Bool enabled;
@@ -1257,11 +1258,6 @@ _mouse_multi_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    struct event_t *ev;
    Evas_Event_Multi_Down *down = event_info;
 
-   elm_smart_scroller_hold_set(wd->scr, 1);
-   elm_smart_scroller_freeze_set(wd->scr, 1);
-   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 1);
-   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 1);
-      
    ev = get_event_object(down->device);
    if(ev) return;
 
@@ -1270,6 +1266,13 @@ _mouse_multi_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
       printf("Failed : create_event_object\n");
       return;
    }
+
+   elm_smart_scroller_hold_set(wd->scr, 1);
+   elm_smart_scroller_freeze_set(wd->scr, 1);
+   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 1);
+   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 1);
+
+   wd->pinch_zoom = EINA_FALSE;
 
    ev->hold_timer = NULL;
    ev->prev.x = down->output.x;
@@ -1303,12 +1306,15 @@ _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    dis_new = get_distance(ev0->prev.x, ev0->prev.y, ev->prev.x, ev->prev.y);
    int zoom = wd->zoom;
    
+   if(wd->pinch_zoom) return;
    if(dis_old != 0) {
       if(dis_old - dis_new > 0 && ev->pinch_dis > TOUCH_HOLD_RANGE){
+         wd->pinch_zoom = EINA_TRUE;
          --zoom;
          elm_map_zoom_set(data, zoom);
          ev->pinch_dis = 0;
       }else if(dis_old - dis_new < 0 && ev->pinch_dis < -TOUCH_HOLD_RANGE){
+         wd->pinch_zoom = EINA_TRUE;
          ++zoom;
          elm_map_zoom_set(data, zoom);
          ev->pinch_dis = 0;
@@ -1338,6 +1344,7 @@ _mouse_multi_up(void *data, Evas *evas, Evas_Object *obj, void *event_info)
       return;
    }
 
+   wd->pinch_zoom = EINA_FALSE;
    dis_old = 0;
    
    ev0 = get_event_object(0);
