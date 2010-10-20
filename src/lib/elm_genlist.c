@@ -5944,7 +5944,7 @@ create_tray_alpha_bg(const Evas_Object *obj)
 }
 
 EAPI void
-elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, int emode)
+elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
