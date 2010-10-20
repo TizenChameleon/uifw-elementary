@@ -439,7 +439,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    else
      {
 	edje_object_signal_emit(wd->ent, "elm,action,unfocus", "elm");
-	edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", "");
+	//edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", "");
 	evas_object_focus_set(wd->ent, 0);
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
 	evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
@@ -1928,7 +1928,7 @@ static int _textinput_control_function(void *data,void *input_data)
        byte_len = strlen(text);/*no of bytes*/
        remain_bytes = wd->max_no_of_bytes-byte_len;
        sprintf(buf,"%d",remain_bytes);
-       edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);
+       //edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);
        if(input_data)
          {
            insert_text =  (char *)input_data;
