@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build37) unstable; urgency=low
+
+  * [els_icon] rotate bug fixed
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build37
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Wed, 20 Oct 2010 21:06:16 +0900
+
 elementary (1.0.0+svn.51480slp2+build36) unstable; urgency=low
 
   * [cnp_helper] merge upstream changes
