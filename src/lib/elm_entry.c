@@ -165,6 +165,8 @@ static void _signal_entry_changed(void *data, Evas_Object *obj, const char *emis
 static void _signal_selection_start(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_selection_changed(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_selection_cleared(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _signal_handler_move_start(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _signal_handler_move_end(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_entry_paste_request(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_entry_copy_notify(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_entry_cut_notify(void *data, Evas_Object *obj, const char *emission, const char *source);
@@ -612,7 +614,7 @@ _copy(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
    elm_widget_scroll_hold_pop(data);
    _store_selection(ELM_SEL_CLIPBOARD, data);
-//   edje_object_part_text_select_none(wd->ent, "elm.text");
+   edje_object_part_text_select_none(wd->ent, "elm.text");
 }
 
 static void
@@ -1128,6 +1130,20 @@ _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emiss
 }
 
 static void
+_signal_handler_move_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   elm_object_scroll_freeze_push(data);
+}
+
+static void
+_signal_handler_move_end(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   elm_object_scroll_freeze_pop(data);
+}
+
+static void
 _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -1157,6 +1173,7 @@ _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emi
 static void
 _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+   Evas_Coord cx, cy, cw, ch;
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    wd->have_selection = EINA_TRUE;
@@ -1164,6 +1181,18 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
    evas_object_smart_callback_call(data, SIG_SELECTION_CHANGED, NULL);
    elm_selection_set(ELM_SEL_PRIMARY, obj, ELM_SEL_FORMAT_MARKUP,
 		   elm_entry_selection_get(data));
+   
+   edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
+   if (!wd->deferred_recalc_job)
+     elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get());
+   else
+     {
+	wd->deferred_cur = EINA_TRUE;
+	wd->cx = cx;
+	wd->cy = cy;
+	wd->cw = cw;
+	wd->ch = ch + elm_finger_size_get();
+     }
 }
 
 static void
@@ -2008,6 +2037,10 @@ elm_entry_add(Evas_Object *parent)
    _elm_theme_object_set(obj, wd->ent, "entry", "base", "default");
    edje_object_signal_callback_add(wd->ent, "entry,changed", "elm.text",
                                    _signal_entry_changed, obj);
+   edje_object_signal_callback_add(wd->ent, "handler,move,start", "elm.text",
+                                   _signal_handler_move_start, obj);
+   edje_object_signal_callback_add(wd->ent, "handler,move,end", "elm.text",
+                                   _signal_handler_move_end, obj);
    edje_object_signal_callback_add(wd->ent, "selection,start", "elm.text",
                                    _signal_selection_start, obj);
    edje_object_signal_callback_add(wd->ent, "selection,changed", "elm.text",
