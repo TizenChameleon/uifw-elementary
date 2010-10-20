@@ -33,7 +33,7 @@ static void _smart_clip_unset(Evas_Object *obj);
 static void _els_smart_icon_flip_horizontal(Smart_Data *sd);
 static void _els_smart_icon_flip_vertical(Smart_Data *sd);
 static void _els_smart_icon_rotate_180(Smart_Data *sd);
-static Eina_Bool _els_smart_icon_dropcb(void *,Evas_Object *, Elm_Drop_Data *);
+static Eina_Bool _els_smart_icon_dropcb(void *,Evas_Object *, Elm_Selection_Data *);
 
 /* local subsystem globals */
 static Evas_Smart *_e_smart = NULL;
@@ -216,8 +216,8 @@ _els_smart_icon_orient_set(Evas_Object *obj, Elm_Image_Orient orient)
       case ELM_IMAGE_ROTATE_180_CW:
          _els_smart_icon_rotate_180(sd);
          return;
-     default:
-        return;
+     //default:
+        //return;
      }
 
    evas_object_image_size_get(sd->obj, &iw, &ih);
@@ -623,7 +623,7 @@ _els_smart_icon_rotate_180(Smart_Data *sd)
 }
 
 static Eina_Bool
-_els_smart_icon_dropcb(void *elmobj,Evas_Object *obj, Elm_Drop_Data *drop)
+_els_smart_icon_dropcb(void *elmobj,Evas_Object *obj, Elm_Selection_Data *drop)
 {
    _els_smart_icon_file_key_set(obj, drop->data, NULL);
    evas_object_smart_callback_call(elmobj, "drop", drop->data);
