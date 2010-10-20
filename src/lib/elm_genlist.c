@@ -467,7 +467,6 @@ static void _edit_controls_eval( Elm_Genlist_Item *it );
 static void _move_edit_controls( Elm_Genlist_Item *it, int itx, int ity );
 static Eina_Bool _item_moving_effect_timer_cb(void *data);
 static int _item_flip_effect_show(void *data);
-static void elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, int emode);
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_VERSION;
 
@@ -3700,6 +3699,15 @@ elm_genlist_clear(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
+   wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_NONE;
+   wd->pinchzoom_effect_mode = ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE;
+   elm_smart_scroller_hold_set(wd->scr, 0);
+   elm_smart_scroller_freeze_set(wd->scr, 0);
+   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
+   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);   
+   elm_smart_scroller_bounce_allow_set(wd->scr, EINA_FALSE, EINA_TRUE);
+   wd->max_git_num  = 0;
+
    if(wd->item_moving_effect_timer)
    {
   	//  ecore_timer_del(wd->item_moving_effect_timer);
@@ -5445,6 +5453,9 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 	if(!wd)
 	  return ECORE_CALLBACK_CANCEL;
 
+        if(wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE)
+            return ECORE_CALLBACK_CANCEL;
+
 	elm_smart_scroller_bounce_allow_set(wd->scr, EINA_FALSE, EINA_FALSE);
 	added_gy += 0.1; 
 
@@ -5629,6 +5640,9 @@ _group_item_expand_moving_effect_timer_cb(void *data)
 
 	if (!wd)
 	  return ECORE_CALLBACK_CANCEL;
+
+        if(wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE)
+            return ECORE_CALLBACK_CANCEL;
 
 	t = ecore_loop_time_get();
 
@@ -5929,10 +5943,9 @@ create_tray_alpha_bg(const Evas_Object *obj)
 	return bg ;
 }
 
-static void
+EAPI void
 elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, int emode)
 {
-   Item_Block *itb;
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
