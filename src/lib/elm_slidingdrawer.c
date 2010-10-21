@@ -227,7 +227,6 @@ elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd;
-	Evas_Coord w, h;
 
 	wd = elm_widget_data_get(obj);
 	wd->max_drag_w = dw;
