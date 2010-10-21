@@ -1904,6 +1904,147 @@ elm_fx_rotation_add(Evas_Object *obj, float from_degree, float to_degree,
    return effect;
 }
 
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+//Rotation3d FX
+/////////////////////////////////////////////////////////////////////////////////////
+typedef struct _rotation3d Elm_Fx_Rotation3d;
+static void _elm_fx_rotation3d_begin(void *data, Eina_Bool auto_reverse,
+				unsigned int repeat_cnt);
+static void _elm_fx_rotation3d_end(void *data, Eina_Bool auto_reverse,
+				unsigned int repeat_cnt);
+static void _elm_fx_rotation3d_op(void *data, Elm_Animator *animator,
+				double frame);
+
+struct _rotation3d
+{
+   Evas_Object *obj;
+   Eina_Bool cw;
+   float from[3];
+   float to[3];
+   float axis_pos[3];
+};
+
+static void
+_elm_fx_rotation3d_begin(void *data, Eina_Bool auto_reverse,
+		       unsigned int repeat_cnt)
+{
+   Elm_Fx_Rotation3d *rotation = data;
+   evas_object_show(rotation->obj);
+}
+
+static void
+_elm_fx_rotation3d_end(void *data, Eina_Bool auto_reverse,
+		     unsigned int repeat_cnt)
+{
+   Elm_Fx_Rotation3d *rotation = data;
+   evas_object_map_enable_set(rotation->obj, EINA_FALSE);
+}
+
+static void
+_elm_fx_rotation3d_op(void *data, Elm_Animator *animator, double frame)
+{
+   Elm_Fx_Rotation3d *rotation;
+
+   Evas_Map *map;
+
+   Evas_Coord x, y, w, h;
+
+   float degree[3];
+
+   float half_w, half_h;
+
+   map = evas_map_new(4);
+   if (!map)
+      return;
+
+   rotation = data;
+
+   evas_map_smooth_set(map, EINA_TRUE);
+   evas_map_util_points_populate_from_object_full(map, rotation->obj, 0);
+   degree[0] = rotation->from[0] + (float)(frame * rotation->to[0]);
+   degree[1] = rotation->from[1] + (float)(frame * rotation->to[1]);
+   degree[2] = rotation->from[2] + (float)(frame * rotation->to[2]);
+
+   if (!rotation->cw) {
+      degree[0] *= -1;
+      degree[1] *= -1;
+      degree[2] *= -1;
+   }
+
+   evas_object_geometry_get(rotation->obj, &x, &y, &w, &h);
+
+   half_w = (float)w *0.5;
+
+   half_h = (float)h *0.5;
+
+   evas_map_util_3d_rotate(map, degree[0], degree[1], degree[2], rotation->axis_pos[0], rotation->axis_pos[1], rotation->axis_pos[2]);
+   evas_map_util_3d_perspective(map, x + half_w, y + half_h, 0, 10000);
+   evas_object_map_enable_set(rotation->obj, EINA_TRUE);
+   evas_object_map_set(rotation->obj, map);
+   evas_map_free(map);
+}
+
+/**
+ * Add Rotation3d effect
+ *
+ * @param[in] obj Evas_Object that effect is applying to
+ * @param[in] from degree Degree when effect begins
+ * @param[in] to_degree Degree when effect is ends
+ * @param[in] axis_dir[3] rotation axis vector. it should be normalized.
+ * @param[in] axis_pos[3] rotation axis origin position.
+ * @param[in] cw Rotation direction. EINA_TRUE is clock wise
+ * @return Rotation effect
+ *
+ * @ingroup Transit
+ */
+EAPI Elm_Effect *
+elm_fx_rotation3d_add(Evas_Object *obj, float from_degree, float to_degree,
+		float* axis_dir, float* axis_pos, Eina_Bool cw)
+{
+   Elm_Effect *effect;
+
+   Elm_Fx_Rotation3d *rotation;
+
+   if (!obj)
+      return NULL;
+
+   effect = calloc(1, sizeof(Elm_Effect));
+   if (!effect)
+      return NULL;
+
+   rotation = calloc(1, sizeof(Elm_Fx_Rotation3d));
+
+   if (!rotation)
+     {
+	free(effect);
+	return NULL;
+     }
+
+   rotation->obj = obj;
+   rotation->cw = cw;
+   rotation->from[0] = from_degree * axis_dir[0];
+   rotation->from[1] = from_degree * axis_dir[1];
+   rotation->from[2] = from_degree * axis_dir[2];
+   rotation->to[0] = (to_degree * axis_dir[0]) - rotation->from[0];
+   rotation->to[1] = (to_degree * axis_dir[1]) - rotation->from[1];
+   rotation->to[2] = (to_degree * axis_dir[2]) - rotation->from[2];
+   rotation->axis_pos[0] = axis_pos[0];
+   rotation->axis_pos[1] = axis_pos[1] ;
+   rotation->axis_pos[2] = axis_pos[2] ;
+
+   effect->begin_op = _elm_fx_rotation3d_begin;
+   effect->end_op = _elm_fx_rotation3d_end;
+   effect->animation_op = _elm_fx_rotation3d_op;
+   effect->user_data = rotation;
+
+   return effect;
+}
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////
 // ImageAnimation FX
 /////////////////////////////////////////////////////////////////////////////////////
