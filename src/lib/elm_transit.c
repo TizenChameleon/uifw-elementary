@@ -1040,7 +1040,7 @@ _set_image_uv_by_axis_y(Evas_Map *map, Elm_Fx_ResizableFlip *flip,
 	evas_map_point_image_uv_set(map, 1, flip->from_size.x, 0);
 	evas_map_point_image_uv_set(map, 2, flip->from_size.x,
 				    flip->from_size.y);
-	evas_map_point_image_uv_set(map, 3, 0, flip->to_size.y);
+	evas_map_point_image_uv_set(map, 3, 0, flip->from_size.y);
      }
 }
 
@@ -1259,7 +1259,7 @@ _elm_fx_wipe_hide(Evas_Map * map, Elm_Fx_Wipe_Dir dir, float x, float y,
      {
    case ELM_FX_WIPE_DIR_UP:
 	w2 = (x + w);
-	h2 = h - (h * frame);
+	h2 = y + h - (h * frame);
 	evas_map_point_image_uv_set(map, 0, 0, 0);
 	evas_map_point_image_uv_set(map, 1, w, 0);
 	evas_map_point_image_uv_set(map, 2, w, h2);
@@ -1304,6 +1304,7 @@ _elm_fx_wipe_hide(Evas_Map * map, Elm_Fx_Wipe_Dir dir, float x, float y,
 	evas_map_point_coord_set(map, 1, w2, y + h2, 0);
 	evas_map_point_coord_set(map, 2, w2, y + h, 0);
 	evas_map_point_coord_set(map, 3, x, y + h, 0);
+	fprintf(stderr, "%f %f %f %f\n", x, y, w, h);
 	break;
      default:
 	break;
