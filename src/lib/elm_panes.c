@@ -207,10 +207,14 @@ EAPI void elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content)
 
    if (content)
      {
-	wd->contents.left = content;
 	elm_widget_sub_object_add(obj, content);
+	wd->contents.left = content;
 	edje_object_part_swallow(wd->panes, "elm.swallow.left", content);
+	if (wd->contents.right)
+	   edje_object_signal_emit(wd->panes, "panes_pair", "elm");
      }
+   else
+      edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
 }
 
 /**
@@ -233,11 +237,14 @@ EAPI void elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
 
    if (content)
      {
-	wd->contents.right = content;
 	elm_widget_sub_object_add(obj, content);
+	wd->contents.right = content;
 	edje_object_part_swallow(wd->panes, "elm.swallow.right", content);
-	edje_object_signal_emit(wd->panes, "panes_pair", "elm");
+	if (wd->contents.left)
+	  edje_object_signal_emit(wd->panes, "panes_pair", "elm");
      }
+   else
+      edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
 }
 
 /**
@@ -288,7 +295,8 @@ elm_panes_content_left_unset(Evas_Object *obj)
    wd = elm_widget_data_get(obj);
 
    content = edje_object_part_swallow_get(wd->panes, "elm.swallow.left");
-   if(!content) return NULL;
+   if (!content)
+     return NULL;
    edje_object_part_unswallow(wd->panes, content);
    elm_widget_sub_object_del(obj, content);
    evas_object_hide(content);
@@ -315,7 +323,8 @@ elm_panes_content_right_unset(Evas_Object *obj)
    wd = elm_widget_data_get(obj);
 
    content = edje_object_part_swallow_get(wd->panes, "elm.swallow.right");
-   if(!content) return NULL;
+   if (!content)
+     return NULL;
    edje_object_part_unswallow(wd->panes, content);
    elm_widget_sub_object_del(obj, content);
    evas_object_hide(content);
@@ -412,10 +421,10 @@ elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    wd->fixed = fixed;
-   if(wd->fixed == EINA_TRUE)
-      edje_object_signal_emit(wd->panes, "elm.fixed", "movement.decider");
+   if (wd->fixed == EINA_TRUE)
+     edje_object_signal_emit(wd->panes, "elm.fixed", "movement.decider");
    else
-      edje_object_signal_emit(wd->panes, "elm.unfixed", "movement.decider");
+     edje_object_signal_emit(wd->panes, "elm.unfixed", "movement.decider");
 }
 
 /**
