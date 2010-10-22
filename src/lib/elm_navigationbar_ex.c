@@ -500,6 +500,7 @@ elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object 
 	if(!item) return; 
 	edje_object_part_swallow(item->base, "elm.swallow.icon", icon);
 	elm_widget_sub_object_add(item->obj, icon);
+	edje_object_signal_emit(item->base, "elm,state,icon,visible", "elm");
 	item->icon = icon;
 }
 
