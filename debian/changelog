@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build39) unstable; urgency=low
+
+  * [entry] add checking current widget at cnp
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build39
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Fri, 22 Oct 2010 11:20:30 +0900
+
 elementary (1.0.0+svn.51480slp2+build38) unstable; urgency=low
 
   * [entry] added copy paste feature - 2 handler selection

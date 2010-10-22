@@ -558,7 +558,7 @@ _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (!wd->password)
      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
    edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
-   elm_widget_scroll_hold_push(data);
+   //elm_widget_scroll_hold_push(data);
 }
 
 static void
@@ -1502,7 +1502,10 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 		return ECORE_CALLBACK_PASS_ON;
 	}
 
-	elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data,NULL,NULL);
+	if (cnpwidgetdata == data)
+	{
+      elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data,NULL,NULL);
+	}
 
 	// end for cbhm
    return ECORE_CALLBACK_PASS_ON;
