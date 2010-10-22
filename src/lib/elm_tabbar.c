@@ -828,7 +828,7 @@ static Eina_Bool edit_item_up_cb(void *data, int type, void *event_info)
 		x = ev->x - w/2;
 		y = ev->y - h;
 
-		evas_object_data_set(wd->moving_obj, "returning", 1);
+		evas_object_data_set(wd->moving_obj, "returning", (void *)1);
 		wd->animating++;
 		move_object_with_animation(wd->moving_obj, x, y, w, h, x_, y_, w_, h_, 0.25, edit_item_return_cb, wd);
 	}
@@ -977,7 +977,7 @@ static Eina_Bool bar_item_move_cb(void *data, int type, void *event_info)
 			elm_table_pack(wd->box, wd->moving_obj, wd->empty_num-1, 0, 1, 1);
 
 			wd->animating++;
-			evas_object_data_set(item->base, "animating", 1);
+			evas_object_data_set(item->base, "animating", (void *)1);
 			move_object_with_animation(item->base, x, y, w, h, x_, y_, w_, h_, 0.25, bar_item_move_end_cb, wd);
 		}
 	}

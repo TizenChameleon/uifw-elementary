@@ -724,7 +724,7 @@ elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char*
 	strncpy(buf, "item/", sizeof(buf));
 	strncat(buf, item_style, sizeof(buf) - strlen(buf));
 	if (!eina_stringshare_replace(&item->item_style, item_style)) return;
-	_elm_theme_object_set(item->obj, item->base,  "navigationbar2", buf, elm_widget_style_get(item->obj));
+	_elm_theme_object_set(item->obj, item->base,  "navigationbar_ex", buf, elm_widget_style_get(item->obj));
 	if(item->title)
 		edje_object_part_text_set(item->base, "elm.text", item->title);
 	if(item->subtitle)

@@ -1,3 +1,51 @@
+elementary (1.0.0+svn.51480slp2+build41) unstable; urgency=low
+
+  * sync with beat-theme
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build41
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Fri, 22 Oct 2010 15:45:19 +0900
+
+elementary (1.0.0+svn.51480slp2+build40) unstable; urgency=low
+
+  * elm_fx changes
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build40
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Fri, 22 Oct 2010 14:05:18 +0900
+
+elementary (1.0.0+svn.51480slp2+build39) unstable; urgency=low
+
+  * [entry] add checking current widget at cnp
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build39
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Fri, 22 Oct 2010 11:20:30 +0900
+
+elementary (1.0.0+svn.51480slp2+build38) unstable; urgency=low
+
+  * [entry] added copy paste feature - 2 handler selection
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build38
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Thu, 20 Oct 2010 22:56:00 +0900
+
+elementary (1.0.0+svn.51480slp2+build37) unstable; urgency=low
+
+  * [els_icon] rotate bug fixed
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build37
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Wed, 20 Oct 2010 21:06:16 +0900
+
+elementary (1.0.0+svn.51480slp2+build36) unstable; urgency=low
+
+  * [cnp_helper] merge upstream changes
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build36
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Wed, 20 Oct 2010 17:48:25 +0900
+
 elementary (1.0.0+svn.51480slp2+build35) unstable; urgency=low
 
   * [elm_entry] password tag bug fix 
