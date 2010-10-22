@@ -558,7 +558,7 @@ _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (!wd->password)
      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
    edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
-   elm_widget_scroll_hold_push(data);
+   //elm_widget_scroll_hold_push(data);
 }
 
 static void
