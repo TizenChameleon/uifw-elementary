@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build40) unstable; urgency=low
+
+  * elm_fx changes
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build40
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Fri, 22 Oct 2010 14:05:18 +0900
+
 elementary (1.0.0+svn.51480slp2+build39) unstable; urgency=low
 
   * [entry] add checking current widget at cnp
