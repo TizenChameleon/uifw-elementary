@@ -2368,6 +2368,7 @@ extern "C" {
    EAPI void         elm_controlbar_view_set(Evas_Object *obj, Evas_Object *view);
    EAPI void         elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
    EAPI void         elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
+   EAPI void         elm_controlbar_view_animation_set(Evas_Object *obj, const char *hide, const char *show);
    /*======= Just for test =======*/
 
 
