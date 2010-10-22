@@ -72,7 +72,7 @@
  * 
  * Signals that you can add callbacks for are:
  * - "changed" - The text within the entry was changed
- * - "activated" - The entry has received focus and the cursor
+ * - "activated" - The entry has had editing finished and changes are to be committed (generally when enter key is pressed)
  * - "press" - The entry has been clicked
  * - "longpressed" - The entry has been clicked for a couple seconds
  * - "clicked" - The entry has been clicked
@@ -431,7 +431,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    if (!wd->editable) return;
    if (elm_widget_focus_get(obj))
      {
-	evas_object_focus_set(wd->ent, 1);
+	evas_object_focus_set(wd->ent, EINA_TRUE);
 	edje_object_signal_emit(wd->ent, "elm,action,focus", "elm");
 
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
@@ -442,7 +442,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      {
 	edje_object_signal_emit(wd->ent, "elm,action,unfocus", "elm");
 	//edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", "");
-	evas_object_focus_set(wd->ent, 0);
+	evas_object_focus_set(wd->ent, EINA_FALSE);
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
 	evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
      }
@@ -693,7 +693,7 @@ _long_press(void *data)
           (wd->ent, "context_menu_orientation");
         if ((context_menu_orientation) &&
             (!strcmp(context_menu_orientation, "horizontal")))
-          elm_hoversel_horizontal_set(wd->hoversel, 1);
+          elm_hoversel_horizontal_set(wd->hoversel, EINA_TRUE);
         elm_object_style_set(wd->hoversel, "entry");
         elm_widget_sub_object_add(data, wd->hoversel);
         elm_hoversel_label_set(wd->hoversel, "Text");
@@ -790,7 +790,7 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
      {
 	ecore_timer_del(wd->longpress_timer);
 	wd->longpress_timer = NULL;
-     }	
+     }
 }
 
 static void
@@ -1481,8 +1481,8 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 /*
    Widget_Data *wd = elm_widget_data_get(data);
    Ecore_X_Event_Selection_Clear *ev = event;
-   if (!wd) return 1;
-   if (!wd->have_selection) return 1;
+   if (!wd) return ECORE_CALLBACK_PASS_ON;
+   if (!wd->have_selection) return ECORE_CALLBACK_PASS_ON;
    if ((ev->selection == ECORE_X_SELECTION_CLIPBOARD) ||
        (ev->selection == ECORE_X_SELECTION_PRIMARY))
      {
