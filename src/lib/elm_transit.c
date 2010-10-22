@@ -1,4 +1,5 @@
 #include <Elementary.h>
+#include "elm_priv.h"
 
 /**
  *
@@ -1921,7 +1922,6 @@ static void _elm_fx_rotation3d_op(void *data, Elm_Animator *animator,
 struct _rotation3d
 {
    Evas_Object *obj;
-   Eina_Bool cw;
    float from[3];
    float to[3];
    float axis_pos[3];
@@ -1968,12 +1968,6 @@ _elm_fx_rotation3d_op(void *data, Elm_Animator *animator, double frame)
    degree[1] = rotation->from[1] + (float)(frame * rotation->to[1]);
    degree[2] = rotation->from[2] + (float)(frame * rotation->to[2]);
 
-   if (!rotation->cw) {
-      degree[0] *= -1;
-      degree[1] *= -1;
-      degree[2] *= -1;
-   }
-
    evas_object_geometry_get(rotation->obj, &x, &y, &w, &h);
 
    half_w = (float)w *0.5;
@@ -1981,7 +1975,7 @@ _elm_fx_rotation3d_op(void *data, Elm_Animator *animator, double frame)
    half_h = (float)h *0.5;
 
    evas_map_util_3d_rotate(map, degree[0], degree[1], degree[2], rotation->axis_pos[0], rotation->axis_pos[1], rotation->axis_pos[2]);
-   evas_map_util_3d_perspective(map, x + half_w, y + half_h, 0, 10000);
+   evas_map_util_3d_perspective(map, x + half_w, y + half_h, 0, 1000);
    evas_object_map_enable_set(rotation->obj, EINA_TRUE);
    evas_object_map_set(rotation->obj, map);
    evas_map_free(map);
@@ -2002,7 +1996,7 @@ _elm_fx_rotation3d_op(void *data, Elm_Animator *animator, double frame)
  */
 EAPI Elm_Effect *
 elm_fx_rotation3d_add(Evas_Object *obj, float from_degree, float to_degree,
-		float* axis_dir, float* axis_pos, Eina_Bool cw)
+		float* axis_dir, float* axis_pos)
 {
    Elm_Effect *effect;
 
@@ -2024,7 +2018,6 @@ elm_fx_rotation3d_add(Evas_Object *obj, float from_degree, float to_degree,
      }
 
    rotation->obj = obj;
-   rotation->cw = cw;
    rotation->from[0] = from_degree * axis_dir[0];
    rotation->from[1] = from_degree * axis_dir[1];
    rotation->from[2] = from_degree * axis_dir[2];
@@ -2032,8 +2025,8 @@ elm_fx_rotation3d_add(Evas_Object *obj, float from_degree, float to_degree,
    rotation->to[1] = (to_degree * axis_dir[1]) - rotation->from[1];
    rotation->to[2] = (to_degree * axis_dir[2]) - rotation->from[2];
    rotation->axis_pos[0] = axis_pos[0];
-   rotation->axis_pos[1] = axis_pos[1] ;
-   rotation->axis_pos[2] = axis_pos[2] ;
+   rotation->axis_pos[1] = axis_pos[1];
+   rotation->axis_pos[2] = axis_pos[2];
 
    effect->begin_op = _elm_fx_rotation3d_begin;
    effect->end_op = _elm_fx_rotation3d_end;
