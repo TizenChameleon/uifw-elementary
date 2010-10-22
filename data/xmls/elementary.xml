@@ -17,10 +17,10 @@
         <Center x="10" y="30" z="20"/>
       </Rotation>
       <Color>
-        <ColorRed from="255" to="255" type="LINEAR"/>
-        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <Red from="255" to="255" type="LINEAR"/>
+        <Green from="255" to="255" type="LINEAR"/>
         <ColorBlue from="255" to="255" type="LINEAR"/>
-        <ColorAlpha from="255" to="255" type="LINEAR"/>
+        <Alpha from="255" to="255" type="LINEAR"/>
       </Color>
 	</Scene>
 	<Scene title="second">
@@ -38,10 +38,10 @@
         <Center x="10" y="30" z="20"/>
       </Rotation>
       <Color>
-        <ColorRed from="255" to="255" type="LINEAR"/>
-        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <Red from="255" to="255" type="LINEAR"/>
+        <Green from="255" to="255" type="LINEAR"/>
         <ColorBlue from="255" to="255" type="LINEAR"/>
-        <ColorAlpha from="255" to="255" type="LINEAR"/>
+        <Alpha from="255" to="255" type="LINEAR"/>
       </Color>
 	</Scene>
 	<Scene title="second">
@@ -59,10 +59,10 @@
         <Center x="10" y="30" z="20"/>
       </Rotation>
       <Color>
-        <ColorRed from="255" to="255" type="LINEAR"/>
-        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <Red from="255" to="255" type="LINEAR"/>
+        <Green from="255" to="255" type="LINEAR"/>
         <ColorBlue from="255" to="255" type="LINEAR"/>
-        <ColorAlpha from="255" to="255" type="LINEAR"/>
+        <Alpha from="255" to="255" type="LINEAR"/>
       </Color>
 	</Scene>
 	<Scene title="second">
@@ -80,10 +80,10 @@
         <Center x="10" y="30" z="20"/>
       </Rotation>
       <Color>
-        <ColorRed from="255" to="255" type="LINEAR"/>
-        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <Red from="255" to="255" type="LINEAR"/>
+        <Green from="255" to="255" type="LINEAR"/>
         <ColorBlue from="255" to="255" type="LINEAR"/>
-        <ColorAlpha from="255" to="255" type="LINEAR"/>
+        <Alpha from="255" to="255" type="LINEAR"/>
       </Color>
 	</Scene>
 	<Scene title="second">
@@ -101,10 +101,10 @@
         <Center x="10" y="30" z="20"/>
       </Rotation>
       <Color>
-        <ColorRed from="255" to="255" type="LINEAR"/>
-        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <Red from="255" to="255" type="LINEAR"/>
+        <Green from="255" to="255" type="LINEAR"/>
         <ColorBlue from="255" to="255" type="LINEAR"/>
-        <ColorAlpha from="255" to="255" type="LINEAR"/>
+        <Alpha from="255" to="255" type="LINEAR"/>
       </Color>
 	</Scene>
 	<Scene title="second">
@@ -122,10 +122,10 @@
         <Center x="10" y="30" z="20"/>
       </Rotation>
       <Color>
-        <ColorRed from="255" to="255" type="LINEAR"/>
-        <ColorGreen from="255" to="255" type="LINEAR"/>
+        <Red from="255" to="255" type="LINEAR"/>
+        <Green from="255" to="255" type="LINEAR"/>
         <ColorBlue from="255" to="255" type="LINEAR"/>
-        <ColorAlpha from="255" to="255" type="LINEAR"/>
+        <Alpha from="255" to="255" type="LINEAR"/>
       </Color>
     </Scene>
   </Animation>
@@ -145,10 +145,10 @@
 			<Center x="0.5" y="0.5" z="0"/>
 		</Rotation>
 		<Color>
-			<ColorRed from="255" to="255" type="LINEAR"/>
-			<ColorGreen from="255" to="255" type="LINEAR"/>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
 			<ColorBlue from="255" to="255" type="LINEAR"/>
-			<ColorAlpha from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="255" type="LINEAR"/>
 		</Color>
 	</Scene>
   </Animation>
@@ -168,10 +168,10 @@
 			<Center x="0.5" y="0.5" z="0"/>
 		</Rotation>
 		<Color>
-			<ColorRed from="255" to="255" type="LINEAR"/>
-			<ColorGreen from="255" to="255" type="LINEAR"/>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
 			<ColorBlue from="255" to="255" type="LINEAR"/>
-			<ColorAlpha from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="255" type="LINEAR"/>
 		</Color>
 	</Scene>
   </Animation>
@@ -283,6 +283,386 @@
 			<AngleZ from="5" to="0" type="DECELERATE"/>
 			<Center x="1.0" y="1.0" z="0"/>
 		</Rotation>
+	</Scene>
+  </Animation>
+  <Animation title="translation-hide">
+	<Scene title="first">
+		<Time start="0" end="0.5"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="-480" type="DECELERATE"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<Blue from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="translation-show">
+	<Scene title="first">
+		<Time start="0.0" end="0.5"/>
+		<Location>
+			<CoordX standard="OBJECT" from="480" to="0" type="DECELERATE"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<Blue from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="flip1-hide">
+	<Scene title="first">
+		<Time start="0" end="0.3"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="90" type="LINEAR"/>
+			<AngleY from="0" to="0" type="LINEAR"/>
+			<AngleZ from="0" to="0" type="LINEAR"/>
+			<Center x="0.5" y="0.5" z="0"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="flip1-show">
+	<Scene title="first">
+		<Time start="0.3" end="0.6"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="270" to="360" type="LINEAR"/>
+			<AngleY from="0" to="0" type="LINEAR"/>
+			<AngleZ from="0" to="0" type="LINEAR"/>
+			<Center x="0.5" y="0.5" z="0"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="flip2-hide">
+	<Scene title="first">
+		<Time start="0" end="0.3"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="LINEAR"/>
+			<AngleY from="0" to="90" type="LINEAR"/>
+			<AngleZ from="0" to="0" type="LINEAR"/>
+			<Center x="0.5" y="0.5" z="0"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="flip2-show">
+	<Scene title="first">
+		<Time start="0.3" end="0.6"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="LINEAR"/>
+			<AngleY from="270" to="360" type="LINEAR"/>
+			<AngleZ from="0" to="0" type="LINEAR"/>
+			<Center x="0.5" y="0.5" z="0"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="drop-hide">
+	<Scene title="first">
+		<Time start="0.0" end="0.5"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="90" type="LINEAR"/>
+			<AngleY from="0" to="0" type="LINEAR"/>
+			<AngleZ from="0" to="0" type="LINEAR"/>
+			<Center x="0.5" y="1.0" z="0"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="drop-show">
+	<Scene title="first">
+		<Time start="0.0" end="0.5"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="-800" to="0" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+	</Scene>
+	<Scene title="first">
+		<Time start="0.0" end="0.2"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="-80" type="DECELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+	</Scene>
+	<Scene title="first">
+		<Time start="0.0" end="0.3"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="-80" to="0" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+	</Scene>
+  </Animation>
+  <Animation title="push-hide">
+	<Scene title="first">
+		<Time start="0.0" end="0.7"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="LINEAR"/>
+			<AngleZ from="0" to="90" type="ACCELERATE"/>
+			<Center x="0.0" y="0.0" z="0"/>
+		</Rotation>
+	</Scene>
+  </Animation>
+  <Animation title="push-show">
+  <Scene title="first">
+		<Time start="0.0" end="0.7"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="LINEAR"/>
+			<AngleZ from="-90" to="0" type="ACCELERATE"/>
+			<Center x="0.0" y="0.0" z="0"/>
+		</Rotation>
+	</Scene>
+  </Animation>
+  <Animation title="rotation1-hide">
+	<Scene title="first">
+		<Time start="0.0" end="0.3"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="160" type="DECELERATE"/>
+			<CoordY standard="OBJECT" from="0" to="230" type="DECELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="-320" type="DECELERATE"/>
+			<CoordH standard="OBJECT" from="0" to="-460" type="DECELERATE"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="0" to="0" type="DECELERATE"/>
+			<Center x="0.5" y="0.5" z="0.5"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="150" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="rotation1-show">
+    <Scene title="first">
+		<Time start="0.3" end="1.0"/>
+		<Location>
+			<CoordX standard="OBJECT" from="160" to="0" type="ACCELERATE"/>
+			<CoordY standard="OBJECT" from="230" to="0" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="-320" to="0" type="ACCELERATE"/>
+			<CoordH standard="OBJECT" from="-460" to="0" type="ACCELERATE"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="ACCELERATE"/>
+			<AngleY from="0" to="0" type="ACCELERATE"/>
+			<AngleZ from="0" to="1080" type="ACCELERATE"/>
+			<Center x="0.5" y="0.5" z="0.5"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="150" to="255" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="wave-hide">
+	<Scene title="first">
+		<Time start="0.0" end="0.5"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="90" type="ACCELERATE"/>
+			<AngleY from="0" to="0" type="ACCELERATE"/>
+			<AngleZ from="0" to="0" type="ACCELERATE"/>
+			<Center x="0.0" y="0.0" z="0"/>
+		</Rotation>
+	</Scene>
+  </Animation>
+  <Animation title="wave-show">
+  <Scene title="first">
+		<Time start="0.0" end="0.7"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="0" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="0" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="90" to="0" type="ACCELERATE"/>
+			<AngleY from="0" to="0" type="ACCELERATE"/>
+			<AngleZ from="0" to="0" type="ACCELERATE"/>
+			<Center x="1.0" y="1.0" z="0"/>
+		</Rotation>
+	</Scene>
+  </Animation>
+  <Animation title="card-hide">
+    <Scene title="first">
+		<Time start="0.0" end="0.3"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="0" type="LINEAR"/>
+			<CoordY standard="OBJECT" from="0" to="155" type="LINEAR"/>
+			<CoordW standard="OBJECT" from="0" to="-240" type="LINEAR"/>
+			<CoordH standard="OBJECT" from="0" to="-310" type="LINEAR"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="LINEAR"/>
+			<AngleZ from="0" to="0" type="DECELERATE"/>
+			<Center x="0.5" y="0.5" z="0.5"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="255" to="150" type="LINEAR"/>
+		</Color>
+	</Scene>
+	<Scene title="first">
+		<Time start="0.0" end="0.3"/>
+		<Location>
+			<CoordX standard="OBJECT" from="0" to="120" type="DECELERATE"/>
+			<CoordY standard="OBJECT" from="155" to="232" type="DECELERATE"/>
+			<CoordW standard="OBJECT" from="-240" to="-360" type="DECELERATE"/>
+			<CoordH standard="OBJECT" from="-310" to="-465" type="DECELERATE"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="DECELERATE"/>
+			<AngleY from="0" to="0" type="DECELERATE"/>
+			<AngleZ from="0" to="0" type="DECELERATE"/>
+			<Center x="0.5" y="0.5" z="0.5"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="150" to="0" type="LINEAR"/>
+		</Color>
+	</Scene>
+  </Animation>
+  <Animation title="card-show">
+    <Scene title="first">
+		<Time start="0.0" end="0.3"/>
+		<Location>
+			<CoordX standard="OBJECT" from="240" to="240" type="ACCELERATE"/>
+			<CoordY standard="OBJECT" from="232" to="155" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="-360" to="-240" type="ACCELERATE"/>
+			<CoordH standard="OBJECT" from="-465" to="-310" type="ACCELERATE"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="ACCELERATE"/>
+			<AngleY from="0" to="0" type="ACCELERATE"/>
+			<AngleZ from="0" to="0" type="ACCELERATE"/>
+			<Center x="0.5" y="0.5" z="0.5"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="0" to="150" type="LINEAR"/>
+		</Color>
+	</Scene>
+	<Scene title="first">
+		<Time start="0.0" end="0.3"/>
+		<Location>
+			<CoordX standard="OBJECT" from="240" to="0" type="ACCELERATE"/>
+			<CoordY standard="OBJECT" from="155" to="0" type="ACCELERATE"/>
+			<CoordW standard="OBJECT" from="-240" to="0" type="ACCELERATE"/>
+			<CoordH standard="OBJECT" from="-310" to="0" type="ACCELERATE"/>
+		</Location>
+		<Rotation>
+			<AngleX from="0" to="0" type="ACCELERATE"/>
+			<AngleY from="0" to="0" type="ACCELERATE"/>
+			<AngleZ from="0" to="0" type="ACCELERATE"/>
+			<Center x="0.5" y="0.5" z="0.5"/>
+		</Rotation>
+		<Color>
+			<Red from="255" to="255" type="LINEAR"/>
+			<Green from="255" to="255" type="LINEAR"/>
+			<ColorBlue from="255" to="255" type="LINEAR"/>
+			<Alpha from="150" to="255" type="LINEAR"/>
+		</Color>
 	</Scene>
   </Animation>
 </AML>
