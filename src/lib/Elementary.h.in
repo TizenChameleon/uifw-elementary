@@ -2196,7 +2196,7 @@ extern "C" {
    EAPI Elm_Effect  *elm_fx_rotation_add(Evas_Object *obj, float from_degree, float to_degree, Eina_Bool cw);
 
    /* Rotation3D Fx */
-   EAPI Elm_Effect  *elm_fx_rotation3d_add(Evas_Object *obj, float from_degree, float to_degree, float* axis_dir, float* axis_pos, Eina_Bool cw);
+   EAPI Elm_Effect  *elm_fx_rotation3d_add(Evas_Object *obj, float from_degree, float to_degree, float* axis_dir, float* axis_pos);
    
    /* Color Fx */
    EAPI Elm_Effect  *elm_fx_color_add(Evas_Object *obj, unsigned int from_r, unsigned int from_g, unsigned int from_b, unsigned int from_a, unsigned int to_r, unsigned int to_g, unsigned int to_b, unsigned int to_a);
