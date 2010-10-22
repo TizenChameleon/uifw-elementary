@@ -1502,7 +1502,10 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
 		return ECORE_CALLBACK_PASS_ON;
 	}
 
-	elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data,NULL,NULL);
+	if (cnpwidgetdata == data)
+	{
+      elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data,NULL,NULL);
+	}
 
 	// end for cbhm
    return ECORE_CALLBACK_PASS_ON;
