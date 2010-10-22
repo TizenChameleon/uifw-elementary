@@ -1259,6 +1259,7 @@ extern "C" {
    EAPI void              elm_genlist_effect_set(const Evas_Object *obj, Eina_Bool emode);
    EAPI void              elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode);
    EAPI void              elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode);
+   EAPI Eina_Bool         elm_genlist_pinch_zoom_mode_get(Evas_Object *obj);
    EINA_DEPRECATED EAPI void              elm_genlist_queue_exception_set(const Evas_Object *obj, Eina_Bool emode);
 
 
