@@ -311,9 +311,9 @@ static void
 _hsl_to_rgb(void *data)
 {
    Widget_Data *wd = (Widget_Data *) data;
-   double r, g, b;
+   double r = 0, g = 0, b = 0;
    double _h, _s, _l;
-   int i;
+   int i = 0;
    double sv, vsf, f, p, q, t, v;
 
    _h = wd->h;
@@ -321,9 +321,7 @@ _hsl_to_rgb(void *data)
    _l = wd->l;
 
    if (_s == 0.0)
-     {
-	r = g = b = _l;
-     }
+     r = g = b = _l;
 
    else
      {
@@ -633,7 +631,7 @@ _mv_timer(void *data)
 	     ecore_timer_del(wd->mv_timer);
 	     wd->mv_timer = NULL;
 	  }
-	return 0;
+	return EINA_FALSE;
      }
 }
 
@@ -651,11 +649,11 @@ _long_press_timer(void *data)
 
    wd->mv_timer = ecore_timer_add(0.01, _mv_timer, cp);
 
-   return 0;
+   return EINA_FALSE;
 }
 
 static void
-_left_button_down_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
+_left_button_down_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Colorpicker_Data *cp = (Colorpicker_Data *) data;
    Widget_Data *wd = elm_widget_data_get(cp->parent);
@@ -732,7 +730,7 @@ _left_button_up_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
 }
 
 static void
-_right_button_up_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
+_right_button_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Colorpicker_Data *cp = (Colorpicker_Data *) data;
    Widget_Data *wd = elm_widget_data_get(cp->parent);
@@ -756,10 +754,11 @@ _right_button_up_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
 static void
 _add_colorbar(Evas_Object * obj)
 {
-   int i;
+   char colorbar_name[128];
    Widget_Data *wd;
    Evas *e;
-   char colorbar_name[128];
+   int i = 0;
+
 
    wd = elm_widget_data_get(obj);
    if (!wd)
@@ -900,7 +899,7 @@ _set_color(Evas_Object * obj, int r, int g, int b)
  * @ingroup Colorpicker
  */
 EAPI Evas_Object *
-elm_colorpicker_add(Evas_Object * parent)
+elm_colorpicker_add(Evas_Object *parent)
 {
    Evas_Object *obj = NULL;
    Widget_Data *wd = NULL;

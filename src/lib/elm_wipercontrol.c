@@ -48,7 +48,7 @@ _theme_hook(Evas_Object *obj)
 static void
 _sizing_eval(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
+//	Widget_Data *wd = elm_widget_data_get(obj);
 }
 
 /**

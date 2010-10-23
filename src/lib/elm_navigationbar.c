@@ -31,6 +31,7 @@ struct _Widget_Data
 	Evas_Object *base;
 	Evas_Object *pager;
 	Eina_Bool popped : 1;
+	Eina_Bool hidden :1;
  };
 
 struct _Item
@@ -260,7 +261,7 @@ _transition_complete_cb(void *data)
 		evas_object_hide(prev_it->fn_btn2);
 		evas_object_hide(prev_it->fn_btn3);
 	}
-	if (it)
+	if ((it)&&(!wd->hidden))
 	{
 		edje_object_part_text_set(wd->base, "elm.text", it->title);
 		if(!cb->first_page)
@@ -327,7 +328,6 @@ _transition_complete_cb(void *data)
 		content = it->content;
 	}
 	edje_object_message_signal_process(wd->base);
-	evas_object_smart_callback_call(navi_bar, "updated", content);
 }
 
 static void 
@@ -345,6 +345,7 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
 {
 	Evas_Object *navi_bar = data;	
 	Widget_Data *wd =  elm_widget_data_get(navi_bar);
+	evas_object_smart_callback_call(navi_bar, "hide,finished", event_info);
 	wd->popped = EINA_TRUE;
 }
 
@@ -1234,6 +1235,7 @@ elm_navigationbar_hidden_set(Evas_Object *obj,
 
 	if (hidden) edje_object_signal_emit(wd->base, "elm,state,item,moveup", "elm");
 	else edje_object_signal_emit(wd->base, "elm,state,item,movedown", "elm");
+	wd->hidden = hidden;
 }
 
 /**

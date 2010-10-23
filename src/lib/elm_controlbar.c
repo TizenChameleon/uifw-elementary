@@ -77,6 +77,10 @@ struct _Widget_Data
    Eina_Bool selected_animation;
 
    Elm_Xml_Animator *xa;
+   Elm_Xml_Animator *vxa;
+
+   char *view_hide;
+   char *view_show;
 };
 
 struct _Elm_Controlbar_Item 
@@ -754,7 +758,6 @@ item_animation_effect(void *data)
    const Eina_List *l;
    Elm_Controlbar_Item * item;
    int rand;
-   Eina_Bool check;
   
    if(!wd->xa){
 	wd->xa = elm_xml_animator_add(wd->object);
@@ -772,7 +775,7 @@ item_animation_effect(void *data)
 	     switch(rand)
 	       {
 		case 0: 
-		   check = elm_xml_animator_object_add(wd->xa, item->base_item, "test", end_item_animation_effect, wd);
+		   elm_xml_animator_object_add(wd->xa, item->base_item, "test", end_item_animation_effect, wd);
 		   break;
 		case 1:
 		   elm_xml_animator_object_add(wd->xa, item->base_item, "test2", end_item_animation_effect, wd);
@@ -1144,6 +1147,28 @@ view_animation_down(Widget_Data *wd, Evas_Object *pre, Evas_Object *cur, void *d
 }
 
 static void 
+end_view_animation_effect(void *data, Evas_Object *obj)
+{
+   Widget_Data *wd = (Widget_Data *)data;
+   elm_xml_animator_object_del(wd->vxa, obj);
+   if(wd->pre_item) evas_object_hide(wd->pre_item->view);
+   if(wd->cur_item) elm_layout_content_set(wd->view, "elm.swallow.view", wd->cur_item->view);
+}
+
+static Eina_Bool
+_check_idler(void *data)
+{
+   printf("in idler\n");
+
+   Elm_Controlbar_Item *it = data;
+
+   Evas_Coord x, y, w, h;
+   evas_object_geometry_get(it->view, &x, &y, &w, &h);
+
+   return ECORE_CALLBACK_CANCEL;
+}
+
+static void 
 selected_box(Elm_Controlbar_Item * it) 
 {
    Widget_Data * wd = elm_widget_data_get(it->obj);
@@ -1154,6 +1179,11 @@ selected_box(Elm_Controlbar_Item * it)
    if(wd->animating) return;
 
    wd->cur_item = it;
+
+   if(!wd->vxa){
+	wd->vxa = elm_xml_animator_add(wd->object);
+	elm_xml_animator_file_set(wd->vxa, "/usr/share/xmls/elementary.xml");
+   }
 
    if(it->style == TABBAR){
 
@@ -1198,8 +1228,25 @@ selected_box(Elm_Controlbar_Item * it)
 		end_selected_box(wd, it->view);
 	     }
 */	    
-	   if(wd->pre_item) evas_object_hide(wd->pre_item->view);
+	   //if(wd->pre_item) evas_object_hide(wd->pre_item->view);
 	   elm_layout_content_set(wd->view, "elm.swallow.view", it->view);
+	   //for test
+	   evas_object_map_enable_set(it->view, EINA_TRUE);
+	  
+	   //evas_object_move(it->view, -480, 94);
+	   //evas_object_resize(it->view, 480, 620);
+	   //evas_object_show(it->view);
+
+	   if(wd->pre_item && wd->pre_item != it)
+	     {
+		if(wd->view_hide) 
+		  elm_xml_animator_object_add(wd->vxa, wd->pre_item->view, wd->view_hide, end_view_animation_effect, wd);
+		else
+		  evas_object_hide(wd->pre_item->view);
+		if(wd->view_show) elm_xml_animator_object_add(wd->vxa, it->view, wd->view_show, end_view_animation_effect, wd);
+	     }
+
+	   elm_xml_animator_run(wd->vxa);
 
 //	   elm_layout_content_set(wd->view, "elm.swallow.view", it->view);
 	   //edje_object_part_swallow(wd->view, "elm.swallow.view", it->view);
@@ -1213,6 +1260,8 @@ selected_box(Elm_Controlbar_Item * it)
    }
 
    evas_object_smart_callback_call(it->obj, "clicked", it);
+
+   ecore_idler_add(_check_idler, it);
 }
 
 static void
@@ -1283,7 +1332,7 @@ pressed_box(Elm_Controlbar_Item * it)
 	   else if (it->style == TOOLBAR)
 	     {
 	
-		//object_color_set(it->base, "elm.toolbar.pressed.color", "elm.swallow.icon");
+		object_color_set(it->base, "elm.toolbar.pressed.color", "elm.swallow.icon");
 		edje_object_signal_emit(_EDJ(it->base), "elm,state,text_selected",
 					  "elm");
 		}
@@ -3479,3 +3528,22 @@ elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Ei
    wd->selected_animation = selected_animation;
 }
 
+EAPI void
+elm_controlbar_view_animation_set(Evas_Object *obj, const char *hide, const char *show)
+{
+   Widget_Data * wd;
+   if (obj == NULL)
+     {
+	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
+	return;
+     }
+   wd = elm_widget_data_get(obj);
+   if (wd == NULL)
+     {
+	fprintf(stderr, "Cannot get smart data\n");
+	return;
+     }
+
+   wd->view_hide = eina_stringshare_add(hide);
+   wd->view_show = eina_stringshare_add(show);
+}

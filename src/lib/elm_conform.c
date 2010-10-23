@@ -129,7 +129,7 @@ _imp_region_show(void *data, Evas_Object *obj)
 }
 
 static void
-_imp_region_changed_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_imp_region_changed_cb(void *data, Evas_Object *obj, void *event_info)
 {
    _imp_region_show(data, obj);
 }
@@ -206,7 +206,7 @@ _autoscroll_mode_enable(void *data)
    bool ret = EINA_FALSE;
    
    Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return EINA_FALSE;
+   if (!wd) return;
    focused_object=_focus_object_get(data);
    if(focused_object)
     {
@@ -227,7 +227,7 @@ static void
 _autoscroll_mode_disable(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return EINA_FALSE;
+   if (!wd) return;
    evas_object_event_callback_del(wd->scroller, EVAS_CALLBACK_RESIZE, _scroller_resize_event_cb);
    evas_object_smart_callback_del(wd->focus_obj, SIG_IMPREGION_CHANGED, _imp_region_changed_cb);
    wd->scroller = NULL;

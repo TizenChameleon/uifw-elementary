@@ -117,7 +117,7 @@ _theme_hook(Evas_Object *obj)
      edje_object_signal_emit(wd->btn, "elm,state,icon,hidden", "elm");
 
    edje_object_part_text_set(wd->btn, "elm.text", wd->label);
-   if (elm_widget_disabled_get(obj))
+   if (elm_object_disabled_get(obj))
      edje_object_signal_emit(wd->btn, "elm,state,disabled", "elm");
    edje_object_message_signal_process(wd->btn);
    edje_object_scale_set(wd->btn, elm_widget_scale_get(obj) * _elm_config->scale);
@@ -160,13 +160,13 @@ _sizing_eval(Evas_Object *obj)
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
    edje_object_size_min_restricted_calc(wd->btn, &minw, &minh, minw, minh);
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-
+   //Commenting to sync with open source and able to resize based on text change
    evas_object_size_hint_min_get(obj, &w, &h);
-   if (w > minw) minw = w;
+   //if (w > minw) minw = w;
    if (h > minh) minh = h;
 
    evas_object_size_hint_min_set(obj, minw, minh);
-   evas_object_size_hint_max_set(obj, maxw, maxh);
+   //evas_object_size_hint_max_set(obj, maxw, maxh);
 }
 
 static void
@@ -315,13 +315,13 @@ elm_button_add(Evas_Object *parent)
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "button");
    elm_widget_type_set(obj, "button");
+   elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_sub_object_add(parent, obj);
    elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
-   elm_widget_can_focus_set(obj, EINA_TRUE);
 
    wd->btn = edje_object_add(e);
    _elm_theme_object_set(obj, wd->btn, "button", "base", "default");

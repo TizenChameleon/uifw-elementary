@@ -850,7 +850,6 @@ static Eina_Bool _bounce_to_right( Widget_Data* wd )
 	evas_object_geometry_get( wd->obj, NULL, NULL, &w, NULL );
 	
 	Elm_Coverflow_Item* item =  eina_list_data_get( wd->valid_item_list );	
-	Evas_Coord a = item->idx * wd->dist_between_items;
 		
 	Evas_Coord right_outside_length = wd->cur_pos.x + (Evas_Coord) wd->valid_item_length - w;
 	Evas_Coord sliding_length = wd->sliding_vector;

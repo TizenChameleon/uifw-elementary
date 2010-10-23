@@ -18,14 +18,16 @@ struct _Widget_Data
 {
    Evas_Object *base, *eb, *cancel_btn;
    Eina_Bool cancel_btn_ani_flag;
+   Eina_Bool cancel_btn_show_mode;
+   Eina_Bool boundary_mode;
 };
 
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _changed(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _clicked(void *data, Evas_Object *obj, void *event_info);
+static void _changed(void *data, Evas_Object *obj, void *event_info);
+static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info);
 
 static void _del_hook(Evas_Object *obj)
 {
@@ -65,21 +67,25 @@ static void _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_max_set(obj, maxw, maxh);
 }
 
-static void _clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+static void _clicked(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
    elm_entry_cursor_end_set(elm_editfield_entry_get(wd->eb));
-   if (wd->cancel_btn_ani_flag == EINA_TRUE)
-     edje_object_signal_emit(wd->base, "CANCELIN", "PROG");
-   else
-     edje_object_signal_emit(wd->base, "CANCELSHOW", "PROG");
+
+   if (wd->cancel_btn_show_mode)
+   {
+	   if (wd->cancel_btn_ani_flag)
+		   edje_object_signal_emit(wd->base, "CANCELIN", "PROG");
+	   else
+		   edje_object_signal_emit(wd->base, "CANCELSHOW", "PROG");
+   }
 
    evas_object_smart_callback_call(data, "clicked", NULL);
 }
 
-static void _changed(void *data, Evas_Object *obj, const char *emission, const char *source)
+static void _changed(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
@@ -89,15 +95,18 @@ static void _changed(void *data, Evas_Object *obj, const char *emission, const c
 //   evas_object_smart_callback_call(data, "changed", NULL);
 }
 
-static void _cancel_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
-   if (wd->cancel_btn_ani_flag == EINA_TRUE)
-     edje_object_signal_emit(wd->base, "CANCELOUT", "PROG");
-   else
-     edje_object_signal_emit(wd->base, "CANCELHIDE", "PROG");
+   if (wd->cancel_btn_show_mode)
+   {
+	   if (wd->cancel_btn_ani_flag)
+		   edje_object_signal_emit(wd->base, "CANCELOUT", "PROG");
+	   else
+		   edje_object_signal_emit(wd->base, "CANCELHIDE", "PROG");
+   }
 
    const char* text;
    text = elm_entry_entry_get(elm_editfield_entry_get(wd->eb));
@@ -116,7 +125,7 @@ _searchicon_clicked(void *data, Evas_Object *obj, const char *emission, const ch
    if (!strcmp(source, "search_icon"))
      evas_object_smart_callback_call(data, "searchsymbol,clicked", NULL);
    else if (!strcmp(source, "base_bg"))
-     _clicked(data, obj, emission, source);
+     _clicked(data, obj, NULL); //emission, source);
 }
 
 /**
@@ -174,6 +183,8 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    elm_widget_sub_object_add(obj, wd->cancel_btn);
 
    wd->cancel_btn_ani_flag = EINA_FALSE;
+   wd->cancel_btn_show_mode = EINA_TRUE;
+   wd->boundary_mode = EINA_TRUE;
 
    elm_widget_resize_object_set(obj, wd->base);
 
@@ -244,8 +255,86 @@ EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool 
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   if (cancel_btn_ani_flag == EINA_TRUE)
-     wd->cancel_btn_ani_flag = EINA_TRUE;
+   if (wd->cancel_btn_ani_flag == cancel_btn_ani_flag) return;
+   else wd->cancel_btn_ani_flag = cancel_btn_ani_flag;
+}
+
+/**
+ * set the cancel button show mode
+ *
+ * @param obj The searchbar object
+ * @param visible The flag of cancen button show or not
+ * @return void
+ *
+ * @ingroup Searchbar
+ */
+EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (wd->cancel_btn_show_mode == visible) return;
+   else wd->cancel_btn_show_mode = visible;
+
+   if (!visible)
+   {
+	   if (wd->cancel_btn_ani_flag)
+		   edje_object_signal_emit(wd->base, "CANCELOUT", "PROG");
+	   else
+		   edje_object_signal_emit(wd->base, "CANCELHIDE", "PROG");
+   }
+   _sizing_eval(obj);
+}
+
+/**
+ * clear searchbar content
+ *
+ * @param obj The searchbar object
+ * @return void
+ *
+ * @ingroup Searchbar
+ */
+EAPI void elm_searchbar_clear(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (wd->cancel_btn_show_mode)
+   {
+	   if (wd->cancel_btn_ani_flag)
+		   edje_object_signal_emit(wd->base, "CANCELOUT", "PROG");
+	   else
+		   edje_object_signal_emit(wd->base, "CANCELHIDE", "PROG");
+   }
+
+   elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
+}
+
+/**
+ * set the searchbar boundary rect mode(with bg rect) set
+ *
+ * @param obj The searchbar object
+ * @param boundary The present flag of boundary rect or not
+ * @return void
+ *
+ * @ingroup Searchbar
+ */
+EAPI void elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (wd->boundary_mode == boundary) return;
+   else wd->boundary_mode = boundary;
+
+   if (wd->boundary_mode)
+   {
+	   edje_object_signal_emit(wd->base, "BDSHOW", "PROG");
+   }
    else
-     wd->cancel_btn_ani_flag = EINA_FALSE;
+   {
+	   edje_object_signal_emit(wd->base, "BDHIDE", "PROG");
+   }
+
+   _sizing_eval(obj);
 }

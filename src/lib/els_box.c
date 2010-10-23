@@ -5,7 +5,7 @@ static void
 _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int extended)
 {
 	Evas_Coord minw, minh, maxw, maxh, mnw, mnh, ww;
-	Evas_Coord w, h, cw = 0, ch = 0, cmaxh = 0, sumw = 0;
+	Evas_Coord w, cw = 0, cmaxh = 0;
 	const Eina_List *l;
 	Evas_Object_Box_Option *opt;
     double wx;

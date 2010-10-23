@@ -17,7 +17,7 @@ struct _Widget_Data
    Evas_Object *notify;
    Evas_Object *layout;
    Evas_Object *parent;
-   Evas_Object *title_area;
+   const char *title_area;
    Evas_Object *title_icon;
    Evas_Object *content_area;
    Evas_Object *desc_label;
@@ -46,7 +46,7 @@ static void _action_area_clicked(void *data, Evas_Object *obj, void *event_info)
 static void _block_clicked_cb(void *data, Evas_Object *obj, void *event_info);
 static void _show(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _hide(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _resize_parent(void *data, Evas *e, Evas_Object *obj, void *event_info);
+
 
 static void
 _del_parent(void *data, Evas *e, Evas_Object *obj, void *evet_info)
@@ -117,11 +117,7 @@ _theme_hook(Evas_Object *obj)
    elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
    elm_notify_orient_set(wd->notify, wd->notify_orient);
    edje_object_message_signal_process(elm_layout_edje_get(wd->layout));
-   if (wd->title_area)
-     {
-         snprintf(buf, sizeof(buf), "popup_title/%s", elm_widget_style_get(obj));
-         elm_object_style_set(wd->title_area, buf);
-     }
+  
    if (wd->action_area)
      {
 	EINA_LIST_FOREACH(wd->button_list, list, action_data)
@@ -354,7 +350,7 @@ elm_popup_add(Evas_Object *parent_app)
 	evas_object_move(parent, x, y);
 	if (rotation != -1) 
 	  elm_win_rotation_with_resize_set(parent, rotation);	  
-	evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _del_parent, obj);
+	
      }
    else
      parent = parent_app;
@@ -392,6 +388,7 @@ elm_popup_add(Evas_Object *parent_app)
      {
 		wd->parent = parent;
 		elm_object_style_set(wd->notify, "popup");
+		evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _del_parent, obj);
      }
 
    ecore_x_netwm_window_type_get(elm_win_xwindow_get(parent), &type);	 
@@ -525,21 +522,10 @@ elm_popup_title_label_set(Evas_Object *obj, const char *text)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   char buf[4096];
    
    if (!wd) return;
-   if (wd->title_area)
-     {
-	evas_object_del(wd->title_area);
-	wd->title_area = NULL;
-     }   
-   wd->title_area = elm_label_add(obj); 
-   snprintf(buf, sizeof(buf), "popup_title/%s", elm_widget_style_get(obj));
-   elm_object_style_set(wd->title_area, buf);
-   elm_label_label_set(wd->title_area, text);
-   evas_object_size_hint_weight_set(wd->title_area, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(wd->title_area, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_layout_content_set(wd->layout, "elm.swallow.title", wd->title_area);      
+   eina_stringshare_replace(&wd->title_area, text);
+   edje_object_part_text_set(elm_layout_edje_get(wd->layout), "elm.swallow.title", text);
    edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,title,visible", "elm");
    if (wd->action_area)
      {
@@ -568,7 +554,7 @@ elm_popup_title_label_get(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    
    if (!wd) return NULL;
-   return elm_label_label_get(wd->title_area);
+   return wd->title_area;
 }
 
 /**

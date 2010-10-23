@@ -594,7 +594,7 @@ static void
 _softkey_up_cb(void *data, Evas_Object *obj, const char *emission,
                const char *source)
 {
-   Evas_Object *edj;
+   Evas_Object *edj = NULL;
 
    Elm_Softkey_Item *it = (Elm_Softkey_Item *) data;
    elm_softkey_panel_close(it->obj);
@@ -618,7 +618,7 @@ static void
 _softkey_down_cb(void *data, Evas_Object *obj, const char *emission,
                  const char *source)
 {
-   Evas_Object *edj;
+   Evas_Object *edj = NULL;
 
    Elm_Softkey_Item *it = (Elm_Softkey_Item *) data;
    evas_object_smart_callback_call(it->obj, "press", it);

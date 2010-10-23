@@ -308,7 +308,7 @@ _smart_drag_stop(Evas_Object *obj)
    evas_object_smart_callback_call(obj, "drag,stop", NULL);
 }
 
-static int
+static Eina_Bool
 _smart_scrollto_x_animator(void *data)
 {
    Hor_Smart_Data *sd = data;
@@ -1362,7 +1362,6 @@ _smart_event_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
 #ifdef SMART_SCROLLER
 
-		int number = NUMBERS_OF_AVERAGE_QUEUE;
 		int i;
 		if(sd->timer) {
 			ecore_timer_del(sd->timer);
@@ -1385,7 +1384,6 @@ _smart_event_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
 		sd->x_pos = x * -1;
 
 #endif
-		 
 	  }
      }
 }
@@ -1548,7 +1546,7 @@ _smart_onhold_animator(void *data)
    Hor_Smart_Data *sd;
    double t, td;
    double vx, vy;
-   Evas_Coord x, y, ox, oy, dx, dy;
+   Evas_Coord x, y, ox, oy; 
 
    sd = data;
    t = ecore_loop_time_get();
@@ -1627,14 +1625,10 @@ static Eina_Bool special_timer_cb(void *d)
 	return ECORE_CALLBACK_RENEW;
 }
 
-static int consumer_timer_cb(void *d)
+static Eina_Bool consumer_timer_cb(void *d)
 {
 	Hor_Smart_Data *sd = d;
-	Eina_List *l;
-	Evas_Object *sub_obj;
-	struct cached_geometry *geo;
 	int tmp_movement = 0;
-	static int x = 0, y = 0;
 
 // TODO: OPTIMIZE ME
 	tmp_movement = sd->consumer_queue[sd->consumer-1];
@@ -1850,8 +1844,8 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
                     {
                        if (sd->down.onhold_animator)
                          {
-                           // ecore_animator_del(sd->down.onhold_animator);
-	                        ecore_timer_del(sd->down.onhold_animator);
+                            ecore_animator_del(sd->down.onhold_animator);
+	                        //ecore_timer_del(sd->down.onhold_animator);
                             sd->down.onhold_animator = NULL;
                          }
                     }

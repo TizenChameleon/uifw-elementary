@@ -284,6 +284,7 @@ _desc_init(void)
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "fps", fps, EET_T_DOUBLE);
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "theme", theme, EET_T_STRING);
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "modules", modules, EET_T_STRING);
+   EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "password_show_last_character", password_show_last_character, EET_T_INT);
 }
 
 static void
@@ -471,6 +472,7 @@ _config_load(void)
    _elm_config->fps = 60.0;
    _elm_config->theme = eina_stringshare_add("default");
    _elm_config->modules = NULL;
+   _elm_config->password_show_last_character = 0;
 }
 static void
 _config_update(void)
@@ -645,6 +647,8 @@ _env_get(void)
    s = getenv("ELM_FINGER_SIZE");
    if (s) _elm_config->finger_size = atoi(s);
 
+   s = getenv("ELM_PASSWORD_SHOW_LAST_CHARACTER");
+   if (s) _elm_config->password_show_last_character = atoi(s);
    s = getenv("ELM_FPS");
    if (s) _elm_config->fps = atof(s);
    if (_elm_config->fps < 1.0) _elm_config->fps = 1.0;

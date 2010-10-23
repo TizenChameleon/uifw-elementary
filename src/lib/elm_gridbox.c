@@ -24,13 +24,13 @@ static void _del_hook(Evas_Object * obj);
 
 static void _sizing_eval(Evas_Object * obj, int mode);
 
-static void _changed_size_hints(void *data, Evas * e, Evas_Object * obj,
+static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj,
 				void *event_info);
-static void _changed_size_min(void *data, Evas * e, Evas_Object * obj,
+static void _changed_size_min(void *data, Evas *e, Evas_Object *obj,
 			      void *event_info);
-static void _sub_del(void *data, Evas_Object * obj, void *event_info);
+static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 
-static void _show_event(void *data, Evas_Object * obj, void *event_info);
+static void _show_event(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static void
 _del_pre_hook(Evas_Object * obj)
@@ -136,31 +136,31 @@ _sizing_eval(Evas_Object * obj, int mode)
 }
 
 static void
-_changed_size_hints(void *data, Evas * e, Evas_Object * obj, void *event_info)
+_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    _sizing_eval(data, 0);
 }
 
 static void
-_changed_size_min(void *data, Evas * e, Evas_Object * obj, void *event_info)
+_changed_size_min(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    _sizing_eval(data, 0);
 }
 
 static void
-_sub_del(void *data, Evas_Object * obj, void *event_info)
+_sub_del(void *data, Evas_Object *obj, void *event_info)
 {
    _sizing_eval(obj, 1);
 }
 
 static void
-_show_event(void *data, Evas_Object * obj, void *event_info)
+_show_event(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    _sizing_eval(data, 0);
 }
 
 static void
-_freeze_on(void *data, Evas_Object * obj, void *event_info)
+_freeze_on(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 

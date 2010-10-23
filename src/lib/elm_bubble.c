@@ -14,9 +14,14 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *bbl;
-   Evas_Object *content, *icon;
+   Evas_Object *content, *icon, *sweep;
    const char *label, *info;
+   
+   Eina_Bool down:1;
+   Evas_Coord_Point down_point;
 };
+
+#define SWEEP_THRESHOLD	100
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
@@ -81,7 +86,37 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 	wd->icon = NULL;
 	edje_object_message_signal_process(wd->bbl);
      }
+   else if (sub == wd->sweep) wd->sweep = NULL;
    _sizing_eval(obj);
+}
+
+static void
+_mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+	Evas_Event_Mouse_Down *ev = event_info;
+
+	wd->down = EINA_TRUE;
+	wd->down_point.x = ev->canvas.x;
+	wd->down_point.y = ev->canvas.y;
+}
+
+static void
+_mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+   	Evas_Event_Mouse_Up *ev = event_info;
+
+	if (!wd->down) return;
+
+	if (ev->canvas.x - wd->down_point.x > SWEEP_THRESHOLD)
+		evas_object_smart_callback_call(data, "sweep,left,right", NULL);
+	else if (wd->down_point.x - ev->canvas.x > SWEEP_THRESHOLD)
+		evas_object_smart_callback_call(data, "sweep,right,left", NULL);
+
+	wd->down = EINA_FALSE;
+	wd->down_point.x = 0;
+	wd->down_point.y = 0;	
 }
 
 /**
@@ -116,6 +151,12 @@ elm_bubble_add(Evas_Object *parent)
    elm_widget_resize_object_set(obj, wd->bbl);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
+   evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_UP, _mouse_up, obj);
+   evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down, obj);
+
+   wd->down = EINA_FALSE;
+   wd->down_point.x = 0;
+   wd->down_point.y = 0;
 
    _sizing_eval(obj);
    return obj;
@@ -265,8 +306,8 @@ elm_bubble_content_unset(Evas_Object *obj)
    if (!wd) return NULL;
    if (!wd->content) return NULL;
    content = wd->content;
-   edje_object_part_unswallow(wd->bbl, wd->content);
-   elm_widget_sub_object_del(obj, wd->content);
+   elm_widget_sub_object_del(obj, content);
+   edje_object_part_unswallow(wd->bbl, content);
    wd->content = NULL;
    return content;
 }
@@ -320,6 +361,58 @@ elm_bubble_icon_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    return wd->icon;
+}
+
+/**
+ * Set the sweep layout
+ *
+ * @param obj The bubble object
+ * @param content The given content of the bubble
+ *
+ * This function sets the sweep layout when "sweep,left,right"signal is emitted. 
+ *
+ * @ingroup Bubble
+ */
+EAPI void
+elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->sweep == sweep) return;
+   if (wd->sweep) evas_object_del(wd->sweep);
+   wd->sweep = sweep;
+   if (sweep)
+     {
+	elm_widget_sub_object_add(obj, sweep);
+	edje_object_part_swallow(wd->bbl, "elm.swallow.sweep", sweep);
+     }
+}
+
+/**
+ * Unset the sweep layout
+ *
+ * @param obj The bubble object
+ * @param content The given content of the bubble
+ *
+ * This function sets the sweep layout when "sweep,right,left"signal is emitted. 
+ *
+ * @ingroup Bubble
+ */
+EAPI Evas_Object *
+elm_bubble_sweep_layout_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *sweep;
+   if (!wd) return NULL;
+   if (!wd->sweep) return NULL;
+   sweep = wd->sweep;
+   elm_widget_sub_object_del(obj, sweep);
+   edje_object_part_unswallow(wd->bbl, sweep);
+   evas_object_hide(sweep);
+   wd->sweep = NULL;
+   return sweep;
 }
 
 /**

@@ -103,10 +103,31 @@ static void
 _on_focus_hook(void *data, Evas_Object *obj)
 {
  	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd || !wd->base) return ;	
-
-	if (!elm_widget_focus_get(obj))
-		edje_object_signal_emit(wd->base, "elm,state,focus,out", "elm");
+	if (!wd || !wd->base) return ;
+	
+	if (elm_widget_focus_get(obj))
+	{
+		if (wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
+			elm_object_focus(wd->time[TIME_HOUR]);
+		
+		else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
+		{
+			switch (wd->date_format)
+			{
+				case DATE_FORMAT_YYDDMM:
+				case DATE_FORMAT_YYMMDD:
+					elm_object_focus(wd->date[DATE_YEAR]);
+					break;
+				case DATE_FORMAT_MMDDYY:
+				case DATE_FORMAT_MMYYDD:
+					elm_object_focus(wd->date[DATE_MON]);
+					break;
+				case DATE_FORMAT_DDMMYY:
+				case DATE_FORMAT_DDYYMM:
+					elm_object_focus(wd->date[DATE_DAY]);
+			}
+		}
+	}
 }
 
 static void
@@ -188,7 +209,6 @@ _signal_ampm_mouse_down(void *data, Evas_Object *obj, const char *emission, cons
 
 	focus_obj = elm_widget_focused_object_get(data);
 	if (focus_obj) elm_object_unfocus(focus_obj);
-	edje_object_signal_emit(wd->base, "elm,state,focus,out", "elm");
 }
 
 static void
@@ -269,9 +289,6 @@ _entry_focused_cb(void *data, Evas_Object *obj, void *event_info)
  	Widget_Data *wd = elm_widget_data_get(data);
 	if (!wd || !wd->base) return;
  
-	if (elm_widget_focus_get(data))
-		edje_object_signal_emit(wd->base, "elm,state,focus,in", "elm");
-
 	if (obj == wd->date[DATE_YEAR])
 		edje_object_signal_emit(wd->base, "elm,state,year,focus,in", "elm");
 	else if (obj == wd->date[DATE_MON])
@@ -365,7 +382,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 			if (wd->pm) edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
 			else edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");
 		}
-		sprintf(str, "%d", num);		
+		sprintf(str, "%02d", num);		
 		elm_entry_entry_set(wd->time[TIME_HOUR], str);
 		edje_object_signal_emit(wd->base, "elm,state,hour,focus,out", "elm");			
 	}
@@ -377,11 +394,12 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 		if (num > MIN_MAXIMUM) num = MIN_MAXIMUM;
 		wd->min = num;
 
-		sprintf(str, "%d", num);
+		sprintf(str, "%02d", num);
 		elm_entry_entry_set(wd->time[TIME_MIN], str);
 		edje_object_signal_emit(wd->base, "elm,state,min,focus,out", "elm");
 	}
-	edje_object_signal_emit(wd->base, "elm,state,focus,out", "elm");
+	
+	evas_object_smart_callback_call(data, "changed", NULL);	
 }
 
 static void 
@@ -597,16 +615,15 @@ _date_update(Evas_Object *obj)
 		}
 
 		if (wd->hour > HOUR_12H_MAXIMUM)
-			sprintf(str, "%d", wd->hour - HOUR_12H_MAXIMUM);
+			sprintf(str, "%02d", wd->hour - HOUR_12H_MAXIMUM);
 		else if (wd->hour == 0)
-			sprintf(str, "%d", HOUR_12H_MAXIMUM);
+			sprintf(str, "%02d", HOUR_12H_MAXIMUM);
 		else
-			sprintf(str, "%d", wd->hour);
+			sprintf(str, "%02d", wd->hour);
 	}
 	elm_entry_entry_set(wd->time[TIME_HOUR], str);
 
-	sprintf(str, "%d", wd->min);
-	if (wd->min == 0) str[1] = '0';
+	sprintf(str, "%02d", wd->min);
 	elm_entry_entry_set(wd->time[TIME_MIN], str);
 }
 
@@ -621,6 +638,7 @@ _date_entry_add(Evas_Object *obj)
 	for (i = 0; i < DATE_MAX; i++)
 	{
 		wd->date[i] = elm_entry_add(obj);
+		elm_entry_single_line_set(wd->date[i], EINA_TRUE);
 		elm_entry_context_menu_disabled_set(wd->date[i], EINA_TRUE);
 	        if (i == DATE_MON) elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_MONTH);
 	        else elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);
@@ -647,6 +665,7 @@ _time_entry_add(Evas_Object *obj)
 	for (i = 0; i < TIME_MAX; i++)
 	{
 		wd->time[i] = elm_entry_add(obj);
+		elm_entry_single_line_set(wd->time[i], EINA_TRUE);
 		elm_entry_context_menu_disabled_set(wd->time[i], EINA_TRUE);
 		elm_entry_input_panel_layout_set(wd->time[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);		
 		elm_entry_maximum_bytes_set(wd->time[i], TIME_MAX_LENGTH);

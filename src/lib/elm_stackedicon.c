@@ -59,7 +59,7 @@ static void _del_all_image(void *data);
 static unsigned int _current_time_get(void);
 static void _icon_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _icon_move_to_zero(Evas_Object *obj);
-static Eina_Bool _icon_move_to_zero_cb(Evas_Object *obj);
+static Eina_Bool _icon_move_to_zero_cb(void *data);
 static void _icon_move_map(void *data, int interval_x, int interval_y);
 static void _icon_map_pos(Evas_Object *obj, int index, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
 static void _calc_item_size(int w, int h, int iw, int ih, int *res_w, int *res_h);
@@ -310,8 +310,9 @@ _icon_move_to_zero(Evas_Object *obj)
 }
 
 static Eina_Bool 
-_icon_move_to_zero_cb(Evas_Object *obj)
-{	
+_icon_move_to_zero_cb(void *data)
+{
+    Evas_Object *obj = (Evas_Object *)data;
 	_icon_move_to_zero(obj);
 	
 	return EXIT_FAILURE;

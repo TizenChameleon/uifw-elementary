@@ -43,7 +43,6 @@ _del_hook(Evas_Object *obj)
 static void
 _theme_hook(Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
    _time_update(obj);
 }
 
@@ -77,7 +76,7 @@ _ticker(void *data)
 static void 
 _signal_chronometer_val_changed(void *data,Evas_Object *obj,const char *emission,const char *source)
 {
-	Widget_Data *wd=elm_widget_data_get(data);
+//	Widget_Data *wd=elm_widget_data_get(data);
 	
 	evas_object_smart_callback_call(data,"changed",NULL);
 }

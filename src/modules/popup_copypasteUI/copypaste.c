@@ -114,7 +114,7 @@ obj_longpress(Evas_Object *obj)
 		if(top)
 		ext_mod->popup = elm_popup_add(top);
 		elm_object_style_set(ext_mod->popup,"menustyle");
-		elm_popup_set_mode(ext_mod->popup, ELM_POPUP_TYPE_ALERT);
+		elm_popup_mode_set(ext_mod->popup, ELM_POPUP_TYPE_ALERT);
 		elm_popup_title_label_set(ext_mod->popup,"CopyPaste");
 		list = elm_list_add(ext_mod->popup);
 		elm_object_style_set(list,"popup");

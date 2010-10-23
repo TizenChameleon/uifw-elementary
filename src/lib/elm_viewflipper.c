@@ -71,7 +71,7 @@ static void _mouse_down(void *data, Evas *e, Evas_Object *o, void *event_info);
 static void _complete_move(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__);
 static void _left_button_click(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__);
 static void _right_button_click(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__);
-static int   _flipping_timer_cb(void *data);
+static Eina_Bool  _flipping_timer_cb(void *data);
 static void _set_layout_each_view(Evas_Object * left,Evas_Object * middle,Evas_Object *right);
 static int   _setView();
 static void _setup_button_show_left_right();
@@ -236,7 +236,7 @@ _right_button_click(void *data, Evas_Object *obj __UNUSED__, const char *emissio
 	printf("_right_button_click\n");
 }
 
-static int
+static Eina_Bool
 _flipping_timer_cb(void *data)
 {
 	if(elm_viewflipper_isAutoStart()==FALSE)
@@ -403,7 +403,6 @@ elm_viewflipper_add(Evas_Object * parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-   Evas_Coord w, h;
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);

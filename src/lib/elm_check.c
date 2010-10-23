@@ -34,6 +34,7 @@ static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _disable_hook(Evas_Object *obj);
+static void _on_focus_hook(void *data, Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
@@ -42,8 +43,10 @@ static void _signal_check_on(void *data, Evas_Object *obj, const char *emission,
 static void _signal_check_toggle(void *data, Evas_Object *obj, const char *emission, const char *source);
 
 static const char SIG_CHANGED[] = "changed";
+static const char SIG_UNFOCUSED[] = "unfocused";
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
+  {SIG_UNFOCUSED, ""},
   {NULL, NULL}
 };
 
@@ -78,6 +81,23 @@ _theme_hook(Evas_Object *obj)
    edje_object_message_signal_process(wd->chk);
    edje_object_scale_set(wd->chk, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
+}
+
+static void
+_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (elm_widget_focus_get(obj))
+     {
+
+        evas_object_focus_set(wd->chk, EINA_TRUE);
+     }
+   else
+     {
+        evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
+        evas_object_focus_set(wd->chk, EINA_FALSE);
+     }
 }
 
 static void
@@ -188,10 +208,12 @@ elm_check_add(Evas_Object *parent)
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "check");
    elm_widget_type_set(obj, "check");
+   elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL );
    elm_widget_disable_hook_set(obj, _disable_hook);
 
    wd->chk = edje_object_add(e);

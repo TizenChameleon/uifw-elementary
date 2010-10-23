@@ -137,8 +137,8 @@ current_time_get()
 }
 
 static void
-set_evas_map_3d(Evas_Object * obj, Evas_Coord x, Evas_Coord y, Evas_Coord w,
-	     Evas_Coord h, double dx, double dy, double dz, Evas_Coord cx, Evas_Coord cy, Evas_Coord cz) 
+set_evas_map_3d(Evas_Object * obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h, double zoomw, double zoomh,
+	      double dx, double dy, double dz, Evas_Coord cx, Evas_Coord cy, Evas_Coord cz) 
 {
    if (obj == NULL)
      {
@@ -149,10 +149,11 @@ set_evas_map_3d(Evas_Object * obj, Evas_Coord x, Evas_Coord y, Evas_Coord w,
       return;
 //	printf("map >> x : %d y : %d w : %d h : %d\n", x, y, w, h); 
    evas_map_smooth_set(map, EINA_TRUE);
-   evas_map_util_points_populate_from_object_full(map, obj, 0);
+//   evas_map_util_points_populate_from_object_full(map, obj, 0);
    evas_object_map_enable_set(obj, EINA_TRUE);
    evas_map_util_3d_perspective(map, x + w / 2, y + h / 2, 0, w * 10);
    evas_map_util_points_populate_from_geometry(map, x, y, w, h, 0);
+   evas_map_util_zoom(map, zoomw, zoomh, x, y);
    evas_map_util_3d_rotate(map, dx, dy, dz, cx, cy, cz);
    evas_object_map_set(obj, map);
    evas_map_free(map);
@@ -195,11 +196,8 @@ get_value_by_standard(Standard_Type type, int object_value, int current, int deg
 
 
 static void
-get_value_by_attribute(Attribute_Type type, Evas_Object *obj, double x, double y, double z, int *cx, int *cy, int *cz)
+get_value_by_attribute(Attribute_Type type, Evas_Coord w, Evas_Coord h, double x, double y, double z, int *cx, int *cy, int *cz)
 {
-	Evas_Coord w, h;
-	evas_object_geometry_get(obj, NULL, NULL, &w, &h);
-
 	switch(type)
 	{
 		case ATTRIBUTE_TYPE_RELATIVE:
@@ -225,7 +223,7 @@ set_evas_map_disable(void *data)
 {
 	Evas_Object *obj = (Evas_Object *)data;
 	evas_object_map_enable_set(obj, EINA_FALSE);
-	evas_render_updates(obj);
+	evas_render_updates(evas_object_evas_get(obj));
 
 	return ECORE_CALLBACK_CANCEL;
 }
@@ -238,18 +236,23 @@ move_evas_map(void *data)
    double t;
    double amount;
 
+   int x, y, w, h;
    int dx, dy, dw, dh;
    int sfx, sfy, sfw, sfh;
    int stx, sty, stw, sth;
-   double dax, day, daz;
-
    int px, py, pw, ph;
+   double zoomw, zoomh;
+
+   double ax, ay, az;
+   double dax, day, daz;
    double pax, pay, paz;
 
-   int x, y, w, h;
-   double ax, ay, az;
-
    int cx, cy, cz;
+
+   int r, g, b, a;
+   int dr, dg, db, da;
+   int pr, pg, pb, pa;
+
 
    Animation_Data * ad = (Animation_Data *) data;
    t = ELM_MAX(0.0, current_time_get() - ad->start_time) / 1000;
@@ -273,7 +276,7 @@ move_evas_map(void *data)
 
 //   printf("%d %d %d %d :: %d %d %d %d\n", sfx, sfy, sfw, sfh, stx, sty, stw, sth);
    if(t < ad->start) {
-	   set_evas_map_3d(ad->obj, sfx, sfy, sfw, sfh, ad->AngleX->from, ad->AngleY->from, ad->AngleZ->from, ad->CoordX->from + ad->Center_x, ad->CoordY->from + ad->Center_y, ad->Center_z);
+	   set_evas_map_3d(ad->obj, sfx, sfy, sfw, sfh, 1.0, 1.0, ad->AngleX->from, ad->AngleY->from, ad->AngleZ->from, ad->CoordX->from + ad->Center_x, ad->CoordY->from + ad->Center_y, ad->Center_z);
 	   return ECORE_CALLBACK_RENEW;
    }
    else t -= ad->start;
@@ -285,6 +288,10 @@ move_evas_map(void *data)
    dax = ad->AngleX->to - ad->AngleX->from;
    day = ad->AngleY->to - ad->AngleY->from;
    daz = ad->AngleZ->to - ad->AngleZ->from;
+   dr = ad->Red->to - ad->Red->from;
+   dg = ad->Green->to - ad->Green->from;
+   db = ad->Blue->to - ad->Blue->from;
+   da = ad->Alpha->to - ad->Alpha->from;
 
    if (t <= ad->duration)
      {
@@ -296,6 +303,10 @@ move_evas_map(void *data)
 		 ax = get_value_by_type(ad->AngleX->type, amount, dax);
 		 ay = get_value_by_type(ad->AngleY->type, amount, day);
 		 az = get_value_by_type(ad->AngleZ->type, amount, daz);
+		 r = get_value_by_type(ad->Red->type, amount, dr);
+		 g = get_value_by_type(ad->Green->type, amount, dg);
+		 b = get_value_by_type(ad->Blue->type, amount, db);
+		 a = get_value_by_type(ad->Alpha->type, amount, da);
      }
    else
      {
@@ -306,6 +317,10 @@ move_evas_map(void *data)
 	ax = dax;
 	ay = day;
 	az = daz;
+	r = dr;
+	g = dg;
+	b = db;
+	a = da;
      }
 
    // standard chek
@@ -313,21 +328,28 @@ move_evas_map(void *data)
    py = sfy + y;
    pw = sfw + w;
    ph = sfh + h;
+   zoomw = (double)pw/(double)tw;
+   zoomh = (double)ph/(double)th;
    pax = ad->AngleX->from + ax;
    pay = ad->AngleY->from + ay;
    paz = ad->AngleZ->from + az;
+   pr = ad->Red->from + r;
+   pg = ad->Green->from + g;
+   pb = ad->Blue->from + b;
+   pa = ad->Alpha->from + a;
 
-   get_value_by_attribute(ad->Center_type, ad->obj, ad->Center_x, ad->Center_y, ad->Center_z, &cx, &cy, &cz);
+   get_value_by_attribute(ad->Center_type, pw, ph, ad->Center_x, ad->Center_y, ad->Center_z, &cx, &cy, &cz);
   
-   if (x == dx && y == dy && w == dw && h == dh && ax == dax && ay == day && az == daz)
+   if (x == dx && y == dy && w == dw && h == dh && ax == dax && ay == day && az == daz && r == dr && g == dg && b == db && a == da)
      {
 	if(ad->timer)
 	{
 		ecore_animator_del(ad->timer);
 		ad->timer = NULL;
 	}
-//	printf("px : %d py : %d pw : %d ph : %d\n", px, py, pw, ph); 
-	set_evas_map_3d(ad->obj, px, py, pw, ph, pax, pay, paz, px + cx, py + cy, cz);
+	//printf("px : %d py : %d pw : %d ph : %d\n", px, py, pw, ph); 
+	set_evas_map_3d(ad->obj, px, py, tw, th, zoomw, zoomh, pax, pay, paz, px + cx, py + cy, cz);
+	evas_object_color_set(ad->obj, pr, pg, pb, pa);
 
 	if(ad->end_func == move_continue){
 		next_ad = (Animation_Data *)ad->data;
@@ -340,8 +362,9 @@ move_evas_map(void *data)
 		}
 	}
 	if (ad->end_func != NULL)
-	   ad->end_func(ad->data, ad->obj);
-	ecore_idler_add(set_evas_map_disable, ad->obj);
+		ad->end_func(ad->data, ad->obj);
+	if(ad->end_func != move_continue)
+		ecore_idler_add(set_evas_map_disable, ad->obj);
 	
 	return ECORE_CALLBACK_CANCEL;
      }
@@ -352,8 +375,9 @@ move_evas_map(void *data)
 //	evas_object_resize(rect, 1, 1);
 //	evas_object_move(rect, px, py);
 //	evas_object_show(rect);
-//	printf(" >>>> px : %d py : %d pw : %d ph : %d\n", px, py, pw, ph); 
-	set_evas_map_3d(ad->obj, px, py, pw, ph, pax, pay, paz, px + cx, py + cy, cz);
+	//printf(" >>>> px : %d py : %d pw : %d ph : %d\n", px, py, pw, ph); 
+	set_evas_map_3d(ad->obj, px, py, tw, th, zoomw, zoomh, pax, pay, paz, px + cx, py + cy, cz);
+	evas_object_color_set(ad->obj, pr, pg, pb, pa);
      }
    return ECORE_CALLBACK_RENEW;
 }
@@ -434,6 +458,19 @@ get_attribute_type(char *str)
 	return ATTRIBUTE_TYPE_RELATIVE;
 }
 
+static void
+init_animation_data(Animation_Data *ad)
+{
+	ad->Red->from = 255;
+	ad->Green->from = 255;
+	ad->Blue->from = 255;
+	ad->Alpha->from = 255;
+	ad->Red->to = 255;
+	ad->Green->to = 255;
+	ad->Blue->to = 255;
+	ad->Alpha->to = 255;
+}
+
 static Eina_List *
 save_animation_data(Eina_List *list, xmlDocPtr doc, xmlNodePtr cur)
 {
@@ -485,6 +522,8 @@ save_animation_data(Eina_List *list, xmlDocPtr doc, xmlNodePtr cur)
 					ad->Green = (Color_Data *) calloc(1, sizeof(Color_Data));
 					ad->Blue = (Color_Data *) calloc(1, sizeof(Color_Data));
 					ad->Alpha = (Color_Data *) calloc(1, sizeof(Color_Data));
+
+					init_animation_data(ad);
 
 					al->scene_list = eina_list_append(al->scene_list, ad);
 

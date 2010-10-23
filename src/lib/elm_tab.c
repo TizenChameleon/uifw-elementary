@@ -839,7 +839,7 @@ static void light_check(Widget_Data *wd)
 static void select_check(Widget_Data *wd)
 {
 	int i = 1;
-	int selected = -1;
+//	int selected = -1;
 	const Eina_List *l;
 	Elm_Tab_Item *item;
 
