@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build42) unstable; urgency=low
+
+  * beat black theme
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build42
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Mon, 25 Oct 2010 21:05:54 +0900
+
 elementary (1.0.0+svn.51480slp2+build41) unstable; urgency=low
 
   * sync with beat-theme
