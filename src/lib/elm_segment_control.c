@@ -381,7 +381,11 @@ _update_list(Evas_Object *obj)
               else
                  edje_object_signal_emit(it->base, "elm,state,icon,hidden", "elm");
           }
-	edje_object_message_signal_process(it->base);
+        if(it->label_wd)
+          {
+             edje_object_signal_emit(it->base, "elm,state,label,visible", "elm");
+             elm_label_text_color_set(it->label_wd, 0x00,0x00, 0x00, 0xff);
+          }
 
 	return;
      }
@@ -426,8 +430,6 @@ _update_list(Evas_Object *obj)
           }
         if(it->sel)
            _signal_segment_on((void*)it);
-
-	edje_object_message_signal_process(it->base);
 
 	i++;
      }
@@ -1058,7 +1060,8 @@ elm_segment_control_item_selected_set( Elm_Segment_Item *item, Eina_Bool select)
 
    if(select)
      {
-        if(item->segment_id == wd->cur_seg_id) return;
+        if(item->segment_id == wd->cur_seg_id && wd->cur_seg_id) return;
+
         item->sel = EINA_TRUE;
       }
    else if(item->segment_id == wd->cur_seg_id)
