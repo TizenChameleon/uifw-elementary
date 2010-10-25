@@ -35,6 +35,8 @@ elm
 	:include:/elm_ts/multibuttonentry/tslist
 	:include:/elm_ts/animator/tslist
 	:include:/elm_ts/editfield/tslist
+	:include:/elm_ts/box/tslist
+	:include:/elm_ts/elm_scroller/tslist
 
 
 #yhkim
