@@ -320,8 +320,9 @@ static Evas_Object *_imageslider_add_obj(Widget_Data *wd)
 	eo = elm_layout_add(wd->obj);
 	elm_layout_theme_set(eo, "imageslider", "base", "default");
 	elm_widget_resize_object_set(wd->obj, eo);
-	edje_object_signal_callback_add(elm_layout_edje_get(eo), "elm,photo,clicked", "", _signal_clicked, wd->obj);
-//	evas_object_smart_member_add(eo, wd->obj);
+	//evas_object_smart_member_add(eo, wd->obj);
+
+	//edje_object_signal_callback_add(elm_layout_edje_get(eo), "elm,photo,clicked", "", _signal_clicked, wd->obj);
 	evas_object_event_callback_add(eo, EVAS_CALLBACK_MOUSE_DOWN, ev_imageslider_down_cb, wd);
 	evas_object_event_callback_add(eo, EVAS_CALLBACK_MOUSE_UP, ev_imageslider_up_cb, wd);
 	evas_object_event_callback_add(eo, EVAS_CALLBACK_MOUSE_MOVE, ev_imageslider_move_cb, wd);
@@ -425,6 +426,7 @@ static void ev_imageslider_down_cb(void * data, Evas * e, Evas_Object * obj, voi
 }
 
 // Whenever MOUSE UP event occurs, Call this function.
+// And make Click Event also.
 static void ev_imageslider_up_cb(void * data, Evas * e, Evas_Object * obj, void * event_info)
 {
 	Widget_Data *wd = data;
@@ -440,13 +442,13 @@ static void ev_imageslider_up_cb(void * data, Evas * e, Evas_Object * obj, void 
 		interval = ev->timestamp - wd->timestamp;
 		if (step == 0 || interval == 0) {
 		     fprintf(stderr, "[[[ DEBUG ]]]: case1: emit CLICK event\n");
-		     evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+		     evas_object_smart_callback_call(wd->obj, SIG_CLICKED, NULL);
 		     return;
 		}
 		if (interval < CLICK_TIME_MAX) {
 			if (step < CLICK_WIDTH_MIN && step > CLICK_WIDTH_MIN) {
 				fprintf(stderr, "[[[ DEBUG ]]]: case2: emit CLICK event\n");
-				evas_object_smart_callback_call(data, SIG_CLICKED, NULL);			
+				evas_object_smart_callback_call(wd->obj, SIG_CLICKED, NULL);			
 				return;
 			}
 		}
@@ -459,6 +461,7 @@ static void ev_imageslider_up_cb(void * data, Evas * e, Evas_Object * obj, void 
 			     _imageslider_obj_move(wd, 0);
 			} else {
 			     fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-black zone (2)\n");
+
 			     _imageslider_obj_move(wd, step);
 			}
 			
@@ -466,9 +469,11 @@ static void ev_imageslider_up_cb(void * data, Evas * e, Evas_Object * obj, void 
 			step = (wd->x - wd->move_x) << 1;
 			if (step <= wd->w && step >= -(wd->w)) {
 			     fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-white zone (1)\n");
+
 			     _imageslider_obj_move(wd, 0);
 			} else {
 			     fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-white zone (2)\n");
+
 			     _imageslider_obj_move(wd, step);
 			}
 		}
@@ -531,11 +536,11 @@ static void ev_imageslider_move_cb(void * data, Evas * e, Evas_Object * obj, voi
 
 // Whenever CLICK event occurs, Call this API
 // But, DONOT emit CLICK event.
+// DO NOT use this callback function. Remove later.
 static void
 _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
 	fprintf(stderr, "[[[ DEBUG ]]]: Call the callback function about Click event!, But DONOT emit CLICK event in the callback function!\n");
-	//evas_object_smart_callback_call(data, SIG_CLICKED, NULL);	
 }
 
 
@@ -795,8 +800,7 @@ elm_imageslider_add(Evas_Object * parent)
 		elm_widget_resize_object_set(obj, wd->ly[i]);
 		evas_object_smart_member_add(wd->ly[i], obj);
 		
-		edje_object_signal_callback_add(elm_layout_edje_get(wd->ly[i]), "elm,photo,clicked", "", _signal_clicked, obj);
-		
+		//edje_object_signal_callback_add(elm_layout_edje_get(wd->ly[i]), "elm,photo,clicked", "", _signal_clicked, obj);
 		evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_DOWN, ev_imageslider_down_cb, wd);
 		evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_UP, ev_imageslider_up_cb, wd);
 		evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_MOVE, ev_imageslider_move_cb, wd);
