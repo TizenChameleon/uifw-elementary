@@ -48,6 +48,18 @@ _theme_hook(Evas_Object *obj)
    _elm_theme_object_set(obj, wd->bbl, "bubble", "base", elm_widget_style_get(obj));
    edje_object_part_text_set(wd->bbl, "elm.text", wd->label);
    edje_object_part_text_set(wd->bbl, "elm.info", wd->info);
+    if (wd->content) 
+      { 
+         edje_object_part_swallow(wd->bbl, "elm.swallow.content", wd->content); 
+         edje_object_message_signal_process(wd->bbl); 
+      } 
+    if (wd->icon)
+    	{
+    	   edje_object_part_swallow(wd->bbl, "elm.swallow.icon", wd->icon);
+	   edje_object_signal_emit(wd->bbl, "elm,state,icon,visible", "elm");
+    	}
+    else 
+       edje_object_signal_emit(wd->bbl, "elm,state,icon,hidden", "elm"); 
    edje_object_scale_set(wd->bbl, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
 }
@@ -288,6 +300,25 @@ elm_bubble_content_set(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
+  * Get the content shown in the bubble 
+  * 
+  * Return the content object which is set for this widget. 
+  * 
+  * @param obj The bubble object 
+  * @return The content that is being used 
+  * 
+  * @ingroup Bubble 
+  */ 
+ EAPI Evas_Object * 
+ elm_bubble_content_get(const Evas_Object *obj) 
+ { 
+    ELM_CHECK_WIDTYPE(obj, widtype) NULL; 
+    Widget_Data *wd = elm_widget_data_get(obj); 
+    if (!wd) return NULL; 
+    return wd->content; 
+ } 
+  
+ /** 
  * Unset the content shown in the bubble
  *
  * Unparent and return the content object which was set for this widget.
@@ -316,6 +347,8 @@ elm_bubble_content_unset(Evas_Object *obj)
  * Set the icon of the bubble
  *
  * Once the icon object is set, a previously set one will be deleted.
+  * If you want to keep the old content object, use the 
+  * elm_icon_content_unset() function. 
  *
  * @param obj The bubble object
  * @param icon The given icon for the bubble
@@ -340,7 +373,6 @@ elm_bubble_icon_set(Evas_Object *obj, Evas_Object *icon)
 	edje_object_signal_emit(wd->bbl, "elm,state,icon,visible", "elm");
 	edje_object_message_signal_process(wd->bbl);
      }
-   
    _sizing_eval(obj);
 }
 
@@ -362,6 +394,31 @@ elm_bubble_icon_get(const Evas_Object *obj)
    if (!wd) return NULL;
    return wd->icon;
 }
+
+ /** 
+  * Unset the icon of the bubble 
+  * 
+  * Unparent and return the icon object which was set for this widget. 
+  * 
+  * @param obj The bubble object 
+  * @return The icon that was being used 
+  * 
+  * @ingroup Bubble 
+  */ 
+ EAPI Evas_Object * 
+ elm_bubble_icon_unset(Evas_Object *obj) 
+ { 
+    ELM_CHECK_WIDTYPE(obj, widtype) NULL; 
+    Widget_Data *wd = elm_widget_data_get(obj); 
+    Evas_Object *icon; 
+    if (!wd) return NULL; 
+    if (!wd->icon) return NULL; 
+    icon = wd->icon; 
+    elm_widget_sub_object_del(obj, icon); 
+    edje_object_part_unswallow(wd->bbl, icon); 
+    wd->icon = NULL; 
+    return icon; 
+ } 
 
 /**
  * Set the sweep layout
@@ -390,7 +447,7 @@ elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep)
 }
 
 /**
- * Unset the sweep layout
+ * Unset and hide the sweep layout
  *
  * @param obj The bubble object
  * @param content The given content of the bubble
