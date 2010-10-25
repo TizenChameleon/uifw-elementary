@@ -1190,9 +1190,9 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) wd->on_hold = EINA_TRUE;
    else wd->on_hold = EINA_FALSE;
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-     evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, NULL);
+     evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, ev);
    else
-     evas_object_smart_callback_call(data, SIG_PRESS, NULL);
+     evas_object_smart_callback_call(data, SIG_PRESS, ev);
    wd->longpressed = EINA_FALSE;
    if (wd->long_timer) ecore_timer_del(wd->long_timer);
    wd->long_timer = ecore_timer_add(1.0, _long_press, data);
@@ -1248,7 +1248,7 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
       wd->long_timer = NULL;
    }
    if (!wd->on_hold)
-   evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+   evas_object_smart_callback_call(data, SIG_CLICKED, ev);
    wd->on_hold = EINA_FALSE;
 }
 
