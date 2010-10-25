@@ -562,6 +562,9 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 	   }
 	   edje_object_part_unswallow(wd->base, wd->entry);
 	   edje_object_part_swallow(wd->base, "elm.swallow.content", wd->scroller);
+	   evas_object_size_hint_weight_set(wd->entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	   evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
 	   elm_scroller_content_set(wd->scroller, wd->entry);
    }
    else {
