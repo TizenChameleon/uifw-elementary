@@ -37,7 +37,7 @@ elm
 	:include:/elm_ts/editfield/tslist
 	:include:/elm_ts/box/tslist
 	:include:/elm_ts/elm_scroller/tslist
-
+	:include:/elm_ts/scrolled_entry/tslist
 
 #yhkim
 ch 

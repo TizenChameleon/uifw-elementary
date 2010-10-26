@@ -1476,6 +1476,8 @@ _groupitem_unrealize(Elm_Genlist_GroupItem *git)
 	EINA_LIST_FREE(git->icon_objs, icon)
 		evas_object_del(icon);
 
+	if(git->wd->max_git_num)
+		git->wd->max_git_num--;
 	git->states = NULL;
 	git->realized = EINA_FALSE;
 }
@@ -2532,7 +2534,8 @@ _item_block_position(Item_Block *itb, int in)
 
 						if (!it->reordering )
 						  {
-							  if (it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE && !it->wd->pinch_zoom_reserve)
+							  if (!it->wd->effect_mode || 
+                        (it->wd->effect_mode && it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE) && !it->wd->pinch_zoom_reserve)
 								 {
 									 _move_edit_controls( it,it->scrl_x, it->scrl_y );
 									 evas_object_resize(it->base, it->w-(it->pad_left+it->pad_right), it->h);
@@ -3281,6 +3284,7 @@ _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
 {
 	if(!wd->queue_exception)
   {
+   if (it->queued) return;
    wd->queue = eina_list_append(wd->queue, it);
 	it->queued = EINA_TRUE;
   }
@@ -3295,7 +3299,6 @@ _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
         _queue_proecess(wd, 0);
      }
 
-   if (it->queued) return;
    if (!wd->queue_idler) wd->queue_idler = ecore_idler_add(_item_idler, wd);
 
 	if(wd->queue_exception)
@@ -5555,7 +5558,7 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 							  if (it->group_item->old_y)
 								 it->old_scrl_y -= (it->group_item->old_y - it->group_item->y);
 
-							  if(git_array[it->group_item->num+1] <=  it->old_scrl_y) 
+							  if(git_array[it->group_item->num+1] <=  it->old_scrl_y || added_gy == 1.0)
 								 evas_object_color_set(it->base, 0,0,0,0);
 
 							  _move_edit_controls(it,it->scrl_x, it->scrl_y);
