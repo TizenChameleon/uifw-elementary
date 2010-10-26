@@ -3223,8 +3223,6 @@ _item_block_add(Widget_Data *wd, Elm_Genlist_Item *it)
      }
 }
 
-#if 1
-
 static int
 _queue_proecess(Widget_Data *wd, int norender)
 {
@@ -3303,71 +3301,6 @@ _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
 	it->queued = EINA_TRUE;
    }
 }
-#else
-
-static int
-_item_idler(void *data)
-{
-   Widget_Data *wd = data;
-   int n, showme = 0;
-   double t0, t;
-
-   t0 = ecore_time_get();
-   for (n = 0; (wd->queue) && (n < 128); n++)
-     {
-        Elm_Genlist_Item *it;
-
-        it = wd->queue->data;
-        wd->queue = eina_list_remove_list(wd->queue, wd->queue);
-        it->queued = EINA_FALSE;
-        _item_block_add(wd, it);
-        t = ecore_time_get();
-        if (it->block->changed)
-          {
-             showme = _item_block_recalc(it->block, it->block->num, 1, 1);
-             it->block->changed = 0;
-          }
-        if (showme) it->block->showme = 1;
-        if (eina_inlist_count(wd->blocks) > 1)
-          {
-             if ((t - t0) > (ecore_animator_frametime_get())) break;
-          }
-     }
-   if (n > 0)
-     {
-        if (wd->calc_job) ecore_job_del(wd->calc_job);
-        wd->calc_job = ecore_job_add(_calc_job, wd);
-     }
-   if (!wd->queue)
-     {
-        wd->queue_idler = NULL;
-        return 0;
-     }
-   return 1;
-}
-
-static void
-_item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
-{
-   Item_Block *itb;
-
-   // Add the initial set of Items directly to the Blocks, to show the genlist
-   // without empty screen.
-   itb = (Item_Block *)(wd->blocks);
-   if( (NULL == itb) || (itb->count < wd->max_items_per_block) )
-     {
-	_item_block_add(wd, it);
-     }
-   else
-     {
-	if (it->queued) return;
-	if (!wd->queue_idler) wd->queue_idler = ecore_idler_add(_item_idler, wd);
-	it->queued = EINA_TRUE;
-	wd->queue = eina_list_append(wd->queue, it);
-     }
-}
-
-#endif
 
 /**
  * Add Group Item to the genlist
