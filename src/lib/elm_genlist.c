@@ -1476,6 +1476,7 @@ _groupitem_unrealize(Elm_Genlist_GroupItem *git)
 	EINA_LIST_FREE(git->icon_objs, icon)
 		evas_object_del(icon);
 
+	git->wd->max_git_num--;
 	git->states = NULL;
 	git->realized = EINA_FALSE;
 }
@@ -3282,6 +3283,7 @@ _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
 {
 	if(!wd->queue_exception)
   {
+   if (it->queued) return;
    wd->queue = eina_list_append(wd->queue, it);
 	it->queued = EINA_TRUE;
   }
@@ -3296,7 +3298,6 @@ _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
         _queue_proecess(wd, 0);
      }
 
-   if (it->queued) return;
    if (!wd->queue_idler) wd->queue_idler = ecore_idler_add(_item_idler, wd);
 
 	if(wd->queue_exception)
