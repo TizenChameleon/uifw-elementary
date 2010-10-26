@@ -930,7 +930,6 @@ _multi_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    Evas_Event_Multi_Down *ev = event_info;
    Evas_Coord dx, dy, adx, ady;
 
-//   elm_smart_scroller_freeze_bounce_animator_set(it->wd->scr, 1);
    if (it->long_timer)
      {
 	ecore_timer_del(it->long_timer);
@@ -1094,7 +1093,6 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    Evas_Event_Mouse_Down *ev = event_info;
    Evas_Coord x, y;
 
-   //elm_smart_scroller_freeze_bounce_animator_set(it->wd->scr, 0);
    it->wd->td1_x = ev->canvas.x;
    it->wd->td1_y = ev->canvas.y;
    if( it->wd->effect_mode && it->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH) 
@@ -1331,8 +1329,9 @@ _set_groupitem( Elm_Genlist_Item *it, Elm_Genlist_GroupItem *git)
 }
 
 static void
-_group_item_click_cb(Elm_Genlist_GroupItem *git)
+_group_item_click_cb(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+   Elm_Genlist_GroupItem *git = data;
    elm_smart_scroller_bounce_allow_set(git->wd->scr, EINA_FALSE, EINA_TRUE);
    if(git->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH)
    {
@@ -2088,7 +2087,7 @@ _reorder_mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *e
 }
 
 static void
-_select_all_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
+_select_all_down(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Item_Block *itb;
    Elm_Genlist_Item *select_all_it = data, *it;
@@ -2190,8 +2189,8 @@ _edit_controls_eval(Elm_Genlist_Item *it)
 				 _elm_theme_object_set(it->wd->obj, it->edit_obj, "genlist", "item/edit_control", elm_widget_style_get(it->wd->obj));
 			 }
 
-		  edje_object_signal_callback_add(it->edit_obj, "elm,action,edit,reset",
-				  "elm", _edit_mode_reset, it);
+		//  edje_object_signal_callback_add(it->edit_obj, "elm,action,edit,reset",
+			//	  "elm", _edit_mode_reset, it);
 	  }
 
 	pad_str = edje_object_data_get(it->edit_obj, "icon_width");
@@ -2206,7 +2205,7 @@ _edit_controls_eval(Elm_Genlist_Item *it)
 
 		  edje_object_signal_callback_add(it->edit_obj, "elm,action,item,insert",
 				  "elm", _insert_new_item_cb, it);
-		  it->pad_left += pad;
+		  it->pad_left += pad * _elm_config->scale;
 	  }
 	else
 	  {
@@ -2236,7 +2235,7 @@ _edit_controls_eval(Elm_Genlist_Item *it)
 
 		  edje_object_signal_callback_add(it->edit_obj, "elm,action,hide,del_confirm",
 				  "elm", _hide_delete_confirm_object, it );
-		  it->pad_left += pad;
+		  it->pad_left += pad * _elm_config->scale;
 		  evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
 				  _reorder_mouse_down, it);
 	  }
@@ -2257,13 +2256,12 @@ _edit_controls_eval(Elm_Genlist_Item *it)
 
 	if ((itmode & ELM_GENLIST_EDIT_MODE_REORDER))
 	  {
-		  Evas_Object *reorder_icon;
 		  const char* reorder_part;
 
 		  reorder_part = edje_object_data_get(it->edit_obj, "reorder");
 		  if (reorder_part && edje_object_part_exists(it->edit_obj, reorder_part))
 			 {
-				 reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part);
+				 edje_object_part_object_get(it->edit_obj, reorder_part);
 
 				 evas_object_event_callback_del(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
 						 _reorder_mouse_down);
@@ -2279,17 +2277,15 @@ _edit_controls_eval(Elm_Genlist_Item *it)
 				 evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_MOVE,
 						 _reorder_mouse_move, it);
 			 }
-		  //  it->pad_right += pad;
+		  //  it->pad_right += pad * _elm_config->scale;
 	  }
 	else
 	  {
-		  Evas_Object *reorder_icon;
 		  const char* reorder_part;
 
 		  reorder_part = edje_object_data_get(it->edit_obj, "reorder");
 		  if (reorder_part && edje_object_part_exists(it->edit_obj, reorder_part))
 			 {
-				 reorder_icon = edje_object_part_object_get(it->edit_obj, reorder_part);
 
 				 if (itmode == ELM_GENLIST_EDIT_MODE_NONE) 
 					{
@@ -2534,8 +2530,8 @@ _item_block_position(Item_Block *itb, int in)
 
 						if (!it->reordering )
 						  {
-							  if (!it->wd->effect_mode || 
-                        (it->wd->effect_mode && it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE) && !it->wd->pinch_zoom_reserve)
+							  if ((!it->wd->effect_mode || 
+                        (it->wd->effect_mode && it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE)) && !it->wd->pinch_zoom_reserve)
 								 {
 									 _move_edit_controls( it,it->scrl_x, it->scrl_y );
 									 evas_object_resize(it->base, it->w-(it->pad_left+it->pad_right), it->h);
@@ -3724,7 +3720,6 @@ elm_genlist_clear(Evas_Object *obj)
    elm_smart_scroller_hold_set(wd->scr, 0);
 	elm_smart_scroller_freeze_set(wd->scr, 0);
    elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
-   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);   
    elm_smart_scroller_bounce_allow_set(wd->scr, EINA_FALSE, EINA_TRUE);
    wd->max_git_num  = 0;
    wd->pinch_zoom_reserve = EINA_FALSE;
@@ -5284,7 +5279,8 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
    if (!it) return;
 
    const Eina_List *l, *list, *l2;
-   const char *label, *rename_swallow_part, *s;
+   const char *label, *rename_swallow_part;
+   char *s;
    Eina_Bool done = EINA_FALSE;
    int label_cnt = 0 , swallow_part_cnt = 0;
 
@@ -5318,7 +5314,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
 		       EINA_LIST_FOREACH(it->wd->edit_field, l2, editfield)
 			 {
 			    entry = elm_editfield_entry_get(editfield);
-			    char *text = elm_entry_entry_get(entry);
+			    const char *text = elm_entry_entry_get(entry);
 
 			    if (it->itc->func.label_changed)
 			      it->itc->func.label_changed( it->data, it, text, edit_field_cnt++);
@@ -5592,7 +5588,7 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 		  elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
 		  elm_smart_scroller_bounce_allow_set(wd->scr, EINA_FALSE, EINA_TRUE);
 
-		  fprintf(stderr,"ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT  FINISH   \n");         
+//		  fprintf(stderr,"ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT  FINISH   \n");         
 
 		  tmp_y  =0 ;
 		  // added for event
@@ -5636,8 +5632,8 @@ _group_item_expand_moving_effect_timer_cb(void *data)
 	int tmp = 0, show_git_cnt = 0, scroll_y = 0, top_git = 0 , git_h = 0, scroll_pan_y = 0, down = 0;
 	int up_cnt = 1, down_cnt = 1, it_h = 0;
 	static int last_git_y = 0;
-
-	double t, p, dt;
+   
+	double t;
 
 	Evas_Coord ox, oy, ow, oh, cvx, cvy, cvw, cvh;
 
@@ -5857,9 +5853,8 @@ _group_item_expand_moving_effect_timer_cb(void *data)
 		  elm_smart_scroller_hold_set(wd->scr, 0);
 		  elm_smart_scroller_freeze_set(wd->scr, 0);
 		  elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
-		  elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);
 		  elm_smart_scroller_bounce_allow_set(wd->scr, EINA_FALSE, EINA_TRUE);
-		  printf("_group_item_expand_moving_effect_timer_cb  FINISH \n");
+//		  printf("_group_item_expand_moving_effect_timer_cb  FINISH \n");
 		  evas_object_lower(wd->alpha_bg);
 		  evas_object_hide(wd->alpha_bg);
 		  //	 evas_object_smart_changed(wd->pan_smart);
@@ -5953,7 +5948,6 @@ _elm_genlist_pinch_zoom_execute(Evas_Object *obj, Eina_Bool emode)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   printf("elm_genlist_pinch_zoom_mode_set emode = %d wd->pinch_zoom = %d wd->pinchzoom_effect_mode = %d \n", emode, wd->pinch_zoom, wd->pinchzoom_effect_mode);
 
    if (!wd || !wd->pinch_zoom) return;   
 
@@ -6071,7 +6065,6 @@ _item_moving_effect_timer_cb(void *data)
 
 			if(itb && itb->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
 			{
-
 
 		      if(it->old_scrl_y && it->old_scrl_y < it->scrl_y) {
 
