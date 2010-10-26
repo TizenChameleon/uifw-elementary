@@ -2532,7 +2532,8 @@ _item_block_position(Item_Block *itb, int in)
 
 						if (!it->reordering )
 						  {
-							  if (it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE && !it->wd->pinch_zoom_reserve)
+							  if (!it->wd->effect_mode || 
+                        (it->wd->effect_mode && it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE) && !it->wd->pinch_zoom_reserve)
 								 {
 									 _move_edit_controls( it,it->scrl_x, it->scrl_y );
 									 evas_object_resize(it->base, it->w-(it->pad_left+it->pad_right), it->h);
@@ -5555,7 +5556,7 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 							  if (it->group_item->old_y)
 								 it->old_scrl_y -= (it->group_item->old_y - it->group_item->y);
 
-							  if(git_array[it->group_item->num+1] <=  it->old_scrl_y) 
+							  if(git_array[it->group_item->num+1] <=  it->old_scrl_y || added_gy == 1.0)
 								 evas_object_color_set(it->base, 0,0,0,0);
 
 							  _move_edit_controls(it,it->scrl_x, it->scrl_y);
