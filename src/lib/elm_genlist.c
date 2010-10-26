@@ -1476,7 +1476,8 @@ _groupitem_unrealize(Elm_Genlist_GroupItem *git)
 	EINA_LIST_FREE(git->icon_objs, icon)
 		evas_object_del(icon);
 
-	git->wd->max_git_num--;
+	if(git->wd->max_git_num)
+		git->wd->max_git_num--;
 	git->states = NULL;
 	git->realized = EINA_FALSE;
 }
