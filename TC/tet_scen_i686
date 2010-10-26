@@ -32,7 +32,10 @@ elm
 	:include:/elm_ts/panes/tslist
 	:include:/elm_ts/controlbar/tslist
 	:include:/elm_ts/scroller/tslist
+	:include:/elm_ts/index/tslist
+	:include:/elm_ts/nocontents/tslist
 	:include:/elm_ts/segmentcontrol/tslist
+	:include:/elm_ts/slider/tslist
 
 
 #yhkim
