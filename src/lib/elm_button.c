@@ -76,7 +76,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_focus_get(obj))
      {
-	if(wd->statelabel[FOCUSED])
+	if (wd->statelabel[FOCUSED])
 	  {
 	     _set_label(obj, wd->statelabel[FOCUSED]);
 	  }
@@ -85,12 +85,12 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      }
    else
      {
-	if(wd->statelabel[DEFAULT])
+	if (wd->statelabel[DEFAULT])
 	  _set_label(obj, wd->statelabel[DEFAULT]);
-#if 0
+//#if 0
 	else
 	  _set_label(obj, wd->label);
-#endif
+//#endif
 	edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
 	evas_object_focus_set(wd->btn, EINA_FALSE);
      }
@@ -131,7 +131,7 @@ _disable_hook(Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_disabled_get(obj))
      {
-	if(wd->statelabel[DISABLED] )
+	if (wd->statelabel[DISABLED] )
 	  {
 	     _set_label(obj, wd->statelabel[DISABLED]);
 	  }
@@ -139,12 +139,12 @@ _disable_hook(Evas_Object *obj)
      }
    else
      {
-	if(wd->statelabel[DEFAULT])
+	if (wd->statelabel[DEFAULT])
 	  _set_label(obj, wd->statelabel[DEFAULT]);
-#if 0
+//#if 0
 	else
 	  _set_label(obj, wd->label);
-#endif
+//#endif
 	edje_object_signal_emit(wd->btn, "elm,state,enabled", "elm");
      }
 }
@@ -248,7 +248,7 @@ _signal_pressed(void *data, Evas_Object *obj __UNUSED__, const char *emission __
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
-   if(wd->statelabel[HIGHLIGHTED])
+   if (wd->statelabel[HIGHLIGHTED])
      {
 	_set_label(data, wd->statelabel[HIGHLIGHTED]);
      }
@@ -266,12 +266,12 @@ _signal_default_text_set(void *data, Evas_Object *obj, const char *emission, con
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   if(wd->statelabel[DEFAULT])
+   if (wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
-#if 0
+//#if 0
    else
      _set_label(data, wd->label);
-#endif
+//#endif
    return;
 }
 
@@ -280,12 +280,12 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   if(wd->statelabel[DEFAULT])
+   if (wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
-#if 0
+//#if 0
    else
      _set_label(data, wd->label);
-#endif
+//#endif
 
    if (wd->timer)
      {
@@ -382,7 +382,6 @@ _set_label(Evas_Object *obj, const char *label)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   edje_object_message_signal_process(wd->btn);
    edje_object_part_text_set(wd->btn, "elm.text", label);
    _sizing_eval(obj);
 }
@@ -401,27 +400,27 @@ elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlSta
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-   if(label == NULL) return;
+   if (label == NULL) return;
 
-   if(state == UIControlStateDefault)
+   if (state == UIControlStateDefault)
      {
 	wd->statetype[DEFAULT] = UIControlStateDefault;
 	eina_stringshare_replace(&wd->statelabel[DEFAULT], label);
 	return;
      }
-   if(state == UIControlStateHighlighted)
+   if (state == UIControlStateHighlighted)
      {
 	wd->statetype[HIGHLIGHTED] = UIControlStateHighlighted;
 	eina_stringshare_replace(&wd->statelabel[HIGHLIGHTED], label);
 	return;
      }
-   if(state == UIControlStateFocused)
+   if (state == UIControlStateFocused)
      {
 	wd->statetype[FOCUSED] = UIControlStateFocused;
 	eina_stringshare_replace(&wd->statelabel[FOCUSED], label);
 	return;
      }
-   if(state == UIControlStateDisabled)
+   if (state == UIControlStateDisabled)
      {
 	wd->statetype[DISABLED] = UIControlStateDisabled;
 	eina_stringshare_replace(&wd->statelabel[DISABLED], label);
@@ -460,13 +459,13 @@ elm_button_label_get_for_state(const Evas_Object *obj, UIControlState state)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   if(state == UIControlStateDefault)
+   if (state == UIControlStateDefault)
      return wd->statelabel[DEFAULT];
-   else if(state == UIControlStateHighlighted)
+   else if (state == UIControlStateHighlighted)
      return wd->statelabel[HIGHLIGHTED];
-   else if(state == UIControlStateFocused)
+   else if (state == UIControlStateFocused)
      return wd->statelabel[FOCUSED];
-   else if(state == UIControlStateDisabled)
+   else if (state == UIControlStateDisabled)
      return wd->statelabel[DISABLED];
    else
      return NULL;
