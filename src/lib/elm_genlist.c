@@ -1,7 +1,3 @@
-/*
- * vim:ts=3:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
- */
-
 #include <Elementary.h>
 #include "elm_priv.h"
 #include "els_scroller.h"
@@ -3361,9 +3357,9 @@ elm_genlist_groupitem_del(Elm_Genlist_GroupItem *git)
  */
 EAPI Elm_Genlist_Item *
 elm_genlist_item_append(Evas_Object *obj, const Elm_Genlist_Item_Class *itc,
-			const void *data, Elm_Genlist_Item *parent,
-			Elm_Genlist_Item_Flags flags,
-			Evas_Smart_Cb func, const void *func_data)
+                        const void *data, Elm_Genlist_Item *parent,
+                        Elm_Genlist_Item_Flags flags,
+                        Evas_Smart_Cb func, const void *func_data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -3372,25 +3368,23 @@ elm_genlist_item_append(Evas_Object *obj, const Elm_Genlist_Item_Class *itc,
    if (!it) return NULL;
    if (!it->parent)
      {
-	wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
-	it->rel = NULL;
-	it->before = 0;
+        wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
+        it->rel = NULL;
+        it->before = 0;
      }
    else
      {
-	Elm_Genlist_Item *it2 = NULL;
-	Eina_List *ll = eina_list_last(it->parent->items);
-	if (ll) it2 = ll->data;
-	it->parent->items = eina_list_append(it->parent->items, it);
-	if (!it2) it2 = it->parent;
-	wd->items = 
-          eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it), 
-                                      EINA_INLIST_GET(it2));
-	if( it->parent->group_item)
-	  _set_groupitem( it, it->parent->group_item );
-	it->rel = it2;
-	it->rel->relcount++;
-	it->before = 0;
+        Elm_Genlist_Item *it2 = NULL;
+        Eina_List *ll = eina_list_last(it->parent->items);
+        if (ll) it2 = ll->data;
+        it->parent->items = eina_list_append(it->parent->items, it);
+        if (!it2) it2 = it->parent;
+        wd->items = 
+           eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it), 
+                                       EINA_INLIST_GET(it2));
+        it->rel = it2;
+        it->rel->relcount++;
+        it->before = 0;
      }
    _item_queue(wd, it);
    return it;
@@ -3420,36 +3414,47 @@ elm_genlist_item_append_with_group(Evas_Object *obj, const Elm_Genlist_Item_Clas
 			Elm_Genlist_Item_Flags flags, Elm_Genlist_GroupItem *git,
 			Evas_Smart_Cb func, const void *func_data)
 {
-    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-    Widget_Data *wd = elm_widget_data_get(obj);
-    Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func, func_data);
-    if (!wd) return NULL;
-    if (!it) return NULL;
-    if (!it->parent)
-      {
-	 wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
-	 it->rel = NULL;
-	 it->before = 0;
-      }
-    else
-      {
-	 Elm_Genlist_Item *it2 = NULL;
-	 Eina_List *ll = eina_list_last(it->parent->items);
-	 if (ll) it2 = ll->data;
-	 it->parent->items = eina_list_append(it->parent->items, it);
-	 if (!it2) it2 = it->parent;
-	 wd->items =
-	    eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
-		  EINA_INLIST_GET(it2));
-	 if( it->parent->group_item)
-	   _set_groupitem( it, it->parent->group_item );
-	 it->rel = it2;
-	 it->rel->relcount++;
-	 it->before = 0;
-      }
-    _set_groupitem( it, git );
-    _item_queue(wd, it);
-    return it;
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	parent = NULL;
+	Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func, func_data);
+   Elm_Genlist_GroupItem *pgit = NULL;
+   Elm_Genlist_Item *it2 = NULL;
+   Eina_List *ll = NULL;
+	if (!wd) return NULL;
+	if (!it) return NULL;
+	if (!git) return NULL;
+
+   pgit = git;
+   while (pgit)
+     {
+        ll = eina_list_last(pgit->items);
+        if (ll) 
+          {
+             it2 = ll->data;
+             break;
+          }
+        if (!(EINA_INLIST_GET(pgit)->prev)) break;
+        pgit = (Elm_Genlist_GroupItem *)(EINA_INLIST_GET(pgit)->prev);
+     }
+   if (it2)
+     {
+        wd->items =
+           eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
+                                       EINA_INLIST_GET(it2));
+        it->rel = it2;
+        it->rel->relcount++;
+     } 
+   else 
+     {
+        wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
+        it->rel = NULL;
+     }
+   git->items = eina_list_append(git->items, it);
+   it->before = 0;
+   it->group_item = git;
+   _item_queue(wd, it);
+   return it;
 }
 
 /**
