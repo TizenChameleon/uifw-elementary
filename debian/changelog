@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build44) unstable; urgency=low
+
+  * [elm_genlist] Fixed edit mode padding for scale factor.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build44
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Tue, 26 Oct 2010 19:51:23 +0900
+
 elementary (1.0.0+svn.51480slp2+build43) unstable; urgency=low
 
   * [elm_genlist] fix expandalbe list problem
