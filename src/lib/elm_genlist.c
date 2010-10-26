@@ -4260,7 +4260,7 @@ elm_genlist_item_expanded_get(const Elm_Genlist_Item *it)
  * @ingroup Genlist
  */
 EAPI int
-elm_genlist_item_expanded_depth_get(Elm_Genlist_Item *it)
+elm_genlist_item_expanded_depth_get(const Elm_Genlist_Item *it)
 {
    if (!it) return 0;
    return it->expanded_depth;
@@ -5998,7 +5998,7 @@ elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode)
  * @ingroup Genlist
  */
 EAPI Eina_Bool
-elm_genlist_pinch_zoom_mode_get(Evas_Object *obj)
+elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    
