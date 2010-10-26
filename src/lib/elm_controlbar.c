@@ -1085,6 +1085,7 @@ move_selected_box(Widget_Data *wd, Elm_Controlbar_Item * fit, Elm_Controlbar_Ite
 	evas_object_geometry_get(to, &tx, &ty, &tw, &th);
 
 	edje_object_signal_emit(_EDJ(wd->pre_item->base), "elm,state,unselected", "elm");
+	edje_object_signal_emit(_EDJ(wd->pre_item->base_item), "elm,state,shadow_hide", "elm");
 	edje_object_signal_emit(_EDJ(wd->cur_item->base), "elm,state,unselected", "elm");
 
 	wd->animating++;
@@ -1251,8 +1252,15 @@ unpressed_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
      {
 	if (item->style == TABBAR)
 	  {
-	     edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
-	     edje_object_signal_emit(_EDJ(item->base_item), "elm,state,shadow_hide", "elm");
+	     if(item->selected)
+	       {
+		  edje_object_signal_emit(_EDJ(item->base), "elm,state,selected", "elm");
+	       }
+	     else
+	       {
+		  edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
+		  edje_object_signal_emit(_EDJ(item->base_item), "elm,state,shadow_hide", "elm");
+	       }
 	  }
 	else if (item->style == TOOLBAR)
 	  {
