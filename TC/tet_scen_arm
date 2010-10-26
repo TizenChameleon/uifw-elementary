@@ -28,8 +28,11 @@ elm
 	:include:/elm_ts/toggle/tslist
 	:include:/elm_ts/panes/tslist
 	:include:/elm_ts/controlbar/tslist
-	:include:/elm_ts/segmentcontrol/tslist
+	:include:/elm_ts/index/tslist
+	:include:/elm_ts/nocontents/tslist
 	:include:/elm_ts/scroller/tslist
+	:include:/elm_ts/segmentcontrol/tslist
+	:include:/elm_ts/slider/tslist
 	:include:/elm_ts/dialoguegroup/tslist
 	:include:/elm_ts/navigationbar_ex/tslist
 	:include:/elm_ts/multibuttonentry/tslist
@@ -37,7 +40,7 @@ elm
 	:include:/elm_ts/editfield/tslist
 	:include:/elm_ts/box/tslist
 	:include:/elm_ts/elm_scroller/tslist
-
+	:include:/elm_ts/scrolled_entry/tslist
 
 #yhkim
 ch 

@@ -577,8 +577,37 @@ elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int 
 	 		if(btn_det->btn_id == button_type)
 	 			return btn_det->btn;
 	 	}
-		return NULL;
- 		
+		return NULL; 		
+ 	}
+
+/**
+ * Unset the button object of the pushed content
+ *
+ * @param[in] item The Navigationbar_ex Item 
+ * @param[in] button_type Indicates the position
+ * @return The button object or NULL if none
+ *
+ * @ingroup Navigationbar_ex
+ */
+EAPI Evas_Object *
+elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type)
+ 	{
+ 		fn_button *btn_det;
+		Eina_List *bl;
+		Evas_Object *btn_ret;
+		EINA_LIST_FOREACH(item->fnbtn_list, bl, btn_det)
+	 	{
+	 		if(btn_det->btn_id == button_type)
+	 			{
+	 				btn_ret = btn_det->btn;
+					elm_widget_sub_object_del(item->obj,btn_det->btn);
+					edje_object_part_unswallow(item->base,btn_det->btn);	
+					item->fnbtn_list = eina_list_remove_list(item->fnbtn_list, bl);
+					btn_det->btn = NULL;
+					return btn_ret;
+	 			}
+	 	}
+		return NULL; 		
  	}
 
 /**
@@ -722,6 +751,9 @@ elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char*
 {
 	if(!item) return;
 	char buf[1024];
+	char buf_fn[1024];
+	Eina_List *bl;
+	fn_button *btn_det;
 	strncpy(buf, "item/", sizeof(buf));
 	strncat(buf, item_style, sizeof(buf) - strlen(buf));
 	if (!eina_stringshare_replace(&item->item_style, item_style)) return;
@@ -730,6 +762,22 @@ elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char*
 		edje_object_part_text_set(item->base, "elm.text", item->title);
 	if(item->subtitle)
 		edje_object_part_text_set(item->base, "elm.text.sub", item->subtitle);
+	if(item->fnbtn_list)
+		{
+			EINA_LIST_FOREACH(item->fnbtn_list, bl, btn_det)
+	 		{
+	 			if(btn_det->btn_id == ELM_NAVIGATIONBAR_EX_BACK_BUTTON)
+		 			{
+		 				snprintf(buf_fn, sizeof(buf_fn), "navigationbar_backbutton/%s", elm_widget_style_get(item->obj));
+						elm_object_style_set(btn_det->btn, buf_fn);
+		 			}
+				else
+					{
+		 				snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/%s", elm_widget_style_get(item->obj));
+						elm_object_style_set(btn_det->btn, buf_fn);
+					}
+	 		}
+		}
 }
 
 /**

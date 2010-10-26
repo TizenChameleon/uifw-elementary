@@ -1121,6 +1121,47 @@ elm_gengrid_item_append(Evas_Object *obj, const Elm_Gengrid_Item_Class *gic,
 }
 
 /**
+ * Prepend item at start of the Gengrid
+ *
+ * This adds an item to the beginning of the list or beginning of the children
+ * of the parent if given.
+ *
+ * @param obj The Gengrid object.
+ * @param gic The item class for the item.
+ * @param data The item data.
+ * @param func Convenience function called when item is selected.
+ * @param func_data Data passed to @p func above.
+ * @return A handle to the item added or NULL if not possible.
+ *
+ * @see elm_gengrid_item_del()
+ *
+ * @ingroup Gengrid
+ */
+
+
+EAPI Elm_Gengrid_Item *
+elm_gengrid_item_prepend(Evas_Object *obj, const Elm_Gengrid_Item_Class *gic,
+                            const void *data, Evas_Smart_Cb func,
+			    const void *func_data)
+{
+   Elm_Gengrid_Item *item;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   
+   item = _item_create(wd, gic, data, func, func_data);
+   if (!item) return NULL;
+   
+   wd->items = eina_list_prepend(wd->items, item);
+   wd->no_select = EINA_FALSE;
+   
+   if (wd->calc_job) ecore_job_del(wd->calc_job);
+   wd->calc_job = ecore_job_add(_calc_job, wd);
+   
+   return item;
+}
+
+/**
  * Remove a item from the Gengrid.
  *
  * @param item The item to be removed.
