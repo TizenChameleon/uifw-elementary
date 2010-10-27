@@ -1,6 +1,7 @@
 CC ?= gcc
 
-TARGETS = utc_UIFW_elm_genlist_add_func
+TARGETS = utc_UIFW_elm_genlist_add_func \
+	  utc_UIFW_elm_genlist_clear_func
 
 PKGS = elementary
 
