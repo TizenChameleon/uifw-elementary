@@ -29,6 +29,7 @@ struct _Widget_Data
    Eina_List *stack;
    Item *top, *oldtop;
    Evas_Object *rect, *clip;
+   Eina_Bool disable_animation: 1;
 };
 
 struct _Item
@@ -113,7 +114,11 @@ _eval_top(Evas_Object *obj)
 	if (wd->top)
 	  {
 	     o = wd->top->base;
-	     if (wd->top->popme)
+		if(wd->disable_animation)
+			{
+				edje_object_signal_emit(o, "elm,action,hide,noanimate", "elm");
+			}
+	     else if (wd->top->popme)
 		edje_object_signal_emit(o, "elm,action,pop", "elm");
 	     else
 		edje_object_signal_emit(o, "elm,action,hide", "elm");
@@ -132,8 +137,10 @@ _eval_top(Evas_Object *obj)
 	wd->top = ittop;
 	o = wd->top->base;
 	evas_object_show(o);
-	if (!animate)
-		edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
+	if ((!animate)||(wd->disable_animation))
+		{
+			edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
+		}
 	else if (wd->oldtop && wd->oldtop->popme)
 	    edje_object_signal_emit(o, "elm,action,show", "elm");
 	else
@@ -465,4 +472,22 @@ elm_pager_content_top_get(const Evas_Object *obj)
    it = eina_list_last(wd->stack)->data;
    return it->content;
 }
+
+/**
+ * This disables content animation on push/pop.
+ *
+ * @param obj The pager object
+ * @param disable  if EINA_TRUE animation is disabled.
+ *
+ * @ingroup Pager
+ */
+EAPI void
+elm_pager_animation_disable_set(Evas_Object *obj, 
+							Eina_Bool disable)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	wd->disable_animation = disable;
+}
+
 

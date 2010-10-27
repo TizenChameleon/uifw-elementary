@@ -30,8 +30,10 @@ struct _Widget_Data
 	Eina_List *stack;
 	Evas_Object *base;
 	Evas_Object *pager;
+	int pushed;
 	Eina_Bool popped : 1;
 	Eina_Bool hidden :1;
+	Eina_Bool disable_animation : 1;
  };
 
 struct _Item
@@ -347,6 +349,7 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
 	Widget_Data *wd =  elm_widget_data_get(navi_bar);
 	evas_object_smart_callback_call(navi_bar, "hide,finished", event_info);
 	wd->popped = EINA_TRUE;
+	wd->pushed = 0;
 }
 
 static int
@@ -511,6 +514,7 @@ elm_navigationbar_add(Evas_Object *parent)
    	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);	
 
 	_sizing_eval(obj);
+	wd->pushed = -1;
 	return obj;
 }
 
@@ -543,6 +547,8 @@ elm_navigationbar_push(Evas_Object *obj,
 	Item *prev_it = NULL;
 
 	if (!wd) return;
+	if(!wd->disable_animation)
+		if(wd->pushed == 1) return;
 
 	it = _check_item_is_added(obj, content);
 	if (it) return;
@@ -616,8 +622,9 @@ elm_navigationbar_push(Evas_Object *obj,
 	_transition_complete_cb(cb);
 	free(cb);
 	//push content to pager
+	if(!cb->first_page)
+		wd->pushed = 1;
 	elm_pager_content_push(wd->pager, it->content);	
-
 	//push item into the stack. it should be always the tail
 	if (!_check_item_is_added(obj, content))
 	wd->stack = eina_list_append(wd->stack, it);	
@@ -1374,4 +1381,21 @@ elm_navigationbar_subtitle_label_get(Evas_Object *obj,
 	return NULL;
 }
 
+/**
+ * This disables content area animation on push/pop.
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] disable  if EINA_TRUE animation is disabled.
+ *
+ * @ingroup NavigationBar
+ */
+EAPI void
+elm_navigationbar_animation_disable_set(Evas_Object *obj, 
+							Eina_Bool disable)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	wd->disable_animation = disable;
+	elm_pager_animation_disable_set(wd->pager, disable);
+}
 

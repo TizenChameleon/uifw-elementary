@@ -1370,6 +1370,7 @@ extern "C" {
    EAPI void         elm_pager_content_promote(Evas_Object *obj, Evas_Object *content);
    EAPI Evas_Object *elm_pager_content_bottom_get(const Evas_Object *obj);
    EAPI Evas_Object *elm_pager_content_top_get(const Evas_Object *obj);
+   EAPI void         elm_pager_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
 
    /* available item styles:
     * default
@@ -2252,6 +2253,7 @@ extern "C" {
    EAPI const char  *elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content);
    EAPI void         elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
    EAPI void         elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list);
+   EAPI void         elm_navigationbar_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
 
      /* NavigationBar */
    typedef enum 
