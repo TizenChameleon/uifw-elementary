@@ -1305,7 +1305,6 @@ _elm_fx_wipe_hide(Evas_Map * map, Elm_Fx_Wipe_Dir dir, float x, float y,
 	evas_map_point_coord_set(map, 1, w2, y + h2, 0);
 	evas_map_point_coord_set(map, 2, w2, y + h, 0);
 	evas_map_point_coord_set(map, 3, x, y + h, 0);
-	fprintf(stderr, "%f %f %f %f\n", x, y, w, h);
 	break;
      default:
 	break;
