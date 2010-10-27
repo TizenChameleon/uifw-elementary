@@ -236,7 +236,7 @@ static struct {
    },
    [CNP_ATOM_UTF8STRING] = {
 	"UTF8_STRING",
-	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP,
+	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_HTML,
 	text_converter,
 	NULL,
 	notify_handler_text,
@@ -244,7 +244,7 @@ static struct {
    },
    [CNP_ATOM_STRING] = {
 	"STRING",
-	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP,
+	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_HTML,
 	text_converter,
 	NULL,
 	notify_handler_text,
@@ -252,7 +252,7 @@ static struct {
    },
    [CNP_ATOM_TEXT] = {
 	"TEXT",
-	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP,
+	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_HTML,
 	text_converter,
 	NULL,
 	NULL,
@@ -260,7 +260,7 @@ static struct {
    },
    [CNP_ATOM_text_plain_utf8] = {
 	"text/plain;charset=ut-8",
-	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP,
+	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_HTML,
 	text_converter,
 	NULL,
 	NULL,
@@ -268,7 +268,7 @@ static struct {
    },
    [CNP_ATOM_text_plain] = {
 	"text/plain",
-	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP,
+	ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_HTML,
 	text_converter,
 	NULL,
 	NULL,
@@ -359,7 +359,7 @@ elm_selection_set(Elm_Sel_Type selection, Evas_Object *widget,
 
    if ((unsigned int)selection >= (unsigned int)ELM_SEL_MAX) return EINA_FALSE;
    if (!_elm_cnp_init_count) _elm_cnp_init();
-   if (!selbuf && format != ELM_SEL_FORMAT_IMAGE)
+   if ((!selbuf) && (format != ELM_SEL_FORMAT_IMAGE))
      return elm_selection_clear(selection, widget);
 
    sel = selections + selection;
@@ -389,7 +389,7 @@ elm_selection_clear(Elm_Sel_Type selection, Evas_Object *widget)
    sel = selections + selection;
 
    /* No longer this selection: Consider it gone! */
-   if (!sel->active || sel->widget != widget) return EINA_TRUE;
+   if ((!sel->active) || (sel->widget != widget)) return EINA_TRUE;
 
    sel->active = 0;
    sel->widget = NULL;
@@ -506,7 +506,7 @@ selection_notify(void *udata __UNUSED__, int type __UNUSED__, void *event){
 
    for (i = 0 ; i < CNP_N_ATOMS ; i ++)
      {
-	if (strcmp(ev->target, atoms[i].name) == 0)
+	if (!strcmp(ev->target, atoms[i].name))
 	  {
 	     if (atoms[i].notify){
 		  cnp_debug("Found something: %s\n", atoms[i].name);
@@ -552,9 +552,10 @@ targets_converter(char *target __UNUSED__, void *data, int size __UNUSED__,
 }
 
 static Eina_Bool
-png_converter(char *target __UNUSED__, void *data, int size,
-              void **data_ret __UNUSED__, int *size_ret __UNUSED__,
-              Ecore_X_Atom *ttype __UNUSED__, int *typesize __UNUSED__)
+png_converter(char *target __UNUSED__, void *data __UNUSED__,
+              int size __UNUSED__, void **data_ret __UNUSED__,
+              int *size_ret __UNUSED__, Ecore_X_Atom *ttype __UNUSED__,
+              int *typesize __UNUSED__)
 {
    cnp_debug("Png converter called\n");
    return EINA_TRUE;
@@ -597,7 +598,7 @@ notify_handler_targets(struct _elm_cnp_selection *sel,
 	if (!(atoms[j].formats & sel->requestformat)) continue;
 	for (i = 0 ; i < targets->data.length ; i ++)
 	  {
-	     if (atoms[j].atom == atomlist[i] && atoms[j].notify)
+	     if ((atoms[j].atom == atomlist[i]) && (atoms[j].notify))
 	       {
 		  cnp_debug("Atom %s matches\n",atoms[j].name);
 		  goto done;
@@ -633,7 +634,7 @@ response_handler_targets(struct _elm_cnp_selection *sel,
 	if (!(atoms[j].formats & sel->requestformat)) continue;
 	for (i = 0 ; i < targets->data.length ; i ++)
 	  {
-	     if (atoms[j].atom == atomlist[i] && atoms[j].response){
+	     if ((atoms[j].atom == atomlist[i]) && (atoms[j].response)){
 		  /* Found a match: Use it */
 		  goto found;
 	     }
@@ -706,7 +707,7 @@ notify_handler_uri(struct _elm_cnp_selection *sel,
         return 0;
       }
    cnp_debug("Got %s\n",p);
-   if (strncmp(p,"file://",7) != 0)
+   if (strncmp(p, "file://", 7))
      {
         /* Try and continue if it looks sane */
         if (*p != '/') return 0;
@@ -714,7 +715,7 @@ notify_handler_uri(struct _elm_cnp_selection *sel,
    else
       p += strlen("file://");
 
-   if (!strstr(p,".png") && !strstr(p,".jpg"))
+   if ((!strstr(p,".png")) && (!strstr(p,".jpg")))
      {
         cnp_debug("No png, ignoring\n");
         if (savedtypes.textreq) savedtypes.textreq = 0;
@@ -881,19 +882,25 @@ text_converter(char *target __UNUSED__, void *data, int size __UNUSED__,
    sel = selections + *(int *)data;
    if (!sel->active) return EINA_TRUE;
 
-   if (sel->format == ELM_SEL_FORMAT_MARKUP){
+   if (sel->format == ELM_SEL_FORMAT_MARKUP ||
+       sel->format == ELM_SEL_FORMAT_HTML)
+     {
 	*data_ret = remove_tags(sel->selbuf, size_ret);
-   } else if (sel->format == ELM_SEL_FORMAT_TEXT || sel->format == ELM_SEL_FORMAT_HTML){
+     }
+   else if (sel->format == ELM_SEL_FORMAT_TEXT)
+     {
         *data_ret = strdup(sel->selbuf);
         *size_ret = strlen(sel->selbuf);
-   } else if (sel->format == ELM_SEL_FORMAT_IMAGE){
+     }
+   else if (sel->format == ELM_SEL_FORMAT_IMAGE)
+     {
 	cnp_debug("Image %s\n",evas_object_type_get(sel->widget));
 	cnp_debug("Elm type: %s\n",elm_object_widget_type_get(sel->widget));
 	evas_object_image_file_get(elm_photocam_internal_image_get(sel->widget), (const char **)data_ret, NULL);
 	if (!*data_ret) *data_ret = strdup("No file");
 	else *data_ret = strdup(*data_ret);
 	*size_ret = strlen(*data_ret);
-   }
+     }
    return EINA_TRUE;
 }
 
@@ -956,7 +963,7 @@ image_provider(void *images __UNUSED__, Evas_Object *entry, const char *item)
    EINA_LIST_FOREACH(pastedimages, l, pi)
      {
 	cnp_debug("is it %s?\n",pi->tag);
-	if (strcmp(pi->tag,item) == 0){
+	if (!strcmp(pi->tag, item)){
 	     /* Found it */
 	     Evas_Object *o;
 	     o = evas_object_image_filled_add(evas_object_evas_get(entry));
@@ -1023,7 +1030,7 @@ pasteimage_provider_set(Evas_Object *entry)
    if (!entry) return false;
    type = elm_widget_type_get(entry);
    printf("type is %s\n",type);
-   if (!type || strcmp(type,"entry") != 0) return false;
+   if ((!type) || (strcmp(type, "entry"))) return false;
 
    v = evas_object_data_get(entry, PROVIDER_SET);
    if (!v)
@@ -1081,13 +1088,13 @@ remove_tags(const char *p, int *len){
 
    while (*p)
      {
-	if (*p != '<' && *p != '&'){
+	if ((*p != '<') && (*p != '&')){
 	     *q ++ = *p ++;
 	} else if (*p == '<') {
-	     if (p[1] == 'b' && p[2] == 'r' &&
-			(p[3] == ' ' || p[3] == '/' || p[3] == '>'))
+	     if ((p[1] == 'b') && (p[2] == 'r') &&
+			((p[3] == ' ') || (p[3] == '/') || (p[3] == '>')))
 		*q++ = '\n';
-	     while (*p && *p != '>') p ++;
+	     while ((*p) && (*p != '>')) p ++;
 	     p ++;
 	} else if (*p == '&') {
 	     p ++;
@@ -1120,7 +1127,7 @@ mark_up(const char *start, int inlen, int *lenp){
   if (inlen >= 0)
      endp = start + inlen;
   /* First pass: Count characters */
-  for (l = 0, p = start ; (!endp || (p < endp)) && *p ; p ++)
+  for (l = 0, p = start ; ((!endp) || (p < endp)) && (*p) ; p ++)
     {
     for (i = 0 ; i < N_ESCAPES ; i ++)
       {
@@ -1160,13 +1167,13 @@ mark_up(const char *start, int inlen, int *lenp){
 
 
 static Eina_Bool
-_dnd_enter(void *data, int etype, void *ev)
+_dnd_enter(void *data __UNUSED__, int etype __UNUSED__, void *ev)
 {
    Ecore_X_Event_Xdnd_Enter *enter = ev;
    int i;
 
    /* Skip it */
-   if (!enter || !enter->num_types || !enter->types) return EINA_TRUE;
+   if ((!enter) || (!enter->num_types) || (!enter->types)) return EINA_TRUE;
 
    cnp_debug("Types\n");
    savedtypes.ntypes = enter->num_types;
@@ -1196,7 +1203,7 @@ _dnd_enter(void *data, int etype, void *ev)
 }
 
 static Eina_Bool
-_dnd_drop(void *data, int etype, void *ev)
+_dnd_drop(void *data __UNUSED__, int etype __UNUSED__, void *ev)
 {
    struct _Ecore_X_Event_Xdnd_Drop *drop;
    struct dropable *dropable;
@@ -1224,7 +1231,7 @@ _dnd_drop(void *data, int etype, void *ev)
            break;
      }
    /* didn't find a window */
-   if (l == NULL)
+   if (!l)
       return true;
 
 
@@ -1242,8 +1249,8 @@ _dnd_drop(void *data, int etype, void *ev)
      {
         dropable = l->data;
         evas_object_geometry_get(dropable->obj, &x, &y, &w, &h);
-        if (savedtypes.x >= x && savedtypes.y >= y &&
-            savedtypes.x < x + w && savedtypes.y < y + h)
+        if ((savedtypes.x >= x) && (savedtypes.y >= y) &&
+            (savedtypes.x < x + w) && (savedtypes.y < y + h))
            break; /* found! */
      }
 
@@ -1259,7 +1266,7 @@ _dnd_drop(void *data, int etype, void *ev)
      {
 	for (j = 0 ; j < savedtypes.ntypes ; j ++)
           {
-             if (strcmp(savedtypes.types[j], atoms[i].name) == 0)
+             if (!strcmp(savedtypes.types[j], atoms[i].name))
                {
                   goto found;
                }
@@ -1331,7 +1338,7 @@ found:
    return true;
 }
 static Eina_Bool
-_dnd_position(void *data, int etype, void *ev)
+_dnd_position(void *data __UNUSED__, int etype __UNUSED__, void *ev)
 {
    struct _Ecore_X_Event_Xdnd_Position *pos;
    Ecore_X_Rectangle rect;
@@ -1356,7 +1363,7 @@ _dnd_position(void *data, int etype, void *ev)
  * appropriately.
  */
 static Eina_Bool
-_dnd_status(void *data, int etype, void *ev)
+_dnd_status(void *data __UNUSED__, int etype __UNUSED__, void *ev)
 {
    struct _Ecore_X_Event_Xdnd_Status *status = ev;
 
@@ -1389,7 +1396,7 @@ elm_drop_target_add(Evas_Object *obj, Elm_Sel_Type format,
    if (!_elm_cnp_init_count) _elm_cnp_init();
 
    /* Is this the first? */
-   first = (drops == NULL) ? 1 : 0;
+   first = (!drops) ? 1 : 0;
 
    drop = calloc(1,sizeof(struct dropable));
    if (!drop) return false;
@@ -1458,7 +1465,7 @@ elm_drop_target_del(Evas_Object *obj)
                                   (Evas_Object_Event_Cb)elm_drop_target_del);
    free(drop);
    /* If still drops there: All fine.. continue */
-   if (drops != NULL) return true;
+   if (drops) return true;
 
    cnp_debug("Disabling DND\n");
    xwin = (Ecore_X_Window)ecore_evas_window_get(ecore_evas_ecore_evas_get(
@@ -1480,7 +1487,7 @@ elm_drop_target_del(Evas_Object *obj)
 
 
 static void
-_drag_mouse_up(void *un, Evas *e, Evas_Object *obj, void *data)
+_drag_mouse_up(void *un __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *data __UNUSED__)
 {
    evas_object_event_callback_del(obj, EVAS_CALLBACK_MOUSE_UP, _drag_mouse_up);
    ecore_x_dnd_drop();
@@ -1572,7 +1579,7 @@ elm_drag_start(Evas_Object *obj, Elm_Sel_Format format, const char *data,
 static struct tmpinfo *
 elm_cnp_tempfile_create(int size){
    struct tmpinfo *info;
-   char *tmppath;
+   const char *tmppath;
    int len;
 
    info = malloc(sizeof(struct tmpinfo));

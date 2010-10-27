@@ -653,6 +653,7 @@ extern "C" {
    EAPI void         elm_gengrid_item_disabled_set(Elm_Gengrid_Item *item, Eina_Bool disabled);
    EAPI Eina_Bool    elm_gengrid_item_disabled_get(const Elm_Gengrid_Item *item);
    EAPI Elm_Gengrid_Item *elm_gengrid_item_append(Evas_Object *obj, const Elm_Gengrid_Item_Class *gcc,  const void *data, Evas_Smart_Cb func, const void *func_data);
+   EAPI Elm_Gengrid_Item *elm_gengrid_item_prepend(Evas_Object *obj, const Elm_Gengrid_Item_Class *gcc,  const void *data, Evas_Smart_Cb func, const void *func_data);
    EAPI void         elm_gengrid_item_update(Elm_Gengrid_Item *it);
    /* smart callbacks called:
     *
@@ -2287,6 +2288,7 @@ extern "C" {
    EAPI void         elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop);
    EAPI Evas_Object *elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item);
    EAPI void         elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon);
+   EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
    
    
    /* Tab Bar */
