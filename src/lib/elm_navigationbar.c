@@ -796,11 +796,14 @@ elm_navigationbar_title_label_set(Evas_Object *obj,
 		{
 			eina_stringshare_replace(&it->title, title);
 			edje_object_part_text_set(wd->base, "elm.text", title);
-			if((it->title_obj)&&(it->title)){ 
-				edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
-			}
-			else
-				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+			if(!wd->hidden)
+				{
+					if((it->title_obj)&&(it->title)){ 
+						edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
+					}
+					else
+						edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+				}
 			_item_sizing_eval(it);
 			break;
 		}
@@ -881,12 +884,15 @@ elm_navigationbar_title_object_add(Evas_Object *obj,
 				evas_object_hide(swallow);
 			}
 			edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
-			if(it->fn_btn3){
-				edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
-				edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
-			}			
-			if((it->title_obj)&&(it->title)){ 
-				edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
+			if(!wd->hidden)
+			{
+				if(it->fn_btn3){
+					edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
+					edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
+				}			
+				if((it->title_obj)&&(it->title)){ 
+					edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
+				}
 			}
 			_item_sizing_eval(it);	
 		}
@@ -934,12 +940,15 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj,
 					} 
 				_multiple_object_unset(it, list);	
 				evas_object_del(it->title_obj);
-				it->title_obj = NULL;				
-				edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
-				if(it->fn_btn3)
+				it->title_obj = NULL;		
+				if(!wd->hidden)
 					{
-						edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
-						edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
+						edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+						if(it->fn_btn3)
+							{
+								edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
+								edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
+							}
 					}
 				_item_sizing_eval(it);
 				
