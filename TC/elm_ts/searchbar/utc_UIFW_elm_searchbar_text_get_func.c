@@ -158,7 +158,7 @@ static void utc_UIFW_elm_searchbar_text_get_func_01(void)
 	TET_CHECK_PASS(NULL, ret_str);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Setting entry of SearchBar is success.");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Getting text of SearchBar is success.");
 }
 
 /**
@@ -173,5 +173,5 @@ static void utc_UIFW_elm_searchbar_text_get_func_02(void)
 	TET_CHECK_FAIL(NULL, ret_str);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Setting entry of SearchBar is failed.");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Getting text of SearchBar is failed.");
 }

@@ -32,8 +32,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_searchbar_entry_get_func_01(void);
-static void utc_UIFW_elm_searchbar_entry_get_func_02(void);
+static void utc_UIFW_elm_cancel_button_animation_set_func_01(void);
+static void utc_UIFW_elm_cancel_button_animation_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -41,8 +41,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_searchbar_entry_get_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_searchbar_entry_get_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_cancel_button_animation_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_cancel_button_animation_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0}
 };
 
@@ -147,29 +147,25 @@ cleanup()
 }
 
 /**
- * @brief Positive test case of elm_searchbar_entry_get()
+ * @brief Positive test case of elm_cancel_button_animation_set()
  */
-static void utc_UIFW_elm_searchbar_entry_get_func_01(void)
+static void utc_UIFW_elm_cancel_button_animation_set_func_01(void)
 {
 	test_eo = elm_searchbar_add(test_win);
-	Evas_Object *en = NULL;
-	en = elm_searchbar_entry_get(test_eo);
-	TET_CHECK_PASS(NULL, en);
+	elm_cancel_button_animation_set(test_eo, EINA_TRUE);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Getting entry of SearchBar is success.");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Setting cancel button animation flag of SearchBar is success.");
 }
 
 /**
- * @brief Negative test case of ug_init elm_searchbar_entry_get()
+ * @brief Negative test case of ug_init elm_cancel_button_animation_set()
  */
-static void utc_UIFW_elm_searchbar_entry_get_func_02(void)
+static void utc_UIFW_elm_cancel_button_animation_set_func_02(void)
 {
-	//test_eo = elm_searchbar_add(NULL);
-	Evas_Object *en = NULL;
-	en = elm_searchbar_entry_get(NULL);
-	TET_CHECK_FAIL(NULL, en);
+	test_eo = elm_searchbar_add(NULL);
+	elm_cancel_button_animation_set(NULL, EINA_TRUE);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Getting entry of SearchBar is failed.");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Setting cancel button animation flag of SearchBar is failed.");
 }

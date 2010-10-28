@@ -1,3 +1,7 @@
+/elm_ts/searchbar/utc_UIFW_elm_searchbar_cancel_button_set_func
 /elm_ts/searchbar/utc_UIFW_elm_searchbar_add_func
+/elm_ts/searchbar/utc_UIFW_elm_searchbar_boundary_rect_set_func
+/elm_ts/searchbar/utc_UIFW_elm_searchbar_cancel_button_animation_set_func
+/elm_ts/searchbar/utc_UIFW_elm_searchbar_clear_func
 /elm_ts/searchbar/utc_UIFW_elm_searchbar_entry_get_func
 /elm_ts/searchbar/utc_UIFW_elm_searchbar_text_get_func
