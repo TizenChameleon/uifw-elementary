@@ -50,6 +50,15 @@ struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_genlist_clear_func_02, NEGATIVE_TC_IDX },
 };
 
+static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part )
+{
+	int index = (int) data;
+
+	if (!strcmp(part, "elm.text")) {
+		return strdup(Items[index]);
+	}
+	return NULL;
+}
 static void startup(void)
 {
 	Elm_Genlist_Item *item = NULL;
@@ -84,15 +93,7 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part )
-{
-	int index = (int) data;
 
-	if (!strcmp(part, "elm.text")) {
-		return strdup(Items[index]);
-	}
-	return NULL;
-}
 
 /**
  * @brief Positive test case of elm_genlist_clear()
