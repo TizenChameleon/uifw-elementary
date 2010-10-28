@@ -327,6 +327,7 @@ struct _Widget_Data
    Evas_Coord start_y_pos;
    double effect_start;
    Eina_Bool queue_exception : 1;
+   int item_count;
 };
 struct _Edit_Data
 {
@@ -563,7 +564,7 @@ _item_hilight(Elm_Genlist_Item *it)
 {
    const char *selectraise;
 
-   if ((it->wd->no_select) || (it->delete_me) || (it->hilighted) ||
+   if ((it->wd->no_select) || (it->delete_me) || (it->hilighted) || (it->disabled) ||
          (it->wd->edit_mode != ELM_GENLIST_EDIT_MODE_NONE)) return;
    if( !it->menuopened )
    	edje_object_signal_emit(it->base, "elm,state,selected", "elm");
@@ -3041,7 +3042,6 @@ elm_genlist_add(Evas_Object *parent)
    edje_object_size_min_calc(elm_smart_scroller_edje_object_get(wd->scr),
                              &minw, &minh);
    evas_object_size_hint_min_set(obj, minw, minh);
-
    _sizing_eval(obj);
    return obj;
 }
@@ -3276,7 +3276,8 @@ _item_queue(Widget_Data *wd, Elm_Genlist_Item *it)
   {
    if (it->queued) return;
    wd->queue = eina_list_append(wd->queue, it);
-	it->queued = EINA_TRUE;
+   it->queued = EINA_TRUE;
+   wd->item_count++;
   }
   
   while ((wd->queue) && ((!wd->blocks) || (!wd->blocks->next)))
@@ -4148,7 +4149,7 @@ EAPI void
 elm_genlist_item_expanded_set(Elm_Genlist_Item *it, Eina_Bool expanded)
 {
    if (!it) return;
-   if (it->expanded == expanded) return;
+   if (it->expanded == expanded || it->disabled ) return;
    it->expanded = expanded;
    it->wd->expand_item = it;   
 	it->effect_done = EINA_FALSE;   
@@ -5401,9 +5402,9 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 
 	int hide_git = 0, git_cnt = 0, list_start_y = 0;
 
-	int git_array[100];
+	int *git_array = NULL;
 	int base_git = 0, base_git_num = 0;
-	int tmp_y = 0;
+	int tmp_y = 0,  devide_size = 1;
 	double t;
 
 	Eina_Bool finish = EINA_FALSE;
@@ -5415,10 +5416,18 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 	if(wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE)
 	  return ECORE_CALLBACK_CANCEL;
 
+	git_array = (int*)malloc(sizeof(int) * wd->max_git_num);
 	t = ecore_loop_time_get();
 
 	if (t - wd->effect_start >= 5.0) 
 	  finish = EINA_TRUE;
+
+	if(wd->item_count < 100)
+		devide_size = 8 * _elm_config->scale;
+	else if(wd->item_count < 500)
+		devide_size = (8 - (devide_size / 100 )) * _elm_config->scale;
+	else
+		devide_size = 2 * _elm_config->scale;
 
 	evas_object_geometry_get(wd->pan_smart, &ox, &oy, &ow, &oh);
 
@@ -5437,7 +5446,7 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 	  {
 		  base_git = oy + git->h * (git->num-1) + git->num;
 		  git->old_y = git->y;
-		  added_gy = abs(base_git - git->y) / 10;
+		  added_gy = abs(base_git - git->y) / devide_size;
 		  if(added_gy < 1.0)
 			 added_gy = 1.0;
 
@@ -5511,7 +5520,7 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 
 		  cnt++;
 	  }
-
+	free(git_array);
 
 	if(finish) // finish animation
 	  {
@@ -5568,7 +5577,7 @@ _group_item_expand_moving_effect_timer_cb(void *data)
 	const Eina_List *l;
 	int cnt = 0, git_count = 0, git_cnt = 0, git_tmp_y = 0, in = 0, start_in = 0;
 	int tmp = 0, show_git_cnt = 0, scroll_y = 0, top_git = 0 , git_h = 0, scroll_pan_y = 0, down = 0;
-	int up_cnt = 1, down_cnt = 1, it_h = 0;
+	int up_cnt = 1, down_cnt = 1, it_h = 0, devide_size = 1;
 	static int last_git_y = 0;
    
 	double t;
@@ -5592,6 +5601,13 @@ _group_item_expand_moving_effect_timer_cb(void *data)
 	  top_git = 1;
 	else if (top_git >= wd->max_git_num)
 	  top_git = wd->max_git_num - 1;    
+
+	if(wd->item_count < 100)
+		devide_size = 8 * _elm_config->scale;
+	else if(wd->item_count < 500)
+		devide_size = (8 - (devide_size / 100 )) * _elm_config->scale;
+	else
+		devide_size = 2 * _elm_config->scale;
 
 	evas_object_geometry_get(wd->pan_smart, &ox, &oy, &ow, &oh);
 	evas_output_viewport_get(evas_object_evas_get(wd->pan_smart), &cvx, &cvy, &cvw, &cvh);
@@ -5675,7 +5691,7 @@ _group_item_expand_moving_effect_timer_cb(void *data)
 								 {
 									 it->old_scrl_y = tmp;
 									 git_tmp_y += it->h;
-									 added_gy2 = abs(git->finish_y - git->y) / 10;
+									 added_gy2 = abs(git->finish_y - git->y) / devide_size;
 									 tmp += it->h - added_gy2;
 								 }
 							  else
@@ -5696,7 +5712,7 @@ _group_item_expand_moving_effect_timer_cb(void *data)
 		  evas_object_raise(git->base);
 		  evas_object_show(git->base);
 
-		  added_gy = abs(git->finish_y - git->y) / 10;
+		  added_gy = abs(git->finish_y - git->y) / devide_size;
 		  if(added_gy < 1.0)
 			 added_gy = 1.0;
 		  if(git->y > git->finish_y) {
