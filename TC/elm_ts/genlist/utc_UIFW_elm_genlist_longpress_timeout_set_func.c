@@ -31,15 +31,14 @@ Evas_Object *main_win, *genlist;
 static char *Items[] = { "Main Item1", "Main Item 2", "Main Item 3", "Main Item 4", "Main Item 5", "Main Item 6", "Main Item 7", "Main Item 8"  };
 Elm_Genlist_Item_Class itc;
 
-
 static void startup(void);
 static void cleanup(void);
 
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_genlist_multi_select_set_func_01(void);
-static void utc_UIFW_elm_genlist_multi_select_set_func_02(void);
+static void utc_UIFW_elm_genlist_longpress_timeout_set_func_01(void);
+static void utc_UIFW_elm_genlist_longpress_timeout_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -47,8 +46,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_genlist_multi_select_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_genlist_multi_select_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_genlist_longpress_timeout_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_genlist_longpress_timeout_set_func_02, NEGATIVE_TC_IDX },
 };
 
 static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part )
@@ -60,6 +59,7 @@ static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part
 	}
 	return NULL;
 }
+
 static void startup(void)
 {
 	Elm_Genlist_Item *item = NULL;
@@ -95,19 +95,19 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_genlist_multi_select_set()
+ * @brief Positive test case of elm_genlist_longpress_timeout_set()
  */
-static void utc_UIFW_elm_genlist_multi_select_set_func_01(void)
+static void utc_UIFW_elm_genlist_longpress_timeout_set_func_01(void)
 {
-   	elm_genlist_multi_select_set(genlist, EINA_TRUE);
+	elm_genlist_longpress_timeout_set(genlist, 1);
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_genlist_multi_select_set()
+ * @brief Negative test case of ug_init elm_genlist_longpress_timeout_set()
  */
-static void utc_UIFW_elm_genlist_multi_select_set_func_02(void)
+static void utc_UIFW_elm_genlist_longpress_timeout_set_func_02(void)
 {
-   	elm_genlist_multi_select_set(NULL, EINA_TRUE);
+	elm_genlist_longpress_timeout_set(NULL, 1);
 	tet_result(TET_PASS);
 }

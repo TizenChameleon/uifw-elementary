@@ -31,15 +31,14 @@ Evas_Object *main_win, *genlist;
 static char *Items[] = { "Main Item1", "Main Item 2", "Main Item 3", "Main Item 4", "Main Item 5", "Main Item 6", "Main Item 7", "Main Item 8"  };
 Elm_Genlist_Item_Class itc;
 
-
 static void startup(void);
 static void cleanup(void);
 
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_genlist_multi_select_set_func_01(void);
-static void utc_UIFW_elm_genlist_multi_select_set_func_02(void);
+static void utc_UIFW_elm_genlist_horizontal_mode_get_func_01(void);
+static void utc_UIFW_elm_genlist_horizontal_mode_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -47,8 +46,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_genlist_multi_select_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_genlist_multi_select_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_genlist_horizontal_mode_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_genlist_horizontal_mode_get_func_02, NEGATIVE_TC_IDX },
 };
 
 static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part )
@@ -60,6 +59,7 @@ static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part
 	}
 	return NULL;
 }
+
 static void startup(void)
 {
 	Elm_Genlist_Item *item = NULL;
@@ -73,6 +73,8 @@ static void startup(void)
 	elm_win_resize_object_add(main_win, genlist);
 	evas_object_size_hint_align_set(genlist, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	evas_object_size_hint_weight_set(genlist, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	elm_genlist_multi_select_set(genlist, EINA_TRUE);
+	elm_genlist_horizontal_mode_set(genlist, ELM_LIST_LIMIT);
 	itc.item_style = "1line_textonly";
 	itc.func.label_get = _gl_label_get;
 	itc.func.icon_get = NULL;
@@ -94,20 +96,38 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
+
 /**
- * @brief Positive test case of elm_genlist_multi_select_set()
+ * @brief Positive test case of elm_genlist_horizontal_mode_get()
  */
-static void utc_UIFW_elm_genlist_multi_select_set_func_01(void)
+static void utc_UIFW_elm_genlist_horizontal_mode_get_func_01(void)
 {
-   	elm_genlist_multi_select_set(genlist, EINA_TRUE);
+	Elm_List_Mode mode = -1;
+
+
+   	mode = elm_genlist_horizontal_mode_get(genlist);
+
+	if (mode < ELM_LIST_COMPRESS) {
+		tet_infoline("elm_genlist_horizontal_mode_get() failed in positive test case");
+		tet_result(TET_FAIL);
+		return;
+	}
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_genlist_multi_select_set()
+ * @brief Negative test case of ug_init elm_genlist_horizontal_mode_get()
  */
-static void utc_UIFW_elm_genlist_multi_select_set_func_02(void)
+static void utc_UIFW_elm_genlist_horizontal_mode_get_func_02(void)
 {
-   	elm_genlist_multi_select_set(NULL, EINA_TRUE);
+	Elm_List_Mode mode = -1;
+
+   	mode = elm_genlist_horizontal_mode_get(genlist);
+
+	if (mode > ELM_LIST_COMPRESS) {
+		tet_infoline("elm_genlist_horizontal_mode_get() failed in negative test case");
+		tet_result(TET_FAIL);
+		return;
+	}
 	tet_result(TET_PASS);
 }
