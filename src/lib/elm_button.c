@@ -141,10 +141,10 @@ _disable_hook(Evas_Object *obj)
      {
 	if (wd->statelabel[DEFAULT])
 	  _set_label(obj, wd->statelabel[DEFAULT]);
-//#if 0
+#if 0
 	else
 	  _set_label(obj, wd->label);
-//#endif
+#endif
 	edje_object_signal_emit(wd->btn, "elm,state,enabled", "elm");
      }
 }
@@ -207,9 +207,6 @@ _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *
      }
    wd->repeating = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
-#if 0
-   _signal_unpressed(data, obj, emission, source); /* safe guard when the theme does not emit the 'unpress' signal */
-#endif
 }
 
 static Eina_Bool
@@ -268,10 +265,10 @@ _signal_default_text_set(void *data, Evas_Object *obj, const char *emission, con
    if (!wd) return;
    if (wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
-//#if 0
+#if 0
    else
      _set_label(data, wd->label);
-//#endif
+#endif
    return;
 }
 
@@ -282,10 +279,10 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
    if (!wd) return;
    if (wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
-//#if 0
+#if 0
    else
      _set_label(data, wd->label);
-//#endif
+#endif
 
    if (wd->timer)
      {
