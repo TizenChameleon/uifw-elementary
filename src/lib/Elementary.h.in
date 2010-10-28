@@ -1171,8 +1171,8 @@ extern "C" {
    EAPI void         elm_slider_end_label_set(Evas_Object *obj, const char *label);
    EAPI const char  *elm_slider_end_label_get(const Evas_Object *obj);
    /* smart callbacks called:
-    * "clicked" - when the user clicks on a carousel item and becomes selected
-   
+    * "changed" - Whenever the slider value is changed by the user.
+    *
     * "delay,changed" - A short time after the value is changed by the user.
     * This will be called only when the user stops dragging for a very short
     * period or when they release their finger/mouse, so it avoids possibly
