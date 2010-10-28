@@ -863,9 +863,13 @@ notify_handler_html(struct _elm_cnp_selection *sel,
         return 0;
      }
 
-
-   cnp_debug("String is %s (%d bytes)\n",data->data,data->length);
-   elm_entry_entry_insert(sel->requestwidget, (char *)data->data);
+   char *stripstr = NULL;
+   stripstr = malloc(sizeof(char)*(data->length+1));
+   strncpy(stripstr, data->data, data->length);
+   stripstr[data->length] = '\0';
+   cnp_debug("String is %s (%d bytes)\n",stripstr,data->length);
+   elm_entry_entry_insert(sel->requestwidget, stripstr);
+   free(stripstr);
 
    return 0;
 }
