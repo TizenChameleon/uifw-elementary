@@ -4,6 +4,7 @@ TARGETS = utc_UIFW_elm_gengrid_add_func \
 	  utc_UIFW_elm_gengrid_item_size_get_func \
 	  utc_UIFW_elm_gengrid_align_get_func \
 	  utc_UIFW_elm_gengrid_item_append_func \
+	  utc_UIFW_elm_gengrid_item_prepend_func \
 	  utc_UIFW_elm_gengrid_item_object_get_func \
 	  utc_UIFW_elm_gengrid_item_data_get_func \
 	  utc_UIFW_elm_gengrid_item_pos_get_func \
