@@ -42,6 +42,7 @@ elm
 	:include:/elm_ts/elm_scroller/tslist
 	:include:/elm_ts/scrolled_entry/tslist
 	:include:/elm_ts/entry/tslist
+	:include:/elm_ts/dayselector/tslist
 
 #yhkim
 ch 
