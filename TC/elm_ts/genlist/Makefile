@@ -23,7 +23,30 @@ TARGETS = utc_UIFW_elm_genlist_add_func \
 	  utc_UIFW_elm_genlist_effect_set_func \
 	  utc_UIFW_elm_genlist_pinch_zoom_set_func \
 	  utc_UIFW_elm_genlist_pinch_zoom_mode_set_func \
-	  utc_UIFW_elm_genlist_pinch_zoom_mode_get_func
+	  utc_UIFW_elm_genlist_pinch_zoom_mode_get_func  \
+	  utc_UIFW_elm_genlist_item_append_func \
+	  utc_UIFW_elm_genlist_item_prepend_func  \
+	  utc_UIFW_elm_genlist_item_insert_before_func \
+	  utc_UIFW_elm_genlist_item_insert_after_func \
+	  utc_UIFW_elm_genlist_selected_item_get_func \
+	  utc_UIFW_elm_genlist_selected_items_get_func \
+	  utc_UIFW_elm_genlist_realized_items_get_func \
+	  utc_UIFW_elm_genlist_at_xy_item_get_func \
+	  utc_UIFW_elm_genlist_first_item_get_func  \
+	  utc_UIFW_elm_genlist_last_item_get_func \
+	  utc_UIFW_elm_genlist_item_next_get_func \
+	  utc_UIFW_elm_genlist_item_prev_get_func \
+	  utc_UIFW_elm_genlist_item_genlist_get_func \
+	  utc_UIFW_elm_genlist_item_parent_get_func \
+	  utc_UIFW_elm_genlist_item_subitems_clear_func \
+	  utc_UIFW_elm_genlist_item_selected_set_funcA \
+	  utc_UIFW_elm_genlist_item_selected_get_func \
+	  utc_UIFW_elm_genlist_item_expanded_set_func \
+	  utc_UIFW_elm_genlist_item_expanded_get_func \
+	  utc_UIFW_elm_genlist_item_disabled_set_func \
+	  utc_UIFW_elm_genlist_item_disabled_get_func \
+	  utc_UIFW_elm_genlist_item_display_only_set_func
+
 
 PKGS = elementary
 
