@@ -28,7 +28,7 @@
 
 
 Evas_Object *main_win;
-Evas_Object *tickernoti;
+Evas_Object *actionslider;
 
 static void startup(void);
 static void cleanup(void);
@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_tickernoti_mode_set_func_01(void);
-static void utc_UIFW_elm_tickernoti_mode_set_func_02(void);
+static void utc_UIFW_elm_actionslider_indicator_pos_set_func_01(void);
+static void utc_UIFW_elm_actionslider_indicator_pos_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_tickernoti_mode_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_tickernoti_mode_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_actionslider_indicator_pos_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_actionslider_indicator_pos_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -57,7 +57,7 @@ static void startup(void)
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
 
-	tickernoti = elm_tickernoti_add(main_win);
+	actionslider = elm_actionslider_add(main_win);
 }
 
 static void cleanup(void)
@@ -69,41 +69,25 @@ static void cleanup(void)
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 
-	evas_object_del(tickernoti);
+	evas_object_del(actionslider);
 }
 
 /**
- * @brief Positive test case of elm_tickernoti_mode_set()
+ * @brief Positive test case of elm_actionslider_indicator_pos_set()
  */
-static void utc_UIFW_elm_tickernoti_mode_set_func_01(void)
+static void utc_UIFW_elm_actionslider_indicator_pos_set_func_01(void)
 {
-	Elm_Tickernoti_Mode mode = ELM_TICKERNOTI_DEFAULT;
+   	elm_actionslider_indicator_pos_set(actionslider, ELM_ACTIONSLIDER_INDICATOR_LEFT);
 
-   	elm_tickernoti_mode_set(tickernoti, ELM_TICKERNOTI_DETAILVIEW);
-   	mode = elm_tickernoti_mode_get(tickernoti);
-
-	if (mode != ELM_TICKERNOTI_DETAILVIEW) {
-		tet_infoline("elm_tickernoti_mode_set() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_tickernoti_mode_set()
+ * @brief Negative test case of ug_init elm_actionslider_indicator_pos_set()
  */
-static void utc_UIFW_elm_tickernoti_mode_set_func_02(void)
+static void utc_UIFW_elm_actionslider_indicator_pos_set_func_02(void)
 {
-	Elm_Tickernoti_Mode mode = ELM_TICKERNOTI_DETAILVIEW;
+   	elm_actionslider_indicator_pos_set(actionslider, 100);
 
-   	elm_tickernoti_mode_set(tickernoti, 100);
-   	mode = elm_tickernoti_mode_get(tickernoti);
-
-	if (mode != ELM_TICKERNOTI_DEFAULT) {
-		tet_infoline("elm_tickernoti_mode_set() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
 	tet_result(TET_PASS);
 }

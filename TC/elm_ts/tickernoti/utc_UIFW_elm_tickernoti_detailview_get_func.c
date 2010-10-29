@@ -57,7 +57,7 @@ static void startup(void)
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
 
-	elm_tickernoti_add(main_win);
+	tickernoti = elm_tickernoti_add(main_win);
 }
 
 static void cleanup(void)

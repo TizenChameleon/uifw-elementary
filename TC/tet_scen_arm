@@ -45,6 +45,7 @@ elm
 	:include:/elm_ts/dayselector/tslist
 	:include:/elm_ts/tickernoti/tslist
 	:include:/elm_ts/transit/tslist
+	:include:/elm_ts/actionslider/tslist
 
 #yhkim
 ch 
