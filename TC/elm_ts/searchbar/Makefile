@@ -1,12 +1,12 @@
 CC ?= gcc
 
-TARGETS = utc_UIFW_elm_searchbar_add_func.c \
-	utc_UIFW_elm_searchbar_boundary_rect_set_func.c \
-	utc_UIFW_elm_searchbar_cancel_button_animation_set_func.c \
-	utc_UIFW_elm_searchbar_cancel_button_set_func.c \
-	utc_UIFW_elm_searchbar_clear_func.c \
-	utc_UIFW_elm_searchbar_entry_get_func.c \
-	utc_UIFW_elm_searchbar_text_get_func.c 
+TARGETS = utc_UIFW_elm_searchbar_add_func \
+	utc_UIFW_elm_searchbar_boundary_rect_set_func \
+	utc_UIFW_elm_searchbar_cancel_button_animation_set_func \
+	utc_UIFW_elm_searchbar_cancel_button_set_func \
+	utc_UIFW_elm_searchbar_clear_func \
+	utc_UIFW_elm_searchbar_entry_get_func \
+	utc_UIFW_elm_searchbar_text_get_func 
 
 PKGS = elementary
 
