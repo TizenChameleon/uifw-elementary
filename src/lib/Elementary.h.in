@@ -2332,7 +2332,9 @@ extern "C" {
         ELM_CONTROLBAR_MODE_TRANSLUCENCE,
         ELM_CONTROLBAR_MODE_TRANSPARENCY,
         ELM_CONTROLBAR_MODE_LARGE,
-        ELM_CONTROLBAR_MODE_SMALL
+        ELM_CONTROLBAR_MODE_SMALL,
+        ELM_CONTROLBAR_MODE_LEFT,
+        ELM_CONTROLBAR_MODE_RIGHT
      } Elm_Controlbar_Mode_Type;
 
    typedef struct _Elm_Controlbar_Item Elm_Controlbar_Item;
@@ -2355,7 +2357,7 @@ extern "C" {
    EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
    EAPI Eina_Bool    elm_controlbar_item_visible_get(Elm_Controlbar_Item * it);
    EAPI void         elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable);
-   EAPI void elm_controlbar_item_icon_set(Elm_Controlbar_Item *it, const char *icon_path);
+   EAPI void         elm_controlbar_item_icon_set(Elm_Controlbar_Item *it, const char *icon_path);
    EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
    EAPI const char  *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
@@ -2366,9 +2368,11 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_item_prev(Elm_Controlbar_Item *it);
    EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
+   EAPI Evas_Object *elm_controlbar_item_view_get(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
    EAPI void         elm_controlbar_alpha_set(Evas_Object *obj, int alpha);
    EAPI void         elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align);
+   EAPI void         elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical);
    /*======= Please don't use this APIs =======*/
    EAPI void         elm_controlbar_edit_start(Evas_Object *obj);
    EAPI void         elm_controlbar_item_editable_set(Elm_Controlbar_Item *it, Eina_Bool editable);
@@ -2882,6 +2886,7 @@ extern "C" {
    /* Xml Animator */
    typedef struct _Elm_Xml_Animator Elm_Xml_Animator;
 
+   EAPI Elm_Xml_Animator *elm_xml_animator_add(Evas_Object *obj);
    EAPI Eina_Bool    elm_xml_animator_file_set(Elm_Xml_Animator *xa, const char *file);
    EAPI Eina_Bool    elm_xml_animator_object_add(Elm_Xml_Animator *xa, Evas_Object *obj, const char *title, void (*end_func)(void *data, Evas_Object *obj), void *data);
    EAPI void         elm_xml_animator_object_del(Elm_Xml_Animator *xa, Evas_Object *obj);
