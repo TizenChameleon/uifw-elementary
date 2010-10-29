@@ -81,6 +81,7 @@ typedef enum _Touch_State
    TOUCH_STATE_TWO_DOWN_UP,
    TOUCH_STATE_TWO_DOWN_UP_DOWN,
    TOUCH_STATE_TWO_DRAG,
+   TOUCH_STATE_TWO_DRAG_ONE_UP,
    TOUCH_STATE_THREE_DOWN
 } Touch_State;
 
@@ -179,6 +180,7 @@ static void _smart_enter_two_down_during_drag(Smart_Data *sd);
 static void _smart_enter_two_down_up(Smart_Data *sd, int downTime, int time);
 static void _smart_enter_two_down_up_down(Smart_Data *sd);
 static void _smart_enter_two_drag(Smart_Data *sd);
+static void _smart_enter_two_drag_one_up(Smart_Data *sd);
 static void _smart_enter_three_down(Smart_Data *sd);
 // emit functions
 static void _smart_emit_press(Smart_Data *sd);
@@ -424,6 +426,15 @@ _smart_mouse_down(void *data, Evas *e, Evas_Object *obj, void *ev)
 	 }
 	 break;
 
+      case TOUCH_STATE_TWO_DRAG_ONE_UP:
+	 mouse_data.x = event->canvas.x;
+	 mouse_data.y = event->canvas.y;
+	 mouse_data.time = event->timestamp;
+	 mouse_data.device = -1;
+	 _smart_set_last_drag(sd, 0, &mouse_data);
+	 _smart_enter_two_drag(sd);
+	 break;
+
       default:
 	 break;
      }
@@ -503,6 +514,10 @@ _smart_mouse_up(void *data, Evas *e, Evas_Object *obj, void *ev)
 	   } break;
 
       case TOUCH_STATE_TWO_DRAG:
+	 _smart_enter_two_drag_one_up(sd);
+	 break;
+
+      case TOUCH_STATE_TWO_DRAG_ONE_UP:
 	 _smart_stop_animator_two_move(sd);
 	 _smart_stop_all_timers(sd);
 	 _smart_enter_none(sd);
@@ -730,6 +745,19 @@ _smart_multi_down(void *data, Evas *e, Evas_Object *obj, void *ev)
 	   }
 	 break;
 
+      case TOUCH_STATE_TWO_DRAG_ONE_UP:
+	 sd->numOfTouch++;
+	 if (sd->numOfTouch == 1)
+	   {
+	      mouse_data.x = event->output.x;
+	      mouse_data.y = event->output.y;
+	      mouse_data.time = event->timestamp;
+	      mouse_data.device = event->device;
+	      _smart_set_last_drag(sd, 1, &mouse_data);
+	      _smart_enter_two_drag(sd);
+	   }
+	 break;
+
       default:
 	 break;
      }
@@ -769,6 +797,15 @@ _smart_multi_up(void *data, Evas *e, Evas_Object *obj, void *ev)
 	   } break;
 
       case TOUCH_STATE_TWO_DRAG:
+	 sd->numOfTouch--;
+	 if (sd->numOfTouch == 0)
+	   {
+	      _smart_enter_two_drag_one_up(sd);
+	   }
+	 break;
+
+      case TOUCH_STATE_TWO_DRAG_ONE_UP:
+	 sd->numOfTouch--;
 	 _smart_stop_animator_two_move(sd);
 	 _smart_stop_all_timers(sd);
 	 _smart_enter_none(sd);
@@ -1229,6 +1266,20 @@ _smart_enter_two_drag(Smart_Data *sd)
 	sd->state = TOUCH_STATE_TWO_DRAG;
 	_smart_emit_two_move_start(sd);
 	sd->animator_two_move = ecore_animator_add(_smart_animation_two_move, sd);
+     }
+   else
+     {
+	sd->state = TOUCH_STATE_NONE;
+     }
+}
+
+static void
+_smart_enter_two_drag_one_up(Smart_Data *sd)
+{
+   DBG("<< %s >>\n", __func__);
+   if (sd->child_obj)
+     {
+	sd->state = TOUCH_STATE_TWO_DRAG_ONE_UP;
      }
    else
      {
