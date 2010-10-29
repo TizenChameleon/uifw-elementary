@@ -43,7 +43,7 @@ elm
 	:include:/elm_ts/scrolled_entry/tslist
 	:include:/elm_ts/entry/tslist
 	:include:/elm_ts/dayselector/tslist
-
+	:include:/elm_ts/transit/tslist
 #yhkim
 ch 
 	/telephony-framework/sim/unit/uts_tapi_verify_chv
