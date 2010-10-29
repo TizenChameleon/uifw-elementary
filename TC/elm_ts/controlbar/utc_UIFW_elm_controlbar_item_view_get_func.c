@@ -37,8 +37,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_controlbar_item_label_set_func_01(void);
-static void utc_UIFW_elm_controlbar_item_label_set_func_02(void);
+static void utc_UIFW_elm_controlbar_item_view_get_func_01(void);
+static void utc_UIFW_elm_controlbar_item_view_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -46,8 +46,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_controlbar_item_label_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_controlbar_item_label_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_controlbar_item_view_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_controlbar_item_view_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -59,7 +59,7 @@ static void startup(void)
 	evas_object_show(main_win);	
 
 	controlbar = elm_controlbar_add(main_win);
-	item1 = elm_controlbar_tab_item_append(controlbar, NULL, "Controlbar", NULL);
+	item1 = elm_controlbar_tab_item_append(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Controlbar", NULL);
 }
 
 static void cleanup(void)
@@ -75,17 +75,20 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_controlbar_item_label_set()
+ * @brief Positive test case of elm_controlbar_item_view_get()
  */
-static void utc_UIFW_elm_controlbar_item_label_set_func_01(void)
+static void utc_UIFW_elm_controlbar_item_view_get_func_01(void)
 {
-	char *label = NULL;
+	Evas_Object *view = NULL;
+	Evas_Object *test_view = NULL;
+	view = elm_icon_add(controlbar);
+   	
+	elm_controlbar_item_view_set(item1, view);
 
-	elm_controlbar_item_label_set(item1, "Success");
-	label = elm_controlbar_item_label_get(item1);
+	test_view = elm_controlbar_item_view_get(item1);
 
-	if (strcmp(label, "Success")) {
-		tet_infoline("elm_controlbar_item_label_set() failed in positive test case");
+	if (test_view != view) {
+		tet_infoline("elm_controlbar_item_view_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -93,17 +96,20 @@ static void utc_UIFW_elm_controlbar_item_label_set_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_controlbar_item_label_set()
+ * @brief Negative test case of ug_init elm_controlbar_item_view_get()
  */
-static void utc_UIFW_elm_controlbar_item_label_set_func_02(void)
+static void utc_UIFW_elm_controlbar_item_view_get_func_02(void)
 {
-	char *label = NULL;
+	Evas_Object *view = NULL;
+	Evas_Object *test_view = NULL;
+   	view = elm_icon_add(controlbar);
+   	
+	elm_controlbar_item_view_set(item1, view);
 
-   	elm_controlbar_item_label_set(NULL, "Fail");
-   	label = elm_controlbar_item_label_get(item1);
+	test_view = elm_controlbar_item_view_get(NULL);
 
-	if (strcmp(label, "Fail")) {
-		tet_infoline("elm_controlbar_item_label_set() failed in negative test case");
+	if (test_view) {
+		tet_infoline("elm_controlbar_item_view_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}

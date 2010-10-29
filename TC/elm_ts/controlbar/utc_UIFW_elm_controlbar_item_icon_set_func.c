@@ -37,8 +37,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_controlbar_item_label_set_func_01(void);
-static void utc_UIFW_elm_controlbar_item_label_set_func_02(void);
+static void utc_UIFW_elm_controlbar_item_icon_set_func_01(void);
+static void utc_UIFW_elm_controlbar_item_icon_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -46,8 +46,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_controlbar_item_label_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_controlbar_item_label_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_controlbar_item_icon_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_controlbar_item_icon_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -75,17 +75,18 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_controlbar_item_label_set()
+ * @brief Positive test case of elm_controlbar_item_icon_set()
  */
-static void utc_UIFW_elm_controlbar_item_label_set_func_01(void)
+static void utc_UIFW_elm_controlbar_item_icon_set_func_01(void)
 {
-	char *label = NULL;
+	Evas_Object *icon = NULL;
 
-	elm_controlbar_item_label_set(item1, "Success");
-	label = elm_controlbar_item_label_get(item1);
+	elm_controlbar_item_icon_set(item1, CONTROLBAR_SYSTEM_ICON_SONGS);
 
-	if (strcmp(label, "Success")) {
-		tet_infoline("elm_controlbar_item_label_set() failed in positive test case");
+	icon = elm_controlbar_item_icon_get(item1);
+
+	if (!icon) {
+		tet_infoline("elm_controlbar_item_icon_set() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -93,17 +94,18 @@ static void utc_UIFW_elm_controlbar_item_label_set_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_controlbar_item_label_set()
+ * @brief Negative test case of ug_init elm_controlbar_item_icon_set()
  */
-static void utc_UIFW_elm_controlbar_item_label_set_func_02(void)
+static void utc_UIFW_elm_controlbar_item_icon_set_func_02(void)
 {
-	char *label = NULL;
+	Evas_Object *icon = NULL;
 
-   	elm_controlbar_item_label_set(NULL, "Fail");
-   	label = elm_controlbar_item_label_get(item1);
+	elm_controlbar_item_icon_set(item1, NULL);
 
-	if (strcmp(label, "Fail")) {
-		tet_infoline("elm_controlbar_item_label_set() failed in negative test case");
+	icon = elm_controlbar_item_icon_get(item1);
+
+	if (icon) {
+		tet_infoline("elm_controlbar_item_icon_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}
