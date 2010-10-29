@@ -32,8 +32,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_label_label_get_func_01(void);
-static void utc_UIFW_elm_label_label_get_func_02(void);
+static void utc_UIFW_elm_label_slide_duration_get_func_01(void);
+static void utc_UIFW_elm_label_slide_duration_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -41,8 +41,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_label_label_get_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_label_label_get_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_label_slide_duration_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_label_slide_duration_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0}
 };
 
@@ -147,30 +147,31 @@ cleanup()
 }
 
 /**
- * @brief Positive test case of elm_label_label_get()
+ * @brief Positive test case of elm_label_slide_duration_get()
  */
-static void utc_UIFW_elm_label_label_get_func_01(void)
+static void utc_UIFW_elm_label_slide_duration_get_func_01(void)
 {
 	test_eo = elm_label_add(test_win);
 	char *ret_str = NULL;
 	elm_label_label_set(test_eo, "test string");
-	ret_str = elm_label_label_get(test_eo);
-	TET_CHECK_PASS(NULL, ret_str);
+	elm_label_slide_duration_set(test_eo, 10);
+	int r = elm_label_slide_duration_get(test_eo);
+	TET_CHECK_PASS(10, r);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, A Label label get is success.");
 }
 
 /**
- * @brief Negative test case of ug_init elm_label_label_get()
+ * @brief Negative test case of ug_init elm_label_slide_duration_get()
  */
-static void utc_UIFW_elm_label_label_get_func_02(void)
+static void utc_UIFW_elm_label_slide_duration_get_func_02(void)
 {
 	test_eo = elm_label_add(test_win);
-	char *ret_str = NULL;
 	elm_label_label_set(test_eo, NULL);
-	ret_str = elm_label_label_get(test_eo);
-	TET_CHECK_FAIL(NULL, ret_str);
+	elm_label_slide_duration_set(test_eo, 10);
+	int r = elm_label_slide_duration_get(NULL);
+	TET_CHECK_FAIL(10, ret_str);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, A Label label get is failed.");
