@@ -44,9 +44,7 @@ elm
 	:include:/elm_ts/entry/tslist
 	:include:/elm_ts/dayselector/tslist
 	:include:/elm_ts/tickernoti/tslist
-
-jaehwan
-	:include:/elm_ts/tickernoti/tslist
+	:include:/elm_ts/transit/tslist
 
 #yhkim
 ch 
