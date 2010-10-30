@@ -30,15 +30,14 @@
 Evas_Object *main_win;
 Evas_Object *ctxpopup;
 
-
 static void startup(void);
 static void cleanup(void);
 
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_ctxpopup_item_label_get_func_01(void);
-static void utc_UIFW_elm_ctxpopup_item_label_get_func_02(void);
+static void utc_UIFW_elm_ctxpopup_content_unset_func_01(void);
+static void utc_UIFW_elm_ctxpopup_content_unset_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -46,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_ctxpopup_item_label_get_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_ctxpopup_item_label_get_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_ctxpopup_content_unset_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_ctxpopup_content_unset_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -57,8 +56,12 @@ static void startup(void)
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);
-	ctxpopup = elm_ctxpopup_add(main_win);	
+
+	ctxpopup = elm_ctxpopup_add(main_win);
+	
+	
 	evas_object_show(ctxpopup);
+	
 }
 
 static void cleanup(void)
@@ -72,15 +75,19 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_ctxpopup_item_label_get()
+ * @brief Positive test case of elm_ctxpopup_content_unset()
  */
-static void utc_UIFW_elm_ctxpopup_item_label_get_func_01(void)
+static void utc_UIFW_elm_ctxpopup_content_unset_func_01(void)
 {
-	Elm_Ctxpopup_Item * item = elm_ctxpopup_item_add(ctxpopup, NULL, "TEST", NULL, NULL);
-	char *label = elm_ctxpopup_item_label_get(item);
+	Evas_Object *btn = elm_button_add(ctxpopup);
+	evas_object_resize(btn, 100, 100);
+	evas_object_show(btn);
+	elm_ctxpopup_content_set(ctxpopup, btn);
+
+   	Evas_Object *content = elm_ctxpopup_content_unset(ctxpopup);
 	
-	if (strcmp( label, "TEST")) {
-		tet_infoline("elm_ctxpopup_item_label_get() failed in positive test case");
+	if (btn != content) {
+		tet_infoline("elm_ctxpopup_content_unset() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -88,15 +95,19 @@ static void utc_UIFW_elm_ctxpopup_item_label_get_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_ctxpopup_item_label_get()
+ * @brief Negative test case of ug_init elm_ctxpopup_content_unset()
  */
-static void utc_UIFW_elm_ctxpopup_item_label_get_func_02(void)
+static void utc_UIFW_elm_ctxpopup_content_unset_func_02(void)
 {
-	Elm_Ctxpopup_Item * item = elm_ctxpopup_item_add(ctxpopup, NULL, "TEST", NULL, NULL);
-	char *label = elm_ctxpopup_item_label_get(NULL);
-	
-	if (!strcmp( label, "TEST")) {
-		tet_infoline("elm_ctxpopup_item_label_get() failed in positive test case");
+	Evas_Object *btn = elm_button_add(ctxpopup);
+	evas_object_resize(btn, 100, 100);
+	evas_object_show(btn);
+	elm_ctxpopup_content_set(ctxpopup, btn);
+
+   	Evas_Object *content = elm_ctxpopup_content_unset(NULL);
+
+	if (content == btn) {
+		tet_infoline("elm_ctxpopup_content_unset() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}
