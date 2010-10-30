@@ -4528,7 +4528,7 @@ elm_genlist_item_del(Elm_Genlist_Item *it)
              it->wd->calc_job = ecore_job_add(_calc_job, it->wd);
           }
         if (it->itc->func.del)
-           it->itc->func.del((void *)it->base.data, it->base.widget);
+           it->itc->func.del((void *)it->data, it->wd->obj);
         return;
      }
    _item_del(it);
