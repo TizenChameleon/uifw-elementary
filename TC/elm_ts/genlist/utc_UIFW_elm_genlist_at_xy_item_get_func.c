@@ -99,7 +99,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_at_xy_item_get_func_01(void)
 {
-   Elm_Genlist_Item *ret = NULL;
+	Elm_Genlist_Item *ret = NULL;
 	int where = 0;
 
 	ret = elm_genlist_at_xy_item_get(genlist, 0, 0, &where);  

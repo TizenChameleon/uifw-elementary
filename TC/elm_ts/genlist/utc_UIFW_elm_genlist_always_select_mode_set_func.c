@@ -108,6 +108,6 @@ static void utc_UIFW_elm_genlist_always_select_mode_set_func_01(void)
  */
 static void utc_UIFW_elm_genlist_always_select_mode_set_func_02(void)
 {
-	elm_genlist_always_select_mode_set(genlist, EINA_FALSE);
+	elm_genlist_always_select_mode_set(NULL, EINA_FALSE);
 	tet_result(TET_PASS);
 }

@@ -100,11 +100,11 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_bounce_get_func_01(void)
 {
-	Eina_Bool H = EINA_FALSE;
-	Eina_Bool V = EINA_FALSE;
+	Eina_Bool h = EINA_FALSE;
+	Eina_Bool v = EINA_FALSE;
 
-  elm_genlist_bounce_get(genlist, &H, &V);
-	if ((!H)||(!V)) {
+	elm_genlist_bounce_get(genlist, &h, &v);
+	if ((!h)||(!v)) {
 		tet_infoline("elm_genlist_bounce_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -117,11 +117,11 @@ static void utc_UIFW_elm_genlist_bounce_get_func_01(void)
  */
 static void utc_UIFW_elm_genlist_bounce_get_func_02(void)
 {
-	Eina_Bool H = EINA_FALSE;
-	Eina_Bool V = EINA_FALSE;
+	Eina_Bool h = EINA_FALSE;
+	Eina_Bool v = EINA_FALSE;
 
-	elm_genlist_bounce_get(genlist, &H, &V);
-	if ((H)||(V)) {
+	elm_genlist_bounce_get(genlist, &h, &v);
+	if ((h)||(v)) {
 		tet_infoline("elm_genlist_bounce_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

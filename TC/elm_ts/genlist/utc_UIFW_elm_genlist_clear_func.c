@@ -100,7 +100,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_clear_func_01(void)
 {
-   elm_genlist_clear(genlist);
+	elm_genlist_clear(genlist);
 	tet_result(TET_PASS);
 }
 

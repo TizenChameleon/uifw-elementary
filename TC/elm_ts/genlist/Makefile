@@ -39,7 +39,7 @@ TARGETS = utc_UIFW_elm_genlist_add_func \
 	  utc_UIFW_elm_genlist_item_genlist_get_func \
 	  utc_UIFW_elm_genlist_item_parent_get_func \
 	  utc_UIFW_elm_genlist_item_subitems_clear_func \
-	  utc_UIFW_elm_genlist_item_selected_set_funcA \
+	  utc_UIFW_elm_genlist_item_selected_set_func \
 	  utc_UIFW_elm_genlist_item_selected_get_func \
 	  utc_UIFW_elm_genlist_item_expanded_set_func \
 	  utc_UIFW_elm_genlist_item_expanded_get_func \

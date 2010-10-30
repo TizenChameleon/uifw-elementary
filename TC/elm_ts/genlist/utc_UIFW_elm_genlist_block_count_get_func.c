@@ -102,7 +102,6 @@ static void utc_UIFW_elm_genlist_block_count_get_func_01(void)
 {
 	int r = 0;
 
-
    	r = elm_genlist_block_count_get(genlist);
 
 	if (!r) {
@@ -119,7 +118,6 @@ static void utc_UIFW_elm_genlist_block_count_get_func_01(void)
 static void utc_UIFW_elm_genlist_block_count_get_func_02(void)
 {
 	int r = 0;
-
 
    	r = elm_genlist_block_count_get(NULL);
 

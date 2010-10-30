@@ -118,7 +118,7 @@ static void utc_UIFW_elm_genlist_always_select_mode_get_func_02(void)
 {
 	Eina_Bool res = EINA_FALSE;
 
- 	res = elm_genlist_always_select_mode_get(genlist);
+ 	res = elm_genlist_always_select_mode_get(NULL);
 
 	if (res) {
 		tet_infoline("elm_genlist_always_select_mode_get() failed in negative test case");
