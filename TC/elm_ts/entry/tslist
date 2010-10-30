@@ -4,6 +4,7 @@
 /elm_ts/entry/utc_UIFW_elm_entry_entry_get_func
 /elm_ts/entry/utc_UIFW_elm_entry_wrap_width_get_func
 /elm_ts/entry/utc_UIFW_elm_entry_editable_get_func
+/elm_ts/entry/utc_UIFW_elm_entry_selection_get_func
 /elm_ts/entry/utc_UIFW_elm_entry_cursor_next_func
 /elm_ts/entry/utc_UIFW_elm_entry_cursor_prev_func
 /elm_ts/entry/utc_UIFW_elm_entry_cursor_up_func
