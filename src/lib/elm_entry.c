@@ -427,6 +427,8 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *top = elm_widget_top_get(obj);
+   Evas_Object *parent_obj = obj;
+
    if (!wd) return;
    if (!wd->editable) return;
    if (elm_widget_focus_get(obj))
@@ -446,6 +448,17 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
 	evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
      }
+   
+	do
+	  {
+	     parent_obj = elm_widget_parent_get(parent_obj); 
+	     if (!parent_obj) break;
+
+		 evas_object_raise(parent_obj);
+	  }
+	while (parent_obj);
+
+	evas_object_raise(obj);
 }
 
 static void
