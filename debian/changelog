@@ -1,11 +1,3 @@
-elementary (1.0.0+svn.51480slp2+build46) unstable; urgency=low
-
-  * Packaging for demo patch.
-  * Git: 165.213.180.234:/git/slp/pkgs/elementary
-  * Tag: elementary_1.0.0+svn.51480slp2+build46
-
- -- Myungjae Lee <mjae.lee@samsung.com>  Sat, 30 Oct 2010 17:00:00 +0900
-
 elementary (1.0.0+svn.51480slp2+build45) unstable; urgency=low
 
   * Packaging with many changes.
