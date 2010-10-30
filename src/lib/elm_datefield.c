@@ -543,8 +543,8 @@ _imf_event_commit_cb(void *data, int type, void *event)
 	Evas_Object *focus_obj;
 	char str[YEAR_MAX_LENGTH+1] = {0,};
 	
-	if (!wd) return ECORE_CALLBACK_RENEW;
- 	if(!elm_widget_focus_get(data)) return ECORE_CALLBACK_RENEW;
+	if (!wd) return ECORE_CALLBACK_PASS_ON;
+ 	if (!elm_widget_focus_get(data)) return ECORE_CALLBACK_PASS_ON;
 	
 	focus_obj = elm_widget_focused_object_get(data);
 	if (!wd->editing) 
@@ -568,7 +568,7 @@ _imf_event_commit_cb(void *data, int type, void *event)
 	if (_check_input_done(data, focus_obj, strlen(str)))
 		_entry_focus_move(data, focus_obj);
 
-	return ECORE_CALLBACK_CANCEL;
+	return ECORE_CALLBACK_DONE;
 }
 
 static void 
