@@ -1316,16 +1316,6 @@ _signal_contract(void *data, Evas_Object *obj __UNUSED__, const char *emission _
 }
 
 static void
-_set_groupitem( Elm_Genlist_Item *it, Elm_Genlist_GroupItem *git)
-{
-   if(it && git )
-     {
-	it->group_item = git;
-	git->items = eina_list_append(git->items, it);
-     }
-}
-
-static void
 _group_item_click_cb(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Elm_Genlist_GroupItem *git = data;
@@ -4526,19 +4516,20 @@ elm_genlist_item_del(Elm_Genlist_Item *it)
    if (!it) return;
    if ((it->relcount > 0) || (it->walking > 0))
      {
-	elm_genlist_item_subitems_clear(it);
-	it->delete_me = EINA_TRUE;
-	if (it->wd->show_item == it) it->wd->show_item = NULL;
-	if (it->selected) it->wd->selected = eina_list_remove(it->wd->selected, it);
-	if (it->block)
-	  {
-	     if (it->realized) _item_unrealize(it);
-	     it->block->changed = EINA_TRUE;
-	     if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
-	     it->wd->calc_job = ecore_job_add(_calc_job, it->wd);
-	  }
-	if (it->itc->func.del) it->itc->func.del(it->data, it->wd->obj);
-	return;
+        elm_genlist_item_subitems_clear(it);
+        it->delete_me = EINA_TRUE;
+        if (it->wd->show_item == it) it->wd->show_item = NULL;
+        if (it->selected) it->wd->selected = eina_list_remove(it->wd->selected, it);
+        if (it->block)
+          {
+             if (it->realized) _item_unrealize(it);
+             it->block->changed = EINA_TRUE;
+             if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
+             it->wd->calc_job = ecore_job_add(_calc_job, it->wd);
+          }
+        if (it->itc->func.del)
+           it->itc->func.del((void *)it->data, it->wd->obj);
+        return;
      }
    _item_del(it);
 }
