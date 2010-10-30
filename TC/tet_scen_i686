@@ -43,6 +43,8 @@ elm
         :include:/elm_ts/scrolled_entry/tslist
         :include:/elm_ts/entry/tslist
 	:include:/elm_ts/dayselector/tslist
+	:include:/elm_ts/ctxpopup/tslist
+	:include:/elm_ts/slidingdrawer/tslist
 
 #yhkim
 ch 

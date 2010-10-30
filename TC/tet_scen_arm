@@ -46,6 +46,8 @@ elm
 	:include:/elm_ts/tickernoti/tslist
 	:include:/elm_ts/transit/tslist
 	:include:/elm_ts/actionslider/tslist
+	:include:/elm_ts/ctxpopup/tslist
+	:include:/elm_ts/slidingdrawer/tslist
 
 #yhkim
 ch 
