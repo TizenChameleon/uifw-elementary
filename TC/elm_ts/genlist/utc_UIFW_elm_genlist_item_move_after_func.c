@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_genlist_item_append_func_01(void);
-static void utc_UIFW_elm_genlist_item_append_func_02(void);
+static void utc_UIFW_elm_genlist_item_move_after_func_01(void);
+static void utc_UIFW_elm_genlist_item_move_after_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_genlist_item_append_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_genlist_item_append_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_genlist_item_move_after_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_genlist_item_move_after_func_02, NEGATIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -78,33 +78,22 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_genlist_item_append()
+ * @brief Positive test case of elm_genlist_item_move_after()
  */
-static void utc_UIFW_elm_genlist_item_append_func_01(void)
+static void utc_UIFW_elm_genlist_item_move_after_func_01(void)
 {
-	Elm_Genlist_Item *item = NULL;
+	Elm_Genlist_Item *item = NULL, *item2 = NULL;
 	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-
-	if (!item) {
-		tet_infoline("elm_genlist_item_append() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
+	item2 = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+	elm_genlist_item_move_after(item2, item);
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_genlist_item_append()
+ * @brief Negative test case of ug_init elm_genlist_item_move_after()
  */
-static void utc_UIFW_elm_genlist_item_append_func_02(void)
+static void utc_UIFW_elm_genlist_item_move_after_func_02(void)
 {
-	Elm_Genlist_Item *item = NULL;
-	item = elm_genlist_item_append(NULL, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-
-	if (item) {
-		tet_infoline("elm_genlist_item_append() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
+	elm_genlist_item_move_after(NULL, NULL);
 	tet_result(TET_PASS);
 }

@@ -28,7 +28,9 @@
 
 
 Evas_Object *main_win, *genlist;
+static char *Items[] = { "Main Item1", "Main Item 2", "Main Item 3", "Main Item 4", "Main Item 5", "Main Item 6", "Main Item 7", "Main Item 8"  };
 Elm_Genlist_Item_Class itc;
+
 
 static void startup(void);
 static void cleanup(void);
@@ -36,8 +38,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_genlist_item_append_func_01(void);
-static void utc_UIFW_elm_genlist_item_append_func_02(void);
+static void utc_UIFW_elm_genlist_item_append_with_group_func_01(void);
+static void utc_UIFW_elm_genlist_item_append_with_group_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,12 +47,24 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_genlist_item_append_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_genlist_item_append_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_genlist_item_append_with_group_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_genlist_item_append_with_group_func_02, NEGATIVE_TC_IDX },
 };
+
+static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part )
+{
+	int index = (int) data;
+
+	if (!strcmp(part, "elm.text")) {
+		return strdup(Items[index]);
+	}
+	return NULL;
+}
 
 static void startup(void)
 {
+	Elm_Genlist_Item *item = NULL;
+	int index = 0;
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
@@ -61,10 +75,14 @@ static void startup(void)
 	evas_object_size_hint_align_set(genlist, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	evas_object_size_hint_weight_set(genlist, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	itc.item_style = "1line_textonly";
-	itc.func.label_get = NULL;
+	itc.func.label_get = _gl_label_get;
 	itc.func.icon_get = NULL;
 	itc.func.state_get = NULL;
 	itc.func.del = NULL;
+	for (index = 0; index < 5; index++) {
+		item = elm_genlist_item_append(genlist, &itc, (void *) index, NULL,
+				ELM_GENLIST_ITEM_NONE, NULL, NULL);
+	}
 }
 
 static void cleanup(void)
@@ -78,15 +96,16 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_genlist_item_append()
+ * @brief Positive test case of elm_genlist_item_append_with_group()
  */
-static void utc_UIFW_elm_genlist_item_append_func_01(void)
+static void utc_UIFW_elm_genlist_item_append_with_group_func_01(void)
 {
-	Elm_Genlist_Item *item = NULL;
-	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-
-	if (!item) {
-		tet_infoline("elm_genlist_item_append() failed in positive test case");
+	Elm_Genlist_GroupItem *git = NULL;
+	Elm_Genlist_Item *it = NULL;
+	git = elm_genlist_groupitem_add(genlist, &itc, NULL);
+	it = elm_genlist_item_append_with_group(genlist, &itc, NULL, NULL, ELM_GENLIST_ITEM_NONE, git, NULL, NULL);
+	if (!it) {
+		tet_infoline("elm_genlist_item_append_with_group() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -94,15 +113,16 @@ static void utc_UIFW_elm_genlist_item_append_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_genlist_item_append()
+ * @brief Negative test case of ug_init elm_genlist_item_append_with_group()
  */
-static void utc_UIFW_elm_genlist_item_append_func_02(void)
+static void utc_UIFW_elm_genlist_item_append_with_group_func_02(void)
 {
-	Elm_Genlist_Item *item = NULL;
-	item = elm_genlist_item_append(NULL, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-
-	if (item) {
-		tet_infoline("elm_genlist_item_append() failed in negative test case");
+	Elm_Genlist_GroupItem *git = NULL;
+	Elm_Genlist_Item *it = NULL;
+	git = elm_genlist_groupitem_add(genlist, &itc, NULL);
+	it = elm_genlist_item_append_with_group(NULL, NULL, NULL, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL, NULL);
+	if (it) {
+		tet_infoline("elm_genlist_item_append_with_group() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}
