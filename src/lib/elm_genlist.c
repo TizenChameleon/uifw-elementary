@@ -3300,17 +3300,18 @@ EAPI Elm_Genlist_GroupItem *
 elm_genlist_groupitem_add(Evas_Object *obj, const Elm_Genlist_Item_Class *itc,
 			const void *data)
 {
-	Elm_Genlist_GroupItem *git;
-	Widget_Data *wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Elm_Genlist_GroupItem *git;
+   Widget_Data *wd = elm_widget_data_get(obj);
 
-	git = calloc(1, sizeof(Elm_Genlist_GroupItem));
-	if (!git) return NULL;
-	git->wd = wd;
-	git->itc = itc;
-	git->data = data;
+   git = calloc(1, sizeof(Elm_Genlist_GroupItem));
+   if (!git) return NULL;
+   git->wd = wd;
+   git->itc = itc;
+   git->data = data;
 
-	wd->group_items = eina_inlist_append(wd->group_items, EINA_INLIST_GET(git) );
-	return git;
+   wd->group_items = eina_inlist_append(wd->group_items, EINA_INLIST_GET(git) );
+   return git;
 }
 
 /**
