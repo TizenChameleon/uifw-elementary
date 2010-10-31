@@ -4089,9 +4089,10 @@ elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
 EAPI void
 elm_genlist_item_selected_set(Elm_Genlist_Item *it, Eina_Bool selected)
 {
+   if (!it) return;
+   ELM_CHECK_WIDTYPE(it->wd->obj, widtype);
    Widget_Data *wd = elm_widget_data_get(it->wd->obj);
    if (!wd) return;
-   if (!it) return;
    if (it->delete_me) return;
    selected = !!selected;
    if (it->selected == selected) return;
