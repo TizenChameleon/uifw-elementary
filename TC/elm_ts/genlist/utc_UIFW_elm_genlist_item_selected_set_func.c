@@ -82,11 +82,10 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_item_selected_set_func_01(void)
 {
-   Elm_Genlist_Item *item = NULL;
+	Elm_Genlist_Item *item = NULL;
 
-   item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
-			ELM_GENLIST_ITEM_NONE, NULL, NULL);      
-	elm_genlist_item_selected_set(item, 1);
+	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);      
+	elm_genlist_item_selected_set(item, EINA_TRUE);
 
 	tet_result(TET_PASS);
 }
@@ -96,11 +95,9 @@ static void utc_UIFW_elm_genlist_item_selected_set_func_01(void)
  */
 static void utc_UIFW_elm_genlist_item_selected_set_func_02(void)
 {
-   Elm_Genlist_Item *item = NULL;
+	Elm_Genlist_Item *item = NULL;
 
-   item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
-			ELM_GENLIST_ITEM_NONE, NULL, NULL);      
-   
+	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);      
 	elm_genlist_item_selected_set(NULL, 1);
 
 	tet_result(TET_PASS);

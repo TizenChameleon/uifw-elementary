@@ -82,12 +82,10 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_item_genlist_get_func_01(void)
 {
-   Elm_Genlist_Item *item = NULL;
-   Evas_Object *ret = NULL;
+	Elm_Genlist_Item *item = NULL;
+	Evas_Object *ret = NULL;
 
-   item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
-			ELM_GENLIST_ITEM_NONE, NULL, NULL);   
-   
+	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);   
 	ret = elm_genlist_item_genlist_get(item);
 
 	if (!ret) {
@@ -103,15 +101,13 @@ static void utc_UIFW_elm_genlist_item_genlist_get_func_01(void)
  */
 static void utc_UIFW_elm_genlist_item_genlist_get_func_02(void)
 {
-   Elm_Genlist_Item *item = NULL;
-   Evas_Object *ret = NULL;
+	Elm_Genlist_Item *item = NULL;
+	Evas_Object *ret = NULL;
 
-   item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
-			ELM_GENLIST_ITEM_NONE, NULL, NULL);   
-   
+	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);   
 	ret = elm_genlist_item_genlist_get(NULL);
 
-	if (!ret) {
+	if (ret) {
 		tet_infoline("elm_genlist_item_genlist_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

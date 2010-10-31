@@ -102,12 +102,12 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_horizontal_mode_get_func_01(void)
 {
-	Elm_List_Mode mode = -1;
+	Elm_List_Mode my_mode = ELM_LIST_SCROLL, ret_mode = 0;
 
+	elm_genlist_horizontal_mode_set(genlist, my_mode);
+   	ret_mode = elm_genlist_horizontal_mode_get(genlist);
 
-   	mode = elm_genlist_horizontal_mode_get(genlist);
-
-	if (mode < ELM_LIST_COMPRESS) {
+	if (ret_mode != my_mode) {
 		tet_infoline("elm_genlist_horizontal_mode_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -120,11 +120,12 @@ static void utc_UIFW_elm_genlist_horizontal_mode_get_func_01(void)
  */
 static void utc_UIFW_elm_genlist_horizontal_mode_get_func_02(void)
 {
-	Elm_List_Mode mode = -1;
+	Elm_List_Mode my_mode = ELM_LIST_SCROLL, ret_mode = 0;
 
-   	mode = elm_genlist_horizontal_mode_get(genlist);
+	elm_genlist_horizontal_mode_set(genlist, my_mode);
+   	ret_mode = elm_genlist_horizontal_mode_get(NULL);
 
-	if (mode > ELM_LIST_COMPRESS) {
+	if (ret_mode == my_mode) {
 		tet_infoline("elm_genlist_horizontal_mode_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

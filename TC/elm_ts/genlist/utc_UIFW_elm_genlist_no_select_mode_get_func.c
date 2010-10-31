@@ -99,11 +99,12 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_no_select_mode_get_func_01(void)
 {
-	Eina_Bool  res = EINA_FALSE;
+	Eina_Bool ret_mode = EINA_FALSE, my_mode = EINA_TRUE;
 
-   	res = elm_genlist_no_select_mode_get(genlist);
+	elm_genlist_no_select_mode_set(genlist, my_mode);
+   	ret_mode = elm_genlist_no_select_mode_get(genlist);
 
-	if (!res) {
+	if (ret_mode != my_mode) {
 		tet_infoline("elm_genlist_no_select_mode_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -116,10 +117,12 @@ static void utc_UIFW_elm_genlist_no_select_mode_get_func_01(void)
  */
 static void utc_UIFW_elm_genlist_no_select_mode_get_func_02(void)
 {
-	Eina_Bool  res = EINA_FALSE;
+	Eina_Bool ret_mode = EINA_FALSE, my_mode = EINA_TRUE;
 
-   	res = elm_genlist_no_select_mode_get(genlist);
-	if (res) {
+	elm_genlist_no_select_mode_set(genlist, my_mode);
+   	ret_mode = elm_genlist_no_select_mode_get(NULL);
+
+	if (ret_mode == my_mode) {
 		tet_infoline("elm_genlist_no_select_mode_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

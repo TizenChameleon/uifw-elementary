@@ -109,6 +109,6 @@ static void utc_UIFW_elm_genlist_horizontal_mode_set_func_01(void)
  */
 static void utc_UIFW_elm_genlist_horizontal_mode_set_func_02(void)
 {
-    elm_genlist_horizontal_mode_set(NULL, ELM_LIST_LIMIT );
+    elm_genlist_horizontal_mode_set(NULL, ELM_LIST_LIMIT);
 	tet_result(TET_PASS);
 }
