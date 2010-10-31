@@ -5909,7 +5909,6 @@ _elm_genlist_pinch_zoom_execute(Evas_Object *obj, Eina_Bool emode)
 	}
 }
 
-
 /**
  * Set pinch zoom mode
  * 
@@ -5924,13 +5923,8 @@ elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd || !wd->pinch_zoom) return;   
-
-	if(emode)
-	  wd->pinch_zoom_reserve = EINA_TRUE;
-	else
-	  wd->pinch_zoom_reserve = EINA_FALSE;
+   wd->pinch_zoom_reserve = emode;
 }
 
 /**
@@ -5946,24 +5940,18 @@ EAPI Eina_Bool
 elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   
    if (!wd) return EINA_FALSE;
-	
    if(wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH)
       return EINA_TRUE;
-   else 
-      return EINA_FALSE;
+   else return EINA_FALSE;
 }
 
 EAPI void
 elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   
    if (!wd) return;
-	
-  	wd->pinch_zoom = emode;
-
+   wd->pinch_zoom = emode;
 }
 
 
