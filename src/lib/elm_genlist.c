@@ -3991,8 +3991,8 @@ elm_genlist_item_next_get(const Elm_Genlist_Item *it)
 {
    while (it)
      {
-	it = (Elm_Genlist_Item *)(EINA_INLIST_GET(it)->next);
-	if ((it) && (!it->delete_me)) break;
+        it = (Elm_Genlist_Item *)(EINA_INLIST_GET(it)->next);
+        if ((it) && (!it->delete_me)) break;
      }
    return (Elm_Genlist_Item *)it;
 }
@@ -4012,8 +4012,8 @@ elm_genlist_item_prev_get(const Elm_Genlist_Item *it)
 {
    while (it)
      {
-	it = (Elm_Genlist_Item *)(EINA_INLIST_GET(it)->prev);
-	if ((it) && (!it->delete_me)) break;
+        it = (Elm_Genlist_Item *)(EINA_INLIST_GET(it)->prev);
+        if ((it) && (!it->delete_me)) break;
      }
    return (Elm_Genlist_Item *)it;
 }
@@ -4611,6 +4611,7 @@ elm_genlist_item_object_get(const Elm_Genlist_Item *it)
 EAPI void
 elm_genlist_item_update(Elm_Genlist_Item *it)
 {
+   if (!it) return;
    if (!it->block) return;
    if (it->delete_me) return;
    it->mincalcd = EINA_FALSE;
