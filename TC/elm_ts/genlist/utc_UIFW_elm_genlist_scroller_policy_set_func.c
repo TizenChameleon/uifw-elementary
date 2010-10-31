@@ -100,7 +100,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_scroller_policy_set_func_01(void)
 {
-	elm_genlist_scroller_policy_set(it, ELM_SCROLLER_POLICY_ON, ELM_SCROLLER_POLICY_OFF);
+	elm_genlist_scroller_policy_set(genlist, ELM_SCROLLER_POLICY_ON, ELM_SCROLLER_POLICY_OFF);
 	tet_result(TET_PASS);
 }
 

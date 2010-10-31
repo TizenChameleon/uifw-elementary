@@ -108,7 +108,7 @@ static void utc_UIFW_elm_genlist_item_data_get_func_01(void)
 	my_data = (char *)calloc(sizeof(char), 10);
 	strcpy(my_data, data);
 	elm_genlist_item_data_set(it, my_data);
-	get_data = elm_genlist_item_data_get(it);
+	get_data = (char *)elm_genlist_item_data_get(it);
 
 	if (get_data != my_data) {
 		tet_infoline("elm_genlist_add() failed in positive test case");
@@ -123,6 +123,6 @@ static void utc_UIFW_elm_genlist_item_data_get_func_01(void)
  */
 static void utc_UIFW_elm_genlist_item_data_get_func_02(void)
 {
-	elm_genlist_item_data_get(NULL, NULL);
+	elm_genlist_item_data_get(NULL);
 	tet_result(TET_PASS);
 }

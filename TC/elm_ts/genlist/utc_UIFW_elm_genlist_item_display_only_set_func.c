@@ -82,12 +82,11 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_item_display_only_set_func_01(void)
 {
-   Elm_Genlist_Item *item = NULL;
-   Eina_Bool ret = EINA_FALSE;
+	Elm_Genlist_Item *item = NULL;
+	Eina_Bool ret = EINA_FALSE;
 
-   item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
-			ELM_GENLIST_ITEM_NONE, NULL, NULL);      
-	elm_genlist_item_display_only_set(item, 1);
+	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);      
+	elm_genlist_item_display_only_set(item, EINA_TRUE);
 
 	ret = elm_genlist_item_display_only_get(item);
    
@@ -104,13 +103,10 @@ static void utc_UIFW_elm_genlist_item_display_only_set_func_01(void)
  */
 static void utc_UIFW_elm_genlist_item_display_only_set_func_02(void)
 {
-   Elm_Genlist_Item *item = NULL;
-   Eina_Bool ret = EINA_FALSE;
+	Elm_Genlist_Item *item = NULL;
 
-   item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
-			ELM_GENLIST_ITEM_NONE, NULL, NULL);      
-   
-	elm_genlist_item_display_only_set(NULL, 0);
+	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);      
+	elm_genlist_item_display_only_set(NULL, EINA_FALSE);
    
 	tet_result(TET_PASS);
 }
