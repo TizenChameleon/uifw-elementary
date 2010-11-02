@@ -235,7 +235,7 @@ _prop_change(void *data __UNUSED__, int ev_type __UNUSED__, void *ev)
                        edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
                     }
                }
-          }				
+          }
         else if (((_atom_config > 0) && (event->atom == _atom_config)) ||
                  (event->atom == _atom[ATOM_E_CONFIG]))
           {
