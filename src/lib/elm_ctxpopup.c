@@ -279,8 +279,7 @@ static int
 _get_indicator_h(Evas_Object *parent)
 {
 	Ecore_X_Window zone, xwin, root;
-	int w = 0, h = 0;
-	int rotation = -1;
+	int h = 0;
    int count;
    unsigned char *prop_data = NULL;
    int ret;
@@ -289,27 +288,11 @@ _get_indicator_h(Evas_Object *parent)
 	   return 0;
    }
 
-   root = ecore_x_window_root_get(ecore_x_window_focus_get());
-   ret  = ecore_x_window_prop_property_get(root, ECORE_X_ATOM_E_ILLUME_ROTATE_ROOT_ANGLE,
-   						 ECORE_X_ATOM_CARDINAL, 32, &prop_data, &count);
-   if (ret && prop_data) memcpy(&rotation, prop_data, sizeof(int));
-   if (prop_data) free(prop_data);
+   xwin = elm_win_xwindow_get(parent);
+   zone = ecore_x_e_illume_zone_get(xwin);
+   ecore_x_e_illume_indicator_geometry_get(zone, NULL, NULL, NULL, &h);
 
-	xwin = elm_win_xwindow_get(parent);
-	zone = ecore_x_e_illume_zone_get(xwin);
-	ecore_x_e_illume_indicator_geometry_get(zone, NULL, NULL, &w, &h);
-
-	if(w< 0) w = 0;
-	if (h < 0) h = 0;
-
-	if( (rotation == 0) || (rotation ==180)) {
-		printf( "indicator  %d\n", h);
-		return h;
-	}else {
-		printf( "indicator  %d\n", w);
-		return w;
-	}
-
+	return h;
 }
 
 static Elm_Ctxpopup_Arrow
@@ -336,31 +319,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	return ELM_CTXPOPUP_ARROW_DOWN;
      }
 
-   evas_object_geometry_get(obj, &x, &y, NULL, NULL);
-   edje_object_size_min_calc(wd->base,&base_w, &base_h);
-
-   edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
-   max_width_size *= elm_scale_get();
-   max_height_size *= elm_scale_get();
-
-   if (base_h > max_height_size)
-      base_h = max_height_size;
-
-   if (base_w > max_width_size)
-      base_w = max_width_size;
-
-   //s -a
-   //evas_object_size_hint_max_get
-
-   if(wd->position_forced)
-   {
-	   rect->x = x;
-	   rect->y = y;
-	   rect->w = base_w;
-	   rect->h = base_h;
-	   return ELM_CTXPOPUP_ARROW_DOWN;
-   }
-
    indicator_h = _get_indicator_h(wd->parent);
    finger_size = elm_finger_size_get();
 
@@ -380,6 +338,28 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 
 	if(area_y < indicator_h) area_y = indicator_h;
 
+	evas_object_geometry_get(obj, &x, &y, NULL, NULL);
+   edje_object_size_min_calc(wd->base,&base_w, &base_h);
+
+   edje_object_size_max_get(wd->base, &max_width_size, &max_height_size);
+   max_width_size *= elm_scale_get();
+   max_height_size *= elm_scale_get();
+
+   if (base_h > max_height_size)
+      base_h = max_height_size;
+
+   if (base_w > max_width_size)
+      base_w = max_width_size;
+
+   if(wd->position_forced)
+   {
+	   rect->x = x;
+	   rect->y = y;
+	   rect->w = base_w;
+	   rect->h = base_h;
+	   return -1;
+   }
+
 	//Define x, y Segments and find invalidated direction.
    for (idx = 0; idx < 4; ++idx)
      {
@@ -387,9 +367,8 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	  {
 	  case ELM_CTXPOPUP_ARROW_DOWN:
 	     temp_y = y - base_h;
-	     if ((temp_y - arrow_h - finger_size) > area_y) {
+	     if ((temp_y - arrow_h - finger_size) > area_y)
 		continue;
-	     }
 	     available_direction[idx] = 0;
 	     break;
 	  case ELM_CTXPOPUP_ARROW_RIGHT:
@@ -450,14 +429,63 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	break;
      }
 
-   //Not enough space to locate. In this case, just show And prevent to show the arrow.
-   if( !(available_direction[0] | available_direction[1] | available_direction[2] | available_direction[3]) )
-   {
+	//Not enough space to locate. In this case, just show and prevent to show the arrow.
+	if( ( x + base_w > area_x + area_w ) ||  ( y + base_h > area_y + area_h )  || ( x < area_x ) || ( y < area_y ) )
+	{
+/*			switch (wd->arrow_priority[idx])
+			  {
+			  case ELM_CTXPOPUP_ARROW_DOWN:
+			     ADJUST_POS_X(x);
+			     y -= (base_h + finger_size);
+			     arrow = ELM_CTXPOPUP_ARROW_DOWN;
+			     break;
+			  case ELM_CTXPOPUP_ARROW_RIGHT:
+			     ADJUST_POS_Y(y);
+			     x -= (base_w + finger_size);
+			     arrow = ELM_CTXPOPUP_ARROW_RIGHT;
+			     break;
+			  case ELM_CTXPOPUP_ARROW_LEFT:
+			     ADJUST_POS_Y(y);
+			     x += finger_size;
+			     arrow = ELM_CTXPOPUP_ARROW_LEFT;
+			     break;
+			  case ELM_CTXPOPUP_ARROW_UP:
+			     ADJUST_POS_X(x);
+			     y += finger_size;
+			     arrow = ELM_CTXPOPUP_ARROW_UP;
+			     break;
+			  default:
+			     break;
+			  }
+			break;
+		     }
+
+		   if (base_w > area_w) {
+			   base_w = area_w;
+		   }
+
+		   if(base_h > area_h) {
+			   base_h = area_h;
+		   }
+
+		   if(wd->position_forced)
+		   {
+			   rect->x = x;
+			   rect->y = y;
+			   rect->w = base_w;
+			   rect->h = base_h;
+			   return -1;
+		   }
+*/
+
+
+
 	   x = area_x + (area_w/2) - (base_w / 2);
-	   y = area_y + (area_y/2) - (base_h / 2);
-	   arrow = -1;
+	   y = area_y + (area_h/2) - (base_h / 2);
 	   evas_object_hide(wd->arrow);
-   }
+	   arrow = -1;
+
+	}
 
    rect->x = x;
    rect->y = y;
