@@ -896,13 +896,13 @@ elm_ctxpopup_item_label_get(Elm_Ctxpopup_Item *item)
 /**
  * Add a new ctxpopup object to the parent.
  *
- * @param[in] obj	window object
+ * @param[in] parent	window object
  * @return 		New object or NULL if it cannot be created
  *
  * @ingroup Ctxpopup
  */
 EAPI Evas_Object *
-elm_ctxpopup_add(Evas_Object *obj)
+elm_ctxpopup_add(Evas_Object *parent)
 {
    Evas_Object *obj;
    Evas *e;
