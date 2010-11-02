@@ -396,14 +396,17 @@ _add_image(Evas_Object *obj, void *data)
 	if (!wd || !it) return;
 
 	ly = edje_object_add(evas_object_evas_get(obj));
+	if(!ly) return;
 	_elm_theme_object_set(obj, ly, "stackedicon", "icon", elm_widget_style_get(obj));
 	evas_object_size_hint_weight_set(ly, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	elm_widget_sub_object_add(obj, ly); 
 	
 	ic = evas_object_image_add(evas_object_evas_get(obj));
+	if(!ic) return;
 	evas_object_image_load_size_set(ic, wd->w/2, wd->h/2);
 	evas_object_image_file_set(ic, it->path, NULL);
 	evas_object_image_size_get(ic, &iw, &ih);
+	if(!iw || !ih) return;
 
 	_calc_item_size(wd->w - 2, wd->h - 2, iw, ih, &it->w, &it->h);
 
@@ -415,6 +418,7 @@ _add_image(Evas_Object *obj, void *data)
 	edje_object_part_swallow(ly, "contents", ic);
 	
 	pad = evas_object_rectangle_add(evas_object_evas_get(obj));
+	if(!pad) return;
 	evas_object_size_hint_align_set(pad, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	evas_object_color_set(pad, 0, 0, 0, it->index*25);
 	edje_object_part_swallow(ly, "shadow", pad);
@@ -441,20 +445,24 @@ _add_image_to_buffer(Evas_Object *obj, Evas* e, void *data)
 
 	// FIXME: add an opaque rectangle because of alpha bug of evas_map.
 	Evas_Object* rect = evas_object_rectangle_add( e );
+	if(!rect) return;
 	evas_object_resize( rect, 1, 1);
 	evas_object_move(rect, wd->w/2, wd->h/2);
 	evas_object_color_set( rect, 0, 0, 0, 255 );
 	evas_object_show( rect );	
 
 	ly = edje_object_add(e);
+	if(!ly) return;
 	_elm_theme_object_set(obj, ly, "stackedicon", "icon", elm_widget_style_get(obj));
 	evas_object_size_hint_weight_set(ly, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
 	ic = evas_object_image_add(e);
+	if(!ic) return;
 	evas_object_image_alpha_set(ic, EINA_TRUE);
 	evas_object_image_load_size_set(ic, wd->w/2, wd->h/2);
 	evas_object_image_file_set(ic, it->path, NULL);
 	evas_object_image_size_get(ic, &iw, &ih);
+	if(!iw || !ih) return;
 
 	_calc_item_size(wd->w - 2, wd->h - 2, iw, ih, &res_w, &res_h);
 
