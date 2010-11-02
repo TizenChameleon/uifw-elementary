@@ -1892,31 +1892,6 @@ extern "C" {
     * default
     */
 
-   typedef struct _Buttonpicker_Item Elm_Buttonpicker_Item;
-   EINA_DEPRECATED EAPI Evas_Object     *elm_buttonpicker_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void             elm_buttonpicker_next(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void             elm_buttonpicker_prev(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EINA_DEPRECATED EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EINA_DEPRECATED EAPI const Eina_List *elm_buttonpicker_items_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Elm_Buttonpicker_Item *elm_buttonpicker_first_item_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Elm_Buttonpicker_Item *elm_buttonpicker_last_item_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Elm_Buttonpicker_Item *elm_buttonpicker_selected_item_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void             elm_buttonpicker_item_selected_set(Elm_Buttonpicker_Item *item);
-   EINA_DEPRECATED EAPI void             elm_buttonpicker_item_del(Elm_Buttonpicker_Item *item);
-   EINA_DEPRECATED EAPI const char      *elm_buttonpicker_item_label_get(Elm_Buttonpicker_Item *item);
-   EINA_DEPRECATED EAPI void             elm_buttonpicker_item_label_set(Elm_Buttonpicker_Item *item, const char *label);
-   EINA_DEPRECATED EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_prev(Elm_Buttonpicker_Item *item);
-   EINA_DEPRECATED EAPI Elm_Buttonpicker_Item *elm_buttonpicker_item_next(Elm_Buttonpicker_Item *item);
-   /* smart callback called:
-    * "changed" - when buttonpicker selected item is changed
-    * "overflowed" - when buttonpicker item is changed to first item from last item
-    * "underflowed" - when buttonpicker item is changed to last item from first item.
-    */
-   /* available styles:
-    * default
-    */
-
    EAPI Evas_Object *elm_timepicker_add(Evas_Object *parent);
    EAPI void         elm_timepicker_time_set(Evas_Object *obj, int hrs, int min, int sec);
    EAPI void         elm_timepicker_time_get(Evas_Object *obj, int *hrs, int *min, int *sec);
@@ -1924,18 +1899,6 @@ extern "C" {
    EAPI void         elm_timepicker_show_seconds_set(Evas_Object *obj, Eina_Bool seconds);
    /* smart callback called:
     * "changed" - when timepicker selected item is changed
-    */
-   /* available styles:
-    * default
-    */
-
-   EINA_DEPRECATED EAPI Evas_Object *elm_timepicker3_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_timepicker3_time_set(Evas_Object *obj, int hrs, int min, int sec);
-   EINA_DEPRECATED EAPI void         elm_timepicker3_time_get(Evas_Object *obj, int *hrs, int *min, int *sec);
-   EINA_DEPRECATED EAPI void         elm_timepicker3_show_am_pm_set(Evas_Object *obj, Eina_Bool am_pm);
-   EINA_DEPRECATED EAPI void         elm_timepicker3_show_seconds_set(Evas_Object *obj, Eina_Bool seconds);
-   /* smart callback called:
-    * "changed" - when timepicker3 selected item is changed
     */
    /* available styles:
     * default
@@ -1952,38 +1915,6 @@ extern "C" {
    EAPI const char  *elm_datepicker_date_format_get(Evas_Object *obj);
    /* smart callback called:
     * "changed" - when datepicker selected item is changed
-    */
-   /* available styles:
-    * default
-    */
-
-   EINA_DEPRECATED EAPI Evas_Object *elm_datepicker2_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_datepicker2_date_set(Evas_Object *obj, int year, int month, int day);
-   EINA_DEPRECATED EAPI void         elm_datepicker2_date_get(Evas_Object *obj, int *year, int *month, int *day);
-   EINA_DEPRECATED EAPI void         elm_datepicker2_date_min_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
-   EINA_DEPRECATED EAPI void         elm_datepicker2_date_min_get(Evas_Object *obj, int *year, int *month, int *day);
-   EINA_DEPRECATED EAPI void         elm_datepicker2_date_max_set(Evas_Object *obj, int year, int month, int day); // Not implemented
-   EINA_DEPRECATED EAPI void         elm_datepicker2_date_max_get(Evas_Object *obj, int *year, int *month, int *day);
-   EINA_DEPRECATED EAPI void         elm_datepicker2_date_format_set(Evas_Object *obj, const char *fmt);
-   EINA_DEPRECATED EAPI const char  *elm_datepicker2_date_format_get(Evas_Object *obj);
-   /* smart callback called:
-    * "changed" - when datepicker selected item is changed
-    */
-   /* available styles:
-    * default
-    */
-    
-   EINA_DEPRECATED EAPI Evas_Object *elm_datepicker3_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_datepicker3_date_set(Evas_Object *obj, int year, int month, int day);
-   EINA_DEPRECATED EAPI void         elm_datepicker3_date_get(Evas_Object *obj, int *year, int *month, int *day);
-   EINA_DEPRECATED EAPI void         elm_datepicker3_date_min_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
-   EINA_DEPRECATED EAPI void         elm_datepicker3_date_min_get(Evas_Object *obj, int *year, int *month, int *day);
-   EINA_DEPRECATED EAPI void         elm_datepicker3_date_max_set(Evas_Object *obj, int year, int month, int day); // Not implemented
-   EINA_DEPRECATED EAPI void         elm_datepicker3_date_max_get(Evas_Object *obj, int *year, int *month, int *day); 
-   EINA_DEPRECATED EAPI void         elm_datepicker3_date_format_set(Evas_Object *obj, const char *fmt);
-   EINA_DEPRECATED EAPI const char  *elm_datepicker3_date_format_get(Evas_Object *obj);
-   /* smart callback called:
-    * "changed" - when datepicker3 selected item is changed
     */
    /* available styles:
     * default
@@ -2420,19 +2351,6 @@ extern "C" {
    EAPI void         elm_actionsheet_button_add(Evas_Object *obj, const Elm_Actionsheet_Button_Type type, const char *title, void (*button_clicked_cb) (void *data, Evas_Object *obj, void *event_info), void *event_info);
    EAPI int          elm_actionsheet_button_title_get(Evas_Object *obj, const int index, char **title);
 
-   /* Toolbar 2 */
-   typedef struct _Elm_Toolbar2_Item Elm_Toolbar2_Item;
-   EINA_DEPRECATED EAPI Evas_Object *elm_toolbar2_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_toolbar2_icon_size_set(Evas_Object *obj, int icon_size);
-   EINA_DEPRECATED EAPI int          elm_toolbar2_icon_size_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Elm_Toolbar2_Item *elm_toolbar2_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *data);
-   EINA_DEPRECATED EAPI Evas_Object *elm_toolbar2_item_icon_get(Elm_Toolbar2_Item *item);
-   EINA_DEPRECATED EAPI void         elm_toolbar2_item_del(Elm_Toolbar2_Item *it);
-   EINA_DEPRECATED EAPI void         elm_toolbar2_item_del_cb_set(Elm_Toolbar2_Item *it, void (*func)(void *data, Evas_Object *obj, void *event_info));
-   EINA_DEPRECATED EAPI void         elm_toolbar2_scrollable_set(Evas_Object *obj, Eina_Bool scrollable);
-   EINA_DEPRECATED EAPI void         elm_toolbar2_homogenous_set(Evas_Object *obj, Eina_Bool homogenous);
-   EINA_DEPRECATED EAPI void         elm_toolbar2_align_set(Evas_Object *obj, double align);
-
    /* colorpicker */
    EAPI Evas_Object *elm_colorpicker_add(Evas_Object *parent);
    EAPI void         elm_colorpicker_color_set(Evas_Object *obj, int r, int g , int b);
@@ -2556,50 +2474,6 @@ extern "C" {
     * "indicator,position" - when a button reaches to the special position like "left", "right" and "center".
     */
    
-   /* zoomcontrols */
-   EINA_DEPRECATED EAPI Evas_Object *elm_zoomcontrols_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_zoomcontrols_range_set(Evas_Object *obj, int range);
-   /* smart callbacks called:
-    * "up_clicked" - when up button of zoomcontrols is clicked 
-    * "down_clicked" - when down button of zoomcontrols is clicked
-    */         
-
-   /* viewflipper */
-   typedef enum _Elm_Viewflipper_Policy
-     {
-        ERROR_0  = -1,    //can not find wanted value
-        SUCCESS =0,
-        FLIP_RANGE_X =30, 
-        ERROR_1  =1001,	//confrim parameter is layout or not
-        ERROR_2 ,	//confrim memory check
-        ERROR_3 ,	//data is empty
-        ERROR_4 ,	//check the range
-        ERROR_5 ,	//Non need operation
-        ERROR_6 ,	//waiting gui
-        ERROR_7 ,	//timer second is not setup or can not time setup
-        DIR_LEFT ,
-        DIR_RIGHT ,
-        EACH_LAST 
-     } Elm_Viewflipper_Policy;
-   EINA_DEPRECATED EAPI int          elm_viewflipper_isFlipbutton();
-   EINA_DEPRECATED EAPI int          elm_viewflipper_isAutoStart();
-   EINA_DEPRECATED EAPI int          elm_viewflipper_isValidPos(int pos);
-   EINA_DEPRECATED EAPI int          elm_viewflipper_addChild(Evas_Object * child_layout);
-   EINA_DEPRECATED EAPI int          elm_viewflipper_removeChild(Evas_Object * child_layout);
-   EINA_DEPRECATED EAPI int          elm_viewflipper_removeChildAt(int pos);
-   EINA_DEPRECATED EAPI int          elm_viewflipper_getPositionChild(Evas_Object * child_layout);
-   EINA_DEPRECATED EAPI Evas_Object *elm_viewflipper_getChildAt(int pos);
-   EINA_DEPRECATED EAPI int          elm_viewflipper_getCountChild();
-   EINA_DEPRECATED EAPI int          elm_viewflipper_setDisplayedChild(int pos);
-   EINA_DEPRECATED EAPI int          elm_viewflipper_setNowView();
-   EINA_DEPRECATED EAPI int          elm_viewflipper_setNextView();
-   EINA_DEPRECATED EAPI int          elm_viewflipper_setPreviousView();
-   EINA_DEPRECATED EAPI int          elm_viewflipper_setFlipInterval(int milliseconds);
-   EINA_DEPRECATED EAPI int          elm_viewflipper_setFlipbutton(int showbutton);
-   EINA_DEPRECATED EAPI int          elm_viewflipper_startAutoFlippingWithOption(int drection,int pos); 
-   EINA_DEPRECATED EAPI int          elm_viewflipper_startAutoFlipping();
-   EINA_DEPRECATED EAPI int          elm_viewflipper_stopAutoFlipping();
-	   
    /* gallery */
    struct _Elm_Gallery_Item 
      {
@@ -2647,25 +2521,6 @@ extern "C" {
    EAPI void         elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh);
    EAPI void         elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy);
    
-   /* wipercontrol*/
-   EINA_DEPRECATED EAPI Evas_Object *elm_wipercontrol_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_wipercontrol_below_content_set (Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED EAPI void         elm_wipercontrol_above_content_set (Evas_Object *obj, Evas_Object *content);
-
-   /* AnalogClock */
-   EINA_DEPRECATED EAPI Evas_Object *elm_analogclock_add(Evas_Object *parent);
-
-   /* ratingbar */
-   EINA_DEPRECATED EAPI Evas_Object *elm_ratingbar_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_ratingbar_rating_set(Evas_Object *obj, int rating);
-   EINA_DEPRECATED EAPI int          elm_ratingbar_rating_get(Evas_Object *obj);
-   /* smart callback called:
-    * "changed" - when a rating is changed
-    */
-   /* available styles:
-    * default
-    */
- 
    /* multibuttonentry */
    typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
    EAPI Evas_Object               *elm_multibuttonentry_add(Evas_Object *parent);
@@ -2714,15 +2569,6 @@ extern "C" {
     * default
     */
 
-   /* chronometer */
-   EINA_DEPRECATED EAPI Evas_Object *elm_chronometer_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_chronometer_start(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_chronometer_stop(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_chronometer_time_set(Evas_Object *obj, int hrs, int min, int sec);
-   EINA_DEPRECATED EAPI void         elm_chronometer_time_get(const Evas_Object *obj, int *hrs, int *min, int *sec);
-   EINA_DEPRECATED EAPI void         elm_chronometer_format_set(Evas_Object *obj, Eina_Bool format);
-   EINA_DEPRECATED EAPI void         elm_chronometer_format_get(Evas_Object *obj, Eina_Bool *format);
-
    /* dialoguegroup */
    typedef struct _Dialogue_Item Dialogue_Item;
    
@@ -2764,46 +2610,6 @@ extern "C" {
    EAPI void         elm_autocompleteview_data_set(Evas_Object *obj, Eina_List *data_list);
    EAPI void         elm_autocompleteview_match_func_set(Evas_Object *obj, elmautocompleteview_matchfunction func, void *data);
    EAPI void         elm_autocompleteview_text_update(Evas_Object *obj, char *text);
-
-   /* coverflow */
-   typedef struct _Coverflow_Item Elm_Coverflow_Item;
-   typedef struct _Coverflow_Item_Class 
-     {
-        void (*CoverflowItemGenFunc)(void* data, Evas_Object* obj);
-        void (*CoverflowItemDelFunc)(void* data, Evas_Object* obj); 
-     } Elm_Coverflow_Item_Class;
-  
-   EINA_DEPRECATED EAPI Evas_Object *elm_coverflow_add( Evas_Object* parent );
-   EINA_DEPRECATED EAPI Elm_Coverflow_Item* elm_coverflow_item_append( Evas_Object* obj, Elm_Coverflow_Item_Class* cic, void* data, void (*func)(void* data, Evas_Object* obj, void* event_info ), void* func_data );
-   EINA_DEPRECATED EAPI void         elm_coverflow_clear( Evas_Object* obj );
-
-   /* Cabinet */
-   typedef struct _Cabinet_Item Elm_Cabinet_Item;
-   EINA_DEPRECATED EAPI Evas_Object        *elm_cabinet_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void                elm_cabinet_next(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void                elm_cabinet_prev(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Eina_Bool           elm_cabinet_bounce_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void                elm_cabinet_bounce_set(Evas_Object *obj, Eina_Bool bounce);
-   EINA_DEPRECATED EAPI Elm_Cabinet_Item   *elm_cabinet_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EINA_DEPRECATED EAPI Elm_Cabinet_Item   *elm_cabinet_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data);
-   EINA_DEPRECATED EAPI const Eina_List    *elm_cabinet_items_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Elm_Cabinet_Item   *elm_cabinet_first_item_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Elm_Cabinet_Item   *elm_cabinet_last_item_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Elm_Cabinet_Item   *elm_cabinet_selected_item_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void                elm_cabinet_item_selected_set(Elm_Cabinet_Item *item);
-   EINA_DEPRECATED EAPI void                elm_cabinet_item_del(Elm_Cabinet_Item *item);
-   EINA_DEPRECATED EAPI const char         *elm_cabinet_item_label_get(Elm_Cabinet_Item *item);
-   EINA_DEPRECATED EAPI void                elm_cabinet_item_label_set(Elm_Cabinet_Item *item, const char *label);
-   EINA_DEPRECATED EAPI const char         *elm_cabinet_item_sub_info_get(Elm_Cabinet_Item *item);
-   EINA_DEPRECATED EAPI void                elm_cabinet_item_sub_info_set(Elm_Cabinet_Item *item, const char *sub_info);
-   EINA_DEPRECATED EAPI Elm_Cabinet_Item   *elm_cabinet_item_prev(Elm_Cabinet_Item *item);
-   EINA_DEPRECATED EAPI Elm_Cabinet_Item   *elm_cabinet_item_next(Elm_Cabinet_Item *item);
-   EINA_DEPRECATED EAPI void               *elm_cabinet_item_data_get(Elm_Cabinet_Item *item);
-   EINA_DEPRECATED EAPI void                elm_cabinet_item_data_set(Elm_Cabinet_Item *item, void *data);
-   EINA_DEPRECATED EAPI Eina_Bool           elm_cabinet_item_del_btn_disabled_get(Elm_Cabinet_Item *item);
-   EINA_DEPRECATED EAPI void                elm_cabinet_item_del_btn_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled);
-   EINA_DEPRECATED EAPI Eina_Bool           elm_cabinet_item_sub_info_disabled_get(Elm_Cabinet_Item *item);
-   EINA_DEPRECATED EAPI void                elm_cabinet_item_sub_info_disabled_set(Elm_Cabinet_Item *item, Eina_Bool disabled);
 
    /* Dayselector */
    typedef enum 

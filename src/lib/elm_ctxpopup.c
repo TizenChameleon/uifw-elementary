@@ -303,10 +303,13 @@ _get_indicator_h(Evas_Object *parent)
 	if (h < 0) h = 0;
 
 	if( (rotation == 0) || (rotation ==180)) {
+		printf( "indicator  %d\n", h);
 		return h;
 	}else {
+		printf( "indicator  %d\n", w);
 		return w;
 	}
+
 }
 
 static Elm_Ctxpopup_Arrow
@@ -345,6 +348,9 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 
    if (base_w > max_width_size)
       base_w = max_width_size;
+
+   //s -a
+   //evas_object_size_hint_max_get
 
    if(wd->position_forced)
    {
@@ -444,14 +450,13 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	break;
      }
 
-   //Not enough space to locate. In this case, just show with down arrow.
-   //And prevent to show the arrow.
+   //Not enough space to locate. In this case, just show And prevent to show the arrow.
    if( !(available_direction[0] | available_direction[1] | available_direction[2] | available_direction[3]) )
    {
-	     ADJUST_POS_X(x);
-	     arrow = -1;
-	     y = indicator_h;
-	     evas_object_hide(wd->arrow);
+	   x = area_x + (area_w/2) - (base_w / 2);
+	   y = area_y + (area_y/2) - (base_h / 2);
+	   arrow = -1;
+	   evas_object_hide(wd->arrow);
    }
 
    rect->x = x;
@@ -891,13 +896,13 @@ elm_ctxpopup_item_label_get(Elm_Ctxpopup_Item *item)
 /**
  * Add a new ctxpopup object to the parent.
  *
- * @param[in] parent 	Parent object
+ * @param[in] obj	window object
  * @return 		New object or NULL if it cannot be created
  *
  * @ingroup Ctxpopup
  */
 EAPI Evas_Object *
-elm_ctxpopup_add(Evas_Object *parent)
+elm_ctxpopup_add(Evas_Object *obj)
 {
    Evas_Object *obj;
    Evas *e;
