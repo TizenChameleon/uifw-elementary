@@ -497,7 +497,9 @@ _ellipsis_fit_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
    if (cutline < 1)
 	   cutline = 1;
 
-   evas_textblock_cursor_char_coord_set(tc1, 0, 0);
+//   evas_textblock_cursor_char_coord_set(tc1, 0, 0);
+//   evas_textblock_cursor_paragraph_char_first(tc1);
+   evas_textblock_cursor_pos_set(tc1, 0);
    evas_textblock_cursor_line_set(tc2, cutline-1);
    evas_textblock_cursor_line_char_last(tc2);
    for (i = 0; i < (minshowcount+1); i++)
