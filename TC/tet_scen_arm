@@ -48,6 +48,8 @@ elm
 	:include:/elm_ts/actionslider/tslist
 	:include:/elm_ts/ctxpopup/tslist
 	:include:/elm_ts/slidingdrawer/tslist
+	:include:/elm_ts/stackedicon/tslist
+	:include:/elm_ts/progressbar/tslist
 
 #yhkim
 ch 
