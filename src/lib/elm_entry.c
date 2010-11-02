@@ -599,7 +599,7 @@ _store_selection(Elm_Sel_Type seltype, Evas_Object *obj)
    sel = edje_object_part_text_selection_get(wd->ent, "elm.text");
    elm_selection_set(seltype, obj, ELM_SEL_FORMAT_MARKUP, sel);
    if (seltype == ELM_SEL_CLIPBOARD)
-	   eina_stringshare_replace(&wd->cut_sel, sel);
+      eina_stringshare_replace(&wd->cut_sel, sel);
 }
 
 static void
@@ -793,16 +793,16 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    if (ev->button != 1) return;
 
    if (!wd->double_clicked)
-   {
-	   if ((wd->api) && (wd->api->obj_mouseup))
-		 {
-		wd->api->obj_mouseup(data);
-		 }
-   }
+     {
+        if ((wd->api) && (wd->api->obj_mouseup))
+          {
+             wd->api->obj_mouseup(data);
+          }
+     }
    if (wd->longpress_timer)
      {
-	ecore_timer_del(wd->longpress_timer);
-	wd->longpress_timer = NULL;
+        ecore_timer_del(wd->longpress_timer);
+        wd->longpress_timer = NULL;
      }
 }
 
@@ -2036,6 +2036,7 @@ elm_entry_add(Evas_Object *parent)
    wd->editable     = EINA_TRUE;
    wd->disabled     = EINA_FALSE;
    wd->context_menu = EINA_TRUE;
+   wd->autoperiod   = EINA_TRUE;
 
    wd->ellipsis_threshold = 0;
 
@@ -2294,7 +2295,7 @@ elm_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool show_last
    wd->linewrap = EINA_FALSE;
    wd->char_linewrap = EINA_FALSE;
    t = eina_stringshare_add(elm_entry_entry_get(obj));
-    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
    eina_stringshare_del(t);
    _sizing_eval(obj);
@@ -2373,10 +2374,10 @@ elm_entry_entry_get(const Evas_Object *obj)
    if (wd->text) return wd->text;
    text = edje_object_part_text_get(wd->ent, "elm.text");
    if (!text)
-	 {
-	ERR("text=NULL for edje %p, part 'elm.text'", wd->ent);
-	return NULL;
-	 }
+     {
+        ERR("text=NULL for edje %p, part 'elm.text'", wd->ent);
+        return NULL;
+     }
    eina_stringshare_replace(&wd->text, text);
    if(wd->password)return elm_entry_markup_to_utf8(wd->text);
    return wd->text;
@@ -2417,7 +2418,7 @@ elm_entry_entry_insert(Evas_Object *obj, const char *entry)
    edje_object_part_text_insert(wd->ent, "elm.text", entry);
    // start for cbhm
    if (cnpwidgetdata == obj)
-	   ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+      ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
    // end for cbhm
    wd->changed = EINA_TRUE;
    _sizing_eval(obj);
