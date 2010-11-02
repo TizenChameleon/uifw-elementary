@@ -346,6 +346,7 @@ _is_width_over(Evas_Object *obj, int linemode)
 
    if (!wd) return 0;
 
+   // too short to ellipsis
    if (strlen(edje_object_part_text_get(wd->lbl, "elm.text")) <= ellen)
 	   return 0;
 
@@ -353,8 +354,22 @@ _is_width_over(Evas_Object *obj, int linemode)
 
    evas_object_geometry_get (obj, &vx,&vy,&vw,&vh);
 
+   /*
+   fprintf(stderr, "## _is_width_over\n");
+   fprintf(stderr, "## x = %d, y = %d, w = %d, h = %d\n", x, y, w, h);
+   fprintf(stderr, "## vx = %d, vy = %d, vw = %d, vh = %d\n", vx, vy, vw, vh);
+   if (linemode)
+	   fprintf(stderr, "## wd->wrap_w = %d, wd->wrap_h = %d\n", wd->wrap_w, wd->wrap_h);
+   else
+	   fprintf(stderr, "## wd->wrap_w = %d\n", wd->wrap_w);
+   */
+
    if (linemode == 0) // single line
      {
+       // skip if too early to check widget size
+       if (w < 0 && h < 0)
+         return 0;
+       // if string fits at widget
        if ((x >= 0) && (y >= 0))
 	   {
 		   if ((wd->wrap_w > 0) && (wd->wrap_w < w))
@@ -377,24 +392,145 @@ _is_width_over(Evas_Object *obj, int linemode)
      }
    else // multiline
      {
-       if (vy > h && h > wd->wrap_h) return 1;
+//       if (vy > h && h > wd->wrap_h) return 1;
+		 if ((x >= 0 || y >= 0) && h > wd->wrap_h) return 1;
      }
 
    return 0;
 }
 
 static void
+_ellipsis_fontsize_set(Evas_Object *obj, int fontsize, Eina_Strbuf *txtbuf)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   Eina_Strbuf *fontbuf = NULL;
+   fontbuf = eina_strbuf_new();
+   eina_strbuf_append_printf(fontbuf, "%d", fontsize);
+   _strbuf_key_value_replace(txtbuf, "font_size", eina_strbuf_string_get(fontbuf), 0);
+   edje_object_part_text_set(wd->lbl, "elm.text", eina_strbuf_string_get(txtbuf));
+   eina_strbuf_free(fontbuf);
+}
+
+static Eina_Bool
+_ellipsis_cut_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   const char *ellipsis_string = "...";
+   int minshowcount = strlen(ellipsis_string);
+   Evas_Coord w, h;
+   Evas_Textblock_Cursor *tc1, *tc2;
+   char *cutstr, *elstr;
+   int limitw = 0;
+   int lencutstr = 0;
+   int i = 0;
+
+   edje_object_part_geometry_get(wd->lbl,"elm.text",NULL,NULL,&w,&h);
+   if (w <= 0)
+	   return EINA_FALSE;
+   tc1 = evas_object_textblock_cursor_new(edje_object_part_object_get(wd->lbl, "elm.text"));
+   tc2 = evas_object_textblock_cursor_new(edje_object_part_object_get(wd->lbl, "elm.text"));
+   
+   if (wd->wrap_w > 0 && wd->wrap_w < w)
+	   limitw = wd->wrap_w;
+   else
+	   limitw = w;
+//   evas_textblock_cursor_char_coord_set(tc1, 0, 0);
+//   evas_textblock_cursor_paragraph_char_first(tc1);
+   evas_textblock_cursor_pos_set(tc1, 0);
+   evas_textblock_cursor_char_coord_set(tc2, limitw, 0);
+   for (i = 0; i < (minshowcount+1); i++)
+	   evas_textblock_cursor_char_prev(tc2);
+   cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
+
+   // FIXME: consider other unicode encoding, currenly only care about utf-8
+   lencutstr = strlen(cutstr);
+   elstr = malloc(sizeof(char)*(lencutstr+minshowcount+1));
+   strcpy(elstr, cutstr);
+   strcat(elstr, ellipsis_string);
+
+   edje_object_part_text_set(wd->lbl, "elm.text", elstr);
+
+   free(elstr);
+   evas_textblock_cursor_free(tc1);
+   evas_textblock_cursor_free(tc2);
+	
+   return EINA_TRUE;
+}
+
+static Eina_Bool
+_ellipsis_fit_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   const char *ellipsis_string = "...";
+   int minshowcount = strlen(ellipsis_string);
+   Evas_Coord w, h;
+   Evas_Textblock_Cursor *tc1, *tc2;
+   int linenum = 0, cutline = 0;
+   double lineheight = 0.0;
+   char *cutstr, *elstr;
+   int lencutstr = 0;
+   int limith = 0;
+   int i;
+
+   edje_object_part_geometry_get(wd->lbl,"elm.text", NULL, NULL, &w, &h);
+
+   tc1 = evas_object_textblock_cursor_new(edje_object_part_object_get(wd->lbl, "elm.text"));
+   tc2 = evas_object_textblock_cursor_new(edje_object_part_object_get(wd->lbl, "elm.text"));
+   // goto last paragraph
+   while (evas_textblock_cursor_paragraph_next(tc2) == EINA_TRUE)
+	   ;
+   evas_textblock_cursor_paragraph_last(tc2);
+   // get total linenumber
+   linenum = evas_textblock_cursor_line_geometry_get(tc2, NULL, NULL, NULL, NULL);
+   lineheight = h/linenum * 1.0;
+   if (wd->wrap_h > 0 && wd->wrap_h < h)
+	   limith = wd->wrap_h;
+   else
+	   limith = h;
+   cutline = limith / lineheight;
+   if (cutline < 1)
+	   cutline = 1;
+
+   evas_textblock_cursor_char_coord_set(tc1, 0, 0);
+   evas_textblock_cursor_line_set(tc2, cutline-1);
+   evas_textblock_cursor_line_char_last(tc2);
+   for (i = 0; i < (minshowcount+1); i++)
+	   evas_textblock_cursor_char_prev(tc2);
+   cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
+
+   // FIXME: consider other unicode encoding, currenly only care about utf-8
+   lencutstr = strlen(cutstr);
+   elstr = malloc(sizeof(char)*(lencutstr+minshowcount+1));
+   strcpy(elstr, cutstr);
+   strcat(elstr, ellipsis_string);
+
+   edje_object_part_text_set(wd->lbl, "elm.text", elstr);
+
+   free(elstr);
+   evas_textblock_cursor_free(tc1);
+   evas_textblock_cursor_free(tc2);
+
+   return EINA_TRUE;
+}
+
+static void
 _ellipsis_label_to_width(Evas_Object *obj, int linemode)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   int cur_fontsize = 0, len, showcount;
-   Eina_Strbuf *fontbuf = NULL, *txtbuf = NULL;
+   if (!wd) return;
+
+   int cur_fontsize = 0;
+   Eina_Strbuf *txtbuf = NULL;
    char **kvalue = NULL;
    const char *minfont, *deffont, *maxfont;
-   const char *ellipsis_string = "...";
-   int minfontsize, maxfontsize, minshowcount;
+   int minfontsize, maxfontsize;
 
-   minshowcount = strlen(ellipsis_string) + 1;
    minfont = edje_object_data_get(wd->lbl, "min_font_size");
    if (minfont) minfontsize = atoi(minfont);
    else minfontsize = 1;
@@ -419,51 +555,23 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
      {
        if (cur_fontsize > minfontsize)
          {
-           cur_fontsize--;
-           if (fontbuf != NULL)
-             {
-               eina_strbuf_free(fontbuf);
-               fontbuf = NULL;
-             }
-           fontbuf = eina_strbuf_new();
-           eina_strbuf_append_printf(fontbuf, "%d", cur_fontsize);
-           _strbuf_key_value_replace(txtbuf, "font_size", eina_strbuf_string_get(fontbuf), 0);
-           edje_object_part_text_set(wd->lbl, "elm.text", eina_strbuf_string_get(txtbuf));
-           eina_strbuf_free(fontbuf);
-           fontbuf = NULL;
+           cur_fontsize -= 3;
+		   if (cur_fontsize < minfontsize)
+             cur_fontsize = minfontsize;
+		   _ellipsis_fontsize_set(obj, cur_fontsize, txtbuf);
          }
        else
          {
-           if (txtbuf != NULL)
+           if (linemode == 0) // single line
              {
-               eina_strbuf_free(txtbuf);
-               txtbuf = NULL;
-             }
-           txtbuf = eina_strbuf_new();
-           eina_strbuf_append_printf(txtbuf, "%s", edje_object_part_text_get(wd->lbl, "elm.text"));
-           len = eina_strbuf_length_get(txtbuf);
-           showcount = len - 1;
-           while (showcount > minshowcount)
+               _ellipsis_cut_chars_to_widget(obj, cur_fontsize, linemode);
+			   break;
+			 }
+           else // multiline
              {
-               unsigned char *ltxt = eina_strbuf_string_get(txtbuf);
-               len = eina_strbuf_length_get(txtbuf);
-               // FIXME : more reliable truncate routine is needed
-               //         it works on only EUC-KR
-               int delta = 0;
-			   if (ltxt[len-minshowcount-delta] >= 0x80)
-                 {
-                   delta = 2;
-                   showcount--;
-                 }
-               eina_strbuf_remove(txtbuf, len-minshowcount-delta, len);
-               eina_strbuf_append(txtbuf, ellipsis_string);
-               edje_object_part_text_set(wd->lbl, "elm.text", eina_strbuf_string_get(txtbuf));
-
-               if (_is_width_over(obj, linemode))
-                 showcount--;
-               else 
-                 break;
-             }
+               _ellipsis_fit_chars_to_widget(obj, cur_fontsize, linemode);
+			   break;
+			 }
          }
      }
 
