@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build46) unstable; urgency=low
+
+  * add controlbar vertical mode
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build46
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 02 Nov 2010 10:50:43 +0900
+
 elementary (1.0.0+svn.51480slp2+build45) unstable; urgency=low
 
   * Packaging with many changes.
