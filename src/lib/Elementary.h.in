@@ -2039,13 +2039,13 @@ extern "C" {
    /* QuickContactBadge */
    typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;
 
-   EAPI Evas_Object *elm_quickcontactbadge_add(Evas_Object* parent);
-   EAPI void         elm_quickcontactbadge_item_icon_set(Elm_Quickcontactbadge_Item* item, Evas_Object* icon);
-   EAPI Elm_Quickcontactbadge_Item* elm_quickcontactbadge_icon_add( Evas_Object* obj, Evas_Object* icon, void (*func ) (void* data, Evas_Object* obj, void* event_info ), const void* data ); 
-   EAPI void         elm_quickcontactbadge_item_del(Elm_Quickcontactbadge_Item* item);
-   EAPI void         elm_quickcontactbadge_clear(Evas_Object* obj);
-   EAPI void         elm_quickcontactbadge_horizontal_set( Evas_Object* obj, Eina_Bool horizontal );
-   EAPI Evas_Object *elm_quickcontactbadge_item_icon_get( Elm_Quickcontactbadge_Item* item ); 
+   EINA_DEPRECATED EAPI Evas_Object *elm_quickcontactbadge_add(Evas_Object* parent);
+   EINA_DEPRECATED EAPI void         elm_quickcontactbadge_item_icon_set(Elm_Quickcontactbadge_Item* item, Evas_Object* icon);
+   EINA_DEPRECATED EAPI Elm_Quickcontactbadge_Item* elm_quickcontactbadge_icon_add( Evas_Object* obj, Evas_Object* icon, void (*func ) (void* data, Evas_Object* obj, void* event_info ), const void* data ); 
+   EINA_DEPRECATED EAPI void         elm_quickcontactbadge_item_del(Elm_Quickcontactbadge_Item* item);
+   EINA_DEPRECATED EAPI void         elm_quickcontactbadge_clear(Evas_Object* obj);
+   EINA_DEPRECATED EAPI void         elm_quickcontactbadge_horizontal_set( Evas_Object* obj, Eina_Bool horizontal );
+   EINA_DEPRECATED EAPI Evas_Object *elm_quickcontactbadge_item_icon_get( Elm_Quickcontactbadge_Item* item ); 
 
    /* Tab */
    typedef enum _Elm_Tab_Move_Type
@@ -2346,10 +2346,10 @@ extern "C" {
         ELM_ACTIONSHEET_BT_DESTRUCTIVE
      } Elm_Actionsheet_Button_Type;
 
-   EAPI Evas_Object *elm_actionsheet_add(Evas_Object *parent);
-   EAPI void         elm_actionsheet_title_set(Evas_Object *obj, const char *title);
-   EAPI void         elm_actionsheet_button_add(Evas_Object *obj, const Elm_Actionsheet_Button_Type type, const char *title, void (*button_clicked_cb) (void *data, Evas_Object *obj, void *event_info), void *event_info);
-   EAPI int          elm_actionsheet_button_title_get(Evas_Object *obj, const int index, char **title);
+   EINA_DEPRECATED EAPI Evas_Object *elm_actionsheet_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_actionsheet_title_set(Evas_Object *obj, const char *title);
+   EINA_DEPRECATED EAPI void         elm_actionsheet_button_add(Evas_Object *obj, const Elm_Actionsheet_Button_Type type, const char *title, void (*button_clicked_cb) (void *data, Evas_Object *obj, void *event_info), void *event_info);
+   EINA_DEPRECATED EAPI int          elm_actionsheet_button_title_get(Evas_Object *obj, const int index, char **title);
 
    /* colorpicker */
    EAPI Evas_Object *elm_colorpicker_add(Evas_Object *parent);

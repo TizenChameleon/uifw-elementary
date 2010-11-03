@@ -307,7 +307,6 @@ _get_indicator_h(Evas_Object *parent)
 	return h;
 }
 
-
 static Elm_Ctxpopup_Arrow
 _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 {
@@ -315,13 +314,13 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    Evas_Coord_Point pos;
    Evas_Coord_Point base_size;
    Evas_Coord_Point max_size;
-   Evas_Coord_Point temp;
    Evas_Coord_Rectangle area_rect;
    Evas_Coord_Point parent_size;
    Evas_Coord_Point arrow_size;
    Elm_Ctxpopup_Arrow arrow;
    Evas_Coord finger_size;
-   Evas_Coord indicator_h ;
+   Evas_Coord indicator_h;
+   Evas_Coord_Point temp;
    int idx;
 
    wd = elm_widget_data_get(obj);
@@ -375,52 +374,117 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 
    for (idx = 0; idx < 4; ++idx)
    {
-	switch (wd->arrow_priority[idx])
-	{
-		case ELM_CTXPOPUP_ARROW_DOWN:
-			temp.y = pos.y - base_size.y;
-		    if ((temp.y - arrow_size.y - finger_size) < area_rect.y)
-		    	continue;
-			_adjust_pos_x( &pos, &base_size, &area_rect );
-			pos.y -= (base_size.y + finger_size);
-			arrow = ELM_CTXPOPUP_ARROW_DOWN;
-			break;
-		case ELM_CTXPOPUP_ARROW_RIGHT:
-			temp.x = (pos.x - base_size.x);
-			if ((temp.x - arrow_size.x - finger_size) < area_rect.x)
-				continue;
-			_adjust_pos_y( &pos, &base_size, &area_rect );
-			pos.x -= (base_size.x + finger_size);
-			arrow = ELM_CTXPOPUP_ARROW_RIGHT;
-			break;
-		case ELM_CTXPOPUP_ARROW_LEFT:
-			temp.x = (pos.x + base_size.x);
-			if ((temp.x + arrow_size.x + finger_size) > (area_rect.x + area_rect.w))
-				continue;
-			_adjust_pos_y( &pos, &base_size, &area_rect );
-			pos.x += finger_size;
-			arrow = ELM_CTXPOPUP_ARROW_LEFT;
-			break;
-		case ELM_CTXPOPUP_ARROW_UP:
-			temp.y = (pos.y + base_size.y);
-			if ((temp.y + arrow_size.y + finger_size) > (area_rect.y +area_rect.h))
-				continue;
-			_adjust_pos_x( &pos, &base_size, &area_rect );
-			pos.y += finger_size;
-			arrow = ELM_CTXPOPUP_ARROW_UP;
-			break;
-		default:
-			break;
-	  }
-	break;
+	   switch ( wd->arrow_priority[ idx ] )
+	   	{
+	   		case ELM_CTXPOPUP_ARROW_DOWN:
+	   			temp.y = pos.y - base_size.y;
+	   		    if ((temp.y - arrow_size.y - finger_size) < area_rect.y)
+	   		    	continue;
+	   			_adjust_pos_x( &pos, &base_size, &area_rect );
+	   			pos.y -= (base_size.y + finger_size);
+	   			arrow = ELM_CTXPOPUP_ARROW_DOWN;
+	   			break;
+	   		case ELM_CTXPOPUP_ARROW_RIGHT:
+	   			temp.x = (pos.x - base_size.x);
+	   			if ((temp.x - arrow_size.x - finger_size) < area_rect.x)
+	   				continue;
+	   			_adjust_pos_y( &pos, &base_size, &area_rect );
+	   			pos.x -= (base_size.x + finger_size);
+	   			arrow = ELM_CTXPOPUP_ARROW_RIGHT;
+	   			break;
+	   		case ELM_CTXPOPUP_ARROW_LEFT:
+	   			temp.x = (pos.x + base_size.x);
+	   			if ((temp.x + arrow_size.x + finger_size) > (area_rect.x + area_rect.w))
+	   				continue;
+	   			_adjust_pos_y( &pos, &base_size, &area_rect );
+	   			pos.x += finger_size;
+	   			arrow = ELM_CTXPOPUP_ARROW_LEFT;
+	   			break;
+	   		case ELM_CTXPOPUP_ARROW_UP:
+	   			temp.y = (pos.y + base_size.y);
+	   			if ((temp.y + arrow_size.y + finger_size) > (area_rect.y +area_rect.h))
+	   				continue;
+	   			_adjust_pos_x( &pos, &base_size, &area_rect );
+	   			pos.y += finger_size;
+	   			arrow = ELM_CTXPOPUP_ARROW_UP;
+	   			break;
+	   		default:
+	   			break;
+	   	  }
+	   break;
      }
 
-   //In this case, all directions are invalid because of lack of space.
+     //In this case, all directions are invalid because of lack of space.
    if( idx == 4 ) {
 	   //TODO 1: Find the largest space direction.
+/*
+	   Evas_Coord length[4];
+
+	   length[ ELM_CTXPOPUP_ARROW_DOWN ] = pos.y - area_rect.y;
+	   length[ ELM_CTXPOPUP_ARROW_UP ] = ( area_rect.y + area_rect.h ) - pos.y;
+	   length[ ELM_CTXPOPUP_ARROW_RIGHT ] = pos.x - area_rect.x;
+	   length[ ELM_CTXPOPUP_ARROW_LEFT ] = ( area_rect.x + area_rect.w ) - pos.x;
+
+	   int i, j, idx;
+	   for( i = 0; i < 4; ++i ) {
+		   for( j = 1; j < 4; ++j ) {
+			   if( length[ idx ] < length[ j ] ) {
+				   idx = j;
+			   }
+		   }
+	   }
+*/
+	   //TODO 1: Find the largest space direction.
+	   Evas_Coord length[2];
+	   length[ 0 ] = pos.y - area_rect.y;
+	   length[ 1 ] = ( area_rect.y + area_rect.h ) - pos.y;
+
+	   int idx;
+	   if(length[0] > length[1] )
+		   idx = ELM_CTXPOPUP_ARROW_DOWN;
+	   else
+		   idx = ELM_CTXPOPUP_ARROW_UP;
 
 	   //TODO 2: determine x , y
-	   //TODO 3: resize the box
+		switch ( idx )
+		{
+			case ELM_CTXPOPUP_ARROW_DOWN:
+				_adjust_pos_x( &pos, &base_size, &area_rect );
+				pos.y -= (base_size.y + finger_size);
+				arrow = ELM_CTXPOPUP_ARROW_DOWN;
+				if(pos.y < area_rect.y + arrow_size.y) {
+					base_size.y -= ( (area_rect.y + arrow_size.y) - pos.y );
+					pos.y = area_rect.y + arrow_size.y;
+				}
+				break;
+			case ELM_CTXPOPUP_ARROW_RIGHT:
+				_adjust_pos_y( &pos, &base_size, &area_rect );
+				pos.x -= (base_size.x + finger_size);
+				arrow = ELM_CTXPOPUP_ARROW_RIGHT;
+				if(pos.x < area_rect.x + arrow_size.x) {
+					base_size.x -= ( (area_rect.x + arrow_size.x) - pos.x );
+					pos.x = area_rect.x + arrow_size.x;
+				}
+				break;
+			case ELM_CTXPOPUP_ARROW_LEFT:
+				_adjust_pos_y( &pos, &base_size, &area_rect );
+				pos.x += finger_size;
+				arrow = ELM_CTXPOPUP_ARROW_LEFT;
+				if( pos.x + arrow_size.x + base_size.x > area_rect.x + area_rect.w ) {
+					base_size.x -= ( (pos.x + arrow_size.x + base_size.x )  - (area_rect.x + area_rect.w ) );
+				}
+				break;
+			case ELM_CTXPOPUP_ARROW_UP:
+				_adjust_pos_x( &pos, &base_size, &area_rect );
+				pos.y += finger_size;
+				arrow = ELM_CTXPOPUP_ARROW_UP;
+				if( pos.y + arrow_size.y + base_size.y  > area_rect.y + area_rect.h ) {
+					base_size.y -= ( ( pos.y + arrow_size.y +  base_size.y ) - (area_rect.y + area_rect.h) );
+				}
+				break;
+			default:
+				break;
+		  }
    }
 
    rect->x = pos.x;
@@ -917,7 +981,6 @@ elm_ctxpopup_add(Evas_Object *parent)
 
    //Box
    wd->box = elm_box_add(obj);
-   evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_scroller_content_set(wd->scroller, wd->box);
 

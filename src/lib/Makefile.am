@@ -99,7 +99,6 @@ elm_editfield.c \
 elm_colorpicker.c \
 elm_colorpalette.c \
 elm_ctxpopup.c \
-elm_quickcontactbadge.c \
 elm_actionsheet.c \
 elm_gridbox.c \
 elm_softkey.c \
