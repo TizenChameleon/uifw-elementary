@@ -913,6 +913,19 @@ done_button_cb(void *data, Evas_Object * obj, void *event_info)
 //
 ////////////////////////////////////////////////////////////////////
 
+static Eina_Bool
+item_exist_check(Widget_Data *wd, Elm_Controlbar_Item *item)
+{
+   const Eina_List *l;
+   Elm_Controlbar_Item *it;
+
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+	if(it == item) return EINA_TRUE;
+     }
+   return EINA_FALSE;
+}
+
 static int
 check_bar_item_number(Widget_Data *wd)
 {
@@ -1328,10 +1341,10 @@ selected_box(Elm_Controlbar_Item * it)
 	  {
 	     it->func(it->data, it->obj, it);
 	  }
-	if(it->base) edje_object_signal_emit(_EDJ(it->base), "elm,state,text_unselected", "elm");
+	if(item_exist_check(wd, it)) edje_object_signal_emit(_EDJ(it->base), "elm,state,text_unselected", "elm");
    }
 
-   if(it) evas_object_smart_callback_call(it->obj, "clicked", it);
+   if(item_exist_check(wd, it)) evas_object_smart_callback_call(it->obj, "clicked", it);
 }
 
 static void
