@@ -442,7 +442,7 @@ _ellipsis_cut_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
 //   evas_textblock_cursor_paragraph_char_first(tc1);
    evas_textblock_cursor_pos_set(tc1, 0);
    evas_textblock_cursor_char_coord_set(tc2, limitw, 0);
-   for (i = 0; i < (minshowcount+1); i++)
+   for (i = 0; i <= minshowcount; i++)
 	   evas_textblock_cursor_char_prev(tc2);
    cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
 
@@ -502,7 +502,7 @@ _ellipsis_fit_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
    evas_textblock_cursor_pos_set(tc1, 0);
    evas_textblock_cursor_line_set(tc2, cutline-1);
    evas_textblock_cursor_line_char_last(tc2);
-   for (i = 0; i < (minshowcount+1); i++)
+   for (i = 0; i <= minshowcount; i++)
 	   evas_textblock_cursor_char_prev(tc2);
    cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
 
@@ -949,6 +949,7 @@ elm_label_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g,
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
    evas_object_color_set(wd->bg, r, g, b, a);
 
    if (wd->bgcolor == EINA_FALSE)
@@ -970,6 +971,7 @@ elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
    if (wd->ellipsis == ellipsis) return;
    wd->ellipsis = ellipsis;
    if (wd->linewrap) _theme_change(obj);
@@ -990,6 +992,7 @@ elm_label_wrap_mode_set(Evas_Object *obj, Eina_Bool wrapmode)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
    if (wd->wrapmode == wrapmode) return;
    wd->wrapmode = wrapmode;
    _label_state_change(obj);
