@@ -1328,10 +1328,10 @@ selected_box(Elm_Controlbar_Item * it)
 	  {
 	     it->func(it->data, it->obj, it);
 	  }
-	edje_object_signal_emit(_EDJ(it->base), "elm,state,text_unselected", "elm");
+	if(it->base) edje_object_signal_emit(_EDJ(it->base), "elm,state,text_unselected", "elm");
    }
 
-   evas_object_smart_callback_call(it->obj, "clicked", it);
+   if(it) evas_object_smart_callback_call(it->obj, "clicked", it);
 }
 
 static void
