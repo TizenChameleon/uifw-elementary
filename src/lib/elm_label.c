@@ -442,7 +442,7 @@ _ellipsis_cut_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
 //   evas_textblock_cursor_paragraph_char_first(tc1);
    evas_textblock_cursor_pos_set(tc1, 0);
    evas_textblock_cursor_char_coord_set(tc2, limitw, 0);
-   for (i = 0; i < (minshowcount+1); i++)
+   for (i = 0; i <= minshowcount; i++)
 	   evas_textblock_cursor_char_prev(tc2);
    cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
 
@@ -502,7 +502,7 @@ _ellipsis_fit_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
    evas_textblock_cursor_pos_set(tc1, 0);
    evas_textblock_cursor_line_set(tc2, cutline-1);
    evas_textblock_cursor_line_char_last(tc2);
-   for (i = 0; i < (minshowcount+1); i++)
+   for (i = 0; i <= minshowcount; i++)
 	   evas_textblock_cursor_char_prev(tc2);
    cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
 
