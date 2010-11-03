@@ -1342,7 +1342,8 @@ elm_ctxpopup_button_append(Evas_Object *obj, const char *label,
 	edje_object_part_swallow(wd->btn_layout, buf, btn);
 
 	edje_object_part_geometry_get(wd->btn_layout, buf, NULL, NULL, &w, &h);
-	evas_object_size_hint_max_set(wd->btn_layout, -1, 60);
+	//TODO: remove this line!!
+	evas_object_size_hint_max_set(wd->btn_layout, -1, 60 * elm_scale_get() );
 
    if (wd->visible)
       _sizing_eval(obj);
