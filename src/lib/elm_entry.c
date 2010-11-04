@@ -256,9 +256,20 @@ _del_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Elm_Entry_Context_Menu_Item *it;
    Elm_Entry_Item_Provider *ip;
+   Evas_Object *parent_obj = obj;   
+   Evas_Object *above = NULL;   
 
    if (wd->hovdeljob) ecore_job_del(wd->hovdeljob);
    if ((wd->api) && (wd->api->obj_unhook)) wd->api->obj_unhook(obj); // module - unhook
+
+   /*  added for locating parents as they were */
+   while (parent_obj)
+     {
+        above = evas_object_data_get(parent_obj, "raise");         
+        if (above)
+           evas_object_stack_below(parent_obj, above);
+        parent_obj = elm_widget_parent_get(parent_obj); 
+     }
 
    entries = eina_list_remove(entries, obj);
 #ifdef HAVE_ELEMENTARY_X
