@@ -4,7 +4,6 @@
 /elm_ts/toggle/utc_UIFW_elm_toggle_icon_set_func
 /elm_ts/toggle/utc_UIFW_elm_toggle_icon_get_func
 /elm_ts/toggle/utc_UIFW_elm_toggle_states_labels_set_func
-/elm_ts/toggle/utc_UIFW__battery_read_status_func
 /elm_ts/toggle/utc_UIFW_elm_toggle_states_labels_get_func
 /elm_ts/toggle/utc_UIFW_elm_toggle_state_set_func
 /elm_ts/toggle/utc_UIFW_elm_toggle_state_get_func
