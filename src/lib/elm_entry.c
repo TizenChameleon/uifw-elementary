@@ -454,7 +454,9 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         
         while (parent_obj)
 	  {
-             evas_object_data_set(parent_obj, "raise", evas_object_above_get(parent_obj));
+             above = evas_object_above_get(parent_obj);
+             if (above)
+                evas_object_data_set(parent_obj, "raise", above);
 	     evas_object_raise(parent_obj);
 	     parent_obj = elm_widget_parent_get(parent_obj); 
 	  }
@@ -471,7 +473,8 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         while (parent_obj)
 	  {
              above = evas_object_data_get(parent_obj, "raise");         
-             evas_object_stack_below(parent_obj, above);
+             if (above)
+                evas_object_stack_below(parent_obj, above);
 	     parent_obj = elm_widget_parent_get(parent_obj); 
 	  }
      }
