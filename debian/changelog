@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build48) unstable; urgency=low
+
+  * rolled-back elm_label to 11th OCT.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build48
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Thu, 04 Nov 2010 23:37:09 +0900
+
 elementary (1.0.0+svn.51480slp2+build47) unstable; urgency=low
 
   * add controlbar vertical mode
