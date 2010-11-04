@@ -1382,12 +1382,14 @@ unpressed_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 	  }
      }
 
-   evas_object_geometry_get(wd->pre_item->base, &x, &y, &w, &h);
-   if(ev->output.x > x && ev->output.x < x+w && ev->output.y > y && ev->output.y < y+h)
+   if(item_exist_check(wd, wd->pre_item))
      {
-	selected_box(wd->pre_item);
+	evas_object_geometry_get(wd->pre_item->base, &x, &y, &w, &h);
+	if(ev->output.x > x && ev->output.x < x+w && ev->output.y > y && ev->output.y < y+h)
+	  {
+	     selected_box(wd->pre_item);
+	  }
      }
-
    return;
 }
 
