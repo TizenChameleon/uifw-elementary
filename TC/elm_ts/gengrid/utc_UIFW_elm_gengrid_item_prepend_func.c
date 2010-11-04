@@ -57,8 +57,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_gengrid_item_append_func_01(void);
-static void utc_UIFW_elm_gengrid_item_append_func_02(void);
+static void utc_UIFW_elm_gengrid_item_prepend_func_01(void);
+static void utc_UIFW_elm_gengrid_item_prepend_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -66,8 +66,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_gengrid_item_append_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_gengrid_item_append_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_gengrid_item_prepend_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_gengrid_item_prepend_func_02, NEGATIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -123,7 +123,7 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-static void utc_UIFW_elm_gengrid_item_append_func_01(void)
+static void utc_UIFW_elm_gengrid_item_prepend_func_01(void)
 {
 	Elm_Gengrid_Item *item = NULL;
 	
@@ -131,10 +131,10 @@ static void utc_UIFW_elm_gengrid_item_append_func_01(void)
 	TET_CHECK_PASS(NULL, item);
 	
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_gengrid_item_append");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_gengrid_item_prepend");
 }
 
-static void utc_UIFW_elm_gengrid_item_append_func_02(void)
+static void utc_UIFW_elm_gengrid_item_prepend_func_02(void)
 {
 	Elm_Gengrid_Item *item = NULL;
 
@@ -142,5 +142,5 @@ static void utc_UIFW_elm_gengrid_item_append_func_02(void)
 	TET_CHECK_FAIL(NULL, item);
 	
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_gengrid_item_append");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_gengrid_item_prepend");
 }
