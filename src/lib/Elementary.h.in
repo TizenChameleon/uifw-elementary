@@ -1944,13 +1944,13 @@ extern "C" {
    */
    
    /* titlebar */
-   EAPI Evas_Object *elm_titlebar_add(Evas_Object *parent);
-   EAPI void         elm_titlebar_label_set(Evas_Object *obj, const char *label);
-   EAPI const char  *elm_titlebar_label_get(Evas_Object *obj);
-   EAPI void         elm_titlebar_icon_set(Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object *elm_titlebar_icon_get(Evas_Object *obj);
-   EAPI void         elm_titlebar_end_set(Evas_Object *obj, Evas_Object *end);
-   EAPI Evas_Object *elm_titlebar_end_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI Evas_Object *elm_titlebar_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_titlebar_label_set(Evas_Object *obj, const char *label);
+   EINA_DEPRECATED EAPI const char  *elm_titlebar_label_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_titlebar_icon_set(Evas_Object *obj, Evas_Object *icon);
+   EINA_DEPRECATED EAPI Evas_Object *elm_titlebar_icon_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_titlebar_end_set(Evas_Object *obj, Evas_Object *end);
+   EINA_DEPRECATED EAPI Evas_Object *elm_titlebar_end_get(Evas_Object *obj);
 
    /* popup */
    typedef enum _Elm_Popup_Response
@@ -2036,17 +2036,6 @@ extern "C" {
    EAPI Eina_Bool    elm_ctxpopup_position_forced_get(Evas_Object *obj);
    EAPI void         elm_ctxpopup_area_set(Evas_Object *obj, Evas_Object *rect); 
    
-   /* QuickContactBadge */
-   typedef struct _Quickcontactbadge_Item Elm_Quickcontactbadge_Item;
-
-   EINA_DEPRECATED EAPI Evas_Object *elm_quickcontactbadge_add(Evas_Object* parent);
-   EINA_DEPRECATED EAPI void         elm_quickcontactbadge_item_icon_set(Elm_Quickcontactbadge_Item* item, Evas_Object* icon);
-   EINA_DEPRECATED EAPI Elm_Quickcontactbadge_Item* elm_quickcontactbadge_icon_add( Evas_Object* obj, Evas_Object* icon, void (*func ) (void* data, Evas_Object* obj, void* event_info ), const void* data ); 
-   EINA_DEPRECATED EAPI void         elm_quickcontactbadge_item_del(Elm_Quickcontactbadge_Item* item);
-   EINA_DEPRECATED EAPI void         elm_quickcontactbadge_clear(Evas_Object* obj);
-   EINA_DEPRECATED EAPI void         elm_quickcontactbadge_horizontal_set( Evas_Object* obj, Eina_Bool horizontal );
-   EINA_DEPRECATED EAPI Evas_Object *elm_quickcontactbadge_item_icon_get( Elm_Quickcontactbadge_Item* item ); 
-
    /* Tab */
    typedef enum _Elm_Tab_Move_Type
      {
@@ -2067,24 +2056,24 @@ extern "C" {
 
    typedef struct _Elm_Tab_Item Elm_Tab_Item;
 
-   EAPI Evas_Object  *elm_tab_add(Evas_Object *parent);
-   EAPI void          elm_tab_set(Evas_Object *obj, int mode);
-   EAPI Elm_Tab_Item *elm_tab_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *data);
-   EAPI void          elm_tab_item_del(Elm_Tab_Item *item);
-   EAPI void          elm_tab_item_select(Elm_Tab_Item *item);
-   EAPI Evas_Object  *elm_tab_item_icon_get(Elm_Tab_Item *item);
-   EAPI const char   *elm_tab_item_label_get(Elm_Tab_Item *item);
-   EAPI void          elm_tab_item_label_set(Elm_Tab_Item *item, const char *label);
-   EAPI void          elm_tab_item_badge_set(Elm_Tab_Item *item, const int badge);   
-   EAPI Elm_Tab_Item *elm_tab_selected_item_get(Evas_Object *obj);   
-   EAPI Elm_Tab_Item *elm_tab_first_item_get(Evas_Object *obj);   
-   EAPI Elm_Tab_Item *elm_tab_last_item_get(Evas_Object *obj);   
-   EAPI Eina_List    *elm_tab_items_get(Evas_Object *obj);   
-   EAPI Elm_Tab_Item *elm_tab_item_prev(Elm_Tab_Item *item);   
-   EAPI Elm_Tab_Item *elm_tab_item_next(Elm_Tab_Item *item);   
-   EAPI void          elm_tab_move(Evas_Object *obj, int direction);
-   EAPI void          elm_tab_edit_disable_set(Evas_Object *obj, Eina_Bool disable);
-   EAPI Eina_Bool     elm_tab_edit_disable_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI Evas_Object  *elm_tab_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void          elm_tab_set(Evas_Object *obj, int mode);
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *data);
+   EINA_DEPRECATED EAPI void          elm_tab_item_del(Elm_Tab_Item *item);
+   EINA_DEPRECATED EAPI void          elm_tab_item_select(Elm_Tab_Item *item);
+   EINA_DEPRECATED EAPI Evas_Object  *elm_tab_item_icon_get(Elm_Tab_Item *item);
+   EINA_DEPRECATED EAPI const char   *elm_tab_item_label_get(Elm_Tab_Item *item);
+   EINA_DEPRECATED EAPI void          elm_tab_item_label_set(Elm_Tab_Item *item, const char *label);
+   EINA_DEPRECATED EAPI void          elm_tab_item_badge_set(Elm_Tab_Item *item, const int badge);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_selected_item_get(Evas_Object *obj);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_first_item_get(Evas_Object *obj);   
+   EINA_DEPRECATED API Elm_Tab_Item *elm_tab_last_item_get(Evas_Object *obj);   
+   EINA_DEPRECATED EAPI Eina_List    *elm_tab_items_get(Evas_Object *obj);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_item_prev(Elm_Tab_Item *item);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_item_next(Elm_Tab_Item *item);   
+   EINA_DEPRECATED EAPI void          elm_tab_move(Evas_Object *obj, int direction);
+   EINA_DEPRECATED EAPI void          elm_tab_edit_disable_set(Evas_Object *obj, Eina_Bool disable);
+   EINA_DEPRECATED EAPI Eina_Bool     elm_tab_edit_disable_get(Evas_Object *obj);
 
    /* tansit */
    typedef struct _transit Elm_Transit;
@@ -2233,14 +2222,14 @@ extern "C" {
    #define TAB_BAR_SYSTEM_ICON_MESSAGE "elm/icon/tabbar_message/default" 
    #define TAB_BAR_SYSTEM_ICON_SETTING "elm/icon/tabbar_setting/default" 
 
-   EAPI Evas_Object *elm_tabbar_add(Evas_Object *parent);
-   EAPI Elm_Tab_Item *elm_tabbar_item_add(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
-   EAPI Evas_Object *elm_tabbar_item_icon_get(Elm_Tab_Item *it);
-   EAPI const char  *elm_tabbar_item_label_get(Elm_Tab_Item *it);
-   EAPI void         elm_tabbar_item_label_set(Elm_Tab_Item *it, const char *label);
-   EAPI void         elm_tabbar_item_select(Elm_Tab_Item *it);
-   EAPI void         elm_tabbar_edit_start(Evas_Object *obj);
-   EAPI void         elm_tabbar_item_visible_set(Elm_Tab_Item *it, Eina_Bool bar);
+   EINA_DEPRECATED EAPI Evas_Object *elm_tabbar_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tabbar_item_add(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
+   EINA_DEPRECATED EAPI Evas_Object *elm_tabbar_item_icon_get(Elm_Tab_Item *it);
+   EINA_DEPRECATED EAPI const char  *elm_tabbar_item_label_get(Elm_Tab_Item *it);
+   EINA_DEPRECATED EAPI void         elm_tabbar_item_label_set(Elm_Tab_Item *it, const char *label);
+   EINA_DEPRECATED EAPI void         elm_tabbar_item_select(Elm_Tab_Item *it);
+   EINA_DEPRECATED EAPI void         elm_tabbar_edit_start(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_tabbar_item_visible_set(Elm_Tab_Item *it, Eina_Bool bar);
 
    /* smart callbacks called:
     * "clicked" - when item clicked
@@ -2407,24 +2396,24 @@ extern "C" {
 
    /* softkey */
    typedef struct _Elm_Softkey_Item Elm_Softkey_Item;
-   EAPI Evas_Object *elm_softkey_add(Evas_Object *parent);
-   EAPI Elm_Softkey_Item *elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
-   EAPI void         elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type);
-   EAPI void         elm_softkey_button_show(Evas_Object *obj, Elm_Softkey_Type type);
-   EAPI void         elm_softkey_button_hide(Evas_Object *obj, Elm_Softkey_Type type);
+   EINA_DEPRECATED EAPI Evas_Object *elm_softkey_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI Elm_Softkey_Item *elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
+   EINA_DEPRECATED EAPI void         elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type);
+   EINA_DEPRECATED EAPI void         elm_softkey_button_show(Evas_Object *obj, Elm_Softkey_Type type);
+   EINA_DEPRECATED EAPI void         elm_softkey_button_hide(Evas_Object *obj, Elm_Softkey_Type type);
 
-   EAPI Elm_Softkey_Item *elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
-   EAPI int          elm_softkey_panel_del(Evas_Object *obj);
-   EAPI int          elm_softkey_panel_close(Evas_Object *obj);
-   EAPI int          elm_softkey_panel_open(Evas_Object *obj);
+   EINA_DEPRECATED EAPI Elm_Softkey_Item *elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
+   EINA_DEPRECATED EAPI int          elm_softkey_panel_del(Evas_Object *obj);
+   EINA_DEPRECATED EAPI int          elm_softkey_panel_close(Evas_Object *obj);
+   EINA_DEPRECATED EAPI int          elm_softkey_panel_open(Evas_Object *obj);
 
-   EAPI void         elm_softkey_item_icon_set(Elm_Softkey_Item *item, Evas_Object *icon);
-   EAPI Evas_Object *elm_softkey_item_icon_get(Elm_Softkey_Item * item);
-   EAPI void         elm_softkey_item_label_set(Elm_Softkey_Item *item, const char *label);
-   EAPI const char  *elm_softkey_item_label_get(Elm_Softkey_Item * item);
-   EAPI Eina_Bool    elm_softkey_item_disabled_get(Elm_Softkey_Item *item);
-   EAPI void         elm_softkey_item_disabled_set(Elm_Softkey_Item *item, Eina_Bool disabled);
-   EAPI void         elm_softkey_item_callback_set(Elm_Softkey_Item* item, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data );
+   EINA_DEPRECATED EAPI void         elm_softkey_item_icon_set(Elm_Softkey_Item *item, Evas_Object *icon);
+   EINA_DEPRECATED EAPI Evas_Object *elm_softkey_item_icon_get(Elm_Softkey_Item * item);
+   EINA_DEPRECATED EAPI void         elm_softkey_item_label_set(Elm_Softkey_Item *item, const char *label);
+   EINA_DEPRECATED EAPI const char  *elm_softkey_item_label_get(Elm_Softkey_Item * item);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_softkey_item_disabled_get(Elm_Softkey_Item *item);
+   EINA_DEPRECATED EAPI void         elm_softkey_item_disabled_set(Elm_Softkey_Item *item, Eina_Bool disabled);
+   EINA_DEPRECATED EAPI void         elm_softkey_item_callback_set(Elm_Softkey_Item* item, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data );
    /* smart callback called: 
     * "clicked" - the user clicked the button, event_info: Softkey item
     * "press"   - the user press the button, event_info: Softkey item
@@ -2433,13 +2422,13 @@ extern "C" {
     */
        
    /* gridbox */
-   EAPI Evas_Object *elm_gridbox_add(Evas_Object *parent);
-   EAPI void         elm_gridbox_padding_set(Evas_Object *obj, Evas_Coord horizontal, Evas_Coord vertical);
-   EAPI void         elm_gridbox_item_size_set(Evas_Object *obj, Evas_Coord h_itemsize, Evas_Coord v_itemsize);
-   EAPI void         elm_gridbox_pack(Evas_Object *obj, Evas_Object *subobj);
-   EAPI Eina_Bool    elm_gridbox_unpack(Evas_Object *obj, Evas_Object *subobj);
-   EAPI Eina_List   *elm_gridbox_children_get(Evas_Object *obj);
-   EAPI void         elm_gridbox_homogenous_padding_set(Evas_Object *obj, Eina_Bool homogenous);
+   EINA_DEPRECATED EAPI Evas_Object *elm_gridbox_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_gridbox_padding_set(Evas_Object *obj, Evas_Coord horizontal, Evas_Coord vertical);
+   EINA_DEPRECATED EAPI void         elm_gridbox_item_size_set(Evas_Object *obj, Evas_Coord h_itemsize, Evas_Coord v_itemsize);
+   EINA_DEPRECATED EAPI void         elm_gridbox_pack(Evas_Object *obj, Evas_Object *subobj);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_gridbox_unpack(Evas_Object *obj, Evas_Object *subobj);
+   EINA_DEPRECATED EAPI Eina_List   *elm_gridbox_children_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_gridbox_homogenous_padding_set(Evas_Object *obj, Eina_Bool homogenous);
 
    /* actionslider */                        
    typedef enum _Elm_Actionslider_Indicator_Pos  
@@ -2489,16 +2478,16 @@ extern "C" {
         Eina_Bool on_highquality : 1;		
      };
    typedef struct _Elm_Gallery_Item Elm_Gallery_Item;
-   EAPI Evas_Object *elm_gallery_add(Evas_Object *parent);
-   EAPI Eina_Bool    elm_gallery_data_set(Evas_Object *obj, Eina_List *list);
-   EAPI Elm_Gallery_Item *elm_gallery_item_append(Evas_Object *obj, const char *photo_file);
-   EAPI Elm_Gallery_Item *elm_gallery_item_prepend(Evas_Object *obj, const char *photo_file);
-   EAPI void         elm_gallery_item_del(Elm_Gallery_Item *it);
-   EAPI const char  *elm_gallery_item_file_get(Elm_Gallery_Item *it);
-   EAPI void         elm_gallery_item_show(Elm_Gallery_Item *it);
-   EAPI Eina_List   *elm_gallery_item_list_get(Evas_Object *obj);
-   EAPI void         elm_gallery_set_type(Evas_Object *obj,int type);
-   EAPI void         elm_gallery_set_max_count(Evas_Object *obj,int max_value);
+   EINA_DEPRECATED EAPI Evas_Object *elm_gallery_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_gallery_data_set(Evas_Object *obj, Eina_List *list);
+   EINA_DEPRECATED EAPI Elm_Gallery_Item *elm_gallery_item_append(Evas_Object *obj, const char *photo_file);
+   EINA_DEPRECATED EAPI Elm_Gallery_Item *elm_gallery_item_prepend(Evas_Object *obj, const char *photo_file);
+   EINA_DEPRECATED EAPI void         elm_gallery_item_del(Elm_Gallery_Item *it);
+   EINA_DEPRECATED EAPI const char  *elm_gallery_item_file_get(Elm_Gallery_Item *it);
+   EINA_DEPRECATED EAPI void         elm_gallery_item_show(Elm_Gallery_Item *it);
+   EINA_DEPRECATED EAPI Eina_List   *elm_gallery_item_list_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_gallery_set_type(Evas_Object *obj,int type);
+   EINA_DEPRECATED EAPI void         elm_gallery_set_max_count(Evas_Object *obj,int max_value);
 
    /* Sliding Drawer */
    typedef enum _Elm_SlidingDrawer_Pos 
