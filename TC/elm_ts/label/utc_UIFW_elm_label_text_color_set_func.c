@@ -32,8 +32,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_label_font_color_set_func_01(void);
-static void utc_UIFW_elm_label_font_color_set_func_02(void);
+static void utc_UIFW_elm_label_text_color_set_func_01(void);
+static void utc_UIFW_elm_label_text_color_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -41,8 +41,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_label_font_color_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_label_font_color_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_label_text_color_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_label_text_color_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0}
 };
 
@@ -147,24 +147,24 @@ cleanup()
 }
 
 /**
- * @brief Positive test case of elm_label_font_color_set()
+ * @brief Positive test case of elm_label_text_color_set()
  */
-static void utc_UIFW_elm_label_font_color_set_func_01(void)
+static void utc_UIFW_elm_label_text_color_set_func_01(void)
 {
 	test_eo = elm_label_add(test_win);
-	elm_label_font_color_set(test_eo, 255, 255, 255, 255);
+	elm_label_text_color_set(test_eo, 255, 255, 255, 255);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, A  Label font color set is success.");
 }
 
 /**
- * @brief Negative test case of ug_init elm_label_font_color_set()
+ * @brief Negative test case of ug_init elm_label_text_color_set()
  */
-static void utc_UIFW_elm_label_font_color_set_func_02(void)
+static void utc_UIFW_elm_label_text_color_set_func_02(void)
 {
 	test_eo = elm_label_add(NULL);
-	elm_label_font_color_set(test_eo, 255, 255, 255, 255);
+	elm_label_text_color_set(NULL, 255, 255, 255, 255);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, A Label font color set is failed.");

@@ -32,8 +32,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_cancel_button_animation_set_func_01(void);
-static void utc_UIFW_elm_cancel_button_animation_set_func_02(void);
+static void utc_UIFW_elm_searchbar_cancel_button_animation_set_func_01(void);
+static void utc_UIFW_elm_searchbar_cancel_button_animation_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -41,8 +41,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_cancel_button_animation_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_cancel_button_animation_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_searchbar_cancel_button_animation_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_searchbar_cancel_button_animation_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0}
 };
 
@@ -147,24 +147,24 @@ cleanup()
 }
 
 /**
- * @brief Positive test case of elm_cancel_button_animation_set()
+ * @brief Positive test case of elm_searchbar_cancel_button_animation_set()
  */
-static void utc_UIFW_elm_cancel_button_animation_set_func_01(void)
+static void utc_UIFW_elm_searchbar_cancel_button_animation_set_func_01(void)
 {
 	test_eo = elm_searchbar_add(test_win);
-	elm_cancel_button_animation_set(test_eo, EINA_TRUE);
+	elm_searchbar_cancel_button_animation_set(test_eo, EINA_TRUE);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Setting cancel button animation flag of SearchBar is success.");
 }
 
 /**
- * @brief Negative test case of ug_init elm_cancel_button_animation_set()
+ * @brief Negative test case of ug_init elm_searchbar_cancel_button_animation_set()
  */
-static void utc_UIFW_elm_cancel_button_animation_set_func_02(void)
+static void utc_UIFW_elm_searchbar_cancel_button_animation_set_func_02(void)
 {
 	test_eo = elm_searchbar_add(NULL);
-	elm_cancel_button_animation_set(NULL, EINA_TRUE);
+	elm_searchbar_cancel_button_animation_set(NULL, EINA_TRUE);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Setting cancel button animation flag of SearchBar is failed.");

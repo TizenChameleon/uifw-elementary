@@ -902,7 +902,7 @@ elm_label_text_align_set(Evas_Object *obj, const char *alignmode)
  * @param r Red property background color of The label object 
  * @param g Green property background color of The label object 
  * @param b Blue property background color of The label object 
- * @param a Alpha property background alpha of The label object 
+ * @param a Alpha property background color of The label object 
  *
  * @ingroup Label
  */
@@ -937,7 +937,7 @@ elm_label_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsig
  * @param r Red property background color of The label object 
  * @param g Green property background color of The label object 
  * @param b Blue property background color of The label object 
- * @param a Alpha property background alpha of The label object 
+ * @param a Alpha property background color of The label object 
  * @ingroup Label
  */
 EAPI void
