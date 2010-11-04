@@ -92,8 +92,8 @@ static void startup(void)
 	test_eo = elm_gengrid_add(test_win);
 	
 	gic.item_style = "default_gridtext";
-	gic.func.label_get = grid_label_get;
-	gic.func.icon_get = grid_icon_get;
+	gic.func.label_get = NULL;
+	gic.func.icon_get = NULL;
 	
 	item = elm_gengrid_item_append(test_eo, &gic, NULL, NULL, NULL);
 	
