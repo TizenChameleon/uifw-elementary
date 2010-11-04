@@ -438,15 +438,13 @@ _ellipsis_cut_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
 	   limitw = wd->wrap_w;
    else
 	   limitw = w;
-//   evas_textblock_cursor_char_coord_set(tc1, 0, 0);
-//   evas_textblock_cursor_paragraph_char_first(tc1);
    evas_textblock_cursor_pos_set(tc1, 0);
    evas_textblock_cursor_char_coord_set(tc2, limitw, 0);
    for (i = 0; i <= minshowcount; i++)
 	   evas_textblock_cursor_char_prev(tc2);
    cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
 
-   // FIXME: consider other unicode encoding, currenly only care about utf-8
+   // FIXME: consider other unicode encoding, currently only care about utf-8
    lencutstr = strlen(cutstr);
    elstr = malloc(sizeof(char)*(lencutstr+minshowcount+1));
    strcpy(elstr, cutstr);
@@ -462,7 +460,7 @@ _ellipsis_cut_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
 }
 
 static Eina_Bool
-_ellipsis_fit_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
+_ellipsis_cut_lines_to_widget(Evas_Object *obj, int fontsize, int linemode)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
@@ -497,8 +495,6 @@ _ellipsis_fit_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
    if (cutline < 1)
 	   cutline = 1;
 
-//   evas_textblock_cursor_char_coord_set(tc1, 0, 0);
-//   evas_textblock_cursor_paragraph_char_first(tc1);
    evas_textblock_cursor_pos_set(tc1, 0);
    evas_textblock_cursor_line_set(tc2, cutline-1);
    evas_textblock_cursor_line_char_last(tc2);
@@ -506,7 +502,7 @@ _ellipsis_fit_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
 	   evas_textblock_cursor_char_prev(tc2);
    cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
 
-   // FIXME: consider other unicode encoding, currenly only care about utf-8
+   // FIXME: consider other unicode encoding, currently only care about utf-8
    lencutstr = strlen(cutstr);
    elstr = malloc(sizeof(char)*(lencutstr+minshowcount+1));
    strcpy(elstr, cutstr);
@@ -571,7 +567,7 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
 			 }
            else // multiline
              {
-               _ellipsis_fit_chars_to_widget(obj, cur_fontsize, linemode);
+               _ellipsis_cut_lines_to_widget(obj, cur_fontsize, linemode);
 			   break;
 			 }
          }
