@@ -2067,7 +2067,7 @@ extern "C" {
    EINA_DEPRECATED EAPI void          elm_tab_item_badge_set(Elm_Tab_Item *item, const int badge);   
    EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_selected_item_get(Evas_Object *obj);   
    EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_first_item_get(Evas_Object *obj);   
-   EINA_DEPRECATED API Elm_Tab_Item *elm_tab_last_item_get(Evas_Object *obj);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_last_item_get(Evas_Object *obj);   
    EINA_DEPRECATED EAPI Eina_List    *elm_tab_items_get(Evas_Object *obj);   
    EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_item_prev(Elm_Tab_Item *item);   
    EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_item_next(Elm_Tab_Item *item);   
