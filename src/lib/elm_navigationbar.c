@@ -620,10 +620,10 @@ elm_navigationbar_push(Evas_Object *obj,
 		cb->first_page = EINA_TRUE;
 	}
 	_transition_complete_cb(cb);
-	free(cb);
 	//push content to pager
 	if(!cb->first_page)
 		wd->pushed = 1;
+	free(cb);
 	elm_pager_content_push(wd->pager, it->content);	
 	//push item into the stack. it should be always the tail
 	if (!_check_item_is_added(obj, content))
