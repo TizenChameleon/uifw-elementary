@@ -73,15 +73,20 @@ _check_clicked(void *data, Evas_Object *obj, void *event_info)
 static void
 _theme_hook(Evas_Object *obj)
 {
+	char *day_name[] = {"sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+	char buf[256];
+
 	int idx;
 	Widget_Data* wd = (Widget_Data*) elm_widget_data_get(obj);
-
 	if(!wd) return;
 
   _elm_theme_object_set(obj, wd->base, "dayselector", "base", elm_widget_style_get(obj));
 
-  for(idx=0; idx<7; ++idx) 
-		elm_object_style_set(wd->check[idx], "dayselector");
+    for( idx = 0; idx < 7; ++idx ) {
+    	sprintf(buf, "dayselector/%s_%s", elm_widget_style_get(obj), day_name[idx]);
+    	elm_object_style_set(wd->check[idx], buf );
+    }
+
 }
 
 /**
@@ -158,6 +163,17 @@ elm_dayselector_add(Evas_Object *parent)
    Widget_Data *wd;
    int idx;
 
+   char *label[] = { "S", "M", "T", "W", "T", "F", "S" };
+   char *day_name[] = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+   char *style_name[] = { "dayselector/sun_first_sun",
+										  "dayselector/sun_first_mon",
+										  "dayselector/sun_first_tue",
+										  "dayselector/sun_first_wed",
+										  "dayselector/sun_first_thu",
+										  "dayselector/sun_first_fri",
+										  "dayselector/sun_first_sat",
+   };
+
    e = evas_object_evas_get(parent);
    if(!e) return NULL;
 
@@ -178,46 +194,16 @@ elm_dayselector_add(Evas_Object *parent)
 	elm_object_style_set(wd->base, "dayselector");
 	elm_widget_resize_object_set(obj, wd->base); 
 
-	//Buttons
-
-	//Left-side Button
-	wd->check[0]=elm_check_add(wd->base);
-	elm_widget_sub_object_add(obj, wd->check[0]);
-	evas_object_smart_callback_add(wd->check[0], "changed", _check_clicked, obj);
-
- 	for(idx=1; idx<6; ++idx)
+	//Checks
+ 	for(idx=0; idx<7; ++idx)
 	{
 		wd->check[idx]=elm_check_add(wd->base);
 		elm_widget_sub_object_add(obj, wd->check[idx]);
 		evas_object_smart_callback_add(wd->check[idx], "changed", _check_clicked, obj);
+		elm_check_label_set(wd->check[idx], label[idx] );
+		edje_object_part_swallow(wd->base, day_name[idx], wd->check[idx]);
+		elm_object_style_set(wd->check[idx], style_name[idx]);
 	}
-
- 	//Right-side Button
- 	wd->check[6]=elm_check_add(wd->base);
- 	elm_widget_sub_object_add(obj, wd->check[6]);
- 	evas_object_smart_callback_add(wd->check[6], "changed", _check_clicked, obj);
-
-	elm_check_label_set(wd->check[ELM_DAYSELECTOR_SUN], "S");
-	edje_object_part_swallow(wd->base, "sun", wd->check[0]);
-	elm_object_style_set(wd->check[0], "dayselector_sun");
-	elm_check_label_set(wd->check[ELM_DAYSELECTOR_MON], "M");
-	edje_object_part_swallow(wd->base, "mon", wd->check[1]);
-	elm_object_style_set(wd->check[1], "dayselector_mon");
-	elm_check_label_set(wd->check[ELM_DAYSELECTOR_TUE], "T");
-	edje_object_part_swallow(wd->base, "tue", wd->check[2]);
-	elm_object_style_set(wd->check[2], "dayselector_tue");
-	elm_check_label_set(wd->check[ELM_DAYSELECTOR_WED], "W");
-	edje_object_part_swallow(wd->base, "wed", wd->check[3]);
-	elm_object_style_set(wd->check[3], "dayselector_wed");
-	elm_check_label_set(wd->check[ELM_DAYSELECTOR_THU], "T");
-	edje_object_part_swallow(wd->base, "thu", wd->check[4]);
-	elm_object_style_set(wd->check[4], "dayselector_thu");
-	elm_check_label_set(wd->check[ELM_DAYSELECTOR_FRI], "F");
-	edje_object_part_swallow(wd->base, "fri", wd->check[5]);
-	elm_object_style_set(wd->check[5], "dayselector_fri");
-	elm_check_label_set(wd->check[ELM_DAYSELECTOR_SAT], "S");
-	edje_object_part_swallow(wd->base, "sat", wd->check[6]);
-	elm_object_style_set(wd->check[6], "dayselector_sat");
 
 //	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _dayselector_resize, wd);
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
