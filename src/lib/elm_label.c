@@ -527,12 +527,13 @@ _is_width_over(Evas_Object *obj, int linemode)
 
    // too short to ellipsis
    char *plaintxt = _mkup_to_text(edje_object_part_text_get(wd->lbl, "elm.text"));
-   if (strlen(plaintxt) <= ellen)
-     {
+   int plainlen = 0;
+   if (plaintxt != NULL)
+   {
+	   plainlen = strlen(plaintxt);
        free(plaintxt);
-       return 0;   
-     }
-   free(plaintxt);
+   }
+   if (plainlen <= ellen) return 0;   
 
    edje_object_part_geometry_get(wd->lbl,"elm.text",&x,&y,&w,&h);
 
@@ -573,7 +574,7 @@ _is_width_over(Evas_Object *obj, int linemode)
 			   return 0;
 	   }
 
-       if (ellen < wd->wrap_w && w > wd->wrap_w) return 1;
+       if (0 < wd->wrap_w && w > wd->wrap_w) return 1;
      }
    else // multiline
      {
@@ -757,14 +758,10 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
 			 }
          }
      }
-
-// remove infinite loop
-//   wd->changed = 1;
-//   _sizing_eval(obj);
 }
 
 /*
- * setting internal state of mulitline entry
+ * setting internal state of mulitline label
  * singleline doesn't need it
  */
 
