@@ -62,7 +62,7 @@
  * implements a class/callback system where the application provides a structure
  * with information about that type of item (Gengrid may contain multiple different
  * items with different classes, states and styles). Gengrid will call the functions
- * in this struct (methods) when a item is "realized" (that is created
+ * in this struct (methods) when an item is "realized" (that is created
  * dynamically while scrolling). All objects will simply be deleted when no
  * longer needed with evas_object_del(). The Elm_GenGrid_Item_Class structure
  * contains the following members:
