@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build49) unstable; urgency=low
+
+  * merged only elm_photocam with the Elementary - r54152
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build49
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Fri, 05 Nov 2010 09:13:42 +0900
+
 elementary (1.0.0+svn.51480slp2+build48) unstable; urgency=low
 
   * rolled-back elm_label to 11th OCT.
