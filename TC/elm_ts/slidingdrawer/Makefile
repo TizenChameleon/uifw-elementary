@@ -1,6 +1,11 @@
 CC ?= gcc
 
-TARGETS = uts_elm_button_add_func
+TARGETS = uts_elm_slidingdrawer_add_func \
+	  uts_elm_slidingdrawer_content_set \
+	  uts_elm_slidingdrawer_content_unset \
+	  uts_elm_slidingdrawer_pos_set \
+	  uts_elm_slidingdrawer_max_drag_value_set \
+	  uts_elm_slidingdrawer_drag_value_set
 
 PKGS = elementary
 

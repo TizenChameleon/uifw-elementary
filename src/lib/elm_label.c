@@ -335,6 +335,185 @@ _stringshare_key_value_replace(const char **srcstring, char *key, const char *va
    return 0;
 }
 
+
+// FIXME: move to some where(such as elm_util??).
+//        copied from elm_entry for check pure text length w/o tags.
+static char *
+_str_append(char *str, const char *txt, int *len, int *alloc)
+{
+   int txt_len = strlen(txt);
+
+   if (txt_len <= 0) return str;
+   if ((*len + txt_len) >= *alloc)
+     {
+	char *str2;
+	int alloc2;
+
+	alloc2 = *alloc + txt_len + 128;
+	str2 = realloc(str, alloc2);
+	if (!str2) return str;
+	*alloc = alloc2;
+	str = str2;
+     }
+   strcpy(str + *len, txt);
+   *len += txt_len;
+   return str;
+}
+
+// FIXME: move to some where(such as elm_util??).
+//        copied from elm_entry for check pure text length w/o tags.
+static char *
+_strncpy(char* dest, const char* src, size_t count)
+{
+   if (!dest) 
+     {
+	ERR( "dest is NULL" );
+	return NULL;
+     }
+   if (!src) 
+     {
+	ERR( "src is NULL" );
+	return NULL;
+     }
+   if (count < 0)
+     {
+	ERR( "count is smaller than 0" );
+	return NULL;
+     }
+
+   return strncpy( dest, src, count );
+}
+
+// FIXME: move to some where(such as elm_util??).
+//        copied from elm_entry for check pure text length w/o tags.
+static char *
+_mkup_to_text(const char *mkup)
+{
+   char *str = NULL;
+   int str_len = 0, str_alloc = 0;
+   char *s, *p;
+   char *tag_start, *tag_end, *esc_start, *esc_end, *ts;
+
+   if (!mkup) return NULL;
+   s=p=NULL;
+   tag_start = tag_end = esc_start = esc_end = NULL;
+   p = (char *)mkup;
+   s = p;
+   for (;;)
+     {
+	if (((p!=NULL)&&(*p == 0)) ||
+	    (tag_end) || (esc_end) ||
+	    (tag_start) || (esc_start))
+	  {
+	     if (tag_end)
+	       {
+		  char *ttag;
+
+		  ttag = malloc(tag_end - tag_start);
+		  if (ttag)
+		    {
+		       _strncpy(ttag, tag_start + 1, tag_end - tag_start - 1);
+		       ttag[tag_end - tag_start - 1] = 0;
+		       if (!strcmp(ttag, "br"))
+			 str = _str_append(str, "\n", &str_len, &str_alloc);
+		       else if (!strcmp(ttag, "\n"))
+			 str = _str_append(str, "\n", &str_len, &str_alloc);
+		       else if (!strcmp(ttag, "\\n"))
+			 str = _str_append(str, "\n", &str_len, &str_alloc);
+		       else if (!strcmp(ttag, "\t"))
+			 str = _str_append(str, "\t", &str_len, &str_alloc);
+		       else if (!strcmp(ttag, "\\t"))
+			 str = _str_append(str, "\t", &str_len, &str_alloc);
+		       else if (!strcmp(ttag, "ps")) /* Unicode paragraph separator */
+			 str = _str_append(str, "\xE2\x80\xA9", &str_len, &str_alloc);
+		       free(ttag);
+		    }
+		  tag_start = tag_end = NULL;
+	       }
+	     else if (esc_end)
+	       {
+		  ts = malloc(esc_end - esc_start + 1);
+		  if (ts)
+		    {
+		       const char *esc;
+		       _strncpy(ts, esc_start, esc_end - esc_start);
+		       ts[esc_end - esc_start] = 0;
+		       esc = evas_textblock_escape_string_get(ts);
+		       if (esc)
+			 str = _str_append(str, esc, &str_len, &str_alloc);
+		       free(ts);
+		    }
+		  esc_start = esc_end = NULL;
+	       }
+	     else if ((p!=NULL)&&(*p == 0))
+	       {
+		  ts = malloc(p - s + 1);
+		  if (ts)
+		    {
+		       _strncpy(ts, s, p - s);
+		       ts[p - s] = 0;
+		       str = _str_append(str, ts, &str_len, &str_alloc);
+		       free(ts);
+		    }
+                  break;
+	       }
+	  }
+	if ((p!=NULL)&&(*p == '<'))
+	  {
+	     if (!esc_start)
+	       {
+		  tag_start = p;
+		  tag_end = NULL;
+		  ts = malloc(p - s + 1);
+		  if (ts)
+		    {
+		       _strncpy(ts, s, p - s);
+		       ts[p - s] = 0;
+		       str = _str_append(str, ts, &str_len, &str_alloc);
+		       free(ts);
+		    }
+		  s = NULL;
+	       }
+	  }
+	else if ((p!=NULL)&&(*p == '>'))
+	  {
+	     if (tag_start)
+	       {
+		  tag_end = p;
+		  s = p + 1;
+	       }
+	  }
+	else if ((p!=NULL)&&(*p == '&'))
+	  {
+	     if (!tag_start)
+	       {
+		  esc_start = p;
+		  esc_end = NULL;
+		  ts = malloc(p - s + 1);
+		  if (ts)
+		    {
+		       _strncpy(ts, s, p - s);
+		       ts[p - s] = 0;
+		       str = _str_append(str, ts, &str_len, &str_alloc);
+		       free(ts);
+		    }
+		  s = NULL;
+	       }
+	  }
+	else if ((p!=NULL)&&(*p == ';'))
+	  {
+	     if (esc_start)
+	       {
+		  esc_end = p;
+		  s = p + 1;
+	       }
+	  }
+	p++;
+     }
+   return str;
+}
+
+
 static int
 _is_width_over(Evas_Object *obj, int linemode)
 {
@@ -347,14 +526,19 @@ _is_width_over(Evas_Object *obj, int linemode)
    if (!wd) return 0;
 
    // too short to ellipsis
-   if (strlen(edje_object_part_text_get(wd->lbl, "elm.text")) <= ellen)
-	   return 0;
+   char *plaintxt = _mkup_to_text(edje_object_part_text_get(wd->lbl, "elm.text"));
+   if (strlen(plaintxt) <= ellen)
+     {
+       free(plaintxt);
+       return 0;   
+     }
+   free(plaintxt);
 
    edje_object_part_geometry_get(wd->lbl,"elm.text",&x,&y,&w,&h);
 
    evas_object_geometry_get (obj, &vx,&vy,&vw,&vh);
 
-   /*
+/*
    fprintf(stderr, "## _is_width_over\n");
    fprintf(stderr, "## x = %d, y = %d, w = %d, h = %d\n", x, y, w, h);
    fprintf(stderr, "## vx = %d, vy = %d, vw = %d, vh = %d\n", vx, vy, vw, vh);
@@ -362,7 +546,8 @@ _is_width_over(Evas_Object *obj, int linemode)
 	   fprintf(stderr, "## wd->wrap_w = %d, wd->wrap_h = %d\n", wd->wrap_w, wd->wrap_h);
    else
 	   fprintf(stderr, "## wd->wrap_w = %d\n", wd->wrap_w);
-   */
+   fprintf(stderr, "## check str = %s\n", edje_object_part_text_get(wd->lbl, "elm.text"));
+*/
 
    if (linemode == 0) // single line
      {
@@ -400,17 +585,21 @@ _is_width_over(Evas_Object *obj, int linemode)
 }
 
 static void
-_ellipsis_fontsize_set(Evas_Object *obj, int fontsize, Eina_Strbuf *txtbuf)
+_ellipsis_fontsize_set(Evas_Object *obj, int fontsize)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
    Eina_Strbuf *fontbuf = NULL;
+   Eina_Strbuf *txtbuf = NULL;
+   txtbuf = eina_strbuf_new();
    fontbuf = eina_strbuf_new();
+   eina_strbuf_append(txtbuf, edje_object_part_text_get(wd->lbl, "elm.text"));
    eina_strbuf_append_printf(fontbuf, "%d", fontsize);
    _strbuf_key_value_replace(txtbuf, "font_size", eina_strbuf_string_get(fontbuf), 0);
    edje_object_part_text_set(wd->lbl, "elm.text", eina_strbuf_string_get(txtbuf));
    eina_strbuf_free(fontbuf);
+   eina_strbuf_free(txtbuf);
 }
 
 static Eina_Bool
@@ -524,7 +713,6 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
    if (!wd) return;
 
    int cur_fontsize = 0;
-   Eina_Strbuf *txtbuf = NULL;
    char **kvalue = NULL;
    const char *minfont, *deffont, *maxfont;
    int minfontsize, maxfontsize;
@@ -546,9 +734,6 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
        if (*kvalue != NULL) cur_fontsize = atoi((char*)kvalue);
      }
 
-   txtbuf = eina_strbuf_new();
-   eina_strbuf_append(txtbuf, wd->label);
-
    while (_is_width_over(obj, linemode))
      {
        if (cur_fontsize > minfontsize)
@@ -556,7 +741,7 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
            cur_fontsize -= 3;
 		   if (cur_fontsize < minfontsize)
              cur_fontsize = minfontsize;
-		   _ellipsis_fontsize_set(obj, cur_fontsize, txtbuf);
+		   _ellipsis_fontsize_set(obj, cur_fontsize);
          }
        else
          {
@@ -573,9 +758,9 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
          }
      }
 
-   if (txtbuf) eina_strbuf_free(txtbuf);
-   wd->changed = 1;
-   _sizing_eval(obj);
+// remove infinite loop
+//   wd->changed = 1;
+//   _sizing_eval(obj);
 }
 
 /*
@@ -902,7 +1087,7 @@ elm_label_text_align_set(Evas_Object *obj, const char *alignmode)
  * @param r Red property background color of The label object 
  * @param g Green property background color of The label object 
  * @param b Blue property background color of The label object 
- * @param a Alpha property background alpha of The label object 
+ * @param a Alpha property background color of The label object 
  *
  * @ingroup Label
  */
@@ -937,7 +1122,7 @@ elm_label_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsig
  * @param r Red property background color of The label object 
  * @param g Green property background color of The label object 
  * @param b Blue property background color of The label object 
- * @param a Alpha property background alpha of The label object 
+ * @param a Alpha property background color of The label object 
  * @ingroup Label
  */
 EAPI void

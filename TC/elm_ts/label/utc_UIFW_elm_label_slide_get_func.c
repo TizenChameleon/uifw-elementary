@@ -152,10 +152,9 @@ cleanup()
 static void utc_UIFW_elm_label_slide_get_func_01(void)
 {
 	test_eo = elm_label_add(test_win);
-	char *ret_str = NULL;
 	elm_label_label_set(test_eo, "test string");
-	elm_label_slide_get(test_eo, EINA_TRUE);
-	Eina_Bool r = elm_label_slide_get(test_eo, EINA_TRUE);
+	elm_label_slide_set(test_eo, EINA_TRUE);
+	Eina_Bool r = elm_label_slide_get(test_eo);
 	TET_CHECK_PASS(EINA_TRUE, r);
 
 	tet_result(TET_PASS);
@@ -167,8 +166,7 @@ static void utc_UIFW_elm_label_slide_get_func_01(void)
  */
 static void utc_UIFW_elm_label_slide_get_func_02(void)
 {
-	elm_label_slide_get(NULL, EINA_TRUE);
-	Eina_Bool r = elm_label_slide_get(test_eo);
+	Eina_Bool r = elm_label_slide_get(NULL);
 	TET_CHECK_FAIL(EINA_TRUE, r);
 
 	tet_result(TET_PASS);

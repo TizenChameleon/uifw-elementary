@@ -4,7 +4,6 @@
  */
 #ifndef ELEMENTARY_H
 #define ELEMENTARY_H
-
 /**
  * @file Elementary.h
  * @brief Elementary's API
@@ -1520,13 +1519,13 @@ extern "C" {
 
    typedef enum _Elm_Photocam_Zoom_Mode
      {
-        ELM_PHOTOCAM_ZOOM_MODE_MANUAL = 0,
-        ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT,
-        ELM_PHOTOCAM_ZOOM_MODE_AUTO_FILL,
-        ELM_PHOTOCAM_ZOOM_MODE_LAST
+	ELM_PHOTOCAM_ZOOM_MODE_MANUAL = 0,
+	ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT,
+	ELM_PHOTOCAM_ZOOM_MODE_AUTO_FILL,
+	ELM_PHOTOCAM_ZOOM_MODE_LAST
      } Elm_Photocam_Zoom_Mode;
    EAPI Evas_Object *elm_photocam_add(Evas_Object *parent);
-   EAPI int          elm_photocam_file_set(Evas_Object *obj, const char *file);
+   EAPI int elm_photocam_file_set(Evas_Object *obj, const char *file);
    EAPI const char * elm_photocam_file_get(const Evas_Object *obj);
    EAPI void         elm_photocam_zoom_set(Evas_Object *obj, double zoom);
    EAPI double       elm_photocam_zoom_get(const Evas_Object *obj);
@@ -1539,6 +1538,8 @@ extern "C" {
    EAPI void         elm_photocam_paused_set(Evas_Object *obj, Eina_Bool paused);
    EAPI Eina_Bool    elm_photocam_paused_get(const Evas_Object *obj);
    EAPI Evas_Object *elm_photocam_internal_image_get(const Evas_Object *obj);
+   EAPI void         elm_photocam_bounce_set(Evas_Object *obj,  Eina_Bool h_bounce, Eina_Bool v_bounce);
+   EAPI void         elm_photocam_bounce_get(const Evas_Object *obj,  Eina_Bool *h_bounce, Eina_Bool *v_bounce);
 
    /* smart callbacks called:
     * "clicked" - when image clicked
@@ -2569,7 +2570,8 @@ extern "C" {
         ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE = (1 << 2),
         ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN = (1 << 3),
         ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW = (1 << 4),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_LAST = (1 << 5)
+        ELM_DIALOGUEGROUP_ITEM_STYLE_NO_BG = (1 << 5),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_LAST = (1 << 6)
      } Elm_Dialoguegroup_Item_Style;
 
    EAPI Evas_Object   *elm_dialoguegroup_add(Evas_Object *parent);
