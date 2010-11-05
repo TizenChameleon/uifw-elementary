@@ -31,7 +31,6 @@ struct _Widget_Data
 	Evas_Object *base;
 	Evas_Object *pager;
 	int pushed;
-	Eina_Bool popped : 1;
 	Eina_Bool hidden :1;
 	Eina_Bool disable_animation : 1;
  };
@@ -276,6 +275,8 @@ _transition_complete_cb(void *data)
 					{
 						edje_object_signal_emit(wd->base, "elm,action,push", "elm");
 					}
+
+				edje_object_signal_emit(wd->base, "elm,state,rect,enabled", "elm");
 			}
 		if (it->title_obj) 
 			{
@@ -337,9 +338,7 @@ _back_button_clicked(void *data, Evas_Object *obj, void *event_info)
 {
 	Item *it = data;	
 	Widget_Data *wd =  elm_widget_data_get(it->obj);
-	if(wd->popped)
-		elm_navigationbar_pop(it->obj);
-	wd->popped = EINA_FALSE;
+	elm_navigationbar_pop(it->obj);
 }
 
 static void 
@@ -348,8 +347,8 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
 	Evas_Object *navi_bar = data;	
 	Widget_Data *wd =  elm_widget_data_get(navi_bar);
 	evas_object_smart_callback_call(navi_bar, "hide,finished", event_info);
-	wd->popped = EINA_TRUE;
 	wd->pushed = 0;
+	edje_object_signal_emit(wd->base, "elm,state,rect,disabled", "elm");
 }
 
 static int
@@ -512,7 +511,7 @@ elm_navigationbar_add(Evas_Object *parent)
 	elm_widget_sub_object_add(obj, wd->pager);
 	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->pager);
 	evas_object_smart_callback_add(wd->pager, "hide,finished", _hide_finished, obj);	
-   	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);	
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);	
 
 	_sizing_eval(obj);
 	wd->pushed = -1;
