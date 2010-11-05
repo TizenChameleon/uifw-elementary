@@ -758,8 +758,9 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
          }
      }
 
-   wd->changed = 1;
-   _sizing_eval(obj);
+// remove infinite loop
+//   wd->changed = 1;
+//   _sizing_eval(obj);
 }
 
 /*
