@@ -1124,7 +1124,10 @@ elm_index_item_clear(Evas_Object *obj)
         if (it->level != wd->level) continue;
         clear = eina_list_append(clear, it);
      }
-   EINA_LIST_FREE(clear, it) _item_free(it);
+   EINA_LIST_FREE(clear, it) {
+	   _item_free(it);
+	   wd->tot_items_count[wd->level]--;
+   }
 }
 
 /**

@@ -395,6 +395,7 @@ _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_
 				elm_object_style_set(new_btn, buf);					
 			}
 		elm_widget_sub_object_add(obj, new_btn);
+		elm_object_focus_allow_set(new_btn, EINA_FALSE);
 		changed = TRUE;
 	}
 	return changed;
@@ -568,7 +569,6 @@ elm_navigationbar_push(Evas_Object *obj,
 		ll = ll->prev;
 		prev_it = NULL;
 	}
-
 	it->obj = obj;
 	it->fn_btn1 = fn_btn1;
 	it->fn_btn2 = fn_btn2;
@@ -580,7 +580,6 @@ elm_navigationbar_push(Evas_Object *obj,
 		char *prev_title = NULL;
 
 		it->back_btn = elm_button_add(obj);
-		elm_object_focus_allow_set(it->back_btn, EINA_FALSE);
 		prev_title = (char *)prev_it->title;
 		if(prev_title)
 			{
@@ -672,7 +671,6 @@ elm_navigationbar_pop(Evas_Object *obj)
 				it = ll->data;
 			}
 	}
-	
 	//unswallow items and start trasition
 	Transit_Cb_Data *cb = ELM_NEW(Transit_Cb_Data);
 	if (prev_it && it) 
