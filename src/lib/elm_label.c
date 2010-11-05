@@ -513,7 +513,6 @@ _mkup_to_text(const char *mkup)
    return str;
 }
 
-
 static int
 _is_width_over(Evas_Object *obj, int linemode)
 {
@@ -535,9 +534,9 @@ _is_width_over(Evas_Object *obj, int linemode)
    }
    if (plainlen <= ellen) return 0;   
 
-   edje_object_part_geometry_get(wd->lbl,"elm.text",&x,&y,&w,&h);
+   edje_object_part_geometry_get(wd->lbl, "elm.text", &x, &y, &w, &h);
 
-   evas_object_geometry_get (obj, &vx,&vy,&vw,&vh);
+   evas_object_geometry_get(obj, &vx, &vy, &vw, &vh);
 
 /*
    fprintf(stderr, "## _is_width_over\n");
@@ -618,7 +617,7 @@ _ellipsis_cut_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
    int lencutstr = 0;
    int i = 0;
 
-   edje_object_part_geometry_get(wd->lbl,"elm.text",NULL,NULL,&w,&h);
+   edje_object_part_geometry_get(wd->lbl,"elm.text", NULL, NULL, &w, &h);
    if (w <= 0)
 	   return EINA_FALSE;
    tc1 = evas_object_textblock_cursor_new(edje_object_part_object_get(wd->lbl, "elm.text"));
@@ -633,6 +632,21 @@ _ellipsis_cut_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
    for (i = 0; i <= minshowcount; i++)
 	   evas_textblock_cursor_char_prev(tc2);
    cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
+
+/*
+   int eolpos = evas_textblock_cursor_paragraph_text_length_get(tc1);
+   Evas_Coord cx, cy, cw, ch;
+   for (i = eolpos; i > minshowcount; i--)
+   {
+	   evas_textblock_cursor_pos_set(tc2, i);
+	   fprintf(stderr, "## tc2 = %d\n", evas_textblock_cursor_pos_get(tc2));
+	   evas_textblock_cursor_char_geometry_get(tc2, &cx, &cy, &cw, &ch);
+	   fprintf(stderr, "## limitw = %d\n", limitw);
+	   fprintf(stderr, "## cx = %d, cy = %d, cw = %d, ch = %d\n", cx, cy, cw, ch);
+	   if (cx <= limitw)
+		   break;
+   }
+*/
 
    // FIXME: consider other unicode encoding, currently only care about utf-8
    lencutstr = strlen(cutstr);
