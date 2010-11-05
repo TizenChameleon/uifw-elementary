@@ -1,6 +1,10 @@
 CC ?= gcc
 
-TARGETS = uts_elm_button_add_func
+TARGETS = utc_elm_actionslider_add_func \
+		  utc_elm_actionslider_indicator_pos_set_func \
+		  utc_elm_actionslider_magnet_pos_set_func \
+		  utc_elm_actionslider_label_set_func \
+		  utc_elm_actionslider_hold_func 
 
 PKGS = elementary
 
