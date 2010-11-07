@@ -87,7 +87,7 @@ static void _btn_layout_create(Evas_Object *obj);
 static int _get_indicator_h(Evas_Object *parent);
 static void _delete_area_rect_callbacks(Widget_Data *wd);
 static void _adjust_pos_x( Evas_Coord_Point *pos, Evas_Coord_Point *base_size, Evas_Coord_Rectangle *area_rect );
-static void _adjust_pos_y( Evas_Coord_Point *pos, Evas_Coord_Point *base_size, Evas_Coord_Rectangle *area_rect );
+static void _adjust_pos_y( int indicator_h, Evas_Coord_Point *pos, Evas_Coord_Point *base_size, Evas_Coord_Rectangle *area_rect );
 
 static void
 _delete_area_rect_callbacks(Widget_Data *wd)
@@ -251,9 +251,6 @@ _item_sizing_eval(Elm_Ctxpopup_Item *item)
    edje_object_size_min_restricted_calc(item->base, &min_w, &min_h, min_w,
 					min_h);
 
-   if (!item->separator)
-      elm_coords_finger_size_adjust(1, &min_w, 1, &min_h);
-
    evas_object_size_hint_min_set(item->base, min_w, min_h);
    evas_object_size_hint_max_set(item->base, max_w, max_h);
 }
@@ -274,7 +271,7 @@ static void _adjust_pos_x( Evas_Coord_Point *pos, Evas_Coord_Point *base_size, E
 		pos->x = area_rect->x;
 }
 
-static void _adjust_pos_y( Evas_Coord_Point *pos, Evas_Coord_Point *base_size, Evas_Coord_Rectangle *area_rect )
+static void _adjust_pos_y( int indicator_h, Evas_Coord_Point *pos, Evas_Coord_Point *base_size, Evas_Coord_Rectangle *area_rect )
 {
 		pos->y -= (base_size->y / 2);
 
@@ -284,10 +281,12 @@ static void _adjust_pos_y( Evas_Coord_Point *pos, Evas_Coord_Point *base_size, E
 			pos->y = area_rect->y + area_rect->h - base_size->y;
 		}
 
-		if( base_size->y  > area_rect->h )
+		if( base_size->y  > area_rect->h ) {
 			base_size->y -= (base_size->y - area_rect->h );
-		if( pos->y < area_rect->y)
+		}
+		if( pos->y < area_rect->y) {
 			pos->y = area_rect->y;
+		}
 }
 
 static int
@@ -325,6 +324,8 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 
    wd = elm_widget_data_get(obj);
 
+   Evas_Coord min_calc_h;
+
    if ((!wd) || (!rect))
      {
 	return ELM_CTXPOPUP_ARROW_DOWN;
@@ -347,10 +348,14 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 		area_rect.h = parent_size.y;
 	}
 
-	if(area_rect.y < indicator_h) area_rect.y = indicator_h;
-
+	if(area_rect.y < indicator_h) {
+		temp.y = indicator_h - area_rect.y;
+		area_rect.y = indicator_h;
+		area_rect.h -= temp.y;
+	}
 	evas_object_geometry_get(obj, &pos.x, &pos.y, NULL, NULL);
    edje_object_size_min_calc(wd->base,&base_size.x, &base_size.y);
+   min_calc_h = base_size.y;
 
    edje_object_size_max_get(wd->base, &max_size.x, &max_size.y);
    max_size.x *= elm_scale_get();
@@ -369,7 +374,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	   rect->y = pos.y;
 	   rect->w = base_size.x;
 	   rect->h = base_size.y;
-	   return -1;
+	   return ELM_CTXPOPUP_ARROW_UP;
    }
 
    for (idx = 0; idx < 4; ++idx)
@@ -388,7 +393,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	   			temp.x = (pos.x - base_size.x);
 	   			if ((temp.x - arrow_size.x - finger_size) < area_rect.x)
 	   				continue;
-	   			_adjust_pos_y( &pos, &base_size, &area_rect );
+	   			_adjust_pos_y( indicator_h, &pos, &base_size, &area_rect );
 	   			pos.x -= (base_size.x + finger_size);
 	   			arrow = ELM_CTXPOPUP_ARROW_RIGHT;
 	   			break;
@@ -396,7 +401,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 	   			temp.x = (pos.x + base_size.x);
 	   			if ((temp.x + arrow_size.x + finger_size) > (area_rect.x + area_rect.w))
 	   				continue;
-	   			_adjust_pos_y( &pos, &base_size, &area_rect );
+	   			_adjust_pos_y( indicator_h, &pos, &base_size, &area_rect );
 	   			pos.x += finger_size;
 	   			arrow = ELM_CTXPOPUP_ARROW_LEFT;
 	   			break;
@@ -458,7 +463,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 				}
 				break;
 			case ELM_CTXPOPUP_ARROW_RIGHT:
-				_adjust_pos_y( &pos, &base_size, &area_rect );
+				_adjust_pos_y( indicator_h, &pos, &base_size, &area_rect );
 				pos.x -= (base_size.x + finger_size);
 				arrow = ELM_CTXPOPUP_ARROW_RIGHT;
 				if(pos.x < area_rect.x + arrow_size.x) {
@@ -467,7 +472,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 				}
 				break;
 			case ELM_CTXPOPUP_ARROW_LEFT:
-				_adjust_pos_y( &pos, &base_size, &area_rect );
+				_adjust_pos_y( indicator_h, &pos, &base_size, &area_rect );
 				pos.x += finger_size;
 				arrow = ELM_CTXPOPUP_ARROW_LEFT;
 				if( pos.x + arrow_size.x + base_size.x > area_rect.x + area_rect.w ) {
@@ -478,7 +483,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 				_adjust_pos_x( &pos, &base_size, &area_rect );
 				pos.y += finger_size;
 				arrow = ELM_CTXPOPUP_ARROW_UP;
-				if( pos.y + arrow_size.y + base_size.y  > area_rect.y + area_rect.h ) {
+				if( pos.y + arrow_size.y + base_size.y > area_rect.y + area_rect.h ) {
 					base_size.y -= ( ( pos.y + arrow_size.y +  base_size.y ) - (area_rect.y + area_rect.h) );
 				}
 				break;
@@ -491,6 +496,11 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    rect->y = pos.y;
    rect->w = base_size.x;
    rect->h = base_size.y;
+
+   if(!wd->content ) {
+	   evas_object_geometry_get( wd->scroller, NULL, NULL, &temp.x, &temp.y);
+	   evas_object_size_hint_min_set(wd->box, temp.x, temp.y  + (base_size.y - min_calc_h));
+   }
 
    return arrow;
 }
@@ -613,7 +623,6 @@ _shift_base_by_arrow(Evas_Object *arrow, Elm_Ctxpopup_Arrow arrow_dir,
 		     Evas_Coord_Rectangle *rect)
 {
    Evas_Coord arrow_w, arrow_h;
-
    evas_object_geometry_get(arrow, NULL, NULL, &arrow_w, &arrow_h);
 
    switch (arrow_dir)
@@ -782,10 +791,9 @@ _ctxpopup_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
    if (!wd->position_forced)
       evas_object_show(wd->arrow);
 
-	_show_effect(wd);
-   
-   wd->visible = EINA_TRUE;
+   _show_effect(wd);
 
+   wd->visible = EINA_TRUE;
 }
 
 static void
@@ -972,12 +980,10 @@ elm_ctxpopup_add(Evas_Object *parent)
    wd->scroller = elm_scroller_add(obj);
    elm_object_style_set(wd->scroller, "ctxpopup");
    elm_scroller_content_min_limit(wd->scroller, EINA_TRUE, EINA_TRUE);
-   elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_AUTO,
-			   ELM_SCROLLER_POLICY_AUTO);
    elm_scroller_bounce_set(wd->scroller, EINA_FALSE, EINA_TRUE);
    edje_object_part_swallow(wd->base, "elm.swallow.scroller", wd->scroller);
    evas_object_event_callback_add(wd->scroller, EVAS_CALLBACK_RESIZE,
-				  _ctxpopup_scroller_resize, obj);
+		   _ctxpopup_scroller_resize, obj);
 
    //Box
    wd->box = elm_box_add(obj);
@@ -1492,7 +1498,6 @@ EAPI Elm_Ctxpopup_Item *
 elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon,
 		      Evas_Smart_Cb func, void *data)
 {
-	fprintf( stderr, "elm_ctxpopup_icon_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
 	return elm_ctxpopup_item_add(obj, icon, NULL, func, data);
 }
 
@@ -1500,7 +1505,6 @@ EAPI Elm_Ctxpopup_Item *
 elm_ctxpopup_label_add(Evas_Object *obj, const char *label,
 		       Evas_Smart_Cb func, void *data)
 {
-	fprintf( stderr, "elm_ctxpopup_label_add is deprecated!! Pleaes use \"elm_ctxpopup_item_add.\"");
 	return elm_ctxpopup_item_add(obj, NULL, label, func, data);
 }
 
