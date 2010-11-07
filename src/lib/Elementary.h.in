@@ -1800,9 +1800,9 @@ extern "C" {
    EAPI void          elm_animator_auto_reverse_set(Elm_Animator *animator, Eina_Bool reverse);
    EAPI void          elm_animator_pause(Elm_Animator *animator);
    EAPI void          elm_animator_resume(Elm_Animator *animator);
-   EAPI Eina_Bool     elm_animator_auto_reverse_get(Elm_Animator *animator);
-   EAPI Eina_Bool     elm_animator_operating_get(Elm_Animator *animator);
-   EAPI unsigned int  elm_animator_repeat_get(Elm_Animator *animator);
+   EAPI Eina_Bool     elm_animator_auto_reverse_get(const Elm_Animator *animator);
+   EAPI Eina_Bool     elm_animator_operating_get(const Elm_Animator *animator);
+   EAPI unsigned int  elm_animator_repeat_get(const Elm_Animator *animator);
 
    /* calendar */
    typedef enum 
