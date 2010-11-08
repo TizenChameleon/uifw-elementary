@@ -31,7 +31,6 @@ struct _Widget_Data
 {
    Evas_Object *parent;
    Evas_Object *base;
-   Evas_Object *base2;
    Evas_Object *content;
    Evas_Object *box;
    Evas_Object *arrow;
