@@ -287,7 +287,7 @@ EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
 }
 
 /**
- * clear searchbar content
+ * clear searchbar status
  *
  * @param obj The searchbar object
  * @return void
