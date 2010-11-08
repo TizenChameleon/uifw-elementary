@@ -27,11 +27,10 @@ typedef struct _Transit_Cb_Data Transit_Cb_Data;
 
 struct _Widget_Data
 {
-	Eina_List *stack;
+	Eina_List *stack, *to_delete;
 	Evas_Object *base;
 	Evas_Object *pager;
 	Eina_Bool hidden :1;
-	Eina_Bool disable_animation : 1;
  };
 
 struct _Item
@@ -135,8 +134,8 @@ static void
 _delete_item(Item *it)
 {
 	Eina_List *ll;
+	if(!it) return;
 	Evas_Object *list_obj;
-	
 	evas_object_del(it->back_btn);
 	evas_object_del(it->fn_btn1);
 	evas_object_del(it->fn_btn2);
@@ -249,11 +248,11 @@ _transition_complete_cb(void *data)
 		ll = eina_list_last(wd->stack);
 		if (ll->data == prev_it)
 		{
-			_delete_item(prev_it);
+			wd->to_delete = eina_list_append(wd->to_delete, prev_it);
 			wd->stack = eina_list_remove_list(wd->stack, ll);
 		}
 	}
-	else if (prev_it)
+	if(prev_it)
 	{
 	 	evas_object_hide(prev_it->fn_btn1);
 		evas_object_hide(prev_it->back_btn);
@@ -336,8 +335,18 @@ static void
 _back_button_clicked(void *data, Evas_Object *obj, void *event_info)
 {
 	Item *it = data;	
-	Widget_Data *wd =  elm_widget_data_get(it->obj);
 	elm_navigationbar_pop(it->obj);
+}
+
+static void
+_process_deletions(Widget_Data *wd)
+{
+	if (!wd) return;	
+	Item *it;
+	EINA_LIST_FREE(wd->to_delete, it)
+		{
+			_delete_item(it);
+		}
 }
 
 static void 
@@ -346,6 +355,11 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
 	Evas_Object *navi_bar = data;	
 	Widget_Data *wd =  elm_widget_data_get(navi_bar);
 	evas_object_smart_callback_call(navi_bar, "hide,finished", event_info);
+	if(wd->to_delete)
+		{
+			_process_deletions(wd);
+			wd->to_delete = NULL;
+		}
 	edje_object_signal_emit(wd->base, "elm,state,rect,disabled", "elm");
 }
 
@@ -610,7 +624,7 @@ elm_navigationbar_push(Evas_Object *obj,
 		cb->it = it;
 		cb->pop = EINA_FALSE;	
 		cb->first_page = EINA_TRUE;
-	}
+	}	
 	_transition_complete_cb(cb);
 	free(cb);
 	elm_pager_content_push(wd->pager, it->content);	
@@ -726,7 +740,7 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 			it = ll->data;		
 			if (it->obj && (it->content != content)) 
 				{ 
-					_delete_item(ll->data);
+					wd->to_delete = eina_list_append(wd->to_delete, it);
 					wd->stack = eina_list_remove_list(wd->stack, ll);
 					it = NULL;
 				}
@@ -1390,9 +1404,8 @@ EAPI void
 elm_navigationbar_animation_disable_set(Evas_Object *obj, 
 							Eina_Bool disable)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
-	wd->disable_animation = disable;
 	elm_pager_animation_disable_set(wd->pager, disable);
 }
 
