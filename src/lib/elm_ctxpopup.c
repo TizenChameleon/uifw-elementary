@@ -31,6 +31,7 @@ struct _Widget_Data
 {
    Evas_Object *parent;
    Evas_Object *base;
+   Evas_Object *base2;
    Evas_Object *content;
    Evas_Object *box;
    Evas_Object *arrow;
@@ -247,6 +248,9 @@ _item_sizing_eval(Elm_Ctxpopup_Item *item)
 
    if (!item->separator)
       elm_coords_finger_size_adjust(1, &min_w, 1, &min_h);
+
+   Evas_Coord x, y, w, h;
+   evas_object_geometry_get(item->base, &x, &y, &w, &h);
 
    edje_object_size_min_restricted_calc(item->base, &min_w, &min_h, min_w,
 					min_h);
@@ -498,8 +502,8 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    rect->h = base_size.y;
 
    if(!wd->content ) {
-	   evas_object_geometry_get( wd->scroller, NULL, NULL, &temp.x, &temp.y);
-	   evas_object_size_hint_min_set(wd->box, temp.x, temp.y  + (base_size.y - min_calc_h));
+	   evas_object_geometry_get( wd->box, NULL, NULL, &temp.x, &temp.y);
+	   evas_object_size_hint_min_set(wd->scroller, temp.x, temp.y  + (base_size.y - min_calc_h));
    }
 
    return arrow;
@@ -595,10 +599,24 @@ _sizing_eval(Evas_Object *obj)
    if ((!wd) || (!wd->parent))
       return;
 
+   Evas_Coord_Point box_size = { 0, 0 };
+   Evas_Coord_Point _box_size = { 0, 0 };
+
    EINA_LIST_FOREACH(wd->items, elist, item)
    {
+	   evas_object_size_hint_min_get(item->base, &_box_size.x, &_box_size.y);
+	   if(!wd->horizontal) {
+		   if(_box_size.x > box_size.x) box_size.x = _box_size.x;
+		   if(_box_size.y != -1 )  box_size.y += _box_size.y;
+	   }else {
+		   if(_box_size.x != -1 )  box_size.x += _box_size.x;
+		   if(_box_size.y > box_size.y) box_size.y = _box_size.y;
+	   }
       _item_sizing_eval(item);
    }
+
+   if( !wd->content)
+   evas_object_size_hint_min_set(wd->box, box_size.x, box_size.y);
 
    //content
    if(wd->content) {
@@ -976,12 +994,21 @@ elm_ctxpopup_add(Evas_Object *parent)
    elm_widget_sub_object_add(obj, wd->base);
    _elm_theme_object_set(obj, wd->base, "ctxpopup", "base", "default");
 
+   //Base2
+/*   wd->base2 = edje_object_add(e);
+   elm_widget_sub_object_add(obj, wd->base2);
+   _elm_theme_object_set(obj, wd->base2, "ctxpopup", "base", "default2");
+   evas_object_size_hint_align_set(wd->base2, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(wd->base2, 1, 1);
+   evas_object_show(wd->base2);
+   evas_object_size_hint_min_set(wd->base2, 420, 300); */
+
    //Scroller
    wd->scroller = elm_scroller_add(obj);
    elm_object_style_set(wd->scroller, "ctxpopup");
-   elm_scroller_content_min_limit(wd->scroller, EINA_TRUE, EINA_TRUE);
+   //elm_scroller_content_min_limit(wd->scroller, EINA_TRUE, EINA_TRUE);
+   evas_object_size_hint_align_set(wd->scroller, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_scroller_bounce_set(wd->scroller, EINA_FALSE, EINA_TRUE);
-   edje_object_part_swallow(wd->base, "elm.swallow.scroller", wd->scroller);
    evas_object_event_callback_add(wd->scroller, EVAS_CALLBACK_RESIZE,
 		   _ctxpopup_scroller_resize, obj);
 
@@ -989,6 +1016,9 @@ elm_ctxpopup_add(Evas_Object *parent)
    wd->box = elm_box_add(obj);
    evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_scroller_content_set(wd->scroller, wd->box);
+
+   //edje_object_part_swallow(wd->base2, "elm.swallow.content", wd->scroller);
+   edje_object_part_swallow(wd->base, "elm.swallow.scroller", wd->scroller);
 
    //Arrow
    wd->arrow = edje_object_add(e);
