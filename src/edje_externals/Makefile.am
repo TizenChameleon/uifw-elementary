@@ -44,6 +44,7 @@ elm_photocam.c \
 elm_progressbar.c \
 elm_radio.c \
 elm_scrolled_entry.c \
+elm_searchbar.c \
 elm_slider.c \
 elm_slideshow.c \
 elm_spinner.c \

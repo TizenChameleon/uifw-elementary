@@ -30,7 +30,6 @@ struct _Widget_Data
 	Eina_List *stack;
 	Evas_Object *base;
 	Evas_Object *pager;
-	int pushed;
 	Eina_Bool hidden :1;
 	Eina_Bool disable_animation : 1;
  };
@@ -347,7 +346,6 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
 	Evas_Object *navi_bar = data;	
 	Widget_Data *wd =  elm_widget_data_get(navi_bar);
 	evas_object_smart_callback_call(navi_bar, "hide,finished", event_info);
-	wd->pushed = 0;
 	edje_object_signal_emit(wd->base, "elm,state,rect,disabled", "elm");
 }
 
@@ -514,7 +512,6 @@ elm_navigationbar_add(Evas_Object *parent)
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);	
 
 	_sizing_eval(obj);
-	wd->pushed = -1;
 	return obj;
 }
 
@@ -547,9 +544,6 @@ elm_navigationbar_push(Evas_Object *obj,
 	Item *prev_it = NULL;
 
 	if (!wd) return;
-	if(!wd->disable_animation)
-		if(wd->pushed == 1) return;
-
 	it = _check_item_is_added(obj, content);
 	if (it) return;
 	if (!it) it = ELM_NEW(Item); 
@@ -618,9 +612,6 @@ elm_navigationbar_push(Evas_Object *obj,
 		cb->first_page = EINA_TRUE;
 	}
 	_transition_complete_cb(cb);
-	//push content to pager
-	if(!cb->first_page)
-		wd->pushed = 1;
 	free(cb);
 	elm_pager_content_push(wd->pager, it->content);	
 	//push item into the stack. it should be always the tail
