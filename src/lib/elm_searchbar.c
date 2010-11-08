@@ -287,7 +287,7 @@ EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
 }
 
 /**
- * clear searchbar content
+ * clear searchbar status
  *
  * @param obj The searchbar object
  * @return void
@@ -307,7 +307,7 @@ EAPI void elm_searchbar_clear(Evas_Object *obj)
 		   edje_object_signal_emit(wd->base, "CANCELHIDE", "PROG");
    }
 
-   elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
+//   elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
 }
 
 /**

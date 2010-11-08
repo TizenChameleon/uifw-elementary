@@ -2517,6 +2517,10 @@ extern "C" {
    EAPI const char                *elm_multibuttonentry_label_get(Evas_Object *obj);
    EAPI void                       elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
    EAPI Evas_Object               *elm_multibuttonentry_entry_get(Evas_Object *obj);
+   EAPI const char *               elm_multibuttonentry_guide_text_get(Evas_Object *obj);
+   EAPI void                       elm_multibuttonentry_guide_text_set(Evas_Object *obj, const char *guidetext);
+   EAPI int                        elm_multibuttonentry_contracted_state_get(Evas_Object *obj);
+   EAPI void                       elm_multibuttonentry_contracted_state_set(Evas_Object *obj, int contracted);
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data);
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data);
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data);
@@ -2541,6 +2545,7 @@ extern "C" {
     * "deleted" - when an item of multibuttonentry is deleted. 
     * "expanded" - when the multibuttonentry is expanded. 
     * "contracted" - when the multibuttonentry is contracted. 
+    * "contracted,state,changed" - when the contracted state of multibuttonentry is changed. 
     */
    /* available styles:
     * default
