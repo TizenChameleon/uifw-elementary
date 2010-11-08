@@ -130,14 +130,14 @@ _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_min_get(wd->content, &minw, &minh);
    evas_object_size_hint_max_get(wd->content, &maxw, &maxh);
    evas_object_size_hint_weight_get(wd->content, &xw, &yw);
-   evas_object_geometry_get(wd->content, NULL, NULL, &w, &h);
+   //evas_object_geometry_get(wd->content, NULL, NULL, &w, &h);
 
    if (wd->scr)
      {
         elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, &vh);
         if (xw > 0.0)
           {
-        	 if(w > vw) vw = w;
+//        	 if(w > vw) vw = w;
              if ((minw > 0) && (vw < minw))  vw = minw;
              else if ((maxw > 0) && (vw > maxw)) vw = maxw;
           }
@@ -145,7 +145,7 @@ _sizing_eval(Evas_Object *obj)
 
         if (yw > 0.0)
           {
-        	 if(h > vh) vh = h;
+  //      	 if(h > vh) vh = h;
              if ((minh > 0) && (vh < minh))  vh = minh;
              else if ((maxh > 0) && (vh > maxh)) vh = maxh;
           }
