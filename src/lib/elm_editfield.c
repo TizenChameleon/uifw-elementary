@@ -71,7 +71,8 @@ _on_focus_hook(void *data, Evas_Object *obj)
      {
 	evas_object_smart_callback_call(obj, "unfocused", NULL);
 	wd->editing = EINA_FALSE;
-	edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");		
+	edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
+	edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
 	if(_empty_entry(wd->entry)) 
 	  {
 	     if(wd->guide_text) 
@@ -97,10 +98,6 @@ _theme_hook(Evas_Object *obj)
    	edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
    if(!wd->editing)
      edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");	
-   if (wd->eraser_show) 
-	edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
-   else 
-	edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
    if(wd->show_guide_text)
      {
 	if(_empty_entry(wd->entry)) 
@@ -191,12 +188,14 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
 
    if(!_empty_entry(wd->entry)) 
      {
-	if(wd->guide_text) 
-	  {
-	     edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
-	     wd->show_guide_text = EINA_FALSE;
-	  }
+	if(wd->eraser_show)
+	   edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
      }
+   else 
+     {
+	if(wd->eraser_show)
+	   edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
+     } 
 }
 
 #ifdef HAVE_CONFORMANT_AUTOSCROLL
@@ -216,31 +215,25 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
 
    if(!strcmp(source, "eraser"))
    {
-	   elm_entry_entry_set(wd->entry, "");
-	   if(wd->editing == EINA_FALSE) {
-		   if(wd->guide_text) 
-		   {
-			   edje_object_part_text_set(wd->base, "elm.guidetext", wd->guide_text);
-			   edje_object_signal_emit(wd->base, "elm,state,guidetext,visible", "elm");
-			   wd->show_guide_text = EINA_TRUE;
-		   }
-	   }
+      elm_entry_entry_set(wd->entry, "");
+      edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
    } 	   
    else if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "eraser"))
      {
 	edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
-	if(wd->single_line)
-		elm_widget_focus_set(wd->scroller, EINA_TRUE);
-	else	
-		elm_widget_focus_set(wd->entry, EINA_TRUE);			
+
+	elm_object_focus(wd->entry);			
 
 	if(wd->editing == EINA_FALSE)
-	  elm_entry_cursor_end_set(wd->entry);
+      	   elm_entry_cursor_end_set(wd->entry);
 	
+	if(!(_empty_entry(wd->entry)) && (wd->eraser_show)) 
+	   edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
+		
 	if(wd->guide_text) 
 	   {
-		  edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
-		  wd->show_guide_text = EINA_FALSE;
+ 	      edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
+	      wd->show_guide_text = EINA_FALSE;
 	   }
 	evas_object_smart_callback_call(data, "clicked", NULL);
 	wd->editing = EINA_TRUE;
@@ -255,6 +248,15 @@ _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
    if (!wd || !wd->base) return;
    evas_object_geometry_get(obj, NULL, NULL, NULL, &h);
 }
+
+static void
+_signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_signal_emit(wd->base, emission, source);
+}
+
 
 /**
  * Add a new editfield object
@@ -284,6 +286,7 @@ elm_editfield_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_changed_hook_set(obj, _changed_hook);
    elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
+   elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
    elm_widget_can_focus_set(obj, EINA_TRUE);
 #ifdef HAVE_CONFORMANT_AUTOSCROLL
    elm_widget_imp_region_get_hook_set(obj, _imp_region_get_hook, NULL);
@@ -294,6 +297,9 @@ elm_editfield_add(Evas_Object *parent)
    elm_widget_resize_object_set(obj, wd->base);
    edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "*", 
 	 _signal_mouse_clicked, obj);
+   edje_object_signal_callback_add(wd->base, "clicked", "*", 
+	 _signal_mouse_clicked, obj);
+
    evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
 
    wd->editing = EINA_FALSE;
@@ -447,7 +453,7 @@ EAPI void
 elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);	
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;	
+   ELM_CHECK_WIDTYPE(obj, widtype) ;	
    if (!wd || !wd->base || !icon)
      return;
    if ((wd->licon != icon) && (wd->licon))
@@ -497,7 +503,7 @@ EAPI void
 elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   ELM_CHECK_WIDTYPE(obj, widtype) ;
    if (!wd || !wd->base || !icon)
      return;
    if ((wd->ricon != icon) && (wd->ricon))
@@ -624,9 +630,7 @@ elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
    
    wd->eraser_show = visible;
 
-   if (visible) 
-	edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
-   else 
+   if (!visible) 
 	edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
    
    return; 
