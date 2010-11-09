@@ -20,14 +20,14 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
 {
-	Evas_Object* selectioninfo;
-	Evas_Object* content;
-	Evas_Object* parent;
-	Eina_Bool* check_state;
-	int check_count;
+   Evas_Object* selectioninfo;
+   Evas_Object* content;
+   Evas_Object* parent;
+   Eina_Bool* check_state;
+   int check_count;
 
-	int timeout;
-	Ecore_Timer *timer;
+   int timeout;
+   Ecore_Timer *timer;
 };
 
 static const char *widtype = NULL;
@@ -45,151 +45,167 @@ static void _resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void
 _del_pre_hook(Evas_Object *obj)
 {
-	evas_object_event_callback_del_full(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
-	evas_object_event_callback_del_full(obj, EVAS_CALLBACK_MOVE, _resize, obj);
-	evas_object_event_callback_del_full(obj, EVAS_CALLBACK_SHOW, _show, obj);
-	evas_object_event_callback_del_full(obj, EVAS_CALLBACK_HIDE, _hide, obj);
+   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
+   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_MOVE, _resize, obj);
+   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_SHOW, _show, obj);
+   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_HIDE, _hide, obj);
 }
 
 static void
 _del_hook(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	elm_selectioninfo_content_set(obj, NULL);
-	elm_selectioninfo_parent_set(obj, NULL);
-	if (wd->timer)
-	{
-	     ecore_timer_del(wd->timer);
-	     wd->timer = NULL;
-	}
-	free(wd);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_selectioninfo_content_set(obj, NULL);
+   elm_selectioninfo_parent_set(obj, NULL);
+   if (wd->timer)
+     {
+	ecore_timer_del(wd->timer);
+	wd->timer = NULL;
+     }
+   free(wd);
 }
 
 static void
 _theme_hook(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	_elm_theme_object_set(obj, wd->selectioninfo, "selectioninfo", "base", "default");
-	edje_object_scale_set(wd->selectioninfo, elm_widget_scale_get(obj) *_elm_config->scale);
-	_sizing_eval(obj);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_theme_object_set(obj, wd->selectioninfo, "selectioninfo", "base", "default");
+   edje_object_scale_set(wd->selectioninfo, elm_widget_scale_get(obj) *_elm_config->scale);
+   _sizing_eval(obj);
 }
 
 static void
 _sizing_eval(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Coord x,y,w,h;
-	if (!wd) return;
-	if (!wd->parent) return;
-	evas_object_geometry_get(wd->parent, &x, &y, &w, &h);
-	evas_object_move(obj, x, y);
-	evas_object_resize(obj, w, h);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Coord x,y,w,h;
+   if (!wd) return;
+   if (!wd->parent) return;
+   evas_object_geometry_get(wd->parent, &x, &y, &w, &h);
+   evas_object_move(obj, x, y);
+   evas_object_resize(obj, w, h);
 }
 
 static void
 _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-	_sizing_eval(data);
+   _calc(data);
 }
 
 static void
 _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	if (event_info == wd->content) wd->content = NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *sub = event_info;
+   if (!wd) return;
+   
+   if (sub == wd->content) 
+     {
+	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+					     _changed_size_hints, obj);
+	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_RESIZE,
+		  		             _content_resize, obj);
+	wd->content = NULL;
+     }
 }
 
 static void
 _resize(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-	_calc(obj);
+   _calc(obj);
 }
 
 static void
 _content_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-	_calc(data);
+   _calc(data);
 }
 
 static void
 _calc(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Coord minw = -1, minh = -1;
-	Evas_Coord x, y, w, h;
-	if (!wd) return;
-	evas_object_geometry_get(obj, &x, &y, &w, &h);
-	edje_object_size_min_calc(wd->selectioninfo, &minw, &minh);
-
-	if (wd->content)
-	{
-		evas_object_move(wd->selectioninfo, x, y + h - minh);
-		evas_object_resize(wd->selectioninfo, w, minh);
-	}
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Coord minw = -1, minh = -1;
+   Evas_Coord x, y, w, h;
    
-	_sizing_eval(obj);
+   if (!wd) return;
+   evas_object_geometry_get(obj, &x, &y, &w, &h);
+   edje_object_size_min_calc(wd->selectioninfo, &minw, &minh);
+   edje_object_size_min_restricted_calc(wd->selectioninfo, &minw, &minh, minw, minh);
+
+   if (wd->content)
+     {
+	int offx = (w - minw) / 2;
+
+	evas_object_move(wd->selectioninfo, x + offx, y + h - minh);
+	evas_object_resize(wd->selectioninfo, minw, minh);
+     }
+   _sizing_eval(obj);
 }
 
 static Eina_Bool
 _timer_cb(void *data)
 {
-	Evas_Object *obj = data;
-        Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return ECORE_CALLBACK_CANCEL;
-	wd->timer = NULL;
-	evas_object_hide(obj);
-	evas_object_smart_callback_call(obj, "selectioninfo,timeout", NULL);
-	return ECORE_CALLBACK_CANCEL;
+   Evas_Object *obj = data;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return ECORE_CALLBACK_CANCEL;
+   wd->timer = NULL;
+   evas_object_hide(obj);
+   evas_object_smart_callback_call(obj, "selectioninfo,timeout", NULL);
+   return ECORE_CALLBACK_CANCEL;
 }
 
 
 static void
 _show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	evas_object_show(wd->selectioninfo);
-	if (wd->timer)
-	{
-		ecore_timer_del(wd->timer);
-		wd->timer = NULL;
-	}
-	if (wd->timeout > 0)
-		wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   evas_object_show(wd->selectioninfo);
+   if (wd->timer)
+     {
+	ecore_timer_del(wd->timer);
+	wd->timer = NULL;
+     }
+   if (wd->timeout > 0)
+     wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
+
+   evas_object_smart_callback_call(obj, "selectioninfo,show", NULL);
 }
 
 static void
 _hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	evas_object_hide(wd->selectioninfo);
-	if (wd->timer)
-	{
-		ecore_timer_del(wd->timer);
-		wd->timer = NULL;
-	}
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   evas_object_hide(wd->selectioninfo);
+   if (wd->timer)
+     {
+	ecore_timer_del(wd->timer);
+	wd->timer = NULL;
+     }
+
+   evas_object_smart_callback_call(obj, "selectioninfo,hide", NULL);
 }
 
 static void
 _parent_del(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	wd->parent = NULL;
-	evas_object_hide(obj);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+     wd->parent = NULL;
+   evas_object_hide(obj);
 }
 
 static void
 _parent_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	wd->parent = NULL;
-	evas_object_hide(obj);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->parent = NULL;
+   evas_object_hide(obj);
 }
 
 /**
@@ -203,37 +219,37 @@ _parent_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *
 EAPI Evas_Object *
 elm_selectioninfo_add(Evas_Object *parent)
 {
-	if (!parent) return NULL;
+   if (!parent) return NULL;
 
-	Evas_Object *obj;
-	Evas *e;
-	Widget_Data *wd;
+   Evas_Object *obj;
+   Evas *e;
+   Widget_Data *wd;
 
-	wd = ELM_NEW(Widget_Data);
-	e = evas_object_evas_get(parent);
-	obj = elm_widget_add(e);
-	ELM_SET_WIDTYPE(widtype, "selectioninfo");
-	elm_widget_type_set(obj, "selectioninfo");
-	elm_widget_sub_object_add(parent, obj);
-	elm_widget_data_set(obj, wd);
-	elm_widget_del_pre_hook_set(obj, _del_pre_hook);
-	elm_widget_del_hook_set(obj, _del_hook);
-	elm_widget_theme_hook_set(obj, _theme_hook);
+   wd = ELM_NEW(Widget_Data);
+   e = evas_object_evas_get(parent);
+   obj = elm_widget_add(e);
+   ELM_SET_WIDTYPE(widtype, "selectioninfo");
+   elm_widget_type_set(obj, "selectioninfo");
+   elm_widget_sub_object_add(parent, obj);
+   elm_widget_data_set(obj, wd);
+   elm_widget_del_pre_hook_set(obj, _del_pre_hook);
+   elm_widget_del_hook_set(obj, _del_hook);
+   elm_widget_theme_hook_set(obj, _theme_hook);
 
-	wd->selectioninfo = edje_object_add(e);
-	_elm_theme_object_set(obj, wd->selectioninfo, "selectioninfo", "base", "default");
-	_resize(obj, NULL, obj, NULL);
+   wd->selectioninfo = edje_object_add(e);
+   _elm_theme_object_set(obj, wd->selectioninfo, "selectioninfo", "base", "default");
+   //_resize(obj, NULL, obj, NULL);
 	
-	elm_selectioninfo_parent_set(obj, parent);
+   elm_selectioninfo_parent_set(obj, parent);
 
-	evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _resize, obj);
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, obj);
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, obj);
+   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _resize, obj);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, obj);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, obj);
 
-	_sizing_eval(obj);
-	return obj;
+   _sizing_eval(obj);
+   return obj;
 }
 
 /**
@@ -247,29 +263,22 @@ elm_selectioninfo_add(Evas_Object *parent)
 EAPI void
 elm_selectioninfo_content_set(Evas_Object *obj, Evas_Object *content)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	if (wd->content)
-	{
-		evas_object_event_callback_del_full(wd->content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-		evas_object_event_callback_del_full(wd->content, EVAS_CALLBACK_RESIZE, _content_resize, obj);
-		evas_object_del(wd->content);
-		wd->content = NULL;
-	}
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->content == content) return;
+   if (wd->content) evas_object_del(wd->content);
+   wd->content = content;
    
-	if (content)
-	{
-		elm_widget_sub_object_add(obj, content);
-		wd->content = content;
-		evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-		evas_object_event_callback_add(content, EVAS_CALLBACK_RESIZE, _content_resize, obj);
-		edje_object_part_swallow(wd->selectioninfo, "elm.swallow.content", content);
-        
-		_sizing_eval(obj);
-	}
-	
-	_calc(obj);
+   if (content)
+     {
+	elm_widget_sub_object_add(obj, content);
+	evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+	evas_object_event_callback_add(content, EVAS_CALLBACK_RESIZE, _content_resize, obj);
+	edje_object_part_swallow(wd->selectioninfo, "elm.swallow.content", content);
+     }
+   _sizing_eval(obj);   
+   _calc(obj);
 }
 
 /**
@@ -283,31 +292,31 @@ elm_selectioninfo_content_set(Evas_Object *obj, Evas_Object *content)
 EAPI void
 elm_selectioninfo_parent_set(Evas_Object *obj, Evas_Object *parent)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	if (wd->parent)
-	{
-		evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-		evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE, _changed_size_hints, obj);
-		evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_MOVE, _changed_size_hints, obj);
-		evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_DEL, _parent_del, obj);
-		evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_HIDE, _parent_hide, obj);
-		wd->parent = NULL;
-	}
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->parent)
+     {
+	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE, _changed_size_hints, obj);
+	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_MOVE, _changed_size_hints, obj);
+	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_DEL, _parent_del, obj);
+	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_HIDE, _parent_hide, obj);
+	wd->parent = NULL;
+     }
    
-	if (parent)
-	{
-		wd->parent = parent;
-		evas_object_event_callback_add(parent, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-		evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _changed_size_hints, obj);
-		evas_object_event_callback_add(parent, EVAS_CALLBACK_MOVE, _changed_size_hints, obj);
-		evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _parent_del, obj);
-		evas_object_event_callback_add(parent, EVAS_CALLBACK_HIDE, _parent_hide, obj);
-		_sizing_eval(obj);
-	}
+   if (parent)
+     {
+	wd->parent = parent;
+	evas_object_event_callback_add(parent, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+	evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _changed_size_hints, obj);
+	evas_object_event_callback_add(parent, EVAS_CALLBACK_MOVE, _changed_size_hints, obj);
+	evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _parent_del, obj);
+	evas_object_event_callback_add(parent, EVAS_CALLBACK_HIDE, _parent_hide, obj);
+	_sizing_eval(obj);
+     }
 	
-	_calc(obj);
+   _calc(obj);
 }
 
 /**
@@ -322,11 +331,11 @@ elm_selectioninfo_parent_set(Evas_Object *obj, Evas_Object *parent)
 EAPI void
 elm_selectioninfo_timeout_set(Evas_Object *obj, int timeout)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	wd->timeout = timeout;
-	elm_selectioninfo_timer_init(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->timeout = timeout;
+   elm_selectioninfo_timer_init(obj);
 }
 
 /**
@@ -338,13 +347,13 @@ elm_selectioninfo_timeout_set(Evas_Object *obj, int timeout)
 EAPI void
 elm_selectioninfo_timer_init(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	if (wd->timer) ecore_timer_del(wd->timer);
-	wd->timer = NULL;
-	if (wd->timeout > 0)
-		wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->timer) ecore_timer_del(wd->timer);
+   wd->timer = NULL;
+   if (wd->timeout > 0)
+     wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
 }
 
 /**
@@ -359,11 +368,11 @@ elm_selectioninfo_timer_init(Evas_Object *obj)
 EAPI void
 elm_selectioninfo_check_state_set(Evas_Object *obj, Eina_Bool *state, int count)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	wd->check_state = state;
-	wd->check_count = count;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->check_state = state;
+   wd->check_count = count;
 }
 
 /**
@@ -377,18 +386,18 @@ elm_selectioninfo_check_state_set(Evas_Object *obj, Eina_Bool *state, int count)
 EAPI int
 elm_selectioninfo_checked_count_get(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return -1;
-
-	int i;
-	int count = 0;
-	for (i=0; i<wd->check_count; i++)
-	{
-		if (wd->check_state[i])
-		count++;
-	}
-
-	return count;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return -1;
+   
+   int i;
+   int count = 0;
+   for (i=0; i<wd->check_count; i++)
+     {
+	if (wd->check_state[i])
+	  count++;
+     }
+   
+   return count;
 }
 
 /**
@@ -403,10 +412,10 @@ elm_selectioninfo_checked_count_get(Evas_Object *obj)
 EAPI void
 elm_selectioninfo_label_set(Evas_Object *obj, char* text)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-
-	edje_object_part_text_set(_EDJ(wd->content), "elm.text", strdup(text));
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   
+   edje_object_part_text_set(_EDJ(wd->content), "elm.text", strdup(text));
 }
 
