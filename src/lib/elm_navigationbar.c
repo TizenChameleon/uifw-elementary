@@ -27,7 +27,7 @@ typedef struct _Transit_Cb_Data Transit_Cb_Data;
 
 struct _Widget_Data
 {
-	Eina_List *stack, *to_delete;
+	Eina_List *stack;
 	Evas_Object *base;
 	Evas_Object *pager;
 	Eina_Bool hidden :1;
@@ -248,11 +248,11 @@ _transition_complete_cb(void *data)
 		ll = eina_list_last(wd->stack);
 		if (ll->data == prev_it)
 		{
-			wd->to_delete = eina_list_append(wd->to_delete, prev_it);
+			_delete_item(prev_it);
 			wd->stack = eina_list_remove_list(wd->stack, ll);
 		}
 	}
-	if(prev_it)
+	else if (prev_it)
 	{
 	 	evas_object_hide(prev_it->fn_btn1);
 		evas_object_hide(prev_it->back_btn);
@@ -338,28 +338,12 @@ _back_button_clicked(void *data, Evas_Object *obj, void *event_info)
 	elm_navigationbar_pop(it->obj);
 }
 
-static void
-_process_deletions(Widget_Data *wd)
-{
-	if (!wd) return;	
-	Item *it;
-	EINA_LIST_FREE(wd->to_delete, it)
-		{
-			_delete_item(it);
-		}
-}
-
 static void 
 _hide_finished(void *data, Evas_Object *obj, void *event_info)
 {
 	Evas_Object *navi_bar = data;	
 	Widget_Data *wd =  elm_widget_data_get(navi_bar);
 	evas_object_smart_callback_call(navi_bar, "hide,finished", event_info);
-	if(wd->to_delete)
-		{
-			_process_deletions(wd);
-			wd->to_delete = NULL;
-		}
 	edje_object_signal_emit(wd->base, "elm,state,rect,disabled", "elm");
 }
 
@@ -740,7 +724,7 @@ elm_navigationbar_to_content_pop(Evas_Object *obj,
 			it = ll->data;		
 			if (it->obj && (it->content != content)) 
 				{ 
-					wd->to_delete = eina_list_append(wd->to_delete, it);
+					_delete_item(ll->data);
 					wd->stack = eina_list_remove_list(wd->stack, ll);
 					it = NULL;
 				}
