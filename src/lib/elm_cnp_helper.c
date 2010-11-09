@@ -715,9 +715,9 @@ notify_handler_uri(struct _elm_cnp_selection *sel,
    else
       p += strlen("file://");
 
-   if ((!strstr(p,".png")) && (!strstr(p,".jpg")))
+   if ((!strcasestr(p,".png")) && (!strcasestr(p,".jpg")) && (!strcasestr(p,".bmp")))
      {
-        cnp_debug("No png, ignoring\n");
+        cnp_debug("No image(png, jpg and bmp), ignoring\n");
         if (savedtypes.textreq) savedtypes.textreq = 0;
         return 0;
      }
