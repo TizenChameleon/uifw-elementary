@@ -1,7 +1,7 @@
 #include <Elementary.h>
 #ifndef ELM_LIB_QUICKLAUNCH
 
-/* A simple test, just displaying calendar in it's default state */
+/* A simple test, just displaying calendar in its default state */
 void
 test_calendar(void *data, Evas_Object *obj, void *event_info)
 {
