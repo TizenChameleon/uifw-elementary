@@ -1489,7 +1489,7 @@ create_item_label(Evas_Object *obj, Elm_Controlbar_Item * it, char *part)
    label = elm_label_add(obj);
    elm_object_style_set(label, "controlbar");
    elm_label_label_set(label, it->text);
-   //elm_label_text_align_set(label, "center");
+   elm_label_text_align_set(label, "center");
    elm_label_text_color_set(label, 255, 255, 255, 255);
    elm_label_line_wrap_set(label, EINA_TRUE);
    elm_label_ellipsis_set(label, EINA_TRUE);
