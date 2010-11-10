@@ -27,6 +27,13 @@ _ctxpopup_position(Evas_Object *obj)
 }
 
 static void
+_select_all(void *data, Evas_Object *obj, void *event_info)
+{
+   ext_mod->selectall(data,obj,event_info);
+   evas_object_hide(obj);
+}
+
+static void
 _select(void *data, Evas_Object *obj, void *event_info)
 {
    ext_mod->select(data,obj,event_info);
@@ -151,7 +158,10 @@ obj_longpress(Evas_Object *obj)
 		if (!ext_mod->selmode)
 		{	
 			if (!ext_mod->password)
+			{
 				elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select",_select, obj );
+				elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select All",_select_all, obj );
+			}
 			if (1) // need way to detect if someone has a selection
 				{
 					if (ext_mod->editable)
@@ -177,6 +187,7 @@ obj_longpress(Evas_Object *obj)
 						{
 							_cancel(obj,ext_mod->popup,NULL);		
 							elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select",_select, obj );
+							elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select All",_select_all, obj );
 							if (1) // need way to detect if someone has a selection
 								{
 									if (ext_mod->editable)

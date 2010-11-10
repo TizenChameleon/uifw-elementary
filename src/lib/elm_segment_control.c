@@ -103,28 +103,28 @@ _signal_segment_on(void *data)
    Elm_Segment_Item *item = (Elm_Segment_Item *) data;
    Elm_Segment_Item *it;
    Eina_List *l;
-   
+
    Widget_Data *wd = elm_widget_data_get(item->obj);
    if (!wd) return;
-
    item->sel = EINA_TRUE;
 
-   edje_object_signal_emit(item->base, "elm,state,segment,on", "elm");
-   if(!item->label_wd)
-     edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
-   if(item->label_wd)
-      elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
-
-   if (item->segment_id == wd->cur_seg_id) return;
+   if (item->segment_id == wd->cur_seg_id && item->segment_id) return;
 
    EINA_LIST_FOREACH(wd->seg_ctrl, l, it)
      {
         if (it->segment_id == wd->cur_seg_id)
 	  {
-             _signal_segment_off (it);
+	     _signal_segment_off (it);
 	     break;
 	  }
      }
+
+   edje_object_signal_emit(item->base, "elm,state,segment,on", "elm");
+   if(!item->label_wd)
+      edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
+   if(item->label_wd)
+      elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
+
    wd->cur_seg_id = item->segment_id;
    evas_object_smart_callback_call(item->obj, "changed", (void*)wd->cur_seg_id);
 
@@ -140,17 +140,16 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
    if (item->segment_id == wd->cur_seg_id)
      {
-      if(!item->label_wd)
-        edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
-      item->sel = EINA_TRUE;
-       return;
+        if(!item->label_wd)
+           edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
+        item->sel = EINA_TRUE;
+        return;
      }
     _signal_segment_on((void*)item);
     if(item->label_wd)
        elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
 
-     return;
-
+    return;
 }
 
 static void
@@ -162,7 +161,6 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    if (!wd) return;
    
    edje_object_signal_emit(item->base, "elm,action,focus", "elm");
-
 }
 
 static void
@@ -198,6 +196,7 @@ _item_free(Evas_Object *obj, Elm_Segment_Item *it)
    if(it)
      free(it);
    it = NULL;
+   
    return;
 }
 
@@ -1061,18 +1060,16 @@ elm_segment_control_item_selected_set( Elm_Segment_Item *item, Eina_Bool select)
    if(select)
      {
         if(item->segment_id == wd->cur_seg_id && wd->cur_seg_id) return;
-
         item->sel = EINA_TRUE;
-      }
+     }
    else if(item->segment_id == wd->cur_seg_id)
-      {
-         item->sel = EINA_FALSE;
-         wd->cur_seg_id = -1;
-         _signal_segment_off(item);
-      } 
+     {
+        item->sel = EINA_FALSE;
+        wd->cur_seg_id = -1;
+        _signal_segment_off(item);
+     } 
 
    return;
-
 }
 
 /**
