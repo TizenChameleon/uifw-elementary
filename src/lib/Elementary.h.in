@@ -1778,7 +1778,7 @@ extern "C" {
    EAPI Eina_Bool    elm_mapbuf_alpha_get(const Evas_Object *obj);
 
    /* animator */
-   typedef struct _Animator Elm_Animator;
+   typedef struct _Elm_Animator Elm_Animator;
 
    typedef enum 
      {
