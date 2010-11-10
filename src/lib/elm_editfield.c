@@ -190,6 +190,11 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
      {
         if(wd->eraser_show)
            edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
+	if(wd->guide_text) 
+	  {
+	     edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
+	     wd->show_guide_text = EINA_FALSE;
+	  }
      }
    else 
      {

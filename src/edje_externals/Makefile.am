@@ -39,11 +39,13 @@ elm_genlist.c \
 elm_hoversel.c \
 elm_list.c \
 elm_map.c \
+elm_nocontents.c \
 elm_notepad.c \
 elm_photocam.c \
 elm_progressbar.c \
 elm_radio.c \
 elm_scrolled_entry.c \
+elm_scroller.c \
 elm_searchbar.c \
 elm_slider.c \
 elm_slideshow.c \
