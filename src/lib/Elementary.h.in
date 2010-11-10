@@ -2683,6 +2683,8 @@ extern "C" {
 
    /* smart callback called:
     * "selectioninfo,timeout" - when time out
+    * "selectioninfo,show" - when selectioninfo show
+    * "selectioninfo,hide" - when selectioninfo hide
     */
 
    /* Xml Animator */

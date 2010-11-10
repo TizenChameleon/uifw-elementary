@@ -1118,6 +1118,10 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    if( it->wd->edit_mode != ELM_GENLIST_EDIT_MODE_NONE )
      (void)_edit_mode_reset( it->wd );
    if (ev->button != 1) return;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)  
+     {  
+        it->wd->on_hold = EINA_TRUE;  
+     }  
 
    if(it->wd->edit_field && !it->renamed)
      elm_genlist_item_rename_mode_set(it, 0);
@@ -1130,6 +1134,7 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    it->wd->longpressed = EINA_FALSE;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) it->wd->on_hold = EINA_TRUE;
    else it->wd->on_hold = EINA_FALSE;
+   if (it->wd->on_hold) return; 
    it->wd->wasselected = it->selected;
    _item_hilight(it);
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
@@ -1266,6 +1271,7 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
           }
      }
    if ((it->disabled) || (dragged)) return;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return;    
    if (it->wd->multi)
      {
 	if (!it->selected && !it->menuopened)
@@ -2061,57 +2067,55 @@ _calc_job(void *data)
 				 showme = _item_block_recalc(itb, in, 0, 1);
 				 chb = itb;
 			 }
-		  itb->y = y;
-		  itb->x = 0;
-		  minh += itb->minh;
-		  if (minw == -1) minw = itb->minw;
-		  else if (minw < itb->minw)
-			 {
-				 minw = itb->minw;
-				 minw_change = 1;
-			 }
-		  itb->w = minw;
-		  itb->h = itb->minh;
-		  y += itb->h;
-		  in += itb->count;
-		  if (showme)
-			 {
-				 if(wd->show_item) 
-					{
-						wd->show_item->showme = 0;
-						if (wd->bring_in)
-						  elm_smart_scroller_region_bring_in(wd->scr,
-								  wd->show_item->x + wd->show_item->block->x,
-								  wd->show_item->y + wd->show_item->block->y,
-								  wd->show_item->block->w,
-								  wd->show_item->h);
-						else
-						  elm_smart_scroller_child_region_show(wd->scr,
-								  wd->show_item->x + wd->show_item->block->x,
-								  wd->show_item->y + wd->show_item->block->y,
-								  wd->show_item->block->w,
-								  wd->show_item->h);
-						wd->show_item = NULL;
-					}
-			 }
-	  }
-
-	if (minw_change)
-	  {
-		  EINA_INLIST_FOREACH(wd->blocks, itb)
-			 {
-				 itb->minw = minw;
-				 itb->w = itb->minw;
-			 }
-	  }
-	if ((chb) && (EINA_INLIST_GET(chb)->next))
-	  {
-		  EINA_INLIST_FOREACH(EINA_INLIST_GET(chb)->next, itb)
-			  if (itb->realized) _item_block_unrealize(itb);
-	  }
-	evas_object_geometry_get(wd->pan_smart, NULL, NULL, &ow, &oh);
-	if (minw < ow) minw = ow;
-	if ((minw != wd->minw) || (minh != wd->minh) || wd->select_all_item)
+        itb->y = y;
+        itb->x = 0;
+        minh += itb->minh;
+        if (minw == -1) minw = itb->minw;
+        else if (minw < itb->minw)
+          {
+             minw = itb->minw;
+             minw_change = 1;
+          }
+        itb->w = minw;
+        itb->h = itb->minh;
+        y += itb->h;
+        in += itb->count;
+        if ((showme) && (wd->show_item) && (wd->show_item->mincalcd))
+          {
+             wd->show_item->showme = 0;
+             if (wd->bring_in)
+               elm_smart_scroller_region_bring_in(wd->scr,
+                                                  wd->show_item->x + wd->show_item->block->x,
+                                                  wd->show_item->y + wd->show_item->block->y,
+                                                  wd->show_item->block->w,
+                                                  wd->show_item->h);
+             else
+               elm_smart_scroller_child_region_show(wd->scr,
+                                                    wd->show_item->x + wd->show_item->block->x,
+                                                    wd->show_item->y + wd->show_item->block->y,
+                                                    wd->show_item->block->w,
+                                                    wd->show_item->h);
+             wd->show_item = NULL;
+          }
+     }
+   if (minw_change)
+     {
+        EINA_INLIST_FOREACH(wd->blocks, itb)
+          {
+             itb->minw = minw;
+             itb->w = itb->minw;
+          }
+     }
+   if ((chb) && (EINA_INLIST_GET(chb)->next))
+     {
+        EINA_INLIST_FOREACH(EINA_INLIST_GET(chb)->next, itb)
+          {
+             if (itb->realized) _item_block_unrealize(itb);
+          }
+     }
+   evas_object_geometry_get(wd->pan_smart, NULL, NULL, &ow, &oh);
+   if (minw < ow) minw = ow;
+   if ((minw != wd->minw) || (minh != wd->minh) || wd->select_all_item)
      {
         wd->minw = minw;
         wd->minh = minh;

@@ -11,25 +11,25 @@
 
 struct _Dialogue_Item
 {
-	Evas_Object *parent;
-	Evas_Object *bg_layout;
-	Evas_Object *content;
-	Elm_Dialoguegroup_Item_Style style;
-	const char *location;
-	Eina_Bool press;
-//	Eina_Bool line_show;
+   Evas_Object *parent;
+   Evas_Object *bg_layout;
+   Evas_Object *content;
+   Elm_Dialoguegroup_Item_Style style;
+   const char *location;
+   Eina_Bool press;
+   //	Eina_Bool line_show;
 };
 
 
 typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
-	Evas_Object *parent;
-	Evas_Object *box;
-	Evas_Object *title_layout;
-	const char *title;
-	unsigned int num;
-	Eina_List *items;
+   Evas_Object *parent;
+   Evas_Object *box;
+   Evas_Object *title_layout;
+   const char *title;
+   unsigned int num;
+   Eina_List *items;
 };
 
 static const char*widtype = NULL;
@@ -44,41 +44,41 @@ static void _set_item_theme(Dialogue_Item *item, const char *location);
 static void _change_item_bg(Dialogue_Item *item, const char *location);
 static Dialogue_Item* _create_item(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style, const char *location);
 
-	
+
 static void
 _del_hook(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
+   Widget_Data *wd = elm_widget_data_get(obj);
 
-	if (!wd) return;
-	if (wd->title) eina_stringshare_del(wd->title);
-	
-	_remove_all(obj);
-	
-	if (wd->box){
-		evas_object_del(wd->box);
-		wd->box = NULL;
-	}
-	
-	free(wd);
+   if (!wd) return;
+   if (wd->title) eina_stringshare_del(wd->title);
+
+   _remove_all(obj);
+
+   if (wd->box){
+        evas_object_del(wd->box);
+        wd->box = NULL;
+   }
+
+   free(wd);
 }
 
 
 static void
 _theme_hook(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Eina_List *l;
-	Dialogue_Item *item;	
-	
-	if (!wd) return;	
-	if (wd->title) {
-		elm_layout_theme_set(wd->title_layout, "dialoguegroup", "title", elm_widget_style_get(obj));
-		edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", wd->title);
-	}
-	EINA_LIST_FOREACH(wd->items, l, item) 
-		_change_item_bg( item, item->location );	
-	_sizing_eval(obj);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_List *l;
+   Dialogue_Item *item;	
+
+   if (!wd) return;	
+   if (wd->title) {
+        elm_layout_theme_set(wd->title_layout, "dialoguegroup", "title", elm_widget_style_get(obj));
+        edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", wd->title);
+   }
+   EINA_LIST_FOREACH(wd->items, l, item) 
+      _change_item_bg( item, item->location );	
+   _sizing_eval(obj);
 }
 
 static void
@@ -90,130 +90,130 @@ _disable_hook(Evas_Object *obj)
 static void
 _sizing_eval(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Evas_Coord minw, minh, maxw, maxh;
-	
-	if (!wd) return;
-	evas_object_size_hint_min_get(wd->box, &minw, &minh);
-	evas_object_size_hint_max_get(wd->box, &maxw, &maxh);
-	evas_object_size_hint_min_set(obj, minw, minh);
-	evas_object_size_hint_max_set(obj, maxw, maxh);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Coord minw, minh, maxw, maxh;
+
+   if (!wd) return;
+   evas_object_size_hint_min_get(wd->box, &minw, &minh);
+   evas_object_size_hint_max_get(wd->box, &maxw, &maxh);
+   evas_object_size_hint_min_set(obj, minw, minh);
+   evas_object_size_hint_max_set(obj, maxw, maxh);
 }
 
 static void _remove_all(Evas_Object *obj)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *item;	
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Dialogue_Item *item;	
 
-	if (!wd) return;
+   if (!wd) return;
 
-	wd->num = 0;
-	
-	if (wd->items) {
-		EINA_LIST_FREE(wd->items, item) {
-			if (item->content){
-				evas_object_del(item->content);
-				item->content = NULL;
-			}
-			if (item->bg_layout){
-				evas_object_del(item->bg_layout);
-				item->bg_layout = NULL;
-			}
-			if (item->location)
-				eina_stringshare_del(item->location);
-			free(item);
-		}
-	}
+   wd->num = 0;
+
+   if (wd->items) {
+        EINA_LIST_FREE(wd->items, item) {
+             if (item->content){
+                  evas_object_del(item->content);
+                  item->content = NULL;
+             }
+             if (item->bg_layout){
+                  evas_object_del(item->bg_layout);
+                  item->bg_layout = NULL;
+             }
+             if (item->location)
+                eina_stringshare_del(item->location);
+             free(item);
+        }
+   }
 }
 
 static void _set_item_theme(Dialogue_Item *item, const char *location)
 {
-	if (!item) return;
-	char buf[30];
+   if (!item) return;
+   char buf[30];
 
-	if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT) 
-		snprintf(buf, sizeof(buf), "bg_%s", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD) 
-		snprintf(buf, sizeof(buf), "editfield_%s", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE) 
-		snprintf(buf, sizeof(buf), "editfield_with_title_%s", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE) 
-		snprintf(buf, sizeof(buf), "edit_title_%s", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN) 
-		snprintf(buf, sizeof(buf), "hidden_%s", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW) 
-		snprintf(buf, sizeof(buf), "dataview_%s", location);
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_NO_BG) 
-		snprintf(buf, sizeof(buf), "no_bg_%s", location);
-	elm_layout_theme_set(item->bg_layout, "dialoguegroup", buf, elm_widget_style_get(item->parent));
+   if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT) 
+      snprintf(buf, sizeof(buf), "bg_%s", location);
+   else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD) 
+      snprintf(buf, sizeof(buf), "editfield_%s", location);
+   else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE) 
+      snprintf(buf, sizeof(buf), "editfield_with_title_%s", location);
+   else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE) 
+      snprintf(buf, sizeof(buf), "edit_title_%s", location);
+   else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN) 
+      snprintf(buf, sizeof(buf), "hidden_%s", location);
+   else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW) 
+      snprintf(buf, sizeof(buf), "dataview_%s", location);
+   else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_NO_BG) 
+      snprintf(buf, sizeof(buf), "no_bg_%s", location);
+   elm_layout_theme_set(item->bg_layout, "dialoguegroup", buf, elm_widget_style_get(item->parent));
 }
 
 /*
-static void _set_line_show(Dialogue_Item *item, Dialogue_Item *after)
-{
-	if(!item || !after) return;
+   static void _set_line_show(Dialogue_Item *item, Dialogue_Item *after)
+   {
+   if(!item || !after) return;
 
-	if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT) {
-		if (after->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT) {
-			item->line_show = EINA_TRUE;
-			edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,line,show", "elm");	
-		}
-		else if (after->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD) {
-			item->line_show = EINA_FALSE;
-			edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,line,hide", "elm");	
-		}	
-	}
-	else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD) 
-		item->line_show = EINA_TRUE;	
-}
+   if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT) {
+   if (after->style == ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT) {
+   item->line_show = EINA_TRUE;
+   edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,line,show", "elm");	
+   }
+   else if (after->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD) {
+   item->line_show = EINA_FALSE;
+   edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,line,hide", "elm");	
+   }	
+   }
+   else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD) 
+   item->line_show = EINA_TRUE;	
+   }
 */
 
 static void _change_item_bg(Dialogue_Item *item, const char *location)
 {
-	if (!item) return;
-	
-	eina_stringshare_replace(&item->location, location);
-	_set_item_theme(item, location);
-	elm_layout_content_set(item->bg_layout, "swallow", item->content);
-	if(item->press == EINA_TRUE)
-		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
-	else
-		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");
+   if (!item) return;
 
-/*	if(item->line_show == EINA_FALSE)
-		edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,line,hide", "elm");*/
-		       	
+   eina_stringshare_replace(&item->location, location);
+   _set_item_theme(item, location);
+   elm_layout_content_set(item->bg_layout, "swallow", item->content);
+   if(item->press == EINA_TRUE)
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
+   else
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");
+
+   /*	if(item->line_show == EINA_FALSE)
+        edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,line,hide", "elm");*/
+
 }
 
 static Dialogue_Item* _create_item(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style, const char *location)
 {
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *item;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Dialogue_Item *item;
 
-	if (!wd) return NULL;
-	
-	item = ELM_NEW(Dialogue_Item);
-	item->parent = obj;
-	item->content = subobj;
-	item->press = EINA_TRUE;
-	item->style = style;
-//	item->line_show = EINA_TRUE;
-	eina_stringshare_replace(&item->location, location);
-	
-	item->bg_layout = elm_layout_add(wd->box);
-	_set_item_theme(item, location);
-	evas_object_size_hint_weight_set(item->bg_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	evas_object_size_hint_align_set(item->bg_layout, EVAS_HINT_FILL, 0.0);
-	evas_object_show(item->bg_layout);	
+   if (!wd) return NULL;
 
-	elm_layout_content_set(item->bg_layout, "swallow", item->content);
+   item = ELM_NEW(Dialogue_Item);
+   item->parent = obj;
+   item->content = subobj;
+   item->press = EINA_TRUE;
+   item->style = style;
+   //	item->line_show = EINA_TRUE;
+   eina_stringshare_replace(&item->location, location);
 
-	return item;
+   item->bg_layout = elm_layout_add(wd->box);
+   _set_item_theme(item, location);
+   evas_object_size_hint_weight_set(item->bg_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(item->bg_layout, EVAS_HINT_FILL, 0.0);
+   evas_object_show(item->bg_layout);	
+
+   elm_layout_content_set(item->bg_layout, "swallow", item->content);
+
+   return item;
 }
 
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-	_sizing_eval(data);
+   _sizing_eval(data);
 }
 
 /**
@@ -226,31 +226,31 @@ static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *eve
  */
 EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent)
 {
-	Evas_Object *obj = NULL;
-	Widget_Data *wd = NULL;
-	Evas *e = NULL;
+   Evas_Object *obj = NULL;
+   Widget_Data *wd = NULL;
+   Evas *e = NULL;
 
-	e = evas_object_evas_get(parent);
-	if (e == NULL) return NULL;
-	wd = ELM_NEW(Widget_Data);
-	obj = elm_widget_add(e);
-	ELM_SET_WIDTYPE(widtype, "dialoguegroup");
-	elm_widget_type_set(obj, "dialoguegroup");
-	elm_widget_sub_object_add(parent, obj);
-	elm_widget_data_set(obj, wd);
-	elm_widget_del_hook_set(obj, _del_hook);
-	elm_widget_theme_hook_set(obj, _theme_hook);
+   e = evas_object_evas_get(parent);
+   if (e == NULL) return NULL;
+   wd = ELM_NEW(Widget_Data);
+   obj = elm_widget_add(e);
+   ELM_SET_WIDTYPE(widtype, "dialoguegroup");
+   elm_widget_type_set(obj, "dialoguegroup");
+   elm_widget_sub_object_add(parent, obj);
+   elm_widget_data_set(obj, wd);
+   elm_widget_del_hook_set(obj, _del_hook);
+   elm_widget_theme_hook_set(obj, _theme_hook);
 
-	wd->parent = parent;
-	wd->num = 0;
-	
-	wd->box = elm_box_add(obj);
-	evas_object_event_callback_add(wd->box, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	evas_object_show(wd->box);
-	elm_widget_resize_object_set(obj, wd->box);
-	
-	_sizing_eval(obj);
-	return obj;
+   wd->parent = parent;
+   wd->num = 0;
+
+   wd->box = elm_box_add(obj);
+   evas_object_event_callback_add(wd->box, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+   evas_object_show(wd->box);
+   elm_widget_resize_object_set(obj, wd->box);
+
+   _sizing_eval(obj);
+   return obj;
 }
 
 /**
@@ -266,31 +266,31 @@ EAPI Evas_Object *elm_dialoguegroup_add(Evas_Object *parent)
 EAPI Dialogue_Item *
 elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *item = NULL, *new_item = NULL;	
-	
-	if (!wd || !subobj) return NULL;
-	
-	if (!wd->items) 
-		new_item = _create_item(obj, subobj, style, "default");
-	else {
-	       	if (wd->num == 1) {	
-			item = eina_list_data_get(wd->items);
-			_change_item_bg(item, "top");		
-		}		
-		else {
-			item = eina_list_data_get( eina_list_last(wd->items) );
-			_change_item_bg(item, "middle");		
-		}
-		new_item = _create_item(obj, subobj, style, "bottom");
-//		_set_line_show(item, new_item);
-	}
-	elm_box_pack_end(wd->box, new_item->bg_layout);
-	wd->items = eina_list_append(wd->items, new_item);			
-	wd->num++;
-	_sizing_eval(obj);
-	return new_item;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Dialogue_Item *item = NULL, *new_item = NULL;	
+
+   if (!wd || !subobj) return NULL;
+
+   if (!wd->items) 
+      new_item = _create_item(obj, subobj, style, "default");
+   else {
+        if (wd->num == 1) {	
+             item = eina_list_data_get(wd->items);
+             _change_item_bg(item, "top");		
+        }		
+        else {
+             item = eina_list_data_get( eina_list_last(wd->items) );
+             _change_item_bg(item, "middle");		
+        }
+        new_item = _create_item(obj, subobj, style, "bottom");
+        //		_set_line_show(item, new_item);
+   }
+   elm_box_pack_end(wd->box, new_item->bg_layout);
+   wd->items = eina_list_append(wd->items, new_item);			
+   wd->num++;
+   _sizing_eval(obj);
+   return new_item;
 }
 
 
@@ -307,34 +307,34 @@ elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegrou
 EAPI Dialogue_Item *
 elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *item = NULL, *new_item = NULL;
-	
-	if (!wd || !subobj) return NULL;
-	
-	if (!wd->items)
-		new_item = _create_item(obj, subobj, style, "default");	
-	else {
-	       	if (wd->num == 1) {	
-			item = eina_list_data_get(wd->items);
-			_change_item_bg(item, "bottom");
-		}		
-		else {
-			item = eina_list_data_get(wd->items);
-			_change_item_bg(item, "middle");		
-		}
-		new_item = _create_item(obj, subobj, style, "top");
-//		_set_line_show(new_item, item);
-	}
-	if(wd->title_layout)
-		elm_box_pack_after(wd->box, new_item->bg_layout, wd->title_layout);	
-	else			
-		elm_box_pack_start(wd->box, new_item->bg_layout);		
-	wd->items = eina_list_prepend(wd->items, new_item);		
-	wd->num++;
-	_sizing_eval(obj);
-	return new_item;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Dialogue_Item *item = NULL, *new_item = NULL;
+
+   if (!wd || !subobj) return NULL;
+
+   if (!wd->items)
+      new_item = _create_item(obj, subobj, style, "default");	
+   else {
+        if (wd->num == 1) {	
+             item = eina_list_data_get(wd->items);
+             _change_item_bg(item, "bottom");
+        }		
+        else {
+             item = eina_list_data_get(wd->items);
+             _change_item_bg(item, "middle");		
+        }
+        new_item = _create_item(obj, subobj, style, "top");
+        //		_set_line_show(new_item, item);
+   }
+   if(wd->title_layout)
+      elm_box_pack_after(wd->box, new_item->bg_layout, wd->title_layout);	
+   else			
+      elm_box_pack_start(wd->box, new_item->bg_layout);		
+   wd->items = eina_list_prepend(wd->items, new_item);		
+   wd->num++;
+   _sizing_eval(obj);
+   return new_item;
 }
 
 /**
@@ -351,35 +351,35 @@ elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegro
 EAPI Dialogue_Item * 
 elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *after, Elm_Dialoguegroup_Item_Style style)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *after_item = NULL, *item = NULL;
-	Eina_List *l;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Dialogue_Item *after_item = NULL, *item = NULL;
+   Eina_List *l;
 
-	if (!wd || !subobj || !after || !wd->items) return NULL;
+   if (!wd || !subobj || !after || !wd->items) return NULL;
 
-	EINA_LIST_FOREACH(wd->items, l, after_item) {
-		if(after == after_item) {
-			if( !strcmp(after_item->location, "default") ) {
-				_change_item_bg(after_item, "top");
-				item = _create_item(obj, subobj, style, "bottom");
-			}			
-			else if( !strcmp(after_item->location, "top") || !strcmp(after_item->location, "middle") )	
-				item = _create_item(obj, subobj, style, "middle");		
-			else if( !strcmp(after_item->location, "bottom") ) {
-				_change_item_bg(after_item, "middle");
-				item = _create_item(obj, subobj, style, "bottom");		
-			}
+   EINA_LIST_FOREACH(wd->items, l, after_item) {
+        if(after == after_item) {
+             if( !strcmp(after_item->location, "default") ) {
+                  _change_item_bg(after_item, "top");
+                  item = _create_item(obj, subobj, style, "bottom");
+             }			
+             else if( !strcmp(after_item->location, "top") || !strcmp(after_item->location, "middle") )	
+                item = _create_item(obj, subobj, style, "middle");		
+             else if( !strcmp(after_item->location, "bottom") ) {
+                  _change_item_bg(after_item, "middle");
+                  item = _create_item(obj, subobj, style, "bottom");		
+             }
 
-			elm_box_pack_after(wd->box, item->bg_layout, after_item->bg_layout);
-			wd->items = eina_list_append_relative(wd->items, item, after_item);
-		//	_set_line_show(after, item);
-		}		
-	}
-		
-	wd->num++;
-	_sizing_eval(obj);
-	return item;
+             elm_box_pack_after(wd->box, item->bg_layout, after_item->bg_layout);
+             wd->items = eina_list_append_relative(wd->items, item, after_item);
+             //	_set_line_show(after, item);
+        }		
+   }
+
+   wd->num++;
+   _sizing_eval(obj);
+   return item;
 }
 
 /**
@@ -396,39 +396,39 @@ elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_I
 EAPI Dialogue_Item *
 elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *before, Elm_Dialoguegroup_Item_Style style)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	Dialogue_Item *before_item = NULL, *item = NULL;
-	Eina_List *l;
-	Eina_List *prev;
-	
-	if (!wd || !subobj || !before || !wd->items) return NULL;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Dialogue_Item *before_item = NULL, *item = NULL;
+   Eina_List *l;
+   Eina_List *prev;
 
-	EINA_LIST_FOREACH(wd->items, l, before_item) {
-		if(before == before_item) {
-			if( !strcmp(before_item->location, "default") ) {
-				_change_item_bg(before_item, "bottom");
-				item = _create_item(obj, subobj, style, "top");
-			}
-				
-			else if( !strcmp(before_item->location, "top") ) {
-				_change_item_bg(before_item, "middle");
-				item = _create_item(obj, subobj, style, "top");			
-			}
+   if (!wd || !subobj || !before || !wd->items) return NULL;
 
-			else if( !strcmp(before_item->location, "middle") || !strcmp(before_item->location, "bottom") ) {
-				item = _create_item(obj, subobj, style, "middle");
-				prev = eina_list_prev(l);
-			//	_set_line_show(prev->data, item);
-			}
-			elm_box_pack_before(wd->box, item->bg_layout, before_item->bg_layout);
-			wd->items = eina_list_prepend_relative(wd->items, item, before_item);
-		}		
-	}
-		
-	wd->num++;
-	_sizing_eval(obj);	
-	return item;
+   EINA_LIST_FOREACH(wd->items, l, before_item) {
+        if(before == before_item) {
+             if( !strcmp(before_item->location, "default") ) {
+                  _change_item_bg(before_item, "bottom");
+                  item = _create_item(obj, subobj, style, "top");
+             }
+
+             else if( !strcmp(before_item->location, "top") ) {
+                  _change_item_bg(before_item, "middle");
+                  item = _create_item(obj, subobj, style, "top");			
+             }
+
+             else if( !strcmp(before_item->location, "middle") || !strcmp(before_item->location, "bottom") ) {
+                  item = _create_item(obj, subobj, style, "middle");
+                  prev = eina_list_prev(l);
+                  //	_set_line_show(prev->data, item);
+             }
+             elm_box_pack_before(wd->box, item->bg_layout, before_item->bg_layout);
+             wd->items = eina_list_prepend_relative(wd->items, item, before_item);
+        }		
+   }
+
+   wd->num++;
+   _sizing_eval(obj);	
+   return item;
 }
 
 /**
@@ -442,46 +442,46 @@ elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_
 EAPI void
 elm_dialoguegroup_remove(Dialogue_Item *item)
 {
-	if (!item) return;
-   	ELM_CHECK_WIDTYPE(item->parent, widtype) ;
-	Dialogue_Item *current_item;
-	Widget_Data *wd = elm_widget_data_get(item->parent);
-	Eina_List *l;
-	
-	if (!wd || !wd->items || !item) return ;
-	
-	EINA_LIST_FOREACH(wd->items, l, current_item) {
-		if (current_item == item) {
-			if (current_item->content){
-				evas_object_del(current_item->content);
-				current_item->content = NULL;
-			}
-			if (current_item->bg_layout){
-				evas_object_del(current_item->bg_layout);
-				current_item->bg_layout = NULL;
-			}
-			elm_box_unpack(wd->box, current_item->bg_layout);			
-			wd->items = eina_list_remove(wd->items, current_item);
-		}
-	}
-		
-	wd->num--;
-	
-	if (wd->num == 0) return;
-	
-	if (wd->num == 1) {
-		current_item = eina_list_data_get(wd->items);
-		_change_item_bg(current_item, "default");
-	}
+   if (!item) return;
+   ELM_CHECK_WIDTYPE(item->parent, widtype) ;
+   Dialogue_Item *current_item;
+   Widget_Data *wd = elm_widget_data_get(item->parent);
+   Eina_List *l;
 
-	else {		
-		current_item = eina_list_data_get(wd->items);
-		_change_item_bg(current_item, "top");
-		current_item = eina_list_data_get( eina_list_last(wd->items) );
-		_change_item_bg(current_item, "bottom");		
-	}
+   if (!wd || !wd->items || !item) return ;
 
-	_sizing_eval(item->parent);	
+   EINA_LIST_FOREACH(wd->items, l, current_item) {
+        if (current_item == item) {
+             if (current_item->content){
+                  evas_object_del(current_item->content);
+                  current_item->content = NULL;
+             }
+             if (current_item->bg_layout){
+                  evas_object_del(current_item->bg_layout);
+                  current_item->bg_layout = NULL;
+             }
+             elm_box_unpack(wd->box, current_item->bg_layout);			
+             wd->items = eina_list_remove(wd->items, current_item);
+        }
+   }
+
+   wd->num--;
+
+   if (wd->num == 0) return;
+
+   if (wd->num == 1) {
+        current_item = eina_list_data_get(wd->items);
+        _change_item_bg(current_item, "default");
+   }
+
+   else {		
+        current_item = eina_list_data_get(wd->items);
+        _change_item_bg(current_item, "top");
+        current_item = eina_list_data_get( eina_list_last(wd->items) );
+        _change_item_bg(current_item, "bottom");		
+   }
+
+   _sizing_eval(item->parent);	
 }
 
 /**
@@ -494,9 +494,9 @@ elm_dialoguegroup_remove(Dialogue_Item *item)
 EAPI void
 elm_dialoguegroup_remove_all(Evas_Object *obj)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype);
-	_remove_all(obj);	
-	_sizing_eval(obj);	
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   _remove_all(obj);	
+   _sizing_eval(obj);	
 }
 
 
@@ -511,25 +511,25 @@ elm_dialoguegroup_remove_all(Evas_Object *obj)
 EAPI void 
 elm_dialoguegroup_title_set(Evas_Object *obj, const char *title)
 {
-   	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	
-	if (!wd) return ;
-	eina_stringshare_replace(&wd->title, title);
-	if (!title) {
-	 	wd->title = NULL;      	
-		elm_box_unpack(wd->box, wd->title_layout);		
-	} 	
-	if (!wd->title_layout) {
-		wd->title_layout = elm_layout_add(wd->box);
-		elm_layout_theme_set(wd->title_layout, "dialoguegroup", "title", elm_widget_style_get(obj));
-		evas_object_size_hint_weight_set(wd->title_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-		evas_object_size_hint_align_set(wd->title_layout, EVAS_HINT_FILL, 0.0);
-		evas_object_show(wd->title_layout);	
-		edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", title);
-		elm_box_pack_start(wd->box, wd->title_layout);
-	}
-	edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", title);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return ;
+   eina_stringshare_replace(&wd->title, title);
+   if (!title) {
+        wd->title = NULL;      	
+        elm_box_unpack(wd->box, wd->title_layout);		
+   } 	
+   if (!wd->title_layout) {
+        wd->title_layout = elm_layout_add(wd->box);
+        elm_layout_theme_set(wd->title_layout, "dialoguegroup", "title", elm_widget_style_get(obj));
+        evas_object_size_hint_weight_set(wd->title_layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(wd->title_layout, EVAS_HINT_FILL, 0.0);
+        evas_object_show(wd->title_layout);	
+        edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", title);
+        elm_box_pack_start(wd->box, wd->title_layout);
+   }
+   edje_object_part_text_set(elm_layout_edje_get(wd->title_layout), "text", title);
 }
 
 /**
@@ -543,10 +543,10 @@ elm_dialoguegroup_title_set(Evas_Object *obj, const char *title)
 EAPI const char *
 elm_dialoguegroup_title_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return NULL;
-	return wd->title;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->title;
 }
 
 /**
@@ -563,12 +563,12 @@ elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press)
 {
    if(!item) return;
    ELM_CHECK_WIDTYPE(item->parent, widtype) ;
-   
+
    item->press = press;
    if(press == EINA_TRUE)
-	   edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
    else
-	   edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");	
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");	
 }
 
 /**
@@ -585,7 +585,7 @@ elm_dialoguegroup_press_effect_get(Dialogue_Item *item)
 {
    if(!item) return EINA_FALSE;
    ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
-   
+
    return item->press;
 }
 
@@ -603,7 +603,7 @@ elm_dialoguegroup_item_content_get(Dialogue_Item *item)
 {
    if(!item) return NULL;
    ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
-   
+
    return item->content;
 }
 
@@ -618,14 +618,14 @@ elm_dialoguegroup_item_content_get(Dialogue_Item *item)
 EAPI void 
 elm_dialoguegroup_item_style_set(Dialogue_Item *item, Elm_Dialoguegroup_Item_Style style)
 {
-	if(!item) return;
-   	ELM_CHECK_WIDTYPE(item->parent, widtype);
-	Widget_Data *wd = elm_widget_data_get(item->parent);
-	
-	item->style = style;
-	_change_item_bg(item, item->location);
-	
-	if (!wd) return ;
+   if(!item) return;
+   ELM_CHECK_WIDTYPE(item->parent, widtype);
+   Widget_Data *wd = elm_widget_data_get(item->parent);
+
+   item->style = style;
+   _change_item_bg(item, item->location);
+
+   if (!wd) return ;
 }
 
 /**
@@ -640,11 +640,13 @@ elm_dialoguegroup_item_style_set(Dialogue_Item *item, Elm_Dialoguegroup_Item_Sty
 EAPI Elm_Dialoguegroup_Item_Style
 elm_dialoguegroup_item_style_get(Dialogue_Item *item)
 {
-	if(!item) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
-   	ELM_CHECK_WIDTYPE(item->parent, widtype);
-	Widget_Data *wd = elm_widget_data_get(item->parent);
-	
-	if (!wd) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
+   if(!item) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
+   ELM_CHECK_WIDTYPE(item->parent, widtype);
+   Widget_Data *wd = elm_widget_data_get(item->parent);
 
-	return item->style;
+   if (!wd) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
+
+   return item->style;
 }
+
+/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/

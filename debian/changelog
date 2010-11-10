@@ -1,3 +1,27 @@
+elementary (1.0.0+svn.51480slp2+build54) unstable; urgency=low
+
+  * repackaging for patch about scroller(ON_HOLD)
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build54
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 10 Nov 2010 10:32:15 +0900
+
+elementary (1.0.0+svn.51480slp2+build53) unstable; urgency=low
+
+  * repackaging
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build53
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Tue, 09 Nov 2010 15:09:50 +0900
+
+elementary (1.0.0+svn.51480slp2+build52) unstable; urgency=low
+
+  * bug fixed and singal added from selectioninfo
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build52
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Tue, 09 Nov 2010 14:31:35 +0900
+
 elementary (1.0.0+svn.51480slp2+build51) unstable; urgency=low
 
   * bugfix ellipsis is_width_over func
