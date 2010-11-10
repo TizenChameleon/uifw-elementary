@@ -1118,6 +1118,10 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    if( it->wd->edit_mode != ELM_GENLIST_EDIT_MODE_NONE )
      (void)_edit_mode_reset( it->wd );
    if (ev->button != 1) return;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)  
+     {  
+        it->wd->on_hold = EINA_TRUE;  
+     }  
 
    if(it->wd->edit_field && !it->renamed)
      elm_genlist_item_rename_mode_set(it, 0);
@@ -1130,6 +1134,7 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    it->wd->longpressed = EINA_FALSE;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) it->wd->on_hold = EINA_TRUE;
    else it->wd->on_hold = EINA_FALSE;
+   if (it->wd->on_hold) return; 
    it->wd->wasselected = it->selected;
    _item_hilight(it);
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
@@ -1266,6 +1271,7 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
           }
      }
    if ((it->disabled) || (dragged)) return;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return;    
    if (it->wd->multi)
      {
 	if (!it->selected && !it->menuopened)
