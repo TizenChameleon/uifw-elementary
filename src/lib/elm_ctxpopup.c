@@ -116,7 +116,7 @@ static void _area_rect_resize(void *data, Evas *e, Evas_Object *obj,
 		void *event_info) {
 	Widget_Data *wd = elm_widget_data_get(data);
 	if(wd->visible) {
-		_reset_scroller_resize(wd);
+		_reset_scroller_size(wd);
 		_sizing_eval(obj);
 	}
 }
@@ -125,7 +125,7 @@ static void _area_rect_move(void *data, Evas *e, Evas_Object *obj,
 		void *event_info) {
 	Widget_Data *wd = elm_widget_data_get(data);
 	if(wd->visible) {
-		_reset_scroller_resize(wd);
+		_reset_scroller_size(wd);
 		_sizing_eval(obj);
 	}
 }
@@ -762,7 +762,7 @@ static void _theme_hook(Evas_Object *obj) {
 		elm_object_style_set(wd->scroller, elm_object_style_get(obj));
 
 	if(wd->visible) {
-		_reset_scroller_resize(wd);
+		_reset_scroller_size(wd);
 		_sizing_eval(obj);
 	}
 }
@@ -1142,7 +1142,7 @@ EAPI void elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
 	edje_object_message_signal_process(item->base);
 
 	if (wd->visible) {
-		_reset_scroller_resize(wd);
+		_reset_scroller_size(wd);
 		_sizing_eval(item->ctxpopup);
 	}
 }
