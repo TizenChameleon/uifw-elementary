@@ -582,6 +582,20 @@ _dismissed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 }
 
 static void
+_selectall(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   wd->selmode = EINA_TRUE;
+   if (!wd->password)
+     edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
+   edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
+   edje_object_part_text_select_all(wd->ent, "elm.text");
+   //elm_widget_scroll_hold_push(data);
+   elm_object_scroll_freeze_pop(data);
+}
+
+static void
 _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -591,6 +605,7 @@ _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (!wd->password)
      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
    edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
+   elm_object_scroll_freeze_pop(data);
    //elm_widget_scroll_hold_push(data);
 }
 
@@ -2154,7 +2169,7 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->cut = _cut;
    ext_mod->paste = _paste;
    ext_mod->select = _select;
-   ext_mod->selectall = NULL; /* to be implemented*/
+   ext_mod->selectall = _selectall;
    ext_mod->ent = wd->ent;
    ext_mod->items = wd->items;
    ext_mod->longpress_timer = wd->longpress_timer;
