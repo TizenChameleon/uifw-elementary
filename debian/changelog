@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build57) unstable; urgency=low
+
+  * repackaging
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build57
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Thu, 11 Nov 2010 01:16:57 +0900
+
 elementary (1.0.0+svn.51480slp2+build56) unstable; urgency=low
 
   * fix ctxpopup resizng error
