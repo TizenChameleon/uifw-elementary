@@ -1,4 +1,7 @@
 #include <Elementary.h>
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
 /* Hint:
@@ -895,6 +898,30 @@ item_drag_right(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
+scroll_top(void *data, Evas_Object *obj, void *event_info)
+{
+   printf("Top edge!\n");
+}
+
+static void
+scroll_bottom(void *data, Evas_Object *obj, void *event_info)
+{
+   printf("Bottom edge!\n");
+}
+
+static void
+scroll_left(void *data, Evas_Object *obj, void *event_info)
+{
+   printf("Left edge!\n");
+}
+
+static void
+scroll_right(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   printf("Right edge!\n");
+}
+
+static void
 item_drag(void *data, Evas_Object *obj, void *event_info)
 {
    printf("drag\n");
@@ -916,7 +943,7 @@ void
 test_genlist5(void *data, Evas_Object *obj, void *event_info)
 {
    Evas_Object *win, *bg, *gl, *bx, *bx2, *bt;
-   static Testitem tit[3];
+   static Testitem tit[5];
 
    win = elm_win_add(NULL, "genlist-5", ELM_WIN_BASIC);
    elm_win_title_set(win, "Genlist 5");
@@ -955,7 +982,15 @@ test_genlist5(void *data, Evas_Object *obj, void *event_info)
    tit[2].item = elm_genlist_item_append(gl, &itc5,
 					 &(tit[2])/* item data */, NULL/* parent */, ELM_GENLIST_ITEM_NONE, gl_sel/* func */,
 					 NULL/* func data */);
+   tit[3].mode = 3;
+   tit[3].item = elm_genlist_item_append(gl, &itc5,
+					 &(tit[3])/* item data */, NULL/* parent */, ELM_GENLIST_ITEM_NONE, gl_sel/* func */,
+					 NULL/* func data */);
 
+   tit[4].mode = 4;
+   tit[4].item = elm_genlist_item_append(gl, &itc5,
+					 &(tit[4])/* item data */, NULL/* parent */, ELM_GENLIST_ITEM_NONE, gl_sel/* func */,
+					 NULL/* func data */);
    elm_box_pack_end(bx, gl);
    evas_object_show(bx);
 
@@ -963,6 +998,10 @@ test_genlist5(void *data, Evas_Object *obj, void *event_info)
    evas_object_smart_callback_add(gl, "drag,start,down", item_drag_down, NULL);
    evas_object_smart_callback_add(gl, "drag,start,left", item_drag_left, NULL);
    evas_object_smart_callback_add(gl, "drag,start,right", item_drag_right, NULL);
+   evas_object_smart_callback_add(gl, "scroll,edge,top", scroll_top, NULL);
+   evas_object_smart_callback_add(gl, "scroll,edge,bottom", scroll_bottom, NULL);
+   evas_object_smart_callback_add(gl, "scroll,edge,left", scroll_left, NULL);
+   evas_object_smart_callback_add(gl, "scroll,edge,right", scroll_right, NULL);
    evas_object_smart_callback_add(gl, "drag", item_drag, NULL);
    evas_object_smart_callback_add(gl, "drag,stop", item_drag_stop, NULL);
    evas_object_smart_callback_add(gl, "longpressed", item_longpress, NULL);
