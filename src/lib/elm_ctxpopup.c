@@ -611,6 +611,7 @@ static void _sizing_eval(Evas_Object *obj) {
 
 	EINA_LIST_FOREACH(wd->items, elist, item)
 	{
+		_item_sizing_eval(item);
 		evas_object_size_hint_min_get(item->base, &_box_size.x, &_box_size.y);
 		if(!wd->horizontal) {
 			if(_box_size.x > box_size.x) box_size.x = _box_size.x;
@@ -619,7 +620,6 @@ static void _sizing_eval(Evas_Object *obj) {
 			if(_box_size.x != -1 ) box_size.x += _box_size.x;
 			if(_box_size.y > box_size.y) box_size.y = _box_size.y;
 		}
-		_item_sizing_eval(item);
 		++idx;
 	}
 
@@ -793,6 +793,8 @@ static void _ctxpopup_show(void *data, Evas *e, Evas_Object *obj,
 	if ((eina_list_count(wd->items) < 1) && (!wd->content) && (wd->btn_cnt < 1))
 		return;
 
+	wd->visible = EINA_TRUE;
+
 	_sizing_eval(obj);
 
 	if (!wd->screen_dimmed_disabled) {
@@ -805,8 +807,6 @@ static void _ctxpopup_show(void *data, Evas *e, Evas_Object *obj,
 		evas_object_show(wd->arrow);
 
 	_show_effect(wd);
-
-	wd->visible = EINA_TRUE;
 }
 
 static void _ctxpopup_hide(void *data, Evas *e, Evas_Object *obj,
