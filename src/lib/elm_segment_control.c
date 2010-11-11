@@ -839,7 +839,7 @@ elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool
 /**
  * Delete a segment item to segmentcontrol
  * @param obj The SegmentControl object
- * @param index The position at which segment item to be deleted
+ * @param item The  segment item to be deleted
  * @param animate If 1 the action be animated with sliding effects default 0.
  *
  * @ingroup SegmentControl SegmentControl
@@ -984,6 +984,7 @@ elm_segment_control_item_selected_get(const Evas_Object *obj)
 /**
  * Get the currently selected segment item of segmentcontrol
  * @param obj The SegmentControl object
+ * @param value The Selected Segment id.
  * @return The selected Segment item
  *
  * @ingroup SegmentControl SegmentControl
@@ -1030,8 +1031,8 @@ elm_segment_control_get_segment_count(Evas_Object *obj)
 
 /**
  * Get the base object of segment item in segmentcontrol
- * @param obj The Segment item
- * @return obj The base object of the segment item
+ * @param it The Segment item
+ * @return obj The base object of the segment item.
  *
  * @ingroup SegmentControl SegmentControl
  */

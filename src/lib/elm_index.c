@@ -1139,7 +1139,7 @@ elm_index_item_clear(Evas_Object *obj)
  * @ingroup Index
  */
 EAPI void
-elm_index_item_go(Evas_Object *obj, int level __UNUSED__)
+elm_index_item_go(Evas_Object *obj, int level)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
