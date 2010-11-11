@@ -69,7 +69,7 @@ static void _item_sizing_eval(Item *it);
 static void _delete_item(Item *it);
 static void _back_button_clicked(void *data, Evas_Object *obj, void *event_info);
 static int _set_button_width(Evas_Object *obj);
-static void _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_Bool back_btn);
+static Eina_Bool _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_Bool back_btn);
 static Evas_Object *_multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, int width);
 static Item *_check_item_is_added(Evas_Object *obj, Evas_Object *content);
 static void _transition_complete_cb(void *data);
@@ -365,10 +365,13 @@ _set_button_width(Evas_Object *obj)
 	return w;
 }
 
-static void 
+static Eina_Bool 
 _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_Bool back_btn)
 {
 	char buf[4096];
+	Eina_Bool changed = EINA_FALSE;
+	if(prev_btn == new_btn)
+		return changed;
 	
 	if (prev_btn) 
 	{
@@ -389,8 +392,9 @@ _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_
 			}
 		elm_widget_sub_object_add(obj, new_btn);
 		elm_object_focus_allow_set(new_btn, EINA_FALSE);
+		changed = EINA_TRUE;
 	}
-	return;
+	return changed;
 }
 
 static Item *
@@ -972,6 +976,7 @@ _elm_navigationbar_back_button_set(Evas_Object *obj,
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
+	Eina_Bool changed;
 
 	if (!wd) return;
 	
@@ -979,7 +984,7 @@ _elm_navigationbar_back_button_set(Evas_Object *obj,
 	{
 		if (it->content == content) 
 		{
-			_button_set(obj, it->back_btn, button, EINA_TRUE);
+			changed = _button_set(obj, it->back_btn, button, EINA_TRUE);
 			it->back_btn = button;
 			_item_sizing_eval(it);
 			break;
@@ -991,7 +996,7 @@ _elm_navigationbar_back_button_set(Evas_Object *obj,
 	if (ll) 
 	{
 		it = ll->data;
-		if (it->back_btn && (it->content == content) && (!it->fn_btn1)) 
+		if (it->back_btn && changed && (it->content == content) && (!it->fn_btn1)) 
 		{
 			edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->back_btn);	
 			evas_object_smart_callback_add(it->back_btn, "clicked", _back_button_clicked, it); 
@@ -1025,6 +1030,7 @@ _elm_navigationbar_function_button1_set(Evas_Object *obj,
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
+	Eina_Bool changed;
 
 	if (!wd) return;
 
@@ -1032,7 +1038,7 @@ _elm_navigationbar_function_button1_set(Evas_Object *obj,
 	{
 		if (it->content == content) 
 		{
-			_button_set(obj, it->fn_btn1, button, EINA_FALSE);
+			changed = _button_set(obj, it->fn_btn1, button, EINA_FALSE);
 			it->fn_btn1 = button;
 			_item_sizing_eval(it);
 			break;
@@ -1044,7 +1050,7 @@ _elm_navigationbar_function_button1_set(Evas_Object *obj,
 	if (ll) 
 	{
 		it = ll->data;
-		if (it->fn_btn1 && (it->content == content)) 
+		if (it->fn_btn1 && changed && (it->content == content)) 
 		{
 			if (edje_object_part_swallow_get(wd->base, "elm.swallow.btn1") == it->back_btn)
 			{
@@ -1083,13 +1089,14 @@ _elm_navigationbar_function_button2_set(Evas_Object *obj,
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
+	Eina_Bool changed;
 
 	if (!wd) return;
 	 EINA_LIST_FOREACH(wd->stack, ll, it)
 		{
 			if (it->content == content) 
 			{
-				_button_set(obj, it->fn_btn2, button, EINA_FALSE);
+				changed = _button_set(obj, it->fn_btn2, button, EINA_FALSE);
 				it->fn_btn2 = button;
 				_item_sizing_eval(it);
 				break;
@@ -1101,7 +1108,7 @@ _elm_navigationbar_function_button2_set(Evas_Object *obj,
 	if (ll) 
 		{
 			it = ll->data;
-			if (it->fn_btn2 && (it->content == content)) 
+			if (it->fn_btn2 && changed && (it->content == content)) 
 				{
 					edje_object_part_swallow(wd->base, "elm.swallow.btn2", it->fn_btn2);
 				}
@@ -1134,6 +1141,7 @@ _elm_navigationbar_function_button3_set(Evas_Object *obj,
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Eina_List *ll;
 	Item *it;
+	Eina_Bool changed;
 
 	if (!wd) return;
 
@@ -1141,7 +1149,7 @@ _elm_navigationbar_function_button3_set(Evas_Object *obj,
 	{
 		if (it->content == content) 
 		{
-			_button_set(obj, it->fn_btn3, button, EINA_FALSE);
+			changed = _button_set(obj, it->fn_btn3, button, EINA_FALSE);
 			it->fn_btn3 = button;
 			_item_sizing_eval(it);
 			break;
@@ -1153,7 +1161,7 @@ _elm_navigationbar_function_button3_set(Evas_Object *obj,
 	if (ll) 
 	{
 		it = ll->data;
-		if (it->fn_btn3 && (it->content == content)) 
+		if (it->fn_btn3 && changed && (it->content == content)) 
 			{
 				edje_object_part_swallow(wd->base, "elm.swallow.btn3", it->fn_btn3);
 			}
