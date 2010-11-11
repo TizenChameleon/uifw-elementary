@@ -56,7 +56,8 @@ elm_toggle.c \
 elm_toolbar.c \
 elm_notify.c \
 elm_panes.c \
-elm_navigationbar.c
+elm_navigationbar.c \
+elm_navigationbar_ex.c
 
 module_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
 module_la_LDFLAGS = -no-undefined -module -avoid-version -shared -fPIC
