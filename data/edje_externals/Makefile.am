@@ -17,6 +17,7 @@ ico_check.png \
 ico_clock.png \
 ico_fileselector.png \
 ico_fileselector_button.png \
+ico_gengrid.png \
 ico_genlist.png \
 ico_hoversel.png \
 ico_icon.png \
