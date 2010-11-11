@@ -429,6 +429,7 @@ _imp_region_get_hook(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_
    if (y) *y = cy;
    if (w) *w = cw;
    if (h) *h = ch;
+
    return NULL;
 }
 #endif
@@ -460,7 +461,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	     evas_object_raise(parent_obj);
 	     parent_obj = elm_widget_parent_get(parent_obj); 
 	  }
-
      }
    else
      {
@@ -582,6 +582,20 @@ _dismissed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 }
 
 static void
+_selectall(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   wd->selmode = EINA_TRUE;
+   if (!wd->password)
+     edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
+   edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
+   edje_object_part_text_select_all(wd->ent, "elm.text");
+   //elm_widget_scroll_hold_push(data);
+   elm_object_scroll_freeze_pop(data);
+}
+
+static void
 _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -591,6 +605,7 @@ _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (!wd->password)
      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
    edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
+   elm_object_scroll_freeze_pop(data);
    //elm_widget_scroll_hold_push(data);
 }
 
@@ -1502,7 +1517,6 @@ _event_selection_notify(void *data, int type __UNUSED__, void *event)
 	wd->drag_selection_asked = EINA_FALSE;
 
         ecore_x_dnd_send_finished();
-
      }
 
    return ECORE_CALLBACK_PASS_ON;
@@ -1523,27 +1537,26 @@ _event_selection_clear(void *data, int type __UNUSED__, void *event)
      }
    return 1;*/
 
-	// start for cbhm
+   // start for cbhm
    Evas_Object *top = elm_widget_top_get(data);
    Ecore_X_Event_Selection_Clear *ev = event;
 
    if (!top)
-	   return ECORE_CALLBACK_PASS_ON;
+      return ECORE_CALLBACK_PASS_ON;
 
-	if (ev->selection != ECORE_X_SELECTION_SECONDARY)
-	{
-		return ECORE_CALLBACK_PASS_ON;
-	}
+   if (ev->selection != ECORE_X_SELECTION_SECONDARY)
+     {
+        return ECORE_CALLBACK_PASS_ON;
+     }
 
-	if (cnpwidgetdata == data)
-	{
-      elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data,NULL,NULL);
-	}
+   if (cnpwidgetdata == data)
+     {
+        elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data,NULL,NULL);
+     }
 
-	// end for cbhm
+   // end for cbhm
    return ECORE_CALLBACK_PASS_ON;
 }
-
 
 static Eina_Bool
 _drag_drop_cb(void *data __UNUSED__, Evas_Object *obj, Elm_Selection_Data *drop)
@@ -1979,7 +1992,7 @@ _ellipsis_entry_to_width(Evas_Object *obj)
 
 static int _textinput_control_function(void *data,void *input_data)
 {
-   /*calculate character count*/
+   /* calculate character count */
    Evas_Object *entry = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
    char buf[10]="\0";
@@ -1988,27 +2001,27 @@ static int _textinput_control_function(void *data,void *input_data)
    char *text = edje_object_part_text_get(wd->ent, "elm.text");
    char *insert_text;  
    size_t remain_bytes;
-   if(text!=NULL)
+   if (text != NULL)
      {
-       byte_len = strlen(text);/*no of bytes*/
-       remain_bytes = wd->max_no_of_bytes-byte_len;
-       sprintf(buf,"%d",remain_bytes);
-       //edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);
-       if(input_data)
-         {
-           insert_text =  (char *)input_data;
-           insert_text_len = strlen(insert_text);
-           if(remain_bytes<insert_text_len)
-             {
-               evas_object_smart_callback_call(entry, "maxlength,reached", NULL);
-               return EINA_TRUE;
-             }
-           if(byte_len>=wd->max_no_of_bytes)
-             {
-               evas_object_smart_callback_call(entry, "maxlength,reached", NULL);
-               return EINA_TRUE;
-             }
-         }
+        byte_len = strlen(text); /* no of bytes */
+        remain_bytes = wd->max_no_of_bytes - byte_len;
+        sprintf(buf,"%d",remain_bytes);
+        //edje_object_part_text_set(wd->ent, "elm_entry_remain_byte_count", buf);
+        if (input_data)
+          {
+             insert_text =  (char *)input_data;
+             insert_text_len = strlen(insert_text);
+             if (remain_bytes < insert_text_len)
+               {
+                  evas_object_smart_callback_call(entry, "maxlength,reached", NULL);
+                  return EINA_TRUE;
+               }
+             if (byte_len >= wd->max_no_of_bytes)
+               {
+                  evas_object_smart_callback_call(entry, "maxlength,reached", NULL);
+                  return EINA_TRUE;
+               }
+          }
      }
    return EINA_FALSE;  
 }
@@ -2154,7 +2167,7 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->cut = _cut;
    ext_mod->paste = _paste;
    ext_mod->select = _select;
-   ext_mod->selectall = NULL; /* to be implemented*/
+   ext_mod->selectall = _selectall;
    ext_mod->ent = wd->ent;
    ext_mod->items = wd->items;
    ext_mod->longpress_timer = wd->longpress_timer;
@@ -2272,21 +2285,15 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    if (password)
      {
         if (wd->autoperiod)
-          {
-             elm_entry_autoperiod_set(obj, EINA_FALSE);
-          }
+           elm_entry_autoperiod_set(obj, EINA_FALSE);
 
         if (wd->autocapital)
-          {
-             elm_entry_autocapitalization_set(obj, EINA_FALSE);
-          }
+           elm_entry_autocapitalization_set(obj, EINA_FALSE);
      }
 
    ic = elm_entry_imf_context_get(obj);
    if (ic)
-     {
-        ecore_imf_context_input_panel_layout_set(ic, wd->input_panel_layout);
-     }
+      ecore_imf_context_input_panel_layout_set(ic, wd->input_panel_layout);
 
    eina_stringshare_del(t);
    _sizing_eval(obj);

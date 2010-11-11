@@ -373,13 +373,13 @@ _prop_change(void *data, int type __UNUSED__, void *event)
         if (virt_keypad_state == wd->vkeypad_state)   return ECORE_CALLBACK_PASS_ON;
         wd->vkeypad_state = virt_keypad_state;
         if(wd->vkeypad_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_ON)
-         {
-           _autoscroll_mode_enable(data);
-         }
+          {
+             _autoscroll_mode_enable(data);
+          }
         else if(wd->vkeypad_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF)
-         {
-           _autoscroll_mode_disable(data);
-     }
+          {
+             _autoscroll_mode_disable(data);
+          }
      }
 #endif
 #endif
