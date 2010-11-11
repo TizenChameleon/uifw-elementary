@@ -887,8 +887,7 @@ elm_navigationbar_title_object_add(Evas_Object *obj,
  * Unset the list of title objects corresponding to given content and returns it to  
  * the application.
  * @param[in] obj The NavigationBar object
- * @param[in] content The object pushed
- * @param[in] title_obj a title object (normally button or segment_control)
+ * @param[in] content The content object pushed
  * @param[out] list updates the list with title objects list, this list has to be freed and the
  * objects have to be deleted by application.
  * @ingroup NavigationBar
