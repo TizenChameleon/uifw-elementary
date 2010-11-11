@@ -53,6 +53,7 @@ struct _Widget_Data
 	Evas_Object *date[DATE_MAX];
 	Evas_Object *time[TIME_MAX];
 	Ecore_Event_Handler *handler;
+	Ecore_Idler *idler;
 	int layout;
 
 	int year, month, day, hour, min;
@@ -84,6 +85,7 @@ static void _input_panel_event_callback(void *data, Ecore_IMF_Context *ctx, int 
 static void _date_entry_add(Evas_Object *obj);
 static void _time_entry_add(Evas_Object *obj);
 static void _date_update(Evas_Object *obj);
+static Eina_Bool _focus_idler_cb(void *obj);
 static void _entry_focus_move(Evas_Object *obj, Evas_Object *focus_obj);
 static Eina_Bool _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen);
 static int _maximum_day_get(int year, int month);
@@ -104,30 +106,8 @@ _on_focus_hook(void *data, Evas_Object *obj)
 {
  	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd || !wd->base) return ;
-	
-	if (elm_widget_focus_get(obj))
-	{
-		if (wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
-			elm_object_focus(wd->time[TIME_HOUR]);
-		
-		else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
-		{
-			switch (wd->date_format)
-			{
-				case DATE_FORMAT_YYDDMM:
-				case DATE_FORMAT_YYMMDD:
-					elm_object_focus(wd->date[DATE_YEAR]);
-					break;
-				case DATE_FORMAT_MMDDYY:
-				case DATE_FORMAT_MMYYDD:
-					elm_object_focus(wd->date[DATE_MON]);
-					break;
-				case DATE_FORMAT_DDMMYY:
-				case DATE_FORMAT_DDYYMM:
-					elm_object_focus(wd->date[DATE_DAY]);
-			}
-		}
-	}
+
+	if (elm_widget_focus_get(obj)) wd->idler = ecore_idler_add(_focus_idler_cb, obj);
 }
 
 static void
@@ -283,12 +263,52 @@ _signal_rect_mouse_down(void *data, Evas_Object *obj, const char *emission, cons
 	}
 }
 
+static Eina_Bool 
+_focus_idler_cb(void *obj)
+{
+ 	Widget_Data *wd = elm_widget_data_get(obj);
+	Evas_Object *focus_obj;
+ 
+	focus_obj = elm_widget_focused_object_get(obj);
+	if (focus_obj == obj)
+	{
+		if (wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
+			elm_object_focus(wd->time[TIME_HOUR]);
+		
+		else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
+		{
+			switch (wd->date_format)
+			{
+				case DATE_FORMAT_YYDDMM:
+				case DATE_FORMAT_YYMMDD:
+					elm_object_focus(wd->date[DATE_YEAR]);
+					break;
+				case DATE_FORMAT_MMDDYY:
+				case DATE_FORMAT_MMYYDD:
+					elm_object_focus(wd->date[DATE_MON]);
+					break;
+				case DATE_FORMAT_DDMMYY:
+				case DATE_FORMAT_DDYYMM:
+					elm_object_focus(wd->date[DATE_DAY]);
+			}
+		}
+	}
+	wd->idler = NULL;
+	return EINA_FALSE;
+}
+
 static void
 _entry_focused_cb(void *data, Evas_Object *obj, void *event_info)
 {
  	Widget_Data *wd = elm_widget_data_get(data);
 	if (!wd || !wd->base) return;
- 
+
+	if (wd->idler) 
+	{
+		ecore_idler_del(wd->idler);
+		wd->idler = NULL;
+	}
+	
 	if (obj == wd->date[DATE_YEAR])
 		edje_object_signal_emit(wd->base, "elm,state,year,focus,in", "elm");
 	else if (obj == wd->date[DATE_MON])
@@ -732,6 +752,7 @@ elm_datefield_add(Evas_Object *parent)
 	wd->editing = EINA_FALSE;
 	wd->time_mode = EINA_TRUE;
 	wd->date_format = DATE_FORMAT_MMDDYY;
+	wd->idler = NULL;
 	
 	_theme_hook(obj);
 	

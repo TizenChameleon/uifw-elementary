@@ -74,7 +74,14 @@ static void
 _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Coord by, cy;
    if (!wd) return;
+
+   //bg image resizing problem because of entry resizing
+   evas_object_geometry_get(data, NULL, &by, NULL, NULL);
+   evas_object_geometry_get(wd->content, NULL, &cy, NULL, NULL);
+   if (by > 0 && cy > 0) edje_object_signal_emit(wd->bbl, "elm,state,bg,visible", "elm");
+
    _sizing_eval(data);
 }
 
