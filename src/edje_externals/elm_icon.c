@@ -125,8 +125,8 @@ external_icon_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Exte
    else if (!strcmp(param->name, "prescale")
 		   && param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
      {
-	elm_icon_prescale_set(obj, param->d);
-	param_icon->prescale_size = param->d;
+	elm_icon_prescale_set(obj, param->i);
+	param_icon->prescale_size = param->i;
 	return EINA_TRUE;
      }
 
@@ -178,7 +178,7 @@ external_icon_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_Exte
    else if (!strcmp(param->name, "prescale")
 		   && param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
      {
-        param->d = param_icon->prescale_size;
+        param->i = param_icon->prescale_size;
 	return EINA_TRUE;
      }
 
@@ -232,7 +232,7 @@ external_icon_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, c
 	  }
 	else if (!strcmp(param->name, "prescale"))
 	  {
-	     mem->prescale_size = param->d;
+	     mem->prescale_size = param->i;
 	     mem->prescale_size_exists = EINA_TRUE;
 	  }
      }
