@@ -37,6 +37,7 @@ elm_fileselector.c \
 elm_fileselector_button.c \
 elm_genlist.c \
 elm_hoversel.c \
+elm_icon.c \
 elm_list.c \
 elm_map.c \
 elm_nocontents.c \
