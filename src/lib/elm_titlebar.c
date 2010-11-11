@@ -75,9 +75,9 @@ _sub_del(void *data __UNUSED__, Evas_Object * obj, void *event_info)
 				       _changed_size_hints, obj);
    if (sub == wd->icon)
      {
-	edje_object_signal_emit(wd->tbar, "elm,state,icon,hidden", "elm");
-	wd->icon = NULL;
-	edje_object_message_signal_process(wd->tbar);
+        edje_object_signal_emit(wd->tbar, "elm,state,icon,hidden", "elm");
+        wd->icon = NULL;
+        edje_object_message_signal_process(wd->tbar);
      }
    else if (sub == wd->end) wd->end = NULL;
    _sizing_eval(obj);

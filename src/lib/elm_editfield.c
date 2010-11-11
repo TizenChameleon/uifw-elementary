@@ -563,22 +563,25 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
       return;
    wd->single_line = single_line;
    elm_entry_single_line_set(wd->entry, single_line);
-   if(single_line) {
-        if(!wd->scroller){
+   if(single_line) 
+     {
+        if(!wd->scroller)
+          {
              wd->scroller = elm_scroller_add(obj);
              elm_scroller_bounce_set(wd->scroller, 0, 0);
              elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
              elm_widget_sub_object_add(obj, wd->scroller);
              elm_scroller_content_min_limit(wd->scroller, 0, 1);
-        }
+          }
         edje_object_part_unswallow(wd->base, wd->entry);
         edje_object_part_swallow(wd->base, "elm.swallow.content", wd->scroller);
         evas_object_size_hint_weight_set(wd->entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
         elm_scroller_content_set(wd->scroller, wd->entry);
-   }
-   else {
+     }
+   else 
+     {
         entry = elm_entry_add(obj);
         elm_object_style_set(entry, "editfield");
         evas_object_size_hint_weight_set(entry, 0, EVAS_HINT_EXPAND);
@@ -595,7 +598,7 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
         evas_object_del(wd->entry);
         wd->entry = entry;
         edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
-   }
+     }
 }
 
 /**

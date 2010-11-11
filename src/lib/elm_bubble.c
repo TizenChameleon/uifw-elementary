@@ -51,8 +51,8 @@ _theme_hook(Evas_Object *obj)
    if (wd->content) edje_object_part_swallow(wd->bbl, "elm.swallow.content", wd->content); 
    if (wd->icon)
      {
-     	 edje_object_part_swallow(wd->bbl, "elm.swallow.icon", wd->icon);
-	 edje_object_signal_emit(wd->bbl, "elm,state,icon,visible", "elm");
+        edje_object_part_swallow(wd->bbl, "elm.swallow.icon", wd->icon);
+        edje_object_signal_emit(wd->bbl, "elm,state,icon,visible", "elm");
         edje_object_message_signal_process(wd->bbl); 
      }
    edje_object_scale_set(wd->bbl, elm_widget_scale_get(obj) * _elm_config->scale);
@@ -100,30 +100,30 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 static void
 _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
-	Widget_Data *wd = elm_widget_data_get(data);
-	Evas_Event_Mouse_Down *ev = event_info;
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Event_Mouse_Down *ev = event_info;
 
-	wd->down = EINA_TRUE;
-	wd->down_point.x = ev->canvas.x;
-	wd->down_point.y = ev->canvas.y;
+   wd->down = EINA_TRUE;
+   wd->down_point.x = ev->canvas.x;
+   wd->down_point.y = ev->canvas.y;
 }
 
 static void
 _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
-	Widget_Data *wd = elm_widget_data_get(data);
-   	Evas_Event_Mouse_Up *ev = event_info;
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Event_Mouse_Up *ev = event_info;
 
-	if (!wd->down) return;
+   if (!wd->down) return;
 
-	if (ev->canvas.x - wd->down_point.x > SWEEP_THRESHOLD)
-		evas_object_smart_callback_call(data, "sweep,left,right", NULL);
-	else if (wd->down_point.x - ev->canvas.x > SWEEP_THRESHOLD)
-		evas_object_smart_callback_call(data, "sweep,right,left", NULL);
+   if (ev->canvas.x - wd->down_point.x > SWEEP_THRESHOLD)
+      evas_object_smart_callback_call(data, "sweep,left,right", NULL);
+   else if (wd->down_point.x - ev->canvas.x > SWEEP_THRESHOLD)
+      evas_object_smart_callback_call(data, "sweep,right,left", NULL);
 
-	wd->down = EINA_FALSE;
-	wd->down_point.x = 0;
-	wd->down_point.y = 0;	
+   wd->down = EINA_FALSE;
+   wd->down_point.x = 0;
+   wd->down_point.y = 0;	
 }
 
 /**
