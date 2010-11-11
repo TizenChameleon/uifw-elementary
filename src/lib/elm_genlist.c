@@ -4312,6 +4312,8 @@ _group_item_contract_moving_effect_timer_cb(void *data)
    evas_object_geometry_get(wd->pan_smart, &ox, &oy, &ow, &oh);
 
    list_start_y = oy;
+   if (wd->edit_mode & ELM_GENLIST_EDIT_MODE_SELECTALL)
+      list_start_y += wd->select_all_item->h;
 
    EINA_INLIST_FOREACH(wd->group_items, git)
      {
@@ -4324,7 +4326,7 @@ _group_item_contract_moving_effect_timer_cb(void *data)
 
    EINA_INLIST_FOREACH(wd->group_items, git)
      {
-        base_git = oy + git->h * (git->num-1) + git->num;
+        base_git = list_start_y + git->h * (git->num-1) + git->num;
         git->old_y = git->y;
         added_gy = abs(base_git - git->y) / devide_size;
         if(added_gy < 1.0)
@@ -4370,7 +4372,11 @@ _group_item_contract_moving_effect_timer_cb(void *data)
         evas_object_resize(git->base, wd->minw, git->h );
         evas_object_move(git->base, git->x, git->y);
         evas_object_raise(git->base);        
-        evas_object_show(git->base);
+        if(git->y < list_start_y)
+           evas_object_lower(git->base); 
+        else
+           evas_object_raise(git->base);
+        evas_object_show(git->base);      
 
         EINA_INLIST_FOREACH(wd->blocks, itb)
           {
@@ -4382,9 +4388,11 @@ _group_item_contract_moving_effect_timer_cb(void *data)
                           it->old_scrl_y -= (it->group_item->old_y - it->group_item->y);
 
                        if(git_array[it->group_item->num+1] <=  it->old_scrl_y || added_gy == 1.0)
-                          evas_object_color_set(it->base, 0,0,0,0);
-
-                       _move_edit_controls(it,it->scrl_x, it->scrl_y);
+                         {
+                            evas_object_color_set(it->base, 0,0,0,0);
+                            evas_object_color_set(it->edit_obj, 0,0,0,0);
+                         }
+                       _move_edit_controls(it,it->scrl_x, it->old_scrl_y);
                        evas_object_resize(it->base, itb->wd->minw-(it->pad_left+it->pad_right), it->h);
                        evas_object_move(it->base, it->scrl_x+it->pad_left, it->old_scrl_y);
                        evas_object_raise(it->group_item->base);
@@ -4397,7 +4405,7 @@ _group_item_contract_moving_effect_timer_cb(void *data)
              finish = EINA_TRUE;
              break;
           }
-
+        if(wd->select_all_item)  evas_object_raise(wd->select_all_item->base);
         cnt++;
      }
    free(git_array);
@@ -4429,6 +4437,7 @@ _group_item_contract_moving_effect_timer_cb(void *data)
                             tmp_y += it->h;
                             // need to handle edit mode
                             evas_object_move(it->base, it->scrl_x+it->pad_left, it->old_scrl_y);
+                            evas_object_move(it->edit_obj, it->scrl_x, it->old_scrl_y);
                             evas_object_color_set(it->base, 0,0,0,0);
                             evas_object_show(it->base);
                        }
@@ -4491,7 +4500,8 @@ _group_item_expand_moving_effect_timer_cb(void *data)
 
    evas_object_geometry_get(wd->pan_smart, &ox, &oy, &ow, &oh);
    evas_output_viewport_get(evas_object_evas_get(wd->pan_smart), &cvx, &cvy, &cvw, &cvh);
-
+   if (wd->edit_mode & ELM_GENLIST_EDIT_MODE_SELECTALL)
+      oy += wd->select_all_item->h;
    // calculate git count and srcroll move position
    EINA_INLIST_FOREACH(wd->group_items, git)
      {
@@ -4589,8 +4599,16 @@ _group_item_expand_moving_effect_timer_cb(void *data)
         down = 0;
 
         evas_object_move(git->base, git->x, git->y);
-        evas_object_raise(git->base);
-        evas_object_show(git->base);
+        if(git->y >= oy)
+          {
+             evas_object_raise(git->base);
+             evas_object_show(git->base);
+          }
+        else 
+          {
+             evas_object_lower(git->base);
+             evas_object_hide(git->base);
+          }
 
         added_gy = abs(git->finish_y - git->y) / devide_size;
         if (added_gy < 1.0) added_gy = 1.0;
@@ -4641,6 +4659,8 @@ _group_item_expand_moving_effect_timer_cb(void *data)
                          {            
                             evas_object_resize(it->base, wd->minw-(it->pad_left+it->pad_right), it->h);
                             evas_object_move(it->base, it->scrl_x+it->pad_left, it->old_scrl_y);
+                            _move_edit_controls(it, it->scrl_x, it->old_scrl_y);
+                            evas_object_color_set(it->edit_obj, 255,255,255,255);
                             evas_object_color_set(it->base, 255,255,255,255);
                             evas_object_raise(it->base);
                             evas_object_raise(it->group_item->base);
@@ -5969,7 +5989,7 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
         itc.func.del = NULL;
         itc.func.editmode_get = NULL;
 
-        wd->select_all_item = _item_new(wd, &itc, NULL, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+        wd->select_all_item = _item_new(wd, &itc, (void *)(edit_class->select_all_data), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
         if (!wd) return;
         if (!wd->select_all_item) return;

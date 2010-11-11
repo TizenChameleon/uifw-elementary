@@ -1237,6 +1237,7 @@ extern "C" {
         GenlistSelectedFunc selected;
         const char *item_style;
         const char *select_all_item_style;
+        const void *select_all_data;   
      };
    EAPI Evas_Object      *elm_genlist_add(Evas_Object *parent);
    EAPI void              elm_genlist_clear(Evas_Object *obj);
