@@ -78,6 +78,18 @@
  * longpressed - This is called when the item is pressed for a certain amount
  * of time. By default it's 1 second.
  *
+ * scroll,edge,top - This is called when the genlist is scrolled until the top
+ * edge.
+ *
+ * scroll,edge,bottom - This is called when the genlist is scrolled until the
+ * bottom edge.
+ *
+ * scroll,edge,left - This is called when the genlist is scrolled until the
+ * left edge.
+ *
+ * scroll,edge,right - This is called when the genlist is scrolled until the
+ * right edge.
+ *
  * Genlist has a fairly large API, mostly because it's relatively complex,
  * trying to be both expansive, powerful and efficient. First we will begin
  * an overview o the theory behind genlist.
@@ -2450,6 +2462,34 @@ _freeze_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__
    elm_smart_scroller_freeze_set(wd->scr, 0);
 }
 
+static void
+_scroll_edge_left(void *data, Evas_Object *scr __UNUSED__, void *event_info __UNUSED__)
+{
+   Evas_Object *obj = data;
+   evas_object_smart_callback_call(obj, "scroll,edge,left", NULL);
+}
+
+static void
+_scroll_edge_right(void *data, Evas_Object *scr __UNUSED__, void *event_info __UNUSED__)
+{
+   Evas_Object *obj = data;
+   evas_object_smart_callback_call(obj, "scroll,edge,right", NULL);
+}
+
+static void
+_scroll_edge_top(void *data, Evas_Object *scr __UNUSED__, void *event_info __UNUSED__)
+{
+   Evas_Object *obj = data;
+   evas_object_smart_callback_call(obj, "scroll,edge,top", NULL);
+}
+
+static void
+_scroll_edge_bottom(void *data, Evas_Object *scr __UNUSED__, void *event_info __UNUSED__)
+{
+   Evas_Object *obj = data;
+   evas_object_smart_callback_call(obj, "scroll,edge,bottom", NULL);
+}
+
 /**
  * Add a new Genlist object
  *
@@ -2500,6 +2540,11 @@ elm_genlist_add(Evas_Object *parent)
    elm_widget_resize_object_set(obj, wd->scr);
 
 	elm_smart_scroller_bounce_allow_set(wd->scr, EINA_FALSE, EINA_TRUE);
+
+   evas_object_smart_callback_add(wd->scr, "edge,left", _scroll_edge_left, obj);
+   evas_object_smart_callback_add(wd->scr, "edge,right", _scroll_edge_right, obj);
+   evas_object_smart_callback_add(wd->scr, "edge,top", _scroll_edge_top, obj);
+   evas_object_smart_callback_add(wd->scr, "edge,bottom", _scroll_edge_bottom, obj);
 
    wd->obj = obj;
    wd->mode = ELM_LIST_SCROLL;
