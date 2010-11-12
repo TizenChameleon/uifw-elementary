@@ -151,7 +151,7 @@ _sizing_eval(Evas_Object* obj)
 /**
  * Add the dayselector.
  *
- * @param[in] item 	 	Parent object.
+ * @param[in] parent 	 	Parent object.
  *
  * @ingroup Dayselector
  */
