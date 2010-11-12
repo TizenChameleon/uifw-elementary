@@ -1054,8 +1054,7 @@ _elm_navigationbar_function_button1_set(Evas_Object *obj,
 			if (edje_object_part_swallow_get(wd->base, "elm.swallow.btn1") == it->back_btn)
 			{
 				edje_object_part_unswallow(wd->base, it->back_btn);
-				evas_object_del(it->back_btn);
-				it->back_btn = NULL;
+				evas_object_hide(it->back_btn);
 			}
 			edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->fn_btn1);
 		}
