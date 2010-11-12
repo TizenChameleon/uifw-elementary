@@ -50,21 +50,25 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *style = elm_widget_style_get(obj);
+   double size;
 
    if (!wd) return;
+   size = elm_panes_content_left_size_get(obj);
+   
    if (wd->horizontal)
      _elm_theme_object_set(obj, wd->panes, "panes", "horizontal", style);
    else
      _elm_theme_object_set(obj, wd->panes, "panes", "vertical", style);
 
    if (wd->contents.left)
-     edje_object_part_swallow(wd->panes, "elm.swallow.left", wd->contents.right);
+     edje_object_part_swallow(wd->panes, "elm.swallow.left", wd->contents.left);
    if (wd->contents.right)
      edje_object_part_swallow(wd->panes, "elm.swallow.right", wd->contents.right);
 
    edje_object_scale_set(wd->panes, elm_widget_scale_get(obj) *
                          _elm_config->scale);
    _sizing_eval(obj);
+   elm_panes_content_left_size_set(obj, size);
 }
 
 static void
@@ -156,6 +160,7 @@ elm_panes_add(Evas_Object *parent)
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "panes");
    elm_widget_type_set(obj, widtype);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
@@ -188,23 +193,27 @@ elm_panes_add(Evas_Object *parent)
 }
 
 /**
- * Set a control as a left/top content of the pane
+ * Set the left/top content of the panes widget
  *
- * @param[in] obj The pane object
- * @param[in] content The object to be set as content
+ * Once the content object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_panes_content_left_unset() function.
+ *
+ * @param[in] obj The panes object
+ * @param[in] content The new left/top content object
  *
  * @ingroup Panes
  */
-EAPI void elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content)
+EAPI void
+elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (wd->contents.left)
      {
 	evas_object_del(wd->contents.left);
 	wd->contents.left = NULL;
      }
-
    if (content)
      {
 	elm_widget_sub_object_add(obj, content);
@@ -218,23 +227,27 @@ EAPI void elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
- * Set a control as a right/bottom content of the pane
+ * Set the right/bottom content of the panes widget
  *
- * @param[in] obj The pane object
- * @param[in] content The object to be set as content
+ * Once the content object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_panes_content_right_unset() function.
+ *
+ * @param[in] obj The panes object
+ * @param[in] content The new right/bottom content object
  *
  * @ingroup Panes
  */
-EAPI void elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
+EAPI void
+elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (wd->contents.right)
      {
 	evas_object_del(wd->contents.right);
 	wd->contents.right = NULL;
      }
-
    if (content)
      {
 	elm_widget_sub_object_add(obj, content);
@@ -248,40 +261,48 @@ EAPI void elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
- * Get the left/top content of the pane
+ * Get the left/top content used for the panes
+ *
+ * Return the left/top content object which is set for this widget.
  *
  * @param[in] obj The pane object
- * @return The Evas Object set as a left/top content of the pane
+ * @return The left/top content object that is being used
  *
  * @ingroup Panes
  */
-EAPI Evas_Object
-*elm_panes_content_left_get(const Evas_Object *obj)
+EAPI Evas_Object *
+elm_panes_content_left_get(const Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    return wd->contents.left;
 }
 
 /**
- * Get the right/bottom content of the pane
+ * Get the right/bottom content used for the panes
+ *
+ * Return the right/bottom content object which is set for this widget.
  *
  * @param[in] obj The pane object
  * @return The Evas Object set as a right/bottom content of the pane
  *
  * @ingroup Panes
  */
-EAPI Evas_Object
-*elm_panes_content_right_get(const Evas_Object *obj)
+EAPI Evas_Object *
+elm_panes_content_right_get(const Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    return wd->contents.right;
 }
 
 /**
- * Unset a control from a left/top content of the pane
+ * Unset the left/top content used for the panes
  *
- * @param[in] obj The pane object
- * @return The content being unset
+ * Unparent and return the left content object which was set for this widget.
+ *
+ * @param[in] obj The panes object
+ * @return The left/top content object that was being used
  *
  * @ingroup Panes
  */
@@ -289,8 +310,8 @@ EAPI Evas_Object *
 elm_panes_content_left_unset(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd;
-   Evas_Object *content;
+   Widget_Data *wd = NULL;
+   Evas_Object *content = NULL;
 
    wd = elm_widget_data_get(obj);
 
@@ -306,10 +327,12 @@ elm_panes_content_left_unset(Evas_Object *obj)
 }
 
 /**
- * Unset a control from a right/bottom content of the pane
+ * Unset the right/bottom content used for the panes
  *
- * @param[in] obj The pane object
-  * @return The content being unset
+ * Unparent and return the right content object which was set for this widget.
+ *
+ * @param[in] obj The panes object
+  * @return The right/bottom content object that was being used
  *
  * @ingroup Panes
  */
@@ -317,8 +340,8 @@ EAPI Evas_Object *
 elm_panes_content_right_unset(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd;
-   Evas_Object *content;
+   Widget_Data *wd = NULL;
+   Evas_Object *content = NULL;
 
    wd = elm_widget_data_get(obj);
 
@@ -336,7 +359,7 @@ elm_panes_content_right_unset(Evas_Object *obj)
 /**
  * Get the relative normalized size of left/top content of the pane
  *
- * @param[in] obj The pane object
+ * @param[in] obj The panes object
  * @return The value of type double in the range [0.0,1.0]
  *
  * @ingroup Panes
@@ -344,21 +367,19 @@ elm_panes_content_right_unset(Evas_Object *obj)
 EAPI double 
 elm_panes_content_left_size_get(const Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) 0.0;
    Widget_Data *wd = elm_widget_data_get(obj);
    double w, h;
 
    edje_object_part_drag_value_get(wd->panes, "elm.bar", &w, &h);
-
-   if (wd->horizontal)
-     return h;
-   else
-     return w;
+   if (wd->horizontal) return h;
+   else return w;
 }
 
 /**
- * Set a size of the left content with a relative normalized double value
+ * Set a size of the left/top content with a relative normalized double value
  *
- * @param[in] obj The pane object
+ * @param[in] obj The panes object
  * @param[in] size The value of type double in the range [0.0,1.0]
  *
  * @ingroup Panes
@@ -366,8 +387,11 @@ elm_panes_content_left_size_get(const Evas_Object *obj)
 EAPI void 
 elm_panes_content_left_size_set(Evas_Object *obj, double size)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
+   if (size < 0.0) size = 0.0;
+   else if (size > 1.0) size = 1.0;
    if (wd->horizontal)
      edje_object_part_drag_value_set(wd->panes, "elm.bar", 0.0, size);
    else
@@ -375,9 +399,11 @@ elm_panes_content_left_size_set(Evas_Object *obj, double size)
 }
 
 /**
- * Set the type of an existing pane object to horizontal/vertical
+ * Set the type of an existing panes object to horizontal/vertical
  *
- * @param[in] obj The pane object
+ * By default the panes is of vertical type
+ *
+ * @param[in] obj The panes object
  * @param[in] horizontal Boolean value. If true, then the type is set to horizontal else vertical
  *
  * @ingroup Panes
@@ -385,6 +411,7 @@ elm_panes_content_left_size_set(Evas_Object *obj, double size)
 EAPI void 
 elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    wd->horizontal = horizontal;
@@ -395,7 +422,7 @@ elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 /**
  * Indicate if the type of pane object is horizontal or not
  *
- * @param[in] obj The pane object
+ * @param[in] obj The panes object
  * @return true if it is of horizontal type else false
  *
  * @ingroup Panes
@@ -403,15 +430,15 @@ elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 EAPI Eina_Bool 
 elm_panes_horizontal_get(const Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-
    return wd->horizontal;
 }
 
 /**
  * Set a handler of the pane object non-movable or movable
  *
- * @param[in] obj The pane object
+ * @param[in] obj The panes object
  * @param[in] fixed If set to true then the views size can't be changed using handler otherwise using handler they can be resized
  *
  * @ingroup Panes
@@ -419,6 +446,7 @@ elm_panes_horizontal_get(const Evas_Object *obj)
 EAPI void
 elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    wd->fixed = fixed;
    if (wd->fixed == EINA_TRUE)
@@ -428,9 +456,9 @@ elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
 }
 
 /**
- * Indicate if the handler of the pane object can be moved with user interaction
+ * Indicate if the handler of the panes object can be moved with user interaction
  *
- * @param[in] obj The pane object
+ * @param[in] obj The panes object
  * @return false if the views can be resized using handler else true
  *
  * @ingroup Panes
@@ -438,6 +466,7 @@ elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
 EAPI Eina_Bool
 elm_panes_fixed_get(const Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
    return wd->fixed;
 }
