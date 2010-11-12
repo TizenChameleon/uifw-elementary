@@ -871,7 +871,7 @@ elm_imageslider_item_append(Evas_Object * obj, const char * photo_file, Elm_Imag
 * @ingroup	Imageslider
 */
 EAPI Elm_Imageslider_Item *
-elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, unsigned int n, void *data)
+elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, unsigned int index, void *data)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd;
@@ -891,7 +891,7 @@ elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, E
 	it->func = func;
 	it->data = data;
 
-	wd->its = eina_list_append_relative(wd->its, it, eina_list_nth(wd->its, n-2));
+	wd->its = eina_list_append_relative(wd->its, it, eina_list_nth(wd->its, index-2));
 
 	if (!wd->cur) wd->cur = wd->its;
 
