@@ -2571,6 +2571,8 @@ extern "C" {
    EAPI void                  elm_stackedicon_item_del(Elm_Stackedicon_Item *it);
    EAPI Eina_List            *elm_stackedicon_item_list_get(Evas_Object *obj);
    /* smart callback called:
+    * "expanded" - This signal is emitted when a stackedicon is expanded. 
+    * "clicked" - This signal is emitted when a stackedicon is clicked.
     */
    /* available styles:
     * default
