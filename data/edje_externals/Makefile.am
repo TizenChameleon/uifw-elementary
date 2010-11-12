@@ -29,6 +29,7 @@ ico_nocontents.png \
 ico_notepad.png \
 ico_page_control.png \
 ico_photocam.png \
+ico_picker.png \
 ico_progressbar.png \
 ico_radio.png \
 ico_scrolled_entry.png \

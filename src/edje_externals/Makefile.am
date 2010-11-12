@@ -33,8 +33,8 @@ elm_bubble.c \
 elm_button.c \
 elm_check.c \
 elm_clock.c \
-elm_datepicker.c \
 elm_datefield.c \
+elm_datepicker.c \
 elm_fileselector.c \
 elm_fileselector_button.c \
 elm_gengrid.c \
@@ -47,6 +47,7 @@ elm_nocontents.c \
 elm_notepad.c \
 elm_page_control.c \
 elm_photocam.c \
+elm_picker.c \
 elm_progressbar.c \
 elm_radio.c \
 elm_scrolled_entry.c \
