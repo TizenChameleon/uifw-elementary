@@ -43,6 +43,7 @@ elm_hoversel.c \
 elm_icon.c \
 elm_list.c \
 elm_map.c \
+elm_multibuttonentry.c \
 elm_nocontents.c \
 elm_notepad.c \
 elm_page_control.c \
