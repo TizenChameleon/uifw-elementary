@@ -393,6 +393,25 @@ elm_scroller_content_set(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
+ * Get the content of the scroller widget
+ *
+ * Return the content object which is set for this widget
+ *
+ * @param obj The slider object
+ * @return The content that is being used
+ *
+ * @ingroup Scroller
+ */
+EAPI Evas_Object *
+elm_scroller_content_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->content;
+}
+
+/**
  * Unset the content of the scroller widget
  *
  * Unparent and return the content object which was set for this widget
@@ -604,6 +623,24 @@ elm_scroller_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce
    if (!wd) return;
    if (wd->scr)
      elm_smart_scroller_bounce_allow_set(wd->scr, h_bounce, v_bounce);
+}
+
+/**
+ * Get the bounce mode
+ *
+ * @param obj The Scroller object
+ * @param h_bounce Allow bounce horizontally
+ * @param v_bounce Allow bounce vertically
+ *
+ * @ingroup Scroller
+ */
+EAPI void
+elm_scroller_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_smart_scroller_bounce_allow_get(wd->scr, h_bounce, v_bounce);
 }
 
 /**
