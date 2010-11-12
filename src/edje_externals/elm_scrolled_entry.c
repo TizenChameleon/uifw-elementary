@@ -5,11 +5,28 @@ typedef struct _Elm_Params_Entry
    const char *text;
    Eina_Bool text_set:1;
    Eina_Bool editable:1;
+   Eina_Bool editable_exists:1;   
    Eina_Bool single:1;
+   Eina_Bool single_exists:1;   
+   Eina_Bool wrap:1;
+   Eina_Bool wrap_exists:1;   
+   Eina_Bool char_wrap:1;
+   Eina_Bool char_wrap_exists:1;
    Eina_Bool password:1;
-   Eina_Bool editable_exists:1;
-   Eina_Bool single_exists:1;
    Eina_Bool password_exists:1;
+   Eina_Bool context_menu_disabled:1;
+   Eina_Bool context_menu_disabled_exists:1;
+   Eina_Bool bounce:1;
+   Eina_Bool bounce_exists;
+   Eina_Bool h_bounce:1;
+   Eina_Bool h_bounce_exists:1;
+   Eina_Bool v_bounce:1;
+   Eina_Bool v_bounce_exists:1;
+   Eina_Bool autocapitalization:1;
+   Eina_Bool autocapitalization_exists:1;   
+   Eina_Bool autoperiod:1;
+   Eina_Bool autoperiod_exists:1;   
+   
 } Elm_Params_Entry;
 
 static void
@@ -30,8 +47,30 @@ external_scrolled_entry_state_set(void *data __UNUSED__, Evas_Object *obj, const
      elm_scrolled_entry_editable_set(obj, p->editable);
    if (p->single_exists)
      elm_scrolled_entry_single_line_set(obj, p->single);
+   if (p->wrap_exists)
+     elm_scrolled_entry_line_wrap_set(obj, p->wrap);
+   if (p->char_wrap_exists)
+     elm_scrolled_entry_line_char_wrap_set(obj, p->char_wrap);  
    if (p->password_exists)
      elm_scrolled_entry_password_set(obj, p->password);
+   if (p->context_menu_disabled_exists)
+     elm_scrolled_entry_context_menu_disabled_set(obj, p->context_menu_disabled);   
+   if ((p->h_bounce_exists) && (p->v_bounce_exists))
+     elm_scrolled_entry_bounce_set(obj, p->h_bounce, p->v_bounce);   
+   else if ((p->h_bounce_exists) || (p->v_bounce_exists))
+     {
+	Eina_Bool h_bounce, v_bounce;
+
+	elm_smart_scroller_bounce_allow_get(obj, &h_bounce, &v_bounce);
+	if (p->h_bounce_exists)
+	  elm_scrolled_entry_bounce_set(obj, p->h_bounce, v_bounce);
+	else
+	  elm_scrolled_entry_bounce_set(obj, h_bounce, p->v_bounce);
+     }
+   if (p->autocapitalization_exists)
+     elm_scrolled_entry_autocapitalization_set(obj, p->autocapitalization);
+   if (p->autoperiod_exists)
+     elm_scrolled_entry_autoperiod_set(obj, p->autoperiod);   
 }
 
 static Eina_Bool
@@ -61,6 +100,22 @@ external_scrolled_entry_param_set(void *data __UNUSED__, Evas_Object *obj, const
 	     return EINA_TRUE;
 	  }
      }
+   else if (!strcmp(param->name, "line wrap"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     elm_scrolled_entry_line_wrap_set(obj, param->i);
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "character line wrap"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     elm_scrolled_entry_line_char_wrap_set(obj, param->i);
+	     return EINA_TRUE;
+	  }
+     }     
    else if (!strcmp(param->name, "password"))
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
@@ -69,7 +124,51 @@ external_scrolled_entry_param_set(void *data __UNUSED__, Evas_Object *obj, const
 	     return EINA_TRUE;
 	  }
      }
-
+   else if (!strcmp(param->name, "context menu disabled"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     elm_scrolled_entry_context_menu_disabled_set(obj, param->i);
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "height bounce"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     Eina_Bool h_bounce, v_bounce;
+	     elm_smart_scroller_bounce_allow_get(obj, &h_bounce, &v_bounce);
+	     elm_scrolled_entry_bounce_set(obj, param->i, v_bounce);
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "width bounce"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     Eina_Bool h_bounce, v_bounce;
+	     elm_smart_scroller_bounce_allow_get(obj, &h_bounce, &v_bounce);
+	     elm_scrolled_entry_bounce_set(obj, h_bounce, param->i);
+	     return EINA_TRUE;
+	  }
+     }  
+   else if (!strcmp(param->name, "autocapitalization"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     elm_scrolled_entry_autocapitalization_set(obj, param->i);
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "autoperiod"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     elm_scrolled_entry_autoperiod_set(obj, param->i);
+	     return EINA_TRUE;
+	  }
+     }
+   
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
 
@@ -111,6 +210,34 @@ external_scrolled_entry_param_get(void *data __UNUSED__, const Evas_Object *obj,
 	     return EINA_TRUE;
 	  }
      }
+   else if (!strcmp(param->name, "context menu disabled"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     param->i = elm_scrolled_entry_context_menu_disabled_get(obj);
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "height bounce"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     Eina_Bool h_bounce, v_bounce;
+	     elm_smart_scroller_bounce_allow_get(obj, &h_bounce, &v_bounce);
+	     param->i = h_bounce;
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "width bounce"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     Eina_Bool h_bounce, v_bounce;
+	     elm_smart_scroller_bounce_allow_get(obj, &h_bounce, &v_bounce);
+	     param->i = v_bounce;
+	     return EINA_TRUE;
+	  }
+     }   
 
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -138,6 +265,16 @@ external_scrolled_entry_params_parse(void *data __UNUSED__, Evas_Object *obj __U
 	     mem->single = !!param->i;
 	     mem->single_exists = EINA_TRUE;
 	  }
+	else if (!strcmp(param->name, "line wrap"))
+	  {
+	     mem->wrap = !!param->i;
+	     mem->wrap_exists = EINA_TRUE;
+	  }
+	else if (!strcmp(param->name, "character line wrap"))
+	  {
+	     mem->char_wrap = !!param->i;
+	     mem->char_wrap_exists = EINA_TRUE;
+	  }   
 	else if (!strcmp(param->name, "password"))
 	  {
 	     mem->password = !!param->i;
@@ -148,8 +285,33 @@ external_scrolled_entry_params_parse(void *data __UNUSED__, Evas_Object *obj __U
 	     mem->editable = param->i;
 	     mem->editable_exists = EINA_TRUE;
 	  }
+	else if (!strcmp(param->name, "context menu disabled"))
+	  {
+	     mem->context_menu_disabled = param->i;
+	     mem->context_menu_disabled_exists = EINA_TRUE;
+	  }   
+	else if (!strcmp(param->name, "height bounce"))
+	  {
+	     mem->h_bounce = !!param->i;
+	     mem->h_bounce_exists = EINA_TRUE;
+	  }
+	else if (!strcmp(param->name, "width bounce"))
+	  {
+	     mem->v_bounce = !!param->i;
+	     mem->v_bounce_exists = EINA_TRUE;
+	  }
+	else if (!strcmp(param->name, "autocapitalization"))
+	  {
+	     mem->autocapitalization = !!param->i;
+	     mem->autocapitalization_exists = EINA_TRUE;
+	  }
+	else if (!strcmp(param->name, "autoperiod"))
+	  {
+	     mem->autoperiod = !!param->i;
+	     mem->autoperiod_exists = EINA_TRUE;
+	  }
      }
-
+         
    return mem;
 }
 
@@ -174,7 +336,14 @@ static Edje_External_Param_Info external_scrolled_entry_params[] = {
    EDJE_EXTERNAL_PARAM_INFO_STRING_DEFAULT("text", "some text"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("editable"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("single line"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("line wrap"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("character line wrap"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("password"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("context menu disabled"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("height bounce"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("width bounce"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("autocapitalization"),   
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("autoperiod"),      
    EDJE_EXTERNAL_PARAM_INFO_SENTINEL
 };
 

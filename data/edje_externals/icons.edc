@@ -39,4 +39,6 @@ ICON("thumb")
 ICON("toggle")
 ICON("toolbar")
 ICON("slideshow")
+ICON("timepicker")
+
 
