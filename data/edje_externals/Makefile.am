@@ -24,6 +24,7 @@ ico_icon.png \
 ico_list.png \
 ico_map.png \
 ico_notepad.png \
+ico_page_control.png \
 ico_photocam.png \
 ico_progressbar.png \
 ico_radio.png \
