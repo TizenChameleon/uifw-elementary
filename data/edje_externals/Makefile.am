@@ -15,6 +15,8 @@ ico_bubble.png \
 ico_button.png \
 ico_check.png \
 ico_clock.png \
+ico_datefield.png \
+ico_datepicker.png \
 ico_fileselector.png \
 ico_fileselector_button.png \
 ico_gengrid.png \

@@ -791,7 +791,7 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
  * @ingroup Datefield
  */
 EAPI Elm_Datefield_Layout
-elm_datefield_layout_get(Evas_Object *obj)
+elm_datefield_layout_get(const Evas_Object *obj)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -859,7 +859,7 @@ elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
  * @ingroup Datefield
  */
 EAPI void
-elm_datefield_date_get(Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min)
+elm_datefield_date_get(const Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -937,7 +937,7 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
  * @ingroup Datefield
  */
 EAPI Eina_Bool
-elm_datefield_time_mode_get(Evas_Object *obj)
+elm_datefield_time_mode_get(const Evas_Object *obj)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
@@ -989,7 +989,7 @@ elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
  * @ingroup Datefield
  */
 EAPI const char *
-elm_datefield_date_format_get(Evas_Object *obj)
+elm_datefield_date_format_get(const Evas_Object *obj)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);

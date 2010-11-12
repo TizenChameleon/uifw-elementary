@@ -33,6 +33,8 @@ elm_bubble.c \
 elm_button.c \
 elm_check.c \
 elm_clock.c \
+elm_datepicker.c \
+elm_datefield.c \
 elm_fileselector.c \
 elm_fileselector_button.c \
 elm_gengrid.c \

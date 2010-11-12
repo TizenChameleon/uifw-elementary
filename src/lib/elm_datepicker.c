@@ -476,7 +476,7 @@ elm_datepicker_date_set(Evas_Object *obj, int year, int month, int day)
  * @ingroup Datepicker
  */
 EAPI void
-elm_datepicker_date_get(Evas_Object *obj, int *year, int *month, int *day)
+elm_datepicker_date_get(const Evas_Object *obj, int *year, int *month, int *day)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
@@ -515,7 +515,7 @@ elm_datepicker_date_min_set(Evas_Object *obj, int year, int month, int day)
  * @ingroup Datepicker
  */
 EAPI void
-elm_datepicker_date_min_get(Evas_Object *obj, int *year, int *month, int *day)
+elm_datepicker_date_min_get(const Evas_Object *obj, int *year, int *month, int *day)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
@@ -554,7 +554,7 @@ elm_datepicker_date_max_set(Evas_Object *obj, int year, int month, int day)
  * @ingroup Datepicker
  */
 EAPI void
-elm_datepicker_date_max_get(Evas_Object *obj, int *year, int *month, int *day)
+elm_datepicker_date_max_get(const Evas_Object *obj, int *year, int *month, int *day)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return;
@@ -603,7 +603,7 @@ elm_datepicker_date_format_set(Evas_Object *obj, const char *fmt)
  * @ingroup Datepicker
  */
 EAPI const char *
-elm_datepicker_date_format_get(Evas_Object *obj)
+elm_datepicker_date_format_get(const Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	if (!wd) return NULL;
