@@ -43,6 +43,7 @@ elm_list.c \
 elm_map.c \
 elm_nocontents.c \
 elm_notepad.c \
+elm_page_control.c \
 elm_photocam.c \
 elm_progressbar.c \
 elm_radio.c \
