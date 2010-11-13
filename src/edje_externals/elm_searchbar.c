@@ -55,7 +55,7 @@ external_searchbar_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
           {
-             param->s = elm_searchbar_text_get(obj);
+             param->s = elm_searchbar_text_get((Evas_Object *)obj);
              return EINA_TRUE;
           }
      }
