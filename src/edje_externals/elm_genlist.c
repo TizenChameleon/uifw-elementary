@@ -4,6 +4,7 @@
 
 typedef struct _Elm_Params_Genlist
 {
+   Elm_Params base;
    const char *horizontal_mode;
    Eina_Bool multi:1;
    Eina_Bool multi_exists:1;
@@ -21,7 +22,7 @@ typedef struct _Elm_Params_Genlist
    Eina_Bool v_bounce_exists:1;
 } Elm_Params_Genlist;
 
-static const char* list_horizontal_mode_choices[] = {"compress", "scroll", "limit", NULL};
+static const char* list_horizontal_mode_choices[] = {"compress", "scroll", "limit", "expand", NULL};
 
 static Elm_List_Mode
 _list_horizontal_mode_setting_get(const char *horizontal_mode_str)
@@ -298,9 +299,9 @@ external_genlist_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__
 }
 
 static Evas_Object *external_genlist_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
@@ -316,6 +317,7 @@ external_genlist_params_free(void *params)
 }
 
 static Edje_External_Param_Info external_genlist_params[] = {
+   DEFINE_EXTERNAL_COMMON_PARAMS,
    EDJE_EXTERNAL_PARAM_INFO_CHOICE_FULL("horizontal mode", "scroll", list_horizontal_mode_choices),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("multi select"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("always select"),
