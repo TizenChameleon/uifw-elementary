@@ -292,16 +292,14 @@ external_slider_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_Ex
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
 	  {
-	     //param->i = elm_slider_indicator_show_get(obj); //this API should be added.
-	     return EINA_TRUE;
+	     return EINA_FALSE;
 	  }
      }
    else if (!strcmp(param->name, "value animated"))
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
 	  {
-	    // param->d = elm_slider_value_animated_get(obj); //this API should be added.
-	     return EINA_TRUE;
+	     return EINA_FALSE;
 	  }
      }
    else if (!strcmp(param->name, "end label"))
