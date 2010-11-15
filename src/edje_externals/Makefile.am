@@ -33,6 +33,7 @@ elm_bubble.c \
 elm_button.c \
 elm_check.c \
 elm_clock.c \
+elm_calendar.c \
 elm_datefield.c \
 elm_datepicker.c \
 elm_fileselector.c \
@@ -64,7 +65,7 @@ elm_panes.c \
 elm_navigationbar.c \
 elm_navigationbar_ex.c \
 elm_pager.c \
-elm_timepicker.c
+elm_timepicker.c 
 
 module_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
 module_la_LDFLAGS = -no-undefined -module -avoid-version -shared -fPIC
