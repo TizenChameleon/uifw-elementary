@@ -100,6 +100,11 @@ _del_hook(Evas_Object *obj)
 		wd->items = NULL;
 	}
 	wd->current = NULL;
+
+	if(wd->entry) evas_object_del(wd->entry);
+	if(wd->label) evas_object_del(wd->label);
+	if(wd->guidetext) evas_object_del(wd->guidetext);
+	if(wd->end) evas_object_del(wd->end);	
 }
 
 static void
@@ -356,7 +361,7 @@ _set_label(Evas_Object *obj, const char* str)
 		if(!(wd->label = elm_label_add(obj))) return;
 		elm_object_style_set(wd->label, "extended/multibuttonentry_default");
 		elm_label_ellipsis_set(wd->label, EINA_TRUE);
-		elm_label_wrap_width_set(wd->label, 100);
+		elm_label_wrap_width_set(wd->label, 180);
 		elm_label_text_align_set(wd->label, "left");
 		evas_object_size_hint_weight_set(wd->label, 0.0, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->label, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -377,7 +382,7 @@ _set_guidetext(Evas_Object *obj, const char* str)
 	if(!wd->guidetext){
 		if(!(wd->guidetext = edje_object_add(evas_object_evas_get(obj)))) return;
 		_elm_theme_object_set(obj, wd->guidetext, "multibuttonentry", "guidetext", elm_widget_style_get(obj));
-		evas_object_size_hint_min_set(wd->guidetext, 350, 0);
+		evas_object_size_hint_min_set(wd->guidetext, 280, 0);
 		evas_object_size_hint_weight_set(wd->guidetext, 0.0, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->guidetext, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	}
