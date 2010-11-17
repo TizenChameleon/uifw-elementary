@@ -1260,17 +1260,17 @@ _elm_fx_wipe_hide(Evas_Map * map, Elm_Fx_Wipe_Dir dir, float x, float y,
      {
    case ELM_FX_WIPE_DIR_UP:
 	w2 = (x + w);
-	h2 = y + h - (h * frame);
+	h2 = h - (h * frame);
 	evas_map_point_image_uv_set(map, 0, 0, 0);
 	evas_map_point_image_uv_set(map, 1, w, 0);
-	evas_map_point_image_uv_set(map, 2, w, h2);
-	evas_map_point_image_uv_set(map, 3, 0, h2);
+	evas_map_point_image_uv_set(map, 2, w, h-(h*frame));
+	evas_map_point_image_uv_set(map, 3, 0, h-(h*frame));
 	evas_map_point_coord_set(map, 0, x, y, 0);
 	evas_map_point_coord_set(map, 1, w2, y, 0);
-	evas_map_point_coord_set(map, 2, w2, h2, 0);
-	evas_map_point_coord_set(map, 3, x, h2, 0);
+	evas_map_point_coord_set(map, 2, w2, y+h, 0);
+	evas_map_point_coord_set(map, 3, x, y+h, 0);
 	break;
-     case ELM_FX_WIPE_DIR_LEFT:
+	case ELM_FX_WIPE_DIR_LEFT:
 	w2 = w - (w * frame);
 	h2 = (y + h);
 	evas_map_point_image_uv_set(map, 0, 0, 0);

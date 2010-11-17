@@ -1,3 +1,19 @@
+elementary (1.0.0+svn.51480slp2+build60) unstable; urgency=low
+
+  * Apply quicklaunch works in SVN
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build60
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Tue, 16 Nov 2010 20:21:34 +0900
+
+elementary (1.0.0+svn.51480slp2+build59) unstable; urgency=low
+
+  * Packaging
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build59
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 16 Nov 2010 14:18:33 +0900
+
 elementary (1.0.0+svn.51480slp2+build58) unstable; urgency=low
 
   * repackaging

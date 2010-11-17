@@ -137,8 +137,11 @@ _delete_item(Item *it)
 	if(!it) return;
 	Evas_Object *list_obj;
 	evas_object_del(it->back_btn);
+	elm_object_unfocus(it->fn_btn1);
 	evas_object_del(it->fn_btn1);
+	elm_object_unfocus(it->fn_btn2);
 	evas_object_del(it->fn_btn2);
+	elm_object_unfocus(it->fn_btn3);
 	evas_object_del(it->fn_btn3);	
 	if (it->title) eina_stringshare_del(it->title);
 	if (it->subtitle) eina_stringshare_del(it->subtitle);
@@ -391,7 +394,6 @@ _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_
 				elm_object_style_set(new_btn, buf);					
 			}
 		elm_widget_sub_object_add(obj, new_btn);
-		elm_object_focus_allow_set(new_btn, EINA_FALSE);
 		changed = EINA_TRUE;
 	}
 	return changed;
@@ -580,6 +582,7 @@ elm_navigationbar_push(Evas_Object *obj,
 			}
 		evas_object_smart_callback_add(it->back_btn, "clicked", _back_button_clicked, it); 
 		_button_set(obj, NULL, it->back_btn, EINA_TRUE);
+		elm_object_focus_allow_set(it->back_btn, EINA_FALSE);
 	}
 	
 	eina_stringshare_replace(&it->title, title);

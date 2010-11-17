@@ -176,6 +176,7 @@ main(int argc, char **argv)
 	CRITICAL("listen(sock=%d, 4096): %s", sock, strerror(errno));
 	exit(-1);
      }
+   elm_quicklaunch_mode_set(EINA_TRUE);
    elm_quicklaunch_init(argc, argv);
    restart_time = ecore_time_get();
 
@@ -280,7 +281,7 @@ main(int argc, char **argv)
 		  handle_run(fd, bytes);
 	       }
 	  }
-	elm_quicklaunch_sub_shutdown();
+	while (elm_quicklaunch_sub_shutdown() > 0);
      }
    elm_quicklaunch_shutdown();
 

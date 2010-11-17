@@ -33,6 +33,8 @@ elm_bubble.c \
 elm_button.c \
 elm_check.c \
 elm_clock.c \
+elm_colorpalette.c\
+elm_colorpicker.c\
 elm_calendar.c \
 elm_datefield.c \
 elm_datepicker.c \
@@ -53,6 +55,7 @@ elm_picker.c \
 elm_progressbar.c \
 elm_radio.c \
 elm_scrolled_entry.c \
+elm_scroller.c \
 elm_searchbar.c \
 elm_slider.c \
 elm_slideshow.c \
