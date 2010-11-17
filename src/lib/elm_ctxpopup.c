@@ -837,11 +837,11 @@ static void _bg_clicked_cb(void *data, Evas_Object *obj, const char *emission,
 
 static void _parent_resize(void *data, Evas *e, Evas_Object *obj,
 		void *event_info) {
-	Evas_Coord w, h;
-	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(data);
 
-	if (!wd)
-		return;
+	Evas_Coord w, h;
+
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(data);
+	if (!wd) 	return;
 
 	evas_object_geometry_get(obj, NULL, NULL, &w, &h);
 	evas_object_resize(wd->bg, w, h);
