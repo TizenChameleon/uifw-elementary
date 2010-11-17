@@ -32,3 +32,5 @@ void elm_smart_scroller_paging_set              (Evas_Object *obj, double pagere
 void elm_smart_scroller_region_bring_in         (Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
 void elm_smart_scroller_widget_set              (Evas_Object *obj, Evas_Object *wid);
 void elm_smart_scroller_page_move_set           (Evas_Object *obj, Eina_Bool set);
+void elm_smart_scroller_freeze_momentum_animator_set(Evas_Object *obj, Eina_Bool freeze);
+void elm_smart_scroller_freeze_bounce_animator_set(Evas_Object *obj, Eina_Bool freeze);

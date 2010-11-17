@@ -2564,10 +2564,6 @@ _smart_init(void)
 void
 elm_smart_scroller_freeze_momentum_animator_set(Evas_Object *obj, Eina_Bool freeze)
 {
-#ifdef DEBUG_PRINT
-	fprintf(stderr,"%s : %d \n", __FUNCTION__, __LINE__);
-#endif
-
    API_ENTRY return;
    sd->freeze_momentum_animator = freeze;
    if (sd->freeze_momentum_animator)
@@ -2578,26 +2574,19 @@ elm_smart_scroller_freeze_momentum_animator_set(Evas_Object *obj, Eina_Bool free
              sd->down.momentum_animator = NULL;
           }
      }
-
 }
-
 
 void
 elm_smart_scroller_freeze_bounce_animator_set(Evas_Object *obj, Eina_Bool freeze)
 {
-#ifdef DEBUG_PRINT
-	fprintf(stderr,"%s : %d \n", __FUNCTION__, __LINE__);
-#endif
-
    API_ENTRY return;
    sd->freeze_bounce_animator = freeze;
    if (sd->freeze_bounce_animator)
      {
-      if (sd->scrollto.y.animator)
-        {
-           ecore_animator_del(sd->scrollto.y.animator);
-           sd->scrollto.y.animator = NULL;
-        }
+        if (sd->scrollto.y.animator)
+          {
+             ecore_animator_del(sd->scrollto.y.animator);
+             sd->scrollto.y.animator = NULL;
+          }
      }
-
 }
