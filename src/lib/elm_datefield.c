@@ -327,28 +327,28 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 {
  	Widget_Data *wd = elm_widget_data_get(data);
 	char str[YEAR_MAX_LENGTH+1] = {0,};
+	int num = 0;
 
 	if (!wd || !wd->base) return;
  	wd->editing = FALSE;
 
 	if (obj == wd->date[DATE_YEAR])
 	{
-		int ret =0;
 		if (strlen(elm_entry_entry_get(wd->date[DATE_YEAR]))) wd->year = atoi(elm_entry_entry_get(wd->date[DATE_YEAR]));
 		wd->year = _check_date_boundary(data, wd->year, DATE_YEAR);
 		sprintf(str, "%d", wd->year);
 		elm_entry_entry_set(wd->date[DATE_YEAR], str);
 
 		//check month boundary
-		if(wd->month != (ret = _check_date_boundary(data, wd->month, DATE_MON)))
+		if(wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
 		{
-			wd->month = ret;
+			wd->month = num;
 			elm_entry_entry_set(wd->date[DATE_MON], month_label[wd->month-1]);
 		}
 		//check day boundary
-		if (wd->day != (ret = _check_date_boundary(data, wd->day, DATE_DAY)))
+		if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
 		{
-			wd->day = ret;
+			wd->day = num;
 			sprintf(str, "%d", wd->day);		
 			elm_entry_entry_set(wd->date[DATE_DAY], str);
 		}		
@@ -356,16 +356,15 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 	}
 	else if (obj == wd->date[DATE_MON])
 	{
-		int ret = 0;
-		if(wd->month != (ret = _check_date_boundary(data, wd->month, DATE_MON)))
+		if(wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
 		{
-			wd->month = ret;
+			wd->month = num;
 			elm_entry_entry_set(wd->date[DATE_MON], month_label[wd->month-1]);
 		}
 		//check day boundary
-		if (wd->day != (ret = _check_date_boundary(data, wd->day, DATE_DAY)))
+		if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
 		{
-			wd->day = ret;
+			wd->day = num;
 			sprintf(str, "%d", wd->day);		
 			elm_entry_entry_set(wd->date[DATE_DAY], str);
 		}
@@ -381,8 +380,9 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
  	}
 	else if (obj == wd->time[TIME_HOUR])
 	{
-		int num;
 		if (strlen(elm_entry_entry_get(wd->time[TIME_HOUR]))) num = atoi(elm_entry_entry_get(wd->time[TIME_HOUR]));
+		else num = wd->hour;
+		
 		if (!wd->time_mode) // 24 mode
 		{
 			if (num > HOUR_24H_MAXIMUM) num = HOUR_24H_MAXIMUM;
@@ -412,7 +412,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 	}
 	else if (obj == wd->time[TIME_MIN])
 	{
-		if (strlen(elm_entry_entry_get(wd->time[TIME_MIN]))) wd->min = atoi(elm_entry_entry_get(wd->time[TIME_MIN]));
+		if (strlen(elm_entry_entry_get(wd->time[TIME_MIN]))) wd->min = atoi(elm_entry_entry_get(wd->time[TIME_MIN]));	
 		if (wd->min > MIN_MAXIMUM) wd->min = MIN_MAXIMUM;
 
 		sprintf(str, "%02d", wd->min);
