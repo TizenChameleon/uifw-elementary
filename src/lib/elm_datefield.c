@@ -38,14 +38,12 @@ enum {
 #define DAY_MAX_LENGTH		2
 #define TIME_MAX_LENGTH	2
 
-#define YEAR_MAXIMUM		2099
-#define YEAR_MINIMUM		1900
 #define MONTH_MAXIMUM		12
 #define HOUR_24H_MAXIMUM	23
 #define HOUR_12H_MAXIMUM	12
 #define MIN_MAXIMUM		59
 
-static char month_label[13][4] = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+static char month_label[12][4] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 struct _Widget_Data
 {
@@ -57,6 +55,8 @@ struct _Widget_Data
 	int layout;
 
 	int year, month, day, hour, min;
+	int y_max, m_max, d_max;
+	int y_min, m_min, d_min;
 	int date_format;
 	Eina_Bool pm:1;
 	Eina_Bool time_mode:1;
@@ -89,6 +89,7 @@ static Eina_Bool _focus_idler_cb(void *obj);
 static void _entry_focus_move(Evas_Object *obj, Evas_Object *focus_obj);
 static Eina_Bool _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen);
 static int _maximum_day_get(int year, int month);
+static int _check_date_boundary(Evas_Object *obj, int num, int flag);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -329,54 +330,59 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 	int num = 0;
 
 	if (!wd || !wd->base) return;
-	
  	wd->editing = FALSE;
 
 	if (obj == wd->date[DATE_YEAR])
 	{
-		if (!strlen(elm_entry_entry_get(wd->date[DATE_YEAR]))) num = wd->year;
-		else num = atoi(elm_entry_entry_get(wd->date[DATE_YEAR]));
-		
-		if (num > YEAR_MAXIMUM) num = YEAR_MAXIMUM;
-		else if (num < YEAR_MINIMUM) num = YEAR_MINIMUM;
-		wd->year = num;
-
-		sprintf(str, "%d", num);
+		if (strlen(elm_entry_entry_get(wd->date[DATE_YEAR]))) wd->year = atoi(elm_entry_entry_get(wd->date[DATE_YEAR]));
+		wd->year = _check_date_boundary(data, wd->year, DATE_YEAR);
+		sprintf(str, "%d", wd->year);
 		elm_entry_entry_set(wd->date[DATE_YEAR], str);
+
+		//check month boundary
+		if(wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
+		{
+			wd->month = num;
+			elm_entry_entry_set(wd->date[DATE_MON], month_label[wd->month-1]);
+		}
+		//check day boundary
+		if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
+		{
+			wd->day = num;
+			sprintf(str, "%d", wd->day);		
+			elm_entry_entry_set(wd->date[DATE_DAY], str);
+		}		
 		edje_object_signal_emit(wd->base, "elm,state,year,focus,out", "elm");
 	}
 	else if (obj == wd->date[DATE_MON])
 	{
- 		int day_of_month = _maximum_day_get(wd->year, wd->month);
-
-		if (wd->day > day_of_month) 
+		if(wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
 		{
-			wd->day = day_of_month;
-			sprintf(str, "%d", wd->day);
+			wd->month = num;
+			elm_entry_entry_set(wd->date[DATE_MON], month_label[wd->month-1]);
+		}
+		//check day boundary
+		if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
+		{
+			wd->day = num;
+			sprintf(str, "%d", wd->day);		
 			elm_entry_entry_set(wd->date[DATE_DAY], str);
 		}
 		edje_object_signal_emit(wd->base, "elm,state,month,focus,out", "elm");
 	}	
  	else if (obj == wd->date[DATE_DAY])
  	{
- 		int day_of_month = _maximum_day_get(wd->year, wd->month);
-
-		if (!strlen(elm_entry_entry_get(wd->date[DATE_DAY]))) num = wd->day;
-		else num = atoi(elm_entry_entry_get(wd->date[DATE_DAY]));
-		
-		if (num > day_of_month) num = day_of_month;
-		else if (num == 0) num = 1;
-		wd->day = num;
-		
-		sprintf(str, "%d", num);		
+ 		if (strlen(elm_entry_entry_get(wd->date[DATE_DAY]))) wd->day = atoi(elm_entry_entry_get(wd->date[DATE_DAY]));
+		wd->day = _check_date_boundary(data, wd->day, DATE_DAY);
+		sprintf(str, "%d", wd->day);		
 		elm_entry_entry_set(wd->date[DATE_DAY], str);
 		edje_object_signal_emit(wd->base, "elm,state,day,focus,out", "elm");
  	}
 	else if (obj == wd->time[TIME_HOUR])
 	{
-		if (!strlen(elm_entry_entry_get(wd->time[TIME_HOUR]))) num = (wd->hour == 0)? 24 : wd->hour;
-		else num = atoi(elm_entry_entry_get(wd->time[TIME_HOUR]));
-
+		if (strlen(elm_entry_entry_get(wd->time[TIME_HOUR]))) num = atoi(elm_entry_entry_get(wd->time[TIME_HOUR]));
+		else num = wd->hour;
+		
 		if (!wd->time_mode) // 24 mode
 		{
 			if (num > HOUR_24H_MAXIMUM) num = HOUR_24H_MAXIMUM;
@@ -384,7 +390,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 		}
 		else // 12 mode
 		{
-			if (num > HOUR_24H_MAXIMUM)
+			if (num > HOUR_24H_MAXIMUM || num == 0)
 			{
 				num = HOUR_12H_MAXIMUM;
 				wd->pm = EINA_FALSE;
@@ -393,9 +399,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 			{
 				num -= HOUR_12H_MAXIMUM;
 				wd->pm = EINA_TRUE;
-			}
-			else if (num == 0) num = 1;
-			
+			}			
 			wd->hour = (wd->pm == EINA_TRUE)? num + HOUR_12H_MAXIMUM : num;
 			if((wd->hour % 12) == 0) wd->hour -= HOUR_12H_MAXIMUM;
 
@@ -408,17 +412,13 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 	}
 	else if (obj == wd->time[TIME_MIN])
 	{
-		if (!strlen(elm_entry_entry_get(wd->time[TIME_MIN]))) num = wd->min;
-		else num = atoi(elm_entry_entry_get(wd->time[TIME_MIN]));
-		
-		if (num > MIN_MAXIMUM) num = MIN_MAXIMUM;
-		wd->min = num;
+		if (strlen(elm_entry_entry_get(wd->time[TIME_MIN]))) wd->min = atoi(elm_entry_entry_get(wd->time[TIME_MIN]));	
+		if (wd->min > MIN_MAXIMUM) wd->min = MIN_MAXIMUM;
 
-		sprintf(str, "%02d", num);
+		sprintf(str, "%02d", wd->min);
 		elm_entry_entry_set(wd->time[TIME_MIN], str);
 		edje_object_signal_emit(wd->base, "elm,state,min,focus,out", "elm");
 	}
-	
 	evas_object_smart_callback_call(data, "changed", NULL);	
 }
 
@@ -496,6 +496,38 @@ _entry_focus_move(Evas_Object *obj, Evas_Object *focus_obj)
 }
 
 static int
+_check_date_boundary(Evas_Object *obj, int num, int flag)
+{
+	Widget_Data *wd = elm_widget_data_get(obj);
+	if (flag == DATE_YEAR)
+	{
+		if (num > wd->y_max) num = wd->y_max;
+		else if (num < wd->y_min) num = wd->y_min;
+		return num;
+	}
+
+	else if (flag == DATE_MON)
+	{
+		if (wd->year == wd->y_max && num > wd->m_max) num = wd->m_max;
+		else if (wd->year == wd->y_min && num < wd->m_min) num = wd->m_min;
+		else if (num > MONTH_MAXIMUM) num = MONTH_MAXIMUM;
+		else if (num <= 0) num = 1;
+		return num;
+	}
+
+	else if (flag == DATE_DAY)
+	{
+		int day_of_month = _maximum_day_get(wd->year, wd->month);
+		if (wd->year == wd->y_max && wd->month == wd->m_max && num > wd->d_max) num = wd->d_max;
+		else if (wd->year == wd->y_min && wd->month == wd->m_min && num < wd->d_min) num = wd->d_min;
+		else if (num > day_of_month) num = day_of_month;
+		else if (num <= 0) num = 1;
+		return num;
+	}
+	return num;
+}
+
+static int
 _maximum_day_get(int year, int month)
 {
 	int day_of_month = 0;
@@ -533,16 +565,21 @@ _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen)
 		wd->editing = EINA_FALSE;
 	else if (focus_obj == wd->date[DATE_MON] && strlen == MONTH_MAX_LENGTH)
  		wd->editing = EINA_FALSE;
- 	else if (focus_obj == wd->date[DATE_DAY] && strlen == DAY_MAX_LENGTH)
+ 	else if (focus_obj == wd->date[DATE_DAY])
+	{
+		if (strlen == DAY_MAX_LENGTH || atoi(elm_entry_entry_get(focus_obj)) > 3)
 		wd->editing = EINA_FALSE;
+	}
 	else if (focus_obj == wd->time[TIME_HOUR])
 	{	
 		if (strlen == TIME_MAX_LENGTH || atoi(elm_entry_entry_get(focus_obj)) > 2)
 			wd->editing = EINA_FALSE;
 	}
-	else if (focus_obj == wd->time[TIME_MIN] && strlen == TIME_MAX_LENGTH) 
+	else if (focus_obj == wd->time[TIME_MIN])
+	{
+		if (strlen == TIME_MAX_LENGTH || atoi(elm_entry_entry_get(focus_obj)) > 5) 
 		wd->editing = EINA_FALSE;
-
+	}
 	return !wd->editing;
 }
 
@@ -576,7 +613,7 @@ _imf_event_commit_cb(void *data, int type, void *event)
 	if (focus_obj == wd->date[DATE_MON])
 	{
 		wd->month = atoi(ev->str);
-		strcpy(str, month_label[wd->month]);
+		strcpy(str, month_label[wd->month-1]);
 	}
 	else
 	{
@@ -613,7 +650,7 @@ _date_update(Evas_Object *obj)
  	sprintf(str, "%d", wd->year);
 	elm_entry_entry_set(wd->date[DATE_YEAR], str);
 
-	sprintf(str, "%s", month_label[wd->month]);
+	sprintf(str, "%s", month_label[wd->month-1]);
 	elm_entry_entry_set(wd->date[DATE_MON], str);
 
 	sprintf(str, "%d", wd->day);
@@ -743,16 +780,19 @@ elm_datefield_add(Evas_Object *parent)
 	_date_entry_add(obj);
 	_time_entry_add(obj);	
 
-	wd->year = YEAR_MINIMUM;
+	wd->y_min = 1900;
+	wd->m_min = 1;
+	wd->d_min = 1;
+	wd->y_max = 2099;
+	wd->m_max = 12;
+	wd->d_max = 31;	
+	wd->year = wd->y_min;
 	wd->month = 1;
 	wd->day = 1;
-	wd->hour = 0;
-	wd->min = 0;
+
 	wd->layout = ELM_DATEFIELD_LAYOUT_DATEANDTIME;
-	wd->editing = EINA_FALSE;
 	wd->time_mode = EINA_TRUE;
 	wd->date_format = DATE_FORMAT_MMDDYY;
-	wd->idler = NULL;
 	
 	_theme_hook(obj);
 	
@@ -774,12 +814,14 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
 	Widget_Data *wd = elm_widget_data_get(obj);
 	
 	if (!wd) return;
+	if (layout < ELM_DATEFIELD_LAYOUT_TIME ||layout > ELM_DATEFIELD_LAYOUT_DATEANDTIME) return;
 
 	if (wd->layout != layout)
 	{
 		wd->layout = layout;
 		_theme_hook(obj);
 	}
+	return EINA_TRUE;
 }
 
 /**
@@ -810,7 +852,7 @@ elm_datefield_layout_get(const Evas_Object *obj)
  * @param day The day to set
  * @param hour The hours to set (24hour mode - 0~23)
  * @param min The minutes to set (0~59)
- *
+ * 
  * @ingroup Datefield
  */
 EAPI void
@@ -822,18 +864,9 @@ elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
 	
 	if (!wd) return;
 
-	if (year > YEAR_MAXIMUM) wd->year = YEAR_MAXIMUM;
-	else if (year < YEAR_MINIMUM) wd->year = YEAR_MINIMUM;
-	else wd->year = year;
-
-	if (month > MONTH_MAXIMUM) wd->month = MONTH_MAXIMUM;
-	else if (month <= 0) wd->month = 1;
-	else wd->month = month;
-
- 	day_of_month = _maximum_day_get(wd->year, wd->month);	
-	if (day > day_of_month) wd->day = day_of_month;
-	else if (day <= 0) wd->day = 1;
-	else wd->day = day;
+	wd->year = _check_date_boundary(obj, year, DATE_YEAR);
+	wd->month = _check_date_boundary(obj, month, DATE_MON);
+	wd->day = _check_date_boundary(obj, day, DATE_DAY);
 	
 	if (hour > HOUR_24H_MAXIMUM) wd->hour = HOUR_24H_MAXIMUM;
 	else if (hour < 0) wd->hour = 0;
@@ -876,6 +909,154 @@ elm_datefield_date_get(const Evas_Object *obj, int *year, int *month, int *day, 
 		*hour = wd->hour;
 	if (min)
 		*min = wd->min;
+}
+
+/**
+ * Set upper boundary of the datefield
+ *
+ * @param obj The datefield object
+ * @param year The year to set
+ * @param month The month to set
+ * @param day The day to set
+ * @return TRUE/FALSE
+ *
+ * @ingroup Datefield
+ */
+EAPI Eina_Bool
+elm_datefield_date_max_set(Evas_Object *obj, int year, int month, int day)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	int day_of_month;
+	Eina_Bool update = EINA_FALSE;
+	
+	if (!wd) return EINA_FALSE;
+	if (month < 1 || month > MONTH_MAXIMUM) return EINA_FALSE;
+	day_of_month = _maximum_day_get(year, month);
+	if (day < 1 || day > day_of_month) return EINA_FALSE;
+
+	wd->y_max = year;
+	wd->m_max = month;
+	wd->d_max = day;
+
+	if (wd->year > wd->y_max)
+	{
+		wd->year = wd->y_max;
+		update = EINA_TRUE;
+	}
+	if (wd->year == wd->y_max && wd->month > wd->m_max)
+	{
+		wd->month = wd->m_max;
+		update = EINA_TRUE;
+	}
+	if (wd->year == wd->y_max && wd->month == wd->m_max && wd->day > wd->d_max)
+	{
+		wd->day = wd->d_max;
+		update = EINA_TRUE;
+	}
+
+	if (update) _date_update(obj);
+	return EINA_TRUE;
+}
+
+/**
+ * Get upper boundary of the datefield
+ *
+ * @param obj The datefield object
+ * @param year The pointer to the variable get the maximum year
+ * @param month The pointer to the variable get the maximum month
+ * @param day The pointer to the variable get the maximum day
+ *
+ * @ingroup Datefield
+ */
+EAPI void
+elm_datefield_date_max_get(const Evas_Object *obj, int *year, int *month, int *day)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	
+	if (!wd) return;
+	
+	if (year)
+		*year = wd->y_max;
+	if (month)
+		*month = wd->m_max;
+	if (day)
+		*day = wd->d_max;
+}
+
+/**
+ * Set lower boundary of the datefield
+ *
+ * @param obj The datefield object
+ * @param year The year to set
+ * @param month The month to set
+ * @param day The day to set
+ * @return TRUE/FALSE
+ *
+ * @ingroup Datepicker
+ */
+EAPI Eina_Bool
+elm_datefield_date_min_set(Evas_Object *obj, int year, int month, int day)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	int day_of_month;
+	Eina_Bool update = EINA_FALSE;
+	
+	if (!wd) return EINA_FALSE;
+	if (month < 1 || month > MONTH_MAXIMUM) return EINA_FALSE;
+	day_of_month = _maximum_day_get(year, month);
+	if (day < 1 || day > day_of_month) return EINA_FALSE;
+
+	wd->y_min = year;
+	wd->m_min = month;
+	wd->d_min = day;
+
+	if (wd->year < wd->y_min)
+	{
+		wd->year = wd->y_min;
+		update = EINA_TRUE;
+	}
+	if (wd->year == wd->y_min && wd->month < wd->m_min)
+	{
+		wd->month = wd->m_min;
+		update = EINA_TRUE;
+	}
+	if (wd->year == wd->y_min && wd->month == wd->m_min && wd->day < wd->d_min)
+	{
+		wd->day = wd->d_min;
+		update = EINA_TRUE;
+	}
+
+	if (update) _date_update(obj);
+	return EINA_TRUE;
+}
+
+/**
+ * Get lower boundary of the datefield
+ *
+ * @param obj The datefield object
+ * @param year The pointer to the variable get the maximum year
+ * @param month The pointer to the variable get the maximum month
+ * @param day The pointer to the variable get the maximum day
+ *
+ * @ingroup Datefield
+ */
+EAPI void
+elm_datefield_date_min_get(const Evas_Object *obj, int *year, int *month, int *day)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype);
+	Widget_Data *wd = elm_widget_data_get(obj);
+	
+	if (!wd) return;
+	
+	if (year)
+		*year = wd->y_min;
+	if (month)
+		*month = wd->m_min;
+	if (day)
+		*day = wd->d_min;
 }
 
 /**
