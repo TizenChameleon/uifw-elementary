@@ -62,10 +62,15 @@ _theme_hook(Evas_Object *obj)
    Item *it;
    if (!wd) return;
    EINA_LIST_FOREACH(wd->stack, l, it)
-     edje_object_scale_set(it->base, elm_widget_scale_get(obj) * 
-                           _elm_config->scale);
+     {
+        _elm_theme_object_set(obj, it->base,  "pager", "base",
+                              elm_widget_style_get(obj));
+        edje_object_scale_set(it->base, elm_widget_scale_get(obj) *
+                              _elm_config->scale);
+     }
    _sizing_eval(obj);
 }
+
 
 static void
 _sizing_eval(Evas_Object *obj)
@@ -141,8 +146,15 @@ _eval_top(Evas_Object *obj)
 		{
 			edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
 		}
-	else if (wd->oldtop && wd->oldtop->popme)
-	    edje_object_signal_emit(o, "elm,action,show", "elm");
+        else if (wd->oldtop)
+          {
+             if (elm_object_focus_get(wd->oldtop->content))
+               elm_object_focus(wd->top->content);
+             if (wd->oldtop->popme)
+               edje_object_signal_emit(o, "elm,action,show", "elm");
+             else
+               edje_object_signal_emit(o, "elm,action,push", "elm");
+          }
 	else
 	    edje_object_signal_emit(o, "elm,action,push", "elm");
 	onshow = edje_object_data_get(o, "onshow");
@@ -212,6 +224,7 @@ _signal_hide_finished(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    evas_object_smart_callback_call(obj2, "hide,finished", it->content);
    edje_object_message_signal_process(it->base);
    if (it->popme) evas_object_del(it->content);
+   evas_object_hide(it->content);
    _sizing_eval(obj2);
 }
 
@@ -239,6 +252,7 @@ elm_pager_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
 
    wd->clip = evas_object_rectangle_add(e);
    elm_widget_resize_object_set(obj, wd->clip);
@@ -466,11 +480,9 @@ elm_pager_content_top_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it;
    if (!wd) return NULL;
-   if (!wd->stack) return NULL;
-   it = eina_list_last(wd->stack)->data;
-   return it->content;
+   if (!wd->top) return NULL;
+   return wd->top->content;
 }
 
 /**
