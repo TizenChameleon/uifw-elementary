@@ -845,7 +845,11 @@ static void _parent_resize(void *data, Evas *e, Evas_Object *obj,
 
 	evas_object_geometry_get(obj, NULL, NULL, &w, &h);
 	evas_object_resize(wd->bg, w, h);
-	evas_object_hide(data);
+
+   if(wd->visible == EINA_FALSE) return;
+	wd->visible = EINA_FALSE;
+   _hide_ctxpopup(data);
+
 }
 
 static void _ctxpopup_show(void *data, Evas *e, Evas_Object *obj,
