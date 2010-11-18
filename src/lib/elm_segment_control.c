@@ -91,7 +91,8 @@ _signal_segment_off(void *data)
       }
     if(item->label_wd)
       {
-         elm_label_text_color_set(item->label_wd, 0xff,0xff, 0xff, 0xff);
+         elm_label_text_color_set(item->label_wd, 0x1b,0x1a, 0x18, 0xff);
+//         edje_object_signal_emit(item->label_wd, "elm,state,text,default", "elm");
       }
 
     return;
@@ -123,7 +124,8 @@ _signal_segment_on(void *data)
    if(!item->label_wd)
       edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
    if(item->label_wd)
-      elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
+      elm_label_text_color_set(item->label_wd, 0xff,0xff, 0xff, 0xff);
+//	   edje_object_signal_emit(item->label_wd, "elm,state,text,pressed", "elm");
 
    wd->cur_seg_id = item->segment_id;
    evas_object_smart_callback_call(item->obj, "changed", (void*)wd->cur_seg_id);
@@ -148,6 +150,7 @@ _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
     _signal_segment_on((void*)item);
     if(item->label_wd)
        elm_label_text_color_set(item->label_wd, 0x00,0x00, 0x00, 0xff);
+//    	edje_object_signal_emit(item->label_wd, "elm,state,text,selected", "elm");
 
     return;
 }
@@ -160,6 +163,14 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 
    if (!wd) return;
    
+   if(!item->label_wd)
+   {
+      edje_object_signal_emit(item->base, "elm,state,text,pressed", "elm");
+   }
+   if(item->label_wd && wd->cur_seg_id != item->segment_id)
+      elm_label_text_color_set(item->label_wd, 0xff,0xff, 0xff, 0xff);
+//	   edje_object_signal_emit(item->label_wd, "elm,state,text,pressed", "elm");
+
    edje_object_signal_emit(item->base, "elm,action,focus", "elm");
 }
 
@@ -281,9 +292,11 @@ _segment_item_resizing(void *data)
         if (it->segment_id == wd->cur_seg_id && it->sel)
           {
             elm_label_text_color_set(it->label_wd, 0x00,0x00, 0x00, 0xff);
+//            edje_object_signal_emit(it->label_wd, "elm,state,text,selected", "elm");
           }
         else
-           elm_label_text_color_set(it->label_wd, 0xFF,0xFF, 0xFF, 0xff);
+           elm_label_text_color_set(it->label_wd, 0x1b,0x1a, 0x18, 0xff);
+//        	edje_object_signal_emit(it->label_wd, "elm,state,text,default", "elm");
      }
 }
 
@@ -364,27 +377,28 @@ _update_list(Evas_Object *obj)
 	edje_object_signal_emit(it->base, "elm,state,segment,on", "elm");
 	if(it->label && !it->label_wd)
 	  {
-     	     edje_object_signal_emit(it->base, "elm,state,text,change", "elm");
+       	 edje_object_signal_emit(it->base, "elm,state,text,change", "elm");
 	     edje_object_part_text_set(it->base, "elm.text", it->label);
   	  }
 	else
-           edje_object_signal_emit(it->base, "elm,state,text,hidden", "elm");
+       edje_object_signal_emit(it->base, "elm,state,text,hidden", "elm");
 
-        if (it->icon && edje_object_part_swallow_get(it->base, "elm.swallow.content") == NULL)
-          {
-              if(it->icon)
-                {
-                   edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
-                   edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
-                }
-              else
-                 edje_object_signal_emit(it->base, "elm,state,icon,hidden", "elm");
-          }
-        if(it->label_wd)
-          {
+	if (it->icon && edje_object_part_swallow_get(it->base, "elm.swallow.content") == NULL)
+	  {
+             if(it->icon)
+	       {
+		  edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
+		  edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+	       }
+	     else
+                edje_object_signal_emit(it->base, "elm,state,icon,hidden", "elm");
+	  }
+	if(it->label_wd)
+	  {
              edje_object_signal_emit(it->base, "elm,state,label,visible", "elm");
-             elm_label_text_color_set(it->label_wd, 0x00,0x00, 0x00, 0xff);
-          }
+	     elm_label_text_color_set(it->label_wd, 0x00,0x00, 0x00, 0xff);
+//		 edje_object_signal_emit(it->label_wd, "elm,state,text,selected", "elm");
+	  }
 
 	return;
      }
@@ -1041,7 +1055,7 @@ elm_segment_control_item_object_get(Elm_Segment_Item *it)
 {
    if (!it) return NULL;
    
-   return it->base;
+   return it->obj;
 }
 
 /**
@@ -1124,12 +1138,11 @@ elm_segment_control_item_label_object_set(Elm_Segment_Item *item, char *label)
    if(!label) return NULL;
 
    item->label_wd = elm_label_add(item->obj);
+   elm_object_style_set(item->label_wd, "segment");
    elm_label_label_set(item->label_wd, label);
    elm_label_text_align_set(item->label_wd, "middle");
    elm_label_ellipsis_set(item->label_wd, 1);
-   elm_label_line_wrap_set(item->label_wd, 1);
    eina_stringshare_replace(&item->label, label);
-   elm_object_style_set(item->label_wd, "segment");
 
    return item->label_wd;
 }
