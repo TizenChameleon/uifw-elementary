@@ -374,10 +374,15 @@ static void
 _config_apply(void)
 {
    _elm_theme_parse(NULL, _elm_config->theme);
-   if (_elm_config->modules) _elm_module_parse(_elm_config->modules);
    ecore_animator_frametime_set(1.0 / _elm_config->fps);
+}
+
+static void
+_config_sub_apply(void)
+{
    edje_frametime_set(1.0 / _elm_config->fps);
    edje_scale_set(_elm_config->scale);
+   if (_elm_config->modules) _elm_module_parse(_elm_config->modules);
    edje_input_panel_enabled_set(_elm_config->input_panel_enable);
    edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
    edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
@@ -718,7 +723,7 @@ _elm_config_sub_init(void)
 		    {
 		       _elm_config->scale = (double)val / 1000.0;
 		       // FIXME: hack until e export finger size too
-		       if (getenv("ELM_FINGER_SIZE"))
+		       if (!getenv("ELM_FINGER_SIZE"))
 			 _elm_config->finger_size = 40.0 * _elm_config->scale;
                        edje_scale_set(_elm_config->scale);
 		    }
@@ -809,6 +814,7 @@ _elm_config_sub_init(void)
           }
 #endif
       }
+   _config_sub_apply();
 }
 
 void
