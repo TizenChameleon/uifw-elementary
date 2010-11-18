@@ -2708,12 +2708,12 @@ extern "C" {
    /* Xml Animator */
    typedef struct _Elm_Xml_Animator Elm_Xml_Animator;
 
-   EAPI Elm_Xml_Animator *elm_xml_animator_add(Evas_Object *obj);
-   EAPI Eina_Bool    elm_xml_animator_file_set(Elm_Xml_Animator *xa, const char *file);
-   EAPI Eina_Bool    elm_xml_animator_object_add(Elm_Xml_Animator *xa, Evas_Object *obj, const char *title, void (*end_func)(void *data, Evas_Object *obj), void *data);
-   EAPI void         elm_xml_animator_object_del(Elm_Xml_Animator *xa, Evas_Object *obj);
-   EAPI void         elm_xml_animator_del(Elm_Xml_Animator *xa);
-   EAPI void         elm_xml_animator_run(Elm_Xml_Animator *xa);
+   EINA_DEPRECATED EAPI Elm_Xml_Animator *elm_xml_animator_add(Evas_Object *obj);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_xml_animator_file_set(Elm_Xml_Animator *xa, const char *file);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_xml_animator_object_add(Elm_Xml_Animator *xa, Evas_Object *obj, const char *title, void (*end_func)(void *data, Evas_Object *obj), void *data);
+   EINA_DEPRECATED EAPI void         elm_xml_animator_object_del(Elm_Xml_Animator *xa, Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_xml_animator_del(Elm_Xml_Animator *xa);
+   EINA_DEPRECATED EAPI void         elm_xml_animator_run(Elm_Xml_Animator *xa);
    
 #ifdef __cplusplus
 }
