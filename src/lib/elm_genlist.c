@@ -3,6 +3,8 @@
 #include "els_scroller.h"
 
 #define SWIPE_MOVES 12
+#define MAX_ITEMS_PER_BLOCK 32
+#define LONGPRESS_TIMEOUT 1.0
 
 /**
  * @defgroup Genlist Genlist
@@ -2547,8 +2549,9 @@ elm_genlist_add(Evas_Object *parent)
 
    wd->obj = obj;
    wd->mode = ELM_LIST_SCROLL;
+   wd->max_items_per_block = MAX_ITEMS_PER_BLOCK;
    wd->max_items_per_block = 32;
-   wd->longpress_timeout = 1.0;
+   wd->longpress_timeout = LONGPRESS_TIMEOUT;
 	wd->max_git_num = 0;
 
    evas_object_smart_callback_add(obj, "scroll-hold-on", _hold_on, obj);
@@ -2862,7 +2865,6 @@ elm_genlist_item_append(Evas_Object *obj, const Elm_Genlist_Item_Class *itc,
      {
         wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
         it->rel = NULL;
-        it->before = 0;
      }
    else
      {
@@ -2876,8 +2878,8 @@ elm_genlist_item_append(Evas_Object *obj, const Elm_Genlist_Item_Class *itc,
                                        EINA_INLIST_GET(it2));
         it->rel = it2;
         it->rel->relcount++;
-        it->before = 0;
      }
+   it->before = 0;
    _item_queue(wd, it);
    return it;
 }
@@ -3997,6 +3999,25 @@ elm_genlist_item_update(Elm_Genlist_Item *it)
 }
 
 /**
+ * Update the item class of an item
+ *
+ * @param it The item
+ * @parem itc The item class for the item
+ *
+ * @ingroup Genlist
+ */
+EAPI void
+elm_genlist_item_item_class_update(Elm_Genlist_Item *it, const Elm_Genlist_Item_Class *itc)
+{
+   if (!it) return;
+   if (!it->block) return;
+   if (!itc) return;
+   if (it->delete_me) return;
+   it->itc = itc;
+   elm_genlist_item_update(it);
+}
+
+/**
  * This sets the horizontal stretching mode
  *
  * This sets the mode used for sizing items horizontally. Valid modes are
@@ -4124,8 +4145,8 @@ elm_genlist_no_select_mode_get(const Evas_Object *obj)
  * Set compress mode
  *
  * This will enable the compress mode where items are "compressed" horizontally
- * to fit the genlist scrollable viewport width. this is special for gnelist.
- * do not rely on elm_genlist_horizontal_mode_set() being set to
+ * to fit the genlist scrollable viewport width. This is special for genlist.
+ * Do not rely on elm_genlist_horizontal_mode_set() being set to
  * ELM_LIST_COMPRESS to work as genlist needs to handle it specially.
  *
  * @param obj The genlist object
