@@ -528,11 +528,23 @@ elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item)
 elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data)
 {
 	if(!item) return;
+	Eina_List *bl;
 	Evas_Object *btn;
 	char buf[1024],theme[1024];
-	fn_button *btn_det;
+	fn_button *btn_det = NULL;
+	EINA_LIST_FOREACH(item->fnbtn_list, bl, btn_det)
+		{
+			if(btn_det->btn_id == button_type)
+				{
+					evas_object_del(btn_det->btn);
+					free(btn_det);
+					btn_det = NULL;
+					item->fnbtn_list = eina_list_remove_list(item->fnbtn_list, bl);
+				}
+		}	
 	btn = elm_button_add(item->obj);
 	btn_det = ELM_NEW(btn_det);
+	if(!btn_det) return;
 	if(button_type == ELM_NAVIGATIONBAR_EX_BACK_BUTTON)
 		{
 			snprintf(theme, sizeof(theme), "navigationbar_backbutton/%s", elm_widget_style_get(item->obj));
@@ -555,7 +567,7 @@ elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char
 	elm_widget_sub_object_add(item->obj, btn);
 	btn_det->btn = btn;
 	btn_det->btn_id = button_type;
-	item->fnbtn_list = eina_list_append(item->fnbtn_list, btn_det);
+	item->fnbtn_list = eina_list_append(item->fnbtn_list, btn_det);		
 }
 
 /**
