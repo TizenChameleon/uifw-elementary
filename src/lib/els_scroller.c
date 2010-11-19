@@ -559,6 +559,8 @@ _smart_bounce_x_animator(void *data)
           {
              if (sd->down.momentum_animator)
                sd->down.bounce_x_hold = 1;
+			 else
+			   _smart_anim_stop(sd->smart_obj);
              sd->down.bounce_x_animator = NULL;
              sd->down.pdx = 0;
              sd->bouncemex = 0;
@@ -593,6 +595,8 @@ _smart_bounce_y_animator(void *data)
           {
              if (sd->down.momentum_animator)
                sd->down.bounce_y_hold = 1;
+			 else
+			   _smart_anim_stop(sd->smart_obj);
              sd->down.bounce_y_animator = NULL;
              sd->down.pdy = 0;
              sd->bouncemey = 0;
