@@ -874,11 +874,11 @@ extern "C" {
 	ELM_TEXT_FORMAT_PLAIN_UTF8,
 	ELM_TEXT_FORMAT_MARKUP_UTF8
      } Elm_Text_Format;
-   EAPI Evas_Object *elm_notepad_add(Evas_Object *parent);
-   EAPI void         elm_notepad_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format);
-   EAPI void         elm_notepad_file_save(Evas_Object *obj, const char *file, Elm_Text_Format format);
-   EAPI void         elm_notepad_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
-   EAPI void         elm_notepad_autosave_set(Evas_Object *obj, Eina_Bool autosave);
+   EINA_DEPRECATED EAPI Evas_Object *elm_notepad_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_notepad_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format);
+   EINA_DEPRECATED EAPI void         elm_notepad_file_save(Evas_Object *obj, const char *file, Elm_Text_Format format);
+   EINA_DEPRECATED EAPI void         elm_notepad_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
+   EINA_DEPRECATED EAPI void         elm_notepad_autosave_set(Evas_Object *obj, Eina_Bool autosave);
 
    /* smart callbacks called:
     */
