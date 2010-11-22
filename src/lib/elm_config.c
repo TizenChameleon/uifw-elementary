@@ -683,13 +683,13 @@ _elm_config_init(void)
    _desc_init();
    _profile_get();
    _config_load();
-   _env_get();
-   _config_apply();
 }
 
 void
 _elm_config_sub_init(void)
 {
+   _env_get();
+   _config_apply();
    if ((_elm_config->engine == ELM_SOFTWARE_X11) ||
        (_elm_config->engine == ELM_SOFTWARE_16_X11) ||
        (_elm_config->engine == ELM_XRENDER_X11) ||
