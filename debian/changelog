@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build62) unstable; urgency=low
+
+  * repackaging
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build62 
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Mon, 22 Nov 2010 20:52:44 +0900
+
 elementary (1.0.0+svn.51480slp2+build61) unstable; urgency=low
 
   * repackaging
