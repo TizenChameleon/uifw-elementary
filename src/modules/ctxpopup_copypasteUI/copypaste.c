@@ -165,7 +165,7 @@ obj_longpress(Evas_Object *obj)
 			if (1) // need way to detect if someone has a selection
 				{
 					if (ext_mod->editable)
-						elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",	_paste, obj );
+						elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",_paste, obj );
 				}
 	//		elm_ctxpopup_item_add(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 	// start for cbhm
@@ -182,6 +182,8 @@ obj_longpress(Evas_Object *obj)
 							elm_ctxpopup_item_add(ext_mod->popup, NULL, "Copy",_copy, obj );
 							if (ext_mod->editable)
 								elm_ctxpopup_item_add(ext_mod->popup, NULL, "Cut",_cut, obj );							
+							if (ext_mod->editable)
+								elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",_paste, obj );
 						}
 					else
 						{
