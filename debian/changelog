@@ -1,3 +1,12 @@
+elementary (1.0.0+svn.51480slp2+build63) unstable; urgency=low
+
+  * [elm_genlist] fix exponential scroll speed in edit mode and fix pinch zoom click event bug
+  * [elm_genlist] added elm_genlist_item_prepend_with_group api
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build63
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Tue, 23 Nov 2010 13:36:06 +0900
+
 elementary (1.0.0+svn.51480slp2+build62) unstable; urgency=low
 
   * repackaging
