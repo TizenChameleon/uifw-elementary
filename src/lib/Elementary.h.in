@@ -1317,6 +1317,7 @@ extern "C" {
    EAPI Elm_Genlist_GroupItem *elm_genlist_groupitem_add(Evas_Object *obj, const Elm_Genlist_Item_Class *itc, const void *data);
    EAPI void              elm_genlist_groupitem_del( Elm_Genlist_GroupItem *git);
    EAPI Elm_Genlist_Item *elm_genlist_item_append_with_group(Evas_Object *obj, const Elm_Genlist_Item_Class *itc, const void *data, Elm_Genlist_Item *parent, Elm_Genlist_Item_Flags flags, Elm_Genlist_GroupItem *git, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *func_data);   
+   EAPI Elm_Genlist_Item *elm_genlist_item_prepend_with_group(Evas_Object *obj, const Elm_Genlist_Item_Class *itc, const void *data, Elm_Genlist_Item *parent, Elm_Genlist_Item_Flags flags, Elm_Genlist_GroupItem *git, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *func_data);
    EAPI void              elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after );
    EAPI void              elm_genlist_effect_set(const Evas_Object *obj, Eina_Bool emode);
    EAPI void              elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode);

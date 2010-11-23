@@ -5873,6 +5873,88 @@ elm_genlist_item_append_with_group(Evas_Object *obj, const Elm_Genlist_Item_Clas
 }
 
 /**
+ * Prepend item at start of the genlist with Group Item
+ *
+ * This adds the given item to the beginning of the list or beginning of the
+ * children if the parent is given.
+ *
+ * @param obj The genlist object
+ * @param itc The item class for the item
+ * @param data The item data
+ * @param parent The parent item, or NULL if none
+ * @param flags Item flags
+ * @param git Group Item
+ * @param func Convenience function called when item selected
+ * @param func_data Data passed to @p func above.
+ * @return A handle to the item added or NULL if not possible
+ *
+ * @ingroup Genlist
+ */
+EAPI Elm_Genlist_Item *
+elm_genlist_item_prepend_with_group(Evas_Object *obj, const Elm_Genlist_Item_Class *itc,
+                                   const void *data, Elm_Genlist_Item *parent,
+                                   Elm_Genlist_Item_Flags flags, Elm_Genlist_GroupItem *git,
+                                   Evas_Smart_Cb func, const void *func_data)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   parent = NULL;
+   Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func, func_data);
+   Elm_Genlist_GroupItem *pgit = NULL;
+   Elm_Genlist_Item *it2 = NULL;
+   Eina_List *ll = NULL;
+   Eina_Bool new_group = EINA_FALSE;
+   if (!wd) return NULL;
+   if (!it) return NULL;
+   if (!git) return NULL;
+
+   pgit = git;
+   while (pgit)
+     {
+      	if(new_group)
+            ll = eina_list_last(pgit->items);
+         else
+            ll = pgit->items;
+         
+        if (ll) 
+          {
+             it2 = ll->data;
+             break;
+          }
+        if (!(EINA_INLIST_GET(pgit)->prev)) break;
+        pgit = (Elm_Genlist_GroupItem *)(EINA_INLIST_GET(pgit)->prev);
+        new_group = EINA_TRUE;
+     }
+   if (it2)
+     {
+        if(new_group)
+         wd->items =
+           eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
+                                       EINA_INLIST_GET(it2));
+        else        
+		    wd->items =
+		       eina_inlist_prepend_relative(wd->items, EINA_INLIST_GET(it),
+                                       EINA_INLIST_GET(it2));
+        it->rel = it2;
+        it->rel->relcount++;
+     } 
+   else 
+     {
+        wd->items = eina_inlist_prepend(wd->items, EINA_INLIST_GET(it));
+        it->rel = NULL;
+     }
+   git->items = eina_list_prepend(git->items, it);
+   if(!new_group)
+	   it->before = 1;
+   else
+      it->before = 0;
+   
+   it->group_item = git;
+   _item_queue(wd, it);
+   return it;
+}
+
+/**
  * Moves the Genlist Item
  */
 EAPI void
