@@ -350,6 +350,9 @@ struct _Widget_Data
    double effect_start;
    Eina_Bool queue_exception : 1;
    int item_count;
+   Eina_Bool reoder_moved : 1;
+   int reoder_pan_y;   
+   Eina_Bool group_items_moved : 1;
 };
 
 struct _Edit_Data
@@ -946,6 +949,8 @@ _edit_long_press(void *data)
   it->wd->ed->reorder_item->reordering = 1;
   it->wd->ed->reorder_rel = NULL;
   elm_smart_scroller_hold_set(it->wd->scr, EINA_TRUE);
+  it->wd->reoder_pan_y = it->wd->pan_y;
+  it->wd->reoder_moved = EINA_TRUE;
 
   return 0;
 }
@@ -1120,6 +1125,7 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    Evas_Event_Mouse_Down *ev = event_info;
    Evas_Coord x, y;
 
+   it->wd->group_items_moved = EINA_FALSE;
    it->wd->td1_x = ev->canvas.x;
    it->wd->td1_y = ev->canvas.y;
    if (it->wd->effect_mode && it->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH) 
@@ -1358,8 +1364,12 @@ _group_item_click_cb(void *data, Evas_Object *obj __UNUSED__, const char *emissi
    elm_smart_scroller_bounce_allow_set(git->wd->scr, EINA_FALSE, EINA_TRUE);
    if (git->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH)
      {
+      if(!git->wd->group_items_moved) 
+      {
         git->wd->pinch_it = git->num;
         _elm_genlist_pinch_zoom_execute(git->wd->obj, 0);   
+      }
+      git->wd->group_items_moved = EINA_FALSE;
      }
    return;
 }
@@ -1987,11 +1997,6 @@ _item_block_position(Item_Block *itb, int in)
 
                   is_reorder = _get_space_for_reorder_item(it);
 
-                  if (is_reorder)
-                     it->reorder_check = 1;
-                  else
-                     it->reorder_check = 0;
-
                   if (it->wd->ed)
                     {
                        if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && !(in % it->wd->max_items_per_block) && !itb->reoder_y) 
@@ -2221,8 +2226,25 @@ _pan_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
 //   if (x > ow) x = ow;
 //   if (y > oh) y = oh;
    if ((x == sd->wd->pan_x) && (y == sd->wd->pan_y)) return;
-   sd->wd->pan_x = x;
-   sd->wd->pan_y = y;
+
+   if(sd->wd->reoder_moved)
+     {
+        sd->wd->pan_x = x;
+        if(sd->wd->pan_y >= sd->wd->minh) 
+          sd->wd->pan_y = sd->wd->minh;
+        else 
+	  {
+             if(sd->wd->pan_y < y )
+                sd->wd->pan_y = y + 5 + abs(sd->wd->reoder_pan_y - sd->wd->pan_y) / 100;
+             else
+                sd->wd->pan_y = y - 5 - abs(sd->wd->reoder_pan_y - sd->wd->pan_y) / 100;
+	  }
+     }
+   else 
+    {
+       sd->wd->pan_x = x;
+       sd->wd->pan_y = y;
+    }
    evas_object_smart_changed(obj);
 }
 
@@ -2345,6 +2367,7 @@ _pan_calculate(Evas_Object *obj)
 
    if (sd->wd->pinchzoom_effect_mode == ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_CONTRACT_FINISH)
      {
+        sd->wd->group_items_moved = EINA_TRUE;
         sd->wd->contract_pan_y = sd->wd->pan_y;      
         EINA_INLIST_FOREACH(sd->wd->group_items, git)
           {
@@ -2865,6 +2888,7 @@ elm_genlist_item_append(Evas_Object *obj, const Elm_Genlist_Item_Class *itc,
      {
         wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
         it->rel = NULL;
+
      }
    else
      {
@@ -5339,9 +5363,6 @@ _reorder_mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *e
    Evas_Event_Mouse_Down *ev = event_info;
    Evas_Coord x, y;
 
-   if (!elm_genlist_item_next_get(it))
-      return;
-
    if (it->wd->edit_field && !it->renamed)
       elm_genlist_item_rename_mode_set(it, 0);
 
@@ -5388,6 +5409,7 @@ _reorder_mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *eve
      }
 
    it->down = 0;
+   it->wd->reoder_moved = EINA_FALSE;
 
    if (it->wd->ed->ec->selected)
       it->wd->ed->ec->selected(NULL, it, 1);
@@ -5759,6 +5781,7 @@ _get_space_for_reorder_item(Elm_Genlist_Item *it)
      {
         it->wd->ed->reorder_rel = it;
         it->scrl_y+=it->wd->ed->reorder_item->h;
+        it->reorder_check = 1;
         return it->wd->ed->reorder_item->h;
      }
    return 0;
@@ -5974,7 +5997,7 @@ elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after)
    it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
    _item_block_del(it);
 
-   if ((!next_item  && !after->reorder_check) || (next_item && !after->reorder_check)) 
+   if ((!next_item  && after->reorder_check) || (next_item && !after->reorder_check)) 
      {
 
         if (next_item && !after->reorder_check  && it == after)
@@ -6008,6 +6031,7 @@ elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after)
           }
         it->before = 1;
      }
+   after->reorder_check = 0;
    _item_queue(it->wd, it);
 }
 
