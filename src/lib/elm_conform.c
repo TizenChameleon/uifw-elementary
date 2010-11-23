@@ -140,8 +140,8 @@ _scroller_resize_event_cb(void *data, Evas *e, Evas_Object *obj, void *event_inf
    _imp_region_show(data, obj);
 }
 
-static bool
-_focus_object_region_calc(void *data, int *kh, bool reg_scrol_resz_evnt)
+static Eina_Bool
+_focus_object_region_calc(void *data, int *kh, Eina_Bool reg_scrol_resz_evnt)
 {
    Evas_Coord fx = 0, fy = 0, fw = 0, fh = 0;
    Evas_Coord sx = 0, sy = 0, sw = 0, sh = 0;
@@ -162,8 +162,8 @@ _focus_object_region_calc(void *data, int *kh, bool reg_scrol_resz_evnt)
    wd->frely = tsy + fy;
 }
 
-static bool
-_get_scroller(void *data, Evas_Object * foc_obj, bool reg_scrol_resz_evnt)
+static Eina_Bool
+_get_scroller(void *data, Evas_Object * foc_obj, Eina_Bool reg_scrol_resz_evnt)
 {
    Evas_Coord x = 0, y = 0, w = 0, h = 0;
    Evas_Object * parent = NULL;
@@ -203,7 +203,7 @@ static void
 _autoscroll_mode_enable(void *data)
 {
    Evas_Object * focused_object=NULL;
-   bool ret = EINA_FALSE;
+   Eina_Bool ret = EINA_FALSE;
    
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
