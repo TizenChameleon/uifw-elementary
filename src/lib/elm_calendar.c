@@ -1025,9 +1025,9 @@ elm_calendar_marks_draw(Evas_Object *obj)
 EAPI void 
 elm_calendar_text_saturday_color_set(const Evas_Object *obj, int pos)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
+   if (!wd) return;
 
    char emission[16];
    snprintf(emission, sizeof(emission), "cit_%d,saturday", pos);
@@ -1045,9 +1045,9 @@ elm_calendar_text_saturday_color_set(const Evas_Object *obj, int pos)
 EAPI void 
 elm_calendar_text_sunday_color_set(const Evas_Object *obj, int pos)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
+   if (!wd) return;
 
    char emission[16];
    snprintf(emission, sizeof(emission), "cit_%d,sunday", pos);
@@ -1065,9 +1065,9 @@ elm_calendar_text_sunday_color_set(const Evas_Object *obj, int pos)
 EAPI void 
 elm_calendar_text_weekday_color_set(const Evas_Object *obj, int pos)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
+   if (!wd) return;
 
    char emission[16];
    snprintf(emission, sizeof(emission), "cit_%d,weekday", pos);
