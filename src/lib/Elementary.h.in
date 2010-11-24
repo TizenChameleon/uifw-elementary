@@ -2595,7 +2595,8 @@ extern "C" {
         ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN = (1 << 3),
         ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW = (1 << 4),
         ELM_DIALOGUEGROUP_ITEM_STYLE_NO_BG = (1 << 5),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_LAST = (1 << 6)
+        ELM_DIALOGUEGROUP_ITEM_STYLE_SUB = (1 << 6),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_LAST = (1 << 7)
      } Elm_Dialoguegroup_Item_Style;
 
    EAPI Evas_Object   *elm_dialoguegroup_add(Evas_Object *parent);
