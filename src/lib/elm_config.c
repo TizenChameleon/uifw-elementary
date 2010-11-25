@@ -285,6 +285,7 @@ _desc_init(void)
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "theme", theme, EET_T_STRING);
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "modules", modules, EET_T_STRING);
    EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "password_show_last_character", password_show_last_character, EET_T_INT);
+   EET_DATA_DESCRIPTOR_ADD_BASIC(_config_edd, Elm_Config, "longpress_timeout", longpress_timeout, EET_T_DOUBLE);
 }
 
 static void
@@ -478,6 +479,7 @@ _config_load(void)
    _elm_config->theme = eina_stringshare_add("default");
    _elm_config->modules = NULL;
    _elm_config->password_show_last_character = 0;
+   _elm_config->longpress_timeout = 1.0;
 }
 static void
 _config_update(void)
@@ -675,6 +677,10 @@ _env_get(void)
      {
         _elm_config->autoperiod_allow = atoi(s);
      }
+
+   s = getenv("ELM_LONGPRESS_TIMEOUT");
+   if (s) _elm_config->longpress_timeout = atof(s);
+   if (_elm_config->longpress_timeout < 0.0) _elm_config->longpress_timeout = 0.0;
 }
 
 void

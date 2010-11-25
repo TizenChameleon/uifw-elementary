@@ -814,7 +814,8 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
    if (ev->button != 1) return;
    //   if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
    if (wd->longpress_timer) ecore_timer_del(wd->longpress_timer);
-   wd->longpress_timer = ecore_timer_add(1.0, _long_press, data);
+   wd->longpress_timer = ecore_timer_add(elm_longpress_timeout_get(), _long_press, data);
+   printf(" long press timeout : %lf \n\n", elm_longpress_timeout_get());
    wd->downx = ev->canvas.x;
    wd->downy = ev->canvas.y;
 }
