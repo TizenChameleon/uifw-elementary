@@ -121,6 +121,7 @@ struct _Elm_Config
    int autocapital_allow;
    int autoperiod_allow;   
    int password_show_last_character;
+   double       longpress_timeout;
 };
 
 struct _Elm_Module

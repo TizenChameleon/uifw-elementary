@@ -1679,3 +1679,27 @@ EAPI void *elm_object_signal_callback_del(Evas_Object *obj, const char *emission
 {
     return elm_widget_signal_callback_del(obj, emission, source, func);
 }
+
+/**
+ * Set the duration for occuring long press event.
+ *
+ * @param lonpress_timeout Timeout for long press event
+ * @ingroup Longpress
+ */
+EAPI void
+elm_longpress_timeout_set(double longpress_timeout)
+{
+   _elm_config->longpress_timeout = longpress_timeout;
+}
+
+/**
+ * Get the duration for occuring long press event.
+ *
+ * @return Timeout for long press event
+ * @ingroup Longpress
+ */
+EAPI double
+elm_longpress_timeout_get(void)
+{
+   return _elm_config->longpress_timeout;
+}

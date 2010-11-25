@@ -350,13 +350,33 @@ static void _group_bubble_content_free(Marker_Group *group);
 static void marker_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord ox, Evas_Coord oy, Evas_Coord ow, Evas_Coord oh);
 static void _bubble_sc_hits_changed_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
+static void _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info);
+static void _mouse_up(void *data, Evas *evas, Evas_Object *obj, void *event_info);
+static void _mouse_move(void *data, Evas *evas, Evas_Object *obj, void *event_info);
+
+static void _mouse_multi_down(void *data, Evas *evas, Evas_Object *obj, void *event_info);
+static void _mouse_multi_up(void *data, Evas *evas, Evas_Object *obj, void *event_info);
+static void _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info);
+
 static Eina_Bool
 hold_timer_cb(void *data)
 {
-  struct event_t *ev0 = (struct event_t *)data;
-  ev0->hold_timer = NULL;
+   struct event_t *ev0 = (struct event_t *)data;
+   ev0->hold_timer = NULL;
 
-  return ECORE_CALLBACK_CANCEL;
+   return ECORE_CALLBACK_CANCEL;
+}
+
+static void 
+_rect_resize_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   int x,y,w,h;
+
+   evas_object_geometry_get(wd->rect,&x,&y,&w,&h);
+   evas_object_geometry_get(wd->pan_smart,&x,&y,&w,&h);
+   evas_object_resize(wd->rect,w,h);
+   evas_object_move(wd->rect,x,y);
 }
 
 static int
@@ -1169,7 +1189,7 @@ _long_press(void *data)
 }
 
 static void
-_mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Down *ev = (Evas_Event_Mouse_Down*)event_info;
@@ -1182,8 +1202,8 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
          ev0->hold_timer = NULL;
          ev0->prev.x = ev->output.x;
          ev0->prev.y = ev->output.y;
-      }
-   }
+      }else return;
+   }else return;
 
    if (!wd) return;
    if (ev->button != 1) return;
@@ -1195,14 +1215,16 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
      evas_object_smart_callback_call(data, SIG_PRESS, ev);
    wd->longpressed = EINA_FALSE;
    if (wd->long_timer) ecore_timer_del(wd->long_timer);
-   wd->long_timer = ecore_timer_add(1.0, _long_press, data);
+   wd->long_timer = ecore_timer_add(2.0, _long_press, data);
 }
 
 static void
-_mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_mouse_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
+   Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Move *move = (Evas_Event_Mouse_Move *)event_info;
    struct event_t *ev0;
+   if(wd->pinch_zoom) return;
    ev0 = get_event_object(0);
    if(ev0 == NULL) return;
    	
@@ -1211,7 +1233,7 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
 }
 
 static void
-_mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_mouse_up(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Up *ev = event_info;
@@ -1229,6 +1251,11 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
             ecore_timer_del(ev0->hold_timer);
             ev0->hold_timer = NULL;
          }
+         elm_smart_scroller_hold_set(wd->scr, 0);
+         elm_smart_scroller_freeze_set(wd->scr, 0);
+         elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
+         elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);
+         wd->pinch_zoom = EINA_FALSE;
       }else{
          ev1 = get_event_object(mdevice);
          if(ev1 != NULL){
@@ -1259,25 +1286,34 @@ _mouse_multi_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    struct event_t *ev;
    Evas_Event_Multi_Down *down = event_info;
 
-   ev = get_event_object(down->device);
-   if(ev) return;
-
-   ev = create_event_object(obj, down->device);
-   if(!ev){
-      DBG("Failed : create_event_object");
-      return;
-   }
-
    elm_smart_scroller_hold_set(wd->scr, 1);
    elm_smart_scroller_freeze_set(wd->scr, 1);
    elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 1);
    elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 1);
+
+   ev = get_event_object(down->device);
+   if(ev) goto done;
+
+   ev = create_event_object(obj, down->device);
+   if(!ev){
+      DBG("Failed : create_event_object");
+      goto done;
+   }
 
    wd->pinch_zoom = EINA_FALSE;
 
    ev->hold_timer = NULL;
    ev->prev.x = down->output.x;
    ev->prev.y = down->output.y;
+
+done:
+   return;
+error:
+   elm_smart_scroller_hold_set(wd->scr, 0);
+   elm_smart_scroller_freeze_set(wd->scr, 0);
+   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
+   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);
+
 }
 
 static void
@@ -1289,6 +1325,7 @@ _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    struct event_t *ev0;
    struct event_t *ev;
 
+   if(wd->pinch_zoom) return;
    ev = get_event_object(move->device);
    if(ev == NULL) {
       DBG("Cannot get multi device");
@@ -1307,7 +1344,6 @@ _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    dis_new = get_distance(ev0->prev.x, ev0->prev.y, ev->prev.x, ev->prev.y);
    int zoom = wd->zoom;
    
-   if(wd->pinch_zoom) return;
    if(dis_old != 0) {
       if(dis_old - dis_new > 0 && ev->pinch_dis > TOUCH_HOLD_RANGE){
          wd->pinch_zoom = EINA_TRUE;
@@ -1334,18 +1370,11 @@ _mouse_multi_up(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    struct event_t *ev0;
    struct event_t *ev;
 
-   elm_smart_scroller_hold_set(wd->scr, 0);
-   elm_smart_scroller_freeze_set(wd->scr, 0);
-   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
-   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);
-
    ev = get_event_object(up->device);
    if(ev == NULL){
       DBG("Cannot get multi device");
       return;
    }
-
-   wd->pinch_zoom = EINA_FALSE;
    dis_old = 0;
    
    ev0 = get_event_object(0);
@@ -2029,6 +2058,7 @@ elm_map_add(Evas_Object *parent)
 	 _pan_max_get, _pan_child_size_get);
 
    wd->rect = evas_object_rectangle_add(e);
+   evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_RESIZE, _rect_resize_cb, obj);
    evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MOUSE_DOWN,
 	 _mouse_down, obj);
    evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MOUSE_UP,
