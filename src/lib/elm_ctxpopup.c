@@ -1501,12 +1501,11 @@ EAPI void elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
-	Evas_Coord w, h;
 
 	if(!wd || !content) return;
 
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_DEL, _content_del, obj);
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _ctxpopup_changed_size_hints, NULL);
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints, NULL);
 	
 	edje_object_part_swallow(wd->base, "elm.swallow.content", content);
 	elm_widget_sub_object_add(obj, content);
@@ -1534,11 +1533,13 @@ elm_ctxpopup_content_unset(Evas_Object *obj)
 	Evas_Object *content;
 
 	content = wd->content;
-	wd->content = NULL;
+	
+	if(!content) return NULL;
 
-	if (content) edje_object_part_unswallow(wd->base, content);
-
+	edje_object_part_unswallow(wd->base, content);
 	elm_widget_sub_object_del(obj, content);
+	evas_object_event_callback_del(content, EVAS_CALLBACK_DEL, _content_del);
+	evas_object_event_callback_del(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints); 
 	edje_object_signal_emit(wd->base, "elm,state,content,disable", "elm");
 
 	elm_ctxpopup_scroller_disabled_set(obj, EINA_FALSE);
