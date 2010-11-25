@@ -821,7 +821,7 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
 		wd->layout = layout;
 		_theme_hook(obj);
 	}
-	return EINA_TRUE;
+	return;
 }
 
 /**
@@ -835,7 +835,7 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
 EAPI Elm_Datefield_Layout
 elm_datefield_layout_get(const Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) 0;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	
 	if (!wd) return 0;
@@ -860,7 +860,6 @@ elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
-	int day_of_month;
 	
 	if (!wd) return;
 
@@ -925,7 +924,7 @@ elm_datefield_date_get(const Evas_Object *obj, int *year, int *month, int *day, 
 EAPI Eina_Bool
 elm_datefield_date_max_set(Evas_Object *obj, int year, int month, int day)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int day_of_month;
 	Eina_Bool update = EINA_FALSE;
@@ -999,7 +998,7 @@ elm_datefield_date_max_get(const Evas_Object *obj, int *year, int *month, int *d
 EAPI Eina_Bool
 elm_datefield_date_min_set(Evas_Object *obj, int year, int month, int day)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	int day_of_month;
 	Eina_Bool update = EINA_FALSE;

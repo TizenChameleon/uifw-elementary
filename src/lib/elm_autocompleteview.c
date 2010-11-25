@@ -131,7 +131,7 @@ static void _list_click( void *data, Evas_Object *obj, void *event_info )
 	if((it==NULL)||(wd==NULL))
 		return;
 	const char *text = elm_list_item_label_get(it);
-	evas_object_smart_callback_call((Evas_Object *)data, "selected", text);		
+	evas_object_smart_callback_call((Evas_Object *)data, "selected", (void *)text);
 	if(wd->data_list)
 	{
 		if(text!=NULL)
