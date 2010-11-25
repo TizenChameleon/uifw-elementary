@@ -1037,7 +1037,7 @@ EAPI void elm_gallery_set_type(Evas_Object *obj,int type)
 {
 	Widget_Data *wd;
 	wd = evas_object_smart_data_get(obj);
-	if (!wd) return NULL;
+	if (!wd) return;
 
 	wd->item_type = type;
 	
@@ -1057,7 +1057,7 @@ EAPI void elm_gallery_set_max_count(Evas_Object *obj,int max_value)
 {
 	Widget_Data *wd;
 	wd = evas_object_smart_data_get(obj);
-	if (!wd) return NULL;
+	if (!wd) return;
 
 	wd->item_count = max_value;
 }

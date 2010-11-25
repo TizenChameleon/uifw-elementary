@@ -643,7 +643,7 @@ EAPI Elm_Dialoguegroup_Item_Style
 elm_dialoguegroup_item_style_get(Dialogue_Item *item)
 {
    if(!item) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
-   ELM_CHECK_WIDTYPE(item->parent, widtype);
+   ELM_CHECK_WIDTYPE(item->parent, widtype) ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
    Widget_Data *wd = elm_widget_data_get(item->parent);
 
    if (!wd) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;

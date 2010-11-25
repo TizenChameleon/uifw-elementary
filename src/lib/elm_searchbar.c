@@ -204,7 +204,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
 EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
+   if (!wd) return;
 
    elm_entry_entry_set(elm_editfield_entry_get(wd->eb), entry);
 }

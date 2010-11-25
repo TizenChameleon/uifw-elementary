@@ -21,7 +21,6 @@
 
 
 #include <string.h>
-#include <stdbool.h>
 #include <math.h>
 
 #include <Elementary.h>
@@ -1195,7 +1194,7 @@ static void press_down_cb(void *data, Evas *evas, Evas_Object *obj, void *event_
 	Evas_Event_Mouse_Down *ev = event_info;
 	Widget_Data *wd = (Widget_Data *)data;
 
-	wd->flag = true;
+	wd->flag = EINA_TRUE;
 	wd->tab_down_x = ev->output.x;
 	wd->tab_down_y = ev->output.y;
 
@@ -1230,7 +1229,7 @@ static void press_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_in
 		// return if dont need to move
 		if(wd->num <= wd->view_slot_num) return;
 
-		if(wd->flag == true){
+		if(wd->flag == EINA_TRUE){
 			if(abs(wd->tab_down_y - ev->output.y) < wd->h){
 				if((wd->tab_down_x - ev->output.x ) > wd->w / 4){
 					_move_obj_to_left(wd);
@@ -1240,7 +1239,7 @@ static void press_up_cb(void *data, Evas *evas, Evas_Object *obj, void *event_in
 			}
 		}
 	}
-	wd->flag = false;
+	wd->flag = EINA_FALSE;
 }
 
 void tab_item_cb(void *data, Evas_Object *obj, const char *emission, const char *source)

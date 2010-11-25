@@ -578,9 +578,9 @@ elm_tickernoti_mode_set (const Evas_Object *obj, Elm_Tickernoti_Mode mode)
 EAPI Evas_Object *
 elm_tickernoti_detailview_get (const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) -1;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return -1;
+   if (!wd) return NULL;
    return wd->win_detail;
 }
 

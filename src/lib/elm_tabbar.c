@@ -21,7 +21,6 @@
 
 
 #include <string.h>
-#include <stdbool.h>
 #include <math.h>
 
 #include <Elementary.h>
@@ -1582,7 +1581,7 @@ EAPI void elm_tabbar_edit_start(Evas_Object *obj)
  * Set item in bar
  *
  * @param	it The item of tab
- * @param	bar true or false
+ * @param	bar EINA_TRUE or EINA_FALSE
  *
  * @ingroup Tab
  */

@@ -1655,7 +1655,7 @@ EAPI void elm_ctxpopup_title_set(Evas_Object *obj, const char *title )
 
 EAPI const char* elm_ctxpopup_title_get(Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
 	return wd->title; 
 }

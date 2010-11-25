@@ -1365,7 +1365,6 @@ _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 static void
 _mouse_multi_up(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Multi_Up *up = (Evas_Event_Multi_Up *)event_info;
    struct event_t *ev0;
    struct event_t *ev;
