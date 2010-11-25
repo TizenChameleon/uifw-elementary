@@ -691,6 +691,13 @@ static void _sizing_eval(Evas_Object *obj)
 		evas_object_size_hint_min_set(wd->scroller, box_size.x, box_size.y);
 	}
 
+	if(wd->content) {
+		Evas_Coord a, b, c,d;
+		evas_object_size_hint_min_get(wd->content, &a, &b);
+		evas_object_size_hint_max_get(wd->content, &a, &b);
+		evas_object_geometry_get(wd->content, &a, &b, &c, &d);
+	}
+	
 	//Base
 	wd->arrow_dir = _calc_base_geometry(obj, &rect);
 	if ((!wd->position_forced) && (wd->arrow_dir != -1)) {
@@ -981,9 +988,8 @@ static void _item_obj_create(Elm_Ctxpopup_Item *item, char *group_name)
 
 static void _content_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(data);
 	if(!wd) return;
-
 	if(wd->visible) _sizing_eval(data);
 }
 
@@ -1504,8 +1510,8 @@ EAPI void elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 
 	if(!wd || !content) return;
 
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_DEL, _content_del, obj);
-	evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints, NULL);
+	evas_object_event_callback_add(content, EVAS_CALLBACK_DEL, _content_del, obj);
+	evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints, obj);
 	
 	edje_object_part_swallow(wd->base, "elm.swallow.content", content);
 	elm_widget_sub_object_add(obj, content);
