@@ -989,7 +989,7 @@ static void _content_changed_size_hints(void *data, Evas *e, Evas_Object *obj, v
 
 static void _content_del(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-	elm_ctxpopup_content_unset(data, obj);
+	elm_ctxpopup_content_unset(data);
 }
 
 
