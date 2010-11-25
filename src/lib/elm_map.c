@@ -367,23 +367,6 @@ hold_timer_cb(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static Eina_Bool
-unfreeze_timer_cb(void *data)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   if(wd->zoom_animator){
-     return ECORE_CALLBACK_RENEW;
-   }
-
-   elm_smart_scroller_hold_set(wd->scr, 0);
-   elm_smart_scroller_freeze_set(wd->scr, 0);
-   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
-   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);
-   wd->pinch_zoom = EINA_FALSE;
-
-   return ECORE_CALLBACK_CANCEL;
-}
-
 static void 
 _rect_resize_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
@@ -1238,8 +1221,10 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 static void
 _mouse_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 {
+   Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Move *move = (Evas_Event_Mouse_Move *)event_info;
    struct event_t *ev0;
+   if(wd->pinch_zoom) return;
    ev0 = get_event_object(0);
    if(ev0 == NULL) return;
    	
@@ -1266,6 +1251,11 @@ _mouse_up(void *data, Evas *evas, Evas_Object *obj, void *event_info)
             ecore_timer_del(ev0->hold_timer);
             ev0->hold_timer = NULL;
          }
+         elm_smart_scroller_hold_set(wd->scr, 0);
+         elm_smart_scroller_freeze_set(wd->scr, 0);
+         elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
+         elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);
+         wd->pinch_zoom = EINA_FALSE;
       }else{
          ev1 = get_event_object(mdevice);
          if(ev1 != NULL){
@@ -1335,6 +1325,7 @@ _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    struct event_t *ev0;
    struct event_t *ev;
 
+   if(wd->pinch_zoom) return;
    ev = get_event_object(move->device);
    if(ev == NULL) {
       DBG("Cannot get multi device");
@@ -1353,7 +1344,6 @@ _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    dis_new = get_distance(ev0->prev.x, ev0->prev.y, ev->prev.x, ev->prev.y);
    int zoom = wd->zoom;
    
-   if(wd->pinch_zoom) return;
    if(dis_old != 0) {
       if(dis_old - dis_new > 0 && ev->pinch_dis > TOUCH_HOLD_RANGE){
          wd->pinch_zoom = EINA_TRUE;
@@ -1398,8 +1388,6 @@ _mouse_multi_up(void *data, Evas *evas, Evas_Object *obj, void *event_info)
       }   
    }
    destroy_event_object(ev);
-
-   ecore_timer_add(1.00f, unfreeze_timer_cb, data);
 }
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_NULL;
