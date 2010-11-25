@@ -96,6 +96,8 @@ static void _adjust_pos_y(int indicator_h, Evas_Coord_Point *pos,
 		Evas_Coord_Point *base_size, Evas_Coord_Rectangle *area_rect);
 static void _reset_scroller_size(Widget_Data *wd);
 static void _hide_ctxpopup(Evas_Object *obj);
+static void _content_del(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _content_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static void _reset_scroller_size(Widget_Data *wd)
 {
@@ -439,7 +441,6 @@ static Elm_Ctxpopup_Arrow _calc_base_geometry(Evas_Object *obj, Evas_Coord_Recta
 
 	//Limit to Min Size 
 	evas_object_size_hint_min_get(obj, &min_size.x, &min_size.y);
-	fprintf(stderr, "2. %d %d\n", min_size.x, min_size.y);
 	
 	if( min_size.y > 0 ) { 
 		if(base_size.y < min_size.y) base_size.y = min_size.y;
@@ -670,6 +671,7 @@ static void _sizing_eval(Evas_Object *obj)
 	if ((!wd) || (!wd->parent)) return;
 	int idx = 0;
 
+	//Box, scroller 
 	EINA_LIST_FOREACH(wd->items, elist, item)
 	{
 		_item_sizing_eval(item);
@@ -684,16 +686,12 @@ static void _sizing_eval(Evas_Object *obj)
 		++idx;
 	}
 
-	//content
-	if (wd->content) {
-		evas_object_geometry_get(wd->content, NULL, NULL, &rect.w, &rect.h);
-		evas_object_size_hint_min_set(wd->content, rect.w, rect.h);
-	}else {
+	if(!wd->content) {
 		evas_object_size_hint_min_set(wd->box, box_size.x, box_size.y);
 		evas_object_size_hint_min_set(wd->scroller, box_size.x, box_size.y);
 	}
 
-	//base
+	//Base
 	wd->arrow_dir = _calc_base_geometry(obj, &rect);
 	if ((!wd->position_forced) && (wd->arrow_dir != -1)) {
 		_update_arrow_obj(obj, wd->arrow_dir);
@@ -980,6 +978,21 @@ static void _item_obj_create(Elm_Ctxpopup_Item *item, char *group_name)
 			EVAS_HINT_EXPAND);
 	evas_object_show(item->base);
 }
+
+static void _content_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
+	if(!wd) return;
+
+	if(wd->visible) _sizing_eval(data);
+}
+
+static void _content_del(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+	elm_ctxpopup_content_unset(data, obj);
+}
+
+
 
 /**
  * Get the icon object for the given item.
@@ -1474,6 +1487,8 @@ EAPI void elm_ctxpopup_arrow_priority_set(Evas_Object *obj,
 	wd->arrow_priority[3] = fourth;
 }
 
+
+
 /**
  * Swallow the user content
  *
@@ -1488,22 +1503,19 @@ EAPI void elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
 	Evas_Coord w, h;
 
+	if(!wd || !content) return;
+
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_DEL, _content_del, obj);
+	evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _ctxpopup_changed_size_hints, NULL);
+	
 	edje_object_part_swallow(wd->base, "elm.swallow.content", content);
 	elm_widget_sub_object_add(obj, content);
-	wd->content = content;
 	edje_object_signal_emit(wd->base, "elm,state,content,enable", "elm");
-
-	evas_object_size_hint_min_get(content, &w, &h);
-
-	if ((w == 0) && (h == 0)) {
-		evas_object_geometry_get(content, NULL, NULL, &w, &h);
-		evas_object_size_hint_min_set(content, w, h);
-	}
-
 	elm_ctxpopup_scroller_disabled_set(obj, EINA_TRUE);
 
-	if (wd->visible)
-		_sizing_eval(obj);
+	wd->content = content;
+
+	if(wd->visible) _sizing_eval(obj);
 }
 
 /**

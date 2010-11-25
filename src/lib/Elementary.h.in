@@ -2053,6 +2053,8 @@ extern "C" {
    EAPI void	     elm_ctxpopup_position_forced_set(Evas_Object *obj, Eina_Bool forced);
    EAPI Eina_Bool    elm_ctxpopup_position_forced_get(Evas_Object *obj);
    EAPI void         elm_ctxpopup_area_set(Evas_Object *obj, Evas_Object *rect); 
+   EINA_DEPRECATED EAPI void         elm_ctxpopup_title_set(Evas_Object *obj, const char *title);
+   EINA_DEPRECATED EAPI const char  *elm_ctxpopup_title_get(Evas_Object *obj);
    
    /* Tab */
    typedef enum _Elm_Tab_Move_Type
