@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build64) unstable; urgency=low
+
+  * [elm_config] longpress_timeout is added
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build64
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Thu, 25 Nov 2010 19:43:25 +0900
+
 elementary (1.0.0+svn.51480slp2+build63) unstable; urgency=low
 
   * [elm_genlist] fix exponential scroll speed in edit mode and fix pinch zoom click event bug
