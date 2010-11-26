@@ -79,18 +79,6 @@ static int * _animator_animate_add_cb(Evas_Object *obj);
 static int * _animator_animate_del_cb(Evas_Object *obj);
 
 static void
-_on_focus_hook(void *data, Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (elm_widget_focus_get(obj))
-     evas_object_focus_set((Evas_Object *)wd->seg_ctrl, 1);
-   else
-     evas_object_focus_set((Evas_Object *)wd->seg_ctrl, 0);
-}
-
-static void
 _signal_segment_off(void *data)
 {
     Elm_Segment_Item *item = (Elm_Segment_Item *) data;
@@ -98,7 +86,7 @@ _signal_segment_off(void *data)
     if (!wd) return;
     
     edje_object_signal_emit(item->base, "elm,action,unfocus", "elm");
-    edje_object_signal_emit(item->base, "elm,state,segment,off", "elm");
+    edje_object_signal_emit(item->base, "elm,state,segment,release", "elm");
     if(!item->label_wd && item->label)
       edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
     if(item->label_wd)
@@ -130,7 +118,7 @@ _signal_segment_selected(void *data)
 	  }
         it->selected_id = -1;
      }
-   edje_object_signal_emit(item->base, "elm,state,segment,on", "elm");
+   edje_object_signal_emit(item->base, "elm,action,focus", "elm");
    if(!item->label_wd)
      edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
    if(item->label_wd)
@@ -167,8 +155,7 @@ _signal_segment_on(void *data)
 	  }
 	it->selected_id = -1;
      }
-
-   edje_object_signal_emit(item->base, "elm,state,segment,on", "elm");
+   edje_object_signal_emit(item->base, "elm,action,focus", "elm");
    if(!item->label_wd)
      edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
    if(item->label_wd)
@@ -213,7 +200,7 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    if(item->label_wd && wd->cur_seg_id != item->segment_id)
      elm_label_text_color_set(item->label_wd, wd->press_r, wd->press_g, wd->press_b, wd->press_a);
 
-   edje_object_signal_emit(item->base, "elm,action,focus", "elm");
+   edje_object_signal_emit(item->base, "elm,state,segment,press", "elm");
    return;
 }
 
@@ -743,7 +730,6 @@ elm_segment_control_add(Evas_Object *parent)
    obj = elm_widget_add(e);
    elm_widget_type_set(obj, "segmented-control");
    elm_widget_sub_object_add(parent, obj);
-   elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
