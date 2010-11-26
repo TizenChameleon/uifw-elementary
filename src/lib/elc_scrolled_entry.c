@@ -133,7 +133,7 @@ static Evas_Object *
 _imp_region_get_hook(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   if (!wd) return NULL;
    elm_widget_imp_region_get(wd->entry, x, y, w, h);
    return wd->scroller;
 }

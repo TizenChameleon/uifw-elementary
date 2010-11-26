@@ -297,7 +297,6 @@ static void
 _view_update(Evas_Object *obj)
 {	
 	Widget_Data *wd = elm_widget_data_get(obj);	
-	Evas_Coord w_label = 0, h_label = 0, w = 0, h = 0;
 	if (!wd || !wd->box || !wd->entry) return;
 
 	if(wd->contracted == 1){

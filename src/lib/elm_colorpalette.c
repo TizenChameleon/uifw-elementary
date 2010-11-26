@@ -97,8 +97,7 @@ static void
 _sub_del(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd)
-      return;
+   if (!wd) return;
 }
 
 static void

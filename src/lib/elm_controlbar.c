@@ -10,7 +10,6 @@
  */  
    
 #include <string.h>
-#include <stdbool.h>
 #include <math.h>
    
 #include <Elementary.h>
@@ -3426,7 +3425,7 @@ elm_controlbar_edit_start(Evas_Object * obj)
  * Set the visible status of item in bar
  *
  * @param	it The item of controlbar
- * @param	bar true or false
+ * @param	bar EINA_TRUE or EINA_FALSE
  *
  * @ingroup Controlbar
  */ 
@@ -3448,7 +3447,7 @@ elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool visible)
  * Get the result which or not item is visible in bar
  *
  * @param	it The item of controlbar
- * @return	true or false
+ * @return	EINA_TRUE or EINA_FALSE
  *
  * @ingroup Controlbar
  */ 
@@ -3496,7 +3495,7 @@ elm_controlbar_item_editable_set(Elm_Controlbar_Item * it, Eina_Bool editable)
  * Set item disable
  *
  * @param	it The item of controlbar
- * @param	bar true or false
+ * @param	bar EINA_TRUE or EINA_FALSE
  *
  * @ingroup Controlbar
  */ 

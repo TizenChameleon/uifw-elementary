@@ -1223,7 +1223,7 @@ elm_label_slide_set(Evas_Object *obj, Eina_Bool slide)
 EAPI Eina_Bool
 elm_label_slide_get(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
 
@@ -1265,6 +1265,6 @@ elm_label_slide_duration_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) 0;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   if (!wd) return 0;
    return wd->slide_duration;
 }
