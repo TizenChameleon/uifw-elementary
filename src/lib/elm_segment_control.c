@@ -1065,7 +1065,7 @@ elm_segment_control_item_selected_get(const Evas_Object *obj)
           {
     	     wd->cur_seg_id = it->selected_id;
           }
-        if(it->segment_id == wd->cur_seg_id)
+        if(it->segment_id == wd->cur_seg_id && it->sel)
           return it;
      }
     return NULL;
