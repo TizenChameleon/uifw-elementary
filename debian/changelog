@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build65) unstable; urgency=low
+
+  * Package upload due to EFL merge.
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build65
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Fri, 26 Nov 2010 15:58:44 +0900
+
 elementary (1.0.0+svn.51480slp2+build64) unstable; urgency=low
 
   * [elm_config] longpress_timeout is added
