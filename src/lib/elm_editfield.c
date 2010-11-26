@@ -234,7 +234,7 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
 
         if(!(_empty_entry(wd->entry)) && (wd->eraser_show)) 
            edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
-
+             
         if(wd->guide_text) 
           {
              edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
@@ -309,7 +309,7 @@ elm_editfield_add(Evas_Object *parent)
 
    wd->editing = EINA_FALSE;
    wd->single_line = EINA_FALSE;
-   wd->eraser_show = EINA_FALSE;
+   wd->eraser_show = EINA_TRUE;
 
    wd->entry = elm_entry_add(obj);
    elm_object_style_set(wd->entry, "editfield");
