@@ -606,7 +606,7 @@ _state_value_set(Evas_Object *obj)
 
 static void _color_value_get(Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
+   Widget_Data *wd = (Widget_Data *)obj;
    if (!wd) return;
 
    const char *def_r, *def_g, *def_b, *def_a;
@@ -1227,6 +1227,7 @@ elm_segment_control_item_label_object_set(Elm_Segment_Item *item, char *label)
    if(!wd) return NULL;
    if(!label) return NULL;
 
+   _color_value_get(wd);
    item->label_wd = elm_label_add(item->obj);
    elm_object_style_set(item->label_wd, "segment");
    elm_label_label_set(item->label_wd, label);
