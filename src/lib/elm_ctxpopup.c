@@ -289,7 +289,6 @@ static void _separator_obj_add(Evas_Object *obj)
 	if (!item) return;
 
 	item->base = edje_object_add(evas_object_evas_get(wd->base));
-
 	if (!item->base) {
 		free(item);
 		return;
@@ -391,8 +390,6 @@ static Elm_Ctxpopup_Arrow _calc_base_geometry(Evas_Object *obj, Evas_Coord_Recta
 	Evas_Coord finger_size;
 	Evas_Coord indicator_h;
 	Evas_Coord_Point temp;
-	Evas_Coord min_calc_h;
-	Evas_Coord min_calc_w;
 	int idx;
 
 	wd = elm_widget_data_get(obj);
@@ -423,34 +420,29 @@ static Elm_Ctxpopup_Arrow _calc_base_geometry(Evas_Object *obj, Evas_Coord_Recta
 		area_rect.y = indicator_h;
 		area_rect.h -= temp.y;
 	}
-	
 	evas_object_geometry_get(obj, &pos.x, &pos.y, NULL, NULL);
-	edje_object_size_min_calc(wd->base, &base_size.x, &base_size.y);
 
-	min_calc_w = base_size.x;
-	min_calc_h = base_size.y;
+	//recalc the edje 
+	edje_object_size_min_calc(wd->base, &base_size.x, &base_size.y);
+	evas_object_smart_calculate(wd->base);
 
 	//Limit to Max Size
 	evas_object_size_hint_max_get(obj, &max_size.x, &max_size.y);
-	
-	if( max_size.y > 0 ) 
-		if(base_size.y > max_size.y) base_size.y = max_size.y;
 
-	if( max_size.x > 0 ) 
-		if(base_size.x > max_size.x) base_size.x = max_size.x;
+	if((max_size.y > 0 ) && (base_size.y > max_size.y)) 
+		base_size.y = max_size.y;
+
+	if((max_size.x > 0 ) && (base_size.x > max_size.x)) 
+		base_size.x = max_size.x;
 
 	//Limit to Min Size 
 	evas_object_size_hint_min_get(obj, &min_size.x, &min_size.y);
 	
-	if( min_size.y > 0 ) { 
+	if( min_size.y > 0 )  
 		if(base_size.y < min_size.y) base_size.y = min_size.y;
-		if(min_calc_h <  min_size.y) min_calc_h = min_size.y;
-	}
 		
-	if( min_size.x > 0 ) {
+	if( min_size.x > 0 ) 
 		if(base_size.x < min_size.x) base_size.x = min_size.x;
-		if(min_calc_w <  min_size.x) min_calc_w = min_size.x;
-	}
 
 	//In case of position forced. It shows up just like popup.  
 	if (wd->position_forced) {
@@ -576,12 +568,6 @@ static Elm_Ctxpopup_Arrow _calc_base_geometry(Evas_Object *obj, Evas_Coord_Recta
 	rect->w = base_size.x;
 	rect->h = base_size.y;
 
-	//resize scroller according to final size. 
-	if (!wd->content) {
-		evas_object_geometry_get(wd->box, NULL, NULL, &temp.x, &temp.y);
-		evas_object_size_hint_min_set(wd->scroller, temp.x + (base_size.x	- min_calc_w), temp.y + (base_size.y - min_calc_h));
-	}
-
 	return arrow;
 }
 
@@ -691,13 +677,6 @@ static void _sizing_eval(Evas_Object *obj)
 		evas_object_size_hint_min_set(wd->scroller, box_size.x, box_size.y);
 	}
 
-	if(wd->content) {
-		Evas_Coord a, b, c,d;
-		evas_object_size_hint_min_get(wd->content, &a, &b);
-		evas_object_size_hint_max_get(wd->content, &a, &b);
-		evas_object_geometry_get(wd->content, &a, &b, &c, &d);
-	}
-	
 	//Base
 	wd->arrow_dir = _calc_base_geometry(obj, &rect);
 	if ((!wd->position_forced) && (wd->arrow_dir != -1)) {
@@ -705,6 +684,11 @@ static void _sizing_eval(Evas_Object *obj)
 		_shift_base_by_arrow(wd->arrow, wd->arrow_dir, &rect);
 	}
 
+	//resize scroller according to final size. 
+	if (!wd->content) {
+		evas_object_smart_calculate(wd->scroller);
+	}
+	
 	evas_object_move(wd->base, rect.x, rect.y);
 	evas_object_resize(wd->base, rect.w, rect.h);
 }
@@ -989,8 +973,15 @@ static void _item_obj_create(Elm_Ctxpopup_Item *item, char *group_name)
 static void _content_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(data);
+	Evas_Coord x, y, w, h;
+
 	if(!wd) return;
-	if(wd->visible) _sizing_eval(data);
+
+	if(wd->visible) {
+		evas_object_geometry_get(obj, &x, &y, &w, &h);
+		evas_object_size_hint_min_set(obj, w, h);
+		_sizing_eval(data);
+	}
 }
 
 static void _content_del(void *data, Evas *e, Evas_Object *obj, void *event_info)
@@ -1115,10 +1106,8 @@ elm_ctxpopup_add(Evas_Object *parent)
 
 	//Box
 	wd->box = elm_box_add(obj);
-	evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND,
-			EVAS_HINT_EXPAND);
+	evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND,	EVAS_HINT_EXPAND);
 	elm_scroller_content_set(wd->scroller, wd->box);
-
 	edje_object_part_swallow(wd->base, "elm.swallow.scroller", wd->scroller);
 
 	//Arrow
@@ -1131,8 +1120,7 @@ elm_ctxpopup_add(Evas_Object *parent)
 	wd->arrow_priority[2] = ELM_CTXPOPUP_ARROW_LEFT;
 	wd->arrow_priority[3] = ELM_CTXPOPUP_ARROW_UP;
 
-	evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE,
-			_parent_resize, obj);
+	evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _parent_resize, obj);
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _ctxpopup_show, NULL);
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _ctxpopup_hide, NULL);
 	evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _ctxpopup_move, NULL);
@@ -1493,8 +1481,6 @@ EAPI void elm_ctxpopup_arrow_priority_set(Evas_Object *obj,
 	wd->arrow_priority[3] = fourth;
 }
 
-
-
 /**
  * Swallow the user content
  *
@@ -1511,12 +1497,12 @@ EAPI void elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 
 	evas_object_event_callback_add(content, EVAS_CALLBACK_DEL, _content_del, obj);
 //	evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints, obj);
+	evas_object_event_callback_add(content, EVAS_CALLBACK_RESIZE, _content_changed_size_hints, obj);
 	
 	edje_object_part_swallow(wd->base, "elm.swallow.content", content);
 	elm_widget_sub_object_add(obj, content);
 	edje_object_signal_emit(wd->base, "elm,state,content,enable", "elm");
 	elm_ctxpopup_scroller_disabled_set(obj, EINA_TRUE);
-
 	wd->content = content;
 
 	if(wd->visible) _sizing_eval(obj);
