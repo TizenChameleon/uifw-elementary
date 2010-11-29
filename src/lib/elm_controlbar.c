@@ -1,6 +1,3 @@
-/*
- * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
- */
 /**
  * @defgroup Controlbar Controlbar
  * @ingroup Elementary
@@ -138,7 +135,7 @@ struct _Animation_Data
    Ecore_Animator * timer;
 };
 
-
+static const char *widtype = NULL;
 // prototype
 static int check_bar_item_number(Widget_Data *wd);
 static void selected_box(Elm_Controlbar_Item * it);
@@ -2328,6 +2325,7 @@ create_more_item(Widget_Data *wd, int style)
    obj = elm_widget_add(wd->evas);
    if (obj == NULL)
       return NULL;
+   ELM_SET_WIDTYPE(widtype, "controlbar");
    elm_widget_type_set(obj, "controlbar");
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
@@ -2483,6 +2481,7 @@ create_more_item(Widget_Data *wd, int style)
 							     Evas_Object *
 							     view)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * lit;
    Widget_Data * wd;
@@ -2532,6 +2531,7 @@ create_more_item(Widget_Data *wd, int style)
 							      Evas_Object *
 							      view)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * lit;
@@ -2581,6 +2581,7 @@ elm_controlbar_tab_item_insert_before(Evas_Object * obj,
 				      const char *icon_path,
 				      const char *label, Evas_Object * view)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * lit;
@@ -2639,6 +2640,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
 				     const char *icon_path, const char *label,
 				     Evas_Object * view)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * lit;
@@ -2707,6 +2709,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
 							      void *data)
    
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * lit;
    Widget_Data * wd;
@@ -2758,6 +2761,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
 							       void
 							       *data)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * lit;
@@ -2808,6 +2812,7 @@ elm_controlbar_tool_item_insert_before(Evas_Object * obj,
 						      void *event_info),
 				       void *data)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * lit;
@@ -2867,6 +2872,7 @@ elm_controlbar_tool_item_insert_after(Evas_Object * obj,
 						     void *event_info),
 				      void *data)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * lit;
@@ -2920,6 +2926,7 @@ elm_controlbar_tool_item_insert_after(Evas_Object * obj,
 								obj_item,
 								const int sel)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    it = create_object_item(obj, obj_item, sel);
@@ -2948,6 +2955,7 @@ elm_controlbar_tool_item_insert_after(Evas_Object * obj,
 								 obj_item,
 								 const int sel)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * item;
@@ -2978,6 +2986,7 @@ elm_controlbar_object_item_insert_before(Evas_Object * obj,
 					 Elm_Controlbar_Item * before,
 					 Evas_Object * obj_item, const int sel)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    if (!before)
@@ -3008,6 +3017,7 @@ elm_controlbar_object_item_insert_after(Evas_Object * obj,
 					Elm_Controlbar_Item * after,
 					Evas_Object * obj_item, const int sel)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd;
    Elm_Controlbar_Item * it;
    Elm_Controlbar_Item * item;
@@ -3157,13 +3167,32 @@ EAPI void
 elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path) 
 {
    if (it == NULL)
-      return;
-   it->icon_path = icon_path;
+     return;
+   if(it->icon_path)
+     eina_stringshare_del(it->icon_path);
+   it->icon_path = eina_stringshare_add(icon_path);
+
    if(it->icon)
      {
 	evas_object_del(it->icon);
 	it->icon = NULL;
      }
+   if(it->icon_shadow)
+     {
+	evas_object_del(it->icon_shadow);
+	it->icon_shadow = NULL;
+     }
+   if(it->edit_icon)
+     {
+	evas_object_del(it->edit_icon);
+	it->edit_icon = NULL;
+     }
+   if(it->edit_icon_shadow)
+     {
+	evas_object_del(it->edit_icon_shadow);
+	it->edit_icon_shadow = NULL;
+     }
+
    it->icon = create_item_icon(it->base_item, it, "elm.swallow.icon");
    it->icon_shadow = create_item_icon(it->base_item, it, "elm.swallow.icon_shadow");
    it->edit_icon = create_item_icon(it->edit_item, it, "elm.swallow.icon");
@@ -3260,6 +3289,7 @@ elm_controlbar_item_label_get(Elm_Controlbar_Item * it)
    EAPI Elm_Controlbar_Item * elm_controlbar_selected_item_get(Evas_Object *
 							       obj) 
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    const Eina_List *l;
 
    Elm_Controlbar_Item * item;
@@ -3286,8 +3316,7 @@ elm_controlbar_item_label_get(Elm_Controlbar_Item * it)
  */ 
    EAPI Elm_Controlbar_Item * elm_controlbar_first_item_get(Evas_Object * obj) 
 {
-   if (obj == NULL)
-      return NULL;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd = elm_widget_data_get(obj);
    if (!wd || !wd->items)
       return NULL;
@@ -3304,8 +3333,7 @@ elm_controlbar_item_label_get(Elm_Controlbar_Item * it)
  */ 
    EAPI Elm_Controlbar_Item * elm_controlbar_last_item_get(Evas_Object * obj) 
 {
-   if (obj == NULL)
-      return NULL;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd = elm_widget_data_get(obj);
    if (!wd || !wd->items)
       return NULL;
@@ -3322,8 +3350,7 @@ elm_controlbar_item_label_get(Elm_Controlbar_Item * it)
  */ 
    EAPI Eina_List * elm_controlbar_items_get(Evas_Object * obj) 
 {
-   if (obj == NULL)
-      return NULL;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd = elm_widget_data_get(obj);
    if (!wd || !wd->items)
       return NULL;
@@ -3405,13 +3432,8 @@ elm_controlbar_edit_start(Evas_Object * obj)
    printf("Thank you.\n");
    printf("==================================\n");
 
-   Widget_Data * wd;
-   if (obj == NULL)
-     {
-	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
-	return;
-     }
-   wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (wd == NULL)
      {
 	fprintf(stderr, "Cannot get smart data\n");
@@ -3529,13 +3551,8 @@ elm_controlbar_view_set(Evas_Object * obj, Evas_Object * view)
    printf("Thank you.\n");
    printf("==================================\n");
 
-   Widget_Data * wd;
-   if (obj == NULL)
-     {
-	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
-	return;
-     }
-   wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (wd == NULL)
      {
 	fprintf(stderr, "Cannot get smart data\n");
@@ -3589,13 +3606,8 @@ elm_controlbar_item_view_get(Elm_Controlbar_Item *it)
    EAPI void
 elm_controlbar_mode_set(Evas_Object *obj, int mode) 
 {
-   Widget_Data * wd;
-   if (obj == NULL)
-     {
-	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
-	return;
-     }
-   wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (wd == NULL)
      {
 	fprintf(stderr, "Cannot get smart data\n");
@@ -3658,14 +3670,9 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
    EAPI void
 elm_controlbar_alpha_set(Evas_Object *obj, int alpha)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    int r, g, b;
-   Widget_Data * wd;
-   if (obj == NULL)
-     {
-	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
-	return;
-     }
-   wd = elm_widget_data_get(obj);
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (wd == NULL)
      {
 	fprintf(stderr, "Cannot get smart data\n");
@@ -3697,16 +3704,11 @@ elm_controlbar_alpha_set(Evas_Object *obj, int alpha)
 EAPI void
 elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align)
 {
-   Widget_Data * wd;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
    Elm_Controlbar_Item *item;
    const Eina_List *l;
    int i;
-   if (obj == NULL)
-     {
-	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
-	return;
-     }
-   wd = elm_widget_data_get(obj);
    if (wd == NULL)
      {
 	fprintf(stderr, "Cannot get smart data\n");
@@ -3782,13 +3784,8 @@ elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align)
 EAPI void
 elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical)
 {
-   Widget_Data * wd;
-   if (obj == NULL)
-     {
-	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
-	return;
-     }
-   wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (wd == NULL)
      {
 	fprintf(stderr, "Cannot get smart data\n");
@@ -3838,13 +3835,8 @@ elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Ob
    printf("Thank you.\n");
    printf("==================================\n");
 
-   Widget_Data * wd;
-   if (obj == NULL)
-     {
-	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
-	return;
-     }
-   wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (wd == NULL)
      {
 	fprintf(stderr, "Cannot get smart data\n");
@@ -3873,13 +3865,8 @@ elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Ei
    printf("Thank you.\n");
    printf("==================================\n");
 
-   Widget_Data * wd;
-   if (obj == NULL)
-     {
-	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
-	return;
-     }
-   wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (wd == NULL)
      {
 	fprintf(stderr, "Cannot get smart data\n");
@@ -3902,13 +3889,8 @@ elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Ei
 EAPI void
 elm_controlbar_view_animation_set(Evas_Object *obj, const char *hide, const char *show)
 {
-   Widget_Data * wd;
-   if (obj == NULL)
-     {
-	fprintf(stderr, "Invalid argument: controlbar object is NULL\n");
-	return;
-     }
-   wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (wd == NULL)
      {
 	fprintf(stderr, "Cannot get smart data\n");
