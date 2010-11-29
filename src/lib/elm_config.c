@@ -656,6 +656,7 @@ _env_get(void)
 
    s = getenv("ELM_PASSWORD_SHOW_LAST_CHARACTER");
    if (s) _elm_config->password_show_last_character = atoi(s);
+
    s = getenv("ELM_FPS");
    if (s) _elm_config->fps = atof(s);
    if (_elm_config->fps < 1.0) _elm_config->fps = 1.0;
@@ -665,18 +666,6 @@ _env_get(void)
 
    s = getenv("ELM_INPUT_PANEL");
    if (s) _elm_config->input_panel_enable = atoi(s);
-
-   s = getenv("ELM_ENTRY_AUTOCAPITAL_ALLOW");
-   if (s) 
-     {
-        _elm_config->autocapital_allow = atoi(s);
-     }
-
-   s = getenv("ELM_ENTRY_AUTOPERIOD_ALLOW");
-   if (s)
-     {
-        _elm_config->autoperiod_allow = atoi(s);
-     }
 
    s = getenv("ELM_LONGPRESS_TIMEOUT");
    if (s) _elm_config->longpress_timeout = atof(s);
@@ -792,30 +781,24 @@ _elm_config_sub_init(void)
                     }
                }
           }
-        if (!getenv("ELM_ENTRY_AUTOCAPITAL_ALLOW"))
+        if (ecore_x_window_prop_card32_get(_root_1st,
+                                           _atom[ATOM_E_AUTOCAPITAL_ALLOW],
+                                           &val, 1) > 0)
           {
-             if (ecore_x_window_prop_card32_get(_root_1st,
-                                                _atom[ATOM_E_AUTOCAPITAL_ALLOW],
-                                                &val, 1) > 0)
+             if (val > 0)
                {
-                  if (val > 0)
-                    {
-                       _elm_config->autocapital_allow = val;
-                       edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
-                    }
+                  _elm_config->autocapital_allow = val;
+                  edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
                }
           }
-        if (!getenv("ELM_ENTRY_AUTOPERIOD_ALLOW"))
+        if (ecore_x_window_prop_card32_get(_root_1st,
+                                           _atom[ATOM_E_AUTOPERIOD_ALLOW],
+                                           &val, 1) > 0)
           {
-             if (ecore_x_window_prop_card32_get(_root_1st,
-                                                _atom[ATOM_E_AUTOPERIOD_ALLOW],
-                                                &val, 1) > 0)
+             if (val > 0)
                {
-                  if (val > 0)
-                    {
-                       _elm_config->autoperiod_allow = val;
-                       edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
-                    }
+                  _elm_config->autoperiod_allow = val;
+                  edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
                }
           }
 #endif
