@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build66) unstable; urgency=low
+
+  * Package upload due to segmented control fix
+  * Git: 165.213.180.234:/git/slp/pkgs/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build66
+
+ -- Seokjae Jeong <seok.j.jeong@samsung.com>  Sat, 27 Nov 2010 14:05:50 +0900
+
 elementary (1.0.0+svn.51480slp2+build65) unstable; urgency=low
 
   * Package upload due to EFL merge.

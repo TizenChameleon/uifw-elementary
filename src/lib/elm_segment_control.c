@@ -809,7 +809,7 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
  * @param obj The SegmentControl object
  * @param icon The icon object for added segment item
  * @param label The label for added segment item
- * @param animate If 1 the action be animated with sliding effects default 0.
+ * @param animate If EINA_TRUE the action be animated with sliding effects default EINA_FALSE.
  * @return The new segment item or NULL if it cannot be created
  *
  * @ingroup SegmentControl SegmentControl
@@ -878,7 +878,7 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const ch
  * @param icon The icon object for added segment item
  * @param label The label for added segment item
  * @param index The position at which segment item to be inserted
- * @param animate If 1 the action be animated with sliding effects default 0.
+ * @param animate If 1EINA_TRUE the action be animated with sliding effects default EINA_FALSE.
  * @return The new segment item or NULL if it cannot be created
  *
  * @ingroup SegmentControl SegmentControl
@@ -927,7 +927,7 @@ elm_segment_control_item_del(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool
  * Delete a segment item to segmentcontrol
  * @param obj The SegmentControl object
  * @param item The  segment item to be deleted
- * @param animate If 1 the action be animated with sliding effects default 0.
+ * @param animate If EINA_TRUE the action be animated with sliding effects default EINA_FALSE.
  *
  * @ingroup SegmentControl SegmentControl
  */
@@ -976,7 +976,7 @@ elm_segment_control_item_del_at(Evas_Object *obj,  unsigned int index, Eina_Bool
  * Delete a segment item of given index to segmentcontrol
  * @param obj The SegmentControl object
  * @param index The position at which segment item to be deleted
- * @param animate If 1 the action be animated with sliding effects default 0.
+ * @param animate If EINA_TRUE the action be animated with sliding effects default EINA_FALSE.
  *
  * @ingroup SegmentControl SegmentControl
  */
