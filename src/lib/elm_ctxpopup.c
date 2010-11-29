@@ -97,7 +97,7 @@ static void _adjust_pos_y(int indicator_h, Evas_Coord_Point *pos,
 static void _reset_scroller_size(Widget_Data *wd);
 static void _hide_ctxpopup(Evas_Object *obj);
 static void _content_del(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _content_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _content_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static void _reset_scroller_size(Widget_Data *wd)
 {
@@ -722,6 +722,8 @@ static void _del_pre_hook(Evas_Object *obj) {
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
 	if (!wd) return;
 
+	fprintf(stderr, "del!\n");
+
 	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE,
 			_parent_resize, obj);
 
@@ -740,6 +742,8 @@ static void _del_hook(Evas_Object *obj)
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(obj);
 
 	if (!wd) return;
+
+	fprintf(stderr, "del2\n");
 	elm_ctxpopup_clear(obj);
 	evas_object_del(wd->arrow);
 	evas_object_del(wd->base);
@@ -949,9 +953,11 @@ static void _ctxpopup_item_select(void *data, Evas_Object *obj,
 
 	if (!item) return;
 	if (item->disabled) return;
-	if (item->func) 
+
+	if (item->func) { 
+		_ctxpopup_hide(item->ctxpopup, NULL, item->ctxpopup, NULL);
 		item->func(item->data, item->ctxpopup, item);
-	_ctxpopup_hide(item->ctxpopup, NULL, item->ctxpopup, NULL);
+	}
 }
 
 static void _item_obj_create(Elm_Ctxpopup_Item *item, char *group_name) 
@@ -970,16 +976,17 @@ static void _item_obj_create(Elm_Ctxpopup_Item *item, char *group_name)
 	evas_object_show(item->base);
 }
 
-static void _content_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
+static void _content_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
 	Widget_Data *wd = (Widget_Data *) elm_widget_data_get(data);
 	Evas_Coord x, y, w, h;
 
 	if(!wd) return;
 
+	evas_object_geometry_get(obj, &x, &y, &w, &h);
+	evas_object_size_hint_min_set(obj, w, h);
+	
 	if(wd->visible) {
-		evas_object_geometry_get(obj, &x, &y, &w, &h);
-		evas_object_size_hint_min_set(obj, w, h);
 		_sizing_eval(data);
 	}
 }
@@ -1497,7 +1504,7 @@ EAPI void elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 
 	evas_object_event_callback_add(content, EVAS_CALLBACK_DEL, _content_del, obj);
 //	evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints, obj);
-	evas_object_event_callback_add(content, EVAS_CALLBACK_RESIZE, _content_changed_size_hints, obj);
+	evas_object_event_callback_add(content, EVAS_CALLBACK_RESIZE, _content_resize, obj);
 	
 	edje_object_part_swallow(wd->base, "elm.swallow.content", content);
 	elm_widget_sub_object_add(obj, content);
@@ -1530,7 +1537,7 @@ elm_ctxpopup_content_unset(Evas_Object *obj)
 	edje_object_part_unswallow(wd->base, content);
 	elm_widget_sub_object_del(obj, content);
 	evas_object_event_callback_del(content, EVAS_CALLBACK_DEL, _content_del);
-	evas_object_event_callback_del(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints); 
+	evas_object_event_callback_del(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_resize); 
 	edje_object_signal_emit(wd->base, "elm,state,content,disable", "elm");
 
 	elm_ctxpopup_scroller_disabled_set(obj, EINA_FALSE);
