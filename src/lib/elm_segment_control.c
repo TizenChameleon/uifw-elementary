@@ -65,8 +65,11 @@ static void _theme_hook(Evas_Object *obj);
 static void _item_free(Evas_Object *obj, Elm_Segment_Item *it);
 static void _del_hook(Evas_Object *obj);
 static void _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data);
-static void _segment_resizing(void *data);
+static void _segment_resizing(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _segment_item_resizing(void *data, Evas *e, Evas_Object *obj, void *event_info);
+#if 0
 static void _object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
+#endif
 static void _update_list(Evas_Object *obj);
 static void _refresh_segment_ids(Evas_Object *obj);
 static void _state_value_set(Evas_Object *obj);
@@ -269,7 +272,7 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 }
 
 static void
-_segment_resizing(void *data)
+_segment_resizing(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
    if (!wd) return;
@@ -281,7 +284,7 @@ _segment_resizing(void *data)
 
    _state_value_set((Evas_Object *)data);
 }
-
+#if 0
 static void 
 _object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
@@ -292,9 +295,10 @@ _object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
    ecore_job_add(_segment_resizing, (Evas_Object *)data);
 }
+#endif
 
 static void
-_segment_item_resizing(void *data)
+_segment_item_resizing(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd;
    Elm_Segment_Item *it = (Elm_Segment_Item *)data; 
@@ -327,12 +331,13 @@ _segment_item_resizing(void *data)
           elm_label_text_color_set(it->label_wd, wd->def_r, wd->def_g, wd->def_b, wd->def_a);
      }
 }
-
+#if 0
 static void 
 _object_item_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    ecore_job_add(_segment_item_resizing, (Evas_Object *)data);
 }
+#endif
 
 static Elm_Segment_Item*
 _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
@@ -743,7 +748,7 @@ elm_segment_control_add(Evas_Object *parent)
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->box);
    evas_object_show(wd->box);
 
-   evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _object_resize, obj);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _segment_resizing, obj);
    wd->id = 0;
    wd->del_index = -1;
    wd->insert_index = -1;
@@ -783,7 +788,7 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
    
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down, it);
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_UP, _mouse_up, it);
-   evas_object_event_callback_add(it->base, EVAS_CALLBACK_RESIZE, _object_item_resize, it);
+   evas_object_event_callback_add(it->base, EVAS_CALLBACK_RESIZE, _segment_item_resizing, it);
    wd->insert_index = -1;
    wd->del_index = -1;
    _refresh_segment_ids(obj);
@@ -843,7 +848,7 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const ch
      }
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down, it);
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_UP, _mouse_up, it);
-   evas_object_event_callback_add(it->base, EVAS_CALLBACK_RESIZE, _object_item_resize, it);
+   evas_object_event_callback_add(it->base, EVAS_CALLBACK_RESIZE, _segment_item_resizing, it);
    wd->insert_index = index;
    wd->id = eina_list_count(wd->seg_ctrl);
    _refresh_segment_ids(obj);
@@ -1213,7 +1218,7 @@ elm_segment_control_item_label_object_set(Elm_Segment_Item *item, char *label)
    if(!wd) return NULL;
    if(!label) return NULL;
 
-   _color_value_get(wd);
+   _color_value_get((Evas_Object *)wd);
    item->label_wd = elm_label_add(item->obj);
    elm_object_style_set(item->label_wd, "segment");
    elm_label_label_set(item->label_wd, label);
