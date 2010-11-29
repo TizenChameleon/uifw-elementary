@@ -635,12 +635,12 @@ _item_block_del(Elm_Genlist_Item *it)
      }
    else
      {
-        if (itb->count < 16)
+        if (itb->count < itb->wd->max_items_per_block/2)
           {
              il = EINA_INLIST_GET(itb);
              Item_Block *itbp = (Item_Block *)(il->prev);
              Item_Block *itbn = (Item_Block *)(il->next);
-             if ((itbp) && ((itbp->count + itb->count) < 48))
+             if ((itbp) && ((itbp->count + itb->count) < itb->wd->max_items_per_block + itb->wd->max_items_per_block/2))
                {
                   Elm_Genlist_Item *it2;
 
@@ -654,7 +654,7 @@ _item_block_del(Elm_Genlist_Item *it)
                   it->wd->blocks = eina_inlist_remove(it->wd->blocks, EINA_INLIST_GET(itb));
                   free(itb);
                }
-             else if ((itbn) && ((itbn->count + itb->count) < 48))
+             else if ((itbn) && ((itbn->count + itb->count) < itb->wd->max_items_per_block + itb->wd->max_items_per_block/2))
                {
                   while (itb->items)
                     {
@@ -930,11 +930,33 @@ _long_press(void *data)
 static Eina_Bool
 _edit_long_press(void *data)
 {
-  Elm_Genlist_Item *it = data; 
+  Elm_Genlist_Item *it = data, *it_tmp; 
   Evas_Coord x, y;
-
+  static Eina_Bool contracted = EINA_FALSE;
+  Eina_List *l;
+  Item_Block *itb;
+   
   it->edit_long_timer = NULL;
   if ((it->disabled) || (it->dragging)) return 0;
+
+  EINA_INLIST_FOREACH(it->wd->blocks, itb)
+   {
+     EINA_LIST_FOREACH(itb->items, l, it_tmp)
+      {
+       if(!it_tmp->parent && elm_genlist_item_expanded_get(it_tmp)) 
+         {
+           elm_genlist_item_expanded_set(it_tmp, EINA_FALSE);
+           contracted = EINA_TRUE;
+           return 1;
+           
+         }
+      }
+   }
+  if(contracted) {
+   contracted = EINA_FALSE;
+   return 0;
+  }
+
   edje_object_signal_emit(it->edit_obj, "elm,action,item,reorder_start", "elm");
 
   evas_object_geometry_get(it->base, &x, &y, NULL, NULL);
