@@ -168,6 +168,7 @@ _populate(Evas_Object *obj)
    struct tm first_day;
    Eina_List *l;
    char *buf;
+   Eina_Bool last_row=1;
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
@@ -193,13 +194,57 @@ _populate(Evas_Object *obj)
    first_day.tm_mday = 1;
    mktime(&first_day);
 
+   wd->first_day_it = first_day.tm_wday;
+
+      if ((35- wd->first_day_it) >(maxdays-1)) 
+ 	  last_row=0;
+
+	  if (last_row==0)
+	    {
+             for (i = 0; i < 5; i++) 
+		{
+         	char emission[18];
+         	snprintf(emission, sizeof(emission), "cseph_%i,row_hide", i);
+         	edje_object_signal_emit(wd->calendar, emission, "elm"); 
+		}
+            char emission[23];
+            snprintf(emission, sizeof(emission), "cseph_%i,row_invisible", 5);
+            edje_object_signal_emit(wd->calendar, emission, "elm"); 
+
+            for (i = 0; i < 35; i++)
+	      {
+         	char emission[21];
+         	snprintf(emission, sizeof(emission), "cit_%i,cell_expanded", i);
+         	edje_object_signal_emit(wd->calendar, emission, "elm");
+	      }
+            for (i = 35; i < 42; i++)
+	      {
+         	char emission[22];
+         	snprintf(emission, sizeof(emission), "cit_%i,cell_invisible", i);
+         	edje_object_signal_emit(wd->calendar, emission, "elm");
+	      }
+	   }
+	  else
+	   {
+              for (i = 0; i < 6; i++)
+		{
+		char emission[18];
+         	snprintf(emission, sizeof(emission), "cseph_%i,row_show", i);
+         	edje_object_signal_emit(wd->calendar, emission, "elm");
+		}
+
+             for (i = 0; i < 42; i++)
+	      {
+         	char emission[20];
+         	snprintf(emission, sizeof(emission), "cit_%i,cell_default", i);
+         	edje_object_signal_emit(wd->calendar, emission, "elm");
+	      }
+	   }
+
    for (i = 0; i < 42; i++)
      {
 	if ((!day) && (i == first_day.tm_wday))
-	  {
 	     day = 1;
-	     wd->first_day_it = i;
-	  }
 
 	if ((day == wd->current_time.tm_mday)
 	      && (mon == wd->current_time.tm_mon)

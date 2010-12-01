@@ -28,19 +28,10 @@ struct _Widget_Data
    unsigned int insert_index;
    unsigned int del_index;
    unsigned int cur_seg_id;
-   unsigned int def_r;
-   unsigned int def_g;
-   unsigned int def_b;
-   unsigned int def_a;
-   unsigned int press_r;
-   unsigned int press_g;
-   unsigned int press_b;
-   unsigned int press_a;
-   unsigned int sel_r;
-   unsigned int sel_g;
-   unsigned int sel_b;
-   unsigned int sel_a;
    double scale_factor;
+   unsigned int def_color[4];
+   unsigned int press_color[4];
+   unsigned int sel_color[4];
 };
 
 struct _Elm_Segment_Item
@@ -56,6 +47,9 @@ struct _Elm_Segment_Item
    Eina_Bool sel : 1;
 };
 
+#define MAXTOKENS 5
+
+char **_split(char *string, char *delim);
 static void _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info);
 static void _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _signal_segment_selected(void *data);
@@ -88,12 +82,13 @@ _signal_segment_off(void *data)
     Widget_Data *wd = elm_widget_data_get(item->obj);
     if (!wd) return;
     
+    item->sel = EINA_FALSE;
     edje_object_signal_emit(item->base, "elm,action,unfocus", "elm");
     edje_object_signal_emit(item->base, "elm,state,segment,release", "elm");
     if(!item->label_wd && item->label)
       edje_object_signal_emit(item->base, "elm,state,text,visible", "elm");
     if(item->label_wd)
-      elm_label_text_color_set(item->label_wd, wd->def_r, wd->def_g, wd->def_b, wd->def_a);
+      elm_label_text_color_set(item->label_wd, wd->def_color[0], wd->def_color[1], wd->def_color[2], wd->def_color[3]);
 
     return;
 }
@@ -125,7 +120,7 @@ _signal_segment_selected(void *data)
    if(!item->label_wd)
      edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
    if(item->label_wd)
-     elm_label_text_color_set(item->label_wd, wd->sel_r, wd->sel_g, wd->sel_b, wd->sel_a);
+     elm_label_text_color_set(item->label_wd, wd->sel_color[0], wd->sel_color[1], wd->sel_color[2], wd->sel_color[3]);
    item->selected_id = item->segment_id;
    evas_object_smart_callback_call(item->obj, "changed", (void*)item->selected_id);
 
@@ -162,7 +157,7 @@ _signal_segment_on(void *data)
    if(!item->label_wd)
      edje_object_signal_emit(item->base, "elm,state,text,change", "elm");
    if(item->label_wd)
-     elm_label_text_color_set(item->label_wd, wd->sel_r,wd->sel_g, wd->sel_g, wd->sel_a);
+     elm_label_text_color_set(item->label_wd, wd->sel_color[0],wd->sel_color[1], wd->sel_color[1], wd->sel_color[3]);
 
    wd->cur_seg_id = item->segment_id;
    evas_object_smart_callback_call(item->obj, "changed", (void*)wd->cur_seg_id);
@@ -201,7 +196,7 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
         edje_object_signal_emit(item->base, "elm,state,text,pressed", "elm");
      }
    if(item->label_wd && wd->cur_seg_id != item->segment_id)
-     elm_label_text_color_set(item->label_wd, wd->press_r, wd->press_g, wd->press_b, wd->press_a);
+     elm_label_text_color_set(item->label_wd, wd->press_color[0], wd->press_color[1], wd->press_color[2], wd->press_color[3]);
 
    edje_object_signal_emit(item->base, "elm,state,segment,press", "elm");
    return;
@@ -325,10 +320,10 @@ _segment_item_resizing(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	edje_object_signal_emit(it->base, "elm,state,label,visible", "elm");
         if (it->segment_id == wd->cur_seg_id && it->sel)
           {
-            elm_label_text_color_set(it->label_wd, wd->sel_r, wd->sel_g, wd->sel_b, wd->sel_a);
+            elm_label_text_color_set(it->label_wd, wd->sel_color[0], wd->sel_color[1], wd->sel_color[2], wd->sel_color[3]);
           }
         else
-          elm_label_text_color_set(it->label_wd, wd->def_r, wd->def_g, wd->def_b, wd->def_a);
+          elm_label_text_color_set(it->label_wd, wd->def_color[0], wd->def_color[1], wd->def_color[2], wd->def_color[3]);
      }
 }
 #if 0
@@ -430,7 +425,7 @@ _update_list(Evas_Object *obj)
 	if(it->label_wd)
 	  {
              edje_object_signal_emit(it->base, "elm,state,label,visible", "elm");
-	     elm_label_text_color_set(it->label_wd, wd->sel_r, wd->sel_g, wd->sel_b, wd->sel_a);
+	     elm_label_text_color_set(it->label_wd, wd->sel_color[0], wd->sel_color[1], wd->sel_color[2], wd->sel_color[3]);
 	  }
 
 	return;
@@ -596,53 +591,116 @@ _state_value_set(Evas_Object *obj)
     return;
 }
 
+/* split string into tokens, return token array */
+char **
+_split(char *string, char *delim) 
+{
+   char **tokens = NULL;
+   char *working = NULL;
+   char *token = NULL;
+   int idx = 0;
+
+   tokens  = malloc(sizeof(char *) * MAXTOKENS);
+   if(tokens == NULL)
+     return NULL;
+   working = malloc(sizeof(char) * strlen(string) + 1);
+   if(working == NULL)
+     return NULL;
+
+ /* to make sure, copy string to a safe place */
+   strcpy(working, string);
+   for(idx = 0; idx < MAXTOKENS; idx++)
+     tokens[idx] = NULL;
+
+   token = strtok(working, delim);
+   idx = 0;
+
+ /* always keep the last entry NULL termindated */
+   while((idx < (MAXTOKENS - 1)) && (token != NULL)) {
+     tokens[idx] = malloc(sizeof(char) * strlen(token) + 1);
+     if(tokens[idx] != NULL) {
+       strcpy(tokens[idx], token);
+       idx++;
+       token = strtok(NULL, delim);
+     }
+   }
+
+ free(working);
+ return tokens;
+}
+
 static void _color_value_get(Evas_Object *obj)
 {
    Widget_Data *wd = (Widget_Data *)obj;
    if (!wd) return;
 
-   const char *def_r, *def_g, *def_b, *def_a;
-   const char *press_r, *press_g, *press_b, *press_a;
-   const char *sel_r, *sel_g, *sel_b, *sel_a;
+   const char *def_color;
+   const char *press_color;
+   const char *sel_color;
 
-   def_r = edje_object_data_get(wd->base, "def_r");
-   if (def_r) wd->def_r = atoi(def_r);
-   else wd->def_r = 0x1B;
-   def_g = edje_object_data_get(wd->base, "def_g");
-   if (def_g) wd->def_g = atoi(def_g);
-   else wd->def_g = 0x1A;
-   def_b = edje_object_data_get(wd->base, "def_b");
-   if (def_b) wd->def_b = atoi(def_b);
-   else wd->def_b = 0x18;
-   def_a = edje_object_data_get(wd->base, "def_a");
-   if (def_a) wd->def_a = atoi(def_a);
-   else wd->def_a = 0xFF;
+   char *delim = " ";
+   char **tokens = NULL;
+   int i = 0;
 
-   press_r = edje_object_data_get(wd->base, "press_r");
-   if (press_r) wd->press_r = atoi(press_r);
-   else wd->press_r = 0xFF;
-   press_g = edje_object_data_get(wd->base, "press_g");
-   if (press_g) wd->press_g = atoi(press_g);
-   else wd->press_g = 0xFF;
-   press_b = edje_object_data_get(wd->base, "press_b");
-   if (press_b) wd->press_b = atoi(press_b);
-   else wd->press_b = 0xFF;
-   press_a = edje_object_data_get(wd->base, "press_a");
-   if (press_a) wd->press_a = atoi(press_a);
-   else wd->press_a = 0xFF;
+   def_color = edje_object_data_get(wd->base, "def_rgb");
+   if(def_color)
+     {
+        tokens = _split(def_color, delim);
+  	for(i = 0; tokens[i] != NULL; i++)
+    	  {
+   	     if (tokens[i]) wd->def_color[i] = atoi(tokens[i]);
+  	     else wd->def_color[i] = 0xFF;
+  	  }
+  	for(i = 0; tokens[i] != NULL; i++)
+	  free(tokens[i]);
+  	free(tokens);
+  	tokens = NULL;
+     }
+   else
+     {
+        for(i = 0; i<(MAXTOKENS - 1); i++)
+  	  wd->def_color[i] = 0xFF;
+     }
+   press_color = edje_object_data_get(wd->base, "press_rgb");
+   if(press_color)
+     {
+        tokens = _split(press_color, delim);
+	for(i = 0; tokens[i] != NULL; i++)
+  	  {
+	     if (tokens[i]) wd->press_color[i] = atoi(tokens[i]);
+	     else wd->press_color[i] = 0xFF;
+	  }
+	for(i = 0; tokens[i] != NULL; i++)
+  	  free(tokens[i]);
+	free(tokens);
+	tokens = NULL;
+     }
+   else
+     {
+        for(i = 0; i<(MAXTOKENS - 1); i++)
+          wd->press_color[i] = 0xFF;
+     }
 
-   sel_r = edje_object_data_get(wd->base, "sel_r");
-   if (sel_r) wd->sel_r = atoi(sel_r);
-   else  wd->sel_r = 0x00;
-   sel_g = edje_object_data_get(wd->base, "sel_g");
-   if (sel_g) wd->sel_g = atoi(sel_g);
-   else wd->sel_g = 0x00;
-   sel_b = edje_object_data_get(wd->base, "sel_b");
-   if (sel_b) wd->sel_b = atoi(sel_b);
-   else wd->sel_b = 0x00;
-   sel_a = edje_object_data_get(wd->base, "sel_a");
-   if (sel_a) wd->sel_a = atoi(sel_a);
-   else wd->sel_a = 0xFF;
+   sel_color = edje_object_data_get(wd->base, "sel_rgb");
+   if(sel_color)
+     {
+       tokens = _split(sel_color, delim);
+       for(i = 0; tokens[i] != NULL; i++)
+         {
+	    if (tokens[i]) wd->sel_color[i] = atoi(tokens[i]);
+     	    else wd->sel_color[i] = 0xFF;
+    	 }
+       for(i = 0; tokens[i] != NULL; i++)
+	 free(tokens[i]);
+       
+       free(tokens);
+       tokens = NULL;
+     }
+   else
+     {
+        for(i = 0; i<(MAXTOKENS - 1); i++)
+    	  wd->sel_color[i] = 0xFF;
+     }
 }
 
 static int *
@@ -770,6 +828,8 @@ elm_segment_control_add(Evas_Object *parent)
    if (hpad) wd->h_pad = atoi(hpad);
    else wd->h_pad = 1;
 
+   _color_value_get((Evas_Object *)wd);
+
    return obj;
 }
 
@@ -800,7 +860,10 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon, const char *la
 	wd->ani = ecore_animator_add( _animator_animate_add_cb, obj );
      }
    else
+   {
      _state_value_set(obj);
+     _update_list(obj);
+   }
    evas_object_show( it->base);
 
    evas_object_box_append(wd->box, it->base);
@@ -860,7 +923,10 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon, const ch
 	wd->ani = ecore_animator_add( _animator_animate_add_cb, obj );
      }
    else
-      _state_value_set(obj);
+   {
+     _state_value_set(obj);
+     _update_list(obj);
+   }
 
    evas_object_show( it->base);
 
@@ -1218,7 +1284,6 @@ elm_segment_control_item_label_object_set(Elm_Segment_Item *item, char *label)
    if(!wd) return NULL;
    if(!label) return NULL;
 
-   _color_value_get((Evas_Object *)wd);
    item->label_wd = elm_label_add(item->obj);
    elm_object_style_set(item->label_wd, "segment");
    elm_label_label_set(item->label_wd, label);

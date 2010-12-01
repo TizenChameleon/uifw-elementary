@@ -220,8 +220,7 @@ static int check_letter(const char *str, int length)
 	int code = str[length];
 
 	if(code == '\0') return length; // null string
-	else if((code >= 'A' && code <= 'Z') || (code >= 'a' && code <= 'z')) return length; // alphabet
-	else if ('0'<=code && code<='9') return length; // number
+	else if(isalnum(code)) return length; // alphabet or number
 	else if ((33<=code && code<47) || (58<=code && code<64) || (91<=code && code<96) || (123<=code && code<126)) return length; // special letter
 
 	return length-1;
