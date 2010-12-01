@@ -141,7 +141,7 @@ obj_longpress(Evas_Object *obj)
 	if (ext_mod->context_menu)
 	{
 		if (ext_mod->popup) evas_object_del(ext_mod->popup);
-      	else elm_widget_scroll_freeze_push(obj);
+//      	else elm_widget_scroll_freeze_push(obj);
 		top = elm_widget_top_get(obj);
 		if(top)
 			ext_mod->popup = elm_ctxpopup_add(top);
@@ -153,6 +153,7 @@ obj_longpress(Evas_Object *obj)
 		if ((context_menu_orientation) &&
 		(!strcmp(context_menu_orientation, "horizontal")))
 		elm_ctxpopup_horizontal_set(ext_mod->popup, EINA_TRUE);
+		elm_ctxpopup_screen_dimmed_disabled_set(ext_mod->popup, EINA_TRUE);
 
 		elm_widget_sub_object_add(obj, ext_mod->popup);
 		if (!ext_mod->selmode)
@@ -193,7 +194,7 @@ obj_longpress(Evas_Object *obj)
 							if (1) // need way to detect if someone has a selection
 								{
 									if (ext_mod->editable)
-										elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",	_paste, obj );
+										elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",_paste, obj );
 								}
 						}
 	// start for cbhm
@@ -230,6 +231,18 @@ obj_mouseup(Evas_Object *obj)
 				_cancel(obj,ext_mod->popup,NULL);
 			}
      }     
+}
+
+
+EAPI void
+obj_hidemenu(Evas_Object *obj)
+{
+	if (!obj || !ext_mod) {
+		return;
+	}
+
+	evas_object_hide(ext_mod->popup);
+//	if (ext_mod->popup) evas_object_del(ext_mod->popup);
 }
 
 

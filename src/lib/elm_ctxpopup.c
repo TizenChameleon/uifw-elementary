@@ -219,19 +219,17 @@ static void _hide_effect(Evas_Object *obj)
 		elm_transit_completion_callback_set(wd->transit, _hide_effect_done, obj);
 	}
 
-//	elm_transit_fx_insert(wd->transit, elm_fx_color_add(wd->base, 255, 255, 255, 255, 0, 0, 0, 0));
-
 	switch(wd->arrow_dir) {
-		case  ELM_FX_WIPE_DIR_UP:
+		case  ELM_CTXPOPUP_ARROW_DOWN:
 			elm_transit_fx_insert(wd->transit, elm_fx_wipe_add(wd->base, ELM_FX_WIPE_TYPE_HIDE, ELM_FX_WIPE_DIR_DOWN));
 			break;
-		case  ELM_FX_WIPE_DIR_LEFT:
+		case  ELM_CTXPOPUP_ARROW_RIGHT:
 			elm_transit_fx_insert(wd->transit, elm_fx_wipe_add(wd->base, ELM_FX_WIPE_TYPE_HIDE, ELM_FX_WIPE_DIR_RIGHT));
 			break;
-		case  ELM_FX_WIPE_DIR_RIGHT:
+		case  ELM_CTXPOPUP_ARROW_LEFT:
 			elm_transit_fx_insert(wd->transit, elm_fx_wipe_add(wd->base, ELM_FX_WIPE_TYPE_HIDE, ELM_FX_WIPE_DIR_LEFT));
 			break;
-		case  ELM_FX_WIPE_DIR_DOWN:
+		case  ELM_CTXPOPUP_ARROW_UP:
 			elm_transit_fx_insert(wd->transit, elm_fx_wipe_add(wd->base, ELM_FX_WIPE_TYPE_HIDE, ELM_FX_WIPE_DIR_UP));
 			break;
 		default:
@@ -886,7 +884,8 @@ static void _hide_ctxpopup(Evas_Object *obj)
 	evas_object_hide(wd->base);
 
 	_reset_scroller_size(wd);
-	evas_object_smart_callback_call(obj, "hide", NULL);
+
+	evas_object_smart_callback_call(obj, "hide", NULL); 
 }
 
 static void _ctxpopup_hide(void *data, Evas *e, Evas_Object *obj, void *event_info) 
@@ -897,11 +896,13 @@ static void _ctxpopup_hide(void *data, Evas *e, Evas_Object *obj, void *event_in
 	if(wd->visible == EINA_FALSE)	 return;
 
 	wd->visible = EINA_FALSE;
-
+/*
 	if (!wd->screen_dimmed_disabled)
 		edje_object_signal_emit(wd->bg, "elm,state,hide", "elm");
 
 	_hide_effect(obj);
+*/
+	_hide_ctxpopup(obj);
 }
 
 static void _ctxpopup_scroller_resize(void *data, Evas *e, Evas_Object * obj,
@@ -954,7 +955,7 @@ static void _ctxpopup_item_select(void *data, Evas_Object *obj,
 	if (item->disabled) return;
 
 	if (item->func) { 
-		_ctxpopup_hide(item->ctxpopup, NULL, item->ctxpopup, NULL);
+		evas_object_hide(item->ctxpopup);
 		item->func(item->data, item->ctxpopup, item);
 	}
 }
@@ -1357,7 +1358,7 @@ EAPI void elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item)
 	}
 	free(item);
 	if (eina_list_count(wd->items) == 0) {
-		_ctxpopup_hide(obj, NULL, obj, NULL);
+		evas_object_hide(obj);
 	}
 }
 

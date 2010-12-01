@@ -2243,6 +2243,7 @@ extern "C" {
    EAPI Evas_Object *elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item);
    EAPI void         elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon);
    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
+   EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
    
    
    /* Tab Bar */
