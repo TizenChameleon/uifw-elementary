@@ -2627,8 +2627,8 @@ extern "C" {
    EAPI Evas_Object   *elm_dialoguegroup_item_content_get(Dialogue_Item *item);
    EAPI void	       elm_dialoguegroup_item_style_set(Dialogue_Item *item, Elm_Dialoguegroup_Item_Style style);
    EAPI Elm_Dialoguegroup_Item_Style	elm_dialoguegroup_item_style_get(Dialogue_Item *item);
-
-
+   EAPI void           elm_dialoguegroup_item_disabled_set(Dialogue_Item *item, Eina_Bool disabled);
+   EAPI Eina_Bool      elm_dialoguegroup_item_disabled_get(Dialogue_Item *item);   
   
    /* AutoCompleteView */
    typedef Eina_Bool (*elmautocompleteview_matchfunction) (Evas_Object *obj, char *text, Evas_Object *list, void *data);

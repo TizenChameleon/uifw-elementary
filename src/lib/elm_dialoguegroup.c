@@ -17,6 +17,7 @@ struct _Dialogue_Item
    Elm_Dialoguegroup_Item_Style style;
    const char *location;
    Eina_Bool press;
+   Eina_Bool disabled;
    //	Eina_Bool line_show;
 };
 
@@ -177,10 +178,14 @@ static void _change_item_bg(Dialogue_Item *item, const char *location)
    eina_stringshare_replace(&item->location, location);
    _set_item_theme(item, location);
    elm_layout_content_set(item->bg_layout, "swallow", item->content);
-   if(item->press == EINA_TRUE)
+   if((item->press == EINA_TRUE) && (item->disabled == EINA_FALSE))
       edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
    else
-      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");   
+   if(item->disabled == EINA_TRUE)
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,disabled", "elm");
+   else
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,enabled", "elm");
 
    /*	if(item->line_show == EINA_FALSE)
         edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,line,hide", "elm");*/
@@ -198,6 +203,7 @@ static Dialogue_Item* _create_item(Evas_Object *obj, Evas_Object *subobj, Elm_Di
    item->parent = obj;
    item->content = subobj;
    item->press = EINA_TRUE;
+   item->disabled = EINA_FALSE;
    item->style = style;
    //	item->line_show = EINA_TRUE;
    eina_stringshare_replace(&item->location, location);
@@ -567,7 +573,7 @@ elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press)
    ELM_CHECK_WIDTYPE(item->parent, widtype) ;
 
    item->press = press;
-   if(press == EINA_TRUE)
+   if((press == EINA_TRUE) && (item->disabled == EINA_FALSE))
       edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
    else
       edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");	
@@ -651,4 +657,52 @@ elm_dialoguegroup_item_style_get(Dialogue_Item *item)
    return item->style;
 }
 
+/**
+ * Set item state as disable or not.
+ *
+ * @param item dialoguegroup item.
+ * @param disabled if EINA_TRUE disabled, else abled. 
+ * 
+ * @ingroup DialogueGroup
+ */
+EAPI void 
+elm_dialoguegroup_item_disabled_set(Dialogue_Item *item, Eina_Bool disabled)
+{
+   if(!item) return;
+   ELM_CHECK_WIDTYPE(item->parent, widtype);
+   
+   item->disabled = disabled;
+   
+   if(disabled == EINA_TRUE)
+     {
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,disabled", "elm");
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,off", "elm");	
+     }
+   else
+     {
+      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,enabled", "elm");
+      if(item->press == EINA_TRUE)
+         edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
+     }
+}
+
+/**
+ * Get item state whether disabled or not.
+ *
+ * @param item dialoguegroup item.
+ * @return if EINA_TRUE, then disabled else abled.
+ * 
+ * @ingroup DialogueGroup
+ */
+
+EAPI Eina_Bool
+elm_dialoguegroup_item_disabled_get(Dialogue_Item *item)
+{
+   if(!item) return EINA_FALSE;
+   ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
+
+   return item->disabled;
+}
+
 /* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/
+
