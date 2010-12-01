@@ -163,6 +163,7 @@ static void _resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static const char *_getbase(Evas_Object *obj);
 static void _signal_entry_changed(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_selection_start(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _signal_selection_end(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_selection_changed(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_selection_cleared(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_handler_move_start(void *data, Evas_Object *obj, const char *emission, const char *source);
@@ -226,6 +227,7 @@ struct _Mod_Api
    void (*obj_hook) (Evas_Object *obj);
    void (*obj_unhook) (Evas_Object *obj);
    void (*obj_longpress) (Evas_Object *obj);
+   void (*obj_hidemenu) (Evas_Object *obj);
    void (*obj_mouseup) (Evas_Object *obj);
 };
 
@@ -244,6 +246,8 @@ _module(Evas_Object *obj __UNUSED__)
      _elm_module_symbol_get(m, "obj_unhook");
    ((Mod_Api *)(m->api)      )->obj_longpress = // called on long press menu
      _elm_module_symbol_get(m, "obj_longpress");
+   ((Mod_Api *)(m->api)      )->obj_hidemenu = // called on hide menu
+     _elm_module_symbol_get(m, "obj_hidemenu");
     ((Mod_Api *)(m->api)      )->obj_mouseup = // called on mouseup
    _elm_module_symbol_get(m, "obj_mouseup");
    ok: // ok - return api
@@ -657,12 +661,12 @@ _copy(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   wd->selmode = EINA_FALSE;
-   edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
-   edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
+   //wd->selmode = EINA_FALSE;
+   //edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
+   //edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
    elm_widget_scroll_hold_pop(data);
    _store_selection(ELM_SEL_CLIPBOARD, data);
-   edje_object_part_text_select_none(wd->ent, "elm.text");
+   //edje_object_part_text_select_none(wd->ent, "elm.text");
 }
 
 static void
@@ -1182,6 +1186,11 @@ _signal_handler_move_start(void *data, Evas_Object *obj __UNUSED__, const char *
 {
    Widget_Data *wd = elm_widget_data_get(data);
    elm_object_scroll_freeze_push(data);
+
+   if ((wd->api) && (wd->api->obj_hidemenu))
+     {
+        wd->api->obj_hidemenu(data);
+     }
 }
 
 static void
@@ -1189,6 +1198,20 @@ _signal_handler_move_end(void *data, Evas_Object *obj __UNUSED__, const char *em
 {
    Widget_Data *wd = elm_widget_data_get(data);
    elm_object_scroll_freeze_pop(data);
+
+   if (wd->have_selection)
+	   _long_press(data);
+}
+
+static void
+_signal_selection_end(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+/*	
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Object *entry;
+   if (!wd) return;
+*/
+	_long_press(data);
 }
 
 static void
@@ -1445,6 +1468,11 @@ _signal_mouse_down(void *data, Evas_Object *obj __UNUSED__, const char *emission
    if (!wd) return;
    wd->double_clicked = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_PRESS, NULL);
+   
+   if ((wd->api) && (wd->api->obj_hidemenu))
+     {
+        wd->api->obj_hidemenu(data);
+     }
 }
 
 static void
@@ -1453,6 +1481,9 @@ _signal_mouse_up(void *data, Evas_Object *obj __UNUSED__, const char *emission _
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+   
+//   if (wd->have_selection)
+//	   _long_press(data);
 }
 
 static void
@@ -2093,6 +2124,8 @@ elm_entry_add(Evas_Object *parent)
                                    _signal_handler_move_end, obj);
    edje_object_signal_callback_add(wd->ent, "selection,start", "elm.text",
                                    _signal_selection_start, obj);
+   edje_object_signal_callback_add(wd->ent, "selection,end", "elm.text",
+                                   _signal_selection_end, obj);
    edje_object_signal_callback_add(wd->ent, "selection,changed", "elm.text",
                                    _signal_selection_changed, obj);
    edje_object_signal_callback_add(wd->ent, "selection,cleared", "elm.text",
