@@ -37,6 +37,7 @@ struct _Widget_Data
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
+static void _swallow_conformant_parts(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static Eina_Bool _prop_change(void *data, int type, void *event);
 #ifdef HAVE_CONFORMANT_AUTOSCROLL
@@ -59,6 +60,8 @@ _theme_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    _elm_theme_object_set(obj, wd->base, "conformant", "base", elm_widget_style_get(obj));
+   _swallow_conformant_parts(obj);
+
    if (wd->content)
      edje_object_part_swallow(wd->base, "elm.swallow.content", wd->content);
    edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
@@ -74,6 +77,53 @@ _sizing_eval(Evas_Object *obj)
    edje_object_size_min_calc(wd->base, &mw, &mh);
    evas_object_size_hint_min_set(obj, mw, mh);
    evas_object_size_hint_max_set(obj, -1, -1);
+}
+
+static void
+_swallow_conformant_parts(Evas_Object *obj)
+{
+#ifdef HAVE_ELEMENTARY_X
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   Ecore_X_Window zone, xwin;
+   int sh = -1;
+
+   xwin = elm_win_xwindow_get(obj);
+   zone = ecore_x_e_illume_zone_get(xwin);
+
+   ecore_x_e_illume_indicator_geometry_get(zone, NULL, NULL, NULL, &sh);
+   if (sh < 0) sh = 0;
+   if(!wd->shelf)
+      wd->shelf = evas_object_rectangle_add(evas_object_evas_get(obj));
+   evas_object_color_set(wd->shelf, 0, 0, 0, 0);
+   evas_object_size_hint_min_set(wd->shelf, -1, sh);
+   evas_object_size_hint_max_set(wd->shelf, -1, sh);
+   edje_object_part_swallow(wd->base, "elm.swallow.shelf", wd->shelf);
+
+#ifdef HAVE_CONFORMANT_AUTOSCROLL
+   wd->scroller = NULL;
+   wd->focus_obj = NULL;
+   sh = -1;
+   ecore_x_e_illume_keyboard_geometry_get(zone, NULL, NULL, NULL, &sh);
+   if (sh < 0) sh = 0;
+   if(!wd->virtualkeypad)
+      wd->virtualkeypad= evas_object_rectangle_add(evas_object_evas_get(obj));
+   evas_object_color_set(wd->virtualkeypad, 0, 0, 0, 0);
+   evas_object_size_hint_min_set(wd->virtualkeypad, -1, sh);
+   evas_object_size_hint_max_set(wd->virtualkeypad, -1, sh);
+   edje_object_part_swallow(wd->base, "elm.swallow.virtualkeypad", wd->virtualkeypad);
+#endif
+
+   sh = -1;
+   ecore_x_e_illume_softkey_geometry_get(zone, NULL, NULL, NULL, &sh);
+   if (sh < 0) sh = 0;
+   if(!wd->panel)
+      wd->panel = evas_object_rectangle_add(evas_object_evas_get(obj));
+   evas_object_color_set(wd->panel, 0, 0, 0, 0);
+   evas_object_size_hint_min_set(wd->panel, -1, sh);
+   evas_object_size_hint_max_set(wd->panel, -1, sh);
+   edje_object_part_swallow(wd->base, "elm.swallow.panel", wd->panel);
+#endif
 }
 
 static void
@@ -235,57 +285,6 @@ _autoscroll_mode_disable(void *data)
 }
 #endif
 
-/* unused now - but meant to be for making sure the focused widget is always
- * visible when the vkbd comes and goes by moving the conformant obj (and thus
- * its children) to  show the focused widget (and if focus changes follow)
-
-static Evas_Object *
-_focus_object_get(const Evas_Object *obj)
-{
-   Evas_Object *win, *foc;
-   
-   win = elm_widget_top_get(obj);
-   if (!win) return NULL;
-   foc = elm_widget_top_get(win);
-}
-
-static void
-_focus_object_region_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
-{
-   evas_object_geometry_get(obj, x, y, w, h);
-}
-
-static void
-_focus_change_del(void *data, Evas_Object *obj, void *event_info)
-{
-   // called from toplevel when the focused window shanges
-}
-
-static void
-_autoscroll_move(Evas_Object *obj)
-{
-   // move conformant edje by delta to show focused widget
-}
-
-static void
-_autoscroll_mode_enable(Evas_Object *obj)
-{
-   // called when autoscroll mode should be on - content area smaller than
-   // its min size
-   // 1. get focused object
-   // 2. if not in visible conformant area calculate delta needed to
-   //    get it in
-   // 3. store delta and call _autoscroll_move() which either asanimates
-   //    or jumps right there
-}
-
-static void
-_autoscroll_mode_disable(Evas_Object *obj)
-{
-   // called when autoscroll mode should be off - set delta to 0 and
-   // call _autoscroll_move()
-}
-*/
 
 static Eina_Bool
 _prop_change(void *data, int type __UNUSED__, void *event) 
@@ -417,48 +416,14 @@ elm_conformant_add(Evas_Object *parent)
    wd->base = edje_object_add(evas);
    _elm_theme_object_set(obj, wd->base, "conformant", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
+   _swallow_conformant_parts(obj);
 
 #ifdef HAVE_ELEMENTARY_X
-   Ecore_X_Window zone, xwin;
-   int sh = -1;
-
-   xwin = elm_win_xwindow_get(parent);
-   zone = ecore_x_e_illume_zone_get(xwin);
-
-   ecore_x_e_illume_indicator_geometry_get(zone, NULL, NULL, NULL, &sh);
-   if (sh < 0) sh = 0;
-   wd->shelf = evas_object_rectangle_add(evas);
-   evas_object_color_set(wd->shelf, 0, 0, 0, 0);
-   evas_object_size_hint_min_set(wd->shelf, -1, sh);
-   evas_object_size_hint_max_set(wd->shelf, -1, sh);
-   edje_object_part_swallow(wd->base, "elm.swallow.shelf", wd->shelf);
-
+   wd->prop_hdl = ecore_event_handler_add(ECORE_X_EVENT_WINDOW_PROPERTY,
+                                          _prop_change, obj);
 #ifdef HAVE_CONFORMANT_AUTOSCROLL
-   wd->scroller = NULL;
-   wd->focus_obj = NULL;
-   sh = -1;
-   ecore_x_e_illume_keyboard_geometry_get(zone, NULL, NULL, NULL, &sh);
-   if (sh < 0) sh = 0;
-   wd->virtualkeypad= evas_object_rectangle_add(evas);
-   evas_object_color_set(wd->virtualkeypad, 0, 0, 0, 0);
-   evas_object_size_hint_min_set(wd->virtualkeypad, -1, sh);
-   evas_object_size_hint_max_set(wd->virtualkeypad, -1, sh);
-   edje_object_part_swallow(wd->base, "elm.swallow.virtualkeypad", wd->virtualkeypad);
    wd->vkeypad_state = ECORE_X_VIRTUAL_KEYBOARD_STATE_UNKNOWN;
 #endif
-
-   sh = -1;
-   ecore_x_e_illume_softkey_geometry_get(zone, NULL, NULL, NULL, &sh);
-   if (sh < 0) sh = 0;
-   wd->panel = evas_object_rectangle_add(evas);
-   evas_object_color_set(wd->panel, 0, 0, 0, 0);
-   evas_object_size_hint_min_set(wd->panel, -1, sh);
-   evas_object_size_hint_max_set(wd->panel, -1, sh);
-   edje_object_part_swallow(wd->base, "elm.swallow.panel", wd->panel);
-
-   wd->prop_hdl = ecore_event_handler_add(ECORE_X_EVENT_WINDOW_PROPERTY, 
-                                          _prop_change, obj);
-   // FIXME: get kbd region prop
 #endif
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
