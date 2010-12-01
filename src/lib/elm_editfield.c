@@ -188,7 +188,7 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
 
    if(!_empty_entry(wd->entry)) 
      {
-        if(wd->eraser_show)
+        if(wd->eraser_show && elm_object_focus_get(obj))
            edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
 	if(wd->guide_text) 
 	  {
