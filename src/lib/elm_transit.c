@@ -1,25 +1,52 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
+#define ELM_TRANSIT_CHECK_OR_RETURN(transit, ...) \
+   do { \
+      if (!transit) { \
+         CRITICAL("Elm_Transit " # transit " is NULL!"); \
+         return __VA_ARGS__; \
+      } \
+      if (!EINA_MAGIC_CHECK(transit, ELM_TRANSIT_MAGIC)) { \
+         EINA_MAGIC_FAIL(transit, ELM_TRANSIT_MAGIC); \
+         return __VA_ARGS__; \
+      } \
+      if (transit->deleted){ \
+         ERR("Elm_Transit " # transit " has already been deleted!"); \
+         return __VA_ARGS__; \
+      } \
+   } while (0)
+
+
 /**
  *
  * @defgroup Transit Transit
  * @ingroup Elementary
  *
- * Transit is designed to set the various effects for the Evas_Object such like translation, 
- * rotation, etc. For using Effects, Create transit and insert the some of effects which are 
- * interested. Each effects has the type of Elm_Effect and those can be inserted into transit. 
- * Once effects are inserted into transit, transit will manage those effects.(ex) deleting). 
-*/
+ * Transit (see Warning below) is designed to set the various effects for the
+ * Evas_Object such like translation, rotation, etc. For using Effects, Create
+ * transit and insert effects which are interesting.
+ * Once effects are inserted into transit, transit will manage those effects.
+ * (ex deleting).
+ *
+ * @warning We strongly recomend to use elm_transit just when edje can not do
+ * the trick. Edje has more advantage than Elm_Transit, it has more flexibility and
+ * animations can be manipulated inside the theme.
+ */
+
 struct _transit
 {
-   Evas_Object *parent;
+#define ELM_TRANSIT_MAGIC 0xd27f190a
+   EINA_MAGIC;
+
+	Evas_Object *parent;
    Elm_Animator *animator;
    Eina_List *effect_list;
-   Evas_Object *block_rect;
+	Elm_Transit_Tween_Mode tween_mode;
+	Evas_Object *block_rect;
    void (*completion_op) (void *data, Elm_Transit *transit);
    void *completion_arg;
-   Eina_Bool reserved_del:1;
+   Eina_Bool deleted:1;
 };
 
 struct _effect
@@ -39,16 +66,30 @@ static void _transit_fx_begin(Elm_Transit *transit);
 static void _transit_fx_end(Elm_Transit *transit);
 static void _transit_complete_cb(void *data);
 static void _transit_fx_del(Elm_Effect *effect);
-//static void _transit_parent_del(void *data); 
 
-/*
+
+//NEW
+static void _elm_transit_del(Elm_Transit *transit);
+
+
 static void
-_animator_parent_del(void *data)
+_elm_transit_del(Elm_Transit *transit)
 {
-	Elm_Transit *transit = data; 
-	elm_transit_del(data);
+	if (elm_animator_operating_get(transit->animator))
+     {
+        transit->deleted = EINA_TRUE;
+		  return;
+     }
+
+   if (transit->block_rect)
+      evas_object_del(transit->block_rect);
+
+   elm_animator_del(transit->animator);
+   elm_transit_fx_clear(transit);
+	
+	EINA_MAGIC_SET(transit, EINA_MAGIC_NONE);
+   free(transit);
 }
-*/
 
 static Evas_Object *
 _create_block_rect(Evas_Object *parent)
@@ -136,9 +177,9 @@ _transit_complete_cb(void *data)
    if (transit->completion_op)
       transit->completion_op(transit->completion_arg, transit);
 
-   if (transit->reserved_del)
+   if (transit->deleted)
      {
-	transit->reserved_del = EINA_FALSE;
+	transit->deleted = EINA_FALSE;
 	elm_transit_del(transit);
      }
 }
@@ -173,8 +214,7 @@ _transit_fx_del(Elm_Effect *effect)
 EAPI void
 elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool disabled)
 {
-   if (!transit)
-      return;
+   ELM_TRANSIT_CHECK_OR_RETURN(transit);
 
    if (disabled)
      {
@@ -192,19 +232,22 @@ elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool disabled)
 }
 
 /**
- * Get the value of event blockd status.
+ * Get the value of event blocked status.
  *
- * @param[in] transit Transit
- * @return EINA_TRUE, when event block is disabled
+ * @see elm_transit_event_block_set()
  *
- * @ingroup Transit 
+ * @param[in] transit The Transit object
+ * @return EINA_TRUE, when event block is enabled. If @p transit is NULL
+ * EINA_FALSE is returned
+ *
+ * @ingroup Transit
  */
 EAPI Eina_Bool
-elm_transit_event_block_disabled_get(Elm_Transit *transit)
+elm_transit_event_block_disabled_get(const Elm_Transit *transit)
 {
-   if (!transit)
-      return EINA_FALSE;
-   return transit->block_rect ? EINA_TRUE : EINA_FALSE;
+	ELM_TRANSIT_CHECK_OR_RETURN(transit, EINA_FALSE);
+   
+	return transit->block_rect ? EINA_TRUE : EINA_FALSE;
 }
 
 /**
@@ -220,12 +263,11 @@ elm_transit_event_block_disabled_get(Elm_Transit *transit)
 EAPI Eina_Bool
 elm_transit_fx_remove(Elm_Transit *transit, Elm_Effect *effect)
 {
-   Eina_List *elist;
+	ELM_TRANSIT_CHECK_OR_RETURN(transit, EINA_FALSE);
+
+	Eina_List *elist;
 
    Elm_Effect *_effect;
-
-   if (!transit)
-      return EINA_FALSE;
 
    EINA_LIST_FOREACH(transit->effect_list, elist, _effect)
    {
@@ -250,12 +292,11 @@ elm_transit_fx_remove(Elm_Transit *transit, Elm_Effect *effect)
 EAPI void
 elm_transit_fx_clear(Elm_Transit *transit)
 {
-   Eina_List *elist;
+	ELM_TRANSIT_CHECK_OR_RETURN(transit);
+
+	Eina_List *elist;
 
    Elm_Effect *effect;
-
-   if (!transit)
-      return;
 
    EINA_LIST_FOREACH(transit->effect_list, elist, effect)
    {
@@ -275,8 +316,8 @@ elm_transit_fx_clear(Elm_Transit *transit)
 EAPI const Eina_List *
 elm_transit_fx_get(Elm_Transit *transit)
 {
-   if (!transit)
-      return NULL;
+   ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
+
    return transit->effect_list;
 }
 
@@ -295,11 +336,15 @@ elm_transit_completion_callback_set(Elm_Transit *transit,
 						Elm_Transit *transit),
 				    void *data)
 {
-   if (!transit)
-      return;
-   transit->completion_op = op;
+   ELM_TRANSIT_CHECK_OR_RETURN(transit);
+
+	transit->completion_op = op;
    transit->completion_arg = data;
 }
+
+
+
+
 
 /**
  * Delete transit. 
@@ -311,26 +356,11 @@ elm_transit_completion_callback_set(Elm_Transit *transit,
 EAPI void
 elm_transit_del(Elm_Transit *transit)
 {
-   if (!transit)
-      return;
-   if (elm_animator_operating_get(transit->animator))
-     {
-	transit->reserved_del = EINA_TRUE;
-	return;
-     }
+	ELM_TRANSIT_CHECK_OR_RETURN(transit);
 
-   if (transit->block_rect)
-      evas_object_del(transit->block_rect);
-
-   elm_animator_del(transit->animator);
-   elm_transit_fx_clear(transit);
-
-//	if(transit->parent) 
-//	{
-//		evas_object_event_callback_del(transit->parent, EVAS_CALLBACK_DEL, _transit_parent_del);
-//	}
-
-   free(transit);
+	_elm_transit_del(transit);
+//	if (transit->walking) transit->deleted = EINA_TRUE;
+//   else _elm_transit_del(transit);
 }
 
 /**
@@ -344,11 +374,69 @@ elm_transit_del(Elm_Transit *transit)
 EAPI void
 elm_transit_curve_style_set(Elm_Transit *transit, Elm_Animator_Curve_Style cs)
 {
-   if (!transit)
-      return;
+   ELM_TRANSIT_CHECK_OR_RETURN(transit);
    elm_animator_curve_style_set(transit->animator, cs);
 }
 
+/**
+ * Set the transit animation acceleration type.
+ *
+ * This function sets the tween mode of the transit that can be:
+ * ELM_TRANSIT_TWEEN_MODE_LINEAR - The default mode.
+ * ELM_TRANSIT_TWEEN_MODE_SINUSOIDAL - Starts in accelerate mode and ends decelerating.
+ * ELM_TRANSIT_TWEEN_MODE_DECELERATE - The animation will be slowed over time.
+ * ELM_TRANSIT_TWEEN_MODE_ACCELERATE - The animation will accelerate over time.
+ *
+ * @param[in] transit The transit object.
+ * @param[in] tween_mode The tween type.
+ *
+ * @ingroup Transit
+ */
+EAPI void
+elm_transit_tween_mode_set(Elm_Transit *transit, Elm_Transit_Tween_Mode tween_mode)
+{
+   ELM_TRANSIT_CHECK_OR_RETURN(transit);
+
+   transit->tween_mode = tween_mode;
+
+	switch(tween_mode) 
+	{
+		case ELM_TRANSIT_TWEEN_MODE_LINEAR:
+			elm_animator_curve_style_set(transit->animator, ELM_ANIMATOR_CURVE_LINEAR);
+			break;
+		case ELM_TRANSIT_TWEEN_MODE_SINUSODIAL:
+			elm_animator_curve_style_set(transit->animator, ELM_ANIMATOR_CURVE_IN_OUT);
+			break;
+		case ELM_TRANSIT_TWEEN_MODE_DECELERATE:
+			elm_animator_curve_style_set(transit->animator, ELM_ANIMATOR_CURVE_OUT);
+			break;
+		case ELM_TRANSIT_TWEEN_MODE_ACCELERATE:
+			elm_animator_curve_style_set(transit->animator, ELM_ANIMATOR_CURVE_IN);
+			break;
+		default:
+			break;
+	}
+
+}
+
+/**
+ * Get the transit animation acceleration type.
+ *
+ * @note @p transit can not be NULL
+ *
+ * @param[in] transit The transit object.
+ * @return The tween type. If @p transit is NULL
+ * ELM_TRANSIT_TWEEN_MODE_LINEAR is returned.
+ *
+ * @ingroup Transit
+ */
+EAPI Elm_Transit_Tween_Mode
+elm_transit_tween_mode_get(const Elm_Transit *transit)
+{
+   ELM_TRANSIT_CHECK_OR_RETURN(transit, ELM_TRANSIT_TWEEN_MODE_LINEAR);
+
+   return transit->tween_mode;
+}
 
 /**
  * Add new transit. 
@@ -361,12 +449,21 @@ elm_transit_curve_style_set(Elm_Transit *transit, Elm_Animator_Curve_Style cs)
 EAPI Elm_Transit *
 elm_transit_add(Evas_Object *parent)
 {
-   Elm_Transit *transit = calloc(1, sizeof(Elm_Transit));
+   Elm_Transit *transit = ELM_NEW(Elm_Transit);
 
-   if (!transit)
-      return NULL;
+   if (!transit) return NULL;
 
-   transit->animator = elm_animator_add(parent);
+   EINA_MAGIC_SET(transit, ELM_TRANSIT_MAGIC);
+
+   //elm_transit_tween_mode_set(transit, ELM_TRANSIT_TWEEN_MODE_LINEAR);
+
+   //transit->time.duration = duration;
+
+	//transit->time.begin = ecore_loop_time_get();
+   
+	//transit->animator = ecore_animator_add(_animator_animate_cb, transit);
+
+	transit->animator = elm_animator_add(parent);
 
    if (!transit->animator)
      {
@@ -401,8 +498,7 @@ elm_transit_add(Evas_Object *parent)
 EAPI void
 elm_transit_auto_reverse_set(Elm_Transit *transit, Eina_Bool reverse)
 {
-   if (!transit)
-      return;
+   ELM_TRANSIT_CHECK_OR_RETURN(transit);
    elm_animator_auto_reverse_set(transit->animator, reverse);
 }
 
@@ -415,15 +511,16 @@ elm_transit_auto_reverse_set(Elm_Transit *transit, Eina_Bool reverse)
  *
  * @ingroup Transit 
  */
+//EAPI void 
+//elm_transit_effect_add(Elm_Transit *transit, void (*cb)(void *data, Elm_Transit *transit, double progress), void *data, void (*data_free_cb)(void *data, Elm_Transit *transit))
 EAPI Eina_Bool
 elm_transit_fx_insert(Elm_Transit *transit, Elm_Effect *effect)
 {
-   Eina_List *elist;
-
+   ELM_TRANSIT_CHECK_OR_RETURN(transit, EINA_FALSE);
+	
    Elm_Effect *_effect;
 
-   if (!transit)
-      return EINA_FALSE;
+	Eina_List *elist;
 
    EINA_LIST_FOREACH(transit->effect_list, elist, _effect)
    {
@@ -448,9 +545,8 @@ elm_transit_fx_insert(Elm_Transit *transit, Elm_Effect *effect)
 EAPI void
 elm_transit_repeat_set(Elm_Transit *transit, unsigned int repeat)
 {
-   if (!transit)
-      return;
-   elm_animator_repeat_set(transit->animator, repeat);
+	ELM_TRANSIT_CHECK_OR_RETURN(transit);
+	elm_animator_repeat_set(transit->animator, repeat);
 }
 
 /**
@@ -463,8 +559,7 @@ elm_transit_repeat_set(Elm_Transit *transit, unsigned int repeat)
 EAPI void
 elm_transit_stop(Elm_Transit *transit)
 {
-   if (!transit)
-      return;
+	ELM_TRANSIT_CHECK_OR_RETURN(transit);
    elm_animator_stop(transit->animator);
 }
 
@@ -479,8 +574,7 @@ elm_transit_stop(Elm_Transit *transit)
 EAPI void
 elm_transit_run(Elm_Transit *transit, double duration)
 {
-   if (!transit)
-      return;
+	ELM_TRANSIT_CHECK_OR_RETURN(transit);
    _transit_fx_begin(transit);
    elm_animator_duration_set(transit->animator, duration);
 
@@ -509,8 +603,7 @@ elm_transit_run(Elm_Transit *transit, double duration)
 EAPI void
 elm_transit_pause(Elm_Transit *transit)
 {
-	if(!transit)
-		return;
+	ELM_TRANSIT_CHECK_OR_RETURN(transit);
 
 	elm_animator_pause(transit->animator);
 }
@@ -525,8 +618,7 @@ elm_transit_pause(Elm_Transit *transit)
 EAPI void
 elm_transit_resume(Elm_Transit *transit)
 {
-	if(!transit)
-		return;
+	ELM_TRANSIT_CHECK_OR_RETURN(transit);
 
 	elm_animator_resume(transit->animator);
 }
