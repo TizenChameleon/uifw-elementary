@@ -267,11 +267,11 @@ elm_slidingdrawer_add(Evas_Object *parent)
 	//widget
 	obj = elm_widget_add(e);
 	elm_widget_type_set(obj, "slidingdrawer");
+        elm_widget_can_focus_set(obj, EINA_FALSE);
 	elm_widget_sub_object_add(parent, obj);
 	elm_widget_data_set(obj, wd);
 	elm_widget_del_hook_set(obj, _del_hook);
 	elm_widget_theme_hook_set(obj, _theme_hook);
-	elm_widget_can_focus_set(obj, EINA_FALSE);
 
 	//base
 	wd->base = edje_object_add(e);
