@@ -44,7 +44,7 @@ struct _Elm_Animator
    void *completion_arg;
    Elm_Animator_Curve_Style curve_style;
    Eina_Bool auto_reverse:1;
-   Eina_Bool on_animating:1;
+   Eina_Bool walking:1;
 };
 
 static double _animator_curve_linear(double frame);
@@ -143,7 +143,7 @@ _animator_animate_cb(void *data)
    //Repeat and reverse and time done!
    if (!animator->cur_repeat_cnt)
      {
-	animator->on_animating = EINA_FALSE;
+	animator->walking = EINA_FALSE;
 	_delete_animator(animator);
 	if (animator->completion_op)
 	   animator->completion_op(animator->completion_arg);
@@ -261,7 +261,7 @@ EAPI void
 elm_animator_duration_set(Elm_Animator *animator, double duration)
 {
    ELM_ANIMATOR_CHECK_OR_RETURN(animator);
-   if (animator->on_animating) return;
+   if (animator->walking) return;
    animator->duration = duration;
 }
 
@@ -281,7 +281,7 @@ elm_animator_operation_callback_set(Elm_Animator *animator,
                                     void *data)
 {
    ELM_ANIMATOR_CHECK_OR_RETURN(animator);
-   if (animator->on_animating) return;
+   if (animator->walking) return;
    animator->animator_op = func;
    animator->animator_arg = data;
 }
@@ -321,7 +321,7 @@ EAPI Eina_Bool
 elm_animator_operating_get(const Elm_Animator *animator)
 {
    ELM_ANIMATOR_CHECK_OR_RETURN(animator, EINA_FALSE);
-   return animator->on_animating;
+   return animator->walking;
 }
 
 /**
@@ -359,7 +359,7 @@ elm_animator_completion_callback_set(Elm_Animator *animator,
                                      void *data)
 {
    ELM_ANIMATOR_CHECK_OR_RETURN(animator);
-   if (animator->on_animating) return;
+   if (animator->walking) return;
    animator->completion_op = func;
    animator->completion_arg = data;
 }
@@ -375,7 +375,7 @@ EAPI void
 elm_animator_pause(Elm_Animator *animator)
 {
    ELM_ANIMATOR_CHECK_OR_RETURN(animator);
-   if (!animator->on_animating) return;
+   if (!animator->walking) return;
    ecore_animator_freeze(animator->animator);
 }
 
@@ -390,7 +390,7 @@ EAPI void
 elm_animator_resume(Elm_Animator *animator)
 {
    ELM_ANIMATOR_CHECK_OR_RETURN(animator);
-   if (!animator->on_animating) return;
+   if (!animator->walking) return;
    ecore_animator_thaw(animator->animator);
 }
 
@@ -405,7 +405,7 @@ EAPI void
 elm_animator_stop(Elm_Animator *animator)
 {
    ELM_ANIMATOR_CHECK_OR_RETURN(animator);
-   animator->on_animating = EINA_FALSE;
+   animator->walking = EINA_FALSE;
    _delete_animator(animator);
 }
 
@@ -442,5 +442,5 @@ elm_animator_animate(Elm_Animator *animator)
    animator->cur_repeat_cnt = animator->repeat_cnt;
    if (!animator->animator)
       animator->animator = ecore_animator_add(_animator_animate_cb, animator);
-   if (animator->animator) animator->on_animating = EINA_TRUE;
+   if (animator->animator) animator->walking = EINA_TRUE;
 }
