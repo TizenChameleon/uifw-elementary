@@ -33,14 +33,16 @@ typedef struct _function_button fn_button;
 struct _Widget_Data
 {
    Eina_List *stack, *to_delete;
-   Elm_Navigationbar_ex_Item *top;
+   Elm_Navigationbar_ex_Item *top, *oldtop;
    Evas_Object *rect, *clip;
    Eina_Bool del_on_pop : 1;
+   Eina_Bool disable_animation: 1;
 };
 
 struct _Elm_Navigationbar_ex_Item
 {
    Evas_Object *obj, *base, *content;
+   Evas_Object *t_base, *ct_base;
    Evas_Coord minw, minh;
    const char *title;
    const char *subtitle;
@@ -82,7 +84,7 @@ _content_unset(Elm_Navigationbar_ex_Item* item)
 	if(!item->content) return NULL; 
 	content = item->content;
 	elm_widget_sub_object_del(item->obj,item->content);
-	edje_object_part_unswallow(item->base,item->content);	
+	edje_object_part_unswallow(item->ct_base,item->content);	
 	item->content = NULL;
 	evas_object_hide(content);
 	return content;
@@ -91,17 +93,26 @@ _content_unset(Elm_Navigationbar_ex_Item* item)
 static void
 _theme_hook(Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Eina_List *l;
-   char buf_fn[1024];
-   Elm_Navigationbar_ex_Item *it;
-   if (!wd) return;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	Eina_List *l;
+	char buf_fn[1024];
+	char buf[1024];
+	Elm_Navigationbar_ex_Item *it;
+	if (!wd) return;
    EINA_LIST_FOREACH(wd->stack, l, it)
    	{
    	Eina_List *bl;
 	fn_button *btn;
-     edje_object_scale_set(it->base, elm_widget_scale_get(obj) * 
+   edje_object_scale_set(it->base, elm_widget_scale_get(obj) * 
                            _elm_config->scale);
+
+   strncpy(buf, "item/", sizeof(buf));
+   strncat(buf, it->item_style, sizeof(buf) - strlen(buf));
+   _elm_theme_object_set(obj, it->t_base,  "navigationbar_ex", buf, elm_widget_style_get(obj));
+
+	_elm_theme_object_set(obj, it->ct_base,  "navigationbar_ex", "content", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, it->base,  "navigationbar_ex", "base", elm_widget_style_get(obj));
+
 	 EINA_LIST_FOREACH(it->fnbtn_list, bl, btn)
 	 	{
 	 		if(btn->btn_id == ELM_NAVIGATIONBAR_EX_BACK_BUTTON)
@@ -144,60 +155,115 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
    evas_object_size_hint_min_get(it->content, &minw, &minh);
    // FIXME: why is this needed? how does edje get this unswallowed or
    // lose its callbacks to edje
-   edje_object_part_swallow(it->base, "elm.swallow.content", it->content);
+   edje_object_part_swallow(it->ct_base, "elm.swallow.content", it->content);
    edje_object_size_min_calc(it->base, &it->minw, &it->minh);
    _sizing_eval(it->obj);
 }
 
 static void
-_eval_top(Evas_Object *obj, Eina_Bool push)
+_eval_top(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Eina_Bool animate=EINA_TRUE;
-   Elm_Navigationbar_ex_Item *ittop;
+   Eina_Bool animate = EINA_TRUE;
+   Elm_Navigationbar_ex_Item *ittop = NULL;
    if (!wd) return;
    if (!wd->stack) return;
    ittop = eina_list_last(wd->stack)->data;
    if (ittop != wd->top)
      {
-	Evas_Object *o;
+	Evas_Object *o, *o1, *o2;
 	const char *onshow, *onhide;
 
 	if (wd->top)
 	  {
 	     o = wd->top->base;
-	     edje_object_signal_emit(o, "elm,action,hide", "elm");
-	     onhide = edje_object_data_get(o, "onhide");
+		 o1 = wd->top->ct_base;
+		 o2 = wd->top->t_base;/*make use of the signals sent for animation*/
+
+		 /*issue to fix, hide signal does not come for t_base, increasing time helps 
+		 in getting correct events in pop*/
+		if(wd->disable_animation)
+			{
+				edje_object_signal_emit(o2, "elm,action,hide,noanimate", "elm");
+				edje_object_signal_emit(o1, "elm,action,hide,noanimate", "elm");				
+			}
+	     else if (wd->top->popme)
+			{	
+				edje_object_signal_emit(o2, "elm,action,pop", "elm");
+				edje_object_signal_emit(o1, "elm,action,pop", "elm");
+	     	}
+	     else
+	     	{
+	    		edje_object_signal_emit(o2, "elm,action,hide", "elm");
+				edje_object_signal_emit(o1, "elm,action,hide", "elm");
+	     	}
+	     onhide = edje_object_data_get(o1, "onhide");
 	     if (onhide)
 	       {
-		  if (!strcmp(onhide, "raise")) evas_object_raise(o);
-		  else if (!strcmp(onhide, "lower")) evas_object_lower(o);
+		  if (!strcmp(onhide, "raise")) {
+					evas_object_raise(o2);
+					evas_object_raise(o1);
+		  		}
+		  else if (!strcmp(onhide, "lower")) 
+				{
+					evas_object_lower(o2);
+					evas_object_lower(o1);				
+		  		}
 	       }
 	  }
 	else
 	  {
 	     animate = EINA_FALSE;
 	  }
+	wd->oldtop = wd->top;
 	wd->top = ittop;
 	o = wd->top->base;
+	o1 = wd->top->ct_base;
+	o2 = wd->top->t_base;
 	evas_object_show(o);
-	if(animate)
-		{
-		if(push)
-	  edje_object_signal_emit(o, "elm,action,show,push", "elm");
-		else
-	  edje_object_signal_emit(o, "elm,action,show,pop", "elm");
+	evas_object_show(o2);
+	evas_object_show(o1);
+
+	 if ((!animate)||(wd->disable_animation))
+		{	
+			edje_object_signal_emit(o2, "elm,action,show,noanimate", "elm");
+			edje_object_signal_emit(o1, "elm,action,show,noanimate", "elm");			
 		}
+    else if (wd->oldtop)
+      {
+         if (elm_object_focus_get(wd->oldtop->content))
+           elm_object_focus(wd->top->content);
+         if (wd->oldtop->popme)
+         	{
+         		edje_object_signal_emit(o2, "elm,action,show", "elm");
+				edje_object_signal_emit(o1, "elm,action,show", "elm");					
+         	}
+         else
+         	{
+         		edje_object_signal_emit(o2, "elm,action,push", "elm");
+				edje_object_signal_emit(o1, "elm,action,push", "elm");
+         	}
+      }
 	else
-	  edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
-	onshow = edje_object_data_get(o, "onshow");
+		{
+			edje_object_signal_emit(o2, "elm,action,push", "elm");
+			edje_object_signal_emit(o1, "elm,action,push", "elm");
+		}
+	onshow = edje_object_data_get(o1, "onshow");
 	if (onshow)
 	  {
-	     if (!strcmp(onshow, "raise")) evas_object_raise(o);
-	     else if (!strcmp(onshow, "lower")) evas_object_lower(o);		 
+	     if (!strcmp(onshow, "raise")) {
+			 	evas_object_raise(o2);
+				evas_object_raise(o1);
+	     	}
+	     else if (!strcmp(onshow, "lower")) {
+				evas_object_lower(o2);
+				evas_object_lower(o1);
+	     	}
 	  }
-     }
+    }
 }
+
 
 static void
 _move(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
@@ -238,10 +304,13 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 			}
 		if(it->item_style) eina_stringshare_del(it->item_style);
 		if(it->title_obj) evas_object_del(it->title_obj);
-	     evas_object_del(it->base);
-	     _eval_top(it->obj, EINA_FALSE);
-	     free(it);
-	     return;
+		if(it->icon) evas_object_del(it->icon);
+		evas_object_del(it->t_base);
+		evas_object_del(it->ct_base);
+		evas_object_del(it->base);
+		_eval_top(it->obj);
+		free(it);
+		return;
 	  }
      }
 }
@@ -264,10 +333,14 @@ _signal_hide_finished(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    Elm_Navigationbar_ex_Item *it = data;
    Evas_Object *obj2 = it->obj;
    Widget_Data *wd = elm_widget_data_get(it->obj);
+   evas_object_hide(it->t_base);
+   evas_object_hide(it->ct_base);
    evas_object_hide(it->base);
-   edje_object_signal_emit(it->base, "elm,action,reset", "elm");
+	edje_object_signal_emit(it->t_base, "elm,action,reset", "elm");
+	edje_object_signal_emit(it->ct_base, "elm,action,reset", "elm");
    evas_object_smart_callback_call(obj2, "hide,finished", it->content);
-   edje_object_message_signal_process(it->base);
+   edje_object_message_signal_process(it->t_base);	 
+   edje_object_message_signal_process(it->ct_base);
    if(it->popme)
    	{
    		if(wd->del_on_pop)
@@ -295,7 +368,7 @@ static void _item_promote(Elm_Navigationbar_ex_Item* item)
 	  {
 	     wd->stack = eina_list_remove_list(wd->stack, l);
 	     wd->stack = eina_list_append(wd->stack, it);
-	     _eval_top(it->obj, EINA_FALSE);
+	     _eval_top(it->obj);
 	     return;
 	  }
      }
@@ -323,8 +396,11 @@ _process_deletions(Widget_Data *wd)
 				}
 			if(it->title_obj) evas_object_del(it->title_obj);		
 			if(it->content)  evas_object_del(it->content);
+			if(it->icon) evas_object_del(it->icon);
+			evas_object_del(it->t_base);
+			evas_object_del(it->ct_base);
 			evas_object_del(it->base);
-			_eval_top(it->obj, EINA_FALSE);
+			_eval_top(it->obj);
 			free(it);
 			it = NULL;
 		}	
@@ -354,7 +430,7 @@ elm_navigationbar_ex_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
-
+   elm_widget_can_focus_set(obj, EINA_FALSE);
    wd->clip = evas_object_rectangle_add(e);
    elm_widget_resize_object_set(obj, wd->clip);
    elm_widget_sub_object_add(obj, wd->clip);
@@ -401,29 +477,47 @@ elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const cha
    it->obj = obj;
    it->content = content;
    it->base = edje_object_add(evas_object_evas_get(obj));
+   it->ct_base = edje_object_add(evas_object_evas_get(obj));
+   it->t_base = edje_object_add(evas_object_evas_get(obj));
+
    evas_object_smart_member_add(it->base, obj);
+   evas_object_smart_member_add(it->ct_base, obj);
+   evas_object_smart_member_add(it->t_base, obj);
+	 
    evas_object_geometry_get(obj, &x, &y, &w, &h);
    evas_object_move(it->base, x, y);
    evas_object_resize(it->base, w, h);
    evas_object_clip_set(it->base, wd->clip);
-   elm_widget_sub_object_add(obj, it->base);
-   elm_widget_sub_object_add(obj, it->content);
-   strncpy(buf, "item/", sizeof(buf));
+	 
+	elm_widget_sub_object_add(obj, it->base);
+	elm_widget_sub_object_add(obj, it->ct_base);
+	elm_widget_sub_object_add(obj, it->t_base);
+
+	elm_widget_sub_object_add(obj, it->content);
+
+	_elm_theme_object_set(obj, it->base,  "navigationbar_ex", "base", elm_widget_style_get(obj));
+	_elm_theme_object_set(obj, it->ct_base,  "navigationbar_ex", "content", elm_widget_style_get(obj));
+
+	strncpy(buf, "item/", sizeof(buf));
    strncat(buf, item_style, sizeof(buf) - strlen(buf));
    if (!eina_stringshare_replace(&it->item_style, item_style)) return NULL;
-   
-   _elm_theme_object_set(obj, it->base,  "navigationbar_ex", buf, elm_widget_style_get(obj));
-   edje_object_signal_callback_add(it->base, "elm,action,hide,finished", "", 
-                                   _signal_hide_finished, it);
-   evas_object_event_callback_add(it->content,
-                                  EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				  _changed_size_hints, it);
-   edje_object_part_swallow(it->base, "elm.swallow.content", it->content);
+   _elm_theme_object_set(obj, it->t_base,  "navigationbar_ex", buf, elm_widget_style_get(obj));
+
+
+	edje_object_part_swallow(it->base, "elm.swallow.title", it->t_base);
+	edje_object_part_swallow(it->base, "elm.swallow.content", it->ct_base);
+
+	edje_object_signal_callback_add(it->ct_base, "elm,action,hide,finished", "", 
+	                             _signal_hide_finished, it);
+	evas_object_event_callback_add(it->content,
+	                            EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+		  _changed_size_hints, it);
+   edje_object_part_swallow(it->ct_base, "elm.swallow.content", it->content);
    edje_object_size_min_calc(it->base, &it->minw, &it->minh);
    evas_object_data_set(it->base, "_elm_leaveme", obj);
    evas_object_show(it->content);
    wd->stack = eina_list_append(wd->stack, it);
-   _eval_top(obj, EINA_TRUE);
+   _eval_top(obj);
    _sizing_eval(obj);
    return it;
 }
@@ -441,8 +535,14 @@ elm_navigationbar_ex_item_title_label_set( Elm_Navigationbar_ex_Item* item,
 {
 	if(!item) return;
 	if (!eina_stringshare_replace(&item->title, title)) return;
-   	if (item->base)
-     edje_object_part_text_set(item->base, "elm.text", item->title);	
+   	if (item->t_base)
+   	{
+   		if((item->title_obj)&&(item->title))
+			{
+				edje_object_signal_emit(item->base, "elm,state,extend,title", "elm");
+			}	
+    	 edje_object_part_text_set(item->t_base, "elm.text", item->title);	
+   	}
 }
 
 /**
@@ -474,8 +574,8 @@ elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item,
 {
 	if(!item) return;
 	if (!eina_stringshare_replace(&item->subtitle, subtitle)) return;
-   	if (item->base)
-     edje_object_part_text_set(item->base, "elm.text.sub", item->subtitle);	
+   	if (item->t_base)
+     edje_object_part_text_set(item->t_base, "elm.text.sub", item->subtitle);	
 }
 
 /**
@@ -498,9 +598,9 @@ EAPI void
 elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon)
 {
 	if(!item) return; 
-	edje_object_part_swallow(item->base, "elm.swallow.icon", icon);
+	edje_object_part_swallow(item->t_base, "elm.swallow.icon", icon);
 	elm_widget_sub_object_add(item->obj, icon);
-	edje_object_signal_emit(item->base, "elm,state,icon,visible", "elm");
+	edje_object_signal_emit(item->t_base, "elm,state,icon,visible", "elm");
 	item->icon = icon;
 }
 
@@ -563,7 +663,7 @@ elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char
 		elm_button_icon_set(btn, icon);
 	elm_object_focus_allow_set(btn, EINA_FALSE); 
 	evas_object_smart_callback_add(btn, "clicked", func, data);
-	edje_object_part_swallow(item->base, buf, btn);
+	edje_object_part_swallow(item->t_base, buf, btn);
 	elm_widget_sub_object_add(item->obj, btn);
 	btn_det->btn = btn;
 	btn_det->btn_id = button_type;
@@ -613,7 +713,7 @@ elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, in
 	 			{
 	 				btn_ret = btn_det->btn;
 					elm_widget_sub_object_del(item->obj,btn_det->btn);
-					edje_object_part_unswallow(item->base,btn_det->btn);	
+					edje_object_part_unswallow(item->t_base,btn_det->btn);	
 					item->fnbtn_list = eina_list_remove_list(item->fnbtn_list, bl);
 					btn_det->btn = NULL;
 					return btn_ret;
@@ -638,8 +738,12 @@ elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item,
 	item->title_obj = title_obj;
 	if(title_obj)
 		{
+			if((item->title_obj)&&(item->title))
+				{
+					edje_object_signal_emit(item->base, "elm,state,extend,title", "elm");
+				}			
 			elm_widget_sub_object_add(item->obj,title_obj);
-			edje_object_part_swallow(item->base, "elm.swallow.title", title_obj);
+			edje_object_part_swallow(item->t_base, "elm.swallow.title", title_obj);
 		}
 	_sizing_eval(item->obj);
 }
@@ -680,7 +784,7 @@ elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item)
 	if(!item->title_obj) return NULL; 
 	title_obj = item->title_obj;
 	elm_widget_sub_object_del(item->obj,item->title_obj);
-	edje_object_part_unswallow(item->base,item->title_obj);	
+	edje_object_part_unswallow(item->t_base,item->title_obj);	
 	item->title_obj = NULL;
 	return title_obj;
 }
@@ -769,11 +873,11 @@ elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char*
 	strncpy(buf, "item/", sizeof(buf));
 	strncat(buf, item_style, sizeof(buf) - strlen(buf));
 	if (!eina_stringshare_replace(&item->item_style, item_style)) return;
-	_elm_theme_object_set(item->obj, item->base,  "navigationbar_ex", buf, elm_widget_style_get(item->obj));
+	_elm_theme_object_set(item->obj, item->t_base,  "navigationbar_ex", buf, elm_widget_style_get(item->obj));
 	if(item->title)
-		edje_object_part_text_set(item->base, "elm.text", item->title);
+		edje_object_part_text_set(item->t_base, "elm.text", item->title);
 	if(item->subtitle)
-		edje_object_part_text_set(item->base, "elm.text.sub", item->subtitle);
+		edje_object_part_text_set(item->t_base, "elm.text.sub", item->subtitle);
 	if(item->fnbtn_list)
 		{
 			EINA_LIST_FOREACH(item->fnbtn_list, bl, btn_det)
@@ -839,7 +943,9 @@ EAPI void elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item)
    Eina_List *list;
    if (!wd) return;
    if (!wd->stack) return;
-   list = eina_list_last(wd->stack);
+	it = eina_list_last(wd->stack)->data;
+	it->popme = EINA_TRUE;
+	list = eina_list_last(wd->stack);
    if(list)
    	{
    		while(list)
@@ -856,7 +962,7 @@ EAPI void elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item)
 				list = list->prev;
    			}
    	}  
-    _eval_top(it->obj, EINA_FALSE);
+    _eval_top(it->obj);
 	if(wd->to_delete)
 		_process_deletions(wd);
 }
@@ -889,18 +995,28 @@ elm_navigationbar_ex_item_pop(Evas_Object *obj)
 	if (!ll)
 	  {
 	  	
-	     Evas_Object *o;
+	     Evas_Object *o, *o2;
 	     const char *onhide;
 
 	     wd->top = it;
-	     o = wd->top->base;
-		 
-	     edje_object_signal_emit(o, "elm,action,hide", "elm");
+		o = wd->top->ct_base;
+		o2 = wd->top->t_base; 	 
+
+		edje_object_signal_emit(o2, "elm,action,pop", "elm");
+		edje_object_signal_emit(o, "elm,action,pop", "elm");
 	     onhide = edje_object_data_get(o, "onhide");
 	     if (onhide)
 	       {
-		  if (!strcmp(onhide, "raise")) evas_object_raise(o);
-		  else if (!strcmp(onhide, "lower")) evas_object_lower(o);
+		  if (!strcmp(onhide, "raise")) 
+				{
+					evas_object_raise(o2);
+					evas_object_raise(o);
+		  		}
+		  else if (!strcmp(onhide, "lower")) 
+				{
+					evas_object_lower(o2);
+					evas_object_lower(o);
+		  		}
 	       }
 	     wd->top = NULL;
 	  }
@@ -951,6 +1067,23 @@ elm_navigationbar_ex_item_top_get(const Evas_Object *obj)
    if (!wd->stack) return NULL;
    it = eina_list_last(wd->stack)->data;
    return it;
+}
+
+/**
+ * This disables content animation on push/pop.
+ *
+ * @param obj The navigationbar_ex object
+ * @param disable  if EINA_TRUE animation is disabled.
+ *
+ * @ingroup Navigationbar_ex
+ */
+EAPI void
+elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, 
+							Eina_Bool disable)
+{
+	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
+	Widget_Data *wd = elm_widget_data_get(obj);
+	wd->disable_animation = disable;
 }
 
 

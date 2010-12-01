@@ -804,6 +804,21 @@ void _label_sliding_change(Evas_Object *obj)
 	   fprintf(stderr, "ERR: elm_label dosen't support multiline sliding effect!!!\n");
 	   fprintf(stderr, "ERR: elm_label dosen't support multiline sliding effect!!!\n");
 	   fprintf(stderr, "ERR: elm_label dosen't support multiline sliding effect!!!\n");
+	   return;
+   }
+
+   char *plaintxt = _mkup_to_text(edje_object_part_text_get(wd->lbl, "elm.text"));
+   int plainlen = 0;
+   if (plaintxt != NULL)
+   {
+	   plainlen = strlen(plaintxt);
+       free(plaintxt);
+   }
+   if (plainlen < 1) 
+   {
+	   wd->slidingmode = EINA_TRUE;
+	   fprintf(stderr, "ERR: too short to slide label!!!\n");
+	   return;
    }
 
    if (wd->slidingmode)
