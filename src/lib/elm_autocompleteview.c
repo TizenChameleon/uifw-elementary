@@ -35,11 +35,11 @@ static void _editfield_clicked_cb(void *data, Evas_Object *obj, void *event_info
 static void _entry_changed_cb(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   char *text=NULL;
-   int textlen=0;
-   char *real=NULL,*res=NULL;
+   const char *text = NULL;
+   int textlen = 0;
+   char *real = NULL,*res = NULL;
    Eina_List *l;
-   Eina_Bool textfound=EINA_FALSE;
+   Eina_Bool textfound = EINA_FALSE;
    if(!wd) return;
    if (elm_widget_disabled_get(data)) return;
    if(wd->text_set)
@@ -110,7 +110,6 @@ _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_min_set(obj, minw, minh);
    evas_object_size_hint_max_set(obj, maxw, maxh);
 }
-
 
 static void
 _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
@@ -225,7 +224,6 @@ EAPI Evas_Object *
 elm_autocompleteview_entry_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if(!wd) return NULL;
 
    return wd->entry;
@@ -243,7 +241,6 @@ EAPI Evas_Object *
 elm_autocompleteview_editfield_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if(!wd) return NULL;
 
    return wd->editfield;
@@ -263,8 +260,8 @@ EAPI void
 elm_autocompleteview_threshold_set(Evas_Object *obj, int threshold)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if(!wd) return;
+
    if(threshold <=0)
      {
         wd->threshold = 1;
@@ -288,8 +285,8 @@ EAPI int
 elm_autocompleteview_threshold_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if(!wd) return -1;
+
    return wd->threshold;
 }
 
@@ -306,7 +303,6 @@ EAPI void
 elm_autocompleteview_data_set(Evas_Object *obj, Eina_List *data_list)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if(!wd) return;
 
    wd->data_list = data_list;
@@ -329,7 +325,6 @@ EAPI void
 elm_autocompleteview_match_func_set(Evas_Object *obj, elmautocompleteview_matchfunction func,void *data)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if(!wd) return;
 
    wd->func = func;
@@ -348,7 +343,6 @@ EAPI void
 elm_autocompleteview_text_update(Evas_Object *obj, char *text)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if(!wd) return;
 
    if(text!=NULL)

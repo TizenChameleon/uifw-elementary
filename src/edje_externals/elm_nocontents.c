@@ -57,8 +57,6 @@ static void *
 external_nocontents_params_parse(void *data, Evas_Object *obj, const Eina_List *params)
 {
    Elm_Params_Nocontents *mem;
-   Edje_External_Param *param;
-   const Eina_List *l;
 
    mem = external_common_params_parse(Elm_Params_Nocontents, data, obj, params);
    if (!mem)
@@ -77,7 +75,6 @@ static Evas_Object *external_nocontents_content_get(void *data __UNUSED__,
 static void
 external_nocontents_params_free(void *params)
 {
-Elm_Params_Nocontents *mem = params;
    external_common_params_free(params);
 }
 

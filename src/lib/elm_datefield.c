@@ -1119,7 +1119,7 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 EAPI Eina_Bool
 elm_datefield_time_mode_get(const Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
 	Widget_Data *wd = elm_widget_data_get(obj);
 	
 	if (!wd) return EINA_FALSE;
@@ -1171,7 +1171,7 @@ elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
 EAPI const char *
 elm_datefield_date_format_get(const Evas_Object *obj)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype);
+	ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 	Widget_Data *wd = elm_widget_data_get(obj);
 
 	switch (wd->date_format)

@@ -1081,7 +1081,7 @@ EAPI void
 elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, 
 							Eina_Bool disable)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
+	ELM_CHECK_WIDTYPE(obj, widtype);
 	Widget_Data *wd = elm_widget_data_get(obj);
 	wd->disable_animation = disable;
 }

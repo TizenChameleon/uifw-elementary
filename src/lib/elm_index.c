@@ -699,7 +699,7 @@ static int
 _group_count(Evas_Object *obj, int extraIndex, int adj_pos, int vis_pos)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   if (!wd) return 0;
    int group_count = MIN_GRP_SIZE;
    while(group_count <= wd->max_grp_size)
      {
@@ -710,8 +710,9 @@ _group_count(Evas_Object *obj, int extraIndex, int adj_pos, int vis_pos)
 	else
 	  return wd->max_grp_size;
 
-	group_count+=MIN_GRP_SIZE;
+	group_count += MIN_GRP_SIZE;
      }
+   return group_count;
 }
 static void
 _index_process(Evas_Object *obj)
