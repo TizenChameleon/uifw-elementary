@@ -1915,7 +1915,7 @@ _item_block_position(Item_Block *itb, int in)
    int vis=0;
    int is_reorder = 0;
    Elm_Genlist_GroupItem *git = NULL;
-   Elm_Genlist_Item *select_all_item;
+   Elm_Genlist_Item *select_all_item = NULL;
 
    evas_object_geometry_get(itb->wd->pan_smart, &ox, &oy, &ow, &oh);
    evas_output_viewport_get(evas_object_evas_get(itb->wd->obj), &cvx, &cvy, &cvw, &cvh);
@@ -6375,7 +6375,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
 
    Item_Block *itb;
    Evas_Object *editfield;
-   Evas_Object *entry;
+   Evas_Object *entry = NULL;
    int edit_field_cnt = 0;
    Evas_Object *icon;   
 
