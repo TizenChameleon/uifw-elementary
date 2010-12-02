@@ -175,7 +175,7 @@ _get_value_in_key_string(const char *oldstring, char *key, char **value)
 
         firstindex = abs(oldstring - curlocater);
         firstindex += strlen(key)+1; // strlen("key") + strlen("=")
-        *value = (char*)oldstring + firstindex;
+        *value = (char*)(oldstring + firstindex);
 
         while (oldstring != starttag)
           {
@@ -268,7 +268,7 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int
                  replocater++;
 			   }
 
-                while (*replocater != NULL && *replocater != ' ' && *replocater != '>')
+                while (replocater != NULL && *replocater != ' ' && *replocater != '>')
                   replocater++;
 
                if (replocater-curlocater > strlen(key)+1)
@@ -620,8 +620,8 @@ _ellipsis_cut_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
    edje_object_part_geometry_get(wd->lbl,"elm.text", NULL, NULL, &w, &h);
    if (w <= 0)
 	   return EINA_FALSE;
-   tc1 = evas_object_textblock_cursor_new(edje_object_part_object_get(wd->lbl, "elm.text"));
-   tc2 = evas_object_textblock_cursor_new(edje_object_part_object_get(wd->lbl, "elm.text"));
+   tc1 = evas_object_textblock_cursor_new((Evas_Object*)edje_object_part_object_get(wd->lbl, "elm.text"));
+   tc2 = evas_object_textblock_cursor_new((Evas_Object*)edje_object_part_object_get(wd->lbl, "elm.text"));
    
    if (wd->wrap_w > 0 && wd->wrap_w < w)
 	   limitw = wd->wrap_w;
@@ -682,8 +682,8 @@ _ellipsis_cut_lines_to_widget(Evas_Object *obj, int fontsize, int linemode)
 
    edje_object_part_geometry_get(wd->lbl,"elm.text", NULL, NULL, &w, &h);
 
-   tc1 = evas_object_textblock_cursor_new(edje_object_part_object_get(wd->lbl, "elm.text"));
-   tc2 = evas_object_textblock_cursor_new(edje_object_part_object_get(wd->lbl, "elm.text"));
+   tc1 = evas_object_textblock_cursor_new((Evas_Object*)edje_object_part_object_get(wd->lbl, "elm.text"));
+   tc2 = evas_object_textblock_cursor_new((Evas_Object*)edje_object_part_object_get(wd->lbl, "elm.text"));
    // goto last paragraph
    while (evas_textblock_cursor_paragraph_next(tc2) == EINA_TRUE)
 	   ;
@@ -728,7 +728,7 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
    if (!wd) return;
 
    int cur_fontsize = 0;
-   char **kvalue = NULL;
+   char *kvalue;
    const char *minfont, *deffont, *maxfont;
    int minfontsize, maxfontsize;
 
@@ -746,8 +746,10 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
 
    if (_get_value_in_key_string(wd->label, "font_size", &kvalue) == 0)
      {
-       if (*kvalue != NULL) cur_fontsize = atoi((char*)kvalue);
+       if (kvalue != NULL) cur_fontsize = atoi(kvalue);
+	   fprintf(stderr, "## cur_fontsize = %d\n", cur_fontsize);
      }
+
 
    while (_is_width_over(obj, linemode))
      {
@@ -775,7 +777,7 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
 }
 
 /*
- * setting internal state of mulitline label
+ * setting internal state of mulitline label.
  * singleline doesn't need it
  */
 
