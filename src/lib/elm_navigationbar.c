@@ -1164,6 +1164,8 @@ _elm_navigationbar_function_button3_set(Evas_Object *obj,
 		it = ll->data;
 		if (it->fn_btn3 && changed && (it->content == content)) 
 			{
+				edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
+				edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
 				edje_object_part_swallow(wd->base, "elm.swallow.btn3", it->fn_btn3);
 			}
 	}
