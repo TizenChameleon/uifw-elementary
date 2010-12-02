@@ -339,8 +339,6 @@ _item_del(Elm_Controlbar_Item *it)
      evas_object_del(it->edit_item);
    if (it->view)
      {
-	if(it->selected)
-	  elm_layout_content_unset(wd->view, "elm.swallow.view");
 	evas_object_hide(it->view);
      }
 }
@@ -360,6 +358,7 @@ _del_hook(Evas_Object * obj)
       free(item);
       item = NULL;
    }
+   /*
    if (wd->view)
      {
 	content = elm_layout_content_unset(wd->view, "elm.swallow.view");
@@ -372,6 +371,7 @@ _del_hook(Evas_Object * obj)
 	evas_object_del(wd->edit_box);
 	wd->edit_box = NULL;
      }
+	 */
    if (wd->navigation)
      {
 	evas_object_del(wd->navigation);
@@ -382,6 +382,7 @@ _del_hook(Evas_Object * obj)
 	evas_object_del(wd->bg);
 	wd->bg = NULL;
      }
+   /*
    if (wd->edje)
      {
 	evas_object_del(wd->edje);
@@ -412,6 +413,7 @@ _del_hook(Evas_Object * obj)
 	evas_object_del(wd->event_box);
 	wd->event_box = NULL;
      }
+	 */
    if (wd->xa)
      {
 	elm_xml_animator_del(wd->xa);
@@ -487,23 +489,16 @@ _theme_hook(Evas_Object * obj)
 static void 
 _sub_del(void *data, Evas_Object * obj, void *event_info) 
 {
-   Widget_Data * wd = elm_widget_data_get(obj);
-   
-      //Evas_Object *sub = event_info;
-      if (!wd)
-      return;
-   
-      /*
-       * if (sub == wd->icon)
-       * {
-       * edje_object_signal_emit(wd->btn, "elm,state,icon,hidden", "elm");
-       * evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-       * _changed_size_hints, obj);
-       * wd->icon = NULL;
-       * edje_object_message_signal_process(wd->btn);
-       * _sizing_eval(obj);
-       * }
-       */ 
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *sub = event_info;
+   Evas_Object *content;
+   if (!wd) return;
+
+   if (sub == wd->view)
+     {
+        content = elm_layout_content_unset(wd->view, "elm.swallow.view");
+	evas_object_hide(content);
+     }
 }
 
 static void 
@@ -2448,17 +2443,17 @@ create_more_item(Widget_Data *wd, int style)
    evas_object_repeat_events_set(wd->event_box, EINA_TRUE);
    evas_object_show(wd->event_box);
 
-      //FIXME
-      //      evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-   evas_object_smart_member_add(wd->view, obj);
-   evas_object_smart_member_add(wd->edit_box, obj);
+   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
+   
+   elm_widget_sub_object_add(obj, wd->view);
+   elm_widget_sub_object_add(obj, wd->edit_box);
    elm_widget_resize_object_set(obj, wd->edje);
-   evas_object_smart_member_add(wd->focused_box, obj);
-   evas_object_smart_member_add(wd->focused_box_left, obj);
-   evas_object_smart_member_add(wd->focused_box_right, obj);
-   evas_object_smart_member_add(wd->box, obj);
-   evas_object_smart_member_add(wd->event_box, obj);
-
+   elm_widget_sub_object_add(obj, wd->focused_box);
+   elm_widget_sub_object_add(obj, wd->focused_box_left);
+   elm_widget_sub_object_add(obj, wd->focused_box_right);
+   elm_widget_sub_object_add(obj, wd->box);
+   elm_widget_sub_object_add(obj, wd->event_box);
+      
    _sizing_eval(obj);
    return obj;
 }
