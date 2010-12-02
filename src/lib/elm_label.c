@@ -538,6 +538,7 @@ _is_width_over(Evas_Object *obj, int linemode)
 
    evas_object_geometry_get(obj, &vx, &vy, &vw, &vh);
 
+/*
    fprintf(stderr, "## _is_width_over\n");
    fprintf(stderr, "## x = %d, y = %d, w = %d, h = %d\n", x, y, w, h);
    fprintf(stderr, "## vx = %d, vy = %d, vw = %d, vh = %d\n", vx, vy, vw, vh);
@@ -546,6 +547,7 @@ _is_width_over(Evas_Object *obj, int linemode)
    else
 	   fprintf(stderr, "## wd->wrap_w = %d\n", wd->wrap_w);
    fprintf(stderr, "## check str = %s\n", edje_object_part_text_get(wd->lbl, "elm.text"));
+*/
 
    if (linemode == 0) // single line
      {
