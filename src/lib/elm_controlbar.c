@@ -2445,14 +2445,14 @@ create_more_item(Widget_Data *wd, int style)
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    
-   elm_widget_sub_object_add(obj, wd->view);
-   elm_widget_sub_object_add(obj, wd->edit_box);
+   evas_object_smart_member_add(wd->view, obj);
+   evas_object_smart_member_add(wd->edit_box, obj);
    elm_widget_resize_object_set(obj, wd->edje);
-   elm_widget_sub_object_add(obj, wd->focused_box);
-   elm_widget_sub_object_add(obj, wd->focused_box_left);
-   elm_widget_sub_object_add(obj, wd->focused_box_right);
-   elm_widget_sub_object_add(obj, wd->box);
-   elm_widget_sub_object_add(obj, wd->event_box);
+   evas_object_smart_member_add(wd->focused_box, obj);
+   evas_object_smart_member_add(wd->focused_box_left, obj);
+   evas_object_smart_member_add(wd->focused_box_right, obj);
+   evas_object_smart_member_add(wd->box, obj);
+   evas_object_smart_member_add(wd->event_box, obj);
       
    _sizing_eval(obj);
    return obj;
@@ -3138,8 +3138,8 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
    EAPI void
 elm_controlbar_item_select(Elm_Controlbar_Item * it) 
 {
-   if (it->obj == NULL)
-      return;
+   if (it == NULL) return;
+   if (it->obj == NULL) return;
    Widget_Data * wd = elm_widget_data_get(it->obj);
    if (wd == NULL)
       return;
