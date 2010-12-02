@@ -45,8 +45,6 @@ struct _Widget_Data
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _sub_del(void *data, Evas_Object *obj, void *event_info);
-
 
 static void _colorpalette_object_move(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _colorpalette_object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -90,14 +88,6 @@ _theme_hook(Evas_Object *obj)
    _color_table_update(obj, wd->row, wd->col, wd->num, wd->color);
    _sizing_eval(obj);
 
-}
-
-
-static void
-_sub_del(void *data, Evas_Object *obj, void *event_info)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
 }
 
 static void

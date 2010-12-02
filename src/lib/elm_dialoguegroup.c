@@ -38,7 +38,6 @@ static const char*widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _disable_hook(Evas_Object *obj);
 
 static void _remove_all(Evas_Object *obj);
 static void _set_item_theme(Dialogue_Item *item, const char *location);
@@ -80,12 +79,6 @@ _theme_hook(Evas_Object *obj)
    EINA_LIST_FOREACH(wd->items, l, item) 
       _change_item_bg( item, item->location );	
    _sizing_eval(obj);
-}
-
-static void
-_disable_hook(Evas_Object *obj)
-{
-
 }
 
 static void
