@@ -538,7 +538,6 @@ _is_width_over(Evas_Object *obj, int linemode)
 
    evas_object_geometry_get(obj, &vx, &vy, &vw, &vh);
 
-/*
    fprintf(stderr, "## _is_width_over\n");
    fprintf(stderr, "## x = %d, y = %d, w = %d, h = %d\n", x, y, w, h);
    fprintf(stderr, "## vx = %d, vy = %d, vw = %d, vh = %d\n", vx, vy, vw, vh);
@@ -547,7 +546,6 @@ _is_width_over(Evas_Object *obj, int linemode)
    else
 	   fprintf(stderr, "## wd->wrap_w = %d\n", wd->wrap_w);
    fprintf(stderr, "## check str = %s\n", edje_object_part_text_get(wd->lbl, "elm.text"));
-*/
 
    if (linemode == 0) // single line
      {
@@ -629,24 +627,33 @@ _ellipsis_cut_chars_to_widget(Evas_Object *obj, int fontsize, int linemode)
 	   limitw = w;
    evas_textblock_cursor_pos_set(tc1, 0);
    evas_textblock_cursor_char_coord_set(tc2, limitw, 0);
+
+   // if too small to cut,(is it bug? or any other reasons?)
+   // then fallback to one step mode
+   if (evas_textblock_cursor_pos_get(tc2) < minshowcount)
+   {
+	   int eolpos = evas_textblock_cursor_paragraph_text_length_get(tc1);
+	   Evas_Coord cx, cy, cw, ch;
+	   for (i = eolpos; i > minshowcount; i--)
+	   {
+		   evas_textblock_cursor_pos_set(tc2, i);
+		   evas_textblock_cursor_char_geometry_get(tc2, &cx, &cy, &cw, &ch);
+		   if (cx <= limitw)
+			   break;
+	   }
+
+	   if (evas_textblock_cursor_pos_get(tc2) < minshowcount)
+	   {
+		   evas_textblock_cursor_free(tc1);
+		   evas_textblock_cursor_free(tc2);
+	
+		   return EINA_FALSE;
+	   }
+   }
+
    for (i = 0; i <= minshowcount; i++)
 	   evas_textblock_cursor_char_prev(tc2);
    cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
-
-/*
-   int eolpos = evas_textblock_cursor_paragraph_text_length_get(tc1);
-   Evas_Coord cx, cy, cw, ch;
-   for (i = eolpos; i > minshowcount; i--)
-   {
-	   evas_textblock_cursor_pos_set(tc2, i);
-	   fprintf(stderr, "## tc2 = %d\n", evas_textblock_cursor_pos_get(tc2));
-	   evas_textblock_cursor_char_geometry_get(tc2, &cx, &cy, &cw, &ch);
-	   fprintf(stderr, "## limitw = %d\n", limitw);
-	   fprintf(stderr, "## cx = %d, cy = %d, cw = %d, ch = %d\n", cx, cy, cw, ch);
-	   if (cx <= limitw)
-		   break;
-   }
-*/
 
    // FIXME: consider other unicode encoding, currently only care about utf-8
    lencutstr = strlen(cutstr);
