@@ -750,7 +750,6 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
 	   fprintf(stderr, "## cur_fontsize = %d\n", cur_fontsize);
      }
 
-
    while (_is_width_over(obj, linemode))
      {
        if (cur_fontsize > minfontsize)

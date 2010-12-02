@@ -82,7 +82,7 @@ void _search_clipboard_window(Ecore_X_Window w)
 	int format;
 	unsigned long nitems;
 	unsigned long bytes_after;
-	unsigned long nsize;
+	unsigned long nsize = 0;
 	unsigned char *propName = 0;
 	if(Success == 
 	   XGetWindowProperty(cbhm_disp, w, atomWMName, 0, (long)nsize, False,
@@ -91,7 +91,7 @@ void _search_clipboard_window(Ecore_X_Window w)
 	{
 		if(propName != 0)
 		{
-			if (strcmp(CLIPBOARD_MANAGER_WINDOW_TITLE_STRING, propName) == 0)
+			if (strcmp((const char *)CLIPBOARD_MANAGER_WINDOW_TITLE_STRING,(const char *)propName) == 0)
 				cbhm_win = w;
 			XFree(propName);
 		}
@@ -133,7 +133,7 @@ int _send_clipboard_events(char *cmd)
 
 int _get_clipboard_data(Atom datom, char **datomptr)
 {
-	Atom atomUTF8String = XInternAtom(cbhm_disp, "UTF8_STRING", False);
+//	Atom atomUTF8String = XInternAtom(cbhm_disp, "UTF8_STRING", False);
 	Atom type;
 	int format;
 	unsigned long nitems;
@@ -150,8 +150,10 @@ int _get_clipboard_data(Atom datom, char **datomptr)
 	else
 		return -1;
 
+/*
 	fprintf(stderr, "## format = %d\n", format);
 	fprintf(stderr, "## nsize = %d\n", nsize);
+*/
 
 	if (format != 8)
 		return -1;
@@ -166,9 +168,9 @@ int _get_clipboard_data(Atom datom, char **datomptr)
 
 		if(propname != NULL)
 		{
-			fprintf(stderr, "## get data(0x%x) : %s\n", propname, propname);
-			fprintf(stderr, "## after nsize = %d\n", nsize);
-			*datomptr = propname;
+//			fprintf(stderr, "## get data(0x%x) : %s\n", propname, propname);
+//			fprintf(stderr, "## after nsize = %d\n", nsize);
+			*datomptr = (char*)propname;
 //			XFree(propName);
 		}
 
@@ -186,7 +188,8 @@ int _get_clipboard_data(Atom datom, char **datomptr)
 
 void free_clipboard_data(char *dptr)
 {
-	return XFree(dptr);
+	XFree(dptr);
+	return;
 }
 
 
@@ -351,8 +354,8 @@ elm_cbhm_get_data_by_position(int pos, char **dataptr)
 
 	if (ret >= 0 && *dataptr != NULL)
 	{
-		fprintf(stderr, "## d get retptr : %s\n", *dataptr);
-		fprintf(stderr, "## dptr = 0x%x\n", *dataptr);
+//		fprintf(stderr, "## d get retptr : %s\n", *dataptr);
+//		fprintf(stderr, "## dptr = 0x%x\n", *dataptr);
 
 		return 0;
 	}
