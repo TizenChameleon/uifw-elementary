@@ -106,6 +106,7 @@ _swallow_conformant_parts(Evas_Object *obj)
    sh = -1;
    ecore_x_e_illume_keyboard_geometry_get(zone, NULL, NULL, NULL, &sh);
    if (sh < 0) sh = 0;
+   wd->vkeypad_height = sh;
    if(!wd->virtualkeypad)
       wd->virtualkeypad= evas_object_rectangle_add(evas_object_evas_get(obj));
    evas_object_color_set(wd->virtualkeypad, 0, 0, 0, 0);
@@ -422,7 +423,7 @@ elm_conformant_add(Evas_Object *parent)
    wd->prop_hdl = ecore_event_handler_add(ECORE_X_EVENT_WINDOW_PROPERTY,
                                           _prop_change, obj);
 #ifdef HAVE_CONFORMANT_AUTOSCROLL
-   wd->vkeypad_state = ECORE_X_VIRTUAL_KEYBOARD_STATE_UNKNOWN;
+   wd->vkeypad_state = ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF;
 #endif
 #endif
 
