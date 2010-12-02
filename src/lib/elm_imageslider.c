@@ -109,7 +109,7 @@ static int _check_drag(int state, void *data);
 static void _check_zoom(void *data);
 static void _anim(Widget_Data *wd);
 static Eina_Bool _timer_cb(void *data);
-static void _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
+//static void _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void ev_imageslider_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void ev_imageslider_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void ev_imageslider_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -534,6 +534,7 @@ static void ev_imageslider_move_cb(void * data, Evas * e, Evas_Object * obj, voi
 
 }
 
+#if 0
 // Whenever CLICK event occurs, Call this API
 // But, DONOT emit CLICK event.
 // DO NOT use this callback function. Remove later.
@@ -542,7 +543,7 @@ _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *
 {
 	fprintf(stderr, "[[[ DEBUG ]]]: Call the callback function about Click event!, But DONOT emit CLICK event in the callback function!\n");
 }
-
+#endif
 
 static inline double time_get(Evas_Coord x, Evas_Coord w)
 {
@@ -790,7 +791,7 @@ elm_imageslider_add(Evas_Object * parent)
 	elm_widget_data_set(obj, wd);
 	//wd->parent = parent;
 	elm_widget_del_hook_set(obj, _del_hook);
-	//elm_widget_theme_hook_set(obj, _theme_hook);
+	elm_widget_theme_hook_set(obj, _theme_hook);
 
 	wd->clip = evas_object_rectangle_add(e);
 	
