@@ -747,7 +747,6 @@ _ellipsis_label_to_width(Evas_Object *obj, int linemode)
    if (_get_value_in_key_string(wd->label, "font_size", &kvalue) == 0)
      {
        if (kvalue != NULL) cur_fontsize = atoi(kvalue);
-	   fprintf(stderr, "## cur_fontsize = %d\n", cur_fontsize);
      }
 
    while (_is_width_over(obj, linemode))
