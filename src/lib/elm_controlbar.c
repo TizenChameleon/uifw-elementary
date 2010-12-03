@@ -923,6 +923,9 @@ item_exist_check(Widget_Data *wd, Elm_Controlbar_Item *item)
    const Eina_List *l;
    Elm_Controlbar_Item *it;
 
+   if(!wd) return EINA_FALSE;
+   if(!wd->items) return EINA_FALSE;
+
    EINA_LIST_FOREACH(wd->items, l, it)
      {
         if(it == item) return EINA_TRUE;
@@ -1375,14 +1378,14 @@ selected_box(Elm_Controlbar_Item * it)
         //	   evas_object_show(it->view);	   
 
    }else if(it->style == TOOLBAR){
+        edje_object_signal_emit(_EDJ(it->base), "elm,state,text_unselected", "elm");
         if (it->func)
           {
              it->func(it->data, it->obj, it);
           }
-        if(item_exist_check(wd, it)) edje_object_signal_emit(_EDJ(it->base), "elm,state,text_unselected", "elm");
    }
 
-   if(item_exist_check(wd, it)) evas_object_smart_callback_call(it->obj, "clicked", it);
+   //if(item_exist_check(wd, it)) evas_object_smart_callback_call(it->obj, "clicked", it);
 }
 
 static void
@@ -3140,6 +3143,7 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
 EAPI void
 elm_controlbar_item_select(Elm_Controlbar_Item * it) 
 {
+	printf("%s ::: %d\n", __func__, __LINE__);
    if (it == NULL) return;
    if (it->obj == NULL) return;
    Widget_Data * wd = elm_widget_data_get(it->obj);
