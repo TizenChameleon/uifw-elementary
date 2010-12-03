@@ -4377,6 +4377,46 @@ elm_genlist_longpress_timeout_get(const Evas_Object *obj)
    return wd->longpress_timeout;
 }
 
+/**
+ * Set the scrollbar policy
+ *
+ * This sets the scrollbar visibility policy for the given genlist scroller.
+ * ELM_SMART_SCROLLER_POLICY_AUTO means the scrollber is made visible if it
+ * is needed, and otherwise kept hidden. ELM_SMART_SCROLLER_POLICY_ON turns
+ * it on all the time, and ELM_SMART_SCROLLER_POLICY_OFF always keeps it off.
+ * This applies respectively for the horizontal and vertical scrollbars.
+ *
+ * @param obj The genlist object
+ * @param policy_h Horizontal scrollbar policy
+ * @param policy_v Vertical scrollbar policy
+ *
+ * @ingroup List
+ */
+EAPI void
+elm_genlist_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, Elm_Scroller_Policy policy_v)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if ((policy_h >= ELM_SCROLLER_POLICY_LAST) ||
+       (policy_v >= ELM_SCROLLER_POLICY_LAST))
+     return;
+   if (wd->scr)
+     elm_smart_scroller_policy_set(wd->scr, policy_h, policy_v);
+}
+
+EAPI void
+elm_genlist_scroller_policy_get(const Evas_Object *obj, Elm_Scroller_Policy *policy_h, Elm_Scroller_Policy *policy_v)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Elm_Smart_Scroller_Policy s_policy_h, s_policy_v;
+   if ((!wd) || (!wd->scr)) return;
+   elm_smart_scroller_policy_get(wd->scr, &s_policy_h, &s_policy_v);
+   if (policy_h) *policy_h = (Elm_Scroller_Policy) s_policy_h;
+   if (policy_v) *policy_v = (Elm_Scroller_Policy) s_policy_v;
+}
+
 // added for item moving animation.
 static Eina_Bool
 _group_item_contract_moving_effect_timer_cb(void *data)
@@ -6055,40 +6095,6 @@ elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after)
      }
    after->reorder_check = 0;
    _item_queue(it->wd, it);
-}
-
-/**
- * Set the Genlist Internal scroller scrollbar policy
- *
- * This sets the Genlist Internal scrollbar visibility policy.
- * ELM_SMART_SCROLLER_POLICY_AUTO means the scrollbar is made visible if it
- * is needed, and otherwise kept hidden. ELM_SMART_SCROLLER_POLICY_ON turns
- * it on all the time, and ELM_SMART_SCROLLER_POLICY_OFF always keeps it off.
- * This applies respectively for the horizontal and vertical scrollbars.
- *
- * @param obj The Genlist object
- * @param policy_h Horizontal scrollbar policy
- * @param policy_v Vertical scrollbar policy
- *
- * @ingroup Genlist
- */
-EAPI void
-elm_genlist_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, Elm_Scroller_Policy policy_v)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd)  return;
-
-   const Elm_Scroller_Policy map[3] =
-     {
-        ELM_SMART_SCROLLER_POLICY_AUTO,
-        ELM_SMART_SCROLLER_POLICY_ON,
-        ELM_SMART_SCROLLER_POLICY_OFF
-     };
-   if ((policy_h < 0) || (policy_h >= 3) || (policy_v < 0) || (policy_v >= 3))
-      return;
-
-   elm_smart_scroller_policy_set(wd->scr, map[policy_h], map[policy_v]);
 }
 
 EAPI void
