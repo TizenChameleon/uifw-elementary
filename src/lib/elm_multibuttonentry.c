@@ -44,6 +44,7 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data {
 	Evas_Object *base;
 	Evas_Object *box;
+	Evas_Object *rect;
 	Evas_Object *entry;
 	Evas_Object *label;
 	Evas_Object *guidetext;
@@ -101,6 +102,7 @@ _del_hook(Evas_Object *obj)
 	}
 	wd->current = NULL;
 
+	if(wd->rect) evas_object_del(wd->rect);
 	if(wd->entry) evas_object_del(wd->entry);
 	if(wd->label) evas_object_del(wd->label);
 	if(wd->guidetext) evas_object_del(wd->guidetext);
@@ -142,9 +144,16 @@ _sizing_eval(Evas_Object *obj)
 {
 	Widget_Data *wd = elm_widget_data_get(obj);
 	Evas_Coord minw = -1, minh = -1;
+	Evas_Coord left, right, top, bottom;
 	if (!wd) return;
 
 	evas_object_size_hint_min_get(wd->box, &minw, &minh);
+	edje_object_part_geometry_get(wd->base, "top.left.pad", NULL, NULL, &left, &top);
+	edje_object_part_geometry_get(wd->base, "bottom.right.pad", NULL, NULL, &right, &bottom);	
+
+	minw += (left + right);
+	minh += (top + bottom);
+	
 	evas_object_size_hint_min_set(obj, minw, minh);
 }
 
@@ -209,7 +218,7 @@ _contracted_state_set(Evas_Object *obj, int contracted)
 	elm_scrolled_entry_entry_set(wd->entry, "");
 
 	if(contracted == 1){		
-		Evas_Coord w=0, w_label=0;
+		Evas_Coord w=0, w_tmp=0;
 		
 		// unpack all items and entry
 		EINA_LIST_FOREACH(wd->items, l, item) {
@@ -226,10 +235,13 @@ _contracted_state_set(Evas_Object *obj, int contracted)
 		// pack buttons only 1line
 		w = wd->w_box;
 
+		// w -= w_rect
+		if(wd->rect) evas_object_geometry_get(wd->rect, NULL, NULL, &w_tmp, NULL);
+		w -= w_tmp;
+
 		// w -= w_label
-		if(wd->label) 
-			evas_object_geometry_get(wd->label, NULL, NULL, &w_label, NULL);
-		w -= w_label;
+		if(wd->label) evas_object_geometry_get(wd->label, NULL, NULL, &w_tmp, NULL);
+		w -= w_tmp;
 
 		// w -= w_btns		
 		item = NULL;
@@ -364,7 +376,10 @@ _set_label(Evas_Object *obj, const char* str)
 		elm_label_text_align_set(wd->label, "left");
 		evas_object_size_hint_weight_set(wd->label, 0.0, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->label, EVAS_HINT_FILL, EVAS_HINT_FILL);
-		if(wd->box)	elm_box_pack_start(wd->box, wd->label);
+		if(wd->box){
+			if(wd->rect) elm_box_pack_after(wd->box, wd->label, wd->rect);
+			else elm_box_pack_start(wd->box, wd->label);
+		}
 		evas_object_show(wd->label);
 	}
 
@@ -667,6 +682,19 @@ _view_init(Evas_Object *obj)
 		edje_object_part_swallow(wd->base, "box.swallow", wd->box);
 	}
 	
+	if(!wd->rect){
+		Evas_Coord w, h;
+		if(!(wd->rect = edje_object_add(evas_object_evas_get(obj)))) return;
+		_elm_theme_object_set(obj, wd->rect, "multibuttonentry", "rect", elm_widget_style_get(obj));
+		elm_widget_sub_object_add(obj, wd->rect);
+		edje_object_part_geometry_get(wd->rect, "elm.base", NULL, NULL, &w, &h);
+		evas_object_size_hint_min_set(wd->rect, w, h);		
+		evas_object_size_hint_weight_set(wd->rect, 0.0, EVAS_HINT_EXPAND);
+		evas_object_size_hint_align_set(wd->rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
+		if(wd->box)	elm_box_pack_start(wd->box, wd->rect);
+		evas_object_show(wd->rect);
+	}
+	
 	if(!wd->entry){
 		if(!(wd->entry = elm_scrolled_entry_add(obj))) return;
 		elm_scrolled_entry_single_line_set(wd->entry, EINA_TRUE);
@@ -676,7 +704,7 @@ _view_init(Evas_Object *obj)
 		evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_UP, _evas_key_up_cb, obj);
 		evas_object_size_hint_weight_set(wd->entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 		evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
-		elm_box_pack_end(wd->box, wd->entry);
+		if(wd->box)	elm_box_pack_end(wd->box, wd->entry);
 		evas_object_show(wd->entry);
 	}
 
