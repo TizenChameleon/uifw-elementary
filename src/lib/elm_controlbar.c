@@ -3143,7 +3143,6 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
 EAPI void
 elm_controlbar_item_select(Elm_Controlbar_Item * it) 
 {
-	printf("%s ::: %d\n", __func__, __LINE__);
    if (it == NULL) return;
    if (it->obj == NULL) return;
    Widget_Data * wd = elm_widget_data_get(it->obj);
