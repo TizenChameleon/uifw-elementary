@@ -2596,7 +2596,7 @@ elm_genlist_add(Evas_Object *parent)
    wd->mode = ELM_LIST_SCROLL;
    wd->max_items_per_block = MAX_ITEMS_PER_BLOCK;
    wd->max_items_per_block = 32;
-   wd->longpress_timeout = LONGPRESS_TIMEOUT;
+   wd->longpress_timeout = elm_longpress_timeout_get();
 	wd->max_git_num = 0;
 
    evas_object_smart_callback_add(obj, "scroll-hold-on", _hold_on, obj);

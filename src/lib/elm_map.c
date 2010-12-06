@@ -1215,7 +1215,7 @@ _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
      evas_object_smart_callback_call(data, SIG_PRESS, ev);
    wd->longpressed = EINA_FALSE;
    if (wd->long_timer) ecore_timer_del(wd->long_timer);
-   wd->long_timer = ecore_timer_add(2.0, _long_press, data);
+   wd->long_timer = ecore_timer_add(elm_longpress_timeout_get(), _long_press, data);
 }
 
 static void
