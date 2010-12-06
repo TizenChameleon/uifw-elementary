@@ -51,7 +51,6 @@ struct _Elm_Segment_Item
 char **_split(const char *string, char *delim);
 static void _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info);
 static void _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _signal_segment_selected(void *data);
 static void _signal_segment_on(void *data);
 static void _signal_segment_off(void *data);
 static void _theme_hook(Evas_Object *obj);
