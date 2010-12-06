@@ -288,6 +288,8 @@ elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegrou
         //		_set_line_show(item, new_item);
    }
    elm_box_pack_end(wd->box, new_item->bg_layout);
+   if(style == ELM_DIALOGUEGROUP_ITEM_STYLE_SUB)
+      edje_object_signal_emit(elm_layout_edje_get(new_item->bg_layout), "flip_item", "");
    wd->items = eina_list_append(wd->items, new_item);			
    wd->num++;
    _sizing_eval(obj);
@@ -332,6 +334,8 @@ elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegro
       elm_box_pack_after(wd->box, new_item->bg_layout, wd->title_layout);	
    else			
       elm_box_pack_start(wd->box, new_item->bg_layout);		
+   if(style == ELM_DIALOGUEGROUP_ITEM_STYLE_SUB) 
+                  edje_object_signal_emit(elm_layout_edje_get(new_item->bg_layout), "flip_item", "");
    wd->items = eina_list_prepend(wd->items, new_item);		
    wd->num++;
    _sizing_eval(obj);
@@ -371,8 +375,9 @@ elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_I
                   _change_item_bg(after_item, "middle");
                   item = _create_item(obj, subobj, style, "bottom");		
              }
-
              elm_box_pack_after(wd->box, item->bg_layout, after_item->bg_layout);
+             if(style == ELM_DIALOGUEGROUP_ITEM_STYLE_SUB) 
+                  edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "flip_item", "");
              wd->items = eina_list_append_relative(wd->items, item, after_item);
              //	_set_line_show(after, item);
         }		
@@ -423,6 +428,8 @@ elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_
                   //	_set_line_show(prev->data, item);
              }
              elm_box_pack_before(wd->box, item->bg_layout, before_item->bg_layout);
+             if(style == ELM_DIALOGUEGROUP_ITEM_STYLE_SUB) 
+                  edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "flip_item", "");
              wd->items = eina_list_prepend_relative(wd->items, item, before_item);
         }		
    }
