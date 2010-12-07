@@ -15,15 +15,15 @@ struct _Widget_Data
 
    struct
      {
-	Evas_Object *left;
-	Evas_Object *right;
+        Evas_Object *left;
+        Evas_Object *right;
      } contents;
 
    struct
      {
-	int x_diff;
-	int y_diff;
-	Eina_Bool move;
+        int x_diff;
+        int y_diff;
+        Eina_Bool move;
      } move;
 
    Eina_Bool clicked_double;
@@ -93,17 +93,16 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
    if (!wd) return;
    if (sub == wd->contents.left)
      {
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                             _changed_size_hints, obj);
-	wd->contents.left = NULL;
-	_sizing_eval(obj);
+        wd->contents.left = NULL;
+        _sizing_eval(obj);
      }
    else if (sub == wd->contents.right)
      {
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                            _changed_size_hints, obj);
-	wd->contents.right= NULL;
-	_sizing_eval(obj);
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+        wd->contents.right= NULL;
+       _sizing_eval(obj);
      }
 }
 
@@ -135,8 +134,8 @@ _unpress(void *data, Evas_Object *obj __UNUSED__ , const char *emission __UNUSED
 
    if (wd->clicked_double)
      {
-	evas_object_smart_callback_call(data, "clicked,double", NULL);
-	wd->clicked_double = EINA_FALSE;
+        evas_object_smart_callback_call(data, "clicked,double", NULL);
+        wd->clicked_double = EINA_FALSE;
      }
 }
 
@@ -154,6 +153,8 @@ elm_panes_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
+
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
@@ -211,16 +212,16 @@ elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (wd->contents.left)
      {
-	evas_object_del(wd->contents.left);
-	wd->contents.left = NULL;
+        evas_object_del(wd->contents.left);
+        wd->contents.left = NULL;
      }
    if (content)
      {
-	elm_widget_sub_object_add(obj, content);
-	wd->contents.left = content;
-	edje_object_part_swallow(wd->panes, "elm.swallow.left", content);
-	if (wd->contents.right)
-	   edje_object_signal_emit(wd->panes, "panes_pair", "elm");
+        elm_widget_sub_object_add(obj, content);
+        wd->contents.left = content;
+        edje_object_part_swallow(wd->panes, "elm.swallow.left", content);
+        if (wd->contents.right)
+          edje_object_signal_emit(wd->panes, "panes_pair", "elm");
      }
    else
       edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
@@ -245,19 +246,19 @@ elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (wd->contents.right)
      {
-	evas_object_del(wd->contents.right);
-	wd->contents.right = NULL;
+        evas_object_del(wd->contents.right);
+        wd->contents.right = NULL;
      }
    if (content)
      {
-	elm_widget_sub_object_add(obj, content);
-	wd->contents.right = content;
-	edje_object_part_swallow(wd->panes, "elm.swallow.right", content);
-	if (wd->contents.left)
-	  edje_object_signal_emit(wd->panes, "panes_pair", "elm");
+        elm_widget_sub_object_add(obj, content);
+        wd->contents.right = content;
+        edje_object_part_swallow(wd->panes, "elm.swallow.right", content);
+        if (wd->contents.left)
+          edje_object_signal_emit(wd->panes, "panes_pair", "elm");
      }
    else
-      edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
+     edje_object_signal_emit(wd->panes, "panes_unpair", "elm");
 }
 
 /**
@@ -314,10 +315,9 @@ elm_panes_content_left_unset(Evas_Object *obj)
    Evas_Object *content = NULL;
 
    wd = elm_widget_data_get(obj);
-
-   content = edje_object_part_swallow_get(wd->panes, "elm.swallow.left");
-   if (!content)
-     return NULL;
+   if (!wd) return NULL;
+   if (!wd->contents.left) return NULL;
+   content = wd->contents.left;
    edje_object_part_unswallow(wd->panes, content);
    elm_widget_sub_object_del(obj, content);
    evas_object_hide(content);
@@ -344,10 +344,10 @@ elm_panes_content_right_unset(Evas_Object *obj)
    Evas_Object *content = NULL;
 
    wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (!wd->contents.right) return NULL;
 
-   content = edje_object_part_swallow_get(wd->panes, "elm.swallow.right");
-   if (!content)
-     return NULL;
+   content = wd->contents.right;
    edje_object_part_unswallow(wd->panes, content);
    elm_widget_sub_object_del(obj, content);
    evas_object_hide(content);

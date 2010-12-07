@@ -482,7 +482,7 @@ struct _Elm_Genlist_GroupItem
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
-//static void _show_region_hook(void *data, Evas_Object *obj);
+static void _show_region_hook(void *data, Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _item_unrealize(Elm_Genlist_Item *it);
 static void _item_block_unrealize(Item_Block *itb);
@@ -553,7 +553,6 @@ _theme_hook(Evas_Object *obj)
    _sizing_eval(obj);
 }
 
-/*
 static void
 _show_region_hook(void *data, Evas_Object *obj)
 {
@@ -561,9 +560,11 @@ _show_region_hook(void *data, Evas_Object *obj)
    Evas_Coord x, y, w, h;
    if (!wd) return;
    elm_widget_show_region_get(obj, &x, &y, &w, &h);
+   //x & y are screen coordinates, Add with pan coordinates
+   x += wd->pan_x;
+   y += wd->pan_y;
    elm_smart_scroller_child_region_show(wd->scr, x, y, w, h);
 }
-*/
 
 static void
 _sizing_eval(Evas_Object *obj)
@@ -2579,6 +2580,7 @@ elm_genlist_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_on_show_region_hook_set(obj, _show_region_hook, obj);
 
    wd->scr = elm_smart_scroller_add(e);
    elm_smart_scroller_widget_set(wd->scr, obj);
@@ -3197,7 +3199,6 @@ elm_genlist_multi_select_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return wd->multi;
 }
-
 
 /**
  * Get the selectd item in the genlist
@@ -6236,7 +6237,6 @@ elm_genlist_edit_selected_items_del(Evas_Object *obj)
    if (!wd) return;
    if (!wd->blocks) return;
 
-
    EINA_INLIST_FOREACH(wd->blocks, itb)
      {
         if (!wd->blocks) break;
@@ -6309,7 +6309,6 @@ elm_genlist_edit_selected_items_del(Evas_Object *obj)
    if (wd->calc_job) ecore_job_del(wd->calc_job);
    wd->calc_job = ecore_job_add(_calc_job, wd);	
 }
-
 
 EAPI void
 elm_genlist_selected_items_del(Evas_Object *obj)
@@ -6405,7 +6404,6 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
                     {
                        it->renamed = EINA_FALSE;
 
-
                        EINA_LIST_FOREACH(it->wd->edit_field, l2, editfield)
                          {
                             entry = elm_editfield_entry_get(editfield);
@@ -6479,6 +6477,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
                             elm_editfield_entry_single_line_set(editfield, EINA_TRUE);	
                             elm_editfield_eraser_set(editfield, EINA_TRUE);
                             edje_object_part_swallow(it->edit_obj, rename_swallow_part, editfield);
+                            elm_widget_sub_object_add(it->edit_obj, editfield);
 
                             evas_object_show(editfield);
 
