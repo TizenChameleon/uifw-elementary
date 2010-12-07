@@ -128,17 +128,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      elm_widget_focus_steal(wd->entry);
 }
 
-#ifdef HAVE_CONFORMANT_AUTOSCROLL
-static Evas_Object *
-_imp_region_get_hook(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   elm_widget_imp_region_get(wd->entry, x, y, w, h);
-   return wd->scroller;
-}
-#endif
-
 static void
 _disable_hook(Evas_Object *obj)
 {
@@ -155,7 +144,6 @@ _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
    elm_object_signal_emit(wd->entry, emission, source);
    elm_object_signal_emit(wd->scroller, emission, source);
 }
-
 
 static void
 _entry_changed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
@@ -289,11 +277,9 @@ elm_scrolled_entry_add(Evas_Object *parent)
    elm_widget_can_focus_set(obj, 1);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
-#ifdef HAVE_CONFORMANT_AUTOSCROLL
-   elm_widget_imp_region_get_hook_set(obj, _imp_region_get_hook, NULL);
-#endif
 
    wd->scroller = elm_scroller_add(parent);
+   elm_widget_sub_object_add(obj, wd->scroller);
    elm_widget_resize_object_set(obj, wd->scroller);
    elm_scroller_bounce_set(wd->scroller, 0, 0);
    elm_scroller_propagate_events_set(wd->scroller, 1);
@@ -381,7 +367,6 @@ elm_scrolled_entry_single_line_get(const Evas_Object *obj)
    return elm_entry_single_line_get(wd->entry);
 }
 
-
 /**
  * This sets the scrolled entry object to password mode.  All text entered
  * and/or displayed within the widget will be replaced with asterisks (*).
@@ -418,7 +403,6 @@ elm_scrolled_entry_password_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return elm_entry_password_get(wd->entry);
 }
-
 
 /**
  * This sets the text displayed within the scrolled entry to @p entry.
@@ -569,7 +553,6 @@ elm_scrolled_entry_editable_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return elm_entry_editable_get(wd->entry);
 }
-
 
 /**
  * This drops any existing text selection within the scrolled entry.

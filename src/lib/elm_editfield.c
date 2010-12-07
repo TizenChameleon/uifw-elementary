@@ -36,11 +36,6 @@ static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *eve
 static void _on_focus_hook(void *data, Evas_Object *obj);
 static Eina_Bool _empty_entry(Evas_Object *entry);
 
-#ifdef HAVE_CONFORMANT_AUTOSCROLL
-static const char SIG_CURSOR_CHANGED[] = "cursor,changed";
-static const char SIG_IMPREGION_CHANGED[] = "impregion,changed";
-#endif
-
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -50,23 +45,12 @@ _del_hook(Evas_Object *obj)
    free(wd);
 }
 
-#ifdef HAVE_CONFORMANT_AUTOSCROLL
-static Evas_Object *
-_imp_region_get_hook(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   elm_widget_imp_region_get(wd->entry, x, y, w, h);
-   return NULL;
-}
-#endif
-
 static void
 _on_focus_hook(void *data, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->base)
-      return ;	
+      return;	
    if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)) ) 
      {
         evas_object_smart_callback_call(obj, "unfocused", NULL);
@@ -203,15 +187,6 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
      } 
 }
 
-#ifdef HAVE_CONFORMANT_AUTOSCROLL
-static void
-_entry_cursor_changed_cb(void *data, Evas_Object *obj, void* event_info)
-{
-   Evas_Object *ef_obj = (Evas_Object *)data;
-   evas_object_smart_callback_call(ef_obj, SIG_IMPREGION_CHANGED, NULL);
-}
-#endif
-
 static void
 _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
@@ -293,9 +268,6 @@ elm_editfield_add(Evas_Object *parent)
    elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
    elm_widget_can_focus_set(obj, EINA_TRUE);
-#ifdef HAVE_CONFORMANT_AUTOSCROLL
-   elm_widget_imp_region_get_hook_set(obj, _imp_region_get_hook, NULL);
-#endif
 
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "editfield", "base", "default");
@@ -321,10 +293,6 @@ elm_editfield_add(Evas_Object *parent)
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
    evas_object_smart_callback_add(wd->entry, "changed", _entry_changed_cb, obj);
    elm_widget_sub_object_add(obj, wd->entry);
-#ifdef HAVE_CONFORMANT_AUTOSCROLL
-   evas_object_smart_callback_add(wd->entry, SIG_CURSOR_CHANGED, _entry_cursor_changed_cb, obj); 
-#endif
-
    _sizing_eval(obj);
 
    return obj;
