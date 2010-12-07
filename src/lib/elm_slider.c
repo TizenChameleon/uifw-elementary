@@ -184,20 +184,18 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (!wd) return;
    if (sub == wd->icon)
      {
-	edje_object_signal_emit(wd->slider, "elm,state,icon,hidden", "elm");
-	evas_object_event_callback_del_full
-	   (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	wd->icon = NULL;
-	edje_object_message_signal_process(wd->slider);
-	_sizing_eval(obj);
+        edje_object_signal_emit(wd->slider, "elm,state,icon,hidden", "elm");
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+        wd->icon = NULL;
+        edje_object_message_signal_process(wd->slider);
+        _sizing_eval(obj);
      }
    if (sub == wd->e_icon)
      {
-	edje_object_signal_emit(wd->slider, "elm,state,eicon,hidden", "elm");
-	evas_object_event_callback_del_full
-	   (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	wd->e_icon = NULL;
-	_sizing_eval(obj);
+        edje_object_signal_emit(wd->slider, "elm,state,eicon,hidden", "elm");
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+        wd->e_icon = NULL;
+        _sizing_eval(obj);
      }
 }
 
@@ -217,18 +215,17 @@ _val_fetch(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    double posx = 0.0, posy = 0.0, pos = 0.0, val;
    if (!wd) return;
-   edje_object_part_drag_value_get(wd->slider, "elm.dragable.slider",
-				   &posx, &posy);
+   edje_object_part_drag_value_get(wd->slider, "elm.dragable.slider", &posx, &posy);
    if (wd->horizontal) pos = posx;
    else pos = posy;
    if (wd->inverted) pos = 1.0 - pos;
    val = (pos * (wd->val_max - wd->val_min)) + wd->val_min;
    if (val != wd->val)
      {
-	wd->val = val;
-	evas_object_smart_callback_call(obj, SIG_CHANGED, NULL);
-	if (wd->delay) ecore_timer_del(wd->delay);
-	wd->delay = ecore_timer_add(0.2, _delay_change, obj);
+        wd->val = val;
+        evas_object_smart_callback_call(obj, SIG_CHANGED, NULL);
+        if (wd->delay) ecore_timer_del(wd->delay);
+        wd->delay = ecore_timer_add(0.2, _delay_change, obj);
      }
 }
 
@@ -255,10 +252,9 @@ _units_set(Evas_Object *obj)
    if (!wd) return;
    if (wd->units)
      {
-	char buf[1024];
-
-	snprintf(buf, sizeof(buf), wd->units, wd->val);
-	edje_object_part_text_set(wd->slider, "elm.units", buf);
+        char buf[1024];
+        snprintf(buf, sizeof(buf), wd->units, wd->val);
+        edje_object_part_text_set(wd->slider, "elm.units", buf);
      }
    else if (wd->e_label)
      edje_object_part_text_set(wd->slider, "elm.units", wd->e_label);
@@ -273,15 +269,15 @@ _indicator_set(Evas_Object *obj)
    if (!wd) return;
    if (wd->indicator_format_func)
      {
-	const char *buf;
-	buf = wd->indicator_format_func(wd->val);
-	edje_object_part_text_set(wd->slider, "elm.indicator", buf);
+        const char *buf;
+        buf = wd->indicator_format_func(wd->val);
+        edje_object_part_text_set(wd->slider, "elm.indicator", buf);
      }
    else if (wd->indicator)
      {
-	char buf[1024];
-	snprintf(buf, sizeof(buf), wd->indicator, wd->val);
-	edje_object_part_text_set(wd->slider, "elm.indicator", buf);
+        char buf[1024];
+        snprintf(buf, sizeof(buf), wd->indicator, wd->val);
+        edje_object_part_text_set(wd->slider, "elm.indicator", buf);
      }
    else
      edje_object_part_text_set(wd->slider, "elm.indicator", NULL);
@@ -290,18 +286,18 @@ _indicator_set(Evas_Object *obj)
 static void
 _drag(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-    Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
-    /* delete thumb move timer when drag event occured to the moving thumb */
-    if(wd->mv_timer)
-      {
-	 ecore_timer_del(wd->mv_timer);
-	 wd->mv_timer = NULL;
-      }
-    edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
-    edje_object_message_signal_process(wd->slider);
-    _val_fetch(data);
-    _units_set(data);
-    _indicator_set(data);
+   Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
+   /* delete thumb move timer when drag event occured to the moving thumb */
+   if(wd->mv_timer)
+     {
+        ecore_timer_del(wd->mv_timer);
+        wd->mv_timer = NULL;
+     }
+   edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
+   edje_object_message_signal_process(wd->slider);
+   _val_fetch(data);
+   _units_set(data);
+   _indicator_set(data);
 }
 
 static void
@@ -311,14 +307,14 @@ _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUS
    /*  delete thumb move timer when drag event occured to the moving thumb */
    if(wd->mv_timer)
      {
-	ecore_timer_del(wd->mv_timer);
-	wd->mv_timer = NULL;
+        ecore_timer_del(wd->mv_timer);
+        wd->mv_timer = NULL;
      }
    elm_widget_scroll_hold_push(data);
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_START, NULL);
    edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
-    edje_object_message_signal_process(wd->slider); 
+   edje_object_message_signal_process(wd->slider); 
    _units_set(data);
    _indicator_set(data);
 }
@@ -357,20 +353,18 @@ _spacer_cb(void *data, Evas * e, Evas_Object * obj, void *event_info)
 
    evas_object_geometry_get(wd->spacer, &x, &y, &w, &h);
    edje_object_part_drag_value_get(wd->slider, "elm.dragable.slider", &button_x, &button_y);
-   if(wd->horizontal){
-     button_x = ((double)ev->output.x - (double)x) / (double)w;
-     if (button_x > 1)
-       button_x = 1;
-     if (button_x < 0)
-       button_x = 0;
-   }
-   else {
-     button_y = ((double)ev->output.y - (double)y) / (double)h;
-     if (button_y > 1)
-       button_y = 1;
-     if (button_y < 0)
-       button_y = 0;
-   }
+   if(wd->horizontal)
+     {
+        button_x = ((double)ev->output.x - (double)x) / (double)w;
+        if (button_x > 1) button_x = 1;
+        if (button_x < 0) button_x = 0;
+     }
+   else 
+     {
+        button_y = ((double)ev->output.y - (double)y) / (double)h;
+        if (button_y > 1) button_y = 1;
+        if (button_y < 0) button_y = 0;
+     }
    edje_object_part_drag_value_set(wd->slider, "elm.dragable.slider", button_x, button_y);
    evas_event_feed_mouse_cancel(e, 0, NULL);
    wd->feed_cnt ++;
@@ -423,7 +417,7 @@ elm_slider_add(Evas_Object *parent)
    edje_object_signal_callback_add(wd->slider, "drag,stop", "*", _drag_stop, obj);
    edje_object_signal_callback_add(wd->slider, "drag,step", "*", _drag_stop, obj);
    edje_object_signal_callback_add(wd->slider, "drag,page", "*", _drag_stop, obj);
-//   edje_object_signal_callback_add(wd->slider, "drag,set", "*", _drag_stop, obj);
+   //edje_object_signal_callback_add(wd->slider, "drag,set", "*", _drag_stop, obj);
    edje_object_signal_callback_add(wd->slider, "mouse,wheel,0,-1", "*", _drag_up, obj);
    edje_object_signal_callback_add(wd->slider, "mouse,wheel,0,1", "*", _drag_down, obj);
    edje_object_part_drag_value_set(wd->slider, "elm.dragable.slider", 0.0, 0.0);
@@ -462,13 +456,13 @@ elm_slider_label_set(Evas_Object *obj, const char *label)
    eina_stringshare_replace(&wd->label, label);
    if (label)
      {
-	edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
-	edje_object_message_signal_process(wd->slider);
+        edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
+        edje_object_message_signal_process(wd->slider);
      }
    else
      {
-	edje_object_signal_emit(wd->slider, "elm,state,text,hidden", "elm");
-	edje_object_message_signal_process(wd->slider);
+        edje_object_signal_emit(wd->slider, "elm,state,text,hidden", "elm");
+        edje_object_message_signal_process(wd->slider);
      }
    edje_object_part_text_set(wd->slider, "elm.text", label);
    _sizing_eval(obj);
@@ -512,12 +506,11 @@ elm_slider_icon_set(Evas_Object *obj, Evas_Object *icon)
    wd->icon = icon;
    if (icon)
      {
-	elm_widget_sub_object_add(obj, icon);
-	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				       _changed_size_hints, obj);
-	edje_object_part_swallow(wd->slider, "elm.swallow.content", icon);
-	edje_object_signal_emit(wd->slider, "elm,state,icon,visible", "elm");
-	edje_object_message_signal_process(wd->slider);
+        elm_widget_sub_object_add(obj, icon);
+        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+        edje_object_part_swallow(wd->slider, "elm.swallow.content", icon);
+        edje_object_signal_emit(wd->slider, "elm,state,icon,visible", "elm");
+        edje_object_message_signal_process(wd->slider);
      }
    _sizing_eval(obj);
 }
@@ -612,13 +605,13 @@ elm_slider_unit_format_set(Evas_Object *obj, const char *units)
    eina_stringshare_replace(&wd->units, units);
    if (units)
      {
-	edje_object_signal_emit(wd->slider, "elm,state,units,visible", "elm");
-	edje_object_message_signal_process(wd->slider);
+        edje_object_signal_emit(wd->slider, "elm,state,units,visible", "elm");
+        edje_object_message_signal_process(wd->slider);
      }
    else
      {
-	edje_object_signal_emit(wd->slider, "elm,state,units,hidden", "elm");
-	edje_object_message_signal_process(wd->slider);
+        edje_object_signal_emit(wd->slider, "elm,state,units,hidden", "elm");
+        edje_object_message_signal_process(wd->slider);
      }
    _units_set(obj);
    _sizing_eval(obj);
@@ -922,14 +915,12 @@ elm_slider_end_icon_set(Evas_Object *obj, Evas_Object *icon)
 
    if (icon)
      {
-	if ( !(edje_object_part_swallow(wd->slider, "end_icon", icon)) )
-	  return EINA_FALSE;		
-	wd->e_icon = icon;
-	elm_widget_sub_object_add(obj, icon);
-	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-	      _changed_size_hints, obj);
-	edje_object_signal_emit(wd->slider, "elm,state,eicon,visible", "elm");
-	_sizing_eval(obj);
+        if ( !(edje_object_part_swallow(wd->slider, "end_icon", icon)) )
+          return EINA_FALSE;
+        wd->e_icon = icon;
+        elm_widget_sub_object_add(obj, icon);
+        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,_changed_size_hints, obj);
+        edje_object_signal_emit(wd->slider, "elm,state,eicon,visible", "elm");_sizing_eval(obj);
      }
 
    return EINA_TRUE;
@@ -969,10 +960,11 @@ elm_slider_indicator_show_set(Evas_Object *obj, Eina_Bool show)
    if(show)
      edje_object_signal_emit(wd->slider, "elm,state,val,show", "elm");
    else
-     edje_object_signal_emit(wd->slider, "elm,state,val,hide", "elm");			
+     edje_object_signal_emit(wd->slider, "elm,state,val,hide", "elm");
 }
 
-static Eina_Bool _mv_timer_cb(void *data)
+static Eina_Bool
+_mv_timer_cb(void *data)
 {
    Evas_Object* obj = (Evas_Object*)data;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -981,28 +973,28 @@ static Eina_Bool _mv_timer_cb(void *data)
 
    if(wd->src_val < wd->des_val) 
      {
-	wd->src_val += wd->mv_step;
-	if(wd-> src_val > wd->des_val) 	
-	  wd->src_val = wd->des_val;
-     }	
+        wd->src_val += wd->mv_step;
+        if(wd-> src_val > wd->des_val) 
+          wd->src_val = wd->des_val;
+     }
    else if (wd->src_val > wd->des_val) 
      {
-	wd->src_val -= wd->mv_step;
-	if(wd->src_val < wd->des_val) 	
-	  wd->src_val = wd->des_val;
-     }	
+        wd->src_val -= wd->mv_step;
+        if(wd->src_val < wd->des_val) 
+          wd->src_val = wd->des_val;
+     }
 
    elm_slider_value_set(obj, wd->src_val);
    evas_object_smart_callback_call(obj, SIG_CHANGED , NULL);
 
    if (wd->val == wd->des_val) 
      {
-	if(wd->mv_timer)
-	  {
-	     ecore_timer_del(wd->mv_timer);
-	     wd->mv_timer = NULL;
-	  }	
-	return 0;
+        if (wd->mv_timer)
+          {
+             ecore_timer_del(wd->mv_timer);
+             wd->mv_timer = NULL;
+          }
+        return 0;
      }
    else
      return 1;
@@ -1028,16 +1020,16 @@ elm_slider_value_animated_set(Evas_Object *obj, double val)
 
    wd->src_val = wd->val;
    wd->des_val = val;
-   if (wd->des_val < wd->val_min) wd->des_val = wd->val_min;	
+   if (wd->des_val < wd->val_min) wd->des_val = wd->val_min;
    if (wd->des_val > wd->val_max) wd->des_val = wd->val_max;
 
    if(wd->mv_timer)
      {
-	ecore_timer_del(wd->mv_timer);
-	wd->mv_timer = NULL;
+        ecore_timer_del(wd->mv_timer);
+        wd->mv_timer = NULL;
      }
 
-   wd->mv_timer = ecore_timer_add(0.005, _mv_timer_cb, obj);	
+   wd->mv_timer = ecore_timer_add(0.005, _mv_timer_cb, obj);
 }
 
 
@@ -1058,13 +1050,13 @@ elm_slider_end_label_set(Evas_Object *obj, const char *label)
    eina_stringshare_replace(&wd->e_label, label);
    if (label)
      {
-	edje_object_signal_emit(wd->slider, "elm,state,units,visible", "elm");
-	edje_object_message_signal_process(wd->slider);
+        edje_object_signal_emit(wd->slider, "elm,state,units,visible", "elm");
+        edje_object_message_signal_process(wd->slider);
      }
    else
      {
-	edje_object_signal_emit(wd->slider, "elm,state,units,hidden", "elm");
-	edje_object_message_signal_process(wd->slider);
+        edje_object_signal_emit(wd->slider, "elm,state,units,hidden", "elm");
+        edje_object_message_signal_process(wd->slider);
      }
    edje_object_part_text_set(wd->slider, "elm.units", label);
    if(wd->units)
