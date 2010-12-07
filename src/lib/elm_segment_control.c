@@ -322,18 +322,7 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon)
    if ((it->icon != icon) && (it->icon))
      elm_widget_sub_object_del(obj, it->icon);
    it->icon = icon;
-   if (it->icon)
-     {
-        elm_widget_sub_object_add(obj, icon);
-	Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
-	elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-	elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-
-	evas_object_size_hint_weight_set(it->base, 1.0, -1.0);
-	evas_object_size_hint_align_set(it->base, 1.0, -1.0);
-	evas_object_size_hint_min_set(it->base, -1, -1);
-	evas_object_size_hint_max_set(it->base, maxw, maxh);
-     }
+   if (it->icon) elm_widget_sub_object_add(obj, it->icon);
 
    edje_object_size_min_restricted_calc(obj, &mw, &mh, 0, 0);
    evas_object_size_hint_weight_set(obj, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -368,18 +357,16 @@ _update_list(Evas_Object *obj)
 	     edje_object_part_text_set(it->base, "elm.text", it->label);
   	  }
 	else
-       edje_object_signal_emit(it->base, "elm,state,text,hidden", "elm");
+        edje_object_signal_emit(it->base, "elm,state,text,hidden", "elm");
 
-	if (it->icon && edje_object_part_swallow_get(it->base, "elm.swallow.content") == NULL)
-	  {
-             if(it->icon)
-	       {
-		  edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
-		  edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
-	       }
-	     else
-               edje_object_signal_emit(it->base, "elm,state,icon,hidden", "elm");
+	if(it->icon)
+          {
+	     edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
+	     edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
 	  }
+	else
+  	  edje_object_signal_emit(it->base, "elm,state,icon,hidden", "elm");
+
 	if(it->label_wd)
 	  {
              edje_object_signal_emit(it->base, "elm,state,label,visible", "elm");
@@ -413,17 +400,15 @@ _update_list(Evas_Object *obj)
         else
           edje_object_signal_emit(it->base, "elm,state,text,hidden", "elm");
 
-        if (it->icon && edje_object_part_swallow_get(it->base, "elm.swallow.content") == NULL)
-          {
-             if(it->icon)
-               {
-                  edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
-                  edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
-               }
-             else
-               edje_object_signal_emit(it->base, "elm,state,icon,hidden", "elm");
-          }
-        if(it->label_wd)
+	if(it->icon)
+  	  {
+             edje_object_part_swallow(it->base, "elm.swallow.content", it->icon);
+	     edje_object_signal_emit(it->base, "elm,state,icon,visible", "elm");
+	  }
+	else
+ 	  edje_object_signal_emit(it->base, "elm,state,icon,hidden", "elm");
+
+	if(it->label_wd)
           {
              edje_object_signal_emit(it->base, "elm,state,label,visible", "elm");
           }
