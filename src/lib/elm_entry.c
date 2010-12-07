@@ -1627,6 +1627,24 @@ _get_item(void *data, Evas_Object *edje __UNUSED__, const char *part __UNUSED__,
         o = ip->func(ip->data, data, item);
         if (o) return o;
      }
+   if (!strncmp(item, "file://", 7))
+     {
+        const char *fname = item + 7;
+
+        o = evas_object_image_filled_add(evas_object_evas_get(data));
+        evas_object_image_file_set(o, fname, NULL);
+        if (evas_object_image_load_error_get(o) == EVAS_LOAD_ERROR_NONE)
+          {
+             evas_object_show(o);
+          }
+        else
+          {
+             evas_object_del(o);
+             o = edje_object_add(evas_object_evas_get(data));
+             _elm_theme_object_set(data, o, "entry/emoticon", "wtf", elm_widget_style_get(data));
+          }
+        return o;
+     }
    o = edje_object_add(evas_object_evas_get(data));
    if (!strncmp(item, "emoticon/", 9))
      ok = _elm_theme_object_set(data, o, "entry", item, elm_widget_style_get(data));
@@ -1654,7 +1672,7 @@ _get_value_in_key_string(const char *oldstring, char *key, char **value)
 
         firstindex = abs(oldstring - curlocater);
         firstindex += strlen(key)+1; // strlen("key") + strlen("=")
-        *value = (char*)oldstring + firstindex;
+        *value = (char*)(oldstring + firstindex);
 
         while (oldstring != starttag)
           {
@@ -1747,7 +1765,7 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int
                  replocater++;
 			   }
 
-                while (*replocater != NULL && *replocater != ' ' && *replocater != '>')
+                while (replocater != NULL && *replocater != ' ' && *replocater != '>')
                   replocater++;
 
                if (replocater-curlocater > strlen(key)+1)
@@ -1842,7 +1860,7 @@ _reverse_ellipsis_entry(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    int cur_fontsize = 0;
    Eina_Strbuf *fontbuf = NULL, *txtbuf = NULL;
-   char **kvalue = NULL;
+   char *kvalue = NULL;
    const char *minfont, *deffont, *maxfont;
    const char *ellipsis_string = "...";
    int minfontsize, maxfontsize, minshowcount;
@@ -1862,7 +1880,7 @@ _reverse_ellipsis_entry(Evas_Object *obj)
 
    if (_get_value_in_key_string(edje_object_part_text_get(wd->ent, "elm.text"), "font_size", &kvalue) == 0)
      {
-       if (*kvalue != NULL) cur_fontsize = atoi((char*)kvalue);
+       if (kvalue != NULL) cur_fontsize = atoi(kvalue);
      }
 
    txtbuf = eina_strbuf_new();
@@ -1928,7 +1946,7 @@ _ellipsis_entry_to_width(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    int cur_fontsize = 0, len, jumpcount;
    Eina_Strbuf *fontbuf = NULL, *txtbuf = NULL;
-   char **kvalue = NULL;
+   char *kvalue = NULL;
    const char *minfont, *deffont, *maxfont;
    const char *ellipsis_string = "...";
    int minfontsize, maxfontsize, minshowcount;
@@ -1950,7 +1968,7 @@ _ellipsis_entry_to_width(Evas_Object *obj)
 
    if (_get_value_in_key_string(edje_object_part_text_get(wd->ent, "elm.text"), "font_size", &kvalue) == 0)
      {
-       if (*kvalue != NULL) cur_fontsize = atoi((char*)kvalue);
+       if (kvalue != NULL) cur_fontsize = atoi(kvalue);
      }
 
    txtbuf = eina_strbuf_new();
@@ -1979,12 +1997,12 @@ _ellipsis_entry_to_width(Evas_Object *obj)
        else
          {
            len = _entry_length_get(obj);
-           cur_str = edje_object_part_text_get(wd->ent, "elm.text");
+           cur_str = (char*)edje_object_part_text_get(wd->ent, "elm.text");
            cur_len = strlen(cur_str);
            tagend = 0;
            for (i = 0; i < len; i++)
              {
-               if(cur_str[i] == '>' && cur_str[i+1] != NULL && 
+               if(cur_str[i] == '>' && cur_str[i+1] != '\0' && 
                   cur_str[i+1] != '<')
                  {
                    tagend = i;
@@ -1994,7 +2012,7 @@ _ellipsis_entry_to_width(Evas_Object *obj)
            jumpcount = 0;
            while (jumpcount < len-strlen(ellipsis_string))
              {
-               cur_str = edje_object_part_text_get(wd->ent, "elm.text");
+               cur_str = (char*)edje_object_part_text_get(wd->ent, "elm.text");
 
                if (txtbuf != NULL)
                  {
@@ -2029,7 +2047,7 @@ static int _textinput_control_function(void *data,void *input_data)
    char buf[10]="\0";
    size_t byte_len;
    size_t insert_text_len=0;
-   char *text = edje_object_part_text_get(wd->ent, "elm.text");
+   char *text = (char*)edje_object_part_text_get(wd->ent, "elm.text");
    char *insert_text;  
    size_t remain_bytes;
    if (text != NULL)
