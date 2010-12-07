@@ -591,6 +591,8 @@ _env_get(void)
    if (s) _elm_config->bring_in_scroll_friction = atof(s);
    s = getenv("ELM_ZOOM_FRICTION");
    if (s) _elm_config->zoom_friction = atof(s);
+   s = getenv("ELM_THUMBSCROLL_BOUNCE_FRICTION");
+   if (s) _elm_config->thumbscroll_bounce_friction = atof(s);
 
    s = getenv("ELM_THEME");
    if (s) eina_stringshare_replace(&_elm_config->theme, s);
