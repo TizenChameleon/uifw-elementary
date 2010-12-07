@@ -406,7 +406,7 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
    _item_hilight(it);
    wd->longpressed = EINA_FALSE;
    if (it->long_timer) ecore_timer_del(it->long_timer);
-   it->long_timer = ecore_timer_add(elm_longpress_timeout_get(), _long_press, it);
+   it->long_timer = ecore_timer_add(_elm_config->longpress_timeout, _long_press, it);
    /* Always call the callbacks last - the user may delete our context! */
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
      evas_object_smart_callback_call(it->obj, "clicked", it);
