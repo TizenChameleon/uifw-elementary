@@ -80,7 +80,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	  {
 	     _set_label(obj, wd->statelabel[FOCUSED]);
 	  }
-	edje_object_signal_emit(wd->btn, "elm,action,focus", "elm");
+	//edje_object_signal_emit(wd->btn, "elm,action,focus", "elm");
 	evas_object_focus_set(wd->btn, EINA_TRUE);
      }
    else
@@ -91,7 +91,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	else
 	  _set_label(obj, wd->label);
 #endif
-	edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
+	//edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
 	evas_object_focus_set(wd->btn, EINA_FALSE);
      }
 }

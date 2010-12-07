@@ -621,9 +621,9 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 	//resize btn and label
 	evas_object_resize(btn, item->vw, h_btn);
 	evas_object_size_hint_min_set(btn, item->vw, h_btn);
-	if((item->rw != item->vw) && (item->vw - 2*padding_outer - 4*padding_inner >=0)){
+	if((item->rw != item->vw) && (item->vw - 2*padding_outer - 2*padding_inner >=0)){
 		evas_object_resize(label, item->vw - 2*padding_outer - 2*padding_inner, h_label);	
-		elm_label_wrap_width_set(label, item->vw - 2*padding_outer - 4*padding_inner ); 
+		elm_label_wrap_width_set(label, item->vw - 2*padding_outer - 2*padding_inner ); 
 	}
 
 	evas_object_smart_callback_call(obj, "added", item);

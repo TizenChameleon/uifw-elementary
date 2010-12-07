@@ -82,8 +82,8 @@ _sizing_eval(Evas_Object *obj)
    if (!wd) return;
    EINA_LIST_FOREACH(wd->stack, l, it)
      {
-	if (it->minw > minw) minw = it->minw;
-	if (it->minh > minh) minh = it->minh;
+        if (it->minw > minw) minw = it->minw;
+        if (it->minh > minh) minh = it->minh;
      }
    evas_object_size_hint_min_set(obj, minw, minh);
    evas_object_size_hint_max_set(obj, -1, -1);
@@ -113,39 +113,39 @@ _eval_top(Evas_Object *obj)
    ittop = eina_list_last(wd->stack)->data;
    if (ittop != wd->top)
      {
-	Evas_Object *o;
-	const char *onshow, *onhide;
-
-	if (wd->top)
-	  {
-	     o = wd->top->base;
-		if(wd->disable_animation)
-			{
-				edje_object_signal_emit(o, "elm,action,hide,noanimate", "elm");
-			}
-	     else if (wd->top->popme)
-		edje_object_signal_emit(o, "elm,action,pop", "elm");
-	     else
-		edje_object_signal_emit(o, "elm,action,hide", "elm");
-	     onhide = edje_object_data_get(o, "onhide");
-	     if (onhide)
-	       {
-		  if (!strcmp(onhide, "raise")) evas_object_raise(o);
-		  else if (!strcmp(onhide, "lower")) evas_object_lower(o);
-	       }
-	  }
-	else
-	  {
-	     animate = EINA_FALSE;
-	  }
-	wd->oldtop = wd->top;
-	wd->top = ittop;
-	o = wd->top->base;
-	evas_object_show(o);
-	if ((!animate)||(wd->disable_animation))
-		{
-			edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
-		}
+        Evas_Object *o;
+        const char *onshow, *onhide;
+        
+        if (wd->top)
+          {
+             o = wd->top->base;
+             if(wd->disable_animation)
+               {
+                  edje_object_signal_emit(o, "elm,action,hide,noanimate", "elm");
+               }
+             else if (wd->top->popme)
+               edje_object_signal_emit(o, "elm,action,pop", "elm");
+             else
+               edje_object_signal_emit(o, "elm,action,hide", "elm");
+             onhide = edje_object_data_get(o, "onhide");
+             if (onhide)
+               {
+                  if (!strcmp(onhide, "raise")) evas_object_raise(o);
+                  else if (!strcmp(onhide, "lower")) evas_object_lower(o);
+               }
+          }
+        else
+          {
+             animate = EINA_FALSE;
+          }
+        wd->oldtop = wd->top;
+        wd->top = ittop;
+        o = wd->top->base;
+        evas_object_show(o);
+        if ((!animate)||(wd->disable_animation))
+          {
+             edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
+          }
         else if (wd->oldtop)
           {
              if (elm_object_focus_get(wd->oldtop->content))
@@ -155,14 +155,14 @@ _eval_top(Evas_Object *obj)
              else
                edje_object_signal_emit(o, "elm,action,push", "elm");
           }
-	else
-	    edje_object_signal_emit(o, "elm,action,push", "elm");
-	onshow = edje_object_data_get(o, "onshow");
-	if (onshow)
-	  {
-	     if (!strcmp(onshow, "raise")) evas_object_raise(o);
-	     else if (!strcmp(onshow, "lower")) evas_object_lower(o);
-	  }
+        else
+          edje_object_signal_emit(o, "elm,action,push", "elm");
+        onshow = edje_object_data_get(o, "onshow");
+        if (onshow)
+          {
+             if (!strcmp(onshow, "raise")) evas_object_raise(o);
+             else if (!strcmp(onshow, "lower")) evas_object_lower(o);
+          }
      }
 }
 
@@ -189,16 +189,16 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
    if (!wd) return;
    EINA_LIST_FOREACH(wd->stack, l, it)
      {
-	if (it->content == sub)
-	  {
-	     wd->stack = eina_list_remove_list(wd->stack, l);
-	     evas_object_event_callback_del_full
+        if (it->content == sub)
+          {
+             wd->stack = eina_list_remove_list(wd->stack, l);
+             evas_object_event_callback_del_full
                (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
-	     evas_object_del(it->base);
-	     _eval_top(it->obj);
-	     free(it);
-	     return;
-	  }
+             evas_object_del(it->base);
+             _eval_top(it->obj);
+             free(it);
+             return;
+          }
      }
 }
 
@@ -242,7 +242,7 @@ elm_pager_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-
+   
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    obj = elm_widget_add(e);
@@ -253,21 +253,21 @@ elm_pager_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_can_focus_set(obj, EINA_FALSE);
-
+   
    wd->clip = evas_object_rectangle_add(e);
    elm_widget_resize_object_set(obj, wd->clip);
    elm_widget_sub_object_add(obj, wd->clip);
-
+   
    wd->rect = evas_object_rectangle_add(e);
    elm_widget_sub_object_add(obj, wd->rect);
    evas_object_color_set(wd->rect, 255, 255, 255, 0); 
    evas_object_clip_set(wd->rect, wd->clip);
-
+   
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
-
+   
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-
+   
    _sizing_eval(obj);
    return obj;
 }
@@ -342,30 +342,31 @@ elm_pager_content_pop(Evas_Object *obj)
    ll = eina_list_last(wd->stack);
    if (ll)
      {
-	ll = ll->prev;
-	if (!ll)
-	  {
-	     Evas_Object *o;
-	     const char *onhide;
-
-	     wd->top = it;
-	     o = wd->top->base;
-	     edje_object_signal_emit(o, "elm,action,pop", "elm");
-	     onhide = edje_object_data_get(o, "onhide");
-	     if (onhide)
-	       {
-		  if (!strcmp(onhide, "raise")) evas_object_raise(o);
-		  else if (!strcmp(onhide, "lower")) evas_object_lower(o);
-	       }
-	     wd->top = NULL;
-	  }
-	else
-	  {
-	     it = ll->data;
-	     elm_pager_content_promote(obj, it->content);
-	  }
+        ll = ll->prev;
+        if (!ll)
+          {
+             Evas_Object *o;
+             const char *onhide;
+             
+             wd->top = it;
+             o = wd->top->base;
+             edje_object_signal_emit(o, "elm,action,pop", "elm");
+             onhide = edje_object_data_get(o, "onhide");
+             if (onhide)
+               {
+                  if (!strcmp(onhide, "raise")) evas_object_raise(o);
+                  else if (!strcmp(onhide, "lower")) evas_object_lower(o);
+               }
+             wd->top = NULL;
+          }
+        else
+          {
+             it = ll->data;
+             elm_pager_content_promote(obj, it->content);
+          }
      }
 }
+
 static void
 _del_job(void *data)
 {
@@ -398,20 +399,20 @@ elm_pager_to_content_pop(Evas_Object *obj, Evas_Object *content)
    ll = eina_list_last(wd->stack);
    if (ll)
      {
-       while(ll)
-   			{
-   				it = ll->data;
-				if(it->content != content)
-					{
-						wd->stack = eina_list_remove_list(wd->stack, ll);
-						ecore_job_add(_del_job, it->content);
-					}
-				else
-					break;
-				
-				ll = ll->prev;
-   			}
-      }
+        while(ll)
+          {
+             it = ll->data;
+             if(it->content != content)
+               {
+                  wd->stack = eina_list_remove_list(wd->stack, ll);
+                  ecore_job_add(_del_job, it->content);
+               }
+             else
+               break;
+             
+             ll = ll->prev;
+          }
+     }
    _eval_top(it->obj);
 }
 
@@ -437,13 +438,13 @@ elm_pager_content_promote(Evas_Object *obj, Evas_Object *content)
    if (!wd) return;
    EINA_LIST_FOREACH(wd->stack, l, it)
      {
-	if (it->content == content)
-	  {
-	     wd->stack = eina_list_remove_list(wd->stack, l);
-	     wd->stack = eina_list_append(wd->stack, it);
-	     _eval_top(obj);
-	     return;
-	  }
+        if (it->content == content)
+          {
+             wd->stack = eina_list_remove_list(wd->stack, l);
+             wd->stack = eina_list_append(wd->stack, it);
+             _eval_top(obj);
+             return;
+          }
      }
 }
 
@@ -494,12 +495,11 @@ elm_pager_content_top_get(const Evas_Object *obj)
  * @ingroup Pager
  */
 EAPI void
-elm_pager_animation_disable_set(Evas_Object *obj, 
-							Eina_Bool disable)
+elm_pager_animation_disable_set(Evas_Object *obj, Eina_Bool disable)
 {
-	ELM_CHECK_WIDTYPE(obj, widtype)NULL;
-	Widget_Data *wd = elm_widget_data_get(obj);
-	wd->disable_animation = disable;
+   ELM_CHECK_WIDTYPE(obj, widtype)NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   wd->disable_animation = disable;
 }
 
 

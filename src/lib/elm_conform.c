@@ -176,7 +176,7 @@ _imp_region_show(void *data, Evas_Object *obj)
    x = x + wd->frelx;
    y = y + wd->frely;
    //if(wd->vkeypad_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_ON)
-   elm_scroller_region_show(wd->scroller, x, y, w, h);
+   elm_scroller_region_bring_in(wd->scroller, x, y, w, h);
 }
 
 static void
@@ -234,7 +234,7 @@ _get_scroller(void *data, Evas_Object * foc_obj, Eina_Bool reg_scrol_resz_evnt)
       if(!strcmp(type,"scroller"))
         {
           root_scroller = parent;
-          break;
+         // break;
         }
       parent = elm_object_parent_widget_get( parent );
     }while(parent && (parent !=win));
