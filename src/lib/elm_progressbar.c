@@ -136,12 +136,12 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (!wd) return;
    if (sub == wd->icon)
      {
-	edje_object_signal_emit(wd->progressbar, "elm,state,icon,hidden", "elm");
-	evas_object_event_callback_del_full
-	  (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	wd->icon = NULL;
-	edje_object_message_signal_process(wd->progressbar);
-	_sizing_eval(obj);
+        edje_object_signal_emit(wd->progressbar, "elm,state,icon,hidden", "elm");
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                            _changed_size_hints, obj);
+        wd->icon = NULL;
+        edje_object_message_signal_process(wd->progressbar);
+        _sizing_eval(obj);
      }
 }
 
@@ -342,13 +342,13 @@ elm_progressbar_label_set(Evas_Object *obj, const char *label)
    eina_stringshare_replace(&wd->label, label);
    if (label)
      {
-	edje_object_signal_emit(wd->progressbar, "elm,state,text,visible", "elm");
-	edje_object_message_signal_process(wd->progressbar);
+        edje_object_signal_emit(wd->progressbar, "elm,state,text,visible", "elm");
+        edje_object_message_signal_process(wd->progressbar);
      }
    else
      {
-	edje_object_signal_emit(wd->progressbar, "elm,state,text,hidden", "elm");
-	edje_object_message_signal_process(wd->progressbar);
+        edje_object_signal_emit(wd->progressbar, "elm,state,text,hidden", "elm");
+        edje_object_message_signal_process(wd->progressbar);
      }
    edje_object_part_text_set(wd->progressbar, "elm.text", label);
    _sizing_eval(obj);
@@ -392,12 +392,12 @@ elm_progressbar_icon_set(Evas_Object *obj, Evas_Object *icon)
    wd->icon = icon;
    if (icon)
      {
-	elm_widget_sub_object_add(obj, icon);
-	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				       _changed_size_hints, obj);
-	edje_object_part_swallow(wd->progressbar, "elm.swallow.content", icon);
-	edje_object_signal_emit(wd->progressbar, "elm,state,icon,visible", "elm");
-	edje_object_message_signal_process(wd->progressbar);
+        elm_widget_sub_object_add(obj, icon);
+        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                       _changed_size_hints, obj);
+        edje_object_part_swallow(wd->progressbar, "elm.swallow.content", icon);
+        edje_object_signal_emit(wd->progressbar, "elm,state,icon,visible", "elm");
+        edje_object_message_signal_process(wd->progressbar);
      }
    _sizing_eval(obj);
 }
@@ -487,13 +487,13 @@ elm_progressbar_unit_format_set(Evas_Object *obj, const char *units)
    eina_stringshare_replace(&wd->units, units);
    if (units)
      {
-	edje_object_signal_emit(wd->progressbar, "elm,state,units,visible", "elm");
-	edje_object_message_signal_process(wd->progressbar);
+        edje_object_signal_emit(wd->progressbar, "elm,state,units,visible", "elm");
+        edje_object_message_signal_process(wd->progressbar);
      }
    else
      {
-	edje_object_signal_emit(wd->progressbar, "elm,state,units,hidden", "elm");
-	edje_object_message_signal_process(wd->progressbar);
+        edje_object_signal_emit(wd->progressbar, "elm,state,units,hidden", "elm");
+        edje_object_message_signal_process(wd->progressbar);
      }
    _units_set(obj);
    _sizing_eval(obj);
