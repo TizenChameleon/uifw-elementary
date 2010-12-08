@@ -143,12 +143,12 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (!wd) return;
    if (sub == wd->icon)
      {
-	edje_object_signal_emit(wd->chk, "elm,state,icon,hidden", "elm");
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+        edje_object_signal_emit(wd->chk, "elm,state,icon,hidden", "elm");
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                        _changed_size_hints, obj);
-	wd->icon = NULL;
-	_sizing_eval(obj);
-	edje_object_message_signal_process(wd->chk);
+        wd->icon = NULL;
+        _sizing_eval(obj);
+        edje_object_message_signal_process(wd->chk);
      }
 }
 
@@ -298,12 +298,12 @@ elm_check_icon_set(Evas_Object *obj, Evas_Object *icon)
    wd->icon = icon;
    if (icon)
      {
-	elm_widget_sub_object_add(obj, icon);
-	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				       _changed_size_hints, obj);
-	edje_object_part_swallow(wd->chk, "elm.swallow.content", icon);
-	edje_object_signal_emit(wd->chk, "elm,state,icon,visible", "elm");
-	edje_object_message_signal_process(wd->chk);
+        elm_widget_sub_object_add(obj, icon);
+        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+        _changed_size_hints, obj);
+        edje_object_part_swallow(wd->chk, "elm.swallow.content", icon);
+        edje_object_signal_emit(wd->chk, "elm,state,icon,visible", "elm");
+        edje_object_message_signal_process(wd->chk);
      }
    _sizing_eval(obj);
 }
@@ -344,12 +344,12 @@ elm_check_state_set(Evas_Object *obj, Eina_Bool state)
    if (!wd) return;
    if (state != wd->state)
      {
-	wd->state = state;
-	if (wd->statep) *wd->statep = wd->state;
-	if (wd->state)
-	  edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
-	else
-	  edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
+        wd->state = state;
+        if (wd->statep) *wd->statep = wd->state;
+        if (wd->state)
+          edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
+        else
+          edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
      }
 }
 
@@ -393,15 +393,15 @@ elm_check_state_pointer_set(Evas_Object *obj, Eina_Bool *statep)
    if (!wd) return;
    if (statep)
      {
-	wd->statep = statep;
-	if (*wd->statep != wd->state)
-	  {
-	     wd->state = *wd->statep;
-	     if (wd->state)
-	       edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
-	     else
-	       edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
-	  }
+        wd->statep = statep;
+        if (*wd->statep != wd->state)
+          {
+             wd->state = *wd->statep;
+             if (wd->state)
+               edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
+             else
+               edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
+          }
      }
    else
      wd->statep = NULL;
