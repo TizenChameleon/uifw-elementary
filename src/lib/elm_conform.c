@@ -17,9 +17,10 @@ struct _Widget_Data
    Evas_Object *shelf, *panel, *virtualkeypad;
    Evas_Object *content;
    Evas_Object *scroller;
-   int vkeypad_height;
-   Ecore_X_Virtual_Keyboard_State vkeypad_state;
    Ecore_Event_Handler *prop_hdl;
+#ifdef HAVE_ELEMENTARY_X
+   Ecore_X_Virtual_Keyboard_State vkb_state;
+#endif
 };
 
 /* local function prototypes */
@@ -75,19 +76,20 @@ _sizing_eval(Evas_Object *obj)
 static void
 _swallow_conformant_parts(Evas_Object *obj)
 {
-#ifdef HAVE_ELEMENTARY_X
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   Ecore_X_Window zone, xwin;
    int sh = -1;
+#ifdef HAVE_ELEMENTARY_X
+   Ecore_X_Window zone, xwin;
 
    xwin = elm_win_xwindow_get(obj);
    zone = ecore_x_e_illume_zone_get(xwin);
 
    ecore_x_e_illume_indicator_geometry_get(zone, NULL, NULL, NULL, &sh);
+#endif
    if (sh < 0) sh = 0;
-   if(!wd->shelf)
-   wd->shelf = evas_object_rectangle_add(evas_object_evas_get(obj));
+   if (!wd->shelf)
+      wd->shelf = evas_object_rectangle_add(evas_object_evas_get(obj));
    evas_object_color_set(wd->shelf, 0, 0, 0, 0);
    evas_object_size_hint_min_set(wd->shelf, -1, sh);
    evas_object_size_hint_max_set(wd->shelf, -1, sh);
@@ -95,26 +97,29 @@ _swallow_conformant_parts(Evas_Object *obj)
 
    wd->scroller = NULL;
    sh = -1;
+#ifdef HAVE_ELEMENTARY_X
    ecore_x_e_illume_keyboard_geometry_get(zone, NULL, NULL, NULL, &sh);
+#endif
    if (sh < 0) sh = 0;
-   wd->vkeypad_height = sh;
-   if(!wd->virtualkeypad)
-   wd->virtualkeypad= evas_object_rectangle_add(evas_object_evas_get(obj));
+   if (!wd->virtualkeypad)
+      wd->virtualkeypad = evas_object_rectangle_add(evas_object_evas_get(obj));
    evas_object_color_set(wd->virtualkeypad, 0, 0, 0, 0);
    evas_object_size_hint_min_set(wd->virtualkeypad, -1, sh);
    evas_object_size_hint_max_set(wd->virtualkeypad, -1, sh);
-   edje_object_part_swallow(wd->base, "elm.swallow.virtualkeypad", wd->virtualkeypad);
+   edje_object_part_swallow(wd->base, "elm.swallow.virtualkeypad",
+                            wd->virtualkeypad);
 
    sh = -1;
+#ifdef HAVE_ELEMENTARY_X
    ecore_x_e_illume_softkey_geometry_get(zone, NULL, NULL, NULL, &sh);
+#endif
    if (sh < 0) sh = 0;
-   if(!wd->panel)
-   wd->panel = evas_object_rectangle_add(evas_object_evas_get(obj));
+   if (!wd->panel)
+      wd->panel = evas_object_rectangle_add(evas_object_evas_get(obj));
    evas_object_color_set(wd->panel, 0, 0, 0, 0);
    evas_object_size_hint_min_set(wd->panel, -1, sh);
    evas_object_size_hint_max_set(wd->panel, -1, sh);
    edje_object_part_swallow(wd->base, "elm.swallow.panel", wd->panel);
-#endif
 }
 
 static void
@@ -144,15 +149,20 @@ static void
 _content_resize_event_cb(void *data, Evas *e, Evas_Object *obj,
                          void *event_info)
 {
-   Evas_Object *focus_obj = elm_widget_focused_object_get(obj);
+   Evas_Object *focus_obj;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF) return;
+   focus_obj = elm_widget_focused_object_get(obj);
    if (focus_obj)
    {
       Evas_Coord x, y, w, h;
 
       elm_widget_show_region_get(focus_obj, &x, &y, &w, &h);
 
-      if (h < _elm_config->finger_size) h = _elm_config->finger_size;
-      else h=1+h;
+      if (h < _elm_config->finger_size)
+         h = _elm_config->finger_size;
+      else
+         h = 1 + h; //elm_widget_show_region_set expects some change, to redo the job.
       elm_widget_show_region_set(focus_obj, x, y, w, h);
    }
 }
@@ -255,8 +265,6 @@ _prop_change(void *data, int type __UNUSED__, void *event)
       zone = ecore_x_e_illume_zone_get(ev->win);
       ecore_x_e_illume_keyboard_geometry_get(zone, NULL, &ky, NULL, &kh);
       if (kh < 0) kh = 0;
-      if (kh == wd->vkeypad_height) return ECORE_CALLBACK_PASS_ON;
-      wd->vkeypad_height = kh;
       evas_object_size_hint_min_set(wd->virtualkeypad, -1, kh);
       evas_object_size_hint_max_set(wd->virtualkeypad, -1, kh);
    }
@@ -264,11 +272,15 @@ _prop_change(void *data, int type __UNUSED__, void *event)
    {
       Ecore_X_Window zone;
       zone = ecore_x_e_illume_zone_get(ev->win);
-      virt_keypad_state = ecore_x_e_virtual_keyboard_state_get(zone);
-      if (virt_keypad_state == wd->vkeypad_state) return ECORE_CALLBACK_PASS_ON;
-      wd->vkeypad_state = virt_keypad_state;
-      if(wd->vkeypad_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_ON)
-         _update_autoscroll_objs(data);
+      wd->vkb_state = ecore_x_e_virtual_keyboard_state_get(zone);
+
+      if(wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF)
+      {
+         evas_object_size_hint_min_set(wd->virtualkeypad, -1, 0);
+         evas_object_size_hint_max_set(wd->virtualkeypad, -1, 0);
+      }
+      else
+      _update_autoscroll_objs(data);
    }
 #endif
 
@@ -310,7 +322,7 @@ elm_conformant_add(Evas_Object *parent)
 #ifdef HAVE_ELEMENTARY_X
    wd->prop_hdl = ecore_event_handler_add(ECORE_X_EVENT_WINDOW_PROPERTY,
             _prop_change, obj);
-   wd->vkeypad_state = ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF;
+   wd->vkb_state = ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF;
 #endif
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
