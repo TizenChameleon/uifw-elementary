@@ -5978,9 +5978,9 @@ elm_genlist_item_append_with_group(Evas_Object *obj, const Elm_Genlist_Item_Clas
  */
 EAPI Elm_Genlist_Item *
 elm_genlist_item_prepend_with_group(Evas_Object *obj, const Elm_Genlist_Item_Class *itc,
-                                   const void *data, Elm_Genlist_Item *parent,
-                                   Elm_Genlist_Item_Flags flags, Elm_Genlist_GroupItem *git,
-                                   Evas_Smart_Cb func, const void *func_data)
+                                    const void *data, Elm_Genlist_Item *parent,
+                                    Elm_Genlist_Item_Flags flags, Elm_Genlist_GroupItem *git,
+                                    Evas_Smart_Cb func, const void *func_data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -5997,11 +5997,11 @@ elm_genlist_item_prepend_with_group(Evas_Object *obj, const Elm_Genlist_Item_Cla
    pgit = git;
    while (pgit)
      {
-      	if(new_group)
-            ll = eina_list_last(pgit->items);
-         else
-            ll = pgit->items;
-         
+        if(new_group)
+           ll = eina_list_last(pgit->items);
+        else
+           ll = pgit->items;
+
         if (ll) 
           {
              it2 = ll->data;
@@ -6014,13 +6014,13 @@ elm_genlist_item_prepend_with_group(Evas_Object *obj, const Elm_Genlist_Item_Cla
    if (it2)
      {
         if(new_group)
-         wd->items =
-           eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
-                                       EINA_INLIST_GET(it2));
+           wd->items =
+              eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
+                                          EINA_INLIST_GET(it2));
         else        
-		    wd->items =
-		       eina_inlist_prepend_relative(wd->items, EINA_INLIST_GET(it),
-                                       EINA_INLIST_GET(it2));
+           wd->items =
+              eina_inlist_prepend_relative(wd->items, EINA_INLIST_GET(it),
+                                           EINA_INLIST_GET(it2));
         it->rel = it2;
         it->rel->relcount++;
      } 
@@ -6031,10 +6031,10 @@ elm_genlist_item_prepend_with_group(Evas_Object *obj, const Elm_Genlist_Item_Cla
      }
    git->items = eina_list_prepend(git->items, it);
    if(!new_group)
-	   it->before = 1;
+      it->before = 1;
    else
       it->before = 0;
-   
+
    it->group_item = git;
    _item_queue(wd, it);
    return it;
