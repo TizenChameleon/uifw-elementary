@@ -60,8 +60,8 @@ _del_hook(Evas_Object *obj)
    elm_selectioninfo_parent_set(obj, NULL);
    if (wd->timer)
      {
-	ecore_timer_del(wd->timer);
-	wd->timer = NULL;
+        ecore_timer_del(wd->timer);
+        wd->timer = NULL;
      }
    free(wd);
 }
@@ -103,11 +103,11 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    
    if (sub == wd->content) 
      {
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-					     _changed_size_hints, obj);
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_RESIZE,
-		  		             _content_resize, obj);
-	wd->content = NULL;
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                            _changed_size_hints, obj);
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_RESIZE,
+                                            _content_resize, obj);
+        wd->content = NULL;
      }
 }
 
@@ -137,10 +137,9 @@ _calc(Evas_Object *obj)
 
    if (wd->content)
      {
-	int offx = (w - minw) / 2;
-
-	evas_object_move(wd->selectioninfo, x + offx, y + h - minh);
-	evas_object_resize(wd->selectioninfo, minw, minh);
+        int offx = (w - minw) / 2;
+        evas_object_move(wd->selectioninfo, x + offx, y + h - minh);
+        evas_object_resize(wd->selectioninfo, minw, minh);
      }
    _sizing_eval(obj);
 }
@@ -166,8 +165,8 @@ _show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_i
    evas_object_show(wd->selectioninfo);
    if (wd->timer)
      {
-	ecore_timer_del(wd->timer);
-	wd->timer = NULL;
+        ecore_timer_del(wd->timer);
+        wd->timer = NULL;
      }
    if (wd->timeout > 0)
      wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
@@ -183,8 +182,8 @@ _hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_i
    evas_object_hide(wd->selectioninfo);
    if (wd->timer)
      {
-	ecore_timer_del(wd->timer);
-	wd->timer = NULL;
+        ecore_timer_del(wd->timer);
+        wd->timer = NULL;
      }
 
    evas_object_smart_callback_call(obj, "selectioninfo,hide", NULL);
@@ -239,7 +238,6 @@ elm_selectioninfo_add(Evas_Object *parent)
    wd->selectioninfo = edje_object_add(e);
    _elm_theme_object_set(obj, wd->selectioninfo, "selectioninfo", "base", "default");
    //_resize(obj, NULL, obj, NULL);
-	
    elm_selectioninfo_parent_set(obj, parent);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
@@ -272,10 +270,10 @@ elm_selectioninfo_content_set(Evas_Object *obj, Evas_Object *content)
    
    if (content)
      {
-	elm_widget_sub_object_add(obj, content);
-	evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	evas_object_event_callback_add(content, EVAS_CALLBACK_RESIZE, _content_resize, obj);
-	edje_object_part_swallow(wd->selectioninfo, "elm.swallow.content", content);
+        elm_widget_sub_object_add(obj, content);
+        evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+        evas_object_event_callback_add(content, EVAS_CALLBACK_RESIZE, _content_resize, obj);
+        edje_object_part_swallow(wd->selectioninfo, "elm.swallow.content", content);
      }
    _sizing_eval(obj);   
    _calc(obj);
@@ -297,25 +295,34 @@ elm_selectioninfo_parent_set(Evas_Object *obj, Evas_Object *parent)
    if (!wd) return;
    if (wd->parent)
      {
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE, _changed_size_hints, obj);
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_MOVE, _changed_size_hints, obj);
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_DEL, _parent_del, obj);
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_HIDE, _parent_hide, obj);
-	wd->parent = NULL;
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                             _changed_size_hints, obj);
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE,
+                                             _changed_size_hints, obj);
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_MOVE,
+                                            _changed_size_hints, obj);
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_DEL,
+                                            _parent_del, obj);
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_HIDE,
+                                            _parent_hide, obj);
+        wd->parent = NULL;
      }
    
    if (parent)
      {
-	wd->parent = parent;
-	evas_object_event_callback_add(parent, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-	evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _changed_size_hints, obj);
-	evas_object_event_callback_add(parent, EVAS_CALLBACK_MOVE, _changed_size_hints, obj);
-	evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL, _parent_del, obj);
-	evas_object_event_callback_add(parent, EVAS_CALLBACK_HIDE, _parent_hide, obj);
-	_sizing_eval(obj);
+        wd->parent = parent;
+        evas_object_event_callback_add(parent, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                       _changed_size_hints, obj);
+        evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE,
+                                       _changed_size_hints, obj);
+        evas_object_event_callback_add(parent, EVAS_CALLBACK_MOVE,
+                                       _changed_size_hints, obj);
+        evas_object_event_callback_add(parent, EVAS_CALLBACK_DEL,
+                                       _parent_del, obj);
+        evas_object_event_callback_add(parent, EVAS_CALLBACK_HIDE,
+                                       _parent_hide, obj);
+        _sizing_eval(obj);
      }
-	
    _calc(obj);
 }
 
@@ -393,8 +400,8 @@ elm_selectioninfo_checked_count_get(Evas_Object *obj)
    int count = 0;
    for (i=0; i<wd->check_count; i++)
      {
-	if (wd->check_state[i])
-	  count++;
+        if (wd->check_state[i])
+          count++;
      }
    
    return count;
