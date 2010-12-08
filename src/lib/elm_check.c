@@ -34,14 +34,13 @@ static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _disable_hook(Evas_Object *obj);
-static void _on_focus_hook(void *data, Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 static void _signal_check_off(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_check_on(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_check_toggle(void *data, Evas_Object *obj, const char *emission, const char *source);
-
+static void _on_focus_hook(void *data, Evas_Object *obj);
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_UNFOCUSED[] = "unfocused";
 static const Evas_Smart_Cb_Description _signals[] = {
@@ -57,6 +56,24 @@ _del_hook(Evas_Object *obj)
    if (!wd) return;
    if (wd->label) eina_stringshare_del(wd->label);
    free(wd);
+}
+
+static void
+_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (elm_widget_focus_get(obj))
+     {
+        edje_object_signal_emit(wd->chk, "elm,action,focus", "elm");
+        evas_object_focus_set(wd->chk, EINA_TRUE);
+     }
+   else
+     {
+        edje_object_signal_emit(wd->chk, "elm,action,unfocus", "elm");        
+        evas_object_focus_set(wd->chk, EINA_FALSE);
+        evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
+     }
 }
 
 static void
@@ -78,26 +95,11 @@ _theme_hook(Evas_Object *obj)
    else
      edje_object_signal_emit(wd->chk, "elm,state,text,hidden", "elm");
    edje_object_part_text_set(wd->chk, "elm.text", wd->label);
+   if (elm_widget_disabled_get(obj))
+      edje_object_signal_emit(wd->chk, "elm,state,disabled", "elm");
    edje_object_message_signal_process(wd->chk);
    edje_object_scale_set(wd->chk, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
-}
-
-static void
-_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (elm_widget_focus_get(obj))
-     {
-
-        evas_object_focus_set(wd->chk, EINA_TRUE);
-     }
-   else
-     {
-        evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
-        evas_object_focus_set(wd->chk, EINA_FALSE);
-     }
 }
 
 static void
@@ -203,6 +205,8 @@ elm_check_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    obj = elm_widget_add(e);
@@ -210,10 +214,10 @@ elm_check_add(Evas_Object *parent)
    elm_widget_type_set(obj, "check");
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_sub_object_add(parent, obj);
+   elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
-   elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL );
    elm_widget_disable_hook_set(obj, _disable_hook);
 
    wd->chk = edje_object_add(e);
@@ -281,6 +285,8 @@ elm_check_label_get(const Evas_Object *obj)
  * Set the icon object of the check object
  *
  * Once the icon object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_check_icon_unset() function.
  *
  * @param[in] obj The check object
  * @param[in] icon The icon object
@@ -323,6 +329,30 @@ elm_check_icon_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    return wd->icon;
+}
+
+/**
+ * Unset the icon used for the check object
+ *
+ * Unparent and return the icon object which was set for this widget.
+ *
+ * @param[in] obj The check object
+ * @return The icon object that was being used
+ *
+ * @ingroup Check
+ */
+EAPI Evas_Object *
+elm_check_icon_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (!wd->icon) return NULL;
+   Evas_Object *icon = wd->icon;
+   elm_widget_sub_object_del(obj, wd->icon);
+   edje_object_part_unswallow(wd->chk, wd->icon);
+   wd->icon = NULL;
+   return icon;
 }
 
 /**
