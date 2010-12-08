@@ -438,13 +438,13 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	_check_enable_returnkey(obj);
 
         while (parent_obj)
-	  {
+          {
              above = evas_object_above_get(parent_obj);
              if (above)
                 evas_object_data_set(parent_obj, "raise", above);
-	     evas_object_raise(parent_obj);
-	     parent_obj = elm_widget_parent_get(parent_obj);
-	  }
+             evas_object_raise(parent_obj);
+             parent_obj = elm_widget_parent_get(parent_obj);
+          }
      }
    else
      {
@@ -705,8 +705,8 @@ _long_press(void *data)
 
    if (wd->longpress_timer)
      {
-	ecore_timer_del(wd->longpress_timer);
-	wd->longpress_timer = NULL;
+        ecore_timer_del(wd->longpress_timer);
+        wd->longpress_timer = NULL;
      }
 
    if ((wd->api) && (wd->api->obj_longpress))
@@ -2083,7 +2083,7 @@ elm_entry_add(Evas_Object *parent)
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
    elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
-   elm_widget_can_focus_set(obj, 1);
+   elm_widget_can_focus_set(obj, EINA_TRUE);
 
    wd->linewrap     = EINA_TRUE;
    wd->ellipsis     = EINA_FALSE;
