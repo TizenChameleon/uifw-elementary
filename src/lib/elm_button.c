@@ -76,23 +76,23 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_focus_get(obj))
      {
-	if (wd->statelabel[FOCUSED])
-	  {
-	     _set_label(obj, wd->statelabel[FOCUSED]);
-	  }
-	//edje_object_signal_emit(wd->btn, "elm,action,focus", "elm");
-	evas_object_focus_set(wd->btn, EINA_TRUE);
+        if (wd->statelabel[FOCUSED])
+          {
+             _set_label(obj, wd->statelabel[FOCUSED]);
+          }
+        //edje_object_signal_emit(wd->btn, "elm,action,focus", "elm");
+        evas_object_focus_set(wd->btn, EINA_TRUE);
      }
    else
      {
-	if (wd->statelabel[DEFAULT])
-	  _set_label(obj, wd->statelabel[DEFAULT]);
-#if 0
-	else
-	  _set_label(obj, wd->label);
-#endif
-	//edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
-	evas_object_focus_set(wd->btn, EINA_FALSE);
+        if (wd->statelabel[DEFAULT])
+          _set_label(obj, wd->statelabel[DEFAULT]);
+        #if 0
+        else
+          _set_label(obj, wd->label);
+        #endif
+        //edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
+        evas_object_focus_set(wd->btn, EINA_FALSE);
      }
 }
 
@@ -131,21 +131,21 @@ _disable_hook(Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_disabled_get(obj))
      {
-	if (wd->statelabel[DISABLED] )
-	  {
-	     _set_label(obj, wd->statelabel[DISABLED]);
-	  }
-	edje_object_signal_emit(wd->btn, "elm,state,disabled", "elm");
+        if (wd->statelabel[DISABLED] )
+          {
+             _set_label(obj, wd->statelabel[DISABLED]);
+          }
+        edje_object_signal_emit(wd->btn, "elm,state,disabled", "elm");
      }
    else
      {
-	if (wd->statelabel[DEFAULT])
-	  _set_label(obj, wd->statelabel[DEFAULT]);
-#if 0
-	else
-	  _set_label(obj, wd->label);
-#endif
-	edje_object_signal_emit(wd->btn, "elm,state,enabled", "elm");
+        if (wd->statelabel[DEFAULT])
+          _set_label(obj, wd->statelabel[DEFAULT]);
+        #if 0
+        else
+          _set_label(obj, wd->label);
+        #endif
+        edje_object_signal_emit(wd->btn, "elm,state,enabled", "elm");
      }
 }
 
@@ -185,12 +185,12 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (!wd) return;
    if (sub == wd->icon)
      {
-	edje_object_signal_emit(wd->btn, "elm,state,icon,hidden", "elm");
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+        edje_object_signal_emit(wd->btn, "elm,state,icon,hidden", "elm");
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                        _changed_size_hints, obj);
-	wd->icon = NULL;
-	edje_object_message_signal_process(wd->btn);
-	_sizing_eval(obj);
+        wd->icon = NULL;
+        edje_object_message_signal_process(wd->btn);
+        _sizing_eval(obj);
      }
 }
 
@@ -201,8 +201,8 @@ _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *
    if (!wd) return;
    if (wd->timer)
      {
-	ecore_timer_del(wd->timer);
-	wd->timer = NULL;
+        ecore_timer_del(wd->timer);
+        wd->timer = NULL;
      }
    wd->repeating = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
@@ -217,10 +217,9 @@ _autorepeat_send(void *data)
    evas_object_smart_callback_call(data, SIG_REPEATED, NULL);
    if (!wd->repeating)
      {
-	wd->timer = NULL;
-	return ECORE_CALLBACK_CANCEL;
+        wd->timer = NULL;
+        return ECORE_CALLBACK_CANCEL;
      }
-
    return ECORE_CALLBACK_RENEW;
 }
 
@@ -246,14 +245,14 @@ _signal_pressed(void *data, Evas_Object *obj __UNUSED__, const char *emission __
 
    if (wd->statelabel[HIGHLIGHTED])
      {
-	_set_label(data, wd->statelabel[HIGHLIGHTED]);
+        _set_label(data, wd->statelabel[HIGHLIGHTED]);
      }
    if (wd->autorepeat && !wd->repeating)
      {
-	if (wd->ar_threshold <= 0.0)
-	  _autorepeat_initial_send(data); /* call immediately */
-	else
-	  wd->timer = ecore_timer_add(wd->ar_threshold, _autorepeat_initial_send, data);
+        if (wd->ar_threshold <= 0.0)
+          _autorepeat_initial_send(data); /* call immediately */
+        else
+          wd->timer = ecore_timer_add(wd->ar_threshold, _autorepeat_initial_send, data);
      }
 }
 
@@ -264,10 +263,10 @@ _signal_default_text_set(void *data, Evas_Object *obj, const char *emission, con
    if (!wd) return;
    if (wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
-#if 0
+   #if 0
    else
      _set_label(data, wd->label);
-#endif
+   #endif
    return;
 }
 
@@ -285,8 +284,8 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
 
    if (wd->timer)
      {
-	ecore_timer_del(wd->timer);
-	wd->timer = NULL;
+        ecore_timer_del(wd->timer);
+        wd->timer = NULL;
      }
    wd->repeating = EINA_FALSE;
    evas_object_smart_callback_call(data, SIG_UNPRESSED, NULL);
@@ -336,7 +335,7 @@ elm_button_add(Evas_Object *parent)
    edje_object_signal_callback_add(wd->btn, "elm,action,unpress", "",
                                    _signal_unpressed, obj);
    edje_object_signal_callback_add(wd->btn, "elm,action,default,text,set", "",
-   		_signal_default_text_set, obj);
+                                   _signal_default_text_set, obj);
    elm_widget_resize_object_set(obj, wd->btn);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
@@ -400,27 +399,27 @@ elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlSta
 
    if (state == UIControlStateDefault)
      {
-	wd->statetype[DEFAULT] = UIControlStateDefault;
-	eina_stringshare_replace(&wd->statelabel[DEFAULT], label);
-	return;
+        wd->statetype[DEFAULT] = UIControlStateDefault;
+        eina_stringshare_replace(&wd->statelabel[DEFAULT], label);
+        return;
      }
    if (state == UIControlStateHighlighted)
      {
-	wd->statetype[HIGHLIGHTED] = UIControlStateHighlighted;
-	eina_stringshare_replace(&wd->statelabel[HIGHLIGHTED], label);
-	return;
+        wd->statetype[HIGHLIGHTED] = UIControlStateHighlighted;
+        eina_stringshare_replace(&wd->statelabel[HIGHLIGHTED], label);
+        return;
      }
    if (state == UIControlStateFocused)
      {
-	wd->statetype[FOCUSED] = UIControlStateFocused;
-	eina_stringshare_replace(&wd->statelabel[FOCUSED], label);
-	return;
+        wd->statetype[FOCUSED] = UIControlStateFocused;
+        eina_stringshare_replace(&wd->statelabel[FOCUSED], label);
+        return;
      }
    if (state == UIControlStateDisabled)
      {
-	wd->statetype[DISABLED] = UIControlStateDisabled;
-	eina_stringshare_replace(&wd->statelabel[DISABLED], label);
-	return;
+        wd->statetype[DISABLED] = UIControlStateDisabled;
+        eina_stringshare_replace(&wd->statelabel[DISABLED], label);
+        return;
      }
 }
 
@@ -488,12 +487,12 @@ elm_button_icon_set(Evas_Object *obj, Evas_Object *icon)
    wd->icon = icon;
    if (icon)
      {
-	elm_widget_sub_object_add(obj, icon);
-	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				       _changed_size_hints, obj);
-	edje_object_part_swallow(wd->btn, "elm.swallow.content", icon);
-	edje_object_signal_emit(wd->btn, "elm,state,icon,visible", "elm");
-	edje_object_message_signal_process(wd->btn);
+        elm_widget_sub_object_add(obj, icon);
+        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                       _changed_size_hints, obj);
+        edje_object_part_swallow(wd->btn, "elm.swallow.content", icon);
+        edje_object_signal_emit(wd->btn, "elm,state,icon,visible", "elm");
+        edje_object_message_signal_process(wd->btn);
      }
    _sizing_eval(obj);
 }
@@ -555,8 +554,8 @@ elm_button_autorepeat_initial_timeout_set(Evas_Object *obj, double t)
    if (wd->ar_threshold == t) return;
    if (wd->timer)
      {
-	ecore_timer_del(wd->timer);
-	wd->timer = NULL;
+        ecore_timer_del(wd->timer);
+        wd->timer = NULL;
      }
    wd->ar_threshold = t;
 }
