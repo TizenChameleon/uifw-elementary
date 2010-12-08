@@ -152,45 +152,44 @@ _content_resize_event_cb(void *data, Evas *e, Evas_Object *obj,
       elm_widget_show_region_get(focus_obj, &x, &y, &w, &h);
 
       if (h < _elm_config->finger_size) h = _elm_config->finger_size;
+      else h=1+h;
       elm_widget_show_region_set(focus_obj, x, y, w, h);
    }
 }
 
 static void
-_autoscroll_mode_enable(void *data)
+_update_autoscroll_objs(void *data)
 {
    char *type;
-   Evas_Object *scrl_obj = NULL;
+   Evas_Object *sub, *top_scroller = NULL;
    Evas_Object *conformant = (Evas_Object *) data;
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   scrl_obj = elm_widget_focused_object_get(conformant);
+   sub = elm_widget_focused_object_get(conformant);
 
    //Look up for Top most scroller in the Focus Object hierarchy inside Conformant.
-   while (scrl_obj)
+   while (sub)
    {
-      type = elm_widget_type_get(scrl_obj);
+      type = elm_widget_type_get(sub);
       if (!strcmp(type, "conformant")) break;
       if (!strcmp(type, "scroller") || !strcmp(type, "genlist"))
-         wd->scroller = scrl_obj;
+         top_scroller = sub;
 
-      scrl_obj = elm_object_parent_widget_get(scrl_obj);
+      sub = elm_object_parent_widget_get(sub);
    }
 
-   if (wd->scroller) evas_object_event_callback_add(wd->scroller,
-                                                    EVAS_CALLBACK_RESIZE,
-                                                    _content_resize_event_cb,
-                                                    data);
-}
-
-static void
-_autoscroll_mode_disable(void *data)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return;
-   evas_object_event_callback_del(wd->scroller, EVAS_CALLBACK_RESIZE,
-                                  _content_resize_event_cb);
-   wd->scroller = NULL;
+   //If the scroller got changed by app, replace it.
+   if (top_scroller != wd->scroller)
+   {
+      if (wd->scroller) evas_object_event_callback_del(wd->scroller,
+                                                       EVAS_CALLBACK_RESIZE,
+                                                       _content_resize_event_cb);
+      wd->scroller = top_scroller;
+      if (wd->scroller) evas_object_event_callback_add(wd->scroller,
+                                                       EVAS_CALLBACK_RESIZE,
+                                                       _content_resize_event_cb,
+                                                       data);
+   }
 }
 
 static Eina_Bool
@@ -269,13 +268,7 @@ _prop_change(void *data, int type __UNUSED__, void *event)
       if (virt_keypad_state == wd->vkeypad_state) return ECORE_CALLBACK_PASS_ON;
       wd->vkeypad_state = virt_keypad_state;
       if(wd->vkeypad_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_ON)
-      {
-         _autoscroll_mode_enable(data);
-      }
-      else if(wd->vkeypad_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF)
-      {
-         _autoscroll_mode_disable(data);
-      }
+         _update_autoscroll_objs(data);
    }
 #endif
 
