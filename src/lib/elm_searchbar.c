@@ -24,6 +24,7 @@ struct _Widget_Data
 
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
+static void _on_focus_hook(void *data, Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _clicked(void *data, Evas_Object *obj, void *event_info);
 static void _changed(void *data, Evas_Object *obj, void *event_info);
@@ -52,6 +53,24 @@ static void _theme_hook(Evas_Object *obj)
 
    edje_object_scale_set(wd->cancel_btn, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
+}
+
+static void
+_on_focus_hook(void *data, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd || !wd->base)
+      return;	
+   if (elm_widget_focus_get(obj))
+     {
+		 elm_entry_cursor_end_set(elm_editfield_entry_get(wd->eb));
+
+		 if (wd->cancel_btn_show_mode)
+		 {
+			 if (wd->cancel_btn_ani_flag) edje_object_signal_emit(wd->base, "CANCELIN", "PROG");
+			 else edje_object_signal_emit(wd->base, "CANCELSHOW", "PROG");
+		 }
+	 }
 }
 
 static void _sizing_eval(Evas_Object *obj)
@@ -146,6 +165,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
    elm_widget_can_focus_set(obj, 1 );
 
    wd->base = edje_object_add(e);
