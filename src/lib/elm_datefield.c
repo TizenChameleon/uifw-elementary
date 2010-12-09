@@ -213,13 +213,14 @@ _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const c
         edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");
         wd->hour -= HOUR_12H_MAXIMUM;
      }
+   evas_object_smart_callback_call(data, "changed", NULL);
 }
 
 static void
 _signal_rect_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return ;
+   if (!wd) return;
 
    if (!strcmp(source, "elm.rect.date.year.over"))
      elm_object_focus(wd->date[DATE_YEAR]);
