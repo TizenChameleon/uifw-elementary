@@ -534,7 +534,6 @@ echo "    EDBus..............: ${have_elementary_edbus}"
 echo "    EFreet.............: ${have_elementary_efreet}"
 echo "    EWeather...........: ${have_elementary_eweather}"
 echo "    Ethumb.............: ${have_elementary_ethumb}"
-echo "    EWebKit............: ${have_elementary_ewebkit}"
 echo "    Xml2...............: ${have_elementary_libxml2}"
 echo
 echo "  eet..................: ${eet_eet}"
