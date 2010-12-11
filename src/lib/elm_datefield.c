@@ -1,5 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
+#include <langinfo.h>
 
 /**
  * @defgroup Datefield Datefield
@@ -37,7 +38,6 @@ enum
 };
 
 #define YEAR_MAX_LENGTH 4
-#define MONTH_MAX_LENGTH 3
 #define DAY_MAX_LENGTH 2
 #define TIME_MAX_LENGTH 2
 
@@ -45,8 +45,6 @@ enum
 #define HOUR_24H_MAXIMUM 23
 #define HOUR_12H_MAXIMUM 12
 #define MIN_MAXIMUM 59
-
-static char month_label[12][4] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 struct _Widget_Data
 {
@@ -63,6 +61,7 @@ struct _Widget_Data
    int date_format;
    Eina_Bool pm:1;
    Eina_Bool time_mode:1;
+   Eina_Bool format_exists:1;
    Eina_Bool editing:1;
 
    void (*func)(void *data, Evas_Object *obj, int value);
@@ -91,6 +90,7 @@ static void _date_update(Evas_Object *obj);
 static Eina_Bool _focus_idler_cb(void *obj);
 static void _entry_focus_move(Evas_Object *obj, Evas_Object *focus_obj);
 static Eina_Bool _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen);
+static char* _get_i18n_string(Evas_Object *obj, nl_item item);
 static int _maximum_day_get(int year, int month);
 static int _check_date_boundary(Evas_Object *obj, int num, int flag);
 
@@ -118,7 +118,9 @@ static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   char sig[32] = {0,};
    int i;
+
    if (!wd || !wd->base) return;
 
    if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
@@ -168,11 +170,31 @@ _theme_hook(Evas_Object *obj)
 
    edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
 
+   //set date format
+   if (wd->format_exists)
+     sprintf(sig, "elm,state,format,%s", elm_datefield_date_format_get(obj));
+   else
+     {
+	char *str = _get_i18n_string(obj, D_FMT);
+	if (str) 
+	  {
+	     if (!strcmp(str, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
+	     else if (!strcmp(str, "yyddmm")) wd->date_format = DATE_FORMAT_YYDDMM;
+	     else if (!strcmp(str, "mmyydd")) wd->date_format = DATE_FORMAT_MMYYDD;
+	     else if (!strcmp(str, "mmddyy")) wd->date_format = DATE_FORMAT_MMDDYY;
+	     else if (!strcmp(str, "ddyymm")) wd->date_format = DATE_FORMAT_DDYYMM;
+	     else if (!strcmp(str, "ddmmyy")) wd->date_format = DATE_FORMAT_DDMMYY;
+	     sprintf(sig, "elm,state,format,%s",str);
+	     free(str);
+	  }
+     }
+   edje_object_signal_emit(wd->base, sig, "elm");
+
    _date_update(obj);
    _sizing_eval(obj);
 }
 
-static void
+   static void
 _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -183,7 +205,7 @@ _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_max_set(obj, -1, -1);
 }
 
-static void
+   static void
 _signal_ampm_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -199,18 +221,29 @@ static void
 _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+   char *str;
+
    if (!wd || !wd->base) return ;
 
-   wd->pm = !wd->pm;
-
+   wd->pm = !wd->pm; 
    if (wd->pm)
      {
-        edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
+	str = _get_i18n_string(data, PM_STR);
+	if (str) 
+	  {
+	     edje_object_part_text_set(wd->base, "elm.text.ampm", str);
+	     free(str);
+	  }
         wd->hour += HOUR_12H_MAXIMUM;
      }
    else
      {
-        edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");
+	str = _get_i18n_string(data, AM_STR);
+	if (str)
+	  {
+	     edje_object_part_text_set(wd->base, "elm.text.ampm", str);
+	     free(str);
+	  }
         wd->hour -= HOUR_12H_MAXIMUM;
      }
    evas_object_smart_callback_call(data, "changed", NULL);
@@ -331,6 +364,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    char str[YEAR_MAX_LENGTH+1] = {0,};
+   char *i18n_str;
    int num = 0;
 
    if (!wd || !wd->base) return;
@@ -347,7 +381,12 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
         if (wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
           {
              wd->month = num;
-             elm_entry_entry_set(wd->date[DATE_MON], month_label[wd->month-1]);
+	     i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
+	     if (i18n_str)
+	       {
+		  elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
+		  free(i18n_str);
+	       }
           }
         //check day boundary
         if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
@@ -363,7 +402,12 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
         if (wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
           {
              wd->month = num;
-             elm_entry_entry_set(wd->date[DATE_MON], month_label[wd->month-1]);
+	     i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
+	     if (i18n_str)
+	       {
+		  elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
+		  free(i18n_str);
+	       }  
           }
         //check day boundary
         if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
@@ -408,8 +452,24 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
                }
              wd->hour = (wd->pm == EINA_TRUE)? num + HOUR_12H_MAXIMUM : num;
              if ((wd->hour % 12) == 0) wd->hour -= HOUR_12H_MAXIMUM;
-             if (wd->pm) edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
-             else edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");
+             if (wd->pm) 
+	       {
+		  i18n_str = _get_i18n_string(data, PM_STR);
+		  if (i18n_str)
+		    {
+		       edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
+		       free(i18n_str);
+		    }
+	       }
+             else 
+	       {
+		  i18n_str = _get_i18n_string(data, AM_STR);
+		  if (i18n_str)
+		    {
+		       edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
+		       free(i18n_str);
+		    }
+	       }
           }
         sprintf(str, "%02d", num);
         elm_entry_entry_set(wd->time[TIME_HOUR], str);
@@ -538,6 +598,72 @@ _check_date_boundary(Evas_Object *obj, int num, int flag)
    return num;
 }
 
+static char*
+_get_i18n_string(Evas_Object *obj, nl_item item)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   const char *fmt;
+   char *str = NULL;
+   int i = 0, j = 0;
+
+   if (!wd) return NULL;
+
+   fmt = nl_langinfo(item);
+   if (!fmt) return NULL;
+
+   switch (item)
+     {
+      case D_FMT:
+	 str = calloc(7, sizeof(char));
+	 while (fmt[i]) 
+	   {
+	      if (fmt[i] == '%' && fmt[i+1]) 
+		{
+		   i++;
+		   switch (fmt[i]) 
+		     {
+		      case 'Y': case 'M': case 'D': case 'y': case 'm': case 'd':
+			 str[j++] = tolower(fmt[i]);
+			 str[j++] = tolower(fmt[i]);
+			 break;
+		     }
+		}
+	      i++;
+	   }
+	 return str;
+      case AM_STR: 
+      case PM_STR:
+	 if (strlen(fmt) > 0)
+	   {
+	      str = calloc(strlen(fmt)+1, sizeof(char));
+	      strcpy(str, fmt);
+	   }
+	 else
+	   {
+	      str = calloc(3, sizeof(char));
+	      if (item == AM_STR) strcpy(str, "AM");
+	      else if (item == PM_STR) strcpy(str, "PM");
+	   }
+	 return str;
+      case ABMON_1: case ABMON_2: case ABMON_3: case ABMON_4: case ABMON_5: case ABMON_6:
+      case ABMON_7: case ABMON_8: case ABMON_9: case ABMON_10: case ABMON_11: case ABMON_12:
+	 str = calloc(strlen(fmt)+1, sizeof(char));
+	 while (fmt[i])
+	   {
+	      str[j++] = fmt[i];
+	      if (fmt[i] >= '1' && fmt[i] <= '9')
+		{
+		   if (fmt[i+1] >= '1' && fmt[i+1] <= '9')
+		     str[j] = fmt[i+1];
+		   break;
+		}
+	      i++;
+	   }
+	 return str;	 
+     }
+   return NULL;
+}
+
 static int
 _maximum_day_get(int year, int month)
 {
@@ -577,7 +703,7 @@ _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen)
 
    if (focus_obj == wd->date[DATE_YEAR] && strlen == YEAR_MAX_LENGTH)
      wd->editing = EINA_FALSE;
-   else if (focus_obj == wd->date[DATE_MON] && strlen == MONTH_MAX_LENGTH)
+   else if (focus_obj == wd->date[DATE_MON])
      wd->editing = EINA_FALSE;
    else if (focus_obj == wd->date[DATE_DAY])
      {
@@ -625,15 +751,23 @@ _imf_event_commit_cb(void *data, int type, void *event)
      }
    if (focus_obj == wd->date[DATE_MON])
      {
+	char *i18n_str;
         wd->month = atoi(ev->str);
-        strcpy(str, month_label[wd->month-1]);
+	i18n_str = _get_i18n_string(data, ABMON_1+wd->month-1);
+	if (i18n_str)
+	  {
+	     elm_entry_entry_set(focus_obj, i18n_str);
+	     //strncpy(str, i18n_str, 15);
+	     free(i18n_str);
+	  }
      }
    else
      {
         strcpy(str, elm_entry_entry_get(focus_obj));
         str[strlen(str)] = ev->str[0];
+	elm_entry_entry_set(focus_obj, str);
      }
-   elm_entry_entry_set(focus_obj, str);
+   //elm_entry_entry_set(focus_obj, str);
 
    if (_check_input_done(data, focus_obj, strlen(str)))
      _entry_focus_move(data, focus_obj);
@@ -656,15 +790,20 @@ static void
 _date_update(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   char str[YEAR_MAX_LENGTH+1];
+   char str[YEAR_MAX_LENGTH+1] = {0,};
+   char *i18n_str;
 
    if (!wd || !wd->base) return;
 
    sprintf(str, "%d", wd->year);
    elm_entry_entry_set(wd->date[DATE_YEAR], str);
 
-   sprintf(str, "%s", month_label[wd->month-1]);
-   elm_entry_entry_set(wd->date[DATE_MON], str);
+   i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
+   if (i18n_str)
+     {
+	elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
+	free(i18n_str);
+     }
 
    sprintf(str, "%d", wd->day);
    elm_entry_entry_set(wd->date[DATE_DAY], str);
@@ -676,12 +815,22 @@ _date_update(Evas_Object *obj)
         if (wd->hour >= HOUR_12H_MAXIMUM)
           {
              wd->pm = EINA_TRUE;
-             edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
+	     i18n_str = _get_i18n_string(obj, PM_STR);
+	     if (i18n_str) 
+	       {
+		  edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
+		  free(i18n_str);
+	       }
           }
         else
           {
              wd->pm = EINA_FALSE;
-             edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");		
+	     i18n_str = _get_i18n_string(obj, AM_STR);
+	     if (i18n_str)
+	       {
+		  edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);		
+		  free(i18n_str);
+	       }
           }
 
         if (wd->hour > HOUR_12H_MAXIMUM)
@@ -719,7 +868,6 @@ _date_entry_add(Evas_Object *obj)
         elm_widget_sub_object_add(obj, wd->date[i]);
      }
    elm_entry_maximum_bytes_set(wd->date[DATE_YEAR], YEAR_MAX_LENGTH);
-   elm_entry_maximum_bytes_set(wd->date[DATE_MON], MONTH_MAX_LENGTH);
    elm_entry_maximum_bytes_set(wd->date[DATE_DAY], DAY_MAX_LENGTH);
 }
 
@@ -749,6 +897,7 @@ _time_entry_add(Evas_Object *obj)
 
 /**
  * Add a new datefield object
+ * The date format and strings are based on current locale
  *
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
@@ -804,7 +953,6 @@ elm_datefield_add(Evas_Object *parent)
 
    wd->layout = ELM_DATEFIELD_LAYOUT_DATEANDTIME;
    wd->time_mode = EINA_TRUE;
-   wd->date_format = DATE_FORMAT_MMDDYY;
 
    _theme_hook(obj);
 
@@ -1088,36 +1236,14 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 
    if (wd->time_mode != mode) 
      {
-        char str[YEAR_MAX_LENGTH+1];
+	char str[YEAR_MAX_LENGTH+1];
 
-        wd->time_mode = mode;
-        if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h", "elm");
-        else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
+	wd->time_mode = mode;
+	if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h", "elm");
+	else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
 
-        if (!wd->time_mode) //24 mode
-          sprintf(str, "%d", wd->hour);
-        else
-          {
-             if (wd->hour >= HOUR_12H_MAXIMUM)
-               {
-                  wd->pm = EINA_TRUE;
-                  edje_object_part_text_set(wd->base, "elm.text.ampm", "PM");
-               }
-             else
-               {
-                  wd->pm = EINA_FALSE;
-                  edje_object_part_text_set(wd->base, "elm.text.ampm", "AM");
-               }
-
-             if (wd->hour > HOUR_12H_MAXIMUM)
-               sprintf(str, "%d", wd->hour - HOUR_12H_MAXIMUM);
-             else if (wd->hour == 0)
-               sprintf(str, "%d", HOUR_12H_MAXIMUM);
-             else
-               sprintf(str, "%d", wd->hour);
-          }
-        elm_entry_entry_set(wd->time[TIME_HOUR], str);
-    }
+	_date_update(obj);
+     }
 }
 
 /**
@@ -1162,7 +1288,7 @@ elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
      {
         sig[j++] = tolower(fmt[i++]);
      }
-
+   sig[j] = '\0';
    edje_object_signal_emit(wd->base, sig, "elm");
 
    if (strstr(sig, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
@@ -1171,6 +1297,7 @@ elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
    else if (strstr(sig, "mmddyy")) wd->date_format = DATE_FORMAT_MMDDYY;
    else if (strstr(sig, "ddyymm")) wd->date_format = DATE_FORMAT_DDYYMM;
    else if (strstr(sig, "ddmmyy")) wd->date_format = DATE_FORMAT_DDMMYY;
+   wd->format_exists = EINA_TRUE;
 }
 
 /**
