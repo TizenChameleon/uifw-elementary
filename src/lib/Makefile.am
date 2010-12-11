@@ -139,10 +139,7 @@ els_hor_scroller.h \
 els_box.c \
 els_box.h \
 els_icon.c \
-els_icon.h \
-\
-els_touch.c \
-els_touch.h
+els_icon.h
 
 
 libelementary_la_CFLAGS =
