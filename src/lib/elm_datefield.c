@@ -194,7 +194,7 @@ _theme_hook(Evas_Object *obj)
    _sizing_eval(obj);
 }
 
-   static void
+static void
 _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -205,7 +205,7 @@ _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_max_set(obj, -1, -1);
 }
 
-   static void
+static void
 _signal_ampm_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -757,7 +757,6 @@ _imf_event_commit_cb(void *data, int type, void *event)
 	if (i18n_str)
 	  {
 	     elm_entry_entry_set(focus_obj, i18n_str);
-	     //strncpy(str, i18n_str, 15);
 	     free(i18n_str);
 	  }
      }
@@ -767,7 +766,6 @@ _imf_event_commit_cb(void *data, int type, void *event)
         str[strlen(str)] = ev->str[0];
 	elm_entry_entry_set(focus_obj, str);
      }
-   //elm_entry_entry_set(focus_obj, str);
 
    if (_check_input_done(data, focus_obj, strlen(str)))
      _entry_focus_move(data, focus_obj);
@@ -1236,12 +1234,9 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 
    if (wd->time_mode != mode) 
      {
-	char str[YEAR_MAX_LENGTH+1];
-
 	wd->time_mode = mode;
 	if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h", "elm");
 	else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
-
 	_date_update(obj);
      }
 }
