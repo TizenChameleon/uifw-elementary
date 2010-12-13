@@ -45,7 +45,6 @@ static const char SIG_CHANGED[] = "changed";
 static const char SIG_UNFOCUSED[] = "unfocused";
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
-  {SIG_UNFOCUSED, ""},
   {NULL, NULL}
 };
 
@@ -72,7 +71,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      {
         edje_object_signal_emit(wd->chk, "elm,action,unfocus", "elm");        
         evas_object_focus_set(wd->chk, EINA_FALSE);
-        evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
      }
 }
 
