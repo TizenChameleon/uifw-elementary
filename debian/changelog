@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build73) unstable; urgency=low
+
+  * Package upload due to EFL merge.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build73
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Tue, 14 Dec 2010 18:02:56 +0900
+
 elementary (1.0.0+svn.51480slp2+build72) unstable; urgency=low
 
   * Repackaging due to edje merging. 
