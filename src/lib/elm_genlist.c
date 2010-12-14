@@ -1091,10 +1091,11 @@ _multi_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
                        // Two finger : Pinch In
                        evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,in", it);
 
-                       if (it->wd->effect_mode == EINA_TRUE)
+                       if (it->wd->effect_mode == EINA_TRUE && it->wd->pinch_zoom == EINA_TRUE)
                          {
                             multi_y_avg= (it->wd->td1_y + it->wd->td2_y) / 2;
-                            it->wd->pinch_it = (multi_y_avg / it->group_item->h + it->wd->contract_pan_y / it->group_item->h) - 2;
+                            if(it->group_item)
+                               it->wd->pinch_it = (multi_y_avg / it->group_item->h + it->wd->contract_pan_y / it->group_item->h) - 2;
                             fprintf(stderr," pinch,in!! it ================ it->y = %d it->old_y = %d it = %d it->wd->td1_y = %d it->wd->td2_y = %d pinch_it = %d  it->wd->contract_pan_y = %d\n", it->y, it->old_scrl_y, it->old_scrl_y / 30,  it->wd->td1_y, it->wd->td2_y, it->wd->pinch_it, it->wd->contract_pan_y);
                             _elm_genlist_pinch_zoom_execute(it->wd->obj, 0);
                          }
@@ -1253,10 +1254,11 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
                     {
                        // Two finger : Pinch In
                        evas_object_smart_callback_call(it->wd->obj, "multi_touch,pinch,in", it);
-                       if (it->wd->effect_mode == EINA_TRUE)
+                       if (it->wd->effect_mode == EINA_TRUE && it->wd->pinch_zoom == EINA_TRUE)
                          {
                             multi_y_avg= (it->wd->td1_y + it->wd->td2_y) / 2;
-                            it->wd->pinch_it = (multi_y_avg / it->group_item->h + it->wd->contract_pan_y / it->group_item->h) - 2;
+                            if(it->group_item)
+	                       it->wd->pinch_it = (multi_y_avg / it->group_item->h + it->wd->contract_pan_y / it->group_item->h) - 2;
                             fprintf(stderr,"mouse up pinch,in!! it ================ it->y = %d it->old_y = %d it = %d it->wd->td1_y = %d it->wd->td2_y = %d pinch_it = %d  it->wd->contract_pan_y = %d \n", it->y, it->old_scrl_y, it->old_scrl_y / 30,  it->wd->td1_y, it->wd->td2_y, it->wd->pinch_it, it->wd->contract_pan_y);
                             _elm_genlist_pinch_zoom_execute(it->wd->obj, 0);
                          }
