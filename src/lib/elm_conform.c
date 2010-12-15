@@ -43,6 +43,9 @@ _del_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (wd->prop_hdl) ecore_event_handler_del(wd->prop_hdl);
+   if (wd->shelf) evas_object_del(wd->shelf);
+   if (wd->virtualkeypad) evas_object_del(wd->virtualkeypad);
+   if (wd->panel) evas_object_del(wd->panel);
    free(wd);
 }
 
