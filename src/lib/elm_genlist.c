@@ -5348,6 +5348,43 @@ _hide_delete_confirm_object (void *data, Evas_Object *obj, const char *emission,
    evas_object_hide(it->wd->ed->del_confirm);
 }
 
+EAPI void
+_edit_item_check_set(Elm_Genlist_Item  *it, Eina_Bool del_confirm_state)
+{
+   if (del_confirm_state)
+     {
+	it->del_confirm_state = 0;
+	it->delete_check = 0;
+	edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,enable", "elm");
+	it->wd->selct_all = 0;
+	if (elm_genlist_item_parent_get(it))
+	  edje_object_signal_emit(elm_genlist_item_parent_get(it)->edit_obj, "elm,state,del,animated,enable", "elm");
+	if (it->wd->select_all_item)
+	  edje_object_signal_emit(it->wd->select_all_item->base, "elm,state,del,animated,enable", "elm");
+	if (!it->wd->selct_all && it->wd->ed->ec->item_selected)
+	  it->wd->ed->ec->item_selected(it->data, it, it->delete_check);
+     }
+   else
+     {
+	edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
+	it->del_confirm_state = 1;
+	it->delete_check = 1;
+     }
+}
+
+EAPI void
+_edit_subitems_check(Elm_Genlist_Item *it)
+{
+   if (!it) return;
+   Eina_List *tl = NULL, *l;
+   Elm_Genlist_Item *it2;
+
+   EINA_LIST_FOREACH(it->items, l, it2)
+     tl = eina_list_append(tl, it2);
+   EINA_LIST_FREE(tl, it2)
+     _edit_item_check_set(it2, !elm_genlist_item_parent_get(it2)->del_confirm_state);
+}
+
 static void
 _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
@@ -5361,22 +5398,8 @@ _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *
         ecore_timer_del(it->edit_long_timer);
         it->edit_long_timer = NULL;
      }
-
-   if (it->del_confirm_state)
-     {
-        it->del_confirm_state = 0;
-        it->delete_check = 0;
-        edje_object_signal_emit(it->edit_obj, "elm,state,del,animated,enable", "elm");
-        it->wd->selct_all = 0;
-        if (it->wd->select_all_item)
-           edje_object_signal_emit(it->wd->select_all_item->base, "elm,state,del,animated,enable", "elm");
-        if (!it->wd->selct_all && it->wd->ed->ec->item_selected)
-           it->wd->ed->ec->item_selected(it->data, it, it->delete_check);
-        return;
-     }
-
-   it->del_confirm_state = 1;
-   it->delete_check = 1;
+   _edit_item_check_set(it, it->del_confirm_state);
+   _edit_subitems_check(it);
    it->wd->ed->del_item = it;
 
    if (!it->wd->selct_all && it->wd->ed->ec->item_selected)
@@ -5391,7 +5414,6 @@ _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *
       edje_object_part_swallow(it->edit_obj, del_icon_part, it->wd->ed->del_confirm);
       evas_object_show(it->wd->ed->del_confirm);
       */
-   edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
 }
 
 static void
