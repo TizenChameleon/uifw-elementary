@@ -183,6 +183,9 @@ _change_item_bg(Dialogue_Item *item, const char *location)
    else
      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,enabled", "elm");
    
+   if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_SUB)
+     edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "flip_item", "");
+
    /*   if(item->line_show == EINA_FALSE)
     edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,line,hide", "elm");*/
    
