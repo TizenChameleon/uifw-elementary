@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build75) unstable; urgency=low
+
+  * Packaging
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build75
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 16 Dec 2010 21:28:13 +0900
+
 elementary (1.0.0+svn.51480slp2+build74) unstable; urgency=low
 
   * [elm_genlist] fix multi-touch bs
