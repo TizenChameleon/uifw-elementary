@@ -1151,10 +1151,13 @@ selected_box(Elm_Controlbar_Item * it)
         }
         it->selected = EINA_TRUE;
 
+        if(wd->more_item != it)
+           evas_object_smart_callback_call(it->obj, "view,change,before", it);
+
         if(fit != NULL && fit != it)
           {
-             if(wd->more_item != it) 
-                evas_object_smart_callback_call(it->obj, "view,change,before", it);
+//             if(wd->more_item != it)
+//                evas_object_smart_callback_call(it->obj, "view,change,before", it);
 
              move_selected_box(wd, fit, it);
           }
