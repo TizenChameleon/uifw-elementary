@@ -1131,8 +1131,8 @@ _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, 
              edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
              edje_object_part_swallow(wd->base, "elm.swallow.btn3", it->fn_btn3);
           }
-		else
-			edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+        else
+          edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
      }
 }
 
