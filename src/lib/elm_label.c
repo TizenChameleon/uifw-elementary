@@ -281,11 +281,9 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf,
                   replocater = curlocater + strlen(key) + 1;
 
                   while (*replocater == ' ' || *replocater == '=')
-                    {
-                       replocater++;
-                    }
+                    replocater++;
 
-                  while (replocater != NULL && *replocater != ' ' && *replocater != '>')
+                  while (*replocater && *replocater != ' ' && *replocater != '>')
                     replocater++;
 
                   if (replocater - curlocater > strlen(key) + 1)
