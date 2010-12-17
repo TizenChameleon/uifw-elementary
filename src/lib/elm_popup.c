@@ -639,9 +639,12 @@ elm_popup_content_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-
+   Evas_Object *content;
+             
    if (!wd) return NULL;
-   return wd->content_area;
+   content = edje_object_part_swallow_get(elm_layout_edje_get(wd->content_area), 
+                                          "elm.swallow.content");
+   return content;
 }
 
 /**
