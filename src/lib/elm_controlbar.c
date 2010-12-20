@@ -111,6 +111,7 @@ struct _Elm_Controlbar_Item
    int style;
    int badge;
    Eina_Bool selected;
+   Eina_Bool default_selected;
    //   Eina_Bool editable;
    Eina_Bool disable;
 };
@@ -1151,11 +1152,15 @@ selected_box(Elm_Controlbar_Item * it)
         }
         it->selected = EINA_TRUE;
 
-        if(fit != NULL && fit != it)
+        if((fit != NULL && fit != it) || it->default_selected)
           {
+             it->default_selected = EINA_FALSE;
              if(wd->more_item != it)
                 evas_object_smart_callback_call(it->obj, "view,change,before", it);
+          }
 
+        if(fit != NULL && fit != it)
+          {
              move_selected_box(wd, fit, it);
           }
         else
@@ -1765,6 +1770,7 @@ create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
    it->text = eina_stringshare_add(label);
    it->icon_path = eina_stringshare_add(icon_path);
    it->selected = EINA_FALSE;
+   it->default_selected = EINA_FALSE;
    //   it->editable = EINA_TRUE;
    it->badge = 0;
    it->sel = 1;
@@ -2333,7 +2339,10 @@ EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_append(Evas_Object * obj,
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
    if (wd->num == 1)
-      selected_box(it);
+     {
+        selected_box(it);
+        it->default_selected = EINA_TRUE;
+     }
 
    _sizing_eval(obj);
    return it;
@@ -2385,7 +2394,10 @@ EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_prepend(Evas_Object *
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
    if (wd->num == 1)
-      selected_box(it);
+     {
+        selected_box(it);
+        it->default_selected = EINA_TRUE;
+     }
    _sizing_eval(obj);
    return it;
 }
@@ -2442,7 +2454,10 @@ elm_controlbar_tab_item_insert_before(Evas_Object * obj,
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
    if (wd->num == 1)
-      selected_box(it);
+     {
+        selected_box(it);
+        it->default_selected = EINA_TRUE;
+     }
    _sizing_eval(obj);
    return it;
 }
@@ -2500,7 +2515,10 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
    if (wd->num == 1)
-      selected_box(it);
+     {
+        selected_box(it);
+        it->default_selected = EINA_TRUE;
+     }
    _sizing_eval(obj);
    return it;
 }
