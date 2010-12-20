@@ -42,7 +42,6 @@ static void _signal_check_on(void *data, Evas_Object *obj, const char *emission,
 static void _signal_check_toggle(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _on_focus_hook(void *data, Evas_Object *obj);
 static const char SIG_CHANGED[] = "changed";
-static const char SIG_UNFOCUSED[] = "unfocused";
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
   {NULL, NULL}
