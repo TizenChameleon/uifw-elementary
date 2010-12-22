@@ -97,6 +97,7 @@ elm_transit.c \
 elm_animator.c \
 elm_editfield.c \
 elm_colorpicker.c \
+elm_colorselector.c \
 elm_colorpalette.c \
 elm_ctxpopup.c \
 elm_actionsheet.c \

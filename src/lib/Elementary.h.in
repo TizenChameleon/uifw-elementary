@@ -2374,13 +2374,20 @@ extern "C" {
    EINA_DEPRECATED EAPI int          elm_actionsheet_button_title_get(Evas_Object *obj, const int index, char **title);
 
    /* colorpicker */
-   EAPI Evas_Object *elm_colorpicker_add(Evas_Object *parent);
-   EAPI void         elm_colorpicker_color_set(Evas_Object *obj, int r, int g , int b);
-   EAPI void         elm_colorpicker_color_get(Evas_Object *obj, int *r, int *g , int *b);
+   EINA_DEPRECATED EAPI Evas_Object *elm_colorpicker_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_colorpicker_color_set(Evas_Object *obj, int r, int g , int b);
+   EINA_DEPRECATED EAPI void         elm_colorpicker_color_get(Evas_Object *obj, int *r, int *g , int *b);
    /* smart callbacks called:
     * "changed" - when color is changed
     */
 
+   /* colorselector */
+   EAPI Evas_Object *elm_colorselector_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+   EAPI void         elm_colorselector_color_set(Evas_Object *obj, int r, int g , int b, int a) EINA_ARG_NONNULL(1);
+   EAPI void         elm_colorselector_color_get(const Evas_Object *obj, int *r, int *g , int *b, int *a) EINA_ARG_NONNULL(1);
+   /* smart callbacks called:
+    * "changed" - when the color value changes
+    */
 
    /* colorpalette */
    typedef struct _Colorpalette_Color Elm_Colorpalette_Color; 
