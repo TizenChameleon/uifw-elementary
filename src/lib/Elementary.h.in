@@ -960,6 +960,7 @@ extern "C" {
    EAPI Evas_Object *elm_bubble_sweep_layout_unset(Evas_Object *obj);
    EAPI void         elm_bubble_corner_set(Evas_Object *obj, const char *corner);
    /* smart callbacks called:
+    * "clicked" - This is called when a user has clicked the bubble
     * "sweep,left,right" - when bubble is sweeped from left to right, this signal is sent.
     * "sweep,right,left" - when bubble is sweeped from right to left, this signal is sent.
     */

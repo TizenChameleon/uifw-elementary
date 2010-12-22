@@ -7,21 +7,31 @@
  *
  * The Bubble is an widget used to show a text in a frame as speech is
  * represented in comics.
+ *
+ * Signals that you can add callbacks for are:
+ *
+ * clicked - This is called when a user has clicked the bubble.
  */
 
 typedef struct _Widget_Data Widget_Data;
 
+#define SWEEP_SUPPORT 1
+
 struct _Widget_Data
 {
    Evas_Object *bbl;
-   Evas_Object *content, *icon, *sweep;
-   const char *label, *info;
-   
+   Evas_Object *content, *icon;
+   const char *label, *info, *corner;
+#ifdef SWEEP_SUPPORT
+   Evas_Object *sweep;
    Eina_Bool down:1;
    Evas_Coord_Point down_point;
+#endif
 };
 
+#ifdef SWEEP_SUPPORT
 #define SWEEP_THRESHOLD	100
+#endif
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
@@ -30,6 +40,13 @@ static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 
+#define SIG_CLICKED "clicked"
+static const Evas_Smart_Cb_Description _signals[] =
+{
+  {SIG_CLICKED, ""},
+  {NULL, NULL}
+};
+
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -37,6 +54,7 @@ _del_hook(Evas_Object *obj)
    if (!wd) return;
    if (wd->label) eina_stringshare_del(wd->label);
    if (wd->info) eina_stringshare_del(wd->info);
+   if (wd->corner) eina_stringshare_del(wd->corner);
    free(wd);
 }
 
@@ -45,17 +63,21 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   _elm_theme_object_set(obj, wd->bbl, "bubble", "base", elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, wd->bbl, "bubble", wd->corner,
+                         elm_widget_style_get(obj));
    edje_object_part_text_set(wd->bbl, "elm.text", wd->label);
    edje_object_part_text_set(wd->bbl, "elm.info", wd->info);
-   if (wd->content) edje_object_part_swallow(wd->bbl, "elm.swallow.content", wd->content); 
-   if (wd->icon)
+   if (wd->content)
      {
-        edje_object_part_swallow(wd->bbl, "elm.swallow.icon", wd->icon);
-        edje_object_signal_emit(wd->bbl, "elm,state,icon,visible", "elm");
+        edje_object_part_swallow(wd->bbl, "elm.swallow.content", wd->content);
         edje_object_message_signal_process(wd->bbl); 
      }
-   edje_object_scale_set(wd->bbl, elm_widget_scale_get(obj) * _elm_config->scale);
+   if (wd->icon)
+     edje_object_signal_emit(wd->bbl, "elm,state,icon,visible", "elm");
+   else
+     edje_object_signal_emit(wd->bbl, "elm,state,icon,hidden", "elm");
+   edje_object_scale_set(wd->bbl,
+                         elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
 }
 
@@ -65,7 +87,8 @@ _sizing_eval(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
    if (!wd) return;
-   edje_object_size_min_calc(wd->bbl, &minw, &minh);
+   elm_coords_finger_size_adjust(1, &minw, 1, &minh);
+   edje_object_size_min_restricted_calc(wd->bbl, &minw, &minh, minw, minh);
    evas_object_size_hint_min_set(obj, minw, minh);
    evas_object_size_hint_max_set(obj, maxw, maxh);
 }
@@ -74,14 +97,7 @@ static void
 _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord by, cy;
    if (!wd) return;
-
-   //bg image resizing problem because of entry resizing
-   evas_object_geometry_get(data, NULL, &by, NULL, NULL);
-   evas_object_geometry_get(wd->content, NULL, &cy, NULL, NULL);
-   if (by > 0 && cy > 0) edje_object_signal_emit(wd->bbl, "elm,state,bg,visible", "elm");
-
    _sizing_eval(data);
 }
 
@@ -100,12 +116,15 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 	wd->icon = NULL;
 	edje_object_message_signal_process(wd->bbl);
      }
+#ifdef SWEEP_SUPPORT
    else if (sub == wd->sweep) wd->sweep = NULL;
+#endif
    _sizing_eval(obj);
 }
 
+#ifdef SWEEP_SUPPORT
 static void
-_mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Down *ev = event_info;
@@ -114,23 +133,29 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
    wd->down_point.x = ev->canvas.x;
    wd->down_point.y = ev->canvas.y;
 }
+#endif
 
 static void
-_mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Up *ev = event_info;
-
+   Widget_Data *wd = elm_widget_data_get(data);
    if (!wd->down) return;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
+     {
+#ifdef SWEEP_SUPPORT 
+	if (ev->canvas.x - wd->down_point.x > SWEEP_THRESHOLD)
+	  evas_object_smart_callback_call(data, "sweep,left,right", NULL);
+	else if (wd->down_point.x - ev->canvas.x > SWEEP_THRESHOLD)
+	  evas_object_smart_callback_call(data, "sweep,right,left", NULL);
 
-   if (ev->canvas.x - wd->down_point.x > SWEEP_THRESHOLD)
-      evas_object_smart_callback_call(data, "sweep,left,right", NULL);
-   else if (wd->down_point.x - ev->canvas.x > SWEEP_THRESHOLD)
-      evas_object_smart_callback_call(data, "sweep,right,left", NULL);
-
-   wd->down = EINA_FALSE;
-   wd->down_point.x = 0;
-   wd->down_point.y = 0;	
+	wd->down = EINA_FALSE;
+	wd->down_point.x = 0;
+	wd->down_point.y = 0;	
+#endif
+     }
+   else if (!wd->sweep)
+     evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
 }
 
 /**
@@ -150,8 +175,11 @@ elm_bubble_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "bubble");
    elm_widget_type_set(obj, "bubble");
@@ -159,19 +187,26 @@ elm_bubble_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
+
+   wd->corner = eina_stringshare_add("base");
 
    wd->bbl = edje_object_add(e);
    _elm_theme_object_set(obj, wd->bbl, "bubble", "base", "default");
    elm_widget_resize_object_set(obj, wd->bbl);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-   evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_UP, _mouse_up, obj);
-   evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_DOWN, _mouse_down, obj);
+   evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_UP,
+                                  _mouse_up, obj);
+#ifdef SWEEP_SUPPORT
+   evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_DOWN,
+                                  _mouse_down, obj);
 
    wd->down = EINA_FALSE;
    wd->down_point.x = 0;
    wd->down_point.y = 0;
-
+#endif
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
    _sizing_eval(obj);
    return obj;
 }
@@ -438,6 +473,7 @@ elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+#ifdef SWEEP_SUPPORT
    if (wd->sweep == sweep) return;
    if (wd->sweep) evas_object_del(wd->sweep);
    wd->sweep = sweep;
@@ -446,6 +482,7 @@ elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep)
 	elm_widget_sub_object_add(obj, sweep);
 	edje_object_part_swallow(wd->bbl, "elm.swallow.sweep", sweep);
      }
+#endif
 }
 
 /**
@@ -463,14 +500,16 @@ elm_bubble_sweep_layout_unset(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *sweep;
+   Evas_Object *sweep = NULL;
    if (!wd) return NULL;
+#ifdef SWEEP_SUPPORT
    if (!wd->sweep) return NULL;
    sweep = wd->sweep;
    elm_widget_sub_object_del(obj, sweep);
    edje_object_part_unswallow(wd->bbl, sweep);
    evas_object_hide(sweep);
    wd->sweep = NULL;
+#endif
    return sweep;
 }
 
@@ -481,6 +520,11 @@ elm_bubble_sweep_layout_unset(Evas_Object *obj)
  * @param corner The given corner for the bubble.
  *
  * This function sets the corner of the bubble.
+ * The corner will be used to find the group in the theme
+ * For example, if you set the corner to "bottom_right",
+ * the following group will be searched:
+ * "elm/bubble/bottom_right/default",
+ * considering default style.
  *
  * @ingroup Bubble
  */
@@ -490,11 +534,26 @@ elm_bubble_corner_set(Evas_Object *obj, const char *corner)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   _elm_theme_object_set(obj, wd->bbl, "bubble", corner, elm_widget_style_get(obj));
-   if (wd->icon)
-     edje_object_part_swallow(wd->bbl, "elm.swallow.icon", wd->icon);
-   if (wd->content)
-     edje_object_part_swallow(wd->bbl, "elm.swallow.content", wd->content);
-   // FIXME: fix label etc.
-   _sizing_eval(obj);
+   EINA_SAFETY_ON_NULL_RETURN(corner);
+   eina_stringshare_replace(&wd->corner, corner);
+   _theme_hook(obj);
+}
+
+/**
+ * Get the corner of the bubble
+ *
+ * @param obj The bubble object.
+ * @return The given corner for the bubble.
+ *
+ * This function gets the corner of the bubble.
+ *
+ * @ingroup Bubble
+ */
+EAPI const char*
+elm_bubble_corner_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->corner;
 }
