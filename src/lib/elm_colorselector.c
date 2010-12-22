@@ -2,7 +2,8 @@
 #include "elm_priv.h"
 
 /**
- * @addtogroup Colorselector Colorselector
+ * @defgroup Colorselector Colorselector
+ * @ingroup Elementary
  *
  * By using colorselector, you can select a color.
  * Colorselector made a color using HSV/HSB mode.
