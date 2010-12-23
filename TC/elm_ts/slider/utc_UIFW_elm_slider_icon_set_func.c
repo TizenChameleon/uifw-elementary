@@ -123,9 +123,9 @@ static void utc_UIFW_elm_slider_icon_set_func_02(void)
          ret_icon = elm_slider_icon_get(slider);
 
          if (!ret_icon) {
-		tet_infoline("elm_slider_icon_set() failed in negative test case");
-		tet_result(TET_FAIL);
+	        tet_result(TET_PASS);
 		return;
 	}
-	tet_result(TET_PASS);
+	tet_infoline("elm_slider_icon_set() failed in negative test case");
+	tet_result(TET_FAIL);
 }
