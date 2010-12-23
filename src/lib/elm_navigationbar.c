@@ -28,6 +28,7 @@ struct _Widget_Data
    Evas_Object *base;
    Evas_Object *pager;
    Eina_Bool hidden :1;
+   Eina_Bool popping: 1;
  };
 
 struct _Item
@@ -343,7 +344,7 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
 {
    Evas_Object *navi_bar = data; 
    Widget_Data *wd =  elm_widget_data_get(navi_bar);
-  
+   wd->popping = EINA_FALSE;
    evas_object_smart_callback_call(navi_bar, "hide,finished", event_info);
    edje_object_signal_emit(wd->base, "elm,state,rect,disabled", "elm");
 }
@@ -638,7 +639,8 @@ elm_navigationbar_pop(Evas_Object *obj)
    Eina_List *ll;
    Item *it = NULL;
    Item *prev_it = NULL;
-
+   
+   if(wd->popping) return;
    if (!wd->stack) return;
 
    //find item to be popped and to be shown
@@ -674,6 +676,7 @@ elm_navigationbar_pop(Evas_Object *obj)
         cb->first_page = EINA_FALSE;
      }
    _transition_complete_cb(cb);
+   wd->popping = EINA_TRUE;
    //pop content from pager
    elm_pager_content_pop(wd->pager);
    if (prev_it && !it)
