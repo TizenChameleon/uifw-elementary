@@ -6,6 +6,13 @@
  * @ingroup Elementary
  *
  * This is a editfield. It can contain a simple label and icon objects.
+ * 
+ * Smart callbacks that you can add are:
+ *
+ * clicked - This signal is emitted when an editfield is clicked.
+ * 
+ * unfocused - This signal is emitted when an editfield is unfocused.
+ * 
  */
 
 //#define ERASER_PADDING (10)

@@ -8,6 +8,11 @@
  *
  * Using colorpalette, you can select a color by clicking
  * a color rectangle on the colorpalette.
+ *
+ * Smart callbacks that you can add are:
+ * 
+ * clicked - This signal is sent when a color rectangle is clicked.
+ * 
  */
 
 

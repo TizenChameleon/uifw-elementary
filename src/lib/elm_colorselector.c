@@ -7,6 +7,11 @@
  *
  * By using colorselector, you can select a color.
  * Colorselector made a color using HSV/HSB mode.
+ *
+ * Smart Callbacks that you can add are : 
+ * 
+ * changed - This signal is emitted when a color change occurs.
+ *
  */
 
 #define BASE_STEP 360.0
