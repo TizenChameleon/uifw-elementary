@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build78) unstable; urgency=low
+
+  * colorselector added (colorpicker deprecated)
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build78 
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Thu, 23 Dec 2010 10:44:26 +0900
+
 elementary (1.0.0+svn.51480slp2+build77) unstable; urgency=low
 
   * controlbar bug fix
