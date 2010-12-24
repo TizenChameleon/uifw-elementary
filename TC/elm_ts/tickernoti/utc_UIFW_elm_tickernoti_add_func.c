@@ -81,6 +81,8 @@ static void utc_UIFW_elm_tickernoti_add_func_01(void)
 		tet_result(TET_FAIL);
 		return;
 	}
+	evas_object_del(tickernoti);
+	tickernoti = NULL;
 	tet_result(TET_PASS);
 }
 
@@ -93,10 +95,12 @@ static void utc_UIFW_elm_tickernoti_add_func_02(void)
 
    	tickernoti = elm_tickernoti_add(NULL);
 	
-	if (tickernoti) {
+	if (!tickernoti) {
 		tet_infoline("elm_tickernoti_add() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}
+	evas_object_del(tickernoti);
+	tickernoti = NULL;
 	tet_result(TET_PASS);
 }

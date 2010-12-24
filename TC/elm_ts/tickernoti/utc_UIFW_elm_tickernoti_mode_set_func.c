@@ -97,8 +97,12 @@ static void utc_UIFW_elm_tickernoti_mode_set_func_02(void)
 {
 	Elm_Tickernoti_Mode mode = ELM_TICKERNOTI_DETAILVIEW;
 
+   	elm_tickernoti_mode_set(tickernoti, ELM_TICKERNOTI_DEFAULT);
    	elm_tickernoti_mode_set(tickernoti, 100);
    	mode = elm_tickernoti_mode_get(tickernoti);
+
+	printf("\n\n\nmode :: %d\n\n\n", mode);
+	printf("\n\n\n%d\n\n\n", ELM_TICKERNOTI_DEFAULT);
 
 	if (mode != ELM_TICKERNOTI_DEFAULT) {
 		tet_infoline("elm_tickernoti_mode_set() failed in negative test case");

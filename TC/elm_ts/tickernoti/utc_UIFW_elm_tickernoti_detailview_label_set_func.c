@@ -100,7 +100,7 @@ static void utc_UIFW_elm_tickernoti_detailview_label_set_func_02(void)
 	elm_tickernoti_detailview_label_set(tickernoti, NULL);
 	text = elm_tickernoti_detailview_label_get(tickernoti);
 
-	if (text) {
+	if (strcmp(text, "")) {
 		tet_infoline("elm_tickernoti_detailview_label_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

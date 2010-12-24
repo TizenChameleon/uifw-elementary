@@ -79,10 +79,10 @@ static void utc_UIFW_elm_tickernoti_rotation_get_func_01(void)
 {
 	int angle = 0;
 
-   	elm_tickernoti_rotation_set(tickernoti, 75);
+   	elm_tickernoti_rotation_set(tickernoti, 90);
    	angle = elm_tickernoti_rotation_get(tickernoti);
 
-	if (angle != 75) {
+	if (angle != 90) {
 		tet_infoline("elm_tickernoti_rotation_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -97,10 +97,10 @@ static void utc_UIFW_elm_tickernoti_rotation_get_func_02(void)
 {
 	int angle = 0;
 
-   	elm_tickernoti_rotation_set(tickernoti, 75);
+   	elm_tickernoti_rotation_set(tickernoti, 90);
    	angle = elm_tickernoti_rotation_get(NULL);
 
-	if (angle != 0) {
+	if (angle != -1) {
 		tet_infoline("elm_tickernoti_rotation_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

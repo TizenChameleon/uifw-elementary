@@ -478,6 +478,9 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
    Evas_Coord x, y, w, h;
    Evas_Coord root_w, root_h;
 
+   if (angle%90 != 0) return;
+   wd->angle = angle;
+
    /* 
    * manual calculate win_tickernoti_indi window position & size 
    *  - win_indi is not full size window (480 x 27)
@@ -561,7 +564,15 @@ elm_tickernoti_mode_set (const Evas_Object *obj, Elm_Tickernoti_Mode mode)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   wd->mode = mode;
+   switch(mode){
+      case ELM_TICKERNOTI_DEFAULT:
+      case ELM_TICKERNOTI_DETAILVIEW:
+         wd->mode = mode;
+         break;
+      default:
+         break;
+   }
+   printf("wd->mode : %d\n", wd->mode);
 }
 
 /**
