@@ -664,6 +664,8 @@ _item_del(Elm_Gengrid_Item *item)
    item->delete_me = EINA_TRUE;
    item->wd->items = eina_list_remove(item->wd->items, item);
    if (item->long_timer) ecore_timer_del(item->long_timer);
+   if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
+   item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
    free(item);
 }
 
@@ -1186,9 +1188,6 @@ elm_gengrid_item_del(Elm_Gengrid_Item *item)
      }
 
    _item_del(item);
-
-   if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
-   item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
 }
 
 /**
