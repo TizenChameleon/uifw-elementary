@@ -372,8 +372,6 @@ _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_
    char buf[4096];
    Eina_Bool changed = EINA_FALSE;
    
-   if (prev_btn == new_btn)
-     return changed;
    if (prev_btn) 
      {
         evas_object_del(prev_btn);
@@ -965,6 +963,8 @@ _elm_navigationbar_back_button_set(Evas_Object *obj, Evas_Object *content, Evas_
      {
         if (it->content == content) 
           {
+             if(it->back_btn == button)
+               return;
              changed = _button_set(obj, it->back_btn, button, EINA_TRUE);
              it->back_btn = button;
              _item_sizing_eval(it);
@@ -1014,6 +1014,8 @@ _elm_navigationbar_function_button1_set(Evas_Object *obj, Evas_Object *content, 
      {
         if (it->content == content) 
           {
+             if(it->fn_btn1 == button)
+               return;
              changed = _button_set(obj, it->fn_btn1, button, EINA_FALSE);
              it->fn_btn1 = button;
              _item_sizing_eval(it);
@@ -1067,6 +1069,8 @@ _elm_navigationbar_function_button2_set(Evas_Object *obj, Evas_Object *content, 
      {
         if (it->content == content) 
           {
+             if(it->fn_btn2 == button)
+               return;
              changed = _button_set(obj, it->fn_btn2, button, EINA_FALSE);
              it->fn_btn2 = button;
              _item_sizing_eval(it);
@@ -1116,6 +1120,8 @@ _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, 
      {
         if (it->content == content) 
           {
+             if(it->fn_btn3 == button)
+               return;
              changed = _button_set(obj, it->fn_btn3, button, EINA_FALSE);
              it->fn_btn3 = button;
              _item_sizing_eval(it);
