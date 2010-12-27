@@ -6071,6 +6071,7 @@ EAPI void
 elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after)
 {
    if (!it) return;
+   if (!after) return;
 
    Elm_Genlist_Item *next_item = elm_genlist_item_next_get(after);
 
