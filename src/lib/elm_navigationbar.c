@@ -891,7 +891,6 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
      {
         last_it = ll->data;
      }
-   if (!wd) return;
    EINA_LIST_FOREACH(wd->stack, ll, it)
      {
         if (it->content == content)   
