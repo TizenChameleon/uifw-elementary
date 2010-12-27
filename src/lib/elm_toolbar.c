@@ -837,9 +837,10 @@ elm_toolbar_align_get(const Evas_Object *obj)
 EAPI void
 elm_toolbar_item_menu_set(Elm_Toolbar_Item *item, Eina_Bool menu)
 {
+   if(!item) return;
    Widget_Data *wd = elm_widget_data_get(item->obj);
 
-   if ((!wd) || (!item)) return;
+   if (!wd) return;
    if (item->menu == menu) return;
    item->menu = menu;
    if (menu)

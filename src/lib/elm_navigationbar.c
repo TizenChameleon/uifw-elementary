@@ -180,11 +180,10 @@ _sizing_eval(Evas_Object *obj)
 static void
 _item_sizing_eval(Item *it)
 {
+   if (!it) return;
    Widget_Data *wd = elm_widget_data_get(it->obj);
    Evas_Coord pad, height, minw, w;
    int pad_count = 2;
-
-   if (!it) return;
 
    edje_object_size_min_calc(wd->base, &minw, NULL);
    evas_object_geometry_get(wd->base, NULL, NULL, &w, NULL);
@@ -882,6 +881,7 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
    Eina_List *ll;
    Item *it;
    Item *last_it = NULL;
