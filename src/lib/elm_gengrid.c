@@ -205,6 +205,7 @@ static void _item_hilight(Elm_Gengrid_Item *item);
 static void _item_unrealize(Elm_Gengrid_Item *item);
 static void _item_select(Elm_Gengrid_Item *item);
 static void _item_unselect(Elm_Gengrid_Item *item);
+static void _calc_job(void *data);
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_VERSION;
 
