@@ -3034,6 +3034,15 @@ elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path)
         //	elm_label_line_wrap_set(it->label_shadow, EINA_FALSE);
         //	elm_label_wrap_mode_set(it->label_shadow, 0);
      }
+
+   if(it->disable)
+     {
+        item_color_set(it, "elm.item.disable.color");
+     }
+   else
+     {
+        item_color_set(it, "elm.item.default.color");
+     }
    /*  if(it->edit_label && it->edit_icon)
        {
        edje_object_signal_emit(_EDJ(it->edit_item), "elm,state,icon_text", "elm");
@@ -3347,6 +3356,22 @@ elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
      {
         item_color_set(it, "elm.item.default.color");
      }
+}
+
+/**
+ * Get item disable
+ *
+ * @param	it The item of controlbar
+ * @return 	EINA_TRUE or EINA_FALSE
+ *
+ * @ingroup Controlbar
+ */ 
+EAPI void
+elm_controlbar_item_disable_get(Elm_Controlbar_Item * it) 
+{
+   if(!it) return;
+
+   return it->disable;
 }
 
 EAPI void
