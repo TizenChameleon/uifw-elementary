@@ -101,20 +101,16 @@ _make_notification_window (Evas_Object *obj)
 /* elm_win_xwindow_get() must call after elm_win_alpha_set() */
    xwin = elm_win_xwindow_get (obj);
    ecore_x_netwm_window_type_set (xwin, ECORE_X_WINDOW_TYPE_NOTIFICATION);
-   if (wd->mode == ELM_TICKERNOTI_DEFAULT)
-   {
-      ecore_x_icccm_hints_set(xwin, 0, ECORE_X_WINDOW_STATE_HINT_NONE, 0, 0, 0, 0, 0);
+   ecore_x_icccm_hints_set(xwin, 0, ECORE_X_WINDOW_STATE_HINT_NONE, 0, 0, 0, 0, 0);
 
-      /* Create atom for notification level */
-      _notification_level_atom = ecore_x_atom_get ("_E_ILLUME_NOTIFICATION_LEVEL");
+   /* Create atom for notification level */
+   _notification_level_atom = ecore_x_atom_get ("_E_ILLUME_NOTIFICATION_LEVEL");
 
-      /* HIGH:150, NORMAL:100, LOW:50 */
-      level = 100;
+   /* HIGH:150, NORMAL:100, LOW:50 */
+   level = 100;
 
-      /* Set notification level of the window */
-      ecore_x_window_prop_property_set (xwin, _notification_level_atom, ECORE_X_ATOM_CARDINAL, 32, &level, 1);
-   }
-
+   /* Set notification level of the window */
+   ecore_x_window_prop_property_set (xwin, _notification_level_atom, ECORE_X_ATOM_CARDINAL, 32, &level, 1);
 }
 #endif
 
