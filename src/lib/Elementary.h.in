@@ -563,8 +563,8 @@ extern "C" {
    EAPI void         elm_label_wrap_mode_set(Evas_Object *obj, Eina_Bool wrapmode);
    EAPI void         elm_label_slide_set(Evas_Object *obj, Eina_Bool slide);
    EAPI Eina_Bool    elm_label_slide_get(Evas_Object *obj);
-   EAPI void         elm_label_slide_duration_set(Evas_Object *obj, double duration);
-   EAPI double       elm_label_slide_duration_get(Evas_Object *obj);
+   EAPI void         elm_label_slide_duration_set(Evas_Object *obj, int duration);
+   EAPI int          elm_label_slide_duration_get(Evas_Object *obj);
    /* available styles:
     * default
     * marker

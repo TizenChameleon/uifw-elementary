@@ -17,7 +17,7 @@ struct _Widget_Data
    Evas_Object *bg;
    const char *label;
    Ecore_Job *deferred_recalc_job;
-   double slide_duration;
+   int slide_duration;
    Evas_Coord lastw;
    Evas_Coord wrap_w;
    Evas_Coord wrap_h;
@@ -625,7 +625,7 @@ _label_sliding_change(Evas_Object *obj)
 
    if (wd->slidingmode)
      {
-        Edje_Message_Float_Set *msg = alloca(sizeof(Edje_Message_Float_Set) + (sizeof(double)));
+        Edje_Message_Int_Set *msg = alloca(sizeof(Edje_Message_Int_Set) + (sizeof(int)));
         
         if (wd->ellipsis)
           {
@@ -634,9 +634,9 @@ _label_sliding_change(Evas_Object *obj)
           }
         
         msg->count = 1;
-        msg->val[0] = wd->slide_duration;
+        msg->val[0] = (int)wd->slide_duration;
 
-        edje_object_message_send(wd->lbl, EDJE_MESSAGE_FLOAT_SET, 0, msg);
+        edje_object_message_send(wd->lbl, EDJE_MESSAGE_INT_SET, 0, msg);
         edje_object_signal_emit(wd->lbl, "elm,state,slide,start", "elm");
      }
    else
@@ -1086,17 +1086,17 @@ elm_label_slide_get(Evas_Object *obj)
  * @ingroup Label
  */
 EAPI void
-elm_label_slide_duration_set(Evas_Object *obj, double duration)
+elm_label_slide_duration_set(Evas_Object *obj, int duration)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   Edje_Message_Float_Set *msg = alloca(sizeof(Edje_Message_Float_Set) + (sizeof(double)));
+   Edje_Message_Int_Set *msg = alloca(sizeof(Edje_Message_Int_Set) + (sizeof(int)));
 
    if (!wd) return;
    wd->slide_duration = duration;
    msg->count = 1;
-   msg->val[0] = wd->slide_duration;
-   edje_object_message_send(wd->lbl, EDJE_MESSAGE_FLOAT_SET, 0, msg);
+   msg->val[0] = (int)wd->slide_duration;
+   edje_object_message_send(wd->lbl, EDJE_MESSAGE_INT_SET, 0, msg);
 }
 
 /**
@@ -1106,10 +1106,10 @@ elm_label_slide_duration_set(Evas_Object *obj, double duration)
  * @return The duration time in moving text from slide begin position to slide end position
  * @ingroup Label
  */
-EAPI double
+EAPI int
 elm_label_slide_duration_get(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) 0.0;
+   ELM_CHECK_WIDTYPE(obj, widtype) 0;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return 0;
    return wd->slide_duration;
