@@ -111,7 +111,7 @@ struct _Elm_Controlbar_Item
    int style;
    int badge;
    Eina_Bool selected;
-   Eina_Bool default_selected;
+//   Eina_Bool default_selected;
    //   Eina_Bool editable;
    Eina_Bool disable;
 };
@@ -1152,13 +1152,7 @@ selected_box(Elm_Controlbar_Item * it)
         }
         it->selected = EINA_TRUE;
 
-        if((fit != NULL && fit != it) || it->default_selected)
-          {
-             it->default_selected = EINA_FALSE;
-             if(wd->more_item != it)
-                evas_object_smart_callback_call(it->obj, "view,change,before", it);
-          }
-
+ 
         if(fit != NULL && fit != it)
           {
              move_selected_box(wd, fit, it);
@@ -1168,6 +1162,14 @@ selected_box(Elm_Controlbar_Item * it)
              edje_object_signal_emit(_EDJ(it->base), wd->selected_signal, "elm");
              edje_object_signal_emit(_EDJ(wd->cur_item->base_item), "elm,state,shadow_show", "elm");
           }
+
+        if(fit != it)
+          {
+//             it->default_selected = EINA_FALSE;
+             if(wd->more_item != it)
+                evas_object_smart_callback_call(it->obj, "view,change,before", it);
+          }
+
 
         /*
            if(fit != NULL && fit != it)
@@ -1770,7 +1772,7 @@ create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
    it->text = eina_stringshare_add(label);
    it->icon_path = eina_stringshare_add(icon_path);
    it->selected = EINA_FALSE;
-   it->default_selected = EINA_FALSE;
+   //it->default_selected = EINA_FALSE;
    //   it->editable = EINA_TRUE;
    it->badge = 0;
    it->sel = 1;
@@ -2338,12 +2340,11 @@ EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_append(Evas_Object * obj,
    wd->items = eina_list_append(wd->items, it);
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
-   if (wd->num == 1)
+/*   if (wd->num == 1)
      {
         selected_box(it);
         it->default_selected = EINA_TRUE;
-     }
-
+     }*/
    _sizing_eval(obj);
    return it;
 }
@@ -2393,11 +2394,11 @@ EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_prepend(Evas_Object *
    wd->items = eina_list_prepend(wd->items, it);
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
-   if (wd->num == 1)
+/*   if (wd->num == 1)
      {
         selected_box(it);
         it->default_selected = EINA_TRUE;
-     }
+     }*/
    _sizing_eval(obj);
    return it;
 }
@@ -2453,11 +2454,11 @@ elm_controlbar_tab_item_insert_before(Evas_Object * obj,
    wd->items = eina_list_prepend_relative(wd->items, it, before);
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
-   if (wd->num == 1)
+/*   if (wd->num == 1)
      {
         selected_box(it);
         it->default_selected = EINA_TRUE;
-     }
+     }*/
    _sizing_eval(obj);
    return it;
 }
@@ -2514,11 +2515,11 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
    wd->items = eina_list_append_relative(wd->items, it, after);
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
-   if (wd->num == 1)
+/*   if (wd->num == 1)
      {
         selected_box(it);
         it->default_selected = EINA_TRUE;
-     }
+     }*/
    _sizing_eval(obj);
    return it;
 }
@@ -3033,6 +3034,15 @@ elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path)
         //	elm_label_line_wrap_set(it->label_shadow, EINA_FALSE);
         //	elm_label_wrap_mode_set(it->label_shadow, 0);
      }
+
+   if(it->disable)
+     {
+        item_color_set(it, "elm.item.disable.color");
+     }
+   else
+     {
+        item_color_set(it, "elm.item.default.color");
+     }
    /*  if(it->edit_label && it->edit_icon)
        {
        edje_object_signal_emit(_EDJ(it->edit_item), "elm,state,icon_text", "elm");
@@ -3346,6 +3356,22 @@ elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
      {
         item_color_set(it, "elm.item.default.color");
      }
+}
+
+/**
+ * Get item disable
+ *
+ * @param	it The item of controlbar
+ * @return 	EINA_TRUE or EINA_FALSE
+ *
+ * @ingroup Controlbar
+ */ 
+EAPI void
+elm_controlbar_item_disable_get(Elm_Controlbar_Item * it) 
+{
+   if(!it) return;
+
+   return it->disable;
 }
 
 EAPI void

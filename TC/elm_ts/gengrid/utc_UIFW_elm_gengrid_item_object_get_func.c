@@ -71,6 +71,20 @@ struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_gengrid_item_object_get_func_02, NEGATIVE_TC_IDX },
 };
 
+static Evas_Object * _icon_get(const void *data, Evas_Object *obj, const char *part)
+{
+	if (!strcmp(part, "elm.swallow.icon"))
+	{
+		Evas_Object *icon = elm_icon_add(obj);
+		elm_icon_file_set(icon, "/usr/share/beat_winset_test/icon/grid_image/1_raw.jpg", NULL);
+		evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+		evas_object_show(icon);
+		return icon;
+	}
+
+	return NULL;
+}
+
 static void startup(void)
 {
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
@@ -90,10 +104,15 @@ static void startup(void)
 	evas_object_show(test_win);
 
 	test_eo = elm_gengrid_add(test_win);
+	elm_gengrid_item_size_set(test_eo, 120, 130);
+	elm_gengrid_align_set(test_eo, 0.5, 0.0);
+	elm_gengrid_horizontal_set(test_eo, EINA_FALSE);
+	elm_gengrid_bounce_set(test_eo, EINA_FALSE, EINA_TRUE);
+	elm_gengrid_multi_select_set(test_eo, EINA_TRUE);
 	
-	gic.item_style = "default_gridtext";
+	gic.item_style = "default_grid";
 	gic.func.label_get = NULL;
-	gic.func.icon_get = NULL;
+	gic.func.icon_get = _icon_get;
 	
 	item = elm_gengrid_item_append(test_eo, &gic, NULL, NULL, NULL);
 	

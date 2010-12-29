@@ -11,7 +11,7 @@
 
 struct _Dialogue_Item
 {
-   Evas_Object *parent;
+   Evas_Object *obj;
    Evas_Object *bg_layout;
    Evas_Object *content;
    Elm_Dialoguegroup_Item_Style style;
@@ -25,7 +25,6 @@ struct _Dialogue_Item
 typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
-   Evas_Object *parent;
    Evas_Object *box;
    Evas_Object *title_layout;
    const char *title;
@@ -143,7 +142,7 @@ _set_item_theme(Dialogue_Item *item, const char *location)
      snprintf(buf, sizeof(buf), "no_bg_%s", location);
    else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_SUB) 
      snprintf(buf, sizeof(buf), "sub_%s", location);
-   elm_layout_theme_set(item->bg_layout, "dialoguegroup", buf, elm_widget_style_get(item->parent));
+   elm_layout_theme_set(item->bg_layout, "dialoguegroup", buf, elm_widget_style_get(item->obj));
 }
 
 /*
@@ -200,7 +199,7 @@ _create_item(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style
    if (!wd) return NULL;
    
    item = ELM_NEW(Dialogue_Item);
-   item->parent = obj;
+   item->obj = obj;
    item->content = subobj;
    item->press = EINA_TRUE;
    item->disabled = EINA_FALSE;
@@ -251,7 +250,6 @@ elm_dialoguegroup_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    
-   wd->parent = parent;
    wd->num = 0;
    
    wd->box = elm_box_add(obj);
@@ -460,9 +458,9 @@ EAPI void
 elm_dialoguegroup_remove(Dialogue_Item *item)
 {
    if (!item) return;
-   ELM_CHECK_WIDTYPE(item->parent, widtype) ;
+   ELM_CHECK_WIDTYPE(item->obj, widtype) ;
    Dialogue_Item *current_item;
-   Widget_Data *wd = elm_widget_data_get(item->parent);
+   Widget_Data *wd = elm_widget_data_get(item->obj);
    Eina_List *l;
    
    if (!wd || !wd->items || !item) return ;
@@ -498,7 +496,7 @@ elm_dialoguegroup_remove(Dialogue_Item *item)
       _change_item_bg(current_item, "bottom");          
    }
    
-   _sizing_eval(item->parent);  
+   _sizing_eval(item->obj);  
 }
 
 /**
@@ -579,7 +577,7 @@ EAPI void
 elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press)
 {
    if (!item) return;
-   ELM_CHECK_WIDTYPE(item->parent, widtype) ;
+   ELM_CHECK_WIDTYPE(item->obj, widtype) ;
    
    item->press = press;
    if ((press == EINA_TRUE) && (item->disabled == EINA_FALSE))
@@ -601,7 +599,7 @@ EAPI Eina_Bool
 elm_dialoguegroup_press_effect_get(Dialogue_Item *item)
 {
    if (!item) return EINA_FALSE;
-   ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
+   ELM_CHECK_WIDTYPE(item->obj, widtype) EINA_FALSE;
    
    return item->press;
 }
@@ -619,7 +617,7 @@ EAPI Evas_Object *
 elm_dialoguegroup_item_content_get(Dialogue_Item *item)
 {
    if (!item) return NULL;
-   ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
+   ELM_CHECK_WIDTYPE(item->obj, widtype) EINA_FALSE;
    
    return item->content;
 }
@@ -636,8 +634,8 @@ EAPI void
 elm_dialoguegroup_item_style_set(Dialogue_Item *item, Elm_Dialoguegroup_Item_Style style)
 {
    if (!item) return;
-   ELM_CHECK_WIDTYPE(item->parent, widtype);
-   Widget_Data *wd = elm_widget_data_get(item->parent);
+   ELM_CHECK_WIDTYPE(item->obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(item->obj);
    
    item->style = style;
    _change_item_bg(item, item->location);
@@ -658,8 +656,8 @@ EAPI Elm_Dialoguegroup_Item_Style
 elm_dialoguegroup_item_style_get(Dialogue_Item *item)
 {
    if (!item) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
-   ELM_CHECK_WIDTYPE(item->parent, widtype) ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
-   Widget_Data *wd = elm_widget_data_get(item->parent);
+   ELM_CHECK_WIDTYPE(item->obj, widtype) ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
+   Widget_Data *wd = elm_widget_data_get(item->obj);
    
    if (!wd) return ELM_DIALOGUEGROUP_ITEM_STYLE_LAST;
    
@@ -678,7 +676,7 @@ EAPI void
 elm_dialoguegroup_item_disabled_set(Dialogue_Item *item, Eina_Bool disabled)
 {
    if (!item) return;
-   ELM_CHECK_WIDTYPE(item->parent, widtype);
+   ELM_CHECK_WIDTYPE(item->obj, widtype);
    
    item->disabled = disabled;
    
@@ -708,7 +706,7 @@ EAPI Eina_Bool
 elm_dialoguegroup_item_disabled_get(Dialogue_Item *item)
 {
    if (!item) return EINA_FALSE;
-   ELM_CHECK_WIDTYPE(item->parent, widtype) EINA_FALSE;
+   ELM_CHECK_WIDTYPE(item->obj, widtype) EINA_FALSE;
    
    return item->disabled;
 }
