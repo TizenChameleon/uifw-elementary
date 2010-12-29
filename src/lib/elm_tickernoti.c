@@ -88,15 +88,35 @@ _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_align_set(obj, maxw, maxh);
 */
 }
-
+#ifdef HAVE_ELEMENTARY_X
 static void
 _make_notification_window (Evas_Object *obj)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
    Ecore_X_Window xwin;
+   Ecore_X_Atom _notification_level_atom;
+   int level;
 /* elm_win_xwindow_get() must call after elm_win_alpha_set() */
    xwin = elm_win_xwindow_get (obj);
    ecore_x_netwm_window_type_set (xwin, ECORE_X_WINDOW_TYPE_NOTIFICATION);
+   if (wd->mode == ELM_TICKERNOTI_DEFAULT)
+   {
+      ecore_x_icccm_hints_set(xwin, 0, ECORE_X_WINDOW_STATE_HINT_NONE, 0, 0, 0, 0, 0);
+
+      /* Create atom for notification level */
+      _notification_level_atom = ecore_x_atom_get ("_E_ILLUME_NOTIFICATION_LEVEL");
+
+      /* HIGH:150, NORMAL:100, LOW:50 */
+      level = 100;
+
+      /* Set notification level of the window */
+      ecore_x_window_prop_property_set (xwin, _notification_level_atom, ECORE_X_ATOM_CARDINAL, 32, &level, 1);
+   }
+
 }
+#endif
 
 static void _detail_show_cb (void *data, Evas_Object *obj, const char *emission, const char *source)
 {
@@ -133,11 +153,14 @@ _create_tickernoti_indi (Evas_Object *obj)
    if (!wd) return;
 
    Evas *e;
+#ifdef HAVE_ELEMENTARY_X
    Evas_Coord w, h;
+#endif
 
    char *data_win_height = NULL; 
-
+#ifdef HAVE_ELEMENTARY_X
    ecore_x_window_size_get (ecore_x_window_root_first_get(), &w, &h);
+#endif
 
    evas_object_move (wd->win_indi, 0, 0);
 
@@ -152,7 +175,9 @@ _create_tickernoti_indi (Evas_Object *obj)
    if (data_win_height != NULL && elm_scale_get() > 0.0) 
      wd->indicator_height = (int)(elm_scale_get() * atoi(data_win_height));
 
+#ifdef HAVE_ELEMENTARY_X
    evas_object_resize (wd->win_indi, w, wd->indicator_height);
+#endif
 	
    edje_object_signal_callback_add (wd->edje_indi, "request,detail,show", "", _detail_show_cb, obj);
    evas_object_show (wd->edje_indi);
@@ -165,11 +190,13 @@ _create_tickernoti_detail (Evas_Object *obj)
    if (!wd) return;
 
    Evas *e;
+#ifdef HAVE_ELEMENTARY_X
    Evas_Coord w, h;
 
    ecore_x_window_size_get (ecore_x_window_root_first_get(), &w, &h);
-
    evas_object_resize (wd->win_detail, w, h);
+#endif
+
    evas_object_move (wd->win_detail, 0, 0);
 
    e = evas_object_evas_get (wd->win_detail);
@@ -476,6 +503,7 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
    if (!wd) return;
 
    Evas_Coord x, y, w, h;
+#ifdef HAVE_ELEMENTARY_X
    Evas_Coord root_w, root_h;
 
    if (angle%90 != 0) return;
@@ -486,32 +514,45 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
    *  - win_indi is not full size window (480 x 27)
    */
    ecore_x_window_size_get (ecore_x_window_root_first_get(), &root_w, &root_h);
+#endif
    evas_object_geometry_get (wd->win_indi, &x, &y, &w, &h);
 
    /* rotate win */
    switch (angle) 
      {
       case 90:
+#ifdef HAVE_ELEMENTARY_X
          w = root_h;
+#endif
    	 h = wd->indicator_height;
    	 x = 0;
    	 y = 0;
    	 break;
       case -90:
+#ifdef HAVE_ELEMENTARY_X
 	 w = root_h; 
+#endif
 	 h = wd->indicator_height;
+#ifdef HAVE_ELEMENTARY_X
 	 x = root_w-h;
+#endif
 	 y = 0;
 	 break;
       case 180:
+#ifdef HAVE_ELEMENTARY_X
 	 w = root_w;
+#endif
 	 h = wd->indicator_height;
 	 x = 0;
+#ifdef HAVE_ELEMENTARY_X
 	 y = root_h-h;
+#endif
 	 break;
       default:
       case 0:
+#ifdef HAVE_ELEMENTARY_X
 	 w = root_w;
+#endif
 	 h = wd->indicator_height;
 	 x = 0;
 	 y = 0;
@@ -524,13 +565,17 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
    evas_object_resize (wd->win_indi, w, h);
    if (evas_object_visible_get (wd->win_indi)) 
      {
+#ifdef HAVE_ELEMENTARY_X
         _make_notification_window (wd->win_indi);
+#endif
      }
 /* detail */
    elm_win_rotation_with_resize_set (wd->win_detail, angle);
    if (evas_object_visible_get (wd->win_detail))  
      {
+#ifdef HAVE_ELEMENTARY_X
         _make_notification_window (wd->win_detail);
+#endif
      }
 }
 
