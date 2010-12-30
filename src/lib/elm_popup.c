@@ -364,8 +364,10 @@ elm_popup_add(Evas_Object *parent_app)
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
 
    wd->notify = elm_notify_add(parent);    
+   elm_widget_sub_object_add(obj, wd->notify);
    elm_widget_resize_object_set(obj, wd->notify);
    elm_notify_orient_set(wd->notify, ELM_NOTIFY_ORIENT_CENTER);
    wd->notify_orient = ELM_NOTIFY_ORIENT_CENTER;
