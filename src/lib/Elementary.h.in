@@ -870,6 +870,22 @@ extern "C" {
     * "unfocused" - keyboard focus is gone
     */
 
+   /* composite widgets - these basically put together basic widgets above
+    * in convenient packages that do more than basic stuff */
+   typedef enum _Elm_Text_Format
+     {
+	ELM_TEXT_FORMAT_PLAIN_UTF8,
+	ELM_TEXT_FORMAT_MARKUP_UTF8
+     } Elm_Text_Format;
+   EINA_DEPRECATED EAPI Evas_Object *elm_notepad_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_notepad_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format);
+   EINA_DEPRECATED EAPI void         elm_notepad_file_save(Evas_Object *obj, const char *file, Elm_Text_Format format);
+   EINA_DEPRECATED EAPI void         elm_notepad_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
+   EINA_DEPRECATED EAPI void         elm_notepad_autosave_set(Evas_Object *obj, Eina_Bool autosave);
+
+   /* smart callbacks called:
+    */
+
    typedef struct _Elm_Entry_Anchorview_Info Elm_Entry_Anchorview_Info;
    struct _Elm_Entry_Anchorview_Info
      {
@@ -1115,11 +1131,22 @@ extern "C" {
    EAPI void             elm_list_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
    EAPI void             elm_list_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, Elm_Scroller_Policy policy_v);
    EAPI void             elm_list_scroller_policy_get(const Evas_Object *obj, Elm_Scroller_Policy *policy_h, Elm_Scroller_Policy *policy_v);
+
    /* smart callbacks called:
     * "clicked" - when the user double-clicked an item
     * "selected" - when the user selected an item
     * "unselected" - when the user selected an item
     * "longpressed" - an item in the hoversel list is long-pressed
+    */
+
+   // FIXME: incomplete - carousel. don't use this until this comment is removed
+   typedef struct _Elm_Carousel_Item Elm_Carousel_Item;
+   EAPI Evas_Object       *elm_carousel_add(Evas_Object *parent);
+   EAPI Elm_Carousel_Item *elm_carousel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, Evas_Smart_Cb func, const void *data);
+   EAPI void               elm_carousel_item_del(Elm_Carousel_Item *item);
+   EAPI void               elm_carousel_item_select(Elm_Carousel_Item *item);
+   /* smart callbacks called:
+    * "clicked" - when the user clicks on a carousel item and becomes selected
     */
 
    EAPI Evas_Object *elm_slider_add(Evas_Object *parent);
@@ -1880,6 +1907,37 @@ extern "C" {
     * "overflowed" - when discpicker item is changed to first item from last item
     * "underflowed" - when discpicker item is changed to last item from first item.
     */
+   /* available styles:
+    * default
+    */
+
+   EAPI Evas_Object *elm_timepicker_add(Evas_Object *parent);
+   EAPI void         elm_timepicker_time_set(Evas_Object *obj, int hrs, int min, int sec);
+   EAPI void         elm_timepicker_time_get(Evas_Object *obj, int *hrs, int *min, int *sec);
+   EAPI void         elm_timepicker_show_am_pm_set(Evas_Object *obj, Eina_Bool am_pm);
+   EAPI void         elm_timepicker_show_seconds_set(Evas_Object *obj, Eina_Bool seconds);
+   /* smart callback called:
+    * "changed" - when timepicker selected item is changed
+    */
+   /* available styles:
+    * default
+    */
+
+   EAPI Evas_Object *elm_datepicker_add(Evas_Object *parent);
+   EAPI void         elm_datepicker_date_set(Evas_Object *obj, int year, int month, int day);
+   EAPI void         elm_datepicker_date_get(const Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker_date_min_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
+   EAPI void         elm_datepicker_date_min_get(const Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker_date_max_set(Evas_Object *obj, int year, int month, int day);  // Not implemented
+   EAPI void         elm_datepicker_date_max_get(const Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datepicker_date_format_set(Evas_Object *obj, const char *fmt);
+   EAPI const char  *elm_datepicker_date_format_get(const Evas_Object *obj);
+   /* smart callback called:
+    * "changed" - when datepicker selected item is changed
+    */
+   /* available styles:
+    * default
+    */
 
    /* datefield */
    typedef enum _Elm_Datefield_Layout
@@ -1908,6 +1966,15 @@ extern "C" {
    * "changed" - when datefield entry is changed, this signal is sent.
    */
    
+   /* titlebar */
+   EINA_DEPRECATED EAPI Evas_Object *elm_titlebar_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_titlebar_label_set(Evas_Object *obj, const char *label);
+   EINA_DEPRECATED EAPI const char  *elm_titlebar_label_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_titlebar_icon_set(Evas_Object *obj, Evas_Object *icon);
+   EINA_DEPRECATED EAPI Evas_Object *elm_titlebar_icon_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_titlebar_end_set(Evas_Object *obj, Evas_Object *end);
+   EINA_DEPRECATED EAPI Evas_Object *elm_titlebar_end_get(Evas_Object *obj);
+
    /* popup */
    typedef enum _Elm_Popup_Response
      {
@@ -1992,6 +2059,45 @@ extern "C" {
    EAPI Eina_Bool    elm_ctxpopup_position_forced_get(Evas_Object *obj);
    EAPI void         elm_ctxpopup_area_set(Evas_Object *obj, Evas_Object *rect); 
    
+   /* Tab */
+   typedef enum _Elm_Tab_Move_Type
+     {
+        ELM_TAB_MOVE_LEFT = 0,
+        ELM_TAB_MOVE_RIGHT = 1
+     } Elm_Tab_Move_Type;
+
+   typedef enum _Elm_Tab_Mode_Type
+     {
+        ELM_TAB_PORTRAIT_2 = 2,
+        ELM_TAB_PORTRAIT_3 = 3,
+        ELM_TAB_PORTRAIT_4 = 4,
+        ELM_TAB_LANDSCAPE_2 = 12,
+        ELM_TAB_LANDSCAPE_3 = 13,
+        ELM_TAB_LANDSCAPE_4 = 14,
+        ELM_TAB_LANDSCAPE_5 = 15,
+     } Elm_Tab_Mode_Type;
+
+   typedef struct _Elm_Tab_Item Elm_Tab_Item;
+
+   EINA_DEPRECATED EAPI Evas_Object  *elm_tab_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void          elm_tab_set(Evas_Object *obj, int mode);
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *data);
+   EINA_DEPRECATED EAPI void          elm_tab_item_del(Elm_Tab_Item *item);
+   EINA_DEPRECATED EAPI void          elm_tab_item_select(Elm_Tab_Item *item);
+   EINA_DEPRECATED EAPI Evas_Object  *elm_tab_item_icon_get(Elm_Tab_Item *item);
+   EINA_DEPRECATED EAPI const char   *elm_tab_item_label_get(Elm_Tab_Item *item);
+   EINA_DEPRECATED EAPI void          elm_tab_item_label_set(Elm_Tab_Item *item, const char *label);
+   EINA_DEPRECATED EAPI void          elm_tab_item_badge_set(Elm_Tab_Item *item, const int badge);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_selected_item_get(Evas_Object *obj);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_first_item_get(Evas_Object *obj);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_last_item_get(Evas_Object *obj);   
+   EINA_DEPRECATED EAPI Eina_List    *elm_tab_items_get(Evas_Object *obj);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_item_prev(Elm_Tab_Item *item);   
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tab_item_next(Elm_Tab_Item *item);   
+   EINA_DEPRECATED EAPI void          elm_tab_move(Evas_Object *obj, int direction);
+   EINA_DEPRECATED EAPI void          elm_tab_edit_disable_set(Evas_Object *obj, Eina_Bool disable);
+   EINA_DEPRECATED EAPI Eina_Bool     elm_tab_edit_disable_get(Evas_Object *obj);
+
    /* tansit */
    typedef enum 
      {
@@ -2140,6 +2246,25 @@ extern "C" {
    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
    EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
    
+   
+   /* Tab Bar */
+   #define TAB_BAR_SYSTEM_ICON_CONTACT "elm/icon/tabbar_contact/default" 
+   #define TAB_BAR_SYSTEM_ICON_GROUP "elm/icon/tabbar_group/default" 
+   #define TAB_BAR_SYSTEM_ICON_SONG "elm/icon/tabbar_song/default" 
+   #define TAB_BAR_SYSTEM_ICON_FAVORITES "elm/icon/tabbar_favorites/default" 
+   #define TAB_BAR_SYSTEM_ICON_SEARCH "elm/icon/tabbar_search/default" 
+   #define TAB_BAR_SYSTEM_ICON_MESSAGE "elm/icon/tabbar_message/default" 
+   #define TAB_BAR_SYSTEM_ICON_SETTING "elm/icon/tabbar_setting/default" 
+
+   EINA_DEPRECATED EAPI Evas_Object *elm_tabbar_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI Elm_Tab_Item *elm_tabbar_item_add(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
+   EINA_DEPRECATED EAPI Evas_Object *elm_tabbar_item_icon_get(Elm_Tab_Item *it);
+   EINA_DEPRECATED EAPI const char  *elm_tabbar_item_label_get(Elm_Tab_Item *it);
+   EINA_DEPRECATED EAPI void         elm_tabbar_item_label_set(Elm_Tab_Item *it, const char *label);
+   EINA_DEPRECATED EAPI void         elm_tabbar_item_select(Elm_Tab_Item *it);
+   EINA_DEPRECATED EAPI void         elm_tabbar_edit_start(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_tabbar_item_visible_set(Elm_Tab_Item *it, Eina_Bool bar);
+
    /* smart callbacks called:
     * "clicked" - when item clicked
     */
@@ -2236,6 +2361,19 @@ extern "C" {
    EAPI void         elm_searchbar_clear(Evas_Object *obj);
    EAPI void         elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary);
 
+   /* actionsheet */
+   typedef enum _Elm_Actionsheet_Button_Type 
+     {
+        ELM_ACTIONSHEET_BT_NORMAL = 0,
+        ELM_ACTIONSHEET_BT_CANCEL,
+        ELM_ACTIONSHEET_BT_DESTRUCTIVE
+     } Elm_Actionsheet_Button_Type;
+
+   EINA_DEPRECATED EAPI Evas_Object *elm_actionsheet_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_actionsheet_title_set(Evas_Object *obj, const char *title);
+   EINA_DEPRECATED EAPI void         elm_actionsheet_button_add(Evas_Object *obj, const Elm_Actionsheet_Button_Type type, const char *title, void (*button_clicked_cb) (void *data, Evas_Object *obj, void *event_info), void *event_info);
+   EINA_DEPRECATED EAPI int          elm_actionsheet_button_title_get(Evas_Object *obj, const int index, char **title);
+
    /* colorpicker */
    EINA_DEPRECATED EAPI Evas_Object *elm_colorpicker_add(Evas_Object *parent);
    EINA_DEPRECATED EAPI void         elm_colorpicker_color_set(Evas_Object *obj, int r, int g , int b);
@@ -2288,6 +2426,51 @@ extern "C" {
     * "unfocused" - when an editfield is unfocused
     */
 
+
+
+   /* softkey */
+   typedef enum 
+     {
+        ELM_SK_LEFT_BTN,
+        ELM_SK_RIGHT_BTN,
+     } Elm_Softkey_Type;
+
+   /* softkey */
+   typedef struct _Elm_Softkey_Item Elm_Softkey_Item;
+   EINA_DEPRECATED EAPI Evas_Object *elm_softkey_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI Elm_Softkey_Item *elm_softkey_button_add(Evas_Object *obj, Elm_Softkey_Type type, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
+   EINA_DEPRECATED EAPI void         elm_softkey_button_del(Evas_Object *obj, Elm_Softkey_Type type);
+   EINA_DEPRECATED EAPI void         elm_softkey_button_show(Evas_Object *obj, Elm_Softkey_Type type);
+   EINA_DEPRECATED EAPI void         elm_softkey_button_hide(Evas_Object *obj, Elm_Softkey_Type type);
+
+   EINA_DEPRECATED EAPI Elm_Softkey_Item *elm_softkey_panel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data);
+   EINA_DEPRECATED EAPI int          elm_softkey_panel_del(Evas_Object *obj);
+   EINA_DEPRECATED EAPI int          elm_softkey_panel_close(Evas_Object *obj);
+   EINA_DEPRECATED EAPI int          elm_softkey_panel_open(Evas_Object *obj);
+
+   EINA_DEPRECATED EAPI void         elm_softkey_item_icon_set(Elm_Softkey_Item *item, Evas_Object *icon);
+   EINA_DEPRECATED EAPI Evas_Object *elm_softkey_item_icon_get(Elm_Softkey_Item * item);
+   EINA_DEPRECATED EAPI void         elm_softkey_item_label_set(Elm_Softkey_Item *item, const char *label);
+   EINA_DEPRECATED EAPI const char  *elm_softkey_item_label_get(Elm_Softkey_Item * item);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_softkey_item_disabled_get(Elm_Softkey_Item *item);
+   EINA_DEPRECATED EAPI void         elm_softkey_item_disabled_set(Elm_Softkey_Item *item, Eina_Bool disabled);
+   EINA_DEPRECATED EAPI void         elm_softkey_item_callback_set(Elm_Softkey_Item* item, void (*func)(void *data, Evas_Object *obj, void *event_info), const void *data );
+   /* smart callback called: 
+    * "clicked" - the user clicked the button, event_info: Softkey item
+    * "press"   - the user press the button, event_info: Softkey item
+    * "panel,show" - when the panel is shown
+    * "panel,hide" - when the panel is hidden
+    */
+       
+   /* gridbox */
+   EINA_DEPRECATED EAPI Evas_Object *elm_gridbox_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_gridbox_padding_set(Evas_Object *obj, Evas_Coord horizontal, Evas_Coord vertical);
+   EINA_DEPRECATED EAPI void         elm_gridbox_item_size_set(Evas_Object *obj, Evas_Coord h_itemsize, Evas_Coord v_itemsize);
+   EINA_DEPRECATED EAPI void         elm_gridbox_pack(Evas_Object *obj, Evas_Object *subobj);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_gridbox_unpack(Evas_Object *obj, Evas_Object *subobj);
+   EINA_DEPRECATED EAPI Eina_List   *elm_gridbox_children_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_gridbox_homogenous_padding_set(Evas_Object *obj, Eina_Bool homogenous);
+
    /* actionslider */                        
    typedef enum _Elm_Actionslider_Indicator_Pos  
      {                                         
@@ -2321,6 +2504,32 @@ extern "C" {
     * "indicator,position" - when a button reaches to the special position like "left", "right" and "center".
     */
    
+   /* gallery */
+   struct _Elm_Gallery_Item 
+     {
+        Evas_Object *parent;
+        Evas_Object *ly;
+        Evas_Object *obj;
+        const char *path;
+        int index;
+        Evas_Coord x, y, w, h;
+        Evas_Coord mw, mh;	
+        Eina_Bool on_hold : 1;
+        Eina_Bool on_show : 1;
+        Eina_Bool on_highquality : 1;		
+     };
+   typedef struct _Elm_Gallery_Item Elm_Gallery_Item;
+   EINA_DEPRECATED EAPI Evas_Object *elm_gallery_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_gallery_data_set(Evas_Object *obj, Eina_List *list);
+   EINA_DEPRECATED EAPI Elm_Gallery_Item *elm_gallery_item_append(Evas_Object *obj, const char *photo_file);
+   EINA_DEPRECATED EAPI Elm_Gallery_Item *elm_gallery_item_prepend(Evas_Object *obj, const char *photo_file);
+   EINA_DEPRECATED EAPI void         elm_gallery_item_del(Elm_Gallery_Item *it);
+   EINA_DEPRECATED EAPI const char  *elm_gallery_item_file_get(Elm_Gallery_Item *it);
+   EINA_DEPRECATED EAPI void         elm_gallery_item_show(Elm_Gallery_Item *it);
+   EINA_DEPRECATED EAPI Eina_List   *elm_gallery_item_list_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_gallery_set_type(Evas_Object *obj,int type);
+   EINA_DEPRECATED EAPI void         elm_gallery_set_max_count(Evas_Object *obj,int max_value);
+
    /* Sliding Drawer */
    typedef enum _Elm_SlidingDrawer_Pos 
      {
