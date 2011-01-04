@@ -15,7 +15,6 @@ ico_bubble.png \
 ico_button.png \
 ico_check.png \
 ico_clock.png \
-ico_colorpicker.png\
 ico_colorpalette.png\
 ico_datefield.png \
 ico_datepicker.png \

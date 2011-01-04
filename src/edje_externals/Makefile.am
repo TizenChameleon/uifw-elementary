@@ -34,7 +34,6 @@ elm_button.c \
 elm_check.c \
 elm_clock.c \
 elm_colorpalette.c\
-elm_colorpicker.c\
 elm_calendar.c \
 elm_datefield.c \
 elm_datepicker.c \
