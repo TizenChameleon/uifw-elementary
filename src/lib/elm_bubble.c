@@ -81,6 +81,21 @@ _theme_hook(Evas_Object *obj)
    _sizing_eval(obj);
 }
 
+static Eina_Bool
+_elm_bubble_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *cur;
+
+   if ((!wd) || (!wd->content))
+     return EINA_FALSE;
+
+   cur = wd->content;
+
+   /* Try Focus cycle in subitem */
+   return elm_widget_focus_next_get(cur, dir, next);
+}
+
 static void
 _sizing_eval(Evas_Object *obj)
 {
@@ -187,6 +202,7 @@ elm_bubble_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_focus_next_hook_set(obj, _elm_bubble_focus_next_hook);
    elm_widget_can_focus_set(obj, EINA_FALSE);
 
    wd->corner = eina_stringshare_add("base");
