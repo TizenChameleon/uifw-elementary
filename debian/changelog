@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build81) unstable; urgency=low
+
+  * Package uplaod for revert
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build81
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Tue, 04 Jan 2011 10:17:20 +0900
+
 elementary (1.0.0+svn.51480slp2+build80) unstable; urgency=low
 
   * Package uplaod for tickernoti bug
