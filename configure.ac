@@ -30,6 +30,8 @@ AM_INIT_AUTOMAKE([1.6 dist-bzip2])
 AM_CONFIG_HEADER([elementary_config.h])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+AC_GNU_SOURCE
+
 AC_C_BIGENDIAN
 AC_ISC_POSIX
 AC_PROG_CC
@@ -464,6 +466,18 @@ if test "x$want_elementary_libxml2" = "xyes" -a "x$have_elementary_libxml2" = "x
     AC_MSG_ERROR(Libxml-2.0 support requested, but no libxml-2.0 found by pkg-config.])
 fi
 AC_SUBST(ELM_LIBXML2_DEF)
+
+ELM_DEBUG_DEF="#undef"
+want_elementary_debug="no"
+AC_ARG_ENABLE([debug],
+   [AC_HELP_STRING([--enable-debug], [enable elementary debug support. @<:@default=disabled@:>@])],
+   [want_elementary_debug=$enableval], [])
+
+if test "x$want_elementary_debug" = "xyes"; then
+        AC_DEFINE(HAVE_ELEMENTARY_DEBUG, 1, [Elementary debug.])
+        ELM_DEBUG_DEF="#define"
+fi
+AC_SUBST(ELM_DEBUG_DEF)
 
 ELM_ALLOCA_H_DEF="#undef"
 AC_CHECK_HEADER(alloca.h, [ELM_ALLOCA_H_DEF="#define"])

@@ -20,7 +20,7 @@ struct _Elm_Win
 #ifdef HAVE_ELEMENTARY_X
    Ecore_X_Window xwin;
    Ecore_Event_Handler *client_message_handler;
-#endif   
+#endif
    Ecore_Job *deferred_resize_job;
    Ecore_Job *deferred_child_eval_job;
 
@@ -31,6 +31,24 @@ struct _Elm_Win
    struct {
       int x, y;
    } screen;
+
+   struct {
+      Evas_Object *top;
+
+      struct {
+         Evas_Object *target;
+         Eina_Bool visible : 1;
+         Eina_Bool handled : 1;
+      } cur, prev;
+
+      const char *style;
+      Ecore_Job *reconf_job;
+
+      Eina_Bool enabled : 1;
+      Eina_Bool changed_theme : 1;
+      Eina_Bool top_animate : 1;
+      Eina_Bool geometry_changed : 1;
+   } focus_highlight;
 };
 
 static const char *widtype = NULL;
@@ -47,6 +65,13 @@ static void _elm_win_xwin_update(Elm_Win *win);
 static void _elm_win_eval_subobjs(Evas_Object *obj);
 static void _elm_win_subobj_callback_del(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _elm_win_subobj_callback_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _elm_win_focus_highlight_init(Elm_Win *win);
+static void _elm_win_focus_highlight_shutdown(Elm_Win *win);
+static void _elm_win_focus_highlight_visible_set(Elm_Win *win, Eina_Bool visible);
+static void _elm_win_focus_highlight_reconfigure_job_start(Elm_Win *win);
+static void _elm_win_focus_highlight_reconfigure_job_stop(Elm_Win *win);
+static void _elm_win_focus_highlight_anim_end(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _elm_win_focus_highlight_reconfigure(Elm_Win *win);
 
 Eina_List *_elm_win_list = NULL;
 
@@ -56,7 +81,7 @@ _elm_win_move(Ecore_Evas *ee)
    Evas_Object *obj = ecore_evas_object_associate_get(ee);
    Elm_Win *win;
    int x, y;
-   
+
    if (!obj) return;
    win = elm_widget_data_get(obj);
    if (!win) return;
@@ -71,7 +96,7 @@ _elm_win_resize(Ecore_Evas *ee)
 {
    Evas_Object *obj = ecore_evas_object_associate_get(ee);
    Elm_Win *win;
-   
+
    if (!obj) return;
    win = elm_widget_data_get(obj);
    if (!win) return;
@@ -84,13 +109,15 @@ _elm_win_focus_in(Ecore_Evas *ee)
 {
    Evas_Object *obj = ecore_evas_object_associate_get(ee);
    Elm_Win *win;
-   
+
    if (!obj) return;
    win = elm_widget_data_get(obj);
    if (!win) return;
    /*NB: Why two different "focus signals" here ??? */
    evas_object_smart_callback_call(win->win_obj, "focus-in", NULL); // FIXME: remove me
    evas_object_smart_callback_call(win->win_obj, "focus,in", NULL);
+   win->focus_highlight.cur.visible = EINA_TRUE;
+   _elm_win_focus_highlight_reconfigure_job_start(win);
 }
 
 static void
@@ -98,18 +125,86 @@ _elm_win_focus_out(Ecore_Evas *ee)
 {
    Evas_Object *obj = ecore_evas_object_associate_get(ee);
    Elm_Win *win;
-   
+
    if (!obj) return;
    win = elm_widget_data_get(obj);
    if (!win) return;
    evas_object_smart_callback_call(win->win_obj, "focus-out", NULL); // FIXME: remove me
    evas_object_smart_callback_call(win->win_obj, "focus,out", NULL);
+   win->focus_highlight.cur.visible = EINA_FALSE;
+   _elm_win_focus_highlight_reconfigure_job_start(win);
+}
+
+static Eina_Bool
+_elm_win_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
+{
+   Elm_Win *wd = elm_widget_data_get(obj);
+   const Eina_List *items;
+   void *(*list_data_get) (const Eina_List *list);
+
+   if (!wd)
+     return EINA_FALSE;
+
+   /* Focus chain */
+   if (wd->subobjs)
+     {
+        if (!(items = elm_widget_focus_custom_chain_get(obj)))
+          {
+             items = wd->subobjs;
+             if (!items)
+               return EINA_FALSE;
+          }
+        list_data_get = eina_list_data_get;
+
+        elm_widget_focus_list_next_get(obj, items, list_data_get, dir, next);
+
+        if (*next)
+          return EINA_TRUE;
+     }
+
+   *next = (Evas_Object *)obj;
+   return EINA_FALSE;
+}
+
+static void
+_elm_win_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
+{
+   if (elm_widget_focus_get(obj))
+     evas_object_focus_set(obj, EINA_TRUE);
+   else
+     evas_object_focus_set(obj, EINA_FALSE);
+}
+
+static Eina_Bool
+_elm_win_event_cb(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
+{
+   if (type == EVAS_CALLBACK_KEY_DOWN)
+     {
+        Evas_Event_Key_Down *ev = event_info;
+        if (!strcmp(ev->keyname, "Tab"))
+          {
+             if(evas_key_modifier_is_set(ev->modifiers, "Shift"))
+               elm_widget_focus_cycle(obj, ELM_FOCUS_PREVIOUS);
+             else
+               elm_widget_focus_cycle(obj, ELM_FOCUS_NEXT);
+             ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+             return EINA_TRUE;
+          }
+     }
+
+   return EINA_FALSE;
 }
 
 static void
 _deferred_ecore_evas_free(void *data)
 {
    ecore_evas_free(data);
+}
+
+static void
+_elm_win_obj_callback_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   elm_object_focus(obj);
 }
 
 static void
@@ -144,25 +239,29 @@ _elm_win_obj_callback_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void
 #ifdef HAVE_ELEMENTARY_X
    if (win->client_message_handler)
      ecore_event_handler_del(win->client_message_handler);
-#endif   
+#endif
 // FIXME: Why are we flushing edje on every window destroy ??
-//   evas_image_cache_flush(win->evas);
-//   evas_font_cache_flush(win->evas);
 //   edje_file_cache_flush();
 //   edje_collection_cache_flush();
+//   evas_image_cache_flush(win->evas);
+//   evas_font_cache_flush(win->evas);
 // FIXME: we are in the del handler for the object and delete the canvas
-// that lives under it from the handler... nasty. deferring doesnt help either
+// that lives under it from the handler... nasty. deferring doesn't help either
    ecore_job_add(_deferred_ecore_evas_free, win->ee);
 //   ecore_evas_free(win->ee);
+
+   _elm_win_focus_highlight_shutdown(win);
+   eina_stringshare_del(win->focus_highlight.style);
+
    free(win);
 
    if ((!_elm_win_list) &&
        (elm_policy_get(ELM_POLICY_QUIT) == ELM_POLICY_QUIT_LAST_WINDOW_CLOSED))
      {
-        evas_image_cache_flush(e);
-        evas_font_cache_flush(e);
         edje_file_cache_flush();
         edje_collection_cache_flush();
+        evas_image_cache_flush(e);
+        evas_font_cache_flush(e);
 	elm_exit();
      }
 }
@@ -190,7 +289,7 @@ _elm_win_delete_request(Ecore_Evas *ee)
    Evas_Object *obj = ecore_evas_object_associate_get(ee);
    Elm_Win *win;
    if (strcmp(elm_widget_type_get(obj), "win")) return;
-   
+
    win = elm_widget_data_get(obj);
    if (!win) return;
    int autodel = win->autodel;
@@ -225,33 +324,41 @@ static void
 _elm_win_xwindow_get(Elm_Win *win)
 {
    win->xwin = 0;
-   switch (_elm_config->engine)
+
+#define ENGINE_COMPARE(name) (!strcmp(_elm_config->engine, name))
+   if (ENGINE_COMPARE(ELM_SOFTWARE_X11))
      {
-      case ELM_SOFTWARE_X11:
-	if (win->ee) win->xwin = ecore_evas_software_x11_window_get(win->ee);
-	break;
-      case ELM_SOFTWARE_FB:
-      case ELM_SOFTWARE_DIRECTFB:
-      case ELM_SOFTWARE_16_WINCE:
-      case ELM_SOFTWARE_SDL:
-      case ELM_SOFTWARE_16_SDL:
-      case ELM_OPENGL_SDL:
-	break;
-      case ELM_SOFTWARE_16_X11:
-	if (win->ee) win->xwin = ecore_evas_software_x11_16_window_get(win->ee);
-	break;
-      case ELM_XRENDER_X11:
-	if (win->ee) win->xwin = ecore_evas_xrender_x11_window_get(win->ee);
-	break;
-      case ELM_OPENGL_X11:
-	if (win->ee) win->xwin = ecore_evas_gl_x11_window_get(win->ee);
-	break;
-      case ELM_SOFTWARE_WIN32:
-	if (win->ee) win->xwin = (long)ecore_evas_win32_window_get(win->ee);
-	break;
-      default:
-	break;
+       if (win->ee) win->xwin = ecore_evas_software_x11_window_get(win->ee);
      }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_X11) ||
+            ENGINE_COMPARE(ELM_SOFTWARE_FB) ||
+            ENGINE_COMPARE(ELM_SOFTWARE_16_WINCE) ||
+            ENGINE_COMPARE(ELM_SOFTWARE_SDL) ||
+            ENGINE_COMPARE(ELM_SOFTWARE_16_SDL) ||
+            ENGINE_COMPARE(ELM_OPENGL_SDL))
+     {
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_16_X11))
+     {
+	if (win->ee) win->xwin = ecore_evas_software_x11_16_window_get(win->ee);
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_8_X11))
+     {
+	if (win->ee) win->xwin = ecore_evas_software_x11_8_window_get(win->ee);
+     }
+   else if (ENGINE_COMPARE(ELM_XRENDER_X11))
+     {
+	if (win->ee) win->xwin = ecore_evas_xrender_x11_window_get(win->ee);
+     }
+   else if (ENGINE_COMPARE(ELM_OPENGL_X11))
+     {
+	if (win->ee) win->xwin = ecore_evas_gl_x11_window_get(win->ee);
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_WIN32))
+     {
+	if (win->ee) win->xwin = (long)ecore_evas_win32_window_get(win->ee);
+     }
+#undef ENGINE_COMPARE
 }
 #endif
 
@@ -313,7 +420,7 @@ _elm_win_eval_subobjs(Evas_Object *obj)
 {
    const Eina_List *l;
    const Evas_Object *child;
-   
+
    Elm_Win *win = elm_widget_data_get(obj);
    Evas_Coord w, h, minw = -1, minh = -1, maxw = -1, maxh = -1;
    int xx = 1, xy = 1;
@@ -339,8 +446,6 @@ _elm_win_eval_subobjs(Evas_Object *obj)
 	if (maxh == -1) maxh = h;
 	else if ((h > 0) && (h < maxh)) maxh = h;
      }
-   if ((maxw >= 0) && (maxw < minw)) maxw = minw;
-   if ((maxh >= 0) && (maxh < minh)) maxh = minh;
    if (!xx) maxw = minw;
    else maxw = 32767;
    if (!xy) maxh = minh;
@@ -358,7 +463,9 @@ _elm_win_eval_subobjs(Evas_Object *obj)
 static void
 _elm_win_subobj_callback_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-   elm_win_resize_object_del(data, obj);
+   Elm_Win *win = elm_widget_data_get(data);
+   win->subobjs = eina_list_remove(win->subobjs, obj);
+   _elm_win_eval_subobjs(win->win_obj);
 }
 
 static void
@@ -375,13 +482,21 @@ _elm_win_shutdown(void)
 }
 
 void
-_elm_win_rescale(void)
+_elm_win_rescale(Elm_Theme *th, Eina_Bool use_theme)
 {
    const Eina_List *l;
    Evas_Object *obj;
 
-   EINA_LIST_FOREACH(_elm_win_list, l, obj)
-     elm_widget_theme(obj);
+   if (!use_theme)
+     {
+        EINA_LIST_FOREACH(_elm_win_list, l, obj)
+          elm_widget_theme(obj);
+     }
+   else
+     {
+        EINA_LIST_FOREACH(_elm_win_list, l, obj)
+          elm_widget_theme_specific(obj, th, EINA_FALSE);
+     }
 }
 
 #ifdef HAVE_ELEMENTARY_X
@@ -394,7 +509,7 @@ _elm_win_client_message(void *data, int type __UNUSED__, void *event)
    if (e->format != 32) return ECORE_CALLBACK_PASS_ON;
    if (e->message_type == ECORE_X_ATOM_E_COMP_FLUSH)
      {
-        if (e->data.l[0] == win->xwin)
+        if ((unsigned)e->data.l[0] == win->xwin)
           {
              Evas *evas = evas_object_evas_get(win->win_obj);
              if (evas)
@@ -408,7 +523,7 @@ _elm_win_client_message(void *data, int type __UNUSED__, void *event)
      }
    else if (e->message_type == ECORE_X_ATOM_E_COMP_DUMP)
      {
-        if (e->data.l[0] == win->xwin)
+        if ((unsigned)e->data.l[0] == win->xwin)
           {
              Evas *evas = evas_object_evas_get(win->win_obj);
              if (evas)
@@ -422,6 +537,358 @@ _elm_win_client_message(void *data, int type __UNUSED__, void *event)
           }
      }
    return ECORE_CALLBACK_PASS_ON;
+}
+#endif
+
+static void
+_elm_win_focus_target_move(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Elm_Win *win = data;
+
+   win->focus_highlight.geometry_changed = EINA_TRUE;
+   _elm_win_focus_highlight_reconfigure_job_start(win);
+}
+
+static void
+_elm_win_focus_target_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Elm_Win *win = data;
+
+   win->focus_highlight.geometry_changed = EINA_TRUE;
+   _elm_win_focus_highlight_reconfigure_job_start(win);
+}
+
+static void
+_elm_win_focus_target_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Elm_Win *win = data;
+
+   win->focus_highlight.cur.target = NULL;
+
+   _elm_win_focus_highlight_reconfigure_job_start(win);
+}
+
+static void
+_elm_win_focus_target_callbacks_add(Elm_Win *win)
+{
+   Evas_Object *obj = win->focus_highlight.cur.target;
+
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE,
+				  _elm_win_focus_target_move, win);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE,
+				  _elm_win_focus_target_resize, win);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_DEL,
+				  _elm_win_focus_target_del, win);
+}
+
+static void
+_elm_win_focus_target_callbacks_del(Elm_Win *win)
+{
+   Evas_Object *obj = win->focus_highlight.cur.target;
+
+   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_MOVE,
+				       _elm_win_focus_target_move, win);
+   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_RESIZE,
+				       _elm_win_focus_target_resize, win);
+   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_DEL,
+				       _elm_win_focus_target_del, win);
+}
+
+static Evas_Object *
+_elm_win_focus_target_get(Evas_Object *obj)
+{
+   Evas_Object *o = obj;
+
+   do
+     {
+        if (elm_widget_is(o))
+          {
+             if (!elm_widget_highlight_ignore_get(o))
+               break;
+             o = elm_widget_parent_get(o);
+             if (!o)
+               o = evas_object_smart_parent_get(o);
+          }
+        else
+          {
+             o = elm_widget_parent_widget_get(o);
+             if (!o)
+               o = evas_object_smart_parent_get(o);
+          }
+     }
+   while (o);
+
+   return o;
+}
+
+static void
+_elm_win_object_focus_in(void *data, Evas *e __UNUSED__, void *event_info)
+{
+   Evas_Object *obj = event_info, *target;
+   Elm_Win *win = data;
+
+   if (win->focus_highlight.cur.target == obj)
+     return;
+
+   target = _elm_win_focus_target_get(obj);
+   win->focus_highlight.cur.target = target;
+   if (elm_widget_highlight_in_theme_get(target))
+     win->focus_highlight.cur.handled = EINA_TRUE;
+   else
+     _elm_win_focus_target_callbacks_add(win);
+
+   _elm_win_focus_highlight_reconfigure_job_start(win);
+}
+
+static void
+_elm_win_object_focus_out(void *data, Evas *e __UNUSED__, void *event_info __UNUSED__)
+{
+   Elm_Win *win = data;
+
+   if (!win->focus_highlight.cur.target)
+     return;
+
+   if (!win->focus_highlight.cur.handled)
+     _elm_win_focus_target_callbacks_del(win);
+   win->focus_highlight.cur.target = NULL;
+   win->focus_highlight.cur.handled = EINA_FALSE;
+
+   _elm_win_focus_highlight_reconfigure_job_start(win);
+}
+
+static void
+_elm_win_focus_highlight_hide(void *data __UNUSED__, Evas_Object *obj, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   evas_object_hide(obj);
+}
+
+static void
+_elm_win_focus_highlight_init(Elm_Win *win)
+{
+   evas_event_callback_add(win->evas, EVAS_CALLBACK_CANVAS_OBJECT_FOCUS_IN,
+                           _elm_win_object_focus_in, win);
+   evas_event_callback_add(win->evas,
+                           EVAS_CALLBACK_CANVAS_OBJECT_FOCUS_OUT,
+                           _elm_win_object_focus_out, win);
+
+   win->focus_highlight.cur.target = evas_focus_get(win->evas);
+
+   win->focus_highlight.top = edje_object_add(win->evas);
+   win->focus_highlight.changed_theme = EINA_TRUE;
+   edje_object_signal_callback_add(win->focus_highlight.top,
+                                   "elm,action,focus,hide,end", "",
+                                   _elm_win_focus_highlight_hide, NULL);
+   edje_object_signal_callback_add(win->focus_highlight.top,
+                                   "elm,action,focus,anim,end", "",
+                                   _elm_win_focus_highlight_anim_end, win);
+   _elm_win_focus_highlight_reconfigure_job_start(win);
+}
+
+static void
+_elm_win_focus_highlight_shutdown(Elm_Win *win)
+{
+   _elm_win_focus_highlight_reconfigure_job_stop(win);
+   if (win->focus_highlight.cur.target)
+     {
+        _elm_win_focus_target_callbacks_del(win);
+        win->focus_highlight.cur.target = NULL;
+     }
+   if (win->focus_highlight.top)
+     {
+        evas_object_del(win->focus_highlight.top);
+        win->focus_highlight.top = NULL;
+     }
+
+     evas_event_callback_del_full(win->evas,
+                                  EVAS_CALLBACK_CANVAS_OBJECT_FOCUS_IN,
+                                  _elm_win_object_focus_in, win);
+     evas_event_callback_del_full(win->evas,
+                                  EVAS_CALLBACK_CANVAS_OBJECT_FOCUS_OUT,
+                                  _elm_win_object_focus_out, win);
+}
+
+static void
+_elm_win_focus_highlight_visible_set(Elm_Win *win, Eina_Bool visible)
+{
+   Evas_Object *top;
+
+   top = win->focus_highlight.top;
+   if (visible)
+     {
+        if (top)
+          {
+             evas_object_show(top);
+             edje_object_signal_emit(top, "elm,action,focus,show", "elm");
+          }
+     }
+   else
+     {
+        if (top)
+          edje_object_signal_emit(top, "elm,action,focus,hide", "elm");
+     }
+}
+
+static void
+_elm_win_focus_highlight_reconfigure_job(void *data)
+{
+   _elm_win_focus_highlight_reconfigure((Elm_Win *)data);
+}
+
+static void
+_elm_win_focus_highlight_reconfigure_job_start(Elm_Win *win)
+{
+   if (win->focus_highlight.reconf_job)
+     ecore_job_del(win->focus_highlight.reconf_job);
+   win->focus_highlight.reconf_job = ecore_job_add(
+      _elm_win_focus_highlight_reconfigure_job, win);
+}
+
+static void
+_elm_win_focus_highlight_reconfigure_job_stop(Elm_Win *win)
+{
+   if (win->focus_highlight.reconf_job)
+     ecore_job_del(win->focus_highlight.reconf_job);
+   win->focus_highlight.reconf_job = NULL;
+}
+
+static void
+_elm_win_focus_highlight_simple_setup(Elm_Win *win, Evas_Object *obj)
+{
+   Evas_Object *clip, *target = win->focus_highlight.cur.target;
+   Evas_Coord x, y, w, h;
+
+   clip = evas_object_clip_get(target);
+   evas_object_geometry_get(target, &x, &y, &w, &h);
+
+   evas_object_move(obj, x, y);
+   evas_object_resize(obj, w, h);
+   evas_object_clip_set(obj, clip);
+}
+
+static void
+_elm_win_focus_highlight_anim_setup(Elm_Win *win, Evas_Object *obj)
+{
+   Evas_Coord tx, ty, tw, th;
+   Evas_Coord w, h, px, py, pw, ph;
+   Edje_Message_Int_Set *m;
+   Evas_Object *previous = win->focus_highlight.prev.target;
+   Evas_Object *target = win->focus_highlight.cur.target;
+
+   evas_object_geometry_get(win->win_obj, NULL, NULL, &w, &h);
+   evas_object_geometry_get(target, &tx, &ty, &tw, &th);
+   evas_object_geometry_get(previous, &px, &py, &pw, &ph);
+   evas_object_move(obj, 0, 0);
+   evas_object_resize(obj, tw, th);
+   evas_object_clip_unset(obj);
+
+   m = alloca(sizeof(*m) + (sizeof(int) * 8));
+   m->count = 8;
+   m->val[0] = px;
+   m->val[1] = py;
+   m->val[2] = pw;
+   m->val[3] = ph;
+   m->val[4] = tx;
+   m->val[5] = ty;
+   m->val[6] = tw;
+   m->val[7] = th;
+   edje_object_message_send(obj, EDJE_MESSAGE_INT_SET, 1, m);
+}
+
+static void
+_elm_win_focus_highlight_anim_end(void *data, Evas_Object *obj, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   Elm_Win *win = data;
+   _elm_win_focus_highlight_simple_setup(win, obj);
+}
+
+static void
+_elm_win_focus_highlight_reconfigure(Elm_Win *win)
+{
+   Evas_Object *target = win->focus_highlight.cur.target;
+   Evas_Object *previous = win->focus_highlight.prev.target;
+   Evas_Object *top = win->focus_highlight.top;
+   Eina_Bool visible_changed;
+   Eina_Bool common_visible;
+   const char *sig = NULL;
+
+   _elm_win_focus_highlight_reconfigure_job_stop(win);
+
+   visible_changed = (win->focus_highlight.cur.visible !=
+                      win->focus_highlight.prev.visible);
+
+   if ((target == previous) && (!visible_changed) &&
+       (!win->focus_highlight.geometry_changed))
+     return;
+
+   if ((previous) && (win->focus_highlight.prev.handled))
+     elm_widget_signal_emit(previous, "elm,action,focus_highlight,hide", "elm");
+
+   if (!target)
+     common_visible = EINA_FALSE;
+   else if (win->focus_highlight.cur.handled)
+     {
+        common_visible = EINA_FALSE;
+        if (win->focus_highlight.cur.visible)
+          sig = "elm,action,focus_highlight,show";
+        else
+          sig = "elm,action,focus_highlight,hide";
+     }
+   else
+     common_visible = win->focus_highlight.cur.visible;
+
+   _elm_win_focus_highlight_visible_set(win, common_visible);
+   if (sig)
+     elm_widget_signal_emit(target, sig, "elm");
+
+   if ((!target) || (!common_visible) || (win->focus_highlight.cur.handled))
+     goto the_end;
+
+   if (win->focus_highlight.changed_theme)
+     {
+        const char *str;
+        if (win->focus_highlight.style)
+          str = win->focus_highlight.style;
+        else
+          str = "default";
+        _elm_theme_object_set(win->win_obj, top, "focus_highlight", "top",
+                              str);
+        win->focus_highlight.changed_theme = EINA_FALSE;
+
+        if (_elm_config->focus_highlight_animate)
+          {
+             str = edje_object_data_get(win->focus_highlight.top, "animate");
+             win->focus_highlight.top_animate = ((str) && (!strcmp(str, "on")));
+          }
+     }
+
+   if ((win->focus_highlight.top_animate) && (previous) &&
+       (!win->focus_highlight.prev.handled))
+     _elm_win_focus_highlight_anim_setup(win, top);
+   else
+     _elm_win_focus_highlight_simple_setup(win, top);
+   evas_object_raise(top);
+
+the_end:
+   win->focus_highlight.geometry_changed = EINA_FALSE;
+   win->focus_highlight.prev = win->focus_highlight.cur;
+}
+
+#ifdef ELM_DEBUG
+static void
+_debug_key_down(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info)
+{
+   Evas_Event_Key_Down *ev = event_info;
+
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
+      return;
+
+
+   if ((strcmp(ev->keyname, "F12")) ||
+       (!evas_key_modifier_is_set(ev->modifiers, "Control")))
+     return;
+
+   printf("Tree graph generated.\n");
+   elm_object_tree_dot_dump(obj, "./dump.dot");
 }
 #endif
 
@@ -453,90 +920,96 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
    const char *fontpath;
 
    win = ELM_NEW(Elm_Win);
-   switch (_elm_config->engine)
+
+#define FALLBACK_TRY(engine)                                            \
+   if (!win->ee)                                                        \
+     do {                                                               \
+       CRITICAL(engine " engine creation failed. Trying software X11."); \
+       win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);      \
+     } while (0)
+
+#define ENGINE_COMPARE(name) (!strcmp(_elm_config->engine, name))
+   if (ENGINE_COMPARE(ELM_SOFTWARE_X11))
      {
-      case ELM_SOFTWARE_X11:
 	win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);
 #ifdef HAVE_ELEMENTARY_X
         win->client_message_handler = ecore_event_handler_add
           (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
-#endif        
-	break;
-      case ELM_SOFTWARE_FB:
-	win->ee = ecore_evas_fb_new(NULL, 0, 1, 1);
-	break;
-      case ELM_SOFTWARE_DIRECTFB:
-        win->ee = ecore_evas_directfb_new(NULL, 1, 0, 0, 1, 1);
-	break;
-      case ELM_SOFTWARE_16_X11:
-	win->ee = ecore_evas_software_x11_16_new(NULL, 0, 0, 0, 1, 1);
-        if (!win->ee)
-          {
-             CRITICAL("Software-16 engine create failed. Try software.");
-             win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);
-          }
-#ifdef HAVE_ELEMENTARY_X
-        win->client_message_handler = ecore_event_handler_add
-          (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
-#endif        
-	break;
-      case ELM_XRENDER_X11:
-	win->ee = ecore_evas_xrender_x11_new(NULL, 0, 0, 0, 1, 1);
-        if (!win->ee)
-          {
-             CRITICAL("XRender engine create failed. Try software.");
-             win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);
-          }
-#ifdef HAVE_ELEMENTARY_X
-        win->client_message_handler = ecore_event_handler_add
-          (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
-#endif        
-	break;
-      case ELM_OPENGL_X11:
-	win->ee = ecore_evas_gl_x11_new(NULL, 0, 0, 0, 1, 1);
-        if (!win->ee)
-          {
-             CRITICAL("OpenGL engine create failed. Try software.");
-             win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);
-          }
-#ifdef HAVE_ELEMENTARY_X
-        win->client_message_handler = ecore_event_handler_add
-          (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
-#endif        
-	break;
-      case ELM_SOFTWARE_WIN32:
-	win->ee = ecore_evas_software_gdi_new(NULL, 0, 0, 1, 1);
-	break;
-      case ELM_SOFTWARE_16_WINCE:
-	win->ee = ecore_evas_software_wince_gdi_new(NULL, 0, 0, 1, 1);
-	break;
-      case ELM_SOFTWARE_SDL:
-	win->ee = ecore_evas_sdl_new(NULL, 0, 0, 0, 0, 0, 1);
-        if (!win->ee)
-          {
-             CRITICAL("Software SDL engine create failed. Try software.");
-             win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);
-          }
-	break;
-      case ELM_SOFTWARE_16_SDL:
-	win->ee = ecore_evas_sdl16_new(NULL, 0, 0, 0, 0, 0, 1);
-        if (!win->ee)
-          {
-             CRITICAL("Sofware-16-SDL engine create failed. Try software.");
-             win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);
-          }
-	break;
-      case ELM_OPENGL_SDL:
-	win->ee = ecore_evas_gl_sdl_new(NULL, 1, 1, 0, 0);
-        if (!win->ee)
-          {
-             CRITICAL("OpenGL SDL engine create failed. Try software.");
-             win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);
-          }
-	break;
-      default:
-	break;
+#endif
      }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_FB))
+     {
+	win->ee = ecore_evas_fb_new(NULL, 0, 1, 1);
+        FALLBACK_TRY("Sofware FB");
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_DIRECTFB))
+     {
+        win->ee = ecore_evas_directfb_new(NULL, 1, 0, 0, 1, 1);
+        FALLBACK_TRY("Sofware DirectFB");
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_16_X11))
+     {
+	win->ee = ecore_evas_software_x11_16_new(NULL, 0, 0, 0, 1, 1);
+        FALLBACK_TRY("Sofware-16");
+#ifdef HAVE_ELEMENTARY_X
+        win->client_message_handler = ecore_event_handler_add
+          (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
+#endif
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_8_X11))
+     {
+	win->ee = ecore_evas_software_x11_8_new(NULL, 0, 0, 0, 1, 1);
+        FALLBACK_TRY("Sofware-8");
+#ifdef HAVE_ELEMENTARY_X
+        win->client_message_handler = ecore_event_handler_add
+          (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
+#endif
+     }
+   else if (ENGINE_COMPARE(ELM_XRENDER_X11))
+     {
+	win->ee = ecore_evas_xrender_x11_new(NULL, 0, 0, 0, 1, 1);
+        FALLBACK_TRY("XRender");
+#ifdef HAVE_ELEMENTARY_X
+        win->client_message_handler = ecore_event_handler_add
+          (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
+#endif
+     }
+   else if (ENGINE_COMPARE(ELM_OPENGL_X11))
+     {
+	win->ee = ecore_evas_gl_x11_new(NULL, 0, 0, 0, 1, 1);
+        FALLBACK_TRY("OpenGL");
+#ifdef HAVE_ELEMENTARY_X
+        win->client_message_handler = ecore_event_handler_add
+          (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
+#endif
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_WIN32))
+     {
+	win->ee = ecore_evas_software_gdi_new(NULL, 0, 0, 1, 1);
+        FALLBACK_TRY("Sofware Win32");
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_16_WINCE))
+     {
+	win->ee = ecore_evas_software_wince_gdi_new(NULL, 0, 0, 1, 1);
+        FALLBACK_TRY("Sofware-16-WinCE");
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_SDL))
+     {
+	win->ee = ecore_evas_sdl_new(NULL, 0, 0, 0, 0, 0, 1);
+        FALLBACK_TRY("Sofware SDL");
+     }
+   else if (ENGINE_COMPARE(ELM_SOFTWARE_16_SDL))
+     {
+	win->ee = ecore_evas_sdl16_new(NULL, 0, 0, 0, 0, 0, 1);
+        FALLBACK_TRY("Sofware-16-SDL");
+     }
+   else if (ENGINE_COMPARE(ELM_OPENGL_SDL))
+     {
+	win->ee = ecore_evas_gl_sdl_new(NULL, 1, 1, 0, 0);
+        FALLBACK_TRY("OpenGL SDL");
+     }
+#undef FALLBACK_TRY
+
    if (!win->ee)
      {
 	ERR("Cannot create window.");
@@ -545,7 +1018,7 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
      }
 #ifdef HAVE_ELEMENTARY_X
    _elm_win_xwindow_get(win);
-#endif   
+#endif
    if ((_elm_config->bgpixmap) && (!_elm_config->compositing))
      ecore_evas_avoid_damage_set(win->ee, ECORE_EVAS_AVOID_DAMAGE_EXPOSE);
 // bg pixmap done by x - has other issues like can be redrawn by x before it
@@ -563,11 +1036,16 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
    elm_widget_type_set(win->win_obj, "win");
    ELM_SET_WIDTYPE(widtype, "win");
    elm_widget_data_set(win->win_obj, win);
+   elm_widget_event_hook_set(win->win_obj, _elm_win_event_cb);
+   elm_widget_on_focus_hook_set(win->win_obj, _elm_win_on_focus_hook, NULL);
+   elm_widget_can_focus_set(win->win_obj, EINA_TRUE);
+   elm_widget_highlight_ignore_set(win->win_obj, EINA_TRUE);
+   elm_widget_focus_next_hook_set(win->win_obj, _elm_win_focus_next_hook);
    evas_object_color_set(win->win_obj, 0, 0, 0, 0);
    evas_object_move(win->win_obj, 0, 0);
    evas_object_resize(win->win_obj, 1, 1);
    evas_object_layer_set(win->win_obj, 50);
-   evas_object_pass_events_set(win->win_obj, 1);
+   evas_object_pass_events_set(win->win_obj, EINA_TRUE);
 
    evas_object_intercept_show_callback_add(win->win_obj,
                                            _elm_win_obj_intercept_show, win);
@@ -575,6 +1053,8 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
 			       ECORE_EVAS_OBJECT_ASSOCIATE_BASE |
 			       ECORE_EVAS_OBJECT_ASSOCIATE_STACK |
 			       ECORE_EVAS_OBJECT_ASSOCIATE_LAYER);
+   evas_object_event_callback_add(win->win_obj, EVAS_CALLBACK_SHOW,
+				  _elm_win_obj_callback_show, win);
    evas_object_event_callback_add(win->win_obj, EVAS_CALLBACK_DEL,
 				  _elm_win_obj_callback_del, win);
 
@@ -588,7 +1068,7 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
    evas_font_cache_set(win->evas, (_elm_config->font_cache * 1024));
    EINA_LIST_FOREACH(_elm_config->font_dirs, l, fontpath)
      evas_font_path_append(win->evas, fontpath);
-   if (_elm_config->font_hinting == 0)
+   if (!_elm_config->font_hinting)
      evas_font_hinting_set(win->evas, EVAS_FONT_HINTING_NONE);
    else if (_elm_config->font_hinting == 1)
      evas_font_hinting_set(win->evas, EVAS_FONT_HINTING_AUTO);
@@ -598,27 +1078,25 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
 #ifdef HAVE_ELEMENTARY_X
    _elm_win_xwin_update(win);
 #endif
-   
+
    _elm_win_list = eina_list_append(_elm_win_list, win->win_obj);
 
-   switch (_elm_config->engine)
+   if (ENGINE_COMPARE(ELM_SOFTWARE_FB))
      {
-      case ELM_SOFTWARE_16_WINCE:
-      case ELM_SOFTWARE_FB:
 	ecore_evas_fullscreen_set(win->ee, 1);
-	break;
-      case ELM_SOFTWARE_X11:
-      case ELM_SOFTWARE_16_X11:
-      case ELM_XRENDER_X11:
-      case ELM_OPENGL_X11:
-      case ELM_SOFTWARE_WIN32:
-      case ELM_SOFTWARE_SDL:
-      case ELM_SOFTWARE_16_SDL:
-      case ELM_OPENGL_SDL:
-      default:
-	break;
      }
-   
+#undef ENGINE_COMPARE
+
+   if (_elm_config->focus_highlight_enable)
+     elm_win_focus_highlight_enabled_set(win->win_obj, EINA_TRUE);
+
+#ifdef ELM_DEBUG
+   Evas_Modifier_Mask mask = evas_key_modifier_mask_get(win->evas, "Control");
+   evas_object_event_callback_add(win->win_obj, EVAS_CALLBACK_KEY_DOWN,
+                                  _debug_key_down, win);
+   Eina_Bool ret = evas_object_key_grab(win->win_obj, "F12", mask, 0, EINA_TRUE);
+   printf("Key F12 exclusive for dot tree generation. (%d)\n", ret);
+#endif
    return win->win_obj;
 }
 
@@ -696,6 +1174,24 @@ elm_win_title_set(Evas_Object *obj, const char *title)
 }
 
 /**
+ * Get the title of the window
+ *
+ * @param obj The window object
+ * @return The title
+ *
+ * @ingroup Win
+ */
+EAPI const char *
+elm_win_title_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   win = elm_widget_data_get(obj);
+   if (!win) return NULL;
+   return ecore_evas_title_get(win->ee);
+}
+
+/**
  * Set the window's autodel state.
  *
  * @param obj The window object
@@ -711,6 +1207,24 @@ elm_win_autodel_set(Evas_Object *obj, Eina_Bool autodel)
    win = elm_widget_data_get(obj);
    if (!win) return;
    win->autodel = autodel;
+}
+
+/**
+ * Get the window's autodel state.
+ *
+ * @param obj The window object
+ * @return If the window will automatically delete itself when closed
+ *
+ * @ingroup Win
+ */
+EAPI Eina_Bool
+elm_win_autodel_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   win = elm_widget_data_get(obj);
+   if (!win) return EINA_FALSE;
+   return win->autodel;
 }
 
 /**
@@ -909,11 +1423,11 @@ elm_win_transparent_set(Evas_Object *obj, Eina_Bool transparent)
    ELM_CHECK_WIDTYPE(obj, widtype);
    win = elm_widget_data_get(obj);
    if (!win) return;
-   
+
 #ifdef HAVE_ELEMENTARY_X
    if (win->xwin)
      {
-       ecore_evas_transparent_set(win->ee, transparent);	  
+       ecore_evas_transparent_set(win->ee, transparent);
 	_elm_win_xwin_update(win);
      }
    else
@@ -994,19 +1508,22 @@ elm_win_fullscreen_set(Evas_Object *obj, Eina_Bool fullscreen)
    ELM_CHECK_WIDTYPE(obj, widtype);
    win = elm_widget_data_get(obj);
    if (!win) return;
-   switch (_elm_config->engine)
+
+#define ENGINE_COMPARE(name) (!strcmp(_elm_config->engine, name))
+   if (ENGINE_COMPARE(ELM_SOFTWARE_FB) ||
+       ENGINE_COMPARE(ELM_SOFTWARE_16_WINCE))
      {
-     case ELM_SOFTWARE_16_WINCE:
-     case ELM_SOFTWARE_FB:
 	// these engines... can ONLY be fullscreen
-	break;
-     default:
+	return;
+     }
+   else
+     {
 	ecore_evas_fullscreen_set(win->ee, fullscreen);
 #ifdef HAVE_ELEMENTARY_X
 	_elm_win_xwin_update(win);
 #endif
-	break;
      }
+#undef ENGINE_COMPARE
 }
 
 /**
@@ -1024,18 +1541,19 @@ elm_win_fullscreen_get(const Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    win = elm_widget_data_get(obj);
    if (!win) return EINA_FALSE;
-   switch (_elm_config->engine)
+
+#define ENGINE_COMPARE(name) (!strcmp(_elm_config->engine, name))
+   if (ENGINE_COMPARE(ELM_SOFTWARE_FB) ||
+       ENGINE_COMPARE(ELM_SOFTWARE_16_WINCE))
      {
-     case ELM_SOFTWARE_16_WINCE:
-     case ELM_SOFTWARE_FB:
 	// these engines... can ONLY be fullscreen
 	return EINA_TRUE;
-	break;
-     default:
-	return ecore_evas_fullscreen_get(win->ee);
-	break;
      }
-   return EINA_FALSE;
+   else
+     {
+	return ecore_evas_fullscreen_get(win->ee);
+     }
+#undef ENGINE_COMPARE
 }
 
 /**
@@ -1131,7 +1649,7 @@ elm_win_layer_set(Evas_Object *obj, int layer)
    ELM_CHECK_WIDTYPE(obj, widtype);
    win = elm_widget_data_get(obj);
    if (!win) return;
-   ecore_evas_layer_set(win->ee, layer); 
+   ecore_evas_layer_set(win->ee, layer);
 #ifdef HAVE_ELEMENTARY_X
    _elm_win_xwin_update(win);
 #endif
@@ -1308,6 +1826,40 @@ elm_win_keyboard_mode_set(Evas_Object *obj, Elm_Win_Keyboard_Mode mode)
 }
 
 /**
+ * Gets the keyboard mode of the window.
+ *
+ * @param obj The window object
+ * @return The mode; one of:
+ * ELM_WIN_KEYBOARD_UNKNOWN
+ * ELM_WIN_KEYBOARD_OFF
+ * ELM_WIN_KEYBOARD_ON
+ * ELM_WIN_KEYBOARD_ALPHA
+ * ELM_WIN_KEYBOARD_NUMERIC
+ * ELM_WIN_KEYBOARD_PIN
+ * ELM_WIN_KEYBOARD_PHONE_NUMBER
+ * ELM_WIN_KEYBOARD_HEX
+ * ELM_WIN_KEYBOARD_TERMINAL
+ * ELM_WIN_KEYBOARD_PASSWORD
+ * ELM_WIN_KEYBOARD_IP
+ * ELM_WIN_KEYBOARD_HOST
+ * ELM_WIN_KEYBOARD_FILE
+ * ELM_WIN_KEYBOARD_URL
+ * ELM_WIN_KEYBOARD_KEYPAD
+ * ELM_WIN_KEYBOARD_J2ME
+ *
+ * @ingroup Win
+ */
+EAPI Elm_Win_Keyboard_Mode
+elm_win_keyboard_mode_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_WIN_KEYBOARD_UNKNOWN;
+   win = elm_widget_data_get(obj);
+   if (!win) return ELM_WIN_KEYBOARD_UNKNOWN;
+   return win->kbdmode;
+}
+
+/**
  * Sets whether the window is a keyboard.
  *
  * @param obj The window object
@@ -1327,6 +1879,29 @@ elm_win_keyboard_win_set(Evas_Object *obj, Eina_Bool is_keyboard)
    if (win->xwin)
      ecore_x_e_virtual_keyboard_set(win->xwin, is_keyboard);
 #endif
+}
+
+/**
+ * Gets whether the window is a keyboard.
+ *
+ * @param obj The window object
+ * @return If the window is a virtual keyboard
+ *
+ * @ingroup Win
+ */
+EAPI Eina_Bool
+elm_win_keyboard_win_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   win = elm_widget_data_get(obj);
+   if (!win) return EINA_FALSE;
+#ifdef HAVE_ELEMENTARY_X
+   _elm_win_xwindow_get(win);
+   if (win->xwin)
+     return ecore_x_e_virtual_keyboard_get(win->xwin);
+#endif
+   return EINA_FALSE;
 }
 
 /**
@@ -1564,6 +2139,127 @@ elm_win_quickpanel_zone_set(Evas_Object *obj, int zone)
 #endif
 }
 
+/**
+ * Get which zone this quickpanel should appear in
+ *
+ * @param obj The window object
+ * @return The requested zone for this quickpanel
+ *
+ * @ingroup Win
+ */
+EAPI int
+elm_win_quickpanel_zone_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   win = elm_widget_data_get(obj);
+   if (!win) return 0;
+#ifdef HAVE_ELEMENTARY_X
+   _elm_win_xwindow_get(win);
+   if (win->xwin)
+     return ecore_x_e_illume_quickpanel_zone_get(win->xwin);
+#endif
+   return 0;
+}
+
+/**
+ * Set the enabled status for the focus highlight in a window
+ *
+ * This function will enable or disable the focus highlight only for the
+ * given window, regardless of the global setting for it
+ *
+ * @param obj The window where to enable the highlight
+ * @param enabled The enabled value for the highlight
+ *
+ * @ingroup Win
+ */
+EAPI void
+elm_win_focus_highlight_enabled_set(Evas_Object *obj, Eina_Bool enabled)
+{
+   Elm_Win *win;
+
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   win = elm_widget_data_get(obj);
+   enabled = !!enabled;
+   if (win->focus_highlight.enabled == enabled)
+     return;
+
+   win->focus_highlight.enabled = enabled;
+
+   if (win->focus_highlight.enabled)
+     _elm_win_focus_highlight_init(win);
+   else
+     _elm_win_focus_highlight_shutdown(win);
+}
+
+/**
+ * Get the enabled value of the focus highlight for this window
+ *
+ * @param obj The window in which to check if the focus highlight is enabled
+ *
+ * @return EINA_TRUE if enabled, EINA_FALSE otherwise
+ *
+ * @ingroup Win
+ */
+EAPI Eina_Bool
+elm_win_focus_highlight_enabled_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+
+   win = elm_widget_data_get(obj);
+   return win->focus_highlight.enabled;
+}
+
+/**
+ * Set the style for the focus highlight on this window
+ *
+ * Sets the style to use for theming the highlight of focused objects on
+ * the given window. If @p style is NULL, the default will be used.
+ *
+ * @param obj The window where to set the style
+ * @param style The style to set
+ *
+ * @ingroup Win
+ */
+EAPI void
+elm_win_focus_highlight_style_set(Evas_Object *obj, const char *style)
+{
+   Elm_Win *win;
+
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   win = elm_widget_data_get(obj);
+   eina_stringshare_replace(&win->focus_highlight.style, style);
+   win->focus_highlight.changed_theme = EINA_TRUE;
+   _elm_win_focus_highlight_reconfigure_job_start(win);
+}
+
+/**
+ * Get the style set for the focus highlight object
+ *
+ * Gets the style set for this windows highilght object, or NULL if none
+ * is set.
+ *
+ * @param obj The window to retrieve the highlights style from
+ *
+ * @return The style set or NULL if none was. Default is used in that case.
+ *
+ * @ingroup Win
+ */
+EAPI const char *
+elm_win_focus_highlight_style_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+
+   win = elm_widget_data_get(obj);
+   return win->focus_highlight.style;
+}
+
 EAPI void
 elm_win_indicator_state_set(Evas_Object *obj, int show_state)
 {
@@ -1644,6 +2340,26 @@ _theme_hook(Evas_Object *obj)
    _sizing_eval(obj);
 }
 
+static Eina_Bool
+_elm_inwin_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd)
+     return EINA_FALSE;
+
+   /* Try Focus cycle in subitem */
+   if (wd->content)
+     {
+        elm_widget_focus_next_get(wd->content, dir, next);
+        if (*next)
+          return EINA_TRUE;
+     }
+
+   *next = (Evas_Object *)obj;
+   return EINA_FALSE;
+}
+
 static void
 _sizing_eval(Evas_Object *obj)
 {
@@ -1678,7 +2394,6 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 
 /**
  * @defgroup Inwin Inwin
- * @ingroup  Elementary
  *
  * An inwin is a window inside a window that is useful for a quick popup.  It does not hover.
  */
@@ -1704,6 +2419,9 @@ elm_win_inwin_add(Evas_Object *obj)
    elm_widget_data_set(obj2, wd);
    elm_widget_del_hook_set(obj2, _del_hook);
    elm_widget_theme_hook_set(obj2, _theme_hook);
+   elm_widget_focus_next_hook_set(obj2, _elm_inwin_focus_next_hook);
+   elm_widget_can_focus_set(obj2, EINA_TRUE);
+   elm_widget_highlight_ignore_set(obj2, EINA_TRUE);
 
    wd->frm = edje_object_add(win->evas);
    _elm_theme_object_set(obj, wd->frm, "win", "inwin", "default");
@@ -1731,7 +2449,7 @@ elm_win_inwin_activate(Evas_Object *obj)
    evas_object_raise(obj);
    evas_object_show(obj);
    edje_object_signal_emit(wd->frm, "elm,action,show", "elm");
-   elm_widget_focused_object_clear(elm_widget_parent_get(obj));
+   elm_object_focus(obj);
 }
 
 /**
@@ -1763,6 +2481,25 @@ elm_win_inwin_content_set(Evas_Object *obj, Evas_Object *content)
 	edje_object_part_swallow(wd->frm, "elm.swallow.content", content);
      }
    _sizing_eval(obj);
+}
+
+/**
+ * Get the content of an inwin object.
+ *
+ * Return the content object which is set for this widget.
+ *
+ * @param obj The inwin object
+ * @return The content that is being used
+ *
+ * @ingroup Inwin
+ */
+EAPI Evas_Object *
+elm_win_inwin_content_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype2) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->content;
 }
 
 /**

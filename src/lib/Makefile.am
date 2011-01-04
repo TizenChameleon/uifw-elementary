@@ -26,7 +26,10 @@ endif
 
 lib_LTLIBRARIES = libelementary.la
 
-includes_HEADERS = Elementary.h elm_priv.h
+includes_HEADERS = \
+Elementary.h \
+Elementary_Cursor.h \
+elm_widget.h
 includesdir = $(includedir)/elementary-@VMAJ@
 
 libelementary_la_SOURCES = \
@@ -60,6 +63,7 @@ elm_searchbar.c \
 elm_list.c \
 elm_carousel.c \
 elm_slider.c \
+elm_actionslider.c \
 elm_genlist.c \
 elm_check.c \
 elm_radio.c \
@@ -104,7 +108,6 @@ elm_ctxpopup.c \
 elm_actionsheet.c \
 elm_gridbox.c \
 elm_softkey.c \
-elm_actionslider.c \
 elm_hor_scroller.c \
 elm_autocompleteview.c \
 elm_controlbar.c \
@@ -123,6 +126,7 @@ elm_multibuttonentry.c \
 elm_stackedicon.c \
 elm_calendar.c \
 elm_xml_animator.c \
+elm_font.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
@@ -141,7 +145,9 @@ els_hor_scroller.h \
 els_box.c \
 els_box.h \
 els_icon.c \
-els_icon.h
+els_icon.h \
+els_cursor.c \
+els_tooltip.c
 
 
 libelementary_la_CFLAGS =

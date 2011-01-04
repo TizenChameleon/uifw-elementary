@@ -10,8 +10,7 @@
 
 static Elm_Theme theme_default =
 {
-   NULL, NULL, NULL, NULL,
-     NULL, 1
+   NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1
 };
 
 static Eina_List *themes = NULL;
@@ -36,6 +35,13 @@ _elm_theme_clear(Elm_Theme *th)
         eina_stringshare_del(th->theme);
         th->theme = NULL;
      }
+  if (th->ref_theme)
+    {
+      th->ref_theme->referrers = 
+        eina_list_remove(th->ref_theme->referrers, th);
+      elm_theme_free(th->ref_theme);
+      th->ref_theme = NULL;
+    }
 }
 
 static const char *
@@ -63,7 +69,7 @@ _elm_theme_theme_element_try(Elm_Theme *th, const char *home, const char *f, con
 
    if ((f[0] == '/') || ((f[0] == '.') && (f[1] == '/')) ||
        ((f[0] == '.') && (f[1] == '.') && (f[2] == '/')) ||
-       (isalpha(f[0]) && f[1] == ':'))
+       ((isalpha(f[0])) && (f[1] == ':')))
      return _elm_theme_find_try(th, f, group);
    else if (((f[0] == '~') && (f[1] == '/')))
      {
@@ -107,10 +113,11 @@ _elm_theme_group_file_find(Elm_Theme *th, const char *group)
 	file = _elm_theme_theme_element_try(th, home, f, group);
 	if (file) return file;
      }
+   if (th->ref_theme) return _elm_theme_group_file_find(th->ref_theme, group);
    return NULL;
 }
 
-int
+Eina_Bool
 _elm_theme_object_set(Evas_Object *parent, Evas_Object *o, const char *clas, const char *group, const char *style)
 {
    Elm_Theme *th = NULL;
@@ -118,7 +125,7 @@ _elm_theme_object_set(Evas_Object *parent, Evas_Object *o, const char *clas, con
    return _elm_theme_set(th, o, clas, group, style);
 }
 
-int
+Eina_Bool
 _elm_theme_object_icon_set(Evas_Object *parent, Evas_Object *o, const char *group, const char *style)
 {
    Elm_Theme *th = NULL;
@@ -126,12 +133,12 @@ _elm_theme_object_icon_set(Evas_Object *parent, Evas_Object *o, const char *grou
    return _elm_theme_icon_set(th, o, group, style);
 }
 
-int
+Eina_Bool
 _elm_theme_set(Elm_Theme *th, Evas_Object *o, const char *clas, const char *group, const char *style)
 {
    const char *file;
    char buf2[1024];
-   int ok;
+   Eina_Bool ok;
 
    if (!th) th = &(theme_default);
    snprintf(buf2, sizeof(buf2), "elm/%s/%s/%s", clas, group, style);
@@ -139,16 +146,22 @@ _elm_theme_set(Elm_Theme *th, Evas_Object *o, const char *clas, const char *grou
    if (file)
      {
 	ok = edje_object_file_set(o, file, buf2);
-	if (ok) return 1;
+	if (ok) return EINA_TRUE;
+        else
+          DBG("could not set theme group '%s' from file '%s': %s",
+              buf2, file, edje_load_error_str(edje_object_load_error_get(o)));
      }
    snprintf(buf2, sizeof(buf2), "elm/%s/%s/default", clas, group);
    file = _elm_theme_group_file_find(th, buf2);
-   if (!file) return 0;
+   if (!file) return EINA_FALSE;
    ok = edje_object_file_set(o, file, buf2);
+   if (!ok)
+     DBG("could not set theme group '%s' from file '%s': %s",
+         buf2, file, edje_load_error_str(edje_object_load_error_get(o)));
    return ok;
 }
 
-int
+Eina_Bool
 _elm_theme_icon_set(Elm_Theme *th, Evas_Object *o, const char *group, const char *style)
 {
    const char *file;
@@ -162,17 +175,17 @@ _elm_theme_icon_set(Elm_Theme *th, Evas_Object *o, const char *group, const char
      {
 	_els_smart_icon_file_edje_set(o, file, buf2);
 	_els_smart_icon_size_get(o, &w, &h);
-	if (w > 0) return 1;
+	if (w > 0) return EINA_TRUE;
      }
    snprintf(buf2, sizeof(buf2), "elm/icon/%s/default", group);
    file = _elm_theme_group_file_find(th, buf2);
-   if (!file) return 0;
+   if (!file) return EINA_FALSE;
    _els_smart_icon_file_edje_set(o, file, buf2);
    _els_smart_icon_size_get(o, &w, &h);
    return (w > 0);
 }
 
-int
+Eina_Bool
 _elm_theme_parse(Elm_Theme *th, const char *theme)
 {
    Eina_List *names = NULL;
@@ -185,7 +198,7 @@ _elm_theme_parse(Elm_Theme *th, const char *theme)
         pe = p;
         for (;;)
           {
-             if ((*pe == ':') || (*pe == 0))
+             if ((*pe == ':') || (!*pe))
                { // p -> pe == 'name:'
                   if (pe > p)
                     {
@@ -193,7 +206,7 @@ _elm_theme_parse(Elm_Theme *th, const char *theme)
                        if (n)
                          {
                             const char *nn;
-                            
+
                             strncpy(n, p, pe - p);
                             n[pe - p] = 0;
                             nn = eina_stringshare_add(n);
@@ -201,7 +214,7 @@ _elm_theme_parse(Elm_Theme *th, const char *theme)
                             free(n);
                          }
                     }
-                  if (*pe == 0) break;
+                  if (!*pe) break;
                   p = pe + 1;
                   pe = p;
                }
@@ -221,7 +234,7 @@ _elm_theme_parse(Elm_Theme *th, const char *theme)
    EINA_LIST_FREE(th->themes, p) eina_stringshare_del(p);
 
    th->themes = names;
-   return 1;
+   return EINA_TRUE;
 }
 
 void
@@ -270,6 +283,7 @@ elm_theme_new(void)
 EAPI void
 elm_theme_free(Elm_Theme *th)
 {
+   EINA_SAFETY_ON_NULL_RETURN(th);
    th->ref--;
    if (th->ref < 1)
      {
@@ -277,6 +291,109 @@ elm_theme_free(Elm_Theme *th)
         themes = eina_list_remove(themes, th);
         free(th);
      }
+}
+
+/**
+ * Copy the theme fom the source to the destination theme
+ * 
+ * @param th The source theme to copy from
+ * @param thdst The destination theme to copy data to
+ * 
+ * This makes a one-time static copy of all the theme config, extensions
+ * and overlays from @p th to @p thdst. If @p th references a theme, then
+ * @p thdst is also set to reference it, with all the theme settings,
+ * overlays and extensions that @p th had.
+ */
+EAPI void
+elm_theme_copy(Elm_Theme *th, Elm_Theme *thdst)
+{
+   const Eina_List *l;
+   const char *f;
+   
+   if (!th) th = &(theme_default);
+   if (!thdst) thdst = &(theme_default);
+   _elm_theme_clear(thdst);
+   if (th->ref_theme)
+     {
+       thdst->ref_theme = th->ref_theme;
+       thdst->ref_theme->referrers = 
+         eina_list_append(thdst->ref_theme->referrers, thdst);
+       thdst->ref_theme->ref++;
+     }
+   EINA_LIST_FOREACH(th->overlay, l, f)
+     {
+       const char *s = eina_stringshare_add(f);
+       if (s) thdst->overlay = eina_list_append(thdst->overlay, s);
+     }
+   EINA_LIST_FOREACH(th->themes, l, f)
+     {
+       const char *s = eina_stringshare_add(f);
+       if (s) thdst->themes = eina_list_append(thdst->themes, s);
+     }
+   EINA_LIST_FOREACH(th->extension, l, f)
+     {
+       const char *s = eina_stringshare_add(f);
+       if (s) thdst->extension = eina_list_append(thdst->extension, s);
+     }
+   if (th->theme) thdst->theme = eina_stringshare_add(th->theme);
+   elm_theme_flush(thdst);
+}
+
+/**
+ * Tell the source theme to reference the ref theme
+ * 
+ * @param th The theme that will do the referencing
+ * @param thref The theme that is the reference source
+ * 
+ * This clears @p th to be empty and then sets it to refer to @p thref
+ * so @p th acts as an override to @p thdst, but where its overrides
+ * don't apply, it will fall through to @pthref for configuration.
+ */
+EAPI void
+elm_theme_ref_set(Elm_Theme *th, Elm_Theme *thref)
+{
+   if (!th) th = &(theme_default);
+   if (!thref) thref = &(theme_default);
+   if (th->ref_theme == thref) return;
+   _elm_theme_clear(th);
+   if (thref)
+     {
+       thref->referrers = eina_list_append(thref->referrers, th);
+       thref->ref++;
+     }
+   th->ref_theme = thref;
+   elm_theme_flush(th);
+}
+
+/**
+ * Return the theme referred to
+ * 
+ * @param th The theme to get the reference from
+ * @return The referenced theme handle
+ * 
+ * This gets the theme set as the reference theme by elm_theme_ref_set().
+ * If no theme is set as a reference, NULL is returned.
+ */
+EAPI Elm_Theme *
+elm_theme_ref_get(Elm_Theme *th)
+{
+   if (!th) th = &(theme_default);
+   return th->ref_theme;
+}
+
+/**
+ * Return the default theme
+ * 
+ * @return The default theme handle
+ * 
+ * This returns the internal default theme setup handle that all widgets
+ * use implicitly unless a specific theme is set. This is also often use
+ * as a shorthand of NULL.
+ */
+EAPI Elm_Theme *
+elm_theme_default_get(void)
+{
+   return &theme_default;
 }
 
 /**
@@ -441,7 +558,7 @@ elm_theme_get(Elm_Theme *th)
         const char *f;
         char *tmp;
         int len;
-        
+
         len = 0;
         EINA_LIST_FOREACH(th->themes, l, f)
           {
@@ -458,6 +575,90 @@ elm_theme_get(Elm_Theme *th)
         th->theme = eina_stringshare_add(tmp);
      }
    return th->theme;
+}
+
+/**
+ * Return a list of theme elements to be used in a theme.
+ * 
+ * @param th Theme to get the list of theme elements from.
+ * @return The internal list of theme elements
+ * 
+ * This returns the internal list of theme elements (will only be valid as
+ * long as the theme is not modified by elm_theme_set() or theme is not
+ * freed by elm_theme_free(). This is a list of strings which must not be
+ * altered as they are also internal. If @p th is NULL, then the default
+ * theme element list is returned.
+ */
+EAPI const Eina_List *
+elm_theme_list_get(const Elm_Theme *th)
+{
+   if (!th) th = &(theme_default);
+   return th->themes;
+}
+
+/**
+ * Return the full patrh for a theme element
+ * 
+ * @param f The theme element name
+ * @param in_search_path Pointer to a boolean to indicate if item is in the search path or not
+ * @return The full path to the file found.
+ * 
+ * This returns a string you should free with free() on success, NULL on
+ * failure. This will search for the given theme element, and if it is a
+ * full or relative path element or a simple searchable name. The returned
+ * path is the full path to the file, if searched, and the file exists, or it
+ * is simply the full path given in the element or a resolved path if
+ * relative to home. The @p in_search_path boolean pointed to is set to
+ * EINA_TRUE if the file was a searchable file andis in the search path,
+ * and EINA_FALSE otherwise.
+ */
+EAPI char *
+elm_theme_list_item_path_get(const char *f, Eina_Bool *in_search_path)
+{
+   static const char *home = NULL;
+   char buf[PATH_MAX];
+   
+   if (!f)
+     {
+        if (in_search_path) *in_search_path = EINA_FALSE;
+        return NULL;
+     }
+   
+   if (!home)
+     {
+	home = getenv("HOME");
+	if (!home) home = "";
+     }
+   
+   if ((f[0] == '/') || ((f[0] == '.') && (f[1] == '/')) ||
+       ((f[0] == '.') && (f[1] == '.') && (f[2] == '/')) ||
+       ((isalpha(f[0])) && (f[1] == ':')))
+     {
+        if (in_search_path) *in_search_path = EINA_FALSE;
+        return strdup(f);
+     }
+   else if (((f[0] == '~') && (f[1] == '/')))
+     {
+        if (in_search_path) *in_search_path = EINA_FALSE;
+	snprintf(buf, sizeof(buf), "%s/%s", home, f + 2);
+        return strdup(buf);
+     }
+   snprintf(buf, sizeof(buf), "%s/.elementary/themes/%s.edj", home, f);
+   if (ecore_file_exists(buf))
+     {
+        if (in_search_path) *in_search_path = EINA_TRUE;
+        return strdup(buf);
+     }
+   
+   snprintf(buf, sizeof(buf), "%s/themes/%s.edj", _elm_data_dir, f);
+   if (ecore_file_exists(buf))
+     {
+        if (in_search_path) *in_search_path = EINA_TRUE;
+        return strdup(buf);
+     }
+   
+   if (in_search_path) *in_search_path = EINA_FALSE;
+   return NULL;
 }
 
 /**
@@ -478,11 +679,18 @@ elm_theme_flush(Elm_Theme *th)
    if (!th) th = &(theme_default);
    if (th->cache) eina_hash_free(th->cache);
    th->cache = eina_hash_string_superfast_new(EINA_FREE_CB(eina_stringshare_del));
-   _elm_win_rescale();
+   _elm_win_rescale(th, EINA_TRUE);
+   if (th->referrers)
+     {
+        Eina_List *l;
+        Elm_Theme *th2;
+
+        EINA_LIST_FOREACH(th->referrers, l, th2) elm_theme_flush(th2);
+     }
 }
 
 /**
- * This flushes all themems (default and specific ones).
+ * This flushes all themes (default and specific ones).
  * 
  * This will flush all themes in the current application context, by calling
  * elm_theme_flush() on each of them.
@@ -524,6 +732,97 @@ elm_theme_all_set(const char *theme)
 }
 
 /**
+ * Return a list of theme elements in the theme search path
+ * 
+ * @return A list of strings that are the theme element names.
+ * 
+ * This lists all available theme files in the standard Elementary search path
+ * for theme elements, and returns them in alphabetical order as theme
+ * element names in a list of strings. Free this with 
+ * elm_theme_name_available_list_free() when you are done with the list.
+ */
+EAPI Eina_List *
+elm_theme_name_available_list_new(void)
+{
+   Eina_List *list = NULL;
+   Eina_List *dir, *l;
+   char buf[PATH_MAX], *file, *s, *th;
+   static const char *home = NULL;
+   
+   if (!home)
+     {
+        home = getenv("HOME");
+        if (!home) home = "";
+     }
+   
+   snprintf(buf, sizeof(buf), "%s/.elementary/themes", home);
+   dir = ecore_file_ls(buf);
+   EINA_LIST_FREE(dir, file)
+     {
+        snprintf(buf, sizeof(buf), "%s/.elementary/themes/%s", home, file);
+        if ((!ecore_file_is_dir(buf)) && (ecore_file_size(buf) > 0))
+          {
+             s = strchr(file, '.');
+             if ((s) && (!strcasecmp(s, ".edj")))
+               {
+                  th = strdup(file);
+                  s = strchr(th, '.');
+                  *s = 0;
+                  list = eina_list_append(list, th);
+               }
+          }
+        free(file);
+     }
+
+   snprintf(buf, sizeof(buf), "%s/themes", _elm_data_dir);
+   dir = ecore_file_ls(buf);
+   EINA_LIST_FREE(dir, file)
+     {
+        snprintf(buf, sizeof(buf), "%s/themes/%s", _elm_data_dir, file);
+        if ((!ecore_file_is_dir(buf)) && (ecore_file_size(buf) > 0))
+          {
+             s = strchr(file, '.');
+             if ((s) && (!strcasecmp(s, ".edj")))
+               {
+                  int dup;
+                  
+                  th = strdup(file);
+                  s = strchr(th, '.');
+                  *s = 0;
+                  dup = 0;
+                  EINA_LIST_FOREACH(list, l, s)
+                    {
+                       if (!strcmp(s, th))
+                         {
+                            dup = 1;
+                            break;
+                         }
+                    }
+                  if (dup) free(th);
+                  else list = eina_list_append(list, th);
+               }
+          }
+        free(file);
+     }
+   list = eina_list_sort(list, 0, EINA_COMPARE_CB(strcasecmp));
+   return list;
+}
+
+/**
+ * Free the list returned by elm_theme_name_available_list_new()
+ * 
+ * This frees the list of themes returned by 
+ * elm_theme_name_available_list_new(). Once freed the list should no longer
+ * be used. a new list mys be created.
+ */
+EAPI void
+elm_theme_name_available_list_free(Eina_List *list)
+{
+   char *s;
+   EINA_LIST_FREE(list, s) free(s);
+}
+
+/**
  * Set a specific theme to be used for this object and its children
  * 
  * @param obj The object to set the theme on
@@ -543,6 +842,7 @@ elm_theme_all_set(const char *theme)
 EAPI void
 elm_object_theme_set(Evas_Object *obj, Elm_Theme *th)
 {
+   EINA_SAFETY_ON_NULL_RETURN(obj);
    elm_widget_theme_set(obj, th);
 }
 
@@ -560,7 +860,8 @@ elm_object_theme_set(Evas_Object *obj, Elm_Theme *th)
  * @ingroup Theme
  */
 EAPI Elm_Theme *
-elm_object_theme_get(Evas_Object *obj)
+elm_object_theme_get(const Evas_Object *obj)
 {
+   EINA_SAFETY_ON_NULL_RETURN_VAL(obj, NULL);
    return elm_widget_theme_get(obj);
 }

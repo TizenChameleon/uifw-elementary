@@ -1,6 +1,5 @@
 #include <Elementary.h>
 #include "elm_priv.h"
-#include "els_pan.h"
 #include "els_hor_scroller.h"
 
 #define SMART_NAME "els_hor_scroller"
@@ -1472,7 +1471,7 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info)
                          {
                             vel = sqrt((dx * dx) + (dy * dy)) / at;
                             if ((_elm_config->thumbscroll_friction > 0.0) &&
-                                (vel > _elm_config->thumbscroll_momentum_threshhold) &&
+                                (vel > _elm_config->thumbscroll_momentum_threshold) &&
                                 (!sd->freeze))
                               {
                                  sd->down.dx = ((double)dx / at);
@@ -1553,8 +1552,8 @@ _smart_onhold_animator(void *data)
    if (sd->down.onhold_tlast > 0.0)
      {
         td = t - sd->down.onhold_tlast;
-        vx = sd->down.onhold_vx * td * (double)_elm_config->thumbscroll_threshhold * 2.0;
-        vy = sd->down.onhold_vy * td * (double)_elm_config->thumbscroll_threshhold * 2.0;
+        vx = sd->down.onhold_vx * td * (double)_elm_config->thumbscroll_threshold * 2.0;
+        vy = sd->down.onhold_vy * td * (double)_elm_config->thumbscroll_threshold * 2.0;
         hor_elm_smart_scroller_child_pos_get(sd->smart_obj, &ox, &oy);
         sd->down.onhold_vxe += vx;
         sd->down.onhold_vye += vy;
@@ -1707,7 +1706,7 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
 	     if ((sd->one_dir_at_a_time) &&
 		 (!sd->down.dir_x) && (!sd->down.dir_y) && (!sd->down.dir_none))
 	       {
-                  if (x > _elm_config->thumbscroll_threshhold)
+                  if (x > _elm_config->thumbscroll_threshold)
                     {
                        if (x > (y * 2))
                          {
@@ -1716,7 +1715,7 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
 			 }
                        else faildir++;
 		    }
-                  if (y > _elm_config->thumbscroll_threshhold)
+                  if (y > _elm_config->thumbscroll_threshold)
 		    {
                        if (y > (x * 2))
 			 {
@@ -1749,8 +1748,8 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
                   if ((sd->down.dragged) ||
                       (((x * x) + (y * y)) >
-                       (_elm_config->thumbscroll_threshhold *
-                        _elm_config->thumbscroll_threshhold)) )
+                       (_elm_config->thumbscroll_threshold *
+                        _elm_config->thumbscroll_threshold)) )
 					  //|| x < SMART_MOVE_THRESHOLD)
                     {
                        if (!sd->down.dragged)
@@ -1795,35 +1794,35 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
                   evas_object_geometry_get(sd->event_obj, &ex, &ey, &ew, &eh);
                   x = ev->cur.canvas.x - ex;
                   y = ev->cur.canvas.y - ey;
-                  if (x < _elm_config->thumbscroll_threshhold)
+                  if (x < _elm_config->thumbscroll_threshold)
                     {
-                       if (_elm_config->thumbscroll_threshhold > 0.0)
-                         vx = -(double)(_elm_config->thumbscroll_threshhold - x) /
-                         _elm_config->thumbscroll_threshhold;
+                       if (_elm_config->thumbscroll_threshold > 0.0)
+                         vx = -(double)(_elm_config->thumbscroll_threshold - x) /
+                         _elm_config->thumbscroll_threshold;
                        else
                          vx = -1.0;
                     }
-                  else if (x > (ew - _elm_config->thumbscroll_threshhold))
+                  else if (x > (ew - _elm_config->thumbscroll_threshold))
                     {
-                       if (_elm_config->thumbscroll_threshhold > 0.0)
-                         vx = (double)(_elm_config->thumbscroll_threshhold - (ew - x)) /
-                         _elm_config->thumbscroll_threshhold;
+                       if (_elm_config->thumbscroll_threshold > 0.0)
+                         vx = (double)(_elm_config->thumbscroll_threshold - (ew - x)) /
+                         _elm_config->thumbscroll_threshold;
                        else
                          vx = 1.0;
                     }
-                  if (y < _elm_config->thumbscroll_threshhold)
+                  if (y < _elm_config->thumbscroll_threshold)
                     {
-                       if (_elm_config->thumbscroll_threshhold > 0.0)
-                         vy = -(double)(_elm_config->thumbscroll_threshhold - y) /
-                         _elm_config->thumbscroll_threshhold;
+                       if (_elm_config->thumbscroll_threshold > 0.0)
+                         vy = -(double)(_elm_config->thumbscroll_threshold - y) /
+                         _elm_config->thumbscroll_threshold;
                        else
                          vy = -1.0;
                     }
-                  else if (y > (eh - _elm_config->thumbscroll_threshhold))
+                  else if (y > (eh - _elm_config->thumbscroll_threshold))
                     {
-                       if (_elm_config->thumbscroll_threshhold > 0.0)
-                         vy = (double)(_elm_config->thumbscroll_threshhold - (eh - y)) /
-                         _elm_config->thumbscroll_threshhold;
+                       if (_elm_config->thumbscroll_threshold > 0.0)
+                         vy = (double)(_elm_config->thumbscroll_threshold - (eh - y)) /
+                         _elm_config->thumbscroll_threshold;
                        else
                          vy = 1.0;
                     }

@@ -383,7 +383,7 @@ _elm_thumb_dropcb(void *data __UNUSED__, Evas_Object *o, Elm_Selection_Data *dro
  *
  * @ingroup Thumb
  */
-EAPI void
+EAPI Eina_Bool
 elm_need_ethumb(void)
 {
 #ifdef ELM_ETHUMB

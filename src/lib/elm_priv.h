@@ -13,74 +13,33 @@
 # include <Ecore_WinCE.h>
 #endif
 
-// FIXME: totally disorganised. clean this up!
-// 
-// Why EAPI in a private header ?
-// EAPI is temporaty - that widget api will change, but makign it EAPI right now to indicate its bound for externalness
+#include "els_pan.h"
+#include "els_scroller.h"
+#include "els_box.h"
+#include "els_icon.h"
+
+#include "elm_widget.h"
+
+#define CRITICAL(...) EINA_LOG_DOM_CRIT(_elm_log_dom, __VA_ARGS__)
+#define ERR(...)      EINA_LOG_DOM_ERR (_elm_log_dom, __VA_ARGS__)
+#define WRN(...)      EINA_LOG_DOM_WARN(_elm_log_dom, __VA_ARGS__)
+#define INF(...)      EINA_LOG_DOM_INFO(_elm_log_dom, __VA_ARGS__)
+#define DBG(...)      EINA_LOG_DOM_DBG (_elm_log_dom, __VA_ARGS__)
 
 typedef struct _Elm_Config    Elm_Config;
 typedef struct _Elm_Module    Elm_Module;
-typedef struct _Elm_Selection_Data Elm_Selection_Data;
-
-typedef Eina_Bool (*Elm_Drop_Cb) (void *d, Evas_Object *o, Elm_Selection_Data *data);
 
 struct _Elm_Theme
 {
-   Eina_List *overlay;
-   Eina_List *themes;
-   Eina_List *extension;
-   Eina_Hash *cache;
+   Eina_List  *overlay;
+   Eina_List  *themes;
+   Eina_List  *extension;
+   Eina_Hash  *cache;
+   Elm_Theme  *ref_theme;
+   Eina_List  *referrers;
    const char *theme;
-   int ref;
+   int         ref;
 };
-
-typedef enum _Elm_Engine
-{
-   ELM_SOFTWARE_X11,
-   ELM_SOFTWARE_FB,
-   ELM_SOFTWARE_DIRECTFB,
-   ELM_SOFTWARE_16_X11,
-   ELM_XRENDER_X11,
-   ELM_OPENGL_X11,
-   ELM_SOFTWARE_WIN32,
-   ELM_SOFTWARE_16_WINCE,
-   ELM_SOFTWARE_SDL,
-   ELM_SOFTWARE_16_SDL,
-   ELM_OPENGL_SDL
-} Elm_Engine;
-
-typedef enum _Elm_Sel_Type
-{
-   ELM_SEL_PRIMARY,
-   ELM_SEL_SECONDARY,
-   ELM_SEL_CLIPBOARD,
-   ELM_SEL_XDND,
-   
-   ELM_SEL_MAX,
-} Elm_Sel_Type;
-
-typedef enum _Elm_Sel_Format
-{
-   /** Plain unformated text: Used for things that don't want rich markup */
-   ELM_SEL_FORMAT_TEXT   = 0x01,
-   /** Edje textblock markup, including inline images */
-   ELM_SEL_FORMAT_MARKUP = 0x02,
-   /** Images */
-   ELM_SEL_FORMAT_IMAGE	 = 0x04,
-   /** Vcards */
-   ELM_SEL_FORMAT_VCARD =  0x08,
-   /** Raw HTMLish things for widgets that want that stuff (hello webkit!) */
-   ELM_SEL_FORMAT_HTML = 0x10,
-} Elm_Sel_Format;
-
-struct _Elm_Selection_Data
-{
-   int                   x, y;
-   Elm_Sel_Format        format;
-   void                 *data;
-   int                   len;
-};
-
 
 /* increment this whenever we change config enough that you need new
  * defaults for elm to work.
@@ -89,200 +48,166 @@ struct _Elm_Selection_Data
 /* increment this whenever a new set of config values are added but the users
  * config doesn't need to be wiped - simply new values need to be put in
  */
-#define ELM_CONFIG_FILE_GENERATION 0x0001
+#define ELM_CONFIG_FILE_GENERATION 0x0003
 #define ELM_CONFIG_VERSION         ((ELM_CONFIG_EPOCH << 16) | ELM_CONFIG_FILE_GENERATION)
+/* NB: profile configuration files (.src) must have their
+ * "config_version" entry's value up-to-date with ELM_CONFIG_VERSION
+ * (in decimal)!! */
 
+/* note: always remember to sync it with elm_config.c */
+extern const char *_elm_engines[];
+
+#define ELM_SOFTWARE_X11      (_elm_engines[0])
+#define ELM_SOFTWARE_FB       (_elm_engines[1])
+#define ELM_SOFTWARE_DIRECTFB (_elm_engines[2])
+#define ELM_SOFTWARE_16_X11   (_elm_engines[3])
+#define ELM_SOFTWARE_8_X11    (_elm_engines[4])
+#define ELM_XRENDER_X11       (_elm_engines[5])
+#define ELM_OPENGL_X11        (_elm_engines[6])
+#define ELM_SOFTWARE_WIN32    (_elm_engines[7])
+#define ELM_SOFTWARE_16_WINCE (_elm_engines[8])
+#define ELM_SOFTWARE_SDL      (_elm_engines[9])
+#define ELM_SOFTWARE_16_SDL   (_elm_engines[10])
+#define ELM_OPENGL_SDL        (_elm_engines[11])
+
+#define ELM_FONT_TOKEN_STYLE ":style="
 
 struct _Elm_Config
 {
-   int config_version;
-   int engine;
-   int thumbscroll_enable;
-   int thumbscroll_threshhold;
-   double thumbscroll_momentum_threshhold;
-   double thumbscroll_friction;
-   double thumbscroll_bounce_friction;
-   double page_scroll_friction;
-   double bring_in_scroll_friction;
-   double zoom_friction;
-   int thumbscroll_bounce_enable;
-   double scale;
-   int bgpixmap;
-   int compositing;
-   Eina_List *font_dirs;
-   int font_hinting;
-   int image_cache;
-   int font_cache;
-   int finger_size;
-   double fps;
-   const char *theme;
-   const char *modules;
+   int          config_version;
+   const char  *engine;
+   Eina_Bool    thumbscroll_enable;
+   int          thumbscroll_threshold;
+   double       thumbscroll_momentum_threshold;
+   double       thumbscroll_friction;
+   double       thumbscroll_bounce_friction;
+   double       page_scroll_friction;
+   double       bring_in_scroll_friction;
+   double       zoom_friction;
+   Eina_Bool    thumbscroll_bounce_enable;
+   double       thumbscroll_border_friction;
+   double       scale;
+   int          bgpixmap;
+   int          compositing;
+   Eina_List   *font_dirs;
+   Eina_List   *font_overlays;
+   int          font_hinting;
+   int          cache_flush_poll_interval;
+   Eina_Bool    cache_flush_enable;
+   int          image_cache;
+   int          font_cache;
+   int          edje_cache;
+   int          edje_collection_cache;
+   int          finger_size;
+   double       fps;
+   const char  *theme;
+   const char  *modules;
+   double       tooltip_delay;
+   Eina_Bool    cursor_engine_only;
+   Eina_Bool    focus_highlight_enable;
+   Eina_Bool    focus_highlight_animate;
+   int          toolbar_shrink_mode;
+   Eina_Bool    fileselector_expand_enable;
+   Eina_Bool    inwin_dialogs_enable;
+   int          icon_size;
+   double       longpress_timeout;
    int input_panel_enable;
    int autocapital_allow;
    int autoperiod_allow;   
    int password_show_last_character;
-   double       longpress_timeout;
 };
 
 struct _Elm_Module
 {
-   int version;
-   const char *name;
-   const char *as;
-   const char *so_path;
-   const char *data_dir;
-   const char *bin_dir;
-   void *handle;
-   void *data;
-   void *api;
-   int (*init_func) (Elm_Module *m);
-   int (*shutdown_func) (Elm_Module *m);
-   int references;
+   int          version;
+   const char  *name;
+   const char  *as;
+   const char  *so_path;
+   const char  *data_dir;
+   const char  *bin_dir;
+   void        *handle;
+   void        *data;
+   void        *api;
+   int        (*init_func) (Elm_Module *m);
+   int        (*shutdown_func) (Elm_Module *m);
+   int          references;
 };
 
 #define ELM_NEW(t) calloc(1, sizeof(t))
 
-void _elm_win_shutdown(void);
-void _elm_win_rescale(void);
+void                _elm_win_shutdown(void);
+void                _elm_win_rescale(Elm_Theme *th, Eina_Bool use_theme);
 
-int _elm_theme_object_set(Evas_Object *parent, Evas_Object *o, const char *clas, const char *group, const char *style);
-int _elm_theme_object_icon_set(Evas_Object *parent, Evas_Object *o, const char *group, const char *style);
-int _elm_theme_set(Elm_Theme *th, Evas_Object *o, const char *clas, const char *group, const char *style);
-int _elm_theme_icon_set(Elm_Theme *th, Evas_Object *o, const char *group, const char *style);
-int _elm_theme_parse(Elm_Theme *th, const char *theme);
-void _elm_theme_shutdown(void);
+Eina_Bool           _elm_theme_object_set(Evas_Object *parent, Evas_Object *o, const char *clas, const char *group, const char *style);
+Eina_Bool           _elm_theme_object_icon_set(Evas_Object *parent, Evas_Object *o, const char *group, const char *style);
+Eina_Bool           _elm_theme_set(Elm_Theme *th, Evas_Object *o, const char *clas, const char *group, const char *style);
+Eina_Bool           _elm_theme_icon_set(Elm_Theme *th, Evas_Object *o, const char *group, const char *style);
+Eina_Bool           _elm_theme_parse(Elm_Theme *th, const char *theme);
+void                _elm_theme_shutdown(void);
 
-void _elm_module_init(void);
-void _elm_module_shutdown(void);
-void _elm_module_parse(const char *s);
-Elm_Module *_elm_module_find_as(const char *as);
-Elm_Module *_elm_module_add(const char *name, const char *as);
-void _elm_module_del(Elm_Module *m);
-const void *_elm_module_symbol_get(Elm_Module *m, const char *name);
-    
-/* FIXME: should this be public? for now - private (but public symbols) */
-EAPI Evas_Object *elm_widget_add(Evas *evas);
-EAPI void         elm_widget_del_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
-EAPI void         elm_widget_del_pre_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
-EAPI void         elm_widget_focus_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
-EAPI void         elm_widget_activate_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
-EAPI void         elm_widget_disable_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
-EAPI void         elm_widget_theme_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
-EAPI void         elm_widget_changed_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
-EAPI void         elm_widget_signal_emit_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source));
-EAPI void         elm_widget_signal_callback_add_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data));
-EAPI void         elm_widget_signal_callback_del_hook_set(Evas_Object *obj, void *(*func) (Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source)));
-EAPI void         elm_widget_theme(Evas_Object *obj);
-EAPI void         elm_widget_on_focus_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
-EAPI void         elm_widget_on_change_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
-#ifdef HAVE_CONFORMANT_AUTOSCROLL
-EAPI void         elm_widget_imp_region_get_hook_set(Evas_Object *obj, Evas_Object * (*func) (const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h), void *data);
-#endif
-EAPI void         elm_widget_on_show_region_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
-EAPI void         elm_widget_data_set(Evas_Object *obj, void *data);
-EAPI void        *elm_widget_data_get(const Evas_Object *obj);
-EAPI void         elm_widget_sub_object_add(Evas_Object *obj, Evas_Object *sobj);
-EAPI void         elm_widget_sub_object_del(Evas_Object *obj, Evas_Object *sobj);
-EAPI void         elm_widget_resize_object_set(Evas_Object *obj, Evas_Object *sobj);
-EAPI void         elm_widget_hover_object_set(Evas_Object *obj, Evas_Object *sobj);
-EAPI void         elm_widget_signal_emit(Evas_Object *obj, const char *emission, const char *source);
-EAPI void         elm_widget_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data);
-EAPI void         *elm_widget_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source));
-EAPI void         elm_widget_can_focus_set(Evas_Object *obj, int can_focus);
-EAPI int          elm_widget_can_focus_get(const Evas_Object *obj);
-EAPI int          elm_widget_focus_get(const Evas_Object *obj);
-EAPI Evas_Object *elm_widget_focused_object_get(const Evas_Object *obj);
-EAPI Evas_Object *elm_widget_top_get(const Evas_Object *obj);
-EAPI int          elm_widget_focus_jump(Evas_Object *obj, int forward);
-EAPI void         elm_widget_focus_set(Evas_Object *obj, int first);
-EAPI void         elm_widget_focused_object_clear(Evas_Object *obj);
-EAPI Evas_Object *elm_widget_parent_get(const Evas_Object *obj);
-EAPI void         elm_widget_focus_steal(Evas_Object *obj);
-EAPI void         elm_widget_activate(Evas_Object *obj);
-EAPI void         elm_widget_change(Evas_Object *obj);
-EAPI void         elm_widget_disabled_set(Evas_Object *obj, int disabled);
-EAPI int          elm_widget_disabled_get(const Evas_Object *obj);
-#ifdef HAVE_CONFORMANT_AUTOSCROLL
-EAPI Evas_Object *elm_widget_imp_region_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h);
-#endif
-EAPI void         elm_widget_show_region_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
-EAPI void         elm_widget_show_region_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h);
-EAPI void         elm_widget_scroll_hold_push(Evas_Object *obj);
-EAPI void         elm_widget_scroll_hold_pop(Evas_Object *obj);
-EAPI int          elm_widget_scroll_hold_get(const Evas_Object *obj);
-EAPI void         elm_widget_scroll_freeze_push(Evas_Object *obj);
-EAPI void         elm_widget_scroll_freeze_pop(Evas_Object *obj);
-EAPI int          elm_widget_scroll_freeze_get(const Evas_Object *obj);
-EAPI void         elm_widget_scale_set(Evas_Object *obj, double scale);
-EAPI double       elm_widget_scale_get(const Evas_Object *obj);
-EAPI void         elm_widget_theme_set(Evas_Object *obj, Elm_Theme *th);
-EAPI Elm_Theme   *elm_widget_theme_get(const Evas_Object *obj);
-EAPI void         elm_widget_style_set(Evas_Object *obj, const char *style);
-EAPI const char  *elm_widget_style_get(const Evas_Object *obj);
-EAPI void         elm_widget_type_set(Evas_Object *obj, const char *type);
-EAPI const char  *elm_widget_type_get(const Evas_Object *obj);
-EAPI void         elm_widget_drag_lock_x_set(Evas_Object *obj, Eina_Bool lock);
-EAPI void         elm_widget_drag_lock_y_set(Evas_Object *obj, Eina_Bool lock);
-EAPI Eina_Bool    elm_widget_drag_lock_x_get(const Evas_Object *obj);
-EAPI Eina_Bool    elm_widget_drag_lock_y_get(const Evas_Object *obj);
-EAPI int          elm_widget_drag_child_locked_x_get(const Evas_Object *obj);
-EAPI int          elm_widget_drag_child_locked_y_get(const Evas_Object *obj);
-    
-EAPI Eina_Bool    elm_widget_is(const Evas_Object *obj);
-EAPI Evas_Object *elm_widget_parent_widget_get(const Evas_Object *obj);
+void                _elm_module_init(void);
+void                _elm_module_shutdown(void);
+void                _elm_module_parse(const char *s);
+Elm_Module         *_elm_module_find_as(const char *as);
+Elm_Module         *_elm_module_add(const char *name, const char *as);
+void                _elm_module_del(Elm_Module *m);
+const void         *_elm_module_symbol_get(Elm_Module *m, const char *name);
 
-EAPI Eina_List   *_elm_stringlist_get(const char *str);
-EAPI void         _elm_stringlist_free(Eina_List *list);
+void                _elm_widget_type_clear(void);
+void                _elm_widget_focus_region_show(const Evas_Object *obj);
 
-Eina_Bool         _elm_widget_type_check(const Evas_Object *obj, const char *type);
+void		    _elm_unneed_ethumb(void);
 
-void		  _elm_unneed_ethumb(void);
+void                _elm_rescale(void);
 
-void              _elm_rescale(void);
+void                _elm_config_init(void);
+void                _elm_config_sub_init(void);
+void                _elm_config_shutdown(void);
+Eina_Bool           _elm_config_save(void);
+void                _elm_config_reload(void);
 
-void              _elm_config_init(void);
-void              _elm_config_sub_init(void);
-void              _elm_config_shutdown(void);
+void                _elm_recache(void);
 
-Eina_Bool            elm_selection_set(Elm_Sel_Type selection, Evas_Object *widget, Elm_Sel_Format format, const char *buf);
-Eina_Bool            elm_selection_clear(Elm_Sel_Type selection, Evas_Object *widget);
-Eina_Bool            elm_selection_get(Elm_Sel_Type selection, Elm_Sel_Format format, Evas_Object *widget, Elm_Drop_Cb datacb, void *udata);
-Eina_Bool            elm_drop_target_add(Evas_Object *widget, Elm_Sel_Type, Elm_Drop_Cb, void *);
-Eina_Bool            elm_drop_target_del(Evas_Object *widget);
-Eina_Bool            elm_drag_start(Evas_Object *, Elm_Sel_Format, const char *, void (*)(void *,Evas_Object*),void*);
+const char         *_elm_config_current_profile_get(void);
+const char         *_elm_config_profile_dir_get(const char *prof, Eina_Bool is_user);
+Eina_List          *_elm_config_profiles_list(void);
+void                _elm_config_profile_set(const char *profile);
 
-Eina_Bool         _elm_dangerous_call_check(const char *call);
+void                _elm_config_engine_set(const char *engine);
 
-void              _elm_widtype_register(const char **ptr);
+Eina_List          *_elm_config_font_overlays_list(void);
+void                _elm_config_font_overlay_set(const char *text_class, const char *font, Evas_Font_Size size);
+void                _elm_config_font_overlay_remove(const char *text_class);
+void                _elm_config_font_overlay_apply(void);
+Eina_List          *_elm_config_text_classes_get(void);
+void                _elm_config_text_classes_free(Eina_List *l);
 
+Elm_Font_Properties *_elm_font_properties_get(Eina_Hash **font_hash, const char *font);
+Eina_Hash           *_elm_font_available_hash_add(Eina_Hash *font_hash, const char *full_name);
+void                 _elm_font_available_hash_del(Eina_Hash *hash);
 
+void                 elm_tooltip_theme(Elm_Tooltip *tt);
+void                 elm_object_sub_tooltip_content_cb_set(Evas_Object *eventarea, Evas_Object *owner, Elm_Tooltip_Content_Cb func, const void *data, Evas_Smart_Cb del_cb);
+void                 elm_cursor_theme(Elm_Cursor *cur);
+void                 elm_object_sub_cursor_set(Evas_Object *eventarea, Evas_Object *owner, const char *cursor);
+
+void                 elm_menu_clone(Evas_Object *from_menu, Evas_Object *to_menu, Elm_Menu_Item *parent);
+
+Eina_Bool           _elm_dangerous_call_check(const char *call);
+
+Evas_Object        *_elm_scroller_edje_object_get(Evas_Object *obj);
+
+char               *_elm_util_mkup_to_text(const char *mkup);
+char               *_elm_util_text_to_mkup(const char *text);
 /* do not use except clipboard history module */
 EAPI Eina_Bool    elm_cbhm_helper_init(Evas_Object *self);
 EAPI void         elm_cbhm_send_raw_data(char *cmd);
-
-#define ELM_SET_WIDTYPE(widtype, type) \
-   do { \
-      if (!widtype) { \
-         widtype = eina_stringshare_add(type); \
-         _elm_widtype_register(&widtype); \
-      } \
-   } while (0)
-
-//#define ELM_CHECK_WIDTYPE(obj, widtype) if (elm_widget_type_get(obj) != widtype) return
-#define ELM_CHECK_WIDTYPE(obj, widtype) if (!_elm_widget_type_check((obj), (widtype))) return
 
 extern char *_elm_appname;
 extern Elm_Config *_elm_config;
 extern const char *_elm_data_dir;
 extern const char *_elm_lib_dir;
 extern int _elm_log_dom;
-
 extern Eina_List *_elm_win_list;
-
-#define CRITICAL(...) EINA_LOG_DOM_CRIT(_elm_log_dom, __VA_ARGS__)
-#define ERR(...) EINA_LOG_DOM_ERR(_elm_log_dom, __VA_ARGS__)
-#define WRN(...) EINA_LOG_DOM_WARN(_elm_log_dom, __VA_ARGS__)
-#define INF(...) EINA_LOG_DOM_INFO(_elm_log_dom, __VA_ARGS__)
-#define DBG(...) EINA_LOG_DOM_DBG(_elm_log_dom, __VA_ARGS__)
 
 #endif
