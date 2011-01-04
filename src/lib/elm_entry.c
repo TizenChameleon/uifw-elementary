@@ -178,7 +178,7 @@ static int _stringshare_key_value_replace(const char **srcstring, char *key, con
 static int _is_width_over(Evas_Object *obj);
 static void _ellipsis_entry_to_width(Evas_Object *obj);
 static void _reverse_ellipsis_entry(Evas_Object *obj);
-static int _textinput_control_function(void *data,void *input_data);
+static Eina_Bool *_textinput_control_function(void *data,void *input_data);
 static int _entry_length_get(Evas_Object *obj);
 
 static const char SIG_CHANGED[] = "changed";
@@ -481,7 +481,7 @@ _signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *so
 }
 
 static void *
-_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source))
+_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
@@ -2013,7 +2013,7 @@ _ellipsis_entry_to_width(Evas_Object *obj)
    _sizing_eval(obj);
 }
 
-static int _textinput_control_function(void *data,void *input_data)
+static Eina_Bool *_textinput_control_function(void *data,void *input_data)
 {
    /* calculate character count */
    Evas_Object *entry = (Evas_Object *)data;

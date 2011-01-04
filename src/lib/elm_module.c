@@ -3,7 +3,7 @@
 
 /* what are moodules in elementary for? for modularising behavior and features
  * so they can be plugged in and out where you dont want the core source to
- * alwyas behave like that or do it that way. plug it at runtime!
+ * always behave like that or do it that way. plug it at runtime!
  * 
  * they have module names (in config) and "slots" to plug that module into
  * to server a purpose. eg you plug plugin "xx" into the "entry-copy-paste"
@@ -25,10 +25,6 @@
  * creation/deletion of the entry as well as replace the longpress behavior.
  */
 
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
-
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
@@ -49,9 +45,9 @@ void
 _elm_module_shutdown(void)
 {
    // FIXME: unload all modules
-   eina_hash_free(modules);
+   if (modules) eina_hash_free(modules);
    modules = NULL;
-   eina_hash_free(modules_as);
+   if (modules_as) eina_hash_free(modules_as);
    modules_as = NULL;
 }
 
@@ -64,7 +60,7 @@ _elm_module_parse(const char *s)
    pe = p;
    for (;;)
      {
-        if ((*pe == ':') || (*pe == 0))
+        if ((*pe == ':') || (!*pe))
           { // p -> pe == 'name:'
              if (pe > p)
                {
@@ -85,7 +81,7 @@ _elm_module_parse(const char *s)
                        free(n);
                     }
                }
-             if (*pe == 0) break;
+             if (!*pe) break;
              p = pe + 1;
              pe = p;
           }

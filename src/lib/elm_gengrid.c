@@ -460,7 +460,7 @@ _item_realize(Elm_Gengrid_Item *item)
 	const Eina_List *l;
 	const char *key;
 
-	item->labels = _elm_stringlist_get(edje_object_data_get(item->base,
+	item->labels = elm_widget_stringlist_get(edje_object_data_get(item->base,
 							        "labels"));
 	EINA_LIST_FOREACH(item->labels, l, key)
 	  {
@@ -479,7 +479,7 @@ _item_realize(Elm_Gengrid_Item *item)
 	const Eina_List *l;
 	const char *key;
 
-	item->icons = _elm_stringlist_get(edje_object_data_get(item->base,
+	item->icons = elm_widget_stringlist_get(edje_object_data_get(item->base,
 							       "icons"));
 	EINA_LIST_FOREACH(item->icons, l, key)
 	  {
@@ -501,7 +501,7 @@ _item_realize(Elm_Gengrid_Item *item)
 	const Eina_List *l;
 	const char *key;
 
-	item->states = _elm_stringlist_get(edje_object_data_get(item->base,
+	item->states = elm_widget_stringlist_get(edje_object_data_get(item->base,
 							        "states"));
 	EINA_LIST_FOREACH(item->states, l, key)
 	  {
@@ -556,11 +556,11 @@ _item_unrealize(Elm_Gengrid_Item *item)
    item->base = NULL;
    evas_object_del(item->spacer);
    item->spacer = NULL;
-   _elm_stringlist_free(item->labels);
+   elm_widget_stringlist_free(item->labels);
    item->labels = NULL;
-   _elm_stringlist_free(item->icons);
+   elm_widget_stringlist_free(item->icons);
    item->icons = NULL;
-   _elm_stringlist_free(item->states);
+   elm_widget_stringlist_free(item->states);
 
    EINA_LIST_FREE(item->icon_objs, icon)
      evas_object_del(icon);
