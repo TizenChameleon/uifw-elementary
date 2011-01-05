@@ -233,8 +233,8 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, const char *key, const char *valu
    
    srcstring = eina_strbuf_string_get(srcbuf);
    curlocater = strstr(srcstring, key);
-   
-   if (!curlocater)
+
+   if (!curlocater || !srcstring)
      insertflag = 1;
    else
      {
@@ -262,13 +262,13 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, const char *key, const char *valu
              if (curlocater)
                {
                   replocater = curlocater + key_len + 1;
-                  while ((*replocater != '=') && (replocater))
+                  while ((*replocater) && (*replocater != '='))
                     replocater++;
 
                   while (*replocater && *replocater != ' ' && *replocater != '>')
                     replocater++;
 
-                  if (replocater - curlocater > strlen(key) + 1)
+                  if (replocater - curlocater > key_len + 1)
                     {
                        replocater--;
                        eina_strbuf_append_n(diffbuf, curlocater, 
