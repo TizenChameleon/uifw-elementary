@@ -1705,7 +1705,7 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int
    srcstring = eina_strbuf_string_get(srcbuf);
    curlocater = strstr(srcstring, key);
 
-   if (curlocater == NULL)
+   if (!curlocater || !srcstring)
      {
        insertflag = 1;
      }
@@ -1736,7 +1736,7 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int
              {
                replocater = curlocater + strlen(key) + 1;
 
-               while (*replocater == ' ' || *replocater == '=')
+               while (*replocater && *replocater == ' ' || *replocater == '=')
                  replocater++;
 
                 while (*replocater && *replocater != ' ' && *replocater != '>')

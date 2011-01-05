@@ -2096,7 +2096,7 @@ extern "C" {
     * timepicker/ampm
     */
 
-   EINA_DEPRECATED typedef struct _Discpicker_Item Elm_Discpicker_Item;
+   typedef struct _Discpicker_Item Elm_Discpicker_Item;
    EINA_DEPRECATED EAPI Evas_Object     *elm_discpicker_add(Evas_Object *parent);
    EINA_DEPRECATED EAPI void             elm_discpicker_row_height_set(Evas_Object *obj, unsigned int row_height);
    EINA_DEPRECATED EAPI void             elm_discpicker_next(Evas_Object *obj);
