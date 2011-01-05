@@ -1,3 +1,19 @@
+elementary (1.0.0+svn.51480slp2+build87) unstable; urgency=low
+
+  * Packaging for fixing elm_priv.h bug
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build87 
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 05 Jan 2011 13:05:03 +0900
+
+elementary (1.0.0+svn.51480slp2+build86) unstable; urgency=low
+
+  * Packaging for fixing elm_priv.h bug
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build86
+ 
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Wed, 05 Jan 2011 12:16:11 +0900
+
 elementary (1.0.0+svn.51480slp2+build85) unstable; urgency=low
 
   * version up

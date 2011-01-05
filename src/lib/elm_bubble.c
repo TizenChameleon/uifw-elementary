@@ -66,7 +66,11 @@ _theme_hook(Evas_Object *obj)
    _elm_theme_object_set(obj, wd->bbl, "bubble", wd->corner,
                          elm_widget_style_get(obj));
    edje_object_part_text_set(wd->bbl, "elm.text", wd->label);
+   if (wd->label) edje_object_signal_emit(wd->bbl, "elm,state,text,visible", "elm");
+   else edje_object_signal_emit(wd->bbl, "elm,state,text,hidden", "elm");
    edje_object_part_text_set(wd->bbl, "elm.info", wd->info);
+   if (wd->info) edje_object_signal_emit(wd->bbl, "elm,state,info,visible", "elm");
+   else edje_object_signal_emit(wd->bbl, "elm,state,info,hidden", "elm");
    if (wd->content)
      {
         edje_object_part_swallow(wd->bbl, "elm.swallow.content", wd->content);
@@ -244,10 +248,10 @@ elm_bubble_label_set(Evas_Object *obj, const char *label)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (label) edje_object_signal_emit(wd->bbl, "elm,state,label,visible", "elm");
-   else edje_object_signal_emit(wd->bbl, "elm,state,label,hidden", "elm");
    eina_stringshare_replace(&wd->label, label);
    edje_object_part_text_set(wd->bbl, "elm.text", label);
+   if (label) edje_object_signal_emit(wd->bbl, "elm,state,text,visible", "elm");
+   else edje_object_signal_emit(wd->bbl, "elm,state,text,hidden", "elm");
    _sizing_eval(obj);
 }
 
@@ -292,6 +296,8 @@ elm_bubble_info_set(Evas_Object *obj, const char *info)
    if (!wd) return;
    eina_stringshare_replace(&wd->info, info);
    edje_object_part_text_set(wd->bbl, "elm.info", info);
+   if (info) edje_object_signal_emit(wd->bbl, "elm,state,info,visible", "elm");
+   else edje_object_signal_emit(wd->bbl, "elm,state,info,hidden", "elm");
    _sizing_eval(obj);
 }
 
