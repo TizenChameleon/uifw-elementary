@@ -707,6 +707,7 @@ collections {
 	 part { name: "button_image";
 	    mouse_events: 1;
 	    description { state: "default" 0.0;
+          min: 15 15;
 	       image {
 		  normal: "bt_base2.png";
 		  border: 7 7 7 7;
@@ -741,7 +742,7 @@ collections {
                fixed: 1 0;
 	       visible: 1;
 	       aspect: 1.0 1.0;
-	       aspect_preference: VERTICAL;
+//	       aspect_preference: VERTICAL;
 	       rel2.offset: 4 -5;
 	    }
 	    description { state: "icononly" 0.0;
@@ -749,10 +750,10 @@ collections {
                fixed: 0 0;
 	       visible: 1;
 	       align: 0.5 0.5;
-	       aspect: 1.0 1.0;
+//	       aspect: 1.0 1.0;
 	       rel2.offset: -5 -5;
 	       rel2.relative: 1.0 1.0;
-	       aspect_preference: VERTICAL;
+//	       aspect_preference: VERTICAL;
 	    }
 	 }
          part {
@@ -774,6 +775,7 @@ collections {
 		  size:     10;
 		  min:      0 0;
 		  align:    0.5 0.5;
+                  text_class: "button";
 	       }
 	    }
 	    description { state: "visible" 0.0;
@@ -839,7 +841,6 @@ collections {
             }
             description { state: "clicked" 0.0;
                inherit:  "default" 0.0;
-               visible: 1;
                color: 255 255 255 255;
             }
          }
@@ -871,9 +872,25 @@ collections {
 	 program {
 	    name:   "button_unclick";
 	    signal: "mouse,up,1";
-	    source: "over2";
+	    source: "over3";
 	    action: SIGNAL_EMIT "elm,action,unpress" "";
 	    after: "button_unclick_anim";
+	 }
+	 program {
+	    name:   "button_pressed_anim";
+	    signal: "elm,anim,activate";
+	    source: "elm";
+	    action: STATE_SET "clicked" 0.0;
+	    target: "button_image";
+	    target: "over3";
+	    after: "button_unpressed_anim";
+	 }
+	 program {
+	    name:   "button_unpressed_anim";
+	    action: STATE_SET "default" 0.0;
+	    transition: DECELERATE 0.5;
+	    target: "button_image";
+	    target: "over3";
 	 }
 	 program {
 	    name:   "button_unclick_anim";
@@ -897,7 +914,7 @@ collections {
 	 }
 	 program {
 	    name:   "button_unclick3";
-	    signal: "mouse,up,1";
+	    signal: "mouse,clicked,1";
 	    source: "over2";
 	    action: SIGNAL_EMIT "elm,action,click" "";
 	 }
@@ -1096,6 +1113,7 @@ collections {
 		  size:     10;
 		  min:      0 0;
 		  align:    0.5 0.5;
+                  text_class: "button";
 	       }
 	    }
 	    description { state: "visible" 0.0;
@@ -1377,6 +1395,7 @@ collections {
 		  size:     10;
 		  min:      0 0;
 		  align:    0.5 0.5;
+                  text_class: "button";
 	       }
 	    }
 	    description { state: "visible" 0.0;
@@ -1483,6 +1502,7 @@ collections {
 	 part { name: "button_image";
 	    mouse_events: 1;
 	    description { state: "default" 0.0;
+          min: 15 15;
            color: 255 255 255 0;
 	       image {
 		  normal: "bt_base2.png";
@@ -1557,6 +1577,7 @@ collections {
 		  size:     10;
 		  min:      0 0;
 		  align:    0.5 0.5;
+                  text_class: "button";
 	       }
 	    }
 	    description { state: "visible" 0.0;
@@ -23798,13 +23819,16 @@ collections {
          image: "arrow_right.png" COMP;
          image: "arrow_left.png" COMP;
       }
+     script {
+        public state_pair = 0; //0:both content are not set, 1:both content are set
+     }
      parts
        {
           part
             {
                name: "whole";
                type: RECT;
-               mouse_events: 0;
+               mouse_events: 1;
                description
                  {
                     state: "default" 0.0;
@@ -23873,8 +23897,8 @@ collections {
                y: 0 0 0;
             }
 	    description { state: "default" 0.0;
-               max: 15 9999;
-               min: 15 100;
+               max: 0 999;
+               min: 0 100;
                rel1.relative: 0.0 0.5;
                rel2.relative: 1.0 0.5;
 	       image {
@@ -23883,11 +23907,21 @@ collections {
 	       }
                image.middle: SOLID;
 	    }
+       description { state: "default" 0.1;
+          inherit: "default" 0.0;
+          max: 15 999;
+          min: 15 100;
+       }
 	    description { state: "clicked" 0.0;
 	       inherit: "default" 0.0;
 	       image.normal: "bt_base1.png";
                image.middle: SOLID;
 	    }
+       description { state: "clicked" 0.1;
+          inherit: "default" 0.1;
+          image.normal: "bt_base1.png";
+          image.middle: SOLID;
+       }
 	    description { state: "disabled" 0.0;
 	       inherit:  "default" 0.0;
 	       image {
@@ -23895,6 +23929,13 @@ collections {
 		  border: 4 4 4 4;
 	       }
 	    }
+       description { state: "disabled" 0.1;
+          inherit:  "default" 0.1;
+          image {
+             normal: "bt_dis_base.png";
+             border: 4 4 4 4;
+         }
+      }
 	 }
 	 part {	  name: "over1";
 	    mouse_events: 0;
@@ -23955,6 +23996,7 @@ collections {
          //Arrow
          part {
             name: "arrow_right";
+            mouse_events: 0;
             description { state: "default" 0.0;
                 min: 45 45;
                 max: 45 45;
@@ -23987,6 +24029,7 @@ collections {
          }
         part {
             name: "arrow_left";
+            mouse_events: 0;
             description { state: "default" 0.0;
                 min: 45 45;
                 max: 45 45;
@@ -24017,6 +24060,18 @@ collections {
                 rel2.offset: (-45/2 - 20) 45/2;
             }
          }
+         part { name: "movement.decider";
+            mouse_events: 1;
+            description { state: "default" 0.0;
+               rel1.to: "elm.bar";
+               rel2.to: "elm.bar";
+               visible: 0;
+            }
+            description { state: "disabled" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+            }
+         }
 
        }
         programs {
@@ -24030,8 +24085,12 @@ collections {
 	 }
 	 program {
 	    name:   "button_click_anim";
-	    action: STATE_SET "clicked" 0.0;
-	    target: "elm.bar";
+       script {
+          if(get_int(state_pair) == 1)
+             set_state(PART:"elm.bar", "clicked", 0.1);
+          else
+             set_state(PART:"elm.bar", "clicked", 0.0);				
+       }
 	 }
 	 program {
 	    name:   "button_unclick";
@@ -24043,8 +24102,12 @@ collections {
 	 }
 	 program {
 	    name:   "button_unclick_anim";
-	    action: STATE_SET "default" 0.0;
-	    target: "elm.bar";
+          script {
+          if(get_int(state_pair) == 1)
+             set_state(PART:"elm.bar", "default", 0.1);
+          else
+             set_state(PART:"elm.bar", "default", 0.0);				
+       }
 	 }
 	 program {
 	    name:   "button_click2";
@@ -24113,6 +24176,48 @@ collections {
             target: "arrow_left";
             transition: DECELERATE 0.4;
         }
+        //fix the pane
+        program {
+           name:   "panes_fixed";
+           signal: "elm.panes.fixed";
+           source: "elm";
+           action: STATE_SET "disabled" 0.0;
+           target: "movement.decider";
+           target: "elm.bar";
+        }
+        //allow the movement by interaction
+        program {
+           name:   "panes_unfixed";
+           signal: "elm.panes.unfixed";
+           source: "elm";
+           action: STATE_SET "default" 0.0;
+           target: "movement.decider";
+           target: "elm.bar";
+        }
+        program {
+           name:   "panes_pair";
+           signal: "elm.panes.pair";
+           source: "elm";
+           script {
+              new st[31];
+              new Float:vl;
+              set_int(state_pair, 1);
+              get_state(PART:"elm.bar", st, 30, vl);
+              set_state(PART:"elm.bar", st, 0.1);
+           }
+        }
+        program {
+           name:   "panes_unpair";
+           signal: "elm.panes.unpair";
+           source: "elm";
+           script {
+              new st[31];
+              new Float:vl;
+              set_int(state_pair, 0);
+              get_state(PART:"elm.bar", st, 30, vl);
+              set_state(PART:"elm.bar", st, 0.0);
+           }
+        }
       }
   }
 
@@ -24129,13 +24234,16 @@ collections {
          image: "arrow_up.png" COMP;
          image: "arrow_down.png" COMP;
       }
+     script {
+        public state_pair = 0; //0:both content are not set, 1:both content are set
+     }
      parts
        {
           part
             {
                name: "whole";
                type: RECT;
-               mouse_events: 0;
+               mouse_events: 1;
                description
                  {
                     state: "default" 0.0;
@@ -24204,8 +24312,8 @@ collections {
                y: 1 1 1;
             }
 	    description { state: "default" 0.0;
-               max: 999 15;
-               min: 100 15;
+               max: 999 0;
+               min: 100 0;
                rel1.relative: 0.5 0.0;
                rel2.relative: 0.5 1.0;
 	       image {
@@ -24214,11 +24322,21 @@ collections {
 	       }
                image.middle: SOLID;
 	    }
+       description { state: "default" 0.1;
+          inherit: "default" 0.0;
+          max: 999 15;
+          min: 100 15;
+       }
 	    description { state: "clicked" 0.0;
 	       inherit: "default" 0.0;
 	       image.normal: "bt_base1.png";
                image.middle: SOLID;
 	    }
+       description { state: "clicked" 0.1;
+          inherit: "default" 0.1;
+          image.normal: "bt_base1.png";
+          image.middle: SOLID;
+       }
 	    description { state: "disabled" 0.0;
 	       inherit:  "default" 0.0;
 	       image {
@@ -24226,6 +24344,13 @@ collections {
 		  border: 4 4 4 4;
 	       }
 	    }
+       description { state: "disabled" 0.1;
+          inherit:  "default" 0.1;
+          image {
+             normal: "bt_dis_base.png";
+             border: 4 4 4 4;
+          }
+       }
 	 }
 	 part {	  name: "over1";
 	    mouse_events: 0;
@@ -24348,6 +24473,19 @@ collections {
                 rel2.offset: 45/2 (-45/2 - 20);
             }
          }
+         part {
+            name: "movement.decider";
+            mouse_events: 1;
+            description { state: "default" 0.0;
+               rel1.to: "elm.bar";
+               rel2.to: "elm.bar";
+               visible: 0;
+            }
+            description { state: "disabled" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+            }
+         }
 
        }
         programs {
@@ -24359,11 +24497,15 @@ collections {
 	    after: "button_click_anim";
             after: "arrow_anim_start";
 	 }
-	 program {
-	    name:   "button_click_anim";
-	    action: STATE_SET "clicked" 0.0;
-	    target: "elm.bar";
-	 }
+    program {
+       name:   "button_click_anim";
+       script {
+          if(get_int(state_pair) == 1)
+             set_state(PART:"elm.bar", "clicked", 0.1);
+          else
+             set_state(PART:"elm.bar", "clicked", 0.0);				
+       }
+    }
 	 program {
 	    name:   "button_unclick";
 	    signal: "mouse,up,1";
@@ -24372,11 +24514,15 @@ collections {
 	    after: "button_unclick_anim";
             after: "arrow_anim_stop";
 	 }
-	 program {
-	    name:   "button_unclick_anim";
-	    action: STATE_SET "default" 0.0;
-	    target: "elm.bar";
-	 }
+    program {
+       name:   "button_unclick_anim";
+       script {
+          if(get_int(state_pair) == 1)
+             set_state(PART:"elm.bar", "default", 0.1);
+          else
+             set_state(PART:"elm.bar", "default", 0.0);				
+       }
+    }
 	 program {
 	    name:   "button_click2";
 	    signal: "mouse,down,1";
@@ -24443,6 +24589,48 @@ collections {
             target: "arrow_right";
             target: "arrow_left";
             transition: DECELERATE 0.4;
+        }
+        //fix the pane
+        program {
+           name:   "panes_fixed";
+           signal: "elm.panes.fixed";
+           source: "elm";
+           action: STATE_SET "disabled" 0.0;
+           target: "movement.decider";
+           target: "elm.bar";
+        }
+        //allow the movement by interaction
+        program {
+           name:   "panes_unfixed";
+           signal: "elm.panes.unfixed";
+           source: "elm";
+           action: STATE_SET "default" 0.0;
+           target: "movement.decider";
+           target: "elm.bar";
+        }
+        program {
+           name:   "panes_pair";
+           signal: "elm.panes.pair";
+           source: "elm";
+           script {
+              new st[31];
+              new Float:vl;
+              set_int(state_pair, 1);
+              get_state(PART:"elm.bar", st, 30, vl);
+              set_state(PART:"elm.bar", st, 0.1);
+           }
+        }
+        program {
+           name:   "panes_unpair";
+           signal: "elm.panes.unpair";
+           source: "elm";
+           script {
+              new st[31];
+              new Float:vl;
+              set_int(state_pair, 0);
+              get_state(PART:"elm.bar", st, 30, vl);
+              set_state(PART:"elm.bar", st, 0.0);
+           }
         }
       }
   }

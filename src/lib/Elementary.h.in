@@ -621,6 +621,7 @@ extern "C" {
    EAPI void         elm_box_unpack_all(Evas_Object *obj);
    /* smart callbacks called:
     */
+
    typedef enum 
      {
 	UIControlStateDefault,
@@ -630,17 +631,34 @@ extern "C" {
 	UIControlStateReserved
      } UIControlState;
 
-   EAPI Evas_Object *elm_button_add(Evas_Object *parent);
-   EAPI void         elm_button_label_set(Evas_Object *obj, const char *label);
+ /* button */
+   EAPI Evas_Object *elm_button_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+   EAPI void         elm_button_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
    EAPI void         elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlState state);
-   EAPI const char  *elm_button_label_get(const Evas_Object *obj);
+   EAPI const char  *elm_button_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI const char  *elm_button_label_get_for_state(const Evas_Object *obj, UIControlState state);
-   EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj);
-   EAPI void         elm_button_autorepeat_set(Evas_Object *obj, Eina_Bool on);
-   EAPI void         elm_button_autorepeat_initial_timeout_set(Evas_Object *obj, double t);
-   EAPI void         elm_button_autorepeat_gap_timeout_set(Evas_Object *obj, double t);
+   EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void         elm_button_autorepeat_set(Evas_Object *obj, Eina_Bool on) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool    elm_button_autorepeat_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void         elm_button_autorepeat_initial_timeout_set(Evas_Object *obj, double t) EINA_ARG_NONNULL(1);
+   EAPI double       elm_button_autorepeat_initial_timeout_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void         elm_button_autorepeat_gap_timeout_set(Evas_Object *obj, double t) EINA_ARG_NONNULL(1);
+   EAPI double       elm_button_autorepeat_gap_timeout_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /* available styles:
+    * default
+    * anchor
+    * hoversel_vertical
+    * hoversel_vertical_entry
+    */
+   /* smart callbacks called:
+    * "clicked" - the user clicked the button
+    * "repeated" - the user pressed the button without releasing it
+    * "unpressed" - when the button is unpressed (released)
+    */
 
+   /* fileselector */
    EAPI Evas_Object *elm_fileselector_button_add(Evas_Object *parent);
    EAPI void         elm_fileselector_button_label_set(Evas_Object *obj, const char *label);
    EAPI const char  *elm_fileselector_button_label_get(const Evas_Object *obj);
@@ -663,17 +681,6 @@ extern "C" {
    EAPI void         elm_fileselector_button_selected_set(Evas_Object *obj, const char *path);
    EAPI const char  *elm_fileselector_button_selected_get(const Evas_Object *obj);
 
-   /* available styles:
-    * default
-    * anchor
-    * hoversel_vertical
-    * hoversel_vertical_entry
-    */
-   /* smart callbacks called:
-    * "clicked" - the user clicked the button
-    * "repeated" - the user pressed the button without releasing it
-    * "unpressed" - when the button is unpressed (released)
-    */
 
    typedef enum _Elm_Scroller_Policy
      {
@@ -1898,20 +1905,19 @@ extern "C" {
     * Update the minimun height of the bar in the theme. No minimun should be set in the vertical theme
     * Add events (move, start ...)
     */
-   EAPI Evas_Object          *elm_panes_add(Evas_Object *parent);
-   EAPI void                  elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content);
-   EAPI void                  elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content);
-   EAPI Evas_Object          *elm_panes_content_left_get(const Evas_Object *obj);
-   EAPI Evas_Object          *elm_panes_content_right_get(const Evas_Object *obj);
-   EAPI Evas_Object          *elm_panes_content_left_unset(Evas_Object *obj);
-   EAPI Evas_Object          *elm_panes_content_right_unset(Evas_Object *obj);
-   EAPI double                elm_panes_content_left_size_get(const Evas_Object *obj);
-   EAPI void                  elm_panes_content_left_size_set(Evas_Object *obj, double size);
-   EAPI void                  elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal);
-   EAPI Eina_Bool             elm_panes_horizontal_get(const Evas_Object *obj);
-   EAPI void                  elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed);
-   EAPI Eina_Bool             elm_panes_fixed_get(const Evas_Object *obj);
-
+   EAPI Evas_Object          *elm_panes_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+   EAPI void                  elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI void                  elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object          *elm_panes_content_left_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object          *elm_panes_content_right_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object          *elm_panes_content_left_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object          *elm_panes_content_right_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI double                elm_panes_content_left_size_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                  elm_panes_content_left_size_set(Evas_Object *obj, double size) EINA_ARG_NONNULL(1);
+   EAPI void                  elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool             elm_panes_horizontal_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                  elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool             elm_panes_fixed_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /* flip */
    typedef enum _Elm_Flip_Mode
      {
