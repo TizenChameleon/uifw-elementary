@@ -243,11 +243,10 @@ _icon_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 static Eina_Bool
 _icon_animation(void *data)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
+   Widget_Data *wd = (Widget_Data *)data;
    double cur_position = 0.0, new_position = 0.0;
    double move_amount = 0.05;
    Eina_Bool flag_finish_animation = EINA_FALSE;
-   if (!wd) return EINA_FALSE;
 
    edje_object_part_drag_value_get(wd->as, "elm.swallow.icon", &cur_position, NULL);
 
