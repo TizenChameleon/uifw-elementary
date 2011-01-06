@@ -1736,15 +1736,11 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int
              {
                replocater = curlocater + strlen(key) + 1;
 
-               while (*replocater && *replocater == ' ' || *replocater == '=')
+               while ((*replocater) && (*replocater != ' ') && (*replocater != '>'))
                  replocater++;
-
-                while (*replocater && *replocater != ' ' && *replocater != '>')
-                  replocater++;
 
                if (replocater-curlocater > strlen(key)+1)
                  {
-                   replocater--;
                    eina_strbuf_append_n(diffbuf, curlocater, replocater-curlocater+1);
                  }
                else
