@@ -2694,7 +2694,8 @@ extern "C" {
 
    /* actionslider */                        
    typedef enum _Elm_Actionslider_Indicator_Pos  
-     {                                         
+     {        
+        ELM_ACTIONSLIDER_INDICATOR_NONE,                                 
         ELM_ACTIONSLIDER_INDICATOR_LEFT,
         ELM_ACTIONSLIDER_INDICATOR_RIGHT,
         ELM_ACTIONSLIDER_INDICATOR_CENTER
@@ -2702,10 +2703,12 @@ extern "C" {
 
    typedef enum _Elm_Actionslider_Magnet_Pos
      {
-        ELM_ACTIONSLIDER_MAGNET_LEFT,
-        ELM_ACTIONSLIDER_MAGNET_RIGHT,
-        ELM_ACTIONSLIDER_MAGNET_BOTH,
-        ELM_ACTIONSLIDER_MAGNET_CENTER
+        ELM_ACTIONSLIDER_MAGNET_NONE = 0,
+        ELM_ACTIONSLIDER_MAGNET_LEFT = 1 << 0,
+        ELM_ACTIONSLIDER_MAGNET_CENTER = 1 << 1, 
+        ELM_ACTIONSLIDER_MAGNET_RIGHT= 1 << 2,
+        ELM_ACTIONSLIDER_MAGNET_ALL = (1 << 3) -1,
+        ELM_ACTIONSLIDER_MAGNET_BOTH = (1 << 3)
      } Elm_Actionslider_Magnet_Pos;
 
    typedef enum _Elm_Actionslider_Label_Pos
@@ -2716,11 +2719,18 @@ extern "C" {
         ELM_ACTIONSLIDER_LABEL_BUTTON
      } Elm_Actionslider_Label_Pos;
 
-   EAPI Evas_Object *elm_actionslider_add(Evas_Object *parent);
-   EAPI void         elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_Pos pos);
-   EAPI void         elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos pos);
-   EAPI void         elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, const char *label);
-   EAPI void         elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag);
+   EAPI Evas_Object                     *elm_actionslider_add(Evas_Object *parent);
+   EAPI void                             elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_Pos pos);
+   EAPI Elm_Actionslider_Indicator_Pos   elm_actionslider_indicator_pos_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                             elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos pos);
+   EAPI Elm_Actionslider_Magnet_Pos      elm_actionslider_magnet_pos_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                             elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, const char *label);
+   EAPI void                             elm_actionslider_labels_get(const Evas_Object *obj, const char **left_label, const char **center_label, const char **right_label) EINA_ARG_NONNULL(1);
+   EAPI void                             elm_actionslider_enabled_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos pos) EINA_ARG_NONNULL(1);
+   EAPI Elm_Actionslider_Magnet_Pos      elm_actionslider_enabled_pos_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                             elm_actionslider_indicator_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EAPI const char                      *elm_actionslider_indicator_label_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                             elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag);
    /* smart callbacks called:
     * "indicator,position" - when a button reaches to the special position like "left", "right" and "center".
     */
