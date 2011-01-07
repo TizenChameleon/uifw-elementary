@@ -950,17 +950,17 @@ _strncpy(char* dest, const char* src, size_t count)
 {
    if (!dest)
      {
-	ERR( "dest is NULL" );
+	//ERR( "dest is NULL" );
 	return NULL;
      }
    if (!src)
      {
-	ERR( "src is NULL" );
+	//ERR( "src is NULL" );
 	return NULL;
      }
    if (count < 0)
      {
-	ERR( "count is smaller than 0" );
+	//ERR( "count is smaller than 0" );
 	return NULL;
      }
 
