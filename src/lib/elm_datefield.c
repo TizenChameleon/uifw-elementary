@@ -172,21 +172,21 @@ _theme_hook(Evas_Object *obj)
 
    //set date format
    if (wd->format_exists)
-     sprintf(sig, "elm,state,format,%s", elm_datefield_date_format_get(obj));
+      sprintf(sig, "elm,state,format,%s", elm_datefield_date_format_get(obj));
    else
      {
-	char *str = _get_i18n_string(obj, D_FMT);
-	if (str) 
-	  {
-	     if (!strcmp(str, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
-	     else if (!strcmp(str, "yyddmm")) wd->date_format = DATE_FORMAT_YYDDMM;
-	     else if (!strcmp(str, "mmyydd")) wd->date_format = DATE_FORMAT_MMYYDD;
-	     else if (!strcmp(str, "mmddyy")) wd->date_format = DATE_FORMAT_MMDDYY;
-	     else if (!strcmp(str, "ddyymm")) wd->date_format = DATE_FORMAT_DDYYMM;
-	     else if (!strcmp(str, "ddmmyy")) wd->date_format = DATE_FORMAT_DDMMYY;
-	     sprintf(sig, "elm,state,format,%s",str);
-	     free(str);
-	  }
+        char *str = _get_i18n_string(obj, D_FMT);
+        if (str) 
+          {
+             if (!strcmp(str, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
+             else if (!strcmp(str, "yyddmm")) wd->date_format = DATE_FORMAT_YYDDMM;
+             else if (!strcmp(str, "mmyydd")) wd->date_format = DATE_FORMAT_MMYYDD;
+             else if (!strcmp(str, "mmddyy")) wd->date_format = DATE_FORMAT_MMDDYY;
+             else if (!strcmp(str, "ddyymm")) wd->date_format = DATE_FORMAT_DDYYMM;
+             else if (!strcmp(str, "ddmmyy")) wd->date_format = DATE_FORMAT_DDMMYY;
+             sprintf(sig, "elm,state,format,%s",str);
+             free(str);
+          }
      }
    edje_object_signal_emit(wd->base, sig, "elm");
 
@@ -228,22 +228,22 @@ _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const c
    wd->pm = !wd->pm; 
    if (wd->pm)
      {
-	str = _get_i18n_string(data, PM_STR);
-	if (str) 
-	  {
-	     edje_object_part_text_set(wd->base, "elm.text.ampm", str);
-	     free(str);
-	  }
+        str = _get_i18n_string(data, PM_STR);
+        if (str) 
+          {
+             edje_object_part_text_set(wd->base, "elm.text.ampm", str);
+             free(str);
+          }
         wd->hour += HOUR_12H_MAXIMUM;
      }
    else
      {
-	str = _get_i18n_string(data, AM_STR);
-	if (str)
-	  {
-	     edje_object_part_text_set(wd->base, "elm.text.ampm", str);
-	     free(str);
-	  }
+        str = _get_i18n_string(data, AM_STR);
+        if (str)
+          {
+             edje_object_part_text_set(wd->base, "elm.text.ampm", str);
+             free(str);
+          }
         wd->hour -= HOUR_12H_MAXIMUM;
      }
    evas_object_smart_callback_call(data, "changed", NULL);
@@ -381,12 +381,12 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
         if (wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
           {
              wd->month = num;
-	     i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
-	     if (i18n_str)
-	       {
-		  elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
-		  free(i18n_str);
-	       }
+             i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
+             if (i18n_str)
+               {
+                  elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
+                  free(i18n_str);
+               }
           }
         //check day boundary
         if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
@@ -402,12 +402,12 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
         if (wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
           {
              wd->month = num;
-	     i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
-	     if (i18n_str)
-	       {
-		  elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
-		  free(i18n_str);
-	       }  
+             i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
+             if (i18n_str)
+               {
+                  elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
+                  free(i18n_str);
+               }  
           }
         //check day boundary
         if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
@@ -453,23 +453,23 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
              wd->hour = (wd->pm == EINA_TRUE)? num + HOUR_12H_MAXIMUM : num;
              if ((wd->hour % 12) == 0) wd->hour -= HOUR_12H_MAXIMUM;
              if (wd->pm) 
-	       {
-		  i18n_str = _get_i18n_string(data, PM_STR);
-		  if (i18n_str)
-		    {
-		       edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
-		       free(i18n_str);
-		    }
-	       }
+               {
+                  i18n_str = _get_i18n_string(data, PM_STR);
+                  if (i18n_str)
+                    {
+                       edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
+                       free(i18n_str);
+                    }
+               }
              else 
-	       {
-		  i18n_str = _get_i18n_string(data, AM_STR);
-		  if (i18n_str)
-		    {
-		       edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
-		       free(i18n_str);
-		    }
-	       }
+               {
+                  i18n_str = _get_i18n_string(data, AM_STR);
+                  if (i18n_str)
+                    {
+                       edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
+                       free(i18n_str);
+                    }
+               }
           }
         sprintf(str, "%02d", num);
         elm_entry_entry_set(wd->time[TIME_HOUR], str);
@@ -614,52 +614,52 @@ _get_i18n_string(Evas_Object *obj, nl_item item)
    switch (item)
      {
       case D_FMT:
-	 str = calloc(7, sizeof(char));
-	 while (fmt[i]) 
-	   {
-	      if (fmt[i] == '%' && fmt[i+1]) 
-		{
-		   i++;
-		   switch (fmt[i]) 
-		     {
-		      case 'Y': case 'M': case 'D': case 'y': case 'm': case 'd':
-			 str[j++] = tolower(fmt[i]);
-			 str[j++] = tolower(fmt[i]);
-			 break;
-		     }
-		}
-	      i++;
-	   }
-	 return str;
+         str = calloc(7, sizeof(char));
+         while (fmt[i]) 
+           {
+              if (fmt[i] == '%' && fmt[i+1]) 
+                {
+                   i++;
+                   switch (fmt[i]) 
+                     {
+                      case 'Y': case 'M': case 'D': case 'y': case 'm': case 'd':
+                         str[j++] = tolower(fmt[i]);
+                         str[j++] = tolower(fmt[i]);
+                         break;
+                     }
+                }
+              i++;
+           }
+         return str;
       case AM_STR: 
       case PM_STR:
-	 if (strlen(fmt) > 0)
-	   {
-	      str = calloc(strlen(fmt)+1, sizeof(char));
-	      strcpy(str, fmt);
-	   }
-	 else
-	   {
-	      str = calloc(3, sizeof(char));
-	      if (item == AM_STR) strcpy(str, "AM");
-	      else if (item == PM_STR) strcpy(str, "PM");
-	   }
-	 return str;
+         if (strlen(fmt) > 0)
+           {
+              str = calloc(strlen(fmt)+1, sizeof(char));
+              strcpy(str, fmt);
+           }
+         else
+           {
+              str = calloc(3, sizeof(char));
+              if (item == AM_STR) strcpy(str, "AM");
+              else if (item == PM_STR) strcpy(str, "PM");
+           }
+         return str;
       case ABMON_1: case ABMON_2: case ABMON_3: case ABMON_4: case ABMON_5: case ABMON_6:
       case ABMON_7: case ABMON_8: case ABMON_9: case ABMON_10: case ABMON_11: case ABMON_12:
-	 str = calloc(strlen(fmt)+1, sizeof(char));
-	 while (fmt[i])
-	   {
-	      str[j++] = fmt[i];
-	      if (fmt[i] >= '1' && fmt[i] <= '9')
-		{
-		   if (fmt[i+1] >= '1' && fmt[i+1] <= '9')
-		     str[j] = fmt[i+1];
-		   break;
-		}
-	      i++;
-	   }
-	 return str;	 
+         str = calloc(strlen(fmt)+1, sizeof(char));
+         while (fmt[i])
+           {
+              str[j++] = fmt[i];
+              if (fmt[i] >= '1' && fmt[i] <= '9')
+                {
+                   if (fmt[i+1] >= '1' && fmt[i+1] <= '9')
+                      str[j] = fmt[i+1];
+                   break;
+                }
+              i++;
+           }
+         return str;	 
      }
    return NULL;
 }
@@ -751,20 +751,20 @@ _imf_event_commit_cb(void *data, int type, void *event)
      }
    if (focus_obj == wd->date[DATE_MON])
      {
-	char *i18n_str;
+        char *i18n_str;
         wd->month = atoi(ev->str);
-	i18n_str = _get_i18n_string(data, ABMON_1+wd->month-1);
-	if (i18n_str)
-	  {
-	     elm_entry_entry_set(focus_obj, i18n_str);
-	     free(i18n_str);
-	  }
+        i18n_str = _get_i18n_string(data, ABMON_1+wd->month-1);
+        if (i18n_str)
+          {
+             elm_entry_entry_set(focus_obj, i18n_str);
+             free(i18n_str);
+          }
      }
    else
      {
         strcpy(str, elm_entry_entry_get(focus_obj));
         str[strlen(str)] = ev->str[0];
-	elm_entry_entry_set(focus_obj, str);
+        elm_entry_entry_set(focus_obj, str);
      }
 
    if (_check_input_done(data, focus_obj, strlen(str)))
@@ -799,8 +799,8 @@ _date_update(Evas_Object *obj)
    i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
    if (i18n_str)
      {
-	elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
-	free(i18n_str);
+        elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
+        free(i18n_str);
      }
 
    sprintf(str, "%d", wd->day);
@@ -813,30 +813,30 @@ _date_update(Evas_Object *obj)
         if (wd->hour >= HOUR_12H_MAXIMUM)
           {
              wd->pm = EINA_TRUE;
-	     i18n_str = _get_i18n_string(obj, PM_STR);
-	     if (i18n_str) 
-	       {
-		  edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
-		  free(i18n_str);
-	       }
+             i18n_str = _get_i18n_string(obj, PM_STR);
+             if (i18n_str) 
+               {
+                  edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
+                  free(i18n_str);
+               }
           }
         else
           {
              wd->pm = EINA_FALSE;
-	     i18n_str = _get_i18n_string(obj, AM_STR);
-	     if (i18n_str)
-	       {
-		  edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);		
-		  free(i18n_str);
-	       }
+             i18n_str = _get_i18n_string(obj, AM_STR);
+             if (i18n_str)
+               {
+                  edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);		
+                  free(i18n_str);
+               }
           }
 
         if (wd->hour > HOUR_12H_MAXIMUM)
-          sprintf(str, "%02d", wd->hour - HOUR_12H_MAXIMUM);
+           sprintf(str, "%02d", wd->hour - HOUR_12H_MAXIMUM);
         else if (wd->hour == 0)
-          sprintf(str, "%02d", HOUR_12H_MAXIMUM);
+           sprintf(str, "%02d", HOUR_12H_MAXIMUM);
         else
-          sprintf(str, "%02d", wd->hour);
+           sprintf(str, "%02d", wd->hour);
      }
    elm_entry_entry_set(wd->time[TIME_HOUR], str);
    sprintf(str, "%02d", wd->min);
@@ -1234,10 +1234,10 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 
    if (wd->time_mode != mode) 
      {
-	wd->time_mode = mode;
-	if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h", "elm");
-	else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
-	_date_update(obj);
+        wd->time_mode = mode;
+        if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h", "elm");
+        else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
+        _date_update(obj);
      }
 }
 
