@@ -1117,7 +1117,8 @@ pasteimage_provider_set(Evas_Object *entry)
 static Eina_Bool
 pasteimage_append(Paste_Image *pi, Evas_Object *entry)
 {
-   char entrytag[100];
+   char *entrytag;
+   char *tagstring = "<item absize=240x180 href=file://%s></item>";
    
    if (!pi) return EINA_FALSE;
    if (!entry) return EINA_FALSE;
@@ -1125,8 +1126,8 @@ pasteimage_append(Paste_Image *pi, Evas_Object *entry)
    pasteimage_provider_set(entry);
 
    pastedimages = eina_list_append(pastedimages, pi);
-   snprintf(entrytag, sizeof(entrytag), 
-            "<item absize=240x180 href=%s>", pi->tag);
+   entrytag = alloca(sizeof(char)*(strlen(tagstring)+strlen(pi->file)+1));
+   snprintf(entrytag, (strlen(tagstring)+strlen(pi->file)), tagstring, pi->file);
    elm_entry_entry_insert(entry, entrytag);
 
    return EINA_TRUE;
@@ -1347,7 +1348,8 @@ found:
         cnp_debug("We found a URI... (%scached)\n", savedtypes.pi ? "" : "not ");
         if (savedtypes.pi)
           {
-             char entrytag[100];
+             char *entrytag;
+             char *tagstring = "<item absize=240x180 href=file://%s></item>";
              
              ddata.x = savedtypes.x;
              ddata.y = savedtypes.y;
@@ -1371,9 +1373,9 @@ found:
                   pasteimage_provider_set(dropable->obj);
                   
                   pastedimages = eina_list_append(pastedimages, savedtypes.pi);
-                  snprintf(entrytag, sizeof(entrytag),
-                           "<item absize=240x180 href=%s>",
-                           savedtypes.pi->tag);
+                  entrytag = alloca(sizeof(char)*(strlen(tagstring)+strlen(savedtypes.pi->file)+1));
+                  snprintf(entrytag, (strlen(tagstring)+strlen(savedtypes.pi->file)),
+                           tagstring, savedtypes.pi->file);
                   ddata.data = entrytag;
                   cnp_debug("Insert %s\n", (char *)ddata.data);
                   dropable->dropcb(dropable->cbdata, dropable->obj, &ddata);
