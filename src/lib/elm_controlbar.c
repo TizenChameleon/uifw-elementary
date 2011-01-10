@@ -3064,6 +3064,7 @@ elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path)
 EAPI Evas_Object *
 elm_controlbar_item_icon_get(Elm_Controlbar_Item * it) 
 {
+   if (it == NULL) return;
    return it->icon;
 }
 
@@ -3111,6 +3112,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
 EAPI const char *
 elm_controlbar_item_label_get(Elm_Controlbar_Item * it) 
 {
+   if (it == NULL) return;
    return it->text;
 }
 
