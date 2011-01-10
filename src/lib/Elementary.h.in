@@ -3001,6 +3001,7 @@ extern "C" {
    EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
    EAPI Eina_Bool    elm_controlbar_item_visible_get(Elm_Controlbar_Item * it);
    EAPI void         elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable);
+   EAPI Eina_Bool    elm_controlbar_item_disable_get(Elm_Controlbar_Item * it);
    EAPI void         elm_controlbar_item_icon_set(Elm_Controlbar_Item *it, const char *icon_path);
    EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
