@@ -159,6 +159,15 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void 
+_signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if(!wd || !wd->base) return;
+
+   evas_object_smart_callback_call(data, "clicked", NULL);
+}
+
+static void 
 _changed_size_hint_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 {
    Evas_Object *eo = (Evas_Object *)data;
@@ -191,6 +200,11 @@ _event_init(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->base)   return;
+
+   if(wd->base)
+   	 {
+   	    edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "*", _signal_mouse_clicked, obj);
+   	 }
 
    if (wd->box)
      {
@@ -449,7 +463,8 @@ _change_current_button_state(Evas_Object *obj, Multibuttonentry_Button_State sta
                 break;
              case MULTIBUTONENTRY_BUTTON_STATE_SELECTED:
                 edje_object_signal_emit(item->button, "focused", "");
-                evas_object_smart_callback_call(obj, "selected", item);
+				evas_object_smart_callback_call(obj, "selected", item); // will be removed!
+                evas_object_smart_callback_call(obj, "item,selected", item);
                 break;
              default:
                 edje_object_signal_emit(item->button, "default", "");
@@ -490,6 +505,7 @@ _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *
 {
    Widget_Data *wd = elm_widget_data_get(data);
    static char str[MAX_STR];
+   Elm_Multibuttonentry_Item *item = NULL;
    if (!wd) return;
 
    strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
@@ -499,6 +515,10 @@ _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *
       _add_button(data, str);
 
    _change_current_button(data, obj);
+
+   if (wd->current)
+      if(item = eina_list_data_get(wd->current))
+         evas_object_smart_callback_call(data, "item,clicked", item);
 }
 
 static void
@@ -538,7 +558,8 @@ _del_button_item(Elm_Multibuttonentry_Item *item)
           {
              wd->items = eina_list_remove(wd->items, _item);
              elm_box_unpack(wd->box, _item->button);
-             evas_object_smart_callback_call(obj, "deleted", _item);
+             evas_object_smart_callback_call(obj, "deleted", _item); // will be removed!
+             evas_object_smart_callback_call(obj, "item,deleted", _item);
              _del_button_obj(obj, _item->button);
              free(_item);
              if (wd->current == l)   
@@ -670,7 +691,8 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
         elm_label_wrap_width_set(label, item->vw - 2*padding_outer - 2*padding_inner ); 
      }
 
-   evas_object_smart_callback_call(obj, "added", item);
+   evas_object_smart_callback_call(obj, "added", item); // will be removed!
+   evas_object_smart_callback_call(obj, "item,added", item);
 
    return item;
 }
