@@ -1535,7 +1535,8 @@ _item_realize(Elm_Genlist_Item *it, int in, int calc)
 
    it->realized = EINA_TRUE;
    it->want_unrealize = EINA_FALSE;
-   if (ELM_GENLIST_EDIT_MODE_NONE != it->wd->edit_mode) 
+   if ((ELM_GENLIST_EDIT_MODE_NONE != it->wd->edit_mode) &&
+       (it->flags != ELM_GENLIST_ITEM_GROUP)) 
      {
         Evas_Object *icon;
         EINA_LIST_FREE(it->edit_icon_objs, icon)
