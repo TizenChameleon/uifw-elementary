@@ -36,12 +36,34 @@ static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *eve
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 static void _signal_toggle_off(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_toggle_on(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _on_focus_hook(void *data, Evas_Object *obj);
+static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src,
+                             Evas_Callback_Type type, void *event_info);
 
 static const char SIG_CHANGED[] = "changed";
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
   {NULL, NULL}
 };
+
+static Eina_Bool
+_event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
+{
+   if (type != EVAS_CALLBACK_KEY_DOWN) return EINA_FALSE;
+   Evas_Event_Key_Down *ev = event_info;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return EINA_FALSE;
+   if (elm_widget_disabled_get(obj)) return EINA_FALSE;
+   if ((strcmp(ev->keyname, "Return")) &&
+       (strcmp(ev->keyname, "KP_Enter")) &&
+       (strcmp(ev->keyname, "space")))
+     return EINA_FALSE;
+   elm_toggle_state_set(obj, !wd->state);
+   evas_object_smart_callback_call(obj, SIG_CHANGED, NULL);
+   ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+   return EINA_TRUE;
+}
 
 static void
 _del_hook(Evas_Object *obj)
@@ -66,6 +88,23 @@ _disable_hook(Evas_Object *obj)
 }
 
 static void
+_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (elm_widget_focus_get(obj))
+     {
+	edje_object_signal_emit(wd->tgl, "elm,action,focus", "elm");
+	evas_object_focus_set(wd->tgl, EINA_TRUE);
+     }
+   else
+     {
+	edje_object_signal_emit(wd->tgl, "elm,action,unfocus", "elm");
+	evas_object_focus_set(wd->tgl, EINA_FALSE);
+     }
+}
+
+static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -86,6 +125,8 @@ _theme_hook(Evas_Object *obj)
    edje_object_part_text_set(wd->tgl, "elm.text", wd->label);
    edje_object_part_text_set(wd->tgl, "elm.ontext", wd->ontext);
    edje_object_part_text_set(wd->tgl, "elm.offtext", wd->offtext);
+   if (elm_widget_disabled_get(obj))
+     edje_object_signal_emit(wd->tgl, "elm,state,disabled", "elm");
    edje_object_message_signal_process(wd->tgl);
    edje_object_scale_set(wd->tgl, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
@@ -154,7 +195,7 @@ _signal_toggle_on(void *data, Evas_Object *obj __UNUSED__, const char *emission 
 /**
  * Add a toggle to @p parent.
  *
- * @param[in] parent The parent object
+ * @param parent The parent object
  *
  * @return The toggle object
  *
@@ -167,16 +208,22 @@ elm_toggle_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "toggle");
    elm_widget_type_set(obj, "toggle");
    elm_widget_sub_object_add(parent, obj);
+   elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
+   elm_widget_can_focus_set(obj, EINA_TRUE);
+   elm_widget_event_hook_set(obj, _event_hook);
 
    wd->tgl = edje_object_add(e);
    _elm_theme_object_set(obj, wd->tgl, "toggle", "base", "default");
@@ -203,8 +250,8 @@ elm_toggle_add(Evas_Object *parent)
 /**
  * Sets the label to be displayed with the toggle.
  *
- * @param[in] obj The toggle object
- * @param[in] label The label to be displayed
+ * @param obj The toggle object
+ * @param label The label to be displayed
  *
  * @ingroup Toggle
  */
@@ -227,7 +274,7 @@ elm_toggle_label_set(Evas_Object *obj, const char *label)
 /**
  * Gets the label of the toggle
  *
- * @param[in] obj The toggle object
+ * @param obj  toggleeee object
  * @return The label of the toggle
  *
  * @ingroup Toggle
@@ -242,12 +289,14 @@ elm_toggle_label_get(const Evas_Object *obj)
 }
 
 /**
- * Sets the icon to be displayed with the toggle.
+ * Set the icon used for the toggle
  *
- * Once the icon object is set, a previously set one will be deleted.
+ * Once the icon object is set, a previously set one will be deleted
+ * If you want to keep that old content object, use the
+ * elm_toggle_icon_unset() function.
  *
- * @param[in] obj The toggle object
- * @param[in] icon The icon object to be displayed
+ * @param obj The toggle object
+ * @param icon The icon object for the button
  *
  * @ingroup Toggle
  */
@@ -273,10 +322,12 @@ elm_toggle_icon_set(Evas_Object *obj, Evas_Object *icon)
 }
 
 /**
- * Gets the icon of the toggle
+ * Get the icon used for the toggle
  *
- * @param[in] obj The toggle object
- * @return The icon object
+ * Return the icon object which is set for this widget.
+ *
+ * @param obj The toggle object
+ * @return The icon object that is being used
  *
  * @ingroup Toggle
  */
@@ -290,11 +341,35 @@ elm_toggle_icon_get(const Evas_Object *obj)
 }
 
 /**
+ * Unset the icon used for the toggle
+ *
+ * Unparent and return the icon object which was set for this widget.
+ *
+ * @param obj The toggle object
+ * @return The icon object that was being used
+ *
+ * @ingroup Toggle
+ */
+EAPI Evas_Object *
+elm_toggle_icon_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (!wd->icon) return NULL;
+   Evas_Object *icon = wd->icon;
+   elm_widget_sub_object_del(obj, wd->icon);
+   edje_object_part_unswallow(wd->tgl, wd->icon);
+   wd->icon = NULL;
+   return icon;
+}
+
+/**
  * Sets the labels to be associated with the on and off states of the toggle.
  *
- * @param[in] obj The toggle object
- * @param[in] onlabel The label displayed when the toggle is in the "on" state
- * @param[in] offlabel The label displayed when the toggle is in the "off" state
+ * @param obj The toggle object
+ * @param onlabel The label displayed when the toggle is in the "on" state
+ * @param offlabel The label displayed when the toggle is in the "off" state
  *
  * @ingroup Toggle
  */
@@ -315,9 +390,9 @@ elm_toggle_states_labels_set(Evas_Object *obj, const char *onlabel, const char *
 /**
  * Gets the labels associated with the on and off states of the toggle.
  *
- * @param[in] obj The toggle object
- * @param[in] onlabel A char** to place the onlabel of @p obj into
- * @param[in] offlabel A char** to place the offlabel of @p obj into
+ * @param obj The toggle object
+ * @param onlabel A char** to place the onlabel of @p obj into
+ * @param offlabel A char** to place the offlabel of @p obj into
  *
  * @ingroup Toggle
  */
@@ -336,8 +411,8 @@ elm_toggle_states_labels_get(const Evas_Object *obj, const char **onlabel, const
 /**
  * Sets the state of the toggle to @p state.
  *
- * @param[in] obj The toggle object
- * @param[in] state The state of @p obj
+ * @param obj The toggle object
+ * @param state The state of @p obj
  *
  * @ingroup Toggle
  */
@@ -361,7 +436,7 @@ elm_toggle_state_set(Evas_Object *obj, Eina_Bool state)
 /**
  * Gets the state of the toggle to @p state.
  *
- * @param[in] obj The toggle object
+ * @param obj The toggle object
  * @return The state of @p obj
  *
  * @ingroup Toggle
@@ -378,8 +453,8 @@ elm_toggle_state_get(const Evas_Object *obj)
 /**
  * Sets the state pointer of the toggle to @p statep.
  *
- * @param[in] obj The toggle object
- * @param[in] statep The state pointer of @p obj
+ * @param obj The toggle object
+ * @param statep The state pointer of @p obj
  *
  * @ingroup Toggle
  */

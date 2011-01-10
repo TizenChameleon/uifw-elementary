@@ -60,12 +60,34 @@ static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 static void _signal_radio_on(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _on_focus_hook(void *data, Evas_Object *obj);
+static void _activate(Evas_Object *obj);
+static void _activate_hook(Evas_Object *obj);
+static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src,
+                             Evas_Callback_Type type, void *event_info);
 
 static const char SIG_CHANGED[] = "changed";
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
   {NULL, NULL}
 };
+
+static Eina_Bool
+_event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
+{
+   if (type != EVAS_CALLBACK_KEY_DOWN) return EINA_FALSE;
+   Evas_Event_Key_Down *ev = event_info;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return EINA_FALSE;
+   if (elm_widget_disabled_get(obj)) return EINA_FALSE;
+
+   if ((strcmp(ev->keyname, "Return")) &&
+       (strcmp(ev->keyname, "KP_Enter")) &&
+       (strcmp(ev->keyname, "space")))
+     return EINA_FALSE;
+   _activate(obj);
+   ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+   return EINA_TRUE;
+}
 
 static void
 _del_hook(Evas_Object *obj)
@@ -77,6 +99,23 @@ _del_hook(Evas_Object *obj)
    if (!wd->group->radios) free(wd->group);
    wd->group = NULL;
    free(wd);
+}
+
+static void
+_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (elm_widget_focus_get(obj))
+     {
+	edje_object_signal_emit(wd->radio, "elm,action,focus", "elm");
+	evas_object_focus_set(wd->radio, EINA_TRUE);
+     }
+   else
+     {
+	edje_object_signal_emit(wd->radio, "elm,action,unfocus", "elm");
+	evas_object_focus_set(wd->radio, EINA_FALSE);
+     }
 }
 
 static void
@@ -98,6 +137,11 @@ _theme_hook(Evas_Object *obj)
    else
      edje_object_signal_emit(wd->radio, "elm,state,text,hidden", "elm");
    edje_object_part_text_set(wd->radio, "elm.text", wd->label);
+   if (elm_widget_disabled_get(obj))
+     {
+        edje_object_signal_emit(wd->radio, "elm,state,disabled", "elm");
+        if (wd->state) _state_set(obj, 0);
+     }
    edje_object_message_signal_process(wd->radio);
    edje_object_scale_set(wd->radio, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
@@ -187,25 +231,37 @@ _state_set_all(Widget_Data *wd)
           }
 	else _state_set(child, 0);
      }
-   if (disabled && selected) _state_set(selected, 1);
+   if ((disabled) && (selected)) _state_set(selected, 1);
 }
 
 static void
-_signal_radio_on(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+_activate(Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (wd->group->value == wd->value) return;
    wd->group->value = wd->value;
    if (wd->group->valuep) *(wd->group->valuep) = wd->group->value;
    _state_set_all(wd);
-   evas_object_smart_callback_call(data, SIG_CHANGED, NULL);
+   evas_object_smart_callback_call(obj, SIG_CHANGED, NULL);
+}
+
+static void
+_activate_hook(Evas_Object *obj)
+{
+   _activate(obj);
+}
+
+static void
+_signal_radio_on(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   _activate(data);
 }
 
 /**
   * Add a new radio to the parent
   *
-  * @param[in] parent The parent object
+  * @param parent The parent object
   * @return The new object or NULL if it cannot be created
   *
   * @ingroup Radio
@@ -217,16 +273,23 @@ elm_radio_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "radio");
    elm_widget_type_set(obj, "radio");
    elm_widget_sub_object_add(parent, obj);
+   elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
+   elm_widget_can_focus_set(obj, EINA_TRUE);
+   elm_widget_activate_hook_set(obj, _activate_hook);
+   elm_widget_event_hook_set(obj, _event_hook);
 
    wd->radio = edje_object_add(e);
    _elm_theme_object_set(obj, wd->radio, "radio", "base", "default");
@@ -251,8 +314,8 @@ elm_radio_add(Evas_Object *parent)
 /**
  * Set the text label of the radio object
  *
- * @param[in] obj The radio object
- * @param[in] label The text label string in UTF-8
+ * @param obj The radio object
+ * @param label The text label string in UTF-8
  *
  * @ingroup Radio
  */
@@ -280,7 +343,7 @@ elm_radio_label_set(Evas_Object *obj, const char *label)
 /**
  * Get the text label of the radio object
  *
- * @param[in] obj The radio object
+ * @param obj The radio object
  * @return The text label string in UTF-8
  *
  * @ingroup Radio
@@ -298,9 +361,11 @@ elm_radio_label_get(const Evas_Object *obj)
  * Set the icon object of the radio object
  *
  * Once the icon object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_radio_icon_unset() function.
  *
- * @param[in] obj The radio object
- * @param[in] icon The icon object
+ * @param obj The radio object
+ * @param icon The icon object
  *
  * @ingroup Radio
  */
@@ -328,7 +393,7 @@ elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon)
 /**
  * Get the icon object of the radio object
  *
- * @param[in] obj The radio object
+ * @param obj The radio object
  * @return The icon object
  *
  * @ingroup Radio
@@ -343,6 +408,30 @@ elm_radio_icon_get(const Evas_Object *obj)
 }
 
 /**
+ * Unset the icon used for the radio object
+ *
+ * Unparent and return the icon object which was set for this widget.
+ *
+ * @param obj The radio object
+ * @return The icon object that was being used
+ *
+ * @ingroup Radio
+ */
+EAPI Evas_Object *
+elm_radio_icon_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (!wd->icon) return NULL;
+   Evas_Object *icon = wd->icon;
+   elm_widget_sub_object_del(obj, wd->icon);
+   edje_object_part_unswallow(wd->radio, wd->icon);
+   wd->icon = NULL;
+   return icon;
+}
+
+/**
  * Add this radio to a group of other radio objects
  *
  * Radio objects work in groups. Each member should have a different integer
@@ -350,8 +439,8 @@ elm_radio_icon_get(const Evas_Object *obj)
  * about eacthother. This adds the given radio object to the group of which
  * the group object indicated is a member.
  *
- * @param[in] obj The radio object
- * @param[in] group The object whose group the object is to join
+ * @param obj The radio object
+ * @param group The object whose group the object is to join
  *
  * @ingroup Radio
  */
@@ -387,8 +476,8 @@ elm_radio_group_add(Evas_Object *obj, Evas_Object *group)
  *
  * This sets the value of the radio.
  *
- * @param[in] obj The radio object
- * @param[in] value The value to use if this radio object is selected
+ * @param obj The radio object
+ * @param value The value to use if this radio object is selected
  *
  * @ingroup Radio
  */
@@ -404,13 +493,32 @@ elm_radio_state_value_set(Evas_Object *obj, int value)
 }
 
 /**
+ * Get the integer value that this radio object represents
+ *
+ * This gets the value of the radio.
+ *
+ * @param obj The radio object
+ * @return The value used if this radio object is selected
+ *
+ * @ingroup Radio
+ */
+EAPI int
+elm_radio_state_value_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return 0;
+   return wd->value;
+}
+
+/**
  * Set the value of the radio.
  *
  * This sets the value of the radio group and will also set the value if
  * pointed to, to the value supplied, but will not call any callbacks.
  *
- * @param[in] obj The radio object
- * @param[in] value The value to use for the group
+ * @param obj The radio object
+ * @param value The value to use for the group
  *
  * @ingroup Radio
  */
@@ -429,7 +537,7 @@ elm_radio_value_set(Evas_Object *obj, int value)
 /**
  * Get the state of the radio object
  *
- * @param[in] obj The radio object
+ * @param obj The radio object
  * @return The integer state
  *
  * @ingroup Radio
@@ -453,8 +561,8 @@ elm_radio_value_get(const Evas_Object *obj)
  * reflect the value of the integer valuep points to, just like calling
  * elm_radio_value_set().
  *
- * @param[in] obj The radio object
- * @param[in] valuep Pointer to the integer to modify
+ * @param obj The radio object
+ * @param valuep Pointer to the integer to modify
  *
  * @ingroup Radio
  */

@@ -3,7 +3,6 @@
 
 /**
  * @defgroup Anchorview Anchorview
- * @ingroup Elementary
  *
  * This is just like the Anchorblock object, but provides a scroller to hold
  * the text automatically.
@@ -175,8 +174,11 @@ elm_anchorview_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "anchorview");
    elm_widget_type_set(obj, "anchorview");
@@ -184,6 +186,7 @@ elm_anchorview_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
    elm_widget_del_hook_set(obj, _del_hook);
+   elm_widget_can_focus_set(obj, EINA_TRUE);
 
    wd->scroller = elm_scroller_add(parent);
    elm_widget_resize_object_set(obj, wd->scroller);
@@ -283,6 +286,26 @@ elm_anchorview_hover_parent_set(Evas_Object *obj, Evas_Object *parent)
 }
 
 /**
+  * Get the parent of the hover popup
+  *
+  * This gets the parent of the hover that anchorview will created. See hover
+  * objects for more information on this.
+  *
+  * @param obj The anchorview object
+  * @return The parent used by hover
+  *
+  * @ingroup Anchorview
+  */
+EAPI Evas_Object *
+elm_anchorview_hover_parent_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->hover_parent;
+}
+
+/**
   * Set the style that the hover should use
   *
   * This sets the style for the hover that anchorview will create. See hover
@@ -300,6 +323,26 @@ elm_anchorview_hover_style_set(Evas_Object *obj, const char *style)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    eina_stringshare_replace(&wd->hover_style, style);
+}
+
+/**
+ * Get the style that the hover should use
+ *
+ * This gets the style for the hover that anchorview will create. See hover
+ * objects for more information
+ *
+ * @param obj The anchorview object
+ * @return The style defined
+ *
+ * @ingroup Anchorview
+ */
+EAPI const char *
+elm_anchorview_hover_style_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->hover_style;
 }
 
 /**
@@ -345,6 +388,24 @@ elm_anchorview_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_boun
 }
 
 /**
+ * Get the bounce mode
+ *
+ * @param obj The Anchorview object
+ * @param h_bounce Allow bounce horizontally
+ * @param v_bounce Allow bounce vertically
+ *
+ * @ingroup Anchorview
+ */
+EAPI void
+elm_anchorview_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_scroller_bounce_get(wd->scroller, h_bounce, v_bounce);
+}
+
+/**
  * This appends a custom item provider to the list for that anchorview
  *
  * This appends the given callback. The list is walked from beginning to end
@@ -366,7 +427,7 @@ elm_anchorview_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (void
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (!func) return;
+   EINA_SAFETY_ON_NULL_RETURN(func);
    Elm_Anchorview_Item_Provider *ip = calloc(1, sizeof(Elm_Anchorview_Item_Provider));
    if (!ip) return;
    ip->func = func;
@@ -392,7 +453,7 @@ elm_anchorview_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (voi
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (!func) return;
+   EINA_SAFETY_ON_NULL_RETURN(func);
    Elm_Anchorview_Item_Provider *ip = calloc(1, sizeof(Elm_Anchorview_Item_Provider));
    if (!ip) return;
    ip->func = func;
@@ -420,7 +481,7 @@ elm_anchorview_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (void
    Eina_List *l;
    Elm_Anchorview_Item_Provider *ip;
    if (!wd) return;
-   if (!func) return;
+   EINA_SAFETY_ON_NULL_RETURN(func);
    EINA_LIST_FOREACH(wd->item_providers, l, ip)
      {
         if ((ip->func == func) && (ip->data == data))

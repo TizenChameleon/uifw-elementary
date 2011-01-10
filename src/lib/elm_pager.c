@@ -6,9 +6,9 @@
  * @ingroup Elementary
  *
  * The pager is an object that allows flipping (with animation) between 1 or
- * more ?�pages??of objects, much like a stack of windows within the window.
+ * more “pages” of objects, much like a stack of windows within the window.
  *
- * Objects can be pushed or popped from he stack or deleted as normal.
+ * Objects can be pushed or popped from the stack or deleted as normal.
  * Pushes and pops will animate (and a pop will delete the object once the
  * animation is finished). Any object in the pager can be promoted to the top
  * (from its current stacking position) as well. Objects are pushed to the
@@ -71,6 +71,20 @@ _theme_hook(Evas_Object *obj)
    _sizing_eval(obj);
 }
 
+static Eina_Bool
+_elm_pager_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *cur;
+
+   if ((!wd) || (!wd->top))
+     return EINA_FALSE;
+
+   cur = wd->top->content;
+
+   /* Try Focus cycle in subitem */
+   return elm_widget_focus_next_get(cur, dir, next);
+}
 
 static void
 _sizing_eval(Evas_Object *obj)
@@ -82,8 +96,8 @@ _sizing_eval(Evas_Object *obj)
    if (!wd) return;
    EINA_LIST_FOREACH(wd->stack, l, it)
      {
-        if (it->minw > minw) minw = it->minw;
-        if (it->minh > minh) minh = it->minh;
+	if (it->minw > minw) minw = it->minw;
+	if (it->minh > minh) minh = it->minh;
      }
    evas_object_size_hint_min_set(obj, minw, minh);
    evas_object_size_hint_max_set(obj, -1, -1);
@@ -157,12 +171,12 @@ _eval_top(Evas_Object *obj)
           }
         else
           edje_object_signal_emit(o, "elm,action,push", "elm");
-        onshow = edje_object_data_get(o, "onshow");
-        if (onshow)
-          {
-             if (!strcmp(onshow, "raise")) evas_object_raise(o);
-             else if (!strcmp(onshow, "lower")) evas_object_lower(o);
-          }
+	onshow = edje_object_data_get(o, "onshow");
+	if (onshow)
+	  {
+	     if (!strcmp(onshow, "raise")) evas_object_raise(o);
+	     else if (!strcmp(onshow, "lower")) evas_object_lower(o);
+	  }
      }
 }
 
@@ -189,16 +203,16 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
    if (!wd) return;
    EINA_LIST_FOREACH(wd->stack, l, it)
      {
-        if (it->content == sub)
-          {
-             wd->stack = eina_list_remove_list(wd->stack, l);
-             evas_object_event_callback_del_full
+	if (it->content == sub)
+	  {
+	     wd->stack = eina_list_remove_list(wd->stack, l);
+	     evas_object_event_callback_del_full
                (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
-             evas_object_del(it->base);
-             _eval_top(it->obj);
-             free(it);
-             return;
-          }
+	     evas_object_del(it->base);
+	     _eval_top(it->obj);
+	     free(it);
+	     return;
+	  }
      }
 }
 
@@ -242,9 +256,12 @@ elm_pager_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-   
+
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "pager");
    elm_widget_type_set(obj, "pager");
@@ -252,22 +269,23 @@ elm_pager_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_focus_next_hook_set(obj, _elm_pager_focus_next_hook);
    elm_widget_can_focus_set(obj, EINA_FALSE);
-   
+
    wd->clip = evas_object_rectangle_add(e);
    elm_widget_resize_object_set(obj, wd->clip);
    elm_widget_sub_object_add(obj, wd->clip);
-   
+
    wd->rect = evas_object_rectangle_add(e);
    elm_widget_sub_object_add(obj, wd->rect);
    evas_object_color_set(wd->rect, 255, 255, 255, 0); 
    evas_object_clip_set(wd->rect, wd->clip);
-   
+
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
-   
+
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-   
+
    _sizing_eval(obj);
    return obj;
 }
@@ -342,28 +360,28 @@ elm_pager_content_pop(Evas_Object *obj)
    ll = eina_list_last(wd->stack);
    if (ll)
      {
-        ll = ll->prev;
-        if (!ll)
-          {
-             Evas_Object *o;
-             const char *onhide;
-             
-             wd->top = it;
-             o = wd->top->base;
-             edje_object_signal_emit(o, "elm,action,pop", "elm");
-             onhide = edje_object_data_get(o, "onhide");
-             if (onhide)
-               {
-                  if (!strcmp(onhide, "raise")) evas_object_raise(o);
-                  else if (!strcmp(onhide, "lower")) evas_object_lower(o);
-               }
-             wd->top = NULL;
-          }
-        else
-          {
-             it = ll->data;
-             elm_pager_content_promote(obj, it->content);
-          }
+	ll = ll->prev;
+	if (!ll)
+	  {
+	     Evas_Object *o;
+	     const char *onhide;
+
+	     wd->top = it;
+	     o = wd->top->base;
+	     edje_object_signal_emit(o, "elm,action,pop", "elm");
+	     onhide = edje_object_data_get(o, "onhide");
+	     if (onhide)
+	       {
+		  if (!strcmp(onhide, "raise")) evas_object_raise(o);
+		  else if (!strcmp(onhide, "lower")) evas_object_lower(o);
+	       }
+	     wd->top = NULL;
+	  }
+	else
+	  {
+	     it = ll->data;
+	     elm_pager_content_promote(obj, it->content);
+	  }
      }
 }
 
@@ -438,13 +456,13 @@ elm_pager_content_promote(Evas_Object *obj, Evas_Object *content)
    if (!wd) return;
    EINA_LIST_FOREACH(wd->stack, l, it)
      {
-        if (it->content == content)
-          {
-             wd->stack = eina_list_remove_list(wd->stack, l);
-             wd->stack = eina_list_append(wd->stack, it);
-             _eval_top(obj);
-             return;
-          }
+	if (it->content == content)
+	  {
+	     wd->stack = eina_list_remove_list(wd->stack, l);
+	     wd->stack = eina_list_append(wd->stack, it);
+	     _eval_top(obj);
+	     return;
+	  }
      }
 }
 
@@ -495,11 +513,9 @@ elm_pager_content_top_get(const Evas_Object *obj)
  * @ingroup Pager
  */
 EAPI void
-elm_pager_animation_disable_set(Evas_Object *obj, Eina_Bool disable)
+elm_pager_animation_disabled_set(Evas_Object *obj, Eina_Bool disable)
 {
    ELM_CHECK_WIDTYPE(obj, widtype)NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    wd->disable_animation = disable;
 }
-
-

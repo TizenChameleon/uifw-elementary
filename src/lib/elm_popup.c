@@ -719,14 +719,14 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
  * @ingroup Popup
  */
 EAPI void 
-elm_popup_timeout_set(Evas_Object *obj, int timeout)
+elm_popup_timeout_set(Evas_Object *obj, double timeout)
 {  
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    
    if (!wd) return;  
    elm_notify_timeout_set(wd->notify, timeout);
-   evas_object_smart_callback_add(wd->notify, "notify,timeout", _elm_popup_timeout, obj);
+   evas_object_smart_callback_add(wd->notify, "timeout", _elm_popup_timeout, obj);
 }
 
 /**

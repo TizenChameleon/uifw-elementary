@@ -3,6 +3,7 @@
 typedef struct _Elm_Params_fileselector_button
 {
    Elm_Params base;
+   const char *label;
    Evas_Object *icon;
 
    struct {
@@ -27,10 +28,10 @@ external_fileselector_button_state_set(void *data __UNUSED__, Evas_Object *obj, 
    else if (from_params) p = from_params;
    else return;
 
-   if (p->base.label)
-     elm_fileselector_button_label_set(obj, p->base.label);
+   if (p->label)
+     elm_fileselector_button_label_set(obj, p->label);
    if (p->icon) elm_fileselector_button_icon_set(obj, p->icon);
-   if (p->fs.path) elm_fileselector_button_selected_set(obj, p->fs.path);
+   if (p->fs.path) elm_fileselector_button_path_set(obj, p->fs.path);
    if (p->fs.is_save_set)
      elm_fileselector_button_is_save_set(obj, p->fs.is_save);
    if (p->fs.folder_only_set)
@@ -66,7 +67,7 @@ external_fileselector_button_param_set(void *data __UNUSED__, Evas_Object *obj, 
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
 	  {
-	     elm_fileselector_button_selected_set(obj, param->s);
+	     elm_fileselector_button_path_set(obj, param->s);
 	     return EINA_TRUE;
 	  }
      }
@@ -129,7 +130,7 @@ external_fileselector_button_param_get(void *data __UNUSED__, const Evas_Object 
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
 	  {
-	     param->s = elm_fileselector_button_selected_get(obj);
+	     param->s = elm_fileselector_button_path_get(obj);
 	     return EINA_TRUE;
 	  }
      }
@@ -173,14 +174,13 @@ external_fileselector_button_param_get(void *data __UNUSED__, const Evas_Object 
 }
 
 static void *
-external_fileselector_button_params_parse(void *data, Evas_Object *obj, const Eina_List *params)
+external_fileselector_button_params_parse(void *data __UNUSED__, Evas_Object *obj, const Eina_List *params)
 {
    Elm_Params_fileselector_button *mem;
    Edje_External_Param *param;
    const Eina_List *l;
 
-   mem = external_common_params_parse(Elm_Params_fileselector_button,
-				      data, obj, params);
+   mem = calloc(1, sizeof(Elm_Params_fileselector_button));
    if (!mem)
      return NULL;
 
@@ -210,15 +210,17 @@ external_fileselector_button_params_parse(void *data, Evas_Object *obj, const Ei
 	     mem->fs.inwin_mode = !!param->i;
 	     mem->fs.inwin_mode_set = EINA_TRUE;
 	  }
+	else if (!strcmp(param->name, "label"))
+	  mem->label = eina_stringshare_add(param->s);
      }
 
    return mem;
 }
 
 static Evas_Object *external_fileselector_button_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
@@ -229,11 +231,14 @@ external_fileselector_button_params_free(void *params)
 
    if (mem->fs.path)
      eina_stringshare_del(mem->fs.path);
-   external_common_params_free(params);
+   if (mem->label)
+      eina_stringshare_del(mem->label);
+   free(params);
 }
 
 static Edje_External_Param_Info external_fileselector_button_params[] = {
    DEFINE_EXTERNAL_COMMON_PARAMS,
+   EDJE_EXTERNAL_PARAM_INFO_STRING("label"),
    EDJE_EXTERNAL_PARAM_INFO_STRING("icon"),
    EDJE_EXTERNAL_PARAM_INFO_STRING("path"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("save"),

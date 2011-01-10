@@ -8,7 +8,7 @@ Elm_Smart_Scroller_Policy;
 
 Evas_Object *elm_smart_scroller_add             (Evas *evas);
 void elm_smart_scroller_child_set               (Evas_Object *obj, Evas_Object *child);
-void elm_smart_scroller_extern_pan_set          (Evas_Object *obj, Evas_Object *pan, void (*pan_set) (Evas_Object *obj, Evas_Coord x, Evas_Coord y), void (*pan_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y), void (*pan_max_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y), void (*pan_child_size_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y));
+void elm_smart_scroller_extern_pan_set          (Evas_Object *obj, Evas_Object *pan, void (*pan_set) (Evas_Object *obj, Evas_Coord x, Evas_Coord y), void (*pan_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y), void (*pan_max_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y), void (*pan_min_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y), void (*pan_child_size_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y));
 void elm_smart_scroller_custom_edje_file_set    (Evas_Object *obj, char *file, char *group);
 void elm_smart_scroller_child_pos_set           (Evas_Object *obj, Evas_Coord x, Evas_Coord y);
 void elm_smart_scroller_child_pos_get           (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
@@ -29,8 +29,10 @@ void elm_smart_scroller_freeze_set              (Evas_Object *obj, Eina_Bool fre
 void elm_smart_scroller_bounce_allow_set        (Evas_Object *obj, Eina_Bool horiz, Eina_Bool vert);
 void elm_smart_scroller_bounce_allow_get        (const Evas_Object *obj, Eina_Bool *horiz, Eina_Bool *vert);
 void elm_smart_scroller_paging_set              (Evas_Object *obj, double pagerel_h, double pagerel_v, Evas_Coord pagesize_h, Evas_Coord pagesize_v);
+void elm_smart_scroller_paging_get              (Evas_Object *obj, double *pagerel_h, double *pagerel_v, Evas_Coord *pagesize_h, Evas_Coord *pagesize_v);
 void elm_smart_scroller_region_bring_in         (Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
 void elm_smart_scroller_widget_set              (Evas_Object *obj, Evas_Object *wid);
-void elm_smart_scroller_page_move_set           (Evas_Object *obj, Eina_Bool set);
-void elm_smart_scroller_freeze_momentum_animator_set(Evas_Object *obj, Eina_Bool freeze);
-void elm_smart_scroller_freeze_bounce_animator_set(Evas_Object *obj, Eina_Bool freeze);
+Eina_Bool elm_smart_scroller_momentum_animator_disabled_get   (Evas_Object *obj);
+void elm_smart_scroller_momentum_animator_disabled_set             (Evas_Object *obj, Eina_Bool disabled);
+void elm_smart_scroller_bounce_animator_disabled_set               (Evas_Object *obj, Eina_Bool disabled);
+Eina_Bool elm_smart_scroller_bounce_animator_disabled_get     (Evas_Object *obj);

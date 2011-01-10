@@ -657,7 +657,7 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, inwin_dialogs_enable, T_UCHAR);
    ELM_CONFIG_VAL(D, T, icon_size, T_INT);
    ELM_CONFIG_VAL(D, T, longpress_timeout, T_DOUBLE);
-   ELM_CONFIG_VAL(D, T, password_show_last_character, T_INT);
+   ELM_CONFIG_VAL(D, T, password_show_last_character, T_UCHAR);
 #undef T
 #undef D
 #undef T_INT
@@ -1200,7 +1200,7 @@ _config_load(void)
    _elm_config->inwin_dialogs_enable = EINA_FALSE;
    _elm_config->icon_size = 32;
    _elm_config->longpress_timeout = 1.0;
-   _elm_config->password_show_last_character = 0;
+   _elm_config->password_show_last_character = EINA_FALSE;
 }
 
 static const char *
@@ -1583,7 +1583,7 @@ _env_get(void)
    if (s) _elm_config->finger_size = atoi(s);
 
    s = getenv("ELM_PASSWORD_SHOW_LAST_CHARACTER");
-   if (s) _elm_config->password_show_last_character = atoi(s);
+   if (s) _elm_config->password_show_last_character = !!atoi(s);
 
    s = getenv("ELM_FPS");
    if (s) _elm_config->fps = atof(s);

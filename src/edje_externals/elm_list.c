@@ -58,7 +58,7 @@ external_list_state_set(void *data __UNUSED__, Evas_Object *obj, const void *fro
 					     p->horizontal_mode);
 
 	if (set != ELM_LIST_LAST)
-	   elm_list_horizontal_mode_set(obj, set);
+	   elm_list_mode_set(obj, set);
      }
 
    if ((p->policy_h) && (p->policy_v))
@@ -97,7 +97,7 @@ external_list_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Exte
 	  {
 	     Elm_List_Mode set = _list_horizontal_mode_setting_get(param->s);
 	     if (set == ELM_LIST_LAST) return EINA_FALSE;
-	     elm_list_horizontal_mode_set(obj, set);
+	     elm_list_mode_set(obj, set);
 	     return EINA_TRUE;
 	  }
      }
@@ -193,7 +193,7 @@ external_list_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_Exte
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_CHOICE)
 	  {
-	     Elm_List_Mode m = elm_list_horizontal_mode_get(obj);
+	     Elm_List_Mode m = elm_list_mode_get(obj);
 
 	     if (m == ELM_LIST_LAST)
 	       return EINA_FALSE;

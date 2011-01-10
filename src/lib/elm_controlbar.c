@@ -2016,7 +2016,7 @@ create_more_view(Widget_Data *wd)
    Evas_Object *icon;
 
    list = elm_list_add( wd->object );
-   elm_list_horizontal_mode_set( list, ELM_LIST_COMPRESS );
+   elm_list_mode_set( list, ELM_LIST_COMPRESS );
 
    EINA_LIST_FOREACH(wd->items, l, item)
      {
@@ -3079,13 +3079,10 @@ EAPI void
 elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label) 
 {
    if (it == NULL) return;
-   if(it->text) eina_stringshare_del(it->text);
-   if(it->label) evas_object_del(it->label);
    it->text = eina_stringshare_add(label);
    it->label = create_item_label(it->base_item, it, "elm.swallow.text");
-   if(it->disable) item_color_set(it, "elm.item.disable.color");
    //   it->edit_label = create_item_label(it->edit_item, it, "elm.swallow.text");
-   
+
    if(it->label && it->icon){
         edje_object_signal_emit(_EDJ(it->base_item), "elm,state,icon_text", "elm");
         elm_label_line_wrap_set(it->label, EINA_FALSE);

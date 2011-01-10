@@ -9,9 +9,8 @@ struct _Elm_Params_Notify {
 	Evas_Object *content; /* part name whose obj is to be set as content */
 	Eina_Bool repeat_events_exists;
 	Eina_Bool repeat_events;
-	Eina_Bool timer_init;
 	Eina_Bool timeout_exists;
-	int timeout;
+	double timeout;
 
 	const char *orient;
 };
@@ -38,7 +37,7 @@ static Elm_Notify_Orient _orient_get(const char *orient)
 	  ELM_NOTIFY_ORIENT_LAST + 1);
 
    for (i = 0; i < sizeof(orients); i++)
-     if (strcmp(orient, orients[i]) == 0) return i;
+     if (!strcmp(orient, orients[i])) return i;
 
    return ELM_NOTIFY_ORIENT_LAST;
 }
@@ -56,13 +55,10 @@ static void external_notify_state_set(void *data __UNUSED__,
 	if (p->content) {
 		elm_notify_content_set(obj, p->content);
 	}
-	if(p->repeat_events_exists)
+	if (p->repeat_events_exists)
 		elm_notify_repeat_events_set(obj, p->repeat_events);
-	if(p->timeout_exists)
+	if (p->timeout_exists)
 		elm_notify_timeout_set(obj, p->timeout);
-	if(p->timer_init)
-		elm_notify_timer_init(obj);
-
 	if (p->orient)
 	{
 		Elm_Notify_Orient set = _orient_get(p->orient);
@@ -74,8 +70,8 @@ static void external_notify_state_set(void *data __UNUSED__,
 static Eina_Bool external_notify_param_set(void *data __UNUSED__,
 		Evas_Object *obj, const Edje_External_Param *param)
 {
-	if (!strcmp(param->name, "content")
-			&& param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
+	if ((!strcmp(param->name, "content"))
+			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING))
 	{
 		Evas_Object *content = external_common_param_edje_object_get(obj, param);
 		if ((strcmp(param->s, "")) && (!content))
@@ -83,26 +79,20 @@ static Eina_Bool external_notify_param_set(void *data __UNUSED__,
 		elm_notify_content_set(obj, content);
 		return EINA_TRUE;
 	}
-	else if (!strcmp(param->name, "repeat_events")
-			&& param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	else if ((!strcmp(param->name, "repeat_events"))
+			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
 	{
 		elm_notify_repeat_events_set(obj, param->i);
 		return EINA_TRUE;
 	}
-	else if (!strcmp(param->name, "timer_init")
-			&& param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	else if ((!strcmp(param->name, "timeout"))
+			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE))
 	{
-		elm_notify_timer_init(obj);
+		elm_notify_timeout_set(obj, param->d);
 		return EINA_TRUE;
 	}
-	else if (!strcmp(param->name, "timeout")
-			&& param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	{
-		elm_notify_timeout_set(obj, param->i);
-		return EINA_TRUE;
-	}
-	else if (!strcmp(param->name, "orient")
-			&& param->type == EDJE_EXTERNAL_PARAM_TYPE_CHOICE)
+	else if ((!strcmp(param->name, "orient"))
+			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_CHOICE))
 	{
 		Elm_Notify_Orient set = _orient_get(param->s);
 		if (set == ELM_NOTIFY_ORIENT_LAST) return EINA_FALSE;
@@ -124,20 +114,20 @@ static Eina_Bool external_notify_param_get(void *data __UNUSED__,
 		/* not easy to get content name back from live object */
 		return EINA_FALSE;
 	}
-	else if (!strcmp(param->name, "repeat_events")
-			&& param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	else if ((!strcmp(param->name, "repeat_events"))
+			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
 	{
 		param->i = elm_notify_repeat_events_get(obj);
 		return EINA_TRUE;
 	}
-	else if (!strcmp(param->name, "timeout")
-			&& param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+	else if ((!strcmp(param->name, "timeout"))
+			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE))
 	{
-		param->i = elm_notify_timeout_get(obj);
+		param->d = elm_notify_timeout_get(obj);
 		return EINA_TRUE;
 	}
-	else if (!strcmp(param->name, "orient")
-			&& param->type == EDJE_EXTERNAL_PARAM_TYPE_CHOICE)
+	else if ((!strcmp(param->name, "orient"))
+			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_CHOICE))
 	{
 		Elm_Notify_Orient set = elm_notify_orient_get(obj);
 		if (set == ELM_NOTIFY_ORIENT_LAST) return EINA_FALSE;
@@ -151,13 +141,13 @@ static Eina_Bool external_notify_param_get(void *data __UNUSED__,
 	return EINA_FALSE;
 }
 
-static void * external_notify_params_parse(void *data, Evas_Object *obj,
+static void * external_notify_params_parse(void *data __UNUSED__, Evas_Object *obj,
 		const Eina_List *params) {
 	Elm_Params_Notify *mem;
 	Edje_External_Param *param;
 	const Eina_List *l;
 
-	mem = external_common_params_parse(Elm_Params_Notify, data, obj, params);
+        mem = calloc(1, sizeof(Elm_Params_Notify));
 	if (!mem)
 		return NULL;
 
@@ -167,12 +157,8 @@ static void * external_notify_params_parse(void *data, Evas_Object *obj,
 			mem->content = external_common_param_edje_object_get(obj, param);
 		else if (!strcmp(param->name, "timeout"))
 		{
-			mem->timeout = param->i;
+			mem->timeout = param->d;
 			mem->timeout_exists = EINA_TRUE;
-		}
-		else if (!strcmp(param->name, "timer_init") && param->i > 0)
-		{
-			mem->timer_init = EINA_TRUE;
 		}
 		else if (!strcmp(param->name, "repeat_events"))
 		{
@@ -197,15 +183,14 @@ static Evas_Object *external_notify_content_get(void *data __UNUSED__,
 }
 
 static void external_notify_params_free(void *params) {
-	external_common_params_free(params);
+	free(params);
 }
 
 static Edje_External_Param_Info external_notify_params[] = {
 		DEFINE_EXTERNAL_COMMON_PARAMS,
 		EDJE_EXTERNAL_PARAM_INFO_STRING("content"),
 		EDJE_EXTERNAL_PARAM_INFO_BOOL("repeat_events"),
-		EDJE_EXTERNAL_PARAM_INFO_INT("timeout"),
-		EDJE_EXTERNAL_PARAM_INFO_BOOL("timer_init"),
+		EDJE_EXTERNAL_PARAM_INFO_DOUBLE("timeout"),
 		EDJE_EXTERNAL_PARAM_INFO_SENTINEL
 };
 
