@@ -5,12 +5,14 @@ EDJE_CC = @edje_cc@
 EDJE_FLAGS = -v -id $(top_srcdir)/data/themes -fd $(top_srcdir)/data/themes
 
 filesdir = $(datadir)/elementary/themes
-files_DATA = default.edj
+files_DATA = default.edj default-desktop.edj
 
 EXTRA_DIST = \
 default.edc \
+default-desktop.edc \
 arrow_down.png \
 arrow_up.png \
+bar_shine.png \
 bt_base1.png \
 bt_base2.png \
 bt_bases.png \
@@ -57,6 +59,8 @@ flip_base_shad.png \
 flip_pmb.png \
 flip_pmt.png \
 flip_shad.png \
+flip_t.png \
+flip_b.png \
 head.png \
 sb_runnerh.png \
 sb_runnerv.png \
@@ -103,13 +107,17 @@ icon_refresh.png \
 icon_folder.png \
 icon_file.png \
 ilist_1.png \
+ilist_1_h.png \
 ilist_2.png \
+ilist_2_h.png \
 ilist_item_shadow.png \
+ilist_item_shadow_h.png \
 sl_bg.png \
 sl_bg_over.png \
 sl_bt_0.png \
 sl_bt_1.png \
 sl_bt_2.png \
+sl_bt_3.png \
 sl_bt2_0_0.png \
 sl_bt2_0_1.png \
 sl_bt2_0_2.png \
@@ -189,12 +197,36 @@ emo-wtf.png \
 map_item.png \
 map_item_2.png \
 shadow.png \
-black.png
+black.png \
+tooltip-corner-top-left-tip.png \
+tooltip-base.png \
+tooltip-corner-bottom-left-tip.png \
+tooltip-edge-top-tip.png \
+tooltip-corner-bottom-right-tip.png \
+tooltip-edge-left-tip.png \
+tooltip-edge-bottom-tip.png \
+tooltip-edge-right-tip.png \
+tooltip-corner-top-right-tip.png \
+color_picker_alpha.png \
+color_picker_alpha_bg.png \
+color_picker_brightness.png \
+color_picker_color.png \
+color_picker_opacity.png \
+icon_arrow_down_left.png \
+icon_arrow_down_right.png \
+icon_arrow_up_left.png \
+icon_arrow_up_right.png \
+thumb_shadow.png
 
 default.edj: Makefile $(EXTRA_DIST)
 	$(EDJE_CC) $(EDJE_FLAGS) \
 	$(top_srcdir)/data/themes/default.edc \
 	$(top_builddir)/data/themes/default.edj
+
+default-desktop.edj: Makefile $(EXTRA_DIST)
+	$(EDJE_CC) $(EDJE_FLAGS) \
+	$(top_srcdir)/data/themes/default-desktop.edc \
+	$(top_builddir)/data/themes/default-desktop.edj
 
 clean-local:
 	rm -f *.edj

@@ -29,8 +29,7 @@ lib_LTLIBRARIES = libelementary.la
 includes_HEADERS = \
 Elementary.h \
 Elementary_Cursor.h \
-elm_widget.h \
-elm_priv.h
+elm_widget.h
 includesdir = $(includedir)/elementary-@VMAJ@
 
 libelementary_la_SOURCES = \
@@ -94,7 +93,6 @@ elm_thumb.c \
 elm_config.c \
 elm_titlebar.c \
 elm_popup.c \
-elm_diskcontroller.c \
 elm_tab.c \
 elm_navigationbar.c \
 elm_navigationbar_ex.c\
@@ -102,6 +100,7 @@ elm_tabbar.c \
 elm_transit.c \
 elm_animator.c \
 elm_editfield.c \
+elm_diskselector.c \
 elm_colorpicker.c \
 elm_colorselector.c \
 elm_colorpalette.c \

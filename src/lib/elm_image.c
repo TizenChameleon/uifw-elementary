@@ -115,8 +115,11 @@ elm_image_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "image");
    elm_widget_type_set(obj, "image");
@@ -125,12 +128,12 @@ elm_image_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
-   elm_widget_can_focus_set(obj, 0);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
 
    wd->img = _els_smart_icon_add(e);
    evas_object_event_callback_add(wd->img, EVAS_CALLBACK_MOUSE_UP,
 				  _mouse_up, obj);
-   evas_object_repeat_events_set(wd->img, 1);
+   evas_object_repeat_events_set(wd->img, EINA_TRUE);
    elm_widget_resize_object_set(obj, wd->img);
 
    wd->smooth = EINA_TRUE;
@@ -162,13 +165,32 @@ elm_image_file_set(Evas_Object *obj, const char *file, const char *group)
    Eina_Bool ret;
    const char *p;
 
-   if ((!wd) || (!file)) return EINA_FALSE;
+   if (!wd) return EINA_FALSE;
+   EINA_SAFETY_ON_NULL_RETURN_VAL(file, EINA_FALSE);
    if (((p = strrchr(file, '.'))) && (!strcasecmp(p, ".edj")))
      ret = _els_smart_icon_file_edje_set(wd->img, file, group);
    else
      ret = _els_smart_icon_file_key_set(wd->img, file, group);
    _sizing_eval(obj);
    return ret;
+}
+
+/**
+ * Get the file that will be used as image
+ *
+ * @param obj The image object
+ * @param file The path to file
+ * @param group The group that the image belongs in edje file
+ *
+ * @ingroup Image
+ */
+EAPI void
+elm_image_file_get(const Evas_Object *obj, const char **file, const char **group)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _els_smart_icon_file_get(wd->img, file, group);
 }
 
 /**
@@ -189,6 +211,24 @@ elm_image_smooth_set(Evas_Object *obj, Eina_Bool smooth)
    if (!wd) return;
    wd->smooth = smooth;
    _sizing_eval(obj);
+}
+
+/**
+ * Get the smooth effect for a image
+ *
+ * @param obj The image object
+ * @return If setted smooth effect
+ *
+ * @ingroup Image
+ */
+EAPI Eina_Bool
+elm_image_smooth_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return EINA_FALSE;
+   return wd->smooth;
 }
 
 /**
@@ -234,6 +274,23 @@ elm_image_no_scale_set(Evas_Object *obj, Eina_Bool no_scale)
 }
 
 /**
+ * Get if the object isn't scalable
+ *
+ * @param obj The image object
+ * @return If isn't scalable
+ *
+ * @ingroup Image
+ */
+EAPI Eina_Bool
+elm_image_no_scale_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return wd->no_scale;
+}
+
+/**
  * Set if the object is (up/down) scalable
  *
  * @param obj The image object
@@ -252,6 +309,25 @@ elm_image_scale_set(Evas_Object *obj, Eina_Bool scale_up, Eina_Bool scale_down)
    wd->scale_up = scale_up;
    wd->scale_down = scale_down;
    _sizing_eval(obj);
+}
+
+/**
+ * Get if the object is (up/down) scalable
+ *
+ * @param obj The image object
+ * @param scale_up A bool to set if the object is scalable up
+ * @param scale_down A bool to set if the object is scalable down
+ *
+ * @ingroup Image
+ */
+EAPI void
+elm_image_scale_get(const Evas_Object *obj, Eina_Bool *scale_up, Eina_Bool *scale_down)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (scale_up) *scale_up = wd->scale_up;
+   if (scale_down) *scale_down = wd->scale_down;
 }
 
 /**
@@ -275,6 +351,24 @@ elm_image_fill_outside_set(Evas_Object *obj, Eina_Bool fill_outside)
 }
 
 /**
+ * Get if the object is filled outside
+ *
+ * @param obj The image object
+ * @return If the object is filled outside
+ *
+ * @ingroup Image
+ */
+EAPI Eina_Bool
+elm_image_fill_outside_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return EINA_FALSE;
+   return wd->fill_outside;
+}
+
+/**
  * Set the prescale size for the image
  *
  * @param obj The image object
@@ -290,6 +384,24 @@ elm_image_prescale_set(Evas_Object *obj, int size)
 
    if (!wd) return;
    _els_smart_icon_scale_size_set(wd->img, size);
+}
+
+/**
+ * Get the prescale size for the image
+ *
+ * @param obj The image object
+ * @return The prescale size
+ *
+ * @ingroup Image
+ */
+EAPI int
+elm_image_prescale_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return 0;
+   return _els_smart_icon_scale_size_get(wd->img);
 }
 
 /**
@@ -315,6 +427,27 @@ elm_image_orient_set(Evas_Object *obj, Elm_Image_Orient orient)
 }
 
 /**
+ * Get the image orient
+ *
+ * @param obj The image object
+ * @return The image orient
+ * (ELM_IMAGE_ORIENT_NONE, ELM_IMAGE_ROTATE_90_CW,
+ *  ELM_IMAGE_ROTATE_180_CW, ELM_IMAGE_ROTATE_90_CCW,
+ *  ELM_IMAGE_FLIP_HORIZONTAL,ELM_IMAGE_FLIP_VERTICAL,
+ *  ELM_IMAGE_FLIP_TRANSPOSE, ELM_IMAGE_FLIP_TRANSVERSE)
+ *
+ * @ingroup Image
+ */
+EAPI Elm_Image_Orient
+elm_image_orient_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_IMAGE_ORIENT_NONE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return ELM_IMAGE_ORIENT_NONE;
+   return _els_smart_icon_orient_get(wd->img);
+}
+
+/**
  * Make the image 'editable'.
  *
  * This means the image is a valid drag target for drag and drop, and can be
@@ -329,8 +462,26 @@ elm_image_editable_set(Evas_Object *obj, Eina_Bool set)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if (!wd) return;;
+   if (!wd) return;
    _els_smart_icon_edit_set(wd->img, set, obj);
+}
+
+/**
+ * Make the image 'editable'.
+ *
+ * This means the image is a valid drag target for drag and drop, and can be
+ * cut or pasted too.
+ *
+ * @param obj Image object.
+ * @return Editability.
+ */
+EAPI Eina_Bool
+elm_image_editable_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _els_smart_icon_edit_get(wd->img);
 }
 
 

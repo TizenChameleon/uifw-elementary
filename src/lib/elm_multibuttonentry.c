@@ -727,7 +727,7 @@ _view_init(Evas_Object *obj)
      {
         if (! (wd->box = elm_box_add (obj))) return;
         elm_widget_sub_object_add(obj, wd->box);
-        elm_box_extended_set(wd->box, EINA_TRUE);
+        elm_box_extended_mode_set(wd->box, EINA_TRUE);
         elm_box_homogenous_set(wd->box, EINA_FALSE);
         edje_object_part_swallow(wd->base, "box.swallow", wd->box);
      }

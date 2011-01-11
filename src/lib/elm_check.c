@@ -41,11 +41,33 @@ static void _signal_check_off(void *data, Evas_Object *obj, const char *emission
 static void _signal_check_on(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_check_toggle(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _on_focus_hook(void *data, Evas_Object *obj);
+static void _activate_hook(Evas_Object *obj);
+static void _activate(Evas_Object *obj);
+static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src,
+                             Evas_Callback_Type type, void *event_info);
+
 static const char SIG_CHANGED[] = "changed";
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
   {NULL, NULL}
 };
+
+static Eina_Bool
+_event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
+{
+   if (type != EVAS_CALLBACK_KEY_DOWN) return EINA_FALSE;
+   Evas_Event_Key_Down *ev = event_info;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return EINA_FALSE;
+   if (elm_widget_disabled_get(obj)) return EINA_FALSE;
+   if ((strcmp(ev->keyname, "Return")) &&
+       (strcmp(ev->keyname, "KP_Enter")) &&
+       (strcmp(ev->keyname, "space")))
+     return EINA_FALSE;
+   _activate(obj);
+   ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+   return EINA_TRUE;
+}
+
 
 static void
 _del_hook(Evas_Object *obj)
@@ -63,13 +85,13 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_focus_get(obj))
      {
-        edje_object_signal_emit(wd->chk, "elm,action,focus", "elm");
-        evas_object_focus_set(wd->chk, EINA_TRUE);
+	edje_object_signal_emit(wd->chk, "elm,action,focus", "elm");
+	evas_object_focus_set(wd->chk, EINA_TRUE);
      }
    else
      {
-        edje_object_signal_emit(wd->chk, "elm,action,unfocus", "elm");        
-        evas_object_focus_set(wd->chk, EINA_FALSE);
+	edje_object_signal_emit(wd->chk, "elm,action,unfocus", "elm");
+	evas_object_focus_set(wd->chk, EINA_FALSE);
      }
 }
 
@@ -80,17 +102,17 @@ _theme_hook(Evas_Object *obj)
    if (!wd) return;
    _elm_theme_object_set(obj, wd->chk, "check", "base", elm_widget_style_get(obj));
    if (wd->icon)
-     edje_object_signal_emit(wd->chk, "elm,state,icon,visible", "elm");
+      edje_object_signal_emit(wd->chk, "elm,state,icon,visible", "elm");
    else
-     edje_object_signal_emit(wd->chk, "elm,state,icon,hidden", "elm");
+      edje_object_signal_emit(wd->chk, "elm,state,icon,hidden", "elm");
    if (wd->state)
-     edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
+      edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
    else
-     edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
+      edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
    if (wd->label)
-     edje_object_signal_emit(wd->chk, "elm,state,text,visible", "elm");
+      edje_object_signal_emit(wd->chk, "elm,state,text,visible", "elm");
    else
-     edje_object_signal_emit(wd->chk, "elm,state,text,hidden", "elm");
+      edje_object_signal_emit(wd->chk, "elm,state,text,hidden", "elm");
    edje_object_part_text_set(wd->chk, "elm.text", wd->label);
    if (elm_widget_disabled_get(obj))
       edje_object_signal_emit(wd->chk, "elm,state,disabled", "elm");
@@ -105,9 +127,9 @@ _disable_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (elm_widget_disabled_get(obj))
-     edje_object_signal_emit(wd->chk, "elm,state,disabled", "elm");
+      edje_object_signal_emit(wd->chk, "elm,state,disabled", "elm");
    else
-     edje_object_signal_emit(wd->chk, "elm,state,enabled", "elm");
+      edje_object_signal_emit(wd->chk, "elm,state,enabled", "elm");
 }
 
 static void
@@ -142,12 +164,12 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (!wd) return;
    if (sub == wd->icon)
      {
-        edje_object_signal_emit(wd->chk, "elm,state,icon,hidden", "elm");
-        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+	edje_object_signal_emit(wd->chk, "elm,state,icon,hidden", "elm");
+	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                        _changed_size_hints, obj);
-        wd->icon = NULL;
-        _sizing_eval(obj);
-        edje_object_message_signal_process(wd->chk);
+	wd->icon = NULL;
+	_sizing_eval(obj);
+	edje_object_message_signal_process(wd->chk);
      }
 }
 
@@ -176,7 +198,19 @@ _signal_check_on(void *data, Evas_Object *obj __UNUSED__, const char *emission _
 static void
 _signal_check_toggle(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
+   _activate(data);
+}
+
+static void
+_activate_hook(Evas_Object *obj)
+{
+   _activate(obj);
+}
+
+static void
+_activate(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    wd->state = !wd->state;
    if (wd->statep) *wd->statep = wd->state;
@@ -184,13 +218,13 @@ _signal_check_toggle(void *data, Evas_Object *obj __UNUSED__, const char *emissi
      edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
    else
      edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
-   evas_object_smart_callback_call(data, SIG_CHANGED, NULL);
+   evas_object_smart_callback_call(obj, SIG_CHANGED, NULL);
 }
 
 /**
  * Add a new Check object
  *
- * @param[in] parent The parent object
+ * @param parent The parent object
  * @return The new object or NULL if it cannot be created
  *
  * @ingroup Check
@@ -206,16 +240,19 @@ elm_check_add(Evas_Object *parent)
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "check");
    elm_widget_type_set(obj, "check");
-   elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_sub_object_add(parent, obj);
    elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
+   elm_widget_can_focus_set(obj, EINA_TRUE);
+   elm_widget_activate_hook_set(obj, _activate_hook);
+   elm_widget_event_hook_set(obj, _event_hook);
 
    wd->chk = edje_object_add(e);
    _elm_theme_object_set(obj, wd->chk, "check", "base", "default");
@@ -240,8 +277,8 @@ elm_check_add(Evas_Object *parent)
 /**
  * Set the text label of the check object
  *
- * @param[in] obj The check object
- * @param[in] label The text label string in UTF-8
+ * @param obj The check object
+ * @param label The text label string in UTF-8
  *
  * @ingroup Check
  */
@@ -264,7 +301,7 @@ elm_check_label_set(Evas_Object *obj, const char *label)
 /**
  * Get the text label of the check object
  *
- * @param[in] obj The check object
+ * @param obj The check object
  * @return The text label string in UTF-8
  *
  * @ingroup Check
@@ -285,8 +322,8 @@ elm_check_label_get(const Evas_Object *obj)
  * If you want to keep that old content object, use the
  * elm_check_icon_unset() function.
  *
- * @param[in] obj The check object
- * @param[in] icon The icon object
+ * @param obj The check object
+ * @param icon The icon object
  *
  * @ingroup Check
  */
@@ -301,12 +338,12 @@ elm_check_icon_set(Evas_Object *obj, Evas_Object *icon)
    wd->icon = icon;
    if (icon)
      {
-        elm_widget_sub_object_add(obj, icon);
-        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-        _changed_size_hints, obj);
-        edje_object_part_swallow(wd->chk, "elm.swallow.content", icon);
-        edje_object_signal_emit(wd->chk, "elm,state,icon,visible", "elm");
-        edje_object_message_signal_process(wd->chk);
+	elm_widget_sub_object_add(obj, icon);
+	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+				       _changed_size_hints, obj);
+	edje_object_part_swallow(wd->chk, "elm.swallow.content", icon);
+	edje_object_signal_emit(wd->chk, "elm,state,icon,visible", "elm");
+	edje_object_message_signal_process(wd->chk);
      }
    _sizing_eval(obj);
 }
@@ -314,7 +351,7 @@ elm_check_icon_set(Evas_Object *obj, Evas_Object *icon)
 /**
  * Get the icon object of the check object
  *
- * @param[in] obj The check object
+ * @param obj The check object
  * @return The icon object
  *
  * @ingroup Check
@@ -333,7 +370,7 @@ elm_check_icon_get(const Evas_Object *obj)
  *
  * Unparent and return the icon object which was set for this widget.
  *
- * @param[in] obj The check object
+ * @param obj The check object
  * @return The icon object that was being used
  *
  * @ingroup Check
@@ -358,8 +395,8 @@ elm_check_icon_unset(Evas_Object *obj)
  * This sets the state of the check and will also set the value if pointed to
  * to the state supplied, but will not call any callbacks.
  *
- * @param[in] obj The check object
- * @param[in] state The state to use (1 == on, 0 == off)
+ * @param obj The check object
+ * @param state The state to use (1 == on, 0 == off)
  *
  * @ingroup Check
  */
@@ -371,19 +408,19 @@ elm_check_state_set(Evas_Object *obj, Eina_Bool state)
    if (!wd) return;
    if (state != wd->state)
      {
-        wd->state = state;
-        if (wd->statep) *wd->statep = wd->state;
-        if (wd->state)
-          edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
-        else
-          edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
+	wd->state = state;
+	if (wd->statep) *wd->statep = wd->state;
+	if (wd->state)
+	  edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
+	else
+	  edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
      }
 }
 
 /**
  * Get the state of the check object
  *
- * @param[in] obj The check object
+ * @param obj The check object
  * @return The boolean state
  *
  * @ingroup Check
@@ -407,8 +444,8 @@ elm_check_state_get(const Evas_Object *obj)
  * reflect the value of the boolean statep points to, just like calling
  * elm_check_state_set().
  *
- * @param[in] obj The check object
- * @param[in] statep Pointer to the boolean to modify
+ * @param obj The check object
+ * @param statep Pointer to the boolean to modify
  *
  * @ingroup Check
  */
@@ -420,15 +457,15 @@ elm_check_state_pointer_set(Evas_Object *obj, Eina_Bool *statep)
    if (!wd) return;
    if (statep)
      {
-        wd->statep = statep;
-        if (*wd->statep != wd->state)
-          {
-             wd->state = *wd->statep;
-             if (wd->state)
-               edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
-             else
-               edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
-          }
+	wd->statep = statep;
+	if (*wd->statep != wd->state)
+	  {
+	     wd->state = *wd->statep;
+	     if (wd->state)
+	       edje_object_signal_emit(wd->chk, "elm,state,check,on", "elm");
+	     else
+	       edje_object_signal_emit(wd->chk, "elm,state,check,off", "elm");
+	  }
      }
    else
      wd->statep = NULL;

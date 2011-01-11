@@ -168,8 +168,11 @@ elm_mapbuf_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "mapbuf");
    elm_widget_type_set(obj, "mapbuf");
@@ -177,6 +180,7 @@ elm_mapbuf_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, NULL);
@@ -213,6 +217,7 @@ elm_mapbuf_content_set(Evas_Object *obj, Evas_Object *content)
    wd->content = content;
    if (content)
      {
+        evas_object_data_set(content, "_elm_leaveme", (void *)1);
 	elm_widget_sub_object_add(content, obj);
 	evas_object_smart_member_add(content, obj);
         evas_object_clip_set(content, evas_object_clip_get(obj));
@@ -222,6 +227,25 @@ elm_mapbuf_content_set(Evas_Object *obj, Evas_Object *content)
      }
    _sizing_eval(obj);
    _configure(obj);
+}
+
+/**
+ * Get the mapbuf front content
+ *
+ * Return the content object which is set for this widget.
+ *
+ * @param obj The mapbuf object
+ * @return The content that is being used
+ *
+ * @ingroup Mapbuf
+ */
+EAPI Evas_Object *
+elm_mapbuf_content_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->content;
 }
 
 /**
@@ -243,9 +267,10 @@ elm_mapbuf_content_unset(Evas_Object *obj)
    if (!wd) return NULL;
    if (!wd->content) return NULL;
    content = wd->content;
-   elm_widget_sub_object_del(obj, wd->content);
-   evas_object_smart_member_del(wd->content);
-   evas_object_clip_unset(wd->content);
+   elm_widget_sub_object_del(obj, content);
+   evas_object_smart_member_del(content);
+   evas_object_clip_unset(content);
+   evas_object_data_del(content, "_elm_leaveme");
    wd->content = NULL;
    return content;
 }

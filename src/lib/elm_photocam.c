@@ -819,6 +819,13 @@ _pan_max_get(Evas_Object *obj, Evas_Coord *x, Evas_Coord *y)
 }
 
 static void
+_pan_min_get(Evas_Object *obj __UNUSED__, Evas_Coord *x, Evas_Coord *y)
+{
+   if (x) *x = 0;
+   if (y) *y = 0;
+}
+
+static void
 _pan_child_size_get(Evas_Object *obj, Evas_Coord *w, Evas_Coord *h)
 {
    Pan *sd = evas_object_smart_data_get(obj);
@@ -969,8 +976,11 @@ elm_photocam_add(Evas_Object *parent)
    static Evas_Smart *smart = NULL;
    Eina_Bool bounce = _elm_config->thumbscroll_bounce_enable;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "photocam");
    elm_widget_type_set(obj, "photocam");
@@ -1026,8 +1036,8 @@ elm_photocam_add(Evas_Object *parent)
      }
 
    elm_smart_scroller_extern_pan_set(wd->scr, wd->pan_smart,
-				     _pan_set, _pan_get,
-				     _pan_max_get, _pan_child_size_get);
+				     _pan_set, _pan_get, _pan_max_get,
+                                     _pan_min_get, _pan_child_size_get);
 
    wd->zoom = 1;
    wd->mode = ELM_PHOTOCAM_ZOOM_MODE_MANUAL;
@@ -1073,7 +1083,7 @@ elm_photocam_add(Evas_Object *parent)
  *
  * @ingroup Photocam
  */
-EAPI int
+EAPI Evas_Load_Error
 elm_photocam_file_set(Evas_Object *obj, const char *file)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EVAS_LOAD_ERROR_NONE;

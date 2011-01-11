@@ -50,6 +50,10 @@ static void _theme_hook(Evas_Object *obj);
 static void _show_region_hook(void *data, Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
+static void _on_focus_hook(void *data, Evas_Object *obj);
+static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src,
+                             Evas_Callback_Type type, void *event_info);
+
 
 static const char SIG_SCROLL[] = "scroll";
 static const char SIG_SCROLL_ANIM_START[] = "scroll,anim,start";
@@ -73,6 +77,95 @@ static const Evas_Smart_Cb_Description _signals[] = {
   {NULL, NULL}
 };
 
+static Eina_Bool
+_event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
+{
+   if (type != EVAS_CALLBACK_KEY_DOWN) return EINA_FALSE;
+   Evas_Event_Key_Down *ev = event_info;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return EINA_FALSE;
+   if (elm_widget_disabled_get(obj)) return EINA_FALSE;
+
+   Evas_Coord x = 0;
+   Evas_Coord y = 0;
+   Evas_Coord step_x = 0;
+   Evas_Coord step_y = 0;
+   Evas_Coord max_x = 0;
+   Evas_Coord max_y = 0;
+   Evas_Coord v_w = 0;
+   Evas_Coord v_h = 0;
+   Evas_Coord page_x = 0;
+   Evas_Coord page_y = 0;
+
+   elm_smart_scroller_child_pos_get(wd->scr, &x, &y);
+   elm_smart_scroller_step_size_get(wd->scr, &step_x, &step_y);
+   elm_smart_scroller_page_size_get(wd->scr, &page_x, &page_y);
+   elm_smart_scroller_child_viewport_size_get(wd->scr, &v_w, &v_h);
+   elm_scroller_child_size_get(obj, &max_x, &max_y);
+
+   if ((!strcmp(ev->keyname, "Left")) || (!strcmp(ev->keyname, "KP_Left")))
+     {
+        x -= step_x;
+     }
+   else if ((!strcmp(ev->keyname, "Right")) || (!strcmp(ev->keyname, "KP_Right")))
+     {
+        x += step_x;
+     }
+   else if ((!strcmp(ev->keyname, "Up"))  || (!strcmp(ev->keyname, "KP_Up")))
+     {
+        y -= step_y;
+     }
+   else if ((!strcmp(ev->keyname, "Down")) || (!strcmp(ev->keyname, "KP_Down")))
+     {
+        y += step_y;
+     }
+   else if ((!strcmp(ev->keyname, "Home")) || (!strcmp(ev->keyname, "KP_Home")))
+     {
+        y = 0;
+     }
+   else if ((!strcmp(ev->keyname, "End")) || (!strcmp(ev->keyname, "KP_End")))
+     {
+        y = max_y - v_h;
+     }
+   else if ((!strcmp(ev->keyname, "Prior")) || (!strcmp(ev->keyname, "KP_Prior")))
+     {
+	if (page_y < 0)
+	  y -= -(page_y * v_h) / 100;
+	else
+           y -= page_y;
+     }
+   else if ((!strcmp(ev->keyname, "Next")) || (!strcmp(ev->keyname, "KP_Next")))
+     {
+	if (page_y < 0)
+	  y += -(page_y * v_h) / 100;
+	else
+	  y += page_y;
+     }
+   else return EINA_FALSE;
+
+   ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+   elm_smart_scroller_child_pos_set(wd->scr, x, y);
+   return EINA_TRUE;
+}
+
+static void
+_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (elm_widget_focus_get(obj))
+     {
+        edje_object_signal_emit(wd->scr, "elm,action,focus", "elm");
+        evas_object_focus_set(wd->scr, EINA_TRUE);
+     }
+   else
+     {
+        edje_object_signal_emit(wd->scr, "elm,action,unfocus", "elm");
+        evas_object_focus_set(wd->scr, EINA_FALSE);
+     }
+}
+
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -88,12 +181,41 @@ _theme_hook(Evas_Object *obj)
    if (!wd) return;
    if (wd->scr)
      {
-        elm_smart_scroller_object_theme_set(obj, wd->scr,
+        Evas_Object *edj;
+        const char *str;
+
+        elm_smart_scroller_object_theme_set(obj, wd->scr, 
                                             wd->widget_name, wd->widget_base,
                                             elm_widget_style_get(obj));
 //        edje_object_scale_set(wd->scr, elm_widget_scale_get(obj) * _elm_config->scale);
+        edj = elm_smart_scroller_edje_object_get(wd->scr);
+        str = edje_object_data_get(edj, "focus_highlight");
+        if ((str) && (!strcmp(str, "on")))
+          elm_widget_highlight_in_theme_set(obj, EINA_TRUE);
+        else
+          elm_widget_highlight_in_theme_set(obj, EINA_FALSE);
      }
    _sizing_eval(obj);
+}
+
+static Eina_Bool
+_elm_scroller_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *cur;
+
+   if ((!wd) || (!wd->content))
+     return EINA_FALSE;
+
+   cur = wd->content;
+
+   /* Try Focus cycle in subitem */
+   if ((elm_widget_can_focus_get(cur)) || (elm_widget_child_can_focus_get(cur)))
+      return elm_widget_focus_next_get(cur, dir, next);
+
+   /* Return */
+   *next = (Evas_Object *)obj;
+   return !elm_widget_focus_get(obj);
 }
 
 static void
@@ -106,9 +228,26 @@ _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
 }
 
 static void
+_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_signal_callback_add(elm_smart_scroller_edje_object_get(wd->scr),
+	 emission, source, func_cb, data);
+}
+
+static void
+_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   edje_object_signal_callback_del_full(
+	 elm_smart_scroller_edje_object_get(wd->scr), emission, source,
+	 func_cb, data);
+}
+
+static void
 _show_region_hook(void *data, Evas_Object *obj)
 {
-
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord x, y, w, h;
    if (!wd) return;
@@ -118,9 +257,16 @@ _show_region_hook(void *data, Evas_Object *obj)
 }
 
 static void
+_focus_region_hook(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (wd->scr)
+     elm_smart_scroller_child_region_show(wd->scr, x, y, w, h);
+}
+
+static void
 _sizing_eval(Evas_Object *obj)
 {
-
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord  vw, vh, minw, minh, maxw, maxh, w, h, vmw, vmh;
    double xw, yw;
@@ -129,38 +275,30 @@ _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_min_get(wd->content, &minw, &minh);
    evas_object_size_hint_max_get(wd->content, &maxw, &maxh);
    evas_object_size_hint_weight_get(wd->content, &xw, &yw);
-   //evas_object_geometry_get(wd->content, NULL, NULL, &w, &h);
-
    if (wd->scr)
      {
         elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, &vh);
         if (xw > 0.0)
           {
-//        	 if(w > vw) vw = w;
-             if ((minw > 0) && (vw < minw))  vw = minw;
+             if ((minw > 0) && (vw < minw)) vw = minw;
              else if ((maxw > 0) && (vw > maxw)) vw = maxw;
           }
         else if (minw > 0) vw = minw;
-
         if (yw > 0.0)
           {
-  //      	 if(h > vh) vh = h;
-             if ((minh > 0) && (vh < minh))  vh = minh;
+             if ((minh > 0) && (vh < minh)) vh = minh;
              else if ((maxh > 0) && (vh > maxh)) vh = maxh;
           }
         else if (minh > 0) vh = minh;
-
         evas_object_resize(wd->content, vw, vh);
         w = -1;
         h = -1;
         edje_object_size_min_calc(elm_smart_scroller_edje_object_get(wd->scr), &vmw, &vmh);
         if (wd->min_w) w = vmw + minw;
         if (wd->min_h) h = vmh + minh;
-		
         evas_object_size_hint_max_get(obj, &maxw, &maxh);
         if ((maxw > 0) && (w > maxw)) w = maxw;
         if ((maxh > 0) && (h > maxh)) h = maxh;
-
         evas_object_size_hint_min_set(obj, w, h);
      }
 }
@@ -174,7 +312,6 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
 static void
 _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 {
-
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *sub = event_info;
 
@@ -194,7 +331,6 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 static void
 _hold_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
@@ -205,7 +341,6 @@ _hold_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 static void
 _hold_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
@@ -216,7 +351,6 @@ _hold_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 static void
 _freeze_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
@@ -227,7 +361,6 @@ _freeze_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 static void
 _freeze_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
@@ -311,25 +444,33 @@ elm_scroller_add(Evas_Object *parent)
    Widget_Data *wd;
    Evas_Coord minw, minh;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "scroller");
    elm_widget_type_set(obj, "scroller");
    elm_widget_sub_object_add(parent, obj);
+   elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
+   elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
+   elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
+   elm_widget_focus_next_hook_set(obj, _elm_scroller_focus_next_hook);
+   elm_widget_can_focus_set(obj, EINA_TRUE);
+   elm_widget_event_hook_set(obj, _event_hook);
+   elm_widget_focus_region_hook_set(obj, _focus_region_hook);
 
    wd->widget_name = eina_stringshare_add("scroller");
    wd->widget_base = eina_stringshare_add("base");
-
+   
    wd->scr = elm_smart_scroller_add(e);
    elm_smart_scroller_widget_set(wd->scr, obj);
-   elm_smart_scroller_object_theme_set(obj, wd->scr,
-                                       wd->widget_name, wd->widget_base,
-                                       elm_widget_style_get(obj));
+   _theme_hook(obj);
    elm_widget_resize_object_set(obj, wd->scr);
    evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				  _changed_size_hints, obj);
@@ -362,6 +503,14 @@ elm_scroller_add(Evas_Object *parent)
    return obj;
 }
 
+Evas_Object *
+_elm_scroller_edje_object_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return elm_smart_scroller_edje_object_get(wd->scr);
+}
 
 /**
  * Set the content of the scroller widget (the object to be scrolled around).
@@ -388,8 +537,8 @@ elm_scroller_content_set(Evas_Object *obj, Evas_Object *content)
      {
 	elm_widget_on_show_region_hook_set(content, _show_region_hook, obj);
 	elm_widget_sub_object_add(obj, content);
-    if (wd->scr)
-        elm_smart_scroller_child_set(wd->scr, content);
+        if (wd->scr)
+          elm_smart_scroller_child_set(wd->scr, content);
 	evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
 				       _changed_size_hints, obj);
      }
@@ -420,7 +569,7 @@ elm_scroller_content_get(const Evas_Object *obj)
  *
  * Unparent and return the content object which was set for this widget
  *
- * @param obj The slider objecet
+ * @param obj The slider object
  * @return The content that was being used
  *
  * @ingroup Scroller
@@ -442,7 +591,7 @@ elm_scroller_content_unset(Evas_Object *obj)
 
 /**
  * Set custom theme elements for the scroller
- *
+ * 
  * @param obj The scroller object
  * @param widget The widget name to use (default is "scroller")
  * @param base The base name to use (default is "base")
@@ -455,7 +604,8 @@ elm_scroller_custom_widget_base_theme_set(Evas_Object *obj, const char *widget, 
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if ((!widget) || (!base)) return;
+   EINA_SAFETY_ON_NULL_RETURN(widget);
+   EINA_SAFETY_ON_NULL_RETURN(base);
    if (eina_stringshare_replace(&wd->widget_name, widget) |
        eina_stringshare_replace(&wd->widget_base, base))
      _theme_hook(obj);
@@ -505,9 +655,8 @@ elm_scroller_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coor
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (wd->scr)
-     elm_smart_scroller_child_region_show(wd->scr, x, y, w, h);
+   if ((!wd) || (!wd->scr)) return;
+   elm_smart_scroller_child_region_show(wd->scr, x, y, w, h);
 }
 
 /**
@@ -536,10 +685,9 @@ elm_scroller_policy_set(Evas_Object *obj, Elm_Scroller_Policy policy_h, Elm_Scro
 	  ELM_SMART_SCROLLER_POLICY_ON,
 	  ELM_SMART_SCROLLER_POLICY_OFF
      };
-   if (!wd) return;
+   if ((!wd) || (!wd->scr)) return;
    if ((policy_h >= 3) || (policy_v >= 3)) return;
-   if (wd->scr)
-     elm_smart_scroller_policy_set(wd->scr, map[policy_h], map[policy_v]);
+   elm_smart_scroller_policy_set(wd->scr, map[policy_h], map[policy_v]);
 }
 
 EAPI void
@@ -547,12 +695,10 @@ elm_scroller_policy_get(const Evas_Object *obj, Elm_Scroller_Policy *policy_h, E
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   Elm_Smart_Scroller_Policy s_policy_h, s_policy_v;
-   if (!wd) return;
-   if (wd->scr)
-     elm_smart_scroller_policy_get(wd->scr, &s_policy_h, &s_policy_v);
-   *policy_h = (Elm_Scroller_Policy) s_policy_h;
-   *policy_v = (Elm_Scroller_Policy) s_policy_v;
+   if ((!wd) || (!wd->scr)) return;
+   elm_smart_scroller_policy_get(wd->scr,
+                                 (Elm_Smart_Scroller_Policy *) policy_h,
+                                 (Elm_Smart_Scroller_Policy *) policy_v);
 }
 
 /**
@@ -575,12 +721,9 @@ elm_scroller_region_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Ev
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (wd->scr)
-     {
-        if ((x) && (y)) elm_smart_scroller_child_pos_get(wd->scr, x, y);
-        if ((w) && (h)) elm_smart_scroller_child_viewport_size_get(wd->scr, w, h);
-     }
+   if ((!wd) || (!wd->scr)) return;
+   if ((x) || (y)) elm_smart_scroller_child_pos_get(wd->scr, x, y);
+   if ((w) || (h)) elm_smart_scroller_child_viewport_size_get(wd->scr, w, h);
 }
 
 /**
@@ -611,7 +754,7 @@ elm_scroller_child_size_get(const Evas_Object *obj, Evas_Coord *w, Evas_Coord *h
  * When scrolling, the scroller may "bounce" when reaching an edge of the child
  * object. This is a visual way to indicate the end has been reached. This is
  * enabled by default for both axes. This will set if it is enabled for that
- * axis with the boolean parameers for each axis.
+ * axis with the boolean parameters for each axis.
  *
  * @param obj The scroller object
  * @param h_bounce Will the scroller bounce horizontally or not
@@ -624,9 +767,8 @@ elm_scroller_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (wd->scr)
-     elm_smart_scroller_bounce_allow_set(wd->scr, h_bounce, v_bounce);
+   if ((!wd) || (!wd->scr)) return;
+   elm_smart_scroller_bounce_allow_set(wd->scr, h_bounce, v_bounce);
 }
 
 /**
@@ -648,15 +790,15 @@ elm_scroller_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *
 }
 
 /**
- * Set scroll page size relative to viewport size
+ * Set scroll page size relative to viewport size.
  *
- * The scroller is sapale of limiting scrolling by the user to "pages". That
+ * The scroller is capable of limiting scrolling by the user to "pages". That
  * is to jump by and only show a "whole page" at a time as if the continuous
- * area of the scroller conent is split into page sized pieces. This sets
+ * area of the scroller content is split into page sized pieces. This sets
  * the size of a page relative to the viewport of the scroller. 1.0 is "1
  * viewport" is size (horizontally or vertically). 0.0 turns it off in that
  * axis. This is mutually exclusive with page size
- * (see elm_scroller_page_size_set()  for more information). likewise 0.5
+ * (see elm_scroller_page_size_set()  for more information). Likewise 0.5
  * is "half a viewport". Sane usable valus are normally between 0.0 and 1.0
  * including 1.0. If you only want 1 axis to be page "limited", use 0.0 for
  * the other axis.
@@ -681,10 +823,10 @@ elm_scroller_page_relative_set(Evas_Object *obj, double h_pagerel, double v_page
 }
 
 /**
- * Set scroll page size
+ * Set scroll page size.
  *
  * See also elm_scroller_page_relative_set(). This, instead of a page size
- * being relaive to the viewport, sets it to an absolute fixed value, with
+ * being relative to the viewport, sets it to an absolute fixed value, with
  * 0 turning it off for that axis.
  *
  * @param obj The scroller object
@@ -707,7 +849,7 @@ elm_scroller_page_size_set(Evas_Object *obj, Evas_Coord h_pagesize, Evas_Coord v
 }
 
 /**
- * Show a specific virtual region within the scroller content object
+ * Show a specific virtual region within the scroller content object.
  *
  * This will ensure all (or part if it does not fit) of the designated
  * region in the virtual content object (0, 0 starting at the top-left of the
@@ -730,41 +872,57 @@ elm_scroller_region_bring_in(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (wd->scr)
-     elm_smart_scroller_region_bring_in(wd->scr, x, y, w, h);
+   if ((!wd) || (!wd->scr)) return;
+   elm_smart_scroller_region_bring_in(wd->scr, x, y, w, h);
 }
 
+
 /**
- * Set scroll only one page
+ * Set event propagation on a scroller
  *
+ * This enables or disabled event propagation from the scroller content to
+ * the scroller and its parent. By default event propagation is disabled.
+ * 
  * @param obj The scroller object
- * @param set Flag
+ * @param propagation If propagation is enabled or not
  *
  * @ingroup Scroller
  */
+EAPI void
+elm_scroller_propagate_events_set(Evas_Object *obj, Eina_Bool propagation)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   evas_object_propagate_events_set(wd->scr, propagation);
+}
+
+/**
+ * Get event propagation for a scroller
+ *
+ * This gets the event propagation for a scroller. See 
+ * elm_scroller_propagate_events_set() for more information
+ * 
+ * @param obj The scroller object
+ * @return The propagation state
+ *
+ * @ingroup Scroller
+ */
+EAPI Eina_Bool
+elm_scroller_propagate_events_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   return evas_object_propagate_events_get(wd->scr);
+}
+
+
+
 EAPI void
 elm_scroller_page_move_set(Evas_Object *obj, Eina_Bool set)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   elm_smart_scroller_page_move_set(wd->scr, set);
-}
-
-/**
- * Set events propagation
- *
- * @param obj The scroller object
- * @param set Flag
- *
- * @ingroup Scroller
- */
-EAPI void
-elm_scroller_propagate_events_set(Evas_Object *obj, Eina_Bool set)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   evas_object_propagate_events_set(wd->scr, set);
+   return ;
 }

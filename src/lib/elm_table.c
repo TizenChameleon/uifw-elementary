@@ -41,6 +41,42 @@ _del_hook(Evas_Object *obj)
    free(wd);
 }
 
+static Eina_Bool
+_elm_table_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   const Eina_List *items;
+   void *(*list_data_get) (const Eina_List *list);
+   Eina_List *(*list_free) (Eina_List *list);
+
+   if ((!wd) || (!wd->tbl))
+     return EINA_FALSE;
+
+   /* Focus chain */
+   /* TODO: Change this to use other chain */
+   if ((items = elm_widget_focus_custom_chain_get(obj)))
+     {
+        list_data_get = eina_list_data_get;
+        list_free = NULL;
+     }
+   else
+     {
+        items = evas_object_table_children_get(wd->tbl);
+        list_data_get = eina_list_data_get;
+        list_free = eina_list_free;
+
+        if (!items) return EINA_FALSE;
+     }
+
+   Eina_Bool ret = elm_widget_focus_list_next_get(obj, items, list_data_get,
+                                                   dir, next);
+
+   if (list_free)
+     list_free((Eina_List *)items);
+
+   return ret;
+}
+
 static void
 _sizing_eval(Evas_Object *obj)
 {
@@ -69,14 +105,6 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
 static void
 _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-   /* We do not add this callback, consequently we do not need to delete it
-   
-   Widget_Data *wd = elm_widget_data_get(obj);
-   evas_Object *sub = event_info;
-
-   evas_object_event_callback_del_full
-     (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
-     */
    _sizing_eval(obj);
 }
 
@@ -95,8 +123,11 @@ elm_table_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "table");
    elm_widget_type_set(obj, "table");
@@ -104,6 +135,9 @@ elm_table_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
+   elm_widget_focus_next_hook_set(obj, _elm_table_focus_next_hook);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
+   elm_widget_highlight_ignore_set(obj, EINA_FALSE);
 
    wd->tbl = evas_object_table_add(e);
    evas_object_event_callback_add(wd->tbl, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
@@ -135,10 +169,28 @@ elm_table_homogenous_set(Evas_Object *obj, Eina_Bool homogenous)
 }
 
 /**
+ * Get the current table homogenous mode.
+ *
+ * @param obj The table object
+ * @return a boolean to set (or no) layout homogenous in the table
+ * (1 = homogenous,  0 = no homogenous)
+ *
+ * @ingroup Table
+ */
+EAPI Eina_Bool
+elm_table_homogenous_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return evas_object_table_homogeneous_get(wd->tbl);
+}
+
+/**
  * Set padding between cells.
  *
  * @param obj The layout object.
- * @param horizontal set the horizontal padding. 
+ * @param horizontal set the horizontal padding.
  * @param vertical set the vertical padding.
  *
  * @ingroup Table
@@ -150,6 +202,24 @@ elm_table_padding_set(Evas_Object *obj, Evas_Coord horizontal, Evas_Coord vertic
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    evas_object_table_padding_set(wd->tbl, horizontal, vertical);
+}
+
+/**
+ * Get padding between cells.
+ *
+ * @param obj The layout object.
+ * @param horizontal set the horizontal padding.
+ * @param vertical set the vertical padding.
+ *
+ * @ingroup Table
+ */
+EAPI void
+elm_table_padding_get(const Evas_Object *obj, Evas_Coord *horizontal, Evas_Coord *vertical)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   evas_object_table_padding_get(wd->tbl, horizontal, vertical);
 }
 
 /**

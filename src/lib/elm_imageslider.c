@@ -878,7 +878,8 @@ _imageslider_update(Widget_Data * wd)
              if (!eo)
                {
                   eo = elm_image_add(wd->obj);
-                  elm_layout_content_set(wd->ly[i], "swl.photo", eo);                  elm_image_prescale_set(eo, wd->w);
+                  elm_layout_content_set(wd->ly[i], "swl.photo", eo);
+                  //elm_image_prescale_set(eo, wd->w);
                   elm_image_file_set(eo, it->photo_file, NULL);
                   elm_image_object_size_get(eo, &it->w, &it->h);
                   evas_object_geometry_get(eo, &it->ox, &it->oy, &it->ow, &it->oh);
@@ -891,11 +892,11 @@ _imageslider_update(Widget_Data * wd)
                   it->moving = wd->moving;
                   if (wd->moving)
                     {
-                       elm_image_prescale_set(eo, MOVING_IMAGE_SIZE);
+                       //elm_image_prescale_set(eo, MOVING_IMAGE_SIZE);
                     }
                   else
                     {
-                       elm_image_prescale_set(eo, it->w > it->h ? it->w : it->h);
+                       //elm_image_prescale_set(eo, it->w > it->h ? it->w : it->h);
                     }
                }
           }

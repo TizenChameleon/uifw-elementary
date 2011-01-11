@@ -262,15 +262,12 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, const char *key, const char *valu
              if (curlocater)
                {
                   replocater = curlocater + key_len + 1;
-                  while ((*replocater) && (*replocater != '='))
+
+                  while ((*replocater) && (*replocater != ' ') && (*replocater != '>'))
                     replocater++;
 
-                  while (*replocater && *replocater != ' ' && *replocater != '>')
-                    replocater++;
-
-                  if (replocater - curlocater > key_len + 1)
+                  if (replocater - curlocater > key_len)
                     {
-                       replocater--;
                        eina_strbuf_append_n(diffbuf, curlocater, 
                                             replocater-curlocater);
                     }
@@ -589,9 +586,9 @@ _label_state_change(Evas_Object *obj)
    if (wd->linewrap)
      {
         if (wd->wrapmode)
-          edje_object_signal_emit(wd->lbl, "elm,state,wordwrap", "elm");
-        else
           edje_object_signal_emit(wd->lbl, "elm,state,default", "elm");
+        else
+          edje_object_signal_emit(wd->lbl, "elm,state,charwrap", "elm");
      }
 }
 
@@ -684,7 +681,7 @@ elm_label_add(Evas_Object *parent)
 
    wd->linewrap = EINA_FALSE;
    wd->ellipsis = EINA_FALSE;
-   wd->wrapmode = EINA_FALSE;
+   wd->wrapmode = EINA_TRUE;
    wd->slidingmode = EINA_FALSE;
    wd->slidingellipsis = EINA_FALSE;
    wd->wrap_w = 0;

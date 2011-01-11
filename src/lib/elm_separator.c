@@ -71,8 +71,11 @@ elm_separator_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "separator");
    wd->horizontal = EINA_FALSE;
@@ -81,7 +84,7 @@ elm_separator_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
-   elm_widget_can_focus_set(obj, 0);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
 
    wd->sep = edje_object_add(e);
    _elm_theme_object_set(obj, wd->sep, "separator", "vertical", "default");

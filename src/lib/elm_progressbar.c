@@ -68,32 +68,31 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   edje_object_part_unswallow(NULL, wd->spacer);
    if (wd->horizontal)
      _elm_theme_object_set(obj, wd->progressbar, "progressbar", "horizontal", elm_widget_style_get(obj));
    else
      _elm_theme_object_set(obj, wd->progressbar, "progressbar", "vertical", elm_widget_style_get(obj));
-   if (wd->inverted)
-     edje_object_signal_emit(wd->progressbar, "elm,state,inverted,on", "elm");
-   else
-     edje_object_signal_emit(wd->progressbar, "elm,state,inverted,off", "elm");
+   
    if (wd->icon)
-     edje_object_signal_emit(wd->progressbar, "elm,state,icon,visible", "elm");
-   else
-     edje_object_signal_emit(wd->progressbar, "elm,state,icon,hidden", "elm");
+     {
+	edje_object_part_swallow(wd->progressbar, "elm.swallow.content", wd->icon);
+	edje_object_signal_emit(wd->progressbar, "elm,state,icon,visible", "elm");
+     }
    if (wd->label)
-     edje_object_signal_emit(wd->progressbar, "elm,state,text,visible", "elm");
-   else
-     edje_object_signal_emit(wd->progressbar, "elm,state,text,hidden", "elm");
-   edje_object_part_text_set(wd->progressbar, "elm.text", wd->label);
+     {
+        edje_object_part_text_set(wd->progressbar, "elm.text", wd->label);
+        edje_object_signal_emit(wd->progressbar, "elm,state,text,visible", "elm");
+     }
    if (wd->pulse)
-     edje_object_signal_emit(wd->progressbar, "elm,state,pulse", "elm");
+      edje_object_signal_emit(wd->progressbar, "elm,state,pulse", "elm");
    else
-     edje_object_signal_emit(wd->progressbar, "elm,state,fraction", "elm");
-   if (wd->units && !wd->pulse)
-     edje_object_signal_emit(wd->progressbar, "elm,state,units,visible", "elm");
-   else
-     edje_object_signal_emit(wd->progressbar, "elm,state,units,hidden", "elm");
+      edje_object_signal_emit(wd->progressbar, "elm,state,fraction", "elm");
+   if (wd->pulse_state)
+      edje_object_signal_emit(wd->progressbar, "elm,state,pulse,start", "elm");
+   
+   if ((wd->units) && (!wd->pulse))
+      edje_object_signal_emit(wd->progressbar, "elm,state,units,visible", "elm");
+   
    if (wd->horizontal)
      evas_object_size_hint_min_set(wd->spacer, (double)wd->size * elm_widget_scale_get(obj) * _elm_config->scale, 1);
    else
@@ -101,6 +100,9 @@ _theme_hook(Evas_Object *obj)
 
    edje_object_part_swallow(wd->progressbar, "elm.swallow.bar", wd->spacer);
 
+   if (wd->inverted)
+      edje_object_signal_emit(wd->progressbar, "elm,state,inverted,on", "elm");
+   
    _units_set(obj);
    edje_object_message_signal_process(wd->progressbar);
    edje_object_scale_set(wd->progressbar, elm_widget_scale_get(obj) * _elm_config->scale);
@@ -136,12 +138,12 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (!wd) return;
    if (sub == wd->icon)
      {
-        edje_object_signal_emit(wd->progressbar, "elm,state,icon,hidden", "elm");
-        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                            _changed_size_hints, obj);
-        wd->icon = NULL;
-        edje_object_message_signal_process(wd->progressbar);
-        _sizing_eval(obj);
+	edje_object_signal_emit(wd->progressbar, "elm,state,icon,hidden", "elm");
+	evas_object_event_callback_del_full
+	  (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+	wd->icon = NULL;
+	edje_object_message_signal_process(wd->progressbar);
+	_sizing_eval(obj);
      }
 }
 
@@ -186,8 +188,11 @@ elm_progressbar_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "progressbar");
    elm_widget_type_set(obj, "progressbar");
@@ -195,6 +200,7 @@ elm_progressbar_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
 
    wd->horizontal = EINA_TRUE;
    wd->inverted = EINA_FALSE;
@@ -209,7 +215,7 @@ elm_progressbar_add(Evas_Object *parent)
 
    wd->spacer = evas_object_rectangle_add(e);
    evas_object_color_set(wd->spacer, 0, 0, 0, 0);
-   evas_object_pass_events_set(wd->spacer, 1);
+   evas_object_pass_events_set(wd->spacer, EINA_TRUE);
    elm_widget_sub_object_add(obj, wd->spacer);
    edje_object_part_swallow(wd->progressbar, "elm.swallow.bar", wd->spacer);
 
@@ -277,7 +283,7 @@ elm_progressbar_pulse(Evas_Object *obj, Eina_Bool state)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    state = !!state;
-   if (!wd->pulse && wd->pulse_state == state) return;
+   if ((!wd->pulse) && (wd->pulse_state == state)) return;
    wd->pulse_state = state;
    if (wd->pulse_state)
      edje_object_signal_emit(wd->progressbar, "elm,state,pulse,start", "elm");
@@ -289,7 +295,7 @@ elm_progressbar_pulse(Evas_Object *obj, Eina_Bool state)
  * Set the value the progressbar indicates
  *
  * @param obj The progressbar object
- * @param val The fraction value (must be beween 0.0 and 1.0)
+ * @param val The fraction value (must be between 0.0 and 1.0)
  *
  * @ingroup Progressbar
  */
@@ -342,13 +348,13 @@ elm_progressbar_label_set(Evas_Object *obj, const char *label)
    eina_stringshare_replace(&wd->label, label);
    if (label)
      {
-        edje_object_signal_emit(wd->progressbar, "elm,state,text,visible", "elm");
-        edje_object_message_signal_process(wd->progressbar);
+	edje_object_signal_emit(wd->progressbar, "elm,state,text,visible", "elm");
+	edje_object_message_signal_process(wd->progressbar);
      }
    else
      {
-        edje_object_signal_emit(wd->progressbar, "elm,state,text,hidden", "elm");
-        edje_object_message_signal_process(wd->progressbar);
+	edje_object_signal_emit(wd->progressbar, "elm,state,text,hidden", "elm");
+	edje_object_message_signal_process(wd->progressbar);
      }
    edje_object_part_text_set(wd->progressbar, "elm.text", label);
    _sizing_eval(obj);
@@ -375,6 +381,8 @@ elm_progressbar_label_get(const Evas_Object *obj)
  * Set the icon object of the progressbar object
  *
  * Once the icon object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_progressbar_icon_unset() function.
  *
  * @param obj The progressbar object
  * @param icon The icon object
@@ -392,12 +400,12 @@ elm_progressbar_icon_set(Evas_Object *obj, Evas_Object *icon)
    wd->icon = icon;
    if (icon)
      {
-        elm_widget_sub_object_add(obj, icon);
-        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, obj);
-        edje_object_part_swallow(wd->progressbar, "elm.swallow.content", icon);
-        edje_object_signal_emit(wd->progressbar, "elm,state,icon,visible", "elm");
-        edje_object_message_signal_process(wd->progressbar);
+	elm_widget_sub_object_add(obj, icon);
+	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+				       _changed_size_hints, obj);
+	edje_object_part_swallow(wd->progressbar, "elm.swallow.content", icon);
+	edje_object_signal_emit(wd->progressbar, "elm,state,icon,visible", "elm");
+	edje_object_message_signal_process(wd->progressbar);
      }
    _sizing_eval(obj);
 }
@@ -417,6 +425,30 @@ elm_progressbar_icon_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    return wd->icon;
+}
+
+/**
+ * Unset the icon used for the progressbar object
+ *
+ * Unparent and return the icon object which was set for this widget.
+ *
+ * @param obj The progressbar object
+ * @return The icon object that was being used
+ *
+ * @ingroup Progressbar
+ */
+EAPI Evas_Object *
+elm_progressbar_icon_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (!wd->icon) return NULL;
+   Evas_Object *icon = wd->icon;
+   elm_widget_sub_object_del(obj, wd->icon);
+   edje_object_part_unswallow(wd->progressbar, wd->icon);
+   wd->icon = NULL;
+   return icon;
 }
 
 /**
@@ -487,13 +519,13 @@ elm_progressbar_unit_format_set(Evas_Object *obj, const char *units)
    eina_stringshare_replace(&wd->units, units);
    if (units)
      {
-        edje_object_signal_emit(wd->progressbar, "elm,state,units,visible", "elm");
-        edje_object_message_signal_process(wd->progressbar);
+	edje_object_signal_emit(wd->progressbar, "elm,state,units,visible", "elm");
+	edje_object_message_signal_process(wd->progressbar);
      }
    else
      {
-        edje_object_signal_emit(wd->progressbar, "elm,state,units,hidden", "elm");
-        edje_object_message_signal_process(wd->progressbar);
+	edje_object_signal_emit(wd->progressbar, "elm,state,units,hidden", "elm");
+	edje_object_message_signal_process(wd->progressbar);
      }
    _units_set(obj);
    _sizing_eval(obj);
