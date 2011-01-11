@@ -1,6 +1,5 @@
 #include <Elementary.h>
 #include "elm_priv.h"
-#include "elm_module_priv.h"
 
 /**
  * @defgroup Map Map
@@ -20,9 +19,9 @@
  *
  * clicked,double - This is called when a user has double-clicked the photo.
  *
- * load,details - Map detailed data load begins.
+ * load,detail - Map detailed data load begins.
  *
- * loaded,details - This is called when all parts of the map are loaded.
+ * loaded,detail - This is called when all parts of the map are loaded.
  *
  * zoom,start - Zoom animation started.
  *
@@ -40,6 +39,8 @@
  *
  * scroll,drag,stop - dragging the contents around has stopped
  *
+ * downloaded - This is called when map images are downloaded
+ *
  * TODO : doxygen
  */
 
@@ -50,6 +51,7 @@ typedef struct _Grid Grid;
 typedef struct _Grid_Item Grid_Item;
 typedef struct _Marker_Group Marker_Group;
 typedef struct _Mod_Api Mod_Api;
+typedef struct _Event Event;
 
 #define DEST_DIR_ZOOM_PATH "/tmp/elm_map/%d/%d/"
 #define DEST_DIR_PATH DEST_DIR_ZOOM_PATH"%d/"
@@ -65,30 +67,36 @@ typedef struct _Map_Sources_Tab
    int zoom_min;
    int zoom_max;
    ElmMapSourceURLFunc url_cb;
-   Eina_Bool use_module : 1;
 } Map_Sources_Tab;
 
-#define ZOOM_MAX 20
-#define TOUCH_HOLD_RANGE 40
+#define ZOOM_MAX 18
+
 //Zemm min is supposed to be 0
-static char * _mapnik_url_cb(void *data ,int x, int y, int zoom);
-static char * _osmarender_url_cb(void *data ,int x, int y, int zoom);
-static char * _cyclemap_url_cb(void *data ,int x, int y, int zoom);
-static char * _maplint_url_cb(void *data ,int x, int y, int zoom);
-static char * _decarta_url_cb(void *data ,int x, int y, int zoom);
+static char *_mapnik_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+static char *_osmarender_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+static char *_cyclemap_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+static char *_maplint_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+static char *_module_url_cb(Evas_Object *obj, int x, int y, int zoom);
+static char * _custom1_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+static char * _custom2_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+static char * _custom3_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+static char * _custom4_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+static char * _custom5_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+static char * _custom6_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
+
 static Map_Sources_Tab map_sources_tab[] =
 {
-     {ELM_MAP_SOURCE_MAPNIK, "Mapnik", 0, 18, _mapnik_url_cb, EINA_FALSE},
-     {ELM_MAP_SOURCE_OSMARENDER, "Osmarender", 0, 17, _osmarender_url_cb, EINA_FALSE},
-     {ELM_MAP_SOURCE_CYCLEMAP, "Cycle Map", 0, 17, _cyclemap_url_cb, EINA_FALSE},
-     {ELM_MAP_SOURCE_MAPLINT, "Maplint", 12, 16, _maplint_url_cb, EINA_FALSE},
-     {ELM_MAP_SOURCE_DECARTA, "Decarta", 1, 20, _decarta_url_cb, EINA_TRUE},
-     {ELM_MAP_SOURCE_CUSTOM_1, "Custom 1", 0, 18, NULL, EINA_FALSE},
-     {ELM_MAP_SOURCE_CUSTOM_2, "Custom 2", 0, 18, NULL, EINA_FALSE},
-     {ELM_MAP_SOURCE_CUSTOM_3, "Custom 3", 0, 18, NULL, EINA_FALSE},
-     {ELM_MAP_SOURCE_CUSTOM_4, "Custom 4", 0, 18, NULL, EINA_FALSE},
-     {ELM_MAP_SOURCE_CUSTOM_5, "Custom 5", 0, 18, NULL, EINA_FALSE},
-     {ELM_MAP_SOURCE_CUSTOM_6, "Custom 6", 0, 18, NULL, EINA_FALSE}
+     {ELM_MAP_SOURCE_MAPNIK, "Mapnik", 0, 18, _mapnik_url_cb},
+     {ELM_MAP_SOURCE_OSMARENDER, "Osmarender", 0, 17, _osmarender_url_cb},
+     {ELM_MAP_SOURCE_CYCLEMAP, "Cycle Map", 0, 17, _cyclemap_url_cb},
+     {ELM_MAP_SOURCE_MAPLINT, "Maplint", 12, 16, _maplint_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_1, "Custom 1", 0, 18, _custom1_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_2, "Custom 2", 0, 18, _custom2_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_3, "Custom 3", 0, 18, _custom3_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_4, "Custom 4", 0, 18, _custom4_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_5, "Custom 5", 0, 18, _custom5_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_6, "Custom 6", 0, 18, _custom6_url_cb},
+     {ELM_MAP_SOURCE_MODULE, "Module", 0, 18, _module_url_cb}
 };
 
 struct _Elm_Map_Marker_Class
@@ -252,12 +260,9 @@ struct _Widget_Data
 
    Elm_Map_Sources source;
    Mod_Api *api;
-};
-
-struct _Pan
-{
-   Evas_Object_Smart_Clipped_Data __clipped_data;
-   Widget_Data *wd;
+   Eina_List *s_event_list;
+   int try_num;
+   int finish_num;
 };
 
 struct _Mod_Api
@@ -268,13 +273,18 @@ struct _Mod_Api
    Eina_Bool (*obj_convert_coord_into_geo) (const Evas_Object *obj, int zoom, int x, int y, int size, double *lon, double *lat);
    Eina_Bool (*obj_convert_geo_into_coord) (const Evas_Object *obj, int zoom, double lon, double lat, int size, int *x, int *y);
 };
+struct _Pan
+{
+   Evas_Object_Smart_Clipped_Data __clipped_data;
+   Widget_Data *wd;
+};
 
-struct event_t
+struct _Event
 {
    int device;
    
-   struct prev {
-   Evas_Coord x, y;
+   struct {
+      Evas_Coord x, y;
    } prev;
    
    Evas_Coord x, y, w, h;
@@ -282,16 +292,10 @@ struct event_t
    Evas_Object *object;
    Ecore_Timer *hold_timer;
    
-   int ts;
-   int v;
-   
    int pinch_dis;
-   Evas_Object *pinch_obj;
-   Evas_Object *test;
 };
-static int dis_old = 0;
-static Eina_List *s_event_list;
 
+static int dis_old = 0;
 static const char *widtype = NULL;
 
 static const char SIG_CHANGED[] = "changed";
@@ -307,6 +311,7 @@ static const char SIG_SCROLL_DRAG_STOP[] = "scroll,drag,stop";
 static const char SIG_ZOOM_CHANGE[] = "zoom,change";
 static const char SIG_ZOOM_START[] = "zoom,start";
 static const char SIG_ZOOM_STOP[] = "zoom,stop";
+static const char SIG_DOWNLOADED[] = "downloaded";
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
   {SIG_CLICKED, ""},
@@ -321,15 +326,21 @@ static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_ZOOM_CHANGE, ""},
   {SIG_ZOOM_START, ""},
   {SIG_ZOOM_STOP, ""},
+  {SIG_DOWNLOADED, ""},
   {NULL, NULL}
 };
 
 static void _pan_calculate(Evas_Object *obj);
 
+static Eina_Bool _hold_timer_cb(void *data);
+static void _rect_resize_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
+static void _on_focus_hook(void *data, Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _calc_job(void *data);
+static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src,
+                             Evas_Callback_Type type, void *event_info);
 static void grid_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord ox, Evas_Coord oy, Evas_Coord ow, Evas_Coord oh);
 static void grid_clear(Evas_Object *obj, Grid *g);
 static Grid *grid_create(Evas_Object *obj);
@@ -357,95 +368,70 @@ static void _mouse_multi_down(void *data, Evas *evas, Evas_Object *obj, void *ev
 static void _mouse_multi_up(void *data, Evas *evas, Evas_Object *obj, void *event_info);
 static void _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info);
 
-static Eina_Bool
-hold_timer_cb(void *data)
-{
-   struct event_t *ev0 = (struct event_t *)data;
-   ev0->hold_timer = NULL;
-
-   return ECORE_CALLBACK_CANCEL;
-}
-
-static void 
-_rect_resize_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   int x,y,w,h;
-
-   evas_object_geometry_get(wd->rect,&x,&y,&w,&h);
-   evas_object_geometry_get(wd->pan_smart,&x,&y,&w,&h);
-   evas_object_resize(wd->rect,w,h);
-   evas_object_move(wd->rect,x,y);
-}
-
 static int
-get_multi_device(void)
+get_multi_device(Evas_Object *obj)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
    Eina_List *l;
-   struct event_t *ev = NULL;
+   Event *ev;
    
-   EINA_LIST_FOREACH(s_event_list, l, ev) {
-      if(ev->device != 0) return ev->device;				
-   }
+   EINA_LIST_FOREACH(wd->s_event_list, l, ev)
+     {
+        if (ev->device) return ev->device;				
+     }
    return 0;
 }
 
 static int
 get_distance(Evas_Coord x1, Evas_Coord y1, Evas_Coord x2, Evas_Coord y2)
 {
-   int dis, dx, dy;
-   
-   dx = x1 - x2;
-   dy = y1 - y2;
-   
-   dis = (int)sqrt(dx * dx + dy  * dy);
-   return dis;
+   int dx = x1 - x2;
+   int dy = y1 - y2;
+   return sqrt((dx * dx) + (dy * dy));
 }
 
-static struct event_t*
-get_event_object(int device)
+static Event *
+create_event_object(void *data, Evas_Object *obj, int device)
 {
-   Eina_List *l;
-   struct event_t *ev = NULL;
+   Widget_Data *wd = elm_widget_data_get(data);
+   Event *ev = calloc(1, sizeof(Event));
    
-   EINA_LIST_FOREACH(s_event_list, l, ev) {
-      if(ev->device == device) break;
-      ev = NULL;
-   }
+   EINA_SAFETY_ON_NULL_RETURN_VAL(ev, NULL);
+   
+   ev->object = obj;
+   ev->device = device;
+   evas_object_geometry_get(obj, &ev->x, &ev->y, &ev->w, &ev->h);
+   wd->s_event_list = eina_list_append(wd->s_event_list, ev);
    return ev;
 }
 
-static struct event_t *
-create_event_object(Evas_Object *object, int device)
+static Event*
+get_event_object(void *data, int device)
 {
-   struct event_t *ev;
-
-   ev = calloc(1, sizeof(struct event_t));
-   if(ev == NULL) DBG("Cannot allocate event_t");
+   Widget_Data *wd = elm_widget_data_get(data);
+   Eina_List *l;
+   Event *ev;
    
-   ev->object = object;
-   ev->device = device;
-   
-   evas_object_geometry_get(object, &ev->x, &ev->y, &ev->w, &ev->h);
-   
-   s_event_list = eina_list_append(s_event_list, ev);
-   
+   EINA_LIST_FOREACH(wd->s_event_list, l, ev)
+     {
+        if (ev->device == device) break;
+        ev = NULL;
+     }
    return ev;
 }
 
 static void
-destroy_event_object(struct event_t *ev)
+destroy_event_object(void *data, Event *ev)
 {
-   if(ev == NULL) return;
-   ev->pinch_obj = NULL;
+   Widget_Data *wd = elm_widget_data_get(data);
+   EINA_SAFETY_ON_NULL_RETURN(ev);
    ev->pinch_dis = 0;
-   
-   s_event_list = eina_list_remove(s_event_list, ev);
-   
-   if (ev->hold_timer) {
-      ecore_timer_del(ev->hold_timer);
-      ev->hold_timer = NULL;
-   }
+   wd->s_event_list = eina_list_remove(wd->s_event_list, ev);
+   if (ev->hold_timer)
+     {
+        ecore_timer_del(ev->hold_timer);
+        ev->hold_timer = NULL;
+     }
    free(ev);
 }
 
@@ -453,15 +439,14 @@ static Mod_Api *
 module(Evas_Object *obj __UNUSED__)
 {
    static Elm_Module *m = NULL;
-   if (m) goto ok; // already found - just use
+   if (m) goto ok;
    if (!(m = _elm_module_find_as("map/api"))) return NULL;
 
-   // get module api
    m->api = malloc(sizeof(Mod_Api));
    if (!m->api) return NULL;
-   ((Mod_Api *)(m->api)      )->obj_hook = // called on creation
+   ((Mod_Api *)(m->api)      )->obj_hook =
      _elm_module_symbol_get(m, "obj_hook");
-   ((Mod_Api *)(m->api)      )->obj_unhook = // called on deletion
+   ((Mod_Api *)(m->api)      )->obj_unhook =
      _elm_module_symbol_get(m, "obj_unhook");
    ((Mod_Api *)(m->api)      )->obj_url_request =
      _elm_module_symbol_get(m, "obj_url_request");
@@ -469,7 +454,7 @@ module(Evas_Object *obj __UNUSED__)
      _elm_module_symbol_get(m, "obj_convert_coord_into_geo");
    ((Mod_Api *)(m->api)      )->obj_convert_geo_into_coord =
      _elm_module_symbol_get(m, "obj_convert_geo_into_coord");
-   ok: // ok - return api
+   ok:
    return m->api;
 }
 
@@ -486,7 +471,7 @@ rect_place(Evas_Object *obj, Evas_Coord px, Evas_Coord py, Evas_Coord ox, Evas_C
    gw = wd->size.w;
    gh = wd->size.h;
 
-   if (ww == gw && hh == gh) return;
+   if ((ww == gw) && (hh == gh)) return;
 
    if (ow > gw) ax = (ow - gw) / 2;
    if (oh > gh) ay = (oh - gh) / 2;
@@ -537,8 +522,8 @@ marker_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord
      }
    wd->marker_zoom = wd->zoom;
 
-   if (wd->paused_markers
-       && (wd->size.nw != wd->size.w || wd->size.nh != wd->size.h) )
+   if ((wd->paused_markers)
+       && ((wd->size.nw != wd->size.w) || (wd->size.nh != wd->size.h)) )
      return;
 
    g_xx = wd->pan_x / wd->tsize;
@@ -554,7 +539,7 @@ marker_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord
    EINA_LIST_FREE(wd->cells_displayed, cell)
      {
 	eina_matrixsparse_cell_position_get(cell, (unsigned long *)&y, (unsigned long *)&x);
-	if (y < g_yy || y > g_yy + g_hh || x < g_xx || x > g_xx + g_ww)
+	if ((y < g_yy) || (y > g_yy + g_hh) || (x < g_xx) || (x > g_xx + g_ww))
 	  {
 	     EINA_LIST_FOREACH(eina_matrixsparse_cell_data_get(cell), l, group)
 	       {
@@ -605,9 +590,9 @@ marker_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord
 		       hh = (((long long)gh * (ty + hh)) / g->h) - yy;
 		    }
 
-		  if (!group->clas->hide
-                      && xx-px+ax+ox >= ox && xx-px+ax+ox<= ox+ow
-                      && yy-py+ay+oy >= oy && yy-py+ay+oy<= oy+oh)
+		  if ((!group->clas->hide)
+                      && (xx-px+ax+ox >= ox) && (xx-px+ax+ox<= ox+ow)
+                      && (yy-py+ay+oy >= oy) && (yy-py+ay+oy<= oy+oh))
 		    {
 		       if (!group->obj) _group_object_create(group);
 
@@ -625,7 +610,7 @@ marker_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord
 		       evas_object_move(group->obj,
                                         xx - px + ax + ox - ww/2,
                                         yy - py + ay + oy - hh/2);
-		       if (!wd->paused_markers || group->update_resize)
+		       if ((!wd->paused_markers) || (group->update_resize))
 			 {
 			    group->update_resize = EINA_FALSE;
 			    evas_object_resize(group->obj, ww, hh);
@@ -727,7 +712,7 @@ grid_clear(Evas_Object *obj, Grid *g)
 	  {
 	     gi->want = EINA_FALSE;
 	     wd->preload_num--;
-	     if (wd->preload_num == 0)
+	     if (!wd->preload_num)
 	       {
 		  edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr),
 			"elm,state,busy,stop", "elm");
@@ -741,6 +726,7 @@ grid_clear(Evas_Object *obj, Grid *g)
 	     ecore_file_download_abort(gi->job);
 	     ecore_file_remove(gi->file);
 	     gi->job = NULL;
+	     wd->try_num--;
 	  }
 	if (gi->file)
 	  eina_stringshare_del(gi->file);
@@ -770,7 +756,7 @@ _tile_update(Grid_Item *gi)
 
    gi->have = EINA_TRUE;
    gi->wd->preload_num--;
-   if (gi->wd->preload_num == 0)
+   if (!gi->wd->preload_num)
      {
 	edje_object_signal_emit(elm_smart_scroller_edje_object_get(gi->wd->scr),
                                 "elm,state,busy,stop", "elm");
@@ -788,13 +774,17 @@ _tile_downloaded(void *data, const char *file __UNUSED__, int status)
    gi->job = NULL;
 
    DBG("DOWNLOAD done %s", gi->file);
-   if (gi->want && !status) _tile_update(gi);
+   if ((gi->want) && (!status)) _tile_update(gi);
 
    if (status)
      {
 	DBG("Download failed %s (%d) ", gi->file, status);
 	ecore_file_remove(gi->file);
      }
+   else
+     gi->wd->finish_num++;
+
+   evas_object_smart_callback_call(gi->wd->obj, SIG_DOWNLOADED, NULL);
 }
 
 static Grid *
@@ -880,14 +870,6 @@ grid_load(Evas_Object *obj, Grid *g)
 	  {
 	     if (gi->want)
 	       {
-		  wd->preload_num--;
-		  if (wd->preload_num == 0)
-		    {
-		       edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr),
-                                               "elm,state,busy,stop", "elm");
-		       evas_object_smart_callback_call(obj, SIG_LOADED_DETAIL,
-						       NULL);
-		    }
 		  evas_object_hide(gi->img);
 		  //evas_object_hide(gi->txt);
 		  evas_object_image_file_set(gi->img, NULL, NULL);
@@ -900,8 +882,18 @@ grid_load(Evas_Object *obj, Grid *g)
 		       ecore_file_download_abort(gi->job);
 		       ecore_file_remove(gi->file);
 		       gi->job = NULL;
+                       wd->try_num--;
 		    }
 		  gi->download = EINA_FALSE;
+		  wd->preload_num--;
+		  if (!wd->preload_num)
+		    {
+		       edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr),
+                                               "elm,state,busy,stop", "elm");
+		       evas_object_smart_callback_call(obj, SIG_LOADED_DETAIL,
+						       NULL);
+		    }
+
 	       }
 	     else if (gi->have)
 	       {
@@ -973,7 +965,7 @@ grid_load(Evas_Object *obj, Grid *g)
 		  eina_matrixsparse_data_idx_set(g->grid, y, x, gi);
 	       }
              
-	     if (!gi->have && !gi->download)
+	     if ((!gi->have) && (!gi->download))
 	       {
 		  char buf[PATH_MAX], buf2[PATH_MAX];
 		  char *source;
@@ -987,11 +979,11 @@ grid_load(Evas_Object *obj, Grid *g)
 		  snprintf(buf2, sizeof(buf2), DEST_FILE_PATH, buf, y);
                   
 		  source = map_sources_tab[wd->source].url_cb(obj, x, y, g->zoom);
-		  if(strlen(source)==0) continue;
+		  if ((!source) || (strlen(source)==0)) continue;
                   
 		  eina_stringshare_replace(&gi->file, buf2);
 
-		  if (ecore_file_exists(buf2) || g == eina_list_data_get(wd->grids))
+		  if ((ecore_file_exists(buf2)) || (g == eina_list_data_get(wd->grids)))
 		    {
 		       gi->download = EINA_TRUE;
 		       wd->preload_num++;
@@ -1010,8 +1002,10 @@ grid_load(Evas_Object *obj, Grid *g)
 			 {
 			    DBG("DOWNLOAD %s \t in %s", source, buf2);
 			    ecore_file_download(source, buf2, _tile_downloaded, NULL, gi, &(gi->job));
-			    if (!gi->job)
-			      DBG("Can't start to download %s", buf);
+                            if (!gi->job)
+                              DBG("Can't start to download %s", buf);
+                            else
+                              wd->try_num++;
 			 }
 		    }
 		  if (source) free(source);
@@ -1052,7 +1046,7 @@ _smooth_update(Evas_Object *obj)
 	EINA_ITERATOR_FOREACH(it, cell)
 	  {
 	     Grid_Item *gi = eina_matrixsparse_cell_data_get(cell);
-	     evas_object_image_smooth_scale_set(gi->img, (wd->nosmooth == 0));
+	     evas_object_image_smooth_scale_set(gi->img, (!wd->nosmooth));
 	  }
 	eina_iterator_free(it);
      }
@@ -1082,7 +1076,7 @@ _scr_timeout(void *data)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return ECORE_CALLBACK_CANCEL;
    wd->nosmooth--;
-   if (wd->nosmooth == 0) _smooth_update(data);
+   if (!wd->nosmooth) _smooth_update(data);
    wd->scr_timer = NULL;
    return ECORE_CALLBACK_CANCEL;
 }
@@ -1169,7 +1163,7 @@ _zoom_anim(void *data)
    if (!go)
      {
 	wd->nosmooth--;
-	if (wd->nosmooth == 0) _smooth_update(data);
+	if (!wd->nosmooth) _smooth_update(data);
 	wd->zoom_animator = NULL;
 	evas_object_smart_callback_call(obj, SIG_ZOOM_STOP, NULL);
      }
@@ -1188,116 +1182,113 @@ _long_press(void *data)
 }
 
 static void
-_mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
+_mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Event_Mouse_Down *ev = (Evas_Event_Mouse_Down*)event_info;
-   struct event_t *ev0;
+   Evas_Event_Mouse_Down *ev = event_info;
+   Event *ev0;
    
-   ev0 = get_event_object(0);
-   if(!ev0){
-      ev0 = create_event_object(obj, 0);
-      if(ev0){
-         ev0->hold_timer = NULL;
-         ev0->prev.x = ev->output.x;
-         ev0->prev.y = ev->output.y;
-      }else return;
-   }else return;
+   ev0 = get_event_object(data, 0);
+   if (ev0) return;
+   ev0 = create_event_object(data, obj, 0);
+   if (!ev0) return;
+
+   ev0->hold_timer = NULL;
+   ev0->prev.x = ev->output.x;
+   ev0->prev.y = ev->output.y;
 
    if (!wd) return;
    if (ev->button != 1) return;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) wd->on_hold = EINA_TRUE;
    else wd->on_hold = EINA_FALSE;
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-     evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, ev);
+      evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, ev);
    else
-     evas_object_smart_callback_call(data, SIG_PRESS, ev);
+      evas_object_smart_callback_call(data, SIG_PRESS, ev);
    wd->longpressed = EINA_FALSE;
    if (wd->long_timer) ecore_timer_del(wd->long_timer);
    wd->long_timer = ecore_timer_add(_elm_config->longpress_timeout, _long_press, data);
 }
 
 static void
-_mouse_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
+_mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Event_Mouse_Move *move = (Evas_Event_Mouse_Move *)event_info;
-   struct event_t *ev0;
-   if(wd->pinch_zoom) return;
-   ev0 = get_event_object(0);
-   if(ev0 == NULL) return;
-   	
+   Evas_Event_Mouse_Move *move = event_info;
+   Event *ev0;
+   
+   if (wd->pinch_zoom) return;
+   ev0 = get_event_object(data, 0);
+   if (!ev0) return;
    ev0->prev.x = move->cur.output.x;
    ev0->prev.y = move->cur.output.y;
 }
 
 static void
-_mouse_up(void *data, Evas *evas, Evas_Object *obj, void *event_info)
+_mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Up *ev = event_info;
-
    int mdevice;
-   struct event_t *ev0;
-   struct event_t *ev1 = NULL;
+   Event *ev0;
+   Event *ev1;
    
-   ev0 = get_event_object(0);
-   if(ev0 != NULL) {
-      mdevice = get_multi_device();
-      if(mdevice == 0) {
-         if(ev0->hold_timer == NULL){
-         }else{
-            ecore_timer_del(ev0->hold_timer);
-            ev0->hold_timer = NULL;
-         }
-         elm_smart_scroller_hold_set(wd->scr, 0);
-         elm_smart_scroller_freeze_set(wd->scr, 0);
-         elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
-         elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);
-         wd->pinch_zoom = EINA_FALSE;
-      }else{
-         ev1 = get_event_object(mdevice);
-         if(ev1 != NULL){
-            ev1->hold_timer = ecore_timer_add(0.35f, hold_timer_cb, ev1);
-         }
-      }
-      destroy_event_object(ev0);
-   }else{
-      DBG("Cannot get event0");
-   }
+   ev0 = get_event_object(data, 0);
+   if (ev0)
+     {
+        mdevice = get_multi_device(data);
+        if (mdevice == 0)
+          {
+             if (ev0->hold_timer)
+               {
+                  ecore_timer_del(ev0->hold_timer);
+                  ev0->hold_timer = NULL;
+               }
+             elm_smart_scroller_hold_set(wd->scr, 0);
+             elm_smart_scroller_freeze_set(wd->scr, 0);
+             wd->pinch_zoom = EINA_FALSE;
+          }
+        else
+          {
+             ev1 = get_event_object(data, mdevice);
+             if (ev1) 
+                ev1->hold_timer = ecore_timer_add(0.35, _hold_timer_cb, ev1);
+          }
+        destroy_event_object(data, ev0);
+     }
+
    if (!wd) return;
    if (ev->button != 1) return;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) wd->on_hold = EINA_TRUE;
    else wd->on_hold = EINA_FALSE;
-   if (wd->long_timer){
-      ecore_timer_del(wd->long_timer);
-      wd->long_timer = NULL;
-   }
-   if (!wd->on_hold)
-   evas_object_smart_callback_call(data, SIG_CLICKED, ev);
+   if (wd->long_timer)
+     {
+	ecore_timer_del(wd->long_timer);
+	wd->long_timer = NULL;
+     }
+   if (!wd->on_hold) evas_object_smart_callback_call(data, SIG_CLICKED, ev);
    wd->on_hold = EINA_FALSE;
 }
 
 static void
-_mouse_multi_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
+_mouse_multi_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   struct event_t *ev;
+   Event *ev;
    Evas_Event_Multi_Down *down = event_info;
 
    elm_smart_scroller_hold_set(wd->scr, 1);
    elm_smart_scroller_freeze_set(wd->scr, 1);
-   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 1);
-   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 1);
 
-   ev = get_event_object(down->device);
-   if(ev) goto done;
+   ev = get_event_object(data, down->device);
+   if (ev) goto done;
 
-   ev = create_event_object(obj, down->device);
-   if(!ev){
-      DBG("Failed : create_event_object");
-      goto done;
-   }
+   ev = create_event_object(data, obj, down->device);
+   if (!ev)
+     {
+        DBG("Failed : create_event_object");
+        goto done;
+     }
 
    wd->pinch_zoom = EINA_FALSE;
 
@@ -1307,88 +1298,104 @@ _mouse_multi_down(void *data, Evas *evas, Evas_Object *obj, void *event_info)
 
 done:
    return;
-error:
-   elm_smart_scroller_hold_set(wd->scr, 0);
-   elm_smart_scroller_freeze_set(wd->scr, 0);
-   elm_smart_scroller_freeze_momentum_animator_set(wd->scr, 0);
-   elm_smart_scroller_freeze_bounce_animator_set(wd->scr, 0);
-
 }
 
 static void
-_mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info)
+_mouse_multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Event_Multi_Move *move = (Evas_Event_Multi_Move *)event_info;
-   int dis_new;
-   struct event_t *ev0;
-   struct event_t *ev;
+   Evas_Event_Multi_Move *move = event_info;
+   int dis_new, zoom;
+   Event *ev0;
+   Event *ev;
 
-   if(wd->pinch_zoom) return;
-   ev = get_event_object(move->device);
-   if(ev == NULL) {
-      DBG("Cannot get multi device");
-      return;
-   }
+   if (wd->pinch_zoom) return;
+   ev = get_event_object(data, move->device);
+   if (!ev) return;
 
    ev->prev.x = move->cur.output.x;
    ev->prev.y = move->cur.output.y;
 
-   ev0 = get_event_object(0);
-   if(ev0 == NULL) {
-      DBG("Cannot get device0");
-      return;
-   }
+   ev0 = get_event_object(data, 0);
+   if (!ev0) return;
 
    dis_new = get_distance(ev0->prev.x, ev0->prev.y, ev->prev.x, ev->prev.y);
-   int zoom = wd->zoom;
+   zoom = wd->zoom;
    
-   if(dis_old != 0) {
-      if(dis_old - dis_new > 0 && ev->pinch_dis > TOUCH_HOLD_RANGE){
-         wd->pinch_zoom = EINA_TRUE;
-         --zoom;
-         elm_map_zoom_set(data, zoom);
-         ev->pinch_dis = 0;
-      }else if(dis_old - dis_new < 0 && ev->pinch_dis < -TOUCH_HOLD_RANGE){
-         wd->pinch_zoom = EINA_TRUE;
-         ++zoom;
-         elm_map_zoom_set(data, zoom);
-         ev->pinch_dis = 0;
-      }
-
-      ev->pinch_dis += (dis_old - dis_new);
-   }
+   if (dis_old)
+     {
+        if (((dis_old - dis_new) > 0) && 
+            (ev->pinch_dis > elm_finger_size_get()))
+          {
+             wd->pinch_zoom = EINA_TRUE;
+             zoom--;
+             elm_map_zoom_set(data, zoom);
+             ev->pinch_dis = 0;
+          }
+        else if (((dis_old - dis_new) < 0) && 
+                 (ev->pinch_dis < -elm_finger_size_get()))
+          {
+             wd->pinch_zoom = EINA_TRUE;
+             zoom++;
+             elm_map_zoom_set(data, zoom);
+             ev->pinch_dis = 0;
+          }
+        ev->pinch_dis += (dis_old - dis_new);
+     }
    dis_old = dis_new;
 }
 
 static void
-_mouse_multi_up(void *data, Evas *evas, Evas_Object *obj, void *event_info)
+_mouse_multi_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
 {
-   Evas_Event_Multi_Up *up = (Evas_Event_Multi_Up *)event_info;
-   struct event_t *ev0;
-   struct event_t *ev;
+   Evas_Event_Multi_Up *up = event_info;
+   Event *ev0;
+   Event *ev;
 
-   ev = get_event_object(up->device);
-   if(ev == NULL){
-      DBG("Cannot get multi device");
-      return;
-   }
+   ev = get_event_object(data, up->device);
+   if (!ev)
+     {
+        DBG("Cannot get multi device");
+        return;
+     }
    dis_old = 0;
    
-   ev0 = get_event_object(0);
-   if(ev0){
-      ev0->hold_timer = ecore_timer_add(0.35f, hold_timer_cb, ev0);
-   }else{
-      if(ev->hold_timer == NULL) {
-      } else {
-         ecore_timer_del(ev->hold_timer);
-         ev->hold_timer = NULL;
-      }   
-   }
-   destroy_event_object(ev);
+   ev0 = get_event_object(data, 0);
+   if (ev0)
+      ev0->hold_timer = ecore_timer_add(0.35, _hold_timer_cb, ev0);
+   else
+     {
+        if (ev->hold_timer)
+          {
+             ecore_timer_del(ev->hold_timer);
+             ev->hold_timer = NULL;
+          }   
+     }
+   destroy_event_object(data, ev);
 }
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_NULL;
+
+static Eina_Bool
+_hold_timer_cb(void *data)
+{
+   Event *ev0 = data;
+   
+   ev0->hold_timer = NULL;
+   return ECORE_CALLBACK_CANCEL;
+}
+
+static void 
+_rect_resize_cb(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   int x, y, w, h;
+
+   evas_object_geometry_get(wd->rect, &x, &y, &w, &h);
+   evas_object_geometry_get(wd->pan_smart, &x, &y, &w, &h);
+   evas_object_resize(wd->rect, w, h);
+   evas_object_move(wd->rect, x, y);
+}
 
 static void
 _del_hook(Evas_Object *obj)
@@ -1396,6 +1403,8 @@ _del_hook(Evas_Object *obj)
    Elm_Map_Group_Class *group_clas;
    Elm_Map_Marker_Class *marker_clas;
    Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_List *l;
+   Event *ev;
 
    if (!wd) return;
 
@@ -1413,12 +1422,17 @@ _del_hook(Evas_Object *obj)
 	free(marker_clas);
      }
 
+   EINA_LIST_FOREACH(wd->s_event_list, l, ev)
+     {
+        destroy_event_object(obj, ev);
+     }
+
    if (wd->calc_job) ecore_job_del(wd->calc_job);
    if (wd->scr_timer) ecore_timer_del(wd->scr_timer);
    if (wd->zoom_animator) ecore_animator_del(wd->zoom_animator);
    if (wd->long_timer) ecore_timer_del(wd->long_timer);
-
    if ((wd->api) && (wd->api->obj_unhook)) wd->api->obj_unhook(obj);
+
    free(wd);
 }
 
@@ -1462,6 +1476,23 @@ _del_pre_hook(Evas_Object *obj)
    evas_object_del(wd->sep_maps_markers);
    evas_object_del(wd->pan_smart);
    wd->pan_smart = NULL;
+}
+
+static void
+_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (elm_widget_focus_get(obj))
+     {
+       edje_object_signal_emit(wd->obj, "elm,action,focus", "elm");
+       evas_object_focus_set(wd->obj, EINA_TRUE);
+     }
+   else
+     {
+       edje_object_signal_emit(wd->obj, "elm,action,unfocus", "elm");
+       evas_object_focus_set(wd->obj, EINA_FALSE);
+     }
 }
 
 static void
@@ -1547,6 +1578,13 @@ _pan_max_get(Evas_Object *obj, Evas_Coord *x, Evas_Coord *y)
    if (oh < 0) oh = 0;
    if (x) *x = ow;
    if (y) *y = oh;
+}
+
+static void
+_pan_min_get(Evas_Object *obj __UNUSED__, Evas_Coord *x, Evas_Coord *y)
+{
+   if (x) *x = 0;
+   if (y) *y = 0;
 }
 
 static void
@@ -1693,7 +1731,7 @@ _group_object_create(Marker_Group *group)
    Evas_Object *icon = NULL;
 
    if (group->obj) return;
-   if (!group->clas->priv.objs_notused || eina_list_count(group->markers) == 1)
+   if ((!group->clas->priv.objs_notused) || (eina_list_count(group->markers) == 1))
      {
 	//set icon and style
 	if (eina_list_count(group->markers) == 1)
@@ -1832,7 +1870,7 @@ _group_bubble_content_update(Marker_Group *group)
 	group->sc = elm_scroller_add(group->bubble);
 	elm_scroller_content_min_limit(group->sc, EINA_FALSE, EINA_TRUE);
 	elm_scroller_policy_set(group->sc, ELM_SCROLLER_POLICY_AUTO, ELM_SCROLLER_POLICY_OFF);
-	elm_scroller_bounce_set(group->sc, EINA_TRUE, EINA_FALSE);
+	elm_scroller_bounce_set(group->sc, _elm_config->thumbscroll_bounce_enable, EINA_FALSE);
 	edje_object_part_swallow(group->bubble, "elm.swallow.content", group->sc);
 	evas_object_show(group->sc);
 	evas_object_smart_member_add(group->sc,
@@ -1854,7 +1892,7 @@ _group_bubble_content_update(Marker_Group *group)
    EINA_LIST_FOREACH(group->markers, l, marker)
      {
 	if (i >= group->wd->markers_max_num) break;
-	if (!marker->content && marker->clas->func.get)
+	if ((!marker->content) && (marker->clas->func.get))
 	  marker->content = marker->clas->func.get(group->wd->obj, marker, marker->data);
 	else if (marker->content)
 	  elm_box_unpack(group->bx, marker->content);
@@ -1876,7 +1914,7 @@ _group_bubble_content_free(Marker_Group *group)
    if (!group->sc) return;
    EINA_LIST_FOREACH(group->markers, l, marker)
      {
-	if (marker->content && marker->clas->func.del)
+	if ((marker->content) && (marker->clas->func.del))
 	  marker->clas->func.del(group->wd->obj, marker, marker->data, marker->content);
 	else if (marker->content)
 	  evas_object_del(marker->content);
@@ -1906,7 +1944,7 @@ _group_bubble_place(Marker_Group *group)
    Evas_Coord xx, yy, ww, hh;
    const char *s;
 
-   if (!group->bubble || !group->obj) return;
+   if ((!group->bubble) || (!group->obj)) return;
 
    evas_object_geometry_get(group->obj, &x, &y, &w, NULL);
    edje_object_size_min_calc(group->bubble, NULL, &hh);
@@ -1956,6 +1994,84 @@ _group_open_cb(void *data, Evas_Object *obj __UNUSED__, const char *emission __U
    _group_bubble_create(group);
 }
 
+static Eina_Bool
+_event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
+{
+   double zoom;
+   Evas_Coord x = 0;
+   Evas_Coord y = 0;
+   Evas_Coord step_x = 0;
+   Evas_Coord step_y = 0;
+   Evas_Coord v_w = 0;
+   Evas_Coord v_h = 0;
+   Evas_Coord page_x = 0;
+   Evas_Coord page_y = 0;
+
+   if (type != EVAS_CALLBACK_KEY_DOWN) return EINA_FALSE;
+   Evas_Event_Key_Down *ev = event_info;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return EINA_FALSE;
+
+   elm_smart_scroller_child_pos_get(wd->scr, &x, &y);
+   elm_smart_scroller_step_size_get(wd->scr, &step_x, &step_y);
+   elm_smart_scroller_page_size_get(wd->scr, &page_x, &page_y);
+   elm_smart_scroller_child_viewport_size_get(wd->scr, &v_w, &v_h);
+
+   if ((!strcmp(ev->keyname, "Left")) || (!strcmp(ev->keyname, "KP_Left")))
+     {
+        x -= step_x;
+     }
+   else if ((!strcmp(ev->keyname, "Right")) || (!strcmp(ev->keyname, "KP_Right")))
+     {
+        x += step_x;
+     }
+   else if ((!strcmp(ev->keyname, "Up"))  || (!strcmp(ev->keyname, "KP_Up")))
+     {
+        y -= step_y;
+     }
+   else if ((!strcmp(ev->keyname, "Down")) || (!strcmp(ev->keyname, "KP_Down")))
+     {
+        y += step_y;
+     }
+   else if ((!strcmp(ev->keyname, "Prior")) || (!strcmp(ev->keyname, "KP_Prior")))
+     {
+        if (page_y < 0)
+           y -= -(page_y * v_h) / 100;
+        else
+           y -= page_y;
+     }
+   else if ((!strcmp(ev->keyname, "Next")) || (!strcmp(ev->keyname, "KP_Next")))
+     {
+        if (page_y < 0)
+           y += -(page_y * v_h) / 100;
+        else
+           y += page_y;
+     }
+   else if (!strcmp(ev->keyname, "KP_Add"))
+     {
+        zoom = elm_map_zoom_get(obj);
+        zoom += 1;
+        elm_map_zoom_mode_set(obj, ELM_MAP_ZOOM_MODE_MANUAL);
+        elm_map_zoom_set(obj, zoom);
+        return EINA_TRUE;
+     }
+   else if (!strcmp(ev->keyname, "KP_Subtract"))
+     {
+        zoom = elm_map_zoom_get(obj);
+        zoom -= 1;
+        elm_map_zoom_mode_set(obj, ELM_MAP_ZOOM_MODE_MANUAL);
+        elm_map_zoom_set(obj, zoom);
+        return EINA_TRUE;
+     }
+   else return EINA_FALSE;
+
+   ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+   elm_smart_scroller_child_pos_set(wd->scr, x, y);
+
+   return EINA_TRUE;
+}
+
 static int idnum = 1;
 
 /**
@@ -1973,9 +2089,10 @@ elm_map_add(Evas_Object *parent)
    Widget_Data *wd;
    Evas_Coord minw, minh;
    Evas_Object *obj;
-   Eina_Bool ret = EINA_FALSE;
-   int idx;
    static Evas_Smart *smart = NULL;
+   Eina_Bool bounce = _elm_config->thumbscroll_bounce_enable;
+
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
 
    if (!ecore_file_download_protocol_available("http://"))
      {
@@ -1984,16 +2101,19 @@ elm_map_add(Evas_Object *parent)
      }
 
    wd = ELM_NEW(Widget_Data);
-   wd->api = NULL;
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "map");
    elm_widget_type_set(obj, "map");
    elm_widget_sub_object_add(parent, obj);
+   elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_can_focus_set(obj, EINA_TRUE);
+   elm_widget_event_hook_set(obj, _event_hook);
 
    wd->scr = elm_smart_scroller_add(e);
    elm_smart_scroller_widget_set(wd->scr, obj);
@@ -2008,21 +2128,15 @@ elm_map_add(Evas_Object *parent)
    evas_object_smart_callback_add(wd->scr, "drag,stop", _scr_drag_stop, obj);
    evas_object_smart_callback_add(wd->scr, "scroll", _scr_scroll, obj);
 
-   elm_smart_scroller_bounce_allow_set(wd->scr, EINA_TRUE, EINA_TRUE);
+   elm_smart_scroller_bounce_allow_set(wd->scr, bounce, bounce);
+
+   wd->api = module(obj);
+   if ((wd->api) && (wd->api->obj_hook)) wd->api->obj_hook(obj);
 
    wd->obj = obj;
 
    wd->markers_max_num = 30;
    wd->source = ELM_MAP_SOURCE_MAPNIK;
-
-   for(idx=ELM_MAP_SOURCE_MAPNIK; idx<=ELM_MAP_SOURCE_CUSTOM_6; idx++)
-   if(map_sources_tab[idx].use_module == EINA_TRUE){
-      if(!wd->api){
-         wd->api = module(obj);
-         if ((wd->api) && (wd->api->obj_hook)) ret = wd->api->obj_hook(obj);
-	 if (!ret) DBG("Failed : loading module [%s]", elm_map_source_name_get(idx));
-      }
-   }
 
    evas_object_smart_callback_add(obj, "scroll-hold-on", _hold_on, obj);
    evas_object_smart_callback_add(obj, "scroll-hold-off", _hold_off, obj);
@@ -2052,23 +2166,24 @@ elm_map_add(Evas_Object *parent)
      }
 
    elm_smart_scroller_extern_pan_set(wd->scr, wd->pan_smart,
-	 _pan_set, _pan_get,
-	 _pan_max_get, _pan_child_size_get);
+                                     _pan_set, _pan_get, _pan_max_get,
+                                     _pan_min_get, _pan_child_size_get);
 
    wd->rect = evas_object_rectangle_add(e);
-   evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_RESIZE, _rect_resize_cb, obj);
+   evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_RESIZE,
+                                  _rect_resize_cb, obj);
    evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MOUSE_DOWN,
 	 _mouse_down, obj);
+   evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MOUSE_MOVE,
+                                  _mouse_move, obj);
    evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MOUSE_UP,
 	 _mouse_up, obj);
-   evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MOUSE_MOVE,
-         _mouse_move, obj);
    evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MULTI_DOWN, 
-         _mouse_multi_down, obj);
+                                  _mouse_multi_down, obj);
    evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MULTI_MOVE,
-         _mouse_multi_move, obj);
+                                  _mouse_multi_move, obj);
    evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MULTI_UP,
-         _mouse_multi_up, obj);
+                                  _mouse_multi_up, obj);
 
    evas_object_smart_member_add(wd->rect, wd->pan_smart);
    elm_widget_sub_object_add(obj, wd->rect);
@@ -2083,7 +2198,7 @@ elm_map_add(Evas_Object *parent)
    wd->tsize = 256;
 
    edje_object_size_min_calc(elm_smart_scroller_edje_object_get(wd->scr),
-	 &minw, &minh);
+                             &minw, &minh);
    evas_object_size_hint_min_set(obj, minw, minh);
 
    wd->paused = EINA_TRUE;
@@ -2131,7 +2246,6 @@ elm_map_zoom_set(Evas_Object *obj, int zoom)
    if (zoom < map_sources_tab[wd->source].zoom_min)
      zoom = map_sources_tab[wd->source].zoom_min;
    if (zoom == wd->zoom) return;
-   if (wd->zoom_animator) return;
 
    wd->zoom = zoom;
    wd->size.ow = wd->size.w;
@@ -2393,7 +2507,7 @@ elm_map_geo_region_bring_in(Evas_Object *obj, double lon, double lat)
    if (wd->zoom_animator)
      {
 	wd->nosmooth--;
-	if (wd->nosmooth == 0) _smooth_update(obj);
+	if (!wd->nosmooth) _smooth_update(obj);
 	ecore_animator_del(wd->zoom_animator);
 	wd->zoom_animator = NULL;
 	zoom_do(obj, 1.0);
@@ -2566,6 +2680,35 @@ elm_map_paused_markers_get(const Evas_Object *obj)
 }
 
 /**
+ * Get the information of downloading status
+ *
+ * This gets the current downloading status for the map object.
+ *
+ * @param obj The map object
+ * @param try_num the number of download trying map
+ * @param finish_num the number of downloaded map
+ *
+ * @ingroup Map
+ */
+
+EAPI void 
+elm_map_utils_downloading_status_get(const Evas_Object *obj, int *try_num, int *finish_num)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   if (try_num)
+     {
+        *try_num = wd->try_num;
+     }
+
+   if (finish_num)
+     {
+        *finish_num = wd->finish_num;
+     }
+}
+/**
  * Convert a pixel coordinate (x,y) into a geographic coordinate (longitude, latitude).
  *
  * @param obj The map object
@@ -2583,11 +2726,9 @@ elm_map_utils_convert_coord_into_geo(const Evas_Object *obj, int x, int y, int s
    Widget_Data *wd = elm_widget_data_get(obj);
    int zoom = floor(log2(size/256));
 
-   if(map_sources_tab[elm_map_source_get(obj)].use_module == EINA_TRUE)
-   if(wd->api) if ((wd->api) && (wd->api->obj_convert_coord_into_geo)){
-      if(wd->api->obj_convert_coord_into_geo(obj, zoom, x, y, size, lon, lat)==EINA_TRUE)
-         return;
-   }
+   if (elm_map_source_get(obj) == ELM_MAP_SOURCE_MODULE)
+     if ((wd->api) && (wd->api->obj_convert_coord_into_geo))
+       if (wd->api->obj_convert_coord_into_geo(obj, zoom, x, y, size, lon, lat)) return;
 
    if (lon)
      {
@@ -2618,11 +2759,9 @@ elm_map_utils_convert_geo_into_coord(const Evas_Object *obj, double lon, double 
    Widget_Data *wd = elm_widget_data_get(obj);
    int zoom = floor(log2(size/256));
 
-   if(map_sources_tab[elm_map_source_get(obj)].use_module == EINA_TRUE)
-   if(wd->api) if ((wd->api) && (wd->api->obj_convert_geo_into_coord)){
-      if(wd->api->obj_convert_geo_into_coord(obj, zoom, lon, lat, size, x, y)==EINA_TRUE)
-         return;
-   }
+   if (elm_map_source_get(obj) == ELM_MAP_SOURCE_MODULE)
+     if ((wd->api) && (wd->api->obj_convert_geo_into_coord))
+       if (wd->api->obj_convert_geo_into_coord(obj, zoom, lon, lat, size, x, y)) return;
 
    if (x)
      *x = floor((lon + 180.0) / 360.0 * size);
@@ -2661,7 +2800,8 @@ elm_map_marker_add(Evas_Object *obj, double lon, double lat, Elm_Map_Marker_Clas
    Evas_Object *o;
 
    if (!wd) return NULL;
-   if (!clas_group || !clas) return NULL;
+   EINA_SAFETY_ON_NULL_RETURN_VAL(clas_group, NULL);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(clas, NULL);
 
    Elm_Map_Marker *marker = ELM_NEW(Elm_Map_Marker);
 
@@ -2833,13 +2973,13 @@ elm_map_marker_remove(Elm_Map_Marker *marker)
    Eina_List *groups;
    Widget_Data *wd;
 
-   if (!marker) return;
+   EINA_SAFETY_ON_NULL_RETURN(marker);
    wd = marker->wd;
    if (!wd) return;
    for (i = 0; i <= ZOOM_MAX; i++)
      {
 	marker->groups[i]->markers = eina_list_remove(marker->groups[i]->markers, marker);
-	if (eina_list_count(marker->groups[i]->markers) == 0)
+	if (!eina_list_count(marker->groups[i]->markers))
 	  {
              groups = eina_matrixsparse_cell_data_get(marker->groups[i]->cell);
              groups = eina_list_remove(groups, marker->groups[i]);
@@ -2866,14 +3006,14 @@ elm_map_marker_remove(Elm_Map_Marker *marker)
 	     if (marker->groups[i]->h > marker->groups[i]->clas->priv.edje_max_h)
 	       marker->groups[i]->h = marker->groups[i]->clas->priv.edje_max_h;
 	  }
-	if (marker->groups[i]->obj && eina_list_count(marker->groups[i]->markers) == 1)
+	if ((marker->groups[i]->obj) && (eina_list_count(marker->groups[i]->markers) == 1))
 	  {
 	     _group_object_free(marker->groups[i]);
 	     _group_object_create(marker->groups[i]);
 	  }
      }
 
-   if (marker->content && marker->clas->func.del)
+   if ((marker->content) && (marker->clas->func.del))
      marker->clas->func.del(marker->wd->obj, marker, marker->data, marker->content);
    else if (marker->content)
      evas_object_del(marker->content);
@@ -2898,7 +3038,7 @@ elm_map_marker_remove(Elm_Map_Marker *marker)
 EAPI void
 elm_map_marker_bring_in(Elm_Map_Marker *marker)
 {
-   if (!marker) return;
+   EINA_SAFETY_ON_NULL_RETURN(marker);
    elm_map_geo_region_bring_in(marker->wd->obj, marker->longitude, marker->latitude);
 }
 
@@ -2913,7 +3053,7 @@ elm_map_marker_bring_in(Elm_Map_Marker *marker)
 EAPI void
 elm_map_marker_show(Elm_Map_Marker *marker)
 {
-   if (!marker) return;
+   EINA_SAFETY_ON_NULL_RETURN(marker);
    elm_map_geo_region_show(marker->wd->obj, marker->longitude, marker->latitude);
 }
 
@@ -2938,22 +3078,22 @@ elm_map_markers_list_show(Eina_List *markers)
    Evas_Coord rw, rh, xc, yc;
    Widget_Data *wd;
 
-   if (!markers) return;
+   EINA_SAFETY_ON_NULL_RETURN(markers);
 
    EINA_LIST_FOREACH(markers, l, marker)
      {
 	wd = marker->wd;
 
-	if (!m_min_lon || marker->longitude < m_min_lon->longitude)
+	if ((!m_min_lon) || (marker->longitude < m_min_lon->longitude))
 	  m_min_lon = marker;
         
-	if (!m_max_lon || marker->longitude > m_max_lon->longitude)
+	if ((!m_max_lon) || (marker->longitude > m_max_lon->longitude))
 	  m_max_lon = marker;
         
-	if (!m_min_lat || marker->latitude > m_min_lat->latitude)
+	if ((!m_min_lat) || (marker->latitude > m_min_lat->latitude))
 	  m_min_lat = marker;
         
-	if (!m_max_lat || marker->latitude < m_max_lat->latitude)
+	if ((!m_max_lat) || (marker->latitude < m_max_lat->latitude))
 	  m_max_lat = marker;
      }
    
@@ -2966,10 +3106,10 @@ elm_map_markers_list_show(Eina_List *markers)
 	Evas_Coord size = pow(2.0, zoom)*wd->tsize;
 	elm_map_utils_convert_geo_into_coord(wd->obj, lon, lat, size, &xc, &yc);
         
-	if (m_min_lon->x[zoom] - wd->marker_max_w >= xc-rw/2
-            && m_min_lat->y[zoom] - wd->marker_max_h >= yc-rh/2
-            && m_max_lon->x[zoom] + wd->marker_max_w <= xc+rw/2
-            && m_max_lat->y[zoom] + wd->marker_max_h <= yc+rh/2)
+	if ((m_min_lon->x[zoom] - wd->marker_max_w >= xc-rw/2)
+            && (m_min_lat->y[zoom] - wd->marker_max_h >= yc-rh/2)
+            && (m_max_lon->x[zoom] + wd->marker_max_w <= xc+rw/2)
+            && (m_max_lat->y[zoom] + wd->marker_max_h <= yc+rh/2))
 	  break;
      }
 
@@ -3007,9 +3147,9 @@ elm_map_max_marker_per_group_set(Evas_Object *obj, int max)
  * @ingroup Map
  */
 EAPI Evas_Object *
-elm_map_marker_object_get(Elm_Map_Marker *marker)
+elm_map_marker_object_get(const Elm_Map_Marker *marker)
 {
-   if (!marker) return NULL;
+   EINA_SAFETY_ON_NULL_RETURN_VAL(marker, NULL);
    return marker->content;
 }
 
@@ -3023,7 +3163,7 @@ elm_map_marker_object_get(Elm_Map_Marker *marker)
 EAPI void
 elm_map_marker_update(Elm_Map_Marker *marker)
 {
-   if (!marker) return;
+   EINA_SAFETY_ON_NULL_RETURN(marker);
    if (marker->content)
      {
 	if (marker->clas->func.del)
@@ -3089,7 +3229,7 @@ elm_map_group_class_new(Evas_Object *obj)
 EAPI void
 elm_map_group_class_style_set(Elm_Map_Group_Class *clas, const char *style)
 {
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    eina_stringshare_replace(&clas->style, style);
 }
 
@@ -3106,7 +3246,7 @@ elm_map_group_class_style_set(Elm_Map_Group_Class *clas, const char *style)
 EAPI void
 elm_map_group_class_icon_cb_set(Elm_Map_Group_Class *clas, ElmMapGroupIconGetFunc icon_get)
 {
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    clas->func.icon_get = icon_get;
 }
 
@@ -3121,7 +3261,7 @@ elm_map_group_class_icon_cb_set(Elm_Map_Group_Class *clas, ElmMapGroupIconGetFun
 EAPI void
 elm_map_group_class_data_set(Elm_Map_Group_Class *clas, void *data)
 {
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    clas->data = data;
 }
 
@@ -3138,7 +3278,7 @@ elm_map_group_class_data_set(Elm_Map_Group_Class *clas, void *data)
 EAPI void
 elm_map_group_class_zoom_displayed_set(Elm_Map_Group_Class *clas, int zoom)
 {
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    clas->zoom_displayed = zoom;
 }
 
@@ -3153,7 +3293,7 @@ elm_map_group_class_zoom_displayed_set(Elm_Map_Group_Class *clas, int zoom)
 EAPI void
 elm_map_group_class_zoom_grouped_set(Elm_Map_Group_Class *clas, int zoom)
 {
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    clas->zoom_grouped = zoom;
 }
 
@@ -3172,7 +3312,7 @@ elm_map_group_class_hide_set(Evas_Object *obj, Elm_Map_Group_Class *clas, Eina_B
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    if (clas->hide == hide) return;
    clas->hide = hide;
    if (wd->grids)
@@ -3217,7 +3357,7 @@ elm_map_marker_class_new(Evas_Object *obj)
 EAPI void
 elm_map_marker_class_style_set(Elm_Map_Marker_Class *clas, const char *style)
 {
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    eina_stringshare_replace(&clas->style, style);
 }
 
@@ -3234,7 +3374,7 @@ elm_map_marker_class_style_set(Elm_Map_Marker_Class *clas, const char *style)
 EAPI void
 elm_map_marker_class_icon_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerIconGetFunc icon_get)
 {
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    clas->func.icon_get = icon_get;
 }
 
@@ -3253,7 +3393,7 @@ elm_map_marker_class_icon_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerIconGet
 EAPI void
 elm_map_marker_class_get_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerGetFunc get)
 {
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    clas->func.get = get;
 }
 
@@ -3271,7 +3411,7 @@ elm_map_marker_class_get_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerGetFunc 
 EAPI void
 elm_map_marker_class_del_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerDelFunc del)
 {
-   if (!clas) return;
+   EINA_SAFETY_ON_NULL_RETURN(clas);
    clas->func.del = del;
 }
 
@@ -3303,7 +3443,7 @@ elm_map_source_set(Evas_Object *obj, Elm_Map_Sources source)
    wd->source = source;
    zoom = wd->zoom;
    wd->zoom = -1;
-
+   
    if (map_sources_tab[wd->source].zoom_max < zoom)
      zoom = map_sources_tab[wd->source].zoom_max;
    if (map_sources_tab[wd->source].zoom_min > zoom)
@@ -3345,7 +3485,8 @@ elm_map_source_get(const Evas_Object *obj)
 EAPI void
 elm_map_source_custom_api_set(Elm_Map_Sources source, const char *name, int zoom_min, int zoom_max, ElmMapSourceURLFunc url_cb)
 {
-   if (!name || !url_cb) return;
+   EINA_SAFETY_ON_NULL_RETURN(name);
+   EINA_SAFETY_ON_NULL_RETURN(url_cb);
    map_sources_tab[source].name = name;
    map_sources_tab[source].zoom_min = zoom_min;
    map_sources_tab[source].zoom_max = zoom_max;
@@ -3396,7 +3537,7 @@ elm_map_source_name_get(Elm_Map_Sources source)
 
 
 static char *
-_mapnik_url_cb(void *data, int x, int y, int zoom)
+_mapnik_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
 {
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf), "http://tile.openstreetmap.org/%d/%d/%d.png",
@@ -3405,43 +3546,82 @@ _mapnik_url_cb(void *data, int x, int y, int zoom)
 }
 
 static char *
-_osmarender_url_cb(void * data, int x, int y, int zoom)
+_osmarender_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
 {
    char buf[PATH_MAX];
-   snprintf(buf, sizeof(buf), "http://tah.openstreetmap.org/Tiles/tile/%d/%d/%d.png",
+   snprintf(buf, sizeof(buf), 
+            "http://tah.openstreetmap.org/Tiles/tile/%d/%d/%d.png",
             zoom, x, y);
    return strdup(buf);
 }
 
 static char *
-_cyclemap_url_cb(void *data, int x, int y, int zoom)
+_cyclemap_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
 {
    char buf[PATH_MAX];
-   snprintf(buf, sizeof(buf), "http://andy.sandbox.cloudmade.com/tiles/cycle/%d/%d/%d.png",
+   snprintf(buf, sizeof(buf), 
+            "http://andy.sandbox.cloudmade.com/tiles/cycle/%d/%d/%d.png",
             zoom, x, y);
    return strdup(buf);
 }
 
 static char *
-_maplint_url_cb(void *data, int x, int y, int zoom)
+_maplint_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
 {
    char buf[PATH_MAX];
-   snprintf(buf, sizeof(buf), "http://tah.openstreetmap.org/Tiles/maplint/%d/%d/%d.png",
+   snprintf(buf, sizeof(buf), 
+            "http://tah.openstreetmap.org/Tiles/maplint/%d/%d/%d.png",
             zoom, x, y);
    return strdup(buf);
 }
 
 static char *
-_decarta_url_cb(void *data, int x, int y, int zoom)
+_custom1_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
 {
-   char *url = NULL;
-   Widget_Data *wd = elm_widget_data_get(data);
-   if(map_sources_tab[elm_map_source_get(data)].use_module == EINA_TRUE)
-   if(wd->api) if ((wd->api) && (wd->api->obj_url_request))
-      url = wd->api->obj_url_request(data, x, y, zoom);
+   return strdup("");
+}
 
-   if(!url) url = strdup("");
+static char *
+_custom2_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
+{
+   return strdup("");
+}
 
-   return url;
+static char *
+_custom3_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
+{
+   return strdup("");
+}
+
+static char *
+_custom4_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
+{
+   return strdup("");
+}
+
+static char *
+_custom5_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
+{
+   return strdup("");
+}
+
+static char *
+_custom6_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
+{
+   return strdup("");
+}
+
+static char *
+_module_url_cb(Evas_Object *obj, int x, int y, int zoom)
+{
+   char *buf = NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (elm_map_source_get(obj) == ELM_MAP_SOURCE_MODULE)
+      if ((wd->api) && (wd->api->obj_url_request))
+         buf = wd->api->obj_url_request(obj, x, y, zoom);
+
+   if (!buf) buf = strdup("");
+
+   return buf;
 }
 

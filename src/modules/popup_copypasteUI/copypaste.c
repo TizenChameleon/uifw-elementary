@@ -3,6 +3,18 @@
 #include "elm_priv.h"
 
 Elm_Entry_Extension_data *ext_mod;
+typedef struct _Elm_Entry_Context_Menu_Item Elm_Entry_Context_Menu_Item;
+struct _Elm_Entry_Context_Menu_Item
+{
+   Evas_Object *obj;
+   const char *label;
+   const char *icon_file;
+   const char *icon_group;
+   Elm_Icon_Type icon_type;
+   Evas_Smart_Cb func;
+   void *data;
+};
+
 
 static void
 _select(void *data, Evas_Object *obj, void *event_info)
@@ -118,7 +130,7 @@ obj_longpress(Evas_Object *obj)
 		elm_popup_title_label_set(ext_mod->popup,"CopyPaste");
 		list = elm_list_add(ext_mod->popup);
 		elm_object_style_set(list,"popup");
-		elm_list_horizontal_mode_set(list, ELM_LIST_COMPRESS);
+		elm_list_mode_set(list, ELM_LIST_COMPRESS);
 		elm_widget_sub_object_add(obj, ext_mod->popup);
 		if (!ext_mod->selmode)
 		{	

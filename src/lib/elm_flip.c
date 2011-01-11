@@ -59,6 +59,22 @@ _theme_hook(Evas_Object *obj)
    _sizing_eval(obj);
 }
 
+static Eina_Bool
+_elm_flip_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd)
+     return EINA_FALSE;
+
+   /* Try Focus cycle in subitem */
+   if (wd->state)
+     return elm_widget_focus_next_get(wd->front.content, dir, next);
+   else
+     return elm_widget_focus_next_get(wd->back.content, dir, next);
+
+}
+
 static void
 _sizing_eval(Evas_Object *obj)
 {
@@ -143,6 +159,7 @@ flip_show_hide(Evas_Object *obj)
            evas_object_hide(wd->back.clip);
      }
 }
+
 static Eina_Bool
 _flip(Evas_Object *obj)
 {
@@ -158,7 +175,6 @@ _flip(Evas_Object *obj)
    if (t > 1.0) t = 1.0;
 
    if (!wd) return ECORE_CALLBACK_CANCEL;
-   evas_object_geometry_get(obj, &x, &y, &w, &h);
 
    mf = evas_map_new(4);
    evas_map_smooth_set(mf, 0);
@@ -166,9 +182,17 @@ _flip(Evas_Object *obj)
    evas_map_smooth_set(mb, 0);
 
    if (wd->front.content)
-     evas_map_util_points_populate_from_object_full(mf, wd->front.content, 0);
+     {
+        evas_object_geometry_get(wd->front.content, &x, &y, &w, &h);
+        evas_map_util_points_populate_from_geometry(mf, x, y, w, h, 0);
+     }
    if (wd->back.content)
-     evas_map_util_points_populate_from_object_full(mb, wd->back.content, 0);
+     {
+        evas_object_geometry_get(wd->back.content, &x, &y, &w, &h);
+        evas_map_util_points_populate_from_geometry(mb, x, y, w, h, 0);
+     }
+   
+   evas_object_geometry_get(obj, &x, &y, &w, &h);
    
    cx = x + (w / 2);
    cy = y + (h / 2);
@@ -313,11 +337,11 @@ _flip(Evas_Object *obj)
      {
         evas_object_map_enable_set(wd->front.content, 0);
         evas_object_map_enable_set(wd->back.content, 0);
-// FIXME: hack around evas rendering bug (only fix makes evas bitch-slow
+        // FIXME: hack around evas rendering bug (only fix makes evas bitch-slow
         evas_object_resize(wd->front.content, 0, 0);
         evas_object_resize(wd->back.content, 0, 0);
         evas_smart_objects_calculate(evas_object_evas_get(obj));
-// FIXME: end hack
+        // FIXME: end hack
         wd->animator = NULL;
         wd->state = !wd->state;
         _configure(obj);
@@ -382,8 +406,11 @@ elm_flip_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
+   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "flip");
    elm_widget_type_set(obj, "flip");
@@ -391,14 +418,18 @@ elm_flip_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_focus_next_hook_set(obj, _elm_flip_focus_next_hook);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
 
    wd->clip = evas_object_rectangle_add(e);
+   evas_object_static_clip_set(wd->clip, 1);
    evas_object_color_set(wd->clip, 255, 255, 255, 255);
    evas_object_move(wd->clip, -49999, -49999);
    evas_object_resize(wd->clip, 99999, 99999);
    elm_widget_sub_object_add(obj, wd->clip);
    evas_object_clip_set(wd->clip, evas_object_clip_get(obj));
    evas_object_smart_member_add(wd->clip, obj);
+   
    wd->front.clip = evas_object_rectangle_add(e);
    evas_object_static_clip_set(wd->front.clip, 1);
    evas_object_data_set(wd->front.clip, "_elm_leaveme", obj);
@@ -430,10 +461,14 @@ elm_flip_add(Evas_Object *parent)
 }
 
 /**
- * Set the flip front content
+ * Set the front content of the flip widget.
+ *
+ * Once the content object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_flip_content_front_unset() function.
  *
  * @param obj The flip object
- * @param content The content to be used in this flip object
+ * @param content The new front content object
  *
  * @ingroup Flip
  */
@@ -444,12 +479,7 @@ elm_flip_content_front_set(Evas_Object *obj, Evas_Object *content)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (wd->front.content == content) return;
-   if ((wd->front.content != content) && (wd->front.content))
-     {
-        evas_object_clip_set(wd->front.content, NULL);
-        elm_widget_sub_object_del(obj, wd->front.content);
-        evas_object_smart_member_del(wd->front.content);
-     }
+   if (wd->front.content) evas_object_del(wd->back.content);
    wd->front.content = content;
    if (content)
      {
@@ -461,15 +491,21 @@ elm_flip_content_front_set(Evas_Object *obj, Evas_Object *content)
 				       _changed_size_hints, obj);
 	_sizing_eval(obj);
      }
+   // force calc to contents are the right size before transition
+   evas_smart_objects_calculate(evas_object_evas_get(obj));
    flip_show_hide(obj);
    _configure(obj);
 }
 
 /**
- * Set the flip back content
+ * Set the back content of the flip widget.
+ *
+ * Once the content object is set, a previously set one will be deleted.
+ * If you want to keep that old content object, use the
+ * elm_flip_content_back_unset() function.
  *
  * @param obj The flip object
- * @param content The content to be used in this flip object
+ * @param content The new back content object
  *
  * @ingroup Flip
  */
@@ -480,12 +516,7 @@ elm_flip_content_back_set(Evas_Object *obj, Evas_Object *content)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (wd->back.content == content) return;
-   if ((wd->back.content != content) && (wd->back.content))
-     {
-        evas_object_clip_set(wd->back.content, NULL);
-        elm_widget_sub_object_del(obj, wd->back.content);
-        evas_object_smart_member_del(wd->back.content);
-     }
+   if (wd->back.content) evas_object_del(wd->back.content);
    wd->back.content = content;
    if (content)
      {
@@ -497,15 +528,19 @@ elm_flip_content_back_set(Evas_Object *obj, Evas_Object *content)
 				       _changed_size_hints, obj);
 	_sizing_eval(obj);
      }
+   // force calc to contents are the right size before transition
+   evas_smart_objects_calculate(evas_object_evas_get(obj));
    flip_show_hide(obj);
    _configure(obj);
 }
 
 /**
- * Get the flip front content
+ * Get the front content used for the flip
+ *
+ * Return the front content object which is set for this widget.
  *
  * @param obj The flip object
- * @return The content to be used in this flip object front
+ * @return The front content object that is being used
  *
  * @ingroup Flip
  */
@@ -517,11 +552,14 @@ elm_flip_content_front_get(const Evas_Object *obj)
    return wd->front.content;
 }
 
+
 /**
- * Get the flip back content
+ * Get the back content used for the flip
+ *
+ * Return the back content object which is set for this widget.
  *
  * @param obj The flip object
- * @return The content to be used in this flip object back
+ * @return The back content object that is being used
  *
  * @ingroup Flip
  */
@@ -531,6 +569,56 @@ elm_flip_content_back_get(const Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    return wd->back.content;
+}
+
+/**
+ * Unset the front content used for the flip
+ *
+ * Unparent and return the front content object which was set for this widget.
+ *
+ * @param obj The flip object
+ * @return The front content object that was being used
+ *
+ * @ingroup Flip
+ */
+EAPI Evas_Object *
+elm_flip_content_front_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (!wd->front.content) return NULL;
+   Evas_Object *content = wd->front.content;
+   evas_object_clip_unset(content);
+   elm_widget_sub_object_del(obj, content);
+   evas_object_smart_member_del(content);
+   wd->front.content = NULL;
+   return content;
+}
+
+/**
+ * Unset the back content used for the flip
+ *
+ * Unparent and return the back content object which was set for this widget.
+ *
+ * @param obj The flip object
+ * @return The back content object that was being used
+ *
+ * @ingroup Flip
+ */
+EAPI Evas_Object *
+elm_flip_content_back_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (!wd->back.content) return NULL;
+   Evas_Object *content = wd->back.content;
+   evas_object_clip_unset(content);
+   elm_widget_sub_object_del(obj, content);
+   evas_object_smart_member_del(content);
+   wd->back.content = NULL;
+   return content;
 }
 
 /**
@@ -582,6 +670,9 @@ elm_flip_perspective_set(Evas_Object *obj, Evas_Coord foc __UNUSED__, Evas_Coord
  * ELM_FLIP_ROTATE_YZ_CENTER_AXIS
  * ELM_FLIP_CUBE_LEFT
  * ELM_FLIP_CUBE_RIGHT
+ * 
+ * FIXME: add - ELM_FLIP_CUBE_UP
+ * FIXMEL add - ELM_FLIP_CUBE_DOWN
  *
  * @ingroup Flip
  */
@@ -596,5 +687,15 @@ elm_flip_go(Evas_Object *obj, Elm_Flip_Mode mode)
    wd->mode = mode;
    wd->start = ecore_loop_time_get();
    wd->len = 0.5;
+   // force calc to contents are the right size before transition
+   evas_smart_objects_calculate(evas_object_evas_get(obj));
    _flip(obj);
+   // FIXME: hack around evas rendering bug (only fix makes evas bitch-slow
+   evas_object_map_enable_set(wd->front.content, 0);
+   evas_object_map_enable_set(wd->back.content, 0);
+   evas_object_resize(wd->front.content, 0, 0);
+   evas_object_resize(wd->back.content, 0, 0);
+   evas_smart_objects_calculate(evas_object_evas_get(obj));
+   _configure(obj);
+   // FIXME: end hack
 }

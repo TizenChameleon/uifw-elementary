@@ -1,68 +1,74 @@
 #include <Elementary.h>
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
 void
-my_fl_1(void *data, Evas_Object *obj, void *event_info)
+my_fl_1(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *fl = data;
    elm_flip_go(fl, ELM_FLIP_ROTATE_Y_CENTER_AXIS);
 }
 
 void
-my_fl_2(void *data, Evas_Object *obj, void *event_info)
+my_fl_2(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *fl = data;
    elm_flip_go(fl, ELM_FLIP_ROTATE_X_CENTER_AXIS);
 }
 
 void
-my_fl_3(void *data, Evas_Object *obj, void *event_info)
+my_fl_3(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *fl = data;
    elm_flip_go(fl, ELM_FLIP_ROTATE_XZ_CENTER_AXIS);
 }
 
 void
-my_fl_4(void *data, Evas_Object *obj, void *event_info)
+my_fl_4(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *fl = data;
    elm_flip_go(fl, ELM_FLIP_ROTATE_YZ_CENTER_AXIS);
 }
 
 void
-my_fl_5(void *data, Evas_Object *obj, void *event_info)
+my_fl_5(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *fl = data;
    elm_flip_go(fl, ELM_FLIP_CUBE_LEFT);
 }
 
 void
-my_fl_6(void *data, Evas_Object *obj, void *event_info)
+my_fl_6(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *fl = data;
    elm_flip_go(fl, ELM_FLIP_CUBE_RIGHT);
 }
 
 void
-my_fl_7(void *data, Evas_Object *obj, void *event_info)
+my_fl_7(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *fl = data;
    elm_flip_go(fl, ELM_FLIP_CUBE_UP);
 }
+
 void
-my_fl_8(void *data, Evas_Object *obj, void *event_info)
+my_fl_8(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *fl = data;
    elm_flip_go(fl, ELM_FLIP_CUBE_DOWN);
 }
+
 void
-test_flip(void *data, Evas_Object *obj, void *event_info)
+test_flip(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *bx, *bx2, *fl, *o, *bt, *ly;
    char buf[PATH_MAX];
    
    win = elm_win_add(NULL, "flip", ELM_WIN_BASIC);
    elm_win_title_set(win, "Flip");
+   elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    elm_win_autodel_set(win, 1);
 
    bg = elm_bg_add(win);
@@ -152,10 +158,12 @@ test_flip(void *data, Evas_Object *obj, void *event_info)
 
    elm_box_pack_end(bx, bx2);
    evas_object_show(bx2);
+   
    bx2 = elm_box_add(win);
    elm_box_horizontal_set(bx2, 1);
    evas_object_size_hint_align_set(bx2, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(bx2, EVAS_HINT_EXPAND, 0.0);
+   
    bt = elm_button_add(win);
    elm_button_label_set(bt, "5");
    evas_object_smart_callback_add(bt, "clicked", my_fl_5, fl);
@@ -171,6 +179,7 @@ test_flip(void *data, Evas_Object *obj, void *event_info)
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, 0.0);
    elm_box_pack_end(bx2, bt);
    evas_object_show(bt);
+   
    bt = elm_button_add(win);
    elm_button_label_set(bt, "7");
    evas_object_smart_callback_add(bt, "clicked", my_fl_7, fl);
@@ -178,6 +187,7 @@ test_flip(void *data, Evas_Object *obj, void *event_info)
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, 0.0);
    elm_box_pack_end(bx2, bt);
    evas_object_show(bt);
+   
    bt = elm_button_add(win);
    elm_button_label_set(bt, "8");
    evas_object_smart_callback_add(bt, "clicked", my_fl_8, fl);
@@ -194,9 +204,9 @@ test_flip(void *data, Evas_Object *obj, void *event_info)
 }
 
 void
-test_flip2(void *data, Evas_Object *obj, void *event_info)
+test_flip2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   Evas_Object *win, *bg, *bx, *bx2, *fl, *o, *bt, *tb, *ic, *li;
+   Evas_Object *win, *bg, *bx, *bx2, *fl, *o, *bt, *tb, *li, *en;
    char buf[PATH_MAX];
    
    win = elm_win_add(NULL, "flip2", ELM_WIN_BASIC);
@@ -229,25 +239,10 @@ test_flip2(void *data, Evas_Object *obj, void *event_info)
    evas_object_size_hint_weight_set(tb, 0.0, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
 
-   ic = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
-   elm_icon_file_set(ic, buf, NULL);
-   elm_toolbar_item_add(tb, ic, "Hello", NULL, NULL);
-   
-   ic = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
-   elm_icon_file_set(ic, buf, NULL);
-   elm_toolbar_item_add(tb, ic, "Out", NULL, NULL);
-   
-   ic = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
-   elm_icon_file_set(ic, buf, NULL);
-   elm_toolbar_item_add(tb, ic, "There", NULL, NULL);
-   
-   ic = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
-   elm_icon_file_set(ic, buf, NULL);
-   elm_toolbar_item_add(tb, ic, "World", NULL, NULL);
+   elm_toolbar_item_append(tb, "arrow_left", "Hello", NULL, NULL);
+   elm_toolbar_item_append(tb, "arrow_right", "Out", NULL, NULL);
+   elm_toolbar_item_append(tb, "home", "There", NULL, NULL);
+   elm_toolbar_item_append(tb, "refresh", "World", NULL, NULL);
    
    elm_box_pack_end(o, tb);
    evas_object_show(tb);
@@ -274,19 +269,46 @@ test_flip2(void *data, Evas_Object *obj, void *event_info)
    
    elm_flip_content_front_set(fl, o);
    evas_object_show(o);
+
+   en = elm_scrolled_entry_add(win);
+   elm_scrolled_entry_line_wrap_set(en, EINA_FALSE);
+   snprintf(buf, sizeof(buf),
+            "This is an entry widget in this window that<br>"
+            "uses markup <b>like this</> for styling and<br>"
+            "formatting <em>like this</>, as well as<br>"
+            "<a href=X><link>links in the text</></a>, so enter text<br>"
+            "in here to edit it. By the way, links are<br>"
+            "called <a href=anc-02>Anchors</a> so you will need<br>"
+            "to refer to them this way.<br>"
+            "<br>"
+            
+            "Also you can stick in items with (relsize + ascent): "
+            "<item relsize=16x16 vsize=ascent href=emoticon/evil-laugh></item>"
+            " (full) "
+            "<item relsize=16x16 vsize=full href=emoticon/guilty-smile></item>"
+            " (to the left)<br>"
+            
+            "Also (size + ascent): "
+            "<item size=16x16 vsize=ascent href=emoticon/haha></item>"
+            " (full) "
+            "<item size=16x16 vsize=full href=emoticon/happy-panting></item>"
+            " (before this)<br>"
+            
+            "And as well (absize + ascent): "
+            "<item absize=64x64 vsize=ascent href=emoticon/knowing-grin></item>"
+            " (full) "
+            "<item absize=64x64 vsize=full href=emoticon/not-impressed></item>"
+            " or even paths to image files on disk too like: "
+            "<item absize=96x128 vsize=full href=file://%s/images/sky_01.jpg></item>"
+            " ... end."
+            , PACKAGE_DATA_DIR
+           );
+   elm_scrolled_entry_entry_set(en, buf);
+   evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    
-   li = elm_list_add(win);
-   evas_object_size_hint_align_set(li, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_weight_set(li, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   
-   elm_list_item_append(li, "This is a list", NULL, NULL,  NULL, NULL);
-   elm_list_item_append(li, "Second item", NULL, NULL,  NULL, NULL);
-   elm_list_item_append(li, "3rd", NULL, NULL,  NULL, NULL);
-   
-   elm_list_go(li);
-   
-   elm_flip_content_back_set(fl, li);
-   evas_object_show(li);
+   elm_flip_content_back_set(fl, en);
+   evas_object_show(en);
 
    evas_object_show(fl);
 
@@ -351,7 +373,7 @@ test_flip2(void *data, Evas_Object *obj, void *event_info)
 }
 
 void
-test_flip3(void *data, Evas_Object *obj, void *event_info)
+test_flip3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *bx, *bx2, *fl, *fl_f, *fl_b, *o, *bt, *fr;
    char buf[PATH_MAX];
@@ -382,13 +404,13 @@ test_flip3(void *data, Evas_Object *obj, void *event_info)
    evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_flip_content_front_set(fl, fr);
    evas_object_show(fr);
-
+   
    fl_f = elm_flip_add(win);
    evas_object_size_hint_align_set(fl_f, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(fl_f, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_frame_content_set(fr, fl_f);
    evas_object_show(fl_f);
-
+   
    o = elm_bg_add(win);
    evas_object_size_hint_align_set(o, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(o, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -396,9 +418,6 @@ test_flip3(void *data, Evas_Object *obj, void *event_info)
    elm_bg_file_set(o, buf, NULL);
    elm_flip_content_front_set(fl_f, o);
    evas_object_show(o);
-
-
-
 
    o = elm_bg_add(win);
    evas_object_size_hint_align_set(o, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -410,21 +429,17 @@ test_flip3(void *data, Evas_Object *obj, void *event_info)
 
    fr = elm_frame_add(win);
    elm_frame_label_set(fr, "Back");
-
-
-
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_flip_content_back_set(fl, fr);
-
    evas_object_show(fr);
-
+   
    fl_b = elm_flip_add(win);
    evas_object_size_hint_align_set(fl_b, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(fl_b, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_frame_content_set(fr, fl_b);
    evas_object_show(fl_b);
-
+   
    o = elm_bg_add(win);
    evas_object_size_hint_align_set(o, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(o, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -433,9 +448,6 @@ test_flip3(void *data, Evas_Object *obj, void *event_info)
    elm_flip_content_front_set(fl_b, o);
    evas_object_show(o);
 
-
-
-
    o = elm_bg_add(win);
    evas_object_size_hint_align_set(o, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(o, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -443,12 +455,6 @@ test_flip3(void *data, Evas_Object *obj, void *event_info)
    elm_bg_file_set(o, buf, NULL);
    elm_flip_content_back_set(fl_b, o);
    evas_object_show(o);
-
-
-
-
-
-
 
    bx2 = elm_box_add(win);
    elm_box_horizontal_set(bx2, 1);
