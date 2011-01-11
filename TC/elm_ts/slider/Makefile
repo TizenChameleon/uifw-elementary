@@ -23,7 +23,6 @@ TARGETS = utc_UIFW_elm_slider_add_func \
 		utc_UIFW_elm_slider_span_size_set_func \
         utc_UIFW_elm_slider_unit_format_get_func \
         utc_UIFW_elm_slider_unit_format_set_func \
-		utc_UIFW_elm_slider_value_animated_set_func \
 		utc_UIFW_elm_slider_value_get_func \
         utc_UIFW_elm_slider_value_set_func 
                 
