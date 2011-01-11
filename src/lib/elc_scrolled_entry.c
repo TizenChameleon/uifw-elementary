@@ -1,8 +1,12 @@
+/*
+ * vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
+ */
 #include <Elementary.h>
 #include "elm_priv.h"
 
 /**
  * @defgroup Scrolled_Entry Scrolled_Entry
+ * @ingroup Elementary
  *
  * A scrolled entry is a convenience widget which shows
  * a box that the user can enter text into.  Unlike an
@@ -31,40 +35,13 @@
  */
 
 typedef struct _Widget_Data Widget_Data;
-typedef struct _Elm_Entry_Context_Menu_Item Elm_Entry_Context_Menu_Item;
-typedef struct _Elm_Entry_Item_Provider Elm_Entry_Item_Provider;
-typedef struct _Elm_Entry_Text_Filter Elm_Entry_Text_Filter;
 
 struct _Widget_Data
 {
    Evas_Object *scroller;
    Evas_Object *entry;
-   Evas_Object *icon;
-   Evas_Object *end;
    Elm_Scroller_Policy policy_h, policy_v;
-   Eina_List *items;
-   Eina_List *item_providers;
-   Eina_List *text_filters;
    Eina_Bool single_line : 1;
-};
-
-struct _Elm_Entry_Context_Menu_Item
-{
-   Evas_Object *obj;
-   Evas_Smart_Cb func;
-   void *data;
-};
-
-struct _Elm_Entry_Item_Provider
-{
-   Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item);
-   void *data;
-};
-
-struct _Elm_Entry_Text_Filter
-{
-   void (*func) (void *data, Evas_Object *entry, char **text);
-   void *data;
 };
 
 static const char *widtype = NULL;
@@ -108,41 +85,9 @@ static const Evas_Smart_Cb_Description _signals[] = {
 static void
 _del_hook(Evas_Object *obj)
 {
-   Elm_Entry_Context_Menu_Item *ci;
-   Elm_Entry_Item_Provider *ip;
-   Elm_Entry_Text_Filter *tf;
-
    Widget_Data *wd = elm_widget_data_get(obj);
-
-   EINA_LIST_FREE(wd->items, ci)
-      free(ci);
-   EINA_LIST_FREE(wd->item_providers, ip)
-      free(ip);
-   EINA_LIST_FREE(wd->text_filters, tf)
-      free(tf);
-
    if (!wd) return;
    free(wd);
-}
-
-static void
-_sizing_eval(Evas_Object *obj)
-{
-   Widget_Data *wd;
-   Evas_Coord minw, minh, minw_scr, minh_scr;
-   wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   evas_object_size_hint_min_get(obj, &minw, &minh);
-   evas_object_size_hint_min_get(wd->scroller, &minw_scr, &minh_scr);
-   if (minw < minw_scr) minw = minw_scr;
-   if (minh < minh_scr) minh = minh_scr;
-
-   evas_object_size_hint_min_set(obj, minw, minh);
-   if (wd->single_line)
-     evas_object_size_hint_max_set(obj, -1, minh);
-   else
-     evas_object_size_hint_max_set(obj, -1, -1);
 }
 
 static void
@@ -152,9 +97,26 @@ _theme_hook(Evas_Object *obj)
    if (!wd) return;
    elm_object_style_set(wd->entry, elm_widget_style_get(obj));
    elm_object_style_set(wd->scroller, elm_widget_style_get(obj));
-   elm_object_disabled_set(wd->entry, elm_widget_disabled_get(obj));
-   elm_object_disabled_set(wd->scroller, elm_widget_disabled_get(obj));
-   _sizing_eval(obj);
+}
+
+static void
+_sizing_eval(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Coord minw, minh, minw_scr, minh_scr;
+   if (!wd) return;
+   
+   evas_object_size_hint_min_get(obj, &minw, &minh);
+   evas_object_size_hint_min_get(wd->scroller, &minw_scr, &minh_scr);
+   if (minw < minw_scr) minw = minw_scr;
+   if (minh < minh_scr) minh = minh_scr;
+
+   evas_object_size_hint_min_set(obj, minw, minh);
+
+   if (wd->single_line)
+     evas_object_size_hint_max_set(obj, -1, minh);
+   else
+     evas_object_size_hint_max_set(obj, -1, -1);
 }
 
 static void
@@ -184,169 +146,108 @@ _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
 }
 
 static void
-_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_object_signal_callback_add(wd->entry, emission, source, func_cb, data);
-   elm_object_signal_callback_add(wd->scroller, emission, source, func_cb,
-	 data);
-}
-
-static void
-_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data __UNUSED__)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   elm_object_signal_callback_del(wd->entry, emission, source, func_cb);
-   elm_object_signal_callback_del(wd->scroller, emission, source, func_cb);
-}
-
-static void
-_on_focus_region_hook(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   elm_widget_focus_region_get(wd->entry, x, y, w, h);
-}
-
-static void
-_changed_size_hints(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
-{
-   _sizing_eval(obj);
-}
-
-static void
-_entry_changed(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_changed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    _sizing_eval(data);
-   evas_object_smart_callback_call(data, SIG_CHANGED, event_info);
+   evas_object_smart_callback_call(data, SIG_CHANGED, NULL);
 }
 
 static void
-_entry_activated(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_activated(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_ACTIVATED, event_info);
+   evas_object_smart_callback_call(data, SIG_ACTIVATED, NULL);
 }
 
 static void
-_entry_press(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_press(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_PRESS, event_info);
+   evas_object_smart_callback_call(data, SIG_PRESS, NULL);
 }
 
 static void
-_entry_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_CLICKED, event_info);
+   evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
 }
 
 static void
-_entry_clicked_double(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_clicked_double(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, event_info);
+   evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, NULL);
 }
 
 static void
-_entry_cursor_changed(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_cursor_changed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_CURSOR_CHANGED, event_info);
+   evas_object_smart_callback_call(data, SIG_CURSOR_CHANGED, NULL);
 }
 
 static void
-_entry_anchor_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_anchor_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_ANCHOR_CLICKED, event_info);
+   evas_object_smart_callback_call(data, SIG_ANCHOR_CLICKED, NULL);
 }
 
 static void
-_entry_selection_start(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_selection_start(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_SELECTION_START, event_info);
+   evas_object_smart_callback_call(data, SIG_SELECTION_START, NULL);
 }
 
 static void
-_entry_selection_changed(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_selection_changed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_SELECTION_CHANGED, event_info);
+   evas_object_smart_callback_call(data, SIG_SELECTION_CHANGED, NULL);
 }
 
 static void
-_entry_selection_cleared(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_selection_cleared(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_SELECTION_CLEARED, event_info);
+   evas_object_smart_callback_call(data, SIG_SELECTION_CLEARED, NULL);
 }
 
 static void
-_entry_selection_paste(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_selection_paste(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_SELECTION_PASTE, event_info);
+   evas_object_smart_callback_call(data, SIG_SELECTION_PASTE, NULL);
 }
 
 static void
-_entry_selection_copy(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_selection_copy(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_SELECTION_COPY, event_info);
+   evas_object_smart_callback_call(data, SIG_SELECTION_COPY, NULL);
 }
 
 static void
-_entry_selection_cut(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_selection_cut(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_SELECTION_CUT, event_info);
+   evas_object_smart_callback_call(data, SIG_SELECTION_CUT, NULL);
 }
 
 static void
-_entry_longpressed(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_longpressed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_LONGPRESSED, event_info);
+   evas_object_smart_callback_call(data, SIG_LONGPRESSED, NULL);
 }
 
 static void
-_entry_focused(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_focused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_FOCUSED, event_info);
+   evas_object_smart_callback_call(data, SIG_FOCUSED, NULL);
 }
 
 static void
-_entry_unfocused(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_unfocused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_UNFOCUSED, event_info);
+   evas_object_smart_callback_call(data, SIG_UNFOCUSED, NULL);
 }
 
 static void
-_context_item_wrap_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_entry_maxlength_reached(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   Elm_Entry_Context_Menu_Item *ci = data;
-   ci->func(ci->data, ci->obj, event_info);
+   evas_object_smart_callback_call(data, "maxlength,reached", NULL);
 }
 
-static Evas_Object *
-_item_provider_wrap_cb(void *data, Evas_Object *obj __UNUSED__, const char *item)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   Eina_List *l;
-   Elm_Entry_Item_Provider *ip;
-
-   EINA_LIST_FOREACH(wd->item_providers, l, ip)
-     {
-        Evas_Object *o;
-        o = ip->func(ip->data, data, item);
-        if (o) return o;
-     }
-   return NULL;
-}
-
-static void
-_text_filter_wrap_cb(void *data, Evas_Object *obj __UNUSED__, char **text)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   Eina_List *l;
-   Elm_Entry_Text_Filter *tf;
-
-   EINA_LIST_FOREACH(wd->text_filters, l, tf)
-     {
-        tf->func(tf->data, data, text);
-        if (!*text) break;
-     }
-}
 
 /**
  * This adds a scrolled entry to @p parent object.
@@ -363,11 +264,8 @@ elm_scrolled_entry_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
-
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
-   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "scrolled_entry");
    elm_widget_type_set(obj, "scrolled_entry");
@@ -376,30 +274,21 @@ elm_scrolled_entry_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
-   elm_widget_can_focus_set(obj, EINA_TRUE);
+   elm_widget_can_focus_set(obj, 1);
    elm_widget_theme_hook_set(obj, _theme_hook);
-   elm_widget_on_focus_region_hook_set(obj, _on_focus_region_hook);
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
-   elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
-   elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
 
-   wd->scroller = elm_scroller_add(obj);
-   //elm_scroller_custom_widget_base_theme_set(wd->scroller, "scroller", "entry");
+   wd->scroller = elm_scroller_add(parent);
+   elm_widget_sub_object_add(obj, wd->scroller);
    elm_widget_resize_object_set(obj, wd->scroller);
-   evas_object_size_hint_weight_set(wd->scroller, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(wd->scroller, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_scroller_bounce_set(wd->scroller, EINA_FALSE, EINA_FALSE);
-   elm_scroller_propagate_events_set(wd->scroller, EINA_TRUE);
-   evas_object_show(wd->scroller);
-
-   wd->entry = elm_entry_add(obj);
+   elm_scroller_bounce_set(wd->scroller, 0, 0);
+   elm_scroller_propagate_events_set(wd->scroller, 1);
+   
+   wd->entry = elm_entry_add(parent);
    evas_object_size_hint_weight_set(wd->entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_scroller_content_set(wd->scroller, wd->entry);
    evas_object_show(wd->entry);
-
-   elm_entry_text_filter_prepend(wd->entry, _text_filter_wrap_cb, obj);
-   elm_entry_item_provider_prepend(wd->entry, _item_provider_wrap_cb, obj);
 
    evas_object_smart_callback_add(wd->entry, "changed", _entry_changed, obj);
    evas_object_smart_callback_add(wd->entry, "activated", _entry_activated, obj);
@@ -417,9 +306,7 @@ elm_scrolled_entry_add(Evas_Object *parent)
    evas_object_smart_callback_add(wd->entry, "longpressed", _entry_longpressed, obj);
    evas_object_smart_callback_add(wd->entry, "focused", _entry_focused, obj);
    evas_object_smart_callback_add(wd->entry, "unfocused", _entry_unfocused, obj);
-
-   evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                  _changed_size_hints, NULL);
+   evas_object_smart_callback_add(wd->entry, "maxlength,reached", _entry_maxlength_reached, obj);
 
    _sizing_eval(obj);
 
@@ -427,216 +314,6 @@ elm_scrolled_entry_add(Evas_Object *parent)
    // TODO: and save some bytes, making descriptions per-class and not instance!
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
    return obj;
-}
-
-/**
- * This sets a widget to be displayed to the left of a scrolled entry.
- *
- * @param obj The scrolled entry object
- * @param icon The widget to display on the left side of the scrolled
- * entry.
- *
- * @note A previously set widget will be destroyed.
- * @note If the object being set does not have minimum size hints set,
- * it won't get properly displayed.
- *
- * @ingroup Scrolled_Entry
- * @see elm_scrolled_entry_end_set
- */
-EAPI void
-elm_scrolled_entry_icon_set(Evas_Object *obj, Evas_Object *icon)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *edje;
-   if (!wd) return;
-   EINA_SAFETY_ON_NULL_RETURN(icon);
-   if (wd->icon == icon) return;
-   if (wd->icon) evas_object_del(wd->icon);
-   wd->icon = icon;
-   edje = _elm_scroller_edje_object_get(wd->scroller);
-   if (!edje) return;
-   edje_object_part_swallow(edje, "elm.swallow.icon", wd->icon);
-   edje_object_signal_emit(edje, "elm,action,show,icon", "elm");
-   _sizing_eval(obj);
-}
-
-/**
- * Gets the leftmost widget of the scrolled entry. This object is
- * owned by the scrolled entry and should not be modified.
- *
- * @param obj The scrolled entry object
- * @return the left widget inside the scroller
- *
- * @ingroup Scrolled_Entry
- */
-EAPI Evas_Object *
-elm_scrolled_entry_icon_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->icon;
-}
-
-/**
- * Unset the leftmost widget of the scrolled entry, unparenting and
- * returning it.
- *
- * @param obj The scrolled entry object
- * @return the previously set icon sub-object of this entry, on
- * success.
- *
- * @see elm_scrolled_entry_icon_set()
- *
- * @ingroup Scrolled_Entry
- */
-EAPI Evas_Object *
-elm_scrolled_entry_icon_unset(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *ret = NULL;
-   if (!wd) return NULL;
-   if (wd->icon)
-     {
-       Evas_Object *edje = _elm_scroller_edje_object_get(wd->scroller);
-       if (!edje) return NULL;
-       ret = wd->icon;
-       edje_object_part_unswallow(edje, wd->icon);
-       edje_object_signal_emit(edje, "elm,action,hide,icon", "elm");
-       wd->icon = NULL;
-       _sizing_eval(obj);
-     }
-   return ret;
-}
-
-/**
- * Sets the visibility of the left-side widget of the scrolled entry,
- * set by @elm_scrolled_entry_icon_set().
- *
- * @param obj The scrolled entry object
- * @param setting EINA_TRUE if the object should be displayed,
- * EINA_FALSE if not.
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_icon_visible_set(Evas_Object *obj, Eina_Bool setting)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if ((!wd) || (!wd->icon)) return;
-   if (setting)
-     evas_object_hide(wd->icon);
-   else
-     evas_object_show(wd->icon);
-   _sizing_eval(obj);
-}
-
-/**
- * This sets a widget to be displayed to the end of a scrolled entry.
- *
- * @param obj The scrolled entry object
- * @param end The widget to display on the right side of the scrolled
- * entry.
- *
- * @note A previously set widget will be destroyed.
- * @note If the object being set does not have minimum size hints set,
- * it won't get properly displayed.
- *
- * @ingroup Scrolled_Entry
- * @see elm_scrolled_entry_icon_set
- */
-EAPI void
-elm_scrolled_entry_end_set(Evas_Object *obj, Evas_Object *end)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *edje;
-   if (!wd) return;
-   EINA_SAFETY_ON_NULL_RETURN(end);
-   if (wd->end == end) return;
-   if (wd->end) evas_object_del(wd->end);
-   wd->end = end;
-   edje = _elm_scroller_edje_object_get(wd->scroller);
-   if (!edje) return;
-   edje_object_part_swallow(edje, "elm.swallow.end", wd->end);
-   edje_object_signal_emit(edje, "elm,action,show,end", "elm");
-   _sizing_eval(obj);
-}
-
-/**
- * Gets the endmost widget of the scrolled entry. This object is owned
- * by the scrolled entry and should not be modified.
- *
- * @param obj The scrolled entry object
- * @return the right widget inside the scroller
- *
- * @ingroup Scrolled_Entry
- */
-EAPI Evas_Object *
-elm_scrolled_entry_end_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->end;
-}
-
-/**
- * Unset the endmost widget of the scrolled entry, unparenting and
- * returning it.
- *
- * @param obj The scrolled entry object
- * @return the previously set icon sub-object of this entry, on
- * success.
- *
- * @see elm_scrolled_entry_icon_set()
- *
- * @ingroup Scrolled_Entry
- */
-EAPI Evas_Object *
-elm_scrolled_entry_end_unset(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *ret = NULL;
-   if (!wd) return NULL;
-   if (wd->end)
-     {
-       Evas_Object *edje = _elm_scroller_edje_object_get(wd->scroller);
-       if (!edje) return NULL;
-       ret = wd->end;
-       edje_object_part_unswallow(edje, wd->end);
-       edje_object_signal_emit(edje, "elm,action,hide,end", "elm");
-       wd->end = NULL;
-       _sizing_eval(obj);
-     }
-   return ret;
-}
-
-/**
- * Sets the visibility of the end widget of the scrolled entry, set by
- * @elm_scrolled_entry_end_set().
- *
- * @param obj The scrolled entry object
- * @param setting EINA_TRUE if the object should be displayed,
- * EINA_FALSE if not.
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_end_visible_set(Evas_Object *obj, Eina_Bool setting)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if ((!wd) || (!wd->end)) return;
-   if (setting)
-     evas_object_hide(wd->end);
-   else
-     evas_object_show(wd->end);
-   _sizing_eval(obj);
 }
 
 /**
@@ -690,7 +367,6 @@ elm_scrolled_entry_single_line_get(const Evas_Object *obj)
    return elm_entry_single_line_get(wd->entry);
 }
 
-
 /**
  * This sets the scrolled entry object to password mode.  All text entered
  * and/or displayed within the widget will be replaced with asterisks (*).
@@ -727,7 +403,6 @@ elm_scrolled_entry_password_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return elm_entry_password_get(wd->entry);
 }
-
 
 /**
  * This sets the text displayed within the scrolled entry to @p entry.
@@ -878,7 +553,6 @@ elm_scrolled_entry_editable_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return elm_entry_editable_get(wd->entry);
 }
-
 
 /**
  * This drops any existing text selection within the scrolled entry.
@@ -1211,18 +885,10 @@ elm_scrolled_entry_context_menu_clear(Evas_Object *obj)
 EAPI void
 elm_scrolled_entry_context_menu_item_add(Evas_Object *obj, const char *label, const char *icon_file, Elm_Icon_Type icon_type, Evas_Smart_Cb func, const void *data)
 {
-   Elm_Entry_Context_Menu_Item *ci;
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-
-   ci = malloc(sizeof(Elm_Entry_Context_Menu_Item));
-   if (!ci) return;
-   ci->func = func;
-   ci->data = (void *)data;
-   ci->obj = obj;
-   wd->items = eina_list_append(wd->items, ci);
-   elm_entry_context_menu_item_add(wd->entry, label, icon_file, icon_type, _context_item_wrap_cb, ci);
+   elm_entry_context_menu_item_add(wd->entry, label, icon_file, icon_type, func, data);
 }
 
 /**
@@ -1296,7 +962,6 @@ elm_scrolled_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_
    if (!wd) return;
    elm_scroller_bounce_set(wd->scroller, h_bounce, v_bounce);
 }
-
 /**
  * This set's the maximum bytes that can be added in to scrolled entry.
  *
@@ -1315,298 +980,22 @@ elm_scrolled_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes)
 }
 
 /**
- * Get the bounce mode
- *
- * @param obj The Scrolled_Entry object
- * @param h_bounce Allow bounce horizontally
- * @param v_bounce Allow bounce vertically
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_scroller_bounce_get(wd->scroller, h_bounce, v_bounce);
-}
-
-/**
- * This appends a custom item provider to the list for that entry
- *
- * This appends the given callback. The list is walked from beginning to end
- * with each function called given the item href string in the text. If the
- * function returns an object handle other than NULL (it should create an
- * and object to do this), then this object is used to replace that item. If
- * not the next provider is called until one provides an item object, or the
- * default provider in entry does.
- *
- * @param obj The entry object
- * @param func The function called to provide the item object
- * @param data The data passed to @p func
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   EINA_SAFETY_ON_NULL_RETURN(func);
-   Elm_Entry_Item_Provider *ip = calloc(1, sizeof(Elm_Entry_Item_Provider));
-   if (!ip) return;
-   ip->func = func;
-   ip->data = data;
-   wd->item_providers = eina_list_append(wd->item_providers, ip);
-}
-
-/**
- * This prepends a custom item provider to the list for that entry
- *
- * This prepends the given callback. See elm_scrolled_entry_item_provider_append() for
- * more information
- *
- * @param obj The entry object
- * @param func The function called to provide the item object
- * @param data The data passed to @p func
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   EINA_SAFETY_ON_NULL_RETURN(func);
-   Elm_Entry_Item_Provider *ip = calloc(1, sizeof(Elm_Entry_Item_Provider));
-   if (!ip) return;
-   ip->func = func;
-   ip->data = data;
-   wd->item_providers = eina_list_prepend(wd->item_providers, ip);
-}
-
-/**
- * This removes a custom item provider to the list for that entry
- *
- * This removes the given callback. See elm_scrolled_entry_item_provider_append() for
- * more information
- *
- * @param obj The entry object
- * @param func The function called to provide the item object
- * @param data The data passed to @p func
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Eina_List *l;
-   Elm_Entry_Item_Provider *ip;
-   if (!wd) return;
-   EINA_SAFETY_ON_NULL_RETURN(func);
-   EINA_LIST_FOREACH(wd->item_providers, l, ip)
-     {
-        if ((ip->func == func) && (ip->data == data))
-          {
-             wd->item_providers = eina_list_remove_list(wd->item_providers, l);
-             free(ip);
-             return;
-          }
-     }
-}
-
-/**
- * Append a filter function for text inserted in the entry
- *
- * Append the given callback to the list. This functions will be called
- * whenever any text is inserted into the entry, with the text to be inserted
- * as a parameter. The callback function is free to alter the text in any way
- * it wants, but it must remember to free the given pointer and update it.
- * If the new text is to be discarded, the function can free it and set it text
- * parameter to NULL. This will also prevent any following filters from being
- * called.
- *
- * @param obj The entry object
- * @param func The function to use as text filter
- * @param data User data to pass to @p func
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_text_filter_append(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
-{
-   Widget_Data *wd;
-   Elm_Entry_Text_Filter *tf;
-   ELM_CHECK_WIDTYPE(obj, widtype);
-
-   wd = elm_widget_data_get(obj);
-
-   EINA_SAFETY_ON_NULL_RETURN(func);
-
-   tf = ELM_NEW(Elm_Entry_Text_Filter);
-   if (!tf) return;
-   tf->func = func;
-   tf->data = data;
-   wd->text_filters = eina_list_append(wd->text_filters, tf);
-}
-
-/**
- * Prepend a filter function for text insdrted in the entry
- *
- * Prepend the given callback to the list. See elm_scrolled_entry_text_filter_append()
- * for more information
- *
- * @param obj The entry object
- * @param func The function to use as text filter
- * @param data User data to pass to @p func
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_text_filter_prepend(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
-{
-   Widget_Data *wd;
-   Elm_Entry_Text_Filter *tf;
-   ELM_CHECK_WIDTYPE(obj, widtype);
-
-   wd = elm_widget_data_get(obj);
-
-   EINA_SAFETY_ON_NULL_RETURN(func);
-
-   tf = ELM_NEW(Elm_Entry_Text_Filter);
-   if (!tf) return;
-   tf->func = func;
-   tf->data = data;
-   wd->text_filters = eina_list_prepend(wd->text_filters, tf);
-}
-
-/**
- * Remove a filter from the list
- *
- * Removes the given callback from the filter list. See elm_scrolled_entry_text_filter_append()
- * for more information.
- *
- * @param obj The entry object
- * @param func The filter function to remove
- * @param data The user data passed when adding the function
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_text_filter_remove(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
-{
-   Widget_Data *wd;
-   Eina_List *l;
-   Elm_Entry_Text_Filter *tf;
-   ELM_CHECK_WIDTYPE(obj, widtype);
-
-   wd = elm_widget_data_get(obj);
-
-   EINA_SAFETY_ON_NULL_RETURN(func);
-
-   EINA_LIST_FOREACH(wd->text_filters, l, tf)
-     {
-        if ((tf->func == func) && (tf->data == data))
-          {
-             wd->text_filters = eina_list_remove_list(wd->text_filters, l);
-             free(tf);
-             return;
-          }
-     }
-}
-
-/**
- * This sets the file (and implicitly loads it) for the text to display and
- * then edit. All changes are written back to the file after a short delay if
- * the entry object is set to autosave.
+ * This set's the scrolled entry in password mode with out masking the last character entered by user,
+ * and later masking the character after 2 seconds.
  *
  * @param obj The scrolled entry object
- * @param file The path to the file to load and save
- * @param format The file format
+ * @param show_last_character The show_last_character flag (1 for "password mode along with showing last character" 
+ * 0 for default)
  *
  * @ingroup Scrolled_Entry
  */
 EAPI void
-elm_scrolled_entry_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format)
+elm_scrolled_entry_password_show_last_character_set(Evas_Object *obj, Eina_Bool show_last_character)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   elm_entry_file_set(wd->entry, file, format);
-}
-
-/**
- * Gets the file to load and save and the file format
- *
- * @param obj The scrolled entry object
- * @param file The path to the file to load and save
- * @param format The file format
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_file_get(const Evas_Object *obj, const char **file, Elm_Text_Format *format)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_entry_file_get(wd->entry, file, format);
-}
-
-/**
- * This function writes any changes made to the file set with
- * elm_scrolled_entry_file_set()
- *
- * @param obj The scrolled entry object
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_file_save(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_entry_file_save(wd->entry);
-}
-
-/**
- * This sets the entry object to 'autosave' the loaded text file or not.
- *
- * @param obj The scrolled entry object
- * @param autosave Autosave the loaded file or not
- *
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_autosave_set(Evas_Object *obj, Eina_Bool autosave)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_entry_autosave_set(wd->entry, autosave);
-}
-
-/**
- * This gets the entry object's 'autosave' status.
- *
- * @param obj The scrolled entry object
- * @return Autosave the loaded file or not
- *
- * @ingroup Scrolled_Entry
- */
-EAPI Eina_Bool
-elm_scrolled_entry_autosave_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-   return elm_entry_autosave_get(wd->entry);
+   elm_entry_password_show_last_character_set(wd->entry, show_last_character);
 }
 
 /**
@@ -1697,3 +1086,4 @@ elm_scrolled_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
 
    elm_entry_autoperiod_set(wd->entry, autoperiod);
 }
+

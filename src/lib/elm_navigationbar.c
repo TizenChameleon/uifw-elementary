@@ -136,23 +136,13 @@ _delete_item(Item *it)
    if (!it) return;
    Evas_Object *list_obj;
    
-   if(it->back_btn)
-     evas_object_del(it->back_btn);
-   if(it->fn_btn1)
-     {
-	elm_object_unfocus(it->fn_btn1);
-	evas_object_del(it->fn_btn1);
-     }
-   if(it->fn_btn2)
-     {
-	elm_object_unfocus(it->fn_btn2);
-	evas_object_del(it->fn_btn2);
-     }
-   if(it->fn_btn3)
-     {
-	elm_object_unfocus(it->fn_btn3);
-	evas_object_del(it->fn_btn3); 
-     }
+   evas_object_del(it->back_btn);
+   elm_object_unfocus(it->fn_btn1);
+   evas_object_del(it->fn_btn1);
+   elm_object_unfocus(it->fn_btn2);
+   evas_object_del(it->fn_btn2);
+   elm_object_unfocus(it->fn_btn3);
+   evas_object_del(it->fn_btn3); 
    if (it->title) 
      eina_stringshare_del(it->title);
    if (it->subtitle) 
@@ -495,8 +485,6 @@ elm_navigationbar_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
@@ -1362,7 +1350,7 @@ elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
- * deprecate this This disables content area animation on push/pop.
+ * This disables content area animation on push/pop.
  *
  * @param[in] obj The NavigationBar object
  * @param[in] disable  if EINA_TRUE animation is disabled.
@@ -1375,23 +1363,6 @@ elm_navigationbar_animation_disable_set(Evas_Object *obj, Eina_Bool disable)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    
-   elm_pager_animation_disabled_set(wd->pager, disable);
-}
-
-/**
- * This disables content area animation on push/pop.
- *
- * @param[in] obj The NavigationBar object
- * @param[in] disable  if EINA_TRUE animation is disabled.
- *
- * @ingroup NavigationBar
- */
-EAPI void 
-elm_navigationbar_animation_disabled_set(Evas_Object *obj, Eina_Bool disable)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   
-   elm_pager_animation_disabled_set(wd->pager, disable);
+   elm_pager_animation_disable_set(wd->pager, disable);
 }
 

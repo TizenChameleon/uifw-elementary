@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build88) unstable; urgency=low
+
+  * Packaging for fixing ctx_popup and elm_config (preload)
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build88  
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Tue, 11 Jan 2011 17:43:32 +0900
+
 elementary (1.0.0+svn.51480slp2+build87) unstable; urgency=low
 
   * Packaging for fixing elm_priv.h bug

@@ -20,7 +20,7 @@ struct _Widget_Data
    Eina_Bool am_pm : 1;
    Eina_Bool edit : 1;
    Elm_Clock_Digedit digedit;
-   int hrs, min, sec, timediff;
+   int hrs, min, sec;
    Evas_Object *digit[6];
    Evas_Object *ampm;
    Evas_Object *sel_obj;
@@ -39,7 +39,6 @@ struct _Widget_Data
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
-static void _on_focus_hook(void *data, Evas_Object *obj);
 static Eina_Bool _ticker(void *data);
 static Eina_Bool _signal_clock_val_up(void *data);
 static Eina_Bool _signal_clock_val_down(void *data);
@@ -80,15 +79,9 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (elm_widget_focus_get(obj))
-     {
-       edje_object_signal_emit(wd->clk, "elm,action,focus", "elm");
-       evas_object_focus_set(wd->clk, EINA_TRUE);
-     }
+     edje_object_signal_emit(wd->clk, "elm,action,focus", "elm");
    else
-     {
-       edje_object_signal_emit(wd->clk, "elm,action,unfocus", "elm");
-       evas_object_focus_set(wd->clk, EINA_FALSE);
-     }
+     edje_object_signal_emit(wd->clk, "elm,action,unfocus", "elm");
 }
 
 static void
@@ -120,32 +113,18 @@ _signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *so
      }
 }
 
-static void
-_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+static void *
+_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source))
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    int i;
+   if (!wd) return NULL;
    for (i = 0; i < 6; i++)
      {
-	edje_object_signal_callback_del_full(wd->digit[i], emission, source,
-                                             func_cb, data);
+	edje_object_signal_callback_del(wd->digit[i], emission, source,
+	      func_cb);
      }
-   edje_object_signal_callback_del_full(wd->clk, emission, source, func_cb,
-                                        data);
-}
-
-static void
-_timediff_set(Widget_Data *wd)
-{
-   struct timeval timev;
-   struct tm *tm;
-   time_t tt;
-   gettimeofday(&timev, NULL);
-   tt = (time_t)(timev.tv_sec);
-   tzset();
-   tm = localtime(&tt);
-   wd->timediff = (((wd->hrs - tm->tm_hour) * 60 +
-	    wd->min - tm->tm_min) * 60) + wd->sec - tm->tm_sec;
+   return edje_object_signal_callback_del(wd->clk, emission, source, func_cb);
 }
 
 static Eina_Bool
@@ -162,7 +141,7 @@ _ticker(void *data)
    wd->ticker = ecore_timer_add(t, _ticker, data);
    if (!wd->edit)
      {
-	tt = (time_t)(timev.tv_sec) + wd->timediff;
+	tt = (time_t)(timev.tv_sec);
 	tzset();
 	tm = localtime(&tt);
 	if (tm)
@@ -364,7 +343,7 @@ _time_update(Evas_Object *obj)
 	     _elm_theme_object_set(obj, wd->digit[i], "clock", "flipdigit", style);
 	     edje_object_scale_set(wd->digit[i], elm_widget_scale_get(obj) * 
                                    _elm_config->scale);
-	     if ((wd->edit) && (wd->digedit & (1 << i)))
+	     if (wd->edit && (wd->digedit & (1 << i)))
 	       edje_object_signal_emit(wd->digit[i], "elm,state,edit,on", "elm");
 	     edje_object_signal_callback_add(wd->digit[i], "elm,action,up,start",
 					     "", _signal_clock_val_up_start, obj);
@@ -433,7 +412,7 @@ _time_update(Evas_Object *obj)
 		  if (hrs > 12) hrs -= 12;
 		  ampm = 1;
 	       }
-	     else if (!hrs) hrs = 12;
+	     else if (hrs == 0) hrs = 12;
 	  }
 	d1 = hrs / 10;
 	d2 = hrs % 10;
@@ -531,11 +510,8 @@ elm_clock_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
-
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
-   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "clock");
    elm_widget_type_set(obj, "clock");
@@ -547,7 +523,6 @@ elm_clock_add(Evas_Object *parent)
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
    elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
-   elm_widget_can_focus_set(obj, EINA_TRUE);
 
    wd->clk = edje_object_add(e);
    elm_widget_resize_object_set(obj, wd->clk);
@@ -558,7 +533,6 @@ elm_clock_add(Evas_Object *parent)
    wd->cur.edit = EINA_TRUE;
    wd->cur.digedit = ELM_CLOCK_NONE;
    wd->first_interval = 0.85;
-   wd->timediff = 0;
 
    _time_update(obj);
    _ticker(obj);
@@ -587,7 +561,6 @@ elm_clock_time_set(Evas_Object *obj, int hrs, int min, int sec)
    wd->hrs = hrs;
    wd->min = min;
    wd->sec = sec;
-   _timediff_set(wd);
    _time_update(obj);
 }
 
@@ -638,9 +611,7 @@ elm_clock_edit_set(Evas_Object *obj, Eina_Bool edit)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    wd->edit = edit;
-   if (!edit)
-     _timediff_set(wd);
-   if ((edit) && (wd->digedit == ELM_CLOCK_NONE))
+   if (edit && (wd->digedit == ELM_CLOCK_NONE))
      elm_clock_digit_edit_set(obj, ELM_CLOCK_ALL);
    else
      _time_update(obj);

@@ -41,8 +41,6 @@ void test_genlist4(void *data, Evas_Object *obj, void *event_info);
 void test_genlist5(void *data, Evas_Object *obj, void *event_info);
 void test_genlist6(void *data, Evas_Object *obj, void *event_info);
 void test_genlist7(void *data, Evas_Object *obj, void *event_info);
-void test_genlist8(void *data, Evas_Object *obj, void *event_info);
-void test_genlist9(void *data, Evas_Object *obj, void *event_info);
 void test_table(void *data, Evas_Object *obj, void *event_info);
 void test_gengrid(void *data, Evas_Object *obj, void *event_info);
 void test_pager(void *data, Evas_Object *obj, void *event_info);
@@ -81,7 +79,6 @@ void test_launcher(void *data, Evas_Object *obj, void *event_info);
 void test_launcher2(void *data, Evas_Object *obj, void *event_info);
 void test_launcher3(void *data, Evas_Object *obj, void *event_info);
 void test_anim(void *data, Evas_Object *obj, void *event_info);
-void test_diskselector(void *data, Evas_Object *obj, void *event_info);
 
 struct elm_test
 {
@@ -241,8 +238,6 @@ my_win_main(void)
    ADD_TEST("Genlist 5", test_genlist5);
    ADD_TEST("Genlist 7", test_genlist7);
    ADD_TEST("Genlist Tree", test_genlist6);
-   ADD_TEST("Genlist Group", test_genlist8);
-   ADD_TEST("Genlist Group Tree", test_genlist9);   
    ADD_TEST("GenGrid", test_gengrid);
    ADD_TEST("Checks", test_check);
    ADD_TEST("Radios", test_radio);
@@ -282,7 +277,6 @@ my_win_main(void)
    ADD_TEST("Animation", test_anim);
    ADD_TEST("Calendar", test_calendar);
    ADD_TEST("Calendar 2", test_calendar2);
-   ADD_TEST("Disk Selector", test_diskselector);
 #undef ADD_TEST
 
    if (tests)

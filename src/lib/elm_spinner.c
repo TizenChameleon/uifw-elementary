@@ -40,10 +40,9 @@ struct _Widget_Data
    Eina_Bool editable : 1;
 };
 
-struct _Elm_Spinner_Special_Value
-{
-   double value;
-   const char *label;
+struct _Elm_Spinner_Special_Value {
+     double value;
+     const char *label;
 };
 
 static const char *widtype = NULL;
@@ -53,9 +52,6 @@ static void _write_label(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 //static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static Eina_Bool _value_set(Evas_Object *obj, double delta);
-static void _on_focus_hook(void *data, Evas_Object *obj);
-static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src,
-                             Evas_Callback_Type type, void *event_info);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -67,13 +63,11 @@ _del_hook(Evas_Object *obj)
    if (wd->delay) ecore_timer_del(wd->delay);
    if (wd->spin) ecore_timer_del(wd->spin);
    if (wd->special_values)
-     {
-        EINA_LIST_FREE(wd->special_values, sv)
-          {
-             eina_stringshare_del(sv->label);
-             free(sv);
-          }
-     }
+       EINA_LIST_FREE(wd->special_values, sv)
+       {
+           eina_stringshare_del(sv->label);
+           free(sv);
+       }
    free(wd);
 }
 
@@ -83,9 +77,9 @@ _disable_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (elm_widget_disabled_get(obj))
-      edje_object_signal_emit(wd->spinner, "elm,state,disabled", "elm");
+     edje_object_signal_emit(wd->spinner, "elm,state,disabled", "elm");
    else
-      edje_object_signal_emit(wd->spinner, "elm,state,enabled", "elm");
+     edje_object_signal_emit(wd->spinner, "elm,state,enabled", "elm");
 }
 
 static void
@@ -102,15 +96,16 @@ _signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *so
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    edje_object_signal_callback_add(wd->spinner, emission,
-                                   source, func_cb, data);
+	 source, func_cb, data);
 }
 
-static void
-_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+static void *
+_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source))
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   edje_object_signal_callback_del_full(wd->spinner, emission, source,
-                                        func_cb, data);
+   if (!wd) return NULL;
+   return edje_object_signal_callback_del(wd->spinner, emission, source,
+	 func_cb);
 }
 
 static void
@@ -121,14 +116,12 @@ _theme_hook(Evas_Object *obj)
    _elm_theme_object_set(obj, wd->spinner, "spinner", "base", elm_widget_style_get(obj));
    edje_object_part_swallow(wd->spinner, "elm.swallow.entry", wd->ent);
    _write_label(obj);
-   if (elm_widget_focus_get(obj))
-      edje_object_signal_emit(wd->spinner, "elm,action,focus", "elm");
-   else
-      edje_object_signal_emit(wd->spinner, "elm,action,unfocus", "elm");
-   if (elm_widget_disabled_get(obj))
-      edje_object_signal_emit(wd->spinner, "elm,state,disabled", "elm");
    edje_object_message_signal_process(wd->spinner);
    edje_object_scale_set(wd->spinner, elm_widget_scale_get(obj) * _elm_config->scale);
+   if (elm_widget_focus_get(obj))
+     edje_object_signal_emit(wd->spinner, "elm,action,focus", "elm");
+   else
+     edje_object_signal_emit(wd->spinner, "elm,action,unfocus", "elm");
    _sizing_eval(obj);
 }
 
@@ -138,15 +131,9 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (elm_widget_focus_get(obj))
-     {
-       edje_object_signal_emit(wd->spinner, "elm,action,focus", "elm");
-       evas_object_focus_set(wd->spinner, EINA_TRUE);
-     }
+     edje_object_signal_emit(wd->spinner, "elm,action,focus", "elm");
    else
-     {
-       edje_object_signal_emit(wd->spinner, "elm,action,unfocus", "elm");
-       evas_object_focus_set(wd->spinner, EINA_FALSE);
-     }
+     edje_object_signal_emit(wd->spinner, "elm,action,unfocus", "elm");
 }
 
 static Eina_Bool
@@ -212,13 +199,11 @@ _write_label(Evas_Object *obj)
    char buf[1024];
    if (!wd) return;
    EINA_LIST_FOREACH(wd->special_values, l, sv)
-     {
-        if (sv->value == wd->val)
-          {
-             snprintf(buf, sizeof(buf), "%s", sv->label);
-             goto apply;
-          }
-     }
+      if (sv->value == wd->val)
+	{
+	   snprintf(buf, sizeof(buf), "%s", sv->label);
+	   goto apply;
+	}
    if (wd->label)
      snprintf(buf, sizeof(buf), wd->label, wd->val);
    else
@@ -501,48 +486,27 @@ _entry_activated(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNU
    wd->delay = ecore_timer_add(0.2, _delay_change, data);
 }
 
-static Eina_Bool
-_event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
+static void
+_entry_event_key_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-   if (elm_widget_disabled_get(obj)) return EINA_FALSE;
-   if (type == EVAS_CALLBACK_KEY_DOWN)
-     {
-        Evas_Event_Key_Down *ev = event_info;
-        if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return EINA_FALSE;
-        else if (!strcmp(ev->keyname, "Left") || !strcmp(ev->keyname, "KP_Left")
-                 || !strcmp(ev->keyname, "Down") || !strcmp(ev->keyname, "KP_Down"))
-          {
-             _val_dec_start(obj);
-             edje_object_signal_emit(wd->spinner, "elm,left,anim,activate", "elm");
-             ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
-             return EINA_TRUE;
-          }
-        else if (!strcmp(ev->keyname, "Right") || !strcmp(ev->keyname, "KP_Right")
-                 || !strcmp(ev->keyname, "Up") || !strcmp(ev->keyname, "KP_Up"))
-          {
-             _val_inc_start(obj);
-             edje_object_signal_emit(wd->spinner, "elm,right,anim,activate", "elm");
-             ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
-             return EINA_TRUE;
-          }
-     }
-   else if (type == EVAS_CALLBACK_KEY_UP)
-     {
-        Evas_Event_Key_Down *ev = event_info;
-        if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return EINA_FALSE;
-        if (!strcmp(ev->keyname, "Right") || !strcmp(ev->keyname, "KP_Right")
-            || !strcmp(ev->keyname, "Up") || !strcmp(ev->keyname, "KP_Up"))
-          _val_inc_stop(obj);
-        else if (!strcmp(ev->keyname, "Left") || !strcmp(ev->keyname, "KP_Left")
-            || !strcmp(ev->keyname, "Down") || !strcmp(ev->keyname, "KP_Down"))
-          _val_dec_stop(obj);
-        else  return EINA_FALSE;
-        ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
-        return EINA_TRUE;
-     }
-     return EINA_FALSE;
+   Evas_Event_Key_Down *ev = event_info;
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return;
+   if (!strcmp(ev->keyname, "Up")) _val_inc_start(data);
+   else if (!strcmp(ev->keyname, "Down")) _val_dec_start(data);
+}
+
+static void
+_entry_event_key_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+{
+   Evas_Event_Key_Down *ev = event_info;
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return;
+   if (!strcmp(ev->keyname, "Up")) _val_inc_stop(data);
+   else if (!strcmp(ev->keyname, "Down")) _val_dec_stop(data);
+   else if (!strcmp(ev->keyname, "Escape")) _reset_value(data);
 }
 
 /**
@@ -560,16 +524,12 @@ elm_spinner_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
-
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
-   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "spinner");
    elm_widget_type_set(obj, "spinner");
    elm_widget_sub_object_add(parent, obj);
-   elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
@@ -578,8 +538,6 @@ elm_spinner_add(Evas_Object *parent)
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
    elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
-   elm_widget_can_focus_set(obj, EINA_TRUE);
-   elm_widget_event_hook_set(obj, _event_hook);
 
    wd->val = 0.0;
    wd->val_min = 0.0;
@@ -613,6 +571,11 @@ elm_spinner_add(Evas_Object *parent)
                                    "*", _button_dec_stop, obj);
    edje_object_part_drag_value_set(wd->spinner, "elm.dragable.slider", 
                                    0.0, 0.0);
+
+   evas_object_event_callback_add(wd->spinner, EVAS_CALLBACK_KEY_DOWN, 
+                                  _entry_event_key_down, obj);
+   evas_object_event_callback_add(wd->spinner, EVAS_CALLBACK_KEY_UP, 
+                                  _entry_event_key_up, obj);
 
    wd->ent = elm_entry_add(obj);
    elm_entry_single_line_set(wd->ent, 1);
@@ -751,7 +714,7 @@ elm_spinner_step_get(const Evas_Object *obj)
  * Set the value the spinner indicates
  *
  * @param obj The spinner object
- * @param val The value (must be between min and max for the spinner)
+ * @param val The value (must be beween min and max for the spinner)
  *
  * @ingroup Spinner
  */

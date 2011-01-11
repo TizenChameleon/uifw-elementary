@@ -412,8 +412,6 @@ elm_navigationbar_ex_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
    
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
@@ -689,7 +687,6 @@ elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char
 EAPI Evas_Object *
 elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type)
 {
-   if (!item) return NULL;
    fn_button *btn_det;
    Eina_List *bl;
    EINA_LIST_FOREACH(item->fnbtn_list, bl, btn_det)
@@ -712,7 +709,6 @@ elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int 
 EAPI Evas_Object *
 elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type)
 {
-   if (!item) return NULL;
    fn_button *btn_det;
    Eina_List *bl;
    Evas_Object *btn_ret;
@@ -825,7 +821,6 @@ elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item)
 EAPI Evas_Object *
 elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item)
 {
- if (!item) return NULL;
    Evas_Object *content = _content_unset(item);
    return content;
 }
@@ -875,7 +870,6 @@ EAPI void
 elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char* item_style)
 {
    if (!item) return;
-   if(!item_style) return;
    char buf[1024];
    char buf_fn[1024];
    Eina_List *bl;
@@ -935,7 +929,6 @@ elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item)
 EAPI void
 elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item)
 {
-   if (!item) return NULL;
    _item_promote(item);  
 }
 

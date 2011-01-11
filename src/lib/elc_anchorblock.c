@@ -3,6 +3,7 @@
 
 /**
  * @defgroup Anchorblock Anchorblock
+ * @ingroup Elementary
  *
  * Anchorblock is for displaying tet that contains markup with anchors like:
  * \<a href=1234\>something\</\> in it. These will be drawn differently and will
@@ -183,11 +184,8 @@ elm_anchorblock_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
-
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
-   if (!e) return NULL;
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "anchorblock");
    elm_widget_type_set(obj, "anchorblock");
@@ -195,7 +193,6 @@ elm_anchorblock_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
    elm_widget_del_hook_set(obj, _del_hook);
-   elm_widget_can_focus_set(obj, EINA_TRUE);
 
    wd->entry = elm_entry_add(parent);
    elm_entry_item_provider_prepend(wd->entry, _item_provider, obj);
@@ -292,26 +289,6 @@ elm_anchorblock_hover_parent_set(Evas_Object *obj, Evas_Object *parent)
 }
 
 /**
- * Get the parent of the hover popup
- *
- * This sgets the parent of the hover that anchorblock will create. See hover
- * objects for more information on this.
- *
- * @param obj The anchorblock object
- * @return The parent used by the hover
- *
- * @ingroup Anchorblock
- */
-EAPI Evas_Object *
-elm_anchorblock_hover_parent_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->hover_parent;
-}
-
-/**
  * Set the style that the hover should use
  *
  * This sets the style for the hover that anchorblock will create. See hover
@@ -329,26 +306,6 @@ elm_anchorblock_hover_style_set(Evas_Object *obj, const char *style)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    eina_stringshare_replace(&wd->hover_style, style);
-}
-
-/**
- * Get the style that the hover should use
- *
- * This gets the style for the hover that anchorblock will create. See hover
- * objects for more information
- *
- * @param obj The anchorblock object
- * @return The style defined
- *
- * @ingroup Anchorblock
- */
-EAPI const char *
-elm_anchorblock_hover_style_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->hover_style;
 }
 
 /**
@@ -394,7 +351,7 @@ elm_anchorblock_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (voi
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   EINA_SAFETY_ON_NULL_RETURN(func);
+   if (!func) return;
    Elm_Anchorblock_Item_Provider *ip = calloc(1, sizeof(Elm_Anchorblock_Item_Provider));
    if (!ip) return;
    ip->func = func;
@@ -420,7 +377,7 @@ elm_anchorblock_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (vo
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   EINA_SAFETY_ON_NULL_RETURN(func);
+   if (!func) return;
    Elm_Anchorblock_Item_Provider *ip = calloc(1, sizeof(Elm_Anchorblock_Item_Provider));
    if (!ip) return;
    ip->func = func;
@@ -448,7 +405,7 @@ elm_anchorblock_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (voi
    Eina_List *l;
    Elm_Anchorblock_Item_Provider *ip;
    if (!wd) return;
-   EINA_SAFETY_ON_NULL_RETURN(func);
+   if (!func) return;
    EINA_LIST_FOREACH(wd->item_providers, l, ip)
      {
         if ((ip->func == func) && (ip->data == data))

@@ -4,18 +4,6 @@
 
 Elm_Entry_Extension_data *ext_mod;
 
-typedef struct _Elm_Entry_Context_Menu_Item Elm_Entry_Context_Menu_Item;
-struct _Elm_Entry_Context_Menu_Item
-{
-   Evas_Object *obj;
-   const char *label;
-   const char *icon_file;
-   const char *icon_group;
-   Elm_Icon_Type icon_type;
-   Evas_Smart_Cb func;
-   void *data;
-};
-
 static void
 _ctxpopup_position(Evas_Object *obj)
 {
