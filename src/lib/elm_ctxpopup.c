@@ -690,7 +690,8 @@ static void _sizing_eval(Evas_Object *obj)
 	evas_object_move(wd->base, rect.x, rect.y);
 	evas_object_resize(wd->base, rect.w, rect.h);
 
-	if(wd->visible) _show_effect(wd);
+	if(wd->visible)
+		edje_object_signal_emit(wd->base, "elm,state,show", "elm");
 }
 
 static void _shift_base_by_arrow(Evas_Object *arrow,
