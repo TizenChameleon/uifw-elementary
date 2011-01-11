@@ -1,32 +1,29 @@
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
 static double size = 0.0;
 
 static void
-_press(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_press(void *data, Evas_Object *obj, void *event_info)
 {
     printf("press\n");
 }
 
 static void
-_unpress(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+_unpress(void *data, Evas_Object *obj, void *event_info)
 {
     printf("unpress, size : %f\n", elm_panes_content_left_size_get(obj));
 }
 
 static void
-_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_clicked(void *data, Evas_Object *obj, void *event_info)
 {
     printf("clicked\n");
 }
 
 
 static void
-_clicked_double(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+_clicked_double(void *data, Evas_Object *obj, void *event_info)
 {
     printf("clicked double\n");
     if(elm_panes_content_left_size_get(obj) > 0)
@@ -40,7 +37,7 @@ _clicked_double(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUS
 
 
 void
-test_panes(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+test_panes(void *data, Evas_Object *obj, void *event_info)
 {
    Evas_Object *win, *bg, *panes, *panes_h, *bt;
 
@@ -51,7 +48,6 @@ test_panes(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_show(bg);
 
    panes = elm_panes_add(win);

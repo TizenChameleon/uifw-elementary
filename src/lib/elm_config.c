@@ -657,7 +657,7 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, inwin_dialogs_enable, T_UCHAR);
    ELM_CONFIG_VAL(D, T, icon_size, T_INT);
    ELM_CONFIG_VAL(D, T, longpress_timeout, T_DOUBLE);
-   ELM_CONFIG_VAL(D, T, password_show_last_character, T_UCHAR);
+   ELM_CONFIG_VAL(D, T, password_show_last_character, T_INT);
 #undef T
 #undef D
 #undef T_INT
@@ -1200,7 +1200,7 @@ _config_load(void)
    _elm_config->inwin_dialogs_enable = EINA_FALSE;
    _elm_config->icon_size = 32;
    _elm_config->longpress_timeout = 1.0;
-   _elm_config->password_show_last_character = EINA_FALSE;
+   _elm_config->password_show_last_character = 0;
 }
 
 static const char *
@@ -1583,7 +1583,7 @@ _env_get(void)
    if (s) _elm_config->finger_size = atoi(s);
 
    s = getenv("ELM_PASSWORD_SHOW_LAST_CHARACTER");
-   if (s) _elm_config->password_show_last_character = !!atoi(s);
+   if (s) _elm_config->password_show_last_character = atoi(s);
 
    s = getenv("ELM_FPS");
    if (s) _elm_config->fps = atof(s);
@@ -1636,15 +1636,20 @@ _elm_config_init(void)
    _desc_init();
    _profile_fetch_from_conf();
    _config_load();
-   _env_get();
-   _config_apply();
-   _elm_config_font_overlay_apply();
-   _elm_recache();
+//   _env_get();
+//   _config_apply();
+//   _elm_config_font_overlay_apply();
+//   _elm_recache();
 }
 
 void
 _elm_config_sub_init(void)
 {
+   _env_get();
+   _config_apply();
+   _elm_config_font_overlay_apply();
+   _elm_recache();
+
 #define ENGINE_COMPARE(name) (!strcmp(_elm_config->engine, name))
    if (ENGINE_COMPARE(ELM_SOFTWARE_X11) ||
        ENGINE_COMPARE(ELM_SOFTWARE_16_X11) ||

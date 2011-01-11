@@ -196,7 +196,7 @@ elm_autocompleteview_add(Evas_Object *parent)
    wd->list = elm_list_add(wd->layout);
    evas_object_size_hint_weight_set(wd->list, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_list_mode_set(wd->list, ELM_LIST_COMPRESS);
+   elm_list_horizontal_mode_set(wd->list, ELM_LIST_COMPRESS);
    elm_object_style_set(wd->list,"autocompleteview");
    elm_list_go(wd->list);
    evas_object_smart_callback_add(wd->list, "selected", _list_click, obj);

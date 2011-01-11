@@ -690,7 +690,7 @@ static void _sizing_eval(Evas_Object *obj)
 	evas_object_move(wd->base, rect.x, rect.y);
 	evas_object_resize(wd->base, rect.w, rect.h);
 
-	if(wd->visible)
+	if(wd->visible) 
 		edje_object_signal_emit(wd->base, "elm,state,show", "elm");
 }
 

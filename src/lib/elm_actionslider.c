@@ -37,7 +37,7 @@ struct _Widget_Data
    Evas_Object	*icon_fake;		// an icon for a button or a bar
 
    // setting
-   Elm_Actionslider_Magnet_Pos	magnet_position, enabled_position;
+   Elm_Actionslider_Magnet_Pos	magnet_position;
    const char *text_left, *text_right, *text_center, *text_button;
 
    // status
@@ -69,22 +69,12 @@ static Eina_Bool _icon_animation(void *data);
 
 static const char *widtype = NULL;
 
-#define SIG_CHANGED "position"
-#define SIG_SELECTED "selected"
-
-static const Evas_Smart_Cb_Description _signals[] =
-{
-   {SIG_CHANGED, ""},
-   {SIG_SELECTED, ""},
-   {NULL, NULL}
-};
-
 
 static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+
    if (wd->icon) 
      {
         evas_object_del(wd->icon);
@@ -109,29 +99,10 @@ _del_hook(Evas_Object *obj)
 }
 
 static void
-_sizing_eval(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Coord minw = -1, minh = -1;
-
-   if (!wd) return;
-   elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-   evas_object_size_hint_min_set(wd->icon, minw, minh);
-   evas_object_size_hint_max_set(wd->icon, -1, -1);
-
-   minw = -1;
-   minh = -1;
-   elm_coords_finger_size_adjust(3, &minw, 1, &minh);
-   edje_object_size_min_restricted_calc(wd->as, &minw, &minh, minw, minh);
-   evas_object_size_hint_min_set(obj, minw, minh);
-   evas_object_size_hint_max_set(obj, -1, -1);
-}
-
-static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+
    if (edje_object_part_swallow_get(wd->as, "elm.swallow.icon") == NULL) 
      edje_object_part_unswallow(wd->as, wd->icon);
    if (edje_object_part_swallow_get(wd->as, "elm.swallow.space") == NULL) 
@@ -164,6 +135,12 @@ _disable_hook(Evas_Object *obj)
 }
 
 static void
+_sizing_eval(Evas_Object *obj)
+{
+//   Widget_Data *wd = elm_widget_data_get(obj);
+}
+
+static void
 _sub_del(void *data, Evas_Object *obj, void *event_info)
 {
 //   Widget_Data *wd = elm_widget_data_get(obj);
@@ -191,11 +168,11 @@ _icon_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
    edje_object_part_drag_value_get(wd->as, "elm.swallow.icon", &pos, NULL);
 
    if (pos == 0.0) 
-     evas_object_smart_callback_call(as, SIG_CHANGED, "left");
+     evas_object_smart_callback_call(as, "position", "left");
    else if (pos == 1.0) 
-     evas_object_smart_callback_call(as, SIG_CHANGED, "right");
+     evas_object_smart_callback_call(as, "position", "right");
    else if (pos >= 0.495 && pos <= 0.505) 
-     evas_object_smart_callback_call(as, SIG_CHANGED, "center");
+     evas_object_smart_callback_call(as, "position", "center");
 
 /*
  * TODO
@@ -277,23 +254,8 @@ _icon_animation(void *data)
      }
    edje_object_part_drag_value_set(wd->as, "elm.swallow.icon", new_position, 0.5);
 
-   if (flag_finish_animation)
-     {
-        if ((!wd->final_position) &&
-            (wd->enabled_position & ELM_ACTIONSLIDER_MAGNET_LEFT))
-          evas_object_smart_callback_call(data, SIG_SELECTED,
-                                          (void *)wd->text_left);
-        else if ((wd->final_position == 0.5) &&
-                 (wd->enabled_position & ELM_ACTIONSLIDER_MAGNET_CENTER))
-          evas_object_smart_callback_call(data, SIG_SELECTED,
-                                          (void *)wd->text_center);
-        else if ((wd->final_position == 1) &&
-                 (wd->enabled_position & ELM_ACTIONSLIDER_MAGNET_RIGHT))
-          evas_object_smart_callback_call(data, SIG_SELECTED,
-                                          (void *)wd->text_right);
-        return EINA_FALSE;
-     }
-   return EINA_TRUE;
+   if (flag_finish_animation == EINA_TRUE) return 0;
+   else  return 1;
 
 }
 
@@ -327,7 +289,6 @@ elm_actionslider_add(Evas_Object *parent)
 
    wd->mouse_down = EINA_FALSE;
    wd->mouse_hold = EINA_FALSE;
-   wd->enabled_position = ELM_ACTIONSLIDER_MAGNET_ALL;
 
    // load background edj
    wd->as = edje_object_add(e);
@@ -412,30 +373,6 @@ elm_actionslider_indicator_pos_set(Evas_Object *obj, Elm_Actionslider_Indicator_
 }
 
 /**
- * Get actionslider indicator position.
- *
- * @param obj The actionslider object.
- * @return The position of the indicator.
- *
- * @ingroup Actionslider
- */
-EAPI Elm_Actionslider_Indicator_Pos
-elm_actionslider_indicator_pos_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) ELM_ACTIONSLIDER_INDICATOR_NONE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   double position;
-   if (!wd) return ELM_ACTIONSLIDER_INDICATOR_NONE;
-
-   edje_object_part_drag_value_get(wd->as, "elm.swallow.icon", &position, NULL);
-   if (position < 0.3)
-     return ELM_ACTIONSLIDER_INDICATOR_LEFT;
-   else if (position < 0.7)
-     return ELM_ACTIONSLIDER_INDICATOR_CENTER;
-   else
-     return ELM_ACTIONSLIDER_INDICATOR_RIGHT;
-}
-/**
  * Set actionslider magnet position. 
  *
  * @param[in] obj The actionslider object. 
@@ -451,63 +388,6 @@ elm_actionslider_magnet_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos po
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    wd->magnet_position = pos;
-}
-
-/**
- * Get actionslider magnet position.
- *
- * @param obj The actionslider object.
- * @return The positions with magnet property.
- *
- * @ingroup Actionslider
- */
-EAPI Elm_Actionslider_Magnet_Pos
-elm_actionslider_magnet_pos_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) ELM_ACTIONSLIDER_MAGNET_NONE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return ELM_ACTIONSLIDER_MAGNET_NONE;
-   return wd->magnet_position;
-}
-
-/**
- * Set actionslider enabled position.
- *
- * All the positions are enabled by default.
- *
- * @param obj The actionslider object.
- * @param pos Bit mask indicating the enabled positions.
- * Example: use (ELM_ACTIONSLIDER_MAGNET_LEFT | ELM_ACTIONSLIDER_MAGNET_RIGHT)
- * to enable both positions, so the user can select it.
- *
- * @ingroup Actionslider
- */
-EAPI void
-elm_actionslider_enabled_pos_set(Evas_Object *obj, Elm_Actionslider_Magnet_Pos pos)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   wd->enabled_position = pos;
-}
-
-/**
- * Get actionslider enabled position.
- *
- * All the positions are enabled by default.
- *
- * @param obj The actionslider object.
- * @return The enabled positions.
- *
- * @ingroup Actionslider
- */
-EAPI Elm_Actionslider_Magnet_Pos
-elm_actionslider_enabled_pos_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) ELM_ACTIONSLIDER_MAGNET_NONE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return ELM_ACTIONSLIDER_MAGNET_NONE;
-   return wd->enabled_position;
 }
 
 /**
@@ -576,66 +456,6 @@ elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, con
           }
      }
 
-}
-
-/**
- * Get actionslider labels.
- *
- * @param obj The actionslider object
- * @param left_label A char** to place the left_label of @p obj into
- * @param center_label A char** to place the center_label of @p obj into
- * @param right_label A char** to place the right_label of @p obj into
- *
- * @ingroup Actionslider
- */
-EAPI void
-elm_actionslider_labels_get(const Evas_Object *obj, const char **left_label, const char **center_label, const char **right_label)
-{
-   if (left_label) *left_label= NULL;
-   if (center_label) *center_label= NULL;
-   if (right_label) *right_label= NULL;
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (left_label) *left_label = wd->text_left;
-   if (center_label) *center_label = wd->text_center;
-   if (right_label) *right_label = wd->text_right;
-}
-
-/**
- * Set the label used on the indicator object.
- *
- * @param obj The actionslider object
- * @param label The label which is going to be set.
- *
- * @ingroup Actionslider
- */
-EAPI void 
-elm_actionslider_indicator_label_set(Evas_Object *obj, const char *label)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   eina_stringshare_replace(&wd->text_button, label);
-   edje_object_part_text_set(wd->as, "elm.text.button", wd->text_button);
-}
-
-/**
- * Get the label used on the indicator object.
- *
- * @param obj The actionslider object
- * @return The indicator label
- *
- * @ingroup Actionslider
- */
-EAPI const char *
-elm_actionslider_indicator_label_get(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->text_button;
 }
 
 /**

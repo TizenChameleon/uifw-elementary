@@ -1,58 +1,49 @@
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
 static Elm_Genlist_Item_Class itc;
 
 static void _bstatus(void *data, Evas_Object *obj, void *event_info);
 static void _tstatus(void *data, Evas_Object *obj, void *event_info);
-static char *_label_get(void *data, Evas_Object *obj, const char *source);
-static Evas_Object *_icon_get(void *data, Evas_Object *obj, const char *source);
-static Eina_Bool _state_get(void *data, Evas_Object *obj, const char *source);
-static void _item_del(void *data, Evas_Object *obj);
+static char *_label_get(const void *data, Evas_Object *obj, const char *source);
+static Evas_Object *_icon_get(const void *data, Evas_Object *obj, const char *source);
+static Eina_Bool _state_get(const void *data, Evas_Object *obj, const char *source);
+static void _item_del(const void *data, Evas_Object *obj);
 static void _fill_list(Evas_Object *obj);
 static Eina_Bool _dir_has_subs(const char *path);
 
 static void
-_tstatus(void *data, Evas_Object *obj, void *event_info __UNUSED__)
+_tstatus(void *data, Evas_Object *obj, void *event_info)
 {
-   Elm_Toolbar_Item *sel;
-   const char *status;
+   char *status;
 
    if (elm_panel_hidden_get((Evas_Object*)data))
      status = "hidden";
-   else
-     status = "shown";
+   else status = "shown";
    printf("The top panel is currently %s\n", status);
-   sel = elm_toolbar_selected_item_get(obj);
-   elm_toolbar_item_selected_set(sel, EINA_FALSE);
+   elm_toolbar_item_unselect_all(obj);
 }
 
 static void
-_bstatus(void *data, Evas_Object *obj, void *event_info __UNUSED__)
+_bstatus(void *data, Evas_Object *obj, void *event_info)
 {
-   Elm_Toolbar_Item *sel;
-   const char *status;
+   char *status;
 
    if (elm_panel_hidden_get((Evas_Object*)data))
      status = "hidden";
-   else
-     status = "shown";
+   else status = "shown";
    printf("The bottom panel is currently %s\n", status);
-   sel = elm_toolbar_selected_item_get(obj);
-   elm_toolbar_item_selected_set(sel, EINA_FALSE);
+   elm_toolbar_item_unselect_all(obj);
 }
 
 static char *
-_label_get(void *data, Evas_Object *obj __UNUSED__, const char *source __UNUSED__) 
+_label_get(const void *data, Evas_Object *obj, const char *source) 
 {
    return strdup(ecore_file_file_get(data));
 }
 
 static Evas_Object *
-_icon_get(void *data, Evas_Object *obj, const char *source) 
+_icon_get(const void *data, Evas_Object *obj, const char *source) 
 {
    if (!strcmp(source, "elm.swallow.icon")) 
      {
@@ -71,13 +62,13 @@ _icon_get(void *data, Evas_Object *obj, const char *source)
 }
 
 static Eina_Bool 
-_state_get(void *data __UNUSED__, Evas_Object *obj __UNUSED__, const char *source __UNUSED__) 
+_state_get(const void *data, Evas_Object *obj, const char *source) 
 {
    return EINA_FALSE;
 }
 
 static void 
-_item_del(void *data, Evas_Object *obj __UNUSED__) 
+_item_del(const void *data, Evas_Object *obj) 
 {
    eina_stringshare_del(data);
 }
@@ -148,9 +139,10 @@ _dir_has_subs(const char *path)
 }
 
 void
-test_panel(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+test_panel(void *data, Evas_Object *obj, void *event_info)
 {
-   Evas_Object *win, *bg, *panel, *bx, *vbx, *toolbar;
+   Evas_Object *win, *bg, *panel, *bx, *vbx, *toolbar, *ic;
+   char buf[PATH_MAX];
    Evas_Object *list;
 
    win = elm_win_add(NULL, "panel", ELM_WIN_BASIC);
@@ -181,12 +173,15 @@ test_panel(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
    toolbar = elm_toolbar_add(win);
    elm_toolbar_homogenous_set(toolbar, 0);
-   elm_toolbar_mode_shrink_set(toolbar, ELM_TOOLBAR_SHRINK_NONE);
+   elm_toolbar_scrollable_set(toolbar, 0);
    evas_object_size_hint_weight_set(toolbar, EVAS_HINT_EXPAND, 0);
    evas_object_size_hint_align_set(toolbar, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(toolbar);
 
-   elm_toolbar_item_append(toolbar, "home", "Hello", _tstatus, panel);
+   ic = elm_icon_add(win);
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
+   elm_icon_file_set(ic, buf, NULL);
+   elm_toolbar_item_add(toolbar, ic, "Hello", _tstatus, panel);
 
    elm_panel_content_set(panel, toolbar);
    elm_box_pack_end(vbx, panel);
@@ -220,7 +215,6 @@ test_panel(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    elm_panel_orient_set(panel, ELM_PANEL_ORIENT_RIGHT);
    evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(panel, 1, EVAS_HINT_FILL);
-   elm_panel_hidden_set(panel, EINA_TRUE);
 
    list = elm_genlist_add(win);
    evas_object_size_hint_min_set(list, 100, -1);
@@ -241,16 +235,18 @@ test_panel(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    elm_panel_orient_set(panel, ELM_PANEL_ORIENT_BOTTOM);
    evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, 0);
    evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_panel_hidden_set(panel, EINA_TRUE);
 
    toolbar = elm_toolbar_add(win);
    elm_toolbar_homogenous_set(toolbar, 0);
-   elm_toolbar_mode_shrink_set(toolbar, ELM_TOOLBAR_SHRINK_NONE);
+   elm_toolbar_scrollable_set(toolbar, 0);
    evas_object_size_hint_weight_set(toolbar, EVAS_HINT_EXPAND, 0);
    evas_object_size_hint_align_set(toolbar, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(toolbar);
 
-   elm_toolbar_item_append(toolbar, "home", "Hello", _bstatus, panel);
+   ic = elm_icon_add(win);
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
+   elm_icon_file_set(ic, buf, NULL);
+   elm_toolbar_item_add(toolbar, ic, "Hello", _bstatus, panel);
 
    elm_panel_content_set(panel, toolbar);
    elm_box_pack_end(vbx, panel);
