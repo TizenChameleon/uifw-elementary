@@ -5290,10 +5290,14 @@ _reorder_mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *e
         ecore_timer_del(it->edit_long_timer);
         it->edit_long_timer = NULL;
      }
+   
+   /*
    if (it->realized)
       it->edit_long_timer = ecore_timer_add(0.3,_edit_long_press, it);
    else
       it->edit_long_timer = NULL;
+   */
+   fprintf(stderr, "genlist : reordering is temporary disabled.\n");
 }
 
 static void
