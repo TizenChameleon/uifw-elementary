@@ -6161,6 +6161,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
      }
 }
 
+/*
 EAPI Elm_Genlist_Item *
 elm_genlist_groupitem_add(Evas_Object *obj, const Elm_Genlist_Item_Class *itc,
                           const void *data)
@@ -6196,6 +6197,7 @@ elm_genlist_groupitem_del(Elm_Genlist_Item *git)
    return elm_genlist_item_del(git);
 }
 
+*/
 static void
 _print_deprecated(const char *deprecated, const char *new)
 {

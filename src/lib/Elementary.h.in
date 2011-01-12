@@ -1885,10 +1885,6 @@ extern "C" {
    EAPI Eina_Bool         elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj);
 
    EINA_DEPRECATED EAPI void              elm_genlist_queue_exception_set(const Evas_Object *obj, Eina_Bool emode);
-   EINA_DEPRECATED EAPI Elm_Genlist_Item *elm_genlist_groupitem_add(Evas_Object *obj, const Elm_Genlist_Item_Class *itc, const void *data);
-   EINA_DEPRECATED EAPI void              elm_genlist_groupitem_del(Elm_Genlist_Item *git);
-   EINA_DEPRECATED EAPI Elm_Genlist_Item *elm_genlist_item_append_with_group(Evas_Object *obj, const Elm_Genlist_Item_Class *itc, const void *data, Elm_Genlist_Item *parent, Elm_Genlist_Item_Flags flags, Elm_Genlist_Item *git, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *func_data);   
-   EINA_DEPRECATED EAPI Elm_Genlist_Item *elm_genlist_item_prepend_with_group(Evas_Object *obj, const Elm_Genlist_Item_Class *itc, const void *data, Elm_Genlist_Item *parent, Elm_Genlist_Item_Flags flags, Elm_Genlist_Item *git, void (*func) (void *data, Evas_Object *obj, void *event_info), const void *func_data);
 
    /* check */
    EAPI Evas_Object *elm_check_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
