@@ -29,7 +29,8 @@ lib_LTLIBRARIES = libelementary.la
 includes_HEADERS = \
 Elementary.h \
 Elementary_Cursor.h \
-elm_widget.h
+elm_widget.h \
+elm_priv.h
 includesdir = $(includedir)/elementary-@VMAJ@
 
 libelementary_la_SOURCES = \

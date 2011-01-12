@@ -13,10 +13,10 @@
 # include <Ecore_WinCE.h>
 #endif
 
-#include "els_pan.h"
-#include "els_scroller.h"
-#include "els_box.h"
-#include "els_icon.h"
+//#include "els_pan.h"
+//#include "els_scroller.h"
+//#include "els_box.h"
+//#include "els_icon.h"
 
 #include "elm_widget.h"
 
@@ -25,6 +25,81 @@
 #define WRN(...)      EINA_LOG_DOM_WARN(_elm_log_dom, __VA_ARGS__)
 #define INF(...)      EINA_LOG_DOM_INFO(_elm_log_dom, __VA_ARGS__)
 #define DBG(...)      EINA_LOG_DOM_DBG (_elm_log_dom, __VA_ARGS__)
+
+Evas_Object *_elm_smart_pan_add            (Evas *evas);
+void         _elm_smart_pan_child_set      (Evas_Object *obj, Evas_Object *child);
+Evas_Object *_elm_smart_pan_child_get      (Evas_Object *obj);
+void         _elm_smart_pan_set            (Evas_Object *obj, Evas_Coord x, Evas_Coord y);
+void         _elm_smart_pan_get            (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
+void         _elm_smart_pan_max_get        (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
+void         _elm_smart_pan_min_get        (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
+void         _elm_smart_pan_child_size_get (Evas_Object *obj, Evas_Coord *w, Evas_Coord *h);
+
+typedef enum _Elm_Smart_Scroller_Policy
+{
+   ELM_SMART_SCROLLER_POLICY_AUTO,
+   ELM_SMART_SCROLLER_POLICY_ON,
+   ELM_SMART_SCROLLER_POLICY_OFF
+}
+Elm_Smart_Scroller_Policy;
+
+Evas_Object *elm_smart_scroller_add             (Evas *evas);
+void elm_smart_scroller_child_set               (Evas_Object *obj, Evas_Object *child);
+void elm_smart_scroller_extern_pan_set          (Evas_Object *obj, Evas_Object *pan, void (*pan_set) (Evas_Object *obj, Evas_Coord x, Evas_Coord y), void (*pan_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y), void (*pan_max_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y), void (*pan_min_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y), void (*pan_child_size_get) (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y));
+void elm_smart_scroller_custom_edje_file_set    (Evas_Object *obj, char *file, char *group);
+void elm_smart_scroller_child_pos_set           (Evas_Object *obj, Evas_Coord x, Evas_Coord y);
+void elm_smart_scroller_child_pos_get           (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
+void elm_smart_scroller_child_region_show       (Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
+void elm_smart_scroller_child_viewport_size_get (Evas_Object *obj, Evas_Coord *w, Evas_Coord *h);
+void elm_smart_scroller_step_size_set           (Evas_Object *obj, Evas_Coord x, Evas_Coord y);
+void elm_smart_scroller_step_size_get           (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
+void elm_smart_scroller_page_size_set           (Evas_Object *obj, Evas_Coord x, Evas_Coord y);
+void elm_smart_scroller_page_size_get           (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
+void elm_smart_scroller_policy_set              (Evas_Object *obj, Elm_Smart_Scroller_Policy hbar, Elm_Smart_Scroller_Policy vbar);
+void elm_smart_scroller_policy_get              (Evas_Object *obj, Elm_Smart_Scroller_Policy *hbar, Elm_Smart_Scroller_Policy *vbar);
+Evas_Object *elm_smart_scroller_edje_object_get (Evas_Object *obj);
+void elm_smart_scroller_single_dir_set          (Evas_Object *obj, Eina_Bool single_dir);
+Eina_Bool elm_smart_scroller_single_dir_get     (Evas_Object *obj);
+void elm_smart_scroller_object_theme_set        (Evas_Object *parent, Evas_Object *obj, const char *clas, const char *group, const char *style);
+void elm_smart_scroller_hold_set                (Evas_Object *obj, Eina_Bool hold);
+void elm_smart_scroller_freeze_set              (Evas_Object *obj, Eina_Bool freeze);
+void elm_smart_scroller_bounce_allow_set        (Evas_Object *obj, Eina_Bool horiz, Eina_Bool vert);
+void elm_smart_scroller_bounce_allow_get        (const Evas_Object *obj, Eina_Bool *horiz, Eina_Bool *vert);
+void elm_smart_scroller_paging_set              (Evas_Object *obj, double pagerel_h, double pagerel_v, Evas_Coord pagesize_h, Evas_Coord pagesize_v);
+void elm_smart_scroller_paging_get              (Evas_Object *obj, double *pagerel_h, double *pagerel_v, Evas_Coord *pagesize_h, Evas_Coord *pagesize_v);
+void elm_smart_scroller_region_bring_in         (Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
+void elm_smart_scroller_widget_set              (Evas_Object *obj, Evas_Object *wid);
+Eina_Bool elm_smart_scroller_momentum_animator_disabled_get   (Evas_Object *obj);
+void elm_smart_scroller_momentum_animator_disabled_set             (Evas_Object *obj, Eina_Bool disabled);
+void elm_smart_scroller_bounce_animator_disabled_set               (Evas_Object *obj, Eina_Bool disabled);
+Eina_Bool elm_smart_scroller_bounce_animator_disabled_get     (Evas_Object *obj);
+
+void _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int homogeneous);
+
+Evas_Object *_els_smart_icon_add              (Evas *evas);
+Eina_Bool    _els_smart_icon_file_key_set     (Evas_Object *obj, const char *file, const char *key);
+Eina_Bool    _els_smart_icon_file_edje_set    (Evas_Object *obj, const char *file, const char *part);
+void         _els_smart_icon_file_get         (const Evas_Object *obj, const char **file, const char **key);
+void         _els_smart_icon_smooth_scale_set (Evas_Object *obj, Eina_Bool smooth);
+Eina_Bool    _els_smart_icon_smooth_scale_get (const Evas_Object *obj);
+Evas_Object *_els_smart_icon_object_get       (const Evas_Object *obj);
+void         _els_smart_icon_size_get         (const Evas_Object *obj, int *w, int *h);
+void         _els_smart_icon_fill_inside_set  (Evas_Object *obj, Eina_Bool fill_inside);
+Eina_Bool    _els_smart_icon_fill_inside_get  (const Evas_Object *obj);
+void         _els_smart_icon_scale_up_set     (Evas_Object *obj, Eina_Bool scale_up);
+Eina_Bool    _els_smart_icon_scale_up_get     (const Evas_Object *obj);
+void         _els_smart_icon_scale_down_set   (Evas_Object *obj, Eina_Bool scale_down);
+Eina_Bool    _els_smart_icon_scale_down_get   (const Evas_Object *obj);
+void         _els_smart_icon_scale_size_set   (Evas_Object *obj, int size);
+int          _els_smart_icon_scale_size_get   (const Evas_Object *obj);
+void         _els_smart_icon_scale_set        (Evas_Object *obj, double scale);
+double       _els_smart_icon_scale_get        (const Evas_Object *obj);
+void         _els_smart_icon_orient_set       (Evas_Object *obj, Elm_Image_Orient orient);
+Elm_Image_Orient _els_smart_icon_orient_get   (const Evas_Object *obj);
+void         _els_smart_icon_edit_set         (Evas_Object *obj, Eina_Bool, Evas_Object *parent);
+Eina_Bool    _els_smart_icon_edit_get         (const Evas_Object *obj);
+Evas_Object *_els_smart_icon_edje_get(Evas_Object *obj);
+
 
 typedef struct _Elm_Config    Elm_Config;
 typedef struct _Elm_Module    Elm_Module;
