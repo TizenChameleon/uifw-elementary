@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build93) unstable; urgency=low
+
+  * fixed a ctxpopup bug. 
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build93
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Wed, 12 Jan 2011 20:47:35 +0900
+
 elementary (1.0.0+svn.51480slp2+build92) unstable; urgency=low
 
   * Packaging for Merge with Upstream.
