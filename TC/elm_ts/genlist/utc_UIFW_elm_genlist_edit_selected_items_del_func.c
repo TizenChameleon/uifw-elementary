@@ -49,6 +49,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_genlist_edit_selected_items_del_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_genlist_edit_selected_items_del_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part )

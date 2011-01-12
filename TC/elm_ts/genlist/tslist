@@ -61,7 +61,4 @@
 /elm_ts/genlist/utc_UIFW_elm_genlist_edit_selected_items_get_func
 /elm_ts/genlist/utc_UIFW_elm_genlist_item_expanded_depth_get_func
 /elm_ts/genlist/utc_UIFW_elm_genlist_item_rename_mode_set_func
-/elm_ts/genlist/utc_UIFW_elm_genlist_groupitem_add_func
-/elm_ts/genlist/utc_UIFW_elm_genlist_groupitem_del_func
-/elm_ts/genlist/utc_UIFW_elm_genlist_item_append_with_group_func
 /elm_ts/genlist/utc_UIFW_elm_genlist_item_move_after_func

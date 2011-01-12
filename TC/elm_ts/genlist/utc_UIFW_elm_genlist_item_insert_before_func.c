@@ -47,6 +47,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_genlist_item_insert_before_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_genlist_item_insert_before_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -87,7 +88,7 @@ static void utc_UIFW_elm_genlist_item_insert_before_func_01(void)
    item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
 			ELM_GENLIST_ITEM_NONE, NULL, NULL);   
    
-	result_item = elm_genlist_item_insert_before(genlist, &itc, (void *) 0, item,
+	result_item = elm_genlist_item_insert_before(genlist, &itc, (void *) 0, NULL, item,
 			ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
 	if (!result_item) {
@@ -108,7 +109,7 @@ static void utc_UIFW_elm_genlist_item_insert_before_func_02(void)
    item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
 			ELM_GENLIST_ITEM_NONE, NULL, NULL);   
    
-	result_item = elm_genlist_item_insert_before(NULL, &itc, (void *) 0, NULL,
+	result_item = elm_genlist_item_insert_before(NULL, &itc, (void *) 0, NULL, NULL,
 			ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
 	if (result_item) {
