@@ -1636,15 +1636,20 @@ _elm_config_init(void)
    _desc_init();
    _profile_fetch_from_conf();
    _config_load();
-   _env_get();
-   _config_apply();
-   _elm_config_font_overlay_apply();
-   _elm_recache();
+//   _env_get();
+//   _config_apply();
+//   _elm_config_font_overlay_apply();
+//   _elm_recache();
 }
 
 void
 _elm_config_sub_init(void)
 {
+   _env_get();
+   _config_apply();
+   _elm_config_font_overlay_apply();
+   _elm_recache();
+
 #define ENGINE_COMPARE(name) (!strcmp(_elm_config->engine, name))
    if (ENGINE_COMPARE(ELM_SOFTWARE_X11) ||
        ENGINE_COMPARE(ELM_SOFTWARE_16_X11) ||
