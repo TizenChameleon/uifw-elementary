@@ -1260,6 +1260,8 @@ extern "C" {
    EAPI void         elm_entry_text_filter_remove(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data) EINA_ARG_NONNULL(1, 2);
    EAPI char        *elm_entry_markup_to_utf8(const char *s);
    EAPI char        *elm_entry_utf8_to_markup(const char *s);
+   EINA_DEPRECATED EAPI void         elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w);
+   EINA_DEPRECATED EAPI Evas_Coord   elm_entry_wrap_width_get(const Evas_Object *obj);
    EINA_DEPRECATED EAPI void         elm_entry_fontsize_set(Evas_Object *obj, int fontsize);
    EINA_DEPRECATED EAPI void         elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
    EINA_DEPRECATED EAPI void         elm_entry_text_align_set(Evas_Object *obj, const char *alignmode);
