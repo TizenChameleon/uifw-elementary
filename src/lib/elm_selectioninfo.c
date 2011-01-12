@@ -423,6 +423,6 @@ elm_selectioninfo_label_set(Evas_Object *obj, char* text)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    
-   edje_object_part_text_set(_EDJ(wd->content), "elm.text", strdup(text));
+   edje_object_part_text_set(_EDJ(wd->content), "elm.text", text);
 }
 
