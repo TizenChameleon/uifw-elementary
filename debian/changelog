@@ -1,3 +1,19 @@
+elementary (1.0.0+svn.51480slp2+build90) unstable; urgency=low
+
+  * Packaging for Merge with Upstream
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build90    
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 12 Jan 2011 11:33:03 +0900
+
+elementary (1.0.0+svn.51480slp2+build89) unstable; urgency=low
+
+  * Packaging for fixing elm_pager
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build89   
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Tue, 11 Jan 2011 23:11:48 +0900
+
 elementary (1.0.0+svn.51480slp2+build88) unstable; urgency=low
 
   * Packaging for fixing ctx_popup and elm_config(preload)
