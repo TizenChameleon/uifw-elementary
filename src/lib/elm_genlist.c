@@ -2910,14 +2910,6 @@ elm_genlist_clear(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   /** this is temporary code **/
-   Elm_Genlist_Item *it;
-   while ((it = elm_genlist_first_item_get(obj))) {
-   	       elm_genlist_item_del(it);
-   }
-   return;
-   /** this should be fixed **/
-
    wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_NONE;
    wd->pinchzoom_effect_mode = ELM_GENLIST_ITEM_PINCHZOOM_EFFECT_NONE;
    elm_smart_scroller_hold_set(wd->scr, 0);
