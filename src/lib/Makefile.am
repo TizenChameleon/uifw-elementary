@@ -105,7 +105,7 @@ elm_diskselector.c \
 elm_colorpicker.c \
 elm_colorselector.c \
 elm_colorpalette.c \
-elm_ctxpopup.c \
+elc_ctxpopup.c \
 elm_actionsheet.c \
 elm_gridbox.c \
 elm_softkey.c \
