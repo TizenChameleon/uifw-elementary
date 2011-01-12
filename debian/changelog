@@ -1,3 +1,12 @@
+elementary (1.0.0+svn.51480slp2+build91) unstable; urgency=low
+
+  * Packaging for Merge with Upstream.
+  * (Genlist Reordering is disabled.)
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build91
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Wed, 12 Jan 2011 13:44:48 +0900
+
 elementary (1.0.0+svn.51480slp2+build90) unstable; urgency=low
 
   * Packaging for Merge with Upstream
