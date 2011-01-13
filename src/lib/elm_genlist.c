@@ -474,7 +474,7 @@ static void _select_all_down(void *data, Evas_Object *obj __UNUSED__, const char
 static void _notify_item_position(Elm_Genlist_Item *it);
 static void _notify_item_position(Elm_Genlist_Item *it);
 static int _get_space_for_reorder_item(Elm_Genlist_Item *it);
-static void _print_deprecated(const char *deprecated, const char *new);
+//static void _print_deprecated(const char *deprecated, const char *new);
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_VERSION;
 
@@ -899,6 +899,7 @@ _long_press(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
+/*
 static Eina_Bool
 _edit_long_press(void *data)
 {
@@ -948,6 +949,7 @@ _edit_long_press(void *data)
 
   return 0;
 }
+*/
  
 static void
 _multi_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
@@ -6208,7 +6210,6 @@ elm_genlist_groupitem_del(Elm_Genlist_Item *git)
    return elm_genlist_item_del(git);
 }
 
-*/
 static void
 _print_deprecated(const char *deprecated, const char *new)
 {
@@ -6217,6 +6218,7 @@ _print_deprecated(const char *deprecated, const char *new)
    fprintf(stderr, "==> Use %s() instead.\n", new);
    fprintf(stderr, "=======================================================\n");
 }
+*/
 
 EAPI void
 elm_genlist_queue_exception_set(const Evas_Object *obj, Eina_Bool emode)
