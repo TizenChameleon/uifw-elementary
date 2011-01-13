@@ -1764,9 +1764,9 @@ _item_block_position(Item_Block *itb, int in)
         it->w = itb->w;
         it->scrl_x = itb->x + it->x - it->wd->pan_x + ox;
         it->scrl_y = itb->y + it->y - it->wd->pan_y + oy;
-		
-             vis = (ELM_RECTS_INTERSECT(it->scrl_x, it->scrl_y, it->w, it->h,
-                                        cvx, cvy, cvw, cvh));
+
+        vis = (ELM_RECTS_INTERSECT(it->scrl_x, it->scrl_y, it->w, it->h,
+                                   cvx, cvy, cvw, cvh));
         if (it->flags != ELM_GENLIST_ITEM_GROUP)
           {
              if ((itb->realized) && (!it->realized))
@@ -1774,73 +1774,73 @@ _item_block_position(Item_Block *itb, int in)
                   if (vis) _item_realize(it, in, 0);
                }
 
-        if (it->realized)
-          {
-             _notify_item_position(it);
-			 if (vis)
-				{
-				   git = it->group_item;
-				   if (git)
-					 {
-						if (git->scrl_y < oy)
-						   git->scrl_y = oy;
-						if ((git->scrl_y + git->h) > (it->scrl_y + it->h))
-						   git->scrl_y = (it->scrl_y + it->h) - git->h;
-						git->want_realize = EINA_TRUE;
-					 }
-				   evas_object_resize(it->base, it->w, it->h);
-				   evas_object_move(it->base,
-									it->scrl_x, it->scrl_y);
-				   evas_object_show(it->base);
-
-
-                  is_reorder = _get_space_for_reorder_item(it);
-
-                  if (it->wd->ed)
-                    {
-                       if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && !(in % it->wd->max_items_per_block) && !itb->reoder_y) 
-                         {
-                            itb->reoder_y -= it->h;
-                            it->scrl_y = oy + itb->y + it->y - itb->wd->pan_y + itb->reoder_y;
-                         }
-                       else if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && !(in % it->wd->max_items_per_block) && itb->reoder_y) 
-                         {
-                            itb->reoder_y = 0;
-                         }
-                    }
-                  y += is_reorder;
-
-                  if (!it->reordering)
-                    {
-                       if ((!it->wd->effect_mode || 
-                            (it->wd->effect_mode && it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE)) && !it->wd->pinch_zoom_reserve)
-                         {
-                            _move_edit_controls(it,it->scrl_x, it->scrl_y);
-                            evas_object_resize(it->base, it->w-(it->pad_left+it->pad_right), it->h);
-
-                            evas_object_move(it->base, it->scrl_x+it->pad_left, it->scrl_y);
-
-                            if (it->delete_check)
-                              {
-                                 edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
-                                 edje_object_signal_emit(it->base, "elm,state,del_confirm", "elm");
-                              }
-                            evas_object_show(it->base);
-                            it->old_pad_left = it->pad_left;
-                            it->old_scrl_y = it->scrl_y;
-                         }
-
-                    }
-               }
-             else
+             if (it->realized)
                {
-                  if (!it->dragging)
-                     _item_unrealize(it);
+                  _notify_item_position(it);
+                  if (vis)
+                    {
+                       git = it->group_item;
+                       if (git)
+                         {
+                            if (git->scrl_y < oy)
+                               git->scrl_y = oy;
+                            if ((git->scrl_y + git->h) > (it->scrl_y + it->h))
+                               git->scrl_y = (it->scrl_y + it->h) - git->h;
+                            git->want_realize = EINA_TRUE;
+                         }
+                       evas_object_resize(it->base, it->w, it->h);
+                       evas_object_move(it->base,
+                                        it->scrl_x, it->scrl_y);
+                       evas_object_show(it->base);
+
+
+                       is_reorder = _get_space_for_reorder_item(it);
+
+                       if (it->wd->ed)
+                         {
+                            if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && !(in % it->wd->max_items_per_block) && !itb->reoder_y) 
+                              {
+                                 itb->reoder_y -= it->h;
+                                 it->scrl_y = oy + itb->y + it->y - itb->wd->pan_y + itb->reoder_y;
+                              }
+                            else if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && !(in % it->wd->max_items_per_block) && itb->reoder_y) 
+                              {
+                                 itb->reoder_y = 0;
+                              }
+                         }
+                       y += is_reorder;
+
+                       if (!it->reordering)
+                         {
+                            if ((!it->wd->effect_mode || 
+                                 (it->wd->effect_mode && it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE)) && !it->wd->pinch_zoom_reserve)
+                              {
+                                 _move_edit_controls(it,it->scrl_x, it->scrl_y);
+                                 evas_object_resize(it->base, it->w-(it->pad_left+it->pad_right), it->h);
+
+                                 evas_object_move(it->base, it->scrl_x+it->pad_left, it->scrl_y);
+
+                                 if (it->delete_check)
+                                   {
+                                      edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
+                                      edje_object_signal_emit(it->base, "elm,state,del_confirm", "elm");
+                                   }
+                                 evas_object_show(it->base);
+                                 it->old_pad_left = it->pad_left;
+                                 it->old_scrl_y = it->scrl_y;
+                              }
+
+                         }
+                    }
+                  else
+                    {
+                       if (!it->dragging)
+                          _item_unrealize(it);
+                    }
                }
+
+             in++;
           }
-		
-     	   in++;
-        }
         else
           {
              if (vis) it->want_realize = EINA_TRUE;
