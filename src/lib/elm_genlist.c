@@ -1703,7 +1703,10 @@ _group_items_recalc(void *data)
         if (git->want_realize) 
           {
              if (!git->realized)
-                _item_realize(git, 0, 0);
+               {
+                  _item_realize(git, 0, 0);
+                  evas_object_smart_callback_call(git->wd->obj, "realized", git);
+               }
              evas_object_resize(git->base, wd->minw, git->h);
              evas_object_move(git->base, git->scrl_x, git->scrl_y);
              evas_object_show(git->base);
@@ -1771,7 +1774,11 @@ _item_block_position(Item_Block *itb, int in)
           {
              if ((itb->realized) && (!it->realized))
                {
-                  if (vis) _item_realize(it, in, 0);
+                  if (vis)
+                    {
+                       _item_realize(it, in, 0);
+                       evas_object_smart_callback_call(it->wd->obj, "realized", it);
+                    }
                }
 
              if (it->realized)
