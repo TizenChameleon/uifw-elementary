@@ -917,9 +917,12 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
                        evas_object_hide(swallow);
                     }
                } 
-             _multiple_object_unset(it, list);   
-             evas_object_del(it->title_obj);
-             it->title_obj = NULL;      
+             _multiple_object_unset(it, list);  
+	     if (it->title_obj)
+               { 
+                  evas_object_del(it->title_obj);
+                  it->title_obj = NULL;      
+	       }
              if (!wd->hidden)
                {
                   edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
