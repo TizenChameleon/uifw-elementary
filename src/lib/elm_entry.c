@@ -2230,6 +2230,7 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    wd->single_line = single_line;
    wd->linewrap = EINA_FALSE;
    wd->char_linewrap = EINA_FALSE;
+   elm_entry_cnp_textonly_set(obj, EINA_TRUE);
    t = eina_stringshare_add(elm_entry_entry_get(obj));
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    elm_entry_entry_set(obj, t);
