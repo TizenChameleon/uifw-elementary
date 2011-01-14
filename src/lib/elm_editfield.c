@@ -300,6 +300,7 @@ elm_editfield_add(Evas_Object *parent)
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
    evas_object_smart_callback_add(wd->entry, "changed", _entry_changed_cb, obj);
    elm_widget_sub_object_add(obj, wd->entry);
+   evas_object_show(wd->entry);
    _sizing_eval(obj);
 
    return obj;
