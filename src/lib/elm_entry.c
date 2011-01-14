@@ -865,7 +865,10 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
    cnpwidgetdata = data;
    elm_cbhm_helper_init(obj);
-   elm_cbhm_send_raw_data("show");
+   if (elm_entry_cnp_textonly_get(obj))
+	   elm_cbhm_send_raw_data("show0");
+   else
+	   elm_cbhm_send_raw_data("show1");
    // end for cbhm
 }
 
@@ -2206,6 +2209,7 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->selmode = wd->selmode;
    ext_mod->cnpinit = _cnpinit;
    ext_mod->context_menu = wd->context_menu;
+   ext_mod->textonly = wd->textonly;
 }
 
 /**
