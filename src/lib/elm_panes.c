@@ -65,7 +65,10 @@ _theme_hook(Evas_Object *obj)
      edje_object_part_swallow(wd->panes, "elm.swallow.left", wd->contents.left);
    if (wd->contents.right)
      edje_object_part_swallow(wd->panes, "elm.swallow.right", wd->contents.right);
-
+   if(wd->contents.left && wd->contents.right)
+     edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
+   if(wd->fixed)
+	   edje_object_signal_emit(wd->panes, "elm.panes.fixed", "elm");
    edje_object_scale_set(wd->panes, elm_widget_scale_get(obj) *
                          _elm_config->scale);
    _sizing_eval(obj);
@@ -365,8 +368,8 @@ elm_panes_content_left_unset(Evas_Object *obj)
    if (!wd) return NULL;
    if (!wd->contents.left) return NULL;
    Evas_Object *content = wd->contents.left;
-   edje_object_part_unswallow(wd->panes, content);
    elm_widget_sub_object_del(obj, content);
+   edje_object_part_unswallow(wd->panes, content);
    evas_object_hide(content);
    wd->contents.left = NULL;
    edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
@@ -391,8 +394,8 @@ elm_panes_content_right_unset(Evas_Object *obj)
    if (!wd) return NULL;
    if (!wd->contents.right) return NULL;
    Evas_Object *content = wd->contents.right;
-   edje_object_part_unswallow(wd->panes, content);
    elm_widget_sub_object_del(obj, content);
+   edje_object_part_unswallow(wd->panes, content);
    evas_object_hide(content);
    wd->contents.right = NULL;
    edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
@@ -479,7 +482,7 @@ elm_panes_horizontal_get(const Evas_Object *obj)
 }
 
 /**
- * Set a handler of the pane object non-movable or movable
+ * Set a handler of the pane object movable or non-movable
  *
  * @param[in] obj The panes object
  * @param[in] fixed If set to true then the views size can't be changed using handler otherwise using handler they can be resized

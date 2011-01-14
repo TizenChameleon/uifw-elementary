@@ -1553,6 +1553,7 @@ _item_unrealize(Elm_Genlist_Item *it)
    Evas_Object *icon;
 
    if (!it->realized) return;
+   evas_object_smart_callback_call(it->wd->obj, "unrealized", it);
    it->menuopened = EINA_FALSE;
    it->wd->menuopened = eina_list_remove(it->wd->menuopened, it);
    if (it->long_timer)
