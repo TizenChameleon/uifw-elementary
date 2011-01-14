@@ -103,6 +103,7 @@ struct _Smart_Data
    unsigned char bounce_vert : 1;
    unsigned char momentum_animator_disabled :1;
    unsigned char bounce_animator_disabled :1;
+   unsigned char event_propagation :1;
 };
 
 /* local subsystem functions */
@@ -1082,6 +1083,22 @@ elm_smart_scroller_single_dir_get(Evas_Object *obj)
 {
    API_ENTRY return EINA_FALSE;
    return sd->one_dir_at_a_time;
+}
+
+void
+elm_smart_scroller_propagate_events_set(Evas_Object *obj, Eina_Bool propagation)
+{
+   API_ENTRY return;
+   sd->event_propagation = propagation;
+
+   evas_object_propagate_events_set(sd->edje_obj, propagation);
+}
+
+Eina_Bool
+elm_smart_scroller_propagate_events_get(Evas_Object *obj)
+{
+   API_ENTRY return EINA_FALSE;
+   return sd->event_propagation;
 }
 
 void

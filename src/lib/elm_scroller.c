@@ -895,7 +895,7 @@ elm_scroller_propagate_events_set(Evas_Object *obj, Eina_Bool propagation)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   evas_object_propagate_events_set(wd->scr, propagation);
+   elm_smart_scroller_propagate_events_set(wd->scr, propagation);
 }
 
 /**
@@ -916,7 +916,7 @@ elm_scroller_propagate_events_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
 
-   return evas_object_propagate_events_get(wd->scr);
+   return elm_smart_scroller_propagate_events_get(wd->scr);
 }
 
 
