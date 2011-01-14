@@ -3501,6 +3501,7 @@ elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
         len = evas_string_char_len_get(current);
         if (len >= lim->max_char_count)
           {
+             evas_object_smart_callback_call(entry, "maxlength,reached", NULL);
              free(*text);
              free(current);
              *text = NULL;
@@ -3521,6 +3522,7 @@ elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
         len = strlen(current);
         if (len >= lim->max_byte_count)
           {
+             evas_object_smart_callback_call(entry, "maxlength,reached", NULL);
              free(*text);
              free(current);
              *text = NULL;

@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build94) unstable; urgency=low
+
+  * Controlbar bug fix - view hide
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build94
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 13 Jan 2011 14:29:37 +0900
+
 elementary (1.0.0+svn.51480slp2+build93) unstable; urgency=low
 
   * fixed a ctxpopup bug. 

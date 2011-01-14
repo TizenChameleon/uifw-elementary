@@ -783,6 +783,8 @@ selected_box(Elm_Controlbar_Item * it)
 
         elm_layout_content_set(wd->view, "elm.swallow.view", it->view);
 
+        if(content) evas_object_hide(content);
+
    }else if(it->style == TOOLBAR){
         edje_object_signal_emit(_EDJ(it->base), "elm,state,text_unselected", "elm");
         if (it->func)

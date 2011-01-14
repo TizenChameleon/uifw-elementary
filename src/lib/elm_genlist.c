@@ -474,7 +474,7 @@ static void _select_all_down(void *data, Evas_Object *obj __UNUSED__, const char
 static void _notify_item_position(Elm_Genlist_Item *it);
 static void _notify_item_position(Elm_Genlist_Item *it);
 static int _get_space_for_reorder_item(Elm_Genlist_Item *it);
-static void _print_deprecated(const char *deprecated, const char *new);
+//static void _print_deprecated(const char *deprecated, const char *new);
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_VERSION;
 
@@ -899,6 +899,7 @@ _long_press(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
+/*
 static Eina_Bool
 _edit_long_press(void *data)
 {
@@ -948,6 +949,7 @@ _edit_long_press(void *data)
 
   return 0;
 }
+*/
  
 static void
 _multi_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
@@ -1703,7 +1705,10 @@ _group_items_recalc(void *data)
         if (git->want_realize) 
           {
              if (!git->realized)
-                _item_realize(git, 0, 0);
+               {
+                  _item_realize(git, 0, 0);
+                  evas_object_smart_callback_call(git->wd->obj, "realized", git);
+               }
              evas_object_resize(git->base, wd->minw, git->h);
              evas_object_move(git->base, git->scrl_x, git->scrl_y);
              evas_object_show(git->base);
@@ -1764,83 +1769,87 @@ _item_block_position(Item_Block *itb, int in)
         it->w = itb->w;
         it->scrl_x = itb->x + it->x - it->wd->pan_x + ox;
         it->scrl_y = itb->y + it->y - it->wd->pan_y + oy;
-		
-             vis = (ELM_RECTS_INTERSECT(it->scrl_x, it->scrl_y, it->w, it->h,
-                                        cvx, cvy, cvw, cvh));
+
+        vis = (ELM_RECTS_INTERSECT(it->scrl_x, it->scrl_y, it->w, it->h,
+                                   cvx, cvy, cvw, cvh));
         if (it->flags != ELM_GENLIST_ITEM_GROUP)
           {
              if ((itb->realized) && (!it->realized))
                {
-                  if (vis) _item_realize(it, in, 0);
-               }
-
-        if (it->realized)
-          {
-             _notify_item_position(it);
-			 if (vis)
-				{
-				   git = it->group_item;
-				   if (git)
-					 {
-						if (git->scrl_y < oy)
-						   git->scrl_y = oy;
-						if ((git->scrl_y + git->h) > (it->scrl_y + it->h))
-						   git->scrl_y = (it->scrl_y + it->h) - git->h;
-						git->want_realize = EINA_TRUE;
-					 }
-				   evas_object_resize(it->base, it->w, it->h);
-				   evas_object_move(it->base,
-									it->scrl_x, it->scrl_y);
-				   evas_object_show(it->base);
-
-
-                  is_reorder = _get_space_for_reorder_item(it);
-
-                  if (it->wd->ed)
+                  if (vis)
                     {
-                       if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && !(in % it->wd->max_items_per_block) && !itb->reoder_y) 
-                         {
-                            itb->reoder_y -= it->h;
-                            it->scrl_y = oy + itb->y + it->y - itb->wd->pan_y + itb->reoder_y;
-                         }
-                       else if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && !(in % it->wd->max_items_per_block) && itb->reoder_y) 
-                         {
-                            itb->reoder_y = 0;
-                         }
-                    }
-                  y += is_reorder;
-
-                  if (!it->reordering)
-                    {
-                       if ((!it->wd->effect_mode || 
-                            (it->wd->effect_mode && it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE)) && !it->wd->pinch_zoom_reserve)
-                         {
-                            _move_edit_controls(it,it->scrl_x, it->scrl_y);
-                            evas_object_resize(it->base, it->w-(it->pad_left+it->pad_right), it->h);
-
-                            evas_object_move(it->base, it->scrl_x+it->pad_left, it->scrl_y);
-
-                            if (it->delete_check)
-                              {
-                                 edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
-                                 edje_object_signal_emit(it->base, "elm,state,del_confirm", "elm");
-                              }
-                            evas_object_show(it->base);
-                            it->old_pad_left = it->pad_left;
-                            it->old_scrl_y = it->scrl_y;
-                         }
-
+                       _item_realize(it, in, 0);
+                       evas_object_smart_callback_call(it->wd->obj, "realized", it);
                     }
                }
-             else
+
+             if (it->realized)
                {
-                  if (!it->dragging)
-                     _item_unrealize(it);
+                  _notify_item_position(it);
+                  if (vis)
+                    {
+                       git = it->group_item;
+                       if (git)
+                         {
+                            if (git->scrl_y < oy)
+                               git->scrl_y = oy;
+                            if ((git->scrl_y + git->h) > (it->scrl_y + it->h))
+                               git->scrl_y = (it->scrl_y + it->h) - git->h;
+                            git->want_realize = EINA_TRUE;
+                         }
+                       evas_object_resize(it->base, it->w, it->h);
+                       evas_object_move(it->base,
+                                        it->scrl_x, it->scrl_y);
+                       evas_object_show(it->base);
+
+
+                       is_reorder = _get_space_for_reorder_item(it);
+
+                       if (it->wd->ed)
+                         {
+                            if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && !(in % it->wd->max_items_per_block) && !itb->reoder_y) 
+                              {
+                                 itb->reoder_y -= it->h;
+                                 it->scrl_y = oy + itb->y + it->y - itb->wd->pan_y + itb->reoder_y;
+                              }
+                            else if (it != it->wd->ed->reorder_item && is_reorder && in > 0 && !(in % it->wd->max_items_per_block) && itb->reoder_y) 
+                              {
+                                 itb->reoder_y = 0;
+                              }
+                         }
+                       y += is_reorder;
+
+                       if (!it->reordering)
+                         {
+                            if ((!it->wd->effect_mode || 
+                                 (it->wd->effect_mode && it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE)) && !it->wd->pinch_zoom_reserve)
+                              {
+                                 _move_edit_controls(it,it->scrl_x, it->scrl_y);
+                                 evas_object_resize(it->base, it->w-(it->pad_left+it->pad_right), it->h);
+
+                                 evas_object_move(it->base, it->scrl_x+it->pad_left, it->scrl_y);
+
+                                 if (it->delete_check)
+                                   {
+                                      edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
+                                      edje_object_signal_emit(it->base, "elm,state,del_confirm", "elm");
+                                   }
+                                 evas_object_show(it->base);
+                                 it->old_pad_left = it->pad_left;
+                                 it->old_scrl_y = it->scrl_y;
+                              }
+
+                         }
+                    }
+                  else
+                    {
+                       if (!it->dragging)
+                          _item_unrealize(it);
+                    }
                }
+
+             in++;
           }
-		
-     	   in++;
-        }
         else
           {
              if (vis) it->want_realize = EINA_TRUE;
@@ -6201,7 +6210,6 @@ elm_genlist_groupitem_del(Elm_Genlist_Item *git)
    return elm_genlist_item_del(git);
 }
 
-*/
 static void
 _print_deprecated(const char *deprecated, const char *new)
 {
@@ -6210,6 +6218,7 @@ _print_deprecated(const char *deprecated, const char *new)
    fprintf(stderr, "==> Use %s() instead.\n", new);
    fprintf(stderr, "=======================================================\n");
 }
+*/
 
 EAPI void
 elm_genlist_queue_exception_set(const Evas_Object *obj, Eina_Bool emode)
