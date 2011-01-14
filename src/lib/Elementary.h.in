@@ -1272,6 +1272,8 @@ extern "C" {
    EAPI void         elm_entry_file_save(Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_autosave_set(Evas_Object *obj, Eina_Bool autosave) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool    elm_entry_autosave_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void         elm_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool    elm_entry_cnp_textonly_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
    EAPI void         elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
    EAPI void         elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
