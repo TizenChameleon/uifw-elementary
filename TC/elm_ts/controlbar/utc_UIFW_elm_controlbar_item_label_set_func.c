@@ -102,7 +102,7 @@ static void utc_UIFW_elm_controlbar_item_label_set_func_02(void)
    	elm_controlbar_item_label_set(NULL, "Fail");
    	label = elm_controlbar_item_label_get(item1);
 
-	if (strcmp(label, "Fail")) {
+	if (!strcmp(label, "Fail")) {
 		tet_infoline("elm_controlbar_item_label_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

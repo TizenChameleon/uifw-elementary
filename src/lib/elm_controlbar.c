@@ -886,8 +886,7 @@ create_item_label(Evas_Object *obj, Elm_Controlbar_Item * it, char *part)
    label = elm_label_add(obj);
    elm_object_style_set(label, "controlbar");
    elm_label_label_set(label, it->text);
-   elm_label_text_align_set(label, "center");
-   elm_label_text_color_set(label, 255, 255, 255, 255);
+   evas_object_color_set(label, 255, 255, 255, 255);
    elm_label_line_wrap_set(label, EINA_TRUE);
    elm_label_ellipsis_set(label, EINA_TRUE);
    elm_label_wrap_mode_set(label, 1);
@@ -2104,9 +2103,10 @@ elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path)
 {
    if (!it) return;
    if(it->icon_path)
-      eina_stringshare_del(it->icon_path);
-   it->icon_path = eina_stringshare_add(icon_path);
-
+     {
+        eina_stringshare_del(it->icon_path);
+        it->icon_path = NULL;
+     }
    if(it->icon)
      {
         evas_object_del(it->icon);
@@ -2118,8 +2118,12 @@ elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path)
         it->icon_shadow = NULL;
      }
 
-   it->icon = create_item_icon(it->base_item, it, "elm.swallow.icon");
-   it->icon_shadow = create_item_icon(it->base_item, it, "elm.swallow.icon_shadow");
+   if(icon_path != NULL)
+     {
+        it->icon_path = eina_stringshare_add(icon_path);
+        it->icon = create_item_icon(it->base_item, it, "elm.swallow.icon");
+        it->icon_shadow = create_item_icon(it->base_item, it, "elm.swallow.icon_shadow");
+     }
 
    if(it->label && it->icon)
      {
@@ -2127,6 +2131,8 @@ elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path)
         elm_label_line_wrap_set(it->label, EINA_FALSE);
         elm_label_wrap_mode_set(it->label, 0);
      }
+   else if(!it->icon)
+      edje_object_signal_emit(_EDJ(it->base_item), "elm,state,default", "elm");
 
    if(it->disable)
       item_color_set(it, "elm.item.disable.color");
@@ -2161,17 +2167,31 @@ EAPI void
 elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label) 
 {
    if (!it) return;
-   if(it->text) eina_stringshare_del(it->text);
-   if(it->label) evas_object_del(it->label);
-   it->text = eina_stringshare_add(label);
-   it->label = create_item_label(it->base_item, it, "elm.swallow.text");
+   if(it->text)
+     {
+        eina_stringshare_del(it->text);
+        it->text = NULL;
+     }
+   if(it->label)
+     {
+        evas_object_del(it->label);
+        it->label = NULL;
+     }
+   if(label != NULL)
+     {
+        it->text = eina_stringshare_add(label);
+        it->label = create_item_label(it->base_item, it, "elm.swallow.text");
+     }
    if(it->disable) item_color_set(it, "elm.item.disable.color");
 
-   if(it->label && it->icon){
+   if(it->label && it->icon)
+     {
         edje_object_signal_emit(_EDJ(it->base_item), "elm,state,icon_text", "elm");
         elm_label_line_wrap_set(it->label, EINA_FALSE);
         elm_label_wrap_mode_set(it->label, 0);
-   }
+     }
+   else if(!it->label)
+      edje_object_signal_emit(_EDJ(it->base_item), "elm,state,default", "elm");
 }
 
 /**

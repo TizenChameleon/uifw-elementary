@@ -100,7 +100,7 @@ static void utc_UIFW_elm_controlbar_selected_item_get_func_02(void)
 {
 	Elm_Controlbar_Item *item = NULL;
 
-   	item = elm_controlbar_selected_item_get(controlbar);
+   	item = elm_controlbar_selected_item_get(NULL);
 
 	if (item) {
 		tet_infoline("elm_controlbar_selected_item_get() failed in negative test case");
