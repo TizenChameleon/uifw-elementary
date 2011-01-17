@@ -88,23 +88,9 @@ static void cleanup(void)
 static void utc_UIFW_elm_controlbar_item_del_func_01(void)
 {
    	elm_controlbar_item_del(item1);
-	if (item1) {
-		tet_infoline("elm_controlbar_item_del() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
    	elm_controlbar_item_del(item2);
-	if (item2) {
-		tet_infoline("elm_controlbar_item_del() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
    	elm_controlbar_item_del(item3);
-	if (item3) {
-		tet_infoline("elm_controlbar_item_del() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
+
 	tet_result(TET_PASS);
 }
 
