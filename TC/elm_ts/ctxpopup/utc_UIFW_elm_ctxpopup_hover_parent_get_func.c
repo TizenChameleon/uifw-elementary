@@ -35,7 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_ctxpopup_area_set_func_01(void);
+static void utc_UIFW_elm_ctxpopup_hover_parent_get_func_01(void);
+static void utc_UIFW_elm_ctxpopup_hover_parent_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -43,7 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_ctxpopup_area_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_ctxpopup_hover_parent_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_ctxpopup_hover_parent_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -59,30 +61,47 @@ static void cleanup(void)
 {
 	if ( NULL != main_win ) {
 		evas_object_del(main_win);
-	       	main_win = NULL;
+	  	main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_ctxpopup_area_set()
+ * @brief Positive test case of elm_ctxpopup_hover_parent_get()
  */
-static void utc_UIFW_elm_ctxpopup_area_set_func_01(void)
+static void utc_UIFW_elm_ctxpopup_hover_parent_get_func_01(void)
 {
-	int r = 0;
-
-	Evas_Object *ctxpopup = elm_ctxpopup_add(main_win);
-	elm_ctxpopup_item_add(ctxpopup, NULL, "TEST", NULL, NULL);
-	evas_object_show(ctxpopup);
+	Evas_Object *r = NULL;
 
 	Evas_Object *rect = evas_object_rectangle_add(evas_object_evas_get(main_win));
 	evas_object_resize(rect, 400, 400);
 	evas_object_show(rect);
+
+	Evas_Object *ctxpopup = elm_ctxpopup_add(main_win);
+	elm_ctxpopup_hover_parent_set(ctxpopup, rect);
+
+	r = elm_ctxpopup_hover_parent_get(ctxpopup);
 	
-   	elm_ctxpopup_area_set(ctxpopup, rect);
-	
+	if (r != rect) {
+		tet_infoline("elm_ctxpopup_hover_parent_get() failed in positive test case");
+		tet_result(TET_FAIL);
+		return;
+	}
 	tet_result(TET_PASS);
 }
 
-
+/**
+ * @brief Negative test case of ug_init elm_ctxpopup_hover_parent_get()
+ */
+static void utc_UIFW_elm_ctxpopup_hover_parent_get_func_02(void)
+{
+	Evas_Object *ctxpopup = elm_ctxpopup_add(main_win);
+	Evas_Object *r = elm_ctxpopup_hover_parent_get(ctxpopup);
+	if (r) {
+		tet_infoline("elm_ctxpopup_hover_parent_get() failed in negative test case");
+		tet_result(TET_FAIL);
+		return;
+	}
+	tet_result(TET_PASS);
+}

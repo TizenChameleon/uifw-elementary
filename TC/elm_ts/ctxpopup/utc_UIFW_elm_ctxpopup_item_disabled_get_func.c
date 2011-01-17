@@ -35,7 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_ctxpopup_position_forced_set_func_01(void);
+static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_01(void);
+static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -43,7 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_ctxpopup_position_forced_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_ctxpopup_item_disabled_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_ctxpopup_item_disabled_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -66,15 +68,42 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_ctxpopup_position_forced_set()
+ * @brief Positive test case of elm_ctxpopup_item_disabled_get()
  */
-static void utc_UIFW_elm_ctxpopup_position_forced_set_func_01(void)
+static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_01(void)
 {
 	Evas_Object *obj = elm_ctxpopup_add(main_win);
+	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
+	elm_ctxpopup_item_disabled_set(item, EINA_TRUE);
 	evas_object_show(obj);
 
-	elm_ctxpopup_position_forced_set(obj, EINA_TRUE);
+   Eina_Bool r = elm_ctxpopup_item_disabled_get(item);
+
+	if (r != EINA_TRUE) {
+		tet_infoline("elm_ctxpopup_item_disabled_get() failed in positive test case");
+		tet_result(TET_FAIL);
+		return;
+	}
 	
 	tet_result(TET_PASS);
 }
 
+/**
+ * @brief Negative test case of ug_init elm_ctxpopup_item_disabled_get()
+ */
+static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_02(void)
+{
+   Evas_Object *obj = elm_ctxpopup_add(main_win);
+	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
+	evas_object_show(obj);
+	
+   Eina_Bool r = elm_ctxpopup_item_disabled_get(item);
+
+	if (r == EINA_TRUE) {
+		tet_infoline("elm_ctxpopup_item_disabled_get() failed in positive test case");
+		tet_result(TET_FAIL);
+		return;
+	}
+	
+	tet_result(TET_PASS);
+}

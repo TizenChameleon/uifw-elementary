@@ -35,7 +35,7 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_ctxpopup_screen_dimmed_disabled_set_func_01(void);
+static void utc_UIFW_elm_ctxpopup_direction_priority_set_func_01(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -43,7 +43,7 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_ctxpopup_screen_dimmed_disabled_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_ctxpopup_direction_priority_set_func_01, POSITIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -57,23 +57,27 @@ static void startup(void)
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) {
+	if ( NULL != main_win ) 
+	{
 		evas_object_del(main_win);
-	       	main_win = NULL;
+	  	main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_ctxpopup_screen_dimmed_disabled_set()
+ * @brief Positive test case of elm_ctxpopup_direction_priority_set()
  */
-static void utc_UIFW_elm_ctxpopup_screen_dimmed_disabled_set_func_01(void)
+static void utc_UIFW_elm_ctxpopup_direction_priority_set_func_01(void)
 {
-	Evas_Object *ctxpopup = elm_ctxpopup_add(main_win);
-	evas_object_show(ctxpopup);
+	int r = 0;
 
-	elm_ctxpopup_screen_dimmed_disabled_set(ctxpopup, EINA_TRUE);
+	Evas_Object *obj = elm_ctxpopup_add(main_win);
+	elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
+	evas_object_show(obj);
+
+	elm_ctxpopup_direction_priority_set( obj, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_RIGHT, ELM_CTXPOPUP_DIRECTION_LEFT, ELM_CTXPOPUP_DIRECTION_UP );
 	
 	tet_result(TET_PASS);
 }

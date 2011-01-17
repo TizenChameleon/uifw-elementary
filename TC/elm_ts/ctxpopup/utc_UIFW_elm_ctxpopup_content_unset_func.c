@@ -7,11 +7,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err == (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 // For checking the result of the negative test case.
@@ -19,11 +19,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err != (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 
@@ -58,17 +58,18 @@ static void startup(void)
 	evas_object_show(main_win);
 
 	ctxpopup = elm_ctxpopup_add(main_win);
-	
-	
+
+
 	evas_object_show(ctxpopup);
-	
+
 }
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) {
+	if ( NULL != main_win ) 
+	{
 		evas_object_del(main_win);
-	       	main_win = NULL;
+		main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
@@ -84,9 +85,10 @@ static void utc_UIFW_elm_ctxpopup_content_unset_func_01(void)
 	evas_object_show(btn);
 	elm_ctxpopup_content_set(ctxpopup, btn);
 
-   	Evas_Object *content = elm_ctxpopup_content_unset(ctxpopup);
-	
-	if (btn != content) {
+	Evas_Object *content = elm_ctxpopup_content_unset(ctxpopup);
+
+	if (btn != content) 
+	{
 		tet_infoline("elm_ctxpopup_content_unset() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -104,9 +106,10 @@ static void utc_UIFW_elm_ctxpopup_content_unset_func_02(void)
 	evas_object_show(btn);
 	elm_ctxpopup_content_set(ctxpopup, btn);
 
-   	Evas_Object *content = elm_ctxpopup_content_unset(NULL);
+	Evas_Object *content = elm_ctxpopup_content_unset(NULL);
 
-	if (content == btn) {
+	if (content == btn) 
+	{
 		tet_infoline("elm_ctxpopup_content_unset() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

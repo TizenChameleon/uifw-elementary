@@ -7,11 +7,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err == (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 // For checking the result of the negative test case.
@@ -19,11 +19,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err != (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 
@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_ctxpopup_item_add_func_01(void);
-static void utc_UIFW_elm_ctxpopup_item_add_func_02(void);
+static void utc_UIFW_elm_ctxpopup_item_append_func_01(void);
+static void utc_UIFW_elm_ctxpopup_item_append_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_ctxpopup_item_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_ctxpopup_item_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_ctxpopup_item_append_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_ctxpopup_item_append_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -62,23 +62,25 @@ static void startup(void)
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) {
+	if ( NULL != main_win ) 
+	{
 		evas_object_del(main_win);
-	       	main_win = NULL;
+		main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_ctxpopup_item_add()
+ * @brief Positive test case of elm_ctxpopup_item_append()
  */
-static void utc_UIFW_elm_ctxpopup_item_add_func_01(void)
+static void utc_UIFW_elm_ctxpopup_item_append_func_01(void)
 {
-   	Elm_Ctxpopup_Item * item = elm_ctxpopup_item_add(ctxpopup, NULL, "TEST", NULL, NULL );
-	
-	if (!item) {
-		tet_infoline("elm_ctxpopup_item_add() failed in positive test case");
+	Elm_Ctxpopup_Item * item = elm_ctxpopup_item_append(ctxpopup, "TEST", NULL, NULL, NULL );
+
+	if (!item) 
+	{
+		tet_infoline("elm_ctxpopup_item_append() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -86,14 +88,15 @@ static void utc_UIFW_elm_ctxpopup_item_add_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_ctxpopup_item_add()
+ * @brief Negative test case of ug_init elm_ctxpopup_item_append()
  */
-static void utc_UIFW_elm_ctxpopup_item_add_func_02(void)
+static void utc_UIFW_elm_ctxpopup_item_append_func_02(void)
 {
-   	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_add( NULL, NULL, "TEST", NULL, NULL );
-	
-	if (item) {
-		tet_infoline("elm_ctxpopup_item_add() failed in negative test case");
+	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append( NULL, "TEST", NULL, NULL, NULL );
+
+	if (item) 
+	{
+		tet_infoline("elm_ctxpopup_item_append() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}
