@@ -232,16 +232,13 @@ static void
 _signal_hide_finished(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Item *it = data;
-   /* FIX ME !! : temporalily add for fixing bug */
-   Evas_Object *content = it->content;
-   //
    Evas_Object *obj2 = it->obj;
    evas_object_hide(it->base);
    edje_object_signal_emit(it->base, "elm,action,reset", "elm");
-   evas_object_smart_callback_call(obj2, "hide,finished", content); //
+   evas_object_smart_callback_call(obj2, "hide,finished", it->content);
    edje_object_message_signal_process(it->base);
-   if (it->popme) evas_object_del(content);//
-   evas_object_hide(content);//
+   evas_object_hide(it->content);
+   if (it->popme) evas_object_del(it->content);
    _sizing_eval(obj2);
 }
 
