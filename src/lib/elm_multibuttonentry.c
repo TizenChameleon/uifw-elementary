@@ -68,7 +68,7 @@ static void _changed_size_hint_cb(void *data, Evas *evas, Evas_Object *obj, void
 static void _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event);
 static void   _event_init(Evas_Object *obj);
 static void _contracted_state_set(Evas_Object *obj, int contracted);
-static void _view_update(Evas_Object *obj);
+static void _view_update(Evas_Object *obj, Eina_Bool focused);
 static void   _set_label(Evas_Object *obj, const char* str);
 static void _change_current_button_state(Evas_Object *obj, Multibuttonentry_Button_State state);
 static void   _change_current_button(Evas_Object *obj, Evas_Object *btn);
@@ -137,7 +137,20 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   _view_update(obj);
+
+   if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)))
+     {
+        _view_update(obj, EINA_FALSE);
+        evas_object_smart_callback_call(obj, "unfocused", NULL);
+     }
+}
+
+static void
+_signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_signal_emit(wd->base, emission, source);
 }
 
 static void
@@ -156,6 +169,16 @@ _sizing_eval(Evas_Object *obj)
    minh += (top + bottom);
    
    evas_object_size_hint_min_set(obj, minw, minh);
+}
+
+static void 
+_signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if(!wd || !wd->base) return;
+
+   _view_update(data, EINA_TRUE);
+   evas_object_smart_callback_call(data, "clicked", NULL);
 }
 
 static void 
@@ -183,7 +206,7 @@ _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
    wd->w_box = w;
    wd->h_box = h;
 
-   _view_update(data);
+   //_view_update(data, EINA_FALSE);
 }
 
 static void
@@ -191,6 +214,12 @@ _event_init(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->base)   return;
+
+   if(wd->base)
+     {
+        edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "*", _signal_mouse_clicked, obj);
+        edje_object_signal_callback_add(wd->base, "clicked", "*", _signal_mouse_clicked, obj);
+     }
 
    if (wd->box)
      {
@@ -241,14 +270,15 @@ _contracted_state_set(Evas_Object *obj, int contracted)
         w = wd->w_box;
 
         // w -= w_rect
-        if (wd->rect) evas_object_geometry_get (wd->rect, NULL, NULL, &w_tmp, NULL);
+        if (wd->rect) evas_object_size_hint_min_get (wd->rect, &w_tmp, NULL);
         w -= w_tmp;
 
         // w -= w_label
-        if (wd->label) evas_object_geometry_get (wd->label, NULL, NULL, &w_tmp, NULL);
+        if (wd->label) evas_object_size_hint_min_get (wd->label, &w_tmp, NULL);
         w -= w_tmp;
 
-        // w -= w_btns      
+        // w -= w_btns 
+        Eina_Bool on_contracted = EINA_FALSE;        
         item = NULL;
         int count = eina_list_count(wd->items);
         EINA_LIST_FOREACH(wd->items, l, item) 
@@ -286,11 +316,23 @@ _contracted_state_set(Evas_Object *obj, int contracted)
                        elm_box_pack_end(wd->box, wd->end);
                        evas_object_show(wd->end);
 
+                       on_contracted = EINA_TRUE;
+                       wd->contracted = contracted;
+                       evas_object_smart_callback_call(obj, "contracted,state,changed", wd->contracted);
+
                        break;
                     }
                }
           }
-
+        if(on_contracted == EINA_FALSE) // unset contracted mode
+          {
+             // pack entry
+             elm_box_pack_end(wd->box, wd->entry);
+             evas_object_show(wd->entry);
+             if(elm_widget_focus_get(obj))
+                elm_object_focus(wd->entry);
+             wd->contracted = 0;
+          }
      }
    else
      {
@@ -312,14 +354,16 @@ _contracted_state_set(Evas_Object *obj, int contracted)
         // pack entry
         elm_box_pack_end(wd->box, wd->entry);
         evas_object_show(wd->entry);
-     }
+        if(elm_widget_focus_get(obj))
+           elm_object_focus(wd->entry);
 
-   wd->contracted = contracted;
-   evas_object_smart_callback_call(obj, "contracted,state,changed", wd->contracted);
+        wd->contracted = contracted;
+        evas_object_smart_callback_call(obj, "contracted,state,changed", wd->contracted);
+     }
 }
 
 static void 
-_view_update(Evas_Object *obj)
+_view_update(Evas_Object *obj, Eina_Bool focused)
 {   
    Widget_Data *wd = elm_widget_data_get(obj);   
    if (!wd || !wd->box || !wd->entry) return;
@@ -330,11 +374,36 @@ _view_update(Evas_Object *obj)
         _contracted_state_set(obj, 1);
      }
 
+   if (wd->contracted != 1)
+     {
+        if (wd->guidetext && !eina_list_count (wd->items) && !elm_widget_focus_get(obj) && !focused)
+          {
+             
+             elm_box_unpack(wd->box, wd->guidetext);
+             elm_box_unpack(wd->box, wd->entry);
+             evas_object_hide(wd->entry);
+             elm_box_pack_end(wd->box, wd->guidetext);                     
+             evas_object_show(wd->guidetext);
+          }
+        else
+          {
+             elm_box_unpack(wd->box, wd->entry);
+             elm_box_unpack(wd->box, wd->guidetext);
+             evas_object_hide(wd->guidetext);
+             elm_box_pack_end(wd->box, wd->entry);
+             evas_object_show(wd->entry);
+
+             if(elm_widget_focus_get(obj) || focused)
+                elm_object_focus(wd->entry);
+          }
+     }
+   
+#if 0
    if (wd->guidetext && (wd->contracted != 1))
      {
         if (!eina_list_count (wd->items))
           {
-             if (elm_widget_focus_get (obj))
+             if (elm_widget_focus_get (obj) || focused)
                {
                   elm_box_unpack(wd->box, wd->entry);
                   elm_box_unpack(wd->box, wd->guidetext);
@@ -343,6 +412,7 @@ _view_update(Evas_Object *obj)
                   elm_box_pack_end(wd->box, wd->entry);
                   evas_object_show(wd->entry);
                   
+                  elm_object_focus(wd->entry);
                   //elm_widget_focus_set(wd->entry, EINA_TRUE);   //FIXME
                }
              else
@@ -365,6 +435,7 @@ _view_update(Evas_Object *obj)
              evas_object_show(wd->entry);
           }
      }
+#endif
 }
 
 /*
@@ -407,7 +478,7 @@ _set_label(Evas_Object *obj, const char* str)
      }
 
    elm_label_label_set(wd->label, str);
-   _view_update(obj);
+   _view_update(obj, EINA_FALSE);
 }
 
 static void
@@ -426,7 +497,7 @@ _set_guidetext(Evas_Object *obj, const char* str)
      }
 
    if (wd->guidetext) edje_object_part_text_set (wd->guidetext, "elm.text", str);
-   _view_update(obj);
+   _view_update(obj, EINA_FALSE);
 }
 
 static void
@@ -449,7 +520,8 @@ _change_current_button_state(Evas_Object *obj, Multibuttonentry_Button_State sta
                 break;
              case MULTIBUTONENTRY_BUTTON_STATE_SELECTED:
                 edje_object_signal_emit(item->button, "focused", "");
-                evas_object_smart_callback_call(obj, "selected", item);
+                evas_object_smart_callback_call(obj, "selected", item); // will be removed!
+                evas_object_smart_callback_call(obj, "item,selected", item);
                 break;
              default:
                 edje_object_signal_emit(item->button, "default", "");
@@ -490,7 +562,8 @@ _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *
 {
    Widget_Data *wd = elm_widget_data_get(data);
    static char str[MAX_STR];
-   if (!wd) return;
+   Elm_Multibuttonentry_Item *item = NULL;
+   if (!wd || wd->contracted) return;
 
    strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
    str[MAX_STR - 1]= 0;
@@ -499,6 +572,10 @@ _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *
       _add_button(data, str);
 
    _change_current_button(data, obj);
+
+   if (wd->current)
+      if(item = eina_list_data_get(wd->current))
+         evas_object_smart_callback_call(data, "item,clicked", item);
 }
 
 static void
@@ -538,7 +615,8 @@ _del_button_item(Elm_Multibuttonentry_Item *item)
           {
              wd->items = eina_list_remove(wd->items, _item);
              elm_box_unpack(wd->box, _item->button);
-             evas_object_smart_callback_call(obj, "deleted", _item);
+             evas_object_smart_callback_call(obj, "deleted", _item); // will be removed!
+             evas_object_smart_callback_call(obj, "item,deleted", _item);
              _del_button_obj(obj, _item->button);
              free(_item);
              if (wd->current == l)   
@@ -581,12 +659,12 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->box || !wd->entry) return NULL;
 
-   if (wd->contracted == 1) return NULL;
+   //if (wd->contracted == 1) return NULL;
 
    // add button
    btn = edje_object_add(evas_object_evas_get(obj));
    _elm_theme_object_set(obj, btn, "multibuttonentry", "btn", elm_widget_style_get(obj));
-   edje_object_signal_callback_add(btn, "clicked", "elm", _button_clicked, obj);
+   edje_object_signal_callback_add(btn, "mouse,clicked,1", "*", _button_clicked, obj);
    evas_object_size_hint_weight_set(btn, 0.0, 0.0);
    evas_object_show(btn);
 
@@ -620,25 +698,27 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
           {
              case MULTIBUTONENTRY_POS_START:
                 wd->items = eina_list_prepend(wd->items, item);
-                _view_update(obj);
-                elm_box_pack_after(wd->box, btn, wd->label);
+                if(wd->label) elm_box_pack_after(wd->box, btn, wd->label);
+                else if(wd->rect) elm_box_pack_after(wd->box, btn, wd->rect);
+                else elm_box_pack_start(wd->box, btn);
+                _view_update(obj, EINA_FALSE);
                 break;
              case MULTIBUTONENTRY_POS_END:
                 wd->items = eina_list_append(wd->items, item);
-                _view_update(obj);
+                _view_update(obj, EINA_FALSE);
                 elm_box_pack_before(wd->box, btn, wd->entry);
                 break;
              case MULTIBUTONENTRY_POS_BEFORE:
                 if (reference)
                   {   
                      wd->items = eina_list_prepend_relative(wd->items, item, reference);
-                     _view_update(obj);
                      elm_box_pack_before(wd->box, btn, reference->button);
+                     _view_update(obj, EINA_FALSE);
                   }
                 else
                   {
                      wd->items = eina_list_append(wd->items, item);
-                     _view_update(obj);
+                     _view_update(obj, EINA_FALSE);
                      elm_box_pack_before(wd->box, btn, wd->entry);
                   }
                 break;
@@ -646,13 +726,12 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
                 if (reference)
                   {   
                      wd->items = eina_list_append_relative(wd->items, item, reference);
-                     _view_update(obj);
                      elm_box_pack_after(wd->box, btn, reference->button);
-                  }
+                     _view_update(obj, EINA_FALSE);                  }
                 else
                   {   
                      wd->items = eina_list_append(wd->items, item);
-                     _view_update(obj);
+                     _view_update(obj, EINA_FALSE);
                      elm_box_pack_before(wd->box, btn, wd->entry);
                   }
                 break;
@@ -670,7 +749,8 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
         elm_label_wrap_width_set(label, item->vw - 2*padding_outer - 2*padding_inner ); 
      }
 
-   evas_object_smart_callback_call(obj, "added", item);
+   evas_object_smart_callback_call(obj, "added", item); // will be removed!
+   evas_object_smart_callback_call(obj, "item,added", item);
 
    return item;
 }
@@ -795,6 +875,7 @@ elm_multibuttonentry_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
+   elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);   
    
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "multibuttonentry", "base", "default");
@@ -1143,6 +1224,9 @@ elm_multibuttonentry_items_del(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    
+   if (wd->contracted == 1)
+      _contracted_state_set(obj, 0);
+      
    if (wd->items)
      {
         Elm_Multibuttonentry_Item *item;
