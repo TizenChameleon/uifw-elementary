@@ -97,8 +97,6 @@ static void _theme_hook(Evas_Object *obj);
 
 static void _sizing_eval(Evas_Object *obj);
 
-static void _imageslider_del_all(Widget_Data * wd);
-
 static void _imageslider_move(void *data, Evas * e, Evas_Object *obj, void *event_info);
 static void _imageslider_resize(void *data, Evas * e, Evas_Object *obj, void *event_info);
 static void _imageslider_show(void *data, Evas * e, Evas_Object *obj, void *event_info);
@@ -107,7 +105,6 @@ static void _imageslider_update(Widget_Data * wd);
 
 static void _imageslider_update_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord y, Evas_Coord w);
 static void _imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord my, Evas_Coord y, Evas_Coord w);
-static Evas_Object *_imageslider_add_obj(Widget_Data * wd);
 
 static void _imageslider_obj_shift(Widget_Data * wd, Eina_Bool left);
 
@@ -124,9 +121,9 @@ static void _anim(Widget_Data * wd);
 static Eina_Bool _timer_cb(void *data);
 
 //static void _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void ev_imageslider_down_cb(void *data, Evas * e, Evas_Object *obj, void *event_info);
-static void ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info);
-static void ev_imageslider_move_cb(void *data, Evas * e, Evas_Object *obj, void *event_info);
+static void _ev_imageslider_down_cb(void *data, Evas * e, Evas_Object *obj, void *event_info);
+static void _ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info);
+static void _ev_imageslider_move_cb(void *data, Evas * e, Evas_Object *obj, void *event_info);
 
 // Whenever the Image Slider item is deleted, Call this funtion.
 static void
@@ -143,7 +140,8 @@ _del_hook(Evas_Object *obj)
 
    for (i = 0; i < BLOCK_MAX; i++)
      {
-        evas_object_del(wd->ly[i]);
+       elm_widget_sub_object_del(wd->obj, wd->ly[i]);
+       evas_object_del(wd->ly[i]);
      }
 
    if (wd->its)
@@ -186,7 +184,6 @@ _theme_hook(Evas_Object *obj)
      {
         wd->ly[i] = elm_layout_add(obj);
         _elm_theme_object_set(obj, wd->ly[i], "imageslider", "base", "default");
-        elm_widget_resize_object_set(obj, wd->ly[i]);
         evas_object_show(wd->ly[i]);
      }
 
@@ -229,7 +226,6 @@ _imageslider_move(void *data, Evas * e, Evas_Object *obj, void *event_info)
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
    wd->x = x;
    wd->y = y;
-   evas_object_move(wd->clip, x, y);
 
    _imageslider_update_pos(wd, wd->x, wd->y, wd->w);
 
@@ -261,8 +257,6 @@ _imageslider_resize(void *data, Evas * e, Evas_Object *obj, void *event_info)
      {
         evas_object_resize(wd->ly[i], w, h);
      }
-
-   evas_object_resize(wd->clip, w, h);
 
    _imageslider_update_pos(wd, wd->x, wd->y, wd->w);
 
@@ -298,28 +292,17 @@ _imageslider_hide(void *data, Evas * e, Evas_Object *obj, void *event_info)
    evas_object_hide(wd->clip);
 }
 
-// Delete all Image Slider items.
-static void
-_imageslider_del_all(Widget_Data * wd)
-{
-
-   int i;
-
-   if (!wd) return;
-
-   for (i = 0; i < BLOCK_MAX; i++)
-     {
-        evas_object_del(wd->ly[i]);
-     }
-}
-
 // Update Image Slider item position.
 static void
 _imageslider_update_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord y, Evas_Coord w)
 {
+   int i = 0;
    evas_object_move(wd->ly[BLOCK_LEFT], x - (w + INTERVAL_WIDTH), y);
    evas_object_move(wd->ly[BLOCK_CENTER], x, y);
    evas_object_move(wd->ly[BLOCK_RIGHT], x + (w + INTERVAL_WIDTH), y);
+   //making sure that the clipping happens for all three layouts based on clipper's geometry
+   for (i = 0; i < BLOCK_MAX; i++)
+     evas_object_clip_set(wd->ly[i], wd->clip);
    evas_render_idle_flush(evas_object_evas_get(wd->obj));
 }
 
@@ -327,13 +310,9 @@ _imageslider_update_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord y, Evas_Coord
 static void
 _imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord my, Evas_Coord y, Evas_Coord w)
 {
-   Evas_Object *eo;
-
    Evas_Coord ix, iy, iw, ih;
-
-   eo = edje_object_part_swallow_get(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "swl.photo");
+   const Evas_Object *eo = elm_layout_content_get((const Evas_Object*)(wd->ly[BLOCK_CENTER]), "swl.photo");
    evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
-
    if ((ix > 0) || (ix + iw < wd->w))
      {
         edje_object_signal_emit(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "block.on", "block");
@@ -342,56 +321,27 @@ _imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord my, Ev
      }
 }
 
-// Add previous/next Image Slider item.
-static Evas_Object *
-_imageslider_add_obj(Widget_Data * wd)
-{
-   Evas_Object *eo;
-
-   eo = elm_layout_add(wd->obj);
-   elm_layout_theme_set(eo, "imageslider", "base", "default");
-   elm_widget_resize_object_set(wd->obj, eo);
-   //evas_object_smart_member_add(eo, wd->obj);
-
-   //edje_object_signal_callback_add(elm_layout_edje_get(eo), "elm,photo,clicked", "", _signal_clicked, wd->obj);
-   evas_object_event_callback_add(eo, EVAS_CALLBACK_MOUSE_DOWN, ev_imageslider_down_cb, wd);
-   evas_object_event_callback_add(eo, EVAS_CALLBACK_MOUSE_UP, ev_imageslider_up_cb, wd);
-   evas_object_event_callback_add(eo, EVAS_CALLBACK_MOUSE_MOVE, ev_imageslider_move_cb, wd);
-   evas_object_resize(eo, wd->w, wd->h);
-   evas_object_move(eo, wd->w + INTERVAL_WIDTH, wd->y);
-   evas_object_clip_set(eo, wd->clip);
-   evas_object_show(eo);
-
-   return eo;
-}
-
 // Shift next/previous Image Slider item in layouts.
 static void
 _imageslider_obj_shift(Widget_Data * wd, Eina_Bool left)
 {
    if (!left)
      {
-        if (wd->ly[BLOCK_LEFT])
-          {
-             evas_object_del(wd->ly[BLOCK_LEFT]);
-             wd->ly[BLOCK_LEFT] = NULL;
-          }
-
+        Evas_Object *ly_temp;
+        ly_temp = wd->ly[BLOCK_LEFT];
         wd->ly[BLOCK_LEFT] = wd->ly[BLOCK_CENTER];
         wd->ly[BLOCK_CENTER] = wd->ly[BLOCK_RIGHT];
-        wd->ly[BLOCK_RIGHT] = _imageslider_add_obj(wd);
+        wd->ly[BLOCK_RIGHT] = ly_temp;
+        elm_layout_content_set(wd->ly[BLOCK_RIGHT], "swl.photo", NULL);
      }
    else
      {
-        if (wd->ly[BLOCK_RIGHT])
-          {
-             evas_object_del(wd->ly[BLOCK_RIGHT]);
-             wd->ly[BLOCK_RIGHT] = NULL;
-          }
-
+        Evas_Object *ly_temp;
+        ly_temp = wd->ly[BLOCK_RIGHT];
         wd->ly[BLOCK_RIGHT] = wd->ly[BLOCK_CENTER];
         wd->ly[BLOCK_CENTER] = wd->ly[BLOCK_LEFT];
-        wd->ly[BLOCK_LEFT] = _imageslider_add_obj(wd);
+        wd->ly[BLOCK_LEFT] = ly_temp;
+        elm_layout_content_set(wd->ly[BLOCK_LEFT], "swl.photo", NULL);
      }
 }
 
@@ -445,7 +395,7 @@ _imageslider_obj_move(Widget_Data * wd, Evas_Coord step)
 
 // Whenever MOUSE DOWN event occurs, Call this function.
 static void
-ev_imageslider_down_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_ev_imageslider_down_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = data;
 
@@ -470,7 +420,7 @@ ev_imageslider_down_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
    wd->dratio = 1;
    wd->ratio = 1;
 
-   eo = edje_object_part_swallow_get(elm_layout_edje_get(obj), "swl.photo");
+   eo = (Evas_Object*)elm_layout_content_get((const Evas_Object*)obj, "swl.photo");
    if (eo)
       evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
 
@@ -485,7 +435,7 @@ ev_imageslider_down_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
 // Whenever MOUSE UP event occurs, Call this function.
 // And make Click Event also.
 static void
-ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = data;
 
@@ -525,13 +475,13 @@ ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
           {
              if (step < FLICK_WIDTH_MIN && step > FLICK_WIDTH_MIN)
                {
-                  fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-black zone (1)\n");
+                  fprintf(stderr, "[[[ DEBUG ]]]:_ev_imageslider_up_cb-black zone (1)\n");
 
                    _imageslider_obj_move(wd, 0);
                }
              else
                {
-                  fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-black zone (2)\n");
+                  fprintf(stderr, "[[[ DEBUG ]]]:_ev_imageslider_up_cb-black zone (2)\n");
 
                   _imageslider_obj_move(wd, step);
                }
@@ -542,13 +492,13 @@ ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
              step = (wd->x - wd->move_x) << 1;
              if (step <= wd->w && step >= -(wd->w))
                {
-                  fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-white zone (1)\n");
+                  fprintf(stderr, "[[[ DEBUG ]]]:_ev_imageslider_up_cb-white zone (1)\n");
 
                   _imageslider_obj_move(wd, 0);
                }
              else
                {
-                  fprintf(stderr, "[[[ DEBUG ]]]:ev_imageslider_up_cb-white zone (2)\n");
+                  fprintf(stderr, "[[[ DEBUG ]]]:_ev_imageslider_up_cb-white zone (2)\n");
 
                   _imageslider_obj_move(wd, step);
                }
@@ -559,7 +509,7 @@ ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
 
 // Whenever MOUSE MOVE event occurs, Call this API.
 static void
-ev_imageslider_move_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_ev_imageslider_move_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
 {
    int idx;
 
@@ -611,7 +561,7 @@ ev_imageslider_move_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
              wd->ratio =
              sqrt((wd->mx - wd->mmx) * (wd->mx - wd->mmx) + (wd->my - wd->mmy) * (wd->my - wd->mmy));
 
-             eo = edje_object_part_swallow_get(elm_layout_edje_get(obj), "swl.photo");
+             eo = (Evas_Object*)elm_layout_content_get((const Evas_Object*)obj, "swl.photo");
              if (eo)
                {
                   it = eina_list_data_get(wd->cur);
@@ -620,7 +570,7 @@ ev_imageslider_move_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
                        edje_object_part_unswallow(elm_layout_edje_get(obj), eo);
                        evas_object_resize(eo, it->w * wd->ratio / wd->dratio, it->h * wd->ratio / wd->dratio);
                        evas_object_size_hint_min_set(eo, it->w * wd->ratio / wd->dratio, it->h * wd->ratio / wd->dratio);
-                       edje_object_part_swallow(elm_layout_edje_get(obj), "swl.photo", eo);
+                       elm_layout_content_set(obj, "swl.photo", eo);
                     }
                }
           }
@@ -690,19 +640,14 @@ _check_drag(int state, void *data)
 
    it = eina_list_data_get(l[state]);
 
-   eo = edje_object_part_swallow_get(elm_layout_edje_get(wd->ly[state]), "swl.photo");
+   eo = (Evas_Object*)elm_layout_content_get(wd->ly[state], "swl.photo");
    if (eo)
      evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
    edje_object_part_drag_value_get(elm_layout_edje_get(wd->ly[state]), "swl.photo", &dx, &dy);
 
    if ((iw != wd->w) || ((dx != 0) || (dy != 0)))
      {
-        if (wd->ly[state])
-          {
-             evas_object_del(wd->ly[state]);
-             wd->ly[state] = NULL;
-          }
-        wd->ly[state] = _imageslider_add_obj(wd);
+        elm_layout_content_set(wd->ly[state], "swl.photo", NULL);
      }
    else
      return 1;
@@ -725,8 +670,7 @@ _check_zoom(void *data)
 
    it = eina_list_data_get(wd->cur);
 
-   eo =
-      edje_object_part_swallow_get(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "swl.photo");
+   eo = (Evas_Object*)elm_layout_content_get(wd->ly[BLOCK_CENTER], "swl.photo");
    if (eo)
       evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
    evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
@@ -850,11 +794,7 @@ _imageslider_update(Widget_Data * wd)
    if (!wd)
      return;
 
-   if (!wd->cur)
-     {
-        _imageslider_del_all(wd);
-        return;
-     }
+   if (!wd->cur) return;
 
    l[BLOCK_LEFT] = eina_list_prev(wd->cur);
    l[BLOCK_CENTER] = wd->cur;
@@ -862,12 +802,10 @@ _imageslider_update(Widget_Data * wd)
 
    for (i = 0; i < BLOCK_MAX; i++)
      {
-        eo =
-        edje_object_part_swallow_get(elm_layout_edje_get(wd->ly[i]), "swl.photo");
+        eo = (Evas_Object*)elm_layout_content_get((const Evas_Object*)wd->ly[i], "swl.photo");
         if (!l[i])
           {
              elm_layout_content_set(wd->ly[i], "swl.photo", NULL);
-             evas_object_del(eo);
           }
         else
           {
@@ -885,6 +823,7 @@ _imageslider_update(Widget_Data * wd)
                   evas_object_geometry_get(eo, &it->ox, &it->oy, &it->ow, &it->oh);
                   it->ow = it->w;
                   it->oh = it->h;
+                  elm_layout_content_set(wd->ly[i], "swl.photo", eo);
                }
 
              if (wd->moving != it->moving)
@@ -929,8 +868,7 @@ elm_imageslider_add(Evas_Object *parent)
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
-   if (e == NULL)
-     return NULL;
+   if (e == NULL) return NULL;
 
    obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "imageslider");
@@ -941,18 +879,19 @@ elm_imageslider_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
 
    wd->clip = evas_object_rectangle_add(e);
+   elm_widget_resize_object_set(obj, wd->clip);
 
    for (i = 0; i < BLOCK_MAX; i++)
      {
         wd->ly[i] = elm_layout_add(obj);
         elm_layout_theme_set(wd->ly[i], "imageslider", "base", "default");
-        elm_widget_resize_object_set(obj, wd->ly[i]);
+        elm_widget_sub_object_add(obj, wd->ly[i]);
         evas_object_smart_member_add(wd->ly[i], obj);
 
         //edje_object_signal_callback_add(elm_layout_edje_get(wd->ly[i]), "elm,photo,clicked", "", _signal_clicked, obj);
-        evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_DOWN, ev_imageslider_down_cb, wd);
-        evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_UP, ev_imageslider_up_cb, wd);
-        evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_MOVE, ev_imageslider_move_cb, wd);
+        evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_DOWN, _ev_imageslider_down_cb, wd);
+        evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_UP, _ev_imageslider_up_cb, wd);
+        evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_MOVE, _ev_imageslider_move_cb, wd);
         evas_object_clip_set(wd->ly[i], wd->clip);
         evas_object_show(wd->ly[i]);
      }
@@ -1110,17 +1049,17 @@ elm_imageslider_item_del(Elm_Imageslider_Item * it)
      return;
 
    EINA_LIST_FOREACH(wd->its, l, _it)
-   {
-      if (_it == it)
-        {
-           if (l == wd->cur)
-              wd->cur = eina_list_prev(wd->cur);
-           wd->its = eina_list_remove(wd->its, it);
-           if (!wd->cur)
-              wd->cur = wd->its;
-           break;
-        }
-   }
+     {
+        if (_it == it)
+          {
+             if (l == wd->cur)
+                wd->cur = eina_list_prev(wd->cur);
+             wd->its = eina_list_remove(wd->its, it);
+             if (!wd->cur)
+                wd->cur = wd->its;
+             break;
+          }
+     }
 
    _imageslider_update(wd);
 
@@ -1199,19 +1138,17 @@ elm_imageslider_item_selected_set(Elm_Imageslider_Item * it)
      return;
 
    EINA_LIST_FOREACH(wd->its, l, _it)
-   {
-      if (_it == it)
-         wd->cur = l;
-   }
+     {
+        if (_it == it)
+          wd->cur = l;
+     }
 
    for (i = 0; i < BLOCK_MAX; i++)
      {
-        eo =
-        edje_object_part_swallow_get(elm_layout_edje_get(wd->ly[i]), "swl.photo");
-        if (eo)
+       eo = (Evas_Object*)elm_layout_content_get(wd->ly[i], "swl.photo");
+       if (eo)
           {
              elm_layout_content_set(wd->ly[i], "swl.photo", NULL);
-             evas_object_del(eo);
           }
      }
 
@@ -1230,8 +1167,7 @@ elm_imageslider_item_selected_set(Elm_Imageslider_Item * it)
 EAPI const char *
 elm_imageslider_item_photo_file_get(Elm_Imageslider_Item * it)
 {
-   if (!it)
-     return NULL;
+   if (!it) return NULL;
 
    return it->photo_file;
 }
@@ -1257,15 +1193,15 @@ elm_imageslider_item_prev(Elm_Imageslider_Item * it)
      return NULL;
 
    EINA_LIST_FOREACH(wd->its, l, _it)
-   {
-      if (_it == it)
-        {
-           l = eina_list_prev(l);
-           if (!l)
-             break;
-           return eina_list_data_get(l);
-        }
-   }
+     {
+        if (_it == it)
+          {
+             l = eina_list_prev(l);
+             if (!l)
+               break;
+             return eina_list_data_get(l);
+          }
+     }
 
    return NULL;
 }
@@ -1291,15 +1227,15 @@ elm_imageslider_item_next(Elm_Imageslider_Item * it)
      return NULL;
 
    EINA_LIST_FOREACH(wd->its, l, _it)
-   {
-      if (_it == it)
-        {
-           l = eina_list_next(l);
-           if (!l)
-             break;
-           return eina_list_data_get(l);
-        }
-   }
+     {
+        if (_it == it)
+          {
+             l = eina_list_next(l);
+             if (!l)
+               break;
+             return eina_list_data_get(l);
+          }
+     }
 
    return NULL;
 }
@@ -1348,3 +1284,4 @@ elm_imageslider_next(Evas_Object * obj)
    _imageslider_obj_move(wd, 1);
 
 }
+
