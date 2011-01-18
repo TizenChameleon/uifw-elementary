@@ -6037,6 +6037,8 @@ elm_genlist_edit_selected_items_get(const Evas_Object *obj)
 
         EINA_LIST_FOREACH(itb->items, l, it)
           {
+             if (it->flags & ELM_GENLIST_ITEM_GROUP)
+                continue;
              if (it->delete_check) list = eina_list_append(list, it);
           }
 
