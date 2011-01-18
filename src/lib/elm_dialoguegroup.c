@@ -382,6 +382,8 @@ elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_I
             _change_item_bg(after_item, "middle");
             item = _create_item(obj, subobj, style, "bottom");          
          }
+         if (!item)
+            return NULL;
          elm_box_pack_after(wd->box, item->bg_layout, after_item->bg_layout);
          if (style == ELM_DIALOGUEGROUP_ITEM_STYLE_SUB) 
            edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "flip_item", "");
@@ -434,6 +436,8 @@ elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_
             prev = eina_list_prev(l);
             //  _set_line_show(prev->data, item);
          }
+         if (!item)
+            return NULL;
          elm_box_pack_before(wd->box, item->bg_layout, before_item->bg_layout);
          if (style == ELM_DIALOGUEGROUP_ITEM_STYLE_SUB) 
            edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "flip_item", "");
