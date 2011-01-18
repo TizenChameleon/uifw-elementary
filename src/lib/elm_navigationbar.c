@@ -142,18 +142,18 @@ _delete_item(Item *it)
      evas_object_del(it->back_btn);
    if(it->fn_btn1)
      {
-	elm_object_unfocus(it->fn_btn1);
-	evas_object_del(it->fn_btn1);
+        elm_object_unfocus(it->fn_btn1);
+        evas_object_del(it->fn_btn1);
      }
    if(it->fn_btn2)
      {
-	elm_object_unfocus(it->fn_btn2);
-	evas_object_del(it->fn_btn2);
+        elm_object_unfocus(it->fn_btn2);
+        evas_object_del(it->fn_btn2);
      }
    if(it->fn_btn3)
      {
-	elm_object_unfocus(it->fn_btn3);
-	evas_object_del(it->fn_btn3); 
+        elm_object_unfocus(it->fn_btn3);
+        evas_object_del(it->fn_btn3); 
      }
    if (it->title) 
      eina_stringshare_del(it->title);
@@ -786,6 +786,11 @@ elm_navigationbar_title_label_set(Evas_Object *obj, Evas_Object *content, const 
                     { 
                        edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
                     }
+                  else if(it->fn_btn3)
+                    {
+                       edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
+                       edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
+                    }
                   else
                     edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
                }
@@ -920,11 +925,11 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
                     }
                } 
              _multiple_object_unset(it, list);  
-	     if (it->title_obj)
+             if (it->title_obj)
                { 
                   evas_object_del(it->title_obj);
                   it->title_obj = NULL;      
-	       }
+               }
              if (!wd->hidden)
                {
                   edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
