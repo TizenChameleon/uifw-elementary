@@ -100,7 +100,6 @@ _theme_hook(Evas_Object *obj)
    Eina_List *list = NULL;
    Item *it = NULL;
    char buf_fn[4096];
-   char buf_bk[4096];
    
    if (!wd) return;
    _elm_theme_object_set(obj, wd->base, "navigationbar", "base", elm_widget_style_get(obj));
@@ -122,8 +121,11 @@ _theme_hook(Evas_Object *obj)
             snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
             elm_object_style_set(it->fn_btn3, buf_fn);            
          }
-        snprintf(buf_bk, sizeof(buf_bk), "navigationbar_backbutton/%s", elm_widget_style_get(obj));
-        elm_object_style_set(it->back_btn, buf_bk);
+        if (it->back_btn)
+          {
+             snprintf(buf_fn, sizeof(buf_fn), "navigationbar_backbutton/%s", elm_widget_style_get(obj));
+             elm_object_style_set(it->back_btn, buf_fn);
+          }
      }
    edje_object_message_signal_process(wd->base);
    _sizing_eval(obj);
