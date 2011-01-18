@@ -452,7 +452,7 @@ _ellipsis_cut_chars_to_widget(Evas_Object *obj)
           }
      }
 
-   for (i = 0; i <= mincount; i++) evas_textblock_cursor_char_prev(tc2);
+   for (i = 0; i < mincount; i++) evas_textblock_cursor_char_prev(tc2);
    cutstr = evas_textblock_cursor_range_text_get(tc1, tc2, EVAS_TEXTBLOCK_TEXT_PLAIN);
    if (!cutstr) return EINA_FALSE;
    
