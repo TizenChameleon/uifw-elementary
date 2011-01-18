@@ -3235,6 +3235,7 @@ elm_genlist_last_item_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
    if (!wd->items) return NULL;
    Elm_Genlist_Item *it = (Elm_Genlist_Item *)(wd->items->last);
    if (!wd) return NULL;
