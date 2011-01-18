@@ -5217,7 +5217,11 @@ static void
 _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    const char *del_conf_style;
-   Elm_Genlist_Item *it = data;
+   Elm_Genlist_Item *it = data, *tmp_it;
+   Item_Block *itb;
+   Eina_List *l;
+   int check_cnt = 0, total_cnt = 0;
+   
    if (_edit_mode_reset(it->wd))
       return;
 
@@ -5230,6 +5234,19 @@ _remove_item_cb(void *data, Evas_Object *obj, const char *emission, const char *
    _edit_subitems_check(it);
    it->wd->ed->del_item = it;
 
+   EINA_INLIST_FOREACH(it->wd->blocks, itb)
+     {
+        EINA_LIST_FOREACH(itb->items, l, tmp_it)
+        	 {
+        	    if(tmp_it->delete_check)
+           	    check_cnt++; 
+        	 }
+        total_cnt += itb->count;
+   	}
+
+   if(check_cnt == total_cnt)
+      edje_object_signal_emit(it->wd->select_all_item->base, "elm,state,del_confirm", "elm");
+   
    if (!it->wd->selct_all && it->wd->ed->ec->item_selected)
       it->wd->ed->ec->item_selected(it->data, it, it->delete_check);
    del_conf_style = edje_object_data_get(it->edit_obj, "del_button_style");
