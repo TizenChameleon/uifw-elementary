@@ -647,7 +647,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	   }
 	   if ((wd->api) && (wd->api->obj_hidemenu))
 	   {
-		   wd->api->obj_hidemenu(data);
+		   wd->api->obj_hidemenu(obj);
 	   }
      }
 }
