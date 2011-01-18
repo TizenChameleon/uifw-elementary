@@ -57,9 +57,10 @@ static void startup(void)
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) {
+	if ( NULL != main_win ) 
+	{
 		evas_object_del(main_win);
-	       	main_win = NULL;
+	  	main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
@@ -71,7 +72,7 @@ static void cleanup(void)
 static void utc_UIFW_elm_ctxpopup_item_del_func_01(void)
 {
 	Evas_Object *obj = elm_ctxpopup_add(main_win);
-	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_add(obj, NULL, "TEST", NULL, NULL);
+	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
 	elm_ctxpopup_item_del(item);
 	evas_object_show(obj);
 	

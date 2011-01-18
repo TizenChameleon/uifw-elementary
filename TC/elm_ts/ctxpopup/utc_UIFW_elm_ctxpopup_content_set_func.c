@@ -7,11 +7,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err == (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 // For checking the result of the negative test case.
@@ -19,11 +19,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err != (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 
@@ -57,9 +57,10 @@ static void startup(void)
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) {
+	if ( NULL != main_win ) 
+	{
 		evas_object_del(main_win);
-	       	main_win = NULL;
+		main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
@@ -75,9 +76,9 @@ static void utc_UIFW_elm_ctxpopup_content_set_func_01(void)
 
 	Evas_Object *btn = elm_button_add(ctxpopup);
 	evas_object_resize(btn, 200, 200);
-	
+
 	elm_ctxpopup_content_set(ctxpopup, btn);
-	
+
 	tet_result(TET_PASS);
 
 }

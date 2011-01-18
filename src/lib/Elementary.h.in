@@ -3268,6 +3268,12 @@ extern "C" {
     * "expanded" - This signal is emitted when a multibuttonentry is expanded. 
     * "contracted" - This signal is emitted when a multibuttonentry is contracted. 
     * "contracted,state,changed" - This signal is emitted when the contracted state of multibuttonentry is changed. 
+    * "item,selected" - This signal is emitted when the selected item of multibuttonentry is changed. 
+    * "item,added" - This signal is emitted when a new multibuttonentry item is added.
+    * "item,deleted" - This signal is emitted when a multibuttonentry item is deleted.
+    * "item,clicked" - This signal is emitted when a multibuttonentry item is clicked. 
+    * "clicked" - This signal is emitted when a multibuttonentry is clicked. 
+    * "unfocused" - This signal is emitted when a multibuttonentry is unfocused. 
     */
    /* available styles:
     * default

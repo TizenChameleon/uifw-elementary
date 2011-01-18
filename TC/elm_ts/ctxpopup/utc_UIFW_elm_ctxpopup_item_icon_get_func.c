@@ -7,11 +7,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err == (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 // For checking the result of the negative test case.
@@ -19,11 +19,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err != (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 
@@ -62,9 +62,10 @@ static void startup(void)
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) {
+	if ( NULL != main_win ) 
+	{
 		evas_object_del(main_win);
-	       	main_win = NULL;
+		main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
@@ -78,12 +79,12 @@ static void utc_UIFW_elm_ctxpopup_item_icon_get_func_01(void)
 	Evas_Object *icon = elm_icon_add(main_win);
 	evas_object_size_hint_min_set(icon, 50, 50);
 	evas_object_show(icon);
-	
-	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_add( ctxpopup, icon, "TEST", NULL, NULL );
-	
-   	Evas_Object *icon2 = elm_ctxpopup_item_icon_get(item);
-	
-	if ( icon != icon2 ) {
+
+	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append( ctxpopup, "TEST", icon, NULL, NULL );
+	Evas_Object *icon2 = elm_ctxpopup_item_icon_get(item);
+
+	if ( icon != icon2 ) 
+	{
 		tet_infoline("elm_ctxpopup_item_icon_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -99,12 +100,13 @@ static void utc_UIFW_elm_ctxpopup_item_icon_get_func_02(void)
 	Evas_Object *icon = elm_icon_add(main_win);
 	evas_object_size_hint_min_set(icon, 50, 50);
 	evas_object_show(icon);
-	
-	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_add( ctxpopup, icon, "TEST", NULL, NULL );
-	
-   	Evas_Object *icon2 = elm_ctxpopup_item_icon_get(NULL);
-	
-	if ( icon == icon2 ) {
+
+	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append( ctxpopup, "TEST", icon, NULL, NULL );
+
+	Evas_Object *icon2 = elm_ctxpopup_item_icon_get(NULL);
+
+	if ( icon == icon2 ) 
+	{
 		tet_infoline("elm_ctxpopup_item_icon_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
