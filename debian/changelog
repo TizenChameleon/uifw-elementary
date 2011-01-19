@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build97) unstable; urgency=low
+
+  * edje_external bugs are fixed
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build97  
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 19 Jan 2011 17:55:04 +0900
+
 elementary (1.0.0+svn.51480slp2+build96) unstable; urgency=low
 
   * Deprecated API and winsets are deleted
