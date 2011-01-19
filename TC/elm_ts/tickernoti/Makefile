@@ -1,21 +1,21 @@
 CC ?= gcc
 
-TARGETS = uts_elm_tickernoti_add_func \
-   		  uts_elm_tickernoti_icon_set_func \
-   		  uts_elm_tickernoti_icon_get_func \
-   		  uts_elm_tickernoti_label_set_func \
-   		  uts_elm_tickernoti_label_get_func \
-   		  uts_elm_tickernoti_detailview_label_set_func \
-   		  uts_elm_tickernoti_detailview_label_get_func \
-   		  uts_elm_tickernoti_detailview_button_set_func \
-   		  uts_elm_tickernoti_detailview_button_get_func \
-   		  uts_elm_tickernoti_detailview_icon_set_func \
-   		  uts_elm_tickernoti_detailview_icon_get_func \
-   		  uts_elm_tickernoti_detailview_get_func \
-   		  uts_elm_tickernoti_rotation_set_func \
-   		  uts_elm_tickernoti_rotation_get_func \
-   		  uts_elm_tickernoti_mode_set_func \
-   		  uts_elm_tickernoti_mode_get_func 
+TARGETS = utc_UIFW_elm_tickernoti_add_func \
+   utc_UIFW_elm_tickernoti_icon_set_func \
+   utc_UIFW_elm_tickernoti_icon_get_func \
+   utc_UIFW_elm_tickernoti_label_set_func \
+   utc_UIFW_elm_tickernoti_label_get_func \
+   utc_UIFW_elm_tickernoti_detailview_label_set_func \
+   utc_UIFW_elm_tickernoti_detailview_label_get_func \
+   utc_UIFW_elm_tickernoti_detailview_button_set_func \
+   utc_UIFW_elm_tickernoti_detailview_button_get_func \
+   utc_UIFW_elm_tickernoti_detailview_icon_set_func \
+   utc_UIFW_elm_tickernoti_detailview_icon_get_func \
+   utc_UIFW_elm_tickernoti_detailview_get_func \
+   utc_UIFW_elm_tickernoti_rotation_set_func \
+   utc_UIFW_elm_tickernoti_rotation_get_func \
+   utc_UIFW_elm_tickernoti_mode_set_func \
+   utc_UIFW_elm_tickernoti_mode_get_func 
 
 PKGS = elementary
 
