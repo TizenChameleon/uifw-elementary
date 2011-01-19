@@ -36,7 +36,6 @@ elm_clock.c \
 elm_colorpalette.c\
 elm_calendar.c \
 elm_datefield.c \
-elm_datepicker.c \
 elm_fileselector.c \
 elm_fileselector_button.c \
 elm_gengrid.c \
@@ -47,10 +46,8 @@ elm_list.c \
 elm_map.c \
 elm_multibuttonentry.c \
 elm_nocontents.c \
-elm_notepad.c \
 elm_page_control.c \
 elm_photocam.c \
-elm_picker.c \
 elm_progressbar.c \
 elm_radio.c \
 elm_scrolled_entry.c \
@@ -66,8 +63,7 @@ elm_notify.c \
 elm_panes.c \
 elm_navigationbar.c \
 elm_navigationbar_ex.c \
-elm_pager.c \
-elm_timepicker.c 
+elm_pager.c 
 
 module_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
 module_la_LDFLAGS = -no-undefined -module -avoid-version -shared -fPIC

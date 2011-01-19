@@ -18,9 +18,6 @@ typedef struct _Elm_Params_Slider
    Evas_Object *end_icon;
    Eina_Bool indicator_show:1;
    Eina_Bool indicator_show_exists:1;
-   double value_animated;
-   Eina_Bool value_animated_exists:1;
-   const char *end_label;
 } Elm_Params_Slider;
 
 static void
@@ -63,10 +60,6 @@ external_slider_state_set(void *data __UNUSED__, Evas_Object *obj, const void *f
      elm_slider_icon_set(obj, p->end_icon);
    if (p->indicator_show_exists)
      elm_slider_horizontal_set(obj, p->indicator_show);
-   if (p->value_animated_exists)
-     elm_slider_value_animated_set(obj, p->value_animated);
-   if (p->end_label)
-     elm_slider_end_label_set(obj, p->end_label);
 }
 
 static Eina_Bool
@@ -176,22 +169,6 @@ external_slider_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Ex
 	     return EINA_TRUE;
 	  }
      }
-   else if (!strcmp(param->name, "value animated"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
-	  {
-	     elm_slider_value_animated_set(obj, param->d);
-	     return EINA_TRUE;
-	  }
-     }
-   if (!strcmp(param->name, "end label"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
-	  {
-	     elm_slider_end_label_set(obj, param->s);
-	     return EINA_TRUE;
-	  }
-     }
 
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -295,21 +272,6 @@ external_slider_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_Ex
 	     return EINA_FALSE;
 	  }
      }
-   else if (!strcmp(param->name, "value animated"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
-	  {
-	     return EINA_FALSE;
-	  }
-     }
-   else if (!strcmp(param->name, "end label"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
-	  {
-	     param->s = elm_slider_end_label_get(obj);
-	     return EINA_TRUE;
-	  }
-     }
 
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -372,13 +334,6 @@ external_slider_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
 	     mem->indicator_show = param->i;
 	     mem->indicator_show_exists = EINA_TRUE;
 	  }
-	else if (!strcmp(param->name, "value animated"))
-	  {
-	     mem->value_animated = param->d;
-	     mem->value_animated_exists = EINA_TRUE;
-	  }
-	else if (!strcmp(param->name, "end label"))
-	  mem->end_label = eina_stringshare_add(param->s);
      }
 
    return mem;
@@ -400,8 +355,6 @@ external_slider_params_free(void *params)
      eina_stringshare_del(mem->unit);
    if (mem->indicator)
      eina_stringshare_del(mem->indicator);
-   if (mem->end_label)
-     eina_stringshare_del(mem->end_label);
    external_common_params_free(params);
 }
 
@@ -418,8 +371,6 @@ static Edje_External_Param_Info external_slider_params[] = {
    EDJE_EXTERNAL_PARAM_INFO_STRING_DEFAULT("indicator format", "%1.2f"),
    EDJE_EXTERNAL_PARAM_INFO_STRING("end icon"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("indicator show"),
-   EDJE_EXTERNAL_PARAM_INFO_DOUBLE("value animated"),
-   EDJE_EXTERNAL_PARAM_INFO_STRING("end label"),
    EDJE_EXTERNAL_PARAM_INFO_SENTINEL
 };
 

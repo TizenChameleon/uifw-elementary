@@ -20,7 +20,7 @@ external_navigationbar_state_set(void *data __UNUSED__, Evas_Object *obj, const 
    else if (from_params) p = from_params;
    else return;
 
-  if(p->disable_animation_exists) elm_navigationbar_animation_disable_set(obj, p->disable_animation);
+  if(p->disable_animation_exists) elm_navigationbar_animation_disabled_set(obj, p->disable_animation);
   if(p->hidden_exists) elm_navigationbar_hidden_set(obj, p->hidden);
 }
 
@@ -31,7 +31,7 @@ external_navigationbar_param_set(void *data __UNUSED__, Evas_Object *obj, const 
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
 	  {
-	     elm_navigationbar_animation_disable_set(obj, param->i);
+	     elm_navigationbar_animation_disabled_set(obj, param->i);
 	     return EINA_TRUE;
 	  }
      }
