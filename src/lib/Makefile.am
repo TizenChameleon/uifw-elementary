@@ -86,35 +86,20 @@ elm_map.c \
 elm_flip.c \
 elm_conform.c \
 elm_mapbuf.c \
-elm_picker.c \
-elm_discpicker.c \
-elm_timepicker.c \
-elm_datepicker.c \
 elm_thumb.c \
 elm_config.c \
-elm_titlebar.c \
 elm_popup.c \
-elm_tab.c \
 elm_navigationbar.c \
 elm_navigationbar_ex.c\
-elm_tabbar.c \
 elm_transit.c \
 elm_animator.c \
 elm_editfield.c \
 elm_diskselector.c \
-elm_colorpicker.c \
 elm_colorselector.c \
 elm_colorpalette.c \
 elc_ctxpopup.c \
-elm_actionsheet.c \
-elm_gridbox.c \
-elm_softkey.c \
-elm_hor_scroller.c \
-elm_autocompleteview.c \
 elm_controlbar.c \
-elm_gallery.c \
 elm_slidingdrawer.c \ 
-elm_wipercontrol.c \
 elm_dialoguegroup.c \
 elm_dayselector.c \
 elm_cnp_helper.c \
@@ -126,7 +111,6 @@ elm_imageslider.c \
 elm_multibuttonentry.c \
 elm_stackedicon.c \
 elm_calendar.c \
-elm_xml_animator.c \
 elm_font.c \
 \
 elc_anchorblock.c \
@@ -134,15 +118,12 @@ elc_anchorview.c \
 elc_fileselector.c \
 elc_fileselector_button.c \
 elc_hoversel.c \
-elc_notepad.c \
 elc_scrolled_entry.c \
 \
 els_pan.c \
 els_pan.h \
 els_scroller.c \
 els_scroller.h \
-els_hor_scroller.c \
-els_hor_scroller.h \
 els_box.c \
 els_box.h \
 els_icon.c \
