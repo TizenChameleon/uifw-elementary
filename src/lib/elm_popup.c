@@ -250,8 +250,8 @@ _action_area_clicked(void *data, Evas_Object *obj, void *event_info)
    adata = (Action_Area_Data *)data;
 
    if (!adata) return;  
-   evas_object_smart_callback_call(adata->obj, "response", (void *)adata->response_id);   
    evas_object_hide(adata->obj);
+   evas_object_smart_callback_call(adata->obj, "response", (void *)adata->response_id);   
 }
 
 static Evas_Object* 
