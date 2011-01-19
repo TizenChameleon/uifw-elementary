@@ -59,8 +59,6 @@ struct _Widget_Data
    Eina_Bool init_animation;
    Eina_Bool selected_animation;
 
-   Elm_Xml_Animator *xa;
-   Elm_Xml_Animator *vxa;
 //   const char *view_hide;
 //   const char *view_show;
    const char *pressed_signal;
@@ -286,11 +284,6 @@ _del_hook(Evas_Object * obj)
         evas_object_del(wd->bg);
         wd->bg = NULL;
      }
-   if (wd->xa)
-     {
-        elm_xml_animator_del(wd->xa);
-        wd->xa = NULL;
-     }
    if (wd->effect_timer)
      {
         ecore_timer_del(wd->effect_timer);
@@ -453,13 +446,6 @@ move_object_with_animation(Evas_Object * obj, Evas_Coord x, Evas_Coord y,
    ad->timer = ecore_animator_add(mv_func, ad);
 }
 
-static void 
-end_item_animation_effect(void *data, Evas_Object *obj)
-{
-   Widget_Data *wd = (Widget_Data *)data;
-   elm_xml_animator_object_del(wd->xa, obj);
-}
-
 static Eina_Bool
 item_animation_effect(void *data)
 {
@@ -467,11 +453,6 @@ item_animation_effect(void *data)
    const Eina_List *l;
    Elm_Controlbar_Item * item;
    int rand;
-
-   if(!wd->xa){
-        wd->xa = elm_xml_animator_add(wd->object);
-        elm_xml_animator_file_set(wd->xa, "/usr/share/xmls/elementary.xml");
-   }
 
    srand(time(NULL));
 
@@ -484,16 +465,12 @@ item_animation_effect(void *data)
              switch(rand)
                {
                 case 0: 
-                   elm_xml_animator_object_add(wd->xa, item->base_item, "test", end_item_animation_effect, wd);
                    break;
                 case 1:
-                   elm_xml_animator_object_add(wd->xa, item->base_item, "test2", end_item_animation_effect, wd);
                    break;
                 case 2:
-                   elm_xml_animator_object_add(wd->xa, item->base_item, "test3", end_item_animation_effect, wd);
                    break;
                 case 3:
-                   elm_xml_animator_object_add(wd->xa, item->base_item, "test4", end_item_animation_effect, wd);
                    break;
                 default:
                    break;
@@ -501,8 +478,6 @@ item_animation_effect(void *data)
              break;
           }
      }
-
-   elm_xml_animator_run(wd->xa);
 
    return ECORE_CALLBACK_RENEW;
 }

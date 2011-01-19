@@ -439,34 +439,6 @@ if test "x$want_elementary_ethumb" = "xyes" -a "x$have_elementary_ethumb" = "xno
 fi
 AC_SUBST(ELM_ETHUMB_DEF)
 
-ELM_LIBXML2_DEF="#undef"
-have_elementary_libxml2="no"
-want_elementary_libxml2="auto"
-AC_ARG_ENABLE([libxml-2.0],
-   [AC_HELP_STRING([--disable-libxml-2.0], [disable libxml-2.0 support. @<:@default=detect@:>@])],
-   [want_elementary_libxml2=$enableval], [])
-
-if test "x$want_elementary_libxml2" != "xno"; then
-    PKG_CHECK_MODULES([ELEMENTARY_LIBXML2],
-       [
-        libxml-2.0
-       ],
-       [
-        AC_DEFINE(HAVE_ELEMENTARY_LIBXML2, 1, [Libxml-2.0 support for Elementary])
-        have_elementary_libxml2="yes"
-        ELM_ETHUMB_DEF="#define"
-        requirement_elm="libxml-2.0 ${requirement_elm}"
-       ],
-       [have_elementary_libxml2="no"]
-    )
-else
-    have_elementary_libxml2="no"
-fi
-if test "x$want_elementary_libxml2" = "xyes" -a "x$have_elementary_libxml2" = "xno"; then
-    AC_MSG_ERROR(Libxml-2.0 support requested, but no libxml-2.0 found by pkg-config.])
-fi
-AC_SUBST(ELM_LIBXML2_DEF)
-
 ELM_DEBUG_DEF="#undef"
 want_elementary_debug="no"
 AC_ARG_ENABLE([debug],
@@ -517,7 +489,6 @@ data/themes/Makefile
 data/images/Makefile
 data/objects/Makefile
 data/desktop/Makefile
-data/xmls/Makefile
 data/edje_externals/Makefile
 config/Makefile
 config/default/Makefile
