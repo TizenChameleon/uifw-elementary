@@ -104,6 +104,9 @@ struct _Widget_Data
    Evas_Object *ent;
    Evas_Object *bg;
    Evas_Object *hoversel;
+   Evas_Object *hover;
+   Evas_Object *layout;
+   Evas_Object *list;
    Ecore_Job *deferred_recalc_job;
    Ecore_Event_Handler *sel_notify_handler;
    Ecore_Event_Handler *sel_clear_handler;
@@ -122,6 +125,7 @@ struct _Widget_Data
    Eina_List *items;
    Eina_List *item_providers;
    Eina_List *text_filters;
+   Eina_List *match_list;
    Ecore_Job *hovdeljob;
    Mod_Api *api; // module api if supplied
    int max_no_of_bytes;
@@ -152,6 +156,9 @@ struct _Widget_Data
    Eina_Bool autocapital : 1;
    Elm_Input_Panel_Layout input_panel_layout;
    Eina_Bool autoperiod : 1;
+   Eina_Bool matchlist_list_clicked : 1;
+   Eina_Bool matchlist_case_sensitive : 1;
+   int matchlist_threshold;
 };
 
 struct _Elm_Entry_Context_Menu_Item
@@ -621,15 +628,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
 	evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
 	_check_enable_returnkey(obj);
-
-	   while (parent_obj)
-	   {
-		   above = evas_object_above_get(parent_obj);
-		   if (above)
-			   evas_object_data_set(parent_obj, "raise", above);
-		   evas_object_raise(parent_obj);
-		   parent_obj = elm_widget_parent_get(parent_obj);
-	   }
      }
    else
      {
@@ -638,13 +636,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
 	evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
 
-	   while (parent_obj)
-	   {
-		   above = evas_object_data_get(parent_obj, "raise");
-		   if (above)
-			   evas_object_stack_below(parent_obj, above);
-		   parent_obj = elm_widget_parent_get(parent_obj);
-	   }
 	   if ((wd->api) && (wd->api->obj_hidemenu))
 	   {
 		   wd->api->obj_hidemenu(obj);
@@ -1130,6 +1121,149 @@ _entry_length_get(Evas_Object *obj)
 }
 
 static void
+_matchlist_show(void *data, Eina_Bool case_sensitive)
+{
+	Widget_Data *wd = elm_widget_data_get(data);
+	const char *text = NULL;
+	int textlen = 0;
+	char *str_list = NULL, *str_result = NULL;
+	char *str_mkup = NULL, *str_front = NULL, *str_mid = NULL;
+
+	Eina_List *l;
+	Eina_Bool textfound = EINA_FALSE;
+
+	if (!wd) return;
+	if (elm_widget_disabled_get(data)) return;
+	if (wd->matchlist_list_clicked)
+	{
+		evas_object_hide(wd->hover);
+		wd->matchlist_list_clicked = EINA_FALSE;
+		return;
+	}
+	text = elm_entry_entry_get(data);
+	if (text == NULL)
+		return;	
+	textlen  = strlen(text);
+	
+	if (textlen < wd->matchlist_threshold)
+	{
+		evas_object_hide(wd->hover);
+		return;
+	}
+	
+	evas_object_hide(wd->hover);
+
+	if (wd->match_list) 
+	{
+		elm_list_clear(wd->list);
+		EINA_LIST_FOREACH(wd->match_list, l, str_list) 
+		{
+			if (case_sensitive)
+				str_result = strstr(str_list,text);
+			else
+				str_result = strcasestr(str_list,text);
+
+			if (str_result)
+			{
+				str_mkup = malloc(strlen(str_list) + 24);
+
+				textlen = strlen(str_list) - strlen(str_result);
+				str_front = malloc(textlen + 1);
+				memset(str_front, 0, textlen + 1);
+				strncpy(str_front, str_list, textlen);
+			
+				textlen = strlen(text);
+				str_mid = malloc(textlen + 1);
+				memset(str_mid, 0, textlen + 1);
+				strncpy(str_mid, str_list + strlen(str_front), textlen);
+				
+				sprintf(str_mkup, "%s<match>%s</match>%s", str_front, str_mid, str_result + strlen(text));
+
+				if (str_front)
+					free(str_front);
+
+				if (str_mid)
+					free(str_mid);
+
+				elm_list_item_append(wd->list, str_mkup, NULL, NULL, NULL, NULL);
+				//free(str_mkup);
+				//str_mkup = NULL;
+				textfound=EINA_TRUE;
+			}
+		}
+	}
+	else
+		return;
+	if (textfound)
+	{
+		elm_list_go(wd->list);		
+		evas_object_show(wd->hover);
+		evas_object_raise(wd->hover);
+	}
+}
+
+static void _matchlist_list_clicked( void *data, Evas_Object *obj, void *event_info )
+{
+   Elm_List_Item *it = (Elm_List_Item *) elm_list_selected_item_get(obj);
+   Widget_Data *wd = elm_widget_data_get(data);
+   if ((it == NULL) || (wd == NULL))
+      return;
+
+   const char *text = elm_list_item_label_get(it);
+   evas_object_smart_callback_call((Evas_Object *)data, "selected", (void *)text);
+   if (wd->match_list)
+     {
+        if (text != NULL)
+          {
+             elm_entry_entry_set(data, elm_entry_markup_to_utf8(text));
+             elm_entry_cursor_end_set(data);
+             wd->matchlist_list_clicked = EINA_TRUE;
+          }
+     }
+   elm_widget_focus_set(data, EINA_TRUE);
+}
+
+EAPI void
+elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_sensitive)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (match_list)
+   {
+	   wd->matchlist_threshold = 1;
+	   wd->hover = elm_hover_add(elm_widget_parent_get(obj));
+	   elm_hover_parent_set(wd->hover, elm_widget_parent_get(obj));
+	   elm_hover_target_set(wd->hover, obj);
+	   elm_object_style_set(wd->hover, "matchlist");
+
+	   wd->layout = elm_layout_add(wd->hover);
+	   elm_layout_theme_set(wd->layout, "entry", "matchlist", "default");
+	   wd->list = elm_list_add(wd->layout);
+	   evas_object_size_hint_weight_set(wd->list, EVAS_HINT_EXPAND, 0.0);
+	   evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
+	   elm_list_mode_set(wd->list, ELM_LIST_COMPRESS);
+	   elm_object_style_set(wd->list, "matchlist");
+	   elm_list_go(wd->list);
+	   evas_object_smart_callback_add(wd->list, "selected", _matchlist_list_clicked, obj);
+	   elm_layout_content_set(wd->layout, "elm.swallow.content", wd->list);
+	   elm_hover_content_set(wd->hover, "bottom", wd->layout);
+   
+	   wd->match_list = match_list;
+   }
+   else
+   {
+	   if (wd->hover)
+		   evas_object_del(wd->hover);
+
+	   wd->match_list = NULL;
+   }
+
+   wd->matchlist_case_sensitive = case_sensitive;
+}
+
+
+static void
 _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -1145,6 +1279,8 @@ _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emiss
 	ecore_timer_del(wd->delay_write);
 	wd->delay_write = NULL;
      }
+
+   if ((wd->single_line) && (wd->match_list)) _matchlist_show(data, wd->matchlist_case_sensitive);
    if ((!wd->autosave) || (!wd->file)) return;
    wd->delay_write = ecore_timer_add(2.0, _delay_write, data);
 }
@@ -3719,7 +3855,6 @@ elm_entry_autosave_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return wd->autosave;
 }
-
 
 /**
  * Control pasting of text and images for the widget.
