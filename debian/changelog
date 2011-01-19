@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build95) unstable; urgency=low
+
+  * bug fix for genlist, text only mode for clipboard added
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build95
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 19 Jan 2011 10:25:46 +0900
+
 elementary (1.0.0+svn.51480slp2+build94) unstable; urgency=low
 
   * Controlbar bug fix - view hide
