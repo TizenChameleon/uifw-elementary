@@ -658,6 +658,7 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, icon_size, T_INT);
    ELM_CONFIG_VAL(D, T, longpress_timeout, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, password_show_last_character, T_UCHAR);
+   ELM_CONFIG_VAL(D, T, input_panel_enable, T_INT);
 #undef T
 #undef D
 #undef T_INT

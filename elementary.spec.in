@@ -93,6 +93,7 @@ test "x$RPM_BUILD_ROOT" != "x/" && rm -rf $RPM_BUILD_ROOT
 %{_datadir}/elementary/config/default/*
 %{_datadir}/elementary/config/illume/*
 %{_datadir}/elementary/config/standard/*
+%{_datadir}/elementary/config/slp/*
 %{_datadir}/elementary/edje_externals/*
 %{_datadir}/elementary/images/*
 %{_datadir}/elementary/objects/*

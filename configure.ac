@@ -494,6 +494,7 @@ config/Makefile
 config/default/Makefile
 config/standard/Makefile
 config/illume/Makefile
+config/slp/Makefile
 ])
 
 #####################################################################
