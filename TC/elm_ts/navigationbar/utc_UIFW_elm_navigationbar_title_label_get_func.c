@@ -112,7 +112,7 @@ static void utc_UIFW_elm_navigationbar_title_label_get_func_02(void)
 	elm_icon_scale_set(content, 1, 1);
 		
    	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
-	const char *text = elm_navigationbar_title_label_get(navibar,content);
+	const char *text = elm_navigationbar_title_label_get(NULL,content);
 	if (text) {
 		tet_infoline("elm_navigationbar_title_label_get() failed in negative test case");
 		tet_result(TET_FAIL);

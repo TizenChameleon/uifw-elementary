@@ -104,7 +104,7 @@ static void utc_UIFW_elm_navigationbar_content_bottom_get_func_01(void)
  */
 static void utc_UIFW_elm_navigationbar_content_bottom_get_func_02(void)
 {
-	Evas_Object *btm =  elm_navigationbar_content_bottom_get(navibar);
+	Evas_Object *btm =  elm_navigationbar_content_bottom_get(NULL);
 	if (btm) {
 		tet_infoline("elm_navigationbar_content_bottom_get() failed in negative test case");
 		tet_result(TET_FAIL);

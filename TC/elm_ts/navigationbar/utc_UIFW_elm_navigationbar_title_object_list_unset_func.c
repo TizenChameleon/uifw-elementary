@@ -125,7 +125,7 @@ static void utc_UIFW_elm_navigationbar_title_object_list_unset_func_02(void)
 	evas_object_show(segment);
 
    	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
-	elm_navigationbar_title_object_list_unset(navibar, content, &list);
+	elm_navigationbar_title_object_list_unset(NULL, content, &list);
 	if (list) {
 		tet_infoline("elm_navigationbar_title_object_list_unset() failed in negative test case");
 		tet_result(TET_FAIL);

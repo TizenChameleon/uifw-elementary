@@ -89,7 +89,7 @@ static void utc_UIFW_elm_navigationbar_content_top_get_func_01(void)
 	elm_icon_scale_set(content, 1, 1);
 		
    	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
-	Evas_Object *top =  elm_navigationbar_content_bottom_get(navibar);
+	Evas_Object *top =  elm_navigationbar_content_top_get(navibar);
 	if (!top) {
 		tet_infoline("elm_navigationbar_content_top_get() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -103,7 +103,7 @@ static void utc_UIFW_elm_navigationbar_content_top_get_func_01(void)
  */
 static void utc_UIFW_elm_navigationbar_content_top_get_func_02(void)
 {	
-	Evas_Object *top =  elm_navigationbar_content_bottom_get(navibar);
+	Evas_Object *top =  elm_navigationbar_content_top_get(NULL);
 	if (top) {
 		tet_infoline("elm_navigationbar_content_top_get() failed in negative test case");
 		tet_result(TET_FAIL);
