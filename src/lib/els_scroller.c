@@ -691,6 +691,7 @@ _smart_momentum_animator(void *data)
    Smart_Data *sd;
    double t, dt, p;
    Evas_Coord x, y, dx, dy, px, py, maxx, maxy, minx, miny;
+   Eina_Bool no_bounce_x_end = EINA_FALSE, no_bounce_y_end = EINA_FALSE;
 
    sd = data;
    t = ecore_loop_time_get();
@@ -739,8 +740,19 @@ _smart_momentum_animator(void *data)
 	elm_smart_scroller_child_pos_set(sd->smart_obj, x, y);
         sd->pan_func.max_get(sd->pan_obj, &maxx, &maxy);
         sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
+	if (!sd->bounce_horiz)
+          {
+             if (x <= minx) no_bounce_x_end = EINA_TRUE;
+             if ((x - minx) >= maxx) no_bounce_x_end = EINA_TRUE;
+          }
+        if (!sd->bounce_vert)
+          {
+             if (y <= miny) no_bounce_y_end = EINA_TRUE;
+             if ((y - miny) >= maxy) no_bounce_y_end = EINA_TRUE;
+          }
         if ((dt >= 1.0) || 
-            ((sd->down.bounce_x_hold) && (sd->down.bounce_y_hold)))
+            ((sd->down.bounce_x_hold) && (sd->down.bounce_y_hold)) ||
+            (no_bounce_x_end && no_bounce_y_end))
 	  {
              _smart_anim_stop(sd->smart_obj);
 	     sd->down.momentum_animator = NULL;
@@ -929,19 +941,11 @@ elm_smart_scroller_child_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord 
    sd->pan_func.get(sd->pan_obj, &px, &py);
 
    nx = px;
-   if (x < px) nx = x;
-   else if ((x + w) > (px + (cw - mx)))
-     {
-	nx = x + w - (cw - mx);
-	if (nx > x) nx = x;
-     }
+   if ((x < px) && ((x + w) < (px + (cw - mx)))) nx = x;
+   else if ((x > px) && ((x + w) > (px + (cw - mx)))) nx = x + w - (cw - mx);
    ny = py;
-   if (y < py) ny = y;
-   else if ((y + h) > (py + (ch - my)))
-     {
-	ny = y + h - (ch - my);
-	if (ny > y) ny = y;
-     }
+   if ((y < py) && ((y + h) < (py + (ch - my)))) ny = y;
+   else if ((y > py) && ((y + h) > (py + (ch - my)))) ny = y + h - (ch - my);
    if ((nx == px) && (ny == py)) return;
    if ((sd->down.bounce_x_animator) || (sd->down.bounce_y_animator) ||
        (sd->scrollto.x.animator) || (sd->scrollto.y.animator))
