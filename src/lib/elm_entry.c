@@ -126,6 +126,7 @@ struct _Widget_Data
    Eina_List *item_providers;
    Eina_List *text_filters;
    Eina_List *match_list;
+   Ecore_Job *matchlist_job;
    Ecore_Job *hovdeljob;
    Mod_Api *api; // module api if supplied
    int max_no_of_bytes;
@@ -232,6 +233,7 @@ static const char SIG_SELECTION_CHANGED[] = "selection,changed";
 static const char SIG_SELECTION_CLEARED[] = "selection,cleared";
 static const char SIG_CURSOR_CHANGED[] = "cursor,changed";
 static const char SIG_ANCHOR_CLICKED[] = "anchor,clicked";
+static const char SIG_MATCHLIST_CLICKED[] = "matchlist,clicked";
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
   {SIG_ACTIVATED, ""},
@@ -249,6 +251,7 @@ static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_SELECTION_CLEARED, ""},
   {SIG_CURSOR_CHANGED, ""},
   {SIG_ANCHOR_CLICKED, ""},
+  {SIG_MATCHLIST_CLICKED, ""},
   {NULL, NULL}
 };
 
@@ -469,6 +472,7 @@ _del_hook(Evas_Object *obj)
    if (wd->text) eina_stringshare_del(wd->text);
    if (wd->bg) evas_object_del(wd->bg);
    if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
+   if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
    if (wd->longpress_timer) ecore_timer_del(wd->longpress_timer);
    EINA_LIST_FREE(wd->items, it)
      {
@@ -1121,7 +1125,7 @@ _entry_length_get(Evas_Object *obj)
 }
 
 static void
-_matchlist_show(void *data, Eina_Bool case_sensitive)
+_matchlist_show(void *data)
 {
 	Widget_Data *wd = elm_widget_data_get(data);
 	const char *text = NULL;
@@ -1158,7 +1162,7 @@ _matchlist_show(void *data, Eina_Bool case_sensitive)
 		elm_list_clear(wd->list);
 		EINA_LIST_FOREACH(wd->match_list, l, str_list) 
 		{
-			if (case_sensitive)
+			if (wd->matchlist_case_sensitive)
 				str_result = strstr(str_list,text);
 			else
 				str_result = strcasestr(str_list,text);
@@ -1218,6 +1222,8 @@ static void _matchlist_list_clicked( void *data, Evas_Object *obj, void *event_i
              elm_entry_entry_set(data, elm_entry_markup_to_utf8(text));
              elm_entry_cursor_end_set(data);
              wd->matchlist_list_clicked = EINA_TRUE;
+			 
+			 evas_object_smart_callback_call(data, SIG_MATCHLIST_CLICKED, elm_entry_markup_to_utf8(text));
           }
      }
    elm_widget_focus_set(data, EINA_TRUE);
@@ -1280,7 +1286,11 @@ _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emiss
 	wd->delay_write = NULL;
      }
 
-   if ((wd->single_line) && (wd->match_list)) _matchlist_show(data, wd->matchlist_case_sensitive);
+   if ((wd->single_line) && (wd->match_list)) 
+   {
+	if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
+	wd->matchlist_job = ecore_job_add(_matchlist_show, data);
+   }
    if ((!wd->autosave) || (!wd->file)) return;
    wd->delay_write = ecore_timer_add(2.0, _delay_write, data);
 }
