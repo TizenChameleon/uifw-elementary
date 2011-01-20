@@ -1138,6 +1138,9 @@ _matchlist_show(void *data)
 
 	if (!wd) return;
 	if (elm_widget_disabled_get(data)) return;
+	
+	wd->matchlist_job = NULL;
+
 	if (wd->matchlist_list_clicked)
 	{
 		evas_object_hide(wd->hover);
