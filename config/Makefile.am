@@ -1,5 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in
-SUBDIRS = default standard illume
+SUBDIRS = default standard illume slp
 
 EET_EET = @eet_eet@
 
