@@ -1238,6 +1238,9 @@ elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_
 
    if (match_list)
    {
+	   Evas_Coord max_w = 9999, max_h = 9999;
+	   const char* key_data = NULL;
+	   
 	   wd->matchlist_threshold = 1;
 	   wd->hover = elm_hover_add(elm_widget_parent_get(obj));
 	   elm_hover_parent_set(wd->hover, elm_widget_parent_get(obj));
@@ -1249,9 +1252,16 @@ elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_
 	   wd->list = elm_list_add(wd->layout);
 	   evas_object_size_hint_weight_set(wd->list, EVAS_HINT_EXPAND, 0.0);
 	   evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
-	   elm_list_mode_set(wd->list, ELM_LIST_COMPRESS);
+	   elm_list_mode_set(wd->list, ELM_LIST_EXPAND);
 	   elm_object_style_set(wd->list, "matchlist");
+	   
+	   key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_width");
+	   if (key_data) max_w = atoi(key_data);
+	   key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_height");
+	   if (key_data) max_h = atoi(key_data);
+
 	   elm_list_go(wd->list);
+	   evas_object_size_hint_max_set(wd->list, max_w, max_h);
 	   evas_object_smart_callback_add(wd->list, "selected", _matchlist_list_clicked, obj);
 	   elm_layout_content_set(wd->layout, "elm.swallow.content", wd->list);
 	   elm_hover_content_set(wd->hover, "bottom", wd->layout);
