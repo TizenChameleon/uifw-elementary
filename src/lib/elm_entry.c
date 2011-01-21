@@ -1150,7 +1150,7 @@ _matchlist_show(void *data)
 	text = elm_entry_entry_get(data);
 	if (text == NULL)
 		return;	
-	textlen  = strlen(text);
+	textlen = strlen(text);
 	
 	if (textlen < wd->matchlist_threshold)
 	{
@@ -1166,13 +1166,13 @@ _matchlist_show(void *data)
 		EINA_LIST_FOREACH(wd->match_list, l, str_list) 
 		{
 			if (wd->matchlist_case_sensitive)
-				str_result = strstr(str_list,text);
+				str_result = strstr(str_list, text);
 			else
-				str_result = strcasestr(str_list,text);
+				str_result = strcasestr(str_list, text);
 
 			if (str_result)
 			{
-				str_mkup = malloc(strlen(str_list) + 24);
+				str_mkup = malloc(strlen(str_list) + 16);
 
 				textlen = strlen(str_list) - strlen(str_result);
 				str_front = malloc(textlen + 1);
@@ -1186,21 +1186,19 @@ _matchlist_show(void *data)
 				
 				sprintf(str_mkup, "%s<match>%s</match>%s", str_front, str_mid, str_result + strlen(text));
 
-				if (str_front)
-					free(str_front);
-
-				if (str_mid)
-					free(str_mid);
-
 				elm_list_item_append(wd->list, str_mkup, NULL, NULL, NULL, NULL);
-				//free(str_mkup);
-				//str_mkup = NULL;
+
+				if (str_mkup) free(str_mkup);
+				if (str_front) free(str_front);
+				if (str_mid) free(str_mid);
+
 				textfound=EINA_TRUE;
 			}
 		}
 	}
 	else
 		return;
+
 	if (textfound)
 	{
 		elm_list_go(wd->list);		
