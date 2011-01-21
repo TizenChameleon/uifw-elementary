@@ -908,6 +908,8 @@ _item_hilight(Elm_Genlist_Item *it)
            evas_object_raise(it->group_item->base.view);
      }
    it->hilighted = EINA_TRUE;
+   if (it->wd->select_all_item) evas_object_raise(it->wd->select_all_item->base.view);   
+
 }
 
 static void
@@ -1247,7 +1249,7 @@ _long_press(void *data)
       return ECORE_CALLBACK_CANCEL;
    it->wd->longpressed = EINA_TRUE;
    evas_object_smart_callback_call(it->base.widget, "longpressed", it);
-   if (it->wd->reorder_mode)
+   if (it->wd->reorder_mode && it != it->wd->select_all_item)
      {
         it->wd->reorder_it = it;
         it->wd->reorder_start_y = 0;
@@ -2391,7 +2393,6 @@ if(!it->wd->effect_mode || (it->expanded_depth == 0) || (it->parent != it->wd->e
         y += it->h;
      }
 
- //  if (itb->wd->select_all_item) evas_object_raise(select_all_item->base.view);   
 }
 
 static void
