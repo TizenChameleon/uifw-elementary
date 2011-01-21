@@ -71,6 +71,10 @@ struct _Smart_Data
    struct {
       Evas_Coord x, y;
    } step, page;
+   struct {
+      Evas_Coord x, y;
+      Ecore_Idler *pos_job;
+   } new;
 
    struct {
       void (*set) (Evas_Object *obj, Evas_Coord x, Evas_Coord y);
@@ -843,6 +847,15 @@ bounce_eval(Smart_Data *sd)
      }
 }
 
+static Eina_Bool
+_smart_pos_set(void *data)
+{
+   Smart_Data *sd = data;
+   elm_smart_scroller_child_pos_set(sd->smart_obj, sd->new.x, sd->new.y);
+
+   return ECORE_CALLBACK_CANCEL;
+}
+
 void
 elm_smart_scroller_child_pos_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
 {
@@ -946,6 +959,8 @@ elm_smart_scroller_child_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord 
    ny = py;
    if ((y < py) && ((y + h) < (py + (ch - my)))) ny = y;
    else if ((y > py) && ((y + h) > (py + (ch - my)))) ny = y + h - (ch - my);
+   sd->new.x = nx;
+   sd->new.y = ny;
    if ((nx == px) && (ny == py)) return;
    if ((sd->down.bounce_x_animator) || (sd->down.bounce_y_animator) ||
        (sd->scrollto.x.animator) || (sd->scrollto.y.animator))
@@ -991,7 +1006,8 @@ elm_smart_scroller_child_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord 
         sd->down.pdx = 0;
         sd->down.pdy = 0;
      }
-   elm_smart_scroller_child_pos_set(obj, nx, ny);
+   if(sd->new.pos_job) ecore_idler_del(sd->new.pos_job);
+   sd->new.pos_job = ecore_idler_add(_smart_pos_set, sd); 
 }
 
 void
