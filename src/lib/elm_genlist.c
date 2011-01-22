@@ -368,6 +368,8 @@ struct _Widget_Data
    Eina_List        *sweeped_items;
    Ecore_Timer      *scr_hold_timer;
    int               total_num;
+   int               group_item_width;
+   int               group_item_height;
 };
 
 struct _Item_Block
@@ -1939,10 +1941,16 @@ _item_realize(Elm_Genlist_Item *it,
           }
      }
 
-   if ((calc) && (it->wd->homogeneous) && (it->wd->item_width))
+   if ((calc) && (it->wd->homogeneous) && (it->wd->item_width) && it->wd->group_item_width )
      {
         /* homogenous genlist shortcut */
-         if (!it->mincalcd)
+         if ((it->flags & ELM_GENLIST_ITEM_GROUP) && (!it->mincalcd))
+           {
+              it->w = it->minw = it->wd->group_item_width;
+              it->h = it->minh = it->wd->group_item_height;
+              it->mincalcd = EINA_TRUE;
+           }
+         else if (!it->mincalcd)
            {
               it->w = it->minw = it->wd->item_width;
               it->h = it->minh = it->wd->item_height;
@@ -2041,11 +2049,22 @@ _item_realize(Elm_Genlist_Item *it,
              it->h = it->minh = mh;
              it->mincalcd = EINA_TRUE;
 
-             if ((!in) && (it->wd->homogeneous))
+             if ((it->wd->homogeneous) && (it->flags & ELM_GENLIST_ITEM_GROUP))
+             	{
+             	   it->wd->group_item_width = mw;
+             	   it->wd->group_item_height = mh;
+             	}
+             else  if ((it->wd->homogeneous))
+          //   if ((!in) && (it->wd->homogeneous))
                {
                   it->wd->item_width = mw;
                   it->wd->item_height = mh;
                }
+             if ((!in) && (it->wd->homogeneous) && (!it->wd->group_item_width))
+             	{
+             	   it->wd->group_item_width = mw;
+             	   it->wd->group_item_height = mh;
+             	}
           }
         if (!calc) evas_object_show(it->base.view);
      }
