@@ -2387,6 +2387,7 @@ _item_block_position(Item_Block *itb,
                             if ((git->scrl_y + git->h) > (it->scrl_y + it->h))
                                git->scrl_y = (it->scrl_y + it->h) - git->h;
                             git->want_realize = EINA_TRUE;
+                            if(select_all_item) git->scrl_y = select_all_item->h;
                          }
                        if (it->wd->reorder_it && !it->wd->reorder_pan_move && it->old_scrl_y &&  it->old_scrl_y != it->scrl_y)
                          {
