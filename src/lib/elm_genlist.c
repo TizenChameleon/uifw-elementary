@@ -539,6 +539,7 @@ static void _create_sweep_objs(Elm_Genlist_Item *it);
 static void _delete_sweep_objs(Elm_Genlist_Item *it);
 static void _effect_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after);
 static void _effect_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before);
+static void _group_items_recalc(void *data);
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_VERSION;
 
@@ -2306,6 +2307,7 @@ _reorder_item_moving_effect_timer_cb(void *data)
 
    _effect_item_controls(it,  it->scrl_x, it->old_scrl_y);
 
+   _group_items_recalc(it->wd);
    if (!it->wd->reorder_it || it->wd->reorder_pan_move)
      {
     	    it->old_scrl_y = it->scrl_y;
@@ -2329,7 +2331,7 @@ _item_block_position(Item_Block *itb,
    Elm_Genlist_Item *it;
    Elm_Genlist_Item *git;
    Evas_Coord y = 0, ox, oy, ow, oh, cvx, cvy, cvw, cvh;
-   int vis = 0;
+   int vis = 0, sel_all_h = 0;
    Elm_Genlist_Item *select_all_item = NULL;
 
    evas_object_geometry_get(itb->wd->pan_smart, &ox, &oy, &ow, &oh);
@@ -2351,6 +2353,7 @@ _item_block_position(Item_Block *itb,
         evas_object_raise(select_all_item->base.view);
 
         y = select_all_item->h;
+        sel_all_h = select_all_item->h;
      }
    
    EINA_LIST_FOREACH(itb->items, l, it)
@@ -2382,12 +2385,11 @@ _item_block_position(Item_Block *itb,
                        git = it->group_item;
                        if (git)
                          {
-                            if (git->scrl_y < oy)
-                               git->scrl_y = oy;
+                            if (git->scrl_y < oy + sel_all_h)
+                               git->scrl_y = oy + sel_all_h;
                             if ((git->scrl_y + git->h) > (it->scrl_y + it->h))
                                git->scrl_y = (it->scrl_y + it->h) - git->h;
                             git->want_realize = EINA_TRUE;
-                            if(select_all_item) git->scrl_y = select_all_item->h;
                          }
                        if (it->wd->reorder_it && !it->wd->reorder_pan_move && it->old_scrl_y &&  it->old_scrl_y != it->scrl_y)
                          {
