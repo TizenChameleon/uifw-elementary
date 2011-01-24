@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build100) unstable; urgency=low
+
+  * Fixed Genlist Reorder.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build100
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Mon, 24 Jan 2011 09:35:29 +0900
+
 elementary (1.0.0+svn.51480slp2+build99) unstable; urgency=low
 
   * Genlist Feature Enhancement. (Sweep, Edit Mode, Reorder, Homogeneous,
