@@ -1575,27 +1575,31 @@ _mouse_up(void            *data,
      }
    if (it->wd->reorder_mode)
      {
-        Evas_Coord rox, roy, row, roh;
+        Evas_Coord rox, roy, row, roh, sel_all_h;
         Elm_Genlist_Item *reorder_it = it->wd->reorder_it;
         if (reorder_it)
-        	 {
-					        Evas_Coord	ox,oy,oh,ow;
-					        evas_object_geometry_get(it->wd->pan_smart, &ox, &oy, &ow, &oh);
-					        evas_object_geometry_get(it->wd->reorder_it->base.view, &rox, &roy, &row, &roh);
-					        if (it->wd->reorder_rel)
-					          {
-					             if (roy + oy  <= it->wd->reorder_rel->scrl_y)
-					                _effect_item_move_before(it->wd->reorder_it, it->wd->reorder_rel);
-					             else
-					                _effect_item_move_after(it->wd->reorder_it, it->wd->reorder_rel);
-					          }
-					        it->wd->reorder_it = it->wd->reorder_rel = NULL;
-					        elm_smart_scroller_hold_set(it->wd->scr, EINA_FALSE);
-					        edje_object_signal_emit(it->edit_obj, "elm,action,item,reorder_end", "elm");
+	  {
+             Evas_Coord	ox,oy,oh,ow;
+             evas_object_geometry_get(it->wd->pan_smart, &ox, &oy, &ow, &oh);
+             evas_object_geometry_get(it->wd->reorder_it->base.view, &rox, &roy, &row, &roh);
+             if (it->wd->select_all_item) sel_all_h = it->wd->select_all_item->h; 
+             if (it->wd->reorder_it->parent == it->wd->reorder_rel->parent)  // todo : refactoring
+               { 
+                  if (it->wd->reorder_rel)
+                    {
+                       if (roy + oy - sel_all_h <= it->wd->reorder_rel->scrl_y)
+                          _effect_item_move_before(it->wd->reorder_it, it->wd->reorder_rel);
+                       else
+                          _effect_item_move_after(it->wd->reorder_it, it->wd->reorder_rel);
+                    }
+               }
+         it->wd->reorder_it = it->wd->reorder_rel = NULL;
+         elm_smart_scroller_hold_set(it->wd->scr, EINA_FALSE);
+         edje_object_signal_emit(it->edit_obj, "elm,action,item,reorder_end", "elm");
 					        
-					        if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
-					        it->wd->calc_job = ecore_job_add(_calc_job, it->wd); 
-         	}
+         if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
+         it->wd->calc_job = ecore_job_add(_calc_job, it->wd); 
+       }
      }
    if (it->wd->longpressed)
      {
@@ -2272,19 +2276,27 @@ _get_space_for_reorder_item(Elm_Genlist_Item *it)
 }
 
 static Eina_Bool
-_item_moving_effect_timer_cb2(void *data)
+_reorder_item_moving_effect_timer_cb(void *data)
 {
    Elm_Genlist_Item *it = data;
 	  Eina_Bool down = EINA_FALSE;
-	  
+   double time = 0.4, t;
+   int y, dy = 4;
+   t = ((0.0 > (t = current_time_get() -  it->wd->start_time)) ? 0.0 : t) / 1000;
+  
+   if (t <= time)
+      y = (1 * sin((t / time) * (M_PI / 2)) * dy);
+   else
+      y = dy;
+
    if (it->old_scrl_y < it->scrl_y)
      {
-        it->old_scrl_y += 4;
+        it->old_scrl_y += y;
         down = EINA_TRUE;
      }
    else if (it->old_scrl_y > it->scrl_y) 
      {
-        it->old_scrl_y -= 4;
+        it->old_scrl_y -= y;
         down = EINA_FALSE;
    	 }
 
@@ -2381,7 +2393,7 @@ _item_block_position(Item_Block *itb,
                             if (!it->move_effect_me)
                               {
                                  it->move_effect_me = EINA_TRUE;
-                                 it->item_moving_effect_timer = ecore_animator_add(_item_moving_effect_timer_cb2, it);
+                                 it->item_moving_effect_timer = ecore_animator_add(_reorder_item_moving_effect_timer_cb, it);
                               }
                         
                          }
