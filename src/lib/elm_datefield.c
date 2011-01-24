@@ -76,7 +76,6 @@ static void _sizing_eval(Evas_Object *obj);
 static void _on_focus_hook(void *data, Evas_Object *obj);
 
 static void _signal_rect_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _signal_ampm_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _entry_focused_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info);
@@ -203,18 +202,6 @@ _sizing_eval(Evas_Object *obj)
    edje_object_size_min_calc(wd->base, &minw, &minh);
    evas_object_size_hint_min_set(obj, minw, minh);
    evas_object_size_hint_max_set(obj, -1, -1);
-}
-
-static void
-_signal_ampm_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Object *focus_obj;
-
-   if (!wd || !wd->base) return ;
-
-   focus_obj = elm_widget_focused_object_get(data);
-   if (focus_obj) elm_object_unfocus(focus_obj);
 }
 
 static void
@@ -932,7 +919,6 @@ elm_datefield_add(Evas_Object *parent)
 
    edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.hour.over", _signal_rect_mouse_down, obj);
    edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.min.over", _signal_rect_mouse_down, obj);
-   edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.ampm.over", _signal_ampm_mouse_down, obj);
    edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "elm.rect.time.ampm.over", _signal_ampm_clicked, obj);
 
    wd->handler =  ecore_event_handler_add(ECORE_IMF_EVENT_COMMIT, _imf_event_commit_cb, obj);
