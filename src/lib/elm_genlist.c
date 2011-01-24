@@ -2090,7 +2090,7 @@ _item_realize(Elm_Genlist_Item *it,
    if (itc) _item_cache_free(itc);
    evas_object_smart_callback_call(it->base.widget, "realized", it);
    
-   if (it->wd->edit_mode != ELM_GENLIST_EDIT_MODE_NONE) _effect_item_realize(it);
+   if ((it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP)) _effect_item_realize(it);
 }
 
 static void
