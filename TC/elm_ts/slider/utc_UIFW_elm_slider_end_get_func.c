@@ -35,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_slider_end_icon_get_func_01(void);
-static void utc_UIFW_elm_slider_end_icon_get_func_02(void);
+static void utc_UIFW_elm_slider_end_get_func_01(void);
+static void utc_UIFW_elm_slider_end_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_slider_end_icon_get_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_slider_end_icon_get_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_slider_end_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_slider_end_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -68,9 +68,9 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_slider_end_icon_get()
+ * @brief Positive test case of elm_slider_end_get()
  */
-static void utc_UIFW_elm_slider_end_icon_get_func_01(void)
+static void utc_UIFW_elm_slider_end_get_func_01(void)
 {
         Evas_Object *icon, *ret_icon = NULL;
         Evas_Object *slider;
@@ -88,11 +88,11 @@ static void utc_UIFW_elm_slider_end_icon_get_func_01(void)
         evas_object_size_hint_weight_set(slider, EVAS_HINT_EXPAND, 0.0);
         evas_object_size_hint_align_set(slider, EVAS_HINT_FILL, 0.5);
 
-        elm_slider_end_icon_set(slider, icon);
-        ret_icon = elm_slider_end_icon_get(slider);
+        elm_slider_end_set(slider, icon);
+        ret_icon = elm_slider_end_get(slider);
 
 	if (!ret_icon) {
-		tet_infoline("elm_slider_end_icon_get() failed in positive test case");
+		tet_infoline("elm_slider_end_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -100,9 +100,9 @@ static void utc_UIFW_elm_slider_end_icon_get_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_slider_end_icon_get()
+ * @brief Negative test case of ug_init elm_slider_end_get()
  */
-static void utc_UIFW_elm_slider_end_icon_get_func_02(void)
+static void utc_UIFW_elm_slider_end_get_func_02(void)
 {
         Evas_Object *icon, *ret_icon;
         Evas_Object *slider;
@@ -120,11 +120,11 @@ static void utc_UIFW_elm_slider_end_icon_get_func_02(void)
         evas_object_size_hint_weight_set(slider, EVAS_HINT_EXPAND, 0.0);
         evas_object_size_hint_align_set(slider, EVAS_HINT_FILL, 0.5);
 
-        elm_slider_end_icon_set(slider, icon);
-        ret_icon = elm_slider_end_icon_get(NULL);
+        elm_slider_end_set(slider, icon);
+        ret_icon = elm_slider_end_get(NULL);
 
 	if (ret_icon) {
-		tet_infoline("elm_slider_end_icon_get() failed in negative test case");
+		tet_infoline("elm_slider_end_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}
