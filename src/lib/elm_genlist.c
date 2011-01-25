@@ -6160,13 +6160,12 @@ elm_genlist_edit_selected_items_del(Evas_Object *obj)
 
    edit_selected_list = elm_genlist_edit_selected_items_get(obj);
    cnt = eina_list_count(edit_selected_list);
-   printf("elm_genlist_edit_selected_items_del items selected counts = %d \n",  cnt);
+//   printf("elm_genlist_edit_selected_items_del items selected counts = %d \n",  cnt);
 
    EINA_LIST_FOREACH(edit_selected_list, l, it)
-   	 {
-   	  if (it->flags != ELM_GENLIST_ITEM_GROUP)
-        elm_genlist_item_del(it);
-    	}
+    {
+       if (it->flags != ELM_GENLIST_ITEM_GROUP) elm_genlist_item_del(it);
+    }
    eina_list_free(edit_selected_list);
 
    evas_render(evas_object_evas_get(wd->obj));
@@ -6209,8 +6208,8 @@ elm_genlist_edit_selected_items_get(const Evas_Object *obj)
 
    EINA_INLIST_FOREACH(wd->items, it)
      {
-        if (it->edit_select_check) list = eina_list_append(list, it);
-    	}
+        if (it->edit_select_check && it->flags != ELM_GENLIST_ITEM_GROUP) list = eina_list_append(list, it);
+     }
    
    return list;
 }
