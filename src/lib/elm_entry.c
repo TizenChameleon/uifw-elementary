@@ -2427,24 +2427,6 @@ elm_entry_single_line_get(const Evas_Object *obj)
 }
 
 /**
- * This set's the maximum bytes that can be added in entry.
- *
- * @param obj The entry object
- * @param max_no_of_bytes Maximum number of bytes entry can have.
- * 
- * @ingroup Entry
- */
-EAPI void
-elm_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-
-   wd->max_no_of_bytes = max_no_of_bytes;
-   edje_object_part_textinput_callback_set(wd->ent, "elm.text", _textinput_control_function,obj);
-}
-
-
-/**
  * This sets the entry object to password mode.  All text entered
  * and/or displayed within the widget will be replaced with asterisks (*).
  *

@@ -834,6 +834,7 @@ static void
 _date_entry_add(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   static Elm_Entry_Filter_Limit_Size filter_data, filter_data2;
    int i;
 
    if (!wd) return;	
@@ -852,25 +853,33 @@ _date_entry_add(Evas_Object *obj)
         evas_object_event_callback_add(wd->date[i], EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
         elm_widget_sub_object_add(obj, wd->date[i]);
      }
-   elm_entry_maximum_bytes_set(wd->date[DATE_YEAR], YEAR_MAX_LENGTH);
-   elm_entry_maximum_bytes_set(wd->date[DATE_DAY], DAY_MAX_LENGTH);
+   
+   filter_data.max_char_count = 0;
+   filter_data.max_byte_count = YEAR_MAX_LENGTH;
+   elm_entry_text_filter_append(wd->date[DATE_YEAR], elm_entry_filter_limit_size, &filter_data);
+   filter_data2.max_char_count = 0;
+   filter_data2.max_byte_count = DAY_MAX_LENGTH;
+   elm_entry_text_filter_append(wd->date[DATE_YEAR], elm_entry_filter_limit_size, &filter_data2);
 }
 
 static void 
 _time_entry_add(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   static Elm_Entry_Filter_Limit_Size filter_data;
    int i;
 
    if (!wd) return;
-
+   
+   filter_data.max_char_count = 0;
+   filter_data.max_byte_count = TIME_MAX_LENGTH;
    for (i = 0; i < TIME_MAX; i++)
      {
         wd->time[i] = elm_entry_add(obj);
         elm_entry_single_line_set(wd->time[i], EINA_TRUE);
         elm_entry_context_menu_disabled_set(wd->time[i], EINA_TRUE);
         elm_entry_input_panel_layout_set(wd->time[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);
-        elm_entry_maximum_bytes_set(wd->time[i], TIME_MAX_LENGTH);
+        elm_entry_text_filter_append(wd->time[i], elm_entry_filter_limit_size, &filter_data);
         evas_object_size_hint_weight_set(wd->time[i], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(wd->time[i], EVAS_HINT_FILL, EVAS_HINT_FILL);
         evas_object_smart_callback_add(wd->time[i], "focused", _entry_focused_cb, obj);
