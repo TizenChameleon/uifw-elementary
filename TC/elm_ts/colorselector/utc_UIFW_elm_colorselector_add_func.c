@@ -35,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_slider_end_label_get_func_01(void);
-static void utc_UIFW_elm_slider_end_label_get_func_02(void);
+static void utc_UIFW_elm_colorselector_add_func_01(void);
+static void utc_UIFW_elm_colorselector_add_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,9 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_slider_end_label_get_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_slider_end_label_get_func_02, NEGATIVE_TC_IDX },
-	{ NULL, 0 }
+	{ utc_UIFW_elm_colorselector_add_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_colorselector_add_func_02, NEGATIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -68,42 +67,36 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_slider_end_label_get()
+ * @brief Positive test case of elm_colorselector_add()
  */
-static void utc_UIFW_elm_slider_end_label_get_func_01(void)
+static void utc_UIFW_elm_colorselector_add_func_01(void)
 {
-        Evas_Object *slider;
-        const char *ret = NULL;
+	Evas_Object *colorselector;
+   	colorselector = elm_colorselector_add(main_win);
 
-        slider = elm_slider_add(main_win);
-
-        elm_slider_end_label_set(slider, "Hello!!!");
-   	ret = elm_slider_end_label_get(slider);
-
-	if (!ret && !strcmp(ret, "Hello!!!")) {
-		tet_infoline("elm_slider_end_label_get() failed in positive test case");
+	if (!colorselector) {
+		tet_infoline("elm_colorselector_add() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
+	evas_object_del(colorselector);
+	colorselector = NULL;
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_slider_end_label_get()
+ * @brief Negative test case of ug_init elm_colorselector_add()
  */
-static void utc_UIFW_elm_slider_end_label_get_func_02(void)
+static void utc_UIFW_elm_colorselector_add_func_02(void)
 {
-        Evas_Object *slider;
-        const char *ret = NULL;
+	Evas_Object *colorselector;
+   	colorselector = elm_colorselector_add(NULL);
 
-        slider = elm_slider_add(main_win);
-
-        elm_slider_end_label_set(slider, "Hello!!!");
-        ret = elm_slider_end_label_get(NULL);
-
-        if (ret) {
-		tet_infoline("elm_slider_end_label_get() failed in negative test case");
+	if (colorselector) {
+		tet_infoline("elm_colorselector_add() failed in negative test case");
 		tet_result(TET_FAIL);
+		evas_object_del(colorselector);
+		colorselector = NULL;
 		return;
 	}
 	tet_result(TET_PASS);

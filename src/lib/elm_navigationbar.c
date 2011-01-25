@@ -1372,23 +1372,6 @@ elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
- * deprecate this This disables content area animation on push/pop.
- *
- * @param[in] obj The NavigationBar object
- * @param[in] disable  if EINA_TRUE animation is disabled.
- *
- * @ingroup NavigationBar
- */
-EAPI void 
-elm_navigationbar_animation_disable_set(Evas_Object *obj, Eina_Bool disable)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   
-   elm_pager_animation_disabled_set(wd->pager, disable);
-}
-
-/**
  * This disables content area animation on push/pop.
  *
  * @param[in] obj The NavigationBar object

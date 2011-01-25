@@ -187,7 +187,7 @@ test_list2(void *data, Evas_Object *obj, void *event_info)
    li = elm_list_add(win);
    evas_object_size_hint_align_set(li, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(li, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_list_horizontal_mode_set(li, ELM_LIST_LIMIT);
+   elm_list_mode_set(li, ELM_LIST_LIMIT);
 //   elm_list_multi_select_set(li, 1);
 
    ic = elm_icon_add(win);
@@ -292,7 +292,7 @@ test_list3(void *data, Evas_Object *obj, void *event_info)
    li = elm_list_add(win);
    elm_win_resize_object_add(win, li);
    evas_object_size_hint_weight_set(li, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_list_horizontal_mode_set(li, ELM_LIST_COMPRESS);
+   elm_list_mode_set(li, ELM_LIST_COMPRESS);
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);

@@ -660,8 +660,8 @@ _elm_fx_resizing_op(void *data, Elm_Animator *animator, double frame)
 
    Elm_Fx_Resizing *resizing = data;
 
-   w = resizing->from.w + (Evas_Coord) ((float)resizing->to.h * (float)frame);
-   h = resizing->from.h + (Evas_Coord) ((float)resizing->to.w * (float)frame);
+   w = resizing->from.w + (Evas_Coord) ((float)resizing->to.w * (float)frame);
+   h = resizing->from.h + (Evas_Coord) ((float)resizing->to.h * (float)frame);
    evas_object_resize(resizing->obj, w, h);
 }
 
