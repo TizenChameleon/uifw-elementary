@@ -55,6 +55,13 @@ static void startup(void)
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
 	popup = elm_popup_add(main_win);
+	Evas_Object *icon = elm_icon_add(popup);
+	snprintf(buf, sizeof(buf), "%s/00_volume_icon.png", ICON_DIR);
+	elm_icon_file_set(icon, buf, NULL);
+	evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+	elm_icon_scale_set(icon, 1, 1);
+	
+	elm_popup_content_set(popup,icon);
 	evas_object_show(popup);	
 }
 

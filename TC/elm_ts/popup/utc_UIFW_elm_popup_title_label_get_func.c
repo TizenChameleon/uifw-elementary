@@ -56,6 +56,7 @@ static void startup(void)
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
 	popup = elm_popup_add(main_win);
+	elm_popup_title_label_set(popup, "title");
 	evas_object_show(popup);	
 }
 
