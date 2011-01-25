@@ -74,17 +74,16 @@ static void utc_UIFW_elm_slider_end_set_func_01(void)
 {
         Evas_Object *icon, *ret_icon;
         Evas_Object *slider;
-        Eina_Bool ret = EINA_FALSE;
 
         icon = elm_icon_add(main_win);
         elm_icon_file_set(icon, ICON_DIR"/00_brightness_right.png", NULL);
         evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 
         slider = elm_slider_add(main_win);
-        ret = elm_slider_end_set(slider, icon);
+        elm_slider_end_set(slider, icon);
         ret_icon = elm_slider_end_get(slider);
 
-        if (!ret_icon && !ret) {
+        if (!ret_icon) {
               tet_infoline("elm_slider_end_set() failed in positive test case");
               tet_result(TET_FAIL);
 	      return;
@@ -99,17 +98,16 @@ static void utc_UIFW_elm_slider_end_set_func_02(void)
 {
         Evas_Object *icon, *ret_icon;
         Evas_Object *slider;
-        Eina_Bool ret = EINA_FALSE;
 
         icon = elm_icon_add(main_win);
         elm_icon_file_set(icon, ICON_DIR"/00_brightness_right.png", NULL);
         evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 
         slider = elm_slider_add(main_win);
-        ret = elm_slider_end_set(slider, NULL);
+        elm_slider_end_set(slider, NULL);
         ret_icon = elm_slider_end_get(slider);
 
-	if (ret_icon && ret) {
+	if (ret_icon) {
 		tet_infoline("elm_slider_end_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
