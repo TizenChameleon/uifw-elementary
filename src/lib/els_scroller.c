@@ -12,6 +12,7 @@ typedef struct _Smart_Data Smart_Data;
 struct _Smart_Data
 {
    Evas_Coord   x, y, w, h;
+   Evas_Coord   wx, wy, ww, wh; /* Last "wanted" geometry */
 
    Evas_Object *smart_obj;
    Evas_Object *child_obj;
@@ -71,6 +72,10 @@ struct _Smart_Data
    struct {
       Evas_Coord x, y;
    } step, page;
+   struct {
+      Evas_Coord x, y;
+      Ecore_Idler *pos_job;
+   } new;
 
    struct {
       void (*set) (Evas_Object *obj, Evas_Coord x, Evas_Coord y);
@@ -166,6 +171,7 @@ elm_smart_scroller_child_set(Evas_Object *obj, Evas_Object *child)
      }
 
    sd->child_obj = child;
+   sd->wx = sd->wy = sd->ww = sd->wh = 0;
    if (!child) return;
 
    if (!sd->pan_obj)
@@ -401,7 +407,7 @@ _smart_scrollto_x(Smart_Data *sd, double t_in, Evas_Coord pos_x)
         elm_smart_scroller_child_pos_get(sd->smart_obj, &x, &y);
         elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &w, &h);
         x = pos_x;
-        elm_smart_scroller_child_region_show(sd->smart_obj, x, y, w, h);
+        elm_smart_scroller_child_region_set(sd->smart_obj, x, y, w, h);
         return;
      }
    t = ecore_loop_time_get();
@@ -412,7 +418,7 @@ _smart_scrollto_x(Smart_Data *sd, double t_in, Evas_Coord pos_x)
    sd->scrollto.x.t_end = t + t_in;
    elm_smart_scroller_child_pos_get(sd->smart_obj, &x, &y);
    elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &w, &h);
-   elm_smart_scroller_child_region_show(sd->smart_obj, x, y, w, h);
+   elm_smart_scroller_child_region_set(sd->smart_obj, x, y, w, h);
    if (!sd->scrollto.x.animator)
      {
         if (!sd->scrollto.y.animator)
@@ -468,7 +474,7 @@ _smart_scrollto_y(Smart_Data *sd, double t_in, Evas_Coord pos_y)
         elm_smart_scroller_child_pos_get(sd->smart_obj, &x, &y);
         elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &w, &h);
         y = pos_y;
-        elm_smart_scroller_child_region_show(sd->smart_obj, x, y, w, h);
+        elm_smart_scroller_child_region_set(sd->smart_obj, x, y, w, h);
         return;
      }
    t = ecore_loop_time_get();
@@ -479,7 +485,7 @@ _smart_scrollto_y(Smart_Data *sd, double t_in, Evas_Coord pos_y)
    sd->scrollto.y.t_end = t + t_in;
    elm_smart_scroller_child_pos_get(sd->smart_obj, &x, &y);
    elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &w, &h);
-   elm_smart_scroller_child_region_show(sd->smart_obj, x, y, w, h);
+   elm_smart_scroller_child_region_set(sd->smart_obj, x, y, w, h);
    if (!sd->scrollto.y.animator)
      {
         if (!sd->scrollto.x.animator)
@@ -574,7 +580,7 @@ _smart_page_adjust(Smart_Data *sd)
    x = _smart_page_x_get(sd, 0);
    y = _smart_page_y_get(sd, 0);
 
-   elm_smart_scroller_child_region_show(sd->smart_obj, x, y, w, h);
+   elm_smart_scroller_child_region_set(sd->smart_obj, x, y, w, h);
 }
 
 static Eina_Bool
@@ -843,6 +849,29 @@ bounce_eval(Smart_Data *sd)
      }
 }
 
+static Eina_Bool
+_smart_pos_set(void *data)
+{
+   Smart_Data *sd = data;
+   elm_smart_scroller_child_pos_set(sd->smart_obj, sd->new.x, sd->new.y);
+
+   if (sd->new.pos_job) ecore_idler_del(sd->new.pos_job);
+   sd->new.pos_job = NULL;
+   return ECORE_CALLBACK_CANCEL;
+}
+
+static Eina_Bool
+_smart_bring_set(void *data)
+{
+   Smart_Data *sd = data;
+   _smart_scrollto_x(sd, _elm_config->bring_in_scroll_friction, sd->new.x);
+   _smart_scrollto_y(sd, _elm_config->bring_in_scroll_friction, sd->new.y);
+
+   if (sd->new.pos_job) ecore_idler_del(sd->new.pos_job);
+   sd->new.pos_job = NULL;
+   return ECORE_CALLBACK_CANCEL;
+}
+
 void
 elm_smart_scroller_child_pos_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
 {
@@ -929,8 +958,10 @@ elm_smart_scroller_child_pos_get(Evas_Object *obj, Evas_Coord *x, Evas_Coord *y)
    sd->pan_func.get(sd->pan_obj, x, y);
 }
 
-void
-elm_smart_scroller_child_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
+/* "internal_call" actually toggles whether we should save the coords and do
+ * extra "speedup" checks, or not. */
+static void
+_elm_smart_scroller_child_region_show_internal(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h, Eina_Bool internal_call)
 {
    Evas_Coord mx = 0, my = 0, cw = 0, ch = 0, px = 0, py = 0, nx, ny, minx = 0, miny = 0;
 
@@ -946,7 +977,15 @@ elm_smart_scroller_child_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord 
    ny = py;
    if ((y < py) && ((y + h) < (py + (ch - my)))) ny = y;
    else if ((y > py) && ((y + h) > (py + (ch - my)))) ny = y + h - (ch - my);
-   if ((nx == px) && (ny == py)) return;
+//   if ((nx == px) && (ny == py)) return;
+   if (!internal_call)
+      {
+         sd->wx = x;
+         sd->wy = y;
+         sd->ww = w;
+         sd->wh = h;
+         if ((nx == px) && (ny == py)) return;
+      }
    if ((sd->down.bounce_x_animator) || (sd->down.bounce_y_animator) ||
        (sd->scrollto.x.animator) || (sd->scrollto.y.animator))
      {
@@ -991,7 +1030,28 @@ elm_smart_scroller_child_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord 
         sd->down.pdx = 0;
         sd->down.pdy = 0;
      }
-   elm_smart_scroller_child_pos_set(obj, nx, ny);
+   sd->new.x = nx;
+   sd->new.y = ny;
+   if (sd->new.pos_job) ecore_idler_del(sd->new.pos_job);
+   sd->new.pos_job = NULL;
+   sd->new.pos_job = ecore_idler_add(_smart_pos_set, sd); 
+}
+
+/* Set should be used for calculated positions, for example, when we move
+ * because of an animation or because this is the correct position after
+ * constraints. */
+void
+elm_smart_scroller_child_region_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
+{
+   _elm_smart_scroller_child_region_show_internal(obj, x, y, w, h, EINA_TRUE);
+}
+
+/* Set should be used for setting the wanted position, for example a user scroll
+ * or moving the cursor in an entry. */
+void
+elm_smart_scroller_child_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
+{
+   _elm_smart_scroller_child_region_show_internal(obj, x, y, w, h, EINA_FALSE);
 }
 
 void
@@ -1180,7 +1240,7 @@ elm_smart_scroller_paging_set(Evas_Object *obj, double pagerel_h, double pagerel
    sd->pagerel_v = pagerel_v;
    sd->pagesize_h = pagesize_h;
    sd->pagesize_v = pagesize_v;
-   _smart_page_adjust(sd);
+   if (sd->child_obj) _smart_page_adjust(sd);
 }
 
 void
@@ -1205,19 +1265,11 @@ elm_smart_scroller_region_bring_in(Evas_Object *obj, Evas_Coord x, Evas_Coord y,
    sd->pan_func.get(sd->pan_obj, &px, &py);
 
    nx = px;
-   if (x < px) nx = x;
-   else if ((x + w) > (px + (cw - mx)))
-     {
-	nx = x + w - (cw - mx);
-	if (nx > x) nx = x;
-     }
+   if ((x < px) && ((x + w) < (px + (cw - mx)))) nx = x;
+   else if ((x > px) && ((x + w) > (px + (cw - mx)))) nx = x + w - (cw - mx);
    ny = py;
-   if (y < py) ny = y;
-   else if ((y + h) > (py + (ch - my)))
-     {
-	ny = y + h - (ch - my);
-	if (ny > y) ny = y;
-     }
+   if ((y < py) && ((y + h) < (py + (ch - my)))) ny = y;
+   else if ((y > py) && ((y + h) > (py + (ch - my)))) ny = y + h - (ch - my);
    if ((nx == px) && (ny == py)) return;
    if ((sd->down.bounce_x_animator) || (sd->down.bounce_y_animator) ||
        (sd->scrollto.x.animator) || (sd->scrollto.y.animator))
@@ -1266,11 +1318,14 @@ elm_smart_scroller_region_bring_in(Evas_Object *obj, Evas_Coord x, Evas_Coord y,
    x = nx;
    if (x < minx) x = minx;
    else if ((x + w) > cw) x = cw - w;
-   _smart_scrollto_x(sd, _elm_config->bring_in_scroll_friction, x);
    y = ny;
    if (y < miny) y = miny;
    else if ((y + h) > ch) y = ch - h;
-   _smart_scrollto_y(sd, _elm_config->bring_in_scroll_friction, y);
+   sd->new.x = nx;
+   sd->new.y = ny;
+   if (sd->new.pos_job) ecore_idler_del(sd->new.pos_job);
+   sd->new.pos_job = NULL;
+   sd->new.pos_job = ecore_idler_add(_smart_bring_set, sd);
 }
 
 void
@@ -1459,7 +1514,11 @@ _smart_event_wheel(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, 
      x += ev->z * sd->step.x;
 
    if ((!sd->hold) && (!sd->freeze))
-     elm_smart_scroller_child_pos_set(sd->smart_obj, x, y);
+     {
+        sd->wx = x;
+        sd->wy = y;
+        elm_smart_scroller_child_pos_set(sd->smart_obj, x, y);
+     }
 }
 
 static void
@@ -1521,6 +1580,11 @@ _smart_event_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSE
              sd->down.ax = 0;
              sd->down.ay = 0;
 	  }
+        if (sd->new.pos_job)
+          {
+             ecore_idler_del(sd->new.pos_job);
+             sd->new.pos_job;
+          }
 	if (ev->button == 1)
 	  {
 	     sd->down.now = 1;
@@ -1572,6 +1636,8 @@ _smart_hold_animator(void *data)
           }
      }
    elm_smart_scroller_child_pos_set(sd->smart_obj, ox, oy);
+   sd->wx = ox;
+   sd->wy = oy;
    return ECORE_CALLBACK_RENEW;
 }
 
@@ -1790,6 +1856,8 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
 	     sd->down.now = 0;
              elm_smart_scroller_child_pos_get(sd->smart_obj, &x, &y);
              elm_smart_scroller_child_pos_set(sd->smart_obj, x, y);
+             sd->wx = x;
+             sd->wy = y;
              if (!_smart_do_page(sd))
                bounce_eval(sd);
 	  }
@@ -1838,6 +1906,8 @@ _smart_onhold_animator(void *data)
           }
         
         elm_smart_scroller_child_pos_set(sd->smart_obj, x, y);
+        sd->wx = x;
+        sd->wy = y;
 //        printf("scroll %i %i\n", sd->down.hold_x, sd->down.hold_y);
      }
    sd->down.onhold_tlast = t;
@@ -1927,6 +1997,8 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *
 #ifdef SCROLLDBG
              printf("::: %i %i\n", ev->cur.canvas.x, ev->cur.canvas.y);
 #endif
+             sd->wx = ev->cur.canvas.x;
+             sd->wy = ev->cur.canvas.y;
 	     memmove(&(sd->down.history[1]), &(sd->down.history[0]),
 		     sizeof(sd->down.history[0]) * 19);
 #ifdef EVTIME
@@ -2495,6 +2567,7 @@ _smart_del(Evas_Object *obj)
    if (sd->down.bounce_y_animator) ecore_animator_del(sd->down.bounce_y_animator);
    if (sd->scrollto.x.animator) ecore_animator_del(sd->scrollto.x.animator);
    if (sd->scrollto.y.animator) ecore_animator_del(sd->scrollto.y.animator);
+   if (sd->new.pos_job) ecore_idler_del(sd->new.pos_job);
    free(sd);
    evas_object_smart_data_set(obj, NULL);
 }
@@ -2515,6 +2588,7 @@ _smart_resize(Evas_Object *obj, Evas_Coord w, Evas_Coord h)
    sd->w = w;
    sd->h = h;
    _smart_reconfigure(sd);
+   elm_smart_scroller_child_region_set(obj, sd->wx, sd->wy, sd->ww, sd->h);
 }
 
 static void

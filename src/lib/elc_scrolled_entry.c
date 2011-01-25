@@ -1009,9 +1009,9 @@ elm_scrolled_entry_cursor_end_set(Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   int x, y, w, h;
-   elm_scroller_region_get(wd->scroller, &x, &y, &w, &h);
+   Evas_Coord x, y, w, h;
    elm_entry_cursor_end_set(wd->entry);
+   elm_widget_show_region_get(wd->entry, &x, &y, &w, &h);
    elm_scroller_region_show(wd->scroller, x, y, w, h);
 }
 
@@ -1295,23 +1295,6 @@ elm_scrolled_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    elm_scroller_bounce_set(wd->scroller, h_bounce, v_bounce);
-}
-
-/**
- * This set's the maximum bytes that can be added in to scrolled entry.
- *
- * @param obj The  scrolled entry object
- * @param max_no_of_bytes Maximum number of bytes scrolled entry can have.
- * 
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_entry_maximum_bytes_set(wd->entry,max_no_of_bytes);
 }
 
 /**

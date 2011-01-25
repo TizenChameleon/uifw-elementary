@@ -2496,14 +2496,3 @@ elm_list_item_disabled_get(const Elm_List_Item *it)
    return it->disabled;
 }
 
-EAPI void
-elm_list_horizontal_mode_set(Evas_Object *obj, Elm_List_Mode mode)
-{
-   elm_list_mode_set(obj, mode);   
-}
-
-EAPI Elm_List_Mode
-elm_list_horizontal_mode_get(const Evas_Object *obj)
-{
-   return elm_list_mode_get(obj);
-}

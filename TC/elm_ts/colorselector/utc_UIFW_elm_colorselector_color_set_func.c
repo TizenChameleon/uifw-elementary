@@ -28,7 +28,7 @@
 
 
 Evas_Object *main_win;
-Evas_Object *colorpicker;
+Evas_Object *colorselector;
 
 static void startup(void);
 static void cleanup(void);
@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_colorpicker_color_set_func_01(void);
-static void utc_UIFW_elm_colorpicker_color_set_func_02(void);
+static void utc_UIFW_elm_colorselector_color_set_func_01(void);
+static void utc_UIFW_elm_colorselector_color_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_colorpicker_color_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_colorpicker_color_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_colorselector_color_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_colorselector_color_set_func_02, NEGATIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -55,8 +55,8 @@ static void startup(void)
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
-	colorpicker = elm_colorpicker_add(main_win);
-	evas_object_show(colorpicker);
+	colorselector = elm_colorselector_add(main_win);
+	evas_object_show(colorselector);
 }
 
 static void cleanup(void)
@@ -65,28 +65,28 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
-	if ( NULL != colorpicker ) {
-		evas_object_del(colorpicker);
-	       	colorpicker = NULL;
+	if ( NULL != colorselector ) {
+		evas_object_del(colorselector);
+	       	colorselector = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_colorpicker_color_set()
+ * @brief Positive test case of elm_colorselector_color_set()
  */
-static void utc_UIFW_elm_colorpicker_color_set_func_01(void)
+static void utc_UIFW_elm_colorselector_color_set_func_01(void)
 {
-   	elm_colorpicker_color_set(colorpicker, 255, 255, 255);
+   	elm_colorselector_color_set(colorselector, 255, 255, 255, 255);
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_colorpicker_color_set()
+ * @brief Negative test case of ug_init elm_colorselector_color_set()
  */
-static void utc_UIFW_elm_colorpicker_color_set_func_02(void)
+static void utc_UIFW_elm_colorselector_color_set_func_02(void)
 {
-   	elm_colorpicker_color_set(NULL, 255, 255, 255);
+   	elm_colorselector_color_set(NULL, 255, 255, 255, 255);
 	tet_result(TET_PASS);
 }

@@ -1191,39 +1191,3 @@ elm_slider_indicator_show_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return wd->indicator_show;
 }
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////  DEPRECTAED  ///////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-EAPI Eina_Bool 
-elm_slider_end_icon_set(Evas_Object *obj, Evas_Object *icon)
-{
-   elm_slider_end_set(obj, icon);
-   return EINA_TRUE;
-}
-
-EAPI Evas_Object *
-elm_slider_end_icon_get(Evas_Object *obj)
-{
-   return elm_slider_end_get(obj);
-}
-
-EAPI void
-elm_slider_value_animated_set(Evas_Object *obj, double val)
-{
-   return ;
-}
-
-EAPI void
-elm_slider_end_label_set(Evas_Object *obj, const char *label)
-{
-   return ;
-}
-
-EAPI const char *
-elm_slider_end_label_get(const Evas_Object *obj)
-{
-   return NULL;
-}

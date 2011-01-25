@@ -1150,7 +1150,7 @@ _matchlist_show(void *data)
 	text = elm_entry_entry_get(data);
 	if (text == NULL)
 		return;	
-	textlen  = strlen(text);
+	textlen = strlen(text);
 	
 	if (textlen < wd->matchlist_threshold)
 	{
@@ -1166,13 +1166,13 @@ _matchlist_show(void *data)
 		EINA_LIST_FOREACH(wd->match_list, l, str_list) 
 		{
 			if (wd->matchlist_case_sensitive)
-				str_result = strstr(str_list,text);
+				str_result = strstr(str_list, text);
 			else
-				str_result = strcasestr(str_list,text);
+				str_result = strcasestr(str_list, text);
 
 			if (str_result)
 			{
-				str_mkup = malloc(strlen(str_list) + 24);
+				str_mkup = malloc(strlen(str_list) + 16);
 
 				textlen = strlen(str_list) - strlen(str_result);
 				str_front = malloc(textlen + 1);
@@ -1186,21 +1186,19 @@ _matchlist_show(void *data)
 				
 				sprintf(str_mkup, "%s<match>%s</match>%s", str_front, str_mid, str_result + strlen(text));
 
-				if (str_front)
-					free(str_front);
-
-				if (str_mid)
-					free(str_mid);
-
 				elm_list_item_append(wd->list, str_mkup, NULL, NULL, NULL, NULL);
-				//free(str_mkup);
-				//str_mkup = NULL;
+
+				if (str_mkup) free(str_mkup);
+				if (str_front) free(str_front);
+				if (str_mid) free(str_mid);
+
 				textfound=EINA_TRUE;
 			}
 		}
 	}
 	else
 		return;
+
 	if (textfound)
 	{
 		elm_list_go(wd->list);		
@@ -1240,6 +1238,9 @@ elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_
 
    if (match_list)
    {
+	   Evas_Coord max_w = 9999, max_h = 9999;
+	   const char* key_data = NULL;
+	   
 	   wd->matchlist_threshold = 1;
 	   wd->hover = elm_hover_add(elm_widget_parent_get(obj));
 	   elm_hover_parent_set(wd->hover, elm_widget_parent_get(obj));
@@ -1251,9 +1252,16 @@ elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_
 	   wd->list = elm_list_add(wd->layout);
 	   evas_object_size_hint_weight_set(wd->list, EVAS_HINT_EXPAND, 0.0);
 	   evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
-	   elm_list_mode_set(wd->list, ELM_LIST_COMPRESS);
+	   elm_list_mode_set(wd->list, ELM_LIST_EXPAND);
 	   elm_object_style_set(wd->list, "matchlist");
+	   
+	   key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_width");
+	   if (key_data) max_w = atoi(key_data);
+	   key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_height");
+	   if (key_data) max_h = atoi(key_data);
+
 	   elm_list_go(wd->list);
+	   evas_object_size_hint_max_set(wd->list, max_w, max_h);
 	   evas_object_smart_callback_add(wd->list, "selected", _matchlist_list_clicked, obj);
 	   elm_layout_content_set(wd->layout, "elm.swallow.content", wd->list);
 	   elm_hover_content_set(wd->hover, "bottom", wd->layout);
@@ -2796,6 +2804,32 @@ elm_entry_select_all(Evas_Object *obj)
      }
    wd->have_selection = EINA_TRUE;
    edje_object_part_text_select_all(wd->ent, "elm.text");
+}
+
+/**
+ * This function returns the geometry of the cursor.
+ *
+ * It's useful if you want to draw something on the cursor (or where it is),
+ * or for example in the case of scrolled entry where you want to show the
+ * cursor.
+ *
+ * @param obj The entry object
+ * @param x returned geometry
+ * @param y returned geometry
+ * @param w returned geometry
+ * @param h returned geometry
+ * @return EINA_TRUE upon success, EINA_FALSE upon failure
+ *
+ * @ingroup Entry
+ */
+EAPI Eina_Bool
+elm_entry_cursor_geometry_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", x, y, w, h);
+   return EINA_TRUE;
 }
 
 /**
