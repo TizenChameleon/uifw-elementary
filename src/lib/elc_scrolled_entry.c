@@ -1298,23 +1298,6 @@ elm_scrolled_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_
 }
 
 /**
- * This set's the maximum bytes that can be added in to scrolled entry.
- *
- * @param obj The  scrolled entry object
- * @param max_no_of_bytes Maximum number of bytes scrolled entry can have.
- * 
- * @ingroup Scrolled_Entry
- */
-EAPI void
-elm_scrolled_entry_maximum_bytes_set(Evas_Object *obj, int max_no_of_bytes)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_entry_maximum_bytes_set(wd->entry,max_no_of_bytes);
-}
-
-/**
  * Get the bounce mode
  *
  * @param obj The Scrolled_Entry object
