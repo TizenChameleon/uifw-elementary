@@ -364,6 +364,21 @@ elm_transit_del(Elm_Transit *transit)
 }
 
 /**
+ * Set the transit animation acceleration style. 
+ *
+ * @param transit	Transit
+ * @param cs Curve style(Please refer elm_animator_curve_style_set)
+ *
+ * @ingroup Transit 
+ */
+EAPI void
+elm_transit_curve_style_set(Elm_Transit *transit, Elm_Animator_Curve_Style cs)
+{
+   ELM_TRANSIT_CHECK_OR_RETURN(transit);
+   elm_animator_curve_style_set(transit->animator, cs);
+}
+
+/**
  * Set the transit animation acceleration type.
  *
  * This function sets the tween mode of the transit that can be:
@@ -645,8 +660,8 @@ _elm_fx_resizing_op(void *data, Elm_Animator *animator, double frame)
 
    Elm_Fx_Resizing *resizing = data;
 
-   w = resizing->from.w + (Evas_Coord) ((float)resizing->to.h * (float)frame);
-   h = resizing->from.h + (Evas_Coord) ((float)resizing->to.w * (float)frame);
+   w = resizing->from.w + (Evas_Coord) ((float)resizing->to.w * (float)frame);
+   h = resizing->from.h + (Evas_Coord) ((float)resizing->to.h * (float)frame);
    evas_object_resize(resizing->obj, w, h);
 }
 
