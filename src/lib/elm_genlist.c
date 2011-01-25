@@ -451,6 +451,7 @@ struct _Elm_Genlist_Item
    Eina_Bool   down : 1;
    Eina_Bool   dragging : 1;
    Eina_Bool   updateme : 1;
+   Eina_Bool   nocache : 1;
 
    // TODO: refactoring
    Eina_Bool   move_effect_me : 1;
@@ -1834,11 +1835,14 @@ _item_realize(Elm_Genlist_Item *it,
    const char *treesize;
    char buf[1024];
    int depth, tsize = 20;
-   Item_Cache *itc;
+   Item_Cache *itc = NULL;
 
    it->order_num_in = in;
 
-   itc = _item_cache_find(it);
+   if (it->nocache)
+      it->nocache = EINA_FALSE;
+   else
+      itc = _item_cache_find(it);
    if (!it->wd->effect_mode && itc)
      {
         it->base.view = itc->base_view;
@@ -2107,7 +2111,7 @@ _item_unrealize(Elm_Genlist_Item *it)
         ecore_timer_del(it->long_timer);
         it->long_timer = NULL;
      }
-   if (it->sweeped || it->wassweeped) 
+   if ((it->sweeped) || (it->wassweeped) || (it->nocache))
      {
         it->sweeped = EINA_FALSE;
         it->wassweeped = EINA_FALSE;
@@ -4596,6 +4600,7 @@ elm_genlist_item_item_class_update(Elm_Genlist_Item             *it,
    EINA_SAFETY_ON_NULL_RETURN(itc);
    if (it->delete_me) return;
    it->itc = itc;
+   it->nocache = EINA_TRUE;
    elm_genlist_item_update(it);
 }
 
