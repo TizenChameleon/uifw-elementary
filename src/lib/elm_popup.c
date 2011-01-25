@@ -821,30 +821,6 @@ elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient)
 }
 
 /**
- * Applications which do not pass any window to popup need to take care of rotation, only when popup is already shown.
- * @param obj The popup object
- * @param rot_angle  the angle to which popup has to be rotated.
- *
- * @ingroup Popup
- */
-EAPI void 
-elm_popup_rotation_set(Evas_Object *obj, int rot_angle)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-
-   if (!wd) return;  
-   if (wd->parent)
-     {
-        if (wd->rot_angle != rot_angle)
-          {
-             elm_win_rotation_with_resize_set(wd->parent,rot_angle);
-             wd->rot_angle = rot_angle;
-          }
-     }
-}
-
-/**
  * Blocks in a main loop until popup either emits response signal or is exited due
  * to exit signal, when exit signal is received dialog responds with ELM_POPUP_RESPONSE_NONE
  * response ID else returns the response ID from response signal emission.

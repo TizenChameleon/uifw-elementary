@@ -364,21 +364,6 @@ elm_transit_del(Elm_Transit *transit)
 }
 
 /**
- * Set the transit animation acceleration style. 
- *
- * @param transit	Transit
- * @param cs Curve style(Please refer elm_animator_curve_style_set)
- *
- * @ingroup Transit 
- */
-EAPI void
-elm_transit_curve_style_set(Elm_Transit *transit, Elm_Animator_Curve_Style cs)
-{
-   ELM_TRANSIT_CHECK_OR_RETURN(transit);
-   elm_animator_curve_style_set(transit->animator, cs);
-}
-
-/**
  * Set the transit animation acceleration type.
  *
  * This function sets the tween mode of the transit that can be:
