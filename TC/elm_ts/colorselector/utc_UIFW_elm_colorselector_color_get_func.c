@@ -28,6 +28,7 @@
 
 
 Evas_Object *main_win;
+Evas_Object *colorselector;
 
 static void startup(void);
 static void cleanup(void);
@@ -35,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_colorpicker_add_func_01(void);
-static void utc_UIFW_elm_colorpicker_add_func_02(void);
+static void utc_UIFW_elm_colorselector_color_get_func_01(void);
+static void utc_UIFW_elm_colorselector_color_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_colorpicker_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_colorpicker_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_colorselector_color_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_colorselector_color_get_func_02, NEGATIVE_TC_IDX },
 };
 
 static void startup(void)
@@ -54,6 +55,8 @@ static void startup(void)
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
+	colorselector = elm_colorselector_add(main_win);
+	evas_object_show(colorselector);
 }
 
 static void cleanup(void)
@@ -62,42 +65,30 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
+	if ( NULL != colorselector ) {
+		evas_object_del(colorselector);
+	       	colorselector = NULL;
+	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_colorpicker_add()
+ * @brief Positive test case of elm_colorselector_color_get()
  */
-static void utc_UIFW_elm_colorpicker_add_func_01(void)
+static void utc_UIFW_elm_colorselector_color_get_func_01(void)
 {
-	Evas_Object *colorpicker;
-   	colorpicker = elm_colorpicker_add(main_win);
-
-	if (!colorpicker) {
-		tet_infoline("elm_colorpicker_add() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	evas_object_del(colorpicker);
-	colorpicker = NULL;
+	int r, g, b, a;
+   	elm_colorselector_color_get(colorselector, &r, &g, &b, &a);
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_colorpicker_add()
+ * @brief Negative test case of ug_init elm_colorselector_color_get()
  */
-static void utc_UIFW_elm_colorpicker_add_func_02(void)
+static void utc_UIFW_elm_colorselector_color_get_func_02(void)
 {
-	Evas_Object *colorpicker;
-   	colorpicker = elm_colorpicker_add(NULL);
-
-	if (colorpicker) {
-		tet_infoline("elm_colorpicker_add() failed in negative test case");
-		tet_result(TET_FAIL);
-		evas_object_del(colorpicker);
-		colorpicker = NULL;
-		return;
-	}
+	int r, g, b, a;
+   	elm_colorselector_color_get(NULL, &r, &g, &b, &a);
 	tet_result(TET_PASS);
 }

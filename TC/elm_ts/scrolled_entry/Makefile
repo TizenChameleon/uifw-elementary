@@ -31,7 +31,6 @@ TARGETS = utc_UIFW_elm_scrolled_entry_add_func \
 	utc_UIFW_elm_scrolled_entry_input_panel_layout_set_func \
 	utc_UIFW_elm_scrolled_entry_line_char_wrap_set_func \
 	utc_UIFW_elm_scrolled_entry_line_wrap_set_func \
-	utc_UIFW_elm_scrolled_entry_maximum_bytes_set_func \
 	utc_UIFW_elm_scrolled_entry_password_get_func \
 	utc_UIFW_elm_scrolled_entry_password_set_func \
 	utc_UIFW_elm_scrolled_entry_password_show_last_character_set_func \

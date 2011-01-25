@@ -1,10 +1,8 @@
 CC ?= gcc
 
 TARGETS = utc_UIFW_elm_slider_add_func \
-		utc_UIFW_elm_slider_end_icon_get_func \
-		utc_UIFW_elm_slider_end_icon_set_func \
-		utc_UIFW_elm_slider_end_label_get_func \
-		utc_UIFW_elm_slider_end_label_set_func \
+		utc_UIFW_elm_slider_end_get_func \
+		utc_UIFW_elm_slider_end_set_func \
 		utc_UIFW_elm_slider_horizontal_get_func \
 		utc_UIFW_elm_slider_horizontal_set_func \
 		utc_UIFW_elm_slider_icon_get_func \
