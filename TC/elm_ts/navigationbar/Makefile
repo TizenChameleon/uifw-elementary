@@ -15,6 +15,7 @@ TARGETS = utc_UIFW_elm_navigationbar_add_func \
 	  utc_UIFW_elm_navigationbar_title_button_get_func \
 	  utc_UIFW_elm_navigationbar_subtitle_label_get_func \
 	  utc_UIFW_elm_navigationbar_subtitle_label_set_func \
+	  utc_UIFW_elm_navigationbar_animation_disabled_set_func \
 	  utc_UIFW_elm_navigationbar_title_object_list_unset_func 
 
 PKGS = elementary
