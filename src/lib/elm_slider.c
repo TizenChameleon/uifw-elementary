@@ -197,7 +197,7 @@ _theme_hook(Evas_Object *obj)
      _elm_theme_object_set(obj, wd->slider, "slider", "horizontal", elm_widget_style_get(obj));
    else
      _elm_theme_object_set(obj, wd->slider, "slider", "vertical", elm_widget_style_get(obj));
-   if (elm_widget_disabled_get(data))
+   if (elm_widget_disabled_get(obj))
      edje_object_signal_emit(wd->slider, "elm,state,disabled", "elm");
    else
      edje_object_signal_emit(wd->slider, "elm,state,enabled", "elm");
