@@ -6164,6 +6164,7 @@ elm_genlist_edit_selected_items_del(Evas_Object *obj)
 
    EINA_LIST_FOREACH(edit_selected_list, l, it)
    	 {
+   	  if (it->flags != ELM_GENLIST_ITEM_GROUP)
         elm_genlist_item_del(it);
     	}
    eina_list_free(edit_selected_list);
