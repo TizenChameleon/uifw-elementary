@@ -15,7 +15,6 @@ TARGETS = utc_UIFW_elm_popup_add_func \
 	  utc_UIFW_elm_popup_mode_set_func \
 	  utc_UIFW_elm_popup_response_func \
 	  utc_UIFW_elm_popup_orient_set_func \
-	  utc_UIFW_elm_popup_rotation_set_func \
 	  utc_UIFW_elm_popup_run_func
 
 PKGS = elementary

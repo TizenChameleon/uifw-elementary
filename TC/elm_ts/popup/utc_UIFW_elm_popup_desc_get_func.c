@@ -55,6 +55,7 @@ static void startup(void)
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);
 	popup = elm_popup_add(main_win);
+	elm_popup_desc_set(popup, "Demo Text");
 	evas_object_show(popup);	
 }
 
@@ -94,7 +95,7 @@ static void utc_UIFW_elm_popup_desc_get_func_01(void)
 static void utc_UIFW_elm_popup_desc_get_func_02(void)
 {
 	const char *text = NULL;
-   	text = elm_popup_desc_get(popup);
+   	text = elm_popup_desc_get(NULL);
 	if (text) {
 		tet_infoline("elm_popup_desc_get() failed in negative test case");
 		tet_result(TET_FAIL);
