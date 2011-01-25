@@ -3073,7 +3073,7 @@ _item_new(Widget_Data                  *wd,
    it->func.data = func_data;
    it->mouse_cursor = NULL;
    it->expanded_depth = 0;
-   if (it->parent && it->parent->edit_select_check) it->edit_select_check = EINA_TRUE;   
+   if ((it->parent) && (it->parent->edit_select_check)) it->edit_select_check = EINA_TRUE;   
    
    return it;
 }
@@ -3600,6 +3600,13 @@ elm_genlist_clear(Evas_Object *obj)
         eina_list_free(wd->selected);
         wd->selected = NULL;
      }
+   if (wd->edit_field)
+     {
+        Evas_Object *editfield;
+        EINA_LIST_FREE(wd->edit_field, editfield)
+          evas_object_del(editfield);
+        wd->edit_field = NULL;
+     }   
    wd->show_item = NULL;
    wd->pan_x = 0;
    wd->pan_y = 0;
@@ -5999,9 +6006,6 @@ _effect_item_unrealize(Elm_Genlist_Item *it)
    EINA_LIST_FREE(it->edit_icon_objs, icon)
       evas_object_del(icon);
 
-   EINA_LIST_FREE(it->wd->edit_field, editfield)
-      evas_object_del(editfield);
-
    edje_object_signal_emit(it->edit_obj, "elm,state,edit_end,disable", "elm");
    it->effect_item_realized = EINA_FALSE;
 }
@@ -6088,6 +6092,13 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
                }
           }
         wd->select_all_item = NULL;
+        if (wd->edit_field)
+           {
+             Evas_Object *editfield;
+             EINA_LIST_FREE(wd->edit_field, editfield)
+               evas_object_del(editfield);
+             wd->edit_field = NULL;
+          }
      }
    else
      {
@@ -6288,23 +6299,22 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
                          {
                             entry = elm_editfield_entry_get(editfield);
                             const char *text = elm_entry_entry_get(entry);
-
-                            if (it->itc->func.label_changed)
+                           if (it->itc->func.label_changed)
                                it->itc->func.label_changed(it->base.data, it, text, edit_field_cnt++);
                          }
-                       Ecore_IMF_Context *imf = elm_entry_imf_context_get(entry);
-                       ecore_imf_context_input_panel_hide(imf);
-
-                       EINA_LIST_FREE(it->wd->edit_field, editfield)
-                          evas_object_del(editfield);
+                       EINA_LIST_FREE(it->wd->edit_field, editfield) 
+                         evas_object_del(editfield);
+                       it->wd->edit_field = NULL;
 
                        if (it->wd->edit_mode)
                          {
                             edje_object_signal_emit(it->edit_obj, "elm,state,edit_end,enable", "elm");
-                            edje_object_signal_emit(it->edit_obj, "elm,state,rename,disable", "elm");				  
+                            edje_object_signal_emit(it->edit_obj, "elm,state,rename,disable", "elm");  
+                            if (it->wd->edit_mode & ELM_GENLIST_EDIT_MODE_SELECT)
+                               edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
                          }
+
                        if(!it->wd->edit_mode) _effect_item_unrealize(it);
-                       elm_genlist_item_update(it);
                        done = EINA_TRUE;
                     }
                }
