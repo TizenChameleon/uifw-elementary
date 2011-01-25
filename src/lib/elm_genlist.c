@@ -4,7 +4,6 @@
 
 #define SWIPE_MOVES         12
 #define MAX_ITEMS_PER_BLOCK 32
-#define LONGPRESS_TIMEOUT   0.2 
 
 /**
  * @defgroup Genlist Genlist
@@ -1576,7 +1575,7 @@ _mouse_up(void            *data,
      }
    if (it->wd->reorder_mode)
      {
-        Evas_Coord rox, roy, row, roh, sel_all_h;
+        Evas_Coord rox, roy, row, roh, sel_all_h = 0;
         Elm_Genlist_Item *reorder_it = it->wd->reorder_it;
         if (reorder_it)
 	  {
@@ -5393,7 +5392,7 @@ _effect_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after)
    if (!after) return;
 
    if (it->wd->ed->ec->move)
-     it->wd->ed->ec->move(it->base.widget, it, it->wd->ed->reorder_rel, EINA_TRUE);
+      it->wd->ed->ec->move(it->base.widget, it, it->wd->ed->reorder_rel, EINA_TRUE);
 
    printf("MOVE AFTER : %d  after = %d \n", (int)elm_genlist_item_data_get(it)+1, (int)elm_genlist_item_data_get(after)+1);
    it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
@@ -5413,7 +5412,7 @@ _effect_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before)
    if (!before) return;
 
    if (it->wd->ed->ec->move)
-     it->wd->ed->ec->move(it->base.widget, it, it->wd->ed->reorder_rel, EINA_TRUE);
+      it->wd->ed->ec->move(it->base.widget, it, it->wd->ed->reorder_rel, EINA_TRUE);
 
    printf("MOVE BEFORE : %d  before = %d \n", (int)elm_genlist_item_data_get(it)+1, (int)elm_genlist_item_data_get(before)+1);
    it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
@@ -5678,11 +5677,13 @@ _item_flip_effect_show(Elm_Genlist_Item *it)
    return ECORE_CALLBACK_CANCEL;
 }
 
+/*
 static void
 _elm_genlist_pinch_zoom_execute(Evas_Object *obj, Eina_Bool emode)
 {
    printf("!!! NOW FIXING \n");	
 }
+*/
 
 /**
  * Set pinch zoom mode
@@ -5730,11 +5731,11 @@ _effect_item_update(Elm_Genlist_Item *it)
 {
    if (it->edit_select_check) 
      {
-         edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
+        edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
      }
    else
      {
-         edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
+        edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
      }
 }
 
@@ -5775,11 +5776,11 @@ _edit_parent_items_checkbox_set(Elm_Genlist_Item  *it)
    if (!it) return;
    Elm_Genlist_Item *tmp_it;
    Eina_Bool parent_check = EINA_TRUE;
-   
+
    EINA_INLIST_FOREACH(it->wd->items, tmp_it)
      {
         if (tmp_it->parent && it->parent)
-        if(tmp_it->parent == it->parent && tmp_it->edit_select_check == EINA_FALSE) parent_check = EINA_FALSE;
+           if(tmp_it->parent == it->parent && tmp_it->edit_select_check == EINA_FALSE) parent_check = EINA_FALSE;
      }
    if (it->parent)
      {
@@ -5789,8 +5790,8 @@ _edit_parent_items_checkbox_set(Elm_Genlist_Item  *it)
 
    if (it->parent)
      {
-         _effect_item_update(it->parent);
-         return _edit_parent_items_checkbox_set(it->parent);
+        _effect_item_update(it->parent);
+        return _edit_parent_items_checkbox_set(it->parent);
      }
 }
 
@@ -5798,14 +5799,14 @@ static void
 _checkbox_item_select_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Elm_Genlist_Item *it = data, *tmp_it;
-   Eina_Bool parent_check = EINA_TRUE, old_check_state;
+   Eina_Bool old_check_state;
    int check_cnt = 0, total_cnt = 0;
    if (!it) return;
-   
+
    _edit_item_checkbox_set(it, !it->edit_select_check);
    _edit_subitems_checkbox_set(it);
    _edit_parent_items_checkbox_set(it);
-   
+
    it->wd->ed->del_item = it;
 
    EINA_INLIST_FOREACH(it->wd->items, tmp_it)
@@ -5831,7 +5832,7 @@ _checkbox_item_select_cb(void *data, Evas_Object *obj, const char *emission, con
              edje_object_signal_emit(it->wd->select_all_item->base.view, "elm,state,del,animated,enable", "elm");
           }
         if (old_check_state != it->wd->select_all_check && it->wd->ed->ec->item_selected)
-          it->wd->ed->ec->item_selected(it->wd->select_all_item->base.data, it->wd->select_all_item, it->wd->select_all_check);
+           it->wd->ed->ec->item_selected(it->wd->select_all_item->base.data, it->wd->select_all_item, it->wd->select_all_check);
      }
 }
 
@@ -5855,9 +5856,9 @@ _select_all_down(void *data, Evas_Object *obj __UNUSED__, const char *emission _
         if (wd->select_all_check) it->edit_select_check = EINA_TRUE;
         else it->edit_select_check = EINA_FALSE;
 
-      // TODO : check this
+        // TODO : check this
         if (old_check_state != it->edit_select_check && it->wd->ed->ec->item_selected)
-          it->wd->ed->ec->item_selected(it->base.data, it, it->edit_select_check);   
+           it->wd->ed->ec->item_selected(it->base.data, it, it->edit_select_check);   
      }
 
    if (wd->ed->ec->item_selected)
@@ -5881,8 +5882,8 @@ _effect_item_controls(Elm_Genlist_Item *it, int itx, int ity)
       it->edit_select_check = EINA_TRUE;
    if (!it->renamed)
      {
-         if (it->edit_select_check) edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
-         else  
+        if (it->edit_select_check) edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
+        else  
            edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
      }
 }
@@ -6032,7 +6033,7 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
    static Elm_Genlist_Item_Class itc;
    Eina_List *l;
    Elm_Genlist_Item *it;
-   
+
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (wd->edit_mode == emode) return;
@@ -6074,7 +6075,7 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
              elm_widget_item_pre_notify_del(wd->select_all_item);
              _item_unrealize(wd->select_all_item);
              elm_widget_item_del(wd->select_all_item);
-             
+
              EINA_INLIST_FOREACH(wd->items, it)
                {
                   if (wd->select_all_check) it->edit_select_check = EINA_TRUE;
@@ -6102,7 +6103,7 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
                     {
                        if (it->flags != ELM_GENLIST_ITEM_GROUP && it->realized)
                          {
-                         		if(it->selected) _item_unselect(it);
+                            if(it->selected) _item_unselect(it);
                             _effect_item_realize(it);
                          }
                     }
@@ -6160,12 +6161,12 @@ elm_genlist_edit_selected_items_del(Evas_Object *obj)
 
    edit_selected_list = elm_genlist_edit_selected_items_get(obj);
    cnt = eina_list_count(edit_selected_list);
-//   printf("elm_genlist_edit_selected_items_del items selected counts = %d \n",  cnt);
+   //   printf("elm_genlist_edit_selected_items_del items selected counts = %d \n",  cnt);
 
    EINA_LIST_FOREACH(edit_selected_list, l, it)
-    {
-       if (it->flags != ELM_GENLIST_ITEM_GROUP) elm_genlist_item_del(it);
-    }
+     {
+        if (it->flags != ELM_GENLIST_ITEM_GROUP) elm_genlist_item_del(it);
+     }
    eina_list_free(edit_selected_list);
 
    evas_render(evas_object_evas_get(wd->obj));
@@ -6210,21 +6211,21 @@ elm_genlist_edit_selected_items_get(const Evas_Object *obj)
      {
         if (it->edit_select_check && it->flags != ELM_GENLIST_ITEM_GROUP) list = eina_list_append(list, it);
      }
-   
+
    return list;
 }
 
 // TODO : add cooment
 EAPI void
 elm_genlist_edit_item_select_set(Elm_Genlist_Item *it,
-                              Eina_Bool         selected)
+                                 Eina_Bool         selected)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    Widget_Data *wd = elm_widget_data_get(it->base.widget);
    if (!wd) return;
    selected = !!selected;
    if (it->edit_select_check == selected) return;
-   
+
    it->edit_select_check = selected;
    _edit_item_checkbox_set(it, it->edit_select_check);
    _edit_subitems_checkbox_set(it);
@@ -6264,7 +6265,6 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
    Evas_Object *editfield;
    Evas_Object *entry = NULL;
    int edit_field_cnt = 0;
-   Evas_Object *icon;   
 
    EINA_INLIST_FOREACH(it->wd->blocks, itb)
      {
@@ -6319,7 +6319,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
              _effect_item_realize(it);
              it->wd->edit_mode = ELM_GENLIST_EDIT_MODE_NONE;
           }        
-				   
+
         EINA_LIST_FOREACH(it->labels, list, label)
           {
              edje_object_signal_emit(it->edit_obj, "elm,state,rename,enable", "elm");
