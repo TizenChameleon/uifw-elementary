@@ -1873,10 +1873,8 @@ extern "C" {
    EAPI void               elm_genlist_item_cursor_engine_only_set(Elm_Genlist_Item *item, Eina_Bool engine_only) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool          elm_genlist_item_cursor_engine_only_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
 
-   EAPI void               elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
    EAPI void               elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
    EAPI void               elm_genlist_edit_selected_items_del(Evas_Object *obj);
-   EAPI void               elm_genlist_selected_items_del(Evas_Object *obj);
    EAPI Eina_List         *elm_genlist_edit_selected_items_get(const Evas_Object *obj);
    EAPI void               elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it, Eina_Bool selected) EINA_ARG_NONNULL(1);
    EAPI const Eina_Bool    elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);;
@@ -1887,6 +1885,8 @@ extern "C" {
    EAPI void               elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode);
    EAPI void               elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode);
    EAPI Eina_Bool          elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj);
+   EINA_DEPRECATED EAPI void elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
+   EINA_DEPRECATED EAPI void elm_genlist_selected_items_del(Evas_Object *obj);
    EINA_DEPRECATED EAPI void elm_genlist_queue_exception_set(const Evas_Object *obj, Eina_Bool emode);
 
   /* check */
