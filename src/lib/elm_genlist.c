@@ -1047,7 +1047,7 @@ _item_select(Elm_Genlist_Item *it)
      }
    if (it->selected)
      {
-        if (it->wd->always_select || it->wd->ed) goto call;
+        if (it->wd->always_select) goto call;
         return;
      }
    it->selected = EINA_TRUE;
