@@ -5,7 +5,7 @@ elementary (1.0.0+svn.51480slp2+build102) unstable; urgency=low
   * Git: 165.213.180.234:slp/pkgs/e/elementary
   * Tag: elementary_1.0.0+svn.51480slp2+build102
 
- -- Juyung Seo <juyung.seo@samsung.com>  Wed, 26 Jan 2011 11:10:04 +0900
+ -- ChunEon Park <chuneon.park@samsung.com>  Wed, 26 Jan 2011 11:10:04 +0900
 
 elementary (1.0.0+svn.51480slp2+build101) unstable; urgency=low
 

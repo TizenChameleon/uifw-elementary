@@ -82,6 +82,7 @@ void test_launcher2(void *data, Evas_Object *obj, void *event_info);
 void test_launcher3(void *data, Evas_Object *obj, void *event_info);
 void test_anim(void *data, Evas_Object *obj, void *event_info);
 void test_diskselector(void *data, Evas_Object *obj, void *event_info);
+void test_ctxpopup(void *data, Evas_Object *obj, void *event_info);
 
 struct elm_test
 {
@@ -283,6 +284,7 @@ my_win_main(void)
    ADD_TEST("Calendar", test_calendar);
    ADD_TEST("Calendar 2", test_calendar2);
    ADD_TEST("Disk Selector", test_diskselector);
+   ADD_TEST("Ctxpopup", test_ctxpopup);
 #undef ADD_TEST
 
    if (tests)
