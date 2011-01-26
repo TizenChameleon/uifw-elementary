@@ -142,6 +142,10 @@ _set_item_theme(Dialogue_Item *item, const char *location)
      snprintf(buf, sizeof(buf), "no_bg_%s", location);
    else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_SUB) 
      snprintf(buf, sizeof(buf), "sub_%s", location);
+   else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT)
+     snprintf(buf, sizeof(buf), "bg_edit_%s", location);
+   else if (item->style == ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_MERGE)
+     snprintf(buf, sizeof(buf), "bg_edit_merge_%s", location);
    elm_layout_theme_set(item->bg_layout, "dialoguegroup", buf, elm_widget_style_get(item->obj));
 }
 
