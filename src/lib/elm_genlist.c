@@ -6279,10 +6279,10 @@ elm_genlist_edit_selected_items_get(const Evas_Object *obj)
    return list;
 }
 
-// TODO : add cooment
+// TODO : add comment
 EAPI void
-elm_genlist_edit_item_select_set(Elm_Genlist_Item *it,
-                                 Eina_Bool         selected)
+elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it,
+                                   Eina_Bool         selected)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    Widget_Data *wd = elm_widget_data_get(it->base.widget);
@@ -6294,9 +6294,9 @@ elm_genlist_edit_item_select_set(Elm_Genlist_Item *it,
    if (it->wd->edit_mode) _checkbox_item_select_process(it);   
 }
 
-// TODO : add cooment                              
-EAPI Eina_Bool
-elm_genlist_edit_item_select_get(const Elm_Genlist_Item *it)
+// TODO : add comment                              
+EAPI const Eina_Bool
+elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it, EINA_FALSE);
    return it->edit_select_check;
