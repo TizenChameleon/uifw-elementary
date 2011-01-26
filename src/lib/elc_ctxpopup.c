@@ -99,6 +99,9 @@ static void _scroller_size_reset(Widget_Data *wd);
 static void _hide(Evas_Object *obj);
 static void _content_del(void *data, Evas *e, Evas_Object *obj __UNUSED__,
                          void *event_info __UNUSED__);
+static void _content_changed_size_hints(void *data __UNUSED__,
+                                        Evas *e __UNUSED__, Evas_Object *obj,
+                                        void *event_info __UNUSED__);
 static void _freeze_on(void *data __UNUSED__, Evas_Object *obj,
                        void *event_info __UNUSED__);
 static void _freeze_off(void *data __UNUSED__, Evas_Object *obj,
@@ -130,9 +133,10 @@ _freeze_on(void *data __UNUSED__, Evas_Object *obj,
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if (!wd)
-      return;
-   elm_object_scroll_freeze_push(wd->scr);
+   if (!wd) return;
+   if (!wd->scr) return;
+
+   elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_FALSE);
 }
 
 static void
@@ -143,7 +147,12 @@ _freeze_off(void *data __UNUSED__, Evas_Object *obj,
 
    if (!wd)
       return;
-   elm_object_scroll_freeze_pop(wd->scr);
+   if (!wd->scr) return;
+
+   if (wd->horizontal)
+      elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_TRUE);
+   else
+      elm_scroller_bounce_set(wd->scr, EINA_TRUE, EINA_FALSE);
 }
 
 static void
@@ -151,9 +160,10 @@ _hold_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if (!wd)
-      return;
-   elm_object_scroll_hold_push(wd->scr);
+   if (!wd) return;
+   if (wd->scr) return;
+
+   elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_FALSE);
 }
 
 static void
@@ -161,9 +171,13 @@ _hold_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if (!wd)
-      return;
-   elm_object_scroll_hold_pop(wd->scr);
+   if (!wd) return;
+   if (wd->scr) return;
+
+   if (wd->horizontal)
+      elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_TRUE);
+   else
+      elm_scroller_bounce_set(wd->scr, EINA_TRUE, EINA_FALSE);
 }
 
 static void
@@ -899,6 +913,20 @@ _content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
 }
 
 static void
+_content_changed_size_hints(void *data __UNUSED__, Evas *e __UNUSED__,
+                            Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Widget_Data *wd;
+
+   wd = elm_widget_data_get(data);
+   if (!wd)
+      return;
+
+   if (wd->visible)
+      _sizing_eval(data);
+}
+
+static void
 _list_del(Widget_Data *wd)
 {
    if (!wd->scr)
@@ -1426,7 +1454,7 @@ elm_ctxpopup_item_disabled_get(const Elm_Ctxpopup_Item *item)
  * once you set a content, the previous list items will be removed. 
  *
  * @param obj Ctxpopup object
- * @param content	Content to be swallowed
+ * @param content Content to be swallowed
  *
  * @ingroup Ctxpopup
  */
@@ -1449,6 +1477,7 @@ elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 
    evas_object_event_callback_add(content, EVAS_CALLBACK_DEL, _content_del,
                                   obj);
+//   evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints, obj);
 
    elm_widget_sub_object_add(obj, content);
    edje_object_part_swallow(wd->base, "elm.swallow.content", content);
@@ -1489,6 +1518,7 @@ elm_ctxpopup_content_unset(Evas_Object *obj)
    edje_object_part_unswallow(wd->base, content);
    elm_widget_sub_object_del(obj, content);
    evas_object_event_callback_del(content, EVAS_CALLBACK_DEL, _content_del);
+   evas_object_event_callback_del(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints);
    edje_object_signal_emit(wd->base, "elm,state,content,disable", "elm");
 
    wd->content = NULL;
@@ -1605,7 +1635,7 @@ EAPI Elm_Ctxpopup_Item *
 elm_ctxpopup_label_add(Evas_Object *obj, const char *label, Evas_Smart_Cb func,
                        void *data) 
 {
-   return elm_ctxpopup_item_add(obj, label, NULL, func, data);
+   return elm_ctxpopup_item_append(obj, label, NULL, func, data);
 }
 
 EAPI void 
@@ -1626,9 +1656,9 @@ elm_ctxpopup_scroller_disabled_set(Evas_Object *obj, Eina_Bool disabled)
       return;
 
    if (disabled)
-      elm_object_scroll_freeze_push(wd->scr);
+      elm_object_scroll_freeze_push(obj);
    else
-      elm_object_scroll_freeze_pop(wd->scr);
+      elm_object_scroll_freeze_pop(obj);
 }
 
 EAPI Elm_Ctxpopup_Item *
