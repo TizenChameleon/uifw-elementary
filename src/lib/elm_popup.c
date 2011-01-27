@@ -306,12 +306,8 @@ _elm_popup_buttons_add_valist(Evas_Object *obj, const char *first_button_text, v
 static void 
 _elm_popup_timeout(void *data, Evas_Object *obj, void *event_info)
 {  
-	printf("%s begin\n");
 	evas_object_hide((Evas_Object*)data);  
-   printf("!!!!!!!!!!!!!!!!!!\n");
 	evas_object_smart_callback_call((Evas_Object *)data, "response", (void *)ELM_POPUP_RESPONSE_TIMEOUT);    
-	printf("@@@@@@@@@@@@@@@@@\n");
-	printf("%s end\n");
 }
 
 static Eina_Bool
