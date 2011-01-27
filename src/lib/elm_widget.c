@@ -287,7 +287,7 @@ _parent_focus(Evas_Object *obj)
    if (sd->on_focus_func) sd->on_focus_func(sd->on_focus_data, obj);
    if (sd->focus_func) sd->focus_func(obj);
 
-   _elm_widget_focus_region_show(obj);
+   if (sd->can_focus) _elm_widget_focus_region_show(obj);
 
    sd->focus_order_on_calc = EINA_FALSE;
 }
