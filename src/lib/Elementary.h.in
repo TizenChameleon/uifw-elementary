@@ -1734,12 +1734,22 @@ extern "C" {
     * "slider,drag,stop" - dragging the slider indicator around has stopped
     */
 
+   /* genlist */
    typedef enum _Elm_Genlist_Item_Flags
      {
         ELM_GENLIST_ITEM_NONE = 0,
         ELM_GENLIST_ITEM_SUBITEMS = (1 << 0),
-        ELM_GENLIST_ITEM_GROUP = (1 << 1)        
+        ELM_GENLIST_ITEM_GROUP = (1 << 1)
      } Elm_Genlist_Item_Flags;
+   typedef struct _Elm_Genlist_Item_Class Elm_Genlist_Item_Class;
+   typedef struct _Elm_Genlist_Item       Elm_Genlist_Item; /**< Item of Elm_Genlist. Sub-type of Elm_Widget_Item */
+   typedef struct _Elm_Genlist_Item_Class_Func Elm_Genlist_Item_Class_Func;
+   typedef char        *(*GenlistItemLabelGetFunc) (const void *data, Evas_Object *obj, const char *part);
+   typedef Evas_Object *(*GenlistItemIconGetFunc)  (const void *data, Evas_Object *obj, const char *part);
+   typedef Eina_Bool    (*GenlistItemStateGetFunc) (const void *data, Evas_Object *obj, const char *part);
+   typedef void         (*GenlistItemDelFunc)      (const void *data, Evas_Object *obj);
+
+   typedef struct _Elm_Genlist_Edit_Class      Elm_Genlist_Edit_Class;
    typedef enum _Elm_Genlist_Edit_Mode
      {
         ELM_GENLIST_EDIT_MODE_NONE    = 0,
@@ -1749,16 +1759,8 @@ extern "C" {
         ELM_GENLIST_EDIT_MODE_SELECT  = (1 << 3),
         ELM_GENLIST_EDIT_MODE_SELECTALL  = (1 << 4)
      } Elm_Genlist_Edit_Mode;
-   typedef struct _Elm_Genlist_Item_Class      Elm_Genlist_Item_Class;
-   typedef struct _Elm_Genlist_Item            Elm_Genlist_Item;
-   typedef struct _Elm_Genlist_Item_Class_Func Elm_Genlist_Item_Class_Func;
-   typedef struct _Elm_Genlist_GroupItem       Elm_Genlist_GroupItem;
-   typedef struct _Elm_Genlist_Edit_Class      Elm_Genlist_Edit_Class;
-   typedef char        *(*GenlistItemLabelGetFunc) (const void *data, Evas_Object *obj, const char *part);
+   // TODO : below should be fixed!!!
    typedef char        *(*GenlistItemLabelChangedFunc) (const void *data, Elm_Genlist_Item *it, const char *text, const int sub_text );
-   typedef Evas_Object *(*GenlistItemIconGetFunc)  (const void *data, Evas_Object *obj, const char *part);
-   typedef Eina_Bool    (*GenlistItemStateGetFunc) (const void *data, Evas_Object *obj, const char *part);
-   typedef void         (*GenlistItemDelFunc)      (const void *data, Evas_Object *obj);
    typedef int          (*GenlistItemEditModeGetFunc)  (const void *data, Evas_Object *obj, const int enabled_edit_modes);
    typedef void         (*GenlistInsertNewFunc)      (Evas_Object *genlist, Elm_Genlist_Item *rel_item);
    typedef void         (*GenlistItemSelectedFunc) (const void *data, Elm_Genlist_Item *it, Eina_Bool selected);
