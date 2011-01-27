@@ -64,7 +64,7 @@ _cut(void *data, Evas_Object *obj, void *event_info)
 {
 	ext_mod->cut(data,obj,event_info);
 	evas_object_hide(obj);
-	elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_FALSE);
+	elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 static void
@@ -72,7 +72,7 @@ _copy(void *data, Evas_Object *obj, void *event_info)
 {
 	ext_mod->copy(data,obj,event_info);
 	evas_object_hide(obj);
-	elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_FALSE);
+	elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 static void
@@ -103,7 +103,7 @@ _cancel(void *data, Evas_Object *obj, void *event_info)
 {
 	ext_mod->cancel(data,obj,event_info);
 	evas_object_hide(obj);
-	elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_FALSE);
+	elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
 static void
@@ -185,31 +185,30 @@ obj_longpress(Evas_Object *obj)
 			ext_mod->popup = elm_ctxpopup_add(top);
 		/*currently below theme not used,when guideline comes a new theme can be created if required*/
 		elm_object_style_set(ext_mod->popup,"extended/entry");
-		elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_TRUE);
+		elm_object_scroll_freeze_push(ext_mod->popup);
 		context_menu_orientation = edje_object_data_get
 		(ext_mod->ent, "context_menu_orientation");
 		if ((context_menu_orientation) &&
 		(!strcmp(context_menu_orientation, "horizontal")))
 		elm_ctxpopup_horizontal_set(ext_mod->popup, EINA_TRUE);
-		elm_ctxpopup_screen_dimmed_disabled_set(ext_mod->popup, EINA_TRUE);
 
 		elm_widget_sub_object_add(obj, ext_mod->popup);
 		if (!ext_mod->selmode)
 		{	
 			if (!ext_mod->password)
 			{
-				elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select",_select, obj );
-				elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select All",_select_all, obj );
+				elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
+				elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
 			}
 			if (1) // need way to detect if someone has a selection
 				{
 					if (ext_mod->editable)
-						elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",_paste, obj );
+						elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
 				}
-	//		elm_ctxpopup_item_add(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
+	//		elm_ctxpopup_item_append(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 	// start for cbhm
 			if (!ext_mod->password)
-				elm_ctxpopup_item_add(ext_mod->popup, NULL, "More", _clipboard_menu, obj );
+				elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
 	// end for cbhm
 		}
 		else
@@ -218,32 +217,32 @@ obj_longpress(Evas_Object *obj)
 				{
 					if (ext_mod->have_selection)
 						{
-							elm_ctxpopup_item_add(ext_mod->popup, NULL, "Copy",_copy, obj );
+							elm_ctxpopup_item_append(ext_mod->popup, "Copy", NULL, _copy, obj );
 							if (ext_mod->editable)
-								elm_ctxpopup_item_add(ext_mod->popup, NULL, "Cut",_cut, obj );							
+								elm_ctxpopup_item_append(ext_mod->popup, "Cut", NULL, _cut, obj );							
 							if (ext_mod->editable)
-								elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",_paste, obj );
-							elm_ctxpopup_item_add(ext_mod->popup, NULL, "Share", _share, obj);
+								elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+							elm_ctxpopup_item_append(ext_mod->popup, "Share", NULL, _share, obj);
 						}
 					else
 						{
 							_cancel(obj,ext_mod->popup,NULL);		
-							elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select",_select, obj );
-							elm_ctxpopup_item_add(ext_mod->popup, NULL, "Select All",_select_all, obj );
+							elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
+							elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
 							if (1) // need way to detect if someone has a selection
 								{
 									if (ext_mod->editable)
-										elm_ctxpopup_item_add(ext_mod->popup, NULL, "Paste",_paste, obj );
+										elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
 								}
 						}
 	// start for cbhm
-							elm_ctxpopup_item_add(ext_mod->popup, NULL, "More",_clipboard_menu, obj );
+							elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
 	// end for cbhm
 				}
 		}
 		EINA_LIST_FOREACH(ext_mod->items, l, it)
 		{
-			elm_ctxpopup_item_add(ext_mod->popup, NULL, it->label,_item_clicked, it );
+			elm_ctxpopup_item_append(ext_mod->popup, it->label, NULL, _item_clicked, it );
 		}
 		if (ext_mod->popup)
 			{
