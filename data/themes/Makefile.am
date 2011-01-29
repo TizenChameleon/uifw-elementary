@@ -1,0 +1,233 @@
+AUTOMAKE_OPTIONS     = 1.4 foreign
+MAINTAINERCLEANFILES = Makefile.in
+
+EDJE_CC = @edje_cc@
+EDJE_FLAGS = -v -id $(top_srcdir)/data/themes -fd $(top_srcdir)/data/themes
+
+filesdir = $(datadir)/elementary/themes
+files_DATA = default.edj default-desktop.edj
+
+EXTRA_DIST = \
+default.edc \
+default-desktop.edc \
+arrow_down.png \
+arrow_up.png \
+bar_shine.png \
+bt_base1.png \
+bt_base2.png \
+bt_bases.png \
+bt_basew.png \
+bt_glow.png \
+bt_hilight.png \
+bt_hilightw.png \
+bt_shine.png \
+bt_sm_base1.png \
+bt_sm_base2.png \
+bt_sm_hilight.png \
+bt_sm_shine.png \
+bt_dis_base.png \
+bt_dis_hilight.png \
+dia_botshad.png \
+dia_grad.png \
+dia_topshad.png \
+frame_1.png \
+frame_2.png \
+flip_0b.png \
+flip_0t.png \
+flip_1b.png \
+flip_1t.png \
+flip_2b.png \
+flip_2t.png \
+flip_3b.png \
+flip_3t.png \
+flip_4b.png \
+flip_4t.png \
+flip_5b.png \
+flip_5t.png \
+flip_6b.png \
+flip_6t.png \
+flip_7b.png \
+flip_7t.png \
+flip_8b.png \
+flip_8t.png \
+flip_9b.png \
+flip_9t.png \
+flip_amb.png \
+flip_amt.png \
+flip_base.png \
+flip_base_shad.png \
+flip_pmb.png \
+flip_pmt.png \
+flip_shad.png \
+flip_t.png \
+flip_b.png \
+head.png \
+sb_runnerh.png \
+sb_runnerv.png \
+shelf_inset.png \
+tog_base.png \
+tog_dis_base.png \
+shad_circ.png \
+bt_dis_base.png \
+bt_dis_hilight.png \
+outdent-top.png \
+outdent-bottom.png \
+updown.png \
+leftright.png \
+hoversel_entry_bg.png \
+cur_box.png \
+cur_hi.png \
+cur_shad.png \
+cur_shine.png \
+cur_glow.png \
+bubble.png \
+bubble_3.png \
+bubble_shine3.png \
+bubble_4.png \
+bubble_shine4.png \
+bubble_1.png \
+bubble_shine.png \
+bubble_2.png \
+icon_home.png \
+icon_close.png \
+icon_apps.png \
+icon_arrow_up.png \
+icon_arrow_down.png \
+icon_arrow_left.png \
+icon_arrow_right.png \
+bt_dis_shine.png \
+icon_left_arrow.png \
+icon_right_arrow.png \
+toolbar_sel.png \
+icon_chat.png \
+icon_clock.png \
+icon_delete.png \
+icon_edit.png \
+icon_refresh.png \
+icon_folder.png \
+icon_file.png \
+ilist_1.png \
+ilist_1_h.png \
+ilist_2.png \
+ilist_2_h.png \
+ilist_item_shadow.png \
+ilist_item_shadow_h.png \
+sl_bg.png \
+sl_bg_over.png \
+sl_bt_0.png \
+sl_bt_1.png \
+sl_bt_2.png \
+sl_bt_3.png \
+sl_bt2_0_0.png \
+sl_bt2_0_1.png \
+sl_bt2_0_2.png \
+sl_bt2_1.png \
+sl_bt2_2.png \
+sl_units.png \
+slv_bg.png \
+slv_bg_over.png \
+slv_units.png \
+check_base.png \
+check.png \
+check2.png \
+radio_base.png \
+radio.png \
+radio2.png \
+separator_h.png \
+separator_v.png \
+toolbar_separator_v.png \
+sp_bt_l.png \
+sp_bt_r.png \
+busy-1.png \
+busy-2.png \
+busy-3.png \
+busy-4.png \
+busy-5.png \
+busy-6.png \
+busy-7.png \
+busy-8.png \
+busy-9.png \
+arrow_right.png \
+arrow_left.png \
+bt_spinner_up.png \
+bt_spinner_down.png \
+bt_spinner_hilight.png \
+up.png \
+down.png \
+emo-angry.png \
+emo-angry-shout.png \
+emo-crazy-laugh.png \
+emo-evil-laugh.png \
+emo-evil.png \
+emo-goggle-smile.png \
+emo-grumpy.png \
+emo-grumpy-smile.png \
+emo-guilty.png \
+emo-guilty-smile.png \
+emo-haha.png \
+emo-half-smile.png \
+emo-happy-panting.png \
+emo-happy.png \
+emo-indifferent.png \
+emo-kiss.png \
+emo-knowing-grin.png \
+emo-laugh.png \
+emo-little-bit-sorry.png \
+emo-love-lots.png \
+emo-love.png \
+emo-minimal-smile.png \
+emo-not-happy.png \
+emo-not-impressed.png \
+emo-omg.png \
+emo-opensmile.png \
+emo-smile.png \
+emo-sorry.png \
+emo-squint-laugh.png \
+emo-surprised.png \
+emo-suspicious.png \
+emo-tongue-dangling.png \
+emo-tongue-poke.png \
+emo-uh.png \
+emo-unhappy.png \
+emo-very-sorry.png \
+emo-what.png \
+emo-wink.png \
+emo-worried.png \
+emo-wtf.png \
+map_item.png \
+map_item_2.png \
+shadow.png \
+black.png \
+tooltip-corner-top-left-tip.png \
+tooltip-base.png \
+tooltip-corner-bottom-left-tip.png \
+tooltip-edge-top-tip.png \
+tooltip-corner-bottom-right-tip.png \
+tooltip-edge-left-tip.png \
+tooltip-edge-bottom-tip.png \
+tooltip-edge-right-tip.png \
+tooltip-corner-top-right-tip.png \
+color_picker_alpha.png \
+color_picker_alpha_bg.png \
+color_picker_brightness.png \
+color_picker_color.png \
+color_picker_opacity.png \
+icon_arrow_down_left.png \
+icon_arrow_down_right.png \
+icon_arrow_up_left.png \
+icon_arrow_up_right.png \
+thumb_shadow.png \
+group_index.png
+
+default.edj: Makefile $(EXTRA_DIST)
+	$(EDJE_CC) $(EDJE_FLAGS) \
+	$(top_srcdir)/data/themes/default.edc \
+	$(top_builddir)/data/themes/default.edj
+
+default-desktop.edj: Makefile $(EXTRA_DIST)
+	$(EDJE_CC) $(EDJE_FLAGS) \
+	$(top_srcdir)/data/themes/default-desktop.edc \
+	$(top_builddir)/data/themes/default-desktop.edj
+
+clean-local:
+	rm -f *.edj
