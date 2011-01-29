@@ -1014,12 +1014,14 @@ _item_del(Elm_Genlist_Item *it)
    it->delete_me = EINA_TRUE;
    if (it->queued)
      it->wd->queue = eina_list_remove(it->wd->queue, it);
+#ifdef ANCHOR_ITEM
    if (it->wd->anchor_item == it)
      {
         it->wd->anchor_item = ELM_GENLIST_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->next);
         if (!it->wd->anchor_item)
           it->wd->anchor_item = ELM_GENLIST_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->prev);
      }
+#endif
    it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
    if (it->parent)
      it->parent->items = eina_list_remove(it->parent->items, it);
@@ -2594,6 +2596,7 @@ _calc_job(void *data)
            wd->minh += wd->select_all_item->h;        
         evas_object_smart_callback_call(wd->pan_smart, "changed", NULL);
         _sizing_eval(wd->obj);
+#ifdef ANCHOR_ITEM        
         if ((wd->anchor_item) && (wd->anchor_item->block) && (!wd->auto_scrolled))
           {
              Elm_Genlist_Item *it;
@@ -2606,6 +2609,7 @@ _calc_job(void *data)
              wd->anchor_item = it;
              wd->anchor_y = it_y;
           }
+#endif
      }
    t = ecore_time_get();
    if (did_must_recalc)
@@ -2703,6 +2707,7 @@ _pan_set(Evas_Object *obj,
    sd->wd->pan_x = x;
    sd->wd->pan_y = y;
 
+#ifdef ANCHOR_ITEM
    EINA_INLIST_FOREACH(sd->wd->blocks, itb)
    {
       if ((itb->y + itb->h) > y)
@@ -2722,6 +2727,7 @@ _pan_set(Evas_Object *obj,
         }
    }
 done:
+#endif      
    evas_object_smart_changed(obj);
 }
 
@@ -3984,11 +3990,11 @@ elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
    Elm_Genlist_Item *it2;
    Evas_Coord y, h;
 
-   if(!it->wd->effect_mode)
+   if(!it->wd->effect_mode || !it->wd->move_effect_mode)
       _item_subitems_clear(it);
    else
      {
-        if(!it->wd->item_moving_effect_timer)
+        if((!it->wd->item_moving_effect_timer) && (it->flags != ELM_GENLIST_ITEM_GROUP))
           {
              it->wd->expand_item = it;
              _item_flip_effect_show(it);
@@ -6572,12 +6578,17 @@ _item_auto_scroll(void *data)
      {
         Elm_Genlist_Item  *it;
         Eina_List *l;
-
+        Evas_Coord ox, oy, ow, oh;
+        evas_object_geometry_get(wd->obj, &ox, &oy, &ow, &oh);
+        
         wd->auto_scrolled = EINA_TRUE;
-        EINA_LIST_FOREACH(wd->expand_item->items, l, it)
+        if (wd->expand_item->scrl_y > (oh + oy) / 2)
           {
-             elm_genlist_item_bring_in(it);
-          }
+            EINA_LIST_FOREACH(wd->expand_item->items, l, it)
+              {
+                 elm_genlist_item_bring_in(it);
+              }
+       	 }
      }
 }
 
