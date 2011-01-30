@@ -5858,8 +5858,8 @@ _select_all_down_process(Elm_Genlist_Item *select_all_it, Eina_Bool checked)
         else it->edit_select_check = EINA_FALSE;
 
         // TODO : check this
-        if (old_check_state != it->edit_select_check && it->wd->ed && it->wd->ed->ec && it->wd->ed->ec->item_selected)
-           it->wd->ed->ec->item_selected(it->base.data, it, it->edit_select_check);   
+//        if (old_check_state != it->edit_select_check && it->wd->ed && it->wd->ed->ec && it->wd->ed->ec->item_selected)
+//           it->wd->ed->ec->item_selected(it->base.data, it, it->edit_select_check);   
      }
 
    if (wd->ed->ec->item_selected)
