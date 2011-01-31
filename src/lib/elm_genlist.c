@@ -1932,7 +1932,7 @@ _item_realize(Elm_Genlist_Item *it,
           {
              if (it->selected != itc->selected)
                {
-                  if ((it->selected) && (!it->sweeped))
+                  if ((it->selected) && (!it->sweeped)&& (!it->wd->edit_mode))
                     edje_object_signal_emit(it->base.view,
                                             "elm,state,selected", "elm");
                }
@@ -1951,7 +1951,7 @@ _item_realize(Elm_Genlist_Item *it,
           }
         else
           {
-             if ((it->selected) && (!it->sweeped))
+             if ((it->selected) && (!it->sweeped)&& (!it->wd->edit_mode))
                 edje_object_signal_emit(it->base.view,
                                         "elm,state,selected", "elm");
              if (it->disabled)
@@ -3097,7 +3097,9 @@ _item_new(Widget_Data                  *wd,
    it->mouse_cursor = NULL;
    it->expanded_depth = 0;
    if ((it->parent) && (it->parent->edit_select_check)) it->edit_select_check = EINA_TRUE;   
-   
+   if ((!it->parent) && (it->wd->select_all_item))
+   	 _select_all_down_process(it->wd->select_all_item, EINA_FALSE); 
+  
    return it;
 }
 
