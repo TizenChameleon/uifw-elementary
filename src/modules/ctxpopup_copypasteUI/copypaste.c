@@ -150,6 +150,8 @@ obj_longpress(Evas_Object *obj)
 	const Eina_List *l;
 	const Elm_Entry_Context_Menu_Item *it;
 	const char *context_menu_orientation;
+	char buf[255];
+	Evas_Object* icon;
 
 	/*update*/
 	elm_entry_extension_module_data_get(obj,ext_mod);
@@ -185,7 +187,13 @@ obj_longpress(Evas_Object *obj)
 	//		elm_ctxpopup_item_append(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 	// start for cbhm
 			if (!ext_mod->password)
-				elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
+			{
+				icon = elm_icon_add(ext_mod->popup);
+				snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
+				elm_icon_file_set(icon, buf, NULL);
+				elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
+				//elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
+			}
 	// end for cbhm
 		}
 		else
@@ -212,7 +220,11 @@ obj_longpress(Evas_Object *obj)
 								}
 						}
 	// start for cbhm
-							elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
+					icon = elm_icon_add(ext_mod->popup);
+					snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
+					elm_icon_file_set(icon, buf, NULL);
+					elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
+					//elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
 	// end for cbhm
 				}
 		}
