@@ -1932,7 +1932,7 @@ _item_realize(Elm_Genlist_Item *it,
           {
              if (it->selected != itc->selected)
                {
-                  if ((it->selected) && (!it->sweeped)&& (!it->wd->edit_mode))
+                  if ((it->selected) && (!it->sweeped) && (!it->wd->edit_mode))
                     edje_object_signal_emit(it->base.view,
                                             "elm,state,selected", "elm");
                }
@@ -1951,7 +1951,7 @@ _item_realize(Elm_Genlist_Item *it,
           }
         else
           {
-             if ((it->selected) && (!it->sweeped)&& (!it->wd->edit_mode))
+             if ((it->selected) && (!it->sweeped) && (!it->wd->edit_mode))
                 edje_object_signal_emit(it->base.view,
                                         "elm,state,selected", "elm");
              if (it->disabled)
@@ -2111,7 +2111,7 @@ _item_realize(Elm_Genlist_Item *it,
    if (itc) _item_cache_free(itc);
    evas_object_smart_callback_call(it->base.widget, "realized", it);
    
-   if ((it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP)) _effect_item_realize(it);
+   if ((it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP) && (!calc)) _effect_item_realize(it);
 }
 
 static void
@@ -3099,7 +3099,8 @@ _item_new(Widget_Data                  *wd,
    if ((it->parent) && (it->parent->edit_select_check)) it->edit_select_check = EINA_TRUE;   
    if ((!it->parent) && (it->wd->select_all_item))
    	 _select_all_down_process(it->wd->select_all_item, EINA_FALSE); 
-  
+   it->num = ++wd->total_num;   // todo : remov
+
    return it;
 }
 
@@ -3264,7 +3265,6 @@ _queue_proecess(Widget_Data *wd,
         it = wd->queue->data;
         wd->queue = eina_list_remove_list(wd->queue, wd->queue);
         it->queued = EINA_FALSE;
-        it->num = ++wd->total_num;   // todo : remov
         _item_block_add(wd, it);
         t = ecore_time_get();
         if (it->block->changed)
@@ -4498,8 +4498,8 @@ elm_genlist_item_del(Elm_Genlist_Item *it)
              if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
              it->wd->calc_job = ecore_job_add(_calc_job, it->wd);
           }
-        if (it->itc->func.del)
-          it->itc->func.del((void *)it->base.data, it->base.widget);
+//        if (it->itc->func.del)
+//        it->itc->func.del((void *)it->base.data, it->base.widget);
         return;
      }
    _item_del(it);
