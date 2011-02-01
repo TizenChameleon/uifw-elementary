@@ -1148,6 +1148,10 @@ pasteimage_append(Paste_Image *pi, Evas_Object *entry)
 			   tw = (double)w*divd;
 			   th = (double)h*divd;
 		   }
+		   if (tw < 20)
+			   tw = 20;
+		   if (th < 20)
+			   th = 20;
 		   sprintf(imgres, "%dx%d", (int)tw, (int)th);
 	   }
 	   else
