@@ -6332,7 +6332,7 @@ elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it)
  *
  * @ingroup Genlist
  */
-EAPI void
+EAPI Evas_Object *
 elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
 {
    if (!it) return;
@@ -6430,7 +6430,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
                             s = it->itc->func.label_get((void *)it->base.data, it->base.widget, list->data);
                             if (s)
                               {
-                                 Evas_Object *entry = elm_editfield_entry_get(editfield);
+                                 entry = elm_editfield_entry_get(editfield);
                                  elm_entry_entry_set(entry,s);
                                  free(s);
                               }
@@ -6443,7 +6443,8 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
                }
           }			
      }
-
+     
+   return entry;
 }
 
 static void _sweep_finish(void *data, Evas_Object *o, const char *emission, const char *source)
