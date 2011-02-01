@@ -41,6 +41,9 @@ icon_22.png \
 icon_23.png \
 bubble.png \
 bubble_sh.png \
+copypaste_icon_clipboard.png \
+copypaste_icon_search.png \
+copypaste_icon_share.png \
 mystrale.jpg \
 mystrale_2.jpg
 
