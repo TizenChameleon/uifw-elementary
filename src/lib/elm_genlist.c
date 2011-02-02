@@ -1266,7 +1266,7 @@ _long_press(void *data)
       return ECORE_CALLBACK_CANCEL;
    it->wd->longpressed = EINA_TRUE;
    evas_object_smart_callback_call(it->base.widget, "longpressed", it);
-   if (it->wd->reorder_mode && it != it->wd->select_all_item)
+   if ((it->wd->reorder_mode) && (it != it->wd->select_all_item) && (it->flags != ELM_GENLIST_ITEM_GROUP))
      {
         it->wd->reorder_it = it;
         it->wd->reorder_start_y = 0;
@@ -2412,7 +2412,7 @@ _item_block_position(Item_Block *itb,
                                git->scrl_y = (it->scrl_y + it->h) - git->h;
                             git->want_realize = EINA_TRUE;
                          }
-                       if (it->wd->reorder_it && !it->wd->reorder_pan_move && it->old_scrl_y &&  it->old_scrl_y != it->scrl_y)
+                       if (it->wd->reorder_it && !it->wd->reorder_pan_move && it->old_scrl_y && it->old_scrl_y != it->scrl_y)
                          {
                             if (!it->move_effect_me)
                               {
@@ -2427,7 +2427,7 @@ _item_block_position(Item_Block *itb,
                            _effect_item_controls(it,  it->scrl_x, it->scrl_y);
                            evas_object_resize(it->base.view, it->w-(it->pad_left+it->pad_right), it->h);
                            evas_object_move(it->base.view, it->scrl_x+it->pad_left, it->scrl_y);
-                           if(!it->wd->effect_mode || (it->expanded_depth == 0) || (it->parent != it->wd->expand_item) || it->effect_done)
+                           if(!it->wd->effect_mode || (it->expanded_depth == 0) || (it->parent != it->wd->expand_item) || it->effect_done || (it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE))
                               evas_object_show(it->base.view);
                            else
                               evas_object_hide(it->base.view);
@@ -3573,6 +3573,7 @@ elm_genlist_clear(Evas_Object *obj)
      {
         Elm_Genlist_Item *it = ELM_GENLIST_ITEM_FROM_INLIST(wd->items);
 
+#ifdef ANCHOR_ITEM        
         if (wd->anchor_item == it)
           {
              wd->anchor_item = (Elm_Genlist_Item *)(EINA_INLIST_GET(it)->next);
@@ -3580,6 +3581,7 @@ elm_genlist_clear(Evas_Object *obj)
                wd->anchor_item =
                  (Elm_Genlist_Item *)(EINA_INLIST_GET(it)->prev);
           }
+#endif        
         wd->items = eina_inlist_remove(wd->items, wd->items);
         if (it->flags & ELM_GENLIST_ITEM_GROUP)
           it->wd->group_items = eina_list_remove(it->wd->group_items, it);
@@ -5660,6 +5662,8 @@ _item_moving_effect_timer_cb(void *data)
         evas_object_lower(wd->alpha_bg);
         evas_object_hide(wd->alpha_bg);
 
+        if (wd->calc_job) ecore_job_del(wd->calc_job);
+        wd->calc_job = ecore_job_add(_calc_job, wd);      
         return ECORE_CALLBACK_CANCEL;
      }
    return ECORE_CALLBACK_RENEW;
