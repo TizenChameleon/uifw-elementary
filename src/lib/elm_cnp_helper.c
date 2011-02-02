@@ -1118,59 +1118,16 @@ static Eina_Bool
 pasteimage_append(Paste_Image *pi, Evas_Object *entry)
 {
    char *entrytag;
-   char *tagstring = "<item absize=%s href=file://%s></item>";
+   char *tagstring = "<item absize=240x180 href=file://%s></item>";
    
    if (!pi) return EINA_FALSE;
    if (!entry) return EINA_FALSE;
 
-   char *imgres = alloca(sizeof(char)*10);
-
-   Evas_Object *o;
-   o = evas_object_image_add(evas_object_evas_get(entry));
-   evas_object_image_file_set(o, pi->file, NULL);
-   if (evas_object_image_load_error_get(o) == EVAS_LOAD_ERROR_NONE)
-   {
-	   int w = 0, h = 0;
-	   evas_object_image_size_get(o, &w, &h);
-	   
-	   if (w > 200 || h > 150)
-	   {
-		   double divd, tw, th;
-		   if (w > h)
-		   {
-			   divd = (double)200/w;
-			   tw = (double)w*divd;
-			   th = (double)h*divd;
-		   }
-		   else
-		   {
-			   divd = (double)150/h;
-			   tw = (double)w*divd;
-			   th = (double)h*divd;
-		   }
-		   if (tw < 20)
-			   tw = 20;
-		   if (th < 20)
-			   th = 20;
-		   sprintf(imgres, "%dx%d", (int)tw, (int)th);
-	   }
-	   else
-	   {
-		   if (!w || !h)
-			   strcpy(imgres, "240x180");
-		   else
-			   sprintf(imgres, "%dx%d", w, h);
-	   }
-   }
-   else
-	   strcpy(imgres, "240x180");
-   evas_object_del(o);
-
    pasteimage_provider_set(entry);
 
    pastedimages = eina_list_append(pastedimages, pi);
-   entrytag = alloca(sizeof(char)*(strlen(tagstring)+strlen(imgres)+strlen(pi->file)+1));
-   snprintf(entrytag, (strlen(tagstring)+strlen(imgres)+strlen(pi->file)), tagstring, imgres, pi->file);
+   entrytag = alloca(sizeof(char)*(strlen(tagstring)+strlen(pi->file)+1));
+   snprintf(entrytag, (strlen(tagstring)+strlen(pi->file)), tagstring, pi->file);
    elm_entry_entry_insert(entry, entrytag);
 
    return EINA_TRUE;
