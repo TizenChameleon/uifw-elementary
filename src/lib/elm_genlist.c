@@ -3575,10 +3575,10 @@ elm_genlist_clear(Evas_Object *obj)
 #ifdef ANCHOR_ITEM        
         if (wd->anchor_item == it)
           {
-             wd->anchor_item = (Elm_Genlist_Item *)(EINA_INLIST_GET(it)->next);
+             wd->anchor_item = ELM_GENLIST_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->next);
              if (!wd->anchor_item)
                wd->anchor_item =
-                 (Elm_Genlist_Item *)(EINA_INLIST_GET(it)->prev);
+                 ELM_GENLIST_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->prev);
           }
 #endif        
         wd->items = eina_inlist_remove(wd->items, wd->items);
