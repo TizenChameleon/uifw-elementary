@@ -5774,12 +5774,10 @@ _effect_item_update(Elm_Genlist_Item *it)
    if (it->edit_select_check) 
      {
         edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
-        edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
      }
    else
      {
         edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
-        edje_object_signal_emit(it->base.view, "elm,state,enabled", "elm");
      }
 }
 
@@ -5791,13 +5789,11 @@ _edit_item_checkbox_set(Elm_Genlist_Item  *it, Eina_Bool edit_select_check_state
      {
         it->edit_select_check = EINA_TRUE;
         edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
-        edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
      }
    else   	
      {
         it->edit_select_check = EINA_FALSE;
         edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
-        edje_object_signal_emit(it->base.view, "elm,state,enabled", "elm");     
      }
    if (it->wd->ed && it->wd->ed->ec && it->wd->ed->ec->item_selected)
       it->wd->ed->ec->item_selected(it->base.data, it, it->edit_select_check);   
@@ -5888,11 +5884,6 @@ _checkbox_item_select_process(Elm_Genlist_Item *it)
 
    if (it->wd->ed) it->wd->ed->del_item = it;
 
-   if (it->edit_select_check)
-      edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
-   else
-      edje_object_signal_emit(it->base.view, "elm,state,enabled", "elm");
-   
    EINA_INLIST_FOREACH(it->wd->items, tmp_it)
      {
         if (tmp_it->edit_select_check) check_cnt++; 
@@ -5956,12 +5947,10 @@ _effect_item_controls(Elm_Genlist_Item *it, int itx, int ity)
      {
         if (it->edit_select_check)
           {
-             edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
              edje_object_signal_emit(it->edit_obj, "elm,state,del_confirm", "elm");
           }
         else
           {
-             edje_object_signal_emit(it->base.view, "elm,state,enabled", "elm");
              edje_object_signal_emit(it->edit_obj, "elm,state,del,enable", "elm");
           }
      }
@@ -6133,7 +6122,6 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
                          {
                             it->pad_left = it->pad_right = 0;
                             if (it->realized) _effect_item_unrealize(it);
-               	            edje_object_signal_emit(it->base.view, "elm,state,enabled", "elm");
                          }
                     }
                }
