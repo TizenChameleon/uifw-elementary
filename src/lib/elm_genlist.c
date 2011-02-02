@@ -2387,9 +2387,8 @@ _item_block_position(Item_Block *itb,
         it->scrl_x = itb->x + it->x - it->wd->pan_x + ox;
         it->scrl_y = itb->y + it->y - it->wd->pan_y + oy;
 
-        if (it->flags != ELM_GENLIST_ITEM_GROUP || (it->wd->reorder_it ))
-           vis = (ELM_RECTS_INTERSECT(it->scrl_x, it->scrl_y, it->w, it->h,
-                                      cvx, cvy, cvw, cvh));
+        vis = (ELM_RECTS_INTERSECT(it->scrl_x, it->scrl_y, it->w, it->h,
+                                   cvx, cvy, cvw, cvh));
         if (it->flags != ELM_GENLIST_ITEM_GROUP || (it->wd->reorder_it ))
           {
              if ((itb->realized) && (!it->realized))
