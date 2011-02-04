@@ -520,6 +520,78 @@ item_exist_check(Widget_Data *wd, Elm_Controlbar_Item *item)
    return EINA_FALSE;
 }
 
+static void
+check_background(Widget_Data *wd)
+{
+   if(!wd) return;
+   Eina_List *l;
+   Elm_Controlbar_Item *it, *it2;
+
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+        if(it->style == TABBAR)
+          {
+             if(wd->mode == ELM_CONTROLBAR_MODE_LEFT)
+                edje_object_signal_emit(wd->bg, "elm,state,tabbar_left", "elm");
+             else if(wd->mode == ELM_CONTROLBAR_MODE_RIGHT)
+                edje_object_signal_emit(wd->bg, "elm,state,tabbar_right", "elm");
+             else
+                edje_object_signal_emit(wd->bg, "elm,state,tabbar", "elm");
+             return;
+          }
+     }
+   edje_object_signal_emit(wd->bg, "elm,state,toolbar", "elm");
+}
+                
+
+static void
+check_toolbar_line(Widget_Data *wd)
+{
+   if(!wd) return;
+   Eina_List *l;
+   Elm_Controlbar_Item *it, *it2;
+
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+        it2 = elm_controlbar_item_prev(it);
+        if(!it2) continue;
+        if(it->style != TOOLBAR || it2->style != TOOLBAR) continue;
+
+        if(wd->vertical)
+          {
+             edje_object_signal_emit(_EDJ(it2->base), "elm,state,right_line_hide", "elm");
+             edje_object_signal_emit(_EDJ(it->base), "elm,state,left_line_hide", "elm");
+
+             if((it->icon || it->label) && (it2->icon || it2->label))
+               {
+                  edje_object_signal_emit(_EDJ(it2->base), "elm,state,bottom_line_show", "elm");
+                  edje_object_signal_emit(_EDJ(it->base), "elm,state,top_line_show", "elm");
+               }
+             else
+               {
+                  edje_object_signal_emit(_EDJ(it2->base), "elm,state,bottom_line_hide", "elm");
+                  edje_object_signal_emit(_EDJ(it->base), "elm,state,top_line_hide", "elm");
+               }
+          }
+        else
+          {
+             edje_object_signal_emit(_EDJ(it2->base), "elm,state,bottom_line_hide", "elm");
+             edje_object_signal_emit(_EDJ(it->base), "elm,state,top_line_hide", "elm");
+
+             if((it->icon || it->label) && (it2->icon || it2->label))
+               {
+                  edje_object_signal_emit(_EDJ(it2->base), "elm,state,right_line_show", "elm");
+                  edje_object_signal_emit(_EDJ(it->base), "elm,state,left_line_show", "elm");
+               }
+             else
+               {
+                  edje_object_signal_emit(_EDJ(it2->base), "elm,state,right_line_hide", "elm");
+                  edje_object_signal_emit(_EDJ(it->base), "elm,state,left_line_hide", "elm");
+               }
+          }
+     }
+}
+
 static int
 check_bar_item_number(Widget_Data *wd)
 {
@@ -1021,7 +1093,7 @@ create_tool_item(Evas_Object * obj, const char *icon_path, const char *label,
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN,
                                   bar_item_down_cb, wd);
    evas_object_show(it->base);
- 
+
    return it;
 }
 
@@ -1471,6 +1543,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_append(Evas_Object * obj,
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
 
+   check_background(wd);
    _sizing_eval(obj);
    return it;
 }
@@ -1521,6 +1594,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_tab_item_prepend(Evas_Object *
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
 
+   check_background(wd);
    _sizing_eval(obj);
    return it;
 }
@@ -1577,6 +1651,7 @@ elm_controlbar_tab_item_insert_before(Evas_Object * obj,
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
 
+   check_background(wd);
    _sizing_eval(obj);
    return it;
 }
@@ -1634,6 +1709,7 @@ elm_controlbar_tab_item_insert_after(Evas_Object * obj,
    if(wd->more_item)
       elm_controlbar_item_view_set(wd->more_item, create_more_view(wd));
 
+   check_background(wd);
    _sizing_eval(obj);
    return it;
 }
@@ -1684,6 +1760,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_tool_item_append(Evas_Object *
         set_items_position(obj, it, NULL, EINA_TRUE);
    }
    wd->items = eina_list_append(wd->items, it);
+   check_toolbar_line(wd);
    _sizing_eval(obj);
    return it;
 }
@@ -1739,6 +1816,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_tool_item_prepend(Evas_Object *
         set_items_position(obj, it, item, EINA_TRUE);
    }
    wd->items = eina_list_prepend(wd->items, it);
+   check_toolbar_line(wd);
    _sizing_eval(obj);
    return it;
 }
@@ -1797,6 +1875,7 @@ elm_controlbar_tool_item_insert_before(Evas_Object * obj,
         set_items_position(obj, it, before, EINA_TRUE);
    }
    wd->items = eina_list_prepend_relative(wd->items, it, before);
+   check_toolbar_line(wd);
    _sizing_eval(obj);
    return it;
 }
@@ -1856,6 +1935,7 @@ elm_controlbar_tool_item_insert_after(Evas_Object * obj,
         set_items_position(obj, it, item, EINA_TRUE);
    }
    wd->items = eina_list_append_relative(wd->items, it, after);
+   check_toolbar_line(wd);
    _sizing_eval(obj);
    return it;
 }
@@ -2478,6 +2558,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
          wd->selected_signal = eina_stringshare_add("elm,state,selected_left");
          wd->pressed_signal = eina_stringshare_add("elm,state,pressed_left");
          edje_object_signal_emit(wd->edje, "elm,state,left", "elm");
+         check_background(wd);
          _sizing_eval(obj);
          return;
       case ELM_CONTROLBAR_MODE_RIGHT:
@@ -2485,6 +2566,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
          wd->selected_signal = eina_stringshare_add("elm,state,selected_right");
          wd->pressed_signal = eina_stringshare_add("elm,state,pressed_right");
          edje_object_signal_emit(wd->edje, "elm,state,right", "elm");
+         check_background(wd);
          _sizing_eval(obj);
          return;
       default:
@@ -2494,6 +2576,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
    wd->selected_box = wd->focused_box;
    wd->selected_signal = eina_stringshare_add("elm,state,selected");
    wd->pressed_signal = eina_stringshare_add("elm,state,pressed");
+   check_background(wd);
    _sizing_eval(obj);
 }
 
@@ -2630,6 +2713,7 @@ elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical)
      {
         repack_items(wd);
      }
+   check_toolbar_line(wd);
 }
 
 static Eina_Bool
