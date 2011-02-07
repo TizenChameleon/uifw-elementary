@@ -540,7 +540,7 @@ static void _delete_sweep_objs(Elm_Genlist_Item *it);
 static void _effect_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after);
 static void _effect_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before);
 static void _group_items_recalc(void *data);
-static void _select_all_down_process(Elm_Genlist_Item *select_all_it, Eina_Bool checked);
+static void _select_all_down_process(Elm_Genlist_Item *select_all_it, Eina_Bool checked, Eina_Bool update_items);
 static void _checkbox_item_select_process(Elm_Genlist_Item *it);
 static void _item_auto_scroll(void *data);
 
@@ -1042,9 +1042,9 @@ _item_select(Elm_Genlist_Item *it)
    if (it == it->wd->select_all_item) 
      { 
         if(it->wd->select_all_check)
-          _select_all_down_process(it->wd->select_all_item, EINA_FALSE);
+          _select_all_down_process(it->wd->select_all_item, EINA_FALSE, EINA_TRUE);
         else
-          _select_all_down_process(it->wd->select_all_item, EINA_TRUE);   	 	  	
+          _select_all_down_process(it->wd->select_all_item, EINA_TRUE, EINA_TRUE); 	 	  	
         return;
      }
    if (it->selected)
@@ -2541,7 +2541,7 @@ _calc_job(void *data)
       itb->h = itb->minh;
       y += itb->h;
       in += itb->count;
-      if ((showme) && (wd->show_item))
+      if ((showme) && (wd->show_item) && (!wd->show_item->queued))
         {
            wd->show_item->showme = EINA_FALSE;
            if (wd->bring_in)
@@ -3090,7 +3090,7 @@ _item_new(Widget_Data                  *wd,
    it->expanded_depth = 0;
    if ((it->parent) && (it->parent->edit_select_check)) it->edit_select_check = EINA_TRUE;   
    if ((!it->parent) && (it->wd->select_all_item))
-   	 _select_all_down_process(it->wd->select_all_item, EINA_FALSE); 
+   	 _select_all_down_process(it->wd->select_all_item, EINA_FALSE, EINA_FALSE); 
    it->num = ++wd->total_num;   // todo : remov
    return it;
 }
@@ -5830,7 +5830,7 @@ _edit_parent_items_checkbox_set(Elm_Genlist_Item  *it)
 }
 
 static void
-_select_all_down_process(Elm_Genlist_Item *select_all_it, Eina_Bool checked)
+_select_all_down_process(Elm_Genlist_Item *select_all_it, Eina_Bool checked, Eina_Bool update_items)
 {
    if (!select_all_it || !select_all_it->wd) return;
 
@@ -5844,15 +5844,18 @@ _select_all_down_process(Elm_Genlist_Item *select_all_it, Eina_Bool checked)
    else
       edje_object_signal_emit(select_all_it->base.view, "elm,state,del,animated,enable", "elm");
 
-   EINA_INLIST_FOREACH(wd->items, it)
+   if (update_items)
      {
-        old_check_state = it->edit_select_check;
-        if (wd->select_all_check) it->edit_select_check = EINA_TRUE;
-        else it->edit_select_check = EINA_FALSE;
+        EINA_INLIST_FOREACH(wd->items, it)
+         {
+            old_check_state = it->edit_select_check;
+            if (wd->select_all_check) it->edit_select_check = EINA_TRUE;
+            else it->edit_select_check = EINA_FALSE;
 
         // TODO : check this
-//        if (old_check_state != it->edit_select_check && it->wd->ed && it->wd->ed->ec && it->wd->ed->ec->item_selected)
-//           it->wd->ed->ec->item_selected(it->base.data, it, it->edit_select_check);   
+  //        if (old_check_state != it->edit_select_check && it->wd->ed && it->wd->ed->ec && it->wd->ed->ec->item_selected)
+  //           it->wd->ed->ec->item_selected(it->base.data, it, it->edit_select_check);   
+         }
      }
 
    if (wd->ed->ec->item_selected)
@@ -5920,7 +5923,7 @@ _select_all_down(void *data, Evas_Object *obj __UNUSED__, const char *emission _
    Widget_Data *wd = select_all_it->wd;
    if (!wd) return;
 
-   _select_all_down_process(select_all_it, !wd->select_all_check);
+   _select_all_down_process(select_all_it, !wd->select_all_check, EINA_TRUE);
 }
 
 
