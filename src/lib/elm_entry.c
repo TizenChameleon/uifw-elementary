@@ -107,6 +107,12 @@ struct _Widget_Data
    Evas_Object *hover;
    Evas_Object *layout;
    Evas_Object *list;
+   Evas_Object *mgf_proxy;
+   Evas_Object *mgf_clip;
+   Evas_Object *mgf_bg;
+   Evas_Coord mgf_height;
+   float mgf_scale;
+   int mgf_type;
    Ecore_Job *deferred_recalc_job;
    Ecore_Event_Handler *sel_notify_handler;
    Ecore_Event_Handler *sel_clear_handler;
@@ -139,7 +145,6 @@ struct _Widget_Data
    Eina_Bool editable : 1;
    Eina_Bool selection_asked : 1;
    Eina_Bool have_selection : 1;
-   Eina_Bool handler_moving : 1;
    Eina_Bool selmode : 1;
    Eina_Bool deferred_cur : 1;
    Eina_Bool disabled : 1;
@@ -205,6 +210,7 @@ static void _signal_selection_changed(void *data, Evas_Object *obj, const char *
 static void _signal_selection_cleared(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_handler_move_start(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_handler_move_end(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _signal_handler_moving(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_entry_paste_request(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_entry_copy_notify(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_entry_cut_notify(void *data, Evas_Object *obj, const char *emission, const char *source);
@@ -216,6 +222,11 @@ static int _is_width_over(Evas_Object *obj);
 static void _ellipsis_entry_to_width(Evas_Object *obj);
 static void _reverse_ellipsis_entry(Evas_Object *obj);
 static int _entry_length_get(Evas_Object *obj);
+static void _magnifier_create(void *data);
+static void _magnifier_show(void *data);
+static void _magnifier_hide(void *data);
+static void _magnifier_move(void *data);
+static void _long_pressed(void *data);
 
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_ACTIVATED[] = "activated";
@@ -254,6 +265,14 @@ static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_MATCHLIST_CLICKED, ""},
   {NULL, NULL}
 };
+
+typedef enum _Elm_Entry_Magnifier_Type
+{
+   _ENTRY_MAGNIFIER_FIXEDSIZE = 0, 
+   _ENTRY_MAGNIFIER_FILLWIDTH,
+   _ENTRY_MAGNIFIER_CIRCULAR,
+} Elm_Entry_Magnifier_Type;
+
 
 static Eina_List *entries = NULL;
 
@@ -474,6 +493,10 @@ _del_hook(Evas_Object *obj)
    if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
    if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
    if (wd->longpress_timer) ecore_timer_del(wd->longpress_timer);
+   if (wd->mgf_proxy) evas_object_del(wd->mgf_proxy);
+   if (wd->mgf_bg) evas_object_del(wd->mgf_bg);
+   if (wd->mgf_clip) evas_object_del(wd->mgf_clip);
+
    EINA_LIST_FREE(wd->items, it)
      {
         eina_stringshare_del(it->label);
@@ -620,8 +643,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *top = elm_widget_top_get(obj);
-   Evas_Object *parent_obj = obj;
-   Evas_Object *above = NULL;
 
    if (!wd) return;
    if (!wd->editable) return;
@@ -632,6 +653,8 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
 	evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
 	_check_enable_returnkey(obj);
+	wd->mgf_type = _ENTRY_MAGNIFIER_FILLWIDTH;
+	_magnifier_create(obj);
      }
    else
      {
@@ -886,14 +909,14 @@ _item_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    if (it->func) it->func(it->data, obj2, NULL);
 }
 
-static Eina_Bool
-_long_press(void *data)
+static void
+_long_pressed(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Object *top;
    const Eina_List *l;
    const Elm_Entry_Context_Menu_Item *it;
-   if (!wd) return ECORE_CALLBACK_CANCEL;
+   if (!wd) return;
    if ((wd->api) && (wd->api->obj_longpress))
      {
         wd->api->obj_longpress(data);
@@ -967,8 +990,139 @@ _long_press(void *data)
         edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
         edje_object_part_text_select_abort(wd->ent, "elm.text");
      }
-   wd->longpress_timer = NULL;
+
    evas_object_smart_callback_call(data, SIG_LONGPRESSED, NULL);
+}
+
+static void
+_magnifier_hide(void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   if (evas_version->major < 2 && evas_version->minor < 1) return;
+
+   evas_object_hide(wd->mgf_bg);
+   evas_object_hide(wd->mgf_clip);
+}
+
+static void
+_magnifier_show(void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   if (evas_version->major < 2 && evas_version->minor < 1) return;
+
+   evas_object_show(wd->mgf_bg);
+   evas_object_show(wd->mgf_clip);
+}
+
+static void
+_magnifier_move(void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   if (evas_version->major < 2 && evas_version->minor < 1) return;
+
+   Evas_Coord x, y, w, h, fs;
+   Evas_Coord cx, cy, cw, ch, ox, oy;
+
+   evas_object_geometry_get(data, &x, &y, &w, &h);
+   edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
+
+   ox = oy = 0;
+   fs = elm_finger_size_get();
+
+   if ((cy + y) - wd->mgf_height - fs < 0)
+	oy = -1 * ((cy + y) - wd->mgf_height - fs);
+
+   if (wd->mgf_type == _ENTRY_MAGNIFIER_FIXEDSIZE)
+	evas_object_move(wd->mgf_bg, (cx + x + cw/2) + ox, (cy + y) - wd->mgf_height - fs + oy);
+   else if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
+	evas_object_move(wd->mgf_bg, x, (cy + y) - wd->mgf_height - fs + oy);
+   else
+	return;
+
+   evas_object_move(wd->mgf_proxy, (1 - wd->mgf_scale) * cx + x + ox, (1 - wd->mgf_scale) * cy + y - wd->mgf_height/2 - ch/2 - fs + oy);
+}
+
+static void
+_magnifier_create(void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Coord x, y, w, h;
+   const char* key_data = NULL;
+
+   if (!wd) return;
+   if (evas_version->major < 2 && evas_version->minor < 1) return;
+
+   if (wd->mgf_proxy)
+     {
+	evas_object_image_source_unset(wd->mgf_proxy);
+	evas_object_color_set(wd->mgf_proxy, 255, 255, 255, 0);
+	evas_object_hide(wd->mgf_proxy);
+	evas_object_clip_unset(wd->mgf_proxy);
+	evas_object_del(wd->mgf_proxy);
+     }
+   if (wd->mgf_bg) evas_object_del(wd->mgf_bg);
+   if (wd->mgf_clip) evas_object_del(wd->mgf_clip);
+
+   evas_object_geometry_get(data, &x, &y, &w, &h);
+   wd->mgf_bg = edje_object_add(evas_object_evas_get(data));
+
+   if (wd->mgf_type == _ENTRY_MAGNIFIER_FIXEDSIZE)
+	_elm_theme_object_set(data, wd->mgf_bg, "entry", "magnifier", "fixed-size");
+   else if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
+	_elm_theme_object_set(data, wd->mgf_bg, "entry", "magnifier", "fill-width");
+   else
+	return;
+
+   wd->mgf_clip = evas_object_rectangle_add(evas_object_evas_get(data));
+   evas_object_color_set(wd->mgf_clip, 255, 255, 255, 255);
+   edje_object_part_swallow(wd->mgf_bg, "swallow", wd->mgf_clip);
+
+   key_data = edje_object_data_get(wd->mgf_bg, "height");
+   if (key_data) wd->mgf_height = atoi(key_data);
+   key_data = edje_object_data_get(wd->mgf_bg, "scale");
+   if (key_data) wd->mgf_scale = atof(key_data);
+   
+   if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
+	evas_object_resize(wd->mgf_bg, w, wd->mgf_height);
+
+   wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(data));
+   evas_object_image_source_set(wd->mgf_proxy, data);
+   evas_object_resize(wd->mgf_proxy, w * wd->mgf_scale, h * wd->mgf_scale);
+   evas_object_image_fill_set(wd->mgf_proxy, 0, 0, w * wd->mgf_scale, h * wd->mgf_scale);
+   evas_object_color_set(wd->mgf_proxy, 255, 255, 255, 255);
+   evas_object_pass_events_set(wd->mgf_proxy, EINA_TRUE);
+   evas_object_show(wd->mgf_proxy);
+   evas_object_clip_set(wd->mgf_proxy, wd->mgf_clip);
+
+   evas_object_layer_set(wd->mgf_bg, EVAS_LAYER_MAX);
+   evas_object_layer_set(wd->mgf_proxy, EVAS_LAYER_MAX);
+}
+
+static Eina_Bool
+_long_press(void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return ECORE_CALLBACK_CANCEL;
+
+   wd->long_pressed = EINA_TRUE;
+
+   if (wd->longpress_timer)
+     {
+        ecore_timer_del(wd->longpress_timer);
+        wd->longpress_timer = NULL;
+     }
+
+   _cancel(data, NULL, NULL);
+	
+   _magnifier_create(data);
+   _magnifier_move(data);
+   _magnifier_show(data);
+   elm_object_scroll_freeze_push(data);
+
+   wd->longpress_timer = NULL;
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -1010,7 +1164,13 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
 	wd->longpress_timer = NULL;
      }
 
+   _magnifier_hide(data);
    elm_object_scroll_freeze_pop(data);
+
+   if (wd->long_pressed)
+     {
+        _long_pressed(data);
+     }
 }
 
 static void
@@ -1061,6 +1221,14 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
 	     ecore_timer_del(wd->longpress_timer);
 	     wd->longpress_timer = NULL;
 	  }
+     }
+
+   if (ev->buttons != 1) return;
+
+   if (wd->long_pressed)
+     {
+	_magnifier_show(data);
+	_magnifier_move(data);
      }
 }
 
@@ -1316,6 +1484,10 @@ _signal_handler_move_start(void *data, Evas_Object *obj __UNUSED__, const char *
      {
         wd->api->obj_hidemenu(data);
      }
+
+   _magnifier_create(data);
+   _magnifier_move(data);
+   _magnifier_show(data);
 }
 
 static void
@@ -1325,18 +1497,24 @@ _signal_handler_move_end(void *data, Evas_Object *obj __UNUSED__, const char *em
    elm_object_scroll_freeze_pop(data);
 
    if (wd->have_selection)
-      _long_press(data);
+     {
+        _magnifier_hide(data);
+        _long_pressed(data);
+     }
+}
+
+static void
+_signal_handler_moving(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+	_magnifier_move(data);
+	_magnifier_show(data);
 }
 
 static void
 _signal_selection_end(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-/*	
-   Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Object *entry;
-   if (!wd) return;
-*/
-   _long_press(data);
+   _magnifier_hide(data);
+   _long_pressed(data);
 }
 
 static void
@@ -1364,6 +1542,26 @@ _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emi
 	     elm_selection_set(ELM_SEL_PRIMARY, data, ELM_SEL_FORMAT_MARKUP, txt);
      }
 #endif
+}
+
+static void
+_signal_magnifier_changed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   Evas_Coord cx, cy, cw, ch;
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
+   edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
+   if (!wd->deferred_recalc_job)
+      elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get());
+   else
+     {
+        wd->deferred_cur = EINA_TRUE;
+        wd->cx = cx;
+        wd->cy = cy;
+        wd->cw = cw;
+        wd->ch = ch + elm_finger_size_get();
+     }
 }
 
 static void
@@ -1426,6 +1624,11 @@ _signal_selection_cleared(void *data, Evas_Object *obj __UNUSED__, const char *e
 #endif
 	  }
      }
+
+   if ((wd->api) && (wd->api->obj_hidemenu))
+   {
+	   wd->api->obj_hidemenu(data);
+   }
 }
 
 static void
@@ -2278,10 +2481,14 @@ elm_entry_add(Evas_Object *parent)
                                    _signal_handler_move_start, obj);
    edje_object_signal_callback_add(wd->ent, "handler,move,end", "elm.text",
                                    _signal_handler_move_end, obj);
+   edje_object_signal_callback_add(wd->ent, "handler,moving", "elm.text",
+                                   _signal_handler_moving, obj);
    edje_object_signal_callback_add(wd->ent, "selection,start", "elm.text",
                                    _signal_selection_start, obj);
    edje_object_signal_callback_add(wd->ent, "selection,end", "elm.text",
                                    _signal_selection_end, obj);
+   edje_object_signal_callback_add(wd->ent, "magnifier,changed", "elm.text",
+                                   _signal_magnifier_changed, obj);
    edje_object_signal_callback_add(wd->ent, "selection,changed", "elm.text",
                                    _signal_selection_changed, obj);
    edje_object_signal_callback_add(wd->ent, "selection,cleared", "elm.text",
@@ -2552,6 +2759,42 @@ elm_entry_entry_get(const Evas_Object *obj)
    eina_stringshare_replace(&wd->text, text);
    if(wd->password)return elm_entry_markup_to_utf8(wd->text);
    return wd->text;
+}
+
+
+/**
+ * This returns EINA_TRUE if the entry is empty/there was an error
+ * and EINA_FALSE if it is not empty.
+ *
+ * @param obj The entry object
+ * @return If the entry is empty or not.
+ *
+ * @ingroup Entry
+ */
+EAPI Eina_Bool
+elm_entry_is_empty(const Evas_Object *obj)
+{
+   /* FIXME: until there's support for that in textblock, we just check
+    * to see if the there is text or not. */
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_TRUE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   const Evas_Object *tb;
+   Evas_Textblock_Cursor *cur;
+   Eina_Bool ret;
+   if (!wd) return EINA_TRUE;
+   /* It's a hack until we get the support suggested above.
+    * We just create a cursor, point it to the begining, and then
+    * try to advance it, if it can advance, the tb is not empty,
+    * otherwise it is. */
+   tb = edje_object_part_object_get(wd->ent, "elm.text");
+   cur = evas_object_textblock_cursor_new((Evas_Object *) tb); /* This is
+      actually, ok for the time being, thsese hackish stuff will be removed
+      once evas 1.0 is out*/
+   evas_textblock_cursor_pos_set(cur, 0);
+   ret = evas_textblock_cursor_char_next(cur);
+   evas_textblock_cursor_free(cur);
+
+   return !ret;
 }
 
 /**
@@ -3969,4 +4212,23 @@ elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout
    wd->input_panel_layout = layout;
 
    ecore_imf_context_input_panel_layout_set(ic, (Ecore_IMF_Input_Panel_Layout)layout);
+}
+	
+/**
+ * Set the magnifier style of the entry
+ *
+ * @param obj The entry object
+ * @param type the magnifier style to set
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_magnifier_type_set(Evas_Object *obj, int type)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->mgf_type = type;
+   _magnifier_create(obj);
 }

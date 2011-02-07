@@ -1282,6 +1282,8 @@ extern "C" {
    EAPI void         elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
    EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj);
    EAPI void         elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_sensitive);
+   EAPI Eina_Bool    elm_entry_is_empty(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void         elm_entry_magnifier_type_set(Evas_Object *obj, int type) EINA_ARG_NONNULL(1);
 
 
    /* pre-made filters for entries */
