@@ -48,7 +48,6 @@ struct _Widget_Data
    Evas_Object *icon;
    Evas_Object *end;
    Evas_Object *spacer;
-   Evas_Object *indicator_label;
    const char *label;
    const char *units;
    const char *indicator;
@@ -190,7 +189,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 static void
 _theme_hook(Evas_Object *obj)
 {
-   Evas_Coord indicator_width;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (wd->horizontal)
@@ -228,14 +226,6 @@ _theme_hook(Evas_Object *obj)
       edje_object_signal_emit(wd->slider, "elm,state,inverted,on", "elm");
    
    edje_object_part_swallow(wd->slider, "elm.swallow.bar", wd->spacer);
-
-   edje_object_part_swallow(wd->slider, "elm.indicator", wd->indicator_label);
-   edje_object_part_geometry_get(wd->slider, "elm.dragable.slider", NULL, NULL, &indicator_width, NULL);
-   elm_label_wrap_width_set(wd->indicator_label, indicator_width);
-   elm_label_text_align_set(wd->indicator_label, "center");
-   elm_label_ellipsis_set(wd->indicator_label, EINA_TRUE);
-   evas_object_show(wd->indicator_label);
-
    _units_set(obj);
    _indicator_set(obj);
    edje_object_message_signal_process(wd->slider);
@@ -372,18 +362,18 @@ _indicator_set(Evas_Object *obj)
    if (!wd) return;
    if (wd->indicator_format_func)
      {
-        const char *buf;
-        buf = wd->indicator_format_func(wd->val);
-        elm_label_label_set(wd->indicator_label, buf);
+	const char *buf;
+	buf = wd->indicator_format_func(wd->val);
+	edje_object_part_text_set(wd->slider, "elm.indicator", buf);
      }
    else if (wd->indicator)
      {
-        char buf[1024];
-        snprintf(buf, sizeof(buf), wd->indicator, wd->val);
-        elm_label_label_set(wd->indicator_label, buf);
+	char buf[1024];
+	snprintf(buf, sizeof(buf), wd->indicator, wd->val);
+	edje_object_part_text_set(wd->slider, "elm.indicator", buf);
      }
    else
-     elm_label_label_set(wd->indicator_label, NULL);
+     edje_object_part_text_set(wd->slider, "elm.indicator", NULL);
 }
 
 static void
@@ -401,16 +391,12 @@ _drag(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, 
 static void
 _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-   Evas_Coord indicator_width;
    Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
    if (elm_widget_disabled_get(data)) return;
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_START, NULL);
    edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
    edje_object_message_signal_process(wd->slider); 
-   elm_object_style_set(wd->indicator_label,"slider_move");
-   edje_object_part_geometry_get(wd->slider, "popup", NULL, NULL, &indicator_width, NULL);
-   elm_label_wrap_width_set(wd->indicator_label, indicator_width);
    _units_set(data);
    _indicator_set(data);
    elm_widget_scroll_hold_push(data);
@@ -419,14 +405,10 @@ _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUS
 static void
 _drag_stop(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-   Evas_Coord indicator_width;
    Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
    if (elm_widget_disabled_get(data)) return;
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_STOP, NULL);
-   elm_object_style_set(wd->indicator_label,"slider_normal");
-   edje_object_part_geometry_get(wd->slider, "button0", NULL, NULL, &indicator_width, NULL);
-   elm_label_wrap_width_set(wd->indicator_label, indicator_width);
    _units_set(data);
    _indicator_set(data);
    elm_widget_scroll_hold_pop(data);
@@ -516,7 +498,6 @@ elm_slider_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-   Evas_Coord indicator_width;
 
    EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
 
@@ -558,17 +539,6 @@ elm_slider_add(Evas_Object *parent)
    evas_object_pass_events_set(wd->spacer, EINA_TRUE);
    elm_widget_sub_object_add(obj, wd->spacer);
    edje_object_part_swallow(wd->slider, "elm.swallow.bar", wd->spacer);
-
-   wd->indicator_label = elm_label_add(obj);
-   elm_object_style_set(wd->indicator_label,"slider_normal");
-   elm_widget_sub_object_add(obj, wd->indicator_label);
-   edje_object_part_swallow(wd->slider, "elm.indicator", wd->indicator_label);
-   edje_object_part_geometry_get(wd->slider, "button0", NULL, NULL, &indicator_width, NULL);
-   elm_label_wrap_width_set(wd->indicator_label, indicator_width);
-   elm_label_text_align_set(wd->indicator_label, "center");
-   elm_label_ellipsis_set(wd->indicator_label, EINA_TRUE);
-   evas_object_show(wd->indicator_label);
-
    evas_object_event_callback_add(wd->spacer, EVAS_CALLBACK_MOUSE_DOWN, _spacer_cb, obj);
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
@@ -652,11 +622,12 @@ elm_slider_icon_set(Evas_Object *obj, Evas_Object *icon)
    wd->icon = icon;
    if (icon)
      {
-        elm_widget_sub_object_add(obj, icon);
-        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,_changed_size_hints, obj);
-        edje_object_part_swallow(wd->slider, "elm.swallow.icon", icon);
-        edje_object_signal_emit(wd->slider, "elm,state,icon,visible", "elm");
-        edje_object_message_signal_process(wd->slider);
+	elm_widget_sub_object_add(obj, icon);
+	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+				       _changed_size_hints, obj);
+	edje_object_part_swallow(wd->slider, "elm.swallow.icon", icon);
+	edje_object_signal_emit(wd->slider, "elm,state,icon,visible", "elm");
+	edje_object_message_signal_process(wd->slider);
      }
    _sizing_eval(obj);
 }
@@ -1088,11 +1059,12 @@ elm_slider_end_set(Evas_Object *obj, Evas_Object *end)
    wd->end = end;
    if (end)
      {
-        elm_widget_sub_object_add(obj, end);
-        evas_object_event_callback_add(end, EVAS_CALLBACK_CHANGED_SIZE_HINTS,_changed_size_hints, obj);
-        edje_object_part_swallow(wd->slider, "elm.swallow.end", end);
-        edje_object_signal_emit(wd->slider, "elm,state,end,visible", "elm");
-        edje_object_message_signal_process(wd->slider);
+	elm_widget_sub_object_add(obj, end);
+	evas_object_event_callback_add(end, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+				       _changed_size_hints, obj);
+	edje_object_part_swallow(wd->slider, "elm.swallow.end", end);
+	edje_object_signal_emit(wd->slider, "elm,state,end,visible", "elm");
+	edje_object_message_signal_process(wd->slider);
      }
    _sizing_eval(obj);
 }
