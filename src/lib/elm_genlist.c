@@ -1752,6 +1752,7 @@ _item_cache_add(Elm_Genlist_Item *it)
 
    it->wd->item_cache_count++;
    itc = calloc(1, sizeof(Item_Cache));
+   if (!itc) return;
    it->wd->item_cache = eina_inlist_prepend(it->wd->item_cache,
                                             EINA_INLIST_GET(itc));
    itc->spacer = it->spacer;
@@ -3563,7 +3564,7 @@ elm_genlist_clear(Evas_Object *obj)
    while (wd->items)
      {
         Elm_Genlist_Item *it = ELM_GENLIST_ITEM_FROM_INLIST(wd->items);
-
+        it->nocache = EINA_TRUE;
 #ifdef ANCHOR_ITEM        
         if (wd->anchor_item == it)
           {
@@ -3577,6 +3578,7 @@ elm_genlist_clear(Evas_Object *obj)
         if (it->flags & ELM_GENLIST_ITEM_GROUP)
           it->wd->group_items = eina_list_remove(it->wd->group_items, it);
         elm_widget_item_pre_notify_del(it);
+        if (it->effect_item_realized) _effect_item_unrealize(it);        
         if (it->realized) _item_unrealize(it);
         if (it->itc->func.del)
           it->itc->func.del((void *)it->base.data, it->base.widget);
@@ -5423,7 +5425,7 @@ _effect_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after)
    if (!after) return;
 
    if (it->wd->ed->ec->move)
-      it->wd->ed->ec->move(it->base.widget, it, it->wd->ed->reorder_rel, EINA_TRUE);
+      it->wd->ed->ec->move(it->base.widget, it, after, EINA_TRUE);
 
 // printf("MOVE AFTER : %d  after = %d \n", (int)elm_genlist_item_data_get(it)+1, (int)elm_genlist_item_data_get(after)+1);
    it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
@@ -5443,7 +5445,7 @@ _effect_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before)
    if (!before) return;
 
    if (it->wd->ed->ec->move)
-      it->wd->ed->ec->move(it->base.widget, it, it->wd->ed->reorder_rel, EINA_TRUE);
+      it->wd->ed->ec->move(it->base.widget, it, before, EINA_FALSE);
 
 //   printf("MOVE BEFORE : %d  before = %d \n", (int)elm_genlist_item_data_get(it)+1, (int)elm_genlist_item_data_get(before)+1);
    it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
