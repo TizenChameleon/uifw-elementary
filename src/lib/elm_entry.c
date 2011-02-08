@@ -1295,84 +1295,84 @@ _entry_length_get(Evas_Object *obj)
 static void
 _matchlist_show(void *data)
 {
-	Widget_Data *wd = elm_widget_data_get(data);
-	const char *text = NULL;
-	int textlen = 0;
-	char *str_list = NULL, *str_result = NULL;
-	char *str_mkup = NULL, *str_front = NULL, *str_mid = NULL;
+   Widget_Data *wd = elm_widget_data_get(data);
+   const char *text = NULL;
+   int textlen = 0;
+   char *str_list = NULL, *str_result = NULL;
+   char *str_mkup = NULL, *str_front = NULL, *str_mid = NULL;
 
-	Eina_List *l;
-	Eina_Bool textfound = EINA_FALSE;
+   Eina_List *l;
+   Eina_Bool textfound = EINA_FALSE;
 
-	if (!wd) return;
-	if (elm_widget_disabled_get(data)) return;
-	
-	wd->matchlist_job = NULL;
+   if (!wd) return;
+   if (elm_widget_disabled_get(data)) return;
 
-	if (wd->matchlist_list_clicked)
-	{
-		evas_object_hide(wd->hover);
-		wd->matchlist_list_clicked = EINA_FALSE;
-		return;
-	}
-	text = elm_entry_entry_get(data);
-	if (text == NULL)
-		return;	
-	textlen = strlen(text);
-	
-	if (textlen < wd->matchlist_threshold)
-	{
-		evas_object_hide(wd->hover);
-		return;
-	}
-	
-	evas_object_hide(wd->hover);
+   wd->matchlist_job = NULL;
 
-	if (wd->match_list) 
-	{
-		elm_list_clear(wd->list);
-		EINA_LIST_FOREACH(wd->match_list, l, str_list) 
-		{
-			if (wd->matchlist_case_sensitive)
-				str_result = strstr(str_list, text);
-			else
-				str_result = strcasestr(str_list, text);
+   if (wd->matchlist_list_clicked)
+     {
+        evas_object_hide(wd->hover);
+        wd->matchlist_list_clicked = EINA_FALSE;
+        return;
+     }
+   text = elm_entry_entry_get(data);
+   if (text == NULL)
+      return;	
+   textlen = strlen(text);
 
-			if (str_result)
-			{
-				str_mkup = malloc(strlen(str_list) + 16);
+   if (textlen < wd->matchlist_threshold)
+     {
+        evas_object_hide(wd->hover);
+        return;
+     }
 
-				textlen = strlen(str_list) - strlen(str_result);
-				str_front = malloc(textlen + 1);
-				memset(str_front, 0, textlen + 1);
-				strncpy(str_front, str_list, textlen);
-			
-				textlen = strlen(text);
-				str_mid = malloc(textlen + 1);
-				memset(str_mid, 0, textlen + 1);
-				strncpy(str_mid, str_list + strlen(str_front), textlen);
-				
-				sprintf(str_mkup, "%s<match>%s</match>%s", str_front, str_mid, str_result + strlen(text));
+   evas_object_hide(wd->hover);
 
-				elm_list_item_append(wd->list, str_mkup, NULL, NULL, NULL, NULL);
+   if (wd->match_list) 
+     {
+        elm_list_clear(wd->list);
+        EINA_LIST_FOREACH(wd->match_list, l, str_list) 
+          {
+             if (wd->matchlist_case_sensitive)
+                str_result = strstr(str_list, text);
+             else
+                str_result = strcasestr(str_list, text);
 
-				if (str_mkup) free(str_mkup);
-				if (str_front) free(str_front);
-				if (str_mid) free(str_mid);
+             if (str_result)
+               {
+                  str_mkup = malloc(strlen(str_list) + 16);
 
-				textfound=EINA_TRUE;
-			}
-		}
-	}
-	else
-		return;
+                  textlen = strlen(str_list) - strlen(str_result);
+                  str_front = malloc(textlen + 1);
+                  memset(str_front, 0, textlen + 1);
+                  strncpy(str_front, str_list, textlen);
 
-	if (textfound)
-	{
-		elm_list_go(wd->list);		
-		evas_object_show(wd->hover);
-		evas_object_raise(wd->hover);
-	}
+                  textlen = strlen(text);
+                  str_mid = malloc(textlen + 1);
+                  memset(str_mid, 0, textlen + 1);
+                  strncpy(str_mid, str_list + strlen(str_front), textlen);
+
+                  sprintf(str_mkup, "%s<match>%s</match>%s", str_front, str_mid, str_result + strlen(text));
+
+                  elm_list_item_append(wd->list, str_mkup, NULL, NULL, NULL, NULL);
+
+                  if (str_mkup) free(str_mkup);
+                  if (str_front) free(str_front);
+                  if (str_mid) free(str_mid);
+
+                  textfound=EINA_TRUE;
+               }
+          }
+     }
+   else
+      return;
+
+   if (textfound)
+     {
+        elm_list_go(wd->list);		
+        evas_object_show(wd->hover);
+        evas_object_raise(wd->hover);
+     }
 }
 
 static void _matchlist_list_clicked( void *data, Evas_Object *obj, void *event_info )
