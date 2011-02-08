@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build108) unstable; urgency=low
+
+  * Fix Genlist Bug with fast scroll.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build108
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Tue, 08 Feb 2011 10:43:57 +0900
+
 elementary (1.0.0+svn.51480slp2+build107) unstable; urgency=low
 
   * cache flush enable = 0
