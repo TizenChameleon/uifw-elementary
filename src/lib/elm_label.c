@@ -354,7 +354,7 @@ _is_width_over(Evas_Object *obj, Eina_Bool multiline)
    fprintf(stderr, "## _is_width_over\n");
    fprintf(stderr, "## x = %d, y = %d, w = %d, h = %d\n", x, y, w, h);
    fprintf(stderr, "## vx = %d, vy = %d, vw = %d, vh = %d\n", vx, vy, vw, vh);
-   if (linemode)
+   if (multiline)
            fprintf(stderr, "## wd->wrap_w = %d, wd->wrap_h = %d\n", wd->wrap_w, wd->wrap_h);
    else
            fprintf(stderr, "## wd->wrap_w = %d\n", wd->wrap_w);
