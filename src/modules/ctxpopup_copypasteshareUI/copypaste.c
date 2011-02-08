@@ -187,7 +187,6 @@ obj_longpress(Evas_Object *obj)
 			ext_mod->popup = elm_ctxpopup_add(top);
 		/*currently below theme not used,when guideline comes a new theme can be created if required*/
 		elm_object_style_set(ext_mod->popup,"extended/entry");
-		elm_object_scroll_freeze_push(ext_mod->popup);
 		context_menu_orientation = edje_object_data_get
 		(ext_mod->ent, "context_menu_orientation");
 		if ((context_menu_orientation) &&
@@ -262,6 +261,7 @@ obj_longpress(Evas_Object *obj)
 		}
 		if (ext_mod->popup)
 			{
+				elm_object_scroll_freeze_push(ext_mod->popup);
 				_ctxpopup_position(obj);
 				evas_object_show(ext_mod->popup);	          
 			}
