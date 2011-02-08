@@ -597,10 +597,18 @@ EAPI void
 elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon)
 {
    if (!item) return; 
-   edje_object_part_swallow(item->t_base, "elm.swallow.icon", icon);
-   elm_widget_sub_object_add(item->obj, icon);
-   edje_object_signal_emit(item->t_base, "elm,state,icon,visible", "elm");
+   if (item->icon == icon) return;
+   if (item->icon) evas_object_del(item->icon);
    item->icon = icon;
+   if(icon)
+     {
+        edje_object_part_swallow(item->t_base, "elm.swallow.icon", icon);
+        elm_widget_sub_object_add(item->obj, icon);
+        edje_object_signal_emit(item->t_base, "elm,state,icon,visible", "elm");
+        edje_object_message_signal_process(item->t_base);
+     }
+   else
+     edje_object_signal_emit(item->t_base, "elm,state,icon,hidden", "elm");
 }
 
 /**
