@@ -710,6 +710,24 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
 }
 
 /**
+ * Get the buttons list.
+ *
+ * @param [in] obj The popup object
+ * @return Button List.
+ *
+ * @ingroup Popup
+ */
+EAPI Eina_List *
+elm_popup_buttons_list_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return;
+   return wd->button_list;
+}
+
+/**
  * This Set's the time before the popup window is hidden, 
  * and ELM_POPUP_RESPONSE_TIMEOUT is sent along with response signal.
  *

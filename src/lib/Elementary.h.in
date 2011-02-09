@@ -2600,6 +2600,13 @@ extern "C" {
         ELM_POPUP_ORIENT_BOTTOM_RIGHT
      } Elm_Popup_Orient;
 
+   typedef struct _Action_Area_Data Action_Area_Data;
+   struct _Action_Area_Data 
+     {
+        Evas_Object *obj;
+        Evas_Object *btn;
+        int response_id;
+     };
    /* smart callbacks called:
     * "response" - when ever popup is closed, this signal is sent with appropriate response id.".
     */
@@ -2620,6 +2627,7 @@ extern "C" {
    EAPI void         elm_popup_response(Evas_Object *obj, int  response_id);
    EAPI void         elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
    EAPI int          elm_popup_run(Evas_Object *obj);
+   EAPI Eina_List *  elm_popup_buttons_list_get(Evas_Object *obj);
 
    /* tansit */
    typedef enum 
