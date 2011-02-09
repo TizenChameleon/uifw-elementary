@@ -1,10 +1,20 @@
+elementary (1.0.0+svn.51480slp2+build109) unstable; urgency=low
+
+  * On-demand module loading.
+  * Fixed genlist cache bug.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build109
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Wed, 09 Feb 2011 13:09:41 +0900
+
 elementary (1.0.0+svn.51480slp2+build108) unstable; urgency=low
 
   * Fix Genlist Bug with fast scroll.
   * Git: 165.213.180.234:slp/pkgs/e/elementary
   * Tag: elementary_1.0.0+svn.51480slp2+build108
+  * i
 
- -- Juyung Seo <juyung.seo@samsung.com>  Tue, 08 Feb 2011 10:43:57 +0900
+ -- Juyung Seo <juyung.seo@samsung.com>  Wed, 09 Feb 2011 13:09:37 +0900
 
 elementary (1.0.0+svn.51480slp2+build107) unstable; urgency=low
 
