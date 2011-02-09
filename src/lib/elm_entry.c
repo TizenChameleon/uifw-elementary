@@ -783,11 +783,9 @@ _selectall(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    wd->selmode = EINA_TRUE;
-   if (!wd->password)
-      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
+   edje_object_part_text_select_none(wd->ent, "elm.text");
    edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
    edje_object_part_text_select_all(wd->ent, "elm.text");
-   //elm_widget_scroll_hold_push(data);
    elm_object_scroll_freeze_pop(data);
 }
 
@@ -802,7 +800,6 @@ _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
    edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
    elm_object_scroll_freeze_pop(data);
-   //elm_widget_scroll_hold_push(data);
 }
 
 static void
