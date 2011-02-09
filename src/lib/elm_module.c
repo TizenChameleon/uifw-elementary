@@ -133,8 +133,11 @@ _elm_module_load(Elm_Module *m)
                }
              else
                {
-                  dlclose(m->handle);
-                  m->handle = NULL;
+                  if (m->handle)
+                    {
+                       dlclose(m->handle);
+                       m->handle = NULL;
+                    }
                   return EINA_FALSE;
                }
           }
@@ -158,8 +161,11 @@ _elm_module_load(Elm_Module *m)
                }
              else
                {
-                  dlclose(m->handle);
-                  m->handle = NULL;
+                  if (m->handle)
+                    {
+                       dlclose(m->handle);
+                       m->handle = NULL;
+                    }
                   return EINA_FALSE;
                }
           }
@@ -177,7 +183,7 @@ _elm_module_unload(Elm_Module *m)
    eina_stringshare_del(m->bin_dir);
    if (m->shutdown_func) m->shutdown_func(m);
    if (m->api) free(m->api);
-   dlclose(m->handle);
+   if (m->handle) dlclose(m->handle);
 }
 
 Elm_Module *
