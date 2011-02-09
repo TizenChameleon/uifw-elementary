@@ -10,7 +10,6 @@
  */
 
 typedef struct _Widget_Data Widget_Data;
-typedef struct _Action_Area_Data Action_Area_Data;
 
 struct _Widget_Data 
 {
@@ -29,13 +28,6 @@ struct _Widget_Data
    Elm_Notify_Orient notify_orient;
    Ecore_Job *del_job;
    Eina_Bool delete_me : 1;
-};
-
-struct _Action_Area_Data 
-{
-   Evas_Object *obj;
-   Evas_Object *btn;
-   int response_id;
 };
 
 static const char *widtype = NULL;
