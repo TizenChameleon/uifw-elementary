@@ -604,13 +604,42 @@ _del_button(Evas_Object *obj)
      }
 }
 
+static void
+_resize_button(Evas_Object *btn, Evas_Object *label, Evas_Coord *realw, Evas_Coord *vieww)
+{
+   Evas_Coord rw, vw;
+   Evas_Coord w_label, h_label, w_btn, h_btn, padding_outer, padding_inner;
+
+   // decide the size of button
+   evas_object_size_hint_min_get(label, &w_label, &h_label);
+   edje_object_part_geometry_get(btn, "elm.base", NULL, NULL, NULL, &h_btn);
+   edje_object_part_geometry_get(btn, "left.padding", NULL, NULL, &padding_outer, NULL);
+   edje_object_part_geometry_get(btn, "left.inner.padding", NULL, NULL, &padding_inner, NULL);    
+   w_btn = w_label + 2*padding_outer + 2*padding_inner;   
+
+   rw = w_btn;
+   vw =(MAX_W_BTN < w_btn) ? MAX_W_BTN : w_btn;    
+
+   //resize btn and label
+   evas_object_resize(btn, vw, h_btn);
+   evas_object_size_hint_min_set(btn, vw, h_btn);
+   if ( (rw != vw) &&  (vw - 2*padding_outer - 2*padding_inner >=0))
+     {
+        evas_object_resize(label, vw - 2*padding_outer - 2*padding_inner, h_label);   
+        elm_label_wrap_width_set(label, vw - 2*padding_outer - 2*padding_inner ); 
+     }
+
+   if(realw) *realw = rw;
+   if(vieww) *vieww = vw;
+}
+
 static Elm_Multibuttonentry_Item*
 _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, const Elm_Multibuttonentry_Item *reference, void *data)
 {
    Elm_Multibuttonentry_Item *item;
    Evas_Object *btn;
    Evas_Object *label;
-   Evas_Coord w_label, h_label, w_btn, h_btn, padding_outer, padding_inner;
+   //Evas_Coord w_label, h_label, w_btn, h_btn, padding_outer, padding_inner;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->box || !wd->entry) return NULL;
 
@@ -630,23 +659,19 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
    elm_label_ellipsis_set(label, EINA_TRUE);
    edje_object_part_swallow(btn, "elm.label", label);
 
-   // decide the size of button
-   evas_object_size_hint_min_get(label, &w_label, &h_label);
-   edje_object_part_geometry_get(btn, "elm.base", NULL, NULL, NULL, &h_btn);
-   edje_object_part_geometry_get(btn, "left.padding", NULL, NULL, &padding_outer, NULL);
-   edje_object_part_geometry_get(btn, "left.inner.padding", NULL, NULL, &padding_inner, NULL);    
-   w_btn = w_label + 2*padding_outer + 2*padding_inner;   
-
    // append item list
    item = ELM_NEW(Elm_Multibuttonentry_Item);
    if (item) 
      {
+        Evas_Coord rw, vw;
+        _resize_button(btn, label, &rw, &vw);
+
         item->multibuttonentry = obj;
         item->button = btn;
         item->label = label;
         item->data = data;
-        item->rw = w_btn;
-        item->vw =(MAX_W_BTN < w_btn) ? MAX_W_BTN : w_btn;      
+        item->rw = rw;
+        item->vw = vw;      
         item->visible = EINA_TRUE;
         
         switch(pos)
@@ -693,15 +718,6 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
              default:
                 break;
           }
-     }
-
-   //resize btn and label
-   evas_object_resize(btn, item->vw, h_btn);
-   evas_object_size_hint_min_set(btn, item->vw, h_btn);
-   if ( (item->rw != item->vw) &&  (item->vw - 2*padding_outer - 2*padding_inner >=0))
-     {
-        evas_object_resize(label, item->vw - 2*padding_outer - 2*padding_inner, h_label);   
-        elm_label_wrap_width_set(label, item->vw - 2*padding_outer - 2*padding_inner ); 
      }
 
    evas_object_smart_callback_call(obj, "added", item); // will be removed!
@@ -1264,6 +1280,7 @@ elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char 
         {
            Evas_Object *label = edje_object_part_swallow_get(_item->button, "elm.label");
            if (label)   elm_label_label_set (label, str);
+           _resize_button(_item->button, label, &_item->rw, &_item->vw);
            break;
         }
 }
