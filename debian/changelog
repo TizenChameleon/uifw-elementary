@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build111) unstable; urgency=low
+
+  * Repackaging
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build111
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Thu, 10 Feb 2011 10:32:19 +0900
+
 elementary (1.0.0+svn.51480slp2+build110) unstable; urgency=low
 
   * Fixed bug in entry text selection
