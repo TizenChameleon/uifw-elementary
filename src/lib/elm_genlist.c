@@ -2877,11 +2877,14 @@ _pan_calculate(Evas_Object *obj)
       if (sd->wd->effect_mode && 
           (sd->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND || sd->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT))
         {
-           _item_flip_effect_show(sd->wd->expand_item);
-           evas_object_raise(sd->wd->alpha_bg);
-           evas_object_show(sd->wd->alpha_bg);
-           sd->wd->start_time = current_time_get();
-           sd->wd->item_moving_effect_timer = ecore_animator_add(_item_moving_effect_timer_cb, sd->wd);
+           if (!sd->wd->item_moving_effect_timer)
+             {
+                _item_flip_effect_show(sd->wd->expand_item);
+                evas_object_raise(sd->wd->alpha_bg);
+                evas_object_show(sd->wd->alpha_bg);
+                sd->wd->start_time = current_time_get();
+                sd->wd->item_moving_effect_timer = ecore_animator_add(_item_moving_effect_timer_cb, sd->wd);
+             }
         }
       else _item_auto_scroll(sd->wd);
    if (sd->wd->select_all_item) evas_object_raise(sd->wd->select_all_item->base.view);         
@@ -3627,6 +3630,11 @@ elm_genlist_clear(Evas_Object *obj)
           evas_object_del(editfield);
         wd->edit_field = NULL;
      }   
+   if (wd->item_moving_effect_timer)
+     {
+        ecore_animator_del(wd->item_moving_effect_timer);
+        wd->item_moving_effect_timer = NULL;   	
+     }
    wd->show_item = NULL;
    wd->pan_x = 0;
    wd->pan_y = 0;
