@@ -3033,9 +3033,6 @@ extern "C" {
    EAPI void                      *elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item);
    EAPI void                       elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data);
    /* smart callback called:
-    * "selected" - This signal is emitted when the selected item of multibuttonentry is changed. 
-    * "added" - This signal is emitted when a new multibuttonentry item is added.
-    * "deleted" - This signal is emitted when a multibuttonentry item is deleted.
     * "expanded" - This signal is emitted when a multibuttonentry is expanded. 
     * "contracted" - This signal is emitted when a multibuttonentry is contracted. 
     * "contracted,state,changed" - This signal is emitted when the contracted state of multibuttonentry is changed. 

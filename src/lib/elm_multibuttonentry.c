@@ -475,7 +475,6 @@ _change_current_button_state(Evas_Object *obj, Multibuttonentry_Button_State sta
                 break;
              case MULTIBUTONENTRY_BUTTON_STATE_SELECTED:
                 edje_object_signal_emit(item->button, "focused", "");
-                evas_object_smart_callback_call(obj, "selected", item); // will be removed!
                 evas_object_smart_callback_call(obj, "item,selected", item);
                 break;
              default:
@@ -570,7 +569,6 @@ _del_button_item(Elm_Multibuttonentry_Item *item)
           {
              wd->items = eina_list_remove(wd->items, _item);
              elm_box_unpack(wd->box, _item->button);
-             evas_object_smart_callback_call(obj, "deleted", _item); // will be removed!
              evas_object_smart_callback_call(obj, "item,deleted", _item);
              _del_button_obj(obj, _item->button);
              free(_item);
@@ -720,7 +718,6 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
           }
      }
 
-   evas_object_smart_callback_call(obj, "added", item); // will be removed!
    evas_object_smart_callback_call(obj, "item,added", item);
 
    return item;
