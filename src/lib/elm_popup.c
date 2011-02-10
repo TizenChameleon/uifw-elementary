@@ -30,6 +30,15 @@ struct _Widget_Data
    Eina_Bool delete_me : 1;
 };
 
+typedef struct _Action_Area_Data Action_Area_Data;
+
+struct _Action_Area_Data 
+{
+	Evas_Object *obj;
+	Evas_Object *btn;
+	int response_id;
+};
+
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
@@ -699,24 +708,6 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_tex
    va_end(args);
    edje_object_message_signal_process(wd->layout);
    _sizing_eval(obj);
-}
-
-/**
- * Get the buttons list.
- *
- * @param [in] obj The popup object
- * @return Button List.
- *
- * @ingroup Popup
- */
-EAPI Eina_List *
-elm_popup_buttons_list_get(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-
-   if (!wd) return;
-   return wd->button_list;
 }
 
 /**
