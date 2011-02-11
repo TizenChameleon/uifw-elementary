@@ -206,7 +206,6 @@ obj_longpress(Evas_Object *obj)
 					if (ext_mod->editable)
 						elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
 				}
-	//		elm_ctxpopup_item_append(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 	// start for cbhm
 			if (!ext_mod->password)
 			{
@@ -214,7 +213,6 @@ obj_longpress(Evas_Object *obj)
 				snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
 				elm_icon_file_set(icon, buf, NULL);
 				elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
-				//elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
 			}
 	// end for cbhm
 		}
@@ -232,8 +230,7 @@ obj_longpress(Evas_Object *obj)
 							icon = elm_icon_add(ext_mod->popup);
 							snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_share.png", PACKAGE_DATA_DIR);
 							elm_icon_file_set(icon, buf, NULL);
-							elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
-							//elm_ctxpopup_item_append(ext_mod->popup, "Share", NULL, _share, obj);
+							elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _share, obj);
 						}
 					else
 						{
@@ -251,7 +248,6 @@ obj_longpress(Evas_Object *obj)
 					snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
 					elm_icon_file_set(icon, buf, NULL);
 					elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
-					//elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
 	// end for cbhm
 				}
 		}
