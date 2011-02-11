@@ -2487,7 +2487,7 @@ elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
 EAPI Eina_Bool
 elm_controlbar_item_disable_get(Elm_Controlbar_Item * it) 
 {
-   if (!it) return -1;
+   if (!it) return EINA_FALSE;
 
    return it->disable;
 }
