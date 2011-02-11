@@ -743,9 +743,12 @@ static void
 _end_selected_box(void *data, Evas_Object *obj)
 {
    Widget_Data * wd = (Widget_Data *)data;
-
-   edje_object_signal_emit(_EDJ(wd->cur_item->base), wd->selected_signal, "elm");
-   edje_object_signal_emit(_EDJ(wd->cur_item->base_item), "elm,state,shadow_show", "elm");
+   
+   if(item_exist_check(wd, wd->cur_item))
+     {
+        edje_object_signal_emit(_EDJ(wd->cur_item->base), wd->selected_signal, "elm");
+        edje_object_signal_emit(_EDJ(wd->cur_item->base_item), "elm,state,shadow_show", "elm");
+     }
 
    wd->animating--;
    if (wd->animating < 0)
@@ -772,28 +775,23 @@ move_selected_box(Widget_Data *wd, Elm_Controlbar_Item * fit, Elm_Controlbar_Ite
    to = (Evas_Object *)edje_object_part_object_get(_EDJ(tit->base), "bg_img");
    evas_object_geometry_get(to, &tx, &ty, &tw, &th);
 
-   edje_object_signal_emit(_EDJ(wd->pre_item->base), "elm,state,unselected", "elm");
-   edje_object_signal_emit(_EDJ(wd->pre_item->base_item), "elm,state,shadow_hide", "elm");
-   edje_object_signal_emit(_EDJ(wd->cur_item->base), "elm,state,unselected", "elm");
+   if(item_exist_check(wd, wd->pre_item))
+     {
+        edje_object_signal_emit(_EDJ(wd->pre_item->base), "elm,state,unselected", "elm");
+        edje_object_signal_emit(_EDJ(wd->pre_item->base_item), "elm,state,shadow_hide", "elm");
+     }
+   if(item_exist_check(wd, wd->cur_item))
+      edje_object_signal_emit(_EDJ(wd->cur_item->base), "elm,state,unselected", "elm");
 
    wd->animating++;
    move_object_with_animation(wd->selected_box, fx, fy, fw, fh, tx, ty, tw, th,
                               0.3, move_evas_object, _end_selected_box, wd);
 }
-/*
-static void 
-end_view_animation_effect(void *data, Evas_Object *obj)
-{
-   Widget_Data *wd = (Widget_Data *)data;
-   elm_xml_animator_object_del(wd->vxa, obj);
-   if(wd->pre_item) {
-        evas_object_hide(wd->pre_item->view);
-   }
-}
-*/
+
 static void 
 selected_box(Elm_Controlbar_Item * it) 
 {
+   if(!it) return;
    Widget_Data * wd = elm_widget_data_get(it->obj);
    const Eina_List *l;
    Elm_Controlbar_Item * item, *fit = NULL;
