@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.51480slp2+build115) unstable; urgency=low
+
+  * Navigationbar_ex : Modified icon set API.
+  * Genlist : Fixed effect_timer clear code.
+  * MultiButtonEntry : Removed the deprecated signals. 
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build115
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Fri, 11 Feb 2011 10:21:48 +0900
+
 elementary (1.0.0+svn.51480slp2+build114) unstable; urgency=low
 
   * Fixing Genlist Bug
