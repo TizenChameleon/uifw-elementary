@@ -73,10 +73,7 @@ static void cleanup(void)
 static void utc_UIFW_elm_entry_add_func_01(void)
 {
 	Evas_Object *entry = NULL;
-	Evas *e;
-	e = evas_object_evas_get(main_win);
-   	entry= elm_entry_add(e);
-	evas_object_show(entry);	
+   	entry= elm_entry_add(main_win);
 	if (!entry) {
 		tet_infoline("elm_entry_add() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -91,8 +88,6 @@ static void utc_UIFW_elm_entry_add_func_01(void)
 static void utc_UIFW_elm_entry_add_func_02(void)
 {
 	Evas_Object *entry = NULL;
-	Evas *e;
-	e = evas_object_evas_get(main_win);
    	entry = elm_entry_add(NULL);
 	evas_object_show(entry);
 	if (entry) {
