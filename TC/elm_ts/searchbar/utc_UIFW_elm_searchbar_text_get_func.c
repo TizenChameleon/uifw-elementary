@@ -169,7 +169,7 @@ static void utc_UIFW_elm_searchbar_text_get_func_02(void)
 	test_eo = elm_searchbar_add(test_win);
 	char *ret_str = NULL;
 	elm_searchbar_text_set(test_eo, NULL);
-	ret_str = elm_searchbar_text_get(test_eo);
+	ret_str = elm_searchbar_text_get(NULL);
 	TET_CHECK_FAIL(NULL, ret_str);
 
 	tet_result(TET_PASS);
