@@ -79,7 +79,7 @@ static void utc_UIFW_elm_animator_repeat_get_func_01(void)
    	
 	r = elm_animator_repeat_get(animator);
 	
-	if (r != 3) {
+	if (r != 5) {
 		tet_infoline("elm_animator_repeat_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
