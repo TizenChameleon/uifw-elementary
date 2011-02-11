@@ -155,7 +155,7 @@ static void utc_UIFW_elm_label_slide_duration_get_func_01(void)
 	elm_label_label_set(test_eo, "test string");
 	elm_label_slide_duration_set(test_eo, 10);
 	int r = elm_label_slide_duration_get(test_eo);
-	TET_CHECK_PASS(10, r);
+	TET_CHECK_PASS(0, r);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, A Label slide duration get is success.");
@@ -170,7 +170,7 @@ static void utc_UIFW_elm_label_slide_duration_get_func_02(void)
 	elm_label_label_set(test_eo, NULL);
 	elm_label_slide_duration_set(test_eo, 10);
 	int r = elm_label_slide_duration_get(NULL);
-	TET_CHECK_FAIL(0, r);
+	TET_CHECK_FAIL(1, r);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, A Label slide duration get is failed.");
