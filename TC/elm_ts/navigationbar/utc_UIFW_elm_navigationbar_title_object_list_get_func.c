@@ -31,7 +31,7 @@
 
 
 Evas_Object *main_win, *navibar;
-char buf[4096];
+char buf[PATH_MAX];
 
 static void startup(void);
 static void cleanup(void);
@@ -61,6 +61,7 @@ static void startup(void)
 	evas_object_show(main_win);	
 	navibar = elm_navigationbar_add(main_win);
 	evas_object_show(navibar);
+	elm_win_resize_object_add(main_win, navibar);	
 }
 
 static void cleanup(void)
@@ -88,14 +89,11 @@ static void utc_UIFW_elm_navigationbar_title_object_list_get_func_01(void)
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
 	
-	Evas_Object *segment = elm_segment_control_add(navibar);
-	elm_segment_control_add_segment(navibar, NULL, "Sg1", EINA_FALSE);
-	elm_segment_control_add_segment(navibar, NULL, "Sg2", EINA_FALSE);
-	elm_segment_control_add_segment(navibar, NULL, "Sg3", EINA_FALSE);	
-	evas_object_show(segment);
+	Evas_Object *title = elm_button_add(navibar);
+	evas_object_show(title);
 
-   	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
-	elm_navigationbar_title_object_add(navibar, content, segment);
+	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
+	elm_navigationbar_title_object_add(navibar, content, title);
 	Eina_List *list = elm_navigationbar_title_object_list_get(navibar, content);
 	if (!list) {
 		tet_infoline("elm_navigationbar_title_object_list_get() failed in positive test case");
@@ -117,14 +115,12 @@ static void utc_UIFW_elm_navigationbar_title_object_list_get_func_02(void)
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
 	
-	Evas_Object *segment = elm_segment_control_add(navibar);
-	elm_segment_control_add_segment(navibar, NULL, "Sg1", EINA_FALSE);
-	elm_segment_control_add_segment(navibar, NULL, "Sg2", EINA_FALSE);
-	elm_segment_control_add_segment(navibar, NULL, "Sg3", EINA_FALSE);	
-	evas_object_show(segment);
+	Evas_Object *title = elm_button_add(navibar);
+	evas_object_show(title);
 
-   	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
-	Eina_List *list = elm_navigationbar_title_object_list_get(navibar, content);
+	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
+	elm_navigationbar_title_object_add(navibar, content, title);
+	Eina_List *list = elm_navigationbar_title_object_list_get(NULL, content);
 	if (list) {
 		tet_infoline("elm_navigationbar_title_object_list_get() failed in negative test case");
 		tet_result(TET_FAIL);
