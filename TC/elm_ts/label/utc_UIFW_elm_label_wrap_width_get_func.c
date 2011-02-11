@@ -169,7 +169,7 @@ static void utc_UIFW_elm_label_wrap_width_get_func_02(void)
 	test_eo = elm_label_add(test_win);
 	elm_label_wrap_width_set(test_eo, 10);
 	int ret = 0;
-	ret = elm_label_wrap_width_get(test_eo);
+	ret = elm_label_wrap_width_get(NULL);
 	TET_CHECK_FAIL(NULL, ret);
 
 	tet_result(TET_PASS);

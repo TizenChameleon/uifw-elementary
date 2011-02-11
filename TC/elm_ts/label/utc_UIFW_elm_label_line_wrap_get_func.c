@@ -167,7 +167,7 @@ static void utc_UIFW_elm_label_line_wrap_get_func_01(void)
 static void utc_UIFW_elm_label_line_wrap_get_func_02(void)
 {
 	test_eo = elm_label_add(test_win);
-	elm_label_line_wrap_set(test_eo, 1);
+	elm_label_line_wrap_set(test_eo, 0);
 	int ret = 0;
 	ret = elm_label_line_wrap_get(test_eo);
 	TET_CHECK_FAIL(NULL, ret);

@@ -170,6 +170,8 @@ static void utc_UIFW_elm_label_label_get_func_02(void)
 	char *ret_str = NULL;
 	elm_label_label_set(test_eo, NULL);
 	ret_str = elm_label_label_get(test_eo);
+	if (strcmp(ret_str, "") == 0)
+		ret_str = NULL;
 	TET_CHECK_FAIL(NULL, ret_str);
 
 	tet_result(TET_PASS);
