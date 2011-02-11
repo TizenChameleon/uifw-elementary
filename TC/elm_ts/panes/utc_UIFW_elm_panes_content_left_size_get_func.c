@@ -74,7 +74,7 @@ static void utc_UIFW_elm_panes_content_left_size_get_func_01(void)
 {
    Evas_Object *panes = NULL;
    Evas_Object *btn = NULL;
-   int size_left = 0;
+   double size_left = 0.0;
 
    panes = elm_panes_add(main_win);
    btn = elm_button_add(panes);
