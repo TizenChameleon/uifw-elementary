@@ -77,7 +77,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_ctxpopup_item_label_get_func_01(void)
 {
-	Elm_Ctxpopup_Item * item = elm_ctxpopup_item_add(ctxpopup, "TEST", NULL, NULL, NULL);
+	Elm_Ctxpopup_Item * item = elm_ctxpopup_item_append(ctxpopup, "TEST", NULL, NULL, NULL);
 	char *label = elm_ctxpopup_item_label_get(item);
 
 	if (strcmp( label, "TEST")) 
@@ -94,7 +94,7 @@ static void utc_UIFW_elm_ctxpopup_item_label_get_func_01(void)
  */
 static void utc_UIFW_elm_ctxpopup_item_label_get_func_02(void)
 {
-	Elm_Ctxpopup_Item * item = elm_ctxpopup_item_add(ctxpopup, "TEST", NULL, NULL, NULL);
+	Elm_Ctxpopup_Item * item = elm_ctxpopup_item_append(ctxpopup, "TEST", NULL, NULL, NULL);
 	char *label = elm_ctxpopup_item_label_get(NULL);
 
 	if (label) 
