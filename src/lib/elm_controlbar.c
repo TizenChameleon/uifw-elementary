@@ -109,6 +109,7 @@ static const char *widtype = NULL;
 // prototype
 static int check_bar_item_number(Widget_Data *wd);
 static void selected_box(Elm_Controlbar_Item * it);
+static void cancel_selected_box(Widget_Data *wd);
 static int pressed_box(Elm_Controlbar_Item * it);
 static void item_color_set(Elm_Controlbar_Item *item, const char *color_part);
 
@@ -229,6 +230,8 @@ _controlbar_object_hide(void *data, Evas * e, Evas_Object * obj,
    evas_object_hide(wd->edje);
    evas_object_hide(wd->box);
    evas_object_hide(wd->event_box);
+
+   cancel_selected_box(wd);
 }
 
 static void
@@ -525,7 +528,7 @@ check_background(Widget_Data *wd)
 {
    if(!wd) return;
    Eina_List *l;
-   Elm_Controlbar_Item *it, *it2;
+   Elm_Controlbar_Item *it;
 
    EINA_LIST_FOREACH(wd->items, l, it)
      {
@@ -717,6 +720,7 @@ hide_selected_box(void *data)
 {
    Evas_Object *selected_box = (Evas_Object *)data;
 
+   evas_object_move(selected_box, -999, -999);
    evas_object_hide(selected_box);
 
    return ECORE_CALLBACK_CANCEL;
@@ -840,15 +844,10 @@ selected_box(Elm_Controlbar_Item * it)
 }
 
 static void
-unpressed_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info) 
+cancel_selected_box(Widget_Data *wd)
 {
-   Widget_Data * wd = (Widget_Data *) data;
    const Eina_List *l;
-   Evas_Event_Mouse_Up * ev = event_info;
-   Evas_Coord x, y, w, h;
    Elm_Controlbar_Item * item;
-
-   evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unpressed_box_cb);
 
    EINA_LIST_FOREACH(wd->items, l, item)
      {
@@ -872,7 +871,19 @@ unpressed_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
                }
           }
      }
+}
 
+static void
+unpressed_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info) 
+{
+   Widget_Data * wd = (Widget_Data *) data;
+   Evas_Event_Mouse_Up * ev = event_info;
+   Evas_Coord x, y, w, h;
+
+   evas_object_event_callback_del(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unpressed_box_cb);
+
+   cancel_selected_box(wd);
+  
    if(item_exist_check(wd, wd->pre_item))
      {
         evas_object_geometry_get(wd->pre_item->base, &x, &y, &w, &h);
@@ -1331,7 +1342,7 @@ create_more_func(void *data, Evas_Object *obj, void *event_info)
                   icon = create_item_icon(ctxpopup, item, NULL); 
                   evas_object_color_set(icon, 0, 0, 0, 255);
                }
-             elm_ctxpopup_item_add(ctxpopup, icon, item->text, _ctxpopup_cb, wd);
+             elm_ctxpopup_item_append(ctxpopup, item->text, icon, _ctxpopup_cb, wd);
           }
      }
 
@@ -2476,7 +2487,7 @@ elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
 EAPI Eina_Bool
 elm_controlbar_item_disable_get(Elm_Controlbar_Item * it) 
 {
-   if (!it) return NULL;
+   if (!it) return -1;
 
    return it->disable;
 }
