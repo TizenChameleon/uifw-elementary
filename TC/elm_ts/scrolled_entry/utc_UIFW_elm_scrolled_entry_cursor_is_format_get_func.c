@@ -75,6 +75,7 @@ static void utc_UIFW_elm_scrolled_entry_cursor_is_format_get_func_01(void)
 	Evas_Object *test_en = elm_scrolled_entry_add(main_win);
 
 	Eina_Bool r = elm_scrolled_entry_cursor_is_format_get(test_en);
+	elm_scrolled_entry_entry_set(test_en, "<br>");
 	TET_CHECK_PASS(EINA_FALSE, r);
 
 	tet_result(TET_PASS);

@@ -75,7 +75,8 @@ static void utc_UIFW_elm_scrolled_entry_cursor_up_func_01(void)
 	Eina_Bool result;
 
 	Evas_Object *test_en = elm_scrolled_entry_add(main_win);
-	elm_scrolled_entry_entry_set(test_en, "This is<br>test scrolled entry");
+	elm_scrolled_entry_entry_set(test_en, "This is a <br>test scrolled entry");
+	elm_scrolled_entry_cursor_end_set(test_en);
 
 	// Current return type of this API is "void"
 	result = elm_scrolled_entry_cursor_up(test_en);
