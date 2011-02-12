@@ -752,7 +752,7 @@ _hover_del(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   
+
    if (wd->hoversel)
      {
         evas_object_del(wd->hoversel);
@@ -1081,7 +1081,7 @@ _magnifier_create(void *data)
    if (key_data) wd->mgf_height = atoi(key_data);
    key_data = edje_object_data_get(wd->mgf_bg, "scale");
    if (key_data) wd->mgf_scale = atof(key_data);
-   
+
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
 	evas_object_resize(wd->mgf_bg, w, wd->mgf_height);
 
@@ -1113,7 +1113,7 @@ _long_press(void *data)
      }
 
    _cancel(data, NULL, NULL);
-	
+
    _magnifier_create(data);
    _magnifier_move(data);
    _magnifier_show(data);
@@ -1314,7 +1314,7 @@ _matchlist_show(void *data)
      }
    text = elm_entry_entry_get(data);
    if (text == NULL)
-      return;	
+      return;
    textlen = strlen(text);
 
    if (textlen < wd->matchlist_threshold)
@@ -1325,10 +1325,10 @@ _matchlist_show(void *data)
 
    evas_object_hide(wd->hover);
 
-   if (wd->match_list) 
+   if (wd->match_list)
      {
         elm_list_clear(wd->list);
-        EINA_LIST_FOREACH(wd->match_list, l, str_list) 
+        EINA_LIST_FOREACH(wd->match_list, l, str_list)
           {
              if (wd->matchlist_case_sensitive)
                 str_result = strstr(str_list, text);
@@ -1366,7 +1366,7 @@ _matchlist_show(void *data)
 
    if (textfound)
      {
-        elm_list_go(wd->list);		
+        elm_list_go(wd->list);
         evas_object_show(wd->hover);
         evas_object_raise(wd->hover);
      }
@@ -1388,7 +1388,7 @@ static void _matchlist_list_clicked( void *data, Evas_Object *obj, void *event_i
              elm_entry_entry_set(data, elm_entry_markup_to_utf8(text));
              elm_entry_cursor_end_set(data);
              wd->matchlist_list_clicked = EINA_TRUE;
-			 
+
 			 evas_object_smart_callback_call(data, SIG_MATCHLIST_CLICKED, elm_entry_markup_to_utf8(text));
           }
      }
@@ -1405,7 +1405,7 @@ elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_
    {
 	   Evas_Coord max_w = 9999, max_h = 9999;
 	   const char* key_data = NULL;
-	   
+
 	   wd->matchlist_threshold = 1;
 	   wd->hover = elm_hover_add(elm_widget_parent_get(obj));
 	   elm_hover_parent_set(wd->hover, elm_widget_parent_get(obj));
@@ -1419,7 +1419,7 @@ elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_
 	   evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	   elm_list_mode_set(wd->list, ELM_LIST_EXPAND);
 	   elm_object_style_set(wd->list, "matchlist");
-	   
+
 	   key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_width");
 	   if (key_data) max_w = atoi(key_data);
 	   key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_height");
@@ -1430,7 +1430,7 @@ elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_
 	   evas_object_smart_callback_add(wd->list, "selected", _matchlist_list_clicked, obj);
 	   elm_layout_content_set(wd->layout, "elm.swallow.content", wd->list);
 	   elm_hover_content_set(wd->hover, "bottom", wd->layout);
-   
+
 	   wd->match_list = match_list;
    }
    else
@@ -1462,7 +1462,7 @@ _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emiss
 	wd->delay_write = NULL;
      }
 
-   if ((wd->single_line) && (wd->match_list)) 
+   if ((wd->single_line) && (wd->match_list))
    {
 	if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
 	wd->matchlist_job = ecore_job_add(_matchlist_show, data);
@@ -1950,7 +1950,7 @@ _get_item(void *data, Evas_Object *edje __UNUSED__, const char *part __UNUSED__,
    if (!strncmp(item, "file://", 7))
      {
         const char *fname = item + 7;
-       
+
         o = evas_object_image_filled_add(evas_object_evas_get(data));
         evas_object_image_file_set(o, fname, NULL);
         if (evas_object_image_load_error_get(o) == EVAS_LOAD_ERROR_NONE)
@@ -4210,7 +4210,7 @@ elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout
 
    ecore_imf_context_input_panel_layout_set(ic, (Ecore_IMF_Input_Panel_Layout)layout);
 }
-	
+
 /**
  * Set the magnifier style of the entry
  *

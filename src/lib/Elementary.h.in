@@ -417,8 +417,8 @@ extern "C" {
    EAPI void             elm_object_tree_dump(const Evas_Object *top);
    EAPI void             elm_object_tree_dot_dump(const Evas_Object *top, const char *file);
 
-   EAPI void         elm_autocapitalization_allow_all_set(Eina_Bool autocap);
-   EAPI void         elm_autoperiod_allow_all_set(Eina_Bool autoperiod);
+   EAPI void             elm_autocapitalization_allow_all_set(Eina_Bool autocap);
+   EAPI void             elm_autoperiod_allow_all_set(Eina_Bool autoperiod);
 
    /* theme */
    typedef struct _Elm_Theme Elm_Theme;
