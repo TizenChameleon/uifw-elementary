@@ -30,8 +30,7 @@
 
 
 Evas_Object *main_win, *navibar;
-char buf[4096];
-
+char buf[PATH_MAX];
 
 static void startup(void);
 static void cleanup(void);
@@ -61,6 +60,7 @@ static void startup(void)
 	evas_object_show(main_win);	
 	navibar = elm_navigationbar_add(main_win);
 	evas_object_show(navibar);
+	elm_win_resize_object_add(main_win, navibar);
 }
 
 static void cleanup(void)
@@ -87,16 +87,12 @@ static void utc_UIFW_elm_navigationbar_title_object_add_func_01(void)
 	elm_icon_file_set(content, buf, NULL);
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
-	
-	Evas_Object *segment = elm_segment_control_add(navibar);
-	elm_segment_control_add_segment(navibar, NULL, "Sg1", EINA_FALSE);
-	elm_segment_control_add_segment(navibar, NULL, "Sg2", EINA_FALSE);
-	elm_segment_control_add_segment(navibar, NULL, "Sg3", EINA_FALSE);	
-	evas_object_show(segment);
 
-   	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
-	elm_navigationbar_title_object_add(navibar, content, segment);
-	
+	Evas_Object *title = elm_button_add(navibar);
+	evas_object_show(title);
+		
+	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
+	elm_navigationbar_title_object_add(navibar, content, title);
 	tet_result(TET_PASS);
 }
 
@@ -105,20 +101,16 @@ static void utc_UIFW_elm_navigationbar_title_object_add_func_01(void)
  */
 static void utc_UIFW_elm_navigationbar_title_object_add_func_02(void)
 {
-	
 	Evas_Object *content = elm_icon_add(navibar);
 	snprintf(buf, sizeof(buf), "%s/00_volume_icon.png", ICON_DIR);
 	elm_icon_file_set(content, buf, NULL);
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
-	
-	Evas_Object *segment = elm_segment_control_add(navibar);
-	elm_segment_control_add_segment(navibar, NULL, "Sg1", EINA_FALSE);
-	elm_segment_control_add_segment(navibar, NULL, "Sg2", EINA_FALSE);
-	elm_segment_control_add_segment(navibar, NULL, "Sg3", EINA_FALSE);	
-	evas_object_show(segment);
 
-   	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
-	elm_navigationbar_title_object_add(NULL, content, segment);
+	Evas_Object *title = elm_button_add(navibar);
+	evas_object_show(title);
+		
+	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
+	elm_navigationbar_title_object_add(NULL, NULL, NULL);
 	tet_result(TET_PASS);
 }
