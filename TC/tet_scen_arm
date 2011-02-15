@@ -38,7 +38,6 @@ elm
 	:include:/elm_ts/animator/tslist
 	:include:/elm_ts/editfield/tslist
 	:include:/elm_ts/box/tslist
-	:include:/elm_ts/elm_scroller/tslist
 	:include:/elm_ts/scrolled_entry/tslist
 	:include:/elm_ts/entry/tslist
 	:include:/elm_ts/dayselector/tslist
