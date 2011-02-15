@@ -72,17 +72,15 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_scroller_content_min_limit_func_01(void)
 {
-	int r = 0;
+	Evas_Object *test_scroller = NULL;
 
-/*
-   	r = elm_scroller_content_min_limit(...);
-*/
-	if (!r) {
-		tet_infoline("elm_scroller_content_min_limit() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
+	test_scroller = elm_scroller_add(main_win);
+
+	// Current return type of this API is "Void"
+   	elm_scroller_content_min_limit(test_scroller, 10, 10);
+
 	tet_result(TET_PASS);
+	tet_infoline("[[ TET_MSG ]]::[ID]: TC_01, [TYPE]: Positive, [RESULT]: PASS, Set the content min value of the scroller widget.");
 }
 
 /**
@@ -90,15 +88,9 @@ static void utc_UIFW_elm_scroller_content_min_limit_func_01(void)
  */
 static void utc_UIFW_elm_scroller_content_min_limit_func_02(void)
 {
-	int r = 0;
+	// Current return type of this API is "Void"
+   	elm_scroller_content_min_limit(NULL, 0, 0);
 
-/*
-   	r = elm_scroller_content_min_limit(...);
-*/
-	if (r) {
-		tet_infoline("elm_scroller_content_min_limit() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
 	tet_result(TET_PASS);
+	tet_infoline("[[ TET_MSG ]]::[ID]: TC_02, [TYPE]: Negative, [RESULT]: PASS, Setting the content min value of the scroller widget has failed.");
 }

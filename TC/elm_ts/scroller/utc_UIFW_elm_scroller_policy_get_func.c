@@ -97,12 +97,14 @@ static void utc_UIFW_elm_scroller_policy_get_func_01(void)
 					case ELM_SCROLLER_POLICY_LAST:
 						tet_result(TET_PASS);
 						tet_infoline("[[ TET_MSG ]]::[ID]: TC_01, [TYPE]: Positive, [RESULT]: PASS, Get the scroller scrollbar policy.");
+						break;
 					default:
 						tet_result(TET_FAIL);
 						tet_infoline("[[ TET_MSG ]]::[ID]: TC_01, [TYPE]: Positive, [RESULT]: FAIL, Getting the scroller scrollbar policy has failed.");
 
 				}
 			}
+			break;
 		default:
 			tet_result(TET_FAIL);
 			tet_infoline("[[ TET_MSG ]]::[ID]: TC_01, [TYPE]: Positive, [RESULT]: FAIL, Getting the scroller scrollbar policy has failed.");
