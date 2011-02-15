@@ -5,27 +5,26 @@
 // For checking the result of the positive test case.
 #define TET_CHECK_PASS(x1, y...) \
 { \
-	Evas_Object *err = y; \
-	if (err == (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+   Evas_Object *err = y; \
+   if (err == (x1)) \
+     { \
+        tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+        tet_result(TET_FAIL); \
+        return; \
+     } \
 }
 
 // For checking the result of the negative test case.
 #define TET_CHECK_FAIL(x1, y...) \
 { \
-	Evas_Object *err = y; \
-	if (err != (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+   Evas_Object *err = y; \
+   if (err != (x1)) \
+     { \
+        tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+        tet_result(TET_FAIL); \
+        return; \
+     } \
 }
-
 
 Evas_Object *main_win;
 Evas_Object *tickernoti;
@@ -40,36 +39,36 @@ static void utc_UIFW_elm_tickernoti_mode_set_func_01(void);
 static void utc_UIFW_elm_tickernoti_mode_set_func_02(void);
 
 enum {
-	POSITIVE_TC_IDX = 0x01,
-	NEGATIVE_TC_IDX,
+   POSITIVE_TC_IDX = 0x01,
+   NEGATIVE_TC_IDX,
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_tickernoti_mode_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_tickernoti_mode_set_func_02, NEGATIVE_TC_IDX },
-	{ NULL, 0 }
+   { utc_UIFW_elm_tickernoti_mode_set_func_01, POSITIVE_TC_IDX },
+   { utc_UIFW_elm_tickernoti_mode_set_func_02, NEGATIVE_TC_IDX },
+   { NULL, 0 }
 };
 
 static void startup(void)
 {
-	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
-	elm_init(0, NULL);
-	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+   tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
+   elm_init(0, NULL);
+   main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
+   evas_object_show(main_win);
 
-	tickernoti = elm_tickernoti_add(main_win);
+   tickernoti = elm_tickernoti_add(main_win);
 }
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) {
-		evas_object_del(main_win);
-	       	main_win = NULL;
-	}
-	elm_shutdown();
-	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
+   if ( NULL != main_win ) {
+      evas_object_del(main_win);
+      main_win = NULL;
+   }
+   elm_shutdown();
+   tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 
-	evas_object_del(tickernoti);
+   evas_object_del(tickernoti);
 }
 
 /**
@@ -77,17 +76,17 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_tickernoti_mode_set_func_01(void)
 {
-	Elm_Tickernoti_Mode mode = ELM_TICKERNOTI_DEFAULT;
+   Elm_Tickernoti_Mode mode = ELM_TICKERNOTI_DEFAULT;
 
-   	elm_tickernoti_mode_set(tickernoti, ELM_TICKERNOTI_DETAILVIEW);
-   	mode = elm_tickernoti_mode_get(tickernoti);
+   elm_tickernoti_mode_set(tickernoti, ELM_TICKERNOTI_DETAILVIEW);
+   mode = elm_tickernoti_mode_get(tickernoti);
 
-	if (mode != ELM_TICKERNOTI_DETAILVIEW) {
-		tet_infoline("elm_tickernoti_mode_set() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
+   if (mode != ELM_TICKERNOTI_DETAILVIEW) {
+      tet_infoline("elm_tickernoti_mode_set() failed in positive test case");
+      tet_result(TET_FAIL);
+      return;
+   }
+tet_result(TET_PASS);
 }
 
 /**
@@ -95,19 +94,16 @@ static void utc_UIFW_elm_tickernoti_mode_set_func_01(void)
  */
 static void utc_UIFW_elm_tickernoti_mode_set_func_02(void)
 {
-	Elm_Tickernoti_Mode mode = ELM_TICKERNOTI_DETAILVIEW;
+   Elm_Tickernoti_Mode mode = ELM_TICKERNOTI_DETAILVIEW;
 
-   	elm_tickernoti_mode_set(tickernoti, ELM_TICKERNOTI_DEFAULT);
-   	elm_tickernoti_mode_set(tickernoti, 100);
-   	mode = elm_tickernoti_mode_get(tickernoti);
+   elm_tickernoti_mode_set(tickernoti, ELM_TICKERNOTI_DEFAULT);
+   elm_tickernoti_mode_set(tickernoti, 100);
+   mode = elm_tickernoti_mode_get(tickernoti);
 
-	printf("\n\n\nmode :: %d\n\n\n", mode);
-	printf("\n\n\n%d\n\n\n", ELM_TICKERNOTI_DEFAULT);
-
-	if (mode != ELM_TICKERNOTI_DEFAULT) {
-		tet_infoline("elm_tickernoti_mode_set() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
+   if (mode != ELM_TICKERNOTI_DEFAULT) {
+      tet_infoline("elm_tickernoti_mode_set() failed in negative test case");
+      tet_result(TET_FAIL);
+      return;
+   }
+   tet_result(TET_PASS);
 }
