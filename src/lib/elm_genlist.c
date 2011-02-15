@@ -5911,9 +5911,6 @@ _checkbox_item_select_process(Elm_Genlist_Item *it)
              it->wd->select_all_check = EINA_FALSE;
              edje_object_signal_emit(it->wd->select_all_item->base.view, "elm,state,del,animated,enable", "elm");
           }
-
-        if (old_check_state != it->wd->select_all_check && it->wd->ed && it->wd->ed->ec && it->wd->ed->ec->item_selected)
-           it->wd->ed->ec->item_selected(it->wd->select_all_item->base.data, it->wd->select_all_item, it->wd->select_all_check);
      }
 }
 
