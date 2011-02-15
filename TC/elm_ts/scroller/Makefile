@@ -14,7 +14,6 @@ TARGETS = utc_UIFW_elm_scroller_add_func \
 	  utc_UIFW_elm_scroller_page_relative_set_func \
 	  utc_UIFW_elm_scroller_page_size_set_func \
 	  utc_UIFW_elm_scroller_region_bring_in_func \
-	  utc_UIFW_elm_scroller_page_move_set_func \
 	  utc_UIFW_elm_scroller_propagate_events_set_func
 
 
