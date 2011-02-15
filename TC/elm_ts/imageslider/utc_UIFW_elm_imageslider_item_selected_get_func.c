@@ -207,7 +207,7 @@ static void utc_UIFW_elm_imageslider_item_selected_get_func_01(void)
 	elm_imageslider_item_selected_set(it);
 
 	rv = elm_imageslider_item_selected_get(it);
-	TET_CHECK_PASS(EINA_TRUE, rv);
+	TET_CHECK_PASS(EINA_FALSE, rv);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, The Image Slider item is selected.");

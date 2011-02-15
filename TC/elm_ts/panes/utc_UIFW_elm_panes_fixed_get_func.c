@@ -112,7 +112,7 @@ static void utc_UIFW_elm_panes_fixed_get_func_02(void)
    elm_panes_content_left_set(panes, btn);
    elm_panes_content_left_size_set(panes, 0.4);
    elm_panes_fixed_set(panes, is_fixed);
-   if(elm_panes_fixed_get(NULL) != is_fixed)
+   if(elm_panes_fixed_get(NULL) == is_fixed)
       {
       tet_infoline("elm_panes_fixed_get() failed in negative test case");
       tet_result(TET_FAIL);
