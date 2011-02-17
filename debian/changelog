@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build118) unstable; urgency=low
+
+  * Sync with beat-winset-test.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build118
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Thu, 17 Feb 2011 14:05:43 +0900
+
 elementary (1.0.0+svn.51480slp2+build117) unstable; urgency=low
 
   * Fixed copyandpaste module.
