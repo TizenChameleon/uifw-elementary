@@ -198,8 +198,11 @@ obj_longpress(Evas_Object *obj)
 		{	
 			if (!ext_mod->password)
 			{
-				elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
-				elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
+				if (!elm_entry_is_empty(obj))
+				{
+					elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
+					elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
+				}
 			}
 			if (1) // need way to detect if someone has a selection
 				{
@@ -235,8 +238,11 @@ obj_longpress(Evas_Object *obj)
 					else
 						{
 							_cancel(obj,ext_mod->popup,NULL);		
-							elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
-							elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
+							if (!elm_entry_is_empty(obj))
+							{
+								elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
+								elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
+							}
 							if (1) // need way to detect if someone has a selection
 								{
 									if (ext_mod->editable)

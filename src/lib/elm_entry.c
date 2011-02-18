@@ -2779,6 +2779,8 @@ elm_entry_is_empty(const Evas_Object *obj)
    Evas_Textblock_Cursor *cur;
    Eina_Bool ret;
    if (!wd) return EINA_TRUE;
+
+#if 0   
    /* It's a hack until we get the support suggested above.
     * We just create a cursor, point it to the begining, and then
     * try to advance it, if it can advance, the tb is not empty,
@@ -2792,6 +2794,14 @@ elm_entry_is_empty(const Evas_Object *obj)
    evas_textblock_cursor_free(cur);
 
    return !ret;
+#endif
+
+   char *str = elm_entry_markup_to_utf8(elm_entry_entry_get(obj));
+   if (!str) return EINA_TRUE;
+
+   ret = (strlen(str) == 0);
+
+   return ret;
 }
 
 /**
