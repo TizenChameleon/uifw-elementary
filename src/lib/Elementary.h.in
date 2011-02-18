@@ -1918,6 +1918,7 @@ extern "C" {
    EAPI int          elm_radio_value_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_radio_value_pointer_set(Evas_Object *obj, int *valuep) EINA_ARG_NONNULL(1);
 
+   /* SegmentControl */
    typedef struct _Elm_Segment_Item Elm_Segment_Item;
    EAPI Evas_Object *elm_segment_control_add(Evas_Object *parent);
    EAPI void         elm_segment_control_item_selected_set(Elm_Segment_Item *item, Eina_Bool select);
