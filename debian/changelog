@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build119) unstable; urgency=low
+
+  * Fixed elm_pager bug.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build119
+
+ -- Juyung Seo <juyung.seo@samsung.com>  Fri, 18 Feb 2011 11:54:07 +0900
+
 elementary (1.0.0+svn.51480slp2+build118) unstable; urgency=low
 
   * Sync with beat-winset-test.

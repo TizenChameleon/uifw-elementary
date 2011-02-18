@@ -424,6 +424,7 @@ elm_pager_to_content_pop(Evas_Object *obj, Evas_Object *content)
                {
                   wd->stack = eina_list_remove_list(wd->stack, ll);
                   ecore_job_add(_del_job, it->content);
+                  it->content = NULL;
                }
              else
                break;
