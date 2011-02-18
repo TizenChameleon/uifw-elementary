@@ -512,3 +512,23 @@ elm_conformant_content_unset(Evas_Object *obj)
    wd->content = NULL;
    return content;
 }
+
+/**
+ * Returns the Evas_Object that represents the content area.
+ *
+ * @param obj The conformant object.
+ * @return The content area of the widget.
+ *
+ * @ingroup Conformant
+ */
+EAPI Evas_Object*
+elm_conformant_content_area_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   /*Finger waggle warning*/
+   _elm_dangerous_call_check(__FUNCTION__);
+   return edje_object_part_object_get(wd->base, "elm.swallow.content");
+}
+
