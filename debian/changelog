@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build121) unstable; urgency=low
+
+  * Fixed bug for select, selectall in an empty entry
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build121
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Fri, 18 Feb 2011 17:07:54 +0900
+
 elementary (1.0.0+svn.51480slp2+build120) unstable; urgency=low
 
   * Package upload
