@@ -434,7 +434,7 @@ elm_popup_add(Evas_Object *parent_app)
  * @ingroup Popup
  */
 EAPI Evas_Object *
-elm_popup_with_buttons_add(Evas_Object *parent, char *title, char *desc_text,int no_of_buttons, char *first_button_text, ...)
+elm_popup_with_buttons_add(Evas_Object *parent, const char *title, const char *desc_text,int no_of_buttons, const char *first_button_text, ...)
 {
    Evas_Object *popup;
    popup = elm_popup_add(parent);
@@ -680,7 +680,7 @@ elm_popup_content_get(Evas_Object *obj)
  * @ingroup Popup
  */
 EAPI void 
-elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, char *first_button_text,  ...)
+elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, const char *first_button_text,  ...)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);  
