@@ -81,6 +81,7 @@ void test_launcher(void *data, Evas_Object *obj, void *event_info);
 void test_launcher2(void *data, Evas_Object *obj, void *event_info);
 void test_launcher3(void *data, Evas_Object *obj, void *event_info);
 void test_anim(void *data, Evas_Object *obj, void *event_info);
+void test_segment_control(void *data, Evas_Object *obj, void *event_info);
 void test_diskselector(void *data, Evas_Object *obj, void *event_info);
 void test_ctxpopup(void *data, Evas_Object *obj, void *event_info);
 
@@ -277,6 +278,7 @@ my_win_main(void)
    ADD_TEST("Conformant", test_conformant);
    ADD_TEST("Multi Touch", test_multi);
    ADD_TEST("Floating Objects", test_floating);
+   ADD_TEST("Segment Control", test_segment_control);
    ADD_TEST("Launcher", test_launcher);
    ADD_TEST("Launcher 2", test_launcher2);
    ADD_TEST("Launcher 3", test_launcher3);

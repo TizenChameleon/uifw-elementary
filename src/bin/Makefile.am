@@ -78,6 +78,7 @@ test_multi.c \
 test_floating.c \
 test_launcher.c \
 test_anim.c \
+test_segment_control.c \
 test_calendar.c \
 test_diskselector.c \
 test_ctxpopup.c 
