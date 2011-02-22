@@ -16,6 +16,9 @@ struct _Widget_Data
    Evas_Object *base, *rect, *img, *overlay;
    const char  *file, *group;
    Elm_Bg_Option option;
+   struct {
+      Evas_Coord w, h;
+   } load_opts;
 };
 
 static const char *widtype = NULL;
@@ -183,8 +186,8 @@ elm_bg_file_set(Evas_Object *obj, const char *file, const char *group)
 
    if (wd->img)
      {
-	evas_object_del(wd->img);
-	wd->img = NULL;
+        evas_object_del(wd->img);
+        wd->img = NULL;
      }
    if (!file)
      {
@@ -198,13 +201,15 @@ elm_bg_file_set(Evas_Object *obj, const char *file, const char *group)
    eina_stringshare_replace(&wd->group, group);
    if (((p = strrchr(file, '.'))) && (!strcasecmp(p, ".edj")))
      {
-	wd->img = edje_object_add(evas_object_evas_get(wd->base));
-	edje_object_file_set(wd->img, file, group);
+        wd->img = edje_object_add(evas_object_evas_get(wd->base));
+        edje_object_file_set(wd->img, file, group);
      }
    else
      {
-	wd->img = evas_object_image_add(evas_object_evas_get(wd->base));
-	evas_object_image_file_set(wd->img, file, group);
+        wd->img = evas_object_image_add(evas_object_evas_get(wd->base));
+        if ((wd->load_opts.w > 0) && (wd->load_opts.h > 0))
+           evas_object_image_load_size_set(wd->img, wd->load_opts.w, wd->load_opts.h);
+        evas_object_image_file_set(wd->img, file, group);
      }
    evas_object_repeat_events_set(wd->img, EINA_TRUE);
    edje_object_part_swallow(wd->base, "elm.swallow.background", wd->img);
