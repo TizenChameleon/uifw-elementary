@@ -47,6 +47,7 @@ struct _Item
    int fn_btn2_w;
    int fn_btn3_w;
    int title_w;
+   Eina_Bool titleobj_visible:1;
 };
 
 struct _Transit_Cb_Data
@@ -79,6 +80,7 @@ static void _elm_navigationbar_function_button2_set(Evas_Object *obj, Evas_Objec
 static Evas_Object *_elm_navigationbar_function_button2_get(Evas_Object *obj, Evas_Object *content);
 static void _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button);
 static Evas_Object *_elm_navigationbar_function_button3_get(Evas_Object *obj, Evas_Object *content);
+static void _show_hide_titleobj(void *data, Evas_Object *obj, const char *emission, const char *source);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -137,7 +139,7 @@ _delete_item(Item *it)
    Eina_List *ll;
    if (!it) return;
    Evas_Object *list_obj;
-   
+   Widget_Data *wd = elm_widget_data_get(it->obj);
    if(it->back_btn)
      evas_object_del(it->back_btn);
    if(it->fn_btn1)
@@ -159,10 +161,15 @@ _delete_item(Item *it)
      eina_stringshare_del(it->title);
    if (it->subtitle) 
      eina_stringshare_del(it->subtitle);
-   EINA_LIST_FOREACH(it->title_list, ll, list_obj)
-     evas_object_del(list_obj);
-   eina_list_free(it->title_list);
-   free(it);   
+   if(it->title_list)
+     {
+        edje_object_signal_callback_del_full(wd->base, "elm,action,clicked", "elm",
+              _show_hide_titleobj, it);   
+        EINA_LIST_FOREACH(it->title_list, ll, list_obj)
+          evas_object_del(list_obj);
+        eina_list_free(it->title_list);
+     }
+   free(it);
 }
 
 static void
@@ -223,6 +230,13 @@ _item_sizing_eval(Item *it)
         it->fn_btn3_w = _set_button_width(it->fn_btn3);
         pad_count++;
      }
+   if ((it->titleobj_visible) && (it->title_list))
+     {
+        it->title_w = _set_button_width(wd->base);
+        it->title_obj = _multiple_object_set(it->obj, it->title_obj, it->title_list, it->title_w);
+        evas_object_resize(it->title_obj, it->title_w, height);
+        evas_object_size_hint_min_set(it->title_obj, it->title_w, height);
+     }
    if (it->title_list)
      {  
         it->title_w = _set_button_width(it->title_obj);
@@ -236,6 +250,28 @@ static void
 _resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    _sizing_eval(obj);
+}
+
+static void
+_show_hide_titleobj(void *data, Evas_Object *obj , const char *emission, const char *source)
+{
+   Item *it = (Item *)data;
+   if(!it) return;
+   Widget_Data *wd = elm_widget_data_get(it->obj);
+   Evas_Object *top = elm_navigationbar_content_top_get(it->obj);
+   if(it->content !=top) return;
+   if(!it->title_obj) return;
+   if(!it->titleobj_visible)
+     {
+        edje_object_signal_emit(wd->base, "elm,state,show,title", "elm");
+        it->titleobj_visible = EINA_TRUE;
+     }
+   else
+     {
+        edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm");
+        it->titleobj_visible = EINA_FALSE;
+     }
+   _item_sizing_eval(it);
 }
 
 static void 
@@ -278,6 +314,9 @@ _transition_complete_cb(void *data)
      }
    if ((it) && (!wd->hidden))
      {
+        /*always hide the extended title object*/
+        edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm");
+        it->titleobj_visible = EINA_FALSE;
         edje_object_part_text_set(wd->base, "elm.text", it->title);
         if (!cb->first_page)
           {
@@ -335,8 +374,13 @@ _transition_complete_cb(void *data)
           edje_object_signal_emit(wd->base, "elm,state,item,reset,rightpad2", "elm");  
         if ((it->title_obj) && (it->title))
           {
-             edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
-          }  
+             edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");  
+             edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");    
+          }
+        else
+          {
+             edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
+          }
         content = it->content;
      }
    edje_object_message_signal_process(wd->base);
@@ -875,13 +919,16 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
                     {
                        edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
                        edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
-                    }        
+                    }
                   if ((it->title_obj) && (it->title))
-                    { 
+                    {
+                       edje_object_signal_callback_add(wd->base, "elm,action,clicked", "elm",
+                                                       _show_hide_titleobj, it);
+                       edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
                        edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
                     }
                }
-             _item_sizing_eval(it);  
+             _item_sizing_eval(it);
           }
      }
 }
@@ -932,12 +979,15 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
                }
              if (!wd->hidden)
                {
-                  edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
-                  if(it->fn_btn3)
-                     {
-                        edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
-                        edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
-                     }
+                 edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
+                 edje_object_signal_callback_del_full(wd->base, "elm,action,clicked", "elm", _show_hide_titleobj,
+                                        it);
+                 edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+                 if(it->fn_btn3)
+                   {
+                      edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
+                      edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
+                   }
                }
              _item_sizing_eval(it);
          }
