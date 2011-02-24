@@ -6392,6 +6392,7 @@ EAPI Evas_Object *
 elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
 {
    if (!it) return NULL;
+   if (it->wd->queue_idler) return NULL;
 
    const Eina_List *l, *list, *l2;
    const char *label, *rename_swallow_part;
