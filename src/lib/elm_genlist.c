@@ -510,7 +510,7 @@ static const char *widtype = NULL;
 static void      _item_cache_zero(Widget_Data *wd);
 static void      _del_hook(Evas_Object *obj);
 static void      _theme_hook(Evas_Object *obj);
-//static void _show_region_hook(void *data, Evas_Object *obj);
+static void      _show_region_hook(void *data, Evas_Object *obj);
 static void      _sizing_eval(Evas_Object *obj);
 static void      _item_unrealize(Elm_Genlist_Item *it);
 static void      _item_block_unrealize(Item_Block *itb);
@@ -834,17 +834,17 @@ _theme_hook(Evas_Object *obj)
    _sizing_eval(obj);
 }
 
-/*
-   static void
-   _show_region_hook(void *data, Evas_Object *obj)
-   {
+static void
+_show_region_hook(void *data, Evas_Object *obj)
+{
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord x, y, w, h;
    if (!wd) return;
    elm_widget_show_region_get(obj, &x, &y, &w, &h);
-   elm_smart_scroller_child_region_show(wd->scr, x, y, w, h);
-   }
- */
+   x += wd->pan_x;
+   y += wd->pan_y;
+   if (y > 0) elm_smart_scroller_child_region_show(wd->scr, x, y, w, h);
+}
 
 static void
 _sizing_eval(Evas_Object *obj)
@@ -2100,7 +2100,7 @@ _item_realize(Elm_Genlist_Item *it,
 
    if (itc) _item_cache_free(itc);
    evas_object_smart_callback_call(it->base.widget, "realized", it);
-   if ((it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP) && ((it->wd->select_all_item) && (it != it->wd->select_all_item)))
+   if ((it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP) && ((!it->wd->select_all_item) || ((it->wd->select_all_item) && (it != it->wd->select_all_item))))
      {
          _effect_item_realize(it, EINA_FALSE);
          edje_object_message_signal_process(it->edit_obj);
@@ -3033,6 +3033,7 @@ elm_genlist_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_event_hook_set(obj, _event_hook);
+   elm_widget_on_show_region_hook_set(obj, _show_region_hook, obj);
 
    wd->scr = elm_smart_scroller_add(e);
    elm_smart_scroller_widget_set(wd->scr, obj);
@@ -6495,7 +6496,8 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode)
                     }
                   label_cnt++;
                }
-          }			
+          }
+        elm_widget_focused_object_clear(elm_widget_focused_object_get(it->wd->obj));
         elm_widget_focus_set(editfield, EINA_TRUE);
      }
      
