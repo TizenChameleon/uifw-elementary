@@ -23,6 +23,26 @@
 #define TOOLBAR 1
 #define OBJECT 2
 
+typedef struct _Animation_Data Animation_Data;
+
+struct _Animation_Data 
+{
+   Evas_Object * obj;
+   Evas_Coord fx;
+   Evas_Coord fy;
+   Evas_Coord fw;
+   Evas_Coord fh;
+   Evas_Coord tx;
+   Evas_Coord ty;
+   Evas_Coord tw;
+   Evas_Coord th;
+   unsigned int start_time;
+   double time;
+   void (*func) (void *data, Evas_Object * obj);
+   void *data;
+   Ecore_Animator * timer;
+};
+
 // internal data structure of controlbar object
 typedef struct _Widget_Data Widget_Data;
 
@@ -58,6 +78,7 @@ struct _Widget_Data
    Ecore_Timer *effect_timer;
    Eina_Bool init_animation;
    Eina_Bool selected_animation;
+   Animation_Data *ad;
 
 //   const char *view_hide;
 //   const char *view_show;
@@ -83,26 +104,6 @@ struct _Elm_Controlbar_Item
    int style;
    Eina_Bool selected;
    Eina_Bool disable;
-};
-
-typedef struct _Animation_Data Animation_Data;
-
-struct _Animation_Data 
-{
-   Evas_Object * obj;
-   Evas_Coord fx;
-   Evas_Coord fy;
-   Evas_Coord fw;
-   Evas_Coord fh;
-   Evas_Coord tx;
-   Evas_Coord ty;
-   Evas_Coord tw;
-   Evas_Coord th;
-   unsigned int start_time;
-   double time;
-   void (*func) (void *data, Evas_Object * obj);
-   void *data;
-   Ecore_Animator * timer;
 };
 
 static const char *widtype = NULL;
@@ -282,15 +283,60 @@ _del_hook(Evas_Object * obj)
         free(item);
         item = NULL;
      }
+   if (wd->view)
+     {
+        Evas_Object *content;
+        content = elm_layout_content_unset(wd->view, "elm.swallow.view");
+        evas_object_hide(content);
+        evas_object_del(wd->view);
+        wd->view = NULL;
+     }
    if (wd->bg)
      {
         evas_object_del(wd->bg);
         wd->bg = NULL;
      }
+   if (wd->box)
+     {
+        evas_object_del(wd->box);
+        wd->box = NULL;
+     }
+   if (wd->event_box)
+     {
+        evas_object_del(wd->event_box);
+        wd->event_box = NULL;
+     }
+   if (wd->focused_box)
+     {
+        evas_object_del(wd->focused_box);
+        wd->focused_box = NULL;
+     }
+   if (wd->focused_box_left)
+     {
+        evas_object_del(wd->focused_box_left);
+        wd->focused_box_left = NULL;
+     }
+   if (wd->focused_box_right)
+     {
+        evas_object_del(wd->focused_box_right);
+        wd->focused_box_right = NULL;
+     }
+   if (wd->edje)
+     {
+        evas_object_del(wd->edje);
+        wd->edje = NULL;
+     }
    if (wd->effect_timer)
      {
         ecore_timer_del(wd->effect_timer);
         wd->effect_timer = NULL;
+     }
+   if (wd->ad)
+     {
+        if (wd->ad->timer) ecore_animator_del(wd->ad->timer);
+        wd->ad->timer = NULL;
+        free(wd->ad);
+        wd->ad = NULL;
      }
 
    free(wd);
@@ -406,7 +452,7 @@ move_evas_object(void *data)
    ph = ad->fh + h;
    if (x == dx && y == dy && w == dw && h == dh)
      {
-        ecore_animator_del(ad->timer);
+        if(ad->timer) ecore_animator_del(ad->timer);
         ad->timer = NULL;
         evas_object_move(ad->obj, px, py);
         evas_object_resize(ad->obj, pw, ph);
@@ -424,7 +470,7 @@ move_evas_object(void *data)
    return ECORE_CALLBACK_RENEW;
 }
 
-static void
+static Animation_Data* 
 move_object_with_animation(Evas_Object * obj, Evas_Coord x, Evas_Coord y,
                            Evas_Coord w, Evas_Coord h, Evas_Coord x_,
                            Evas_Coord y_, Evas_Coord w_, Evas_Coord h_,
@@ -447,6 +493,8 @@ move_object_with_animation(Evas_Object * obj, Evas_Coord x, Evas_Coord y,
    ad->func = func;
    ad->data = data;
    ad->timer = ecore_animator_add(mv_func, ad);
+
+   return ad;
 }
 
 static Eina_Bool
@@ -784,7 +832,14 @@ move_selected_box(Widget_Data *wd, Elm_Controlbar_Item * fit, Elm_Controlbar_Ite
       edje_object_signal_emit(_EDJ(wd->cur_item->base), "elm,state,unselected", "elm");
 
    wd->animating++;
-   move_object_with_animation(wd->selected_box, fx, fy, fw, fh, tx, ty, tw, th,
+   if (wd->ad)
+     {
+        if (wd->ad->timer) ecore_animator_del(wd->ad->timer);
+        wd->ad->timer = NULL;
+        free(wd->ad);
+        wd->ad = NULL;
+     }
+   wd->ad = move_object_with_animation(wd->selected_box, fx, fy, fw, fh, tx, ty, tw, th,
                               0.3, move_evas_object, _end_selected_box, wd);
 }
 
