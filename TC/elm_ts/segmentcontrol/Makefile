@@ -1,19 +1,20 @@
 CC ?= gcc
 
 TARGETS = utc_UIFW_elm_segment_control_add_func \
-		utc_UIFW_elm_segment_control_item_add_func \
-		utc_UIFW_elm_segment_control_item_count_get_func \
-		utc_UIFW_elm_segment_control_item_del_at_func \
-		utc_UIFW_elm_segment_control_item_del_func \
-		utc_UIFW_elm_segment_control_item_get_at_func \
-		utc_UIFW_elm_segment_control_item_icon_get_func \
-		utc_UIFW_elm_segment_control_item_index_get_func \
-		utc_UIFW_elm_segment_control_item_insert_at_func \
-		utc_UIFW_elm_segment_control_item_label_get_func \
-		utc_UIFW_elm_segment_control_item_object_get_func \
-		utc_UIFW_elm_segment_control_item_selected_get_func \
-		utc_UIFW_elm_segment_control_item_selected_set_func \
-                utc_UIFW_elm_segment_control_item_label_object_set_func 
+      utc_UIFW_elm_segment_control_item_add_func \
+      utc_UIFW_elm_segment_control_item_count_get_func \
+      utc_UIFW_elm_segment_control_item_del_at_func \
+      utc_UIFW_elm_segment_control_item_del_func \
+      utc_UIFW_elm_segment_control_item_get_func \
+      utc_UIFW_elm_segment_control_item_icon_get_func \
+      utc_UIFW_elm_segment_control_item_icon_set_func \
+      utc_UIFW_elm_segment_control_item_index_get_func \
+      utc_UIFW_elm_segment_control_item_insert_at_func \
+      utc_UIFW_elm_segment_control_item_label_get_func \
+      utc_UIFW_elm_segment_control_item_label_set_func \
+      utc_UIFW_elm_segment_control_item_object_get_func \
+      utc_UIFW_elm_segment_control_item_selected_get_func \
+      utc_UIFW_elm_segment_control_item_selected_set_func 
 
 PKGS = elementary
 

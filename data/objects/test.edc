@@ -470,6 +470,136 @@ collections {
          }
       }
    }
+   group { name: "segment_test";
+      parts{
+         part {
+            name: "bg";
+            type: RECT;
+            scale: 1; //allow scaling
+            description {
+            state: "default" 0.0;
+            color:  0 0 0 0;
+            }
+         }
+         part { name: "top_padding";
+            type: RECT;
+            scale: 1; //allow scaling
+            description {
+               state: "default" 0.0;
+               min : 250 30; //minimum size for gap filler
+               fixed: 0 1;
+               rel1 { relative: 0 0; }
+               rel2 { relative: 1 0; }
+               color:  0 0 0 0;
+               align: 0 0;
+            }
+         }
+         part { name: "segment";
+            type: SWALLOW;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               fixed: 1 1;
+               min: 360 50;
+               max: 360 50;
+               rel1 { relative: 0 1.0; to_y: "top_padding"; }
+               align: 0.5 0;
+            }
+         }
+         part { name: "btn1_bottom_padding";
+            type: RECT;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               min : 250 30;
+               max : 250 30;
+               fixed: 1 1;
+               align: 0.5 0;
+               rel1 { relative: 0 1.0; to_y: "segment"; }
+               rel2 { relative: 1 1.0; to_y: "segment"; }
+               color: 0 255 0 0;
+            }
+         }
+         part { name: "add";
+            type: SWALLOW;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               fixed: 1 1;
+               align: 0.5 0;
+               min: 250 50;
+               max: 250 50;
+               rel1 { relative: 0 1.0; to_y: "btn1_bottom_padding"; }
+               align: 0.5 0;
+            }
+         }
+         part { name: "btn2_bottom_padding";
+            type: RECT;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               min : 250 50;
+               max : 250 50;
+               fixed: 1 1;
+               align: 0.5 0;
+               rel1 { relative: 0 1.0; to_y: "add"; }
+               rel2 { relative: 1 1.0; to_y: "add"; }
+              color: 0 0 0 0;
+           }
+         }
+         part { name: "del";
+            type: SWALLOW;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               fixed: 1 1;
+               min: 250 50;
+               max: 250 50;
+               align: 0.5 0;
+               rel1 { relative: 0 1.0; to_y: "btn2_bottom_padding"; }
+               align: 0.5 0;
+            }
+         }
+         part { name: "btn3_bottom_padding";
+            type: RECT;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               min : 250 50;
+               max : 250 50;
+               fixed: 1 1;
+               align: 0.5 0;
+               rel1 { relative: 0 1.0; to_y: "del"; }
+               rel2 { relative: 1 1.0; to_y: "del"; }
+               color: 0 0 0 0;
+            }
+         }
+         part { name: "insert";
+            type: SWALLOW;
+            scale: 1;
+            description {
+               fixed: 1 1;
+               min: 250 50;
+               max: 250 50;
+               state: "default" 0.0;
+               rel1 { relative: 0 1.0; to_y: "btn3_bottom_padding"; }
+               align: 0.5 0;
+            }
+         }
+         part { name: "btn_bottom_padding";
+            type: RECT;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               min : 0 30;
+               rel1 { relative: 0 1.0; to_y: "insert"; }
+               rel2 { relative: 1 1.0;}
+               color: 0 0 0 0;
+               align: 0.5 1;
+            }
+         }
+      }
+   }
    group { name: "bg_overlay";
       images {
 	 image: "clo.png" LOSSY 60;

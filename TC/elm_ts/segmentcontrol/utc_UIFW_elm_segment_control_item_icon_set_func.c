@@ -1,5 +1,6 @@
 #include <tet_api.h>
 #include <Elementary.h>
+#define PKG_DATA_DIR "/usr/share/elementary"
 
 // Definitions
 // For checking the result of the positive test case.
@@ -34,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_segment_control_item_count_get_func_01(void);
-static void utc_UIFW_elm_segment_control_item_count_get_func_02(void);
+static void utc_UIFW_elm_segment_control_item_icon_set_func_01(void);
+static void utc_UIFW_elm_segment_control_item_icon_set_func_02(void);
 
 enum {
    POSITIVE_TC_IDX = 0x01,
@@ -43,8 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-   { utc_UIFW_elm_segment_control_item_count_get_func_01, POSITIVE_TC_IDX },
-   { utc_UIFW_elm_segment_control_item_count_get_func_02, NEGATIVE_TC_IDX },
+   { utc_UIFW_elm_segment_control_item_icon_set_func_01, POSITIVE_TC_IDX },
+   { utc_UIFW_elm_segment_control_item_icon_set_func_02, NEGATIVE_TC_IDX },
    { NULL, 0 }
 };
 
@@ -73,20 +74,28 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_segment_control_item_count_get()
+ * @brief Positive test case of elm_segment_control_item_icon_set()
  */
-static void utc_UIFW_elm_segment_control_item_count_get_func_01(void)
+static void utc_UIFW_elm_segment_control_item_icon_set_func_01(void)
 {
-   Evas_Object *segment = NULL;
    Elm_Segment_Item *item = NULL;
-   int count;
+   Evas_Object *icon = NULL;
+   Evas_Object* ic = NULL;
+   char buf[PATH_MAX];
+   Evas_Object *segment = NULL;
+   int index;
 
    segment = elm_segment_control_add(main_win);
    evas_object_show(segment);
+   ic = elm_icon_add(main_win);
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PKG_DATA_DIR);
+   elm_icon_file_set(ic, buf, NULL);
    item = elm_segment_control_item_add(segment, NULL, "All");
-   count = elm_segment_control_item_count_get(segment);
-   if (!count) {
-      tet_infoline("elm_segment_control_item_count_get() failed in positive test case");
+   elm_segment_control_item_icon_set(item, ic);
+   index = elm_segment_control_item_index_get(item);
+   icon = elm_segment_control_item_icon_get(segment,index);
+   if (!icon) {
+      tet_infoline("elm_segment_control_item_icon_set() failed in positive test case");
       tet_result(TET_FAIL);
       return;
    }
@@ -94,21 +103,28 @@ static void utc_UIFW_elm_segment_control_item_count_get_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_segment_control_item_count_get()
+ * @brief Negative test case of ug_init elm_segment_control_item_icon_set()
  */
-static void utc_UIFW_elm_segment_control_item_count_get_func_02(void)
+static void utc_UIFW_elm_segment_control_item_icon_set_func_02(void)
 {
-   Evas_Object *segment = NULL;
    Elm_Segment_Item *item = NULL;
-   int count ;
+   Evas_Object *icon = NULL;
+   Evas_Object* ic = NULL;
+   char buf[PATH_MAX];
+   Evas_Object *segment = NULL;
+   int index;
 
    segment = elm_segment_control_add(main_win);
    evas_object_show(segment);
+   ic = elm_icon_add(main_win);
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PKG_DATA_DIR);
+   elm_icon_file_set(ic, buf, NULL);
    item = elm_segment_control_item_add(segment, NULL, "All");
-   count = elm_segment_control_item_count_get(NULL);
-
-   if (count) {
-      tet_infoline("elm_segment_control_item_count_get() failed in negative test case");
+   elm_segment_control_item_icon_set(item, ic);
+   index = elm_segment_control_item_index_get(item);
+   icon = elm_segment_control_item_icon_get(NULL, index);
+   if (icon) {
+      tet_infoline("elm_segment_control_item_icon_set() failed in negative test case");
       tet_result(TET_FAIL);
       return;
    }
