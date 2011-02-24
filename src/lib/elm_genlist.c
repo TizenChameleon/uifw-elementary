@@ -2117,6 +2117,7 @@ _item_unrealize(Elm_Genlist_Item *it)
 
    if (!it->realized) return;
    if (it->wd->reorder_it && it->wd->reorder_it == it) return;
+   if (it->wd->effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_EDIT_MODE && it->hilighted) return;
    evas_object_smart_callback_call(it->base.widget, "unrealized", it);
    if (it->long_timer)
      {
@@ -3568,6 +3569,7 @@ elm_genlist_clear(Evas_Object *obj)
      {
         Elm_Genlist_Item *it = ELM_GENLIST_ITEM_FROM_INLIST(wd->items);
         it->nocache = EINA_TRUE;
+        it->hilighted = EINA_FALSE;
 #ifdef ANCHOR_ITEM        
         if (wd->anchor_item == it)
           {
@@ -5610,7 +5612,7 @@ _item_moving_effect_timer_cb(void *data)
                                       evas_object_show(it2->base.view);
                                       it2->effect_done = EINA_TRUE;
                                    }
-                                 break;
+                                // break;
                               }
                             it2 = elm_genlist_item_prev_get(it2);
                          }
@@ -5706,7 +5708,6 @@ _item_flip_effect_show(Elm_Genlist_Item *it)
           {
              if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
                {
-                  //                edje_object_signal_emit(it2->base.view, "elm,state,expand_flip", "");
                   edje_object_signal_emit(it2->base.view, "flip_item", "");
                   if(check)
                      evas_object_move(it2->base.view, -9999, -9999);
