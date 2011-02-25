@@ -6130,7 +6130,6 @@ elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
  *
  * @ingroup Genlist
  */
-/*
 EAPI Eina_Bool
 elm_genlist_edit_mode_get(const Evas_Object *obj)
 {
@@ -6141,7 +6140,6 @@ elm_genlist_edit_mode_get(const Evas_Object *obj)
    if (wd->edit_mode) return EINA_TRUE;
    else return EINA_FALSE;
 }
-*/
 
 /**
  * Set Genlist edit mode
