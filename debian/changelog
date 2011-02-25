@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build123) unstable; urgency=low
+
+  * Package Upload
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build123
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Fri, 25 Feb 2011 18:56:00 +0900
+
 elementary (1.0.0+svn.51480slp2+build122) unstable; urgency=low
 
   * (reupload) Fixed bug for select, selectall in an empty entry.
