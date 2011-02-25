@@ -2146,6 +2146,8 @@ _item_unrealize(Elm_Genlist_Item *it)
    it->states = NULL;
    it->realized = EINA_FALSE;
    it->want_unrealize = EINA_FALSE;
+   if (it->wd->edit_field && it->renamed)
+      elm_genlist_item_rename_mode_set(it, EINA_FALSE);
    if (it->wd->edit_mode != ELM_GENLIST_EDIT_MODE_NONE) _effect_item_unrealize(it);
 }
 
@@ -6120,6 +6122,28 @@ elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
 }
 
 /**
+ * Get Genlist edit mode
+ *
+ * @param obj The genlist object
+ * @return The edit mode status
+ * (EINA_TRUE = edit mode, EINA_FALSE = normal mode
+ *
+ * @ingroup Genlist
+ */
+/*
+EAPI Eina_Bool
+elm_genlist_edit_mode_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   if (wd->edit_mode) return EINA_TRUE;
+   else return EINA_FALSE;
+}
+*/
+
+/**
  * Set Genlist edit mode
  *
  * This sets Genlist edit mode.
@@ -6277,6 +6301,7 @@ elm_genlist_edit_selected_items_del(Evas_Object *obj)
    Evas_Coord ox, oy, ow, oh, cvx, cvy, cvw, cvh;
    int vis = 0;
 
+   if (wd->edit_field) return;
    evas_object_geometry_get(wd->pan_smart, &ox, &oy, &ow, &oh);
    evas_output_viewport_get(evas_object_evas_get(wd->obj), &cvx, &cvy,&cvw, &cvh);
    EINA_INLIST_FOREACH(wd->blocks, itb)
