@@ -3179,22 +3179,6 @@ extern "C" {
    EAPI void                   elm_imageslider_prev(Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void                   elm_imageslider_next(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
-   /* Selection Info */
-   EINA_DEPRECATED EAPI Evas_Object *elm_selectioninfo_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_selectioninfo_content_set(Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED EAPI void         elm_selectioninfo_parent_set(Evas_Object *obj, Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_selectioninfo_timeout_set(Evas_Object *obj, int timeout);
-   EINA_DEPRECATED EAPI void         elm_selectioninfo_timer_init(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_selectioninfo_check_state_set(Evas_Object *obj, Eina_Bool *state, int count);
-   EINA_DEPRECATED EAPI int          elm_selectioninfo_checked_count_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_selectioninfo_label_set(Evas_Object *obj, char* text);
-
-   /* smart callback called:
-    * "selectioninfo,timeout" - when time out
-    * "selectioninfo,show" - when selectioninfo show
-    * "selectioninfo,hide" - when selectioninfo hide
-    */
-
   typedef struct _Elm_Store                      Elm_Store;
   typedef struct _Elm_Store_Filesystem           Elm_Store_Filesystem;
   typedef struct _Elm_Store_Item                 Elm_Store_Item;
