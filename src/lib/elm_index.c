@@ -727,7 +727,7 @@ _index_process(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   if(wd->items_count == 0) return;
+   if (wd->items_count == 0) return;
 
    const int adj_pos = (wd->items_count-1)*0.5;
    if(wd->tot_items_count[wd->level] <= wd->max_supp_items_count)
@@ -735,70 +735,77 @@ _index_process(Evas_Object *obj)
    else
       n = wd->max_supp_items_count;
    group_count = MIN_GRP_SIZE;
-   int indx[n];
+
+   int *indx = (int*)calloc(n, sizeof(int));
+   if (!indx) return;
 
    const int minh = wd->min_obj_height;
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-         it->vis_letter = eina_stringshare_add(it->letter);
-         it->size =  minh;
+        it->vis_letter = eina_stringshare_add(it->letter);
+        it->size =  minh;
      }
    int remainder;
    int numberofparts;
    int N = wd->items_count;
 
-   for(i=0;i<n;i++)
+   for (i=0;i<n;i++)
      {
-	indx[i] = minh;
+        indx[i] = minh;
      }
    extraIndex=n-N;
-   if(extraIndex < 0) return;
+   if (extraIndex < 0) return;
 
    group_count = _group_count(obj, extraIndex, adj_pos, N);
-   if(group_count <= 0) return;
+   if (group_count <= 0) return;
 
    PlacementPart place[adj_pos];
    remainder = extraIndex%group_count;
    numberofparts=(extraIndex/group_count)+(remainder == 0? 0: 1);
 
-   for(i=0;i<numberofparts; i++)
+   for (i=0;i<numberofparts; i++)
      {
-         place[i].count=group_count+1;
-         count = (int)(((float)(i+1)/(float)(numberofparts+1))*N);
-         place[i].start= count +i*group_count-1;
+        place[i].count=group_count+1;
+        count = (int)(((float)(i+1)/(float)(numberofparts+1))*N);
+        place[i].start= count +i*group_count-1;
      }
    if (remainder)
      place[numberofparts-1].count=remainder+1;
 
-   for(i=0;i<numberofparts;i++)
+   for (i=0;i<numberofparts;i++)
      {
-	for(j=0;j<place[i].count; j++)
-	  {
-	     indx[((place[i].start)+j)]= MIN_PIXEL_VALUE;
-	  }
-	indx[(place[i].start+(place[i].count)/2)] = minh-place[i].count+1;
+        for (j=0;j<place[i].count; j++)
+          {
+             indx[((place[i].start)+j)]= MIN_PIXEL_VALUE;
+          }
+        indx[(place[i].start+(place[i].count)/2)] = minh-place[i].count+1;
      }
    count = 0;
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-	int size = indx[count];
-	count++;
-	if(size == minh)
-	  {
-	     it->vis_letter = eina_stringshare_add(it->letter);
-	     continue;
-	  }
-	else if(size == 1)
-	  {
-	     eina_stringshare_del(it->vis_letter);
-	     it->vis_letter = eina_stringshare_add("");
-	  }
-	else
-	  {
-	     eina_stringshare_del(it->vis_letter);
-	     it->vis_letter = eina_stringshare_add(wd->special_char);
-	  }
-	it->size = size*wd->scale_factor;
+        int size = indx[count];
+        count++;
+        if (size == minh)
+          {
+             it->vis_letter = eina_stringshare_add(it->letter);
+             continue;
+          }
+        else if (size == 1)
+          {
+             eina_stringshare_del(it->vis_letter);
+             it->vis_letter = eina_stringshare_add("");
+          }
+        else
+          {
+             eina_stringshare_del(it->vis_letter);
+             it->vis_letter = eina_stringshare_add(wd->special_char);
+          }
+        it->size = size*wd->scale_factor;
+     }
+   if (indx)
+     {
+        free(indx);
+        indx = NULL;
      }
 }
 /**
