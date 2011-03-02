@@ -861,8 +861,8 @@ _item_select_cb(void *data, Evas_Object *obj __UNUSED__,
 
    if (item->func)
    {
-      evas_object_hide(item->base.widget);
       item->func((void*) item->base.data, item->base.widget, data);
+      evas_object_hide(item->base.widget);
    }
 }
 
