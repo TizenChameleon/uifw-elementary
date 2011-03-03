@@ -2381,6 +2381,8 @@ extern "C" {
    EAPI void         elm_scrolled_entry_file_save(Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_scrolled_entry_autosave_set(Evas_Object *obj, Eina_Bool autosave) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool    elm_scrolled_entry_autosave_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void         elm_scrolled_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool    elm_scrolled_entry_cnp_textonly_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_scrolled_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled);
    EAPI void         elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
    EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj);
