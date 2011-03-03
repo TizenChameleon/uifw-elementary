@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build125) unstable; urgency=low
+
+  * Upload Package
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build125
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Thu, 03 Mar 2011 16:28:03 +0900
+
 elementary (1.0.0+svn.51480slp2+build124) unstable; urgency=low
 
   * Upload Package
