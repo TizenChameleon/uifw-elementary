@@ -793,6 +793,7 @@ _del_hook(Evas_Object *obj)
    if (wd->must_recalc_idler) ecore_idler_del(wd->must_recalc_idler);
    if (wd->multi_timer) ecore_timer_del(wd->multi_timer);
    if (wd->scr_hold_timer) ecore_timer_del(wd->scr_hold_timer);
+   if (wd->edit_mode) elm_genlist_edit_mode_set(wd->obj, ELM_GENLIST_EDIT_MODE_NONE, NULL);
    free(wd);
 }
 
@@ -3649,11 +3650,6 @@ elm_genlist_clear(Evas_Object *obj)
      {
         ecore_animator_del(wd->item_moving_effect_timer);
         wd->item_moving_effect_timer = NULL;   	
-     }
-   if (wd->edit_mode)
-     {
-        wd->edit_mode = ELM_GENLIST_EDIT_MODE_NONE;
-        elm_genlist_edit_mode_set(wd->obj, ELM_GENLIST_EDIT_MODE_NONE, NULL);
      }
    wd->show_item = NULL;
    wd->pan_x = 0;
