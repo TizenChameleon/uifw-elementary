@@ -188,7 +188,7 @@ obj_longpress(Evas_Object *obj)
 				}
 	//		elm_ctxpopup_item_append(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 	// start for cbhm
-			if (!ext_mod->password)
+			if ((!ext_mod->password) && (ext_mod->editable))
 			{
 				icon = elm_icon_add(ext_mod->popup);
 				snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
@@ -225,11 +225,14 @@ obj_longpress(Evas_Object *obj)
 								}
 						}
 	// start for cbhm
-					icon = elm_icon_add(ext_mod->popup);
-					snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
-					elm_icon_file_set(icon, buf, NULL);
-					elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
-					//elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
+					if (ext_mod->editable)
+					{
+						icon = elm_icon_add(ext_mod->popup);
+						snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
+						elm_icon_file_set(icon, buf, NULL);
+						elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
+						//elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
+					}
 	// end for cbhm
 				}
 		}

@@ -948,7 +948,7 @@ _long_pressed(void *data)
                                           _paste, data);
                }
 	// start for cbhm
-             if (!wd->password)
+             if ((!wd->password) && (wd->editable))
                elm_hoversel_item_add(wd->hoversel, "More", NULL, ELM_ICON_NONE,
                                      _clipboard_menu, data);
 	// end for cbhm
@@ -968,8 +968,9 @@ _long_pressed(void *data)
                   elm_hoversel_item_add(wd->hoversel, "Cancel", NULL, ELM_ICON_NONE,
                                         _cancel, data);
 	// start for cbhm
-                  elm_hoversel_item_add(wd->hoversel, "More", NULL, ELM_ICON_NONE,
-                                        _clipboard_menu, data);
+                  if (wd->editable)
+                    elm_hoversel_item_add(wd->hoversel, "More", NULL, ELM_ICON_NONE,
+                                          _clipboard_menu, data);
 	// end for cbhm
                }
           }

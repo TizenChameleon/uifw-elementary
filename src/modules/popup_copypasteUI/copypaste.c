@@ -146,7 +146,7 @@ obj_longpress(Evas_Object *obj)
 				}
 	//		elm_ctxpopup_item_add(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
 	// start for cbhm
-			if (!ext_mod->password)
+			if ((!ext_mod->password) && (ext_mod->editable))
 				elm_list_item_append(list, "More", NULL, NULL,_clipboard_menu, obj);
 	// end for cbhm
 		}
@@ -171,7 +171,8 @@ obj_longpress(Evas_Object *obj)
 								}
 						}
 	// start for cbhm
-					elm_list_item_append(list, "More", NULL, NULL,_clipboard_menu, obj);
+					if (ext_mod->editable)
+						elm_list_item_append(list, "More", NULL, NULL,_clipboard_menu, obj);
 	// end for cbhm
 				}
 		}
