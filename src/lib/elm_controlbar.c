@@ -111,7 +111,7 @@ static const char *widtype = NULL;
 static int check_bar_item_number(Widget_Data *wd);
 static void selected_box(Elm_Controlbar_Item * it);
 static void cancel_selected_box(Widget_Data *wd);
-static int pressed_box(Elm_Controlbar_Item * it);
+static Eina_Bool pressed_box(Elm_Controlbar_Item * it);
 static void item_color_set(Elm_Controlbar_Item *item, const char *color_part);
 
 ///////////////////////////////////////////////////////////////////
@@ -918,10 +918,7 @@ cancel_selected_box(Widget_Data *wd)
           }
         else if (item->style == TOOLBAR)
           {
-             if(!item->disable)
-               {
-                  edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
-               }
+             edje_object_signal_emit(_EDJ(item->base), "elm,state,unselected", "elm");
           }
      }
 }
@@ -948,7 +945,7 @@ unpressed_box_cb(void *data, Evas *evas, Evas_Object *obj, void *event_info)
    return;
 }
 
-static int
+static Eina_Bool 
 pressed_box(Elm_Controlbar_Item * it) 
 {
    Widget_Data * wd = elm_widget_data_get(it->obj);
@@ -956,9 +953,9 @@ pressed_box(Elm_Controlbar_Item * it)
    const Eina_List *l;
    Elm_Controlbar_Item * item;
 
-   if(wd->animating) return EXIT_FAILURE;
+   if(wd->animating) return EINA_FALSE;
 
-   if(it->disable) return EXIT_FAILURE;
+   if(it->disable) return EINA_FALSE;
 
    EINA_LIST_FOREACH(wd->items, l, item)
      {
@@ -970,11 +967,7 @@ pressed_box(Elm_Controlbar_Item * it)
                }
              else if (it->style == TOOLBAR)
                {
-
-                  if(!it->disable) 
-                    {
-                       edje_object_signal_emit(_EDJ(it->base), "elm,state,toolbar_pressed", "elm");
-                    }
+                  edje_object_signal_emit(_EDJ(it->base), "elm,state,toolbar_pressed", "elm");
                }
              evas_object_event_callback_add(wd->event_box, EVAS_CALLBACK_MOUSE_UP, unpressed_box_cb, (void *)wd);
 
@@ -982,11 +975,11 @@ pressed_box(Elm_Controlbar_Item * it)
           }
      }
    if (!check)
-      return EXIT_FAILURE;
+      return EINA_FALSE;
 
    wd->pre_item = it;
 
-   return EXIT_SUCCESS;
+   return EINA_TRUE;
 }
 
 static Evas_Object *

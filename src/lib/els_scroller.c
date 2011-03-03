@@ -1717,14 +1717,9 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                                 (vel > _elm_config->thumbscroll_momentum_threshold) &&
                                 (!sd->freeze))
                               {
+                                 Evas_Coord cw = 0, ch = 0, px = 0, py = 0;
                                  sd->down.dx = ((double)dx / at);
                                  sd->down.dy = ((double)dy / at);
-                                 if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
-                                     ((sd->down.dx < 0) && (sd->down.pdx < 0)))
-                                   sd->down.dx += (double)sd->down.pdx * 1.5; // FIXME: * 1.5 - probably should be config
-                                 if (((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
-                                     ((sd->down.dy < 0) && (sd->down.pdy < 0)))
-                                   sd->down.dy += (double)sd->down.pdy * 1.5; // FIXME: * 1.5 - probably should be config
                                  if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
                                      ((sd->down.dx < 0) && (sd->down.pdx < 0)) ||
                                      ((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
@@ -1738,6 +1733,28 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                                       dt = _elm_config->thumbscroll_friction;
                                     sd->down.extra_time = _elm_config->thumbscroll_friction - dt;
                                   }
+                                 if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
+                                     ((sd->down.dx < 0) && (sd->down.pdx < 0)))
+                                   {
+                                      int buf = (int)((double)sd->down.dx * (_elm_config->thumbscroll_friction + sd->down.extra_time) * 2);
+                                      sd->down.dx += (double)sd->down.pdx * 1.5; // FIXME: * 1.5 - probably should be config
+                                      int dest = (int)((double)sd->down.dx * (_elm_config->thumbscroll_friction + sd->down.extra_time));
+                                      if (dest < ((px - cw) + buf))
+                                         sd->down.dx = (int)((double)((px - cw) + buf) / (_elm_config->thumbscroll_friction + sd->down.extra_time));
+                                      else if (dest > (px + buf))
+                                         sd->down.dx = (int)((double)(px + buf) / (_elm_config->thumbscroll_friction + sd->down.extra_time));
+                                   }
+                                 if (((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
+                                     ((sd->down.dy < 0) && (sd->down.pdy < 0)))
+                                   {
+                                      int buf = (int)((double)sd->down.dy * (_elm_config->thumbscroll_friction + sd->down.extra_time) * 2);
+                                      sd->down.dy += (double)sd->down.pdy * 1.5; // FIXME: * 1.5 - probably should be config
+                                      int dest = (int)((double)sd->down.dy * (_elm_config->thumbscroll_friction + sd->down.extra_time));
+                                      if (dest < ((py - ch) + buf))
+                                         sd->down.dy = (int)((double)((py - ch) + buf) / (_elm_config->thumbscroll_friction + sd->down.extra_time));
+                                      else if (dest > (py + buf))
+                                         sd->down.dy = (int)((double)(py + buf) / (_elm_config->thumbscroll_friction + sd->down.extra_time));
+                                   }
                                  else
                                   sd->down.extra_time = 0.0;
                                  sd->down.pdx = sd->down.dx;
