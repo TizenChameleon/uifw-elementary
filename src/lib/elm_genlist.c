@@ -2118,7 +2118,6 @@ _item_unrealize(Elm_Genlist_Item *it)
 
    if (!it->realized) return;
    if (it->wd->reorder_it && it->wd->reorder_it == it) return;
-   if (!it->wd->edit_mode && it->hilighted) return;
    evas_object_smart_callback_call(it->base.widget, "unrealized", it);
    if (it->long_timer)
      {
