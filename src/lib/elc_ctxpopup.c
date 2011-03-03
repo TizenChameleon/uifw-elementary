@@ -587,9 +587,13 @@ _sizing_eval(Evas_Object *obj)
    _update_arrow(obj, wd->dir);
    _shift_base_by_arrow(wd->arrow, wd->dir, &rect);
 
+   //move base up, to avoid arrow above base contents
+   if (wd->dir == ELM_CTXPOPUP_DIRECTION_UP)
+      evas_object_layer_set(wd->base, evas_object_layer_get(wd->arrow) + 1);
+
    //resize scroller according to final size. 
    if (!wd->content)
-      evas_object_smart_calculate(wd->scr); 
+      evas_object_smart_calculate(wd->scr);
 
    evas_object_move(wd->base, rect.x, rect.y);
    evas_object_resize(wd->base, rect.w, rect.h);
