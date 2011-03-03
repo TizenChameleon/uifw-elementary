@@ -1068,7 +1068,10 @@ call:
    it->walking--;
    it->wd->walking--;
    if ((it->wd->clear_me) && (!it->wd->walking))
-     elm_genlist_clear(it->base.widget);
+     {
+        elm_genlist_clear(it->base.widget);
+        return;
+     }
    else
      {
         if ((!it->walking) && (it->delete_me))
@@ -1076,7 +1079,7 @@ call:
              if (!it->relcount) _item_del(it);
           }
      }
-   it->wd->last_selected_item = it;
+   if (it && it->wd) it->wd->last_selected_item = it;
 }
 
 static void
