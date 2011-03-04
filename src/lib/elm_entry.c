@@ -1551,7 +1551,7 @@ _signal_magnifier_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
 
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
    if (!wd->deferred_recalc_job)
-      elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get());
+      elm_widget_show_region_set(data, cx, cy, cw, ch);
    else
      {
         wd->deferred_cur = EINA_TRUE;
