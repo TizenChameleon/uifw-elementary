@@ -436,9 +436,9 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
         length[1] = (hover_area.y + hover_area.h) - pos.y;
 
         if (length[0] > length[1])
-           idx = ELM_CTXPOPUP_DIRECTION_DOWN;
-        else
            idx = ELM_CTXPOPUP_DIRECTION_UP;
+        else
+           idx = ELM_CTXPOPUP_DIRECTION_DOWN;
 
         //TODO 2: determine x , y
         switch (idx)
@@ -744,6 +744,9 @@ _ctxpopup_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
                void *event_info __UNUSED__)
 {
    Widget_Data *wd;
+   Eina_List *elist;
+   Elm_Ctxpopup_Item *item;
+   int idx = 0;
 
    wd = elm_widget_data_get(obj);
    if (!wd)
@@ -759,6 +762,19 @@ _ctxpopup_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
    evas_object_show(wd->arrow);
 
    edje_object_signal_emit(wd->bg, "elm,state,show", "elm");
+
+   EINA_LIST_FOREACH(wd->items, elist, item)
+     {
+       if (idx++ == 0)
+         edje_object_signal_emit(item->base.view, "elm,state,default", "elm");
+       else
+         {
+           if(!wd->horizontal)
+             edje_object_signal_emit(item->base.view, "elm,state,vertical", "elm");
+           else
+             edje_object_signal_emit(item->base.view, "elm,state,horizontal", "elm");
+         }
+	   }
 
    _sizing_eval(obj);
 }
@@ -1257,10 +1273,11 @@ EAPI void
 elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 {
 	ELM_CHECK_WIDTYPE(obj, widtype);
-   
+
    Widget_Data *wd;
    Eina_List *elist;
 	 Elm_Ctxpopup_Item *item;
+	 int idx = 0;
 
    wd = elm_widget_data_get(obj);
    if (!wd)
@@ -1276,23 +1293,27 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
         elm_box_horizontal_set(wd->box, EINA_FALSE);
         elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_TRUE);
 
-				edje_object_signal_emit(wd->base, "elm,state,vertical", "elm");
-				EINA_LIST_FOREACH(wd->items, elist, item)
-				{
-					edje_object_signal_emit(item->base.view, "elm,state,vertical", "elm");
-				}
+        EINA_LIST_FOREACH(wd->items, elist, item)
+          {
+             if (idx++ == 0)
+                edje_object_signal_emit(item->base.view, "elm,state,default", "elm");
+             else
+                edje_object_signal_emit(item->base.view, "elm,state,vertical", "elm");
+          }
      }
    else
      {
         elm_box_horizontal_set(wd->box, EINA_TRUE);
         elm_scroller_bounce_set(wd->scr, EINA_TRUE, EINA_FALSE);
-  		
-				edje_object_signal_emit(wd->base, "elm,state,horizontal", "elm");
-				EINA_LIST_FOREACH(wd->items, elist, item)
-				{
-					edje_object_signal_emit(item->base.view, "elm,state,horizontal", "elm");
-				}
-		 }
+
+        EINA_LIST_FOREACH(wd->items, elist, item)
+          {
+             if (idx++ == 0)
+                edje_object_signal_emit(item->base.view, "elm,state,default", "elm");
+             else
+                edje_object_signal_emit(item->base.view, "elm,state,horizontal", "elm");
+          }
+     }
 
    if (wd->visible)
       _sizing_eval(obj);
