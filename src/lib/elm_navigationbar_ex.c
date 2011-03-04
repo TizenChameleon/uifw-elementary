@@ -11,13 +11,13 @@
  *
  * Objects can be pushed or popped from the stack or deleted as normal.
  * Pushes and pops will animate and a pop will delete the object once the
- * animation is finished if delete_on_pop is set else the content is unset and the 
- * content pointer is sent as event information in the hide,finished signal.  
+ * animation is finished if delete_on_pop is set else the content is unset and the
+ * content pointer is sent as event information in the hide,finished signal.
  * Any object in the Navigationbar_ex can be promoted to the top
  * (from its current stacking position) as well. Objects are pushed to the
  * top with elm_navigationbar_ex_item_push() and when the top item is no longer
  * wanted, simply pop it with elm_navigationbar_ex_item_pop() and it will also be
- * deleted/unset depending on delete_on_pop variable. 
+ * deleted/unset depending on delete_on_pop variable.
  * Any object you wish to promote to the top that is already in the
  * navigationbar, simply use elm_navigationbar_ex_item_promote(). If an object is no longer
  * needed and is not the top item, just delete it as normal. You can query
@@ -40,7 +40,7 @@ struct _Widget_Data
 struct _Elm_Navigationbar_ex_Item
 {
    Evas_Object *obj, *base, *content;
-   Evas_Object *t_base, *ct_base;
+   Evas_Object *ct_base;
    Evas_Coord minw, minh;
    const char *title;
    const char *subtitle;
@@ -49,6 +49,7 @@ struct _Elm_Navigationbar_ex_Item
    Evas_Object *title_obj;
    Evas_Object *icon;
    Eina_Bool popme : 1;
+   Eina_Bool titleobj_visible:1;
 };
 
 struct _function_button
@@ -77,10 +78,10 @@ _content_unset(Elm_Navigationbar_ex_Item* item)
 {
    if (!item) return NULL;
    Evas_Object *content = NULL;
-   if (!item->content) return NULL; 
+   if (!item->content) return NULL;
    content = item->content;
    elm_widget_sub_object_del(item->obj,item->content);
-   edje_object_part_unswallow(item->ct_base,item->content);     
+   edje_object_part_unswallow(item->ct_base,item->content);
    item->content = NULL;
    evas_object_hide(content);
    return content;
@@ -99,13 +100,12 @@ _theme_hook(Evas_Object *obj)
      {
         Eina_List *bl;
         fn_button *btn;
-        edje_object_scale_set(it->base, elm_widget_scale_get(obj) * 
-                              _elm_config->scale);      
+        edje_object_scale_set(it->base, elm_widget_scale_get(obj) *
+                              _elm_config->scale);
         strncpy(buf, "item/", sizeof(buf));
         strncat(buf, it->item_style, sizeof(buf) - strlen(buf));
-        _elm_theme_object_set(obj, it->t_base,  "navigationbar_ex", buf, elm_widget_style_get(obj));
+        _elm_theme_object_set(obj, it->base,  "navigationbar_ex", buf, elm_widget_style_get(obj));
         _elm_theme_object_set(obj, it->ct_base,  "navigationbar_ex", "content", elm_widget_style_get(obj));
-        _elm_theme_object_set(obj, it->base,  "navigationbar_ex", "base", elm_widget_style_get(obj));
         EINA_LIST_FOREACH(it->fnbtn_list, bl, btn)
           {
              if (btn->btn_id == ELM_NAVIGATIONBAR_EX_BACK_BUTTON)
@@ -166,22 +166,21 @@ _eval_top(Evas_Object *obj)
      {
         Evas_Object *o, *o1, *o2;
         const char *onshow, *onhide;
-        
+
         if (wd->top)
           {
-             o = wd->top->base;
              o1 = wd->top->ct_base;
-             o2 = wd->top->t_base;/*make use of the signals sent for animation*/
+             o2 = wd->top->base;/*make use of the signals sent for animation*/
 
-             /*issue to fix, hide signal does not come for t_base, increasing time helps 
+             /*issue to fix, hide signal does not come for t_base, increasing time helps
               in getting correct events in pop*/
              if (wd->disable_animation)
                {
                   edje_object_signal_emit(o2, "elm,action,hide,noanimate", "elm");
-                  edje_object_signal_emit(o1, "elm,action,hide,noanimate", "elm");                              
+                  edje_object_signal_emit(o1, "elm,action,hide,noanimate", "elm");
                }
              else if (wd->top->popme)
-               {        
+               {
                   edje_object_signal_emit(o2, "elm,action,pop", "elm");
                   edje_object_signal_emit(o1, "elm,action,pop", "elm");
                }
@@ -199,7 +198,7 @@ _eval_top(Evas_Object *obj)
                   }
                   else if (!strcmp(onhide, "lower")) {
                        evas_object_lower(o2);
-                       evas_object_lower(o1);                           
+                       evas_object_lower(o1);
                   }
                }
           }
@@ -209,17 +208,15 @@ _eval_top(Evas_Object *obj)
           }
         wd->oldtop = wd->top;
         wd->top = ittop;
-        o = wd->top->base;
         o1 = wd->top->ct_base;
-        o2 = wd->top->t_base;
-        evas_object_show(o);
+        o2 = wd->top->base;
         evas_object_show(o2);
         evas_object_show(o1);
-        
+
         if ((!animate)||(wd->disable_animation))
-          {     
+          {
              edje_object_signal_emit(o2, "elm,action,show,noanimate", "elm");
-             edje_object_signal_emit(o1, "elm,action,show,noanimate", "elm");                   
+             edje_object_signal_emit(o1, "elm,action,show,noanimate", "elm");
           }
         else if (wd->oldtop)
           {
@@ -228,7 +225,7 @@ _eval_top(Evas_Object *obj)
              if (wd->oldtop->popme)
                {
                   edje_object_signal_emit(o2, "elm,action,show", "elm");
-                  edje_object_signal_emit(o1, "elm,action,show", "elm");                                        
+                  edje_object_signal_emit(o1, "elm,action,show", "elm");
                }
              else
                {
@@ -296,7 +293,6 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
              if (it->item_style) eina_stringshare_del(it->item_style);
              if (it->title_obj) evas_object_del(it->title_obj);
              if (it->icon) evas_object_del(it->icon);
-             evas_object_del(it->t_base);
              evas_object_del(it->ct_base);
              evas_object_del(it->base);
              _eval_top(it->obj);
@@ -308,7 +304,7 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 
 static void
 _resize(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
-{   
+{
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord w, h;
    Eina_List *l;
@@ -324,13 +320,12 @@ _signal_hide_finished(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    Elm_Navigationbar_ex_Item *it = data;
    Evas_Object *obj2 = it->obj;
    Widget_Data *wd = elm_widget_data_get(it->obj);
-   evas_object_hide(it->t_base);
    evas_object_hide(it->ct_base);
    evas_object_hide(it->base);
-   edje_object_signal_emit(it->t_base, "elm,action,reset", "elm");
+   edje_object_signal_emit(it->base, "elm,action,reset", "elm");
    edje_object_signal_emit(it->ct_base, "elm,action,reset", "elm");
    evas_object_smart_callback_call(obj2, "hide,finished", it->content);
-   edje_object_message_signal_process(it->t_base);       
+   edje_object_message_signal_process(it->base);
    edje_object_message_signal_process(it->ct_base);
    if (it->popme)
      {
@@ -346,7 +341,7 @@ _signal_hide_finished(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    _sizing_eval(obj2);
 }
 
-static void 
+static void
 _item_promote(Elm_Navigationbar_ex_Item* item)
 {
    if (!item) return;
@@ -369,8 +364,8 @@ _item_promote(Elm_Navigationbar_ex_Item* item)
 static void
 _process_deletions(Widget_Data *wd)
 {
-   if (!wd) return;     
-   Elm_Navigationbar_ex_Item *it;       
+   if (!wd) return;
+   Elm_Navigationbar_ex_Item *it;
    fn_button *btn_data;
    Eina_List *list;
    EINA_LIST_FREE(wd->to_delete, it)
@@ -386,16 +381,33 @@ _process_deletions(Widget_Data *wd)
              free(btn_data);
              btn_data = NULL;
           }
-        if (it->title_obj) evas_object_del(it->title_obj);              
+        if (it->title_obj) evas_object_del(it->title_obj);
         if (it->content)  evas_object_del(it->content);
         if (it->icon) evas_object_del(it->icon);
-        evas_object_del(it->t_base);
         evas_object_del(it->ct_base);
         evas_object_del(it->base);
         _eval_top(it->obj);
         free(it);
         it = NULL;
-     }  
+     }
+}
+
+static void
+_show_hide_titleobj(void *data, Evas_Object *obj , const char *emission, const char *source)
+{
+   Elm_Navigationbar_ex_Item *item = (Elm_Navigationbar_ex_Item *)data;
+   if(!item) return;
+   if(!item->title_obj) return;
+   if(!item->titleobj_visible)
+     {
+       edje_object_signal_emit(item->base, "elm,state,show,title", "elm");
+       item->titleobj_visible = EINA_TRUE;
+     }
+   else
+     {
+       edje_object_signal_emit(item->base, "elm,state,hide,title", "elm");
+       item->titleobj_visible = EINA_FALSE;
+     }
 }
 
 /**
@@ -414,7 +426,7 @@ elm_navigationbar_ex_add(Evas_Object *parent)
    Widget_Data *wd;
 
    EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
-   
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    obj = elm_widget_add(e);
@@ -428,15 +440,15 @@ elm_navigationbar_ex_add(Evas_Object *parent)
    wd->clip = evas_object_rectangle_add(e);
    elm_widget_resize_object_set(obj, wd->clip);
    elm_widget_sub_object_add(obj, wd->clip);
-   
+
    wd->rect = evas_object_rectangle_add(e);
    elm_widget_sub_object_add(obj, wd->rect);
-   evas_object_color_set(wd->rect, 255, 255, 255, 0); 
+   evas_object_color_set(wd->rect, 255, 255, 255, 0);
    evas_object_clip_set(wd->rect, wd->clip);
-   
+
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
-   
+
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    wd->del_on_pop = EINA_TRUE;
    _sizing_eval(obj);
@@ -472,36 +484,31 @@ elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const cha
    it->content = content;
    it->base = edje_object_add(evas_object_evas_get(obj));
    it->ct_base = edje_object_add(evas_object_evas_get(obj));
-   it->t_base = edje_object_add(evas_object_evas_get(obj));
 
    evas_object_smart_member_add(it->base, obj);
    evas_object_smart_member_add(it->ct_base, obj);
-   evas_object_smart_member_add(it->t_base, obj);
-         
+
    evas_object_geometry_get(obj, &x, &y, &w, &h);
    evas_object_move(it->base, x, y);
    evas_object_resize(it->base, w, h);
    evas_object_clip_set(it->base, wd->clip);
-   
+
    elm_widget_sub_object_add(obj, it->base);
    elm_widget_sub_object_add(obj, it->ct_base);
-   elm_widget_sub_object_add(obj, it->t_base);
-   
+
    elm_widget_sub_object_add(obj, it->content);
-   
-   _elm_theme_object_set(obj, it->base,  "navigationbar_ex", "base", elm_widget_style_get(obj));
+
    _elm_theme_object_set(obj, it->ct_base,  "navigationbar_ex", "content", elm_widget_style_get(obj));
 
    strncpy(buf, "item/", sizeof(buf));
    strncat(buf, item_style, sizeof(buf) - strlen(buf));
    if (!eina_stringshare_replace(&it->item_style, item_style)) return NULL;
-   _elm_theme_object_set(obj, it->t_base,  "navigationbar_ex", buf, elm_widget_style_get(obj));
-   
-   
-   edje_object_part_swallow(it->base, "elm.swallow.title", it->t_base);
+   _elm_theme_object_set(obj, it->base,  "navigationbar_ex", buf, elm_widget_style_get(obj));
+
+
    edje_object_part_swallow(it->base, "elm.swallow.content", it->ct_base);
-   
-   edje_object_signal_callback_add(it->ct_base, "elm,action,hide,finished", "", 
+
+   edje_object_signal_callback_add(it->ct_base, "elm,action,hide,finished", "",
                                    _signal_hide_finished, it);
    evas_object_event_callback_add(it->content,
                                   EVAS_CALLBACK_CHANGED_SIZE_HINTS,
@@ -518,7 +525,7 @@ elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const cha
 
 /**
  * Set the title string for the pushed Item.
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @param[in] title The title string
  *
  * @ingroup Navigationbar_ex
@@ -528,13 +535,9 @@ elm_navigationbar_ex_item_title_label_set( Elm_Navigationbar_ex_Item* item, cons
 {
    if (!item) return;
    if (!eina_stringshare_replace(&item->title, title)) return;
-   if (item->t_base)
+   if (item->base)
      {
-        if ((item->title_obj) && (item->title))
-          {
-             edje_object_signal_emit(item->base, "elm,state,extend,title", "elm");
-          }     
-        edje_object_part_text_set(item->t_base, "elm.text", item->title);       
+        edje_object_part_text_set(item->base, "elm.text", item->title);
      }
 }
 
@@ -556,18 +559,18 @@ elm_navigationbar_ex_item_title_label_get(Elm_Navigationbar_ex_Item* item)
 /**
  * Set the sub title string for the pushed content
  *
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @param[in] subtitle The subtitle string
  *
  * @ingroup Navigationbar_ex
  */
-EAPI void 
+EAPI void
 elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item, const char *subtitle)
 {
    if (!item) return;
    if (!eina_stringshare_replace(&item->subtitle, subtitle)) return;
-   if (item->t_base)
-     edje_object_part_text_set(item->t_base, "elm.text.sub", item->subtitle);   
+   if (item->base)
+     edje_object_part_text_set(item->base, "elm.text.sub", item->subtitle);
 }
 
 /**
@@ -587,28 +590,28 @@ elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item)
 
 /**
  * Set's the icon object of the pushed content
- *  
+ *
  * @param[in] item The Navigationbar_ex Item
  * @param[in] The icon object or NULL if none
- *  
+ *
  *@ingroup Navigationbar_ex
  */
 EAPI void
 elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon)
 {
-   if (!item) return; 
+   if (!item) return;
    if (item->icon == icon) return;
    if (item->icon) evas_object_del(item->icon);
    item->icon = icon;
    if(icon)
      {
-        edje_object_part_swallow(item->t_base, "elm.swallow.icon", icon);
+        edje_object_part_swallow(item->base, "elm.swallow.icon", icon);
         elm_widget_sub_object_add(item->obj, icon);
-        edje_object_signal_emit(item->t_base, "elm,state,icon,visible", "elm");
-        edje_object_message_signal_process(item->t_base);
+        edje_object_signal_emit(item->base, "elm,state,icon,visible", "elm");
+        edje_object_message_signal_process(item->base);
      }
    else
-     edje_object_signal_emit(item->t_base, "elm,state,icon,hidden", "elm");
+     edje_object_signal_emit(item->base, "elm,state,icon,hidden", "elm");
 }
 
 /**
@@ -616,13 +619,13 @@ elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object 
  *
  * @param[in] item The Navigationbar_ex Item
  * @return The icon object or NULL if none
- * 
+ *
  * @ingroup Navigationbar_ex
  */
 EAPI Evas_Object *
 elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item)
 {
-   if (!item) return NULL; 
+   if (!item) return NULL;
    return item->icon;
 }
 
@@ -630,7 +633,7 @@ elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item)
 /**
  * Set the button object of the pushed content
  *
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @param[in] btn_label The button label
  * @param[in] icon The button icon
  * @param[in] button_type Indicates the position[use macros of type Elm_Navi_ex_Button_Type
@@ -638,7 +641,7 @@ elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item)
  * @param[in] func Callback function called when button is clicked.
  * @param[in] data Callback data that would be sent when button is clicked.
  * @ingroup Navigationbar_ex
- */ 
+ */
 EAPI void
 elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data)
 {
@@ -656,7 +659,7 @@ elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char
              btn_det = NULL;
              item->fnbtn_list = eina_list_remove_list(item->fnbtn_list, bl);
           }
-     }  
+     }
    btn = elm_button_add(item->obj);
    btn_det = ELM_NEW(btn_det);
    if (!btn_det) return;
@@ -669,26 +672,26 @@ elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char
    else
      {
         snprintf(theme, sizeof(theme), "navigationbar_functionbutton/%s", elm_widget_style_get(item->obj));
-        elm_object_style_set(btn, theme);                                       
+        elm_object_style_set(btn, theme);
         snprintf(buf, sizeof(buf), "elm.swallow.btn%d", button_type);
      }
    if (btn_label)
      elm_button_label_set(btn, btn_label);
    if (icon)
      elm_button_icon_set(btn, icon);
-   elm_object_focus_allow_set(btn, EINA_FALSE); 
+   elm_object_focus_allow_set(btn, EINA_FALSE);
    evas_object_smart_callback_add(btn, "clicked", func, data);
-   edje_object_part_swallow(item->t_base, buf, btn);
+   edje_object_part_swallow(item->base, buf, btn);
    elm_widget_sub_object_add(item->obj, btn);
    btn_det->btn = btn;
    btn_det->btn_id = button_type;
-   item->fnbtn_list = eina_list_append(item->fnbtn_list, btn_det);              
+   item->fnbtn_list = eina_list_append(item->fnbtn_list, btn_det);
 }
 
 /**
  * Return the button object of the pushed content
  *
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @param[in] button_type Indicates the position
  * @return The button object or NULL if none
  *
@@ -705,13 +708,13 @@ elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int 
         if (btn_det->btn_id == button_type)
           return btn_det->btn;
      }
-   return NULL;                 
+   return NULL;
 }
 
 /**
  * Unset the button object of the pushed content
  *
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @param[in] button_type Indicates the position
  * @return The button object or NULL if none
  *
@@ -730,18 +733,18 @@ elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, in
           {
              btn_ret = btn_det->btn;
              elm_widget_sub_object_del(item->obj,btn_det->btn);
-             edje_object_part_unswallow(item->t_base,btn_det->btn);     
+             edje_object_part_unswallow(item->base,btn_det->btn);
              item->fnbtn_list = eina_list_remove_list(item->fnbtn_list, bl);
              btn_det->btn = NULL;
              return btn_ret;
           }
      }
-   return NULL;                 
+   return NULL;
 }
 
 /**
- * Sets a title object for the Item 
- * @param[in] item The Navigationbar_ex Item 
+ * Sets a title object for the Item
+ * @param[in] item The Navigationbar_ex Item
  * @param[in] title_obj Title object (normally segment_control/searchbar)
  *
  * @ingroup Navigationbar_ex
@@ -754,19 +757,17 @@ elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item, Evas
    item->title_obj = title_obj;
    if (title_obj)
      {
-        if ((item->title_obj) && (item->title))
-          {
-             edje_object_signal_emit(item->base, "elm,state,extend,title", "elm");
-          }                     
         elm_widget_sub_object_add(item->obj,title_obj);
-        edje_object_part_swallow(item->t_base, "elm.swallow.title", title_obj);
+        edje_object_part_swallow(item->base, "elm.swallow.title", title_obj);
+        edje_object_signal_callback_add(item->base, "elm,action,clicked", "elm",
+                                        _show_hide_titleobj, item);
      }
    _sizing_eval(item->obj);
 }
 
 /**
  * Hides the title area of the item.
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @param[in] hidden if EINA_TRUE the title area is hidden else its shown.
  *
  * @ingroup Navigationbar_ex
@@ -785,7 +786,7 @@ elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item, Eina
  * Unsets a title object for the item, the return object has to be deleted
  * by application if not added again in to navigationbar.
  *
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @return The title object or NULL if none is set
  *
  * @ingroup Navigationbar_ex
@@ -795,10 +796,10 @@ elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item)
 {
    if (!item) return NULL;
    Evas_Object *title_obj=NULL;
-   if (!item->title_obj) return NULL; 
+   if (!item->title_obj) return NULL;
    title_obj = item->title_obj;
    elm_widget_sub_object_del(item->obj,item->title_obj);
-   edje_object_part_unswallow(item->t_base,item->title_obj);    
+   edje_object_part_unswallow(item->base,item->title_obj);
    item->title_obj = NULL;
    return title_obj;
 }
@@ -806,7 +807,7 @@ elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item)
 /**
  * Returns the title object of the pushed content.
  *
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @return The title object or NULL if none is set
  *
  * @ingroup Navigationbar_ex
@@ -821,11 +822,11 @@ elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item)
 
 /**
  * Unsets the content of the item, the return object has to be deleted
- * by application if not added again in to navigationbar, when the content 
- * is unset the corresponding item would be deleted, when this content is pushed again 
+ * by application if not added again in to navigationbar, when the content
+ * is unset the corresponding item would be deleted, when this content is pushed again
  * a new item would be created again.
  *
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @return The content object or NULL if none is set
  *
  * @ingroup Navigationbar_ex
@@ -841,7 +842,7 @@ elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item)
 /**
  * Returns the content of the item.
  *
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @return The content object or NULL if none is set
  *
  * @ingroup Navigationbar_ex
@@ -858,23 +859,23 @@ elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Item* item)
  * if false the item is not deleted but only removed from the stack
  * the pointer of the content is sent along with hide,finished signal.
  *
- * @param[in] obj The Navigationbar_ex object. 
+ * @param[in] obj The Navigationbar_ex object.
  * @param[in] del_on_pop if set the content is deleted on pop else unset, by default the value is EINA_TRUE.
  *
  * @ingroup Navigationbar_ex
  */
-EAPI void 
+EAPI void
 elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   wd->del_on_pop = del_on_pop; 
+   wd->del_on_pop = del_on_pop;
 }
 
 /**
- * Sets the style of the navigationbar item. 
- * @param[in] item The Navigationbar_ex Item 
+ * Sets the style of the navigationbar item.
+ * @param[in] item The Navigationbar_ex Item
  * @param[in] item_style Navigationbar Item style, this can be used when the style of the item has to be dynamically set.
  *
  * @ingroup Navigationbar_ex
@@ -891,11 +892,11 @@ elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char*
    strncpy(buf, "item/", sizeof(buf));
    strncat(buf, item_style, sizeof(buf) - strlen(buf));
    if (!eina_stringshare_replace(&item->item_style, item_style)) return;
-   _elm_theme_object_set(item->obj, item->t_base,  "navigationbar_ex", buf, elm_widget_style_get(item->obj));
+   _elm_theme_object_set(item->obj, item->base,  "navigationbar_ex", buf, elm_widget_style_get(item->obj));
    if (item->title)
-     edje_object_part_text_set(item->t_base, "elm.text", item->title);
+     edje_object_part_text_set(item->base, "elm.text", item->title);
    if (item->subtitle)
-     edje_object_part_text_set(item->t_base, "elm.text.sub", item->subtitle);
+     edje_object_part_text_set(item->base, "elm.text.sub", item->subtitle);
    if (item->fnbtn_list)
      {
         EINA_LIST_FOREACH(item->fnbtn_list, bl, btn_det)
@@ -917,12 +918,12 @@ elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char*
 /**
  * Returns the style of the item.
  *
- * @param[in] item The Navigationbar_ex Item 
+ * @param[in] item The Navigationbar_ex Item
  * @return The item style.
  *
  * @ingroup Navigationbar_ex
  */
-EAPI const char* 
+EAPI const char*
 elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item)
 {
    if (!item) return NULL;
@@ -944,7 +945,7 @@ EAPI void
 elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item)
 {
    if (!item) return NULL;
-   _item_promote(item);  
+   _item_promote(item);
 }
 
 /**
@@ -955,7 +956,7 @@ elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item)
  *
  * @ingroup Navigationbar_ex
  */
-EAPI void 
+EAPI void
 elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item)
 {
    if (!item) return;
@@ -979,19 +980,19 @@ elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item)
                }
              else
                break;
-             
+
              list = list->prev;
           }
-     }  
+     }
    _eval_top(it->obj);
    if (wd->to_delete)
      _process_deletions(wd);
 }
 
 /**
- * Pop the object that is on top of the Navigationbar_ex stack 
+ * Pop the object that is on top of the Navigationbar_ex stack
  * This pops the object that is on top (visible) in the navigationbar, makes it disappear, then deletes/unsets the object
- * based on del_on_pop variable. 
+ * based on del_on_pop variable.
  * The object that was underneath it on the stack will become visible.
  *
  * @param[in] obj The Navigationbar_ex object
@@ -1015,25 +1016,25 @@ elm_navigationbar_ex_item_pop(Evas_Object *obj)
         ll = ll->prev;
         if (!ll)
           {
-             
+
              Evas_Object *o, *o2;
              const char *onhide;
-             
+
              wd->top = it;
              o = wd->top->ct_base;
-             o2 = wd->top->t_base;       
-             
+             o2 = wd->top->base;
+
              edje_object_signal_emit(o2, "elm,action,pop", "elm");
              edje_object_signal_emit(o, "elm,action,pop", "elm");
              onhide = edje_object_data_get(o, "onhide");
              if (onhide)
                {
-                  if (!strcmp(onhide, "raise")) 
+                  if (!strcmp(onhide, "raise"))
                     {
                        evas_object_raise(o2);
                        evas_object_raise(o);
                     }
-                  else if (!strcmp(onhide, "lower")) 
+                  else if (!strcmp(onhide, "lower"))
                     {
                        evas_object_lower(o2);
                        evas_object_lower(o);
