@@ -1235,36 +1235,39 @@ _calc_job(void *data)
    int count;
 
    evas_object_geometry_get(wd->pan_smart, NULL, NULL, &cvw, &cvh);
-   if ((wd->horizontal) && (wd->item_height > 0))
-     nmax = cvh / wd->item_height;
-   else if (wd->item_width > 0)
-     nmax = cvw / wd->item_width;
-
-   if (nmax < 1)
-     nmax = 1;
-
-   count = wd->count;
-   if (wd->horizontal)
+   if ((cvw != 0) || (cvh != 0))
      {
-        minw = ceil(count / (float)nmax) * wd->item_width;
-        minh = nmax * wd->item_height;
-     }
-   else
-     {
-        minw = nmax * wd->item_width;
-        minh = ceil(count / (float)nmax) * wd->item_height;
-     }
+        if ((wd->horizontal) && (wd->item_height > 0))
+          nmax = cvh / wd->item_height;
+        else if (wd->item_width > 0)
+          nmax = cvw / wd->item_width;
 
-   if ((minw != wd->minw) || (minh != wd->minh))
-     {
-        wd->minh = minh;
-        wd->minw = minw;
-        evas_object_smart_callback_call(wd->pan_smart, "changed", NULL);
-     }
+        if (nmax < 1)
+          nmax = 1;
 
-   wd->nmax = nmax;
-   wd->calc_job = NULL;
-   evas_object_smart_changed(wd->pan_smart);
+        count = wd->count;
+        if (wd->horizontal)
+          {
+             minw = ceil(count / (float)nmax) * wd->item_width;
+             minh = nmax * wd->item_height;
+          }
+        else
+          {
+             minw = nmax * wd->item_width;
+             minh = ceil(count / (float)nmax) * wd->item_height;
+          }
+
+        if ((minw != wd->minw) || (minh != wd->minh))
+          {
+             wd->minh = minh;
+             wd->minw = minw;
+             evas_object_smart_callback_call(wd->pan_smart, "changed", NULL);
+          }
+
+        wd->nmax = nmax;
+        wd->calc_job = NULL;
+        evas_object_smart_changed(wd->pan_smart);
+     }
 }
 
 static void
@@ -2165,7 +2168,7 @@ elm_gengrid_item_selected_set(Elm_Gengrid_Item *item,
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item);
    Widget_Data *wd = item->wd;
    if (!wd) return;
-   if ((!item) || (item->delete_me)) return;
+   if (item->delete_me) return;
    selected = !!selected;
    if (item->selected == selected) return;
 
@@ -2777,9 +2780,10 @@ elm_gengrid_last_item_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
    if (!wd->items) return NULL;
    Elm_Gengrid_Item *item = ELM_GENGRID_ITEM_FROM_INLIST(wd->items->last);
-   if (!wd) return NULL;
+   
    while ((item) && (item->delete_me))
      item = ELM_GENGRID_ITEM_FROM_INLIST(EINA_INLIST_GET(item)->prev);
    return item;
