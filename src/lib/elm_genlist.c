@@ -304,7 +304,7 @@ struct _Widget_Data
    Eina_List        *group_items;
    Pan              *pan;
    Evas_Coord        pan_x, pan_y, w, h, minw, minh, realminw, prev_viewport_w;
-   Ecore_Job        *calc_job, *update_job;
+   Ecore_Job        *calc_job, *update_job, *changed_job;
    Ecore_Idler      *queue_idler;
    Ecore_Idler      *must_recalc_idler;
    Eina_List        *queue, *selected;
@@ -517,6 +517,8 @@ static void      _item_block_unrealize(Item_Block *itb);
 static void      _calc_job(void *data);
 static void      _on_focus_hook(void        *data,
                                 Evas_Object *obj);
+static void      _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void      _changed_job(void *data);
 static Eina_Bool _item_multi_select_up(Widget_Data *wd);
 static Eina_Bool _item_multi_select_down(Widget_Data *wd);
 static Eina_Bool _item_single_select_up(Widget_Data *wd);
@@ -790,6 +792,7 @@ _del_hook(Evas_Object *obj)
    _item_cache_zero(wd);
    if (wd->calc_job) ecore_job_del(wd->calc_job);
    if (wd->update_job) ecore_job_del(wd->update_job);
+   if (wd->changed_job) ecore_job_del(wd->changed_job);
    if (wd->must_recalc_idler) ecore_idler_del(wd->must_recalc_idler);
    if (wd->multi_timer) ecore_timer_del(wd->multi_timer);
    if (wd->scr_hold_timer) ecore_timer_del(wd->scr_hold_timer);
@@ -2018,6 +2021,7 @@ _item_realize(Elm_Genlist_Item *it,
                        edje_object_part_swallow(it->base.view, key, ic);
                        evas_object_show(ic);
                        elm_widget_sub_object_add(it->base.widget, ic);
+		               evas_object_event_callback_add(ic, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
                     }
                }
           }
@@ -2452,6 +2456,17 @@ _item_block_position(Item_Block *itb,
 }
 
 static void
+_changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Elm_Genlist_Item *it = data;
+   if (!it) return;
+   it->mincalcd = EINA_FALSE;
+   it->block->updateme = EINA_TRUE;
+   if (it->wd->changed_job) ecore_job_del(it->wd->changed_job);
+   it->wd->changed_job = ecore_job_add(_changed_job, it->wd);
+}
+
+static void
 _group_items_recalc(void *data)
 {
    Widget_Data *wd = data;
@@ -2669,6 +2684,70 @@ _update_job(void *data)
                   recalc = 1;
              }
            num++;
+        }
+      itb->updateme = EINA_FALSE;
+      if (recalc)
+        {
+           position = 1;
+           itb->changed = EINA_TRUE;
+           _item_block_recalc(itb, num0, 0, 1);
+           _item_block_position(itb, num0);
+        }
+   }
+   if (position)
+     {
+        if (wd->calc_job) ecore_job_del(wd->calc_job);
+        wd->calc_job = ecore_job_add(_calc_job, wd);
+     }
+}
+
+static void
+_changed_job(void *data)
+{
+   Widget_Data *wd = data; Eina_List *l2;
+   Item_Block *itb;
+   int num, num0, position = 0, recalc = 0;
+   if (!wd) return;
+   wd->changed_job = NULL;
+   num = 0;
+   EINA_INLIST_FOREACH(wd->blocks, itb)
+   {
+      Evas_Coord itminw, itminh;
+      Elm_Genlist_Item *it;
+
+      if (!itb->updateme)
+        {
+           num += itb->count;
+           if (position)
+             _item_block_position(itb, num);
+           continue;
+        }
+      num0 = num;
+      recalc = 0;
+      EINA_LIST_FOREACH(itb->items, l2, it)
+        {
+        if (!it->mincalcd)
+          {
+             Evas_Coord mw = -1, mh = -1;
+	     itminw = it->w;
+	     itminh = it->h;
+
+             if (it->wd->height_for_width) mw = it->wd->w;
+             if (!it->display_only)
+               elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+             if (it->wd->height_for_width) mw = it->wd->prev_viewport_w;
+             edje_object_size_min_restricted_calc(it->base.view, &mw, &mh, mw, mh);
+             if (!it->display_only)
+               elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+             it->w = it->minw = mw;
+             it->h = it->minh = mh;
+             it->mincalcd = EINA_TRUE;
+
+	     //if ((it->minw != itminw) || (it->minh != itminh))
+	     if ((it->minh != itminh))
+               recalc = 1;
+          }
+	num++;
         }
       itb->updateme = EINA_FALSE;
       if (recalc)
