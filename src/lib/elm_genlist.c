@@ -2021,7 +2021,7 @@ _item_realize(Elm_Genlist_Item *it,
                        edje_object_part_swallow(it->base.view, key, ic);
                        evas_object_show(ic);
                        elm_widget_sub_object_add(it->base.widget, ic);
-		               evas_object_event_callback_add(ic, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
+                       evas_object_event_callback_add(ic, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
                     }
                }
           }
@@ -2725,30 +2725,30 @@ _changed_job(void *data)
       num0 = num;
       recalc = 0;
       EINA_LIST_FOREACH(itb->items, l2, it)
-        {
-        if (!it->mincalcd)
-          {
-             Evas_Coord mw = -1, mh = -1;
-	     itminw = it->w;
-	     itminh = it->h;
+      {
+         if (!it->mincalcd)
+           {
+              Evas_Coord mw = -1, mh = -1;
+              itminw = it->w;
+              itminh = it->h;
 
-             if (it->wd->height_for_width) mw = it->wd->w;
-             if (!it->display_only)
-               elm_coords_finger_size_adjust(1, &mw, 1, &mh);
-             if (it->wd->height_for_width) mw = it->wd->prev_viewport_w;
-             edje_object_size_min_restricted_calc(it->base.view, &mw, &mh, mw, mh);
-             if (!it->display_only)
-               elm_coords_finger_size_adjust(1, &mw, 1, &mh);
-             it->w = it->minw = mw;
-             it->h = it->minh = mh;
-             it->mincalcd = EINA_TRUE;
+              if (it->wd->height_for_width) mw = it->wd->w;
+              if (!it->display_only)
+                elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+              if (it->wd->height_for_width) mw = it->wd->prev_viewport_w;
+              edje_object_size_min_restricted_calc(it->base.view, &mw, &mh, mw, mh);
+              if (!it->display_only)
+                elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+              it->w = it->minw = mw;
+              it->h = it->minh = mh;
+              it->mincalcd = EINA_TRUE;
 
-	     //if ((it->minw != itminw) || (it->minh != itminh))
-	     if ((it->minh != itminh))
-               recalc = 1;
-          }
-	num++;
-        }
+              //if ((it->minw != itminw) || (it->minh != itminh))
+              if ((it->minh != itminh))
+                recalc = 1;
+           }
+         num++;
+      }
       itb->updateme = EINA_FALSE;
       if (recalc)
         {
@@ -6748,6 +6748,6 @@ _item_auto_scroll(void *data)
               {
                  elm_genlist_item_bring_in(it);
               }
-       	 }
+          }
      }
 }
