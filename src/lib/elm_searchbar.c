@@ -127,15 +127,23 @@ static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-_searchicon_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+_basebg_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+
    if (!wd) return;
 
-   if (!strcmp(source, "search_icon"))
-     evas_object_smart_callback_call(data, "searchsymbol,clicked", NULL);
-   else if (!strcmp(source, "base_bg"))
-     _clicked(data, obj, NULL); //emission, source);
+   if (!strcmp(source, "base_bg"))
+      _clicked(data, obj, NULL);
+}
+
+static void
+_searchsymbol_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+
+   if (!wd) return;
+   evas_object_smart_callback_call(data, "searchsymbol,clicked", NULL);
 }
 
 /**
@@ -181,7 +189,8 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    elm_editfield_eraser_set(wd->eb, EINA_TRUE);
    evas_object_smart_callback_add(wd->eb, "clicked", _clicked, obj);
    evas_object_smart_callback_add(elm_editfield_entry_get(wd->eb), "changed", _changed, obj);
-   edje_object_signal_callback_add(wd->base, "mouse,up,1", "*", _searchicon_clicked, obj);
+   edje_object_signal_callback_add(wd->base, "mouse,up,1", "*", _basebg_clicked, obj);
+   edje_object_signal_callback_add(wd->base, "elm,action,click", "", _searchsymbol_clicked, obj);
 
    elm_widget_sub_object_add(obj, wd->eb);
 
