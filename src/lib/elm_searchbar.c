@@ -42,6 +42,8 @@ static void _del_hook(Evas_Object *obj)
 static void _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   char buf[4096];
+
    if (!wd) return;
 
    _elm_theme_object_set(obj, wd->base, "searchbar", "base", elm_widget_style_get(obj));
@@ -50,6 +52,12 @@ static void _theme_hook(Evas_Object *obj)
      edje_object_part_swallow(wd->base, "search_textfield", wd->eb);
    if (wd->cancel_btn)
      edje_object_part_swallow(wd->base, "button_cancel", wd->cancel_btn);
+
+   snprintf(buf, sizeof(buf), "searchbar/%s", elm_widget_style_get(obj));
+   elm_object_style_set(wd->eb, buf);
+
+   snprintf(buf, sizeof(buf), "searchbar/%s", elm_widget_style_get(obj));
+   elm_object_style_set(wd->cancel_btn, buf);
 
    edje_object_scale_set(wd->cancel_btn, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
@@ -158,6 +166,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
+   char buf[4096];
 
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
@@ -182,7 +191,9 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
 
    // Add Entry
    wd->eb = elm_editfield_add(parent);
-   elm_object_style_set(wd->eb, "searchbar");
+   snprintf(buf, sizeof(buf), "searchbar/%s", elm_widget_style_get(obj));
+   elm_object_style_set(wd->eb, buf);
+
    edje_object_part_swallow(wd->base, "search_textfield", wd->eb);
 //   elm_editfield_guide_text_set(wd->eb, "Search");
    elm_editfield_entry_single_line_set(wd->eb, EINA_TRUE);
@@ -197,7 +208,10 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    // Add Button
    wd->cancel_btn = elm_button_add(parent);
    edje_object_part_swallow(wd->base, "button_cancel", wd->cancel_btn);
-   elm_object_style_set(wd->cancel_btn, "custom/darkblue");
+
+   snprintf(buf, sizeof(buf), "searchbar/%s", elm_widget_style_get(obj));
+   elm_object_style_set(wd->cancel_btn, buf);
+
    elm_button_label_set(wd->cancel_btn, "Cancel");
    evas_object_smart_callback_add(wd->cancel_btn, "clicked", _cancel_clicked, obj);
    elm_widget_sub_object_add(obj, wd->cancel_btn);
