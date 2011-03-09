@@ -997,7 +997,6 @@ _magnifier_hide(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   if (evas_version->major < 2 && evas_version->minor < 1) return;
 
    evas_object_hide(wd->mgf_bg);
    evas_object_hide(wd->mgf_clip);
@@ -1008,7 +1007,6 @@ _magnifier_show(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   if (evas_version->major < 2 && evas_version->minor < 1) return;
 
    evas_object_show(wd->mgf_bg);
    evas_object_show(wd->mgf_clip);
@@ -1019,7 +1017,6 @@ _magnifier_move(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   if (evas_version->major < 2 && evas_version->minor < 1) return;
 
    Evas_Coord x, y, w, h, fs;
    Evas_Coord cx, cy, cw, ch, ox, oy;
@@ -1051,7 +1048,6 @@ _magnifier_create(void *data)
    const char* key_data = NULL;
 
    if (!wd) return;
-   if (evas_version->major < 2 && evas_version->minor < 1) return;
 
    if (wd->mgf_proxy)
      {
