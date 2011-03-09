@@ -2293,7 +2293,7 @@ elm_win_indicator_state_get(Evas_Object *obj)
         unsigned int *prop_data = NULL;
 
         ret = ecore_x_window_prop_property_get (win->xwin,
-                    ECORE_X_ATOM_E_ILLUME_INDICATOR_STATE, ECORE_X_ATOM_CARDINAL, 32, &prop_data, &count);
+                    ECORE_X_ATOM_E_ILLUME_INDICATOR_STATE, ECORE_X_ATOM_CARDINAL, 32, (void *)&prop_data, &count);
         if( ret && prop_data )
            memcpy (&show, prop_data, sizeof (int));
 
