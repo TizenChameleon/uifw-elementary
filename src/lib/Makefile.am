@@ -98,7 +98,6 @@ elm_colorselector.c \
 elm_colorpalette.c \
 elc_ctxpopup.c \
 elm_controlbar.c \
-elm_slidingdrawer.c \ 
 elm_dialoguegroup.c \
 elm_dayselector.c \
 elm_cnp_helper.c \
@@ -108,6 +107,7 @@ elm_nocontents.c \
 elm_tickernoti.c \
 elm_imageslider.c \
 elm_multibuttonentry.c \
+elm_slidingdrawer.c \
 elm_stackedicon.c \
 elm_calendar.c \
 elm_font.c \
