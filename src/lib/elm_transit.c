@@ -218,16 +218,16 @@ elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool disabled)
 
    if (disabled)
      {
-	if (transit->block_rect)
-	  {
-	     evas_object_del(transit->block_rect);
-	     transit->block_rect = NULL;
-	  }
+        if (transit->block_rect)
+          {
+             evas_object_del(transit->block_rect);
+             transit->block_rect = NULL;
+          }
      }
    else
      {
-	if (!transit->block_rect)
-	   transit->block_rect = _create_block_rect(transit->parent);
+        if (!transit->block_rect)
+          transit->block_rect = _create_block_rect(transit->parent);
      }
 }
 
@@ -245,9 +245,8 @@ elm_transit_event_block_disabled_set(Elm_Transit *transit, Eina_Bool disabled)
 EAPI Eina_Bool
 elm_transit_event_block_disabled_get(const Elm_Transit *transit)
 {
-	ELM_TRANSIT_CHECK_OR_RETURN(transit, EINA_FALSE);
-   
-	return transit->block_rect ? EINA_TRUE : EINA_FALSE;
+   ELM_TRANSIT_CHECK_OR_RETURN(transit, EINA_FALSE);
+   return transit->block_rect ? EINA_FALSE : EINA_TRUE;
 }
 
 /**
@@ -449,6 +448,8 @@ elm_transit_tween_mode_get(const Elm_Transit *transit)
 EAPI Elm_Transit *
 elm_transit_add(Evas_Object *parent)
 {
+   if (!parent) return NULL;
+
    Elm_Transit *transit = ELM_NEW(Elm_Transit);
 
    if (!transit) return NULL;
@@ -520,13 +521,15 @@ elm_transit_fx_insert(Elm_Transit *transit, Elm_Effect *effect)
 	
    Elm_Effect *_effect;
 
-	Eina_List *elist;
+   Eina_List *elist;
+
+   if (!effect) return EINA_FALSE;
 
    EINA_LIST_FOREACH(transit->effect_list, elist, _effect)
-   {
-      if (_effect == effect)
-	 return EINA_FALSE;
-   }
+     {
+        if (_effect == effect)
+          return EINA_FALSE;
+     }
 
    ++effect->shared_cnt;
    transit->effect_list = eina_list_append(transit->effect_list, effect);

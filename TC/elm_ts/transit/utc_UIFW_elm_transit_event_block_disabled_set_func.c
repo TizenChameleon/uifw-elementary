@@ -79,7 +79,7 @@ static void utc_UIFW_elm_transit_event_block_disbled_set_func_01(void)
 {
 	Eina_Bool r = EINA_FALSE;
 	
-	elm_transit_add(transit);
+	transit = elm_transit_add(main_win);
 	elm_transit_event_block_disabled_set(transit, EINA_TRUE);
 	r = elm_transit_event_block_disabled_get(transit);
 	elm_transit_run(transit, 1.0);
@@ -99,12 +99,12 @@ static void utc_UIFW_elm_transit_event_block_disbled_set_func_02(void)
 {
 	Eina_Bool r = EINA_FALSE;
 	
-	elm_transit_add(transit);
+	elm_transit_add(main_win);
 	elm_transit_event_block_disabled_set(NULL, EINA_TRUE);
-	r = elm_transit_event_block_disabled_get(transit);
+	r = elm_transit_event_block_disabled_get(NULL);
 	elm_transit_run(transit, 1.0);
 
-	if (r = EINA_TRUE) {
+	if (r == EINA_TRUE) {
 		tet_infoline("elm_transit_event_block_disbled_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

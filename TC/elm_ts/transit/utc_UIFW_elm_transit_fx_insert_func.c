@@ -102,7 +102,7 @@ static void utc_UIFW_elm_transit_fx_insert_func_02(void)
 	Elm_Effect *effect = elm_fx_fade_add(main_win, main_win);
 	r = elm_transit_fx_insert(transit, NULL);
 
-	if (r = EINA_TRUE) {
+	if (r == EINA_TRUE) {
 		tet_infoline("elm_transit_fx_insert() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
