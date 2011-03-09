@@ -584,7 +584,7 @@ static Eina_Bool
 _smart_bounce_x_animator(void *data)
 {
    Smart_Data *sd;
-   Evas_Coord x, y, dx, px, cw, w;
+   Evas_Coord x, y, dx, px, w;
    double t, p, dt, pd;
 
    sd = data;
@@ -595,14 +595,13 @@ _smart_bounce_x_animator(void *data)
 	dt = dt / _elm_config->thumbscroll_bounce_friction;
         dx = sd->down.b2x - sd->down.bx;
         sd->pan_func.get(sd->pan_obj, &px, NULL); 
-        sd->pan_func.child_size_get(sd->pan_obj, &cw, NULL); 
-             evas_object_geometry_get(sd->edje_obj, &x, NULL, &w, NULL);
-        if(!sd->down.momentum_animator && ((cw - px) > 0) && ((-px) < (w - x)))
+        elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &w, NULL);
+        if(!sd->down.momentum_animator && ((w - px) > 0) && ((-px) < w))
           {
              pd = (double)dx / (double)w;
              pd = (pd > 0) ? pd : -pd;
              pd = 1.0 - ((1.0 - pd) * (1.0 - pd));
-             dt = dt / (pd * 1.5);
+             dt = dt / pd;
           }
 	if (dt > 1.0) dt = 1.0;
 	p = 1.0 - ((1.0 - dt) * (1.0 - dt));
@@ -632,7 +631,7 @@ static Eina_Bool
 _smart_bounce_y_animator(void *data)
 {
    Smart_Data *sd;
-   Evas_Coord x, y, dy, py, ch, h;
+   Evas_Coord x, y, dy, py, h;
    double t, p, dt, pd;
 
    sd = data;
@@ -643,14 +642,13 @@ _smart_bounce_y_animator(void *data)
 	dt = dt / _elm_config->thumbscroll_bounce_friction;
         dy = sd->down.b2y - sd->down.by;
         sd->pan_func.get(sd->pan_obj, NULL, &py); 
-        sd->pan_func.child_size_get(sd->pan_obj, NULL, &ch); 
-        evas_object_geometry_get(sd->edje_obj, NULL, &y, NULL, &h);
-        if(!sd->down.momentum_animator && ((ch - py) > 0) && ((-py) < (h - y)))
+        elm_smart_scroller_child_viewport_size_get(sd->smart_obj, NULL, &h);
+        if(!sd->down.momentum_animator && ((h - py) > 0) && ((-py) < h))
           {
-             pd = (double)dy / (double)(h - y);
+             pd = (double)dy / (double)h;
              pd = (pd > 0) ? pd : -pd;
              pd = 1.0 - ((1.0 - pd) * (1.0 - pd));
-             dt = dt / (pd * 1.5);
+             dt = dt / pd;
           }
 	if (dt > 1.0) dt = 1.0;
 	p = 1.0 - ((1.0 - dt) * (1.0 - dt));
