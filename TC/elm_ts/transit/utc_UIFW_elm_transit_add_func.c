@@ -46,7 +46,6 @@ enum {
 
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_transit_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_transit_add_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -81,21 +80,6 @@ static void utc_UIFW_elm_transit_add_func_01(void)
 	
 	if (!transit) {
 		tet_infoline("elm_transit_add() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
-}
-
-/**
- * @brief Negative test case of ug_init elm_transit_add()
- */
-static void utc_UIFW_elm_transit_add_func_02(void)
-{
-   	transit = elm_transit_add(NULL);
-
-	if (transit) {
-		tet_infoline("elm_transit_add() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}
