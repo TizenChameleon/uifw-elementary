@@ -1883,7 +1883,7 @@ extern "C" {
    EAPI void               elm_genlist_edit_selected_items_del(Evas_Object *obj);
    EAPI Eina_List         *elm_genlist_edit_selected_items_get(const Evas_Object *obj);
    EAPI void               elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it, Eina_Bool selected) EINA_ARG_NONNULL(1);
-   EAPI const Eina_Bool    elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);;
+   EAPI Eina_Bool          elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
    EAPI Evas_Object       *elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode);
    EAPI void               elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after );
    EAPI void               elm_genlist_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before);

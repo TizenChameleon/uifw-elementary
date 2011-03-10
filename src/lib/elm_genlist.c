@@ -6472,7 +6472,7 @@ elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it,
 }
 
 // TODO : add comment                              
-EAPI const Eina_Bool
+EAPI Eina_Bool
 elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it, EINA_FALSE);
