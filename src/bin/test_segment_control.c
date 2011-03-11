@@ -64,7 +64,6 @@ test_segment_control(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *e
    char buf[PATH_MAX];
    char buf1[PATH_MAX];
    char buf2[PATH_MAX];
-   Evas_Object *check;
 
    win = elm_win_add(NULL, "segmentcontrol", ELM_WIN_BASIC);
    elm_win_title_set(win, "Segment Control");

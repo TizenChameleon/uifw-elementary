@@ -308,7 +308,7 @@ _content_resize_event_cb(void *data, Evas *e, Evas_Object *obj,
 static void
 _update_autoscroll_objs(void *data)
 {
-   char *type;
+   const char *type;
    Evas_Object *sub, *top_scroller = NULL;
    Evas_Object *conformant = (Evas_Object *) data;
    Widget_Data *wd = elm_widget_data_get(data);
@@ -524,11 +524,11 @@ elm_conformant_content_unset(Evas_Object *obj)
 EAPI Evas_Object*
 elm_conformant_content_area_get(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   if (!wd) return NULL;
    /*Finger waggle warning*/
    _elm_dangerous_call_check(__FUNCTION__);
-   return edje_object_part_object_get(wd->base, "elm.swallow.content");
+   return (Evas_Object*)edje_object_part_object_get(wd->base, "elm.swallow.content");
 }
 

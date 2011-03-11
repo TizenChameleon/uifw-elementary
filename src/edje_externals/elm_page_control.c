@@ -65,7 +65,7 @@ external_page_control_param_get(void *data __UNUSED__, const Evas_Object *obj, E
    else if (!strcmp(param->name, "page id")
 		   && param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
      {
-	param->i = elm_page_control_page_id_get(obj);
+	param->i = elm_page_control_page_id_get((Evas_Object *)obj);
 	return EINA_TRUE;
      }
 
