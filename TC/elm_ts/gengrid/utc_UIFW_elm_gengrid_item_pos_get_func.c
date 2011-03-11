@@ -69,6 +69,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_gengrid_item_pos_get_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_gengrid_item_pos_get_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static Evas_Object * _icon_get(const void *data, Evas_Object *obj, const char *part)
