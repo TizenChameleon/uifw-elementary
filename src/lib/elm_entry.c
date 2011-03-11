@@ -648,7 +648,8 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    if (!wd->editable) return;
    if (elm_widget_focus_get(obj))
      {
-	evas_object_focus_set(wd->ent, EINA_TRUE);
+        printf("[Elm_entry::Focused] obj : %p\n", obj);
+        evas_object_focus_set(wd->ent, EINA_TRUE);
 	edje_object_signal_emit(wd->ent, "elm,action,focus", "elm");
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
 	evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
@@ -658,6 +659,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      }
    else
      {
+        printf("[Elm_entry::Unfocused] obj : %p\n", obj);
 	edje_object_signal_emit(wd->ent, "elm,action,unfocus", "elm");
 	evas_object_focus_set(wd->ent, EINA_FALSE);
 	if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
