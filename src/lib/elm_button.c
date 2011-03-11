@@ -127,6 +127,8 @@ _theme_hook(Evas_Object *obj)
    const char *str;
    if (!wd) return;
    _elm_theme_object_set(obj, wd->btn, "button", "base", elm_widget_style_get(obj));
+   if (elm_object_disabled_get(obj))
+     edje_object_signal_emit(wd->btn, "elm,state,disabled", "elm");
    if (wd->icon)
      edje_object_part_swallow(wd->btn, "elm.swallow.content", wd->icon);
    if (wd->label)
@@ -138,8 +140,6 @@ _theme_hook(Evas_Object *obj)
    else
      edje_object_signal_emit(wd->btn, "elm,state,icon,hidden", "elm");
    edje_object_part_text_set(wd->btn, "elm.text", wd->label);
-   if (elm_object_disabled_get(obj))
-     edje_object_signal_emit(wd->btn, "elm,state,disabled", "elm");
    edje_object_message_signal_process(wd->btn);
    edje_object_scale_set(wd->btn, elm_widget_scale_get(obj) * _elm_config->scale);
    str = edje_object_data_get(wd->btn, "focus_highlight");
