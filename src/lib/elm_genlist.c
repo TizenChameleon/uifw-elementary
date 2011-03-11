@@ -797,7 +797,6 @@ _del_hook(Evas_Object *obj)
    if (wd->must_recalc_idler) ecore_idler_del(wd->must_recalc_idler);
    if (wd->multi_timer) ecore_timer_del(wd->multi_timer);
    if (wd->scr_hold_timer) ecore_timer_del(wd->scr_hold_timer);
-   if (wd->edit_mode) elm_genlist_edit_mode_set(wd->obj, ELM_GENLIST_EDIT_MODE_NONE, NULL);
    free(wd);
 }
 
@@ -806,6 +805,7 @@ _del_pre_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   if (wd->edit_mode) elm_genlist_edit_mode_set(wd->obj, ELM_GENLIST_EDIT_MODE_NONE, NULL);
    evas_object_del(wd->pan_smart);
    wd->pan_smart = NULL;
    elm_genlist_clear(obj);
