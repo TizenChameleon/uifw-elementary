@@ -1261,7 +1261,6 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
 static void
 _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Move *move = event_info;
    Event *ev0;
    
