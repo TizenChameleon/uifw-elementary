@@ -354,6 +354,7 @@ struct _Widget_Data
    Eina_Bool         effect_mode : 1;
    Eina_Bool         select_all_check : 1;
    Eina_Bool         auto_scrolled : 1;
+   Eina_Bool         contracting : 1;
    int               edit_mode;
    Edit_Data        *ed;
    Eina_List        *edit_field;
@@ -2189,7 +2190,7 @@ _item_block_recalc(Item_Block *itb,
              else
                {
                   _item_realize(it, in, 1);
-                  _item_unrealize(it);
+                  if (!it->wd->contracting) _item_unrealize(it);
                }
           }
         else
@@ -2246,7 +2247,7 @@ _item_block_unrealize(Item_Block *itb)
                   it->want_unrealize = EINA_TRUE;
                }
              else
-                _item_unrealize(it);
+                if (!it->wd->contracting) _item_unrealize(it);
           }
      }
    if (!dragging)
@@ -2980,6 +2981,7 @@ _pan_calculate(Evas_Object *obj)
         }
       else _item_auto_scroll(sd->wd);
    if (sd->wd->select_all_item) evas_object_raise(sd->wd->select_all_item->base.view);         
+   sd->wd->contracting = EINA_FALSE;
  }
 
 static void
@@ -4208,6 +4210,7 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
      }
    else
      {
+        it->wd->contracting = EINA_TRUE;
         it->wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT;
         if (it->realized)
           edje_object_signal_emit(it->base.view, "elm,state,contracted", "elm");
