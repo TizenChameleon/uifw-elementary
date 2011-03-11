@@ -15,6 +15,17 @@
 #define MIN_GRP_SIZE 2 //for symmetry it is 2, otherwise it can be 1 and zero have no meaning.
 #define MIN_PIXEL_VALUE 1 //Min pixel value is highly dependent on touch sensitivity support.
 #define MIN_OBJ_HEIGHT 24 //should be taken from .edc file.
+
+/*
+ *  use for find view toplevel
+ */
+#define SET_VIEW_LEVEL(wd, view_level)\
+   view_level = wd->level;\
+   while ((!wd->tot_items_count[view_level]) && view_level)\
+     {\
+        view_level--; \
+     }
+
 typedef struct _Widget_Data Widget_Data;
 
 typedef struct _PlacementPart PlacementPart;
@@ -260,7 +271,7 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
         evas_object_show(o);
         i++;
         if(level == 1)
-        	wd->tot_items_count[1] = i;
+          wd->tot_items_count[1] = i;
         evas_object_smart_calculate(box); // force a calc so we know the size
         evas_object_size_hint_min_get(box, &mw, &mh);
         if (mh > h)
@@ -299,9 +310,11 @@ _delay_change(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    void *d;
+   int view_level;
    if (!wd) return ECORE_CALLBACK_CANCEL;
    wd->delay = NULL;
-   d = (void *)elm_index_item_selected_get(data, wd->level);
+   SET_VIEW_LEVEL(wd, view_level);
+   d = (void *)elm_index_item_selected_get(data, view_level);
    if (d) evas_object_smart_callback_call(data, "delay,changed", d);
    return ECORE_CALLBACK_CANCEL;
 }
@@ -321,8 +334,11 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
    Eina_Bool change = EINA_FALSE;
    char *label = NULL, *last = NULL;
    int i;
+   int view_level;
    if (!wd) return;
-   for (i = 0; i <= wd->level; i++)
+
+   SET_VIEW_LEVEL(wd, view_level);
+   for (i = 0; i <= view_level; i++)
      {
         it_last = NULL;
         it_closest  = NULL;
@@ -354,7 +370,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
                   dist = x;
                }
           }
-          if ((i == 0) && (wd->level == 0))
+          if ((i == 0) && (view_level == 0))
             {
                if(cdv > dmax || cdv < dmin)
                  {
@@ -382,7 +398,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
                   const char *stacking, *selectraise;
 
                   it = it_last;
-                  if(wd->level == it->level)
+                  if(view_level == it->level)
                   edje_object_signal_emit(it->base, "elm,state,inactive", "elm");
                   stacking = edje_object_data_get(it->base, "stacking");
                   selectraise = edje_object_data_get(it->base, "selectraise");
@@ -397,7 +413,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
                   const char *selectraise;
 
                   it = it_closest;
-                  if(wd->level == it->level)
+                  if(view_level == it->level)
                   edje_object_signal_emit(it->base, "elm,state,active", "elm");
                   selectraise = edje_object_data_get(it->base, "selectraise");
                   if ((selectraise) && (!strcmp(selectraise, "on")))
@@ -429,7 +445,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
    if (!last) last = strdup("");
    if(!wd->hide_button)
      {
-        if(wd->level == 0)
+        if(view_level == 0)
           {
              if(last)
                {
@@ -437,7 +453,7 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
        		  edje_object_signal_emit(wd->base, "hide_2nd_level", "");
 	       }
        	  }
-        if( wd->level == 1 && wd->level_active[1])
+        if(view_level == 1 && wd->level_active[1])
           {
              edje_object_part_text_set(wd->base, "elm.text", last);
     	     edje_object_signal_emit(wd->base, "hide_first_level", "");
@@ -482,12 +498,15 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *event
    void *d;
    Elm_Index_Item *it;
    Eina_List *l;
+   int view_level;
+
    if (!wd) return;
    if (ev->button != 1) return;
    if (wd->level == 1 && wd->delay) ecore_timer_del(wd->delay);
    wd->delay = NULL;
    wd->down = 0;
-   d = (void *)elm_index_item_selected_get(data, wd->level);
+   SET_VIEW_LEVEL(wd, view_level);
+   d = (void *)elm_index_item_selected_get(data, view_level);
    EINA_LIST_FOREACH(wd->items, l, it)
      {
          edje_object_signal_emit(it->base, "elm,state,inactive", "elm");
@@ -577,16 +596,16 @@ _index_box_refill_job(void *data)
 
    if(pw != wd->pwidth && ph != wd->pheight)
      {
-	if(wd->down == 1)
+        if(wd->down == 1)
 	  {
 	     wd->active = 0;
 	     elm_index_active_set(data, 1);
 	  }
-	_index_box_clear((Evas_Object *)data, wd->bx[0], 0);
-       evas_object_smart_calculate( wd->bx[0]);
-       elm_index_item_go((Evas_Object *)data, wd->level);
-       wd->pwidth = pw;
-       wd->pheight = ph;
+        _index_box_clear((Evas_Object *)data, wd->bx[0], 0);
+        evas_object_smart_calculate( wd->bx[0]);
+        elm_index_item_go((Evas_Object *)data, wd->level);
+        wd->pwidth = pw;
+        wd->pheight = ph;
      }
 }
 
