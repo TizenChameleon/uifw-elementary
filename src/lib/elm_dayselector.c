@@ -24,7 +24,7 @@ struct _Widget_Data
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
-static void _del_pre_hook(Evas_Object *obj);
+//TODO:static void _del_pre_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 //static void _sizing_eval(Evas_Object* obj);
 //static void _dayselector_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);

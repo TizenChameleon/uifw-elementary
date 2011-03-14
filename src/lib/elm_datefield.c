@@ -1274,7 +1274,7 @@ elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
    if (!wd || !fmt) return;
 
    j = strlen(sig);
-   while (j < 32)
+   while (j < 31 )
      {
         sig[j++] = tolower(fmt[i++]);
      }
@@ -1312,8 +1312,8 @@ elm_datefield_date_format_get(const Evas_Object *obj)
       case DATE_FORMAT_MMDDYY: return "mmddyy";
       case DATE_FORMAT_DDYYMM: return "ddyymm";
       case DATE_FORMAT_DDMMYY: return "ddmmyy";
+      default: return NULL;
      }
-   return NULL;
 }
 
 /**

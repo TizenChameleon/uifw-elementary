@@ -405,7 +405,6 @@ _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUS
 static void
 _drag_stop(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-   Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
    if (elm_widget_disabled_get(data)) return;
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_STOP, NULL);
