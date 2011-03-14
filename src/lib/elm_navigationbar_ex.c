@@ -164,7 +164,7 @@ _eval_top(Evas_Object *obj)
    ittop = eina_list_last(wd->stack)->data;
    if (ittop != wd->top)
      {
-        Evas_Object *o, *o1, *o2;
+        Evas_Object *o1, *o2;
         const char *onshow, *onhide;
 
         if (wd->top)
@@ -944,7 +944,7 @@ elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item)
 EAPI void
 elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item)
 {
-   if (!item) return NULL;
+   if (!item) return;
    _item_promote(item);
 }
 

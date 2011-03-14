@@ -1,7 +1,7 @@
 #include <tet_api.h>
 #include <Elementary.h>
 
-#define ICON_DIR "usr/share/beat_winset_test/icon"
+#define ICON_DIR "usr/share/elementary/images"
 
 // Definitions
 // For checking the result of the positive test case.
@@ -82,7 +82,7 @@ static void utc_UIFW_elm_popup_title_icon_set_func_01(void)
 {
 	
 	Evas_Object *icon = elm_icon_add(popup);
-	snprintf(buf, sizeof(buf), "%s/00_volume_icon.png", ICON_DIR);
+	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
 	elm_icon_file_set(icon, buf, NULL);
 	evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(icon, 1, 1);
@@ -98,7 +98,7 @@ static void utc_UIFW_elm_popup_title_icon_set_func_02(void)
 {
 	
 	Evas_Object *icon = elm_icon_add(popup);
-	snprintf(buf, sizeof(buf), "%s/00_volume_icon.png", ICON_DIR);
+	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
 	elm_icon_file_set(icon, buf, NULL);
 	evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(icon, 1, 1);

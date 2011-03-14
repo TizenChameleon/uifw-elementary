@@ -1,6 +1,6 @@
 #include <tet_api.h>
 #include <Elementary.h>
-
+#define ICON_DIR "usr/share/elementary/images"
 // Definitions
 // For checking the result of the positive test case.
 #define TET_CHECK_PASS(x1, y...) \
@@ -51,13 +51,14 @@ struct tet_testlist tet_testlist[] = {
 
 static void startup(void)
 {
+	char buf[PATH_MAX];
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
 	popup = elm_popup_add(main_win);
 	Evas_Object *icon = elm_icon_add(popup);
-	snprintf(buf, sizeof(buf), "%s/00_volume_icon.png", ICON_DIR);
+	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
 	elm_icon_file_set(icon, buf, NULL);
 	evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(icon, 1, 1);
