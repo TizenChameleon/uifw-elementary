@@ -131,13 +131,10 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (sub == wd->content) wd->content = NULL;
    else if (sub == wd->icon)
      {
-	edje_object_signal_emit(wd->bbl, "elm,state,icon,hidden", "elm");
-	wd->icon = NULL;
-	edje_object_message_signal_process(wd->bbl);
+        edje_object_signal_emit(wd->bbl, "elm,state,icon,hidden", "elm");
+        wd->icon = NULL;
+        edje_object_message_signal_process(wd->bbl);
      }
-#ifdef SWEEP_SUPPORT
-   else if (sub == wd->sweep) wd->sweep = NULL;
-#endif
    _sizing_eval(obj);
 }
 
@@ -500,10 +497,7 @@ elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep)
    if (wd->sweep) evas_object_del(wd->sweep);
    wd->sweep = sweep;
    if (sweep)
-     {
-	elm_widget_sub_object_add(obj, sweep);
-	edje_object_part_swallow(wd->bbl, "elm.swallow.sweep", sweep);
-     }
+      edje_object_part_swallow(wd->bbl, "elm.swallow.sweep", sweep);
 #endif
 }
 
@@ -527,7 +521,6 @@ elm_bubble_sweep_layout_unset(Evas_Object *obj)
 #ifdef SWEEP_SUPPORT
    if (!wd->sweep) return NULL;
    sweep = wd->sweep;
-   elm_widget_sub_object_del(obj, sweep);
    edje_object_part_unswallow(wd->bbl, sweep);
    evas_object_hide(sweep);
    wd->sweep = NULL;

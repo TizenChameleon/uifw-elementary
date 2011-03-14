@@ -1278,7 +1278,7 @@ elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
      {
         sig[j++] = tolower(fmt[i++]);
      }
-   sig[j] = '\0';
+   if (j < 32) sig[j] = '\0';
    edje_object_signal_emit(wd->base, sig, "elm");
 
    if (strstr(sig, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
@@ -1313,6 +1313,7 @@ elm_datefield_date_format_get(const Evas_Object *obj)
       case DATE_FORMAT_DDYYMM: return "ddyymm";
       case DATE_FORMAT_DDMMYY: return "ddmmyy";
      }
+   return NULL;
 }
 
 /**
