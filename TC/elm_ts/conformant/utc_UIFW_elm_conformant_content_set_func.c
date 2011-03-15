@@ -46,6 +46,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_conformant_content_set_func_01, POSITIVE_TC_conf },
 	{ utc_UIFW_elm_conformant_content_set_func_02, NEGATIVE_TC_conf },
+        { NULL, 0}
 };
 
 static void startup(void)
