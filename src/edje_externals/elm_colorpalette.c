@@ -74,6 +74,7 @@ external_colorpalette_params_parse(void *data __UNUSED__, Evas_Object *obj, cons
    k = m = ll = 0;
    char test[5] ;
    int d = 0;
+   char *s = NULL ;
    mem = calloc(1, sizeof(Elm_Params_colorpalette));
    if (!mem)
      return NULL;
@@ -96,9 +97,8 @@ external_colorpalette_params_parse(void *data __UNUSED__, Evas_Object *obj, cons
 	   else if (!strcmp(param->name, "color_set"))
          {
            mem->color = (Elm_Colorpalette_Color*) calloc (mem->color_num, sizeof(Elm_Colorpalette_Color));
-           char *s = NULL ;
            s = (char*)param->i;
-           while(k <(mem->color_num) && (ll <= (char*)strlen(param->i)))
+           while(k <(mem->color_num) && (ll <= strlen(s)))
              {
                   if(d == 0)
                    {
