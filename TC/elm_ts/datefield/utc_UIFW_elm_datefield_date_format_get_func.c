@@ -47,6 +47,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_datefield_date_format_get_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_datefield_date_format_get_func_02, NEGATIVE_TC_IDX },
+    { NULL, 0 }
 };
 
 static void startup(void)
@@ -104,7 +105,7 @@ static void utc_UIFW_elm_datefield_date_format_get_func_02(void)
 	datefield = elm_datefield_add(main_win);
    	format = elm_datefield_date_format_get(NULL);
 
-	if (!strcmp(format, "mmddyy")) {
+	if (format) {
 		tet_infoline("elm_datefield_date_format_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
