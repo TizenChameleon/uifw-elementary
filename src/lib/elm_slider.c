@@ -399,7 +399,7 @@ _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUS
    edje_object_message_signal_process(wd->slider); 
    _units_set(data);
    _indicator_set(data);
-   elm_widget_scroll_hold_push(data);
+   elm_widget_scroll_freeze_push(data);
 }
 
 static void
@@ -410,7 +410,7 @@ _drag_stop(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSE
    evas_object_smart_callback_call(data, SIG_DRAG_STOP, NULL);
    _units_set(data);
    _indicator_set(data);
-   elm_widget_scroll_hold_pop(data);
+   elm_widget_scroll_freeze_pop(data);
 }
 
 static void
