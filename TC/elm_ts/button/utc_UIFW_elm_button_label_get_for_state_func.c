@@ -46,6 +46,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_button_label_get_for_state_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_button_label_get_for_state_func_02, NEGATIVE_TC_IDX },
+    { NULL, 0 }
 };
 
 static void startup(void)
@@ -74,8 +75,8 @@ static void utc_UIFW_elm_button_label_get_for_state_func_01(void)
    Evas_Object *button = NULL;
    char *buffer;
    button = elm_button_add(main_win);
-   elm_button_label_set(button, "default", UIControlStateDefault);
-   buffer = elm_button_label_get_for_state(btn, UIControlStateDefault);
+   elm_button_label_set_for_state(button, "default", UIControlStateDefault);
+   buffer = (char*)elm_button_label_get_for_state(button, UIControlStateDefault);
    if(!buffer)
       {
          tet_infoline("elm_button_label_get() failed in positive test case");
@@ -96,8 +97,8 @@ static void utc_UIFW_elm_button_label_get_for_state_func_02(void)
    Evas_Object *button = NULL;
    char *buffer;
    button = elm_button_add(main_win);
-   elm_button_label_set(button, _("default"), UIControlStateDefault);
-   buffer = elm_button_label_get(NULL, "default", UIControlStateDefault);
+   elm_button_label_set_for_state(button, "default", UIControlStateDefault);
+   buffer = (char*)elm_button_label_get_for_state(NULL, UIControlStateDefault);
    if(buffer)
       {
          evas_object_del(button);

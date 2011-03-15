@@ -46,6 +46,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_button_autorepeat_initial_timeout_set_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_button_autorepeat_initial_timeout_set_func_02, NEGATIVE_TC_IDX },
+    { NULL, 0 }
 };
 
 static void startup(void)
@@ -90,7 +91,8 @@ static void utc_UIFW_elm_button_autorepeat_initial_timeout_set_func_02(void)
    Evas_Object *button = NULL;
 
    button = elm_button_add(main_win);
-   elm_button_autorepeat_set(NULL, EINA_TRUE);
+   elm_button_autorepeat_set(button, EINA_TRUE);
+   elm_button_autorepeat_initial_timeout_set(NULL, 1.0);
    evas_object_del(button);
    button = NULL;
    tet_result(TET_PASS);
