@@ -176,10 +176,12 @@ elm_smart_scroller_child_set(Evas_Object *obj, Evas_Object *child)
 	o = _elm_smart_pan_add(evas_object_evas_get(obj));
 	sd->pan_obj = o;
 	evas_object_smart_callback_add(o, "changed", _smart_pan_changed_hook, sd);
-	evas_object_smart_callback_add(o, "pan_changed", _smart_pan_pan_changed_hook, sd);
-	evas_object_show(o);
-	edje_object_part_swallow(sd->edje_obj, "elm.swallow.content", o);
+        evas_object_smart_callback_add(o, "pan_changed", _smart_pan_pan_changed_hook, sd);
+        _elm_smart_pan_child_set(o, child);
+        edje_object_part_swallow(sd->edje_obj, "elm.swallow.content", o);
      }
+   else
+     _elm_smart_pan_child_set(sd->pan_obj, child);
 
    sd->pan_func.set = _elm_smart_pan_set;
    sd->pan_func.get = _elm_smart_pan_get;
@@ -188,7 +190,6 @@ elm_smart_scroller_child_set(Evas_Object *obj, Evas_Object *child)
    sd->pan_func.child_size_get = _elm_smart_pan_child_size_get;
 
    evas_object_event_callback_add(child, EVAS_CALLBACK_DEL, _smart_child_del_hook, sd);
-   _elm_smart_pan_child_set(sd->pan_obj, sd->child_obj);
    sd->pan_func.child_size_get(sd->pan_obj, &w, &h);
    sd->child.w = w;
    sd->child.h = h;
@@ -1052,6 +1053,7 @@ void
 elm_smart_scroller_child_viewport_size_get(Evas_Object *obj, Evas_Coord *w, Evas_Coord *h)
 {
    API_ENTRY return;
+   if (!sd->pan_obj) return;
    edje_object_calc_force(sd->edje_obj);
    evas_object_geometry_get(sd->pan_obj, NULL, NULL, w, h);
 }
@@ -1164,8 +1166,9 @@ elm_smart_scroller_object_theme_set(Evas_Object *parent, Evas_Object *obj, const
 {
    API_ENTRY return;
    Evas_Coord mw, mh;
+   double parent_scale = parent ? elm_widget_scale_get(parent) : 1;
    _elm_theme_object_set(parent, sd->edje_obj, clas, group, style);
-   edje_object_scale_set(sd->edje_obj, elm_widget_scale_get(parent) * _elm_config->scale);
+   edje_object_scale_set(sd->edje_obj, parent_scale * _elm_config->scale);
    if (sd->pan_obj)
      edje_object_part_swallow(sd->edje_obj, "elm.swallow.content", sd->pan_obj);
    mw = mh = -1;
@@ -2264,9 +2267,12 @@ _smart_scrollbar_reset(Smart_Data *sd)
 	edje_object_part_drag_size_set(sd->edje_obj, "elm.dragable.vbar", 1.0, 1.0);
 	edje_object_part_drag_size_set(sd->edje_obj, "elm.dragable.hbar", 1.0, 1.0);
      }
-   sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
-   sd->pan_func.get(sd->pan_obj, &px, &py);
-   sd->pan_func.set(sd->pan_obj, minx, miny);
+   if (sd->pan_obj)
+     {
+        sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
+        sd->pan_func.get(sd->pan_obj, &px, &py);
+        sd->pan_func.set(sd->pan_obj, minx, miny);
+     }
    if ((px != minx) || (py != miny))
      edje_object_signal_emit(sd->edje_obj, "elm,action,scroll", "elm");
 }
@@ -2275,10 +2281,11 @@ static int
 _smart_scrollbar_bar_v_visibility_adjust(Smart_Data *sd)
 {
    int scroll_v_vis_change = 0;
-   Evas_Coord h, vw, vh;
+   Evas_Coord h, vw = 0, vh = 0;
 
    h = sd->child.h;
-   evas_object_geometry_get(sd->pan_obj, NULL, NULL, &vw, &vh);
+   if (sd->pan_obj)
+     evas_object_geometry_get(sd->pan_obj, NULL, NULL, &vw, &vh);
    if (sd->vbar_visible)
      {
 	if (sd->vbar_flags == ELM_SMART_SCROLLER_POLICY_AUTO)
@@ -2343,10 +2350,11 @@ static int
 _smart_scrollbar_bar_h_visibility_adjust(Smart_Data *sd)
 {
    int scroll_h_vis_change = 0;
-   Evas_Coord w, vw, vh;
+   Evas_Coord w, vw = 0, vh = 0;
 
    w = sd->child.w;
-   evas_object_geometry_get(sd->pan_obj, NULL, NULL, &vw, &vh);
+   if (sd->pan_obj)
+     evas_object_geometry_get(sd->pan_obj, NULL, NULL, &vw, &vh);
    if (sd->hbar_visible)
      {
 	if (sd->hbar_flags == ELM_SMART_SCROLLER_POLICY_AUTO)
@@ -2483,9 +2491,12 @@ _smart_scrollbar_size_adjust(Smart_Data *sd)
 
 	edje_object_part_drag_size_set(sd->edje_obj, "elm.dragable.vbar", 1.0, 1.0);
 	edje_object_part_drag_size_set(sd->edje_obj, "elm.dragable.hbar", 1.0, 1.0);
-        sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
-	sd->pan_func.get(sd->pan_obj, &px, &py);
-	sd->pan_func.set(sd->pan_obj, minx, miny);
+        if (sd->pan_obj)
+          {
+             sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
+             sd->pan_func.get(sd->pan_obj, &px, &py);
+             sd->pan_func.set(sd->pan_obj, minx, miny);
+          }
         if ((px != minx) || (py != miny))
 	  edje_object_signal_emit(sd->edje_obj, "elm,action,scroll", "elm");
      }
@@ -2536,7 +2547,6 @@ _smart_add(Evas_Object *obj)
    o = edje_object_add(evas_object_evas_get(obj));
    evas_object_propagate_events_set(o, 0);
    sd->edje_obj = o;
-   // FIXME: null parent obj ... :(
    elm_smart_scroller_object_theme_set(NULL, obj, "scroller", "base", "default");
    edje_object_signal_callback_add(o, "drag", "elm.dragable.vbar", _smart_edje_drag_v, sd);
    edje_object_signal_callback_add(o, "drag,start", "elm.dragable.vbar", _smart_edje_drag_v_start, sd);

@@ -51,6 +51,8 @@ _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   evas_object_del(wd->clip);
+   evas_object_del(wd->rect);
    free(wd);
 }
 
@@ -189,6 +191,7 @@ _move(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSE
    Item *it;
    if (!wd) return;
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
+   evas_object_move(wd->clip, x, y);
    EINA_LIST_FOREACH(wd->stack, l, it)
      evas_object_move(it->base, x, y);
 }
@@ -217,6 +220,22 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 }
 
 static void
+_show(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   evas_object_show(wd->clip);
+}
+
+static void
+_hide(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   evas_object_hide(wd->clip);
+}
+
+static void
 _resize(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {   
    Widget_Data *wd = elm_widget_data_get(data);
@@ -225,6 +244,7 @@ _resize(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNU
    Item *it;
    if (!wd) return;
    evas_object_geometry_get(obj, NULL, NULL, &w, &h);
+   evas_object_resize(wd->clip, w, h);
    EINA_LIST_FOREACH(wd->stack, l, it) evas_object_resize(it->base, w, h);
 }
 
@@ -273,20 +293,20 @@ elm_pager_add(Evas_Object *parent)
    elm_widget_can_focus_set(obj, EINA_FALSE);
 
    wd->clip = evas_object_rectangle_add(e);
-   elm_widget_resize_object_set(obj, wd->clip);
-   elm_widget_sub_object_add(obj, wd->clip);
 
    wd->rect = evas_object_rectangle_add(e);
-   elm_widget_sub_object_add(obj, wd->rect);
    evas_object_color_set(wd->rect, 255, 255, 255, 0); 
    evas_object_clip_set(wd->rect, wd->clip);
 
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, obj);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, obj);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
    _sizing_eval(obj);
+ 
    return obj;
 }
 

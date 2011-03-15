@@ -623,7 +623,8 @@ elm_widget_sub_object_add(Evas_Object *obj, Evas_Object *sobj)
           {
              if (sd2->parent_obj == obj)
                return;
-             elm_widget_sub_object_del(sd2->parent_obj, sobj);
+             if (sd2->parent_obj)
+               elm_widget_sub_object_del(sd2->parent_obj, sobj);
              sd2->parent_obj = obj;
              if (!sd->child_can_focus && (_is_focusable(sobj)))
                sd->child_can_focus = EINA_TRUE;
@@ -1495,11 +1496,12 @@ elm_widget_focus_steal(Evas_Object *obj)
      {
 	parent = elm_widget_parent_get(parent);
 	sd = evas_object_smart_data_get(parent);
-	if (elm_widget_focus_get(sd->resize_obj))
+        if (sd->resize_obj)
           {
-             elm_widget_focused_object_clear(sd->resize_obj);
+             if (elm_widget_focus_get(sd->resize_obj))
+               elm_widget_focused_object_clear(sd->resize_obj);
           }
-	else
+        else
 	  {
 	     const Eina_List *l;
 	     Evas_Object *child;
@@ -2442,7 +2444,11 @@ _newest_focus_order_get(Evas_Object *obj, unsigned int *newest_focus_order, Eina
         if (!ret) continue;
         best = ret;
      }
-   if ((can_focus_only) && (!elm_widget_can_focus_get(best))) return NULL;
+   if (can_focus_only)
+     {
+        if ((!best) || (!elm_widget_can_focus_get(best)))
+          return NULL;
+     }
    return best;
 }
 

@@ -306,11 +306,11 @@ _transition_complete_cb(void *data)
      }  
    else if (prev_it)
      {
-        evas_object_hide(prev_it->fn_btn1);
-        evas_object_hide(prev_it->back_btn);
-        evas_object_hide(prev_it->title_obj);
-        evas_object_hide(prev_it->fn_btn2);
-        evas_object_hide(prev_it->fn_btn3);
+        if (prev_it->fn_btn1) evas_object_hide(prev_it->fn_btn1);
+        if (prev_it->back_btn) evas_object_hide(prev_it->back_btn);
+        if (prev_it->title_obj) evas_object_hide(prev_it->title_obj);
+        if (prev_it->fn_btn2) evas_object_hide(prev_it->fn_btn2);
+        if (prev_it->fn_btn3) evas_object_hide(prev_it->fn_btn3);
      }
    if ((it) && (!wd->hidden))
      {
@@ -407,6 +407,7 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
 static int
 _set_button_width(Evas_Object *obj)
 {
+   if (!obj) return 0;
    Evas_Coord minw = -1, minh = -1, maxw= -1, maxh = -1;
    Evas_Coord w = 0, h = 0;
 

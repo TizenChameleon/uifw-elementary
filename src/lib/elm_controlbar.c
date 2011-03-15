@@ -283,14 +283,6 @@ _del_hook(Evas_Object * obj)
         free(item);
         item = NULL;
      }
-   if (wd->view)
-     {
-        Evas_Object *content;
-        content = elm_layout_content_unset(wd->view, "elm.swallow.view");
-        evas_object_hide(content);
-        evas_object_del(wd->view);
-        wd->view = NULL;
-     }
    if (wd->bg)
      {
         evas_object_del(wd->bg);
