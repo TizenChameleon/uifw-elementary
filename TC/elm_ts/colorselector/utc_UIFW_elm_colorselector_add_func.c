@@ -46,6 +46,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_colorselector_add_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_colorselector_add_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
