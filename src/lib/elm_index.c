@@ -193,8 +193,8 @@ _item_new(Evas_Object *obj, const char *letter, const void *item)
      it->size =  wd->min_1st_level_obj_height;
    if(letter)
      {
-         it->letter = eina_stringshare_add(letter);
-         it->vis_letter = eina_stringshare_add(letter);
+        it->letter = eina_stringshare_add(letter);
+        it->vis_letter = eina_stringshare_add(letter);
      }
    else
      return NULL;
@@ -243,7 +243,7 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
         const char *stacking;
 
         if (it->level != level) continue;
-	if(i > wd->max_supp_items_count) break;
+        if(i > wd->max_supp_items_count) break;
 
         o = edje_object_add(evas_object_evas_get(obj));
         it->base = o;
@@ -376,11 +376,11 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
                  {
                     if(cdv > dmax)
                       {
-                          cdvv = dmax;
+                         cdvv = dmax;
                       }
                     else
                       {
-                          cdvv = dmin;
+                         cdvv = dmin;
                       }
                     edje_object_part_drag_value_set(wd->base, "elm.dragable.index.1", cdv, cdvv);
                  }
@@ -450,20 +450,20 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
              if(last)
                {
                   edje_object_part_text_set(wd->base, "elm.text.body", last);
-       		  edje_object_signal_emit(wd->base, "hide_2nd_level", "");
-	       }
-       	  }
+                  edje_object_signal_emit(wd->base, "hide_2nd_level", "");
+               }
+          }
         if(view_level == 1 && wd->level_active[1])
           {
              edje_object_part_text_set(wd->base, "elm.text", last);
-    	     edje_object_signal_emit(wd->base, "hide_first_level", "");
-     	  }
+             edje_object_signal_emit(wd->base, "hide_first_level", "");
+          }
      }
 
    if(label)
-      free(label);
+     free(label);
    if(last)
-      free(last);
+     free(last);
 }
 
 static void
@@ -509,7 +509,7 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *event
    d = (void *)elm_index_item_selected_get(data, view_level);
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-         edje_object_signal_emit(it->base, "elm,state,inactive", "elm");
+        edje_object_signal_emit(it->base, "elm,state,inactive", "elm");
      }
    if (d) evas_object_smart_callback_call(data, "selected", d);
    elm_index_active_set(data, 0);
@@ -597,10 +597,10 @@ _index_box_refill_job(void *data)
    if(pw != wd->pwidth && ph != wd->pheight)
      {
         if(wd->down == 1)
-	  {
-	     wd->active = 0;
-	     elm_index_active_set(data, 1);
-	  }
+          {
+             wd->active = 0;
+             elm_index_active_set(data, 1);
+          }
         _index_box_clear((Evas_Object *)data, wd->bx[0], 0);
         evas_object_smart_calculate( wd->bx[0]);
         elm_index_item_go((Evas_Object *)data, wd->level);
@@ -694,17 +694,18 @@ elm_index_add(Evas_Object *parent)
 
    if (edje_object_part_exists(wd->base, "elm.swallow.index.1"))
      {
-	wd->bx[1] = evas_object_box_add(e);
-	evas_object_box_layout_set(wd->bx[1], _layout, wd, NULL);
-	elm_widget_sub_object_add(obj, wd->bx[1]);
-	edje_object_part_swallow(wd->base, "elm.swallow.index.1", wd->bx[1]);
-	evas_object_show(wd->bx[1]);
+        wd->bx[1] = evas_object_box_add(e);
+        evas_object_box_layout_set(wd->bx[1], _layout, wd, NULL);
+        elm_widget_sub_object_add(obj, wd->bx[1]);
+        edje_object_part_swallow(wd->base, "elm.swallow.index.1", wd->bx[1]);
+        evas_object_show(wd->bx[1]);
      }
 
    wd->scale_factor = elm_scale_get();
-   if ( wd->scale_factor == 0.0 ) {
-	wd->scale_factor = 1.0;
-   }
+   if ( wd->scale_factor == 0.0 )
+     {
+        wd->scale_factor = 1.0;
+     }
    string = edje_object_data_get(wd->base, "min_1st_level_obj_height");
    if(string)
      wd->min_1st_level_obj_height = (int) (atoi(string))*wd->scale_factor;
@@ -722,14 +723,14 @@ _group_count(Evas_Object *obj, int extraIndex, int adj_pos, int vis_pos)
    int group_count = MIN_GRP_SIZE;
    while(group_count <= wd->max_grp_size)
      {
-	if(extraIndex <= wd->max_grp_size*adj_pos)
-	  {
-	     if(group_count*adj_pos>=extraIndex) return group_count;
-	  }
-	else
-	  return wd->max_grp_size;
+        if(extraIndex <= wd->max_grp_size*adj_pos)
+          {
+             if(group_count*adj_pos>=extraIndex) return group_count;
+          }
+        else
+          return wd->max_grp_size;
 
-	group_count += MIN_GRP_SIZE;
+        group_count += MIN_GRP_SIZE;
      }
    return group_count;
 }
@@ -847,7 +848,7 @@ elm_index_active_set(Evas_Object *obj, Eina_Bool active)
    if (wd->active)
      {
         _index_box_clear(obj, wd->bx[1], 1);
-	_index_process(obj);
+        _index_process(obj);
         _index_box_auto_fill(obj, wd->bx[0], 0);
         edje_object_signal_emit(wd->base, "elm,state,active", "elm");
      }
@@ -1075,16 +1076,16 @@ elm_index_item_sorted_insert(Evas_Object *obj, const char *letter, const void *i
      wd->items = eina_list_prepend_relative_list(wd->items, it, lnear);
    else
      {
-	/* If cmp_data_func is not provided, append a duplicated item */
-	if (!cmp_data_func)
-	  wd->items =  eina_list_append_relative_list(wd->items, it, lnear);
-	else
-	  {
-	     Elm_Index_Item *p_it = eina_list_data_get(lnear);
-	     if (cmp_data_func(p_it->data, it->data) >= 0)
-	       p_it->data = it->data;
-	     _item_free(it);
-	  }
+        /* If cmp_data_func is not provided, append a duplicated item */
+        if (!cmp_data_func)
+          wd->items =  eina_list_append_relative_list(wd->items, it, lnear);
+        else
+          {
+             Elm_Index_Item *p_it = eina_list_data_get(lnear);
+             if (cmp_data_func(p_it->data, it->data) >= 0)
+               p_it->data = it->data;
+             _item_free(it);
+          }
      }
 
    _index_box_clear(obj, wd->bx[wd->level], wd->level);
@@ -1151,10 +1152,11 @@ elm_index_item_clear(Evas_Object *obj)
         if (it->level != wd->level) continue;
         clear = eina_list_append(clear, it);
      }
-   EINA_LIST_FREE(clear, it) {
-	   _item_free(it);
-	   wd->tot_items_count[wd->level]--;
-   }
+   EINA_LIST_FREE(clear, it)
+     {
+        _item_free(it);
+        wd->tot_items_count[wd->level]--;
+     }
 }
 
 /**
@@ -1239,7 +1241,7 @@ elm_index_button_image_invisible_set(Evas_Object *obj, Eina_Bool invisible)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    wd->hide_button = invisible;
-   
+
    edje_object_signal_emit(wd->base, "elm,state,button,image,hide", "elm");
    return;
 }
