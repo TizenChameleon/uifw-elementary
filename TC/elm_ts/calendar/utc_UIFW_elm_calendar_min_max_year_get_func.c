@@ -30,7 +30,7 @@
 Evas_Object *main_win;
 Evas_Object *test_eo = NULL;
 static int min_year = 2010;
-static int max_year = 2010;
+static int max_year = 2020;
 
 static void startup(void);
 static void cleanup(void);
@@ -49,6 +49,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_calendar_min_max_year_get_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_calendar_min_max_year_get_func_02, NEGATIVE_TC_IDX },
+    { NULL, 0 }
 };
 
 static void startup(void)

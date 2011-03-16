@@ -47,6 +47,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_datefield_time_mode_set_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_datefield_time_mode_set_func_02, NEGATIVE_TC_IDX },
+    { NULL, 0 }
 };
 
 static void startup(void)
@@ -98,14 +99,7 @@ static void utc_UIFW_elm_datefield_time_mode_set_func_01(void)
 static void utc_UIFW_elm_datefield_time_mode_set_func_02(void)
 {
 	datefield = elm_datefield_add(main_win);
-	elm_datefield_time_mode_set(datefield, 2);
-	
-	if (!(elm_datefield_time_mode_get(datefield) == EINA_TRUE || elm_datefield_time_mode_get == EINA_FALSE)) {
-		tet_infoline("elm_datefield_time_mode_set() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-
+	elm_datefield_time_mode_set(NULL, EINA_TRUE);
 	evas_object_resize(datefield, 480, 80);
 	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
