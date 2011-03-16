@@ -23,6 +23,7 @@ enum
 {
   TIME_HOUR,
   TIME_MIN,
+  TIME_AMPM,
   TIME_MAX
 };
 
@@ -119,6 +120,7 @@ _theme_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    char sig[32] = {0,};
    int i;
+   char buf[1024];
 
    if (!wd || !wd->base) return;
 
@@ -128,8 +130,11 @@ _theme_hook(Evas_Object *obj)
 
         for (i = 0; i < DATE_MAX; i++)
           elm_object_style_set(wd->date[i], "datefield/hybrid");
-        for (i = 0; i < TIME_MAX; i++)
+        for (i = 0; i < TIME_MAX-1; i++)
           elm_object_style_set(wd->time[i], "datefield/hybrid");
+
+        snprintf(buf, sizeof(buf), "datefield.ampm/%s", elm_widget_style_get(obj));
+        elm_object_style_set(wd->time[TIME_AMPM], buf);
      }
    else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
      {
@@ -145,8 +150,11 @@ _theme_hook(Evas_Object *obj)
      {
         _elm_theme_object_set(obj, wd->base, "datefield", "time", elm_widget_style_get(obj));
 
-        for (i = 0; i < TIME_MAX; i++)
+        for (i = 0; i < TIME_MAX-1; i++)
           elm_object_style_set(wd->time[i], "datefield");
+
+        snprintf(buf, sizeof(buf), "datefield.ampm/%s", elm_widget_style_get(obj));
+        elm_object_style_set(wd->time[TIME_AMPM], buf);
 
         for (i = 0; i < DATE_MAX; i++)
           evas_object_hide(wd->date[i]);
@@ -164,6 +172,7 @@ _theme_hook(Evas_Object *obj)
      {
         edje_object_part_swallow(wd->base, "elm.swallow.time.hour", wd->time[TIME_HOUR]);
         edje_object_part_swallow(wd->base, "elm.swallow.time.min", wd->time[TIME_MIN]);
+        edje_object_part_swallow(wd->base, "elm.swallow.time.ampm", wd->time[TIME_AMPM]);
         edje_object_part_text_set(wd->base, "elm.text.colon", ":");
      }
 
@@ -205,7 +214,7 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void
-_signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+_ampm_clicked_cb(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    char *str;
@@ -218,7 +227,7 @@ _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const c
 	str = _get_i18n_string(data, PM_STR);
 	if (str) 
 	  {
-	     edje_object_part_text_set(wd->base, "elm.text.ampm", str);
+         elm_button_label_set(wd->time[TIME_AMPM], str);
 	     free(str);
 	  }
         wd->hour += HOUR_12H_MAXIMUM;
@@ -228,7 +237,7 @@ _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const c
 	str = _get_i18n_string(data, AM_STR);
 	if (str)
 	  {
-	     edje_object_part_text_set(wd->base, "elm.text.ampm", str);
+         elm_button_label_set(wd->time[TIME_AMPM], str);
 	     free(str);
 	  }
         wd->hour -= HOUR_12H_MAXIMUM;
@@ -252,40 +261,6 @@ _signal_rect_mouse_down(void *data, Evas_Object *obj, const char *emission, cons
      elm_object_focus(wd->time[TIME_HOUR]);
    else if (!strcmp(source, "elm.rect.time.min.over"))
      elm_object_focus(wd->time[TIME_MIN]);
-   else if (!strcmp(source, "elm.rect.date.left.pad"))
-     {
-        switch (wd->date_format)
-          {
-           case DATE_FORMAT_YYDDMM:
-           case DATE_FORMAT_YYMMDD:
-             elm_object_focus(wd->date[DATE_YEAR]);
-             break;
-           case DATE_FORMAT_MMDDYY:
-           case DATE_FORMAT_MMYYDD:
-             elm_object_focus(wd->date[DATE_MON]);
-             break;
-           case DATE_FORMAT_DDMMYY:
-           case DATE_FORMAT_DDYYMM:
-             elm_object_focus(wd->date[DATE_DAY]);
-          }
-     }
-   else if (!strcmp(source, "elm.rect.date.right.pad"))
-     {
-        switch (wd->date_format)
-          {
-           case DATE_FORMAT_MMDDYY:
-           case DATE_FORMAT_DDMMYY:
-             elm_object_focus(wd->date[DATE_YEAR]);
-             break;
-           case DATE_FORMAT_DDYYMM:
-           case DATE_FORMAT_YYDDMM:
-             elm_object_focus(wd->date[DATE_MON]);
-             break;
-           case DATE_FORMAT_YYMMDD:
-           case DATE_FORMAT_MMYYDD:
-             elm_object_focus(wd->date[DATE_DAY]);
-          }
-     }
 }
 
 static Eina_Bool 
@@ -444,7 +419,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 		  i18n_str = _get_i18n_string(data, PM_STR);
 		  if (i18n_str)
 		    {
-		       edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
+               elm_button_label_set(wd->time[TIME_AMPM], i18n_str);
 		       free(i18n_str);
 		    }
 	       }
@@ -453,7 +428,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
 		  i18n_str = _get_i18n_string(data, AM_STR);
 		  if (i18n_str)
 		    {
-		       edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
+               elm_button_label_set(wd->time[TIME_AMPM], i18n_str);
 		       free(i18n_str);
 		    }
 	       }
@@ -550,7 +525,9 @@ _entry_focus_move(Evas_Object *obj, Evas_Object *focus_obj)
    else if (focus_obj == wd->time[TIME_HOUR])
      elm_object_focus(wd->time[TIME_MIN]);
    else if (focus_obj == wd->time[TIME_MIN])
-     elm_object_unfocus(wd->time[TIME_MIN]);
+     elm_object_focus(wd->time[TIME_AMPM]);
+   else if (focus_obj == wd->time[TIME_AMPM])
+     elm_object_unfocus(wd->time[TIME_AMPM]);
 }
 
 static int
@@ -803,7 +780,7 @@ _date_update(Evas_Object *obj)
 	     i18n_str = _get_i18n_string(obj, PM_STR);
 	     if (i18n_str) 
 	       {
-		  edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);
+              elm_button_label_set(wd->time[TIME_AMPM], i18n_str);
 		  free(i18n_str);
 	       }
           }
@@ -813,7 +790,7 @@ _date_update(Evas_Object *obj)
 	     i18n_str = _get_i18n_string(obj, AM_STR);
 	     if (i18n_str)
 	       {
-		  edje_object_part_text_set(wd->base, "elm.text.ampm", i18n_str);		
+              elm_button_label_set(wd->time[TIME_AMPM], i18n_str);
 		  free(i18n_str);
 	       }
           }
@@ -873,7 +850,7 @@ _time_entry_add(Evas_Object *obj)
    
    filter_data.max_char_count = 0;
    filter_data.max_byte_count = TIME_MAX_LENGTH;
-   for (i = 0; i < TIME_MAX; i++)
+   for (i = 0; i < TIME_MAX-1; i++)
      {
         wd->time[i] = elm_entry_add(obj);
         elm_entry_single_line_set(wd->time[i], EINA_TRUE);
@@ -887,6 +864,11 @@ _time_entry_add(Evas_Object *obj)
         evas_object_event_callback_add(wd->time[i], EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
         elm_widget_sub_object_add(obj, wd->time[i]);
      }
+   wd->time[TIME_AMPM] = elm_button_add(obj);
+   evas_object_size_hint_weight_set(wd->time[TIME_AMPM], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(wd->time[TIME_AMPM], EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_smart_callback_add(wd->time[TIME_AMPM], "clicked", _ampm_clicked_cb, obj);
+   elm_widget_sub_object_add(obj, wd->time[TIME_AMPM]);
 }
 
 /**
@@ -920,15 +902,12 @@ elm_datefield_add(Evas_Object *parent)
 
    wd->base = edje_object_add(e);
    elm_widget_resize_object_set(obj, wd->base);
-   edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.left.pad", _signal_rect_mouse_down, obj);
    edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.year.over", _signal_rect_mouse_down, obj);
    edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.month.over", _signal_rect_mouse_down, obj);
    edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.day.over", _signal_rect_mouse_down, obj);
-   edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.right.pad", _signal_rect_mouse_down, obj);
 
    edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.hour.over", _signal_rect_mouse_down, obj);
    edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.min.over", _signal_rect_mouse_down, obj);
-   edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "elm.rect.time.ampm.over", _signal_ampm_clicked, obj);
 
    wd->handler =  ecore_event_handler_add(ECORE_IMF_EVENT_COMMIT, _imf_event_commit_cb, obj);
    _date_entry_add(obj);
@@ -937,7 +916,7 @@ elm_datefield_add(Evas_Object *parent)
    wd->y_min = 1900;
    wd->m_min = 1;
    wd->d_min = 1;
-   wd->y_max = 2099;
+   wd->y_max = -1;
    wd->m_max = 12;
    wd->d_max = 31;
    wd->year = wd->y_min;
