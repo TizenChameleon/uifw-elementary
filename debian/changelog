@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build130) unstable; urgency=low
+
+  * Package Upload
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build130
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Fri, 18 Mar 2011 11:37:23 +0900
+
 elementary (1.0.0+svn.51480slp2+build129) unstable; urgency=low
 
   * Upload Package (revert elm_pager.c)
