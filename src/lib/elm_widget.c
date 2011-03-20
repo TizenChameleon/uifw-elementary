@@ -176,6 +176,12 @@ _sub_obj_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info 
 }
 
 static void
+_sub_obj_hide(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   _if_focused_revert(obj, EINA_TRUE);
+}
+
+static void
 _sub_obj_mouse_down(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Evas_Object *o = obj;
@@ -644,6 +650,8 @@ elm_widget_sub_object_add(Evas_Object *obj, Evas_Object *sobj)
    sd->subobjs = eina_list_append(sd->subobjs, sobj);
    evas_object_data_set(sobj, "elm-parent", obj);
    evas_object_event_callback_add(sobj, EVAS_CALLBACK_DEL, _sub_obj_del, sd);
+   if (_elm_widget_is(sobj))
+     evas_object_event_callback_add(sobj, EVAS_CALLBACK_HIDE, _sub_obj_hide, sd);
    evas_object_smart_callback_call(obj, "sub-object-add", sobj);
    scale = elm_widget_scale_get(sobj);
    th = elm_widget_theme_get(sobj);
@@ -695,6 +703,9 @@ elm_widget_sub_object_del(Evas_Object *obj, Evas_Object *sobj)
      sd->subobjs = eina_list_remove(sd->subobjs, sobj);
    evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_DEL, 
                                        _sub_obj_del, sd);
+   if (_elm_widget_is(sobj))
+     evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_HIDE,
+                                         _sub_obj_hide, sd);
    evas_object_smart_callback_call(obj, "sub-object-del", sobj);
 }
 
@@ -711,6 +722,8 @@ elm_widget_resize_object_set(Evas_Object *obj, Evas_Object *sobj)
 	  {
 	     Smart_Data *sd2 = evas_object_smart_data_get(sd->resize_obj);
 	     if (sd2) sd2->parent_obj = NULL;
+             evas_object_event_callback_del_full(sd->resize_obj, EVAS_CALLBACK_HIDE,
+                                                 _sub_obj_hide, sd);
 	  }
 	evas_object_event_callback_del_full(sd->resize_obj, EVAS_CALLBACK_DEL,
                                             _sub_obj_del, sd);
@@ -730,6 +743,8 @@ elm_widget_resize_object_set(Evas_Object *obj, Evas_Object *sobj)
           {
              Smart_Data *sd2 = evas_object_smart_data_get(sobj);
              if (sd2) sd2->parent_obj = NULL;
+             evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_HIDE,
+                                                 _sub_obj_hide, sd);
           }
         evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_DEL,
                                             _sub_obj_del, sd);
@@ -749,6 +764,8 @@ elm_widget_resize_object_set(Evas_Object *obj, Evas_Object *sobj)
 	  {
 	     Smart_Data *sd2 = evas_object_smart_data_get(sd->resize_obj);
 	     if (sd2) sd2->parent_obj = obj;
+             evas_object_event_callback_add(sobj, EVAS_CALLBACK_HIDE,
+                                            _sub_obj_hide, sd);
 	  }
 	evas_object_clip_set(sobj, evas_object_clip_get(obj));
 	evas_object_smart_member_add(sobj, obj);
@@ -1580,11 +1597,11 @@ elm_widget_show_region_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Co
 
    do
      {
-        parent_obj = sd->parent_obj; 
-        child_obj = sd->obj;
+        parent_obj = sd->parent_obj;
+        if ((!parent_obj) || (!_elm_widget_is(parent_obj))) break;
         sd = evas_object_smart_data_get(parent_obj);
-
-        if ((!parent_obj) || (!sd) || (!_elm_widget_is(parent_obj))) break;
+        if (!sd) break;
+        child_obj = sd->obj;
 
         evas_object_geometry_get(parent_obj, &px, &py, NULL, NULL);
         evas_object_geometry_get(child_obj, &cx, &cy, NULL, NULL);
@@ -2567,7 +2584,6 @@ _smart_hide(Evas_Object *obj)
         if (evas_object_data_get(o, "_elm_leaveme")) continue;
         evas_object_hide(o);
      }
-   _if_focused_revert(obj, EINA_TRUE);
 }
 
 static void
