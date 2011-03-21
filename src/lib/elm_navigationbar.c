@@ -315,7 +315,7 @@ _transition_complete_cb(void *data)
    if ((it) && (!wd->hidden))
      {
         /*always hide the extended title object*/
-        edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm");
+        edje_object_signal_emit(wd->base, "elm,state,hide,noanimate,title", "elm");
         it->titleobj_visible = EINA_FALSE;
         edje_object_part_text_set(wd->base, "elm.text", it->title);
         if (!cb->first_page)
@@ -374,8 +374,7 @@ _transition_complete_cb(void *data)
           edje_object_signal_emit(wd->base, "elm,state,item,reset,rightpad2", "elm");  
         if ((it->title_obj) && (it->title))
           {
-             edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");  
-             edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");    
+             edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
           }
         else
           {
@@ -980,6 +979,11 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
                }
              if (!wd->hidden)
                {
+                  if(it->titleobj_visible)
+                    {
+                       edje_object_signal_emit(wd->base, "elm,state,hide,noanimate,title", "elm");
+                       it->titleobj_visible = EINA_FALSE;
+                    }
                  edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
                  edje_object_signal_callback_del_full(wd->base, "elm,action,clicked", "elm", _show_hide_titleobj,
                                         it);
