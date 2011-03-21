@@ -64,6 +64,7 @@ struct _Widget_Data
    Elm_Controlbar_Item * pre_item;
    Elm_Controlbar_Item * cur_item;
    Evas_Coord x, y, w, h;
+   Eina_Bool disabled;
    Eina_Bool vertical;
    Eina_Bool auto_align;
    int mode;
@@ -80,14 +81,13 @@ struct _Widget_Data
    Eina_Bool selected_animation;
    Animation_Data *ad;
 
-   //   const char *view_hide;
-   //   const char *view_show;
    const char *pressed_signal;
    const char *selected_signal;
 };
 
 struct _Elm_Controlbar_Item
 {
+   Widget_Data * wd;
    Evas_Object * obj;
    Evas_Object * base;
    Evas_Object * base_item;
@@ -369,6 +369,36 @@ _theme_hook(Evas_Object * obj)
 }
 
 static void
+_disable_hook(Evas_Object * obj)
+{
+   Widget_Data * wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   const Eina_List *l;
+   Elm_Controlbar_Item * item;
+   Eina_Bool disabled;
+
+   wd->disabled = elm_widget_disabled_get(obj);
+
+   EINA_LIST_FOREACH(wd->items, l, item)
+     {
+        if (wd->disabled)
+          disabled = wd->disabled;
+        else
+          disabled = item->disable;
+
+        if (item->style == OBJECT)
+          elm_widget_disabled_set(item->base, disabled);
+        else
+          {
+             if (disabled)
+               item_color_set(item, "elm.item.disable.color");
+             else
+               item_color_set(item, "elm.item.default.color");
+          }
+     }
+}
+
+static void
 _sub_del(void *data, Evas_Object * obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -585,7 +615,6 @@ check_background(Widget_Data *wd)
      }
    edje_object_signal_emit(wd->bg, "elm,state,toolbar", "elm");
 }
-
 
 static void
 check_toolbar_line(Widget_Data *wd)
@@ -860,7 +889,6 @@ selected_box(Elm_Controlbar_Item * it)
         }
         it->selected = EINA_TRUE;
 
-
         if(fit != NULL && fit != it)
           {
              move_selected_box(wd, fit, it);
@@ -947,7 +975,7 @@ pressed_box(Elm_Controlbar_Item * it)
 
    if(wd->animating) return EINA_FALSE;
 
-   if(it->disable) return EINA_FALSE;
+   if(wd->disabled || it->disable) return EINA_FALSE;
 
    EINA_LIST_FOREACH(wd->items, l, item)
      {
@@ -1093,6 +1121,7 @@ create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
      }
    it = ELM_NEW(Elm_Controlbar_Item);
    if (!it) return NULL;
+   it->wd = wd;
    it->obj = obj;
    it->text = eina_stringshare_add(label);
    it->icon_path = eina_stringshare_add(icon_path);
@@ -1130,6 +1159,7 @@ create_tool_item(Evas_Object * obj, const char *icon_path, const char *label,
    it = ELM_NEW(Elm_Controlbar_Item);
    if (!it)
      return NULL;
+   it->wd = wd;
    it->obj = obj;
    it->text = eina_stringshare_add(label);
    it->icon_path = eina_stringshare_add(icon_path);
@@ -1165,6 +1195,7 @@ create_object_item(Evas_Object * obj, Evas_Object * obj_item, const int sel)
    it = ELM_NEW(Elm_Controlbar_Item);
    if (!it)
      return NULL;
+   it->wd = wd;
    it->obj = obj;
    it->sel = sel;
    it->style = OBJECT;
@@ -1450,6 +1481,7 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_disable_hook_set(obj, _disable_hook);
 
    // initialization
    wd->parent = parent;
@@ -2238,7 +2270,7 @@ elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path)
    else if(!it->icon)
      edje_object_signal_emit(_EDJ(it->base_item), "elm,state,default", "elm");
 
-   if(it->disable)
+   if(it->wd->disabled || it->disable)
      item_color_set(it, "elm.item.disable.color");
    else
      item_color_set(it, "elm.item.default.color");
@@ -2286,7 +2318,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
         it->text = eina_stringshare_add(label);
         it->label = create_item_label(it->base_item, it, "elm.swallow.text");
      }
-   if(it->disable) item_color_set(it, "elm.item.disable.color");
+   if(it->wd->disabled || it->disable) item_color_set(it, "elm.item.disable.color");
 
    if(it->label && it->icon)
      {
@@ -2500,17 +2532,20 @@ elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
 {
    if (!it) return;
 
-   if(it->disable == disable) return;
+   if (it->disable == disable) return;
 
    it->disable = disable;
 
-   if(it->disable)
-     {
-        item_color_set(it, "elm.item.disable.color");
-     }
+   if (it->wd && it->wd->disabled) return;
+
+   if (it->style == OBJECT)
+     elm_widget_disabled_set(it->base, it->disable);
    else
      {
-        item_color_set(it, "elm.item.default.color");
+        if (it->disable)
+          item_color_set(it, "elm.item.disable.color");
+        else
+          item_color_set(it, "elm.item.default.color");
      }
 }
 
@@ -2848,19 +2883,3 @@ elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Ei
 
    wd->selected_animation = selected_animation;
 }
-/*
-   EAPI void
-   elm_controlbar_view_animation_set(Evas_Object *obj, const char *hide, const char *show)
-   {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (wd == NULL)
-   {
-   fprintf(stderr, "Cannot get smart data\n");
-   return;
-   }
-
-   wd->view_hide = eina_stringshare_add(hide);
-   wd->view_show = eina_stringshare_add(show);
-   }
- */
