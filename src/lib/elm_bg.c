@@ -402,3 +402,28 @@ elm_bg_overlay_unset(Evas_Object *obj)
    _custom_resize(wd, NULL, NULL, NULL);
    return overlay;
 }
+
+/**
+ * Set the size of a loaded image of the canvas of the bg.
+ *
+ * @param obj The bg object
+ * @param w The new width of the canvas image given.
+ * @param h The new height of the canvas image given.
+ *
+ * This function sets a new size for the canvas image of the given the bg.
+ *
+ */
+EAPI void
+elm_bg_load_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   const char *p;
+   if (!wd) return;
+   wd->load_opts.w = w;
+   wd->load_opts.h = h;
+   if (!wd->img) return;
+   if (!(((p = strrchr(wd->file, '.'))) && (!strcasecmp(p, ".edj"))))
+      evas_object_image_load_size_set(wd->img, w, h);
+}
+
