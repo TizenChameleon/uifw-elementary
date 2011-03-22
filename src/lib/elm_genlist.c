@@ -373,6 +373,7 @@ struct _Widget_Data
    Evas_Coord        expand_item_gap;
    int               move_effect_mode;
    unsigned int      start_time;
+   Elm_Genlist_Item *head_item, *tail_item;
 };
 
 struct _Item_Block
@@ -1029,6 +1030,7 @@ _item_del(Elm_Genlist_Item *it)
           it->wd->anchor_item = ELM_GENLIST_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->prev);
      }
 #endif
+   if (it->flags != ELM_GENLIST_ITEM_HEAD)
    it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
    if (it->parent)
      it->parent->items = eina_list_remove(it->parent->items, it);
@@ -1039,6 +1041,7 @@ _item_del(Elm_Genlist_Item *it)
 
    if (it->tooltip.del_cb)
      it->tooltip.del_cb((void *)it->tooltip.data, it->base.widget, it);
+   if (it->flags & ELM_GENLIST_ITEM_HEAD) it->wd->head_item = NULL;
 
    elm_widget_item_del(it);
    it->wd->total_num--;  // todo : remove
@@ -1172,8 +1175,8 @@ _mouse_move(void        *data,
              if (!it->wd->reorder_start_y) it->wd->reorder_start_y = it->block->y + it->y;
 
              evas_object_resize(it->base.view, it->w-(it->pad_left+it->pad_right), it->h);
-             if (it->wd->select_all_item)
-                sel_all_h = it->wd->select_all_item->h; 
+             if (it->wd->head_item)
+                sel_all_h = it->wd->head_item->h;
              if (it_y < oy + sel_all_h) _effect_item_controls(it, it->scrl_x, oy + sel_all_h);
              else if (it_y + it->wd->reorder_it->h > oy+oh) _effect_item_controls(it, it->scrl_x, oy + oh - it->wd->reorder_it->h);
              else _effect_item_controls(it, it->scrl_x, it_y);
@@ -1266,7 +1269,7 @@ _long_press(void *data)
       return ECORE_CALLBACK_CANCEL;
    it->wd->longpressed = EINA_TRUE;
    evas_object_smart_callback_call(it->base.widget, "longpressed", it);
-   if ((it->wd->reorder_mode) && (it != it->wd->select_all_item) && (it->flags != ELM_GENLIST_ITEM_GROUP))
+   if ((it->wd->reorder_mode) && (it != it->wd->head_item) && (it->flags != ELM_GENLIST_ITEM_GROUP))
      {
         it->wd->reorder_it = it;
         it->wd->reorder_start_y = 0;
@@ -1598,7 +1601,7 @@ _mouse_up(void            *data,
              Evas_Coord	ox,oy,oh,ow;
              evas_object_geometry_get(it->wd->pan_smart, &ox, &oy, &ow, &oh);
              evas_object_geometry_get(it->wd->reorder_it->base.view, &rox, &roy, &row, &roh);
-             if (it->wd->select_all_item) sel_all_h = it->wd->select_all_item->h; 
+             if (it->wd->head_item) sel_all_h = it->wd->head_item->h;
              if (it->wd->reorder_rel)
                { 
                   if (it->wd->reorder_it->parent == it->wd->reorder_rel->parent)  // todo : refactoring
@@ -2108,7 +2111,9 @@ _item_realize(Elm_Genlist_Item *it,
 
    if (itc) _item_cache_free(itc);
    evas_object_smart_callback_call(it->base.widget, "realized", it);
-   if ((it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP) && ((!it->wd->select_all_item) || ((it->wd->select_all_item) && (it != it->wd->select_all_item))))
+   if ((!calc) && (it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP) && (it->flags != ELM_GENLIST_ITEM_HEAD))
+     {
+         if (it->itc->edit_item_style ) 
      {
          _effect_item_realize(it, EINA_FALSE);
          edje_object_message_signal_process(it->edit_obj);
@@ -2352,30 +2357,26 @@ _item_block_position(Item_Block *itb,
    Evas_Coord y = 0, ox, oy, ow, oh, cvx, cvy, cvw, cvh;
    int vis = 0;
    int sel_all_h = 0;
-   Elm_Genlist_Item *select_all_item = NULL;
+   Elm_Genlist_Item *head_item = itb->wd->head_item;
 
    evas_object_geometry_get(itb->wd->pan_smart, &ox, &oy, &ow, &oh);
    evas_output_viewport_get(evas_object_evas_get(itb->wd->obj), &cvx, &cvy,
                             &cvw, &cvh);
 
-   if (itb->wd->select_all_item && 
-       (itb->wd->edit_mode & ELM_GENLIST_EDIT_MODE_SELECT || itb->wd->edit_mode & ELM_GENLIST_EDIT_MODE_SELECTALL)) 
+   if (head_item)
      {
-        if (itb->wd->select_all_check)
-           edje_object_signal_emit(itb->wd->select_all_item->base.view, "elm,state,sel_check", "elm");
-        else
-           edje_object_signal_emit(itb->wd->select_all_item->base.view, "elm,state,sel_uncheck", "elm");
-
-        select_all_item = itb->wd->select_all_item;
-
-        evas_object_resize(select_all_item->base.view, itb->w, select_all_item->h);  
-        evas_object_move(select_all_item->base.view, ox, oy);
-        evas_object_raise(select_all_item->base.view);
-
-        y = select_all_item->h;
-        sel_all_h = select_all_item->h;
+        if (!head_item->realized)
+          {
+             _item_realize(head_item, 0, 0);
+             itb->wd->minh += itb->wd->head_item->h;
      }
+        evas_object_resize(head_item->base.view, itb->w, head_item->h);
+        evas_object_move(head_item->base.view, ox, oy);
+        evas_object_raise(head_item->base.view);
 
+        y = head_item->h;
+        sel_all_h = head_item->h;
+     }
    EINA_LIST_FOREACH(itb->items, l, it)
      {
         if (it->delete_me) continue;
@@ -2603,12 +2604,11 @@ _calc_job(void *data)
      }
    wd->realminw = minw;
    if (minw < wd->w) minw = wd->w;
-   if ((minw != wd->minw) || (minh != wd->minh) || (wd->select_all_item))
+   if ((minw != wd->minw) || (minh != wd->minh) || (wd->head_item))
      {
         wd->minw = minw;
         wd->minh = minh;
-        if (wd->select_all_item)
-           wd->minh += wd->select_all_item->h;        
+        if (wd->head_item) wd->minh += wd->head_item->h;
         if (wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE)
            evas_object_smart_callback_call(wd->pan_smart, "changed", NULL);
         _sizing_eval(wd->obj);
@@ -2647,6 +2647,12 @@ _update_job(void *data)
    if (!wd) return;
    wd->update_job = NULL;
    num = 0;
+   if (wd->head_item)
+     {
+         _item_unrealize(wd->head_item);
+         _item_realize(wd->head_item, 0, 0);
+         position = EINA_TRUE;
+     }
    EINA_INLIST_FOREACH(wd->blocks, itb)
    {
       Evas_Coord itminw, itminh;
@@ -2979,7 +2985,7 @@ _pan_calculate(Evas_Object *obj)
              }
         }
       else _item_auto_scroll(sd->wd);
-   if (sd->wd->select_all_item) evas_object_raise(sd->wd->select_all_item->base.view);         
+   if (sd->wd->head_item) evas_object_raise(sd->wd->head_item->base.view);
    sd->wd->contracting = EINA_FALSE;
  }
 
@@ -3450,9 +3456,13 @@ elm_genlist_item_append(Evas_Object                  *obj,
    if (!it) return NULL;
    if (!it->parent)
      {
+        if (flags & ELM_GENLIST_ITEM_HEAD) wd->head_item = it;
+        else
+          {
         if (flags & ELM_GENLIST_ITEM_GROUP)
            wd->group_items = eina_list_append(wd->group_items, it);
         wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
+          }
         it->rel = NULL;
      }
    else
@@ -3474,7 +3484,8 @@ elm_genlist_item_append(Evas_Object                  *obj,
            it->group_item = it->parent->group_item;
      }
    it->before = EINA_FALSE;
-   _item_queue(wd, it);
+   if (flags != ELM_GENLIST_ITEM_HEAD) _item_queue(wd, it);
+
    return it;
 }
 
@@ -3675,6 +3686,7 @@ elm_genlist_clear(Evas_Object *obj)
         wd->items = eina_inlist_remove(wd->items, wd->items);
         if (it->flags & ELM_GENLIST_ITEM_GROUP)
           it->wd->group_items = eina_list_remove(it->wd->group_items, it);
+        if (it->flags & ELM_GENLIST_ITEM_HEAD) it->wd->head_item = NULL;
         elm_widget_item_pre_notify_del(it);
         if (it->effect_item_realized) _effect_item_unrealize(it);        
         if (it->realized) _item_unrealize(it);
@@ -3908,18 +3920,21 @@ elm_genlist_at_xy_item_get(const Evas_Object *obj,
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord ox, oy, ow, oh;
+   Evas_Coord head_y = 0;
    Item_Block *itb;
    Evas_Coord lasty;
    if (!wd) return NULL;
    evas_object_geometry_get(wd->pan_smart, &ox, &oy, &ow, &oh);
    lasty = oy;
+
+   if (wd->head_item) head_y = wd->head_item->h;
    EINA_INLIST_FOREACH(wd->blocks, itb)
    {
       Eina_List *l;
       Elm_Genlist_Item *it;
 
       if (!ELM_RECTS_INTERSECT(ox + itb->x - itb->wd->pan_x,
-                               oy + itb->y - itb->wd->pan_y,
+                               oy + itb->y + head_y - itb->wd->pan_y ,
                                itb->w, itb->h, x, y, 1, 1))
         continue;
       EINA_LIST_FOREACH(itb->items, l, it)
@@ -4706,11 +4721,14 @@ EAPI void
 elm_genlist_item_update(Elm_Genlist_Item *it)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
+   if (it->flags != ELM_GENLIST_ITEM_HEAD)
+     {
    if (!it->block) return;
    if (it->delete_me) return;
    it->mincalcd = EINA_FALSE;
    it->updateme = EINA_TRUE;
    it->block->updateme = EINA_TRUE;
+     }
    if (it->wd->update_job) ecore_job_del(it->wd->update_job);
    it->wd->update_job = ecore_job_add(_update_job, it->wd);
 }
@@ -5694,7 +5712,7 @@ _item_moving_effect_timer_cb(void *data)
                            evas_object_raise(it->base.view);
                        }
 
-                      if(wd->select_all_item) evas_object_raise(wd->select_all_item->base.view);
+                      if(wd->head_item) evas_object_raise(wd->head_item->base.view);
                       if (it->group_item) evas_object_raise(it->group_item->base.view);
                    }
 
