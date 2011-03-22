@@ -6752,3 +6752,24 @@ _item_auto_scroll(void *data)
           }
      }
 }
+
+EAPI int
+elm_genlist_item_flags_get(const Elm_Genlist_Item *item)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, EINA_FALSE);
+   return item->flags;
+}
+
+EAPI void
+elm_genlist_realized_items_update(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   Eina_List *list, *l;
+   Elm_Genlist_Item *it;
+
+   list = elm_genlist_realized_items_get(obj);
+   EINA_LIST_FOREACH(list, l, it)
+     elm_genlist_item_update(it);
+}
+
