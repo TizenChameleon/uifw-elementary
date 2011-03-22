@@ -733,6 +733,21 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    char *str;
    
    data = notify->data;
+
+   if (sel->datacb)
+     {
+        Elm_Selection_Data ddata;
+        
+        str = mark_up((char *)data->data, data->length, NULL);
+        ddata.x = ddata.y = 0;
+        ddata.format = ELM_SEL_FORMAT_TEXT;
+        ddata.data = str;
+        ddata.len = data->length;
+        sel->datacb(sel->udata, sel->widget, &ddata);
+        free(str);
+        return 0;
+     }
+   
    cnp_debug("Notify handler text %d %d %p\n", data->format,data->length, data->data);
    str = mark_up((char *)data->data, data->length, NULL);
    cnp_debug("String is %s (from %s)\n", str, data->data);
@@ -751,7 +766,7 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    Ecore_X_Selection_Data *data;
    Ecore_X_Selection_Data_Files *files;
    Paste_Image *pi;
-   char *p, *pp, *ext;
+   char *p, *pp;
 
    data = notify->data;
    cnp_debug("data->format is %d %p %p\n", data->format, notify, data);
@@ -774,6 +789,17 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
         return 0;
      }
    cnp_debug("Got %s\n",p);
+   if (sel->datacb)
+     {
+        Elm_Selection_Data ddata;
+        
+        ddata.x = ddata.y = 0;
+        ddata.format = ELM_SEL_FORMAT_MARKUP;
+        ddata.data = p;
+        ddata.len = data->length;
+        sel->datacb(sel->udata, sel->widget, &ddata);
+        return 0;
+     }
    if (strncmp(p, "file://", 7))
      {
         /* Try and continue if it looks sane */
@@ -781,29 +807,6 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
      }
    else p += strlen("file://");
    
-   ext = p + strlen(p);
-   if (ext)
-     {
-        Eina_Bool extok = EINA_FALSE;
-        int i;
-        
-        for (i = 0; image_extensions[i]; i++)
-          {
-             pp = ext - strlen(image_extensions[i]);
-             if ((pp >= p) && (!strcasecmp(pp, image_extensions[i])))
-               {
-                  extok = EINA_TRUE;
-                  break;
-               }
-          }
-        if (!extok)
-          {
-             cnp_debug("No known image format extension, ignoring\n");
-             if (savedtypes.textreq) savedtypes.textreq = 0;
-             return 0;
-          }
-     }
-
    if (savedtypes.pi) pasteimage_free(savedtypes.pi);
    pi = pasteimage_alloc(p, data->length);
    if (savedtypes.textreq)
