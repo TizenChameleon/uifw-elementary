@@ -35,6 +35,8 @@ _theme_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
      _elm_theme_object_set(obj, wd->noc, "nocontents", "base", elm_widget_style_get(obj));
+     edje_object_part_text_set(wd->noc, "elm.text", wd->label);
+     edje_object_message_signal_process(wd->noc);
    edje_object_scale_set(wd->noc, elm_widget_scale_get(obj) * _elm_config->scale);
    _sizing_eval(obj);
 }
