@@ -179,6 +179,7 @@ static void
 _segment_off(Elm_Segment_Item *it)
 {
    Widget_Data *wd;
+   char buf[4096];
 
    if (!it) return;
 
@@ -186,7 +187,11 @@ _segment_off(Elm_Segment_Item *it)
    if (!wd) return;
 
    edje_object_signal_emit(it->base.view, "elm,state,segment,normal", "elm");
-   if (it->label) elm_object_style_set(it->label, "segment_normal");
+   if (it->label)
+     {
+        snprintf(buf, sizeof(buf), "%s/segment_normal", elm_widget_style_get(wd->obj));
+        elm_object_style_set(it->label, buf);
+     }
 
    if (wd->selected_item == it) wd->selected_item = NULL;
 }
@@ -195,6 +200,7 @@ static void
 _segment_on(Elm_Segment_Item *it)
 {
    Widget_Data *wd;
+   char buf[4096];
 
    if (!it) return;
 
@@ -205,7 +211,11 @@ _segment_on(Elm_Segment_Item *it)
    if (wd->selected_item) _segment_off(wd->selected_item);
 
    edje_object_signal_emit(it->base.view, "elm,state,segment,selected", "elm");
-   if (it->label) elm_object_style_set(it->label, "segment_selected");
+   if (it->label)
+     {
+        snprintf(buf, sizeof(buf), "%s/segment_selected", elm_widget_style_get(wd->obj));
+        elm_object_style_set(it->label, buf);
+     }
 
    wd->selected_item = it;
    evas_object_smart_callback_call(wd->obj, "changed", (void*) it->seg_index);
@@ -268,6 +278,7 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
    Elm_Segment_Item *it;
    Evas_Event_Mouse_Up *ev;
    Evas_Coord x, y, w, h;
+   char buf[4096];
 
    it = data;
    if (!it) return;
@@ -287,7 +298,11 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
    else
      {
         edje_object_signal_emit(it->base.view, "elm,state,segment,normal", "elm");
-        if (it->label) elm_object_style_set(it->label, "segment_normal");
+        if (it->label)
+          {
+             snprintf(buf, sizeof(buf), "%s/segment_normal", elm_widget_style_get(obj));
+             elm_object_style_set(it->label, buf);
+          }
      }
 }
 
@@ -297,6 +312,7 @@ _mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
 {
    Widget_Data *wd;
    Elm_Segment_Item *it;
+   char buf[4096];
 
    it = data;
    if (!it) return;
@@ -309,7 +325,11 @@ _mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
    if (it == wd->selected_item) return;
 
    edje_object_signal_emit(it->base.view, "elm,state,segment,pressed", "elm");
-   if (it->label) elm_object_style_set(it->label, "segment_pressed");
+   if (it->label)
+     {
+        snprintf(buf, sizeof(buf), "%s/segment_pressed", elm_widget_style_get(wd->obj));
+        elm_object_style_set(it->label, buf);
+     }
 }
 
 static void
@@ -351,6 +371,7 @@ _update_list(Widget_Data *wd)
    Eina_List *l;
    Elm_Segment_Item *it = NULL;
    int index = 0;
+   char buf[4096];
 
    _position_items(wd);
 
@@ -366,7 +387,11 @@ _update_list(Widget_Data *wd)
         if (wd->selected_item == it)
           {
              edje_object_signal_emit(it->base.view, "elm,state,segment,selected", "elm");
-             if (it->label) elm_object_style_set(it->label, "segment_selected");
+             if (it->label)
+               {
+                  snprintf(buf, sizeof(buf), "%s/segment_selected", elm_widget_style_get(wd->obj));
+                  elm_object_style_set(it->label, buf);
+               }
           }
         else
           edje_object_signal_emit(it->base.view, "elm,state,segment,normal", "elm");
@@ -374,7 +399,11 @@ _update_list(Widget_Data *wd)
         if (elm_widget_disabled_get(wd->obj))
           {
              edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
-             if (it->label) elm_object_style_set(it->label, "segment_disabled");
+             if (it->label)
+               {
+                  snprintf(buf, sizeof(buf), "%s/segment_disabled", elm_widget_style_get(wd->obj));
+                  elm_object_style_set(it->label, buf);
+               }
           }
 
         _swallow_item_objects(it);
@@ -398,7 +427,11 @@ _update_list(Widget_Data *wd)
         if (wd->selected_item == it)
           {
              edje_object_signal_emit(it->base.view, "elm,state,segment,selected", "elm");
-             if (it->label) elm_object_style_set(it->label, "segment_selected");
+             if (it->label)
+               {
+                  snprintf(buf, sizeof(buf), "%s/segment_selected", elm_widget_style_get(wd->obj));
+                  elm_object_style_set(it->label, buf);
+               }
           }
         else
           edje_object_signal_emit(it->base.view, "elm,state,segment,normal", "elm");
@@ -406,7 +439,11 @@ _update_list(Widget_Data *wd)
         if (elm_widget_disabled_get(wd->obj))
            {
               edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
-              if (it->label) elm_object_style_set(it->label, "segment_disabled");
+              if (it->label)
+                {
+                   snprintf(buf, sizeof(buf), "%s/segment_disabled", elm_widget_style_get(wd->obj));
+                   elm_object_style_set(it->label, buf);
+                }
            }
 
         _swallow_item_objects(it);
@@ -433,6 +470,7 @@ _item_new(Evas_Object *obj, Evas_Object *icon, const char *label )
 {
    Elm_Segment_Item *it;
    Widget_Data *wd;
+   char buf[4096];
 
    wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
@@ -451,7 +489,8 @@ _item_new(Evas_Object *obj, Evas_Object *icon, const char *label )
      {
         it->label = elm_label_add(obj);
         elm_widget_sub_object_add(it->base.view, it->label);
-        elm_object_style_set(it->label, "segment_normal");
+        snprintf(buf, sizeof(buf), "%s/segment_normal", elm_widget_style_get(obj));
+        elm_object_style_set(it->label, buf);
         elm_label_label_set(it->label, label);
         elm_label_ellipsis_set(it->label, EINA_TRUE);
         evas_object_show(it->label);
@@ -653,6 +692,7 @@ elm_segment_control_item_label_set(Elm_Segment_Item* it, const char* label)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    Widget_Data *wd;
+   char buf[4096];
 
    wd = elm_widget_item_data_get(it);
    if (!wd) return;
@@ -665,10 +705,17 @@ elm_segment_control_item_label_set(Elm_Segment_Item* it, const char* label)
         elm_label_label_set(it->label, label);
         elm_label_ellipsis_set(it->label, EINA_TRUE);
         evas_object_show(it->label);
+
         if(wd->selected_item == it )
-          elm_object_style_set(it->label, "segment_selected");
+          {
+             snprintf(buf, sizeof(buf), "%s/segment_selected", elm_widget_style_get(wd->obj));
+             elm_object_style_set(it->label, buf);
+          }
         else
-          elm_object_style_set(it->label, "segment_normal");
+          {
+             snprintf(buf, sizeof(buf), "%s/segment_normal", elm_widget_style_get(wd->obj));
+             elm_object_style_set(it->label, buf);
+          }
      }
    else if (!label && it->label) // Delete Label Object
      {
