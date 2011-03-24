@@ -387,7 +387,7 @@ _disable_hook(Evas_Object * obj)
           disabled = item->disable;
 
         if (item->style == OBJECT)
-          elm_widget_disabled_set(item->base, disabled);
+          if (item->base) elm_widget_disabled_set(item->base, disabled);
         else
           {
              if (disabled)
@@ -2140,6 +2140,23 @@ elm_controlbar_object_item_insert_after(Evas_Object * obj,
 }
 
 /**
+ * Get the object of the object item
+ *
+ * @param       it The item of controlbar
+ * @return      The object of the object item
+ *
+ * @ingroup Controlbar
+ */
+EAPI Evas_Object *
+elm_controlbar_object_item_object_get(Elm_Controlbar_Item * it)
+{
+   if (!it) return NULL;
+   if (it->style != OBJECT) return NULL;
+   if (!it->base) return NULL;
+   return it->base;
+}
+
+/**
  * Delete item from controlbar
  *
  * @param	it The item of controlbar
@@ -2539,7 +2556,7 @@ elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
    if (it->wd && it->wd->disabled) return;
 
    if (it->style == OBJECT)
-     elm_widget_disabled_set(it->base, it->disable);
+     if (it->base) elm_widget_disabled_set(it->base, it->disable);
    else
      {
         if (it->disable)
