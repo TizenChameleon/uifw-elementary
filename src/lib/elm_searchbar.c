@@ -132,6 +132,7 @@ static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info)
    if (text != NULL && strlen(text) > 0) elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
 
    evas_object_smart_callback_call(data, "cancel,clicked", NULL);
+   elm_object_unfocus(data);
 }
 
 static void
