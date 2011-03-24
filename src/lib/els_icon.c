@@ -167,7 +167,9 @@ _els_smart_icon_size_get(const Evas_Object *obj, int *w, int *h)
 
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
-   if (!strcmp(evas_object_type_get(sd->obj), "edje"))
+
+   const char *type = evas_object_type_get(sd->obj);
+   if ((type) && !strcmp(type, "edje"))
      edje_object_size_min_get(sd->obj, &tw, &th);
    else
      evas_object_image_size_get(sd->obj, &tw, &th);
@@ -424,7 +426,9 @@ _smart_reconfigure(Smart_Data *sd)
    Evas_Coord x, y, w, h;
 
    if (!sd->obj) return;
-   if (!strcmp(evas_object_type_get(sd->obj), "edje"))
+
+   const char *type = evas_object_type_get(sd->obj);
+   if ((type) && !strcmp(type, "edje"))
      {
 	w = sd->w;
 	h = sd->h;
