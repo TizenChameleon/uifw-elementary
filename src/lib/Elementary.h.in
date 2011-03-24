@@ -2826,6 +2826,7 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, Evas_Object *obj_item, const int sel);
+   EAPI Evas_Object *elm_controlbar_object_item_object_get(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_del(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_select(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
