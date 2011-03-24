@@ -3657,7 +3657,6 @@ elm_genlist_clear(Evas_Object *obj)
         }
         return;
      }
-   wd->clear_me = EINA_FALSE;
    while (wd->items)
      {
         Elm_Genlist_Item *it = ELM_GENLIST_ITEM_FROM_INLIST(wd->items);
@@ -3678,12 +3677,13 @@ elm_genlist_clear(Evas_Object *obj)
         elm_widget_item_pre_notify_del(it);
         if (it->effect_item_realized) _effect_item_unrealize(it);        
         if (it->realized) _item_unrealize(it);
-        if (it->itc->func.del)
+        if (((wd->clear_me) || (!it->delete_me)) && (it->itc->func.del))
            it->itc->func.del((void *)it->base.data, it->base.widget);
         if (it->long_timer) ecore_timer_del(it->long_timer);
         if (it->swipe_timer) ecore_timer_del(it->swipe_timer);
         elm_widget_item_del(it);
      }
+   wd->clear_me = EINA_FALSE;
    wd->anchor_item = NULL;
    while (wd->blocks)
      {
@@ -4597,8 +4597,8 @@ elm_genlist_item_del(Elm_Genlist_Item *it)
              if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
              it->wd->calc_job = ecore_job_add(_calc_job, it->wd);
           }
-//        if (it->itc->func.del)
-//        it->itc->func.del((void *)it->base.data, it->base.widget);
+        if (it->itc->func.del)
+          it->itc->func.del((void *)it->base.data, it->base.widget);
         return;
      }
    _item_del(it);
