@@ -94,7 +94,6 @@ struct _Elm_Controlbar_Item
    Evas_Object * view;
    Evas_Object * label;
    Evas_Object * icon;
-   Evas_Object * icon_shadow;
    const char *icon_path;
    const char *text;
    void (*func) (void *data, Evas_Object * obj, void *event_info);
@@ -253,8 +252,6 @@ _item_del(Elm_Controlbar_Item *it)
      eina_stringshare_del(it->icon_path);
    if (it->icon)
      evas_object_del(it->icon);
-   if (it->icon_shadow)
-     evas_object_del(it->icon_shadow);
    if (it->base)
      {
         if (it->style != OBJECT)
@@ -1041,7 +1038,7 @@ create_item_icon(Evas_Object *obj, Elm_Controlbar_Item * it, char *part)
 }
 
 static Evas_Object *
-create_item_layout(Evas_Object * parent, Elm_Controlbar_Item * it, Evas_Object **item, Evas_Object **label, Evas_Object **icon, Evas_Object **sicon)
+create_item_layout(Evas_Object * parent, Elm_Controlbar_Item * it, Evas_Object **item, Evas_Object **label, Evas_Object **icon)
 {
 
    Evas_Object * obj;
@@ -1067,15 +1064,9 @@ create_item_layout(Evas_Object * parent, Elm_Controlbar_Item * it, Evas_Object *
    elm_layout_content_set(obj, "item", *item);
 
    if (it->text)
-     {
-        *label = create_item_label(*item, it, "elm.swallow.text");
-     }
+     *label = create_item_label(*item, it, "elm.swallow.text");
    if (it->icon_path)
-     {
-        *icon = create_item_icon(*item, it, "elm.swallow.icon");
-        *sicon = create_item_icon(*item, it, "elm.swallow.icon_shadow");
-        evas_object_color_set(*sicon, 0, 0, 0, 255);
-     }
+     *icon = create_item_icon(*item, it, "elm.swallow.icon");
    if (*label && *icon)
      {
         edje_object_signal_emit(_EDJ(*item), "elm,state,icon_text", "elm");
@@ -1129,7 +1120,7 @@ create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
    it->sel = 1;
    it->view = view;
    it->style = TABBAR;
-   it->base = create_item_layout(wd->edje, it, &(it->base_item), &(it->label), &(it->icon), &(it->icon_shadow));
+   it->base = create_item_layout(wd->edje, it, &(it->base_item), &(it->label), &(it->icon));
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN,
                                   bar_item_down_cb, wd);
    evas_object_show(it->base);
@@ -1168,7 +1159,7 @@ create_tool_item(Evas_Object * obj, const char *icon_path, const char *label,
    it->func = func;
    it->data = data;
    it->style = TOOLBAR;
-   it->base = create_item_layout(wd->edje, it, &(it->base_item), &(it->label), &(it->icon), &(it->icon_shadow));
+   it->base = create_item_layout(wd->edje, it, &(it->base_item), &(it->label), &(it->icon));
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN,
                                   bar_item_down_cb, wd);
    evas_object_show(it->base);
@@ -1436,7 +1427,7 @@ create_more_item(Widget_Data *wd, int style)
    it->view = create_more_view(wd);
    it->func = create_more_func;
    it->style = style;
-   it->base = create_item_layout(wd->edje, it, &(it->base_item), &(it->label), &(it->icon), &(it->icon_shadow));
+   it->base = create_item_layout(wd->edje, it, &(it->base_item), &(it->label), &(it->icon));
    evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN,
                                   bar_item_down_cb, wd);
    evas_object_show(it->base);
@@ -2265,17 +2256,11 @@ elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path)
         evas_object_del(it->icon);
         it->icon = NULL;
      }
-   if(it->icon_shadow)
-     {
-        evas_object_del(it->icon_shadow);
-        it->icon_shadow = NULL;
-     }
 
    if(icon_path != NULL)
      {
         it->icon_path = eina_stringshare_add(icon_path);
         it->icon = create_item_icon(it->base_item, it, "elm.swallow.icon");
-        it->icon_shadow = create_item_icon(it->base_item, it, "elm.swallow.icon_shadow");
      }
 
    if(it->label && it->icon)
