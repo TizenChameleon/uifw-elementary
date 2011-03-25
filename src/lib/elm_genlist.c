@@ -3908,18 +3908,21 @@ elm_genlist_at_xy_item_get(const Evas_Object *obj,
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord ox, oy, ow, oh;
+   Evas_Coord head_y = 0;
    Item_Block *itb;
    Evas_Coord lasty;
    if (!wd) return NULL;
    evas_object_geometry_get(wd->pan_smart, &ox, &oy, &ow, &oh);
    lasty = oy;
+
+   if (wd->select_all_item) head_y = wd->select_all_item->h;
    EINA_INLIST_FOREACH(wd->blocks, itb)
    {
       Eina_List *l;
       Elm_Genlist_Item *it;
 
       if (!ELM_RECTS_INTERSECT(ox + itb->x - itb->wd->pan_x,
-                               oy + itb->y - itb->wd->pan_y,
+                               oy + itb->y + head_y - itb->wd->pan_y,
                                itb->w, itb->h, x, y, 1, 1))
         continue;
       EINA_LIST_FOREACH(itb->items, l, it)
@@ -6240,6 +6243,7 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
    static Elm_Genlist_Item_Class itc;
    Eina_List *l;
    Elm_Genlist_Item *it;
+   int check_cnt = 0, total_cnt = 0;
 
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -6348,6 +6352,14 @@ elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *e
 
              wd->select_all_item->rel = NULL;
              wd->select_all_item->block = NULL;
+
+             EINA_INLIST_FOREACH(wd->items, it)
+               {
+                  if (it->edit_select_check) check_cnt++;
+                  total_cnt++;
+               }
+            if (check_cnt == total_cnt) wd->select_all_check = EINA_TRUE;
+            else wd->select_all_check = EINA_FALSE;
           }
      }
 
