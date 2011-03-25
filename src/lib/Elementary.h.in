@@ -1937,16 +1937,6 @@ extern "C" {
    EAPI Evas_Object      *elm_segment_control_item_object_get(const Elm_Segment_Item *it) EINA_ARG_NONNULL(1);
    EAPI Elm_Segment_Item *elm_segment_control_item_selected_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void              elm_segment_control_item_selected_set(Elm_Segment_Item *it, Eina_Bool select) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI int               elm_segment_control_get_segment_count(Evas_Object *obj);
-   EINA_DEPRECATED EAPI Elm_Segment_Item *elm_segment_control_selected_segment_get(const Evas_Object *obj, int *value);
-   EINA_DEPRECATED EAPI Evas_Object      *elm_segment_control_get_segment_icon_at(Evas_Object *obj, unsigned int index);
-   EINA_DEPRECATED EAPI const char       *elm_segment_control_get_segment_label_at(Evas_Object *obj, unsigned int index);
-   EINA_DEPRECATED EAPI void              elm_segment_control_delete_segment_at(Evas_Object *obj, unsigned int index, Eina_Bool animate);
-   EINA_DEPRECATED EAPI void              elm_segment_control_delete_segment(Evas_Object *obj, Elm_Segment_Item *item, Eina_Bool animate);
-   EINA_DEPRECATED EAPI void              elm_segment_control_insert_segment_at(Evas_Object *obj, Evas_Object *icon, const char *label, unsigned int index, Eina_Bool animate);
-   EINA_DEPRECATED EAPI Elm_Segment_Item *elm_segment_control_add_segment(Evas_Object *obj, Evas_Object *icon, const char *label, Eina_Bool animate);
-   EINA_DEPRECATED EAPI Evas_Object      *elm_segment_control_item_label_object_set(Elm_Segment_Item *item, char *label);
-
 
    EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
    EAPI void         elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count);
