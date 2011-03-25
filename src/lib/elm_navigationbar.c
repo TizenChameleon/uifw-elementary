@@ -1180,7 +1180,7 @@ _elm_navigationbar_function_button1_set(Evas_Object *obj, Evas_Object *content, 
              changed = _button_set(obj, it->fn_btn1, button, EINA_FALSE);
              it->fn_btn1 = button;
              _item_sizing_eval(it);
-             return;
+             break;
           }
      }
 
