@@ -15,7 +15,7 @@
 #define MIN_GRP_SIZE 2 //for symmetry it is 2, otherwise it can be 1 and zero have no meaning.
 #define MIN_PIXEL_VALUE 1 //Min pixel value is highly dependent on touch sensitivity support.
 #define MIN_OBJ_HEIGHT 24 //should be taken from .edc file.
-
+#define POPUPTEXTLEN 5
 /*
  *  use for find view toplevel
  */
@@ -36,6 +36,7 @@ struct _Widget_Data
    Evas_Object *event[2];
    Evas_Object *bx[2]; // 2 - for now all that's supported
    Eina_List *items; // 1 list. yes N levels, but only 2 for now and # of items will be small
+   char popup_str[2][POPUPTEXTLEN];
    int level;
    int max_supp_items_count;
    int tot_items_count[2];
@@ -52,7 +53,6 @@ struct _Widget_Data
    Eina_Bool down : 1;
    Eina_Bool hide_button : 1;
    double scale_factor;
-
 };
 
 struct _Elm_Index_Item
@@ -445,19 +445,25 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
    if (!last) last = strdup("");
    if(!wd->hide_button)
      {
+        char popup_text[POPUPTEXTLEN * 2 + 1];
         if(view_level == 0)
           {
+             strcpy(wd->popup_str[1], "");
              if(last)
                {
-                  edje_object_part_text_set(wd->base, "elm.text.body", last);
+                  strncpy(wd->popup_str[0], last, POPUPTEXTLEN - 1);
+                  wd->popup_str[0][POPUPTEXTLEN - 1] = '\0';
                   edje_object_signal_emit(wd->base, "hide_2nd_level", "");
                }
           }
         if(view_level == 1 && wd->level_active[1])
           {
-             edje_object_part_text_set(wd->base, "elm.text", last);
+             strncpy(wd->popup_str[1], last, POPUPTEXTLEN);
+             wd->popup_str[1][POPUPTEXTLEN - 1] = '\0';
              edje_object_signal_emit(wd->base, "hide_first_level", "");
           }
+        snprintf(popup_text, POPUPTEXTLEN * 2 + 1, "%s%s", wd->popup_str[0], wd->popup_str[1]);
+        edje_object_part_text_set(wd->base, "elm.text", popup_text);
      }
 
    if(label)
