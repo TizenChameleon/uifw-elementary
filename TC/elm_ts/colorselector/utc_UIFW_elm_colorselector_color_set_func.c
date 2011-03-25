@@ -79,8 +79,14 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_colorselector_color_set_func_01(void)
 {
-   	elm_colorselector_color_set(colorselector, 255, 255, 255, 255);
-	tet_result(TET_PASS);
+   int r, g, b, a;
+   r = g = b = a = -1;
+   elm_colorselector_color_set(colorselector, 255, 255, 255, 255);
+   elm_colorselector_color_get(colorselector, &r, &g, &b, &a);
+   if( (r == 255) && (g == 255) && (b == 255) && (a == 255) )
+     tet_result(TET_PASS);
+   else
+     tet_result(TET_FAIL);
 }
 
 /**
@@ -88,6 +94,6 @@ static void utc_UIFW_elm_colorselector_color_set_func_01(void)
  */
 static void utc_UIFW_elm_colorselector_color_set_func_02(void)
 {
-   	elm_colorselector_color_set(NULL, 255, 255, 255, 255);
-	tet_result(TET_PASS);
+   elm_colorselector_color_set(NULL, -1, -1, -1, -1);
+   tet_result(TET_PASS);
 }
