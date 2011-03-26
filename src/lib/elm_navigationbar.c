@@ -283,15 +283,15 @@ _switch_titleobj_visibility(void *data, Evas_Object *obj , const char *emission,
 
    if(it->content != top) return;
    if(!it->title_obj) return;
-   if(!it->titleobj_visible)
+   if(it->titleobj_visible)
      {
         edje_object_signal_emit(wd->base, "elm,state,show,title", "elm");
-        it->titleobj_visible = EINA_TRUE;
+        it->titleobj_visible = EINA_FALSE;
      }
    else
      {
         edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm");
-        it->titleobj_visible = EINA_FALSE;
+        it->titleobj_visible = EINA_TRUE;
      }
    _item_sizing_eval(it);
 }
@@ -395,17 +395,12 @@ _transition_complete_cb(void *data)
           edje_object_signal_emit(wd->base, "elm,state,item,reset,rightpad2", "elm");
 
         if ((it->title_obj) && (it->title))
-          {
-             edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
-          }
+           edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
         else
-             edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
+           edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
 
         content = it->content;
      }
-
-   edje_object_message_signal_process(wd->base);
-
 }
 
 static void
@@ -988,6 +983,7 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
              edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
              if (wd->title_visible)
                {
+                  //TODO: Will be removed.
                   if (it->fn_btn3)
                     {
                        edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
@@ -998,8 +994,9 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
                        edje_object_signal_callback_add(wd->base, "elm,action,clicked", "elm",
                                                        _switch_titleobj_visibility, it);
                        edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
+                       //TODO: for before nbeat?
                        edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
-                    }
+                  }
                }
              _item_sizing_eval(it);
           }
