@@ -484,6 +484,7 @@ elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const cha
    it->content = content;
    it->base = edje_object_add(evas_object_evas_get(obj));
    it->ct_base = edje_object_add(evas_object_evas_get(obj));
+   it->titleobj_visible = EINA_TRUE;
 
    evas_object_smart_member_add(it->base, obj);
    evas_object_smart_member_add(it->ct_base, obj);
