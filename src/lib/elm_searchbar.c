@@ -20,6 +20,7 @@ struct _Widget_Data
    Eina_Bool cancel_btn_ani_flag;
    Eina_Bool cancel_btn_show_mode;
    Eina_Bool boundary_mode;
+   Ecore_Idler *idler;
 };
 
 static void _del_hook(Evas_Object *obj);
@@ -35,6 +36,7 @@ static void _del_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
+   if (wd->idler) ecore_idler_del(wd->idler);
 
    free(wd);
 }
@@ -109,14 +111,23 @@ static void _clicked(void *data, Evas_Object *obj, void *event_info)
    evas_object_smart_callback_call(data, "clicked", NULL);
 }
 
+static Eina_Bool _delay_changed(void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+
+   if (!wd) return;
+   evas_object_smart_callback_call(data, "delay-changed", NULL);
+   wd->idler = NULL;
+   return ECORE_CALLBACK_CANCEL;
+}
+
 static void _changed(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
    if (!wd) return;
-
-   // TODO : inform to use entry changed callback 
-//   evas_object_smart_callback_call(data, "changed", NULL);
+   if (!wd->idler)
+      wd->idler = ecore_idler_add(_delay_changed, data);
 }
 
 static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info)
@@ -189,9 +200,6 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    if (wd->base == NULL) return NULL;
 
    _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default");
-
-   //	evas_object_size_hint_weight_set(wd->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   //	evas_object_size_hint_align_set(wd->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    // Add Entry
    wd->eb = elm_editfield_add(parent);
