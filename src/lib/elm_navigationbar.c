@@ -43,6 +43,7 @@ struct _Elm_Navigationbar_Item
    Evas_Object *fn_btn3;
    Evas_Object *back_btn;
    Evas_Object *content;
+   Evas_Object *icon;
    int fn_btn1_w;
    int fn_btn2_w;
    int fn_btn3_w;
@@ -155,6 +156,11 @@ _delete_item(Elm_Navigationbar_Item *it)
      {
         elm_widget_sub_object_del(it->obj, it->back_btn);
         evas_object_del(it->back_btn);
+     }
+   if(it->icon)
+     {
+        elm_widget_sub_object_del(it->obj, it->icon);
+        evas_object_del(it->icon);
      }
    if (it->fn_btn1)
      {
@@ -276,15 +282,15 @@ _switch_titleobj_visibility(void *data, Evas_Object *obj , const char *emission,
 
    if(it->content != top) return;
    if(!it->title_obj) return;
-   if(it->titleobj_visible)
+   if(!it->titleobj_visible)
      {
         edje_object_signal_emit(wd->base, "elm,state,show,title", "elm");
-        it->titleobj_visible = EINA_FALSE;
+        it->titleobj_visible = EINA_TRUE;
      }
    else
      {
         edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm");
-        it->titleobj_visible = EINA_TRUE;
+        it->titleobj_visible = EINA_FALSE;
      }
    _item_sizing_eval(it);
 }
@@ -328,12 +334,10 @@ _transition_complete_cb(void *data)
         if (prev_it->title_obj) evas_object_hide(prev_it->title_obj);
         if (prev_it->fn_btn2) evas_object_hide(prev_it->fn_btn2);
         if (prev_it->fn_btn3) evas_object_hide(prev_it->fn_btn3);
+        if (prev_it->icon) evas_object_hide(prev_it->icon);
      }
    if (it && wd->title_visible)
      {
-        /*always hide the extended title object*/
-        edje_object_signal_emit(wd->base, "elm,state,hide,noanimate,title", "elm");
-        it->titleobj_visible = EINA_FALSE;
         edje_object_part_text_set(wd->base, "elm.text", it->title);
 
         if (!cb->first_page)
@@ -386,12 +390,33 @@ _transition_complete_cb(void *data)
           }
         else
           edje_object_signal_emit(wd->base, "elm,state,item,reset,rightpad2", "elm");
+        if(it->icon)
+          {
+             edje_object_part_swallow(wd->base, "elm.swallow.icon", it->icon);
+             edje_object_signal_emit(wd->base, "elm,state,icon,visible", "elm");
+          }
+        else
+          edje_object_signal_emit(wd->base, "elm,state,icon,hidden", "elm");
 
         if ((it->title_obj) && (it->title))
-           edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
+          {
+             edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
+             if(it->titleobj_visible)
+               {
+                 //TODO: remove the dependency on these signals as related to nbeat, try to make it totally theme dependent
+                 edje_object_signal_emit(wd->base, "elm,state,show,noanimate,title", "elm");
+               }
+             else
+               //TODO: remove the dependency on these signals as related to nbeat, try to make it totally theme dependent
+               edje_object_signal_emit(wd->base, "elm,state,hide,noanimate,title", "elm");
+          }
         else
-           edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
-
+          {
+             edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
+             //TODO: remove the dependency on these signals as related to nbeat, try to make it totally theme dependent
+             edje_object_signal_emit(wd->base, "elm,state,hide,noanimate,title", "elm");
+             it->titleobj_visible = EINA_FALSE;
+          }
         content = it->content;
      }
 }
@@ -678,6 +703,7 @@ elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1
         else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
         if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
         if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
+        if (prev_it->icon) edje_object_part_unswallow(wd->base, prev_it->icon);
      }
    //If page is the first, then do not run the transition... but if user want.. ?
    else
@@ -761,6 +787,7 @@ elm_navigationbar_pop(Evas_Object *obj)
         else if (prev_it->back_btn) edje_object_part_unswallow(wd->base, prev_it->back_btn);
         if (prev_it->fn_btn2) edje_object_part_unswallow(wd->base, prev_it->fn_btn2);
         if (prev_it->fn_btn3) edje_object_part_unswallow(wd->base, prev_it->fn_btn3);
+        if (prev_it->icon) edje_object_part_unswallow(wd->base, prev_it->icon);
         _item_sizing_eval(it);
      }
    //This case, it's the last page.
@@ -914,7 +941,7 @@ elm_navigationbar_title_label_get(Evas_Object *obj, Evas_Object *content)
    Eina_List *ll;
    Elm_Navigationbar_Item *it;
 
-   if (!content) return;
+   if (!content) return NULL;
 
    wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
@@ -923,6 +950,98 @@ elm_navigationbar_title_label_get(Evas_Object *obj, Evas_Object *content)
      {
         if (it->content == content)
           return it->title;
+     }
+   return NULL;
+}
+
+/**
+ * Set the title icon for the pushed content
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] content The object to push or pushed
+ * @param[in] icon The icon object
+ *
+ * @ingroup NavigationBar
+ */
+EAPI void
+elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Object *icon)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_List *ll;
+   Elm_Navigationbar_Item *it;
+   Evas_Object *swallow;
+   Eina_Bool changed;
+
+   if (!wd) return;
+   if (content == NULL) return;
+   changed = EINA_FALSE;
+   EINA_LIST_FOREACH(wd->stack, ll, it)
+     {
+        if (it->content == content)
+          {
+             if (it->icon == icon) return;
+             if (it->icon) evas_object_del(it->icon);
+             it->icon = icon;
+             if(icon)
+               {
+                  changed = EINA_TRUE;
+                  elm_widget_sub_object_add(obj, icon);
+               }
+             _item_sizing_eval(it);
+             break;
+          }
+     }
+   //update if the content is the top item
+   if ((!it) || (!it->icon) || (!changed)) return;
+
+   ll = eina_list_last(wd->stack);
+   if (!ll) return;
+   it = ll->data;
+   if (it->content == content)
+     {
+        swallow = edje_object_part_swallow_get(wd->base, "elm.swallow.icon");
+        if (swallow)
+          {
+             edje_object_signal_emit(wd->base, "elm,state,icon,hidden", "elm");
+             edje_object_part_unswallow(wd->base, swallow);
+             evas_object_hide(swallow);
+          }
+        if (wd->title_visible)
+          {
+             edje_object_part_swallow(wd->base, "elm.swallow.icon", icon);
+             edje_object_signal_emit(wd->base, "elm,state,icon,visible", "elm");
+             edje_object_message_signal_process(wd->base);
+          }
+     }
+     else
+       edje_object_signal_emit(wd->base, "elm,state,icon,hidden", "elm");
+}
+
+/**
+ * Get the title icon for the pushed content
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] content The object to push or pushed
+ * @return The icon object or NULL if none
+ *
+ * @ingroup NavigationBar
+ */
+EAPI Evas_Object *
+elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype)NULL;
+   Widget_Data *wd;
+   Eina_List *ll;
+   Elm_Navigationbar_Item *it;
+
+   wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (content == NULL) return NULL;
+   EINA_LIST_FOREACH(wd->stack, ll, it)
+     {
+        if (it->content == content)
+          return it->icon;
      }
    return NULL;
 }
@@ -988,6 +1107,8 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
                                                        _switch_titleobj_visibility, it);
                        edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
                        //TODO: for before nbeat?
+                       edje_object_signal_emit(wd->base, "elm,state,show,noanimate,title", "elm");
+                       it->titleobj_visible = EINA_TRUE;
                        edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
                   }
                }
@@ -1051,6 +1172,7 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
                {
                   if(it->titleobj_visible)
                     {
+                      //TODO: remove the dependency on these signals as related to nbeat?
                        edje_object_signal_emit(wd->base, "elm,state,hide,noanimate,title", "elm");
                        it->titleobj_visible = EINA_FALSE;
                     }
@@ -1545,4 +1667,69 @@ elm_navigationbar_animation_disabled_set(Evas_Object *obj, Eina_Bool disable)
 
    elm_pager_animation_disabled_set(wd->pager, disable);
 }
+
+/**
+ * This shows/hides title object area.
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] show  if EINA_TRUE title object is shown else its hidden.
+ * @param[in] content  The content object packed in navigationbar.
+ * @ingroup NavigationBar
+ */
+EAPI void
+elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *content, Eina_Bool visible)
+{
+    ELM_CHECK_WIDTYPE(obj, widtype);
+    Elm_Navigationbar_Item *it;
+    Widget_Data *wd;
+    Evas_Object *top;
+
+    wd = elm_widget_data_get(obj);
+    if (!wd) return;
+    if (content == NULL) return;
+    top = elm_navigationbar_content_top_get(obj);
+    it = _check_item_is_added(obj, content);
+    if (!it) return;
+    if (!it->title_obj) return;
+    if (it->content == top)
+      {
+         if (visible)
+           {
+              edje_object_signal_emit(wd->base, "elm,state,show,title", "elm");
+              it->titleobj_visible = visible;
+           }
+         else
+           {
+              edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm");
+              it->titleobj_visible = visible;
+           }
+         _item_sizing_eval(it);
+      }
+    else
+      it->titleobj_visible = visible;
+}
+
+/**
+ * This gets the status whether title object is shown/hidden.
+ *
+ * @param[in] obj The NavigationBar object
+ * @param[in] content  The content object packed in navigationbar.
+ * @return The status whether title object is shown/hidden.
+ * @ingroup NavigationBar
+ */
+Eina_Bool
+elm_navigationbar_title_object_visible_get(Evas_Object *obj, Evas_Object *content)
+{
+    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+    Elm_Navigationbar_Item *it;
+    Widget_Data *wd;
+
+    wd = elm_widget_data_get(obj);
+    if (!wd) return EINA_FALSE;
+    if (content == NULL) return EINA_FALSE;
+    it = _check_item_is_added(obj, content);
+    if (!it) return EINA_FALSE;
+    return it->titleobj_visible;
+}
+
 

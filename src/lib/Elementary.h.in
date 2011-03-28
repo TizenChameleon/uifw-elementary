@@ -2749,6 +2749,10 @@ extern "C" {
    EAPI void         elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
    EAPI void         elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list);
    EAPI void         elm_navigationbar_animation_disabled_set(Evas_Object *obj, Eina_Bool disable);
+   EAPI void         elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *content, Eina_Bool visible);
+   Eina_Bool         elm_navigationbar_title_object_visible_get(Evas_Object *obj, Evas_Object *content);
+   EAPI void         elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Object *icon);
+   EAPI Evas_Object *elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content);
 
      /* NavigationBar */
    typedef enum 
