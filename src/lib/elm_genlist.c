@@ -2665,8 +2665,8 @@ _update_job(void *data)
         {
            if (it->updateme)
              {
-                itminw = it->w;
-                itminh = it->h;
+                itminw = it->minw;
+                itminh = it->minh;
 
                 it->updateme = EINA_FALSE;
                 if (it->realized)
