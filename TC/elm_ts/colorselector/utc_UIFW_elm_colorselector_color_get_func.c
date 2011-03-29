@@ -57,6 +57,7 @@ static void startup(void)
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);	
 	colorselector = elm_colorselector_add(main_win);
+	elm_colorselector_color_set(colorselector, 255, 255, 255, 255);
 	evas_object_show(colorselector);
 }
 
@@ -79,9 +80,12 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_colorselector_color_get_func_01(void)
 {
-	int r, g, b, a;
-   	elm_colorselector_color_get(colorselector, &r, &g, &b, &a);
-	tet_result(TET_PASS);
+   int r, g, b, a;
+   elm_colorselector_color_get(colorselector, &r, &g, &b, &a);
+   if( (r == 255) && (g == 255) && (b == 255) && (a == 255) )
+     tet_result(TET_PASS);
+   else
+     tet_result(TET_FAIL);
 }
 
 /**
@@ -89,7 +93,11 @@ static void utc_UIFW_elm_colorselector_color_get_func_01(void)
  */
 static void utc_UIFW_elm_colorselector_color_get_func_02(void)
 {
-	int r, g, b, a;
-   	elm_colorselector_color_get(NULL, &r, &g, &b, &a);
-	tet_result(TET_PASS);
+   int r, g, b, a;
+   r = g = b = a = -1;
+   elm_colorselector_color_get(NULL, &r, &g, &b, &a);
+   if( (r == -1) && (g == -1) && (b == -1) && (a == -1) )
+     tet_result(TET_PASS);
+   else
+     tet_result(TET_FAIL);
 }
