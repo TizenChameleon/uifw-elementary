@@ -251,16 +251,9 @@ _item_sizing_eval(Elm_Navigationbar_Item *it)
         it->fn_btn3_w = _button_size_set(it->fn_btn3);
         pad_count++;
      }
-   if ((it->titleobj_visible) && (it->title_list))
-     {
-        it->title_w = _button_size_set(wd->base);
-        it->title_obj = _multiple_object_set(it->obj, it->title_obj, it->title_list, it->title_w);
-        evas_object_resize(it->title_obj, it->title_w, height);
-        evas_object_size_hint_min_set(it->title_obj, it->title_w, height);
-     }
    if (it->title_list)
      {
-        it->title_w = _button_size_set(it->title_obj);
+        it->title_w = _button_size_set(wd->base);
         it->title_obj = _multiple_object_set(it->obj, it->title_obj, it->title_list, it->title_w);
         evas_object_resize(it->title_obj, it->title_w, height);
         evas_object_size_hint_min_set(it->title_obj, it->title_w, height);
