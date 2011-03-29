@@ -1182,7 +1182,7 @@ _elm_navigationbar_function_button1_set(Evas_Object *obj, Evas_Object *content, 
      }
 
    //update if the content is the top item
-   if ((!it->fn_btn1) || (!changed)) return;
+   if ((!it) || (!it->fn_btn1) || (!changed)) return;
 
    ll = eina_list_last(wd->stack);
    if (!ll) return;
@@ -1244,7 +1244,7 @@ _elm_navigationbar_function_button2_set(Evas_Object *obj, Evas_Object *content, 
      }
 
    //update if the content is the top item
-   if ((!it->fn_btn2) || (!changed)) return;
+   if ((!it) || (!it->fn_btn2) || (!changed)) return;
 
    ll = eina_list_last(wd->stack);
    if (!ll) return;
@@ -1301,7 +1301,7 @@ _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, 
      }
 
    //update if the content is the top item
-   if ((!it->fn_btn3) || (!changed)) return;
+   if ((!it) || (!it->fn_btn3) || (!changed)) return;
 
    ll = eina_list_last(wd->stack);
    if (!ll) return;
