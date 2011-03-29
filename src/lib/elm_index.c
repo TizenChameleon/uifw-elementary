@@ -15,7 +15,6 @@
 #define MIN_GRP_SIZE 2 //for symmetry it is 2, otherwise it can be 1 and zero have no meaning.
 #define MIN_PIXEL_VALUE 1 //Min pixel value is highly dependent on touch sensitivity support.
 #define MIN_OBJ_HEIGHT 24 //should be taken from .edc file.
-#define POPUPTEXTLEN 5
 /*
  *  use for find view toplevel
  */
@@ -36,7 +35,7 @@ struct _Widget_Data
    Evas_Object *event[2];
    Evas_Object *bx[2]; // 2 - for now all that's supported
    Eina_List *items; // 1 list. yes N levels, but only 2 for now and # of items will be small
-   char popup_str[2][POPUPTEXTLEN];
+   char *popup_str[2];
    int level;
    int max_supp_items_count;
    int tot_items_count[2];
@@ -93,6 +92,8 @@ _del_hook(Evas_Object *obj)
    _index_box_clear(obj, wd->bx[0], 0);
    EINA_LIST_FOREACH(wd->items, l, it) clear = eina_list_append(clear, it);
    EINA_LIST_FREE(clear, it) _item_free(it);
+   if(wd->popup_str[0]) free(wd->popup_str[0]);
+   if(wd->popup_str[1]) free(wd->popup_str[1]);
    if (wd->delay) ecore_timer_del(wd->delay);
    free(wd);
 }
@@ -445,25 +446,28 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
    if (!last) last = strdup("");
    if(!wd->hide_button)
      {
-        char popup_text[POPUPTEXTLEN * 2 + 1];
+        char *popup_text;
+
         if(view_level == 0)
           {
-             strcpy(wd->popup_str[1], "");
-             if(last)
-               {
-                  strncpy(wd->popup_str[0], last, POPUPTEXTLEN - 1);
-                  wd->popup_str[0][POPUPTEXTLEN - 1] = '\0';
-                  edje_object_signal_emit(wd->base, "hide_2nd_level", "");
-               }
+             if (wd->popup_str[1]) wd->popup_str[1][0] = '\0';
+             wd->popup_str[0] = (char *)realloc(wd->popup_str[0], (sizeof(char) * strlen(last) + 1));
+
+             strcpy(wd->popup_str[0], last);
+             edje_object_signal_emit(wd->base, "hide_2nd_level", "");
           }
-        if(view_level == 1 && wd->level_active[1])
+        if (view_level == 1 && wd->level_active[1])
           {
-             strncpy(wd->popup_str[1], last, POPUPTEXTLEN);
-             wd->popup_str[1][POPUPTEXTLEN - 1] = '\0';
+             wd->popup_str[1] = (char *)realloc(wd->popup_str[1], (sizeof(char) * strlen(last) + 1));
+
+             strcpy(wd->popup_str[1], last);
              edje_object_signal_emit(wd->base, "hide_first_level", "");
           }
-        snprintf(popup_text, POPUPTEXTLEN * 2 + 1, "%s%s", wd->popup_str[0], wd->popup_str[1]);
+        popup_text = (char *)malloc(sizeof(char) * (strlen(wd->popup_str[0]) + strlen(wd->popup_str[1]) + 1));
+        sprintf(popup_text, "%s%s", wd->popup_str[0], wd->popup_str[1]);
         edje_object_part_text_set(wd->base, "elm.text", popup_text);
+
+        free(popup_text);
      }
 
    if(label)
@@ -718,6 +722,8 @@ elm_index_add(Evas_Object *parent)
    else
      wd->min_1st_level_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
    _sizing_eval(obj);
+   wd->popup_str[0] = calloc(1, sizeof(char) * 1);
+   wd->popup_str[1] = calloc(1, sizeof(char) * 1);
    return obj;
 }
 
