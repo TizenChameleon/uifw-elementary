@@ -3454,6 +3454,8 @@ elm_genlist_item_append(Evas_Object                  *obj,
         if (ll) it2 = ll->data;
         it->parent->items = eina_list_append(it->parent->items, it);
         if (!it2) it2 = it->parent;
+        if (it2->delete_me)
+           it2 = elm_genlist_item_prev_get(it2);
         wd->items =
           eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
                                       EINA_INLIST_GET(it2));
@@ -3516,6 +3518,8 @@ elm_genlist_item_prepend(Evas_Object                  *obj,
         if (ll) it2 = ll->data;
         it->parent->items = eina_list_prepend(it->parent->items, it);
         if (!it2) it2 = it->parent;
+        if (it2->delete_me)
+           it2 = elm_genlist_item_next_get(it2);
         wd->items =
            eina_inlist_prepend_relative(wd->items, EINA_INLIST_GET(it),
                                         EINA_INLIST_GET(it2));
