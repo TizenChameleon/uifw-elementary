@@ -304,7 +304,7 @@ struct _Widget_Data
    Eina_List        *group_items;
    Pan              *pan;
    Evas_Coord        pan_x, pan_y, w, h, minw, minh, realminw, prev_viewport_w;
-   Ecore_Job        *calc_job, *update_job, *changed_job;
+   Ecore_Job        *calc_job, *update_job;
    Ecore_Idler      *queue_idler;
    Ecore_Idler      *must_recalc_idler;
    Eina_List        *queue, *selected;
@@ -373,6 +373,7 @@ struct _Widget_Data
    Evas_Coord        expand_item_gap;
    int               move_effect_mode;
    unsigned int      start_time;
+   Ecore_Job        *changed_job;
 };
 
 struct _Item_Block
