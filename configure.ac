@@ -326,7 +326,7 @@ fi
 
 ELM_EDBUS_DEF="#undef"
 have_elementary_edbus="no"
-want_elementary_edbus="auto"
+want_elementary_edbus="no"
 AC_ARG_ENABLE([edbus],
    [AC_HELP_STRING([--disable-edbus], [disable edbus support. @<:@default=detect@:>@])],
    [want_elementary_edbus=$enableval], [])
@@ -355,7 +355,7 @@ AC_SUBST(ELM_EDBUS_DEF)
 
 ELM_EFREET_DEF="#undef"
 have_elementary_efreet="no"
-want_elementary_efreet="auto"
+want_elementary_efreet="no"
 AC_ARG_ENABLE([efreet],
    [AC_HELP_STRING([--disable-efreet], [disable efreet support. @<:@default=detect@:>@])],
    [want_elementary_efreet=$enableval], [])
