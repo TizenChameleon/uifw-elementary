@@ -86,6 +86,42 @@ static void _switch_titleobj_visibility(void *data, Evas_Object *obj, const char
 
 #define PREV_BUTTON_DEFAULT_LABEL "Previous"
 
+static void _content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Elm_Navigationbar_Item *it = data;
+   it->content = NULL;
+   //TODO: it will be better remove this page?
+}
+
+//TODO: Conisder to make fn_btn_del to one function
+static void
+_fn_btn1_del(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Elm_Navigationbar_Item *it = data;
+   it->fn_btn1 = NULL;
+}
+
+static void
+_fn_btn2_del(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Elm_Navigationbar_Item *it = data;
+   it->fn_btn2 = NULL;
+}
+
+static void
+_fn_btn3_del(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Elm_Navigationbar_Item *it = data;
+   it->fn_btn3 = NULL;
+}
+
+static void
+_back_btn_del(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Elm_Navigationbar_Item *it = data;
+   it->back_btn = NULL;
+}
+
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -154,7 +190,7 @@ _delete_item(Elm_Navigationbar_Item *it)
 
    if(it->back_btn)
      {
-        elm_widget_sub_object_del(it->obj, it->back_btn);
+        evas_object_event_callback_del(it->back_btn, EVAS_CALLBACK_DEL, _back_btn_del);
         evas_object_del(it->back_btn);
      }
    if(it->icon)
@@ -164,19 +200,19 @@ _delete_item(Elm_Navigationbar_Item *it)
      }
    if (it->fn_btn1)
      {
-        elm_widget_sub_object_del(it->obj, it->fn_btn1);
+        evas_object_event_callback_del(it->fn_btn1, EVAS_CALLBACK_DEL, _fn_btn1_del);
         elm_object_unfocus(it->fn_btn1);
         evas_object_del(it->fn_btn1);
      }
    if (it->fn_btn2)
      {
-        elm_widget_sub_object_del(it->obj, it->fn_btn2);
+        evas_object_event_callback_del(it->fn_btn2, EVAS_CALLBACK_DEL, _fn_btn2_del);
         elm_object_unfocus(it->fn_btn2);
         evas_object_del(it->fn_btn2);
      }
    if (it->fn_btn3)
      {
-        elm_widget_sub_object_del(it->obj, it->fn_btn3);
+        evas_object_event_callback_del(it->fn_btn3, EVAS_CALLBACK_DEL, _fn_btn3_del);
         elm_object_unfocus(it->fn_btn3);
         evas_object_del(it->fn_btn3);
      }
@@ -192,6 +228,10 @@ _delete_item(Elm_Navigationbar_Item *it)
           evas_object_del(list_obj);
         eina_list_free(it->title_list);
      }
+
+   if (it->content)
+      evas_object_event_callback_del(it->content, EVAS_CALLBACK_DEL, _content_del);
+
    free(it);
 }
 
@@ -487,13 +527,6 @@ _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_
    return changed;
 }
 
-static void _content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
-{
-   Elm_Navigationbar_Item *it = data;
-   it->content = NULL;
-   //TODO: it will be better remove this page?
-}
-
 static Elm_Navigationbar_Item *
 _check_item_is_added(Evas_Object *obj, Evas_Object *content)
 {
@@ -666,24 +699,29 @@ elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1
    it->fn_btn2 = fn_btn2;
    it->fn_btn3 = fn_btn3;
 
+   if (fn_btn1) evas_object_event_callback_add(fn_btn1, EVAS_CALLBACK_DEL, _fn_btn1_del, it);
+   if (fn_btn2) evas_object_event_callback_add(fn_btn2, EVAS_CALLBACK_DEL, _fn_btn2_del, it);
+   if (fn_btn3) evas_object_event_callback_add(fn_btn3, EVAS_CALLBACK_DEL, _fn_btn3_del, it);
+
    it->content = content;
    //TODO: if contnet is not added yet and not null.
    evas_object_event_callback_add(it->content, EVAS_CALLBACK_DEL, _content_del, it);
 
    //Add a prev-button automatically.
    if ((!fn_btn1) && (prev_it))
-   {
-      it->back_btn = elm_button_add(obj);
+     {
+        it->back_btn = elm_button_add(obj);
 
-      if (prev_it->title)
-        elm_button_label_set(it->back_btn, prev_it->title);
-      else
-        elm_button_label_set(it->back_btn, PREV_BUTTON_DEFAULT_LABEL);
+        if (prev_it->title)
+           elm_button_label_set(it->back_btn, prev_it->title);
+        else
+           elm_button_label_set(it->back_btn, PREV_BUTTON_DEFAULT_LABEL);
 
-      evas_object_smart_callback_add(it->back_btn, "clicked", _back_button_clicked, it);
-      _button_set(obj, NULL, it->back_btn, EINA_TRUE);
-      elm_object_focus_allow_set(it->back_btn, EINA_FALSE);
-   }
+        evas_object_smart_callback_add(it->back_btn, "clicked", _back_button_clicked, it);
+        _button_set(obj, NULL, it->back_btn, EINA_TRUE);
+        elm_object_focus_allow_set(it->back_btn, EINA_FALSE);
+        if (it->back_btn) evas_object_event_callback_add(it->back_btn, EVAS_CALLBACK_DEL, _back_btn_del, it);
+     }
 
    eina_stringshare_replace(&it->title, title);
    edje_object_part_text_set(wd->base, "elm.text", title);
@@ -1299,6 +1337,8 @@ _elm_navigationbar_function_button1_set(Evas_Object *obj, Evas_Object *content, 
    //update if the content is the top item
    if ((!it) || (!it->fn_btn1) || (!changed)) return;
 
+   evas_object_event_callback_add(button, EVAS_CALLBACK_DEL, _fn_btn1_del, it);
+
    ll = eina_list_last(wd->stack);
    if (!ll) return;
 
@@ -1361,6 +1401,8 @@ _elm_navigationbar_function_button2_set(Evas_Object *obj, Evas_Object *content, 
    //update if the content is the top item
    if ((!it) || (!it->fn_btn2) || (!changed)) return;
 
+   evas_object_event_callback_add(button, EVAS_CALLBACK_DEL, _fn_btn2_del, it);
+
    ll = eina_list_last(wd->stack);
    if (!ll) return;
 
@@ -1417,6 +1459,8 @@ _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, 
 
    //update if the content is the top item
    if ((!it) || (!it->fn_btn3) || (!changed)) return;
+
+   evas_object_event_callback_add(button, EVAS_CALLBACK_DEL, _fn_btn3_del, it);
 
    ll = eina_list_last(wd->stack);
    if (!ll) return;
