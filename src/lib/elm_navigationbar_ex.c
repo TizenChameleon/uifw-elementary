@@ -393,7 +393,7 @@ _process_deletions(Widget_Data *wd)
 }
 
 static void
-_show_hide_titleobj(void *data, Evas_Object *obj , const char *emission, const char *source)
+_switch_titleobj_visibility(void *data, Evas_Object *obj , const char *emission, const char *source)
 {
    Elm_Navigationbar_ex_Item *item = (Elm_Navigationbar_ex_Item *)data;
    if(!item) return;
@@ -761,7 +761,7 @@ elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item, Evas
         elm_widget_sub_object_add(item->obj,title_obj);
         edje_object_part_swallow(item->base, "elm.swallow.title", title_obj);
         edje_object_signal_callback_add(item->base, "elm,action,clicked", "elm",
-                                        _show_hide_titleobj, item);
+                                        _switch_titleobj_visibility, item);
      }
    _sizing_eval(item->obj);
 }
@@ -1106,6 +1106,39 @@ elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    wd->disable_animation = disable;
+}
+
+/**
+ * This shows/hides title object area.
+ *
+ * @param[in] item The Navigationbar_ex item
+ * @param[in] visible  if EINA_TRUE title object is shown else its hidden.
+ * @ingroup Navigationbar_ex
+ */
+EAPI void
+elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, Eina_Bool visible)
+{
+   if(!item) return;
+   if(!item->title_obj) return;
+   if(visible)
+     edje_object_signal_emit(item->base, "elm,state,show,title", "elm");
+   else
+     edje_object_signal_emit(item->base, "elm,state,hide,title", "elm");
+   item->titleobj_visible = visible;
+}
+
+/**
+ * This gets the status whether title object is shown/hidden.
+ *
+ * @param[in] item The Navigationbar_ex item
+ * @return The status whether title object is shown/hidden.
+ * @ingroup Navigationbar_ex
+ */
+Eina_Bool
+elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item)
+{
+   if (!item) return NULL;
+   return item->titleobj_visible;
 }
 
 
