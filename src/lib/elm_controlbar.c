@@ -384,7 +384,9 @@ _disable_hook(Evas_Object * obj)
           disabled = item->disable;
 
         if (item->style == OBJECT)
-          if (item->base) elm_widget_disabled_set(item->base, disabled);
+          {
+             if (item->base) elm_widget_disabled_set(item->base, disabled);
+          }
         else
           {
              if (disabled)
@@ -2541,7 +2543,9 @@ elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
    if (it->wd && it->wd->disabled) return;
 
    if (it->style == OBJECT)
-     if (it->base) elm_widget_disabled_set(it->base, it->disable);
+     {
+        if (it->base) elm_widget_disabled_set(it->base, it->disable);
+     }
    else
      {
         if (it->disable)
