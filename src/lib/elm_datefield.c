@@ -101,6 +101,7 @@ _del_hook(Evas_Object *obj)
    if (!wd) return ;
 
    ecore_event_handler_del(wd->handler);
+   ecore_idler_del(wd->idler);
 
    free(wd);
 }
@@ -111,7 +112,7 @@ _on_focus_hook(void *data, Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->base) return ;
 
-   if (elm_widget_focus_get(obj)) wd->idler = ecore_idler_add(_focus_idler_cb, obj);
+   if ((elm_widget_focus_get(obj))&&(!wd->idler))  wd->idler = ecore_idler_add(_focus_idler_cb, obj);
 }
 
 static void
@@ -536,7 +537,7 @@ _check_date_boundary(Evas_Object *obj, int num, int flag)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (flag == DATE_YEAR)
      {
-        if (num > wd->y_max) num = wd->y_max;
+        if ((num > wd->y_max)&&(wd->y_max > wd->y_min)) num = wd->y_max;
         else if (num < wd->y_min) num = wd->y_min;
         return num;
      }
