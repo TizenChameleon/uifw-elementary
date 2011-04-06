@@ -300,7 +300,7 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
         edje_object_signal_emit(it->base.view, "elm,state,segment,normal", "elm");
         if (it->label)
           {
-             snprintf(buf, sizeof(buf), "%s/segment_normal", elm_widget_style_get(obj));
+             snprintf(buf, sizeof(buf), "%s/segment_normal", elm_widget_style_get(wd->obj));
              elm_object_style_set(it->label, buf);
           }
      }
