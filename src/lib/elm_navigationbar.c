@@ -81,6 +81,14 @@ static void _elm_navigationbar_function_button2_set(Evas_Object *obj, Evas_Objec
 static void _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, Evas_Object *new_btn, Elm_Navigationbar_Item *it);
 static void _switch_titleobj_visibility(void *data, Evas_Object *obj, const char *emission, const char *source);
 
+static const char SIG_HIDE_FINISHED[] = "hide,finished";
+static const char SIG_TITLE_OBJ_VISIBLE_CHANGED[] = "titleobj,visible,changed";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+       {SIG_HIDE_FINISHED, ""},
+       {SIG_TITLE_OBJ_VISIBLE_CHANGED, ""},
+       {NULL, NULL}
+};
 
 static void _content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
@@ -335,12 +343,16 @@ _switch_titleobj_visibility(void *data, Evas_Object *obj , const char *emission,
    if(!it->title_obj) return;
    if(!it->titleobj_visible)
      {
+        //elm,state,title,show?
         edje_object_signal_emit(wd->base, "elm,state,show,title", "elm");
+        evas_object_smart_callback_call(it->obj, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_TRUE);
         it->titleobj_visible = EINA_TRUE;
      }
    else
      {
+        //elm,state,title,hide?
         edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm");
+        evas_object_smart_callback_call(it->obj, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_FALSE);
         it->titleobj_visible = EINA_FALSE;
      }
    _item_sizing_eval(it);
@@ -485,7 +497,7 @@ _hide_finished(void *data, Evas_Object *obj, void *event_info)
    Evas_Object *navi_bar = data;
    Widget_Data *wd =  elm_widget_data_get(navi_bar);
    wd->popping = EINA_FALSE;
-   evas_object_smart_callback_call(navi_bar, "hide,finished", event_info);
+   evas_object_smart_callback_call(navi_bar, SIG_HIDE_FINISHED, event_info);
    edje_object_signal_emit(wd->base, "elm,state,rect,disabled", "elm");
 }
 
@@ -658,6 +670,8 @@ elm_navigationbar_add(Evas_Object *parent)
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);
 
    wd->title_visible = EINA_TRUE;
+
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    return obj;
 }
