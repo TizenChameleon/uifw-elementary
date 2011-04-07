@@ -740,7 +740,13 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 
    // add button
    btn = edje_object_add(evas_object_evas_get(obj));
-   _elm_theme_object_set(obj, btn, "multibuttonentry", "btn", elm_widget_style_get(obj));
+
+   const char *btn_style = edje_object_data_get(wd->base,"button");
+
+   if (!btn_style || !strcmp(btn_style,"rect"))
+     _elm_theme_object_set(obj,btn,"multibuttonentry","rect_btn",elm_widget_style_get(obj));
+   else
+     _elm_theme_object_set(obj, btn, "multibuttonentry", "btn", elm_widget_style_get(obj));
    edje_object_signal_callback_add(btn, "mouse,clicked,1", "*", _button_clicked, obj);
    evas_object_size_hint_weight_set(btn, 0.0, 0.0);
    evas_object_show(btn);
