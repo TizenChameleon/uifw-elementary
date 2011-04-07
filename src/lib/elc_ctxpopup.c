@@ -115,11 +115,9 @@ static void _item_label_set(Elm_Ctxpopup_Item *item, const char *label);
 static void _remove_items(Widget_Data * wd);
 
 static const char SIG_DISMISSED[] = "dismissed";
-static const char SIG_HIDE[] = "hide";
 
 static const Evas_Smart_Cb_Description _signals[] = {
        {SIG_DISMISSED, ""},
-       {SIG_HIDE, ""},       //TOOD: Remove!!
        {NULL, NULL}
 };
 
@@ -777,7 +775,6 @@ _hide(Evas_Object *obj)
    _scroller_size_reset(wd);
 
    evas_object_smart_callback_call(obj, SIG_DISMISSED, NULL);
-   evas_object_smart_callback_call(obj, SIG_HIDE, NULL);    //TODO: Remove!   
    wd->visible = EINA_FALSE;
 }
 

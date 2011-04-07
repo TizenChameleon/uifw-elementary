@@ -1372,7 +1372,7 @@ static void _ctxpopup_cb(void *data, Evas_Object *obj, void *event_info)
    ctxpopup = NULL;
 }
 
-static void _ctxpopup_hide_cb(void *data, Evas_Object *obj, void *event_info)
+static void _ctxpopup_dismissed_cb(void *data, Evas_Object *obj, void *event_info)
 {
    Evas_Object *ctxpopup = obj;
 
@@ -1392,7 +1392,7 @@ create_more_func(void *data, Evas_Object *obj, void *event_info)
    if(!wd) return;
 
    ctxpopup = elm_ctxpopup_add(wd->parent);
-   evas_object_smart_callback_add( ctxpopup, "hide", _ctxpopup_hide_cb, wd);
+   evas_object_smart_callback_add( ctxpopup, "dismissed", _ctxpopup_dismissed_cb, wd);
 
    EINA_LIST_FOREACH(wd->items, l, item)
      {
