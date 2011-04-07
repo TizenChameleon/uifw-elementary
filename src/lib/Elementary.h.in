@@ -2909,26 +2909,6 @@ extern "C" {
     * "dismissed" - the ctxpopup was dismissed
     */
 
-   //DEPRECATED CTXPOPUP APIS... 
-   typedef enum _Ctxpopup_Arrow_Direction
-     {
-        ELM_CTXPOPUP_ARROW_DOWN,
-        ELM_CTXPOPUP_ARROW_RIGHT,
-        ELM_CTXPOPUP_ARROW_LEFT,
-        ELM_CTXPOPUP_ARROW_UP,
-     } Elm_Ctxpopup_Arrow;
-
-   EINA_DEPRECATED EAPI void         elm_ctxpopup_area_set(Evas_Object *obj, Evas_Object *rect); 
-   EINA_DEPRECATED EAPI Elm_Ctxpopup_Item *elm_ctxpopup_label_add(Evas_Object *obj, const char *label, Evas_Smart_Cb func, void *data);
-   EINA_DEPRECATED EAPI Elm_Ctxpopup_Item *elm_ctxpopup_icon_add(Evas_Object *obj, Evas_Object *icon, Evas_Smart_Cb func, void *data);
-   EINA_DEPRECATED EAPI Elm_Ctxpopup_Item *elm_ctxpopup_item_add(Evas_Object *obj, Evas_Object *icon, const char* label, Evas_Smart_Cb func, void *data);
-   EINA_DEPRECATED EAPI void         elm_ctxpopup_scroller_disabled_set(Evas_Object *obj, Eina_Bool disabled);
-   EINA_DEPRECATED EAPI void         elm_ctxpopup_screen_dimmed_disabled_set(Evas_Object *obj, Eina_Bool disabled);
-   EINA_DEPRECATED EAPI void         elm_ctxpopup_button_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data);
-   EINA_DEPRECATED EAPI void  	     elm_ctxpopup_arrow_priority_set(Evas_Object *obj, Elm_Ctxpopup_Arrow first, Elm_Ctxpopup_Arrow second, Elm_Ctxpopup_Arrow third, Elm_Ctxpopup_Arrow fourth);
-   EINA_DEPRECATED EAPI void	     elm_ctxpopup_position_forced_set(Evas_Object *obj, Eina_Bool forced);
-   EINA_DEPRECATED EAPI Eina_Bool    elm_ctxpopup_position_forced_get(const Evas_Object *obj);
-
    /* colorpalette */
    typedef struct _Colorpalette_Color Elm_Colorpalette_Color; 
 
