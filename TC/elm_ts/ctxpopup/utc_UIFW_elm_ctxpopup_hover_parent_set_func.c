@@ -73,7 +73,7 @@ static void utc_UIFW_elm_ctxpopup_hover_parent_set_func_01(void)
 	int r = 0;
 
 	Evas_Object *ctxpopup = elm_ctxpopup_add(main_win);
-	elm_ctxpopup_item_add(ctxpopup, NULL, "TEST", NULL, NULL);
+	elm_ctxpopup_item_append(ctxpopup, "TEST", NULL, NULL, NULL);
 	evas_object_show(ctxpopup);
 
 	Evas_Object *rect = evas_object_rectangle_add(evas_object_evas_get(main_win));
