@@ -648,11 +648,11 @@ elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1
    if (ll) prev_it = ll->data;
    else prev_it = NULL;
 
+   it->obj = obj;
    _title_btn_set(it, fn_btn1, ELM_NAVIGATIONBAR_FUNCTION_BUTTON1, EINA_FALSE);
    _title_btn_set(it, fn_btn2, ELM_NAVIGATIONBAR_FUNCTION_BUTTON2, EINA_FALSE);
    _title_btn_set(it, fn_btn3, ELM_NAVIGATIONBAR_FUNCTION_BUTTON3, EINA_FALSE);
 
-   it->obj = obj;
 
    it->content = content;
    evas_object_event_callback_add(it->content, EVAS_CALLBACK_DEL, _content_del, it);
