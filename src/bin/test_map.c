@@ -4,6 +4,8 @@
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
+#define MARKER_MAX 1000
+
 typedef struct Marker_Data
 {
     const char *file;
@@ -15,6 +17,9 @@ static Elm_Map_Group_Class *itc_group1, *itc_group2, *itc_group_parking;
 
 static Evas_Object *rect;
 static int nb_elts;
+static Elm_Map_Marker *markers[MARKER_MAX];
+static Elm_Map_Marker *route_from, *route_to;
+static Elm_Map_Route *route;
 
 Marker_Data data1 = {PACKAGE_DATA_DIR"/images/logo.png"};
 Marker_Data data2 = {PACKAGE_DATA_DIR"/images/logo_small.png"};
@@ -29,6 +34,9 @@ Marker_Data data10 = {PACKAGE_DATA_DIR"/images/sky_03.jpg"};
 Marker_Data data11= {PACKAGE_DATA_DIR"/images/wood_01.jpg"};
 
 Marker_Data data_parking= {PACKAGE_DATA_DIR"/images/parking.png"};
+
+static Evas_Object * _marker_get(Evas_Object *obj, Elm_Map_Marker *marker __UNUSED__, void *data);
+static Evas_Object * _group_icon_get(Evas_Object *obj, void *data);
 
 static void
 my_map_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
@@ -49,19 +57,63 @@ my_map_longpressed(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
 }
 
 static void
-my_map_clicked_double(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+my_map_clicked_double(void *data, Evas_Object *obj, void *event_info)
 {
-   printf("clicked,double\n");
+   double lon, lat;
+   double flon, flat, tlon, tlat;
+   Evas_Coord ox, oy, x, y, w, h;
+   int zoom;
+   Evas_Event_Mouse_Up *down = (Evas_Event_Mouse_Up *)event_info;
+   if (!down) return;
+
+   evas_object_geometry_get(data, &ox, &oy, &w, &h);
+   zoom = elm_map_zoom_get(data);
+   if (zoom<5) return;
+   elm_map_geo_region_get(obj, &lon, &lat);
+   elm_map_utils_convert_geo_into_coord(obj, lon, lat, pow(2.0, zoom)*256, &x, &y);
+   x += down->output.x - (w / 2) - ox;
+   y += down->output.y - (h / 2) - oy;
+   elm_map_utils_convert_coord_into_geo(obj, x, y, pow(2.0, zoom)*256, &lon, &lat);
+
+   itc1 = elm_map_marker_class_new(data);
+
+   elm_map_marker_class_del_cb_set(itc1, NULL);
+
+   itc_group1 = elm_map_group_class_new(data);
+   elm_map_group_class_icon_cb_set(itc_group1, _group_icon_get);
+   elm_map_group_class_data_set(itc_group1, (void *)PACKAGE_DATA_DIR"/images/bubble.png");
+   elm_map_group_class_style_set(itc_group1, "empty");
+   elm_map_group_class_zoom_displayed_set(itc_group1, 5);
+
+   if (route_from && route_to)
+     {
+        elm_map_marker_remove(route_from);
+	route_from = NULL;
+        elm_map_marker_remove(route_to);
+	route_to = NULL;
+        elm_map_route_remove(route);
+     }
+
+   if (!route_from) route_from = elm_map_marker_add(data, lon, lat, itc1, itc_group1, NULL);
+   else route_to = elm_map_marker_add(data, lon, lat, itc1, itc_group1, NULL);
+
+   if (route_from && route_to)
+     {
+        elm_map_marker_region_get(route_from, &flon, &flat);
+        elm_map_marker_region_get(route_to, &tlon, &tlat);
+        route = elm_map_route_add(data, ELM_MAP_ROUTE_TYPE_MOTOCAR, ELM_MAP_ROUTE_METHOD_FASTEST, flon, flat, tlon, tlat);
+        elm_map_route_color_set(route, 255, 0, 0, 255);
+     }
 }
 
 static void
-my_map_load_detail(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+my_map_load_detail(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    printf("load,detail\n");
 }
 
 static void
-my_map_loaded_detail(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+my_map_loaded_detail(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    printf("loaded,detail\n");
 }
@@ -125,12 +177,33 @@ my_map_downloaded(void *data, Evas_Object *obj __UNUSED__, void *event_info __UN
 }
 
 static void
+my_map_route_load(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   printf("route_load\n");
+ }
+
+static void
+my_map_route_loaded(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   double d;
+   const char *w, *n;
+   d = elm_map_route_distance_get(route);
+   printf("route distance = %lf km\n", d);
+
+   w = elm_map_route_waypoint_get(route);
+   if (w) printf("[waypoints]\n%s\n", w);
+
+   n = elm_map_route_node_get(route);
+   if (n) printf("[nodes]\n%s\n", n);
+}
+
+static void
 my_bt_show_reg(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Eina_Bool b = elm_map_paused_get(data);
    elm_map_paused_set(data, EINA_TRUE);
    elm_map_zoom_mode_set(data, ELM_MAP_ZOOM_MODE_MANUAL);
-   elm_map_geo_region_show(data, 2.352, 48.857);
+   elm_map_geo_region_show(data, 126.977969, 37.566535);
    elm_map_zoom_set(data, 18);
    elm_map_paused_set(data, b);
 }
@@ -138,7 +211,7 @@ my_bt_show_reg(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSE
 static void
 my_bt_bring_reg(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   elm_map_geo_region_bring_in(data, 2.352, 48.857);
+   elm_map_geo_region_bring_in(data, 126.977969, 37.566535);
 }
 
 static void
@@ -220,13 +293,14 @@ my_bt_source_module(void *data, Evas_Object *obj __UNUSED__, void *event_info __
 static void
 my_bt_add(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-    int i;
-    Elm_Map_Group_Class *g_clas;
-    Elm_Map_Marker_Class *m_clas;
-    Marker_Data *d = &data7;
+   int i;
+   Elm_Map_Group_Class *g_clas;
+   Elm_Map_Marker_Class *m_clas;
+   Marker_Data *d = &data7;
 
-    for(i =0; i<1000; i++)
-    {
+   if (*markers) return;
+   for(i =0; i<MARKER_MAX; i++)
+     {
         d = &data7;
 
         int r1 = rand() % (180*2*100);
@@ -238,26 +312,37 @@ my_bt_add(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
         else r2 = r2 - 85*100;
 
         int style = rand() % 3;
-        if(!style)
-            m_clas = itc1;
-        else if(style == 1)
-            m_clas = itc2;
+        if (!style) m_clas = itc1;
+        else if (style == 1) m_clas = itc2;
         else
-        {
-            m_clas = itc_parking;
-            d = &data_parking;
-        }
+          {
+             m_clas = itc_parking;
+             d = &data_parking;
+          }
 
-	style = rand() % 2;
-	if (!style)
-	  g_clas = itc_group1;
-	else
-	  g_clas = itc_group2;
+        style = rand() % 2;
+        if (!style) g_clas = itc_group1;
+	else g_clas = itc_group2;
 
-       elm_map_marker_add(data, r1/100., r2/100., m_clas, g_clas, d); 
+       markers[i] = elm_map_marker_add(data, r1/100., r2/100., m_clas, g_clas, d);
     }
-    nb_elts+=1000;
+    nb_elts += 1000;
     printf("nb elements: %d\n", nb_elts);
+}
+
+static void
+my_bt_remove(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   int i;
+
+   for (i = 0; i<MARKER_MAX; i++)
+     { 
+        if (markers[i])
+          {
+             elm_map_marker_remove(markers[i]);
+             markers[i] = NULL;
+          }
+     }
 }
 
 static Evas_Object *
@@ -440,7 +525,7 @@ test_map(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
         evas_object_smart_callback_add(map, "clicked", my_map_clicked, win);
         evas_object_smart_callback_add(map, "press", my_map_press, win);
         evas_object_smart_callback_add(map, "longpressed", my_map_longpressed, win);
-        evas_object_smart_callback_add(map, "clicked,double", my_map_clicked_double, win);
+        evas_object_smart_callback_add(map, "clicked,double", my_map_clicked_double, map);
         evas_object_smart_callback_add(map, "load,detail", my_map_load_detail, win);
         evas_object_smart_callback_add(map, "loaded,detail", my_map_loaded_detail, win);
         evas_object_smart_callback_add(map, "zoom,start", my_map_zoom_start, win);
@@ -452,6 +537,8 @@ test_map(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
         evas_object_smart_callback_add(map, "scroll,drag,stop", my_map_drag_stop, win);
         evas_object_smart_callback_add(map, "scroll", my_map_scroll, win);
         evas_object_smart_callback_add(map, "downloaded", my_map_downloaded, map);
+        evas_object_smart_callback_add(map, "route,load", my_map_route_load, map);
+        evas_object_smart_callback_add(map, "route,loaded", my_map_route_loaded, map);
 
         evas_object_show(map);
 
@@ -468,14 +555,6 @@ test_map(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
         evas_object_show(bt);
 
         bt = elm_button_add(win);
-        elm_button_label_set(bt, "Add 1000 markers");
-        evas_object_smart_callback_add(bt, "clicked", my_bt_add, map);
-        evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-        evas_object_size_hint_align_set(bt, 0.5, 0.1);
-        elm_table_pack(tb2, bt, 1, 0, 1, 1);
-        evas_object_show(bt);
-
-        bt = elm_button_add(win);
         elm_button_label_set(bt, "Z +");
         evas_object_smart_callback_add(bt, "clicked", my_bt_zoom_in, map);
         evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -483,8 +562,32 @@ test_map(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
         elm_table_pack(tb2, bt, 2, 0, 1, 1);
         evas_object_show(bt);
 
+        bx = elm_box_add(win);
+        evas_object_show(bx);
+        evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(bx, 0.5, 0.1);
+        elm_table_pack(tb2, bx, 1, 0, 1, 1);
+
+        //
         bt = elm_button_add(win);
-        elm_button_label_set(bt, "Show Paris");
+        elm_button_label_set(bt, "Add 1000 markers");
+        evas_object_smart_callback_add(bt, "clicked", my_bt_add, map);
+        evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(bt, 0.5, 0.1);
+        evas_object_show(bt);
+        elm_box_pack_end(bx, bt);
+
+        bt = elm_button_add(win);
+        elm_button_label_set(bt, "remove 1000 markers");
+        evas_object_smart_callback_add(bt, "clicked", my_bt_remove, map);
+        evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(bt, 0.5, 0.1);
+        evas_object_show(bt);
+        elm_box_pack_end(bx, bt);
+        //
+
+        bt = elm_button_add(win);
+        elm_button_label_set(bt, "Show Seoul");
         evas_object_smart_callback_add(bt, "clicked", my_bt_show_reg, map);
         evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(bt, 0.1, 0.5);
@@ -492,7 +595,7 @@ test_map(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
         evas_object_show(bt);
 
         bt = elm_button_add(win);
-        elm_button_label_set(bt, "Bring Paris");
+        elm_button_label_set(bt, "Bring Seoul");
         evas_object_smart_callback_add(bt, "clicked", my_bt_bring_reg, map);
         evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(bt, 0.9, 0.5);
