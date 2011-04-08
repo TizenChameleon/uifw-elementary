@@ -102,7 +102,7 @@ my_map_clicked_double(void *data, Evas_Object *obj, void *event_info)
         elm_map_marker_region_get(route_from, &flon, &flat);
         elm_map_marker_region_get(route_to, &tlon, &tlat);
         route = elm_map_route_add(data, ELM_MAP_ROUTE_TYPE_MOTOCAR, ELM_MAP_ROUTE_METHOD_FASTEST, flon, flat, tlon, tlat);
-        elm_map_route_color_set(route, 255, 0, 0, 255);
+        if (route) elm_map_route_color_set(route, 255, 0, 0, 255);
      }
 }
 
