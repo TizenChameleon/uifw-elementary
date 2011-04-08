@@ -39,8 +39,8 @@ struct _Elm_Navigationbar_Item
    Evas_Object *obj;
    const char *title;
    const char *subtitle;
+   Eina_List *title_obj_list;   //TODO: Remove!
    Evas_Object *title_obj;
-   Eina_List *title_list;
    //TODO: Consider makes this Eina_List 
    Evas_Object *title_btns[_ELM_NAVIBAR_TITLE_BTN_MAX_CNT];
    Evas_Object *content;
@@ -72,13 +72,24 @@ static void _delete_item(Elm_Navigationbar_Item *it);
 static void _back_button_clicked(void *data, Evas_Object *obj, void *event_info);
 static int _button_size_set(Evas_Object *obj);
 static Eina_Bool _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_Bool back_btn);
-static Evas_Object *_multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, int width);
 static Elm_Navigationbar_Item *_check_item_is_added(Evas_Object *obj, Evas_Object *content);
 static void _transition_complete_cb(void *data);
-static void _elm_navigationbar_back_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *btn, Elm_Navigationbar_Item *it);
-static void _elm_navigationbar_function_button1_set(Evas_Object *obj, Evas_Object *content, Evas_Object *new_btn, Elm_Navigationbar_Item *it);
-static void _elm_navigationbar_function_button2_set(Evas_Object *obj, Evas_Object *content, Evas_Object *new_btn, Elm_Navigationbar_Item *it);
-static void _elm_navigationbar_function_button3_set(Evas_Object *obj, Evas_Object *content, Evas_Object *new_btn, Elm_Navigationbar_Item *it);
+static void _elm_navigationbar_back_button_set(Evas_Object *obj,
+                                               Evas_Object *content,
+                                               Evas_Object *btn,
+                                               Elm_Navigationbar_Item *it);
+static void _elm_navigationbar_function_button1_set(Evas_Object *obj,
+                                                    Evas_Object *content,
+                                                    Evas_Object *new_btn,
+                                                    Elm_Navigationbar_Item *it);
+static void _elm_navigationbar_function_button2_set(Evas_Object *obj,
+                                                    Evas_Object *content,
+                                                    Evas_Object *new_btn,
+                                                    Elm_Navigationbar_Item *it);
+static void _elm_navigationbar_function_button3_set(Evas_Object *obj,
+                                                    Evas_Object *content,
+                                                    Evas_Object *new_btn,
+                                                    Elm_Navigationbar_Item *it);
 static void _switch_titleobj_visibility(void *data, Evas_Object *obj, const char *emission, const char *source);
 
 static const char SIG_HIDE_FINISHED[] = "hide,finished";
@@ -90,7 +101,8 @@ static const Evas_Smart_Cb_Description _signals[] = {
        {NULL, NULL}
 };
 
-static void _content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+static void
+_content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Elm_Navigationbar_Item *it = data;
    it->content = NULL;
@@ -98,7 +110,18 @@ static void _content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void 
 }
 
 static void
-_title_btn_del(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_title_obj_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Elm_Navigationbar_Item *it = data;
+   Eina_List *l = NULL;
+   elm_navigationbar_title_object_list_unset(it->obj, it->content, &l);
+   if (!l) return;
+   evas_object_del(eina_list_data_get(l));
+   eina_list_free(l);
+}
+
+static void
+_title_btn_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Elm_Navigationbar_Item *it = data;
    int i;
@@ -198,8 +221,6 @@ _delete_item(Elm_Navigationbar_Item *it)
    //TODO: So hard to manange.
    //TODO: Just prepare one layout for title objects.
    //TODO: then remove the layout only.
-   Eina_List *ll;
-   Evas_Object *list_obj;
    Widget_Data *wd;
 
    if (!it) return;
@@ -235,21 +256,23 @@ _delete_item(Elm_Navigationbar_Item *it)
         elm_object_unfocus(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
         evas_object_del(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
      }
+
    if (it->title)
      eina_stringshare_del(it->title);
+
    if (it->subtitle)
      eina_stringshare_del(it->subtitle);
-   if (it->title_list)
+
+   if (it->title_obj)
      {
+        evas_object_event_callback_del(it->title_obj, EVAS_CALLBACK_DEL, _title_obj_del);
         edje_object_signal_callback_del_full(wd->base, "elm,action,clicked", "elm", _switch_titleobj_visibility, it);
-        //TODO: If these title object is one of sub objects,
-        EINA_LIST_FOREACH(it->title_list, ll, list_obj)
-          evas_object_del(list_obj);
-        eina_list_free(it->title_list);
+        evas_object_del(it->title_obj);
+        eina_list_free(it->title_obj_list);
      }
 
    if (it->content)
-      evas_object_event_callback_del(it->content, EVAS_CALLBACK_DEL, _content_del);
+     evas_object_event_callback_del(it->content, EVAS_CALLBACK_DEL, _content_del);
 
    free(it);
 }
@@ -283,8 +306,7 @@ _item_sizing_eval(Elm_Navigationbar_Item *it)
 {
    if (!it) return;
    Widget_Data *wd = elm_widget_data_get(it->obj);
-   Evas_Coord pad, height, minw, w;
-   int pad_count = 2;
+   Evas_Coord height, minw, w;
 
    if (!wd) return;
 
@@ -293,36 +315,23 @@ _item_sizing_eval(Elm_Navigationbar_Item *it)
    if (w < minw) w = minw;
 
    //TODO: Should be removed!! I don't prefer to refer the padding in code.
-   edje_object_part_geometry_get(wd->base, "elm.rect.pad1", NULL, NULL, &pad, NULL);
    edje_object_part_geometry_get(wd->base, "elm.swallow.title", NULL, NULL, NULL, &height);
 
    if (it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON])
-     {
-        it->fn_btn1_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
-        pad_count++;
-     }
+     it->fn_btn1_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
    else if (it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1])
-     {
-        it->fn_btn1_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]);
-        pad_count++;
-     }
+     it->fn_btn1_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]);
+
    if (it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2])
-     {
-        it->fn_btn2_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]);
-        pad_count++;
-     }
+     it->fn_btn2_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]);
+
    if (it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3])
-     {
-        it->fn_btn3_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
-        pad_count++;
-     }
-   if (it->title_list)
-     {
-        it->title_w = _button_size_set(wd->base);
-        it->title_obj = _multiple_object_set(it->obj, it->title_obj, it->title_list, it->title_w);
-        evas_object_resize(it->title_obj, it->title_w, height);
-        evas_object_size_hint_min_set(it->title_obj, it->title_w, height);
-     }
+     it->fn_btn3_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
+
+   //TOOD: Consider here. 
+   it->title_w = _button_size_set(wd->base);
+   evas_object_resize(it->title_obj, it->title_w, height);
+   evas_object_size_hint_min_set(it->title_obj, it->title_w, height);
 }
 
 static void
@@ -392,12 +401,19 @@ _transition_complete_cb(void *data)
      }
    else if (prev_it)
      {
-        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]) evas_object_hide(prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]);
-        if (prev_it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]) evas_object_hide(prev_it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
+        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1])
+          evas_object_hide(prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]);
+        if (prev_it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON])
+          evas_object_hide(prev_it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
         if (prev_it->title_obj) evas_object_hide(prev_it->title_obj);
-        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]) evas_object_hide(prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]);
-        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]) evas_object_hide(prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
-        if (prev_it->icon) evas_object_hide(prev_it->icon);
+        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2])
+          evas_object_hide(prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]);
+        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3])
+           evas_object_hide(prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
+        if (prev_it->icon)
+          evas_object_hide(prev_it->icon);
+        if (prev_it->title_obj)
+          evas_object_hide(prev_it->title_obj);
      }
    if (it && wd->title_visible)
      {
@@ -425,34 +441,16 @@ _transition_complete_cb(void *data)
           edje_object_part_text_set(wd->base, "elm.text.sub", NULL);
 
         if (it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1])
-          {
-             edje_object_signal_emit(wd->base, "elm,state,item,add,leftpad", "elm");
-             edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]);
-          }
+          edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]);
         else if (it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON])
-          {
-             edje_object_signal_emit(wd->base, "elm,state,item,add,leftpad", "elm");
-             edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
-          }
-        else
-          edje_object_signal_emit(wd->base, "elm,state,item,reset,leftpad", "elm");
+          edje_object_part_swallow(wd->base, "elm.swallow.btn1", it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
 
         if (it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2])
-          {
-             edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad", "elm");
-             edje_object_part_swallow(wd->base, "elm.swallow.btn2", it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]);
-          }
-        else
-          edje_object_signal_emit(wd->base, "elm,state,item,reset,rightpad", "elm");
+          edje_object_part_swallow(wd->base, "elm.swallow.btn2", it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]);
 
         if (it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3])
-          {
-             edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
-             edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
-             edje_object_part_swallow(wd->base, "elm.swallow.btn3", it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
-          }
-        else
-          edje_object_signal_emit(wd->base, "elm,state,item,reset,rightpad2", "elm");
+          edje_object_part_swallow(wd->base, "elm.swallow.btn3", it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
+
         if(it->icon)
           {
              edje_object_part_swallow(wd->base, "elm.swallow.icon", it->icon);
@@ -562,71 +560,6 @@ _check_item_is_added(Evas_Object *obj, Evas_Object *content)
      if (it->content == content)
        return it;
    return NULL;
-}
-
-static Evas_Object *
-_multiple_object_set(Evas_Object *obj, Evas_Object *sub_obj, Eina_List *list, int width)
-{
-   Widget_Data *wd;
-   Eina_List *ll;
-   Evas_Object *new_obj, *list_obj;
-   Evas_Coord pad, height;
-   char buf[32];
-   int num = 1;
-   int count;
-
-   wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-
-   //TODO: Let's find other way to support this.
-   edje_object_part_geometry_get(wd->base, "elm.rect.pad1", NULL, NULL, &pad, NULL);
-   edje_object_part_geometry_get(wd->base, "elm.swallow.title", NULL, NULL, NULL, &height);
-   if (!sub_obj)
-     {
-        //TODO: change to edje_obejct.
-        new_obj = elm_layout_add(obj);
-        elm_widget_sub_object_add(obj, new_obj);
-        elm_layout_theme_set(new_obj, "navigationbar", "title", elm_widget_style_get(obj));
-     }
-   else
-     new_obj = sub_obj;
-   count = eina_list_count(list);
-   //TODO: I don prefer to support multiple objects. User may create a box or table then add it.
-   EINA_LIST_FOREACH(list, ll, list_obj)
-     {
-        evas_object_resize(list_obj, (width-(count-1)*pad)/count, height);
-        evas_object_size_hint_min_set(list_obj, (width-(count-1)*pad)/count, height);
-        memset(buf, 0, sizeof(buf));
-        sprintf(buf, "elm,state,item,add,%d", num);
-        edje_object_signal_emit(elm_layout_edje_get(new_obj), buf, "elm");
-        memset(buf, 0, sizeof(buf));
-        sprintf(buf, "elm.swallow.title%d", num++);
-        elm_layout_content_set(new_obj, buf, list_obj);
-     }
-   return new_obj;
-}
-
-static void
-_multiple_object_unset(Elm_Navigationbar_Item *it, Eina_List **list)
-{
-   Evas_Object *list_obj = NULL;
-   Eina_List *l = NULL;
-   Evas_Object *temp_obj;
-   char buf[1024];
-   int num = 1;
-   if (it->title_obj)
-     {
-        EINA_LIST_FOREACH (it->title_list, l, list_obj)
-          {
-             memset(buf, 0, sizeof(buf));
-             sprintf(buf, "elm.swallow.title%d", num++);
-             temp_obj = elm_layout_content_unset(it->title_obj, buf);
-             *list = eina_list_append(*list, temp_obj);
-             evas_object_hide(temp_obj);
-          }
-        eina_list_free(it->title_list);
-        it->title_list = NULL;
-     }
 }
 
 /**
@@ -821,9 +754,7 @@ elm_navigationbar_pop(Evas_Object *obj)
         prev_it = ll->data;
         ll = ll->prev;
         if (ll)
-          {
-             it = ll->data;
-          }
+          it = ll->data;
      }
    //unswallow items and start trasition
    cb = ELM_NEW(Transit_Cb_Data);
@@ -834,12 +765,18 @@ elm_navigationbar_pop(Evas_Object *obj)
         cb->prev_it = prev_it;
         cb->it = it;
         cb->pop = EINA_TRUE;
-        if (prev_it->title_obj) edje_object_part_unswallow(wd->base, prev_it->title_obj);
-        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]) edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]);
-        else if (prev_it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]) edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
-        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]) edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]);
-        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]) edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
-        if (prev_it->icon) edje_object_part_unswallow(wd->base, prev_it->icon);
+        if (prev_it->title_obj)
+          edje_object_part_unswallow(wd->base, prev_it->title_obj);
+        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1])
+          edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON1]);
+        else if (prev_it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON])
+          edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
+        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2])
+           edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON2]);
+        if (prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3])
+           edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
+        if (prev_it->icon)
+           edje_object_part_unswallow(wd->base, prev_it->icon);
         _item_sizing_eval(it);
      }
    //This case, it's the last page.
@@ -1029,6 +966,8 @@ elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Ob
    Evas_Object *swallow;
    Eina_Bool changed;
 
+   //TODO: Add del callback
+
    if (!wd) return;
    if (content == NULL) return;
    changed = EINA_FALSE;
@@ -1117,10 +1056,8 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd;
-   Eina_List *ll;
    Elm_Navigationbar_Item *it;
-   Elm_Navigationbar_Item *last_it;
-   Evas_Object *swallow;
+   Elm_Navigationbar_Item *top_it;
 
    if ((!title_obj) || (!content)) return;
 
@@ -1133,44 +1070,40 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
         ERR("[ERROR]Push the Elm_Navigationbar_Item first, later add the title object");
         return;
      }
-   it->title_list = eina_list_append(it->title_list, title_obj);
-   if (it->obj) _item_sizing_eval(it);
-   //update if the content is the top item
-   ll = eina_list_last(wd->stack);
-   if (ll)
+
+   if (it->title_obj)
      {
-        last_it = ll->data;
-        if (last_it->content == content)
-          {
-             swallow = edje_object_part_swallow_get(wd->base, "elm.swallow.title");
-             if (swallow) {
-                //TODO: WHO REMOVE THIS?
-                edje_object_part_unswallow(wd->base, swallow);
-                evas_object_hide(swallow);
-             }
-             edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
-             if (wd->title_visible)
-               {
-                  //TODO: Will be removed.
-                  if (it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3])
-                    {
-                       edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
-                       edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
-                    }
-                  if ((it->title_obj) && (it->title))
-                    {
-                       edje_object_signal_callback_add(wd->base, "elm,action,clicked", "elm",
-                                                       _switch_titleobj_visibility, it);
-                       edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
-                       //TODO: for before nbeat?
-                       edje_object_signal_emit(wd->base, "elm,state,show,noanimate,title", "elm");
-                       it->titleobj_visible = EINA_TRUE;
-                       edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
-                  }
-               }
-             _item_sizing_eval(it);
-          }
+       evas_object_event_callback_del(it->title_obj, EVAS_CALLBACK_DEL, _title_obj_del);
+       evas_object_del(it->title_obj);
      }
+
+   it->title_obj = title_obj;
+   evas_object_event_callback_add(title_obj, EVAS_CALLBACK_DEL, _title_obj_del, it);
+
+   //TODO: Conserve this line for a while the object list get API is alive.
+   eina_list_free(it->title_obj_list);
+   it->title_obj_list = eina_list_append(NULL, title_obj);
+
+   top_it = eina_list_data_get(eina_list_last(wd->stack));
+   if ((!top_it) || (top_it != it)) return;
+
+   edje_object_part_swallow(wd->base, "elm.swallow.title", title_obj);
+
+   //TODO: Looks something incorrect. 
+   if (wd->title_visible)
+     {
+       if (it->title)
+         {
+            edje_object_signal_callback_add(wd->base, "elm,action,clicked", "elm",
+                                            _switch_titleobj_visibility, it);
+            edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
+            //TODO: for before nbeat?
+            edje_object_signal_emit(wd->base, "elm,state,show,noanimate,title", "elm");
+            it->titleobj_visible = EINA_TRUE;
+            edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
+         }
+     }
+   _item_sizing_eval(it);
 }
 
 /**
@@ -1184,7 +1117,7 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
  */
 //TODO: double pointer ? ...
 //TODO: why did not return the list ?
-//TODO: title_object_unset
+//TODO: rename title_object_unset
 EAPI void
 elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list)
 {
@@ -1192,7 +1125,7 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
    Widget_Data *wd;
    Eina_List *ll;
    Elm_Navigationbar_Item *it;
-   Elm_Navigationbar_Item *last_it;
+   Elm_Navigationbar_Item *top_it;
    Evas_Object *swallow;
 
    if ((!list) || (!content)) return;
@@ -1200,50 +1133,35 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
    wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   ll = eina_list_last(wd->stack);
-   if (!ll) return;
-
-   last_it = ll->data;
-
    EINA_LIST_FOREACH(wd->stack, ll, it)
-     {
-        if (it->content != content) continue;
+     if (it->content != content) break;
 
-        if (last_it->content == it->content)
-          {
-             swallow = edje_object_part_swallow_get(wd->base, "elm.swallow.title");
-             if (swallow)
-               {
-                  //TODO: WHO DELETE THIS?
-                  edje_object_part_unswallow(wd->base, swallow);
-                  evas_object_hide(swallow);
-               }
-             _multiple_object_unset(it, list);
-             if (it->title_obj)
-               {
-                  evas_object_del(it->title_obj);
-                  it->title_obj = NULL;
-               }
-             if (wd->title_visible)
-               {
-                  if(it->titleobj_visible)
-                    {
-                      //TODO: remove the dependency on these signals as related to nbeat?
-                       edje_object_signal_emit(wd->base, "elm,state,hide,noanimate,title", "elm");
-                       it->titleobj_visible = EINA_FALSE;
-                    }
-                 edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
-                 edje_object_signal_callback_del_full(wd->base, "elm,action,clicked", "elm", _switch_titleobj_visibility, it);
-                 edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
-                 if(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3])
-                   {
-                      edje_object_signal_emit(wd->base, "elm,state,item,add,rightpad2", "elm");
-                      edje_object_signal_emit(wd->base, "elm,state,item,fn_btn3_set", "elm");
-                   }
-               }
-             _item_sizing_eval(it);
-         }
-     }
+   if (!it) return;
+
+   *list = eina_list_append(*list, it->title_obj);
+   it->title_obj = NULL;
+
+   top_it = eina_list_data_get(eina_list_last(wd->stack));
+   if ((!top_it) || (top_it->content != content))
+     return;
+
+   //In this case, the content is in the last of the stack
+   swallow = edje_object_part_swallow_get(wd->base, "elm.swallow.title");
+   if (!swallow) return;
+
+   if (wd->title_visible)
+    {
+      if(it->titleobj_visible)
+        {
+          //TODO: remove the dependency on these signals as related to nbeat?
+          edje_object_signal_emit(wd->base, "elm,state,hide,noanimate,title", "elm");
+          it->titleobj_visible = EINA_FALSE;
+        }
+       edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
+       edje_object_signal_callback_del_full(wd->base, "elm,action,clicked", "elm", _switch_titleobj_visibility, it);
+       edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
+   }
+   _item_sizing_eval(it);
 }
 
 
@@ -1256,7 +1174,7 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
  *
  * @ingroup NavigationBar
  */
-//title object get
+//TODO: need to rename title object get
 EAPI Eina_List *
 elm_navigationbar_title_object_list_get(Evas_Object *obj, Evas_Object *content)
 {
@@ -1273,7 +1191,7 @@ elm_navigationbar_title_object_list_get(Evas_Object *obj, Evas_Object *content)
    EINA_LIST_FOREACH(wd->stack, ll, it)
      {
         if (it->content == content)
-          return it->title_list;
+          return it->title_obj_list;
      }
    return NULL;
 }
