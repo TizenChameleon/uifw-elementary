@@ -82,8 +82,8 @@ test_anim.c \
 test_segment_control.c \
 test_calendar.c \
 test_diskselector.c \
-test_ctxpopup.c \
-test_db_store.c
+test_ctxpopup.c
+#test_db_store.c
 
 elementary_test_LDADD = $(top_builddir)/src/lib/libelementary.la \
 	@ELEMENTARY_EWEATHER_LIBS@ \
