@@ -16,7 +16,8 @@ AM_CPPFLAGS = \
 @ELEMENTARY_EDBUS_CFLAGS@ \
 @ELEMENTARY_EFREET_CFLAGS@ \
 @ELEMENTARY_EWEATHER_CFLAGS@ \
-@ELEMENTARY_ETHUMB_CFLAGS@
+@ELEMENTARY_ETHUMB_CFLAGS@ \
+@ELEMENTARY_SQLITE3_CFLAGS@
 
 if ELEMENTARY_WINDOWS_BUILD
 AM_CPPFLAGS += -DELEMENTARY_BUILD
@@ -81,14 +82,16 @@ test_anim.c \
 test_segment_control.c \
 test_calendar.c \
 test_diskselector.c \
-test_ctxpopup.c 
+test_ctxpopup.c \
+test_db_store.c
 
 elementary_test_LDADD = $(top_builddir)/src/lib/libelementary.la \
 	@ELEMENTARY_EWEATHER_LIBS@ \
 	@ELEMENTARY_EDBUS_LIBS@ \
 	@ELEMENTARY_EFREET_LIBS@ \
 	@ELEMENTARY_LIBS@ \
-	@my_libs@
+	@my_libs@ \
+	@ELEMENTARY_SQLITE3_LIBS@
 elementary_test_LDFLAGS =
 
 elementary_config_SOURCES = \

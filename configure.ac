@@ -439,6 +439,33 @@ if test "x$want_elementary_ethumb" = "xyes" -a "x$have_elementary_ethumb" = "xno
 fi
 AC_SUBST(ELM_ETHUMB_DEF)
 
+ELM_SQLITE3_DEF="#undef"
+have_elementary_sqlite3="no"
+want_elementary_sqlite3="auto"
+AC_ARG_ENABLE([sqlite3],
+   [AC_HELP_STRING([--disable-sqlite3], [disable sqlite3 support. @<:@default=detect@:>@])],
+   [want_elementary_sqlite3=$enableval], [])
+
+if test "x$want_elementary_sqlite3" != "xno"; then
+    PKG_CHECK_MODULES([ELEMENTARY_SQLITE3],
+       [
+        sqlite3
+       ],
+       [
+        AC_DEFINE(HAVE_ELEMENTARY_SQLITE3, 1, [sqlite3 support for Elementary])
+        have_elementary_sqlite3="yes"
+        ELM_SQLITE3_DEF="#define"
+        requirement_elm="sqlite3 ${requirement_elm}"
+       ],
+       [have_elementary_sqlite3="no"]
+    )
+else
+    have_elementary_sqlite3="no"
+fi
+if test "x$want_elementary_sqlite3" = "xyes" -a "x$have_elementary_sqlite3" = "xno"; then
+    AC_MSG_ERROR(sqlite3 support requested, but no sqlite3 found by pkg-config.])
+fi
+
 ELM_DEBUG_DEF="#undef"
 want_elementary_debug="no"
 AC_ARG_ENABLE([debug],
