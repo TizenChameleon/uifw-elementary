@@ -52,7 +52,7 @@ typedef struct _Route_Dump Route_Dump;
 #define DEST_DIR_PATH DEST_DIR_ZOOM_PATH"%d/"
 #define DEST_FILE_PATH "%s%d.png"
 #define MOD_AS "map/api"
-#define DEST_XML_FILE "/tmp/elm_map-XXXXXX.xml"
+#define DEST_XML_FILE "/tmp/elm_map-XXXXXX"
 
 #define ROUTE_YOURS_URL "http://www.yournavigation.org/api/dev/route.php"
 #define ROUTE_TYPE_MOTORCAR "motocar"
@@ -620,7 +620,7 @@ module(Evas_Object *obj)
 }
 
 static void
-route_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord ox, Evas_Coord oy, Evas_Coord ow, Evas_Coord oh)
+route_place(Evas_Object *obj, Grid *g __UNUSED__, Evas_Coord px, Evas_Coord py, Evas_Coord ox __UNUSED__, Evas_Coord oy __UNUSED__, Evas_Coord ow, Evas_Coord oh)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1439,9 +1439,11 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
 static void
 _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
+   Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Move *move = event_info;
    Event *ev0;
-   
+
+   if (wd->pinch_zoom) return;
    ev0 = get_event_object(data, 0);
    if (!ev0) return;
    ev0->prev.x = move->cur.output.x;
@@ -1533,6 +1535,7 @@ _mouse_multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__
    Event *ev0;
    Event *ev;
 
+   if (wd->pinch_zoom) return;
    ev = get_event_object(data, move->device);
    if (!ev) return;
 
@@ -1547,16 +1550,16 @@ _mouse_multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__
 
    if (dis_old)
      {
-        if (((dis_old - dis_new) > 0) && 
-            (ev->pinch_dis > elm_finger_size_get()*5))
+        if (((dis_old - dis_new) > 0) &&
+            (ev->pinch_dis > elm_finger_size_get()))
           {
              wd->pinch_zoom = EINA_TRUE;
              zoom--;
              elm_map_zoom_set(data, zoom);
              ev->pinch_dis = 0;
           }
-        else if (((dis_old - dis_new) < 0) && 
-                 (ev->pinch_dis < -elm_finger_size_get()*5))
+        else if (((dis_old - dis_new) < 0) &&
+                 (ev->pinch_dis < -elm_finger_size_get()))
           {
              wd->pinch_zoom = EINA_TRUE;
              zoom++;
@@ -4278,6 +4281,7 @@ elm_map_route_remove(Elm_Map_Route *route)
 EAPI void
 elm_map_route_color_set(Elm_Map_Route *route, int r, int g , int b, int a)
 {
+   EINA_SAFETY_ON_NULL_RETURN(route);
    route->color.r = r;
    route->color.g = g;
    route->color.b = b;
@@ -4298,6 +4302,7 @@ elm_map_route_color_set(Elm_Map_Route *route, int r, int g , int b, int a)
 EAPI void
 elm_map_route_color_get(Elm_Map_Route *route, int *r, int *g , int *b, int *a)
 {
+   EINA_SAFETY_ON_NULL_RETURN(route);
    if (*r) *r = route->color.r;
    if (*g) *g = route->color.g;
    if (*b) *b = route->color.b;
@@ -4315,6 +4320,7 @@ elm_map_route_color_get(Elm_Map_Route *route, int *r, int *g , int *b, int *a)
 EAPI double
 elm_map_route_distance_get(Elm_Map_Route *route)
 {
+   EINA_SAFETY_ON_NULL_RETURN_VAL(route, 0.0);
    return route->info.distance;
 }
 
@@ -4330,6 +4336,7 @@ elm_map_route_distance_get(Elm_Map_Route *route)
 EAPI const char*
 elm_map_route_node_get(Elm_Map_Route *route)
 {
+   EINA_SAFETY_ON_NULL_RETURN_VAL(route, NULL);
    return route->info.nodes;
 }
 
@@ -4345,6 +4352,7 @@ elm_map_route_node_get(Elm_Map_Route *route)
 EAPI const char*
 elm_map_route_waypoint_get(Elm_Map_Route *route)
 {
+   EINA_SAFETY_ON_NULL_RETURN_VAL(route, NULL);
    return route->info.waypoints;
 }
 
