@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build143) unstable; urgency=low
+
+  * [Map] Upstream merge. 
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build143
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Fri, 08 Apr 2011 23:13:43 +0900
+
 elementary (1.0.0+svn.51480slp2+build142) unstable; urgency=low
 
   * [Map] Upstream merge. 
