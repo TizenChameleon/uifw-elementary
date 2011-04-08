@@ -46,7 +46,6 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data {
    Evas_Object *base;
    Evas_Object *box;
-   Evas_Object *rect;
    Evas_Object *entry;
    Evas_Object *label;
    Evas_Object *guidetext;
@@ -105,7 +104,6 @@ _del_hook(Evas_Object *obj)
      }
    wd->current = NULL;
 
-   if (wd->rect) evas_object_del (wd->rect);
    if (wd->entry) evas_object_del (wd->entry);
    if (wd->label) evas_object_del (wd->label);
    if (wd->guidetext) evas_object_del (wd->guidetext);
@@ -305,14 +303,6 @@ _contracted_state_set(Evas_Object *obj, int contracted)
         // pack buttons only 1line
         w = wd->w_box;
 
-        if (wd->rect)
-          {
-             elm_box_pack_end(wd->box, wd->rect);
-             evas_object_size_hint_min_get(wd->rect, &w_tmp, NULL);
-             w -= w_tmp;
-             w -= box_inner_item_width_padding;
-          }
-
         if (wd->label)
           {
              elm_box_pack_end(wd->box, wd->label);
@@ -445,7 +435,6 @@ _contracted_state_set(Evas_Object *obj, int contracted)
 
         // pack buttons only 1line
 
-        if (wd->rect) elm_box_pack_end(wd->box, wd->rect);
         if (wd->label) elm_box_pack_end(wd->box, wd->label);
 
         // pack remain btns
@@ -473,33 +462,23 @@ _contracted_state_set(Evas_Object *obj, int contracted)
 static void
 _view_update(Evas_Object *obj)
 {
-   Evas_Coord room = 0, w = 0;
+   Evas_Coord width = 1, height = 1;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->box || !wd->entry || !(wd->w_box > 0)) return;
-
-   room = wd->w_box;
-   room -= MIN_W_ENTRY;
-
-   if (wd->rect)
-     {
-        evas_object_size_hint_min_get (wd->rect, &w, NULL);
-        room -= w;
-     }
 
    // update label
    if (wd->label)
      {
         elm_box_unpack(wd->box, wd->label);
-        if (wd->rect) elm_box_pack_after (wd->box, wd->label, wd->rect);
-        else elm_box_pack_start(wd->box, wd->label);
-        evas_object_show(wd->label);
-        elm_label_wrap_width_set(wd->label, room);
-        evas_object_size_hint_min_get(wd->label, &w, NULL);
-        room -= w;
+        elm_box_pack_start(wd->box, wd->label);
+        evas_object_size_hint_min_get(wd->label, &width, &height);
      }
 
    if (wd->guidetext)
-     evas_object_size_hint_min_set(wd->guidetext, room, 0);
+     {
+        Evas_Coord guide_text_width = wd->w_box - width;
+        evas_object_size_hint_min_set(wd->guidetext, guide_text_width, height);
+     }
 
    // update buttons in contracted mode
    if (wd->contracted == 1)
@@ -516,19 +495,37 @@ static void
 _set_label(Evas_Object *obj, const char* str)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd || !str)   return;
+   if (!wd || !str) return;
 
-   if (!wd->label)
-     {
-        if (! (wd->label = elm_label_add (obj))) return;
-        elm_object_style_set(wd->label, "extended/multibuttonentry_default");
-        elm_label_ellipsis_set(wd->label, EINA_TRUE);
-        elm_label_text_align_set(wd->label, "left");
-        evas_object_size_hint_weight_set(wd->label, 0.0, EVAS_HINT_EXPAND);
-        evas_object_size_hint_align_set(wd->label, EVAS_HINT_FILL, EVAS_HINT_FILL);
-     }
+   if (wd->label)
+   {
+      Evas_Coord width, height, sum_width = 0;
+      evas_object_size_hint_min_set(wd->label, 0, 0);
+      evas_object_resize(wd->label, 0, 0);
+      edje_object_part_text_set(wd->label, "mbe.label", str);
 
-   if (wd->label) elm_label_label_set(wd->label, str);
+      if (!strcmp(str, ""))
+        {
+           /* FIXME: not work yet */
+           edje_object_signal_emit(wd->label, "elm,mbe,clear_text", "");
+           edje_object_part_geometry_get(wd->label, "mbe.label", NULL, NULL, &width, &height);
+           sum_width += width;
+        }
+      else
+        {
+           edje_object_signal_emit(wd->label, "elm,mbe,set_text", "");
+           edje_object_part_geometry_get(wd->label, "mbe.label", NULL, NULL, &width, &height);
+           sum_width += width;
+
+           edje_object_part_geometry_get(wd->label, "mbe.label.left.padding", NULL, NULL, &width, NULL);
+           sum_width += width;
+
+           edje_object_part_geometry_get(wd->label, "mbe.label.right.padding", NULL, NULL, &width, NULL);
+           sum_width += width;
+        }
+      evas_object_size_hint_min_set(wd->label, sum_width, height);
+   }
+   evas_object_show(wd->label);
    _view_update(obj);
 }
 
@@ -778,7 +775,6 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
              case MULTIBUTONENTRY_POS_START:
                 wd->items = eina_list_prepend(wd->items, item);
                 if(wd->label) elm_box_pack_after(wd->box, btn, wd->label);
-                else if(wd->rect) elm_box_pack_after(wd->box, btn, wd->rect);
                 else elm_box_pack_start(wd->box, btn);
                 _view_update(obj);
                 break;
@@ -882,18 +878,11 @@ _view_init(Evas_Object *obj)
         edje_object_part_swallow(wd->base, "box.swallow", wd->box);
      }
 
-   if (!wd->rect)
+   if (!wd->label)
      {
-        Evas_Coord w, h;
-        if (! (wd->rect = edje_object_add (evas_object_evas_get (obj)))) return;
-        _elm_theme_object_set(obj, wd->rect, "multibuttonentry", "rect", elm_widget_style_get(obj));
-        elm_widget_sub_object_add(obj, wd->rect);
-        edje_object_part_geometry_get(wd->rect, "elm.base", NULL, NULL, &w, &h);
-        evas_object_size_hint_min_set(wd->rect, w, h);
-        evas_object_size_hint_weight_set(wd->rect, 0.0, EVAS_HINT_EXPAND);
-        evas_object_size_hint_align_set(wd->rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
-        if (wd->box)   elm_box_pack_start (wd->box, wd->rect);
-        evas_object_show(wd->rect);
+        if (!(wd->label = edje_object_add(evas_object_evas_get(obj)))) return;
+        _elm_theme_object_set(obj, wd->label, "multibuttonentry", "label", elm_widget_style_get(obj));
+        _set_label(obj, "");
      }
 
    if (!wd->entry)
@@ -1016,7 +1005,7 @@ elm_multibuttonentry_label_get(Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
-   if (wd->label) return elm_label_label_get(wd->label);
+   if (wd->label) return edje_object_part_text_get(wd->guidetext, "elm.text");
    return NULL;
 }
 
@@ -1051,7 +1040,7 @@ elm_multibuttonentry_guide_text_get(Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd)   return NULL;
-   if (wd->guidetext) return elm_label_label_get(wd->guidetext);
+   if (wd->guidetext) return edje_object_part_text_get(wd->guidetext, "elm.text");
    return NULL;
 }
 
