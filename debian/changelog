@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build144) unstable; urgency=low
+
+  * Remove the sqlite dependenc
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build144
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Sat, 09 Apr 2011 23:44:01 +0900
+
 elementary (1.0.0+svn.51480slp2+build143) unstable; urgency=low
 
   * [Map] Upstream merge. 

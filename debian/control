@@ -3,7 +3,7 @@ Section: x11
 Priority: optional
 Maintainer: Jaehwan Kim <jae.hwan.kim@samsung.com>, Chuneon Park <chuneon.park@samsung.com>, Juyung Seo <juyung.seo@samsung.com>, Myungjae Lee <mjae.lee@samsung.com>, Woohyun Jung <wh0705.jung@samsung.com>, Jihoon Kim <jihoon48.kim@samsung.com>, Jeonghyun Yun <jh0506.yun@samsung.com>, Seunggyun Kim <sgyun.kim@samsung.com>, Shinwoo Kim <cinoo.kim@samsung.com>
 Uploaders: Doyoun Kang <doyoun.kang@samsung.com>, Hyoyoung Chang <hyoyoung.chang@samsung.com>, Myoungwoon Kim <myoungwoon.kim@samsung.com>, Shinwoo Kim <cinoo.kim@samsung.com>
-Build-Depends: debhelper (>= 6), cdbs, libecore-dev, libevas-dev, libeet-dev, libeet-bin, libedje-dev, pkg-config, libtool, libeina-dev, libefreet-dev, libethumb-dev, libsqlite3-dev
+Build-Depends: debhelper (>= 6), cdbs, libecore-dev, libevas-dev, libeet-dev, libeet-bin, libedje-dev, pkg-config, libtool, libeina-dev, libefreet-dev, libethumb-dev
 Standards-Version: 3.8.1
 Homepage: http://www.enlightenment.org
 
