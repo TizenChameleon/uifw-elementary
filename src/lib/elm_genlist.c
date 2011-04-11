@@ -6309,3 +6309,16 @@ _item_auto_scroll(void *data)
           }
      }
 }
+
+EAPI void
+elm_genlist_realized_items_update(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   Eina_List *list, *l;
+   Elm_Genlist_Item *it;
+
+   list = elm_genlist_realized_items_get(obj);
+   EINA_LIST_FOREACH(list, l, it)
+     elm_genlist_item_update(it);
+}
