@@ -31,7 +31,6 @@ elm
    :include:/elm_ts/scroller/tslist
    :include:/elm_ts/segmentcontrol/tslist
    :include:/elm_ts/slider/tslist
-   :include:/elm_ts/dialoguegroup/tslist
    :include:/elm_ts/navigationbar_ex/tslist
    :include:/elm_ts/multibuttonentry/tslist
    :include:/elm_ts/animator/tslist
