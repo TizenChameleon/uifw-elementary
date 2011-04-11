@@ -1592,9 +1592,9 @@ _mouse_up(void            *data,
                   if (it->wd->reorder_it->parent == it->wd->reorder_rel->parent)  // todo : refactoring
                     {
                        if (roy + oy <= it->wd->reorder_rel->scrl_y)
-                          _effect_item_move_before(it->wd->reorder_it, it->wd->reorder_rel);
-                       else
                           _effect_item_move_after(it->wd->reorder_it, it->wd->reorder_rel);
+                       else
+                          _effect_item_move_before(it->wd->reorder_it, it->wd->reorder_rel);
                     }
                }
             it->wd->reorder_deleted = EINA_FALSE;
@@ -6128,11 +6128,11 @@ elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it)
  */
 EAPI void
 elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, Eina_Bool renamed)
-          {
+{
    if (!it) return;
 
    if (renamed)
-                    {
+     {
         _item_unrealize(it);
         it->renamed = EINA_TRUE;
         it->wd->rename_it = it;
@@ -6141,19 +6141,19 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, Eina_Bool renamed)
 
         if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
         it->wd->calc_job = ecore_job_add(_calc_job, it->wd);
-          }
-        else
-          {
+     }
+   else
+     {
         if (it->renamed)
-                              {
+          {
              it->renamed = EINA_FALSE;
              it->nocache = EINA_TRUE;
              it->wd->rename_it = NULL;
              _item_cache_zero(it->wd);
              elm_genlist_item_update(it);
-               }
           }
      }
+}
 
 EAPI Eina_Bool
 elm_genlist_item_rename_mode_get(Elm_Genlist_Item *item)
