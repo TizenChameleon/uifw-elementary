@@ -1751,25 +1751,7 @@ extern "C" {
    typedef Evas_Object *(*GenlistItemIconGetFunc)  (const void *data, Evas_Object *obj, const char *part);
    typedef Eina_Bool    (*GenlistItemStateGetFunc) (const void *data, Evas_Object *obj, const char *part);
    typedef void         (*GenlistItemDelFunc)      (const void *data, Evas_Object *obj);
-
-   typedef struct _Elm_Genlist_Edit_Class      Elm_Genlist_Edit_Class;
-   typedef enum _Elm_Genlist_Edit_Mode
-     {
-        ELM_GENLIST_EDIT_MODE_NONE    = 0,
-        ELM_GENLIST_EDIT_MODE_REORDER = (1 << 0),
-        ELM_GENLIST_EDIT_MODE_INSERT  = (1 << 1),
-        ELM_GENLIST_EDIT_MODE_DELETE  = (1 << 2),
-        ELM_GENLIST_EDIT_MODE_SELECT  = (1 << 3),
-        ELM_GENLIST_EDIT_MODE_SELECTALL  = (1 << 4)
-     } Elm_Genlist_Edit_Mode;
-   // TODO : below should be fixed!!!
-   typedef char        *(*GenlistItemLabelChangedFunc) (const void *data, Elm_Genlist_Item *it, const char *text, const int sub_text );
-   typedef int          (*GenlistItemEditModeGetFunc)  (const void *data, Evas_Object *obj, const int enabled_edit_modes);
-   typedef void         (*GenlistInsertNewFunc)      (Evas_Object *genlist, Elm_Genlist_Item *rel_item);
-   typedef void         (*GenlistItemSelectedFunc) (const void *data, Elm_Genlist_Item *it, Eina_Bool selected);
-   typedef void         (*GenlistSelectedFunc) (const void *data, Elm_Genlist_Item *it, Eina_Bool selected);   
-   typedef Eina_Bool    (*GenlistMoveFunc)      ( Evas_Object *genlist, Elm_Genlist_Item *item, Elm_Genlist_Item *rel_item, Eina_Bool move_after);
-   typedef Eina_Bool    (*GenlistRemoveItemFunc)     (Evas_Object *genlist, Elm_Genlist_Item *rel_item);
+   typedef void         (*GenlistItemMovedFunc)    ( Evas_Object *genlist, Elm_Genlist_Item *item, Elm_Genlist_Item *rel_item, Eina_Bool move_after);
 
    struct _Elm_Genlist_Item_Class
      {
@@ -1779,21 +1761,9 @@ extern "C" {
           GenlistItemIconGetFunc   icon_get;
           GenlistItemStateGetFunc  state_get;
           GenlistItemDelFunc       del;
-          GenlistItemEditModeGetFunc editmode_get;
-          GenlistItemLabelChangedFunc label_changed;
+          GenlistItemMovedFunc     moved;
         } func;
-     };
-
-   struct _Elm_Genlist_Edit_Class
-     {
-        GenlistRemoveItemFunc remove;
-        GenlistInsertNewFunc insert_new;
-        GenlistMoveFunc move;
-        GenlistItemSelectedFunc item_selected;
-        GenlistSelectedFunc selected;
-        const char *item_style;
-        const char *select_all_item_style;
-        const void *select_all_data;
+        const char *edit_item_style;
      };
    EAPI Evas_Object      *elm_genlist_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
    EAPI void              elm_genlist_clear(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -1878,22 +1848,25 @@ extern "C" {
    EAPI void               elm_genlist_item_cursor_engine_only_set(Elm_Genlist_Item *item, Eina_Bool engine_only) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool          elm_genlist_item_cursor_engine_only_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
 
-   EAPI void               elm_genlist_edit_mode_set(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
-   EAPI Eina_Bool          elm_genlist_edit_mode_get(const Evas_Object *obj);
-   EAPI void               elm_genlist_edit_selected_items_del(Evas_Object *obj);
-   EAPI Eina_List         *elm_genlist_edit_selected_items_get(const Evas_Object *obj);
-   EAPI void               elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it, Eina_Bool selected) EINA_ARG_NONNULL(1);
-   EAPI Eina_Bool          elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object       *elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, int emode);
-   EAPI void               elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after );
-   EAPI void               elm_genlist_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before);
-   EAPI void               elm_genlist_effect_set(const Evas_Object *obj, Eina_Bool emode);
-   EAPI void               elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode);
-   EAPI void               elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode);
-   EAPI Eina_Bool          elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj);
-   EINA_DEPRECATED EAPI void elm_genlist_set_edit_mode(Evas_Object *obj, int emode, Elm_Genlist_Edit_Class *ec);
+   EAPI void               elm_genlist_edit_mode_set(Evas_Object *obj, Eina_Bool edit_mode) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool          elm_genlist_edit_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, Eina_Bool renamed) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool          elm_genlist_item_rename_mode_get(Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after ) EINA_ARG_NONNULL(1, 2);
+   EAPI void               elm_genlist_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before) EINA_ARG_NONNULL(1, 2);
+   EAPI void               elm_genlist_effect_set(const Evas_Object *obj, Eina_Bool emode) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool          elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_realized_items_update(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_reorder_mode_set(Evas_Object *obj, Eina_Bool reorder_mode) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool          elm_genlist_reorder_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EINA_DEPRECATED EAPI void elm_genlist_selected_items_del(Evas_Object *obj);
    EINA_DEPRECATED EAPI void elm_genlist_queue_exception_set(const Evas_Object *obj, Eina_Bool emode);
+   EINA_DEPRECATED EAPI void               elm_genlist_edit_selected_items_del(Evas_Object *obj);
+   EINA_DEPRECATED EAPI Eina_List         *elm_genlist_edit_selected_items_get(const Evas_Object *obj);
+   EINA_DEPRECATED EAPI void               elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it, Eina_Bool selected);
+   EINA_DEPRECATED EAPI Eina_Bool          elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
 
   /* check */
    EAPI Evas_Object *elm_check_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
