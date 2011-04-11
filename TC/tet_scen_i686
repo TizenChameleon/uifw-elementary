@@ -45,9 +45,10 @@ elm
    :include:/elm_ts/actionslider/tslist
    :include:/elm_ts/ctxpopup/tslist
    :include:/elm_ts/slidingdrawer/tslist
-   :include:/elm_ts/stackedicon/tslist
    :include:/elm_ts/progressbar/tslist
    :include:/elm_ts/conformant/tslist
+# below will be deprecated.
+#:include:/elm_ts/stackedicon/tslist
 
 #yhkim
 ch 
