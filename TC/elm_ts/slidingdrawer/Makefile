@@ -1,11 +1,11 @@
 CC ?= gcc
 
-TARGETS = uts_elm_slidingdrawer_add_func \
-	  uts_elm_slidingdrawer_content_set \
-	  uts_elm_slidingdrawer_content_unset \
-	  uts_elm_slidingdrawer_pos_set \
-	  uts_elm_slidingdrawer_max_drag_value_set \
-	  uts_elm_slidingdrawer_drag_value_set
+TARGETS = utc_UIFW_elm_slidingdrawer_add_func \
+	  utc_UIFW_elm_slidingdrawer_content_set_func \
+	  utc_UIFW_elm_slidingdrawer_content_unset_func \
+	  utc_UIFW_elm_slidingdrawer_pos_set_func \
+	  utc_UIFW_elm_slidingdrawer_max_drag_value_set_func \
+	  utc_UIFW_elm_slidingdrawer_drag_value_set_func
 
 PKGS = elementary
 
