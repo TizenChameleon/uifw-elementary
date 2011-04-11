@@ -306,16 +306,16 @@ _item_sizing_eval(Elm_Navigationbar_Item *it)
 {
    if (!it) return;
    Widget_Data *wd = elm_widget_data_get(it->obj);
-   Evas_Coord height, minw, w;
+   Evas_Coord minw, w;
 
    if (!wd) return;
 
    edje_object_size_min_calc(wd->base, &minw, NULL);
+
+   //TODO: Even the below code for size calculation is redundant and should be removed.
+   //TODO: Item_sizing_eval function has to be totally refactored/removed.
    evas_object_geometry_get(wd->base, NULL, NULL, &w, NULL);
    if (w < minw) w = minw;
-
-   //TODO: Should be removed!! I don't prefer to refer the padding in code.
-   edje_object_part_geometry_get(wd->base, "elm.swallow.title", NULL, NULL, NULL, &height);
 
    if (it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON])
      it->fn_btn1_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
@@ -327,11 +327,6 @@ _item_sizing_eval(Elm_Navigationbar_Item *it)
 
    if (it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3])
      it->fn_btn3_w = _button_size_set(it->title_btns[ELM_NAVIGATIONBAR_FUNCTION_BUTTON3]);
-
-   //TOOD: Consider here. 
-   it->title_w = _button_size_set(wd->base);
-   evas_object_resize(it->title_obj, it->title_w, height);
-   evas_object_size_hint_min_set(it->title_obj, it->title_w, height);
 }
 
 static void
@@ -1134,7 +1129,7 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
    if (!wd) return;
 
    EINA_LIST_FOREACH(wd->stack, ll, it)
-     if (it->content != content) break;
+     if (it->content == content) break;
 
    if (!it) return;
 
