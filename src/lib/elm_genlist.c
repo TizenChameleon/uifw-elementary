@@ -5515,10 +5515,7 @@ _effect_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after)
    if (!it) return;
    if (!after) return;
 
-   if (it->wd->ed->ec->move)
-      it->wd->ed->ec->move(it->base.widget, it, after, EINA_TRUE);
-
-// printf("MOVE AFTER : %d  after = %d \n", (int)elm_genlist_item_data_get(it)+1, (int)elm_genlist_item_data_get(after)+1);
+//   printf("MOVE AFTER : it = %d  after = %d \n", it->num, after->num);
    it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
    it->wd->reorder_deleted = EINA_TRUE;
    _item_block_del(it);
@@ -5528,6 +5525,9 @@ _effect_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after)
    it->rel->relcount++;
    it->before = EINA_FALSE;
    _item_queue(it->wd, it);
+
+   if (it->itc->func.moved)
+      it->itc->func.moved(it->base.widget, it, after, EINA_TRUE);
 }
 
 static void
@@ -5536,10 +5536,7 @@ _effect_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before)
    if (!it) return;
    if (!before) return;
 
-   if (it->wd->ed->ec->move)
-      it->wd->ed->ec->move(it->base.widget, it, before, EINA_FALSE);
-
-//   printf("MOVE BEFORE : %d  before = %d \n", (int)elm_genlist_item_data_get(it)+1, (int)elm_genlist_item_data_get(before)+1);
+//   printf("MOVE BEFORE : it = %d  before = %d \n", it->num, before->num);
    it->wd->items = eina_inlist_remove(it->wd->items, EINA_INLIST_GET(it));
    it->wd->reorder_deleted = EINA_TRUE;
    _item_block_del(it);
@@ -5548,6 +5545,9 @@ _effect_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before)
    it->rel->relcount++;
    it->before = EINA_TRUE;
    _item_queue(it->wd, it);
+
+   if (it->itc->func.moved)
+      it->itc->func.moved(it->base.widget, it, before, EINA_FALSE);
 }
 
 EAPI void
