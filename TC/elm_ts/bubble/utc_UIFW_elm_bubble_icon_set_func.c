@@ -47,6 +47,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_bubble_icon_set_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_bubble_icon_set_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
