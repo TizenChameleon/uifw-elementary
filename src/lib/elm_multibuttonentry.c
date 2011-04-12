@@ -237,26 +237,31 @@ static void
 _set_vis_guidetext(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (wd && !eina_list_count(wd->items))
+   if (wd && !eina_list_count(wd->items) && wd->guidetext
+       && !elm_widget_focus_get(obj) && !wd->focused)
      {
-        if (wd->guidetext && !elm_widget_focus_get(obj) && !wd->focused)
+        elm_box_unpack(wd->box, wd->guidetext);
+        elm_box_unpack(wd->box, wd->entry);
+        evas_object_hide(wd->entry);
+        elm_box_pack_end(wd->box, wd->guidetext);
+        evas_object_show(wd->guidetext);
+        if (wd->n_str)
           {
-             elm_box_unpack(wd->box, wd->guidetext);
-             elm_box_unpack(wd->box, wd->entry);
-             evas_object_hide(wd->entry);
-             elm_box_pack_end(wd->box, wd->guidetext);
-             evas_object_show(wd->guidetext);
+             elm_scrolled_entry_entry_set(wd->entry, "");
+             wd->n_str = 0;
           }
-        else
+     }
+   else
+     {
+        elm_box_unpack(wd->box, wd->entry);
+        elm_box_unpack(wd->box, wd->guidetext);
+        evas_object_hide(wd->guidetext);
+        if (!wd->contracted)
           {
-             elm_box_unpack(wd->box, wd->entry);
-             elm_box_unpack(wd->box, wd->guidetext);
-             evas_object_hide(wd->guidetext);
              elm_box_pack_end(wd->box, wd->entry);
              evas_object_show(wd->entry);
-
-             if(elm_widget_focus_get(obj) || wd->focused)
-                elm_object_focus(wd->entry);
+             if (elm_widget_focus_get(obj) || wd->focused)
+               elm_object_focus(wd->entry);
           }
      }
    return;
@@ -390,7 +395,6 @@ _contracted_state_set(Evas_Object *obj, int contracted)
                                  Evas *e = evas_object_evas_get(obj);
                                  wd->rectForEnd = evas_object_rectangle_add(e);
                                  evas_object_color_set(wd->rectForEnd, 0, 0, 0, 0);
-                                 elm_widget_sub_object_add(obj, wd->rectForEnd);
                               }
                             evas_object_size_hint_min_set(wd->rectForEnd, rectSize, closed_height);
                             elm_box_pack_end(wd->box, wd->rectForEnd);
@@ -488,7 +492,7 @@ _view_update(Evas_Object *obj)
      }
 
    // update guidetext
-   if (wd->contracted != 1) _set_vis_guidetext(obj);
+   _set_vis_guidetext(obj);
 }
 
 static void
@@ -669,6 +673,7 @@ _del_button_item(Elm_Multibuttonentry_Item *item)
              break;
           }
      }
+   _view_update(obj);
 }
 
 static void
@@ -1322,6 +1327,7 @@ elm_multibuttonentry_items_del(Evas_Object *obj)
         wd->items = NULL;
      }
    wd->current = NULL;
+   _view_update(obj);
 }
 
 /**
