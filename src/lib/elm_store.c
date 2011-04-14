@@ -929,7 +929,7 @@ _item_fetch(Elm_Store *st, int index)
 
    EINA_LIST_FOREACH(st->header_items, l, header_list)
      {
-        if ((in_index + eina_list_count(header_list)) > index)
+        if ((in_index + (signed)eina_list_count(header_list)) > index)
           {
              sti = eina_list_nth(header_list, index - in_index);
              if ((!sti->fetched) && st->cb.fetch.func && (!sti->fetch_th))
@@ -969,7 +969,7 @@ _item_unfetch(Elm_Store *st, int index)
 
    EINA_LIST_FOREACH(st->header_items, l, header_list)
      {
-        if ((in_index + eina_list_count(header_list)) > index)
+        if ((in_index + (signed)eina_list_count(header_list)) > index)
           {
              sti = eina_list_nth(header_list, index - in_index);
              if (sti->fetched && st->cb.unfetch.func)
@@ -1314,7 +1314,7 @@ _item_get(const Elm_Store *st, const int index)
 
         EINA_LIST_FOREACH(st->header_items, l, header_list)
           {
-             if ((in_index + eina_list_count(header_list)) > index)
+             if ((in_index + (signed)eina_list_count(header_list)) > index)
                {
                   sti = eina_list_nth(header_list, index - in_index);
                   return sti;
@@ -1388,8 +1388,8 @@ _group_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                   NULL,
                                                                   temp_sti->item,
                                                                   ELM_GENLIST_ITEM_GROUP,
-                                                                  (Evas_Smart_Cb)sti->store->cb.item_select.func,
-                                                                  (void *)sti->store->cb.item_select.data);
+                                                                  _item_select_cb,
+                                                                  NULL);
                        elm_store_item_update(sti->store, sti);
                        last_header = EINA_FALSE;
                        break;
@@ -1457,11 +1457,11 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                             int index = elm_store_item_index_get(last_sti);
                             _item_unfetch(st, index);
                          }
+                       Eina_List *temp_header_list = header_list;
                        header_list = eina_list_remove(header_list, last_sti);
-
-                       if (!header_list)
+                       if (eina_list_count(header_list) == 0)
                          {
-                            st->header_items = eina_list_remove(st->header_items, header_list);
+                            st->header_items = eina_list_remove(st->header_items, temp_header_list);
                             eina_list_free(header_list);
                          }
                        elm_genlist_item_del(last_sti->item);
@@ -1477,7 +1477,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                       _item_unfetch(st, index);
                                    }
                                  header_list = eina_list_remove(header_list, temp_sti);
-                                 st->header_items = eina_list_remove(st->header_items, header_list);
+                                 st->header_items = eina_list_remove(st->header_items, temp_header_list);
                                  eina_list_free(header_list);
                                  elm_genlist_item_del(temp_sti->item);
                               }
@@ -1494,8 +1494,8 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                  header_item->item,
                                                                  last_sti->item,
                                                                  ELM_GENLIST_ITEM_NONE,
-                                                                 (Evas_Smart_Cb)st->cb.item_select.func,
-                                                                 (void *)st->cb.item_select.data);
+                                                                 _item_select_cb,
+                                                                 NULL);
                        elm_store_item_update(st, sti);
                     }
                }
@@ -1526,8 +1526,8 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                       header_item->item,
                                                                       last_sti->item,
                                                                       ELM_GENLIST_ITEM_NONE,
-                                                                      (Evas_Smart_Cb)st->cb.item_select.func,
-                                                                      (void *)st->cb.item_select.data);
+                                                                      _item_select_cb,
+                                                                      NULL);
                             elm_store_item_update(st, sti);
                             normal_add = EINA_FALSE;
                             break;
@@ -1958,7 +1958,6 @@ elm_store_item_del(Elm_Store_Item *sti)
 
    EINA_LIST_FOREACH(sti->store->header_items, l, header_list)
      {
-
         if (header_list)
           {
              Elm_Store_Item *item = eina_list_nth(header_list, 0);
@@ -1976,10 +1975,12 @@ elm_store_item_del(Elm_Store_Item *sti)
                                  int index = elm_store_item_index_get(temp_sti);
                                  _item_unfetch(sti->store, index);
                               }
+                            Eina_List *temp_header_list = header_list;
                             header_list = eina_list_remove(header_list, temp_sti);
-                            if (!header_list)
+                            if (eina_list_count(header_list) == 0)
                               {
-                                 sti->store->header_items = eina_list_remove(sti->store->header_items, header_list);
+                                 sti->store->header_items = eina_list_remove(sti->store->header_items, temp_header_list);
+                                 eina_list_free(header_list);
                               }
                             elm_genlist_item_del(temp_sti->item);
                          }
