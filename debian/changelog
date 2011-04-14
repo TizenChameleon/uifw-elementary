@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build150) unstable; urgency=low
+
+  * [Store] Fix the cache problem of item data on fetch
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build150
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Thu, 14 Apr 2011 20:28:33 +0900
+
 elementary (1.0.0+svn.51480slp2+build149) unstable; urgency=low
 
   * [Genlist] Upstream merge for signal name change.

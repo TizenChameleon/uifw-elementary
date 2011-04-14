@@ -2111,13 +2111,13 @@ _item_realize(Elm_Genlist_Item *it,
    it->want_unrealize = EINA_FALSE;
 
    if (itc) _item_cache_free(itc);
-   evas_object_smart_callback_call(it->base.widget, "realized", it);
+   if (!calc) evas_object_smart_callback_call(it->base.widget, "realized", it);
    if ((!calc) && (it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP))
      {
         if (it->itc->edit_item_style )
           {
-            _effect_item_realize(it, EINA_FALSE);
-            edje_object_message_signal_process(it->edit_obj);
+             _effect_item_realize(it, EINA_FALSE);
+             edje_object_message_signal_process(it->edit_obj);
           }
      }
 }

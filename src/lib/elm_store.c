@@ -641,13 +641,19 @@ elm_store_free(Elm_Store *st)
                   Elm_Store_Item *sti;
                   EINA_LIST_FOREACH(header_list, in_l, sti)
                     {
+                       if (sti->fetch_th)
+                         {
+                            ecore_thread_cancel(sti->fetch_th);
+                            sti->fetch_th = NULL;
+                         }
                        if (sti->data)
                          {
                             int index = elm_store_item_index_get(sti);
                             _item_unfetch(st, index);
                          }
+                       LKD(sti->lock);
+                       free(sti);
                     }
-                  free(sti);
                }
           }
         eina_list_free(st->header_items);
@@ -897,15 +903,34 @@ static void
 _store_fetch_do(void *data, Ecore_Thread *th __UNUSED__)
 {
    Elm_Store_Item *sti = data;
-   sti->store->cb.fetch.func(sti->store->cb.fetch.data, sti, sti->item_info);
-   sti->fetched = EINA_TRUE;
+
+   LKL(sti->lock);
+   if (sti->data)
+     {
+        LKU(sti->lock);
+        return;
+     }
+   if (!sti->fetched)
+     {
+        LKU(sti->lock);
+
+        if (sti->store->cb.fetch.func)
+          {
+             sti->store->cb.fetch.func(sti->store->cb.fetch.data, sti, sti->item_info);
+          }
+        LKL(sti->lock);
+        sti->fetched = EINA_TRUE;
+     }
+   LKU(sti->lock);
 }
 
 static void
 _store_fetch_end(void *data, Ecore_Thread *th)
 {
    Elm_Store_Item *sti = data;
+   LKL(sti->lock);
    if (sti->data) elm_genlist_item_update(sti->item);
+   LKU(sti->lock);
    if (th == sti->fetch_th) sti->fetch_th = NULL;
 }
 
@@ -913,8 +938,10 @@ static void
 _store_fetch_cancel(void *data, Ecore_Thread *th)
 {
    Elm_Store_Item *sti = data;
-   if (sti->data) elm_genlist_item_update(sti->item);
+   LKL(sti->lock);
    if (th == sti->fetch_th) sti->fetch_th = NULL;
+   if (sti->data) elm_genlist_item_update(sti->item);
+   LKU(sti->lock);
 }
 
 static Elm_Store_Item *
@@ -932,21 +959,27 @@ _item_fetch(Elm_Store *st, int index)
         if ((in_index + (signed)eina_list_count(header_list)) > index)
           {
              sti = eina_list_nth(header_list, index - in_index);
+             LKL(sti->lock);
              if ((!sti->fetched) && st->cb.fetch.func && (!sti->fetch_th))
                {
                   if (st->fetch_thread)
                     {
+                       LKU(sti->lock);
                        sti->fetch_th = ecore_thread_run(_store_fetch_do,
                                                         _store_fetch_end,
                                                         _store_fetch_cancel,
                                                         sti);
+                       LKL(sti->lock);
                     }
                   else
                     {
+                       LKU(sti->lock);
                        st->cb.fetch.func(st->cb.fetch.data, sti, sti->item_info);
+                       LKL(sti->lock);
                        sti->fetched = EINA_TRUE;
                     }
                }
+             LKU(sti->lock);
              return sti;
           }
         else
@@ -972,18 +1005,23 @@ _item_unfetch(Elm_Store *st, int index)
         if ((in_index + (signed)eina_list_count(header_list)) > index)
           {
              sti = eina_list_nth(header_list, index - in_index);
+             LKL(sti->lock);
              if (sti->fetched && st->cb.unfetch.func)
                {
                   if (sti->fetch_th)
                     {
+                       LKU(sti->lock);
                        ecore_thread_cancel(sti->fetch_th);
                        sti->fetch_th = NULL;
+                       LKL(sti->lock);
                     }
-
+                  LKU(sti->lock);
                   st->cb.unfetch.func(st->cb.unfetch.data, sti, sti->item_info);
+                  LKL(sti->lock);
                   sti->data = NULL;
                   sti->fetched = EINA_FALSE;
                }
+             LKU(sti->lock);
              return sti;
           }
         else
@@ -1015,38 +1053,40 @@ _item_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
 
    if (sti->item)
      {
-        if (sti->fetched == EINA_FALSE)
+        if (!sti->data)
           {
-             if (!sti->data)
+             int index = elm_store_item_index_get(sti);
+             if (sti->store->start_fetch_index > index)
                {
-                  int index = elm_store_item_index_get(sti);
-                  if (sti->store->start_fetch_index > index)
+                  int diff = sti->store->start_fetch_index - index;
+                  int loop;
+                  for (loop = 1; loop <= diff; loop++)
                     {
-                       int diff = sti->store->start_fetch_index - index;
-                       int loop;
-                       for (loop = 1; loop <= diff; loop++)
-                         {
-                            _item_unfetch(sti->store, sti->store->end_fetch_index);
-                            sti->store->end_fetch_index--;
-                            _item_fetch(sti->store, (sti->store->start_fetch_index - loop));
-                         }
-                       sti->store->start_fetch_index = index;
+                       _item_unfetch(sti->store, sti->store->end_fetch_index);
+                       sti->store->end_fetch_index--;
+                       _item_fetch(sti->store, (sti->store->start_fetch_index - loop));
                     }
-                  else if (index > sti->store->end_fetch_index)
+                  sti->store->start_fetch_index = index;
+               }
+             else if (index > sti->store->end_fetch_index)
+               {
+                  int diff = index - sti->store->end_fetch_index;
+                  int loop;
+                  for (loop = 1; loop <= diff; loop++)
                     {
-                       int diff = index - sti->store->end_fetch_index;
-                       int loop;
-                       for (loop = 1; loop <= diff; loop++)
-                         {
-                            _item_unfetch(sti->store, sti->store->start_fetch_index);
-                            sti->store->start_fetch_index++;
-                            _item_fetch(sti->store, (sti->store->end_fetch_index + loop));
-                         }
-                       sti->store->end_fetch_index = index;
+                       _item_unfetch(sti->store, sti->store->start_fetch_index);
+                       sti->store->start_fetch_index++;
+                       _item_fetch(sti->store, (sti->store->end_fetch_index + loop));
                     }
+                  sti->store->end_fetch_index = index;
+               }
+             else
+               {
+                  _item_fetch(sti->store, index);
                }
           }
 
+        LKL(sti->lock);
         if (sti->data)
           {
              const char *s = "";
@@ -1069,14 +1109,17 @@ _item_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
                     }
                   if (s)
                     {
+                       LKU(sti->lock);
                        return strdup(s);
                     }
                   else
                     {
+                       LKU(sti->lock);
                        return NULL;
                     }
                }
           }
+        LKU(sti->lock);
      }
    return NULL;
 }
@@ -1090,6 +1133,7 @@ _item_icon_get(void *data, Evas_Object *obj, const char *part)
 
    if (sti->item)
      {
+        LKL(sti->lock);
         if (sti->data)
           {
              const Elm_Store_Item_Mapping *m = _item_mapping_find(sti, part);
@@ -1139,9 +1183,11 @@ _item_icon_get(void *data, Evas_Object *obj, const char *part)
                      default:
                         break;
                     }
+                  LKU(sti->lock);
                   return ic;
                }
           }
+        LKU(sti->lock);
      }
    return NULL;
 }
@@ -1388,8 +1434,8 @@ _group_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                   NULL,
                                                                   temp_sti->item,
                                                                   ELM_GENLIST_ITEM_GROUP,
-                                                                  _item_select_cb,
-                                                                  NULL);
+                                                                  (Evas_Smart_Cb)sti->store->cb.item_select.func,
+                                                                  (void *)sti->store->cb.item_select.data);
                        elm_store_item_update(sti->store, sti);
                        last_header = EINA_FALSE;
                        break;
@@ -1403,8 +1449,8 @@ _group_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                       sti,
                                                       NULL,
                                                       ELM_GENLIST_ITEM_GROUP,
-                                                      _item_select_cb,
-                                                      NULL);
+                                                      (Evas_Smart_Cb)sti->store->cb.item_select.func,
+                                                      (void *)sti->store->cb.item_select.data);
                   elm_store_item_update(sti->store, sti);
                }
           }
@@ -1420,8 +1466,8 @@ _group_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                             sti,
                                             NULL,
                                             ELM_GENLIST_ITEM_GROUP,
-                                            _item_select_cb,
-                                            NULL);
+                                            (Evas_Smart_Cb)sti->store->cb.item_select.func,
+                                            (void *)sti->store->cb.item_select.data);
         elm_store_item_update(sti->store, sti);
      }
 }
@@ -1494,8 +1540,8 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                  header_item->item,
                                                                  last_sti->item,
                                                                  ELM_GENLIST_ITEM_NONE,
-                                                                 _item_select_cb,
-                                                                 NULL);
+                                                                 (Evas_Smart_Cb)sti->store->cb.item_select.func,
+                                                                 (void *)sti->store->cb.item_select.data);
                        elm_store_item_update(st, sti);
                     }
                }
@@ -1526,8 +1572,8 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                       header_item->item,
                                                                       last_sti->item,
                                                                       ELM_GENLIST_ITEM_NONE,
-                                                                      _item_select_cb,
-                                                                      NULL);
+                                                                      (Evas_Smart_Cb)sti->store->cb.item_select.func,
+                                                                      (void *)sti->store->cb.item_select.data);
                             elm_store_item_update(st, sti);
                             normal_add = EINA_FALSE;
                             break;
@@ -1545,8 +1591,8 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                       sti,
                                                       NULL,
                                                       ELM_GENLIST_ITEM_NONE,
-                                                      _item_select_cb,
-                                                      NULL);
+                                                      (Evas_Smart_Cb)sti->store->cb.item_select.func,
+                                                      (void *)sti->store->cb.item_select.data);
                   elm_store_item_update(st, sti);
                }
           }
@@ -1563,8 +1609,8 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                       sti,
                                                       NULL,
                                                       ELM_GENLIST_ITEM_NONE,
-                                                      _item_select_cb,
-                                                      NULL);
+                                                      (Evas_Smart_Cb)sti->store->cb.item_select.func,
+                                                      (void *)sti->store->cb.item_select.data);
                   elm_store_item_update(st, sti);
                }
           }
@@ -1834,6 +1880,10 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
 
    sti = calloc(1, sizeof(Elm_Store_Item));
    if (!sti) return NULL;
+   if (st->fetch_thread)
+     {
+        LKI(sti->lock);
+     }
    EINA_MAGIC_SET(sti, ELM_STORE_ITEM_MAGIC);
 
    sti->store = st;
@@ -1925,15 +1975,13 @@ elm_store_item_update(Elm_Store *st, Elm_Store_Item *sti)
 
    int index = elm_store_item_index_get(sti);
 
-   if (sti->fetched)
+   if ((st->start_fetch_index <= index) && (index <= st->end_fetch_index))
      {
-        _item_unfetch(st, index);
-     }
-   _item_fetch(st, index);
-   if (sti->data) elm_genlist_item_update(sti->item);
-
-   if (!st->fetch_thread)
-     {
+        if (sti->fetched)
+          {
+             _item_unfetch(st, index);
+          }
+        _item_fetch(st, index);
         if (sti->data) elm_genlist_item_update(sti->item);
      }
 }
@@ -1982,7 +2030,9 @@ elm_store_item_del(Elm_Store_Item *sti)
                                  sti->store->header_items = eina_list_remove(sti->store->header_items, temp_header_list);
                                  eina_list_free(header_list);
                               }
+                            LKD(sti->lock);
                             elm_genlist_item_del(temp_sti->item);
+                            free(sti);
                          }
                     }
                }
