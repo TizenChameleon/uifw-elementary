@@ -12,7 +12,7 @@
  *
  * Signals that you can add callbacks for are:
  *
- * clicked - The user has double-clicked a item. The event_info
+ * clicked,double - The user has double-clicked a item. The event_info
  * parameter is the Gengrid item that was double-clicked.
  *
  * selected - The user has made an item selected. The event_info
@@ -810,7 +810,10 @@ _mouse_down(void        *data,
    item->wd->wasselected = item->selected;
    _item_hilight(item);
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-     evas_object_smart_callback_call(item->wd->self, "clicked", item);
+     {
+        evas_object_smart_callback_call(item->wd->self, "clicked,double", item);
+        evas_object_smart_callback_call(item->wd->self, "clicked", item); // will be removed
+     }
    if (item->long_timer) ecore_timer_del(item->long_timer);
    if (item->realized)
      item->long_timer = ecore_timer_add(_elm_config->longpress_timeout,
