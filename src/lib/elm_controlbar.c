@@ -2171,6 +2171,8 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
 
    int sel = 1;
 
+   if (!it) return;
+
    obj = it->obj;
    if (it->obj == NULL)
      {
@@ -2187,7 +2189,8 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
    // unpack base item
    if (it->order > 0)
      {
-        elm_table_unpack(wd->box, it->base);
+        if (it->base)
+          elm_table_unpack(wd->box, it->base);
         sel = it->sel;
         EINA_LIST_FOREACH(wd->items, l, item)
           {
@@ -2195,7 +2198,8 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
                {
                   if (item->order > it->order)
                     {
-                       elm_table_unpack(wd->box, item->base);
+                       if (item->base)
+                         elm_table_unpack(wd->box, item->base);
                        item->order -= sel;
                        if(!wd->vertical)
                          elm_table_pack(wd->box, item->base, item->order - 1, 0, item->sel, 1);
