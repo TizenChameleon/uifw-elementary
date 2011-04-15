@@ -1488,9 +1488,10 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
         else
           {
              Eina_List *l;
+             Eina_List *l_next;
              Eina_List *header_list;
 
-             EINA_LIST_FOREACH(st->header_items, l, header_list)
+             EINA_LIST_FOREACH_SAFE(st->header_items, l, l_next, header_list)
                {
                   Elm_Store_Item *header_item = eina_list_nth(header_list, 0);
 
@@ -2002,9 +2003,10 @@ elm_store_item_del(Elm_Store_Item *sti)
    sti->store->total_count--;
 
    Eina_List *l;
+   Eina_List*l_next;
    Eina_List *header_list;
 
-   EINA_LIST_FOREACH(sti->store->header_items, l, header_list)
+   EINA_LIST_FOREACH_SAFE(sti->store->header_items, l, l_next, header_list)
      {
         if (header_list)
           {
@@ -2013,8 +2015,9 @@ elm_store_item_del(Elm_Store_Item *sti)
              if (item->item_info->group_index == sti->item_info->group_index)
                {
                   Eina_List *in_l;
+                  Eina_List *in_l_next;
                   Elm_Store_Item *temp_sti;
-                  EINA_LIST_FOREACH(header_list, in_l, temp_sti)
+                  EINA_LIST_FOREACH_SAFE(header_list, in_l, in_l_next, temp_sti)
                     {
                        if (temp_sti->item_info->index == sti->item_info->index)
                          {
