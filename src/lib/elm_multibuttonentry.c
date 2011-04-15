@@ -9,7 +9,6 @@
  */
 
 #define MAX_STR 256
-#define MAX_W_BTN 200
 #define MIN_W_ENTRY 20
 
 typedef enum _Multibuttonentry_Pos
@@ -36,7 +35,6 @@ typedef enum _MultiButtonEntry_Closed_Button_Type {
 struct _Multibuttonentry_Item {
    Evas_Object *multibuttonentry;
    Evas_Object *button;
-   Evas_Object *label;
    void *data;
    Evas_Coord vw, rw; // vw: visual width, real width
    Eina_Bool  visible: 1;
@@ -126,9 +124,7 @@ _theme_hook(Evas_Object *obj)
    EINA_LIST_FOREACH(wd->items, l, item)
      {
         if (item->button)
-         _elm_theme_object_set (obj, item->button, "multibuttonentry", "btn", elm_widget_style_get (obj));
-        if (item->label)
-         edje_object_part_swallow (item->button, "elm.label", item->label);
+          _elm_theme_object_set(obj, item->button, "multibuttonentry", "btn", elm_widget_style_get (obj));
         edje_object_scale_set(item->button, elm_widget_scale_get(obj) * _elm_config->scale);
      }
 
@@ -636,15 +632,8 @@ _del_button_obj(Evas_Object *obj, Evas_Object *btn)
    if (!wd || !btn)   return;
 
    if (btn)
-     {
-        // del label
-        label = edje_object_part_swallow_get(btn, "elm.label");
-        edje_object_part_unswallow(btn, label);
-        evas_object_del(label);
-
-        // del button
-        evas_object_del(btn);
-     }
+     // del button
+     evas_object_del(btn);
 }
 
 static void
@@ -693,36 +682,34 @@ _del_button(Evas_Object *obj)
      {
         item = eina_list_data_get(wd->current);
         if (item)
-          {
-             _del_button_item(item);
-          }
+          _del_button_item(item);
      }
 }
 
 static void
-_resize_button(Evas_Object *btn, Evas_Object *label, Evas_Coord *realw, Evas_Coord *vieww)
+_resize_button(Evas_Object *btn, Evas_Coord *realw, Evas_Coord *vieww)
 {
    Evas_Coord rw, vw;
-   Evas_Coord w_label, h_label, w_btn, h_btn, padding_outer, padding_inner;
+   Evas_Coord w_text, h_btn, padding_outer, padding_inner;
+   Evas_Coord w_btn = 0, button_max_width = 0;
+   const char *size_str;
+
+   size_str = edje_object_data_get(btn, "button_max_size");
+   if (size_str) button_max_width = (Evas_Coord)atoi(size_str);
 
    // decide the size of button
-   evas_object_size_hint_min_get(label, &w_label, &h_label);
    edje_object_part_geometry_get(btn, "elm.base", NULL, NULL, NULL, &h_btn);
+   edje_object_part_geometry_get(btn, "elm.btn.text", NULL, NULL, &w_text, NULL);
    edje_object_part_geometry_get(btn, "left.padding", NULL, NULL, &padding_outer, NULL);
    edje_object_part_geometry_get(btn, "left.inner.padding", NULL, NULL, &padding_inner, NULL);
-   w_btn = w_label + 2*padding_outer + 2*padding_inner;
+   w_btn = w_text + 2*padding_outer + 2*padding_inner;
 
    rw = w_btn;
-   vw =(MAX_W_BTN < w_btn) ? MAX_W_BTN : w_btn;
+   vw = (button_max_width < w_btn) ? button_max_width : w_btn;
 
-   //resize btn and label
+   //resize btn
    evas_object_resize(btn, vw, h_btn);
    evas_object_size_hint_min_set(btn, vw, h_btn);
-   if ( (rw != vw) &&  (vw - 2*padding_outer - 2*padding_inner >=0))
-     {
-        evas_object_resize(label, vw - 2*padding_outer - 2*padding_inner, h_label);
-        elm_label_wrap_width_set(label, vw - 2*padding_outer - 2*padding_inner );
-     }
 
    if(realw) *realw = rw;
    if(vieww) *vieww = vw;
@@ -733,8 +720,7 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 {
    Elm_Multibuttonentry_Item *item;
    Evas_Object *btn;
-   Evas_Object *label;
-   //Evas_Coord w_label, h_label, w_btn, h_btn, padding_outer, padding_inner;
+   Evas_Coord width, height;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->box || !wd->entry) return NULL;
 
@@ -743,33 +729,25 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
    // add button
    btn = edje_object_add(evas_object_evas_get(obj));
 
-   const char *btn_style = edje_object_data_get(wd->base,"button");
 
-   if (!btn_style || !strcmp(btn_style,"rect"))
-     _elm_theme_object_set(obj,btn,"multibuttonentry","rect_btn",elm_widget_style_get(obj));
-   else
-     _elm_theme_object_set(obj, btn, "multibuttonentry", "btn", elm_widget_style_get(obj));
+   _elm_theme_object_set(obj, btn, "multibuttonentry", "btn", elm_widget_style_get(obj));
+   edje_object_part_text_set(btn, "elm.btn.text", str);
+   edje_object_part_geometry_get(btn, "elm.btn.text", NULL, NULL, &width, &height);
+   evas_object_size_hint_min_set(btn, width, height);
    edje_object_signal_callback_add(btn, "mouse,clicked,1", "*", _button_clicked, obj);
    evas_object_size_hint_weight_set(btn, 0.0, 0.0);
    evas_object_show(btn);
 
    // add label
-   label = elm_label_add(obj);
-   elm_object_style_set(label, "extended/multibuttonentry_button");
-   elm_label_label_set(label, str);
-   elm_label_ellipsis_set(label, EINA_TRUE);
-   edje_object_part_swallow(btn, "elm.label", label);
-
    // append item list
    item = ELM_NEW(Elm_Multibuttonentry_Item);
    if (item)
      {
         Evas_Coord rw, vw;
-        _resize_button(btn, label, &rw, &vw);
+        _resize_button(btn, &rw, &vw);
 
         item->multibuttonentry = obj;
         item->button = btn;
-        item->label = label;
         item->data = data;
         item->rw = rw;
         item->vw = vw;
@@ -1364,11 +1342,10 @@ elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item)
    if (!wd || !wd->items) return NULL;
 
    EINA_LIST_FOREACH(wd->items, l, _item)
-      if (_item == item)
-        {
-           Evas_Object *label = edje_object_part_swallow_get(_item->button, "elm.label");
-           if (label)   return elm_label_label_get (label);
-        }
+     {
+        if (_item == item)
+          return edje_object_part_text_get(_item->button, "elm.btn.text");
+     }
 
    return NULL;
 }
@@ -1395,9 +1372,8 @@ elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char 
    EINA_LIST_FOREACH(wd->items, l, _item)
       if (_item == item)
         {
-           Evas_Object *label = edje_object_part_swallow_get(_item->button, "elm.label");
-           if (label)   elm_label_label_set (label, str);
-           _resize_button(_item->button, label, &_item->rw, &_item->vw);
+           edje_object_part_text_set(_item->button, "elm.btn.text", str);
+           _resize_button(_item->button, &_item->rw, &_item->vw);
            break;
         }
 }
