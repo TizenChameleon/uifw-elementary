@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build154) unstable; urgency=low
+
+  * Multibuttonentry: Fix Focus issue
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build154
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Mon, 18 Apr 2011 16:49:48 +0900
+
 elementary (1.0.0+svn.51480slp2+build153) unstable; urgency=low
 
   * Multibuttonentry: Fix Focus issue
