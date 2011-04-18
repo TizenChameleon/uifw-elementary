@@ -31,6 +31,8 @@
  * "downloaded" - This is called when map images are downloaded
  * "route,load" - This is called when route request begins
  * "route,loaded" - This is called when route request ends
+ * "name,load" - This is called when name request begins
+ * "name,loaded- This is called when name request ends
  *
  * TODO : doxygen
  */
@@ -47,12 +49,14 @@ typedef struct _Route_Node Route_Node;
 typedef struct _Route_Waypoint Route_Waypoint;
 typedef struct _Url_Data Url_Data;
 typedef struct _Route_Dump Route_Dump;
+typedef struct _Name_Dump Name_Dump;
 
 #define DEST_DIR_ZOOM_PATH "/tmp/elm_map/%d/%d/"
 #define DEST_DIR_PATH DEST_DIR_ZOOM_PATH"%d/"
 #define DEST_FILE_PATH "%s%d.png"
 #define MOD_AS "map/api"
-#define DEST_XML_FILE "/tmp/elm_map-XXXXXX"
+#define DEST_ROUTE_XML_FILE "/tmp/elm_map-route-XXXXXX"
+#define DEST_NAME_XML_FILE "/tmp/elm_map-name-XXXXXX"
 
 #define ROUTE_YOURS_URL "http://www.yournavigation.org/api/dev/route.php"
 #define ROUTE_TYPE_MOTORCAR "motocar"
@@ -62,9 +66,15 @@ typedef struct _Route_Dump Route_Dump;
 #define YOURS_DESCRIPTION "description"
 #define YOURS_COORDINATES "coordinates"
 
-// TODO: fix monav & ors url 
+// TODO: fix monav & ors url
 #define ROUTE_MONAV_URL "http://"
 #define ROUTE_ORS_URL "http:///"
+
+#define NAME_NOMINATIM_URL "http://nominatim.openstreetmap.org"
+#define NOMINATIM_RESULT "result"
+#define NOMINATIM_PLACE "place"
+#define NOMINATIM_ATTR_LON "lon"
+#define NOMINATIM_ATTR_LAT "lat"
 
 // Map sources
 // Currently the size of a tile must be 256*256
@@ -78,6 +88,7 @@ typedef struct _Map_Sources_Tab
    ElmMapSourceURLFunc url_cb;
    Elm_Map_Route_Sources route_source;
    ElmMapRouteSourceURLFunc route_url_cb;
+   ElmMapNameSourceURLFunc name_url_cb;
 } Map_Sources_Tab;
 
 #define ZOOM_MAX 18
@@ -110,19 +121,27 @@ static char *_route_custom6_url_cb(Evas_Object *obj __UNUSED__, char *type_name,
 static char *_route_module_url_cb(Evas_Object *obj __UNUSED__, char *type_name, int method, double flon, double flat, double tlon, double tlat);
  */
 
+static char *_nominatim_url_cb(Evas_Object *obj, int method, char *name, double lon, double lat);
+static char *_name_custom1_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__);
+static char *_name_custom2_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__);
+static char *_name_custom3_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__);
+static char *_name_custom4_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__);
+static char *_name_custom5_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__);
+static char *_name_custom6_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__);
+
 static Map_Sources_Tab map_sources_tab[] =
 {
-     {ELM_MAP_SOURCE_MAPNIK, "Mapnik", 0, 18, _mapnik_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb},
-     {ELM_MAP_SOURCE_OSMARENDER, "Osmarender", 0, 17, _osmarender_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb},
-     {ELM_MAP_SOURCE_CYCLEMAP, "Cycle Map", 0, 17, _cyclemap_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb},
-     {ELM_MAP_SOURCE_MAPLINT, "Maplint", 12, 16, _maplint_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb},
-     {ELM_MAP_SOURCE_CUSTOM_1, "Custom 1", 0, 18, _custom1_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_1, _route_custom1_url_cb},
-     {ELM_MAP_SOURCE_CUSTOM_2, "Custom 2", 0, 18, _custom2_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_2, _route_custom2_url_cb},
-     {ELM_MAP_SOURCE_CUSTOM_3, "Custom 3", 0, 18, _custom3_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_3, _route_custom3_url_cb},
-     {ELM_MAP_SOURCE_CUSTOM_4, "Custom 4", 0, 18, _custom4_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_4, _route_custom4_url_cb},
-     {ELM_MAP_SOURCE_CUSTOM_5, "Custom 5", 0, 18, _custom5_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_5, _route_custom5_url_cb},
-     {ELM_MAP_SOURCE_CUSTOM_6, "Custom 6", 0, 18, _custom6_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_6, _route_custom6_url_cb},
-     {ELM_MAP_SOURCE_MODULE, "Module", 0, 18, _module_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb}
+     {ELM_MAP_SOURCE_MAPNIK, "Mapnik", 0, 18, _mapnik_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb, _nominatim_url_cb},
+     {ELM_MAP_SOURCE_OSMARENDER, "Osmarender", 0, 17, _osmarender_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb, _nominatim_url_cb},
+     {ELM_MAP_SOURCE_CYCLEMAP, "Cycle Map", 0, 17, _cyclemap_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb, _nominatim_url_cb},
+     {ELM_MAP_SOURCE_MAPLINT, "Maplint", 12, 16, _maplint_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb, _nominatim_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_1, "Custom 1", 0, 18, _custom1_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_1, _route_custom1_url_cb, _name_custom1_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_2, "Custom 2", 0, 18, _custom2_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_2, _route_custom2_url_cb, _name_custom2_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_3, "Custom 3", 0, 18, _custom3_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_3, _route_custom3_url_cb, _name_custom3_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_4, "Custom 4", 0, 18, _custom4_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_4, _route_custom4_url_cb, _name_custom4_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_5, "Custom 5", 0, 18, _custom5_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_5, _route_custom5_url_cb, _name_custom5_url_cb},
+     {ELM_MAP_SOURCE_CUSTOM_6, "Custom 6", 0, 18, _custom6_url_cb, ELM_MAP_ROUTE_SOURCE_CUSTOM_6, _route_custom6_url_cb, _name_custom6_url_cb},
+     {ELM_MAP_SOURCE_MODULE, "Module", 0, 18, _module_url_cb, ELM_MAP_ROUTE_SOURCE_YOURS, _yours_url_cb, _nominatim_url_cb}
 };
 
 struct _Url_Data
@@ -263,6 +282,18 @@ struct _Route_Waypoint
    const char *point;
 };
 
+struct _Elm_Map_Name
+{
+   Widget_Data *wd;
+
+   Ecore_Con_Url *con_url;
+   int method;
+   char *address;
+   double lon, lat;
+   Url_Data ud;
+   Ecore_Event_Handler *handler;
+};
+
 struct _Grid_Item
 {
    Widget_Data *wd;
@@ -301,7 +332,6 @@ struct _Widget_Data
    Evas_Coord pan_x, pan_y, minw, minh;
 
    int id;
-   int fid;
    int zoom;
    Elm_Map_Zoom_Mode mode;
 
@@ -326,7 +356,6 @@ struct _Widget_Data
    int preload_num;
    Eina_List *grids;
    Eina_Bool resized : 1;
-   Eina_Bool longpressed : 1;
    Eina_Bool on_hold : 1;
    Eina_Bool paused : 1;
    Eina_Bool paused_markers : 1;
@@ -358,6 +387,8 @@ struct _Widget_Data
    Eina_Hash *ua;
    const char *user_agent;
    Eina_List *route;
+   Evas_Event_Mouse_Down ev;
+   Eina_List *names;
 };
 
 struct _Mod_Api
@@ -408,6 +439,23 @@ enum _Route_Xml_Attribute
    ROUTE_XML_LAST
 } Route_Xml_Attibute;
 
+struct _Name_Dump
+{
+   int id;
+   char *address;
+   double lon;
+   double lat;
+};
+
+enum _Name_Xml_Attribute
+{
+   NAME_XML_NONE,
+   NAME_XML_NAME,
+   NAME_XML_LON,
+   NAME_XML_LAT,
+   NAME_XML_LAST
+} Name_Xml_Attibute;
+
 static int dis_old = 0;
 static const char *widtype = NULL;
 
@@ -427,6 +475,8 @@ static const char SIG_ZOOM_STOP[] = "zoom,stop";
 static const char SIG_DOWNLOADED[] = "downloaded";
 static const char SIG_ROUTE_LOAD[] = "route,load";
 static const char SIG_ROUTE_LOADED[] = "route,loaded";
+static const char SIG_NAME_LOAD[] = "name,load";
+static const char SIG_NAME_LOADED[] = "name,loaded";
 static const Evas_Smart_Cb_Description _signals[] = {
        {SIG_CHANGED, ""},
        {SIG_CLICKED, ""},
@@ -444,6 +494,8 @@ static const Evas_Smart_Cb_Description _signals[] = {
        {SIG_DOWNLOADED, ""},
        {SIG_ROUTE_LOAD, ""},
        {SIG_ROUTE_LOADED, ""},
+       {SIG_NAME_LOAD, ""},
+       {SIG_NAME_LOADED, ""},
        {NULL, NULL}
 };
 
@@ -1402,8 +1454,7 @@ _long_press(void *data)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return ECORE_CALLBACK_CANCEL;
    wd->long_timer = NULL;
-   wd->longpressed = EINA_TRUE;
-   evas_object_smart_callback_call(data, SIG_LONGPRESSED, NULL);
+   evas_object_smart_callback_call(data, SIG_LONGPRESSED, &wd->ev);
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -1431,8 +1482,9 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
      evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, ev);
    else
      evas_object_smart_callback_call(data, SIG_PRESS, ev);
-   wd->longpressed = EINA_FALSE;
    if (wd->long_timer) ecore_timer_del(wd->long_timer);
+   wd->ev.output.x = ev->output.x;
+   wd->ev.output.y = ev->output.y;
    wd->long_timer = ecore_timer_add(_elm_config->longpress_timeout, _long_press, data);
 }
 
@@ -1636,6 +1688,7 @@ _del_hook(Evas_Object *obj)
    Route_Waypoint *w;
    Ecore_Event_Handler *h;
    Elm_Map_Route *r;
+   Elm_Map_Name *na;
 
    if (!wd) return;
 
@@ -1686,6 +1739,19 @@ _del_hook(Evas_Object *obj)
         if (r->info.nodes) eina_stringshare_del(r->info.nodes);
         if (r->info.waypoints) eina_stringshare_del(r->info.waypoints);
      }
+
+   EINA_LIST_FREE(wd->names, na)
+     {
+        if (na->address) free(na->address);
+        if (na->handler) ecore_event_handler_del(na->handler);
+        if (na->ud.fname)
+          {
+             ecore_file_remove(na->ud.fname);
+             free(na->ud.fname);
+             na->ud.fname = NULL;
+          }
+     }
+
    if (wd->calc_job) ecore_job_del(wd->calc_job);
    if (wd->scr_timer) ecore_timer_del(wd->scr_timer);
    if (wd->zoom_animator) ecore_animator_del(wd->zoom_animator);
@@ -2341,16 +2407,23 @@ _event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type ty
 }
 
 static Eina_Bool
-cb_dump_attrs(void *data __UNUSED__, const char *key __UNUSED__, const char *value __UNUSED__)
+cb_dump_name_attrs(void *data, const char *key, const char *value)
 {
+   Name_Dump *dump = (Name_Dump*)data;
+   if (!dump) return EINA_FALSE;
+
+   if (!strncmp(key, NOMINATIM_ATTR_LON, sizeof(NOMINATIM_ATTR_LON))) dump->lon = atof(value);
+   else if (!strncmp(key, NOMINATIM_ATTR_LAT, sizeof(NOMINATIM_ATTR_LAT))) dump->lat = atof(value);
+
    return EINA_TRUE;
 }
 
 
 static Eina_Bool
-cb_dump(void *data, Eina_Simple_XML_Type type, const char *value, unsigned offset __UNUSED__, unsigned length)
+cb_route_dump(void *data, Eina_Simple_XML_Type type, const char *value, unsigned offset __UNUSED__, unsigned length)
 {
    Route_Dump *dump = data;
+   if (!dump) return EINA_FALSE;
 
    switch (type)
      {
@@ -2367,14 +2440,8 @@ cb_dump(void *data, Eina_Simple_XML_Type type, const char *value, unsigned offse
                 else if (!strncmp(value, YOURS_COORDINATES, length)) dump->id = ROUTE_XML_COORDINATES;
                 else dump->id = ROUTE_XML_NONE;
              }
-           else
-             {
-                eina_simple_xml_attributes_parse
-                  (attrs, length - (attrs - value), cb_dump_attrs, dump);
-             }
-        }
+         }
         break;
-
       case EINA_SIMPLE_XML_DATA:
         {
            char *buf = malloc(length);
@@ -2386,20 +2453,46 @@ cb_dump(void *data, Eina_Simple_XML_Type type, const char *value, unsigned offse
            free(buf);
         }
         break;
+      default:
+        break;
+     }
 
-      case EINA_SIMPLE_XML_CLOSE:
+   return EINA_TRUE;
+}
+
+static Eina_Bool
+cb_name_dump(void *data, Eina_Simple_XML_Type type, const char *value, unsigned offset __UNUSED__, unsigned length)
+{
+   Name_Dump *dump = data;
+   if (!dump) return EINA_FALSE;
+
+   switch (type)
+     {
+      case EINA_SIMPLE_XML_OPEN:
+      case EINA_SIMPLE_XML_OPEN_EMPTY:
+        {
+           const char *attrs;
+           attrs = eina_simple_xml_tag_attributes_find(value, length);
+           if (attrs)
+             {
+                if (!strncmp(value, NOMINATIM_RESULT, sizeof(NOMINATIM_RESULT)-1)) dump->id = NAME_XML_NAME;
+                else dump->id = NAME_XML_NONE;
+
+                eina_simple_xml_attributes_parse
+                  (attrs, length - (attrs - value), cb_dump_name_attrs, dump);
+             }
+        }
         break;
-      case EINA_SIMPLE_XML_CDATA:
+      case EINA_SIMPLE_XML_DATA:
+        {
+           char *buf = malloc(length + 1);
+           if (!buf) return EINA_FALSE;
+           snprintf(buf, length + 1, "%s", value);
+           if (dump->id == NAME_XML_NAME) dump->address = strdup(buf);
+           free(buf);
+        }
         break;
-      case EINA_SIMPLE_XML_ERROR:
-        break;
-      case EINA_SIMPLE_XML_PROCESSING:
-        break;
-      case EINA_SIMPLE_XML_DOCTYPE:
-        break;
-      case EINA_SIMPLE_XML_COMMENT:
-        break;
-      case EINA_SIMPLE_XML_IGNORED:
+      default:
         break;
      }
 
@@ -2437,7 +2530,7 @@ _parse_kml(void *data)
                {
                   if (fread(buf, 1, sz, f))
                     {
-                       eina_simple_xml_parse(buf, sz, EINA_TRUE, cb_dump, &dump);
+                       eina_simple_xml_parse(buf, sz, EINA_TRUE, cb_route_dump, &dump);
                        free(buf);
                     }
                }
@@ -2502,8 +2595,52 @@ _parse_kml(void *data)
      }
 }
 
+static void
+_parse_name(void *data)
+{
+   Elm_Map_Name *n = (Elm_Map_Name*)data;
+   if (!n && !n->ud.fname) return;
+
+   FILE *f;
+
+   Name_Dump dump = {0, NULL, 0.0, 0.0};
+
+   f = fopen(n->ud.fname, "rb");
+   if (f)
+     {
+        long sz;
+
+        fseek(f, 0, SEEK_END);
+        sz = ftell(f);
+        if (sz > 0)
+          {
+             char *buf;
+
+             fseek(f, 0, SEEK_SET);
+             buf = malloc(sz);
+             if (buf)
+               {
+                  if (fread(buf, 1, sz, f))
+                    {
+                       eina_simple_xml_parse(buf, sz, EINA_TRUE, cb_name_dump, &dump);
+                       free(buf);
+                    }
+               }
+          }
+        fclose(f);
+
+        if (dump.address)
+          {
+             INF("[%lf : %lf] ADDRESS : %s", n->lon, n->lat, dump.address);
+             n->address = strdup(dump.address);
+          }
+        n->lon = dump.lon;
+        n->lat = dump.lat;
+     }
+}
+
 static Eina_Bool
-_common_complete_cb(void *data, int ev_type __UNUSED__, void *event)
+_route_complete_cb(void *data, int ev_type __UNUSED__, void *event)
 {
    Ecore_Con_Event_Url_Complete *ev = event;
    Elm_Map_Route *r = (Elm_Map_Route*)data;
@@ -2527,6 +2664,85 @@ _common_complete_cb(void *data, int ev_type __UNUSED__, void *event)
                            "elm,state,busy,stop", "elm");
    evas_object_smart_callback_call(wd->obj, SIG_ROUTE_LOADED, NULL);
    return EINA_TRUE;
+}
+
+static Eina_Bool
+_name_complete_cb(void *data, int ev_type __UNUSED__, void *event)
+{
+   Ecore_Con_Event_Url_Complete *ev = event;
+   Elm_Map_Name *n = (Elm_Map_Name*)data;
+   Widget_Data *wd = n->wd;
+
+   if ((!n) || (!ev)) return EINA_TRUE;
+   Elm_Map_Name *nn = ecore_con_url_data_get(n->con_url);
+   ecore_con_url_data_set(n->con_url, NULL);
+   if (n!=nn) return EINA_TRUE;
+
+   if (n->ud.fd) fclose(n->ud.fd);
+   _parse_name(n);
+
+   edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr),
+                           "elm,state,busy,stop", "elm");
+   evas_object_smart_callback_call(wd->obj, SIG_NAME_LOADED, NULL);
+   return EINA_TRUE;
+}
+
+static Elm_Map_Name *
+_utils_convert_name(const Evas_Object *obj, int method, char *address, double lon, double lat)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+
+   char buf[PATH_MAX];
+   char *source;
+   int fd;
+   Elm_Map_Name *name = ELM_NEW(Elm_Map_Name);
+   if (!name) return NULL;
+
+   snprintf(buf, sizeof(buf), DEST_NAME_XML_FILE);
+   fd = mkstemp(buf);
+   if (fd < 0)
+     {
+        free(name);
+        return NULL;
+     }
+
+   name->con_url = ecore_con_url_new(NULL);
+   name->ud.fname = strdup(buf);
+   INF("xml file : %s", name->ud.fname);
+
+   name->ud.fd = fdopen(fd, "w+");
+   if ((!name->con_url) || (!name->ud.fd))
+     {
+        ecore_con_url_free(name->con_url);
+        free(name);
+        return NULL;
+     }
+
+   name->wd = wd;
+   name->handler = ecore_event_handler_add (ECORE_CON_EVENT_URL_COMPLETE, _name_complete_cb, name);
+   name->method = method;
+   if (method == ELM_MAP_NAME_METHOD_SEARCH) name->address = strdup(address);
+   else if (method == ELM_MAP_NAME_METHOD_REVERSE) name->address = NULL;
+   name->lon = lon;
+   name->lat = lat;
+
+   source = map_sources_tab[wd->source].name_url_cb(wd->obj, method, address, lon, lat);
+   INF("name url = %s", source);
+
+   wd->names = eina_list_append(wd->names, name);
+   ecore_con_url_url_set(name->con_url, source);
+   ecore_con_url_fd_set(name->con_url, fileno(name->ud.fd));
+   ecore_con_url_data_set(name->con_url, name);
+
+   edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr),
+                           "elm,state,busy,start", "elm");
+   evas_object_smart_callback_call(wd->obj, SIG_NAME_LOAD, NULL);
+   ecore_con_url_get(name->con_url);
+   if (source) free(source);
+
+   return name;
+
 }
 
 static int idnum = 1;
@@ -2636,7 +2852,6 @@ elm_map_add(Evas_Object *parent)
 
    wd->zoom = -1;
    wd->mode = ELM_MAP_ZOOM_MODE_MANUAL;
-   wd->fid = 0;
    wd->id = ((int)getpid() << 16) | idnum;
    idnum++;
 
@@ -3240,7 +3455,42 @@ elm_map_utils_convert_geo_into_coord(const Evas_Object *obj, double lon, double 
      *y = floor((1.0 - log( tan(lat * ELM_PI/180.0) + 1.0 / cos(lat * ELM_PI/180.0)) / ELM_PI) / 2.0 * size);
 }
 
+/**
+ * Convert a geographic coordinate (longitude, latitude) into a name (address).
+ *
+ * @param obj The map object
+ * @param lon the longitude
+ * @param lat the latitude
+ *
+ * @return name the address
+ *
+ * @ingroup Map
+ */
+EAPI Elm_Map_Name *
+elm_map_utils_convert_coord_into_name(const Evas_Object *obj, double lon, double lat)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   return _utils_convert_name(obj, ELM_MAP_NAME_METHOD_REVERSE, NULL, lon, lat);
+}
 
+/**
+ * Convert a name (address) into a geographic coordinate (longitude, latitude).
+ *
+ * @param obj The map object
+ * @param name the address
+ * @param lat the latitude correspond to y
+ *
+ * @return name the address
+ *
+ * @ingroup Map
+ */
+EAPI Elm_Map_Name *
+elm_map_utils_convert_name_into_coord(const Evas_Object *obj, char *address)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   if (!address) return NULL;
+   return _utils_convert_name(obj, ELM_MAP_NAME_METHOD_SEARCH, address, 0.0, 0.0);
+}
 
 /**
  * Add a marker on the map
@@ -3930,6 +4180,7 @@ elm_map_source_set(Evas_Object *obj, Elm_Map_Sources source)
    int zoom;
    Mod_Api *api = NULL;
    if (!wd) return;
+   _elm_config_sub_init();
    if (source == ELM_MAP_SOURCE_MODULE)
      {
         module(obj);
@@ -3963,7 +4214,7 @@ elm_map_source_set(Evas_Object *obj, Elm_Map_Sources source)
  * @ingroup Map
  */
 EAPI void
-elm_map_route_source_set(Evas_Object *obj, Elm_Map_Route_Sources source __UNUSED__)
+elm_map_route_source_set(Evas_Object *obj, Elm_Map_Route_Sources source)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -4019,7 +4270,7 @@ elm_map_route_source_get(const Evas_Object *obj)
  * @ingroup Map
  */
 EAPI void
-elm_map_source_custom_api_set(Elm_Map_Sources source, const char *name, int zoom_min, int zoom_max, ElmMapSourceURLFunc url_cb, ElmMapRouteSourceURLFunc route_url_cb)
+elm_map_source_custom_api_set(Elm_Map_Sources source, const char *name, int zoom_min, int zoom_max, ElmMapSourceURLFunc url_cb, ElmMapRouteSourceURLFunc route_url_cb, ElmMapNameSourceURLFunc name_url_cb)
 {
    EINA_SAFETY_ON_NULL_RETURN(name);
    EINA_SAFETY_ON_NULL_RETURN(url_cb);
@@ -4028,6 +4279,7 @@ elm_map_source_custom_api_set(Elm_Map_Sources source, const char *name, int zoom
    map_sources_tab[source].zoom_max = zoom_max;
    map_sources_tab[source].url_cb = url_cb;
    map_sources_tab[source].route_url_cb = route_url_cb;
+   map_sources_tab[source].name_url_cb = name_url_cb;
 }
 
 /**
@@ -4146,19 +4398,18 @@ elm_map_route_add(Evas_Object *obj,
    Elm_Map_Route *route = ELM_NEW(Elm_Map_Route);
    if (!route) return NULL;
 
-   snprintf(buf, sizeof(buf), DEST_XML_FILE);
+   snprintf(buf, sizeof(buf), DEST_ROUTE_XML_FILE);
    fd = mkstemp(buf);
    if (fd < 0)
      {
         free(route);
         return NULL;
      }
-   
+
    route->con_url = ecore_con_url_new(NULL);
    route->ud.fname = strdup(buf);
    INF("xml file : %s", route->ud.fname);
 
-   wd->fid++;
    route->ud.fd = fdopen(fd, "w+");
    if ((!route->con_url) || (!route->ud.fd))
      {
@@ -4174,7 +4425,7 @@ elm_map_route_add(Evas_Object *obj,
    route->color.a = 255;
    route->handlers = eina_list_append
      (route->handlers, (void *)ecore_event_handler_add
-         (ECORE_CON_EVENT_URL_COMPLETE, _common_complete_cb, route));
+         (ECORE_CON_EVENT_URL_COMPLETE, _route_complete_cb, route));
 
    route->inbound = EINA_FALSE;
    route->type = type;
@@ -4356,6 +4607,45 @@ elm_map_route_waypoint_get(Elm_Map_Route *route)
    return route->info.waypoints;
 }
 
+
+EAPI const char *
+elm_map_name_address_get(Elm_Map_Name *name)
+{
+   EINA_SAFETY_ON_NULL_RETURN_VAL(name, NULL);
+   return name->address;
+}
+
+EAPI void
+elm_map_name_region_get(Elm_Map_Name *name, double *lon, double *lat)
+{
+   EINA_SAFETY_ON_NULL_RETURN(name);
+   if (*lon) *lon = name->lon;
+   if (*lat) *lat = name->lat;
+}
+
+EAPI void
+elm_map_name_remove(Elm_Map_Name *name)
+{
+   EINA_SAFETY_ON_NULL_RETURN(name);
+   if (name->address)
+     {
+        free(name->address);
+        name->address = NULL;
+     }
+   if (name->handler)
+     {
+        ecore_event_handler_del(name->handler);
+        name->handler = NULL;
+     }
+   if (name->ud.fname)
+     {
+        ecore_file_remove(name->ud.fname);
+        free(name->ud.fname);
+        name->ud.fname = NULL;
+     }
+}
+
+
 static char *
 _mapnik_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
 {
@@ -4452,7 +4742,7 @@ static char *_yours_url_cb(Evas_Object *obj __UNUSED__, char *type_name, int met
 {
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf),
-            "%s?flat=%f&flon=%f&tlat=%f&tlon=%f&v=%s&fast=%d&instructions=1",
+            "%s?flat=%lf&flon=%lf&tlat=%lf&tlon=%lf&v=%s&fast=%d&instructions=1",
             ROUTE_YOURS_URL, flat, flon, tlat, tlon, type_name, method);
 
    return strdup(buf);
@@ -4520,3 +4810,67 @@ static char *_route_module_url_cb(Evas_Object *obj __UNUSED__, char *type_name _
    return strdup("");
 }
 */
+
+static char *
+_nominatim_url_cb(Evas_Object *obj, int method, char *name, double lon, double lat)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return strdup("");
+   char **str;
+   unsigned int ele, idx;
+
+   char search_url[PATH_MAX];
+   char buf[PATH_MAX];
+   if (method == ELM_MAP_NAME_METHOD_SEARCH)
+     {
+        search_url[0] = '\0';
+        str = eina_str_split_full(name, " ", 0, &ele);
+        for (idx = 0 ; idx < ele ; idx++)
+          {
+             eina_strlcat(search_url, str[idx], sizeof(search_url));
+             if (!(idx == (ele-1))) eina_strlcat(search_url, "+", sizeof(search_url));
+          }
+        snprintf(buf, sizeof(buf), "%s/search?q=%s&format=xml&polygon=0&addressdetails=0", NAME_NOMINATIM_URL, search_url);
+     }
+   else if (method == ELM_MAP_NAME_METHOD_REVERSE) snprintf(buf, sizeof(buf), "%s/reverse?format=xml&lat=%lf&lon=%lf&zoom=%d&addressdetails=0", NAME_NOMINATIM_URL, lat, lon, wd->zoom);
+   else strcpy(buf, "");
+
+   return strdup(buf);
+}
+
+static char *
+_name_custom1_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__)
+{
+   return strdup("");
+}
+
+static char *
+_name_custom2_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__)
+{
+   return strdup("");
+}
+
+static char *
+_name_custom3_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__)
+{
+   return strdup("");
+}
+
+static char *
+_name_custom4_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__)
+{
+   return strdup("");
+}
+
+static char *
+_name_custom5_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__)
+{
+   return strdup("");
+}
+
+static char *
+_name_custom6_url_cb(Evas_Object *obj __UNUSED__, int method __UNUSED__, char *name __UNUSED__, double lon __UNUSED__, double lat __UNUSED__)
+{
+   return strdup("");
+}
+
