@@ -142,6 +142,11 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         wd->focused = EINA_FALSE;
         _view_update(obj);
         evas_object_smart_callback_call(obj, "unfocused", NULL);
+        if (wd->n_str)
+          {
+             elm_scrolled_entry_entry_set(wd->entry, "");
+             wd->n_str = 0;
+          }
      }
 }
 
@@ -241,11 +246,6 @@ _set_vis_guidetext(Evas_Object *obj)
         evas_object_hide(wd->entry);
         elm_box_pack_end(wd->box, wd->guidetext);
         evas_object_show(wd->guidetext);
-        if (wd->n_str)
-          {
-             elm_scrolled_entry_entry_set(wd->entry, "");
-             wd->n_str = 0;
-          }
      }
    else
      {
