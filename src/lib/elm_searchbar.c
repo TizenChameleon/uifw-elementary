@@ -102,12 +102,6 @@ static void _clicked(void *data, Evas_Object *obj, void *event_info)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
-   if (wd->cancel_btn_show_mode)
-     {
-        if (wd->cancel_btn_ani_flag) edje_object_signal_emit(wd->base, "CANCELIN", "PROG");
-        else edje_object_signal_emit(wd->base, "CANCELSHOW", "PROG");
-     }
-
    evas_object_smart_callback_call(data, "clicked", NULL);
 }
 
@@ -135,15 +129,10 @@ static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
-   if (wd->cancel_btn_show_mode)
-     {
-        if (wd->cancel_btn_ani_flag) edje_object_signal_emit(wd->base, "CANCELOUT", "PROG");
-        else edje_object_signal_emit(wd->base, "CANCELHIDE", "PROG");
-     }
-
    const char* text;
    text = elm_entry_entry_get(elm_editfield_entry_get(wd->eb));
-   if (text != NULL && strlen(text) > 0) elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
+   if (text != NULL && strlen(text) > 0)
+     elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
 
    evas_object_smart_callback_call(data, "cancel,clicked", NULL);
    elm_object_unfocus(data);
