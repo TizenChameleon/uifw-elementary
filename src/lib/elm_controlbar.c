@@ -349,9 +349,9 @@ _theme_hook(Evas_Object * obj)
    evas_object_color_get(wd->bg, &r, &g, &b, NULL);
    evas_object_color_set(wd->bg, r, g, b, (int)(255 * wd->alpha / 100));
    elm_layout_theme_set(wd->view, "controlbar", "view", elm_widget_style_get(obj));
-   elm_layout_theme_set(obj, wd->focused_box, "controlbar", "item_bg_move", elm_widget_style_get(obj));
-   elm_layout_theme_set(obj, wd->focused_box_left, "controlbar", "item_bg_move", elm_widget_style_get(obj));
-   elm_layout_theme_set(obj, wd->focused_box_right, "controlbar", "item_bg_move", elm_widget_style_get(obj));
+   elm_layout_theme_set(wd->focused_box, "controlbar", "item_bg_move", elm_widget_style_get(obj));
+   elm_layout_theme_set(wd->focused_box_left, "controlbar", "item_bg_move", elm_widget_style_get(obj));
+   elm_layout_theme_set(wd->focused_box_right, "controlbar", "item_bg_move", elm_widget_style_get(obj));
    EINA_LIST_FOREACH(wd->items, l, item)
      {
         if (item->style != OBJECT)
@@ -1536,15 +1536,15 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
    evas_object_event_callback_add(bg, EVAS_CALLBACK_RESIZE, _controlbar_object_resize, obj);
 
    wd->selected_box = wd->focused_box = elm_layout_add(wd->bg);
-   elm_layout_theme_set(obj, wd->focused_box, "controlbar", "item_bg_move", "default");
+   elm_layout_theme_set(wd->focused_box, "controlbar", "item_bg_move", "default");
    evas_object_hide(wd->focused_box);
 
-   wd->focused_box_left = elm_layout_add(evas);
-   elm_layout_theme_set(obj, wd->focused_box_left, "controlbar", "item_bg_move_left", "default");
+   wd->focused_box_left = elm_layout_add(wd->bg);
+   elm_layout_theme_set(wd->focused_box_left, "controlbar", "item_bg_move_left", "default");
    evas_object_hide(wd->focused_box_left);
 
-   wd->focused_box_right = elm_layout_add(evas);
-   elm_layout_theme_set(obj, wd->focused_box_right, "controlbar", "item_bg_move_right", "default");
+   wd->focused_box_right = elm_layout_add(wd->bg);
+   elm_layout_theme_set(wd->focused_box_right, "controlbar", "item_bg_move_right", "default");
    evas_object_hide(wd->focused_box_right);
 
    // items container
