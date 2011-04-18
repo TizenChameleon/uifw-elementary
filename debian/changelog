@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build155) unstable; urgency=low
+
+  * Package upload
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build155
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Mon, 18 Apr 2011 20:05:18 +0900
+
 elementary (1.0.0+svn.51480slp2+build154) unstable; urgency=low
 
   * Multibuttonentry: Fix Focus issue
