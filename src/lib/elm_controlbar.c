@@ -131,7 +131,7 @@ _controlbar_move(void *data, Evas_Object * obj)
    wd->x = x;
    wd->y = y;
    evas_object_move(wd->edje, x, y);
-   evas_object_geometry_get(edje_object_part_object_get(wd->edje, "bg_image"), NULL, NULL, &width, NULL);
+   evas_object_geometry_get(elm_layout_content_get(wd->edje, "bg_image"), NULL, NULL, &width, NULL);
    evas_object_geometry_get(wd->parent, &x_, &y_, NULL, NULL);
    switch(wd->mode)
      {
@@ -160,7 +160,7 @@ _controlbar_resize(void *data, Evas_Object * obj)
    wd->w = w;
    wd->h = h;
    evas_object_resize(wd->edje, w, h);
-   evas_object_geometry_get(edje_object_part_object_get(wd->edje, "bg_image"), NULL, NULL, &width, &height);
+   evas_object_geometry_get(elm_layout_content_get(wd->edje, "bg_image"), NULL, NULL, &width, &height);
    evas_object_geometry_get(wd->parent, &x_, &y_, NULL, NULL);
    switch(wd->mode)
      {
@@ -342,16 +342,16 @@ _theme_hook(Evas_Object * obj)
 
    Widget_Data * wd = elm_widget_data_get(obj);
    if (!wd) return;
-   _elm_theme_object_set(obj, wd->edje, "controlbar", "base",
+   elm_layout_theme_set(wd->edje, "controlbar", "base",
                          elm_widget_style_get(obj));
-   _elm_theme_object_set(obj, wd->bg, "controlbar", "background",
+   elm_layout_theme_set(wd->bg, "controlbar", "background",
                          elm_widget_style_get(obj));
    evas_object_color_get(wd->bg, &r, &g, &b, NULL);
    evas_object_color_set(wd->bg, r, g, b, (int)(255 * wd->alpha / 100));
    elm_layout_theme_set(wd->view, "controlbar", "view", elm_widget_style_get(obj));
-   _elm_theme_object_set(obj, wd->focused_box, "controlbar", "item_bg_move", elm_widget_style_get(obj));
-   _elm_theme_object_set(obj, wd->focused_box_left, "controlbar", "item_bg_move", elm_widget_style_get(obj));
-   _elm_theme_object_set(obj, wd->focused_box_right, "controlbar", "item_bg_move", elm_widget_style_get(obj));
+   elm_layout_theme_set(obj, wd->focused_box, "controlbar", "item_bg_move", elm_widget_style_get(obj));
+   elm_layout_theme_set(obj, wd->focused_box_left, "controlbar", "item_bg_move", elm_widget_style_get(obj));
+   elm_layout_theme_set(obj, wd->focused_box_right, "controlbar", "item_bg_move", elm_widget_style_get(obj));
    EINA_LIST_FOREACH(wd->items, l, item)
      {
         if (item->style != OBJECT)
@@ -604,15 +604,15 @@ check_background(Widget_Data *wd)
         if(it->style == TABBAR)
           {
              if(wd->mode == ELM_CONTROLBAR_MODE_LEFT)
-               edje_object_signal_emit(wd->bg, "elm,state,tabbar_left", "elm");
+               edje_object_signal_emit(_EDJ(wd->bg), "elm,state,tabbar_left", "elm");
              else if(wd->mode == ELM_CONTROLBAR_MODE_RIGHT)
-               edje_object_signal_emit(wd->bg, "elm,state,tabbar_right", "elm");
+               edje_object_signal_emit(_EDJ(wd->bg), "elm,state,tabbar_right", "elm");
              else
-               edje_object_signal_emit(wd->bg, "elm,state,tabbar", "elm");
+               edje_object_signal_emit(_EDJ(wd->bg), "elm,state,tabbar", "elm");
              return;
           }
      }
-   edje_object_signal_emit(wd->bg, "elm,state,toolbar", "elm");
+   edje_object_signal_emit(_EDJ(wd->bg), "elm,state,toolbar", "elm");
 }
 
 static void
@@ -800,7 +800,7 @@ item_color_set(Elm_Controlbar_Item *item, const char *color_part)
    Evas_Object *color;
    int r, g, b, a;
 
-   color = (Evas_Object *) edje_object_part_object_get(_EDJ(item->base), color_part);
+   color = elm_layout_content_get(item->base, color_part);
    if (color)
      evas_object_color_get(color, &r, &g, &b, &a);
    evas_object_color_set(item->label, r, g, b, a);
@@ -837,10 +837,10 @@ move_selected_box(Widget_Data *wd, Elm_Controlbar_Item * fit, Elm_Controlbar_Ite
    if(fit->order <= 0 && wd->auto_align)
      fit = wd->more_item;
 
-   from = (Evas_Object *)edje_object_part_object_get(_EDJ(fit->base), "bg_img");
+   from = elm_layout_content_get(fit->base, "bg_img");
    evas_object_geometry_get(from, &fx, &fy, &fw, &fh);
 
-   to = (Evas_Object *)edje_object_part_object_get(_EDJ(tit->base), "bg_img");
+   to = elm_layout_content_get(tit->base, "bg_img");
    evas_object_geometry_get(to, &tx, &ty, &tw, &th);
 
    if(item_exist_check(wd, wd->pre_item))
@@ -1504,8 +1504,8 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
    evas_object_show(wd->view);
 
    /* load background edj */
-   wd->edje = edje_object_add(evas);
-   _elm_theme_object_set(obj, wd->edje, "controlbar", "base", "default");
+   wd->edje = elm_layout_add(obj);
+   elm_layout_theme_set(wd->edje, "controlbar", "base", "default");
    if (wd->edje == NULL)
      {
         printf("Cannot load base edj\n");
@@ -1513,14 +1513,14 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
      }
    evas_object_show(wd->edje);
 
-   wd->bg = edje_object_add(evas);
-   _elm_theme_object_set(obj, wd->bg, "controlbar", "background", "default");
+   wd->bg = elm_layout_add(wd->edje);
+   elm_layout_theme_set(wd->bg, "controlbar", "background", "default");
    if (wd->bg == NULL)
      {
         printf("Cannot load bg edj\n");
         return NULL;
      }
-   edje_object_part_swallow(wd->edje, "bg_image", wd->bg);
+   elm_layout_content_set(wd->edje, "bg_image", wd->bg);
 
    // initialization
    evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_RESIZE,
@@ -1531,20 +1531,20 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
                                   _controlbar_object_show, obj);
    evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_HIDE,
                                   _controlbar_object_hide, obj);
-   bg = (Evas_Object *)edje_object_part_object_get(wd->edje, "bg_image");
+   bg = elm_layout_content_get(wd->edje, "bg_image");
    evas_object_event_callback_add(bg, EVAS_CALLBACK_MOVE, _controlbar_object_move, obj);
    evas_object_event_callback_add(bg, EVAS_CALLBACK_RESIZE, _controlbar_object_resize, obj);
 
-   wd->selected_box = wd->focused_box = edje_object_add(evas);
-   _elm_theme_object_set(obj, wd->focused_box, "controlbar", "item_bg_move", "default");
+   wd->selected_box = wd->focused_box = elm_layout_add(wd->bg);
+   elm_layout_theme_set(obj, wd->focused_box, "controlbar", "item_bg_move", "default");
    evas_object_hide(wd->focused_box);
 
-   wd->focused_box_left = edje_object_add(evas);
-   _elm_theme_object_set(obj, wd->focused_box_left, "controlbar", "item_bg_move_left", "default");
+   wd->focused_box_left = elm_layout_add(evas);
+   elm_layout_theme_set(obj, wd->focused_box_left, "controlbar", "item_bg_move_left", "default");
    evas_object_hide(wd->focused_box_left);
 
-   wd->focused_box_right = edje_object_add(evas);
-   _elm_theme_object_set(obj, wd->focused_box_right, "controlbar", "item_bg_move_right", "default");
+   wd->focused_box_right = elm_layout_add(evas);
+   elm_layout_theme_set(obj, wd->focused_box_right, "controlbar", "item_bg_move_right", "default");
    evas_object_hide(wd->focused_box_right);
 
    // items container
@@ -1553,7 +1553,7 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
    evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND,
                                     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   edje_object_part_swallow(wd->edje, "elm.swallow.items", wd->box);
+   elm_layout_content_set(wd->edje, "elm.swallow.items", wd->box);
    evas_object_show(wd->box);
 
    wd->event_box = evas_object_rectangle_add(evas);
@@ -2633,7 +2633,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
    switch(wd->mode)
      {
       case ELM_CONTROLBAR_MODE_DEFAULT:
-         edje_object_signal_emit(wd->edje, "elm,state,default", "elm");
+         edje_object_signal_emit(_EDJ(wd->edje), "elm,state,default", "elm");
          break;
       case ELM_CONTROLBAR_MODE_TRANSLUCENCE:
          elm_controlbar_alpha_set(obj, 85);
@@ -2642,16 +2642,16 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
          elm_controlbar_alpha_set(obj, 0);
          break;
       case ELM_CONTROLBAR_MODE_LARGE:
-         edje_object_signal_emit(wd->edje, "elm,state,large", "elm");
+         edje_object_signal_emit(_EDJ(wd->edje), "elm,state,large", "elm");
          break;
       case ELM_CONTROLBAR_MODE_SMALL:
-         edje_object_signal_emit(wd->edje, "elm,state,small", "elm");
+         edje_object_signal_emit(_EDJ(wd->edje), "elm,state,small", "elm");
          break;
       case ELM_CONTROLBAR_MODE_LEFT:
          wd->selected_box = wd->focused_box_left;
          wd->selected_signal = eina_stringshare_add("elm,state,selected_left");
          wd->pressed_signal = eina_stringshare_add("elm,state,pressed_left");
-         edje_object_signal_emit(wd->edje, "elm,state,left", "elm");
+         edje_object_signal_emit(_EDJ(wd->edje), "elm,state,left", "elm");
          check_background(wd);
          _sizing_eval(obj);
          return;
@@ -2659,7 +2659,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
          wd->selected_box = wd->focused_box_right;
          wd->selected_signal = eina_stringshare_add("elm,state,selected_right");
          wd->pressed_signal = eina_stringshare_add("elm,state,pressed_right");
-         edje_object_signal_emit(wd->edje, "elm,state,right", "elm");
+         edje_object_signal_emit(_EDJ(wd->edje), "elm,state,right", "elm");
          check_background(wd);
          _sizing_eval(obj);
          return;
