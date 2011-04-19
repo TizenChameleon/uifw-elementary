@@ -15,6 +15,3 @@
 /elm_ts/calendar/utc_UIFW_elm_calendar_mark_del_func
 /elm_ts/calendar/utc_UIFW_elm_calendar_marks_clear_func
 /elm_ts/calendar/utc_UIFW_elm_calendar_marks_draw_func
-/elm_ts/calendar/utc_UIFW_elm_calendar_text_weekday_color_set_func
-/elm_ts/calendar/utc_UIFW_elm_calendar_text_saturday_color_set_func
-/elm_ts/calendar/utc_UIFW_elm_calendar_text_sunday_color_set_func

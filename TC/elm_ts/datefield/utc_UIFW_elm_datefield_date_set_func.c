@@ -82,7 +82,7 @@ static void utc_UIFW_elm_datefield_date_set_func_01(void)
 	datefield = elm_datefield_add(main_win);
 	elm_datefield_date_set(datefield, 2010, 10, 14, 1, 36);
 	elm_datefield_date_get(datefield, &year, &month, &day, &hour, &min);
-	
+
 	if (!(year == 2010 && month == 10 && day == 14 && hour == 1 && min == 36)) {
 		tet_infoline("elm_datefield_date_set() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -104,10 +104,10 @@ static void utc_UIFW_elm_datefield_date_set_func_02(void)
 	int year, month, day, hour, min;
 
 	datefield = elm_datefield_add(main_win);
-   	elm_datefield_date_set(datefield, 3000, 13, 50, 28, 70);
+   	elm_datefield_date_set(NULL, 2010, 10, 14, 1, 36);
 	elm_datefield_date_get(datefield, &year, &month, &day, &hour, &min);
 	
-	if (!(year <= 2099 && month <= 12 && day <= 31 && hour <= 23 && min <= 59)) {
+	if ((year == 2010 && month == 10 && day == 14 && hour == 1 && min <= 36)) {
 		tet_infoline("elm_datefield_date_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

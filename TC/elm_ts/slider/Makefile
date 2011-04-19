@@ -25,7 +25,7 @@ TARGETS = utc_UIFW_elm_slider_add_func \
         utc_UIFW_elm_slider_value_set_func 
                 
 
-PKGS = elementary
+PKGS = elementary evas
 
 LDFLAGS = `pkg-config --libs $(PKGS)`
 LDFLAGS += $(TET_ROOT)/lib/tet3/tcm_s.o
@@ -38,10 +38,11 @@ CFLAGS += -Wall
 
 all: $(TARGETS)
 
-$(TARGET): %: %.c
-	$(CC) -o $@ $< $(CFLAGS) $(LDFLAGS)
+$(TARGETS): %: %.c
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 clean:
 	rm -f $(TARGETS)
 	rm -f tet_captured
+	rm -f tet_lock
 	rm -f *~

@@ -87,7 +87,7 @@ static void utc_UIFW_elm_actionslider_hold_func_01(void)
  */
 static void utc_UIFW_elm_actionslider_hold_func_02(void)
 {
-   	elm_actionslider_hold(actionslider, NULL);
+   	elm_actionslider_hold(NULL, EINA_FALSE);
 
 	tet_result(TET_PASS);
 }

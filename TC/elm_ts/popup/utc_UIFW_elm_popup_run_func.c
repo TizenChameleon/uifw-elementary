@@ -74,12 +74,12 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-static int
+static Eina_Bool
 _exit_timer_popup(void *data)
 {
 	printf("\n\nexiting timer\n");
    elm_popup_response((Evas_Object *)data, ELM_POPUP_RESPONSE_NONE);
-   return 0;
+   return EINA_FALSE;
 }
 
 
