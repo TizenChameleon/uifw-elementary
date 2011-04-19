@@ -800,7 +800,7 @@ item_color_set(Elm_Controlbar_Item *item, const char *color_part)
    Evas_Object *color;
    int r, g, b, a;
 
-   color = elm_layout_content_get(item->base, color_part);
+   color = edje_object_part_object_get(_EDJ(item->base), color_part);
    if (color)
      evas_object_color_get(color, &r, &g, &b, &a);
    evas_object_color_set(item->label, r, g, b, a);
@@ -837,10 +837,10 @@ move_selected_box(Widget_Data *wd, Elm_Controlbar_Item * fit, Elm_Controlbar_Ite
    if(fit->order <= 0 && wd->auto_align)
      fit = wd->more_item;
 
-   from = elm_layout_content_get(fit->base, "bg_img");
+   from = edje_object_part_object_get(_EDJ(fit->base), "bg_img");
    evas_object_geometry_get(from, &fx, &fy, &fw, &fh);
 
-   to = elm_layout_content_get(tit->base, "bg_img");
+   to = edje_object_part_object_get(_EDJ(tit->base), "bg_img");
    evas_object_geometry_get(to, &tx, &ty, &tw, &th);
 
    if(item_exist_check(wd, wd->pre_item))
