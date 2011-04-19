@@ -1,17 +1,23 @@
 # Customize below path information 
-TET_INSTALL_PATH=/scratchbox/TETware
+#TET_INSTALL_PATH=/scratchbox/TETware
+
+CURRENT_USER=`echo $HOME`
+TET_INSTALL_PATH=$CURRENT_USER/sbs/TETware
 
 TET_SIMUL_PATH=$TET_INSTALL_PATH/tetware-simulator
 TET_TARGET_PATH=$TET_INSTALL_PATH/tetware-target
-TET_MOUNTED_PATH=/mnt/nfs/TETware/tetware-target
+TET_MOUNTED_PATH=/mnt/nfs/sbs/TETware/tetware-target
+#TET_MOUNTED_PATH=/opt/home/root/tmp/sbs/TETware/tetware-target
 
-MACHINE=`echo $SBOX_UNAME_MACHINE`
+#MACHINE=`echo $SBOX_UNAME_MACHINE`
 
-if [ $MACHINE = "i686" ]		# Scratchbox i686
+MACHINE=`echo $DEB_BUILD_ARCH_ABI`
+
+if [ $MACHINE = "gnu" ]		# SBS i386
 then			
 	export ARCH=simulator
 	export TET_ROOT=$TET_SIMUL_PATH
-elif [ $MACHINE = "arm" ]	# Scratchbox ARM
+elif [ $MACHINE = "gnueabi" ]	# SBS ARM
 then
 	export ARCH=target
 	export TET_ROOT=$TET_TARGET_PATH

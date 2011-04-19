@@ -1,6 +1,8 @@
-export MACHINE=`echo $SBOX_UNAME_MACHINE`
+#export MACHINE=`echo $SBOX_UNAME_MACHINE`
+export MACHINE=`echo $DEB_BUILD_ARCH_ABI`
+#export MACHINE="gnueabi"
 
-if [ $MACHINE = "i686" ]
+if [ $MACHINE = "gnu" ]
 then
 	TET_SCEN_FILE=tet_scen_i686
 else
@@ -19,7 +21,7 @@ fi
 SCEN_FILE_INPUT="false"
 args_count=0
 
-for i in $* 
+for i in $*
 do
 	args_count=`expr $args_count + 1`
 	if [ $SCEN_FILE_INPUT = "true" ]
@@ -48,15 +50,15 @@ echo TET_SCEN_NAME=$TET_SCEN_NAME
 echo RESULT_TO_JOURNAL=$RESULT_TO_JOURNAL
 
 RESULT_DIR=result
-#if [ $MACHINE = "i686" ]
-if [ $MACHINE = "i686" ]
+
+if [ $MACHINE = "gnu" ]
 then
-	TEXT_RESULT=$RESULT_DIR/EXE-i686-$TET_SCEN_NAME-$FILE_NAME_EXTENSION.html
-	JOURNAL_RESULT=$RESULT_DIR/EXE-i686-$TET_SCEN_NAME-$FILE_NAME_EXTENSION.journal
+	TEXT_RESULT=$RESULT_DIR/EXE-i386-$TET_SCEN_NAME-$FILE_NAME_EXTENSION.html
+	JOURNAL_RESULT=$RESULT_DIR/EXE-i386-$TET_SCEN_NAME-$FILE_NAME_EXTENSION.journal
 else
 	TEXT_RESULT=$RESULT_DIR/EXE-ARM-$TET_SCEN_NAME-$FILE_NAME_EXTENSION.html
 	JOURNAL_RESULT=$RESULT_DIR/EXE-ARM-$TET_SCEN_NAME-$FILE_NAME_EXTENSION.journal
-fi		
+fi
 
 ### Make Result output directory
 echo
