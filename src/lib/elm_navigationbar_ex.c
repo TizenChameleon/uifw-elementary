@@ -65,6 +65,15 @@ static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 
+static const char SIG_HIDE_FINISHED[] = "hide,finished";
+static const char SIG_TITLE_OBJ_VISIBLE_CHANGED[] = "titleobj,visible,changed";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+       {SIG_HIDE_FINISHED, ""},
+       {SIG_TITLE_OBJ_VISIBLE_CHANGED, ""},
+       {NULL, NULL}
+};
+
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -324,7 +333,7 @@ _signal_hide_finished(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    evas_object_hide(it->base);
    edje_object_signal_emit(it->base, "elm,action,reset", "elm");
    edje_object_signal_emit(it->ct_base, "elm,action,reset", "elm");
-   evas_object_smart_callback_call(obj2, "hide,finished", it->content);
+   evas_object_smart_callback_call(obj2, SIG_HIDE_FINISHED, it->content);
    edje_object_message_signal_process(it->base);
    edje_object_message_signal_process(it->ct_base);
    if (it->popme)
@@ -400,13 +409,15 @@ _switch_titleobj_visibility(void *data, Evas_Object *obj , const char *emission,
    if(!item->title_obj) return;
    if(!item->titleobj_visible)
      {
-       edje_object_signal_emit(item->base, "elm,state,show,title", "elm");
-       item->titleobj_visible = EINA_TRUE;
+        edje_object_signal_emit(item->base, "elm,state,show,title", "elm");
+        evas_object_smart_callback_call(item->obj, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_TRUE);
+        item->titleobj_visible = EINA_TRUE;
      }
    else
      {
-       edje_object_signal_emit(item->base, "elm,state,hide,title", "elm");
-       item->titleobj_visible = EINA_FALSE;
+        edje_object_signal_emit(item->base, "elm,state,hide,title", "elm");
+        evas_object_smart_callback_call(item->obj, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_FALSE);
+        item->titleobj_visible = EINA_FALSE;
      }
 }
 
@@ -1121,9 +1132,15 @@ elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, E
    if(!item) return;
    if(!item->title_obj) return;
    if(visible)
-     edje_object_signal_emit(item->base, "elm,state,show,title", "elm");
+     {
+        edje_object_signal_emit(item->base, "elm,state,show,title", "elm");
+        evas_object_smart_callback_call(item->obj, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_TRUE);
+     }
    else
-     edje_object_signal_emit(item->base, "elm,state,hide,title", "elm");
+     {
+        edje_object_signal_emit(item->base, "elm,state,hide,title", "elm");
+        evas_object_smart_callback_call(item->obj, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_FALSE);
+     }
    item->titleobj_visible = visible;
 }
 
