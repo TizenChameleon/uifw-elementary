@@ -18,7 +18,7 @@ TARGETS = utc_UIFW_elm_multibuttonentry_add_func \
 	  utc_UIFW_elm_multibuttonentry_item_next_func \
 	  utc_UIFW_elm_multibuttonentry_item_data_get_func
 
-PKGS = elementary
+PKGS = elementary evas
 
 LDFLAGS = `pkg-config --libs $(PKGS)`
 LDFLAGS += $(TET_ROOT)/lib/tet3/tcm_s.o
@@ -31,8 +31,8 @@ CFLAGS += -Wall
 
 all: $(TARGETS)
 
-$(TARGET): %: %.c
-	$(CC) -o $@ $< $(CFLAGS) $(LDFLAGS)
+$(TARGETS): %: %.c
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 clean:
 	rm -f $(TARGETS)
