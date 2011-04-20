@@ -1,3 +1,12 @@
+elementary (1.0.0+svn.51480slp2+build157) unstable; urgency=low
+
+  * [Gengrid/List/Genlist] Removed clicked signal. Use clicked,double
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build157
+    instead.
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Wed, 20 Apr 2011 13:40:21 +0900
+
 elementary (1.0.0+svn.51480slp2+build156) unstable; urgency=low
 
   * Package upload
