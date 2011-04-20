@@ -160,7 +160,6 @@ _create_back_btn(Evas_Object *parent, const char *title, void *data)
    if (!btn) return NULL;
    elm_button_label_set(btn, title);
    evas_object_smart_callback_add(btn, "clicked", _back_button_clicked, data);
-   elm_object_focus_allow_set(btn, EINA_FALSE);
    return btn;
 }
 
@@ -231,6 +230,7 @@ _delete_item(Elm_Navigationbar_Item *it)
    if(it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON])
      {
         evas_object_event_callback_del(it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON], EVAS_CALLBACK_DEL, _title_btn_del);
+        elm_object_unfocus(it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
         evas_object_del(it->title_btns[ELM_NAVIGATIONBAR_BACK_BUTTON]);
      }
    if(it->icon)
