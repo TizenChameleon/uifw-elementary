@@ -810,10 +810,7 @@ _mouse_down(void        *data,
    item->wd->wasselected = item->selected;
    _item_hilight(item);
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-     {
-        evas_object_smart_callback_call(item->wd->self, "clicked,double", item);
-        evas_object_smart_callback_call(item->wd->self, "clicked", item); // will be removed
-     }
+     evas_object_smart_callback_call(item->wd->self, "clicked,double", item);
    if (item->long_timer) ecore_timer_del(item->long_timer);
    if (item->realized)
      item->long_timer = ecore_timer_add(_elm_config->longpress_timeout,
