@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build158) unstable; urgency=low
+
+  * Package Upload : _elm_util_mkup_to_text is modified for fixing bug
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build158
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Thu, 21 Apr 2011 21:21:43 +0900
+
 elementary (1.0.0+svn.51480slp2+build157) unstable; urgency=low
 
   * [Gengrid/List/Genlist] Removed clicked signal. Use clicked,double
