@@ -103,6 +103,7 @@ _elm_util_mkup_to_text(const char *mkup)
 		    }
                   break;
 	       }
+             if (!*p) break;
 	  }
 	if (*p == '<')
 	  {
