@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build160) unstable; urgency=low
+
+  * Package Upload
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build160
+
+ -- Shinwoo Kim <cinoo.kim@samsung.com>  Fri, 22 Apr 2011 14:56:37 +0900
+
 elementary (1.0.0+svn.51480slp2+build159) unstable; urgency=low
 
   * [store] add and fix the APIs of backing store for a item free and sort
