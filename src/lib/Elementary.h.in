@@ -3225,7 +3225,8 @@ extern "C" {
    typedef void      (*Elm_Store_Item_Fetch_Cb) (void *data, Elm_Store_Item *sti, Elm_Store_Item_Info *info);
    typedef void      (*Elm_Store_Item_Unfetch_Cb) (void *data, Elm_Store_Item *sti, Elm_Store_Item_Info *info);
    typedef void      (*Elm_Store_Item_Select_Cb) (void *data, Elm_Store_Item *sti);
-   typedef void      (*Elm_Store_Item_Sort_Cb) (void *data, Elm_Store_Item *sti, Elm_Store_Item *next);
+   typedef int       (*Elm_Store_Item_Sort_Cb) (void *data, Elm_Store_Item_Info *info1, Elm_Store_Item_Info *info2);
+   typedef void      (*Elm_Store_Item_Free_Cb) (void *data, Elm_Store_Item_Info *info);
    typedef void     *(*Elm_Store_Item_Mapping_Cb) (void *data, Elm_Store_Item *sti, const char *part);
 
    typedef enum
@@ -3308,12 +3309,13 @@ extern "C" {
    EAPI void                    elm_store_item_count_set(Elm_Store *st, int count) EINA_ARG_NONNULL(1);
    EAPI void                    elm_store_item_select_func_set(Elm_Store *st, Elm_Store_Item_Select_Cb func, const void *data) EINA_ARG_NONNULL(1);
    EAPI void                    elm_store_item_sort_func_set(Elm_Store *st, Elm_Store_Item_Sort_Cb func, const void *data) EINA_ARG_NONNULL(1);
+   EAPI void                    elm_store_item_free_func_set(Elm_Store *st, Elm_Store_Item_Free_Cb func, const void *data) EINA_ARG_NONNULL(1);
    EAPI int                     elm_store_item_data_index_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI void                   *elm_store_dbsystem_db_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI void                    elm_store_dbsystem_db_set(Elm_Store *store, void *pDB) EINA_ARG_NONNULL(1);
    EAPI int                     elm_store_item_index_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI Elm_Store_Item         *elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info) EINA_ARG_NONNULL(1);
-   EAPI void                    elm_store_item_update(Elm_Store *st, Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
+   EAPI void                    elm_store_item_update(Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI void                    elm_store_visible_items_update(Elm_Store *st) EINA_ARG_NONNULL(1);
    EAPI void                    elm_store_item_del(Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI void                    elm_store_free(Elm_Store *st);
