@@ -195,14 +195,14 @@ _theme_hook(Evas_Object *obj)
         if (it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON])
          {
             if (it->back_btn)
-              snprintf(buf_fn, sizeof(buf_fn), "navigationbar_backbtn/%s", elm_widget_style_get(obj));
+              snprintf(buf_fn, sizeof(buf_fn), "navigationbar_prev_btn/%s", elm_widget_style_get(obj));
             else
-              snprintf(buf_fn, sizeof(buf_fn), "navigationbar_titlebtn/%s", elm_widget_style_get(obj));
+              snprintf(buf_fn, sizeof(buf_fn), "navigationbar_next_btn/%s", elm_widget_style_get(obj));
             elm_object_style_set(it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON], buf_fn);
          }
         if (it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON])
          {
-            snprintf(buf_fn, sizeof(buf_fn), "navigationbar_titlebtn/%s", elm_widget_style_get(obj));
+            snprintf(buf_fn, sizeof(buf_fn), "navigationbar_next_btn/%s", elm_widget_style_get(obj));
             elm_object_style_set(it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON], buf_fn);
          }
      }
@@ -523,12 +523,12 @@ _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_
 
    if (back_btn)
      {
-        snprintf(buf, sizeof(buf), "navigationbar_backbtn/%s", elm_widget_style_get(obj));
+	snprintf(buf, sizeof(buf), "navigationbar_prev_btn/%s", elm_widget_style_get(obj));
         elm_object_style_set(new_btn, buf);
      }
    else
      {
-        snprintf(buf, sizeof(buf), "navigationbar_titlebtn/%s", elm_widget_style_get(obj));
+        snprintf(buf, sizeof(buf), "navigationbar_next_btn/%s", elm_widget_style_get(obj));
         elm_object_style_set(new_btn, buf);
      }
 
