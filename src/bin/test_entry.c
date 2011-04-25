@@ -1,14 +1,17 @@
 #include <Elementary.h>
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
 #ifndef ELM_LIB_QUICKLAUNCH
 static void
-my_entry_bt_1(void *data, Evas_Object *obj, void *event_info)
+my_entry_bt_1(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_entry_entry_set(en, "");
 }
 
 static void
-my_entry_bt_2(void *data, Evas_Object *obj, void *event_info)
+my_entry_bt_2(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    const char *s = elm_entry_entry_get(en);
@@ -27,7 +30,7 @@ my_entry_bt_2(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_entry_bt_3(void *data, Evas_Object *obj, void *event_info)
+my_entry_bt_3(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    const char *s = elm_entry_selection_get(en);
@@ -46,16 +49,17 @@ my_entry_bt_3(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_entry_bt_4(void *data, Evas_Object *obj, void *event_info)
+my_entry_bt_4(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_entry_entry_insert(en, "Insert some <b>BOLD</> text");
 }
 
 void
-test_entry(void *data, Evas_Object *obj, void *event_info)
+test_entry(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *bx, *bx2, *bt, *en;
+   char buf[4096];
 
    win = elm_win_add(NULL, "entry", ELM_WIN_BASIC);
    elm_win_title_set(win, "Entry");
@@ -73,34 +77,38 @@ test_entry(void *data, Evas_Object *obj, void *event_info)
 
    en = elm_entry_add(win);
    elm_entry_line_wrap_set(en, 0);
-   elm_entry_entry_set(en,
-		       "This is an entry widget in this window that<br>"
-		       "uses markup <b>like this</> for styling and<br>"
-		       "formatting <em>like this</>, as well as<br>"
-		       "<a href=X><link>links in the text</></a>, so enter text<br>"
-		       "in here to edit it. By the way, links are<br>"
-		       "called <a href=anc-02>Anchors</a> so you will need<br>"
-		       "to refer to them this way.<br>"
-                       "<br>"
-                       
-                       "Also you can stick in items with (relsize + ascent): "
-                       "<item relsize=16x16 vsize=ascent href=emoticon/evil-laugh></item>"
-                       " (full) "
-                       "<item relsize=16x16 vsize=full href=emoticon/guilty-smile></item>"
-                       " (to the left)<br>"
-                       
-                       "Also (size + ascent): "
-                       "<item size=16x16 vsize=ascent href=emoticon/haha></item>"
-                       " (full) "
-                       "<item size=16x16 vsize=full href=emoticon/happy-panting></item>"
-                       " (before this)<br>"
-                       
-                       "And as well (absize + ascent): "
-                       "<item absize=64x64 vsize=ascent href=emoticon/knowing-grin></item>"
-                       " (full) "
-                       "<item absize=64x64 vsize=full href=emoticon/not-impressed></item>"
-                       " ... end."
-                       );
+   snprintf(buf, sizeof(buf),
+            "This is an entry widget in this window that<br>"
+            "uses markup <b>like this</> for styling and<br>"
+            "formatting <em>like this</>, as well as<br>"
+            "<a href=X><link>links in the text</></a>, so enter text<br>"
+            "in here to edit it. By the way, links are<br>"
+            "called <a href=anc-02>Anchors</a> so you will need<br>"
+            "to refer to them this way.<br>"
+            "<br>"
+            
+            "Also you can stick in items with (relsize + ascent): "
+            "<item relsize=16x16 vsize=ascent href=emoticon/evil-laugh></item>"
+            " (full) "
+            "<item relsize=16x16 vsize=full href=emoticon/guilty-smile></item>"
+            " (to the left)<br>"
+            
+            "Also (size + ascent): "
+            "<item size=16x16 vsize=ascent href=emoticon/haha></item>"
+            " (full) "
+            "<item size=16x16 vsize=full href=emoticon/happy-panting></item>"
+            " (before this)<br>"
+            
+            "And as well (absize + ascent): "
+            "<item absize=64x64 vsize=ascent href=emoticon/knowing-grin></item>"
+            " (full) "
+            "<item absize=64x64 vsize=full href=emoticon/not-impressed></item>"
+            " or even paths to image files on disk too like: "
+            "<item absize=96x128 vsize=full href=file://%s/images/sky_01.jpg></item>"
+            " ... end."
+            , PACKAGE_DATA_DIR
+            );
+   elm_entry_entry_set(en, buf);
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(bx, en);
@@ -159,14 +167,14 @@ test_entry(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_scrolled_entry_bt_1(void *data, Evas_Object *obj, void *event_info)
+my_scrolled_entry_bt_1(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_entry_set(en, "");
 }
 
 static void
-my_scrolled_entry_bt_2(void *data, Evas_Object *obj, void *event_info)
+my_scrolled_entry_bt_2(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    const char *s = elm_scrolled_entry_entry_get(en);
@@ -185,7 +193,7 @@ my_scrolled_entry_bt_2(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_scrolled_entry_bt_3(void *data, Evas_Object *obj, void *event_info)
+my_scrolled_entry_bt_3(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    const char *s = elm_scrolled_entry_selection_get(en);
@@ -204,14 +212,14 @@ my_scrolled_entry_bt_3(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_scrolled_entry_bt_4(void *data, Evas_Object *obj, void *event_info)
+my_scrolled_entry_bt_4(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_entry_insert(en, "Insert some <b>BOLD</> text");
 }
 
 static void
-my_scrolled_entry_bt_5(void *data, Evas_Object *obj, void *event_info)
+my_scrolled_entry_bt_5(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    const char *s = elm_scrolled_entry_entry_get(en);
@@ -219,16 +227,18 @@ my_scrolled_entry_bt_5(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-scrolled_anchor_test(void *data, Evas_Object *obj, void *event_info)
+scrolled_anchor_test(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_entry_insert(en, "ANCHOR CLICKED");
 }
 
 void
-test_entry_scrolled(void *data, Evas_Object *obj, void *event_info)
+test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *bx, *bx2, *bt, *en, *en_p, *sp;
+   static Elm_Entry_Filter_Accept_Set digits_filter_data, digits_filter_data2;
+   static Elm_Entry_Filter_Limit_Size limit_filter_data, limit_filter_data2;
 
    win = elm_win_add(NULL, "entry-scrolled", ELM_WIN_BASIC);
    elm_win_title_set(win, "Entry Scrolled");
@@ -293,12 +303,68 @@ test_entry_scrolled(void *data, Evas_Object *obj, void *event_info)
    en = elm_scrolled_entry_add(win);
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
-   elm_scrolled_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    elm_scrolled_entry_entry_set(en, "This is a single line");
+   elm_scrolled_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    elm_scrolled_entry_single_line_set(en, 1);
    elm_scrolled_entry_select_all(en);
    evas_object_show(en);
    elm_box_pack_end(bx, en);
+
+   /* Only digits entry */
+   en = elm_scrolled_entry_add(win);
+   evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
+   elm_scrolled_entry_entry_set(en, "01234");
+   elm_scrolled_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+   elm_scrolled_entry_single_line_set(en, 1);
+   evas_object_show(en);
+   elm_box_pack_end(bx, en);
+
+   digits_filter_data.accepted = "0123456789";
+   digits_filter_data.rejected = NULL;
+   elm_scrolled_entry_text_filter_append(en, elm_entry_filter_accept_set, &digits_filter_data);
+
+   /* No digits entry */
+   en = elm_scrolled_entry_add(win);
+   evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
+   elm_scrolled_entry_entry_set(en, "No numbers here");
+   elm_scrolled_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+   elm_scrolled_entry_single_line_set(en, 1);
+   evas_object_show(en);
+   elm_box_pack_end(bx, en);
+
+   digits_filter_data2.accepted = NULL;
+   digits_filter_data2.rejected = "0123456789";
+   elm_scrolled_entry_text_filter_append(en, elm_entry_filter_accept_set, &digits_filter_data2);
+
+   /* Size limited entry */
+   en = elm_scrolled_entry_add(win);
+   evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
+   elm_scrolled_entry_entry_set(en, "Just 20 chars");
+   elm_scrolled_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+   elm_scrolled_entry_single_line_set(en, 1);
+   evas_object_show(en);
+   elm_box_pack_end(bx, en);
+
+   limit_filter_data.max_char_count = 20;
+   limit_filter_data.max_byte_count = 0;
+   elm_scrolled_entry_text_filter_append(en, elm_entry_filter_limit_size, &limit_filter_data);
+
+   /* Byte size limited entry */
+   en = elm_scrolled_entry_add(win);
+   evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
+   elm_scrolled_entry_entry_set(en, "And now only 30 bytes");
+   elm_scrolled_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+   elm_scrolled_entry_single_line_set(en, 1);
+   evas_object_show(en);
+   elm_box_pack_end(bx, en);
+
+   limit_filter_data2.max_char_count = 0;
+   limit_filter_data2.max_byte_count = 30;
+   elm_scrolled_entry_text_filter_append(en, elm_entry_filter_limit_size, &limit_filter_data2);
 
    /* Single line password entry */
    en_p = elm_scrolled_entry_add(win);
@@ -310,6 +376,28 @@ test_entry_scrolled(void *data, Evas_Object *obj, void *event_info)
    elm_scrolled_entry_password_set(en_p, 1);
    evas_object_show(en_p);
    elm_box_pack_end(bx, en_p);
+
+   /* scrolled entry with icon/end widgets*/
+   en = elm_scrolled_entry_add(win);
+   elm_scrolled_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+   elm_scrolled_entry_single_line_set(en, 1);
+   evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   bt = elm_icon_add(win);
+   elm_icon_standard_set(bt, "home");
+   evas_object_size_hint_min_set(bt, 48, 48);
+   evas_object_color_set(bt, 255, 0, 0, 128);
+   evas_object_show(bt);
+   elm_scrolled_entry_icon_set(en, bt);
+   bt = elm_icon_add(win);
+   elm_icon_standard_set(bt, "delete");
+   evas_object_color_set(bt, 255, 0, 0, 128);
+   evas_object_size_hint_min_set(bt, 48, 48);
+   evas_object_show(bt);
+   elm_scrolled_entry_end_set(en, bt);
+   elm_scrolled_entry_entry_set(en, "scrolled entry with icon and end objects");
+   evas_object_show(en);
+   elm_box_pack_end(bx, en);
 
    /* markup scrolled entry */
    en = elm_scrolled_entry_add(win);
@@ -397,14 +485,14 @@ test_entry_scrolled(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_ent_bt_clr(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_clr(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_entry_set(en, "");
 }
 
 static void
-my_ent_bt_pri(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_pri(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    const char *s = elm_scrolled_entry_entry_get(en);
@@ -423,7 +511,7 @@ my_ent_bt_pri(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_ent_bt_sel(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_sel(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    const char *s = elm_scrolled_entry_selection_get(en);
@@ -442,98 +530,98 @@ my_ent_bt_sel(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_ent_bt_all(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_all(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_select_all(en);
 }
 
 static void
-my_ent_bt_non(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_non(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_select_none(en);
 }
 
 static void
-my_ent_bt_ins(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_ins(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_entry_insert(en, "Insert text");
 }
 
 static void
-my_ent_bt_lef(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_lef(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_prev(en);
 }
 
 static void
-my_ent_bt_rig(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_rig(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_next(en);
 }
 
 static void
-my_ent_bt_up_(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_up_(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_up(en);
 }
 
 static void
-my_ent_bt_dow(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_dow(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_down(en);
 }
 
 static void
-my_ent_bt_beg(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_beg(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_begin_set(en);
 }
 
 static void
-my_ent_bt_end(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_end(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_end_set(en);
 }
 
 static void
-my_ent_bt_lbe(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_lbe(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_line_begin_set(en);
 }
 
 static void
-my_ent_bt_len(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_len(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_line_end_set(en);
 }
 
 static void
-my_ent_bt_sbe(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_sbe(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_selection_begin(en);
 }
 
 static void
-my_ent_bt_sen(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_sen(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_cursor_selection_end(en);
 }
 
 static void
-my_ent_bt_fmt(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_fmt(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    printf("IS FORMAT: %i\n", 
@@ -541,7 +629,7 @@ my_ent_bt_fmt(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_ent_bt_vfm(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_vfm(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    printf("IS VISIBLE FORMAT %i\n",
@@ -549,35 +637,35 @@ my_ent_bt_vfm(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_ent_bt_chr(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_chr(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    printf("CHAR '%s'\n", elm_scrolled_entry_cursor_content_get(en));
 }
 
 static void
-my_ent_bt_cut(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_cut(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_selection_cut(en);
 }
 
 static void
-my_ent_bt_cop(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_cop(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_selection_copy(en);
 }
 
 static void
-my_ent_bt_pas(void *data, Evas_Object *obj, void *event_info)
+my_ent_bt_pas(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *en = data;
    elm_scrolled_entry_selection_paste(en);
 }
 
 void
-test_entry3(void *data, Evas_Object *obj, void *event_info)
+test_entry3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *bx, *bx2, *bt, *en;
 
@@ -1137,7 +1225,7 @@ test_entry3(void *data, Evas_Object *obj, void *event_info)
 }
 
 void
-test_entry4(void *data, Evas_Object *obj, void *event_info)
+test_entry4(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *ly, *en;
    char buf[PATH_MAX];
@@ -1204,7 +1292,7 @@ test_entry4(void *data, Evas_Object *obj, void *event_info)
 }
 
 void
-test_entry5(void *data, Evas_Object *obj, void *event_info)
+test_entry5(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *bx, *bx2, *bt, *en;
 
@@ -1493,6 +1581,62 @@ test_entry5(void *data, Evas_Object *obj, void *event_info)
    evas_object_show(bx2);
 
    evas_object_resize(win, 320, 480);
+
+   elm_object_focus(win);
+   evas_object_show(win);
+}
+
+static void
+_scrolled_entry_clear(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Evas_Object *en = data;
+   elm_scrolled_entry_entry_set(en, "");
+}
+
+void
+test_entry_notepad(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Evas_Object *win, *bg, *bx, *bx2, *bt, *np;
+
+   win = elm_win_add(NULL, "entry-notepad", ELM_WIN_BASIC);
+   elm_win_title_set(win, "Entry Notepad");
+   elm_win_autodel_set(win, EINA_TRUE);
+
+   bg = elm_bg_add(win);
+   elm_win_resize_object_add(win, bg);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_show(bg);
+
+   bx = elm_box_add(win);
+   evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, bx);
+   evas_object_show(bx);
+
+   np = elm_scrolled_entry_add(win);
+   elm_scrolled_entry_file_set(np, "note.txt", ELM_TEXT_FORMAT_PLAIN_UTF8);
+   evas_object_size_hint_weight_set(np, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(np, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(bx, np);
+   evas_object_show(np);
+
+   bx2 = elm_box_add(win);
+   elm_box_horizontal_set(bx2, EINA_TRUE);
+   elm_box_homogenous_set(bx2, EINA_TRUE);
+   evas_object_size_hint_weight_set(bx2, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(bx2, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
+   bt = elm_button_add(win);
+   elm_button_label_set(bt, "Clear");
+   evas_object_smart_callback_add(bt, "clicked", _scrolled_entry_clear, np);
+   evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(bx2, bt);
+   evas_object_show(bt);
+
+   elm_box_pack_end(bx, bx2);
+   evas_object_show(bx2);
+
+   evas_object_resize(win, 320, 300);
 
    elm_object_focus(win);
    evas_object_show(win);

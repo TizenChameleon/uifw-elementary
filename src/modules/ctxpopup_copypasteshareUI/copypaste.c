@@ -95,7 +95,7 @@ _share(void *data, Evas_Object *obj, void *event_info)
         free(str);
 
 	evas_object_hide(obj);
-	elm_object_scroll_freeze_pop(ext_mod->popup);
+	elm_ctxpopup_scroller_disabled_set(ext_mod->popup, EINA_FALSE);
 }
 
 static void

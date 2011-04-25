@@ -2,6 +2,7 @@
 
 typedef struct _Elm_Params_Anchorblock
 {
+   Elm_Params base;
    const char *text;
 } Elm_Params_Anchorblock;
 
@@ -63,7 +64,7 @@ external_anchorblock_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUS
    Edje_External_Param *param;
    const Eina_List *l;
 
-   mem = calloc(1, sizeof(Elm_Params_Anchorblock));
+   mem = ELM_NEW(Elm_Params_Anchorblock);
    if (!mem)
      return NULL;
 
@@ -77,9 +78,9 @@ external_anchorblock_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUS
 }
 
 static Evas_Object *external_anchorblock_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
@@ -94,6 +95,7 @@ external_anchorblock_params_free(void *params)
 }
 
 static Edje_External_Param_Info external_anchorblock_params[] = {
+   DEFINE_EXTERNAL_COMMON_PARAMS,
    EDJE_EXTERNAL_PARAM_INFO_STRING_DEFAULT("text", "some text"),
    EDJE_EXTERNAL_PARAM_INFO_SENTINEL
 };

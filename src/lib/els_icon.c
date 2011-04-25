@@ -82,13 +82,10 @@ _els_smart_icon_file_key_set(Evas_Object *obj, const char *file, const char *key
    if (!sd->size)
      evas_object_image_load_size_set(sd->obj, sd->size, sd->size);
    evas_object_image_file_set(sd->obj, file, key);
-   /* by default preload off by seok.j.jeong */
-   sd->preloading = EINA_FALSE;
+   sd->preloading = EINA_TRUE;
    sd->show = EINA_TRUE;
-   if (sd->preloading)
-     evas_object_image_preload(sd->obj, EINA_FALSE);
-   if (sd->preloading) 
-     evas_object_hide(sd->obj);
+   evas_object_hide(sd->obj);
+   evas_object_image_preload(sd->obj, EINA_FALSE);
    if (evas_object_image_load_error_get(sd->obj) != EVAS_LOAD_ERROR_NONE)
      return EINA_FALSE;
    _smart_reconfigure(sd);
@@ -167,9 +164,7 @@ _els_smart_icon_size_get(const Evas_Object *obj, int *w, int *h)
 
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
-
-   const char *type = evas_object_type_get(sd->obj);
-   if ((type) && !strcmp(type, "edje"))
+   if (!strcmp(evas_object_type_get(sd->obj), "edje"))
      edje_object_size_min_get(sd->obj, &tw, &th);
    else
      evas_object_image_size_get(sd->obj, &tw, &th);
@@ -302,7 +297,7 @@ _els_smart_icon_orient_set(Evas_Object *obj, Elm_Image_Orient orient)
          return;
       case ELM_IMAGE_FLIP_VERTICAL:
          _els_smart_icon_flip_vertical(sd);
-	 return;
+         return;
       case ELM_IMAGE_ROTATE_180_CW:
          _els_smart_icon_rotate_180(sd);
          return;
@@ -326,28 +321,28 @@ _els_smart_icon_orient_set(Evas_Object *obj, Elm_Image_Orient orient)
    switch (orient)
      {
       case ELM_IMAGE_FLIP_TRANSPOSE:
-	 to = data;
-	 hw = -hw + 1;
-	 break;
+         to = data;
+         hw = -hw + 1;
+         break;
       case ELM_IMAGE_FLIP_TRANSVERSE:
-	 to = data + hw - 1;
-	 w = -w;
-	 hw = hw - 1;
-	 break;
+         to = data + hw - 1;
+         w = -w;
+         hw = hw - 1;
+         break;
       case ELM_IMAGE_ROTATE_90_CW:
-	 to = data + w - 1;
-	 hw = -hw - 1;
-	 break;
+         to = data + w - 1;
+         hw = -hw - 1;
+         break;
       case ELM_IMAGE_ROTATE_90_CCW:
-	 to = data + hw - w;
-	 w = -w;
-	 hw = hw + 1;
-	 break;
+         to = data + hw - w;
+         w = -w;
+         hw = hw + 1;
+         break;
       default:
-	 ERR("unknown orient %d", orient);
-	 evas_object_del(tmp);
-	 evas_object_image_data_set(sd->obj, data); // give it back
-	 return;
+         ERR("unknown orient %d", orient);
+         evas_object_del(tmp);
+         evas_object_image_data_set(sd->obj, data); // give it back
+         return;
      }
    from = data2;
    for (x = iw; --x >= 0;)
@@ -426,70 +421,68 @@ _smart_reconfigure(Smart_Data *sd)
    Evas_Coord x, y, w, h;
 
    if (!sd->obj) return;
-
-   const char *type = evas_object_type_get(sd->obj);
-   if ((type) && !strcmp(type, "edje"))
+   if (!strcmp(evas_object_type_get(sd->obj), "edje"))
      {
-	w = sd->w;
-	h = sd->h;
-	x = sd->x;
-	y = sd->y;
-	evas_object_move(sd->obj, x, y);
-	evas_object_resize(sd->obj, w, h);
+        w = sd->w;
+        h = sd->h;
+        x = sd->x;
+        y = sd->y;
+        evas_object_move(sd->obj, x, y);
+        evas_object_resize(sd->obj, w, h);
      }
    else
      {
         int iw = 0, ih = 0;
 
-	evas_object_image_size_get(sd->obj, &iw, &ih);
+        evas_object_image_size_get(sd->obj, &iw, &ih);
 
-	iw = ((double)iw) * sd->scale;
-	ih = ((double)ih) * sd->scale;
+        iw = ((double)iw) * sd->scale;
+        ih = ((double)ih) * sd->scale;
 
-	if (iw < 1) iw = 1;
-	if (ih < 1) ih = 1;
+        if (iw < 1) iw = 1;
+        if (ih < 1) ih = 1;
 
-	if (sd->fill_inside)
-	  {
-	     w = sd->w;
-	     h = ((double)ih * w) / (double)iw;
-	     if (h > sd->h)
-	       {
-		  h = sd->h;
-		  w = ((double)iw * h) / (double)ih;
-	       }
-	  }
-	else
-	  {
-	     w = sd->w;
-	     h = ((double)ih * w) / (double)iw;
-	     if (h < sd->h)
-	       {
-		  h = sd->h;
-		  w = ((double)iw * h) / (double)ih;
-	       }
-	  }
-	if (!sd->scale_up)
-	  {
-	     if ((w > iw) || (h > ih))
-	       {
-		  w = iw;
-		  h = ih;
-	       }
-	  }
-	if (!sd->scale_down)
-	  {
-	     if ((w < iw) || (h < ih))
-	       {
-		  w = iw;
-		  h = ih;
-	       }
-	  }
-	x = sd->x + ((sd->w - w) / 2);
-	y = sd->y + ((sd->h - h) / 2);
-	evas_object_move(sd->obj, x, y);
-	evas_object_image_fill_set(sd->obj, 0, 0, w, h);
-	evas_object_resize(sd->obj, w, h);
+        if (sd->fill_inside)
+          {
+             w = sd->w;
+             h = ((double)ih * w) / (double)iw;
+             if (h > sd->h)
+               {
+                  h = sd->h;
+                  w = ((double)iw * h) / (double)ih;
+               }
+          }
+        else
+          {
+             w = sd->w;
+             h = ((double)ih * w) / (double)iw;
+             if (h < sd->h)
+               {
+                  h = sd->h;
+                  w = ((double)iw * h) / (double)ih;
+               }
+          }
+        if (!sd->scale_up)
+          {
+             if ((w > iw) || (h > ih))
+               {
+                  w = iw;
+                  h = ih;
+               }
+          }
+        if (!sd->scale_down)
+          {
+             if ((w < iw) || (h < ih))
+               {
+                  w = iw;
+                  h = ih;
+               }
+          }
+        x = sd->x + ((sd->w - w) / 2);
+        y = sd->y + ((sd->h - h) / 2);
+        evas_object_move(sd->obj, x, y);
+        evas_object_image_fill_set(sd->obj, 0, 0, w, h);
+        evas_object_resize(sd->obj, w, h);
      }
 }
 
@@ -498,28 +491,28 @@ _smart_init(void)
 {
    if (_e_smart) return;
      {
-	static const Evas_Smart_Class sc =
-	  {
-	     "e_icon",
-	       EVAS_SMART_CLASS_VERSION,
-	       _smart_add,
-	       _smart_del,
-	       _smart_move,
-	       _smart_resize,
-	       _smart_show,
-	       _smart_hide,
-	       _smart_color_set,
-	       _smart_clip_set,
-	       _smart_clip_unset,
-	       NULL,
-	       NULL,
-	       NULL,
-	       NULL,
-               NULL,
-               NULL,
-               NULL
-	  };
-	_e_smart = evas_smart_class_new(&sc);
+        static const Evas_Smart_Class sc =
+          {
+             "e_icon",
+             EVAS_SMART_CLASS_VERSION,
+             _smart_add,
+             _smart_del,
+             _smart_move,
+             _smart_resize,
+             _smart_show,
+             _smart_hide,
+             _smart_color_set,
+             _smart_clip_set,
+             _smart_clip_unset,
+             NULL,
+             NULL,
+             NULL,
+             NULL,
+             NULL,
+             NULL,
+             NULL
+          };
+        _e_smart = evas_smart_class_new(&sc);
      }
 }
 

@@ -16,8 +16,8 @@ external_searchbar_state_set(void *data __UNUSED__, Evas_Object *obj, const void
    else if (from_params) p = from_params;
    else return;
 
-   if (p->base.label)
-      elm_searchbar_text_set(obj, p->base.label);
+   //if (p->base.label)
+   //  elm_searchbar_text_set(obj, p->base.label);
    if (p->cancel_button_animation_exists)
       elm_searchbar_cancel_button_animation_set(obj, p->cancel_button_animation);
 }
@@ -80,7 +80,7 @@ external_searchbar_params_parse(void *data, Evas_Object *obj, const Eina_List *p
    Edje_External_Param *param;
    const Eina_List *l;
 
-   mem = external_common_params_parse(Elm_Params_Searchbar, data, obj, params);
+   //mem = external_common_params_parse(Elm_Params_Searchbar, data, obj, params);
    if (!mem)
       return NULL;
 

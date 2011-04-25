@@ -177,7 +177,7 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
    
    if (!wd) return;
 
-   _els_box_layout(o, priv, 1, 0); /* making box layout non homogenous */
+   _els_box_layout(o, priv, 1, 0, elm_widget_mirrored_get(o)); /* making box layout non homogenous */
 
    return;
 }

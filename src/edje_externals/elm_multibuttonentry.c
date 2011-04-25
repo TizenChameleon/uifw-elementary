@@ -80,7 +80,7 @@ external_multibuttonentry_params_parse(void *data __UNUSED__, Evas_Object *obj _
    Edje_External_Param *param;
    const Eina_List *l;
 
-   mem = external_common_params_parse(Elm_Params_Multibuttonentry, data, obj, params);
+   //mem = external_common_params_parse(Elm_Params_Multibuttonentry, data, obj, params);
    if (!mem)
      return NULL;
 

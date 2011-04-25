@@ -1,26 +1,48 @@
 #include <Elementary.h>
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
 static void
-_bt(void *data, Evas_Object *obj, void *event_info)
+_bt(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *notify = data;
    evas_object_show(notify);
 }
 
 static void
-_bt_close(void *data, Evas_Object *obj, void *event_info)
+_bt_close(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *notify = data;
    evas_object_hide(notify);
 }
 
+static void
+_bt_timer_close(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Evas_Object *notify = data;
+   elm_notify_timeout_set(notify, 2.0);
+}
+
+static void
+_notify_timeout(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   printf("Notify timed out!\n");
+}
+
+static void
+_notify_block(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   printf("Notify block area clicked!!\n");
+}
+
 void
-test_notify(void *data, Evas_Object *obj, void *event_info)
+test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *bx, *tb, *notify, *bt, *lb;
 
-   win = elm_win_add(NULL, "Notify", ELM_WIN_BASIC);
+   win = elm_win_add(NULL, "notify", ELM_WIN_BASIC);
    elm_win_title_set(win, "Notify");
    elm_win_autodel_set(win, 1);
 
@@ -63,7 +85,9 @@ test_notify(void *data, Evas_Object *obj, void *event_info)
    elm_notify_repeat_events_set(notify, EINA_FALSE);
    evas_object_size_hint_weight_set(notify, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_notify_orient_set(notify, ELM_NOTIFY_ORIENT_BOTTOM);
-   elm_notify_timeout_set(notify, 5);
+   elm_notify_timeout_set(notify, 5.0);
+   evas_object_smart_callback_add(notify, "timeout", _notify_timeout, NULL);
+   evas_object_smart_callback_add(notify, "block,clicked", _notify_block, NULL);
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
@@ -91,7 +115,8 @@ test_notify(void *data, Evas_Object *obj, void *event_info)
    notify = elm_notify_add(win);
    evas_object_size_hint_weight_set(notify, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_notify_orient_set(notify, ELM_NOTIFY_ORIENT_LEFT);
-   elm_notify_timeout_set(notify, 10);
+   elm_notify_timeout_set(notify, 10.0);
+   evas_object_smart_callback_add(notify, "timeout", _notify_timeout, NULL);
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
@@ -118,7 +143,8 @@ test_notify(void *data, Evas_Object *obj, void *event_info)
    notify = elm_notify_add(win);
    evas_object_size_hint_weight_set(notify, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_notify_orient_set(notify, ELM_NOTIFY_ORIENT_CENTER);
-   elm_notify_timeout_set(notify, 10);
+   elm_notify_timeout_set(notify, 10.0);
+   evas_object_smart_callback_add(notify, "timeout", _notify_timeout, NULL);
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
@@ -261,8 +287,8 @@ test_notify(void *data, Evas_Object *obj, void *event_info)
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close");
-   evas_object_smart_callback_add(bt, "clicked", _bt_close, notify);
+   elm_button_label_set(bt, "Close in 2s");
+   evas_object_smart_callback_add(bt, "clicked", _bt_timer_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 

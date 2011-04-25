@@ -5,33 +5,33 @@
  * CODE. THIS IS ELEMENTARY'S INTERNAL WIDGET API (for now) AND IS NOT
  * FINAL. CALL elm_widget_api_check(ELM_INTERNAL_API_VERSION) TO CHECK IT
  * AT RUNTIME
- * 
+ *
  * How to make your own widget? like this:
- * 
+ *
  * #include <Elementary.h>
  * #include "elm_priv.h"
- * 
+ *
  * typedef struct _Widget_Data Widget_Data;
- *    
+ *
  * struct _Widget_Data
  * {
  *   Evas_Object *sub;
  *   // add any other widget data here too
  * };
- * 
+ *
  * static const char *widtype = NULL;
  * static void _del_hook(Evas_Object *obj);
  * static void _theme_hook(Evas_Object *obj);
  * static void _disable_hook(Evas_Object *obj);
  * static void _sizing_eval(Evas_Object *obj);
  * static void _on_focus_hook(void *data, Evas_Object *obj);
- * 
+ *
  * static const char SIG_CLICKED[] = "clicked";
  * static const Evas_Smart_Cb_Description _signals[] = {
  *   {SIG_CLICKED, ""},
  *   {NULL, NULL}
  * };
- * 
+ *
  * static void
  * _del_hook(Evas_Object *obj)
  * {
@@ -40,7 +40,7 @@
  *    // delete hook - on delete of object delete object struct etc.
  *    free(wd);
  * }
- * 
+ *
  * static void
  * _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
  * {
@@ -59,17 +59,17 @@
  *         evas_object_focus_set(wd->sub, EINA_FALSE);
  *      }
  * }
- * 
+ *
  * static void
  * _theme_hook(Evas_Object *obj)
  * {
  *    Widget_Data *wd = elm_widget_data_get(obj);
  *    if (!wd) return;
  *    // handle change in theme/scale etc.
- *    elm_widget_theme_object_set(obj, wd->sub, "mywidget", "base", 
+ *    elm_widget_theme_object_set(obj, wd->sub, "mywidget", "base",
  *                                elm_widget_style_get(obj));
  * }
- * 
+ *
  * static void
  * _disable_hook(Evas_Object *obj)
  * {
@@ -81,7 +81,7 @@
  *    else
  *      edje_object_signal_emit(wd->sub, "elm,state,enabled", "elm");
  * }
- * 
+ *
  * static void
  * _sizing_eval(Evas_Object *obj)
  * {
@@ -94,7 +94,7 @@
  *    evas_object_size_hint_min_set(obj, minw, minh);
  *    evas_object_size_hint_max_set(obj, maxw, maxh);
  * }
- * 
+ *
  * // actual api to create your widget. add more to manipulate it as needed
  * // mark your calls with EAPI to make them "external api" calls.
  * EAPI Evas_Object *
@@ -103,7 +103,7 @@
  *    Evas_Object *obj;
  *    Evas *e;
  *    Widget_Data *wd;
- * 
+ *
  *    // ALWAYS call this - this checks that your widget matches that of
  *    // elementary and that the api hasn't broken. if it has this returns
  *    // false and you need to handle this error gracefully
@@ -125,7 +125,7 @@
  *    elm_widget_disable_hook_set(obj, _disable_hook);
  *    // this widget can focus (true means yes it can, false means it can't)
  *    elm_widget_can_focus_set(obj, EINA_TRUE);
- * 
+ *
  *    // for this widget we will add 1 sub object that is an edje object
  *    wd->sub = edje_object_add(e);
  *    // set the theme. this follows a scheme for group name like this:
@@ -143,17 +143,17 @@
  *    // set this sub object as the "resize object". widgets get 1 resize
  *    // object that is resized along with the object wrapper.
  *    elm_widget_resize_object_set(obj, wd->sub);
- * 
+ *
  *    // evaluate sizing of the widget (minimum size calc etc.). optional but
  *    // not a bad idea to do here. it will get queued for later anyway
  *    _sizing_eval(obj);
- * 
+ *
  *    // register the smart callback descriptions so we can have some runtime
  *    // info as to what the smart callback strings mean
  *    evas_object_smart_callbacks_descriptions_set(obj, _signals);
  *    return obj;
  * }
- * 
+ *
  * // example - do "whatever" to the widget (here just emit a signal)
  * EAPI void
  * elm_mywidget_whatever(Evas_Object *obj)
@@ -166,19 +166,25 @@
  *    // do whatever you like
  *    edje_object_signal_emit(wd->sub, "elm,state,action,whatever", "elm");
  * }
- * 
+ *
  * // you can add more - you need to see elementary's code to know how to
  * // handle all cases. remember this api is not stable and may change. it's
  * // internal
- * 
+ *
  */
 
-#ifndef ELM_INTERAL_API_MDFGELQ
+#ifndef ELM_INTERNAL_API_ARGESFSDFEFC
 # warning "You are using an internal elementary API. This API is not stable"
 # warning "and is subject to change. You use this at your own risk."
 # warning "Remember to call elm_widget_api_check(ELM_INTERNAL_API_VERSION);"
 # warning "in your widgets before you call any other elm_widget calls to do"
-# warning "a correct runtime version check."
+# warning "a correct runtime version check. Also remember - you don't NEED"
+# warning "to make an Elementary widget is almost ALL cases. You can easily"
+# warning "make a smart object with Evas's API and do everything you need"
+# warning "there. You only need a widget if you want to seamlessly be part"
+# warning "of the focus tree and want to transparently become a container"
+# warning "for any number of child Elementary widgets"
+# error "ERROR. Compile aborted."
 #endif
 #define ELM_INTERNAL_API_VERSION 7000
 
@@ -191,7 +197,7 @@ struct _Elm_Widget_Item
    /* ef1 ~~ efl, el3 ~~ elm */
 #define ELM_WIDGET_ITEM_MAGIC 0xef1e1301
    EINA_MAGIC;
-   
+
    Evas_Object   *widget; /**< the owner widget that owns this item */
    Evas_Object   *view; /**< the base view object */
    const void    *data; /**< item specific data */
@@ -213,8 +219,8 @@ EAPI void             elm_widget_theme_hook_set(Evas_Object *obj, void (*func) (
 EAPI void             elm_widget_event_hook_set(Evas_Object *obj, Eina_Bool (*func) (Evas_Object *obj, Evas_Object *source, Evas_Callback_Type type, void *event_info));
 EAPI void             elm_widget_changed_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj));
 EAPI void             elm_widget_signal_emit_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source));
-EAPI void             elm_widget_signal_callback_add_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data));
-EAPI void             elm_widget_signal_callback_del_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data));
+EAPI void             elm_widget_signal_callback_add_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func_cb, void *data));
+EAPI void             elm_widget_signal_callback_del_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func_cb, void *data));
 EAPI void             elm_widget_theme(Evas_Object *obj);
 EAPI void             elm_widget_theme_specific(Evas_Object *obj, Elm_Theme *th, Eina_Bool force);
 EAPI void             elm_widget_focus_next_hook_set(Evas_Object *obj, Eina_Bool (*func) (const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next));
@@ -275,6 +281,10 @@ EAPI void             elm_widget_scroll_freeze_pop(Evas_Object *obj);
 EAPI int              elm_widget_scroll_freeze_get(const Evas_Object *obj);
 EAPI void             elm_widget_scale_set(Evas_Object *obj, double scale);
 EAPI double           elm_widget_scale_get(const Evas_Object *obj);
+EAPI Eina_Bool        elm_widget_mirrored_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+EAPI void             elm_widget_mirrored_set(Evas_Object *obj, Eina_Bool mirrored) EINA_ARG_NONNULL(1);
+EAPI Eina_Bool        elm_widget_mirrored_automatic_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+EAPI void             elm_widget_mirrored_automatic_set(Evas_Object *obj, Eina_Bool automatic) EINA_ARG_NONNULL(1);
 EAPI void             elm_widget_theme_set(Evas_Object *obj, Elm_Theme *th);
 EAPI Elm_Theme       *elm_widget_theme_get(const Evas_Object *obj);
 EAPI void             elm_widget_style_set(Evas_Object *obj, const char *style);

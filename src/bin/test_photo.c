@@ -1,4 +1,7 @@
 #include <Elementary.h>
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
 static void drop_cb(void *mydata, Evas_Object *obj, void *evdata);
@@ -6,7 +9,7 @@ static void drag_stop_cb(void *mydata, Evas_Object *obj, void *evdata);
 static void drag_start_cb(void *mydata, Evas_Object *obj, void *evdata);
 
 void
-test_photo(void *data, Evas_Object *obj, void *event_info)
+test_photo(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *sc, *tb, *ph;
    int i, j, n;
@@ -46,11 +49,6 @@ test_photo(void *data, Evas_Object *obj, void *event_info)
                       PACKAGE_DATA_DIR, img[n]);
              n++;
              if (n >= 9) n = 0;
-             elm_photo_file_set(ph, buf);
-             evas_object_size_hint_weight_set(ph, EVAS_HINT_EXPAND, 
-                                              EVAS_HINT_EXPAND);
-             evas_object_size_hint_align_set(ph, EVAS_HINT_FILL, 
-                                             EVAS_HINT_FILL);
              elm_photo_size_set(ph, 80);
              elm_photo_file_set(ph, buf);
 	     elm_photo_editable_set(ph, 1);
@@ -65,7 +63,7 @@ test_photo(void *data, Evas_Object *obj, void *event_info)
              evas_object_smart_callback_add(ph, "drag,stop",
                                             drag_stop_cb, NULL);
 
-             if(n == 2 || n == 3) {
+             if((n == 2) || (n == 3)) {
             	 elm_photo_fill_inside_set(ph, EINA_TRUE);
             	 elm_object_style_set(ph, "shadow");
              }
@@ -86,18 +84,19 @@ test_photo(void *data, Evas_Object *obj, void *event_info)
    evas_object_show(win);
 }
 
+/* Never called, elm_photo never call "drop" smart cb */
 static void
-drop_cb(void *mydata, Evas_Object *obj, void *evdata){
-   printf("Drop on obj %p: Image: %s\n",obj,evdata);
+drop_cb(void *mydata __UNUSED__, Evas_Object *obj, void *evdata __UNUSED__){
+   printf("Drop on obj %p\n", obj);
 }
 
 static void
-drag_start_cb(void *mydata, Evas_Object *obj, void *evdata){
+drag_start_cb(void *mydata __UNUSED__, Evas_Object *obj __UNUSED__, void *evdata __UNUSED__){
    
 }
 
 static void
-drag_stop_cb(void *mydata, Evas_Object *obj, void *evdata){
+drag_stop_cb(void *mydata __UNUSED__, Evas_Object *obj __UNUSED__, void *evdata __UNUSED__){
 
 }
 

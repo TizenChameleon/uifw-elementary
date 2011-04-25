@@ -26,6 +26,7 @@ ICON("hoversel")
 ICON("icon")
 ICON("list")
 ICON("map")
+ICON("notepad")
 ICON("multibuttonentry")
 ICON("nocontents")
 ICON("page_control")
@@ -42,5 +43,4 @@ ICON("thumb")
 ICON("toggle")
 ICON("toolbar")
 ICON("slideshow")
-
 

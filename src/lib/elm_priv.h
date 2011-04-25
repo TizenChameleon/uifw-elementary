@@ -26,6 +26,8 @@
 #define INF(...)      EINA_LOG_DOM_INFO(_elm_log_dom, __VA_ARGS__)
 #define DBG(...)      EINA_LOG_DOM_DBG (_elm_log_dom, __VA_ARGS__)
 
+#define E_(string) dgettext(PACKAGE, string)
+
 Evas_Object *_elm_smart_pan_add            (Evas *evas);
 void         _elm_smart_pan_child_set      (Evas_Object *obj, Evas_Object *child);
 Evas_Object *_elm_smart_pan_child_get      (Evas_Object *obj);
@@ -74,7 +76,7 @@ void elm_smart_scroller_momentum_animator_disabled_set             (Evas_Object 
 void elm_smart_scroller_bounce_animator_disabled_set               (Evas_Object *obj, Eina_Bool disabled);
 Eina_Bool elm_smart_scroller_bounce_animator_disabled_get     (Evas_Object *obj);
 
-void _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int homogeneous);
+void _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int rtl);
 
 Evas_Object *_els_smart_icon_add              (Evas *evas);
 Eina_Bool    _els_smart_icon_file_key_set     (Evas_Object *obj, const char *file, const char *key);
@@ -149,43 +151,48 @@ extern const char *_elm_engines[];
 
 struct _Elm_Config
 {
-   int          config_version;
-   const char  *engine;
-   Eina_Bool    thumbscroll_enable;
-   int          thumbscroll_threshold;
-   double       thumbscroll_momentum_threshold;
-   double       thumbscroll_friction;
-   double       thumbscroll_bounce_friction;
-   double       page_scroll_friction;
-   double       bring_in_scroll_friction;
-   double       zoom_friction;
-   Eina_Bool    thumbscroll_bounce_enable;
-   double       thumbscroll_border_friction;
-   double       scale;
-   int          bgpixmap;
-   int          compositing;
-   Eina_List   *font_dirs;
-   Eina_List   *font_overlays;
-   int          font_hinting;
-   int          cache_flush_poll_interval;
-   Eina_Bool    cache_flush_enable;
-   int          image_cache;
-   int          font_cache;
-   int          edje_cache;
-   int          edje_collection_cache;
-   int          finger_size;
-   double       fps;
-   const char  *theme;
-   const char  *modules;
-   double       tooltip_delay;
-   Eina_Bool    cursor_engine_only;
-   Eina_Bool    focus_highlight_enable;
-   Eina_Bool    focus_highlight_animate;
-   int          toolbar_shrink_mode;
-   Eina_Bool    fileselector_expand_enable;
-   Eina_Bool    inwin_dialogs_enable;
-   int          icon_size;
-   double       longpress_timeout;
+   int            config_version;
+   const char    *engine;
+   unsigned char  thumbscroll_enable;
+   int            thumbscroll_threshold;
+   double         thumbscroll_momentum_threshold;
+   double         thumbscroll_friction;
+   double         thumbscroll_bounce_friction;
+   double         page_scroll_friction;
+   double         bring_in_scroll_friction;
+   double         zoom_friction;
+   unsigned char  thumbscroll_bounce_enable;
+   double         thumbscroll_border_friction;
+   double         scale;
+   int            bgpixmap;
+   int            compositing;
+   Eina_List     *font_dirs;
+   Eina_List     *font_overlays;
+   int            font_hinting;
+   int            cache_flush_poll_interval;
+   unsigned char  cache_flush_enable;
+   int            image_cache;
+   int            font_cache;
+   int            edje_cache;
+   int            edje_collection_cache;
+   int            finger_size;
+   double         fps;
+   const char    *theme;
+   const char    *modules;
+   double         tooltip_delay;
+   unsigned char  cursor_engine_only;
+   unsigned char  focus_highlight_enable;
+   unsigned char  focus_highlight_animate;
+   int            toolbar_shrink_mode;
+   unsigned char  fileselector_expand_enable;
+   unsigned char  inwin_dialogs_enable;
+   int            icon_size;
+   double         longpress_timeout;
+   unsigned char  effect_enable;
+   unsigned char  desktop_entry;
+
+   Eina_Bool      is_mirrored : 1;
+
    int input_panel_enable;
    int autocapital_allow;
    int autoperiod_allow;   
@@ -233,9 +240,10 @@ const void         *_elm_module_symbol_get(Elm_Module *m, const char *name);
 void                _elm_widget_type_clear(void);
 void                _elm_widget_focus_region_show(const Evas_Object *obj);
 
-void		    _elm_unneed_ethumb(void);
+void                _elm_unneed_ethumb(void);
 
 void                _elm_rescale(void);
+void                _elm_widget_mirrored_reload(Evas_Object *obj);
 
 void                _elm_config_init(void);
 void                _elm_config_sub_init(void);
@@ -286,5 +294,6 @@ extern const char  *_elm_data_dir;
 extern const char  *_elm_lib_dir;
 extern int          _elm_log_dom;
 extern Eina_List   *_elm_win_list;
+extern int          _elm_win_deferred_free;
 
 #endif

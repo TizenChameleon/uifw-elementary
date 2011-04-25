@@ -1,17 +1,29 @@
 #include <Elementary.h>
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
 
 #ifndef ELM_LIB_QUICKLAUNCH
 static void
-_file_chosen(void *data, Evas_Object *obj, void *event_info)
+_file_chosen(void            *data,
+             Evas_Object *obj __UNUSED__,
+             void            *event_info)
 {
    Evas_Object *entry = data;
-   char *file = event_info;
-   elm_entry_entry_set(entry, file);
-   printf("File chosen: %s\n", file);
+   const char *file = event_info;
+   if (file)
+     {
+        elm_entry_entry_set(entry, file);
+        printf("File chosen: %s\n", file);
+     }
+   else
+     printf("File selection canceled.\n");
 }
 
 static void
-_inwin_mode_toggle(void *data, Evas_Object *obj, void *event_info)
+_inwin_mode_toggle(void            *data,
+                   Evas_Object *obj __UNUSED__,
+                   void *event_info __UNUSED__)
 {
    Evas_Object *fs_bt = data;
    Eina_Bool value = elm_fileselector_button_inwin_mode_get(fs_bt);
@@ -20,17 +32,21 @@ _inwin_mode_toggle(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-_current_sel_toggle(void *data, Evas_Object *obj, void *event_info)
+_current_sel_toggle(void            *data,
+                    Evas_Object *obj __UNUSED__,
+                    void *event_info __UNUSED__)
 {
    Evas_Object *fs_bt = data;
-   Eina_Bool value = elm_fileselector_button_folder_only_get(fs_bt);
-   elm_fileselector_button_folder_only_set(fs_bt, !value);
-   printf("Current selection entry display set to: %s\n",
-	  value ? "false" : "true");
+   Eina_Bool value = elm_fileselector_button_is_save_get(fs_bt);
+   elm_fileselector_button_is_save_set(fs_bt, !value);
+   printf("Current selection editable entry set to: %s\n",
+          value ? "false" : "true");
 }
 
 static void
-_folder_only_toggle(void *data, Evas_Object *obj, void *event_info)
+_folder_only_toggle(void            *data,
+                    Evas_Object *obj __UNUSED__,
+                    void *event_info __UNUSED__)
 {
    Evas_Object *fs_bt = data;
    Eina_Bool value = elm_fileselector_button_folder_only_get(fs_bt);
@@ -39,7 +55,9 @@ _folder_only_toggle(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-_expandable_toggle(void *data, Evas_Object *obj, void *event_info)
+_expandable_toggle(void            *data,
+                   Evas_Object *obj __UNUSED__,
+                   void *event_info __UNUSED__)
 {
    Evas_Object *fs_bt = data;
    Eina_Bool value = elm_fileselector_button_expandable_get(fs_bt);
@@ -48,11 +66,13 @@ _expandable_toggle(void *data, Evas_Object *obj, void *event_info)
 }
 
 void
-test_fileselector_button(void *data, Evas_Object *obj, void *event_info)
+test_fileselector_button(void *data       __UNUSED__,
+                         Evas_Object *obj __UNUSED__,
+                         void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *vbox, *hbox, *ic, *bt, *fs_bt, *en, *lb;
 
-   win = elm_win_add(NULL, "fileselector button", ELM_WIN_BASIC);
+   win = elm_win_add(NULL, "fileselector-button", ELM_WIN_BASIC);
    elm_win_title_set(win, "File Selector Button");
    elm_win_autodel_set(win, 1);
 
@@ -66,11 +86,6 @@ test_fileselector_button(void *data, Evas_Object *obj, void *event_info)
    evas_object_size_hint_weight_set(vbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(vbox);
 
-   vbox = elm_box_add(win);
-   evas_object_size_hint_weight_set(vbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, vbox);
-   evas_object_show(vbox);
-
    /* file selector button */
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "file");
@@ -78,7 +93,6 @@ test_fileselector_button(void *data, Evas_Object *obj, void *event_info)
    fs_bt = elm_fileselector_button_add(win);
    elm_fileselector_button_label_set(fs_bt, "Select a file");
    elm_fileselector_button_icon_set(fs_bt, ic);
-   elm_fileselector_button_inwin_mode_set(fs_bt, EINA_TRUE);
 
    elm_box_pack_end(vbox, fs_bt);
    evas_object_show(fs_bt);
@@ -129,4 +143,5 @@ test_fileselector_button(void *data, Evas_Object *obj, void *event_info)
    evas_object_resize(win, 400, 400);
    evas_object_show(win);
 }
+
 #endif

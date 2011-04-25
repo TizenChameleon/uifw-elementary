@@ -12,6 +12,12 @@
  *
  * @note The hover object will take up the entire space of @p target
  * object.
+ *
+ * Signals that you can add callbacks for are:
+ *
+ * "clicked" - the user clicked the empty space in the hover to dismiss
+ * "smart,changed" - a content object placed under the "smart"
+ *                   policy was replaced to a new slot direction.
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -64,6 +70,7 @@ struct _Widget_Data
 static const char *widtype = NULL;
 static void _del_pre_hook(Evas_Object *obj);
 static void _del_hook(Evas_Object *obj);
+static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _reval_content(Evas_Object *obj);
@@ -80,9 +87,9 @@ static void _elm_hover_sub_obj_placement_eval(Evas_Object *obj);
 static const char SIG_CLICKED[] = "clicked";
 static const char SIG_SMART_LOCATION_CHANGED[] = "smart,changed";
 static const Evas_Smart_Cb_Description _signals[] = {
-  {SIG_CLICKED, ""},
-  {SIG_SMART_LOCATION_CHANGED, ""},
-  {NULL, NULL}
+       {SIG_CLICKED, ""},
+       {SIG_SMART_LOCATION_CHANGED, ""},
+       {NULL, NULL}
 };
 
 static void
@@ -117,14 +124,22 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_focus_get(obj))
      {
-	edje_object_signal_emit(wd->cov, "elm,action,focus", "elm");
-	evas_object_focus_set(wd->cov, EINA_TRUE);
+        edje_object_signal_emit(wd->cov, "elm,action,focus", "elm");
+        evas_object_focus_set(wd->cov, EINA_TRUE);
      }
    else
      {
-	edje_object_signal_emit(wd->cov, "elm,action,unfocus", "elm");
-	evas_object_focus_set(wd->cov, EINA_FALSE);
+        edje_object_signal_emit(wd->cov, "elm,action,unfocus", "elm");
+        evas_object_focus_set(wd->cov, EINA_FALSE);
      }
+}
+
+static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_mirrored_set(wd->cov, rtl);
 }
 
 static void
@@ -132,15 +147,17 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    // FIXME: hover contents doesn't seem to propagate resizes properly
    _elm_theme_object_set(obj, wd->cov, "hover", "base", elm_widget_style_get(obj));
    edje_object_scale_set(wd->cov, elm_widget_scale_get(obj) *
                          _elm_config->scale);
 
    if (wd->smt_sub)
-      _elm_hover_sub_obj_placement_eval(obj);
+     _elm_hover_sub_obj_placement_eval(obj);
    else
-      _reval_content(obj);
+     _reval_content(obj);
    _sizing_eval(obj);
    if (evas_object_visible_get(wd->cov)) _hov_show_do(obj);
 }
@@ -158,7 +175,7 @@ _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
 }
 
 static void
-_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func_cb, void *data)
 {
    Widget_Data *wd;
 
@@ -170,7 +187,7 @@ _signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *so
 }
 
 static void
-_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func_cb, void *data)
 {
    Widget_Data *wd;
 
@@ -209,13 +226,19 @@ static void
 _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Coord x = 0, y = 0, w = 0, h = 0, x2 = 0, y2 = 0, w2 = 0, h2 = 0;
+   Evas_Coord ofs_x, x = 0, y = 0, w = 0, h = 0, x2 = 0, y2 = 0, w2 = 0, h2 = 0;
    if (!wd) return;
    if (wd->parent) evas_object_geometry_get(wd->parent, &x, &y, &w, &h);
    if (wd->hov) evas_object_geometry_get(wd->hov, &x2, &y2, &w2, &h2);
+
+   if (elm_widget_mirrored_get(obj))
+     ofs_x = w - (x2 - x) - w2;
+   else
+     ofs_x = x2 - x;
+
    evas_object_move(wd->cov, x, y);
    evas_object_resize(wd->cov, w, h);
-   evas_object_size_hint_min_set(wd->offset, x2 - x, y2 - y);
+   evas_object_size_hint_min_set(wd->offset, ofs_x, y2 - y);
    evas_object_size_hint_min_set(wd->size, w2, h2);
    edje_object_part_swallow(wd->cov, "elm.swallow.offset", wd->offset);
    edje_object_part_swallow(wd->cov, "elm.swallow.size", wd->size);
@@ -317,7 +340,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (wd->smt_sub)
      {
         if (wd->smt_sub == sub)
-           wd->smt_sub = NULL;
+          wd->smt_sub = NULL;
      }
    else
      {
@@ -341,20 +364,20 @@ _hov_show_do(Evas_Object *obj)
 
    if (wd->cov)
      {
-	evas_object_show(wd->cov);
-	edje_object_signal_emit(wd->cov, "elm,action,show", "elm");
+        evas_object_show(wd->cov);
+        edje_object_signal_emit(wd->cov, "elm,action,show", "elm");
      }
 
    ELM_HOVER_PARTS_FOREACH
      {
-	char buf[1024];
+        char buf[1024];
 
-	if (wd->subs[i].obj)
-	  {
-	     snprintf(buf, sizeof(buf), "elm,action,slot,%s,show",
-		      wd->subs[i].swallow);
-	     edje_object_signal_emit(wd->cov, buf, "elm");
-	  }
+        if (wd->subs[i].obj)
+          {
+             snprintf(buf, sizeof(buf), "elm,action,slot,%s,show",
+                      wd->subs[i].swallow);
+             edje_object_signal_emit(wd->cov, buf, "elm");
+          }
      }
 }
 
@@ -383,20 +406,20 @@ _hov_hide(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
    if (!wd) return;
    if (wd->cov)
      {
-	edje_object_signal_emit(wd->cov, "elm,action,hide", "elm");
-	evas_object_hide(wd->cov);
+        edje_object_signal_emit(wd->cov, "elm,action,hide", "elm");
+        evas_object_hide(wd->cov);
      }
 
    ELM_HOVER_PARTS_FOREACH
      {
-	char buf[1024];
+        char buf[1024];
 
-	if (wd->subs[i].obj)
-	  {
-	     snprintf(buf, sizeof(buf), "elm,action,slot,%s,hide",
-		      wd->subs[i].swallow);
-	     edje_object_signal_emit(wd->cov, buf, "elm");
-	  }
+        if (wd->subs[i].obj)
+          {
+             snprintf(buf, sizeof(buf), "elm,action,slot,%s,hide",
+                      wd->subs[i].swallow);
+             edje_object_signal_emit(wd->cov, buf, "elm");
+          }
      }
 }
 
@@ -477,16 +500,8 @@ elm_hover_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-
-   ELM_HOVER_PARTS_FOREACH
-     wd->subs[i].swallow = _directions[i];
-
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "hover");
    elm_widget_type_set(obj, "hover");
    elm_widget_sub_object_add(parent, obj);
@@ -499,6 +514,9 @@ elm_hover_add(Evas_Object *parent)
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
    elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
+
+   ELM_HOVER_PARTS_FOREACH
+      wd->subs[i].swallow = _directions[i];
 
    wd->hov = evas_object_rectangle_add(e);
    evas_object_pass_events_set(wd->hov, EINA_TRUE);
@@ -533,6 +551,7 @@ elm_hover_add(Evas_Object *parent)
    elm_hover_parent_set(obj, parent);
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
    return obj;
 }
@@ -562,12 +581,12 @@ elm_hover_target_set(Evas_Object *obj, Evas_Object *target)
    wd->target = target;
    if (wd->target)
      {
-	evas_object_event_callback_add(wd->target, EVAS_CALLBACK_DEL,
+        evas_object_event_callback_add(wd->target, EVAS_CALLBACK_DEL,
                                        _target_del, obj);
-	evas_object_event_callback_add(wd->target, EVAS_CALLBACK_MOVE,
+        evas_object_event_callback_add(wd->target, EVAS_CALLBACK_MOVE,
                                        _target_move, obj);
-	elm_widget_hover_object_set(target, obj);
-	_sizing_eval(obj);
+        elm_widget_hover_object_set(target, obj);
+        _sizing_eval(obj);
      }
 }
 
@@ -588,31 +607,31 @@ elm_hover_parent_set(Evas_Object *obj, Evas_Object *parent)
    if (!wd) return;
    if (wd->parent)
      {
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_MOVE,
-                                       _parent_move, obj);
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE,
-                                       _parent_resize, obj);
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_SHOW,
-                                       _parent_show, obj);
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_HIDE,
-                                       _parent_hide, obj);
-	evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_DEL,
-                                       _parent_del, obj);
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_MOVE,
+                                            _parent_move, obj);
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE,
+                                            _parent_resize, obj);
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_SHOW,
+                                            _parent_show, obj);
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_HIDE,
+                                            _parent_hide, obj);
+        evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_DEL,
+                                            _parent_del, obj);
      }
    wd->parent = parent;
    if (wd->parent)
      {
-	evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_MOVE,
+        evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_MOVE,
                                        _parent_move, obj);
-	evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_RESIZE,
+        evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_RESIZE,
                                        _parent_resize, obj);
-	evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_SHOW,
+        evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_SHOW,
                                        _parent_show, obj);
-	evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_HIDE,
+        evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_HIDE,
                                        _parent_hide, obj);
-	evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_DEL,
+        evas_object_event_callback_add(wd->parent, EVAS_CALLBACK_DEL,
                                        _parent_del, obj);
-//	elm_widget_sub_object_add(parent, obj);
+        //	elm_widget_sub_object_add(parent, obj);
      }
    _sizing_eval(obj);
 }
@@ -658,11 +677,11 @@ _elm_hover_subs_del(Widget_Data *wd)
 {
    ELM_HOVER_PARTS_FOREACH
      {
-	if (wd->subs[i].obj)
-	  {
+        if (wd->subs[i].obj)
+          {
              evas_object_del(wd->subs[i].obj);
              wd->subs[i].obj = NULL;
-	  }
+          }
      }
 }
 
@@ -687,6 +706,21 @@ _elm_hover_sub_obj_placement_eval(Evas_Object *obj)
    evas_object_smart_callback_call(obj, SIG_SMART_LOCATION_CHANGED,
                                    (void *)smart_dir);
 
+   if (elm_widget_mirrored_get(obj))
+     {
+        if (smart_dir == _HOV_BOTTOM_LEFT)
+          smart_dir = _HOV_BOTTOM_RIGHT;
+        else if (smart_dir == _HOV_BOTTOM_RIGHT)
+          smart_dir = _HOV_BOTTOM_LEFT;
+        else if (smart_dir == _HOV_RIGHT)
+          smart_dir = _HOV_LEFT;
+        else if (smart_dir == _HOV_LEFT)
+          smart_dir = _HOV_RIGHT;
+        else if (smart_dir == _HOV_TOP_RIGHT)
+          smart_dir = _HOV_TOP_LEFT;
+        else if (smart_dir == _HOV_TOP_LEFT)
+          smart_dir = _HOV_TOP_RIGHT;
+     }
    snprintf(buf, sizeof(buf), "elm.swallow.slot.%s", smart_dir);
    edje_object_part_swallow(wd->cov, buf, wd->smt_sub);
 }
@@ -769,11 +803,11 @@ elm_hover_content_set(Evas_Object *obj, const char *swallow, Evas_Object *conten
 
    ELM_HOVER_PARTS_FOREACH
      {
-	if (!strcmp(swallow, wd->subs[i].swallow))
-	  {
-	     if (content == wd->subs[i].obj)
+        if (!strcmp(swallow, wd->subs[i].swallow))
+          {
+             if (content == wd->subs[i].obj)
                return;
-	     evas_object_del(wd->subs[i].obj);
+             evas_object_del(wd->subs[i].obj);
              wd->subs[i].obj = NULL;
 
              if (content)
@@ -785,11 +819,11 @@ elm_hover_content_set(Evas_Object *obj, const char *swallow, Evas_Object *conten
                   edje_object_part_swallow(wd->cov, buf, content);
                   wd->subs[i].obj = content;
                }
-	     break;
-	  }
+             break;
+          }
      }
 
- end:
+end:
    _sizing_eval(obj);
 }
 
@@ -822,8 +856,8 @@ elm_hover_content_get(const Evas_Object *obj, const char *swallow)
      return wd->smt_sub;
 
    ELM_HOVER_PARTS_FOREACH
-     if (!strcmp(swallow, wd->subs[i].swallow))
-       return wd->subs[i].obj;
+      if (!strcmp(swallow, wd->subs[i].swallow))
+        return wd->subs[i].obj;
 
    return NULL;
 }
@@ -882,20 +916,20 @@ elm_hover_content_unset(Evas_Object *obj, const char *swallow)
 
    ELM_HOVER_PARTS_FOREACH
      {
-	if (!strcmp(swallow, wd->subs[i].swallow))
-	  {
-	     Evas_Object *content;
+        if (!strcmp(swallow, wd->subs[i].swallow))
+          {
+             Evas_Object *content;
 
-	     if (!wd->subs[i].obj)
+             if (!wd->subs[i].obj)
                return NULL;
 
-	     content = wd->subs[i].obj;
-	     elm_widget_sub_object_del(obj, wd->subs[i].obj);
-	     edje_object_part_unswallow(wd->cov, wd->subs[i].obj);
-	     wd->subs[i].obj = NULL;
+             content = wd->subs[i].obj;
+             elm_widget_sub_object_del(obj, wd->subs[i].obj);
+             edje_object_part_unswallow(wd->cov, wd->subs[i].obj);
+             wd->subs[i].obj = NULL;
 
-	     return content;
-	  }
+             return content;
+          }
      }
 
    return NULL;
@@ -937,13 +971,13 @@ elm_hover_best_content_location_get(const Evas_Object *obj, Elm_Hover_Axis pref_
 
    if (pref_axis == ELM_HOVER_AXIS_HORIZONTAL)
      {
-	if (spc_l < spc_r) return _HOV_RIGHT;
-	else return _HOV_LEFT;
+        if (spc_l < spc_r) return _HOV_RIGHT;
+        else return _HOV_LEFT;
      }
    else if (pref_axis == ELM_HOVER_AXIS_VERTICAL)
      {
-	if (spc_t < spc_b) return _HOV_BOTTOM;
-	else return _HOV_TOP;
+        if (spc_t < spc_b) return _HOV_BOTTOM;
+        else return _HOV_TOP;
      }
 
    if (spc_l < spc_r)

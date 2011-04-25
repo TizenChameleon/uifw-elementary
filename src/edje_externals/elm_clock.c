@@ -2,6 +2,7 @@
 
 typedef struct _Elm_Params_Clock
 {
+   Elm_Params base;
    int hrs, min, sec;
    Eina_Bool hrs_exists:1;
    Eina_Bool min_exists:1;
@@ -211,9 +212,9 @@ external_clock_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, 
 }
 
 static Evas_Object *external_clock_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
@@ -226,6 +227,7 @@ external_clock_params_free(void *params)
 }
 
 static Edje_External_Param_Info external_clock_params[] = {
+   DEFINE_EXTERNAL_COMMON_PARAMS,
    EDJE_EXTERNAL_PARAM_INFO_INT("hours"),
    EDJE_EXTERNAL_PARAM_INFO_INT("minutes"),
    EDJE_EXTERNAL_PARAM_INFO_INT("seconds"),

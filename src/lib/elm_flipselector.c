@@ -7,6 +7,14 @@
  * A flip selector is a widget to show a set of label items, one at a
  * time, with an animation when one changes the current selection
  * (like the flip of calendar sheets, in the default theme).
+ *
+ * Signals that you can add callbacks for are:
+ *
+ * "selected" - when flipselector selected item is changed
+ * "overflowed" - when flipselector item is changed to first item
+ *                from last item
+ * "underflowed" - when flipselector item is changed to last item
+ *                 from first item.
  */
 
 /* TODO: ideally, the default theme would use map{} blocks on the TEXT
@@ -32,7 +40,8 @@
 
 #define DATA_GET eina_list_data_get
 
-struct _Elm_Flipselector_Item {
+struct _Elm_Flipselector_Item
+{
    Elm_Widget_Item base;
    const char *label;
    Evas_Smart_Cb func;
@@ -42,7 +51,8 @@ struct _Elm_Flipselector_Item {
 
 typedef struct _Widget_Data Widget_Data;
 
-struct _Widget_Data {
+struct _Widget_Data
+{
    Evas_Object *self;
    Evas_Object *base;
    Eina_List *items;
@@ -73,13 +83,13 @@ static const Evas_Smart_Cb_Description _signals[] = {
   {NULL, NULL}
 };
 
-#define ELM_FLIPSELECTOR_ITEM_CHECK_DELETED_RETURN(it, ...)               \
+#define ELM_FLIPSELECTOR_ITEM_CHECK_DELETED_RETURN(it, ...)             \
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it, __VA_ARGS__);            \
-  if (it->deleted)							\
-    {									\
-       ERR(""#it" has been DELETED.\n");				\
-       return __VA_ARGS__;						\
-    }									\
+  if (it->deleted)                                                      \
+    {                                                                   \
+       ERR(""#it" has been DELETED.\n");                                \
+       return __VA_ARGS__;                                              \
+    }                                                                   \
 
 static Elm_Flipselector_Item *
 _item_new(Evas_Object *obj, const char *label, Evas_Smart_Cb func, const void *data)
@@ -125,7 +135,7 @@ _del_hook(Evas_Object *obj)
      ERR("flipselector deleted while walking.\n");
 
    EINA_LIST_FREE(wd->items, item)
-     _item_free(item);
+      _item_free(item);
 
    if (wd->spin) ecore_timer_del(wd->spin);
    free(wd);
@@ -142,18 +152,18 @@ _theme_hook(Evas_Object *obj)
      return;
 
    _elm_theme_object_set(obj, wd->base, "flipselector", "base",
-			 elm_widget_style_get(obj));
+                         elm_widget_style_get(obj));
    edje_object_scale_set(wd->base,
-			 elm_widget_scale_get(obj) * _elm_config->scale);
+                         elm_widget_scale_get(obj) * _elm_config->scale);
 
    max_len = edje_object_data_get(wd->base, "max_len");
    if (!max_len)
      wd->max_len = MAX_LEN_DEFAULT;
    else
      {
-	wd->max_len = atoi(max_len);
-	if (!wd->max_len)
-	  wd->max_len = MAX_LEN_DEFAULT;
+        wd->max_len = atoi(max_len);
+        if (!wd->max_len)
+          wd->max_len = MAX_LEN_DEFAULT;
      }
 
    _update_view(obj);
@@ -168,17 +178,17 @@ _sentinel_eval(Widget_Data *wd)
 
    if (!wd->items)
      {
-	wd->sentinel = NULL;
-	return;
+        wd->sentinel = NULL;
+        return;
      }
 
    wd->sentinel = wd->items;
 
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-	if (strlen(elm_flipselector_item_label_get(it)) >
-	    strlen(elm_flipselector_item_label_get(DATA_GET(wd->sentinel))))
-	  wd->sentinel = l;
+        if (strlen(elm_flipselector_item_label_get(it)) >
+            strlen(elm_flipselector_item_label_get(DATA_GET(wd->sentinel))))
+          wd->sentinel = l;
      }
 }
 
@@ -195,28 +205,28 @@ _flipselector_process_deletions(Widget_Data *wd)
 
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-	if (!it->deleted)
-	  continue;
+        if (!it->deleted)
+          continue;
 
-	if (wd->current == l)
-	  {
-	     if (wd->current == wd->sentinel)
-	       sentinel_eval = EINA_TRUE;
+        if (wd->current == l)
+          {
+             if (wd->current == wd->sentinel)
+               sentinel_eval = EINA_TRUE;
 
-	     wd->current = eina_list_prev(wd->current);
-	  }
-	wd->items = eina_list_remove(wd->items, it);
+             wd->current = eina_list_prev(wd->current);
+          }
+        wd->items = eina_list_remove(wd->items, it);
 
-	if (!wd->current)
-	  wd->current = wd->items;
+        if (!wd->current)
+          wd->current = wd->items;
 
         _item_free(it);
-	skip = EINA_FALSE;
+        skip = EINA_FALSE;
 
-	if (eina_list_count(wd->items) <= 1)
-	  edje_object_signal_emit(wd->base, "elm,state,button,hidden", "elm");
-	else
-	  edje_object_signal_emit(wd->base, "elm,state,button,visible", "elm");
+        if (eina_list_count(wd->items) <= 1)
+          edje_object_signal_emit(wd->base, "elm,state,button,hidden", "elm");
+        else
+          edje_object_signal_emit(wd->base, "elm,state,button,visible", "elm");
      }
 
    if (!skip)
@@ -233,8 +243,8 @@ _flipselector_walk(Widget_Data *wd)
 {
    if (wd->walking < 0)
      {
-	ERR("walking was negative. fixed!\n");
-	wd->walking = 0;
+        ERR("walking was negative. fixed!\n");
+        wd->walking = 0;
      }
    wd->walking++;
 }
@@ -245,8 +255,8 @@ _flipselector_unwalk(Widget_Data *wd)
    wd->walking--;
    if (wd->walking < 0)
      {
-	ERR("walking became negative. fixed!\n");
-	wd->walking = 0;
+        ERR("walking became negative. fixed!\n");
+        wd->walking = 0;
      }
 
    if (wd->walking)
@@ -306,13 +316,13 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    /* FIXME: no treatment of this signal so far */
    if (elm_widget_focus_get(obj))
      {
-	edje_object_signal_emit(wd->base, "elm,action,focus", "elm");
-	evas_object_focus_set(wd->base, EINA_TRUE);
+        edje_object_signal_emit(wd->base, "elm,action,focus", "elm");
+        evas_object_focus_set(wd->base, EINA_TRUE);
      }
    else
      {
-	edje_object_signal_emit(wd->base, "elm,action,unfocus", "elm");
-	evas_object_focus_set(wd->base, EINA_FALSE);
+        edje_object_signal_emit(wd->base, "elm,action,unfocus", "elm");
+        evas_object_focus_set(wd->base, EINA_FALSE);
      }
 }
 
@@ -331,11 +341,11 @@ _sizing_eval(Evas_Object *obj)
 
    if (wd->sentinel)
      {
-	const char *label = \
-	  elm_flipselector_item_label_get(DATA_GET(wd->sentinel));
+        const char *label = \
+                            elm_flipselector_item_label_get(DATA_GET(wd->sentinel));
 
-	tmp = edje_object_part_text_get(wd->base, "top");
-	edje_object_part_text_set(wd->base, "top", label);
+        tmp = edje_object_part_text_get(wd->base, "top");
+        edje_object_part_text_set(wd->base, "top", label);
      }
 
    edje_object_size_min_restricted_calc(wd->base, &minw, &minh, minw, minh);
@@ -410,8 +420,8 @@ _flip_up(Widget_Data *wd)
 
    if (wd->current == wd->items)
      {
-	wd->current = eina_list_last(wd->items);
-	evas_object_smart_callback_call(wd->self, SIG_UNDERFLOWED, NULL);
+        wd->current = eina_list_last(wd->items);
+        evas_object_smart_callback_call(wd->self, SIG_UNDERFLOWED, NULL);
      }
    else
      wd->current = eina_list_prev(wd->current);
@@ -444,7 +454,7 @@ _signal_val_up(void *data)
 
    return ECORE_CALLBACK_RENEW;
 
- val_up_exit_on_error:
+val_up_exit_on_error:
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -475,8 +485,8 @@ _flip_down(Widget_Data *wd)
    wd->current = eina_list_next(wd->current);
    if (!wd->current)
      {
-	wd->current = wd->items;
-	evas_object_smart_callback_call(wd->self, SIG_OVERFLOWED, NULL);
+        wd->current = wd->items;
+        evas_object_smart_callback_call(wd->self, SIG_OVERFLOWED, NULL);
      }
 
    item = DATA_GET(wd->current);
@@ -506,7 +516,7 @@ _signal_val_down(void *data)
 
    return ECORE_CALLBACK_RENEW;
 
- val_down_exit_on_error:
+val_down_exit_on_error:
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -544,13 +554,13 @@ _callbacks_set(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    edje_object_signal_callback_add(wd->base, "elm,action,up,start",
-				   "", _signal_val_up_start, obj);
+                                   "", _signal_val_up_start, obj);
    edje_object_signal_callback_add(wd->base, "elm,action,up,stop",
-				   "", _signal_val_change_stop, obj);
+                                   "", _signal_val_change_stop, obj);
    edje_object_signal_callback_add(wd->base, "elm,action,down,start",
-				   "", _signal_val_down_start, obj);
+                                   "", _signal_val_down_start, obj);
    edje_object_signal_callback_add(wd->base, "elm,action,down,stop",
-				   "", _signal_val_change_stop, obj);
+                                   "", _signal_val_change_stop, obj);
 }
 
 /**
@@ -568,13 +578,8 @@ elm_flipselector_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
-   wd->self = obj;
    ELM_SET_WIDTYPE(widtype, "flipselector");
    elm_widget_type_set(obj, "flipselector");
    elm_widget_sub_object_add(parent, obj);
@@ -680,16 +685,16 @@ elm_flipselector_item_append(Evas_Object *obj, const char *label, void (*func)(v
 
    wd->items = eina_list_append(wd->items, item);
    if (!wd->current) {
-      wd->current = wd->items;
-      _update_view(obj);
+        wd->current = wd->items;
+        _update_view(obj);
    }
 
    if (!wd->sentinel ||
        (strlen(elm_flipselector_item_label_get(item)) >
-	strlen(elm_flipselector_item_label_get(DATA_GET(wd->sentinel)))))
+        strlen(elm_flipselector_item_label_get(DATA_GET(wd->sentinel)))))
      {
-	wd->sentinel = eina_list_last(wd->items);
-	_sizing_eval(obj);
+        wd->sentinel = eina_list_last(wd->items);
+        _sizing_eval(obj);
      }
 
    if (eina_list_count(wd->items) >= 2)
@@ -731,16 +736,16 @@ elm_flipselector_item_prepend(Evas_Object *obj, const char *label, void (*func)(
 
    wd->items = eina_list_prepend(wd->items, item);
    if (!wd->current) {
-      wd->current = wd->items;
-      _update_view(obj);
+        wd->current = wd->items;
+        _update_view(obj);
    }
 
    if (!wd->sentinel ||
        (strlen(elm_flipselector_item_label_get(item)) >
-	strlen(elm_flipselector_item_label_get(DATA_GET(wd->sentinel)))))
+        strlen(elm_flipselector_item_label_get(DATA_GET(wd->sentinel)))))
      {
-	wd->sentinel = wd->items;
-	_sizing_eval(obj);
+        wd->sentinel = wd->items;
+        _sizing_eval(obj);
      }
 
    if (eina_list_count(wd->items) >= 2)
@@ -793,10 +798,10 @@ elm_flipselector_first_item_get(const Evas_Object *obj)
 
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-	if (it->deleted)
-	  continue;
+        if (it->deleted)
+          continue;
 
-	return it;
+        return it;
      }
 
    return NULL;
@@ -825,10 +830,10 @@ elm_flipselector_last_item_get(const Evas_Object *obj)
 
    EINA_LIST_REVERSE_FOREACH(wd->items, l, it)
      {
-	if (it->deleted)
-	  continue;
+        if (it->deleted)
+          continue;
 
-	return it;
+        return it;
      }
 
    return NULL;
@@ -904,15 +909,15 @@ elm_flipselector_item_selected_set(Elm_Flipselector_Item *item, Eina_Bool select
 
    EINA_LIST_FOREACH(wd->items, l, _item)
      {
-	if (_item == cur)
+        if (_item == cur)
           flipside = MSG_FLIP_DOWN;
 
-	if (_item == item)
-	  {
-	     wd->current = l;
+        if (_item == item)
+          {
+             wd->current = l;
              _send_msg(wd, flipside, (char *)item->label);
-	     break;
-	  }
+             break;
+          }
      }
 
    _flipselector_unwalk(wd);
@@ -957,8 +962,8 @@ elm_flipselector_item_del(Elm_Flipselector_Item *item)
 
    if (wd->walking > 0)
      {
-	item->deleted = EINA_TRUE;
-	return;
+        item->deleted = EINA_TRUE;
+        return;
      }
 
    _flipselector_walk(wd);
@@ -992,8 +997,8 @@ elm_flipselector_item_label_get(const Elm_Flipselector_Item *item)
      return NULL;
 
    EINA_LIST_FOREACH(wd->items, l, _item)
-     if (_item == item)
-       return item->label;
+      if (_item == item)
+        return item->label;
 
    return NULL;
 }
@@ -1034,8 +1039,8 @@ elm_flipselector_item_label_set(Elm_Flipselector_Item *item, const char *label)
 
    if (wd->current == l)
      {
-	_update_view(item->base.widget);
-	_sizing_eval(wd->self);
+        _update_view(item->base.widget);
+        _sizing_eval(wd->self);
      }
 
    return;
@@ -1063,13 +1068,13 @@ elm_flipselector_item_prev_get(Elm_Flipselector_Item *item)
      return NULL;
 
    EINA_LIST_FOREACH(wd->items, l, _item)
-     if (_item == item)
-       {
-	  l = eina_list_prev(l);
-	  if (!l)
-	    return NULL;
-	  return DATA_GET(l);
-       }
+      if (_item == item)
+        {
+           l = eina_list_prev(l);
+           if (!l)
+             return NULL;
+           return DATA_GET(l);
+        }
 
    return NULL;
 }
@@ -1096,13 +1101,13 @@ elm_flipselector_item_next_get(Elm_Flipselector_Item *item)
      return NULL;
 
    EINA_LIST_FOREACH(wd->items, l, _item)
-     if (_item == item)
-       {
-	  l = eina_list_next(l);
-	  if (!l)
-	    return NULL;
-	  return DATA_GET(l);
-       }
+      if (_item == item)
+        {
+           l = eina_list_next(l);
+           if (!l)
+             return NULL;
+           return DATA_GET(l);
+        }
 
    return NULL;
 }

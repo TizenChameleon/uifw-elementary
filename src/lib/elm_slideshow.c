@@ -2,7 +2,7 @@
 #include "elm_priv.h"
 
 /**
- * @defgroup Slideshow slideshow
+ * @defgroup Slideshow Slideshow
  * @ingroup Elementary
  *
  * This object display a list of object (generally a list of images) and some actions like
@@ -14,6 +14,10 @@
  * is displayed the function itc->func.get() is called. This function should create the object,
  * for example the object can be an evas_object_image or a photocam. When a object is no more
  * displayed the function itc->func.del() is called, the user can delete the dana associated to the item.
+ *
+ * Signals that you can add callbacks for are:
+ *
+ * "changed" - when the slideshow switch to another item
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -42,17 +46,18 @@ struct _Widget_Data
    const char *transition;
 
    Ecore_Timer *timer;
-   int timeout;
+   double timeout;
    Eina_Bool loop:1;
 
    struct {
-	   const char *current;
-	   Eina_List *list; //list of const char *
+        const char *current;
+        Eina_List *list; //list of const char *
    } layout;
 };
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
+static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -87,10 +92,15 @@ _event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type ty
        (!strcmp(ev->keyname, "space")))
      {
         if (wd->timeout)
-          elm_slideshow_timeout_set(obj, 0);
-        else
-          elm_slideshow_timeout_set(obj, 3);
-
+          {
+             if (wd->timer)
+               {
+                  ecore_timer_del(wd->timer);
+                  wd->timer = NULL;
+               }
+             else
+               elm_slideshow_timeout_set(obj, wd->timeout);
+          }
         ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
         return EINA_TRUE;
      }
@@ -107,7 +117,7 @@ _del_hook(Evas_Object *obj)
    elm_widget_stringlist_free(wd->transitions);
    if (wd->timer) ecore_timer_del(wd->timer);
    EINA_LIST_FREE(wd->layout.list, layout)
-	   eina_stringshare_del(layout);
+      eina_stringshare_del(layout);
    free(wd);
 }
 
@@ -118,14 +128,22 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_focus_get(obj))
      {
-       edje_object_signal_emit(wd->slideshow, "elm,action,focus", "elm");
-       evas_object_focus_set(wd->slideshow, EINA_TRUE);
+        edje_object_signal_emit(wd->slideshow, "elm,action,focus", "elm");
+        evas_object_focus_set(wd->slideshow, EINA_TRUE);
      }
    else
      {
-       edje_object_signal_emit(wd->slideshow, "elm,action,unfocus", "elm");
-       evas_object_focus_set(wd->slideshow, EINA_FALSE);
+        edje_object_signal_emit(wd->slideshow, "elm,action,unfocus", "elm");
+        evas_object_focus_set(wd->slideshow, EINA_FALSE);
      }
+}
+
+static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_mirrored_set(wd->slideshow, rtl);
 }
 
 static void
@@ -133,6 +151,8 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _elm_theme_object_set(obj, wd->slideshow, "slideshow", "base", elm_widget_style_get(obj));
    edje_object_scale_set(wd->slideshow, elm_widget_scale_get(obj) *
                          _elm_config->scale);
@@ -153,19 +173,20 @@ _sizing_eval(Evas_Object *obj)
 
 static Elm_Slideshow_Item* _item_prev_get(Elm_Slideshow_Item* item)
 {
-	Widget_Data *wd = elm_widget_data_get(item->base.widget);
-	Elm_Slideshow_Item* prev = eina_list_data_get(eina_list_prev(item->l));
-	if((!prev) && (wd->loop))
-		prev = eina_list_data_get(eina_list_last(item->l));
-	return prev;
+   Widget_Data *wd = elm_widget_data_get(item->base.widget);
+   Elm_Slideshow_Item* prev = eina_list_data_get(eina_list_prev(item->l));
+   if((!prev) && (wd->loop))
+     prev = eina_list_data_get(eina_list_last(item->l));
+   return prev;
 }
+
 static Elm_Slideshow_Item* _item_next_get(Elm_Slideshow_Item* item)
 {
-	Widget_Data *wd = elm_widget_data_get(item->base.widget);
-	Elm_Slideshow_Item* next = eina_list_data_get(eina_list_next(item->l));
-	if((!next) && (wd->loop))
-		next = eina_list_data_get(wd->items);
-	return next;
+   Widget_Data *wd = elm_widget_data_get(item->base.widget);
+   Elm_Slideshow_Item* next = eina_list_data_get(eina_list_next(item->l));
+   if((!next) && (wd->loop))
+     next = eina_list_data_get(wd->items);
+   return next;
 }
 
 
@@ -240,28 +261,28 @@ _item_realize(Elm_Slideshow_Item *item)
 static void
 _end(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-	Elm_Slideshow_Item *item;
-	Widget_Data *wd = elm_widget_data_get(data);
-	if (!wd) return;
+   Elm_Slideshow_Item *item;
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
 
-	item = wd->previous;
-	if(item)
-	{
-		edje_object_part_unswallow(NULL, item->base.view);
-		evas_object_hide(item->base.view);
-		wd->previous = NULL;
-	}
+   item = wd->previous;
+   if(item)
+     {
+        edje_object_part_unswallow(NULL, item->base.view);
+        evas_object_hide(item->base.view);
+        wd->previous = NULL;
+     }
 
 
-	item = wd->current;
-	if ((!item) || (!item->base.view)) return;
+   item = wd->current;
+   if ((!item) || (!item->base.view)) return;
 
-	_item_realize(item);
-	edje_object_part_unswallow(NULL, item->base.view);
-	evas_object_show(item->base.view);
+   _item_realize(item);
+   edje_object_part_unswallow(NULL, item->base.view);
+   evas_object_show(item->base.view);
 
-	edje_object_signal_emit(wd->slideshow, "anim,end", "slideshow");
-	edje_object_part_swallow(wd->slideshow, "elm.swallow.1", item->base.view);
+   edje_object_signal_emit(wd->slideshow, "anim,end", "slideshow");
+   edje_object_part_swallow(wd->slideshow, "elm.swallow.1", item->base.view);
 }
 
 
@@ -293,12 +314,8 @@ elm_slideshow_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "slideshow");
    elm_widget_type_set(obj, "slideshow");
    elm_widget_sub_object_add(parent, obj);
@@ -324,13 +341,14 @@ elm_slideshow_add(Evas_Object *parent)
 
    wd->layout.list = elm_widget_stringlist_get(edje_object_data_get(wd->slideshow, "layouts"));
    if (eina_list_count(wd->layout.list) > 0)
-       wd->layout.current = eina_list_data_get(wd->layout.list);
+     wd->layout.current = eina_list_data_get(wd->layout.list);
 
    edje_object_signal_callback_add(wd->slideshow, "end", "slideshow", _end, obj);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
 
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
    return obj;
 }
@@ -390,8 +408,8 @@ elm_slideshow_show(Elm_Slideshow_Item *item)
    _end(item->base.widget, item->base.widget, NULL, NULL);
 
    if (wd->timer) ecore_timer_del(wd->timer);
-   if (wd->timeout > 0)
-	   wd->timer = ecore_timer_add(wd->timeout, _timer_cb, item->base.widget);
+   if (wd->timeout > 0.0)
+     wd->timer = ecore_timer_add(wd->timeout, _timer_cb, item->base.widget);
    _item_realize(next);
    edje_object_part_swallow(wd->slideshow, "elm.swallow.2", next->base.view);
    evas_object_show(next->base.view);
@@ -399,7 +417,7 @@ elm_slideshow_show(Elm_Slideshow_Item *item)
    edje_object_signal_emit(wd->slideshow, buf, "slideshow");
    wd->previous = wd->current;
    wd->current = next;
-
+   evas_object_smart_callback_call(item->base.widget, "changed", wd->current);
 }
 
 /**
@@ -418,18 +436,17 @@ elm_slideshow_next(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-   
+
    if (wd->current)
-	   next = _item_next_get(wd->current);
+     next = _item_next_get(wd->current);
 
    if ((!next) || (next == wd->current)) return;
-   
 
    _end(obj, obj, NULL, NULL);
 
    if (wd->timer) ecore_timer_del(wd->timer);
-   if (wd->timeout > 0)
-	   wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
+   if (wd->timeout > 0.0)
+     wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
 
    _item_realize(next);
 
@@ -441,6 +458,7 @@ elm_slideshow_next(Evas_Object *obj)
 
    wd->previous = wd->current;
    wd->current = next;
+   evas_object_smart_callback_call(obj, "changed", wd->current);
 }
 
 /**
@@ -468,8 +486,8 @@ elm_slideshow_previous(Evas_Object *obj)
    _end(obj, obj, NULL, NULL);
 
    if (wd->timer) ecore_timer_del(wd->timer);
-   if (wd->timeout > 0)
-	   wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
+   if (wd->timeout > 0.0)
+     wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
 
    _item_realize(prev);
 
@@ -481,6 +499,7 @@ elm_slideshow_previous(Evas_Object *obj)
 
    wd->previous = wd->current;
    wd->current = prev;
+   evas_object_smart_callback_call(obj, "changed", wd->current);
 }
 
 /**
@@ -561,7 +580,7 @@ elm_slideshow_transition_get(const Evas_Object *obj)
  * @ingroup Slideshow
  */
 EAPI void
-elm_slideshow_timeout_set(Evas_Object *obj ,int timeout)
+elm_slideshow_timeout_set(Evas_Object *obj, double timeout)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -569,7 +588,7 @@ elm_slideshow_timeout_set(Evas_Object *obj ,int timeout)
    wd->timeout = timeout;
    if (wd->timer) ecore_timer_del(wd->timer);
    wd->timer = NULL;
-   if (timeout > 0)
+   if (timeout > 0.0)
      wd->timer = ecore_timer_add(timeout, _timer_cb, obj);
 }
 
@@ -581,12 +600,12 @@ elm_slideshow_timeout_set(Evas_Object *obj ,int timeout)
  *
  * @ingroup Slideshow
  */
-EAPI int
+EAPI double
 elm_slideshow_timeout_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) -1;
+   ELM_CHECK_WIDTYPE(obj, widtype) -1.0;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return -1;
+   if (!wd) return -1.0;
    return wd->timeout;
 }
 
@@ -672,24 +691,24 @@ elm_slideshow_loop_get(const Evas_Object *obj)
 EAPI void
 elm_slideshow_clear(Evas_Object *obj)
 {
-	Elm_Slideshow_Item *item;
-	ELM_CHECK_WIDTYPE(obj, widtype);
-	Widget_Data *wd = elm_widget_data_get(obj);
-	if (!wd) return;
-	wd->previous = NULL;
-	wd->current = NULL;
-	EINA_LIST_FREE(wd->items_built, item)
-	{
-           if (item->itc->func.del)
-             item->itc->func.del((void*)item->base.data, item->base.view);
-           evas_object_del(item->base.view);
-           item->base.view = NULL;
-	}
+   Elm_Slideshow_Item *item;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->previous = NULL;
+   wd->current = NULL;
+   EINA_LIST_FREE(wd->items_built, item)
+     {
+        if (item->itc->func.del)
+          item->itc->func.del((void*)item->base.data, item->base.view);
+        evas_object_del(item->base.view);
+        item->base.view = NULL;
+     }
 
-	EINA_LIST_FREE(wd->items, item)
-          {
-             elm_widget_item_del(item);
-          }
+   EINA_LIST_FREE(wd->items, item)
+     {
+        elm_widget_item_del(item);
+     }
 }
 
 
@@ -704,28 +723,28 @@ EAPI void
 elm_slideshow_item_del(Elm_Slideshow_Item *item)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item);
-	Widget_Data *wd = elm_widget_data_get(item->base.widget);
-	if (!wd) return;
-	if (wd->previous == item) wd->previous = NULL;
-	if (wd->current == item)
-	{
-		Eina_List *l = eina_list_data_find_list(wd->items, item);
-		Eina_List *l2 = eina_list_next(l);
-		wd->current = NULL;
-		if (!l2)
-			l2 = eina_list_nth_list(wd->items, eina_list_count(wd->items) - 1);
-		if (l2)
-			elm_slideshow_show(eina_list_data_get(l2));
-	}
+   Widget_Data *wd = elm_widget_data_get(item->base.widget);
+   if (!wd) return;
+   if (wd->previous == item) wd->previous = NULL;
+   if (wd->current == item)
+     {
+        Eina_List *l = eina_list_data_find_list(wd->items, item);
+        Eina_List *l2 = eina_list_next(l);
+        wd->current = NULL;
+        if (!l2)
+          l2 = eina_list_nth_list(wd->items, eina_list_count(wd->items) - 1);
+        if (l2)
+          elm_slideshow_show(eina_list_data_get(l2));
+     }
 
-	wd->items = eina_list_remove_list(wd->items, item->l);
-	wd->items_built = eina_list_remove_list(wd->items_built, item->l_built);
+   wd->items = eina_list_remove_list(wd->items, item->l);
+   wd->items_built = eina_list_remove_list(wd->items_built, item->l_built);
 
-	if ((item->base.view) && (item->itc->func.del))
-		item->itc->func.del((void*)item->base.data, item->base.view);
-	if (item->base.view)
-		evas_object_del(item->base.view);
-	free(item);
+   if ((item->base.view) && (item->itc->func.del))
+     item->itc->func.del((void*)item->base.data, item->base.view);
+   if (item->base.view)
+     evas_object_del(item->base.view);
+   free(item);
 }
 
 /**

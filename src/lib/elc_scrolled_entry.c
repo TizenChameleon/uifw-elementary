@@ -12,22 +12,23 @@
  * widget.
  *
  * Signals that you can add callbacks for are:
- * - "changed" - The text within the entry was changed
- * - "activated" - The entry has received focus and the cursor
- * - "press" - The entry has been clicked
- * - "longpressed" - The entry has been clicked for a couple seconds
- * - "clicked" - The entry has been clicked
- * - "clicked,double" - The entry has been double clicked
- * - "focused" - The entry has received focus
- * - "unfocused" - The entry has lost focus
- * - "selection,paste" - A paste action has occurred
- * - "selection,copy" - A copy action has occurred
- * - "selection,cut" - A cut action has occurred
- * - "selection,start" - A selection has begun
- * - "selection,changed" - The selection has changed
- * - "selection,cleared" - The selection has been cleared
- * - "cursor,changed" - The cursor has changed
- * - "anchor,clicked" - The anchor has been clicked
+ *
+ * "changed" - The text within the entry was changed
+ * "activated" - The entry has received focus and the cursor
+ * "press" - The entry has been clicked
+ * "longpressed" - The entry has been clicked for a couple seconds
+ * "clicked" - The entry has been clicked
+ * "clicked,double" - The entry has been double clicked
+ * "focused" - The entry has received focus
+ * "unfocused" - The entry has lost focus
+ * "selection,paste" - A paste action has occurred
+ * "selection,copy" - A copy action has occurred
+ * "selection,cut" - A cut action has occurred
+ * "selection,start" - A selection has begun
+ * "selection,changed" - The selection has changed
+ * "selection,cleared" - The selection has been cleared
+ * "cursor,changed" - The cursor has changed
+ * "anchor,clicked" - The anchor has been clicked
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -86,23 +87,23 @@ static const char SIG_SELECTION_CLEARED[] = "selection,cleared";
 static const char SIG_CURSOR_CHANGED[] = "cursor,changed";
 static const char SIG_ANCHOR_CLICKED[] = "anchor,clicked";
 static const Evas_Smart_Cb_Description _signals[] = {
-  {SIG_CHANGED, ""},
-  {SIG_ACTIVATED, ""},
-  {SIG_PRESS, ""},
-  {SIG_LONGPRESSED, ""},
-  {SIG_CLICKED, ""},
-  {SIG_CLICKED_DOUBLE, ""},
-  {SIG_FOCUSED, ""},
-  {SIG_UNFOCUSED, ""},
-  {SIG_SELECTION_PASTE, ""},
-  {SIG_SELECTION_COPY, ""},
-  {SIG_SELECTION_CUT, ""},
-  {SIG_SELECTION_START, ""},
-  {SIG_SELECTION_CHANGED, ""},
-  {SIG_SELECTION_CLEARED, ""},
-  {SIG_CURSOR_CHANGED, ""},
-  {SIG_ANCHOR_CLICKED, ""},
-  {NULL, NULL}
+       {SIG_CHANGED, ""},
+       {SIG_ACTIVATED, ""},
+       {SIG_PRESS, ""},
+       {SIG_LONGPRESSED, ""},
+       {SIG_CLICKED, ""},
+       {SIG_CLICKED_DOUBLE, ""},
+       {SIG_FOCUSED, ""},
+       {SIG_UNFOCUSED, ""},
+       {SIG_SELECTION_PASTE, ""},
+       {SIG_SELECTION_COPY, ""},
+       {SIG_SELECTION_CUT, ""},
+       {SIG_SELECTION_START, ""},
+       {SIG_SELECTION_CHANGED, ""},
+       {SIG_SELECTION_CLEARED, ""},
+       {SIG_CURSOR_CHANGED, ""},
+       {SIG_ANCHOR_CLICKED, ""},
+       {NULL, NULL}
 };
 
 static void
@@ -184,17 +185,17 @@ _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
 }
 
 static void
-_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func_cb, void *data)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    elm_object_signal_callback_add(wd->entry, emission, source, func_cb, data);
    elm_object_signal_callback_add(wd->scroller, emission, source, func_cb,
-	 data);
+                                  data);
 }
 
 static void
-_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data __UNUSED__)
+_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func_cb, void *data __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    elm_object_signal_callback_del(wd->entry, emission, source, func_cb);
@@ -363,12 +364,8 @@ elm_scrolled_entry_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "scrolled_entry");
    elm_widget_type_set(obj, "scrolled_entry");
    elm_widget_sub_object_add(parent, obj);
@@ -500,13 +497,13 @@ elm_scrolled_entry_icon_unset(Evas_Object *obj)
    if (!wd) return NULL;
    if (wd->icon)
      {
-       Evas_Object *edje = _elm_scroller_edje_object_get(wd->scroller);
-       if (!edje) return NULL;
-       ret = wd->icon;
-       edje_object_part_unswallow(edje, wd->icon);
-       edje_object_signal_emit(edje, "elm,action,hide,icon", "elm");
-       wd->icon = NULL;
-       _sizing_eval(obj);
+        Evas_Object *edje = _elm_scroller_edje_object_get(wd->scroller);
+        if (!edje) return NULL;
+        ret = wd->icon;
+        edje_object_part_unswallow(edje, wd->icon);
+        edje_object_signal_emit(edje, "elm,action,hide,icon", "elm");
+        wd->icon = NULL;
+        _sizing_eval(obj);
      }
    return ret;
 }
@@ -605,13 +602,13 @@ elm_scrolled_entry_end_unset(Evas_Object *obj)
    if (!wd) return NULL;
    if (wd->end)
      {
-       Evas_Object *edje = _elm_scroller_edje_object_get(wd->scroller);
-       if (!edje) return NULL;
-       ret = wd->end;
-       edje_object_part_unswallow(edje, wd->end);
-       edje_object_signal_emit(edje, "elm,action,hide,end", "elm");
-       wd->end = NULL;
-       _sizing_eval(obj);
+        Evas_Object *edje = _elm_scroller_edje_object_get(wd->scroller);
+        if (!edje) return NULL;
+        ret = wd->end;
+        edje_object_part_unswallow(edje, wd->end);
+        edje_object_signal_emit(edje, "elm,action,hide,end", "elm");
+        wd->end = NULL;
+        _sizing_eval(obj);
      }
    return ret;
 }
@@ -660,13 +657,13 @@ elm_scrolled_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    wd->single_line = single_line;
    if (single_line)
      {
-	elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-	elm_scroller_content_min_limit(wd->scroller, 0, 1);
+        elm_scroller_policy_set(wd->scroller, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+        elm_scroller_content_min_limit(wd->scroller, 0, 1);
      }
    else
      {
-	elm_scroller_policy_set(wd->scroller, wd->policy_h, wd->policy_v);
-	elm_scroller_content_min_limit(wd->scroller, 0, 0);
+        elm_scroller_policy_set(wd->scroller, wd->policy_h, wd->policy_v);
+        elm_scroller_content_min_limit(wd->scroller, 0, 0);
      }
    _sizing_eval(obj);
 }
@@ -762,6 +759,24 @@ elm_scrolled_entry_entry_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    return elm_entry_entry_get(wd->entry);
+}
+
+/**
+ * This returns EINA_TRUE if the entry is empty/there was an error
+ * and EINA_FALSE if it is not empty.
+ *
+ * @param obj The entry object
+ * @return If the entry is empty or not.
+ *
+ * @ingroup Entry
+ */
+EAPI Eina_Bool
+elm_scrolled_entry_is_empty(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_TRUE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_TRUE;
+   return elm_entry_is_empty(wd->entry);
 }
 
 /**
@@ -1130,6 +1145,40 @@ elm_scrolled_entry_cursor_content_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    return elm_entry_cursor_content_get(wd->entry);
+}
+
+/**
+ * Sets the cursor position in the scrolled entry to the given value
+ *
+ * @param obj The scrolled entry object
+ * @param pos the position of the cursor
+ *
+ * @ingroup Scrolled_Entry
+ */
+EAPI void
+elm_scrolled_entry_cursor_pos_set(Evas_Object *obj, int pos)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_entry_cursor_pos_set(wd->entry, pos);
+}
+
+/**
+ * Retrieves the current position of the cursor in the scrolled entry
+ *
+ * @param obj The entry object
+ * @return the cursor position
+ *
+ * @ingroup Scrolled_Entry
+ */
+EAPI int
+elm_scrolled_entry_cursor_pos_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return 0;
+   return elm_entry_cursor_pos_get(wd->entry);
 }
 
 /**

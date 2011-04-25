@@ -1,4 +1,4 @@
-##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##
+=-------##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##
 ##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##
 m4_define([v_maj], [0])
 m4_define([v_min], [7])
@@ -8,7 +8,7 @@ m4_if(v_rev, [0], [m4_define([v_rev], m4_esyscmd([git log 2> /dev/null | (grep -
 ##--   When released, remove the dnl on the below line
 dnl m4_undefine([v_rev])
 ##--   When doing snapshots - change soname. remove dnl on below line
-m4_define([relname], [ver-pre-svn-07])
+m4_define([relname], [ver-pre-svn-09])
 m4_define([v_rel], [-release relname])
 ##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##--##
 m4_ifdef([v_rev], [m4_define([v_ver], [v_maj.v_min.v_mic.v_rev])],
@@ -26,8 +26,16 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
+AC_CONFIG_HEADERS([elementary_config.h])
+AH_TOP([
+#ifndef EFL_CONFIG_H__
+#define EFL_CONFIG_H__
+])
+AH_BOTTOM([
+#endif /* EFL_CONFIG_H__ */
+])
+
 AM_INIT_AUTOMAKE([1.6 dist-bzip2])
-AM_CONFIG_HEADER([elementary_config.h])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_GNU_SOURCE
@@ -65,9 +73,9 @@ VMIN=v_min
 AC_SUBST(VMAJ)
 AC_SUBST(VMIN)
 
-VERSION="1.0.0"
-
-EDJE_VERSION="1.0.0"
+# pkg-config
+PKG_PROG_PKG_CONFIG
+EDJE_VERSION=`$PKG_CONFIG edje --modversion | awk -F . '{printf("%s.0.0", $1);}'`
 
 case "$host_os" in
   mingw32ce* | cegcc*)
@@ -100,6 +108,15 @@ else
 fi
 AC_SUBST(pkgconfig_requires_private)
 
+#================================================
+if test "x${prefix}" = "xNONE"; then
+  LOCALE_DIR="${ac_default_prefix}/share/locale"
+else
+  LOCALE_DIR="${prefix}/share/locale"
+fi
+AC_SUBST(LOCALE_DIR)
+#================================================
+
 lt_enable_auto_import=""
 ELM_UNIX_DEF="#undef"
 ELM_WIN32_DEF="#undef"
@@ -114,6 +131,7 @@ case "$host_os" in
       have_windows="yes"
 dnl managed by evil
       AC_DEFINE(HAVE_DLADDR)
+      dlopen_libs=-ldl
       requirement_elm="evil"
       have_socket="no"
     ;;
@@ -123,6 +141,9 @@ dnl managed by evil
       lt_enable_auto_import="-Wl,--enable-auto-import"
       ELM_WIN32_DEF="#define"
       have_windows="yes"
+dnl managed by evil
+      AC_DEFINE(HAVE_DLADDR)
+      dlopen_libs=-ldl
       requirement_elm="evil"
       have_socket="no"
       ;;
@@ -135,7 +156,7 @@ dnl managed by evil
       ELM_UNIX_DEF="#define"
       have_socket="yes"
       AC_CHECK_HEADERS([crt_externs.h])
-      AC_DEFINE([environ], [(*_NSGetEnviron())], [apple doesn't follow POSIX in this case.])
+      AC_DEFINE([environ], [(*_NSGetEnviron())], ["apple doesn't follow POSIX in this case."])
       ;;
    *)
       ELM_UNIX_DEF="#define"
@@ -157,10 +178,17 @@ esac
 AM_CONDITIONAL([BUILD_RUN], [test "x$have_socket" = "xyes"])
 
 have_fork="no"
-AC_CHECK_FUNCS(fork, [
-  have_fork="yes"
-  AC_DEFINE(HAVE_FORK)
-])
+want_quicklaunch="auto"
+AC_ARG_ENABLE([quick-launch],
+	[AC_HELP_STRING([--disable-quick-launch], [disable quick-launch support, @<:@default=detect@:>@])],
+	[want_quicklaunch=$enableval], [])
+
+if test "x$want_quicklaunch" != "xno"; then
+   AC_CHECK_FUNCS(fork, [
+   	have_fork="yes"
+  	AC_DEFINE(HAVE_FORK)
+   ])
+fi
 AM_CONDITIONAL([BUILD_QUICKLAUNCH], [test "x$have_fork" = "xyes"])
 
 AC_SUBST(dlopen_libs)
@@ -175,16 +203,16 @@ PKG_CHECK_MODULES([ELEMENTARY],
    [
     eina >= 1.0.0
     eet >= 1.4.0
-    evas >= 1.0.0
+    evas >= 1.0.999
     ecore >= 1.0.0
     ecore-evas >= 1.0.0
     ecore-file >= 1.0.0
     ecore-imf >= 1.0.0
-    edje >= ${EDJE_VERSION}
+    edje >= 1.0.999
    ]
 )
 
-requirement_elm="edje >= ${EDJE_VERSION} ecore-file >= 1.0.0 ecore-evas >= 1.0.0 ecore >= 1.0.0 evas >= 1.0.0 eet >= 1.4.0 eina >= 1.0.0 ${requirement_elm}"
+requirement_elm="edje >= 1.0.0 ecore-file >= 1.0.0 ecore-evas >= 1.0.0 ecore >= 1.0.0 evas >= 1.0.0 eet >= 1.4.0 eina >= 1.0.0 ${requirement_elm}"
 
 have_elementary_x="no"
 want_elementary_x="auto"
@@ -439,33 +467,6 @@ if test "x$want_elementary_ethumb" = "xyes" -a "x$have_elementary_ethumb" = "xno
 fi
 AC_SUBST(ELM_ETHUMB_DEF)
 
-ELM_SQLITE3_DEF="#undef"
-have_elementary_sqlite3="no"
-want_elementary_sqlite3="auto"
-AC_ARG_ENABLE([sqlite3],
-   [AC_HELP_STRING([--disable-sqlite3], [disable sqlite3 support. @<:@default=detect@:>@])],
-   [want_elementary_sqlite3=$enableval], [])
-
-if test "x$want_elementary_sqlite3" != "xno"; then
-    PKG_CHECK_MODULES([ELEMENTARY_SQLITE3],
-       [
-        sqlite3
-       ],
-       [
-        AC_DEFINE(HAVE_ELEMENTARY_SQLITE3, 1, [sqlite3 support for Elementary])
-        have_elementary_sqlite3="yes"
-        ELM_SQLITE3_DEF="#define"
-        requirement_elm="sqlite3 ${requirement_elm}"
-       ],
-       [have_elementary_sqlite3="no"]
-    )
-else
-    have_elementary_sqlite3="no"
-fi
-if test "x$want_elementary_sqlite3" = "xyes" -a "x$have_elementary_sqlite3" = "xno"; then
-    AC_MSG_ERROR(sqlite3 support requested, but no sqlite3 found by pkg-config.])
-fi
-
 ELM_DEBUG_DEF="#undef"
 want_elementary_debug="no"
 AC_ARG_ENABLE([debug],
@@ -504,6 +505,23 @@ EFL_WITH_BIN([edje], [edje-cc], [edje_cc])
 
 EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
+EFL_ENABLE_BIN([elementary-test])
+EFL_ENABLE_BIN([elementary-config])
+
+m4_ifdef([AM_GNU_GETTEXT_VERSION], [
+AM_GNU_GETTEXT_VERSION([0.12.1])
+])
+
+m4_ifdef([AM_GNU_GETTEXT], [
+AM_GNU_GETTEXT([external])
+po_makefile_in=po/Makefile.in
+AM_CONDITIONAL([HAVE_PO], [true])
+],[
+AM_CONDITIONAL([HAVE_PO], [false])
+])
+AC_SUBST(LTLIBINTL)
+
+
 AC_OUTPUT([
 Makefile
 elementary.spec
@@ -531,6 +549,7 @@ config/Makefile
 config/default/Makefile
 config/standard/Makefile
 config/illume/Makefile
+$po_makefile_in
 config/slp/Makefile
 ])
 
@@ -547,27 +566,30 @@ echo
 echo "Configuration Options Summary:"
 echo
 echo "  Engines:"
-echo "    X11................: ${have_elementary_x}"
-echo "    Framebuffer........: ${have_elementary_fb}"
-echo "    SDL................: ${have_elementary_sdl}"
-echo "    Windows XP.........: ${have_elementary_win32}"
-echo "    Windows CE.........: ${have_elementary_wince}"
+echo "    X11....................: ${have_elementary_x}"
+echo "    Framebuffer............: ${have_elementary_fb}"
+echo "    SDL....................: ${have_elementary_sdl}"
+echo "    Windows XP.............: ${have_elementary_win32}"
+echo "    Windows CE.............: ${have_elementary_wince}"
 echo
 echo "  Features:"
-echo "    EDBus..............: ${have_elementary_edbus}"
-echo "    EFreet.............: ${have_elementary_efreet}"
-echo "    EWeather...........: ${have_elementary_eweather}"
-echo "    Ethumb.............: ${have_elementary_ethumb}"
-echo "    Xml2...............: ${have_elementary_libxml2}"
+echo "    EDBus..................: ${have_elementary_edbus}"
+echo "    EFreet.................: ${have_elementary_efreet}"
+echo "    EWeather...............: ${have_elementary_eweather}"
+echo "    Ethumb.................: ${have_elementary_ethumb}"
+echo "    Quick Launch...........: ${have_fork}"
 echo
-echo "  eet..................: ${eet_eet}"
-echo "  edje_cc..............: ${edje_cc}"
+echo "  eet......................: ${eet_eet}"
+echo "  edje_cc..................: ${edje_cc}"
 echo
-echo "Compilation............: make (or gmake)"
-echo "  CPPFLAGS.............: $CPPFLAGS"
-echo "  CFLAGS...............: $CFLAGS"
-echo "  LDFLAGS..............: $LDFLAGS"
+echo "  Build elementary_test....: ${have_elementary_test}"
+echo "  Build elementary_config..: ${have_elementary_config}"
 echo
-echo "Installation...........: make install (as root if needed, with 'su' or 'sudo')"
-echo "  prefix...............: $prefix"
+echo "Compilation................: make (or gmake)"
+echo "  CPPFLAGS.................: $CPPFLAGS"
+echo "  CFLAGS...................: $CFLAGS"
+echo "  LDFLAGS..................: $LDFLAGS"
+echo
+echo "Installation...............: make install (as root if needed, with 'su' or 'sudo')"
+echo "  prefix...................: $prefix"
 echo

@@ -369,6 +369,9 @@ elm_shutdown(void)
 {
    _elm_init_count--;
    if (_elm_init_count > 0) return _elm_init_count;
+// FIXME : it can cause abnormal program exit
+//   _elm_win_shutdown();
+   while (_elm_win_deferred_free) ecore_main_loop_iterate();
    elm_quicklaunch_sub_shutdown();
    elm_quicklaunch_shutdown();
    return _elm_init_count;
@@ -1057,7 +1060,7 @@ elm_policy_set(unsigned int policy,
  * Gets the policy value set for given identifier.
  *
  * @param policy policy identifier as in Elm_Policy.
- * @ingroup Main
+ * @ingroup General
  *
  * @return policy value. Will be 0 if policy identifier is invalid.
  */
@@ -1067,6 +1070,72 @@ elm_policy_get(unsigned int policy)
    if (policy >= ELM_POLICY_LAST)
      return 0;
    return _elm_policies[policy];
+}
+
+/**
+ * @defgroup UI-Mirroring Selective Widget mirroring
+ *
+ * These functions allow you to set ui-miroring on specific widgets or whe
+ * whole interface. Widgets can be in one of two modes, automatic and manual.
+ * Automatic means they'll be changed according to the system mirroring mode
+ * and manual means only explicit changes will matter. You are not supposed to
+ * change mirroring state of a widget set to automatic, will mostly work, but
+ * the behavior is not really defined.
+ */
+
+/**
+ * Returns the widget's mirrored mode.
+ *
+ * @param obj The widget.
+ * @return mirrored mode of the object.
+ *
+ **/
+EAPI Eina_Bool
+elm_object_mirrored_get(const Evas_Object *obj)
+{
+   EINA_SAFETY_ON_NULL_RETURN_VAL(obj, EINA_FALSE);
+   return elm_widget_mirrored_get(obj);
+}
+
+/**
+ * Sets the widget's mirrored mode.
+ *
+ * @param obj The widget.
+ * @param mirrored EINA_TRUE to set mirrored mode. EINA_FALSE to unset.
+ */
+EAPI void
+elm_object_mirrored_set(Evas_Object *obj, Eina_Bool mirrored)
+{
+   EINA_SAFETY_ON_NULL_RETURN(obj);
+   elm_widget_mirrored_set(obj, mirrored);
+}
+
+/**
+ * Returns the widget's mirrored mode setting.
+ *
+ * @param obj The widget.
+ * @return mirrored mode setting of the object.
+ *
+ **/
+EAPI Eina_Bool
+elm_object_mirrored_automatic_get(const Evas_Object *obj)
+{
+   EINA_SAFETY_ON_NULL_RETURN_VAL(obj, EINA_FALSE);
+   return elm_widget_mirrored_automatic_get(obj);
+}
+
+/**
+ * Sets the widget's mirrored mode setting.
+ * When widget in automatic mode, it follows the system mirrored mode set by
+ * elm_mirrored_set().
+ * @param obj The widget.
+ * @param automatic EINA_TRUE for auto mirrored mode. EINA_FALSE for manual.
+ */
+EAPI void
+elm_object_mirrored_automatic_set(Evas_Object *obj, Eina_Bool automatic)
+{
+   EINA_SAFETY_ON_NULL_RETURN(obj);
+   elm_widget_mirrored_automatic_set(obj, automatic);
 }
 
 /**
@@ -1827,8 +1896,6 @@ elm_autoperiod_allow_all_set(Eina_Bool on)
                                   atom, &on_i, 1);
 #endif
 }
-
-
 /**
  * Adjust size of an element for finger usage
  *
@@ -1881,7 +1948,7 @@ elm_all_flush(void)
    EINA_LIST_FOREACH(_elm_win_list, l, obj)
      {
         Evas *e = evas_object_evas_get(obj);
-            evas_image_cache_flush(e);
+        evas_image_cache_flush(e);
         evas_font_cache_flush(e);
         evas_render_dump(e);
      }
@@ -1963,7 +2030,7 @@ elm_cache_flush_interval_all_set(int size)
  * @see elm_all_flush()
  */
 EAPI Eina_Bool
-elm_cache_flush_enmabled_get(void)
+elm_cache_flush_enabled_get(void)
 {
    return _elm_config->cache_flush_enable;
 }

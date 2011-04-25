@@ -65,8 +65,10 @@ head.png \
 sb_runnerh.png \
 sb_runnerv.png \
 shelf_inset.png \
-tog_base.png \
-tog_dis_base.png \
+tog_base_on.png \
+tog_base_off.png \
+tog_dis_base_on.png \
+tog_dis_base_off.png \
 shad_circ.png \
 bt_dis_base.png \
 bt_dis_hilight.png \
@@ -216,7 +218,8 @@ icon_arrow_down_left.png \
 icon_arrow_down_right.png \
 icon_arrow_up_left.png \
 icon_arrow_up_right.png \
-thumb_shadow.png
+thumb_shadow.png \
+group_index.png
 
 default.edj: Makefile $(EXTRA_DIST)
 	$(EDJE_CC) $(EDJE_FLAGS) \

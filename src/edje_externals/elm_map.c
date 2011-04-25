@@ -4,6 +4,7 @@
 
 typedef struct _Elm_Params_Map
 {
+   Elm_Params base;
    const char *map_source;
    const char *zoom_mode;
    double zoom;
@@ -26,7 +27,7 @@ _zoom_mode_get(const char *map_src)
 	  ELM_MAP_ZOOM_MODE_LAST + 1);
 
    for (i = 0; i < sizeof(zoom_choices); i++)
-     if (strcmp(map_src, zoom_choices[i]) == 0) return i;
+     if (!strcmp(map_src, zoom_choices[i])) return i;
 
    return ELM_MAP_ZOOM_MODE_LAST;
 }
@@ -40,7 +41,7 @@ _map_source_get(const char *map_src)
 	  ELM_MAP_SOURCE_LAST);
 
    for (i = 0; i < sizeof(source_choices); i++)
-     if (strcmp(map_src, source_choices[i]) == 0) return i;
+     if (!strcmp(map_src, source_choices[i])) return i;
 
    return ELM_MAP_SOURCE_LAST;
 }
@@ -173,9 +174,9 @@ external_map_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, co
 }
 
 static Evas_Object *external_map_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
@@ -193,6 +194,7 @@ external_map_params_free(void *params)
 
 static Edje_External_Param_Info external_map_params[] =
   {
+    DEFINE_EXTERNAL_COMMON_PARAMS,
     EDJE_EXTERNAL_PARAM_INFO_CHOICE_FULL("map source", "Mapnik",
 					 source_choices),
     EDJE_EXTERNAL_PARAM_INFO_CHOICE_FULL("zoom mode", "manual", zoom_choices),

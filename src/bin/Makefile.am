@@ -16,17 +16,18 @@ AM_CPPFLAGS = \
 @ELEMENTARY_EDBUS_CFLAGS@ \
 @ELEMENTARY_EFREET_CFLAGS@ \
 @ELEMENTARY_EWEATHER_CFLAGS@ \
-@ELEMENTARY_ETHUMB_CFLAGS@ \
-@ELEMENTARY_SQLITE3_CFLAGS@
+@ELEMENTARY_ETHUMB_CFLAGS@
 
 if ELEMENTARY_WINDOWS_BUILD
 AM_CPPFLAGS += -DELEMENTARY_BUILD
 endif
 
-bin_PROGRAMS = elementary_test elementary_config
+bin_PROGRAMS = @ELEMENTARY_TEST_PRG@ @ELEMENTARY_CONFIG_PRG@
 if BUILD_QUICKLAUNCH
 bin_PROGRAMS += elementary_quicklaunch elementary_run elementary_testql
 endif
+
+EXTRA_PROGRAMS = elementary_test elementary_config
 
 elementary_test_SOURCES = \
 test.c \
@@ -35,6 +36,7 @@ test_icon.c \
 test_box.c \
 test_button.c \
 test_fileselector_button.c \
+test_fileselector_entry.c \
 test_toggle.c \
 test_table.c \
 test_gengrid.c \
@@ -50,7 +52,9 @@ test_list.c \
 test_inwin.c \
 test_scaling.c \
 test_slider.c \
+test_actionslider.c \
 test_genlist.c \
+test_grid \
 test_check.c \
 test_pager.c \
 test_radio.c \
@@ -81,17 +85,24 @@ test_launcher.c \
 test_anim.c \
 test_segment_control.c \
 test_calendar.c \
+test_tooltip.c \
+test_cursor.c \
+test_focus.c \
+test_focus2.c \
+test_focus3.c \
+test_flipselector.c \
 test_diskselector.c \
-test_ctxpopup.c
-#test_db_store.c
+test_colorselector.c \
+test_ctxpopup.c \
+test_bubble.c \
+test_store.c
 
 elementary_test_LDADD = $(top_builddir)/src/lib/libelementary.la \
 	@ELEMENTARY_EWEATHER_LIBS@ \
 	@ELEMENTARY_EDBUS_LIBS@ \
 	@ELEMENTARY_EFREET_LIBS@ \
 	@ELEMENTARY_LIBS@ \
-	@my_libs@ \
-	@ELEMENTARY_SQLITE3_LIBS@
+	@my_libs@
 elementary_test_LDFLAGS =
 
 elementary_config_SOURCES = \
@@ -101,7 +112,8 @@ elementary_config_LDADD = $(top_builddir)/src/lib/libelementary.la \
 	@ELEMENTARY_EWEATHER_LIBS@ \
 	@ELEMENTARY_EDBUS_LIBS@ \
 	@ELEMENTARY_EFREET_LIBS@ \
-	@ELEMENTARY_LIBS@
+	@ELEMENTARY_LIBS@ \ 
+	@my_libs@
 elementary_config_LDFLAGS =
 
 if BUILD_QUICKLAUNCH

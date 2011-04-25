@@ -1,7 +1,17 @@
 #include <Elementary.h>
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
 #ifndef ELM_LIB_QUICKLAUNCH
+
 static void
-my_anchorblock_bt(void *data, Evas_Object *obj, void *event_info)
+_print_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   printf("bubble clicked\n");
+}
+
+static void
+my_anchorblock_bt(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *av = data;
    elm_anchorblock_hover_end(av);
@@ -68,31 +78,31 @@ my_anchorblock_anchor(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-my_anchorblock_edge_left(void *data, Evas_Object *obj, void *event_info)
+my_anchorblock_edge_left(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    printf("left\n");
 }
 
 static void
-my_anchorblock_edge_right(void *data, Evas_Object *obj, void *event_info)
+my_anchorblock_edge_right(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    printf("right\n");
 }
 
 static void
-my_anchorblock_edge_top(void *data, Evas_Object *obj, void *event_info)
+my_anchorblock_edge_top(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    printf("top\n");
 }
 
 static void
-my_anchorblock_edge_bottom(void *data, Evas_Object *obj, void *event_info)
+my_anchorblock_edge_bottom(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    printf("bottom\n");
 }
 
 static void
-my_anchorblock_scroll(void *data, Evas_Object *obj, void *event_info)
+my_anchorblock_scroll(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Evas_Coord x, y, w, h, vw, vh;
 
@@ -102,7 +112,7 @@ my_anchorblock_scroll(void *data, Evas_Object *obj, void *event_info)
 }
 
 void
-test_anchorblock(void *data, Evas_Object *obj, void *event_info)
+test_anchorblock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *av, *sc, *bx, *bb, *ic;
    char buf[PATH_MAX];
@@ -134,12 +144,13 @@ test_anchorblock(void *data, Evas_Object *obj, void *event_info)
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
    elm_icon_file_set(ic, buf, NULL);
    elm_icon_scale_set(ic, 0, 0);
-   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_HORIZONTAL, 1, 1);
 
    bb = elm_bubble_add(win);
    elm_bubble_label_set(bb, "Message 3");
    elm_bubble_info_set(bb, "10:32 4/11/2008");
    elm_bubble_icon_set(bb, ic);
+   evas_object_smart_callback_add(bb, "clicked", _print_clicked, NULL);
    evas_object_show(ic);
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bb, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -166,6 +177,7 @@ test_anchorblock(void *data, Evas_Object *obj, void *event_info)
    elm_bubble_label_set(bb, "Message 2");
    elm_bubble_info_set(bb, "7:16 27/10/2008");
    elm_bubble_icon_set(bb, ic);
+   evas_object_smart_callback_add(bb, "clicked", _print_clicked, NULL);
    evas_object_show(ic);
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bb, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -196,12 +208,13 @@ test_anchorblock(void *data, Evas_Object *obj, void *event_info)
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
    elm_icon_file_set(ic, buf, NULL);
    elm_icon_scale_set(ic, 0, 0);
-   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_HORIZONTAL, 1, 1);
 
    bb = elm_bubble_add(win);
    elm_bubble_label_set(bb, "Message 1");
    elm_bubble_info_set(bb, "20:47 18/6/2008");
    elm_bubble_icon_set(bb, ic);
+   evas_object_smart_callback_add(bb, "clicked", _print_clicked, NULL);
    evas_object_show(ic);
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bb, EVAS_HINT_FILL, EVAS_HINT_FILL);

@@ -2,13 +2,14 @@ AUTOMAKE_OPTIONS     = 1.4 foreign
 MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = \
--DELM_INTERAL_API_MDFGELQ=1 \
+-DELM_INTERNAL_API_ARGESFSDFEFC=1 \
 -I. \
 -I$(top_builddir) \
 -I$(top_srcdir) \
 -I$(top_srcdir)/src/lib \
 -I$(top_builddir)/src/lib \
 -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
+-DLOCALE_DIR=\"@LOCALE_DIR@\" \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 @ELEMENTARY_CFLAGS@ \
 @ELEMENTARY_X_CFLAGS@ \
@@ -18,7 +19,9 @@ AM_CPPFLAGS = \
 @ELEMENTARY_WINCE_CFLAGS@ \
 @ELEMENTARY_EDBUS_CFLAGS@ \
 @ELEMENTARY_EFREET_CFLAGS@ \
-@ELEMENTARY_ETHUMB_CFLAGS@ 
+@ELEMENTARY_ETHUMB_CFLAGS@ \
+@EVIL_CFLAGS@ \
+@EFL_PTHREAD_CFLAGS@
 
 if ELEMENTARY_WINDOWS_BUILD
 AM_CPPFLAGS += -DELEMENTARY_BUILD
@@ -35,6 +38,7 @@ includesdir = $(includedir)/elementary-@VMAJ@
 
 libelementary_la_SOURCES = \
 elm_priv.h \
+\
 elm_main.c \
 elm_util.c \
 elm_theme.c \
@@ -88,20 +92,21 @@ elm_conform.c \
 elm_mapbuf.c \
 elm_thumb.c \
 elm_config.c \
+elm_font.c \
+elm_animator.c \
 elm_popup.c \
 elm_navigationbar.c \
 elm_navigationbar_ex.c\
 elm_transit.c \
-elm_animator.c \
+elm_calendar.c \
+elm_flipselector.c \
 elm_editfield.c \
 elm_diskselector.c \
 elm_colorselector.c \
 elm_colorpalette.c \
-elc_ctxpopup.c \
 elm_controlbar.c \
 elm_dialoguegroup.c \
 elm_dayselector.c \
-elm_cnp_helper.c \
 elm_cbhm_helper.c \
 elm_datefield.c \
 elm_nocontents.c \
@@ -110,16 +115,18 @@ elm_imageslider.c \
 elm_multibuttonentry.c \
 elm_slidingdrawer.c \
 elm_stackedicon.c \
-elm_calendar.c \
-elm_font.c \
 \
 elc_anchorblock.c \
 elc_anchorview.c \
+elc_ctxpopup.c \
 elc_fileselector.c \
 elc_fileselector_button.c \
+elc_fileselector_entry.c \
 elc_hoversel.c \
 elc_scrolled_entry.c \
 \
+els_tooltip.c \
+els_cursor.c \
 els_pan.c \
 els_pan.h \
 els_scroller.c \
@@ -128,10 +135,25 @@ els_box.c \
 els_box.h \
 els_icon.c \
 els_icon.h \
-els_cursor.c \
-els_tooltip.c
+\
+elm_cnp_helper.c
 
 
 libelementary_la_CFLAGS =
-libelementary_la_LIBADD = @my_libs@ @dlopen_libs@ @ELEMENTARY_LIBS@ @ELEMENTARY_X_LIBS@ @ELEMENTARY_FB_LIBS@ @ELEMENTARY_SDL_LIBS@ @ELEMENTARY_WIN32_LIBS@ @ELEMENTARY_WINCE_LIBS@ @ELEMENTARY_EDBUS_LIBS@ @ELEMENTARY_EFREET_LIBS@ @ELEMENTARY_ETHUMB_LIBS@
-libelementary_la_LDFLAGS = -no-undefined @lt_enable_auto_import@ -version-info @version_info@ @release_info@
+libelementary_la_LIBADD = \
+@my_libs@ \
+@dlopen_libs@ \
+@ELEMENTARY_LIBS@ \
+@ELEMENTARY_X_LIBS@ \
+@ELEMENTARY_FB_LIBS@ \
+@ELEMENTARY_SDL_LIBS@ \
+@ELEMENTARY_WIN32_LIBS@ \
+@ELEMENTARY_WINCE_LIBS@ \
+@ELEMENTARY_EDBUS_LIBS@ \
+@ELEMENTARY_EFREET_LIBS@ \
+@ELEMENTARY_ETHUMB_LIBS@ \
+@EVIL_LIBS@ \
+@EFL_PTHREAD_LIBS@
+libelementary_la_LDFLAGS = \
+-no-undefined @lt_enable_auto_import@ \
+-version-info @version_info@ @release_info@

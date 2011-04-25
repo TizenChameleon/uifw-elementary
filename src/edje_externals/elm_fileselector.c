@@ -4,6 +4,7 @@
 
 typedef struct _Elm_Params_Fileselector
 {
+   Elm_Params base;
    Eina_Bool is_save:1;
    Eina_Bool is_save_set:1;
    Eina_Bool folder_only:1;
@@ -23,7 +24,7 @@ external_fileselector_state_set(void *data __UNUSED__, Evas_Object *obj, const v
    else if (from_params) p = from_params;
    else return;
 
-   if (p->is_save_set && p->is_save)
+   if ((p->is_save_set) && (p->is_save))
      elm_fileselector_is_save_set(obj, p->is_save);
    if (p->folder_only_set)
      elm_fileselector_folder_only_set(obj, p->folder_only);
@@ -156,10 +157,10 @@ external_fileselector_params_parse(void *data __UNUSED__, Evas_Object *obj __UNU
 }
 
 static Evas_Object *external_fileselector_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
-	return NULL;
+   ERR("No content.");
+   return NULL;
 }
 
 static void
@@ -171,6 +172,7 @@ external_fileselector_params_free(void *params)
 
 static Edje_External_Param_Info external_fileselector_params[] =
   {
+    DEFINE_EXTERNAL_COMMON_PARAMS,
     EDJE_EXTERNAL_PARAM_INFO_BOOL("save"),
     EDJE_EXTERNAL_PARAM_INFO_BOOL("folder only"),
     EDJE_EXTERNAL_PARAM_INFO_BOOL("show buttons"),

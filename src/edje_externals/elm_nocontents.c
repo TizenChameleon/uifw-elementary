@@ -14,7 +14,7 @@ external_nocontents_state_set(void *data __UNUSED__, Evas_Object *obj, const voi
    else if (from_params) p = from_params;
    else return;
 
-   if (p->base.label) elm_nocontents_label_set(obj, p->base.label);
+   //if (p->base.label) elm_nocontents_label_set(obj, p->base.label);
 }
 
 static Eina_Bool
@@ -58,7 +58,7 @@ external_nocontents_params_parse(void *data, Evas_Object *obj, const Eina_List *
 {
    Elm_Params_Nocontents *mem;
 
-   mem = external_common_params_parse(Elm_Params_Nocontents, data, obj, params);
+   //mem = external_common_params_parse(Elm_Params_Nocontents, data, obj, params);
    if (!mem)
      return NULL;
 

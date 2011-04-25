@@ -1,7 +1,10 @@
 #include <Elementary.h>
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
 #ifndef ELM_LIB_QUICKLAUNCH
 void
-test_inwin(void *data, Evas_Object *obj, void *event_info)
+test_inwin(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *inwin, *lb;
 
@@ -32,12 +35,12 @@ test_inwin(void *data, Evas_Object *obj, void *event_info)
 }
 
 void
-test_inwin2(void *data, Evas_Object *obj, void *event_info)
+test_inwin2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *inwin, *lb;
 
-   win = elm_win_add(NULL, "inwin", ELM_WIN_BASIC);
-   elm_win_title_set(win, "Inwin");
+   win = elm_win_add(NULL, "inwin2", ELM_WIN_BASIC);
+   elm_win_title_set(win, "Inwin 2");
    elm_win_autodel_set(win, 1);
 
    bg = elm_bg_add(win);

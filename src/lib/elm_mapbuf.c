@@ -12,7 +12,7 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
 {
-   Evas_Object *content;
+   Evas_Object *content, *clip;
    Eina_Bool enabled : 1;
    Eina_Bool alpha : 1;
    Eina_Bool smooth : 1;
@@ -73,10 +73,10 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (!wd) return;
    if (sub == wd->content)
      {
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                             _changed_size_hints, obj);
-	wd->content = NULL;
-	_sizing_eval(obj);
+        wd->content = NULL;
+        _sizing_eval(obj);
      }
 }
 
@@ -86,7 +86,7 @@ _mapbuf(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord x, y, w, h;
    if (!wd) return;
-   evas_object_geometry_get(obj, &x, &y, &w, &h);
+   evas_object_geometry_get(wd->clip, &x, &y, &w, &h);
    if (wd->enabled)
      {
         Evas_Map *m;
@@ -116,23 +116,23 @@ _configure(Evas_Object *obj)
    if (wd->content)
      {
         Evas_Coord x, y, w, h, x2, y2;
-        
-        evas_object_geometry_get(obj, &x, &y, &w, &h);
+
+        evas_object_geometry_get(wd->clip, &x, &y, &w, &h);
         evas_object_geometry_get(wd->content, &x2, &y2, NULL, NULL);
         if ((x != x2) || (y != y2))
           {
              if (!wd->enabled)
-                evas_object_move(wd->content, x, y);
+               evas_object_move(wd->content, x, y);
              else
                {
-                  
+
                   Evas *e = evas_object_evas_get(obj);
                   evas_smart_objects_calculate(e);
                   evas_nochange_push(e);
-//                  printf("x--------------------\n");
+                  //                  printf("x-------------------- %i %i\n", x, y);
                   evas_object_move(wd->content, x, y);
                   evas_smart_objects_calculate(e);
-//                  printf("y--------------------\n");
+                  //                  printf("y--------------------\n");
                   evas_nochange_pop(e);
                }
           }
@@ -142,15 +142,15 @@ _configure(Evas_Object *obj)
 }
 
 static void
-_move(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+_move(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   _configure(obj);
+   _configure(data);
 }
 
 static void
-_resize(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
-{    
-   _configure(obj);
+_resize(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   _configure(data);
 }
 
 /**
@@ -168,12 +168,8 @@ elm_mapbuf_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "mapbuf");
    elm_widget_type_set(obj, "mapbuf");
    elm_widget_sub_object_add(parent, obj);
@@ -182,14 +178,21 @@ elm_mapbuf_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_can_focus_set(obj, EINA_FALSE);
 
+   wd->clip = evas_object_rectangle_add(e);
+   evas_object_static_clip_set(wd->clip, EINA_TRUE);
+   evas_object_pass_events_set(wd->clip, EINA_TRUE);
+   evas_object_color_set(wd->clip, 0, 0, 0, 0);
+
+   evas_object_event_callback_add(wd->clip, EVAS_CALLBACK_MOVE, _move, obj);
+   evas_object_event_callback_add(wd->clip, EVAS_CALLBACK_RESIZE, _resize, obj);
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-   evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, NULL);
-   evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);
+
+   elm_widget_resize_object_set(obj, wd->clip);
 
    wd->enabled = 0;
    wd->alpha = 1;
    wd->smooth = 1;
-   
+
    _sizing_eval(obj);
    return obj;
 }
@@ -218,13 +221,16 @@ elm_mapbuf_content_set(Evas_Object *obj, Evas_Object *content)
    if (content)
      {
         evas_object_data_set(content, "_elm_leaveme", (void *)1);
-	elm_widget_sub_object_add(content, obj);
-	evas_object_smart_member_add(content, obj);
-        evas_object_clip_set(content, evas_object_clip_get(obj));
-	evas_object_event_callback_add(content,
+        elm_widget_sub_object_add(content, obj);
+        evas_object_smart_member_add(content, obj);
+        evas_object_clip_set(content, wd->clip);
+        evas_object_color_set(wd->clip, 255, 255, 255, 255);
+        evas_object_event_callback_add(content,
                                        EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				       _changed_size_hints, obj);
+                                       _changed_size_hints, obj);
      }
+   else
+     evas_object_color_set(wd->clip, 0, 0, 0, 0);
    _sizing_eval(obj);
    _configure(obj);
 }
@@ -269,6 +275,7 @@ elm_mapbuf_content_unset(Evas_Object *obj)
    content = wd->content;
    elm_widget_sub_object_del(obj, content);
    evas_object_smart_member_del(content);
+   evas_object_color_set(wd->clip, 0, 0, 0, 0);
    evas_object_clip_unset(content);
    evas_object_data_del(content, "_elm_leaveme");
    wd->content = NULL;
@@ -291,6 +298,7 @@ elm_mapbuf_enabled_set(Evas_Object *obj, Eina_Bool enabled)
    if (!wd) return;
    if (wd->enabled == enabled) return;
    wd->enabled = enabled;
+   if (wd->content) evas_object_static_clip_set(wd->content, wd->enabled);
    _configure(obj);
 }
 

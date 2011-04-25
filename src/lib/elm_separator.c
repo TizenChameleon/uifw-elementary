@@ -5,7 +5,8 @@
  * @defgroup Separator Separator
  * @ingroup Elementary
  *
- * A separator is a widget that adds a very thin object to separate other objects.
+ * A separator is a widget that adds a very thin object to separate other 
+ * objects.
  * A separator can be vertical or horizontal.
  */
 
@@ -19,6 +20,7 @@ struct _Widget_Data
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
+static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 
@@ -31,10 +33,20 @@ _del_hook(Evas_Object *obj)
 }
 
 static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_mirrored_set(wd->sep, rtl);
+}
+
+static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    if (wd->horizontal)
      _elm_theme_object_set(obj, wd->sep, "separator", "horizontal", elm_widget_style_get(obj));
    else
@@ -71,12 +83,8 @@ elm_separator_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "separator");
    wd->horizontal = EINA_FALSE;
    elm_widget_type_set(obj, "separator");
@@ -89,6 +97,7 @@ elm_separator_add(Evas_Object *parent)
    wd->sep = edje_object_add(e);
    _elm_theme_object_set(obj, wd->sep, "separator", "vertical", "default");
    elm_widget_resize_object_set(obj, wd->sep);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
    return obj;
 }

@@ -1,4 +1,7 @@
 #include <Elementary.h>
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
 #ifndef ELM_LIB_QUICKLAUNCH
 typedef struct _Testitem
 {
@@ -8,58 +11,78 @@ typedef struct _Testitem
    int onoff;
 } Testitem;
 
+static const char *img[9] =
+{
+   "panel_01.jpg",
+   "plant_01.jpg",
+   "rock_01.jpg",
+   "rock_02.jpg",
+   "sky_01.jpg",
+   "sky_02.jpg",
+   "sky_03.jpg",
+   "sky_04.jpg",
+   "wood_01.jpg",
+};
+
 static Elm_Gengrid_Item_Class gic;
 
 static void
-grid_drag_up(void *data, Evas_Object *obj, void *event_info)
+_horizontal_grid(void *data, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Evas_Object *grid = data;
+   elm_gengrid_horizontal_set(grid, elm_check_state_get(obj));
+}
+
+static void
+grid_drag_up(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    printf("Drag up: %p\n", event_info);
 }
 
 static void
-grid_drag_right(void *data, Evas_Object *obj, void *event_info)
+grid_drag_right(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    printf("Drag right: %p\n", event_info);
 }
 
 static void
-grid_drag_down(void *data, Evas_Object *obj, void *event_info)
+grid_drag_down(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    printf("Drag down: %p\n", event_info);
 }
 
 static void
-grid_drag_left(void *data, Evas_Object *obj, void *event_info)
+grid_drag_left(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    printf("Drag left: %p\n", event_info);
 }
 
 static void
-grid_drag_stop(void *data, Evas_Object *obj, void *event_info)
+grid_drag_stop(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    printf("Drag stop: %p\n", event_info);
 }
 
 static void
-grid_selected(void *data, Evas_Object *obj, void *event_info)
+grid_selected(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    printf("Selected: %p\n", event_info);
 }
 
 static void
-grid_clicked(void *data, Evas_Object *obj, void *event_info)
+grid_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    printf("Clicked: %p\n", event_info);
 }
 
 static void
-grid_longpress(void *data, Evas_Object *obj, void *event_info)
+grid_longpress(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    printf("longpress %p\n", event_info);
 }
 
 static void
-grid_item_check_changed(void *data, Evas_Object *obj, void *event_info)
+grid_item_check_changed(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Testitem *ti = data;
    ti->onoff = elm_check_state_get(obj);
@@ -67,7 +90,7 @@ grid_item_check_changed(void *data, Evas_Object *obj, void *event_info)
 }
 
 char *
-grid_label_get(const void *data, Evas_Object *obj, const char *part)
+grid_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
 {
    const Testitem *ti = data;
    char buf[256];
@@ -76,7 +99,7 @@ grid_label_get(const void *data, Evas_Object *obj, const char *part)
 }
 
 Evas_Object *
-grid_icon_get(const void *data, Evas_Object *obj, const char *part)
+grid_icon_get(void *data, Evas_Object *obj, const char *part)
 {
    const Testitem *ti = data;
    if (!strcmp(part, "elm.swallow.icon"))
@@ -102,13 +125,13 @@ grid_icon_get(const void *data, Evas_Object *obj, const char *part)
 }
 
 Eina_Bool
-grid_state_get(const void *data, Evas_Object *obj, const char *part)
+grid_state_get(void *data __UNUSED__, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
 {
    return EINA_FALSE;
 }
 
 void
-grid_del(const void *data, Evas_Object *obj)
+grid_del(void *data __UNUSED__, Evas_Object *obj __UNUSED__)
 {
 }
 
@@ -119,27 +142,15 @@ grid_sel(void *data, Evas_Object *obj, void *event_info)
 }
 
 void
-test_gengrid(void *data, Evas_Object *obj, void *event_info)
+test_gengrid(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *grid;
    static Testitem ti[144];
    int i, n;
    char buf[PATH_MAX];
-   const char *img[9] =
-     {
-	"panel_01.jpg",
-	"plant_01.jpg",
-	"rock_01.jpg",
-	"rock_02.jpg",
-	"sky_01.jpg",
-	"sky_02.jpg",
-	"sky_03.jpg",
-	"sky_04.jpg",
-	"wood_01.jpg",
-     };
 
-   win = elm_win_add(NULL, "grid", ELM_WIN_BASIC);
-   elm_win_title_set(win, "Grid");
+   win = elm_win_add(NULL, "gengrid", ELM_WIN_BASIC);
+   elm_win_title_set(win, "GenGrid");
    elm_win_autodel_set(win, 1);
 
    bg = elm_bg_add(win);
@@ -181,6 +192,164 @@ test_gengrid(void *data, Evas_Object *obj, void *event_info)
 
    evas_object_show(grid);
    elm_win_resize_object_add(win, grid);
+
+   evas_object_resize(win, 600, 600);
+   evas_object_show(win);
+}
+
+static void
+_before_bt_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Testitem *ti;
+   Evas_Object *grid = data;
+   Elm_Gengrid_Item *sel;
+   char buf[PATH_MAX];
+
+   sel = elm_gengrid_selected_item_get(grid);
+   if (!sel)
+       return;
+   snprintf(buf, sizeof(buf), "%s/images/%s", PACKAGE_DATA_DIR, img[rand() % 9]);
+   ti = malloc(sizeof(*ti));
+   ti->mode = 0;
+   ti->path = eina_stringshare_add(buf);
+   ti->item = elm_gengrid_item_insert_before(grid, &gic, ti, sel, grid_sel,
+                                             NULL);
+}
+
+static void
+_after_bt_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Testitem *ti;
+   Evas_Object *grid = data;
+   Elm_Gengrid_Item *sel;
+   char buf[PATH_MAX];
+
+   sel = elm_gengrid_selected_item_get(grid);
+   if (!sel)
+       return;
+   snprintf(buf, sizeof(buf), "%s/images/%s", PACKAGE_DATA_DIR, img[rand() % 9]);
+   ti = malloc(sizeof(*ti));
+   ti->mode = 0;
+   ti->path = eina_stringshare_add(buf);
+   ti->item = elm_gengrid_item_insert_after(grid, &gic, ti, sel, grid_sel,
+                                            NULL);
+}
+
+static void
+_prepend_bt_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Testitem *ti;
+   Evas_Object *grid = data;
+   char buf[PATH_MAX];
+
+   snprintf(buf, sizeof(buf), "%s/images/%s", PACKAGE_DATA_DIR, img[rand() % 9]);
+   ti = malloc(sizeof(*ti));
+   ti->mode = 0;
+   ti->path = eina_stringshare_add(buf);
+   ti->item = elm_gengrid_item_prepend(grid, &gic, ti, grid_sel, NULL);
+}
+
+static void
+_append_bt_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Testitem *ti;
+   Evas_Object *grid = data;
+   char buf[PATH_MAX];
+
+   snprintf(buf, sizeof(buf), "%s/images/%s", PACKAGE_DATA_DIR, img[rand() % 9]);
+   ti = malloc(sizeof(*ti));
+   ti->mode = 0;
+   ti->path = eina_stringshare_add(buf);
+   ti->item = elm_gengrid_item_append(grid, &gic, ti, grid_sel, NULL);
+}
+
+static void
+_size_changed(void *data, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Evas_Object *grid = data;
+   int size = elm_spinner_value_get(obj);
+   elm_gengrid_item_size_set(grid, size, size);
+}
+
+void
+test_gengrid2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Evas_Object *win, *bg, *grid, *bx, *hbx, *bt, *ck;
+
+   win = elm_win_add(NULL, "gengrid2", ELM_WIN_BASIC);
+   elm_win_title_set(win, "GenGrid2");
+   elm_win_autodel_set(win, 1);
+
+   bg = elm_bg_add(win);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, bg);
+   evas_object_show(bg);
+
+   bx = elm_box_add(win);
+   evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, bx);
+   evas_object_show(bx);
+
+   grid = elm_gengrid_add(win);
+   elm_gengrid_item_size_set(grid, 150, 150);
+   elm_gengrid_horizontal_set(grid, EINA_FALSE);
+   elm_gengrid_multi_select_set(grid, EINA_FALSE);
+   evas_object_smart_callback_add(grid, "selected", grid_selected, NULL);
+   evas_object_size_hint_weight_set(grid, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_min_set(grid, 600, 500);
+   elm_box_pack_end(bx, grid);
+   evas_object_show(grid);
+
+   hbx = elm_box_add(win);
+   evas_object_size_hint_weight_set(hbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_box_horizontal_set(hbx, EINA_TRUE);
+   elm_box_pack_end(bx, hbx);
+   evas_object_show(hbx);
+
+   bt = elm_button_add(win);
+   elm_button_label_set(bt, "Append");
+   evas_object_smart_callback_add(bt, "clicked", _append_bt_clicked, grid);
+   elm_box_pack_end(hbx, bt);
+   evas_object_show(bt);
+
+   bt = elm_button_add(win);
+   elm_button_label_set(bt, "Prepend");
+   evas_object_smart_callback_add(bt, "clicked", _prepend_bt_clicked, grid);
+   elm_box_pack_end(hbx, bt);
+   evas_object_show(bt);
+
+   bt = elm_button_add(win);
+   elm_button_label_set(bt, "Insert before");
+   evas_object_smart_callback_add(bt, "clicked", _before_bt_clicked, grid);
+   elm_box_pack_end(hbx, bt);
+   evas_object_show(bt);
+
+   bt = elm_button_add(win);
+   elm_button_label_set(bt, "Insert after");
+   evas_object_smart_callback_add(bt, "clicked", _after_bt_clicked, grid);
+   elm_box_pack_end(hbx, bt);
+   evas_object_show(bt);
+
+   bt = elm_spinner_add(win);
+   elm_spinner_min_max_set(bt, 10, 1024);
+   elm_spinner_value_set(bt, 150);
+   elm_spinner_label_format_set(bt, "Item size: %.0f");
+   evas_object_smart_callback_add(bt, "changed", _size_changed, grid);
+   evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_box_pack_end(hbx, bt);
+   evas_object_show(bt);
+
+   ck = elm_check_add(win);
+   elm_check_label_set(ck, "Horizontal Mode");
+   evas_object_smart_callback_add(ck, "changed", _horizontal_grid, grid);
+   elm_box_pack_end(hbx, ck);
+   evas_object_show(ck);
+
+   gic.item_style = "default";
+   gic.func.label_get = grid_label_get;
+   gic.func.icon_get = grid_icon_get;
+   gic.func.state_get = grid_state_get;
+   gic.func.del = grid_del;
 
    evas_object_resize(win, 600, 600);
    evas_object_show(win);

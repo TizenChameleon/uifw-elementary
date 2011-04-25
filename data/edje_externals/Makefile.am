@@ -27,6 +27,7 @@ ico_list.png \
 ico_map.png \
 ico_nocontents.png \
 ico_page_control.png \
+ico_notepad.png \
 ico_photocam.png \
 ico_progressbar.png \
 ico_radio.png \
@@ -37,7 +38,7 @@ ico_slideshow.png \
 ico_spinner.png \
 ico_thumb.png \
 ico_toggle.png \
-ico_toolbar.png 
+ico_toolbar.png
 
 icons.edj: Makefile $(EXTRA_DIST)
 	$(EDJE_CC) $(EDJE_FLAGS) \

@@ -103,7 +103,7 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 {
    Widget_Data *wd = data;
    if (!wd) return;
-   _els_box_layout(o, priv, wd->horizontal, 0); /* making box layout non homogenous */
+   _els_box_layout(o, priv, wd->horizontal, 0, 0); /* making box layout non homogenous */
 }
 
 static void
@@ -910,7 +910,7 @@ elm_index_item_level_get(const Evas_Object *obj)
  *
  * @ingroup Index
  */
-EAPI const void *
+EAPI void *
 elm_index_item_selected_get(const Evas_Object *obj, int level)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;

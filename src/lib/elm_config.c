@@ -9,6 +9,7 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
+
 Elm_Config *_elm_config = NULL;
 char *_elm_profile = NULL;
 static Eet_Data_Descriptor *_config_edd = NULL;
@@ -657,6 +658,8 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, inwin_dialogs_enable, T_UCHAR);
    ELM_CONFIG_VAL(D, T, icon_size, T_INT);
    ELM_CONFIG_VAL(D, T, longpress_timeout, T_DOUBLE);
+   ELM_CONFIG_VAL(D, T, effect_enable, T_UCHAR);
+   ELM_CONFIG_VAL(D, T, desktop_entry, T_UCHAR);
    ELM_CONFIG_VAL(D, T, password_show_last_character, T_UCHAR);
    ELM_CONFIG_VAL(D, T, input_panel_enable, T_INT);
 #undef T
@@ -731,7 +734,11 @@ _elm_user_dir_snprintf(char       *dst,
    size_t user_dir_len, off;
    va_list ap;
 
+#ifdef _WIN32
+   home = evil_homedir_get();
+#else
    home = getenv("HOME");
+#endif
    if (!home)
      home = "/";
 
@@ -1084,8 +1091,8 @@ _elm_recache(void)
    EINA_LIST_FOREACH(_elm_win_list, l, win)
      {
         Evas *e = evas_object_evas_get(win);
-        evas_image_cache_set(e, _elm_config->image_cache);
-        evas_font_cache_set(e, _elm_config->font_cache);
+        evas_image_cache_set(e, _elm_config->image_cache * 1024);
+        evas_font_cache_set(e, _elm_config->font_cache * 1024);
      }
    edje_file_cache_set(_elm_config->edje_cache);
    edje_collection_cache_set(_elm_config->edje_collection_cache);
@@ -1204,6 +1211,11 @@ _config_load(void)
    _elm_config->inwin_dialogs_enable = EINA_FALSE;
    _elm_config->icon_size = 32;
    _elm_config->longpress_timeout = 1.0;
+   _elm_config->effect_enable = EINA_TRUE;
+   _elm_config->desktop_entry = EINA_FALSE;
+
+   _elm_config->is_mirrored = EINA_FALSE; /* Read sys value in env_get() */
+
    _elm_config->password_show_last_character = EINA_FALSE;
 }
 
@@ -1596,6 +1608,12 @@ _env_get(void)
    s = getenv("ELM_MODULES");
    if (s) eina_stringshare_replace(&_elm_config->modules, s);
 
+   /* Get RTL orientation from system */
+   setlocale(LC_ALL, "");
+   bindtextdomain("elementary", LOCALE_DIR);
+   textdomain("elementary");
+   _elm_config->is_mirrored = !strcmp(E_("default:LTR"), "default:RTL");
+
    s = getenv("ELM_TOOLTIP_DELAY");
    if (s)
      {
@@ -1632,6 +1650,37 @@ _env_get(void)
    if (s) _elm_config->longpress_timeout = atof(s);
    if (_elm_config->longpress_timeout < 0.0)
      _elm_config->longpress_timeout = 0.0;
+
+   s = getenv("ELM_EFFECT_ENABLE");
+   if (s) _elm_config->effect_enable = !!atoi(s);
+
+   s = getenv("ELM_DESKTOP_ENTRY");
+   if (s) _elm_config->desktop_entry = !!atoi(s);
+}
+
+/**
+ * Get the system mirrored mode. This determines the default mirrored mode
+ * of widgets.
+ *
+ * @return EINA_TRUE if mirrored is set, EINA_FALSE otherwise
+ */
+EAPI Eina_Bool
+elm_mirrored_get(void)
+{
+   return _elm_config->is_mirrored;
+}
+
+/**
+ * Set the system mirrored mode. This determines the default mirrored mode
+ * of widgets.
+ *
+ * @param mirrored EINA_TRUE to set mirrored mode, EINA_FALSE to unset it.
+ */
+EAPI void
+elm_mirrored_set(Eina_Bool mirrored)
+{
+   _elm_config->is_mirrored = mirrored;
+   _elm_rescale();
 }
 
 void

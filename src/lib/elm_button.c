@@ -7,6 +7,12 @@
  *
  * This is a push-button. Press it and run some function. It can contain
  * a simple label and icon object.
+ *
+ * Signals that you can add callbacks for are:
+ *
+ * "clicked" - the user clicked the button
+ * "repeated" - the user pressed the button without releasing it
+ * "unpressed" - when the button is unpressed (released)
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -55,10 +61,10 @@ static const char SIG_CLICKED[] = "clicked";
 static const char SIG_REPEATED[] = "repeated";
 static const char SIG_UNPRESSED[] = "unpressed";
 static const Evas_Smart_Cb_Description _signals[] = {
-  {SIG_CLICKED, ""},
-  {SIG_REPEATED, ""},
-  {SIG_UNPRESSED, ""},
-  {NULL, NULL}
+       {SIG_CLICKED, ""},
+       {SIG_REPEATED, ""},
+       {SIG_UNPRESSED, ""},
+       {NULL, NULL}
 };
 
 static Eina_Bool
@@ -121,11 +127,21 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 }
 
 static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_mirrored_set(wd->btn, rtl);
+}
+
+static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *str;
    if (!wd) return;
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _elm_theme_object_set(obj, wd->btn, "button", "base", elm_widget_style_get(obj));
    if (elm_object_disabled_get(obj))
      edje_object_signal_emit(wd->btn, "elm,state,disabled", "elm");
@@ -134,7 +150,7 @@ _theme_hook(Evas_Object *obj)
    if (wd->label)
      edje_object_signal_emit(wd->btn, "elm,state,text,visible", "elm");
    else
-     edje_object_signal_emit(wd->btn, "elm,state,text,hidden", "elm");  
+     edje_object_signal_emit(wd->btn, "elm,state,text,hidden", "elm");
    if (wd->icon)
      edje_object_signal_emit(wd->btn, "elm,state,icon,visible", "elm");
    else
@@ -184,7 +200,7 @@ _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
 }
 
 static void
-_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+_signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func_cb, void *data)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -192,7 +208,7 @@ _signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *so
 }
 
 static void
-_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, void (*func_cb) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+_signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func_cb, void *data)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    edje_object_signal_callback_del_full(wd->btn, emission, source, func_cb,
@@ -235,12 +251,12 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    if (!wd) return;
    if (sub == wd->icon)
      {
-	edje_object_signal_emit(wd->btn, "elm,state,icon,hidden", "elm");
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, obj);
-	wd->icon = NULL;
-	edje_object_message_signal_process(wd->btn);
-	_sizing_eval(obj);
+        edje_object_signal_emit(wd->btn, "elm,state,icon,hidden", "elm");
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                            _changed_size_hints, obj);
+        wd->icon = NULL;
+        edje_object_message_signal_process(wd->btn);
+        _sizing_eval(obj);
      }
 }
 
@@ -251,8 +267,8 @@ _activate(Evas_Object *obj)
    if (!wd) return;
    if (wd->timer)
      {
-	ecore_timer_del(wd->timer);
-	wd->timer = NULL;
+        ecore_timer_del(wd->timer);
+        wd->timer = NULL;
      }
    wd->repeating = EINA_FALSE;
    evas_object_smart_callback_call(obj, SIG_CLICKED, NULL);
@@ -279,8 +295,8 @@ _autorepeat_send(void *data)
    evas_object_smart_callback_call(data, SIG_REPEATED, NULL);
    if (!wd->repeating)
      {
-	wd->timer = NULL;
-	return ECORE_CALLBACK_CANCEL;
+        wd->timer = NULL;
+        return ECORE_CALLBACK_CANCEL;
      }
 
    return ECORE_CALLBACK_RENEW;
@@ -312,11 +328,33 @@ _signal_pressed(void *data, Evas_Object *obj __UNUSED__, const char *emission __
      }
    if ((wd->autorepeat) && (!wd->repeating))
      {
-	if (wd->ar_threshold <= 0.0)
-	  _autorepeat_initial_send(data); /* call immediately */
-	else
-	  wd->timer = ecore_timer_add(wd->ar_threshold, _autorepeat_initial_send, data);
+        if (wd->ar_threshold <= 0.0)
+          _autorepeat_initial_send(data); /* call immediately */
+        else
+          wd->timer = ecore_timer_add(wd->ar_threshold, _autorepeat_initial_send, data);
      }
+}
+
+static void
+_signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   if (wd->statelabel[DEFAULT])
+     _set_label(data, wd->statelabel[DEFAULT]);
+   #if 0
+   else
+     _set_label(data, wd->label);
+   #endif
+   return;
+
+   if (wd->timer)
+     {
+        ecore_timer_del(wd->timer);
+        wd->timer = NULL;
+     }
+   wd->repeating = EINA_FALSE;
+   evas_object_smart_callback_call(data, SIG_UNPRESSED, NULL);
 }
 
 static void
@@ -332,28 +370,6 @@ _signal_default_text_set(void *data, Evas_Object *obj, const char *emission, con
    #endif
    return;
 }
-
-static void
-_signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return;
-   if (wd->statelabel[DEFAULT])
-     _set_label(data, wd->statelabel[DEFAULT]);
-#if 0
-   else
-     _set_label(data, wd->label);
-#endif
-
-   if (wd->timer)
-     {
-	ecore_timer_del(wd->timer);
-	wd->timer = NULL;
-     }
-   wd->repeating = EINA_FALSE;
-   evas_object_smart_callback_call(data, SIG_UNPRESSED, NULL);
-}
-
 /**
  * Add a new button to the parent
  * @param[in] parent The parent object
@@ -368,16 +384,12 @@ elm_button_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "button");
    elm_widget_type_set(obj, "button");
    elm_widget_sub_object_add(parent, obj);
-   elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
+   elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
@@ -542,10 +554,10 @@ elm_button_label_get_for_state(const Evas_Object *obj, UIControlState state)
  *
  * Once the icon object is set, a previously set one will be deleted
  * If you want to keep that old content object, use the
- * elm_button_icon_unset() function. 
+ * elm_button_icon_unset() function.
  *
  * @param[in] obj The button object
- * @param[in] icon The image for the button
+ * @param[in] icon The icon object for the button
  *
  * @ingroup Button
  */
@@ -560,12 +572,12 @@ elm_button_icon_set(Evas_Object *obj, Evas_Object *icon)
    wd->icon = icon;
    if (icon)
      {
-	elm_widget_sub_object_add(obj, icon);
-	evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				       _changed_size_hints, obj);
-	edje_object_part_swallow(wd->btn, "elm.swallow.content", icon);
-	edje_object_signal_emit(wd->btn, "elm,state,icon,visible", "elm");
-	edje_object_message_signal_process(wd->btn);
+        elm_widget_sub_object_add(obj, icon);
+        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                       _changed_size_hints, obj);
+        edje_object_part_swallow(wd->btn, "elm.swallow.content", icon);
+        edje_object_signal_emit(wd->btn, "elm,state,icon,visible", "elm");
+        edje_object_message_signal_process(wd->btn);
      }
    _sizing_eval(obj);
 }
@@ -574,6 +586,7 @@ elm_button_icon_set(Evas_Object *obj, Evas_Object *icon)
  * Get the icon used for the button
  *
  * Return the icon object which is set for this widget.
+ *
  * @param[in] obj The button object
  * @return The icon object that is being used
  *
@@ -638,7 +651,7 @@ elm_button_autorepeat_set(Evas_Object *obj, Eina_Bool on)
 /**
  * Get if autorepeat event is on
  *
- * @param obj The button object
+ * @param[in] obj The button object
  * @return If autorepeat is on
  *
  * @ingroup Button
@@ -669,8 +682,8 @@ elm_button_autorepeat_initial_timeout_set(Evas_Object *obj, double t)
    if (wd->ar_threshold == t) return;
    if (wd->timer)
      {
-	ecore_timer_del(wd->timer);
-	wd->timer = NULL;
+        ecore_timer_del(wd->timer);
+        wd->timer = NULL;
      }
    wd->ar_threshold = t;
 }

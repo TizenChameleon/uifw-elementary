@@ -2,7 +2,7 @@
 #include "elm_priv.h"
 
 /**
- * @defgroup Panes panes
+ * @defgroup Panes Panes
  * @ingroup Elementary
  *
  */
@@ -15,15 +15,15 @@ struct _Widget_Data
 
    struct
      {
-	Evas_Object *left;
-	Evas_Object *right;
+        Evas_Object *left;
+        Evas_Object *right;
      } contents;
 
    struct
      {
-	int x_diff;
-	int y_diff;
-	Eina_Bool move;
+        int x_diff;
+        int y_diff;
+        Eina_Bool move;
      } move;
 
    Eina_Bool clicked_double;
@@ -33,6 +33,7 @@ struct _Widget_Data
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
+static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -47,6 +48,14 @@ _del_hook(Evas_Object *obj)
 }
 
 static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_mirrored_set(wd->panes, rtl);
+}
+
+static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -54,8 +63,10 @@ _theme_hook(Evas_Object *obj)
    double size;
 
    if (!wd) return;
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    size = elm_panes_content_left_size_get(obj);
-   
+
    if (wd->horizontal)
      _elm_theme_object_set(obj, wd->panes, "panes", "horizontal", style);
    else
@@ -143,17 +154,17 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
    if (!wd) return;
    if (sub == wd->contents.left)
      {
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                             _changed_size_hints, obj);
-	wd->contents.left = NULL;
-	_sizing_eval(obj);
+        wd->contents.left = NULL;
+        _sizing_eval(obj);
      }
    else if (sub == wd->contents.right)
      {
-	evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+        evas_object_event_callback_del_full(sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                             _changed_size_hints, obj);
-	wd->contents.right= NULL;
-	_sizing_eval(obj);
+        wd->contents.right= NULL;
+        _sizing_eval(obj);
      }
 }
 
@@ -185,8 +196,8 @@ _unpress(void *data, Evas_Object *obj __UNUSED__ , const char *emission __UNUSED
 
    if (wd->clicked_double)
      {
-	evas_object_smart_callback_call(data, "clicked,double", NULL);
-	wd->clicked_double = EINA_FALSE;
+        evas_object_smart_callback_call(data, "clicked,double", NULL);
+        wd->clicked_double = EINA_FALSE;
      }
 }
 
@@ -205,12 +216,8 @@ elm_panes_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "panes");
    elm_widget_type_set(obj, "panes");
    elm_widget_can_focus_set(obj, EINA_FALSE);
@@ -229,22 +236,24 @@ elm_panes_add(Evas_Object *parent)
 
    elm_panes_content_left_size_set(obj, 0.5);
 
-   edje_object_signal_callback_add(wd->panes, "elm,action,click", "", 
+   edje_object_signal_callback_add(wd->panes, "elm,action,click", "",
                                    _clicked, obj);
-   edje_object_signal_callback_add(wd->panes, "elm,action,click,double", "", 
+   edje_object_signal_callback_add(wd->panes, "elm,action,click,double", "",
                                    _clicked_double, obj);
-   edje_object_signal_callback_add(wd->panes, "elm,action,press", "", 
+   edje_object_signal_callback_add(wd->panes, "elm,action,press", "",
                                    _press, obj);
-   edje_object_signal_callback_add(wd->panes, "elm,action,unpress", "", 
+   edje_object_signal_callback_add(wd->panes, "elm,action,unpress", "",
                                    _unpress, obj);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-   evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS, 
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                   _changed_size_hints, obj);
 
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
    return obj;
 }
+
 
 /**
  * Set the left/top content of the panes widget
@@ -265,14 +274,14 @@ elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (wd->contents.left)
      {
-	evas_object_del(wd->contents.left);
-	wd->contents.left = NULL;
+        evas_object_del(wd->contents.left);
+        wd->contents.left = NULL;
      }
    if (content)
      {
-	wd->contents.left = content;
-	elm_widget_sub_object_add(obj, content);
-	edje_object_part_swallow(wd->panes, "elm.swallow.left", content);
+        wd->contents.left = content;
+        elm_widget_sub_object_add(obj, content);
+        edje_object_part_swallow(wd->panes, "elm.swallow.left", content);
         if (wd->contents.right)
           edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
      }
@@ -299,14 +308,14 @@ elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (wd->contents.right)
      {
-	evas_object_del(wd->contents.right);
-	wd->contents.right = NULL;
+        evas_object_del(wd->contents.right);
+        wd->contents.right = NULL;
      }
    if (content)
      {
-	wd->contents.right = content;
-	elm_widget_sub_object_add(obj, content);
-	edje_object_part_swallow(wd->panes, "elm.swallow.right", content);
+        wd->contents.right = content;
+        elm_widget_sub_object_add(obj, content);
+        edje_object_part_swallow(wd->panes, "elm.swallow.right", content);
         if (wd->contents.left)
           edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
      }

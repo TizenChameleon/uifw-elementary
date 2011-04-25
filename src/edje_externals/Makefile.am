@@ -1,7 +1,7 @@
 MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = \
--DELM_INTERAL_API_MDFGELQ=1 \
+-DELM_INTERNAL_API_ARGESFSDFEFC=1 \
 -I. \
 -I$(top_builddir) \
 -I$(top_srcdir) \
@@ -39,10 +39,10 @@ elm_calendar.c \
 elm_datefield.c \
 elm_fileselector.c \
 elm_fileselector_button.c \
-elm_gengrid.c \
+elm_fileselector_entry.c \
 elm_genlist.c \
+elm_gengrid.c \
 elm_hoversel.c \
-elm_icon.c \
 elm_list.c \
 elm_map.c \
 elm_multibuttonentry.c \
@@ -52,7 +52,6 @@ elm_photocam.c \
 elm_progressbar.c \
 elm_radio.c \
 elm_scrolled_entry.c \
-elm_scroller.c \
 elm_searchbar.c \
 elm_slider.c \
 elm_slideshow.c \
@@ -62,6 +61,9 @@ elm_toggle.c \
 elm_toolbar.c \
 elm_notify.c \
 elm_panes.c \
+elm_label.c \
+elm_icon.c \
+elm_scroller.c \
 elm_navigationbar.c \
 elm_navigationbar_ex.c \
 elm_pager.c 

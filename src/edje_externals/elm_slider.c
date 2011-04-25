@@ -3,6 +3,7 @@
 typedef struct _Elm_Params_Slider
 {
    Elm_Params base;
+   const char *label;
    Evas_Object *icon;
    const char *indicator, *unit;
    double min, max, value;
@@ -29,8 +30,8 @@ external_slider_state_set(void *data __UNUSED__, Evas_Object *obj, const void *f
    else if (from_params) p = from_params;
    else return;
 
-   if (p->base.label)
-     elm_slider_label_set(obj, p->base.label);
+   if (p->label)
+     elm_slider_label_set(obj, p->label);
    if (p->icon)
      elm_slider_icon_set(obj, p->icon);
    if (p->span_exists)
@@ -286,7 +287,7 @@ external_slider_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
    Edje_External_Param *param;
    const Eina_List *l;
 
-   mem = external_common_params_parse(Elm_Params_Slider, data, obj, params);
+   mem = calloc(1, sizeof(Elm_Params_Slider));
    if (!mem)
      return NULL;
 
@@ -334,15 +335,17 @@ external_slider_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
 	     mem->indicator_show = param->i;
 	     mem->indicator_show_exists = EINA_TRUE;
 	  }
+	else if (!strcmp(param->name, "label"))
+	  mem->label = eina_stringshare_add(param->s);
      }
 
    return mem;
 }
 
 static Evas_Object *external_slider_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
@@ -355,11 +358,14 @@ external_slider_params_free(void *params)
      eina_stringshare_del(mem->unit);
    if (mem->indicator)
      eina_stringshare_del(mem->indicator);
-   external_common_params_free(params);
+   if (mem->label)
+     eina_stringshare_del(mem->label);
+   free(params);
 }
 
 static Edje_External_Param_Info external_slider_params[] = {
    DEFINE_EXTERNAL_COMMON_PARAMS,
+   EDJE_EXTERNAL_PARAM_INFO_STRING("label"),
    EDJE_EXTERNAL_PARAM_INFO_STRING("icon"),
    EDJE_EXTERNAL_PARAM_INFO_DOUBLE("min"),
    EDJE_EXTERNAL_PARAM_INFO_DOUBLE_DEFAULT("max", 10.0),

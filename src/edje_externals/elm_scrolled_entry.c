@@ -311,14 +311,14 @@ external_scrolled_entry_params_parse(void *data __UNUSED__, Evas_Object *obj __U
 	     mem->autoperiod_exists = EINA_TRUE;
 	  }
      }
-         
+
    return mem;
 }
 
 static Evas_Object *external_scrolled_entry_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
@@ -333,6 +333,7 @@ external_scrolled_entry_params_free(void *params)
 }
 
 static Edje_External_Param_Info external_scrolled_entry_params[] = {
+   DEFINE_EXTERNAL_COMMON_PARAMS,
    EDJE_EXTERNAL_PARAM_INFO_STRING_DEFAULT("text", "some text"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("editable"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("single line"),

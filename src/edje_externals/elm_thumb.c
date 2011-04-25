@@ -4,6 +4,7 @@
 
 typedef struct _Elm_Params_Thumb
 {
+   Elm_Params base;
    const char *animate;
 } Elm_Params_Thumb;
 
@@ -18,7 +19,7 @@ _anim_setting_get(const char *anim_str)
 
    for (i = 0; i < sizeof(choices); i++)
      {
-	if (strcmp(anim_str, choices[i]) == 0)
+	if (!strcmp(anim_str, choices[i]))
 	  return i;
      }
    return ELM_THUMB_ANIMATION_LAST;
@@ -105,9 +106,9 @@ external_thumb_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, 
 }
 
 static Evas_Object *external_thumb_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
@@ -123,6 +124,7 @@ external_thumb_params_free(void *params)
 
 static Edje_External_Param_Info external_thumb_params[] =
   {
+    DEFINE_EXTERNAL_COMMON_PARAMS,
     EDJE_EXTERNAL_PARAM_INFO_CHOICE_FULL("animate", "loop", choices),
     EDJE_EXTERNAL_PARAM_INFO_SENTINEL
   };

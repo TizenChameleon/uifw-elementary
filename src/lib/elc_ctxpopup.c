@@ -14,7 +14,7 @@
  *
  * Signals that you can add callbacks for are:
  *
- * dismissed - the ctxpopup was dismissed
+ * "dismissed" - the ctxpopup was dismissed
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -99,9 +99,6 @@ static void _scroller_size_reset(Widget_Data *wd);
 static void _hide(Evas_Object *obj);
 static void _content_del(void *data, Evas *e, Evas_Object *obj __UNUSED__,
                          void *event_info __UNUSED__);
-static void _content_changed_size_hints(void *data __UNUSED__,
-                                        Evas *e __UNUSED__, Evas_Object *obj,
-                                        void *event_info __UNUSED__);
 static void _freeze_on(void *data __UNUSED__, Evas_Object *obj,
                        void *event_info __UNUSED__);
 static void _freeze_off(void *data __UNUSED__, Evas_Object *obj,
@@ -332,7 +329,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                                  &arrow_size.x, &arrow_size.y);
    evas_object_resize(wd->arrow, arrow_size.x, arrow_size.y);
 
-   //Initialize Area Rectangle. 
+   //Initialize Area Rectangle.
    if (wd->hover_parent)
       evas_object_geometry_get(wd->hover_parent, &hover_area.x, &hover_area.y,
                                &hover_area.w, &hover_area.h);
@@ -348,7 +345,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 
    evas_object_geometry_get(obj, &pos.x, &pos.y, NULL, NULL);
 
-   //recalc the edje 
+   //recalc the edje
    edje_object_size_min_calc(wd->base, &base_size.x, &base_size.y);
    evas_object_smart_calculate(wd->base);
 
@@ -361,7 +358,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    if ((max_size.x > 0) && (base_size.x > max_size.x))
       base_size.x = max_size.x;
 
-   //Limit to Min Size 
+   //Limit to Min Size
    evas_object_size_hint_min_get(obj, &min_size.x, &min_size.y);
 
    if ((min_size.y > 0) && (base_size.y < min_size.y))
@@ -371,7 +368,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
       base_size.x = min_size.x;
 
    //Check the Which direction is available.
-   //If find a avaialble direction, it adjusts position and size. 
+   //If find a avaialble direction, it adjusts position and size.
    for (idx = 0; idx < 4; idx++)
      {
         switch (wd->dir_priority[idx])
@@ -478,7 +475,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
           }
      }
 
-   //Final position and size. 
+   //Final position and size.
    rect->x = pos.x;
    rect->y = pos.y;
    rect->w = base_size.x;
@@ -495,8 +492,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
    Widget_Data *wd;
 
    wd = elm_widget_data_get(obj);
-   if (!wd)
-      return;
+   if (!wd) return;
 
    evas_object_geometry_get(obj, &x, &y, NULL, NULL);
    evas_object_geometry_get(wd->arrow, NULL, NULL, &arrow_size.w,
@@ -544,7 +540,7 @@ _sizing_eval(Evas_Object *obj)
    wd = elm_widget_data_get(obj);
    if ((!wd) || (!wd->parent)) return;
 
-   //Box, Scroller 
+   //Box, Scroller
    EINA_LIST_FOREACH(wd->items, elist, item)
      {
         _item_sizing_eval(item);
@@ -684,10 +680,10 @@ _theme_hook(Evas_Object *obj)
 
    if (wd->scr)
      {
-        if (!strncmp(elm_object_style_get(obj), "default", 
+        if (!strncmp(elm_object_style_get(obj), "default",
                      strlen("default")))
            elm_object_style_set(wd->scr, "ctxpopup");
-        else 
+        else
            elm_object_style_set(wd->scr, elm_object_style_get(obj));
      }
 
@@ -904,20 +900,6 @@ _content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
 }
 
 static void
-_content_changed_size_hints(void *data __UNUSED__, Evas *e __UNUSED__,
-                            Evas_Object *obj, void *event_info __UNUSED__)
-{
-   Widget_Data *wd;
-
-   wd = elm_widget_data_get(data);
-   if (!wd)
-      return;
-
-   if (wd->visible)
-      _sizing_eval(data);
-}
-
-static void
 _list_del(Widget_Data *wd)
 {
    if (!wd->scr) return;
@@ -940,8 +922,8 @@ _list_new(Evas_Object *obj)
    elm_object_style_set(wd->scr, "ctxpopup");
    evas_object_size_hint_align_set(wd->scr, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_RESIZE,
-                                  _scroller_resize, obj);  
-   edje_object_part_swallow(wd->base, "elm.swallow.content", wd->scr); 
+                                  _scroller_resize, obj);
+   edje_object_part_swallow(wd->base, "elm.swallow.content", wd->scr);
 
    //box
    wd->box = elm_box_add(obj);
@@ -949,7 +931,7 @@ _list_new(Evas_Object *obj)
                                     EVAS_HINT_EXPAND);
 
    elm_scroller_content_set(wd->scr, wd->box);
-   elm_ctxpopup_horizontal_set(obj, wd->horizontal); 
+   elm_ctxpopup_horizontal_set(obj, wd->horizontal);
 }
 
 static void
@@ -989,12 +971,8 @@ elm_ctxpopup_add(Evas_Object *parent)
    Widget_Data *wd;
    Evas_Coord x, y, w, h;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "ctxpopup");
    elm_widget_type_set(obj, "ctxpopup");
    elm_widget_sub_object_add(parent, obj);
@@ -1066,15 +1044,15 @@ elm_ctxpopup_item_icon_get(const Elm_Ctxpopup_Item *item)
 }
 
 /**
- * Sets the side icon associated with the ctxpopup item  
+ * Sets the side icon associated with the ctxpopup item
  *
  * Once the icon object is set, a previously set one will be deleted.
  * You probably don't want, then, to have the <b>same</b> icon object
  * set for more than one item of the list (when replacing one of its
  * instances).
- * 
+ *
  * @param item Ctxpopup item
- * @param icon	Icon object to be set
+ * @param icon Icon object to be set
  *
  * @ingroup Ctxpopup
  */
@@ -1118,7 +1096,7 @@ elm_ctxpopup_item_label_get(const Elm_Ctxpopup_Item *item)
  *
  * @param item Ctxpopup item
  * @param label String to set as label
- * 
+ *
  * @ingroup Ctxpopup
  */
 EAPI void
@@ -1141,12 +1119,12 @@ elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label)
 }
 
 /**
- * Set the Ctxpopup's parent 
- * Set the parent object (it would much probably be the 
+ * Set the Ctxpopup's parent
+ * Set the parent object (it would much probably be the
  * window that the ctxpopup is in).
  *
  * @param obj The ctxpopup object
- * @param area	The parent to use
+ * @param area The parent to use
  *
  * @note elm_ctxpopup_add() will automatically call this function
  * with its @c parent argument.
@@ -1179,7 +1157,7 @@ elm_ctxpopup_hover_parent_set(Evas_Object *obj, Evas_Object *hover_parent)
 }
 
 /**
- * Get the Ctxpopup's parent 
+ * Get the Ctxpopup's parent
  *
  * @param obj The ctxpopup object
  *
@@ -1223,7 +1201,7 @@ elm_ctxpopup_clear(Evas_Object * obj)
  * Change the ctxpopup's orientation to horizontal or vertical.
  *
  * @param obj Ctxpopup object
- * @param horizontal @c	EINA_TRUE for horizontal mode, @c EINA_FALSE for vertical
+ * @param horizontal @c EINA_TRUE for horizontal mode, @c EINA_FALSE for vertical
  *
  * @ingroup Ctxpopup
  */
@@ -1301,15 +1279,15 @@ elm_ctxpopup_horizontal_get(const Evas_Object *obj)
  * Add a new item to a ctxpopup object.
  *
  * Both a item list and a content could not be set at the same time!
- * once you set add a item, the previous content will be removed. 
+ * once you set add a item, the previous content will be removed.
  *
  * @param obj Ctxpopup object
- * @param icon Icon to be set on new item 
- * @param label The Label of the new item 
+ * @param icon Icon to be set on new item
+ * @param label The Label of the new item
  * @param func Convenience function called when item selected
  * @param data Data passed to @p func above
  * @return A handle to the item added or @c NULL, on errors
- * 
+ *
  * @ingroup Ctxpopup
  */
 EAPI Elm_Ctxpopup_Item *
@@ -1342,7 +1320,7 @@ elm_ctxpopup_item_append(Evas_Object *obj, const char *label,
       _item_new(item, "icon_text_style_item");
    else if (label)
       _item_new(item, "text_style_item");
-   else 
+   else
       _item_new(item, "icon_style_item");
 
    _item_icon_set(item, icon);
@@ -1441,11 +1419,11 @@ elm_ctxpopup_item_disabled_get(const Elm_Ctxpopup_Item *item)
 
 /**
  * Once the content object is set, a previously set one will be deleted.
- * If you want to keep that old content object, use the 
+ * If you want to keep that old content object, use the
  * elm_ctxpopup_content_unset() function
- * 
+ *
  * Both a item list and a content could not be set at the same time!
- * once you set a content, the previous list items will be removed. 
+ * once you set a content, the previous list items will be removed.
  *
  * @param obj Ctxpopup object
  * @param content Content to be swallowed
@@ -1471,7 +1449,6 @@ elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
 
    evas_object_event_callback_add(content, EVAS_CALLBACK_DEL, _content_del,
                                   obj);
-//   evas_object_event_callback_add(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints, obj);
 
    elm_widget_sub_object_add(obj, content);
    edje_object_part_swallow(wd->base, "elm.swallow.content", content);
@@ -1487,7 +1464,7 @@ elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
  * Unset the ctxpopup content
  *
  * Unparent and return the content object which was set for this widget
- * 
+ *
  * @param obj Ctxpopup object
  * @return The content that was being used
  *
@@ -1510,7 +1487,6 @@ elm_ctxpopup_content_unset(Evas_Object *obj)
    edje_object_part_unswallow(wd->base, content);
    elm_widget_sub_object_del(obj, content);
    evas_object_event_callback_del(content, EVAS_CALLBACK_DEL, _content_del);
-// evas_object_event_callback_del(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _content_changed_size_hints);
    edje_object_signal_emit(wd->base, "elm,state,content,disable", "elm");
 
    wd->content = NULL;
@@ -1557,12 +1533,12 @@ elm_ctxpopup_direction_priority_set(Evas_Object *obj,
  *
  * @param obj Ctxpopup object
  * @param first 1st priority of direction to be returned
- * @param second 2nd priority of direction to be returned 
- * @param third 3th priority of direction to be returned 
- * @param fourth 4th priority of direction to be returned 
+ * @param second 2nd priority of direction to be returned
+ * @param third 3th priority of direction to be returned
+ * @param fourth 4th priority of direction to be returned
  *
  * @see elm_ctxpopup_direction_priority_set for more information.
- * 
+ *
  * @ingroup Ctxpopup
  */
 EAPI void

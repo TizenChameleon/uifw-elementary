@@ -74,6 +74,8 @@ SIG_FWD(SELECTION_CUT)
 SIG_FWD(UNPRESSED)
 #undef SIG_FWD
 
+static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
+
 static void
 _FILE_CHOSEN_fwd(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 {
@@ -152,6 +154,15 @@ _elm_fileselector_entry_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direct
 }
 
 static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_widget_mirrored_set(wd->button, rtl);
+   edje_object_mirrored_set(wd->edje, rtl);
+}
+
+static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -159,6 +170,9 @@ _theme_hook(Evas_Object *obj)
    char buf[1024];
 
    if (!wd) return;
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
+
    _elm_theme_object_set(obj, wd->edje, "fileselector_entry", "base", style);
    if (elm_object_disabled_get(obj))
       edje_object_signal_emit(wd->edje, "elm,state,disabled", "elm");
@@ -210,15 +224,11 @@ EAPI Evas_Object *
 elm_fileselector_entry_add(Evas_Object *parent)
 {
    Evas_Object *obj;
-   Evas *e = evas_object_evas_get(parent);
-   if (!e) return NULL;
+   Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "fileselector_entry");
    elm_widget_type_set(obj, "fileselector_entry");
    elm_widget_sub_object_add(parent, obj);
@@ -234,11 +244,13 @@ elm_fileselector_entry_add(Evas_Object *parent)
    elm_widget_resize_object_set(obj, wd->edje);
 
    wd->button = elm_fileselector_button_add(obj);
+   elm_widget_mirrored_automatic_set(wd->button, EINA_FALSE);
+   ELM_SET_WIDTYPE(widtype, "fileselector_entry");
    elm_widget_style_set(wd->button, "fileselector_entry/default");
    edje_object_part_swallow(wd->edje, "elm.swallow.button", wd->button);
    elm_widget_sub_object_add(obj, wd->button);
    evas_object_event_callback_add
-     (wd->button, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+      (wd->button, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
    elm_fileselector_button_expandable_set(wd->button,
                                           _elm_config->fileselector_expand_enable);
 
@@ -250,13 +262,14 @@ elm_fileselector_entry_add(Evas_Object *parent)
 #undef SIG_FWD
 
    wd->entry = elm_scrolled_entry_add(obj);
+   elm_widget_mirrored_automatic_set(wd->entry, EINA_FALSE);
    elm_widget_style_set(wd->entry, "fileselector_entry/default");
    elm_scrolled_entry_single_line_set(wd->entry, EINA_TRUE);
    elm_scrolled_entry_editable_set(wd->entry, EINA_TRUE);
    edje_object_part_swallow(wd->edje, "elm.swallow.entry", wd->entry);
    elm_widget_sub_object_add(obj, wd->entry);
    evas_object_event_callback_add
-     (wd->entry, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+      (wd->entry, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
 
 #define SIG_FWD(name)                                                   \
    evas_object_smart_callback_add(wd->entry, SIG_##name, _##name##_fwd, obj)
@@ -273,6 +286,7 @@ elm_fileselector_entry_add(Evas_Object *parent)
    SIG_FWD(SELECTION_CUT);
 #undef SIG_FWD
 
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
 
    // TODO: convert Elementary to subclassing of Evas_Smart_Class

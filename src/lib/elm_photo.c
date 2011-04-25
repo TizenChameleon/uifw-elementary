@@ -6,14 +6,14 @@
  * @ingroup Elementary
  *
  * For displaying the photo of a person (contact). Simple yet
- * with a very specific purpose. 
- * 
+ * with a very specific purpose.
+ *
  * Signals that you can add callbacks for are:
  *
- *  - clicked: This is called when a user has clicked the photo
- *  - drop: Something was dropped on the widget
- *  - drag,start: Someone started dragging the image out of the object
- *  - drag,end: Dragged item was dropped (somewhere)
+ * "clicked" - This is called when a user has clicked the photo
+ * "drop" - Something was dropped on the widget
+ * "drag,start" - Someone started dragging the image out of the object
+ * "drag,end" - Dragged item was dropped (somewhere)
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -29,6 +29,7 @@ struct _Widget_Data
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
+static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -43,14 +44,24 @@ _del_hook(Evas_Object *obj)
 }
 
 static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   edje_object_mirrored_set(wd->frm, rtl);
+}
+
+static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   _elm_theme_object_set(obj, wd->frm, "photo", "base", 
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(wd->frm, elm_widget_mirrored_get(obj));
+   _elm_theme_object_set(obj, wd->frm, "photo", "base",
                          elm_widget_style_get(obj));
    edje_object_part_swallow(wd->frm, "elm.swallow.content", wd->img);
-   edje_object_scale_set(wd->frm, elm_widget_scale_get(obj) * 
+   edje_object_scale_set(wd->frm, elm_widget_scale_get(obj) *
                          _elm_config->scale);
    _sizing_eval(obj);
 }
@@ -62,7 +73,7 @@ _sizing_eval(Evas_Object *obj)
    Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
 
    if (!wd) return;
-   if (wd->size > 0) 
+   if (wd->size > 0)
      {
         double scale = 0.0;
 
@@ -86,7 +97,7 @@ _icon_move_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, v
    Widget_Data *wd = elm_widget_data_get(data);
 
    if (!wd) return;
-   if (wd->fill) 
+   if (wd->fill)
      {
         Edje_Message_Int_Set *msg;
         Evas_Object *icon = _els_smart_icon_object_get(wd->img);
@@ -207,12 +218,8 @@ elm_photo_add(Evas_Object *parent)
    Widget_Data *wd;
    Evas_Object *icon;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "photo");
    elm_widget_type_set(obj, "photo");
    elm_widget_sub_object_add(parent, obj);
@@ -232,12 +239,12 @@ elm_photo_add(Evas_Object *parent)
    _els_smart_icon_fill_inside_set(wd->img, 0);
    _els_smart_icon_scale_size_set(wd->img, 0);
    wd->fill = EINA_FALSE;
-   _els_smart_icon_scale_set(wd->img, 
+   _els_smart_icon_scale_set(wd->img,
                              elm_widget_scale_get(obj) * _elm_config->scale);
    evas_object_event_callback_add(wd->img, EVAS_CALLBACK_MOUSE_UP,
-				  _mouse_up, obj);
+                                  _mouse_up, obj);
    evas_object_event_callback_add(wd->img, EVAS_CALLBACK_MOUSE_DOWN,
-				  _mouse_down, obj);
+                                  _mouse_down, obj);
    evas_object_repeat_events_set(wd->img, 1);
    edje_object_part_swallow(wd->frm, "elm.swallow.content", wd->img);
    evas_object_show(wd->img);
@@ -247,9 +254,11 @@ elm_photo_add(Evas_Object *parent)
 
    icon = _els_smart_icon_object_get(wd->img);
    evas_object_event_callback_add(icon, EVAS_CALLBACK_MOVE,
-				  _icon_move_resize, obj);
+                                  _icon_move_resize, obj);
    evas_object_event_callback_add(icon, EVAS_CALLBACK_RESIZE,
-   				  _icon_move_resize, obj);
+                                  _icon_move_resize, obj);
+
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
    return obj;
 }

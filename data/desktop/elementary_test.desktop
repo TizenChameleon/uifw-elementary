@@ -1,10 +1,13 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Elementary Test
+Name[ru]=Тест Elementary
 Comment=Elementary Test Application
-Comment[cs]=Testovac� aplikace Elementary
+Comment[ru]=Тестовое приложение Элементария
+Comment[cs]=Testovací aplikace Elementary
 Comment[fr]=Programme de tests pour Elementary
 Comment[it]=Applicazione di test per Elementary
+Comment[pt]=Uma aplicação de teste do Elementary
 Exec=elementary_test
 Icon=elementary
 Terminal=false

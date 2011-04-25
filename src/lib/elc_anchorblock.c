@@ -12,8 +12,8 @@
  *
  * Signals that you can add callbacks for are:
  *
- * anchor,clicked - anchor called was clicked. event_info is anchor info -
- * Elm_Entry_Anchorview_Info
+ * "anchor,clicked" - anchor called was clicked. event_info is anchor info -
+ *                    Elm_Entry_Anchorview_Info
  */
 typedef struct _Widget_Data Widget_Data;
 typedef struct _Elm_Anchorblock_Item_Provider Elm_Anchorblock_Item_Provider;
@@ -37,10 +37,10 @@ static const char *widtype = NULL;
 
 static const char SIG_ANCHOR_CLICKED[] = "anchor,clicked";
 static const Evas_Smart_Cb_Description _signals[] = {
-  {SIG_ANCHOR_CLICKED, ""}, /* TODO: declare the type properly, as data is
-			     * being passed
-			     */
-  {NULL, NULL}
+       {SIG_ANCHOR_CLICKED, ""}, /* TODO: declare the type properly, as data is
+                                  * being passed
+                                  */
+       {NULL, NULL}
 };
 
 static void _del_pre_hook(Evas_Object *obj);
@@ -48,6 +48,7 @@ static void _del_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _parent_del(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 
 static void
 _del_pre_hook(Evas_Object *obj)
@@ -72,6 +73,23 @@ _del_hook(Evas_Object *obj)
         free(ip);
      }
    free(wd);
+}
+
+static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_widget_mirrored_set(wd->hover, rtl);
+}
+
+static void
+_theme_hook(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
 }
 
 static void
@@ -110,6 +128,7 @@ _anchor_clicked(void *data, Evas_Object *obj, void *event_info)
    evas_object_move(wd->pop, info->x, info->y);
    evas_object_resize(wd->pop, info->w, info->h);
    wd->hover = elm_hover_add(obj);
+   elm_widget_mirrored_set(wd->hover, elm_widget_mirrored_get((Evas_Object *) data));
    if (wd->hover_style)
      elm_object_style_set(wd->hover, wd->hover_style);
    hover_parent = wd->hover_parent;
@@ -138,6 +157,14 @@ _anchor_clicked(void *data, Evas_Object *obj, void *event_info)
    if (py < (y + (h / 3))) ei.hover_top = 0;
    ei.hover_bottom = 1;
    if (py > (y + ((h * 2) / 3))) ei.hover_bottom = 0;
+
+   if (elm_widget_mirrored_get(wd->hover))
+     {  /* Swap right and left because they switch sides in RTL */
+        Eina_Bool tmp = ei.hover_left;
+        ei.hover_left = ei.hover_right;
+        ei.hover_right = tmp;
+     }
+
    evas_object_smart_callback_call(data, SIG_ANCHOR_CLICKED, &ei);
    evas_object_smart_callback_add(wd->hover, "clicked", _hover_clicked, data);
    evas_object_show(wd->hover);
@@ -183,18 +210,15 @@ elm_anchorblock_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "anchorblock");
    elm_widget_type_set(obj, "anchorblock");
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
    elm_widget_del_hook_set(obj, _del_hook);
+   elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_can_focus_set(obj, EINA_TRUE);
 
    wd->entry = elm_entry_add(parent);
@@ -205,13 +229,14 @@ elm_anchorblock_add(Evas_Object *parent)
    evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				  _changed_size_hints, obj);
+                                  _changed_size_hints, obj);
 
    elm_entry_entry_set(wd->entry, "");
 
    evas_object_smart_callback_add(wd->entry, "anchor,clicked",
-				  _anchor_clicked, obj);
+                                  _anchor_clicked, obj);
 
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
 
    // TODO: convert Elementary to subclassing of Evas_Smart_Class
@@ -248,16 +273,16 @@ elm_anchorblock_text_set(Evas_Object *obj, const char *text)
 }
 
 /**
-  * Get the markup text set for the anchorblock
-  *
-  * This retrieves back the string set by @c elm_anchorblock_text_set().
-  *
-  * @param obj The anchorblock object
-  * @return text The markup text set or @c NULL, either if it was not set
-  * or an error occurred
-  *
-  * @ingroup Anchorblock
-  */
+ * Get the markup text set for the anchorblock
+ *
+ * This retrieves back the string set by @c elm_anchorblock_text_set().
+ *
+ * @param obj The anchorblock object
+ * @return text The markup text set or @c NULL, either if it was not set
+ * or an error occurred
+ *
+ * @ingroup Anchorblock
+ */
 EAPI const char*
 elm_anchorblock_text_get(const Evas_Object *obj)
 {
@@ -381,7 +406,7 @@ elm_anchorblock_hover_end(Evas_Object *obj)
  * and object to do this), then this object is used to replace that item. If
  * not the next provider is called until one provides an item object, or the
  * default provider in anchorblock does.
- * 
+ *
  * @param obj The anchorblock object
  * @param func The function called to provide the item object
  * @param data The data passed to @p func
@@ -407,7 +432,7 @@ elm_anchorblock_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (voi
  *
  * This prepends the given callback. See elm_anchorblock_item_provider_append() for
  * more information
- * 
+ *
  * @param obj The anchorblock object
  * @param func The function called to provide the item object
  * @param data The data passed to @p func
@@ -433,7 +458,7 @@ elm_anchorblock_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (vo
  *
  * This removes the given callback. See elm_anchorblock_item_provider_append() for
  * more information
- * 
+ *
  * @param obj The anchorblock object
  * @param func The function called to provide the item object
  * @param data The data passed to @p func

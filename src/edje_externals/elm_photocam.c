@@ -4,6 +4,7 @@
 
 typedef struct _Elm_Params_Photocam
 {
+   Elm_Params base;
    const char *file;
    double zoom;
    const char *zoom_mode;
@@ -144,7 +145,7 @@ external_photocam_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_
 }
 
 static void *
-external_photocam_params_parse(void *data, Evas_Object *obj, const Eina_List *params)
+external_photocam_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, const Eina_List *params)
 {
    Elm_Params_Photocam *mem;
    Edje_External_Param *param;
@@ -176,9 +177,9 @@ external_photocam_params_parse(void *data, Evas_Object *obj, const Eina_List *pa
 }
 
 static Evas_Object *external_photocam_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
@@ -195,6 +196,7 @@ external_photocam_params_free(void *params)
 }
 
 static Edje_External_Param_Info external_photocam_params[] = {
+   DEFINE_EXTERNAL_COMMON_PARAMS,
    EDJE_EXTERNAL_PARAM_INFO_STRING("file"),
    EDJE_EXTERNAL_PARAM_INFO_DOUBLE("zoom"),
    EDJE_EXTERNAL_PARAM_INFO_CHOICE_FULL("zoom mode", "manual", choices),

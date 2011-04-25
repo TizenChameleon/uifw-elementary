@@ -22,6 +22,7 @@ static void _del_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
+static void _theme_hook(Evas_Object *obj);
 
 static void
 _del_pre_hook(Evas_Object *obj)
@@ -78,6 +79,23 @@ _elm_table_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas
 }
 
 static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if ((!wd) || (!wd->tbl))
+     return;
+
+   evas_object_table_mirrored_set(wd->tbl, rtl);
+}
+
+static void
+_theme_hook(Evas_Object *obj)
+{
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
+}
+
+static void
 _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -123,12 +141,8 @@ elm_table_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "table");
    elm_widget_type_set(obj, "table");
    elm_widget_sub_object_add(parent, obj);
@@ -138,14 +152,16 @@ elm_table_add(Evas_Object *parent)
    elm_widget_focus_next_hook_set(obj, _elm_table_focus_next_hook);
    elm_widget_can_focus_set(obj, EINA_FALSE);
    elm_widget_highlight_ignore_set(obj, EINA_FALSE);
+   elm_widget_theme_hook_set(obj, _theme_hook);
 
    wd->tbl = evas_object_table_add(e);
    evas_object_event_callback_add(wd->tbl, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-				  _changed_size_hints, obj);
+                                  _changed_size_hints, obj);
    elm_widget_resize_object_set(obj, wd->tbl);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
    return obj;
 }
 

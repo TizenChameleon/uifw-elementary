@@ -2,7 +2,8 @@
 
 typedef struct _Elm_Params_Slideshow
 {
-   int timeout;
+   Elm_Params base;
+   double timeout;
    const char *transition;
    const char *layout;
    Eina_Bool loop:1;
@@ -40,9 +41,9 @@ external_slideshow_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje
 {
    if (!strcmp(param->name, "timeout"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
 	  {
-	     elm_slideshow_timeout_set(obj, param->i);
+	     elm_slideshow_timeout_set(obj, param->d);
 	     return EINA_TRUE;
 	  }
      }
@@ -82,9 +83,9 @@ external_slideshow_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje
 {
    if (!strcmp(param->name, "timeout"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
 	  {
-	     param->i = elm_slideshow_timeout_get(obj);
+	     param->d = elm_slideshow_timeout_get(obj);
 	     return EINA_TRUE;
 	  }
      }
@@ -120,7 +121,7 @@ external_slideshow_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje
 }
 
 static void *
-external_slideshow_params_parse(void *data, Evas_Object *obj, const Eina_List *params)
+external_slideshow_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, const Eina_List *params)
 {
    Elm_Params_Slideshow *mem;
    Edje_External_Param *param;
@@ -134,7 +135,7 @@ external_slideshow_params_parse(void *data, Evas_Object *obj, const Eina_List *p
      {
 	if (!strcmp(param->name, "timeout"))
 	  {
-	     mem->timeout = param->i;
+	     mem->timeout = param->d;
 	     mem->timeout_exists = EINA_TRUE;
 	  }
 	else if (!strcmp(param->name, "loop"))
@@ -156,23 +157,24 @@ external_slideshow_params_parse(void *data, Evas_Object *obj, const Eina_List *p
 }
 
 static Evas_Object *external_slideshow_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
+	ERR("No content.");
 	return NULL;
 }
 
 static void
-external_slideshow_params_free(void *params)
+external_slideshow_params_free(void *params __UNUSED__)
 {
    return;
 }
 
 static Edje_External_Param_Info external_slideshow_params[] = {
-   EDJE_EXTERNAL_PARAM_INFO_INT("timeout"),
+   DEFINE_EXTERNAL_COMMON_PARAMS,
+   EDJE_EXTERNAL_PARAM_INFO_DOUBLE("timeout"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("loop"),
    EDJE_EXTERNAL_PARAM_INFO_CHOICE_FULL("transition", "fade", transitions),
-   EDJE_EXTERNAL_PARAM_INFO_CHOICE_FULL("layout", "fullscreen", transitions),
+   EDJE_EXTERNAL_PARAM_INFO_CHOICE_FULL("layout", "fullscreen", layout),
    EDJE_EXTERNAL_PARAM_INFO_SENTINEL
 };
 

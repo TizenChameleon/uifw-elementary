@@ -9,6 +9,12 @@
  * window) with an Elementary File Selector within. When a file is
  * chosen, the (inner) window is closed and the selected file is
  * exposed as an evas_object_smart_callback_call() of the button.
+ *
+ * Signals that you can add callbacks for are:
+ * 
+ * "file,chosen" - the user has selected a path, whose string pointer comes 
+ *                 as event info
+ *
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -49,8 +55,8 @@ static void _activate(Widget_Data *wd);
 
 static const char SIG_FILE_CHOSEN[] = "file,chosen";
 static const Evas_Smart_Cb_Description _signals[] = {
-   {SIG_FILE_CHOSEN, "s"},
-   {NULL, NULL}
+       {SIG_FILE_CHOSEN, "s"},
+       {NULL, NULL}
 };
 
 static void
@@ -83,11 +89,23 @@ _on_focus_hook(void *data   __UNUSED__,
 }
 
 static void
+_mirrored_set(Evas_Object *obj, Eina_Bool rtl)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_widget_mirrored_set(wd->btn, rtl);
+   elm_widget_mirrored_set(wd->fs, rtl);
+}
+
+static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    char buf[4096];
    if (!wd) return;
+   _elm_widget_mirrored_reload(obj);
+   _mirrored_set(obj, elm_widget_mirrored_get(obj));
+
    snprintf(buf, sizeof(buf), "fileselector_button/%s",
             elm_widget_style_get(obj));
    elm_object_style_set(wd->btn, buf);
@@ -192,6 +210,8 @@ _activate(Widget_Data *wd)
      wd->fsw = _new_window_add(wd);
 
    wd->fs = elm_fileselector_add(wd->fsw);
+   elm_widget_mirrored_set(wd->fs, elm_widget_mirrored_get(wd->self));
+   elm_widget_mirrored_automatic_set(wd->fs, EINA_FALSE);
    elm_fileselector_expandable_set(wd->fs, wd->fsd.expandable);
    elm_fileselector_folder_only_set(wd->fs, wd->fsd.folder_only);
    elm_fileselector_is_save_set(wd->fs, wd->fsd.is_save);
@@ -250,23 +270,11 @@ elm_fileselector_button_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(parent, NULL);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   wd->window_title = eina_stringshare_add(DEFAULT_WINDOW_TITLE);
-   wd->fsd.path = eina_stringshare_add(getenv("HOME"));
-   wd->fsd.expandable = _elm_config->fileselector_expand_enable;
-   wd->inwin_mode = _elm_config->inwin_dialogs_enable;
-   wd->w = 400;
-   wd->h = 400;
-
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "fileselector_button");
    elm_widget_type_set(obj, "fileselector_button");
    elm_widget_sub_object_add(parent, obj);
-   wd->self = obj;
    elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
@@ -275,7 +283,17 @@ elm_fileselector_button_add(Evas_Object *parent)
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_activate_hook_set(obj, _activate_hook);
 
+   wd->self = obj;
+   wd->window_title = eina_stringshare_add(DEFAULT_WINDOW_TITLE);
+   if (getenv("HOME")) wd->fsd.path = eina_stringshare_add(getenv("HOME"));
+   else wd->fsd.path = eina_stringshare_add("/");
+   wd->fsd.expandable = _elm_config->fileselector_expand_enable;
+   wd->inwin_mode = _elm_config->inwin_dialogs_enable;
+   wd->w = 400;
+   wd->h = 400;
+
    wd->btn = elm_button_add(parent);
+   elm_widget_mirrored_automatic_set(wd->btn, EINA_FALSE);
    elm_widget_resize_object_set(obj, wd->btn);
    evas_object_event_callback_add(wd->btn, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                   _changed_size_hints, obj);
