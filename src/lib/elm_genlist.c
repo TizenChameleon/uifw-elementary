@@ -3817,7 +3817,7 @@ elm_genlist_selected_items_get(const Evas_Object *obj)
  * @ingroup Genlist
  */
 EAPI Eina_List *
-elm_genlist_realized_items_get(Evas_Object *obj)
+elm_genlist_realized_items_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
