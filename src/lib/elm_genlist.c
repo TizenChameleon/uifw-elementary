@@ -1826,11 +1826,11 @@ _item_realize(Elm_Genlist_Item *it,
    if ((it->realized) || (it->delete_me)) return;
    it->order_num_in = in;
    if (it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE)	calc = EINA_FALSE;
-   if ((it->nocache) && (!it->renamed) && (!it->wd->effect_mode))
+   if ((it->nocache) && (!it->renamed))
      it->nocache = EINA_FALSE;
    else
      itc = _item_cache_find(it);
-   if (itc)
+   if (itc && (!it->wd->effect_mode))
      {
         it->base.view = itc->base_view;
         itc->base_view = NULL;
