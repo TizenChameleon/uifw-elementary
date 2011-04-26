@@ -1892,7 +1892,7 @@ extern "C" {
    /* operations to retrieve existing items */
    EAPI Elm_Genlist_Item *elm_genlist_selected_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI const Eina_List  *elm_genlist_selected_items_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI Eina_List        *elm_genlist_realized_items_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_List        *elm_genlist_realized_items_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI Elm_Genlist_Item *elm_genlist_at_xy_item_get(const Evas_Object *obj, Evas_Coord x, Evas_Coord y, int *posret) EINA_ARG_NONNULL(1);
    EAPI Elm_Genlist_Item *elm_genlist_first_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI Elm_Genlist_Item *elm_genlist_last_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
