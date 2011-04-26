@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build163) unstable; urgency=low
+
+  * Elementary Migration with the latest elementary in SVN
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build163
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 26 Apr 2011 16:04:45 +0900
+
 elementary (1.0.0+svn.51480slp2+build162) unstable; urgency=low
 
   * Elementary Migration with the latest elementary in SVN
