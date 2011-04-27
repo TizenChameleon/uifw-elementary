@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build165) unstable; urgency=low
+
+  * Package upload for elm_transit merging
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build165
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Wed, 27 Apr 2011 14:09:21 +0900
+
 elementary (1.0.0+svn.51480slp2+build164) unstable; urgency=low
 
   * Package upload
