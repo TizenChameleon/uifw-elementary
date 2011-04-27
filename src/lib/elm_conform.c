@@ -306,9 +306,8 @@ _content_resize_event_cb(void *data, Evas *e, Evas_Object *obj,
 
       if (h < _elm_config->finger_size)
          h = _elm_config->finger_size;
-      else
-         h = 1 + h; //elm_widget_show_region_set expects some change, to redo the job.
-      elm_widget_show_region_set(focus_obj, x, y, w, h);
+
+      elm_widget_show_region_set(focus_obj, x, y, w, h, EINA_TRUE);
    }
 }
 

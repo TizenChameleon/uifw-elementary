@@ -674,7 +674,7 @@ _elm_win_recalc_job(void *data)
       evas_object_size_hint_max_set(data, -1, minh);
 
    if (wd->deferred_cur)
-     elm_widget_show_region_set(data, wd->cx, wd->cy, wd->cw, wd->ch);
+     elm_widget_show_region_set(data, wd->cx, wd->cy, wd->cw, wd->ch, EINA_FALSE);
 }
 
 static void
@@ -1673,7 +1673,7 @@ _signal_magnifier_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
 
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
    if (!wd->deferred_recalc_job)
-      elm_widget_show_region_set(data, cx, cy, cw, ch);
+      elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
    else
      {
         wd->deferred_cur = EINA_TRUE;
@@ -1698,7 +1698,7 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
 
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
    if (!wd->deferred_recalc_job)
-      elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get());
+      elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get(), EINA_FALSE);
    else
      {
         wd->deferred_cur = EINA_TRUE;
@@ -1807,7 +1807,7 @@ _signal_cursor_changed(void *data, Evas_Object *obj __UNUSED__, const char *emis
                                              &cx, &cy, &cw, &ch);
    wd->cursor_pos = edje_object_part_text_cursor_pos_get(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
    if (!wd->deferred_recalc_job)
-     elm_widget_show_region_set(data, cx, cy, cw, ch);
+     elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
    else
      {
         wd->deferred_cur = EINA_TRUE;
