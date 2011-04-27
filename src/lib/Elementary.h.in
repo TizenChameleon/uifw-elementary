@@ -1860,8 +1860,8 @@ extern "C" {
           GenlistItemMovedFunc     moved;
         } func;
         const char *edit_item_style;
+        const char                *mode_item_style;
      };
-
    EAPI Evas_Object      *elm_genlist_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
    EAPI void              elm_genlist_clear(Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void              elm_genlist_multi_select_set(Evas_Object *obj, Eina_Bool multi) EINA_ARG_NONNULL(1);
@@ -2029,6 +2029,9 @@ extern "C" {
    EINA_DEPRECATED EAPI Eina_List         *elm_genlist_edit_selected_items_get(const Evas_Object *obj);
    EINA_DEPRECATED EAPI void               elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it, Eina_Bool selected);
    EINA_DEPRECATED EAPI Eina_Bool          elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_item_mode_set(Elm_Genlist_Item *it, const char *mode_type, Eina_Bool mode_set) EINA_ARG_NONNULL(1, 2);
+   EAPI const char        *elm_genlist_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI const Elm_Genlist_Item *elm_genlist_mode_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
   /* check */
    EAPI Evas_Object *elm_check_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
