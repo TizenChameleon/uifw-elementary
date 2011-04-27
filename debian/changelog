@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build167) unstable; urgency=low
+
+  * Textdomain should only be used for applications not libs
+  * Git: git:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build167
+
+ -- Myoungwoon Kim <myoungwoon.kim@samsung.com>  Wed, 27 Apr 2011 18:51:45 +0900
+
 elementary (1.0.0+svn.51480slp2+build166) unstable; urgency=low
 
   * [Genlist] Upstream merge. Added genlist mode feature. This feature
