@@ -1,3 +1,12 @@
+elementary (1.0.0+svn.51480slp2+build166) unstable; urgency=low
+
+  * [Genlist] Upstream merge. Added genlist mode feature. This feature
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build166
+    is used as a sweep in SLP.
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Wed, 27 Apr 2011 15:34:11 +0900
+
 elementary (1.0.0+svn.51480slp2+build165) unstable; urgency=low
 
   * Package upload for elm_transit merging
