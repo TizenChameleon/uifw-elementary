@@ -28,6 +28,7 @@
 
 
 Evas_Object *main_win;
+Elm_Transit *transit;
 
 static void startup(void);
 static void cleanup(void);
@@ -35,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_fx_image_animation_add_func_01(void);
-static void utc_UIFW_elm_fx_image_animation_add_func_02(void);
+static void utc_UIFW_elm_transit_event_enabled_set_func_01(void);
+static void utc_UIFW_elm_transit_event_enabled_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_fx_image_animation_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_fx_image_animation_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_event_enabled_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_event_enabled_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -63,21 +64,27 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
+	if ( NULL != transit ) {
+		elm_transit_del(transit);
+		transit = NULL;
+	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_fx_image_animation_add()
+ * @brief Positive test case of elm_transit_event_block_disbled_set()
  */
-static void utc_UIFW_elm_fx_image_animation_add_func_01(void)
+static void utc_UIFW_elm_transit_event_enabled_set_func_01(void)
 {
-	Evas_Object *icon = elm_icon_add(main_win);
-	const char* icon_path[] = {"/usr/share/beat_winset_test/icon/sky_01.jpg", "/usr/share/beat-winset-test/icon/sky_02.jpg"};
-	Elm_Effect *effect = elm_fx_image_animation_add(icon, icon_path, 2);
+	Eina_Bool r = EINA_FALSE;
 	
-	if (effect == NULL) {
-		tet_infoline("elm_fx_image_animation_add() failed in positive test case");
+	transit = elm_transit_add();
+	elm_transit_event_enabled_set(transit, EINA_TRUE);
+	r = elm_transit_event_enabled_get(transit);
+
+	if (r == EINA_FALSE) {
+		tet_infoline("elm_transit_event_enabled_set() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -85,15 +92,18 @@ static void utc_UIFW_elm_fx_image_animation_add_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_fx_image_animation_add()
+ * @brief Negative test case of ug_init elm_transit_event_block_disbled_set()
  */
-static void utc_UIFW_elm_fx_image_animation_add_func_02(void)
+static void utc_UIFW_elm_transit_event_enabled_set_func_02(void)
 {
-	const char* icon_path[] = {"/usr/share/beat_winset_test/icon/sky_01.jpg", "/usr/share/beat-winset-test/icon/sky_02.jpg"};
-	Elm_Effect *effect = elm_fx_image_animation_add(NULL, icon_path, 2);
+	Eina_Bool r = EINA_FALSE;
 	
-	if (effect != NULL) {
-		tet_infoline("elm_fx_image_animation_add() failed in negative test case");
+	elm_transit_add();
+	elm_transit_event_enabled_set(NULL, EINA_TRUE);
+	r = elm_transit_event_enabled_get(NULL);
+
+	if (r == EINA_TRUE) {
+		tet_infoline("elm_transit_event_enabled_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}

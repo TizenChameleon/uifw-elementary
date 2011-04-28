@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_transit_fx_clear_func_01(void);
-static void utc_UIFW_elm_transit_fx_clear_func_02(void);
+static void utc_UIFW_elm_transit_duration_get_func_01(void);
+static void utc_UIFW_elm_transit_duration_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_transit_fx_clear_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_transit_fx_clear_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_duration_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_duration_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -73,39 +73,32 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_transit_fx_clear()
+ * @brief Positive test case of elm_transit_duration_get()
  */
-static void utc_UIFW_elm_transit_fx_clear_func_01(void)
+static void utc_UIFW_elm_transit_duration_get_func_01(void)
 {
-	transit = elm_transit_add(main_win);
-	Elm_Effect *effect = elm_fx_fade_add(main_win, main_win);
-	elm_transit_fx_insert(transit, effect);
-	elm_transit_fx_clear(transit);
-	elm_transit_run(transit, 1.0);
+	transit = elm_transit_add();
+	elm_transit_duration_set(transit, 3);
 
-	/*if (!r) {
-		tet_infoline("elm_transit_fx_clear() failed in positive test case");
+	if (elm_transit_duration_get(transit) != 3) {
+		tet_infoline("elm_transit_duration_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_transit_fx_clear()
+ * @brief Negative test case of ug_init elm_transit_duration_get()
  */
-static void utc_UIFW_elm_transit_fx_clear_func_02(void)
+static void utc_UIFW_elm_transit_duration_get_func_02(void)
 {
-	transit = elm_transit_add(main_win);
-	Elm_Effect *effect = elm_fx_fade_add(main_win, main_win);
-	elm_transit_fx_insert(transit, effect);
-	elm_transit_fx_clear(NULL);
-	elm_transit_run(transit, 1.0);
+	transit = elm_transit_add();
 
-	/*if (r) {
-		tet_infoline("elm_transit_fx_clear() failed in negative test case");
+	if (elm_transit_duration_get(NULL) == 3) {
+		tet_infoline("elm_transit_duration_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }

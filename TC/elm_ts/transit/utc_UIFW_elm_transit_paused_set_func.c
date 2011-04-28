@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_transit_completion_callback_set_func_01(void);
-static void utc_UIFW_elm_transit_completion_callback_set_func_02(void);
+static void utc_UIFW_elm_transit_paused_set_func_01(void);
+static void utc_UIFW_elm_transit_paused_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_transit_completion_callback_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_transit_completion_callback_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_paused_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_paused_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -64,7 +64,7 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
-	if ( NULL != transit) {
+	if ( NULL != transit ) {
 		elm_transit_del(transit);
 		transit = NULL;
 	}
@@ -72,41 +72,43 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-void _transition_comp(void *data, Elm_Transit* transit)
-{
-	elm_transit_del(transit);
-	transit = NULL;
-}
 /**
- * @brief Positive test case of elm_transit_completion_callback_set()
+ * @brief Positive test case of elm_transit_paused_set()
  */
-static void utc_UIFW_elm_transit_completion_callback_set_func_01(void)
+static void utc_UIFW_elm_transit_paused_set_func_01(void)
 {
-	elm_transit_add(main_win);
-	elm_transit_completion_callback_set(transit, _transition_comp, NULL);
-	elm_transit_run(transit, 1.0);
-	
-	/*if (!r) {
-		tet_infoline("elm_transit_completion_callback_set() failed in positive test case");
+	Evas_Object *btn = elm_button_add(main_win);
+	transit = elm_transit_add();
+	elm_transit_object_add(transit, btn);
+	elm_transit_duration_set(transit, 1);
+	elm_transit_effect_resizing_add(transit, 100, 100, 200, 200);
+	elm_transit_go(transit);
+	elm_transit_paused_set(transit, EINA_TRUE);
+
+	if (elm_transit_paused_get(transit) == EINA_FALSE) {
+		tet_infoline("elm_transit_paused_set() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_transit_completion_callback_set()
+ * @brief Negative test case of ug_init elm_transit_paused_set()
  */
-static void utc_UIFW_elm_transit_completion_callback_set_func_02(void)
+static void utc_UIFW_elm_transit_paused_set_func_02(void)
 {
-	elm_transit_add(main_win);
-	elm_transit_completion_callback_set(NULL, _transition_comp, NULL);
-	elm_transit_run(transit, 1.0);
+	Evas_Object *btn = elm_button_add(main_win);
+	transit = elm_transit_add();
+	elm_transit_object_add(transit, btn);
+	elm_transit_duration_set(transit, 1);
+	elm_transit_effect_resizing_add(transit, 100, 100, 200, 200);
+	elm_transit_go(transit);
 
-	/*if (r) {
-		tet_infoline("elm_transit_completion_callback_set() failed in negative test case");
+	if (elm_transit_paused_get(NULL) == EINA_TRUE) {
+		tet_infoline("elm_transit_paused_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }

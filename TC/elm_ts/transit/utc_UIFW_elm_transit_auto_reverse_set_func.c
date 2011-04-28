@@ -77,15 +77,14 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_transit_auto_reverse_set_func_01(void)
 {
-	transit = elm_transit_add(main_win);
+	transit = elm_transit_add();
 	elm_transit_auto_reverse_set(transit, EINA_TRUE);
-	elm_transit_run(transit, 1.0);
 
-	/*if (!r) {
+	if (elm_transit_auto_reverse_get(transit) == EINA_FALSE) {
 		tet_infoline("elm_transit_auto_reverse_set() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }
 
@@ -94,14 +93,12 @@ static void utc_UIFW_elm_transit_auto_reverse_set_func_01(void)
  */
 static void utc_UIFW_elm_transit_auto_reverse_set_func_02(void)
 {
-	transit = elm_transit_add(main_win);
-	elm_transit_auto_reverse_set(NULL, EINA_TRUE);
-	elm_transit_run(transit, 1.0);
+	transit = elm_transit_add();
 
-	/*if (r) {
+	if (elm_transit_auto_reverse_get(NULL) == EINA_TRUE) {
 		tet_infoline("elm_transit_auto_reverse_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }

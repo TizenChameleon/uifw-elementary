@@ -76,7 +76,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_transit_add_func_01(void)
 {
-   	transit = elm_transit_add(main_win);
+   	transit = elm_transit_add();
 	
 	if (!transit) {
 		tet_infoline("elm_transit_add() failed in positive test case");

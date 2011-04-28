@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_transit_curve_style_set_func_01(void);
-static void utc_UIFW_elm_transit_curve_style_set_func_02(void);
+static void utc_UIFW_elm_transit_event_enabled_get_func_01(void);
+static void utc_UIFW_elm_transit_event_enabled_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_transit_curve_style_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_transit_curve_style_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_event_enabled_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_event_enabled_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -73,36 +73,39 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_transit_curve_style_set()
+ * @brief Positive test case of elm_transit_event_block_disabled_get()
  */
-static void utc_UIFW_elm_transit_curve_style_set_func_01(void)
+static void utc_UIFW_elm_transit_event_enabled_get_func_01(void)
 {
-	transit = elm_transit_add(main_win);
-	elm_transit_curve_style_set(transit, ELM_ANIMATOR_CURVE_OUT);
-	elm_transit_run(transit, 1.0);
-
-	/*if (!r) {
-		tet_infoline("elm_transit_curve_style_set() failed in positive test case");
+	Eina_Bool r = EINA_FALSE;
+	
+	transit = elm_transit_add();
+	elm_transit_event_enabled_set(transit, EINA_TRUE);
+	r = elm_transit_event_enabled_get(transit);
+	
+	if (r == EINA_FALSE) {
+		tet_infoline("elm_transit_event_enabled_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_transit_curve_style_set()
+ * @brief Negative test case of ug_init elm_transit_event_block_disabled_get()
  */
-static void utc_UIFW_elm_transit_curve_style_set_func_02(void)
+static void utc_UIFW_elm_transit_event_enabled_get_func_02(void)
 {
-	transit = elm_transit_add(main_win);
-	elm_transit_curve_style_set(NULL, ELM_ANIMATOR_CURVE_OUT);
-	elm_transit_curve_style_set(transit, ELM_ANIMATOR_CURVE_OUT+1);
-	elm_transit_run(transit, 1.0);
+	Eina_Bool r = EINA_FALSE;
+	
+	transit = elm_transit_add();
+	elm_transit_event_enabled_set(transit, EINA_TRUE);
+	r = elm_transit_event_enabled_get(NULL);
 
-	/*if (r) {
-		tet_infoline("elm_transit_curve_style_set() failed in negative test case");
+	if (r == EINA_TRUE) {
+		tet_infoline("elm_transit_event_enabled_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }

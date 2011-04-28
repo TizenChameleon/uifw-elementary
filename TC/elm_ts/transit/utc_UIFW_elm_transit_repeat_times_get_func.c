@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_transit_del_func_01(void);
-static void utc_UIFW_elm_transit_del_func_02(void);
+static void utc_UIFW_elm_transit_repeat_times_get_func_01(void);
+static void utc_UIFW_elm_transit_repeat_times_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_transit_del_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_transit_del_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_repeat_times_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_repeat_times_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -73,34 +73,33 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_transit_del()
+ * @brief Positive test case of elm_transit_repeat_times_get()
  */
-static void utc_UIFW_elm_transit_del_func_01(void)
+static void utc_UIFW_elm_transit_repeat_times_get_func_01(void)
 {
-	transit = elm_transit_add();
-   	elm_transit_del(transit);
-	transit = NULL;
+   	transit = elm_transit_add();
+	elm_transit_repeat_times_set(transit, 3);
 
-	/*if (!r) {
-		tet_infoline("elm_transit_del() failed in positive test case");
+	if (elm_transit_repeat_times_get(transit) != 3) {
+		tet_infoline("elm_transit_repeat_times_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_transit_del()
+ * @brief Negative test case of ug_init elm_transit_repeat_times_get()
  */
-static void utc_UIFW_elm_transit_del_func_02(void)
+static void utc_UIFW_elm_transit_repeat_times_get_func_02(void)
 {
 	transit = elm_transit_add();
-	elm_transit_del(NULL);
+	elm_transit_repeat_times_set(NULL, 3);
 
-	/*if (r) {
-		tet_infoline("elm_transit_del() failed in negative test case");
+	if (elm_transit_repeat_times_get(transit) == 3) {
+		tet_infoline("elm_transit_repeat_times_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
-	}*/
+	}
 	tet_result(TET_PASS);
 }

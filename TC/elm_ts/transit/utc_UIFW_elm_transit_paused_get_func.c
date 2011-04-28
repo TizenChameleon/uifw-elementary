@@ -28,6 +28,7 @@
 
 
 Evas_Object *main_win;
+Elm_Transit *transit;
 
 static void startup(void);
 static void cleanup(void);
@@ -35,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_fx_zoom_add_func_01(void);
-static void utc_UIFW_elm_fx_zoom_add_func_02(void);
+static void utc_UIFW_elm_transit_paused_get_func_01(void);
+static void utc_UIFW_elm_transit_paused_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_fx_zoom_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_fx_zoom_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_paused_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_paused_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -54,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -63,19 +64,29 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
+	if ( NULL != transit ) {
+		elm_transit_del(transit);
+		transit = NULL;
+	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_fx_zoom_add()
+ * @brief Positive test case of elm_transit_paused_get()
  */
-static void utc_UIFW_elm_fx_zoom_add_func_01(void)
+static void utc_UIFW_elm_transit_paused_get_func_01(void)
 {
-	Elm_Effect *effect = elm_fx_zoom_add(main_win, 0.6, 1.0);
-	
-	if (effect == NULL) {
-		tet_infoline("elm_fx_zoom_add() failed in positive test case");
+	Evas_Object *btn = elm_button_add(main_win);
+	transit = elm_transit_add();
+	elm_transit_object_add(transit, btn);
+	elm_transit_duration_set(transit, 1);
+	elm_transit_effect_resizing_add(transit, 100, 100, 200, 200);
+	elm_transit_go(transit);
+	elm_transit_paused_set(transit, EINA_TRUE);
+
+	if (elm_transit_paused_get(transit) == EINA_FALSE) {
+		tet_infoline("elm_transit_paused_set() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -83,14 +94,19 @@ static void utc_UIFW_elm_fx_zoom_add_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_fx_zoom_add()
+ * @brief Negative test case of ug_init elm_transit_paused_get()
  */
-static void utc_UIFW_elm_fx_zoom_add_func_02(void)
+static void utc_UIFW_elm_transit_paused_get_func_02(void)
 {
-	Elm_Effect *effect = elm_fx_zoom_add(NULL, 0.6, 1.0);
+	Evas_Object *btn = elm_button_add(main_win);
+	transit = elm_transit_add();
+	elm_transit_object_add(transit, btn);
+	elm_transit_duration_set(transit, 1);
+	elm_transit_effect_resizing_add(transit, 100, 100, 200, 200);
+	elm_transit_go(transit);
 
-	if (effect != NULL) {
-		tet_infoline("elm_fx_zoom_add() failed in negative test case");
+	if (elm_transit_paused_get(NULL) == EINA_TRUE) {
+		tet_infoline("elm_transit_paused_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}

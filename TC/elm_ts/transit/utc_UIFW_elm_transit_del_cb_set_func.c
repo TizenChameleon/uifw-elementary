@@ -36,8 +36,7 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_transit_fx_insert_func_01(void);
-static void utc_UIFW_elm_transit_fx_insert_func_02(void);
+static void utc_UIFW_elm_transit_del_cb_set_func_01(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +44,7 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_transit_fx_insert_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_transit_fx_insert_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_del_cb_set_func_01, POSITIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -64,7 +62,7 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
-	if ( NULL != transit ) {
+	if ( NULL != transit) {
 		elm_transit_del(transit);
 		transit = NULL;
 	}
@@ -72,40 +70,25 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-/**
- * @brief Positive test case of elm_transit_fx_insert()
- */
-static void utc_UIFW_elm_transit_fx_insert_func_01(void)
+void _del_cb(void *data, Elm_Transit* transit)
 {
-	Eina_Bool r = EINA_FALSE;
-	
-	transit = elm_transit_add(main_win);
-	Elm_Effect *effect = elm_fx_fade_add(main_win, main_win);
-	r = elm_transit_fx_insert(transit, effect);
-
-	if (r == EINA_FALSE) {
-		tet_infoline("elm_transit_fx_insert() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
+	elm_transit_del(transit);
+	transit = NULL;
 }
-
 /**
- * @brief Negative test case of ug_init elm_transit_fx_insert()
+ * @brief Positive test case of elm_transit_del_cb_set()
  */
-static void utc_UIFW_elm_transit_fx_insert_func_02(void)
+static void utc_UIFW_elm_transit_del_cb_set_func_01(void)
 {
-	Eina_Bool r = EINA_FALSE;
-
-	transit = elm_transit_add(main_win);
-	Elm_Effect *effect = elm_fx_fade_add(main_win, main_win);
-	r = elm_transit_fx_insert(transit, NULL);
-
-	if (r == EINA_TRUE) {
-		tet_infoline("elm_transit_fx_insert() failed in negative test case");
+	elm_transit_add();
+	elm_transit_del_cb_set(transit, _del_cb, NULL);
+	elm_transit_duration_set(transit, 1.0);
+	elm_transit_go(transit);
+	
+	/*if (!r) {
+		tet_infoline("elm_transit_del_cb_set() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
-	}
+	}*/
 	tet_result(TET_PASS);
 }

@@ -36,8 +36,7 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_transit_event_block_disbled_set_func_01(void);
-static void utc_UIFW_elm_transit_event_block_disbled_set_func_02(void);
+static void utc_UIFW_elm_transit_go_func_01(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +44,7 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_transit_event_block_disbled_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_transit_event_block_disbled_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_go_func_01, POSITIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -73,41 +71,13 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_transit_event_block_disbled_set()
+ * @brief Positive test case of elm_transit_go()
  */
-static void utc_UIFW_elm_transit_event_block_disbled_set_func_01(void)
+static void utc_UIFW_elm_transit_go_func_01(void)
 {
-	Eina_Bool r = EINA_FALSE;
-	
-	transit = elm_transit_add(main_win);
-	elm_transit_event_block_disabled_set(transit, EINA_TRUE);
-	r = elm_transit_event_block_disabled_get(transit);
-	elm_transit_run(transit, 1.0);
+	transit = elm_transit_add();
+	elm_transit_duration_set(transit, 1);
+	elm_transit_go(transit);
 
-	if (r == EINA_FALSE) {
-		tet_infoline("elm_transit_event_block_disbled_set() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
-}
-
-/**
- * @brief Negative test case of ug_init elm_transit_event_block_disbled_set()
- */
-static void utc_UIFW_elm_transit_event_block_disbled_set_func_02(void)
-{
-	Eina_Bool r = EINA_FALSE;
-	
-	elm_transit_add(main_win);
-	elm_transit_event_block_disabled_set(NULL, EINA_TRUE);
-	r = elm_transit_event_block_disabled_get(NULL);
-	elm_transit_run(transit, 1.0);
-
-	if (r == EINA_TRUE) {
-		tet_infoline("elm_transit_event_block_disbled_set() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
 	tet_result(TET_PASS);
 }

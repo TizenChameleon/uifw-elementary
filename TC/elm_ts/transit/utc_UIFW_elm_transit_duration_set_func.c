@@ -28,6 +28,7 @@
 
 
 Evas_Object *main_win;
+Elm_Transit *transit;
 
 static void startup(void);
 static void cleanup(void);
@@ -35,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_fx_wipe_add_func_01(void);
-static void utc_UIFW_elm_fx_wipe_add_func_02(void);
+static void utc_UIFW_elm_transit_duration_set_func_01(void);
+static void utc_UIFW_elm_transit_duration_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_fx_wipe_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_fx_wipe_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_duration_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_duration_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -63,19 +64,24 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
+	if ( NULL != transit ) {
+		elm_transit_del(transit);
+		transit = NULL;
+	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_fx_wipe_add()
+ * @brief Positive test case of elm_transit_duration_set()
  */
-static void utc_UIFW_elm_fx_wipe_add_func_01(void)
+static void utc_UIFW_elm_transit_duration_set_func_01(void)
 {
-	Elm_Effect *effect = elm_fx_wipe_add(main_win, ELM_FX_WIPE_TYPE_SHOW, ELM_FX_WIPE_DIR_RIGHT);
+	transit = elm_transit_add();
+	elm_transit_duration_set(transit, 3);
 
-	if (effect == NULL) {
-		tet_infoline("elm_fx_wipe_add() failed in positive test case");
+	if (elm_transit_duration_get(transit) != 3) {
+		tet_infoline("elm_transit_duration_set() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -83,14 +89,15 @@ static void utc_UIFW_elm_fx_wipe_add_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_fx_wipe_add()
+ * @brief Negative test case of ug_init elm_transit_duration_set()
  */
-static void utc_UIFW_elm_fx_wipe_add_func_02(void)
+static void utc_UIFW_elm_transit_duration_set_func_02(void)
 {
-	Elm_Effect *effect = elm_fx_wipe_add(NULL, ELM_FX_WIPE_TYPE_SHOW, ELM_FX_WIPE_DIR_RIGHT);
+	transit = elm_transit_add();
+	elm_transit_duration_set(NULL, 3);
 
-	if (effect != NULL) {
-		tet_infoline("elm_fx_wipe_add() failed in negative test case");
+	if (elm_transit_duration_get(NULL) == 3) {
+		tet_infoline("elm_transit_duration_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}

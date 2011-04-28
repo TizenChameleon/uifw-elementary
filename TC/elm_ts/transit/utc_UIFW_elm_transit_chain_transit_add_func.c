@@ -28,6 +28,8 @@
 
 
 Evas_Object *main_win;
+Elm_Transit *transit;
+Elm_Transit *transit2;
 
 static void startup(void);
 static void cleanup(void);
@@ -35,8 +37,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_fx_blend_add_func_01(void);
-static void utc_UIFW_elm_fx_blend_add_func_02(void);
+static void utc_UIFW_elm_transit_chain_transit_add_func_01(void);
+static void utc_UIFW_elm_transit_chain_transit_add_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +46,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_fx_blend_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_fx_blend_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_chain_transit_add_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_chain_transit_add_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -54,7 +56,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -63,19 +65,30 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
+	if ( NULL != transit ) {
+		elm_transit_del(transit);
+		transit = NULL;
+	}
+	if ( NULL != transit2 ) {
+		elm_transit_del(transit2);
+		transit2 = NULL;
+	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_fx_blend_add()
+ * @brief Positive test case of elm_transit_chain_transit_add()
  */
-static void utc_UIFW_elm_fx_blend_add_func_01(void)
+static void utc_UIFW_elm_transit_chain_transit_add_func_01(void)
 {
-	Elm_Effect *effect = elm_fx_blend_add(main_win, main_win);
+   	transit = elm_transit_add();
+	transit2 = elm_transit_add();
 
-	if (effect == NULL) {
-		tet_infoline("elm_fx_blend_add() failed in positive test case");
+	elm_transit_chain_transit_add(transit, transit2);
+
+	if (!elm_transit_chain_transits_get(transit)) {
+		tet_infoline("elm_transit_chain_transit_add() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -83,14 +96,16 @@ static void utc_UIFW_elm_fx_blend_add_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_fx_blend_add()
+ * @brief Negative test case of ug_init elm_transit_chain_transit_add()
  */
-static void utc_UIFW_elm_fx_blend_add_func_02(void)
+static void utc_UIFW_elm_transit_chain_transit_add_func_02(void)
 {
-	Elm_Effect *effect = elm_fx_blend_add(NULL, NULL);
+   	transit = elm_transit_add();
+	transit2 = elm_transit_add();
+	elm_transit_chain_transit_add(NULL, NULL);
 
-	if (effect != NULL) {
-		tet_infoline("elm_fx_blend_add() failed in negative test case");
+	if (elm_transit_chain_transits_get(NULL)) {
+		tet_infoline("elm_transit_chain_transit_add() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}

@@ -36,8 +36,7 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_transit_resume_func_01(void);
-static void utc_UIFW_elm_transit_resume_func_02(void);
+static void utc_UIFW_elm_transit_object_remove_func_01(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +44,7 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_transit_resume_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_transit_resume_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_transit_object_remove_func_01, POSITIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -64,7 +62,7 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
-	if ( NULL != transit) {
+	if ( NULL != transit ) {
 		elm_transit_del(transit);
 		transit = NULL;
 	}
@@ -72,38 +70,16 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
+
 /**
- * @brief Positive test case of elm_transit_resume()
+ * @brief Negative test case of elm_transit_object_remove()
  */
-static void utc_UIFW_elm_transit_resume_func_01(void)
+static void utc_UIFW_elm_transit_object_remove_func_01(void)
 {
-	transit = elm_transit_add(main_win);
-	elm_transit_run(transit, 1.0);
-	elm_transit_pause(transit);
-	elm_transit_resume(transit);
-	
-	/*if (!r) {
-		tet_infoline("elm_transit_resume() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}*/
+   	transit = elm_transit_add();
+	Evas_Object *btn = elm_button_add(main_win);
+	elm_transit_object_add(transit, btn);
+	elm_transit_object_remove(transit, btn);
 	tet_result(TET_PASS);
 }
 
-/**
- * @brief Negative test case of ug_init elm_transit_resume()
- */
-static void utc_UIFW_elm_transit_resume_func_02(void)
-{
-	transit = elm_transit_add(main_win);
-	elm_transit_run(transit, 1.0);
-	elm_transit_pause(transit);
-	elm_transit_resume(NULL);
-
-	/*if (r) {
-		tet_infoline("elm_transit_resume() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}*/
-	tet_result(TET_PASS);
-}

@@ -1,33 +1,43 @@
 CC ?= gcc
 
-TARGETS = uts_elm_transit_add_func \
-	  uts_elm_transit_auto_reverse_set_func \
-	  uts_elm_transit_completion_callback_set_func \
-	  uts_elm_transit_curve_style_set_func \
-	  uts_elm_transit_del_func \
-	  uts_elm_transit_event_block_disabled_get_func \
-	  uts_elm_transit_event_block_disabled_set_func \
-	  uts_elm_transit_fx_clear_func \
-	  uts_elm_transit_fx_insert_func \
-	  uts_elm_transit_pause_func \
-	  uts_elm_transit_repeat_set_func \
-	  uts_elm_transit_resume_func \
-	  uts_elm_transit_run_func \
-	  uts_elm_transit_stop_func \
-	  uts_elm_transit_fx_blend_add_func \
-     uts_elm_transit_fx_color_add_func \
-     uts_elm_transit_fx_fade_add_func \
-	  uts_elm_transit_fx_flip_add_func \
-	  uts_elm_transit_fx_image_animation_add_func \
-     uts_elm_transit_fx_resizable_flip_add_func \
-     uts_elm_transit_fx_resizing_add_func \
-	  uts_elm_transit_fx_rotation3d_add_func \
-     uts_elm_transit_fx_roation_add_func \
-	  uts_elm_transit_fx_translation_add_func \
-	  uts_elm_transit_fx_wipe_add_func \
-	  uts_elm_transit_fx_zoom_add_func \
+TARGETS = utc_UIFW_elm_transit_add_func \
+	  utc_UIFW_elm_transit_del_func \
+  	  utc_UIFW_elm_transit_effect_add_func \
+  	  utc_UIFW_elm_transit_effect_del_func \
+  	  utc_UIFW_elm_transit_object_add_func \
+  	  utc_UIFW_elm_transit_object_remove_func \
+  	  utc_UIFW_elm_transit_objects_get_func \
+  	  utc_UIFW_elm_transit_objects_final_state_keep_set_func \
+ 	  utc_UIFW_elm_transit_objects_final_state_keep_get_func \
+ 	  utc_UIFW_elm_transit_event_enabled_set_func \
+ 	  utc_UIFW_elm_transit_event_enabled_get_func \
+ 	  utc_UIFW_elm_transit_del_cb_set_func \
+  	  utc_UIFW_elm_transit_auto_reverse_set_func \
+	  utc_UIFW_elm_transit_auto_reverse_get_func \
+	  utc_UIFW_elm_transit_repeat_times_set_func \
+	  utc_UIFW_elm_transit_repeat_times_get_func \
+	  utc_UIFW_elm_transit_tween_mode_set_func \
+	  utc_UIFW_elm_transit_duration_set_func \
+	  utc_UIFW_elm_transit_duration_get_func \
+	  utc_UIFW_elm_transit_go_func \
+	  utc_UIFW_elm_transit_paused_set_func \
+	  utc_UIFW_elm_transit_paused_get_func \
+	  utc_UIFW_elm_transit_progress_value_get_func \
+	  utc_UIFW_elm_transit_chain_transit_add_func \
+	  utc_UIFW_elm_transit_chain_transits_get_func \
+	  utc_UIFW_elm_transit_effect_blend_add_func \
+	  utc_UIFW_elm_transit_effect_resizing_add_func \
+	  utc_UIFW_elm_transit_effect_translation_add_func \
+	  utc_UIFW_elm_transit_effect_zoom_add_func \
+	  utc_UIFW_elm_transit_effect_flip_add_func \
+	  utc_UIFW_elm_transit_effect_resizable_flip_add_func \
+	  utc_UIFW_elm_transit_effect_wipe_add_func \
+	  utc_UIFW_elm_transit_effect_color_add_func \
+	  utc_UIFW_elm_transit_effect_fade_add_func \
+	  utc_UIFW_elm_transit_effect_rotation_add_func \
+	  utc_UIFW_elm_transit_effect_image_animation_add_func
 
-PKGS = elementary
+PKGS = elementary evas eina
 
 LDFLAGS = `pkg-config --libs $(PKGS)`
 LDFLAGS += $(TET_ROOT)/lib/tet3/tcm_s.o
@@ -40,8 +50,8 @@ CFLAGS += -Wall
 
 all: $(TARGETS)
 
-$(TARGET): %: %.c
-	$(CC) -o $@ $< $(CFLAGS) $(LDFLAGS)
+$(TARGETS): %: %.c
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 clean:
 	rm -f $(TARGETS)
