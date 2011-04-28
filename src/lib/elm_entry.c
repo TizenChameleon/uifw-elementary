@@ -2454,6 +2454,8 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    wd->single_line = EINA_TRUE;
    wd->linewrap = EINA_FALSE;
    wd->char_linewrap = EINA_FALSE;
+   if (_elm_config->password_show_last_character)
+     wd->show_last_character = EINA_TRUE;
    _theme_hook(obj);
 }
 
