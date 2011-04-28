@@ -184,7 +184,7 @@
 # warning "there. You only need a widget if you want to seamlessly be part"
 # warning "of the focus tree and want to transparently become a container"
 # warning "for any number of child Elementary widgets"
-# error "ERROR. Compile aborted."
+//# error "ERROR. Compile aborted."
 #endif
 #define ELM_INTERNAL_API_VERSION 7000
 
