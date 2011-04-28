@@ -426,7 +426,6 @@ struct _Widget_Data
         Evas_Coord cx, cy;
         double level;
    } pinch_zoom;
-
 };
 
 struct _Mod_Api
@@ -1639,15 +1638,13 @@ _mouse_multi_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *eve
    elm_smart_scroller_hold_set(wd->scr, 1);
    elm_smart_scroller_freeze_set(wd->scr, 1);
 
-   if ((wd->multi_count + 1) > 1) goto done;
-   else wd->multi_count++;
-
    ev = create_event_object(data, obj, down->device);
    if (!ev)
      {
         DBG("Failed : create_event_object");
         goto done;
      }
+   wd->multi_count++;
 
    ev->hold_timer = NULL;
    ev->start.x = ev->prev.x = down->output.x;
@@ -1682,7 +1679,7 @@ _mouse_multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__
    ev0 = get_event_object(data, 0);
    if (!ev0) return;
 
-   if (wd->multi_count == 1)
+   if (wd->multi_count >= 1)
      {
         Evas_Coord x, y, w, h;
         float half_w, half_h;
