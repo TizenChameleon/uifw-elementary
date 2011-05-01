@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build170) unstable; urgency=low
+
+  * Package Upload : updated transit.
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build170
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Sun, 01 May 2011 16:53:36 +0900
+
 elementary (1.0.0+svn.51480slp2+build169) unstable; urgency=low
 
   * Package Upload : mutibutton entry is opimized
