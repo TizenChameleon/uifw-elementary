@@ -513,7 +513,7 @@ elm_tickernoti_rotation_get (const Evas_Object *obj)
  * Set the rotation used on the tickernoti object
  *
  * @param obj The tickernotil object
- * @param angle The rotation angle will be used on the tickernoti object
+ * @param angle The rotation angle(in degree) will be used on the tickernoti object
  * @ingroup TickerNoti
  */
 EAPI void
@@ -521,15 +521,19 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
    Evas_Coord x, y, w, h;
+
+   if (!wd) return;
+   if (angle%90 != 0) return;
+
+   if (angle >= 0)
+     angle = angle%360;
+   else
+     angle = angle - (angle/360 - 1)*360;
+
+   wd->angle = angle;
 #ifdef HAVE_ELEMENTARY_X
    Evas_Coord root_w, root_h;
-
-   if (angle%90 != 0) return;
-   wd->angle = angle;
-
    /* 
    * manual calculate win_tickernoti_indi window position & size 
    *  - win_indi is not full size window (480 x 27)
@@ -551,7 +555,7 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
          x = 0;
          y = 0;
          break;
-      case -90:
+      case 270:
 #ifdef HAVE_ELEMENTARY_X
          w = root_h;
 #endif
