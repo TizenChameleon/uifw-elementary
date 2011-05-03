@@ -659,7 +659,8 @@ _del_button_item(Elm_Multibuttonentry_Item *item)
    if (wd->view_state == MULTIBUTTONENTRY_VIEW_CONTRACTED)
      _contracted_state_set(obj, 1);
 
-   evas_object_smart_callback_call(obj, "item,added", item);
+   if (!eina_list_count(wd->items))
+     _set_vis_guidetext(obj);
 }
 
 static void
