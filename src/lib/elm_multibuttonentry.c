@@ -718,15 +718,18 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
    Elm_Multibuttonentry_Item *item;
    Evas_Object *btn;
    Evas_Coord width, height;
+   const char *str_utf8 = NULL;
+
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd || !wd->box || !wd->entry) return NULL;
 
    // add button
    btn = edje_object_add(evas_object_evas_get(obj));
+   str_utf8 = elm_entry_markup_to_utf8(str);
 
    _elm_theme_object_set(obj, btn, "multibuttonentry", "btn", elm_widget_style_get(obj));
-   edje_object_part_text_set(btn, "elm.btn.text", str);
+   edje_object_part_text_set(btn, "elm.btn.text", str_utf8);
    edje_object_part_geometry_get(btn, "elm.btn.text", NULL, NULL, &width, &height);
    evas_object_size_hint_min_set(btn, width, height);
    edje_object_signal_callback_add(btn, "mouse,clicked,1", "*", _button_clicked, obj);
@@ -837,6 +840,8 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
           }
      }
    evas_object_smart_callback_call(obj, "item,added", item);
+
+   free(str_utf8);
 
    return item;
 }
