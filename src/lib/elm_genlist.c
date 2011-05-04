@@ -5685,13 +5685,13 @@ elm_genlist_reorder_mode_get(const Evas_Object *obj)
 }
 
 EAPI void
-elm_genlist_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after)
+elm_genlist_item_move_after(Elm_Genlist_Item *it __UNUSED__, Elm_Genlist_Item *after __UNUSED__)
 {
    return;
 }
 
 EAPI void
-elm_genlist_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before)
+elm_genlist_item_move_before(Elm_Genlist_Item *it __UNUSED__, Elm_Genlist_Item *before __UNUSED__)
 {
    return;
 }
@@ -6015,7 +6015,7 @@ _elm_genlist_pinch_zoom_execute(Evas_Object *obj, Eina_Bool emode)
  * @ingroup Genlist
  */
 EAPI void
-elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode)
+elm_genlist_pinch_zoom_mode_set(Evas_Object *obj __UNUSED__, Eina_Bool emode __UNUSED__)
 {
    printf("!!! NOW FIXING \n");
 }
@@ -6030,14 +6030,14 @@ elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode)
  * @ingroup Genlist
  */
 EAPI Eina_Bool
-elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj)
+elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj __UNUSED__)
 {
    printf("!!! NOW FIXING \n");
    return EINA_FALSE;
 }
 
 EAPI void
-elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode)
+elm_genlist_pinch_zoom_set(Evas_Object *obj __UNUSED__, Eina_Bool emode __UNUSED__)
 {
    printf("!!! NOW FIXING \n");
 }
@@ -6244,7 +6244,7 @@ elm_genlist_edit_mode_set(Evas_Object *obj, Eina_Bool edit_mode)
  * @ingroup Genlist
  */
 EAPI void
-elm_genlist_edit_selected_items_del(Evas_Object *obj)
+elm_genlist_edit_selected_items_del(Evas_Object *obj __UNUSED__)
 {
    fprintf(stderr, "=================> Caution!!! <========================\n");
    fprintf(stderr, "==> elm_genlist_edit_selected_items_del() is deprecated. <=======\n");
@@ -6252,7 +6252,7 @@ elm_genlist_edit_selected_items_del(Evas_Object *obj)
 }
 
 EAPI void
-elm_genlist_selected_items_del(Evas_Object *obj)
+elm_genlist_selected_items_del(Evas_Object *obj __UNUSED__)
 {
    fprintf(stderr, "=================> Caution!!! <========================\n");
    fprintf(stderr, "==> elm_genlist_selected_items_del() is deprecated. <=======\n");
@@ -6275,7 +6275,7 @@ elm_genlist_selected_items_del(Evas_Object *obj)
  * @ingroup Genlist
  */
 EAPI Eina_List *
-elm_genlist_edit_selected_items_get(const Evas_Object *obj)
+elm_genlist_edit_selected_items_get(const Evas_Object *obj __UNUSED__)
 {
    fprintf(stderr, "========================> Caution!!! <==========================\n");
    fprintf(stderr, "==> elm_genlist_edit_selected_items_get() is deprecated. <=======\n");
@@ -6285,8 +6285,8 @@ elm_genlist_edit_selected_items_get(const Evas_Object *obj)
 
 // TODO : add comment
 EAPI void
-elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it,
-                                   Eina_Bool         selected)
+elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it __UNUSED__,
+                                   Eina_Bool         selected __UNUSED__)
 {
    fprintf(stderr, "========================> Caution!!! <==========================\n");
    fprintf(stderr, "==> elm_genlist_edit_item_selected_set() is deprecated. <=======\n");
@@ -6295,7 +6295,7 @@ elm_genlist_edit_item_selected_set(Elm_Genlist_Item *it,
 
 // TODO : add comment
 EAPI Eina_Bool
-elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it)
+elm_genlist_edit_item_selected_get(const Elm_Genlist_Item *it __UNUSED__)
 {
    fprintf(stderr, "========================> Caution!!! <==========================\n");
    fprintf(stderr, "==> elm_genlist_edit_item_selected_get() is deprecated. <=======\n");
