@@ -4,7 +4,7 @@ export MACHINE=`echo $DEB_BUILD_ARCH_ABI`
 
 if [ $MACHINE = "gnu" ]
 then
-	TET_SCEN_FILE=tet_scen_i686
+	TET_SCEN_FILE=tet_scen_i386
 else
 	TET_SCEN_FILE=tet_scen_arm
 fi
