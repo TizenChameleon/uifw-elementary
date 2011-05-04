@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build173) unstable; urgency=low
+
+  * Package upload
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build173
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Wed, 04 May 2011 19:11:23 +0900
+
 elementary (1.0.0+svn.51480slp2+build172) unstable; urgency=low
 
   * Fixed elm_util bug.
