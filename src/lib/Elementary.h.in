@@ -708,7 +708,7 @@ extern "C" {
    EAPI void                elm_box_transition_free(void *data);
    /* smart callbacks called:
     */
-   typedef enum 
+   typedef enum
      {
 	UIControlStateDefault,
 	UIControlStateHighlighted,
@@ -1226,7 +1226,7 @@ extern "C" {
         ELM_INPUT_PANEL_LAYOUT_NUMBER,          /**< Number layout */
         ELM_INPUT_PANEL_LAYOUT_EMAIL,           /**< Email layout */
         ELM_INPUT_PANEL_LAYOUT_URL,             /**< URL layout */
-        ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,     /**< Phone Number layout */  
+        ELM_INPUT_PANEL_LAYOUT_PHONENUMBER,     /**< Phone Number layout */
         ELM_INPUT_PANEL_LAYOUT_IP,              /**< IP layout */
         ELM_INPUT_PANEL_LAYOUT_MONTH,           /**< Month layout */
         ELM_INPUT_PANEL_LAYOUT_NUMBERONLY,      /**< Number Only layout */
@@ -1241,7 +1241,7 @@ extern "C" {
         ELM_INPUT_PANEL_LAYOUT_CUSTOM_9,
         ELM_INPUT_PANEL_LAYOUT_CUSTOM_10
      } Elm_Input_Panel_Layout;
-   
+
    typedef struct _Elm_Hoversel_Item Elm_Hoversel_Item; /**< Item of Elm_Hoversel. Sub-type of Elm_Widget_Item */
 
    EAPI Evas_Object *elm_entry_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
@@ -1435,7 +1435,7 @@ extern "C" {
    /* smart callbacks called:
     * "clicked" - the user clicked the bubble
     * "sweep,left,right" - when bubble is sweeped from left to right, this signal is sent.
-    * "sweep,right,left" - when bubble is sweeped from right to left, this signal is sent.  
+    * "sweep,right,left" - when bubble is sweeped from right to left, this signal is sent.
     */
 
    /* photo */
@@ -1779,7 +1779,7 @@ extern "C" {
     */
 
 
-   /* actionslider */           
+   /* actionslider */
 
    typedef enum _Elm_Actionslider_Pos
      {
@@ -1789,10 +1789,10 @@ extern "C" {
         ELM_ACTIONSLIDER_RIGHT = 1 << 2,
         ELM_ACTIONSLIDER_ALL = (1 << 3) -1
      } Elm_Actionslider_Pos;
-             
-   typedef enum _Elm_Actionslider_Indicator_Pos  
-     {        
-        ELM_ACTIONSLIDER_INDICATOR_NONE,                                 
+
+   typedef enum _Elm_Actionslider_Indicator_Pos
+     {
+        ELM_ACTIONSLIDER_INDICATOR_NONE,
         ELM_ACTIONSLIDER_INDICATOR_LEFT,
         ELM_ACTIONSLIDER_INDICATOR_RIGHT,
         ELM_ACTIONSLIDER_INDICATOR_CENTER
@@ -1802,7 +1802,7 @@ extern "C" {
      {
         ELM_ACTIONSLIDER_MAGNET_NONE = 0,
         ELM_ACTIONSLIDER_MAGNET_LEFT = 1 << 0,
-        ELM_ACTIONSLIDER_MAGNET_CENTER = 1 << 1, 
+        ELM_ACTIONSLIDER_MAGNET_CENTER = 1 << 1,
         ELM_ACTIONSLIDER_MAGNET_RIGHT= 1 << 2,
         ELM_ACTIONSLIDER_MAGNET_ALL = (1 << 3) -1,
         ELM_ACTIONSLIDER_MAGNET_BOTH = (1 << 3)
@@ -1978,9 +1978,9 @@ extern "C" {
     * "unrealized" - This is called just before an item is unrealized. After
     *                this call icon objects provided will be deleted and the item object
     *                itself delete or be put into a floating cache.
-    * "drag,start,up" - This is called when the item in the list has been dragged 
+    * "drag,start,up" - This is called when the item in the list has been dragged
     *                   (not scrolled) up.
-    * "drag,start,down" - This is called when the item in the list has been dragged 
+    * "drag,start,down" - This is called when the item in the list has been dragged
     *                     (not scrolled) down.
     * "drag,start,left" - This is called when the item in the list has been dragged i
     *                     (not scrolled) left.
@@ -2792,7 +2792,7 @@ extern "C" {
         ELM_DATEFIELD_LAYOUT_DATE,
         ELM_DATEFIELD_LAYOUT_DATEANDTIME
      } Elm_Datefield_Layout;
-  
+
    EAPI Evas_Object *elm_datefield_add(Evas_Object *parent);
    EAPI void         elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
    EAPI Elm_Datefield_Layout elm_datefield_layout_get(const Evas_Object *obj);
@@ -2802,23 +2802,23 @@ extern "C" {
    EAPI void         elm_datefield_date_max_get(const Evas_Object *obj, int *year, int *month, int *day);
    EAPI Eina_Bool elm_datefield_date_min_set(Evas_Object *obj, int year, int month, int day);
    EAPI void         elm_datefield_date_min_get(const Evas_Object *obj, int *year, int *month, int *day);
-   EAPI void         elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);    
+   EAPI void         elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);
    EAPI Eina_Bool    elm_datefield_time_mode_get(const Evas_Object *obj);
    EAPI void         elm_datefield_date_format_set(Evas_Object *obj, const char *fmt);
    EAPI const char  *elm_datefield_date_format_get(const Evas_Object *obj);
    EAPI void         elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data);
-   EAPI void         elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value));  
+   EAPI void         elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value));
    /* smart callbacks called:
    * "changed" - when datefield entry is changed, this signal is sent.
    */
-   
+
    /* popup */
    typedef enum _Elm_Popup_Response
      {
         ELM_POPUP_RESPONSE_NONE = -1,
         ELM_POPUP_RESPONSE_TIMEOUT = -2,
         ELM_POPUP_RESPONSE_OK = -3,
-        ELM_POPUP_RESPONSE_CANCEL = -4,	
+        ELM_POPUP_RESPONSE_CANCEL = -4,
         ELM_POPUP_RESPONSE_CLOSE = -5
      } Elm_Popup_Response;
 
@@ -2863,7 +2863,7 @@ extern "C" {
    EAPI int          elm_popup_run(Evas_Object *obj);
 
    /* NavigationBar */
-   typedef enum 
+   typedef enum
      {
         ELM_NAVIGATIONBAR_FUNCTION_BUTTON1,
         ELM_NAVIGATIONBAR_FUNCTION_BUTTON2,
@@ -2894,7 +2894,7 @@ extern "C" {
    EAPI Evas_Object *elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content);
 
      /* NavigationBar */
-   typedef enum 
+   typedef enum
      {
         ELM_NAVIGATIONBAR_EX_BACK_BUTTON,
         ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1,
@@ -2932,18 +2932,18 @@ extern "C" {
    EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
    EAPI void         elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, Eina_Bool visible);
    Eina_Bool         elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item);
-   
-   
+
+
    /* Control Bar */
-   #define CONTROLBAR_SYSTEM_ICON_ALBUMS "controlbar_albums" 
-   #define CONTROLBAR_SYSTEM_ICON_ARTISTS "controlbar_artists" 
-   #define CONTROLBAR_SYSTEM_ICON_SONGS "controlbar_songs" 
-   #define CONTROLBAR_SYSTEM_ICON_PLAYLIST "controlbar_playlist" 
-   #define CONTROLBAR_SYSTEM_ICON_MORE "controlbar_more" 
-   #define CONTROLBAR_SYSTEM_ICON_CONTACTS "controlbar_contacts" 
-   #define CONTROLBAR_SYSTEM_ICON_DIALER "controlbar_dialer" 
-   #define CONTROLBAR_SYSTEM_ICON_FAVORITES "controlbar_favorites" 
-   #define CONTROLBAR_SYSTEM_ICON_LOGS "controlbar_logs" 
+   #define CONTROLBAR_SYSTEM_ICON_ALBUMS "controlbar_albums"
+   #define CONTROLBAR_SYSTEM_ICON_ARTISTS "controlbar_artists"
+   #define CONTROLBAR_SYSTEM_ICON_SONGS "controlbar_songs"
+   #define CONTROLBAR_SYSTEM_ICON_PLAYLIST "controlbar_playlist"
+   #define CONTROLBAR_SYSTEM_ICON_MORE "controlbar_more"
+   #define CONTROLBAR_SYSTEM_ICON_CONTACTS "controlbar_contacts"
+   #define CONTROLBAR_SYSTEM_ICON_DIALER "controlbar_dialer"
+   #define CONTROLBAR_SYSTEM_ICON_FAVORITES "controlbar_favorites"
+   #define CONTROLBAR_SYSTEM_ICON_LOGS "controlbar_logs"
 
    typedef enum _Elm_Controlbar_Mode_Type
      {
@@ -3123,9 +3123,9 @@ extern "C" {
    EAPI Elm_Transit_Effect *elm_transit_effect_image_animation_add(Elm_Transit *transit, Eina_List *images);
 
    /* colorpalette */
-   typedef struct _Colorpalette_Color Elm_Colorpalette_Color; 
+   typedef struct _Colorpalette_Color Elm_Colorpalette_Color;
 
-   struct _Colorpalette_Color 
+   struct _Colorpalette_Color
      {
         unsigned int r, g, b;
      };
@@ -3158,17 +3158,17 @@ extern "C" {
     * "unfocused" - when an editfield is unfocused
     */
 
-   
+
    /* Sliding Drawer */
-   typedef enum _Elm_SlidingDrawer_Pos 
+   typedef enum _Elm_SlidingDrawer_Pos
      {
         ELM_SLIDINGDRAWER_BOTTOM,
         ELM_SLIDINGDRAWER_LEFT,
         ELM_SLIDINGDRAWER_RIGHT,
         ELM_SLIDINGDRAWER_TOP
      } Elm_SlidingDrawer_Pos;
- 
-   typedef struct _Elm_SlidingDrawer_Drag_Value 
+
+   typedef struct _Elm_SlidingDrawer_Drag_Value
      {
         double x, y;
      } Elm_SlidingDrawer_Drag_Value;
@@ -3179,7 +3179,7 @@ extern "C" {
    EAPI void         elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos);
    EAPI void         elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh);
    EAPI void         elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy);
-   
+
    /* multibuttonentry */
    typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
    EAPI Evas_Object               *elm_multibuttonentry_add(Evas_Object *parent);
@@ -3209,23 +3209,23 @@ extern "C" {
    EAPI void                      *elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item);
    EAPI void                       elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data);
    /* smart callback called:
-    * "selected" - This signal is emitted when the selected item of multibuttonentry is changed. 
+    * "selected" - This signal is emitted when the selected item of multibuttonentry is changed.
     * "added" - This signal is emitted when a new multibuttonentry item is added.
     * "deleted" - This signal is emitted when a multibuttonentry item is deleted.
-    * "expanded" - This signal is emitted when a multibuttonentry is expanded. 
-    * "contracted" - This signal is emitted when a multibuttonentry is contracted. 
-    * "contracted,state,changed" - This signal is emitted when the contracted state of multibuttonentry is changed. 
-    * "item,selected" - This signal is emitted when the selected item of multibuttonentry is changed. 
+    * "expanded" - This signal is emitted when a multibuttonentry is expanded.
+    * "contracted" - This signal is emitted when a multibuttonentry is contracted.
+    * "contracted,state,changed" - This signal is emitted when the contracted state of multibuttonentry is changed.
+    * "item,selected" - This signal is emitted when the selected item of multibuttonentry is changed.
     * "item,added" - This signal is emitted when a new multibuttonentry item is added.
     * "item,deleted" - This signal is emitted when a multibuttonentry item is deleted.
-    * "item,clicked" - This signal is emitted when a multibuttonentry item is clicked. 
-    * "clicked" - This signal is emitted when a multibuttonentry is clicked. 
-    * "unfocused" - This signal is emitted when a multibuttonentry is unfocused. 
+    * "item,clicked" - This signal is emitted when a multibuttonentry item is clicked.
+    * "clicked" - This signal is emitted when a multibuttonentry is clicked.
+    * "unfocused" - This signal is emitted when a multibuttonentry is unfocused.
     */
    /* available styles:
     * default
     */
- 
+
    /* stackedicon */
    typedef struct _Stackedicon_Item Elm_Stackedicon_Item;
    EAPI Evas_Object          *elm_stackedicon_add(Evas_Object *parent);
@@ -3234,7 +3234,7 @@ extern "C" {
    EAPI void                  elm_stackedicon_item_del(Elm_Stackedicon_Item *it);
    EAPI Eina_List            *elm_stackedicon_item_list_get(Evas_Object *obj);
    /* smart callback called:
-    * "expanded" - This signal is emitted when a stackedicon is expanded. 
+    * "expanded" - This signal is emitted when a stackedicon is expanded.
     * "clicked" - This signal is emitted when a stackedicon is clicked.
     */
    /* available styles:
@@ -3243,7 +3243,7 @@ extern "C" {
 
    /* dialoguegroup */
    typedef struct _Dialogue_Item Dialogue_Item;
-   
+
    typedef enum _Elm_Dialoguegourp_Item_Style
      {
         ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT = 0,
@@ -3275,23 +3275,23 @@ extern "C" {
    EINA_DEPRECATED EAPI Elm_Dialoguegroup_Item_Style	elm_dialoguegroup_item_style_get(Dialogue_Item *item);
    EINA_DEPRECATED EAPI void           elm_dialoguegroup_item_disabled_set(Dialogue_Item *item, Eina_Bool disabled);
    EINA_DEPRECATED EAPI Eina_Bool      elm_dialoguegroup_item_disabled_get(Dialogue_Item *item);
- 
+
    /* Dayselector */
-   typedef enum 
-     { 
-        ELM_DAYSELECTOR_SUN, 
-        ELM_DAYSELECTOR_MON, 
-        ELM_DAYSELECTOR_TUE, 
-        ELM_DAYSELECTOR_WED, 
-        ELM_DAYSELECTOR_THU, 
-        ELM_DAYSELECTOR_FRI, 
-        ELM_DAYSELECTOR_SAT 
+   typedef enum
+     {
+        ELM_DAYSELECTOR_SUN,
+        ELM_DAYSELECTOR_MON,
+        ELM_DAYSELECTOR_TUE,
+        ELM_DAYSELECTOR_WED,
+        ELM_DAYSELECTOR_THU,
+        ELM_DAYSELECTOR_FRI,
+        ELM_DAYSELECTOR_SAT
      } Elm_DaySelector_Day;
 
    EAPI Evas_Object *elm_dayselector_add(Evas_Object *parent);
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
    EAPI void         elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked);
-   
+
    /* NoContents */
    EAPI Evas_Object *elm_nocontents_add(Evas_Object *parent);
    EAPI void         elm_nocontents_label_set(Evas_Object *obj, const char *label);
@@ -3300,9 +3300,9 @@ extern "C" {
    EAPI Evas_Object *elm_nocontents_custom_get(const Evas_Object *obj);
 
    /* TickerNoti */
-   typedef enum 
-     { 
-        ELM_TICKERNOTI_DEFAULT, 
+   typedef enum
+     {
+        ELM_TICKERNOTI_DEFAULT,
         ELM_TICKERNOTI_DETAILVIEW
      } Elm_Tickernoti_Mode;
 
@@ -3324,7 +3324,7 @@ extern "C" {
    EAPI Elm_Tickernoti_Mode  elm_tickernoti_mode_get (const Evas_Object *obj);
 
    /* Image Slider */
-   typedef struct _Imageslider_Item Elm_Imageslider_Item;   
+   typedef struct _Imageslider_Item Elm_Imageslider_Item;
    typedef void (*Elm_Imageslider_Cb)(void *data, Evas_Object *obj, void *event_info);
    EAPI Evas_Object           *elm_imageslider_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data) EINA_ARG_NONNULL(1);
