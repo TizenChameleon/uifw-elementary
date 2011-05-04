@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.51480slp2+build172) unstable; urgency=low
+
+  * Fixed elm_util bug.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.51480slp2+build172
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Wed, 04 May 2011 11:20:46 +0900
+
 elementary (1.0.0+svn.51480slp2+build171) unstable; urgency=low
 
   * Package upload
