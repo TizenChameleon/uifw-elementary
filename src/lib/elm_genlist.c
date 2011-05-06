@@ -2017,6 +2017,8 @@ _item_realize(Elm_Genlist_Item *it,
                        evas_object_show(ic);
                        elm_widget_sub_object_add(it->base.widget, ic);
                        evas_object_event_callback_add(ic, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
+                       if (it->disabled)
+                         elm_widget_disabled_set(ic, EINA_TRUE);
                     }
                }
              if (it->wd->rename_it && it->renamed)
@@ -3151,6 +3153,8 @@ _mode_item_realize(Elm_Genlist_Item *it)
                   edje_object_part_swallow(it->mode_view, key, ic);
                   evas_object_show(ic);
                   elm_widget_sub_object_add(it->base.widget, ic);
+                  if (it->disabled)
+                    elm_widget_disabled_set(ic, EINA_TRUE);
                }
           }
      }
@@ -4316,7 +4320,7 @@ elm_genlist_item_selected_set(Elm_Genlist_Item *it,
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    Widget_Data *wd = elm_widget_data_get(it->base.widget);
    if (!wd) return;
-   if (it->delete_me) return;
+   if ((it->delete_me) || (it->disabled)) return;
    selected = !!selected;
    if (it->selected == selected) return;
 
@@ -4441,15 +4445,21 @@ elm_genlist_item_disabled_set(Elm_Genlist_Item *it,
                               Eina_Bool         disabled)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
+   Eina_List *l;
+   Evas_Object *obj;
    if (it->disabled == disabled) return;
    if (it->delete_me) return;
    it->disabled = disabled;
+   if (it->selected)
+     elm_genlist_item_selected_set(it, EINA_FALSE);
    if (it->realized)
      {
         if (it->disabled)
           edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
         else
           edje_object_signal_emit(it->base.view, "elm,state,enabled", "elm");
+        EINA_LIST_FOREACH(it->icon_objs, l, obj)
+           elm_widget_disabled_set(obj, disabled);
      }
 }
 
@@ -6114,6 +6124,8 @@ _effect_item_realize(Elm_Genlist_Item *it, Eina_Bool effect_on)
                        edje_object_part_swallow(it->edit_obj, key, ic);
                        evas_object_show(ic);
                        elm_widget_sub_object_add(it->base.widget, ic);
+                       if (it->disabled)
+                         elm_widget_disabled_set(ic, EINA_TRUE);
                     }
                }
           }
@@ -6418,6 +6430,7 @@ elm_genlist_item_mode_set(Elm_Genlist_Item *it,
 
    if (!wd) return;
    if (!mode_type) return;
+   if ((it->delete_me) || (it->disabled)) return;
 
    if ((wd->mode_item == it) &&
        (!strcmp(mode_type, wd->mode_type)) &&
