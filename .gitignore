@@ -4,16 +4,13 @@
 *.la
 .libs
 .deps
-*.swp
+.*.swp
 *.pc
 Makefile
 Makefile.in
 *.so
 *.edj
-*~
 src/lib/Elementary.h
-src/lib/Makefile
-src/lib/Makefile.in
 elementary_config
 elementary_quicklaunch
 elementary_run
@@ -21,6 +18,7 @@ elementary_test
 elementary_testql
 /aclocal.m4
 /autom4te.cache/
+/config.cache
 /config.guess
 /config.log
 /config.status
