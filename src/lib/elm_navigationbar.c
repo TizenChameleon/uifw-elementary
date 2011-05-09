@@ -382,7 +382,7 @@ _transition_complete_cb(void *data)
                edje_object_signal_emit(wd->base, "elm,action,pop", "elm");
              else
                edje_object_signal_emit(wd->base, "elm,action,push", "elm");
-             edje_object_signal_emit(wd->base, "elm,state,rect,enabled", "elm");
+             evas_object_pass_events_set(wd->base, EINA_TRUE);
           }
         if (it->title_obj)
           {
@@ -445,7 +445,7 @@ _hide_finished(void *data, Evas_Object *obj __UNUSED__, void *event_info)
    Widget_Data *wd =  elm_widget_data_get(navi_bar);
    wd->popping = EINA_FALSE;
    evas_object_smart_callback_call(navi_bar, SIG_HIDE_FINISHED, event_info);
-   edje_object_signal_emit(wd->base, "elm,state,rect,disabled", "elm");
+   evas_object_pass_events_set(wd->base, EINA_FALSE);
 }
 
 static void
@@ -581,6 +581,8 @@ elm_navigationbar_add(Evas_Object *parent)
    wd->title_visible = EINA_TRUE;
 
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
+
+   //TODO: apply elm_object_disabled_set
 
    return obj;
 }
