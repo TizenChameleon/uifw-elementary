@@ -80,9 +80,9 @@ static void cleanup(void)
 static void utc_UIFW_elm_navigationbar_ex_item_title_object_set_func_01(void)
 {
 	Evas_Object *title_obj = elm_segment_control_add(navi_ex);
-	elm_segment_control_add_segment(title_obj, NULL, "Sg1", EINA_FALSE);
-	elm_segment_control_add_segment(title_obj, NULL, "Sg2", EINA_FALSE);
-	elm_segment_control_add_segment(title_obj, NULL, "Sg3", EINA_FALSE);
+	elm_segment_control_item_add(title_obj, NULL, "Sg1" );
+	elm_segment_control_item_add(title_obj, NULL, "Sg2" );
+	elm_segment_control_item_add(title_obj, NULL, "Sg3" );
 	evas_object_show(title_obj);
 	elm_navigationbar_ex_item_title_object_set(item, title_obj);
 	tet_result(TET_PASS);
@@ -94,9 +94,9 @@ static void utc_UIFW_elm_navigationbar_ex_item_title_object_set_func_01(void)
 static void utc_UIFW_elm_navigationbar_ex_item_title_object_set_func_02(void)
 {
 	Evas_Object *title_obj = elm_segment_control_add(navi_ex);
-	elm_segment_control_add_segment(title_obj, NULL, "Sg1", EINA_FALSE);
-	elm_segment_control_add_segment(title_obj, NULL, "Sg2", EINA_FALSE);
-	elm_segment_control_add_segment(title_obj, NULL, "Sg3", EINA_FALSE);
+	elm_segment_control_item_add(title_obj, NULL, "Sg1" );
+	elm_segment_control_item_add(title_obj, NULL, "Sg2" );
+	elm_segment_control_item_add(title_obj, NULL, "Sg3" );
 	evas_object_show(title_obj);
 	elm_navigationbar_ex_item_title_object_set(NULL, title_obj);
 	tet_result(TET_PASS);
