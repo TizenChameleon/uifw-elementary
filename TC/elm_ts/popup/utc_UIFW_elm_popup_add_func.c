@@ -95,7 +95,7 @@ static void utc_UIFW_elm_popup_add_func_02(void)
 
    	popup = elm_popup_add(NULL);
 
-	if (!popup) {
+	if (popup) {
 		tet_infoline("elm_popup_add() with parent as NULL failed in positive test case");
 		tet_result(TET_FAIL);
 		return;

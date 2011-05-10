@@ -91,7 +91,7 @@ static void utc_UIFW_elm_popup_with_buttons_add_func_02(void)
 	Evas_Object *popup = NULL;
 	popup = elm_popup_with_buttons_add(NULL, "title", "this is text", 1, "ok", ELM_POPUP_RESPONSE_OK, NULL);
 		
-	if (!popup) {
+	if (popup) {
 		tet_infoline("elm_popup_with_buttons_add() parent as NULL failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
