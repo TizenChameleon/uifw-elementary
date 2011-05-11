@@ -106,10 +106,10 @@ static void utc_UIFW_elm_genlist_item_insert_after_func_02(void)
 {
    Elm_Genlist_Item *item = NULL, *result_item = NULL;
 
-   item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL, NULL,
+   item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
 			ELM_GENLIST_ITEM_NONE, NULL, NULL);   
    
-	result_item = elm_genlist_item_insert_after(NULL, &itc, (void *) 0, NULL, NULL,
+	result_item = elm_genlist_item_insert_after(NULL, &itc, (void *) 0, NULL, item,
 			ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
 	if (result_item) {
