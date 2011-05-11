@@ -62,9 +62,9 @@ static void startup(void)
 	evas_object_show(btn);
 	item = elm_navigationbar_ex_item_push(navi_ex, btn, "topbar_seg_full");
 	Evas_Object *title_obj = elm_segment_control_add(navi_ex);
-	elm_segment_control_add_segment(title_obj, NULL, "Sg1", EINA_FALSE);
-	elm_segment_control_add_segment(title_obj, NULL, "Sg2", EINA_FALSE);
-	elm_segment_control_add_segment(title_obj, NULL, "Sg3", EINA_FALSE);
+	elm_segment_control_item_add(title_obj, NULL, "Sg1" );
+	elm_segment_control_item_add(title_obj, NULL, "Sg2" );
+	elm_segment_control_item_add(title_obj, NULL, "Sg3" );
 	evas_object_show(title_obj);
 	elm_navigationbar_ex_item_title_object_set(item, title_obj);
 	elm_win_resize_object_add(main_win, navi_ex);
