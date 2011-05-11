@@ -476,7 +476,7 @@ static void      _theme_hook(Evas_Object *obj);
 static void      _show_region_hook(void        *data,
                                    Evas_Object *obj);
 static void      _sizing_eval(Evas_Object *obj);
-static void      _item_unrealize(Elm_Genlist_Item *it);
+static void      _item_unrealize(Elm_Genlist_Item *it, Eina_Bool calc);
 static void      _item_block_unrealize(Item_Block *itb);
 static void      _calc_job(void *data);
 static void      _on_focus_hook(void        *data,
@@ -1007,7 +1007,7 @@ _item_del(Elm_Genlist_Item *it)
    it->wd->walking -= it->walking;
    if (it->wd->show_item == it) it->wd->show_item = NULL;
    if (it->selected) it->wd->selected = eina_list_remove(it->wd->selected, it);
-   if (it->realized) _item_unrealize(it);
+   if (it->realized) _item_unrealize(it, EINA_FALSE);
    if (it->effect_item_realized) _effect_item_unrealize(it);
    if (it->block) _item_block_del(it);
    if ((!it->delete_me) && (it->itc->func.del))
@@ -1593,7 +1593,7 @@ _mouse_up(void        *data,
      {
         if (it->want_unrealize)
           {
-             _item_unrealize(it);
+             _item_unrealize(it, EINA_FALSE);
              if (it->block->want_unrealize)
                _item_block_unrealize(it->block);
           }
@@ -2110,7 +2110,7 @@ _item_realize(Elm_Genlist_Item *it,
    it->want_unrealize = EINA_FALSE;
 
    if (itc) _item_cache_free(itc);
-   evas_object_smart_callback_call(it->base.widget, "realized", it);
+   if (!calc) evas_object_smart_callback_call(it->base.widget, "realized", it);
    if ((!calc) && (it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP))
      {
         if (it->itc->edit_item_style )
@@ -2122,13 +2122,13 @@ _item_realize(Elm_Genlist_Item *it,
 }
 
 static void
-_item_unrealize(Elm_Genlist_Item *it)
+_item_unrealize(Elm_Genlist_Item *it, Eina_Bool calc)
 {
    Evas_Object *icon;
 
    if (!it->realized) return;
    if (it->wd->reorder_it && it->wd->reorder_it == it) return;
-   evas_object_smart_callback_call(it->base.widget, "unrealized", it);
+   if (!calc) evas_object_smart_callback_call(it->base.widget, "unrealized", it);
    if (it->long_timer)
      {
         ecore_timer_del(it->long_timer);
@@ -2187,13 +2187,13 @@ _item_block_recalc(Item_Block *itb,
                   if (changed)
                     {
                        _item_realize(it, in, EINA_TRUE);
-                       _item_unrealize(it);
+                       _item_unrealize(it, EINA_TRUE);
                     }
                }
              else
                {
                   _item_realize(it, in, EINA_TRUE);
-                  if (!it->wd->contracting) _item_unrealize(it);
+                  if (!it->wd->contracting) _item_unrealize(it, EINA_TRUE);
                }
           }
         else
@@ -2250,7 +2250,7 @@ _item_block_unrealize(Item_Block *itb)
                   it->want_unrealize = EINA_TRUE;
                }
              else
-                if (!it->wd->contracting) _item_unrealize(it);
+                if (!it->wd->contracting) _item_unrealize(it, EINA_FALSE);
           }
      }
    if (!dragging)
@@ -2451,7 +2451,7 @@ _item_block_position(Item_Block *itb,
                     }
                   else
                     {
-                       if (!it->dragging) _item_unrealize(it);
+                       if (!it->dragging) _item_unrealize(it, EINA_FALSE);
                     }
                }
              in++;
@@ -2496,7 +2496,7 @@ _group_items_recalc(void *data)
         else if (!git->want_realize && git->realized)
           {
              if (!git->dragging)
-               _item_unrealize(git);
+               _item_unrealize(git, EINA_FALSE);
           }
      }
 }
@@ -2678,14 +2678,14 @@ _update_job(void *data)
                 it->updateme = EINA_FALSE;
                 if (it->realized)
                   {
-                     _item_unrealize(it);
+                     _item_unrealize(it, EINA_FALSE);
                      _item_realize(it, num, 0);
                      position = 1;
                   }
                 else
                   {
                      _item_realize(it, num, 1);
-                     _item_unrealize(it);
+                     _item_unrealize(it, EINA_TRUE);
                   }
                 if ((it->minw != itminw) || (it->minh != itminh))
                   recalc = 1;
@@ -3862,7 +3862,7 @@ elm_genlist_clear(Evas_Object *obj)
         if (it->flags & ELM_GENLIST_ITEM_GROUP)
           it->wd->group_items = eina_list_remove(it->wd->group_items, it);
         elm_widget_item_pre_notify_del(it);
-        if (it->realized) _item_unrealize(it);
+        if (it->realized) _item_unrealize(it, EINA_FALSE);
         if (((wd->clear_me) || (!it->delete_me)) && (it->itc->func.del))
           it->itc->func.del((void *)it->base.data, it->base.widget);
         if (it->long_timer) ecore_timer_del(it->long_timer);
@@ -4776,7 +4776,7 @@ elm_genlist_item_del(Elm_Genlist_Item *it)
                                               it);
         if (it->block)
           {
-             if (it->realized) _item_unrealize(it);
+             if (it->realized) _item_unrealize(it, EINA_FALSE);
              it->block->changed = EINA_TRUE;
              if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
              it->wd->calc_job = ecore_job_add(_calc_job, it->wd);
@@ -6332,7 +6332,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, Eina_Bool renamed)
 
    if (renamed)
      {
-        _item_unrealize(it);
+        _item_unrealize(it, EINA_FALSE);
         it->renamed = EINA_TRUE;
         it->wd->rename_it = it;
         it->nocache = EINA_TRUE;
