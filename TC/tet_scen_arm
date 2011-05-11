@@ -18,7 +18,6 @@ elm
    :include:/elm_ts/label/tslist
    :include:/elm_ts/searchbar/tslist
    :include:/elm_ts/datefield/tslist
-   :include:/elm_ts/bubble/tslist
    :include:/elm_ts/navigationbar/tslist
    :include:/elm_ts/calendar/tslist
    :include:/elm_ts/check/tslist
@@ -48,6 +47,7 @@ elm
    :include:/elm_ts/conformant/tslist
 # below will be deprecated.
 #:include:/elm_ts/stackedicon/tslist
+#:include:/elm_ts/bubble/tslist
 
 #yhkim
 ch 
