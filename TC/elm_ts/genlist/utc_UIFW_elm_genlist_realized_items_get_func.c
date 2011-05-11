@@ -7,11 +7,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err == (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 // For checking the result of the negative test case.
@@ -19,11 +19,11 @@
 { \
 	Evas_Object *err = y; \
 	if (err != (x1)) \
-		{ \
-			tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
-			tet_result(TET_FAIL); \
-			return; \
-		} \
+	{ \
+		tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL); \
+		return; \
+	} \
 }
 
 
@@ -68,7 +68,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	genlist = elm_genlist_add(main_win);
 	evas_object_show(genlist);
 	elm_win_resize_object_add(main_win, genlist);
@@ -89,7 +89,7 @@ static void cleanup(void)
 {
 	if ( NULL != main_win ) {
 		evas_object_del(main_win);
-	       	main_win = NULL;
+		main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
@@ -100,11 +100,11 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_realized_items_get_func_01(void)
 {
-   Eina_List *ret = NULL;
-   
-   ret = elm_genlist_realized_items_get(genlist);
+	Eina_List *ret = NULL;
 
-	tet_result(TET_PASS);   
+	ret = elm_genlist_realized_items_get(genlist);
+
+	tet_result(TET_PASS);
 }
 
 /**
@@ -112,14 +112,14 @@ static void utc_UIFW_elm_genlist_realized_items_get_func_01(void)
  */
 static void utc_UIFW_elm_genlist_realized_items_get_func_02(void)
 {
-   Eina_List *ret = NULL;
-   
-   ret = elm_genlist_realized_items_get(NULL);
+	Eina_List *ret = NULL;
+
+	ret = elm_genlist_realized_items_get(NULL);
 
 	if (ret) {
 		tet_infoline("elm_genlist_realized_items_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}
-	tet_result(TET_PASS);   
+	tet_result(TET_PASS);
 }
