@@ -14,6 +14,24 @@
 		} \
 }
 
+#define TET_CHECK_STRING_PASS(x, y)\
+{\
+	if (x == NULL || y == NULL)\
+	{\
+		tet_printf("[TET_CHECK_STRING_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__);\
+		tet_printf("[TET_CHECK_STRING_PASS]:: Test string is NULL");\
+		tet_result(TET_FAIL);\
+		return;\
+	}\
+	if (strcmp(x, y))\
+	{\
+		tet_printf("[TET_CHECK_STRING_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__);\
+		tet_result(TET_FAIL);\
+		return;\
+	}\
+}
+
+
 // For checking the result of the negative test case.
 #define TET_CHECK_FAIL(x1, y...) \
 { \
@@ -26,6 +44,17 @@
 		} \
 }
 
+#define TET_CHECK_STRING_FAIL(x, y)\
+{\
+	if (x == NULL || y == NULL)\
+		return;\
+	if (strcmp(x, y) == 0)\
+	{\
+		tet_printf("[TET_CHECK_STRING_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
+		tet_result(TET_FAIL);\
+		return;\
+	}\
+}
 
 Evas_Object *main_win;
 
@@ -158,7 +187,7 @@ static void utc_UIFW_elm_multibuttonentry_label_get_func_01(void)
 	test_eo = elm_multibuttonentry_add(test_win);
 	elm_multibuttonentry_label_set(test_eo, "test");
 	ret_str = elm_multibuttonentry_label_get(test_eo);
-	TET_CHECK_PASS(NULL, ret_str);
+	TET_CHECK_STRING_PASS("test", ret_str);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_multibuttonentry_label_get().");
@@ -174,9 +203,10 @@ static void utc_UIFW_elm_multibuttonentry_label_get_func_02(void)
 	const char *ret_str = NULL;
 
 	test_eo = elm_multibuttonentry_add(test_win);
+	elm_multibuttonentry_label_set(test_eo, "test");
 	elm_multibuttonentry_label_set(test_eo, NULL);
 	ret_str = elm_multibuttonentry_label_get(test_eo);
-	TET_CHECK_FAIL(NULL, ret_str);
+	TET_CHECK_STRING_FAIL("test", ret_str);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_multibuttonentry_label_get().");
