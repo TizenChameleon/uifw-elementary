@@ -116,7 +116,7 @@ static void utc_UIFW_elm_navigationbar_title_button_get_func_02(void)
 	elm_button_label_set(button, "next");
 
 	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
-	Evas_Object *btn = elm_navigationbar_title_button_get(navibar, content, ELM_NAVIGATIONBAR_FUNCTION_BUTTON1);
+	Evas_Object *btn = elm_navigationbar_title_button_get(NULL, content, ELM_NAVIGATIONBAR_FUNCTION_BUTTON1);
 	if (btn) {
 		tet_infoline("elm_navigationbar_title_button_get() failed in negative test case");
 		tet_result(TET_FAIL);
