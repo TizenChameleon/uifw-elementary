@@ -96,8 +96,6 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-static Elm_Genlist_Edit_Class ec;
-
 /**
  * @brief Positive test case of elm_genlist_item_rename_mode_set()
  */
@@ -105,7 +103,6 @@ static void utc_UIFW_elm_genlist_item_rename_mode_set_func_01(void)
 {
 	Elm_Genlist_Item *it = NULL;
 
-	elm_genlist_edit_mode_set(genlist, ELM_GENLIST_EDIT_MODE_REORDER | ELM_GENLIST_EDIT_MODE_SELECT, &ec);
 	it = elm_genlist_item_append(genlist, &itc, NULL, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
 	elm_genlist_item_rename_mode_set(it, EINA_TRUE);
 	tet_result(TET_PASS);
@@ -116,7 +113,6 @@ static void utc_UIFW_elm_genlist_item_rename_mode_set_func_01(void)
  */
 static void utc_UIFW_elm_genlist_item_rename_mode_set_func_02(void)
 {
-	elm_genlist_edit_mode_set(genlist, ELM_GENLIST_EDIT_MODE_REORDER | ELM_GENLIST_EDIT_MODE_SELECT, &ec);
 	elm_genlist_item_rename_mode_set(NULL, EINA_FALSE);
 	tet_result(TET_PASS);
 }

@@ -96,17 +96,15 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-static Elm_Genlist_Edit_Class ec;
-
 /**
  * @brief Positive test case of elm_genlist_edit_mode_set()
  */
 static void utc_UIFW_elm_genlist_edit_mode_set_func_01(void)
 {
-	ec.move = NULL;
-	ec.item_selected = NULL;
+	itc.func.moved = NULL;
+	itc.edit_item_style = "edit_default";
 
-	elm_genlist_edit_mode_set(genlist, ELM_GENLIST_EDIT_MODE_REORDER | ELM_GENLIST_EDIT_MODE_SELECT, &ec);
+	elm_genlist_edit_mode_set(genlist, EINA_TRUE);
 
 	tet_result(TET_PASS);
 }
@@ -116,6 +114,6 @@ static void utc_UIFW_elm_genlist_edit_mode_set_func_01(void)
  */
 static void utc_UIFW_elm_genlist_edit_mode_set_func_02(void)
 {
-	elm_genlist_edit_mode_set(NULL, ELM_GENLIST_EDIT_MODE_NONE, NULL);
+	elm_genlist_edit_mode_set(NULL, EINA_FALSE);
 	tet_result(TET_PASS);
 }
