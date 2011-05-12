@@ -92,6 +92,9 @@ static void   _add_button(Evas_Object *obj, char *str);
 static void   _evas_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info );
 static void   _view_init(Evas_Object *obj);
 static void _set_vis_guidetext(Evas_Object *obj);
+static void _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv);
+static Evas_Coord _calculate_item_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj_index);
+static void _box_layout_cb(Evas_Object *o, Evas_Object_Box_Data *priv, void *data);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -899,7 +902,7 @@ _view_init(Evas_Object *obj)
      {
         if (! (wd->box = elm_box_add (obj))) return;
         elm_widget_sub_object_add(obj, wd->box);
-        elm_box_extended_mode_set(wd->box, EINA_TRUE);
+        elm_box_layout_set(wd->box, _box_layout_cb, NULL, NULL);
         elm_box_homogenous_set(wd->box, EINA_FALSE);
         edje_object_part_swallow(wd->base, "box.swallow", wd->box);
      }
@@ -953,6 +956,188 @@ _view_init(Evas_Object *obj)
              evas_object_size_hint_min_set(wd->end, button_min_width, button_min_height);
              elm_widget_sub_object_add(obj, wd->end);
           }
+     }
+}
+
+static void
+_calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv)
+{
+   Evas_Coord minw, minh, maxw, maxh, mnw, mnh, ww;
+   Evas_Coord w, cw = 0, cmaxh = 0;
+   const Eina_List *l;
+   Evas_Object_Box_Option *opt;
+   double wx;
+
+   /* FIXME: need to calc max */
+   minw = 0;
+   minh = 0;
+   maxw = -1;
+   maxh = -1;
+
+   evas_object_geometry_get(box, NULL, NULL, &w, NULL);
+   evas_object_size_hint_min_get(box, &minw, NULL);
+
+   EINA_LIST_FOREACH(priv->children, l, opt)
+     {
+        evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
+        evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
+
+        if(wx)
+          {
+             if (mnw != -1 && (w - cw) >= mnw)
+                ww = w - cw;
+             else
+                ww = w;
+          }
+        else
+           ww = mnw;
+
+        if ((cw + mnw) > w)
+          {
+             minh += cmaxh;
+             cw = 0;
+             cmaxh = 0;
+          }
+        cw += ww;
+        if (cmaxh < mnh) cmaxh = mnh;
+     }
+
+   minh += cmaxh;
+
+   evas_object_size_hint_min_set(box, minw, minh);
+}
+
+static Evas_Coord
+_calculate_item_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj_index)
+{
+   Evas_Coord mnw, mnh, cw = 0, cmaxh = 0, w, ww;
+   const Eina_List *l;
+   Evas_Object_Box_Option *opt;
+   int index = 0;
+   double wx;
+
+   evas_object_geometry_get(box, NULL, NULL, &w, NULL);
+
+   EINA_LIST_FOREACH(priv->children, l, opt)
+     {
+        evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
+        evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
+
+        if(wx)
+          {
+             if (mnw != -1 && (w - cw) >= mnw)
+                ww = w - cw;
+             else
+                ww = w;
+          }
+        else
+           ww = mnw;
+
+        if ((cw + ww) > w)
+          {
+             if (index > obj_index) return cmaxh;
+             cw = 0;
+             cmaxh = 0;
+          }
+
+        cw += ww;
+        if (cmaxh < mnh) cmaxh = mnh;
+
+        index++;
+     }
+
+   return cmaxh;
+}
+
+static void
+_box_layout_cb(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
+{
+   Evas_Coord x, y, w, h, xx, yy;
+   const Eina_List *l;
+   Evas_Object *obj;
+   Evas_Coord minw, minh, wdif, hdif;
+   int count = 0;
+   double ax, ay;
+   Evas_Object_Box_Option *opt;
+
+   _calculate_box_min_size(o, priv);
+
+   evas_object_geometry_get(o, &x, &y, &w, &h);
+
+   evas_object_size_hint_min_get(o, &minw, &minh);
+   evas_object_size_hint_align_get(o, &ax, &ay);
+   count = eina_list_count(priv->children);
+   if (w < minw)
+     {
+        x = x + ((w - minw) * (1.0 - ax));
+        w = minw;
+     }
+   if (h < minh)
+     {
+        y = y + ((h - minh) * (1.0 - ay));
+        h = minh;
+     }
+
+   wdif = w - minw;
+   hdif = h - minh;
+   xx = x;
+   yy = y;
+
+   Evas_Coord cw = 0, ch = 0, cmaxh = 0, obj_index = 0;
+
+   EINA_LIST_FOREACH(priv->children, l, opt)
+     {
+        Evas_Coord mnw, mnh, mxw, mxh;
+        double wx, wy;
+        int fw, fh, xw, xh;
+
+        obj = opt->obj;
+        evas_object_size_hint_align_get(obj, &ax, &ay);
+        evas_object_size_hint_weight_get(obj, &wx, &wy);
+        evas_object_size_hint_min_get(obj, &mnw, &mnh);
+        evas_object_size_hint_max_get(obj, &mxw, &mxh);
+        fw = fh = 0;
+        xw = xh = 0;
+        if (ax == -1.0) {fw = 1; ax = 0.5;}
+        if (ay == -1.0) {fh = 1; ay = 0.5;}
+        if (wx > 0.0) xw = 1;
+        if (wy > 0.0) xh = 1;
+        Evas_Coord ww, hh, ow, oh;
+
+        if(wx)
+          {
+             if (mnw != -1 && (w - cw) >= mnw)
+                ww = w - cw;
+             else
+                ww = w;
+          }
+        else
+           ww = mnw;
+        hh = _calculate_item_max_height(o, priv, obj_index);
+
+        ow = mnw;
+        if (fw) ow = ww;
+        if ((mxw >= 0) && (mxw < ow)) ow = mxw;
+        oh = mnh;
+        if (fh) oh = hh;
+        if ((mxh >= 0) && (mxh < oh)) oh = mxh;
+
+        if ((cw + ww) > w)
+          {
+             ch += cmaxh;
+             cw = 0;
+             cmaxh = 0;
+          }
+
+        evas_object_move(obj,
+                         xx + cw + (Evas_Coord)(((double)(ww - ow)) * ax),
+                         yy + ch + (Evas_Coord)(((double)(hh - oh)) * ay));
+        evas_object_resize(obj, ow, oh);
+
+        cw += ww;
+        if (cmaxh < hh) cmaxh = hh;
+
+        obj_index++;
      }
 }
 
