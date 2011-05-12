@@ -3,6 +3,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = \
 -DELM_INTERNAL_API_ARGESFSDFEFC=1 \
+-DMODULES_PATH=\"$(libdir)/elementary/modules\" \
 -I. \
 -I$(top_builddir) \
 -I$(top_srcdir) \
@@ -32,90 +33,11 @@ lib_LTLIBRARIES = libelementary.la
 includes_HEADERS = \
 Elementary.h \
 Elementary_Cursor.h \
-elm_widget.h \
-elm_priv.h
+elm_widget.h
 includesdir = $(includedir)/elementary-@VMAJ@
 
 libelementary_la_SOURCES = \
 elm_priv.h \
-\
-elm_main.c \
-elm_util.c \
-elm_theme.c \
-elm_module.c \
-elm_store.c \
-\
-elm_win.c \
-elm_widget.c \
-elm_bg.c \
-elm_icon.c \
-elm_image.c \
-elm_box.c \
-elm_button.c \
-elm_scroller.c \
-elm_label.c \
-elm_toggle.c \
-elm_frame.c \
-elm_table.c \
-elm_gengrid.c \
-elm_clock.c \
-elm_layout.c \
-elm_hover.c \
-elm_entry.c \
-elm_bubble.c \
-elm_photo.c \
-elm_toolbar.c \
-elm_searchbar.c \
-elm_list.c \
-elm_carousel.c \
-elm_slider.c \
-elm_actionslider.c \
-elm_genlist.c \
-elm_check.c \
-elm_radio.c \
-elm_segment_control.c \
-elm_pagecontrol.c \
-elm_pager.c \
-elm_progressbar.c \
-elm_separator.c \
-elm_spinner.c \
-elm_index.c \
-elm_photocam.c \
-elm_notify.c \
-elm_slideshow.c \
-elm_menu.c \
-elm_panel.c \
-elm_panes.c \
-elm_map.c \
-elm_flip.c \
-elm_conform.c \
-elm_mapbuf.c \
-elm_thumb.c \
-elm_config.c \
-elm_font.c \
-elm_animator.c \
-elm_popup.c \
-elm_navigationbar.c \
-elm_navigationbar_ex.c\
-elm_transit.c \
-elm_calendar.c \
-elm_flipselector.c \
-elm_editfield.c \
-elm_diskselector.c \
-elm_colorselector.c \
-elm_colorpalette.c \
-elm_controlbar.c \
-elm_dialoguegroup.c \
-elm_dayselector.c \
-elm_cbhm_helper.c \
-elm_datefield.c \
-elm_nocontents.c \
-elm_tickernoti.c \
-elm_imageslider.c \
-elm_multibuttonentry.c \
-elm_slidingdrawer.c \
-elm_stackedicon.c \
-\
 elc_anchorblock.c \
 elc_anchorview.c \
 elc_ctxpopup.c \
@@ -124,20 +46,92 @@ elc_fileselector_button.c \
 elc_fileselector_entry.c \
 elc_hoversel.c \
 elc_scrolled_entry.c \
-\
-els_tooltip.c \
+elm_actionslider.c \
+elm_animator.c \
+elm_bg.c \
+elm_box.c \
+elm_bubble.c \
+elm_button.c \
+elm_calendar.c \
+elm_carousel.c \
+elm_cbhm_helper.c \
+elm_check.c \
+elm_clock.c \
+elm_cnp_helper.c \
+elm_colorpalette.c \
+elm_colorselector.c \
+elm_config.c \
+elm_conform.c \
+elm_controlbar.c \
+elm_datefield.c \
+elm_dayselector.c \
+elm_dialoguegroup.c \
+elm_diskselector.c \
+elm_editfield.c \
+elm_entry.c \
+elm_flip.c \
+elm_flipselector.c \
+elm_font.c \
+elm_frame.c \
+elm_gengrid.c \
+elm_genlist.c \
+elm_hover.c \
+elm_icon.c \
+elm_image.c \
+elm_imageslider.c \
+elm_index.c \
+elm_label.c \
+elm_layout.c \
+elm_list.c \
+elm_main.c \
+elm_map.c \
+elm_mapbuf.c \
+elm_menu.c \
+elm_module.c \
+elm_multibuttonentry.c \
+elm_navigationbar.c \
+elm_navigationbar_ex.c\
+elm_nocontents.c \
+elm_notify.c \
+elm_pagecontrol.c \
+elm_pager.c \
+elm_panel.c \
+elm_panes.c \
+elm_photo.c \
+elm_photocam.c \
+elm_popup.c \
+elm_progressbar.c \
+elm_radio.c \
+elm_scroller.c \
+elm_searchbar.c \
+elm_segment_control.c \
+elm_separator.c \
+elm_slider.c \
+elm_slideshow.c \
+elm_slidingdrawer.c \
+elm_spinner.c \
+elm_stackedicon.c \
+elm_store.c \
+elm_table.c \
+elm_theme.c \
+elm_thumb.c \
+elm_tickernoti.c \
+elm_toggle.c \
+elm_toolbar.c \
+elm_transit.c \
+elm_util.c \
+elm_widget.c \
+elm_win.c \
+els_box.c \
+els_box.h \
 els_cursor.c \
+els_icon.c \
+els_icon.h \
 els_pan.c \
 els_pan.h \
 els_scroller.c \
 els_scroller.h \
-els_box.c \
-els_box.h \
-els_icon.c \
-els_icon.h \
-\
-elm_cnp_helper.c
-
+els_tooltip.c
 
 libelementary_la_CFLAGS =
 libelementary_la_LIBADD = \
