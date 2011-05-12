@@ -2736,8 +2736,8 @@ _changed_job(void *data)
          if (!it->mincalcd)
            {
               Evas_Coord mw = -1, mh = -1;
-              itminw = it->w;
-              itminh = it->h;
+              itminw = it->minw;
+              itminh = it->minh;
 
               if (it->wd->height_for_width) mw = it->wd->w;
               if (!it->display_only)
