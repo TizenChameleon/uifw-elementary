@@ -77,6 +77,7 @@ struct _Elm_Store
              void                  *data;
         } item_free;
    } cb;
+   LK(lock);
    Eina_Bool      sorted : 1;
    Eina_Bool      fetch_thread : 1;
    Eina_Bool      multi_load : 1;
@@ -642,6 +643,8 @@ elm_store_free(Elm_Store *st)
      }
    else
      {
+        LKL(st->lock);
+        st->live = EINA_FALSE;
         Eina_List *l;
         Eina_List *l_next;
         Eina_List *header_list;
@@ -687,6 +690,7 @@ elm_store_free(Elm_Store *st)
              elm_genlist_clear(st->genlist);
              st->genlist = NULL;
           }
+        LKD(st->lock);
      }
    free(st);
 }
@@ -883,6 +887,7 @@ _store_init(size_t size)
 {
    Elm_Store *st = calloc(1, size);
    if (!st) return NULL;
+   LKI(st->lock);
 
    eina_magic_string_set(ELM_STORE_MAGIC, "Elm_Store");
    eina_magic_string_set(ELM_STORE_FILESYSTEM_MAGIC, "Elm_Store_Filesystem");
@@ -968,34 +973,41 @@ _item_fetch(Elm_Store *st, int index)
      {
         if(header_list)
           {
-             if ((in_index + (signed)eina_list_count(header_list)) > index)
+             if ((in_index + eina_list_count(header_list)) > index)
                {
                   sti = eina_list_nth(header_list, index - in_index);
-                  LKL(sti->lock);
-                  if (st->cb.fetch.func)
+                  if(sti)
                     {
-                       if (st->fetch_thread)
+                       if (st->cb.fetch.func)
                          {
-                            if (!sti->fetch_th)
+                            LKL(sti->lock);
+                            if (st->fetch_thread)
+                              {
+                                 if (!sti->fetch_th)
+                                   {
+                                      LKU(sti->lock);
+                                      sti->fetch_th = ecore_thread_run(_store_fetch_do,
+                                                                       _store_fetch_end,
+                                                                       _store_fetch_cancel,
+                                                                       sti);
+                                      LKL(sti->lock);
+                                   }
+                              }
+                            else
                               {
                                  LKU(sti->lock);
-                                 sti->fetch_th = ecore_thread_run(_store_fetch_do,
-                                                                  _store_fetch_end,
-                                                                  _store_fetch_cancel,
-                                                                  sti);
+                                 st->cb.fetch.func(st->cb.fetch.data, sti, sti->item_info);
                                  LKL(sti->lock);
+                                 sti->fetched = EINA_TRUE;
                               }
                          }
-                       else
-                         {
-                            LKU(sti->lock);
-                            st->cb.fetch.func(st->cb.fetch.data, sti, sti->item_info);
-                            LKL(sti->lock);
-                            sti->fetched = EINA_TRUE;
-                         }
+                       LKU(sti->lock);
+                       return sti;
                     }
-                  LKU(sti->lock);
-                  return sti;
+                  else
+                    {
+                       return NULL;
+                    }
                }
              else
                {
@@ -1024,23 +1036,31 @@ _item_unfetch(Elm_Store *st, int index)
              if ((in_index + (signed)eina_list_count(header_list)) > index)
                {
                   sti = eina_list_nth(header_list, index - in_index);
-                  LKL(sti->lock);
-                  if (st->cb.unfetch.func)
+                  if(sti)
                     {
-                       if (sti->fetch_th)
+                       if (st->cb.unfetch.func)
                          {
-                            LKU(sti->lock);
-                            ecore_thread_cancel(sti->fetch_th);
-                            sti->fetch_th = NULL;
                             LKL(sti->lock);
+
+                            if (sti->fetch_th)
+                              {
+                                 LKU(sti->lock);
+                                 ecore_thread_cancel(sti->fetch_th);
+                                 sti->fetch_th = NULL;
+                                 LKL(sti->lock);
+                              }
+                            LKU(sti->lock);
+                            st->cb.unfetch.func(st->cb.unfetch.data, sti, sti->item_info);
+                            LKL(sti->lock);
+                            sti->fetched = EINA_FALSE;
                          }
                        LKU(sti->lock);
-                       st->cb.unfetch.func(st->cb.unfetch.data, sti, sti->item_info);
-                       LKL(sti->lock);
-                       sti->fetched = EINA_FALSE;
+                       return sti;
                     }
-                  LKU(sti->lock);
-                  return sti;
+                  else
+                    {
+                       return NULL;
+                    }
                }
              else
                {
@@ -2195,10 +2215,8 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
 
    sti = calloc(1, sizeof(Elm_Store_Item));
    if (!sti) return NULL;
-   if (st->fetch_thread)
-     {
-        LKI(sti->lock);
-     }
+
+   LKI(sti->lock);
    EINA_MAGIC_SET(sti, ELM_STORE_ITEM_MAGIC);
 
    sti->store = st;
@@ -2217,6 +2235,7 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
 
    if (st->live)
      {
+        LKL(st->lock);
         if (sti->item_info->item_type == ELM_GENLIST_ITEM_GROUP)
           {
              _group_item_append(sti, itc);
@@ -2225,6 +2244,7 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
           {
              _normal_item_append(sti, itc);
           }
+        LKU(st->lock);
         return sti;
      }
    else
