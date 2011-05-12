@@ -623,6 +623,7 @@ _desc_init(void)
 #define D _config_edd
    ELM_CONFIG_VAL(D, T, config_version, T_INT);
    ELM_CONFIG_VAL(D, T, engine, T_STRING);
+   ELM_CONFIG_VAL(D, T, vsync, T_UCHAR);
    ELM_CONFIG_VAL(D, T, thumbscroll_enable, T_UCHAR);
    ELM_CONFIG_VAL(D, T, thumbscroll_threshold, T_INT);
    ELM_CONFIG_VAL(D, T, thumbscroll_momentum_threshold, T_DOUBLE);
@@ -1177,6 +1178,7 @@ _config_load(void)
    _elm_config = ELM_NEW(Elm_Config);
    _elm_config->config_version = ELM_CONFIG_VERSION;
    _elm_config->engine = eina_stringshare_add("software_x11");
+   _elm_config->vsync = 0;
    _elm_config->thumbscroll_enable = EINA_TRUE;
    _elm_config->thumbscroll_threshold = 24;
    _elm_config->thumbscroll_momentum_threshold = 100.0;
@@ -1501,6 +1503,9 @@ _env_get(void)
                  (!strcasecmp(s, "software_16_wince_gdi")))
           eina_stringshare_replace(&_elm_config->engine, ELM_SOFTWARE_16_WINCE);
      }
+   
+   s = getenv("ELM_VSYNC");
+   if (s) _elm_config->vsync = !!atoi(s);
 
    s = getenv("ELM_THUMBSCROLL_ENABLE");
    if (s) _elm_config->thumbscroll_enable = !!atoi(s);
