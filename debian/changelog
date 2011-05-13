@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build01) unstable; urgency=low
+
+  * Version is updated(58393)
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build01
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Fri, 13 May 2011 10:12:46 +0900
+
 elementary (1.0.0+svn.51480slp2+build174) unstable; urgency=low
 
   * Package upload
