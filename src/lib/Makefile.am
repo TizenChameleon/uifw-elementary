@@ -33,6 +33,7 @@ lib_LTLIBRARIES = libelementary.la
 includes_HEADERS = \
 Elementary.h \
 Elementary_Cursor.h \
+elm_priv.h \
 elm_widget.h
 includesdir = $(includedir)/elementary-@VMAJ@
 
