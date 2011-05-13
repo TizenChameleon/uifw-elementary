@@ -56,8 +56,16 @@ static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd) return;
+
+#ifdef HAVE_ELEMENTARY_X
+   if(wd->wnd_map_handler)
+     {
+        ecore_event_handler_del(wd->wnd_map_handler);
+        wd->wnd_map_handler = NULL;
+     }
+#endif
+
    free(wd);
 }
 
