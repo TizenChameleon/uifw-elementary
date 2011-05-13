@@ -153,7 +153,6 @@ struct _Elm_Config
 {
    int            config_version;
    const char    *engine;
-   unsigned char  vsync;
    unsigned char  thumbscroll_enable;
    int            thumbscroll_threshold;
    double         thumbscroll_momentum_threshold;
