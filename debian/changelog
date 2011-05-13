@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build02) unstable; urgency=low
+
+  * Package Upload : elm_map modification
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build02
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Fri, 13 May 2011 10:50:41 +0900
+
 elementary (1.0.0+svn.58393slp2+build01) unstable; urgency=low
 
   * Version is updated(58393)
