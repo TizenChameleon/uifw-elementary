@@ -2733,7 +2733,7 @@ _changed_job(void *data)
       recalc = 0;
       EINA_LIST_FOREACH(itb->items, l2, it)
       {
-         if (!it->mincalcd)
+         if ((!it->mincalcd) && (it->realized))
            {
               Evas_Coord mw = -1, mh = -1;
               itminw = it->minw;
