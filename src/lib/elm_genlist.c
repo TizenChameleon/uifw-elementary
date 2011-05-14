@@ -2655,52 +2655,52 @@ _update_job(void *data)
    wd->update_job = NULL;
    num = 0;
    EINA_INLIST_FOREACH(wd->blocks, itb)
-   {
-      Evas_Coord itminw, itminh;
-      Elm_Genlist_Item *it;
+     {
+        Evas_Coord itminw, itminh;
+        Elm_Genlist_Item *it;
 
-      if (!itb->updateme)
-        {
-           num += itb->count;
-           if (position)
-             _item_block_position(itb, num);
-           continue;
-        }
-      num0 = num;
-      recalc = 0;
-      EINA_LIST_FOREACH(itb->items, l2, it)
-        {
-           if (it->updateme)
-             {
-                itminw = it->minw;
-                itminh = it->minh;
+        if (!itb->updateme)
+          {
+             num += itb->count;
+             if (position)
+               _item_block_position(itb, num);
+             continue;
+          }
+        num0 = num;
+        recalc = 0;
+        EINA_LIST_FOREACH(itb->items, l2, it)
+          {
+             if (it->updateme)
+               {
+                  itminw = it->minw;
+                  itminh = it->minh;
 
-                it->updateme = EINA_FALSE;
-                if (it->realized)
-                  {
-                     _item_unrealize(it, EINA_FALSE);
-                     _item_realize(it, num, 0);
-                     position = 1;
-                  }
-                else
-                  {
-                     _item_realize(it, num, 1);
-                     _item_unrealize(it, EINA_TRUE);
-                  }
-                if ((it->minw != itminw) || (it->minh != itminh))
-                  recalc = 1;
-             }
-           num++;
-        }
-      itb->updateme = EINA_FALSE;
-      if (recalc)
-        {
-           position = 1;
-           itb->changed = EINA_TRUE;
-           _item_block_recalc(itb, num0, 0, 1);
-           _item_block_position(itb, num0);
-        }
-   }
+                  it->updateme = EINA_FALSE;
+                  if (it->realized)
+                    {
+                       _item_unrealize(it, EINA_FALSE);
+                       _item_realize(it, num, EINA_FALSE);
+                       position = 1;
+                    }
+                  else
+                    {
+                       _item_realize(it, num, EINA_TRUE);
+                       _item_unrealize(it, EINA_TRUE);
+                    }
+                  if ((it->minw != itminw) || (it->minh != itminh))
+                    recalc = 1;
+               }
+             num++;
+          }
+        itb->updateme = EINA_FALSE;
+        if (recalc)
+          {
+             position = 1;
+             itb->changed = EINA_TRUE;
+             _item_block_recalc(itb, num0, 0, 1);
+             _item_block_position(itb, num0);
+          }
+     }
    if (position)
      {
         if (wd->calc_job) ecore_job_del(wd->calc_job);
@@ -2718,53 +2718,53 @@ _changed_job(void *data)
    wd->changed_job = NULL;
    num = 0;
    EINA_INLIST_FOREACH(wd->blocks, itb)
-   {
-      Evas_Coord itminw, itminh;
-      Elm_Genlist_Item *it;
+     {
+        Evas_Coord itminw, itminh;
+        Elm_Genlist_Item *it;
 
-      if (!itb->updateme)
-        {
-           num += itb->count;
-           if (position)
-             _item_block_position(itb, num);
-           continue;
-        }
-      num0 = num;
-      recalc = 0;
-      EINA_LIST_FOREACH(itb->items, l2, it)
-      {
-         if ((!it->mincalcd) && (it->realized))
-           {
-              Evas_Coord mw = -1, mh = -1;
-              itminw = it->minw;
-              itminh = it->minh;
+        if (!itb->updateme)
+          {
+             num += itb->count;
+             if (position)
+               _item_block_position(itb, num);
+             continue;
+          }
+        num0 = num;
+        recalc = 0;
+        EINA_LIST_FOREACH(itb->items, l2, it)
+          {
+             if ((!it->mincalcd) && (it->realized))
+               {
+                  Evas_Coord mw = -1, mh = -1;
+                  itminw = it->minw;
+                  itminh = it->minh;
 
-              if (it->wd->height_for_width) mw = it->wd->w;
-              if (!it->display_only)
-                elm_coords_finger_size_adjust(1, &mw, 1, &mh);
-              if (it->wd->height_for_width) mw = it->wd->prev_viewport_w;
-              edje_object_size_min_restricted_calc(it->base.view, &mw, &mh, mw, mh);
-              if (!it->display_only)
-                elm_coords_finger_size_adjust(1, &mw, 1, &mh);
-              it->w = it->minw = mw;
-              it->h = it->minh = mh;
-              it->mincalcd = EINA_TRUE;
+                  if (it->wd->height_for_width) mw = it->wd->w;
+                  if (!it->display_only)
+                    elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+                  if (it->wd->height_for_width) mw = it->wd->prev_viewport_w;
+                  edje_object_size_min_restricted_calc(it->base.view, &mw, &mh, mw, mh);
+                  if (!it->display_only)
+                    elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+                  it->w = it->minw = mw;
+                  it->h = it->minh = mh;
+                  it->mincalcd = EINA_TRUE;
 
-              //if ((it->minw != itminw) || (it->minh != itminh))
-              if ((it->minh != itminh))
-                recalc = 1;
-           }
-         num++;
-      }
-      itb->updateme = EINA_FALSE;
-      if (recalc)
-        {
-           position = 1;
-           itb->changed = EINA_TRUE;
-           _item_block_recalc(itb, num0, 0, 1);
-           _item_block_position(itb, num0);
-        }
-   }
+                  //if ((it->minw != itminw) || (it->minh != itminh))
+                  if ((it->minh != itminh))
+                    recalc = 1;
+               }
+             num++;
+          }
+        itb->updateme = EINA_FALSE;
+        if (recalc)
+          {
+             position = 1;
+             itb->changed = EINA_TRUE;
+             _item_block_recalc(itb, num0, 0, 1);
+             _item_block_position(itb, num0);
+          }
+     }
    if (position)
      {
         if (wd->calc_job) ecore_job_del(wd->calc_job);
@@ -5860,7 +5860,7 @@ _item_moving_effect_timer_cb(void *data)
 
                   if (it->old_scrl_y + y < oy + oh)
                     {
-                       if (!it->realized) _item_realize(it, in, 0);
+                       if (!it->realized) _item_realize(it, in, EINA_FALSE);
                     }
                   if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE && it->old_scrl_y + y < it->scrl_y)
                      it->old_scrl_y = it->scrl_y - y;
