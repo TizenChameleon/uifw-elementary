@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elementary 0.7.0.57309\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-04-18 15:52+0900\n"
+"POT-Creation-Date: 2011-05-14 11:29+0900\n"
 "PO-Revision-Date: 2011-02-25 20:22+0100\n"
 "Last-Translator: Fabian Nowak <timystery@arcor.de>\n"
 "Language-Team: German\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: src/lib/elc_fileselector.c:595
@@ -34,7 +34,7 @@ msgstr "Abbrechen"
 msgid "OK"
 msgstr "OK"
 
-#: src/lib/elm_config.c:1615
+#: src/lib/elm_config.c:1622
 msgid "default:LTR"
 msgstr "Standard: LTR"
 
