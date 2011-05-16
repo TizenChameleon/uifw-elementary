@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build04) unstable; urgency=low
+
+  * Package Upload
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build04
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Mon, 16 May 2011 10:40:12 +0900
+
 elementary (1.0.0+svn.58393slp2+build03) unstable; urgency=low
 
   * Package Upload : commented the vsync modification temporary (elm_win, elm_config, elm_priv)
