@@ -51,6 +51,9 @@ static void _block_clicked_cb(void *data, Evas_Object *obj, void *event_info);
 static void _show(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _hide(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
+static void _state_set_cb(void *data, Evas_Object *obj __UNUSED__,
+                           const char *emission __UNUSED__,
+                           const char *source __UNUSED__);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -323,6 +326,15 @@ _mirrored_set(Evas_Object *obj, Eina_Bool rtl)
    elm_object_mirrored_set(wd->notify, rtl);
 }
 
+static void
+_state_set_cb(void *data, Evas_Object *obj __UNUSED__,
+               const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
+   if (!wd) return;
+   if (wd->layout) elm_layout_sizing_eval(wd->layout);
+}
+
 /**
  * Add a new Popup object.
  *
@@ -366,6 +378,10 @@ elm_popup_add(Evas_Object *parent)
 
    elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
    elm_notify_content_set(wd->notify, wd->layout);
+
+   edje_object_signal_callback_add(elm_layout_edje_get(wd->layout), "elm,state,title,visible", "elm", _state_set_cb, obj);
+   edje_object_signal_callback_add(elm_layout_edje_get(wd->layout), "elm,state,button,visible", "elm", _state_set_cb, obj);
+   edje_object_signal_callback_add(elm_layout_edje_get(wd->layout), "elm,state,button,title,visible", "elm", _state_set_cb, obj);
 
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, NULL);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
