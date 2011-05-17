@@ -62,7 +62,7 @@ _del_hook(Evas_Object *obj)
    if (!wd) return;
 
 #ifdef HAVE_ELEMENTARY_X
-   if(wd->wnd_map_handler)
+   if (wd->wnd_map_handler)
      {
         ecore_event_handler_del(wd->wnd_map_handler);
         wd->wnd_map_handler = NULL;
@@ -176,7 +176,7 @@ _wnd_map_notify(void *data, int type, void *event)
 {
    Evas* e = NULL;
    Evas_Object* obj = (Evas_Object*)data;
-   Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
+   Widget_Data *wd = elm_widget_data_get(data);
 
    if (obj && wd->wnd_map_handler)
      {
@@ -216,7 +216,7 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
         if (!curr_rmethod) return;
         if (!gl_rmethod) return;
         if (curr_rmethod == gl_rmethod)
-           wd->wnd_map_handler = ecore_event_handler_add(ECORE_X_EVENT_WINDOW_SHOW, _wnd_map_notify, obj);
+          wd->wnd_map_handler = ecore_event_handler_add(ECORE_X_EVENT_WINDOW_SHOW, _wnd_map_notify, obj);
      }
 #endif
 }
