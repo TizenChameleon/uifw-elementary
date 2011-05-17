@@ -20,6 +20,8 @@ struct _Elm_Entry_Context_Menu_Item
 static void
 _ctxpopup_position(Evas_Object *obj)
 {
+   if(!ext_mod) return;
+
    Evas_Coord cx, cy, cw, ch, x, y, mw, mh;
    evas_object_geometry_get(ext_mod->ent, &x, &y, NULL, NULL);
    edje_object_part_text_cursor_geometry_get(ext_mod->ent, "elm.text",
@@ -42,6 +44,8 @@ _ctxpopup_position(Evas_Object *obj)
 static void
 _select_all(void *data, Evas_Object *obj, void *event_info)
 {
+   if(!ext_mod) return;
+
    ext_mod->selectall(data,obj,event_info);
    evas_object_hide(obj);
 }
@@ -49,6 +53,8 @@ _select_all(void *data, Evas_Object *obj, void *event_info)
 static void
 _select(void *data, Evas_Object *obj, void *event_info)
 {
+   if(!ext_mod) return;
+
    ext_mod->select(data,obj,event_info);
    evas_object_hide(obj);
 }
@@ -56,6 +62,8 @@ _select(void *data, Evas_Object *obj, void *event_info)
 static void
 _paste(void *data, Evas_Object *obj, void *event_info)
 {
+   if(!ext_mod) return;
+
    ext_mod->paste(data,obj,event_info);
    evas_object_hide(obj);
 }
@@ -63,6 +71,8 @@ _paste(void *data, Evas_Object *obj, void *event_info)
 static void
 _cut(void *data, Evas_Object *obj, void *event_info)
 {
+   if(!ext_mod) return;
+
    ext_mod->cut(data,obj,event_info);
    evas_object_hide(obj);
    elm_object_scroll_freeze_pop(ext_mod->popup);
@@ -71,6 +81,8 @@ _cut(void *data, Evas_Object *obj, void *event_info)
 static void
 _copy(void *data, Evas_Object *obj, void *event_info)
 {
+   if(!ext_mod) return;
+
    ext_mod->copy(data,obj,event_info);
    evas_object_hide(obj);
    elm_object_scroll_freeze_pop(ext_mod->popup);
@@ -79,6 +91,8 @@ _copy(void *data, Evas_Object *obj, void *event_info)
 static void
 _cancel(void *data, Evas_Object *obj, void *event_info)
 {
+   if(!ext_mod) return;
+
    ext_mod->cancel(data,obj,event_info);
    evas_object_hide(obj);
    elm_object_scroll_freeze_pop(ext_mod->popup);
@@ -87,6 +101,8 @@ _cancel(void *data, Evas_Object *obj, void *event_info)
 static void
 _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
 {
+   if(!ext_mod) return;
+
    // start for cbhm
    ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
    ext_mod->cnpinit(data,obj,event_info);
@@ -122,11 +138,12 @@ elm_modapi_shutdown(void *m)
    return 1; // succeed always
 }
 
-// module fucns for the specific module type
+// module funcs for the specific module type
 EAPI void
 obj_hook(Evas_Object *obj)
 {
    _mod_hook_count++;
+   //if(_mod_hook_count > 1) return;
 
    if(!ext_mod)
      {
@@ -139,7 +156,6 @@ EAPI void
 obj_unhook(Evas_Object *obj)
 {
    _mod_hook_count--;
-
    if(_mod_hook_count > 0) return;
 
    if(ext_mod)
@@ -153,6 +169,7 @@ EAPI void
 obj_longpress(Evas_Object *obj)
 {	
    if(!ext_mod) return;
+
    Evas_Object *top;
    const Eina_List *l;
    const Elm_Entry_Context_Menu_Item *it;
