@@ -1021,9 +1021,9 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
      }
    else if (ENGINE_COMPARE(ELM_OPENGL_X11))
      {
-/*      int opt[10];
+        int opt[10];
         int opt_i = 0;
-        
+
         if (_elm_config->vsync)
           {
              opt[opt_i] = ECORE_EVAS_GL_X11_OPT_VSYNC;
@@ -1033,7 +1033,7 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
           }
         if (opt_i > 0)
            win->ee = ecore_evas_gl_x11_options_new(NULL, 0, 0, 0, 1, 1, opt);
-        else */
+        else
            win->ee = ecore_evas_gl_x11_new(NULL, 0, 0, 0, 1, 1);
         FALLBACK_TRY("OpenGL");
 #ifdef HAVE_ELEMENTARY_X
