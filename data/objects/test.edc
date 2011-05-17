@@ -619,6 +619,8 @@ collections {
             scale: 1; //allow scaling
             description {
             state: "default" 0.0;
+            visible: 0;
+            min: 480 400;
             color:  0 0 0 0;
             }
          }
@@ -627,24 +629,150 @@ collections {
             scale: 1; //allow scaling
             description {
                state: "default" 0.0;
+               visible: 0;
                min : 250 30; //minimum size for gap filler
                fixed: 0 1;
-               rel1 { relative: 0 0; }
-               rel2 { relative: 1 0; }
+               rel1 {
+                  relative: 0.0 0.0;
+               }
+               rel2 {
+                  relative: 1.0 0.0;
+               }
                color:  0 0 0 0;
                align: 0 0;
             }
          }
-         part { name: "segment";
+         part { name: "segment1";
             type: SWALLOW;
             scale: 1;
             description {
                state: "default" 0.0;
                fixed: 1 1;
-               min: 360 50;
-               max: 360 50;
-               rel1 { relative: 0 1.0; to_y: "top_padding"; }
+               rel1 {
+                  relative: 0.0 1.0;
+                  to_x: "bg";
+                  to_y: "top_padding";
+               }
+               rel2 {
+                  relative: 1.0 0.25;
+                  to: "bg";
+               }
+               align: 0.5 0.0;
+            }
+         }
+         part { name: "segment1_bottom_padding";
+            type: RECT;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               visible: 0;
+               min : 250 10;
+               max : 250 10;
+               fixed: 1 1;
                align: 0.5 0;
+               rel1 {
+                  relative: 0 1.0;
+                  to_y: "segment1";
+               }
+               rel2 {
+                  relative: 1 1.0;
+                  to_y: "segment1";
+               }
+               color: 0 255 0 0;
+            }
+         }
+         part { name: "segment2";
+            type: SWALLOW;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               fixed: 1 1;
+               rel1 {
+                  relative: 0.1 1.0;
+                  to_x: "bg";
+                  to_y: "segment1_bottom_padding";
+               }
+               rel2 {
+                  relative: 0.9 160/400;
+                  to: "bg";
+               }
+               align: 0.5 0.0;
+            }
+         }
+         part { name: "segment2_bottom_padding";
+            type: RECT;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               visible: 0;
+               min : 250 10;
+               max : 250 10;
+               fixed: 1 1;
+               align: 0.5 0;
+               rel1 {
+                  relative: 0 1.0;
+                  to_y: "segment2";
+               }
+               rel2 {
+                  relative: 1 1.0;
+                  to_y: "segment2";
+               }
+            }
+         }
+         part { name: "segment3";
+            type: SWALLOW;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               fixed: 1 1;
+               rel1 {
+                  relative: 0.2 1.0;
+                  to_x: "bg";
+                  to_y: "segment2_bottom_padding";
+               }
+               rel2 {
+                  relative: 0.8 0.6;
+                  to: "bg";
+               }
+               align: 0.5 0.0;
+            }
+         }
+         part { name: "segment3_bottom_padding";
+            type: RECT;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               visible: 0;
+               min : 250 10;
+               max : 250 10;
+               fixed: 1 1;
+               align: 0.5 0;
+               rel1 {
+                  relative: 0 1.0;
+                  to_y: "segment3";
+               }
+               rel2 {
+                  relative: 1 1.0;
+                  to_y: "segment3";
+               }
+            }
+         }
+         part { name: "segment4";
+            type: SWALLOW;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               fixed: 1 1;
+               rel1 {
+                  relative: 0.3 1.0;
+                  to_x: "bg";
+                  to_y: "segment3_bottom_padding";
+               }
+               rel2 {
+                  relative: 0.7 340/400;
+                  to: "bg";
+               }
+               align: 0.5 0.0;
             }
          }
          part { name: "btn1_bottom_padding";
@@ -652,91 +780,19 @@ collections {
             scale: 1;
             description {
                state: "default" 0.0;
-               min : 250 30;
-               max : 250 30;
+               visible: 0;
+               min : 250 100;
+               max : 250 100;
                fixed: 1 1;
                align: 0.5 0;
-               rel1 { relative: 0 1.0; to_y: "segment"; }
-               rel2 { relative: 1 1.0; to_y: "segment"; }
-               color: 0 255 0 0;
-            }
-         }
-         part { name: "add";
-            type: SWALLOW;
-            scale: 1;
-            description {
-               state: "default" 0.0;
-               fixed: 1 1;
-               align: 0.5 0;
-               min: 250 50;
-               max: 250 50;
-               rel1 { relative: 0 1.0; to_y: "btn1_bottom_padding"; }
-               align: 0.5 0;
-            }
-         }
-         part { name: "btn2_bottom_padding";
-            type: RECT;
-            scale: 1;
-            description {
-               state: "default" 0.0;
-               min : 250 50;
-               max : 250 50;
-               fixed: 1 1;
-               align: 0.5 0;
-               rel1 { relative: 0 1.0; to_y: "add"; }
-               rel2 { relative: 1 1.0; to_y: "add"; }
-              color: 0 0 0 0;
-           }
-         }
-         part { name: "del";
-            type: SWALLOW;
-            scale: 1;
-            description {
-               state: "default" 0.0;
-               fixed: 1 1;
-               min: 250 50;
-               max: 250 50;
-               align: 0.5 0;
-               rel1 { relative: 0 1.0; to_y: "btn2_bottom_padding"; }
-               align: 0.5 0;
-            }
-         }
-         part { name: "btn3_bottom_padding";
-            type: RECT;
-            scale: 1;
-            description {
-               state: "default" 0.0;
-               min : 250 50;
-               max : 250 50;
-               fixed: 1 1;
-               align: 0.5 0;
-               rel1 { relative: 0 1.0; to_y: "del"; }
-               rel2 { relative: 1 1.0; to_y: "del"; }
-               color: 0 0 0 0;
-            }
-         }
-         part { name: "insert";
-            type: SWALLOW;
-            scale: 1;
-            description {
-               fixed: 1 1;
-               min: 250 50;
-               max: 250 50;
-               state: "default" 0.0;
-               rel1 { relative: 0 1.0; to_y: "btn3_bottom_padding"; }
-               align: 0.5 0;
-            }
-         }
-         part { name: "btn_bottom_padding";
-            type: RECT;
-            scale: 1;
-            description {
-               state: "default" 0.0;
-               min : 0 30;
-               rel1 { relative: 0 1.0; to_y: "insert"; }
-               rel2 { relative: 1 1.0;}
-               color: 0 0 0 0;
-               align: 0.5 1;
+               rel1 {
+                  relative: 0 1.0;
+                  to_y: "segment4";
+               }
+               rel2 {
+                  relative: 1 1.0;
+                  to_y: "segment4";
+               }
             }
          }
       }
