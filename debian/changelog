@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build07) unstable; urgency=low
+
+  * [Store] Add the store live flag in item fetch and unfetch
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build07
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Wed, 18 May 2011 22:14:38 +0900
+
 elementary (1.0.0+svn.58393slp2+build06) unstable; urgency=low
 
   * modified to elm_priv.h not to be public
