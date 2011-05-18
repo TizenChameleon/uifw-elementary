@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build06) unstable; urgency=low
+
+  * modified to elm_priv.h not to be public
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build06
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Wed, 18 May 2011 14:44:51 +0900
+
 elementary (1.0.0+svn.58393slp2+build05) unstable; urgency=low
 
   * [Store] Fix the crash problem in label get func
