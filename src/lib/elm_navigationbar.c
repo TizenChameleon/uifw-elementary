@@ -225,7 +225,7 @@ _item_del(Elm_Navigationbar_Item *it)
 
    if (!it) return;
 
-   if (!it->titleobj_switching_job)
+   if (it->titleobj_switching_job)
      ecore_job_del(it->titleobj_switching_job);
 
    wd = elm_widget_data_get(it->base.widget);
