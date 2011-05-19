@@ -53,6 +53,7 @@ struct _Elm_Navigationbar_Item
    Evas_Object *title_btns[ELM_NAVIGATIONBAR_TITLE_BTN_CNT];
    Evas_Object *content;
    Evas_Object *icon;
+   Ecore_Job *titleobj_switching_job;
    Eina_Bool titleobj_visible :1;
    Eina_Bool back_btn :1;
 };
@@ -88,14 +89,17 @@ static void _elm_navigationbar_next_btn_set(Evas_Object *obj,
                                             Evas_Object *content,
                                             Evas_Object *new_btn,
                                             Elm_Navigationbar_Item *it);
-static void _switch_titleobj_visibility(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _title_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _titleobj_switching_job(void *data);
 
 static const char SIG_HIDE_FINISHED[] = "hide,finished";
 static const char SIG_TITLE_OBJ_VISIBLE_CHANGED[] = "titleobj,visible,changed";
+static const char SIG_TITLE_CLICKED[] = "title,clicked";
 
 static const Evas_Smart_Cb_Description _signals[] = {
        {SIG_HIDE_FINISHED, ""},
        {SIG_TITLE_OBJ_VISIBLE_CHANGED, ""},
+       {SIG_TITLE_CLICKED, ""},
        {NULL, NULL}
 };
 
@@ -221,6 +225,9 @@ _item_del(Elm_Navigationbar_Item *it)
 
    if (!it) return;
 
+   if (!it->titleobj_switching_job)
+     ecore_job_del(it->titleobj_switching_job);
+
    wd = elm_widget_data_get(it->base.widget);
    if (!wd) return;
 
@@ -240,7 +247,6 @@ _item_del(Elm_Navigationbar_Item *it)
    if (it->title_obj)
      {
         evas_object_event_callback_del(it->title_obj, EVAS_CALLBACK_DEL, _title_obj_del);
-        edje_object_signal_callback_del_full(wd->base, "elm,action,clicked", "elm", _switch_titleobj_visibility, it);
         evas_object_del(it->title_obj);
         eina_list_free(it->title_obj_list);
      }
@@ -304,30 +310,59 @@ _resize(void *data __UNUSED__, Evas *e  __UNUSED__, Evas_Object *obj, void *even
 }
 
 static void
-_switch_titleobj_visibility(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+_titleobj_switching_job(void *data)
 {
    Elm_Navigationbar_Item *it = data;
-   if(!it) return;
    Widget_Data *wd = elm_widget_data_get(it->base.widget);
-   Evas_Object *top = elm_navigationbar_content_top_get(it->base.widget);
+   if (!wd) return;
 
-   if(it->content != top) return;
-   if(!it->title_obj) return;
-   if(!it->titleobj_visible)
+   it->titleobj_switching_job = NULL;
+
+   if (!it->title_obj) return;
+
+   if (elm_navigationbar_content_top_get(it->base.widget) != it->content)
+     return;
+
+   if (it->titleobj_visible)
+     edje_object_signal_emit(wd->base, "elm,state,show,title", "elm"); //elm,state,title,show
+   else
+     edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm"); //elm,state,title,hide
+
+   _item_sizing_eval(it);
+}
+
+static void
+_title_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   Evas_Object *navibar = data;
+   Widget_Data *wd;
+   Eina_List *last;
+   Elm_Navigationbar_Item *it;
+
+   wd = elm_widget_data_get(navibar);
+   if (!wd) return;
+
+   last = eina_list_last(wd->stack);
+   if (!last) return;
+
+   it = eina_list_data_get(last);
+   if ((!it) || (!it->title_obj)) return;
+
+   if (!it->titleobj_visible)
      {
-        //elm,state,title,show?
-        edje_object_signal_emit(wd->base, "elm,state,show,title", "elm");
-        evas_object_smart_callback_call(it->base.widget, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_TRUE);
         it->titleobj_visible = EINA_TRUE;
+        evas_object_smart_callback_call(it->base.widget, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_TRUE);
      }
    else
      {
-        //elm,state,title,hide?
-        edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm");
-        evas_object_smart_callback_call(it->base.widget, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_FALSE);
         it->titleobj_visible = EINA_FALSE;
+        evas_object_smart_callback_call(it->base.widget, SIG_TITLE_OBJ_VISIBLE_CHANGED, (void *) EINA_FALSE);
      }
-   _item_sizing_eval(it);
+
+   evas_object_smart_callback_call(navibar, SIG_TITLE_CLICKED, NULL);
+
+   if (!it->titleobj_switching_job)
+     it->titleobj_switching_job = ecore_job_add(_titleobj_switching_job, it);
 }
 
 //TODO: should be renamed.
@@ -568,6 +603,10 @@ elm_navigationbar_add(Evas_Object *parent)
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "navigationbar", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
+   //TODO: elm,action,title,clicked
+   edje_object_signal_callback_add(wd->base, "elm,action,clicked", "elm",
+                                            _title_clicked, obj);
+
 
    //TODO: How about making the pager as a base?
    //TODO: Swallow title and content as one content into the pager.
@@ -1008,8 +1047,6 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
      {
        if (it->title)
          {
-            edje_object_signal_callback_add(wd->base, "elm,action,clicked", "elm",
-                                            _switch_titleobj_visibility, it);
             edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
             //TODO: for before nbeat?
             edje_object_signal_emit(wd->base, "elm,state,show,noanimate,title", "elm");
@@ -1065,7 +1102,6 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
           it->titleobj_visible = EINA_FALSE;
         }
        edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
-       edje_object_signal_callback_del_full(wd->base, "elm,action,clicked", "elm", _switch_titleobj_visibility, it);
        edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
    }
    _item_sizing_eval(it);
@@ -1348,15 +1384,8 @@ elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *conten
 
    it->titleobj_visible = visible;
 
-   if (elm_navigationbar_content_top_get(obj) != content)
-     return;
-
-   if (visible)
-     edje_object_signal_emit(wd->base, "elm,state,show,title", "elm");
-   else
-     edje_object_signal_emit(wd->base, "elm,state,hide,title", "elm");
-
-   _item_sizing_eval(it);
+   if (!it->titleobj_switching_job)
+     it->titleobj_switching_job = ecore_job_add(_titleobj_switching_job, it);
 }
 
 /**
