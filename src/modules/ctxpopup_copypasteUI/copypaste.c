@@ -125,6 +125,14 @@ _item_clicked(void *data, Evas_Object *obj, void *event_info)
    evas_object_hide(obj);
 }
 
+static void
+_ctxpopup_dismissed_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
+{
+   if (!ext_mod) return;
+
+   elm_object_scroll_freeze_pop(ext_mod->popup);
+}
+
 // module api funcs needed
 EAPI int
 elm_modapi_init(void *m)
@@ -185,7 +193,10 @@ obj_longpress(Evas_Object *obj)
         //else elm_widget_scroll_freeze_push(obj);
         top = elm_widget_top_get(obj);
         if(top)
-           ext_mod->popup = elm_ctxpopup_add(top);
+          {
+             ext_mod->popup = elm_ctxpopup_add(top);
+             evas_object_smart_callback_add(ext_mod->popup, "dismissed", _ctxpopup_dismissed_cb, NULL);
+          }
         /*currently below theme not used,when guideline comes a new theme can be created if required*/
         elm_object_style_set(ext_mod->popup,"extended/entry");
         context_menu_orientation = edje_object_data_get
