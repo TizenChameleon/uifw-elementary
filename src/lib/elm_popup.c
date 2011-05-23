@@ -356,7 +356,6 @@ elm_popup_add(Evas_Object *parent)
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
    ELM_SET_WIDTYPE(widtype, "popup");
    elm_widget_type_set(obj, widtype);
-   elm_widget_can_focus_set(obj, EINA_FALSE);
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
