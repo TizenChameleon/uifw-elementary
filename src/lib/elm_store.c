@@ -642,6 +642,7 @@ elm_store_free(Elm_Store *st)
      }
    else
      {
+        printf("[store_debug][%s][%d]\n",__FUNCTION__,__LINE__);
         st->live = EINA_FALSE;
         Eina_List *l;
         Eina_List *l_next;
@@ -670,7 +671,7 @@ elm_store_free(Elm_Store *st)
                             if (sti->fetched)
                               {
                                  int index = elm_store_item_index_get(sti);
-                                 _item_unfetch(st, index);
+                                 if (index != -1) _item_unfetch(st, index);
                               }
                             LKD(sti->lock);
                             //                           free(sti);
@@ -679,6 +680,7 @@ elm_store_free(Elm_Store *st)
                }
           }
         eina_list_free(st->header_items);
+        printf("[store_debug][%s][%d]\n",__FUNCTION__,__LINE__);
 
         if (st->genlist)
           {
@@ -972,6 +974,7 @@ _item_fetch(Elm_Store *st, int index)
                {
                   if ((in_index + eina_list_count(header_list)) > index)
                     {
+                       if( index - in_index < 0 ) printf("[store_debug][%s][%d][index = %d]\n",__FUNCTION__,__LINE__,index);
                        sti = eina_list_nth(header_list, index - in_index);
                        if(sti)
                          {
@@ -1033,8 +1036,9 @@ _item_unfetch(Elm_Store *st, int index)
           {
              if(header_list)
                {
-                  if ((in_index + (signed)eina_list_count(header_list)) > index)
+                  if ((in_index + eina_list_count(header_list)) > index)
                     {
+                       if( index - in_index < 0 ) printf("[store_debug][%s][%d][index = %d]\n",__FUNCTION__,__LINE__,index);
                        sti = eina_list_nth(header_list, index - in_index);
                        if(sti)
                          {
@@ -1095,42 +1099,49 @@ _item_realize(Elm_Store_Item *sti)
      {
         int index = elm_store_item_index_get(sti);
 
-        if ((st->start_fetch_index <= index) && (index <= (st->start_fetch_index + st->cache_max)))
+        if (index != -1)
           {
-             if (sti->fetched)
+             if ((st->start_fetch_index <= index) && (index <= (st->start_fetch_index + st->cache_max)))
                {
-                  _item_unfetch(st, index);
-               }
-             _item_fetch(st, index);
+                  if (sti->fetched)
+                    {
+                       _item_unfetch(st, index);
+                    }
+                  _item_fetch(st, index);
 
-             if(st->end_fetch_index < index)
+                  if(st->end_fetch_index < index)
+                    {
+                       st->end_fetch_index = index;
+                    }
+               }
+             else if (st->start_fetch_index > index)
                {
+                  int diff = st->start_fetch_index - index;
+                  int loop;
+                  for (loop = 1; loop <= diff; loop++)
+                    {
+                       _item_unfetch(st, st->end_fetch_index);
+                       st->end_fetch_index--;
+                       _item_fetch(sti->store, (st->start_fetch_index - loop));
+                    }
+                  st->start_fetch_index = index;
+               }
+             else if (index > st->end_fetch_index)
+               {
+                  int diff = index - st->end_fetch_index;
+                  int loop;
+                  for (loop = 1; loop <= diff; loop++)
+                    {
+                       _item_unfetch(st, st->start_fetch_index);
+                       st->start_fetch_index++;
+                       _item_fetch(st, (st->end_fetch_index + loop));
+                    }
                   st->end_fetch_index = index;
                }
           }
-        else if (st->start_fetch_index > index)
+        else
           {
-             int diff = st->start_fetch_index - index;
-             int loop;
-             for (loop = 1; loop <= diff; loop++)
-               {
-                  _item_unfetch(st, st->end_fetch_index);
-                  st->end_fetch_index--;
-                  _item_fetch(sti->store, (st->start_fetch_index - loop));
-               }
-             st->start_fetch_index = index;
-          }
-        else if (index > st->end_fetch_index)
-          {
-             int diff = index - st->end_fetch_index;
-             int loop;
-             for (loop = 1; loop <= diff; loop++)
-               {
-                  _item_unfetch(st, st->start_fetch_index);
-                  st->start_fetch_index++;
-                  _item_fetch(st, (st->end_fetch_index + loop));
-               }
-             st->end_fetch_index = index;
+             return;
           }
      }
 }
@@ -1633,7 +1644,14 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                           if (remove_item->fetched)
                                                             {
                                                                int index = elm_store_item_index_get(remove_item);
-                                                               _item_unfetch(st, index);
+                                                               if (index != -1)
+                                                                 {
+                                                                    _item_unfetch(st, index);
+                                                                 }
+                                                               else
+                                                                 {
+                                                                    return;
+                                                                 }
                                                             }
                                                           Eina_List *temp_header_list = header_list;
                                                           header_list = eina_list_remove(header_list, remove_item);
@@ -1659,7 +1677,14 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                     if (temp_sti->fetched)
                                                                       {
                                                                          int index = elm_store_item_index_get(temp_sti);
-                                                                         _item_unfetch(st, index);
+                                                                         if (index != -1)
+                                                                           {
+                                                                              _item_unfetch(st, index);
+                                                                           }
+                                                                         else
+                                                                           {
+                                                                              return;
+                                                                           }
                                                                       }
                                                                     header_list = eina_list_remove(header_list, temp_sti);
                                                                     st->total_item_count--;
@@ -1723,6 +1748,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                   }
                                                 else
                                                   {
+                                                     if( (eina_list_count(header_list) - 1) < 0 ) printf("[store_debug][%s][%d][eina_list_count(header_list) = %d]\n",__FUNCTION__,__LINE__,eina_list_count(header_list));
                                                      Elm_Store_Item *last_sti = eina_list_nth(header_list, eina_list_count(header_list) - 1);
                                                      sti->item_info->index = eina_list_count(header_list);
                                                      header_list = eina_list_append(header_list, sti);
@@ -1744,6 +1770,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                    }
                                  if(last_add)
                                    {
+                                      if( (eina_list_count(header_list) - 1) < 0 ) printf("[store_debug][%s][%d][eina_list_count(header_list) = %d]\n",__FUNCTION__,__LINE__,eina_list_count(header_list));
                                       Elm_Store_Item *last_sti = eina_list_nth(header_list, eina_list_count(header_list) - 1);
                                       sti->item_info->index = eina_list_count(header_list);
                                       header_list = eina_list_append(header_list, sti);
@@ -1822,6 +1849,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                        }
                                                      else
                                                        {
+                                                          if( (eina_list_count(header_list) - 1) < 0 ) printf("[store_debug][%s][%d][eina_list_count(header_list) = %d]\n",__FUNCTION__,__LINE__,eina_list_count(header_list));
                                                           Elm_Store_Item *last_sti = eina_list_nth(header_list, eina_list_count(header_list) - 1);
                                                           sti->item_info->index = eina_list_count(header_list);
                                                           header_list = eina_list_append(header_list, sti);
@@ -1843,6 +1871,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                         }
                                       if(normal_add)
                                         {
+                                           if( (eina_list_count(header_list) - 1) < 0 ) printf("[store_debug][%s][%d][eina_list_count(header_list) = %d]\n",__FUNCTION__,__LINE__,eina_list_count(header_list));
                                            Elm_Store_Item *last_sti = eina_list_nth(header_list, eina_list_count(header_list) - 1);
                                            sti->item_info->index = eina_list_count(header_list);
                                            header_list = eina_list_append(header_list, sti);
@@ -2288,13 +2317,19 @@ elm_store_visible_items_update(Elm_Store *st)
                {
                   Elm_Store_Item *realized_sti = elm_genlist_item_data_get(it);
                   int index = elm_store_item_index_get(realized_sti);
-
-                  if(realized_sti->fetched)
+                  if (index != -1)
                     {
-                       _item_unfetch(st, index);
+                       if(realized_sti->fetched)
+                         {
+                            _item_unfetch(st, index);
+                         }
+                       _item_fetch(st, index);
+                       if (realized_sti->data) elm_genlist_item_update(realized_sti->item);
                     }
-                  _item_fetch(st, index);
-                  if (realized_sti->data) elm_genlist_item_update(realized_sti->item);
+                  else
+                    {
+                       return;
+                    }
                }
           }
      }
@@ -2315,26 +2350,33 @@ elm_store_item_update(Elm_Store_Item *sti)
    Elm_Store *st = sti->store;
 
    int index = elm_store_item_index_get(sti);
-   if ((st->start_fetch_index <= index) && (index <= (st->start_fetch_index + st->cache_max)))
+   if (index != -1)
      {
-        if (sti->fetched)
+        if ((st->start_fetch_index <= index) && (index <= (st->start_fetch_index + st->cache_max)))
           {
-             _item_unfetch(st, index);
-          }
-        _item_fetch(st, index);
+             if (sti->fetched)
+               {
+                  _item_unfetch(st, index);
+               }
+             _item_fetch(st, index);
 
-        if(st->end_fetch_index < (st->total_item_count-1))
-          {
-             if( (st->end_fetch_index - st->cache_max) == st->start_fetch_index)
+             if(st->end_fetch_index < (st->total_item_count-1))
                {
-                  _item_unfetch(st, (st->total_item_count-1));
+                  if( (st->end_fetch_index - st->cache_max) == st->start_fetch_index)
+                    {
+                       _item_unfetch(st, (st->total_item_count-1));
+                    }
+                  else
+                    {
+                       st->end_fetch_index = (st->total_item_count-1);
+                    }
                }
-             else
-               {
-                  st->end_fetch_index = (st->total_item_count-1);
-               }
+             if(sti->data) elm_genlist_item_update(sti->item);
           }
-        if(sti->data) elm_genlist_item_update(sti->item);
+     }
+   else
+     {
+        return;
      }
 }
 
@@ -2389,7 +2431,14 @@ elm_store_item_del(Elm_Store_Item *sti)
                                            if (remove_sti->fetched)
                                              {
                                                 int index = elm_store_item_index_get(remove_sti);
-                                                _item_unfetch(st, index);
+                                                if (index != -1)
+                                                  {
+                                                     _item_unfetch(st, index);
+                                                  }
+                                                else
+                                                  {
+                                                     return;
+                                                  }
                                              }
                                            Eina_List *temp_header_list = header_list;
                                            header_list = eina_list_remove(header_list, remove_sti);
@@ -2415,7 +2464,14 @@ elm_store_item_del(Elm_Store_Item *sti)
                                                      if (temp_sti->fetched)
                                                        {
                                                           int index = elm_store_item_index_get(temp_sti);
-                                                          _item_unfetch(st, index);
+                                                          if (index != -1)
+                                                            {
+                                                               _item_unfetch(st, index);
+                                                            }
+                                                          else
+                                                            {
+                                                               return;
+                                                            }
                                                        }
                                                      header_list = eina_list_remove(header_list, temp_sti);
                                                      st->total_item_count--;

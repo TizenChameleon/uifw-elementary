@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build09) unstable; urgency=low
+
+  * [Store] add debug pointe and fix the eina list parameter set
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build09
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Mon, 23 May 2011 15:19:30 +0900
+
 elementary (1.0.0+svn.58393slp2+build08) unstable; urgency=low
 
   * [Navigationbar] updated title clicked events
