@@ -2935,8 +2935,8 @@ extern "C" {
    EAPI void         elm_controlbar_item_select(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
    EAPI Eina_Bool    elm_controlbar_item_visible_get(Elm_Controlbar_Item * it);
-   EAPI void         elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable);
-   EAPI Eina_Bool    elm_controlbar_item_disable_get(Elm_Controlbar_Item * it);
+   EAPI void         elm_controlbar_item_disabled_set(Elm_Controlbar_Item * it, Eina_Bool disabled);
+   EAPI Eina_Bool    elm_controlbar_item_disabled_get(Elm_Controlbar_Item * it);
    EAPI void         elm_controlbar_item_icon_set(Elm_Controlbar_Item *it, const char *icon_path);
    EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
@@ -2954,8 +2954,10 @@ extern "C" {
    EAPI void         elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align);
    EAPI void         elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical);
    /*======= Please don't use this APIs =======*/
-   EAPI void         elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI void         elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
+   EINA_DEPRECATED EAPI void         elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_controlbar_item_disable_get(Elm_Controlbar_Item * it);
+   EINA_DEPRECATED EAPI void         elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EINA_DEPRECATED EAPI void         elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
    /*======= Just for test =======*/
 
    /* SearchBar */
