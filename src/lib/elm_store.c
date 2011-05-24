@@ -642,7 +642,7 @@ elm_store_free(Elm_Store *st)
      }
    else
      {
-        printf("[store_debug][%s][%d]\n",__FUNCTION__,__LINE__);
+        elm_genlist_clear(st->genlist);
         st->live = EINA_FALSE;
         Eina_List *l;
         Eina_List *l_next;
@@ -680,7 +680,6 @@ elm_store_free(Elm_Store *st)
                }
           }
         eina_list_free(st->header_items);
-        printf("[store_debug][%s][%d]\n",__FUNCTION__,__LINE__);
 
         if (st->genlist)
           {
