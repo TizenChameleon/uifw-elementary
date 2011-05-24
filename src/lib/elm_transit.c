@@ -133,7 +133,7 @@ _elm_transit_obj_states_save(Evas_Object *obj, Elm_Obj_Data *obj_data)
 }
 
 static Eina_Bool
-_hash_foreach_pass_events_set(const Eina_Hash *hash, const void *key, void *data, void *fdata)
+_hash_foreach_pass_events_set(const Eina_Hash *hash __UNUSED__, const void *key, void *data __UNUSED__, void *fdata)
 {
    Elm_Transit *transit = fdata;
    evas_object_pass_events_set((Evas_Object*) key, transit->event_enabled);
@@ -141,7 +141,7 @@ _hash_foreach_pass_events_set(const Eina_Hash *hash, const void *key, void *data
 }
 
 static Eina_Bool
-_hash_foreach_obj_states_save(const Eina_Hash *hash, const void *key, void *data, void *fdata)
+_hash_foreach_obj_states_save(const Eina_Hash *hash __UNUSED__, const void *key, void *data, void *fdata __UNUSED__)
 {
    _elm_transit_obj_states_save((Evas_Object *) key, (Elm_Obj_Data *) data);
    return EINA_TRUE;
@@ -161,6 +161,46 @@ _elm_transit_object_remove_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj, 
    transit->objs = eina_list_remove(transit->objs, obj);
    if (!transit->objs) elm_transit_del(transit);
 }
+
+//TODO: Remove!
+//Since evas map have a afterimage bug for this time.
+//This function is added temporary.
+static void
+_obj_damage_area_set(Evas_Object *obj)
+{
+   const Evas_Map *map;
+   Evas_Coord_Point coords;
+   Evas_Coord_Point min, max;
+   int i;
+
+   map  = evas_object_map_get(obj);
+   if (!map) return;
+
+  evas_map_point_coord_get(map, 0, &coords.x, &coords.y, NULL);
+
+   max = min = coords;
+
+   for (i = 1; i < 4; ++i)
+     {
+        evas_map_point_coord_get(map, i, &coords.x, &coords.y, NULL);
+
+        if (coords.x < min.x)
+          min.x = coords.x;
+        else if (coords.x > max.x)
+          max.x = coords.x;
+
+        if (coords.y < min.y)
+          min.y = coords.y;
+        else if (coords.y > max.y)
+          max.y = coords.y;
+     }
+
+   evas_damage_rectangle_add(evas_object_evas_get(obj),
+                             min.x, min.y,
+                             max.x - min.x, max.y - min.y);
+}
+
+
 
 static void
 _elm_transit_object_remove(Elm_Transit *transit, Evas_Object *obj)
@@ -188,6 +228,11 @@ _elm_transit_object_remove(Elm_Transit *transit, Evas_Object *obj)
                 evas_object_map_enable_set(obj, EINA_FALSE);
              if (state->map)
                 evas_object_map_set(obj, state->map);
+
+             //TODO: Remove!
+             //Since evas map have a afterimage bug for this time.
+             //This line is added temporary.
+             _obj_damage_area_set(obj);
 
           }
         free(state);
@@ -619,8 +664,6 @@ EAPI void
 elm_transit_event_enabled_set(Elm_Transit *transit, Eina_Bool enabled)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit);
-   Evas_Object *obj;
-   Elm_Obj_Data *obj_data;
 
    if (transit->event_enabled == enabled) return;
    transit->event_enabled = !!enabled;
@@ -982,9 +1025,6 @@ elm_transit_progress_value_get(const Elm_Transit *transit)
 EAPI void
 elm_transit_objects_final_state_keep_set(Elm_Transit *transit, Eina_Bool state_keep)
 {
-   Evas_Object *obj;
-   Elm_Obj_Data *obj_data;
-
    ELM_TRANSIT_CHECK_OR_RETURN(transit);
    if (transit->state_keep == state_keep) return;
    if (transit->animator) return;
