@@ -1521,6 +1521,9 @@ _mouse_up(void        *data,
    it->wd->mouse_down = EINA_FALSE;
    if (it->wd->multitouched)
      {
+        // in single selection modes, some multi touching can make multi highlighted items.
+        // if a item not selected and highlighted, it should be unhighlighted.
+        if ((!it->wd->multi) && (!it->selected) && (it->highlighted)) _item_unselect(it);
         if (it->wd->multi_down) return;
         _multi_touch_gesture_eval(data);
         return;
