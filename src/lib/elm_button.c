@@ -346,7 +346,6 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
    else
      _set_label(data, wd->label);
    #endif
-   return;
 
    if (wd->timer)
      {
@@ -368,7 +367,6 @@ _signal_default_text_set(void *data, Evas_Object *obj, const char *emission, con
    else
      _set_label(data, wd->label);
    #endif
-   return;
 }
 /**
  * Add a new button to the parent
