@@ -1374,11 +1374,10 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
                                   _controlbar_object_show, obj);
    evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_HIDE,
                                   _controlbar_object_hide, obj);
-#if 0
+
    bg = elm_layout_content_get(wd->edje, "bg_image");
    evas_object_event_callback_add(bg, EVAS_CALLBACK_MOVE, _controlbar_object_move, obj);
    evas_object_event_callback_add(bg, EVAS_CALLBACK_RESIZE, _controlbar_object_resize, obj);
-#endif
 
    wd->selected_box = elm_layout_add(wd->bg);
    elm_layout_theme_set(wd->selected_box, "controlbar", "item_bg_move", "default");
@@ -2396,9 +2395,9 @@ EAPI void
 elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view)
 {
    if (!it) return;
+   if (it->view == view) return;
 
-   if (it->view) evas_object_del(it->view);
-
+   evas_object_del(it->view);
    it->view = view;
 }
 
@@ -2416,6 +2415,36 @@ elm_controlbar_item_view_get(Elm_Controlbar_Item *it)
    if (!it) return NULL;
 
    return it->view;
+}
+
+/**
+ * Unset the view of the item
+ *
+ * @param	it The item of controlbar
+ * @return	The view for the item
+ *
+ * @ingroup Controlbar
+ */
+EAPI Evas_Object *
+elm_controlbar_item_view_unset(Elm_Controlbar_Item *it)
+{
+   if (!it) return NULL;
+   if (it->obj == NULL) return NULL;
+   Widget_Data * wd = elm_widget_data_get(it->obj);
+   if (!wd) return NULL;
+   Evas_Object *content;
+
+   if (it->view == elm_layout_content_get(wd->view, "elm.swallow.view"))
+     {
+        content = elm_layout_content_unset(wd->view, "elm.swallow.view");
+        if (content) evas_object_hide(content);
+     }
+   else
+     content = it->view;
+
+   it->view = NULL;
+
+   return content;
 }
 
 /**
