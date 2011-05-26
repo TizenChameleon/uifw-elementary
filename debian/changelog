@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build16) unstable; urgency=low
+
+  * [store] crash and lockup problem fix
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build16
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Thu, 26 May 2011 15:35:28 +0900
+
 elementary (1.0.0+svn.58393slp2+build15) unstable; urgency=low
 
   * Controlbar bug fix
