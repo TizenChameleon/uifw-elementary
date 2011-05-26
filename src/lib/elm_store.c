@@ -77,6 +77,7 @@ struct _Elm_Store
              void                  *data;
         } item_free;
    } cb;
+   LK(lock);
    Eina_Bool      sorted : 1;
    Eina_Bool      fetch_thread : 1;
    Eina_Bool      multi_load : 1;
@@ -642,6 +643,7 @@ elm_store_free(Elm_Store *st)
      }
    else
      {
+        LKL(st->lock);
         st->live = EINA_FALSE;
         if (st->genlist)
           {
@@ -689,6 +691,8 @@ elm_store_free(Elm_Store *st)
                }
           }
         eina_list_free(st->header_items);
+        LKU(st->lock);
+        LKD(st->lock);
      }
    free(st);
 }
@@ -885,6 +889,7 @@ _store_init(size_t size)
 {
    Elm_Store *st = calloc(1, size);
    if (!st) return NULL;
+   LKI(st->lock);
 
    eina_magic_string_set(ELM_STORE_MAGIC, "Elm_Store");
    eina_magic_string_set(ELM_STORE_FILESYSTEM_MAGIC, "Elm_Store_Filesystem");
@@ -2265,6 +2270,7 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
 
    if (st->live)
      {
+        LKL(st->lock);
         if (sti->item_info->item_type == ELM_GENLIST_ITEM_GROUP)
           {
              _group_item_append(sti, itc);
@@ -2273,6 +2279,7 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
           {
              _normal_item_append(sti, itc);
           }
+        LKU(st->lock);
         return sti;
      }
    else
