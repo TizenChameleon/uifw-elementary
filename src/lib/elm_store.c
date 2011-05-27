@@ -77,7 +77,6 @@ struct _Elm_Store
              void                  *data;
         } item_free;
    } cb;
-   LK(lock);
    Eina_Bool      sorted : 1;
    Eina_Bool      fetch_thread : 1;
    Eina_Bool      multi_load : 1;
@@ -643,7 +642,6 @@ elm_store_free(Elm_Store *st)
      }
    else
      {
-        LKL(st->lock);
         st->live = EINA_FALSE;
         if (st->genlist)
           {
@@ -688,11 +686,11 @@ elm_store_free(Elm_Store *st)
                     }
                   st->header_items = eina_list_remove(st->header_items, header_list);
                   eina_list_free(header_list);
+                  header_list = NULL;
                }
           }
         eina_list_free(st->header_items);
-        LKU(st->lock);
-        LKD(st->lock);
+        st->header_items = NULL;
      }
    free(st);
 }
@@ -889,7 +887,6 @@ _store_init(size_t size)
 {
    Elm_Store *st = calloc(1, size);
    if (!st) return NULL;
-   LKI(st->lock);
 
    eina_magic_string_set(ELM_STORE_MAGIC, "Elm_Store");
    eina_magic_string_set(ELM_STORE_FILESYSTEM_MAGIC, "Elm_Store_Filesystem");
@@ -1663,6 +1660,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                             {
                                                                st->header_items = eina_list_remove(st->header_items, temp_header_list);
                                                                eina_list_free(header_list);
+                                                               header_list = NULL;
                                                             }
                                                           else if(eina_list_count(header_list) == 1)
                                                             {
@@ -1692,6 +1690,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                     free(temp_sti);
                                                                     st->header_items = eina_list_remove(st->header_items, temp_header_list);
                                                                     eina_list_free(header_list);
+                                                                    header_list = NULL;
                                                                  }
                                                             }
                                                           removed = EINA_TRUE;
@@ -2270,7 +2269,6 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
 
    if (st->live)
      {
-        LKL(st->lock);
         if (sti->item_info->item_type == ELM_GENLIST_ITEM_GROUP)
           {
              _group_item_append(sti, itc);
@@ -2279,7 +2277,6 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
           {
              _normal_item_append(sti, itc);
           }
-        LKU(st->lock);
         return sti;
      }
    else
@@ -2446,6 +2443,7 @@ elm_store_item_del(Elm_Store_Item *sti)
                                              {
                                                 st->header_items = eina_list_remove(st->header_items, temp_header_list);
                                                 eina_list_free(header_list);
+                                                header_list = NULL;
                                              }
                                            else if (eina_list_count(header_list) == 1)
                                              {
@@ -2475,6 +2473,7 @@ elm_store_item_del(Elm_Store_Item *sti)
                                                      free(temp_sti);
                                                      st->header_items = eina_list_remove(st->header_items, temp_header_list);
                                                      eina_list_free(header_list);
+                                                     header_list = NULL;
                                                   }
                                              }
                                            removed = EINA_TRUE;
