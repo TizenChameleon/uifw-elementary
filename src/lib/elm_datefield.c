@@ -1326,7 +1326,7 @@ elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCall
           ecore_imf_context_input_panel_event_callback_add(
         elm_entry_imf_context_get(wd->date[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback, obj);
 
-        for (i = 0; i < TIME_MAX; i++)
+        for (i = 0; i < TIME_MAX-1; i++)
           ecore_imf_context_input_panel_event_callback_add(
         elm_entry_imf_context_get(wd->time[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback, obj);
      }
@@ -1355,7 +1355,7 @@ elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCall
           ecore_imf_context_input_panel_event_callback_del(
         elm_entry_imf_context_get(wd->date[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback);
 
-        for (i = 0; i < TIME_MAX; i++)
+        for (i = 0; i < TIME_MAX-1; i++)
           ecore_imf_context_input_panel_event_callback_del(
         elm_entry_imf_context_get(wd->time[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback);
 
