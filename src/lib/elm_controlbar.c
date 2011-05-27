@@ -306,9 +306,10 @@ _theme_hook(Evas_Object * obj)
         if (item->selected)
           _select_box(item);
      }
-   evas_object_smart_member_add(wd->view, obj);
-   evas_object_smart_member_add(wd->selected_box, obj);
-   evas_object_smart_member_add(wd->box, obj);
+//TODO: "These lines affects item after images. I don't know why it does this time Please check it by you!!"
+//   evas_object_smart_member_add(wd->view, obj);
+//   evas_object_smart_member_add(wd->selected_box, obj);
+//   evas_object_smart_member_add(wd->box, obj);
 }
 
 static void
