@@ -68,12 +68,14 @@ struct _Widget_Data {
    Evas_Coord w_box, h_box;
    int  contracted;
    Eina_Bool  focused: 1;
+   Ecore_IMF_Context *imf_context;
 };
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _on_focus_hook(void *data __UNUSED__, Evas_Object *obj);
+static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src, Evas_Callback_Type type, void *event_info);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hint_cb(void *data, Evas *evas, Evas_Object *obj, void *event);
 static void _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event);
@@ -87,9 +89,13 @@ static void   _button_clicked(void *data, Evas_Object *obj, const char *emission
 static void   _del_button_obj(Evas_Object *obj, Evas_Object *btn);
 static void   _del_button_item(Elm_Multibuttonentry_Item *item);
 static void   _del_button(Evas_Object *obj);
+static void   _select_button(Evas_Object *obj, Evas_Object *btn);
 static Elm_Multibuttonentry_Item* _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, const Elm_Multibuttonentry_Item *reference, void *data);
 static void   _add_button(Evas_Object *obj, char *str);
-static void   _evas_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info );
+static void   _evas_mbe_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void   _entry_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void  _entry_focus_in_cb(void *data, Evas *e, __UNUSED__ void *event_info);
+static void  _entry_focus_out_cb(void *data, Evas *e, __UNUSED__ void *event_info);
 static void   _view_init(Evas_Object *obj);
 static void _set_vis_guidetext(Evas_Object *obj);
 static void _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv);
@@ -147,20 +153,30 @@ static void
 _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+
    if (!wd) return;
 
-   if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)))
+   if (elm_widget_focus_get(obj))
+     {
+        if (wd->imf_context) ecore_imf_context_input_panel_show(wd->imf_context);
+        evas_object_focus_set(obj, EINA_TRUE);
+     }
+   else
      {
         wd->focused = EINA_FALSE;
         _view_update(obj);
         evas_object_smart_callback_call(obj, "unfocused", NULL);
-        if (wd->n_str)
-          {
-             elm_scrolled_entry_entry_set(wd->entry, "");
-             wd->n_str = 0;
-          }
+        if (wd->imf_context) ecore_imf_context_input_panel_hide(wd->imf_context);
+        evas_object_focus_set(obj, EINA_FALSE);
      }
 }
+
+static Eina_Bool
+_event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
+{
+   return EINA_TRUE;
+}
+
 
 static void
 _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
@@ -237,12 +253,20 @@ _event_init(Evas_Object *obj)
      {
         edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "*", _signal_mouse_clicked, obj);
         edje_object_signal_callback_add(wd->base, "clicked", "*", _signal_mouse_clicked, obj);
+        evas_object_event_callback_add(wd->base, EVAS_CALLBACK_KEY_UP, _evas_mbe_key_up_cb, obj);
      }
 
    if (wd->box)
      {
         evas_object_event_callback_add(wd->box, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
         evas_object_event_callback_add(wd->box, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hint_cb, obj);
+     }
+
+   if (wd->entry)
+     {
+        evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
+        evas_object_smart_callback_add(wd->entry, "focused", _entry_focus_in_cb, obj);
+        evas_object_smart_callback_add(wd->entry, "unfocused", _entry_focus_out_cb, obj);
      }
 }
 
@@ -269,7 +293,8 @@ _set_vis_guidetext(Evas_Object *obj)
         elm_box_pack_end(wd->box, wd->entry);
         evas_object_show(wd->entry);
         if (elm_widget_focus_get(obj) || wd->focused)
-          elm_object_focus(wd->entry);
+          if (!wd->current)
+            elm_object_focus(wd->entry);
         wd->view_state = MULTIBUTTONENTRY_VIEW_ENTRY;
      }
    return;
@@ -463,6 +488,7 @@ _view_update(Evas_Object *obj)
 {
    Evas_Coord width = 1, height = 1;
    Widget_Data *wd = elm_widget_data_get(obj);
+
    if (!wd || !wd->box || !wd->entry || !(wd->w_box > 0)) return;
 
    // update label
@@ -603,21 +629,18 @@ static void
 _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   static char str[MAX_STR];
+
    Elm_Multibuttonentry_Item *item = NULL;
    if (!wd || wd->view_state == MULTIBUTTONENTRY_VIEW_CONTRACTED) return;
-
-   strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
-   str[MAX_STR - 1]= 0;
-
-   if (strlen (str))
-      _add_button(data, str);
 
    _change_current_button(data, obj);
 
    if (wd->current)
-      if((item = eina_list_data_get(wd->current)) != NULL)
-         evas_object_smart_callback_call(data, "item,clicked", item);
+     if ((item = eina_list_data_get(wd->current)) != NULL)
+       {
+          evas_object_smart_callback_call(data, "item,clicked", item);
+          _select_button(data, item->button);
+       }
 }
 
 static void
@@ -666,24 +689,25 @@ _del_button_item(Elm_Multibuttonentry_Item *item)
      _set_vis_guidetext(obj);
 }
 
+
 static void
-_del_button(Evas_Object *obj)
+_select_button(Evas_Object *obj, Evas_Object *btn)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Elm_Multibuttonentry_Item *item;
-   if (!wd || !wd->items) return;
 
-   if (!wd->current)
+   if (!wd) return;
+
+   if (btn)
      {
-        // let the last button focus
-        item = eina_list_data_get(eina_list_last(wd->items));
-        if (item->button)   _change_current_button (obj, item->button);
+        _change_current_button(obj, btn);
+        elm_object_unfocus(wd->entry);
+        evas_object_focus_set(btn, EINA_TRUE);
      }
    else
      {
-        item = eina_list_data_get(wd->current);
-        if (item)
-          _del_button_item(item);
+        _change_current_button_state(obj, MULTIBUTONENTRY_BUTTON_STATE_DEFAULT);
+        elm_object_focus(wd->entry);
      }
 }
 
@@ -739,6 +763,7 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
    edje_object_signal_callback_add(btn, "mouse,clicked,1", "*", _button_clicked, obj);
    evas_object_size_hint_weight_set(btn, 0.0, 0.0);
    evas_object_show(btn);
+
    // append item list
    item = ELM_NEW(Elm_Multibuttonentry_Item);
    if (item)
@@ -864,21 +889,56 @@ _add_button(Evas_Object *obj, char *str)
 }
 
 static void
-_evas_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info )
+_evas_mbe_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   Elm_Multibuttonentry_Item *item = NULL;
+
+   static char str[MAX_STR];
+
+   if (!wd || !wd->base || !wd->box) return;
+
+   strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
+   str[MAX_STR - 1] = 0;
+
+
+   Evas_Event_Key_Up *ev = (Evas_Event_Key_Up*)event_info;
+
+   if ( (wd->current) &&  ( (strcmp (ev->keyname, "BackSpace") == 0) || (strcmp (ev->keyname, "BackSpace (") == 0)))
+     {
+        item = eina_list_data_get(wd->current);
+        if (item)
+          {
+             _del_button_item(item);
+             elm_object_focus(wd->entry);
+          }
+     }
+   else if (( (!wd->current) && (wd->n_str == 0) && (strcmp (ev->keyname, "BackSpace") == 0) || (strcmp (ev->keyname, "BackSpace (") == 0)))
+     {
+        item = eina_list_data_get(eina_list_last(wd->items));
+        if (item)
+          _select_button(data, item->button);
+     }
+   else
+     {
+        // nothing
+     }
+   wd->n_str = strlen(str);
+}
+
+static void
+_entry_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *) event_info;
    static char str[MAX_STR];
+
    if (!wd || !wd->base || !wd->box) return;
 
    strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
-   str[MAX_STR - 1]= 0;
+   str[MAX_STR - 1] = 0;
 
-   if ( (wd->n_str == 0) &&  (strcmp (str, "") == 0) &&  ( (strcmp (ev->keyname, "BackSpace") == 0)|| (strcmp (ev->keyname, "BackSpace (") == 0)))
-     {
-        _del_button(data);
-     }
-   else if ( (strcmp (str, "") != 0) &&  (strcmp (ev->keyname, "KP_Enter") == 0 ||strcmp (ev->keyname, "Return") == 0 ))
+   if ( (strcmp (str, "") != 0) && (strcmp (ev->keyname, "KP_Enter") == 0 || strcmp (ev->keyname, "Return") == 0 ))
      {
         _add_button(data, str);
         wd->n_str = 0;
@@ -888,8 +948,27 @@ _evas_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info )
      {
         //
      }
+}
 
-   wd->n_str = strlen(str);
+static void
+_entry_focus_in_cb(void *data, Evas *e, __UNUSED__ void *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+
+   _change_current_button_state(data, MULTIBUTONENTRY_BUTTON_STATE_DEFAULT);
+}
+
+static void
+_entry_focus_out_cb(void *data, Evas *e, __UNUSED__ void *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   static char str[MAX_STR];
+
+   strncpy(str,elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
+   str[MAX_STR -1] = 0;
+
+   if (strlen(str))
+     _add_button(data, str);
 }
 
 static void
@@ -921,13 +1000,14 @@ _view_init(Evas_Object *obj)
         elm_scrolled_entry_single_line_set(wd->entry, EINA_TRUE);
         elm_scrolled_entry_entry_set(wd->entry, "");
         elm_scrolled_entry_cursor_end_set(wd->entry);
+        elm_scrolled_entry_input_panel_enabled_set(wd->entry, EINA_FALSE);
         evas_object_size_hint_min_set(wd->entry, MIN_W_ENTRY, 0);
-        evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_UP, _evas_key_up_cb, obj);
         evas_object_size_hint_weight_set(wd->entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
         if (wd->box)   elm_box_pack_end (wd->box, wd->entry);
         evas_object_show(wd->entry);
         wd->view_state = MULTIBUTTONENTRY_VIEW_ENTRY;
+        wd->imf_context = elm_scrolled_entry_imf_context_get(wd->entry);
      }
 
    if (!wd->end)
@@ -1168,17 +1248,20 @@ elm_multibuttonentry_add(Evas_Object *parent)
 
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_event_hook_set(obj, _event_hook);
    elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
 
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "multibuttonentry", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
+   elm_widget_can_focus_set(obj,EINA_TRUE);
 
    wd->view_state = MULTIBUTTONENTRY_VIEW_NONE;
    wd->focused = EINA_FALSE;
    wd->n_str = 0;
    wd->rectForEnd = NULL;
+   wd->imf_context = NULL;
 
    _view_init(obj);
    _event_init(obj);
@@ -1484,6 +1567,7 @@ elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item)
    Widget_Data *wd;
    Eina_List *l;
    Elm_Multibuttonentry_Item *_item;
+
    if (!item) return;
    ELM_CHECK_WIDTYPE(item->multibuttonentry, widtype);
    wd = elm_widget_data_get(item->multibuttonentry);
@@ -1492,9 +1576,7 @@ elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item)
    EINA_LIST_FOREACH(wd->items, l, _item)
      {
         if (_item == item)
-          {
-             _change_current_button(item->multibuttonentry, item->button);
-          }
+          _select_button(item->multibuttonentry, item->button);
      }
 }
 
@@ -1511,7 +1593,8 @@ elm_multibuttonentry_item_unselect_all(Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   _change_current_button_state(obj, MULTIBUTONENTRY_BUTTON_STATE_DEFAULT);
+
+   _select_button(obj, NULL);
 }
 
 /**
