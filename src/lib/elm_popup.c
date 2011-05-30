@@ -26,9 +26,6 @@ struct _Widget_Data
    Evas_Object *content;
    Elm_Notify_Orient notify_orient;
    Eina_Bool delete_me : 1;
-#ifdef HAVE_ELEMENTARY_X
-   Ecore_Event_Handler* wnd_map_handler;
-#endif
 };
 
 typedef struct _Action_Area_Data Action_Area_Data;
@@ -60,15 +57,6 @@ _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-
-#ifdef HAVE_ELEMENTARY_X
-   if (wd->wnd_map_handler)
-     {
-        ecore_event_handler_del(wd->wnd_map_handler);
-        wd->wnd_map_handler = NULL;
-     }
-#endif
-
    free(wd);
 }
 
@@ -171,30 +159,6 @@ _block_clicked_cb(void *data, Evas_Object *obj, void *event_info)
      }
 }
 
-static Eina_Bool
-_wnd_map_notify(void *data, int type, void *event)
-{
-   Evas* e = NULL;
-   Evas_Object* obj = (Evas_Object*)data;
-   Widget_Data *wd = elm_widget_data_get(data);
-
-   if (obj && wd->wnd_map_handler)
-     {
-        e = evas_object_evas_get(obj);
-
-        if (e)
-          {
-             /* Render given object again, previous frame was discarded. */
-             evas_render(e);
-             ecore_event_handler_del(wd->wnd_map_handler);
-             wd->wnd_map_handler = NULL;
-             return 1;
-          }
-     }
-
-   return 0;
-}
-
 static void
 _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
@@ -204,21 +168,6 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
    elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
    _sizing_eval(obj);
    evas_object_show(obj);
-#ifdef HAVE_ELEMENTARY_X
-   if (e && !wd->wnd_map_handler)
-     {
-        int curr_rmethod = 0;
-        int gl_rmethod = 0;
-
-        curr_rmethod = evas_output_method_get(e);
-        gl_rmethod = evas_render_method_lookup("gl_x11");
-
-        if (!curr_rmethod) return;
-        if (!gl_rmethod) return;
-        if (curr_rmethod == gl_rmethod)
-          wd->wnd_map_handler = ecore_event_handler_add(ECORE_X_EVENT_WINDOW_SHOW, _wnd_map_notify, obj);
-     }
-#endif
 }
 
 static void
@@ -394,7 +343,6 @@ elm_popup_add(Evas_Object *parent)
      }
 #endif
    _sizing_eval(obj);
-
    return obj;
 }
 
@@ -448,7 +396,6 @@ elm_popup_with_buttons_add(Evas_Object *parent, const char *title, const char *d
      }
    edje_object_message_signal_process(wd->layout);
    _sizing_eval(popup);
-
    return popup;
 }
 
