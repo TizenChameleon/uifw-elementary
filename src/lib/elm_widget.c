@@ -1731,6 +1731,7 @@ elm_widget_focus_steal(Evas_Object *obj)
 
    if (sd->focused) return;
    if (sd->disabled) return;
+   if (!sd->can_focus) return;
    parent = obj;
    for (;;)
      {
