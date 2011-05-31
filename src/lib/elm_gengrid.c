@@ -24,7 +24,7 @@
  * application provides a structure with information about that type
  * of item (Gengrid may contain multiple different items with
  * different classes, states and styles). Gengrid will call the
- * functions in this struct (methods) when an item is "realized" (that
+ * functions in this struct (methods) when a item is "realized" (that
  * is created dynamically while scrolling). All objects will simply be
  * deleted when no longer needed with evas_object_del(). The
  * Elm_GenGrid_Item_Class structure contains the following members:
@@ -61,7 +61,7 @@
  * where XXX is the name of the part.
  *
  * func.del - This is called when elm_gengrid_item_del() is called on
- * an item or elm_gengrid_clear() is called on the Gengrid. This is
+ * a item or elm_gengrid_clear() is called on the Gengrid. This is
  * intended for use when actual Gengrid items are deleted, so any
  * backing data attached to the item (e.g. its data parameter on
  * creation) can be deleted.
@@ -75,14 +75,14 @@
  * only valid as long as no items are modified (added, deleted,
  * selected or unselected).
  *
- * If an item changes (state of boolean changes, label or icons
+ * If a item changes (state of boolean changes, label or icons
  * change), then use elm_gengrid_item_update() to have Gengrid update
  * the item with the new state. Gengrid will re-realize the item thus
  * call the functions in the _Elm_Gengrid_Item_Class for that item.
  *
- * To programmatically (un)select an item use
+ * To programmatically (un)select a item use
  * elm_gengrid_item_selected_set().  To get its selected state use
- * elm_gengrid_item_selected_get(). To make an item disabled (unable to
+ * elm_gengrid_item_selected_get(). To make a item disabled (unable to
  * be selected and appear differently) use
  * elm_gengrid_item_disabled_set() to set this and
  * elm_gengrid_item_disabled_get() to get the disabled state.
@@ -101,11 +101,11 @@
  * absolutely must have a specific style that overrides any theme the
  * user or system sets up you can use elm_theme_overlay_add() to add
  * such a file.
- *
+ * 
  * Signals that you can add callbacks for are:
  *
  * "clicked,double" - The user has double-clicked or pressed enter on
- *                    an item. The event_infoparameter is the Gengrid item
+ *                    a item. The event_infoparameter is the Gengrid item
  *                    that was double-clicked.
  * "selected" - The user has made an item selected. The event_info
  *              parameter is the Gengrid item that was selected.
@@ -115,7 +115,7 @@
  *              as a real evas object. event_info is the Gengrid item that was
  *              created. The object may be deleted at any time, so it is up to
  *              the caller to not use the object pointer from
- *              elm_gengrid_item_object_get() in a way where it may point to
+ *              elm_gengrid_item_object_get() in a way where it may point to 
  *              freed objects.
  * "unrealized" - This is called when the real evas object for this item
  *                is deleted. event_info is the Gengrid item that was created.
@@ -194,13 +194,12 @@ struct _Widget_Data
    Eina_Inlist      *items;
    Ecore_Job        *calc_job;
    Eina_List        *selected;
-   Elm_Gengrid_Item *last_selected_item, *reorder_item;
+   Elm_Gengrid_Item *last_selected_item;
    double            align_x, align_y;
 
    Evas_Coord        pan_x, pan_y;
    Evas_Coord        item_width, item_height; /* Each item size */
    Evas_Coord        minw, minh; /* Total obj size */
-   Evas_Coord        reorder_item_x, reorder_item_y;
    unsigned int      nmax;
    long              count;
    int               walking;
@@ -213,10 +212,6 @@ struct _Widget_Data
    Eina_Bool         wasselected : 1;
    Eina_Bool         always_select : 1;
    Eina_Bool         clear_me : 1;
-   Eina_Bool         h_bounce : 1;
-   Eina_Bool         v_bounce : 1;
-   Eina_Bool         reorder_mode : 1;
-   Eina_Bool         reorder_item_changed : 1;
 };
 
 #define ELM_GENGRID_ITEM_FROM_INLIST(item) \
@@ -252,43 +247,6 @@ static Eina_Bool _deselect_all_items(Widget_Data *wd);
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_VERSION;
 static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
-
-static const char SIG_CLICKED_DOUBLE[] = "clicked,double";
-static const char SIG_SELECTED[] = "selected";
-static const char SIG_UNSELECTED[] = "unselected";
-static const char SIG_REALIZED[] = "realized";
-static const char SIG_UNREALIZED[] = "unrealized";
-static const char SIG_CHANGED[] = "changed";
-static const char SIG_DRAG_START_UP[] = "drag,start,up";
-static const char SIG_DRAG_START_DOWN[] = "drag,start,down";
-static const char SIG_DRAG_START_LEFT[] = "drag,start,left";
-static const char SIG_DRAG_START_RIGHT[] = "drag,start,right";
-static const char SIG_DRAG_STOP[] = "drag,stop";
-static const char SIG_DRAG[] = "drag";
-static const char SIG_SCROLL[] = "scroll";
-static const char SIG_SCROLL_DRAG_START[] = "scroll,drag,start";
-static const char SIG_SCROLL_DRAG_STOP[] = "scroll,drag,stop";
-
-static const Evas_Smart_Cb_Description _signals[] = {
-       {SIG_CLICKED_DOUBLE, ""},
-       {SIG_SELECTED, ""},
-       {SIG_UNSELECTED, ""},
-       {SIG_REALIZED, ""},
-       {SIG_UNREALIZED, ""},
-       {SIG_CHANGED, ""},
-       {SIG_DRAG_START_UP, ""},
-       {SIG_DRAG_START_DOWN, ""},
-       {SIG_DRAG_START_LEFT, ""},
-       {SIG_DRAG_START_RIGHT, ""},
-       {SIG_DRAG_STOP, ""},
-       {SIG_DRAG, ""},
-       {SIG_SCROLL, ""},
-       {SIG_SCROLL_DRAG_START, ""},
-       {SIG_SCROLL_DRAG_STOP, ""},
-       {NULL, NULL}
-};
-
-
 
 static Eina_Bool
 _event_hook(Evas_Object       *obj,
@@ -463,8 +421,7 @@ _event_hook(Evas_Object       *obj,
             (!strcmp(ev->keyname, "space")))
      {
         item = elm_gengrid_selected_item_get(obj);
-        evas_object_smart_callback_call(item->wd->self, SIG_CLICKED_DOUBLE, item);
-        evas_object_smart_callback_call(item->wd->self, "clicked", item); // will be removed
+        evas_object_smart_callback_call(item->wd->self, "clicked,double", item);
      }
    else return EINA_FALSE;
 
@@ -751,7 +708,6 @@ _mouse_move(void        *data,
    Elm_Gengrid_Item *item = data;
    Evas_Event_Mouse_Move *ev = event_info;
    Evas_Coord minw = 0, minh = 0, x, y, dx, dy, adx, ady;
-   Evas_Coord ox, oy, ow, oh, it_scrl_x, it_scrl_y;
 
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
      {
@@ -769,7 +725,7 @@ _mouse_move(void        *data,
              ecore_timer_del(item->long_timer);
              item->long_timer = NULL;
           }
-        evas_object_smart_callback_call(item->wd->self, SIG_DRAG, item);
+        evas_object_smart_callback_call(item->wd->self, "drag", item);
         return;
      }
    if ((!item->down) || (item->wd->longpressed))
@@ -778,26 +734,6 @@ _mouse_move(void        *data,
           {
              ecore_timer_del(item->long_timer);
              item->long_timer = NULL;
-          }
-        if ((item->wd->reorder_mode) && (item->wd->reorder_item))
-          {
-             evas_object_geometry_get(item->wd->pan_smart, &ox, &oy, &ow, &oh);
-
-             it_scrl_x = ev->cur.canvas.x - item->wd->reorder_item->dx;
-             it_scrl_y = ev->cur.canvas.y - item->wd->reorder_item->dy;
-
-             if (it_scrl_x < ox) item->wd->reorder_item_x = ox;
-             else if (it_scrl_x + item->wd->item_width > ox + ow)
-               item->wd->reorder_item_x = ox + ow - item->wd->item_width;
-             else item->wd->reorder_item_x = it_scrl_x;
-
-             if (it_scrl_y < oy) item->wd->reorder_item_y = oy;
-             else if (it_scrl_y + item->wd->item_height > oy + oh)
-               item->wd->reorder_item_y = oy + oh - item->wd->item_height;
-             else item->wd->reorder_item_y = it_scrl_y;
-
-             if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
-             item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
           }
         return;
      }
@@ -819,13 +755,13 @@ _mouse_move(void        *data,
         const char *left_drag, *right_drag;
         if (!elm_widget_mirrored_get(item->wd->self))
           {
-             left_drag = SIG_DRAG_START_LEFT;
-             right_drag = SIG_DRAG_START_RIGHT;
+             left_drag = "drag,start,left";
+             right_drag = "drag,start,right";
           }
         else
           {
-             left_drag = SIG_DRAG_START_RIGHT;
-             right_drag = SIG_DRAG_START_LEFT;
+             left_drag = "drag,start,right";
+             right_drag = "drag,start,left";
           }
 
         item->dragging = 1;
@@ -839,7 +775,7 @@ _mouse_move(void        *data,
         if (dy < 0)
           {
              if (ady > adx)
-               evas_object_smart_callback_call(item->wd->self, SIG_DRAG_START_UP,
+               evas_object_smart_callback_call(item->wd->self, "drag,start,up",
                                                item);
              else
                {
@@ -852,7 +788,7 @@ _mouse_move(void        *data,
           {
              if (ady > adx)
                evas_object_smart_callback_call(item->wd->self,
-                                               SIG_DRAG_START_DOWN, item);
+                                               "drag,start,down", item);
              else
                {
                   if (dx < 0)
@@ -875,14 +811,6 @@ _long_press(void *data)
    if ((item->disabled) || (item->dragging)) return ECORE_CALLBACK_CANCEL;
    item->wd->longpressed = EINA_TRUE;
    evas_object_smart_callback_call(item->wd->self, "longpressed", item);
-   if (item->wd->reorder_mode)
-     {
-        item->wd->reorder_item = item;
-        evas_object_raise(item->base.view);
-        elm_smart_scroller_hold_set(item->wd->scr, EINA_TRUE);
-        elm_smart_scroller_bounce_allow_set(item->wd->scr, EINA_FALSE, EINA_FALSE);
-        edje_object_signal_emit(item->base.view, "elm,state,reorder_enabled", "elm");
-     }
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -908,10 +836,7 @@ _mouse_down(void        *data,
    item->wd->wasselected = item->selected;
    _item_hilight(item);
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-     {
-        evas_object_smart_callback_call(item->wd->self, SIG_CLICKED_DOUBLE, item);
-        evas_object_smart_callback_call(item->wd->self, "clicked", item); // will be removed
-     }
+     evas_object_smart_callback_call(item->wd->self, "clicked,double", item);
    if (item->long_timer) ecore_timer_del(item->long_timer);
    if (item->realized)
      item->long_timer = ecore_timer_add(_elm_config->longpress_timeout,
@@ -942,7 +867,7 @@ _mouse_up(void            *data,
    if (item->dragging)
      {
         item->dragging = EINA_FALSE;
-        evas_object_smart_callback_call(item->wd->self, SIG_DRAG_STOP, item);
+        evas_object_smart_callback_call(item->wd->self, "drag,stop", item);
         dragged = EINA_TRUE;
      }
    if (item->wd->on_hold)
@@ -950,17 +875,6 @@ _mouse_up(void            *data,
         item->wd->longpressed = EINA_FALSE;
         item->wd->on_hold = EINA_FALSE;
         return;
-     }
-   if ((item->wd->reorder_mode) && (item->wd->reorder_item))
-     {
-        if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
-          item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
-
-        evas_object_smart_callback_call(item->wd->self, "moved", item->wd->reorder_item);
-        item->wd->reorder_item = NULL;
-        elm_smart_scroller_hold_set(item->wd->scr, EINA_FALSE);
-        elm_smart_scroller_bounce_allow_set(item->wd->scr, item->wd->h_bounce, item->wd->v_bounce);
-        edje_object_signal_emit(item->base.view, "elm,state,reorder_disabled", "elm");
      }
    if (item->wd->longpressed)
      {
@@ -1173,7 +1087,6 @@ _item_place(Elm_Gengrid_Item *item,
 {
    Evas_Coord x, y, ox, oy, cvx, cvy, cvw, cvh;
    Evas_Coord tch, tcw, alignw = 0, alignh = 0, vw, vh;
-   Eina_Bool reorder_item_move_forward = EINA_FALSE;
    item->x = cx;
    item->y = cy;
    evas_object_geometry_get(item->wd->pan_smart, &ox, &oy, &vw, &vh);
@@ -1248,57 +1161,7 @@ _item_place(Elm_Gengrid_Item *item,
      {
         _item_realize(item);
         if (!was_realized)
-          evas_object_smart_callback_call(item->wd->self, SIG_REALIZED, item);
-        if ((item->wd->reorder_mode) && (item->wd->reorder_item))
-          {
-             if (item->wd->reorder_item == item)
-               {
-                  evas_object_move(item->base.view,
-                                   item->wd->reorder_item_x, item->wd->reorder_item_y);
-                  evas_object_resize(item->base.view,
-                                     item->wd->item_width, item->wd->item_height);
-                  return;
-               }
-             else
-               {
-                  if (ELM_RECTS_INTERSECT(item->wd->reorder_item_x, item->wd->reorder_item_y,
-                                          item->wd->item_width, item->wd->item_height,
-                                          x+(item->wd->item_width/2), y+(item->wd->item_height/2),
-                                          1, 1))
-                    {
-                       if (item->wd->horizontal)
-                         {
-                            if ((item->wd->nmax * item->wd->reorder_item->x + item->wd->reorder_item->y) >
-                                (item->wd->nmax * item->x + item->y))
-                              reorder_item_move_forward = EINA_TRUE;
-                         }
-                       else
-                         {
-                            if ((item->wd->nmax * item->wd->reorder_item->y + item->wd->reorder_item->x) >
-                                (item->wd->nmax * item->y + item->x))
-                              reorder_item_move_forward = EINA_TRUE;
-                         }
-
-                       item->wd->items = eina_inlist_remove(item->wd->items,
-                                                            EINA_INLIST_GET(item->wd->reorder_item));
-                       if (reorder_item_move_forward)
-                         item->wd->items = eina_inlist_prepend_relative(item->wd->items,
-                                                                        EINA_INLIST_GET(item->wd->reorder_item),
-                                                                        EINA_INLIST_GET(item));
-                       else
-                         item->wd->items = eina_inlist_append_relative(item->wd->items,
-                                                                       EINA_INLIST_GET(item->wd->reorder_item),
-                                                                       EINA_INLIST_GET(item));
-
-                       item->wd->reorder_item_changed = EINA_TRUE;
-
-                       if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
-                         item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
-
-                       return;
-                    }
-               }
-          }
+          evas_object_smart_callback_call(item->wd->self, "realized", item);
         evas_object_move(item->base.view, x, y);
         evas_object_resize(item->base.view, item->wd->item_width,
                            item->wd->item_height);
@@ -1307,7 +1170,7 @@ _item_place(Elm_Gengrid_Item *item,
      {
         _item_unrealize(item);
         if (was_realized)
-          evas_object_smart_callback_call(item->wd->self, SIG_UNREALIZED, item);
+          evas_object_smart_callback_call(item->wd->self, "unrealized", item);
      }
 }
 
@@ -1370,7 +1233,7 @@ call:
    if (item->func.func)
      item->func.func((void *)item->func.data, item->wd->self, item);
    if (!item->delete_me)
-     evas_object_smart_callback_call(item->wd->self, SIG_SELECTED, item);
+     evas_object_smart_callback_call(item->wd->self, "selected", item);
    item->walking--;
    item->wd->walking--;
    if ((item->wd->clear_me) && (!item->wd->walking))
@@ -1393,7 +1256,7 @@ _item_unselect(Elm_Gengrid_Item *item)
      {
         item->selected = EINA_FALSE;
         item->wd->selected = eina_list_remove(item->wd->selected, item);
-        evas_object_smart_callback_call(item->wd->self, SIG_UNSELECTED, item);
+        evas_object_smart_callback_call(item->wd->self, "unselected", item);
      }
 }
 
@@ -1552,12 +1415,9 @@ _pan_calculate(Evas_Object *obj)
    if (!sd) return;
    if (!sd->wd->nmax) return;
 
-   sd->wd->reorder_item_changed = EINA_FALSE;
-
    EINA_INLIST_FOREACH(sd->wd->items, item)
      {
         _item_place(item, cx, cy);
-        if (sd->wd->reorder_item_changed) return;
         if (sd->wd->horizontal)
           {
              cy = (cy + 1) % sd->wd->nmax;
@@ -1569,7 +1429,7 @@ _pan_calculate(Evas_Object *obj)
              if (!cx) cy++;
           }
      }
-   evas_object_smart_callback_call(sd->wd->self, SIG_CHANGED, NULL);
+   evas_object_smart_callback_call(sd->wd->self, "changed", NULL);
 }
 
 static void
@@ -1628,7 +1488,7 @@ _scr_drag_start(void            *data,
                 Evas_Object *obj __UNUSED__,
                 void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_SCROLL_DRAG_START, NULL);
+   evas_object_smart_callback_call(data, "scroll,drag,start", NULL);
 }
 
 static void
@@ -1636,7 +1496,7 @@ _scr_drag_stop(void            *data,
                Evas_Object *obj __UNUSED__,
                void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_SCROLL_DRAG_STOP, NULL);
+   evas_object_smart_callback_call(data, "scroll,drag,stop", NULL);
 }
 
 static void
@@ -1644,7 +1504,7 @@ _scr_scroll(void            *data,
             Evas_Object *obj __UNUSED__,
             void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, SIG_SCROLL, NULL);
+   evas_object_smart_callback_call(data, "scroll", NULL);
 }
 
 /**
@@ -1705,8 +1565,6 @@ elm_gengrid_add(Evas_Object *parent)
    evas_object_smart_callback_add(obj, "scroll-hold-off", _hold_off, obj);
    evas_object_smart_callback_add(obj, "scroll-freeze-on", _freeze_on, obj);
    evas_object_smart_callback_add(obj, "scroll-freeze-off", _freeze_off, obj);
-
-   evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    if (!smart)
      {
@@ -2012,7 +1870,7 @@ elm_gengrid_item_insert_after(Evas_Object                  *obj,
 }
 
 /**
- * Remove an item from the Gengrid.
+ * Remove a item from the Gengrid.
  *
  * @param item The item to be removed.
  * @return @c EINA_TRUE on success or @c EINA_FALSE otherwise.
@@ -2061,24 +1919,6 @@ elm_gengrid_horizontal_set(Evas_Object *obj,
    /* Update the items to conform to the new layout */
    if (wd->calc_job) ecore_job_del(wd->calc_job);
    wd->calc_job = ecore_job_add(_calc_job, wd);
-}
-
-/**
- * Get for what direction the Gengrid is expanded.
- *
- * @param obj The Gengrid object.
- * @return If the Gengrid is expanded horizontally return @c EINA_TRUE
- * else @c EINA_FALSE.
- *
- * @ingroup Gengrid
- */
-EAPI Eina_Bool
-elm_gengrid_horizontal_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-   return wd->horizontal;
 }
 
 /**
@@ -2190,7 +2030,7 @@ elm_gengrid_item_update(Elm_Gengrid_Item *item)
 }
 
 /**
- * Returns the data associated to an item
+ * Returns the data associated to a item
  *
  * This returns the data value passed on the elm_gengrid_item_append()
  * and related item addition calls.
@@ -2211,7 +2051,7 @@ elm_gengrid_item_data_get(const Elm_Gengrid_Item *item)
 }
 
 /**
- * Set the datan item from the gengrid item
+ * Set the data item from the gengrid item
  *
  * This set the data value passed on the elm_gengrid_item_append() and
  * related item addition calls. This function will also call
@@ -2340,9 +2180,9 @@ elm_gengrid_selected_items_get(const Evas_Object *obj)
 }
 
 /**
- * Set the selected state of an item.
+ * Set the selected state of a item.
  *
- * This sets the selected state of an item. If multi-select is not
+ * This sets the selected state of a item. If multi-select is not
  * enabled and selected is EINA_TRUE, previously selected items are
  * unselected.
  *
@@ -2377,9 +2217,9 @@ elm_gengrid_item_selected_set(Elm_Gengrid_Item *item,
 }
 
 /**
- * Get the selected state of an item.
+ * Get the selected state of a item.
  *
- * This gets the selected state of an item (1 selected, 0 not selected).
+ * This gets the selected state of a item (1 selected, 0 not selected).
  *
  * @param item The item
  * @return The selected state
@@ -2394,7 +2234,7 @@ elm_gengrid_item_selected_get(const Elm_Gengrid_Item *item)
 }
 
 /**
- * Sets the disabled state of an item.
+ * Sets the disabled state of a item.
  *
  * A disabled item cannot be selected or unselected. It will also
  * change appearance to disabled. This sets the disabled state (1
@@ -2412,7 +2252,7 @@ elm_gengrid_item_disabled_set(Elm_Gengrid_Item *item,
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item);
    if (item->disabled == disabled) return;
    if (item->delete_me) return;
-   item->disabled = !!disabled;
+   item->disabled = disabled;
    if (item->realized)
      {
         if (item->disabled)
@@ -2423,7 +2263,7 @@ elm_gengrid_item_disabled_set(Elm_Gengrid_Item *item,
 }
 
 /**
- * Get the disabled state of an item.
+ * Get the disabled state of a item.
  *
  * This gets the disabled state of the given item.
  *
@@ -2497,7 +2337,7 @@ elm_gengrid_item_tooltip_text_set(Elm_Gengrid_Item *item,
  * @param data what to provide to @a func as callback data/context.
  * @param del_cb called when data is not needed anymore, either when
  *        another callback replaces @func, the tooltip is unset with
- *        elm_gengrid_item_tooltip_unset() or the owner @an item
+ *        elm_gengrid_item_tooltip_unset() or the owner @a item
  *        dies. This callback receives as the first parameter the
  *        given @a data, and @c event_info is the item.
  *
@@ -2732,43 +2572,6 @@ elm_gengrid_item_cursor_engine_only_get(const Elm_Gengrid_Item *item)
 }
 
 /**
- * Set the reorder mode
- *
- * @param obj The Gengrid object
- * @param reorder_mode The reorder mode
- * (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Gengrid
- */
-EAPI void
-elm_gengrid_reorder_mode_set(Evas_Object *obj,
-                             Eina_Bool    reorder_mode)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   wd->reorder_mode = reorder_mode;
-}
-
-/**
- * Get the reorder mode
- *
- * @param obj The Gengrid object
- * @return The reorder mode
- * (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Gengrid
- */
-EAPI Eina_Bool
-elm_gengrid_reorder_mode_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-   return wd->reorder_mode;
-}
-
-/**
  * Set the always select mode.
  *
  * Cells will only call their selection func and callback when first
@@ -2869,8 +2672,6 @@ elm_gengrid_bounce_set(Evas_Object *obj,
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    elm_smart_scroller_bounce_allow_set(wd->scr, h_bounce, v_bounce);
-   wd->h_bounce = h_bounce;
-   wd->v_bounce = v_bounce;
 }
 
 /**
@@ -2890,8 +2691,7 @@ elm_gengrid_bounce_get(const Evas_Object *obj,
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   *h_bounce = wd->h_bounce;
-   *v_bounce = wd->v_bounce;
+   elm_smart_scroller_bounce_allow_get(wd->scr, h_bounce, v_bounce);
 }
 
 /**
@@ -2942,37 +2742,6 @@ elm_gengrid_page_relative_set(Evas_Object *obj,
    elm_smart_scroller_paging_get(wd->scr, NULL, NULL, &pagesize_h, &pagesize_v);
    elm_smart_scroller_paging_set(wd->scr, h_pagerel, v_pagerel, pagesize_h,
                                  pagesize_v);
-}
-
-/*
- * Get gengrid scroll page size relative to viewport size.
- *
- * The gengrid scroller is capable of limiting scrolling by the user
- * to "pages" That is to jump by and only show a "whole page" at a
- * time as if the continuous area of the scroller content is split
- * into page sized pieces.  This sets the size of a page relative to
- * the viewport of the scroller. 1.0 is "1 viewport" is size
- * (horizontally or vertically). 0.0 turns it off in that axis. This
- * is mutually exclusive with page size (see
- * elm_gengrid_page_size_set() for more information). Likewise 0.5 is
- * "half a viewport". Sane usable valus are normally between 0.0 and
- * 1.0 including 1.0. If you only want 1 axis to be page "limited",
- * use 0.0 for the other axis.
- *
- * @param obj The gengrid object
- * @param h_pagerel The horizontal page relative size
- * @param v_pagerel The vertical page relative size
- *
- @ingroup Gengrid
- */
-EAPI void
-elm_gengrid_page_relative_get(const Evas_Object *obj, double *h_pagerel, double *v_pagerel)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   elm_smart_scroller_paging_get(wd->scr, h_pagerel, v_pagerel, NULL, NULL);
 }
 
 /**
