@@ -6,13 +6,13 @@
  * @ingroup Elementary
  *
  * This is a editfield. It can contain a simple label and icon objects.
- * 
+ *
  * Smart callbacks that you can add are:
  *
  * clicked - This signal is emitted when an editfield is clicked.
- * 
+ *
  * unfocused - This signal is emitted when an editfield is unfocused.
- * 
+ *
  */
 
 //#define ERASER_PADDING (10)
@@ -21,7 +21,7 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
 {
-   Evas_Object *base;	
+   Evas_Object *base;
    Evas_Object *entry;
    Evas_Object *scroller;
    Evas_Object *ricon;
@@ -57,16 +57,16 @@ _on_focus_hook(void *data, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->base)
-      return;	
-   if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)) ) 
+      return;
+   if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)) )
      {
         evas_object_smart_callback_call(obj, "unfocused", NULL);
         wd->editing = EINA_FALSE;
         edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
         edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
-        if(_empty_entry(wd->entry)) 
+        if(_empty_entry(wd->entry))
           {
-             if(wd->guide_text) 
+             if(wd->guide_text)
                {
                   edje_object_part_text_set(wd->base, "elm.guidetext", wd->guide_text);
                   edje_object_signal_emit(wd->base, "elm,state,guidetext,visible", "elm");
@@ -88,19 +88,19 @@ _theme_hook(Evas_Object *obj)
    else
       edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
    if(!wd->editing)
-      edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");	
+      edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
    if(wd->show_guide_text)
      {
-        if(_empty_entry(wd->entry)) 
+        if(_empty_entry(wd->entry))
           {
-             if(wd->guide_text) 
+             if(wd->guide_text)
                {
                   edje_object_part_text_set(wd->base, "elm.guidetext", wd->guide_text);
                   edje_object_signal_emit(wd->base, "elm,state,guidetext,visible", "elm");
                }
           }
-     }     
-   if(wd->ricon)	
+     }
+   if(wd->ricon)
       edje_object_part_swallow(wd->base, "right_icon", wd->ricon);
    if(wd->licon)
       edje_object_part_swallow(wd->base, "left_icon", wd->licon);
@@ -132,9 +132,9 @@ static void
 _request_sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if(!wd || !wd->base) 
+   if(!wd || !wd->base)
       return;
-   if (wd->needs_size_calc) 
+   if (wd->needs_size_calc)
       return;
    wd->needs_size_calc = EINA_TRUE;
    evas_object_smart_changed(obj);
@@ -165,7 +165,7 @@ _empty_entry(Evas_Object *entry)
    }
    if(len == 0)
       return EINA_TRUE;
-   else 
+   else
       return EINA_FALSE;
 }
 
@@ -177,21 +177,21 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
 
    if(!wd || !wd->base) return;
 
-   if(!_empty_entry(wd->entry)) 
+   if(!_empty_entry(wd->entry))
      {
         if(wd->eraser_show && elm_object_focus_get(obj))
            edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
-	if(wd->guide_text) 
+	if(wd->guide_text)
 	  {
 	     edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
 	     wd->show_guide_text = EINA_FALSE;
 	  }
      }
-   else 
+   else
      {
         if(wd->eraser_show)
            edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
-     } 
+     }
 }
 
 static void
@@ -204,20 +204,20 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
      {
         elm_entry_entry_set(wd->entry, "");
         edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
-     } 	   
+     }
    else if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "eraser"))
      {
         edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
 
-        elm_object_focus(wd->entry);			
+        elm_object_focus(wd->entry);
 
         if(wd->editing == EINA_FALSE)
            elm_entry_cursor_end_set(wd->entry);
 
-        if(!(_empty_entry(wd->entry)) && (wd->eraser_show)) 
+        if(!(_empty_entry(wd->entry)) && (wd->eraser_show))
            edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
-             
-        if(wd->guide_text) 
+
+        if(wd->guide_text)
           {
              edje_object_signal_emit(wd->base, "elm,state,guidetext,hidden", "elm");
              wd->show_guide_text = EINA_FALSE;
@@ -230,7 +230,7 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
 static void
 _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 {
-   Widget_Data *wd = elm_widget_data_get(data);	
+   Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord h;
    if (!wd || !wd->base) return;
    evas_object_geometry_get(obj, NULL, NULL, NULL, &h);
@@ -279,9 +279,9 @@ elm_editfield_add(Evas_Object *parent)
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "editfield", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
-   edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "*", 
+   edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "*",
                                    _signal_mouse_clicked, obj);
-   edje_object_signal_callback_add(wd->base, "clicked", "*", 
+   edje_object_signal_callback_add(wd->base, "clicked", "*",
                                    _signal_mouse_clicked, obj);
 
    evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
@@ -319,17 +319,17 @@ elm_editfield_label_set(Evas_Object *obj, const char *label)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    ELM_CHECK_WIDTYPE(obj, widtype);
-   if (!wd || !wd->base) 
+   if (!wd || !wd->base)
       return;
-   if (wd->label) 
+   if (wd->label)
       eina_stringshare_del(wd->label);
-   if (label) 
+   if (label)
      {
         wd->label = eina_stringshare_add(label);
         edje_object_signal_emit(wd->base, "elm,state,text,visible", "elm");
         edje_object_signal_emit(wd->base, "elm,state,left,icon,hide", "elm");
      }
-   else 
+   else
      {
         wd->label = NULL;
         edje_object_signal_emit(wd->base, "elm,state,text,hidden", "elm");
@@ -353,7 +353,7 @@ elm_editfield_label_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   if (!wd || !wd->base) 
+   if (!wd || !wd->base)
       return NULL;
    return wd->label;
 }
@@ -373,9 +373,9 @@ elm_editfield_guide_text_set(Evas_Object *obj, const char *text)
    ELM_CHECK_WIDTYPE(obj, widtype);
    if (!wd || !wd->base)
       return;
-   if (wd->guide_text) 
+   if (wd->guide_text)
       eina_stringshare_del(wd->guide_text);
-   if (text) 
+   if (text)
      {
         wd->guide_text = eina_stringshare_add(text);
         edje_object_part_text_set(wd->base, "elm.guidetext", wd->guide_text);
@@ -430,19 +430,19 @@ elm_editfield_entry_get(Evas_Object *obj)
  *
  * @ingroup Editfield
  */
-EAPI void 
+EAPI void
 elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);	
-   ELM_CHECK_WIDTYPE(obj, widtype) ;	
+   Widget_Data *wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype) ;
    if (!wd || !wd->base || !icon)
       return;
    if ((wd->licon != icon) && (wd->licon))
-      elm_widget_sub_object_del(obj, wd->licon);	
+      elm_widget_sub_object_del(obj, wd->licon);
    if (icon)
      {
         if (!(edje_object_part_swallow(wd->base, "left_icon", icon)))
-           return;		
+           return;
         wd->licon = icon;
         elm_widget_sub_object_add(obj, icon);
         evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
@@ -450,7 +450,7 @@ elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
         edje_object_signal_emit(wd->base, "elm,state,left,icon,show", "elm");
         edje_object_signal_emit(wd->base, "elm,state,text,hidden", "elm");
         _sizing_eval(obj);
-     }	
+     }
    return;
 }
 
@@ -465,9 +465,9 @@ elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
 EAPI Evas_Object *
 elm_editfield_left_icon_get(Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);    	
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;	
-   if (!wd || !wd->base || !wd->licon) 
+   Widget_Data *wd = elm_widget_data_get(obj);
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   if (!wd || !wd->base || !wd->licon)
       return NULL;
    return wd->licon;
 }
@@ -480,7 +480,7 @@ elm_editfield_left_icon_get(Evas_Object *obj)
  *
  * @ingroup Editfield
  */
-EAPI void 
+EAPI void
 elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -488,18 +488,18 @@ elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
    if (!wd || !wd->base || !icon)
       return;
    if ((wd->ricon != icon) && (wd->ricon))
-      elm_widget_sub_object_del(obj, wd->ricon);	
+      elm_widget_sub_object_del(obj, wd->ricon);
    if (icon)
      {
         if ( !(edje_object_part_swallow(wd->base, "right_icon", icon)) )
-           return;				
+           return;
         wd->ricon = icon;
         elm_widget_sub_object_add(obj, icon);
         evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, obj);		
+                                       _changed_size_hints, obj);
         edje_object_signal_emit(wd->base, "elm,state,right,icon,show", "elm");
         _sizing_eval(obj);
-     }	
+     }
    return;
 }
 
@@ -515,7 +515,7 @@ EAPI Evas_Object *
 elm_editfield_right_icon_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;	
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    if (!wd || !wd->base || !wd->ricon)
       return NULL;
    return wd->ricon;
@@ -524,7 +524,7 @@ elm_editfield_right_icon_get(Evas_Object *obj)
 /**
  * Set entry object style as single-line or multi-line.
  *
- * @param obj The editfield object  
+ * @param obj The editfield object
  * @param single_line 1 if single-line , 0 if multi-line
  *
  * @ingroup Editfield
@@ -534,12 +534,12 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *entry;
-   ELM_CHECK_WIDTYPE(obj, widtype);	   
-   if (!wd || !wd->base || wd->single_line == single_line) 
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   if (!wd || !wd->base || wd->single_line == single_line)
       return;
    wd->single_line = single_line;
    elm_entry_single_line_set(wd->entry, single_line);
-   if(single_line) 
+   if(single_line)
      {
         if(!wd->scroller)
           {
@@ -556,7 +556,7 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 
         elm_scroller_content_set(wd->scroller, wd->entry);
      }
-   else 
+   else
      {
         entry = elm_entry_add(obj);
         elm_object_style_set(entry, "editfield");
@@ -580,7 +580,7 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 /**
  * Get the current entry object style(single-line or multi-line)
  *
- * @param obj The editfield object  
+ * @param obj The editfield object
  * @return 1 if single-line , 0 if multi-line
  *
  * @ingroup Editfield
@@ -589,7 +589,7 @@ EAPI Eina_Bool
 elm_editfield_entry_single_line_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;	
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    if (!wd || !wd->base)
       return EINA_FALSE;
    return wd->single_line;
@@ -598,8 +598,8 @@ elm_editfield_entry_single_line_get(Evas_Object *obj)
 /**
  * Set enable user to clean all of text.
  *
- * @param obj The editfield object  
- * @param visible If true, the eraser is visible and user can clean all of text by using eraser.  
+ * @param obj The editfield object
+ * @param visible If true, the eraser is visible and user can clean all of text by using eraser.
  * If false, the eraser is invisible.
  *
  * @ingroup Editfield
@@ -608,22 +608,22 @@ EAPI void
 elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype);	
+   ELM_CHECK_WIDTYPE(obj, widtype);
    if (!wd || !wd->base)
       return;
 
    wd->eraser_show = visible;
 
-   if (!visible) 
+   if (!visible)
       edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
 
-   return; 
+   return;
 }
 
 /**
  * Get the current state of erase (visible/invisible)
  *
- * @param obj The editfield object  
+ * @param obj The editfield object
  * @return 1 if visible, 0 if invisible
  *
  * @ingroup Editfield
@@ -632,7 +632,7 @@ EAPI Eina_Bool
 elm_editfield_eraser_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;	
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    if (!wd || !wd->base)
       return EINA_FALSE;
    return wd->eraser_show;
