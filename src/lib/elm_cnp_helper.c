@@ -158,6 +158,7 @@ static int notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_No
 static int notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
 static int notify_handler_image(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
 static int notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
+static int notify_handler_edje(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
 static int notify_handler_html(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
 static int vcard_receive(Cnp_Selection *sed, Ecore_X_Event_Selection_Notify *notify);
 
@@ -189,10 +190,10 @@ static Cnp_Atom atoms[CNP_N_ATOMS] = {
      },
      [CNP_ATOM_XELM] =  {
           "application/x-elementary-markup",
-          ELM_SEL_FORMAT_MARKUP,
+          ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_HTML,
           edje_converter,
           NULL,
-          NULL,
+          notify_handler_edje,
           0
      },
      [CNP_ATOM_text_uri] = {
@@ -1111,14 +1112,13 @@ _convert_to_edje(Eina_List* nodes)
                             else if (!strcmp(_HTMLtoEFLConvertTable[j].src, "img"))
                               {
                                  PItemTagData data = trail->tagData;
-                                 char *width = IMAGE_DEFAULT_WIDTH, *height = IMAGE_DEFAULT_HEIGHT;
-                                 if (data->href)
-                                   eina_strbuf_append_printf(html, " href=%s", data->href);
-                                 if (data->width)
+                                 char *width = IMAGE_DEFAULT_WIDTH, *height = IMAGE_DEFAULT_HEIGHT;                                 if (data->width)
                                    width = data->width;
                                  if (data->height)
                                    height = data->height;
-                                 eina_strbuf_append_printf(html, " absize=%sx%s></item>", width, height);
+                                 eina_strbuf_append_printf(html, " absize=%sx%s", width, height);
+                                 if (data->href)
+                                   eina_strbuf_append_printf(html, " href=%s></item>", data->href);
                                  break;
                               }
                          }
@@ -1671,7 +1671,34 @@ notify_handler_image(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    return 0;
 }
 
+static int
+notify_handler_edje(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
+{
+   Ecore_X_Selection_Data *data;
 
+   data = notify->data;
+
+   char *stripstr = NULL;
+   stripstr = malloc(sizeof(char) * (data->length + 1));
+   strncpy(stripstr, (char *)data->data, data->length);
+   stripstr[data->length] = '\0';
+
+   if (sel->datacb)
+     {
+        Elm_Selection_Data ddata;
+        ddata.x = ddata.y = 0;
+        ddata.format = ELM_SEL_FORMAT_MARKUP;
+        ddata.data = stripstr;
+        ddata.len = data->length;
+        sel->datacb(sel->udata, sel->widget, &ddata);
+     }
+   else
+     elm_entry_entry_insert(sel->requestwidget, stripstr);
+
+   cnp_debug("String is %s (%d bytes)\n", stripstr, data->length);
+   free(stripstr);
+   return 0;
+}
 /**
  *    Warning: Generic text/html can';t handle it sanely.
  *    Firefox sends ucs2 (i think).
@@ -1685,23 +1712,24 @@ notify_handler_html(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    cnp_debug("Got some HTML: Checking encoding is useful\n");
    data = notify->data;
 
+   char *stripstr = NULL;
+   stripstr = malloc(sizeof(char) * (data->length + 1));
+   strncpy(stripstr, (char *)data->data, data->length);
+   stripstr[data->length] = '\0';
+
    if (sel->datacb)
      {
         Elm_Selection_Data ddata;
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_HTML;
-        ddata.data = data->data;
+        ddata.data = stripstr;
         ddata.len = data->length;
         sel->datacb(sel->udata, sel->widget, &ddata);
-        return 0;
      }
+   else
+     elm_entry_entry_insert(sel->requestwidget, stripstr);
 
-   char *stripstr = NULL;
-   stripstr = malloc(sizeof(char) * (data->length + 1));
-   strncpy(stripstr, (char *)data->data, data->length);
-   stripstr[data->length] = '\0';
    cnp_debug("String is %s (%d bytes)\n", stripstr, data->length);
-   elm_entry_entry_insert(sel->requestwidget, stripstr);
    free(stripstr);
    return 0;
 }
@@ -1742,7 +1770,6 @@ static Eina_Bool
 edje_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **data_ret, int *size_ret, Ecore_X_Atom *ttype __UNUSED__, int *typesize __UNUSED__)
 {
    Cnp_Selection *sel;
-
    sel = selections + *((int *)data);
 /*   if (data_ret) *data_ret = strdup(sel->selbuf);
    if (size_ret) *size_ret = strlen(sel->selbuf);*/
