@@ -162,6 +162,7 @@ test_gengrid(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    elm_gengrid_item_size_set(grid, 150, 150);
    elm_gengrid_horizontal_set(grid, EINA_FALSE);
    elm_gengrid_multi_select_set(grid, EINA_TRUE);
+   elm_gengrid_reorder_mode_set(grid, EINA_TRUE);
    evas_object_smart_callback_add(grid, "selected", grid_selected, NULL);
    evas_object_smart_callback_add(grid, "clicked", grid_clicked, NULL);
    evas_object_smart_callback_add(grid, "longpressed", grid_longpress, NULL);
