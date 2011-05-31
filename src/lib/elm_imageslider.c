@@ -1173,6 +1173,27 @@ elm_imageslider_item_photo_file_get(Elm_Imageslider_Item * it)
 }
 
 /**
+* Sets the photo file path of given Image Slider item
+*
+* @param it         The Image Slider item
+* @param photo_file The photo file path or NULL;
+*
+* @ingroup Imageslider
+*/
+EAPI void
+elm_imageslider_item_photo_file_set(Elm_Imageslider_Item *it, const char *photo_file)
+{
+   if (!it) return;
+   ELM_CHECK_WIDTYPE(it->obj, widtype);
+
+   if (photo_file)
+     {
+        eina_stringshare_replace(&(it->photo_file), photo_file);
+        elm_imageslider_item_update(it);
+     }
+}
+
+/**
 * Get the previous Image Slider item
 *
 * @param it 		The Image Slider item
@@ -1285,3 +1306,28 @@ elm_imageslider_next(Evas_Object * obj)
 
 }
 
+/**
+* Updates an Image Slider item
+*
+* @param it The Image Slider item
+*
+* @ingroup Imageslider
+*/
+EAPI void
+elm_imageslider_item_update(Elm_Imageslider_Item *it)
+{
+   Widget_Data *wd;
+   int i = 0;
+
+   if (!it || (!(wd = elm_widget_data_get(it->obj)))) return;
+   ELM_CHECK_WIDTYPE(it->obj, widtype);
+
+   if (it == eina_list_data_get(eina_list_prev(wd->cur)))
+     elm_layout_content_set(wd->ly[BLOCK_LEFT], "swl.photo", NULL);
+   else if (it == eina_list_data_get(wd->cur))
+     elm_layout_content_set(wd->ly[BLOCK_CENTER], "swl.photo", NULL);
+   else if (it == eina_list_data_get(eina_list_prev(wd->cur)))
+     elm_layout_content_set(wd->ly[BLOCK_RIGHT], "swl.photo", NULL);
+
+   _imageslider_update(wd);
+}

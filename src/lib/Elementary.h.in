@@ -3301,6 +3301,8 @@ extern "C" {
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_next(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
    EAPI void                   elm_imageslider_prev(Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void                   elm_imageslider_next(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                   elm_imageslider_item_photo_file_set(Elm_Imageslider_Item *it, const char *photo_file) EINA_ARG_NONNULL(1,2);
+   EAPI void                   elm_imageslider_item_update(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
 
    /* Store */
    typedef struct _Elm_Store                      Elm_Store;
