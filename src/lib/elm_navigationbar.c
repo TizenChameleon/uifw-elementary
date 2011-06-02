@@ -265,25 +265,16 @@ _item_del(Elm_Navigationbar_Item *it)
 static void
 _sizing_eval(Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Coord minw = -1, minh = -1;
-   Evas_Coord w = -1, h = -1;
+   Widget_Data *wd;
    Eina_List *list;
 
-   edje_object_size_min_calc(wd->base, &minw, &minh);
-   evas_object_size_hint_min_get(obj, &w, &h);
-   if (w > minw) minw = w;
-   if (h > minw) minh = h;
-
-   evas_object_size_hint_min_set(obj, minw, minh);
-   evas_object_size_hint_max_set(obj, -1, -1);
+   wd  = elm_widget_data_get(obj);
+   if (!wd) return;
 
    list = eina_list_last(wd->stack);
-   if (list)
-     {
-        Elm_Navigationbar_Item *it = list->data;
-        _item_sizing_eval(it);
-     }
+   if (!list) return;
+
+   _item_sizing_eval(list->data);
 }
 
 static void
@@ -606,7 +597,6 @@ elm_navigationbar_add(Evas_Object *parent)
    //TODO: elm,action,title,clicked
    edje_object_signal_callback_add(wd->base, "elm,action,clicked", "elm",
                                             _title_clicked, obj);
-
 
    //TODO: How about making the pager as a base?
    //TODO: Swallow title and content as one content into the pager.
