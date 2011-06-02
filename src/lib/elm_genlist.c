@@ -2774,7 +2774,8 @@ _changed_job(void *data)
 {
    Widget_Data *wd = data; Eina_List *l2;
    Item_Block *itb;
-   int num, num0, position = 0, recalc = 0;
+   int num, num0, position = 0;
+   Eina_Bool width_changed = EINA_FALSE, height_changed = EINA_FALSE;
    if (!wd) return;
    wd->changed_job = NULL;
    num = 0;
@@ -2791,7 +2792,7 @@ _changed_job(void *data)
              continue;
           }
         num0 = num;
-        recalc = 0;
+        width_changed = height_changed = EINA_FALSE;
         EINA_LIST_FOREACH(itb->items, l2, it)
           {
              if ((!it->mincalcd) && (it->realized))
@@ -2812,17 +2813,37 @@ _changed_job(void *data)
                   it->mincalcd = EINA_TRUE;
 
                   //if ((it->minw != itminw) || (it->minh != itminh))
+                  //if ((it->minh != itminh))
+                  //  recalc = 1;
+                  if ((it->minw != itminw))
+                    width_changed = EINA_TRUE;
                   if ((it->minh != itminh))
-                    recalc = 1;
+                    height_changed = EINA_TRUE;
+
+                  if ((!it->wd->group_item_width) && (it->flags == ELM_GENLIST_ITEM_GROUP))
+                    {
+                       it->wd->group_item_width = mw;
+                       it->wd->group_item_height = mh;
+                    }
+                  else if ((!it->wd->item_width) && (it->flags == ELM_GENLIST_ITEM_NONE))
+                    {
+                       it->wd->item_width = mw;
+                       it->wd->item_height = mh;
+                    }
                }
              num++;
           }
         itb->updateme = EINA_FALSE;
-        if (recalc)
+        // TODO: why this is separated.
+        if (height_changed)
           {
              position = 1;
              itb->changed = EINA_TRUE;
              _item_block_recalc(itb, num0, 0, 1);
+             _item_block_position(itb, num0);
+          }
+        else if (width_changed)
+          {
              _item_block_position(itb, num0);
           }
      }
