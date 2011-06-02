@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build19) unstable; urgency=low
+
+  * [genlist] Adding freezes and thaws. Upstream merge.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build19
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Thu, 02 Jun 2011 11:24:43 +0900
+
 elementary (1.0.0+svn.58393slp2+build18) unstable; urgency=low
 
   * [controlbar] fixed item afterimage problem
