@@ -50,6 +50,15 @@ static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
+static Eina_List *_item_get(Evas_Object *obj, Evas_Object *content);
+
+static const char SIG_HIDE_FINISHED[] = "hide,finished";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_HIDE_FINISHED, ""},
+   {NULL, NULL}
+};
+
 
 static void
 _del_hook(Evas_Object *obj)
@@ -87,6 +96,23 @@ _theme_hook(Evas_Object *obj)
                               _elm_config->scale);
      }
    _sizing_eval(obj);
+}
+
+static Eina_List *
+_item_get(Evas_Object *obj, Evas_Object *content)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Item *it;
+   Eina_List *l;
+   if (!wd) return;
+
+   EINA_LIST_FOREACH(wd->stack, l, it)
+     {
+        if (it->content == content)
+          return l;
+     }
+
+   return NULL;
 }
 
 static Eina_Bool
@@ -154,9 +180,13 @@ _eval_top(Evas_Object *obj)
              if(wd->disable_animation)
                {
                   edje_object_signal_emit(o, "elm,action,hide,noanimate", "elm");
+                  wd->stack = eina_list_remove(wd->stack, wd->top);
                }
              else if (wd->top->popme)
-               edje_object_signal_emit(o, "elm,action,pop", "elm");
+               {
+                  edje_object_signal_emit(o, "elm,action,pop", "elm");
+                  wd->stack = eina_list_remove(wd->stack, wd->top);
+               }
              else
                edje_object_signal_emit(o, "elm,action,hide", "elm");
              onhide = edje_object_data_get(o, "onhide");
@@ -219,19 +249,19 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
    Eina_List *l;
    Item *it;
    if (!wd) return;
-   EINA_LIST_FOREACH(wd->stack, l, it)
-     {
-        if (it->content == sub)
-          {
-             wd->stack = eina_list_remove_list(wd->stack, l);
-             evas_object_event_callback_del_full
-                (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
-             evas_object_del(it->base);
-             _eval_top(it->obj);
-             free(it);
-             return;
-          }
-     }
+   l = _item_get(obj, sub);
+   if (!l) return;
+   it = l->data;
+
+   wd->stack = eina_list_remove_list(wd->stack, l);
+   evas_object_event_callback_del_full
+      (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
+   //TODO: Since the base and content is sub object of pager,
+   //this function (and _item_get) will be called unnecessary.
+   //consider use EVAS_CALLBACK_DEL instead of sub_del callback
+   evas_object_del(it->base);
+   _eval_top(data);
+   free(it);
 }
 
 static void
@@ -251,13 +281,25 @@ _signal_hide_finished(void *data, Evas_Object *obj __UNUSED__, const char *emiss
 {
    Item *it = data;
    Evas_Object *obj2 = it->obj;
-   evas_object_hide(it->base);
-   edje_object_signal_emit(it->base, "elm,action,reset", "elm");
-   evas_object_smart_callback_call(obj2, "hide,finished", it->content);
-   edje_object_message_signal_process(it->base);
-   evas_object_hide(it->content);
-   if (it->popme) evas_object_del(it->content);
-   _sizing_eval(obj2);
+   Evas_Object *content = it->content;
+
+   if (it->popme)
+     {
+        evas_object_del(it->base);
+        evas_object_event_callback_del_full
+           (content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
+        evas_object_del(content);
+        free(it);
+     }
+   else
+     {
+        evas_object_hide(it->base);
+        edje_object_signal_emit(it->base, "elm,action,reset", "elm");
+        edje_object_message_signal_process(it->base);
+        evas_object_hide(content);
+     }
+    evas_object_smart_callback_call(obj2, SIG_HIDE_FINISHED, content);
+    _sizing_eval(obj2);
 }
 
 /**
@@ -300,6 +342,8 @@ elm_pager_add(Evas_Object *parent)
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
+
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
    return obj;
@@ -315,15 +359,20 @@ elm_pager_add(Evas_Object *parent)
  * @param content The object to push
  *
  * @ingroup Pager
+ * @warning It will be failed if the content exists on the stack already.
  */
 EAPI void
 elm_pager_content_push(Evas_Object *obj, Evas_Object *content)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   Item *it = ELM_NEW(Item);
    Evas_Coord x, y, w, h;
-   if (!wd) return;
+   Item *it;
+
+   if ((!wd) || (!content)) return;
+   if (_item_get(obj, content)) return;
+
+   it = ELM_NEW(Item);
    if (!it) return;
    it->obj = obj;
    it->content = content;
@@ -384,6 +433,7 @@ elm_pager_content_pop(Evas_Object *obj)
              wd->top = it;
              o = wd->top->base;
              edje_object_signal_emit(o, "elm,action,pop", "elm");
+             wd->stack = eina_list_remove(wd->stack, it);
              onhide = edje_object_data_get(o, "onhide");
              if (onhide)
                {
@@ -470,16 +520,13 @@ elm_pager_content_promote(Evas_Object *obj, Evas_Object *content)
    Eina_List *l;
    Item *it;
    if (!wd) return;
-   EINA_LIST_FOREACH(wd->stack, l, it)
-     {
-        if (it->content == content)
-          {
-             wd->stack = eina_list_remove_list(wd->stack, l);
-             wd->stack = eina_list_append(wd->stack, it);
-             _eval_top(obj);
-             return;
-          }
-     }
+   l = _item_get(obj, content);
+   if (!l) return;
+
+   it = l->data;
+   wd->stack = eina_list_remove_list(wd->stack, l);
+   wd->stack = eina_list_append(wd->stack, it);
+   _eval_top(obj);
 }
 
 /**
