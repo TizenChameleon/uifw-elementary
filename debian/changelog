@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build22) unstable; urgency=low
+
+  * Package Upload for base.src and elementar_config
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build22
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Tue, 07 Jun 2011 21:23:02 +0900
+
 elementary (1.0.0+svn.58393slp2+build21) unstable; urgency=low
 
   * [pager] fixed elm_pager_content_bottom_get logic error
