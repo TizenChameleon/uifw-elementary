@@ -1,10 +1,12 @@
 elementary (1.0.0+svn.58393slp2+build21) unstable; urgency=low
 
   * [pager] fixed elm_pager_content_bottom_get logic error
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build21
   * Git: 165.213.180.234:slp/pkgs/e/elementary
   * Tag: elementary_1.0.0+svn.58393slp2+build21
 
- -- ChunEon Park <chuneon.park@samsung.com>  Sat, 04 Jun 2011 20:28:05 +0900
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Sat, 04 Jun 2011 20:28:05 +0900
 
 elementary (1.0.0+svn.58393slp2+build20) unstable; urgency=low
 
