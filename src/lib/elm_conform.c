@@ -295,7 +295,10 @@ _content_resize_event_cb(void *data, Evas *e, Evas_Object *obj,
    Evas_Object *conformant = (Evas_Object *) data;
    Widget_Data *wd = elm_widget_data_get(conformant);
    if (!wd) return;
+
+#ifdef HAVE_ELEMENTARY_X
    if (wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF) return;
+#endif
 
    focus_obj = elm_widget_focused_object_get(conformant);
    if (focus_obj)

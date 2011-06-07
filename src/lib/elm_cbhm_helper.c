@@ -1,9 +1,10 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
+#ifdef HAVE_ELEMENTARY_X
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
-
+#endif
 
 /**
  * @defgroup CBHM_helper CBHM_helper
@@ -18,19 +19,24 @@
 #define CLIPBOARD_MANAGER_WINDOW_TITLE_STRING "X11_CLIPBOARD_HISTORY_MANAGER"
 #define ATOM_CBHM_WINDOW_NAME "CBHM_XWIN"
 
+#ifdef HAVE_ELEMENTARY_X
 static Ecore_X_Display *cbhm_disp = NULL;
 static Ecore_X_Window cbhm_win = None;
 static Ecore_X_Window self_win = None;
+#endif
 static Eina_Bool init_flag = EINA_FALSE;
 
 void _get_clipboard_window();
 unsigned int _get_cbhm_serial_number();
 void _search_clipboard_window(Ecore_X_Window w);
 int _send_clipboard_events(char *cmd);
+#ifdef HAVE_ELEMENTARY_X
 int _get_clipboard_data(Atom datom, char **datomptr);
+#endif
 
 void _get_clipboard_window()
 {
+#ifdef HAVE_ELEMENTARY_X
 	Atom actual_type;
 	int actual_format;
 	unsigned long nitems, bytes_after;
@@ -46,15 +52,17 @@ void _get_clipboard_window()
 		XFree(prop_return);
 		fprintf(stderr, "## find clipboard history manager at root\n");
 	}
+#endif
 }
 
 unsigned int _get_cbhm_serial_number()
 {
+	unsigned int senum = 0;
+#ifdef HAVE_ELEMENTARY_X
 	Atom actual_type;
 	int actual_format;
 	unsigned long nitems, bytes_after;
 	unsigned char *prop_return = NULL;
-	unsigned int senum = 0;
 	Atom atomCbhmSN = XInternAtom(cbhm_disp, "CBHM_SERIAL_NUMBER", False);
 
 	// FIXME : is it really needed?
@@ -70,11 +78,13 @@ unsigned int _get_cbhm_serial_number()
 		XFree(prop_return);
 	}
 	fprintf(stderr, "## chbm_serial = %d\n", senum);
+#endif
 	return senum;
 }
 
 void _search_clipboard_window(Ecore_X_Window w)
 {
+#ifdef HAVE_ELEMENTARY_X
     // Get the PID for the current Window.
 	Atom atomWMName = XInternAtom(cbhm_disp, "_NET_WM_NAME", False);
 	Atom atomUTF8String = XInternAtom(cbhm_disp, "UTF8_STRING", False);
@@ -108,6 +118,7 @@ void _search_clipboard_window(Ecore_X_Window w)
 		for(i = 0; i < nchildren; i++)
 			_search_clipboard_window(wchild[i]);
 	}
+#endif
 }
 
 int _send_clipboard_events(char *cmd)
@@ -115,6 +126,7 @@ int _send_clipboard_events(char *cmd)
 	if (cmd == NULL)
 		return -1;
 
+#ifdef HAVE_ELEMENTARY_X
 	Atom atomCBHM_MSG = XInternAtom(cbhm_disp, "CBHM_MSG", False);
 
 	XClientMessageEvent m;
@@ -127,10 +139,11 @@ int _send_clipboard_events(char *cmd)
 	sprintf(m.data.b, "%s", cmd);
 
 	XSendEvent(cbhm_disp, cbhm_win, False, NoEventMask, (XEvent*)&m);
-
+#endif
 	return 0;
 }
 
+#ifdef HAVE_ELEMENTARY_X
 int _get_clipboard_data(Atom datom, char **datomptr)
 {
 //	Atom atomUTF8String = XInternAtom(cbhm_disp, "UTF8_STRING", False);
@@ -184,12 +197,14 @@ int _get_clipboard_data(Atom datom, char **datomptr)
 	*datomptr = NULL;
 	return -1;
 }
-
+#endif
 
 void free_clipboard_data(char *dptr)
 {
+#ifdef HAVE_ELEMENTARY_X
 	XFree(dptr);
 	return;
+#endif
 }
 
 
@@ -206,6 +221,7 @@ elm_cbhm_helper_init(Evas_Object *self)
 {
 	init_flag = EINA_FALSE;
 
+#ifdef HAVE_ELEMENTARY_X
 	cbhm_disp = ecore_x_display_get();
 	if (cbhm_disp == NULL)
 		return init_flag;
@@ -218,7 +234,7 @@ elm_cbhm_helper_init(Evas_Object *self)
    
 	if (cbhm_disp && cbhm_win && self_win)
 		init_flag = EINA_TRUE;
-
+#endif
 	return init_flag;
 }
 
@@ -258,9 +274,11 @@ elm_cbhm_get_count()
 
 	_send_clipboard_events("get count");
 
+#ifdef HAVE_ELEMENTARY_X
 	Atom atomCBHM_cCOUNT = XInternAtom(cbhm_disp, "CBHM_cCOUNT", False);
 
 	_get_clipboard_data(atomCBHM_cCOUNT, &retptr);
+#endif
 
 	if (retptr != NULL)
 	{
@@ -291,9 +309,11 @@ elm_cbhm_get_raw_data()
 
 	_send_clipboard_events("get raw");
 
+#ifdef HAVE_ELEMENTARY_X
 	Atom atomCBHM_cRAW = XInternAtom(cbhm_disp, "CBHM_cRAW", False);
 
 	_get_clipboard_data(atomCBHM_cRAW, &retptr);
+#endif
 
 	if (retptr != NULL)
 	{
@@ -348,9 +368,11 @@ elm_cbhm_get_data_by_position(int pos, char **dataptr)
 
 	sprintf(reqbuf, "CBHM_c%d", pos);
 
+#ifdef HAVE_ELEMENTARY_X
 	Atom atomCBHM_cPOS = XInternAtom(cbhm_disp, reqbuf, False);
 
 	ret = _get_clipboard_data(atomCBHM_cPOS, dataptr);
+#endif
 
 	if (ret >= 0 && *dataptr != NULL)
 	{
