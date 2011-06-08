@@ -79,11 +79,12 @@ static void
 _share(void *data, Evas_Object *obj, void *event_info)
 {
 	char *str = NULL;
+#ifdef HAVE_ELEMENTARY_X
 	Ecore_X_Atom atom;
-
+#endif
 	str = elm_entry_markup_to_utf8(elm_entry_selection_get(data));
         if (!str) return;
-
+#ifdef HAVE_ELEMENTARY_X
         atom = ecore_x_atom_get("_TEXT_SHARE_TEST");
         if (atom)
           {
@@ -92,6 +93,7 @@ _share(void *data, Evas_Object *obj, void *event_info)
                                            atom, ECORE_X_EVENT_MASK_WINDOW_CONFIGURE,
                                            0, 0, 0, 0, 0);
           }
+#endif
         free(str);
 
 	evas_object_hide(obj);
@@ -110,7 +112,9 @@ static void
 _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
 {
 	// start for cbhm
+#ifdef HAVE_ELEMENTARY_X
 	ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+#endif
 	ext_mod->cnpinit(data,obj,event_info);
 	elm_cbhm_helper_init(obj);
 	if (ext_mod->textonly)

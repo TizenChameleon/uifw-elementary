@@ -996,7 +996,9 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    if (!wd) return;
 
    // start for cbhm
+#ifdef HAVE_ELEMENTARY_X
    ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+#endif
    cnpwidgetdata = data;
    elm_cbhm_helper_init(obj);
    if (elm_entry_cnp_textonly_get(obj))
@@ -2625,8 +2627,10 @@ elm_entry_entry_insert(Evas_Object *obj, const char *entry)
    if (!wd) return;
    edje_object_part_text_insert(wd->ent, "elm.text", entry);
    // start for cbhm
+#ifdef HAVE_ELEMENTARY_X
    if (cnpwidgetdata == obj)
       ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+#endif
    // end for cbhm
    wd->changed = EINA_TRUE;
    _sizing_eval(obj);

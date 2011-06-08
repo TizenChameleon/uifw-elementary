@@ -2419,8 +2419,8 @@ elm_win_indicator_state_set(Evas_Object *obj, int show_state)
    if (strcmp(elm_widget_type_get(obj), "win")) return;
    win = elm_widget_data_get(obj);
    if (!win) return;
-   _elm_win_xwindow_get(win);
 #ifdef HAVE_ELEMENTARY_X
+   _elm_win_xwindow_get(win);
    if (win->xwin)
       return ecore_x_window_prop_property_set (win->xwin,
                    ECORE_X_ATOM_E_ILLUME_INDICATOR_STATE, ECORE_X_ATOM_CARDINAL, 32, &show_state, 1);
@@ -2435,8 +2435,8 @@ elm_win_indicator_state_get(Evas_Object *obj)
    if (strcmp(elm_widget_type_get(obj), "win")) return -1;
    win = elm_widget_data_get(obj);
    if (!win) return -1;
-   _elm_win_xwindow_get(win);
 #ifdef HAVE_ELEMENTARY_X
+   _elm_win_xwindow_get(win);
    if (win->xwin)
      {
         int ret;

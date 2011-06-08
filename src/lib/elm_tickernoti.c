@@ -157,9 +157,10 @@ static Evas_Object
    elm_win_autodel_set (win, EINA_TRUE);
    elm_win_alpha_set (win, EINA_TRUE);
 
+#ifdef HAVE_ELEMENTARY_X
 /* set top window */
    _make_notification_window (win);
-   
+#endif
    return win;
 }
 
@@ -239,14 +240,18 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
    if (wd->mode == ELM_TICKERNOTI_DEFAULT) 
      {
         evas_object_hide (wd->win_detail);
+#ifdef HAVE_ELEMENTARY_X
 	_make_notification_window (wd->win_indi);
+#endif
 	evas_object_show (wd->win_indi);
 	edje_object_signal_emit (wd->edje_indi, "effect,show", "bg_1line");
      }
    else if (wd->mode == ELM_TICKERNOTI_DETAILVIEW) 
      {
         evas_object_hide (wd->win_indi);
+#ifdef HAVE_ELEMENTARY_X
 	_make_notification_window (wd->win_detail);
+#endif
 	evas_object_show (wd->win_detail);
 	edje_object_signal_emit (wd->edje_detail, "effect,show", "bg_2line");
      }
