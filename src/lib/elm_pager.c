@@ -185,7 +185,8 @@ _eval_top(Evas_Object *obj)
              if(wd->disable_animation)
                {
                   edje_object_signal_emit(o, "elm,action,hide,noanimate", "elm");
-                  wd->stack = eina_list_remove(wd->stack, wd->top);
+                  if (wd->top->popme)
+                    wd->stack = eina_list_remove(wd->stack, wd->top);
                }
              else if (wd->top->popme)
                {
