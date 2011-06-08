@@ -48,8 +48,14 @@ static void _del_hook(Evas_Object *obj);
 static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _sub_del(void *data, Evas_Object *obj, void *event_info);
+static void _changed_size_hints(void *data,
+                                Evas *e,
+                                Evas_Object *obj,
+                                void *event_info);
+static void _content_del(void *data,
+                         Evas *e,
+                         Evas_Object *obj,
+                         void *event_info);
 static Eina_List *_item_get(Evas_Object *obj, Evas_Object *content);
 
 static const char SIG_HIDE_FINISHED[] = "hide,finished";
@@ -58,7 +64,6 @@ static const Evas_Smart_Cb_Description _signals[] = {
    {SIG_HIDE_FINISHED, ""},
    {NULL, NULL}
 };
-
 
 static void
 _del_hook(Evas_Object *obj)
@@ -242,23 +247,18 @@ _move(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSE
 }
 
 static void
-_sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Object *sub = event_info;
    Eina_List *l;
    Item *it;
    if (!wd) return;
-   l = _item_get(obj, sub);
+   l = _item_get(data, obj);
    if (!l) return;
    it = l->data;
-
    wd->stack = eina_list_remove_list(wd->stack, l);
    evas_object_event_callback_del_full
-      (sub, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
-   //TODO: Since the base and content is sub object of pager,
-   //this function (and _item_get) will be called unnecessary.
-   //consider use EVAS_CALLBACK_DEL instead of sub_del callback
+      (data, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
    evas_object_del(it->base);
    _eval_top(data);
    free(it);
@@ -286,8 +286,13 @@ _signal_hide_finished(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    if (it->popme)
      {
         evas_object_del(it->base);
-        evas_object_event_callback_del_full
-           (content, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
+        evas_object_event_callback_del_full(content,
+                                            EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                            _changed_size_hints,
+                                            it);
+        evas_object_event_callback_del(content,
+                                       EVAS_CALLBACK_DEL,
+                                       _content_del);
         evas_object_del(content);
         free(it);
      }
@@ -340,8 +345,6 @@ elm_pager_add(Evas_Object *parent)
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
 
-   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
-
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
@@ -384,12 +387,24 @@ elm_pager_content_push(Evas_Object *obj, Evas_Object *content)
    evas_object_clip_set(it->base, wd->clip);
    elm_widget_sub_object_add(obj, it->base);
    elm_widget_sub_object_add(obj, it->content);
-   _elm_theme_object_set(obj, it->base,  "pager", "base", elm_widget_style_get(obj));
-   edje_object_signal_callback_add(it->base, "elm,action,hide,finished", "",
-                                   _signal_hide_finished, it);
+   _elm_theme_object_set(obj,
+                         it->base,
+                         "pager",
+                         "base",
+                         elm_widget_style_get(obj));
+   edje_object_signal_callback_add(it->base,
+                                   "elm,action,hide,finished",
+                                   "",
+                                   _signal_hide_finished,
+                                   it);
    evas_object_event_callback_add(it->content,
                                   EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                  _changed_size_hints, it);
+                                  _changed_size_hints,
+                                  it);
+   evas_object_event_callback_add(it->content,
+                                  EVAS_CALLBACK_DEL,
+                                  _content_del,
+                                  obj);
    edje_object_part_swallow(it->base, "elm.swallow.content", it->content);
    edje_object_size_min_calc(it->base, &it->minw, &it->minh);
    evas_object_data_set(it->base, "_elm_leaveme", obj);
