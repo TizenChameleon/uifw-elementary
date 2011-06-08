@@ -169,7 +169,7 @@ static void
 _eval_top(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Eina_Bool animate=EINA_TRUE;
+   Eina_Bool show_noanimate=EINA_TRUE;
    Item *ittop;
    if (!wd) return;
    if (!wd->stack) return;
@@ -204,13 +204,13 @@ _eval_top(Evas_Object *obj)
           }
         else
           {
-             animate = EINA_FALSE;
+             show_noanimate = EINA_FALSE;
           }
         wd->oldtop = wd->top;
         wd->top = ittop;
         o = wd->top->base;
         evas_object_show(o);
-        if ((!animate)||(wd->disable_animation))
+        if ((!show_noanimate)||(wd->disable_animation))
           {
              edje_object_signal_emit(o, "elm,action,show,noanimate", "elm");
           }
