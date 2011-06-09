@@ -2085,6 +2085,7 @@ mark_up(const char *start, int inlen, int *lenp)
           {
              if (*p == escapes[i].value)
                {
+                  if (!iscntrl(escapes[i].value)) l++;
                   l += strlen(escapes[i].escape);
                   break;
                }
@@ -2101,6 +2102,7 @@ mark_up(const char *start, int inlen, int *lenp)
           {
              if (*p == escapes[i].value)
                {
+                  if (!iscntrl(escapes[i].value)) *q++ = '&';
                   strcpy(q, escapes[i].escape);
                   q += strlen(escapes[i].escape);
                   p ++;
