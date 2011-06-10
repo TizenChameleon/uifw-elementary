@@ -212,6 +212,8 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
 
    wd->focused = EINA_TRUE;
    _view_update(data);
+
+   if (wd->imf_context) ecore_imf_context_input_panel_show(wd->imf_context);
    evas_object_smart_callback_call(data, "clicked", NULL);
 }
 
