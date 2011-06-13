@@ -1165,7 +1165,6 @@ _mouse_move(void        *data,
              int it_y = ev->cur.canvas.y - it->wd->reorder_it->dy;
              if (!it->wd->reorder_start_y) it->wd->reorder_start_y = it->block->y + it->y;
 
-             evas_object_resize(it->base.view, it->w, it->h);
              if (it_y < oy) _effect_item_controls(it, it->scrl_x, oy);
              else if (it_y + it->wd->reorder_it->h > oy+oh) _effect_item_controls(it, it->scrl_x, oy + oh - it->wd->reorder_it->h);
              else _effect_item_controls(it, it->scrl_x, it_y);
