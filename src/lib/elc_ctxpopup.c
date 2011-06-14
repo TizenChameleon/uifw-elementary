@@ -516,7 +516,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
               if (y < (arrow_size.h * 0.5) + base_size.y) y = 0;
               else if (y > base_size.y + base_size.h - (arrow_size.h * 0.5)) y = base_size.h - arrow_size.h;
               else y = y - base_size.y - (arrow_size.h * 0.5);
-              edje_object_part_drag_value_set(wd->base, "elm.swallow.arrow_left", 0.5,
+              edje_object_part_drag_value_set(wd->base, "elm.swallow.arrow_left", 1,
                                               (double) (y) / (double) (base_size.h - arrow_size.h));
           }
          break;
@@ -533,7 +533,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
               if (y < (arrow_size.h * 0.5) + base_size.y) y = 0;
               else if (y > base_size.y + base_size.h - (arrow_size.h * 0.5)) y = base_size.h - arrow_size.h;
               else y = y - base_size.y - (arrow_size.h * 0.5);
-              edje_object_part_drag_value_set(wd->base, "elm.swallow.arrow_right", 0.5,
+              edje_object_part_drag_value_set(wd->base, "elm.swallow.arrow_right", 0,
                                               (double) (y) / (double) (base_size.h - arrow_size.h));
             }
          break;
@@ -551,7 +551,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
               else if (x > base_size.x + base_size.w - (arrow_size.w * 0.5)) x = base_size.w - arrow_size.w;
               else x = x - base_size.x - (arrow_size.w * 0.5);
               edje_object_part_drag_value_set(wd->base, "elm.swallow.arrow_up",
-                                              (double) (x) / (double) (base_size.w - arrow_size.w), 0.5);
+                                              (double) (x) / (double) (base_size.w - arrow_size.w), 1);
            }
          break;
       case ELM_CTXPOPUP_DIRECTION_DOWN:
@@ -568,7 +568,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
               else if (x > base_size.x + base_size.w - (arrow_size.w * 0.5)) x = base_size.w - arrow_size.w;
               else x = x - base_size.x - (arrow_size.w * 0.5);
               edje_object_part_drag_value_set(wd->base, "elm.swallow.arrow_down",
-                                              (double) (x) / (double) (base_size.w - arrow_size.w), 0.5);
+                                              (double) (x) / (double) (base_size.w - arrow_size.w), 0);
            }
          break;
       default:
