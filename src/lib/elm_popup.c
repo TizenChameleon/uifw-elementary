@@ -319,6 +319,7 @@ elm_popup_add(Evas_Object *parent)
    elm_notify_repeat_events_set(wd->notify, EINA_FALSE);
    evas_object_size_hint_weight_set(wd->notify, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->notify, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_style_set(wd->notify, "popup");
 
    wd->layout = elm_layout_add(parent);
    evas_object_size_hint_weight_set(wd->layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -339,7 +340,7 @@ elm_popup_add(Evas_Object *parent)
    ecore_x_netwm_window_type_get(elm_win_xwindow_get(parent), &type);
    if (type == ECORE_X_WINDOW_TYPE_DIALOG)
      {
-        elm_object_style_set(wd->notify, "popup");
+        elm_object_style_set(wd->notify, "transparent");
      }
 #endif
    _sizing_eval(obj);
