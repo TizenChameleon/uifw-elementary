@@ -192,6 +192,13 @@ struct _Elm_Entry_Text_Filter
    void *data;
 };
 
+typedef enum _Length_Unit
+{
+   LENGTH_UNIT_CHAR,
+   LENGTH_UNIT_BYTE,
+   LENGTH_UNIT_LAST
+} Length_Unit;
+
 static const char *widtype = NULL;
 // start for cbhm
 static Evas_Object *cnpwidgetdata = NULL;
@@ -220,6 +227,7 @@ static void _signal_entry_paste_request(void *data, Evas_Object *obj, const char
 static void _signal_entry_copy_notify(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_entry_cut_notify(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_cursor_changed(void *data, Evas_Object *obj, const char *emission, const char *source);
+static void _add_chars_till_limit(Evas_Object *obj, char **text, int can_add, Length_Unit unit);
 static int _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int deleteflag);
 static int _stringshare_key_value_replace(const char **srcstring, char *key, const char *value, int deleteflag);
 static int _entry_length_get(Evas_Object *obj);
@@ -2230,6 +2238,74 @@ _text_filter(void *data, Evas_Object *edje __UNUSED__, const char *part __UNUSED
      }
 }
 
+static void
+_add_chars_till_limit(Evas_Object *obj, char **text, int can_add, Length_Unit unit)
+{
+   int i = 0, unit_size;
+   int current_len = strlen(*text);
+   char *new_text = *text;
+   if (unit >= LENGTH_UNIT_LAST) return;
+   while (*new_text)
+     {
+        if (*new_text == '<')
+          {
+             while (*new_text != '>')
+               {
+                  new_text++;
+                  if (!*new_text) break;
+               }
+             new_text++;
+          }
+        else
+          {
+             int index = 0;
+             if (*new_text == '&')
+               {
+                  while (*(new_text + index) != ';')
+                    {
+                       index++;
+                       if (!*(new_text + index)) break;
+                    }
+               }
+             char *markup;
+             index = evas_string_char_next_get(new_text, index, NULL);
+             markup = malloc(index + 1);
+             strncpy(markup, new_text, index);
+             markup[index] = 0;
+             if (unit == LENGTH_UNIT_BYTE)
+               unit_size = strlen(elm_entry_markup_to_utf8(markup));
+             else if (unit == LENGTH_UNIT_CHAR)
+               unit_size = evas_string_char_len_get(elm_entry_markup_to_utf8(markup));
+             if (markup)
+               {
+                  free(markup);
+                  markup = NULL;
+               }
+             if (can_add < unit_size)
+               {
+                  if (!i)
+                    {
+                       evas_object_smart_callback_call(obj, "maxlength,reached", NULL);
+                       free(*text);
+                       *text = NULL;
+                       return;
+                    }
+                  can_add = 0;
+                  strncpy(new_text, new_text + index, current_len - ((new_text + index) - *text));
+                  current_len -= index;
+                  (*text)[current_len] = 0;
+               }
+             else
+               {
+                  new_text += index;
+                  can_add -= unit_size;
+               }
+             i++;
+          }
+     }
+   evas_object_smart_callback_call(obj, "maxlength,reached", NULL);
+}
+
 /**
  * This adds an entry to @p parent object.
  *
@@ -3709,7 +3785,6 @@ elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
 
    if (lim->max_char_count > 0)
      {
-        int cut;
         len = evas_string_char_len_get(current);
         if (len >= lim->max_char_count)
           {
@@ -3719,17 +3794,11 @@ elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
              *text = NULL;
              return;
           }
-        newlen = evas_string_char_len_get(*text);
-        cut = strlen(*text);
-        while ((len + newlen) > lim->max_char_count)
-          {
-             cut = evas_string_char_prev_get(*text, cut, NULL);
-             newlen--;
-          }
-        (*text)[cut] = 0;
+        newlen = evas_string_char_len_get(elm_entry_markup_to_utf8(*text));
+        if ((len + newlen) > lim->max_char_count)
+          _add_chars_till_limit(entry, text, (lim->max_char_count - len), LENGTH_UNIT_CHAR);
      }
-
-   if (lim->max_byte_count > 0)
+   else if (lim->max_byte_count > 0)
      {
         len = strlen(current);
         if (len >= lim->max_byte_count)
@@ -3740,19 +3809,9 @@ elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
              *text = NULL;
              return;
           }
-        newlen = strlen(*text);
-        while ((len + newlen) > lim->max_byte_count)
-          {
-             int p = evas_string_char_prev_get(*text, newlen, NULL);
-             newlen -= (newlen - p);
-          }
-        if (newlen)
-          (*text)[newlen] = 0;
-        else
-          {
-             free(*text);
-             *text = NULL;
-          }
+        newlen = strlen(elm_entry_markup_to_utf8(*text));
+        if ((len + newlen) > lim->max_byte_count)
+          _add_chars_till_limit(entry, text, (lim->max_byte_count - len), LENGTH_UNIT_BYTE);
      }
    free(current);
 }
