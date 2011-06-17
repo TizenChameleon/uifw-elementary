@@ -3447,7 +3447,7 @@ extern "C" {
    EAPI void              elm_segment_control_item_del_at(Evas_Object *obj, int index) EINA_ARG_NONNULL(1);
    EAPI int               elm_segment_control_item_count_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI Elm_Segment_Item *elm_segment_control_item_get(const Evas_Object *obj, int index) EINA_ARG_NONNULL(1);
-   EAPI const char       *elm_segment_control_item_label_get(Evas_Object *obj, int index) EINA_ARG_NONNULL(1);
+   EAPI const char       *elm_segment_control_item_label_get(const Evas_Object *obj, int index) EINA_ARG_NONNULL(1);
    EAPI void              elm_segment_control_item_label_set(Elm_Segment_Item* it, const char* label) EINA_ARG_NONNULL(1);
    EAPI Evas_Object      *elm_segment_control_item_icon_get(const Evas_Object *obj, int index) EINA_ARG_NONNULL(1);
    EAPI void              elm_segment_control_item_icon_set(Elm_Segment_Item *it, Evas_Object *icon) EINA_ARG_NONNULL(1);

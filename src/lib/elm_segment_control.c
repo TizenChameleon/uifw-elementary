@@ -652,7 +652,7 @@ elm_segment_control_item_del_at(Evas_Object *obj, int index)
  * @ingroup SegmentControl
  */
 EAPI const char*
-elm_segment_control_item_label_get(Evas_Object *obj, int index)
+elm_segment_control_item_label_get(const Evas_Object *obj, int index)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Elm_Segment_Item *it;
