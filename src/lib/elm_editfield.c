@@ -176,7 +176,19 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
    Widget_Data *wd = elm_widget_data_get(ef_obj);
 
    if(!wd || !wd->base) return;
-
+   if(wd->single_line)
+     {
+        if(elm_entry_password_get(wd->entry))
+          {
+             edje_object_signal_emit(wd->base, "elm,state,password,set", "elm");
+             edje_object_part_text_set(wd->base, "elm.content.password", elm_entry_entry_get(wd->entry));
+          }
+        else
+          {
+             edje_object_signal_emit(wd->base, "elm,state,password,unset", "elm");
+             edje_object_part_text_set(wd->base, "elm.content.text", elm_entry_entry_get(wd->entry));
+          }
+     }
    if(!_empty_entry(wd->entry))
      {
         if(wd->eraser_show && elm_object_focus_get(obj))
@@ -555,6 +567,7 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
         evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
         elm_scroller_content_set(wd->scroller, wd->entry);
+        edje_object_signal_emit(wd->base, "elm,state,text,singleline", "elm");
      }
    else
      {
@@ -574,6 +587,7 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
         evas_object_del(wd->entry);
         wd->entry = entry;
         edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
+        edje_object_signal_emit(wd->base, "elm,state,text,multiline", "elm");
      }
 }
 
