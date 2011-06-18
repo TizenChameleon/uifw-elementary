@@ -43,7 +43,11 @@ static void _calc(Evas_Object *obj);
 static void _content_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _show(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _hide(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _parent_del(void *data,  Evas *e, Evas_Object *obj, void *event_info);
+static void _parent_hide(void *data,  Evas *e, Evas_Object *obj, void *event_info);
+
 static void _resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _restack(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static const char SIG_BLOCK_CLICKED[] = "block,clicked";
 static const char SIG_TIMEOUT[] = "timeout";
@@ -60,6 +64,7 @@ _del_pre_hook(Evas_Object *obj)
    evas_object_event_callback_del_full(obj, EVAS_CALLBACK_MOVE, _resize, obj);
    evas_object_event_callback_del_full(obj, EVAS_CALLBACK_SHOW, _show, obj);
    evas_object_event_callback_del_full(obj, EVAS_CALLBACK_HIDE, _hide, obj);
+   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_RESTACK, _restack, obj);
 }
 
 static void
@@ -122,7 +127,6 @@ _notify_orientation_with_rtl(Evas_Object *obj, Elm_Notify_Orient orient)
 
    return orient;
 }
-
 
 static void
 _notify_theme_apply(Evas_Object *obj)
@@ -301,6 +305,15 @@ _signal_block_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emiss
 }
 
 static void
+_restack(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   evas_object_layer_set(wd->notify,
+                         evas_object_layer_get(obj));
+}
+
+static void
 _resize(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    _calc(obj);
@@ -384,21 +397,20 @@ _hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_i
 }
 
 static void
-_parent_del(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+_parent_del(void *data,  Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
+   Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    wd->parent = NULL;
-   evas_object_hide(obj);
+   evas_object_hide(data);
 }
 
 static void
-_parent_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+_parent_hide(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
+   Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   wd->parent = NULL;
-   evas_object_hide(obj);
+   evas_object_hide(data);
 }
 
 static Eina_Bool
@@ -456,7 +468,7 @@ elm_notify_add(Evas_Object *parent)
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _resize, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, obj);
-
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_RESTACK, _restack, obj);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
 
@@ -545,7 +557,7 @@ elm_notify_content_get(const Evas_Object *obj)
 /**
  * Set the notify parent
  *
- * Once the parent object is set, a previously set one will be desconected
+ * Once the parent object is set, a previously set one will be disconnected
  * and replaced.
  *
  * @param obj The notify object
@@ -729,4 +741,3 @@ elm_notify_repeat_events_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return wd->repeat_events;
 }
-
