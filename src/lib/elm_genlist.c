@@ -4384,11 +4384,11 @@ elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
    Elm_Genlist_Item *it2;
    Evas_Coord y, h;
 
-   if(!it->wd->effect_mode || !it->wd->move_effect_mode)
+   if (!it->wd->effect_mode || !it->wd->move_effect_mode)
       _item_subitems_clear(it);
    else
      {
-        if((!it->wd->item_moving_effect_timer) && (it->flags != ELM_GENLIST_ITEM_GROUP) &&
+        if ((!it->wd->item_moving_effect_timer) && (it->flags != ELM_GENLIST_ITEM_GROUP) &&
              it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE	)
           {
              it->wd->expand_item = it;
@@ -4399,9 +4399,9 @@ elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
               it2= it;
              do {
                   it2 = elm_genlist_item_next_get(it2);
-                  if(!it2) break;
+                  if (!it2) break;
              } while (it2->expanded_depth > it->expanded_depth);
-             if(it2)
+             if (it2)
                 it->wd->expand_item_gap = it->wd->expand_item_end - it2->old_scrl_y;
              else
                 it->wd->expand_item_gap = 0;
@@ -4490,7 +4490,7 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
    it->expanded = expanded;
    it->wd->expand_item = it;
 
-   if(it->wd->effect_mode && !it->wd->alpha_bg)
+   if (it->wd->effect_mode && !it->wd->alpha_bg)
       it->wd->alpha_bg = _create_tray_alpha_bg(it->base.widget);
 
    if (it->expanded)
@@ -5918,7 +5918,6 @@ _item_moving_effect_timer_cb(void *data)
    double time = 0.3, t;
    int y, dy;
    Eina_Bool check, end = EINA_FALSE;
-   //   static Eina_Bool first = EINA_TRUE;
    int in = 0;
 
    t = ((0.0 > (t = current_time_get() - wd->start_time)) ? 0.0 : t) / 1000;
@@ -5926,123 +5925,146 @@ _item_moving_effect_timer_cb(void *data)
    evas_object_geometry_get(wd->pan_smart, &ox, &oy, &ow, &oh);
    evas_output_viewport_get(evas_object_evas_get(wd->pan_smart), &cvx, &cvy, &cvw, &cvh);
    if (t > time) end = EINA_TRUE;
-   EINA_INLIST_FOREACH(wd->blocks, itb)
+
+   it2 = elm_genlist_item_next_get(wd->expand_item);
+   while (it2)
      {
-        itb->w = wd->minw;
-        if (ELM_RECTS_INTERSECT(itb->x - wd->pan_x + ox,
-                                itb->y - wd->pan_y + oy,
-                                itb->w, itb->h,
-                                cvx, cvy, cvw, cvh))
+        if (wd->expand_item->expanded_depth >= it2->expanded_depth) break;
+        it2 = elm_genlist_item_next_get(it2);
+     }
+   dy = 0;
+   if (it2)
+     {
+        if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
+          dy = it2->scrl_y - it2->old_scrl_y;
+        else if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
+          dy = wd->expand_item_gap;
+
+        if (t <= time)
           {
-             EINA_LIST_FOREACH(itb->items, l, it)
+             y = ((1 - (1 - (t / time)) * (1 - (t /time))) * dy);
+          }
+        else
+          {
+             end = EINA_TRUE;
+             y = dy;
+          }
+
+        check = EINA_FALSE;
+        EINA_INLIST_FOREACH(wd->blocks, itb)
+          {
+             itb->w = wd->minw;
+             if (ELM_RECTS_INTERSECT(itb->x - wd->pan_x + ox,
+                                     itb->y - wd->pan_y + oy,
+                                     itb->w, itb->h,
+                                     cvx, cvy, cvw, cvh))
                {
-                  if (wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE)
+                  EINA_LIST_FOREACH(itb->items, l, it)
                     {
-                       it2 = it;
-                       check = EINA_FALSE;
-                       do {
-                            if(it2->parent == wd->expand_item) check = EINA_TRUE;
-                            it2 = it2->parent;
-                       } while(it2);
-                       if(check) continue;
-                    }
-                  dy = 0;
-                  //printf(" s: %d %d ", oy, oh);
-                  if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
-                     dy = it->scrl_y - it->old_scrl_y;
-                  else if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
-                    {
-                       //                  printf("%d %d\n", it->old_scrl_y, wd->expand_item_end);
-                       if(wd->expand_item_end < it->old_scrl_y)
-                          dy = wd->expand_item_gap;
-                    }
-                  else if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE)
-                    {
-                        if (wd->expand_item_end < it->old_scrl_y)
-                          dy = wd->expand_item_gap;
-                    }
-                  if (t <= time)
-                     y = (1 * sin((t / time) * (M_PI / 2)) * dy);
-                  else
-                    {
-                       end = EINA_TRUE;
-                       y = dy;
-                    }
+                       if (it == it2) check = EINA_TRUE;
+                       if (!check) continue;
 
-                  if (!it->old_scrl_y)
-                     it->old_scrl_y  = it->scrl_y;
-
-
-                  if (it->old_scrl_y + y < oy + oh)
-                    {
-                       if (!it->realized) _item_realize(it, in, EINA_FALSE);
-                    }
-                  if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE && it->old_scrl_y + y < it->scrl_y)
-                     it->old_scrl_y = it->scrl_y - y;
-                  in++;
-
-                 if (wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE ||
-                       (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE && it->old_scrl_y + y >= it->scrl_y))
-                   {
-                      if (wd->edit_mode) _effect_item_controls(it, it->scrl_x, it->old_scrl_y + y);
-                      else
-                       {
-                           evas_object_resize(it->base.view, it->w, it->h);
-                           evas_object_move(it->base.view, it->scrl_x, it->old_scrl_y + y);
-                           evas_object_show(it->base.view);
-                           evas_object_raise(it->base.view);
-                       }
-
-                      if (it->group_item) evas_object_raise(it->group_item->base.view);
-                   }
-
-                  if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
-                    {
-                       it2 = elm_genlist_item_prev_get(it);
-                       while(it2)
+                       if (!it->old_scrl_y)
+                         it->old_scrl_y  = it->scrl_y;
+                       if (it->old_scrl_y + y < oy + oh)
                          {
-                            if((it2->scrl_y < it->old_scrl_y + y) && (it2->expanded_depth > it->expanded_depth))
-                              {
-                                 if(!it2->effect_done)
-                                   {
-                                      //edje_object_signal_emit(it2->base.view, "elm,state,expand_flip", "");
-                                      evas_object_move(it2->base.view, it2->scrl_x, it2->scrl_y);
-                                      evas_object_show(it2->base.view);
-                                      it2->effect_done = EINA_TRUE;
-                                   }
-                                // break;
-                              }
-                            it2 = elm_genlist_item_prev_get(it2);
+                            if (!it->realized) _item_realize(it, in, 0);
                          }
-                    }
-                  else if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
-                    {
-                       it2 = elm_genlist_item_prev_get(it);
-                       while(it2)
+                       if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE && it->old_scrl_y + y < it->scrl_y)
+                         it->old_scrl_y = it->scrl_y - y;
+                       in++;
+
+                       if (wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE ||
+                           (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE && it->old_scrl_y + y >= it->scrl_y))
                          {
-                            if((it2->scrl_y > it->old_scrl_y + y) && (it2->expanded_depth > it->expanded_depth))
-                              {
-                                 if(!it2->effect_done)
-                                   {
-                                      edje_object_signal_emit(it2->base.view, "elm,state,hide", "");
-                                      it2->effect_done = EINA_TRUE;
-                                   }
-                              }
+                            if (wd->edit_mode) _effect_item_controls(it, it->scrl_x, it->old_scrl_y + y);
                             else
-                               break;
-                            it2 = elm_genlist_item_prev_get(it2);
+                              {
+                                 evas_object_resize(it->base.view, it->w, it->h);
+                                 evas_object_move(it->base.view, it->scrl_x, it->old_scrl_y + y);
+                                 evas_object_show(it->base.view);
+                                 evas_object_raise(it->base.view);
+                              }
+
+                            if (it->group_item) evas_object_raise(it->group_item->base.view);
                          }
                     }
                }
           }
+
+        if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
+          {
+             it = elm_genlist_item_prev_get(it2);
+             while (it)
+               {
+                  if ((it->scrl_y < it2->old_scrl_y + y) && (it->expanded_depth > it2->expanded_depth))
+                    {
+                       if (!it->effect_done)
+                         {
+                            edje_object_signal_emit(it->base.view, "flip_item", "");
+                            evas_object_show(it->base.view);
+                            it->effect_done = EINA_TRUE;
+                         }
+                    }
+                  it = elm_genlist_item_prev_get(it);
+                  if (it->expanded_depth <= it2->expanded_depth) break;
+               }
+          }
+        else if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
+          {
+             it = elm_genlist_item_prev_get(it2);
+             while (it)
+               {
+                  if ((it->scrl_y > it2->old_scrl_y + y) && (it->expanded_depth > it2->expanded_depth))
+                    {
+                       if (!it->effect_done)
+                         {
+                            edje_object_signal_emit(it->base.view, "elm,state,hide", "");
+                            it->effect_done = EINA_TRUE;
+                         }
+                    }
+                  else
+                    break;
+                  it = elm_genlist_item_prev_get(it);
+               }
+          }
      }
-   //   first = EINA_FALSE;
-   //   printf("\n");
+   else
+     {
+        int expand_num = 0;
+        int expand_order = 0;
+        if (wd->expand_item) it = elm_genlist_item_next_get(wd->expand_item);
+        while (it)
+          {
+             expand_num++;
+             it = elm_genlist_item_next_get(it);
+          }
+        if (wd->expand_item) it = elm_genlist_item_next_get(wd->expand_item);
+        while (it)
+          {
+             expand_order++;
+             if (wd->expand_item->expanded_depth >= it->expanded_depth) break;
+             if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
+               {
+                  if (!it->effect_done)
+                    {
+                       if (t >= (((expand_order - 1) * time) / expand_num))
+                         {
+                            edje_object_signal_emit(it->base.view, "flip_item", "");
+                            evas_object_show(it->base.view);
+                            it->effect_done = EINA_TRUE;
+                         }
+                    }
+               }
+             it = elm_genlist_item_next_get(it);
+          }
+     }
+
    if (end)
      {
         if (wd->item_moving_effect_timer)
           {
-             if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
+             if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
                 _item_subitems_clear(wd->expand_item);
              EINA_INLIST_FOREACH(wd->blocks, itb)
                {
@@ -6053,9 +6075,7 @@ _item_moving_effect_timer_cb(void *data)
                     }
                }
           }
-        //evas_render(evas_object_evas_get(wd->obj));
         wd->item_moving_effect_timer = NULL;
-        //        first = EINA_TRUE;
 
         _item_auto_scroll(wd);
         evas_object_lower(wd->alpha_bg);
@@ -6083,7 +6103,7 @@ _emit_contract(Elm_Genlist_Item *it)
    it->effect_done = EINA_FALSE;
 
    EINA_LIST_FOREACH(it->items, l, it2)
-      if(it2)
+      if (it2)
          _emit_contract(it2);
 }
 
@@ -6097,25 +6117,19 @@ _item_flip_effect_show(Elm_Genlist_Item *it)
    Eina_Bool check = EINA_FALSE;
 
    it2 = elm_genlist_item_next_get(it);
-   while(it2)
+   while (it2)
      {
-        if(it2->expanded_depth <= it->expanded_depth) check = EINA_TRUE;
+        if (it2->expanded_depth <= it->expanded_depth) check = EINA_TRUE;
         it2 = elm_genlist_item_next_get(it2);
      }
    EINA_LIST_FOREACH(it->items, l, it2)
      {
         if (it2->parent && it == it2->parent)
           {
-             if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
-               {
-                  edje_object_signal_emit(it2->base.view, "flip_item", "");
-                  if(check)
-                     evas_object_move(it2->base.view, -9999, -9999);
-                  else
-                     evas_object_show(it2->base.view);
-               }
-             else if(wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
-                _emit_contract(it2);
+             if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
+               edje_object_signal_emit(it2->base.view, "elm,state,hide", "");
+             else if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
+               _emit_contract(it2);
           }
      }
 
