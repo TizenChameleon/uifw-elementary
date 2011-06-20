@@ -107,8 +107,16 @@ _mirrored_set(Evas_Object *obj, Eina_Bool rtl)
 static void
 _theme_hook(Evas_Object *obj)
 {
+   unsigned int counter = 0;
+   unsigned int i = 1;
+   unsigned int length = 0;
+   char *str = NULL;
+   char labels[128] ;
+   char buffer[PATH_MAX]={'\0',};
+   char s1[PATH_MAX] = {'\0',};
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+
    _elm_widget_mirrored_reload(obj);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _elm_theme_object_set(obj, wd->chk, "check", "base", elm_widget_style_get(obj));
@@ -129,6 +137,24 @@ _theme_hook(Evas_Object *obj)
      edje_object_signal_emit(wd->chk, "elm,state,disabled", "elm");
    edje_object_message_signal_process(wd->chk);
    edje_object_scale_set(wd->chk, elm_widget_scale_get(obj) * _elm_config->scale);
+
+   //introduced internationalization of additional text parts used in style
+   while (1)
+     {
+        // s1 is  used  to store part name while buffer is used to store the part's value string
+        snprintf(labels,sizeof(labels),"label_%d",i++);
+        str = edje_object_data_get(wd->chk,labels);
+        if (!str) break;
+        length = strlen(str);
+        while ((str[counter]!= ' ') && (counter < length))
+          counter++;
+        if (counter == length)
+          continue;
+        strncpy(s1, str, counter);
+        s1[counter] = '\0';
+        strncpy(buffer, str + counter, sizeof(buffer));
+        edje_object_part_text_set(wd->chk, s1, E_(buffer));
+     }
    _sizing_eval(obj);
 }
 
