@@ -727,6 +727,8 @@ elm_theme_all_set(const char *theme)
    if (!atom) atom = ecore_x_atom_get("ENLIGHTENMENT_THEME");
    ecore_x_window_prop_string_set(ecore_x_window_root_first_get(),
                                   atom, theme);
+   //FIXME - ecore_x_window_prop_string_set() works properly only after ecore_x_window_prop_string_get() is called.
+   ecore_x_window_prop_string_get(ecore_x_window_root_first_get(), atom);
 #endif
    elm_theme_set(NULL, theme);
 }
