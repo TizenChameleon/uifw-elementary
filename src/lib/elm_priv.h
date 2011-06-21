@@ -164,6 +164,7 @@ struct _Elm_Config
    double         zoom_friction;
    unsigned char  thumbscroll_bounce_enable;
    double         thumbscroll_border_friction;
+   double         scroll_smooth_time_interval;
    double         scale;
    int            bgpixmap;
    int            compositing;
