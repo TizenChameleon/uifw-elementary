@@ -824,10 +824,10 @@ _set_EFL_item_data(PItemTagData data, const char *tag_str)
              strcat(modify, path);
              data->href = modify;
              cnp_debug("image href ---%s---\n", data->href);
+             free(value);
           }
         else
           freeAndAssign(data->href, value);
-        free(value);
      }
 
    value = _get_tag_value(tag_str, "absize");
@@ -906,10 +906,10 @@ _set_HTML_img_data(PItemTagData data, const char *tag_str)
              strcat(modify, path);
              data->href = modify;
              cnp_debug("image src ---%s---\n", data->href);
+             free(value);
           }
         else
           freeAndAssign(data->href, value);
-        free(value);
      }
 
    value = _get_tag_value(tag_str, "width");
@@ -1112,7 +1112,8 @@ _convert_to_edje(Eina_List* nodes)
                             else if (!strcmp(_HTMLtoEFLConvertTable[j].src, "img"))
                               {
                                  PItemTagData data = trail->tagData;
-                                 char *width = IMAGE_DEFAULT_WIDTH, *height = IMAGE_DEFAULT_HEIGHT;                                 if (data->width)
+                                 char *width = IMAGE_DEFAULT_WIDTH, *height = IMAGE_DEFAULT_HEIGHT;
+                                 if (data->width)
                                    width = data->width;
                                  if (data->height)
                                    height = data->height;
