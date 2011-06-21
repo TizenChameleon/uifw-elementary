@@ -2956,12 +2956,6 @@ extern "C" {
    EAPI void         elm_controlbar_alpha_set(Evas_Object *obj, int alpha);
    EAPI void         elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align);
    EAPI void         elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical);
-   /*======= Please don't use this APIs =======*/
-   EINA_DEPRECATED EAPI void         elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable);
-   EINA_DEPRECATED EAPI Eina_Bool    elm_controlbar_item_disable_get(Elm_Controlbar_Item * it);
-   EINA_DEPRECATED EAPI void         elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   EINA_DEPRECATED EAPI void         elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation);
-   /*======= Just for test =======*/
 
    /* SearchBar */
    EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent);

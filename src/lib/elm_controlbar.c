@@ -2334,12 +2334,6 @@ elm_controlbar_item_visible_get(Elm_Controlbar_Item * it)
    return EINA_TRUE;
 }
 
-EAPI void
-elm_controlbar_item_disable_set(Elm_Controlbar_Item * it, Eina_Bool disable)
-{
-   elm_controlbar_item_disabled_set(it, disable);
-}
-
 /**
  * Set item disable
  *
@@ -2360,12 +2354,6 @@ elm_controlbar_item_disabled_set(Elm_Controlbar_Item * it, Eina_Bool disabled)
    if (it->wd && it->wd->disabled) return;
 
    if (it->base_item) elm_widget_disabled_set(it->base_item, disabled);
-}
-
-EAPI Eina_Bool
-elm_controlbar_item_disable_get(Elm_Controlbar_Item * it)
-{
-   return elm_controlbar_item_disabled_get(it);
 }
 
 /**
@@ -2669,104 +2657,3 @@ elm_controlbar_item_button_get(Elm_Controlbar_Item *it)
 
    return NULL;
 }
-
-EAPI void
-elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data)
-{
-   printf("\n==================================\n");
-   printf("This API will be deleted : %s\n", __func__);
-   printf("\n==================================\n");
-}
-
-EAPI void
-elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation)
-{
-   printf("\n==================================\n");
-   printf("This API will be deleted : %s\n", __func__);
-   printf("\n==================================\n");
-}
-
-#if 0
-static Eina_Bool
-init_animation(void *data)
-{
-   const Eina_List *l;
-   Elm_Controlbar_Item * item;
-   Widget_Data * wd = (Widget_Data *)data;
-
-   wd->visible_items = eina_list_free(wd->visible_items);
-   EINA_LIST_FOREACH(wd->items, l, item)
-     {
-        if (item->order > 0)
-          {
-             wd->visible_items = eina_list_append(wd->visible_items, item->base_item);
-          }
-     }
-
-   if (wd->ani_func)
-     wd->ani_func(wd->ani_data, wd->object, wd->visible_items);
-
-   return ECORE_CALLBACK_CANCEL;
-}
-EAPI void
-elm_controlbar_animation_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data)
-{
-   printf("\n==================================\n");
-   printf("%s\n", __func__);
-   printf("==================================\n");
-   printf("This API is just for test.\n");
-   printf("Please don't use it!!\n");
-   printf("Thank you.\n");
-   printf("==================================\n");
-
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (wd == NULL)
-     {
-        fprintf(stderr, "Cannot get smart data\n");
-        return;
-     }
-
-   //   if (!func)
-   //   {
-   wd->init_animation = EINA_TRUE;
-
-   wd->ani_func = func;
-   wd->ani_data = data;
-
-   ecore_idler_add(init_animation, wd);
-   // }
-}
-
-EAPI void
-elm_controlbar_item_animation_set(Evas_Object *obj, Eina_Bool auto_animation, Eina_Bool selected_animation)
-{
-   printf("\n==================================\n");
-   printf("%s\n", __func__);
-   printf("==================================\n");
-   printf("This API is just for test.\n");
-   printf("Please don't use it!!\n");
-   printf("Thank you.\n");
-   printf("==================================\n");
-
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (wd == NULL)
-     {
-        fprintf(stderr, "Cannot get smart data\n");
-        return;
-     }
-
-   if (auto_animation && !wd->effect_timer)
-     {
-        wd->effect_timer = ecore_timer_add(1.5, item_animation_effect, wd);
-     }
-   else
-     {
-        if (wd->effect_timer) ecore_timer_del(wd->effect_timer);
-        wd->effect_timer = NULL;
-     }
-
-   wd->selected_animation = selected_animation;
-}
-#endif
