@@ -2433,11 +2433,11 @@ _item_block_position(Item_Block *itb,
                                    cvx, cvy, cvw, cvh));
         if (it->flags != ELM_GENLIST_ITEM_GROUP || (it->wd->reorder_it ))
           {
-             if ((itb->realized) && (!it->realized))
+             if ((itb->realized))
                {
                   if (vis)
                     {
-                       _item_realize(it, in, EINA_FALSE);
+                       if (!it->realized) _item_realize(it, in, EINA_FALSE);
                        if (it->renamed)
                          {
                             if (it->wd->edit_mode) edje_object_signal_emit(it->edit_obj, "elm,state,rename,enabled", "elm");
