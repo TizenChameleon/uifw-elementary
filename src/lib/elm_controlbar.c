@@ -1969,7 +1969,7 @@ elm_controlbar_object_item_insert_after(Evas_Object * obj,
  * @ingroup Controlbar
  */
 EAPI Evas_Object *
-elm_controlbar_object_item_object_get(Elm_Controlbar_Item * it)
+elm_controlbar_object_item_object_get(const Elm_Controlbar_Item * it)
 {
    if (!it) return NULL;
    if (it->style != OBJECT) return NULL;
@@ -2111,7 +2111,7 @@ elm_controlbar_item_icon_set(Elm_Controlbar_Item * it, const char *icon_path)
  * @ingroup Controlbar
  */
 EAPI Evas_Object *
-elm_controlbar_item_icon_get(Elm_Controlbar_Item * it)
+elm_controlbar_item_icon_get(const Elm_Controlbar_Item * it)
 {
    if (!it) return NULL;
    return it->icon;
@@ -2155,7 +2155,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
  * @ingroup Controlbar
  */
 EAPI const char *
-elm_controlbar_item_label_get(Elm_Controlbar_Item * it)
+elm_controlbar_item_label_get(const Elm_Controlbar_Item * it)
 {
    if (!it) return NULL;
    return it->text;
@@ -2169,7 +2169,7 @@ elm_controlbar_item_label_get(Elm_Controlbar_Item * it)
  *
  * @ingroup Controlbar
  */
-EAPI Elm_Controlbar_Item * elm_controlbar_selected_item_get(Evas_Object *
+EAPI Elm_Controlbar_Item * elm_controlbar_selected_item_get(const Evas_Object *
                                                             obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -2194,7 +2194,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_selected_item_get(Evas_Object *
  *
  * @ingroup Controlbar
  */
-EAPI Elm_Controlbar_Item * elm_controlbar_first_item_get(Evas_Object * obj)
+EAPI Elm_Controlbar_Item * elm_controlbar_first_item_get(const Evas_Object * obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd = elm_widget_data_get(obj);
@@ -2210,7 +2210,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_first_item_get(Evas_Object * obj)
  *
  * @ingroup Controlbar
  */
-EAPI Elm_Controlbar_Item * elm_controlbar_last_item_get(Evas_Object * obj)
+EAPI Elm_Controlbar_Item * elm_controlbar_last_item_get(const Evas_Object * obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd = elm_widget_data_get(obj);
@@ -2226,7 +2226,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_last_item_get(Evas_Object * obj)
  *
  * @ingroup Controlbar
  */
-EAPI Eina_List * elm_controlbar_items_get(Evas_Object * obj)
+EAPI const Eina_List * elm_controlbar_items_get(const Evas_Object * obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data * wd = elm_widget_data_get(obj);
@@ -2323,7 +2323,7 @@ elm_controlbar_item_visible_set(Elm_Controlbar_Item * it, Eina_Bool visible)
  * @ingroup Controlbar
  */
 EAPI Eina_Bool
-elm_controlbar_item_visible_get(Elm_Controlbar_Item * it)
+elm_controlbar_item_visible_get(const Elm_Controlbar_Item * it)
 {
    if (!it) return EINA_FALSE;
    if (it->obj == NULL) return EINA_FALSE;
@@ -2365,7 +2365,7 @@ elm_controlbar_item_disabled_set(Elm_Controlbar_Item * it, Eina_Bool disabled)
  * @ingroup Controlbar
  */
 EAPI Eina_Bool
-elm_controlbar_item_disabled_get(Elm_Controlbar_Item * it)
+elm_controlbar_item_disabled_get(const Elm_Controlbar_Item * it)
 {
    if (!it) return EINA_FALSE;
 
@@ -2399,7 +2399,7 @@ elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view)
  * @ingroup Controlbar
  */
 EAPI Evas_Object *
-elm_controlbar_item_view_get(Elm_Controlbar_Item *it)
+elm_controlbar_item_view_get(const Elm_Controlbar_Item *it)
 {
    if (!it) return NULL;
 
@@ -2648,7 +2648,7 @@ elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical)
  * @ingroup Controlbar
  */
 EAPI Evas_Object *
-elm_controlbar_item_button_get(Elm_Controlbar_Item *it)
+elm_controlbar_item_button_get(const Elm_Controlbar_Item *it)
 {
    if (!it) return NULL;
    if (it->style == OBJECT) return NULL;
