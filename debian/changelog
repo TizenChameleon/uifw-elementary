@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build28) unstable; urgency=low
+
+  * [genlist] Removed some APIs and const.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build28
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Wed, 22 Jun 2011 14:24:41 +0900
+
 elementary (1.0.0+svn.58393slp2+build27) unstable; urgency=low
 
   * Package Upload : temporary modification for setting theme property
