@@ -2051,7 +2051,7 @@ _item_realize(Elm_Genlist_Item *it,
                          elm_widget_disabled_set(ic, EINA_TRUE);
                     }
                }
-             if (it->wd->rename_it && it->renamed)
+             if (it->renamed)
                {
                   it->icons =
                       elm_widget_stringlist_get(edje_object_data_get(it->base.view, "renames"));
