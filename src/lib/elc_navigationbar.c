@@ -53,7 +53,6 @@ struct _Elm_Navigationbar_Item
    Evas_Object *title_btns[ELM_NAVIGATIONBAR_TITLE_BTN_CNT];
    Evas_Object *content;
    Evas_Object *icon;
-   Ecore_Job *titleobj_switching_job;
    Eina_Bool titleobj_visible :1;
    Eina_Bool back_btn :1;
 };
@@ -90,7 +89,7 @@ static void _elm_navigationbar_next_btn_set(Evas_Object *obj,
                                             Evas_Object *new_btn,
                                             Elm_Navigationbar_Item *it);
 static void _title_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _titleobj_switching_job(void *data);
+static void _titleobj_switching(Evas_Object *obj, Elm_Navigationbar_Item *it);
 
 static const char SIG_HIDE_FINISHED[] = "hide,finished";
 static const char SIG_TITLE_OBJ_VISIBLE_CHANGED[] = "titleobj,visible,changed";
@@ -225,9 +224,6 @@ _item_del(Elm_Navigationbar_Item *it)
 
    if (!it) return;
 
-   if (it->titleobj_switching_job)
-     ecore_job_del(it->titleobj_switching_job);
-
    wd = elm_widget_data_get(it->base.widget);
    if (!wd) return;
 
@@ -301,13 +297,10 @@ _resize(void *data __UNUSED__, Evas *e  __UNUSED__, Evas_Object *obj, void *even
 }
 
 static void
-_titleobj_switching_job(void *data)
+_titleobj_switching(Evas_Object *obj, Elm_Navigationbar_Item *it)
 {
-   Elm_Navigationbar_Item *it = data;
-   Widget_Data *wd = elm_widget_data_get(it->base.widget);
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-
-   it->titleobj_switching_job = NULL;
 
    if (!it->title_obj) return;
 
@@ -352,8 +345,7 @@ _title_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emission __U
 
    evas_object_smart_callback_call(navibar, SIG_TITLE_CLICKED, NULL);
 
-   if (!it->titleobj_switching_job)
-     it->titleobj_switching_job = ecore_job_add(_titleobj_switching_job, it);
+   _titleobj_switching(navibar, it);
 }
 
 //TODO: should be renamed.
@@ -413,10 +405,7 @@ _transition_complete_cb(void *data)
         if (it->title_obj)
           {
              edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
-             edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
           }
-        if (it->title)
-             edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
         if (it->subtitle)
           edje_object_part_text_set(wd->base, "elm.text.sub", it->subtitle);
         else
@@ -870,13 +859,6 @@ elm_navigationbar_title_label_set(Evas_Object *obj, Evas_Object *content, const 
 
    eina_stringshare_replace(&it->title, title);
    edje_object_part_text_set(wd->base, "elm.text", title);
-   if (wd->title_visible)
-     {
-        if ((it->title_obj) && (it->title))
-          edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
-        else
-          edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
-     }
    _item_sizing_eval(it);
 }
 
@@ -1041,7 +1023,6 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
             //TODO: for before nbeat?
             edje_object_signal_emit(wd->base, "elm,state,show,noanimate,title", "elm");
             it->titleobj_visible = EINA_TRUE;
-            edje_object_signal_emit(wd->base, "elm,state,extend,title", "elm");
          }
      }
    _item_sizing_eval(it);
@@ -1092,7 +1073,6 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
           it->titleobj_visible = EINA_FALSE;
         }
        edje_object_signal_emit(wd->base, "elm,state,hide,extended", "elm");
-       edje_object_signal_emit(wd->base, "elm,state,retract,title", "elm");
    }
    _item_sizing_eval(it);
 }
@@ -1369,13 +1349,10 @@ elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *conten
     wd = elm_widget_data_get(obj);
     if (!wd) return;
 
-   it = evas_object_data_get(content, _navigationbar_key);
-   if ((!it) || (!it->title_obj)) return;
-
-   it->titleobj_visible = visible;
-
-   if (!it->titleobj_switching_job)
-     it->titleobj_switching_job = ecore_job_add(_titleobj_switching_job, it);
+    it = evas_object_data_get(content, _navigationbar_key);
+    if (!it) return;
+    if (it->titleobj_visible == visible) return;
+    _titleobj_switching(obj, it);
 }
 
 /**
