@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build31) unstable; urgency=low
+
+  * [store] Fixed the unnecessary code
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build31
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Fri, 24 Jun 2011 21:29:07 +0900
+
 elementary (1.0.0+svn.58393slp2+build30) unstable; urgency=low
 
   * [navigationbar] removed internal ecore_job usage 
