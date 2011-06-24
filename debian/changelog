@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build29) unstable; urgency=low
+
+  * [genlist] Fixed rename bug.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build29
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Fri, 24 Jun 2011 10:37:42 +0900
+
 elementary (1.0.0+svn.58393slp2+build28) unstable; urgency=low
 
   * [genlist] Removed some APIs and const.
