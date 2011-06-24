@@ -66,7 +66,7 @@ static void _theme_hook(Evas_Object *obj)
 }
 
 static void
-_on_focus_hook(void *data, Evas_Object *obj)
+_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->base)
@@ -97,7 +97,8 @@ static void _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_max_set(obj, maxw, maxh);
 }
 
-static void _clicked(void *data, Evas_Object *obj, void *event_info)
+static void _clicked(void *data, Evas_Object *obj __UNUSED__,
+                     void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -109,13 +110,15 @@ static Eina_Bool _delay_changed(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
-   if (!wd) return;
+   if (!wd) return ECORE_CALLBACK_CANCEL;
+
    evas_object_smart_callback_call(data, "delay-changed", NULL);
    wd->idler = NULL;
    return ECORE_CALLBACK_CANCEL;
 }
 
-static void _changed(void *data, Evas_Object *obj, void *event_info)
+static void _changed(void *data, Evas_Object *obj __UNUSED__,
+                     void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
@@ -124,7 +127,8 @@ static void _changed(void *data, Evas_Object *obj, void *event_info)
       wd->idler = ecore_idler_add(_delay_changed, data);
 }
 
-static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info)
+static void _cancel_clicked(void *data, Evas_Object *obj __UNUSED__,
+                            void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -139,7 +143,8 @@ static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-_basebg_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+_basebg_clicked(void *data, Evas_Object *obj, const char *emission __UNUSED__,
+                const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
@@ -150,7 +155,9 @@ _basebg_clicked(void *data, Evas_Object *obj, const char *emission, const char *
 }
 
 static void
-_searchsymbol_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+_searchsymbol_clicked(void *data, Evas_Object *obj __UNUSED__,
+                      const char *emission __UNUSED__,
+                      const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 

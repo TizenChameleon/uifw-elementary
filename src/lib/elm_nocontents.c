@@ -141,7 +141,7 @@ elm_nocontents_custom_set(const Evas_Object *obj, Evas_Object *custom)
 
    if (!wd) return;
    if (!custom) return;
-   elm_widget_sub_object_add(obj, custom);
+   elm_widget_sub_object_add((Evas_Object *)obj, custom);
    edje_object_part_swallow(wd->noc, "custom", custom);
    wd->custom = custom;
 }
