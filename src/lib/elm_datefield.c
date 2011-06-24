@@ -54,7 +54,7 @@ struct _Widget_Data
    Evas_Object *time[TIME_MAX];
    Ecore_Event_Handler *handler;
    Ecore_Idler *idler;
-   int layout;
+   unsigned int layout;
 
    int year, month, day, hour, min;
    int y_max, m_max, d_max;
@@ -74,15 +74,14 @@ static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _on_focus_hook(void *data, Evas_Object *obj);
+static void _on_focus_hook(void *data __UNUSED__, Evas_Object *obj);
 
-static void _signal_rect_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _signal_ampm_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _entry_focused_cb(void *data, Evas_Object *obj, void *event_info);
-static void _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info);
-static void _entry_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info);
-static Eina_Bool _imf_event_commit_cb(void *data, int type, void *event);
-static void _input_panel_event_callback(void *data, Ecore_IMF_Context *ctx, int value);
+static void _signal_rect_mouse_down(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source);
+static void _entry_focused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__);
+static void _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__);
+static void _entry_key_up_cb(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj , void *event_info);
+static Eina_Bool _imf_event_commit_cb(void *data, int type __UNUSED__, void *event);
+static void _input_panel_event_callback(void *data, Ecore_IMF_Context *ctx __UNUSED__, int value);
 
 static void _date_entry_add(Evas_Object *obj);
 static void _time_entry_add(Evas_Object *obj);
@@ -107,7 +106,7 @@ _del_hook(Evas_Object *obj)
 }
 
 static void
-_on_focus_hook(void *data, Evas_Object *obj)
+_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->base) return ;
@@ -215,7 +214,7 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void
-_ampm_clicked_cb(void *data, Evas_Object *obj, void *event_info)
+_ampm_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    char *str;
@@ -247,7 +246,7 @@ _ampm_clicked_cb(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-_signal_rect_mouse_down(void *data, Evas_Object *obj, const char *emission, const char *source)
+_signal_rect_mouse_down(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -299,7 +298,7 @@ _focus_idler_cb(void *obj)
 }
 
 static void
-_entry_focused_cb(void *data, Evas_Object *obj, void *event_info)
+_entry_focused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd || !wd->base) return;
@@ -323,7 +322,7 @@ _entry_focused_cb(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-_entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
+_entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    char str[YEAR_MAX_LENGTH+1] = {0,};
@@ -689,7 +688,7 @@ _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen)
 }
 
 static void
-_entry_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info)
+_entry_key_up_cb(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj , void *event_info)
 {
    Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *) event_info;
 
@@ -698,7 +697,7 @@ _entry_key_up_cb(void *data, Evas *e , Evas_Object *obj , void *event_info)
 }
 
 static Eina_Bool 
-_imf_event_commit_cb(void *data, int type, void *event)
+_imf_event_commit_cb(void *data , int type __UNUSED__, void *event)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Ecore_IMF_Event_Commit *ev = (Ecore_IMF_Event_Commit *) event;
@@ -739,7 +738,7 @@ _imf_event_commit_cb(void *data, int type, void *event)
 }
 
 static void 
-_input_panel_event_callback(void *data, Ecore_IMF_Context *ctx, int value)
+_input_panel_event_callback(void *data, Ecore_IMF_Context *ctx __UNUSED__, int value)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
@@ -947,7 +946,7 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-   if (layout < ELM_DATEFIELD_LAYOUT_TIME ||layout > ELM_DATEFIELD_LAYOUT_DATEANDTIME) return;
+   if (layout > ELM_DATEFIELD_LAYOUT_DATEANDTIME) return;
 
    if (wd->layout != layout)
      {

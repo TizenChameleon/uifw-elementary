@@ -28,7 +28,7 @@ static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 //static void _sizing_eval(Evas_Object* obj);
 //static void _dayselector_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
-//static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _changed_size_hints(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -45,7 +45,7 @@ _dayselector_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 */
 static void
-_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_changed_size_hints(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Evas_Coord w, h;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -56,7 +56,7 @@ _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void 
-_check_clicked(void *data, Evas_Object *obj, void *event_info)
+_check_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    static Elm_DaySelector_Day day;
    Widget_Data* wd = (Widget_Data*) elm_widget_data_get(data);

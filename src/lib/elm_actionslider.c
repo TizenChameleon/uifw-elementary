@@ -67,9 +67,9 @@ static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 /*
  * callback functions
  */
-static void _icon_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _icon_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _icon_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _icon_down_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
+static void _icon_move_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
+static void _icon_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__);
 
 /*
  * internal functions
@@ -209,25 +209,17 @@ _theme_hook(Evas_Object *obj)
 static void
 _disable_hook(Evas_Object *obj)
 {
-//   Widget_Data *wd = elm_widget_data_get(obj);
-/*
-   TODO
+   Widget_Data *wd = elm_widget_data_get(obj);
+
    if (elm_widget_disabled_get(obj))
-     edje_object_signal_emit(wd->btn, "elm,state,disabled", "elm");
+     edje_object_signal_emit(wd->icon, "elm,state,disabled", "elm");
    else
-     edje_object_signal_emit(wd->btn, "elm,state,enabled", "elm");
-*/
+     edje_object_signal_emit(wd->icon, "elm,state,enabled", "elm");
+
 }
 
 static void
-_sub_del(void *data, Evas_Object *obj, void *event_info)
-{
-//   Widget_Data *wd = elm_widget_data_get(obj);
-//   Evas_Object *sub = event_info;
-}
-
-static void
-_icon_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_icon_down_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
    if (!wd) return;
@@ -235,7 +227,7 @@ _icon_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_icon_move_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_icon_move_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *as = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get(as);
@@ -269,7 +261,7 @@ edje_object_signal_emit(wd->as, "elm,hide,text,center", "elm");
 }
 
 static void
-_icon_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_icon_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Evas_Object *as = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get((Evas_Object *)data);
@@ -466,7 +458,6 @@ elm_actionslider_add(Evas_Object *parent)
    edje_object_part_swallow(wd->as, "elm.swallow.space", wd->icon_fake);
 
    // event callbacks
-   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    evas_object_event_callback_add(wd->icon, EVAS_CALLBACK_MOUSE_DOWN, _icon_down_cb, obj);
    evas_object_event_callback_add(wd->icon, EVAS_CALLBACK_MOUSE_MOVE, _icon_move_cb, obj);
    evas_object_event_callback_add(wd->icon, EVAS_CALLBACK_MOUSE_UP, _icon_up_cb, obj);
