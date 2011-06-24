@@ -2493,8 +2493,6 @@ _item_block_position(Item_Block *itb,
                                        evas_object_hide(it->base.view);
                                     }
                                }
-                               it->old_scrl_x = it->scrl_x;
-                               it->old_scrl_y = it->scrl_y;
                             }
                     }
                   else
@@ -2507,6 +2505,11 @@ _item_block_position(Item_Block *itb,
         else
           {
              if (vis) it->want_realize = EINA_TRUE;
+          }
+        if (!it->wd->effect_mode || it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE || ((it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) && it->parent == it->wd->expand_item))
+          {
+             it->old_scrl_x = it->scrl_x;
+             it->old_scrl_y = it->scrl_y;
           }
         y += it->h;
      }
