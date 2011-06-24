@@ -69,6 +69,8 @@ struct _Widget_Data {
    int  contracted;
    Eina_Bool  focused: 1;
    Ecore_IMF_Context *imf_context;
+   Elm_Multibuttonentry_Item_Verify_Callback add_callback;
+   void *add_callback_data;
 };
 
 static const char *widtype = NULL;
@@ -754,6 +756,8 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 
    if (!wd || !wd->box || !wd->entry) return NULL;
 
+   if ((wd->add_callback) && !wd->add_callback(obj, str, data, wd->add_callback_data)) return NULL;
+
    // add button
    btn = edje_object_add(evas_object_evas_get(obj));
    str_utf8 = elm_entry_markup_to_utf8(str);
@@ -1264,6 +1268,8 @@ elm_multibuttonentry_add(Evas_Object *parent)
    wd->n_str = 0;
    wd->rectForEnd = NULL;
    wd->imf_context = NULL;
+   wd->add_callback = NULL;
+   wd->add_callback_data = NULL;
 
    _view_init(obj);
    _event_init(obj);
@@ -1786,3 +1792,22 @@ elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data)
    item->data = data;
 }
 
+/**
+ * Set the multibuttonentry item_verify_callback function
+ *
+ * @param obj The multibuttonentry object
+ * @param func The function pointer to be called, it it's NULL, callback function will be deleted.
+ * @param data user data to be passed to the callback function
+ *
+ * @ingroup Multibuttonentry
+ */
+EAPI void
+elm_multibuttonentry_item_verify_callback_set(Evas_Object *obj, Elm_Multibuttonentry_Item_Verify_Callback func, void *data)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->add_callback = func;
+   wd->add_callback_data = data;
+}

@@ -3134,6 +3134,7 @@ extern "C" {
 
    /* multibuttonentry */
    typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
+   typedef Eina_Bool (*Elm_Multibuttonentry_Item_Verify_Callback) (Evas_Object *obj, const char *item_label, void *item_data, void *data);
    EAPI Evas_Object               *elm_multibuttonentry_add(Evas_Object *parent);
    EAPI const char                *elm_multibuttonentry_label_get(Evas_Object *obj);
    EAPI void                       elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
@@ -3160,6 +3161,7 @@ extern "C" {
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item);
    EAPI void                      *elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item);
    EAPI void                       elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data);
+   EAPI void                       elm_multibuttonentry_item_verify_callback_set(Evas_Object *obj, Elm_Multibuttonentry_Item_Verify_Callback func, void *data);
    /* smart callback called:
     * "selected" - This signal is emitted when the selected item of multibuttonentry is changed.
     * "added" - This signal is emitted when a new multibuttonentry item is added.
