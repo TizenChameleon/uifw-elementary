@@ -481,4 +481,38 @@ elm_image_editable_get(const Evas_Object *obj)
 }
 
 
-/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/
+/**
+ * Enable/disable retaining up the aspect ratio of the image.
+ *
+ * @param obj The image object.
+ * @param retained Retaining or Non retaining.
+ *
+ * @ingroup Image
+ */
+EAPI void
+elm_image_aspect_ratio_retained_set(Evas_Object *obj, Eina_Bool retained)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   return _els_smart_icon_aspect_ratio_retained_set(wd->img, retained);
+}
+
+/**
+ * Get if the object retains the aspect ratio.
+ *
+ * @param obj The image object.
+ * @return If the object retains the aspect ratio.
+ *
+ * @ingroup Image
+ */
+EAPI Eina_Bool
+elm_image_aspect_ratio_retained_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _els_smart_icon_aspect_ratio_retained_get(wd->img);
+}
+
+/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-3f0^-2{2(0W1st0 :*/
