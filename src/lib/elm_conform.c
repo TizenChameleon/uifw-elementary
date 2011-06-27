@@ -67,8 +67,6 @@ _del_pre_hook(Evas_Object *obj)
 #ifdef HAVE_ELEMENTARY_X
    if (wd->prop_hdl) ecore_event_handler_del(wd->prop_hdl);
 #endif
-   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_RESIZE, _conformant_move_resize_event_cb, obj);
-   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_MOVE, _conformant_move_resize_event_cb, obj);
 }
 
 static void
