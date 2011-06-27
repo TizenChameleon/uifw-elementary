@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build33) unstable; urgency=low
+
+  * [store] Fixed the item info free
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build33
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Mon, 27 Jun 2011 17:57:17 +0900
+
 elementary (1.0.0+svn.58393slp2+build32) unstable; urgency=low
 
   * [store] Fixed the store item check

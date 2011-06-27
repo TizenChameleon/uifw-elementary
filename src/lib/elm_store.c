@@ -674,6 +674,7 @@ elm_store_free(Elm_Store *st)
                             if (st->cb.item_free.func)
                               {
                                  st->cb.item_free.func(st->cb.item_free.data, sti->item_info);
+                                 sti->item_info = NULL;
                               }
                             if (sti->fetched)
                               {
@@ -1076,6 +1077,11 @@ _item_mapping_find(Elm_Store_Item *sti, const char *part)
 {
    if (!EINA_MAGIC_CHECK(sti, ELM_STORE_ITEM_MAGIC)) return NULL;
    const Elm_Store_Item_Mapping *m;
+
+   if(!sti->item_info)
+     {
+        return NULL;
+     }
 
    for (m = sti->item_info->mapping; m; m++)
      {
@@ -1646,6 +1652,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                if (st->cb.item_free.func)
                                                                  {
                                                                     st->cb.item_free.func(st->cb.item_free.data, remove_item->item_info);
+                                                                    remove_item->item_info = NULL;
                                                                  }
                                                                if (remove_item->fetched)
                                                                  {
@@ -1680,6 +1687,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                               if (st->cb.item_free.func)
                                                                                 {
                                                                                    st->cb.item_free.func(st->cb.item_free.data, temp_sti->item_info);
+                                                                                   temp_sti->item_info = NULL;
                                                                                 }
                                                                               if (temp_sti->fetched)
                                                                                 {
@@ -2085,7 +2093,7 @@ elm_store_item_index_get(const Elm_Store_Item *sti)
              if (header_list)
                {
                   Elm_Store_Item *temp_sti = eina_list_nth(header_list, 0);
-                  if(temp_sti && temp_sti->item_info)
+                  if(temp_sti && temp_sti->item_info && sti->item_info)
                     {
                        if (sti->item_info->group_index == temp_sti->item_info->group_index)
                          {
@@ -2153,7 +2161,7 @@ elm_store_item_data_index_get(const Elm_Store_Item *sti)
                   if (header_list)
                     {
                        Elm_Store_Item *temp_sti = eina_list_nth(header_list, 0);
-                       if(temp_sti && temp_sti->item_info)
+                       if(temp_sti && temp_sti->item_info && sti->item_info)
                          {
 
                             if(temp_sti->item_info->item_type == ELM_GENLIST_ITEM_GROUP)
@@ -2410,7 +2418,7 @@ elm_store_item_del(Elm_Store_Item *sti)
              if (header_list)
                {
                   Elm_Store_Item *header_item = eina_list_nth(header_list, 0);
-                  if(header_item && header_item->item_info)
+                  if(header_item && header_item->item_info && sti->item_info)
                     {
 
                        if (header_item->item_info->group_index == sti->item_info->group_index)
@@ -2434,6 +2442,7 @@ elm_store_item_del(Elm_Store_Item *sti)
                                                 if (st->cb.item_free.func)
                                                   {
                                                      st->cb.item_free.func(st->cb.item_free.data, remove_sti->item_info);
+                                                     remove_sti->item_info = NULL;
                                                   }
                                                 if (remove_sti->fetched)
                                                   {
@@ -2468,6 +2477,7 @@ elm_store_item_del(Elm_Store_Item *sti)
                                                                if (st->cb.item_free.func)
                                                                  {
                                                                     st->cb.item_free.func(st->cb.item_free.data, temp_sti->item_info);
+                                                                    temp_sti->item_info = NULL;
                                                                  }
                                                                if (temp_sti->fetched)
                                                                  {
