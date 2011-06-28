@@ -438,7 +438,7 @@ struct _Elm_Genlist_Item
    Evas_Object *edit_obj;
    int         num;
    Ecore_Animator *item_moving_effect_timer;
-   Evas_Coord  old_scrl_x, old_scrl_y;
+   Evas_Coord  old_scrl_y;
 };
 
 struct _Item_Cache
@@ -2508,7 +2508,6 @@ _item_block_position(Item_Block *itb,
           }
         if (!it->wd->effect_mode || it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE || ((it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) && it->parent == it->wd->expand_item))
           {
-             it->old_scrl_x = it->scrl_x;
              it->old_scrl_y = it->scrl_y;
           }
         y += it->h;
