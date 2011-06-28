@@ -1352,6 +1352,7 @@ elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *conten
     it = evas_object_data_get(content, _navigationbar_key);
     if (!it) return;
     if (it->titleobj_visible == visible) return;
+    it->titleobj_visible = visible;
     _titleobj_switching(obj, it);
 }
 
