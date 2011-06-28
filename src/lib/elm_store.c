@@ -681,9 +681,7 @@ elm_store_free(Elm_Store *st)
                                  int index = elm_store_item_index_get(sti);
                                  if (index != -1) _item_unfetch(st, index);
                               }
-                            header_list = eina_list_remove(header_list, sti);
                             LKD(sti->lock);
-                            free(sti);
                          }
                     }
                   st->header_items = eina_list_remove(st->header_items, header_list);
