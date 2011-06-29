@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build35) unstable; urgency=low
+
+  * [store] Fixed the crash problem of store item info
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build35
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Wed, 29 Jun 2011 14:29:50 +0900
+
 elementary (1.0.0+svn.58393slp2+build34) unstable; urgency=low
 
   * repackaging
