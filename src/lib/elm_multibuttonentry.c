@@ -698,7 +698,6 @@ _del_button_item(Elm_Multibuttonentry_Item *item)
      _set_vis_guidetext(obj);
 }
 
-
 static void
 _select_button(Evas_Object *obj, Evas_Object *btn)
 {
@@ -710,13 +709,17 @@ _select_button(Evas_Object *obj, Evas_Object *btn)
    if (btn)
      {
         _change_current_button(obj, btn);
-        elm_object_unfocus(wd->entry);
-        evas_object_focus_set(btn, EINA_TRUE);
+        if (elm_widget_focus_get(obj))
+          {
+             elm_object_unfocus(wd->entry);
+             evas_object_focus_set(btn, EINA_TRUE);
+          }
      }
    else
      {
         _change_current_button_state(obj, MULTIBUTONENTRY_BUTTON_STATE_DEFAULT);
-        elm_object_focus(wd->entry);
+        if (elm_widget_focus_get(obj))
+          elm_object_focus(wd->entry);
      }
 }
 
@@ -972,6 +975,7 @@ static void
 _entry_focus_in_cb(void *data, Evas *e, __UNUSED__ void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
 
    _change_current_button_state(data, MULTIBUTONENTRY_BUTTON_STATE_DEFAULT);
 }
@@ -980,6 +984,8 @@ static void
 _entry_focus_out_cb(void *data, Evas *e, __UNUSED__ void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
    static char str[MAX_STR];
 
    strncpy(str,elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
