@@ -1405,29 +1405,15 @@ _list_update(void *data, Ecore_Thread *th __UNUSED__, void *msg)
 static void
 _list_end(void *data, Ecore_Thread *th)
 {
-   EINA_SAFETY_ON_NULL_RETURN(data);
-   EINA_SAFETY_ON_NULL_RETURN(th);
    Elm_Store *st = data;
-
-   if (th == st->list_th)
-     {
-        ecore_thread_cancel(st->list_th);
-        st->list_th = NULL;
-     }
+   if (th == st->list_th) st->list_th = NULL;
 }
 
 static void
 _list_cancel(void *data, Ecore_Thread *th)
 {
-   EINA_SAFETY_ON_NULL_RETURN(data);
-   EINA_SAFETY_ON_NULL_RETURN(th);
    Elm_Store *st = data;
-
-   if (th == st->list_th)
-     {
-        ecore_thread_cancel(st->list_th);
-        st->list_th = NULL;
-     }
+   if (th == st->list_th) st->list_th = NULL;
 }
 
 static void
@@ -1677,7 +1663,6 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                if (eina_list_count(header_list) == 0)
                                                                  {
                                                                     st->header_items = eina_list_remove(st->header_items, temp_header_list);
-                                                                    header_list = eina_list_free(header_list);
                                                                  }
                                                                else if(eina_list_count(header_list) == 1)
                                                                  {
@@ -1711,11 +1696,10 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                               elm_genlist_item_del(temp_sti->item);
                                                                               free(temp_sti);
                                                                               st->header_items = eina_list_remove(st->header_items, temp_header_list);
-                                                                              header_list = eina_list_free(header_list);
                                                                            }
                                                                       }
                                                                  }
-                                                               temp_header_list = eina_list_free(temp_header_list);
+                                                               temp_header_list = NULL;
                                                                removed = EINA_TRUE;
                                                             }
                                                        }
@@ -2472,7 +2456,6 @@ elm_store_item_del(Elm_Store_Item *sti)
                                                 if (eina_list_count(header_list) == 0)
                                                   {
                                                      st->header_items = eina_list_remove(st->header_items, temp_header_list);
-                                                     header_list = eina_list_free(header_list);
                                                   }
                                                 else if (eina_list_count(header_list) == 1)
                                                   {
@@ -2505,11 +2488,10 @@ elm_store_item_del(Elm_Store_Item *sti)
                                                                elm_genlist_item_del(temp_sti->item);
                                                                free(temp_sti);
                                                                st->header_items = eina_list_remove(st->header_items, temp_header_list);
-                                                               header_list = eina_list_free(header_list);
                                                             }
                                                        }
                                                   }
-                                                temp_header_list = eina_list_free(temp_header_list);
+                                                temp_header_list = NULL;
                                                 removed = EINA_TRUE;
                                              }
                                         }
