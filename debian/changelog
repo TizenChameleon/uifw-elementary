@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build36) unstable; urgency=low
+
+  * [store] Fixed the header list free and thread cancel problem.
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build36
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Thu, 30 Jun 2011 21:01:10 +0900
+
 elementary (1.0.0+svn.58393slp2+build35) unstable; urgency=low
 
   * [store] Fixed the crash problem of store item info
