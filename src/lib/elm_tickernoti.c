@@ -135,12 +135,16 @@ _make_notification_window (Evas_Object *obj)
 }
 #endif
 
-static void _detail_show_cb (void *data, Evas_Object *obj, const char *emission, const char *source)
+static void _detail_show_cb (void *data, Evas_Object *obj __UNUSED__,
+                             const char *emission __UNUSED__,
+                             const char *source __UNUSED__)
 {
    evas_object_smart_callback_call ((Evas_Object *)data, "detail,show", NULL);
 }
 
-static void _detail_hide_cb (void *data, Evas_Object *obj, const char *emission, const char *source)
+static void _detail_hide_cb (void *data, Evas_Object *obj __UNUSED__,
+                             const char *emission __UNUSED__,
+                             const char *source __UNUSED__)
 {
    evas_object_smart_callback_call ((Evas_Object *)data, "detail,hide", NULL);
 }
@@ -232,9 +236,10 @@ _create_tickernoti_detail (Evas_Object *obj)
 }
 
 static void
-_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
-{  
-   Widget_Data *wd = elm_widget_data_get(obj);   
+_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
+      void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
    if (wd->mode == ELM_TICKERNOTI_DEFAULT) 
@@ -258,7 +263,8 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
+      void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 

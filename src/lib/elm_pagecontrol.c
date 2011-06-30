@@ -9,7 +9,7 @@
  * @ingroup Elementary
  *
  *  A page control is a succession of dots centered in the control.
- *  Each dot corresponds to a page in the application’s document (or other data-model entity),
+ *  Each dot corresponds to a page in the application's document (or other data-model entity),
  *  with the white dot indicating the currently viewed page.
  */
 
@@ -20,7 +20,7 @@ struct _Widget_Data
 {
    Evas_Object *base;
    Evas_Object *hbox;
-   int page_count;
+   unsigned int page_count;
    Eina_List *page_list;
    unsigned int cur_page_id;
    Evas_Object *parent;
@@ -31,7 +31,7 @@ struct _Page_Item
 {
    Evas_Object *obj;
    Evas_Object *base;
-   int page_id;
+   unsigned int page_id;
 };
 
 
@@ -99,18 +99,20 @@ _page_find(Evas_Object *obj, unsigned int index)
    Page_Item *it;
    Eina_List *l;
    
-   int i = 0;
+   unsigned int i = 0;
    EINA_LIST_FOREACH(wd->page_list, l, it)
      {
-	if (i == index) return it;
-	i++;
+        if (i == index) return it;
+        i++;
      }
 
    return NULL;
 }
 
 static void 
-_indicator_clicked_cb(void *data, Evas_Object *obj, const char *emission, const char *source)
+_indicator_clicked_cb(void *data, Evas_Object *obj,
+                      const char *emission __UNUSED__,
+                      const char *source __UNUSED__)
 {
    Evas_Object *wd_obj = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get(wd_obj);
@@ -118,24 +120,24 @@ _indicator_clicked_cb(void *data, Evas_Object *obj, const char *emission, const 
 
    Page_Item *it;
    Eina_List *l;
-   
-   int page_id = 0;
+
+   unsigned int page_id = 0;
    EINA_LIST_FOREACH(wd->page_list, l, it)
      {
-	if (it->base == obj)
-	  page_id = it->page_id;	
+        if (it->base == obj)
+          page_id = it->page_id;
      }
-   
+
    if (page_id == wd->cur_page_id) return;
-   
+
    it = _page_find(wd_obj, wd->cur_page_id);
    if (!it) return;
-   
+
    edje_object_signal_emit(it->base, "elm,state,indicator,off", "elm");
-   
+
    it = _page_find(wd_obj, page_id);
    if (!it) return;
-   
+
    edje_object_signal_emit(it->base, "elm,state,indicator,on", "elm");
    wd->cur_page_id = page_id;
    evas_object_smart_callback_call(it->obj, "changed", NULL);
@@ -251,7 +253,7 @@ elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count)
    Page_Item *it;
    Evas_Coord mw, mh;
    
-   int i;
+   unsigned int i;
    for (i = 0; i < page_count; i++)
      {
 	it = _create_item(obj, i);

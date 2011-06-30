@@ -6,7 +6,9 @@ typedef struct _Elm_Params_Nocontents
 }Elm_Params_Nocontents;
 
 static void
-external_nocontents_state_set(void *data __UNUSED__, Evas_Object *obj, const void *from_params, const void *to_params, float pos __UNUSED__)
+external_nocontents_state_set(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
+                              const void *from_params, const void *to_params,
+                              float pos __UNUSED__)
 {
    const Elm_Params_Nocontents *p;
 
@@ -54,9 +56,11 @@ external_nocontents_param_get(void *data __UNUSED__, const Evas_Object *obj, Edj
 }
 
 static void *
-external_nocontents_params_parse(void *data, Evas_Object *obj, const Eina_List *params)
+external_nocontents_params_parse(void *data __UNUSED__,
+                           Evas_Object *obj __UNUSED__,
+                           const Eina_List *params __UNUSED__)
 {
-   Elm_Params_Nocontents *mem;
+   Elm_Params_Nocontents *mem = NULL;
 
    //mem = external_common_params_parse(Elm_Params_Nocontents, data, obj, params);
    if (!mem)
@@ -66,7 +70,8 @@ external_nocontents_params_parse(void *data, Evas_Object *obj, const Eina_List *
 }
 
 static Evas_Object *external_nocontents_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__,
+		const char *content __UNUSED__)
 {
 	ERR("so content");
 	return NULL;
