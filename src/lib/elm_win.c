@@ -6,7 +6,57 @@
  * @ingroup Elementary
  *
  * The window class of Elementary.  Contains functions to manipulate
- * windows.
+ * windows. The Evas engine used to render the window contents is specified
+ * in the system or user elementary config files (whichever is found last),
+ * and can be overridden with the ELM_ENGINE environment variable for testing.
+ * Engines that may be supported (depending on Evas and Ecore-Evas compilation
+ * setup and modules actually installed at runtime) are (listed in order of
+ * best supported and most likely to be complete and work to lowest quality).
+ *
+ * "x11", "x", "software-x11", "software_x11"
+ *   (Software rendering in X11)
+ * "gl", "opengl", "opengl-x11", "opengl_x11"
+ *   (OpenGL or OpenGL-ES2 rendering in X11)
+ * "shot:..."
+ *   (Virtual screenshot renderer - renders to output file and exits)
+ * "fb", "software-fb", "software_fb"
+ *   (Linux framebuffer direct software rendering)
+ * "sdl", "software-sdl", "software_sdl"
+ *   (SDL software rendering to SDL buffer)
+ * "gl-sdl", "gl_sdl", "opengl-sdl", "opengl_sdl"
+ *   (OpenGL or OpenGL-ES2 rendering using SDL as the buffer)
+ * "gdi", "software-gdi", "software_gdi"
+ *   (Windows WIN32 rendering via GDI with software)
+ * "dfb", "directfb"
+ *   (Rendering to a DirectFB window)
+ * "x11-8", "x8", "software-8-x11", "software_8_x11"
+ *   (Rendering in grayscale using dedicated 8bit software engine in X11)
+ * "x11-16", "x16", "software-16-x11", "software_16_x11"
+ *   (Rendering in X11 using 16bit software engine)
+ * "wince-gdi", "software-16-wince-gdi", "software_16_wince_gdi"
+ *   (Windows CE rendering via GDI with 16bit software renderer)
+ * "sdl-16", "software-16-sdl", "software_16_sdl"
+ *   (Rendering to SDL buffer with 16bit software renderer)
+ *
+ * All engines use a simple string to select the engine to render, EXCEPT
+ * the "shot" engine. This actually encodes the output of the virtual
+ * screenshot and how long to delay in the engine string. The engine string
+ * is encoded in the following way:
+ *
+ *   "shot:[delay=XX][:][file=XX]"
+ *
+ * Where options are separated by a ":" char if more than one option is given,
+ * with delay, if provided being the first option and file the last (order
+ * is important). The delay specifies how long to wait after the window is
+ * shown before doing the virtual "in memory" rendering and then save the
+ * output to the file specified by the file option (and then exit). If no
+ * delay is given, the default is 0.5 seconds. If no file is given the
+ * default output file is "out.png". Some examples of using the shot engine:
+ *
+ *   ELM_ENGINE="shot:delay=1.0:file=elm_test.png" elementary_test
+ *   ELM_ENGINE="shot:file=elm_test2.png" elementary_test
+ *   ELM_ENGINE="shot:delay=2.0" elementary_test
+ *   ELM_ENGINE="shot:" elementary_test
  *
  * Signals that you can add callbacks for are:
  *
@@ -33,6 +83,10 @@ struct _Elm_Win
 
    Elm_Win_Type type;
    Elm_Win_Keyboard_Mode kbdmode;
+   struct {
+      const char *info;
+      Ecore_Timer *timer;
+   } shot;
    Eina_Bool autodel : 1;
    int *autodel_clear, rot;
    struct {
@@ -80,8 +134,135 @@ static void _elm_win_focus_highlight_reconfigure_job_stop(Elm_Win *win);
 static void _elm_win_focus_highlight_anim_end(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _elm_win_focus_highlight_reconfigure(Elm_Win *win);
 
+static const char SIG_DELETE_REQUEST[] = "delete,request";
+static const char SIG_FOCUS_OUT[] = "focus,in";
+static const char SIG_FOCUS_IN[] = "focus,out";
+static const char SIG_MOVED[] = "moved";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_DELETE_REQUEST, ""},
+   {SIG_FOCUS_OUT, ""},
+   {SIG_FOCUS_IN, ""},
+   {SIG_MOVED, ""},
+   {NULL, NULL}
+};
+
+
+
 Eina_List *_elm_win_list = NULL;
 int _elm_win_deferred_free = 0;
+
+// exmaple shot spec (wait 0.1 sec then save as my-window.png):
+// ELM_ENGINE="shot:delay=0.1:file=my-window.png"
+
+static double
+_shot_delay_get(Elm_Win *win)
+{
+   char *p, *pd;
+   char *d = strdup(win->shot.info);
+
+   if (!d) return 0.5;
+   for (p = (char *)win->shot.info; *p; p++)
+     {
+        if (!strncmp(p, "delay=", 6))
+          {
+             double v;
+
+             for (pd = d, p += 6; (*p) && (*p != ':'); p++, pd++)
+               {
+                  *pd = *p;
+               }
+             *pd = 0;
+             v = atof(d);
+             free(d);
+             return v;
+          }
+     }
+   free(d);
+   return 0.5;
+}
+
+static char *
+_shot_file_get(Elm_Win *win)
+{
+   char *p;
+   char *tmp = strdup(win->shot.info);
+
+   if (!tmp) return NULL;
+   for (p = (char *)win->shot.info; *p; p++)
+     {
+        if (!strncmp(p, "file=", 5))
+          {
+             strcpy(tmp, p + 5);
+             return tmp;
+          }
+     }
+   free(tmp);
+   return strdup("out.png");
+}
+
+static char *
+_shot_key_get(Elm_Win *win __UNUSED__)
+{
+   return NULL;
+}
+
+static char *
+_shot_flags_get(Elm_Win *win __UNUSED__)
+{
+   return NULL;
+}
+
+static void
+_shot_do(Elm_Win *win)
+{
+   Ecore_Evas *ee;
+   Evas_Object *o;
+   unsigned int *pixels;
+   int w, h;
+   char *file, *key, *flags;
+
+   ecore_evas_manual_render(win->ee);
+   pixels = (void *)ecore_evas_buffer_pixels_get(win->ee);
+   if (!pixels) return;
+   ecore_evas_geometry_get(win->ee, NULL, NULL, &w, &h);
+   if ((w < 1) || (h < 1)) return;
+   file = _shot_file_get(win);
+   if (!file) return;
+   key = _shot_key_get(win);
+   flags = _shot_flags_get(win);
+   ee = ecore_evas_buffer_new(1, 1);
+   o = evas_object_image_add(ecore_evas_get(ee));
+   evas_object_image_alpha_set(o, ecore_evas_alpha_get(win->ee));
+   evas_object_image_size_set(o, w, h);
+   evas_object_image_data_set(o, pixels);
+   if (!evas_object_image_save(o, file, key, flags))
+     {
+        ERR("Cannot save window to '%s' (key '%s', flags '%s')",
+            file, key, flags);
+     }
+   free(file);
+   if (key) free(key);
+   if (flags) free(flags);
+   ecore_evas_free(ee);
+}
+
+static Eina_Bool
+_shot_delay(void *data)
+{
+   Elm_Win *win = data;
+   _shot_do(win);
+   win->shot.timer = NULL;
+   elm_exit();
+   return EINA_FALSE;
+}
+
+static void
+_shot_handle(Elm_Win *win)
+{
+   if (!win->shot.info) return;
+   win->shot.timer = ecore_timer_add(_shot_delay_get(win), _shot_delay, win);
+}
 
 static void
 _elm_win_move(Ecore_Evas *ee)
@@ -213,7 +394,10 @@ _deferred_ecore_evas_free(void *data)
 static void
 _elm_win_obj_callback_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
+   Elm_Win *win = data;
+
    elm_object_focus(obj);
+   if (win->shot.info) _shot_handle(win);
 }
 
 static void
@@ -235,6 +419,8 @@ _elm_win_obj_callback_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void
    ecore_evas_callback_resize_set(win->ee, NULL);
    if (win->deferred_resize_job) ecore_job_del(win->deferred_resize_job);
    if (win->deferred_child_eval_job) ecore_job_del(win->deferred_child_eval_job);
+   if (win->shot.info) eina_stringshare_del(win->shot.info);
+   if (win->shot.timer) ecore_timer_del(win->shot.timer);
    while (((child = evas_object_bottom_get(win->evas))) &&
           (child != obj))
      {
@@ -1066,6 +1252,12 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
         win->ee = ecore_evas_gl_sdl_new(NULL, 1, 1, 0, 0);
         FALLBACK_TRY("OpenGL SDL");
      }
+   else if (!strncmp(_elm_config->engine, "shot:", 5))
+     {
+        win->ee = ecore_evas_buffer_new(1, 1);
+        ecore_evas_manual_render_set(win->ee, EINA_TRUE);
+        win->shot.info = eina_stringshare_add(_elm_config->engine + 5);
+     }
 #undef FALLBACK_TRY
 
    if (!win->ee)
@@ -1161,7 +1353,8 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
 }
 
 /**
- * Add @p subobj as a resize object of window @p obj.
+ * Add @p subobj as a resize object of window @p obj. Note, do not move and
+ * resize window and sub object at the same time. It will cause problem.
  *
  * @param obj The window object
  * @param subobj The resize object to add

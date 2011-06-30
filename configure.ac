@@ -521,6 +521,10 @@ AM_CONDITIONAL([HAVE_PO], [false])
 ])
 AC_SUBST(LTLIBINTL)
 
+### Build and install examples
+EFL_CHECK_BUILD_EXAMPLES([enable_build_examples="yes"], [enable_build_examples="no"])
+EFL_CHECK_INSTALL_EXAMPLES([enable_install_examples="yes"], [enable_install_examples="no"])
+
 
 AC_OUTPUT([
 Makefile
@@ -528,6 +532,7 @@ elementary.spec
 elementary.pc
 doc/elementary.dox
 doc/Makefile
+doc/Doxyfile
 src/Makefile
 src/lib/Makefile
 src/lib/Elementary.h
@@ -539,6 +544,7 @@ src/modules/ctxpopup_copypasteUI/Makefile
 src/modules/ctxpopup_copypasteshareUI/Makefile
 src/modules/popup_copypasteUI/Makefile
 src/edje_externals/Makefile
+src/examples/Makefile
 data/Makefile
 data/themes/Makefile
 data/images/Makefile
@@ -583,6 +589,8 @@ echo "  eet......................: ${eet_eet}"
 echo "  edje_cc..................: ${edje_cc}"
 echo
 echo "  Build elementary_test....: ${have_elementary_test}"
+echo "  Examples.............: ${enable_build_examples}"
+echo "  Examples installed...: ${enable_install_examples}"
 echo "  Build elementary_config..: ${have_elementary_config}"
 echo
 echo "Compilation................: make (or gmake)"
