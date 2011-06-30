@@ -210,7 +210,7 @@ _sizing_eval(Evas_Object *obj)
 
 // Whenever MOVE event occurs, Call this function.
 static void
-_imageslider_move(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_imageslider_move(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd;
 
@@ -233,7 +233,7 @@ _imageslider_move(void *data, Evas * e, Evas_Object *obj, void *event_info)
 
 // Whenever RESIZE event occurs, Call this fucntion.
 static void
-_imageslider_resize(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_imageslider_resize(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    int i;
 
@@ -264,7 +264,7 @@ _imageslider_resize(void *data, Evas * e, Evas_Object *obj, void *event_info)
 
 // Whenever SHOW event occurs, Call this function.
 static void
-_imageslider_show(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_imageslider_show(void *data, Evas * e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd;
 
@@ -281,7 +281,7 @@ _imageslider_show(void *data, Evas * e, Evas_Object *obj, void *event_info)
 
 // Whenever HIDE event occurs, Call this function.
 static void
-_imageslider_hide(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_imageslider_hide(void *data, Evas * e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd;
 
@@ -308,7 +308,7 @@ _imageslider_update_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord y, Evas_Coord
 
 // Update the center position of Image Slider item.
 static void
-_imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord my, Evas_Coord y, Evas_Coord w)
+_imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord my __UNUSED__, Evas_Coord y, Evas_Coord w)
 {
    Evas_Coord ix, iy, iw, ih;
    const Evas_Object *eo = elm_layout_content_get((const Evas_Object*)(wd->ly[BLOCK_CENTER]), "swl.photo");
@@ -395,14 +395,11 @@ _imageslider_obj_move(Widget_Data * wd, Evas_Coord step)
 
 // Whenever MOUSE DOWN event occurs, Call this function.
 static void
-_ev_imageslider_down_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_ev_imageslider_down_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = data;
-
-   Evas_Event_Mouse_Down *ev = event_info;
-
    Evas_Coord ix, iy, iw, ih;
-
+   Evas_Event_Mouse_Down *ev = event_info;
    Evas_Object *eo = NULL;
 
    if (wd->ani_lock)
@@ -435,7 +432,7 @@ _ev_imageslider_down_cb(void *data, Evas * e, Evas_Object *obj, void *event_info
 // Whenever MOUSE UP event occurs, Call this function.
 // And make Click Event also.
 static void
-_ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_ev_imageslider_up_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = data;
 
@@ -509,7 +506,7 @@ _ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
 
 // Whenever MOUSE MOVE event occurs, Call this API.
 static void
-_ev_imageslider_move_cb(void *data, Evas * e, Evas_Object *obj, void *event_info)
+_ev_imageslider_move_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *event_info)
 {
    int idx;
 
@@ -1317,7 +1314,6 @@ EAPI void
 elm_imageslider_item_update(Elm_Imageslider_Item *it)
 {
    Widget_Data *wd;
-   int i = 0;
 
    if (!it || (!(wd = elm_widget_data_get(it->obj)))) return;
    ELM_CHECK_WIDTYPE(it->obj, widtype);
