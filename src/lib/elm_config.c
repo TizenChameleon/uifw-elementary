@@ -1504,6 +1504,8 @@ _env_get(void)
                  (!strcasecmp(s, "software-16-wince-gdi")) ||
                  (!strcasecmp(s, "software_16_wince_gdi")))
           eina_stringshare_replace(&_elm_config->engine, ELM_SOFTWARE_16_WINCE);
+        else if ((!strncmp(s, "shot:", 5)))
+          eina_stringshare_replace(&_elm_config->engine, s);
      }
    
    s = getenv("ELM_VSYNC");
