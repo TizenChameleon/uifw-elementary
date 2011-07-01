@@ -1,0 +1,113 @@
+MAINTAINERCLEANFILES = Makefile.in
+
+.PHONY: screenshots
+
+pkglibdir = $(datadir)/$(PACKAGE)/examples
+
+AM_CPPFLAGS = \
+-I. \
+-I$(top_srcdir)/src/lib \
+-I$(top_builddir)/src/lib \
+-DPACKAGE_DATA_DIR="\"$(datadir)/elementary\"" \
+-DPACKAGE_BIN_DIR=\"$(bindir)\" \
+-DPACKAGE_LIB_DIR=\"$(libdir)\" \
+@ELEMENTARY_EDBUS_CFLAGS@ \
+@ELEMENTARY_EFREET_CFLAGS@ \
+@ELEMENTARY_ETHUMB_CFLAGS@ \
+@ELEMENTARY_CFLAGS@
+
+LDADD = \
+	@ELEMENTARY_LIBS@ \
+	$(top_builddir)/src/lib/libelementary.la
+
+EDJE_CC = @edje_cc@
+EDJE_FLAGS_VERBOSE_ =
+EDJE_FLAGS_VERBOSE_0 =
+EDJE_FLAGS_VERBOSE_1 = -v
+EDJE_FLAGS = $(EDJE_FLAGS_$(V))
+
+SRCS = \
+	actionslider_example_01.c \
+	anchorblock_example_01.c \
+	animator_example_01.c \
+	bubble_example_01.c \
+	button_example_01.c \
+	transit_example_01.c \
+	transit_example_02.c \
+	transit_example_03.c \
+	transit_example_04.c \
+	bg_example_01.c \
+	bg_example_02.c \
+	bg_example_03.c \
+	box_example_02.c \
+	general_funcs_example.c \
+	theme_example_01.c \
+	theme_example_02.c \
+	theme_example.edc
+
+pkglib_PROGRAMS =
+
+if EFL_INSTALL_EXAMPLES
+filesdir = $(datadir)/$(PACKAGE)/examples
+files_DATA = $(SRCS)
+endif
+
+if EFL_BUILD_EXAMPLES
+theme_example.edj: Makefile theme_example.edc
+	$(EDJE_CC) $(EDJE_FLAGS) \
+	$(top_srcdir)/src/examples/theme_example.edc \
+	$(top_builddir)/src/examples/theme_example.edj
+
+clean-local:
+	rm -f *.edj
+
+pkglib_PROGRAMS += \
+	actionslider_example_01 \
+	anchorblock_example_01 \
+	animator_example_01 \
+	bubble_example_01 \
+	button_example_01 \
+	transit_example_01 \
+	transit_example_02 \
+	transit_example_03 \
+	transit_example_04 \
+	bg_example_01 \
+	bg_example_02 \
+	bg_example_03 \
+	box_example_02 \
+	general_funcs_example \
+	theme_example_01 \
+	theme_example_02 \
+	theme_example.edj
+
+# This variable will hold the list of screenshots that will be made
+# by "make screenshots". Each item in the list is of the form:
+# <example executable>:<screenshot filename>:<delay in seconds>
+SCREENSHOTS = \
+	actionslider_example_01:actionslider_01.png:0.0 \
+	bg_example_02:bg_01.png:0.0 \
+	box_example_02:box_example_02.png:1.3 \
+	bubble_example_01:bubble_example_01.png:0.0 \
+	button_example_01:button_01.png:0.0 \
+	animator_example_01:animator_example_01.png:0.2 \
+	animator_example_01:animator_example_02.png:0.5 \
+	animator_example_01:animator_example_03.png:0.9 \
+	theme_example_01:theme_example_01.png:0.0
+
+screenshots: all
+	@mkdir -p $(top_srcdir)/doc/img/screenshots
+	@for ss in $(SCREENSHOTS); do \
+		SS_ENTRY=($${ss//:/ }) ; \
+		EXAMPLE=$${SS_ENTRY[0]} ; \
+		SS_FILE=$${SS_ENTRY[1]} ; \
+		SS_DELAY=$${SS_ENTRY[2]} ; \
+		ELM_ENGINE="shot:delay=$${SS_DELAY}:file=$(top_srcdir)/doc/img/screenshots/$${SS_FILE}" ./$${EXAMPLE} ; \
+		convert $(top_srcdir)/doc/img/screenshots/$${SS_FILE} $(top_srcdir)/doc/img/screenshots/$${SS_FILE/.png/.eps} ; \
+	done
+
+else
+
+screenshots:
+	@echo "Examples are not built. Run \"./configure --enable-build-examples\" first."
+
+endif
