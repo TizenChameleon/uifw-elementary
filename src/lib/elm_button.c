@@ -12,6 +12,7 @@
  *
  * "clicked" - the user clicked the button
  * "repeated" - the user pressed the button without releasing it
+ * "pressed" - when the button is pressed
  * "unpressed" - when the button is unpressed (released)
  */
 
@@ -59,10 +60,12 @@ static void _signal_default_text_set(void *data, Evas_Object *obj, const char *e
 
 static const char SIG_CLICKED[] = "clicked";
 static const char SIG_REPEATED[] = "repeated";
+static const char SIG_PRESSED[] = "pressed";
 static const char SIG_UNPRESSED[] = "unpressed";
 static const Evas_Smart_Cb_Description _signals[] = {
        {SIG_CLICKED, ""},
        {SIG_REPEATED, ""},
+       {SIG_PRESSED, ""},
        {SIG_UNPRESSED, ""},
        {NULL, NULL}
 };
@@ -333,6 +336,8 @@ _signal_pressed(void *data, Evas_Object *obj __UNUSED__, const char *emission __
         else
           wd->timer = ecore_timer_add(wd->ar_threshold, _autorepeat_initial_send, data);
      }
+
+   evas_object_smart_callback_call(data, SIG_PRESSED, NULL);
 }
 
 static void
