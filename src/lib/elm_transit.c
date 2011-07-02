@@ -113,7 +113,6 @@ struct _Elm_Transit_Obj_Data
 typedef struct _Elm_Transit_Effect_Module Elm_Transit_Effect_Module;
 typedef struct _Elm_Transit_Obj_Data Elm_Transit_Obj_Data;
 typedef struct _Elm_Transit_Obj_State Elm_Transit_Obj_State;
-static void _transit_obj_damage_area_set(Evas_Object *obj);
 static void _transit_obj_data_update(Elm_Transit *transit, Evas_Object *obj);
 static void _transit_obj_data_recover(Elm_Transit *transit, Evas_Object *obj);
 static void _transit_obj_states_save(Evas_Object *obj, Elm_Transit_Obj_Data *obj_data);
@@ -200,44 +199,6 @@ _transit_obj_remove_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *e
    if (!transit->objs) elm_transit_del(transit);
 }
 
-//TODO: Remove!
-//Since evas map have a afterimage bug for this time.
-//This function is added temporary.
-static void
-_transit_obj_damage_area_set(Evas_Object *obj)
-{
-   const Evas_Map *map;
-   Evas_Coord_Point coords;
-   Evas_Coord_Point min, max;
-   int i;
-
-   map  = evas_object_map_get(obj);
-   if (!map) return;
-
-   evas_map_point_coord_get(map, 0, &coords.x, &coords.y, NULL);
-
-   max = min = coords;
-
-   for (i = 1; i < 4; ++i)
-     {
-        evas_map_point_coord_get(map, i, &coords.x, &coords.y, NULL);
-
-        if (coords.x < min.x)
-          min.x = coords.x;
-        else if (coords.x > max.x)
-          max.x = coords.x;
-
-        if (coords.y < min.y)
-          min.y = coords.y;
-        else if (coords.y > max.y)
-          max.y = coords.y;
-     }
-
-   evas_damage_rectangle_add(evas_object_evas_get(obj),
-                             min.x, min.y,
-                             max.x - min.x, max.y - min.y);
-}
-
 static void
 _transit_obj_data_recover(Elm_Transit *transit, Evas_Object *obj)
 {
@@ -265,12 +226,6 @@ _transit_obj_data_recover(Elm_Transit *transit, Evas_Object *obj)
                evas_object_map_enable_set(obj, EINA_FALSE);
              if (state->map)
                evas_object_map_set(obj, state->map);
-
-             //TODO: Remove!
-             //Since evas map have a afterimage bug for this time.
-             //This line is added temporary.
-             _transit_obj_damage_area_set(obj);
-
           }
         free(state);
      }
@@ -461,7 +416,11 @@ EAPI Elm_Transit *
 elm_transit_add(void)
 {
    Elm_Transit *transit = ELM_NEW(Elm_Transit);
-   if (!transit) return NULL;
+   if (!transit)
+     {
+        ERR("Failed to allocate a elm_transit object!");
+        return NULL;
+     }
 
    EINA_MAGIC_SET(transit, ELM_TRANSIT_MAGIC);
 
@@ -535,10 +494,18 @@ elm_transit_effect_add(Elm_Transit *transit, Elm_Transit_Effect_Transition_Cb tr
    Elm_Transit_Effect_Module *effect_module;
 
    EINA_INLIST_FOREACH(transit->effect_list, effect_module)
-     if ((effect_module->transition_cb == transition_cb) && (effect_module->effect == effect)) return;
+     if ((effect_module->transition_cb == transition_cb) && (effect_module->effect == effect))
+       {
+          WRN("elm_transit does not allow to add the duplicated effect! : transit=%p", transit);
+          return;
+       }
 
    effect_module = ELM_NEW(Elm_Transit_Effect_Module);
-   if (!effect_module) return;
+   if (!effect_module)
+     {
+        ERR("Failed to allocate a new effect!: transit=%p", transit);
+        return;
+     }
 
    effect_module->end_cb = end_cb;
    effect_module->transition_cb = transition_cb;
@@ -919,7 +886,11 @@ EAPI void
 elm_transit_duration_set(Elm_Transit *transit, double duration)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit);
-   if (transit->animator) return;
+   if (transit->animator)
+     {
+        WRN("elm_transit does not allow to set the duration time in operating! : transit=%p", transit);
+        return;
+     }
    transit->time.duration = duration;
 }
 
@@ -1075,7 +1046,11 @@ elm_transit_objects_final_state_keep_set(Elm_Transit *transit, Eina_Bool state_k
    ELM_TRANSIT_CHECK_OR_RETURN(transit);
 
    if (transit->state_keep == state_keep) return;
-   if (transit->animator) return;
+   if (transit->animator)
+     {
+        WRN("elm_transit does not allow to change final state keep mode in operating! : transit=%p", transit);
+        return;
+     }
    transit->state_keep = !!state_keep;
 }
 
@@ -1117,8 +1092,13 @@ elm_transit_chain_transit_add(Elm_Transit *transit, Elm_Transit *chain_transit)
    ELM_TRANSIT_CHECK_OR_RETURN(transit);
    ELM_TRANSIT_CHECK_OR_RETURN(chain_transit);
 
-   if (transit == chain_transit) return;
-   if (transit == chain_transit->prev_chain_transit) return;
+   if (transit == chain_transit)
+     {
+        WRN("You add a same transit as a chain transit! : transit=%p, chain_transit=%p", transit, chain_transit);
+        return;
+     }
+   if (transit == chain_transit->prev_chain_transit)
+     return;
 
    if (chain_transit->prev_chain_transit)
      chain_transit->prev_chain_transit->next_chain_transits = eina_list_remove(chain_transit->prev_chain_transit->next_chain_transits, chain_transit);
@@ -1144,9 +1124,9 @@ elm_transit_chain_transits_get(const Elm_Transit * transit)
    return transit->next_chain_transits;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //Resizing Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Resizing Elm_Transit_Effect_Resizing;
 
 struct _Elm_Transit_Effect_Resizing
@@ -1219,16 +1199,20 @@ elm_transit_effect_resizing_add(Elm_Transit *transit, Evas_Coord from_w, Evas_Co
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
    Elm_Transit_Effect *effect = _transit_effect_resizing_context_new(from_w, from_h, to_w, to_h);
 
-   if (!effect) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate resizing effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
                           _transit_effect_resizing_op, effect,
                           _transit_effect_resizing_context_free);
    return effect;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //Translation Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Translation Elm_Transit_Effect_Translation;
 typedef struct _Elm_Transit_Effect_Translation_Node Elm_Transit_Effect_Translation_Node;
 
@@ -1372,19 +1356,22 @@ EAPI Elm_Transit_Effect *
 elm_transit_effect_translation_add(Elm_Transit *transit, Evas_Coord from_dx, Evas_Coord from_dy, Evas_Coord to_dx, Evas_Coord to_dy)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
-   Elm_Transit_Effect *effect_context = _transit_effect_translation_context_new(from_dx, from_dy, to_dx, to_dy);
+   Elm_Transit_Effect *effect = _transit_effect_translation_context_new(from_dx, from_dy, to_dx, to_dy);
 
-   if (!effect_context) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate translation effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
-                          _transit_effect_translation_op, effect_context,
+                          _transit_effect_translation_op, effect,
                           _transit_effect_translation_context_free);
-   return effect_context;
+   return effect;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //Zoom Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Zoom Elm_Transit_Effect_Zoom;
 
 struct _Elm_Transit_Effect_Zoom
@@ -1462,19 +1449,22 @@ EAPI Elm_Transit_Effect *
 elm_transit_effect_zoom_add(Elm_Transit *transit, float from_rate, float to_rate)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
-   Elm_Transit_Effect *effect_context = _transit_effect_zoom_context_new(from_rate, to_rate);
+   Elm_Transit_Effect *effect = _transit_effect_zoom_context_new(from_rate, to_rate);
 
-   if (!effect_context) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate zoom effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
-                          _transit_effect_zoom_op, effect_context,
+                          _transit_effect_zoom_op, effect,
                           _transit_effect_zoom_context_free);
-   return effect_context;
+   return effect;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //Flip Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Flip Elm_Transit_Effect_Flip;
 
 struct _Elm_Transit_Effect_Flip
@@ -1626,18 +1616,22 @@ EAPI Elm_Transit_Effect *
 elm_transit_effect_flip_add(Elm_Transit *transit, Elm_Transit_Effect_Flip_Axis axis, Eina_Bool cw)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
-   Elm_Transit_Effect *effect_context = _transit_effect_flip_context_new(axis, cw);
+   Elm_Transit_Effect *effect = _transit_effect_flip_context_new(axis, cw);
 
-   if (!effect_context) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate flip effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
-                          _transit_effect_flip_op, effect_context,
+                          _transit_effect_flip_op, effect,
                           _transit_effect_flip_context_free);
-   return effect_context;
+   return effect;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //ResizableFlip Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Resizable_Flip Elm_Transit_Effect_ResizableFlip;
 typedef struct _Elm_Transit_Effect_Resizable_Flip_Node Elm_Transit_Effect_ResizableFlip_Node;
 
@@ -1927,19 +1921,22 @@ EAPI Elm_Transit_Effect *
 elm_transit_effect_resizable_flip_add(Elm_Transit *transit, Elm_Transit_Effect_Flip_Axis axis, Eina_Bool cw)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
-   Elm_Transit_Effect *effect_context = _transit_effect_resizable_flip_context_new(axis, cw);
+   Elm_Transit_Effect *effect = _transit_effect_resizable_flip_context_new(axis, cw);
 
-   if (!effect_context) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate resizable_flip effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
-                          _transit_effect_resizable_flip_op, effect_context,
+                          _transit_effect_resizable_flip_op, effect,
                           _transit_effect_resizable_flip_context_free);
-   return effect_context;
+   return effect;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //Wipe Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Wipe Elm_Transit_Effect_Wipe;
 
 struct _Elm_Transit_Effect_Wipe
@@ -2158,19 +2155,22 @@ EAPI void *
 elm_transit_effect_wipe_add(Elm_Transit *transit, Elm_Transit_Effect_Wipe_Type type, Elm_Transit_Effect_Wipe_Dir dir)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
-   void *effect_context = _transit_effect_wipe_context_new(type, dir);
+   void *effect = _transit_effect_wipe_context_new(type, dir);
 
-   if (!effect_context) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate wipe effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
-                          _transit_effect_wipe_op, effect_context,
+                          _transit_effect_wipe_op, effect,
                           _transit_effect_wipe_context_free);
-   return effect_context;
+   return effect;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //Color Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Color Elm_Transit_Effect_Color;
 
 struct _Elm_Transit_Effect_Color
@@ -2254,18 +2254,22 @@ EAPI Elm_Transit_Effect *
 elm_transit_effect_color_add(Elm_Transit *transit, unsigned int from_r, unsigned int from_g, unsigned int from_b, unsigned int from_a, unsigned int to_r, unsigned int to_g, unsigned int to_b, unsigned int to_a)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
-   Elm_Transit_Effect *effect_context = _transit_effect_color_context_new(from_r, from_g, from_b, from_a, to_r, to_g, to_b, to_a);
+   Elm_Transit_Effect *effect = _transit_effect_color_context_new(from_r, from_g, from_b, from_a, to_r, to_g, to_b, to_a);
 
-   if (!effect_context) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate color effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
-                          _transit_effect_color_op, effect_context,
+                          _transit_effect_color_op, effect,
                           _transit_effect_color_context_free);
-   return effect_context;
+   return effect;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //Fade Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Fade Elm_Transit_Effect_Fade;
 typedef struct _Elm_Transit_Effect_Fade_Node Elm_Transit_Effect_Fade_Node;
 
@@ -2464,18 +2468,22 @@ elm_transit_effect_fade_add(Elm_Transit *transit)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
 
-   Elm_Transit_Effect *effect_context = _transit_effect_fade_context_new();
-   if (!effect_context) return NULL;
+   Elm_Transit_Effect *effect = _transit_effect_fade_context_new();
+
+   if (!effect)
+     {
+        ERR("Failed to allocate fade effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
-                          _transit_effect_fade_op, effect_context,
+                          _transit_effect_fade_op, effect,
                           _transit_effect_fade_context_free);
-   return effect_context;
+   return effect;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //Blend Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Blend Elm_Transit_Effect_Blend;
 typedef struct _Elm_Transit_Effect_Blend_Node Elm_Transit_Effect_Blend_Node;
 
@@ -2646,19 +2654,22 @@ EAPI Elm_Transit_Effect *
 elm_transit_effect_blend_add(Elm_Transit *transit)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
-   Elm_Transit_Effect *effect_context = _transit_effect_blend_context_new();
+   Elm_Transit_Effect *effect = _transit_effect_blend_context_new();
 
-   if (!effect_context) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate blend effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
-                          _transit_effect_blend_op, effect_context,
+                          _transit_effect_blend_op, effect,
                           _transit_effect_blend_context_free);
-   return effect_context;
+   return effect;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //Rotation Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Rotation Elm_Transit_Effect_Rotation;
 
 struct _Elm_Transit_Effect_Rotation
@@ -2699,7 +2710,7 @@ _transit_effect_rotation_op(Elm_Transit_Effect *effect, Elm_Transit *transit, do
         half_w = (float)w * 0.5;
         half_h = (float)h * 0.5;
 
-        evas_map_util_3d_rotate(map, 0, 0, degree, x + half_w, y + half_h, 0);
+        evas_map_util_rotate(map, degree, x + half_w, y + half_h);
         evas_map_util_3d_perspective(map, x + half_w, y + half_h, 0, _TRANSIT_FOCAL);
         evas_object_map_enable_set(obj, EINA_TRUE);
         evas_object_map_set(obj, map);
@@ -2744,19 +2755,22 @@ EAPI Elm_Transit_Effect *
 elm_transit_effect_rotation_add(Elm_Transit *transit, float from_degree, float to_degree)
 {
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
-   Elm_Transit_Effect *effect_context = _transit_effect_rotation_context_new(from_degree, to_degree);
+   Elm_Transit_Effect *effect = _transit_effect_rotation_context_new(from_degree, to_degree);
 
-   if (!effect_context) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate rotation effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
-                          _transit_effect_rotation_op, effect_context,
+                          _transit_effect_rotation_op, effect,
                           _transit_effect_rotation_context_free);
-   return effect_context;
+   return effect;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 //ImageAnimation Effect
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 typedef struct _Elm_Transit_Effect_Image_Animation Elm_Transit_Effect_Image_Animation;
 
 struct _Elm_Transit_Effect_Image_Animation
@@ -2861,7 +2875,11 @@ elm_transit_effect_image_animation_add(Elm_Transit *transit, Eina_List *images)
    ELM_TRANSIT_CHECK_OR_RETURN(transit, NULL);
    Elm_Transit_Effect *effect = _transit_effect_image_animation_context_new(images);
 
-   if (!effect) return NULL;
+   if (!effect)
+     {
+        ERR("Failed to allocate image_animation effect! : transit=%p", transit);
+        return NULL;
+     }
    elm_transit_effect_add(transit,
                           _transit_effect_image_animation_op, effect,
                           _transit_effect_image_animation_context_free);
