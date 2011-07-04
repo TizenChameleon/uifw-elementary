@@ -1644,7 +1644,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                       }
                                                                     else
                                                                       {
-                                                                         return;
+                                                                         break;
                                                                       }
                                                                  }
                                                                if (st->cb.item_free.func)
@@ -1653,53 +1653,59 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                     remove_item->item_info = NULL;
                                                                  }
 
-                                                               Eina_List *temp_header_list = header_list;
-                                                               header_list = eina_list_remove(header_list, remove_item);
-                                                               st->total_item_count--;
-                                                               LKD(remove_item->lock);
-                                                               elm_genlist_item_del(remove_item->item);
-                                                               free(remove_item);
-
-                                                               if (eina_list_count(header_list) == 0)
+                                                               if (eina_list_count(header_list) == 1)
                                                                  {
-                                                                    st->header_items = eina_list_remove(st->header_items, temp_header_list);
+                                                                    st->header_items = eina_list_remove(st->header_items, header_list);
+                                                                    header_list = eina_list_free(header_list);
+                                                                    st->total_item_count--;
+                                                                    LKD(remove_item->lock);
+                                                                    elm_genlist_item_del(remove_item->item);
+                                                                    free(remove_item);
+                                                                    break;
                                                                  }
-                                                               else if(eina_list_count(header_list) == 1)
+                                                               else
                                                                  {
-                                                                    Elm_Store_Item *temp_sti = eina_list_nth(header_list, 0);
-                                                                    if(temp_sti && temp_sti->item_info)
+                                                                    header_list = eina_list_remove(header_list, remove_item);
+                                                                    st->total_item_count--;
+                                                                    LKD(remove_item->lock);
+                                                                    elm_genlist_item_del(remove_item->item);
+                                                                    free(remove_item);
+                                                                 }
+
+                                                               if(eina_list_count(header_list) == 1)
+                                                                 {
+                                                                    Elm_Store_Item *t_sti = eina_list_nth(header_list, 0);
+                                                                    if(t_sti && t_sti->item_info)
                                                                       {
-                                                                         if (temp_sti->item_info->item_type == ELM_GENLIST_ITEM_GROUP)
+                                                                         if (t_sti->item_info->item_type == ELM_GENLIST_ITEM_GROUP)
                                                                            {
-                                                                              if (temp_sti->fetched)
+                                                                              if (t_sti->fetched)
                                                                                 {
-                                                                                   int index = elm_store_item_index_get(temp_sti);
+                                                                                   int index = elm_store_item_index_get(t_sti);
                                                                                    if (index != -1)
                                                                                      {
                                                                                         _item_unfetch(st, index);
                                                                                      }
                                                                                    else
                                                                                      {
-                                                                                        return;
+                                                                                        break;
                                                                                      }
                                                                                 }
 
                                                                               if (st->cb.item_free.func)
                                                                                 {
-                                                                                   st->cb.item_free.func(st->cb.item_free.data, temp_sti->item_info);
-                                                                                   temp_sti->item_info = NULL;
+                                                                                   st->cb.item_free.func(st->cb.item_free.data, t_sti->item_info);
+                                                                                   t_sti->item_info = NULL;
                                                                                 }
-
-                                                                              header_list = eina_list_remove(header_list, temp_sti);
+                                                                              st->header_items = eina_list_remove(st->header_items, header_list);
+                                                                              header_list = eina_list_free(header_list);
                                                                               st->total_item_count--;
-                                                                              LKD(temp_sti->lock);
-                                                                              elm_genlist_item_del(temp_sti->item);
-                                                                              free(temp_sti);
-                                                                              st->header_items = eina_list_remove(st->header_items, temp_header_list);
+                                                                              LKD(t_sti->lock);
+                                                                              elm_genlist_item_del(t_sti->item);
+                                                                              free(t_sti);
                                                                            }
                                                                       }
                                                                  }
-                                                               temp_header_list = NULL;
                                                                removed = EINA_TRUE;
                                                             }
                                                        }
@@ -2446,27 +2452,35 @@ elm_store_item_del(Elm_Store_Item *sti)
                                                      remove_sti->item_info = NULL;
                                                   }
 
-                                                Eina_List *temp_header_list = header_list;
-                                                header_list = eina_list_remove(header_list, remove_sti);
-                                                st->total_item_count--;
-                                                LKD(remove_sti->lock);
-                                                elm_genlist_item_del(remove_sti->item);
-                                                free(remove_sti);
-
-                                                if (eina_list_count(header_list) == 0)
+                                                if (eina_list_count(header_list) == 1)
                                                   {
-                                                     st->header_items = eina_list_remove(st->header_items, temp_header_list);
+                                                     st->header_items = eina_list_remove(st->header_items, header_list);
+                                                     header_list = eina_list_free(header_list);
+                                                     st->total_item_count--;
+                                                     LKD(remove_sti->lock);
+                                                     elm_genlist_item_del(remove_sti->item);
+                                                     free(remove_sti);
+                                                     return;
                                                   }
-                                                else if (eina_list_count(header_list) == 1)
+                                                else
                                                   {
-                                                     Elm_Store_Item *temp_sti = eina_list_nth(header_list, 0);
-                                                     if(temp_sti && temp_sti->item_info)
+                                                     header_list = eina_list_remove(header_list, remove_sti);
+                                                     st->total_item_count--;
+                                                     LKD(remove_sti->lock);
+                                                     elm_genlist_item_del(remove_sti->item);
+                                                     free(remove_sti);
+                                                  }
+
+                                                if (eina_list_count(header_list) == 1)
+                                                  {
+                                                     Elm_Store_Item *t_sti = eina_list_nth(header_list, 0);
+                                                     if(t_sti && t_sti->item_info)
                                                        {
-                                                          if (temp_sti->item_info->item_type == ELM_GENLIST_ITEM_GROUP)
+                                                          if (t_sti->item_info->item_type == ELM_GENLIST_ITEM_GROUP)
                                                             {
-                                                               if (temp_sti->fetched)
+                                                               if (t_sti->fetched)
                                                                  {
-                                                                    int index = elm_store_item_index_get(temp_sti);
+                                                                    int index = elm_store_item_index_get(t_sti);
                                                                     if (index != -1)
                                                                       {
                                                                          _item_unfetch(st, index);
@@ -2478,20 +2492,18 @@ elm_store_item_del(Elm_Store_Item *sti)
                                                                  }
                                                                if (st->cb.item_free.func)
                                                                  {
-                                                                    st->cb.item_free.func(st->cb.item_free.data, temp_sti->item_info);
-                                                                    temp_sti->item_info = NULL;
+                                                                    st->cb.item_free.func(st->cb.item_free.data, t_sti->item_info);
+                                                                    t_sti->item_info = NULL;
                                                                  }
-
-                                                               header_list = eina_list_remove(header_list, temp_sti);
+                                                               st->header_items = eina_list_remove(st->header_items, header_list);
+                                                               header_list = eina_list_free(header_list);
                                                                st->total_item_count--;
-                                                               LKD(temp_sti->lock);
-                                                               elm_genlist_item_del(temp_sti->item);
-                                                               free(temp_sti);
-                                                               st->header_items = eina_list_remove(st->header_items, temp_header_list);
+                                                               LKD(t_sti->lock);
+                                                               elm_genlist_item_del(t_sti->item);
+                                                               free(t_sti);
                                                             }
                                                        }
                                                   }
-                                                temp_header_list = NULL;
                                                 removed = EINA_TRUE;
                                              }
                                         }
