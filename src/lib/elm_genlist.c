@@ -329,7 +329,6 @@ struct _Widget_Data
    Eina_Bool         reorder_deleted : 1;
    Eina_Bool         effect_mode : 1;
    Eina_Bool         auto_scrolled : 1;
-   Eina_Bool         contracting : 1;
    int               edit_mode;
    int               total_num;
    Elm_Genlist_Item *reorder_it, *reorder_rel;
@@ -2151,6 +2150,7 @@ _item_realize(Elm_Genlist_Item *it,
             edje_object_message_signal_process(it->edit_obj);
           }
      }
+   edje_object_message_signal_process(it->base.view);
 }
 
 static void
@@ -2229,7 +2229,7 @@ _item_block_recalc(Item_Block *itb,
              else
                {
                   _item_realize(it, in, EINA_TRUE);
-                  if (!it->wd->contracting) _item_unrealize(it, EINA_TRUE);
+                  _item_unrealize(it, EINA_TRUE);
                }
           }
         else
@@ -2292,7 +2292,7 @@ _item_block_unrealize(Item_Block *itb)
                   it->want_unrealize = EINA_TRUE;
                }
              else
-                if (!it->wd->contracting) _item_unrealize(it, EINA_FALSE);
+                _item_unrealize(it, EINA_FALSE);
           }
      }
    if (!dragging)
@@ -3072,7 +3072,6 @@ _pan_calculate(Evas_Object *obj)
              }
         }
       else _item_auto_scroll(sd->wd);
-   sd->wd->contracting = EINA_FALSE;
    evas_event_thaw(evas_object_evas_get(obj));
    evas_event_thaw_eval(evas_object_evas_get(obj));
  }
@@ -4505,7 +4504,6 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
      }
    else
      {
-        it->wd->contracting = EINA_TRUE;
         it->wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT;
         if (it->realized)
           edje_object_signal_emit(it->base.view, "elm,state,contracted", "elm");
