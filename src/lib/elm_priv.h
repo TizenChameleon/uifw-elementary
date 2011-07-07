@@ -198,7 +198,8 @@ struct _Elm_Config
    int input_panel_enable;
    int autocapital_allow;
    int autoperiod_allow;   
-   Eina_Bool    password_show_last_character;
+   Eina_Bool      password_show_last;
+   double         password_show_last_timeout;
 };
 
 struct _Elm_Module

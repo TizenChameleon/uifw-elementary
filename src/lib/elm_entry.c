@@ -143,7 +143,6 @@ struct _Widget_Data
    Eina_Bool char_linewrap : 1;
    Eina_Bool single_line : 1;
    Eina_Bool password : 1;
-   Eina_Bool show_last_character : 1;
    Eina_Bool editable : 1;
    Eina_Bool selection_asked : 1;
    Eina_Bool have_selection : 1;
@@ -1369,11 +1368,7 @@ _getbase(Evas_Object *obj)
    if (!wd) return "base";
    if (wd->editable)
      {
-        if (wd->password)
-          {
-             if (wd->show_last_character) return "custom-password";
-             else return "base-password";
-          }
+        if (wd->password) return "base-password";
 	else
 	  {
 	     if (wd->single_line) return "base-single";
@@ -1387,11 +1382,7 @@ _getbase(Evas_Object *obj)
      }
    else
      {
-        if (wd->password)
-          {
-             if (wd->show_last_character) return "custom-password";
-             else return "base-password";
-          }
+        if (wd->password) return "base-password";
 	else
 	  {
 	     if (wd->single_line) return "base-single-noedit";
@@ -2532,8 +2523,6 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    wd->single_line = EINA_TRUE;
    wd->linewrap = EINA_FALSE;
    wd->char_linewrap = EINA_FALSE;
-   if (_elm_config->password_show_last_character)
-     wd->show_last_character = EINA_TRUE;
    _theme_hook(obj);
 }
 

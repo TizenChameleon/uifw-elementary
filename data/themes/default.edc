@@ -8973,68 +8973,6 @@ collections {
       }
    }
 
-   group { name: "elm/entry/custom-password/default";
-      parts {
-         part { name: "elm.text";
-            type: TEXTBLOCK;
-            mouse_events: 1;
-            scale: 1;
-            entry_mode: PASSWORD_SHOW_LAST_CHARACTER;
-            select_mode: EXPLICIT;
-            multiline: 0;
-            source: "elm/entry/selection/default"; // selection under
-            source4: "elm/entry/cursor/default"; // cursorover
-            source5: "elm/entry/anchor/default"; // anchor under
-            description { state: "default" 0.0;
-               text {
-                  style: "entry_single_textblock_style";
-                  repch: "*";
-                  min: 1 1;
-                  max: 0 1;
-               }
-            }
-            description { state: "disabled" 0.0;
-               inherit: "default" 0.0;
-               text {
-                  style: "entry_single_textblock_disabled_style";
-               }
-            }
-         }
-      }
-      programs {
-         program { name: "focus";
-            signal: "load";
-            source: "";
-            action: FOCUS_SET;
-            target: "elm.text";
-         }
-         program { name: "password_stop"; 
-            signal: "cursor,changed";
-            source: "elm.text";
-            action: ACTION_STOP;
-            target: "password_start";
-            after: "password_start";
-         }
-         program { name: "password_start";
-            in: 2.0 0.0;
-            action: HIDE_VISIBLE_PASSWORD;
-            target: "elm.text";
-         }
-         program { name: "disable";
-            signal: "elm,state,disabled";
-            source: "elm";
-            action: STATE_SET "disabled" 0.0;
-            target: "elm.text";
-         }
-         program { name: "enable";
-            signal: "elm,state,enabled";
-            source: "elm";
-            action: STATE_SET "default" 0.0;
-            target: "elm.text";
-         }
-      }
-   }
-
    group { name: "elm/entry/cursor/default";
       images {
          image: "cur_box.png" COMP;
