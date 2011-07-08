@@ -118,7 +118,7 @@ _del_hook(Evas_Object *obj)
 }
 
 static Elm_Actionslider_Indicator_Pos
-_get_pos_by_orientation(const Evas_Object *obj, Elm_Actionslider_Pos pos)
+_get_pos_by_orientation(const Evas_Object *obj, Elm_Actionslider_Indicator_Pos pos)
 {
    if (elm_widget_mirrored_get(obj))
      {

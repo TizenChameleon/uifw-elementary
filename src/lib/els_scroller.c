@@ -719,8 +719,6 @@ _smart_bounce_y_animator(void *data)
    Smart_Data *sd;
    Evas_Coord x, y, dy, py, h, ody, ed, md;
    double t, p, dt, pd, r;
-   Evas_Coord x, y, dy;
-   double t, p, dt;
 
    sd = data;
    t = ecore_loop_time_get();

@@ -34,7 +34,6 @@ EXTRA_PROGRAMS = elementary_test elementary_config
 elementary_test_SOURCES = \
 test.c \
 test_3d.c \
-test_actionslider.c \
 test_anchorblock.c \
 test_anchorview.c \
 test_anim.c \
@@ -109,7 +108,6 @@ test_win_state.c
 if HAVE_EIO
 elementary_test_SOURCES += test_eio.c
 endif
->>>>>>> upstream
 
 elementary_test_LDADD = $(top_builddir)/src/lib/libelementary.la \
 	@ELEMENTARY_EWEATHER_LIBS@ \

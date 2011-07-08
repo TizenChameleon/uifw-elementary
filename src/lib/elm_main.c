@@ -1858,6 +1858,8 @@ elm_autocapitalization_allow_all_set(Eina_Bool on)
    if (!atom) atom = ecore_x_atom_get("ENLIGHTENMENT_AUTOCAPITAL_ALLOW");
    ecore_x_window_prop_card32_set(ecore_x_window_root_first_get(),
                                   atom, &on_i, 1);
+#endif
+}
 
 EAPI void
 elm_autoperiod_allow_all_set(Eina_Bool on)

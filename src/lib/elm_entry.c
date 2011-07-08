@@ -152,11 +152,8 @@ struct _Widget_Data
    Elm_Scroller_Policy policy_h, policy_v;
    Elm_Wrap_Type linewrap;
    Eina_Bool changed : 1;
-   Eina_Bool linewrap : 1;
-   Eina_Bool char_linewrap : 1;
    Eina_Bool single_line : 1;
    Eina_Bool password : 1;
-   Eina_Bool show_last_character : 1;
    Eina_Bool editable : 1;
    Eina_Bool selection_asked : 1;
    Eina_Bool have_selection : 1;
@@ -721,7 +718,7 @@ _recalc_cursor_geometry(Evas_Object *obj)
               &cx, &cy, &cw, &ch);
         if (wd->cur_changed)
           {
-             elm_widget_show_region_set(obj, cx, cy, cw, ch);
+             elm_widget_show_region_set(obj, cx, cy, cw, ch, EINA_FALSE);
              wd->cur_changed = EINA_FALSE;
           }
      }
@@ -764,7 +761,7 @@ _elm_win_recalc_job(void *data)
                                                   &cx, &cy, &cw, &ch);
         if (wd->cur_changed)
           {
-             elm_widget_show_region_set(data, cx, cy, cw, ch);
+             elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
              wd->cur_changed = EINA_FALSE;
           }
      }

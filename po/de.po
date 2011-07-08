@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elementary 0.7.0.57309\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-06-20 14:18+0530\n"
+"POT-Creation-Date: 2011-07-08 20:09+0900\n"
 "PO-Revision-Date: 2011-02-25 20:22+0100\n"
 "Last-Translator: Fabian Nowak <timystery@arcor.de>\n"
 "Language-Team: German\n"
@@ -18,50 +18,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/lib/elc_fileselector.c:595
+#: src/lib/elc_fileselector.c:849
 msgid "Up"
 msgstr "Aufwärts"
 
-#: src/lib/elc_fileselector.c:610
+#: src/lib/elc_fileselector.c:864
 msgid "Home"
 msgstr "Persönlicher Ordner"
 
-#: src/lib/elc_fileselector.c:791 src/lib/elm_entry.c:1097
+#: src/lib/elc_fileselector.c:1052 src/lib/elm_entry.c:1282
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/lib/elc_fileselector.c:801
+#: src/lib/elc_fileselector.c:1062
 msgid "OK"
 msgstr "OK"
 
-#: src/lib/elm_config.c:1622
+#: src/lib/elm_config.c:1647
 msgid "default:LTR"
 msgstr "Standard: LTR"
 
-#: src/lib/elm_entry.c:1071
+#: src/lib/elm_entry.c:1256
 msgid "Select"
 msgstr "Auswählen"
 
-#: src/lib/elm_entry.c:1076
+#: src/lib/elm_entry.c:1261
 msgid "Paste"
 msgstr "Einfügen"
 
-#: src/lib/elm_entry.c:1081 src/lib/elm_entry.c:1101
+#: src/lib/elm_entry.c:1266 src/lib/elm_entry.c:1286
 msgid "More"
 msgstr ""
 
-#: src/lib/elm_entry.c:1091
+#: src/lib/elm_entry.c:1276
 msgid "Copy"
 msgstr "Kopieren"
 
-#: src/lib/elm_entry.c:1094
+#: src/lib/elm_entry.c:1279
 msgid "Cut"
 msgstr "Ausschneiden"
-
-#: src/lib/elm_check.c:156
-msgid "On"
-msgstr ""
-
-#: src/lib/elm_check.c:156
-msgid "Off"
-msgstr ""

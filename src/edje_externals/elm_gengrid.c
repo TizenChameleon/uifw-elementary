@@ -81,8 +81,7 @@ external_gengrid_state_set(void *data __UNUSED__, Evas_Object *obj, const void *
         int h_itemsize, v_itemsize;
         elm_gengrid_item_size_get(obj, &h_itemsize, &v_itemsize);
         elm_gengrid_item_size_set(obj, p->h_itemsize, v_itemsize);
-   else if (p->align_x_exists && p->align_y_exists)
-     elm_gengrid_align_set(obj, p->align_x, p->align_y);
+     }
    else if (p->align_x_exists || p->align_y_exists)
      {
         double x, y;

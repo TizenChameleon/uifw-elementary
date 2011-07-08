@@ -3139,7 +3139,7 @@ extern "C" {
    EAPI void         elm_entry_autosave_set(Evas_Object *obj, Eina_Bool autosave) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool    elm_entry_autosave_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly) EINA_ARG_NONNULL(1);
-   EAPI Eina_Bool    elm_entry_cnp_textonly_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool    elm_entry_cnp_textonly_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
    EAPI void         elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
    EAPI void         elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
@@ -3162,7 +3162,7 @@ extern "C" {
    EAPI void         elm_entry_scrollbar_policy_set(Evas_Object *obj, Elm_Scroller_Policy h, Elm_Scroller_Policy v);
    EAPI void         elm_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
    EAPI void         elm_entry_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce);
-        
+
    /* pre-made filters for entries */
    typedef struct _Elm_Entry_Filter_Limit_Size Elm_Entry_Filter_Limit_Size;
    struct _Elm_Entry_Filter_Limit_Size
@@ -4842,7 +4842,7 @@ extern "C" {
    EAPI void            elm_index_item_data_set(Elm_Index_Item *it, const void *data) EINA_ARG_NONNULL(1);
    EAPI void            elm_index_item_del_cb_set(Elm_Index_Item *it, Evas_Smart_Cb func) EINA_ARG_NONNULL(1);
    EAPI const char     *elm_index_item_letter_get(const Elm_Index_Item *item) EINA_ARG_NONNULL(1);
-   EAPI void         elm_index_button_image_invisible_set(Evas_Object *obj, Eina_Bool invisible);
+   EAPI void            elm_index_button_image_invisible_set(Evas_Object *obj, Eina_Bool invisible) EINA_ARG_NONNULL(1);
    /* smart callbacks called:
     * "changed" - when the selected index item changes
     * "delay,changed" - when the selected index item changes, but after some small idle period
