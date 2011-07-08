@@ -1065,6 +1065,9 @@ _config_sub_apply(void)
 {
    edje_frametime_set(1.0 / _elm_config->fps);
    edje_scale_set(_elm_config->scale);
+   edje_password_show_last_set(_elm_config->password_show_last);
+   edje_password_show_last_timeout_set(_elm_config->password_show_last_timeout);
+   if (_elm_config->modules) _elm_module_parse(_elm_config->modules);
    edje_input_panel_enabled_set(_elm_config->input_panel_enable);
    edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
    edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
