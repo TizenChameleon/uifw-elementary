@@ -61,6 +61,15 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    Evas_Object *win, *bg, *bx, *disk, *ic;
    Elm_Diskselector_Item *it;
    char buf[PATH_MAX];
+   int idx = 0;
+
+   char *month_list[] = {
+      "Jan", "Feb", "Mar",
+      "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep",
+      "Oct", "Nov", "Dec"
+   };
+   char date[3];
 
    win = elm_win_add(NULL, "diskselector", ELM_WIN_BASIC);
    elm_win_title_set(win, "Disk Selector");
@@ -103,7 +112,7 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    elm_box_pack_end(bx, disk);
    evas_object_show(disk);
    evas_object_smart_callback_add(disk, "selected", _print_disk_info_cb, NULL);
-   elm_diskselector_side_label_lenght_set(disk, 4);
+   elm_diskselector_side_label_length_set(disk, 4);
 
    disk = elm_diskselector_add(win);
    ic = elm_icon_add(win);
@@ -123,6 +132,61 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    elm_box_pack_end(bx, disk);
    evas_object_show(disk);
    evas_object_smart_callback_add(disk, "selected", _print_disk_info_cb, NULL);
+
+   disk = elm_diskselector_add(win);
+   ic = elm_icon_add(win);
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
+   elm_icon_file_set(ic, buf, NULL);
+   elm_icon_scale_set(ic, 1, 1);
+   elm_diskselector_item_append(disk, "머리스타일", ic, NULL, NULL);
+   elm_diskselector_item_append(disk, "プロが伝授する", NULL, NULL, NULL);
+   elm_diskselector_item_append(disk, "生上访要求政府", NULL, NULL, NULL);
+   elm_diskselector_item_append(disk, "English", NULL, NULL, NULL);
+   elm_diskselector_item_append(disk, "والشريعة", NULL, NULL, NULL);
+   elm_diskselector_item_append(disk, "עִבְרִית", NULL, NULL, NULL);
+   elm_diskselector_item_append(disk, "Grüßen", NULL, NULL, NULL);
+   elm_diskselector_round_set(disk, EINA_TRUE);
+   evas_object_size_hint_weight_set(disk, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(disk, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(bx, disk);
+   evas_object_show(disk);
+   evas_object_smart_callback_add(disk, "selected", _print_disk_info_cb, NULL);
+
+   // displayed item number setting example
+   disk = elm_diskselector_add(win);
+   elm_diskselector_display_item_num_set(disk, 5);
+
+   for (idx = 0; idx < (int)(sizeof(month_list) / sizeof(month_list[0])); idx++)
+     {
+        it = elm_diskselector_item_append(disk, month_list[idx], NULL, NULL, NULL);
+     }
+
+   elm_diskselector_item_selected_set(it, EINA_TRUE);
+   elm_diskselector_round_set(disk, EINA_TRUE);
+   evas_object_size_hint_weight_set(disk, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(disk, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(bx, disk);
+   evas_object_show(disk);
+   evas_object_smart_callback_add(disk, "selected", _print_disk_info_cb, NULL);
+
+   // displayed item number setting example
+   disk = elm_diskselector_add(win);
+   elm_diskselector_display_item_num_set(disk, 7);
+
+   for (idx = 1; idx < 31; idx++)
+     {
+        snprintf(date, sizeof(date), "%d", idx);
+        it = elm_diskselector_item_append(disk, date, NULL, NULL, NULL);
+     }
+
+   elm_diskselector_item_selected_set(it, EINA_TRUE);
+   elm_diskselector_round_set(disk, EINA_TRUE);
+   evas_object_size_hint_weight_set(disk, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(disk, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(bx, disk);
+   evas_object_show(disk);
+   evas_object_smart_callback_add(disk, "selected", _print_disk_info_cb, NULL);
+
 
    evas_object_resize(win, 320, 480);
    evas_object_show(win);

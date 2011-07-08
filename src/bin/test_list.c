@@ -90,7 +90,7 @@ test_list(void        *data __UNUSED__,
    it2 = elm_list_item_append(li, "How", ic, ic2, NULL, NULL);
 
    bx = elm_box_add(win);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
@@ -140,7 +140,7 @@ test_list(void        *data __UNUSED__,
    elm_win_resize_object_add(win, tb2);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Hello");
+   elm_object_text_set(bt, "Hello");
    evas_object_smart_callback_add(bt, "clicked", my_show_it, it1);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bt, 0.9, 0.5);
@@ -148,7 +148,7 @@ test_list(void        *data __UNUSED__,
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "How");
+   elm_object_text_set(bt, "How");
    evas_object_smart_callback_add(bt, "clicked", my_show_it, it2);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bt, 0.9, 0.5);
@@ -156,7 +156,7 @@ test_list(void        *data __UNUSED__,
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "doing");
+   elm_object_text_set(bt, "doing");
    evas_object_smart_callback_add(bt, "clicked", my_show_it, it3);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bt, 0.9, 0.5);
@@ -164,7 +164,7 @@ test_list(void        *data __UNUSED__,
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Here");
+   elm_object_text_set(bt, "Here");
    evas_object_smart_callback_add(bt, "clicked", my_show_it, it4);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bt, 0.9, 0.5);
@@ -172,7 +172,7 @@ test_list(void        *data __UNUSED__,
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Maybe this...");
+   elm_object_text_set(bt, "Maybe this...");
    evas_object_smart_callback_add(bt, "clicked", my_show_it, it5);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bt, 0.9, 0.5);
@@ -281,7 +281,7 @@ test_list_horizontal(void        *data __UNUSED__,
    elm_win_resize_object_add(win, tb2);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Hello");
+   elm_object_text_set(bt, "Hello");
    evas_object_smart_callback_add(bt, "clicked", my_show_it, it1);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bt, 0.5, 0.9);
@@ -289,7 +289,7 @@ test_list_horizontal(void        *data __UNUSED__,
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "How");
+   elm_object_text_set(bt, "How");
    evas_object_smart_callback_add(bt, "clicked", my_show_it, it2);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bt, 0.5, 0.9);
@@ -297,7 +297,7 @@ test_list_horizontal(void        *data __UNUSED__,
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "doing");
+   elm_object_text_set(bt, "doing");
    evas_object_smart_callback_add(bt, "clicked", my_show_it, it3);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bt, 0.5, 0.9);
@@ -305,7 +305,7 @@ test_list_horizontal(void        *data __UNUSED__,
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "And");
+   elm_object_text_set(bt, "And");
    evas_object_smart_callback_add(bt, "clicked", my_show_it, it4);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bt, 0.5, 0.9);
@@ -393,7 +393,7 @@ test_list2(void        *data __UNUSED__,
    elm_list_item_append(li, "How", ic, ic2, NULL, NULL);
 
    bx2 = elm_box_add(win);
-   elm_box_horizontal_set(bx2, 1);
+   elm_box_horizontal_set(bx2, EINA_TRUE);
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
@@ -431,13 +431,13 @@ test_list2(void        *data __UNUSED__,
    evas_object_show(li);
 
    bx2 = elm_box_add(win);
-   elm_box_horizontal_set(bx2, 1);
-   elm_box_homogenous_set(bx2, 1);
+   elm_box_horizontal_set(bx2, EINA_TRUE);
+   elm_box_homogeneous_set(bx2, EINA_TRUE);
    evas_object_size_hint_weight_set(bx2, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bx2, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Clear");
+   elm_object_text_set(bt, "Clear");
    evas_object_smart_callback_add(bt, "clicked", my_li2_clear, li);
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, 0.0);
@@ -496,7 +496,7 @@ test_list3(void        *data __UNUSED__,
    elm_icon_scale_set(ic, 0, 0);
    elm_icon_file_set(ic, buf, NULL);
    ic2 = elm_button_add(win);
-   elm_button_label_set(ic2, "Click me");
+   elm_object_text_set(ic2, "Click me");
    evas_object_smart_callback_add(ic2, "clicked", _bt_clicked, NULL);
    evas_object_propagate_events_set(ic2, 0);
    elm_list_item_append(li, "Hello", ic, ic2, _it_clicked, NULL);
@@ -506,7 +506,7 @@ test_list3(void        *data __UNUSED__,
    elm_icon_scale_set(ic, 0, 0);
    elm_icon_file_set(ic, buf, NULL);
    ic2 = elm_button_add(win);
-   elm_button_label_set(ic2, "Click me");
+   elm_object_text_set(ic2, "Click me");
    evas_object_smart_callback_add(ic2, "clicked", _bt_clicked, NULL);
    elm_list_item_append(li, "world", ic, ic2, _it_clicked, NULL);
 
@@ -524,7 +524,7 @@ test_list3(void        *data __UNUSED__,
    elm_list_item_append(li, "How", ic, ic2, NULL, NULL);
 
    bx = elm_box_add(win);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
@@ -604,21 +604,22 @@ test_list4_swipe(void        *data,
    item_data = elm_list_item_data_get(event_info);
 
    box = elm_box_add(info->win);
-   elm_box_horizontal_set(box, 0);
-   elm_box_homogenous_set(box, 0);
+   elm_box_horizontal_set(box, EINA_FALSE);
+   elm_box_homogeneous_set(box, EINA_FALSE);
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(box);
 
-   entry = elm_scrolled_entry_add(info->win);
-   elm_scrolled_entry_editable_set(entry, EINA_FALSE);
-   elm_scrolled_entry_entry_set(entry, item_data);
+   entry = elm_entry_add(info->win);
+   elm_entry_scrollable_set(entry, EINA_TRUE);
+   elm_entry_editable_set(entry, EINA_FALSE);
+   elm_entry_entry_set(entry, item_data);
    evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(entry);
 
    button = elm_button_add(info->win);
-   elm_button_label_set(button, "back");
+   elm_object_text_set(button, "back");
    evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, 0);
    evas_object_size_hint_align_set(button, EVAS_HINT_FILL, 0);
    evas_object_smart_callback_add(button, "clicked", test_list4_back_cb, info);
@@ -754,7 +755,7 @@ test_list5_swipe(void        *data __UNUSED__,
    if (elm_list_item_end_get(event_info)) return;
 
    button = elm_button_add(info->win);
-   elm_button_label_set(button, "delete");
+   elm_object_text_set(button, "delete");
    evas_object_propagate_events_set(button, 0);
    evas_object_smart_callback_add(button, "clicked", test_list5_item_del,
                                   event_info);

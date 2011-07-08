@@ -10,8 +10,8 @@
  *
  * Signals that you can add callbacks for are:
  *
- * "changed" - Whenever the toggle value has been changed.  Is not called until 
- *             the toggle is released by the cursor (assuming it has been 
+ * "changed" - Whenever the toggle value has been changed.  Is not called until
+ *             the toggle is released by the cursor (assuming it has been
  *             triggered by the cursor in the first place).
  */
 
@@ -202,6 +202,33 @@ _signal_toggle_on(void *data, Evas_Object *obj __UNUSED__, const char *emission 
    evas_object_smart_callback_call(data, SIG_CHANGED, NULL);
 }
 
+static void
+_elm_toggle_label_set(Evas_Object *obj, const char *item, const char *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item) return;
+   if (!wd) return;
+   eina_stringshare_replace(&wd->label, label);
+   if (label)
+     edje_object_signal_emit(wd->tgl, "elm,state,text,visible", "elm");
+   else
+     edje_object_signal_emit(wd->tgl, "elm,state,text,hidden", "elm");
+   edje_object_message_signal_process(wd->tgl);
+   edje_object_part_text_set(wd->tgl, "elm.text", label);
+   _sizing_eval(obj);
+}
+
+static const char *
+_elm_toggle_label_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item) return NULL;
+   if (!wd) return NULL;
+   return wd->label;
+}
+
 /**
  * Add a toggle to @p parent.
  *
@@ -230,6 +257,8 @@ elm_toggle_add(Evas_Object *parent)
    elm_widget_disable_hook_set(obj, _disable_hook);
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_event_hook_set(obj, _event_hook);
+   elm_widget_text_set_hook_set(obj, _elm_toggle_label_set);
+   elm_widget_text_get_hook_set(obj, _elm_toggle_label_get);
 
    wd->tgl = edje_object_add(e);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
@@ -262,21 +291,12 @@ elm_toggle_add(Evas_Object *parent)
  * @param label The label to be displayed
  *
  * @ingroup Toggle
+ * @deprecate use elm_object_text_* instead.
  */
 EAPI void
 elm_toggle_label_set(Evas_Object *obj, const char *label)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   eina_stringshare_replace(&wd->label, label);
-   if (label)
-     edje_object_signal_emit(wd->tgl, "elm,state,text,visible", "elm");
-   else
-     edje_object_signal_emit(wd->tgl, "elm,state,text,hidden", "elm");
-   edje_object_message_signal_process(wd->tgl);
-   edje_object_part_text_set(wd->tgl, "elm.text", label);
-   _sizing_eval(obj);
+   _elm_toggle_label_set(obj, NULL, label);
 }
 
 /**
@@ -286,14 +306,12 @@ elm_toggle_label_set(Evas_Object *obj, const char *label)
  * @return The label of the toggle
  *
  * @ingroup Toggle
+ * @deprecate use elm_object_text_* instead.
  */
 EAPI const char *
 elm_toggle_label_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->label;
+   return _elm_toggle_label_get(obj, NULL);
 }
 
 /**

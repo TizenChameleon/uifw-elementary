@@ -43,7 +43,7 @@ struct _Widget_Data
    int year_min, year_max, spin_speed;
    int today_it, selected_it, first_day_it;
    Ecore_Timer *spin, *update_timer;
-   char * (*format_func) (struct tm *stime);
+   char * (*format_func) (struct tm *selected_time);
    const char *weekdays[7];
    struct tm current_time, selected_time;
    Day_Color day_color[42]; // EINA_DEPRECATED
@@ -62,6 +62,14 @@ struct _Elm_Calendar_Mark
 static const char *widtype = NULL;
 static void _on_focus_hook(void *data, Evas_Object *obj);
 static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
+
+static const char SIG_CHANGED[] = "changed";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_CHANGED, ""},
+   {NULL, NULL}
+};
+
 
 /* Should not be translated, it's used if we failed
  * getting from locale. */
@@ -113,12 +121,12 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static inline int
-_maxdays_get(struct tm *time)
+_maxdays_get(struct tm *selected_time)
 {
    int month, year;
 
-   month = time->tm_mon;
-   year = time->tm_year + 1900;
+   month = selected_time->tm_mon;
+   year = selected_time->tm_year + 1900;
 
    return _days_in_month[((!(year % 4)) &&
                           ((!(year % 400)) ||
@@ -161,10 +169,10 @@ _today(Widget_Data *wd, int it)
 }
 
 static char *
-_format_month_year(struct tm *stime)
+_format_month_year(struct tm *selected_time)
 {
    char buf[32];
-   if (!strftime(buf, sizeof(buf), "%B %Y", stime)) return NULL;
+   if (!strftime(buf, sizeof(buf), "%B %Y", selected_time)) return NULL;
    return strdup(buf);
 }
 
@@ -330,21 +338,21 @@ _populate(Evas_Object *obj)
    EINA_LIST_FOREACH(wd->marks, l, mark)
      {
         struct tm *mtime = &mark->mark_time;
-        int mon = wd->selected_time.tm_mon;
+        int month = wd->selected_time.tm_mon;
         int year = wd->selected_time.tm_year;
         int mday_it = mtime->tm_mday + wd->first_day_it - 1;
 
         switch (mark->repeat)
           {
            case ELM_CALENDAR_UNIQUE:
-              if ((mtime->tm_mon == mon) && (mtime->tm_year == year))
+              if ((mtime->tm_mon == month) && (mtime->tm_year == year))
                 _cit_mark(wd->calendar, mday_it, mark->mark_type);
               break;
            case ELM_CALENDAR_DAILY:
-              if (((mtime->tm_year == year) && (mtime->tm_mon < mon)) ||
+              if (((mtime->tm_year == year) && (mtime->tm_mon < month)) ||
                   (mtime->tm_year < year))
                 day = 1;
-              else if ((mtime->tm_year == year) && (mtime->tm_mon == mon))
+              else if ((mtime->tm_year == year) && (mtime->tm_mon == month))
                 day = mtime->tm_mday;
               else
                 break;
@@ -353,10 +361,10 @@ _populate(Evas_Object *obj)
                           mark->mark_type);
               break;
            case ELM_CALENDAR_WEEKLY:
-              if (((mtime->tm_year == year) && (mtime->tm_mon < mon)) ||
+              if (((mtime->tm_year == year) && (mtime->tm_mon < month)) ||
                   (mtime->tm_year < year))
                 day = 1;
-              else if ((mtime->tm_year == year) && (mtime->tm_mon == mon))
+              else if ((mtime->tm_year == year) && (mtime->tm_mon == month))
                 day = mtime->tm_mday;
               else
                 break;
@@ -367,12 +375,12 @@ _populate(Evas_Object *obj)
               break;
            case ELM_CALENDAR_MONTHLY:
               if (((mtime->tm_year < year) ||
-                   ((mtime->tm_year == year) && (mtime->tm_mon <= mon))) &&
+                   ((mtime->tm_year == year) && (mtime->tm_mon <= month))) &&
                   (mtime->tm_mday <= maxdays))
                 _cit_mark(wd->calendar, mday_it, mark->mark_type);
               break;
            case ELM_CALENDAR_ANNUALLY:
-              if ((mtime->tm_year <= year) && (mtime->tm_mon == mon) &&
+              if ((mtime->tm_year <= year) && (mtime->tm_mon == month) &&
                   (mtime->tm_mday <= maxdays))
                 _cit_mark(wd->calendar, mday_it, mark->mark_type);
               break;
@@ -537,7 +545,7 @@ _update_month(Evas_Object *obj, int delta)
      wd->selected_time.tm_mday = maxdays;
 
    _fix_selected_time(wd);
-   evas_object_smart_callback_call(obj, "changed", NULL);
+   evas_object_smart_callback_call(obj, SIG_CHANGED, NULL);
 
    return EINA_TRUE;
 }
@@ -619,7 +627,7 @@ _update_sel_it(Evas_Object *obj, int sel_it)
    wd->selected_time.tm_mday = day;
    _select(wd, wd->selected_it);
    _fix_selected_time(wd);
-   evas_object_smart_callback_call(obj, "changed", NULL);
+   evas_object_smart_callback_call(obj, SIG_CHANGED, NULL);
 }
 
 static void
@@ -766,6 +774,8 @@ elm_calendar_add(Evas_Object *parent)
                                    "*", _button_stop, obj);
    edje_object_signal_callback_add(wd->calendar, "elm,action,selected",
                                    "*", _day_selected, obj);
+
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    for (i = 0; i < 7; i++)
      {
@@ -1070,10 +1080,10 @@ elm_calendar_selected_time_get(const Evas_Object *obj, struct tm *selected_time)
  * Example:
  * @code
  * static char *
- * _format_month_year(struct tm *stime)
+ * _format_month_year(struct tm *selected_time)
  * {
  *    char buf[32];
- *    if (!strftime(buf, sizeof(buf), "%B %Y", stime)) return NULL;
+ *    if (!strftime(buf, sizeof(buf), "%B %Y", selected_time)) return NULL;
  *    return strdup(buf);
  * }
  * elm_calendar_format_function_set(calendar, _format_month_year);
@@ -1086,7 +1096,7 @@ elm_calendar_selected_time_get(const Evas_Object *obj, struct tm *selected_time)
  * @ingroup Calendar
  */
 EAPI void
-elm_calendar_format_function_set(Evas_Object *obj, char * (*format_function) (struct tm *stime))
+elm_calendar_format_function_set(Evas_Object *obj, char * (*format_function) (struct tm *selected_time))
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);

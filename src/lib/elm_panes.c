@@ -38,12 +38,24 @@ static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
+static const char SIG_CLICKED[] = "clicked";
+static const char SIG_PRESS[] = "press";
+static const char SIG_UNPRESS[] = "unpress";
+static const char SIG_CLICKED_DOUBLE[] = "clicked,double";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_CLICKED, ""},
+   {SIG_PRESS, ""},
+   {SIG_UNPRESS, ""},
+   {SIG_CLICKED_DOUBLE, ""},
+   {NULL, NULL}
+};
+
 static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (wd->panes) evas_object_del(wd->panes);
    free(wd);
 }
 
@@ -79,7 +91,8 @@ _theme_hook(Evas_Object *obj)
    if(wd->contents.left && wd->contents.right)
      edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
    if(wd->fixed)
-	   edje_object_signal_emit(wd->panes, "elm.panes.fixed", "elm");
+     edje_object_signal_emit(wd->panes, "elm.panes.fixed", "elm");
+
    edje_object_scale_set(wd->panes, elm_widget_scale_get(obj) *
                          _elm_config->scale);
    _sizing_eval(obj);
@@ -171,7 +184,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
 static void
 _clicked(void *data, Evas_Object *obj __UNUSED__ , const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-   evas_object_smart_callback_call(data, "clicked", NULL);
+   evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
 }
 
 static void
@@ -185,18 +198,18 @@ _clicked_double(void *data, Evas_Object *obj __UNUSED__ , const char *emission _
 static void
 _press(void *data, Evas_Object *obj __UNUSED__ , const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-   evas_object_smart_callback_call(data, "press", NULL);
+   evas_object_smart_callback_call(data, SIG_PRESS, NULL);
 }
 
 static void
 _unpress(void *data, Evas_Object *obj __UNUSED__ , const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   evas_object_smart_callback_call(data, "unpress", NULL);
+   evas_object_smart_callback_call(data, SIG_UNPRESS, NULL);
 
    if (wd->clicked_double)
      {
-        evas_object_smart_callback_call(data, "clicked,double", NULL);
+        evas_object_smart_callback_call(data, SIG_CLICKED_DOUBLE, NULL);
         wd->clicked_double = EINA_FALSE;
      }
 }
@@ -226,8 +239,6 @@ elm_panes_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_focus_next_hook_set(obj, _elm_panes_focus_next_hook);
-   wd->contents.left = NULL;
-   wd->contents.right = NULL;
 
    wd->panes = edje_object_add(e);
    _elm_theme_object_set(obj, wd->panes, "panes", "vertical", "default");
@@ -248,6 +259,8 @@ elm_panes_add(Evas_Object *parent)
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                   _changed_size_hints, obj);
+
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
@@ -419,7 +432,7 @@ elm_panes_content_right_unset(Evas_Object *obj)
  *
  * @ingroup Panes
  */
-EAPI double 
+EAPI double
 elm_panes_content_left_size_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) 0.0;
@@ -439,7 +452,7 @@ elm_panes_content_left_size_get(const Evas_Object *obj)
  *
  * @ingroup Panes
  */
-EAPI void 
+EAPI void
 elm_panes_content_left_size_set(Evas_Object *obj, double size)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -463,7 +476,7 @@ elm_panes_content_left_size_set(Evas_Object *obj, double size)
  *
  * @ingroup Panes
  */
-EAPI void 
+EAPI void
 elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -482,7 +495,7 @@ elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
  *
  * @ingroup Panes
  */
-EAPI Eina_Bool 
+EAPI Eina_Bool
 elm_panes_horizontal_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;

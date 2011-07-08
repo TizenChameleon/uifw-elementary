@@ -12,7 +12,6 @@
 
 //#define DEBUGON 1
 
-
 #ifdef DEBUGON
 # define cnp_debug(x...) fprintf(stderr, __FILE__": " x)
 #else
@@ -143,7 +142,6 @@ static char *mark_up(const char *start, int inlen, int *lenp);
 static Evas_Object *image_provider(void *images, Evas_Object *entry, const char *item);
 static void entry_deleted(void *images, Evas *e, Evas_Object *entry, void *unused);
 
-
 static Eina_Bool targets_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
 static Eina_Bool text_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
 static Eina_Bool html_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
@@ -190,7 +188,7 @@ static Cnp_Atom atoms[CNP_N_ATOMS] = {
      },
      [CNP_ATOM_XELM] =  {
           "application/x-elementary-markup",
-          ELM_SEL_FORMAT_TEXT | ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_HTML,
+          ELM_SEL_FORMAT_MARKUP,
           edje_converter,
           NULL,
           notify_handler_edje,
@@ -407,7 +405,6 @@ static Ecore_Event_Handler *handler_status = NULL;
 /* Stringshared, so I can just compare pointers later */
 static const char *text_uri;
 
-
 /* For convert EFL to HTML */
 
 #define TAGPOS_START    0x00000001
@@ -515,7 +512,11 @@ static PTagNode
 _new_tag_node(char *tag, char *tag_str, char* str, char *pos_in_ori_str)
 {
    PTagNode newNode = calloc(1, sizeof(TagNode));
+   if (tag)
+     eina_str_tolower(&tag);
    newNode->tag = tag;
+   if (tag_str)
+     eina_str_tolower(&tag_str);
    newNode->tag_str = tag_str;
    newNode->str = str;
    newNode->pos_in_ori_str = pos_in_ori_str;
@@ -1149,9 +1150,11 @@ _convert_to_edje(Eina_List* nodes)
                          }
                        switch(trail->tagPosType)
                          {
+                            /* not support in efl
                           case TAGPOS_ALONE:
                              eina_strbuf_append(html, " />");
                              break;
+                             */
                           default:
                              eina_strbuf_append(html, ">");
                              break;
@@ -1169,12 +1172,18 @@ _convert_to_edje(Eina_List* nodes)
    return ret;
 
 }
+
 Eina_Bool
 elm_selection_set(Elm_Sel_Type selection, Evas_Object *widget, Elm_Sel_Format format, const char *selbuf)
 {
 #ifdef HAVE_ELEMENTARY_X
+   Evas_Object *top = elm_widget_top_get(widget);
+   Ecore_X_Window xwin;
    Cnp_Selection *sel;
 
+   if (top) xwin = elm_win_xwindow_get(top);
+   else xwin = elm_win_xwindow_get(widget);
+   if (!xwin) return EINA_FALSE;
    if ((unsigned int)selection >= (unsigned int)ELM_SEL_MAX) return EINA_FALSE;
    if (!_elm_cnp_init_count) _elm_cnp_init();
    if ((!selbuf) && (format != ELM_SEL_FORMAT_IMAGE))
@@ -1185,7 +1194,7 @@ elm_selection_set(Elm_Sel_Type selection, Evas_Object *widget, Elm_Sel_Format fo
    sel->active = 1;
    sel->widget = widget;
 
-   sel->set(elm_win_xwindow_get(widget),&selection,sizeof(Elm_Sel_Type));
+   sel->set(xwin, &selection, sizeof(Elm_Sel_Type));
    sel->format = format;
    sel->selbuf = selbuf ? strdup(selbuf) : NULL;
 
@@ -1398,6 +1407,28 @@ vcard_send(char *target __UNUSED__, void *data __UNUSED__, int size __UNUSED__, 
 
    return EINA_TRUE;
 }
+
+static Eina_Bool
+is_uri_type_data(Cnp_Selection *sel __UNUSED__, Ecore_X_Event_Selection_Notify *notify)
+{
+   Ecore_X_Selection_Data *data;
+   char *p;
+
+   data = notify->data;
+   cnp_debug("data->format is %d %p %p\n", data->format, notify, data);
+   if (data->content == ECORE_X_SELECTION_CONTENT_FILES) return EINA_TRUE;
+   else p = (char *)data->data;
+
+   if (!p) return EINA_TRUE;
+   cnp_debug("Got %s\n", p);
+   if (strncmp(p, "file://", 7))
+     {
+        if (*p != '/') return EINA_FALSE;
+     }
+
+   return EINA_TRUE;
+}
+
 /*
  * Callback to handle a targets response on a selection request:
  * So pick the format we'd like; and then request it.
@@ -1407,6 +1438,7 @@ notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notif
 {
    Ecore_X_Selection_Data_Targets *targets;
    Ecore_X_Atom *atomlist;
+   Evas_Object *top;
    int i, j;
 
    targets = notify->data;
@@ -1420,6 +1452,11 @@ notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notif
           {
              if ((atoms[j].atom == atomlist[i]) && (atoms[j].notify))
                {
+                  if ((j == CNP_ATOM_text_uri) ||
+                      (j == CNP_ATOM_text_urilist))
+                    {
+                      if(!is_uri_type_data(sel, notify)) continue;
+                    }
                   cnp_debug("Atom %s matches\n",atoms[j].name);
                   goto done;
                }
@@ -1430,8 +1467,10 @@ notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notif
    return ECORE_CALLBACK_PASS_ON;
 
 done:
-   cnp_debug("Sending request for %s\n",atoms[j].name);
-   sel->request(elm_win_xwindow_get(sel->requestwidget), atoms[j].name);
+   top = elm_widget_top_get(sel->requestwidget);
+   if (!top) top = sel->requestwidget;
+   cnp_debug("Sending request for %s\n", atoms[j].name);
+   sel->request(elm_win_xwindow_get(top), atoms[j].name);
 
    return ECORE_CALLBACK_PASS_ON;
 }
@@ -1486,7 +1525,7 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    if (sel->datacb)
      {
         Elm_Selection_Data ddata;
-        
+
         str = mark_up((char *)data->data, data->length, NULL);
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_TEXT;
@@ -1496,7 +1535,7 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
         free(str);
         return 0;
      }
-   
+
    cnp_debug("Notify handler text %d %d %p\n", data->format,data->length, data->data);
    str = mark_up((char *)data->data, data->length, NULL);
    cnp_debug("String is %s (from %s)\n", str, data->data);
@@ -1545,7 +1584,7 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    if (sel->datacb)
      {
         Elm_Selection_Data ddata;
-        
+
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_MARKUP;
         ddata.data = p;
@@ -1700,6 +1739,7 @@ notify_handler_edje(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    free(stripstr);
    return 0;
 }
+
 /**
  *    Warning: Generic text/html can';t handle it sanely.
  *    Firefox sends ucs2 (i think).
@@ -2097,7 +2137,7 @@ mark_up(const char *start, int inlen, int *lenp)
    q = ret = malloc(l + 1);
 
    /* Second pass: Change characters */
-   for (p = start; *p; )
+   for (p = start; ((!endp) || (p < endp)) && (*p); )
      {
         for (i = 0; i < N_ESCAPES; i++)
           {
@@ -2144,6 +2184,7 @@ _dnd_enter(void *data __UNUSED__, int etype __UNUSED__, void *ev)
              /* Request it, so we know what it is */
              cnp_debug("Sending uri request\n");
              savedtypes.textreq = 1;
+             if (savedtypes.pi) pasteimage_free(savedtypes.pi);
              savedtypes.pi = NULL; /* FIXME: Free? */
              ecore_x_selection_xdnd_request(enter->win, text_uri);
           }
@@ -2252,6 +2293,9 @@ found:
                   cnp_debug("Insert %s\n", (char *)ddata.data);
                   dropable->dropcb(dropable->cbdata, dropable->obj, &ddata);
                   ecore_x_dnd_send_finished();
+                  
+                  if (savedtypes.pi) pasteimage_free(savedtypes.pi);
+                  savedtypes.pi = NULL;
                   return EINA_TRUE;
                }
              else if (dropable->types & ELM_SEL_FORMAT_IMAGE)
@@ -2262,7 +2306,7 @@ found:
                   dropable->dropcb(dropable->cbdata, dropable->obj, &ddata);
                   ecore_x_dnd_send_finished();
 
-                  pasteimage_free(savedtypes.pi);
+                  if (savedtypes.pi) pasteimage_free(savedtypes.pi);
                   savedtypes.pi = NULL;
 
                   return EINA_TRUE;

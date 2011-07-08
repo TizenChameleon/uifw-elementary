@@ -7,7 +7,7 @@
 static void _pos_selected_cb(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 {
    printf("Selection: %s\n", (char *)event_info);
-   //printf("Label selected: %s\n", elm_actionslider_selected_label_get(obj));
+   printf("Label selected: %s\n", elm_actionslider_selected_label_get(obj));
 }
 
 static void
@@ -31,7 +31,7 @@ _magnet_enable_disable_cb(void *data __UNUSED__, Evas_Object *obj, void *event_i
 void
 test_actionslider(void *data __UNUSED__, Evas_Object * obj __UNUSED__, void *event_info __UNUSED__)
 {
-   Evas_Object *win, *bg, *bx, *ms;
+   Evas_Object *win, *bg, *bx, *as;
 
    win = elm_win_add(NULL, "actionslider", ELM_WIN_BASIC);
    elm_win_title_set(win, "Actionslider");
@@ -47,83 +47,95 @@ test_actionslider(void *data __UNUSED__, Evas_Object * obj __UNUSED__, void *eve
    elm_win_resize_object_add(win, bx);
    evas_object_show(bx);
 
-   ms = elm_actionslider_add(win);
-   evas_object_size_hint_weight_set(ms, EVAS_HINT_EXPAND, 0);
-   evas_object_size_hint_align_set(ms, EVAS_HINT_FILL, 0);
-   elm_actionslider_indicator_pos_set(ms, ELM_ACTIONSLIDER_RIGHT);
-   elm_actionslider_magnet_pos_set(ms, ELM_ACTIONSLIDER_RIGHT);
-   //elm_actionslider_labels_set(ms, "Snooze", NULL, "Stop");
-   elm_actionslider_enabled_pos_set(ms, ELM_ACTIONSLIDER_LEFT |
+   as = elm_actionslider_add(win);
+   evas_object_size_hint_weight_set(as, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(as, EVAS_HINT_FILL, 0);
+   elm_actionslider_indicator_pos_set(as, ELM_ACTIONSLIDER_RIGHT);
+   elm_actionslider_magnet_pos_set(as, ELM_ACTIONSLIDER_RIGHT);
+   elm_object_text_part_set(as, "left", "Snooze");
+   elm_object_text_part_set(as, "center", NULL);
+   elm_object_text_part_set(as, "right", "Stop");
+   elm_actionslider_enabled_pos_set(as, ELM_ACTIONSLIDER_LEFT |
                                     ELM_ACTIONSLIDER_RIGHT);
-   evas_object_smart_callback_add(ms, "pos_changed",
+   evas_object_smart_callback_add(as, "pos_changed",
                                   _position_change_magnetic_cb, NULL);
-   evas_object_smart_callback_add(ms, "selected", _pos_selected_cb, NULL);
-   evas_object_show(ms);
-   elm_box_pack_end(bx, ms);
+   evas_object_smart_callback_add(as, "selected", _pos_selected_cb, NULL);
+   evas_object_show(as);
+   elm_box_pack_end(bx, as);
 
-   ms = elm_actionslider_add(win);
-   evas_object_size_hint_weight_set(ms, EVAS_HINT_EXPAND, 0);
-   evas_object_size_hint_align_set(ms, EVAS_HINT_FILL, 0);
-   elm_actionslider_indicator_pos_set(ms, ELM_ACTIONSLIDER_CENTER);
-   elm_actionslider_magnet_pos_set(ms, ELM_ACTIONSLIDER_CENTER);
-   //elm_actionslider_labels_set(ms, "Snooze", NULL, "Stop");
-   elm_actionslider_enabled_pos_set(ms, ELM_ACTIONSLIDER_LEFT |
+   as = elm_actionslider_add(win);
+   evas_object_size_hint_weight_set(as, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(as, EVAS_HINT_FILL, 0);
+   elm_actionslider_indicator_pos_set(as, ELM_ACTIONSLIDER_CENTER);
+   elm_actionslider_magnet_pos_set(as, ELM_ACTIONSLIDER_CENTER);
+   elm_object_text_part_set(as, "left", "Snooze");
+   elm_object_text_part_set(as, "center", NULL);
+   elm_object_text_part_set(as, "right", "Stop");
+   elm_actionslider_enabled_pos_set(as, ELM_ACTIONSLIDER_LEFT |
                                     ELM_ACTIONSLIDER_RIGHT);
-   evas_object_smart_callback_add(ms, "selected", _pos_selected_cb, NULL);
-   evas_object_show(ms);
-   elm_box_pack_end(bx, ms);
+   evas_object_smart_callback_add(as, "selected", _pos_selected_cb, NULL);
+   evas_object_show(as);
+   elm_box_pack_end(bx, as);
 
-   ms = elm_actionslider_add(win);
-   elm_object_style_set(ms, "bar");
-   evas_object_size_hint_weight_set(ms, EVAS_HINT_EXPAND, 0);
-   evas_object_size_hint_align_set(ms, EVAS_HINT_FILL, 0);
-   elm_actionslider_indicator_pos_set(ms, ELM_ACTIONSLIDER_LEFT);
-   elm_actionslider_magnet_pos_set(ms, ELM_ACTIONSLIDER_CENTER|
+   as = elm_actionslider_add(win);
+   elm_object_style_set(as, "bar");
+   evas_object_size_hint_weight_set(as, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(as, EVAS_HINT_FILL, 0);
+   elm_actionslider_indicator_pos_set(as, ELM_ACTIONSLIDER_LEFT);
+   elm_actionslider_magnet_pos_set(as, ELM_ACTIONSLIDER_CENTER|
                                    ELM_ACTIONSLIDER_RIGHT);
-   elm_actionslider_enabled_pos_set(ms, ELM_ACTIONSLIDER_CENTER |
+   elm_actionslider_enabled_pos_set(as, ELM_ACTIONSLIDER_CENTER |
                                     ELM_ACTIONSLIDER_RIGHT);
-   //elm_actionslider_labels_set(ms, NULL, "Accept", "Reject");
-   evas_object_smart_callback_add(ms, "selected", _pos_selected_cb, NULL);
-   evas_object_show(ms);
-   elm_box_pack_end(bx, ms);
+   elm_object_text_part_set(as, "left", NULL);
+   elm_object_text_part_set(as, "center", "Accept");
+   elm_object_text_part_set(as, "right", "Reject");
+   evas_object_smart_callback_add(as, "selected", _pos_selected_cb, NULL);
+   evas_object_show(as);
+   elm_box_pack_end(bx, as);
 
-   ms = elm_actionslider_add(win);
-   elm_object_style_set(ms, "bar");
-   evas_object_size_hint_weight_set(ms, EVAS_HINT_EXPAND, 0);
-   evas_object_size_hint_align_set(ms, EVAS_HINT_FILL, 0);
-   elm_actionslider_indicator_pos_set(ms, ELM_ACTIONSLIDER_LEFT);
-   elm_actionslider_magnet_pos_set(ms, ELM_ACTIONSLIDER_LEFT);
-   //elm_actionslider_labels_set(ms, NULL, "Accept", "Reject");
-   elm_actionslider_indicator_label_set(ms, "Go");
-   evas_object_smart_callback_add(ms, "pos_changed",
+   as = elm_actionslider_add(win);
+   elm_object_style_set(as, "bar");
+   evas_object_size_hint_weight_set(as, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(as, EVAS_HINT_FILL, 0);
+   elm_actionslider_indicator_pos_set(as, ELM_ACTIONSLIDER_LEFT);
+   elm_actionslider_magnet_pos_set(as, ELM_ACTIONSLIDER_LEFT);
+   elm_object_text_part_set(as, "left", NULL);
+   elm_object_text_part_set(as, "center", "Accept");
+   elm_object_text_part_set(as, "right", "Reject");
+   elm_object_text_set(as, "Go");
+   evas_object_smart_callback_add(as, "pos_changed",
                                   _position_change_magnetic_cb, NULL);
-   evas_object_smart_callback_add(ms, "selected", _pos_selected_cb, NULL);
-   evas_object_show(ms);
-   elm_box_pack_end(bx, ms);
+   evas_object_smart_callback_add(as, "selected", _pos_selected_cb, NULL);
+   evas_object_show(as);
+   elm_box_pack_end(bx, as);
 
 
-   ms = elm_actionslider_add(win);
-   evas_object_size_hint_weight_set(ms, EVAS_HINT_EXPAND, 0);
-   evas_object_size_hint_align_set(ms, EVAS_HINT_FILL, 0);
-   elm_actionslider_indicator_pos_set(ms, ELM_ACTIONSLIDER_LEFT);
-   elm_actionslider_magnet_pos_set(ms, ELM_ACTIONSLIDER_ALL);
-   //elm_actionslider_labels_set(ms, "Left", "Center", "Right");
-   elm_actionslider_indicator_label_set(ms, "Go");
-   evas_object_smart_callback_add(ms, "selected", _pos_selected_cb, NULL);
-   evas_object_show(ms);
-   elm_box_pack_end(bx, ms);
+   as = elm_actionslider_add(win);
+   evas_object_size_hint_weight_set(as, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(as, EVAS_HINT_FILL, 0);
+   elm_actionslider_indicator_pos_set(as, ELM_ACTIONSLIDER_LEFT);
+   elm_actionslider_magnet_pos_set(as, ELM_ACTIONSLIDER_ALL);
+   elm_object_text_part_set(as, "left", "Left");
+   elm_object_text_part_set(as, "center", "Center");
+   elm_object_text_part_set(as, "right", "Right");
+   elm_object_text_set(as, "Go");
+   evas_object_smart_callback_add(as, "selected", _pos_selected_cb, NULL);
+   evas_object_show(as);
+   elm_box_pack_end(bx, as);
 
-   ms = elm_actionslider_add(win);
-   evas_object_size_hint_weight_set(ms, EVAS_HINT_EXPAND, 0);
-   evas_object_size_hint_align_set(ms, EVAS_HINT_FILL, 0);
-   elm_actionslider_indicator_pos_set(ms, ELM_ACTIONSLIDER_CENTER);
-   elm_actionslider_magnet_pos_set(ms, ELM_ACTIONSLIDER_CENTER);
-   //elm_actionslider_labels_set(ms, "Enable", "Magnet", "Disable");
-   evas_object_smart_callback_add(ms, "pos_changed",
+   as = elm_actionslider_add(win);
+   evas_object_size_hint_weight_set(as, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(as, EVAS_HINT_FILL, 0);
+   elm_actionslider_indicator_pos_set(as, ELM_ACTIONSLIDER_CENTER);
+   elm_actionslider_magnet_pos_set(as, ELM_ACTIONSLIDER_CENTER);
+   elm_object_text_part_set(as, "left", "Enable");
+   elm_object_text_part_set(as, "center", "Magnet");
+   elm_object_text_part_set(as, "right", "Disable");
+   evas_object_smart_callback_add(as, "pos_changed",
                                   _magnet_enable_disable_cb, NULL);
-   evas_object_smart_callback_add(ms, "selected", _pos_selected_cb, NULL);
-   evas_object_show(ms);
-   elm_box_pack_end(bx, ms);
+   evas_object_smart_callback_add(as, "selected", _pos_selected_cb, NULL);
+   evas_object_show(as);
+   elm_box_pack_end(bx, as);
 
    evas_object_resize(win, 320, 400);
    evas_object_show(win);

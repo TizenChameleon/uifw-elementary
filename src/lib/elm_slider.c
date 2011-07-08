@@ -33,8 +33,8 @@
  * "slider,drag,start" - dragging the slider indicator around has started
  * "slider,drag,stop" - dragging the slider indicator around has stopped
  * "delay,changed" - A short time after the value is changed by the user.
- *                   This will be called only when the user stops dragging for 
- *                   a very short period or when they release their 
+ *                   This will be called only when the user stops dragging for
+ *                   a very short period or when they release their
  *                   finger/mouse, so it avoids possibly expensive reactions to
  *                   the value change.
  */
@@ -487,13 +487,13 @@ _spacer_cb(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *event_info)
    edje_object_part_drag_value_get(wd->slider, "elm.dragable.slider", &button_x, &button_y);
    if (wd->horizontal)
      {
-        button_x = ((double)ev->output.x - (double)x) / (double)w;
+        button_x = ((double)ev->canvas.x - (double)x) / (double)w;
         if (button_x > 1) button_x = 1;
         if (button_x < 0) button_x = 0;
      }
    else
      {
-        button_y = ((double)ev->output.y - (double)y) / (double)h;
+        button_y = ((double)ev->canvas.y - (double)y) / (double)h;
         if (button_y > 1) button_y = 1;
         if (button_y < 0) button_y = 0;
      }
@@ -503,6 +503,38 @@ _spacer_cb(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *event_info)
    if(wd->feed_cnt < 3)
    evas_event_feed_mouse_down(e, 1, EVAS_BUTTON_NONE, 0, NULL);
    wd->feed_cnt = 0;
+}
+
+static void
+_elm_slider_label_set(Evas_Object *obj, const char *item, const char *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item) return;
+   if (!wd) return;
+   eina_stringshare_replace(&wd->label, label);
+   if (label)
+     {
+        edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
+        edje_object_message_signal_process(wd->slider);
+     }
+   else
+     {
+        edje_object_signal_emit(wd->slider, "elm,state,text,hidden", "elm");
+        edje_object_message_signal_process(wd->slider);
+     }
+   edje_object_part_text_set(wd->slider, "elm.text", label);
+   _sizing_eval(obj);
+}
+
+static const char *
+_elm_slider_label_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item) return NULL;
+   if (!wd) return NULL;
+   return wd->label;
 }
 
 /**
@@ -532,6 +564,8 @@ elm_slider_add(Evas_Object *parent)
    elm_widget_disable_hook_set(obj, _disable_hook);
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_event_hook_set(obj, _event_hook);
+   elm_widget_text_set_hook_set(obj, _elm_slider_label_set);
+   elm_widget_text_get_hook_set(obj, _elm_slider_label_get);
 
    wd->horizontal = EINA_TRUE;
    wd->indicator_show = EINA_TRUE;
@@ -579,22 +613,7 @@ elm_slider_add(Evas_Object *parent)
 EAPI void
 elm_slider_label_set(Evas_Object *obj, const char *label)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   eina_stringshare_replace(&wd->label, label);
-   if (label)
-     {
-        edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
-        edje_object_message_signal_process(wd->slider);
-     }
-   else
-     {
-        edje_object_signal_emit(wd->slider, "elm,state,text,hidden", "elm");
-        edje_object_message_signal_process(wd->slider);
-     }
-   edje_object_part_text_set(wd->slider, "elm.text", label);
-   _sizing_eval(obj);
+   _elm_slider_label_set(obj, NULL, label);
 }
 
 /**
@@ -608,10 +627,7 @@ elm_slider_label_set(Evas_Object *obj, const char *label)
 EAPI const char *
 elm_slider_label_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->label;
+   return _elm_slider_label_get(obj, NULL);
 }
 
 /**
@@ -1030,7 +1046,7 @@ elm_slider_inverted_get(const Evas_Object *obj)
 }
 
 /**
- * Set the format function pointer for the inducator area
+ * Set the format function pointer for the indicator area
  *
  * Set the callback function to format the indicator string.
  * See elm_slider_indicator_format_set() for more info on how this works.

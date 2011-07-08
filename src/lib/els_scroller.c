@@ -37,8 +37,9 @@ struct _Smart_Data
         struct {
              Evas_Coord    x, y;
              double        timestamp, localtimestamp;
-        } history[20];
+        } history[60];
         struct {
+           double tadd, dxsum, dysum;
            double est_timestamp_diff;
         } hist;
       double anim_start;
@@ -106,10 +107,10 @@ struct _Smart_Data
    unsigned char bouncemey : 1;
    unsigned char bounce_horiz : 1;
    unsigned char bounce_vert : 1;
-   unsigned char momentum_animator_disabled :1;
-   unsigned char bounce_animator_disabled :1;
-   Eina_Bool is_mirrored : 1;
    unsigned char event_propagation :1;
+   Eina_Bool momentum_animator_disabled :1;
+   Eina_Bool bounce_animator_disabled :1;
+   Eina_Bool is_mirrored : 1;
    Eina_Bool wheel_disabled : 1;
 };
 
@@ -215,11 +216,8 @@ elm_smart_scroller_child_set(Evas_Object *obj, Evas_Object *child)
         sd->pan_obj = o;
         evas_object_smart_callback_add(o, "changed", _smart_pan_changed_hook, sd);
         evas_object_smart_callback_add(o, "pan_changed", _smart_pan_pan_changed_hook, sd);
-        _elm_smart_pan_child_set(o, child);
         edje_object_part_swallow(sd->edje_obj, "elm.swallow.content", o);
      }
-   else
-     _elm_smart_pan_child_set(sd->pan_obj, child);
 
    sd->pan_func.set = _elm_smart_pan_set;
    sd->pan_func.get = _elm_smart_pan_get;
@@ -228,6 +226,7 @@ elm_smart_scroller_child_set(Evas_Object *obj, Evas_Object *child)
    sd->pan_func.child_size_get = _elm_smart_pan_child_size_get;
 
    evas_object_event_callback_add(child, EVAS_CALLBACK_DEL, _smart_child_del_hook, sd);
+   _elm_smart_pan_child_set(sd->pan_obj, child);
    sd->pan_func.child_size_get(sd->pan_obj, &w, &h);
    sd->child.w = w;
    sd->child.h = h;
@@ -720,6 +719,8 @@ _smart_bounce_y_animator(void *data)
    Smart_Data *sd;
    Evas_Coord x, y, dy, py, h, ody, ed, md;
    double t, p, dt, pd, r;
+   Evas_Coord x, y, dy;
+   double t, p, dt;
 
    sd = data;
    t = ecore_loop_time_get();
@@ -853,7 +854,7 @@ _smart_momentum_animator(void *data)
              y = py;
           }
         elm_smart_scroller_child_pos_set(sd->smart_obj, x, y);
-        _update_wanted_coordinates(sd, px, py);
+        _update_wanted_coordinates(sd, x, y);
         sd->pan_func.max_get(sd->pan_obj, &maxx, &maxy);
         sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
         if (!sd->bounce_horiz)
@@ -917,7 +918,7 @@ bounce_eval(Smart_Data *sd)
    if ((!sd->widget) ||
        (!elm_widget_drag_child_locked_x_get(sd->widget)))
      {
-        if (!sd->down.bounce_x_animator && !sd->bounce_animator_disabled)
+        if ((!sd->down.bounce_x_animator) && (!sd->bounce_animator_disabled))
           {
              if (sd->bouncemex)
                {
@@ -939,7 +940,7 @@ bounce_eval(Smart_Data *sd)
    if ((!sd->widget) ||
        (!elm_widget_drag_child_locked_y_get(sd->widget)))
      {
-        if (!sd->down.bounce_y_animator && !sd->bounce_animator_disabled)
+        if ((!sd->down.bounce_y_animator) && (!sd->bounce_animator_disabled))
           {
              if (sd->bouncemey)
                {
@@ -1046,18 +1047,19 @@ elm_smart_scroller_child_pos_get(Evas_Object *obj, Evas_Coord *x, Evas_Coord *y)
    sd->pan_func.get(sd->pan_obj, x, y);
 }
 
-/* "internal_call" actually toggles whether we should save the coords and do
- * extra "speedup" checks, or not. */
-static void
-_elm_smart_scroller_child_region_show_internal(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h, Eina_Bool internal_call)
+/* returns TRUE when we need to move the scroller, FALSE otherwise.
+ * Updates w and h either way, so save them if you need them. */
+static Eina_Bool
+_elm_smart_scroller_child_region_show_internal(Evas_Object *obj, Evas_Coord *_x, Evas_Coord *_y, Evas_Coord w, Evas_Coord h)
 {
-   Evas_Coord mx = 0, my = 0, cw = 0, ch = 0, px = 0, py = 0, nx, ny, minx = 0, miny = 0;
+   Evas_Coord mx = 0, my = 0, cw = 0, ch = 0, px = 0, py = 0, nx, ny, minx = 0, miny = 0, pw = 0, ph = 0, x = *_x, y = *_y;
 
-   API_ENTRY return;
+   API_ENTRY return EINA_FALSE;
    sd->pan_func.max_get(sd->pan_obj, &mx, &my);
    sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
    sd->pan_func.child_size_get(sd->pan_obj, &cw, &ch);
    sd->pan_func.get(sd->pan_obj, &px, &py);
+   evas_object_geometry_get(sd->pan_obj, NULL, NULL, &pw, &ph);
 
    nx = px;
    if ((x < px) && ((x + w) < (px + (cw - mx)))) nx = x;
@@ -1065,14 +1067,6 @@ _elm_smart_scroller_child_region_show_internal(Evas_Object *obj, Evas_Coord x, E
    ny = py;
    if ((y < py) && ((y + h) < (py + (ch - my)))) ny = y;
    else if ((y > py) && ((y + h) > (py + (ch - my)))) ny = y + h - (ch - my);
-   if (!internal_call)
-     {
-        sd->wx = x;
-        sd->wy = y;
-        sd->ww = w;
-        sd->wh = h;
-        if ((nx == px) && (ny == py)) return;
-     }
 
    if ((sd->down.bounce_x_animator) || (sd->down.bounce_y_animator) ||
        (sd->scrollto.x.animator) || (sd->scrollto.y.animator))
@@ -1118,13 +1112,18 @@ _elm_smart_scroller_child_region_show_internal(Evas_Object *obj, Evas_Coord x, E
         sd->down.pdx = 0;
         sd->down.pdy = 0;
      }
+
    x = nx;
-   if ((x + w) > cw) x = cw - w;
+   if ((x + pw) > cw) x = cw - pw;
    if (x < minx) x = minx;
    y = ny;
-   if ((y + h) > ch) y = ch - h;
+   if ((y + ph) > ch) y = ch - ph;
    if (y < miny) y = miny;
-   elm_smart_scroller_child_pos_set(obj, x, y);
+
+   if ((x == px) && (y == py)) return EINA_FALSE;
+   *_x = x;
+   *_y = y;
+   return EINA_TRUE;
 }
 
 /* Set should be used for calculated positions, for example, when we move
@@ -1133,7 +1132,8 @@ _elm_smart_scroller_child_region_show_internal(Evas_Object *obj, Evas_Coord x, E
 void
 elm_smart_scroller_child_region_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
 {
-   _elm_smart_scroller_child_region_show_internal(obj, x, y, w, h, EINA_TRUE);
+   if (_elm_smart_scroller_child_region_show_internal(obj, &x, &y, w, h))
+      elm_smart_scroller_child_pos_set(obj, x, y);
 }
 
 /* Set should be used for setting the wanted position, for example a user scroll
@@ -1141,7 +1141,13 @@ elm_smart_scroller_child_region_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y
 void
 elm_smart_scroller_child_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
 {
-   _elm_smart_scroller_child_region_show_internal(obj, x, y, w, h, EINA_FALSE);
+   API_ENTRY return;
+   sd->wx = x;
+   sd->wy = y;
+   sd->ww = w;
+   sd->wh = h;
+   if (_elm_smart_scroller_child_region_show_internal(obj, &x, &y, w, h))
+      elm_smart_scroller_child_pos_set(obj, x, y);
 }
 
 void
@@ -1335,7 +1341,7 @@ elm_smart_scroller_paging_set(Evas_Object *obj, double pagerel_h, double pagerel
    sd->pagerel_v = pagerel_v;
    sd->pagesize_h = pagesize_h;
    sd->pagesize_v = pagesize_v;
-   if (sd->child_obj) _smart_page_adjust(sd);
+   _smart_page_adjust(sd);
 }
 
 void
@@ -1351,77 +1357,12 @@ elm_smart_scroller_paging_get(Evas_Object *obj, double *pagerel_h, double *pager
 void
 elm_smart_scroller_region_bring_in(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
 {
-   Evas_Coord mx = 0, my = 0, cw = 0, ch = 0, px = 0, py = 0, nx, ny, minx = 0, miny = 0;
-
    API_ENTRY return;
-   sd->pan_func.max_get(sd->pan_obj, &mx, &my);
-   sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
-   sd->pan_func.child_size_get(sd->pan_obj, &cw, &ch);
-   sd->pan_func.get(sd->pan_obj, &px, &py);
-
-   nx = px;
-   if ((x < px) && ((x + w) < (px + (cw - mx)))) nx = x;
-   else if ((x > px) && ((x + w) > (px + (cw - mx)))) nx = x + w - (cw - mx);
-   ny = py;
-   if ((y < py) && ((y + h) < (py + (ch - my)))) ny = y;
-   else if ((y > py) && ((y + h) > (py + (ch - my)))) ny = y + h - (ch - my);
-   sd->wx = x;
-   sd->wy = y;
-   sd->ww = w;
-   sd->wh = h;
-   if ((nx == px) && (ny == py)) return;
-   if ((sd->down.bounce_x_animator) || (sd->down.bounce_y_animator) ||
-       (sd->scrollto.x.animator) || (sd->scrollto.y.animator))
+   if (_elm_smart_scroller_child_region_show_internal(obj, &x, &y, w, h))
      {
-        _smart_anim_stop(sd->smart_obj);
+        _smart_scrollto_x(sd, _elm_config->bring_in_scroll_friction, x);
+        _smart_scrollto_y(sd, _elm_config->bring_in_scroll_friction, y);
      }
-   if (sd->scrollto.x.animator)
-     {
-        ecore_animator_del(sd->scrollto.x.animator);
-        sd->scrollto.x.animator = NULL;
-     }
-   if (sd->scrollto.y.animator)
-     {
-        ecore_animator_del(sd->scrollto.y.animator);
-        sd->scrollto.y.animator = NULL;
-     }
-   if (sd->down.bounce_x_animator)
-     {
-        ecore_animator_del(sd->down.bounce_x_animator);
-        sd->down.bounce_x_animator = NULL;
-        sd->bouncemex = 0;
-     }
-   if (sd->down.bounce_y_animator)
-     {
-        ecore_animator_del(sd->down.bounce_y_animator);
-        sd->down.bounce_y_animator = NULL;
-        sd->bouncemey = 0;
-     }
-   if (sd->down.hold_animator)
-     {
-        ecore_animator_del(sd->down.hold_animator);
-        sd->down.hold_animator = NULL;
-        _smart_drag_stop(sd->smart_obj);
-     }
-   if (sd->down.momentum_animator)
-     {
-        ecore_animator_del(sd->down.momentum_animator);
-        sd->down.momentum_animator = NULL;
-        sd->down.bounce_x_hold = 0;
-        sd->down.bounce_y_hold = 0;
-        sd->down.ax = 0;
-        sd->down.ay = 0;
-        sd->down.pdx = 0;
-        sd->down.pdy = 0;
-     }
-   x = nx;
-   if ((x + w) > cw) x = cw - w;
-   if (x < minx) x = minx;
-   _smart_scrollto_x(sd, _elm_config->bring_in_scroll_friction, x);
-   y = ny;
-   if ((y + h) > ch) y = ch - h;
-   if (y < miny) y = miny;
-   _smart_scrollto_y(sd, _elm_config->bring_in_scroll_friction, y);
 }
 
 void
@@ -1706,6 +1647,9 @@ _smart_event_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSE
           {
              sd->down.hist.est_timestamp_diff =
                 ecore_loop_time_get() - ((double)ev->timestamp / 1000.0);
+             sd->down.hist.tadd = 0.0;
+             sd->down.hist.dxsum = 0.0;
+             sd->down.hist.dysum = 0.0;
              sd->down.now = 1;
              sd->down.dragged = 0;
              sd->down.dir_x = 0;
@@ -1716,7 +1660,7 @@ _smart_event_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSE
              sd->down.sx = x;
              sd->down.sy = y;
              sd->down.locked = 0;
-             memset(&(sd->down.history[0]), 0, sizeof(sd->down.history[0]) * 20);
+             memset(&(sd->down.history[0]), 0, sizeof(sd->down.history[0]) * 60);
 #ifdef EVTIME
              sd->down.history[0].timestamp = ev->timestamp / 1000.0;
              sd->down.history[0].localtimestamp = ecore_loop_time_get();
@@ -1931,7 +1875,7 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
 #ifdef SCROLLDBG
                        printf("------ %i %i\n", ev->canvas.x, ev->canvas.y);
 #endif
-                       for (i = 0; i < 20; i++)
+                       for (i = 0; i < 60; i++)
                          {
                             dt = t - sd->down.history[i].timestamp;
                             if (dt > 0.2) break;
@@ -1947,7 +1891,7 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                        ax /= (i + 1);
                        ay /= (i + 1);
                        at /= (i + 1);
-                       at *= 4.0;
+                       at *= 4.0; // magic number! just trial and error shows this makes it behave "nicer" and not run off at high speed all the time
                        dx = ev->canvas.x - ax;
                        dy = ev->canvas.y - ay;
                        if (at > 0)
@@ -1959,24 +1903,24 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                                  sd->down.dx = ((double)dx / at);
                                  sd->down.dy = ((double)dy / at);
                                  if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
-                                     ((sd->down.dx < 0) && (sd->down.pdx < 0)) ||
-                                     ((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
-                                     ((sd->down.dy < 0) && (sd->down.pdy < 0)))
-                                  {
-                                    double t = ecore_loop_time_get();
-                                    double dt = t - sd->down.anim_start;
-
-                                    if (dt < 0.0) dt = 0.0;
-                                    else if (dt > _elm_config->thumbscroll_friction)
-                                      dt = _elm_config->thumbscroll_friction;
-                                    sd->down.extra_time = _elm_config->thumbscroll_friction - dt;
-                                  }
-                                 if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
                                      ((sd->down.dx < 0) && (sd->down.pdx < 0)))
                                    sd->down.dx += (double)sd->down.pdx * 1.5; // FIXME: * 1.5 - probably should be config
                                  if (((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
                                      ((sd->down.dy < 0) && (sd->down.pdy < 0)))
                                    sd->down.dy += (double)sd->down.pdy * 1.5; // FIXME: * 1.5 - probably should be config
+                                 if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
+                                     ((sd->down.dx < 0) && (sd->down.pdx < 0)) ||
+                                     ((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
+                                     ((sd->down.dy < 0) && (sd->down.pdy < 0)))
+                                   {
+                                      double t = ecore_loop_time_get();
+                                      double dt = t - sd->down.anim_start;
+
+                                      if (dt < 0.0) dt = 0.0;
+                                      else if (dt > _elm_config->thumbscroll_friction)
+                                        dt = _elm_config->thumbscroll_friction;
+                                      sd->down.extra_time = _elm_config->thumbscroll_friction - dt;
+                                   }
                                  else
                                    sd->down.extra_time = 0.0;
                                  sd->down.pdx = sd->down.dx;
@@ -1985,7 +1929,7 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                                  oy = -sd->down.dy;
                                  if (!_smart_do_page(sd))
                                    {
-                                      if (!sd->down.momentum_animator && !sd->momentum_animator_disabled)
+                                      if ((!sd->down.momentum_animator) && (!sd->momentum_animator_disabled))
                                         {
                                            sd->down.momentum_animator = ecore_animator_add(_smart_momentum_animator, sd);
                                            ev->event_flags |= EVAS_EVENT_FLAG_ON_SCROLL;
@@ -2224,9 +2168,10 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *
              printf("::: %i %i\n", ev->cur.canvas.x, ev->cur.canvas.y);
 #endif
              memmove(&(sd->down.history[1]), &(sd->down.history[0]),
-                     sizeof(sd->down.history[0]) * 19);
+                     sizeof(sd->down.history[0]) * (60 - 1));
 #ifdef EVTIME
              sd->down.history[0].timestamp = ev->timestamp / 1000.0;
+             sd->down.history[0].localtimestamp = ecore_loop_time_get();
 #else
              sd->down.history[0].timestamp = ecore_loop_time_get();
 #endif
@@ -2335,7 +2280,6 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *
                                  else x = sd->down.locked_x;
                               }
                          }
-                       if (_elm_config->thumbscroll_border_friction > 0.0)
                          {
                             Evas_Coord minx, miny;
                             sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
@@ -2699,14 +2643,11 @@ _smart_scrollbar_size_adjust(Smart_Data *sd)
      {
         Evas_Coord px = 0, py = 0, minx = 0, miny = 0;
 
-	edje_object_part_drag_size_set(sd->edje_obj, "elm.dragable.vbar", 1.0, 1.0);
-	edje_object_part_drag_size_set(sd->edje_obj, "elm.dragable.hbar", 1.0, 1.0);
-        if (sd->pan_obj)
-          {
-             sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
-             sd->pan_func.get(sd->pan_obj, &px, &py);
-             sd->pan_func.set(sd->pan_obj, minx, miny);
-          }
+        edje_object_part_drag_size_set(sd->edje_obj, "elm.dragable.vbar", 1.0, 1.0);
+        edje_object_part_drag_size_set(sd->edje_obj, "elm.dragable.hbar", 1.0, 1.0);
+        sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
+        sd->pan_func.get(sd->pan_obj, &px, &py);
+        sd->pan_func.set(sd->pan_obj, minx, miny);
         if ((px != minx) || (py != miny))
           edje_object_signal_emit(sd->edje_obj, "elm,action,scroll", "elm");
      }
@@ -2751,8 +2692,8 @@ _smart_add(Evas_Object *obj)
    sd->bounce_vert = 1;
 
    sd->one_dir_at_a_time = 1;
-   sd->momentum_animator_disabled = 0;
-   sd->bounce_animator_disabled = 0;
+   sd->momentum_animator_disabled = EINA_FALSE;
+   sd->bounce_animator_disabled = EINA_FALSE;
 
    o = edje_object_add(evas_object_evas_get(obj));
    evas_object_propagate_events_set(o, 0);
@@ -2897,4 +2838,3 @@ _smart_init(void)
         _smart = evas_smart_class_new(&sc);
      }
 }
-

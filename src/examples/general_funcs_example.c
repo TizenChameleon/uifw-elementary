@@ -76,15 +76,15 @@ elm_main(int    argc __UNUSED__,
    Evas_Object *win, *bg, *box, *frame, *check, *b, *slider;
 
    /* tell elm about our app so it can figure out where to get files */
-   //elm_app_compile_bin_dir_set(PACKAGE_BIN_DIR);
-   //elm_app_compile_data_dir_set(PACKAGE_DATA_DIR);
-   //elm_app_compile_lib_dir_set(PACKAGE_LIB_DIR);
-   //elm_app_info_set(elm_main, "elementary", "images/logo.png");
+   elm_app_compile_bin_dir_set(PACKAGE_BIN_DIR);
+   elm_app_compile_data_dir_set(PACKAGE_DATA_DIR);
+   elm_app_compile_lib_dir_set(PACKAGE_LIB_DIR);
+   elm_app_info_set(elm_main, "elementary", "images/logo.png");
 
-   //fprintf(stdout, "prefix was set to: %s\n", elm_app_prefix_dir_get());
-   //fprintf(stdout, "data directory is: %s\n", elm_app_data_dir_get());
-   //fprintf(stdout, "library directory is: %s\n", elm_app_lib_dir_get());
-   //fprintf(stdout, "locale directory is: %s\n", elm_app_locale_dir_get());
+   fprintf(stdout, "prefix was set to: %s\n", elm_app_prefix_dir_get());
+   fprintf(stdout, "data directory is: %s\n", elm_app_data_dir_get());
+   fprintf(stdout, "library directory is: %s\n", elm_app_lib_dir_get());
+   fprintf(stdout, "locale directory is: %s\n", elm_app_locale_dir_get());
 
    win = elm_win_add(NULL, "top-level-funcs-example", ELM_WIN_BASIC);
    elm_win_title_set(win, "Elementary Top-level Functions Example");

@@ -28,6 +28,7 @@
 
 #define E_(string) dgettext(PACKAGE, string)
 
+// els_pan.h
 Evas_Object *_elm_smart_pan_add            (Evas *evas);
 void         _elm_smart_pan_child_set      (Evas_Object *obj, Evas_Object *child);
 Evas_Object *_elm_smart_pan_child_get      (Evas_Object *obj);
@@ -37,6 +38,7 @@ void         _elm_smart_pan_max_get        (Evas_Object *obj, Evas_Coord *x, Eva
 void         _elm_smart_pan_min_get        (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
 void         _elm_smart_pan_child_size_get (Evas_Object *obj, Evas_Coord *w, Evas_Coord *h);
 
+// els_scroller.h
 typedef enum _Elm_Smart_Scroller_Policy
 {
    ELM_SMART_SCROLLER_POLICY_AUTO,
@@ -52,6 +54,7 @@ void elm_smart_scroller_custom_edje_file_set    (Evas_Object *obj, char *file, c
 void elm_smart_scroller_child_pos_set           (Evas_Object *obj, Evas_Coord x, Evas_Coord y);
 void elm_smart_scroller_child_pos_get           (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
 void elm_smart_scroller_child_region_show       (Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
+void elm_smart_scroller_child_region_set        (Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
 void elm_smart_scroller_child_viewport_size_get (Evas_Object *obj, Evas_Coord *w, Evas_Coord *h);
 void elm_smart_scroller_step_size_set           (Evas_Object *obj, Evas_Coord x, Evas_Coord y);
 void elm_smart_scroller_step_size_get           (Evas_Object *obj, Evas_Coord *x, Evas_Coord *y);
@@ -63,6 +66,7 @@ Evas_Object *elm_smart_scroller_edje_object_get (Evas_Object *obj);
 void elm_smart_scroller_single_dir_set          (Evas_Object *obj, Eina_Bool single_dir);
 Eina_Bool elm_smart_scroller_single_dir_get     (Evas_Object *obj);
 void elm_smart_scroller_object_theme_set        (Evas_Object *parent, Evas_Object *obj, const char *clas, const char *group, const char *style);
+void elm_smart_scroller_mirrored_set            (Evas_Object *obj, Eina_Bool mirrored);
 void elm_smart_scroller_hold_set                (Evas_Object *obj, Eina_Bool hold);
 void elm_smart_scroller_freeze_set              (Evas_Object *obj, Eina_Bool freeze);
 void elm_smart_scroller_bounce_allow_set        (Evas_Object *obj, Eina_Bool horiz, Eina_Bool vert);
@@ -75,9 +79,13 @@ Eina_Bool elm_smart_scroller_momentum_animator_disabled_get   (Evas_Object *obj)
 void elm_smart_scroller_momentum_animator_disabled_set             (Evas_Object *obj, Eina_Bool disabled);
 void elm_smart_scroller_bounce_animator_disabled_set               (Evas_Object *obj, Eina_Bool disabled);
 Eina_Bool elm_smart_scroller_bounce_animator_disabled_get     (Evas_Object *obj);
+Eina_Bool elm_smart_scroller_wheel_disabled_get (Evas_Object *obj);
+void elm_smart_scroller_wheel_disabled_set      (Evas_Object *obj, Eina_Bool disabled);
 
+// els_box.h
 void _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int rtl);
 
+// els_icon.h
 Evas_Object *_els_smart_icon_add              (Evas *evas);
 Eina_Bool    _els_smart_icon_file_key_set     (Evas_Object *obj, const char *file, const char *key);
 Eina_Bool    _els_smart_icon_file_edje_set    (Evas_Object *obj, const char *file, const char *part);
@@ -101,6 +109,16 @@ Elm_Image_Orient _els_smart_icon_orient_get   (const Evas_Object *obj);
 void         _els_smart_icon_edit_set         (Evas_Object *obj, Eina_Bool, Evas_Object *parent);
 Eina_Bool    _els_smart_icon_edit_get         (const Evas_Object *obj);
 Evas_Object *_els_smart_icon_edje_get(Evas_Object *obj);
+void         _els_smart_icon_aspect_ratio_retained_set(Evas_Object *obj, Eina_Bool retained);
+Eina_Bool    _els_smart_icon_aspect_ratio_retained_get(const Evas_Object *obj);
+
+#ifdef ENABLE_NLS
+# include <libintl.h>
+# define E_(string) dgettext(PACKAGE, string)
+#else
+# define bindtextdomain(domain,dir)
+# define E_(string) (string)
+#endif
 
 
 typedef struct _Elm_Config    Elm_Config;
@@ -165,6 +183,10 @@ struct _Elm_Config
    unsigned char  thumbscroll_bounce_enable;
    double         thumbscroll_border_friction;
    double         scroll_smooth_time_interval;
+   double         scroll_smooth_amount;
+   double         scroll_smooth_history_weight;
+   double         scroll_smooth_future_time;
+   double         scroll_smooth_time_window;
    double         scale;
    int            bgpixmap;
    int            compositing;
@@ -192,13 +214,12 @@ struct _Elm_Config
    double         longpress_timeout;
    unsigned char  effect_enable;
    unsigned char  desktop_entry;
-
    Eina_Bool      is_mirrored : 1;
-
-   int input_panel_enable;
-   int autocapital_allow;
-   int autoperiod_allow;   
-   Eina_Bool    password_show_last_character;
+   Eina_Bool      password_show_last;
+   double         password_show_last_timeout;
+   int            input_panel_enable;
+   int            autocapital_allow;
+   int            autoperiod_allow;
 };
 
 struct _Elm_Module
@@ -216,8 +237,6 @@ struct _Elm_Module
    int        (*shutdown_func) (Elm_Module *m);
    int          references;
 };
-
-#define ELM_NEW(t) calloc(1, sizeof(t))
 
 void                _elm_win_shutdown(void);
 void                _elm_win_rescale(Elm_Theme *th, Eina_Bool use_theme);

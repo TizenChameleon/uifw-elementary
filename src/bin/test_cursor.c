@@ -121,13 +121,13 @@ test_cursor(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bt = elm_button_add(win);
    elm_object_cursor_set(bt, ELM_CURSOR_COFFEE_MUG);
-   elm_button_label_set(bt, "Coffee Mug");
+   elm_object_text_set(bt, "Coffee Mug");
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
    elm_object_cursor_set(bt, ELM_CURSOR_CLOCK);
-   elm_button_label_set(bt, "Cursor unset");
+   elm_object_text_set(bt, "Cursor unset");
    elm_object_cursor_unset(bt);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
@@ -146,9 +146,10 @@ test_cursor(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    elm_list_go(list);
    evas_object_show(list);
 
-   entry = elm_scrolled_entry_add(win);
-   elm_scrolled_entry_entry_set(entry, "Xterm cursor");
-   elm_scrolled_entry_single_line_set(entry, EINA_TRUE);
+   entry = elm_entry_add(win);
+   elm_entry_scrollable_set(entry, EINA_TRUE);
+   elm_entry_entry_set(entry, "Xterm cursor");
+   elm_entry_single_line_set(entry, EINA_TRUE);
    evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, 0);
    evas_object_size_hint_fill_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(bx, entry);
@@ -197,7 +198,7 @@ test_cursor2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    evas_object_show(bx);
 
    o = elm_toolbar_add(win);
-   elm_toolbar_homogenous_set(o, 0);
+   elm_toolbar_homogeneous_set(o, 0);
    evas_object_size_hint_weight_set(o, 0.0, 0.0);
    evas_object_size_hint_align_set(o, EVAS_HINT_FILL, 0.0);
    tit = elm_toolbar_item_append(o, NULL, "Bogosity", NULL, NULL);
@@ -310,27 +311,27 @@ test_cursor3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    o = elm_button_add(win);
    elm_object_cursor_set(o, ELM_CURSOR_HAND1);
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
-   elm_button_label_set(o, "hand1");
+   elm_object_text_set(o, "hand1");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, ELM_CURSOR_HAND2);
-   elm_button_label_set(o, "hand2 x");
+   elm_object_text_set(o, "hand2 x");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, ELM_CURSOR_HAND2);
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
-   elm_button_label_set(o, "hand2");
+   elm_object_text_set(o, "hand2");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, "hand3");
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
-   elm_button_label_set(o, "hand3");
+   elm_object_text_set(o, "hand3");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
@@ -338,7 +339,7 @@ test_cursor3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    elm_object_cursor_set(o, "hand3");
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
    elm_object_cursor_style_set(o, "transparent");
-   elm_button_label_set(o, "hand3 transparent");
+   elm_object_text_set(o, "hand3 transparent");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
@@ -346,27 +347,27 @@ test_cursor3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    elm_object_cursor_set(o, "hand3");
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
    elm_object_cursor_unset(o);
-   elm_button_label_set(o, "unset");
+   elm_object_text_set(o, "unset");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, "hand4");
-   elm_button_label_set(o, "not existent");
+   elm_object_text_set(o, "not existent");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
    elm_cursor_engine_only_set(0);
    o = elm_button_add(win);
    elm_object_cursor_set(o, "hand2");
-   elm_button_label_set(o, "hand 2 engine only config false");
+   elm_object_text_set(o, "hand 2 engine only config false");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
    elm_cursor_engine_only_set(1);
    o = elm_button_add(win);
    elm_object_cursor_set(o, "hand2");
-   elm_button_label_set(o, "hand 2 engine only config true");
+   elm_object_text_set(o, "hand 2 engine only config true");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 

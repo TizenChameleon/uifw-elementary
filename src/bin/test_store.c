@@ -20,9 +20,9 @@ _st_selected(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 }
 
 static void
-_st_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_st_double_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
-   printf("clicked: %p\n", event_info);
+   printf("double clicked: %p\n", event_info);
 }
 
 static void
@@ -34,7 +34,7 @@ _st_longpress(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
 // store callbacks to handle loading/parsing/freeing of store items from src
 static Elm_Genlist_Item_Class itc1 =
 {
-  "message", { NULL, NULL, NULL, NULL }
+  "message", { NULL, NULL, NULL, NULL, NULL }, NULL
 };
 
 static const Elm_Store_Item_Mapping it1_mapping[] =
@@ -61,7 +61,7 @@ static const Elm_Store_Item_Mapping it1_mapping[] =
     ELM_STORE_ITEM_MAPPING_ICON,
       "elm.swallow.icon", 0,
       { .icon = {
-        48, 48, 
+        48, 48,
         ELM_ICON_LOOKUP_THEME_FDO,
         EINA_TRUE, EINA_FALSE,
         EINA_TRUE,
@@ -130,9 +130,9 @@ _st_store_fetch(void *data __UNUSED__, Elm_Store_Item *sti)
   // if we already have my item data - skip
   if (elm_store_item_data_get(sti)) return;
   // open the mail file and parse it
-  f = fopen(path, "r");
+  f = fopen(path, "rb");
   if (!f) return;
-  
+
   // alloc my item in memory that holds data to show in the list
   myit = calloc(1, sizeof(My_Item));
   if (!myit)
@@ -226,27 +226,27 @@ void
 test_store(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
   Evas_Object *win, *bg, *gl, *bx;
-  
+
   Elm_Store *st;
 
   win = elm_win_add(NULL, "store", ELM_WIN_BASIC);
   elm_win_title_set(win, "Store");
   elm_win_autodel_set(win, 1);
-  
+
   bg = elm_bg_add(win);
   elm_win_resize_object_add(win, bg);
   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
   evas_object_show(bg);
-  
+
   bx = elm_box_add(win);
   evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
   elm_win_resize_object_add(win, bx);
   evas_object_show(bx);
-  
+
   gl = elm_genlist_add(win);
   elm_genlist_height_for_width_mode_set(gl, EINA_TRUE);
   evas_object_smart_callback_add(gl, "selected", _st_selected, NULL);
-  evas_object_smart_callback_add(gl, "clicked", _st_clicked, NULL);
+  evas_object_smart_callback_add(gl, "clicked,double", _st_double_clicked, NULL);
   evas_object_smart_callback_add(gl, "longpressed", _st_longpress, NULL);
   evas_object_size_hint_weight_set(gl, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
   evas_object_size_hint_align_set(gl, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -261,7 +261,7 @@ test_store(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
   elm_store_sorted_set(st, EINA_TRUE);
   elm_store_target_genlist_set(st, gl);
   elm_store_filesystem_directory_set(st, "./store");
-  
+
   evas_object_resize(win, 480, 800);
   evas_object_show(win);
 }

@@ -13,7 +13,6 @@
  * Signals that you can add callbacks for are:
  *
  * "clicked" - This is called when a user has clicked the image
- * "drop" - Something has been dropped on the image
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -33,6 +32,14 @@ static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
+
+static const char SIG_CLICKED[] = "clicked";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_CLICKED, ""},
+   {NULL, NULL}
+};
+
 
 static void
 _del_hook(Evas_Object *obj)
@@ -97,7 +104,7 @@ _sizing_eval(Evas_Object *obj)
 static void
 _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   evas_object_smart_callback_call(data, "clicked", NULL);
+   evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
 }
 
 /**
@@ -131,6 +138,8 @@ elm_image_add(Evas_Object *parent)
                                   _mouse_up, obj);
    evas_object_repeat_events_set(wd->img, EINA_TRUE);
    elm_widget_resize_object_set(obj, wd->img);
+
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    wd->smooth = EINA_TRUE;
    wd->scale_up = EINA_TRUE;
@@ -237,6 +246,8 @@ elm_image_smooth_get(const Evas_Object *obj)
  * @param obj The image object.
  * @param w Pointer to store width, or NULL.
  * @param h Pointer to store height, or NULL.
+ *
+ * @ingroup Image
  */
 EAPI void
 elm_image_object_size_get(const Evas_Object *obj, int *w, int *h)
@@ -451,6 +462,8 @@ elm_image_orient_get(const Evas_Object *obj)
  *
  * @param obj Image object.
  * @param set Turn on or off editability.
+ *
+ * @ingroup Image
  */
 EAPI void
 elm_image_editable_set(Evas_Object *obj, Eina_Bool set)
@@ -480,6 +493,26 @@ elm_image_editable_get(const Evas_Object *obj)
    return _els_smart_icon_edit_get(wd->img);
 }
 
+/**
+ * Get the image object
+ *
+ * When you create a image with elm_image_add(). You can get this object (be
+ * careful to not manipulate it as it is under control of elementary), and use
+ * it to do things like get pixel data, save the image to a file, etc.
+ *
+ * @param obj The image object to get the inlined image from
+ * @return The inlined image object, or NULL if none exists
+ *
+ * @ingroup Image
+ */
+EAPI Evas_Object *
+elm_image_object_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return _els_smart_icon_object_get(wd->img);
+}
 
 /**
  * Enable/disable retaining up the aspect ratio of the image.

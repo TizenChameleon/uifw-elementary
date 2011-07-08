@@ -166,40 +166,52 @@ elm_table_add(Evas_Object *parent)
 }
 
 /**
- * Set the homogenous layout in the table
+ * Set the homogeneous layout in the table
  *
  * @param obj The layout object
- * @param homogenous A boolean to set (or no) layout homogenous
+ * @param homogeneous A boolean to set (or no) layout homogeneous
  * in the table
- * (1 = homogenous,  0 = no homogenous)
+ * (1 = homogeneous,  0 = no homogeneous)
  *
  * @ingroup Table
  */
 EAPI void
-elm_table_homogenous_set(Evas_Object *obj, Eina_Bool homogenous)
+elm_table_homogeneous_set(Evas_Object *obj, Eina_Bool homogeneous)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   evas_object_table_homogeneous_set(wd->tbl, homogenous);
+   evas_object_table_homogeneous_set(wd->tbl, homogeneous);
+}
+
+EINA_DEPRECATED EAPI void
+elm_table_homogenous_set(Evas_Object *obj, Eina_Bool homogenous)
+{
+   elm_table_homogeneous_set(obj, homogenous);
 }
 
 /**
- * Get the current table homogenous mode.
+ * Get the current table homogeneous mode.
  *
  * @param obj The table object
- * @return a boolean to set (or no) layout homogenous in the table
- * (1 = homogenous,  0 = no homogenous)
+ * @return a boolean to set (or no) layout homogeneous in the table
+ * (1 = homogeneous,  0 = no homogeneous)
  *
  * @ingroup Table
  */
 EAPI Eina_Bool
-elm_table_homogenous_get(const Evas_Object *obj)
+elm_table_homogeneous_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
    return evas_object_table_homogeneous_get(wd->tbl);
+}
+
+EINA_DEPRECATED EAPI Eina_Bool
+elm_table_homogenous_get(const Evas_Object *obj)
+{
+   return elm_table_homogeneous_get(obj);
 }
 
 /**
@@ -279,6 +291,53 @@ elm_table_unpack(Evas_Object *obj, Evas_Object *subobj)
 }
 
 /**
+ * Set the packing location of an existing child of the table
+ *
+ * @param subobj The subobject to be modified in the table
+ * @param x Coordinate to X axis
+ * @param y Coordinate to Y axis
+ * @param w Horizontal length
+ * @param h Vertical length
+ *
+ * @ingroup Table
+ */
+EAPI void
+elm_table_pack_set(Evas_Object *subobj, int x, int y, int w, int h)
+{
+   Evas_Object *obj = elm_widget_parent_widget_get(subobj);
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   evas_object_table_pack(wd->tbl, subobj, x, y, w, h);
+}
+
+/**
+ * Set the packing location of an existing child of the table
+ *
+ * @param subobj The subobject to be modified in the table
+ * @param x Coordinate to X axis
+ * @param y Coordinate to Y axis
+ * @param w Horizontal length
+ * @param h Vertical length
+ *
+ * @ingroup Table
+ */
+EAPI void
+elm_table_pack_get(Evas_Object *subobj, int *x, int *y, int *w, int *h)
+{
+   Evas_Object *obj = elm_widget_parent_widget_get(subobj);
+   unsigned short ix, iy, iw, ih;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   evas_object_table_pack_get(wd->tbl, subobj, &ix, &iy, &iw, &ih);
+   if (x) *x = ix;
+   if (y) *y = iy;
+   if (w) *w = iw;
+   if (h) *h = ih;
+}
+
+/**
  * Faster way to remove all child objects from a table object.
  *
  * @param obj The table object
@@ -289,8 +348,12 @@ elm_table_unpack(Evas_Object *obj, Evas_Object *subobj)
 EAPI void
 elm_table_clear(Evas_Object *obj, Eina_Bool clear)
 {
+   Eina_List *chld;
+   Evas_Object *o;
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   chld = evas_object_table_children_get(wd->tbl);
+   EINA_LIST_FREE(chld, o) elm_widget_sub_object_del(obj, o);
    evas_object_table_clear(wd->tbl, clear);
 }

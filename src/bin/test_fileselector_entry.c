@@ -39,12 +39,12 @@ _folder_only_toggle(void            *data,
    if (!value)
      {
         elm_icon_standard_set(ic, "folder");
-        elm_fileselector_entry_button_label_set(fs_en, "Select a folder");
+        elm_object_text_set(fs_en, "Select a folder");
      }
    else
      {
         elm_icon_standard_set(ic, "file");
-        elm_fileselector_entry_button_label_set(fs_en, "Select a file");
+        elm_object_text_set(fs_en, "Select a file");
      }
 }
 
@@ -96,7 +96,7 @@ test_fileselector_entry(void *data       __UNUSED__,
    elm_icon_standard_set(ic, "file");
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    fs_en = elm_fileselector_entry_add(win);
-   elm_fileselector_entry_button_label_set(fs_en, "Select a file");
+   elm_object_text_set(fs_en, "Select a file");
    elm_fileselector_entry_button_icon_set(fs_en, ic);
    evas_object_size_hint_weight_set(fs_en, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(fs_en, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -112,25 +112,25 @@ test_fileselector_entry(void *data       __UNUSED__,
    evas_object_show(hbox);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Toggle inwin mode");
+   elm_object_text_set(bt, "Toggle inwin mode");
    evas_object_smart_callback_add(bt, "clicked", _inwin_mode_toggle, fs_en);
    elm_box_pack_end(hbox, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Toggle folder only mode");
+   elm_object_text_set(bt, "Toggle folder only mode");
    evas_object_smart_callback_add(bt, "clicked", _folder_only_toggle, fs_en);
    elm_box_pack_end(hbox, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Toggle expandable mode");
+   elm_object_text_set(bt, "Toggle expandable mode");
    evas_object_smart_callback_add(bt, "clicked", _expandable_toggle, fs_en);
    elm_box_pack_end(hbox, bt);
    evas_object_show(bt);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "Last selection:");
+   elm_object_text_set(lb, "Last selection:");
    elm_box_pack_end(vbox, lb);
    evas_object_show(lb);
 
@@ -140,7 +140,7 @@ test_fileselector_entry(void *data       __UNUSED__,
    evas_object_show(hbox);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Toggle disabled");
+   elm_object_text_set(bt, "Toggle disabled");
    evas_object_smart_callback_add(bt, "clicked", _disabled_toggle, fs_en);
    elm_box_pack_end(hbox, bt);
    evas_object_show(bt);

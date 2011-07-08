@@ -58,6 +58,15 @@ static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src,
 
 static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 
+static const char SIG_CHANGED[] = "changed";
+static const char SIG_DELAY_CHANGED[] = "delay,changed";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_CHANGED, ""},
+   {SIG_DELAY_CHANGED, ""},
+   {NULL, NULL}
+};
+
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -166,7 +175,7 @@ _delay_change(void *data)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return ECORE_CALLBACK_CANCEL;
    wd->delay = NULL;
-   evas_object_smart_callback_call(data, "delay,changed", NULL);
+   evas_object_smart_callback_call(data, SIG_DELAY_CHANGED, NULL);
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -265,7 +274,7 @@ _value_set(Evas_Object *obj, double delta)
    if (new_val == wd->val) return EINA_FALSE;
    wd->val = new_val;
 
-   evas_object_smart_callback_call(obj, "changed", NULL);
+   evas_object_smart_callback_call(obj, SIG_CHANGED, NULL);
    if (wd->delay) ecore_timer_del(wd->delay);
    wd->delay = ecore_timer_add(0.2, _delay_change, obj);
 
@@ -511,7 +520,7 @@ _entry_activated(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNU
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    _apply_entry_value(data);
-   evas_object_smart_callback_call(data, "changed", NULL);
+   evas_object_smart_callback_call(data, SIG_CHANGED, NULL);
    if (wd->delay) ecore_timer_del(wd->delay);
    wd->delay = ecore_timer_add(0.2, _delay_change, data);
 }
@@ -631,6 +640,8 @@ elm_spinner_add(Evas_Object *parent)
    edje_object_part_swallow(wd->spinner, "elm.swallow.entry", wd->ent);
    edje_object_signal_callback_add(wd->spinner, "elm,action,entry,toggle",
                                    "*", _toggle_entry, obj);
+
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _write_label(obj);

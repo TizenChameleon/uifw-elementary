@@ -33,7 +33,7 @@ elm_main(int argc, char **argv)
    evas_object_show(bg);
 
    label = elm_label_add(win);
-   //elm_object_text_set(label, "This is the CONTENT of our bubble");
+   elm_object_text_set(label, "This is the CONTENT of our bubble");
    evas_object_show(label);
 
    icon = evas_object_rectangle_add(evas_object_evas_get(win));
@@ -51,7 +51,7 @@ elm_main(int argc, char **argv)
    evas_object_smart_callback_add(bubble, "clicked", _bla, NULL);
 
    label = elm_label_add(win);
-   //elm_object_text_set(label, "Bubble with no icon, info or label");
+   elm_object_text_set(label, "Bubble with no icon, info or label");
    evas_object_show(label);
 
    bubble = elm_bubble_add(win);

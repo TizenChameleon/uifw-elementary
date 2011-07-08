@@ -23,37 +23,37 @@ test_scaling(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    evas_object_show(bx);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Scale: 0.5");
+   elm_object_text_set(bt, "Scale: 0.5");
    elm_object_scale_set(bt, 0.5);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Scale: 0.75");
+   elm_object_text_set(bt, "Scale: 0.75");
    elm_object_scale_set(bt, 0.75);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Scale: 1.0");
+   elm_object_text_set(bt, "Scale: 1.0");
    elm_object_scale_set(bt, 1.0);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Scale: 1.5");
+   elm_object_text_set(bt, "Scale: 1.5");
    elm_object_scale_set(bt, 1.5);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Scale: 2.0");
+   elm_object_text_set(bt, "Scale: 2.0");
    elm_object_scale_set(bt, 2.0);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Scale: 3.0");
+   elm_object_text_set(bt, "Scale: 3.0");
    elm_object_scale_set(bt, 3.0);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
@@ -83,9 +83,9 @@ test_scaling2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
 
    fr = elm_frame_add(win);
    elm_object_scale_set(fr, 0.5);
-   elm_frame_label_set(fr, "Scale: 0.5");
+   elm_object_text_set(fr, "Scale: 0.5");
    lb = elm_label_add(win);
-   elm_label_label_set(lb,
+   elm_object_text_set(lb,
 		       "Parent frame scale<br>"
 		       "is 0.5. Child should<br>"
 		       "inherit it.");
@@ -95,9 +95,9 @@ test_scaling2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    evas_object_show(fr);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Scale: 1.0");
+   elm_object_text_set(fr, "Scale: 1.0");
    lb = elm_label_add(win);
-   elm_label_label_set(lb,
+   elm_object_text_set(lb,
 		       "Parent frame scale<br>"
 		       "is 1.0. Child should<br>"
 		       "inherit it.");
@@ -108,9 +108,9 @@ test_scaling2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    evas_object_show(fr);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Scale: 2.0");
+   elm_object_text_set(fr, "Scale: 2.0");
    lb = elm_label_add(win);
-   elm_label_label_set(lb,
+   elm_object_text_set(lb,
 		       "Parent frame scale<br>"
 		       "is 2.0. Child should<br>"
 		       "inherit it.");

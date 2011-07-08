@@ -3,7 +3,6 @@
 
 /**
  * @defgroup Thumb Thumb
- * @ingroup Elementary
  *
  * A thumb object is used for displaying the thumbnail of an image or video.
  * You must have compiled Elementary with Ethumb_Client support and the DBus
@@ -36,6 +35,15 @@ struct _Widget_Data
         int id;
         const char *file;
         const char *key;
+#ifdef HAVE_ELEMENTARY_ETHUMB
+        const char *thumb_path;
+        const char *thumb_key;
+        Ethumb_Exists *exists;
+
+        Ethumb_Thumb_Format format;
+
+        Eina_Bool retry : 1;
+#endif
      } thumb;
    Ecore_Event_Handler *eeh;
    Elm_Thumb_Animation_Setting anim_setting;
@@ -47,13 +55,13 @@ struct _Widget_Data
 
 static const char *widtype = NULL;
 
-#define SIG_CLICKED "clicked"
-#define SIG_CLICKED_DOUBLE "clicked,double"
-#define SIG_GENERATE_ERROR "generate,error"
-#define SIG_GENERATE_START "generate,start"
-#define SIG_GENERATE_STOP "generate,stop"
-#define SIG_LOAD_ERROR "load,error"
-#define SIG_PRESS "press"
+static const char SIG_CLICKED[] = "clicked";
+static const char SIG_CLICKED_DOUBLE[] = "clicked,double";
+static const char SIG_GENERATE_ERROR[] = "generate,error";
+static const char SIG_GENERATE_START[] = "generate,start";
+static const char SIG_GENERATE_STOP[] = "generate,stop";
+static const char SIG_LOAD_ERROR[] = "load,error";
+static const char SIG_PRESS[] = "press";
 
 static const Evas_Smart_Cb_Description _signals[] =
 {
@@ -76,6 +84,14 @@ static const Evas_Smart_Cb_Description _signals[] =
 
 struct _Ethumb_Client *_elm_ethumb_client = NULL;
 Eina_Bool _elm_ethumb_connected = EINA_FALSE;
+#ifdef HAVE_ELEMENTARY_ETHUMB
+static Eina_List *retry = NULL;
+static int pending_request = 0;
+
+static void _thumb_exists(Ethumb_Client *client __UNUSED__, Ethumb_Exists *thread,
+                          Eina_Bool exists, void *data);
+
+#endif
 
 EAPI int ELM_ECORE_EVENT_ETHUMB_CONNECT = 0;
 
@@ -86,8 +102,24 @@ _del_hook(Evas_Object *obj)
 
 #ifdef HAVE_ELEMENTARY_ETHUMB
    if (wd->thumb.id >= 0)
-     ethumb_client_generate_cancel(_elm_ethumb_client, wd->thumb.id,
-                                   NULL, NULL, NULL);
+     {
+        ethumb_client_generate_cancel(_elm_ethumb_client, wd->thumb.id,
+                                      NULL, NULL, NULL);
+        wd->thumb.id = -1;
+     }
+   if (wd->thumb.exists)
+     {
+        ethumb_client_thumb_exists_cancel(wd->thumb.exists, _thumb_exists, wd);
+        wd->thumb.exists = NULL;
+     }
+   if (wd->thumb.retry)
+     {
+        retry = eina_list_remove(retry, wd);
+        wd->thumb.retry = EINA_FALSE;
+     }
+
+   eina_stringshare_del(wd->thumb.thumb_path);
+   eina_stringshare_del(wd->thumb.thumb_key);
 #endif
 
    eina_stringshare_del(wd->file);
@@ -141,12 +173,104 @@ _mouse_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *
 }
 
 static void
-_finished_thumb(Widget_Data *wd, const char *thumb_path, const char *thumb_key)
+_thumb_ready(Widget_Data *wd, const char *thumb_path, const char *thumb_key)
 {
-   Eina_Bool new_view = EINA_FALSE;
-   int r;
    Evas_Coord mw, mh;
+   Evas_Coord aw, ah;
+
+   evas_object_image_size_get(wd->view, &aw, &ah);
+   evas_object_size_hint_aspect_set(wd->view,
+				    EVAS_ASPECT_CONTROL_BOTH,
+				    aw, ah);
+   edje_object_part_swallow(wd->frame, "elm.swallow.content", wd->view);
+   edje_object_size_min_get(wd->frame, &mw, &mh);
+   edje_object_size_min_restricted_calc(wd->frame, &mw, &mh, mw, mh);
+   evas_object_size_hint_min_set(wd->self, mw, mh);
+   eina_stringshare_replace(&(wd->thumb.file), thumb_path);
+   eina_stringshare_replace(&(wd->thumb.key), thumb_key);
+   edje_object_signal_emit(wd->frame, EDJE_SIGNAL_GENERATE_STOP, "elm");
+   evas_object_smart_callback_call(wd->self, SIG_GENERATE_STOP, NULL);
+}
+
+static void
+_thumb_loaded(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = data;
+   const char *thumb_path;
+   const char *thumb_key;
+
+   evas_object_image_file_get(wd->view, &thumb_path, &thumb_key);
+
+   _thumb_ready(wd, thumb_path, thumb_key);
+}
+
+/* As we do use stat to check if a thumbnail is available, it's possible
+   that we end up accessing before the file is completly written on disk.
+   By retrying each time a thumbnail is finished we should be fine or not.
+*/
+static Eina_Bool
+_retry_thumb(Widget_Data *wd)
+{
+   int r;
+
+   if ((wd->is_video) && (wd->thumb.format == ETHUMB_THUMB_EET))
+     {
+        edje_object_file_set(wd->view, NULL, NULL);
+        if (!edje_object_file_set(wd->view,
+                                  wd->thumb.thumb_path,
+                                  "movie/thumb"))
+          {
+             if (pending_request == 0)
+               ERR("could not set file=%s key=%s for %s",
+                   wd->thumb.thumb_path,
+                   wd->thumb.thumb_key,
+                   wd->file);
+             goto view_err;
+          }
+     }
+   else
+     {
+        evas_object_image_file_set(wd->view, NULL, NULL);
+        evas_object_image_file_set(wd->view,
+                                   wd->thumb.thumb_path,
+                                   wd->thumb.thumb_key);
+        r = evas_object_image_load_error_get(wd->view);
+        if (r != EVAS_LOAD_ERROR_NONE)
+          {
+             if (pending_request == 0)
+               ERR("%s: %s", wd->thumb.thumb_path, evas_load_error_str(r));
+             goto view_err;
+          }
+
+        evas_object_event_callback_add(wd->view,
+                                       EVAS_CALLBACK_IMAGE_PRELOADED,
+                                       _thumb_loaded, wd);
+        evas_object_image_preload(wd->view, EINA_TRUE);
+        return EINA_TRUE;
+     }
+
+   _thumb_ready(wd, wd->thumb.thumb_path, wd->thumb.thumb_key);
+
+   eina_stringshare_del(wd->thumb.thumb_path);
+   wd->thumb.thumb_path = NULL;
+
+   eina_stringshare_del(wd->thumb.thumb_key);
+   wd->thumb.thumb_key = NULL;
+
+   return EINA_TRUE;
+
+ view_err:
+   return EINA_FALSE;
+}
+
+static void
+_finished_thumb(Widget_Data *wd,
+                const char *thumb_path,
+                const char *thumb_key)
+{
+   Eina_List *l, *ll;
    Evas *evas;
+   int r;
 
    evas = evas_object_evas_get(wd->self);
    if ((wd->view) && (wd->is_video ^ wd->was_video))
@@ -167,14 +291,18 @@ _finished_thumb(Widget_Data *wd, const char *thumb_path, const char *thumb_key)
                   ERR("could not create edje object");
                   goto err;
                }
-             new_view = EINA_TRUE;
+             elm_widget_sub_object_add(wd->self, wd->view);
           }
 
-        if (!edje_object_file_set(wd->view, thumb_path, "movie/thumb"))
+        if (!edje_object_file_set(wd->view, thumb_path, thumb_key))
           {
-             ERR("could not set file=%s key=%s for %s", thumb_path, thumb_key,
-                 wd->file);
-             goto view_err;
+             wd->thumb.thumb_path = eina_stringshare_ref(thumb_path);
+             wd->thumb.thumb_key = eina_stringshare_ref(thumb_key);
+             wd->thumb.format = ethumb_client_format_get(_elm_ethumb_client);
+             wd->thumb.retry = EINA_TRUE;
+
+             retry = eina_list_append(retry, wd);
+             return ;
           }
      }
    else
@@ -187,32 +315,55 @@ _finished_thumb(Widget_Data *wd, const char *thumb_path, const char *thumb_key)
                   ERR("could not create image object");
                   goto err;
                }
-             new_view = EINA_TRUE;
+             evas_object_event_callback_add(wd->view,
+                                            EVAS_CALLBACK_IMAGE_PRELOADED,
+                                            _thumb_loaded, wd);
+             elm_widget_sub_object_add(wd->self, wd->view);
+             evas_object_hide(wd->view);
           }
 
         evas_object_image_file_set(wd->view, thumb_path, thumb_key);
         r = evas_object_image_load_error_get(wd->view);
         if (r != EVAS_LOAD_ERROR_NONE)
           {
-             ERR("%s: %s", thumb_path, evas_load_error_str(r));
-             goto view_err;
+             WRN("%s: %s", thumb_path, evas_load_error_str(r));
+             wd->thumb.thumb_path = eina_stringshare_ref(thumb_path);
+             wd->thumb.thumb_key = eina_stringshare_ref(thumb_key);
+             wd->thumb.format = ethumb_client_format_get(_elm_ethumb_client);
+             wd->thumb.retry = EINA_TRUE;
+
+             retry = eina_list_append(retry, wd);
+             return ;
           }
+
+        evas_object_image_preload(wd->view, 0);
+        return ;
      }
 
-   if (new_view) elm_widget_sub_object_add(wd->self, wd->view);
-   edje_object_part_swallow(wd->frame, "elm.swallow.content", wd->view);
-   edje_object_size_min_get(wd->frame, &mw, &mh);
-   edje_object_size_min_restricted_calc(wd->frame, &mw, &mh, mw, mh);
-   evas_object_size_hint_min_set(wd->self, mw, mh);
-   eina_stringshare_replace(&(wd->thumb.file), thumb_path);
-   eina_stringshare_replace(&(wd->thumb.key), thumb_key);
-   edje_object_signal_emit(wd->frame, EDJE_SIGNAL_GENERATE_STOP, "elm");
-   evas_object_smart_callback_call(wd->self, SIG_GENERATE_STOP, NULL);
+   _thumb_ready(wd, thumb_path, thumb_key);
+
+   EINA_LIST_FOREACH_SAFE(retry, l, ll, wd)
+     if (_retry_thumb(wd))
+       retry = eina_list_remove_list(retry, l);
+
+   if (pending_request == 0)
+     EINA_LIST_FREE(retry, wd)
+       {
+          eina_stringshare_del(wd->thumb.thumb_path);
+          wd->thumb.thumb_path = NULL;
+
+          eina_stringshare_del(wd->thumb.thumb_key);
+          wd->thumb.thumb_key = NULL;
+
+          evas_object_del(wd->view);
+          wd->view = NULL;
+
+          edje_object_signal_emit(wd->frame, EDJE_SIGNAL_LOAD_ERROR, "elm");
+          evas_object_smart_callback_call(wd->self, SIG_LOAD_ERROR, NULL);
+       }
+
    return;
 
-view_err:
-   evas_object_del(wd->view);
-   wd->view = NULL;
 err:
    edje_object_signal_emit(wd->frame, EDJE_SIGNAL_LOAD_ERROR, "elm");
    evas_object_smart_callback_call(wd->self, SIG_LOAD_ERROR, NULL);
@@ -225,6 +376,8 @@ _finished_thumb_cb(void *data, Ethumb_Client *c __UNUSED__, int id, const char *
 
    EINA_SAFETY_ON_FALSE_RETURN(wd->thumb.id == id);
    wd->thumb.id = -1;
+
+   pending_request--;
 
    edje_object_signal_emit(wd->frame, EDJE_SIGNAL_PULSE_STOP, "elm");
 
@@ -240,21 +393,21 @@ _finished_thumb_cb(void *data, Ethumb_Client *c __UNUSED__, int id, const char *
 }
 
 static void
-_thumb_apply(Widget_Data *wd)
+_thumb_exists(Ethumb_Client *client __UNUSED__, Ethumb_Exists *thread,
+              Eina_Bool exists, void *data)
 {
-   if (wd->thumb.id > 0)
-     {
-        ethumb_client_generate_cancel
-           (_elm_ethumb_client, wd->thumb.id, NULL, NULL, NULL);
-        wd->thumb.id = -1;
-     }
+   Widget_Data *wd = data;
 
-   if (!wd->file) return;
+   if (ethumb_client_thumb_exists_check(thread))
+     return ;
 
-   ethumb_client_file_set(_elm_ethumb_client, wd->file, wd->key);
-   if (ethumb_client_thumb_exists(_elm_ethumb_client))
+   wd->thumb.exists = NULL;
+
+   if (exists)
      {
         const char *thumb_path, *thumb_key;
+
+        pending_request--;
 
         wd->thumb.id = -1;
         ethumb_client_thumb_path_get(_elm_ethumb_client, &thumb_path,
@@ -271,10 +424,44 @@ _thumb_apply(Widget_Data *wd)
      }
    else
      {
+        pending_request--;
+
         wd->thumb.id = -1;
         edje_object_signal_emit(wd->frame, EDJE_SIGNAL_GENERATE_ERROR, "elm");
         evas_object_smart_callback_call(wd->self, SIG_GENERATE_ERROR, NULL);
      }
+
+}
+
+static void
+_thumb_apply(Widget_Data *wd)
+{
+   if (wd->thumb.id > 0)
+     {
+        ethumb_client_generate_cancel
+           (_elm_ethumb_client, wd->thumb.id, NULL, NULL, NULL);
+        wd->thumb.id = -1;
+     }
+
+   if (wd->thumb.exists)
+     {
+        ethumb_client_thumb_exists_cancel(wd->thumb.exists, _thumb_exists, wd);
+        wd->thumb.exists = NULL;
+     }
+
+   if (wd->thumb.retry)
+     {
+        retry = eina_list_remove(retry, wd);
+        wd->thumb.retry = EINA_FALSE;
+     }
+
+   if (!wd->file) return;
+
+   pending_request++;
+   ethumb_client_file_set(_elm_ethumb_client, wd->file, wd->key);
+   wd->thumb.exists = ethumb_client_thumb_exists(_elm_ethumb_client,
+                                                 _thumb_exists,
+                                                 wd);
 }
 
 static Eina_Bool
@@ -321,6 +508,18 @@ _thumb_hide_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
 
         edje_object_signal_emit(wd->frame, EDJE_SIGNAL_GENERATE_STOP, "elm");
         evas_object_smart_callback_call(wd->self, SIG_GENERATE_STOP, NULL);
+     }
+
+   if (wd->thumb.exists)
+     {
+        ethumb_client_thumb_exists_cancel(wd->thumb.exists, _thumb_exists, wd);
+        wd->thumb.exists = NULL;
+     }
+
+   if (wd->thumb.retry)
+     {
+        retry = eina_list_remove(retry, wd);
+        wd->thumb.retry = EINA_FALSE;
      }
 
    if (wd->eeh)
@@ -448,6 +647,9 @@ elm_thumb_add(Evas_Object *parent)
    wd->was_video = EINA_FALSE;
 
 #ifdef HAVE_ELEMENTARY_ETHUMB
+   wd->thumb.thumb_path = NULL;
+   wd->thumb.thumb_key = NULL;
+   wd->thumb.exists = NULL;
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOUSE_DOWN,
                                   _mouse_down_cb, wd);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOUSE_UP,
@@ -743,4 +945,4 @@ elm_thumb_editable_get(const Evas_Object *obj)
    return wd->edit;
 }
 
-/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/
+/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-3f0^-2{2(0W1st0 :*/

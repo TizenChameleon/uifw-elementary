@@ -189,7 +189,7 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 {
    Widget_Data *wd = data;
    if (!wd) return;
-   //_els_box_layout(o, priv, EINA_TRUE, EINA_FALSE, EINA_FALSE);
+   _els_box_layout(o, priv, EINA_TRUE, EINA_FALSE, EINA_FALSE);
 }
 
 static void
@@ -485,6 +485,5 @@ elm_panel_toggle(Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   wd->hidden = !(wd->hidden);
    _toggle_panel(obj, NULL, "elm,action,panel,toggle", "*");
 }

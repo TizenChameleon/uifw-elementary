@@ -90,7 +90,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
           {
              Evas_Object *lb = elm_label_add(win);
-             elm_label_label_set(lb,
+             elm_object_text_set(lb,
                                  "<b>Use Tab and Shift+Tab</b>"
                                 );
              evas_object_size_hint_weight_set(lb, 0.0, 0.0);
@@ -108,11 +108,12 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
           }
 
           {
-             Evas_Object *en = elm_scrolled_entry_add(win);
+             Evas_Object *en = elm_entry_add(win);
+             elm_entry_scrollable_set(en, EINA_TRUE);
              evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
              evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
-             elm_scrolled_entry_entry_set(en, "This is a single line");
-             elm_scrolled_entry_single_line_set(en, 1);
+             elm_entry_entry_set(en, "This is a single line");
+             elm_entry_single_line_set(en, 1);
              elm_box_pack_end(bx, en);
              my_show(en);
           }
@@ -129,7 +130,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
                {
                   Evas_Object *bt;
                   bt = elm_button_add(win);
-                  elm_button_label_set(bt, "Box");
+                  elm_object_text_set(bt, "Box");
                   evas_object_size_hint_align_set(bt, EVAS_HINT_FILL,
                                                   EVAS_HINT_FILL);
                   evas_object_size_hint_weight_set(bt, 0.0, 0.0);
@@ -153,7 +154,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
                     {
                        Evas_Object *bt;
                        bt = elm_button_add(win);
-                       elm_button_label_set(bt, "Scroller");
+                       elm_object_text_set(bt, "Scroller");
                        evas_object_size_hint_align_set(bt, EVAS_HINT_FILL,
                                                        EVAS_HINT_FILL);
                        evas_object_size_hint_weight_set(bt, 0.0, 0.0);
@@ -170,7 +171,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
           {
              Evas_Object *bt;
              bt = elm_button_add(win);
-             elm_button_label_set(bt, "Box");
+             elm_object_text_set(bt, "Box");
              evas_object_size_hint_align_set(bt, EVAS_HINT_FILL,
                                              EVAS_HINT_FILL);
              evas_object_size_hint_weight_set(bt, 0.0, 0.0);
@@ -200,7 +201,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
                     {
                        Evas_Object *bt;
                        bt = elm_button_add(win);
-                       elm_button_label_set(bt, "Box");
+                       elm_object_text_set(bt, "Box");
                        evas_object_size_hint_align_set(bt, EVAS_HINT_FILL,
                                                        EVAS_HINT_FILL);
                        evas_object_size_hint_weight_set(bt, 0.0, 0.0);
@@ -231,7 +232,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
                     {
                        Evas_Object *bt;
                        bt = elm_button_add(win);
-                       elm_button_label_set(bt, "BX Scroller");
+                       elm_object_text_set(bt, "BX Scroller");
                        evas_object_size_hint_align_set(bt, EVAS_HINT_FILL,
                                                        EVAS_HINT_FILL);
                        evas_object_size_hint_weight_set(bt, 0.0, 0.0);
@@ -265,7 +266,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
                {
                   Evas_Object *bt;
                   bt = elm_button_add(win);
-                  elm_button_label_set(bt, "Layout");
+                  elm_object_text_set(bt, "Layout");
                   evas_object_size_hint_align_set(bt, EVAS_HINT_FILL,
                                                   EVAS_HINT_FILL);
                   evas_object_size_hint_weight_set(bt, 0.0, 0.0);
@@ -286,7 +287,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
                {
                   Evas_Object *bt;
                   bt = elm_button_add(win);
-                  elm_button_label_set(bt, "Disable");
+                  elm_object_text_set(bt, "Disable");
                   evas_object_size_hint_align_set(bt, EVAS_HINT_FILL,
                                                   EVAS_HINT_FILL);
                   evas_object_size_hint_weight_set(bt, 0.0, 0.0);
@@ -297,7 +298,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
                   Evas_Object *bt2;
                   bt2 = elm_button_add(win);
-                  elm_button_label_set(bt2, "Enable");
+                  elm_object_text_set(bt2, "Enable");
                   evas_object_size_hint_align_set(bt2, EVAS_HINT_FILL,
                                                   EVAS_HINT_FILL);
                   evas_object_size_hint_weight_set(bt2, 0.0, 0.0);
@@ -319,7 +320,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
           {
              Evas_Object *fr = elm_frame_add(win);
-             elm_frame_label_set(fr, "Frame");
+             elm_object_text_set(fr, "Frame");
              elm_box_pack_end(bx, fr);
              evas_object_show(fr);
 
@@ -333,7 +334,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
                       {
                          Evas_Object *bt;
                          bt = elm_button_add(win);
-                         elm_button_label_set(bt, "Table");
+                         elm_object_text_set(bt, "Table");
                          evas_object_size_hint_align_set(bt, EVAS_HINT_FILL,
                                                          EVAS_HINT_FILL);
                          evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -345,7 +346,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
           {
              Evas_Object *fr = elm_bubble_add(win);
-             elm_bubble_label_set(fr, "Bubble");
+             elm_object_text_set(fr, "Bubble");
              evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
              evas_object_size_hint_align_set(fr, EVAS_HINT_FILL,
                                              EVAS_HINT_FILL);
@@ -362,7 +363,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
                       {
                          Evas_Object *bt;
                          bt = elm_button_add(win);
-                         elm_button_label_set(bt, "Table");
+                         elm_object_text_set(bt, "Table");
                          evas_object_size_hint_align_set(bt, EVAS_HINT_FILL,
                                                          EVAS_HINT_FILL);
                          evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);

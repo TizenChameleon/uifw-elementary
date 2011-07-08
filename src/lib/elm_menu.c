@@ -11,7 +11,7 @@
  *
  * Signals that you can add callbacks for are:
  *
- * "clicked" - the user clicked the empty space in the menu to dismiss. 
+ * "clicked" - the user clicked the empty space in the menu to dismiss.
  *             event_info is NULL.
  */
 
@@ -55,6 +55,14 @@ static void _submenu_open(void *data, Evas_Object *obj, const char *emission, co
 static void _parent_resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _parent_del(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _menu_hide(void *data, Evas_Object *obj, void *event_info);
+
+static const char SIG_CLICKED[] = "clicked";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_CLICKED, ""},
+   {NULL, NULL}
+};
+
 
 static void
 _del_item(Elm_Menu_Item *item)
@@ -274,7 +282,7 @@ static void
 _hover_clicked_cb(void *data, Evas_Object *obj, void *event_info)
 {
    _menu_hide(data, obj, event_info);
-   evas_object_smart_callback_call(data, "clicked", NULL);
+   evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
 }
 
 static void
@@ -483,6 +491,8 @@ elm_menu_add(Evas_Object *parent)
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, obj);
 
    evas_object_event_callback_add(wd->bx, EVAS_CALLBACK_RESIZE, _menu_resize, obj);
+
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    _sizing_eval(obj);
    return obj;
@@ -770,7 +780,7 @@ elm_menu_item_disabled_set(Elm_Menu_Item *item, Eina_Bool disabled)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item);
    if (disabled == item->disabled) return;
-   item->disabled = disabled;
+   item->disabled = !!disabled;
    if (disabled)
      {
         edje_object_signal_emit(item->base.view, "elm,state,disabled", "elm");

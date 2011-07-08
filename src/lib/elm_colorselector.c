@@ -85,7 +85,7 @@ static void _right_button_up_cb(void *data, Evas *e, Evas_Object *obj, void *eve
 static void _add_colorbar(Evas_Object *obj);
 static void _set_color(Evas_Object *obj, int r, int g, int b, int a);
 
-#define SIG_CHANGED "changed"
+static const char SIG_CHANGED[] = "changed";
 
 static const Evas_Smart_Cb_Description _signals[] =
 {
@@ -461,7 +461,7 @@ _colorbar_cb(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *event_info)
    evas_object_geometry_get(cp->bar, &x, &y, &w, &h);
    edje_object_part_drag_value_get(cp->colorbar, "elm.arrow",
                                    &arrow_x, &arrow_y);
-   if (w > 0) arrow_x = (double)(ev->output.x - x) / (double)w;
+   if (w > 0) arrow_x = (double)(ev->canvas.x - x) / (double)w;
    if (arrow_x > 1) arrow_x = 1;
    if (arrow_x < 0) arrow_x = 0;
    edje_object_part_drag_value_set(cp->colorbar, "elm.arrow", arrow_x, arrow_y);

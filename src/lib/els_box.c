@@ -2,20 +2,16 @@
 #include "elm_priv.h"
 
 static void
-_smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int extended)
+_smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horizontal, int homogeneous)
 {
-   Evas_Coord minw, minh, maxw, maxh, mnw, mnh, ww;
-   Evas_Coord w, cw = 0, cmaxh = 0;
+   Evas_Coord minw, minh, mnw, mnh;
    const Eina_List *l;
    Evas_Object_Box_Option *opt;
-   double wx;
+   int c;
 
    /* FIXME: need to calc max */
    minw = 0;
    minh = 0;
-   maxw = -1;
-   maxh = -1;
-
    if (homogeneous)
      {
         EINA_LIST_FOREACH(priv->children, l, opt)
@@ -31,46 +27,13 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
      }
    else
      {
-        if (horizontal && extended)
-          {
-             evas_object_geometry_get(box, NULL, NULL, &w, NULL);
-             evas_object_size_hint_min_get(box, &minw, NULL);
-          }
-
         EINA_LIST_FOREACH(priv->children, l, opt)
           {
              evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
              if (horizontal)
                {
-                  if (extended)
-                    {
-                       evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
-
-                       if(wx)
-                         {
-                            if (mnw != -1 && (w - cw) >= mnw)
-                               ww = w - cw;
-                            else
-                               ww = w;
-                         }
-                       else
-                          ww = mnw;
-
-                       if ((cw + mnw) > w)
-                         {
-                            minh += cmaxh;
-
-                            cw = 0;
-                            cmaxh = 0;
-                         }
-                       cw += ww;
-                       if (cmaxh < mnh) cmaxh = mnh;
-                    }
-                  else
-                    {
-                       if (minh < mnh) minh = mnh;
-                       minw += mnw;
-                    }
+                  if (minh < mnh) minh = mnh;
+                  minw += mnw;
                }
              else
                {
@@ -78,69 +41,18 @@ _smart_extents_calculate(Evas_Object *box, Evas_Object_Box_Data *priv, int horiz
                   minh += mnh;
                }
           }
-
-        if(horizontal && extended)
-          {
-             minh += cmaxh;
-          }
-
+     }
+   c = eina_list_count(priv->children) - 1;
+   if (c > 0)
+     {
+        if (horizontal) minw += priv->pad.h * c;
+        else            minh += priv->pad.v * c;
      }
    evas_object_size_hint_min_set(box, minw, minh);
 }
 
-static Evas_Coord
-_smart_extents_calculate_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj_index)
-{
-   Evas_Coord mnw, mnh, cw = 0, cmaxh = 0, w, ww;
-   const Eina_List *l;
-   Evas_Object_Box_Option *opt;
-   int index = 0;
-   double wx;
-
-   evas_object_geometry_get(box, NULL, NULL, &w, NULL);
-
-   EINA_LIST_FOREACH(priv->children, l, opt)
-     {
-        evas_object_size_hint_min_get(opt->obj, &mnw, &mnh);
-        evas_object_size_hint_weight_get(opt->obj, &wx, NULL);
-
-        if(wx)
-          {
-             if (mnw != -1 && (w - cw) >= mnw)
-                ww = w - cw;
-             else
-                ww = w;
-          }
-        else
-           ww = mnw;
-
-        if ((cw + ww) > w)
-          {
-             if (index > obj_index )
-               {
-                  return cmaxh;
-               }
-             cw = 0;
-             cmaxh = 0;
-          }
-
-        cw += ww;
-        if (cmaxh < mnh) cmaxh = mnh;
-
-        index++;
-     }
-
-   return cmaxh;
-}
-
 void
 _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int rtl)
-{
-   _els_box_layout_ex(o, priv, horizontal, homogeneous, 0, rtl);
-}
-
-void
-_els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int extended, int rtl)
 {
    Evas_Coord x, y, w, h, xx, yy;
    const Eina_List *l;
@@ -150,13 +62,14 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
    double ax, ay;
    Evas_Object_Box_Option *opt;
 
-   _smart_extents_calculate(o, priv, horizontal, homogeneous, extended);
+   _smart_extents_calculate(o, priv, horizontal, homogeneous);
 
    evas_object_geometry_get(o, &x, &y, &w, &h);
 
    evas_object_size_hint_min_get(o, &minw, &minh);
    evas_object_size_hint_align_get(o, &ax, &ay);
    count = eina_list_count(priv->children);
+
    if (w < minw)
      {
         x = x + ((w - minw) * (1.0 - ax));
@@ -181,7 +94,7 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
              if (wy > 0.0) expand++;
           }
      }
-   if ((!expand) && (!extended))
+   if (!expand)
      {
         evas_object_size_hint_align_get(o, &ax, &ay);
         if (horizontal)
@@ -199,9 +112,6 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
    hdif = h - minh;
    xx = x;
    yy = y;
-
-   Evas_Coord cw = 0, ch = 0, cmaxh = 0, obj_index = 0;
-
    EINA_LIST_FOREACH(priv->children, l, opt)
      {
         Evas_Coord mnw, mnh, mxw, mxh;
@@ -223,73 +133,35 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
           {
              Evas_Coord ww, hh, ow, oh;
 
-             if (extended)
+             if (homogeneous)
                {
-                 if(wx)
-                   {
-                      if (mnw != -1 && (w - cw) >= mnw)
-                         ww = w - cw;
-                      else
-                         ww = w;
-                   }
-                 else
-                    ww = mnw;
-                 hh = _smart_extents_calculate_max_height(o, priv, obj_index);
-
-                 ow = mnw;
-                 if (fw) ow = ww;
-                 if ((mxw >= 0) && (mxw < ow)) ow = mxw;
-                 oh = mnh;
-                 if (fh) oh = hh;
-                 if ((mxh >= 0) && (mxh < oh)) oh = mxh;
-
-                 if ((cw + ww) > w)
-                   {
-                      ch += cmaxh;
-
-                      cw = 0;
-                      cmaxh = 0;
-                   }
-
-                 evas_object_move(obj,
-                                  xx + cw + (Evas_Coord)(((double)(ww - ow)) * ax),
-                                  yy + ch + (Evas_Coord)(((double)(hh - oh)) * ay));
-                 evas_object_resize(obj, ow, oh);
-
-                 cw += ww;
-                 if (cmaxh < hh) cmaxh = hh;
+                  ww = (w / (Evas_Coord)count);
                }
              else
                {
-                if (homogeneous)
-                  {
-                     ww = (w / (Evas_Coord)count);
-                  }
-                else
-                  {
-                     ww = mnw;
-                     if ((expand > 0) && (xw))
-                       {
-                          if (expand == 1) ow = wdif;
-                          else ow = (w - minw) / expand;
-                          wdif -= ow;
-                          ww += ow;
-                       }
-                  }
-                hh = h;
-                ow = mnw;
-                if (fw) ow = ww;
-                if ((mxw >= 0) && (mxw < ow)) ow = mxw;
-                oh = mnh;
-                if (fh) oh = hh;
-                if ((mxh >= 0) && (mxh < oh)) oh = mxh;
-                evas_object_move(obj,
-                                 ((!rtl) ? (xx) : (x + (w - (xx - x) - ww)))
-                                 + (Evas_Coord)(((double)(ww - ow)) * ax),
-                                 yy + (Evas_Coord)(((double)(hh - oh)) * ay));
-                evas_object_resize(obj, ow, oh);
-                xx += ww;
+                  ww = mnw;
+                  if ((expand > 0) && (xw))
+                    {
+                       if (expand == 1) ow = wdif;
+                       else ow = (w - minw) / expand;
+                       wdif -= ow;
+                       ww += ow;
+                    }
                }
+             hh = h;
+             ow = mnw;
+             if (fw) ow = ww;
+             if ((mxw >= 0) && (mxw < ow)) ow = mxw;
+             oh = mnh;
+             if (fh) oh = hh;
+             if ((mxh >= 0) && (mxh < oh)) oh = mxh;
+             evas_object_move(obj,
+                              ((!rtl) ? (xx) : (x + (w - (xx - x) - ww)))
+                              + (Evas_Coord)(((double)(ww - ow)) * ax),
+                              yy + (Evas_Coord)(((double)(hh - oh)) * ay));
+             evas_object_resize(obj, ow, oh);
+             xx += ww;
+             xx += priv->pad.h;
           }
         else
           {
@@ -322,9 +194,8 @@ _els_box_layout_ex(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, i
                               yy + (Evas_Coord)(((double)(hh - oh)) * ay));
              evas_object_resize(obj, ow, oh);
              yy += hh;
+             yy += priv->pad.v;
           }
-
-        obj_index++;
      }
 }
 

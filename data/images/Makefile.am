@@ -45,6 +45,8 @@ copypaste_icon_clipboard.png \
 copypaste_icon_search.png \
 copypaste_icon_share.png \
 mystrale.jpg \
-mystrale_2.jpg
+mystrale_2.jpg \
+twofish.jpg \
+pt.png
 
 EXTRA_DIST = $(files_DATA)

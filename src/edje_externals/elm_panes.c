@@ -39,7 +39,7 @@ static void external_panes_state_set(void *data __UNUSED__,
 		elm_panes_horizontal_set(obj, p->horizontal);
 
 	if(p->is_fixed)
-	                elm_panes_fixed_set(obj, p->fixed);
+		elm_panes_fixed_set(obj, p->fixed);
 }
 
 static Eina_Bool external_panes_param_set(void *data __UNUSED__,
@@ -75,12 +75,12 @@ static Eina_Bool external_panes_param_set(void *data __UNUSED__,
 		elm_panes_content_left_size_set(obj, param->d);
 		return EINA_TRUE;
 	}
-        else if ((!strcmp(param->name, "fixed"))
-                        && (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
-        {
-                elm_panes_fixed_set(obj, param->i);
-                return EINA_TRUE;
-        }
+	else if ((!strcmp(param->name, "fixed"))
+					&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
+	{
+			elm_panes_fixed_set(obj, param->i);
+			return EINA_TRUE;
+	}
 
 	ERR("unknown parameter '%s' of type '%s'",
 			param->name, edje_external_param_type_str(param->type));
@@ -113,12 +113,12 @@ static Eina_Bool external_panes_param_get(void *data __UNUSED__,
 		param->d = elm_panes_content_left_size_get(obj);
 		return EINA_TRUE;
 	}
-        else if ((!strcmp(param->name, "fixed"))
-                        && (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
-        {
-                param->i = elm_panes_fixed_get(obj);
-                return EINA_TRUE;
-        }
+	else if ((!strcmp(param->name, "fixed"))
+					&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
+	{
+			param->i = elm_panes_fixed_get(obj);
+			return EINA_TRUE;
+	}
 
 	ERR("unknown parameter '%s' of type '%s'",
 			param->name, edje_external_param_type_str(param->type));
@@ -152,11 +152,11 @@ static void * external_panes_params_parse(void *data __UNUSED__, Evas_Object *ob
 			mem->is_left_size = EINA_TRUE;
 			mem->left_size = param->d;
 		}
-                else if (!strcmp(param->name, "fixed"))
-                {
-                        mem->is_fixed = EINA_TRUE;
-                        mem->fixed = param->i;
-                }
+		else if (!strcmp(param->name, "fixed"))
+		{
+				mem->is_fixed = EINA_TRUE;
+				mem->fixed = param->i;
+		}
 
 	}
 

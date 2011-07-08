@@ -21,7 +21,10 @@ AM_CPPFLAGS = \
 @ELEMENTARY_EDBUS_CFLAGS@ \
 @ELEMENTARY_EFREET_CFLAGS@ \
 @ELEMENTARY_ETHUMB_CFLAGS@ \
+@ELEMENTARY_EMAP_CFLAGS@ \
 @EVIL_CFLAGS@ \
+@EIO_CFLAGS@ \
+@EMOTION_CFLAGS@ \
 @EFL_PTHREAD_CFLAGS@
 
 if ELEMENTARY_WINDOWS_BUILD
@@ -41,8 +44,8 @@ elm_priv.h \
 elc_anchorblock.c \
 elc_anchorview.c \
 elc_ctxpopup.c \
-elc_fileselector.c \
 elc_fileselector_button.c \
+elc_fileselector.c \
 elc_fileselector_entry.c \
 elc_hoversel.c \
 elc_navigationbar.c \
@@ -77,6 +80,9 @@ elm_font.c \
 elm_frame.c \
 elm_gengrid.c \
 elm_genlist.c \
+elm_genscroller.c \
+elm_glview.c \
+elm_grid.c \
 elm_hover.c \
 elm_icon.c \
 elm_image.c \
@@ -86,8 +92,8 @@ elm_label.c \
 elm_layout.c \
 elm_list.c \
 elm_main.c \
-elm_map.c \
 elm_mapbuf.c \
+elm_map.c \
 elm_menu.c \
 elm_module.c \
 elm_multibuttonentry.c \
@@ -120,6 +126,7 @@ elm_toggle.c \
 elm_toolbar.c \
 elm_transit.c \
 elm_util.c \
+elm_video.c \
 elm_widget.c \
 elm_win.c \
 els_box.c \
@@ -146,7 +153,10 @@ libelementary_la_LIBADD = \
 @ELEMENTARY_EDBUS_LIBS@ \
 @ELEMENTARY_EFREET_LIBS@ \
 @ELEMENTARY_ETHUMB_LIBS@ \
+@ELEMENTARY_EMAP_LIBS@ \
 @EVIL_LIBS@ \
+@EIO_LIBS@ \
+@EMOTION_LIBS@ \
 @EFL_PTHREAD_LIBS@
 libelementary_la_LDFLAGS = \
 -no-undefined @lt_enable_auto_import@ \

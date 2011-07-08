@@ -25,7 +25,7 @@ my_anchorblock_anchor(void *data, Evas_Object *obj, void *event_info)
    Evas_Object *bt, *bx;
 
    bt = elm_button_add(obj);
-   elm_button_label_set(bt, ei->name);
+   elm_object_text_set(bt, ei->name);
    elm_hover_content_set(ei->hover, "middle", bt);
    evas_object_show(bt);
 
@@ -34,17 +34,17 @@ my_anchorblock_anchor(void *data, Evas_Object *obj, void *event_info)
      {
 	bx = elm_box_add(obj);
 	bt = elm_button_add(obj);
-	elm_button_label_set(bt, "Top 1");
+	elm_object_text_set(bt, "Top 1");
 	elm_box_pack_end(bx, bt);
 	evas_object_smart_callback_add(bt, "clicked", my_anchorblock_bt, av);
 	evas_object_show(bt);
 	bt = elm_button_add(obj);
-	elm_button_label_set(bt, "Top 2");
+	elm_object_text_set(bt, "Top 2");
 	elm_box_pack_end(bx, bt);
 	evas_object_smart_callback_add(bt, "clicked", my_anchorblock_bt, av);
 	evas_object_show(bt);
 	bt = elm_button_add(obj);
-	elm_button_label_set(bt, "Top 3");
+	elm_object_text_set(bt, "Top 3");
 	elm_box_pack_end(bx, bt);
 	evas_object_smart_callback_add(bt, "clicked", my_anchorblock_bt, av);
 	evas_object_show(bt);
@@ -54,7 +54,7 @@ my_anchorblock_anchor(void *data, Evas_Object *obj, void *event_info)
    if (ei->hover_bottom)
      {
 	bt = elm_button_add(obj);
-	elm_button_label_set(bt, "Bot");
+	elm_object_text_set(bt, "Bot");
 	elm_hover_content_set(ei->hover, "bottom", bt);
 	evas_object_smart_callback_add(bt, "clicked", my_anchorblock_bt, av);
 	evas_object_show(bt);
@@ -62,7 +62,7 @@ my_anchorblock_anchor(void *data, Evas_Object *obj, void *event_info)
    if (ei->hover_left)
      {
 	bt = elm_button_add(obj);
-	elm_button_label_set(bt, "Left");
+	elm_object_text_set(bt, "Left");
 	elm_hover_content_set(ei->hover, "left", bt);
 	evas_object_smart_callback_add(bt, "clicked", my_anchorblock_bt, av);
 	evas_object_show(bt);
@@ -70,7 +70,7 @@ my_anchorblock_anchor(void *data, Evas_Object *obj, void *event_info)
    if (ei->hover_right)
      {
 	bt = elm_button_add(obj);
-	elm_button_label_set(bt, "Right");
+	elm_object_text_set(bt, "Right");
 	elm_hover_content_set(ei->hover, "right", bt);
 	evas_object_smart_callback_add(bt, "clicked", my_anchorblock_bt, av);
 	evas_object_show(bt);
@@ -147,8 +147,8 @@ test_anchorblock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_HORIZONTAL, 1, 1);
 
    bb = elm_bubble_add(win);
-   elm_bubble_label_set(bb, "Message 3");
-   elm_bubble_info_set(bb, "10:32 4/11/2008");
+   elm_object_text_set(bb, "Message 3");
+   elm_object_text_part_set(bb, "info", "10:32 4/11/2008");
    elm_bubble_icon_set(bb, ic);
    evas_object_smart_callback_add(bb, "clicked", _print_clicked, NULL);
    evas_object_show(ic);
@@ -157,11 +157,11 @@ test_anchorblock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    av = elm_anchorblock_add(win);
    elm_anchorblock_hover_style_set(av, "popout");
    elm_anchorblock_hover_parent_set(av, win);
-   elm_anchorblock_text_set(av,
+   elm_object_text_set(av,
 			   "Hi there. This is the most recent message in the "
 			   "list of messages. It has one <a href=tel:+614321234>+61 432 1234</a> "
 			   "(phone number) to click on.");
-   evas_object_smart_callback_add(av, "anchor,clicked", 
+   evas_object_smart_callback_add(av, "anchor,clicked",
                                   my_anchorblock_anchor, av);
    elm_bubble_content_set(bb, av);
    evas_object_show(av);
@@ -174,8 +174,8 @@ test_anchorblock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 
    bb = elm_bubble_add(win);
-   elm_bubble_label_set(bb, "Message 2");
-   elm_bubble_info_set(bb, "7:16 27/10/2008");
+   elm_object_text_set(bb, "Message 2");
+   elm_object_text_part_set(bb, "info", "7:16 27/10/2008");
    elm_bubble_icon_set(bb, ic);
    evas_object_smart_callback_add(bb, "clicked", _print_clicked, NULL);
    evas_object_show(ic);
@@ -184,7 +184,7 @@ test_anchorblock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    av = elm_anchorblock_add(win);
    elm_anchorblock_hover_style_set(av, "popout");
    elm_anchorblock_hover_parent_set(av, win);
-   elm_anchorblock_text_set(av,
+   elm_object_text_set(av,
 			   "Hey what are you doing? This is the second last message "
 			   "Hi there. This is the most recent message in the "
 			   "list. It's a longer one so it can wrap more and "
@@ -211,8 +211,8 @@ test_anchorblock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_HORIZONTAL, 1, 1);
 
    bb = elm_bubble_add(win);
-   elm_bubble_label_set(bb, "Message 1");
-   elm_bubble_info_set(bb, "20:47 18/6/2008");
+   elm_object_text_set(bb, "Message 1");
+   elm_object_text_part_set(bb, "info", "20:47 18/6/2008");
    elm_bubble_icon_set(bb, ic);
    evas_object_smart_callback_add(bb, "clicked", _print_clicked, NULL);
    evas_object_show(ic);
@@ -222,8 +222,8 @@ test_anchorblock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    av = elm_anchorblock_add(win);
    elm_anchorblock_hover_style_set(av, "popout");
    elm_anchorblock_hover_parent_set(av, win);
-   elm_anchorblock_text_set(av, "This is a short message. <item relsize=16x16 vsize=full href=emoticon/haha></item>");
-   evas_object_smart_callback_add(av, "anchor,clicked", 
+   elm_object_text_set(av, "This is a short message. <item relsize=16x16 vsize=full href=emoticon/haha></item>");
+   evas_object_smart_callback_add(av, "anchor,clicked",
                                   my_anchorblock_anchor, av);
    elm_bubble_content_set(bb, av);
    evas_object_show(av);
@@ -232,7 +232,7 @@ test_anchorblock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
 
    elm_scroller_content_set(sc, bx);
    evas_object_show(bx);
-   
+
    evas_object_show(sc);
 
    evas_object_resize(win, 320, 300);

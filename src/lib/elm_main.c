@@ -167,7 +167,7 @@ sudo make install
 @endverbatim
  *
  * Note sudo was assumed to get root permissions, as this would install in
- * /usr/local which is system-owned. Ue any way you like to gain root, or
+ * /usr/local which is system-owned. Use any way you like to gain root, or
  * specify a different prefix with configure:
  *
 @verbatim
@@ -196,7 +196,7 @@ make distcheck
  * included (that is sources for your application, not libraries it depends
  * on like Elementary). It builds cleanly in a buildroot and does not
  * contain any files that are temporarily generated like binaries and other
- * build-gnerated files, so the tarball is clean, and no need to worry
+ * build-generated files, so the tarball is clean, and no need to worry
  * about cleaning up your tree before packaging.
  *
 @verbatim
@@ -298,6 +298,7 @@ static Eina_Bool _elm_signal_exit(void *data,
                                   int   ev_type,
                                   void *ev);
 
+static Eina_Prefix *pfx = NULL;
 char *_elm_appname = NULL;
 const char *_elm_data_dir = NULL;
 const char *_elm_lib_dir = NULL;
@@ -328,20 +329,87 @@ _elm_rescale(void)
    _elm_win_rescale(NULL, EINA_FALSE);
 }
 
-/**
- * @defgroup General General
- * @ingroup Main
- */
+static void *app_mainfunc = NULL;
+static const char *app_domain = NULL;
+static const char *app_checkfile = NULL;
 
-/**
- * Inititalise Elementary
- *
- * @return The init counter value.
- *
- * This call is exported only for use by the ELM_MAIN() macro. There is no
- * need to use this if you use this macro (which is highly advisable).
- * @ingroup General
- */
+static const char *app_compile_bin_dir = NULL;
+static const char *app_compile_lib_dir = NULL;
+static const char *app_compile_data_dir = NULL;
+static const char *app_compile_locale_dir = NULL;
+static const char *app_prefix_dir = NULL;
+static const char *app_bin_dir = NULL;
+static const char *app_lib_dir = NULL;
+static const char *app_data_dir = NULL;
+static const char *app_locale_dir = NULL;
+
+static Eina_Prefix *app_pfx = NULL;
+
+static void
+_prefix_check(void)
+{
+   int argc = 0;
+   char **argv = NULL;
+   const char *dirs[4] = { NULL, NULL, NULL, NULL };
+   char *caps = NULL, *p1, *p2;
+
+   if (app_pfx) return;
+   if (!app_domain) return;
+
+   ecore_app_args_get(&argc, &argv);
+   if (argc < 1) return;
+
+   dirs[0] = app_compile_bin_dir;
+   dirs[1] = app_compile_lib_dir;
+   dirs[2] = app_compile_data_dir;
+   dirs[3] = app_compile_locale_dir;
+
+   if (!dirs[1]) dirs[1] = dirs[0];
+   if (!dirs[0]) dirs[0] = dirs[1];
+   if (!dirs[3]) dirs[3] = dirs[2];
+   if (!dirs[2]) dirs[2] = dirs[3];
+
+   if (app_domain)
+     {
+        caps = alloca(strlen(app_domain) + 1);
+        for (p1 = (char *)app_domain, p2 = caps; *p1; p1++, p2++)
+           *p2 = toupper(*p1);
+        *p2 = 0;
+     }
+   app_pfx = eina_prefix_new(argv[0], app_mainfunc, caps, app_domain,
+                             app_checkfile, dirs[0], dirs[1], dirs[2], dirs[3]);
+}
+
+static void
+_prefix_shutdown(void)
+{
+   if (app_pfx) eina_prefix_free(app_pfx);
+   if (app_domain) eina_stringshare_del(app_domain);
+   if (app_checkfile) eina_stringshare_del(app_checkfile);
+   if (app_compile_bin_dir) eina_stringshare_del(app_compile_bin_dir);
+   if (app_compile_lib_dir) eina_stringshare_del(app_compile_lib_dir);
+   if (app_compile_data_dir) eina_stringshare_del(app_compile_data_dir);
+   if (app_compile_locale_dir) eina_stringshare_del(app_compile_locale_dir);
+   if (app_prefix_dir) eina_stringshare_del(app_prefix_dir);
+   if (app_bin_dir) eina_stringshare_del(app_bin_dir);
+   if (app_lib_dir) eina_stringshare_del(app_lib_dir);
+   if (app_data_dir) eina_stringshare_del(app_data_dir);
+   if (app_locale_dir) eina_stringshare_del(app_locale_dir);
+   app_mainfunc = NULL;
+   app_domain = NULL;
+   app_checkfile = NULL;
+   app_compile_bin_dir = NULL;
+   app_compile_lib_dir = NULL;
+   app_compile_data_dir = NULL;
+   app_compile_locale_dir = NULL;
+   app_prefix_dir = NULL;
+   app_bin_dir = NULL;
+   app_lib_dir = NULL;
+   app_data_dir = NULL;
+   app_locale_dir = NULL;
+   app_pfx = NULL;
+}
+
 EAPI int
 elm_init(int    argc,
          char **argv)
@@ -350,33 +418,104 @@ elm_init(int    argc,
    if (_elm_init_count > 1) return _elm_init_count;
    elm_quicklaunch_init(argc, argv);
    elm_quicklaunch_sub_init(argc, argv);
+   _prefix_shutdown();
    return _elm_init_count;
 }
 
-/**
- * Shut down Elementary
- *
- * @return The init counter value.
- *
- * This should be called at the end of your application just before it ceases
- * to do any more processing. This will clean up any permanent resources your
- * application may have allocated via Elementary that would otherwise persist
- * on an exit without this call.
- * @ingroup General
- */
 EAPI int
 elm_shutdown(void)
 {
    _elm_init_count--;
    if (_elm_init_count > 0) return _elm_init_count;
-// FIXME : it can cause abnormal program exit
-// After app-core fixing the issue about app's callback fucntion pointer,
-// activate _elm_win_shutdown();
    _elm_win_shutdown();
    while (_elm_win_deferred_free) ecore_main_loop_iterate();
+// wrningz :(
+//   _prefix_shutdown();
    elm_quicklaunch_sub_shutdown();
    elm_quicklaunch_shutdown();
    return _elm_init_count;
+}
+
+EAPI void
+elm_app_info_set(void *mainfunc, const char *dom, const char *checkfile)
+{
+   app_mainfunc = mainfunc;
+   eina_stringshare_replace(&app_domain, dom);
+   eina_stringshare_replace(&app_checkfile, checkfile);
+}
+
+EAPI void
+elm_app_compile_bin_dir_set(const char *dir)
+{
+   eina_stringshare_replace(&app_compile_bin_dir, dir);
+}
+
+EAPI void
+elm_app_compile_lib_dir_set(const char *dir)
+{
+   eina_stringshare_replace(&app_compile_lib_dir, dir);
+}
+
+EAPI void
+elm_app_compile_data_dir_set(const char *dir)
+{
+   eina_stringshare_replace(&app_compile_data_dir, dir);
+}
+
+EAPI void
+elm_app_compile_locale_set(const char *dir)
+{
+   eina_stringshare_replace(&app_compile_locale_dir, dir);
+}
+
+EAPI const char *
+elm_app_prefix_dir_get(void)
+{
+   if (app_prefix_dir) return app_prefix_dir;
+   _prefix_check();
+  if (!app_pfx) return "";
+   app_prefix_dir = eina_prefix_get(app_pfx);
+   return app_prefix_dir;
+}
+
+EAPI const char *
+elm_app_bin_dir_get(void)
+{
+   if (app_bin_dir) return app_bin_dir;
+   _prefix_check();
+   if (!app_pfx) return "";
+   app_bin_dir = eina_prefix_bin_get(app_pfx);
+   return app_bin_dir;
+}
+
+EAPI const char *
+elm_app_lib_dir_get(void)
+{
+   if (app_lib_dir) return app_lib_dir;
+   _prefix_check();
+   if (!app_pfx) return "";
+   app_lib_dir = eina_prefix_lib_get(app_pfx);
+   return app_lib_dir;
+}
+
+EAPI const char *
+elm_app_data_dir_get(void)
+{
+   if (app_data_dir) return app_data_dir;
+   _prefix_check();
+   if (!app_pfx) return "";
+   app_data_dir = eina_prefix_data_get(app_pfx);
+   return app_data_dir;
+}
+
+EAPI const char *
+elm_app_locale_dir_get(void)
+{
+   if (app_locale_dir) return app_locale_dir;
+   _prefix_check();
+   if (!app_pfx) return "";
+   app_locale_dir = eina_prefix_locale_get(app_pfx);
+   return app_locale_dir;
 }
 
 #ifdef ELM_EDBUS
@@ -388,7 +527,6 @@ elm_need_e_dbus(void)
 #ifdef ELM_EDBUS
    if (_elm_need_e_dbus++) return EINA_TRUE;
    e_dbus_init();
-   e_hal_init();
    return EINA_TRUE;
 #else
    return EINA_FALSE;
@@ -402,7 +540,6 @@ _elm_unneed_e_dbus(void)
    if (--_elm_need_e_dbus) return;
 
    _elm_need_e_dbus = 0;
-   e_hal_shutdown();
    e_dbus_shutdown();
 #endif
 }
@@ -467,8 +604,6 @@ EAPI int
 elm_quicklaunch_init(int    argc,
                      char **argv)
 {
-   char buf[PATH_MAX], *s;
-
    _elm_ql_init_count++;
    if (_elm_ql_init_count > 1) return _elm_ql_init_count;
    eina_init();
@@ -481,6 +616,10 @@ elm_quicklaunch_init(int    argc,
 
    eet_init();
    ecore_init();
+
+#ifdef HAVE_ELEMENTARY_EMAP
+   emap_init();
+#endif
    ecore_app_args_set(argc, (const char **)argv);
 
    memset(_elm_policies, 0, sizeof(_elm_policies));
@@ -493,75 +632,19 @@ elm_quicklaunch_init(int    argc,
 
    if (argv) _elm_appname = strdup(ecore_file_file_get(argv[0]));
 
-   if (!_elm_data_dir)
+   pfx = eina_prefix_new(NULL, elm_quicklaunch_init,
+                         "ELM", "elementary", "config/profile.cfg",
+                         PACKAGE_LIB_DIR, /* don't have a bin dir currently */
+                         PACKAGE_LIB_DIR,
+                         PACKAGE_DATA_DIR,
+                         LOCALE_DIR);
+   if (pfx)
      {
-        s = getenv("ELM_DATA_DIR");
-        _elm_data_dir = eina_stringshare_add(s);
+        _elm_data_dir = eina_stringshare_add(eina_prefix_data_get(pfx));
+        _elm_lib_dir = eina_stringshare_add(eina_prefix_lib_get(pfx));
      }
-   if (!_elm_data_dir)
-     {
-        s = getenv("ELM_PREFIX");
-        if (s)
-          {
-             snprintf(buf, sizeof(buf), "%s/share/elementary", s);
-             _elm_data_dir = eina_stringshare_add(buf);
-          }
-     }
-   if (!_elm_lib_dir)
-     {
-        s = getenv("ELM_LIB_DIR");
-        _elm_lib_dir = eina_stringshare_add(s);
-     }
-   if (!_elm_lib_dir)
-     {
-        s = getenv("ELM_PREFIX");
-        if (s)
-          {
-             snprintf(buf, sizeof(buf), "%s/lib", s);
-             _elm_lib_dir = eina_stringshare_add(buf);
-          }
-     }
-#ifdef HAVE_DLADDR
-   if ((!_elm_data_dir) || (!_elm_lib_dir))
-     {
-        Dl_info elementary_dl;
-        // libelementary.so/../../share/elementary/
-        if (dladdr(elm_init, &elementary_dl))
-          {
-             char *dir, *dir2;
-
-             dir = ecore_file_dir_get(elementary_dl.dli_fname);
-             if (dir)
-               {
-                  if (!_elm_lib_dir)
-                    {
-                       if (ecore_file_is_dir(dir))
-                         _elm_lib_dir = eina_stringshare_add(dir);
-                    }
-                  if (!_elm_data_dir)
-                    {
-                       dir2 = ecore_file_dir_get(dir);
-                       if (dir2)
-                         {
-                            snprintf(buf, sizeof(buf), "%s/share/elementary", dir2);
-                            if (ecore_file_is_dir(buf))
-                              _elm_data_dir = eina_stringshare_add(buf);
-                            free(dir2);
-                         }
-                    }
-                  free(dir);
-               }
-          }
-     }
-#endif
-   if (!_elm_data_dir)
-     _elm_data_dir = eina_stringshare_add(PACKAGE_DATA_DIR);
-   if (!_elm_data_dir)
-     _elm_data_dir = eina_stringshare_add("/");
-   if (!_elm_lib_dir)
-     _elm_lib_dir = eina_stringshare_add(PACKAGE_LIB_DIR);
-   if (!_elm_lib_dir)
-     _elm_lib_dir = eina_stringshare_add("/");
+   if (!_elm_data_dir) _elm_data_dir = eina_stringshare_add("/");
+   if (!_elm_lib_dir) _elm_lib_dir = eina_stringshare_add("/");
 
    _elm_config_init();
    return _elm_ql_init_count;
@@ -654,6 +737,8 @@ elm_quicklaunch_shutdown(void)
 {
    _elm_ql_init_count--;
    if (_elm_ql_init_count > 0) return _elm_ql_init_count;
+   if (pfx) eina_prefix_free(pfx);
+   pfx = NULL;
    eina_stringshare_del(_elm_data_dir);
    _elm_data_dir = NULL;
    eina_stringshare_del(_elm_lib_dir);
@@ -672,6 +757,11 @@ elm_quicklaunch_shutdown(void)
    _elm_unneed_e_dbus();
    _elm_unneed_ethumb();
    ecore_file_shutdown();
+
+#ifdef HAVE_ELEMENTARY_EMAP
+   emap_shutdown();
+#endif
+
    ecore_shutdown();
    eet_shutdown();
 
@@ -987,51 +1077,18 @@ elm_quicklaunch_exe_path_get(const char *exe)
    return NULL;
 }
 
-/**
- * Run the main loop
- *
- * This call should be called just after all initialization is complete. This
- * function will not return until elm_exit() is called. It will keep looping
- * running the main event/processing loop for Elementary.
- * @ingroup General
- */
 EAPI void
 elm_run(void)
 {
    ecore_main_loop_begin();
 }
 
-/**
- * Exit the main loop
- *
- * If this call is called, it will flag the main loop to cease processing and
- * return back to its parent function.
- * @ingroup General
- */
 EAPI void
 elm_exit(void)
 {
    ecore_main_loop_quit();
 }
 
-/**
- * Set new policy value.
- *
- * This will emit the ecore event ELM_EVENT_POLICY_CHANGED in the main
- * loop giving the event information Elm_Event_Policy_Changed with
- * policy identifier, new and old values.
- *
- * @param policy policy identifier as in Elm_Policy.
- * @param value policy value, depends on identifiers, usually there is
- *        an enumeration with the same prefix as the policy name, for
- *        example: ELM_POLICY_QUIT and Elm_Policy_Quit
- *        (ELM_POLICY_QUIT_NONE, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED).
- * @ingroup General
- *
- * @return @c EINA_TRUE on success or @c EINA_FALSE on error (right
- *         now just invalid policy identifier, but in future policy
- *         value might be enforced).
- */
 EAPI Eina_Bool
 elm_policy_set(unsigned int policy,
                int          value)
@@ -1058,14 +1115,6 @@ elm_policy_set(unsigned int policy,
    return EINA_TRUE;
 }
 
-/**
- * Gets the policy value set for given identifier.
- *
- * @param policy policy identifier as in Elm_Policy.
- * @ingroup General
- *
- * @return policy value. Will be 0 if policy identifier is invalid.
- */
 EAPI int
 elm_policy_get(unsigned int policy)
 {
@@ -1077,7 +1126,7 @@ elm_policy_get(unsigned int policy)
 /**
  * @defgroup UI-Mirroring Selective Widget mirroring
  *
- * These functions allow you to set ui-miroring on specific widgets or whe
+ * These functions allow you to set ui-mirroring on specific widgets or the
  * whole interface. Widgets can be in one of two modes, automatic and manual.
  * Automatic means they'll be changed according to the system mirroring mode
  * and manual means only explicit changes will matter. You are not supposed to
@@ -1140,25 +1189,6 @@ elm_object_mirrored_automatic_set(Evas_Object *obj, Eina_Bool automatic)
    elm_widget_mirrored_automatic_set(obj, automatic);
 }
 
-/**
- * @defgroup Scaling Selective Widget Scaling
- * @ingroup Main
- *
- * Different widgets can be scaled independently. These functions allow you to
- * manipulate this scaling on a per-widget basis. The object and all its
- * children get their scaling factors multiplied by the scale factor set.
- * This is multiplicative, in that if a child also has a scale size set it is
- * in turn multiplied by its parent's scale size. 1.0 means “don't scale”,
- * 2.0 is double size, 0.5 is half etc.
- */
-
-/**
- * Set the scaling factor
- *
- * @param obj The object
- * @param scale Scale factor (from 0.0 up, with 1.0 == no scaling)
- * @ingroup Scaling
- */
 EAPI void
 elm_object_scale_set(Evas_Object *obj,
                      double       scale)
@@ -1167,18 +1197,25 @@ elm_object_scale_set(Evas_Object *obj,
    elm_widget_scale_set(obj, scale);
 }
 
-/**
- * Get the scaling factor
- *
- * @param obj The object
- * @return The scaling factor set by elm_object_scale_set()
- * @ingroup Scaling
- */
 EAPI double
 elm_object_scale_get(const Evas_Object *obj)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(obj, 0.0);
    return elm_widget_scale_get(obj);
+}
+
+EAPI void
+elm_object_text_part_set(Evas_Object *obj, const char *item, const char *label)
+{
+   EINA_SAFETY_ON_NULL_RETURN(obj);
+   elm_widget_text_part_set(obj, item, label);
+}
+
+EAPI const char *
+elm_object_text_part_get(const Evas_Object *obj, const char *item)
+{
+   EINA_SAFETY_ON_NULL_RETURN_VAL(obj, NULL);
+   return elm_widget_text_part_get(obj, item);
 }
 
 /**
@@ -1234,22 +1271,6 @@ elm_scale_all_set(double scale)
 #endif
 }
 
-/**
- * @defgroup Styles Styles
- * @ingroup Main
- *
- * Widgets can have different styles of look. These generic API's set
- * styles of widgets, if they support them (and if the theme(s) do).
- */
-
-/**
- * Set the style
- *
- * This sets the name of the style
- * @param obj The object
- * @param style The style name to use
- * @ingroup Styles
- */
 EAPI void
 elm_object_style_set(Evas_Object *obj,
                      const char  *style)
@@ -1258,17 +1279,6 @@ elm_object_style_set(Evas_Object *obj,
    elm_widget_style_set(obj, style);
 }
 
-/**
- * Get the style
- *
- * This gets the style being used for that widget. Note that the string
- * pointer is only valid as longas the object is valid and the style doesn't
- * change.
- *
- * @param obj The object
- * @return The style name
- * @ingroup Styles
- */
 EAPI const char *
 elm_object_style_get(const Evas_Object *obj)
 {
@@ -1276,15 +1286,6 @@ elm_object_style_get(const Evas_Object *obj)
    return elm_widget_style_get(obj);
 }
 
-/**
- * Set the disable state
- *
- * This sets the disable state for the widget.
- *
- * @param obj The object
- * @param disabled The state
- * @ingroup Styles
- */
 EAPI void
 elm_object_disabled_set(Evas_Object *obj,
                         Eina_Bool    disabled)
@@ -1293,15 +1294,6 @@ elm_object_disabled_set(Evas_Object *obj,
    elm_widget_disabled_set(obj, disabled);
 }
 
-/**
- * Get the disable state
- *
- * This gets the disable state for the widget.
- *
- * @param obj The object
- * @return True, if the widget is disabled
- * @ingroup Styles
- */
 EAPI Eina_Bool
 elm_object_disabled_get(const Evas_Object *obj)
 {
@@ -1812,23 +1804,6 @@ elm_font_available_hash_del(Eina_Hash *hash)
    _elm_font_available_hash_del(hash);
 }
 
-/**
- * @defgroup Fingers Fingers
- * @ingroup Main
- *
- * Elementary is designed to be finger-friendly for touchscreens, and so in
- * addition to scaling for display resolution, it can also scale based on
- * finger "resolution" (or size).
- */
-
-/**
- * Get the configured finger size
- *
- * This gets the globally configured finger size in pixels
- *
- * @return The finger size
- * @ingroup Fingers
- */
 EAPI Evas_Coord
 elm_finger_size_get(void)
 {
@@ -1870,7 +1845,7 @@ elm_finger_size_all_set(Evas_Coord size)
    if (!atom) atom = ecore_x_atom_get("ENLIGHTENMENT_FINGER_SIZE");
    ecore_x_window_prop_card32_set(ecore_x_window_root_first_get(),
                                   atom, &size_i, 1);
-#endif   
+#endif
 }
 
 EAPI void
@@ -1883,8 +1858,6 @@ elm_autocapitalization_allow_all_set(Eina_Bool on)
    if (!atom) atom = ecore_x_atom_get("ENLIGHTENMENT_AUTOCAPITAL_ALLOW");
    ecore_x_window_prop_card32_set(ecore_x_window_root_first_get(),
                                   atom, &on_i, 1);
-#endif
-}
 
 EAPI void
 elm_autoperiod_allow_all_set(Eina_Bool on)
@@ -2061,7 +2034,7 @@ elm_cache_flush_enabled_set(Eina_Bool enabled)
  * Set the configured cache flush enabled state for all applications on the
  * display
  *
- * This sets the globally configured cache flush enabled state for all 
+ * This sets the globally configured cache flush enabled state for all
  * applications on the display.
  *
  * @param size The cache flush enabled state
@@ -2300,23 +2273,6 @@ elm_edje_collection_cache_all_set(int size)
 #endif
 }
 
-/**
- * @defgroup Focus Focus
- * @ingroup Main
- *
- * Objects have focus. This is what determines where the keyboard input goes to
- * within the application window.
- */
-
-/**
- * Get the focus of the object
- *
- * This gets the focused property of the object.
- *
- * @param obj The object
- * @return 1 if the object is focused, 0 if not.
- * @ingroup Focus
- */
 EAPI Eina_Bool
 elm_object_focus_get(const Evas_Object *obj)
 {
@@ -2324,14 +2280,6 @@ elm_object_focus_get(const Evas_Object *obj)
    return elm_widget_focus_get(obj);
 }
 
-/**
- * Set the focus to the object
- *
- * This sets the focus target for keyboard input to be the object indicated.
- *
- * @param obj The object
- * @ingroup Focus
- */
 EAPI void
 elm_object_focus(Evas_Object *obj)
 {
@@ -2342,15 +2290,6 @@ elm_object_focus(Evas_Object *obj)
    elm_widget_focus_cycle(obj, ELM_FOCUS_NEXT);
 }
 
-/**
- * Remove the focus from the object
- *
- * This removes the focus target for keyboard input from be the object
- * indicated.
- *
- * @param obj The object
- * @ingroup Focus
- */
 EAPI void
 elm_object_unfocus(Evas_Object *obj)
 {
@@ -2359,16 +2298,6 @@ elm_object_unfocus(Evas_Object *obj)
    elm_widget_focused_object_clear(obj);
 }
 
-/**
- * Set the ability for the object to focus
- *
- * This sets the ability for the object to be able to get keyboard focus or
- * not. By default all objects are able to be focused.
- *
- * @param obj The object
- * @param enable 1 if the object can be focused, 0 if not
- * @ingroup Focus
- */
 EAPI void
 elm_object_focus_allow_set(Evas_Object *obj,
                            Eina_Bool    enable)
@@ -2377,16 +2306,6 @@ elm_object_focus_allow_set(Evas_Object *obj,
    elm_widget_can_focus_set(obj, enable);
 }
 
-/**
- * Get the ability for the object to focus
- *
- * This gets the ability for the object to be able to get keyboard focus or
- * not. By default all objects are able to be focused.
- *
- * @param obj The object
- * @return 1 if the object is allowed to be focused, 0 if not.
- * @ingroup Focus
- */
 EAPI Eina_Bool
 elm_object_focus_allow_get(const Evas_Object *obj)
 {
@@ -3288,15 +3207,6 @@ elm_object_scroll_freeze_pop(Evas_Object *obj)
 }
 
 /**
- * @defgroup WidgetNavigation Widget Tree Navigation.
- * @ingroup Main
- *
- * How to check if an Evas Object is an Elementary widget? How to get
- * the first elementary widget that is parent of the given object?
- * These are all covered in widget tree navigation.
- */
-
-/**
  * Check if the given Evas Object is an Elementary widget.
  *
  * @param obj the object to query.
@@ -3311,14 +3221,6 @@ elm_object_widget_check(const Evas_Object *obj)
    return elm_widget_is(obj);
 }
 
-/**
- * Get the first parent of the given object that is an Elementary widget.
- *
- * @param obj the object to query.
- * @return the parent object that is an Elementary widget, or @c NULL
- *         if no parent is, or no parents at all.
- * @ingroup WidgetNavigation
- */
 EAPI Evas_Object *
 elm_object_parent_widget_get(const Evas_Object *obj)
 {
@@ -3398,7 +3300,7 @@ elm_object_signal_emit(Evas_Object *obj,
  * @param data A pointer to data to pass in to the callback function.
  * @ingroup General
  */
-EAPI void 
+EAPI void
 elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
 {
     EINA_SAFETY_ON_NULL_RETURN(obj);
@@ -3515,7 +3417,7 @@ elm_object_tree_dot_dump(const Evas_Object *top,
                          const char        *file)
 {
 #ifdef ELM_DEBUG
-   FILE *f = fopen(file, "w");
+   FILE *f = fopen(file, "wb");
    elm_widget_tree_dot_dump(top, f);
    fclose(f);
 #else

@@ -5,7 +5,6 @@
 
 /**
  * @defgroup List List
- * @ingroup Elementary
  *
  * A list is a very simple type of list widget.  For more robust
  * lists, @ref Genlist should probably be used.
@@ -932,9 +931,7 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
    it->swipe_timer = ecore_timer_add(0.4, _swipe_cancel, it);
    /* Always call the callbacks last - the user may delete our context! */
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-     {
-        evas_object_smart_callback_call(it->base.widget, SIG_CLICKED_DOUBLE, it);
-     }
+     evas_object_smart_callback_call(it->base.widget, SIG_CLICKED_DOUBLE, it);
    wd->swipe = EINA_FALSE;
    wd->movements = 0;
 
@@ -1348,7 +1345,7 @@ elm_list_add(Evas_Object *parent)
                                        _elm_config->thumbscroll_bounce_enable);
 
    wd->box = elm_box_add(parent);
-   elm_box_homogenous_set(wd->box, 1);
+   elm_box_homogeneous_set(wd->box, 1);
    evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, 0.0);
    elm_widget_on_show_region_hook_set(wd->box, _show_region_hook, obj);

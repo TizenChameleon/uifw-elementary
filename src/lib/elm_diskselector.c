@@ -6,7 +6,7 @@
  * with the selected on the middle.
  *
  * It can act like a circular list with round mode and labels can be
- * reduced for a defined lenght for side items.
+ * reduced for a defined length for side items.
  *
  * Signals that you can add callbacks for are:
  *
@@ -179,6 +179,7 @@ _theme_data_get(Widget_Data *wd)
         if (str) wd->display_item_num = MAX(DISPLAY_ITEM_NUM_MIN, atoi(str));
         else wd->display_item_num = DISPLAY_ITEM_NUM_MIN;
      }
+
    str = edje_object_data_get(wd->right_blank, "min_width");
    if (str) wd->minw = MAX(-1, atoi(str));
    else
@@ -422,20 +423,32 @@ _event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type ty
 }
 
 static int
+_count_letter(const char *str)
+{
+   int pos = 0;
+   int code = 0, chnum;
+
+   for (chnum = 0; ; chnum++)
+     {
+        pos = evas_string_char_next_get(str, pos, &code);
+        if (code == 0) break;
+     }
+   return chnum;
+}
+
+static int
 _check_letter(const char *str, int length)
 {
-   int code = str[length];
+   int pos = 0;
+   int code = 0, chnum;
 
-   if (code == '\0')
-     return length;		// null string
-   else if (((code >= 65) && (code <= 90)) || ((code >= 97) && (code <= 122)))
-     return length;		// alphabet
-   else if ((48 <= code) && (code < 58))
-     return length;		// number
-   else if (((33 <= code) && (code < 47)) || ((58 <= code) && (code < 64))
-            || ((91 <= code) && (code < 96)) || ((123 <= code) && (code < 126)))
-     return length;		// special letter
-   return length - 1;
+   for (chnum = 0; ; chnum++)
+     {
+        if (chnum == length) break;
+        pos = evas_string_char_next_get(str, pos, &code);
+        if (code == 0) break;
+     }
+   return pos;
 }
 
 static Eina_Bool
@@ -467,7 +480,9 @@ _check_string(void *data)
         if ((x + w <= ox) || (x >= ox + ow))
           continue;
 
-        len = eina_stringshare_strlen(it->label);
+        len = _count_letter(it->label);
+//        // FIXME: len should be # of ut8f letters. ie count using utf8 string walk, not stringshare len
+//        len = eina_stringshare_strlen(it->label);
 
         if (x <= ox + 5)
           edje_object_signal_emit(it->base.view, "elm,state,left_side",
@@ -485,6 +500,7 @@ _check_string(void *data)
                                        "elm");
           }
 
+        // if len is les that the limit len, skip anyway
         if (len <= wd->len_side)
           continue;
 
@@ -497,7 +513,9 @@ _check_string(void *data)
 
         length = len - (int)(diff * steps / (ow / 3));
         length = MAX(length, wd->len_side);
+        // limit string len to "length" ut8f chars
         length = _check_letter(it->label, length);
+        // cut it off at byte mark returned form _check_letter
         strncpy(buf, it->label, length);
         buf[length] = '\0';
         edje_object_part_text_set(it->base.view, "elm.text", buf);
@@ -811,7 +829,7 @@ elm_diskselector_add(Evas_Object *parent)
 
    wd->main_box = elm_box_add(parent);
    elm_box_horizontal_set(wd->main_box, EINA_TRUE);
-   elm_box_homogenous_set(wd->main_box, EINA_TRUE);
+   elm_box_homogeneous_set(wd->main_box, EINA_TRUE);
    evas_object_size_hint_weight_set(wd->main_box, EVAS_HINT_EXPAND,
                                     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->main_box, EVAS_HINT_FILL,
@@ -939,16 +957,16 @@ elm_diskselector_round_set(Evas_Object * obj, Eina_Bool round)
 }
 
 /**
- * Get the side labels max lenght
+ * Get the side labels max length
  *
  * @param obj The diskselector object
- * @return The max lenght defined for side labels, or 0 if not a valid
+ * @return The max length defined for side labels, or 0 if not a valid
  * diskselector
  *
  * @ingroup Diskselector
  */
 EAPI int
-elm_diskselector_side_label_lenght_get(const Evas_Object *obj)
+elm_diskselector_side_label_length_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) 0;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -957,20 +975,32 @@ elm_diskselector_side_label_lenght_get(const Evas_Object *obj)
 }
 
 /**
- * Set the side labels max lenght
+ * Set the side labels max length
  *
  * @param obj The diskselector object
- * @param len The max lenght defined for side labels
+ * @param len The max length defined for side labels
  *
  * @ingroup Diskselector
  */
 EAPI void
-elm_diskselector_side_label_lenght_set(Evas_Object *obj, int len)
+elm_diskselector_side_label_length_set(Evas_Object *obj, int len)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    wd->len_side = len;
+}
+
+EAPI void
+elm_diskselector_side_label_lenght_set(Evas_Object *obj, int len)
+{
+   return elm_diskselector_side_label_length_set(obj, len);
+}
+
+EAPI int
+elm_diskselector_side_label_lenght_get(const Evas_Object *obj)
+{
+   return elm_diskselector_side_label_length_get(obj);
 }
 
 /**

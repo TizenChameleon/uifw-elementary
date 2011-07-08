@@ -3,7 +3,6 @@
 
 /**
  * @defgroup File_Selector_Button File Selector Button
- * @ingroup Elementary
  *
  * A button that, when clicked, creates an Elementary window (or inner
  * window) with an Elementary File Selector within. When a file is
@@ -11,8 +10,8 @@
  * exposed as an evas_object_smart_callback_call() of the button.
  *
  * Signals that you can add callbacks for are:
- * 
- * "file,chosen" - the user has selected a path, whose string pointer comes 
+ *
+ * "file,chosen" - the user has selected a path, whose string pointer comes
  *                 as event info
  *
  */
@@ -255,6 +254,27 @@ _selection_done(void            *data,
                                    (void *)wd->fsd.path);
 }
 
+static void
+_elm_fileselector_button_label_set(Evas_Object *obj, const char *item,
+                                  const char  *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   if (item && strcmp(item, "default")) return;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_object_text_set(wd->btn, label);
+}
+
+static const char *
+_elm_fileselector_button_label_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return NULL;
+   if (!wd) return NULL;
+   return elm_object_text_get(wd->btn);
+}
+
 /**
  * Add a new file selector button into the parent object.
  *
@@ -282,6 +302,8 @@ elm_fileselector_button_add(Evas_Object *parent)
    elm_widget_disable_hook_set(obj, _disable_hook);
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_activate_hook_set(obj, _activate_hook);
+   elm_widget_text_set_hook_set(obj, _elm_fileselector_button_label_set);
+   elm_widget_text_get_hook_set(obj, _elm_fileselector_button_label_get);
 
    wd->self = obj;
    wd->window_title = eina_stringshare_add(DEFAULT_WINDOW_TITLE);
@@ -312,15 +334,13 @@ elm_fileselector_button_add(Evas_Object *parent)
  * @param label The text label text to be displayed on the button
  *
  * @ingroup File_Selector_Button
+ * @deprecated use elm_object_text_set() instead.
  */
 EAPI void
 elm_fileselector_button_label_set(Evas_Object *obj,
                                   const char  *label)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_button_label_set(wd->btn, label);
+   _elm_fileselector_button_label_set(obj, NULL, label);
 }
 
 /**
@@ -330,14 +350,12 @@ elm_fileselector_button_label_set(Evas_Object *obj,
  * @return The button label
  *
  * @ingroup File_Selector_Button
+ * @deprecated use elm_object_text_set() instead.
  */
 EAPI const char *
 elm_fileselector_button_label_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return elm_button_label_get(wd->btn);
+   return _elm_fileselector_button_label_get(obj, NULL);
 }
 
 /**

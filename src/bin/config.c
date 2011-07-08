@@ -80,7 +80,7 @@ struct _Fonts_Data
        lb = elm_label_add(win);                                     \
        evas_object_size_hint_weight_set(lb, EVAS_HINT_EXPAND, 0.0); \
        evas_object_size_hint_align_set(lb, EVAS_HINT_FILL, 0.5);    \
-       elm_label_label_set(lb, label);                              \
+       elm_object_text_set(lb, label);                              \
        elm_frame_content_set(pd, lb);                               \
        evas_object_show(lb);                                        \
     }                                                               \
@@ -117,6 +117,7 @@ config_exit(void *data       __UNUSED__,
      }
 
    elm_font_available_hash_del(fdata.font_hash);
+   fdata.font_hash = NULL;
 
    EINA_LIST_FREE(fdata.font_px_list, sd)
      {
@@ -131,7 +132,10 @@ config_exit(void *data       __UNUSED__,
      }
 
    if (fdata.cur_font) eina_stringshare_del(fdata.cur_font);
+   fdata.cur_font = NULL;
+
    if (fdata.cur_style) eina_stringshare_del(fdata.cur_style);
+   fdata.cur_style = NULL;
 
    elm_config_save();
    elm_exit(); /* exit the program's main loop that runs in elm_run() */
@@ -253,7 +257,7 @@ ts_change(void *data       __UNUSED__,
           void *event_info __UNUSED__)
 {
    Eina_Bool val = elm_check_state_get(obj);
-   Eina_Bool sb = elm_scroll_bounce_enabled_get();
+   Eina_Bool sb = elm_scroll_thumbscroll_enabled_get();
 
    if (val == sb) return;
    elm_scroll_thumbscroll_enabled_all_set(val);
@@ -363,7 +367,7 @@ cf_enable(void *data,
           void *event_info __UNUSED__)
 {
    Eina_Bool cf = elm_cache_flush_enabled_get();
-   Eina_Bool val = elm_check_state_get(obj); 
+   Eina_Bool val = elm_check_state_get(obj);
 
    if (cf == val) return;
    elm_object_disabled_set((Evas_Object *)data, !val);
@@ -546,12 +550,12 @@ _status_basic(Evas_Object *win,
 
    fr = elm_frame_add(win);
    evas_object_size_hint_weight_set(fr, 1.0, 1.0);
-   elm_frame_label_set(fr, "Information");
+   elm_object_text_set(fr, "Information");
    elm_box_pack_end(bx0, fr);
    evas_object_show(fr);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb,
+   elm_object_text_set(lb,
                        "Applying configuration change"
                        );
    elm_frame_content_set(fr, lb);
@@ -567,7 +571,7 @@ _status_config(Evas_Object *win,
    fr = elm_frame_add(win);
    evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_frame_label_set(fr, "Sizing");
+   elm_object_text_set(fr, "Sizing");
    elm_box_pack_end(bx0, fr);
    evas_object_show(fr);
 
@@ -1197,25 +1201,29 @@ _sample_theme_new(Evas_Object *win)
    evas_object_show(bg);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Button");
+   evas_object_size_hint_weight_set(bt, 1.0, 0.0);
+   elm_object_text_set(bt, "Button");
    elm_table_pack(base, bt, 0, 0, 1, 1);
    evas_object_show(bt);
 
    ck = elm_check_add(win);
-   elm_check_label_set(ck, "Check");
+   evas_object_size_hint_weight_set(ck, 1.0, 0.0);
+   elm_object_text_set(ck, "Check");
    elm_table_pack(base, ck, 0, 1, 1, 1);
    evas_object_show(ck);
 
    rd = elm_radio_add(win);
+   evas_object_size_hint_weight_set(rd, 1.0, 0.0);
    elm_radio_state_value_set(rd, 0);
-   elm_radio_label_set(rd, "Radio 1");
+   elm_object_text_set(rd, "Radio 1");
    elm_table_pack(base, rd, 1, 0, 1, 1);
    evas_object_show(rd);
    rdg = rd;
 
    rd = elm_radio_add(win);
+   evas_object_size_hint_weight_set(rd, 1.0, 0.0);
    elm_radio_state_value_set(rd, 1);
-   elm_radio_label_set(rd, "Radio 2");
+   elm_object_text_set(rd, "Radio 2");
    elm_radio_group_add(rd, rdg);
    elm_table_pack(base, rd, 1, 1, 1, 1);
    evas_object_show(rd);
@@ -1228,7 +1236,7 @@ _sample_theme_new(Evas_Object *win)
    evas_object_show(sp);
 
    sl = elm_slider_add(win);
-   elm_slider_label_set(sl, "Slider");
+   elm_object_text_set(sl, "Slider");
    elm_slider_span_size_set(sl, 120);
    elm_slider_min_max_set(sl, 1, 10);
    elm_slider_value_set(sl, 4);
@@ -1238,7 +1246,7 @@ _sample_theme_new(Evas_Object *win)
    evas_object_show(sl);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Frame");
+   elm_object_text_set(fr, "Frame");
    elm_table_pack(base, fr, 0, 4, 2, 1);
    evas_object_size_hint_weight_set(fr, 1.0, 1.0);
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -1256,6 +1264,7 @@ _sample_theme_new(Evas_Object *win)
    elm_list_go(li);
 
    rc = evas_object_rectangle_add(evas_object_evas_get(win));
+   evas_object_size_hint_weight_set(rc, 1.0, 1.0);
    evas_object_size_hint_min_set(rc, 160, 120);
    elm_table_pack(base, rc, 0, 4, 2, 1);
 
@@ -1275,10 +1284,12 @@ _status_config_themes(Evas_Object *win,
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    rc = evas_object_rectangle_add(evas_object_evas_get(win));
+   evas_object_size_hint_weight_set(rc, 1.0, 1.0);
    evas_object_size_hint_min_set(rc, 0, 130);
    elm_table_pack(tb, rc, 0, 0, 1, 1);
 
    rc = evas_object_rectangle_add(evas_object_evas_get(win));
+   evas_object_size_hint_weight_set(rc, 1.0, 1.0);
    evas_object_size_hint_min_set(rc, 0, 200);
    elm_table_pack(tb, rc, 0, 1, 1, 1);
 
@@ -1353,7 +1364,7 @@ _status_config_themes(Evas_Object *win,
    /* FIXME: not implemented yet
       bt = elm_button_add(win);
       evas_object_smart_callback_add(bt, "clicked", _theme_browse, win);
-      elm_button_label_set(bt, "Browse...");
+      elm_object_text_set(bt, "Browse...");
       evas_object_size_hint_weight_set(bt, 1.0, 1.0);
       evas_object_size_hint_align_set(bt, 0.9, 0.9);
       elm_frame_content_set(pd, bt);
@@ -1367,7 +1378,7 @@ _status_config_themes(Evas_Object *win,
    evas_object_show(pd);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Preview");
+   elm_object_text_set(fr, "Preview");
    evas_object_size_hint_weight_set(fr, 1.0, 1.0);
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_frame_content_set(pd, fr);
@@ -1395,15 +1406,15 @@ _status_config_themes(Evas_Object *win,
 
    pd = elm_frame_add(win);
    elm_object_style_set(pd, "pad_medium");
-   evas_object_size_hint_weight_set(pd, 0.0, 0.0);
+   evas_object_size_hint_weight_set(pd, 1.0, 0.0);
    evas_object_size_hint_align_set(pd, 0.5, 0.5);
    elm_table_pack(tb, pd, 0, 3, 1, 1);
    evas_object_show(pd);
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _theme_use, win);
-   elm_button_label_set(bt, "Use Theme");
-   evas_object_size_hint_weight_set(bt, 0.0, 0.0);
+   elm_object_text_set(bt, "Use Theme");
+   evas_object_size_hint_weight_set(bt, 1.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_frame_content_set(pd, bt);
    evas_object_show(bt);
@@ -1876,11 +1887,13 @@ _status_config_fonts(Evas_Object *win,
    /* yeah, dummy rectangles are ugly as hell, but no good way yet of
       fixing sizes */
    rc = evas_object_rectangle_add(evas_object_evas_get(win));
+   evas_object_size_hint_weight_set(rc, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(rc, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(rc, 70, 170);
    elm_table_pack(base, rc, 1, 0, 1, 1);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Font Class");
+   elm_object_text_set(fr, "Font Class");
    elm_table_pack(base, fr, 0, 0, 1, 2);
    evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -1897,7 +1910,7 @@ _status_config_fonts(Evas_Object *win,
    _font_classes_list_load(li);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Font");
+   elm_object_text_set(fr, "Font");
    elm_table_pack(base, fr, 1, 0, 1, 2);
    evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -1914,11 +1927,13 @@ _status_config_fonts(Evas_Object *win,
    ELM_LIST_DISABLE(li);
 
    rc = evas_object_rectangle_add(evas_object_evas_get(win));
+   evas_object_size_hint_weight_set(rc, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(rc, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(rc, 70, 130);
    elm_table_pack(base, rc, 1, 2, 1, 1);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Style");
+   elm_object_text_set(fr, "Style");
    elm_table_pack(base, fr, 0, 2, 1, 1);
    evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -1936,7 +1951,7 @@ _status_config_fonts(Evas_Object *win,
                                   NULL);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Size");
+   elm_object_text_set(fr, "Size");
    elm_table_pack(base, fr, 1, 2, 1, 1);
    evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -1962,9 +1977,8 @@ _status_config_fonts(Evas_Object *win,
    snprintf(buf, sizeof(buf), "%s/objects/font_preview.edj", PACKAGE_DATA_DIR);
    preview = elm_layout_add(win);
    elm_layout_file_set(preview, buf, "font_preview");
-   elm_layout_text_set(preview, "elm.text", "Preview Text — 我真的会写中文");
-   evas_object_size_hint_weight_set(preview, EVAS_HINT_EXPAND,
-                                    EVAS_HINT_EXPAND);
+   elm_object_text_part_set(preview, "elm.text", "Preview Text — 我真的会写中文");
+   evas_object_size_hint_weight_set(preview, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(preview, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(preview);
 
@@ -1981,7 +1995,7 @@ _status_config_fonts(Evas_Object *win,
 
    pd = elm_frame_add(win);
    elm_object_style_set(pd, "pad_medium");
-   evas_object_size_hint_weight_set(pd, 0.0, 0.0);
+   evas_object_size_hint_weight_set(pd, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(pd, 0.5, 0.5);
    elm_table_pack(base, pd, 0, 5, 2, 1);
    evas_object_show(pd);
@@ -1994,7 +2008,7 @@ _status_config_fonts(Evas_Object *win,
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _font_overlay_set_all, win);
-   elm_button_label_set(bt, "Set to All");
+   elm_object_text_set(bt, "Set to All");
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_box_pack_end(bx, bt);
@@ -2002,7 +2016,7 @@ _status_config_fonts(Evas_Object *win,
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _font_overlay_reset, win);
-   elm_button_label_set(bt, "Reset");
+   elm_object_text_set(bt, "Reset");
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_box_pack_end(bx, bt);
@@ -2010,7 +2024,7 @@ _status_config_fonts(Evas_Object *win,
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _font_overlay_reset_all, win);
-   elm_button_label_set(bt, "Reset All");
+   elm_object_text_set(bt, "Reset All");
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_box_pack_end(bx, bt);
@@ -2018,7 +2032,7 @@ _status_config_fonts(Evas_Object *win,
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _font_overlay_change, win);
-   elm_button_label_set(bt, "Apply");
+   elm_object_text_set(bt, "Apply");
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_box_pack_end(bx, bt);
@@ -2094,14 +2108,14 @@ _profiles_list_selected_cb(void            *data,
 
    snprintf(buf, sizeof(buf), "<hilight>Selected profile: %s</><br>",
             prof_name);
-   elm_label_label_set(evas_object_data_get(obj, "prof_name_lbl"), buf);
+   elm_object_text_set(evas_object_data_get(obj, "prof_name_lbl"), buf);
 
    en = evas_object_data_get(obj, "prof_desc_entry");
 #ifdef ELM_EFREET
-   if (desk) elm_scrolled_entry_entry_set(en, desk->comment);
+   if (desk) elm_entry_entry_set(en, desk->comment);
    else
 #endif
-   elm_scrolled_entry_entry_set(en, "Unknown");
+   elm_entry_entry_set(en, "Unknown");
 
 #ifdef ELM_EFREET
    if (desk) efreet_desktop_free(desk);
@@ -2209,7 +2223,7 @@ _status_config_profiles(Evas_Object *win,
    evas_object_size_hint_weight_set(fr_bx1, EVAS_HINT_EXPAND,
                                     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fr_bx1, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_homogenous_set(fr_bx1, EINA_TRUE);
+   elm_box_homogeneous_set(fr_bx1, EINA_TRUE);
    evas_object_show(fr_bx1);
 
    fr_bx2 = elm_box_add(win);
@@ -2219,7 +2233,7 @@ _status_config_profiles(Evas_Object *win,
    evas_object_show(fr_bx2);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Available Profiles");
+   elm_object_text_set(fr, "Available Profiles");
    evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_frame_content_set(fr, fr_bx1);
@@ -2243,8 +2257,9 @@ _status_config_profiles(Evas_Object *win,
 
    evas_object_show(lb);
 
-   en = elm_scrolled_entry_add(win);
-   elm_scrolled_entry_editable_set(en, EINA_FALSE);
+   en = elm_entry_add(win);
+   elm_entry_scrollable_set(en, EINA_TRUE);
+   elm_entry_editable_set(en, EINA_FALSE);
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(en);
@@ -2280,7 +2295,7 @@ _status_config_profiles(Evas_Object *win,
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _profile_use, li);
-   elm_button_label_set(bt, "Use");
+   elm_object_text_set(bt, "Use");
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_box_pack_end(btn_bx, bt);
@@ -2290,7 +2305,7 @@ _status_config_profiles(Evas_Object *win,
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _btn_todo, NULL); /* TODO */
-   elm_button_label_set(bt, "Delete");
+   elm_object_text_set(bt, "Delete");
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_box_pack_end(btn_bx, bt);
@@ -2300,7 +2315,7 @@ _status_config_profiles(Evas_Object *win,
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _profile_reset, li);
-   elm_button_label_set(bt, "Reset");
+   elm_object_text_set(bt, "Reset");
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_box_pack_end(btn_bx, bt);
@@ -2310,7 +2325,7 @@ _status_config_profiles(Evas_Object *win,
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _btn_todo, NULL); /* TODO */
-   elm_button_label_set(bt, "Add new");
+   elm_object_text_set(bt, "Add new");
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_box_pack_end(btn_bx, bt);
@@ -2354,7 +2369,7 @@ _status_config_scrolling(Evas_Object *win,
    elm_object_tooltip_text_set(ck, "Set whether scrollers should bounce<br>"
                                    "when they reach their viewport's edge<br>"
                                    "during a scroll");
-   elm_check_label_set(ck, "Enable scroll bounce");
+   elm_object_text_set(ck, "Enable scroll bounce");
    evas_object_data_set(win, "scroll_bounce_check", ck);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(ck, EVAS_HINT_FILL, 0.5);
@@ -2393,7 +2408,7 @@ _status_config_scrolling(Evas_Object *win,
    ck = elm_check_add(win);
    elm_object_tooltip_text_set(ck, "Set whether scrollers should be<br>"
                                    "draggable from any point in their views");
-   elm_check_label_set(ck, "Enable thumb scroll");
+   elm_object_text_set(ck, "Enable thumb scroll");
    evas_object_data_set(win, "thumbscroll_check", ck);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(ck, EVAS_HINT_FILL, 0.5);
@@ -2658,7 +2673,7 @@ _status_config_rendering(Evas_Object *win,
    evas_object_size_hint_align_set(bx, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Available Engines");
+   elm_object_text_set(fr, "Available Engines");
    evas_object_size_hint_weight_set(fr, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fr, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(bx, fr);
@@ -2693,7 +2708,7 @@ _status_config_rendering(Evas_Object *win,
 
    bt = elm_button_add(win);
    evas_object_smart_callback_add(bt, "clicked", _engine_use, li);
-   elm_button_label_set(bt, "Use Engine");
+   elm_object_text_set(bt, "Use Engine");
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_size_hint_align_set(bt, 0.5, 0.5);
    elm_frame_content_set(pd, bt);
@@ -2729,15 +2744,15 @@ _status_config_caches(Evas_Object *win,
    ck = elm_check_add(win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(ck, EVAS_HINT_FILL, 0.5);
-   elm_check_label_set(ck, "Enable Flushing");
+   elm_object_text_set(ck, "Enable Flushing");
    elm_check_state_set(ck, elm_cache_flush_enabled_get());
    evas_object_smart_callback_add(ck, "changed", cf_enable, sl);
    elm_box_pack_end(bx, ck);
    evas_object_show(ck);
-   
+
    elm_box_pack_end(bx, sl);
    evas_object_show(sl);
-   
+
    evas_object_smart_callback_add(sl, "changed", cf_round, NULL);
    evas_object_smart_callback_add(sl, "delay,changed", cf_change, NULL);
 
@@ -2851,7 +2866,7 @@ _status_config_full(Evas_Object *win,
 
    tb = elm_toolbar_add(win);
    elm_toolbar_menu_parent_set(tb, win);
-   elm_toolbar_homogenous_set(tb, 0);
+   elm_toolbar_homogeneous_set(tb, 0);
    evas_object_size_hint_weight_set(tb, 1.0, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
@@ -2941,6 +2956,10 @@ elm_main(int    argc,
          char **argv)
 {
    int i;
+
+   elm_app_info_set(elm_main, "elementary", "images/logo.png");
+   elm_app_compile_bin_dir_set(PACKAGE_BIN_DIR);
+   elm_app_compile_data_dir_set(PACKAGE_DATA_DIR);
 
    for (i = 1; i < argc; i++)
      {

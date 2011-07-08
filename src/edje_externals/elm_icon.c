@@ -1,5 +1,4 @@
 #include <assert.h>
-
 #include "private.h"
 
 typedef struct _Elm_Params_Icon
@@ -17,6 +16,8 @@ typedef struct _Elm_Params_Icon
    Eina_Bool no_scale : 1;
    Eina_Bool prescale_size_exists;
    int prescale_size;
+   Elm_Params base;
+   const char *icon;
 } Elm_Params_Icon;
 
 static Elm_Params_Icon *param_icon;
@@ -25,6 +26,8 @@ static void
 external_icon_state_set(void *data __UNUSED__, Evas_Object *obj, const void *from_params, const void *to_params, float pos __UNUSED__)
 {
    const Elm_Params_Icon *p;
+   Evas_Object *edje;
+   const char *file;
 
    if (to_params) p = to_params;
    else if (from_params) p = from_params;
@@ -74,12 +77,23 @@ external_icon_state_set(void *data __UNUSED__, Evas_Object *obj, const void *fro
         elm_icon_prescale_set(obj, p->prescale_size);
 	param_icon->prescale_size = p->prescale_size;
      }
+   if (p->icon)
+   {
+	   edje = evas_object_smart_parent_get(obj);
+	   edje_object_file_get(edje, &file, NULL);
+
+	   if (!elm_icon_file_set(obj, file, p->icon))
+		   elm_icon_standard_set(obj, p->icon);
+   }
 }
 
 static Eina_Bool
 external_icon_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_External_Param *param)
 {
-   if (!strcmp(param->name, "file") 
+   Evas_Object *edje;
+   const char *file;
+
+   if (!strcmp(param->name, "file")
 		   && param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
      {
         Eina_Bool ret = elm_icon_file_set(obj, param->s, NULL);
@@ -128,6 +142,18 @@ external_icon_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Exte
 	elm_icon_prescale_set(obj, param->i);
 	param_icon->prescale_size = param->i;
 	return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "icon"))
+     {
+	   if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
+	   {
+		   edje = evas_object_smart_parent_get(obj);
+		   edje_object_file_get(edje, &file, NULL);
+
+		   if (!elm_icon_file_set(obj, file, param->s))
+			   elm_icon_standard_set(obj, param->s);
+		   return EINA_TRUE;
+	  }
      }
 
    ERR("unknown parameter '%s' of type '%s'",
@@ -181,9 +207,14 @@ external_icon_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_Exte
         param->i = param_icon->prescale_size;
 	return EINA_TRUE;
      }
+   else if (!strcmp(param->name, "icon"))
+     {
+	/* not easy to get icon name back from live object */
+	return EINA_FALSE;
+     }
 
    ERR("unknown parameter '%s' of type '%s'",
-		   param->name, edje_external_param_type_str(param->type));
+       param->name, edje_external_param_type_str(param->type));
 
    return EINA_FALSE;
 }
@@ -194,10 +225,8 @@ external_icon_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, c
    Elm_Params_Icon *mem;
    Edje_External_Param *param;
    const Eina_List *l;
-  
    param_icon = calloc(1, sizeof(Elm_Params_Icon));
-   
-   mem = calloc(1, sizeof(Elm_Params_Icon));
+   mem = ELM_NEW(Elm_Params_Icon);
    if (!mem)
      return NULL;
 
@@ -234,17 +263,21 @@ external_icon_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, c
 	  {
 	     mem->prescale_size = param->i;
 	     mem->prescale_size_exists = EINA_TRUE;
-	  }
+          }
+        else if (!strcmp(param->name, "icon"))
+          {
+             mem->icon = eina_stringshare_add(param->s);
+          }
      }
-   
+
    return mem;
 }
 
 static Evas_Object *external_icon_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-   ERR("so content");
-   return NULL;
+	ERR("no content");
+	return NULL;
 }
 
 static void
@@ -259,19 +292,24 @@ external_icon_params_free(void *params)
    if (param_icon->file)
      eina_stringshare_del(param_icon->file);
    free(param_icon);
+
+   if (mem->icon)
+        eina_stringshare_del(mem->icon);
+   external_common_params_free(params);
 }
 
 static Edje_External_Param_Info external_icon_params[] = {
-    EDJE_EXTERNAL_PARAM_INFO_STRING("file"),
-    EDJE_EXTERNAL_PARAM_INFO_BOOL("smooth"),
-    EDJE_EXTERNAL_PARAM_INFO_BOOL("no scale"),
-    EDJE_EXTERNAL_PARAM_INFO_BOOL("scale up"),
-    EDJE_EXTERNAL_PARAM_INFO_BOOL("scale down"),
-    EDJE_EXTERNAL_PARAM_INFO_BOOL("fill outside"),
-    EDJE_EXTERNAL_PARAM_INFO_INT("prescale"),
-    EDJE_EXTERNAL_PARAM_INFO_SENTINEL
+   DEFINE_EXTERNAL_COMMON_PARAMS,
+   EDJE_EXTERNAL_PARAM_INFO_STRING("icon"),
+   EDJE_EXTERNAL_PARAM_INFO_STRING("file"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("smooth"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("no scale"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("scale up"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("scale down"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("fill outside"),
+   EDJE_EXTERNAL_PARAM_INFO_INT("prescale"),
+   EDJE_EXTERNAL_PARAM_INFO_SENTINEL
 };
 
 DEFINE_EXTERNAL_ICON_ADD(icon, "icon");
 DEFINE_EXTERNAL_TYPE_SIMPLE(icon, "Icon");
-

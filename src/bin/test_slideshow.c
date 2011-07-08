@@ -50,14 +50,14 @@ static void
 _hv_select(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    elm_slideshow_transition_set(slideshow, data);
-   elm_hoversel_label_set(obj, data);
+   elm_object_text_set(obj, data);
 }
 
 static void
 _layout_select(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    elm_slideshow_layout_set(slideshow, data);
-   elm_hoversel_label_set(obj, data);
+   elm_object_text_set(obj, data);
 }
 
 static void
@@ -152,13 +152,13 @@ test_slideshow(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
                                   notify);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Previous");
+   elm_object_text_set(bt, "Previous");
    evas_object_smart_callback_add(bt, "clicked", _previous, slideshow);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Next");
+   elm_object_text_set(bt, "Next");
    evas_object_smart_callback_add(bt, "clicked", _next, slideshow);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
@@ -168,7 +168,7 @@ test_slideshow(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    elm_hoversel_hover_parent_set(hv, win);
    EINA_LIST_FOREACH(elm_slideshow_transitions_get(slideshow), l, transition)
       elm_hoversel_item_add(hv, transition, NULL, 0, _hv_select, transition);
-   elm_hoversel_label_set(hv, eina_list_data_get(elm_slideshow_transitions_get(slideshow)));
+   elm_object_text_set(hv, eina_list_data_get(elm_slideshow_transitions_get(slideshow)));
    evas_object_show(hv);
 
    hv = elm_hoversel_add(win);
@@ -176,7 +176,7 @@ test_slideshow(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    elm_hoversel_hover_parent_set(hv, win);
    EINA_LIST_FOREACH(elm_slideshow_layouts_get(slideshow), l, layout)
        elm_hoversel_item_add(hv, layout,  NULL, 0, _layout_select, layout);
-   elm_hoversel_label_set(hv, elm_slideshow_layout_get(slideshow));
+   elm_object_text_set(hv, elm_slideshow_layout_get(slideshow));
    evas_object_show(hv);
 
    spin = elm_spinner_add(win);
@@ -190,14 +190,14 @@ test_slideshow(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    bt = elm_button_add(win);
    bt_start = bt;
-   elm_button_label_set(bt, "Start");
+   elm_object_text_set(bt, "Start");
    evas_object_smart_callback_add(bt, "clicked", _start, spin);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
    bt_stop = bt;
-   elm_button_label_set(bt, "Stop");
+   elm_object_text_set(bt, "Stop");
    evas_object_smart_callback_add(bt, "clicked", _stop, spin);
    elm_box_pack_end(bx, bt);
    elm_object_disabled_set(bt, EINA_TRUE);

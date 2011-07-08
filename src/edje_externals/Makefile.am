@@ -40,33 +40,34 @@ elm_datefield.c \
 elm_fileselector.c \
 elm_fileselector_button.c \
 elm_fileselector_entry.c \
-elm_genlist.c \
 elm_gengrid.c \
+elm_genlist.c \
 elm_hoversel.c \
+elm_icon.c \
+elm_index.c \
+elm_label.c \
 elm_list.c \
 elm_map.c \
 elm_multibuttonentry.c \
+elm_navigationbar.c \
+elm_navigationbar_ex.c \
 elm_nocontents.c \
+elm_notify.c \
 elm_page_control.c \
+elm_pager.c \
+elm_panes.c \
 elm_photocam.c \
 elm_progressbar.c \
 elm_radio.c \
-elm_scrolled_entry.c \
+elm_scroller.c \
 elm_searchbar.c \
+elm_segment_control.c \
 elm_slider.c \
 elm_slideshow.c \
 elm_spinner.c \
 elm_thumb.c \
 elm_toggle.c \
-elm_toolbar.c \
-elm_notify.c \
-elm_panes.c \
-elm_label.c \
-elm_icon.c \
-elm_scroller.c \
-elm_navigationbar.c \
-elm_navigationbar_ex.c \
-elm_pager.c 
+elm_toolbar.c
 
 module_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
 module_la_LDFLAGS = -no-undefined -module -avoid-version -shared -fPIC
