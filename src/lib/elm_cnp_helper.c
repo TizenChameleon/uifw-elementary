@@ -2654,7 +2654,7 @@ elm_cnp_tempfile_create(int size)
         return info;
      }
 
-   eina_mmap_safety_enabled_set(EINA_TRUE);
+   //eina_mmap_safety_enabled_set(EINA_TRUE); // NOTE: Temporary comment
 
    info->map = mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, info->fd, 0);
    if (info->map == MAP_FAILED)

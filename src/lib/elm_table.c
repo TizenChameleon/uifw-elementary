@@ -330,7 +330,7 @@ elm_table_pack_get(Evas_Object *subobj, int *x, int *y, int *w, int *h)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   //evas_object_table_pack_get(wd->tbl, subobj, &ix, &iy, &iw, &ih); // MIGRATION: TEMP
+   evas_object_table_pack_get(wd->tbl, subobj, &ix, &iy, &iw, &ih);
    if (x) *x = ix;
    if (y) *y = iy;
    if (w) *w = iw;

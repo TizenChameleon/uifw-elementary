@@ -67,9 +67,6 @@ struct _Widget_Data
    Eina_Bool inverted : 1;
    Eina_Bool indicator_show : 1;
    int feed_cnt;
-   double val, val_min, val_max;
-   Ecore_Timer *delay;
-   Evas_Coord size;
 };
 
 #define ELM_SLIDER_INVERTED_FACTOR (-1.0)
