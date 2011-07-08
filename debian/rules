@@ -12,4 +12,4 @@ CFLAGS += -fPIC -W -Wall -Wextra
 LDFLAGS += -Wl,--hash-style=both -Wl,--as-needed
 
 clean::
-	[ ! -f Makefile ] || make distclean
+	[ ! -f Makefile ] || make distclean || true
