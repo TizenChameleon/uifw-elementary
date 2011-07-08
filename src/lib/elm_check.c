@@ -263,7 +263,7 @@ _elm_check_label_set(Evas_Object *obj, const char *item, const char *label)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (item) return;
+   if (item && strcmp(item, "default")) return;
    if (!wd) return;
    eina_stringshare_replace(&wd->label, label);
    if (label)
@@ -280,7 +280,7 @@ _elm_check_label_get(const Evas_Object *obj, const char *item)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (item) return NULL;
+   if (item && strcmp(item, "default")) return NULL;
    if (!wd) return NULL;
    return wd->label;
 }
@@ -344,6 +344,7 @@ elm_check_add(Evas_Object *parent)
  * @param label The text label string in UTF-8
  *
  * @ingroup Check
+ * @deprecated use elm_object_text_set() instead.
  */
 EAPI void
 elm_check_label_set(Evas_Object *obj, const char *label)
@@ -358,6 +359,7 @@ elm_check_label_set(Evas_Object *obj, const char *label)
  * @return The text label string in UTF-8
  *
  * @ingroup Check
+ * @deprecated use elm_object_text_set() instead.
  */
 EAPI const char *
 elm_check_label_get(const Evas_Object *obj)

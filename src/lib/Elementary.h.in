@@ -1608,8 +1608,8 @@ extern "C" {
    EAPI int          elm_win_quickpanel_priority_minor_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_win_quickpanel_zone_set(Evas_Object *obj, int zone) EINA_ARG_NONNULL(1);
    EAPI int          elm_win_quickpanel_zone_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void         elm_win_prop_focus_skip_set(Evas_Object *obj, Eina_Bool skip); EINA_ARG_NONNULL(1);
-   EAPI void         elm_win_illume_command_send(Evas_Object *obj, Elm_Illume_Command command, void *params); EINA_ARG_NONNULL(1);
+   EAPI void         elm_win_prop_focus_skip_set(Evas_Object *obj, Eina_Bool skip) EINA_ARG_NONNULL(1);
+   EAPI void         elm_win_illume_command_send(Evas_Object *obj, Elm_Illume_Command command, void *params) EINA_ARG_NONNULL(1);
    EAPI Evas_Object *elm_win_inlined_image_object_get(Evas_Object *obj);
    EAPI void         elm_win_focus_highlight_enabled_set(Evas_Object *obj, Eina_Bool enabled) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool    elm_win_focus_highlight_enabled_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -2363,13 +2363,17 @@ extern "C" {
    /**
     * @defgroup Button Button
     *
+    * @image html  widget/button/preview-00.png
+    * @image html  widget/button/preview-01.png
+    * @image html  widget/button/preview-02.png
+    *
     * This is a push-button. Press it and run some function. It can contain
     * a simple label and icon object and it also has an autorepeat feature.
     *
     * This widgets emits the following signals:
     * @li "clicked": the user clicked the button (press/release).
     * @li "repeated": the user pressed the button without releasing it.
-    * @li "pressed": button was pressed. 
+    * @li "pressed": button was pressed.
     * @li "unpressed": button was released after being pressed.
     * In all three cases, the @c event parameter of the callback will be
     * @c NULL.
@@ -2567,8 +2571,8 @@ extern "C" {
 
    /* fileselector */
    EAPI Evas_Object *elm_fileselector_button_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-   EAPI void         elm_fileselector_button_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   EAPI const char  *elm_fileselector_button_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_fileselector_button_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI const char  *elm_fileselector_button_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_fileselector_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    EAPI Evas_Object *elm_fileselector_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI Evas_Object *elm_fileselector_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -2598,8 +2602,8 @@ extern "C" {
     */
 
    EAPI Evas_Object *elm_fileselector_entry_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-   EAPI void         elm_fileselector_entry_button_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   EAPI const char  *elm_fileselector_entry_button_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_fileselector_entry_button_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI const char  *elm_fileselector_entry_button_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_fileselector_entry_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    EAPI Evas_Object *elm_fileselector_entry_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI Evas_Object *elm_fileselector_entry_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -2707,11 +2711,11 @@ extern "C" {
 
    /* frame */
    EAPI Evas_Object *elm_frame_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI void         elm_frame_label_set(Evas_Object *obj, const char *label); EINA_ARG_NONNULL(1)
-   EINA_DEPRECATED EAPI const char  *elm_frame_label_get(const Evas_Object *obj); EINA_ARG_NONNULL(1)
-   EAPI void         elm_frame_content_set(Evas_Object *obj, Evas_Object *content); EINA_ARG_NONNULL(1)
-   EAPI Evas_Object *elm_frame_content_get(const Evas_Object *obj); EINA_ARG_NONNULL(1)
-   EAPI Evas_Object *elm_frame_content_unset(Evas_Object *obj); EINA_ARG_NONNULL(1)
+   EINA_DEPRECATED EAPI void         elm_frame_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI const char  *elm_frame_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void         elm_frame_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_frame_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_frame_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /* available styles:
     * default
     * pad_small
@@ -3092,6 +3096,7 @@ extern "C" {
    EAPI void         elm_entry_entry_insert(Evas_Object *obj, const char *entry) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_line_wrap_set(Evas_Object *obj, Elm_Wrap_Type wrap) EINA_ARG_NONNULL(1);
    EINA_DEPRECATED EAPI void         elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap) EINA_ARG_NONNULL(1);
+   EAPI Elm_Wrap_Type elm_entry_line_wrap_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_editable_set(Evas_Object *obj, Eina_Bool editable) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool    elm_entry_editable_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_select_none(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -3296,8 +3301,9 @@ extern "C" {
     *
     * Other markup can be used to style the text in different ways, but it's
     * up to the style defined in the theme which tags do what.
+    * @deprecated use elm_object_text_set() instead.
     */
-   EAPI void         elm_anchorview_text_set(Evas_Object *obj, const char *text) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_anchorview_text_set(Evas_Object *obj, const char *text) EINA_ARG_NONNULL(1);
    /**
     * Get the markup text set for the anchorview
     *
@@ -3306,8 +3312,9 @@ extern "C" {
     * @param obj The anchorview object
     * @return The markup text set or @c NULL if nothing was set or an error
     * occurred
+    * @deprecated use elm_object_text_set() instead.
     */
-   EAPI const char  *elm_anchorview_text_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI const char  *elm_anchorview_text_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Set the parent of the hover popup
     *
@@ -3638,8 +3645,9 @@ extern "C" {
     *
     * Other markup can be used to style the text in different ways, but it's
     * up to the style defined in the theme which tags do what.
+    * @deprecated use elm_object_text_set() instead.
     */
-   EAPI void         elm_anchorblock_text_set(Evas_Object *obj, const char *text) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_anchorblock_text_set(Evas_Object *obj, const char *text) EINA_ARG_NONNULL(1);
    /**
     * Get the markup text set for the anchorblock
     *
@@ -3648,8 +3656,9 @@ extern "C" {
     * @param obj The anchorblock object
     * @return The markup text set or @c NULL if nothing was set or an error
     * occurred
+    * @deprecated use elm_object_text_set() instead.
     */
-   EAPI const char  *elm_anchorblock_text_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI const char  *elm_anchorblock_text_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Set the parent of the hover popup
     *
@@ -3801,8 +3810,9 @@ extern "C" {
     *
     * This function sets the title of the bubble. Where this appears depends on
     * the selected corner.
+    * @deprecated use elm_object_text_set() instead.
     */
-   EAPI void         elm_bubble_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_bubble_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
    /**
     * Get the label of the bubble
     *
@@ -3810,8 +3820,9 @@ extern "C" {
     * @return The string of set in the label
     *
     * This function gets the title of the bubble.
+    * @deprecated use elm_object_text_set() instead.
     */
-   EAPI const char  *elm_bubble_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI const char  *elm_bubble_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Set the info of the bubble
     *
@@ -3820,8 +3831,9 @@ extern "C" {
     *
     * This function sets the info of the bubble. Where this appears depends on
     * the selected corner.
+    * @deprecated use elm_object_text_set() instead.
     */
-   EAPI void         elm_bubble_info_set(Evas_Object *obj, const char *info) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_bubble_info_set(Evas_Object *obj, const char *info) EINA_ARG_NONNULL(1);
    /**
     * Get the info of the bubble
     *
@@ -3830,8 +3842,9 @@ extern "C" {
     * @return The "info" string of the bubble
     *
     * This function gets the info text.
+    * @deprecated use elm_object_text_set() instead.
     */
-   EAPI const char  *elm_bubble_info_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI const char  *elm_bubble_info_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Set the content to be shown in the bubble
     *
@@ -3937,6 +3950,273 @@ extern "C" {
     * "drag,start" - Someone started dragging the image out of the object
     * "drag,end" - Dragged item was dropped (somewhere)
     */
+
+   /* gesture layer */
+   /** @defgroup Elm_Gesture_Layer Gesture Layer */
+   /**
+    * @enum _Elm_Gesture_Types
+    * Emum of supported gesture types.
+    * @ingroup Elm_Gesture_Layer
+    */
+   enum _Elm_Gesture_Types
+     {
+        ELM_GESTURE_FIRST = 0,
+
+        ELM_GESTURE_N_TAPS, /**< N fingers single taps */
+        ELM_GESTURE_N_DOUBLE_TAPS, /**< N fingers double-single taps */
+        ELM_GESTURE_N_TRIPLE_TAPS, /**< N fingers triple-single taps */
+
+        ELM_GESTURE_MOMENTUM, /**< Reports momentum in the dircetion of move */
+
+        ELM_GESTURE_N_LINES, /**< N fingers line gesture */
+        ELM_GESTURE_N_FLICKS, /**< N fingers flick gesture */
+
+        ELM_GESTURE_ZOOM, /**< Zoom */
+        ELM_GESTURE_ROTATE, /**< Rotate */
+
+        ELM_GESTURE_LAST
+     };
+
+   /**
+    * @typedef Elm_Gesture_Types
+    * Type for Emum of supported gesture types.
+    * @ingroup Elm_Gesture_Layer
+    */
+   typedef enum _Elm_Gesture_Types Elm_Gesture_Types;
+
+   /**
+    * @enum _Elm_Gesture_State
+    * Emum of gesture states.
+    * @ingroup Elm_Gesture_Layer
+    */
+   enum _Elm_Gesture_State
+     {
+        ELM_GESTURE_STATE_UNDEFINED = -1, /**< Gesture not STARTed */
+        ELM_GESTURE_STATE_START,          /**< Gesture STARTed     */
+        ELM_GESTURE_STATE_MOVE,           /**< Gesture is ongoing  */
+        ELM_GESTURE_STATE_END,            /**< Gesture completed   */
+        ELM_GESTURE_STATE_ABORT    /**< Onging gesture was ABORTed */
+     };
+   /**
+    * @typedef Elm_Gesture_State
+    * gesture states.
+    * @ingroup Elm_Gesture_Layer
+    */
+   typedef enum _Elm_Gesture_State Elm_Gesture_State;
+
+   /**
+    * @struct _Elm_Gesture_Taps_Info
+    * Struct holds taps info for user
+    * @ingroup Elm_Gesture_Layer
+    */
+   struct _Elm_Gesture_Taps_Info
+     {
+        Evas_Coord x, y;         /**< Holds center point between fingers */
+        unsigned int n;          /**< Number of fingers tapped           */
+        unsigned int timestamp;  /**< event timestamp       */
+     };
+
+   /**
+    * @typedef Elm_Gesture_Taps_Info
+    * holds taps info for user
+    * @ingroup Elm_Gesture_Layer
+    */
+   typedef struct _Elm_Gesture_Taps_Info Elm_Gesture_Taps_Info;
+
+   /**
+    * @struct _Elm_Gesture_Momentum_Info
+    * Struct holds momentum info for user
+    * x1 and y1 are not necessarily in sync
+    * x1 holds x value of x direction starting point
+    * and same holds for y1.
+    * This is noticeable when doing V-shape movement
+    * @ingroup Elm_Gesture_Layer
+    */
+   struct _Elm_Gesture_Momentum_Info
+     {  /* Report line ends, timestamps, and momentum computed        */
+        Evas_Coord x1; /**< Final-swipe direction starting point on X */
+        Evas_Coord y1; /**< Final-swipe direction starting point on Y */
+        Evas_Coord x2; /**< Final-swipe direction ending point on X   */
+        Evas_Coord y2; /**< Final-swipe direction ending point on Y   */
+
+        unsigned int tx; /**< Timestamp of start of final x-swipe */
+        unsigned int ty; /**< Timestamp of start of final y-swipe */
+
+        Evas_Coord mx; /**< Momentum on X */
+        Evas_Coord my; /**< Momentum on Y */
+     };
+
+   /**
+    * @typedef Elm_Gesture_Momentum_Info
+    * holds momentum info for user
+    * @ingroup Elm_Gesture_Layer
+    */
+    typedef struct _Elm_Gesture_Momentum_Info Elm_Gesture_Momentum_Info;
+
+   /**
+    * @struct _Elm_Gesture_Line_Info
+    * Struct holds line info for user
+    * @ingroup Elm_Gesture_Layer
+    */
+   struct _Elm_Gesture_Line_Info
+     {  /* Report line ends, timestamps, and momentum computed      */
+        Elm_Gesture_Momentum_Info momentum; /**< Line momentum info */
+        unsigned int n;            /**< Number of fingers (lines)   */
+        /* FIXME should be radians, bot degrees */
+        double angle;              /**< Angle (direction) of lines  */
+     };
+
+   /**
+    * @typedef _Elm_Gesture_Line_Info
+    * Holds line info for user
+    * @ingroup Elm_Gesture_Layer
+    */
+    typedef struct  _Elm_Gesture_Line_Info Elm_Gesture_Line_Info;
+
+   /**
+    * @struct _Elm_Gesture_Zoom_Info
+    * Struct holds zoom info for user
+    * @ingroup Elm_Gesture_Layer
+    */
+   struct _Elm_Gesture_Zoom_Info
+     {
+        Evas_Coord x, y;       /**< Holds zoom center point reported to user  */
+        Evas_Coord radius; /**< Holds radius between fingers reported to user */
+        float zoom;            /**< Zoom value: 1.0 means no zoom             */
+        float momentum;        /**< Zoom momentum: zoom growth per second (NOT YET SUPPORTED) */
+     };
+
+   /**
+    * @typedef Elm_Gesture_Zoom_Info
+    * Holds zoom info for user
+    * @ingroup Elm_Gesture_Layer
+    */
+   typedef struct _Elm_Gesture_Zoom_Info Elm_Gesture_Zoom_Info;
+
+   /**
+    * @struct _Elm_Gesture_Rotate_Info
+    * Struct holds rotation info for user
+    * @ingroup Elm_Gesture_Layer
+    */
+   struct _Elm_Gesture_Rotate_Info
+     {
+        Evas_Coord x, y;   /**< Holds zoom center point reported to user      */
+        Evas_Coord radius; /**< Holds radius between fingers reported to user */
+        double base_angle; /**< Holds start-angle */
+        double angle;      /**< Rotation value: 0.0 means no rotation         */
+        double momentum;   /**< Rotation momentum: rotation done per second (NOT YET SUPPORTED) */
+     };
+
+   /**
+    * @typedef Elm_Gesture_Rotate_Info
+    * Holds rotation info for user
+    * @ingroup Elm_Gesture_Layer
+    */
+   typedef struct _Elm_Gesture_Rotate_Info Elm_Gesture_Rotate_Info;
+
+   /**
+    * @typedef Elm_Gesture_Event_Cb
+    * User callback used to stream gesture info from gesture layer
+    * @param data user data
+    * @param event_info gesture report info
+    * Returns a flag field to be applied on the causing event.
+    * You should probably return EVAS_EVENT_FLAG_ON_HOLD if your widget acted
+    * upon the event, in an irreversible way.
+    *
+    * @ingroup Elm_Gesture_Layer
+    */
+   typedef Evas_Event_Flags (*Elm_Gesture_Event_Cb) (void *data, void *event_info);
+
+   /**
+    * Use function to set callbacks to be notified about
+    * change of state of gesture.
+    * When a user registers a callback with this function
+    * this means this gesture has to be tested.
+    *
+    * When ALL callbacks for a gesture are set to NULL
+    * it means user isn't interested in gesture-state
+    * and it will not be tested.
+    *
+    * @param obj Pointer to gesture-layer.
+    * @param idx The gesture you would like to track its state.
+    * @param cb callback function pointer.
+    * @param cb_type what event this callback tracks: START, MOVE, END, ABORT.
+    * @param data user info to be sent to callback (usually, Smart Data)
+    *
+    * @ingroup Elm_Gesture_Layer
+    */
+   EAPI void elm_gesture_layer_cb_set(Evas_Object *obj, Elm_Gesture_Types idx, Elm_Gesture_State cb_type, Elm_Gesture_Event_Cb cb, void *data) EINA_ARG_NONNULL(1);
+
+   /**
+    * Call this function to get repeat-events settings.
+    *
+    * @param obj Pointer to gesture-layer.
+    *
+    * @return repeat events settings.
+    * @see elm_gesture_layer_hold_events_set()
+    * @ingroup Elm_Gesture_Layer
+    */
+   EAPI Eina_Bool elm_gesture_layer_hold_events_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * This function called in order to make gesture-layer repeat events.
+    * Set this of you like to get the raw events only if gestures were not detected.
+    * Clear this if you like gesture layer to fwd events as testing gestures.
+    *
+    * @param obj Pointer to gesture-layer.
+    * @param r Repeat: TRUE/FALSE
+    *
+    * @ingroup Elm_Gesture_Layer
+    */
+   EAPI void elm_gesture_layer_hold_events_set(Evas_Object *obj, Eina_Bool r) EINA_ARG_NONNULL(1);
+
+   /**
+    * This function sets step-value for zoom action.
+    * Set step to any positive value.
+    * Cancel step setting by setting to 0.0
+    *
+    * @param obj Pointer to gesture-layer.
+    * @param s new zoom step value.
+    *
+    * @ingroup Elm_Gesture_Layer
+    */
+   EAPI void elm_gesture_layer_zoom_step_set(Evas_Object *obj, double s) EINA_ARG_NONNULL(1);
+
+   /**
+    * This function sets step-value for rotate action.
+    * Set step to any positive value.
+    * Cancel step setting by setting to 0.0
+    *
+    * @param obj Pointer to gesture-layer.
+    * @param s new roatate step value.
+    *
+    * @ingroup Elm_Gesture_Layer
+    */
+   EAPI void elm_gesture_layer_rotate_step_set(Evas_Object *obj, double s) EINA_ARG_NONNULL(1);
+
+   /**
+    * This function called to attach gesture-layer to an Evas_Object.
+    * @param obj Pointer to gesture-layer.
+    * @param t Pointer to underlying object (AKA Target)
+    *
+    * @return TRUE, FALSE on success, failure.
+    *
+    * @ingroup Elm_Gesture_Layer
+    */
+   EAPI Eina_Bool elm_gesture_layer_attach(Evas_Object *obj, Evas_Object *t) EINA_ARG_NONNULL(1, 2);
+
+   /**
+    * Call this function to construct a new gesture-layer object.
+    * This does not activate the gesture layer. You have to
+    * call elm_gesture_layer_attach in order to 'activate' gesture-layer.
+    *
+    * @param parent the parent object.
+    *
+    * @return Pointer to new gesture-layer object.
+    *
+    * @ingroup Elm_Gesture_Layer
+    */
+   EAPI Evas_Object *elm_gesture_layer_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
 
    /* thumb */
    typedef enum _Elm_Thumb_Animation_Setting
@@ -4246,7 +4526,8 @@ extern "C" {
    EAPI const char        *elm_slider_unit_format_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void               elm_slider_indicator_format_set(Evas_Object *obj, const char *indicator) EINA_ARG_NONNULL(1);
    EAPI const char        *elm_slider_indicator_format_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void               elm_slider_indicator_format_function_set(Evas_Object *obj, const char *(*func)(double val)) EINA_ARG_NONNULL(1);
+  EAPI void                elm_slider_indicator_format_function_set(Evas_Object *obj, const char *(*func)(double val), void (*free_func)(const char *str)) EINA_ARG_NONNULL(1);
+  EAPI void                elm_slider_units_format_function_set(Evas_Object *obj, const char *(*func)(double val), void (*free_func)(const char *str)) EINA_ARG_NONNULL(1);
    EAPI void               elm_slider_horizontal_set(Evas_Object *obj, Eina_Bool horizontal) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool          elm_slider_horizontal_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void               elm_slider_min_max_set(Evas_Object *obj, double min, double max) EINA_ARG_NONNULL(1);
@@ -4644,8 +4925,8 @@ extern "C" {
 
    /* radio */
    EAPI Evas_Object *elm_radio_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-   EAPI void         elm_radio_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   EAPI const char  *elm_radio_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_radio_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI const char  *elm_radio_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    EAPI Evas_Object *elm_radio_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI Evas_Object *elm_radio_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -4767,8 +5048,8 @@ extern "C" {
    EAPI void         elm_progressbar_pulse(Evas_Object *obj, Eina_Bool state) EINA_ARG_NONNULL(1);
    EAPI void         elm_progressbar_value_set(Evas_Object *obj, double val) EINA_ARG_NONNULL(1);
    EAPI double       elm_progressbar_value_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void         elm_progressbar_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   EAPI const char  *elm_progressbar_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_progressbar_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI const char  *elm_progressbar_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_progressbar_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    EAPI Evas_Object *elm_progressbar_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI Evas_Object *elm_progressbar_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -5338,6 +5619,7 @@ extern "C" {
     * The @a parent argument can be set to NULL for no parent. If a parent is set
     * there is no need to call elm_animator_del(), when the parent is deleted it
     * will delete the animator.
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI Elm_Animator*            elm_animator_add(Evas_Object *parent);
    /**
@@ -5346,6 +5628,7 @@ extern "C" {
     * automatically called when the parent is deleted.
     *
     * @param[in] animator Animator object
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_del(Elm_Animator *animator) EINA_ARG_NONNULL(1);
    /**
@@ -5353,6 +5636,7 @@ extern "C" {
     *
     * @param[in] animator Animator object
     * @param[in] duration Duration in second
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_duration_set(Elm_Animator *animator, double duration) EINA_ARG_NONNULL(1);
    /**
@@ -5365,6 +5649,7 @@ extern "C" {
     * The @p func callback will be called with a frame value in range [0, 1] which
     * indicates how far along the animation should be. It is the job of @p func to
     * actually change the state of any object(or objects) that are being animated.
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_operation_callback_set(Elm_Animator *animator, Elm_Animator_Operation_Cb func, void *data) EINA_ARG_NONNULL(1);
    /**
@@ -5375,6 +5660,7 @@ extern "C" {
     * @param[in]  data Callback function user argument
     *
     * @warning @a func will not be executed if elm_animator_stop() is called.
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_completion_callback_set(Elm_Animator *animator, Elm_Animator_Completion_Cb func, void *data) EINA_ARG_NONNULL(1);
    /**
@@ -5386,6 +5672,7 @@ extern "C" {
     * animation in progress the animation will be stopped(the operation callback
     * will not be executed again) and it can't be restarted using
     * elm_animator_resume().
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_stop(Elm_Animator *animator) EINA_ARG_NONNULL(1);
    /**
@@ -5393,6 +5680,7 @@ extern "C" {
     *
     * @param[in]  animator Animator object
     * @param[in]  repeat_cnt Repeat count
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_repeat_set(Elm_Animator *animator, unsigned int repeat_cnt) EINA_ARG_NONNULL(1);
    /**
@@ -5403,6 +5691,7 @@ extern "C" {
     * This function starts the animation if the nescessary properties(duration
     * and operation callback) have been set. Once started the animation will
     * run until complete or elm_animator_stop() is called.
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_animate(Elm_Animator *animator) EINA_ARG_NONNULL(1);
    /**
@@ -5410,6 +5699,7 @@ extern "C" {
     *
     * @param[in] animator Animator object
     * @param[in] cs Curve style. Default is ELM_ANIMATOR_CURVE_LINEAR
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_curve_style_set(Elm_Animator *animator, Elm_Animator_Curve_Style cs) EINA_ARG_NONNULL(1);
    /**
@@ -5417,8 +5707,9 @@ extern "C" {
     *
     * @param[in] animator Animator object
     * @param[in] cs Curve style. Default is ELM_ANIMATOR_CURVE_LINEAR
+    * @deprecated Use @ref Transit instead.
     */
-   EINA_DEPRECATED EAPI Elm_Animator_Curve_Style elm_animator_curve_style_get(const Elm_Animator *animator); EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Elm_Animator_Curve_Style elm_animator_curve_style_get(const Elm_Animator *animator) EINA_ARG_NONNULL(1);
    /**
     * @brief Sets wether the animation should be automatically reversed.
     *
@@ -5430,12 +5721,14 @@ extern "C" {
     * will run in reverse once for each time it ran forward.@n
     * Runnin an animation in reverse is accomplished by calling the operation
     * callback with a frame value starting at 1 and diminshing until 0.
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_auto_reverse_set(Elm_Animator *animator, Eina_Bool reverse) EINA_ARG_NONNULL(1);
    /**
     * Gets wether the animation will automatically reversed
     *
     * @param[in] animator Animator object
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI Eina_Bool                elm_animator_auto_reverse_get(const Elm_Animator *animator) EINA_ARG_NONNULL(1);
    /**
@@ -5445,12 +5738,14 @@ extern "C" {
     * or through elm_animator_stop()).
     *
     * @param[in] animator Animator object
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI Eina_Bool                elm_animator_operating_get(const Elm_Animator *animator) EINA_ARG_NONNULL(1);
    /**
     * Gets how many times the animation will be repeated
     *
     * @param[in] animator Animator object
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI unsigned int             elm_animator_repeat_get(const Elm_Animator *animator) EINA_ARG_NONNULL(1);
    /**
@@ -5462,6 +5757,7 @@ extern "C" {
     * will not be called). If the animation is not yet running this is a no-op.
     * Once an animation has been paused with this function it can be resumed
     * using elm_animator_resume().
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_pause(Elm_Animator *animator) EINA_ARG_NONNULL(1);
    /**
@@ -5479,6 +5775,7 @@ extern "C" {
     * animation with a duration of 3 seconds is paused after 1 second for 1 second
     * it will resume as if it had ben animating for 2 seconds, the operating
     * callback will be called with a frame value of aproximately 2/3.
+    * @deprecated Use @ref Transit instead.
     */
    EINA_DEPRECATED EAPI void                     elm_animator_resume(Elm_Animator *animator) EINA_ARG_NONNULL(1);
    /**
@@ -7032,6 +7329,7 @@ extern "C" {
    EAPI void elm_video_pause(Evas_Object *video);
    EAPI void elm_video_stop(Evas_Object *video);
    EAPI Eina_Bool elm_video_is_playing(Evas_Object *video);
+   EAPI Eina_Bool elm_video_is_seekable(Evas_Object *video);
    EAPI Eina_Bool elm_video_audio_mute_get(Evas_Object *video);
    EAPI void elm_video_audio_mute_set(Evas_Object *video, Eina_Bool mute);
    EAPI double elm_video_audio_level_get(Evas_Object *video);
@@ -7042,6 +7340,9 @@ extern "C" {
    EAPI void elm_video_remember_position_set(Evas_Object *video, Eina_Bool remember);
    EAPI Eina_Bool elm_video_remember_position_get(Evas_Object *video);
    EAPI const char *elm_video_title_get(Evas_Object *video);
+
+   EAPI Evas_Object *elm_player_add(Evas_Object *parent);
+   EAPI void elm_player_video_set(Evas_Object *player, Evas_Object *video);
 
 #ifdef __cplusplus
 }

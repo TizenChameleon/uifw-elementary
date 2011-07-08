@@ -199,6 +199,7 @@ _elm_anchorview_text_get(const Evas_Object *obj, const char *item)
    if (!wd) return NULL;
    return elm_entry_entry_get(wd->entry);
 }
+
 EAPI Evas_Object *
 elm_anchorview_add(Evas_Object *parent)
 {

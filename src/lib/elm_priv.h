@@ -309,6 +309,9 @@ char               *_elm_util_text_to_mkup(const char *text);
 EAPI Eina_Bool    elm_cbhm_helper_init(Evas_Object *self);
 EAPI void         elm_cbhm_send_raw_data(char *cmd);
 
+Eina_Bool           _elm_video_check(Evas_Object *video);
+
+
 extern char        *_elm_appname;
 extern Elm_Config  *_elm_config;
 extern const char  *_elm_data_dir;

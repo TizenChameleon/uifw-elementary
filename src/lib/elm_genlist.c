@@ -1501,7 +1501,7 @@ _mouse_down(void        *data,
    _item_highlight(it);
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
      if ((!it->disabled) && (!it->display_only))
-       evas_object_smart_callback_call(it->base.widget, "clicked,double", it);
+       evas_object_smart_callback_call(it->base.widget, SIG_CLICKED_DOUBLE, it);
    if (it->long_timer) ecore_timer_del(it->long_timer);
    if (it->swipe_timer) ecore_timer_del(it->swipe_timer);
    it->swipe_timer = ecore_timer_add(0.4, _swipe_cancel, it);
@@ -2141,7 +2141,8 @@ _item_realize(Elm_Genlist_Item *it,
    if (itc) _item_cache_free(itc);
    evas_event_thaw(evas_object_evas_get(it->wd->obj));
    evas_event_thaw_eval(evas_object_evas_get(it->wd->obj));
-   if (!calc) evas_object_smart_callback_call(it->base.widget, "realized", it);
+   if (!calc)
+     evas_object_smart_callback_call(it->base.widget, SIG_REALIZED, it);
    if ((!calc) && (it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP))
      {
         if (it->itc->edit_item_style )

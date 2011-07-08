@@ -37,6 +37,7 @@ elm_clock.c \
 elm_colorpalette.c\
 elm_calendar.c \
 elm_datefield.c \
+elm_entry.c \
 elm_fileselector.c \
 elm_fileselector_button.c \
 elm_fileselector_entry.c \

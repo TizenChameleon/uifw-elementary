@@ -50,6 +50,7 @@ elc_fileselector_entry.c \
 elc_hoversel.c \
 elc_navigationbar.c \
 elc_navigationbar_ex.c\
+elc_player.c \
 elc_scrolled_entry.c \
 elm_actionslider.c \
 elm_animator.c \
@@ -81,6 +82,7 @@ elm_frame.c \
 elm_gengrid.c \
 elm_genlist.c \
 elm_genscroller.c \
+elm_gesture_layer.c \
 elm_glview.c \
 elm_grid.c \
 elm_hover.c \
