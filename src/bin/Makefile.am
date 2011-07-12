@@ -34,6 +34,7 @@ EXTRA_PROGRAMS = elementary_test elementary_config
 elementary_test_SOURCES = \
 test.c \
 test_3d.c \
+test_actionslider.c \
 test_anchorblock.c \
 test_anchorview.c \
 test_anim.c \
