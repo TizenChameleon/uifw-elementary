@@ -1397,7 +1397,10 @@ _magnifier_create(void *data)
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
 	evas_object_resize(wd->mgf_bg, w, wd->mgf_height);
 
-   wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(data));
+   if (wd->scroll)
+     wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(wd->scroller));
+   else
+     wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(data));
    evas_object_image_source_set(wd->mgf_proxy, data);
    evas_object_resize(wd->mgf_proxy, w * wd->mgf_scale, h * wd->mgf_scale);
    evas_object_image_fill_set(wd->mgf_proxy, 0, 0, w * wd->mgf_scale, h * wd->mgf_scale);
