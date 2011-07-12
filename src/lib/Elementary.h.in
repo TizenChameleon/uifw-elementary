@@ -8186,7 +8186,6 @@ extern "C" {
      } Elm_Controlbar_Mode_Type;
 
    typedef struct _Elm_Controlbar_Item Elm_Controlbar_Item;
-
    EAPI Evas_Object *elm_controlbar_add(Evas_Object *parent);
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_append(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
@@ -8200,31 +8199,31 @@ extern "C" {
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, Evas_Object *obj_item, const int sel);
-   EAPI Evas_Object *elm_controlbar_object_item_object_get(Elm_Controlbar_Item *it);
+   EAPI Evas_Object *elm_controlbar_object_item_object_get(const Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_del(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_select(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
-   EAPI Eina_Bool    elm_controlbar_item_visible_get(Elm_Controlbar_Item * it);
+   EAPI Eina_Bool    elm_controlbar_item_visible_get(const Elm_Controlbar_Item * it);
    EAPI void         elm_controlbar_item_disabled_set(Elm_Controlbar_Item * it, Eina_Bool disabled);
-   EAPI Eina_Bool    elm_controlbar_item_disabled_get(Elm_Controlbar_Item * it);
+   EAPI Eina_Bool    elm_controlbar_item_disabled_get(const Elm_Controlbar_Item * it);
    EAPI void         elm_controlbar_item_icon_set(Elm_Controlbar_Item *it, const char *icon_path);
-   EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
+   EAPI Evas_Object *elm_controlbar_item_icon_get(const Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
-   EAPI const char  *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
-   EAPI Elm_Controlbar_Item *elm_controlbar_selected_item_get(Evas_Object *obj);
-   EAPI Elm_Controlbar_Item *elm_controlbar_first_item_get(Evas_Object *obj);
-   EAPI Elm_Controlbar_Item *elm_controlbar_last_item_get(Evas_Object *obj);
-   EAPI Eina_List   *elm_controlbar_items_get(Evas_Object *obj);
+   EAPI const char  *elm_controlbar_item_label_get(const Elm_Controlbar_Item *it);
+   EAPI Elm_Controlbar_Item *elm_controlbar_selected_item_get(const Evas_Object *obj);
+   EAPI Elm_Controlbar_Item *elm_controlbar_first_item_get(const Evas_Object *obj);
+   EAPI Elm_Controlbar_Item *elm_controlbar_last_item_get(const Evas_Object *obj);
+   EAPI const Eina_List   *elm_controlbar_items_get(const Evas_Object *obj);
    EAPI Elm_Controlbar_Item *elm_controlbar_item_prev(Elm_Controlbar_Item *it);
    EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
-   EAPI Evas_Object *elm_controlbar_item_view_get(Elm_Controlbar_Item *it);
+   EAPI Evas_Object *elm_controlbar_item_view_get(const Elm_Controlbar_Item *it);
    EAPI Evas_Object *elm_controlbar_item_view_unset(Elm_Controlbar_Item *it);
+   EAPI Evas_Object *elm_controlbar_item_button_get(const Elm_Controlbar_Item *it);
    EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
    EAPI void         elm_controlbar_alpha_set(Evas_Object *obj, int alpha);
    EAPI void         elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align);
    EAPI void         elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical);
-
 
    /* SearchBar */
    EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent);
@@ -8235,7 +8234,6 @@ extern "C" {
    EAPI void         elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible);
    EAPI void         elm_searchbar_clear(Evas_Object *obj);
    EAPI void         elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary);
-
 
 #ifdef __cplusplus
 }
