@@ -131,7 +131,7 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 {
    Widget_Data *wd = data;
    if (!wd) return;
-   _els_box_layout(o, priv, wd->horizontal, 1, 0);
+   _els_box_layout(o, priv, wd->horizontal, 0, 0);
 }
 
 static void
