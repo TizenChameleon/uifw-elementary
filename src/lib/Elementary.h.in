@@ -4,7 +4,7 @@
  */
 
 /**
-@file elementary.dox
+@file Elementary.h.in
 @brief Elementary Widget Library
 */
 
@@ -2709,23 +2709,137 @@ extern "C" {
     *             by the cursor in the first place).
     */
 
-   /* frame */
-   EAPI Evas_Object *elm_frame_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI void         elm_frame_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI const char  *elm_frame_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void         elm_frame_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object *elm_frame_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object *elm_frame_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /* available styles:
-    * default
-    * pad_small
-    * pad_medium
-    * pad_large
-    * pad_huge
-    * outdent_top
-    * outdent_bottom
+   /**
+    * @page tutorial_frame Frame example
+    * @dontinclude frame_example_01.c
+    *
+    * In this example we are going to create 4 Frames with different styles and
+    * add a rectangle of different color in each.
+    *
+    * We start we the usual setup code:
+    * @until show(bg)
+    *
+    * And then create one rectangle:
+    * @until show
+    *
+    * To add it in our first frame, which since it doesn't have it's style
+    * specifically set uses the default style:
+    * @until show
+    *
+    * And then create another rectangle:
+    * @until show
+    *
+    * To add it in our second frame, which uses the "pad_small" style, note that
+    * even tough we are setting a text for this frame it won't be show, only the
+    * default style shows the Frame's title:
+    * @until show
+    * @note The "pad_small", "pad_medium", "pad_large" and "pad_huge" styles are
+    * very similar, their only difference is the size of the empty area around
+    * the content of the frame.
+    *
+    * And then create yet another rectangle:
+    * @until show
+    *
+    * To add it in our third frame, which uses the "outdent_top" style, note
+    * that even tough we are setting a text for this frame it won't be show,
+    * only the default style shows the Frame's title:
+    * @until show
+    *
+    * And then create one last rectangle:
+    * @until show
+    *
+    * To add it in our fourth and final frame, which uses the "outdent_bottom"
+    * style, note that even tough we are setting a text for this frame it won't
+    * be show, only the default style shows the Frame's title:
+    * @until show
+    *
+    * And now we are left with just some more setup code:
+    * @until ELM_MAIN()
+    *
+    * Our example will look like this:
+    * @image html screenshots/frame_example_01.png
+    * @image latex screenshots/frame_example_01.eps
+    *
+    * @example frame_example_01.c
     */
-   /* smart callbacks called:
+   /**
+    * @defgroup Frame Frame
+    *
+    * @brief Frame is a widget that holds some content and has a title.
+    *
+    * The default look is a frame with a title, but Frame supports multple
+    * styles:
+    * @li default
+    * @li pad_small
+    * @li pad_medium
+    * @li pad_large
+    * @li pad_huge
+    * @li outdent_top
+    * @li outdent_bottom
+    *
+    * Of all this styles only default shows the title. Frame emits no signals.
+    *
+    * For a detailed example see the @ref tutorial_frame.
+    *
+    * @{
+    */
+   /**
+    * @brief Add a new frame to the parent
+    *
+    * @param parent The parent object
+    * @return The new object or NULL if it cannot be created
+    */
+   EAPI Evas_Object *elm_frame_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Set the frame label
+    *
+    * @param obj The frame object
+    * @param label The label of this frame object
+    *
+    * @deprecated use elm_object_text_set() instead.
+    */
+   EINA_DEPRECATED EAPI void         elm_frame_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the frame label
+    *
+    * @param obj The frame object
+    *
+    * @return The label of this frame objet or NULL if unable to get frame
+    *
+    * @deprecated use elm_object_text_get() instead.
+    */
+   EINA_DEPRECATED EAPI const char  *elm_frame_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Set the content of the frame widget
+    *
+    * Once the content object is set, a previously set one will be deleted.
+    * If you want to keep that old content object, use the
+    * elm_frame_content_unset() function.
+    *
+    * @param obj The frame object
+    * @param content The content will be filled in this frame object
+    */
+   EAPI void         elm_frame_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the content of the frame widget
+    *
+    * Return the content object which is set for this widget
+    *
+    * @param obj The frame object
+    * @return The content that is being used
+    */
+   EAPI Evas_Object *elm_frame_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Unset the content of the frame widget
+    *
+    * Unparent and return the content object which was set for this widget
+    *
+    * @param obj The frame object
+    * @return The content that was being used
+    */
+   EAPI Evas_Object *elm_frame_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * @}
     */
 
    /* table */
@@ -2849,34 +2963,305 @@ extern "C" {
     * "drag,stop" - Gengrid is not being dragged.
     */
 
-   /* clock */
+   /**
+    * @defgroup Clock Clock
+    *
+    * This is a @b digital clock widget. In its default theme, it has a
+    * vintage "flipping numbers clock" appearance, which will animate
+    * sheets of individual algarisms individually as time goes by.
+    *
+    * A newly created clock will fetch system's time (already
+    * considering local time adjustments) to start with, and will tick
+    * accondingly. It may or may not show seconds.
+    *
+    * Clocks have an @b edition mode. When in it, the sheets will
+    * display extra arrow indications on the top and bottom and the
+    * user may click on them to raise or lower the time values. After
+    * it's told to exit edition mode, it will keep ticking with that
+    * new time set (it keeps the difference from local time).
+    *
+    * Also, when under edition mode, user clicks on the cited arrows
+    * which are @b held for some time will make the clock to flip the
+    * sheet, thus editing the time, continuosly and automatically for
+    * the user. The interval between sheet flips will keep growing in
+    * time, so that it helps the user to reach a time which is distant
+    * from the one set.
+    *
+    * The time display is, by default, in military mode (24h), but an
+    * am/pm indicator may be optionally shown, too, when it will
+    * switch to 12h.
+    *
+    * Smart callbacks one can register to:
+    * - "changed" - the clock's user changed the time
+    *
+    * Here is an example on its usage:
+    * @li @ref clock_example
+    */
+
+   /**
+    * @addtogroup Clock
+    * @{
+    */
+
+   /**
+    * Identifiers for which clock digits should be editable, when a
+    * clock widget is in edition mode. Values may be ORed together to
+    * make a mask, naturally.
+    *
+    * @see elm_clock_edit_set()
+    * @see elm_clock_digit_edit_set()
+    */
    typedef enum _Elm_Clock_Digedit
      {
-        ELM_CLOCK_NONE         = 0,
-        ELM_CLOCK_HOUR_DECIMAL = 1 << 0,
-        ELM_CLOCK_HOUR_UNIT    = 1 << 1,
-        ELM_CLOCK_MIN_DECIMAL  = 1 << 2,
-        ELM_CLOCK_MIN_UNIT     = 1 << 3,
-        ELM_CLOCK_SEC_DECIMAL  = 1 << 4,
-        ELM_CLOCK_SEC_UNIT     = 1 << 5,
-        ELM_CLOCK_ALL          = (1 << 6) - 1
+        ELM_CLOCK_NONE         = 0, /**< Default value. Means that all digits are editable, when in edition mode. */
+        ELM_CLOCK_HOUR_DECIMAL = 1 << 0, /**< Decimal algarism of hours value should be editable */
+        ELM_CLOCK_HOUR_UNIT    = 1 << 1, /**< Unit algarism of hours value should be editable */
+        ELM_CLOCK_MIN_DECIMAL  = 1 << 2, /**< Decimal algarism of minutes value should be editable */
+        ELM_CLOCK_MIN_UNIT     = 1 << 3, /**< Unit algarism of minutes value should be editable */
+        ELM_CLOCK_SEC_DECIMAL  = 1 << 4, /**< Decimal algarism of seconds value should be editable */
+        ELM_CLOCK_SEC_UNIT     = 1 << 5, /**< Unit algarism of seconds value should be editable */
+        ELM_CLOCK_ALL          = (1 << 6) - 1 /**< All digits should be editable */
      } Elm_Clock_Digedit;
 
+   /**
+    * Add a new clock widget to the given parent Elementary
+    * (container) object
+    *
+    * @param parent The parent object
+    * @return a new clock widget handle or @c NULL, on errors
+    *
+    * This function inserts a new clock widget on the canvas.
+    *
+    * @ingroup Clock
+    */
    EAPI Evas_Object      *elm_clock_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+
+   /**
+    * Set a clock widget's time, programmatically
+    *
+    * @param obj The clock widget object
+    * @param hrs The hours to set
+    * @param min The minutes to set
+    * @param sec The secondes to set
+    *
+    * This function updates the time that is showed by the clock
+    * widget.
+    *
+    *  Values @b must be set within the following ranges:
+    * - 0 - 23, for hours
+    * - 0 - 59, for minutes
+    * - 0 - 59, for seconds,
+    *
+    * even if the clock is not in "military" mode.
+    *
+    * @warning The behavior for values set out of those ranges is @b
+    * indefined.
+    *
+    * @ingroup Clock
+    */
    EAPI void              elm_clock_time_set(Evas_Object *obj, int hrs, int min, int sec) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get a clock widget's time values
+    *
+    * @param obj The clock object
+    * @param[out] hrs Pointer to the variable to get the hours value
+    * @param[out] min Pointer to the variable to get the minutes value
+    * @param[out] sec Pointer to the variable to get the seconds value
+    *
+    * This function gets the time set for @p obj, returning
+    * it on the variables passed as the arguments to function
+    *
+    * @note Use @c NULL pointers on the time values you're not
+    * interested in: they'll be ignored by the function.
+    *
+    * @ingroup Clock
+    */
    EAPI void              elm_clock_time_get(const Evas_Object *obj, int *hrs, int *min, int *sec) EINA_ARG_NONNULL(1);
+
+   /**
+    * Set whether a given clock widget is under <b>edition mode</b> or
+    * under (default) displaying-only mode.
+    *
+    * @param obj The clock object
+    * @param edit @c EINA_TRUE to put it in edition, @c EINA_FALSE to
+    * put it back to "displaying only" mode
+    *
+    * This function makes a clock's time to be editable or not <b>by
+    * user interaction</b>. When in edition mode, clocks @b stop
+    * ticking, until one brings them back to canonical mode. The
+    * elm_clock_digit_edit_set() function will influence which digits
+    * of the clock will be editable. By default, all of them will be
+    * (#ELM_CLOCK_NONE).
+    *
+    * @note am/pm sheets, if being shown, will @b always be editable
+    * under edition mode.
+    *
+    * @see elm_clock_edit_get()
+    *
+    * @ingroup Clock
+    */
    EAPI void              elm_clock_edit_set(Evas_Object *obj, Eina_Bool edit) EINA_ARG_NONNULL(1);
+
+   /**
+    * Retrieve whether a given clock widget is under <b>edition
+    * mode</b> or under (default) displaying-only mode.
+    *
+    * @param obj The clock object
+    * @param edit @c EINA_TRUE, if it's in edition mode, @c EINA_FALSE
+    * otherwise
+    *
+    * This function retrieves whether the clock's time can be edited
+    * or not by user interaction.
+    *
+    * @see elm_clock_edit_set() for more details
+    *
+    * @ingroup Clock
+    */
    EAPI Eina_Bool         elm_clock_edit_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Set what digits of the given clock widget should be editable
+    * when in edition mode.
+    *
+    * @param obj The clock object
+    * @param digedit Bit mask indicating the digits to be editable
+    * (values in #Elm_Clock_Digedit).
+    *
+    * If the @p digedit param is #ELM_CLOCK_NONE, editing will be
+    * disabled on @p obj (same effect as elm_clock_edit_set(), with @c
+    * EINA_FALSE).
+    *
+    * @see elm_clock_digit_edit_get()
+    *
+    * @ingroup Clock
+    */
    EAPI void              elm_clock_digit_edit_set(Evas_Object *obj, Elm_Clock_Digedit digedit) EINA_ARG_NONNULL(1);
+
+   /**
+    * Retrieve what digits of the given clock widget should be
+    * editable when in edition mode.
+    *
+    * @param obj The clock object
+    * @return Bit mask indicating the digits to be editable
+    * (values in #Elm_Clock_Digedit).
+    *
+    * @see elm_clock_digit_edit_set() for more details
+    *
+    * @ingroup Clock
+    */
    EAPI Elm_Clock_Digedit elm_clock_digit_edit_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Set if the given clock widget must show hours in military or
+    * am/pm mode
+    *
+    * @param obj The clock object
+    * @param am_pm @c EINA_TRUE to put it in am/pm mode, @c EINA_FALSE
+    * to military mode
+    *
+    * This function sets if the clock must show hours in military or
+    * am/pm mode. In some countries like Brazil the military mode
+    * (00-24h-format) is used, in opposition to the USA, where the
+    * am/pm mode is more commonly used.
+    *
+    * @see elm_clock_show_am_pm_get()
+    *
+    * @ingroup Clock
+    */
    EAPI void              elm_clock_show_am_pm_set(Evas_Object *obj, Eina_Bool am_pm) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get if the given clock widget shows hours in military or am/pm
+    * mode
+    *
+    * @param obj The clock object
+    * @return @c EINA_TRUE, if in am/pm mode, @c EINA_FALSE if in
+    * military
+    *
+    * This function gets if the clock shows hours in military or am/pm
+    * mode.
+    *
+    * @see elm_clock_show_am_pm_set() for more details
+    *
+    * @ingroup Clock
+    */
    EAPI Eina_Bool         elm_clock_show_am_pm_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Set if the given clock widget must show time with seconds or not
+    *
+    * @param obj The clock object
+    * @param seconds @c EINA_TRUE to show seconds, @c EINA_FALSE otherwise
+    *
+    * This function sets if the given clock must show or not elapsed
+    * seconds. By default, they are @b not shown.
+    *
+    * @see elm_clock_show_seconds_get()
+    *
+    * @ingroup Clock
+    */
    EAPI void              elm_clock_show_seconds_set(Evas_Object *obj, Eina_Bool seconds) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get whether the given clock widget is showing time with seconds
+    * or not
+    *
+    * @param obj The clock object
+    * @return @c EINA_TRUE if it's showing seconds, @c EINA_FALSE otherwise
+    *
+    * This function gets whether @p obj is showing or not the elapsed
+    * seconds.
+    *
+    * @see elm_clock_show_seconds_set()
+    *
+    * @ingroup Clock
+    */
    EAPI Eina_Bool         elm_clock_show_seconds_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Set the interval on time updates for an user mouse button hold
+    * on clock widgets' time edition.
+    *
+    * @param obj The clock object
+    * @param interval The (first) interval value in seconds
+    *
+    * This interval value is @b decreased while the user holds the
+    * mouse pointer either incrementing or decrementing a given the
+    * clock digit's value.
+    *
+    * This helps the user to get to a given time distant from the
+    * current one easier/faster, as it will start to flip quicker and
+    * quicker on mouse button holds.
+    *
+    * The calculation for the next flip interval value, starting from
+    * the one set with this call, is the previous interval divided by
+    * 1.05, so it decreases a little bit.
+    *
+    * The default starting interval value for automatic flips is
+    * @b 0.85 seconds.
+    *
+    * @see elm_clock_interval_get()
+    *
+    * @ingroup Clock
+    */
    EAPI void              elm_clock_interval_set(Evas_Object *obj, double interval) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the interval on time updates for an user mouse button hold
+    * on clock widgets' time edition.
+    *
+    * @param obj The clock object
+    * @return The (first) interval value, in seconds, set on it
+    *
+    * @see elm_clock_interval_set() for more details
+    *
+    * @ingroup Clock
+    */
    EAPI double            elm_clock_interval_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /* smart callbacks called:
-    * "changed" - the user changed the time
+
+   /**
+    * @}
     */
 
    /* layout */
@@ -4827,9 +5212,15 @@ extern "C" {
    EAPI void               elm_genlist_item_cursor_engine_only_set(Elm_Genlist_Item *item, Eina_Bool engine_only) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool          elm_genlist_item_cursor_engine_only_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
    EAPI void               elm_genlist_realized_items_update(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /* smart callbacks called:
-    * "clicked,double" - This is called when a user has double-clicked an item. The
-    *                    event_info parameter is the genlist item that was double-clicked.
+   EAPI void               elm_genlist_item_mode_set(Elm_Genlist_Item *it, const char *mode_type, Eina_Bool mode_set) EINA_ARG_NONNULL(1, 2);
+   EAPI const char        *elm_genlist_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI const Elm_Genlist_Item *elm_genlist_mode_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_reorder_mode_set(Evas_Object *obj, Eina_Bool reorder_mode) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool          elm_genlist_reorder_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /* Signals that you can add callbacks for are:
+    * "clicked,double" - This is called when a user has double-clicked an item.
+    *                    The event_info parameter is the genlist item that was
+    *                    double-clicked.
     * "selected" - This is called when a user has made an item selected. The
     *              event_info parameter is the genlist item that was selected.
     * "unselected" - This is called when a user has made an item unselected. The
@@ -4903,24 +5294,156 @@ extern "C" {
    EAPI void               elm_genlist_pinch_zoom_set(Evas_Object *obj, Eina_Bool emode) EINA_ARG_NONNULL(1);
    EAPI void               elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool          elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void               elm_genlist_reorder_mode_set(Evas_Object *obj, Eina_Bool reorder_mode) EINA_ARG_NONNULL(1);
-   EAPI Eina_Bool          elm_genlist_reorder_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void               elm_genlist_item_mode_set(Elm_Genlist_Item *it, const char *mode_type, Eina_Bool mode_set) EINA_ARG_NONNULL(1, 2);
-   EAPI const char        *elm_genlist_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI const Elm_Genlist_Item *elm_genlist_mode_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
-   /* check */
+   /**
+    * @page tutorial_check Check example
+    * @dontinclude check_example_01.c
+    *
+    * This example will show 2 checkboxes, one with just a label and the second
+    * one with both a label and an icon. This example also ilustrates how to
+    * have the checkbox change the value of a variable and how to react to those
+    * changes.
+    *
+    * We will start with the usual setup code:
+    * @until show(bg)
+    *
+    * And now we create our first checkbox, set its label, tell it to change
+    * the value of @p value when the checkbox stats is changed and ask to be
+    * notified of state changes:
+    * @until show
+    *
+    * For our second checkbox we are going to set an icon so we need to create
+    * and icon:
+    * @until show
+    * @note For simplicity we are using a rectangle as icon, but any evas object
+    * can be used.
+    *
+    * And for our second checkbox we set the label, icon and state to true:
+    * @until show
+    *
+    * We now do some more setup:
+    * @until ELM_MAIN
+    *
+    * And finally implement the callback that will be called when the first
+    * checkbox's state changes. This callback will use @p data to print a
+    * message:
+    * @until }
+    * @note This work because @p data is @p value(from the main function) and @p
+    * value is changed when the checkbox is changed.
+    *
+    * Our example will look like this:
+    * @image html screenshots/check_example_01.png
+    * @image latex screenshots/check_example_01.eps
+    *
+    * @example check_example_01.c
+    */
+   /**
+    * @defgroup Check Check
+    *
+    * @brief The check widget allows for toggling a value between true and
+    * false.
+    *
+    * Check objects are a lot like radio objects in layout and functionality
+    * except they do not work as a group, but independently and only toggle the
+    * value of a boolean from false to true (0 or 1). elm_check_state_set() sets
+    * the boolean state (1 for true, 0 for false), and elm_check_state_get()
+    * returns the current state. For convenience, like the radio objects, you
+    * can set a pointer to a boolean directly with elm_check_state_pointer_set()
+    * for it to modify.
+    *
+    * Signals that you can add callbacks for are:
+    * "changed" - This is called whenever the user changes the state of one of
+    *             the check object(event_info is NULL).
+    *
+    * @ref tutorial_check should give you a firm grasp of how to use this widget.
+    * @{
+    */
+   /**
+    * @brief Add a new Check object
+    *
+    * @param parent The parent object
+    * @return The new object or NULL if it cannot be created
+    */
    EAPI Evas_Object *elm_check_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Set the text label of the check object
+    *
+    * @param obj The check object
+    * @param label The text label string in UTF-8
+    *
+    * @deprecated use elm_object_text_set() instead.
+    */
    EINA_DEPRECATED EAPI void         elm_check_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the text label of the check object
+    *
+    * @param obj The check object
+    * @return The text label string in UTF-8
+    *
+    * @deprecated use elm_object_text_get() instead.
+    */
    EINA_DEPRECATED EAPI const char  *elm_check_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Set the icon object of the check object
+    *
+    * @param obj The check object
+    * @param icon The icon object
+    *
+    * Once the icon object is set, a previously set one will be deleted.
+    * If you want to keep that old content object, use the
+    * elm_check_icon_unset() function.
+    */
    EAPI void         elm_check_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the icon object of the check object
+    *
+    * @param obj The check object
+    * @return The icon object
+    */
    EAPI Evas_Object *elm_check_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Unset the icon used for the check object
+    *
+    * @param obj The check object
+    * @return The icon object that was being used
+    *
+    * Unparent and return the icon object which was set for this widget.
+    */
    EAPI Evas_Object *elm_check_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Set the on/off state of the check object
+    *
+    * @param obj The check object
+    * @param state The state to use (1 == on, 0 == off)
+    *
+    * This sets the state of the check. If set
+    * with elm_check_state_pointer_set() the state of that variable is also
+    * changed. Calling this @b doesn't cause the "changed" signal to be emited.
+    */
    EAPI void         elm_check_state_set(Evas_Object *obj, Eina_Bool state) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the state of the check object
+    *
+    * @param obj The check object
+    * @return The boolean state
+    */
    EAPI Eina_Bool    elm_check_state_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Set a convenience pointer to a boolean to change
+    *
+    * @param obj The check object
+    * @param statep Pointer to the boolean to modify
+    *
+    * This sets a pointer to a boolean, that, in addition to the check objects
+    * state will also be modified directly. To stop setting the object pointed
+    * to simply use NULL as the @p statep parameter. If @p statep is not NULL,
+    * then when this is called, the check objects state will also be modified to
+    * reflect the value of the boolean @p statep points to, just like calling
+    * elm_check_state_set().
+    */
    EAPI void         elm_check_state_pointer_set(Evas_Object *obj, Eina_Bool *statep) EINA_ARG_NONNULL(1);
-   /* smart callbacks called:
-    * "changed" - This is called whenever the user changes the state of one of the check object.
+   /**
+    * @}
     */
 
    /* radio */
@@ -5522,36 +6045,336 @@ extern "C" {
    EAPI void         elm_mapbuf_alpha_set(Evas_Object *obj, Eina_Bool alpha) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool    elm_mapbuf_alpha_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
-   /* flipselector */
-   typedef struct _Elm_Flipselector_Item Elm_Flipselector_Item;
-
-   EAPI Evas_Object               *elm_flipselector_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-   EAPI void                       elm_flipselector_flip_next(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                       elm_flipselector_flip_prev(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI Elm_Flipselector_Item     *elm_flipselector_item_append(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data) EINA_ARG_NONNULL(1);
-   EAPI Elm_Flipselector_Item     *elm_flipselector_item_prepend(Evas_Object *obj, const char *label, void (*func)(void *data, Evas_Object *obj, void *event_info), void *data) EINA_ARG_NONNULL(1);
-   EAPI const Eina_List           *elm_flipselector_items_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI Elm_Flipselector_Item     *elm_flipselector_first_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI Elm_Flipselector_Item     *elm_flipselector_last_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI Elm_Flipselector_Item     *elm_flipselector_selected_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                       elm_flipselector_item_selected_set(Elm_Flipselector_Item *item, Eina_Bool selected) EINA_ARG_NONNULL(1);
-   EAPI Eina_Bool                  elm_flipselector_item_selected_get(const Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
-   EAPI void                       elm_flipselector_item_del(Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
-   EAPI const char                *elm_flipselector_item_label_get(const Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
-   EAPI void                       elm_flipselector_item_label_set(Elm_Flipselector_Item *item, const char *label) EINA_ARG_NONNULL(1);
-   EAPI Elm_Flipselector_Item     *elm_flipselector_item_prev_get(Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
-   EAPI Elm_Flipselector_Item     *elm_flipselector_item_next_get(Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
-   EAPI void                       elm_flipselector_interval_set(Evas_Object *obj, double interval) EINA_ARG_NONNULL(1);
-   EAPI double                     elm_flipselector_interval_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /* smart callbacks called:
-    * "selected" - when flipselector selected item is changed
-    * "overflowed" - when flipselector item is changed to first item
-    *                from last item
-    * "underflowed" - when flipselector item is changed to last item
-    *                 from first item.
+   /**
+    * @defgroup Flipselector Flip Selector
+    *
+    * A flip selector is a widget to show a set of @b text items, one
+    * at a time, with the same sheet switching style as the @ref Clock
+    * "clock" widget, when one changes the current displaying sheet
+    * (thus, the "flip" in the name).
+    *
+    * User clicks to flip sheets which are @b held for some time will
+    * make the flip selector to flip continuosly and automatically for
+    * the user. The interval between flips will keep growing in time,
+    * so that it helps the user to reach an item which is distant from
+    * the current selection.
+    *
+    * Smart callbacks one can register to:
+    * - @c "selected" - when the widget's selected text item is changed
+    * - @c "overflowed" - when the widget's current selection is changed
+    *   from the first item in its list to the last
+    * - @c "underflowed" - when the widget's current selection is changed
+    *   from the last item in its list to the first
+    *
+    * Available styles for it:
+    * - @c "default"
+    *
+    * Here is an example on its usage:
+    * @li @ref flipselector_example
     */
-   /* available styles:
-    * default
+
+   /**
+    * @addtogroup Flipselector
+    * @{
+    */
+
+   typedef struct _Elm_Flipselector_Item Elm_Flipselector_Item; /**< Item handle for a flip selector widget. */
+
+   /**
+    * Add a new flip selector widget to the given parent Elementary
+    * (container) widget
+    *
+    * @param parent The parent object
+    * @return a new flip selector widget handle or @c NULL, on errors
+    *
+    * This function inserts a new flip selector widget on the canvas.
+    *
+    * @ingroup Flipselector
+    */
+   EAPI Evas_Object               *elm_flipselector_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+
+   /**
+    * Programmatically select the next item of a flip selector widget
+    *
+    * @param obj The flipselector object
+    *
+    * @note The selection will be animated. Also, if it reaches the
+    * end of its list of member items, it will continue with the first
+    * one onwards.
+    *
+    * @ingroup Flipselector
+    */
+   EAPI void                       elm_flipselector_flip_next(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Programmatically select the previous item of a flip selector
+    * widget
+    *
+    * @param obj The flipselector object
+    *
+    * @note The selection will be animated.  Also, if it reaches the
+    * beginning of its list of member items, it will continue with the
+    * last one backwards.
+    *
+    * @ingroup Flipselector
+    */
+   EAPI void                       elm_flipselector_flip_prev(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Append a (text) item to a flip selector widget
+    *
+    * @param obj The flipselector object
+    * @param label The (text) label of the new item
+    * @param func Convenience callback function to take place when
+    * item is selected
+    * @param data Data passed to @p func, above
+    * @return A handle to the item added or @c NULL, on errors
+    *
+    * The widget's list of labels to show will be appended with the
+    * given value. If the user wishes so, a callback function pointer
+    * can be passed, which will get called when this same item is
+    * selected.
+    *
+    * @note The current selection @b won't be modified by appending an
+    * element to the list.
+    *
+    * @note The maximum length of the text label is going to be
+    * determined <b>by the widget's theme</b>. Strings larger than
+    * that value are going to be @b truncated.
+    *
+    * @ingroup Flipselector
+    */
+   EAPI Elm_Flipselector_Item     *elm_flipselector_item_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, void *data) EINA_ARG_NONNULL(1);
+
+   /**
+    * Prepend a (text) item to a flip selector widget
+    *
+    * @param obj The flipselector object
+    * @param label The (text) label of the new item
+    * @param func Convenience callback function to take place when
+    * item is selected
+    * @param data Data passed to @p func, above
+    * @return A handle to the item added or @c NULL, on errors
+    *
+    * The widget's list of labels to show will be prepended with the
+    * given value. If the user wishes so, a callback function pointer
+    * can be passed, which will get called when this same item is
+    * selected.
+    *
+    * @note The current selection @b won't be modified by prepending
+    * an element to the list.
+    *
+    * @note The maximum length of the text label is going to be
+    * determined <b>by the widget's theme</b>. Strings larger than
+    * that value are going to be @b truncated.
+    *
+    * @ingroup Flipselector
+    */
+   EAPI Elm_Flipselector_Item     *elm_flipselector_item_prepend(Evas_Object *obj, const char *label, Evas_Smart_Cb func, void *data) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the internal list of items in a given flip selector widget.
+    *
+    * @param obj The flipselector object
+    * @return The list of items (#Elm_Flipselector_Item as data) or @c
+    * NULL on errors.
+    *
+    * This list is @b not to be modified in any way and must not be
+    * freed. Use the list members with functions like
+    * elm_flipselector_item_label_set(),
+    * elm_flipselector_item_label_get(), elm_flipselector_item_del(),
+    * elm_flipselector_item_del(),
+    * elm_flipselector_item_selected_get(),
+    * elm_flipselector_item_selected_set().
+    *
+    * @warning This list is only valid until @p obj object's internal
+    * items list is changed. It should be fetched again with another
+    * call to this function when changes happen.
+    *
+    * @ingroup Flipselector
+    */
+   EAPI const Eina_List           *elm_flipselector_items_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the first item in the given flip selector widget's list of
+    * items.
+    *
+    * @param obj The flipselector object
+    * @return The first item or @c NULL, if it has no items (and on
+    * errors)
+    *
+    * @see elm_flipselector_item_append()
+    * @see elm_flipselector_last_item_get()
+    *
+    * @ingroup Flipselector
+    */
+   EAPI Elm_Flipselector_Item     *elm_flipselector_first_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the last item in the given flip selector widget's list of
+    * items.
+    *
+    * @param obj The flipselector object
+    * @return The last item or @c NULL, if it has no items (and on
+    * errors)
+    *
+    * @see elm_flipselector_item_prepend()
+    * @see elm_flipselector_first_item_get()
+    *
+    * @ingroup Flipselector
+    */
+   EAPI Elm_Flipselector_Item     *elm_flipselector_last_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the currently selected item in a flip selector widget.
+    *
+    * @param obj The flipselector object
+    * @return The selected item or @c NULL, if the widget has no items
+    * (and on erros)
+    *
+    * @ingroup Flipselector
+    */
+   EAPI Elm_Flipselector_Item     *elm_flipselector_selected_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Set whether a given flip selector widget's item should be the
+    * currently selected one.
+    *
+    * @param item The flip selector item
+    * @param selected @c EINA_TRUE to select it, @c EINA_FALSE to unselect.
+    *
+    * This sets whether @p item is or not the selected (thus, under
+    * display) one. If @p item is different than one under display,
+    * the latter will be unselected. If the @p item is set to be
+    * unselected, on the other hand, the @b first item in the widget's
+    * internal members list will be the new selected one.
+    *
+    * @see elm_flipselector_item_selected_get()
+    *
+    * @ingroup Flipselector
+    */
+   EAPI void                       elm_flipselector_item_selected_set(Elm_Flipselector_Item *item, Eina_Bool selected) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get whether a given flip selector widget's item is the currently
+    * selected one.
+    *
+    * @param item The flip selector item
+    * @return @c EINA_TRUE, if it's selected, @c EINA_FALSE otherwise
+    * (or on errors).
+    *
+    * @see elm_flipselector_item_selected_set()
+    *
+    * @ingroup Flipselector
+    */
+   EAPI Eina_Bool                  elm_flipselector_item_selected_get(const Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
+
+   /**
+    * Delete a given item from a flip selector widget.
+    *
+    * @param item The item to delete
+    *
+    * @ingroup Flipselector
+    */
+   EAPI void                       elm_flipselector_item_del(Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the label of a given flip selector widget's item.
+    *
+    * @param item The item to get label from
+    * @return The text label of @p item or @c NULL, on errors
+    *
+    * @see elm_flipselector_item_label_set()
+    *
+    * @ingroup Flipselector
+    */
+   EAPI const char                *elm_flipselector_item_label_get(const Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
+
+   /**
+    * Set the label of a given flip selector widget's item.
+    *
+    * @param item The item to set label on
+    * @param label The text label string, in UTF-8 encoding
+    *
+    * @see elm_flipselector_item_label_get()
+    *
+    * @ingroup Flipselector
+    */
+   EAPI void                       elm_flipselector_item_label_set(Elm_Flipselector_Item *item, const char *label) EINA_ARG_NONNULL(1);
+
+   /**
+    * Gets the item before @p item in a flip selector widget's
+    * internal list of items.
+    *
+    * @param item The item to fetch previous from
+    * @return The item before the @p item, in its parent's list. If
+    *         there is no previous item for @p item or there's an
+    *         error, @c NULL is returned.
+    *
+    * @see elm_flipselector_item_next_get()
+    *
+    * @ingroup Flipselector
+    */
+   EAPI Elm_Flipselector_Item     *elm_flipselector_item_prev_get(Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
+
+   /**
+    * Gets the item after @p item in a flip selector widget's
+    * internal list of items.
+    *
+    * @param item The item to fetch next from
+    * @return The item after the @p item, in its parent's list. If
+    *         there is no next item for @p item or there's an
+    *         error, @c NULL is returned.
+    *
+    * @see elm_flipselector_item_next_get()
+    *
+    * @ingroup Flipselector
+    */
+   EAPI Elm_Flipselector_Item     *elm_flipselector_item_next_get(Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
+
+   /**
+    * Set the interval on time updates for an user mouse button hold
+    * on a flip selector widget.
+    *
+    * @param obj The flip selector object
+    * @param interval The (first) interval value in seconds
+    *
+    * This interval value is @b decreased while the user holds the
+    * mouse pointer either flipping up or flipping doww a given flip
+    * selector.
+    *
+    * This helps the user to get to a given item distant from the
+    * current one easier/faster, as it will start to flip quicker and
+    * quicker on mouse button holds.
+    *
+    * The calculation for the next flip interval value, starting from
+    * the one set with this call, is the previous interval divided by
+    * 1.05, so it decreases a little bit.
+    *
+    * The default starting interval value for automatic flips is
+    * @b 0.85 seconds.
+    *
+    * @see elm_flipselector_interval_get()
+    *
+    * @ingroup Flipselector
+    */
+   EAPI void                       elm_flipselector_interval_set(Evas_Object *obj, double interval) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the interval on time updates for an user mouse button hold
+    * on a flip selector widget.
+    *
+    * @param obj The flip selector object
+    * @return The (first) interval value, in seconds, set on it
+    *
+    * @see elm_flipselector_interval_set() for more details
+    *
+    * @ingroup Flipselector
+    */
+   EAPI double                     elm_flipselector_interval_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * @}
     */
 
    /**
@@ -5866,234 +6689,81 @@ extern "C" {
     * "selected" - when item is selected (scroller stops)
     */
 
-   /* datefield */
-   typedef enum _Elm_Datefield_Layout
-     {
-        ELM_DATEFIELD_LAYOUT_TIME,
-        ELM_DATEFIELD_LAYOUT_DATE,
-        ELM_DATEFIELD_LAYOUT_DATEANDTIME
-     } Elm_Datefield_Layout;
-
-   EAPI Evas_Object *elm_datefield_add(Evas_Object *parent);
-   EAPI void         elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
-   EAPI Elm_Datefield_Layout elm_datefield_layout_get(const Evas_Object *obj);
-   EAPI void         elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour, int min);
-   EAPI void         elm_datefield_date_get(const Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min);
-   EAPI Eina_Bool elm_datefield_date_max_set(Evas_Object *obj, int year, int month, int day);
-   EAPI void         elm_datefield_date_max_get(const Evas_Object *obj, int *year, int *month, int *day);
-   EAPI Eina_Bool elm_datefield_date_min_set(Evas_Object *obj, int year, int month, int day);
-   EAPI void         elm_datefield_date_min_get(const Evas_Object *obj, int *year, int *month, int *day);
-   EAPI void         elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);
-   EAPI Eina_Bool    elm_datefield_time_mode_get(const Evas_Object *obj);
-   EAPI void         elm_datefield_date_format_set(Evas_Object *obj, const char *fmt);
-   EAPI const char  *elm_datefield_date_format_get(const Evas_Object *obj);
-   EAPI void         elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data);
-   EAPI void         elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value));
-   /* smart callbacks called:
-   * "changed" - when datefield entry is changed, this signal is sent.
-   */
-
-   /* popup */
-   typedef enum _Elm_Popup_Response
-     {
-        ELM_POPUP_RESPONSE_NONE = -1,
-        ELM_POPUP_RESPONSE_TIMEOUT = -2,
-        ELM_POPUP_RESPONSE_OK = -3,
-        ELM_POPUP_RESPONSE_CANCEL = -4,
-        ELM_POPUP_RESPONSE_CLOSE = -5
-     } Elm_Popup_Response;
-
-   typedef enum _Elm_Popup_Mode
-     {
-        ELM_POPUP_TYPE_NONE = 0,
-        ELM_POPUP_TYPE_ALERT = (1 << 0)
-     } Elm_Popup_Mode;
-
-   typedef enum _Elm_Popup_Orient
-     {
-        ELM_POPUP_ORIENT_TOP,
-        ELM_POPUP_ORIENT_CENTER,
-        ELM_POPUP_ORIENT_BOTTOM,
-        ELM_POPUP_ORIENT_LEFT,
-        ELM_POPUP_ORIENT_RIGHT,
-        ELM_POPUP_ORIENT_TOP_LEFT,
-        ELM_POPUP_ORIENT_TOP_RIGHT,
-        ELM_POPUP_ORIENT_BOTTOM_LEFT,
-        ELM_POPUP_ORIENT_BOTTOM_RIGHT
-     } Elm_Popup_Orient;
-
-   /* smart callbacks called:
-    * "response" - when ever popup is closed, this signal is sent with appropriate response id.".
+   /**
+    * @page tutorial_colorselector Color selector example
+    * @dontinclude colorselector_example_01.c
+    *
+    * This example shows how to change the color of a rectangle using a color
+    * selector. We aren't going to explain a lot of the code since it's the
+    * usual setup code:
+    * @until show(rect)
+    *
+    * Now that we have a window with background and a rectangle we can create
+    * our color_selector and set it's initial color to fully opaque blue:
+    * @until show
+    *
+    * Next we tell ask to be notified whenever the color changes:
+    * @until changed
+    *
+    * We follow that we some more run of the mill setup code:
+    * @until ELM_MAIN()
+    *
+    * And now get to the callback that sets the color of the rectangle:
+    * @until }
+    *
+    * This example will look like this:
+    * @image html screenshots/colorselector_example_01.png
+    * @image latex screenshots/colorselector_example_01.eps
+    *
+    * @example colorselector_example_01.c
     */
-
-   EAPI Evas_Object *elm_popup_add(Evas_Object *parent);
-   EAPI void         elm_popup_desc_set(Evas_Object *obj, const char *text);
-   EAPI const char  *elm_popup_desc_get(Evas_Object *obj);
-   EAPI void         elm_popup_title_label_set(Evas_Object *obj, const char *text);
-   EAPI const char  *elm_popup_title_label_get(Evas_Object *obj);
-   EAPI void         elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object *elm_popup_title_icon_get(Evas_Object *obj);
-   EAPI void         elm_popup_content_set(Evas_Object *obj, Evas_Object *content);
-   EAPI Evas_Object *elm_popup_content_get(Evas_Object *obj);
-   EAPI void         elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, const char *first_button_text,  ...);
-   EAPI Evas_Object *elm_popup_with_buttons_add(Evas_Object *parent, const char *title, const char *desc_text,int no_of_buttons, const char *first_button_text, ... );
-   EAPI void         elm_popup_timeout_set(Evas_Object *obj, double timeout);
-   EAPI void         elm_popup_mode_set(Evas_Object *obj, Elm_Popup_Mode mode);
-   EAPI void         elm_popup_response(Evas_Object *obj, int  response_id);
-   EAPI void         elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
-   EAPI int          elm_popup_run(Evas_Object *obj);
-
-   /* NavigationBar */
-   typedef enum
-     {
-        ELM_NAVIGATIONBAR_FUNCTION_BUTTON1,
-        ELM_NAVIGATIONBAR_FUNCTION_BUTTON2,
-        ELM_NAVIGATIONBAR_FUNCTION_BUTTON3,
-        ELM_NAVIGATIONBAR_BACK_BUTTON
-     } Elm_Navi_Button_Type;
-
-   EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);
-   EAPI void         elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1, Evas_Object *fn_btn2, Evas_Object *fn_btn3, Evas_Object *content);
-   EAPI void         elm_navigationbar_pop(Evas_Object *obj);
-   EAPI void         elm_navigationbar_to_content_pop(Evas_Object *obj, Evas_Object *content);
-   EAPI void         elm_navigationbar_title_label_set(Evas_Object *obj, Evas_Object *content, const char *title);
-   EAPI const char  *elm_navigationbar_title_label_get(Evas_Object *obj, Evas_Object *content);
-   EAPI void         elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_Object *title_obj);
-   EAPI Eina_List   *elm_navigationbar_title_object_list_get(Evas_Object *obj, Evas_Object *content);
-   EAPI Evas_Object *elm_navigationbar_content_top_get(Evas_Object *obj);
-   EAPI Evas_Object *elm_navigationbar_content_bottom_get(Evas_Object *obj);
-   EAPI void         elm_navigationbar_hidden_set(Evas_Object *obj, Eina_Bool hidden);
-   EAPI void         elm_navigationbar_title_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Elm_Navi_Button_Type button_type);
-   EAPI Evas_Object *elm_navigationbar_title_button_get(Evas_Object *obj, Evas_Object *content, Elm_Navi_Button_Type button_type);
-   EAPI const char  *elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content);
-   EAPI void         elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
-   EAPI void         elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list);
-   EAPI void         elm_navigationbar_animation_disabled_set(Evas_Object *obj, Eina_Bool disable);
-   EAPI void         elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *content, Eina_Bool visible);
-   Eina_Bool         elm_navigationbar_title_object_visible_get(Evas_Object *obj, Evas_Object *content);
-   EAPI void         elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Object *icon);
-   EAPI Evas_Object *elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content);
-
-     /* NavigationBar */
-   typedef enum
-     {
-        ELM_NAVIGATIONBAR_EX_BACK_BUTTON,
-        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1,
-        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON2,
-        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON3,
-        ELM_NAVIGATIONBAR_EX_MAX
-     } Elm_Navi_ex_Button_Type;
-   typedef struct _Elm_Navigationbar_ex_Item Elm_Navigationbar_ex_Item;
-
-   EAPI Evas_Object *elm_navigationbar_ex_add(Evas_Object *parent);
-   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const char *item_style);
-   EAPI void         elm_navigationbar_ex_item_pop(Evas_Object *obj);
-   EAPI void         elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_item_title_label_set(Elm_Navigationbar_ex_Item *item, const char *title);
-   EAPI const char  *elm_navigationbar_ex_item_title_label_get(Elm_Navigationbar_ex_Item* item);
-   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_top_get(const Evas_Object *obj);
-   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_bottom_get(const Evas_Object *obj);
-   EAPI void         elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data);
-   EAPI Evas_Object *elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type);
-   EAPI void         elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item, Evas_Object *title_obj);
-   EAPI Evas_Object *elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item, Eina_Bool hidden);
-   EAPI Evas_Object *elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item);
-   EAPI const char  *elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item, const char *subtitle);
-   EAPI void         elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char* item_style);
-   EAPI const char  *elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item);
-   EAPI Evas_Object *elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item);
-   EAPI Evas_Object *elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop);
-   EAPI Evas_Object *elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon);
-   EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
-   EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
-   EAPI void         elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, Eina_Bool visible);
-   Eina_Bool         elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item);
-
-
-   /* Control Bar */
-   #define CONTROLBAR_SYSTEM_ICON_ALBUMS "controlbar_albums"
-   #define CONTROLBAR_SYSTEM_ICON_ARTISTS "controlbar_artists"
-   #define CONTROLBAR_SYSTEM_ICON_SONGS "controlbar_songs"
-   #define CONTROLBAR_SYSTEM_ICON_PLAYLIST "controlbar_playlist"
-   #define CONTROLBAR_SYSTEM_ICON_MORE "controlbar_more"
-   #define CONTROLBAR_SYSTEM_ICON_CONTACTS "controlbar_contacts"
-   #define CONTROLBAR_SYSTEM_ICON_DIALER "controlbar_dialer"
-   #define CONTROLBAR_SYSTEM_ICON_FAVORITES "controlbar_favorites"
-   #define CONTROLBAR_SYSTEM_ICON_LOGS "controlbar_logs"
-
-   typedef enum _Elm_Controlbar_Mode_Type
-     {
-        ELM_CONTROLBAR_MODE_DEFAULT = 0,
-        ELM_CONTROLBAR_MODE_TRANSLUCENCE,
-        ELM_CONTROLBAR_MODE_TRANSPARENCY,
-        ELM_CONTROLBAR_MODE_LARGE,
-        ELM_CONTROLBAR_MODE_SMALL,
-        ELM_CONTROLBAR_MODE_LEFT,
-        ELM_CONTROLBAR_MODE_RIGHT
-     } Elm_Controlbar_Mode_Type;
-
-   typedef struct _Elm_Controlbar_Item Elm_Controlbar_Item;
-
-   EAPI Evas_Object *elm_controlbar_add(Evas_Object *parent);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_append(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, Evas_Object *view);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, Evas_Object *view);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_append(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   EAPI Elm_Controlbar_Item *elm_controlbar_object_item_append(Evas_Object *obj, Evas_Object *obj_item, const int sel);
-   EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
-   EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
-   EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, Evas_Object *obj_item, const int sel);
-   EAPI Evas_Object *elm_controlbar_object_item_object_get(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_del(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_select(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
-   EAPI Eina_Bool    elm_controlbar_item_visible_get(Elm_Controlbar_Item * it);
-   EAPI void         elm_controlbar_item_disabled_set(Elm_Controlbar_Item * it, Eina_Bool disabled);
-   EAPI Eina_Bool    elm_controlbar_item_disabled_get(Elm_Controlbar_Item * it);
-   EAPI void         elm_controlbar_item_icon_set(Elm_Controlbar_Item *it, const char *icon_path);
-   EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
-   EAPI const char  *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
-   EAPI Elm_Controlbar_Item *elm_controlbar_selected_item_get(Evas_Object *obj);
-   EAPI Elm_Controlbar_Item *elm_controlbar_first_item_get(Evas_Object *obj);
-   EAPI Elm_Controlbar_Item *elm_controlbar_last_item_get(Evas_Object *obj);
-   EAPI Eina_List   *elm_controlbar_items_get(Evas_Object *obj);
-   EAPI Elm_Controlbar_Item *elm_controlbar_item_prev(Elm_Controlbar_Item *it);
-   EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
-   EAPI Evas_Object *elm_controlbar_item_view_get(Elm_Controlbar_Item *it);
-   EAPI Evas_Object *elm_controlbar_item_view_unset(Elm_Controlbar_Item *it);
-   EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
-   EAPI void         elm_controlbar_alpha_set(Evas_Object *obj, int alpha);
-   EAPI void         elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align);
-   EAPI void         elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical);
-
-
-   /* SearchBar */
-   EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent);
-   EAPI void         elm_searchbar_text_set(Evas_Object *obj, const char *entry);
-   EAPI const char  *elm_searchbar_text_get(Evas_Object *obj);
-   EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj);
-   EAPI void         elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag);
-   EAPI void         elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible);
-   EAPI void         elm_searchbar_clear(Evas_Object *obj);
-   EAPI void         elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary);
-
-   /* colorselector */
+   /**
+    * @defgroup Colorselector Colorselector
+    *
+    * @{
+    *
+    * @brief Widget for user to select a color.
+    *
+    * Signals that you can add callbacks for are:
+    * "changed" - When the color value changes(event_info is NULL).
+    *
+    * See @ref tutorial_colorselector.
+    */
+   /**
+    * @brief Add a new colorselector to the parent
+    *
+    * @param parent The parent object
+    * @return The new object or NULL if it cannot be created
+    *
+    * @ingroup Colorselector
+    */
    EAPI Evas_Object *elm_colorselector_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+   /**
+    * Set a color for the colorselector
+    *
+    * @param obj   Colorselector object
+    * @param r     r-value of color
+    * @param g     g-value of color
+    * @param b     b-value of color
+    * @param a     a-value of color
+    *
+    * @ingroup Colorselector
+    */
    EAPI void         elm_colorselector_color_set(Evas_Object *obj, int r, int g , int b, int a) EINA_ARG_NONNULL(1);
+   /**
+    * Get a color from the colorselector
+    *
+    * @param obj   Colorselector object
+    * @param r     integer pointer for r-value of color
+    * @param g     integer pointer for g-value of color
+    * @param b     integer pointer for b-value of color
+    * @param a     integer pointer for a-value of color
+    *
+    * @ingroup Colorselector
+    */
    EAPI void         elm_colorselector_color_get(const Evas_Object *obj, int *r, int *g , int *b, int *a) EINA_ARG_NONNULL(1);
-   /* smart callbacks called:
-    * "changed" - when the color value changes
+   /**
+    * @}
     */
 
    /* Contextual Popup */
@@ -7343,6 +8013,229 @@ extern "C" {
 
    EAPI Evas_Object *elm_player_add(Evas_Object *parent);
    EAPI void elm_player_video_set(Evas_Object *player, Evas_Object *video);
+
+   /* datefield */
+   typedef enum _Elm_Datefield_Layout
+     {
+        ELM_DATEFIELD_LAYOUT_TIME,
+        ELM_DATEFIELD_LAYOUT_DATE,
+        ELM_DATEFIELD_LAYOUT_DATEANDTIME
+     } Elm_Datefield_Layout;
+
+   EAPI Evas_Object *elm_datefield_add(Evas_Object *parent);
+   EAPI void         elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
+   EAPI Elm_Datefield_Layout elm_datefield_layout_get(const Evas_Object *obj);
+   EAPI void         elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour, int min);
+   EAPI void         elm_datefield_date_get(const Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min);
+   EAPI Eina_Bool elm_datefield_date_max_set(Evas_Object *obj, int year, int month, int day);
+   EAPI void         elm_datefield_date_max_get(const Evas_Object *obj, int *year, int *month, int *day);
+   EAPI Eina_Bool elm_datefield_date_min_set(Evas_Object *obj, int year, int month, int day);
+   EAPI void         elm_datefield_date_min_get(const Evas_Object *obj, int *year, int *month, int *day);
+   EAPI void         elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);
+   EAPI Eina_Bool    elm_datefield_time_mode_get(const Evas_Object *obj);
+   EAPI void         elm_datefield_date_format_set(Evas_Object *obj, const char *fmt);
+   EAPI const char  *elm_datefield_date_format_get(const Evas_Object *obj);
+   EAPI void         elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data);
+   EAPI void         elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value));
+   /* smart callbacks called:
+   * "changed" - when datefield entry is changed, this signal is sent.
+   */
+
+   /* popup */
+   typedef enum _Elm_Popup_Response
+     {
+        ELM_POPUP_RESPONSE_NONE = -1,
+        ELM_POPUP_RESPONSE_TIMEOUT = -2,
+        ELM_POPUP_RESPONSE_OK = -3,
+        ELM_POPUP_RESPONSE_CANCEL = -4,
+        ELM_POPUP_RESPONSE_CLOSE = -5
+     } Elm_Popup_Response;
+
+   typedef enum _Elm_Popup_Mode
+     {
+        ELM_POPUP_TYPE_NONE = 0,
+        ELM_POPUP_TYPE_ALERT = (1 << 0)
+     } Elm_Popup_Mode;
+
+   typedef enum _Elm_Popup_Orient
+     {
+        ELM_POPUP_ORIENT_TOP,
+        ELM_POPUP_ORIENT_CENTER,
+        ELM_POPUP_ORIENT_BOTTOM,
+        ELM_POPUP_ORIENT_LEFT,
+        ELM_POPUP_ORIENT_RIGHT,
+        ELM_POPUP_ORIENT_TOP_LEFT,
+        ELM_POPUP_ORIENT_TOP_RIGHT,
+        ELM_POPUP_ORIENT_BOTTOM_LEFT,
+        ELM_POPUP_ORIENT_BOTTOM_RIGHT
+     } Elm_Popup_Orient;
+
+   /* smart callbacks called:
+    * "response" - when ever popup is closed, this signal is sent with appropriate response id.".
+    */
+
+   EAPI Evas_Object *elm_popup_add(Evas_Object *parent);
+   EAPI void         elm_popup_desc_set(Evas_Object *obj, const char *text);
+   EAPI const char  *elm_popup_desc_get(Evas_Object *obj);
+   EAPI void         elm_popup_title_label_set(Evas_Object *obj, const char *text);
+   EAPI const char  *elm_popup_title_label_get(Evas_Object *obj);
+   EAPI void         elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon);
+   EAPI Evas_Object *elm_popup_title_icon_get(Evas_Object *obj);
+   EAPI void         elm_popup_content_set(Evas_Object *obj, Evas_Object *content);
+   EAPI Evas_Object *elm_popup_content_get(Evas_Object *obj);
+   EAPI void         elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, const char *first_button_text,  ...);
+   EAPI Evas_Object *elm_popup_with_buttons_add(Evas_Object *parent, const char *title, const char *desc_text,int no_of_buttons, const char *first_button_text, ... );
+   EAPI void         elm_popup_timeout_set(Evas_Object *obj, double timeout);
+   EAPI void         elm_popup_mode_set(Evas_Object *obj, Elm_Popup_Mode mode);
+   EAPI void         elm_popup_response(Evas_Object *obj, int  response_id);
+   EAPI void         elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
+   EAPI int          elm_popup_run(Evas_Object *obj);
+
+   /* NavigationBar */
+   typedef enum
+     {
+        ELM_NAVIGATIONBAR_FUNCTION_BUTTON1,
+        ELM_NAVIGATIONBAR_FUNCTION_BUTTON2,
+        ELM_NAVIGATIONBAR_FUNCTION_BUTTON3,
+        ELM_NAVIGATIONBAR_BACK_BUTTON
+     } Elm_Navi_Button_Type;
+
+   EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);
+   EAPI void         elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1, Evas_Object *fn_btn2, Evas_Object *fn_btn3, Evas_Object *content);
+   EAPI void         elm_navigationbar_pop(Evas_Object *obj);
+   EAPI void         elm_navigationbar_to_content_pop(Evas_Object *obj, Evas_Object *content);
+   EAPI void         elm_navigationbar_title_label_set(Evas_Object *obj, Evas_Object *content, const char *title);
+   EAPI const char  *elm_navigationbar_title_label_get(Evas_Object *obj, Evas_Object *content);
+   EAPI void         elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_Object *title_obj);
+   EAPI Eina_List   *elm_navigationbar_title_object_list_get(Evas_Object *obj, Evas_Object *content);
+   EAPI Evas_Object *elm_navigationbar_content_top_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_navigationbar_content_bottom_get(Evas_Object *obj);
+   EAPI void         elm_navigationbar_hidden_set(Evas_Object *obj, Eina_Bool hidden);
+   EAPI void         elm_navigationbar_title_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Elm_Navi_Button_Type button_type);
+   EAPI Evas_Object *elm_navigationbar_title_button_get(Evas_Object *obj, Evas_Object *content, Elm_Navi_Button_Type button_type);
+   EAPI const char  *elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content);
+   EAPI void         elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
+   EAPI void         elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list);
+   EAPI void         elm_navigationbar_animation_disabled_set(Evas_Object *obj, Eina_Bool disable);
+   EAPI void         elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *content, Eina_Bool visible);
+   Eina_Bool         elm_navigationbar_title_object_visible_get(Evas_Object *obj, Evas_Object *content);
+   EAPI void         elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Object *icon);
+   EAPI Evas_Object *elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content);
+
+     /* NavigationBar */
+   typedef enum
+     {
+        ELM_NAVIGATIONBAR_EX_BACK_BUTTON,
+        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1,
+        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON2,
+        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON3,
+        ELM_NAVIGATIONBAR_EX_MAX
+     } Elm_Navi_ex_Button_Type;
+   typedef struct _Elm_Navigationbar_ex_Item Elm_Navigationbar_ex_Item;
+
+   EAPI Evas_Object *elm_navigationbar_ex_add(Evas_Object *parent);
+   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const char *item_style);
+   EAPI void         elm_navigationbar_ex_item_pop(Evas_Object *obj);
+   EAPI void         elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item);
+   EAPI void         elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item);
+   EAPI void         elm_navigationbar_ex_item_title_label_set(Elm_Navigationbar_ex_Item *item, const char *title);
+   EAPI const char  *elm_navigationbar_ex_item_title_label_get(Elm_Navigationbar_ex_Item* item);
+   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_top_get(const Evas_Object *obj);
+   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_bottom_get(const Evas_Object *obj);
+   EAPI void         elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data);
+   EAPI Evas_Object *elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type);
+   EAPI void         elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item, Evas_Object *title_obj);
+   EAPI Evas_Object *elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item);
+   EAPI void         elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item, Eina_Bool hidden);
+   EAPI Evas_Object *elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item);
+   EAPI const char  *elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item);
+   EAPI void         elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item, const char *subtitle);
+   EAPI void         elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char* item_style);
+   EAPI const char  *elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item);
+   EAPI Evas_Object *elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item);
+   EAPI Evas_Object *elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Item* item);
+   EAPI void         elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop);
+   EAPI Evas_Object *elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item);
+   EAPI void         elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon);
+   EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
+   EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
+   EAPI void         elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, Eina_Bool visible);
+   Eina_Bool         elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item);
+
+
+   /* Control Bar */
+   #define CONTROLBAR_SYSTEM_ICON_ALBUMS "controlbar_albums"
+   #define CONTROLBAR_SYSTEM_ICON_ARTISTS "controlbar_artists"
+   #define CONTROLBAR_SYSTEM_ICON_SONGS "controlbar_songs"
+   #define CONTROLBAR_SYSTEM_ICON_PLAYLIST "controlbar_playlist"
+   #define CONTROLBAR_SYSTEM_ICON_MORE "controlbar_more"
+   #define CONTROLBAR_SYSTEM_ICON_CONTACTS "controlbar_contacts"
+   #define CONTROLBAR_SYSTEM_ICON_DIALER "controlbar_dialer"
+   #define CONTROLBAR_SYSTEM_ICON_FAVORITES "controlbar_favorites"
+   #define CONTROLBAR_SYSTEM_ICON_LOGS "controlbar_logs"
+
+   typedef enum _Elm_Controlbar_Mode_Type
+     {
+        ELM_CONTROLBAR_MODE_DEFAULT = 0,
+        ELM_CONTROLBAR_MODE_TRANSLUCENCE,
+        ELM_CONTROLBAR_MODE_TRANSPARENCY,
+        ELM_CONTROLBAR_MODE_LARGE,
+        ELM_CONTROLBAR_MODE_SMALL,
+        ELM_CONTROLBAR_MODE_LEFT,
+        ELM_CONTROLBAR_MODE_RIGHT
+     } Elm_Controlbar_Mode_Type;
+
+   typedef struct _Elm_Controlbar_Item Elm_Controlbar_Item;
+
+   EAPI Evas_Object *elm_controlbar_add(Evas_Object *parent);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_append(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, Evas_Object *view);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, Evas_Object *view);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_append(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
+   EAPI Elm_Controlbar_Item *elm_controlbar_object_item_append(Evas_Object *obj, Evas_Object *obj_item, const int sel);
+   EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
+   EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
+   EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, Evas_Object *obj_item, const int sel);
+   EAPI Evas_Object *elm_controlbar_object_item_object_get(Elm_Controlbar_Item *it);
+   EAPI void         elm_controlbar_item_del(Elm_Controlbar_Item *it);
+   EAPI void         elm_controlbar_item_select(Elm_Controlbar_Item *it);
+   EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
+   EAPI Eina_Bool    elm_controlbar_item_visible_get(Elm_Controlbar_Item * it);
+   EAPI void         elm_controlbar_item_disabled_set(Elm_Controlbar_Item * it, Eina_Bool disabled);
+   EAPI Eina_Bool    elm_controlbar_item_disabled_get(Elm_Controlbar_Item * it);
+   EAPI void         elm_controlbar_item_icon_set(Elm_Controlbar_Item *it, const char *icon_path);
+   EAPI Evas_Object *elm_controlbar_item_icon_get(Elm_Controlbar_Item *it);
+   EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
+   EAPI const char  *elm_controlbar_item_label_get(Elm_Controlbar_Item *it);
+   EAPI Elm_Controlbar_Item *elm_controlbar_selected_item_get(Evas_Object *obj);
+   EAPI Elm_Controlbar_Item *elm_controlbar_first_item_get(Evas_Object *obj);
+   EAPI Elm_Controlbar_Item *elm_controlbar_last_item_get(Evas_Object *obj);
+   EAPI Eina_List   *elm_controlbar_items_get(Evas_Object *obj);
+   EAPI Elm_Controlbar_Item *elm_controlbar_item_prev(Elm_Controlbar_Item *it);
+   EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
+   EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
+   EAPI Evas_Object *elm_controlbar_item_view_get(Elm_Controlbar_Item *it);
+   EAPI Evas_Object *elm_controlbar_item_view_unset(Elm_Controlbar_Item *it);
+   EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
+   EAPI void         elm_controlbar_alpha_set(Evas_Object *obj, int alpha);
+   EAPI void         elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align);
+   EAPI void         elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical);
+
+
+   /* SearchBar */
+   EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent);
+   EAPI void         elm_searchbar_text_set(Evas_Object *obj, const char *entry);
+   EAPI const char  *elm_searchbar_text_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj);
+   EAPI void         elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag);
+   EAPI void         elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible);
+   EAPI void         elm_searchbar_clear(Evas_Object *obj);
+   EAPI void         elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary);
+
 
 #ifdef __cplusplus
 }

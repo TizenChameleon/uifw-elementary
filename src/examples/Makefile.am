@@ -32,6 +32,9 @@ SRCS = \
 	animator_example_01.c \
 	bubble_example_01.c \
 	button_example_01.c \
+	check_example_01.c \
+	colorselector_example_01.c
+	frame_example_01.c \
 	transit_example_01.c \
 	transit_example_02.c \
 	transit_example_03.c \
@@ -43,6 +46,7 @@ SRCS = \
 	general_funcs_example.c \
 	theme_example_01.c \
 	theme_example_02.c \
+	clock_example.c \
 	theme_example.edc
 
 pkglib_PROGRAMS =
@@ -67,6 +71,9 @@ pkglib_PROGRAMS += \
 	animator_example_01 \
 	bubble_example_01 \
 	button_example_01 \
+	check_example_01 \
+	colorselector_example_01 \
+	frame_example_01 \
 	transit_example_01 \
 	transit_example_02 \
 	transit_example_03 \
@@ -78,6 +85,8 @@ pkglib_PROGRAMS += \
 	general_funcs_example \
 	theme_example_01 \
 	theme_example_02 \
+	clock_example \
+	flipselector_example \
 	theme_example.edj
 
 # This variable will hold the list of screenshots that will be made
@@ -89,10 +98,15 @@ SCREENSHOTS = \
 	box_example_02:box_example_02.png:1.3 \
 	bubble_example_01:bubble_example_01.png:0.0 \
 	button_example_01:button_01.png:0.0 \
+	check_example_01:check_example_01.png:0.0 \
+	colorselector_example_01:colorselector_example_01.png:0.0 \
 	animator_example_01:animator_example_01.png:0.2 \
 	animator_example_01:animator_example_02.png:0.5 \
 	animator_example_01:animator_example_03.png:0.9 \
-	theme_example_01:theme_example_01.png:0.0
+	frame_example_01:frame_example_01.png:0.0 \
+	theme_example_01:theme_example_01.png:0.0 \
+	clock_example:clock_example.png:0.5 \
+	flipselector_example:flipselector_example.png:0.0
 
 screenshots: all
 	@mkdir -p $(top_srcdir)/doc/img/screenshots
