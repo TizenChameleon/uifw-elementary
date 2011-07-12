@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-07-08 21:27+0900\n"
+"POT-Creation-Date: 2011-07-12 12:15+0900\n"
 "PO-Revision-Date: 2011-03-26 13:53+0100\n"
 "Last-Translator: Massimo Maiurana <maiurana@gmail.com>\n"
 "Language-Team: none\n"
@@ -14,19 +14,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/lib/elc_fileselector.c:849
+#: src/lib/elc_fileselector.c:853
 msgid "Up"
 msgstr "Su"
 
-#: src/lib/elc_fileselector.c:864
+#: src/lib/elc_fileselector.c:868
 msgid "Home"
 msgstr "Home"
 
-#: src/lib/elc_fileselector.c:1052 src/lib/elm_entry.c:1282
+#: src/lib/elc_fileselector.c:1056 src/lib/elm_entry.c:1282
 msgid "Cancel"
 msgstr "Annulla"
 
-#: src/lib/elc_fileselector.c:1062
+#: src/lib/elc_fileselector.c:1066
 msgid "OK"
 msgstr "OK"
 
