@@ -971,7 +971,7 @@ _show_region_hook(void *data, Evas_Object *obj)
    if (!wd) return;
    elm_widget_show_region_get(obj, &x, &y, &w, &h);
    if (wd->scroll)
-      elm_smart_scroller_child_region_show(wd->scroller, x, y, w, h);
+     elm_smart_scroller_child_region_show(wd->scroller, x, y, w, h);
 }
 
 static void
