@@ -427,8 +427,8 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
    wd->desc_label = elm_label_add(obj);
    snprintf(buf, sizeof(buf), "popup_description/%s", elm_widget_style_get(obj));
    elm_object_style_set(wd->desc_label, buf);
-   elm_label_line_wrap_set(wd->desc_label, EINA_TRUE);
-   elm_label_label_set(wd->desc_label, text);
+   elm_label_line_wrap_set(wd->desc_label, ELM_WRAP_MIXED);
+   elm_object_text_set(wd->desc_label, text);
    evas_object_size_hint_weight_set(wd->desc_label, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(wd->desc_label, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(wd->desc_label);
