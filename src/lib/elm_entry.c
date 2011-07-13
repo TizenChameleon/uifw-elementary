@@ -801,6 +801,7 @@ _sizing_eval(Evas_Object *obj)
              if (wd->single_line) h = vmh + minh;
              else h = vmh;
              evas_object_resize(wd->ent, vw, vh);
+             evas_object_size_hint_min_get(obj, &w, NULL);
              evas_object_size_hint_min_set(obj, w, h);
              if (wd->single_line)
                 evas_object_size_hint_max_set(obj, -1, h);
@@ -838,6 +839,7 @@ _sizing_eval(Evas_Object *obj)
                     &vmw, &vmh);
              if (wd->single_line) h = vmh + minh;
              else h = vmh;
+             evas_object_size_hint_min_get(obj, &w, NULL);
              evas_object_size_hint_min_set(obj, w, h);
              if (wd->single_line)
                 evas_object_size_hint_max_set(obj, -1, h);
@@ -1792,14 +1794,23 @@ static void
 _entry_changed_common_handling(void *data, const char *event)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord minh;
+   Evas_Coord minw, minh;
    if (!wd) return;
    wd->changed = EINA_TRUE;
    /* Reset the size hints which are no more relevant.
     * Keep the height, this is a hack, but doesn't really matter
     * cause we'll re-eval in a moment. */
-   evas_object_size_hint_min_get(data, NULL, &minh);
-   evas_object_size_hint_min_set(data, -1, minh);
+   if (wd->scroll)
+     {
+        evas_object_size_hint_min_get(data, &minw, &minh);
+        evas_object_size_hint_min_set(data, minw, minh);
+     }
+   else
+     {
+        evas_object_size_hint_min_get(data, NULL, &minh);
+        evas_object_size_hint_min_set(data, -1, minh);
+     }
+
    _sizing_eval(data);
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
