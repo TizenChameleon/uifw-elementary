@@ -4487,6 +4487,7 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
                               Eina_Bool         expanded)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
+   if (it->flags != ELM_GENLIST_ITEM_SUBITEMS) return;
    if (it->expanded == expanded) return;
    it->expanded = expanded;
    it->wd->expand_item = it;
