@@ -1466,18 +1466,18 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    if (wd->disabled) return;
    if (ev->button == 1)
      {
-        if (wd->longpress_timer)
-          {
-             ecore_timer_del(wd->longpress_timer);
-             wd->longpress_timer = NULL;
-          }
-
         if (!wd->double_clicked)
           {
              if ((wd->api) && (wd->api->obj_mouseup))
                {
                   wd->api->obj_mouseup(data);
                }
+          }
+
+        if (wd->longpress_timer)
+          {
+             ecore_timer_del(wd->longpress_timer);
+             wd->longpress_timer = NULL;
           }
 
         _magnifier_hide(data);
@@ -2686,7 +2686,7 @@ elm_entry_add(Evas_Object *parent)
    evas_object_size_hint_weight_set(wd->scroller, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->scroller, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
-   evas_object_propagate_events_set(wd->scroller, EINA_TRUE);
+   elm_smart_scroller_propagate_events_set(wd->scroller, EINA_TRUE);
 
    wd->linewrap     = ELM_WRAP_WORD;
    wd->editable     = EINA_TRUE;
@@ -4427,6 +4427,22 @@ elm_entry_scrollable_set(Evas_Object *obj, Eina_Bool scroll)
         elm_smart_scroller_child_set(wd->scroller, wd->ent);
         evas_object_show(wd->scroller);
         elm_widget_on_show_region_hook_set(obj, _show_region_hook, obj);
+        if (wd->single_line)
+           elm_smart_scroller_policy_set(wd->scroller,
+                                         ELM_SMART_SCROLLER_POLICY_OFF,
+                                         ELM_SMART_SCROLLER_POLICY_OFF);
+        else
+          {
+             const Elm_Scroller_Policy map[3] =
+               {
+                  ELM_SMART_SCROLLER_POLICY_AUTO,
+                  ELM_SMART_SCROLLER_POLICY_ON,
+                  ELM_SMART_SCROLLER_POLICY_OFF
+               };
+             elm_smart_scroller_policy_set(wd->scroller,
+                                           map[wd->policy_h],
+                                           map[wd->policy_v]);
+          }
      }
    else
      {
