@@ -317,7 +317,7 @@ _contracted_state_set(Evas_Object *obj, int contracted)
    Elm_Multibuttonentry_Item *item;
    if (!wd || !wd->box) return;
 
-   elm_scrolled_entry_entry_set(wd->entry, "");
+   elm_entry_entry_set(wd->entry, "");
 
    if (wd->view_state == MULTIBUTTONENTRY_VIEW_ENTRY)
      evas_object_hide(wd->entry);
@@ -896,7 +896,7 @@ _add_button(Evas_Object *obj, char *str)
    if (!wd) return;
 
    //remove entry text
-   elm_scrolled_entry_entry_set(wd->entry, "");
+   elm_entry_entry_set(wd->entry, "");
 
    // add button
    _add_button_item(obj, str, MULTIBUTONENTRY_POS_END, NULL, NULL);
@@ -912,7 +912,7 @@ _evas_mbe_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
    if (!wd || !wd->base || !wd->box) return;
 
-   strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
+   strncpy(str, elm_entry_entry_get(wd->entry), MAX_STR);
    str[MAX_STR - 1] = 0;
 
    Evas_Event_Key_Up *ev = (Evas_Event_Key_Up*)event_info;
@@ -960,7 +960,7 @@ _entry_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 
    if (!wd || !wd->base || !wd->box) return;
 
-   strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
+   strncpy(str, elm_entry_entry_get(wd->entry), MAX_STR);
    str[MAX_STR - 1] = 0;
 
    if ( (strcmp (str, "") != 0) && (strcmp (ev->keyname, "KP_Enter") == 0 || strcmp (ev->keyname, "Return") == 0 ))
@@ -988,7 +988,7 @@ _entry_focus_out_cb(void *data, Evas *e, __UNUSED__ void *event_info)
 
    static char str[MAX_STR];
 
-   strncpy(str,elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
+   strncpy(str,elm_entry_entry_get(wd->entry), MAX_STR);
    str[MAX_STR -1] = 0;
 
    if (strlen(str))
@@ -1003,7 +1003,7 @@ _entry_changed_cb(void *data, Evas_Object *obj, void *event_info)
 
    static char str[MAX_STR];
 
-   strncpy(str, elm_scrolled_entry_entry_get(wd->entry), MAX_STR);
+   strncpy(str, elm_entry_entry_get(wd->entry), MAX_STR);
    str[MAX_STR -1] = 0;
 
    wd->n_str =  strlen(str);
@@ -1034,18 +1034,19 @@ _view_init(Evas_Object *obj)
 
    if (!wd->entry)
      {
-        if (! (wd->entry = elm_scrolled_entry_add (obj))) return;
-        elm_scrolled_entry_single_line_set(wd->entry, EINA_TRUE);
-        elm_scrolled_entry_entry_set(wd->entry, "");
-        elm_scrolled_entry_cursor_end_set(wd->entry);
-        elm_scrolled_entry_input_panel_enabled_set(wd->entry, EINA_FALSE);
+        if (! (wd->entry = elm_entry_add (obj))) return;
+        elm_entry_scrollable_set(wd->entry, EINA_TRUE);
+        elm_entry_single_line_set(wd->entry, EINA_TRUE);
+        elm_entry_entry_set(wd->entry, "");
+        elm_entry_cursor_end_set(wd->entry);
+        elm_entry_input_panel_enabled_set(wd->entry, EINA_FALSE);
         evas_object_size_hint_min_set(wd->entry, MIN_W_ENTRY, 0);
         evas_object_size_hint_weight_set(wd->entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(wd->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
         if (wd->box)   elm_box_pack_end (wd->box, wd->entry);
         evas_object_show(wd->entry);
         wd->view_state = MULTIBUTTONENTRY_VIEW_ENTRY;
-        wd->imf_context = elm_scrolled_entry_imf_context_get(wd->entry);
+        wd->imf_context = elm_entry_imf_context_get(wd->entry);
      }
 
    if (!wd->end)
