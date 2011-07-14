@@ -6202,6 +6202,9 @@ _effect_item_realize(Elm_Genlist_Item *it, Eina_Bool effect_on)
    if ((it->effect_item_realized) || (it->delete_me)) return;
    char buf[1024];
 
+   if (it->mode_view)
+     _mode_finished_signal_cb(it, elm_genlist_item_object_get(it), NULL, NULL);
+
    it->edit_obj = edje_object_add(evas_object_evas_get(it->base.widget));
    edje_object_scale_set(it->edit_obj, elm_widget_scale_get(it->base.widget) *
                          _elm_config->scale);
@@ -6495,6 +6498,7 @@ elm_genlist_item_mode_set(Elm_Genlist_Item *it,
    if (!wd) return;
    if (!mode_type) return;
    if ((it->delete_me) || (it->disabled)) return;
+   if (wd->edit_mode) return;
 
    if ((wd->mode_item == it) &&
        (!strcmp(mode_type, wd->mode_type)) &&

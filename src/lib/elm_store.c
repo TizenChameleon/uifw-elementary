@@ -1192,6 +1192,7 @@ _item_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
                        else
                          {
                             LKU(sti->lock);
+                            printf("[%s][%d][%s] Return NULL \n",__FUNCTION__,__LINE__,part);
                             return NULL;
                          }
                     }
@@ -1489,6 +1490,8 @@ _group_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
 
                                            if(sort == ELM_STORE_ITEM_SORT_LOW)
                                              {
+                                                printf("[%s][%d] sti->item_info->group_index = %d  \n",__FUNCTION__,__LINE__,sti->item_info->group_index);
+                                                printf("[%s][%d] group_sti->item_info->group_index = %d  \n",__FUNCTION__,__LINE__,group_sti->item_info->group_index);
                                                 st->header_items = eina_list_prepend_relative(st->header_items, new_header_list, header_list);
                                                 sti->item = elm_genlist_item_insert_before(st->genlist,
                                                                                            itc,
@@ -1741,6 +1744,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
 
                                                           if(sort == ELM_STORE_ITEM_SORT_LOW)
                                                             {
+                                                               printf("[%s][%d] comp_item->item_info->item_type = %d  \n",__FUNCTION__,__LINE__,comp_item->item_info->item_type);
                                                                sti->item_info->index = comp_item->item_info->index;
                                                                comp_item->item_info->index++;
                                                                header_list = eina_list_prepend_relative(header_list, sti, comp_item);
@@ -1840,6 +1844,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
 
                                                           if(sort == ELM_STORE_ITEM_SORT_LOW)
                                                             {
+                                                               printf("[%s][%d] comp_item->item_info->item_type = %d  \n",__FUNCTION__,__LINE__,comp_item->item_info->item_type);
                                                                sti->item_info->index = comp_item->item_info->index;
                                                                comp_item->item_info->index++;
                                                                header_list = eina_list_prepend_relative(header_list, sti, comp_item);
