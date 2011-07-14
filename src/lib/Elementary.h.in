@@ -7124,6 +7124,13 @@ extern "C" {
    typedef void (*Elm_Transit_Effect_End_Cb) (Elm_Transit_Effect *effect, Elm_Transit *transit);
 
    /**
+    * Elm_Transit_Del_Cb
+    *
+    * A callback called when the transit is deleted.
+    */
+   typedef void (*Elm_Transit_Del_Cb) (void *data, Elm_Transit *transit);
+
+   /**
     * Add new transit.
     *
     * @note Is not necessary to delete the transit object, it will be deleted at
@@ -7331,7 +7338,7 @@ extern "C" {
     *
     * @ingroup Transit
     */
-   EAPI void                        elm_transit_del_cb_set(Elm_Transit *transit, void (*cb)(void *data, Elm_Transit* transit), void *data) EINA_ARG_NONNULL(1);
+   EAPI void                        elm_transit_del_cb_set(Elm_Transit *transit, Elm_Transit_Del_Cb cb, void *data) EINA_ARG_NONNULL(1);
 
    /**
     * Set reverse effect automatically.
@@ -7522,6 +7529,21 @@ extern "C" {
     * @ingroup Transit
     */
    EAPI void                        elm_transit_chain_transit_add(Elm_Transit *transit, Elm_Transit *chain_transit) EINA_ARG_NONNULL(1, 2);
+
+   /**
+    * Cut off the chain relationship between two transits.
+    *
+    * @note @p transit can not be NULL. Transit would have the chain relationship with @p chain transit.
+    * @note @p chain_transit can not be NULL. Chain transits should be chained to the @p transit.
+    *
+    * @param transit The transit object.
+    * @param chain_transit The chain transit object.
+    *
+    * This function remove the @p chain_transit transition from the @p transit. 
+    *
+    * @ingroup Transit
+    */
+   EAPI void                        elm_transit_chain_transit_del(Elm_Transit *transit, Elm_Transit *chain_transit) EINA_ARG_NONNULL(1,2);
 
    /**
     * Get the current chain transit list.
