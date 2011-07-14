@@ -6337,6 +6337,9 @@ elm_genlist_edit_mode_set(Evas_Object *obj, Eina_Bool edit_mode)
    if (!wd) return;
    if (wd->edit_mode == edit_mode) return;
 
+   if (wd->mode_item && wd->mode_item->mode_view)
+     _mode_finished_signal_cb(wd->mode_item, elm_genlist_item_object_get(wd->mode_item), NULL, NULL);
+
    wd->edit_mode = edit_mode;
    if (!wd->edit_mode)
      {
@@ -6494,6 +6497,7 @@ elm_genlist_item_mode_set(Elm_Genlist_Item *it,
    if (!wd) return;
    if (!mode_type) return;
    if ((it->delete_me) || (it->disabled)) return;
+   if (wd->edit_mode) return;
 
    if ((wd->mode_item == it) &&
        (!strcmp(mode_type, wd->mode_type)) &&
