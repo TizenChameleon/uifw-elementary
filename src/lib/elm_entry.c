@@ -1317,6 +1317,9 @@ _magnifier_hide(void *data)
 
    evas_object_hide(wd->mgf_bg);
    evas_object_hide(wd->mgf_clip);
+
+   if (wd->scroll)
+     elm_smart_scroller_freeze_set(wd->scroller, EINA_FALSE);
 }
 
 static void
@@ -1341,7 +1344,12 @@ _magnifier_move(void *data)
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
 
    if (wd->scroll)
-     evas_object_geometry_get(wd->scroller, &x, &y, &w, &h);
+     {
+        evas_object_geometry_get(wd->scroller, &x, &y, &w, &h);
+        elm_smart_scroller_child_pos_get(wd->scroller, &ox, &oy);
+        cx -= ox;
+        cy -= oy;
+     }
    else
      evas_object_geometry_get(data, &x, &y, &w, &h);
 
@@ -1409,6 +1417,7 @@ _magnifier_create(void *data)
 
    if (wd->scroll)
      {
+        elm_smart_scroller_freeze_set(wd->scroller, EINA_TRUE);
         wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(wd->scroller));
         evas_object_image_source_set(wd->mgf_proxy, wd->scroller);
      }
