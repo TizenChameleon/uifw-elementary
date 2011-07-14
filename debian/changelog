@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build45) unstable; urgency=low
+
+  * [store] Package Upload
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build45
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Thu, 14 Jul 2011 20:57:42 +0900
+
 elementary (1.0.0+svn.58393slp2+build44) unstable; urgency=low
 
   * Package Upload
