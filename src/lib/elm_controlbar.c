@@ -428,7 +428,7 @@ _move_object_with_animation(Evas_Object * obj, Evas_Coord x, Evas_Coord y,
                                          Evas_Object * obj), void *data)
 {
    Animation_Data * ad = (Animation_Data *) malloc(sizeof(Animation_Data));
-   if (!wd) return NULL;
+   if (!ad) return NULL;
    ad->obj = obj;
    ad->fx = x;
    ad->fy = y;
