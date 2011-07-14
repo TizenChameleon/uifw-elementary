@@ -1,3 +1,19 @@
+elementary (1.0.0+svn.58393slp2+build44) unstable; urgency=low
+
+  * Package Upload
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build44
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Wed, 13 Jul 2011 22:57:41 +0900
+
+elementary (1.0.0+svn.58393slp2+build43) unstable; urgency=low
+
+  * Package Upload
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build43
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Wed, 13 Jul 2011 20:14:18 +0900
+
 elementary (1.0.0+svn.58393slp2+build42) unstable; urgency=low
 
   * Package Upload

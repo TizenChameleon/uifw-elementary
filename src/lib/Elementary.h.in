@@ -6443,6 +6443,7 @@ extern "C" {
     * there is no need to call elm_animator_del(), when the parent is deleted it
     * will delete the animator.
     * @deprecated Use @ref Transit instead.
+
     */
    EINA_DEPRECATED EAPI Elm_Animator*            elm_animator_add(Evas_Object *parent);
    /**
