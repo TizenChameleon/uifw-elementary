@@ -1338,8 +1338,12 @@ _magnifier_move(void *data)
    Evas_Coord x, y, w, h, fs;
    Evas_Coord cx, cy, cw, ch, ox, oy;
 
-   evas_object_geometry_get(data, &x, &y, &w, &h);
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
+
+   if (wd->scroll)
+     evas_object_geometry_get(wd->scroller, &x, &y, &w, &h);
+   else
+     evas_object_geometry_get(data, &x, &y, &w, &h);
 
    ox = oy = 0;
    fs = elm_finger_size_get();
@@ -1377,7 +1381,11 @@ _magnifier_create(void *data)
    if (wd->mgf_bg) evas_object_del(wd->mgf_bg);
    if (wd->mgf_clip) evas_object_del(wd->mgf_clip);
 
-   evas_object_geometry_get(data, &x, &y, &w, &h);
+   if (wd->scroll)
+     evas_object_geometry_get(wd->scroller, &x, &y, &w, &h);
+   else
+     evas_object_geometry_get(data, &x, &y, &w, &h);
+
    wd->mgf_bg = edje_object_add(evas_object_evas_get(data));
 
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FIXEDSIZE)
@@ -1400,10 +1408,15 @@ _magnifier_create(void *data)
      evas_object_resize(wd->mgf_bg, w, wd->mgf_height);
 
    if (wd->scroll)
-     wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(wd->scroller));
+     {
+        wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(wd->scroller));
+        evas_object_image_source_set(wd->mgf_proxy, wd->scroller);
+     }
    else
-     wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(data));
-   evas_object_image_source_set(wd->mgf_proxy, data);
+     {
+        wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(data));
+        evas_object_image_source_set(wd->mgf_proxy, data);
+     }
    evas_object_resize(wd->mgf_proxy, w * wd->mgf_scale, h * wd->mgf_scale);
    evas_object_image_fill_set(wd->mgf_proxy, 0, 0, w * wd->mgf_scale, h * wd->mgf_scale);
    evas_object_color_set(wd->mgf_proxy, 255, 255, 255, 255);
@@ -2854,9 +2867,12 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    if (wd->scroller)
      {
         if (wd->single_line)
-           elm_smart_scroller_policy_set(wd->scroller,
-                                         ELM_SMART_SCROLLER_POLICY_OFF,
-                                         ELM_SMART_SCROLLER_POLICY_OFF);
+          {
+             elm_smart_scroller_policy_set(wd->scroller,
+                                           ELM_SMART_SCROLLER_POLICY_OFF,
+                                           ELM_SMART_SCROLLER_POLICY_OFF);
+             elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
+          }
         else
           {
              const Elm_Scroller_Policy map[3] =
@@ -2868,6 +2884,7 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
              elm_smart_scroller_policy_set(wd->scroller,
                                            map[wd->policy_h],
                                            map[wd->policy_v]);
+             elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
           }
         _sizing_eval(obj);
      }
@@ -4439,9 +4456,12 @@ elm_entry_scrollable_set(Evas_Object *obj, Eina_Bool scroll)
         evas_object_show(wd->scroller);
         elm_widget_on_show_region_hook_set(obj, _show_region_hook, obj);
         if (wd->single_line)
-           elm_smart_scroller_policy_set(wd->scroller,
-                                         ELM_SMART_SCROLLER_POLICY_OFF,
-                                         ELM_SMART_SCROLLER_POLICY_OFF);
+          {
+             elm_smart_scroller_policy_set(wd->scroller,
+                                           ELM_SMART_SCROLLER_POLICY_OFF,
+                                           ELM_SMART_SCROLLER_POLICY_OFF);
+             elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
+          }
         else
           {
              const Elm_Scroller_Policy map[3] =
@@ -4453,6 +4473,7 @@ elm_entry_scrollable_set(Evas_Object *obj, Eina_Bool scroll)
              elm_smart_scroller_policy_set(wd->scroller,
                                            map[wd->policy_h],
                                            map[wd->policy_v]);
+             elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
           }
      }
    else
