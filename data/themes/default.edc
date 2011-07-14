@@ -7560,7 +7560,7 @@ collections {
             scale: 1;
             description { state: "default" 0.0;
                align: 0.0 0.0;
-               rel2{ to:"clipper"; relative: 1.0 1.0;}
+               rel2{ to:"clipper"; relative: 1.0 1.0; }
             }
             description { state: "hidden" 0.0;
                visible: 0;
@@ -7640,7 +7640,7 @@ collections {
             scale: 1;
             description { state: "default" 0.0;
                align: 0.0 0.0;
-               rel2{ to:"clipper"; relative: 1.0 1.0;}
+               rel2{ to:"clipper"; relative: 1.0 1.0; }
             }
             description { state: "hidden" 0.0;
                visible: 0;
@@ -7714,7 +7714,7 @@ collections {
                set_int(sbvis_v, 0);
                set_int(sbvis_h, 0);
                set_int(sbalways_v, 0);
-                                   set_int(sbalways_h, 0);
+               set_int(sbalways_h, 0);
                set_int(sbvis_timer, 0);
             }
          }
@@ -7763,21 +7763,21 @@ collections {
          program { name: "sb_vbar_show";
             signal: "do-show-vbar";
             source: "";
-            action:  STATE_SET "default" 0.0;
+            action: STATE_SET "default" 0.0;
             transition: LINEAR 1.0;
             target: "sb_vbar_clip";
          }
          program { name: "sb_vbar_hide";
             signal: "do-hide-vbar";
             source: "";
-            action:  STATE_SET "hidden" 0.0;
+            action: STATE_SET "hidden" 0.0;
             transition: LINEAR 1.0;
             target: "sb_vbar_clip";
          }
          program { name: "hbar_show";
             signal: "elm,action,show,hbar";
             source: "elm";
-            action:  STATE_SET "default" 0.0;
+            action: STATE_SET "default" 0.0;
             target: "sb_hbar_clip_master";
          }
          program { name: "hbar_hide";
@@ -7819,17 +7819,17 @@ collections {
          program { name: "sb_hbar_show";
             signal: "do-show-hbar";
             source: "";
-            action:  STATE_SET "default" 0.0;
+            action: STATE_SET "default" 0.0;
             transition: LINEAR 1.0;
             target: "sb_hbar_clip";
          }
          program { name: "sb_hbar_hide";
             signal: "do-hide-hbar";
             source: "";
-            action:  STATE_SET "hidden" 0.0;
+            action: STATE_SET "hidden" 0.0;
             transition: LINEAR 1.0;
             target: "sb_hbar_clip";
-         }             
+         }
          program { name: "scroll";
             signal: "elm,action,scroll";
             source: "elm";
@@ -7912,12 +7912,12 @@ collections {
          image: "bt_shine.png" COMP;
       }
       parts {
-		  part { name: "arrow_area_left";
+         part { name: "arrow_area_left";
             type: RECT;
             mouse_events: 0;
             description { state: "default" 0.0;
                visible: 0;
-               min: 40 0;
+               min: 20 0;
                fixed: 1 1;
                align: 1 0.5;
                rel1 {
@@ -7934,7 +7934,7 @@ collections {
             mouse_events: 0;
             description { state: "default" 0.0;
                visible: 0;
-               min: 40 0;
+               min: 20 0;
                fixed: 1 1;
                align: 0 0.5;
                rel1 {
@@ -7951,7 +7951,7 @@ collections {
             mouse_events: 0;
             description { state: "default" 0.0;
                visible: 0;
-               min: 0 40;
+               min: 0 20;
                fixed: 1 1;
                align: 0.5 1;
                rel1 {
@@ -7968,7 +7968,7 @@ collections {
             mouse_events: 0;
             description { state: "default" 0.0;
                visible: 0;
-               min: 0 40;
+               min: 0 20;
                fixed: 1 1;
                align: 0.5 0;
                rel1 {
@@ -7989,9 +7989,8 @@ collections {
                y: 1 1 0;
                confine: "arrow_area_up";
             }
-            description {
-               state: "default" 0.0;
-               min: 40 40;
+            description { state: "default" 0.0;
+               min: 36 20;
                fixed: 1 1;
                visible: 1;
             }
@@ -8005,9 +8004,8 @@ collections {
                y: 1 1 0;
                confine: "arrow_area_down";
             }
-            description {
-               state: "default" 0.0;
-               min: 40 40;
+            description { state: "default" 0.0;
+               min: 36 20;
                fixed: 1 1;
                visible: 1;
             }
@@ -8021,9 +8019,8 @@ collections {
                y: 1 1 0;
                confine: "arrow_area_left";
             }
-            description {
-               state: "default" 0.0;
-               min: 40 40;
+            description { state: "default" 0.0;
+               min: 20 36;
                fixed: 1 1;
                visible: 1;
             }
@@ -8037,9 +8034,8 @@ collections {
                y: 1 1 0;
                confine: "arrow_area_right";
             }
-            description {
-               state: "default" 0.0;
-               min: 40 40;
+            description { state: "default" 0.0;
+               min: 20 36;
                fixed: 1 1;
                visible: 1;
             }
@@ -8078,19 +8074,19 @@ collections {
          part { name: "elm.swallow.content";
             type: SWALLOW;
             description { state: "default" 0.0;
-               rel1 { to:"base"; offset: 4 4; };
-               rel2 { to:"base"; offset: -5 -5; };
+               rel1 { to:"base"; offset: 4 4; }
+               rel2 { to:"base"; offset: -5 -5; }
             }
-         }          
+         }
       }
    }
 ///////////////////////////////////////////////////////////////////////////////
    group { name: "elm/ctxpopup/arrow/default";
       images {
-         image: "icon_arrow_left.png" COMP;
-         image: "icon_arrow_right.png" COMP;
-         image: "icon_arrow_up.png" COMP;
-         image: "icon_arrow_down.png" COMP;
+         image: "ctxpopup_arrow_left.png" COMP;
+         image: "ctxpopup_arrow_right.png" COMP;
+         image: "ctxpopup_arrow_up.png" COMP;
+         image: "ctxpopup_arrow_down.png" COMP;
       }
       parts {
          part { name: "ctxpopup_arrow";
@@ -8098,39 +8094,43 @@ collections {
             scale: 1;
             description {
                state: "default" 0.0;
-               min: 40 40;
+               min: 36 36;
                fixed: 1 1;
                visible: 0;
                align: 0.5 0.5;
             }
             description {
                state: "left" 0.0;
-               min: 40 40;
+               min: 20 36;
                fixed: 1 1;
                align: 0.0 0.5;
-               image { normal: "icon_arrow_left.png";
-               }
+               rel1 { offset: 3 0; }
+               rel2 { offset: 2 -1; }
+               image { normal: "ctxpopup_arrow_left.png"; }
             }
             description { state: "right" 0.0;
-               min: 40 40;
+               min: 20 36;
                fixed: 1 1;
                align: 1.0 0.5;
-               image { normal: "icon_arrow_right.png";                
-					}
+               rel1 { offset: -5 0; }
+               rel2 { offset: -6 -1; }
+               image { normal: "ctxpopup_arrow_right.png"; }
             }
             description { state: "top" 0.0;
-               min: 40 40;
+               min: 36 20;
                fixed: 1 1;
                align: 0.5 0.0;
-               image { normal: "icon_arrow_up.png";
-               }
+               rel1 { offset: 0 5; }
+               rel2 { offset: -1 4; }
+               image { normal: "ctxpopup_arrow_up.png"; }
             }
             description { state: "bottom" 0.0;
-               min: 40 40;
+               min: 36 20;
                fixed: 1 1;
                align: 0.5 1.0;
-               image { normal: "icon_arrow_down.png";
-               }
+               rel1 { offset: 0 -5; }
+               rel2 { offset: -1 -6; }
+               image { normal: "ctxpopup_arrow_down.png"; }
             }
          }
       }
@@ -8164,8 +8164,8 @@ collections {
 ///////////////////////////////////////////////////////////////////////////////
    group {
       name: "elm/ctxpopup/icon_text_style_item/default";
-           alias: "elm/ctxpopup/text_style_item/default";
-           alias: "elm/ctxpopup/icon_style_item/default";
+        alias: "elm/ctxpopup/text_style_item/default";
+        alias: "elm/ctxpopup/icon_style_item/default";
       images {
          image: "hoversel_entry_bg.png" COMP;
       }
@@ -8193,19 +8193,21 @@ collections {
          }
          part { name: "elm.swallow.icon";
             type: SWALLOW;
+            clip_to: "disclip";
             scale: 1;
             description { state: "default" 0.0;
                min: 25 25;
-               max: 25 25;  
+               max: 25 25;
                align: 0 0.5;
                aspect: 1.0 1.0;
-               rel1 { offset: 10 10; }  
+               rel1 { offset: 10 10; }
                                         rel2 { offset: 0 -10; }
             }
          }
          part { name: "elm.text";
             type: TEXT;
             mouse_events: 0;
+            clip_to: "disclip";
             scale: 1;
             description { state: "default" 0.0;
                min: 1 40;
@@ -8226,7 +8228,7 @@ collections {
                color: 0 0 0 255;
             }
          }
-                        part { name: "over1";
+         part { name: "over1";
             mouse_events: 1;
             repeat_events: 1;
             ignore_flags: ON_HOLD;
@@ -8252,13 +8254,19 @@ collections {
          part { name: "disclip";
             type: RECT;
             description { state: "default" 0.0;
+               color: 255 255 255 255;
+            }
+            description { state: "enabled" 0.0;
+               color: 127 127 127 127;
+            }
+         }
+         part { name: "blocker";
+            description { state: "default" 0.0;
                visible: 0;
             }
             description { state: "enabled" 0.0;
                visible: 1;
-               color: 50 50 50 127;
-               rel1.offset: 4 4;
-               rel2.offset: -5 -5;
+               color: 0 0 0 0;
             }
          }
       }
@@ -8274,12 +8282,14 @@ collections {
             source: "elm";
             action: STATE_SET "enabled" 0.0;
             target: "disclip";
+            target: "blocker";
          }
          program { name: "enable";
             signal: "elm,state,enabled";
             source: "elm";
             action: STATE_SET "default" 0.0;
             target: "disclip";
+            target: "blocker";
          }
          program { name: "item_click2";
             signal: "mouse,down,1";
@@ -8293,7 +8303,7 @@ collections {
             signal: "mouse,up,1";
             source: "over2";
             script {
-                                        set_state(PART:"elm.text", "default", 0.0);
+               set_state(PART:"elm.text", "default", 0.0);
                set_state(PART:"bg", "default", 0.0);
             }
          }
