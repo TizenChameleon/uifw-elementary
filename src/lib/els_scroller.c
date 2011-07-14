@@ -690,7 +690,7 @@ _smart_bounce_x_animator(void *data)
         if (sd->down.momentum_animator)
           {
              ed = abs(sd->down.dx * (_elm_config->thumbscroll_friction + sd->down.extra_time) - sd->down.b0x);
-             md = abs(15*w); // FIXME : 15 - probably should be config
+             md = abs(_elm_config->thumbscroll_friction*5*w);
              if (ed > md) r = (double)(md)/(double)ed;
           }
         x = sd->down.b2x + (int)((double)(dx - odx)*r);
@@ -744,7 +744,7 @@ _smart_bounce_y_animator(void *data)
         if (sd->down.momentum_animator)
           {
              ed = abs(sd->down.dy * (_elm_config->thumbscroll_friction + sd->down.extra_time) - sd->down.b0y);
-             md = abs(15*h); // FIXME : 15 - probably should be config
+             md = abs(_elm_config->thumbscroll_friction*5*h);
              if (ed > md) r = (double)(md)/(double)ed;
           }
         y = sd->down.b2y + (int)((double)(dy - ody)*r);

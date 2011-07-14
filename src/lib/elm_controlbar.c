@@ -428,6 +428,7 @@ _move_object_with_animation(Evas_Object * obj, Evas_Coord x, Evas_Coord y,
                                          Evas_Object * obj), void *data)
 {
    Animation_Data * ad = (Animation_Data *) malloc(sizeof(Animation_Data));
+   if (!wd) return NULL;
    ad->obj = obj;
    ad->fx = x;
    ad->fy = y;
@@ -574,6 +575,7 @@ _insert_item_in_bar(Elm_Controlbar_Item * it, int order)
    const Eina_List *l;
    Elm_Controlbar_Item * item;
    Widget_Data * wd = elm_widget_data_get(it->obj);
+   if (!wd) return NULL;
    int check = 0;
 
    if (order == 0) return;
@@ -618,6 +620,7 @@ _delete_item_in_bar(Elm_Controlbar_Item * it)
    const Eina_List *l;
    Elm_Controlbar_Item * item;
    Widget_Data * wd = elm_widget_data_get(it->obj);
+   if (!wd) return;
    int i = 0;
 
    EINA_LIST_FOREACH(wd->items, l, item)
@@ -662,6 +665,7 @@ _set_item_visible(Elm_Controlbar_Item *it, Eina_Bool visible)
    if (visible)
      {
         item = elm_controlbar_last_item_get(it->obj);
+        if (!item) return;
         while (!elm_controlbar_item_visible_get(item)){
              item = elm_controlbar_item_prev(item);
         }
@@ -745,6 +749,7 @@ _select_box(Elm_Controlbar_Item * it)
 {
    if (!it) return;
    Widget_Data * wd = elm_widget_data_get(it->obj);
+   if (!wd) return;
    const Eina_List *l;
    Elm_Controlbar_Item * item, *fit = NULL;
    Evas_Object * content;
@@ -844,6 +849,7 @@ static Eina_Bool
 _press_box(Elm_Controlbar_Item * it)
 {
    Widget_Data * wd = elm_widget_data_get(it->obj);
+   if (!wd) return EINA_FALSE;
    int check = 0;
    const Eina_List *l;
    Elm_Controlbar_Item * item;
@@ -954,7 +960,7 @@ _create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
         return NULL;
      }
    wd = elm_widget_data_get(obj);
-   if (wd == NULL)
+   if (!wd)
      {
         fprintf(stderr, "Cannot get smart data\n");
         return NULL;
@@ -991,7 +997,7 @@ _create_tool_item(Evas_Object * obj, const char *icon_path, const char *label,
         return NULL;
      }
    wd = elm_widget_data_get(obj);
-   if (wd == NULL)
+   if (!wd)
      {
         fprintf(stderr, "Cannot get smart data\n");
         return NULL;
@@ -1027,7 +1033,7 @@ _create_object_item(Evas_Object * obj, Evas_Object * obj_item, const int sel)
         return NULL;
      }
    wd = elm_widget_data_get(obj);
-   if (wd == NULL)
+   if (!wd)
      {
         fprintf(stderr, "Cannot get smart data\n");
         return NULL;
@@ -1085,7 +1091,7 @@ _set_items_position(Evas_Object * obj, Elm_Controlbar_Item * it,
         return;
      }
    wd = elm_widget_data_get(obj);
-   if (wd == NULL)
+   if (!wd)
      {
         fprintf(stderr, "Cannot get smart data\n");
         return;
@@ -1148,6 +1154,7 @@ _list_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    if (!item) return;
 
    wd = elm_widget_data_get(item->obj);
+   if (!wd) return;
 
    EINA_LIST_FOREACH(wd->items, l, it)
      {
@@ -1864,6 +1871,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_object_item_append(Evas_Object *
    it = _create_object_item(obj, obj_item, sel);
    if (!it) return NULL;
    wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
    _set_items_position(obj, it, NULL, EINA_TRUE);
    wd->items = eina_list_append(wd->items, it);
    _sizing_eval(obj);
@@ -1893,6 +1901,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_object_item_prepend(Evas_Object *
    it = _create_object_item(obj, obj_item, sel);
    if (!it) return NULL;
    wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
    item = eina_list_data_get(wd->items);
    _set_items_position(obj, it, item, EINA_TRUE);
    wd->items = eina_list_prepend(wd->items, it);
@@ -1923,6 +1932,7 @@ elm_controlbar_object_item_insert_before(Evas_Object * obj,
    it = _create_object_item(obj, obj_item, sel);
    if (!it) return NULL;
    wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
    _set_items_position(obj, it, before, EINA_TRUE);
    wd->items = eina_list_prepend_relative(wd->items, it, before);
    _sizing_eval(obj);
@@ -1953,6 +1963,7 @@ elm_controlbar_object_item_insert_after(Evas_Object * obj,
    it = _create_object_item(obj, obj_item, sel);
    if (!it) return NULL;
    wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
    item = elm_controlbar_item_next(after);
    _set_items_position(obj, it, item, EINA_TRUE);
    wd->items = eina_list_append_relative(wd->items, it, after);
@@ -2008,7 +2019,7 @@ elm_controlbar_item_del(Elm_Controlbar_Item * it)
         return;
      }
    wd = elm_widget_data_get(it->obj);
-   if (wd == NULL)
+   if (!wd)
      {
         printf("Cannot get smart data\n");
         return;
@@ -2062,7 +2073,7 @@ elm_controlbar_item_select(Elm_Controlbar_Item * it)
    if (!it) return;
    if (it->obj == NULL) return;
    Widget_Data * wd = elm_widget_data_get(it->obj);
-   if (wd == NULL) return;
+   if (!wd) return;
 
    _select_box(it);
 }
@@ -2449,7 +2460,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (wd == NULL)
+   if (!wd)
      {
         fprintf(stderr, "Cannot get smart data\n");
         return;
@@ -2517,7 +2528,7 @@ elm_controlbar_alpha_set(Evas_Object *obj, int alpha)
    ELM_CHECK_WIDTYPE(obj, widtype);
    int r, g, b;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (wd == NULL)
+   if (!wd)
      {
         fprintf(stderr, "Cannot get smart data\n");
         return;
@@ -2550,7 +2561,7 @@ elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align)
    Elm_Controlbar_Item *item;
    const Eina_List *l;
    int i;
-   if (wd == NULL)
+   if (!wd)
      {
         fprintf(stderr, "Cannot get smart data\n");
         return;
@@ -2623,7 +2634,7 @@ elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (wd == NULL)
+   if (!wd)
      {
         fprintf(stderr, "Cannot get smart data\n");
         return;
