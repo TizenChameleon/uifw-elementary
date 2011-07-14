@@ -46,23 +46,46 @@ _elm_win_recalc_job(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord minw = -1, minh = -1;
-   Evas_Coord resw;
+   Evas_Coord resw, resh;
+
    if (!wd) return;
    wd->deferred_recalc_job = NULL;
-   evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, NULL);
+   
+   evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
    if (wd->wrap_w > resw)
-      resw = wd->wrap_w;
+     resw = wd->wrap_w;
+   if (wd->wrap_h > resh)
+     resh = wd->wrap_h;
 
-   edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, resw, 0);
-   /* This is a hack to workaround the way min size hints are treated.
-    * If the minimum width is smaller than the restricted width, it means
-    * the mininmum doesn't matter. */
-   if ((minw <= resw) && (minw != wd->wrap_w))
+   if (wd->wrap_h == -1) /* open source routine */
      {
-        Evas_Coord ominw = -1;
-        evas_object_size_hint_min_get(data, &ominw, NULL);
-        minw = ominw;
+        edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, resw, 0);
+        /* This is a hack to workaround the way min size hints are treated.
+         * If the minimum width is smaller than the restricted width, it means
+         * the mininmum doesn't matter. */
+        if ((minw <= resw) && (minw != wd->wrap_w))
+          {
+             Evas_Coord ominw = -1;
+             evas_object_size_hint_min_get(data, &ominw, NULL);
+             minw = ominw;
+          }
      }
+   else /* ellipsis && linewrap && wrap_height_set routine */
+     {
+        edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, 0, resh);
+        if ((minh <= resh) && (minh != wd->wrap_h))
+          {
+             Evas_Coord ominh = -1;
+             evas_object_size_hint_min_get(data, NULL, &ominh);
+             minh = ominh;
+          }
+
+		evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
+		minw = resw;
+		if (minh > wd->wrap_h)
+			minh = wd->wrap_h;
+     }
+
    evas_object_size_hint_min_set(data, minw, minh);
    evas_object_size_hint_max_set(data, wd->wrap_w, wd->wrap_h);
 
