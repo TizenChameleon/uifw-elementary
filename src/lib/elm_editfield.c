@@ -52,7 +52,7 @@ _del_hook(Evas_Object *obj)
 }
 
 static void
-_on_focus_hook(void *data, Evas_Object *obj)
+_on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->base)
@@ -137,7 +137,7 @@ _request_sizing_eval(Evas_Object *obj)
 }
 
 static void
-_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    double weight_x;
    evas_object_size_hint_weight_get(data, &weight_x, NULL);
@@ -166,7 +166,7 @@ _empty_entry(Evas_Object *entry)
 }
 
 static void
-_entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
+_entry_changed_cb(void *data, Evas_Object *obj, void* event_info __UNUSED__)
 {
    Evas_Object *ef_obj = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get(ef_obj);
@@ -203,7 +203,7 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info)
 }
 
 static void
-_signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+_signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if(!wd || !wd->base) return;
@@ -236,7 +236,7 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
 }
 
 static void
-_resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
+_resize_cb(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord h;
@@ -541,7 +541,6 @@ EAPI void
 elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *entry;
    ELM_CHECK_WIDTYPE(obj, widtype);
    if (!wd || !wd->base || wd->single_line == single_line)
       return;
