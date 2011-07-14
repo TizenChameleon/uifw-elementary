@@ -74,18 +74,25 @@ _els_smart_icon_file_key_set(Evas_Object *obj, const char *file, const char *key
    sd = evas_object_smart_data_get(obj);
    if (!sd) return EINA_FALSE;
    /* smart code here */
-   if (sd->prev) evas_object_del(sd->prev);
-   pclip = evas_object_clip_get(sd->obj);
-   if (sd->obj) sd->prev = sd->obj;
-   sd->obj = evas_object_image_add(evas_object_evas_get(obj));
-   evas_object_event_callback_add(sd->obj, EVAS_CALLBACK_IMAGE_PRELOADED,
-                                  _preloaded, sd);
-   evas_object_smart_member_add(sd->obj, obj);
-   if (sd->prev) evas_object_smart_member_add(sd->prev, obj);
-   evas_object_image_scale_hint_set(sd->obj, EVAS_IMAGE_SCALE_HINT_STATIC);
-   evas_object_clip_set(sd->obj, pclip);
+   /* NOTE: Do not merge upstream for the if (sd->edje) { } statements 
+      But wonder whether the edje resource icons have no problem. */
+   if (sd->edje)
+     {
+        if (sd->prev) evas_object_del(sd->prev);
+        pclip = evas_object_clip_get(sd->obj);
+        if (sd->obj) sd->prev = sd->obj;
+        sd->obj = evas_object_image_add(evas_object_evas_get(obj));
+        evas_object_event_callback_add(sd->obj,
+                                       EVAS_CALLBACK_IMAGE_PRELOADED,
+                                       _preloaded, sd);
+        evas_object_smart_member_add(sd->obj, obj);
+        if (sd->prev) evas_object_smart_member_add(sd->prev, obj);
+        evas_object_image_scale_hint_set(sd->obj,
+                                         EVAS_IMAGE_SCALE_HINT_STATIC);
+        evas_object_clip_set(sd->obj, pclip);
 
-   sd->edje = EINA_FALSE;
+        sd->edje = EINA_FALSE;
+     }
 
    if (!sd->size)
      evas_object_image_load_size_set(sd->obj, sd->size, sd->size);
