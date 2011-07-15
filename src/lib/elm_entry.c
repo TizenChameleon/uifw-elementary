@@ -900,7 +900,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
         _check_enable_returnkey(obj);
         wd->mgf_type = _ENTRY_MAGNIFIER_FILLWIDTH;
-        _magnifier_create(obj);
      }
    else
      {
@@ -1373,7 +1372,7 @@ static void
 _magnifier_create(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord x, y, w, h;
+   Evas_Coord x, y, w, h, mw, mh;
    const char* key_data = NULL;
 
    if (!wd) return;
@@ -1393,6 +1392,9 @@ _magnifier_create(void *data)
      evas_object_geometry_get(wd->scroller, &x, &y, &w, &h);
    else
      evas_object_geometry_get(data, &x, &y, &w, &h);
+
+   if ((w <= 0) || (h <= 0))
+	   return;
 
    wd->mgf_bg = edje_object_add(evas_object_evas_get(data));
 
@@ -1426,8 +1428,14 @@ _magnifier_create(void *data)
         wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(data));
         evas_object_image_source_set(wd->mgf_proxy, data);
      }
-   evas_object_resize(wd->mgf_proxy, w * wd->mgf_scale, h * wd->mgf_scale);
-   evas_object_image_fill_set(wd->mgf_proxy, 0, 0, w * wd->mgf_scale, h * wd->mgf_scale);
+
+   mw = (Evas_Coord)((float)w * wd->mgf_scale);
+   mh = (Evas_Coord)((float)h * wd->mgf_scale);
+   if ((mw <= 0) || (mh <= 0))
+	   return;
+
+   evas_object_resize(wd->mgf_proxy, mw, mh);
+   evas_object_image_fill_set(wd->mgf_proxy, 0, 0, mw - 1, mh - 1);
    evas_object_color_set(wd->mgf_proxy, 255, 255, 255, 255);
    evas_object_pass_events_set(wd->mgf_proxy, EINA_TRUE);
    evas_object_show(wd->mgf_proxy);
