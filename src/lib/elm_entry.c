@@ -1394,7 +1394,7 @@ _magnifier_create(void *data)
      evas_object_geometry_get(data, &x, &y, &w, &h);
 
    if ((w <= 0) || (h <= 0))
-	   return;
+     return;
 
    wd->mgf_bg = edje_object_add(evas_object_evas_get(data));
 
@@ -1432,7 +1432,7 @@ _magnifier_create(void *data)
    mw = (Evas_Coord)((float)w * wd->mgf_scale);
    mh = (Evas_Coord)((float)h * wd->mgf_scale);
    if ((mw <= 0) || (mh <= 0))
-	   return;
+     return;
 
    evas_object_resize(wd->mgf_proxy, mw, mh);
    evas_object_image_fill_set(wd->mgf_proxy, 0, 0, mw, mh);
@@ -1953,7 +1953,7 @@ _signal_magnifier_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
 
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
    if (!wd->deferred_recalc_job)
-      elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
+     elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
    else
      {
         wd->deferred_cur = EINA_TRUE;
@@ -1978,7 +1978,7 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
 
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
    if (!wd->deferred_recalc_job)
-      elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get(), EINA_FALSE);
+     elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get(), EINA_FALSE);
    else
      {
         wd->deferred_cur = EINA_TRUE;
