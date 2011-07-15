@@ -1435,7 +1435,7 @@ _magnifier_create(void *data)
 	   return;
 
    evas_object_resize(wd->mgf_proxy, mw, mh);
-   evas_object_image_fill_set(wd->mgf_proxy, 0, 0, mw - 1, mh - 1);
+   evas_object_image_fill_set(wd->mgf_proxy, 0, 0, mw, mh);
    evas_object_color_set(wd->mgf_proxy, 255, 255, 255, 255);
    evas_object_pass_events_set(wd->mgf_proxy, EINA_TRUE);
    evas_object_show(wd->mgf_proxy);
