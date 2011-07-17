@@ -39,6 +39,7 @@ static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _show_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _on_focus_hook(void *data, Evas_Object *obj);
 static Eina_Bool _empty_entry(Evas_Object *entry);
 
@@ -62,6 +63,10 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         evas_object_smart_callback_call(obj, "unfocused", NULL);
         wd->editing = EINA_FALSE;
         edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
+
+        if (!wd->single_line) // FIXME : if textblock works well, delete
+          edje_object_signal_emit(wd->base, "elm,state,entry,show", "elm"); // FIXME : if textblock works well, delete
+
         edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
         if(_empty_entry(wd->entry))
           {
@@ -145,6 +150,15 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
       _request_sizing_eval(data);
 }
 
+static void
+_show_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if ((!wd) && (!wd->entry)) return;
+   if (wd->editing && wd->single_line)  // FIXME : single_line is not needed for this conditional state after TEXTBLOCK fixing
+     elm_object_focus(wd->entry);
+}
+
 static Eina_Bool
 _empty_entry(Evas_Object *entry)
 {
@@ -172,6 +186,7 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info __UNUSED__)
    Widget_Data *wd = elm_widget_data_get(ef_obj);
 
    if(!wd || !wd->base) return;
+
    if(wd->single_line)
      {
         if(elm_entry_password_get(wd->entry))
@@ -182,9 +197,12 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info __UNUSED__)
         else
           {
              edje_object_signal_emit(wd->base, "elm,state,password,unset", "elm");
-             edje_object_part_text_set(wd->base, "elm.content.text", elm_entry_entry_get(wd->entry));
+             edje_object_part_text_set(wd->base, "elm.content.single", elm_entry_entry_get(wd->entry));
           }
      }
+//   else     // Add after TEXTBLOCK fix
+//     edje_object_part_text_set(wd->base, "elm.content.multi", elm_entry_entry_get(wd->entry));
+
    if(!_empty_entry(wd->entry))
      {
         if(wd->eraser_show && elm_object_focus_get(obj))
@@ -200,6 +218,9 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info __UNUSED__)
         if(wd->eraser_show)
            edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
      }
+
+   if (!wd->editing && wd->single_line)
+     edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
 }
 
 static void
@@ -215,12 +236,15 @@ _signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emiss
      }
    else if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "eraser"))
      {
-        edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
-
-        elm_object_focus(wd->entry);
-
         if(wd->editing == EINA_FALSE)
            elm_entry_cursor_end_set(wd->entry);
+
+        wd->editing = EINA_TRUE;
+
+        edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
+
+        if (!wd->single_line)        //FIXME : after fixing TEXTBLOCK, this should be deleted
+          elm_object_focus(wd->entry);
 
         if(!(_empty_entry(wd->entry)) && (wd->eraser_show))
            edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
@@ -231,7 +255,6 @@ _signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emiss
              wd->show_guide_text = EINA_FALSE;
           }
         evas_object_smart_callback_call(data, "clicked", NULL);
-        wd->editing = EINA_TRUE;
      }
 }
 
@@ -302,9 +325,8 @@ elm_editfield_add(Evas_Object *parent)
    elm_object_style_set(wd->entry, "editfield");
    evas_object_size_hint_weight_set(wd->entry, 0, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->entry, 0, EVAS_HINT_FILL);
-   evas_object_event_callback_add(wd->entry,
-                                  EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                  _changed_size_hints, obj);
+   evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, obj);
+   evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_SHOW, _show_cb, obj);
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
    evas_object_smart_callback_add(wd->entry, "changed", _entry_changed_cb, obj);
    elm_widget_sub_object_add(obj, wd->entry);
@@ -558,6 +580,8 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
         elm_entry_single_line_set(wd->entry,EINA_FALSE);
         edje_object_signal_emit(wd->base, "elm,state,text,multiline", "elm");
      }
+   if (!wd->editing)
+     edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
 }
 
 /**
@@ -595,7 +619,7 @@ elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
    if (!wd || !wd->base)
       return;
 
-   wd->eraser_show = visible;
+   wd->eraser_show = !!visible;
 
    if (!visible)
       edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
