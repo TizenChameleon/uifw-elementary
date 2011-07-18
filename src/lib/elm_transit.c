@@ -701,6 +701,16 @@ elm_transit_chain_transit_del(Elm_Transit *transit, Elm_Transit *chain_transit)
    transit->next_chain_transits = eina_list_remove(transit->next_chain_transits, chain_transit);
 }
 
+/**
+ * Get the current chain transit list.
+ *
+ * @note @p transit can not be NULL.
+ *
+ * @param transit The transit object.
+ * @return chain transit list.
+ *
+ * @ingroup Transit
+ */
 EAPI Eina_List *
 elm_transit_chain_transits_get(const Elm_Transit * transit)
 {
