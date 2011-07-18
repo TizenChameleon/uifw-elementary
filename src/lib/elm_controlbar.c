@@ -306,6 +306,10 @@ _theme_hook(Evas_Object * obj)
         if (item->selected)
           _select_box(item);
      }
+//TODO: "These lines affects item after images. I don't know why it does this time Please check it by you!!"
+//   evas_object_smart_member_add(wd->view, obj);
+//   evas_object_smart_member_add(wd->selected_box, obj);
+//   evas_object_smart_member_add(wd->box, obj);
 }
 
 static void
@@ -363,16 +367,15 @@ _sizing_eval(Evas_Object * obj)
 static Eina_Bool
 _move_evas_object(void *data)
 {
-   Evas_Object *bg_image;
-   double t, vx, vy, vw, vh;
+   double t;
+
    int dx, dy, dw, dh;
+
    int px, py, pw, ph;
-   int ox, oy, ow, oh;
+
    int x, y, w, h;
 
    Animation_Data * ad = (Animation_Data *) data;
-   bg_image = edje_object_part_object_get(_EDJ(ad->obj), "bg_image");
-   if (bg_image) evas_object_geometry_get(bg_image, &ox, &oy, &ow, &oh);
    t = ELM_MAX(0.0, ecore_loop_time_get() - ad->start_time);
    dx = ad->tx - ad->fx;
    dy = ad->ty - ad->fy;
@@ -396,32 +399,22 @@ _move_evas_object(void *data)
    py = ad->fy + y;
    pw = ad->fw + w;
    ph = ad->fh + h;
-
-   if ((ow - pw) == 0)
-     vx = 0;
-   else
-     vx = (double)(px - ox) / (double)(ow - pw);
-   if ((oh - ph) == 0)
-     vy = 0;
-   else
-     vy = (double)(py - oy) / (double)(oh - ph);
-   vw = (double)pw / (double)ow;
-   vh = (double)ph / (double)oh;
-
    if (x == dx && y == dy && w == dw && h == dh)
      {
         if (ad->timer) ecore_animator_del(ad->timer);
         ad->timer = NULL;
-        edje_object_part_drag_size_set(_EDJ(ad->obj), "elm.dragable.box", vw, vh);
-        edje_object_part_drag_value_set(_EDJ(ad->obj), "elm.dragable.box", vx, vy);
+        evas_object_move(ad->obj, px, py);
+        evas_object_resize(ad->obj, pw, ph);
+        evas_object_show(ad->obj);
         if (ad->func != NULL)
           ad->func(ad->data, ad->obj);
         return ECORE_CALLBACK_CANCEL;
      }
    else
      {
-        edje_object_part_drag_size_set(_EDJ(ad->obj), "elm.dragable.box", vw, vh);
-        edje_object_part_drag_value_set(_EDJ(ad->obj), "elm.dragable.box", vx, vy);
+        evas_object_move(ad->obj, px, py);
+        evas_object_resize(ad->obj, pw, ph);
+        evas_object_show(ad->obj);
      }
    return ECORE_CALLBACK_RENEW;
 }
@@ -689,9 +682,10 @@ _set_item_visible(Elm_Controlbar_Item *it, Eina_Bool visible)
 static Eina_Bool
 _hide_selected_box(void *data)
 {
-   Evas_Object *base = (Evas_Object *)data;
+   Evas_Object *selected_box = (Evas_Object *)data;
 
-   edje_object_part_drag_size_set(_EDJ(base), "elm.dragable.box", 0.0, 0.0);
+   evas_object_move(selected_box, -999, -999);
+   evas_object_hide(selected_box);
 
    return ECORE_CALLBACK_CANCEL;
 }
@@ -713,7 +707,7 @@ _end_selected_box(void *data, Evas_Object *obj __UNUSED__)
         wd->animating = 0;
      }
 
-   ecore_idler_add(_hide_selected_box, wd->edje);
+   ecore_idler_add(_hide_selected_box, wd->selected_box);
 }
 
 static void
@@ -746,7 +740,7 @@ _move_selected_box(Widget_Data *wd, Elm_Controlbar_Item * fit, Elm_Controlbar_It
         free(wd->ad);
         wd->ad = NULL;
      }
-   wd->ad = _move_object_with_animation(wd->edje, fx, fy, fw, fh, tx, ty, tw, th,
+   wd->ad = _move_object_with_animation(wd->selected_box, fx, fy, fw, fh, tx, ty, tw, th,
                                        0.3, _move_evas_object, _end_selected_box, wd);
 }
 
@@ -1408,7 +1402,10 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
+   evas_object_smart_member_add(wd->view, obj);
    elm_widget_resize_object_set(obj, wd->edje);
+   evas_object_smart_member_add(wd->selected_box, obj);
+   evas_object_smart_member_add(wd->box, obj);
 
    _sizing_eval(obj);
 
