@@ -908,12 +908,13 @@ _item_highlight(Elm_Genlist_Item *it)
    if ((it->wd->no_select) || (it->delete_me) || (it->highlighted) ||
        (it->disabled) || (it->display_only) || (it->mode_view))
      return;
-   if (!it->wd->edit_mode)
-      edje_object_signal_emit(it->base.view, "elm,state,selected", "elm");
+   edje_object_signal_emit(it->base.view, "elm,state,selected", "elm");
+   if (it->edit_obj) edje_object_signal_emit(it->edit_obj, "elm,state,selected", "elm");
    selectraise = edje_object_data_get(it->base.view, "selectraise");
    if ((selectraise) && (!strcmp(selectraise, "on")))
      {
-        if (!it->wd->edit_mode) evas_object_raise(it->base.view);
+        if (it->edit_obj) evas_object_raise(it->edit_obj);
+        else evas_object_raise(it->base.view);
         if ((it->group_item) && (it->group_item->realized))
           evas_object_raise(it->group_item->base.view);
      }
@@ -1088,6 +1089,7 @@ _item_unselect(Elm_Genlist_Item *it)
 
    if ((it->delete_me) || (!it->highlighted)) return;
    edje_object_signal_emit(it->base.view, "elm,state,unselected", "elm");
+   if (it->edit_obj) edje_object_signal_emit(it->edit_obj, "elm,state,unselected", "elm");
    stacking = edje_object_data_get(it->base.view, "stacking");
    selectraise = edje_object_data_get(it->base.view, "selectraise");
    if ((selectraise) && (!strcmp(selectraise, "on")))
@@ -1949,38 +1951,64 @@ _item_realize(Elm_Genlist_Item *it,
                                        _multi_up, it);
         evas_object_event_callback_add(it->base.view, EVAS_CALLBACK_MULTI_MOVE,
                                        _multi_move, it);
+
+        if ((!it->edit_obj) &&(it->wd->edit_mode) &&
+            (it->flags != ELM_GENLIST_ITEM_GROUP) && (it->itc->edit_item_style))
+          _effect_item_realize(it, EINA_FALSE);
+
         if (itc)
           {
-             if (it->selected != itc->selected)
+             if ((it->selected) && (it->selected != itc->selected))
                {
-                  if ((it->selected) && (!it->wd->edit_mode))
-                    edje_object_signal_emit(it->base.view,
+                  edje_object_signal_emit(it->base.view,
+                                          "elm,state,selected", "elm");
+                  if (it->edit_obj)
+                    edje_object_signal_emit(it->edit_obj,
                                             "elm,state,selected", "elm");
                }
-             if (it->disabled != itc->disabled)
+             if ((it->disabled) && (it->disabled != itc->disabled))
                {
-                  if (it->disabled)
-                    edje_object_signal_emit(it->base.view,
+                  edje_object_signal_emit(it->base.view,
+                                          "elm,state,disabled", "elm");
+                  if (it->edit_obj)
+                    edje_object_signal_emit(it->edit_obj,
                                             "elm,state,disabled", "elm");
                }
-             if (it->expanded != itc->expanded)
+             if ((it->expanded) && (it->expanded != itc->expanded))
                {
-                  if (it->expanded)
-                    edje_object_signal_emit(it->base.view,
+                  edje_object_signal_emit(it->base.view,
+                                          "elm,state,expanded", "elm");
+                  if (it->edit_obj)
+                    edje_object_signal_emit(it->edit_obj,
                                             "elm,state,expanded", "elm");
                }
           }
         else
           {
-             if ((it->selected) && (!it->wd->edit_mode))
-               edje_object_signal_emit(it->base.view,
-                                       "elm,state,selected", "elm");
+             if (it->selected)
+               {
+                  edje_object_signal_emit(it->base.view,
+                                          "elm,state,selected", "elm");
+                  if (it->edit_obj)
+                    edje_object_signal_emit(it->edit_obj,
+                                            "elm,state,selected", "elm");
+               }
              if (it->disabled)
-               edje_object_signal_emit(it->base.view,
-                                       "elm,state,disabled", "elm");
+               {
+                  edje_object_signal_emit(it->base.view,
+                                          "elm,state,disabled", "elm");
+                  if (it->edit_obj)
+                    edje_object_signal_emit(it->edit_obj,
+                                            "elm,state,disabled", "elm");
+               }
              if (it->expanded)
-               edje_object_signal_emit(it->base.view,
-                                       "elm,state,expanded", "elm");
+               {
+                  edje_object_signal_emit(it->base.view,
+                                          "elm,state,expanded", "elm");
+                  if (it->edit_obj)
+                    edje_object_signal_emit(it->edit_obj,
+                                            "elm,state,expanded", "elm");
+               }
           }
      }
 
@@ -2144,10 +2172,10 @@ _item_realize(Elm_Genlist_Item *it,
    if (!calc) evas_object_smart_callback_call(it->base.widget, "realized", it);
    if ((!calc) && (it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP))
      {
-        if (it->itc->edit_item_style )
+        if (it->itc->edit_item_style)
           {
-            _effect_item_realize(it, EINA_FALSE);
-            edje_object_message_signal_process(it->edit_obj);
+             if (!it->edit_obj) _effect_item_realize(it, EINA_FALSE);
+             edje_object_message_signal_process(it->edit_obj);
           }
      }
    edje_object_message_signal_process(it->base.view);
@@ -4571,9 +4599,17 @@ elm_genlist_item_disabled_set(Elm_Genlist_Item *it,
    if (it->realized)
      {
         if (it->disabled)
-          edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
+          {
+             edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
+             if (it->edit_obj)
+               edje_object_signal_emit(it->edit_obj, "elm,state,disabled", "elm");
+          }
         else
-          edje_object_signal_emit(it->base.view, "elm,state,enabled", "elm");
+          {
+             edje_object_signal_emit(it->base.view, "elm,state,enabled", "elm");
+             if (it->edit_obj)
+               edje_object_signal_emit(it->edit_obj, "elm,state,enabled", "elm");
+          }
         EINA_LIST_FOREACH(it->icon_objs, l, obj)
            elm_widget_disabled_set(obj, disabled);
      }
