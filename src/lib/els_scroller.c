@@ -1723,7 +1723,7 @@ _smart_hold_animator(void *data)
    fx = sd->down.hold_x;
    fy = sd->down.hold_y;
 
-   if (_elm_config->scroll_smooth_time_interval > 0.0)
+   if ((!sd->hold) && (!sd->freeze) && (_elm_config->scroll_smooth_time_interval > 0.0))
      {
         int i, count = 0; //count for the real event number we have to deal with
         int queue_size = 10; //for event queue size
