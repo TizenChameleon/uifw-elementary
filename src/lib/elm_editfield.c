@@ -84,9 +84,13 @@ static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   char buf[4096];
    if (!wd || !wd->base)
       return;
+
    _elm_theme_object_set(obj, wd->base, "editfield", "base", elm_widget_style_get(obj));
+   snprintf(buf, sizeof(buf), "editfield/%s", elm_widget_style_get(obj));
+   elm_object_style_set(wd->entry, buf);
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
    if(!wd->editing)
       edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
