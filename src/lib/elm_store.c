@@ -1745,6 +1745,7 @@ _normal_item_append(Elm_Store_Item *sti, Elm_Genlist_Item_Class *itc)
                                                                sti->item_info->index = comp_item->item_info->index;
                                                                comp_item->item_info->index++;
                                                                header_list = eina_list_prepend_relative(header_list, sti, comp_item);
+                                                               l->data = header_list;
                                                                st->total_item_count++;
                                                                sti->item = elm_genlist_item_insert_before(st->genlist,
                                                                                                           itc,
