@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-07-12 12:15+0900\n"
+"POT-Creation-Date: 2011-07-19 17:25+0900\n"
 "PO-Revision-Date: 2010-12-26 10:05+0200\n"
 "Last-Translator: Tom Hacohen <tom.hacohen@partner.samsung.com>\n"
 "Language-Team: General\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#: src/lib/elc_fileselector.c:1056 src/lib/elm_entry.c:1282
+#: src/lib/elc_fileselector.c:1056 src/lib/elm_entry.c:1283
 msgid "Cancel"
 msgstr ""
 
@@ -37,22 +37,22 @@ msgstr ""
 msgid "default:LTR"
 msgstr "default:RTL"
 
-#: src/lib/elm_entry.c:1256
+#: src/lib/elm_entry.c:1257
 msgid "Select"
 msgstr ""
 
-#: src/lib/elm_entry.c:1261
+#: src/lib/elm_entry.c:1262
 msgid "Paste"
 msgstr ""
 
-#: src/lib/elm_entry.c:1266 src/lib/elm_entry.c:1286
+#: src/lib/elm_entry.c:1267 src/lib/elm_entry.c:1287
 msgid "More"
 msgstr ""
 
-#: src/lib/elm_entry.c:1276
+#: src/lib/elm_entry.c:1277
 msgid "Copy"
 msgstr ""
 
-#: src/lib/elm_entry.c:1279
+#: src/lib/elm_entry.c:1280
 msgid "Cut"
 msgstr ""

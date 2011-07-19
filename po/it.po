@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-07-12 12:15+0900\n"
+"POT-Creation-Date: 2011-07-19 17:25+0900\n"
 "PO-Revision-Date: 2011-03-26 13:53+0100\n"
 "Last-Translator: Massimo Maiurana <maiurana@gmail.com>\n"
 "Language-Team: none\n"
@@ -22,7 +22,7 @@ msgstr "Su"
 msgid "Home"
 msgstr "Home"
 
-#: src/lib/elc_fileselector.c:1056 src/lib/elm_entry.c:1282
+#: src/lib/elc_fileselector.c:1056 src/lib/elm_entry.c:1283
 msgid "Cancel"
 msgstr "Annulla"
 
@@ -34,22 +34,22 @@ msgstr "OK"
 msgid "default:LTR"
 msgstr "predefintito: LTR"
 
-#: src/lib/elm_entry.c:1256
+#: src/lib/elm_entry.c:1257
 msgid "Select"
 msgstr "Seleziona"
 
-#: src/lib/elm_entry.c:1261
+#: src/lib/elm_entry.c:1262
 msgid "Paste"
 msgstr "Incolla"
 
-#: src/lib/elm_entry.c:1266 src/lib/elm_entry.c:1286
+#: src/lib/elm_entry.c:1267 src/lib/elm_entry.c:1287
 msgid "More"
 msgstr ""
 
-#: src/lib/elm_entry.c:1276
+#: src/lib/elm_entry.c:1277
 msgid "Copy"
 msgstr "Copia"
 
-#: src/lib/elm_entry.c:1279
+#: src/lib/elm_entry.c:1280
 msgid "Cut"
 msgstr "Taglia"

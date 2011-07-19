@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elementary 0.7.0.57309\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-07-12 12:15+0900\n"
+"POT-Creation-Date: 2011-07-19 17:25+0900\n"
 "PO-Revision-Date: 2011-06-19 16:41+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@gmail.com>\n"
 "Language-Team: Dutch <vistausss@gmail.com>\n"
@@ -28,7 +28,7 @@ msgstr "Omhoog"
 msgid "Home"
 msgstr "Persoonlijke map"
 
-#: src/lib/elc_fileselector.c:1056 src/lib/elm_entry.c:1282
+#: src/lib/elc_fileselector.c:1056 src/lib/elm_entry.c:1283
 msgid "Cancel"
 msgstr "Annuleren"
 
@@ -40,22 +40,22 @@ msgstr "OK"
 msgid "default:LTR"
 msgstr "Standaard: LTR"
 
-#: src/lib/elm_entry.c:1256
+#: src/lib/elm_entry.c:1257
 msgid "Select"
 msgstr "Selecteren"
 
-#: src/lib/elm_entry.c:1261
+#: src/lib/elm_entry.c:1262
 msgid "Paste"
 msgstr "Plakken"
 
-#: src/lib/elm_entry.c:1266 src/lib/elm_entry.c:1286
+#: src/lib/elm_entry.c:1267 src/lib/elm_entry.c:1287
 msgid "More"
 msgstr ""
 
-#: src/lib/elm_entry.c:1276
+#: src/lib/elm_entry.c:1277
 msgid "Copy"
 msgstr "Kopiëren"
 
-#: src/lib/elm_entry.c:1279
+#: src/lib/elm_entry.c:1280
 msgid "Cut"
 msgstr "Knippen"
