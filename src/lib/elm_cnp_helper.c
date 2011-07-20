@@ -1423,6 +1423,8 @@ is_uri_type_data(Cnp_Selection *sel __UNUSED__, Ecore_X_Event_Selection_Notify *
    cnp_debug("Got %s\n", p);
    if (strncmp(p, "file://", 7))
      {
+        /* elm_selection_set send target notify->data just "x" */
+        if (*p == 'x') return EINA_TRUE;
         if (*p != '/') return EINA_FALSE;
      }
 
