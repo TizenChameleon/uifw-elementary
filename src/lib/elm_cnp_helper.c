@@ -188,7 +188,7 @@ static Cnp_Atom atoms[CNP_N_ATOMS] = {
      },
      [CNP_ATOM_XELM] =  {
           "application/x-elementary-markup",
-          ELM_SEL_FORMAT_MARKUP,
+          ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_HTML,
           edje_converter,
           NULL,
           notify_handler_edje,
