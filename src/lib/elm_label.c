@@ -468,6 +468,11 @@ _ellipsis_label_to_width(Evas_Object *obj)
         if (kvalue != NULL) cur_fontsize = atoi(kvalue);
      }
 
+   /* TODO : Remove ellipsis logic in elm_lable and use ellipsis feature in evas textblock */
+   _ellipsis_fontsize_set(obj, cur_fontsize);
+   return;
+
+/*
    while (_is_width_over(obj))
      {
         if (cur_fontsize > minfontsize)
@@ -481,6 +486,7 @@ _ellipsis_label_to_width(Evas_Object *obj)
              break;
           }
      }
+*/
 }
 
 static void
