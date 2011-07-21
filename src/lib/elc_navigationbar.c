@@ -78,7 +78,6 @@ static void _item_del(Elm_Navigationbar_Item *it);
 static void _back_button_clicked(void *data, Evas_Object *obj, void *event_info);
 static void _button_size_set(Evas_Object *obj);
 static Eina_Bool _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_Bool back_btn);
-static Elm_Navigationbar_Item *_check_item_is_added(Evas_Object *obj, Evas_Object *content);
 static void _transition_complete_cb(void *data);
 static void _elm_navigationbar_prev_btn_set(Evas_Object *obj,
                                             Evas_Object *content,
@@ -164,7 +163,7 @@ _create_back_btn(Evas_Object *parent, const char *title, void *data)
 {
    Evas_Object *btn = elm_button_add(parent);
    if (!btn) return NULL;
-   elm_button_label_set(btn, title);
+   elm_object_text_set(btn, title);
    evas_object_smart_callback_add(btn, "clicked", _back_button_clicked, data);
    elm_object_focus_allow_set(btn, EINA_FALSE);
    return btn;
@@ -189,26 +188,53 @@ _theme_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_List *list = NULL;
    Elm_Navigationbar_Item *it = NULL;
-   char buf_fn[4096];
+   char buf[4096];
 
    if (!wd) return;
    _elm_theme_object_set(obj, wd->base, "navigationbar", "base", elm_widget_style_get(obj));
-   EINA_LIST_FOREACH(wd->stack, list, it)
+
+   list = eina_list_last(wd->stack);
+   if (list)
      {
-        if (it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON])
-         {
-            if (it->back_btn)
-              snprintf(buf_fn, sizeof(buf_fn), "navigationbar_prev_btn/%s", elm_widget_style_get(obj));
-            else
-              snprintf(buf_fn, sizeof(buf_fn), "navigationbar_next_btn/%s", elm_widget_style_get(obj));
-            elm_object_style_set(it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON], buf_fn);
-         }
-        if (it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON])
-         {
-            snprintf(buf_fn, sizeof(buf_fn), "navigationbar_next_btn/%s", elm_widget_style_get(obj));
-            elm_object_style_set(it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON], buf_fn);
-         }
+        it = eina_list_data_get(list);
+        if (it)
+          {
+             //buttons
+             if (it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON])
+               edje_object_part_swallow(wd->base, "elm.swallow.prev_btn", it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON]);
+             if (it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON])
+               edje_object_part_swallow(wd->base, "elm.swallow.next_btn", it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON]);
+
+             //icon
+             if (it->icon)
+               {
+                  edje_object_part_swallow(wd->base, "elm.swallow.icon", it->icon);
+                  edje_object_signal_emit(wd->base, "elm,state,icon,visible", "elm");
+               }
+
+             //title text
+             if (it->title)
+               edje_object_part_text_set(wd->base, "elm.text", it->title);
+
+             //title object 
+             if (it->title_obj)
+               {
+                  edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
+
+                  if (it->titleobj_visible)
+                    edje_object_signal_emit(wd->base, "elm,state,show,noanimate,title", "elm");
+                  else
+                    edje_object_signal_emit(wd->base, "elm,state,hide,noanimate,title", "elm"); //elm,state,title,hide
+
+                  if (it->title)
+                    edje_object_signal_emit(wd->base, "elm,state,show,extended", "elm");
+               }
+            }
      }
+
+   if (!wd->title_visible)
+     edje_object_signal_emit(wd->base, "elm,state,item,moveup", "elm");
+
    edje_object_message_signal_process(wd->base);
    _sizing_eval(obj);
 }
@@ -543,8 +569,11 @@ _button_set(Evas_Object *obj, Evas_Object *prev_btn, Evas_Object *new_btn, Eina_
      }
    else
      {
-        snprintf(buf, sizeof(buf), "navigationbar_next_btn/%s", elm_widget_style_get(obj));
-        elm_object_style_set(new_btn, buf);
+        if (!strcmp("default", elm_object_style_get(new_btn)))
+          {
+             snprintf(buf, sizeof(buf), "navigationbar_next_btn/%s", elm_widget_style_get(obj));
+             elm_object_style_set(new_btn, buf);
+          }
      }
 
    elm_widget_sub_object_add(obj, new_btn);
