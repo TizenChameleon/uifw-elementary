@@ -2169,7 +2169,8 @@ _item_realize(Elm_Genlist_Item *it,
    if (itc) _item_cache_free(itc);
    evas_event_thaw(evas_object_evas_get(it->wd->obj));
    evas_event_thaw_eval(evas_object_evas_get(it->wd->obj));
-   if (!calc) evas_object_smart_callback_call(it->base.widget, "realized", it);
+   if (!calc)
+     evas_object_smart_callback_call(it->base.widget, "realized", it);
    if ((!calc) && (it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP))
      {
         if (it->itc->edit_item_style)

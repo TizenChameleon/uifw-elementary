@@ -4,20 +4,20 @@
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
-static void 
-_cb_radio_changed(void *data, Evas_Object *obj, void *event __UNUSED__) 
+static void
+_cb_radio_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
 {
    Evas_Object *o_bg = data;
 
    elm_bg_option_set(o_bg, elm_radio_value_get((Evas_Object *)obj));
 }
 
-static void 
-_cb_overlay_changed(void *data, Evas_Object *obj, void *event __UNUSED__) 
+static void
+_cb_overlay_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
 {
    Evas_Object *o_bg = data;
 
-   if (elm_check_state_get(obj)) 
+   if (elm_check_state_get(obj))
      {
         Evas_Object *parent, *over;
         char buff[PATH_MAX];
@@ -28,12 +28,12 @@ _cb_overlay_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
         edje_object_file_set(over, buff, "bg_overlay");
         elm_bg_overlay_set(o_bg, over);
      }
-   else 
+   else
      elm_bg_overlay_set(o_bg, NULL);
 }
 
-static void 
-_cb_color_changed(void *data, Evas_Object *obj, void *event __UNUSED__) 
+static void
+_cb_color_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
 {
    Evas_Object *o_bg = data;
    double val = 0.0;
@@ -41,11 +41,11 @@ _cb_color_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
    val = elm_spinner_value_get(obj);
    if (val == 1.0)
      elm_bg_color_set(o_bg, 255, 255, 255);
-   else if (val == 2.0) 
+   else if (val == 2.0)
      elm_bg_color_set(o_bg, 255, 0, 0);
-   else if (val == 3.0) 
+   else if (val == 3.0)
      elm_bg_color_set(o_bg, 0, 0, 255);
-   else if (val == 4.0) 
+   else if (val == 4.0)
      elm_bg_color_set(o_bg, 0, 255, 0);
 }
 
@@ -139,7 +139,7 @@ test_bg_options(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_
 
    rd = elm_radio_add(win);
    elm_radio_state_value_set(rd, ELM_BG_OPTION_CENTER);
-   elm_radio_label_set(rd, "Center");
+   elm_object_text_set(rd, "Center");
    evas_object_size_hint_weight_set(rd, EVAS_HINT_EXPAND, EVAS_HINT_FILL);
    evas_object_smart_callback_add(rd, "changed", _cb_radio_changed, o_bg);
    elm_box_pack_end(hbox, rd);
@@ -149,7 +149,7 @@ test_bg_options(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_
    rd = elm_radio_add(win);
    elm_radio_state_value_set(rd, ELM_BG_OPTION_SCALE);
    elm_radio_group_add(rd, rdg);
-   elm_radio_label_set(rd, "Scale");
+   elm_object_text_set(rd, "Scale");
    evas_object_size_hint_weight_set(rd, EVAS_HINT_EXPAND, EVAS_HINT_FILL);
    evas_object_smart_callback_add(rd, "changed", _cb_radio_changed, o_bg);
    elm_box_pack_end(hbox, rd);
@@ -158,7 +158,7 @@ test_bg_options(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_
    rd = elm_radio_add(win);
    elm_radio_state_value_set(rd, ELM_BG_OPTION_STRETCH);
    elm_radio_group_add(rd, rdg);
-   elm_radio_label_set(rd, "Stretch");
+   elm_object_text_set(rd, "Stretch");
    evas_object_size_hint_weight_set(rd, EVAS_HINT_EXPAND, EVAS_HINT_FILL);
    evas_object_smart_callback_add(rd, "changed", _cb_radio_changed, o_bg);
    elm_box_pack_end(hbox, rd);
@@ -167,7 +167,7 @@ test_bg_options(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_
    rd = elm_radio_add(win);
    elm_radio_state_value_set(rd, ELM_BG_OPTION_TILE);
    elm_radio_group_add(rd, rdg);
-   elm_radio_label_set(rd, "Tile");
+   elm_object_text_set(rd, "Tile");
    evas_object_size_hint_weight_set(rd, EVAS_HINT_EXPAND, EVAS_HINT_FILL);
    evas_object_smart_callback_add(rd, "changed", _cb_radio_changed, o_bg);
    elm_box_pack_end(hbox, rd);
@@ -176,13 +176,13 @@ test_bg_options(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_
    elm_radio_value_set(rdg, ELM_BG_OPTION_SCALE);
 
    rd = elm_check_add(win);
-   elm_check_label_set(rd, "Show Overlay");
+   elm_object_text_set(rd, "Show Overlay");
    evas_object_size_hint_weight_set(rd, EVAS_HINT_EXPAND, EVAS_HINT_FILL);
    evas_object_smart_callback_add(rd, "changed", _cb_overlay_changed, o_bg);
    elm_box_pack_end(hbox, rd);
    evas_object_show(rd);
 
-   /* color choices ... this is ghetto, but we don't have a 'colorpicker' 
+   /* color choices ... this is ghetto, but we don't have a 'colorpicker'
     * widget yet :( */
    rd = elm_spinner_add(win);
    elm_object_style_set(rd, "vertical");

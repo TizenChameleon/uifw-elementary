@@ -74,7 +74,7 @@ test_weather(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
-#ifdef HAVE_ELEMENTARY_EWEATHER 
+#ifdef HAVE_ELEMENTARY_EWEATHER
    bx = elm_box_add(win);
    elm_win_resize_object_add(win, bx);
    evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -112,13 +112,13 @@ test_weather(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    evas_object_show(bx0);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "First city");
+   elm_object_text_set(bt, "First city");
    evas_object_show(bt);
    elm_box_pack_end(bx0, bt);
    evas_object_smart_callback_add(bt, "clicked", _first_city_cb, NULL);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Second city");
+   elm_object_text_set(bt, "Second city");
    evas_object_show(bt);
    elm_box_pack_end(bx0, bt);
    evas_object_smart_callback_add(bt, "clicked", _second_city_cb, NULL);
@@ -133,7 +133,7 @@ test_weather(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 
    hv = elm_hoversel_add(win);
    elm_hoversel_hover_parent_set(hv, win);
-   elm_hoversel_label_set(hv, "data source");
+   elm_object_text_set(hv, "data source");
    evas_object_size_hint_weight_set(hv, 0.0, 0.0);
    evas_object_size_hint_align_set(hv, 0.5, 0.5);
    elm_box_pack_end(bx0, hv);
@@ -154,7 +154,7 @@ test_weather(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    evas_object_show(en);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Apply");
+   elm_object_text_set(bt, "Apply");
    evas_object_show(bt);
    elm_box_pack_end(bx0, bt);
    evas_object_smart_callback_add(bt, "clicked", _apply_cb, NULL);
@@ -163,10 +163,10 @@ test_weather(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 
 #else
     Evas_Object *lbl;
-    
+
     lbl = elm_label_add(win);
     elm_win_resize_object_add(win, lbl);
-    elm_label_label_set(lbl, "libeweather is required to display the forecast.");
+    elm_object_text_set(lbl, "libeweather is required to display the forecast.");
     evas_object_show(lbl);
 #endif
 

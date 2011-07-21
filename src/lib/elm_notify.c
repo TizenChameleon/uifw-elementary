@@ -1,7 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-
 /**
  * @defgroup Notify Notify
  *
@@ -333,6 +332,8 @@ _calc(Evas_Object *obj)
    Evas_Coord x, y, w, h;
 
    if (!wd) return;
+   _sizing_eval(obj);
+
    evas_object_geometry_get(obj, &x, &y, &w, &h);
    edje_object_size_min_get(wd->notify, &minw, &minh);
    edje_object_size_min_restricted_calc(wd->notify, &minw, &minh, minw, minh);
@@ -342,7 +343,6 @@ _calc(Evas_Object *obj)
         _notify_move_to_orientation(obj);
         evas_object_resize(wd->notify, minw, minh);
      }
-   _sizing_eval(obj);
 }
 
 static Eina_Bool
@@ -397,7 +397,7 @@ _hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_i
 }
 
 static void
-_parent_del(void *data,  Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+_parent_del(void *data,  Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;

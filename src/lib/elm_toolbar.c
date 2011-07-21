@@ -82,6 +82,14 @@ static void _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data);
 static void _elm_toolbar_item_icon_obj_set(Evas_Object *obj, Elm_Toolbar_Item *item, Evas_Object *icon_obj, const char *icon_str, double icon_size, const char *signal);
 static void _item_label_set(Elm_Toolbar_Item *item, const char *label, const char *signal);
 
+static const char SIG_CLICKED[] = "clicked";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_CLICKED, ""},
+   {NULL, NULL}
+};
+
+
 static Eina_Bool
 _item_icon_set(Evas_Object *icon_obj, const char *type, const char *icon)
 {
@@ -167,7 +175,7 @@ _item_select(Elm_Toolbar_Item *it)
         _menu_move_resize(it, NULL, NULL, NULL);
      }
    if (it->func) it->func((void *)(it->base.data), it->base.widget, it);
-   evas_object_smart_callback_call(obj2, "clicked", it);
+   evas_object_smart_callback_call(obj2, SIG_CLICKED, it);
 }
 
 static void
@@ -206,7 +214,7 @@ _item_disable(Elm_Toolbar_Item *it, Eina_Bool disabled)
 
    if (!wd) return;
    if (it->disabled == disabled) return;
-   it->disabled = disabled;
+   it->disabled = !!disabled;
    if (it->disabled)
      {
         edje_object_signal_emit(it->base.view, "elm,state,disabled", "elm");
@@ -619,7 +627,7 @@ _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
    Evas_Object *obj = (Evas_Object *) data;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   //_els_box_layout(o, priv, 1, wd->homogeneous, elm_widget_mirrored_get(obj));
+   _els_box_layout(o, priv, 1, wd->homogeneous, elm_widget_mirrored_get(obj));
 }
 
 static Elm_Toolbar_Item *
@@ -749,6 +757,8 @@ elm_toolbar_add(Evas_Object *parent)
    evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_RESIZE, _resize, obj);
    evas_object_event_callback_add(wd->bx, EVAS_CALLBACK_RESIZE, _resize, obj);
    elm_toolbar_icon_order_lookup_set(obj, ELM_ICON_LOOKUP_THEME_FDO);
+
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    _sizing_eval(obj);
    return obj;
@@ -1758,26 +1768,32 @@ elm_toolbar_mode_shrink_get(const Evas_Object *obj)
 }
 
 /**
- * Set the homogenous mode of toolbar @p obj.
+ * Set the homogeneous mode of toolbar @p obj.
  *
  * @param obj The toolbar object
- * @param homogenous If true, the toolbar items will be uniform in size
+ * @param homogeneous If true, the toolbar items will be uniform in size
  *
  * @ingroup Toolbar
  */
 EAPI void
-elm_toolbar_homogenous_set(Evas_Object *obj, Eina_Bool homogenous)
+elm_toolbar_homogeneous_set(Evas_Object *obj, Eina_Bool homogeneous)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-   wd->homogeneous = !!homogenous;
+   wd->homogeneous = !!homogeneous;
    evas_object_smart_calculate(wd->bx);
 }
 
+EINA_DEPRECATED EAPI void
+elm_toolbar_homogenous_set(Evas_Object *obj, Eina_Bool homogenous)
+{
+   elm_toolbar_homogeneous_set(obj, homogenous);
+}
+
 /**
- * Get the homogenous mode of toolbar @p obj.
+ * Get the homogeneous mode of toolbar @p obj.
  *
  * @param obj The toolbar object
  * @return If true, the toolbar items are uniform in size
@@ -1785,13 +1801,19 @@ elm_toolbar_homogenous_set(Evas_Object *obj, Eina_Bool homogenous)
  * @ingroup Toolbar
  */
 EAPI Eina_Bool
-elm_toolbar_homogenous_get(const Evas_Object *obj)
+elm_toolbar_homogeneous_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return EINA_FALSE;
    return wd->homogeneous;
+}
+
+EINA_DEPRECATED EAPI Eina_Bool
+elm_toolbar_homogenous_get(const Evas_Object *obj)
+{
+   return elm_toolbar_homogeneous_get(obj);
 }
 
 /**

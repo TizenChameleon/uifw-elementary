@@ -1,20 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-/**
- * @defgroup Anchorblock Anchorblock
- *
- * Anchorblock is for displaying tet that contains markup with anchors like:
- * \<a href=1234\>something\</\> in it. These will be drawn differently and will
- * be able to be clicked on by the user to display a popup. This popup then
- * is intended to contain extra options such as "call", "add to contacts",
- * "open web page" etc.
- *
- * Signals that you can add callbacks for are:
- *
- * "anchor,clicked" - anchor called was clicked. event_info is anchor info -
- *                    Elm_Entry_Anchorview_Info
- */
 typedef struct _Widget_Data Widget_Data;
 typedef struct _Elm_Anchorblock_Item_Provider Elm_Anchorblock_Item_Provider;
 
@@ -195,14 +181,31 @@ _item_provider(void *data, Evas_Object *entry __UNUSED__, const char *item)
    return NULL;
 }
 
-/**
- * Add a new Anchorblock object
- *
- * @param parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup Anchorblock
- */
+static void
+_elm_anchorblock_text_set(Evas_Object *obj, const char *item, const char *text)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return;
+   if (!wd) return;
+   elm_entry_entry_set(wd->entry, text);
+   if (wd->hover) evas_object_del(wd->hover);
+   if (wd->pop) evas_object_del(wd->pop);
+   wd->hover = NULL;
+   wd->pop = NULL;
+   _sizing_eval(obj);
+}
+
+static const char*
+_elm_anchorblock_text_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return NULL;
+   if (!wd) return NULL;
+   return elm_entry_entry_get(wd->entry);
+}
+
 EAPI Evas_Object *
 elm_anchorblock_add(Evas_Object *parent)
 {
@@ -220,6 +223,8 @@ elm_anchorblock_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_can_focus_set(obj, EINA_TRUE);
+   elm_widget_text_set_hook_set(obj, _elm_anchorblock_text_set);
+   elm_widget_text_get_hook_set(obj, _elm_anchorblock_text_get);
 
    wd->entry = elm_entry_add(parent);
    elm_entry_item_provider_prepend(wd->entry, _item_provider, obj);
@@ -245,64 +250,18 @@ elm_anchorblock_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * Set the text markup of the anchorblock
- *
- * This sets the text of the anchorblock to be the text given as @p text. This
- * text is in markup format with \<a href=XXX\> beginning an achor with the
- * string link of 'XXX', and \</\> or \</a\> ending the link. Other markup can
- * be used dependign on the style support.
- *
- * @param obj The anchorblock object
- * @param text The text to set, or NULL to clear
- *
- * @ingroup Anchorblock
- */
 EAPI void
 elm_anchorblock_text_set(Evas_Object *obj, const char *text)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_entry_entry_set(wd->entry, text);
-   if (wd->hover) evas_object_del(wd->hover);
-   if (wd->pop) evas_object_del(wd->pop);
-   wd->hover = NULL;
-   wd->pop = NULL;
-   _sizing_eval(obj);
+   _elm_anchorblock_text_set(obj, NULL, text);
 }
 
-/**
- * Get the markup text set for the anchorblock
- *
- * This retrieves back the string set by @c elm_anchorblock_text_set().
- *
- * @param obj The anchorblock object
- * @return text The markup text set or @c NULL, either if it was not set
- * or an error occurred
- *
- * @ingroup Anchorblock
- */
 EAPI const char*
 elm_anchorblock_text_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return elm_entry_entry_get(wd->entry);
+   return _elm_anchorblock_text_get(obj, NULL);
 }
 
-/**
- * Set the parent of the hover popup
- *
- * This sets the parent of the hover that anchorblock will create. See hover
- * objects for more information on this.
- *
- * @param obj The anchorblock object
- * @param parent The parent the hover should use
- *
- * @ingroup Anchorblock
- */
 EAPI void
 elm_anchorblock_hover_parent_set(Evas_Object *obj, Evas_Object *parent)
 {
@@ -316,17 +275,6 @@ elm_anchorblock_hover_parent_set(Evas_Object *obj, Evas_Object *parent)
      evas_object_event_callback_add(wd->hover_parent, EVAS_CALLBACK_DEL, _parent_del, obj);
 }
 
-/**
- * Get the parent of the hover popup
- *
- * This sgets the parent of the hover that anchorblock will create. See hover
- * objects for more information on this.
- *
- * @param obj The anchorblock object
- * @return The parent used by the hover
- *
- * @ingroup Anchorblock
- */
 EAPI Evas_Object *
 elm_anchorblock_hover_parent_get(const Evas_Object *obj)
 {
@@ -336,17 +284,6 @@ elm_anchorblock_hover_parent_get(const Evas_Object *obj)
    return wd->hover_parent;
 }
 
-/**
- * Set the style that the hover should use
- *
- * This sets the style for the hover that anchorblock will create. See hover
- * objects for more information
- *
- * @param obj The anchorblock object
- * @param style The style to use
- *
- * @ingroup Anchorblock
- */
 EAPI void
 elm_anchorblock_hover_style_set(Evas_Object *obj, const char *style)
 {
@@ -356,17 +293,6 @@ elm_anchorblock_hover_style_set(Evas_Object *obj, const char *style)
    eina_stringshare_replace(&wd->hover_style, style);
 }
 
-/**
- * Get the style that the hover should use
- *
- * This gets the style for the hover that anchorblock will create. See hover
- * objects for more information
- *
- * @param obj The anchorblock object
- * @return The style defined
- *
- * @ingroup Anchorblock
- */
 EAPI const char *
 elm_anchorblock_hover_style_get(const Evas_Object *obj)
 {
@@ -376,15 +302,6 @@ elm_anchorblock_hover_style_get(const Evas_Object *obj)
    return wd->hover_style;
 }
 
-/**
- * Stop the hover popup in the anchorblock
- *
- * This will stop the hover popup in the anchorblock if it is currently active.
- *
- * @param obj The anchorblock object
- *
- * @ingroup Anchorblock
- */
 EAPI void
 elm_anchorblock_hover_end(Evas_Object *obj)
 {
@@ -397,22 +314,6 @@ elm_anchorblock_hover_end(Evas_Object *obj)
    wd->pop = NULL;
 }
 
-/**
- * This appends a custom item provider to the list for that anchorblock
- *
- * This appends the given callback. The list is walked from beginning to end
- * with each function called given the item href string in the text. If the
- * function returns an object handle other than NULL (it should create an
- * and object to do this), then this object is used to replace that item. If
- * not the next provider is called until one provides an item object, or the
- * default provider in anchorblock does.
- *
- * @param obj The anchorblock object
- * @param func The function called to provide the item object
- * @param data The data passed to @p func
- *
- * @ingroup Anchorblock
- */
 EAPI void
 elm_anchorblock_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *anchorblock, const char *item), void *data)
 {
@@ -427,18 +328,6 @@ elm_anchorblock_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (voi
    wd->item_providers = eina_list_append(wd->item_providers, ip);
 }
 
-/**
- * This prepends a custom item provider to the list for that anchorblock
- *
- * This prepends the given callback. See elm_anchorblock_item_provider_append() for
- * more information
- *
- * @param obj The anchorblock object
- * @param func The function called to provide the item object
- * @param data The data passed to @p func
- *
- * @ingroup Anchorblock
- */
 EAPI void
 elm_anchorblock_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *anchorblock, const char *item), void *data)
 {
@@ -453,18 +342,6 @@ elm_anchorblock_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (vo
    wd->item_providers = eina_list_prepend(wd->item_providers, ip);
 }
 
-/**
- * This removes a custom item provider to the list for that anchorblock
- *
- * This removes the given callback. See elm_anchorblock_item_provider_append() for
- * more information
- *
- * @param obj The anchorblock object
- * @param func The function called to provide the item object
- * @param data The data passed to @p func
- *
- * @ingroup Anchorblock
- */
 EAPI void
 elm_anchorblock_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *anchorblock, const char *item), void *data)
 {

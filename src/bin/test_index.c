@@ -57,11 +57,11 @@ test_index(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    evas_object_size_hint_weight_set(gl, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, gl);
    evas_object_show(gl);
-   
+
    id = elm_index_add(win);
    evas_object_size_hint_weight_set(id, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, id);
-   
+
    evas_object_show(id);
 
    itci.item_style     = "default";
@@ -74,13 +74,13 @@ test_index(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    for (i = 0; i < 100; i++)
      {
         it = elm_genlist_item_append(gl, &itci,
-                                     (void *)(long)j/* item data */, 
+                                     (void *)(long)j/* item data */,
                                      NULL/* parent */, ELM_GENLIST_ITEM_NONE,
                                      NULL/* func */, NULL/* func data */);
         if (!(j & 0xf))
           {
              char buf[32];
-             
+
              snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 4) & 0xf));
              elm_index_item_append(id, buf, it);
           }
@@ -143,7 +143,7 @@ test_index2_it_add(void *data, Evas_Object *obj __UNUSED__, void *event_info __U
    const char *label;
    char letter[2];
 
-   label = elm_scrolled_entry_entry_get(gui->entry);
+   label = elm_entry_entry_get(gui->entry);
    snprintf(letter, sizeof(letter), "%c", label[0]);
    it = elm_list_item_sorted_insert(gui->lst, label, NULL, NULL, NULL, NULL,
 	 test_index2_cmp);
@@ -223,16 +223,17 @@ test_index2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 	 test_index2_id_changed, NULL);
    evas_object_show(gui->id);
 
-   gui->entry = elm_scrolled_entry_add(win);
-   elm_scrolled_entry_entry_set(gui->entry, "Label");
-   elm_scrolled_entry_single_line_set(gui->entry, EINA_TRUE);
+   gui->entry = elm_entry_add(win);
+   elm_entry_scrollable_set(gui->entry, EINA_TRUE);
+   elm_entry_entry_set(gui->entry, "Label");
+   elm_entry_single_line_set(gui->entry, EINA_TRUE);
    evas_object_size_hint_weight_set(gui->entry, EVAS_HINT_EXPAND, 0);
    evas_object_size_hint_fill_set(gui->entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(box, gui->entry);
    evas_object_show(gui->entry);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Add");
+   elm_object_text_set(bt, "Add");
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, 0);
    evas_object_size_hint_fill_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(box, bt);

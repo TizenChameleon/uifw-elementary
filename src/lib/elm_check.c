@@ -1,25 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-/**
- * @defgroup Check Check
- * @ingroup Elementary
- *
- * The check widget allows for toggling a value between true or false (1 or 0).
- *
- * Check objects are a lot like radio objects in layout and functionality
- * except they do not work as a group, but independently and only toggle the
- * value of a boolean from false to true (0 or 1). elm_check_state_set() sets
- * the boolean state (1 for true, 0 for false), and elm_check_state_get()
- * returns the current state. For convenience, like the radio objects, you
- * can set a pointer to a boolean directly with elm_check_state_pointer_set()
- * for it to modify.
- *
- * Signals that you can add callbacks for are:
- *
- * "changed" - This is called whenever the user changes the state of one of the
- *             check object.
- */
 typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
@@ -258,14 +239,33 @@ _activate(Evas_Object *obj)
    evas_object_smart_callback_call(obj, SIG_CHANGED, NULL);
 }
 
-/**
- * Add a new Check object
- *
- * @param parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup Check
- */
+static void
+_elm_check_label_set(Evas_Object *obj, const char *item, const char *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return;
+   if (!wd) return;
+   eina_stringshare_replace(&wd->label, label);
+   if (label)
+     edje_object_signal_emit(wd->chk, "elm,state,text,visible", "elm");
+   else
+     edje_object_signal_emit(wd->chk, "elm,state,text,hidden", "elm");
+   edje_object_message_signal_process(wd->chk);
+   edje_object_part_text_set(wd->chk, "elm.text", label);
+   _sizing_eval(obj);
+}
+
+static const char *
+_elm_check_label_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return NULL;
+   if (!wd) return NULL;
+   return wd->label;
+}
+
 EAPI Evas_Object *
 elm_check_add(Evas_Object *parent)
 {
@@ -286,6 +286,8 @@ elm_check_add(Evas_Object *parent)
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_activate_hook_set(obj, _activate_hook);
    elm_widget_event_hook_set(obj, _event_hook);
+   elm_widget_text_set_hook_set(obj, _elm_check_label_set);
+   elm_widget_text_get_hook_set(obj, _elm_check_label_get);
 
    wd->chk = edje_object_add(e);
    _elm_theme_object_set(obj, wd->chk, "check", "base", "default");
@@ -308,59 +310,18 @@ elm_check_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * Set the text label of the check object
- *
- * @param obj The check object
- * @param label The text label string in UTF-8
- *
- * @ingroup Check
- */
 EAPI void
 elm_check_label_set(Evas_Object *obj, const char *label)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   eina_stringshare_replace(&wd->label, label);
-   if (label)
-     edje_object_signal_emit(wd->chk, "elm,state,text,visible", "elm");
-   else
-     edje_object_signal_emit(wd->chk, "elm,state,text,hidden", "elm");
-   edje_object_message_signal_process(wd->chk);
-   edje_object_part_text_set(wd->chk, "elm.text", label);
-   _sizing_eval(obj);
+   _elm_check_label_set(obj, NULL, label);
 }
 
-/**
- * Get the text label of the check object
- *
- * @param obj The check object
- * @return The text label string in UTF-8
- *
- * @ingroup Check
- */
 EAPI const char *
 elm_check_label_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->label;
+   return _elm_check_label_get(obj, NULL);
 }
 
-/**
- * Set the icon object of the check object
- *
- * Once the icon object is set, a previously set one will be deleted.
- * If you want to keep that old content object, use the
- * elm_check_icon_unset() function.
- *
- * @param obj The check object
- * @param icon The icon object
- *
- * @ingroup Check
- */
 EAPI void
 elm_check_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
@@ -382,14 +343,6 @@ elm_check_icon_set(Evas_Object *obj, Evas_Object *icon)
    _sizing_eval(obj);
 }
 
-/**
- * Get the icon object of the check object
- *
- * @param obj The check object
- * @return The icon object
- *
- * @ingroup Check
- */
 EAPI Evas_Object *
 elm_check_icon_get(const Evas_Object *obj)
 {
@@ -399,16 +352,6 @@ elm_check_icon_get(const Evas_Object *obj)
    return wd->icon;
 }
 
-/**
- * Unset the icon used for the check object
- *
- * Unparent and return the icon object which was set for this widget.
- *
- * @param obj The check object
- * @return The icon object that was being used
- *
- * @ingroup Check
- */
 EAPI Evas_Object *
 elm_check_icon_unset(Evas_Object *obj)
 {
@@ -423,17 +366,6 @@ elm_check_icon_unset(Evas_Object *obj)
    return icon;
 }
 
-/**
- * Set the on/off state of the check object
- *
- * This sets the state of the check and will also set the value if pointed to
- * to the state supplied, but will not call any callbacks.
- *
- * @param obj The check object
- * @param state The state to use (1 == on, 0 == off)
- *
- * @ingroup Check
- */
 EAPI void
 elm_check_state_set(Evas_Object *obj, Eina_Bool state)
 {
@@ -451,14 +383,6 @@ elm_check_state_set(Evas_Object *obj, Eina_Bool state)
      }
 }
 
-/**
- * Get the state of the check object
- *
- * @param obj The check object
- * @return The boolean state
- *
- * @ingroup Check
- */
 EAPI Eina_Bool
 elm_check_state_get(const Evas_Object *obj)
 {
@@ -468,21 +392,6 @@ elm_check_state_get(const Evas_Object *obj)
    return wd->state;
 }
 
-/**
- * Set a convenience pointer to a boolean to change
- *
- * This sets a pointer to a boolean, that, in addition to the check objects
- * state will also be modified directly. To stop setting the object pointed
- * to simply use NULL as the statep parameter. If statep is not NULL, then
- * when this is called, the check objects state will also be modified to
- * reflect the value of the boolean statep points to, just like calling
- * elm_check_state_set().
- *
- * @param obj The check object
- * @param statep Pointer to the boolean to modify
- *
- * @ingroup Check
- */
 EAPI void
 elm_check_state_pointer_set(Evas_Object *obj, Eina_Bool *statep)
 {

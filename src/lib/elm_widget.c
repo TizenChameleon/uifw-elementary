@@ -70,6 +70,11 @@ struct _Smart_Data
                                       Evas_Coord        *y,
                                       Evas_Coord        *w,
                                       Evas_Coord        *h);
+   void       (*on_text_set_func)(Evas_Object *obj,
+                                   const char  *item,
+                                   const char  *text);
+   const char *(*on_text_get_func)(const Evas_Object *obj,
+                                    const char  *item);
    void        *data;
    Evas_Coord   rx, ry, rw, rh;
    int          scroll_hold;
@@ -215,7 +220,7 @@ _sub_obj_hide(void        *data __UNUSED__,
               Evas_Object *obj,
               void        *event_info __UNUSED__)
 {
-   _if_focused_revert(obj, EINA_TRUE);
+   elm_widget_focus_hide_handle(obj);
 }
 
 static void
@@ -224,16 +229,7 @@ _sub_obj_mouse_down(void        *data __UNUSED__,
                     Evas_Object *obj,
                     void        *event_info __UNUSED__)
 {
-   Evas_Object *o = obj;
-   do
-     {
-        if (_elm_widget_is(o)) break;
-        o = evas_object_smart_parent_get(o);
-     }
-   while (o);
-   if (!o) return;
-   if (!_is_focusable(o)) return;
-   elm_widget_focus_steal(o);
+   elm_widget_focus_mouse_down_handle(obj);
 }
 
 static void
@@ -484,6 +480,25 @@ elm_widget_event_hook_set(Evas_Object *obj,
 {
    API_ENTRY return;
    sd->event_func = func;
+}
+
+EAPI void
+elm_widget_text_set_hook_set(Evas_Object *obj,
+                              void       (*func)(Evas_Object *obj,
+                                                 const char  *item,
+                                                 const char  *text))
+{
+   API_ENTRY return;
+   sd->on_text_set_func = func;
+}
+
+EAPI void
+elm_widget_text_get_hook_set(Evas_Object *obj,
+                              const char *(*func)(const Evas_Object *obj,
+                                                  const char  *item))
+{
+   API_ENTRY return;
+   sd->on_text_get_func = func;
 }
 
 EAPI void
@@ -1737,6 +1752,7 @@ elm_widget_focus_steal(Evas_Object *obj)
         o = elm_widget_parent_get(parent);
         if (!o) break;
         sd = evas_object_smart_data_get(o);
+        if (sd->disabled) return;
         if (sd->focused) break;
         parent = o;
      }
@@ -1784,30 +1800,35 @@ elm_widget_change(Evas_Object *obj)
 
 EAPI void
 elm_widget_disabled_set(Evas_Object *obj,
-                        int          disabled)
+                        Eina_Bool    disabled)
 {
    API_ENTRY return;
 
    if (sd->disabled == disabled) return;
-   sd->disabled = disabled;
+   sd->disabled = !!disabled;
    if (sd->focused)
      {
         Evas_Object *o, *parent;
-
         parent = obj;
-        for (;;)
+        o = elm_widget_parent_get(parent);
+        if (!o)
+          elm_widget_focused_object_clear(parent);
+        else
           {
-             o = elm_widget_parent_get(parent);
-             if (!o) break;
              parent = o;
+             for (;;)
+               {
+                  o = elm_widget_parent_get(parent);
+                  if (!o) break;
+                  parent = o;
+               }
+             elm_widget_focus_cycle(parent, ELM_FOCUS_NEXT);
           }
-        if (elm_widget_focus_get(obj))
-          elm_widget_focus_cycle(parent, ELM_FOCUS_NEXT);
      }
    if (sd->disable_func) sd->disable_func(obj);
 }
 
-EAPI int
+EAPI Eina_Bool
 elm_widget_disabled_get(const Evas_Object *obj)
 {
    API_ENTRY return 0;
@@ -1820,7 +1841,7 @@ elm_widget_show_region_set(Evas_Object *obj,
                            Evas_Coord   y,
                            Evas_Coord   w,
                            Evas_Coord   h,
-                           Eina_Bool forceshow)
+                           Eina_Bool    forceshow)
 {
    Evas_Object *parent_obj, *child_obj;
    Evas_Coord px, py, cx, cy;
@@ -2015,6 +2036,28 @@ elm_widget_theme_set(Evas_Object *obj,
         if (th) th->ref++;
         elm_widget_theme(obj);
      }
+}
+
+EAPI void
+elm_widget_text_part_set(Evas_Object *obj, const char *item, const char *label)
+{
+   API_ENTRY return;
+
+   if (!sd->on_text_set_func)
+     return;
+
+   sd->on_text_set_func(obj, item, label);
+}
+
+EAPI const char *
+elm_widget_text_part_get(const Evas_Object *obj, const char *item)
+{
+   API_ENTRY return NULL;
+
+   if (!sd->on_text_get_func)
+     return NULL;
+
+   return sd->on_text_get_func(obj, item);
 }
 
 EAPI Elm_Theme *
@@ -2226,6 +2269,27 @@ elm_widget_stringlist_free(Eina_List *list)
    EINA_LIST_FREE(list, s) eina_stringshare_del(s);
 }
 
+EAPI void
+elm_widget_focus_hide_handle(Evas_Object *obj)
+{
+   _if_focused_revert(obj, EINA_TRUE);
+}
+
+EAPI void
+elm_widget_focus_mouse_down_handle(Evas_Object *obj)
+{
+   Evas_Object *o = obj;
+   do
+     {
+        if (_elm_widget_is(o)) break;
+        o = evas_object_smart_parent_get(o);
+     }
+   while (o);
+   if (!o) return;
+   if (!_is_focusable(o)) return;
+   elm_widget_focus_steal(o);
+}
+
 /**
  * @internal
  *
@@ -2410,7 +2474,7 @@ _elm_widget_item_tooltip_label_create(void        *data,
    if (!label)
      return NULL;
    elm_object_style_set(label, "tooltip");
-   elm_label_label_set(label, data);
+   elm_object_text_set(label, data);
    return label;
 }
 
@@ -2729,7 +2793,10 @@ _newest_focus_order_get(Evas_Object  *obj,
    Evas_Object *child, *ret, *best;
 
    API_ENTRY return NULL;
-   if (!evas_object_visible_get(obj)) return NULL;
+
+   if ((!evas_object_visible_get(obj)) || (elm_widget_disabled_get(obj)))
+     return NULL;
+
    best = NULL;
    if (*newest_focus_order < sd->focus_order)
      {
@@ -2867,7 +2934,8 @@ _smart_hide(Evas_Object *obj)
    Eina_List *list;
    Evas_Object *o;
    INTERNAL_ENTRY
-     list = evas_object_smart_members_get(obj);
+
+   list = evas_object_smart_members_get(obj);
    EINA_LIST_FREE(list, o)
      {
         if (evas_object_data_get(o, "_elm_leaveme")) continue;

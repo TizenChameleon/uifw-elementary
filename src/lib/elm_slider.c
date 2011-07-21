@@ -33,8 +33,8 @@
  * "slider,drag,start" - dragging the slider indicator around has started
  * "slider,drag,stop" - dragging the slider indicator around has stopped
  * "delay,changed" - A short time after the value is changed by the user.
- *                   This will be called only when the user stops dragging for 
- *                   a very short period or when they release their 
+ *                   This will be called only when the user stops dragging for
+ *                   a very short period or when they release their
  *                   finger/mouse, so it avoids possibly expensive reactions to
  *                   the value change.
  */
@@ -47,17 +47,26 @@ struct _Widget_Data
    Evas_Object *icon;
    Evas_Object *end;
    Evas_Object *spacer;
+
+   Ecore_Timer *delay;
+
    const char *label;
    const char *units;
    const char *indicator;
+
    const char *(*indicator_format_func)(double val);
+   void (*indicator_format_free)(const char *str);
+
+   const char *(*units_format_func)(double val);
+   void (*units_format_free)(const char *str);
+
+   double val, val_min, val_max;
+   Evas_Coord size;
+
    Eina_Bool horizontal : 1;
    Eina_Bool inverted : 1;
    Eina_Bool indicator_show : 1;
    int feed_cnt;
-   double val, val_min, val_max;
-   Ecore_Timer *delay;
-   Evas_Coord size;
 };
 
 #define ELM_SLIDER_INVERTED_FACTOR (-1.0)
@@ -366,7 +375,14 @@ _units_set(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (wd->units)
+   if (wd->units_format_func)
+     {
+        const char *buf;
+        buf = wd->units_format_func(wd->val);
+        edje_object_part_text_set(wd->slider, "elm.units", buf);
+        if (wd->units_format_free) wd->units_format_free(buf);
+     }
+   else if (wd->units)
      {
         char buf[1024];
 
@@ -387,6 +403,7 @@ _indicator_set(Evas_Object *obj)
         const char *buf;
         buf = wd->indicator_format_func(wd->val);
         edje_object_part_text_set(wd->slider, "elm.dragable.slider:elm.indicator", buf);
+        if (wd->indicator_format_free) wd->indicator_format_free(buf);
      }
    else if (wd->indicator)
      {
@@ -487,13 +504,13 @@ _spacer_cb(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *event_info)
    edje_object_part_drag_value_get(wd->slider, "elm.dragable.slider", &button_x, &button_y);
    if (wd->horizontal)
      {
-        button_x = ((double)ev->output.x - (double)x) / (double)w;
+        button_x = ((double)ev->canvas.x - (double)x) / (double)w;
         if (button_x > 1) button_x = 1;
         if (button_x < 0) button_x = 0;
      }
    else
      {
-        button_y = ((double)ev->output.y - (double)y) / (double)h;
+        button_y = ((double)ev->canvas.y - (double)y) / (double)h;
         if (button_y > 1) button_y = 1;
         if (button_y < 0) button_y = 0;
      }
@@ -503,6 +520,38 @@ _spacer_cb(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *event_info)
    if(wd->feed_cnt < 3)
    evas_event_feed_mouse_down(e, 1, EVAS_BUTTON_NONE, 0, NULL);
    wd->feed_cnt = 0;
+}
+
+static void
+_elm_slider_label_set(Evas_Object *obj, const char *item, const char *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return;
+   if (!wd) return;
+   eina_stringshare_replace(&wd->label, label);
+   if (label)
+     {
+        edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
+        edje_object_message_signal_process(wd->slider);
+     }
+   else
+     {
+        edje_object_signal_emit(wd->slider, "elm,state,text,hidden", "elm");
+        edje_object_message_signal_process(wd->slider);
+     }
+   edje_object_part_text_set(wd->slider, "elm.text", label);
+   _sizing_eval(obj);
+}
+
+static const char *
+_elm_slider_label_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return NULL;
+   if (!wd) return NULL;
+   return wd->label;
 }
 
 /**
@@ -532,6 +581,8 @@ elm_slider_add(Evas_Object *parent)
    elm_widget_disable_hook_set(obj, _disable_hook);
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_event_hook_set(obj, _event_hook);
+   elm_widget_text_set_hook_set(obj, _elm_slider_label_set);
+   elm_widget_text_get_hook_set(obj, _elm_slider_label_get);
 
    wd->horizontal = EINA_TRUE;
    wd->indicator_show = EINA_TRUE;
@@ -579,22 +630,7 @@ elm_slider_add(Evas_Object *parent)
 EAPI void
 elm_slider_label_set(Evas_Object *obj, const char *label)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   eina_stringshare_replace(&wd->label, label);
-   if (label)
-     {
-        edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
-        edje_object_message_signal_process(wd->slider);
-     }
-   else
-     {
-        edje_object_signal_emit(wd->slider, "elm,state,text,hidden", "elm");
-        edje_object_message_signal_process(wd->slider);
-     }
-   edje_object_part_text_set(wd->slider, "elm.text", label);
-   _sizing_eval(obj);
+   _elm_slider_label_set(obj, NULL, label);
 }
 
 /**
@@ -608,10 +644,7 @@ elm_slider_label_set(Evas_Object *obj, const char *label)
 EAPI const char *
 elm_slider_label_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->label;
+   return _elm_slider_label_get(obj, NULL);
 }
 
 /**
@@ -1030,7 +1063,7 @@ elm_slider_inverted_get(const Evas_Object *obj)
 }
 
 /**
- * Set the format function pointer for the inducator area
+ * Set the format function pointer for the indicator area
  *
  * Set the callback function to format the indicator string.
  * See elm_slider_indicator_format_set() for more info on how this works.
@@ -1038,16 +1071,42 @@ elm_slider_inverted_get(const Evas_Object *obj)
  * @param obj The slider object
  * @param indicator The format string for the indicator display
  * @param func The indicator format function
+ * @param free_func The freeing function for the format string
  *
  * @ingroup Slider
  */
 EAPI void
-elm_slider_indicator_format_function_set(Evas_Object *obj, const char *(*func)(double val))
+elm_slider_indicator_format_function_set(Evas_Object *obj, const char *(*func)(double val), void (*free_func)(const char *str))
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    wd->indicator_format_func = func;
+   wd->indicator_format_free = free_func;
+   _indicator_set(obj);
+}
+
+/**
+ * Set the format function pointer for the units area
+ *
+ * Set the callback function to format the indicator string.
+ * See elm_slider_units_format_set() for more info on how this works.
+ *
+ * @param obj The slider object
+ * @param indicator The format string for the units display
+ * @param func The units format function
+ * @param free_func The freeing function for the format string
+ *
+ * @ingroup Slider
+ */
+EAPI void
+elm_slider_units_format_function_set(Evas_Object *obj, const char *(*func)(double val), void (*free_func)(const char *str))
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->units_format_func = func;
+   wd->units_format_free = free_func;
    _indicator_set(obj);
 }
 

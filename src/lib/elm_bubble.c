@@ -1,18 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-/**
- * @defgroup Bubble Bubble
- * @ingroup Elementary
- *
- * The Bubble is an widget used to show a text in a frame as speech is
- * represented in comics.
- *
- * Signals that you can add callbacks for are:
- *
- * "clicked" - This is called when a user has clicked the bubble.
- */
-
 typedef struct _Widget_Data Widget_Data;
 
 #define SWEEP_SUPPORT 1
@@ -41,7 +29,8 @@ static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
 
-#define SIG_CLICKED "clicked"
+static const char SIG_CLICKED[] = "clicked";
+
 static const Evas_Smart_Cb_Description _signals[] =
 {
      {SIG_CLICKED, ""},
@@ -185,16 +174,52 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
      evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
 }
 
-/**
- * Add a new bubble to the parent
- *
- * @param parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * This function adds a text bubble to the given parent evas object.
- *
- * @ingroup Bubble
- */
+static void
+_elm_bubble_label_set(Evas_Object *obj, const char *item, const char *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (!item || !strcmp(item, "default"))
+     {
+        eina_stringshare_replace(&wd->label, label);
+        edje_object_part_text_set(wd->bbl, "elm.text", label);
+        if (label) edje_object_signal_emit(wd->bbl, "elm,state,text,visible",
+              "elm");
+        else edje_object_signal_emit(wd->bbl, "elm,state,text,hidden", "elm");
+        _sizing_eval(obj);
+     }
+   else if (!strcmp(item, "info"))
+     {
+        eina_stringshare_replace(&wd->info, label);
+        edje_object_part_text_set(wd->bbl, "elm.info", label);
+        if (label) edje_object_signal_emit(wd->bbl, "elm,state,info,visible",
+              "elm");
+        else edje_object_signal_emit(wd->bbl, "elm,state,info,hidden", "elm");
+        _sizing_eval(obj);
+     }
+}
+
+static const char*
+_elm_bubble_label_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+
+   if (!item || !strcmp(item, "default"))
+     {
+        return wd->label;
+     }
+   else if (!strcmp(item, "info"))
+     {
+        return wd->info;
+     }
+
+   return NULL;
+}
+
 EAPI Evas_Object *
 elm_bubble_add(Evas_Object *parent)
 {
@@ -212,6 +237,8 @@ elm_bubble_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_focus_next_hook_set(obj, _elm_bubble_focus_next_hook);
    elm_widget_can_focus_set(obj, EINA_FALSE);
+   elm_widget_text_set_hook_set(obj, _elm_bubble_label_set);
+   elm_widget_text_get_hook_set(obj, _elm_bubble_label_get);
 
    wd->corner = eina_stringshare_add("base");
 
@@ -229,6 +256,7 @@ elm_bubble_add(Evas_Object *parent)
    wd->down_point.x = 0;
    wd->down_point.y = 0;
 #endif
+
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _elm_theme_object_set(obj, wd->bbl, "bubble", wd->corner,
@@ -237,114 +265,30 @@ elm_bubble_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * Set the label of the bubble
- *
- * @param obj The bubble object
- * @param label The string to set in the label
- *
- * This function sets the title of the bubble that is shown on top of
- * the bubble.
- *
- * @ingroup Bubble
- */
 EAPI void
 elm_bubble_label_set(Evas_Object *obj, const char *label)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   eina_stringshare_replace(&wd->label, label);
-   edje_object_part_text_set(wd->bbl, "elm.text", label);
-   if (label) edje_object_signal_emit(wd->bbl, "elm,state,text,visible", "elm");
-   else edje_object_signal_emit(wd->bbl, "elm,state,text,hidden", "elm");
-   _sizing_eval(obj);
+   _elm_bubble_label_set(obj, NULL, label);
 }
 
-/**
- * Get the label of the bubble
- *
- * @param obj The bubble object
- * @return The string of set in the label
- *
- * This function gets the title of the bubble that is shown on top of
- * the bubble.
- *
- * @ingroup Bubble
- */
 EAPI const char*
 elm_bubble_label_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->label;
+   return _elm_bubble_label_get(obj, NULL);
 }
 
-/**
- * Set the info of the bubble
- *
- * @param obj The bubble object
- * @param info The given info about the bubble
- *
- * This function sets the text shown on the top right of bubble.
- * In the Anchorblock example of the Elementary tests application it
- * shows time.
- *
- * @ingroup Bubble
- *
- */
 EAPI void
 elm_bubble_info_set(Evas_Object *obj, const char *info)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   eina_stringshare_replace(&wd->info, info);
-   edje_object_part_text_set(wd->bbl, "elm.info", info);
-   if (info) edje_object_signal_emit(wd->bbl, "elm,state,info,visible", "elm");
-   else edje_object_signal_emit(wd->bbl, "elm,state,info,hidden", "elm");
-   _sizing_eval(obj);
+   _elm_bubble_label_set(obj, "info", info);
 }
 
-/**
- * Get the info of the bubble
- *
- * @param obj The bubble object
- *
- * @return The "info" string of the bubble
- *
- * This function gets the text set to be displayed at the top right of
- * the bubble.
- *
- * @ingroup Bubble
- *
- */
 EAPI const char *
 elm_bubble_info_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->info;
+   return _elm_bubble_label_get(obj, "info");
 }
 
-/**
- * Set the content to be shown in the bubble
- *
- * Once the content object is set, a previously set one will be deleted.
- * If you want to keep the old content object, use the
- * elm_bubble_content_unset() function.
- *
- * @param obj The bubble object
- * @param content The given content of the bubble
- *
- * This function sets the content shown on the middle of the bubble.
- * In the Anchorblock example of the Elementary tests application it
- * shows time.
- *
- * @ingroup Bubble
- */
 EAPI void
 elm_bubble_content_set(Evas_Object *obj, Evas_Object *content)
 {
@@ -364,16 +308,6 @@ elm_bubble_content_set(Evas_Object *obj, Evas_Object *content)
    _sizing_eval(obj);
 }
 
-/**
- * Get the content shown in the bubble
- *
- * Return the content object which is set for this widget.
- *
- * @param obj The bubble object
- * @return The content that is being used
- *
- * @ingroup Bubble
- */
 EAPI Evas_Object *
 elm_bubble_content_get(const Evas_Object *obj)
 {
@@ -383,16 +317,6 @@ elm_bubble_content_get(const Evas_Object *obj)
    return wd->content;
 }
 
-/**
- * Unset the content shown in the bubble
- *
- * Unparent and return the content object which was set for this widget.
- *
- * @param obj The bubble object
- * @return The content that was being used
- *
- * @ingroup Bubble
- */
 EAPI Evas_Object *
 elm_bubble_content_unset(Evas_Object *obj)
 {
@@ -408,18 +332,6 @@ elm_bubble_content_unset(Evas_Object *obj)
    return content;
 }
 
-/**
- * Set the icon of the bubble
- *
- * Once the icon object is set, a previously set one will be deleted.
- * If you want to keep the old content object, use the
- * elm_icon_content_unset() function.
- *
- * @param obj The bubble object
- * @param icon The given icon for the bubble
- *
- * @ingroup Bubble
- */
 EAPI void
 elm_bubble_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
@@ -441,16 +353,6 @@ elm_bubble_icon_set(Evas_Object *obj, Evas_Object *icon)
    _sizing_eval(obj);
 }
 
-/**
- * Get the icon of the bubble
- *
- * @param obj The bubble object
- * @return The icon for the bubble
- *
- * This function gets the icon shown on the top left of bubble.
- *
- * @ingroup Bubble
- */
 EAPI Evas_Object *
 elm_bubble_icon_get(const Evas_Object *obj)
 {
@@ -460,16 +362,6 @@ elm_bubble_icon_get(const Evas_Object *obj)
    return wd->icon;
 }
 
-/**
- * Unset the icon of the bubble
- *
- * Unparent and return the icon object which was set for this widget.
- *
- * @param obj The bubble object
- * @return The icon that was being used
- *
- * @ingroup Bubble
- */
 EAPI Evas_Object *
 elm_bubble_icon_unset(Evas_Object *obj)
 {
@@ -485,16 +377,6 @@ elm_bubble_icon_unset(Evas_Object *obj)
    return icon;
 }
 
-/**
- * Set the sweep layout
- *
- * @param obj The bubble object
- * @param content The given content of the bubble
- *
- * This function sets the sweep layout when "sweep,left,right"signal is emitted. 
- *
- * @ingroup Bubble
- */
 EAPI void
 elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep)
 {
@@ -510,16 +392,6 @@ elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep)
 #endif
 }
 
-/**
- * Unset and hide the sweep layout
- *
- * @param obj The bubble object
- * @param content The given content of the bubble
- *
- * This function sets the sweep layout when "sweep,right,left"signal is emitted. 
- *
- * @ingroup Bubble
- */
 EAPI Evas_Object *
 elm_bubble_sweep_layout_unset(Evas_Object *obj)
 {
@@ -537,21 +409,6 @@ elm_bubble_sweep_layout_unset(Evas_Object *obj)
    return sweep;
 }
 
-/**
- * Set the corner of the bubble
- *
- * @param obj The bubble object.
- * @param corner The given corner for the bubble.
- *
- * This function sets the corner of the bubble.
- * The corner will be used to find the group in the theme
- * For example, if you set the corner to "bottom_right",
- * the following group will be searched:
- * "elm/bubble/bottom_right/default",
- * considering default style.
- *
- * @ingroup Bubble
- */
 EAPI void
 elm_bubble_corner_set(Evas_Object *obj, const char *corner)
 {
@@ -563,16 +420,6 @@ elm_bubble_corner_set(Evas_Object *obj, const char *corner)
    _theme_hook(obj);
 }
 
-/**
- * Get the corner of the bubble
- *
- * @param obj The bubble object.
- * @return The given corner for the bubble.
- *
- * This function gets the corner of the bubble.
- *
- * @ingroup Bubble
- */
 EAPI const char*
 elm_bubble_corner_get(const Evas_Object *obj)
 {

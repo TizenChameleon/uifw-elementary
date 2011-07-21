@@ -1,6 +1,6 @@
 %define _missing_doc_files_terminate_build 0
 
-%{!?_rel:%{expand:%%global _rel 0.r%(svnversion | sed 's/[^0-9].*$//' || echo 0000)}}
+%{!?_rel:%{expand:%%global _rel 0.enl%{?dist}}}
 
 Summary: EFL toolkit for small touchscreens
 Name: @PACKAGE@
@@ -79,12 +79,14 @@ test "x$RPM_BUILD_ROOT" != "x/" && rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.so
 %{_libdir}/*.la
 %{_libdir}/*.a
+%{_libdir}/edje/modules/elm/*/module.so
+%{_libdir}/edje/modules/elm/*/module.la
+%{_libdir}/elementary/modules/test_*/*/module.*
+%{_libdir}/pkgconfig/*
+%{_includedir}/elementary-0/*.h
 %{_libdir}/edje/*.so
 %{_libdir}/edje/*.la
-%{_libdir}/elementary/modules/test_entry/*/module.*
-%{_libdir}/pkgconfig/*
 %{_includedir}/*.h
-%{_includedir}/elementary/*.h
 
 %files bin
 %defattr(-, root, root)

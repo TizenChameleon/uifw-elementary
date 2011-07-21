@@ -7,6 +7,7 @@ struct _Smart_Data
 {
    Evas_Coord   x, y, w, h;
    Evas_Object *obj;
+   Evas_Object *prev;
    int          size;
    double       scale;
    Eina_Bool fill_inside : 1;
@@ -50,13 +51,18 @@ _els_smart_icon_add(Evas *evas)
 }
 
 static void
-_preloaded(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
+_preloaded(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event __UNUSED__)
 {
    Smart_Data *sd = data;
 
    sd->preloading = EINA_FALSE;
-   if (sd->show)
-     evas_object_show(sd->obj);
+   if (obj == sd->obj)
+     {
+        if (sd->show)
+          evas_object_show(sd->obj);
+     }
+   if (sd->prev) evas_object_del(sd->prev);
+   sd->prev = NULL;
 }
 
 Eina_Bool
@@ -68,31 +74,43 @@ _els_smart_icon_file_key_set(Evas_Object *obj, const char *file, const char *key
    sd = evas_object_smart_data_get(obj);
    if (!sd) return EINA_FALSE;
    /* smart code here */
+   /* NOTE: Do not merge upstream for the if (sd->edje) { } statements 
+      But wonder whether the edje resource icons have no problem. */
    if (sd->edje)
      {
+        if (sd->prev) evas_object_del(sd->prev);
         pclip = evas_object_clip_get(sd->obj);
-        if (sd->obj) evas_object_del(sd->obj);
+        if (sd->obj) sd->prev = sd->obj;
         sd->obj = evas_object_image_add(evas_object_evas_get(obj));
-        evas_object_image_scale_hint_set(sd->obj, EVAS_IMAGE_SCALE_HINT_STATIC);
-        evas_object_smart_member_add(sd->obj, obj);
-        evas_object_event_callback_add(sd->obj, EVAS_CALLBACK_IMAGE_PRELOADED, 
+        evas_object_event_callback_add(sd->obj,
+                                       EVAS_CALLBACK_IMAGE_PRELOADED,
                                        _preloaded, sd);
+        evas_object_smart_member_add(sd->obj, obj);
+        if (sd->prev) evas_object_smart_member_add(sd->prev, obj);
+        evas_object_image_scale_hint_set(sd->obj,
+                                         EVAS_IMAGE_SCALE_HINT_STATIC);
         evas_object_clip_set(sd->obj, pclip);
+
         sd->edje = EINA_FALSE;
      }
+
    if (!sd->size)
      evas_object_image_load_size_set(sd->obj, sd->size, sd->size);
    evas_object_image_file_set(sd->obj, file, key);
-   /* by default preload off by seok.j.jeong */
-   sd->preloading = EINA_FALSE;
+   // NOTE: Do not merge upstream for sd->preloading.
+   sd->preloading = EINA_FALSE; // by default preload off by seok.j.jeong
    sd->show = EINA_TRUE;
+   // NOTE: Do not merge upstream for sd->preloading.
    if (sd->preloading)
      evas_object_image_preload(sd->obj, EINA_FALSE);
-   /* sd->preloading can be changed by above function. so add "if (sd->preloading)" as below */
-   if (sd->preloading)
+   // NOTE: Do not merge upstream for sd->preloading.
+   if (sd->preloading) // sd->preloading can be changed by above function. so add "if (sd->preloading)" as below
      evas_object_hide(sd->obj);
    if (evas_object_image_load_error_get(sd->obj) != EVAS_LOAD_ERROR_NONE)
-     return EINA_FALSE;
+     {
+        ERR("Things are going bad for '%s' (%p)", file, sd->obj);
+        return EINA_FALSE;
+     }
    _smart_reconfigure(sd);
    return EINA_TRUE;
 }
@@ -106,6 +124,9 @@ _els_smart_icon_file_edje_set(Evas_Object *obj, const char *file, const char *pa
    sd = evas_object_smart_data_get(obj);
    if (!sd) return EINA_FALSE;
    /* smart code here */
+   if (sd->prev) evas_object_del(sd->prev);
+   sd->prev = NULL;
+
    if (!sd->edje)
      {
         pclip = evas_object_clip_get(sd->obj);
@@ -166,6 +187,7 @@ _els_smart_icon_size_get(const Evas_Object *obj, int *w, int *h)
 {
    Smart_Data *sd;
    int tw, th;
+   int cw, ch;
 
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
@@ -173,6 +195,9 @@ _els_smart_icon_size_get(const Evas_Object *obj, int *w, int *h)
      edje_object_size_min_get(sd->obj, &tw, &th);
    else
      evas_object_image_size_get(sd->obj, &tw, &th);
+   evas_object_geometry_get(sd->obj, NULL, NULL, &cw, &ch);
+   tw = tw > cw ? tw : cw;
+   th = th > ch ? th : ch;
    tw = ((double)tw) * sd->scale;
    th = ((double)th) * sd->scale;
    if (w) *w = tw;
@@ -549,6 +574,7 @@ _smart_add(Evas_Object *obj)
    sd = calloc(1, sizeof(Smart_Data));
    if (!sd) return;
    sd->obj = evas_object_image_add(evas_object_evas_get(obj));
+   sd->prev = NULL;
    evas_object_image_scale_hint_set(sd->obj, EVAS_IMAGE_SCALE_HINT_STATIC);
    sd->x = 0;
    sd->y = 0;
@@ -574,6 +600,7 @@ _smart_del(Evas_Object *obj)
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
    evas_object_del(sd->obj);
+   if (sd->prev) evas_object_del(sd->prev);
    free(sd);
 }
 
@@ -612,7 +639,11 @@ _smart_show(Evas_Object *obj)
    if (!sd) return;
    sd->show = EINA_TRUE;
    if (!sd->preloading)
-     evas_object_show(sd->obj);
+     {
+        evas_object_show(sd->obj);
+        if (sd->prev) evas_object_del(sd->prev);
+        sd->prev = NULL;
+     }
 }
 
 static void
@@ -624,6 +655,8 @@ _smart_hide(Evas_Object *obj)
    if (!sd) return;
    sd->show = EINA_FALSE;
    evas_object_hide(sd->obj);
+   if (sd->prev) evas_object_del(sd->prev);
+   sd->prev = NULL;
 }
 
 static void
@@ -634,6 +667,7 @@ _smart_color_set(Evas_Object *obj, int r, int g, int b, int a)
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
    evas_object_color_set(sd->obj, r, g, b, a);
+   if (sd->prev) evas_object_color_set(sd->prev, r, g, b, a);
 }
 
 static void
@@ -644,6 +678,7 @@ _smart_clip_set(Evas_Object *obj, Evas_Object * clip)
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
    evas_object_clip_set(sd->obj, clip);
+   if (sd->prev) evas_object_clip_set(sd->prev, clip);
 }
 
 static void
@@ -654,6 +689,7 @@ _smart_clip_unset(Evas_Object *obj)
    sd = evas_object_smart_data_get(obj);
    if (!sd) return;
    evas_object_clip_unset(sd->obj);
+   if (sd->prev) evas_object_clip_unset(sd->prev);
 }
 
 static void
@@ -749,4 +785,4 @@ _els_smart_icon_dropcb(void *elmobj,Evas_Object *obj, Elm_Selection_Data *drop)
 
    return EINA_TRUE;
 }
-/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-2f0^-2{2(0W1st0 :*/
+/* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-3f0^-2{2(0W1st0 :*/

@@ -115,6 +115,8 @@ test_fileselector(void *data       __UNUSED__,
     */
    setlocale(LC_ALL, "");
 
+   elm_need_ethumb();
+
    win = elm_win_add(NULL, "fileselector", ELM_WIN_BASIC);
    elm_win_title_set(win, "File Selector");
    elm_win_autodel_set(win, 1);
@@ -160,21 +162,21 @@ test_fileselector(void *data       __UNUSED__,
    evas_object_show(hbox);
 
    bt = elm_check_add(win);
-   elm_check_label_set(bt, "is save");
+   elm_object_text_set(bt, "is save");
    elm_check_state_set(bt, elm_fileselector_is_save_get(fs));
    evas_object_smart_callback_add(bt, "changed", _is_save_clicked, fs);
    elm_box_pack_end(hbox, bt);
    evas_object_show(bt);
 
    bt = elm_check_add(win);
-   elm_check_label_set(bt, "folder only");
+   elm_object_text_set(bt, "folder only");
    elm_check_state_set(bt, elm_fileselector_folder_only_get(fs));
    evas_object_smart_callback_add(bt, "changed", _folder_only_clicked, fs);
    elm_box_pack_end(hbox, bt);
    evas_object_show(bt);
 
    bt = elm_check_add(win);
-   elm_check_label_set(bt, "expandable");
+   elm_object_text_set(bt, "expandable");
    elm_check_state_set(bt, elm_fileselector_expandable_get(fs));
    evas_object_smart_callback_add(bt, "changed", _expandable_clicked, fs);
    elm_box_pack_end(hbox, bt);
@@ -186,19 +188,19 @@ test_fileselector(void *data       __UNUSED__,
    evas_object_show(hbox);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "selected get");
+   elm_object_text_set(bt, "selected get");
    evas_object_smart_callback_add(bt, "clicked", _sel_get_clicked, fs);
    elm_box_pack_end(hbox, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "path get");
+   elm_object_text_set(bt, "path get");
    evas_object_smart_callback_add(bt, "clicked", _path_get_clicked, fs);
    elm_box_pack_end(hbox, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "mode cycle");
+   elm_object_text_set(bt, "mode cycle");
    evas_object_smart_callback_add(bt, "clicked", _mode_cycle_clicked, fs);
    elm_box_pack_end(hbox, bt);
    evas_object_show(bt);

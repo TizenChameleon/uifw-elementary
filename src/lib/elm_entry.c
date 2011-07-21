@@ -92,7 +92,14 @@
  * "selection,cleared" - The selection has been cleared
  * "cursor,changed" - The cursor has changed
  * "anchor,clicked" - The anchor has been clicked
+ * "preedit,changed" - The preedit string has changed
  */
+
+/* Maximum chunk size to be inserted to the entry at once
+ * FIXME: This size is arbitrary, should probably choose a better size.
+ * Possibly also find a way to set it to a low value for weak computers,
+ * and to a big value for better computers. */
+#define _CHUNK_SIZE 10000
 
 typedef struct _Mod_Api Mod_Api;
 
@@ -103,7 +110,7 @@ typedef struct _Elm_Entry_Text_Filter Elm_Entry_Text_Filter;
 
 struct _Widget_Data
 {
-   Evas_Object *ent;
+   Evas_Object *ent, *scroller, *end, *icon;
    Evas_Object *bg;
    Evas_Object *hoversel;
    Evas_Object *hover;
@@ -120,13 +127,18 @@ struct _Widget_Data
    Ecore_Event_Handler *sel_clear_handler;
    Ecore_Timer *longpress_timer;
    Ecore_Timer *delay_write;
+   /* for deferred appending */
+   Ecore_Idler *append_text_idler;
+   char *append_text_left;
+   int append_text_position;
+   int append_text_len;
    /* Only for clipboard */
    const char *cut_sel;
    const char *text;
    Evas_Coord wrap_w;
    const char *file;
    Elm_Text_Format format;
-   Evas_Coord lastw;
+   Evas_Coord lastw, entmw, entmh;
    Evas_Coord downx, downy;
    Evas_Coord cx, cy, cw, ch;
    Eina_List *items;
@@ -137,10 +149,9 @@ struct _Widget_Data
    Ecore_Job *hovdeljob;
    Mod_Api *api; // module api if supplied
    int cursor_pos;
-   int max_no_of_bytes;
+   Elm_Scroller_Policy policy_h, policy_v;
+   Elm_Wrap_Type linewrap;
    Eina_Bool changed : 1;
-   Eina_Bool linewrap : 1;
-   Eina_Bool char_linewrap : 1;
    Eina_Bool single_line : 1;
    Eina_Bool password : 1;
    Eina_Bool editable : 1;
@@ -148,6 +159,7 @@ struct _Widget_Data
    Eina_Bool have_selection : 1;
    Eina_Bool selmode : 1;
    Eina_Bool deferred_cur : 1;
+   Eina_Bool cur_changed : 1;
    Eina_Bool disabled : 1;
    Eina_Bool double_clicked : 1;
    Eina_Bool long_pressed : 1;
@@ -158,6 +170,7 @@ struct _Widget_Data
    Eina_Bool autosave : 1;
    Eina_Bool textonly : 1;
    Eina_Bool usedown : 1;
+   Eina_Bool scroll : 1;
    Eina_Bool autoreturnkey : 1;
    Eina_Bool input_panel_enable : 1;
    Eina_Bool autocapital : 1;
@@ -252,6 +265,7 @@ static const char SIG_SELECTION_CLEARED[] = "selection,cleared";
 static const char SIG_CURSOR_CHANGED[] = "cursor,changed";
 static const char SIG_ANCHOR_CLICKED[] = "anchor,clicked";
 static const char SIG_MATCHLIST_CLICKED[] = "matchlist,clicked";
+static const char SIG_PREEDIT_CHANGED[] = "preedit,changed";
 static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_CHANGED, ""},
   {SIG_ACTIVATED, ""},
@@ -269,6 +283,7 @@ static const Evas_Smart_Cb_Description _signals[] = {
   {SIG_SELECTION_CLEARED, ""},
   {SIG_CURSOR_CHANGED, ""},
   {SIG_ANCHOR_CLICKED, ""},
+  {SIG_PREEDIT_CHANGED, ""},
   {SIG_MATCHLIST_CLICKED, ""},
   {NULL, NULL}
 };
@@ -567,13 +582,22 @@ _del_hook(Evas_Object *obj)
 
    entries = eina_list_remove(entries, obj);
 #ifdef HAVE_ELEMENTARY_X
-   ecore_event_handler_del(wd->sel_notify_handler);
-   ecore_event_handler_del(wd->sel_clear_handler);
+   if (wd->sel_notify_handler)
+     ecore_event_handler_del(wd->sel_notify_handler);
+   if (wd->sel_clear_handler)
+     ecore_event_handler_del(wd->sel_clear_handler);
 #endif
    if (wd->cut_sel) eina_stringshare_del(wd->cut_sel);
    if (wd->text) eina_stringshare_del(wd->text);
    if (wd->bg) evas_object_del(wd->bg);
    if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
+   if (wd->append_text_idler)
+     {
+        ecore_idler_del(wd->append_text_idler);
+        free(wd->append_text_left);
+        wd->append_text_left = NULL;
+        wd->append_text_idler = NULL;
+     }
    if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
    if (wd->longpress_timer) ecore_timer_del(wd->longpress_timer);
    if (wd->mgf_proxy) evas_object_del(wd->mgf_proxy);
@@ -617,7 +641,7 @@ _theme_hook(Evas_Object *obj)
    t = eina_stringshare_add(elm_entry_entry_get(obj));
    _elm_theme_object_set(obj, wd->ent, "entry", _getbase(obj), elm_widget_style_get(obj));
    if (_elm_config->desktop_entry)
-      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
+     edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
    elm_entry_entry_set(obj, t);
    eina_stringshare_del(t);
    if (elm_widget_disabled_get(obj))
@@ -628,6 +652,21 @@ _theme_hook(Evas_Object *obj)
      edje_object_signal_emit(wd->ent, "elm,action,focus", "elm");
    edje_object_message_signal_process(wd->ent);
    edje_object_scale_set(wd->ent, elm_widget_scale_get(obj) * _elm_config->scale);
+   elm_smart_scroller_mirrored_set(wd->scroller, elm_widget_mirrored_get(obj));
+   elm_smart_scroller_object_theme_set(obj, wd->scroller, "scroller", "entry",
+                                       elm_widget_style_get(obj));
+   if (wd->scroll)
+     {
+        const char *str;
+        Evas_Object *edj;
+
+        edj = elm_smart_scroller_edje_object_get(wd->scroller);
+        str = edje_object_data_get(edj, "focus_highlight");
+        if ((str) && (!strcmp(str, "on")))
+           elm_widget_highlight_in_theme_set(obj, EINA_TRUE);
+        else
+           elm_widget_highlight_in_theme_set(obj, EINA_FALSE);
+     }
 
    if (wd->password)
      {
@@ -667,21 +706,65 @@ _disable_hook(Evas_Object *obj)
 }
 
 static void
+_recalc_cursor_geometry(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   evas_object_smart_callback_call(obj, SIG_CURSOR_CHANGED, NULL);
+   if (!wd->deferred_recalc_job)
+     {
+        Evas_Coord cx, cy, cw, ch;
+        edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text",
+              &cx, &cy, &cw, &ch);
+        if (wd->cur_changed)
+          {
+             elm_widget_show_region_set(obj, cx, cy, cw, ch, EINA_FALSE);
+             wd->cur_changed = EINA_FALSE;
+          }
+     }
+   else
+      wd->deferred_cur = EINA_TRUE;
+}
+
+static void
 _elm_win_recalc_job(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord minh = -1, resw = -1;
+   Evas_Coord minh = -1, resw = -1, minw = -1;
    if (!wd) return;
    wd->deferred_recalc_job = NULL;
+
    evas_object_geometry_get(wd->ent, NULL, NULL, &resw, NULL);
-   edje_object_size_min_restricted_calc(wd->ent, NULL, &minh, resw, 0);
-   elm_coords_finger_size_adjust(1, NULL, 1, &minh);
-   evas_object_size_hint_min_set(data, -1, minh);
+   edje_object_size_min_restricted_calc(wd->ent, &minw, &minh, resw, 0);
+   elm_coords_finger_size_adjust(1, &minw, 1, &minh);
+   wd->entmw = minw;
+   wd->entmh = minh;
+   /* This is a hack to workaround the way min size hints are treated.
+    * If the minimum width is smaller than the restricted width, it means
+    * the mininmum doesn't matter. */
+   if (minw <= resw)
+     {
+        Evas_Coord ominw = -1;
+        evas_object_size_hint_min_get(data, &ominw, NULL);
+        minw = ominw;
+     }
+   evas_object_size_hint_min_set(data, minw, minh);
    if (wd->single_line)
       evas_object_size_hint_max_set(data, -1, minh);
+   else
+      evas_object_size_hint_max_set(data, -1, -1);
 
    if (wd->deferred_cur)
-     elm_widget_show_region_set(data, wd->cx, wd->cy, wd->cw, wd->ch, EINA_FALSE);
+     {
+        Evas_Coord cx, cy, cw, ch;
+        edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text",
+                                                  &cx, &cy, &cw, &ch);
+        if (wd->cur_changed)
+          {
+             elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
+             wd->cur_changed = EINA_FALSE;
+          }
+     }
 }
 
 static void
@@ -691,24 +774,93 @@ _sizing_eval(Evas_Object *obj)
    Evas_Coord minw = -1, minh = -1;
    Evas_Coord resw, resh;
    if (!wd) return;
-   if ((wd->linewrap) || (wd->char_linewrap))
+
+   evas_object_geometry_get(obj, NULL, NULL, &resw, &resh);
+   if (wd->linewrap)
      {
-        evas_object_geometry_get(wd->ent, NULL, NULL, &resw, &resh);
         if ((resw == wd->lastw) && (!wd->changed)) return;
         wd->changed = EINA_FALSE;
         wd->lastw = resw;
-        if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
-        wd->deferred_recalc_job = ecore_job_add(_elm_win_recalc_job, obj);
+        if (wd->scroll)
+          {
+             Evas_Coord vw = 0, vh = 0, vmw = 0, vmh = 0, w = -1, h = -1;
+
+             evas_object_resize(wd->scroller, resw, resh);
+             edje_object_size_min_calc
+                (elm_smart_scroller_edje_object_get(wd->scroller),
+                    &vmw, &vmh);
+             elm_smart_scroller_child_viewport_size_get(wd->scroller, &vw, &vh);
+             edje_object_size_min_restricted_calc(wd->ent, &minw, &minh, vw, 0);
+             wd->entmw = minw;
+             wd->entmh = minh;
+             elm_coords_finger_size_adjust(1, &minw, 1, &minh);
+
+             if ((minw > 0) && (vw < minw)) vw = minw;
+             if (minh > vh) vh = minh;
+
+             if (wd->single_line) h = vmh + minh;
+             else h = vmh;
+             evas_object_resize(wd->ent, vw, vh);
+             evas_object_size_hint_min_get(obj, &w, NULL);
+             evas_object_size_hint_min_set(obj, w, h);
+             if (wd->single_line)
+                evas_object_size_hint_max_set(obj, -1, h);
+             else
+                evas_object_size_hint_max_set(obj, -1, -1);
+          }
+        else
+          {
+             if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
+             wd->deferred_recalc_job = ecore_job_add(_elm_win_recalc_job, obj);
+          }
      }
    else
      {
-        evas_object_geometry_get(wd->ent, NULL, NULL, &resw, &resh);
-        edje_object_size_min_calc(wd->ent, &minw, &minh);
-        elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-        evas_object_size_hint_min_set(obj, minw, minh);
-        if (wd->single_line)
-           evas_object_size_hint_max_set(obj, -1, minh);
+        if (!wd->changed) return;
+        wd->changed = EINA_FALSE;
+        wd->lastw = resw;
+        if (wd->scroll)
+          {
+             Evas_Coord vw = 0, vh = 0, vmw = 0, vmh = 0, w = -1, h = -1;
+
+             edje_object_size_min_calc(wd->ent, &minw, &minh);
+             wd->entmw = minw;
+             wd->entmh = minh;
+             elm_coords_finger_size_adjust(1, &minw, 1, &minh);
+
+             elm_smart_scroller_child_viewport_size_get(wd->scroller, &vw, &vh);
+
+             if ((minw > 0) && (vw < minw)) vw = minw;
+             if (minh > 0) vh = minh;
+
+             evas_object_resize(wd->ent, vw, vh);
+             edje_object_size_min_calc
+                (elm_smart_scroller_edje_object_get(wd->scroller),
+                    &vmw, &vmh);
+             if (wd->single_line) h = vmh + minh;
+             else h = vmh;
+             evas_object_size_hint_min_get(obj, &w, NULL);
+             evas_object_size_hint_min_set(obj, w, h);
+             if (wd->single_line)
+                evas_object_size_hint_max_set(obj, -1, h);
+             else
+                evas_object_size_hint_max_set(obj, -1, -1);
+          }
+        else
+          {
+             edje_object_size_min_calc(wd->ent, &minw, &minh);
+             wd->entmw = minw;
+             wd->entmh = minh;
+             elm_coords_finger_size_adjust(1, &minw, 1, &minh);
+             evas_object_size_hint_min_set(obj, minw, minh);
+             if (wd->single_line)
+                evas_object_size_hint_max_set(obj, -1, minh);
+             else
+                evas_object_size_hint_max_set(obj, -1, -1);
+          }
      }
+
+   _recalc_cursor_geometry(obj);
 }
 
 static void
@@ -748,7 +900,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
         _check_enable_returnkey(obj);
         wd->mgf_type = _ENTRY_MAGNIFIER_FILLWIDTH;
-        _magnifier_create(obj);
      }
    else
      {
@@ -771,6 +922,9 @@ _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    edje_object_signal_emit(wd->ent, emission, source);
+   if (wd->scroller)
+      edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scroller),
+                              emission, source);
 }
 
 static void
@@ -779,6 +933,9 @@ _signal_callback_add_hook(Evas_Object *obj, const char *emission, const char *so
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    edje_object_signal_callback_add(wd->ent, emission, source, func_cb, data);
+   if (wd->scroller)
+      edje_object_signal_callback_add(elm_smart_scroller_edje_object_get(wd->scroller),
+                                      emission, source, func_cb, data);
 }
 
 static void
@@ -787,6 +944,9 @@ _signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *so
    Widget_Data *wd = elm_widget_data_get(obj);
    edje_object_signal_callback_del_full(wd->ent, emission, source, func_cb,
                                         data);
+   if (wd->scroller)
+      edje_object_signal_callback_del_full(elm_smart_scroller_edje_object_get(wd->scroller),
+                                           emission, source, func_cb, data);
 }
 
 static void
@@ -794,6 +954,25 @@ _on_focus_region_hook(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", x, y, w, h);
+}
+
+static void
+_focus_region_hook(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (wd->scroll)
+      elm_smart_scroller_child_region_show(wd->scroller, x, y, w, h);
+}
+
+static void
+_show_region_hook(void *data, Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Coord x, y, w, h;
+   if (!wd) return;
+   elm_widget_show_region_get(obj, &x, &y, &w, &h);
+   if (wd->scroll)
+     elm_smart_scroller_child_region_show(wd->scroller, x, y, w, h);
 }
 
 static void
@@ -814,8 +993,8 @@ _hoversel_position(Evas_Object *obj)
         ch = 1;
      }
    else
-      edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text",
-                                                &cx, &cy, &cw, &ch);
+     edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text",
+                                               &cx, &cy, &cw, &ch);
    evas_object_size_hint_min_get(wd->hoversel, &mw, &mh);
    if (cw < mw)
      {
@@ -844,13 +1023,21 @@ _resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   if ((wd->linewrap) || (wd->char_linewrap))
+
+   if (wd->linewrap)
      {
         _sizing_eval(data);
      }
+   else if (wd->scroll)
+     {
+        Evas_Coord vw = 0, vh = 0;
+
+        elm_smart_scroller_child_viewport_size_get(wd->scroller, &vw, &vh);
+        if (vw < wd->entmw) vw = wd->entmw;
+        if (vh < wd->entmh) vh = wd->entmh;
+        evas_object_resize(wd->ent, vw, vh);
+     }
    if (wd->hoversel) _hoversel_position(data);
-   //   Evas_Coord ww, hh;
-   //   evas_object_geometry_get(wd->ent, NULL, NULL, &ww, &hh);
 }
 
 static void
@@ -879,7 +1066,7 @@ _dismissed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
         if (!_elm_config->desktop_entry)
           {
              if (!wd->password)
-                edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
+               edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
           }
      }
    elm_widget_scroll_freeze_pop(data);
@@ -909,7 +1096,7 @@ _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (!_elm_config->desktop_entry)
      {
         if (!wd->password)
-           edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
+          edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
      }
    edje_object_signal_emit(wd->ent, "elm,state,select,on", "elm");
    if (!_elm_config->desktop_entry)
@@ -957,10 +1144,10 @@ _cut(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    /* Store it */
    wd->selmode = EINA_FALSE;
    if (!_elm_config->desktop_entry)
-      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
+     edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
    edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
    if (!_elm_config->desktop_entry)
-      elm_widget_scroll_hold_pop(data);
+     elm_widget_scroll_hold_pop(data);
    _store_selection(ELM_SEL_CLIPBOARD, data);
    edje_object_part_text_insert(wd->ent, "elm.text", "");
    edje_object_part_text_select_none(wd->ent, "elm.text");
@@ -971,11 +1158,11 @@ _copy(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   //wd->selmode = EINA_FALSE;
+   wd->selmode = EINA_FALSE;
    if (!_elm_config->desktop_entry)
      {
-        //edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
-        //edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
+        edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
+        edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
         elm_widget_scroll_hold_pop(data);
      }
    _store_selection(ELM_SEL_CLIPBOARD, data);
@@ -989,10 +1176,10 @@ _cancel(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (!wd) return;
    wd->selmode = EINA_FALSE;
    if (!_elm_config->desktop_entry)
-      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
+     edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
    edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
    if (!_elm_config->desktop_entry)
-      elm_widget_scroll_hold_pop(data);
+     elm_widget_scroll_hold_pop(data);
    edje_object_part_text_select_none(wd->ent, "elm.text");
 }
 
@@ -1009,9 +1196,9 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    cnpwidgetdata = data;
    elm_cbhm_helper_init(obj);
    if (elm_entry_cnp_textonly_get(obj))
-	   elm_cbhm_send_raw_data("show0");
+     elm_cbhm_send_raw_data("show0");
    else
-	   elm_cbhm_send_raw_data("show1");
+     elm_cbhm_send_raw_data("show1");
    // end for cbhm
 }
 
@@ -1060,7 +1247,7 @@ _menu_press(Evas_Object *obj)
           elm_hoversel_horizontal_set(wd->hoversel, EINA_TRUE);
         elm_object_style_set(wd->hoversel, "entry");
         elm_widget_sub_object_add(obj, wd->hoversel);
-        elm_hoversel_label_set(wd->hoversel, "Text");
+        elm_object_text_set(wd->hoversel, "Text");
         top = elm_widget_top_get(obj);
         if (top) elm_hoversel_hover_parent_set(wd->hoversel, top);
         evas_object_smart_callback_add(wd->hoversel, "dismissed", _dismissed, obj);
@@ -1119,8 +1306,6 @@ _menu_press(Evas_Object *obj)
              edje_object_part_text_select_abort(wd->ent, "elm.text");
           }
      }
-
-   evas_object_smart_callback_call(obj, SIG_LONGPRESSED, NULL);
 }
 
 static void
@@ -1131,6 +1316,9 @@ _magnifier_hide(void *data)
 
    evas_object_hide(wd->mgf_bg);
    evas_object_hide(wd->mgf_clip);
+
+   if (wd->scroll)
+     elm_smart_scroller_freeze_set(wd->scroller, EINA_FALSE);
 }
 
 static void
@@ -1152,21 +1340,30 @@ _magnifier_move(void *data)
    Evas_Coord x, y, w, h, fs;
    Evas_Coord cx, cy, cw, ch, ox, oy;
 
-   evas_object_geometry_get(data, &x, &y, &w, &h);
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
+
+   if (wd->scroll)
+     {
+        evas_object_geometry_get(wd->scroller, &x, &y, &w, &h);
+        elm_smart_scroller_child_pos_get(wd->scroller, &ox, &oy);
+        cx -= ox;
+        cy -= oy;
+     }
+   else
+     evas_object_geometry_get(data, &x, &y, &w, &h);
 
    ox = oy = 0;
    fs = elm_finger_size_get();
 
    if ((cy + y) - wd->mgf_height - fs < 0)
-	oy = -1 * ((cy + y) - wd->mgf_height - fs);
+     oy = -1 * ((cy + y) - wd->mgf_height - fs);
 
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FIXEDSIZE)
-	evas_object_move(wd->mgf_bg, (cx + x + cw/2) + ox, (cy + y) - wd->mgf_height - fs + oy);
+     evas_object_move(wd->mgf_bg, (cx + x + cw/2) + ox, (cy + y) - wd->mgf_height - fs + oy);
    else if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
-	evas_object_move(wd->mgf_bg, x, (cy + y) - wd->mgf_height - fs + oy);
+     evas_object_move(wd->mgf_bg, x, (cy + y) - wd->mgf_height - fs + oy);
    else
-	return;
+     return;
 
    evas_object_move(wd->mgf_proxy, (1 - wd->mgf_scale) * cx + x + ox, (1 - wd->mgf_scale) * cy + y - wd->mgf_height/2 - ch/2 - fs + oy);
 }
@@ -1175,7 +1372,7 @@ static void
 _magnifier_create(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord x, y, w, h;
+   Evas_Coord x, y, w, h, mw, mh;
    const char* key_data = NULL;
 
    if (!wd) return;
@@ -1191,15 +1388,22 @@ _magnifier_create(void *data)
    if (wd->mgf_bg) evas_object_del(wd->mgf_bg);
    if (wd->mgf_clip) evas_object_del(wd->mgf_clip);
 
-   evas_object_geometry_get(data, &x, &y, &w, &h);
+   if (wd->scroll)
+     evas_object_geometry_get(wd->scroller, &x, &y, &w, &h);
+   else
+     evas_object_geometry_get(data, &x, &y, &w, &h);
+
+   if ((w <= 0) || (h <= 0))
+     return;
+
    wd->mgf_bg = edje_object_add(evas_object_evas_get(data));
 
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FIXEDSIZE)
-	_elm_theme_object_set(data, wd->mgf_bg, "entry", "magnifier", "fixed-size");
+     _elm_theme_object_set(data, wd->mgf_bg, "entry", "magnifier", "fixed-size");
    else if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
-	_elm_theme_object_set(data, wd->mgf_bg, "entry", "magnifier", "fill-width");
+     _elm_theme_object_set(data, wd->mgf_bg, "entry", "magnifier", "fill-width");
    else
-	return;
+     return;
 
    wd->mgf_clip = evas_object_rectangle_add(evas_object_evas_get(data));
    evas_object_color_set(wd->mgf_clip, 255, 255, 255, 255);
@@ -1211,12 +1415,27 @@ _magnifier_create(void *data)
    if (key_data) wd->mgf_scale = atof(key_data);
 
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
-	evas_object_resize(wd->mgf_bg, w, wd->mgf_height);
+     evas_object_resize(wd->mgf_bg, w, wd->mgf_height);
 
-   wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(data));
-   evas_object_image_source_set(wd->mgf_proxy, data);
-   evas_object_resize(wd->mgf_proxy, w * wd->mgf_scale, h * wd->mgf_scale);
-   evas_object_image_fill_set(wd->mgf_proxy, 0, 0, w * wd->mgf_scale, h * wd->mgf_scale);
+   if (wd->scroll)
+     {
+        elm_smart_scroller_freeze_set(wd->scroller, EINA_TRUE);
+        wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(wd->scroller));
+        evas_object_image_source_set(wd->mgf_proxy, wd->scroller);
+     }
+   else
+     {
+        wd->mgf_proxy = evas_object_image_add(evas_object_evas_get(data));
+        evas_object_image_source_set(wd->mgf_proxy, data);
+     }
+
+   mw = (Evas_Coord)((float)w * wd->mgf_scale);
+   mh = (Evas_Coord)((float)h * wd->mgf_scale);
+   if ((mw <= 0) || (mh <= 0))
+     return;
+
+   evas_object_resize(wd->mgf_proxy, mw, mh);
+   evas_object_image_fill_set(wd->mgf_proxy, 0, 0, mw, mh);
    evas_object_color_set(wd->mgf_proxy, 255, 255, 255, 255);
    evas_object_pass_events_set(wd->mgf_proxy, EINA_TRUE);
    evas_object_show(wd->mgf_proxy);
@@ -1260,14 +1479,14 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
    if (!wd) return;
    if (wd->disabled) return;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return;
-   if (ev->button != 1) return;
-   //   if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-   if (wd->longpress_timer) ecore_timer_del(wd->longpress_timer);
-   wd->longpress_timer = ecore_timer_add(_elm_config->longpress_timeout, _long_press, data);
    wd->downx = ev->canvas.x;
    wd->downy = ev->canvas.y;
-
    wd->long_pressed = EINA_FALSE;
+   if (ev->button == 1)
+     {
+        if (wd->longpress_timer) ecore_timer_del(wd->longpress_timer);
+        wd->longpress_timer = ecore_timer_add(_elm_config->longpress_timeout, _long_press, data);
+     }
 }
 
 static void
@@ -1277,26 +1496,34 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
    Evas_Event_Mouse_Up *ev = event_info;
    if (!wd) return;
    if (wd->disabled) return;
-   if (ev->button != 1) return;
-
-   if (!wd->double_clicked)
+   if (ev->button == 1)
      {
-        if ((wd->api) && (wd->api->obj_mouseup))
+        if (!wd->double_clicked)
           {
-             wd->api->obj_mouseup(data);
+             if ((wd->api) && (wd->api->obj_mouseup))
+               {
+                  wd->api->obj_mouseup(data);
+               }
           }
-     }
-   if (wd->longpress_timer)
-     {
-        ecore_timer_del(wd->longpress_timer);
-        wd->longpress_timer = NULL;
-     }
 
-   _magnifier_hide(data);
-   elm_object_scroll_freeze_pop(data);
+        if (wd->longpress_timer)
+          {
+             ecore_timer_del(wd->longpress_timer);
+             wd->longpress_timer = NULL;
+          }
 
-   if (wd->long_pressed)
+        _magnifier_hide(data);
+        elm_object_scroll_freeze_pop(data);
+
+        if (wd->long_pressed)
+          {
+             _menu_press(data);
+          }
+
+     }
+   else if (ev->button == 3)
      {
+        wd->usedown = 1;
         _menu_press(data);
      }
 }
@@ -1352,12 +1579,13 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
           }
      }
 
-   if (ev->buttons != 1) return;
-
-   if (wd->long_pressed)
+   if (ev->buttons == 1)
      {
-        _magnifier_show(data);
-        _magnifier_move(data);
+        if (wd->long_pressed)
+          {
+             _magnifier_show(data);
+             _magnifier_move(data);
+          }
      }
 }
 
@@ -1369,33 +1597,52 @@ _getbase(Evas_Object *obj)
    if (wd->editable)
      {
         if (wd->password) return "base-password";
-	else
-	  {
-	     if (wd->single_line) return "base-single";
-	     else
-	       {
-		  if (wd->linewrap) return "base";
-                  else if (wd->char_linewrap) return "base-charwrap";
-		  else  return "base-nowrap";
-	       }
-	  }
+        else
+          {
+             if (wd->single_line) return "base-single";
+             else
+               {
+                  switch (wd->linewrap)
+                    {
+                     case ELM_WRAP_CHAR:
+                        return "base-charwrap";
+                     case ELM_WRAP_WORD:
+                        return "base";
+                     case ELM_WRAP_MIXED:
+                        return "base-mixedwrap";
+                     case ELM_WRAP_NONE:
+                     default:
+                        return "base-nowrap";
+                    }
+               }
+          }
      }
    else
      {
         if (wd->password) return "base-password";
-	else
-	  {
-	     if (wd->single_line) return "base-single-noedit";
-	     else
-	       {
-		  if (wd->linewrap) return "base-noedit";
-                  else if (wd->char_linewrap) return "base-noedit-charwrap";
-		  else  return "base-nowrap-noedit";
-	       }
-	  }
+        else
+          {
+             if (wd->single_line) return "base-single-noedit";
+             else
+               {
+                  switch (wd->linewrap)
+                    {
+                     case ELM_WRAP_CHAR:
+                        return "base-noedit-charwrap";
+                     case ELM_WRAP_WORD:
+                        return "base-noedit";
+                     case ELM_WRAP_MIXED:
+                        return "base-noedit-mixedwrap";
+                     case ELM_WRAP_NONE:
+                     default:
+                        return "base-nowrap-noedit";
+                    }
+               }
+          }
      }
    return "base";
 }
+
 
 static int
 _entry_length_get(Evas_Object *obj)
@@ -1438,7 +1685,7 @@ _matchlist_show(void *data)
      }
    text = elm_entry_entry_get(data);
    if (text == NULL)
-      return;
+     return;
    textlen = strlen(text);
 
    if (textlen < wd->matchlist_threshold)
@@ -1455,21 +1702,26 @@ _matchlist_show(void *data)
         EINA_LIST_FOREACH(wd->match_list, l, str_list)
           {
              if (wd->matchlist_case_sensitive)
-                str_result = strstr(str_list, text);
+               str_result = strstr(str_list, text);
              else
-                str_result = strcasestr(str_list, text);
+               str_result = strcasestr(str_list, text);
 
              if (str_result)
                {
                   str_mkup = malloc(strlen(str_list) + 16);
+                  if (str_mkup == NULL) return;
 
                   textlen = strlen(str_list) - strlen(str_result);
                   str_front = malloc(textlen + 1);
+                  if (str_front == NULL) return;
+
                   memset(str_front, 0, textlen + 1);
                   strncpy(str_front, str_list, textlen);
 
                   textlen = strlen(text);
                   str_mid = malloc(textlen + 1);
+                  if (str_mid == NULL) return;
+
                   memset(str_mid, 0, textlen + 1);
                   strncpy(str_mid, str_list + strlen(str_front), textlen);
 
@@ -1486,7 +1738,7 @@ _matchlist_show(void *data)
           }
      }
    else
-      return;
+     return;
 
    if (textfound)
      {
@@ -1501,7 +1753,7 @@ static void _matchlist_list_clicked( void *data, Evas_Object *obj, void *event_i
    Elm_List_Item *it = (Elm_List_Item *) elm_list_selected_item_get(obj);
    Widget_Data *wd = elm_widget_data_get(data);
    if ((it == NULL) || (wd == NULL))
-      return;
+     return;
 
    const char *text = elm_list_item_label_get(it);
    evas_object_smart_callback_call((Evas_Object *)data, "selected", (void *)text);
@@ -1526,60 +1778,74 @@ elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_
    if (!wd) return;
 
    if (match_list)
-   {
-	   Evas_Coord max_w = 9999, max_h = 9999;
-	   const char* key_data = NULL;
+     {
+        Evas_Coord max_w = 9999, max_h = 9999;
+        const char* key_data = NULL;
 
-	   wd->matchlist_threshold = 1;
-	   wd->hover = elm_hover_add(elm_widget_parent_get(obj));
-	   elm_hover_parent_set(wd->hover, elm_widget_parent_get(obj));
-	   elm_hover_target_set(wd->hover, obj);
-	   elm_object_style_set(wd->hover, "matchlist");
+        wd->matchlist_threshold = 1;
+        wd->hover = elm_hover_add(elm_widget_parent_get(obj));
+        elm_hover_parent_set(wd->hover, elm_widget_parent_get(obj));
+        elm_hover_target_set(wd->hover, obj);
+        elm_object_style_set(wd->hover, "matchlist");
 
-	   wd->layout = elm_layout_add(wd->hover);
-	   elm_layout_theme_set(wd->layout, "entry", "matchlist", "default");
-	   wd->list = elm_list_add(wd->layout);
-	   evas_object_size_hint_weight_set(wd->list, EVAS_HINT_EXPAND, 0.0);
-	   evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
-	   elm_list_mode_set(wd->list, ELM_LIST_EXPAND);
-	   elm_object_style_set(wd->list, "matchlist");
+        wd->layout = elm_layout_add(wd->hover);
+        elm_layout_theme_set(wd->layout, "entry", "matchlist", "default");
+        wd->list = elm_list_add(wd->layout);
+        evas_object_size_hint_weight_set(wd->list, EVAS_HINT_EXPAND, 0.0);
+        evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
+        elm_list_mode_set(wd->list, ELM_LIST_EXPAND);
+        elm_object_style_set(wd->list, "matchlist");
 
-	   key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_width");
-	   if (key_data) max_w = atoi(key_data);
-	   key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_height");
-	   if (key_data) max_h = atoi(key_data);
+        key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_width");
+        if (key_data) max_w = atoi(key_data);
+        key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_height");
+        if (key_data) max_h = atoi(key_data);
 
-	   elm_list_go(wd->list);
-	   evas_object_size_hint_max_set(wd->list, max_w, max_h);
-	   evas_object_smart_callback_add(wd->list, "selected", _matchlist_list_clicked, obj);
-	   elm_layout_content_set(wd->layout, "elm.swallow.content", wd->list);
-	   elm_hover_content_set(wd->hover, "bottom", wd->layout);
+        elm_list_go(wd->list);
+        evas_object_size_hint_max_set(wd->list, max_w, max_h);
+        evas_object_smart_callback_add(wd->list, "selected", _matchlist_list_clicked, obj);
+        elm_layout_content_set(wd->layout, "elm.swallow.content", wd->list);
+        elm_hover_content_set(wd->hover, "bottom", wd->layout);
 
-	   wd->match_list = match_list;
-   }
+        wd->match_list = match_list;
+     }
    else
-   {
-	   if (wd->hover)
-		   evas_object_del(wd->hover);
+     {
+        if (wd->hover)
+          evas_object_del(wd->hover);
 
-	   wd->match_list = NULL;
-   }
+        wd->match_list = NULL;
+     }
 
    wd->matchlist_case_sensitive = case_sensitive;
 }
 
-
 static void
-_signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+_entry_changed_common_handling(void *data, const char *event)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Coord minw, minh;
    if (!wd) return;
    wd->changed = EINA_TRUE;
+   /* Reset the size hints which are no more relevant.
+    * Keep the height, this is a hack, but doesn't really matter
+    * cause we'll re-eval in a moment. */
+   if (wd->scroll)
+     {
+        evas_object_size_hint_min_get(data, &minw, &minh);
+        evas_object_size_hint_min_set(data, minw, minh);
+     }
+   else
+     {
+        evas_object_size_hint_min_get(data, NULL, &minh);
+        evas_object_size_hint_min_set(data, -1, minh);
+     }
+
    _sizing_eval(data);
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
    _check_enable_returnkey(data);
-   evas_object_smart_callback_call(data, SIG_CHANGED, NULL);
+   evas_object_smart_callback_call(data, event, NULL);
    if (wd->delay_write)
      {
         ecore_timer_del(wd->delay_write);
@@ -1594,6 +1860,19 @@ _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    if ((!wd->autosave) || (!wd->file)) return;
    wd->delay_write = ecore_timer_add(2.0, _delay_write, data);
 }
+
+static void
+_signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   _entry_changed_common_handling(data, SIG_CHANGED);
+}
+
+static void
+_signal_preedit_changed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
+{
+   _entry_changed_common_handling(data, SIG_PREEDIT_CHANGED);
+}
+
 
 static void
 _signal_handler_move_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
@@ -1674,7 +1953,7 @@ _signal_magnifier_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
 
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
    if (!wd->deferred_recalc_job)
-      elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
+     elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
    else
      {
         wd->deferred_cur = EINA_TRUE;
@@ -1699,7 +1978,7 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
 
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
    if (!wd->deferred_recalc_job)
-      elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get(), EINA_FALSE);
+     elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get(), EINA_FALSE);
    else
      {
         wd->deferred_cur = EINA_TRUE;
@@ -1801,22 +2080,10 @@ static void
 _signal_cursor_changed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord cx, cy, cw, ch;
    if (!wd) return;
-   evas_object_smart_callback_call(data, SIG_CURSOR_CHANGED, NULL);
-   edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text",
-                                             &cx, &cy, &cw, &ch);
    wd->cursor_pos = edje_object_part_text_cursor_pos_get(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
-   if (!wd->deferred_recalc_job)
-     elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
-   else
-     {
-        wd->deferred_cur = EINA_TRUE;
-        wd->cx = cx;
-        wd->cy = cy;
-        wd->cw = cw;
-        wd->ch = ch;
-     }
+   wd->cur_changed = EINA_TRUE;
+   _recalc_cursor_geometry(data);
 }
 
 static void
@@ -1846,7 +2113,7 @@ _signal_anchor_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emis
         const Eina_List *geoms;
 
         n = p + 1;
-        p2 = p - 1;
+        p2 = p -1;
         while (p2 >= emission)
           {
              if (*p2 == ',') break;
@@ -1868,7 +2135,7 @@ _signal_anchor_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emis
              Evas_Coord px, py, x, y;
 
              evas_object_geometry_get(wd->ent, &x, &y, NULL, NULL);
-             evas_pointer_output_xy_get(evas_object_evas_get(wd->ent), &px, &py);
+             evas_pointer_canvas_xy_get(evas_object_evas_get(wd->ent), &px, &py);
              EINA_LIST_FOREACH(geoms, l, r)
                {
                   if (((r->x + x) <= px) && ((r->y + y) <= py) &&
@@ -2000,6 +2267,7 @@ _event_selection_notify(void *data, int type __UNUSED__, void *event)
         wd->drag_selection_asked = EINA_FALSE;
 
         ecore_x_dnd_send_finished();
+
      }
    return ECORE_CALLBACK_PASS_ON;
 }
@@ -2040,7 +2308,6 @@ _event_selection_clear(void *data __UNUSED__, int type __UNUSED__, void *event _
    return ECORE_CALLBACK_PASS_ON;
 }
 
-
 static Eina_Bool
 _drag_drop_cb(void *data __UNUSED__, Evas_Object *obj, Elm_Selection_Data *drop)
 {
@@ -2048,9 +2315,8 @@ _drag_drop_cb(void *data __UNUSED__, Evas_Object *obj, Elm_Selection_Data *drop)
    Eina_Bool rv;
 
    wd = elm_widget_data_get(obj);
-
    if (!wd) return EINA_FALSE;
-   printf("Inserting at (%d,%d) %s\n", drop->x, drop->y, (char*)drop->data);
+   printf("Inserting at (%d,%d) %s\n",drop->x,drop->y,(char*)drop->data);
 
    edje_object_part_text_cursor_copy(wd->ent, "elm.text",
                                      EDJE_CURSOR_MAIN,/*->*/EDJE_CURSOR_USER);
@@ -2229,6 +2495,54 @@ _text_filter(void *data, Evas_Object *edje __UNUSED__, const char *part __UNUSED
      }
 }
 
+/* This function is used to insert text by chunks in jobs */
+static Eina_Bool
+_text_append_idler(void *data)
+{
+   int start;
+   char backup;
+   Evas_Object *obj = (Evas_Object *) data;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (wd->text) eina_stringshare_del(wd->text);
+   wd->text = NULL;
+   wd->changed = EINA_TRUE;
+
+   start = wd->append_text_position;
+   if(start + _CHUNK_SIZE < wd->append_text_len)
+     {
+        wd->append_text_position = (start + _CHUNK_SIZE);
+        /* Go to the start of the nearest codepoint, because we don't want
+         * to cut it in the middle */
+        eina_unicode_utf8_get_prev(wd->append_text_left,
+              &wd->append_text_position);
+     }
+   else
+     {
+        wd->append_text_position = wd->append_text_len;
+     }
+
+   backup = wd->append_text_left[wd->append_text_position];
+   wd->append_text_left[wd->append_text_position] = '\0';
+
+   edje_object_part_text_append(wd->ent, "elm.text",
+         wd->append_text_left + start);
+
+   wd->append_text_left[wd->append_text_position] = backup;
+
+   /* If there's still more to go, renew the idler, else, cleanup */
+   if (wd->append_text_position < wd->append_text_len)
+     {
+        return ECORE_CALLBACK_RENEW;
+     }
+   else
+     {
+        free(wd->append_text_left);
+        wd->append_text_left = NULL;
+        wd->append_text_idler = NULL;
+        return ECORE_CALLBACK_CANCEL;
+     }
+}
+
 static void
 _add_chars_till_limit(Evas_Object *obj, char **text, int can_add, Length_Unit unit)
 {
@@ -2297,6 +2611,77 @@ _add_chars_till_limit(Evas_Object *obj, char **text, int can_add, Length_Unit un
    evas_object_smart_callback_call(obj, "maxlength,reached", NULL);
 }
 
+static void
+_elm_entry_text_set(Evas_Object *obj, const char *item, const char *entry)
+{
+   int len = 0;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   if (item && strcmp(item, "default")) return;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (!entry) entry = "";
+   if (wd->text) eina_stringshare_del(wd->text);
+   wd->text = NULL;
+   wd->changed = EINA_TRUE;
+
+   /* Clear currently pending job if there is one */
+   if (wd->append_text_idler)
+     {
+        ecore_idler_del(wd->append_text_idler);
+        free(wd->append_text_left);
+        wd->append_text_left = NULL;
+        wd->append_text_idler = NULL;
+     }
+
+   len = strlen(entry);
+   /* Split to ~_CHUNK_SIZE chunks */
+   if (len > _CHUNK_SIZE)
+     {
+        wd->append_text_left = (char *) malloc(len + 1);
+     }
+
+   /* If we decided to use the idler */
+   if (wd->append_text_left)
+     {
+        /* Need to clear the entry first */
+        edje_object_part_text_set(wd->ent, "elm.text", "");
+        memcpy(wd->append_text_left, entry, len + 1);
+        wd->append_text_position = 0;
+        wd->append_text_len = len;
+        wd->append_text_idler = ecore_idler_add(_text_append_idler, obj);
+     }
+   else
+     {
+        edje_object_part_text_set(wd->ent, "elm.text", entry);
+     }
+}
+
+static const char *
+_elm_entry_text_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return NULL;
+   const char *text;
+   if (!wd) return NULL;
+   if (wd->text)
+     {
+        if (wd->password)
+          return elm_entry_markup_to_utf8(wd->text);
+        else
+          return wd->text;
+     }
+   text = edje_object_part_text_get(wd->ent, "elm.text");
+   if (!text)
+     {
+        ERR("text=NULL for edje %p, part 'elm.text'", wd->ent);
+        return NULL;
+     }
+   eina_stringshare_replace(&wd->text, text);
+   if (wd->password) return elm_entry_markup_to_utf8(wd->text);
+   return wd->text;
+}
+
 /**
  * This adds an entry to @p parent object.
  *
@@ -2324,15 +2709,27 @@ elm_entry_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
+   elm_widget_focus_region_hook_set(obj, _focus_region_hook);
    elm_widget_on_focus_region_hook_set(obj, _on_focus_region_hook);
    elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
    elm_object_cursor_set(obj, ELM_CURSOR_XTERM);
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_highlight_ignore_set(obj, EINA_TRUE);
+   elm_widget_text_set_hook_set(obj, _elm_entry_text_set);
+   elm_widget_text_get_hook_set(obj, _elm_entry_text_get);
 
-   wd->linewrap     = EINA_TRUE;
-   wd->char_linewrap= EINA_FALSE;
+   wd->scroller = elm_smart_scroller_add(e);
+   elm_widget_sub_object_add(obj, wd->scroller);
+   elm_smart_scroller_widget_set(wd->scroller, obj);
+   elm_smart_scroller_object_theme_set(obj, wd->scroller, "scroller", "entry",
+                                       elm_widget_style_get(obj));
+   evas_object_size_hint_weight_set(wd->scroller, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(wd->scroller, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
+   elm_smart_scroller_propagate_events_set(wd->scroller, EINA_TRUE);
+
+   wd->linewrap     = ELM_WRAP_WORD;
    wd->editable     = EINA_TRUE;
    wd->disabled     = EINA_FALSE;
    wd->context_menu = EINA_TRUE;
@@ -2341,20 +2738,23 @@ elm_entry_add(Evas_Object *parent)
    wd->autoperiod   = EINA_TRUE;
 
    wd->ent = edje_object_add(e);
+   elm_widget_sub_object_add(obj, wd->ent);
    edje_object_item_provider_set(wd->ent, _get_item, obj);
-   edje_object_text_insert_filter_callback_add(wd->ent, "elm.text", _text_filter, obj);
+   edje_object_text_insert_filter_callback_add(wd->ent,"elm.text", _text_filter, obj);
    evas_object_event_callback_add(wd->ent, EVAS_CALLBACK_MOVE, _move, obj);
-   evas_object_event_callback_add(wd->ent, EVAS_CALLBACK_RESIZE, _resize, obj);
    evas_object_event_callback_add(wd->ent, EVAS_CALLBACK_MOUSE_DOWN,
                                   _mouse_down, obj);
    evas_object_event_callback_add(wd->ent, EVAS_CALLBACK_MOUSE_UP,
                                   _mouse_up, obj);
    evas_object_event_callback_add(wd->ent, EVAS_CALLBACK_MOUSE_MOVE,
                                   _mouse_move, obj);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
 
    _elm_theme_object_set(obj, wd->ent, "entry", "base", "default");
    edje_object_signal_callback_add(wd->ent, "entry,changed", "elm.text",
                                    _signal_entry_changed, obj);
+   edje_object_signal_callback_add(wd->ent, "preedit,changed", "elm.text",
+                                   _signal_preedit_changed, obj);
    edje_object_signal_callback_add(wd->ent, "handler,move,start", "elm.text",
                                    _signal_handler_move_start, obj);
    edje_object_signal_callback_add(wd->ent, "handler,move,end", "elm.text",
@@ -2401,7 +2801,7 @@ elm_entry_add(Evas_Object *parent)
                                    _signal_mouse_double, obj);
    edje_object_part_text_set(wd->ent, "elm.text", "");
    if (_elm_config->desktop_entry)
-      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
+     edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
    elm_widget_resize_object_set(obj, wd->ent);
    _sizing_eval(obj);
 
@@ -2478,10 +2878,33 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    if (!wd) return;
    if (wd->single_line == single_line) return;
    wd->single_line = single_line;
-   wd->linewrap = EINA_FALSE;
-   wd->char_linewrap = EINA_FALSE;
+   wd->linewrap = ELM_WRAP_NONE;
    elm_entry_cnp_textonly_set(obj, EINA_TRUE);
    _theme_hook(obj);
+   if (wd->scroller)
+     {
+        if (wd->single_line)
+          {
+             elm_smart_scroller_policy_set(wd->scroller,
+                                           ELM_SMART_SCROLLER_POLICY_OFF,
+                                           ELM_SMART_SCROLLER_POLICY_OFF);
+             elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
+          }
+        else
+          {
+             const Elm_Scroller_Policy map[3] =
+               {
+                  ELM_SMART_SCROLLER_POLICY_AUTO,
+                  ELM_SMART_SCROLLER_POLICY_ON,
+                  ELM_SMART_SCROLLER_POLICY_OFF
+               };
+             elm_smart_scroller_policy_set(wd->scroller,
+                                           map[wd->policy_h],
+                                           map[wd->policy_v]);
+             elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
+          }
+        _sizing_eval(obj);
+     }
 }
 
 /**
@@ -2521,8 +2944,7 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    if (wd->password == password) return;
    wd->password = password;
    wd->single_line = EINA_TRUE;
-   wd->linewrap = EINA_FALSE;
-   wd->char_linewrap = EINA_FALSE;
+   wd->linewrap = ELM_WRAP_NONE;
    _theme_hook(obj);
 }
 
@@ -2556,24 +2978,46 @@ elm_entry_password_get(const Evas_Object *obj)
 EAPI void
 elm_entry_entry_set(Evas_Object *obj, const char *entry)
 {
+   _elm_entry_text_set(obj, NULL, entry);
+}
+
+/**
+ * This appends @p entry to the text of the entry.
+ *
+ * @param obj The entry object
+ * @param entry The text to be displayed
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_entry_append(Evas_Object *obj, const char *entry)
+{
+   int len = 0;
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (!entry) entry = "";
-   if(wd->max_no_of_bytes)
+   wd->changed = EINA_TRUE;
+
+   len = strlen(entry);
+   if (wd->append_text_left)
      {
-        int len = strlen(entry);
-        if(len > wd->max_no_of_bytes)
+        char *tmpbuf;
+        tmpbuf = realloc(wd->append_text_left, wd->append_text_len + len + 1);
+        if (!tmpbuf)
           {
-             ERR("[ERROR]the length of the text set is more than max no of bytes, text cannot be set");
+             /* Do something */
              return;
           }
+        wd->append_text_left = tmpbuf;
+        memcpy(wd->append_text_left + wd->append_text_len, entry, len + 1);
+        wd->append_text_len += len;
      }
-   edje_object_part_text_set(wd->ent, "elm.text", entry);
-   if (wd->text) eina_stringshare_del(wd->text);
-   wd->text = NULL;
-   wd->changed = EINA_TRUE;
-   _sizing_eval(obj);
+   else
+     {
+        /* FIXME: Add chunked appending here (like in entry_set) */
+        edje_object_part_text_append(wd->ent, "elm.text", entry);
+     }
 }
 
 /**
@@ -2588,24 +3032,7 @@ elm_entry_entry_set(Evas_Object *obj, const char *entry)
 EAPI const char *
 elm_entry_entry_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   const char *text;
-   if (!wd) return NULL;
-
-   if ((wd->text)&&(wd->password))
-     return elm_entry_markup_to_utf8(wd->text);
-
-   if (wd->text) return wd->text;
-   text = edje_object_part_text_get(wd->ent, "elm.text");
-   if (!text)
-     {
-        ERR("text=NULL for edje %p, part 'elm.text'", wd->ent);
-        return NULL;
-     }
-   eina_stringshare_replace(&wd->text, text);
-   if(wd->password)return elm_entry_markup_to_utf8(wd->text);
-   return wd->text;
+   return _elm_entry_text_get(obj, NULL);
 }
 
 /**
@@ -2705,7 +3132,6 @@ elm_entry_entry_insert(Evas_Object *obj, const char *entry)
  * This enables word line wrapping in the entry object.  It is the opposite
  * of elm_entry_single_line_set().  Additionally, setting this disables
  * character line wrapping.
- * See also elm_entry_line_char_wrap_set().
  *
  * @param obj The entry object
  * @param wrap If true, the entry will be wrapped once it reaches the end
@@ -2715,15 +3141,14 @@ elm_entry_entry_insert(Evas_Object *obj, const char *entry)
  * @ingroup Entry
  */
 EAPI void
-elm_entry_line_wrap_set(Evas_Object *obj, Eina_Bool wrap)
+elm_entry_line_wrap_set(Evas_Object *obj, Elm_Wrap_Type wrap)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (wd->linewrap == wrap) return;
+   wd->lastw = -1;
    wd->linewrap = wrap;
-   if(wd->linewrap)
-     wd->char_linewrap = EINA_FALSE;
    _theme_hook(obj);
 }
 
@@ -2758,28 +3183,21 @@ elm_entry_wrap_width_get(const Evas_Object *obj)
 }
 
 /**
- * This enables character line wrapping in the entry object.  It is the opposite
- * of elm_entry_single_line_set().  Additionally, setting this disables
- * word line wrapping.
+ * Get the wrapping behavior of the entry.
  * See also elm_entry_line_wrap_set().
  *
  * @param obj The entry object
- * @param wrap If true, the entry will be wrapped once it reaches the end
- * of the object. Wrapping will occur immediately upon reaching the end of the object.
+ * @return Wrap type
  *
  * @ingroup Entry
  */
-EAPI void
-elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
+EAPI Elm_Wrap_Type
+elm_entry_line_wrap_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (wd->char_linewrap == wrap) return;
-   wd->char_linewrap = wrap;
-   if(wd->char_linewrap)
-     wd->linewrap = EINA_FALSE;
-   _theme_hook(obj);
+   if (!wd) return EINA_FALSE;
+   return wd->linewrap;
 }
 
 /**
@@ -2845,7 +3263,7 @@ elm_entry_select_none(Evas_Object *obj)
      {
         wd->selmode = EINA_FALSE;
         if (!_elm_config->desktop_entry)
-           edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
+          edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
         edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
      }
    wd->have_selection = EINA_FALSE;
@@ -2869,7 +3287,7 @@ elm_entry_select_all(Evas_Object *obj)
      {
         wd->selmode = EINA_FALSE;
         if (!_elm_config->desktop_entry)
-           edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
+          edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
         edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
      }
    wd->have_selection = EINA_TRUE;
@@ -2999,7 +3417,13 @@ elm_entry_cursor_end_set(Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   int x, y, w, h;
    edje_object_part_text_cursor_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
+   if (wd->scroll)
+     {
+        elm_widget_show_region_get(wd->ent, &x, &y, &w, &h);
+        elm_smart_scroller_child_region_show(wd->scroller, x, y, w, h);
+     }
 }
 
 /**
@@ -3765,8 +4189,6 @@ elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
    widget_type = elm_widget_type_get(entry);
    if (!strcmp(widget_type, "entry"))
      text_get = elm_entry_entry_get;
-   else if (!strcmp(widget_type, "scrolled_entry"))
-     text_get = elm_scrolled_entry_entry_get;
    else /* huh? */
      return;
 
@@ -4015,12 +4437,368 @@ elm_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly)
  * @ingroup Entry
  */
 EAPI Eina_Bool
-elm_entry_cnp_textonly_get(Evas_Object *obj)
+elm_entry_cnp_textonly_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
    return wd->textonly;
+}
+
+/**
+ * Enable or disable scrolling in entry
+ *
+ * Normally the entry is not scrollable unless you enable it with this call.
+ *
+ * @param obj The entry object
+ * @param scroll EINA_TRUE if it is to be scrollable, EINA_FALSE otherwise
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_scrollable_set(Evas_Object *obj, Eina_Bool scroll)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   scroll = !!scroll;
+   if (wd->scroll == scroll) return;
+   wd->scroll = scroll;
+   if (wd->scroll)
+     {
+        elm_widget_sub_object_del(obj, wd->scroller);
+        elm_widget_resize_object_set(obj, wd->scroller);
+        elm_widget_sub_object_add(obj, wd->ent);
+        elm_smart_scroller_child_set(wd->scroller, wd->ent);
+        evas_object_show(wd->scroller);
+        elm_widget_on_show_region_hook_set(obj, _show_region_hook, obj);
+        if (wd->single_line)
+          {
+             elm_smart_scroller_policy_set(wd->scroller,
+                                           ELM_SMART_SCROLLER_POLICY_OFF,
+                                           ELM_SMART_SCROLLER_POLICY_OFF);
+             elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
+          }
+        else
+          {
+             const Elm_Scroller_Policy map[3] =
+               {
+                  ELM_SMART_SCROLLER_POLICY_AUTO,
+                  ELM_SMART_SCROLLER_POLICY_ON,
+                  ELM_SMART_SCROLLER_POLICY_OFF
+               };
+             elm_smart_scroller_policy_set(wd->scroller,
+                                           map[wd->policy_h],
+                                           map[wd->policy_v]);
+             elm_smart_scroller_bounce_allow_set(wd->scroller, EINA_FALSE, EINA_FALSE);
+          }
+     }
+   else
+     {
+        elm_smart_scroller_child_set(wd->scroller, NULL);
+        elm_widget_sub_object_del(obj, wd->ent);
+        elm_widget_resize_object_set(obj, wd->ent);
+        evas_object_smart_member_add(wd->scroller, obj);
+        elm_widget_sub_object_add(obj, wd->scroller);
+        evas_object_hide(wd->scroller);
+        elm_widget_on_show_region_hook_set(obj, NULL, NULL);
+     }
+   wd->lastw = -1;
+   _theme_hook(obj);
+}
+
+/**
+ * Get the scrollable state of the entry
+ *
+ * Normally the entry is not scrollable. This gets the scrollable state
+ * of the entry. See elm_entry_scrollable_set() for more information.
+ *
+ * @param obj The entry object
+ * @return The scrollable state
+ *
+ * @ingroup Entry
+ */
+EAPI Eina_Bool
+elm_entry_scrollable_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return wd->scroll;
+}
+
+/**
+ * This sets a widget to be displayed to the left of a scrolled entry.
+ *
+ * @param obj The scrolled entry object
+ * @param icon The widget to display on the left side of the scrolled
+ * entry.
+ *
+ * @note A previously set widget will be destroyed.
+ * @note If the object being set does not have minimum size hints set,
+ * it won't get properly displayed.
+ *
+ * @ingroup Entry
+ * @see elm_entry_end_set
+ */
+EAPI void
+elm_entry_icon_set(Evas_Object *obj, Evas_Object *icon)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *edje;
+   if (!wd) return;
+   EINA_SAFETY_ON_NULL_RETURN(icon);
+   if (wd->icon == icon) return;
+   if (wd->icon) evas_object_del(wd->icon);
+   wd->icon = icon;
+   edje = elm_smart_scroller_edje_object_get(wd->scroller);
+   if (!edje) return;
+   edje_object_part_swallow(edje, "elm.swallow.icon", wd->icon);
+   edje_object_signal_emit(edje, "elm,action,show,icon", "elm");
+   _sizing_eval(obj);
+}
+
+/**
+ * Gets the leftmost widget of the scrolled entry. This object is
+ * owned by the scrolled entry and should not be modified.
+ *
+ * @param obj The scrolled entry object
+ * @return the left widget inside the scroller
+ *
+ * @ingroup Entry
+ */
+EAPI Evas_Object *
+elm_entry_icon_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->icon;
+}
+
+/**
+ * Unset the leftmost widget of the scrolled entry, unparenting and
+ * returning it.
+ *
+ * @param obj The scrolled entry object
+ * @return the previously set icon sub-object of this entry, on
+ * success.
+ *
+ * @see elm_entry_icon_set()
+ *
+ * @ingroup Entry
+ */
+EAPI Evas_Object *
+elm_entry_icon_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *ret = NULL;
+   if (!wd) return NULL;
+   if (wd->icon)
+     {
+        Evas_Object *edje = elm_smart_scroller_edje_object_get(wd->scroller);
+        if (!edje) return NULL;
+        ret = wd->icon;
+        edje_object_part_unswallow(edje, wd->icon);
+        edje_object_signal_emit(edje, "elm,action,hide,icon", "elm");
+        wd->icon = NULL;
+        _sizing_eval(obj);
+     }
+   return ret;
+}
+
+/**
+ * Sets the visibility of the left-side widget of the scrolled entry,
+ * set by @elm_entry_icon_set().
+ *
+ * @param obj The scrolled entry object
+ * @param setting EINA_TRUE if the object should be displayed,
+ * EINA_FALSE if not.
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_icon_visible_set(Evas_Object *obj, Eina_Bool setting)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if ((!wd) || (!wd->icon)) return;
+   if (setting)
+      evas_object_hide(wd->icon);
+   else
+      evas_object_show(wd->icon);
+   _sizing_eval(obj);
+}
+
+/**
+ * This sets a widget to be displayed to the end of a scrolled entry.
+ *
+ * @param obj The scrolled entry object
+ * @param end The widget to display on the right side of the scrolled
+ * entry.
+ *
+ * @note A previously set widget will be destroyed.
+ * @note If the object being set does not have minimum size hints set,
+ * it won't get properly displayed.
+ *
+ * @ingroup Entry
+ * @see elm_entry_icon_set
+ */
+EAPI void
+elm_entry_end_set(Evas_Object *obj, Evas_Object *end)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *edje;
+   if (!wd) return;
+   EINA_SAFETY_ON_NULL_RETURN(end);
+   if (wd->end == end) return;
+   if (wd->end) evas_object_del(wd->end);
+   wd->end = end;
+   edje = elm_smart_scroller_edje_object_get(wd->scroller);
+   if (!edje) return;
+   edje_object_part_swallow(edje, "elm.swallow.end", wd->end);
+   edje_object_signal_emit(edje, "elm,action,show,end", "elm");
+   _sizing_eval(obj);
+}
+
+/**
+ * Gets the endmost widget of the scrolled entry. This object is owned
+ * by the scrolled entry and should not be modified.
+ *
+ * @param obj The scrolled entry object
+ * @return the right widget inside the scroller
+ *
+ * @ingroup Entry
+ */
+EAPI Evas_Object *
+elm_entry_end_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->end;
+}
+
+/**
+ * Unset the endmost widget of the scrolled entry, unparenting and
+ * returning it.
+ *
+ * @param obj The scrolled entry object
+ * @return the previously set icon sub-object of this entry, on
+ * success.
+ *
+ * @see elm_entry_icon_set()
+ *
+ * @ingroup Entry
+ */
+EAPI Evas_Object *
+elm_entry_end_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *ret = NULL;
+   if (!wd) return NULL;
+   if (wd->end)
+     {
+        Evas_Object *edje = elm_smart_scroller_edje_object_get(wd->scroller);
+        if (!edje) return NULL;
+        ret = wd->end;
+        edje_object_part_unswallow(edje, wd->end);
+        edje_object_signal_emit(edje, "elm,action,hide,end", "elm");
+        wd->end = NULL;
+        _sizing_eval(obj);
+     }
+   return ret;
+}
+
+/**
+ * Sets the visibility of the end widget of the scrolled entry, set by
+ * @elm_entry_end_set().
+ *
+ * @param obj The scrolled entry object
+ * @param setting EINA_TRUE if the object should be displayed,
+ * EINA_FALSE if not.
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_end_visible_set(Evas_Object *obj, Eina_Bool setting)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if ((!wd) || (!wd->end)) return;
+   if (setting)
+      evas_object_hide(wd->end);
+   else
+      evas_object_show(wd->end);
+   _sizing_eval(obj);
+}
+
+/**
+ * This sets the scrolled entry's scrollbar policy (ie. enabling/disabling them).
+ *
+ * @param obj The scrolled entry object
+ * @param h The horizontal scrollbar policy to apply
+ * @param v The vertical scrollbar policy to apply
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_scrollbar_policy_set(Evas_Object *obj, Elm_Scroller_Policy h, Elm_Scroller_Policy v)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   const Elm_Scroller_Policy map[3] =
+     {
+        ELM_SMART_SCROLLER_POLICY_AUTO,
+        ELM_SMART_SCROLLER_POLICY_ON,
+        ELM_SMART_SCROLLER_POLICY_OFF
+     };
+   if (!wd) return;
+   wd->policy_h = h;
+   wd->policy_v = v;
+   elm_smart_scroller_policy_set(wd->scroller,
+                                 map[wd->policy_h],
+                                 map[wd->policy_v]);
+}
+
+/**
+ * This enables/disables bouncing within the entry.
+ *
+ * @param obj The scrolled entry object
+ * @param h The horizontal bounce state
+ * @param v The vertical bounce state
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_smart_scroller_bounce_allow_set(wd->scroller, h_bounce, v_bounce);
+}
+
+/**
+ * Get the bounce mode
+ *
+ * @param obj The Entry object
+ * @param h_bounce Allow bounce horizontally
+ * @param v_bounce Allow bounce vertically
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   elm_smart_scroller_bounce_allow_get(wd->scroller, h_bounce, v_bounce);
 }
 
 /**
@@ -4082,4 +4860,10 @@ elm_entry_magnifier_type_set(Evas_Object *obj, int type)
 
    wd->mgf_type = type;
    _magnifier_create(obj);
+}
+
+EINA_DEPRECATED EAPI void
+elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
+{
+   if (wrap) elm_entry_line_wrap_set(obj, ELM_WRAP_CHAR);
 }

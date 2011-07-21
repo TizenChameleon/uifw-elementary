@@ -15,7 +15,6 @@
  *
  * "clicked" - the user clicked the hoversel button and popped up the sel
  * "selected" - an item in the hoversel list is selected. event_info is the item
- * "selected" - Elm_Hoversel_Item
  * "dismissed" - the hover is dismissed
  */
 typedef struct _Widget_Data Widget_Data;
@@ -48,6 +47,17 @@ static void _disable_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _parent_del(void *data, Evas *e, Evas_Object *obj, void *event_info);
+
+static const char SIG_CLICKED[] = "clicked";
+static const char SIG_SELECTED[] = "selected";
+static const char SIG_DISMISSED[] = "dismissed";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_CLICKED, ""},
+   {SIG_SELECTED, ""},
+   {SIG_DISMISSED, ""},
+   {NULL, NULL}
+};
 
 static void
 _del_pre_hook(Evas_Object *obj)
@@ -151,7 +161,7 @@ _item_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED
 
    elm_hoversel_hover_end(obj2);
    if (item->func) item->func((void *)item->base.data, obj2, item);
-   evas_object_smart_callback_call(obj2, "selected", item);
+   evas_object_smart_callback_call(obj2, SIG_SELECTED, item);
 }
 
 static void
@@ -185,7 +195,7 @@ _activate(Evas_Object *obj)
 
    bx = elm_box_add(wd->hover);
    elm_widget_mirrored_automatic_set(bx, EINA_FALSE);
-   elm_box_homogenous_set(bx, 1);
+   elm_box_homogeneous_set(bx, 1);
 
    elm_box_horizontal_set(bx, wd->horizontal);
 
@@ -201,7 +211,7 @@ _activate(Evas_Object *obj)
         elm_widget_mirrored_automatic_set(bt, EINA_FALSE);
         elm_widget_mirrored_set(bt, elm_widget_mirrored_get(obj));
         elm_object_style_set(bt, buf);
-        elm_button_label_set(bt, item->label);
+        elm_object_text_set(bt, item->label);
         if (item->icon_file)
           {
              ic = elm_icon_add(obj);
@@ -233,7 +243,7 @@ _activate(Evas_Object *obj)
    evas_object_show(bx);
 
    evas_object_show(wd->hover);
-   evas_object_smart_callback_call(obj, "clicked", NULL);
+   evas_object_smart_callback_call(obj, SIG_CLICKED, NULL);
 
    //   if (wd->horizontal) evas_object_hide(wd->btn);
 }
@@ -256,6 +266,26 @@ _parent_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *e
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    wd->hover_parent = NULL;
+}
+
+static void
+_elm_hoversel_label_set(Evas_Object *obj, const char *item, const char *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return;
+   if (!wd) return;
+   elm_object_text_set(wd->btn, label);
+}
+
+static const char *
+_elm_hoversel_label_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return NULL;
+   if ((!wd) || (!wd->btn)) return NULL;
+   return elm_object_text_get(wd->btn);
 }
 
 /**
@@ -286,6 +316,8 @@ elm_hoversel_add(Evas_Object *parent)
    elm_widget_activate_hook_set(obj, _activate_hook);
    elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
    elm_widget_can_focus_set(obj, EINA_TRUE);
+   elm_widget_text_set_hook_set(obj, _elm_hoversel_label_set);
+   elm_widget_text_get_hook_set(obj, _elm_hoversel_label_get);
 
    wd->btn = elm_button_add(parent);
    elm_widget_mirrored_automatic_set(wd->btn, EINA_FALSE);
@@ -294,10 +326,13 @@ elm_hoversel_add(Evas_Object *parent)
    evas_object_event_callback_add(wd->btn, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                   _changed_size_hints, obj);
    evas_object_smart_callback_add(wd->btn, "clicked", _button_clicked, obj);
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
+
    elm_widget_sub_object_add(obj, wd->btn);
 
    elm_hoversel_hover_parent_set(obj, parent);
    _theme_hook(obj);
+
    return obj;
 }
 
@@ -351,7 +386,7 @@ elm_hoversel_hover_parent_get(const Evas_Object *obj)
  * Set the hoversel button label
  *
  * This sets the label of the button that is always visible (before it is
- * clicked and expanded). Also see elm_button_label_set().
+ * clicked and expanded). Also see elm_object_text_set().
  *
  * @param obj The hoversel object
  * @param label The label text.
@@ -361,10 +396,7 @@ elm_hoversel_hover_parent_get(const Evas_Object *obj)
 EAPI void
 elm_hoversel_label_set(Evas_Object *obj, const char *label)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_button_label_set(wd->btn, label);
+   _elm_hoversel_label_set(obj, NULL, label);
 }
 
 /**
@@ -378,10 +410,7 @@ elm_hoversel_label_set(Evas_Object *obj, const char *label)
 EAPI const char *
 elm_hoversel_label_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if ((!wd) || (!wd->btn)) return NULL;
-   return elm_button_label_get(wd->btn);
+   return _elm_hoversel_label_get(obj, NULL);
 }
 
 /**
@@ -518,7 +547,7 @@ elm_hoversel_hover_end(Evas_Object *obj)
    wd->expanded = EINA_FALSE;
    evas_object_del(wd->hover);
    wd->hover = NULL;
-   evas_object_smart_callback_call(obj, "dismissed", NULL);
+   evas_object_smart_callback_call(obj, SIG_DISMISSED, NULL);
 }
 
 /**

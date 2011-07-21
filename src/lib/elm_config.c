@@ -74,7 +74,7 @@ static size_t _elm_user_dir_snprintf(char       *dst,
 #ifdef HAVE_ELEMENTARY_X
 static Ecore_Event_Handler *_prop_change_handler = NULL;
 static Ecore_X_Window _root_1st = 0;
-#define ATOM_COUNT 25
+#define ATOM_COUNT 22
 static Ecore_X_Atom _atom[ATOM_COUNT];
 static Ecore_X_Atom _atom_config = 0;
 static const char *_atom_names[ATOM_COUNT] =
@@ -126,10 +126,10 @@ static const char *_atom_names[ATOM_COUNT] =
 #define ATOM_E_THUMBSCROLL_PAGE_SCROLL_FRICTION     18
 #define ATOM_E_THUMBSCROLL_BRING_IN_SCROLL_FRICTION 19
 #define ATOM_E_THUMBSCROLL_ZOOM_FRICTION            20
-#define ATOM_E_INPUT_PANEL 21
-#define ATOM_E_AUTOCAPITAL_ALLOW 22
-#define ATOM_E_AUTOPERIOD_ALLOW 23
-#define ATOM_E_CONFIG                               24
+#define ATOM_E_CONFIG                               21
+#define ATOM_E_INPUT_PANEL                          22
+#define ATOM_E_AUTOCAPITAL_ALLOW                    23
+#define ATOM_E_AUTOPERIOD_ALLOW                     24
 
 static Eina_Bool _prop_config_get(void);
 static Eina_Bool _prop_change(void *data  __UNUSED__,
@@ -443,9 +443,8 @@ _prop_change(void *data  __UNUSED__,
                                                 event->atom,
                                                 &val, 1) > 0)
                {
-                  if (val > 0)
-                    _elm_config->thumbscroll_momentum_threshold =
-                      (double)val / 1000.0;
+                  _elm_config->thumbscroll_momentum_threshold =
+                     (double)val / 1000.0;
                }
           }
         else if (event->atom == _atom[ATOM_E_THUMBSCROLL_FRICTION])
@@ -456,8 +455,7 @@ _prop_change(void *data  __UNUSED__,
                                                 event->atom,
                                                 &val, 1) > 0)
                {
-                  if (val > 0)
-                    _elm_config->thumbscroll_friction = (double)val / 1000.0;
+                  _elm_config->thumbscroll_friction = (double)val / 1000.0;
                }
           }
         else if (event->atom == _atom[ATOM_E_THUMBSCROLL_BORDER_FRICTION])
@@ -468,9 +466,8 @@ _prop_change(void *data  __UNUSED__,
                                                 event->atom,
                                                 &val, 1) > 0)
                {
-                  if (val > 0)
-                    _elm_config->thumbscroll_border_friction =
-                      (double)val / 1000.0;
+                  _elm_config->thumbscroll_border_friction =
+                     (double)val / 1000.0;
                }
           }
         else if (event->atom == _atom[ATOM_E_THUMBSCROLL_PAGE_SCROLL_FRICTION])
@@ -481,9 +478,8 @@ _prop_change(void *data  __UNUSED__,
                                                 event->atom,
                                                 &val, 1) > 0)
                {
-                  if (val > 0)
-                    _elm_config->page_scroll_friction =
-                      (double)val / 1000.0;
+                  _elm_config->page_scroll_friction =
+                     (double)val / 1000.0;
                }
           }
         else if (event->atom ==
@@ -495,9 +491,8 @@ _prop_change(void *data  __UNUSED__,
                                                 event->atom,
                                                 &val, 1) > 0)
                {
-                  if (val > 0)
-                    _elm_config->bring_in_scroll_friction =
-                      (double)val / 1000.0;
+                  _elm_config->bring_in_scroll_friction =
+                     (double)val / 1000.0;
                }
           }
         else if (event->atom ==
@@ -509,7 +504,6 @@ _prop_change(void *data  __UNUSED__,
                                                 event->atom,
                                                 &val, 1) > 0)
                {
-                  if (val > 0)
                     _elm_config->zoom_friction = (double)val / 1000.0;
                }
           }
@@ -525,7 +519,7 @@ _prop_change(void *data  __UNUSED__,
 
                    input_panel_enable = _elm_config->input_panel_enable;
                    _elm_config->input_panel_enable = val;
-                   if (input_panel_enable != _elm_config->input_panel_enable) 
+                   if (input_panel_enable != _elm_config->input_panel_enable)
                      {
                         edje_input_panel_enabled_set(_elm_config->input_panel_enable);
                      }
@@ -543,12 +537,12 @@ _prop_change(void *data  __UNUSED__,
 
                    autocapital_allow = _elm_config->autocapital_allow;
                    _elm_config->autocapital_allow = val;
-                   if (autocapital_allow != _elm_config->autocapital_allow) 
+                   if (autocapital_allow != _elm_config->autocapital_allow)
                      {
                         edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
                      }
                }
-          }		
+          }
         else if (event->atom == _atom[ATOM_E_AUTOPERIOD_ALLOW])
           {
              unsigned int val = 0;
@@ -561,7 +555,7 @@ _prop_change(void *data  __UNUSED__,
 
                   autoperiod_allow = _elm_config->autoperiod_allow;
                   _elm_config->autoperiod_allow = val;
-                  if (autoperiod_allow != _elm_config->autoperiod_allow) 
+                  if (autoperiod_allow != _elm_config->autoperiod_allow)
                     {
                        edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
                     }
@@ -635,6 +629,10 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, zoom_friction, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, thumbscroll_bounce_enable, T_UCHAR);
    ELM_CONFIG_VAL(D, T, scroll_smooth_time_interval, T_DOUBLE);
+   ELM_CONFIG_VAL(D, T, scroll_smooth_amount, T_DOUBLE);
+   ELM_CONFIG_VAL(D, T, scroll_smooth_history_weight, T_DOUBLE);
+   ELM_CONFIG_VAL(D, T, scroll_smooth_future_time, T_DOUBLE);
+   ELM_CONFIG_VAL(D, T, scroll_smooth_time_window, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, scale, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, bgpixmap, T_INT);
    ELM_CONFIG_VAL(D, T, compositing, T_INT);
@@ -1073,6 +1071,9 @@ _config_sub_apply(void)
    edje_input_panel_enabled_set(_elm_config->input_panel_enable);
    edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
    edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
+   edje_password_show_last_set(_elm_config->password_show_last);
+   edje_password_show_last_timeout_set(_elm_config->password_show_last_timeout);
+   if (_elm_config->modules) _elm_module_parse(_elm_config->modules);
 }
 
 static Eina_Bool
@@ -1194,6 +1195,10 @@ _config_load(void)
    _elm_config->zoom_friction = 0.5;
    _elm_config->thumbscroll_border_friction = 0.5;
    _elm_config->scroll_smooth_time_interval = 0.008;
+   _elm_config->scroll_smooth_amount = 1.0;
+   _elm_config->scroll_smooth_history_weight = 0.3;
+   _elm_config->scroll_smooth_future_time = 0.0;
+   _elm_config->scroll_smooth_time_window = 0.2;
    _elm_config->scale = 1.0;
    _elm_config->bgpixmap = 0;
    _elm_config->compositing = 1;
@@ -1464,7 +1469,7 @@ _env_get(void)
                  (!strcasecmp(s, "opengl_x11")))
           eina_stringshare_replace(&_elm_config->engine, ELM_OPENGL_X11);
         else if ((!strcasecmp(s, "x11-8")) ||
-                 (!strcasecmp(s, "x18")) ||
+                 (!strcasecmp(s, "x8")) ||
                  (!strcasecmp(s, "software-8-x11")) ||
                  (!strcasecmp(s, "software_8_x11")))
           eina_stringshare_replace(&_elm_config->engine, ELM_SOFTWARE_8_X11);
@@ -1473,11 +1478,13 @@ _env_get(void)
                  (!strcasecmp(s, "software-16-x11")) ||
                  (!strcasecmp(s, "software_16_x11")))
           eina_stringshare_replace(&_elm_config->engine, ELM_SOFTWARE_16_X11);
+/*
         else if ((!strcasecmp(s, "xrender")) ||
                  (!strcasecmp(s, "xr")) ||
                  (!strcasecmp(s, "xrender-x11")) ||
                  (!strcasecmp(s, "xrender_x11")))
           eina_stringshare_replace(&_elm_config->engine, ELM_XRENDER_X11);
+ */
         else if ((!strcasecmp(s, "fb")) ||
                  (!strcasecmp(s, "software-fb")) ||
                  (!strcasecmp(s, "software_fb")))
@@ -1509,7 +1516,7 @@ _env_get(void)
         else if ((!strncmp(s, "shot:", 5)))
           eina_stringshare_replace(&_elm_config->engine, s);
      }
-   
+
    s = getenv("ELM_VSYNC");
    if (s) _elm_config->vsync = !!atoi(s);
 
@@ -1546,7 +1553,14 @@ _env_get(void)
      }
    s = getenv("ELM_SCROLL_SMOOTH_TIME_INTERVAL");
    if (s) _elm_config->scroll_smooth_time_interval = atof(s);
-
+   s = getenv("ELM_SCROLL_SMOOTH_AMOUNT");
+   if (s) _elm_config->scroll_smooth_amount = atof(s);
+   s = getenv("ELM_SCROLL_SMOOTH_HISTORY_WEIGHT");
+   if (s) _elm_config->scroll_smooth_history_weight = atof(s);
+   s = getenv("ELM_SCROLL_SMOOTH_FUTURE_TIME");
+   if (s) _elm_config->scroll_smooth_future_time = atof(s);
+   s = getenv("ELM_SCROLL_SMOOTH_TIME_WINDOW");
+   if (s) _elm_config->scroll_smooth_time_window = atof(s);
    s = getenv("ELM_THEME");
    if (s) eina_stringshare_replace(&_elm_config->theme, s);
 
@@ -1632,9 +1646,6 @@ _env_get(void)
 
    /* Get RTL orientation from system */
    setlocale(LC_ALL, "");
-   //Tom: SVN 58494 - textdomain should only be used for applications not libs.
-   //bindtextdomain("elementary", LOCALE_DIR);
-   //textdomain("elementary");
    bindtextdomain(PACKAGE, LOCALE_DIR);
    _elm_config->is_mirrored = !strcmp(E_("default:LTR"), "default:RTL");
 
@@ -1713,6 +1724,7 @@ _elm_config_init(void)
    _desc_init();
    _profile_fetch_from_conf();
    _config_load();
+// NOTE: Do not merge upstream code. Just leave it.
 //   _env_get();
 //   _config_apply();
 //   _elm_config_font_overlay_apply();
@@ -1722,6 +1734,7 @@ _elm_config_init(void)
 void
 _elm_config_sub_init(void)
 {
+   // NOTE: Do not merge upstream code. Just leave it.
    _env_get();
    _config_apply();
    _elm_config_font_overlay_apply();

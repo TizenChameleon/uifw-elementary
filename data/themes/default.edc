@@ -319,6 +319,7 @@ collections {
       alias: "elm/carousel/base/default";
       alias: "elm/gengrid/base/default";
       alias: "elm/scroller/base/map_bubble";
+      alias: "elm/genscroller/base/default";
 
       data {
          item: "focus_highlight" "on";
@@ -1397,7 +1398,7 @@ collections {
       data.item: "max_font_size" "60";
       styles {
          style { name: "textblock_style";
-            base: "font=Sans font_size=10 color=#000 wrap=word text_class=label";
+            base: "font=Sans font_size=10 color=#000 text_class=label";
             tag:  "br" "\n";
             tag:  "ps" "ps";
             tag:  "hilight" "+ font=Sans:style=Bold";
@@ -1427,62 +1428,6 @@ collections {
             description { state: "default" 0.0;
                rel1.relative: 0.0 0.0;
                rel2.relative: 1.0 1.0;
-               text {
-                  style: "textblock_style";
-                  min: 1 1;
-               }
-            }
-         }
-      }
-   }
-
-   group { name: "elm/label/base_wrap/default";
-      data.item: "default_font_size" "10";
-      data.item: "min_font_size" "6";
-      data.item: "max_font_size" "60";
-      parts {
-         part { name: "label.swallow.background";
-            type: SWALLOW;
-            description { state: "default" 0.0;
-               visible: 1;
-               rel1 { relative: 0 0; to: "elm.text"; }
-               rel2 { relative: 1 1; to: "elm.text"; }
-            }
-         }
-         part { name: "elm.text";
-            type: TEXTBLOCK;
-            mouse_events: 0;
-            scale: 1;
-            description { state: "default" 0.0;
-               text {
-                  style: "textblock_style";
-                  min: 0 1;
-               }
-            }
-         }
-      }
-   }
-
-   group { name: "elm/label/base_wrap_ellipsis/default";
-      data.item: "default_font_size" "10";
-      data.item: "min_font_size" "6";
-      data.item: "max_font_size" "60";
-      parts {
-         part { name: "label.swallow.background";
-            type: SWALLOW;
-            description { state: "default" 0.0;
-               visible: 1;
-               rel1 { relative: 0 0; to: "elm.text"; }
-               rel2 { relative: 1 1; to: "elm.text"; }
-            }
-         }
-         part { name: "elm.text";
-            type: TEXTBLOCK;
-            mouse_events: 0;
-            scale: 1;
-            multiline: 1;
-            description { state: "default" 0.0;
-               fixed: 0 1;
                text {
                   style: "textblock_style";
                   min: 0 1;
@@ -1529,33 +1474,6 @@ collections {
       }
    }
 
-   group { name: "elm/label/base_wrap/marker";
-      data.item: "default_font_size" "10";
-      data.item: "min_font_size" "6";
-      data.item: "max_font_size" "60";
-      parts {
-         part { name: "label.swallow.background";
-            type: SWALLOW;
-            description { state: "default" 0.0;
-               visible: 1;
-               rel1 { relative: 0 0; to: "elm.text"; }
-               rel2 { relative: 1 1; to: "elm.text"; }
-            }
-         }
-         part { name: "elm.text";
-            type: TEXTBLOCK;
-            mouse_events: 0;
-            scale: 1;
-            description { state: "default" 0.0;
-               text {
-                  style: "textblock_style2";
-                  min: 0 1;
-               }
-            }
-         }
-      }
-   }
-
    group { name: "elm/label/base/slide_long";
       data.item: "default_font_size" "10";
       data.item: "min_font_size" "6";
@@ -1567,7 +1485,7 @@ collections {
         public message(Msg_Type:type, id, ...) {
            if ((type == MSG_FLOAT_SET) && (id == 0)) {
               new Float:duration;
-              duration = getarg(2);
+              duration = getfarg(2);
               set_float(g_duration, duration);
            }
         }
@@ -1693,7 +1611,7 @@ collections {
          public message(Msg_Type:type, id, ...) {
             if ((type == MSG_FLOAT_SET) && (id == 0)) {
                new Float:duration;
-               duration = getarg(2);
+               duration = getfarg(2);
                set_float(g_duration, duration);
             }
          }
@@ -1818,7 +1736,7 @@ collections {
          public message(Msg_Type:type, id, ...) {
             if ((type == MSG_FLOAT_SET) && (id == 0)) {
                new Float:duration;
-               duration = getarg(2);
+               duration = getfarg(2);
                set_float(g_duration, duration);
             }
          }
@@ -3373,7 +3291,6 @@ collections {
                else {
                   emit("elm,action,toggle,off", "");
                }
-       
             }
          }
          program { name: "toggle_on";
@@ -8482,12 +8399,90 @@ collections {
                text {
                   style: "entry_textblock_style";
                   min: 0 1;
+                  align: 0.0 0.0;
                }
             }
             description { state: "disabled" 0.0;
                inherit: "default" 0.0;
                text {
                   style: "entry_textblock_disabled_style";
+                  min: 0 1;
+               }
+            }
+         }
+      }
+      programs {
+         program { name: "focus";
+            signal: "load";
+            source: "";
+            action: FOCUS_SET;
+            target: "elm.text";
+         }
+         program { name: "disable";
+            signal: "elm,state,disabled";
+            source: "elm";
+            action: STATE_SET "disabled" 0.0;
+            target: "elm.text";
+         }
+         program { name: "enable";
+            signal: "elm,state,enabled";
+            source: "elm";
+            action: STATE_SET "default" 0.0;
+            target: "elm.text";
+         }
+      }
+   }
+
+   group { name: "elm/entry/base-mixedwrap/default";
+      styles
+      {
+         style { name: "entry_textblock_style_mixedwrap";
+            base: "font=Sans font_size=10 color=#000 wrap=mixed text_class=entry";
+            tag:  "br" "\n";
+            tag:  "ps" "ps";
+            tag:  "tab" "\t";
+            tag:  "em" "+ font=Sans:style=Oblique";
+            tag:  "b" "+ font=Sans:style=Bold";
+            tag:  "link" "+ color=#800 underline=on underline_color=#8008";
+            tag:  "hilight" "+ font=Sans:style=Bold";
+         }
+         style { name: "entry_textblock_disabled_style_mixedwrap";
+            base: "font=Sans font_size=10 color=#00000080 wrap=char text_class=entry";
+            tag:  "br" "\n";
+            tag:  "ps" "ps";
+            tag:  "tab" "\t";
+            tag:  "em" "+ font=Sans:style=Oblique";
+            tag:  "b" "+ font=Sans:style=Bold";
+            tag:  "link" "+ color=#00000080 underline=on underline_color=#00000080";
+            tag:  "hilight" "+ font=Sans:style=Bold";
+         }
+      }
+      parts {
+         part { name: "elm.text";
+            type: TEXTBLOCK;
+            mouse_events: 1;
+            scale: 1;
+            entry_mode: EDITABLE;
+            select_mode: EXPLICIT;
+            multiline: 1;
+            source: "elm/entry/selection/default"; // selection under
+//          source2: "X"; // selection over
+//          source3: "X"; // cursor under
+            source4: "elm/entry/cursor/default"; // cursorover
+            source5: "elm/entry/anchor/default"; // anchor under
+//          source6: "X"; // anchor over
+            description { state: "default" 0.0;
+               fixed: 1 0;
+               text {
+                  style: "entry_textblock_style_mixedwrap";
+                  min: 0 1;
+                  align: 0.0 0.0;
+               }
+            }
+            description { state: "disabled" 0.0;
+               inherit: "default" 0.0;
+               text {
+                  style: "entry_textblock_disabled_style_mixedwrap";
                   min: 0 1;
                }
             }
@@ -8558,6 +8553,7 @@ collections {
                text {
                   style: "entry_textblock_style_charwrap";
                   min: 0 1;
+                  align: 0.0 0.0;
                }
             }
             description { state: "disabled" 0.0;
@@ -8607,6 +8603,7 @@ collections {
                text {
                   style: "entry_textblock_style";
                   min: 1 1;
+                  align: 0.0 0.0;
                }
             }
             description { state: "disabled" 0.0;
@@ -8709,7 +8706,8 @@ collections {
                text {
                   style: "entry_single_textblock_style";
                   min: 1 1;
-                  max: 0 1;
+                  max: 0 0;
+                  align: 0.0 0.5;
                }
             }
             description { state: "disabled" 0.0;
@@ -8757,7 +8755,8 @@ collections {
                text {
                   style: "entry_single_textblock_style";
                   min: 1 1;
-                  max: 0 1;
+                  max: 0 0;
+                  align: 0.0 0.5;
                }
             }
             description { state: "disabled" 0.0;
@@ -8806,12 +8805,62 @@ collections {
                text {
                   style: "entry_textblock_style";
                   min: 0 1;
+                  align: 0.0 0.0;
                }
             }
             description { state: "disabled" 0.0;
                inherit: "default" 0.0;
                text {
                   style: "entry_textblock_disabled_style";
+               }
+            }
+         }
+      }
+      programs {
+         program { name: "focus";
+            signal: "load";
+            source: "";
+            action: FOCUS_SET;
+            target: "elm.text";
+         }
+         program { name: "disable";
+            signal: "elm,state,disabled";
+            source: "elm";
+            action: STATE_SET "disabled" 0.0;
+            target: "elm.text";
+         }
+         program { name: "enable";
+            signal: "elm,state,enabled";
+            source: "elm";
+            action: STATE_SET "default" 0.0;
+            target: "elm.text";
+         }
+      }
+   }
+
+   group { name: "elm/entry/base-noedit-mixedwrap/default";
+      parts {
+         part { name: "elm.text";
+            type: TEXTBLOCK;
+            mouse_events: 1;
+            scale: 1;
+            entry_mode: PLAIN;
+            select_mode: EXPLICIT;
+            multiline: 1;
+            source: "elm/entry/selection/default"; // selection under
+            source5: "elm/entry/anchor/default"; // anchor under
+            description { state: "default" 0.0;
+               fixed: 1 0;
+               text {
+                  style: "entry_textblock_style_mixedwrap";
+                  min: 0 1;
+                  align: 0.0 0.0;
+               }
+            }
+            description { state: "disabled" 0.0;
+               inherit: "default" 0.0;
+               text {
+                  style: "entry_textblock_disabled_style_mixedwrap";
                }
             }
          }
@@ -8854,6 +8903,7 @@ collections {
                text {
                   style: "entry_textblock_style_charwrap";
                   min: 0 1;
+                  align: 0.0 0.0;
                }
             }
             description { state: "disabled" 0.0;
@@ -8901,62 +8951,13 @@ collections {
                text {
                   style: "entry_textblock_style";
                   min: 1 1;
+                  align: 0.0 0.0;
                }
             }
             description { state: "disabled" 0.0;
                inherit: "default" 0.0;
                text {
                   style: "entry_textblock_disabled_style";
-               }
-            }
-         }
-      }
-      programs {
-         program { name: "focus";
-            signal: "load";
-            source: "";
-            action: FOCUS_SET;
-            target: "elm.text";
-         }
-         program { name: "disable";
-            signal: "elm,state,disabled";
-            source: "elm";
-            action: STATE_SET "disabled" 0.0;
-            target: "elm.text";
-         }
-         program { name: "enable";
-            signal: "elm,state,enabled";
-            source: "elm";
-            action: STATE_SET "default" 0.0;
-            target: "elm.text";
-         }
-      }
-   }
-
-   group { name: "elm/entry/base-password/default";
-      parts {
-         part { name: "elm.text";
-            type: TEXTBLOCK;
-            mouse_events: 1;
-            scale: 1;
-            entry_mode: PASSWORD;
-            select_mode: EXPLICIT;
-            multiline: 0;
-            source: "elm/entry/selection/default"; // selection under
-            source4: "elm/entry/cursor/default"; // cursorover
-            source5: "elm/entry/anchor/default"; // anchor under
-            description { state: "default" 0.0;
-               text {
-                  style: "entry_single_textblock_style";
-                  repch: "*";
-                  min: 1 1;
-                  max: 0 1;
-               }
-            }
-            description { state: "disabled" 0.0;
-               inherit: "default" 0.0;
-               text {
-                  style: "entry_single_textblock_disabled_style";
                }
             }
          }
@@ -10012,7 +10013,7 @@ collections {
                     image.normal: "shadow.png";
                 }
             }
-  
+
 
                  part { name: "elm.swallow.content";
                     type: SWALLOW;
@@ -10022,7 +10023,7 @@ collections {
                             fixed: 1 1;
                     }
                  }
-     
+
                  part {
                 name: "border";
                 type: IMAGE;
@@ -10228,121 +10229,63 @@ collections {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-   group { name: "elm/icon/home/default"; alias: "elm/icon/toolbar/home/default"; min: 32 32;
-      images.image: "icon_home.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_home.png"; } } } }
-   group { name: "elm/icon/close/default"; alias: "elm/icon/toolbar/close/default"; min: 32 32;
-      images.image: "icon_close.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_close.png"; } } } }
-   group { name: "elm/icon/apps/default"; alias: "elm/icon/toolbar/apps/default"; min: 32 32;
-      images.image: "icon_apps.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_apps.png"; } } } }
-   group { name: "elm/icon/arrow_up/default"; alias: "elm/icon/toolbar/arrow_up/default"; min: 32 32;
-      images.image: "icon_arrow_up.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_arrow_up.png"; } } } }
+#define GROUP_ALIAS_ICON(Name, Alias, File, Min, Max)                   \
+   group { name: "elm/icon/"##Name##"/default"; min: Min Min; max: Max Max; \
+      alias: "elm/icon/"##Alias##"/default";                            \
+      images.image: File COMP; parts { part { name: "base";             \
+            description { aspect: 1.0 1.0; aspect_preference: BOTH;     \
+               image.normal: File; } } } }
+
+#define GROUP_ICON(Name, File, Min, Max)                      \
+   group { name: "elm/icon/"##Name##"/default"; min: Min Min; max: Max Max; \
+      images.image: File COMP; parts { part { name: "base";             \
+            description { aspect: 1.0 1.0; aspect_preference: BOTH;     \
+               image.normal: File; } } } }
+
    group { name: "elm/icon/arrow_down/default";
            alias: "elm/icon/toolbar/arrow_down/default";
            alias: "elm/icon/toolbar/more_menu/default"; min: 32 32;
       images.image: "icon_arrow_down.png" COMP; parts { part { name: "base";
          description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
             image.normal: "icon_arrow_down.png"; } } } }
-   group { name: "elm/icon/arrow_left/default"; alias: "elm/icon/toolbar/arrow_left/default"; min: 32 32;
-      images.image: "icon_arrow_left.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_arrow_left.png"; } } } }
-   group { name: "elm/icon/arrow_right/default"; alias: "elm/icon/toolbar/arrow_right/default"; min: 32 32;
-      images.image: "icon_arrow_right.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_arrow_right.png"; } } } }
-   group { name: "elm/icon/chat/default"; alias: "elm/icon/toolbar/chat/default"; min: 32 32;
-      images.image: "icon_chat.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_chat.png"; } } } }
-   group { name: "elm/icon/clock/default"; alias: "elm/icon/toolbar/clock/default"; min: 32 32;
-      images.image: "icon_clock.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_clock.png"; } } } }
-   group { name: "elm/icon/delete/default"; alias: "elm/icon/toolbar/delete/default"; min: 32 32;
-      images.image: "icon_delete.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_delete.png"; } } } }
-   group { name: "elm/icon/edit/default"; alias: "elm/icon/toolbar/edit/default"; min: 32 32;
-      images.image: "icon_edit.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_edit.png"; } } } }
-   group { name: "elm/icon/refresh/default"; alias: "elm/icon/toolbar/refresh/default"; min: 32 32;
-      images.image: "icon_refresh.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_refresh.png"; } } } }
-   group { name: "elm/icon/folder/default"; alias: "elm/icon/toolbar/folder/default"; min: 32 32;
-      images.image: "icon_folder.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_folder.png"; } } } }
-   group { name: "elm/icon/file/default"; alias: "elm/icon/toolbar/file/default"; min: 32 32;
-      images.image: "icon_file.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_file.png"; } } } }
+
+   GROUP_ALIAS_ICON("home", "toolbar/home", "icon_home.png", 32, 0);
+   GROUP_ALIAS_ICON("close", "toolbar/close", "icon_close.png", 32, 0);
+   GROUP_ALIAS_ICON("apps", "toolbar/apps", "icon_apps.png", 32, 0);
+   GROUP_ALIAS_ICON("arrow_up", "toolbar/arrow_up", "icon_arrow_up.png", 32, 0);
+   GROUP_ALIAS_ICON("arrow_left", "toolbar/arrow_left", "icon_arrow_left.png", 32, 0);
+   GROUP_ALIAS_ICON("arrow_right", "toolbar/arrow_right", "icon_arrow_right.png", 32, 0);
+   GROUP_ALIAS_ICON("chat", "toolbar/chat", "icon_chat.png", 32, 0);
+   GROUP_ALIAS_ICON("clock", "toolbar/clock", "icon_clock.png", 32, 0);
+   GROUP_ALIAS_ICON("delete", "toolbar/delete", "icon_delete.png", 32, 0);
+   GROUP_ALIAS_ICON("edit", "toolbar/edit", "icon_edit.png", 32, 0);
+   GROUP_ALIAS_ICON("refresh", "toolbar/refresh", "icon_refresh.png", 32, 0);
+   GROUP_ALIAS_ICON("folder", "toolbar/folder", "icon_folder.png", 32, 0);
+   GROUP_ALIAS_ICON("file", "toolbar/file", "icon_file.png", 32, 0);
 ///////////////////////////////////////////////////////////////////////////////
-   group { name: "elm/icon/menu/home/default"; min: 24 24; max: 24 24;
-      images.image: "icon_home.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_home.png"; } } } }
-   group { name: "elm/icon/menu/close/default"; min: 24 24; max: 24 24;
-      images.image: "icon_close.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_close.png"; } } } }
-   group { name: "elm/icon/menu/apps/default"; min: 24 24; max: 24 24;
-      images.image: "icon_apps.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_apps.png"; } } } }
-   group { name: "elm/icon/menu/arrow_up/default"; min: 24 24; max: 24 24;
-      images.image: "icon_arrow_up.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_arrow_up.png"; } } } }
-   group { name: "elm/icon/menu/arrow_down/default"; min: 24 24; max: 24 24;
-      images.image: "icon_arrow_down.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_arrow_down.png"; } } } }
-   group { name: "elm/icon/menu/arrow_left/default"; min: 24 24; max: 24 24;
-      images.image: "icon_arrow_left.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_arrow_left.png"; } } } }
-   group { name: "elm/icon/menu/arrow_right/default"; min: 24 24; max: 24 24;
-      images.image: "icon_arrow_right.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_arrow_right.png"; } } } }
-   group { name: "elm/icon/menu/chat/default"; min: 24 24; max: 24 24;
-      images.image: "icon_chat.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_chat.png"; } } } }
-   group { name: "elm/icon/menu/clock/default"; min: 24 24; max: 24 24;
-      images.image: "icon_clock.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_clock.png"; } } } }
-   group { name: "elm/icon/menu/delete/default"; min: 24 24; max: 24 24;
-      images.image: "icon_delete.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_delete.png"; } } } }
-   group { name: "elm/icon/menu/edit/default"; min: 24 24; max: 24 24;
-      images.image: "icon_edit.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_edit.png"; } } } }
-   group { name: "elm/icon/menu/refresh/default"; min: 24 24; max: 24 24;
-      images.image: "icon_refresh.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_refresh.png"; } } } }
-   group { name: "elm/icon/menu/folder/default"; min: 24 24; max: 24 24;
-      images.image: "icon_folder.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_folder.png"; } } } }
-   group { name: "elm/icon/menu/file/default"; min: 24 24; max: 24 24;
-      images.image: "icon_file.png" COMP; parts { part { name: "base";
-         description { state: "default" 0.0; aspect: 1.0 1.0; aspect_preference: BOTH;
-            image.normal: "icon_file.png"; } } } }
+   GROUP_ICON("menu/home", "icon_home.png", 24, 24);
+   GROUP_ICON("menu/close", "icon_close.png", 24, 24);
+   GROUP_ICON("menu/apps", "icon_apps.png", 24, 24);
+   GROUP_ICON("menu/arrow_up", "icon_arrow_up.png", 24, 24);
+   GROUP_ICON("menu/arrow_down", "icon_arrow_down.png", 24, 24);
+   GROUP_ICON("menu/arrow_left", "icon_arrow_left.png", 24, 24);
+   GROUP_ICON("menu/arrow_right", "icon_arrow_right.png", 24, 24);
+   GROUP_ICON("menu/chat", "icon_chat.png", 24, 24);
+   GROUP_ICON("menu/clock", "icon_clock.png", 24, 24);
+   GROUP_ICON("menu/delete", "icon_delete.png", 24, 24);
+   GROUP_ICON("menu/edit", "icon_edit.png", 24, 24);
+   GROUP_ICON("menu/refresh", "icon_refresh.png", 24, 24);
+   GROUP_ICON("menu/folder", "icon_folder.png", 24, 24);
+   GROUP_ICON("menu/file", "icon_file.png", 24, 24);
+
+   GROUP_ICON("media_player/forward", "mp_forward.png", 16, 0);
+   GROUP_ICON("media_player/info", "mp_info.png", 16, 0);
+   GROUP_ICON("media_player/next", "mp_next.png", 16, 0);
+   GROUP_ICON("media_player/pause", "mp_pause.png", 16, 0);
+   GROUP_ICON("media_player/play", "mp_play.png", 16, 0);
+   GROUP_ICON("media_player/prev", "mp_prev.png", 16, 0);
+   GROUP_ICON("media_player/rewind", "mp_rewind.png", 16, 0);
+   GROUP_ICON("media_player/stop", "mp_stop.png", 16, 0);
 
 ///////////////////////////////////////////////////////////////////////////////
    group { name: "elm/toolbar/base/default";
@@ -11813,6 +11756,7 @@ collections {
             }
          }
          part { name: "image_1_whole";
+            type: RECT;
             description {
                state: "default" 0.0;
                color: 255 255 255 255;
@@ -11879,6 +11823,7 @@ collections {
             }
          }
          part { name: "image_2_whole";
+            type: RECT;
             description {
                state: "default" 0.0;
                visible: 1;
@@ -14539,6 +14484,481 @@ collections {
       }
    }
 
+   group { name: "elm/slider/vertical/default";
+      images {
+         image: "slv_bg.png" COMP;
+         image: "slv_bg_over.png" COMP;
+
+         image: "slv_units.png" COMP;
+      }
+      parts {
+         part { name: "base";
+            mouse_events: 0;
+            description { state: "default" 0.0;
+               max: 6 99999;
+               min: 6 0;
+               rel1 { to: "bg";
+                  offset: 1 0;
+               }
+               rel2 { to: "bg";
+                  offset: -2 -1;
+               }
+               image.normal: "slv_bg.png";
+               fill.smooth: 0;
+            }
+         }
+         part { name: "level";
+            type: RECT;
+            mouse_events: 0;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               rel1.to: "base";
+               rel2 {
+                  to_x: "base";
+                  to_y: "elm.dragable.slider";
+                  relative: 1.0 0.5;
+               }
+               color: 255 0 0 200;
+            }
+            description { state: "inverted" 0.0;
+               inherit: "default" 0.0;
+               visible: 0;
+            }
+            description { state: "disabled" 0.0;
+               inherit: "default" 0.0;
+               color: 255 0 0 100;
+            }
+            description { state: "disabled_inverted" 0.0;
+               inherit: "default" 0.0;
+               visible: 0;
+            }
+         }
+         part { name: "level2";
+            type: RECT;
+            mouse_events: 0;
+            description { state: "default" 0.0;
+               fixed: 1 1;
+               visible: 0;
+               rel1 {
+                  to_x: "base";
+                  to_y: "elm.dragable.slider";
+                  relative: 0.0 0.5;
+               }
+               rel2.to: "base";
+               color: 255 0 0 200;
+            }
+            description { state: "inverted" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+            }
+            description { state: "disabled" 0.0;
+               inherit: "default" 0.0;
+               color: 255 0 0 100;
+            }
+            description { state: "disabled_inverted" 0.0;
+               inherit: "default" 0.0;
+               color: 255 0 0 100;
+               visible: 1;
+            }
+         }
+         part {
+            name: "base_over";
+            mouse_events: 0;
+            description { state: "default" 0.0;
+               rel1.to: "base";
+               rel1.offset: -1 -1;
+               rel2.to: "base";
+               rel2.offset: 0 0;
+               image {
+                  normal: "slv_bg_over.png";
+                  border: 3 3 3 3;
+               }
+               fill.smooth: 0;
+            }
+         }
+         part { name: "bg";
+            type: RECT;
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               visible: 0;
+               rel1.to: "elm.swallow.bar";
+               rel2.to: "elm.swallow.bar";
+               color: 0 0 0 0;
+            }
+         }
+         part { name: "elm.swallow.bar";
+            type: SWALLOW;
+            scale: 1;
+            description { state: "default" 0.0;
+               min: 24 48;
+               max: 24 9999;
+               align: 0.5 1.0;
+               rel1 {
+                  to_y: "elm.text";
+                  relative: 0.0 1.0;
+                  offset: 0 10;
+               }
+               rel2 {
+                  to_y: "elm.units";
+                  relative: 1.0 0.0;
+                  offset: -1 -8;
+               }
+            }
+         }
+         part { name: "elm.swallow.icon";
+            type: SWALLOW;
+            description { state: "default" 0.0;
+               visible: 0;
+               align: 0.5 0.0;
+               rel1 {
+                  offset: 0 4;
+                  to_x: "elm.swallow.bar";
+               }
+               rel2 {
+                  offset: -1 3;
+                  relative: 1.0 0.0;
+                  to_x: "elm.swallow.bar";
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               aspect: 1.0 1.0;
+               aspect_preference: HORIZONTAL;
+               rel2.offset: -1 4;
+            }
+         }
+         part { name: "elm.text";
+            type: TEXT;
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               visible: 0;
+               fixed: 0 1;
+               align: 0.5 0.0;
+               rel1.to_y: "elm.swallow.icon";
+               rel1.relative: 0.0 1.0;
+               rel1.offset: 0 -1;
+               rel2.to_y: "elm.swallow.icon";
+               rel2.relative: 1.0 1.0;
+               rel2.offset: -1 -1;
+               color: 0 0 0 255;
+               text {
+                  font: "Sans,Edje-Vera";
+                  size: 10;
+                  min: 0 0;
+                  align: 0.5 0.0;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               text.min: 1 1;
+               rel1.offset: 4 0;
+               rel2.offset: -5 0;
+            }
+            description { state: "disabled" 0.0;
+               inherit: "default" 0.0;
+               color: 255 128 128 128;
+               visible: 0;
+            }
+            description { state: "disabled_visible" 0.0;
+               inherit: "default" 0.0;
+               color: 0 0 0 128;
+               color3: 0 0 0 0;
+               visible: 1;
+               text.min: 1 1;
+            }
+         }
+         part {
+            name: "elm.swallow.end";
+            type: SWALLOW;
+            description {
+               state: "default" 0.0;
+               visible: 0;
+               align: 0.5 1.0;
+               rel1 {
+                  offset: 0 -4;
+                  relative: 0.0 1.0;
+                  to_x: "elm.swallow.bar";
+               }
+               rel2 {
+                  offset: -1 -3;
+                  to_x: "elm.swallow.bar";
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               aspect: 1.0 1.0;
+               aspect_preference: HORIZONTAL;
+               rel2.offset: -1 -4;
+            }
+         }
+         part { name: "units";
+            mouse_events: 0;
+            description { state: "default" 0.0;
+               visible: 0;
+               rel1 {
+                  to: "elm.units";
+                  offset: -8 0;
+               }
+               rel2 {
+                  to: "elm.units";
+                  offset: 7 8;
+               }
+               image {
+                  normal: "slv_units.png";
+                  border: 8 8 0 9;
+               }
+               fill.smooth: 0;
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+            }
+         }
+         part { name: "elm.units";
+            type: TEXT;
+            mouse_events: 0;
+            scale: 1;
+            description { state: "default" 0.0;
+               visible: 0;
+               fixed: 1 1;
+               align: 0.5 1.0;
+               rel1.relative: 0.0 0.0;
+               rel1.to_y: "elm.swallow.end";
+               rel1.offset: 8 0;
+               rel2.relative: 1.0 0.0;
+               rel2.to_y: "elm.swallow.end";
+               rel2.offset: -9 0;
+               color: 0 0 0 255;
+               text {
+                  font: "Sans,Edje-Vera";
+                  size: 10;
+                  min: 0 0;
+                  align: 0.5 0.0;
+               }
+            }
+            description { state: "visible" 0.0;
+               inherit: "default" 0.0;
+               fixed: 1 1;
+               visible: 1;
+               text.min: 1 1;
+               rel1.offset: 8 -9;
+               rel2.offset: -9 -9;
+            }
+            description { state: "disabled" 0.0;
+               inherit: "default" 0.0;
+               color:  0 0 0 128;
+               color3: 0 0 0 0;
+               visible: 0;
+            }
+            description { state: "disabled_visible" 0.0;
+               inherit: "default" 0.0;
+               fixed: 1 1;
+               visible: 1;
+               text.min: 1 1;
+               rel1.offset: 8 -9;
+               rel2.offset: -9 -9;
+               color: 0 0 0 128;
+               color3: 0 0 0 0;
+            }
+         }
+         part { name: "elm.dragable.slider";
+            type: GROUP;
+            source: "elm/slider/vertical/indicator/default";
+            mouse_events: 1;
+            repeat_events: 1;
+            scale: 1;
+            dragable {
+               x: 0 0 0;
+               y: 1 1 0;
+               confine: "bg";
+            }
+            description { state: "default" 0.0;
+               min: 24 0;
+               max: 24 0;
+               fixed: 1 1;
+               rel1 {
+                  relative: 0.5  0.0;
+                  to_y: "bg";
+               }
+               rel2 {
+                  relative: 0.5  1.0;
+                  to_y: "bg";
+               }
+               color: 0 0 0 0;
+            }
+         }
+              part { name: "disabler";
+                type: RECT;
+                description { state: "default" 0.0;
+                   color: 0 0 0 0;
+                   visible: 0;
+                }
+                description { state: "disabled" 0.0;
+                   inherit: "default" 0.0;
+                   visible: 1;
+                }
+             }
+          }
+
+      programs {
+         program { name: "text_show";
+            signal: "elm,state,text,visible";
+            source: "elm";
+            action:  STATE_SET "visible" 0.0;
+            target: "elm.text";
+         }
+         program { name: "text_hide";
+            signal: "elm,state,text,hidden";
+            source: "elm";
+            action:  STATE_SET "default" 0.0;
+            target: "elm.text";
+         }
+         program { name: "icon_show";
+            signal: "elm,state,icon,visible";
+            source: "elm";
+            action:  STATE_SET "visible" 0.0;
+            target: "elm.swallow.icon";
+         }
+         program { name: "icon_hide";
+            signal: "elm,state,icon,hidden";
+            source: "elm";
+            action:  STATE_SET "default" 0.0;
+            target: "elm.swallow.icon";
+         }
+         program { name: "end_show";
+            signal: "elm,state,end,visible";
+            source: "elm";
+            action:  STATE_SET "visible" 0.0;
+            target: "elm.swallow.end";
+         }
+         program { name: "end_hide";
+            signal: "elm,state,end,hidden";
+            source: "elm";
+            action:  STATE_SET "default" 0.0;
+            target: "elm.swallow.end";
+         }
+         program { name: "units_show";
+            signal: "elm,state,units,visible";
+            source: "elm";
+            action:  STATE_SET "visible" 0.0;
+            target: "elm.units";
+            target: "units";
+         }
+         program { name: "units_hide";
+            signal: "elm,state,units,hidden";
+            source: "elm";
+            action:  STATE_SET "default" 0.0;
+            target: "elm.units";
+            target: "units";
+         }
+         program { name: "invert_on";
+            signal: "elm,state,inverted,on";
+            source: "elm";
+            action:  STATE_SET "inverted" 0.0;
+            target: "level";
+            target: "level2";
+         }
+         program { name: "invert_off";
+            signal: "elm,state,inverted,off";
+            source: "elm";
+            action:  STATE_SET "default" 0.0;
+            target: "level";
+            target: "level2";
+         }
+         program {
+            name:   "go_disabled";
+            signal: "elm,state,disabled";
+            source: "elm";
+            action: STATE_SET "disabled" 0.0;
+//            target: "button0";
+            target: "disabler";
+            after: "disable_text";
+            after: "disable_ind";
+         }
+
+         program { name: "disable_ind";
+            action: SIGNAL_EMIT "elm.dragable.slider:elm,state,disabled" "elm";
+         }
+
+         program { name: "disable_text";
+            script {
+            new st[31];
+            new Float:vl;
+               get_state(PART:"elm.text", st, 30, vl);
+               if (!strcmp(st, "visible"))
+                  set_state(PART:"elm.text", "disabled_visible", 0.0);
+               else
+                  set_state(PART:"elm.text", "disabled", 0.0);
+
+               get_state(PART:"elm.units", st, 30, vl);
+               if (!strcmp(st, "visible"))
+                  set_state(PART:"elm.units", "disabled_visible", 0.0);
+               else
+                  set_state(PART:"elm.units", "disabled", 0.0);
+
+               get_state(PART:"level2", st, 30, vl);
+               if (!strcmp(st, "inverted"))
+               {
+                  set_state(PART:"level", "disabled_inverted", 0.0);
+                  set_state(PART:"level2", "disabled_inverted", 0.0);
+               }
+               else
+               {
+                  set_state(PART:"level", "disabled", 0.0);
+                  set_state(PART:"level2", "disabled", 0.0);
+               }
+            }
+         }
+
+         program { name: "enable";
+            signal: "elm,state,enabled";
+            source: "elm";
+            action: STATE_SET "default" 0.0;
+//            target: "button0";
+            target: "disabler";
+            after: "enable_text";
+            after: "enable_ind";
+         }
+
+         program { name: "enable_ind";
+            action: SIGNAL_EMIT "elm.dragable.slider:elm,state,enabled" "elm";
+         }
+         program { name: "enable_text";
+            script {
+               new st[31];
+               new Float:vl;
+               get_state(PART:"elm.text", st, 30, vl);
+               if (!strcmp(st, "disabled_visible"))
+                  set_state(PART:"elm.text", "visible", 0.0);
+               else
+                  set_state(PART:"elm.text", "default", 0.0);
+
+               get_state(PART:"elm.units", st, 30, vl);
+               if (!strcmp(st, "disabled_visible"))
+                  set_state(PART:"elm.units", "visible", 0.0);
+               else
+                  set_state(PART:"elm.units", "default", 0.0);
+
+               get_state(PART:"level2", st, 30, vl);
+               if (!strcmp(st, "disabled_inverted"))
+               {
+                  set_state(PART:"level", "inverted", 0.0);
+                  set_state(PART:"level2", "inverted", 0.0);
+               }
+               else
+               {
+                  set_state(PART:"level", "default", 0.0);
+                  set_state(PART:"level2", "default", 0.0);
+               }
+            }
+         }
+      }
+   }
    group { name: "elm/slider/horizontal/indicator/default";
            alias: "elm/slider/horizontal/indicator/disabled";
            alias: "elm/slider/vertical/indicator/default";
@@ -14851,761 +15271,6 @@ collections {
       }
    }
 
-   group { name: "elm/slider/vertical/default";
-      images {
-	 image: "slv_bg.png" COMP;
-	 image: "slv_bg_over.png" COMP;
-
-	 image: "sl_bt_0.png" COMP;
-	 image: "sl_bt_1.png" COMP;
-	 image: "sl_bt_2.png" COMP;
-	 image: "sl_bt_3.png" COMP;
-	 image: "sl_bt2_0_0.png" COMP;
-	 image: "sl_bt2_0_1.png" COMP;
-	 image: "sl_bt2_0_2.png" COMP;
-	 image: "sl_bt2_1.png" COMP;
-	 image: "sl_bt2_2.png" COMP;
-
-         image: "slv_units.png" COMP;
-      }
-      script {
-         public value_hide = 0;
-         public set_value_show() {
-            set_int(value_hide, 0);
-         }
-         public set_value_hide() {
-            set_int(value_hide, 1);
-         }
-         public thumb_down() {
-            if (get_int(value_hide) == 1) {
-               set_state(PART:"elm.indicator", "default", 0.0);
-               set_state(PART:"button3", "default", 0.0);
-               set_state(PART:"button4", "default", 0.0);
-               set_state(PART:"button5", "default", 0.0);
-               set_state(PART:"button6", "default", 0.0);
-               set_state(PART:"button7", "default", 0.0);
-            } else {
-               set_state(PART:"elm.indicator", "visible", 0.0);
-               set_state(PART:"button3", "visible", 0.0);
-               set_state(PART:"button4", "visible", 0.0);
-               set_state(PART:"button5", "visible", 0.0);
-               set_state(PART:"button6", "visible", 0.0);
-               set_state(PART:"button7", "visible", 0.0);
-            }
-         }
-         public thumb_up() {
-            set_state(PART:"elm.indicator", "default", 0.0);
-            set_state(PART:"button3", "default", 0.0);
-            set_state(PART:"button4", "default", 0.0);
-            set_state(PART:"button5", "default", 0.0);
-            set_state(PART:"button6", "default", 0.0);
-            set_state(PART:"button7", "default", 0.0);
-         }
-      }
-      parts {
-         part { name: "base";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               max: 6 99999;
-               min: 6 0;
-               rel1 { to: "bg";
-                  offset: 1 0;
-               }
-               rel2 { to: "bg";
-                  offset: -2 -1;
-               }
-               image.normal: "slv_bg.png";
-               fill.smooth: 0;
-            }
-         }
-         part { name: "level";
-            type: RECT;
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               rel1.to: "base";
-               rel2 {
-                  to_x: "base";
-                  to_y: "elm.dragable.slider";
-                  relative: 1.0 0.5;
-               }
-               color: 255 0 0 200;
-            }
-            description { state: "inverted" 0.0;
-               inherit: "default" 0.0;
-               visible: 0;
-            }
-            description { state: "disabled" 0.0;
-               inherit: "default" 0.0;
-               color: 255 0 0 100;
-            }
-            description { state: "disabled_inverted" 0.0;
-               inherit: "default" 0.0;
-               visible: 0;
-            }
-         }
-         part { name: "level2";
-            type: RECT;
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               visible: 0;
-               rel1 {
-                  to_x: "base";
-                  to_y: "elm.dragable.slider";
-                  relative: 0.0 0.5;
-               }
-               rel2.to: "base";
-               color: 255 0 0 200;
-            }
-            description { state: "inverted" 0.0;
-               inherit: "default" 0.0;
-               visible: 1;
-            }
-            description { state: "disabled" 0.0;
-               inherit: "default" 0.0;
-               color: 255 0 0 100;
-            }
-            description { state: "disabled_inverted" 0.0;
-               inherit: "default" 0.0;
-               color: 255 0 0 100;
-               visible: 1;
-            }
-         }
-         part {
-            name: "base_over";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               rel1.to: "base";
-               rel1.offset: -1 -1;
-               rel2.to: "base";
-               rel2.offset: 0 0;
-               image {
-                  normal: "slv_bg_over.png";
-                  border: 3 3 3 3;
-               }
-               fill.smooth: 0;
-            }
-         }
-         part { name: "bg";
-	    type: RECT;
-	    mouse_events: 0;
-	    scale: 1;
-	    description { state: "default" 0.0;
-               visible: 0;
-	       rel1.to: "elm.swallow.bar";
-	       rel2.to: "elm.swallow.bar";
-	       color: 0 0 0 0;
-	    }
-	 }
-	 part { name: "elm.swallow.bar";
-	    type: SWALLOW;
-            scale: 1;
-	    description { state: "default" 0.0;
-	       min: 24 48;
-	       max: 24 9999;
-	       align: 0.5 1.0;
-	       rel1 {
-                  to_y: "elm.text";
-                  relative: 0.0 1.0;
-                  offset: 0 10;
-               }
-	       rel2 {
-                  to_y: "elm.units";
-                  relative: 1.0 0.0;
-                  offset: -1 -8;
-               }
-	    }
-	 }
-	 part { name: "elm.swallow.icon";
-	    type: SWALLOW;
-	    description { state: "default" 0.0;
-	       visible: 0;
-	       align: 0.5 0.0;
-	       rel1 {
-                  offset: 0 4;
-                  to_x: "elm.swallow.bar";
-               }
-	       rel2 {
-                  offset: -1 3;
-                  relative: 1.0 0.0;
-                  to_x: "elm.swallow.bar";
-               }
-	    }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-	       aspect: 1.0 1.0;
-	       aspect_preference: HORIZONTAL;
-	       rel2.offset: -1 4;
-	    }
-	 }
-         part { name: "elm.text";
-	    type: TEXT;
-	    mouse_events: 0;
-	    scale: 1;
-	    description { state: "default" 0.0;
-	       visible: 0;
-               fixed: 0 1;
-               align: 0.5 0.0;
-	       rel1.to_y: "elm.swallow.icon";
-	       rel1.relative: 0.0 1.0;
-               rel1.offset: 0 -1;
-	       rel2.to_y: "elm.swallow.icon";
-	       rel2.relative: 1.0 1.0;
-	       rel2.offset: -1 -1;
-	       color: 0 0 0 255;
-	       text {
-		  font: "Sans,Edje-Vera";
-		  size: 10;
-		  min: 0 0;
-		  align: 0.5 0.0;
-	       }
-	    }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-	       text.min: 1 1;
-               rel1.offset: 4 0;
-               rel2.offset: -5 0;
-	    }
-	    description { state: "disabled" 0.0;
-	       inherit: "default" 0.0;
-	       color: 255 128 128 128;
-	       visible: 0;
-	    }
-	    description { state: "disabled_visible" 0.0;
-	       inherit: "default" 0.0;
-	       color: 0 0 0 128;
-	       color3: 0 0 0 0;
-	       visible: 1;
-	       text.min: 1 1;
-	    }
-	 }
-	 part {
-            name: "elm.swallow.end";
-            type: SWALLOW;
-	    description {
-               state: "default" 0.0;
-	       visible: 0;
-	       align: 0.5 1.0;
-	       rel1 {
-                  offset: 0 -4;
-                  relative: 0.0 1.0;
-                  to_x: "elm.swallow.bar";
-               }
-	       rel2 {
-                  offset: -1 -3;
-                  to_x: "elm.swallow.bar";
-               }
-	    }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-	       aspect: 1.0 1.0;
-	       aspect_preference: HORIZONTAL;
-	       rel2.offset: -1 -4;
-	    }
-	 }
-         part { name: "units";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-	       visible: 0;
-               rel1 {
-                  to: "elm.units";
-                  offset: -8 0;
-               }
-               rel2 {
-                  to: "elm.units";
-                  offset: 7 8;
-               }
-               image {
-                  normal: "slv_units.png";
-                  border: 8 8 0 9;
-               }
-               fill.smooth: 0;
-            }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-            }
-         }
-         part { name: "elm.units";
-	    type: TEXT;
-	    mouse_events: 0;
-	    scale: 1;
-	    description { state: "default" 0.0;
-	       visible: 0;
-               fixed: 1 1;
-	       align: 0.5 1.0;
-	       rel1.relative: 0.0 0.0;
-	       rel1.to_y: "elm.swallow.end";
-	       rel1.offset: 8 0;
-	       rel2.relative: 1.0 0.0;
-	       rel2.to_y: "elm.swallow.end";
-	       rel2.offset: -9 0;
-	       color: 0 0 0 255;
-	       text {
-		  font: "Sans,Edje-Vera";
-		  size: 10;
-		  min: 0 0;
-		  align: 0.5 0.0;
-	       }
-	    }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-               fixed: 1 1;
-	       visible: 1;
-	       text.min: 1 1;
-	       rel1.offset: 8 -9;
-	       rel2.offset: -9 -9;
-	    }
-	    description { state: "disabled" 0.0;
-	       inherit: "default" 0.0;
-	       color:  0 0 0 128;
-	       color3: 0 0 0 0;
-	       visible: 0;
-	    }
-	    description { state: "disabled_visible" 0.0;
-	       inherit: "default" 0.0;
-	       fixed: 1 1;
-	       visible: 1;
-	       text.min: 1 1;
-	       rel1.offset: 8 -9;
-	       rel2.offset: -9 -9;
-	       color: 0 0 0 128;
-	       color3: 0 0 0 0;
-	    }
-	 }
-         part { name: "elm.dragable.slider";
-            type: RECT;
-            mouse_events: 0;
-            scale: 1;
-            dragable {
-               x: 0 0 0;
-               y: 1 1 0;
-               confine: "bg";
-            }
-            description { state: "default" 0.0;
-               min: 24 0;
-               max: 24 0;
-               fixed: 1 1;
-               rel1 {
-                  relative: 0.5  0.0;
-                  to_y: "bg";
-               }
-               rel2 {
-                  relative: 0.5  1.0;
-                  to_y: "bg";
-               }
-               color: 0 0 0 0;
-            }
-         }
-         part { name: "button_events";
-	    type: RECT;
- 	    dragable {
-	       events: "elm.dragable.slider";
-	    }
-            mouse_events: 1;
-	    description { state: "default" 0.0;
-               fixed: 1 1;
-               min: 16 16;
-               aspect: 1.0 1.0;
-               aspect_preference: HORIZONTAL;
-	       rel1.to_y: "elm.dragable.slider";
-	       rel2.to_y: "elm.dragable.slider";
-	       color: 0 0 0 0;
-	    }
-	 }
-         part { name: "button0";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               fixed: 1 1;
-               max: 17 999;
-               min: 17 24;
-               rel1.to: "elm.dragable.slider";
-               rel2.to: "elm.dragable.slider";
-               image {
-                  normal: "sl_bt_0.png";
-                  border: 5 5 5 10;
-               }
-               fill.smooth: 0;
-            }
-            description { state: "disabled" 0.0;
-               inherit: "default" 0.0;
-               image {
-                  normal: "sl_bt_3.png";
-                  border: 5 5 5 10;
-               }
-            }
-         }
-         part { name: "button1";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               rel1.to: "button0";
-               rel2 {
-                  to: "button0";
-                  relative: 1.0 0.5;
-                  offset: -1 -5;
-               }
-               image {
-                  normal: "sl_bt_1.png";
-                  border: 5 5 5 0;
-               }
-            }
-         }
-         part { name: "button2";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               rel1.to: "button0";
-               rel2.to: "button0";
-               image {
-                  normal: "sl_bt_2.png";
-                  border: 5 5 5 10;
-               }
-               fill.smooth: 0;
-            }
-         }
-         part { name: "button3";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-	       visible: 0;
-               min: 8 32;
-               align: 1.0 0.5;
-               rel1 {
-                  to_x: "elm.indicator";
-                  to_y: "button4";
-                  relative: 0.0 0.0;
-                  offset: -7 0;
-               }
-               rel2 {
-                  to: "button4";
-                  relative: 0.0 1.0;
-                  offset: -1 -1;
-               }
-               image {
-                  normal: "sl_bt2_0_0.png";
-                  border: 6 0 6 12;
-               }
-               fill.smooth: 0;
-            }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-            }
-         }
-         part { name: "button4";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-	       visible: 0;
-               max: 15 999;
-               min: 15 32;
-               fixed: 1 1;
-               rel1 {
-                  to_x: "button0";
-                  to_y: "elm.indicator";
-                  offset: 0 -7;
-               }
-               rel2.to: "button0";
-               image {
-                  normal: "sl_bt2_0_1.png";
-                  border: 0 0 6 12;
-               }
-               fill.smooth: 0;
-            }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-            }
-         }
-         part { name: "button5";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-	       visible: 0;
-               min: 8 32;
-               align: 0.0 0.5;
-               rel1 {
-                  to: "button4";
-                  relative: 1.0 0.0;
-                  offset: 0 0;
-               }
-               rel2 {
-                  to_x: "elm.indicator";
-                  to_y: "button4";
-                  relative: 1.0 1.0;
-                  offset: 6 -1;
-               }
-               image {
-                  normal: "sl_bt2_0_2.png";
-                  border: 0 6 6 12;
-               }
-               fill.smooth: 0;
-            }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-            }
-         }
-         part { name: "elm.indicator";
-	    type: TEXT;
-	    mouse_events: 0;
-            effect: SOFT_SHADOW;
-	    scale: 1;
-	    description { state: "default" 0.0;
-	       visible: 0;
-               fixed: 1 1;
-               align: 0.5 1.0;
-	       rel1 {
-                  to: "button0";
-                  relative: 0.0 -1.0;
-                  offset: 0 0;
-               }
-	       rel2 {
-                  to: "button0";
-                  relative: 1.0 -1.0;
-                  offset: -1 0;
-               }
-	       color: 224 224 224 255;
-	       color3: 0 0 0 64;
-	       text {
-		  font:     "Sans,Edje-Vera";
-		  size:     10;
-		  min:      0 0;
-		  align:    0.5 0.5;
-	       }
-	    }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-	       text.min: 1 1;
-               rel1.offset: 0 -1;
-               rel2.offset: -1 -1;
-	    }
-	 }
-         part { name: "button6";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-	       visible: 0;
-               rel1.to: "button3";
-               rel2 {
-                  to: "button5";
-                  relative: 1.0 0.3;
-                  offset: -1 -1;
-               }
-               image {
-                  normal: "sl_bt2_1.png";
-                  border: 5 5 5 0;
-               }
-               fill.smooth: 0;
-            }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-            }
-         }
-         part { name: "button7";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-	       visible: 0;
-               rel1.to: "button3";
-               rel2.to: "button5";
-               image {
-                  normal: "sl_bt2_2.png";
-                  border: 5 5 5 0;
-                  middle: 0;
-               }
-               fill.smooth: 0;
-            }
-	    description { state: "visible" 0.0;
-	       inherit: "default" 0.0;
-	       visible: 1;
-            }
-         }
- 	     part { name: "disabler";
-	        type: RECT;
-	        description { state: "default" 0.0;
-	           color: 0 0 0 0;
-	           visible: 0;
-	        }
-	        description { state: "disabled" 0.0;
-	           inherit: "default" 0.0;
-	           visible: 1;
-	        }
-	     }
-	  }
-
-      programs {
-	 program { name: "text_show";
-	    signal: "elm,state,text,visible";
-	    source: "elm";
-	    action:  STATE_SET "visible" 0.0;
-	    target: "elm.text";
-	 }
-	 program { name: "text_hide";
-	    signal: "elm,state,text,hidden";
-	    source: "elm";
-	    action:  STATE_SET "default" 0.0;
-	    target: "elm.text";
-	 }
-	 program { name: "icon_show";
-	    signal: "elm,state,icon,visible";
-	    source: "elm";
-	    action:  STATE_SET "visible" 0.0;
-	    target: "elm.swallow.icon";
-	 }
-	 program { name: "icon_hide";
-	    signal: "elm,state,icon,hidden";
-	    source: "elm";
-	    action:  STATE_SET "default" 0.0;
-	    target: "elm.swallow.icon";
-	 }
-	 program { name: "end_show";
-	    signal: "elm,state,end,visible";
-	    source: "elm";
-	    action:  STATE_SET "visible" 0.0;
-	    target: "elm.swallow.end";
-	 }
-	 program { name: "end_hide";
-	    signal: "elm,state,end,hidden";
-	    source: "elm";
-	    action:  STATE_SET "default" 0.0;
-	    target: "elm.swallow.end";
-	 }
-	 program { name: "units_show";
-	    signal: "elm,state,units,visible";
-	    source: "elm";
-	    action:  STATE_SET "visible" 0.0;
-	    target: "elm.units";
-	    target: "units";
-	 }
-	 program { name: "units_hide";
-	    signal: "elm,state,units,hidden";
-	    source: "elm";
-	    action:  STATE_SET "default" 0.0;
-	    target: "elm.units";
-	    target: "units";
-	 }
-	 program { name: "invert_on";
-	    signal: "elm,state,inverted,on";
-	    source: "elm";
-	    action:  STATE_SET "inverted" 0.0;
-	    target: "level";
-	    target: "level2";
-	 }
-	 program { name: "invert_off";
-	    signal: "elm,state,inverted,off";
-	    source: "elm";
-	    action:  STATE_SET "default" 0.0;
-	    target: "level";
-	    target: "level2";
-	 }
-	 program { name: "set_val_show";
-	    signal: "elm,state,val,show";
-	    source: "elm";
-	    script {
-               set_value_show();
-	    }
-	 }
-	 program { name: "set_val_hide";
-	    signal: "elm,state,val,hide";
-	    source: "elm";
-	    script {
-               set_value_hide();
-	    }
-	 }
-	 program { name: "val_show";
-	    signal: "mouse,down,*";
-	    source: "elm.dragable.slider";
-	    script {
-               thumb_down();
-	    }
-	 }
-	 program { name: "val_hide";
-	    signal: "mouse,up,*";
-	    source: "elm.dragable.slider";
-	    script {
-               thumb_up();
-	    }
-	 }
-	 program {
-	    name:   "go_disabled";
-	    signal: "elm,state,disabled";
-	    source: "elm";
-	    action: STATE_SET "disabled" 0.0;
-	    target: "button0";
-	    target: "disabler";
-	    after: "disable_text";
-	 }
-	 program { name: "disable_text";
-	    script {
-	    new st[31];
-	    new Float:vl;
-	       get_state(PART:"elm.text", st, 30, vl);
-	       if (!strcmp(st, "visible"))
-	          set_state(PART:"elm.text", "disabled_visible", 0.0);
-	       else
-	          set_state(PART:"elm.text", "disabled", 0.0);
-
-	       get_state(PART:"elm.units", st, 30, vl);
-	       if (!strcmp(st, "visible")) 
-	          set_state(PART:"elm.units", "disabled_visible", 0.0);
-	       else 
-	          set_state(PART:"elm.units", "disabled", 0.0);
-
-	       get_state(PART:"level2", st, 30, vl);
-	       if (!strcmp(st, "inverted")) 
-               {
-	          set_state(PART:"level", "disabled_inverted", 0.0);
-	          set_state(PART:"level2", "disabled_inverted", 0.0);
-               }
-	       else 
-               {
-	          set_state(PART:"level", "disabled", 0.0);
-	          set_state(PART:"level2", "disabled", 0.0);
-               }
-	    }
-	 }
-
-	 program { name: "enable";
-	    signal: "elm,state,enabled";
-	    source: "elm";
-	    action: STATE_SET "default" 0.0;
-	    target: "button0";
-	    target: "disabler";
-	    after: "enable_text";
-	 }
-	 program { name: "enable_text";
-	    script {
-	       new st[31];
-	       new Float:vl;
-	       get_state(PART:"elm.text", st, 30, vl);
-	       if (!strcmp(st, "disabled_visible"))
-	          set_state(PART:"elm.text", "visible", 0.0);
-	       else
-	          set_state(PART:"elm.text", "default", 0.0);
-
-	       get_state(PART:"elm.units", st, 30, vl);
-	       if (!strcmp(st, "disabled_visible"))
-	          set_state(PART:"elm.units", "visible", 0.0);
-	       else
-	          set_state(PART:"elm.units", "default", 0.0);
-     
-	       get_state(PART:"level2", st, 30, vl);
-	       if (!strcmp(st, "disabled_inverted"))
-               {
-	          set_state(PART:"level", "inverted", 0.0);
-	          set_state(PART:"level2", "inverted", 0.0);
-               }
-	       else
-               {
-	          set_state(PART:"level", "default", 0.0);
-	          set_state(PART:"level2", "default", 0.0);
-               }
-	    }
-	 }
-      }
-   }
-
 ////////////////////////////////////////////////////////////////////////////////
 // actionslider
 ////////////////////////////////////////////////////////////////////////////////
@@ -15614,9 +15279,6 @@ collections {
       images {
          image: "shelf_inset.png" COMP;
          image: "ilist_1.png" COMP;
-         image: "bt_bases.png" COMP;
-         image: "bt_basew.png" COMP;
-         image: "bt_hilightw.png" COMP;
       }
 
       parts {
@@ -15625,7 +15287,7 @@ collections {
             mouse_events: 0;
             description {
                state: "default" 0.0;
-               min: 75 25;
+               min: 75 30;
                rel1.offset: 1 1;
                rel2.offset: -2 -2;
                image {
@@ -15699,9 +15361,10 @@ collections {
                }
             }
          }
-         part { name: "elm.drag_button_base";
+         part { name: "elm.swallow.icon";
             type: SWALLOW;
-            mouse_events: 0;
+            mouse_events: 1;
+            repeat_events: 1;
             scale: 1;
             description { state: "default" 0.0;
                fixed: 1 1;
@@ -15719,100 +15382,26 @@ collections {
                y: 0 0 0;
             }
          }
-         part { name: "elm.drag_button";
-            type: RECT;
-            mouse_events: 1;
-            description { state: "default" 0.0;
-               min: 50 25;
-               color: 255 255 255 0;
-               rel1.to_x: "elm.drag_button_base";
-               rel1.to_y: "icon.dragable.area";
-               rel2.to_x: "elm.drag_button_base";
-               rel2.to_y: "icon.dragable.area";
-            }
-            dragable {
-               events: "elm.drag_button_base";
-            }
-         }
-         part { name: "button0";
+         part {
+            name: "elm.swallow.space";
+            type: SWALLOW;
             mouse_events: 0;
-            description { state: "default" 0.0;
-               rel1.to: "button2";
-               rel1.offset: -4 -4;
-               rel2.to: "button2";
-               rel2.offset: 3 3;
-               image {
-                  normal: "bt_bases.png";
-                  border: 11 11 11 11;
-                  middle: SOLID;
-               }
-               color: 255 255 255 128;
-            }
-         }
-         part { name: "button2";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               rel1.to: "elm.drag_button";
-               rel2.to: "elm.drag_button";
-               image {
-                  normal: "bt_basew.png";
-                  border: 7 7 7 7;
-                  middle: SOLID;
-               }
-               color: 255 255 255 210;
-            }
-         }
-         part { name: "button3";
-            mouse_events: 0;
-            description { state: "default" 0.0;
-               rel1.to: "button2";
-               rel2.to: "button2";
-               rel2.relative: 1.0 0.5;
-               image {
-                  normal: "bt_hilightw.png";
-                  border: 4 4 4 0;
-               }
-               color: 255 255 255 190;
-            }
-         }
-         part { name: "elm.text.indicator";
-            type: TEXT;
             scale: 1;
-            mouse_events: 0;
-            description { state: "default" 0.0;
+            description {
+               state: "default" 0.0;
+               min: 50 25;
+               fixed: 1 0;
+               align: 0.5 0.5;
                rel1 {
-                  to: "elm.drag_button";
-                  offset: 5 0;
+                  relative: 0.5 0.0;
+                  to: "icon.dragable.area";
                }
                rel2 {
-                  to: "elm.drag_button";
-                  offset: -5 0;
+                  relative: 0.5 1.0;
+                  to: "icon.dragable.area";
                }
-               color: 0 0 0 255;
-               text {
-                  font: "Sans,Edje-Vera";
-                  size: 10;
-                  align: 0.5 0.5;
-                  min: 0 1;
-               }
+               visible: 0;
             }
-         }
-      }
-      programs {
-         program { name: "elm.drag_button,mouse,up";
-            signal: "mouse,up,1";
-            source: "elm.drag_button";
-            action: SIGNAL_EMIT "elm.drag_button,mouse,up" "";
-         }
-         program { name: "elm.drag_button,mouse,down";
-            signal: "mouse,down,1";
-            source: "elm.drag_button";
-            action: SIGNAL_EMIT "elm.drag_button,mouse,down" "";
-         }
-         program { name: "elm.drag_button,mouse,move";
-            signal: "mouse,move";
-            source: "elm.drag_button_base";
-            action: SIGNAL_EMIT "elm.drag_button,mouse,move" "";
          }
       }
    }
@@ -15822,9 +15411,6 @@ collections {
       images {
          image: "shelf_inset.png" COMP;
          image: "ilist_1.png" COMP;
-         image: "bt_bases.png" COMP;
-         image: "bt_basew.png" COMP;
-         image: "bt_hilightw.png" COMP;
       }
 
       parts {
@@ -15916,13 +15502,13 @@ collections {
                rel2 {
                   relative: 0 1;
                   offset: 3 -3;
-                  to_x: "elm.drag_button_base";
+                  to_x: "elm.swallow.icon";
                   to_y: "base";
                }
                color: 0 0 0 180;
             }
          }
-         part { name: "elm.drag_button_base";
+         part { name: "elm.swallow.icon";
             type: SWALLOW;
             mouse_events: 1;
             scale: 1;
@@ -15930,9 +15516,12 @@ collections {
                fixed: 1 1;
                min: 50 25;
                align: 0.5 0.5;
-               rel1.to: "icon.dragable.area";
+               rel1 {
+                  relative: 0.0 0.5;
+                  to: "icon.dragable.area";
+               }
                rel2 {
-                  relative: 0.0 1.0;
+                  relative: 0.0 0.5;
                   to: "icon.dragable.area";
                }
             }
@@ -15942,19 +15531,46 @@ collections {
                y: 0 0 0;
             }
          }
+         part {
+            name: "elm.swallow.space";
+            type: SWALLOW;
+            mouse_events: 0;
+            scale: 1;
+            description {
+               state: "default" 0.0;
+               min: 50 25;
+               fixed: 1 0;
+               align: 0.5 0.5;
+               rel1 {
+                  relative: 0.5 0.0;
+                  to: "icon.dragable.area";
+               }
+               rel2 {
+                  relative: 0.5 1.0;
+                  to: "icon.dragable.area";
+               }
+               visible: 0;
+            }
+         }
+      }
+   }
+
+   group { name: "elm/actionslider/icon/default";
+      alias:"elm/actionslider/icon/bar";
+
+      images {
+         image: "bt_bases.png" COMP;
+         image: "bt_basew.png" COMP;
+         image: "bt_hilightw.png" COMP;
+      }
+      parts {
          part { name: "elm.drag_button";
             type: RECT;
             mouse_events: 1;
             description { state: "default" 0.0;
                min: 50 25;
+               align: 0.5 0.5;
                color: 255 255 255 0;
-               rel1.to_x: "elm.drag_button_base";
-               rel1.to_y: "icon.dragable.area";
-               rel2.to_x: "elm.drag_button_base";
-               rel2.to_y: "icon.dragable.area";
-            }
-            dragable {
-               events: "elm.drag_button_base";
             }
          }
          part { name: "button0";
@@ -15998,7 +15614,7 @@ collections {
                color: 255 255 255 190;
             }
          }
-         part { name: "elm.text.indicator";
+         part { name: "elm.text.button";
             type: TEXT;
             scale: 1;
             mouse_events: 0;
@@ -16034,13 +15650,15 @@ collections {
          }
          program { name: "elm.drag_button,mouse,move";
             signal: "mouse,move";
-            source: "elm.drag_button_base";
+            source: "elm.swallow.icon";
             action: SIGNAL_EMIT "elm.drag_button,mouse,move" "";
          }
       }
    }
+///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
+
    group { name: "elm/genlist/item/default/default";
       data.item: "stacking" "above";
       data.item: "selectraise" "on";
@@ -23925,7 +23543,7 @@ collections {
                   font: "Sans,Edje-Vera";
                   size: 10;
                   min: 0 1;
-                  align: 0.0 0.5;
+                  align: -1.0 0.5;
                }
             }
             description { state: "visible" 0.0;
@@ -24069,6 +23687,7 @@ collections {
          }
       }
    }
+
 ///////////////////////////////////////////////////////////////////////////////
    group { name: "elm/radio/base/default";
       images {
@@ -24153,7 +23772,7 @@ collections {
                   font: "Sans,Edje-Vera";
                   size: 10;
                   min: 0 0;
-                  align: 0.0 0.5;
+                  align: -1.0 0.5;
                }
             }
             description { state: "visible" 0.0;
@@ -24285,6 +23904,7 @@ collections {
          }
       }
    }
+
    group { name: "elm/genlist/tree_compress_odd/double_label/default";
       data.item: "stacking" "below";
       data.item: "selectraise" "on";
@@ -26402,6 +26022,7 @@ collections {
       }
    }
 
+
 ///////////////////////////////////////////////////////////////////////////////
    group { name: "elm/pager/base/default";
       data.item: "onshow" "raise";
@@ -27486,6 +27107,7 @@ collections {
       }
       parts {
          part { name: "elm.background.progressbar";
+            type: RECT;
             mouse_events: 0;
             description {
                state: "default" 0.0;
@@ -27753,6 +27375,7 @@ collections {
            }
          }
          part { name: "progress-rect";
+            type: RECT;
             mouse_events: 0;
             description {
                state: "default" 0.0;
@@ -29583,7 +29206,6 @@ collections {
                        relative: 0.0 0.0;
                        offset:   0 0;
                    }
-                   color: 0 0 255 128;
                }
            }
            part { name: "elm.swallow.event.0";
@@ -29816,6 +29438,30 @@ collections {
             description {
                state: "default" 0.0;
                color: 0 0 0 0;
+            }
+         }
+         part { name: "reorder_bg";
+            mouse_events: 0;
+            description { state: "default" 0.0;
+               visible: 0;
+               color: 255 255 255 0;
+               rel1 {
+                  relative: 0.0 0.0;
+                  offset: -10 -10;
+               }
+               rel2 {
+                  relative: 1.0 1.0;
+                  offset: 12 12;
+               }
+               image {
+                  normal: "bt_bases.png";
+                  border: 6 6 6 6;
+               }
+            }
+            description { state: "enabled" 0.0;
+               inherit: "default" 0.0;
+               visible: 1;
+               color: 255 255 255 255;
             }
          }
          part { name: "base_sh";
@@ -30053,6 +29699,20 @@ collections {
             source:  "elm";
             action:  STATE_SET "default" 0.0;
             target:  "disclip";
+         }
+         program { name:    "go_reorder_disabled";
+            signal:  "elm,state,reorder,disabled";
+            source:  "elm";
+            action:  STATE_SET "default" 0.0;
+            target:  "reorder_bg";
+            transition: DECELERATE 0.5;
+         }
+         program { name:    "go_reorder_enabled";
+            signal:  "elm,state,reorder,enabled";
+            source:  "elm";
+            action:  STATE_SET "enabled" 0.0;
+            target:  "reorder_bg";
+            transition: DECELERATE 0.5;
          }
       }
    }
@@ -32204,20 +31864,20 @@ collections {
 /////////////////////////////////////////////////////////////////////////////
   group {
      name: "elm/panes/vertical/default";
-     images {
-        image: "bt_base1.png" COMP;
-        image: "bt_base2.png" COMP;
-        image: "bt_hilight.png" COMP;
-        image: "bt_shine.png" COMP;
-        image: "bt_glow.png" COMP;
-        image: "bt_dis_base.png" COMP;
-        image: "bt_dis_hilight.png" COMP;
-        image: "arrow_right.png" COMP;
-        image: "arrow_left.png" COMP;
-     }
-     script {
-        public state_pair = 0; //0:both content are not set, 1:both content are set
-     }
+      images {
+         image: "bt_base1.png" COMP;
+         image: "bt_base2.png" COMP;
+         image: "bt_hilight.png" COMP;
+         image: "bt_shine.png" COMP;
+         image: "bt_glow.png" COMP;
+         image: "bt_dis_base.png" COMP;
+         image: "bt_dis_hilight.png" COMP;
+         image: "arrow_right.png" COMP;
+         image: "arrow_left.png" COMP;
+      }
+      script {
+         public state_pair = 0; //0:both content are not set, 1:both content are set
+      }
      parts
        {
           part
@@ -32504,7 +32164,6 @@ collections {
                visible: 1;
             }
          }
-
        }
        programs {
          program {
@@ -32754,17 +32413,17 @@ collections {
 
   group {
      name: "elm/panes/horizontal/default";
-     images {
-        image: "bt_base1.png" COMP;
-        image: "bt_base2.png" COMP;
-        image: "bt_hilight.png" COMP;
-        image: "bt_shine.png" COMP;
-        image: "bt_glow.png" COMP;
-        image: "bt_dis_base.png" COMP;
-        image: "bt_dis_hilight.png" COMP;
-        image: "arrow_up.png" COMP;
-        image: "arrow_down.png" COMP;
-     }
+      images {
+         image: "bt_base1.png" COMP;
+         image: "bt_base2.png" COMP;
+         image: "bt_hilight.png" COMP;
+         image: "bt_shine.png" COMP;
+         image: "bt_glow.png" COMP;
+         image: "bt_dis_base.png" COMP;
+         image: "bt_dis_hilight.png" COMP;
+         image: "arrow_up.png" COMP;
+         image: "arrow_down.png" COMP;
+      }
      script {
         public state_pair = 0; //0:both content are not set, 1:both content are set
      }
@@ -33019,7 +32678,6 @@ collections {
                visible: 1;
             }
          }
-
        }
        programs {
           program {
@@ -33167,8 +32825,6 @@ collections {
         }
       }
   }
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 // PANEL
@@ -33811,7 +33467,7 @@ collections {
         part { name: "elm.swallow.shelf";
            type: SWALLOW;
            description { state: "default" 0.0;
-              fixed: 1 1;
+              fixed: 0 1;
               align: 0.0 0.0;
               rel2.relative: 1.0 0.0;
            }
@@ -33819,6 +33475,7 @@ collections {
         part { name: "elm.swallow.content";
            type: SWALLOW;
            description { state: "default" 0.0;
+              fixed: 0 1;
               align: 0.5 0.5;
               rel1.relative: 0.0 1.0;
               rel1.to_y: "elm.swallow.shelf";
@@ -33831,8 +33488,6 @@ collections {
            description { state: "default" 0.0;
               fixed: 0 1;
               align: 0.0 1.0;
-              rel1.relative: 0.0 0.0;
-              rel1.to_y: "elm.swallow.panel";
               rel2.relative: 1.0 0.0;
               rel2.to_y: "elm.swallow.panel";
            }
@@ -33840,7 +33495,7 @@ collections {
         part { name: "elm.swallow.panel";
            type: SWALLOW;
            description { state: "default" 0.0;
-              fixed: 1 1;
+              fixed: 0 1;
               align: 0.0 1.0;
               rel1.relative: 0.0 1.0;
            }
@@ -35646,6 +35301,9 @@ collections {
 
       data {
          item: "len_threshold" "14";
+         item: "display_item_num" "3";
+         item: "min_height" "-1";
+         item: "min_width" "-1";
       }
 
       parts {
@@ -37348,8 +37006,253 @@ collections {
          }
       }
    }
+
+   group {
+      name: "elm/player/base/default";
+      min: 290 26;
+
+      parts {
+         part {
+            type: SWALLOW;
+            name: "media_player/slider";
+
+            description {
+               rel2 {
+                  relative: 1.0 0.0;
+                  to_x: "media_player/forward";
+               }
+            }
+         }
+         part {
+            type: SWALLOW;
+            name: "media_player/rewind";
+
+            description {
+               rel1 {
+                  to_y: "media_player/slider";
+                  offset: 42 0;
+                  relative: 0.0 1.0;
+               }
+               rel2 {
+                  relative: 0.0 1.0;
+               }
+            }
+         }
+         part {
+            type: SWALLOW;
+            name: "media_player/prev";
+
+            description {
+               rel1 {
+                  to: "media_player/rewind";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "media_player/rewind";
+                  relative: 2.0 1.0;
+               }
+            }
+         }
+         part {
+            type: SWALLOW;
+            name: "media_player/play";
+
+            description {
+               rel1 {
+                  to: "media_player/prev";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "media_player/prev";
+                  relative: 2.0 1.0;
+               }
+            }
+            description {
+               state: hidden 0.0;
+               inherit: default 0.0;
+               visible: 0;
+            }
+         }
+         part {
+            type: SWALLOW;
+            name: "media_player/pause";
+
+            description {
+               rel1.to: "media_player/play";
+               rel2.to: "media_player/play";
+            }
+            description {
+               state: hidden 0.0;
+               inherit: default 0.0;
+               visible: 0;
+            }
+         }
+         part {
+            type: SWALLOW;
+            name: "media_player/info";
+            description {
+               rel1 {
+                  to: "media_player/play";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "media_player/play";
+                  relative: 2.0 1.0;
+               }
+            }
+         }
+
+         part {
+            type: SWALLOW;
+            name: "media_player/stop";
+            description {
+               rel1 {
+                  to: "media_player/info";
+                  relative: 3.0 0.0;
+               }
+               rel2 {
+                  to: "media_player/info";
+                  relative: 4.0 1.0;
+               }
+            }
+         }
+         part {
+            type: SWALLOW;
+            name: "media_player/next";
+            description {
+               rel1 {
+                  to: "media_player/stop";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "media_player/stop";
+                  relative: 2.0 1.0;
+               }
+            }
+         }
+         part {
+            type: SWALLOW;
+            name: "media_player/forward";
+            description {
+               rel1 {
+                  to: "media_player/next";
+                  relative: 1.0 0.0;
+               }
+               rel2 {
+                  to: "media_player/next";
+                  relative: 2.0 1.0;
+               }
+            }
+         }
+      }
+      programs {
+         program {
+            signal: "show";
+            source: "";
+            after: "pause/0";
+         }
+         program {
+            signal: "elm,player,play";
+            source: "elm";
+            after: "play/0";
+         }
+         program {
+            signal: "elm,player,pause";
+            source: "elm";
+            after: "pause/0";
+         }
+         program {
+            name: "play/0";
+
+            action: STATE_SET "hidden" 0.0;
+            target: "media_player/play";
+
+            after: "play/1";
+         }
+         program {
+            name: "play/1";
+
+            action: STATE_SET "default" 0.0;
+            target: "media_player/pause";
+         }
+         program {
+            name: "pause/0";
+
+            action: STATE_SET "hidden" 0.0;
+            target: "media_player/pause";
+
+            after: "pause/1";
+         }
+         program {
+            name: "pause/1";
+
+            action: STATE_SET "default" 0.0;
+            target: "media_player/play";
+         }
+      }
+   }
+
+   group {
+      name: "elm/video/base/default";
+
+      parts {
+         part {
+            name: "clipper";
+            type: RECT;
+
+            description {
+               color: 255 255 255 255;
+            }
+            description {
+               state: "darker" 0.0;
+               color: 128 128 128 255;
+            }
+         }
+         part {
+            name: "elm.swallow.video";
+            type: SWALLOW;
+
+            clip_to: "clipper";
+            mouse_events: 1;
+            repeat_events: 1;
+
+            description {
+               aspect_preference: BOTH;
+               aspect: 1 1;
+            }
+         }
+      }
+
+      programs {
+         program {
+            signal: "elm,video,load";
+            source: "elm";
+
+            action: STATE_SET "darker" 0.0;
+            target: "clipper";
+         }
+         program {
+            signal: "elm,video,play";
+            source: "elm";
+
+            action: STATE_SET "default" 0.0;
+            target: "clipper";
+         }
+         program {
+            signal: "elm,video,end";
+            source: "elm";
+
+            action: STATE_SET "darker" 0.0;
+            target: "clipper";
+            transition: LINEAR 0.5;
+         }
+         program {
+            signal: "elm,video,pause";
+            source: "elm";
+
+            action: STATE_SET "darker" 0.0;
+            target: "clipper";
+         }
+      }
+   }
 }
-
-
-
-

@@ -184,7 +184,7 @@
 # warning "there. You only need a widget if you want to seamlessly be part"
 # warning "of the focus tree and want to transparently become a container"
 # warning "for any number of child Elementary widgets"
-//# error "ERROR. Compile aborted."
+//# error "ERROR. Compile aborted." // Note : Do not merge this from upstream.
 #endif
 #define ELM_INTERNAL_API_VERSION 7000
 
@@ -228,6 +228,8 @@ EAPI void             elm_widget_on_focus_hook_set(Evas_Object *obj, void (*func
 EAPI void             elm_widget_on_change_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
 EAPI void             elm_widget_on_show_region_hook_set(Evas_Object *obj, void (*func) (void *data, Evas_Object *obj), void *data);
 EAPI void             elm_widget_focus_region_hook_set(Evas_Object *obj, void (*func) (Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h));
+EAPI void             elm_widget_text_set_hook_set(Evas_Object *obj, void (*func)(Evas_Object *obj, const char *item, const char *text));
+EAPI void             elm_widget_text_get_hook_set(Evas_Object *obj, const char *(*func)(const Evas_Object *obj, const char *item));
 EAPI void             elm_widget_on_focus_region_hook_set(Evas_Object *obj, void (*func) (const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h));
 EAPI void             elm_widget_data_set(Evas_Object *obj, void *data);
 EAPI void            *elm_widget_data_get(const Evas_Object *obj);
@@ -268,8 +270,8 @@ EAPI Evas_Object     *elm_widget_parent_get(const Evas_Object *obj);
 EAPI void             elm_widget_focus_steal(Evas_Object *obj);
 EAPI void             elm_widget_activate(Evas_Object *obj);
 EAPI void             elm_widget_change(Evas_Object *obj);
-EAPI void             elm_widget_disabled_set(Evas_Object *obj, int disabled);
-EAPI int              elm_widget_disabled_get(const Evas_Object *obj);
+EAPI void             elm_widget_disabled_set(Evas_Object *obj, Eina_Bool disabled);
+EAPI Eina_Bool        elm_widget_disabled_get(const Evas_Object *obj);
 EAPI void             elm_widget_show_region_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h, Eina_Bool forceshow);
 EAPI void             elm_widget_show_region_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h);
 EAPI void             elm_widget_focus_region_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h);
@@ -306,6 +308,10 @@ EAPI void             elm_widget_type_register(const char **ptr);
 EAPI Eina_Bool        elm_widget_type_check(const Evas_Object *obj, const char *type);
 EAPI Eina_List       *elm_widget_stringlist_get(const char *str);
 EAPI void             elm_widget_stringlist_free(Eina_List *list);
+EAPI void             elm_widget_focus_hide_handle(Evas_Object *obj);
+EAPI void             elm_widget_focus_mouse_down_handle(Evas_Object *obj);
+EAPI void             elm_widget_text_part_set(Evas_Object *obj, const char *item, const char *label);
+EAPI const char      *elm_widget_text_part_get(const Evas_Object *obj, const char *item);
 
 EAPI Elm_Widget_Item *_elm_widget_item_new(Evas_Object *parent, size_t alloc_size);
 EAPI void             _elm_widget_item_del(Elm_Widget_Item *item);
@@ -501,7 +507,7 @@ EAPI void             elm_widget_tree_dot_dump(const Evas_Object *top, FILE *out
       evas = evas_object_evas_get(par); if (!(evas)) return (ret); \
       wdat = ELM_NEW(wdtype); if (!(wdat)) return (ret); \
       ob = elm_widget_add(evas); if (!(ob)) { free(wdat); return (ret); } \
-   } while (0);
+   } while (0)
 
 /**
  * The drag and drop API.
@@ -555,6 +561,5 @@ Eina_Bool            elm_selection_get(Elm_Sel_Type selection, Elm_Sel_Format fo
 Eina_Bool            elm_drop_target_add(Evas_Object *widget, Elm_Sel_Type, Elm_Drop_Cb, void *);
 Eina_Bool            elm_drop_target_del(Evas_Object *widget);
 Eina_Bool            elm_drag_start(Evas_Object *, Elm_Sel_Format, const char *, void (*)(void *,Evas_Object*),void*);
-
 
 #endif

@@ -2,18 +2,7 @@
 #include "elm_priv.h"
 
 /**
- * @defgroup Button Button
  * @ingroup Elementary
- *
- * This is a push-button. Press it and run some function. It can contain
- * a simple label and icon object.
- *
- * Signals that you can add callbacks for are:
- *
- * "clicked" - the user clicked the button
- * "repeated" - the user pressed the button without releasing it
- * "pressed" - when the button is pressed
- * "unpressed" - when the button is unpressed (released)
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -113,19 +102,15 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
           {
              _set_label(obj, wd->statelabel[FOCUSED]);
           }
-	edje_object_signal_emit(wd->btn, "elm,action,focus", "elm");
-	evas_object_focus_set(wd->btn, EINA_TRUE);
+   edje_object_signal_emit(wd->btn, "elm,action,focus", "elm");
+   evas_object_focus_set(wd->btn, EINA_TRUE);
      }
    else
      {
         if (wd->statelabel[DEFAULT])
           _set_label(obj, wd->statelabel[DEFAULT]);
-        #if 0
-        else
-          _set_label(obj, wd->label);
-        #endif
-	edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
-	evas_object_focus_set(wd->btn, EINA_FALSE);
+   edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
+   evas_object_focus_set(wd->btn, EINA_FALSE);
      }
 }
 
@@ -186,10 +171,6 @@ _disable_hook(Evas_Object *obj)
      {
         if (wd->statelabel[DEFAULT])
           _set_label(obj, wd->statelabel[DEFAULT]);
-        #if 0
-        else
-          _set_label(obj, wd->label);
-        #endif
         edje_object_signal_emit(wd->btn, "elm,state,enabled", "elm");
      }
 }
@@ -229,9 +210,7 @@ _sizing_eval(Evas_Object *obj)
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
    edje_object_size_min_restricted_calc(wd->btn, &minw, &minh, minw, minh);
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
-   //Commenting to sync with open source and able to resize based on text change
    evas_object_size_hint_min_get(obj, &w, &h);
-   //if (w > minw) minw = w;
    if (h > minh) minh = h;
 
    evas_object_size_hint_min_set(obj, minw, minh);
@@ -347,10 +326,6 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
    if (!wd) return;
    if (wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
-   #if 0
-   else
-     _set_label(data, wd->label);
-   #endif
 
    if (wd->timer)
      {
@@ -368,18 +343,34 @@ _signal_default_text_set(void *data, Evas_Object *obj, const char *emission, con
    if (!wd) return;
    if (wd->statelabel[DEFAULT])
      _set_label(data, wd->statelabel[DEFAULT]);
-   #if 0
-   else
-     _set_label(data, wd->label);
-   #endif
 }
-/**
- * Add a new button to the parent
- * @param[in] parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup Button
- */
+
+_elm_button_label_set(Evas_Object *obj, const char *item, const char *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return;
+   if (!wd) return;
+   eina_stringshare_replace(&wd->label, label);
+   if (label)
+     edje_object_signal_emit(wd->btn, "elm,state,text,visible", "elm");
+   else
+     edje_object_signal_emit(wd->btn, "elm,state,text,hidden", "elm");
+   edje_object_message_signal_process(wd->btn);
+   edje_object_part_text_set(wd->btn, "elm.text", label);
+   _sizing_eval(obj);
+}
+
+static const char *
+_elm_button_label_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return NULL;
+   if (!wd) return NULL;
+   return wd->label;
+}
+
 EAPI Evas_Object *
 elm_button_add(Evas_Object *parent)
 {
@@ -403,6 +394,8 @@ elm_button_add(Evas_Object *parent)
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
    elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
+   elm_widget_text_set_hook_set(obj, _elm_button_label_set);
+   elm_widget_text_get_hook_set(obj, _elm_button_label_get);
 
    wd->btn = edje_object_add(e);
    _elm_theme_object_set(obj, wd->btn, "button", "base", "default");
@@ -434,30 +427,6 @@ elm_button_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * Set the label used in the button
- *
- * @param[in] obj The button object
- * @param[in] label The text will be written on the button
- *
- * @ingroup Button
- */
-EAPI void
-elm_button_label_set(Evas_Object *obj, const char *label)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   eina_stringshare_replace(&wd->label, label);
-   if (label)
-     edje_object_signal_emit(wd->btn, "elm,state,text,visible", "elm");
-   else
-     edje_object_signal_emit(wd->btn, "elm,state,text,hidden", "elm");
-   edje_object_message_signal_process(wd->btn);
-   edje_object_part_text_set(wd->btn, "elm.text", label);
-   _sizing_eval(obj);
-}
-
 static void
 _set_label(Evas_Object *obj, const char *label)
 {
@@ -466,15 +435,7 @@ _set_label(Evas_Object *obj, const char *label)
    edje_object_part_text_set(wd->btn, "elm.text", label);
    _sizing_eval(obj);
 }
-/**
- * Set the label for each state of button
- *
- * @param[in] obj The button object
- * @param[in] label The text will be written on the button
- * @param[in] state The state of button
- *
- * @ingroup Button
- */
+
 EAPI void
 elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlState state)
 {
@@ -509,31 +470,6 @@ elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlSta
      }
 }
 
-/**
- * Get the label of button
- *
- * @param[in] obj The button object
- * @return The title of button
- *
- * @ingroup Button
- */
-EAPI const char *
-elm_button_label_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->label;
-}
-/**
- * Get the label of button for each state
- *
- * @param[in] obj The button object
- * @param[in] state The state of button
- * @return The title of button for state
- *
- * @ingroup Button
- */
 EAPI const char*
 elm_button_label_get_for_state(const Evas_Object *obj, UIControlState state)
 {
@@ -552,18 +488,18 @@ elm_button_label_get_for_state(const Evas_Object *obj, UIControlState state)
      return NULL;
 }
 
-/**
- * Set the icon used for the button
- *
- * Once the icon object is set, a previously set one will be deleted
- * If you want to keep that old content object, use the
- * elm_button_icon_unset() function.
- *
- * @param[in] obj The button object
- * @param[in] icon The icon object for the button
- *
- * @ingroup Button
- */
+EAPI void
+elm_button_label_set(Evas_Object *obj, const char *label)
+{
+   _elm_button_label_set(obj, NULL, label);
+}
+
+EAPI const char *
+elm_button_label_get(const Evas_Object *obj)
+{
+   return _elm_button_label_get(obj, NULL);
+}
+
 EAPI void
 elm_button_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
@@ -585,16 +521,6 @@ elm_button_icon_set(Evas_Object *obj, Evas_Object *icon)
    _sizing_eval(obj);
 }
 
-/**
- * Get the icon used for the button
- *
- * Return the icon object which is set for this widget.
- *
- * @param[in] obj The button object
- * @return The icon object that is being used
- *
- * @ingroup Button
- */
 EAPI Evas_Object *
 elm_button_icon_get(const Evas_Object *obj)
 {
@@ -604,16 +530,6 @@ elm_button_icon_get(const Evas_Object *obj)
    return wd->icon;
 }
 
-/**
- * Unset the icon used for the button
- *
- * Unparent and return the icon object which was set for this widget.
- *
- * @param[in] obj The button object
- * @return The icon object that was being used
- *
- * @ingroup Button
- */
 EAPI Evas_Object *
 elm_button_icon_unset(Evas_Object *obj)
 {
@@ -628,14 +544,6 @@ elm_button_icon_unset(Evas_Object *obj)
    return icon;
 }
 
-/**
- * Turn on/off the autorepeat event generated when the user keeps pressing on the button
- *
- * @param[in] obj The button object
- * @param[in] on  A bool to turn on/off the event
- *
- * @ingroup Button
- */
 EAPI void
 elm_button_autorepeat_set(Evas_Object *obj, Eina_Bool on)
 {
@@ -651,14 +559,6 @@ elm_button_autorepeat_set(Evas_Object *obj, Eina_Bool on)
    wd->repeating = EINA_FALSE;
 }
 
-/**
- * Get if autorepeat event is on
- *
- * @param[in] obj The button object
- * @return If autorepeat is on
- *
- * @ingroup Button
- */
 EAPI Eina_Bool
 elm_button_autorepeat_get(const Evas_Object *obj)
 {
@@ -668,14 +568,6 @@ elm_button_autorepeat_get(const Evas_Object *obj)
    return wd->autorepeat;
 }
 
-/**
- * Set the initial timeout before the autorepeat event is generated
- *
- * @param[in] obj The button object
- * @param[in] t   Timeout
- *
- * @ingroup Button
- */
 EAPI void
 elm_button_autorepeat_initial_timeout_set(Evas_Object *obj, double t)
 {
@@ -691,14 +583,6 @@ elm_button_autorepeat_initial_timeout_set(Evas_Object *obj, double t)
    wd->ar_threshold = t;
 }
 
-/**
- * Get the initial timeout before the autorepeat event is generated
- *
- * @param[in] obj The button object
- * @return Timeout
- *
- * @ingroup Button
- */
 EAPI double
 elm_button_autorepeat_initial_timeout_get(const Evas_Object *obj)
 {
@@ -708,14 +592,6 @@ elm_button_autorepeat_initial_timeout_get(const Evas_Object *obj)
    return wd->ar_threshold;
 }
 
-/**
- * Set the interval between each generated autorepeat event
- *
- * @param[in] obj The button object
- * @param[in] t   Interval
- *
- * @ingroup Button
- */
 EAPI void
 elm_button_autorepeat_gap_timeout_set(Evas_Object *obj, double t)
 {
@@ -728,14 +604,6 @@ elm_button_autorepeat_gap_timeout_set(Evas_Object *obj, double t)
    if ((wd->repeating) && (wd->timer)) ecore_timer_interval_set(wd->timer, t);
 }
 
-/**
- * Get the interval between each generated autorepeat event
- *
- * @param[in] obj The button object
- * @return Interval
- *
- * @ingroup Button
- */
 EAPI double
 elm_button_autorepeat_gap_timeout_get(const Evas_Object *obj)
 {

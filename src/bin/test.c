@@ -22,6 +22,7 @@ void test_transit5(void *data, Evas_Object *obj, void *event_info);
 void test_transit6(void *data, Evas_Object *obj, void *event_info);
 void test_transit7(void *data, Evas_Object *obj, void *event_info);
 void test_transit8(void *data, Evas_Object *obj, void *event_info);
+void test_transit9(void *data, Evas_Object *obj, void *event_info);
 void test_fileselector_button(void *data, Evas_Object *obj, void *event_info);
 void test_fileselector_entry(void *data, Evas_Object *obj, void *event_info);
 void test_toggle(void *data, Evas_Object *obj, void *event_info);
@@ -67,7 +68,16 @@ void test_genlist6(void *data, Evas_Object *obj, void *event_info);
 void test_genlist7(void *data, Evas_Object *obj, void *event_info);
 void test_genlist8(void *data, Evas_Object *obj, void *event_info);
 void test_genlist9(void *data, Evas_Object *obj, void *event_info);
+void test_genlist10(void *data, Evas_Object *obj, void *event_info);
+void test_genlist11(void *data, Evas_Object *obj, void *event_info);
+void test_genscroller(void *data, Evas_Object *obj, void *event_info);
+void test_gesture_layer(void *data, Evas_Object *obj, void *event_info);
 void test_table(void *data, Evas_Object *obj, void *event_info);
+void test_table2(void *data, Evas_Object *obj, void *event_info);
+void test_table3(void *data, Evas_Object *obj, void *event_info);
+void test_table4(void *data, Evas_Object *obj, void *event_info);
+void test_table5(void *data, Evas_Object *obj, void *event_info);
+void test_table6(void *data, Evas_Object *obj, void *event_info);
 void test_gengrid(void *data, Evas_Object *obj, void *event_info);
 void test_gengrid2(void *data, Evas_Object *obj, void *event_info);
 void test_pager(void *data, Evas_Object *obj, void *event_info);
@@ -98,6 +108,8 @@ void test_weather(void *data, Evas_Object *obj, void *event_info);
 void test_flip(void *data, Evas_Object *obj, void *event_info);
 void test_flip2(void *data, Evas_Object *obj, void *event_info);
 void test_flip3(void *data, Evas_Object *obj, void *event_info);
+void test_flip4(void *data, Evas_Object *obj, void *event_info);
+void test_flip_page(void *data, Evas_Object *obj, void *event_info);
 void test_label(void *data, Evas_Object *obj, void *event_info);
 void test_conformant(void *data, Evas_Object *obj, void *event_info);
 void test_conformant2(void *data, Evas_Object *obj, void *event_info);
@@ -122,6 +134,14 @@ void test_ctxpopup(void *data, Evas_Object *obj, void *event_info);
 void test_bubble(void *data, Evas_Object *obj, void *event_info);
 void test_segment_control(void *data, Evas_Object *obj, void *event_info);
 void test_store(void *data, Evas_Object *obj, void *event_info);
+void test_win_inline(void *data, Evas_Object *obj, void *event_info);
+void test_grid(void *data, Evas_Object *obj, void *event_info);
+void test_glview_simple(void *data, Evas_Object *obj, void *event_info);
+void test_glview(void *data, Evas_Object *obj, void *event_info);
+void test_3d(void *data, Evas_Object *obj, void *event_info);
+#ifdef HAVE_EIO
+void test_eio(void *data, Evas_Object *obj, void *event_info);
+#endif
 
 struct elm_test
 {
@@ -167,7 +187,7 @@ _ui_tg_changed(void *data, Evas_Object *obj, void *event_info)
 
 
 static void
-my_win_main(char *autorun)
+my_win_main(char *autorun, Eina_Bool test_win_only)
 {
    Evas_Object *win, *bg, *bx0, *lb, *li, *idx, *fr, *tg;
    Eina_List *tests, *l;
@@ -225,20 +245,20 @@ my_win_main(char *autorun)
    evas_object_show(bx0);
 
    fr = elm_frame_add(win);
-   elm_frame_label_set(fr, "Information");
+   elm_object_text_set(fr, "Information");
    elm_box_pack_end(bx0, fr);
    evas_object_show(fr);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb,
-		       "Please select a test from the list below<br>"
-		       "by clicking the test button to show the<br>"
-		       "test window.");
+   elm_object_text_set(lb,
+                       "Please select a test from the list below<br>"
+                       "by clicking the test button to show the<br>"
+                       "test window.");
    elm_frame_content_set(fr, lb);
    evas_object_show(lb);
 
    tg = elm_toggle_add(win);
-   elm_toggle_label_set(tg, "UI-Mirroring:");
+   elm_object_text_set(tg, "UI-Mirroring:");
    elm_toggle_state_set(tg, elm_mirrored_get());
    evas_object_smart_callback_add(tg, "changed", _ui_tg_changed, NULL);
    elm_box_pack_end(bx0, tg);
@@ -276,10 +296,16 @@ my_win_main(char *autorun)
    ADD_TEST("Transit 6", test_transit6);
    ADD_TEST("Transit 7", test_transit7);
    ADD_TEST("Transit 8", test_transit8);
+   ADD_TEST("Transit 9", test_transit9);
    ADD_TEST("File Selector Button", test_fileselector_button);
    ADD_TEST("File Selector Entry", test_fileselector_entry);
    ADD_TEST("Toggles", test_toggle);
    ADD_TEST("Table", test_table);
+   ADD_TEST("Table Homogeneous", test_table2);
+   ADD_TEST("Table 3", test_table3);
+   ADD_TEST("Table 4", test_table4);
+   ADD_TEST("Table 5", test_table5);
+   ADD_TEST("Table 6", test_table6);
    ADD_TEST("Clock", test_clock);
    ADD_TEST("Clock 2", test_clock2);
    ADD_TEST("Layout", test_layout);
@@ -320,6 +346,11 @@ my_win_main(char *autorun)
    ADD_TEST("Genlist Tree", test_genlist6);
    ADD_TEST("Genlist Group", test_genlist8);
    ADD_TEST("Genlist Group Tree", test_genlist9);
+   ADD_TEST("Genlist Mode", test_genlist10);
+   ADD_TEST("Genlist Reorder Mode", test_genlist11);
+#ifdef HAVE_EIO
+   ADD_TEST("Genlist Eio", test_eio);
+#endif
    ADD_TEST("GenGrid", test_gengrid);
    ADD_TEST("GenGrid 2", test_gengrid2);
    ADD_TEST("Checks", test_check);
@@ -350,6 +381,8 @@ my_win_main(char *autorun)
    ADD_TEST("Flip", test_flip);
    ADD_TEST("Flip 2", test_flip2);
    ADD_TEST("Flip 3", test_flip3);
+   ADD_TEST("Flip Interactive", test_flip4);
+   ADD_TEST("Flip Page", test_flip_page);
    ADD_TEST("Label", test_label);
    ADD_TEST("Conformant", test_conformant);
    ADD_TEST("Conformant 2", test_conformant2);
@@ -376,31 +409,38 @@ my_win_main(char *autorun)
    ADD_TEST("Bubble", test_bubble);
    ADD_TEST("Segment Control", test_segment_control);
    ADD_TEST("Store", test_store);
+   ADD_TEST("Window Inline", test_win_inline);
+   ADD_TEST("Grid", test_grid);
+   ADD_TEST("GLViewSimple", test_glview_simple);
+   ADD_TEST("GLView", test_glview);
+   ADD_TEST("3D", test_3d);
+   ADD_TEST("Genscroller", test_genscroller);
+   ADD_TEST("Gesture Layer", test_gesture_layer);
 #undef ADD_TEST
 
    if (autorun)
      {
         EINA_LIST_FOREACH(tests, l, t)
-          if ((t->name) && (t->cb) && (!strcmp(t->name, autorun)))
-            t->cb(NULL, NULL, NULL);
+           if ((t->name) && (t->cb) && (!strcmp(t->name, autorun)))
+             t->cb(NULL, NULL, NULL);
      }
 
    if (tests)
      {
-	char last_letter = 0;
-	EINA_LIST_FREE(tests, t)
-	  {
-	     Elm_List_Item *it;
-	     it = elm_list_item_append(li, t->name, NULL, NULL, t->cb, NULL);
-	     if (last_letter != t->name[0])
-	       {
-		  char letter[2] = {t->name[0], '\0'};
-		  elm_index_item_append(idx, letter, it);
-		  last_letter = t->name[0];
-	       }
-	     free(t);
-	  }
-	elm_index_item_go(idx, 0);
+        char last_letter = 0;
+        EINA_LIST_FREE(tests, t)
+          {
+             Elm_List_Item *it;
+             it = elm_list_item_append(li, t->name, NULL, NULL, t->cb, NULL);
+             if (last_letter != t->name[0])
+               {
+                  char letter[2] = {t->name[0], '\0'};
+                  elm_index_item_append(idx, letter, it);
+                  last_letter = t->name[0];
+               }
+             free(t);
+          }
+        elm_index_item_go(idx, 0);
      }
 
    elm_list_go(li);
@@ -408,7 +448,8 @@ my_win_main(char *autorun)
    /* set an initial window size */
    evas_object_resize(win, 320, 480);
    /* show the window */
-   evas_object_show(win);
+   if (!test_win_only)
+      evas_object_show(win);
 }
 
 /* this is your elementary main function - it MUST be called IMMEDIATELY
@@ -417,16 +458,32 @@ my_win_main(char *autorun)
 EAPI int
 elm_main(int argc, char **argv)
 {
+   Eina_Bool test_win_only = EINA_FALSE;
    char *autorun = NULL;
+
+   /* tell elm about our app so it can figure out where to get files */
+   elm_app_info_set(elm_main, "elementary", "images/logo.png");
+   elm_app_compile_bin_dir_set(PACKAGE_BIN_DIR);
+   elm_app_compile_data_dir_set(PACKAGE_DATA_DIR);
 
    /* if called with a single argument try to autorun a test with
     * the same name as the given param
     * ex:  elementary_test "Box Vert 2" */
    if (argc == 2)
      autorun = argv[1];
+   else if (argc == 3)
+     {
+        /* Just a workaround to make the shot module more
+         * useful with elementary test. */
+        if (!strcmp(argv[1], "--test-win-only"))
+          {
+             test_win_only = EINA_TRUE;
+             autorun = argv[2];
+          }
+     }
 
    /* put here any init specific to this app like parsing args etc. */
-   my_win_main(autorun); /* create main window */
+   my_win_main(autorun, test_win_only); /* create main window */
    elm_run(); /* and run the program now  and handle all events etc. */
    /* if the mainloop that elm_run() runs exist - we exit the app */
    elm_shutdown(); /* clean up and shut down */

@@ -81,7 +81,7 @@ _FILE_CHOSEN_fwd(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    const char *file = event_info;
-   elm_scrolled_entry_entry_set(wd->entry, file);
+   elm_entry_entry_set(wd->entry, file);
    evas_object_smart_callback_call(data, SIG_FILE_CHOSEN, event_info);
 }
 
@@ -89,7 +89,7 @@ static void
 _ACTIVATED_fwd(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   const char *file = elm_scrolled_entry_entry_get(wd->entry);
+   const char *file = elm_entry_entry_get(wd->entry);
    elm_fileselector_button_path_set(wd->button, file);
    evas_object_smart_callback_call(data, SIG_ACTIVATED, event_info);
 }
@@ -212,6 +212,26 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
    _sizing_eval(data);
 }
 
+static void
+_elm_fileselector_entry_button_label_set(Evas_Object *obj, const char *item, const char *label)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return;
+   if (!wd) return;
+   elm_object_text_set(wd->button, label);
+}
+
+static const char *
+_elm_fileselector_entry_button_label_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return NULL;
+   if (!wd) return NULL;
+   return elm_object_text_get(wd->button);
+}
+
 /**
  * Add a new file selector entry into the parent object.
  *
@@ -238,6 +258,8 @@ elm_fileselector_entry_add(Evas_Object *parent)
    elm_widget_focus_next_hook_set(obj, _elm_fileselector_entry_focus_next_hook);
    elm_widget_can_focus_set(obj, EINA_FALSE);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_text_set_hook_set(obj, _elm_fileselector_entry_button_label_set);
+   elm_widget_text_get_hook_set(obj, _elm_fileselector_entry_button_label_get);
 
    wd->edje = edje_object_add(e);
    _elm_theme_object_set(obj, wd->edje, "fileselector_entry", "base", "default");
@@ -261,11 +283,12 @@ elm_fileselector_entry_add(Evas_Object *parent)
    SIG_FWD(FILE_CHOSEN);
 #undef SIG_FWD
 
-   wd->entry = elm_scrolled_entry_add(obj);
+   wd->entry = elm_entry_add(obj);
+   elm_entry_scrollable_set(wd->entry, EINA_TRUE);
    elm_widget_mirrored_automatic_set(wd->entry, EINA_FALSE);
    elm_widget_style_set(wd->entry, "fileselector_entry/default");
-   elm_scrolled_entry_single_line_set(wd->entry, EINA_TRUE);
-   elm_scrolled_entry_editable_set(wd->entry, EINA_TRUE);
+   elm_entry_single_line_set(wd->entry, EINA_TRUE);
+   elm_entry_editable_set(wd->entry, EINA_TRUE);
    edje_object_part_swallow(wd->edje, "elm.swallow.entry", wd->entry);
    elm_widget_sub_object_add(obj, wd->entry);
    evas_object_event_callback_add
@@ -302,23 +325,18 @@ elm_fileselector_entry_add(Evas_Object *parent)
  * @param label The text label text to be displayed on the entry
  *
  * @ingroup File_Selector_Entry
+ * @deprecated use elm_object_text_set() instead.
  */
 EAPI void
 elm_fileselector_entry_button_label_set(Evas_Object *obj, const char *label)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   elm_fileselector_button_label_set(wd->button, label);
+   _elm_fileselector_entry_button_label_set(obj, NULL, label);
 }
 
 EAPI const char *
 elm_fileselector_entry_button_label_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return elm_fileselector_button_label_get(wd->button);
+   return _elm_fileselector_entry_button_label_get(obj, NULL);
 }
 
 /**
@@ -451,7 +469,7 @@ elm_fileselector_entry_path_set(Evas_Object *obj, const char *path)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    elm_fileselector_button_path_set(wd->button, path);
-   elm_scrolled_entry_entry_set(wd->entry, path);
+   elm_entry_entry_set(wd->entry, path);
 }
 
 /**
@@ -467,7 +485,7 @@ elm_fileselector_entry_path_get(const Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
-   return elm_scrolled_entry_entry_get(wd->entry);
+   return elm_entry_entry_get(wd->entry);
 }
 
 /**

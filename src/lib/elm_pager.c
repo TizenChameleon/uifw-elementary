@@ -109,7 +109,7 @@ _item_get(Evas_Object *obj, Evas_Object *content)
    Widget_Data *wd = elm_widget_data_get(obj);
    Item *it;
    Eina_List *l;
-   if (!wd) return;
+   if (!wd) return NULL;
 
    EINA_LIST_FOREACH(wd->stack, l, it)
      {
@@ -169,7 +169,7 @@ static void
 _eval_top(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Eina_Bool show_noanimate=EINA_TRUE;
+   Eina_Bool show_noanimate = EINA_TRUE;
    Item *ittop;
    if (!wd) return;
    if (!wd->stack) return;
@@ -248,7 +248,7 @@ _move(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSE
 }
 
 static void
-_content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_content_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Eina_List *l;

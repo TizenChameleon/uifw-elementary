@@ -177,6 +177,12 @@ dnl managed by evil
 esac
 AM_CONDITIONAL([BUILD_RUN], [test "x$have_socket" = "xyes"])
 
+m4_ifdef([v_mic],
+   [
+    EFL_COMPILER_FLAG([-Wall])
+    EFL_COMPILER_FLAG([-W])
+   ])
+
 have_fork="no"
 want_quicklaunch="auto"
 AC_ARG_ENABLE([quick-launch],
@@ -201,7 +207,7 @@ AM_CONDITIONAL([ELEMENTARY_WINDOWS_BUILD], [test "x${have_windows}" = "xyes"])
 
 PKG_CHECK_MODULES([ELEMENTARY],
    [
-    eina >= 1.0.0
+    eina >= 1.0.999
     eet >= 1.4.0
     evas >= 1.0.999
     ecore >= 1.0.0
@@ -211,6 +217,37 @@ PKG_CHECK_MODULES([ELEMENTARY],
     edje >= 1.0.999
    ]
 )
+
+PKG_CHECK_MODULES([ECORE_CON],
+	[ecore-con],
+	[
+	 have_ecore_con="yes"
+	 AC_DEFINE(HAVE_ECORE_CON, 1, [Use Ecore_Con for downloding files])
+	 requirement_elm="ecore-con ${requirement_elm}"
+	],
+	[have_ecore_con="no"])
+
+PKG_CHECK_MODULES([EIO],
+	[eio],
+	[
+	 have_eio="yes"
+	 AC_DEFINE(HAVE_EIO, 1, [Use EIO for asynchronous file access])
+	 requirement_elm="eio ${requirement_elm}"
+	],
+	[have_eio="no"])
+
+AM_CONDITIONAL([HAVE_EIO], [test "x${have_eio}" = "xyes"])
+
+PKG_CHECK_MODULES([EMOTION],
+	[emotion],
+	[
+	 have_emotion="yes"
+	 AC_DEFINE(HAVE_EMOTION, 1, [Use Emotion for asynchronous file access])
+	 requirement_elm="emotion ${requirement_elm}"
+	],
+	[have_emotion="no"])
+
+AM_CONDITIONAL([HAVE_EMOTION], [test "x${have_emotion}" = "xyes"])
 
 requirement_elm="edje >= 1.0.0 ecore-file >= 1.0.0 ecore-evas >= 1.0.0 ecore >= 1.0.0 evas >= 1.0.0 eet >= 1.4.0 eina >= 1.0.0 ${requirement_elm}"
 
@@ -363,13 +400,12 @@ if test "x$want_elementary_edbus" != "xno"; then
     PKG_CHECK_MODULES([ELEMENTARY_EDBUS],
        [
         edbus >= 1.0.0
-        ehal >= 1.0.0
        ],
        [
         AC_DEFINE(HAVE_ELEMENTARY_EDBUS, 1, [EDBus support for Elementary])
         have_elementary_edbus="yes"
         ELM_EDBUS_DEF="#define"
-        requirement_elm="ehal >= 1.0.0 edbus >= 1.0.0 ${requirement_elm}"
+        requirement_elm="edbus >= 1.0.0 ${requirement_elm}"
        ],
        [have_elementary_edbus="no"]
     )
@@ -377,7 +413,7 @@ else
     have_elementary_edbus="no"
 fi
 if test "x$want_elementary_edbus" = "xyes" -a "x$have_elementary_edbus" = "xno"; then
-    AC_MSG_ERROR([E_DBus support requested, but no edbus/ehal found by pkg-config.])
+    AC_MSG_ERROR([E_DBus support requested, but no e_dbus found by pkg-config.])
 fi
 AC_SUBST(ELM_EDBUS_DEF)
 
@@ -438,6 +474,36 @@ if test "x$want_elementary_eweather" = "xyes" -a "x$have_elementary_eweather" = 
     AC_MSG_ERROR([Eweather support requested, but no eweather found by pkg-config.])
 fi
 AC_SUBST(ELM_EWEATHER_DEF)
+
+ELM_EMAP_DEF="#undef"
+have_elementary_emap="no"
+want_elementary_emap="auto"
+AC_ARG_ENABLE([emap],
+   [AC_HELP_STRING([--disable-emap], [disable emap support. @<:@default=detect@:>@])],
+   [want_elementary_emap=$enableval], [])
+
+if test "x$want_elementary_emap" != "xno"; then
+    PKG_CHECK_MODULES([ELEMENTARY_EMAP],
+       [
+        emap
+       ],
+       [
+        AC_DEFINE(HAVE_ELEMENTARY_EMAP, 1, [EMap support for Elementary])
+        have_elementary_emap="yes"
+        ELM_EMAP_DEF="#define"
+        requirement_elm="emap ${requirement_elm}"
+       ],
+       [have_elementary_emap="no"]
+    )
+else
+    have_elementary_emap="no"
+fi
+if test "x$want_elementary_emap" = "xyes" -a "x$have_elementary_emap" = "xno"; then
+    AC_MSG_ERROR([Emap support requested, but no emap found by pkg-config.])
+fi
+AC_SUBST(ELM_EMAP_DEF)
+
+
 
 ELM_ETHUMB_DEF="#undef"
 have_elementary_ethumb="no"
@@ -555,8 +621,8 @@ config/Makefile
 config/default/Makefile
 config/standard/Makefile
 config/illume/Makefile
-$po_makefile_in
 config/slp/Makefile
+$po_makefile_in
 ])
 
 #####################################################################
@@ -582,8 +648,11 @@ echo "  Features:"
 echo "    EDBus..................: ${have_elementary_edbus}"
 echo "    EFreet.................: ${have_elementary_efreet}"
 echo "    EWeather...............: ${have_elementary_eweather}"
+echo "    EMap...................: ${have_elementary_emap}"
 echo "    Ethumb.................: ${have_elementary_ethumb}"
 echo "    Quick Launch...........: ${have_fork}"
+echo "    EIO....................: ${have_eio}"
+echo "    Emotion................: ${have_emotion}"
 echo
 echo "  eet......................: ${eet_eet}"
 echo "  edje_cc..................: ${edje_cc}"

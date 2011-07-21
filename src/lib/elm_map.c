@@ -1,6 +1,14 @@
-#include <Elementary.h>
-#include "Ecore_Con.h"
-#include "Eina.h"
+
+
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
+
+#ifdef HAVE_ECORE_CON
+# include <Ecore_Con.h>
+#endif
+
+#include "Elementary.h"
 #include "elm_priv.h"
 
 /**
@@ -62,11 +70,12 @@ typedef struct _Grid Grid;
 typedef struct _Grid_Item Grid_Item;
 typedef struct _Marker_Group Marker_Group;
 typedef struct _Event Event;
-typedef struct _Route_Node Route_Node;
-typedef struct _Route_Waypoint Route_Waypoint;
+typedef struct _Path_Node Path_Node;
+typedef struct _Path_Waypoint Path_Waypoint;
 typedef struct _Url_Data Url_Data;
 typedef struct _Route_Dump Route_Dump;
 typedef struct _Name_Dump Name_Dump;
+typedef struct _Track_Dump Track_Dump;
 
 #define DEST_DIR_ZOOM_PATH "/tmp/elm_map/%d/%d/"
 #define DEST_DIR_PATH DEST_DIR_ZOOM_PATH"%d/"
@@ -95,6 +104,13 @@ typedef struct _Name_Dump Name_Dump;
 #define PINCH_ZOOM_MIN 0.1
 #define PINCH_ZOOM_MAX 5.0
 
+#define GPX_NAME "name>"
+#define GPX_COORDINATES "trkpt "
+#define GPX_LON "lon"
+#define GPX_LAT "lat"
+#define GPX_ELE "ele>"
+#define GPX_TIME "time>"
+
 // Map sources
 // Currently the size of a tile must be 256*256
 // and the size of the map must be pow(2.0, z)*tile_size
@@ -110,8 +126,6 @@ typedef struct _Map_Sources_Tab
    ElmMapModuleGeoIntoCoordFunc geo_into_coord;
    ElmMapModuleCoordIntoGeoFunc coord_into_geo;
 } Map_Sources_Tab;
-
-#define ZOOM_MAX 18
 
 //Zemm min is supposed to be 0
 static char *_mapnik_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom);
@@ -167,11 +181,9 @@ struct _Elm_Map_Marker
    double longitude, latitude;
 
    Evas_Coord map_size;
-   Evas_Coord x[ZOOM_MAX+1], y[ZOOM_MAX+1];
+   Evas_Coord *x, *y;
    void *data;
-
-   Marker_Group *groups[ZOOM_MAX+1];
-
+   Marker_Group **groups;
    Evas_Object *content;
 };
 
@@ -221,8 +233,8 @@ struct _Elm_Map_Route
 {
    Widget_Data *wd;
 
-   Route_Node *n;
-   Route_Waypoint *w;
+   Path_Node *n;
+   Path_Waypoint *w;
    Ecore_Con_Url *con_url;
 
    int type;
@@ -254,7 +266,7 @@ struct _Elm_Map_Route
    Eina_Bool inbound : 1;
 };
 
-struct _Route_Node
+struct _Path_Node
 {
    Widget_Data *wd;
 
@@ -265,7 +277,7 @@ struct _Route_Node
    } pos;
 };
 
-struct _Route_Waypoint
+struct _Path_Waypoint
 {
    Widget_Data *wd;
 
@@ -357,7 +369,7 @@ struct _Widget_Data
    } center_on;
 
    Ecore_Job *markers_place_job;
-   Eina_Matrixsparse *markers[ZOOM_MAX+1];
+   Eina_Matrixsparse **markers;
    Eina_List *cells_displayed; // list of Eina_Matrixsparse_Cell
    Evas_Coord markers_max_num;
    int marker_max_w, marker_max_h;
@@ -375,6 +387,7 @@ struct _Widget_Data
    Eina_Hash *ua;
    const char *user_agent;
    Eina_List *route;
+   Eina_List *track;
    Evas_Event_Mouse_Down ev;
    Eina_List *names;
    int multi_count;
@@ -382,11 +395,13 @@ struct _Widget_Data
    struct {
         Evas_Coord cx, cy;
         double level, diff;
+        Eina_Bool doing : 1;
    } pinch;
 
    struct {
         Evas_Coord cx, cy;
         double a, d;
+        Eina_Bool doing : 1;
    } rotate;
 
    struct {
@@ -403,6 +418,8 @@ struct _Widget_Data
    Evas_Map *map;
    Ecore_Timer *zoom_timer;
    Map_Sources_Tab *src;
+   const char *gpx_file;
+   int zoom_min, zoom_max;
 };
 
 struct _Pan
@@ -474,6 +491,14 @@ enum _Zoom_Method
    ZOOM_METHOD_OUT,
    ZOOM_METHOD_LAST
 } Zoom_Mode;
+
+enum _Track_Xml_Attribute
+{
+   TRACK_XML_NONE,
+   TRACK_XML_COORDINATES,
+   TRACK_XML_LAST
+} Track_Xml_Attibute;
+
 
 static const char *widtype = NULL;
 
@@ -557,6 +582,7 @@ static void _mouse_multi_up(void *data, Evas *evas, Evas_Object *obj, void *even
 static void _mouse_multi_move(void *data, Evas *evas, Evas_Object *obj, void *event_info);
 
 static void route_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord ox, Evas_Coord oy, Evas_Coord ow, Evas_Coord oh);
+static void track_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord ox, Evas_Coord oy, Evas_Coord ow, Evas_Coord oh);
 
 static int
 get_multi_device(Evas_Object *obj)
@@ -570,14 +596,6 @@ get_multi_device(Evas_Object *obj)
         if (ev->device) return ev->device;
      }
    return 0;
-}
-
-static int
-get_distance(Evas_Coord x1, Evas_Coord y1, Evas_Coord x2, Evas_Coord y2)
-{
-   int dx = x1 - x2;
-   int dy = y1 - y2;
-   return sqrt((dx * dx) + (dy * dy));
 }
 
 static Event *
@@ -738,6 +756,40 @@ source_init(void *data)
 }
 
 static void
+zoom_min_get(void *data)
+{
+   ELM_CHECK_WIDTYPE(data, widtype);
+   Widget_Data *wd = elm_widget_data_get(data);
+   Map_Sources_Tab *s;
+   Eina_List *l;
+   int tz;
+
+   if (!wd) return;
+   EINA_LIST_FOREACH(wd->map_sources_tab, l, s)
+     {
+        tz = s->zoom_min;
+        if (tz < wd->zoom_min) wd->zoom_min = tz;
+     }
+}
+
+static void
+zoom_max_get(void *data)
+{
+   ELM_CHECK_WIDTYPE(data, widtype);
+   Widget_Data *wd = elm_widget_data_get(data);
+   Map_Sources_Tab *s;
+   Eina_List *l;
+   int tz;
+
+   if (!wd) return;
+   EINA_LIST_FOREACH(wd->map_sources_tab, l, s)
+     {
+        tz = s->zoom_max;
+        if (tz > wd->zoom_max) wd->zoom_max = tz;
+     }
+}
+
+static void
 obj_rotate_zoom(void *data, Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(data, widtype);
@@ -756,12 +808,54 @@ obj_rotate_zoom(void *data, Evas_Object *obj)
 }
 
 static void
+#ifdef ELM_EMAP
+track_place(Evas_Object *obj, Grid *g __UNUSED__, Evas_Coord px, Evas_Coord py, Evas_Coord ox __UNUSED__, Evas_Coord oy __UNUSED__, Evas_Coord ow, Evas_Coord oh)
+#else
+track_place(Evas_Object *obj __UNUSED__, Grid *g __UNUSED__, Evas_Coord px __UNUSED__, Evas_Coord py __UNUSED__, Evas_Coord ox __UNUSED__, Evas_Coord oy __UNUSED__, Evas_Coord ow __UNUSED__, Evas_Coord oh __UNUSED__)
+#endif
+{
+#ifdef ELM_EMAP
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_List *l;
+   Evas_Object *route;
+   int xmin, xmax, ymin, ymax;
+
+   if (!wd) return;
+   Evas_Coord size = pow(2.0, wd->zoom)*wd->tsize;
+
+   EINA_LIST_FOREACH(wd->track, l, route)
+     {
+        elm_map_utils_convert_geo_into_coord(wd->obj, elm_route_lon_min_get(route), elm_route_lat_max_get(route), size, &xmin, &ymin);
+        elm_map_utils_convert_geo_into_coord(wd->obj, elm_route_lon_max_get(route), elm_route_lat_min_get(route), size, &xmax, &ymax);
+
+        if( !(xmin < px && xmax < px) && !(xmin > px+ow && xmax > px+ow))
+        {
+           if( !(ymin < py && ymax < py) && !(ymin > py+oh && ymax > py+oh))
+           {
+              //display the route
+              evas_object_move(route, xmin - px + ox, ymin - py + oy);
+              evas_object_resize(route, xmax - xmin, ymax - ymin);
+
+              evas_object_raise(route);
+              obj_rotate_zoom(obj, route);
+              evas_object_show(route);
+
+              continue;
+           }
+        }
+        //the route is not display
+        evas_object_hide(route);
+     }
+#endif
+}
+static void
 route_place(Evas_Object *obj, Grid *g __UNUSED__, Evas_Coord px, Evas_Coord py, Evas_Coord ox __UNUSED__, Evas_Coord oy __UNUSED__, Evas_Coord ow, Evas_Coord oh)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_List *lr, *lp, *ln;
-   Route_Node *n;
+   Path_Node *n;
    Evas_Object *p;
    Elm_Map_Route *r;
    int nodes;
@@ -1157,7 +1251,6 @@ _tile_update(Grid_Item *gi)
      }
 }
 
-
 static void
 _tile_downloaded(void *data, const char *file __UNUSED__, int status)
 {
@@ -1166,10 +1259,9 @@ _tile_downloaded(void *data, const char *file __UNUSED__, int status)
    gi->download = EINA_FALSE;
    gi->job = NULL;
 
-   DBG("DOWNLOAD done %s", gi->file);
-   if ((gi->want) && (!status)) _tile_update(gi);
+   if ((gi->want) && (status == 200)) _tile_update(gi);
 
-   if (status)
+   if (status != 200)
      {
         DBG("Download failed %s (%d) ", gi->file, status);
         ecore_file_remove(gi->file);
@@ -1178,6 +1270,7 @@ _tile_downloaded(void *data, const char *file __UNUSED__, int status)
      gi->wd->finish_num++;
 
    evas_object_smart_callback_call(gi->wd->obj, SIG_DOWNLOADED, NULL);
+   DBG("DOWNLOAD done %s", gi->file);
 }
 
 static Grid *
@@ -1614,8 +1707,8 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    if (!ev0) return;
 
    ev0->hold_timer = NULL;
-   ev0->prev.x = ev->output.x;
-   ev0->prev.y = ev->output.y;
+   ev0->prev.x = ev->canvas.x;
+   ev0->prev.y = ev->canvas.y;
 
    if (ev->button != 1) return;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) wd->on_hold = EINA_TRUE;
@@ -1625,8 +1718,8 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_inf
    else
      evas_object_smart_callback_call(data, SIG_PRESS, ev);
    if (wd->long_timer) ecore_timer_del(wd->long_timer);
-   wd->ev.output.x = ev->output.x;
-   wd->ev.output.y = ev->output.y;
+   wd->ev.canvas.x = ev->output.x;
+   wd->ev.canvas.y = ev->output.y;
    wd->long_timer = ecore_timer_add(_elm_config->longpress_timeout, _long_press, data);
 }
 
@@ -1638,8 +1731,8 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
 
    ev0 = get_event_object(data, 0);
    if (!ev0) return;
-   ev0->prev.x = move->cur.output.x;
-   ev0->prev.y = move->cur.output.y;
+   ev0->prev.x = move->cur.canvas.x;
+   ev0->prev.y = move->cur.canvas.y;
 }
 
 static void
@@ -1709,8 +1802,8 @@ _mouse_multi_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *eve
    wd->multi_count++;
 
    ev->hold_timer = NULL;
-   ev->start.x = ev->prev.x = down->output.x;
-   ev->start.y = ev->prev.y = down->output.y;
+   ev->start.x = ev->prev.x = down->canvas.x;
+   ev->start.y = ev->prev.y = down->canvas.y;
    ev->pinch_start_dis = 0;
    wd->pinch.level = 1.0;
    wd->pinch.diff = 1.0;
@@ -1730,7 +1823,7 @@ _mouse_multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__
    ELM_CHECK_WIDTYPE(data, widtype);
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Multi_Move *move = event_info;
-   int dis_new;
+   int dis_new, dx, dy;
    double t, tt, a, a_diff;
    Event *ev0;
    Event *ev;
@@ -1750,7 +1843,9 @@ _mouse_multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__
         evas_object_geometry_get(data, &x, &y, &w, &h);
         half_w = (float)w * 0.5;
         half_h = (float)h * 0.5;
-        dis_new = get_distance(ev0->prev.x, ev0->prev.y, ev->prev.x, ev->prev.y);
+        dx = ev0->prev.x - ev->prev.x;
+        dy = ev0->prev.y - ev->prev.y;
+        dis_new = sqrt((dx * dx) + (dy * dy));
 
         if (!ev->pinch_start_dis) ev->pinch_start_dis = dis_new;
         else
@@ -1759,18 +1854,27 @@ _mouse_multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__
              tt = wd->pinch.diff;
              wd->pinch.diff = (double)(ev->pinch_dis - ev->pinch_start_dis);
              t = (wd->pinch.diff * 0.01) + 1.0;
-             if (((wd->zoom + (int)t - 1) < wd->src->zoom_min) ||
-                 ((wd->zoom + (int)t - 1) > wd->src->zoom_max) ||
-                 (t > PINCH_ZOOM_MAX) || (t < PINCH_ZOOM_MIN))
+             if ((t > 1.1) || (wd->rotate.doing))
                {
-                  wd->pinch.diff = tt;
-                  goto do_nothing;
+                  if (((wd->zoom + (int)t - 1) < wd->src->zoom_min) ||
+                      ((wd->zoom + (int)t - 1) > wd->src->zoom_max) ||
+                      (t > PINCH_ZOOM_MAX) || (t < PINCH_ZOOM_MIN))
+                    {
+                       wd->pinch.diff = tt;
+                       goto do_nothing;
+                    }
+                  else
+                    {
+                       wd->pinch.level = (wd->pinch.diff * 0.01) + 1.0;
+                       wd->pinch.cx = x + half_w;
+                       wd->pinch.cy = y + half_h;
+                       wd->pinch.doing = EINA_TRUE;
+                       if (!wd->rotate.doing) goto do_zoom_only;
+                    }
                }
              else
                {
-                  wd->pinch.level = (wd->pinch.diff * 0.01) + 1.0;
-                  wd->pinch.cx = x + half_w;
-                  wd->pinch.cy = y + half_h;
+                  if (wd->pinch.doing) goto do_nothing;
                }
 
              a = (double)(ev->prev.y - ev0->prev.y) / (double)(ev->prev.x - ev0->prev.x);
@@ -1783,15 +1887,16 @@ _mouse_multi_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__
                   wd->rotate.a = a;
                   wd->rotate.cx = x + half_w;
                   wd->rotate.cy = y + half_h;
+                  wd->rotate.doing = EINA_TRUE;
                }
-
+do_zoom_only:
              if (wd->calc_job) ecore_job_del(wd->calc_job);
              wd->calc_job = ecore_job_add(_calc_job, wd);
           }
      }
 do_nothing:
-   ev->prev.x = move->cur.output.x;
-   ev->prev.y = move->cur.output.y;
+   ev->prev.x = move->cur.canvas.x;
+   ev->prev.y = move->cur.canvas.y;
 }
 
 static void
@@ -1818,8 +1923,10 @@ _mouse_multi_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, 
    else if (wd->pinch.diff < 0.0) zoom = (int)floor(-1.0 / ((wd->pinch.diff * 0.005) + 1.0));
    elm_map_zoom_set(data, wd->zoom + zoom);
    wd->pinch.level = 1.0;
+   wd->pinch.doing = EINA_FALSE;
    wd->paused = tp;
    wd->rotate.a = 0.0;
+   wd->rotate.doing = EINA_FALSE;
 
    ev = get_event_object(data, up->device);
    if (!ev)
@@ -1944,11 +2051,12 @@ _del_hook(Evas_Object *obj)
    Eina_List *l;
    Event *ev;
    Evas_Object *p;
-   Route_Node *n;
-   Route_Waypoint *w;
+   Path_Node *n;
+   Path_Waypoint *w;
    Ecore_Event_Handler *h;
    Elm_Map_Route *r;
    Elm_Map_Name *na;
+   Evas_Object *route;
 
    if (!wd) return;
    EINA_LIST_FREE(wd->groups_clas, group_clas)
@@ -2011,6 +2119,11 @@ _del_hook(Evas_Object *obj)
           }
      }
 
+   EINA_LIST_FREE(wd->track, route)
+     {
+        evas_object_del(route);
+     }
+
    if (wd->map) evas_map_free(wd->map);
    if (wd->source_names) free(wd->source_names);
    if (wd->calc_job) ecore_job_del(wd->calc_job);
@@ -2019,6 +2132,7 @@ _del_hook(Evas_Object *obj)
    if (wd->long_timer) ecore_timer_del(wd->long_timer);
    if (wd->user_agent) eina_stringshare_del(wd->user_agent);
    if (wd->ua) eina_hash_free(wd->ua);
+   if (wd->markers) free(wd->markers);
 
    free(wd);
 }
@@ -2036,7 +2150,7 @@ _del_pre_hook(Evas_Object *obj)
 
    if (!wd) return;
    grid_clearall(obj);
-   for (i = 0; i < ZOOM_MAX + 1; i++)
+   for (i = 0; i <= wd->zoom_max; i++)
      {
         if (!wd->markers[i]) continue;
         Eina_Iterator *it = eina_matrixsparse_iterator_new(wd->markers[i]);
@@ -2075,12 +2189,12 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    if (!wd) return;
    if (elm_widget_focus_get(obj))
      {
-        edje_object_signal_emit(wd->obj, "elm,action,focus", "elm");
+        edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr), "elm,action,focus", "elm");
         evas_object_focus_set(wd->obj, EINA_TRUE);
      }
    else
      {
-        edje_object_signal_emit(wd->obj, "elm,action,unfocus", "elm");
+        edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr), "elm,action,unfocus", "elm");
         evas_object_focus_set(wd->obj, EINA_FALSE);
      }
 }
@@ -2243,6 +2357,7 @@ _pan_calculate(Evas_Object *obj)
         grid_place(sd->wd->obj, g, sd->wd->pan_x, sd->wd->pan_y, ox, oy, ow, oh);
         marker_place(sd->wd->obj, g, sd->wd->pan_x, sd->wd->pan_y, ox, oy, ow, oh);
         if (!sd->wd->zoom_animator) route_place(sd->wd->obj, g, sd->wd->pan_x, sd->wd->pan_y, ox, oy, ow, oh);
+        if (!sd->wd->zoom_animator) track_place(sd->wd->obj, g, sd->wd->pan_x, sd->wd->pan_y, ox, oy, ow, oh);
      }
 }
 
@@ -2818,7 +2933,7 @@ _parse_kml(void *data)
              r->info.waypoint_count = ele;
              for (idx = 0 ; idx < ele ; idx++)
                {
-                  Route_Waypoint *wp = ELM_NEW(Route_Waypoint);
+                  Path_Waypoint *wp = ELM_NEW(Path_Waypoint);
                   if (wp)
                     {
                        wp->wd = r->wd;
@@ -2843,7 +2958,7 @@ _parse_kml(void *data)
              for (idx = 0 ; idx < ele ; idx++)
                {
                   sscanf(str[idx], "%lf,%lf", &lon, &lat);
-                  Route_Node *n = ELM_NEW(Route_Node);
+                  Path_Node *n = ELM_NEW(Path_Node);
                   if (n)
                     {
                        n->wd = r->wd;
@@ -3073,8 +3188,13 @@ elm_map_add(Evas_Object *parent)
    wd->map = evas_map_new(4);
    if (!wd->map) return NULL;
 
+   wd->zoom_min = 0xFF;
+   wd->zoom_max = 0X00;
    wd->markers_max_num = 30;
    wd->pinch.level = 1.0;
+   zoom_min_get(obj);
+   zoom_max_get(obj);
+   wd->markers = calloc(wd->zoom_max + 1, sizeof(void*));
 
    evas_object_smart_callback_add(obj, "scroll-hold-on", _hold_on, obj);
    evas_object_smart_callback_add(obj, "scroll-hold-off", _hold_off, obj);
@@ -3179,6 +3299,7 @@ elm_map_zoom_set(Evas_Object *obj, int zoom)
    Evas_Coord rx, ry, rw, rh;
    Evas_Object *p;
    Elm_Map_Route *r;
+   Evas_Object *route;
    int z = 0, zoom_changed = 0, started = 0;
 
    if ((!wd) || (!wd->src) || (wd->zoom_animator)) return;
@@ -3205,6 +3326,11 @@ elm_map_zoom_set(Evas_Object *obj, int zoom)
                   evas_object_polygon_points_clear(p);
                }
           }
+     }
+
+   EINA_LIST_FOREACH(wd->track, l, route)
+     {
+       evas_object_hide(route);
      }
 
    if (wd->mode != ELM_MAP_ZOOM_MODE_MANUAL)
@@ -3798,6 +3924,9 @@ elm_map_marker_add(Evas_Object *obj, double lon, double lat, Elm_Map_Marker_Clas
    marker->longitude = lon;
    marker->latitude = lat;
    marker->data = data;
+   marker->x = calloc(wd->zoom_max + 1, sizeof(Evas_Coord));
+   marker->y = calloc(wd->zoom_max + 1, sizeof(Evas_Coord));
+   marker->groups = calloc(wd->zoom_max + 1, sizeof(Marker_Group*));
 
    tabi[1] = tabi[4] = tabi[6] = -1;
    tabi[2] = tabi[0] = tabi[7] = 0;
@@ -3851,7 +3980,7 @@ elm_map_marker_add(Evas_Object *obj, double lon, double lat, Elm_Map_Marker_Clas
         clas->priv.set = EINA_TRUE;
      }
 
-   for (i = clas_group->zoom_displayed; i <= ZOOM_MAX; i++)
+   for (i = clas_group->zoom_displayed; i <= wd->zoom_max; i++)
      {
         elm_map_utils_convert_geo_into_coord(obj, lon, lat, pow(2.0, i)*wd->tsize,
                                              &(marker->x[i]), &(marker->y[i]));
@@ -3969,7 +4098,7 @@ elm_map_marker_remove(Elm_Map_Marker *marker)
    EINA_SAFETY_ON_NULL_RETURN(marker);
    wd = marker->wd;
    if (!wd) return;
-   for (i = marker->clas_group->zoom_displayed; i <= ZOOM_MAX; i++)
+   for (i = marker->clas_group->zoom_displayed; i <= wd->zoom_max; i++)
      {
         marker->groups[i]->markers = eina_list_remove(marker->groups[i]->markers, marker);
         if (!eina_list_count(marker->groups[i]->markers))
@@ -4011,6 +4140,10 @@ elm_map_marker_remove(Elm_Map_Marker *marker)
      marker->clas->func.del(marker->wd->obj, marker, marker->data, marker->content);
    else if (marker->content)
      evas_object_del(marker->content);
+
+   if (marker->x) free(marker->x);
+   if (marker->y) free(marker->y);
+   if (marker->groups) free(marker->groups);
 
    free(marker);
 
@@ -4224,7 +4357,7 @@ elm_map_group_class_new(Evas_Object *obj)
 
    if (!wd) return NULL;
    Elm_Map_Group_Class *clas = calloc(1, sizeof(Elm_Map_Group_Class));
-   clas->zoom_grouped = ZOOM_MAX;
+   clas->zoom_grouped = wd->zoom_max;
    wd->groups_clas = eina_list_append(wd->groups_clas, clas);
    return clas;
 }
@@ -4548,6 +4681,24 @@ elm_map_route_source_get(const Evas_Object *obj)
 }
 
 /**
+ * Set the maximum zoom of the source.
+ *
+ * @param source the source
+ *
+ * @ingroup Map
+ */
+EAPI void
+elm_map_source_zoom_max_set(Evas_Object *obj, int zoom)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if ((!wd) || (!wd->src)) return;
+   if ((zoom > wd->zoom_max) || (zoom < wd->zoom_min)) return;
+   wd->src->zoom_max = zoom;
+}
+
+/**
  * Get the maximum zoom of the source.
  *
  * @param source the source
@@ -4564,6 +4715,25 @@ elm_map_source_zoom_max_get(const Evas_Object *obj)
    if ((!wd) || (!wd->src)) return 18;
    return wd->src->zoom_max;
 }
+
+/**
+ * Set the minimum zoom of the source.
+ *
+ * @param source the source
+ *
+ * @ingroup Map
+ */
+EAPI void
+elm_map_source_zoom_min_set(Evas_Object *obj, int zoom)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if ((!wd) || (!wd->src)) return;
+   if ((zoom > wd->zoom_max) || (zoom < wd->zoom_min)) return;
+   wd->src->zoom_min = zoom;
+}
+
 
 /**
  * Get the minimum zoom of the source.
@@ -4729,6 +4899,7 @@ elm_map_route_add(Evas_Object *obj,
    return route;
 }
 
+
 /**
  * Remove a route from the map
  *
@@ -4742,8 +4913,8 @@ elm_map_route_remove(Elm_Map_Route *route)
 {
    EINA_SAFETY_ON_NULL_RETURN(route);
 
-   Route_Waypoint *w;
-   Route_Node *n;
+   Path_Waypoint *w;
+   Path_Node *n;
    Evas_Object *p;
    Ecore_Event_Handler *h;
 
@@ -5016,12 +5187,60 @@ elm_map_wheel_disabled_get(const Evas_Object *obj)
    return wd->wheel_disabled;
 }
 
+#ifdef ELM_EMAP
+/**
+ * Add a track on the map
+ *
+ * @param obj The map object
+ * @param emap the emap object
+ *
+ * @return The Route object. This is a elm object of type Elm_Route
+ *
+ * @ingroup Map
+ */
+EAPI Evas_Object *
+elm_map_track_add(Evas_Object *obj, EMap_Route *emap)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return EINA_FALSE;
+
+   Evas_Object *route = elm_route_add(obj);
+   elm_route_emap_set(route, emap);
+   wd->track = eina_list_append(wd->track, route);
+
+   return route;
+}
+
+#endif
+
+/**
+ * Remove a track from the map
+ *
+ * @param track The track to remove
+ *
+ * @ingroup Map
+ */
+
+EAPI void
+elm_map_track_remove(Evas_Object *obj, Evas_Object *route)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) ;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return ;
+
+   wd->track = eina_list_remove(wd->track, route);
+   evas_object_del(route);
+}
+
 static char *
 _mapnik_url_cb(Evas_Object *obj __UNUSED__, int x, int y, int zoom)
 {
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf), "http://tile.openstreetmap.org/%d/%d/%d.png",
-            zoom, x, y);
+          zoom, x, y);
    return strdup(buf);
 }
 

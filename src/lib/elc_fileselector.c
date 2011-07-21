@@ -24,6 +24,14 @@
  * "done" - the user clicks on the ok or cancel button
  */
 
+#ifdef HAVE_CONFIG_H
+# include "elementary_config.h"
+#endif
+
+#ifdef HAVE_EIO
+# include <Eio.h>
+#endif
+
 #include <Elementary.h>
 #include "elm_priv.h"
 
@@ -31,6 +39,8 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
 {
+   EINA_REFCOUNT;
+
    Evas_Object *edje;
    Evas_Object *filename_entry;
    Evas_Object *path_entry;
@@ -48,6 +58,10 @@ struct _Widget_Data
 
    const char  *path_separator;
 
+#ifdef HAVE_EIO
+   Eio_File    *current;
+#endif
+
    Elm_Fileselector_Mode mode;
 
    Eina_Bool    only_folder : 1;
@@ -60,8 +74,34 @@ struct sel_data
    const char  *path;
 };
 
-Elm_Genlist_Item_Class list_itc;
-Elm_Gengrid_Item_Class grid_itc;
+typedef struct _Widget_Request Widget_Request;
+struct _Widget_Request
+{
+   Widget_Data *wd;
+   Elm_Genlist_Item *parent;
+
+   Evas_Object *obj;
+   const char *path;
+   Eina_Bool first : 1;
+};
+
+typedef enum {
+  ELM_DIRECTORY = 0,
+  ELM_FILE_IMAGE = 1,
+  ELM_FILE_UNKNOW = 2,
+  ELM_FILE_LAST
+} Elm_Fileselector_Type;
+
+static Elm_Genlist_Item_Class list_itc[ELM_FILE_LAST] = {
+  { "default", { NULL, NULL, NULL, NULL, NULL }, NULL },
+  { "default", { NULL, NULL, NULL, NULL, NULL }, NULL },
+  { "default", { NULL, NULL, NULL, NULL, NULL }, NULL }
+};
+static Elm_Gengrid_Item_Class grid_itc[ELM_FILE_LAST] = {
+  { "default", { NULL, NULL, NULL, NULL } },
+  { "default", { NULL, NULL, NULL, NULL } },
+  { "default", { NULL, NULL, NULL, NULL } }
+};
 
 static const char *widtype = NULL;
 
@@ -83,22 +123,37 @@ static void _do_anchors(Evas_Object *obj,
 
 /***  ELEMENTARY WIDGET  ***/
 static void
-_del_hook(Evas_Object *obj)
+_widget_data_free(Widget_Data *wd)
 {
-   Widget_Data *wd;
-   void *sd;
-
-   wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
    if (wd->path) eina_stringshare_del(wd->path);
    if (wd->selection) eina_stringshare_del(wd->selection);
    if (wd->sel_idler)
      {
+        void *sd;
+
         sd = ecore_idler_del(wd->sel_idler);
         free(sd);
      }
    free(wd);
+}
+
+static void
+_del_hook(Evas_Object *obj)
+{
+   Widget_Data *wd;
+
+   wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+#ifdef HAVE_EIO
+   if (wd->current)
+     eio_file_cancel(wd->current);
+#endif
+
+   wd->files_list = NULL;
+   wd->files_grid = NULL;
+
+   EINA_REFCOUNT_UNREF(wd, _widget_data_free);
 }
 
 static void
@@ -212,25 +267,56 @@ _itc_label_get(void              *data,
 }
 
 static Evas_Object *
-_itc_icon_get(void        *data,
-              Evas_Object *obj,
-              const char  *source)
+_itc_icon_folder_get(void        *data __UNUSED__,
+                     Evas_Object *obj,
+                     const char  *source)
 {
    Evas_Object *ic;
 
-   if (!strcmp(source, "elm.swallow.icon"))
-     {
-        ic = elm_icon_add(obj);
-        if (ecore_file_is_dir((char *)data))
-          elm_icon_standard_set(ic, "folder");
-        else
-          elm_icon_standard_set(ic, "file");
-        evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL,
-                                         1, 1);
-        evas_object_show(ic);
-        return ic;
-     }
-   return NULL;
+   if (strcmp(source, "elm.swallow.icon")) return NULL;
+
+   ic = elm_icon_add(obj);
+   elm_icon_standard_set(ic, "folder");
+
+   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL,
+                                    1, 1);
+   return ic;
+}
+
+static Evas_Object *
+_itc_icon_image_get(void        *data,
+                    Evas_Object *obj,
+                    const char  *source)
+{
+   const char *filename = data;
+   Evas_Object *ic;
+
+   if (strcmp(source, "elm.swallow.icon")) return NULL;
+
+   ic = elm_icon_add(obj);
+   elm_icon_standard_set(ic, "image");
+   elm_icon_thumb_set(ic, filename, NULL);
+
+   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL,
+                                    1, 1);
+   return ic;
+}
+
+static Evas_Object *
+_itc_icon_file_get(void        *data __UNUSED__,
+                   Evas_Object *obj,
+                   const char  *source)
+{
+   Evas_Object *ic;
+
+   if (strcmp(source, "elm.swallow.icon")) return NULL;
+
+   ic = elm_icon_add(obj);
+   elm_icon_standard_set(ic, "file");
+
+   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL,
+                                    1, 1);
+   return ic;
 }
 
 static Eina_Bool
@@ -303,7 +389,7 @@ _sel_do(void *data)
         if (wd->expand && wd->mode == ELM_FILESELECTOR_LIST)
           {
              _do_anchors(sd->fs, path);
-             elm_scrolled_entry_entry_set(wd->filename_entry, "");
+             elm_entry_entry_set(wd->filename_entry, "");
           }
         else
           {
@@ -325,7 +411,7 @@ _sel_do(void *data)
              _populate(sd->fs, p, NULL);
              eina_stringshare_del(p);
           }
-        elm_scrolled_entry_entry_set(wd->filename_entry,
+        elm_entry_entry_set(wd->filename_entry,
                                      ecore_file_file_get(path));
      }
 
@@ -471,8 +557,155 @@ _do_anchors(Evas_Object *obj,
    free(tok[0]);
    free(tok);
 
-   elm_scrolled_entry_entry_set(wd->path_entry, buf);
+   elm_entry_entry_set(wd->path_entry, buf);
 }
+
+#ifdef HAVE_EIO
+static Eina_Bool
+_filter_cb(void *data __UNUSED__, Eio_File *handler, const Eina_File_Direct_Info *info)
+{
+   const char *filename;
+
+   if (info->path[info->name_start] == '.')
+     return EINA_FALSE;
+
+   filename = eina_stringshare_add(info->path);
+   eio_file_associate_direct_add(handler, "filename", filename, EINA_FREE_CB(eina_stringshare_del));
+
+   if (info->type == EINA_FILE_DIR)
+     {
+        eio_file_associate_direct_add(handler, "type/grid", &grid_itc[ELM_DIRECTORY], NULL);
+        eio_file_associate_direct_add(handler, "type/list", &list_itc[ELM_DIRECTORY], NULL);
+     }
+   else
+     {
+        if (evas_object_image_extension_can_load_get(info->path + info->name_start))
+          {
+             eio_file_associate_direct_add(handler, "type/grid", &grid_itc[ELM_FILE_IMAGE], NULL);
+             eio_file_associate_direct_add(handler, "type/list", &list_itc[ELM_FILE_IMAGE], NULL);
+          }
+        else
+          {
+             eio_file_associate_direct_add(handler, "type/grid", &grid_itc[ELM_FILE_UNKNOW], NULL);
+             eio_file_associate_direct_add(handler, "type/list", &list_itc[ELM_FILE_UNKNOW], NULL);
+          }
+     }
+
+   return EINA_TRUE;
+}
+
+static int
+_file_grid_cmp(const void *a, const void *b)
+{
+   const Elm_Gengrid_Item *ga = a;
+   const Elm_Gengrid_Item *gb = b;
+   const Elm_Gengrid_Item_Class *ca = elm_gengrid_item_item_class_get(ga);
+   const Elm_Gengrid_Item_Class *cb = elm_gengrid_item_item_class_get(gb);
+
+   if (ca == &grid_itc[ELM_DIRECTORY])
+     {
+        if (cb != &grid_itc[ELM_DIRECTORY])
+          return -1;
+     }
+
+   return strcoll(elm_gengrid_item_data_get(ga), elm_gengrid_item_data_get(gb));
+}
+
+static int
+_file_list_cmp(const void *a, const void *b)
+{
+   const Elm_Genlist_Item *la = a;
+   const Elm_Genlist_Item *lb = b;
+   const Elm_Genlist_Item_Class *ca = elm_genlist_item_item_class_get(la);
+   const Elm_Genlist_Item_Class *cb = elm_genlist_item_item_class_get(lb);
+
+   if (ca == &list_itc[ELM_DIRECTORY])
+     {
+        if (cb != &list_itc[ELM_DIRECTORY])
+          return -1;
+     }
+
+   return strcoll(elm_genlist_item_data_get(la), elm_genlist_item_data_get(lb));
+}
+
+static void
+_signal_first(Widget_Request *wr)
+{
+   if (!wr->first) return ;
+   evas_object_smart_callback_call(wr->obj, SIG_DIRECTORY_OPEN, (void *)wr->path);
+   if (!wr->parent)
+     {
+        elm_genlist_clear(wr->wd->files_list);
+        elm_gengrid_clear(wr->wd->files_grid);
+        eina_stringshare_replace(&wr->wd->path, wr->path);
+        _do_anchors(wr->obj, wr->path);
+     }
+
+   if (wr->wd->filename_entry) elm_entry_entry_set(wr->wd->filename_entry, "");
+
+   wr->first = EINA_FALSE;
+}
+
+static void
+_main_cb(void *data, Eio_File *handler, const Eina_File_Direct_Info *info __UNUSED__)
+{
+   Widget_Request *wr = data;
+
+   if (eio_file_check(handler))
+     return ;
+   if (!wr->wd->files_list || !wr->wd->files_grid || wr->wd->current != handler)
+     {
+        eio_file_cancel(handler);
+        return ;
+     }
+
+   _signal_first(wr);
+
+   if (wr->wd->mode == ELM_FILESELECTOR_LIST)
+     elm_genlist_item_direct_sorted_insert(wr->wd->files_list, eio_file_associate_find(handler, "type/list"),
+                                           eina_stringshare_ref(eio_file_associate_find(handler, "filename")),
+                                           wr->parent, ELM_GENLIST_ITEM_NONE, _file_list_cmp, NULL, NULL);
+   else if (wr->wd->mode == ELM_FILESELECTOR_GRID)
+     elm_gengrid_item_direct_sorted_insert(wr->wd->files_grid, eio_file_associate_find(handler, "type/grid"),
+                                           eina_stringshare_ref(eio_file_associate_find(handler, "filename")),
+                                           _file_grid_cmp, NULL, NULL);
+}
+
+static void
+_widget_request_cleanup(Widget_Request *wr)
+{
+   EINA_REFCOUNT_UNREF(wr->wd, _widget_data_free);
+
+   eina_stringshare_del(wr->path);
+   free(wr);
+}
+
+static void
+_done_cb(void *data, Eio_File *handler __UNUSED__)
+{
+   Widget_Request *wr = data;
+
+   _signal_first(wr);
+
+#ifdef HAVE_EIO
+   wr->wd->current = NULL;
+#endif
+   _widget_request_cleanup(wr);
+}
+
+static void
+_error_cb(void *data, Eio_File *handler, int error __UNUSED__)
+{
+   Widget_Request *wr = data;
+
+#ifdef HAVE_EIO
+   if (wr->wd->current == handler)
+     wr->wd->current = NULL;
+#endif
+   _widget_request_cleanup(wr);
+}
+
+#endif
 
 static void
 _populate(Evas_Object      *obj,
@@ -480,15 +713,20 @@ _populate(Evas_Object      *obj,
           Elm_Genlist_Item *parent)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   DIR *dir;
-   struct dirent *dp;
-   char buf[PATH_MAX];
-   char *real;
-   Eina_List *files = NULL, *dirs = NULL, *l;
+#ifdef HAVE_EIO
+   Widget_Request *wr;
+#else
+   Eina_File_Direct_Info *file;
+   Eina_Iterator *it;
+   const char *real;
+   Eina_List *files = NULL, *dirs = NULL;
+#endif
 
-   if ((!wd) || (!ecore_file_is_dir(path))) return;
-   dir = opendir(path);
-   if (!dir) return;
+   if (!wd) return;
+#ifndef HAVE_EIO
+   if (!ecore_file_is_dir(path)) return ;
+   it = eina_file_stat_ls(path);
+   if (!it) return ;
    evas_object_smart_callback_call(obj, SIG_DIRECTORY_OPEN, (void *)path);
    if (!parent)
      {
@@ -498,57 +736,74 @@ _populate(Evas_Object      *obj,
         _do_anchors(obj, path);
      }
 
-   if (wd->filename_entry) elm_scrolled_entry_entry_set(wd->filename_entry, "");
-   while ((dp = readdir(dir)))
+   if (wd->filename_entry) elm_entry_entry_set(wd->filename_entry, "");
+   EINA_ITERATOR_FOREACH(it, file)
      {
-        if (dp->d_name[0] == '.') continue;  // TODO make this configurable
+        const char *filename;
 
-        snprintf(buf, sizeof(buf), "%s/%s", path, dp->d_name);
-        real = ecore_file_realpath(buf); /* TODO: this will resolv
-                                          * symlinks...I dont like
-                                          * it*/
-        if (ecore_file_is_dir(real))
-          dirs = eina_list_append(dirs, real);
+        if (file->path[file->name_start] == '.')
+          continue ;
+
+        filename = eina_stringshare_add(file->path);
+        if (file->type == EINA_FILE_DIR)
+          dirs = eina_list_append(dirs, filename);
         else if (!wd->only_folder)
-          files = eina_list_append(files, real);
+          files = eina_list_append(files, filename);
      }
-   closedir(dir);
+   eina_iterator_free(it);
 
    files = eina_list_sort(files, eina_list_count(files),
                           EINA_COMPARE_CB(strcoll));
    dirs = eina_list_sort(dirs, eina_list_count(dirs), EINA_COMPARE_CB(strcoll));
-   EINA_LIST_FOREACH(dirs, l, real)
+   EINA_LIST_FREE(dirs, real)
      {
         if (wd->mode == ELM_FILESELECTOR_LIST)
-          elm_genlist_item_append(wd->files_list, &list_itc,
-                                  eina_stringshare_add(real), /* item data */
+          elm_genlist_item_append(wd->files_list, &list_itc[ELM_DIRECTORY],
+                                  real, /* item data */
                                   parent,
                                   wd->expand ? ELM_GENLIST_ITEM_SUBITEMS :
                                   ELM_GENLIST_ITEM_NONE,
                                   NULL, NULL);
         else if (wd->mode == ELM_FILESELECTOR_GRID)
-          elm_gengrid_item_append(wd->files_grid, &grid_itc,
-                                  eina_stringshare_add(real), /* item data */
+          elm_gengrid_item_append(wd->files_grid, &grid_itc[ELM_DIRECTORY],
+                                  real, /* item data */
                                   NULL, NULL);
-
-        free(real);
      }
-   eina_list_free(dirs);
 
-   EINA_LIST_FOREACH(files, l, real)
+   EINA_LIST_FREE(files, real)
      {
+        Elm_Fileselector_Type type = evas_object_image_extension_can_load_fast_get(real) ?
+          ELM_FILE_IMAGE : ELM_FILE_UNKNOW;
+
         if (wd->mode == ELM_FILESELECTOR_LIST)
-          elm_genlist_item_append(wd->files_list, &list_itc,
-                                  eina_stringshare_add(real), /* item data */
+          elm_genlist_item_append(wd->files_list, &list_itc[type],
+                                  real, /* item data */
                                   parent, ELM_GENLIST_ITEM_NONE,
                                   NULL, NULL);
         else if (wd->mode == ELM_FILESELECTOR_GRID)
-          elm_gengrid_item_append(wd->files_grid, &grid_itc,
-                                  eina_stringshare_add(real), /* item data */
+          elm_gengrid_item_append(wd->files_grid, &grid_itc[type],
+                                  real, /* item data */
                                   NULL, NULL);
-        free(real);
      }
-   eina_list_free(files);
+#else
+   if (wd->current)
+     eio_file_cancel(wd->current);
+   wr = malloc(sizeof (Widget_Request));
+   if (!wr) return ;
+   wr->wd = wd;
+   EINA_REFCOUNT_REF(wr->wd);
+   wr->parent = parent; /* FIXME: should we refcount the parent ? */
+   wr->obj = obj;
+   wr->path = eina_stringshare_add(path);
+   wr->first = EINA_TRUE;
+
+   wd->current = eio_file_stat_ls(path,
+                                  _filter_cb,
+                                  _main_cb,
+                                  _done_cb,
+                                  _error_cb,
+                                  wr);
+#endif
 }
 
 /***  API  ***/
@@ -567,9 +822,12 @@ elm_fileselector_add(Evas_Object *parent)
    Evas *e;
    Evas_Object *obj, *ic, *bt, *li, *en, *grid;
    Widget_Data *wd;
+   unsigned int i;
    int s;
 
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
+
+   EINA_REFCOUNT_INIT(wd);
 
    ELM_SET_WIDTYPE(widtype, "fileselector");
    elm_widget_type_set(obj, "fileselector");
@@ -592,7 +850,7 @@ elm_fileselector_add(Evas_Object *parent)
    bt = elm_button_add(parent);
    elm_widget_mirrored_automatic_set(bt, EINA_FALSE);
    elm_button_icon_set(bt, ic);
-   elm_button_label_set(bt, E_("Up"));
+   elm_object_text_set(bt, E_("Up"));
    evas_object_size_hint_align_set(bt, 0.0, 0.0);
 
    evas_object_smart_callback_add(bt, "clicked", _up, obj);
@@ -607,7 +865,7 @@ elm_fileselector_add(Evas_Object *parent)
    bt = elm_button_add(parent);
    elm_widget_mirrored_automatic_set(bt, EINA_FALSE);
    elm_button_icon_set(bt, ic);
-   elm_button_label_set(bt, E_("Home"));
+   elm_object_text_set(bt, E_("Home"));
    evas_object_size_hint_align_set(bt, 0.0, 0.0);
 
    evas_object_smart_callback_add(bt, "clicked", _home, obj);
@@ -615,11 +873,16 @@ elm_fileselector_add(Evas_Object *parent)
    elm_widget_sub_object_add(obj, bt);
    wd->home_button = bt;
 
-   list_itc.item_style = grid_itc.item_style = "default";
-   list_itc.func.label_get = grid_itc.func.label_get = _itc_label_get;
-   list_itc.func.icon_get = grid_itc.func.icon_get = _itc_icon_get;
-   list_itc.func.state_get = grid_itc.func.state_get = _itc_state_get;
-   list_itc.func.del = grid_itc.func.del = _itc_del;
+   list_itc[ELM_DIRECTORY].func.icon_get = grid_itc[ELM_DIRECTORY].func.icon_get = _itc_icon_folder_get;
+   list_itc[ELM_FILE_IMAGE].func.icon_get = grid_itc[ELM_FILE_IMAGE].func.icon_get = _itc_icon_image_get;
+   list_itc[ELM_FILE_UNKNOW].func.icon_get = grid_itc[ELM_FILE_UNKNOW].func.icon_get = _itc_icon_file_get;
+
+   for (i = 0; i < ELM_FILE_LAST; ++i)
+     {
+        list_itc[i].func.label_get = grid_itc[i].func.label_get = _itc_label_get;
+        list_itc[i].func.state_get = grid_itc[i].func.state_get = _itc_state_get;
+        list_itc[i].func.del = grid_itc[i].func.del = _itc_del;
+     }
 
    li = elm_genlist_add(parent);
    elm_widget_mirrored_automatic_set(li, EINA_FALSE);
@@ -650,11 +913,12 @@ elm_fileselector_add(Evas_Object *parent)
    wd->files_grid = grid;
 
    // path entry
-   en = elm_scrolled_entry_add(parent);
+   en = elm_entry_add(parent);
+   elm_entry_scrollable_set(en, EINA_TRUE);
    elm_widget_mirrored_automatic_set(en, EINA_FALSE);
-   elm_scrolled_entry_editable_set(en, EINA_FALSE);
-   elm_scrolled_entry_single_line_set(en, EINA_TRUE);
-   elm_scrolled_entry_line_char_wrap_set(en, EINA_TRUE);
+   elm_entry_editable_set(en, EINA_FALSE);
+   elm_entry_single_line_set(en, EINA_TRUE);
+   elm_entry_line_wrap_set(en, ELM_WRAP_CHAR);
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
@@ -664,11 +928,12 @@ elm_fileselector_add(Evas_Object *parent)
    wd->path_entry = en;
 
    // filename entry
-   en = elm_scrolled_entry_add(parent);
+   en = elm_entry_add(parent);
+   elm_entry_scrollable_set(en, EINA_TRUE);
    elm_widget_mirrored_automatic_set(en, EINA_FALSE);
-   elm_scrolled_entry_editable_set(en, EINA_TRUE);
-   elm_scrolled_entry_single_line_set(en, EINA_TRUE);
-   elm_scrolled_entry_line_char_wrap_set(en, EINA_TRUE);
+   elm_entry_editable_set(en, EINA_TRUE);
+   elm_entry_single_line_set(en, EINA_TRUE);
+   elm_entry_line_wrap_set(en, ELM_WRAP_CHAR);
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
@@ -788,7 +1053,7 @@ elm_fileselector_buttons_ok_cancel_set(Evas_Object *obj,
         // cancel btn
         bt = elm_button_add(obj);
         elm_widget_mirrored_automatic_set(bt, EINA_FALSE);
-        elm_button_label_set(bt, E_("Cancel"));
+        elm_object_text_set(bt, E_("Cancel"));
 
         evas_object_smart_callback_add(bt, "clicked", _canc, obj);
 
@@ -798,7 +1063,7 @@ elm_fileselector_buttons_ok_cancel_set(Evas_Object *obj,
         // ok btn
         bt = elm_button_add(obj);
         elm_widget_mirrored_automatic_set(bt, EINA_FALSE);
-        elm_button_label_set(bt, E_("OK"));
+        elm_object_text_set(bt, E_("OK"));
 
         evas_object_smart_callback_add(bt, "clicked", _ok, obj);
 
@@ -1009,7 +1274,7 @@ elm_fileselector_selected_get(const Evas_Object *obj)
         const char *name;
         char buf[PATH_MAX];
 
-        name = elm_scrolled_entry_entry_get(wd->filename_entry);
+        name = elm_entry_entry_get(wd->filename_entry);
         snprintf(buf, sizeof(buf), "%s/%s",
                  wd->only_folder ? ecore_file_dir_get(wd->path) : wd->path,
                  name);
@@ -1062,7 +1327,7 @@ elm_fileselector_selected_set(Evas_Object *obj,
         _populate(obj, ecore_file_dir_get(path), NULL);
         if (wd->filename_entry)
           {
-             elm_scrolled_entry_entry_set(wd->filename_entry,
+             elm_entry_entry_set(wd->filename_entry,
                                           ecore_file_file_get(path));
              eina_stringshare_replace(&wd->selection, path);
           }

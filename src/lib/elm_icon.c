@@ -27,6 +27,26 @@ struct _Widget_Data
    Evas_Object *img;
    const char *stdicon;
    Elm_Icon_Lookup_Order lookup_order;
+
+#ifdef HAVE_ELEMENTARY_ETHUMB
+   struct {
+      int id;
+
+      struct {
+         const char *path;
+         const char *key;
+      } file, thumb;
+
+      Ethumb_Exists *exists;
+
+      Ecore_Event_Handler *eeh;
+
+      Ethumb_Thumb_Format format;
+
+      Eina_Bool retry : 1;
+   } thumb;
+#endif
+
 #ifdef ELM_EFREET
    struct {
         int requested_size;
@@ -40,6 +60,13 @@ struct _Widget_Data
    Eina_Bool no_scale : 1;
 };
 
+#ifdef HAVE_ELEMENTARY_ETHUMB
+static Eina_List *_elm_icon_retry = NULL;
+static int _icon_pending_request = 0;
+
+static void _icon_thumb_exists(Ethumb_Client *client __UNUSED__, Ethumb_Exists *thread, Eina_Bool exists, void *data);
+#endif
+
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
@@ -48,6 +75,14 @@ static void _mouse_up(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static Eina_Bool _icon_standard_set(Widget_Data *wd, Evas_Object *obj, const char *name);
 static Eina_Bool _icon_freedesktop_set(Widget_Data *wd, Evas_Object *obj, const char *name, int size);
+
+static const char SIG_CLICKED[] = "clicked";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_CLICKED, ""},
+   {NULL, NULL}
+};
+
 
 //FIXME: move this code to ecore
 #ifdef _WIN32
@@ -65,13 +100,251 @@ _path_is_absolute(const char *path)
 }
 #endif
 
+static inline int
+_icon_size_min_get(Evas_Object *icon)
+{
+   int size;
+   _els_smart_icon_size_get(icon, &size, NULL);
+   return (size < 32) ? 32 : size;
+}
+
+#ifdef HAVE_ELEMENTARY_ETHUMB
+static void
+_icon_thumb_stop(Widget_Data *wd, void *ethumbd)
+{
+   if (wd->thumb.id >= 0)
+     {
+        ethumb_client_generate_cancel(ethumbd, wd->thumb.id, NULL, NULL, NULL);
+        wd->thumb.id = -1;
+        _icon_pending_request--;
+     }
+
+   if (wd->thumb.exists)
+     {
+        ethumb_client_thumb_exists_cancel(wd->thumb.exists, _icon_thumb_exists, wd);
+        wd->thumb.exists = NULL;
+        _icon_pending_request--;
+     }
+
+   if (wd->thumb.retry)
+     {
+        _elm_icon_retry = eina_list_remove(_elm_icon_retry, wd);
+        wd->thumb.retry = EINA_FALSE;
+     }
+}
+
+static Eina_Bool
+_icon_thumb_display(Widget_Data *wd)
+{
+   Eina_Bool ret = EINA_FALSE;
+
+   if (wd->thumb.format == ETHUMB_THUMB_EET)
+     {
+        static const char *extensions[] = {
+          ".avi", ".mp4", ".ogv", ".mov", ".mpg", ".wmv", NULL
+        };
+        const char **ext, *ptr;
+        int prefix_size;
+        Eina_Bool video = EINA_FALSE;
+
+        prefix_size = eina_stringshare_strlen(wd->thumb.file.path) - 4;
+        if (prefix_size >= 0)
+          {
+             ptr = wd->thumb.file.path + prefix_size;
+             for (ext = extensions; *ext; ++ext)
+               if (!strcasecmp(ptr, *ext))
+                 {
+                    video = EINA_TRUE;
+                    break;
+                 }
+          }
+
+        if (video)
+          ret = _els_smart_icon_file_edje_set(wd->img, wd->thumb.thumb.path, wd->thumb.thumb.key);
+     }
+
+   if (!ret)
+     ret = _els_smart_icon_file_key_set(wd->img, wd->thumb.thumb.path, wd->thumb.thumb.key);
+
+   return ret;
+}
+
+static Eina_Bool
+_icon_thumb_retry(Widget_Data *wd)
+{
+   return _icon_thumb_display(wd);
+}
+
+static void
+_icon_thumb_cleanup(Ethumb_Client *ethumbd)
+{
+   Eina_List *l, *ll;
+   Widget_Data *wd;
+
+   EINA_LIST_FOREACH_SAFE(_elm_icon_retry, l, ll, wd)
+     if (_icon_thumb_retry(wd))
+       {
+          _elm_icon_retry = eina_list_remove_list(_elm_icon_retry, l);
+          wd->thumb.retry = EINA_FALSE;
+       }
+
+   if (_icon_pending_request == 0)
+     EINA_LIST_FREE(_elm_icon_retry, wd)
+       _icon_thumb_stop(wd, ethumbd);
+}
+
+static void
+_icon_thumb_finish(Widget_Data *wd, Ethumb_Client *ethumbd)
+{
+   const char *file = NULL, *group = NULL;
+   Eina_Bool ret;
+
+   _els_smart_icon_file_get(wd->img, &file, &group);
+   file = eina_stringshare_ref(file);
+   group = eina_stringshare_ref(group);
+
+   ret = _icon_thumb_display(wd);
+
+   if (!ret && file)
+     {
+        const char *p;
+
+        if (!wd->thumb.retry)
+          {
+             _elm_icon_retry = eina_list_append(_elm_icon_retry, wd);
+             wd->thumb.retry = EINA_TRUE;
+          }
+
+        /* Back to previous image */
+        if (((p = strrchr(file, '.'))) && (!strcasecmp(p, ".edj")))
+          _els_smart_icon_file_edje_set(wd->img, file, group);
+        else
+          _els_smart_icon_file_key_set(wd->img, file, group);
+     }
+
+   _icon_thumb_cleanup(ethumbd);
+
+   eina_stringshare_del(file);
+   eina_stringshare_del(group);
+}
+
+static void
+_icon_thumb_cb(void *data,
+               Ethumb_Client *ethumbd,
+               int id,
+               const char *file __UNUSED__,
+               const char *key __UNUSED__,
+               const char *thumb_path,
+               const char *thumb_key,
+               Eina_Bool success)
+{
+   Widget_Data *wd = data;
+
+   EINA_SAFETY_ON_FALSE_RETURN(wd->thumb.id == id);
+   wd->thumb.id = -1;
+
+   _icon_pending_request--;
+
+   if (success)
+     {
+        eina_stringshare_replace(&wd->thumb.thumb.path, thumb_path);
+        eina_stringshare_replace(&wd->thumb.thumb.key, thumb_key);
+        wd->thumb.format = ethumb_client_format_get(ethumbd);
+
+        _icon_thumb_finish(wd, ethumbd);
+     }
+   else
+     {
+        ERR("could not generate thumbnail for %s (key: %s)", file, key);
+        _icon_thumb_cleanup(ethumbd);
+     }
+}
+
+static void
+_icon_thumb_exists(Ethumb_Client *client __UNUSED__, Ethumb_Exists *thread, Eina_Bool exists, void *data)
+{
+   Widget_Data *wd = data;
+   Ethumb_Client *ethumbd;
+
+   if (ethumb_client_thumb_exists_check(thread))
+     return ;
+
+   wd->thumb.exists = NULL;
+
+   ethumbd = elm_thumb_ethumb_client_get();
+
+   if (exists)
+     {
+        const char *thumb_path, *thumb_key;
+
+        _icon_pending_request--;
+        ethumb_client_thumb_path_get(ethumbd, &thumb_path, &thumb_key);
+        eina_stringshare_replace(&wd->thumb.thumb.path, thumb_path);
+        eina_stringshare_replace(&wd->thumb.thumb.key, thumb_key);
+        wd->thumb.format = ethumb_client_format_get(ethumbd);
+
+        _icon_thumb_finish(wd, ethumbd);
+     }
+   else if ((wd->thumb.id = ethumb_client_generate(ethumbd, _icon_thumb_cb, wd, NULL)) == -1)
+     {
+        ERR("Generate was unable to start !");
+        /* Failed to generate thumbnail */
+        _icon_pending_request--;
+     }
+}
+
+static void
+_icon_thumb_apply(Widget_Data *wd)
+{
+   Ethumb_Client *ethumbd;
+
+   ethumbd = elm_thumb_ethumb_client_get();
+
+   _icon_thumb_stop(wd, ethumbd);
+
+   if (!wd->thumb.file.path) return ;
+
+   _icon_pending_request++;
+   if (!ethumb_client_file_set(ethumbd, wd->thumb.file.path, wd->thumb.file.key)) return ;
+   ethumb_client_size_set(ethumbd, _icon_size_min_get(wd->img), _icon_size_min_get(wd->img));
+   wd->thumb.exists = ethumb_client_thumb_exists(ethumbd, _icon_thumb_exists, wd);
+}
+
+static Eina_Bool
+_icon_thumb_apply_cb(void *data, int type __UNUSED__, void *ev __UNUSED__)
+{
+   Widget_Data *wd = data;
+
+   _icon_thumb_apply(wd);
+   return ECORE_CALLBACK_RENEW;
+}
+#endif
+
 static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
+#ifdef HAVE_ELEMENTARY_ETHUMB
+   Ethumb_Client *ethumbd;
+#endif
+
    if (!wd) return;
    if (wd->stdicon) eina_stringshare_del(wd->stdicon);
+
+#ifdef HAVE_ELEMENTARY_ETHUMB
+   ethumbd = elm_thumb_ethumb_client_get();
+   _icon_thumb_stop(wd, ethumbd);
+
+   eina_stringshare_del(wd->thumb.file.path);
+   eina_stringshare_del(wd->thumb.file.key);
+   eina_stringshare_del(wd->thumb.thumb.path);
+   eina_stringshare_del(wd->thumb.thumb.key);
+
+   if (wd->thumb.eeh)
+     ecore_event_handler_del(wd->thumb.eeh);
+#endif
+
    free(wd);
 }
 
@@ -169,7 +442,7 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
 {
    Evas_Event_Mouse_Up *ev = event_info;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return;
-   evas_object_smart_callback_call(data, "clicked", event_info);
+   evas_object_smart_callback_call(data, SIG_CLICKED, event_info);
 }
 
 /**
@@ -206,6 +479,12 @@ elm_icon_add(Evas_Object *parent)
                                   _mouse_up, obj);
    evas_object_repeat_events_set(wd->img, EINA_TRUE);
    elm_widget_resize_object_set(obj, wd->img);
+
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
+
+#ifdef HAVE_ELEMENTARY_ETHUMB
+   wd->thumb.id = -1;
+#endif
 
    wd->smooth = EINA_TRUE;
    wd->scale_up = EINA_TRUE;
@@ -262,6 +541,34 @@ elm_icon_file_get(const Evas_Object *obj, const char **file, const char **group)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    _els_smart_icon_file_get(wd->img, file, group);
+}
+
+EAPI void
+elm_icon_thumb_set(const Evas_Object *obj, const char *file, const char *group)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+#ifdef HAVE_ELEMENTARY_ETHUMB
+   eina_stringshare_replace(&wd->thumb.file.path, file);
+   eina_stringshare_replace(&wd->thumb.file.key, group);
+
+   if (elm_thumb_ethumb_client_connected())
+     {
+        _icon_thumb_apply(wd);
+        return ;
+     }
+
+   if (!wd->thumb.eeh)
+     {
+        wd->thumb.eeh = ecore_event_handler_add(ELM_ECORE_EVENT_ETHUMB_CONNECT, _icon_thumb_apply_cb, wd);
+     }
+#else
+   (void) obj;
+   (void) file;
+   (void) group;
+#endif
 }
 
 static Eina_Bool
@@ -338,53 +645,37 @@ _icon_freedesktop_set(Widget_Data *wd, Evas_Object *obj, const char *name, int s
    return EINA_FALSE;
 }
 
-static inline int
-_icon_size_min_get(Evas_Object *icon)
+static Eina_Bool
+_elm_icon_standard_set(Widget_Data *wd, Evas_Object *obj, const char *name, Eina_Bool *fdo)
 {
-   int size;
-   _els_smart_icon_size_get(icon, &size, NULL);
-   return (size < 32) ? 32 : size;
-}
-
-/**
- * Set the theme, as standard, for a icon.
- * If theme was not found and it is the absolute path of an image file, this
- * image will be used.
- *
- * @param obj The icon object
- * @param name The theme name
- *
- * @return (1 = success, 0 = error)
- *
- * @ingroup Icon
- */
-EAPI Eina_Bool
-elm_icon_standard_set(Evas_Object *obj, const char *name)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
    char *tmp;
    Eina_Bool ret;
-
-   if ((!wd) || (!name)) return EINA_FALSE;
 
    /* try locating the icon using the specified lookup order */
    switch (wd->lookup_order)
      {
       case ELM_ICON_LOOKUP_FDO:
          ret = _icon_freedesktop_set(wd, obj, name, _icon_size_min_get(wd->img));
+         if (ret && fdo) *fdo = EINA_TRUE;
          break;
       case ELM_ICON_LOOKUP_THEME:
          ret = _icon_standard_set(wd, obj, name);
          break;
       case ELM_ICON_LOOKUP_THEME_FDO:
-         ret = _icon_standard_set(wd, obj, name) ||
-            _icon_freedesktop_set(wd, obj, name, _icon_size_min_get(wd->img));
+         ret = _icon_standard_set(wd, obj, name);
+         if (!ret)
+           {
+              ret = _icon_freedesktop_set(wd, obj, name, _icon_size_min_get(wd->img));
+              if (ret && fdo) *fdo = EINA_TRUE;
+           }
          break;
       case ELM_ICON_LOOKUP_FDO_THEME:
       default:
-         ret = _icon_freedesktop_set(wd, obj, name, _icon_size_min_get(wd->img)) ||
-            _icon_standard_set(wd, obj, name);
+         ret = _icon_freedesktop_set(wd, obj, name, _icon_size_min_get(wd->img));
+         if (!ret)
+           ret = _icon_standard_set(wd, obj, name);
+         else if (fdo)
+           *fdo = EINA_TRUE;
          break;
      }
 
@@ -403,13 +694,67 @@ elm_icon_standard_set(Evas_Object *obj, const char *name)
    if (!(tmp = strchr(name, '/'))) return EINA_FALSE;
    ++tmp;
    if (*tmp) return elm_icon_standard_set(obj, tmp);
-
    /* give up */
    return EINA_FALSE;
 }
 
+static void
+_elm_icon_standard_resize(void *data,
+                          Evas *e __UNUSED__,
+                          Evas_Object *obj,
+                          void *event_info __UNUSED__)
+{
+   Widget_Data *wd = data;
+   const char *refup = eina_stringshare_ref(wd->stdicon);
+   Eina_Bool fdo = EINA_FALSE;
+
+   if (!_elm_icon_standard_set(wd, obj, wd->stdicon, &fdo) || (!fdo))
+     evas_object_event_callback_del_full(obj, EVAS_CALLBACK_RESIZE,
+                                         _elm_icon_standard_resize, wd);
+#ifdef HAVE_ELEMENTARY_ETHUMB
+   if (wd->thumb.file.path)
+     elm_icon_thumb_set(obj, wd->thumb.file.path, wd->thumb.file.key);
+#endif
+
+   eina_stringshare_del(refup);
+}
+
 /**
- * Get the theme, as standard, for a icon
+ * Set the theme, as standard, for an icon.
+ * If theme was not found and it is the absolute path of an image file, this
+ * image will be used.
+ *
+ * @param obj The icon object
+ * @param name The theme name
+ *
+ * @return (1 = success, 0 = error)
+ *
+ * @ingroup Icon
+ */
+EAPI Eina_Bool
+elm_icon_standard_set(Evas_Object *obj, const char *name)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_Bool fdo = EINA_FALSE;
+   Eina_Bool ret;
+
+   if ((!wd) || (!name)) return EINA_FALSE;
+
+   evas_object_event_callback_del_full(obj, EVAS_CALLBACK_RESIZE,
+                                       _elm_icon_standard_resize, wd);
+
+   ret = _elm_icon_standard_set(wd, obj, name, &fdo);
+
+   if (fdo)
+     evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE,
+                                    _elm_icon_standard_resize, wd);
+
+   return ret;
+}
+
+/**
+ * Get the theme, as standard, for an icon
  *
  * @param obj The icon object
  * @return The theme name
@@ -459,7 +804,7 @@ elm_icon_order_lookup_get(const Evas_Object *obj)
 }
 
 /**
- * Set the smooth effect for a icon
+ * Set the smooth effect for an icon
  *
  * @param obj The icon object
  * @param smooth A bool to set (or no) smooth effect
@@ -479,7 +824,7 @@ elm_icon_smooth_set(Evas_Object *obj, Eina_Bool smooth)
 }
 
 /**
- * Get the smooth effect for a icon
+ * Get the smooth effect for an icon
  *
  * @param obj The icon object
  * @return If setted smooth effect

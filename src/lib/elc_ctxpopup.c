@@ -49,10 +49,16 @@ struct _Widget_Data
 
 static const char *widtype = NULL;
 
-static void _del_hook(Evas_Object *obj);
-static void _del_pre_hook(Evas_Object *obj);
-static void _theme_hook(Evas_Object *obj);
-static void _sizing_eval(Evas_Object *obj);
+static void _freeze_on(void *data __UNUSED__, Evas_Object *obj,
+                       void *event_info __UNUSED__);
+static void _freeze_off(void *data __UNUSED__, Evas_Object *obj,
+                        void *event_info __UNUSED__);
+static void _hold_on(void *data __UNUSED__, Evas_Object *obj,
+                     void *event_info __UNUSED__);
+static void _hold_off(void *data __UNUSED__, Evas_Object *obj,
+                      void *event_info __UNUSED__);
+static void _scroller_size_reset(Widget_Data *wd);
+static void _hover_parent_callbacks_del(Evas_Object *obj);
 static void _hover_parent_resize(void *data, Evas *e __UNUSED__,
                                  Evas_Object *obj __UNUSED__,
                                  void *event_info __UNUSED__);
@@ -62,7 +68,24 @@ static void _hover_parent_move(void *data, Evas *e __UNUSED__,
 static void _hover_parent_del(void *data, Evas *e __UNUSED__,
                               Evas_Object *obj __UNUSED__,
                               void *event_info __UNUSED__);
-static void _hover_parent_callbacks_del(Evas_Object *obj);
+static void _item_sizing_eval(Elm_Ctxpopup_Item *item);
+static void _adjust_pos_x(Evas_Coord_Point *pos, Evas_Coord_Point *base_size,
+                          Evas_Coord_Rectangle *hover_area);
+static void _adjust_pos_y(Evas_Coord_Point *pos, Evas_Coord_Point *base_size,
+                          Evas_Coord_Rectangle *hover_area);
+static void _ctxpopup_changed_size_hints(void *data __UNUSED__,
+                                         Evas *e __UNUSED__, Evas_Object *obj,
+                                         void *event_info __UNUSED__);
+static Elm_Ctxpopup_Direction _calc_base_geometry(Evas_Object *obj,
+                                                  Evas_Coord_Rectangle *rect);
+static void _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir);
+static void _sizing_eval(Evas_Object *obj);
+static void _shift_base_by_arrow(Evas_Object *arrow,
+                                 Elm_Ctxpopup_Direction dir,
+                                 Evas_Coord_Rectangle *rect);
+static void _del_pre_hook(Evas_Object *obj);
+static void _del_hook(Evas_Object *obj);
+static void _theme_hook(Evas_Object *obj);
 static void _bg_clicked_cb(void *data, Evas_Object *obj __UNUSED__,
                            const char *emission __UNUSED__,
                            const char *source __UNUSED__);
@@ -70,52 +93,30 @@ static void _parent_resize(void *data, Evas *e, Evas_Object *obj,
                            void *event_info __UNUSED__);
 static void _ctxpopup_show(void *data __UNUSED__, Evas *e __UNUSED__,
                            Evas_Object *obj, void *event_info __UNUSED__);
+static void _hide(Evas_Object *obj);
 static void _ctxpopup_hide(void *data __UNUSED__, Evas *e __UNUSED__,
-                           Evas_Object *obj, void *event_info __UNUSED__);
-static void _ctxpopup_move(void *data __UNUSED__, Evas *e __UNUSED__,
                            Evas_Object *obj, void *event_info __UNUSED__);
 static void _scroller_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj,
                              void *event_info __UNUSED__);
-static void _ctxpopup_changed_size_hints(void *data __UNUSED__,
-                                         Evas *e __UNUSED__, Evas_Object *obj,
-                                         void *event_info __UNUSED__);
-static void _item_new(Elm_Ctxpopup_Item *item, char *group_name);
-static void _list_new(Evas_Object *obj);
-static void _item_sizing_eval(Elm_Ctxpopup_Item *item);
+static void _ctxpopup_move(void *data __UNUSED__, Evas *e __UNUSED__,
+                           Evas_Object *obj, void *event_info __UNUSED__);
 static void _item_select_cb(void *data, Evas_Object *obj __UNUSED__,
                             const char *emission __UNUSED__,
                             const char *source __UNUSED__);
-static Elm_Ctxpopup_Direction _calc_base_geometry(Evas_Object *obj,
-                                                  Evas_Coord_Rectangle *rect);
-static void _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir);
-static void _shift_base_by_arrow(Evas_Object *arrow,
-                                 Elm_Ctxpopup_Direction dir,
-                                 Evas_Coord_Rectangle *rect);
-static void _adjust_pos_x(Evas_Coord_Point *pos, Evas_Coord_Point *base_size,
-                          Evas_Coord_Rectangle *hover_area);
-static void _adjust_pos_y(Evas_Coord_Point *pos, Evas_Coord_Point *base_size,
-                          Evas_Coord_Rectangle *hover_area);
-static void _scroller_size_reset(Widget_Data *wd);
-static void _hide(Evas_Object *obj);
-static void _content_del(void *data, Evas *e, Evas_Object *obj __UNUSED__,
-                         void *event_info __UNUSED__);
-static void _freeze_on(void *data __UNUSED__, Evas_Object *obj,
-                       void *event_info __UNUSED__);
-static void _freeze_off(void *data __UNUSED__, Evas_Object *obj,
-                        void *event_info __UNUSED__);
-static void _hold_on(void *data __UNUSED__, Evas_Object *obj,
-                     void *event_info __UNUSED__);
-static void _hold_off(void *data __UNUSED__, Evas_Object *obj,
-                      void *event_info __UNUSED__);
 static void _item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon);
 static void _item_label_set(Elm_Ctxpopup_Item *item, const char *label);
+static void _item_new(Elm_Ctxpopup_Item *item, char *group_name);
+static void _content_del(void *data, Evas *e, Evas_Object *obj __UNUSED__,
+                         void *event_info __UNUSED__);
+static void _list_del(Widget_Data *wd);
+static void _list_new(Evas_Object *obj);
 static void _remove_items(Widget_Data * wd);
 
 static const char SIG_DISMISSED[] = "dismissed";
 
 static const Evas_Smart_Cb_Description _signals[] = {
-       {SIG_DISMISSED, ""},
-       {NULL, NULL}
+   {SIG_DISMISSED, ""},
+   {NULL, NULL}
 };
 
 #define ELM_CTXPOPUP_ITEM_CHECK_RETURN(it, ...)                        \
@@ -128,8 +129,7 @@ _freeze_on(void *data __UNUSED__, Evas_Object *obj,
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if (!wd) return;
-   if (!wd->scr) return;
+   if ((!wd) || (!wd->scr)) return;
 
    elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_FALSE);
 }
@@ -140,9 +140,7 @@ _freeze_off(void *data __UNUSED__, Evas_Object *obj,
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if (!wd)
-      return;
-   if (!wd->scr) return;
+   if ((!wd) || (!wd->scr)) return;
 
    if (wd->horizontal)
       elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_TRUE);
@@ -155,8 +153,7 @@ _hold_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if (!wd) return;
-   if (wd->scr) return;
+   if ((!wd) || (!wd->scr)) return;
 
    elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_FALSE);
 }
@@ -166,8 +163,7 @@ _hold_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if (!wd) return;
-   if (wd->scr) return;
+   if ((!wd) || (!wd->scr)) return;
 
    if (wd->horizontal)
       elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_TRUE);
@@ -514,7 +510,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
                 y = y - base_size.y - (arrow_size.h * 0.5);
               edje_object_part_drag_value_set(wd->base, "elm.swallow.arrow_left", 1,
                                               (double) (y) / (double) (base_size.h - arrow_size.h));
-          }
+           }
          break;
       case ELM_CTXPOPUP_DIRECTION_RIGHT:
          edje_object_signal_emit(wd->arrow, "elm,state,right", "elm");
@@ -627,7 +623,7 @@ _sizing_eval(Evas_Object *obj)
    _update_arrow(obj, wd->dir);
    _shift_base_by_arrow(wd->arrow, wd->dir, &rect);
 
-   //resize scroller according to final size. 
+   //resize scroller according to final size.
    if (!wd->content)
       evas_object_smart_calculate(wd->scr);
 
@@ -1263,8 +1259,8 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 
    Widget_Data *wd;
    Eina_List *elist;
-	 Elm_Ctxpopup_Item *item;
-	 int idx = 0;
+   Elm_Ctxpopup_Item *item;
+   int idx = 0;
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -1464,7 +1460,6 @@ EAPI Eina_Bool
 elm_ctxpopup_item_disabled_get(const Elm_Ctxpopup_Item *item)
 {
    ELM_CTXPOPUP_ITEM_CHECK_RETURN(item, EINA_FALSE);
-
    return item->disabled;
 }
 
@@ -1605,12 +1600,8 @@ elm_ctxpopup_direction_priority_get(Evas_Object *obj,
    wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   if (first)
-      *first = wd->dir_priority[0];
-   if (second)
-      *second = wd->dir_priority[1];
-   if (third)
-      *third = wd->dir_priority[2];
-   if (fourth)
-      *fourth = wd->dir_priority[3];
+   if (first) *first = wd->dir_priority[0];
+   if (second) *second = wd->dir_priority[1];
+   if (third) *third = wd->dir_priority[2];
+   if (fourth) *fourth = wd->dir_priority[3];
 }

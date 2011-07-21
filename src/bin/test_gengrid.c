@@ -70,9 +70,9 @@ grid_selected(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
 }
 
 static void
-grid_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+grid_double_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
-   printf("Clicked: %p\n", event_info);
+   printf("Double clicked: %p\n", event_info);
 }
 
 static void
@@ -170,7 +170,7 @@ test_gengrid(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    elm_gengrid_multi_select_set(grid, EINA_TRUE);
    elm_gengrid_reorder_mode_set(grid, EINA_TRUE);
    evas_object_smart_callback_add(grid, "selected", grid_selected, NULL);
-   evas_object_smart_callback_add(grid, "clicked", grid_clicked, NULL);
+   evas_object_smart_callback_add(grid, "clicked,double", grid_double_clicked, NULL);
    evas_object_smart_callback_add(grid, "longpressed", grid_longpress, NULL);
    evas_object_smart_callback_add(grid, "moved", grid_moved, NULL);
    evas_object_smart_callback_add(grid, "drag,start,up", grid_drag_up, NULL);
@@ -315,25 +315,25 @@ test_gengrid2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    evas_object_show(hbx);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Append");
+   elm_object_text_set(bt, "Append");
    evas_object_smart_callback_add(bt, "clicked", _append_bt_clicked, grid);
    elm_box_pack_end(hbx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Prepend");
+   elm_object_text_set(bt, "Prepend");
    evas_object_smart_callback_add(bt, "clicked", _prepend_bt_clicked, grid);
    elm_box_pack_end(hbx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Insert before");
+   elm_object_text_set(bt, "Insert before");
    evas_object_smart_callback_add(bt, "clicked", _before_bt_clicked, grid);
    elm_box_pack_end(hbx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Insert after");
+   elm_object_text_set(bt, "Insert after");
    evas_object_smart_callback_add(bt, "clicked", _after_bt_clicked, grid);
    elm_box_pack_end(hbx, bt);
    evas_object_show(bt);
@@ -348,7 +348,7 @@ test_gengrid2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    evas_object_show(bt);
 
    ck = elm_check_add(win);
-   elm_check_label_set(ck, "Horizontal Mode");
+   elm_object_text_set(ck, "Horizontal Mode");
    evas_object_smart_callback_add(ck, "changed", _horizontal_grid, grid);
    elm_box_pack_end(hbx, ck);
    evas_object_show(ck);

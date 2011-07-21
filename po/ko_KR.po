@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-06-20 14:18+0530\n"
+"POT-Creation-Date: 2011-07-19 17:25+0900\n"
 "PO-Revision-Date: 2011-02-22 09:09-0800\n"
 "Last-Translator: Daniel Juyung Seo <seojuyung@gmail.com>\n"
 "Language-Team: General\n"
@@ -16,50 +16,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/lib/elc_fileselector.c:595
+#: src/lib/elc_fileselector.c:853
 msgid "Up"
 msgstr "위로"
 
-#: src/lib/elc_fileselector.c:610
+#: src/lib/elc_fileselector.c:868
 msgid "Home"
 msgstr "홈"
 
-#: src/lib/elc_fileselector.c:791 src/lib/elm_entry.c:1097
+#: src/lib/elc_fileselector.c:1056 src/lib/elm_entry.c:1283
 msgid "Cancel"
 msgstr "취소"
 
-#: src/lib/elc_fileselector.c:801
+#: src/lib/elc_fileselector.c:1066
 msgid "OK"
 msgstr "확인"
 
-#: src/lib/elm_config.c:1622
+#: src/lib/elm_config.c:1650
 msgid "default:LTR"
 msgstr "default:RTL"
 
-#: src/lib/elm_entry.c:1071
+#: src/lib/elm_entry.c:1257
 msgid "Select"
 msgstr "선택"
 
-#: src/lib/elm_entry.c:1076
+#: src/lib/elm_entry.c:1262
 msgid "Paste"
 msgstr "붙여넣기"
 
-#: src/lib/elm_entry.c:1081 src/lib/elm_entry.c:1101
+#: src/lib/elm_entry.c:1267 src/lib/elm_entry.c:1287
 msgid "More"
 msgstr ""
 
-#: src/lib/elm_entry.c:1091
+#: src/lib/elm_entry.c:1277
 msgid "Copy"
 msgstr "복사"
 
-#: src/lib/elm_entry.c:1094
+#: src/lib/elm_entry.c:1280
 msgid "Cut"
 msgstr "잘라내기"
-
-#: src/lib/elm_check.c:156
-msgid "On"
-msgstr ""
-
-#: src/lib/elm_check.c:156
-msgid "Off"
-msgstr ""

@@ -75,11 +75,12 @@ test_box_vert2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    bx = elm_box_add(win);
    elm_win_resize_object_add(win, bx);
-   evas_object_size_hint_weight_set(bx, 0.0, 0.0);
+   elm_box_padding_set(bx, 10, 10);
+   evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bx);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Button 1");
+   elm_object_text_set(bt, "Button 1");
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_smart_callback_add(bt, "clicked", _del_cb, bx);
@@ -87,7 +88,7 @@ test_box_vert2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Button 2");
+   elm_object_text_set(bt, "Button 2");
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_smart_callback_add(bt, "clicked", _del_cb, bx);
@@ -95,7 +96,7 @@ test_box_vert2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Button 3");
+   elm_object_text_set(bt, "Button 3");
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_smart_callback_add(bt, "clicked", _del_cb, bx);
@@ -103,7 +104,7 @@ test_box_vert2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Button 4");
+   elm_object_text_set(bt, "Button 4");
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_smart_callback_add(bt, "clicked", _del_cb, bx);
@@ -111,7 +112,7 @@ test_box_vert2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Button 5");
+   elm_object_text_set(bt, "Button 5");
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(bt, 0.0, 0.0);
    evas_object_smart_callback_add(bt, "clicked", _del_cb, bx);
@@ -137,7 +138,7 @@ test_box_horiz(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    evas_object_show(bg);
 
    bx = elm_box_add(win);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    elm_win_resize_object_add(win, bx);
    evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bx);
@@ -186,8 +187,8 @@ _test_box_transition_change(void *data)
    if (!data) return;
    next_layout = eina_list_data_get(tdata->transitions);
    layout_data = elm_box_transition_new(2.0, tdata->last_layout,
-         NULL, NULL, next_layout, NULL, NULL,
-         _test_box_transition_change, tdata);
+                                        NULL, NULL, next_layout, NULL, NULL,
+                                        _test_box_transition_change, tdata);
    elm_box_layout_set(tdata->box, elm_box_layout_transition, layout_data, elm_box_transition_free);
    tdata->last_layout = next_layout;
 
@@ -198,8 +199,8 @@ static void
 _win_del(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Transitions_Data *tdata = data;
-   elm_box_layout_set(tdata->box, evas_object_box_layout_horizontal, NULL, NULL);
-   free(data);
+   if (!data) return;
+   free(tdata);
 }
 
 void
@@ -224,7 +225,7 @@ test_box_transition(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_show(bx);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Button 1");
+   elm_object_text_set(bt, "Button 1");
    evas_object_size_hint_weight_set(bt, 1.0, 1.0);
    evas_object_size_hint_align_set(bt, -1.0, -1.0);
    evas_object_smart_callback_add(bt, "clicked", _del_cb, bx);
@@ -233,7 +234,7 @@ test_box_transition(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Button 2");
+   elm_object_text_set(bt, "Button 2");
    evas_object_size_hint_weight_set(bt, 1.0, 1.0);
    evas_object_size_hint_align_set(bt, -1.0, -1.0);
    evas_object_smart_callback_add(bt, "clicked", _del_cb, bx);
@@ -242,7 +243,7 @@ test_box_transition(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Button 3");
+   elm_object_text_set(bt, "Button 3");
    evas_object_size_hint_weight_set(bt, 1.0, 1.0);
    evas_object_size_hint_align_set(bt, -1.0, -1.0);
    evas_object_smart_callback_add(bt, "clicked", _del_cb, bx);

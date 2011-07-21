@@ -295,7 +295,8 @@ static const Evas_Smart_Cb_Description _signals[] = {
        {NULL, NULL}
 };
 
-
+static Eina_Compare_Cb _elm_gengrid_item_compare_cb;
+static Eina_Compare_Cb _elm_gengrid_item_compare_data_cb;
 
 static Eina_Bool
 _event_hook(Evas_Object       *obj,
@@ -471,7 +472,6 @@ _event_hook(Evas_Object       *obj,
      {
         item = elm_gengrid_selected_item_get(obj);
         evas_object_smart_callback_call(item->wd->self, SIG_CLICKED_DOUBLE, item);
-        evas_object_smart_callback_call(item->wd->self, "clicked", item); // will be removed
      }
    else return EINA_FALSE;
 
@@ -915,10 +915,7 @@ _mouse_down(void        *data,
    item->wd->wasselected = item->selected;
    _item_hilight(item);
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-     {
-        evas_object_smart_callback_call(item->wd->self, SIG_CLICKED_DOUBLE, item);
-        evas_object_smart_callback_call(item->wd->self, "clicked", item); // will be removed
-     }
+     evas_object_smart_callback_call(item->wd->self, SIG_CLICKED_DOUBLE, item);
    if (item->long_timer) ecore_timer_del(item->long_timer);
    if (item->realized)
      item->long_timer = ecore_timer_add(_elm_config->longpress_timeout,
@@ -1446,6 +1443,7 @@ call:
      evas_object_smart_callback_call(item->wd->self, SIG_SELECTED, item);
    item->walking--;
    item->wd->walking--;
+   item->wd->last_selected_item = item;
    if ((item->wd->clear_me) && (!item->wd->walking))
      elm_gengrid_clear(item->base.widget);
    else
@@ -1453,7 +1451,6 @@ call:
         if ((!item->walking) && (item->delete_me))
           if (!item->relcount) _item_del(item);
      }
-   item->wd->last_selected_item = item;
 }
 
 static void
@@ -1728,6 +1725,24 @@ _scr_scroll(void            *data,
             void *event_info __UNUSED__)
 {
    evas_object_smart_callback_call(data, SIG_SCROLL, NULL);
+}
+
+static int
+_elm_gengrid_item_compare_data(const void *data, const void *data1)
+{
+   const Elm_Gengrid_Item *item = data;
+   const Elm_Gengrid_Item *item1 = data1;
+
+   return _elm_gengrid_item_compare_data_cb(item->base.data, item1->base.data);
+}
+
+static int
+_elm_gengrid_item_compare(const void *data, const void *data1)
+{
+   Elm_Gengrid_Item *item, *item1;
+   item = ELM_GENGRID_ITEM_FROM_INLIST(data);
+   item1 = ELM_GENGRID_ITEM_FROM_INLIST(data1);
+   return _elm_gengrid_item_compare_cb(item, item1);
 }
 
 /**
@@ -2096,6 +2111,44 @@ elm_gengrid_item_insert_after(Evas_Object                  *obj,
    return item;
 }
 
+EAPI Elm_Gengrid_Item *
+elm_gengrid_item_direct_sorted_insert(Evas_Object                  *obj,
+				      const Elm_Gengrid_Item_Class *gic,
+				      const void                   *data,
+				      Eina_Compare_Cb               comp,
+				      Evas_Smart_Cb                 func,
+				      const void                   *func_data)
+{
+   Elm_Gengrid_Item *item;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+
+   item = _item_create(wd, gic, data, func, func_data);
+   if (!item) return NULL;
+
+   _elm_gengrid_item_compare_cb = comp;
+   wd->items = eina_inlist_sorted_insert(wd->items, EINA_INLIST_GET(item),
+                                         _elm_gengrid_item_compare);
+   if (wd->calc_job) ecore_job_del(wd->calc_job);
+   wd->calc_job = ecore_job_add(_calc_job, wd);
+
+   return item;
+}
+
+EAPI Elm_Gengrid_Item *
+elm_gengrid_item_sorted_insert(Evas_Object                  *obj,
+                               const Elm_Gengrid_Item_Class *gic,
+                               const void                   *data,
+                               Eina_Compare_Cb               comp,
+                               Evas_Smart_Cb                 func,
+                               const void                   *func_data)
+{
+   _elm_gengrid_item_compare_data_cb = comp;
+
+   return elm_gengrid_item_direct_sorted_insert(obj, gic, data, _elm_gengrid_item_compare_data, func, func_data);
+}
+
 /**
  * Remove an item from the Gengrid.
  *
@@ -2317,6 +2370,25 @@ elm_gengrid_item_data_set(Elm_Gengrid_Item *item,
    elm_gengrid_item_update(item);
 }
 
+EAPI const Elm_Gengrid_Item_Class *
+elm_gengrid_item_item_class_get(const Elm_Gengrid_Item *item)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, NULL);
+   if (item->delete_me) return NULL;
+   return item->gic;
+}
+
+EAPI void
+elm_gengrid_item_item_class_set(Elm_Gengrid_Item *item,
+                                const Elm_Gengrid_Item_Class *gic)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item);
+   EINA_SAFETY_ON_NULL_RETURN(gic);
+   if (item->delete_me) return;
+   item->gic = gic;
+   elm_gengrid_item_update(item);
+}
+
 /**
  * Get the item's coordinates.
  *
@@ -2534,7 +2606,7 @@ _elm_gengrid_item_label_create(void        *data,
    if (!label)
      return NULL;
    elm_object_style_set(label, "tooltip");
-   elm_label_label_set(label, data);
+   elm_object_text_set(label, data);
    return label;
 }
 

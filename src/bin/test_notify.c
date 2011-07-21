@@ -61,22 +61,22 @@ test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    evas_object_show(bx);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "This position is the default.");
+   elm_object_text_set(lb, "This position is the default.");
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close");
+   elm_object_text_set(bt, "Close");
    evas_object_smart_callback_add(bt, "clicked", _bt_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Top");
+   elm_object_text_set(bt, "Top");
    evas_object_smart_callback_add(bt, "clicked", _bt, notify);
    elm_table_pack(tb, bt, 1, 0, 1, 1);
    evas_object_show(bt);
@@ -91,23 +91,23 @@ test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    evas_object_show(bx);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "Bottom position. This notify use a timeout of 5 sec.<br>"
+   elm_object_text_set(lb, "Bottom position. This notify use a timeout of 5 sec.<br>"
 	 "<b>The events outside the window are blocked.</b>");
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close");
+   elm_object_text_set(bt, "Close");
    evas_object_smart_callback_add(bt, "clicked", _bt_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Bottom");
+   elm_object_text_set(bt, "Bottom");
    evas_object_smart_callback_add(bt, "clicked", _bt, notify);
    elm_table_pack(tb, bt, 1, 2, 1, 1);
    evas_object_show(bt);
@@ -120,22 +120,22 @@ test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    evas_object_show(bx);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "Left position. This notify use a timeout of 10 sec.");
+   elm_object_text_set(lb, "Left position. This notify use a timeout of 10 sec.");
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close");
+   elm_object_text_set(bt, "Close");
    evas_object_smart_callback_add(bt, "clicked", _bt_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Left");
+   elm_object_text_set(bt, "Left");
    evas_object_smart_callback_add(bt, "clicked", _bt, notify);
    elm_table_pack(tb, bt, 0, 1, 1, 1);
    evas_object_show(bt);
@@ -148,22 +148,22 @@ test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    evas_object_show(bx);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "Center position. This notify use a timeout of 10 sec.");
+   elm_object_text_set(lb, "Center position. This notify use a timeout of 10 sec.");
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close");
+   elm_object_text_set(bt, "Close");
    evas_object_smart_callback_add(bt, "clicked", _bt_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Center");
+   elm_object_text_set(bt, "Center");
    evas_object_smart_callback_add(bt, "clicked", _bt, notify);
    elm_table_pack(tb, bt, 1, 1, 1, 1);
    evas_object_show(bt);
@@ -174,22 +174,22 @@ test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    evas_object_show(bx);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "Right position.");
+   elm_object_text_set(lb, "Right position.");
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close");
+   elm_object_text_set(bt, "Close");
    evas_object_smart_callback_add(bt, "clicked", _bt_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Right");
+   elm_object_text_set(bt, "Right");
    evas_object_smart_callback_add(bt, "clicked", _bt, notify);
    elm_table_pack(tb, bt, 2, 1, 1, 1);
    evas_object_show(bt);
@@ -200,22 +200,22 @@ test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    evas_object_show(bx);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "Top Left position.");
+   elm_object_text_set(lb, "Top Left position.");
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close");
+   elm_object_text_set(bt, "Close");
    evas_object_smart_callback_add(bt, "clicked", _bt_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Top Left");
+   elm_object_text_set(bt, "Top Left");
    evas_object_smart_callback_add(bt, "clicked", _bt, notify);
    elm_table_pack(tb, bt, 0, 0, 1, 1);
    evas_object_show(bt);
@@ -226,22 +226,22 @@ test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    evas_object_show(bx);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "Top Right position.");
+   elm_object_text_set(lb, "Top Right position.");
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close");
+   elm_object_text_set(bt, "Close");
    evas_object_smart_callback_add(bt, "clicked", _bt_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Top Right");
+   elm_object_text_set(bt, "Top Right");
    evas_object_smart_callback_add(bt, "clicked", _bt, notify);
    elm_table_pack(tb, bt, 2, 0, 1, 1);
    evas_object_show(bt);
@@ -252,22 +252,22 @@ test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    evas_object_show(bx);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "Bottom Left position.");
+   elm_object_text_set(lb, "Bottom Left position.");
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close");
+   elm_object_text_set(bt, "Close");
    evas_object_smart_callback_add(bt, "clicked", _bt_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Bottom Left");
+   elm_object_text_set(bt, "Bottom Left");
    evas_object_smart_callback_add(bt, "clicked", _bt, notify);
    elm_table_pack(tb, bt, 0, 2, 1, 1);
    evas_object_show(bt);
@@ -278,22 +278,22 @@ test_notify(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    bx = elm_box_add(win);
    elm_notify_content_set(notify, bx);
-   elm_box_horizontal_set(bx, 1);
+   elm_box_horizontal_set(bx, EINA_TRUE);
    evas_object_show(bx);
 
    lb = elm_label_add(win);
-   elm_label_label_set(lb, "Bottom Right position.");
+   elm_object_text_set(lb, "Bottom Right position.");
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Close in 2s");
+   elm_object_text_set(bt, "Close in 2s");
    evas_object_smart_callback_add(bt, "clicked", _bt_timer_close, notify);
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 
    bt = elm_button_add(win);
-   elm_button_label_set(bt, "Bottom Right");
+   elm_object_text_set(bt, "Bottom Right");
    evas_object_smart_callback_add(bt, "clicked", _bt, notify);
    elm_table_pack(tb, bt, 2, 2, 1, 1);
    evas_object_show(bt);
