@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build02) unstable; urgency=low
+
+  * Package Upload : editfield expanding bug was fixed
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build02
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Thu, 21 Jul 2011 20:54:13 +0900
+
 elementary (1.0.0+svn.61256slp2+build01) unstable; urgency=low
 
   * Updated package revision to svn.61256. 
