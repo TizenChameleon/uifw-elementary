@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.58393slp2+build52) unstable; urgency=low
+
+  * [SVN Migration r61256]
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.58393slp2+build52
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Thu, 21 Jul 2011 10:00:49 +0900
+
 elementary (1.0.0+svn.58393slp2+build51) unstable; urgency=low
 
   * Package Upload
