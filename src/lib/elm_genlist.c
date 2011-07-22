@@ -2229,8 +2229,7 @@ _item_unrealize(Elm_Genlist_Item *it, Eina_Bool calc)
 static Eina_Bool
 _item_block_recalc(Item_Block *itb,
                    int         in,
-                   int         qadd,
-                   int         norender)
+                   int         qadd)
 {
    const Eina_List *l;
    Elm_Genlist_Item *it;
@@ -2273,8 +2272,6 @@ _item_block_recalc(Item_Block *itb,
    itb->minw = minw;
    itb->minh = minh;
    itb->changed = EINA_FALSE;
-   /* force an evas norender to garbage collect deleted objects */
-   //if (norender) evas_norender(evas_object_evas_get(itb->wd->obj));
    evas_event_thaw(evas_object_evas_get(itb->wd->obj));
    evas_event_thaw_eval(evas_object_evas_get(itb->wd->obj));
    return showme;
@@ -2642,7 +2639,7 @@ _calc_job(void *data)
                   itb->must_recalc = EINA_FALSE;
                }
              if (itb->realized) _item_block_unrealize(itb);
-             showme = _item_block_recalc(itb, in, 0, 1);
+             showme = _item_block_recalc(itb, in, 0);
              chb = itb;
           }
         itb->y = y;
@@ -2786,7 +2783,7 @@ _update_job(void *data)
           {
              position = 1;
              itb->changed = EINA_TRUE;
-             _item_block_recalc(itb, num0, 0, 1);
+             _item_block_recalc(itb, num0, 0);
              _item_block_position(itb, num0);
           }
      }
@@ -2869,7 +2866,7 @@ _changed_job(void *data)
           {
              position = 1;
              itb->changed = EINA_TRUE;
-             _item_block_recalc(itb, num0, 0, 1);
+             _item_block_recalc(itb, num0, 0);
              _item_block_position(itb, num0);
           }
         else if (width_changed)
@@ -3644,8 +3641,7 @@ newblock:
 }
 
 static int
-_queue_process(Widget_Data *wd,
-               int          norender)
+_queue_process(Widget_Data *wd)
 {
    int n;
    Eina_Bool showme = EINA_FALSE;
@@ -3664,8 +3660,7 @@ _queue_process(Widget_Data *wd,
         t = ecore_time_get();
         if (it->block->changed)
           {
-             showme = _item_block_recalc(it->block, it->block->num, 1,
-                                         norender);
+             showme = _item_block_recalc(it->block, it->block->num, 1);
              it->block->changed = 0;
           }
         if (showme) it->block->showme = EINA_TRUE;
@@ -3688,7 +3683,7 @@ _idle_process(void *data, Eina_Bool *wakeup)
    //static double q_start = 0.0;
    //if (q_start == 0.0) q_start = ecore_time_get();
    //xxx
-   if (_queue_process(wd, 1) > 0) *wakeup = EINA_TRUE;
+   if (_queue_process(wd) > 0) *wakeup = EINA_TRUE;
    if (!wd->queue)
      {
         //xxx
@@ -3733,7 +3728,7 @@ _item_queue(Widget_Data      *wd,
              ecore_idle_enterer_del(wd->queue_idle_enterer);
              wd->queue_idle_enterer = NULL;
           }
-        _queue_process(wd, 0);
+        _queue_process(wd);
      }
 //   evas_event_thaw(evas_object_evas_get(wd->obj));
 //   evas_event_thaw_eval(evas_object_evas_get(wd->obj));
@@ -5082,7 +5077,7 @@ _elm_genlist_item_label_create(void        *data,
    if (!label)
      return NULL;
    elm_object_style_set(label, "tooltip");
-   elm_label_label_set(label, data);
+   elm_object_text_set(label, data);
    return label;
 }
 
@@ -5951,7 +5946,7 @@ _item_moving_effect_timer_cb(void *data)
    if (!wd) return EINA_FALSE;
    Item_Block *itb;
    Evas_Coord ox, oy, ow, oh, cvx, cvy, cvw, cvh;
-   Elm_Genlist_Item *it, *it2;
+   Elm_Genlist_Item *it = NULL, *it2;
    const Eina_List *l;
    double time = 0.3, t;
    int y, dy;
@@ -6239,7 +6234,7 @@ _effect_item_realize(Elm_Genlist_Item *it, Eina_Bool effect_on)
    char buf[1024];
 
    if (it->mode_view)
-     _mode_finished_signal_cb(it, elm_genlist_item_object_get(it), NULL, NULL);
+     _mode_finished_signal_cb(it, (Evas_Object *)elm_genlist_item_object_get(it), NULL, NULL);
 
    it->edit_obj = edje_object_add(evas_object_evas_get(it->base.widget));
    edje_object_scale_set(it->edit_obj, elm_widget_scale_get(it->base.widget) *
@@ -6286,7 +6281,7 @@ _effect_item_realize(Elm_Genlist_Item *it, Eina_Bool effect_on)
              EINA_LIST_FOREACH(it->icons, l, key)
                {
                   Evas_Object *ic = it->itc->func.icon_get
-                     (it->base.data, it->base.widget, l->data);
+                     ((void *)it->base.data, it->base.widget, l->data);
 
                   if (ic)
                     {
