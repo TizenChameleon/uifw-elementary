@@ -58,6 +58,15 @@ struct _Widget_Data
    Eina_Bool smooth : 1;
    Eina_Bool fill_outside : 1;
    Eina_Bool no_scale : 1;
+
+   /* for animation feature */
+   Ecore_Timer *timer;
+   int frame_count;
+   int cur_frame;
+   double duration;
+   Eina_Bool anim : 1;
+   Eina_Bool play : 1;
+
 };
 
 #ifdef HAVE_ELEMENTARY_ETHUMB
@@ -345,6 +354,8 @@ _del_hook(Evas_Object *obj)
      ecore_event_handler_del(wd->thumb.eeh);
 #endif
 
+   if (wd->timer)
+     ecore_timer_del(wd->timer);
    free(wd);
 }
 
@@ -443,6 +454,28 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
    Evas_Event_Mouse_Up *ev = event_info;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return;
    evas_object_smart_callback_call(data, SIG_CLICKED, event_info);
+}
+
+static Eina_Bool
+_elm_icon_animate_cb(void *data)
+{
+   Widget_Data  *wd = data;
+   Evas_Object  *img_obj;
+
+   if (!wd) return ECORE_CALLBACK_CANCEL;
+   if (!wd->anim) return ECORE_CALLBACK_CANCEL;
+
+   img_obj = _els_smart_icon_object_get(wd->img);
+   wd->cur_frame++;
+   if (wd->cur_frame > wd->frame_count)
+     wd->cur_frame = wd->cur_frame % wd->frame_count;
+   evas_object_image_animated_frame_set(img_obj, wd->cur_frame);
+
+   wd->duration = evas_object_image_animated_frame_duration_get(img_obj, wd->cur_frame, 0);
+
+   if (wd->duration > 0)
+     ecore_timer_interval_set(wd->timer, wd->duration);
+   return ECORE_CALLBACK_RENEW;
 }
 
 /**
@@ -569,6 +602,133 @@ elm_icon_thumb_set(const Evas_Object *obj, const char *file, const char *group)
    (void) file;
    (void) group;
 #endif
+}
+
+/**
+ * Get the flag related with elm icon can support animation
+ *
+ * @param obj The icon object
+ * @return The flag of animation available
+ *
+ *
+ * @ingroup Icon
+ */
+EAPI Eina_Bool
+elm_icon_anim_available_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Evas_Object *img_obj ;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   img_obj = _els_smart_icon_object_get(wd->img);
+
+   return evas_object_image_animated_get(img_obj);
+}
+
+/**
+ * Set animation mode of the icon.
+ *
+ * @param obj The icon object
+ * @param anim @c EINA_TRUE if the object do animation job,
+ * @c EINA_FALSE otherwise. Default is @c EINA_FALSE.
+ *
+ * @ingroup Icon
+ */
+EAPI void
+elm_icon_anim_set(Evas_Object *obj, Eina_Bool anim)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Evas_Object *img_obj ;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->anim == anim) return;
+
+   img_obj = _els_smart_icon_object_get(wd->img);
+   if (!evas_object_image_animated_get(img_obj)) return;
+   if (anim)
+     {
+        wd->frame_count = evas_object_image_animated_frame_count_get(img_obj);
+        wd->cur_frame = 1;
+        wd->duration = evas_object_image_animated_frame_duration_get(img_obj, wd->cur_frame, 0);
+        evas_object_image_animated_frame_set(img_obj, wd->cur_frame);
+     }
+   else
+     {
+        wd->frame_count = -1;
+        wd->cur_frame = -1;
+        wd->duration = -1;
+     }
+   wd->anim = anim;
+   return;
+}
+
+/**
+ * Get animation mode of the icon.
+ *
+ * @param obj The icon object
+ * @return The animation mode of the icon object
+ *
+ * @ingroup Icon
+ */
+EAPI Eina_Bool
+elm_icon_anim_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return wd->anim;
+}
+
+/**
+ * Set animation play mode of the icon.
+ *
+ * @param obj The icon object
+ * @param play @c EINA_TRUE the object play animation images,
+ * @c EINA_FALSE otherwise. Default is @c EINA_FALSE.
+ *
+ * @ingroup Icon
+ */
+EAPI void
+elm_icon_anim_play_set(Evas_Object *obj, Eina_Bool play)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (!wd->anim) return;
+   if (wd->play == play) return;
+
+   if (play)
+     {
+        wd->timer = ecore_timer_add(wd->duration, _elm_icon_animate_cb, wd);
+     }
+   else
+     {
+        if (wd->timer)
+          {
+             ecore_timer_del(wd->timer);
+             wd->timer = NULL;
+          }
+     }
+   wd->play = play;
+
+}
+
+/**
+ * Get animation play mode of the icon.
+ *
+ * @param obj The icon object
+ * @return The play mode of the icon object
+ *
+ * @ingroup Icon
+ */
+EAPI Eina_Bool
+elm_icon_anim_play_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return wd->play;
 }
 
 static Eina_Bool
