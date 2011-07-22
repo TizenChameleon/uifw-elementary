@@ -348,7 +348,10 @@ _swallow_item_objects(Elm_Segment_Item *it)
      edje_object_signal_emit(it->base.view, "elm,state,icon,hidden", "elm");
 
    if (it->label)
+   {
+     edje_object_part_text_set(it->base.view, "elm.text", it->label);
      edje_object_signal_emit(it->base.view, "elm,state,text,visible", "elm");
+   }
    else
      edje_object_signal_emit(it->base.view, "elm,state,text,hidden", "elm");
    edje_object_message_signal_process(it->base.view);
@@ -463,6 +466,8 @@ _item_new(Evas_Object *obj, Evas_Object *icon, const char *label)
                          *_elm_config->scale);
    evas_object_smart_member_add(it->base.view, obj);
    elm_widget_sub_object_add(obj, it->base.view);
+   evas_object_clip_set(it->base.view, evas_object_clip_get(obj));
+
    _elm_theme_object_set(obj, it->base.view, "segment_control", "item",
                          elm_object_style_get(obj));
    edje_object_mirrored_set(it->base.view,
