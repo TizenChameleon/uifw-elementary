@@ -810,6 +810,8 @@ elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item)
    Evas_Object *title_obj=NULL;
    if (!item->title_obj) return NULL;
    title_obj = item->title_obj;
+   edje_object_signal_callback_del(item->base, "elm,action,clicked", "elm",
+                                   _switch_titleobj_visibility);
    elm_widget_sub_object_del(item->obj,item->title_obj);
    edje_object_part_unswallow(item->base,item->title_obj);
    item->title_obj = NULL;
