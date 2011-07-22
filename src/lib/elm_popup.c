@@ -202,7 +202,7 @@ _elm_popup_add_button(Evas_Object *obj, const char *text, int response_id)
    btn = elm_button_add(obj);
    snprintf(buf, sizeof(buf), "popup_button/%s", elm_widget_style_get(obj));
    elm_object_style_set(btn, buf);
-   elm_button_label_set(btn, text);
+   elm_object_text_set(btn, text);
    adata->response_id = response_id;
    adata->obj = obj;
    adata->btn = btn;
@@ -454,7 +454,7 @@ elm_popup_desc_get(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return NULL;
-   return elm_label_label_get(wd->desc_label);
+   return elm_object_text_get(wd->desc_label);
 }
 
 /**

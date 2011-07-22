@@ -227,7 +227,7 @@ _ampm_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNU
 	str = _get_i18n_string(data, PM_STR);
 	if (str)
 	  {
-         elm_button_label_set(wd->time[TIME_AMPM], str);
+         elm_object_text_set(wd->time[TIME_AMPM], str);
 	     free(str);
 	  }
         wd->hour += HOUR_12H_MAXIMUM;
@@ -237,7 +237,7 @@ _ampm_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNU
 	str = _get_i18n_string(data, AM_STR);
 	if (str)
 	  {
-         elm_button_label_set(wd->time[TIME_AMPM], str);
+         elm_object_text_set(wd->time[TIME_AMPM], str);
 	     free(str);
 	  }
         wd->hour -= HOUR_12H_MAXIMUM;
@@ -419,7 +419,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 		  i18n_str = _get_i18n_string(data, PM_STR);
 		  if (i18n_str)
 		    {
-               elm_button_label_set(wd->time[TIME_AMPM], i18n_str);
+               elm_object_text_set(wd->time[TIME_AMPM], i18n_str);
 		       free(i18n_str);
 		    }
 	       }
@@ -428,7 +428,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 		  i18n_str = _get_i18n_string(data, AM_STR);
 		  if (i18n_str)
 		    {
-               elm_button_label_set(wd->time[TIME_AMPM], i18n_str);
+               elm_object_text_set(wd->time[TIME_AMPM], i18n_str);
 		       free(i18n_str);
 		    }
 	       }
@@ -780,7 +780,7 @@ _date_update(Evas_Object *obj)
 	     i18n_str = _get_i18n_string(obj, PM_STR);
 	     if (i18n_str)
 	       {
-              elm_button_label_set(wd->time[TIME_AMPM], i18n_str);
+              elm_object_text_set(wd->time[TIME_AMPM], i18n_str);
 		  free(i18n_str);
 	       }
           }
@@ -790,7 +790,7 @@ _date_update(Evas_Object *obj)
 	     i18n_str = _get_i18n_string(obj, AM_STR);
 	     if (i18n_str)
 	       {
-              elm_button_label_set(wd->time[TIME_AMPM], i18n_str);
+              elm_object_text_set(wd->time[TIME_AMPM], i18n_str);
 		  free(i18n_str);
 	       }
           }

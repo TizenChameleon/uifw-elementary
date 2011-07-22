@@ -931,7 +931,7 @@ _create_item_layout(Evas_Object * parent, Elm_Controlbar_Item * it, Evas_Object 
    elm_layout_content_set(obj, "item", *item);
 
    if (it->text)
-     elm_button_label_set(*item, it->text);
+     elm_object_text_set(*item, it->text);
    if (it->icon_path)
      *icon = _create_item_icon(*item, it, "elm.swallow.icon");
 
@@ -2153,7 +2153,7 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item * it, const char *label)
    if (label != NULL)
      {
         it->text = eina_stringshare_add(label);
-        elm_button_label_set(it->base_item, it->text);
+        elm_object_text_set(it->base_item, it->text);
      }
    if (it->wd->disabled || it->disabled)
      elm_widget_disabled_set(it->base_item, EINA_TRUE);

@@ -393,7 +393,7 @@ _contracted_state_set(Evas_Object *obj, int contracted)
                        if (count > 0)
                          {
                             snprintf(buf, sizeof(buf), "... + %d", count);
-                            elm_label_label_set(wd->end, buf);
+                            elm_object_text_set(wd->end, buf);
                             evas_object_size_hint_min_get(wd->end, &w_label_count, NULL);
                          }
 
@@ -405,7 +405,7 @@ _contracted_state_set(Evas_Object *obj, int contracted)
 
                             count++;
                             snprintf(buf, sizeof(buf), "... + %d", count);
-                            elm_label_label_set(wd->end, buf);
+                            elm_object_text_set(wd->end, buf);
                             evas_object_size_hint_min_get(wd->end, &w_label_count, NULL);
 
                             elm_box_pack_end(wd->box, wd->end);

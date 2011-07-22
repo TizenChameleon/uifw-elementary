@@ -688,7 +688,7 @@ elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char
         snprintf(buf, sizeof(buf), "elm.swallow.btn%d", button_type);
      }
    if (btn_label)
-     elm_button_label_set(btn, btn_label);
+     elm_object_text_set(btn, btn_label);
    if (icon)
      elm_button_icon_set(btn, icon);
    elm_object_focus_allow_set(btn, EINA_FALSE);

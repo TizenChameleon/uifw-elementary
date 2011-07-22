@@ -191,7 +191,7 @@ elm_dayselector_add(Evas_Object *parent)
         wd->check[idx]=elm_check_add(wd->base);
         elm_widget_sub_object_add(obj, wd->check[idx]);
         evas_object_smart_callback_add(wd->check[idx], "changed", _check_clicked, obj);
-        elm_check_label_set(wd->check[idx], label[idx] );
+        elm_object_text_set(wd->check[idx], label[idx] );
         edje_object_part_swallow(wd->base, day_name[idx], wd->check[idx]);
         elm_object_style_set(wd->check[idx], style_name[idx]);
      }
