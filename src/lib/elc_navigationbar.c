@@ -216,7 +216,7 @@ _theme_hook(Evas_Object *obj)
              if (it->title)
                edje_object_part_text_set(wd->base, "elm.text", it->title);
 
-             //title object 
+             //title object
              if (it->title_obj)
                {
                   edje_object_part_swallow(wd->base, "elm.swallow.title", it->title_obj);
@@ -1043,7 +1043,7 @@ elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_
 
    edje_object_part_swallow(wd->base, "elm.swallow.title", title_obj);
 
-   //TODO: Looks something incorrect. 
+   //TODO: Looks something incorrect.
    if (wd->title_visible)
      {
        if (it->title)

@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -85,7 +85,7 @@ static void utc_UIFW_elm_bubble_content_unset_func_01(void)
 	elm_entry_entry_set(entry, "Don't push yourself too much. you're gonna get sick");
 	elm_bubble_content_set(bubble, entry);
    	content = elm_bubble_content_unset(bubble);
-	
+
 	if (!content || content != entry) {
 		tet_infoline("elm_bubble_content_unset() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -95,7 +95,7 @@ static void utc_UIFW_elm_bubble_content_unset_func_01(void)
 	evas_object_resize(bubble, 480, 0);
 	evas_object_move(bubble, 0, 40);
 	evas_object_show(bubble);
-	
+
 	tet_result(TET_PASS);
 }
 
@@ -112,7 +112,7 @@ static void utc_UIFW_elm_bubble_content_unset_func_02(void)
 	elm_entry_entry_set(entry, "Don't push yourself too much. you're gonna get sick");
 	elm_bubble_content_set(bubble, entry);
 	content = elm_bubble_content_unset(NULL);
-	
+
 	if (content) {
 		tet_infoline("elm_bubble_content_unset() failed in negative test case");
 		tet_result(TET_FAIL);
@@ -122,6 +122,6 @@ static void utc_UIFW_elm_bubble_content_unset_func_02(void)
 	evas_object_resize(bubble, 480, 0);
 	evas_object_move(bubble, 0, 40);
 	evas_object_show(bubble);
-	
+
 	tet_result(TET_PASS);
 }

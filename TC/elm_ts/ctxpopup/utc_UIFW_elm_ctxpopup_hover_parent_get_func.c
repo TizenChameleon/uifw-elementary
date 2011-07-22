@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -82,7 +82,7 @@ static void utc_UIFW_elm_ctxpopup_hover_parent_get_func_01(void)
 	elm_ctxpopup_hover_parent_set(ctxpopup, rect);
 
 	r = elm_ctxpopup_hover_parent_get(ctxpopup);
-	
+
 	if (r != rect) {
 		tet_infoline("elm_ctxpopup_hover_parent_get() failed in positive test case");
 		tet_result(TET_FAIL);

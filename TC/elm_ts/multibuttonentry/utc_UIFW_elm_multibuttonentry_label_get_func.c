@@ -183,7 +183,7 @@ cleanup()
 static void utc_UIFW_elm_multibuttonentry_label_get_func_01(void)
 {
 	const char *ret_str = NULL;
-	
+
 	test_eo = elm_multibuttonentry_add(test_win);
 	elm_multibuttonentry_label_set(test_eo, "test");
 	ret_str = elm_multibuttonentry_label_get(test_eo);

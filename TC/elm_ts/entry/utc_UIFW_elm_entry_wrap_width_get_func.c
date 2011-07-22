@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	entry = elm_entry_add(main_win);
 	evas_object_show(entry);
 	elm_entry_wrap_width_set(entry, test_wrap_width);
@@ -82,7 +82,7 @@ static void utc_UIFW_elm_entry_wrap_width_get_func_01(void)
 {
 	Evas_Coord w = 0;
 	w = elm_entry_wrap_width_get(entry);
-	
+
 	if (w!=test_wrap_width) {
 		tet_infoline("elm_entry_wrap_width_get() failed in positive test case");
 		tet_result(TET_FAIL);

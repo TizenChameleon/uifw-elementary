@@ -57,9 +57,9 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	navi_ex = elm_navigationbar_ex_add(main_win);
-	evas_object_show(navi_ex);	
+	evas_object_show(navi_ex);
 	Evas_Object *btn = elm_button_add(navi_ex);
 	item = elm_navigationbar_ex_item_push(navi_ex, btn, "topbar_1fn");
 	elm_navigationbar_ex_item_title_button_set(item, "button", NULL, ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1, NULL, NULL);
@@ -99,10 +99,10 @@ static void utc_UIFW_elm_navigationbar_ex_item_content_get_func_01(void)
  */
 static void utc_UIFW_elm_navigationbar_ex_item_content_get_func_02(void)
 {
-	
-	Evas_Object *content = NULL;	
+
+	Evas_Object *content = NULL;
 	content = elm_navigationbar_ex_item_content_get(NULL);
-	
+
 	if (content) {
 		tet_infoline("elm_navigationbar_ex_item_content_get() failed in negative test case");
 		tet_result(TET_FAIL);

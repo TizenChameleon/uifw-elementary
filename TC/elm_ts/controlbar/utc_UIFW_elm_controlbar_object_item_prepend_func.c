@@ -56,10 +56,10 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
 	controlbar = elm_controlbar_add(main_win);
-	
+
 	button = elm_button_add(controlbar);
 	elm_button_label_set(button, "button");
 }
@@ -78,7 +78,7 @@ static void cleanup(void)
 		evas_object_del(button);
 	       	button = NULL;
 	}
-	
+
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
@@ -90,7 +90,7 @@ static void utc_UIFW_elm_controlbar_object_item_prepend_func_01(void)
 {
 	Elm_Controlbar_Item *item = NULL;
    	item = elm_controlbar_object_item_prepend(controlbar, button, 3);
-	
+
 	if (!item) {
 		tet_infoline("elm_controlbar_object_item_prepend() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -106,7 +106,7 @@ static void utc_UIFW_elm_controlbar_object_item_prepend_func_02(void)
 {
 	Elm_Controlbar_Item *item = NULL;
    	item = elm_controlbar_object_item_prepend(NULL, button, 3);
-	
+
 	if (item) {
 		tet_infoline("elm_controlbar_object_item_prepend() failed in negative test case");
 		tet_result(TET_FAIL);

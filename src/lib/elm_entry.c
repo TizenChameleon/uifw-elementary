@@ -3084,7 +3084,7 @@ elm_entry_is_empty(const Evas_Object *obj)
    Eina_Bool ret;
    if (!wd) return EINA_TRUE;
 
-#if 0   
+#if 0
    /* It's a hack until we get the support suggested above.
     * We just create a cursor, point it to the begining, and then
     * try to advance it, if it can advance, the tb is not empty,
@@ -4121,10 +4121,10 @@ elm_entry_text_align_set(Evas_Object *obj, const char *alignmode)
  * Set the text color on the entry object
  *
  * @param obj The entry object
- * @param r Red property background color of The entry object 
- * @param g Green property background color of The entry object 
- * @param b Blue property background color of The entry object 
- * @param a Alpha property background alpha of The entry object 
+ * @param r Red property background color of The entry object
+ * @param g Green property background color of The entry object
+ * @param b Blue property background color of The entry object
+ * @param a Alpha property background alpha of The entry object
  *
  * @ingroup Entry
  */
@@ -4158,10 +4158,10 @@ elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsig
  * Set background color of the entry
  *
  * @param obj The entry object
- * @param r Red property background color of The entry object 
- * @param g Green property background color of The entry object 
- * @param b Blue property background color of The entry object 
- * @param a Alpha property background alpha of The entry object 
+ * @param r Red property background color of The entry object
+ * @param g Green property background color of The entry object
+ * @param b Blue property background color of The entry object
+ * @param a Alpha property background alpha of The entry object
  * @ingroup Entry
  */
 EAPI void

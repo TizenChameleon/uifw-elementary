@@ -104,7 +104,7 @@ static void utc_UIFW_elm_conformant_content_unset_func_02(void)
         elm_conformant_content_unset(NULL);
 	conform = elm_object_parent_widget_get(entry);
 	if (!conform) {
-		tet_infoline("elm_conformant_content_unset() failed in negative test case");	
+		tet_infoline("elm_conformant_content_unset() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}

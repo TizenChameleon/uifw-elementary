@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -90,7 +90,7 @@ static void utc_UIFW_elm_popup_with_buttons_add_func_02(void)
 {
 	Evas_Object *popup = NULL;
 	popup = elm_popup_with_buttons_add(NULL, "title", "this is text", 1, "ok", ELM_POPUP_RESPONSE_OK, NULL);
-		
+
 	if (popup) {
 		tet_infoline("elm_popup_with_buttons_add() parent as NULL failed in positive test case");
 		tet_result(TET_FAIL);

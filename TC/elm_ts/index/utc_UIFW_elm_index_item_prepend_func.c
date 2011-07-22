@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -72,7 +72,7 @@ char *gli_label_get(const void *data, Evas_Object *obj, const char *part)
 {
    char buf[256];
    int j = (int)data;
-   snprintf(buf, sizeof(buf), "%c%c", 
+   snprintf(buf, sizeof(buf), "%c%c",
             'A' + ((j >> 4) & 0xf),
             'a' + ((j     ) & 0xf)
             );
@@ -89,9 +89,9 @@ static void utc_UIFW_elm_index_item_prepend_func_01(void)
 	Evas_Object *gl = NULL;
 	int i = 0, j = 0;
 	const char  *letter = NULL;
-	
+
 	gl = elm_genlist_add(main_win);
-   	idx= elm_index_add(main_win);	
+   	idx= elm_index_add(main_win);
 	evas_object_show(gl);
 	evas_object_show(idx);
     	itci.item_style     = "default";
@@ -108,9 +108,9 @@ static void utc_UIFW_elm_index_item_prepend_func_01(void)
 		}
 		if(i == 40) it_gl = it;
 		j += 2;
-    	}	
+    	}
 	elm_index_item_go(idx, 0);
-    	it_idx = elm_index_item_find(idx,(void*)it_gl);	
+    	it_idx = elm_index_item_find(idx,(void*)it_gl);
     	letter = elm_index_item_letter_get(it_idx);
     	if((strcmp(letter,"K"))){
 		tet_infoline("elm_index_item_prepend() with argument as NULL failed in positive test case");
@@ -130,11 +130,11 @@ static void utc_UIFW_elm_index_item_prepend_func_02(void)
 	Elm_Index_Item *it_idx = NULL;
 	Evas_Object *gl = NULL;
 	int i = 0, j = 0;
-	
+
 	gl = elm_genlist_add(main_win);
    	idx= elm_index_add(main_win);
         evas_object_show(gl);
-	evas_object_show(idx);	
+	evas_object_show(idx);
 	itci.item_style     = "default";
 	itci.func.label_get = gli_label_get;
 	itci.func.icon_get  = NULL;
@@ -149,11 +149,11 @@ static void utc_UIFW_elm_index_item_prepend_func_02(void)
      		}
 		if(i == 40) it_gl = it;
        		j += 2;
-	}	
+	}
 	elm_index_item_go(idx, 0);
-	it_idx = elm_index_item_find(idx,(void*)it_gl);	
+	it_idx = elm_index_item_find(idx,(void*)it_gl);
 	if(it_idx) {
-		tet_infoline("elm_index_item_prepend() failed in negative test case");	
+		tet_infoline("elm_index_item_prepend() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
    	}

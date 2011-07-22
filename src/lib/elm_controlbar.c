@@ -1738,7 +1738,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_tool_item_prepend(Evas_Object *
  * Insert new tool item before given item
  *
  * @param	obj The controlbar object
- * @param	before The given item	
+ * @param	before The given item
  * @param	icon_path The icon path of item
  * @param	label The label of item
  * @param	func Callback function of item
@@ -1797,7 +1797,7 @@ elm_controlbar_tool_item_insert_before(Evas_Object * obj,
  * Insert new tool item after given item
  *
  * @param	obj The controlbar object
- * @param	after The given item	
+ * @param	after The given item
  * @param	icon_path The icon path of item
  * @param	label The label of item
  * @param	func Callback function of item
@@ -1887,7 +1887,7 @@ EAPI Elm_Controlbar_Item * elm_controlbar_object_item_append(Evas_Object *
  *
  * @param	obj The controlbar object
  * @param	obj_item The object of item
- * @param	sel The number of sel occupied 
+ * @param	sel The number of sel occupied
  * @return  The item of controlbar
  *
  * @ingroup Controlbar
@@ -1917,9 +1917,9 @@ EAPI Elm_Controlbar_Item * elm_controlbar_object_item_prepend(Evas_Object *
  * Insert new object item before given item
  *
  * @param	obj The controlbar object
- * @param	before The given item	
+ * @param	before The given item
  * @param	obj_item The object of item
- * @param	sel The number of sel occupied 
+ * @param	sel The number of sel occupied
  * @return  The item of controlbar
  *
  * @ingroup Controlbar
@@ -1947,9 +1947,9 @@ elm_controlbar_object_item_insert_before(Evas_Object * obj,
  * Insert new object item after given item
  *
  * @param	obj The controlbar object
- * @param	after The given item	
+ * @param	after The given item
  * @param	obj_item The object of item
- * @param	sel The number of sel occupied 
+ * @param	sel The number of sel occupied
  * @return  The item of controlbar
  *
  * @ingroup Controlbar
@@ -2549,7 +2549,7 @@ elm_controlbar_alpha_set(Evas_Object *obj, int alpha)
 
 /**
  * Set auto-align mode of the controlbar(It's not prepared yet)
- * If you set the auto-align and add items more than 5, 
+ * If you set the auto-align and add items more than 5,
  * the "more" item will be made and the items more than 5 will be unvisible.
  *
  * @param	obj The object of the controlbar
@@ -2658,7 +2658,7 @@ elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical)
  * Get the button object of the item
  *
  * @param	it The item of controlbar
- * @return  button object of the item	
+ * @return  button object of the item
  *
  * @ingroup Controlbar
  */

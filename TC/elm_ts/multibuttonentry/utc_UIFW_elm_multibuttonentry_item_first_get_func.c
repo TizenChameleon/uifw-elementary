@@ -185,7 +185,7 @@ static void utc_UIFW_elm_multibuttonentry_item_first_get_func_02(void)
 	added_item2 = elm_multibuttonentry_item_add_end(test_eo, "item2", NULL);
 	first_item = elm_multibuttonentry_item_first_get(test_win);
 	TET_CHECK_FAIL(NULL, first_item);
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_multibuttonentry_item_first_get().");
 }

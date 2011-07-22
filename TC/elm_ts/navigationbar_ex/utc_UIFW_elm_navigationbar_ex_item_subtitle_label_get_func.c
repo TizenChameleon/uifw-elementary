@@ -59,16 +59,16 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	navi_ex = elm_navigationbar_ex_add(main_win);
-	evas_object_show(navi_ex);	
+	evas_object_show(navi_ex);
 	Evas_Object *btn = elm_button_add(navi_ex);
 	evas_object_show(btn);
 	item = elm_navigationbar_ex_item_push(navi_ex, btn, "topbar_back_1fn_2lines_facebook");
 	elm_navigationbar_ex_item_title_button_set(item, "button", NULL, ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1, NULL, NULL);
 	elm_navigationbar_ex_item_title_button_set(item, "button", NULL, ELM_NAVIGATIONBAR_EX_BACK_BUTTON, _quit_button_cb, NULL);
 	elm_navigationbar_ex_item_title_label_set(item, "title");
-	elm_navigationbar_ex_item_subtitle_label_set(item, "subtitle");	
+	elm_navigationbar_ex_item_subtitle_label_set(item, "subtitle");
 	elm_win_resize_object_add(main_win, navi_ex);
 }
 
@@ -87,9 +87,9 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_navigationbar_ex_item_subtitle_label_get_func_01(void)
 {
-	
+
 	const char *subtitle = NULL;
-	
+
    	subtitle = elm_navigationbar_ex_item_subtitle_label_get(item);
 
 	if (!subtitle) {
@@ -106,7 +106,7 @@ static void utc_UIFW_elm_navigationbar_ex_item_subtitle_label_get_func_01(void)
 static void utc_UIFW_elm_navigationbar_ex_item_subtitle_label_get_func_02(void)
 {
 	const char *subtitle = NULL;
-	
+
    	subtitle = elm_navigationbar_ex_item_subtitle_label_get(NULL);
 
 	if (subtitle) {

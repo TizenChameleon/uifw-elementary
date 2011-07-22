@@ -49,7 +49,7 @@ _del_hook(Evas_Object *obj)
 
    Evas_Object *p = elm_widget_parent_get(obj);
    if (p == wd->win_indi) ecore_job_add (_del_job, p);
-   
+
    evas_object_del (wd->edje_indi);
    wd->edje_indi = NULL;
    evas_object_del (wd->edje_detail);
@@ -149,7 +149,7 @@ static void _detail_hide_cb (void *data, Evas_Object *obj __UNUSED__,
    evas_object_smart_callback_call ((Evas_Object *)data, "detail,hide", NULL);
 }
 
-static Evas_Object 
+static Evas_Object
 *_create_window (Evas_Object *parent, const char *name)
 {
    Evas_Object *win;
@@ -168,7 +168,7 @@ static Evas_Object
    return win;
 }
 
-static void 
+static void
 _create_tickernoti_indi (Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -179,7 +179,7 @@ _create_tickernoti_indi (Evas_Object *obj)
    Evas_Coord w;
 #endif
 
-   char *data_win_height = NULL; 
+   char *data_win_height = NULL;
    evas_object_move (wd->win_indi, 0, 0);
 
    e = evas_object_evas_get (wd->win_indi);
@@ -190,19 +190,19 @@ _create_tickernoti_indi (Evas_Object *obj)
 
    /* tickernoti indicator height set */
    data_win_height = (char *)edje_object_data_get (wd->edje_indi, "height");
-   if (data_win_height != NULL && elm_scale_get() > 0.0) 
+   if (data_win_height != NULL && elm_scale_get() > 0.0)
      wd->indicator_height = (int)(elm_scale_get() * atoi(data_win_height));
 
 #ifdef HAVE_ELEMENTARY_X
    ecore_x_window_size_get (ecore_x_window_root_first_get(), &w, NULL);
    evas_object_resize (wd->win_indi, w, wd->indicator_height);
 #endif
-	
+
    edje_object_signal_callback_add (wd->edje_indi, "request,detail,show", "", _detail_show_cb, obj);
    evas_object_show (wd->edje_indi);
 }
 
-static void 
+static void
 _create_tickernoti_detail (Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -242,7 +242,7 @@ _show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   if (wd->mode == ELM_TICKERNOTI_DEFAULT) 
+   if (wd->mode == ELM_TICKERNOTI_DEFAULT)
      {
         evas_object_hide (wd->win_detail);
 #ifdef HAVE_ELEMENTARY_X
@@ -251,7 +251,7 @@ _show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
 	evas_object_show (wd->win_indi);
 	edje_object_signal_emit (wd->edje_indi, "effect,show", "bg_1line");
      }
-   else if (wd->mode == ELM_TICKERNOTI_DETAILVIEW) 
+   else if (wd->mode == ELM_TICKERNOTI_DETAILVIEW)
      {
         evas_object_hide (wd->win_indi);
 #ifdef HAVE_ELEMENTARY_X
@@ -269,7 +269,7 @@ _hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-   evas_object_hide (obj); 
+   evas_object_hide (obj);
    evas_object_hide (wd->win_indi);
    evas_object_hide (wd->win_detail);
 }
@@ -337,7 +337,7 @@ elm_tickernoti_add(Evas_Object *parent)
  * @param icon The icon object will be used on the tickernoti object
  * @ingroup TickerNoti
  */
-EAPI void 
+EAPI void
 elm_tickernoti_icon_set (const Evas_Object *obj, Evas_Object *icon)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -443,7 +443,7 @@ elm_tickernoti_detailview_label_get (const Evas_Object *obj)
  * @param button The button object will be used on the tickernoti object
  * @ingroup TickerNoti
  */
-EAPI void 
+EAPI void
 elm_tickernoti_detailview_button_set (const Evas_Object *obj, Evas_Object *button)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -477,7 +477,7 @@ elm_tickernoti_detailview_button_get (const Evas_Object *obj)
  * @param icon The icon object will be used on the tickernoti object
  * @ingroup TickerNoti
  */
-EAPI void 
+EAPI void
 elm_tickernoti_detailview_icon_set (const Evas_Object *obj, Evas_Object *icon)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -508,7 +508,7 @@ elm_tickernoti_detailview_icon_get (const Evas_Object *obj)
  * Get the rotation used on the tickernoti object
  *
  * @param obj The tickernotil object
- * @return The rotation angle 
+ * @return The rotation angle
  * @ingroup TickerNoti
  */
 EAPI int
@@ -545,8 +545,8 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
    wd->angle = angle;
 #ifdef HAVE_ELEMENTARY_X
    Evas_Coord root_w, root_h;
-   /* 
-   * manual calculate win_tickernoti_indi window position & size 
+   /*
+   * manual calculate win_tickernoti_indi window position & size
    *  - win_indi is not full size window (480 x 27)
    */
    ecore_x_window_size_get (ecore_x_window_root_first_get(), &root_w, &root_h);
@@ -557,7 +557,7 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
      evas_object_geometry_get (wd->win_detail, &x, &y, &w, &h);
 
    /* rotate win */
-   switch (angle) 
+   switch (angle)
      {
       case 90:
 #ifdef HAVE_ELEMENTARY_X
@@ -598,7 +598,7 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
    elm_win_rotation_with_resize_set (wd->win_indi, angle);
    evas_object_move (wd->win_indi, x, y);
    evas_object_resize (wd->win_indi, w, wd->indicator_height);
-   if (evas_object_visible_get (wd->win_indi)) 
+   if (evas_object_visible_get (wd->win_indi))
      {
 #ifdef HAVE_ELEMENTARY_X
         _make_notification_window (wd->win_indi);
@@ -608,7 +608,7 @@ elm_tickernoti_rotation_set (const Evas_Object *obj, int angle)
    elm_win_rotation_with_resize_set (wd->win_detail, angle);
    evas_object_move (wd->win_detail, x, y);
    evas_object_resize (wd->win_detail, w, wd->detail_view_height);
-   if (evas_object_visible_get (wd->win_detail))  
+   if (evas_object_visible_get (wd->win_detail))
      {
 #ifdef HAVE_ELEMENTARY_X
         _make_notification_window (wd->win_detail);

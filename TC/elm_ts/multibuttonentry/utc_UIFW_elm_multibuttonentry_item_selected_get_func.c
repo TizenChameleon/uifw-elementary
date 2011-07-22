@@ -155,7 +155,7 @@ cleanup()
 static void utc_UIFW_elm_multibuttonentry_item_selected_get_func_01(void)
 {
 	Elm_Multibuttonentry_Item *added_item1 = NULL, *added_item2 = NULL, *selected_item = NULL;
-	
+
 	test_eo = elm_multibuttonentry_add(test_win);
 	added_item1 = elm_multibuttonentry_item_add_end(test_eo, "item1", NULL);
 	added_item2 = elm_multibuttonentry_item_add_end(test_eo, "item2", NULL);

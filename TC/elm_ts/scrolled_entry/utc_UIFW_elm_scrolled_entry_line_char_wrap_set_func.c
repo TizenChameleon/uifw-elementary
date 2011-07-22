@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -79,7 +79,7 @@ static void utc_UIFW_elm_scrolled_entry_line_char_wrap_set_func_01(void)
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Enabling character line wrapping in the scrolled entry object had succeed.");
-	
+
 
 }
 

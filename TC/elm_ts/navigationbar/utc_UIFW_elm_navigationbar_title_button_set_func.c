@@ -101,7 +101,7 @@ static void utc_UIFW_elm_navigationbar_title_button_set_func_01(void)
  * @brief Negative test case of ug_init elm_navigationbar_title_button_set()
  */
 static void utc_UIFW_elm_navigationbar_title_button_set_func_02(void)
-{	
+{
 	Evas_Object *content = elm_icon_add(navibar);
 	snprintf(buf, sizeof(buf), "%s/00_volume_icon.png", ICON_DIR);
 	elm_icon_file_set(content, buf, NULL);

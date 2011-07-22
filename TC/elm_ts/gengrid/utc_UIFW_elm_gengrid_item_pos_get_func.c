@@ -49,7 +49,7 @@ void _elm_precondition(void)
 	evas_object_size_hint_weight_set(main_bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
 	evas_object_resize(main_win, 320, 480);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void startup(void);
@@ -82,7 +82,7 @@ static Evas_Object * _icon_get(const void *data, Evas_Object *obj, const char *p
 		evas_object_show(icon);
 		return icon;
 	}
-	
+
 	return NULL;
 }
 
@@ -95,12 +95,12 @@ static void startup(void)
 	test_win = elm_win_add(NULL, "Page Control", ELM_WIN_BASIC);
 	elm_win_title_set(test_win, "Page Control");
 	elm_win_autodel_set(test_win, 1);
-	
+
 	test_bg = elm_bg_add(test_win);
 	elm_win_resize_object_add(test_win, test_bg);
 	evas_object_size_hint_weight_set(test_bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_show(test_bg);
-	
+
 	evas_object_resize(test_win, 480, 800);
 	evas_object_show(test_win);
 
@@ -110,13 +110,13 @@ static void startup(void)
 	elm_gengrid_horizontal_set(test_eo, EINA_FALSE);
 	elm_gengrid_bounce_set(test_eo, EINA_FALSE, EINA_TRUE);
 	elm_gengrid_multi_select_set(test_eo, EINA_TRUE);
-	
+
 	gic.item_style = "default_grid";
 	gic.func.label_get = NULL;
 	gic.func.icon_get = _icon_get;
-	
+
 	item = elm_gengrid_item_append(test_eo, &gic, test_bg, NULL, NULL);
-		
+
 	tet_infoline("[[ TET_MSG ]]:: Completing startup");
 }
 
@@ -125,25 +125,25 @@ static void cleanup(void)
 	if ( NULL != main_win ) {
 		main_win = NULL;
 	}
-	
+
 	if ( NULL != main_bg ) {
 		main_bg = NULL;
 	}
-	
+
 	if ( NULL != test_win ) {
 		test_win = NULL;
 	}
-	
+
 	if ( NULL != test_bg ) {
 		test_bg = NULL;
 	}
-	
+
 	if ( NULL != test_eo ) {
 		test_eo = NULL;
 	}
-	
+
 	elm_exit();
-	
+
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
@@ -151,12 +151,12 @@ static void utc_UIFW_elm_gengrid_item_pos_get_func_01(void)
 {
 	unsigned int x, y;
 	x = -1; y = -1;
-	
+
 	elm_gengrid_item_pos_get(item, &x, &y);
-	
+
 	TET_CHECK_PASS(-1, x);
 	TET_CHECK_PASS(-1, y);
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_gengrid_item_pos_get");
 }
@@ -165,12 +165,12 @@ static void utc_UIFW_elm_gengrid_item_pos_get_func_02(void)
 {
 	unsigned int x, y;
 	x = -1; y = -1;
-	
+
 	elm_gengrid_item_pos_get(NULL, &x, &y);
-	
+
 	TET_CHECK_FAIL(-1, x);
 	TET_CHECK_FAIL(-1, y);
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_gengrid_item_pos_get");
 }

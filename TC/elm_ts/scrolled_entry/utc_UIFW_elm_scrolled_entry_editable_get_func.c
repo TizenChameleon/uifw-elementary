@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -83,7 +83,7 @@ static void utc_UIFW_elm_scrolled_entry_editable_get_func_01(void)
 		tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Getting the editable attribute of the scrolled entry had succeed.");
 	} else {
 		tet_result(TET_FAIL);
-		tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:FAIL, Getting the editable attribute of the scrolled entry had failed.");	
+		tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:FAIL, Getting the editable attribute of the scrolled entry had failed.");
 	}
 }
 
@@ -101,7 +101,7 @@ static void utc_UIFW_elm_scrolled_entry_editable_get_func_02(void)
 		tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Getting the editable attribute of the scrolled entry had failed.");
 	} else {
 		tet_result(TET_FAIL);
-		tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:FAIL, Error occurs while getting the editable attribute of the scrolled entry.");	
+		tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:FAIL, Error occurs while getting the editable attribute of the scrolled entry.");
 	}
 
 }

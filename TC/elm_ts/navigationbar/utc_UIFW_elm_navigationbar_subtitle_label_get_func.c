@@ -87,7 +87,7 @@ static void utc_UIFW_elm_navigationbar_subtitle_label_get_func_01(void)
 	elm_icon_file_set(content, buf, NULL);
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
-		
+
    	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
 	elm_navigationbar_subtitle_label_set(navibar, content, "subtitle");
 	const char *text = elm_navigationbar_subtitle_label_get(navibar,content);
@@ -109,7 +109,7 @@ static void utc_UIFW_elm_navigationbar_subtitle_label_get_func_02(void)
 	elm_icon_file_set(content, buf, NULL);
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
-		
+
    	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
 	const char *text = elm_navigationbar_subtitle_label_get(navibar,content);
 	if (text) {

@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
 	progressbar = elm_progressbar_add(main_win);
 	evas_object_show(progressbar);
@@ -69,7 +69,7 @@ static void cleanup(void)
 		evas_object_del(progressbar);
 	    progressbar = NULL;
 	}
-	
+
 	if ( NULL != main_win ) {
 		evas_object_del(main_win);
 	       	main_win = NULL;
@@ -94,7 +94,7 @@ static void utc_UIFW_elm_progressbar_pulse_get_func_01(void)
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_progressbar_pulse_get().");
 }
@@ -105,7 +105,7 @@ static void utc_UIFW_elm_progressbar_pulse_get_func_01(void)
 static void utc_UIFW_elm_progressbar_pulse_get_func_02(void)
 {
 	Eina_Bool flag = EINA_FALSE;
-	
+
 	tet_infoline("[[ DEBUG:: Negative ]]");
 
 	elm_progressbar_pulse_set(progressbar, EINA_TRUE);

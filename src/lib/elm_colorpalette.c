@@ -10,9 +10,9 @@
  * a color rectangle on the colorpalette.
  *
  * Smart callbacks that you can add are:
- * 
+ *
  * clicked - This signal is sent when a color rectangle is clicked.
- * 
+ *
  */
 
 
@@ -285,7 +285,7 @@ static void _color_table_update(Evas_Object *obj, int row, int col, int color_nu
       return;
 
    count = 0;
-   
+
    e = evas_object_evas_get(wd->parent);
 
    _color_table_delete(obj);

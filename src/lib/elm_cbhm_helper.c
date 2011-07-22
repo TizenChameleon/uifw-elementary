@@ -42,10 +42,10 @@ void _get_clipboard_window()
 	unsigned long nitems, bytes_after;
 	unsigned char *prop_return = NULL;
 	Atom atomCbhmWin = XInternAtom(cbhm_disp, ATOM_CBHM_WINDOW_NAME, False);
-	if(Success == 
-	   XGetWindowProperty(cbhm_disp, DefaultRootWindow(cbhm_disp), atomCbhmWin, 
-						  0, sizeof(Ecore_X_Window), False, XA_WINDOW, 
-						  &actual_type, &actual_format, &nitems, &bytes_after, &prop_return) && 
+	if(Success ==
+	   XGetWindowProperty(cbhm_disp, DefaultRootWindow(cbhm_disp), atomCbhmWin,
+						  0, sizeof(Ecore_X_Window), False, XA_WINDOW,
+						  &actual_type, &actual_format, &nitems, &bytes_after, &prop_return) &&
 	   prop_return)
 	{
 		cbhm_win = *(Ecore_X_Window*)prop_return;
@@ -68,10 +68,10 @@ unsigned int _get_cbhm_serial_number()
 	// FIXME : is it really needed?
 	XSync(cbhm_disp, EINA_FALSE);
 
-	if(Success == 
-	   XGetWindowProperty(cbhm_disp, cbhm_win, atomCbhmSN, 
-						  0, sizeof(Ecore_X_Window), False, XA_INTEGER, 
-						  &actual_type, &actual_format, &nitems, &bytes_after, &prop_return) && 
+	if(Success ==
+	   XGetWindowProperty(cbhm_disp, cbhm_win, atomCbhmSN,
+						  0, sizeof(Ecore_X_Window), False, XA_INTEGER,
+						  &actual_type, &actual_format, &nitems, &bytes_after, &prop_return) &&
 	   prop_return)
 	{
 		senum = *(unsigned int*)prop_return;
@@ -94,7 +94,7 @@ void _search_clipboard_window(Ecore_X_Window w)
 	unsigned long bytes_after;
 	unsigned long nsize = 0;
 	unsigned char *propName = 0;
-	if(Success == 
+	if(Success ==
 	   XGetWindowProperty(cbhm_disp, w, atomWMName, 0, (long)nsize, False,
 						  atomUTF8String, &type, &format, &nitems, &bytes_after, &propName))
 
@@ -156,7 +156,7 @@ int _get_clipboard_data(Atom datom, char **datomptr)
 	// FIXME : is it really needed?
 	XSync(cbhm_disp, EINA_FALSE);
 
-	if (Success == 
+	if (Success ==
 		XGetWindowProperty(cbhm_disp, self_win, datom, 0, 0, False,
 						   AnyPropertyType, &type, &format, &nitems, &nsize, &propname))
 		XFree(propname);
@@ -171,7 +171,7 @@ int _get_clipboard_data(Atom datom, char **datomptr)
 	if (format != 8)
 		return -1;
 
-	if (Success == 
+	if (Success ==
 		XGetWindowProperty(cbhm_disp, self_win, datom, 0, (long)nsize, False,
 						   AnyPropertyType, &type, &format, &nitems, &nsize, &propname))
 	{
@@ -216,7 +216,7 @@ void free_clipboard_data(char *dptr)
  *
  * @ingroup CBHM_helper
  */
-EAPI Eina_Bool 
+EAPI Eina_Bool
 elm_cbhm_helper_init(Evas_Object *self)
 {
 	init_flag = EINA_FALSE;
@@ -231,7 +231,7 @@ elm_cbhm_helper_init(Evas_Object *self)
 		_search_clipboard_window(DefaultRootWindow(cbhm_disp));
 	if (self_win == None)
 		self_win = ecore_evas_software_x11_window_get(ecore_evas_ecore_evas_get(evas_object_evas_get(self)));
-   
+
 	if (cbhm_disp && cbhm_win && self_win)
 		init_flag = EINA_TRUE;
 #endif
@@ -245,7 +245,7 @@ elm_cbhm_helper_init(Evas_Object *self)
  *
  * @ingroup CBHM_helper
  */
-EAPI unsigned int 
+EAPI unsigned int
 elm_cbhm_get_serial_number()
 {
 	if (init_flag == EINA_FALSE)
@@ -263,7 +263,7 @@ elm_cbhm_get_serial_number()
  *
  * @ingroup CBHM_helper
  */
-EAPI int 
+EAPI int
 elm_cbhm_get_count()
 {
 	if (init_flag == EINA_FALSE)
@@ -299,7 +299,7 @@ elm_cbhm_get_count()
  *
  * @ingroup CBHM_helper
  */
-EAPI int 
+EAPI int
 elm_cbhm_get_raw_data()
 {
 	if (init_flag == EINA_FALSE)

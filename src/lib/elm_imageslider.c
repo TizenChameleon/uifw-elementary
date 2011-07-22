@@ -1,6 +1,6 @@
-/* 
-* 
-* vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2 
+/*
+*
+* vim:ts=8:sw=3:sts=8:noexpandtab:cino=>5n-3f0^-2{2
 */
 #include <stdio.h>
 #include <math.h>
@@ -11,7 +11,7 @@
 * @defgroup Imageslider Imageslider
 * @ingroup Elementary
 *
-* By flicking images on the screen, 
+* By flicking images on the screen,
 * you can see the images in specific path.
 */
 
@@ -537,7 +537,7 @@ _ev_imageslider_move_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void 
                   else
                     idx = BLOCK_RIGHT;
 
-                  wd->move_x = wd->x + ((ev->cur.canvas.x - wd->down_pos.x)); 
+                  wd->move_x = wd->x + ((ev->cur.canvas.x - wd->down_pos.x));
                   wd->move_y = wd->y + ((ev->cur.canvas.y - wd->down_pos.y));
 
                   if (wd->on_zoom)
@@ -841,13 +841,13 @@ _imageslider_update(Widget_Data * wd)
    _anim(wd);
 }
 
-/** 
-* Add an Image Slider widget 
-* 
-* @param 	parent	The parent object 
-* @return	The new Image slider object or NULL if it cannot be created 
-* 
-* @ingroup Imageslider 
+/**
+* Add an Image Slider widget
+*
+* @param 	parent	The parent object
+* @return	The new Image slider object or NULL if it cannot be created
+*
+* @ingroup Imageslider
 */
 EAPI Evas_Object *
 elm_imageslider_add(Evas_Object *parent)
@@ -905,16 +905,16 @@ elm_imageslider_add(Evas_Object *parent)
    return obj;
 }
 
-/** 
-* Append an Image Slider item 
-* 
-* @param 	obj          The Image Slider object 
-* @param	photo_file   photo file path 
-* @param	func         callback function 
-* @param	data         callback data 
-* @return	The Image Slider item handle or NULL 
-* 
-* @ingroup Imageslider 
+/**
+* Append an Image Slider item
+*
+* @param 	obj          The Image Slider object
+* @param	photo_file   photo file path
+* @param	func         callback function
+* @param	data         callback data
+* @return	The Image Slider item handle or NULL
+*
+* @ingroup Imageslider
 */
 EAPI Elm_Imageslider_Item *
 elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data)
@@ -989,16 +989,16 @@ elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, E
    return it;
 }
 
-/** 
-* Prepend Image Slider item 
-* 
-* @param 	obj          The Image Slider object 
-* @param	photo_file   photo file path 
-* @param	func         callback function 
-* @param	data         callback data 
-* @return	The imageslider item handle or NULL 
-* 
-* @ingroup Imageslider 
+/**
+* Prepend Image Slider item
+*
+* @param 	obj          The Image Slider object
+* @param	photo_file   photo file path
+* @param	func         callback function
+* @param	data         callback data
+* @return	The imageslider item handle or NULL
+*
+* @ingroup Imageslider
 */
 EAPI Elm_Imageslider_Item *
 elm_imageslider_item_prepend(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data)

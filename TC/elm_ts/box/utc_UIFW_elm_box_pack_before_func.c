@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -90,7 +90,7 @@ static void utc_UIFW_elm_box_pack_before_func_01(void)
  * @brief Negative test case of ug_init elm_box_pack_before()
  */
 static void utc_UIFW_elm_box_pack_before_func_02(void)
-{	
+{
 	// Current return type of thsi API is "Void".
 	elm_box_pack_before(NULL, NULL, NULL);
 

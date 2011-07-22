@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
 	progressbar = elm_progressbar_add(main_win);
 	evas_object_show(progressbar);
@@ -65,12 +65,12 @@ static void startup(void)
 }
 
 static void cleanup(void)
-{	
+{
 	if ( NULL != progressbar ) {
 		evas_object_del(progressbar);
 	    progressbar = NULL;
 	}
-	
+
 	if ( NULL != main_win ) {
 		evas_object_del(main_win);
 	       	main_win = NULL;
@@ -87,7 +87,7 @@ static void utc_UIFW_elm_progressbar_unit_format_get_func_01(void)
 	const char *str = NULL;
 
 	tet_infoline("[[ DEBUG :: Positive ]]");
-	
+
 	elm_progressbar_unit_format_set(progressbar, "%1.1f units");
 	str = elm_progressbar_unit_format_get(progressbar);
 	if (strcmp(str, "%1.1f units") != 0) {
@@ -95,7 +95,7 @@ static void utc_UIFW_elm_progressbar_unit_format_get_func_01(void)
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_progressbar_unit_format_get().");
 }
@@ -108,7 +108,7 @@ static void utc_UIFW_elm_progressbar_unit_format_get_func_02(void)
 	const char *str = NULL;
 
 	tet_infoline("[[ DEBUG:: Negative ]]");
-	
+
 	elm_progressbar_unit_format_set(progressbar, "%1.1f units");
 	str = elm_progressbar_unit_format_get(NULL);
 	if (str) {
@@ -116,7 +116,7 @@ static void utc_UIFW_elm_progressbar_unit_format_get_func_02(void)
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_progressbar_unit_format_get().");
 }

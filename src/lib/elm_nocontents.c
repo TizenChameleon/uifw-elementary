@@ -133,7 +133,7 @@ elm_nocontents_label_get(const Evas_Object *obj)
  * @param custom The custom object will be used on the nocontents object
  * @ingroup NoContents
  */
-EAPI void 
+EAPI void
 elm_nocontents_custom_set(const Evas_Object *obj, Evas_Object *custom)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);

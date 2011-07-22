@@ -56,7 +56,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
 	controlbar = elm_controlbar_add(main_win);
 	item1 = elm_controlbar_tab_item_append(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Controlbar", NULL);
@@ -80,7 +80,7 @@ static void cleanup(void)
 static void utc_UIFW_elm_controlbar_item_auto_align_set_func_01(void)
 {
    	elm_controlbar_item_auto_align_set(controlbar, EINA_TRUE);
-	
+
 	tet_result(TET_PASS);
 }
 
@@ -90,6 +90,6 @@ static void utc_UIFW_elm_controlbar_item_auto_align_set_func_01(void)
 static void utc_UIFW_elm_controlbar_item_auto_align_set_func_02(void)
 {
    	elm_controlbar_item_auto_align_set(controlbar, NULL);
-	
+
 	tet_result(TET_PASS);
 }

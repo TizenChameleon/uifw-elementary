@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -76,7 +76,7 @@ static void utc_UIFW_elm_scrolled_entry_password_get_func_01(void)
 
 	Evas_Object *test_en = elm_scrolled_entry_add(main_win);
 	elm_scrolled_entry_password_set(test_en, EINA_TRUE);
-	
+
 	result = elm_scrolled_entry_password_get(test_en);
 
 	if ( result == EINA_TRUE) {
@@ -85,7 +85,7 @@ static void utc_UIFW_elm_scrolled_entry_password_get_func_01(void)
 	} else {
 		tet_result(TET_FAIL);
 		tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:FAIL, Getting the status that the scrolled entry is on password mode had failed.");
-	
+
 	}
 }
 

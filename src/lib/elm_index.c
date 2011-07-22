@@ -717,7 +717,7 @@ elm_index_add(Evas_Object *parent)
    Widget_Data *wd;
    Evas_Coord minw, minh;
    const char *string;
-  
+
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
    ELM_SET_WIDTYPE(widtype, "index");

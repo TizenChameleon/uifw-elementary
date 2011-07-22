@@ -619,7 +619,7 @@ _cell_place(Elm_Grid_Cell *cell, Evas_Coord cx, Evas_Coord cy)
 	alignw = (vw - tcw)*cell->wd->align_x;
      }
    else if (cell->wd->horizontal && cell->wd->minw > vw)
-        alignw = 0;   
+        alignw = 0;
    if (!cell->wd->horizontal && cell->wd->minh < vh)
      {
         int rows;

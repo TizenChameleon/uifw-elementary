@@ -177,7 +177,7 @@ obj_unhook(Evas_Object *obj)
 
 EAPI void
 obj_longpress(Evas_Object *obj)
-{	
+{
    if(!ext_mod) return;
 
    Evas_Object *top;
@@ -297,12 +297,12 @@ obj_mouseup(Evas_Object *obj)
    /*update*/
    elm_entry_extension_module_data_get(obj,ext_mod);
    if (ext_mod->longpress_timer)
-     {    
+     {
         if (ext_mod->have_selection )
           {
              _cancel(obj,ext_mod->popup,NULL);
           }
-     }     
+     }
 }
 
 

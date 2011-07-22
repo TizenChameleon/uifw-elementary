@@ -2295,7 +2295,7 @@ found:
                   cnp_debug("Insert %s\n", (char *)ddata.data);
                   dropable->dropcb(dropable->cbdata, dropable->obj, &ddata);
                   ecore_x_dnd_send_finished();
-                  
+
                   if (savedtypes.pi) pasteimage_free(savedtypes.pi);
                   savedtypes.pi = NULL;
                   return EINA_TRUE;

@@ -11,7 +11,7 @@
 
 typedef struct _Widget_Data Widget_Data;
 
-enum 
+enum
 {
   DATE_YEAR,
   DATE_MON,
@@ -184,7 +184,7 @@ _theme_hook(Evas_Object *obj)
    else
      {
 	char *str = _get_i18n_string(obj, D_FMT);
-	if (str) 
+	if (str)
 	  {
 	     if (!strcmp(str, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
 	     else if (!strcmp(str, "yyddmm")) wd->date_format = DATE_FORMAT_YYDDMM;
@@ -221,11 +221,11 @@ _ampm_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNU
 
    if (!wd || !wd->base) return ;
 
-   wd->pm = !wd->pm; 
+   wd->pm = !wd->pm;
    if (wd->pm)
      {
 	str = _get_i18n_string(data, PM_STR);
-	if (str) 
+	if (str)
 	  {
          elm_button_label_set(wd->time[TIME_AMPM], str);
 	     free(str);
@@ -263,7 +263,7 @@ _signal_rect_mouse_down(void *data, Evas_Object *obj __UNUSED__, const char *emi
      elm_object_focus(wd->time[TIME_MIN]);
 }
 
-static Eina_Bool 
+static Eina_Bool
 _focus_idler_cb(void *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -303,7 +303,7 @@ _entry_focused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd || !wd->base) return;
 
-   if (wd->idler) 
+   if (wd->idler)
      {
         ecore_idler_del(wd->idler);
         wd->idler = NULL;
@@ -369,13 +369,13 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 	       {
 		  elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
 		  free(i18n_str);
-	       }  
+	       }
           }
         //check day boundary
         if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
           {
              wd->day = num;
-             sprintf(str, "%d", wd->day);		
+             sprintf(str, "%d", wd->day);
              elm_entry_entry_set(wd->date[DATE_DAY], str);
           }
         edje_object_signal_emit(wd->base, "elm,state,month,focus,out", "elm");
@@ -414,7 +414,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
                }
              wd->hour = (wd->pm == EINA_TRUE)? num + HOUR_12H_MAXIMUM : num;
              if ((wd->hour % 12) == 0) wd->hour -= HOUR_12H_MAXIMUM;
-             if (wd->pm) 
+             if (wd->pm)
 	       {
 		  i18n_str = _get_i18n_string(data, PM_STR);
 		  if (i18n_str)
@@ -423,7 +423,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 		       free(i18n_str);
 		    }
 	       }
-             else 
+             else
 	       {
 		  i18n_str = _get_i18n_string(data, AM_STR);
 		  if (i18n_str)
@@ -439,7 +439,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
      }
    else if (obj == wd->time[TIME_MIN])
      {
-        if (strlen(elm_entry_entry_get(wd->time[TIME_MIN]))) 
+        if (strlen(elm_entry_entry_get(wd->time[TIME_MIN])))
           wd->min = atoi(elm_entry_entry_get(wd->time[TIME_MIN]));
         if (wd->min > MIN_MAXIMUM) wd->min = MIN_MAXIMUM;
 
@@ -450,7 +450,7 @@ _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    evas_object_smart_callback_call(data, "changed", NULL);
 }
 
-static void 
+static void
 _entry_focus_move(Evas_Object *obj, Evas_Object *focus_obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -579,12 +579,12 @@ _get_i18n_string(Evas_Object *obj, nl_item item)
      {
       case D_FMT:
 	 str = calloc(7, sizeof(char));
-	 while (fmt[i]) 
+	 while (fmt[i])
 	   {
-	      if (fmt[i] == '%' && fmt[i+1]) 
+	      if (fmt[i] == '%' && fmt[i+1])
 		{
 		   i++;
-		   switch (fmt[i]) 
+		   switch (fmt[i])
 		     {
 		      case 'Y': case 'M': case 'D': case 'y': case 'm': case 'd':
 			 str[j++] = tolower(fmt[i]);
@@ -595,7 +595,7 @@ _get_i18n_string(Evas_Object *obj, nl_item item)
 	      i++;
 	   }
 	 return str;
-      case AM_STR: 
+      case AM_STR:
       case PM_STR:
 	 if (strlen(fmt) > 0)
 	   {
@@ -623,7 +623,7 @@ _get_i18n_string(Evas_Object *obj, nl_item item)
 		}
 	      i++;
 	   }
-	 return str;	 
+	 return str;
      }
    return NULL;
 }
@@ -658,7 +658,7 @@ _maximum_day_get(int year, int month)
    return day_of_month;
 }
 
-static Eina_Bool 
+static Eina_Bool
 _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -681,7 +681,7 @@ _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen)
      }
    else if (focus_obj == wd->time[TIME_MIN])
      {
-        if (strlen == TIME_MAX_LENGTH || atoi(elm_entry_entry_get(focus_obj)) > 5) 
+        if (strlen == TIME_MAX_LENGTH || atoi(elm_entry_entry_get(focus_obj)) > 5)
           wd->editing = EINA_FALSE;
      }
    return !wd->editing;
@@ -696,7 +696,7 @@ _entry_key_up_cb(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj , v
      elm_entry_entry_set(obj, "");
 }
 
-static Eina_Bool 
+static Eina_Bool
 _imf_event_commit_cb(void *data , int type __UNUSED__, void *event)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -708,7 +708,7 @@ _imf_event_commit_cb(void *data , int type __UNUSED__, void *event)
    if (!elm_widget_focus_get(data)) return ECORE_CALLBACK_PASS_ON;
 
    focus_obj = elm_widget_focused_object_get(data);
-   if (!wd->editing) 
+   if (!wd->editing)
      {
         elm_entry_entry_set(focus_obj, "");
         wd->editing = EINA_TRUE;
@@ -737,14 +737,14 @@ _imf_event_commit_cb(void *data , int type __UNUSED__, void *event)
    return ECORE_CALLBACK_DONE;
 }
 
-static void 
+static void
 _input_panel_event_callback(void *data, Ecore_IMF_Context *ctx __UNUSED__, int value)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
    if (!wd) return;
 
-   if (wd->func)  
+   if (wd->func)
      wd->func(wd->func_data, data, value);
 }
 
@@ -778,7 +778,7 @@ _date_update(Evas_Object *obj)
           {
              wd->pm = EINA_TRUE;
 	     i18n_str = _get_i18n_string(obj, PM_STR);
-	     if (i18n_str) 
+	     if (i18n_str)
 	       {
               elm_button_label_set(wd->time[TIME_AMPM], i18n_str);
 		  free(i18n_str);
@@ -807,14 +807,14 @@ _date_update(Evas_Object *obj)
    elm_entry_entry_set(wd->time[TIME_MIN], str);
 }
 
-static void 
+static void
 _date_entry_add(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    static Elm_Entry_Filter_Limit_Size filter_data, filter_data2;
    int i;
 
-   if (!wd) return;	
+   if (!wd) return;
 
    for (i = 0; i < DATE_MAX; i++)
      {
@@ -830,7 +830,7 @@ _date_entry_add(Evas_Object *obj)
         evas_object_event_callback_add(wd->date[i], EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
         elm_widget_sub_object_add(obj, wd->date[i]);
      }
-   
+
    filter_data.max_char_count = 0;
    filter_data.max_byte_count = YEAR_MAX_LENGTH;
    elm_entry_text_filter_append(wd->date[DATE_YEAR], elm_entry_filter_limit_size, &filter_data);
@@ -839,7 +839,7 @@ _date_entry_add(Evas_Object *obj)
    elm_entry_text_filter_append(wd->date[DATE_YEAR], elm_entry_filter_limit_size, &filter_data2);
 }
 
-static void 
+static void
 _time_entry_add(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -847,7 +847,7 @@ _time_entry_add(Evas_Object *obj)
    int i;
 
    if (!wd) return;
-   
+
    filter_data.max_char_count = 0;
    filter_data.max_byte_count = TIME_MAX_LENGTH;
    for (i = 0; i < TIME_MAX-1; i++)
@@ -888,9 +888,9 @@ elm_datefield_add(Evas_Object *parent)
    Widget_Data *wd;
 
    e = evas_object_evas_get(parent);
-   if (!e) return NULL; 
+   if (!e) return NULL;
    wd = ELM_NEW(Widget_Data);
-   obj = elm_widget_add(e); 
+   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "datefield");
    elm_widget_type_set(obj, "datefield");
    elm_widget_sub_object_add(parent, obj);
@@ -984,7 +984,7 @@ elm_datefield_layout_get(const Evas_Object *obj)
  * @param day The day to set
  * @param hour The hours to set (24hour mode - 0~23)
  * @param min The minutes to set (0~59)
- * 
+ *
  * @ingroup Datefield
  */
 EAPI void
@@ -1194,7 +1194,7 @@ elm_datefield_date_min_get(const Evas_Object *obj, int *year, int *month, int *d
  * Set if the datefield show hours in military or am/pm mode
  *
  * @param obj The datefield object
- * @param mode option for the hours mode. If true, it is shown as 12h mode, if false, it is shown as 24h mode. Default value is true 
+ * @param mode option for the hours mode. If true, it is shown as 12h mode, if false, it is shown as 24h mode. Default value is true
  *
  * @ingroup Datefield
  */
@@ -1206,7 +1206,7 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 
    if (!wd) return;
 
-   if (wd->time_mode != mode) 
+   if (wd->time_mode != mode)
      {
 	wd->time_mode = mode;
 	if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h", "elm");
@@ -1219,7 +1219,7 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
  * get time mode of the datefield
  *
  * @param obj The datefield object
- * @return time mode (EINA_TRUE: 12hour mode / EINA_FALSE: 24hour mode) 
+ * @return time mode (EINA_TRUE: 12hour mode / EINA_FALSE: 24hour mode)
  *
  * @ingroup Datefield
  */
@@ -1300,11 +1300,11 @@ elm_datefield_date_format_get(const Evas_Object *obj)
  *
  * @param obj The datefield object
  * @param func The function to be called when the event is triggered (value will be the Ecore_IMF_Input_Panel_State)
- * @param data The data pointer to be passed to @p func 
+ * @param data The data pointer to be passed to @p func
  *
  * @ingroup Datefield
  */
-EAPI void 
+EAPI void
 elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -1339,7 +1339,7 @@ elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCall
  *
  * @ingroup Datefield
  */
-EAPI void 
+EAPI void
 elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value))
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -1348,7 +1348,7 @@ elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCall
 
    if (!wd) return;
 
-   if (wd->func && wd->func == pEventCallbackFunc) 
+   if (wd->func && wd->func == pEventCallbackFunc)
      {
         for (i = 0; i < DATE_MAX; i++)
           ecore_imf_context_input_panel_event_callback_del(

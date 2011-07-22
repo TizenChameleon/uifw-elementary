@@ -59,7 +59,7 @@ static void startup(void)
 
 	dayselector = elm_dayselector_add(main_win);
 	evas_object_show(dayselector);
-	
+
 }
 
 static void cleanup(void)
@@ -81,7 +81,7 @@ static void utc_UIFW_elm_dayselector_check_state_get_func_01(void)
 
 	elm_dayselector_check_state_set(dayselector, ELM_DAYSELECTOR_MON, EINA_TRUE);
 	r = elm_dayselector_check_state_get(dayselector, ELM_DAYSELECTOR_MON);
-	
+
 	if (!r) {
 		tet_infoline("elm_dayselector_check_state_get() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -98,7 +98,7 @@ static void utc_UIFW_elm_dayselector_check_state_get_func_02(void)
 	int r = 0;
 	elm_dayselector_check_state_set(dayselector, ELM_DAYSELECTOR_MON, EINA_TRUE);
 	r = elm_dayselector_check_state_get(NULL, ELM_DAYSELECTOR_MON);
-	
+
 	if (r) {
 		tet_infoline("elm_dayselector_check_state_get() failed in negative test case");
 		tet_result(TET_FAIL);

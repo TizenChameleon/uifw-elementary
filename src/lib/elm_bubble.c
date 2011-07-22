@@ -159,7 +159,7 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
    if (!wd->down) return;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
      {
-#ifdef SWEEP_SUPPORT 
+#ifdef SWEEP_SUPPORT
 	if (ev->canvas.x - wd->down_point.x > SWEEP_THRESHOLD)
 	  evas_object_smart_callback_call(data, "sweep,left,right", NULL);
 	else if (wd->down_point.x - ev->canvas.x > SWEEP_THRESHOLD)
@@ -167,7 +167,7 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
 
 	wd->down = EINA_FALSE;
 	wd->down_point.x = 0;
-	wd->down_point.y = 0;	
+	wd->down_point.y = 0;
 #endif
      }
    else if (!wd->sweep)

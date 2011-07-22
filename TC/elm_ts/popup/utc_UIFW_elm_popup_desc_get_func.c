@@ -57,7 +57,7 @@ static void startup(void)
 	evas_object_show(main_win);
 	popup = elm_popup_add(main_win);
 	elm_popup_desc_set(popup, "Demo Text");
-	evas_object_show(popup);	
+	evas_object_show(popup);
 }
 
 static void cleanup(void)

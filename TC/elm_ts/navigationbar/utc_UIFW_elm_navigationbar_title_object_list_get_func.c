@@ -58,10 +58,10 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	navibar = elm_navigationbar_add(main_win);
 	evas_object_show(navibar);
-	elm_win_resize_object_add(main_win, navibar);	
+	elm_win_resize_object_add(main_win, navibar);
 }
 
 static void cleanup(void)
@@ -88,11 +88,11 @@ static void utc_UIFW_elm_navigationbar_title_object_list_get_func_01(void)
 	elm_icon_file_set(content, buf, NULL);
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
-	
+
 	Evas_Object *title = elm_button_add(navibar);
 	evas_object_show(title);
 
-	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
+	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
 	elm_navigationbar_title_object_add(navibar, content, title);
 	Eina_List *list = elm_navigationbar_title_object_list_get(navibar, content);
 	if (!list) {
@@ -108,17 +108,17 @@ static void utc_UIFW_elm_navigationbar_title_object_list_get_func_01(void)
  */
 static void utc_UIFW_elm_navigationbar_title_object_list_get_func_02(void)
 {
-	
+
 	Evas_Object *content = elm_icon_add(navibar);
 	snprintf(buf, sizeof(buf), "%s/00_volume_icon.png", ICON_DIR);
 	elm_icon_file_set(content, buf, NULL);
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
-	
+
 	Evas_Object *title = elm_button_add(navibar);
 	evas_object_show(title);
 
-	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
+	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
 	elm_navigationbar_title_object_add(navibar, content, title);
 	Eina_List *list = elm_navigationbar_title_object_list_get(NULL, content);
 	if (list) {

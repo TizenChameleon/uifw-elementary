@@ -55,7 +55,7 @@ static void startup(void)
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);
 	animator = elm_animator_add(NULL);
-	
+
 }
 
 static void cleanup(void)

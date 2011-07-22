@@ -155,7 +155,7 @@ cleanup()
 static void utc_UIFW_elm_multibuttonentry_entry_get_func_01(void)
 {
 	Evas_Object *entry = NULL;
-	
+
 	test_eo = elm_multibuttonentry_add(test_win);
 	entry = elm_multibuttonentry_entry_get(test_eo);
 	TET_CHECK_PASS(NULL, entry);
@@ -171,7 +171,7 @@ static void utc_UIFW_elm_multibuttonentry_entry_get_func_01(void)
 static void utc_UIFW_elm_multibuttonentry_entry_get_func_02(void)
 {
 	Evas_Object *entry = NULL;
-	
+
 	test_eo = elm_multibuttonentry_add(test_win);
 	entry = elm_multibuttonentry_entry_get(NULL);
 	TET_CHECK_FAIL(NULL, entry);

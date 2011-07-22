@@ -82,7 +82,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
 	stackedicon = elm_stackedicon_add(main_win);
 	evas_object_show(stackedicon);
@@ -119,7 +119,7 @@ static void utc_UIFW_elm_stackedicon_item_list_get_func_01(void)
 	Elm_Stackedicon_Item *it = NULL;
 
 	tet_infoline("[[ DEBUG :: Positive ]]");
-	
+
 	list = elm_stackedicon_item_list_get(stackedicon);
 	if (!list) {
 		tet_infoline("elm_stackedicon_item_list_get() failed in positive test case");
@@ -133,14 +133,14 @@ static void utc_UIFW_elm_stackedicon_item_list_get_func_01(void)
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	it = eina_list_data_get(eina_list_last(list));
 	if (it != it3) {
 		tet_infoline("elm_stackedicon_item_list_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_stackedicon_item_list_get().");
 }
@@ -152,7 +152,7 @@ static void utc_UIFW_elm_stackedicon_item_list_get_func_02(void)
 {
 	Eina_List *list = NULL;
 	Elm_Imageslider_Item *it = NULL;
-	
+
 	tet_infoline("[[ DEBUG:: Negative ]]");
 
 	list = elm_stackedicon_item_list_get(NULL);
@@ -161,7 +161,7 @@ static void utc_UIFW_elm_stackedicon_item_list_get_func_02(void)
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_stackedicon_item_list_get().");
 }

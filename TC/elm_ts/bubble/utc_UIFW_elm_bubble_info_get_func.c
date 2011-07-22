@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -78,11 +78,11 @@ static void cleanup(void)
 static void utc_UIFW_elm_bubble_info_get_func_01(void)
 {
 	const char *info = NULL;
-	
+
 	bubble = elm_bubble_add(main_win);
 	elm_bubble_info_set(bubble, "09:42 AM");
 	info = elm_bubble_info_get(bubble);
-	
+
 	if (!info || strcmp(info, "09:42 AM")) {
 		tet_infoline("elm_bubble_info_get() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -92,7 +92,7 @@ static void utc_UIFW_elm_bubble_info_get_func_01(void)
 	evas_object_resize(bubble, 480, 0);
 	evas_object_move(bubble, 0, 40);
 	evas_object_show(bubble);
-	
+
 	tet_result(TET_PASS);
 }
 
@@ -116,6 +116,6 @@ static void utc_UIFW_elm_bubble_info_get_func_02(void)
 	evas_object_resize(bubble, 480, 0);
 	evas_object_move(bubble, 0, 40);
 	evas_object_show(bubble);
-	
+
 	tet_result(TET_PASS);
 }

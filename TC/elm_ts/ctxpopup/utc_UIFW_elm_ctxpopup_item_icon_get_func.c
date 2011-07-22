@@ -57,12 +57,12 @@ static void startup(void)
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);
 	ctxpopup = elm_ctxpopup_add(main_win);
-	evas_object_show(ctxpopup);	
+	evas_object_show(ctxpopup);
 }
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) 
+	if ( NULL != main_win )
 	{
 		evas_object_del(main_win);
 		main_win = NULL;
@@ -83,7 +83,7 @@ static void utc_UIFW_elm_ctxpopup_item_icon_get_func_01(void)
 	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append( ctxpopup, "TEST", icon, NULL, NULL );
 	Evas_Object *icon2 = elm_ctxpopup_item_icon_get(item);
 
-	if ( icon != icon2 ) 
+	if ( icon != icon2 )
 	{
 		tet_infoline("elm_ctxpopup_item_icon_get() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -105,7 +105,7 @@ static void utc_UIFW_elm_ctxpopup_item_icon_get_func_02(void)
 
 	Evas_Object *icon2 = elm_ctxpopup_item_icon_get(NULL);
 
-	if ( icon == icon2 ) 
+	if ( icon == icon2 )
 	{
 		tet_infoline("elm_ctxpopup_item_icon_get() failed in negative test case");
 		tet_result(TET_FAIL);

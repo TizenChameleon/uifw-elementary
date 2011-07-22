@@ -159,7 +159,7 @@ static void utc_UIFW_elm_multibuttonentry_items_get_func_01(void)
 	const Eina_List *items = NULL;
 	int i=0;
 	unsigned int count = 0;
-	
+
 	test_eo = elm_multibuttonentry_add(test_win);
 
 	// test 1
@@ -169,7 +169,7 @@ static void utc_UIFW_elm_multibuttonentry_items_get_func_01(void)
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	for(i=0; i< 5; i++){
 		elm_multibuttonentry_item_add_end(test_eo, "item", NULL);
 	}
@@ -198,7 +198,7 @@ static void utc_UIFW_elm_multibuttonentry_items_get_func_02(void)
 {
 	Eina_List *items = NULL;
 	int i=0;
-	
+
 	test_eo = elm_multibuttonentry_add(NULL);
 	for(i=0; i< 5; i++){
 		elm_multibuttonentry_item_add_end(test_eo, "item", NULL);

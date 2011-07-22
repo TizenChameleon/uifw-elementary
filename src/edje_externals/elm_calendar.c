@@ -177,25 +177,25 @@ external_calendar_params_parse(void *data __UNUSED__, Evas_Object *obj, const Ei
 
    EINA_LIST_FOREACH(params, l, param)
      {
-	if (!strcmp(param->name, "year_min")) 
+	if (!strcmp(param->name, "year_min"))
 	   mem->year_min = param->i;
 
 	else if(!strcmp(param->name, "year_max"))
            mem->year_max = param->i;
 
-	else if (!strcmp(param->name, "sel_enable")) 
+	else if (!strcmp(param->name, "sel_enable"))
           {
 	   mem->sel_enable = param->i;
 	   mem->sel_exists = EINA_TRUE;
           }
 
-	else if (!strcmp(param->name, "weekday_color")) 
+	else if (!strcmp(param->name, "weekday_color"))
 	   mem->weekday_color = param->i;
 
-	else if (!strcmp(param->name, "saturday_color")) 
+	else if (!strcmp(param->name, "saturday_color"))
 	   mem->saturday_color = param->i;
 
-	else if (!strcmp(param->name, "sunday_color")) 
+	else if (!strcmp(param->name, "sunday_color"))
 	   mem->sunday_color = param->i;
      }
 

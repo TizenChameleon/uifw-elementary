@@ -155,19 +155,19 @@ cleanup()
 static void utc_UIFW_elm_multibuttonentry_item_add_before_func_01(void)
 {
 	Elm_Multibuttonentry_Item *added_item1 = NULL, *added_item2 = NULL, *before_item = NULL;
-	
+
 	test_eo = elm_multibuttonentry_add(test_win);
 	added_item1 = elm_multibuttonentry_item_add_start(test_eo, "item1", NULL);
 	added_item2 = elm_multibuttonentry_item_add_before(test_eo, "item2", added_item1, NULL);
 	TET_CHECK_PASS(NULL, added_item2);
-	
+
 	before_item = elm_multibuttonentry_item_prev(added_item1);
 	if (added_item2 != before_item) {
 		tet_infoline("elm_multibuttonentry_item_add_before() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_multibuttonentry_item_add_before().");
 }
@@ -179,7 +179,7 @@ static void utc_UIFW_elm_multibuttonentry_item_add_before_func_01(void)
 static void utc_UIFW_elm_multibuttonentry_item_add_before_func_02(void)
 {
 	Elm_Multibuttonentry_Item *added_item1 = NULL, *added_item2 = NULL;
-	
+
 	test_eo = elm_multibuttonentry_add(NULL);
 	added_item1 = elm_multibuttonentry_item_add_start(test_eo, "item1", NULL);
 	added_item2 = elm_multibuttonentry_item_add_before(test_eo, NULL, added_item1, NULL);

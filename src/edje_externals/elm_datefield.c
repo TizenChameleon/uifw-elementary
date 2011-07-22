@@ -19,12 +19,12 @@ typedef struct _Elm_Params_Datefield
 } Elm_Params_Datefield;
 
 static const char *datefield_layout_choices[] = {"time", "date", "dateandtime", NULL};
-   
+
 static Elm_Datefield_Layout
 _datefield_layout_setting_get(const char *layout_str)
 {
    unsigned int i;
-   
+
    for (i = 0; i < sizeof(datefield_layout_choices)/sizeof(datefield_layout_choices[0]); i++)
      {
 	    if (!strcmp(layout_str, datefield_layout_choices[i]))
@@ -55,7 +55,7 @@ external_datefield_state_set(void *data __UNUSED__, Evas_Object *obj, const void
      {
         int year, mon, day, hour, min;
 	 elm_datefield_date_get(obj, &year, &mon, &day, &hour, &min);
-	 
+
 	 if (p->year_exists) year = p->year;
 	 if (p->mon_exists) mon = p->mon;
 	 if (p->day_exists) day = p->day;
@@ -92,7 +92,7 @@ external_datefield_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje
 	     elm_datefield_time_mode_set(obj, param->i);
 	     return EINA_TRUE;
 	  }
-     }   
+     }
    else if (!strcmp(param->name, "years"))
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
@@ -132,7 +132,7 @@ external_datefield_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje
 	     elm_datefield_date_set(obj, year, mon, day, param->i, min);
 	     return EINA_TRUE;
 	  }
-     }	  
+     }
    else if (!strcmp(param->name, "days"))
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
@@ -142,8 +142,8 @@ external_datefield_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje
 	     elm_datefield_date_set(obj, year, mon, day, hour, param->i);
 	     return EINA_TRUE;
 	  }
-     }	  
-   
+     }
+
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
 
@@ -164,7 +164,7 @@ external_datefield_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje
 	     param->s = datefield_layout_choices[layout];
 	     return EINA_TRUE;
 	  }
-     } 
+     }
    else if (!strcmp(param->name, "date_format"))
      {
        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
@@ -220,7 +220,7 @@ external_datefield_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje
 	     elm_datefield_date_get(obj, NULL, NULL, NULL, NULL, &(param->i));
 	     return EINA_TRUE;
 	  }
-     }   
+     }
 
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -238,7 +238,7 @@ external_datefield_params_parse(void *data, Evas_Object *obj, const Eina_List *p
    mem = calloc(1, sizeof(Elm_Params_Datefield));
    if (!mem)
      return NULL;
-   
+
    EINA_LIST_FOREACH(params, l, param)
      {
 	if (!strcmp(param->name, "layout"))
@@ -291,9 +291,9 @@ static void
 external_datefield_params_free(void *params)
 {
    Elm_Params_Datefield *mem = params;
-   
+
    if (mem->layout)
-     eina_stringshare_del(mem->layout);  
+     eina_stringshare_del(mem->layout);
    if (mem->format)
      eina_stringshare_del(mem->format);
 
@@ -302,7 +302,7 @@ external_datefield_params_free(void *params)
 
 static Edje_External_Param_Info external_datefield_params[] = {
    EDJE_EXTERNAL_PARAM_INFO_CHOICE_FULL("layout", "dateandtime", datefield_layout_choices),
-   EDJE_EXTERNAL_PARAM_INFO_STRING("date_format"),  
+   EDJE_EXTERNAL_PARAM_INFO_STRING("date_format"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("time_mode"),
    EDJE_EXTERNAL_PARAM_INFO_INT_DEFAULT("years", 1900),
    EDJE_EXTERNAL_PARAM_INFO_INT_DEFAULT("months", 1),

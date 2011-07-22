@@ -78,7 +78,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
 	stackedicon = elm_stackedicon_add(main_win);
 	evas_object_show(stackedicon);
@@ -127,7 +127,7 @@ static void utc_UIFW_elm_stackedicon_item_prepend_func_01(void)
 static void utc_UIFW_elm_stackedicon_item_prepend_func_02(void)
 {
 	Elm_Imageslider_Item *it = NULL;
-	
+
 	tet_infoline("[[ DEBUG:: Negative ]]");
 
 	it = elm_stackedicon_item_prepend(NULL, icon_path[1]);

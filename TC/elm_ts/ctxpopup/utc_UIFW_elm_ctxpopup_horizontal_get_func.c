@@ -55,14 +55,14 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	ctxpopup = elm_ctxpopup_add(main_win);
 	elm_ctxpopup_horizontal_set(ctxpopup, EINA_TRUE);
 }
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) 
+	if ( NULL != main_win )
 	{
 		evas_object_del(main_win);
 		main_win = NULL;
@@ -96,7 +96,7 @@ static void utc_UIFW_elm_ctxpopup_horizontal_get_func_02(void)
 
 	r = elm_ctxpopup_horizontal_get(NULL);
 
-	if (r) 
+	if (r)
 	{
 		tet_infoline("elm_ctxpopup_horizontal_get() failed in negative test case");
 		tet_result(TET_FAIL);

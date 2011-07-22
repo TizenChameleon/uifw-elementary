@@ -62,7 +62,7 @@ static void startup(void)
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);
-	
+
 	test_eo = elm_calendar_add(main_win);
 	elm_calendar_weekdays_names_set(test_eo, weekdays);
 }

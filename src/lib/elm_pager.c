@@ -509,7 +509,7 @@ elm_pager_to_content_pop(Evas_Object *obj, Evas_Object *content)
                }
              else
                break;
-             
+
              ll = ll->prev;
           }
      }

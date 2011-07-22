@@ -89,7 +89,7 @@ _share(void *data, Evas_Object *obj, void *event_info)
         if (atom)
           {
              ecore_x_window_prop_string_set(ecore_x_window_root_first_get(), atom, str);
-             ecore_x_client_message32_send(ecore_x_window_root_first_get(), 
+             ecore_x_client_message32_send(ecore_x_window_root_first_get(),
                                            atom, ECORE_X_EVENT_MASK_WINDOW_CONFIGURE,
                                            0, 0, 0, 0, 0);
           }
@@ -171,7 +171,7 @@ obj_unhook(Evas_Object *obj)
 
 EAPI void
 obj_longpress(Evas_Object *obj)
-{	
+{
 	if(!ext_mod) return;
 	Evas_Object *top;
 	const Eina_List *l;
@@ -199,7 +199,7 @@ obj_longpress(Evas_Object *obj)
 
 		elm_widget_sub_object_add(obj, ext_mod->popup);
 		if (!ext_mod->selmode)
-		{	
+		{
 			if (!ext_mod->password)
 			{
 				if (!elm_entry_is_empty(obj))
@@ -231,7 +231,7 @@ obj_longpress(Evas_Object *obj)
 						{
 							elm_ctxpopup_item_append(ext_mod->popup, "Copy", NULL, _copy, obj );
 							if (ext_mod->editable)
-								elm_ctxpopup_item_append(ext_mod->popup, "Cut", NULL, _cut, obj );							
+								elm_ctxpopup_item_append(ext_mod->popup, "Cut", NULL, _cut, obj );
 							if (ext_mod->editable)
 								elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
 							icon = elm_icon_add(ext_mod->popup);
@@ -241,7 +241,7 @@ obj_longpress(Evas_Object *obj)
 						}
 					else
 						{
-							_cancel(obj,ext_mod->popup,NULL);		
+							_cancel(obj,ext_mod->popup,NULL);
 							if (!elm_entry_is_empty(obj))
 							{
 								elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
@@ -272,7 +272,7 @@ obj_longpress(Evas_Object *obj)
 			{
 				elm_object_scroll_freeze_push(ext_mod->popup);
 				_ctxpopup_position(obj);
-				evas_object_show(ext_mod->popup);	          
+				evas_object_show(ext_mod->popup);
 			}
 		}
 	ext_mod->longpress_timer = NULL;
@@ -288,12 +288,12 @@ obj_mouseup(Evas_Object *obj)
 /*update*/
 	elm_entry_extension_module_data_get(obj,ext_mod);
    if (ext_mod->longpress_timer)
-     {    
+     {
 		if (ext_mod->have_selection )
-			{				
+			{
 				_cancel(obj,ext_mod->popup,NULL);
 			}
-     }     
+     }
 }
 
 

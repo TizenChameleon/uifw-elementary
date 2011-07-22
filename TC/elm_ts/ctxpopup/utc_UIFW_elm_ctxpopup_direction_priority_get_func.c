@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -80,8 +80,8 @@ static void utc_UIFW_elm_ctxpopup_direction_priority_get_func_01(void)
 
    Elm_Ctxpopup_Direction first, second, third, fourth;
 	elm_ctxpopup_direction_priority_get(obj, &first, &second, &third, &fourth);
-	
-	if (first != ELM_CTXPOPUP_DIRECTION_DOWN || 
+
+	if (first != ELM_CTXPOPUP_DIRECTION_DOWN ||
 		 second != ELM_CTXPOPUP_DIRECTION_RIGHT ||
 		 third != ELM_CTXPOPUP_DIRECTION_LEFT ||
 		 fourth != ELM_CTXPOPUP_DIRECTION_UP ) {

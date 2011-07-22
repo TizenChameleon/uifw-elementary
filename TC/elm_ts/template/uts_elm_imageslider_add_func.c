@@ -36,7 +36,7 @@ Evas_Object *test_eo = NULL;
 // Declare internal functions
 void _elm_precondition(void);
 static void _win_del(void *data, Evas_Object *obj, void *event_info);
-	
+
 
 // Delete main window
 static void _win_del(void *data, Evas_Object *obj, void *event_info)
@@ -60,9 +60,9 @@ void _elm_precondition(void)
 	// set an initial window size
 	evas_object_resize(main_win, 320, 480);
 	// show the window
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
-	//elm_run(); 
+	//elm_run();
 }
 
 
@@ -74,7 +74,7 @@ startup()
 
 	// Elm precondition
 	_elm_precondition();
-	
+
 	// Test precondition
 	test_win = elm_win_add(NULL, "Image Silder", ELM_WIN_BASIC);
 	elm_win_title_set(test_win, "Image Slider");
@@ -83,10 +83,10 @@ startup()
 	test_bg = elm_bg_add(test_win);
 	elm_win_resize_object_add(test_win, test_bg);
 	evas_object_size_hint_weight_set(test_bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	evas_object_show(test_bg);	
-	
+	evas_object_show(test_bg);
+
 	evas_object_resize(test_win, 480, 800);
-	evas_object_show(test_win);	
+	evas_object_show(test_win);
 
 	tet_infoline("[[ TET_MSG ]]:: Completing startup");
 }
@@ -99,27 +99,27 @@ cleanup()
 	if ( NULL != main_win ) {
 		main_win = NULL;
 	}
-	
+
 	if ( NULL != main_bg ) {
 		main_bg = NULL;
 	}
-	
+
 	if ( NULL != test_win ) {
 		test_win = NULL;
 	}
-	
+
 	if ( NULL != test_bg ) {
 		test_bg = NULL;
 	}
-	
+
 	if ( NULL != test_eo ) {
 		test_eo = NULL;
 	}
 
 	elm_exit();
-	
+
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
-	
+
 }
 
 // Positive test case.
@@ -129,7 +129,7 @@ void uts_elm_imageslider_add_test_001()
 	TET_CHECK_PASS(NULL, test_win);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, An Image Slider is added successfully.");	
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, An Image Slider is added successfully.");
 
 }
 
@@ -141,7 +141,7 @@ void uts_elm_imageslider_add_test_002()
 	TET_CHECK_FAIL(NULL, test_eo);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Adding an Image Slider has failed.");	
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Adding an Image Slider has failed.");
 }
 
 

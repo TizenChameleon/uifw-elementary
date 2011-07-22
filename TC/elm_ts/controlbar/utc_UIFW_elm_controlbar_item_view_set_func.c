@@ -56,7 +56,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
 	controlbar = elm_controlbar_add(main_win);
 	item1 = elm_controlbar_tab_item_append(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Controlbar", NULL);
@@ -82,7 +82,7 @@ static void utc_UIFW_elm_controlbar_item_view_set_func_01(void)
 	Evas_Object *view = NULL;
 	Evas_Object *test_view = NULL;
 	view = elm_icon_add(controlbar);
-   	
+
 	elm_controlbar_item_view_set(item1, view);
 
 	test_view = elm_controlbar_item_view_get(item1);
@@ -101,7 +101,7 @@ static void utc_UIFW_elm_controlbar_item_view_set_func_01(void)
 static void utc_UIFW_elm_controlbar_item_view_set_func_02(void)
 {
 	Evas_Object *test_view = NULL;
-   	
+
 	elm_controlbar_item_view_set(item1, NULL);
 
 	test_view = elm_controlbar_item_view_get(item1);

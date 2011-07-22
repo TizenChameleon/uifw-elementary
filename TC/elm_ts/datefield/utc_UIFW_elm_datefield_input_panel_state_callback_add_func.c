@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -104,7 +104,7 @@ static void utc_UIFW_elm_datefield_input_panel_state_callback_add_func_02(void)
 {
 	datefield = elm_datefield_add(main_win);
 	elm_datefield_input_panel_state_callback_add(NULL, _input_panel_state_cb, NULL);
-	
+
 	/*if (r) {
 		tet_infoline("elm_datefield_input_panel_state_callback_add() failed in negative test case");
 		tet_result(TET_FAIL);

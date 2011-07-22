@@ -59,14 +59,14 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
 	controlbar = elm_controlbar_add(main_win);
-	item1 = elm_controlbar_tab_item_append(controlbar, NULL, "Controlbar", NULL); 
-	item2 = elm_controlbar_tool_item_append(controlbar, NULL, "Controlbar", NULL, NULL); 
+	item1 = elm_controlbar_tab_item_append(controlbar, NULL, "Controlbar", NULL);
+	item2 = elm_controlbar_tool_item_append(controlbar, NULL, "Controlbar", NULL, NULL);
 	button = elm_button_add(controlbar);
 	elm_button_label_set(button, "button");
-	item3 = elm_controlbar_object_item_append(controlbar, button, 3); 
+	item3 = elm_controlbar_object_item_append(controlbar, button, 3);
 }
 
 static void cleanup(void)

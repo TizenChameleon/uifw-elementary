@@ -58,7 +58,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	animator = elm_animator_add(main_win);
 	elm_animator_operation_callback_set(animator, _op, NULL);
 	elm_animator_duration_set(animator, 3);

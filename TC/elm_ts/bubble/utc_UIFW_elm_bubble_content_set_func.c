@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -93,7 +93,7 @@ static void utc_UIFW_elm_bubble_content_set_func_01(void)
 	evas_object_resize(bubble, 480, 0);
 	evas_object_move(bubble, 0, 40);
 	evas_object_show(bubble);
-	
+
 	tet_result(TET_PASS);
 }
 
@@ -104,7 +104,7 @@ static void utc_UIFW_elm_bubble_content_set_func_02(void)
 {
 	bubble = elm_bubble_add(main_win);
 	elm_bubble_content_set(bubble, NULL);
-	
+
 	if (elm_bubble_content_unset(bubble)) {
 		tet_infoline("elm_bubble_content_set() failed in negative test case");
 		tet_result(TET_FAIL);
@@ -114,6 +114,6 @@ static void utc_UIFW_elm_bubble_content_set_func_02(void)
 	evas_object_resize(bubble, 480, 0);
 	evas_object_move(bubble, 0, 40);
 	evas_object_show(bubble);
-	
+
 	tet_result(TET_PASS);
 }

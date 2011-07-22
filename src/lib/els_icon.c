@@ -74,7 +74,7 @@ _els_smart_icon_file_key_set(Evas_Object *obj, const char *file, const char *key
    sd = evas_object_smart_data_get(obj);
    if (!sd) return EINA_FALSE;
    /* smart code here */
-   /* NOTE: Do not merge upstream for the if (sd->edje) { } statements 
+   /* NOTE: Do not merge upstream for the if (sd->edje) { } statements
       But wonder whether the edje resource icons have no problem. */
    if (sd->edje)
      {

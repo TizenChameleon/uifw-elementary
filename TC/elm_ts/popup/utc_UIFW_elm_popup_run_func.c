@@ -55,9 +55,9 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	popup = elm_popup_add(main_win);
-	evas_object_show(popup);	
+	evas_object_show(popup);
 }
 
 static void cleanup(void)
@@ -92,7 +92,7 @@ static void utc_UIFW_elm_popup_run_func_01(void)
 
 	ecore_timer_add(1.0, _exit_timer_popup, popup);
    	r = elm_popup_run(popup);
-	
+
 	if (!r) {
 		tet_infoline("elm_popup_run() failed in positive test case");
 		tet_result(TET_FAIL);

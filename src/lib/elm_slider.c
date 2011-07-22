@@ -435,7 +435,7 @@ _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUS
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_START, NULL);
    edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
-   edje_object_message_signal_process(wd->slider); 
+   edje_object_message_signal_process(wd->slider);
    _units_set(data);
    _indicator_set(data);
    elm_widget_scroll_freeze_push(data);

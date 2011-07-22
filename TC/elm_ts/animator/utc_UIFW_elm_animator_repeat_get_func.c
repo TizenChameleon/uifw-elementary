@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	animator = elm_animator_add(main_win);
 	elm_animator_repeat_set(animator, 5);
 }
@@ -76,9 +76,9 @@ static void cleanup(void)
 static void utc_UIFW_elm_animator_repeat_get_func_01(void)
 {
 	int r = 0;
-   	
+
 	r = elm_animator_repeat_get(animator);
-	
+
 	if (r != 5) {
 		tet_infoline("elm_animator_repeat_get() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -93,9 +93,9 @@ static void utc_UIFW_elm_animator_repeat_get_func_01(void)
 static void utc_UIFW_elm_animator_repeat_get_func_02(void)
 {
 	int r = 0;
-   	
+
 	r = elm_animator_repeat_get(NULL);
-	
+
 	if (r != 0) {
 		tet_infoline("elm_animator_repeat_get() failed in negative test case");
 		tet_result(TET_FAIL);

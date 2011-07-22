@@ -50,7 +50,7 @@ _elm_win_recalc_job(void *data)
 
    if (!wd) return;
    wd->deferred_recalc_job = NULL;
-   
+
    evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
    if (wd->wrap_w > resw)
      resw = wd->wrap_w;
@@ -953,7 +953,7 @@ elm_label_background_color_set(Evas_Object *obj,
  * @param obj The label object
  * @param wrapmode 0 is charwrap, 1 is wordwrap
  * @ingroup Label
- * @deprecated 
+ * @deprecated
 */
 EAPI void
 elm_label_wrap_mode_set(Evas_Object *obj,

@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -74,13 +74,13 @@ static void utc_UIFW_elm_index_item_level_get_func_01(void)
 {
 	Evas_Object *idx = NULL;
 	int level = -1;
-	
+
    	idx = elm_index_add(main_win);
 	evas_object_show(idx);
 	elm_index_item_go(idx, 0);
 	elm_index_item_level_set(idx,0);
 	level = elm_index_item_level_get(idx);
-	if (level!=0) {	
+	if (level!=0) {
 		tet_infoline("elm_index_item_level_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -101,7 +101,7 @@ static void utc_UIFW_elm_index_item_level_get_func_02(void)
 	item_level = elm_index_item_level_get(idx);
 	elm_index_item_level_set(NULL,1);
 	level = elm_index_item_level_get(idx);
-	if (level!=item_level) {	
+	if (level!=item_level) {
 		tet_infoline("elm_index_item_level_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;

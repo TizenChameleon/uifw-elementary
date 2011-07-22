@@ -25,7 +25,7 @@ external_timepicker_state_set(void *data __UNUSED__, Evas_Object *obj, const voi
      elm_timepicker_show_am_pm_set(obj, p->show_am_pm);
    if (p->show_seconds_exists)
      elm_timepicker_show_seconds_set(obj, p->show_seconds);
-   
+
 }
 
 static Eina_Bool
@@ -70,7 +70,7 @@ external_timepicker_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSE
    Elm_Params_Timepicker *mem;
    Edje_External_Param *param;
    const Eina_List *l;
-  
+
    mem = calloc(1, sizeof(Elm_Params_Timepicker));
    if (!mem)
      return NULL;
@@ -88,7 +88,7 @@ external_timepicker_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSE
 	     mem->show_seconds_exists = EINA_TRUE;
 	  }
      }
-   
+
    return mem;
 }
 

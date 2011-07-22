@@ -35,21 +35,21 @@ struct _Page_Item
 };
 
 
-static void 
+static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    _elm_theme_object_set(obj, wd->base, "pagecontrol", "base", elm_widget_style_get(obj));
 }
 
-static void 
+static void
 _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord minw = -1, minh = -1;
 
    if (!wd) return;
-   
+
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
    edje_object_size_min_restricted_calc(wd->base, &minw, &minh, minw, minh);
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
@@ -57,7 +57,7 @@ _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_max_set(obj, -1, -1);
 }
 
-static void 
+static void
 _item_free(Evas_Object *obj, Page_Item *it)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -67,26 +67,26 @@ _item_free(Evas_Object *obj, Page_Item *it)
      wd->page_list = eina_list_remove(wd->page_list, it);
 
    if (it->base) evas_object_del(it->base);
-   
+
    if (it) free(it);
    it = NULL;
 
    return;
 }
 
-static void 
+static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Page_Item *it;
    Eina_List *l, *clear = NULL;
-   
+
    EINA_LIST_FOREACH(wd->page_list, l, it) clear = eina_list_append(clear, it);
    EINA_LIST_FREE(clear, it) _item_free(obj, it);
-   
+
    if (wd) free(wd);
    wd = NULL;
-   
+
    return;
 }
 
@@ -98,7 +98,7 @@ _page_find(Evas_Object *obj, unsigned int index)
 
    Page_Item *it;
    Eina_List *l;
-   
+
    unsigned int i = 0;
    EINA_LIST_FOREACH(wd->page_list, l, it)
      {
@@ -109,7 +109,7 @@ _page_find(Evas_Object *obj, unsigned int index)
    return NULL;
 }
 
-static void 
+static void
 _indicator_clicked_cb(void *data, Evas_Object *obj,
                       const char *emission __UNUSED__,
                       const char *source __UNUSED__)
@@ -150,33 +150,33 @@ _create_item(Evas_Object *obj, unsigned int page_id)
    Evas_Coord mw, mh;
    it = calloc(1, sizeof(Page_Item));
    if (!it) return NULL;
-   
+
    it->obj = obj;
    it->page_id = page_id;
-   
+
    it->base = edje_object_add(evas_object_evas_get(obj));
-   
+
    char pi_name[128];
    sprintf(pi_name, "default_%d", page_id+1);
    _elm_theme_object_set(obj, it->base, "page", "item", pi_name);
    edje_object_size_min_restricted_calc(it->base, &mw, &mh, 0, 0);
    evas_object_size_hint_weight_set(it->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(it->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   
+
    evas_object_resize(it->base, mw, mh);
    evas_object_size_hint_min_set(it->base, mw, mh);
    evas_object_size_hint_max_set(it->base, mw, mh);
-   
+
    edje_object_signal_callback_add(it->base, "clicked", "indicator_clicked", _indicator_clicked_cb, obj);
-   
+
    return it;
 }
 
-static void 
+static void
 _layout(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
 {
    Widget_Data *wd = data;
-   
+
    if (!wd) return;
 
    _els_box_layout(o, priv, 1, 0, elm_widget_mirrored_get(o)); /* making box layout non homogenous */
@@ -195,11 +195,11 @@ EAPI Evas_Object *
 elm_page_control_add(Evas_Object *parent)
 {
    if (!parent) return NULL;
-   
+
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-   
+
    wd = ELM_NEW(Widget_Data);
    e = evas_object_evas_get(parent);
    obj = elm_widget_add(e);
@@ -208,31 +208,31 @@ elm_page_control_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
-   
+
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "pagecontrol", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
-   
+
    wd->scale_factor = elm_scale_get();
-   if ( wd->scale_factor == 0.0 ) 
+   if ( wd->scale_factor == 0.0 )
      wd->scale_factor = 1.0;
-   
+
    wd->hbox = evas_object_box_add(e);
    evas_object_size_hint_weight_set(wd->hbox, 0, 0);
-   
+
    evas_object_box_layout_set(wd->hbox, _layout, wd, NULL);
    elm_widget_sub_object_add(obj, wd->hbox);
-   
+
    edje_object_part_swallow(wd->base, "elm.swallow.page", wd->hbox);
-   
+
    evas_object_show(wd->hbox);
-   
+
    wd->parent = parent;
    wd->page_count = 0;
    wd->cur_page_id = 0;
-   
+
    _sizing_eval(obj);
-   
+
    return obj;
 }
 
@@ -243,7 +243,7 @@ elm_page_control_add(Evas_Object *parent)
  *
  * @ingroup PageControl
  */
-EAPI void 
+EAPI void
 elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -252,7 +252,7 @@ elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count)
 
    Page_Item *it;
    Evas_Coord mw, mh;
-   
+
    unsigned int i;
    for (i = 0; i < page_count; i++)
      {
@@ -263,13 +263,13 @@ elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count)
 	     edje_object_signal_emit(it->base, "elm,state,indicator,on", "elm");
 	     evas_object_geometry_get(it->base, NULL, NULL, &mw, &mh);
 	  }
-	
+
 	evas_object_show(it->base);
-	
+
 	evas_object_box_append(wd->hbox, it->base);
 	evas_object_smart_calculate(wd->hbox);
      }
-   
+
    int width = mw*page_count;
    evas_object_resize(wd->hbox, width, mh);
    evas_object_size_hint_min_set(wd->hbox, width, mh);
@@ -285,22 +285,22 @@ elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count)
  *
  * @ingroup PageControl
  */
-EAPI void 
+EAPI void
 elm_page_control_page_id_set(Evas_Object *obj, unsigned int page_id)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   
+
    if(page_id >= wd->page_count || page_id == wd->cur_page_id) return;
-   
+
    Page_Item *it;
    it = _page_find(obj, wd->cur_page_id);
    if (!it) return;
-   
+
    edje_object_signal_emit(it->base, "elm,state,indicator,off", "elm");
    it = _page_find(obj, page_id);
    if (!it) return;
-   
+
    edje_object_signal_emit(it->base, "elm,state,indicator,on", "elm");
    wd->cur_page_id=page_id;
 }
@@ -312,12 +312,12 @@ elm_page_control_page_id_set(Evas_Object *obj, unsigned int page_id)
  *
  * @ingroup PageControl
  */
-EAPI unsigned int 
+EAPI unsigned int
 elm_page_control_page_id_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return -1;
-   
+
    return wd->cur_page_id;
 }
 

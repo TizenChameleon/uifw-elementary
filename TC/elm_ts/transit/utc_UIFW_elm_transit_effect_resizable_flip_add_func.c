@@ -64,7 +64,7 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
-   
+
 	if ( NULL != transit ) {
 		elm_transit_del(transit);
 		transit = NULL;
@@ -80,7 +80,7 @@ static void cleanup(void)
 static void utc_UIFW_elm_transit_effect_resizable_flip_add_func_01(void)
 {
 	transit = elm_transit_add();
-	
+
 	Elm_Transit_Effect *effect = elm_transit_effect_resizable_flip_add(transit, ELM_TRANSIT_EFFECT_FLIP_AXIS_Y, EINA_TRUE);
 
 	if (effect == NULL) {
@@ -97,7 +97,7 @@ static void utc_UIFW_elm_transit_effect_resizable_flip_add_func_01(void)
 static void utc_UIFW_elm_transit_effect_resizable_flip_add_func_02(void)
 {
 	transit = elm_transit_add();
-	
+
 	Elm_Transit_Effect *effect = elm_transit_effect_resizable_flip_add(NULL, ELM_TRANSIT_EFFECT_FLIP_AXIS_Y, EINA_TRUE);
 
 	if (effect) {

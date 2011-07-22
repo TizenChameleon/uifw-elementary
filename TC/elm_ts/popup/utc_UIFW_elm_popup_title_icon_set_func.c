@@ -57,7 +57,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	popup = elm_popup_add(main_win);
 	evas_object_show(popup);
 }
@@ -81,13 +81,13 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_popup_title_icon_set_func_01(void)
 {
-	
+
 	Evas_Object *icon = elm_icon_add(popup);
 	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
 	elm_icon_file_set(icon, buf, NULL);
 	evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(icon, 1, 1);
-	
+
 	elm_popup_title_icon_set(popup,icon);
 	tet_result(TET_PASS);
 }
@@ -97,14 +97,14 @@ static void utc_UIFW_elm_popup_title_icon_set_func_01(void)
  */
 static void utc_UIFW_elm_popup_title_icon_set_func_02(void)
 {
-	
+
 	Evas_Object *icon = elm_icon_add(popup);
 	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
 	elm_icon_file_set(icon, buf, NULL);
 	evas_object_size_hint_aspect_set(icon, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(icon, 1, 1);
-	
+
 	elm_popup_title_icon_set(NULL,icon);
 	tet_result(TET_PASS);
-	
+
 }

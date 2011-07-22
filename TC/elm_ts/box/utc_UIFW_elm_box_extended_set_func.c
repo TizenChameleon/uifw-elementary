@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -73,7 +73,7 @@ static void cleanup(void)
 static void utc_UIFW_elm_box_extended_set_func_01(void)
 {
 	Evas_Object *test_eo = NULL;
-	
+
 	test_eo = elm_box_add(main_win);
 
 	// Current return type of this API is "Void".
@@ -90,7 +90,7 @@ static void utc_UIFW_elm_box_extended_set_func_01(void)
 static void utc_UIFW_elm_box_extended_set_func_02(void)
 {
 	Evas_Object *test_eo = NULL;
-	
+
 	test_eo = elm_box_add(main_win);
 
 	// Current return type of this API is "Void".

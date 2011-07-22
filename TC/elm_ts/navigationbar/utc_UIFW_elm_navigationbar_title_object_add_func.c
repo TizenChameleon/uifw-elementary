@@ -57,7 +57,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	navibar = elm_navigationbar_add(main_win);
 	evas_object_show(navibar);
 	elm_win_resize_object_add(main_win, navibar);
@@ -90,7 +90,7 @@ static void utc_UIFW_elm_navigationbar_title_object_add_func_01(void)
 
 	Evas_Object *title = elm_button_add(navibar);
 	evas_object_show(title);
-		
+
 	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
 	elm_navigationbar_title_object_add(navibar, content, title);
 	tet_result(TET_PASS);
@@ -109,7 +109,7 @@ static void utc_UIFW_elm_navigationbar_title_object_add_func_02(void)
 
 	Evas_Object *title = elm_button_add(navibar);
 	evas_object_show(title);
-		
+
 	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
 	elm_navigationbar_title_object_add(NULL, NULL, NULL);
 	tet_result(TET_PASS);

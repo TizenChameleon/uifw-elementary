@@ -55,10 +55,10 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	ef = elm_editfield_add(main_win);
 	evas_object_show(ef);
-	ic = elm_icon_add(main_win);	
+	ic = elm_icon_add(main_win);
 	evas_object_show(ic);
 	elm_editfield_right_icon_set(ef, ic);
 }
@@ -88,7 +88,7 @@ static void utc_UIFW_elm_editfield_right_icon_get_func_01(void)
 {
 	Evas_Object *r = NULL;
    	r = elm_editfield_right_icon_get(ef);
-	
+
 	if (!r) {
 		tet_infoline("elm_editfield_right_icon_get() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -104,7 +104,7 @@ static void utc_UIFW_elm_editfield_right_icon_get_func_02(void)
 {
 	Evas_Object *r = NULL;
    	r = elm_editfield_right_icon_get(NULL);
-	
+
 	if (r) {
 		tet_infoline("elm_editfield_right_icon_get() failed in negative test case");
 		tet_result(TET_FAIL);

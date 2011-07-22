@@ -18,7 +18,7 @@ external_multibuttonentry_state_set(void *data __UNUSED__, Evas_Object *obj, con
    if (p->label)
      elm_multibuttonentry_label_set(obj, p->label);
    if (p->guide_text)
-     elm_multibuttonentry_guide_text_set(obj, p->guide_text);   
+     elm_multibuttonentry_guide_text_set(obj, p->guide_text);
 }
 
 static Eina_Bool

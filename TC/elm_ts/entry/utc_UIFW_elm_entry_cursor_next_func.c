@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	entry = elm_entry_add(main_win);
 	evas_object_show(entry);
 	elm_entry_entry_set(entry, "test string");
@@ -82,7 +82,7 @@ static void utc_UIFW_elm_entry_cursor_next_func_01(void)
 {
 	Eina_Bool ret = EINA_FALSE;
 	ret = elm_entry_cursor_next(entry);
-	
+
 	if (!ret) {
 		tet_infoline("elm_entry_cursor_next() failed in positive test case");
 		tet_result(TET_FAIL);

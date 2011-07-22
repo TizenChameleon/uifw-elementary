@@ -66,7 +66,7 @@ static void startup(void)
 
 static void cleanup(void)
 {
-	if ( NULL != main_win ) 
+	if ( NULL != main_win )
 	{
 		evas_object_del(main_win);
 		main_win = NULL;
@@ -87,7 +87,7 @@ static void utc_UIFW_elm_ctxpopup_content_unset_func_01(void)
 
 	Evas_Object *content = elm_ctxpopup_content_unset(ctxpopup);
 
-	if (btn != content) 
+	if (btn != content)
 	{
 		tet_infoline("elm_ctxpopup_content_unset() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -108,7 +108,7 @@ static void utc_UIFW_elm_ctxpopup_content_unset_func_02(void)
 
 	Evas_Object *content = elm_ctxpopup_content_unset(NULL);
 
-	if (content == btn) 
+	if (content == btn)
 	{
 		tet_infoline("elm_ctxpopup_content_unset() failed in negative test case");
 		tet_result(TET_FAIL);

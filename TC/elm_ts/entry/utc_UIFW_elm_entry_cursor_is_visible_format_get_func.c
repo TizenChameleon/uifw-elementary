@@ -49,7 +49,7 @@ void _elm_precondition(void)
 	evas_object_size_hint_weight_set(main_bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
 	evas_object_resize(main_win, 320, 480);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void startup(void);
@@ -80,15 +80,15 @@ static void startup(void)
 	test_win = elm_win_add(NULL, "Entry", ELM_WIN_BASIC);
 	elm_win_title_set(test_win, "Entry");
 	elm_win_autodel_set(test_win, 1);
-	
+
 	test_bg = elm_bg_add(test_win);
 	elm_win_resize_object_add(test_win, test_bg);
 	evas_object_size_hint_weight_set(test_bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	evas_object_show(test_bg);
-	
+
 	evas_object_resize(test_win, 480, 800);
 	evas_object_show(test_win);
-	
+
 	tet_infoline("[[ TET_MSG ]]:: Completing startup");
 }
 
@@ -97,25 +97,25 @@ static void cleanup(void)
 	if ( NULL != main_win ) {
 		main_win = NULL;
 	}
-	
+
 	if ( NULL != main_bg ) {
 		main_bg = NULL;
 	}
-	
+
 	if ( NULL != test_win ) {
 		test_win = NULL;
 	}
-	
+
 	if ( NULL != test_bg ) {
 		test_bg = NULL;
 	}
-	
+
 	if ( NULL != test_eo ) {
 		test_eo = NULL;
 	}
-	
+
 	elm_exit();
-	
+
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
@@ -123,12 +123,12 @@ static void utc_UIFW_elm_entry_cursor_is_visible_format_get_func_01(void)
 {
 	test_eo = NULL;
 	Eina_Bool flag = EINA_FALSE;
-	
+
 	test_eo = elm_entry_add(test_win);
 	flag = elm_entry_cursor_is_visible_format_get(test_eo);
-	
+
 	TET_CHECK_PASS(EINA_TRUE, flag);
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_entry_cursor_is_visible_format_get");
 }
@@ -136,11 +136,11 @@ static void utc_UIFW_elm_entry_cursor_is_visible_format_get_func_01(void)
 static void utc_UIFW_elm_entry_cursor_is_visible_format_get_func_02(void)
 {
 	Eina_Bool flag = EINA_FALSE;
-	
+
 	flag = elm_entry_cursor_is_visible_format_get(NULL);
 
 	TET_CHECK_FAIL(EINA_FALSE, flag);
-	
+
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_entry_cursor_is_visible_format_get");
 }

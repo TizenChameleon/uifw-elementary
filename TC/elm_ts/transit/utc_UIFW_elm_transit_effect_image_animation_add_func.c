@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -64,7 +64,7 @@ static void cleanup(void)
 		evas_object_del(main_win);
 	       	main_win = NULL;
 	}
-   
+
 	if (NULL != transit) {
 		 elm_transit_del(transit);
 	}
@@ -92,7 +92,7 @@ static void utc_UIFW_elm_transit_effect_image_animation_add_func_01(void)
 		"/opt/apps/com.samsung.elm-demo-slp/res/images/animatedicon/calendar_10.png",
 		"/opt/apps/com.samsung.elm-demo-slp/res/images/animatedicon/calendar_11.png"
 	};
-  
+
 	Eina_List *images;
 	int i;
 	for(i = 0; i < 12; ++i)
@@ -101,7 +101,7 @@ static void utc_UIFW_elm_transit_effect_image_animation_add_func_01(void)
 	transit = elm_transit_add();
 
 	Elm_Transit_Effect *effect = elm_transit_effect_image_animation_add(transit, images);
-	
+
 	if (effect == NULL) {
 		tet_infoline("elm_transit_effect_image_animation_add() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -118,7 +118,7 @@ static void utc_UIFW_elm_transit_effect_image_animation_add_func_02(void)
 	transit = elm_transit_add();
 
 	Elm_Transit_Effect *effect = elm_transit_effect_image_animation_add(NULL, NULL);
-	
+
 	if (effect != NULL) {
 		tet_infoline("elm_transit_effect_image_animation_add() failed in negative test case");
 		tet_result(TET_FAIL);

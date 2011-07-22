@@ -58,7 +58,7 @@ static void startup(void)
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);
 	navi_ex = elm_navigationbar_ex_add(main_win);
-	evas_object_show(navi_ex);	
+	evas_object_show(navi_ex);
 	Evas_Object *btn = elm_button_add(navi_ex);
 	evas_object_show(btn);
 	item = elm_navigationbar_ex_item_push(navi_ex, btn, "topbar_1fn");
@@ -104,7 +104,7 @@ static void utc_UIFW_elm_navigationbar_ex_item_title_label_get_func_02(void)
 
 
    	label = elm_navigationbar_ex_item_title_label_get(NULL);
-	
+
 	if (label) {
 		tet_infoline("elm_navigationbar_ex_item_title_label_get() failed in negative test case");
 		tet_result(TET_FAIL);

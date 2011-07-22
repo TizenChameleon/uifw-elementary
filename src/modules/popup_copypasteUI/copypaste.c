@@ -114,11 +114,11 @@ obj_unhook(Evas_Object *obj)
 
 EAPI void
 obj_longpress(Evas_Object *obj)
-{		
+{
 	if(!ext_mod) return;
 	Evas_Object *top;
 	Evas_Object *list;
-	
+
 	const Eina_List *l;
 	const Elm_Entry_Context_Menu_Item *it;
 	/*update*/
@@ -138,7 +138,7 @@ obj_longpress(Evas_Object *obj)
 		elm_list_mode_set(list, ELM_LIST_COMPRESS);
 		elm_widget_sub_object_add(obj, ext_mod->popup);
 		if (!ext_mod->selmode)
-		{	
+		{
 			if (!ext_mod->password)
 				elm_list_item_append(list, "Select", NULL, NULL,_select, obj);
 			if (1) // need way to detect if someone has a selection
@@ -164,7 +164,7 @@ obj_longpress(Evas_Object *obj)
 						}
 					else
 						{
-							_cancel(obj,ext_mod->popup,NULL);		
+							_cancel(obj,ext_mod->popup,NULL);
 							elm_list_item_append(list, "Select", NULL, NULL,_select, obj);
 							if (1) // need way to detect if someone has a selection
 								{
@@ -186,7 +186,7 @@ obj_longpress(Evas_Object *obj)
 		{
 			elm_list_go(list);
 			elm_popup_content_set(ext_mod->popup, list);
-			evas_object_show(ext_mod->popup);	       
+			evas_object_show(ext_mod->popup);
 			evas_render( evas_object_evas_get( ext_mod->popup ) );
 		}
 	}
@@ -199,11 +199,11 @@ obj_mouseup(Evas_Object *obj)
 /*update*/
 	elm_entry_extension_module_data_get(obj,ext_mod);
    if (ext_mod->longpress_timer)
-     {    	
+     {
 		if (ext_mod->have_selection )
-			{				
+			{
 				_cancel(obj,ext_mod->popup,NULL);
 			}
-     }     
+     }
 }
 

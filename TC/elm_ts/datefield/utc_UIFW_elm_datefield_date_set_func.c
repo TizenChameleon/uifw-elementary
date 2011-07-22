@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -78,7 +78,7 @@ static void cleanup(void)
 static void utc_UIFW_elm_datefield_date_set_func_01(void)
 {
 	int year, month, day, hour, min;
-	
+
 	datefield = elm_datefield_add(main_win);
 	elm_datefield_date_set(datefield, 2010, 10, 14, 1, 36);
 	elm_datefield_date_get(datefield, &year, &month, &day, &hour, &min);
@@ -92,7 +92,7 @@ static void utc_UIFW_elm_datefield_date_set_func_01(void)
 	evas_object_resize(datefield, 480, 80);
 	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
-	
+
 	tet_result(TET_PASS);
 }
 
@@ -106,7 +106,7 @@ static void utc_UIFW_elm_datefield_date_set_func_02(void)
 	datefield = elm_datefield_add(main_win);
    	elm_datefield_date_set(NULL, 2010, 10, 14, 1, 36);
 	elm_datefield_date_get(datefield, &year, &month, &day, &hour, &min);
-	
+
 	if ((year == 2010 && month == 10 && day == 14 && hour == 1 && min <= 36)) {
 		tet_infoline("elm_datefield_date_set() failed in negative test case");
 		tet_result(TET_FAIL);
@@ -116,6 +116,6 @@ static void utc_UIFW_elm_datefield_date_set_func_02(void)
 	evas_object_resize(datefield, 480, 80);
 	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
-	
+
 	tet_result(TET_PASS);
 }

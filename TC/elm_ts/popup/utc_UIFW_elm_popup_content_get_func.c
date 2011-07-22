@@ -54,13 +54,13 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	popup = elm_popup_add(main_win);
 	Evas_Object *content = elm_button_add(popup);
 	evas_object_show(content);
-	
+
 	elm_popup_content_set(popup,content);
-	evas_object_show(popup);	
+	evas_object_show(popup);
 }
 
 static void cleanup(void)

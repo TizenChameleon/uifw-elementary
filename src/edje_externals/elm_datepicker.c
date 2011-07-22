@@ -25,7 +25,7 @@ external_datepicker_state_set(void *data __UNUSED__, Evas_Object *obj, const voi
      {
         int year, mon, day;
 	 elm_datepicker_date_get(obj, &year, &mon, &day);
-	 
+
 	 if (p->year_exists) year = p->year;
 	 if (p->mon_exists) mon = p->mon;
 	 if (p->day_exists) day = p->day;
@@ -74,7 +74,7 @@ external_datepicker_param_set(void *data __UNUSED__, Evas_Object *obj, const Edj
 	     return EINA_TRUE;
 	  }
      }
-   
+
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
 
@@ -91,7 +91,7 @@ external_datepicker_param_get(void *data __UNUSED__, const Evas_Object *obj, Edj
 	     param->s = elm_datepicker_date_format_get(obj);
 	     return EINA_TRUE;
 	  }
-     } 
+     }
    else if (!strcmp(param->name, "years"))
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
@@ -115,7 +115,7 @@ external_datepicker_param_get(void *data __UNUSED__, const Evas_Object *obj, Edj
 	     elm_datepicker_date_get(obj, NULL, NULL, &(param->i));
 	     return EINA_TRUE;
 	  }
-     } 
+     }
 
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -133,7 +133,7 @@ external_datepicker_params_parse(void *data, Evas_Object *obj, const Eina_List *
    mem = calloc(1, sizeof(Elm_Params_Datepicker));
    if (!mem)
      return NULL;
-   
+
    EINA_LIST_FOREACH(params, l, param)
      {
 	if (!strcmp(param->name, "format"))
@@ -152,7 +152,7 @@ external_datepicker_params_parse(void *data, Evas_Object *obj, const Eina_List *
 	{
 	  mem->day = param->i;
 	  mem->day_exists = EINA_TRUE;
-	}	
+	}
      }
 
    return mem;
@@ -169,9 +169,9 @@ static void
 external_datepicker_params_free(void *params)
 {
    Elm_Params_Datepicker *mem = params;
-   
+
    if (mem->format)
-     eina_stringshare_del(mem->format);   
+     eina_stringshare_del(mem->format);
 
    free(mem);
 }

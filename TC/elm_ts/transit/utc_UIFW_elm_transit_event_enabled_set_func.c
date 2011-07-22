@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -78,7 +78,7 @@ static void cleanup(void)
 static void utc_UIFW_elm_transit_event_enabled_set_func_01(void)
 {
 	Eina_Bool r = EINA_FALSE;
-	
+
 	transit = elm_transit_add();
 	elm_transit_event_enabled_set(transit, EINA_TRUE);
 	r = elm_transit_event_enabled_get(transit);
@@ -97,7 +97,7 @@ static void utc_UIFW_elm_transit_event_enabled_set_func_01(void)
 static void utc_UIFW_elm_transit_event_enabled_set_func_02(void)
 {
 	Eina_Bool r = EINA_FALSE;
-	
+
 	elm_transit_add();
 	elm_transit_event_enabled_set(NULL, EINA_TRUE);
 	r = elm_transit_event_enabled_get(NULL);

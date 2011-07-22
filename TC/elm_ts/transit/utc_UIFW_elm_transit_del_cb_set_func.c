@@ -53,7 +53,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -84,7 +84,7 @@ static void utc_UIFW_elm_transit_del_cb_set_func_01(void)
 	elm_transit_del_cb_set(transit, _del_cb, NULL);
 	elm_transit_duration_set(transit, 1.0);
 	elm_transit_go(transit);
-	
+
 	/*if (!r) {
 		tet_infoline("elm_transit_del_cb_set() failed in positive test case");
 		tet_result(TET_FAIL);

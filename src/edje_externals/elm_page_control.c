@@ -81,7 +81,7 @@ external_page_control_params_parse(void *data __UNUSED__, Evas_Object *obj __UNU
    Elm_Params_Icon *mem;
    Edje_External_Param *param;
    const Eina_List *l;
-  
+
    mem = calloc(1, sizeof(Elm_Params_Icon));
    if (!mem)
      return NULL;
@@ -99,7 +99,7 @@ external_page_control_params_parse(void *data __UNUSED__, Evas_Object *obj __UNU
 	     mem->page_id_exists = EINA_TRUE;
 	  }
      }
-   
+
    return mem;
 }
 

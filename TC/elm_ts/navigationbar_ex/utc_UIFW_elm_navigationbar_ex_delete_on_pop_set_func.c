@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	navi_ex = elm_navigationbar_ex_add(main_win);
 	evas_object_show(navi_ex);
 	elm_win_resize_object_add(main_win, navi_ex);

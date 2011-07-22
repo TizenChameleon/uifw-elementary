@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -84,7 +84,7 @@ static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_01(void)
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	tet_result(TET_PASS);
 }
 
@@ -96,7 +96,7 @@ static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_02(void)
    Evas_Object *obj = elm_ctxpopup_add(main_win);
 	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
 	evas_object_show(obj);
-	
+
    Eina_Bool r = elm_ctxpopup_item_disabled_get(item);
 
 	if (r == EINA_TRUE) {
@@ -104,6 +104,6 @@ static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_02(void)
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	tet_result(TET_PASS);
 }

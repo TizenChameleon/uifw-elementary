@@ -89,11 +89,11 @@ static void utc_UIFW_elm_navigationbar_title_object_list_unset_func_01(void)
 	elm_icon_file_set(content, buf, NULL);
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
-	
+
 	Evas_Object *title = elm_button_add(navibar);
 	evas_object_show(title);
 
-	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
+	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
 	elm_navigationbar_title_object_add(navibar, content, title);
 	elm_navigationbar_title_object_list_unset(navibar, content, &list);
 	if (!list) {
@@ -115,11 +115,11 @@ static void utc_UIFW_elm_navigationbar_title_object_list_unset_func_02(void)
 	elm_icon_file_set(content, buf, NULL);
 	evas_object_size_hint_aspect_set(content, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 	elm_icon_scale_set(content, 1, 1);
-	
+
 	Evas_Object *title = elm_button_add(navibar);
 	evas_object_show(title);
 
-	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);		
+	elm_navigationbar_push(navibar, "title", NULL, NULL, NULL, content);
 	elm_navigationbar_title_object_add(navibar, content, title);
 	elm_navigationbar_title_object_list_unset(NULL, content, &list);
 	if (list) {

@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -88,7 +88,7 @@ static void utc_UIFW_elm_datefield_add_func_01(void)
 	evas_object_resize(datefield, 480, 80);
 	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
-	
+
 	tet_result(TET_PASS);
 }
 
@@ -96,7 +96,7 @@ static void utc_UIFW_elm_datefield_add_func_01(void)
  * @brief Negative test case of ug_init elm_datefield_add()
  */
 static void utc_UIFW_elm_datefield_add_func_02(void)
-{	
+{
    	datefield = elm_datefield_add(NULL);
 
 	if (datefield) {
@@ -104,10 +104,10 @@ static void utc_UIFW_elm_datefield_add_func_02(void)
 		tet_result(TET_FAIL);
 		return;
 	}
-	
+
 	evas_object_resize(datefield, 480, 80);
 	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
-	
+
 	tet_result(TET_PASS);
 }

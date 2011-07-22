@@ -5,12 +5,12 @@
  * @defgroup Dayselector Dayselector
  * @ingroup Elementary
  *
- * DaySelector. 
+ * DaySelector.
  *
  * Signals that you can add callbacks for are:
  *
- * dayselector,changed - This is called whenever the user changes the state of one of the check object. 
- * 
+ * dayselector,changed - This is called whenever the user changes the state of one of the check object.
+ *
  */
 
 typedef struct _Widget_Data Widget_Data;
@@ -55,7 +55,7 @@ _changed_size_hints(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
    evas_object_size_hint_min_set(obj, w * elm_scale_get(), h * elm_scale_get());
 }
 
-static void 
+static void
 _check_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    static Elm_DaySelector_Day day;
@@ -94,8 +94,8 @@ _theme_hook(Evas_Object *obj)
  * Set the state of given check object.
  *
  * @param[in] obj  	     Dayselector
- * @param[in] day        day user want to know. 
- * @param[in] checked    state of the day. Eina_True is checked. 
+ * @param[in] day        day user want to know.
+ * @param[in] checked    state of the day. Eina_True is checked.
  *
  * @ingroup Dayselector
  */
@@ -112,11 +112,11 @@ elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_
  * Get the state of given check object.
  *
  * @param[in] obj  	 	Dayselector
- * @param[in] day        day user want to know. 
+ * @param[in] day        day user want to know.
  *
  * @ingroup Dayselector
  */
-EAPI Eina_Bool 
+EAPI Eina_Bool
 elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
@@ -142,7 +142,7 @@ _sizing_eval(Evas_Object* obj)
    if (h < min_h) h = min_h;
    else if (h > max_h) h = max_h;
 
-   evas_object_resize(wd->base, w, h);  
+   evas_object_resize(wd->base, w, h);
 }
 */
 /**
@@ -184,7 +184,7 @@ elm_dayselector_add(Evas_Object *parent)
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "dayselector", "base", elm_widget_style_get(obj));
    elm_object_style_set(wd->base, "dayselector");
-   elm_widget_resize_object_set(obj, wd->base); 
+   elm_widget_resize_object_set(obj, wd->base);
    //Checks
    for (idx=0; idx<7; ++idx)
      {

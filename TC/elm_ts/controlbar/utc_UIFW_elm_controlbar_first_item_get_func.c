@@ -56,7 +56,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 
 	controlbar = elm_controlbar_add(main_win);
 	item1 = elm_controlbar_tab_item_append(controlbar, NULL, "Controlbar", NULL);
@@ -83,7 +83,7 @@ static void utc_UIFW_elm_controlbar_first_item_get_func_01(void)
 	Elm_Controlbar_Item *item = NULL;
 
    	item = elm_controlbar_first_item_get(controlbar);
-	
+
 	if (item != item1) {
 		tet_infoline("elm_controlbar_first_item_get() failed in positive test case");
 		tet_result(TET_FAIL);

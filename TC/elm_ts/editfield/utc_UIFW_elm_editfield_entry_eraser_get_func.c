@@ -54,7 +54,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 	ef = elm_editfield_add(main_win);
 	evas_object_show(ef);
 	elm_editfield_eraser_set(ef, EINA_TRUE);
@@ -81,7 +81,7 @@ static void utc_UIFW_elm_editfield_entry_eraser_get_func_01(void)
 {
 	Eina_Bool r = EINA_FALSE;
    	r = elm_editfield_eraser_get(ef);
-	
+
 	if (!r) {
 		tet_infoline("elm_editfield_entry_eraser_get() failed in positive test case");
 		tet_result(TET_FAIL);
@@ -97,7 +97,7 @@ static void utc_UIFW_elm_editfield_entry_eraser_get_func_02(void)
 {
 	Eina_Bool r = EINA_FALSE;
    	r = elm_editfield_eraser_get(NULL);
-	
+
 	if (r) {
 		tet_infoline("elm_editfield_entry_eraser_get() failed in negative test case");
 		tet_result(TET_FAIL);

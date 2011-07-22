@@ -55,7 +55,7 @@ static void startup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
-	evas_object_show(main_win);	
+	evas_object_show(main_win);
 }
 
 static void cleanup(void)
@@ -72,7 +72,7 @@ char *gli_label_get(const void *data, Evas_Object *obj, const char *part)
 {
    char buf[256];
    int j = (int)data;
-   snprintf(buf, sizeof(buf), "%c%c", 
+   snprintf(buf, sizeof(buf), "%c%c",
             'A' + ((j >> 4) & 0xf),
             'a' + ((j     ) & 0xf)
             );
@@ -90,11 +90,11 @@ static void utc_UIFW_elm_index_item_data_get_func_01(void)
 	Evas_Object *gl = NULL;
 	void *d = NULL;
 	int i = 0, j = 0;
-	
+
 	gl = elm_genlist_add(main_win);
-   	idx= elm_index_add(main_win);	
+   	idx= elm_index_add(main_win);
     	evas_object_show(gl);
-	evas_object_show(idx);	
+	evas_object_show(idx);
     	itci.item_style     = "default";
     	itci.func.label_get = gli_label_get;
     	itci.func.icon_get  = NULL;
@@ -107,12 +107,12 @@ static void utc_UIFW_elm_index_item_data_get_func_01(void)
          		snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 4) & 0xf));
          		elm_index_item_append(idx, buf, it);
         	}
-        	j += 2;	
+        	j += 2;
 	  	if(i==0)
 	  	it_gl=it;
     	}
 	elm_index_item_go(idx, 0);
-        item = elm_index_item_find(idx,it_gl);	
+        item = elm_index_item_find(idx,it_gl);
 	d =  (void*)elm_index_item_data_get(item);
 	if(!item) {
 		tet_infoline("elm_index_item_data_get() failed in positive test case");
@@ -134,11 +134,11 @@ static void utc_UIFW_elm_index_item_data_get_func_02(void)
 	Evas_Object *gl = NULL;
 	void *d = NULL;
 	int i = 0, j = 0;
-	
+
 	gl = elm_genlist_add(main_win);
-   	idx= elm_index_add(main_win);	
+   	idx= elm_index_add(main_win);
     	evas_object_show(gl);
-	evas_object_show(idx);	
+	evas_object_show(idx);
     	itci.item_style     = "default";
     	itci.func.label_get = gli_label_get;
     	itci.func.icon_get  = NULL;
@@ -151,11 +151,11 @@ static void utc_UIFW_elm_index_item_data_get_func_02(void)
          		snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 4) & 0xf));
          		elm_index_item_append(idx, buf, it);
         	}
-        	j += 2;	
+        	j += 2;
 	  	if(i==0) it_gl=it;
     	}
 	elm_index_item_go(idx, 0);
-        item = elm_index_item_find(NULL,it_gl);	
+        item = elm_index_item_find(NULL,it_gl);
 	d = (void *) elm_index_item_data_get(NULL);
 	if(d) {
 		tet_infoline("elm_index_item_data_get() with argument as NULL failed in negative test case");
