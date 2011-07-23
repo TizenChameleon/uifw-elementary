@@ -692,6 +692,7 @@ _theme_hook(Evas_Object *obj)
    Widget_Data *wd;
    Eina_List *elist;
    Elm_Ctxpopup_Item *item;
+   int idx = 0;
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -715,11 +716,30 @@ _theme_hook(Evas_Object *obj)
         if (item->disabled)
            edje_object_signal_emit(item->base.view, "elm,state,disabled", "elm");
 
+       /*
+        *  For separator, if the first item has visible separator,
+        *  then it should be aligned with edge of the base part.
+        *  In some cases, it gives improper display. Ex) rounded corner
+        *  So the first item separator should be invisible.
+        */
+       if ((idx++) == 0)
+         edje_object_signal_emit(item->base.view, "elm,state,default", "elm");
+       else
+         {
+           if(!wd->horizontal)
+             edje_object_signal_emit(item->base.view, "elm,state,vertical", "elm");
+           else
+             edje_object_signal_emit(item->base.view, "elm,state,horizontal", "elm");
+         }
+
         edje_object_message_signal_process(item->base.view);
      }
 
    _elm_theme_object_set(obj, wd->bg, "ctxpopup", "bg",
                          elm_widget_style_get(obj));
+   if (evas_object_visible_get(wd->bg))
+     edje_object_signal_emit(wd->bg, "elm,state,show", "elm");
+
    _elm_theme_object_set(obj, wd->base, "ctxpopup", "base",
                          elm_widget_style_get(obj));
    _elm_theme_object_set(obj, wd->arrow, "ctxpopup", "arrow",
@@ -799,7 +819,7 @@ _ctxpopup_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
            else
              edje_object_signal_emit(item->base.view, "elm,state,horizontal", "elm");
          }
-	   }
+     }
 
    _sizing_eval(obj);
 }
