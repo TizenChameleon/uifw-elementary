@@ -108,10 +108,11 @@ gltt_label_get(void            *data,
 
 static Evas_Object *
 _tt_item_icon(void *data   __UNUSED__,
-              Evas_Object *obj,
+              Evas_Object *obj __UNUSED__,
+              Evas_Object *tt,
               void *item   __UNUSED__)
 {
-   Evas_Object *ic = elm_icon_add(obj);
+   Evas_Object *ic = elm_icon_add(tt);
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png",
             elm_app_data_dir_get());
@@ -227,9 +228,10 @@ _tt_text_replace_timed(void *data       __UNUSED__,
 
 static Evas_Object *
 _tt_icon(void *data   __UNUSED__,
-         Evas_Object *obj)
+         Evas_Object *obj __UNUSED__,
+         Evas_Object *tt)
 {
-   Evas_Object *ic = elm_icon_add(obj);
+   Evas_Object *ic = elm_icon_add(tt);
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png",
             elm_app_data_dir_get());
@@ -241,9 +243,10 @@ _tt_icon(void *data   __UNUSED__,
 
 static Evas_Object *
 _tt_icon2(void *data   __UNUSED__,
-          Evas_Object *obj)
+          Evas_Object *obj __UNUSED__,
+          Evas_Object *tt)
 {
-   Evas_Object *ic = elm_icon_add(obj);
+   Evas_Object *ic = elm_icon_add(tt);
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf), "%s/images/icon_00.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
@@ -475,6 +478,9 @@ test_tooltip(void *data       __UNUSED__,
    elm_list_item_tooltip_text_set(li, "Something useful here?");
    li = elm_list_item_append(lst, "Icon Tooltip", NULL, NULL, NULL, NULL);
    elm_list_item_tooltip_content_cb_set(li, _tt_item_icon, NULL, NULL);
+   li = elm_list_item_append(lst, "Big Icon Tooltip", NULL, NULL, NULL, NULL);
+   elm_list_item_tooltip_content_cb_set(li, _tt_item_icon2, NULL, NULL);
+   elm_list_item_tooltip_size_restrict_disable(li, EINA_TRUE);
    evas_object_size_hint_weight_set(lst, EVAS_HINT_EXPAND,
                                     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(lst, EVAS_HINT_FILL, EVAS_HINT_FILL);
