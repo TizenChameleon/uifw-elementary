@@ -20,7 +20,8 @@ struct _Elm_Menu_Item
 
    Eina_Bool separator : 1;
    Eina_Bool disabled : 1;
-   Eina_Bool selected: 1;
+   Eina_Bool selected : 1;
+   Eina_Bool object_item : 1;
 };
 
 struct _Widget_Data
@@ -622,6 +623,52 @@ elm_menu_item_add(Evas_Object *obj, Elm_Menu_Item *parent, const char *icon, con
 
    _sizing_eval(obj);
    return subitem;
+}
+
+EAPI Elm_Menu_Item *
+elm_menu_item_add_object(Evas_Object *obj, Elm_Menu_Item *parent, Evas_Object *subobj, Evas_Smart_Cb func, const void *data)
+{
+   Elm_Menu_Item *subitem;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return NULL;
+   subitem = elm_widget_item_new(obj, Elm_Menu_Item);
+   if (!subitem) return NULL;
+
+   subitem->base.data = data;
+   subitem->func = func;
+   subitem->parent = parent;
+   subitem->object_item = EINA_TRUE;
+   subitem->icon = subobj;
+
+   _item_obj_create(subitem);
+
+   elm_widget_sub_object_add(subitem->base.widget, subitem->icon);
+   edje_object_part_swallow(subitem->base.view, "elm.swallow.content", subobj);
+   _sizing_eval(subitem->base.widget);
+
+   if (parent)
+     {
+        if (!parent->submenu.bx) _item_submenu_obj_create(parent);
+        elm_box_pack_end(parent->submenu.bx, subitem->base.view);
+        parent->submenu.items = eina_list_append(parent->submenu.items, subitem);
+     }
+   else
+     {
+        elm_box_pack_end(wd->bx, subitem->base.view);
+        wd->items = eina_list_append(wd->items, subitem);
+     }
+
+   _sizing_eval(obj);
+   return subitem;
+}
+
+EAPI unsigned int
+elm_menu_item_index_get(const Elm_Menu_Item *item)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, 0);
+   return item->idx;
 }
 
 EAPI void
