@@ -348,10 +348,10 @@ _swallow_item_objects(Elm_Segment_Item *it)
      edje_object_signal_emit(it->base.view, "elm,state,icon,hidden", "elm");
 
    if (it->label)
-   {
-     edje_object_part_text_set(it->base.view, "elm.text", it->label);
-     edje_object_signal_emit(it->base.view, "elm,state,text,visible", "elm");
-   }
+     {
+        edje_object_part_text_set(it->base.view, "elm.text", it->label);
+        edje_object_signal_emit(it->base.view, "elm,state,text,visible", "elm");
+     }
    else
      edje_object_signal_emit(it->base.view, "elm,state,text,hidden", "elm");
    edje_object_message_signal_process(it->base.view);
