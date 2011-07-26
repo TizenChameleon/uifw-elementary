@@ -127,6 +127,7 @@ _theme_hook(Evas_Object *obj)
      }
 
    _add_colorbar(obj);
+   elm_colorselector_color_set(obj, wd->r, wd->g, wd->b, wd->a);
    _sizing_eval(obj);
 }
 
