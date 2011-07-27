@@ -108,25 +108,41 @@ _theme_hook(Evas_Object *obj)
    EINA_LIST_FOREACH(wd->stack, l, it)
      {
         Eina_List *bl;
-        fn_button *btn;
+        fn_button *btn_det;
         edje_object_scale_set(it->base, elm_widget_scale_get(obj) *
                               _elm_config->scale);
         strncpy(buf, "item/", sizeof(buf));
         strncat(buf, it->item_style, sizeof(buf) - strlen(buf));
         _elm_theme_object_set(obj, it->base,  "navigationbar_ex", buf, elm_widget_style_get(obj));
         _elm_theme_object_set(obj, it->ct_base,  "navigationbar_ex", "content", elm_widget_style_get(obj));
-        EINA_LIST_FOREACH(it->fnbtn_list, bl, btn)
+        if (it->title)
+          edje_object_part_text_set(it->base, "elm.text", it->title);
+        if (it->subtitle)
+          edje_object_part_text_set(it->base, "elm.text.sub", it->subtitle);
+        if (it->title_obj)
           {
-             if (btn->btn_id == ELM_NAVIGATIONBAR_EX_BACK_BUTTON)
+             edje_object_part_swallow(it->base, "elm.swallow.title", it->title_obj);
+             if (it->titleobj_visible)
+               edje_object_signal_emit(it->base, "elm,state,show,title", "elm");
+             else
+               edje_object_signal_emit(it->base, "elm,state,hide,title", "elm");
+          }
+        if (it->icon)
+          edje_object_part_swallow(it->base, "elm.swallow.icon", it->icon);
+        EINA_LIST_FOREACH(it->fnbtn_list, bl, btn_det)
+          {
+             if (btn_det->btn_id == ELM_NAVIGATIONBAR_EX_BACK_BUTTON)
                {
                   snprintf(buf_fn, sizeof(buf_fn), "navigationbar_backbutton/%s", elm_widget_style_get(obj));
-                  elm_object_style_set(btn->btn, buf_fn);
+                  snprintf(buf, sizeof(buf), "elm.swallow.back");
                }
              else
                {
                   snprintf(buf_fn, sizeof(buf_fn), "navigationbar_functionbutton/%s", elm_widget_style_get(obj));
-                  elm_object_style_set(btn->btn, buf_fn);
+                  snprintf(buf, sizeof(buf), "elm.swallow.btn%d", btn_det->btn_id);
                }
+             elm_object_style_set(btn_det->btn, buf_fn);
+             edje_object_part_swallow(it->base, buf, btn_det->btn);
           }
      }
    _sizing_eval(obj);
@@ -1156,7 +1172,7 @@ elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, E
 Eina_Bool
 elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item)
 {
-   if (!item) return NULL;
+   if (!item) return EINA_FALSE;
    return item->titleobj_visible;
 }
 
