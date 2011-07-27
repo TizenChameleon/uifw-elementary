@@ -6857,12 +6857,12 @@ extern "C" {
         double x, y;
      } Elm_SlidingDrawer_Drag_Value;
 
-   EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
-   EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
-   EAPI Evas_Object *elm_slidingdrawer_content_unset(Evas_Object *obj);
-   EAPI void         elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos);
-   EAPI void         elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh);
-   EAPI void         elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy);
+   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_content_unset(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy);
 
    /* multibuttonentry */
    typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
