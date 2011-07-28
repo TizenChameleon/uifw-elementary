@@ -168,6 +168,7 @@ static void pasteimage_free(Paste_Image *pi);
  *	then can lookup in one index, not N checks */
 static const Escape escapes[] = {
        { "<br>",   '\n' },
+       { "<ps>",   '\n' },
        { "<\t>",   '\t' },
        { "gt;",    '>'  },
        { "lt;",    '<'  },
@@ -426,6 +427,7 @@ TagTable _EFLtoHTMLConvertTable[] = {
        {"underline", "del", 0},
        {"strikethrough", "ins", 0},
        {"br", "br", 1},
+       {"ps", "br", 1},
        {"b", "b", 1},
        {"item", "img", 1}
 };
