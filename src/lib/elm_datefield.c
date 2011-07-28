@@ -13,22 +13,6 @@ typedef struct _Widget_Data Widget_Data;
 
 enum
 {
-  DATE_YEAR,
-  DATE_MON,
-  DATE_DAY,
-  DATE_MAX
-};
-
-enum
-{
-  TIME_HOUR,
-  TIME_MIN,
-  TIME_AMPM,
-  TIME_MAX
-};
-
-enum
-{
   DATE_FORMAT_YYMMDD,
   DATE_FORMAT_YYDDMM,
   DATE_FORMAT_MMYYDD,
@@ -38,70 +22,64 @@ enum
   DATE_FORMAT_MAX
 };
 
-#define YEAR_MAX_LENGTH 4
-#define DAY_MAX_LENGTH 2
-#define TIME_MAX_LENGTH 2
+enum
+{
+  ENTRY_YEAR,
+  ENTRY_MON,
+  ENTRY_DAY,
+  ENTRY_HOUR,
+  ENTRY_MIN
+};
 
 #define MONTH_MAXIMUM 12
 #define HOUR_24H_MAXIMUM 23
 #define HOUR_12H_MAXIMUM 12
 #define MIN_MAXIMUM 59
+#define YEAR_MAX_LENGTH 4
 
 struct _Widget_Data
 {
    Evas_Object *base;
-   Evas_Object *date[DATE_MAX];
-   Evas_Object *time[TIME_MAX];
-   Ecore_Event_Handler *handler;
-   Ecore_Idler *idler;
+   Evas_Object *time_ampm;
+   Evas_Object *ctxpopup;
+   Evas_Object *diskselector;
    unsigned int layout;
-
    int year, month, day, hour, min;
    int y_max, m_max, d_max;
    int y_min, m_min, d_min;
-   int date_format;
+   int date_format,date_focusedpart;
    Eina_Bool pm:1;
    Eina_Bool time_mode:1;
    Eina_Bool format_exists:1;
-   Eina_Bool editing:1;
-
-   void (*func)(void *data, Evas_Object *obj, int value);
-   void *func_data;
+   Eina_Bool ctxpopup_show:1;
 };
 
 static const char *widtype = NULL;
 
 static void _del_hook(Evas_Object *obj);
+static void _on_focus_hook(void *data __UNUSED__, Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _on_focus_hook(void *data __UNUSED__, Evas_Object *obj);
-
-static void _signal_rect_mouse_down(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source);
-static void _entry_focused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__);
-static void _entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__);
-static void _entry_key_up_cb(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj , void *event_info);
-static Eina_Bool _imf_event_commit_cb(void *data, int type __UNUSED__, void *event);
-static void _input_panel_event_callback(void *data, Ecore_IMF_Context *ctx __UNUSED__, int value);
-
-static void _date_entry_add(Evas_Object *obj);
-static void _time_entry_add(Evas_Object *obj);
-static void _date_update(Evas_Object *obj);
-static Eina_Bool _focus_idler_cb(void *obj);
-static void _entry_focus_move(Evas_Object *obj, Evas_Object *focus_obj);
-static Eina_Bool _check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen);
-static char* _get_i18n_string(Evas_Object *obj, nl_item item);
+static void _datefield_resize_cb(void *data, Evas *e __UNUSED__,
+                                 Evas_Object *obj, void *event_info __UNUSED__);
+static void _ampm_clicked_cb(void *data, Evas_Object *obj, void *event_info);
+static void _signal_rect_mouse_down(void *data, Evas_Object *obj __UNUSED__,
+                                    const char *emission __UNUSED__,
+                                    const char *source);
+static void _diskselector_cb(void *data, Evas_Object *obj __UNUSED__,
+                             void *event_info);
+static void _datefield_focus_set(Evas_Object *data);
 static int _maximum_day_get(int year, int month);
 static int _check_date_boundary(Evas_Object *obj, int num, int flag);
+static char* _get_i18n_string(Evas_Object *obj, nl_item item);
+static void _date_update(Evas_Object *obj);
 
 static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+
    if (!wd) return ;
-
-   ecore_event_handler_del(wd->handler);
-   ecore_idler_del(wd->idler);
-
    free(wd);
 }
 
@@ -109,9 +87,8 @@ static void
 _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd || !wd->base) return ;
 
-   if ((elm_widget_focus_get(obj))&&(!wd->idler))  wd->idler = ecore_idler_add(_focus_idler_cb, obj);
+   if (!wd || !wd->base) return ;
 }
 
 static void
@@ -119,82 +96,67 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    char sig[32] = {0,};
-   int i;
    char buf[1024];
 
    if (!wd || !wd->base) return;
 
    if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
-     {
-        _elm_theme_object_set(obj, wd->base, "datefield", "dateandtime", elm_widget_style_get(obj));
-
-        for (i = 0; i < DATE_MAX; i++)
-          elm_object_style_set(wd->date[i], "datefield/hybrid");
-        for (i = 0; i < TIME_MAX-1; i++)
-          elm_object_style_set(wd->time[i], "datefield/hybrid");
-
-        snprintf(buf, sizeof(buf), "datefield.ampm/%s", elm_widget_style_get(obj));
-        elm_object_style_set(wd->time[TIME_AMPM], buf);
-     }
+      _elm_theme_object_set(obj, wd->base, "datefield", "dateandtime",
+                            elm_widget_style_get(obj));
    else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
-     {
-        _elm_theme_object_set(obj, wd->base, "datefield", "date", elm_widget_style_get(obj));
-
-        for (i = 0; i < DATE_MAX; i++)
-          elm_object_style_set(wd->date[i], "datefield");
-
-        for (i = 0; i < TIME_MAX; i++)
-          evas_object_hide(wd->time[i]);
-     }
+      _elm_theme_object_set(obj, wd->base, "datefield", "date",
+                            elm_widget_style_get(obj));
    else if (wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
+      _elm_theme_object_set(obj, wd->base, "datefield", "time",
+                            elm_widget_style_get(obj));
+
+   if (wd->time_ampm)
      {
-        _elm_theme_object_set(obj, wd->base, "datefield", "time", elm_widget_style_get(obj));
-
-        for (i = 0; i < TIME_MAX-1; i++)
-          elm_object_style_set(wd->time[i], "datefield");
-
-        snprintf(buf, sizeof(buf), "datefield.ampm/%s", elm_widget_style_get(obj));
-        elm_object_style_set(wd->time[TIME_AMPM], buf);
-
-        for (i = 0; i < DATE_MAX; i++)
-          evas_object_hide(wd->date[i]);
+        edje_object_part_unswallow(wd->base,wd->time_ampm);
+        evas_object_del(wd->time_ampm);
+        wd->time_ampm = NULL;
+   }
+   if ((wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME
+                  || wd->layout == ELM_DATEFIELD_LAYOUT_TIME) && wd->time_mode)
+     {
+        wd->time_ampm = elm_button_add(obj);
+        elm_widget_sub_object_add(obj, wd->time_ampm);
+        edje_object_part_swallow(wd->base, "elm.swallow.time.ampm",
+                                 wd->time_ampm);
+        snprintf(buf,sizeof(buf),"datefield.ampm/%s",elm_widget_style_get(obj));
+        elm_object_style_set(wd->time_ampm, buf);
+        evas_object_size_hint_weight_set(wd->time_ampm, EVAS_HINT_EXPAND,
+                                         EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(wd->time_ampm, EVAS_HINT_FILL,
+                                        EVAS_HINT_FILL);
+        evas_object_smart_callback_add(wd->time_ampm, "clicked",
+                                       _ampm_clicked_cb, obj);
      }
 
-   if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
-     {
-        edje_object_part_swallow(wd->base, "elm.swallow.date.year", wd->date[DATE_YEAR]);
-        edje_object_part_swallow(wd->base, "elm.swallow.date.month", wd->date[DATE_MON]);
-        edje_object_part_swallow(wd->base, "elm.swallow.date.day", wd->date[DATE_DAY]);
-        edje_object_part_text_set(wd->base, "elm.text.date.comma", ",");
-     }
-
-   if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
-     {
-        edje_object_part_swallow(wd->base, "elm.swallow.time.hour", wd->time[TIME_HOUR]);
-        edje_object_part_swallow(wd->base, "elm.swallow.time.min", wd->time[TIME_MIN]);
-        edje_object_part_swallow(wd->base, "elm.swallow.time.ampm", wd->time[TIME_AMPM]);
-        edje_object_part_text_set(wd->base, "elm.text.colon", ":");
-     }
-
-   edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
+   edje_object_scale_set(wd->base,elm_widget_scale_get(obj)*_elm_config->scale);
 
    //set date format
    if (wd->format_exists)
      sprintf(sig, "elm,state,format,%s", elm_datefield_date_format_get(obj));
    else
      {
-	char *str = _get_i18n_string(obj, D_FMT);
-	if (str)
-	  {
-	     if (!strcmp(str, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
-	     else if (!strcmp(str, "yyddmm")) wd->date_format = DATE_FORMAT_YYDDMM;
-	     else if (!strcmp(str, "mmyydd")) wd->date_format = DATE_FORMAT_MMYYDD;
-	     else if (!strcmp(str, "mmddyy")) wd->date_format = DATE_FORMAT_MMDDYY;
-	     else if (!strcmp(str, "ddyymm")) wd->date_format = DATE_FORMAT_DDYYMM;
-	     else if (!strcmp(str, "ddmmyy")) wd->date_format = DATE_FORMAT_DDMMYY;
-	     sprintf(sig, "elm,state,format,%s",str);
-	     free(str);
-	  }
+        char *str = _get_i18n_string(obj, D_FMT);
+        if (str)
+          {
+             if (!strcmp(str, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
+             else if (!strcmp(str, "yyddmm"))
+                wd->date_format = DATE_FORMAT_YYDDMM;
+             else if (!strcmp(str, "mmyydd"))
+                wd->date_format = DATE_FORMAT_MMYYDD;
+             else if (!strcmp(str, "mmddyy"))
+                wd->date_format = DATE_FORMAT_MMDDYY;
+             else if (!strcmp(str, "ddyymm"))
+                wd->date_format = DATE_FORMAT_DDYYMM;
+             else if (!strcmp(str, "ddmmyy"))
+                wd->date_format = DATE_FORMAT_DDMMYY;
+             sprintf(sig, "elm,state,format,%s",str);
+             free(str);
+          }
      }
    edje_object_signal_emit(wd->base, sig, "elm");
 
@@ -214,7 +176,56 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void
-_ampm_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_datefield_resize_cb(void *data,Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
+                     void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+
+   if (!wd || !wd->base) return ;
+
+   Evas_Object *disk = elm_ctxpopup_content_unset(wd->ctxpopup);
+   if (disk) evas_object_del(disk);
+   if (wd->ctxpopup_show)
+     wd->ctxpopup_show = EINA_FALSE;
+   evas_object_hide(wd->ctxpopup);
+}
+
+static void
+_ctxpopup_dismissed_cb(void *data, Evas_Object *obj __UNUSED__,
+                       void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+
+   if (!wd || !wd->base) return ;
+
+   Evas_Object *disk = elm_ctxpopup_content_unset(wd->ctxpopup);
+   if (disk) evas_object_del(disk);
+   if (wd->ctxpopup_show)
+     wd->ctxpopup_show = EINA_FALSE;
+
+   switch (wd->date_focusedpart)
+     {
+      case ENTRY_YEAR:
+        edje_object_signal_emit(wd->base, "elm,state,year,focus,out", "elm");
+        break;
+      case ENTRY_MON:
+        edje_object_signal_emit(wd->base, "elm,state,month,focus,out", "elm");
+        break;
+      case ENTRY_DAY:
+        edje_object_signal_emit(wd->base, "elm,state,day,focus,out", "elm");
+        break;
+      case ENTRY_HOUR:
+        edje_object_signal_emit(wd->base, "elm,state,hour,focus,out", "elm");
+        break;
+      case ENTRY_MIN:
+        edje_object_signal_emit(wd->base, "elm,state,min,focus,out", "elm");
+        break;
+     }
+}
+
+static void
+_ampm_clicked_cb(void *data, Evas_Object *obj __UNUSED__,
+                 void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    char *str;
@@ -224,408 +235,226 @@ _ampm_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNU
    wd->pm = !wd->pm;
    if (wd->pm)
      {
-	str = _get_i18n_string(data, PM_STR);
-	if (str)
-	  {
-         elm_object_text_set(wd->time[TIME_AMPM], str);
-	     free(str);
-	  }
+   str = _get_i18n_string(data, PM_STR);
+   if (str)
+     {
+         elm_object_text_set(wd->time_ampm, str);
+        free(str);
+     }
         wd->hour += HOUR_12H_MAXIMUM;
      }
    else
      {
-	str = _get_i18n_string(data, AM_STR);
-	if (str)
-	  {
-         elm_object_text_set(wd->time[TIME_AMPM], str);
-	     free(str);
-	  }
+   str = _get_i18n_string(data, AM_STR);
+   if (str)
+     {
+         elm_object_text_set(wd->time_ampm, str);
+        free(str);
+     }
         wd->hour -= HOUR_12H_MAXIMUM;
      }
    evas_object_smart_callback_call(data, "changed", NULL);
 }
 
 static void
-_signal_rect_mouse_down(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source)
+_signal_rect_mouse_down(void *data, Evas_Object *obj __UNUSED__,
+                        const char *emission __UNUSED__, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+
    if (!wd) return;
 
    if (!strcmp(source, "elm.rect.date.year.over"))
-     elm_object_focus(wd->date[DATE_YEAR]);
+      wd->date_focusedpart = ENTRY_YEAR;
    else if (!strcmp(source, "elm.rect.date.month.over"))
-     elm_object_focus(wd->date[DATE_MON]);
+      wd->date_focusedpart = ENTRY_MON;
    else if (!strcmp(source, "elm.rect.date.day.over"))
-     elm_object_focus(wd->date[DATE_DAY]);
+      wd->date_focusedpart = ENTRY_DAY;
    else if (!strcmp(source, "elm.rect.time.hour.over"))
-     elm_object_focus(wd->time[TIME_HOUR]);
+      wd->date_focusedpart = ENTRY_HOUR;
    else if (!strcmp(source, "elm.rect.time.min.over"))
-     elm_object_focus(wd->time[TIME_MIN]);
-}
+     wd->date_focusedpart = ENTRY_MIN;
 
-static Eina_Bool
-_focus_idler_cb(void *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *focus_obj;
-
-   focus_obj = elm_widget_focused_object_get(obj);
-   if (focus_obj == obj)
-     {
-        if (wd->layout == ELM_DATEFIELD_LAYOUT_TIME)
-          elm_object_focus(wd->time[TIME_HOUR]);
-
-        else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME || wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
-          {
-             switch (wd->date_format)
-               {
-                case DATE_FORMAT_YYDDMM:
-                case DATE_FORMAT_YYMMDD:
-                  elm_object_focus(wd->date[DATE_YEAR]);
-                  break;
-                case DATE_FORMAT_MMDDYY:
-                case DATE_FORMAT_MMYYDD:
-                  elm_object_focus(wd->date[DATE_MON]);
-                  break;
-                case DATE_FORMAT_DDMMYY:
-                case DATE_FORMAT_DDYYMM:
-                  elm_object_focus(wd->date[DATE_DAY]);
-               }
-          }
-     }
-   wd->idler = NULL;
-   return EINA_FALSE;
+   _datefield_focus_set(data);
 }
 
 static void
-_entry_focused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
+_diskselector_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd || !wd->base) return;
+    const char *label = elm_diskselector_item_label_get(
+                        (Elm_Diskselector_Item *) event_info);
+    Widget_Data *wd = elm_widget_data_get(data);
+    int i=0, mon = 0, hour =0;
 
-   if (wd->idler)
-     {
-        ecore_idler_del(wd->idler);
-        wd->idler = NULL;
-     }
+    if (!wd || !wd->base) return;
 
-   if (obj == wd->date[DATE_YEAR])
-     edje_object_signal_emit(wd->base, "elm,state,year,focus,in", "elm");
-   else if (obj == wd->date[DATE_MON])
-     edje_object_signal_emit(wd->base, "elm,state,month,focus,in", "elm");
-   else if (obj == wd->date[DATE_DAY])
-     edje_object_signal_emit(wd->base, "elm,state,day,focus,in", "elm");
-   else if (obj == wd->time[TIME_HOUR])
-     edje_object_signal_emit(wd->base, "elm,state,hour,focus,in", "elm");
-   else if (obj == wd->time[TIME_MIN])
-     edje_object_signal_emit(wd->base, "elm,state,min,focus,in", "elm");
-}
-
-static void
-_entry_unfocused_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   char str[YEAR_MAX_LENGTH+1] = {0,};
-   char *i18n_str;
-   int num = 0;
-
-   if (!wd || !wd->base) return;
-   wd->editing = FALSE;
-
-   if (obj == wd->date[DATE_YEAR])
-     {
-        if (strlen(elm_entry_entry_get(wd->date[DATE_YEAR])))
-          wd->year = atoi(elm_entry_entry_get(wd->date[DATE_YEAR]));
-        wd->year = _check_date_boundary(data, wd->year, DATE_YEAR);
-        sprintf(str, "%d", wd->year);
-        elm_entry_entry_set(wd->date[DATE_YEAR], str);
-        //check month boundary
-        if (wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
+    if (label)
+      {
+        if ((wd->date_focusedpart == ENTRY_YEAR) && (wd->year!=atoi(label)))
           {
-             wd->month = num;
-	     i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
-	     if (i18n_str)
-	       {
-		  elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
-		  free(i18n_str);
-	       }
+             wd->year = _check_date_boundary(data, atoi(label), ENTRY_YEAR);
+             edje_object_signal_emit(wd->base,"elm,state,year,focus,out","elm");
+             _date_update(data);
           }
-        //check day boundary
-        if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
+        else if (wd->date_focusedpart == ENTRY_MON)
           {
-             wd->day = num;
-             sprintf(str, "%d", wd->day);
-             elm_entry_entry_set(wd->date[DATE_DAY], str);
-          }
-        edje_object_signal_emit(wd->base, "elm,state,year,focus,out", "elm");
-     }
-   else if (obj == wd->date[DATE_MON])
-     {
-        if (wd->month != (num = _check_date_boundary(data, wd->month, DATE_MON)))
-          {
-             wd->month = num;
-	     i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
-	     if (i18n_str)
-	       {
-		  elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
-		  free(i18n_str);
-	       }
-          }
-        //check day boundary
-        if (wd->day != (num = _check_date_boundary(data, wd->day, DATE_DAY)))
-          {
-             wd->day = num;
-             sprintf(str, "%d", wd->day);
-             elm_entry_entry_set(wd->date[DATE_DAY], str);
-          }
-        edje_object_signal_emit(wd->base, "elm,state,month,focus,out", "elm");
-     }
-   else if (obj == wd->date[DATE_DAY])
-     {
-        if (strlen(elm_entry_entry_get(wd->date[DATE_DAY])))
-          wd->day = atoi(elm_entry_entry_get(wd->date[DATE_DAY]));
-        wd->day = _check_date_boundary(data, wd->day, DATE_DAY);
-        sprintf(str, "%d", wd->day);
-        elm_entry_entry_set(wd->date[DATE_DAY], str);
-        edje_object_signal_emit(wd->base, "elm,state,day,focus,out", "elm");
-     }
-   else if (obj == wd->time[TIME_HOUR])
-     {
-        if (strlen(elm_entry_entry_get(wd->time[TIME_HOUR])))
-          num = atoi(elm_entry_entry_get(wd->time[TIME_HOUR]));
-        else num = wd->hour;
-
-        if (!wd->time_mode) // 24 mode
-          {
-             if (num > HOUR_24H_MAXIMUM) num = HOUR_24H_MAXIMUM;
-             wd->hour = num;
-          }
-        else // 12 mode
-          {
-             if (num > HOUR_24H_MAXIMUM || num == 0)
+             char *month_list[] = {
+                             E_("Jan"), E_("Feb"), E_("Mar"), E_("Apr"),
+                             E_("May"), E_("Jun"), E_("Jul"), E_("Aug"),
+                             E_("Sep"), E_("Oct"), E_("Nov"), E_("Dec"),
+             };
+             for (i=0; i <12; i++)
                {
-                  num = HOUR_12H_MAXIMUM;
-                  wd->pm = EINA_FALSE;
+                   if (!(strcmp(month_list[i],label)))
+                     mon = _check_date_boundary(data, i+1, ENTRY_MON);
                }
-             else if (num > HOUR_12H_MAXIMUM)
+             if (wd->month != mon)
                {
-                  num -= HOUR_12H_MAXIMUM;
-                  wd->pm = EINA_TRUE;
+                  wd->month = mon;
+                  edje_object_signal_emit(wd->base, "elm,state,month,focus,out",
+                                          "elm");
+                  _date_update(data);
                }
-             wd->hour = (wd->pm == EINA_TRUE)? num + HOUR_12H_MAXIMUM : num;
-             if ((wd->hour % 12) == 0) wd->hour -= HOUR_12H_MAXIMUM;
-             if (wd->pm)
-	       {
-		  i18n_str = _get_i18n_string(data, PM_STR);
-		  if (i18n_str)
-		    {
-               elm_object_text_set(wd->time[TIME_AMPM], i18n_str);
-		       free(i18n_str);
-		    }
-	       }
+          }
+        else if ((wd->date_focusedpart == ENTRY_DAY) && (wd->day!=atoi(label)))
+          {
+             wd->day = _check_date_boundary(data, atoi(label), ENTRY_DAY);
+             edje_object_signal_emit(wd->base,"elm,state,day,focus,out", "elm");
+             _date_update(data);
+          }
+        else if (wd->date_focusedpart == ENTRY_HOUR)
+          {
+             if ((wd->hour > 12)&& (wd->time_mode)&& (wd->pm))
+               hour = wd->hour - HOUR_12H_MAXIMUM;
              else
-	       {
-		  i18n_str = _get_i18n_string(data, AM_STR);
-		  if (i18n_str)
-		    {
-               elm_object_text_set(wd->time[TIME_AMPM], i18n_str);
-		       free(i18n_str);
-		    }
-	       }
+               hour = wd->hour;
+             if (hour!=atoi(label))
+               {
+                  wd->hour = atoi(label);
+                  edje_object_signal_emit(wd->base, "elm,state,hour,focus,out",
+                                          "elm");
+                  _date_update(data);
+               }
           }
-        sprintf(str, "%02d", num);
-        elm_entry_entry_set(wd->time[TIME_HOUR], str);
-        edje_object_signal_emit(wd->base, "elm,state,hour,focus,out", "elm");
+        else if ((wd->date_focusedpart == ENTRY_MIN) && (wd->min!=atoi(label)))
+          {
+             wd->min = atoi(label);
+             edje_object_signal_emit(wd->base,"elm,state,min,focus,out", "elm");
+             _date_update(data);
+          }
      }
-   else if (obj == wd->time[TIME_MIN])
-     {
-        if (strlen(elm_entry_entry_get(wd->time[TIME_MIN])))
-          wd->min = atoi(elm_entry_entry_get(wd->time[TIME_MIN]));
-        if (wd->min > MIN_MAXIMUM) wd->min = MIN_MAXIMUM;
-
-        sprintf(str, "%02d", wd->min);
-        elm_entry_entry_set(wd->time[TIME_MIN], str);
-        edje_object_signal_emit(wd->base, "elm,state,min,focus,out", "elm");
-     }
-   evas_object_smart_callback_call(data, "changed", NULL);
 }
 
 static void
-_entry_focus_move(Evas_Object *obj, Evas_Object *focus_obj)
+_datefield_focus_set(Evas_Object *data)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   Elm_Diskselector_Item *item = NULL;
+   Evas_Object *diskselector, *disk, *edj_part = NULL;
+   const char *item_list[138], *value = NULL;
+   int idx, count_start = 0, count_end = 0;
+   Evas_Coord x, y, w, h;
 
-   if (focus_obj == wd->date[DATE_YEAR])
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd || !wd->base) return;
+
+   diskselector = elm_diskselector_add(elm_widget_top_get(data));
+   elm_object_style_set(diskselector, "extended/timepicker");
+   evas_object_size_hint_weight_set(diskselector, EVAS_HINT_EXPAND,
+                                    EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(diskselector, EVAS_HINT_FILL,EVAS_HINT_FILL);
+   elm_diskselector_display_item_num_set(diskselector, 8);
+   elm_object_focus_allow_set(diskselector, EINA_FALSE);
+   elm_diskselector_side_label_lenght_set(diskselector, 4);
+
+   char *month_list[] = {
+               E_("Jan"), E_("Feb"), E_("Mar"), E_("Apr"), E_("May"), E_("Jun"),
+               E_("Jul"), E_("Aug"), E_("Sep"), E_("Oct"), E_("Nov"), E_("Dec"),
+    };
+
+   if (wd->date_focusedpart == ENTRY_YEAR)
      {
-        switch (wd->date_format)
+        edje_object_signal_emit(wd->base, "elm,state,year,focus,in", "elm");
+        value =(char *)edje_object_part_text_get(wd->base,"elm.text.date.year");
+        edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
+                                                   "elm.rect.date.year.over");
+        count_start = wd->y_min;
+        if (wd->y_max > wd->y_min)
+           count_end = wd->y_max ;
+        else
+           count_end = 2037 ;
+        //Maximum limit is set for making it compatible with Calendar widget.
+     }
+   else if (wd->date_focusedpart == ENTRY_MON)
+     {
+        edje_object_signal_emit(wd->base, "elm,state,month,focus,in", "elm");
+        value=(char *)edje_object_part_text_get(wd->base,"elm.text.date.month");
+        edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
+                                                   "elm.rect.date.month.over");
+        count_start = 0;
+        count_end = MONTH_MAXIMUM - 1;
+     }
+   else if (wd->date_focusedpart == ENTRY_DAY)
+     {
+        edje_object_signal_emit(wd->base, "elm,state,day,focus,in", "elm");
+        value = (char *)edje_object_part_text_get(wd->base,"elm.text.date.day");
+        edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
+                                                   "elm.rect.date.day.over");
+        count_start = 1;
+        count_end = _maximum_day_get(wd->year, wd->month);
+     }
+   else if (wd->date_focusedpart == ENTRY_HOUR)
+     {
+        edje_object_signal_emit(wd->base, "elm,state,hour,focus,in", "elm");
+        value =(char *)edje_object_part_text_get(wd->base,"elm.text.time.hour");
+        edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
+                                                   "elm.rect.time.hour.over");
+        if (wd->time_mode)
           {
-           case DATE_FORMAT_DDMMYY:
-           case DATE_FORMAT_MMDDYY:
-             {
-                 if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
-                   elm_object_focus(wd->time[TIME_HOUR]);
-                 else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
-                   elm_object_unfocus(wd->date[DATE_YEAR]);
-             }
-             break;
-           case DATE_FORMAT_DDYYMM:
-           case DATE_FORMAT_YYMMDD:
-             elm_object_focus(wd->date[DATE_MON]);
-             break;
-           case DATE_FORMAT_MMYYDD:
-           case DATE_FORMAT_YYDDMM:
-             elm_object_focus(wd->date[DATE_DAY]);
+             count_start = 1;
+             count_end = HOUR_12H_MAXIMUM ;
+          }
+        else
+          {
+             count_start = 0;
+             count_end = HOUR_24H_MAXIMUM ;
           }
      }
-   else if (focus_obj == wd->date[DATE_MON])
+   else if (wd->date_focusedpart == ENTRY_MIN)
      {
-        switch (wd->date_format)
-          {
-           case DATE_FORMAT_DDYYMM:
-           case DATE_FORMAT_YYDDMM:
-             {
-                if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
-                  elm_object_focus(wd->time[TIME_HOUR]);
-                else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
-                  elm_object_unfocus(wd->date[DATE_MON]);
-             }
-             break;
-           case DATE_FORMAT_DDMMYY:
-           case DATE_FORMAT_MMYYDD:
-             elm_object_focus(wd->date[DATE_YEAR]);
-             break;
-           case DATE_FORMAT_MMDDYY:
-           case DATE_FORMAT_YYMMDD:
-             elm_object_focus(wd->date[DATE_DAY]);
-          }
+        edje_object_signal_emit(wd->base, "elm,state,min,focus,in", "elm");
+        value = (char *)edje_object_part_text_get(wd->base,"elm.text.time.min");
+        edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
+                                                   "elm.rect.time.min.over");
+        count_start = 0;
+        count_end = MIN_MAXIMUM;
      }
-   else if (focus_obj == wd->date[DATE_DAY])
+   if (wd->ctxpopup_show) return;
+   for (idx=count_start; idx<= count_end; idx++)
      {
-        switch (wd->date_format)
-          {
-           case DATE_FORMAT_YYMMDD:
-           case DATE_FORMAT_MMYYDD:
-             {
-                if (wd->layout == ELM_DATEFIELD_LAYOUT_DATEANDTIME)
-                  elm_object_focus(wd->time[TIME_HOUR]);
-                else if (wd->layout == ELM_DATEFIELD_LAYOUT_DATE)
-                  elm_object_unfocus(wd->date[DATE_DAY]);
-             }
-             break;
-           case DATE_FORMAT_DDYYMM:
-           case DATE_FORMAT_MMDDYY:
-             elm_object_focus(wd->date[DATE_YEAR]);
-             break;
-           case DATE_FORMAT_DDMMYY:
-           case DATE_FORMAT_YYDDMM:
-             elm_object_focus(wd->date[DATE_MON]);
-          }
+        char str[5];
+        if (wd->date_focusedpart == ENTRY_MON)
+          snprintf(str, sizeof(str), month_list[idx]);
+        else
+          snprintf(str, sizeof(str), "%02d", idx);
+        item_list[idx] = eina_stringshare_add(str);
+        if (strcmp(value, item_list[idx]) == 0)
+          item = elm_diskselector_item_append(diskselector,item_list[idx],NULL,
+                                              _diskselector_cb, data);
+        else
+          elm_diskselector_item_append(diskselector, item_list[idx], NULL,
+                                       _diskselector_cb, data);
+        eina_stringshare_del(item_list[idx]);
      }
-   else if (focus_obj == wd->time[TIME_HOUR])
-     elm_object_focus(wd->time[TIME_MIN]);
-   else if (focus_obj == wd->time[TIME_MIN])
-     elm_object_focus(wd->time[TIME_AMPM]);
-   else if (focus_obj == wd->time[TIME_AMPM])
-     elm_object_unfocus(wd->time[TIME_AMPM]);
-}
+   elm_diskselector_round_set(diskselector, EINA_TRUE);
+   if(item != NULL) elm_diskselector_item_selected_set(item, EINA_TRUE);
 
-static int
-_check_date_boundary(Evas_Object *obj, int num, int flag)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (flag == DATE_YEAR)
-     {
-        if ((num > wd->y_max)&&(wd->y_max > wd->y_min)) num = wd->y_max;
-        else if (num < wd->y_min) num = wd->y_min;
-        return num;
-     }
-
-   else if (flag == DATE_MON)
-     {
-        if (wd->year == wd->y_max && num > wd->m_max) num = wd->m_max;
-        else if (wd->year == wd->y_min && num < wd->m_min) num = wd->m_min;
-        else if (num > MONTH_MAXIMUM) num = MONTH_MAXIMUM;
-        else if (num <= 0) num = 1;
-        return num;
-     }
-
-   else if (flag == DATE_DAY)
-     {
-        int day_of_month = _maximum_day_get(wd->year, wd->month);
-        if (wd->year == wd->y_max && wd->month == wd->m_max && num > wd->d_max) num = wd->d_max;
-        else if (wd->year == wd->y_min && wd->month == wd->m_min && num < wd->d_min) num = wd->d_min;
-        else if (num > day_of_month) num = day_of_month;
-        else if (num <= 0) num = 1;
-        return num;
-     }
-   return num;
-}
-
-static char*
-_get_i18n_string(Evas_Object *obj, nl_item item)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   const char *fmt;
-   char *str = NULL;
-   int i = 0, j = 0;
-
-   if (!wd) return NULL;
-
-   fmt = nl_langinfo(item);
-   if (!fmt) return NULL;
-
-   switch (item)
-     {
-      case D_FMT:
-	 str = calloc(7, sizeof(char));
-	 while (fmt[i])
-	   {
-	      if (fmt[i] == '%' && fmt[i+1])
-		{
-		   i++;
-		   switch (fmt[i])
-		     {
-		      case 'Y': case 'M': case 'D': case 'y': case 'm': case 'd':
-			 str[j++] = tolower(fmt[i]);
-			 str[j++] = tolower(fmt[i]);
-			 break;
-		     }
-		}
-	      i++;
-	   }
-	 return str;
-      case AM_STR:
-      case PM_STR:
-	 if (strlen(fmt) > 0)
-	   {
-	      str = calloc(strlen(fmt)+1, sizeof(char));
-	      strcpy(str, fmt);
-	   }
-	 else
-	   {
-	      str = calloc(3, sizeof(char));
-	      if (item == AM_STR) strcpy(str, "AM");
-	      else if (item == PM_STR) strcpy(str, "PM");
-	   }
-	 return str;
-      case ABMON_1: case ABMON_2: case ABMON_3: case ABMON_4: case ABMON_5: case ABMON_6:
-      case ABMON_7: case ABMON_8: case ABMON_9: case ABMON_10: case ABMON_11: case ABMON_12:
-	 str = calloc(strlen(fmt)+1, sizeof(char));
-	 while (fmt[i])
-	   {
-	      str[j++] = fmt[i];
-	      if (fmt[i] >= '1' && fmt[i] <= '9')
-		{
-		   if (fmt[i+1] >= '1' && fmt[i+1] <= '9')
-		     str[j] = fmt[i+1];
-		   break;
-		}
-	      i++;
-	   }
-	 return str;
-     }
-   return NULL;
+   disk = elm_ctxpopup_content_unset(wd->ctxpopup);
+   if (disk) evas_object_del(disk);
+   elm_ctxpopup_content_set(wd->ctxpopup, diskselector);
+   evas_object_show(wd->ctxpopup);
+   wd->ctxpopup_show = EINA_TRUE;
+   evas_object_geometry_get(edj_part, &x, &y, &w, &h);
+   evas_object_move(wd->ctxpopup, (x+w/2), (y+h) );
 }
 
 static int
@@ -658,141 +487,153 @@ _maximum_day_get(int year, int month)
    return day_of_month;
 }
 
-static Eina_Bool
-_check_input_done(Evas_Object *obj, Evas_Object *focus_obj, int strlen)
+static int
+_check_date_boundary(Evas_Object *obj, int num, int flag)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (flag == ENTRY_YEAR)
+     {
+        if ((num > wd->y_max)&&(wd->y_max > wd->y_min)) num = wd->y_max;
+        else if (num < wd->y_min) num = wd->y_min;
+        return num;
+     }
 
-   if (!wd) return EINA_FALSE;
+   else if (flag == ENTRY_MON)
+     {
+        if (wd->year == wd->y_max && num > wd->m_max) num = wd->m_max;
+        else if (wd->year == wd->y_min && num < wd->m_min) num = wd->m_min;
+        else if (num > MONTH_MAXIMUM) num = MONTH_MAXIMUM;
+        else if (num <= 0) num = 1;
+        return num;
+     }
 
-   if (focus_obj == wd->date[DATE_YEAR] && strlen == YEAR_MAX_LENGTH)
-     wd->editing = EINA_FALSE;
-   else if (focus_obj == wd->date[DATE_MON])
-     wd->editing = EINA_FALSE;
-   else if (focus_obj == wd->date[DATE_DAY])
+   else if (flag == ENTRY_DAY)
      {
-        if (strlen == DAY_MAX_LENGTH || atoi(elm_entry_entry_get(focus_obj)) > 3)
-          wd->editing = EINA_FALSE;
+        int day_of_month = _maximum_day_get(wd->year, wd->month);
+        if (wd->year == wd->y_max && wd->month == wd->m_max && num > wd->d_max)
+          num = wd->d_max;
+        else if (wd->year == wd->y_min && wd->month == wd->m_min
+                 && num < wd->d_min) num = wd->d_min;
+        else if (num > day_of_month) num = day_of_month;
+        else if (num <= 0) num = 1;
+        return num;
      }
-   else if (focus_obj == wd->time[TIME_HOUR])
-     {
-        if (strlen == TIME_MAX_LENGTH || atoi(elm_entry_entry_get(focus_obj)) > 2)
-          wd->editing = EINA_FALSE;
-     }
-   else if (focus_obj == wd->time[TIME_MIN])
-     {
-        if (strlen == TIME_MAX_LENGTH || atoi(elm_entry_entry_get(focus_obj)) > 5)
-          wd->editing = EINA_FALSE;
-     }
-   return !wd->editing;
+   return num;
 }
 
-static void
-_entry_key_up_cb(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj , void *event_info)
+static char*
+_get_i18n_string(Evas_Object *obj, nl_item item)
 {
-   Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *) event_info;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   const char *fmt;
+   char *str = NULL;
+   int i = 0, j = 0;
 
-   if (!strcmp(ev->keyname, "BackSpace"))
-     elm_entry_entry_set(obj, "");
-}
+   if (!wd) return NULL;
 
-static Eina_Bool
-_imf_event_commit_cb(void *data , int type __UNUSED__, void *event)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   Ecore_IMF_Event_Commit *ev = (Ecore_IMF_Event_Commit *) event;
-   Evas_Object *focus_obj;
-   char str[YEAR_MAX_LENGTH+1] = {0,};
+   fmt = nl_langinfo(item);
+   if (!fmt) return NULL;
 
-   if (!wd) return ECORE_CALLBACK_PASS_ON;
-   if (!elm_widget_focus_get(data)) return ECORE_CALLBACK_PASS_ON;
-
-   focus_obj = elm_widget_focused_object_get(data);
-   if (!wd->editing)
+   switch (item)
      {
-        elm_entry_entry_set(focus_obj, "");
-        wd->editing = EINA_TRUE;
+      case D_FMT:
+    str = calloc(7, sizeof(char));
+    while (fmt[i])
+      {
+         if (fmt[i] == '%' && fmt[i+1])
+      {
+         i++;
+         switch (fmt[i])
+           {
+            case 'Y': case 'M': case 'D': case 'y': case 'm': case 'd':
+          str[j++] = tolower(fmt[i]);
+          str[j++] = tolower(fmt[i]);
+          break;
+           }
+      }
+         i++;
+      }
+    return str;
+      case AM_STR:
+      case PM_STR:
+    if (strlen(fmt) > 0)
+      {
+         str = calloc(strlen(fmt)+1, sizeof(char));
+         strcpy(str, fmt);
+      }
+    else
+      {
+         str = calloc(3, sizeof(char));
+         if (item == AM_STR) strcpy(str, "AM");
+         else if (item == PM_STR) strcpy(str, "PM");
+      }
+    return str;
+      case ABMON_1: case ABMON_2: case ABMON_3: case ABMON_4: case ABMON_5:
+      case ABMON_6: case ABMON_7: case ABMON_8: case ABMON_9: case ABMON_10:
+      case ABMON_11: case ABMON_12:
+    str = calloc(strlen(fmt)+1, sizeof(char));
+    while (fmt[i])
+      {
+         str[j++] = fmt[i];
+         if (fmt[i] >= '1' && fmt[i] <= '9')
+      {
+         if (fmt[i+1] >= '1' && fmt[i+1] <= '9')
+           str[j] = fmt[i+1];
+         break;
+      }
+         i++;
+      }
+    return str;
      }
-   if (focus_obj == wd->date[DATE_MON])
-     {
-	char *i18n_str;
-        wd->month = atoi(ev->str);
-	i18n_str = _get_i18n_string(data, ABMON_1+wd->month-1);
-	if (i18n_str)
-	  {
-	     elm_entry_entry_set(focus_obj, i18n_str);
-	     free(i18n_str);
-	  }
-     }
-   else
-     {
-        strcpy(str, elm_entry_entry_get(focus_obj));
-        str[strlen(str)] = ev->str[0];
-	elm_entry_entry_set(focus_obj, str);
-     }
-
-   if (_check_input_done(data, focus_obj, strlen(str)))
-     _entry_focus_move(data, focus_obj);
-
-   return ECORE_CALLBACK_DONE;
-}
-
-static void
-_input_panel_event_callback(void *data, Ecore_IMF_Context *ctx __UNUSED__, int value)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-
-   if (!wd) return;
-
-   if (wd->func)
-     wd->func(wd->func_data, data, value);
+   return NULL;
 }
 
 static void
 _date_update(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *diskselector;
    char str[YEAR_MAX_LENGTH+1] = {0,};
    char *i18n_str;
 
    if (!wd || !wd->base) return;
 
    sprintf(str, "%d", wd->year);
-   elm_entry_entry_set(wd->date[DATE_YEAR], str);
+   edje_object_part_text_set(wd->base, "elm.text.date.year", str);
 
    i18n_str = _get_i18n_string(obj, ABMON_1+wd->month-1);
    if (i18n_str)
      {
-	elm_entry_entry_set(wd->date[DATE_MON], i18n_str);
-	free(i18n_str);
+        edje_object_part_text_set(wd->base, "elm.text.date.month", i18n_str);
+        free(i18n_str);
      }
 
-   sprintf(str, "%d", wd->day);
-   elm_entry_entry_set(wd->date[DATE_DAY], str);
+   sprintf(str, "%02d", wd->day);
+   edje_object_part_text_set(wd->base, "elm.text.date.day", str);
 
    if (!wd->time_mode) //24 mode
-     sprintf(str, "%d", wd->hour);
+     sprintf(str, "%02d", wd->hour);
    else
      {
         if (wd->hour >= HOUR_12H_MAXIMUM)
           {
              wd->pm = EINA_TRUE;
-	     i18n_str = _get_i18n_string(obj, PM_STR);
-	     if (i18n_str)
-	       {
-              elm_object_text_set(wd->time[TIME_AMPM], i18n_str);
-		  free(i18n_str);
-	       }
+             i18n_str = _get_i18n_string(obj, PM_STR);
+             if ((i18n_str)&&(wd->time_ampm))
+               {
+                  elm_object_text_set(wd->time_ampm, i18n_str);
+                  free(i18n_str);
+               }
           }
         else
           {
              wd->pm = EINA_FALSE;
-	     i18n_str = _get_i18n_string(obj, AM_STR);
-	     if (i18n_str)
-	       {
-              elm_object_text_set(wd->time[TIME_AMPM], i18n_str);
-		  free(i18n_str);
-	       }
+             i18n_str = _get_i18n_string(obj, AM_STR);
+             if ((i18n_str)&&(wd->time_ampm))
+               {
+                  elm_object_text_set(wd->time_ampm, i18n_str);
+                  free(i18n_str);
+               }
           }
 
         if (wd->hour > HOUR_12H_MAXIMUM)
@@ -802,74 +643,17 @@ _date_update(Evas_Object *obj)
         else
           sprintf(str, "%02d", wd->hour);
      }
-   elm_entry_entry_set(wd->time[TIME_HOUR], str);
+   edje_object_part_text_set(wd->base, "elm.text.time.hour", str);
    sprintf(str, "%02d", wd->min);
-   elm_entry_entry_set(wd->time[TIME_MIN], str);
+   edje_object_part_text_set(wd->base, "elm.text.time.min", str);
+
+   diskselector = elm_ctxpopup_content_unset(wd->ctxpopup);
+   if (diskselector) evas_object_del(diskselector);
+   evas_object_hide(wd->ctxpopup);
+   if (wd->ctxpopup_show)
+     wd->ctxpopup_show = EINA_FALSE;
 }
 
-static void
-_date_entry_add(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   static Elm_Entry_Filter_Limit_Size filter_data, filter_data2;
-   int i;
-
-   if (!wd) return;
-
-   for (i = 0; i < DATE_MAX; i++)
-     {
-        wd->date[i] = elm_entry_add(obj);
-        elm_entry_single_line_set(wd->date[i], EINA_TRUE);
-        elm_entry_context_menu_disabled_set(wd->date[i], EINA_TRUE);
-        if (i == DATE_MON) elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_MONTH);
-        else elm_entry_input_panel_layout_set(wd->date[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);
-        evas_object_size_hint_weight_set(wd->date[i], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-        evas_object_size_hint_align_set(wd->date[i], EVAS_HINT_FILL, EVAS_HINT_FILL);
-        evas_object_smart_callback_add(wd->date[i], "focused", _entry_focused_cb, obj);
-        evas_object_smart_callback_add(wd->date[i], "unfocused", _entry_unfocused_cb, obj);
-        evas_object_event_callback_add(wd->date[i], EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
-        elm_widget_sub_object_add(obj, wd->date[i]);
-     }
-
-   filter_data.max_char_count = 0;
-   filter_data.max_byte_count = YEAR_MAX_LENGTH;
-   elm_entry_text_filter_append(wd->date[DATE_YEAR], elm_entry_filter_limit_size, &filter_data);
-   filter_data2.max_char_count = 0;
-   filter_data2.max_byte_count = DAY_MAX_LENGTH;
-   elm_entry_text_filter_append(wd->date[DATE_YEAR], elm_entry_filter_limit_size, &filter_data2);
-}
-
-static void
-_time_entry_add(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   static Elm_Entry_Filter_Limit_Size filter_data;
-   int i;
-
-   if (!wd) return;
-
-   filter_data.max_char_count = 0;
-   filter_data.max_byte_count = TIME_MAX_LENGTH;
-   for (i = 0; i < TIME_MAX-1; i++)
-     {
-        wd->time[i] = elm_entry_add(obj);
-        elm_entry_single_line_set(wd->time[i], EINA_TRUE);
-        elm_entry_context_menu_disabled_set(wd->time[i], EINA_TRUE);
-        elm_entry_input_panel_layout_set(wd->time[i], ELM_INPUT_PANEL_LAYOUT_NUMBERONLY);
-        elm_entry_text_filter_append(wd->time[i], elm_entry_filter_limit_size, &filter_data);
-        evas_object_size_hint_weight_set(wd->time[i], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-        evas_object_size_hint_align_set(wd->time[i], EVAS_HINT_FILL, EVAS_HINT_FILL);
-        evas_object_smart_callback_add(wd->time[i], "focused", _entry_focused_cb, obj);
-        evas_object_smart_callback_add(wd->time[i], "unfocused", _entry_unfocused_cb, obj);
-        evas_object_event_callback_add(wd->time[i], EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
-        elm_widget_sub_object_add(obj, wd->time[i]);
-     }
-   wd->time[TIME_AMPM] = elm_button_add(obj);
-   evas_object_size_hint_weight_set(wd->time[TIME_AMPM], EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(wd->time[TIME_AMPM], EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_smart_callback_add(wd->time[TIME_AMPM], "clicked", _ampm_clicked_cb, obj);
-   elm_widget_sub_object_add(obj, wd->time[TIME_AMPM]);
-}
 
 /**
  * Add a new datefield object
@@ -885,7 +669,10 @@ elm_datefield_add(Evas_Object *parent)
 {
    Evas_Object *obj;
    Evas *e;
+   char buf[4096];
    Widget_Data *wd;
+
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
    e = evas_object_evas_get(parent);
    if (!e) return NULL;
@@ -902,16 +689,33 @@ elm_datefield_add(Evas_Object *parent)
 
    wd->base = edje_object_add(e);
    elm_widget_resize_object_set(obj, wd->base);
-   edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.year.over", _signal_rect_mouse_down, obj);
-   edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.month.over", _signal_rect_mouse_down, obj);
-   edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.date.day.over", _signal_rect_mouse_down, obj);
+   edje_object_signal_callback_add(wd->base, "mouse,down,1",
+                    "elm.rect.date.year.over", _signal_rect_mouse_down, obj);
+   edje_object_signal_callback_add(wd->base, "mouse,down,1",
+                    "elm.rect.date.month.over", _signal_rect_mouse_down, obj);
+   edje_object_signal_callback_add(wd->base, "mouse,down,1",
+                    "elm.rect.date.day.over", _signal_rect_mouse_down, obj);
 
-   edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.hour.over", _signal_rect_mouse_down, obj);
-   edje_object_signal_callback_add(wd->base, "mouse,down,1", "elm.rect.time.min.over", _signal_rect_mouse_down, obj);
+   edje_object_signal_callback_add(wd->base, "mouse,down,1",
+                    "elm.rect.time.hour.over", _signal_rect_mouse_down, obj);
+   edje_object_signal_callback_add(wd->base, "mouse,down,1",
+                     "elm.rect.time.min.over", _signal_rect_mouse_down, obj);
 
-   wd->handler =  ecore_event_handler_add(ECORE_IMF_EVENT_COMMIT, _imf_event_commit_cb, obj);
-   _date_entry_add(obj);
-   _time_entry_add(obj);
+   wd->ctxpopup = elm_ctxpopup_add(elm_widget_top_get(obj));
+   snprintf(buf,sizeof(buf),"extended/timepicker/%s",elm_widget_style_get(obj));
+   elm_object_style_set(wd->ctxpopup, buf);
+   elm_ctxpopup_horizontal_set(wd->ctxpopup, EINA_TRUE);
+   elm_ctxpopup_direction_priority_set(wd->ctxpopup,ELM_CTXPOPUP_DIRECTION_DOWN,
+               ELM_CTXPOPUP_DIRECTION_UP,ELM_CTXPOPUP_DIRECTION_LEFT,
+               ELM_CTXPOPUP_DIRECTION_RIGHT);
+   evas_object_size_hint_weight_set(wd->ctxpopup, EVAS_HINT_EXPAND,
+                                    EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(wd->ctxpopup, EVAS_HINT_FILL,EVAS_HINT_FILL);
+   elm_object_focus_allow_set(wd->ctxpopup, EINA_FALSE);
+   evas_object_smart_callback_add(wd->ctxpopup, "dismissed",
+                                  _ctxpopup_dismissed_cb, obj);
+   evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE,
+                                  _datefield_resize_cb, obj);
 
    wd->y_min = 1900;
    wd->m_min = 1;
@@ -922,6 +726,7 @@ elm_datefield_add(Evas_Object *parent)
    wd->year = wd->y_min;
    wd->month = 1;
    wd->day = 1;
+   wd->ctxpopup_show = EINA_FALSE;
 
    wd->layout = ELM_DATEFIELD_LAYOUT_DATEANDTIME;
    wd->time_mode = EINA_TRUE;
@@ -935,7 +740,8 @@ elm_datefield_add(Evas_Object *parent)
  * set layout for the datefield
  *
  * @param obj The datefield object
- * @param layout set layout for date/time/dateandtime (default: ELM_DATEFIELD_LAYOUT_DATEANDTIME)
+ * @param layout set layout for date/time/dateandtime
+ * (default: ELM_DATEFIELD_LAYOUT_DATEANDTIME)
  *
  * @ingroup Datefield
  */
@@ -950,6 +756,12 @@ elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout)
 
    if (wd->layout != layout)
      {
+        if (wd->time_ampm)
+          {
+             edje_object_part_unswallow(wd->base,wd->time_ampm);
+             evas_object_del(wd->time_ampm);
+             wd->time_ampm = NULL;
+          }
         wd->layout = layout;
         _theme_hook(obj);
      }
@@ -988,16 +800,17 @@ elm_datefield_layout_get(const Evas_Object *obj)
  * @ingroup Datefield
  */
 EAPI void
-elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour, int min)
+elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
+                       int min)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
 
-   wd->year = _check_date_boundary(obj, year, DATE_YEAR);
-   wd->month = _check_date_boundary(obj, month, DATE_MON);
-   wd->day = _check_date_boundary(obj, day, DATE_DAY);
+   wd->year = _check_date_boundary(obj, year, ENTRY_YEAR);
+   wd->month = _check_date_boundary(obj, month, ENTRY_MON);
+   wd->day = _check_date_boundary(obj, day, ENTRY_DAY);
 
    if (hour > HOUR_24H_MAXIMUM) wd->hour = HOUR_24H_MAXIMUM;
    else if (hour < 0) wd->hour = 0;
@@ -1023,7 +836,8 @@ elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour,
  * @ingroup Datefield
  */
 EAPI void
-elm_datefield_date_get(const Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min)
+elm_datefield_date_get(const Evas_Object *obj, int *year, int *month, int *day,
+                       int *hour, int *min)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1101,7 +915,8 @@ elm_datefield_date_max_set(Evas_Object *obj, int year, int month, int day)
  * @ingroup Datefield
  */
 EAPI void
-elm_datefield_date_max_get(const Evas_Object *obj, int *year, int *month, int *day)
+elm_datefield_date_max_get(const Evas_Object *obj, int *year, int *month,
+                           int *day)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1175,7 +990,8 @@ elm_datefield_date_min_set(Evas_Object *obj, int year, int month, int day)
  * @ingroup Datefield
  */
 EAPI void
-elm_datefield_date_min_get(const Evas_Object *obj, int *year, int *month, int *day)
+elm_datefield_date_min_get(const Evas_Object *obj, int *year, int *month,
+                           int *day)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1194,7 +1010,8 @@ elm_datefield_date_min_get(const Evas_Object *obj, int *year, int *month, int *d
  * Set if the datefield show hours in military or am/pm mode
  *
  * @param obj The datefield object
- * @param mode option for the hours mode. If true, it is shown as 12h mode, if false, it is shown as 24h mode. Default value is true
+ * @param mode option for the hours mode. If true, it is shown as 12h mode,
+ * if false, it is shown as 24h mode. Default value is true
  *
  * @ingroup Datefield
  */
@@ -1208,10 +1025,11 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 
    if (wd->time_mode != mode)
      {
-	wd->time_mode = mode;
-	if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h", "elm");
-	else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
-	_date_update(obj);
+   wd->time_mode = mode;
+   if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h",
+                                               "elm");
+   else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
+   _date_update(obj);
      }
 }
 
@@ -1299,36 +1117,22 @@ elm_datefield_date_format_get(const Evas_Object *obj)
  * Add a callback function for input panel state
  *
  * @param obj The datefield object
- * @param func The function to be called when the event is triggered (value will be the Ecore_IMF_Input_Panel_State)
+ * @param func The function to be called when the event is triggered
+ * (value will be the Ecore_IMF_Input_Panel_State)
  * @param data The data pointer to be passed to @p func
  *
  * @ingroup Datefield
  */
 EAPI void
-elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data)
+elm_datefield_input_panel_state_callback_add(Evas_Object *obj,
+          void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value),
+          void *data)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   int i;
-
-   if (!wd) return;
-
-   if (wd->func && (wd->func != pEventCallbackFunc))
-     elm_datefield_input_panel_state_callback_del(obj, wd->func);
-
-   if (wd->func != pEventCallbackFunc)
-     {
-        wd->func = pEventCallbackFunc;
-        wd->func_data = data;
-
-        for (i = 0; i < DATE_MAX; i++)
-          ecore_imf_context_input_panel_event_callback_add(
-        elm_entry_imf_context_get(wd->date[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback, obj);
-
-        for (i = 0; i < TIME_MAX-1; i++)
-          ecore_imf_context_input_panel_event_callback_add(
-        elm_entry_imf_context_get(wd->time[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback, obj);
-     }
+   // This API will be no more in use after the redesigning of datefield widget
+   //with ctxpopup & diskselector instead of using entry objects edited by Vkpd.
+   // API will be deprecated soon.
+   printf( "#####\nWARNING: API elm_datefield_input_panel_state_callback_add "
+            "will be deprecated soon \n#####\n");
 }
 
 /**
@@ -1340,25 +1144,12 @@ elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCall
  * @ingroup Datefield
  */
 EAPI void
-elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value))
+elm_datefield_input_panel_state_callback_del(Evas_Object *obj,
+          void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value))
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   int i;
-
-   if (!wd) return;
-
-   if (wd->func && wd->func == pEventCallbackFunc)
-     {
-        for (i = 0; i < DATE_MAX; i++)
-          ecore_imf_context_input_panel_event_callback_del(
-        elm_entry_imf_context_get(wd->date[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback);
-
-        for (i = 0; i < TIME_MAX-1; i++)
-          ecore_imf_context_input_panel_event_callback_del(
-        elm_entry_imf_context_get(wd->time[i]), ECORE_IMF_INPUT_PANEL_STATE_EVENT, _input_panel_event_callback);
-
-        wd->func = NULL;
-        wd->func_data = NULL;
-     }
+   // This API will be no more in use after the redesigning of datefield widget
+   //with ctxpopup & diskselector instead of using entry objects edited by Vkpd.
+   // API will be deprecated soon.
+   printf( "#####\nWARNING: API elm_datefield_input_panel_state_callback_del"
+            "will be deprecated soon \n#####\n");
 }
