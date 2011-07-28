@@ -171,22 +171,19 @@ _del_hook(Evas_Object *obj)
 static void
 _theme_hook(Evas_Object *obj)
 {
-   int i;
+   int i = 0;
+   Widget_Data *wd = elm_widget_data_get(obj);
 
-   Widget_Data *wd;
-
-   wd = elm_widget_data_get(obj);
-
-   if (!wd || !wd->ly)
-     return;
+   if (!wd) return;
 
    for (i = 0; i < BLOCK_MAX; i++)
      {
-        wd->ly[i] = elm_layout_add(obj);
-        _elm_theme_object_set(obj, wd->ly[i], "imageslider", "base", "default");
+        if (wd->ly[i])
+          _elm_theme_object_set(obj, wd->ly[i], "imageslider", "base",
+                                elm_object_style_get(obj));
         evas_object_show(wd->ly[i]);
      }
-
+   _imageslider_update(wd);
    _sizing_eval(obj);
 }
 
