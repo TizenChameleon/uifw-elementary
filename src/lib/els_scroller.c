@@ -472,6 +472,8 @@ _smart_momentum_end(Smart_Data *sd)
         sd->down.bounce_y_hold = 0;
         sd->down.ax = 0;
         sd->down.ay = 0;
+        sd->down.dx = 0;
+        sd->down.dy = 0;
         sd->down.pdx = 0;
         sd->down.pdy = 0;
      }
@@ -1004,19 +1006,25 @@ elm_smart_scroller_child_pos_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
      edje_object_signal_emit(sd->edje_obj, "elm,action,scroll", "elm");
    if (!sd->down.bounce_x_animator)
      {
-        if ((x < minx) || (x > (mx + minx)))
+        if (((x < minx) && (0 <= sd->down.dx)) ||
+            ((x > (mx + minx)) && (0 >= sd->down.dx)))
           {
              sd->bouncemex = 1;
              bounce_eval(sd);
           }
+        else
+           sd->bouncemex = 0;
      }
    if (!sd->down.bounce_y_animator)
      {
-        if ((y < miny) || (y > my + miny))
+        if (((y < miny) && (0 <= sd->down.dy)) ||
+            ((y > (my + miny)) && (0 >= sd->down.dy)))
           {
              sd->bouncemey = 1;
              bounce_eval(sd);
           }
+        else
+           sd->bouncemey = 0;
      }
    if ((x != px) || (y != py))
      {
@@ -1327,8 +1335,8 @@ void
 elm_smart_scroller_bounce_allow_get(const Evas_Object *obj, Eina_Bool *horiz, Eina_Bool *vert)
 {
    API_ENTRY return;
-   *horiz = sd->bounce_horiz;
-   *vert = sd->bounce_vert;
+   if (horiz) *horiz = sd->bounce_horiz;
+   if (vert) *vert = sd->bounce_vert;
 }
 
 void
@@ -1898,14 +1906,20 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                             if ((_elm_config->thumbscroll_friction > 0.0) &&
                                 (vel > _elm_config->thumbscroll_momentum_threshold))
                               {
+                                 int minx, miny, mx, my, px, py;
+                                 sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
+                                 sd->pan_func.max_get(sd->pan_obj, &mx, &my);
+                                 sd->pan_func.get(sd->pan_obj, &px, &py);
                                  sd->down.dx = ((double)dx / at);
                                  sd->down.dy = ((double)dy / at);
                                  if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
                                      ((sd->down.dx < 0) && (sd->down.pdx < 0)))
-                                   sd->down.dx += (double)sd->down.pdx * 1.5; // FIXME: * 1.5 - probably should be config
+                                   if (px > minx && px < mx)
+                                     sd->down.dx += (double)sd->down.pdx * 1.5; // FIXME: * 1.5 - probably should be config
                                  if (((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
                                      ((sd->down.dy < 0) && (sd->down.pdy < 0)))
-                                   sd->down.dy += (double)sd->down.pdy * 1.5; // FIXME: * 1.5 - probably should be config
+                                   if (py > miny && py < my)
+                                     sd->down.dy += (double)sd->down.pdy * 1.5; // FIXME: * 1.5 - probably should be config
                                  if (((sd->down.dx > 0) && (sd->down.pdx > 0)) ||
                                      ((sd->down.dx < 0) && (sd->down.pdx < 0)) ||
                                      ((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
