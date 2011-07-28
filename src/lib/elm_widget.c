@@ -96,6 +96,7 @@ struct _Smart_Data
    Eina_Bool    can_focus : 1;
    Eina_Bool    child_can_focus : 1;
    Eina_Bool    focused : 1;
+   Eina_Bool    tree_unfocusable : 1;
    Eina_Bool    highlight_ignore : 1;
    Eina_Bool    highlight_in_theme : 1;
    Eina_Bool    disabled : 1;
@@ -1055,6 +1056,49 @@ elm_widget_child_can_focus_get(const Evas_Object *obj)
    return sd->child_can_focus;
 }
 
+/**
+ * @internal
+ *
+ * This API makes the widget object and its children to be unfocusable.
+ *
+ * This API can be helpful for an object to be deleted.
+ * When an object will be deleted soon, it and its children may not
+ * want to get focus (by focus reverting or by other focus controls).
+ * Then, just use this API before deleting.
+ *
+ * @param obj The widget root of sub-tree
+ * @param tree_unfocusable If true, set the object sub-tree as unfocusable
+ *
+ * @ingroup Widget
+ */
+EAPI void
+elm_widget_tree_unfocusable_set(Evas_Object *obj,
+                                Eina_Bool    tree_unfocusable)
+{
+   API_ENTRY return;
+
+   if (sd->tree_unfocusable == tree_unfocusable) return;
+   sd->tree_unfocusable = !!tree_unfocusable;
+   elm_widget_focus_tree_unfocusable_handle(obj);
+}
+
+/**
+ * @internal
+ *
+ * This returns true, if the object sub-tree is unfocusable.
+ *
+ * @param obj The widget root of sub-tree
+ * @return EINA_TRUE if the object sub-tree is unfocusable
+ *
+ * @ingroup Widget
+ */
+EAPI Eina_Bool
+elm_widget_tree_unfocusable_get(const Evas_Object *obj)
+{
+   API_ENTRY return EINA_FALSE;
+   return sd->tree_unfocusable;
+}
+
 EAPI void
 elm_widget_highlight_ignore_set(Evas_Object *obj,
                                 Eina_Bool    ignore)
@@ -1445,7 +1489,9 @@ elm_widget_focus_next_get(const Evas_Object  *obj,
    API_ENTRY return EINA_FALSE;
 
    /* Ignore if disabled */
-   if ((!evas_object_visible_get(obj)) || (elm_widget_disabled_get(obj)))
+   if ((!evas_object_visible_get(obj))
+       || (elm_widget_disabled_get(obj))
+       || (elm_widget_tree_unfocusable_get(obj)))
      return EINA_FALSE;
 
    /* Try use hook */
@@ -1746,13 +1792,14 @@ elm_widget_focus_steal(Evas_Object *obj)
    if (sd->focused) return;
    if (sd->disabled) return;
    if (!sd->can_focus) return;
+   if (sd->tree_unfocusable) return;
    parent = obj;
    for (;;)
      {
         o = elm_widget_parent_get(parent);
         if (!o) break;
         sd = evas_object_smart_data_get(o);
-        if (sd->disabled) return;
+        if (sd->disabled || sd->tree_unfocusable) return;
         if (sd->focused) break;
         parent = o;
      }
@@ -1806,25 +1853,7 @@ elm_widget_disabled_set(Evas_Object *obj,
 
    if (sd->disabled == disabled) return;
    sd->disabled = !!disabled;
-   if (sd->focused)
-     {
-        Evas_Object *o, *parent;
-        parent = obj;
-        o = elm_widget_parent_get(parent);
-        if (!o)
-          elm_widget_focused_object_clear(parent);
-        else
-          {
-             parent = o;
-             for (;;)
-               {
-                  o = elm_widget_parent_get(parent);
-                  if (!o) break;
-                  parent = o;
-               }
-             elm_widget_focus_cycle(parent, ELM_FOCUS_NEXT);
-          }
-     }
+   elm_widget_focus_disabled_handle(obj);
    if (sd->disable_func) sd->disable_func(obj);
 }
 
@@ -2288,6 +2317,25 @@ elm_widget_focus_mouse_down_handle(Evas_Object *obj)
    if (!o) return;
    if (!_is_focusable(o)) return;
    elm_widget_focus_steal(o);
+}
+
+EAPI void
+elm_widget_focus_tree_unfocusable_handle(Evas_Object *obj)
+{
+   API_ENTRY return;
+
+   if (!elm_widget_parent_get(obj))
+     elm_widget_focused_object_clear(obj);
+   else
+     _if_focused_revert(obj, EINA_TRUE);
+}
+
+EAPI void
+elm_widget_focus_disabled_handle(Evas_Object *obj)
+{
+   API_ENTRY return;
+
+   elm_widget_focus_tree_unfocusable_handle(obj);
 }
 
 /**
@@ -2794,7 +2842,9 @@ _newest_focus_order_get(Evas_Object  *obj,
 
    API_ENTRY return NULL;
 
-   if ((!evas_object_visible_get(obj)) || (elm_widget_disabled_get(obj)))
+   if (!evas_object_visible_get(obj)
+       || (elm_widget_disabled_get(obj))
+       || (elm_widget_tree_unfocusable_get(obj)))
      return NULL;
 
    best = NULL;
