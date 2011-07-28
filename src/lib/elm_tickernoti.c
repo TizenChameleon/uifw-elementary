@@ -68,8 +68,10 @@ _theme_hook(Evas_Object *obj)
 
    if (!wd) return;
 
-   _elm_theme_object_set (wd->win_indi, wd->edje_indi, "tickernoti", "base", elm_widget_style_get(obj));
-   _elm_theme_object_set (wd->edje_detail, wd->edje_detail, "tickernoti", "2line", elm_widget_style_get(obj));
+   _elm_theme_object_set (wd->win_indi, wd->edje_indi, "tickernoti", "1line",
+                          elm_widget_style_get(obj));
+   _elm_theme_object_set (wd->win_detail, wd->edje_detail, "tickernoti", "2line",
+                          elm_widget_style_get(obj));
 
    edje_object_scale_set (wd->edje_indi, elm_widget_scale_get(obj) * _elm_config->scale);
    edje_object_scale_set (wd->edje_detail, elm_widget_scale_get(obj) * _elm_config->scale);
@@ -91,6 +93,11 @@ _theme_hook(Evas_Object *obj)
    evas_object_resize (wd->win_indi, w, wd->indicator_height);
    evas_object_resize (wd->win_detail, w, wd->detail_view_height);
 #endif
+
+   if (wd->label_indi)
+     edje_object_part_text_set(wd->edje_indi, "elm.text", wd->label_indi);
+   if (wd->label_detail)
+     edje_object_part_text_set(wd->edje_detail, "elm.text", wd->label_detail);
 
    _sizing_eval(obj);
 }
@@ -160,6 +167,7 @@ static Evas_Object
    elm_win_borderless_set (win, EINA_TRUE);
    elm_win_autodel_set (win, EINA_TRUE);
    elm_win_alpha_set (win, EINA_TRUE);
+   elm_win_transparent_set(win, EINA_TRUE);
 
 #ifdef HAVE_ELEMENTARY_X
 /* set top window */
@@ -171,21 +179,20 @@ static Evas_Object
 static void
 _create_tickernoti_indi (Evas_Object *obj)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   Evas *e;
 #ifdef HAVE_ELEMENTARY_X
    Evas_Coord w;
 #endif
-
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas *e;
    char *data_win_height = NULL;
+
+   if (!wd) return;
    evas_object_move (wd->win_indi, 0, 0);
 
    e = evas_object_evas_get (wd->win_indi);
 
    wd->edje_indi = edje_object_add (e);
-   _elm_theme_object_set (wd->win_indi, wd->edje_indi, "tickernoti", "base", "default");
+   _elm_theme_object_set (wd->win_indi, wd->edje_indi, "tickernoti", "1line", "default");
    elm_win_resize_object_add (wd->win_indi, wd->edje_indi);
 
    /* tickernoti indicator height set */
@@ -205,12 +212,14 @@ _create_tickernoti_indi (Evas_Object *obj)
 static void
 _create_tickernoti_detail (Evas_Object *obj)
 {
+#ifdef HAVE_ELEMENTARY_X
+   Evas_Coord w;
+#endif
    Widget_Data *wd = elm_widget_data_get(obj);
    char *data_win_height = NULL;
+   Evas *e;
 
    if (!wd) return;
-
-   Evas *e;
 
    evas_object_move (wd->win_detail, 0, 0);
    e = evas_object_evas_get (wd->win_detail);
@@ -225,8 +234,6 @@ _create_tickernoti_detail (Evas_Object *obj)
      wd->detail_view_height = (int)(elm_scale_get() * atoi(data_win_height));
 
 #ifdef HAVE_ELEMENTARY_X
-   Evas_Coord w;
-
    ecore_x_window_size_get (ecore_x_window_root_first_get(), &w, NULL);
    evas_object_resize (wd->win_detail, w, wd->detail_view_height);
 #endif
@@ -306,18 +313,6 @@ elm_tickernoti_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_can_focus_set(obj, 0);
 
-   wd->edje_indi = NULL;
-   wd->edje_detail = NULL;
-   wd->icon_indi = NULL;
-   wd->icon_detail = NULL;
-   wd->button_detail = NULL;
-
-   wd->label_indi = NULL;
-   wd->label_detail = NULL;
-
-   wd->indicator_height = 0;
-   wd->angle = 0;
-
    wd->mode = ELM_TICKERNOTI_DEFAULT;
 
    _create_tickernoti_indi (obj);
@@ -377,10 +372,10 @@ elm_tickernoti_label_set (Evas_Object *obj, const char *label)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
+
    if (!wd) return;
-   if (!label) label = "";
    eina_stringshare_replace(&wd->label_indi, label);
-   edje_object_part_text_set(wd->edje_indi, "text", label);
+   edje_object_part_text_set(wd->edje_indi, "elm.text", wd->label_indi);
    _sizing_eval(obj);
 }
 
@@ -413,10 +408,10 @@ elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
+
    if (!wd) return;
-   if (!label) label = "";
    eina_stringshare_replace(&wd->label_detail, label);
-   edje_object_part_text_set(wd->edje_detail, "text", label);
+   edje_object_part_text_set(wd->edje_detail, "elm.text", wd->label_detail);
    _sizing_eval(obj);
 }
 
@@ -654,7 +649,6 @@ elm_tickernoti_mode_set (const Evas_Object *obj, Elm_Tickernoti_Mode mode)
       default:
          break;
    }
-   printf("wd->mode : %d\n", wd->mode);
 }
 
 /**
