@@ -1407,6 +1407,7 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
    do {                                                               \
         CRITICAL(engine " engine creation failed. Trying software X11."); \
         win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);      \
+        elm_engine_set(ELM_SOFTWARE_X11);      \
    } while (0)
 #define ENGINE_COMPARE(name) (!strcmp(_elm_config->engine, name))
 
