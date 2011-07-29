@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build08) unstable; urgency=low
+
+  * Upload Package
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build08
+
+ -- Myungjae Lee <mjae.lee@samsung.com>  Fri, 29 Jul 2011 21:40:00 +0900
+
 elementary (1.0.0+svn.61256slp2+build07) unstable; urgency=low
 
   * Upload Package
