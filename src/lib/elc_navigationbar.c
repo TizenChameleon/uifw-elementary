@@ -89,6 +89,7 @@ static void _elm_navigationbar_next_btn_set(Evas_Object *obj,
                                             Elm_Navigationbar_Item *it);
 static void _title_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _titleobj_switching(Evas_Object *obj, Elm_Navigationbar_Item *it);
+static void _emit_hook(Evas_Object *obj, const char *emission, const char *source);
 
 static const char SIG_HIDE_FINISHED[] = "hide,finished";
 static const char SIG_TITLE_OBJ_VISIBLE_CHANGED[] = "titleobj,visible,changed";
@@ -182,13 +183,43 @@ _del_hook(Evas_Object *obj)
    free(wd);
 }
 
+void
+_emit_hook(Evas_Object *obj, const char *emission, const char *source)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   Widget_Data *wd;
+   Eina_List *last;
+   Elm_Navigationbar_Item *it;
+
+   wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   last = eina_list_last(wd->stack);
+   if (!last) return;
+
+   it = eina_list_data_get(last);
+   if ((!it) || (!it->title_obj)) return;
+
+   //FIXME: I know this is really bullshit.
+   //We don't need to keep the titleobj_visible but return the status in edc.
+   if (!strcmp(source, "elm"))
+     {
+        if (!strcmp(emission, "elm,state,hide,noanimate,title"))
+          it->titleobj_visible = EINA_FALSE;
+        else if (!strcmp(emission, "elm,state,show,noanimate,title"))
+          it->titleobj_visible = EINA_TRUE;
+     }
+
+   edje_object_signal_emit(wd->base, emission, source);
+}
+
 static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_List *list = NULL;
    Elm_Navigationbar_Item *it = NULL;
-   char buf[4096];
 
    if (!wd) return;
    _elm_theme_object_set(obj, wd->base, "navigationbar", "base", elm_widget_style_get(obj));
@@ -608,6 +639,7 @@ elm_navigationbar_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_signal_emit_hook_set(obj, _emit_hook);
 
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "navigationbar", "base", "default");

@@ -8155,6 +8155,9 @@ extern "C" {
    EAPI int          elm_popup_run(Evas_Object *obj);
 
    /* NavigationBar */
+   #define NAVIBAR_TITLEOBJ_INSTANT_HIDE "elm,state,hide,noanimate,title", "elm"
+   #define NAVIBAR_TITLEOBJ_INSTANT_SHOW "elm,state,show,noanimate,title", "elm"
+
    typedef enum
      {
         ELM_NAVIGATIONBAR_FUNCTION_BUTTON1,
