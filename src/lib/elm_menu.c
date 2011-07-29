@@ -7,7 +7,7 @@ struct _Elm_Menu_Item
 {
    ELM_WIDGET_ITEM;
    Elm_Menu_Item *parent;
-   Evas_Object *icon;
+   Evas_Object *content;
    const char *icon_str;
    const char *label;
    Evas_Smart_Cb func;
@@ -117,14 +117,14 @@ _theme_hook(Evas_Object *obj)
                      (obj, VIEW(item), "menu", "item_with_submenu",
                       elm_widget_style_get(obj));
                   elm_menu_item_label_set(item, item->label);
-                  elm_menu_item_icon_set(item, item->icon_str);
+                  elm_menu_item_object_icon_name_set(item, item->icon_str);
                }
              else
                {
                   _elm_theme_object_set(obj, VIEW(item), "menu", "item",
                                         elm_widget_style_get(obj));
                   elm_menu_item_label_set(item, item->label);
-                  elm_menu_item_icon_set(item, item->icon_str);
+                  elm_menu_item_object_icon_name_set(item, item->icon_str);
                }
              if (item->disabled)
                edje_object_signal_emit
@@ -420,7 +420,7 @@ _item_submenu_obj_create(Elm_Menu_Item *item)
    edje_object_mirrored_set(VIEW(item), elm_widget_mirrored_get(WIDGET(item)));
    _elm_theme_object_set(WIDGET(item), VIEW(item), "menu", "item_with_submenu",  elm_widget_style_get(WIDGET(item)));
    elm_menu_item_label_set(item, item->label);
-   if (item->icon_str) elm_menu_item_icon_set(item, item->icon_str);
+   if (item->icon_str) elm_menu_item_object_icon_name_set(item, item->icon_str);
 
    edje_object_signal_callback_add(VIEW(item), "elm,action,open", "",
                                    _submenu_open, item);
@@ -621,14 +621,14 @@ elm_menu_item_add(Evas_Object *obj, Elm_Menu_Item *parent, const char *icon, con
    subitem->base.data = data;
    subitem->func = func;
    subitem->parent = parent;
-   subitem->icon = icon_obj;
+   subitem->content = icon_obj;
 
    _item_obj_create(subitem);
    elm_menu_item_label_set(subitem, label);
 
-   elm_widget_sub_object_add(WIDGET(subitem), subitem->icon);
-   edje_object_part_swallow(VIEW(subitem), "elm.swallow.content", subitem->icon);
-   if (icon) elm_menu_item_icon_set(subitem, icon);
+   elm_widget_sub_object_add(WIDGET(subitem), subitem->content);
+   edje_object_part_swallow(VIEW(subitem), "elm.swallow.content", subitem->content);
+   if (icon) elm_menu_item_object_icon_name_set(subitem, icon);
 
    _elm_menu_item_add_helper(obj, parent, subitem, wd);
 
@@ -650,11 +650,11 @@ elm_menu_item_add_object(Evas_Object *obj, Elm_Menu_Item *parent, Evas_Object *s
    subitem->func = func;
    subitem->parent = parent;
    subitem->object_item = EINA_TRUE;
-   subitem->icon = subobj;
+   subitem->content = subobj;
 
    _item_obj_create(subitem);
 
-   elm_widget_sub_object_add(subitem->base.widget, subitem->icon);
+   elm_widget_sub_object_add(subitem->base.widget, subitem->content);
    edje_object_part_swallow(subitem->base.view, "elm.swallow.content", subobj);
    _sizing_eval(subitem->base.widget);
 
@@ -694,7 +694,7 @@ elm_menu_item_label_get(const Elm_Menu_Item *item)
 }
 
 EAPI void
-elm_menu_item_icon_set(Elm_Menu_Item *item, const char *icon)
+elm_menu_item_object_icon_name_set(Elm_Menu_Item *item, const char *icon)
 {
    char icon_tmp[512];
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item);
@@ -702,7 +702,7 @@ elm_menu_item_icon_set(Elm_Menu_Item *item, const char *icon)
    if (!*icon) return;
    if ((item->icon_str) && (!strcmp(item->icon_str, icon))) return;
    if ((snprintf(icon_tmp, sizeof(icon_tmp), "menu/%s", icon) > 0) &&
-       (elm_icon_standard_set(item->icon, icon_tmp)))
+       (elm_icon_standard_set(item->content, icon_tmp)))
      {
         eina_stringshare_replace(&item->icon_str, icon);
         edje_object_signal_emit(VIEW(item), "elm,state,icon,visible", "elm");
@@ -711,6 +711,12 @@ elm_menu_item_icon_set(Elm_Menu_Item *item, const char *icon)
      edje_object_signal_emit(VIEW(item), "elm,state,icon,hidden", "elm");
    edje_object_message_signal_process(VIEW(item));
    _sizing_eval(WIDGET(item));
+}
+
+EAPI void
+elm_menu_item_icon_set(Elm_Menu_Item *item, const char *icon)
+{
+   elm_menu_item_object_icon_name_set(item, icon);
 }
 
 EAPI void
@@ -770,18 +776,48 @@ elm_menu_item_separator_add(Evas_Object *obj, Elm_Menu_Item *parent)
    return subitem;
 }
 
-EAPI const Evas_Object *
-elm_menu_item_object_icon_get(const Elm_Menu_Item *item)
+EAPI Eina_Bool
+elm_menu_item_object_content_set(Elm_Menu_Item *item, Evas_Object *obj)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, EINA_FALSE);
+   if (item->content)
+     {
+        elm_widget_sub_object_del(item->base.widget, item->content);
+        evas_object_del(item->content);
+     }
+     
+   item->content = obj;
+
+   elm_widget_sub_object_add(item->base.widget, item->content);
+   edje_object_part_swallow(item->base.view, "elm.swallow.content", item->content);
+   _sizing_eval(item->base.widget);
+   return EINA_TRUE;
+}
+
+EAPI Evas_Object *
+elm_menu_item_object_content_get(const Elm_Menu_Item *item)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, NULL);
-   return (const Evas_Object *)item->icon;
+   return item->content;
+}
+
+EAPI Evas_Object *
+elm_menu_item_object_icon_get(const Elm_Menu_Item *item)
+{
+   return elm_menu_item_object_content_get(item);
+}
+
+EAPI const char *
+elm_menu_item_object_icon_name_get(const Elm_Menu_Item *item)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, NULL);
+   return item->icon_str;
 }
 
 EAPI const char *
 elm_menu_item_icon_get(const Elm_Menu_Item *item)
 {
-   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, NULL);
-   return item->icon_str;
+   return elm_menu_item_object_icon_name_get(item);
 }
 
 EAPI Eina_Bool
@@ -801,7 +837,7 @@ elm_menu_item_del(Elm_Menu_Item *item)
 
    EINA_LIST_FREE(item->submenu.items, _item) elm_menu_item_del(_item);
    if (item->label) eina_stringshare_del(item->label);
-   if (item->icon) evas_object_del(item->icon);
+   if (item->content) evas_object_del(item->content);
    if (item->submenu.hv) evas_object_del(item->submenu.hv);
    if (item->submenu.location) evas_object_del(item->submenu.location);
 
@@ -922,6 +958,13 @@ elm_menu_item_next_get(const Elm_Menu_Item *it)
         return l->data;
      }
    return NULL;
+}
+
+EAPI Evas_Object *
+elm_menu_item_menu_get(const Elm_Menu_Item *item)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, NULL);
+   return item->base.widget;
 }
 
 EAPI Elm_Menu_Item *
