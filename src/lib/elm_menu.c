@@ -11,6 +11,7 @@ struct _Elm_Menu_Item
    const char *icon_str;
    const char *label;
    Evas_Smart_Cb func;
+   unsigned int idx;
 
    struct {
       Evas_Object *hv, *bx, *location;
@@ -614,11 +615,13 @@ elm_menu_item_add(Evas_Object *obj, Elm_Menu_Item *parent, const char *icon, con
         if (!parent->submenu.bx) _item_submenu_obj_create(parent);
         elm_box_pack_end(parent->submenu.bx, VIEW(subitem));
         parent->submenu.items = eina_list_append(parent->submenu.items, subitem);
+        subitem->idx = eina_list_count(parent->submenu.items) - 1;
      }
    else
      {
         elm_box_pack_end(wd->bx, VIEW(subitem));
         wd->items = eina_list_append(wd->items, subitem);
+        subitem->idx = eina_list_count(wd->items) - 1;
      }
 
    _sizing_eval(obj);
@@ -653,11 +656,13 @@ elm_menu_item_add_object(Evas_Object *obj, Elm_Menu_Item *parent, Evas_Object *s
         if (!parent->submenu.bx) _item_submenu_obj_create(parent);
         elm_box_pack_end(parent->submenu.bx, subitem->base.view);
         parent->submenu.items = eina_list_append(parent->submenu.items, subitem);
+        subitem->idx = eina_list_count(parent->submenu.items) - 1;
      }
    else
      {
         elm_box_pack_end(wd->bx, subitem->base.view);
         wd->items = eina_list_append(wd->items, subitem);
+        subitem->idx = eina_list_count(wd->items) - 1;
      }
 
    _sizing_eval(obj);
