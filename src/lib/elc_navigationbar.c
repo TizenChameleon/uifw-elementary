@@ -166,7 +166,6 @@ _create_back_btn(Evas_Object *parent, const char *title, void *data)
    if (!btn) return NULL;
    elm_object_text_set(btn, title);
    evas_object_smart_callback_add(btn, "clicked", _back_button_clicked, data);
-   elm_object_focus_allow_set(btn, EINA_FALSE);
    return btn;
 }
 
@@ -814,6 +813,8 @@ elm_navigationbar_pop(Evas_Object *obj)
         //TODO: seems that flag is inverted.
         cb->first_page = EINA_FALSE;
      }
+   if (prev_it->content)
+     elm_object_tree_unfocusable_set(prev_it->content, EINA_TRUE);
    cb->navibar = obj;
    _transition_complete_cb(cb);
    wd->popping = EINA_TRUE;
