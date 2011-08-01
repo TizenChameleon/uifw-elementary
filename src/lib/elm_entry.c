@@ -1800,55 +1800,6 @@ static void _matchlist_list_clicked( void *data, Evas_Object *obj, void *event_i
    elm_widget_focus_set(data, EINA_TRUE);
 }
 
-EAPI void
-elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_sensitive)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (match_list)
-     {
-        Evas_Coord max_w = 9999, max_h = 9999;
-        const char* key_data = NULL;
-
-        wd->matchlist_threshold = 1;
-        wd->hover = elm_hover_add(elm_widget_parent_get(obj));
-        elm_hover_parent_set(wd->hover, elm_widget_parent_get(obj));
-        elm_hover_target_set(wd->hover, obj);
-        elm_object_style_set(wd->hover, "matchlist");
-
-        wd->layout = elm_layout_add(wd->hover);
-        elm_layout_theme_set(wd->layout, "entry", "matchlist", "default");
-        wd->list = elm_list_add(wd->layout);
-        evas_object_size_hint_weight_set(wd->list, EVAS_HINT_EXPAND, 0.0);
-        evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
-        elm_list_mode_set(wd->list, ELM_LIST_EXPAND);
-        elm_object_style_set(wd->list, "matchlist");
-
-        key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_width");
-        if (key_data) max_w = atoi(key_data);
-        key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_height");
-        if (key_data) max_h = atoi(key_data);
-
-        elm_list_go(wd->list);
-        evas_object_size_hint_max_set(wd->list, max_w, max_h);
-        evas_object_smart_callback_add(wd->list, "selected", _matchlist_list_clicked, obj);
-        elm_layout_content_set(wd->layout, "elm.swallow.content", wd->list);
-        elm_hover_content_set(wd->hover, "bottom", wd->layout);
-
-        wd->match_list = match_list;
-     }
-   else
-     {
-        if (wd->hover)
-          evas_object_del(wd->hover);
-
-        wd->match_list = NULL;
-     }
-
-   wd->matchlist_case_sensitive = case_sensitive;
-}
-
 static void
 _entry_changed_common_handling(void *data, const char *event)
 {
@@ -3182,36 +3133,6 @@ elm_entry_line_wrap_set(Evas_Object *obj, Elm_Wrap_Type wrap)
 }
 
 /**
- * Set wrap width of the entry
- *
- * @param obj The entry object
- * @param w The wrap width in pixels at a minimum where words need to wrap
- * @ingroup Entry
- */
-EAPI void
-elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (wd->wrap_w == w) return;
-   wd->wrap_w = w;
-   _sizing_eval(obj);
-}
-
-/**
- * get wrap width of the entry
- *
- * @param obj The entry object
- * @return The wrap width in pixels at a minimum where words need to wrap
- * @ingroup Entry
- */
-EAPI Evas_Coord
-elm_entry_wrap_width_get(const Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   return wd->wrap_w;
-}
-
-/**
  * Get the wrapping behavior of the entry.
  * See also elm_entry_line_wrap_set().
  *
@@ -3966,220 +3887,6 @@ elm_entry_utf8_to_markup(const char *s)
 }
 
 /**
- * Get the input method context in the entry widget
- *
- * @param obj The entry object
- * @return The input method context
- *
- * @ingroup Entry
- */
-EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd || !wd->ent) return NULL;
-
-   return edje_object_part_text_imf_context_get(wd->ent, "elm.text");
-}
-
-/**
- * Set whether entry should enable the return key on soft keyboard automatically
- *
- * @param obj The entry object
- * @param on If true, entry enables the return key on soft keyboard automatically.
- *
- * @ingroup Entry
- */
-EAPI void
-elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   wd->autoreturnkey = on;
-   _check_enable_returnkey(obj);
-}
-
-/**
- * Set whether entry should support auto capitalization
- *
- * @param obj The entry object
- * @param on If true, entry suports auto capitalization.
- *
- * @ingroup Entry
- */
-EAPI void
-elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (wd->password)
-     wd->autocapital = EINA_FALSE;
-   else
-     wd->autocapital = autocap;
-
-   if (wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_URL ||
-       wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_EMAIL)
-     wd->autocapital = EINA_FALSE;
-
-   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapital);
-}
-
-/**
- * Set whether entry should support auto period
- *
- * @param obj The entry object
- * @param on If true, entry suports auto period.
- *
- * @ingroup Entry
- */
-EAPI void
-elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (wd->password)
-     wd->autoperiod = EINA_FALSE;
-   else
-     wd->autoperiod = autoperiod;
-
-   if (wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_URL ||
-       wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_EMAIL)
-     wd->autoperiod = EINA_FALSE;
-
-   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
-}
-
-/**
- * Set the font size on the entry object
- *
- * @param obj The entry object
- * @param size font size
- *
- * @ingroup Entry
- */
-EAPI void
-elm_entry_fontsize_set(Evas_Object *obj, int fontsize)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Eina_Strbuf *fontbuf = NULL;
-   int removeflag = 0;
-   const char *t;
-
-   if (!wd) return;
-   t = eina_stringshare_add(elm_entry_entry_get(obj));
-   fontbuf = eina_strbuf_new();
-   eina_strbuf_append_printf(fontbuf, "%d", fontsize);
-
-   if (fontsize == 0) removeflag = 1; // remove fontsize tag
-
-   if (_stringshare_key_value_replace(&t, "font_size", eina_strbuf_string_get(fontbuf), removeflag) == 0)
-     {
-       elm_entry_entry_set(obj, t);
-       wd->changed = 1;
-       _sizing_eval(obj);
-     }
-   eina_strbuf_free(fontbuf);
-   eina_stringshare_del(t);
-}
-
-/**
- * Set the text align on the entry object
- *
- * @param obj The entry object
- * @param align align mode
- *
- * @ingroup Entry
- */
-EAPI void
-elm_entry_text_align_set(Evas_Object *obj, const char *alignmode)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   int len;
-   const char *t;
-
-   if (!wd) return;
-   t = eina_stringshare_add(elm_entry_entry_get(obj));
-   len = strlen(t);
-   if (len <= 0) return;
-
-   if (_stringshare_key_value_replace(&t, "align", alignmode, 0) == 0)
-     elm_entry_entry_set(obj, t);
-
-   wd->changed = 1;
-   _sizing_eval(obj);
-   eina_stringshare_del(t);
-}
-
-/**
- * Set the text color on the entry object
- *
- * @param obj The entry object
- * @param r Red property background color of The entry object
- * @param g Green property background color of The entry object
- * @param b Blue property background color of The entry object
- * @param a Alpha property background alpha of The entry object
- *
- * @ingroup Entry
- */
-EAPI void
-elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Eina_Strbuf *colorbuf = NULL;
-   const char *t;
-   int len;
-
-   if (!wd) return;
-   t = eina_stringshare_add(elm_entry_entry_get(obj));
-   len = strlen(t);
-   if (len <= 0) return;
-   colorbuf = eina_strbuf_new();
-   eina_strbuf_append_printf(colorbuf, "#%02X%02X%02X%02X", r, g, b, a);
-
-   if (_stringshare_key_value_replace(&t, "color", eina_strbuf_string_get(colorbuf), 0) == 0)
-     {
-       elm_entry_entry_set(obj, t);
-       wd->changed = 1;
-       _sizing_eval(obj);
-     }
-   eina_strbuf_free(colorbuf);
-   eina_stringshare_del(t);
-}
-
-/**
- * Set background color of the entry
- *
- * @param obj The entry object
- * @param r Red property background color of The entry object
- * @param g Green property background color of The entry object
- * @param b Blue property background color of The entry object
- * @param a Alpha property background alpha of The entry object
- * @ingroup Entry
- */
-EAPI void
-elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   evas_object_color_set(wd->bg, r, g, b, a);
-
-   if (wd->bgcolor == EINA_FALSE)
-     {
-       wd->bgcolor = 1;
-       edje_object_part_swallow(wd->ent, "entry.swallow.background", wd->bg);
-     }
-}
-
-/**
  * Filter inserted text based on user defined character and byte limits
  *
  * Add this filter to an entry to limit the characters that it will accept
@@ -4830,6 +4537,109 @@ elm_entry_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_b
    elm_smart_scroller_bounce_allow_get(wd->scroller, h_bounce, v_bounce);
 }
 
+EINA_DEPRECATED EAPI void
+elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
+{
+   if (wrap) elm_entry_line_wrap_set(obj, ELM_WRAP_CHAR);
+}
+
+/**
+ * Set background color of the entry
+ *
+ * @param obj The entry object
+ * @param r Red property background color of The entry object
+ * @param g Green property background color of The entry object
+ * @param b Blue property background color of The entry object
+ * @param a Alpha property background alpha of The entry object
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   evas_object_color_set(wd->bg, r, g, b, a);
+
+   if (wd->bgcolor == EINA_FALSE)
+     {
+       wd->bgcolor = 1;
+       edje_object_part_swallow(wd->ent, "entry.swallow.background", wd->bg);
+     }
+}
+
+/**
+ * Set whether entry should support auto capitalization
+ *
+ * @param obj The entry object
+ * @param on If true, entry suports auto capitalization.
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (wd->password)
+     wd->autocapital = EINA_FALSE;
+   else
+     wd->autocapital = autocap;
+
+   if (wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_URL ||
+       wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_EMAIL)
+     wd->autocapital = EINA_FALSE;
+
+   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapital);
+}
+
+/**
+ * Set whether entry should support auto period
+ *
+ * @param obj The entry object
+ * @param on If true, entry suports auto period.
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (wd->password)
+     wd->autoperiod = EINA_FALSE;
+   else
+     wd->autoperiod = autoperiod;
+
+   if (wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_URL ||
+       wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_EMAIL)
+     wd->autoperiod = EINA_FALSE;
+
+   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
+}
+
+/**
+ * Set whether entry should enable the return key on soft keyboard automatically
+ *
+ * @param obj The entry object
+ * @param on If true, entry enables the return key on soft keyboard automatically.
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->autoreturnkey = on;
+   _check_enable_returnkey(obj);
+}
+
 /**
  * This sets the attribute to show the input panel automatically.
  *
@@ -4873,6 +4683,72 @@ elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout
 }
 
 /**
+ * Get the input method context in the entry widget
+ *
+ * @param obj The entry object
+ * @return The input method context
+ *
+ * @ingroup Entry
+ */
+EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd || !wd->ent) return NULL;
+
+   return edje_object_part_text_imf_context_get(wd->ent, "elm.text");
+}
+
+EAPI void
+elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_sensitive)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (match_list)
+     {
+        Evas_Coord max_w = 9999, max_h = 9999;
+        const char* key_data = NULL;
+
+        wd->matchlist_threshold = 1;
+        wd->hover = elm_hover_add(elm_widget_parent_get(obj));
+        elm_hover_parent_set(wd->hover, elm_widget_parent_get(obj));
+        elm_hover_target_set(wd->hover, obj);
+        elm_object_style_set(wd->hover, "matchlist");
+
+        wd->layout = elm_layout_add(wd->hover);
+        elm_layout_theme_set(wd->layout, "entry", "matchlist", "default");
+        wd->list = elm_list_add(wd->layout);
+        evas_object_size_hint_weight_set(wd->list, EVAS_HINT_EXPAND, 0.0);
+        evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
+        elm_list_mode_set(wd->list, ELM_LIST_EXPAND);
+        elm_object_style_set(wd->list, "matchlist");
+
+        key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_width");
+        if (key_data) max_w = atoi(key_data);
+        key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_height");
+        if (key_data) max_h = atoi(key_data);
+
+        elm_list_go(wd->list);
+        evas_object_size_hint_max_set(wd->list, max_w, max_h);
+        evas_object_smart_callback_add(wd->list, "selected", _matchlist_list_clicked, obj);
+        elm_layout_content_set(wd->layout, "elm.swallow.content", wd->list);
+        elm_hover_content_set(wd->hover, "bottom", wd->layout);
+
+        wd->match_list = match_list;
+     }
+   else
+     {
+        if (wd->hover)
+          evas_object_del(wd->hover);
+
+        wd->match_list = NULL;
+     }
+
+   wd->matchlist_case_sensitive = case_sensitive;
+}
+
+/**
  * Set the magnifier style of the entry
  *
  * @param obj The entry object
@@ -4891,8 +4767,132 @@ elm_entry_magnifier_type_set(Evas_Object *obj, int type)
    _magnifier_create(obj);
 }
 
-EINA_DEPRECATED EAPI void
-elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
+/**
+ * Set wrap width of the entry
+ *
+ * @param obj The entry object
+ * @param w The wrap width in pixels at a minimum where words need to wrap
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w)
 {
-   if (wrap) elm_entry_line_wrap_set(obj, ELM_WRAP_CHAR);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (wd->wrap_w == w) return;
+   wd->wrap_w = w;
+   _sizing_eval(obj);
+}
+
+/**
+ * get wrap width of the entry
+ *
+ * @param obj The entry object
+ * @return The wrap width in pixels at a minimum where words need to wrap
+ * @ingroup Entry
+ */
+EAPI Evas_Coord
+elm_entry_wrap_width_get(const Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   return wd->wrap_w;
+}
+
+/**
+ * Set the font size on the entry object
+ *
+ * @param obj The entry object
+ * @param size font size
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_fontsize_set(Evas_Object *obj, int fontsize)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_Strbuf *fontbuf = NULL;
+   int removeflag = 0;
+   const char *t;
+
+   if (!wd) return;
+   t = eina_stringshare_add(elm_entry_entry_get(obj));
+   fontbuf = eina_strbuf_new();
+   eina_strbuf_append_printf(fontbuf, "%d", fontsize);
+
+   if (fontsize == 0) removeflag = 1; // remove fontsize tag
+
+   if (_stringshare_key_value_replace(&t, "font_size", eina_strbuf_string_get(fontbuf), removeflag) == 0)
+     {
+       elm_entry_entry_set(obj, t);
+       wd->changed = 1;
+       _sizing_eval(obj);
+     }
+   eina_strbuf_free(fontbuf);
+   eina_stringshare_del(t);
+}
+
+/**
+ * Set the text color on the entry object
+ *
+ * @param obj The entry object
+ * @param r Red property background color of The entry object
+ * @param g Green property background color of The entry object
+ * @param b Blue property background color of The entry object
+ * @param a Alpha property background alpha of The entry object
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_Strbuf *colorbuf = NULL;
+   const char *t;
+   int len;
+
+   if (!wd) return;
+   t = eina_stringshare_add(elm_entry_entry_get(obj));
+   len = strlen(t);
+   if (len <= 0) return;
+   colorbuf = eina_strbuf_new();
+   eina_strbuf_append_printf(colorbuf, "#%02X%02X%02X%02X", r, g, b, a);
+
+   if (_stringshare_key_value_replace(&t, "color", eina_strbuf_string_get(colorbuf), 0) == 0)
+     {
+       elm_entry_entry_set(obj, t);
+       wd->changed = 1;
+       _sizing_eval(obj);
+     }
+   eina_strbuf_free(colorbuf);
+   eina_stringshare_del(t);
+}
+
+/**
+ * Set the text align on the entry object
+ *
+ * @param obj The entry object
+ * @param align align mode
+ *
+ * @ingroup Entry
+ */
+EAPI void
+elm_entry_text_align_set(Evas_Object *obj, const char *alignmode)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   int len;
+   const char *t;
+
+   if (!wd) return;
+   t = eina_stringshare_add(elm_entry_entry_get(obj));
+   len = strlen(t);
+   if (len <= 0) return;
+
+   if (_stringshare_key_value_replace(&t, "align", alignmode, 0) == 0)
+     elm_entry_entry_set(obj, t);
+
+   wd->changed = 1;
+   _sizing_eval(obj);
+   eina_stringshare_del(t);
 }
