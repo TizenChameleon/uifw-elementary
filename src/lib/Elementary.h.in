@@ -4926,16 +4926,6 @@ extern "C" {
     * "scroll,edge,right" - the list is scrolled until the right edge
     */
 
-   // FIXME: incomplete - carousel. don't use this until this comment is removed
-   typedef struct _Elm_Carousel_Item Elm_Carousel_Item;
-   EAPI Evas_Object       *elm_carousel_add(Evas_Object *parent);
-   EAPI Elm_Carousel_Item *elm_carousel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, Evas_Smart_Cb func, const void *data);
-   EAPI void               elm_carousel_item_del(Elm_Carousel_Item *item);
-   EAPI void               elm_carousel_item_select(Elm_Carousel_Item *item);
-   /* smart callbacks called:
-    * "clicked" - when the user clicks on a carousel item and becomes selected
-    */
-
    /* slider */
    EAPI Evas_Object       *elm_slider_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
    EINA_DEPRECATED EAPI void               elm_slider_label_set(Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
@@ -5503,11 +5493,6 @@ extern "C" {
    /* smart callbacks called:
     * "changed" - when the radio status is changed
     */
-
-   EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
-   EAPI void         elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count);
-   EAPI	void         elm_page_control_page_id_set(Evas_Object *obj, unsigned int page_id);
-   EAPI unsigned int elm_page_control_page_id_get(Evas_Object *obj);
 
    /* pager */
    EAPI Evas_Object *elm_pager_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
@@ -6841,197 +6826,6 @@ extern "C" {
     * "dismissed" - the ctxpopup was dismissed
     */
 
-   /* colorpalette */
-   typedef struct _Colorpalette_Color Elm_Colorpalette_Color;
-
-   struct _Colorpalette_Color
-     {
-        unsigned int r, g, b;
-     };
-
-   EAPI Evas_Object *elm_colorpalette_add(Evas_Object *parent);
-   EAPI void         elm_colorpalette_color_set(Evas_Object *obj, int color_num, Elm_Colorpalette_Color *color);
-   EAPI void         elm_colorpalette_row_column_set(Evas_Object *obj, int row, int col);
-   /* smart callbacks called:
-    * "clicked" - when image clicked
-    */
-
-   /* editfield */
-   EAPI Evas_Object *elm_editfield_add(Evas_Object *parent);
-   EAPI void         elm_editfield_label_set(Evas_Object *obj, const char *label);
-   EAPI const char  *elm_editfield_label_get(Evas_Object *obj);
-   EAPI void         elm_editfield_guide_text_set(Evas_Object *obj, const char *text);
-   EAPI const char  *elm_editfield_guide_text_get(Evas_Object *obj);
-   EAPI Evas_Object *elm_editfield_entry_get(Evas_Object *obj);
-//   EAPI Evas_Object *elm_editfield_clear_button_show(Evas_Object *obj, Eina_Bool show);
-   EAPI void         elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object *elm_editfield_right_icon_get(Evas_Object *obj);
-   EAPI void         elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object *elm_editfield_left_icon_get(Evas_Object *obj);
-   EAPI void         elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
-   EAPI Eina_Bool    elm_editfield_entry_single_line_get(Evas_Object *obj);
-   EAPI void         elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible);
-   EAPI Eina_Bool    elm_editfield_eraser_get(Evas_Object *obj);
-   /* smart callbacks called:
-    * "clicked" - when an editfield is clicked
-    * "unfocused" - when an editfield is unfocused
-    */
-
-
-   /* Sliding Drawer */
-   typedef enum _Elm_SlidingDrawer_Pos
-     {
-        ELM_SLIDINGDRAWER_BOTTOM,
-        ELM_SLIDINGDRAWER_LEFT,
-        ELM_SLIDINGDRAWER_RIGHT,
-        ELM_SLIDINGDRAWER_TOP
-     } Elm_SlidingDrawer_Pos;
-
-   typedef struct _Elm_SlidingDrawer_Drag_Value
-     {
-        double x, y;
-     } Elm_SlidingDrawer_Drag_Value;
-
-   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_content_unset(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy);
-
-   /* multibuttonentry */
-   typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
-   typedef Eina_Bool (*Elm_Multibuttonentry_Item_Verify_Callback) (Evas_Object *obj, const char *item_label, void *item_data, void *data);
-   EAPI Evas_Object               *elm_multibuttonentry_add(Evas_Object *parent);
-   EAPI const char                *elm_multibuttonentry_label_get(Evas_Object *obj);
-   EAPI void                       elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
-   EAPI Evas_Object               *elm_multibuttonentry_entry_get(Evas_Object *obj);
-   EAPI const char *               elm_multibuttonentry_guide_text_get(Evas_Object *obj);
-   EAPI void                       elm_multibuttonentry_guide_text_set(Evas_Object *obj, const char *guidetext);
-   EAPI int                        elm_multibuttonentry_contracted_state_get(Evas_Object *obj);
-   EAPI void                       elm_multibuttonentry_contracted_state_set(Evas_Object *obj, int contracted);
-   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data);
-   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data);
-   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data);
-   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *after, void *data);
-   EAPI const Eina_List           *elm_multibuttonentry_items_get(Evas_Object *obj);
-   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_first_get(Evas_Object *obj);
-   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_last_get(Evas_Object *obj);
-   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_selected_get(Evas_Object *obj);
-   EAPI void                       elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item);
-   EAPI void                       elm_multibuttonentry_item_unselect_all(Evas_Object *obj);
-   EAPI void                       elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item);
-   EAPI void                       elm_multibuttonentry_items_del(Evas_Object *obj);
-   EAPI const char                *elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item);
-   EAPI void                       elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char *str);
-   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_prev(Elm_Multibuttonentry_Item *item);
-   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item);
-   EAPI void                      *elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item);
-   EAPI void                       elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data);
-   EAPI void                       elm_multibuttonentry_item_verify_callback_set(Evas_Object *obj, Elm_Multibuttonentry_Item_Verify_Callback func, void *data);
-   /* smart callback called:
-    * "selected" - This signal is emitted when the selected item of multibuttonentry is changed.
-    * "added" - This signal is emitted when a new multibuttonentry item is added.
-    * "deleted" - This signal is emitted when a multibuttonentry item is deleted.
-    * "expanded" - This signal is emitted when a multibuttonentry is expanded.
-    * "contracted" - This signal is emitted when a multibuttonentry is contracted.
-    * "contracted,state,changed" - This signal is emitted when the contracted state of multibuttonentry is changed.
-    * "item,selected" - This signal is emitted when the selected item of multibuttonentry is changed.
-    * "item,added" - This signal is emitted when a new multibuttonentry item is added.
-    * "item,deleted" - This signal is emitted when a multibuttonentry item is deleted.
-    * "item,clicked" - This signal is emitted when a multibuttonentry item is clicked.
-    * "clicked" - This signal is emitted when a multibuttonentry is clicked.
-    * "unfocused" - This signal is emitted when a multibuttonentry is unfocused.
-    */
-   /* available styles:
-    * default
-    */
-
-   /* stackedicon */
-   typedef struct _Stackedicon_Item Elm_Stackedicon_Item;
-   EAPI Evas_Object          *elm_stackedicon_add(Evas_Object *parent);
-   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const char *path);
-   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const char *path);
-   EAPI void                  elm_stackedicon_item_del(Elm_Stackedicon_Item *it);
-   EAPI Eina_List            *elm_stackedicon_item_list_get(Evas_Object *obj);
-   /* smart callback called:
-    * "expanded" - This signal is emitted when a stackedicon is expanded.
-    * "clicked" - This signal is emitted when a stackedicon is clicked.
-    */
-   /* available styles:
-    * default
-    */
-
-   /* dialoguegroup */
-   typedef struct _Dialogue_Item Dialogue_Item;
-
-   typedef enum _Elm_Dialoguegourp_Item_Style
-     {
-        ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT = 0,
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE = (1 << 1),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE = (1 << 2),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN = (1 << 3),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW = (1 << 4),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_NO_BG = (1 << 5),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_SUB = (1 << 6),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT = (1 << 7),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_MERGE = (1 << 8),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_LAST = (1 << 9)
-     } Elm_Dialoguegroup_Item_Style;
-
-   EINA_DEPRECATED EAPI Evas_Object   *elm_dialoguegroup_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *after, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *before, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_remove(Dialogue_Item *item);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_remove_all(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_title_set(Evas_Object *obj, const char *title);
-   EINA_DEPRECATED EAPI const char    *elm_dialoguegroup_title_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press);
-   EINA_DEPRECATED EAPI Eina_Bool      elm_dialoguegroup_press_effect_get(Dialogue_Item *item);
-   EINA_DEPRECATED EAPI Evas_Object   *elm_dialoguegroup_item_content_get(Dialogue_Item *item);
-   EINA_DEPRECATED EAPI void	       elm_dialoguegroup_item_style_set(Dialogue_Item *item, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI Elm_Dialoguegroup_Item_Style	elm_dialoguegroup_item_style_get(Dialogue_Item *item);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_item_disabled_set(Dialogue_Item *item, Eina_Bool disabled);
-   EINA_DEPRECATED EAPI Eina_Bool      elm_dialoguegroup_item_disabled_get(Dialogue_Item *item);
-
-   /* Dayselector */
-   typedef enum
-     {
-        ELM_DAYSELECTOR_SUN,
-        ELM_DAYSELECTOR_MON,
-        ELM_DAYSELECTOR_TUE,
-        ELM_DAYSELECTOR_WED,
-        ELM_DAYSELECTOR_THU,
-        ELM_DAYSELECTOR_FRI,
-        ELM_DAYSELECTOR_SAT
-     } Elm_DaySelector_Day;
-
-   EAPI Evas_Object *elm_dayselector_add(Evas_Object *parent);
-   EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
-   EAPI void         elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked);
-
-   /* Image Slider */
-   typedef struct _Imageslider_Item Elm_Imageslider_Item;
-   typedef void (*Elm_Imageslider_Cb)(void *data, Evas_Object *obj, void *event_info);
-   EAPI Evas_Object           *elm_imageslider_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-   EAPI Elm_Imageslider_Item  *elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data) EINA_ARG_NONNULL(1);
-   EAPI Elm_Imageslider_Item  *elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, unsigned int index, void *data) EINA_ARG_NONNULL(1);
-   EAPI Elm_Imageslider_Item  *elm_imageslider_item_prepend(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data) EINA_ARG_NONNULL(1);
-   EAPI void                   elm_imageslider_item_del(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   EAPI Elm_Imageslider_Item  *elm_imageslider_selected_item_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI Eina_Bool              elm_imageslider_item_selected_get(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   EAPI void                   elm_imageslider_item_selected_set(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   EAPI const char            *elm_imageslider_item_photo_file_get(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   EAPI Elm_Imageslider_Item  *elm_imageslider_item_prev(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   EAPI Elm_Imageslider_Item  *elm_imageslider_item_next(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   EAPI void                   elm_imageslider_prev(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                   elm_imageslider_next(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                   elm_imageslider_item_photo_file_set(Elm_Imageslider_Item *it, const char *photo_file) EINA_ARG_NONNULL(1,2);
-   EAPI void                   elm_imageslider_item_update(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-
    /* transit */
    /**
     *
@@ -7989,37 +7783,6 @@ extern "C" {
    EAPI const Elm_Store        *elm_store_item_store_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI const Elm_Genlist_Item *elm_store_item_genlist_item_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
 
-   /* NoContents */
-   EAPI Evas_Object *elm_nocontents_add(Evas_Object *parent);
-   EAPI void         elm_nocontents_label_set(Evas_Object *obj, const char *label);
-   EAPI const char  *elm_nocontents_label_get(const Evas_Object *obj);
-   EAPI void         elm_nocontents_custom_set(const Evas_Object *obj, Evas_Object *custom);
-   EAPI Evas_Object *elm_nocontents_custom_get(const Evas_Object *obj);
-
-   /* TickerNoti */
-   typedef enum
-     {
-        ELM_TICKERNOTI_DEFAULT,
-        ELM_TICKERNOTI_DETAILVIEW
-     } Elm_Tickernoti_Mode;
-
-   EAPI Evas_Object         *elm_tickernoti_add (Evas_Object *parent);
-   EAPI void                 elm_tickernoti_icon_set (const Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object         *elm_tickernoti_icon_get (const Evas_Object *obj);
-   EAPI void                 elm_tickernoti_label_set (Evas_Object *obj, const char *label);
-   EAPI const char          *elm_tickernoti_label_get (const Evas_Object *obj);
-   EAPI void                elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label);
-   EAPI const char          *elm_tickernoti_detailview_label_get (const Evas_Object *obj);
-   EAPI void                 elm_tickernoti_detailview_button_set (const Evas_Object *obj, Evas_Object *button);
-   EAPI Evas_Object         *elm_tickernoti_detailview_button_get (const Evas_Object *obj);
-   EAPI void                 elm_tickernoti_detailview_icon_set (const Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object         *elm_tickernoti_detailview_icon_get (const Evas_Object *obj);
-   EAPI Evas_Object         *elm_tickernoti_detailview_get (const Evas_Object *obj);
-   EAPI int                  elm_tickernoti_rotation_get (const Evas_Object *obj);
-   EAPI void                 elm_tickernoti_rotation_set (const Evas_Object *obj, int angle);
-   EAPI void                 elm_tickernoti_mode_set (const Evas_Object *obj, Elm_Tickernoti_Mode mode);
-   EAPI Elm_Tickernoti_Mode  elm_tickernoti_mode_get (const Evas_Object *obj);
-
    /* SegmentControl */
    typedef struct _Elm_Segment_Item Elm_Segment_Item;
    EAPI Evas_Object      *elm_segment_control_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
@@ -8077,6 +7840,16 @@ extern "C" {
 
    EAPI Evas_Object *elm_player_add(Evas_Object *parent);
    EAPI void elm_player_video_set(Evas_Object *player, Evas_Object *video);
+
+   // FIXME: incomplete - carousel. don't use this until this comment is removed
+   typedef struct _Elm_Carousel_Item Elm_Carousel_Item;
+   EAPI Evas_Object       *elm_carousel_add(Evas_Object *parent);
+   EAPI Elm_Carousel_Item *elm_carousel_item_add(Evas_Object *obj, Evas_Object *icon, const char *label, Evas_Smart_Cb func, const void *data);
+   EAPI void               elm_carousel_item_del(Elm_Carousel_Item *item);
+   EAPI void               elm_carousel_item_select(Elm_Carousel_Item *item);
+   /* smart callbacks called:
+    * "clicked" - when the user clicks on a carousel item and becomes selected
+    */
 
    /* datefield */
    typedef enum _Elm_Datefield_Layout
@@ -8302,6 +8075,232 @@ extern "C" {
    EAPI void         elm_searchbar_clear(Evas_Object *obj);
    EAPI void         elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary);
 
+   EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
+   EAPI void         elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count);
+   EAPI	void         elm_page_control_page_id_set(Evas_Object *obj, unsigned int page_id);
+   EAPI unsigned int elm_page_control_page_id_get(Evas_Object *obj);
+
+   /* NoContents */
+   EAPI Evas_Object *elm_nocontents_add(Evas_Object *parent);
+   EAPI void         elm_nocontents_label_set(Evas_Object *obj, const char *label);
+   EAPI const char  *elm_nocontents_label_get(const Evas_Object *obj);
+   EAPI void         elm_nocontents_custom_set(const Evas_Object *obj, Evas_Object *custom);
+   EAPI Evas_Object *elm_nocontents_custom_get(const Evas_Object *obj);
+
+   /* TickerNoti */
+   typedef enum
+     {
+        ELM_TICKERNOTI_DEFAULT,
+        ELM_TICKERNOTI_DETAILVIEW
+     } Elm_Tickernoti_Mode;
+
+   EAPI Evas_Object         *elm_tickernoti_add (Evas_Object *parent);
+   EAPI void                 elm_tickernoti_icon_set (const Evas_Object *obj, Evas_Object *icon);
+   EAPI Evas_Object         *elm_tickernoti_icon_get (const Evas_Object *obj);
+   EAPI void                 elm_tickernoti_label_set (Evas_Object *obj, const char *label);
+   EAPI const char          *elm_tickernoti_label_get (const Evas_Object *obj);
+   EAPI void                elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label);
+   EAPI const char          *elm_tickernoti_detailview_label_get (const Evas_Object *obj);
+   EAPI void                 elm_tickernoti_detailview_button_set (const Evas_Object *obj, Evas_Object *button);
+   EAPI Evas_Object         *elm_tickernoti_detailview_button_get (const Evas_Object *obj);
+   EAPI void                 elm_tickernoti_detailview_icon_set (const Evas_Object *obj, Evas_Object *icon);
+   EAPI Evas_Object         *elm_tickernoti_detailview_icon_get (const Evas_Object *obj);
+   EAPI Evas_Object         *elm_tickernoti_detailview_get (const Evas_Object *obj);
+   EAPI int                  elm_tickernoti_rotation_get (const Evas_Object *obj);
+   EAPI void                 elm_tickernoti_rotation_set (const Evas_Object *obj, int angle);
+   EAPI void                 elm_tickernoti_mode_set (const Evas_Object *obj, Elm_Tickernoti_Mode mode);
+   EAPI Elm_Tickernoti_Mode  elm_tickernoti_mode_get (const Evas_Object *obj);
+
+   /* colorpalette */
+   typedef struct _Colorpalette_Color Elm_Colorpalette_Color;
+
+   struct _Colorpalette_Color
+     {
+        unsigned int r, g, b;
+     };
+
+   EAPI Evas_Object *elm_colorpalette_add(Evas_Object *parent);
+   EAPI void         elm_colorpalette_color_set(Evas_Object *obj, int color_num, Elm_Colorpalette_Color *color);
+   EAPI void         elm_colorpalette_row_column_set(Evas_Object *obj, int row, int col);
+   /* smart callbacks called:
+    * "clicked" - when image clicked
+    */
+
+   /* editfield */
+   EAPI Evas_Object *elm_editfield_add(Evas_Object *parent);
+   EAPI void         elm_editfield_label_set(Evas_Object *obj, const char *label);
+   EAPI const char  *elm_editfield_label_get(Evas_Object *obj);
+   EAPI void         elm_editfield_guide_text_set(Evas_Object *obj, const char *text);
+   EAPI const char  *elm_editfield_guide_text_get(Evas_Object *obj);
+   EAPI Evas_Object *elm_editfield_entry_get(Evas_Object *obj);
+//   EAPI Evas_Object *elm_editfield_clear_button_show(Evas_Object *obj, Eina_Bool show);
+   EAPI void         elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon);
+   EAPI Evas_Object *elm_editfield_right_icon_get(Evas_Object *obj);
+   EAPI void         elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon);
+   EAPI Evas_Object *elm_editfield_left_icon_get(Evas_Object *obj);
+   EAPI void         elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
+   EAPI Eina_Bool    elm_editfield_entry_single_line_get(Evas_Object *obj);
+   EAPI void         elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible);
+   EAPI Eina_Bool    elm_editfield_eraser_get(Evas_Object *obj);
+   /* smart callbacks called:
+    * "clicked" - when an editfield is clicked
+    * "unfocused" - when an editfield is unfocused
+    */
+
+
+   /* Sliding Drawer */
+   typedef enum _Elm_SlidingDrawer_Pos
+     {
+        ELM_SLIDINGDRAWER_BOTTOM,
+        ELM_SLIDINGDRAWER_LEFT,
+        ELM_SLIDINGDRAWER_RIGHT,
+        ELM_SLIDINGDRAWER_TOP
+     } Elm_SlidingDrawer_Pos;
+
+   typedef struct _Elm_SlidingDrawer_Drag_Value
+     {
+        double x, y;
+     } Elm_SlidingDrawer_Drag_Value;
+
+   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_content_unset(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy);
+
+   /* multibuttonentry */
+   typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
+   typedef Eina_Bool (*Elm_Multibuttonentry_Item_Verify_Callback) (Evas_Object *obj, const char *item_label, void *item_data, void *data);
+   EAPI Evas_Object               *elm_multibuttonentry_add(Evas_Object *parent);
+   EAPI const char                *elm_multibuttonentry_label_get(Evas_Object *obj);
+   EAPI void                       elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
+   EAPI Evas_Object               *elm_multibuttonentry_entry_get(Evas_Object *obj);
+   EAPI const char *               elm_multibuttonentry_guide_text_get(Evas_Object *obj);
+   EAPI void                       elm_multibuttonentry_guide_text_set(Evas_Object *obj, const char *guidetext);
+   EAPI int                        elm_multibuttonentry_contracted_state_get(Evas_Object *obj);
+   EAPI void                       elm_multibuttonentry_contracted_state_set(Evas_Object *obj, int contracted);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *after, void *data);
+   EAPI const Eina_List           *elm_multibuttonentry_items_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_first_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_last_get(Evas_Object *obj);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_selected_get(Evas_Object *obj);
+   EAPI void                       elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item);
+   EAPI void                       elm_multibuttonentry_item_unselect_all(Evas_Object *obj);
+   EAPI void                       elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item);
+   EAPI void                       elm_multibuttonentry_items_del(Evas_Object *obj);
+   EAPI const char                *elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item);
+   EAPI void                       elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char *str);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_prev(Elm_Multibuttonentry_Item *item);
+   EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item);
+   EAPI void                      *elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item);
+   EAPI void                       elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data);
+   EAPI void                       elm_multibuttonentry_item_verify_callback_set(Evas_Object *obj, Elm_Multibuttonentry_Item_Verify_Callback func, void *data);
+   /* smart callback called:
+    * "selected" - This signal is emitted when the selected item of multibuttonentry is changed.
+    * "added" - This signal is emitted when a new multibuttonentry item is added.
+    * "deleted" - This signal is emitted when a multibuttonentry item is deleted.
+    * "expanded" - This signal is emitted when a multibuttonentry is expanded.
+    * "contracted" - This signal is emitted when a multibuttonentry is contracted.
+    * "contracted,state,changed" - This signal is emitted when the contracted state of multibuttonentry is changed.
+    * "item,selected" - This signal is emitted when the selected item of multibuttonentry is changed.
+    * "item,added" - This signal is emitted when a new multibuttonentry item is added.
+    * "item,deleted" - This signal is emitted when a multibuttonentry item is deleted.
+    * "item,clicked" - This signal is emitted when a multibuttonentry item is clicked.
+    * "clicked" - This signal is emitted when a multibuttonentry is clicked.
+    * "unfocused" - This signal is emitted when a multibuttonentry is unfocused.
+    */
+   /* available styles:
+    * default
+    */
+
+   /* stackedicon */
+   typedef struct _Stackedicon_Item Elm_Stackedicon_Item;
+   EAPI Evas_Object          *elm_stackedicon_add(Evas_Object *parent);
+   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const char *path);
+   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const char *path);
+   EAPI void                  elm_stackedicon_item_del(Elm_Stackedicon_Item *it);
+   EAPI Eina_List            *elm_stackedicon_item_list_get(Evas_Object *obj);
+   /* smart callback called:
+    * "expanded" - This signal is emitted when a stackedicon is expanded.
+    * "clicked" - This signal is emitted when a stackedicon is clicked.
+    */
+   /* available styles:
+    * default
+    */
+
+   /* dialoguegroup */
+   typedef struct _Dialogue_Item Dialogue_Item;
+
+   typedef enum _Elm_Dialoguegourp_Item_Style
+     {
+        ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT = 0,
+        ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE = (1 << 1),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE = (1 << 2),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN = (1 << 3),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW = (1 << 4),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_NO_BG = (1 << 5),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_SUB = (1 << 6),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT = (1 << 7),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_MERGE = (1 << 8),
+        ELM_DIALOGUEGROUP_ITEM_STYLE_LAST = (1 << 9)
+     } Elm_Dialoguegroup_Item_Style;
+
+   EINA_DEPRECATED EAPI Evas_Object   *elm_dialoguegroup_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);
+   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);
+   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *after, Elm_Dialoguegroup_Item_Style style);
+   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *before, Elm_Dialoguegroup_Item_Style style);
+   EINA_DEPRECATED EAPI void           elm_dialoguegroup_remove(Dialogue_Item *item);
+   EINA_DEPRECATED EAPI void           elm_dialoguegroup_remove_all(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void           elm_dialoguegroup_title_set(Evas_Object *obj, const char *title);
+   EINA_DEPRECATED EAPI const char    *elm_dialoguegroup_title_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void           elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press);
+   EINA_DEPRECATED EAPI Eina_Bool      elm_dialoguegroup_press_effect_get(Dialogue_Item *item);
+   EINA_DEPRECATED EAPI Evas_Object   *elm_dialoguegroup_item_content_get(Dialogue_Item *item);
+   EINA_DEPRECATED EAPI void	       elm_dialoguegroup_item_style_set(Dialogue_Item *item, Elm_Dialoguegroup_Item_Style style);
+   EINA_DEPRECATED EAPI Elm_Dialoguegroup_Item_Style	elm_dialoguegroup_item_style_get(Dialogue_Item *item);
+   EINA_DEPRECATED EAPI void           elm_dialoguegroup_item_disabled_set(Dialogue_Item *item, Eina_Bool disabled);
+   EINA_DEPRECATED EAPI Eina_Bool      elm_dialoguegroup_item_disabled_get(Dialogue_Item *item);
+
+   /* Dayselector */
+   typedef enum
+     {
+        ELM_DAYSELECTOR_SUN,
+        ELM_DAYSELECTOR_MON,
+        ELM_DAYSELECTOR_TUE,
+        ELM_DAYSELECTOR_WED,
+        ELM_DAYSELECTOR_THU,
+        ELM_DAYSELECTOR_FRI,
+        ELM_DAYSELECTOR_SAT
+     } Elm_DaySelector_Day;
+
+   EAPI Evas_Object *elm_dayselector_add(Evas_Object *parent);
+   EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
+   EAPI void         elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked);
+
+   /* Image Slider */
+   typedef struct _Imageslider_Item Elm_Imageslider_Item;
+   typedef void (*Elm_Imageslider_Cb)(void *data, Evas_Object *obj, void *event_info);
+   EAPI Evas_Object           *elm_imageslider_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data) EINA_ARG_NONNULL(1);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, unsigned int index, void *data) EINA_ARG_NONNULL(1);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_prepend(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data) EINA_ARG_NONNULL(1);
+   EAPI void                   elm_imageslider_item_del(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_selected_item_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool              elm_imageslider_item_selected_get(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
+   EAPI void                   elm_imageslider_item_selected_set(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
+   EAPI const char            *elm_imageslider_item_photo_file_get(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_prev(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
+   EAPI Elm_Imageslider_Item  *elm_imageslider_item_next(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
+   EAPI void                   elm_imageslider_prev(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                   elm_imageslider_next(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                   elm_imageslider_item_photo_file_set(Elm_Imageslider_Item *it, const char *photo_file) EINA_ARG_NONNULL(1,2);
+   EAPI void                   elm_imageslider_item_update(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
 #ifdef __cplusplus
 }
 #endif
