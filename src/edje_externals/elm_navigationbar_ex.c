@@ -39,7 +39,7 @@ external_navigationbar_ex_param_set(void *data __UNUSED__, Evas_Object *obj, con
 }
 
 static Eina_Bool
-external_navigationbar_ex_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_External_Param *param)
+external_navigationbar_ex_param_get(void *data __UNUSED__, const Evas_Object *obj __UNUSED__, Edje_External_Param *param)
 {
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -71,7 +71,7 @@ external_navigationbar_ex_params_parse(void *data __UNUSED__, Evas_Object *obj _
 }
 
 static Evas_Object *external_navigationbar_ex_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
 	ERR("so content");
 	return NULL;
