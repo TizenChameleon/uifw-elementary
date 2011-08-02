@@ -3557,12 +3557,6 @@ extern "C" {
    EAPI void         elm_entry_text_filter_remove(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data) EINA_ARG_NONNULL(1, 2);
    EAPI char        *elm_entry_markup_to_utf8(const char *s) EINA_MALLOC EINA_WARN_UNUSED_RESULT;
    EAPI char        *elm_entry_utf8_to_markup(const char *s) EINA_MALLOC EINA_WARN_UNUSED_RESULT;
-   EINA_DEPRECATED EAPI void         elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w);
-   EINA_DEPRECATED EAPI Evas_Coord   elm_entry_wrap_width_get(const Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_entry_fontsize_set(Evas_Object *obj, int fontsize);
-   EINA_DEPRECATED EAPI void         elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
-   EINA_DEPRECATED EAPI void         elm_entry_text_align_set(Evas_Object *obj, const char *alignmode);
-   EAPI void         elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
    EAPI void         elm_entry_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_file_get(const Evas_Object *obj, const char **file, Elm_Text_Format *format) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_file_save(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -3570,15 +3564,6 @@ extern "C" {
    EAPI Eina_Bool    elm_entry_autosave_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool    elm_entry_cnp_textonly_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void         elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
-   EAPI void         elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
-   EAPI void         elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
-   EAPI void         elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled);
-   EAPI void         elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
-   EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj);
-   EAPI void         elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_sensitive);
-   EAPI Eina_Bool    elm_entry_is_empty(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void         elm_entry_magnifier_type_set(Evas_Object *obj, int type) EINA_ARG_NONNULL(1);
    EAPI void         elm_entry_scrollable_set(Evas_Object *obj, Eina_Bool scroll);
    EAPI Eina_Bool    elm_entry_scrollable_get(const Evas_Object *obj);
    EAPI void         elm_entry_icon_set(Evas_Object *obj, Evas_Object *icon);
@@ -3608,6 +3593,22 @@ extern "C" {
         const char *rejected;
      };
    EAPI void         elm_entry_filter_accept_set(void *data, Evas_Object *entry, char **text) EINA_ARG_NONNULL(1, 3);
+   EAPI void         elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
+   EAPI void         elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
+   EAPI void         elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
+   EAPI void         elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
+   EAPI void         elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled);
+   EAPI void         elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
+   EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj);
+   EAPI void         elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_sensitive);
+   EAPI void         elm_entry_magnifier_type_set(Evas_Object *obj, int type) EINA_ARG_NONNULL(1);
+
+   EINA_DEPRECATED EAPI void         elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w);
+   EINA_DEPRECATED EAPI Evas_Coord   elm_entry_wrap_width_get(const Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_entry_fontsize_set(Evas_Object *obj, int fontsize);
+   EINA_DEPRECATED EAPI void         elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
+   EINA_DEPRECATED EAPI void         elm_entry_text_align_set(Evas_Object *obj, const char *alignmode);
+
    /* smart callbacks called:
     * "changed" - the text content changed
     * "selection,start" - the user started selecting text
