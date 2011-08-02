@@ -91,7 +91,6 @@ static void _change_current_button(Evas_Object *obj, Evas_Object *btn);
 static void _button_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _del_button_obj(Evas_Object *obj, Evas_Object *btn);
 static void _del_button_item(Elm_Multibuttonentry_Item *item);
-static void _del_button(Evas_Object *obj);
 static void _select_button(Evas_Object *obj, Evas_Object *btn);
 static Elm_Multibuttonentry_Item* _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, const Elm_Multibuttonentry_Item *reference, void *data);
 static void _add_button(Evas_Object *obj, char *str);
@@ -99,8 +98,8 @@ static void _evas_mbe_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *eve
 static void _entry_changed_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _entry_key_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _entry_focus_in_cb(void *data, Evas *e, __UNUSED__ void *event_info);
-static void _entry_focus_out_cb(void *data, Evas *e, __UNUSED__ void *event_info);
+static void _entry_focus_in_cb(void *data, Evas_Object *obj, void *event_info);
+static void _entry_focus_out_cb(void *data, Evas_Object *obj, void *event_info);
 static void _view_init(Evas_Object *obj);
 static void _set_vis_guidetext(Evas_Object *obj);
 static void _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv);
@@ -177,7 +176,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 }
 
 static Eina_Bool
-_event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
+_event_hook(Evas_Object *obj __UNUSED__, Evas_Object *src __UNUSED__, Evas_Callback_Type type __UNUSED__, void *event_info __UNUSED__)
 {
    return EINA_TRUE;
 }
@@ -211,7 +210,7 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void
-_signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+_signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if(!wd || !wd->base) return;
@@ -224,7 +223,7 @@ _signal_mouse_clicked(void *data, Evas_Object *obj, const char *emission, const 
 }
 
 static void
-_changed_size_hint_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
+_changed_size_hint_cb(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
 {
    Evas_Object *eo = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get(data);
@@ -233,7 +232,7 @@ _changed_size_hint_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 }
 
 static void
-_resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
+_resize_cb(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord w, h;
@@ -243,7 +242,6 @@ _resize_cb(void *data, Evas *evas, Evas_Object *obj, void *event)
 
    if (wd->h_box < h) evas_object_smart_callback_call (data, "expanded", NULL);
    else if (wd->h_box > h) evas_object_smart_callback_call (data, "contracted", NULL);
-   else ;
 
    wd->w_box = w;
    wd->h_box = h;
@@ -635,7 +633,7 @@ _change_current_button(Evas_Object *obj, Evas_Object *btn)
 }
 
 static void
-_button_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
+_button_clicked(void *data, Evas_Object *obj, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
@@ -702,8 +700,6 @@ static void
 _select_button(Evas_Object *obj, Evas_Object *btn)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Elm_Multibuttonentry_Item *item;
-
    if (!wd) return;
 
    if (btn)
@@ -758,7 +754,7 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
    Elm_Multibuttonentry_Item *item;
    Evas_Object *btn;
    Evas_Coord width, height;
-   const char *str_utf8 = NULL;
+   char *str_utf8 = NULL;
 
    Widget_Data *wd = elm_widget_data_get(obj);
 
@@ -903,7 +899,7 @@ _add_button(Evas_Object *obj, char *str)
 }
 
 static void
-_evas_mbe_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_evas_mbe_key_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Elm_Multibuttonentry_Item *item = NULL;
@@ -928,7 +924,8 @@ _evas_mbe_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
                   elm_object_focus(wd->entry);
                }
           }
-        else if (((!wd->current) && (wd->n_str == 0) && (strcmp (ev->keyname, "BackSpace") == 0) || (strcmp (ev->keyname, "BackSpace (") == 0)))
+        else if ((((!wd->current) && (wd->n_str == 0) && (strcmp (ev->keyname, "BackSpace") == 0))
+                  || (strcmp (ev->keyname, "BackSpace (") == 0)))
           {
              item = eina_list_data_get(eina_list_last(wd->items));
              if (item)
@@ -940,7 +937,7 @@ _evas_mbe_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_entry_key_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_entry_key_down_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Key_Down *ev = (Evas_Event_Key_Down *)event_info;
@@ -952,7 +949,7 @@ _entry_key_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_entry_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_entry_key_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *) event_info;
@@ -972,7 +969,7 @@ _entry_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_entry_focus_in_cb(void *data, Evas *e, __UNUSED__ void *event_info)
+_entry_focus_in_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -981,7 +978,7 @@ _entry_focus_in_cb(void *data, Evas *e, __UNUSED__ void *event_info)
 }
 
 static void
-_entry_focus_out_cb(void *data, Evas *e, __UNUSED__ void *event_info)
+_entry_focus_out_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -996,7 +993,7 @@ _entry_focus_out_cb(void *data, Evas *e, __UNUSED__ void *event_info)
 }
 
 static void
-_entry_changed_cb(void *data, Evas_Object *obj, void *event_info)
+_entry_changed_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -1020,7 +1017,7 @@ _view_init(Evas_Object *obj)
         if (! (wd->box = elm_box_add (obj))) return;
         elm_widget_sub_object_add(obj, wd->box);
         elm_box_layout_set(wd->box, _box_layout_cb, NULL, NULL);
-        elm_box_homogenous_set(wd->box, EINA_FALSE);
+        elm_box_homogeneous_set(wd->box, EINA_FALSE);
         edje_object_part_swallow(wd->base, "box.swallow", wd->box);
      }
 
@@ -1169,7 +1166,7 @@ _calculate_item_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj
 }
 
 static void
-_box_layout_cb(Evas_Object *o, Evas_Object_Box_Data *priv, void *data)
+_box_layout_cb(Evas_Object *o, Evas_Object_Box_Data *priv, void *data __UNUSED__)
 {
    Evas_Coord x, y, w, h, xx, yy;
    const Eina_List *l;
