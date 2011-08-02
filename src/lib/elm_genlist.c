@@ -3504,6 +3504,14 @@ _item_new(Widget_Data                  *wd,
    it->mouse_cursor = NULL;
    it->expanded_depth = 0;
    it->num = ++wd->total_num;   // todo : remove
+
+   if (it->parent)
+     {
+        if (it->parent->flags & ELM_GENLIST_ITEM_GROUP)
+          it->group_item = parent;
+        else if (it->parent->group_item)
+          it->group_item = it->parent->group_item;
+     }
    return it;
 }
 
@@ -3801,11 +3809,6 @@ elm_genlist_item_append(Evas_Object                  *obj,
                                       EINA_INLIST_GET(it2));
         it->rel = it2;
         it->rel->relcount++;
-
-        if (it->parent->flags & ELM_GENLIST_ITEM_GROUP)
-          it->group_item = parent;
-        else if (it->parent->group_item)
-          it->group_item = it->parent->group_item;
      }
    it->before = EINA_FALSE;
    _item_queue(wd, it);
@@ -3905,7 +3908,17 @@ elm_genlist_item_insert_before(Evas_Object                  *obj,
    Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func,
                                     func_data);
    if (!it) return NULL;
-   if (it->parent)
+   /* It makes no sense to insert before in an empty list with before != NULL, something really bad is happening in your app. */
+   EINA_SAFETY_ON_NULL_RETURN_VAL(wd->items, NULL);
+
+   if (!it->parent)
+     {
+        if ((flags & ELM_GENLIST_ITEM_GROUP) &&
+            (before->flags & ELM_GENLIST_ITEM_GROUP))
+          wd->group_items = eina_list_prepend_relative(wd->group_items, it,
+                                                       before);
+     }
+   else
      {
         it->parent->items = eina_list_prepend_relative(it->parent->items, it,
                                                        before);
@@ -3953,13 +3966,23 @@ elm_genlist_item_insert_after(Evas_Object                  *obj,
    Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func,
                                     func_data);
    if (!it) return NULL;
-   wd->items = eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
-                                           EINA_INLIST_GET(after));
-   if (it->parent)
+   /* It makes no sense to insert after in an empty list with after != NULL, something really bad is happening in your app. */
+   EINA_SAFETY_ON_NULL_RETURN_VAL(wd->items, NULL);
+
+   if (!it->parent)
+     {
+        if ((flags & ELM_GENLIST_ITEM_GROUP) &&
+            (after->flags & ELM_GENLIST_ITEM_GROUP))
+          wd->group_items = eina_list_append_relative(wd->group_items, it,
+                                                      after);
+     }
+   else
      {
         it->parent->items = eina_list_append_relative(it->parent->items, it,
                                                       after);
      }
+   wd->items = eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
+                                           EINA_INLIST_GET(after));
    it->rel = after;
    it->rel->relcount++;
    it->before = EINA_FALSE;
