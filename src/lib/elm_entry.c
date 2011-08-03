@@ -135,6 +135,7 @@ struct _Widget_Data
    /* Only for clipboard */
    const char *cut_sel;
    const char *text;
+   const char *password_text;
    Evas_Coord wrap_w;
    const char *file;
    Elm_Text_Format format;
@@ -589,6 +590,7 @@ _del_hook(Evas_Object *obj)
 #endif
    if (wd->cut_sel) eina_stringshare_del(wd->cut_sel);
    if (wd->text) eina_stringshare_del(wd->text);
+   if (wd->password_text) eina_stringshare_del(wd->password_text);
    if (wd->bg) evas_object_del(wd->bg);
    if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
    if (wd->append_text_idler)
@@ -1824,6 +1826,8 @@ _entry_changed_common_handling(void *data, const char *event)
    _sizing_eval(data);
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
+   if (wd->password_text) eina_stringshare_del(wd->password_text);
+   wd->password_text = NULL;
    _check_enable_returnkey(data);
    evas_object_smart_callback_call(data, event, NULL);
    if (wd->delay_write)
@@ -2485,6 +2489,8 @@ _text_append_idler(void *data)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
+   if (wd->password_text) eina_stringshare_del(wd->password_text);
+   wd->password_text = NULL;
    wd->changed = EINA_TRUE;
 
    start = wd->append_text_position;
@@ -2602,6 +2608,8 @@ _elm_entry_text_set(Evas_Object *obj, const char *item, const char *entry)
    if (!entry) entry = "";
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
+   if (wd->password_text) eina_stringshare_del(wd->password_text);
+   wd->password_text = NULL;
    wd->changed = EINA_TRUE;
 
    /* Clear currently pending job if there is one */
@@ -2644,12 +2652,13 @@ _elm_entry_text_get(const Evas_Object *obj, const char *item)
    if (item && strcmp(item, "default")) return NULL;
    const char *text;
    if (!wd) return NULL;
-   if (wd->text)
+   if (wd->password)
      {
-        if (wd->password)
-          return elm_entry_markup_to_utf8(wd->text);
-        else
-          return wd->text;
+        if(wd->password_text) return wd->password_text;
+     }
+   else if (wd->text) 
+     {
+        return wd->text;
      }
    text = edje_object_part_text_get(wd->ent, "elm.text");
    if (!text)
@@ -2658,7 +2667,17 @@ _elm_entry_text_get(const Evas_Object *obj, const char *item)
         return NULL;
      }
    eina_stringshare_replace(&wd->text, text);
-   if (wd->password) return elm_entry_markup_to_utf8(wd->text);
+   if (wd->password)
+     {
+        const char *pw_text;
+        pw_text = elm_entry_markup_to_utf8(wd->text);
+        if (pw_text)
+          {
+             eina_stringshare_replace(&wd->password_text, pw_text);
+             free(pw_text);
+             return wd->password_text;
+          }
+     }
    return wd->text;
 }
 
