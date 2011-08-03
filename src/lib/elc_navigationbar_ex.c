@@ -418,7 +418,7 @@ _process_deletions(Widget_Data *wd)
 }
 
 static void
-_switch_titleobj_visibility(void *data, Evas_Object *obj , const char *emission, const char *source)
+_switch_titleobj_visibility(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Elm_Navigationbar_ex_Item *item = (Elm_Navigationbar_ex_Item *)data;
    if(!item) return;
