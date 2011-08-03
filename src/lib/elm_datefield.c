@@ -342,6 +342,7 @@ _diskselector_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info)
              edje_object_signal_emit(wd->base,"elm,state,min,focus,out", "elm");
              _date_update(data);
           }
+        evas_object_smart_callback_call(data, "changed", NULL);
      }
 }
 
