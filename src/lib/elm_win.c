@@ -2582,7 +2582,7 @@ elm_win_inwin_activate(Evas_Object *obj)
    evas_object_raise(obj);
    evas_object_show(obj);
    edje_object_signal_emit(wd->frm, "elm,action,show", "elm");
-   elm_object_focus(obj);
+   elm_object_focus_set(obj, EINA_TRUE);
 }
 
 EAPI void
