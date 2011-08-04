@@ -195,6 +195,7 @@ static void
 _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+
    Evas_Coord minw = -1, minh = -1;
    Evas_Coord left, right, top, bottom;
    if (!wd) return;
@@ -283,13 +284,14 @@ static void
 _set_vis_guidetext(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
 
    elm_box_unpack(wd->box, wd->guidetext);
    elm_box_unpack(wd->box, wd->entry);
    if (wd->view_state == MULTIBUTTONENTRY_VIEW_CONTRACTED) return;
 
-   if (wd && !eina_list_count(wd->items) && wd->guidetext
-       && !elm_widget_focus_get(obj) && !wd->focused)
+   if (wd && (!eina_list_count(wd->items)) && wd->guidetext
+       && (!elm_widget_focus_get(obj)) && (!wd->focused) && (!wd->n_str))
      {
         evas_object_hide(wd->entry);
         elm_box_pack_end(wd->box, wd->guidetext);
@@ -316,8 +318,6 @@ _contracted_state_set(Evas_Object *obj, int contracted)
    Eina_List *l;
    Elm_Multibuttonentry_Item *item;
    if (!wd || !wd->box) return;
-
-   elm_entry_entry_set(wd->entry, "");
 
    if (wd->view_state == MULTIBUTTONENTRY_VIEW_ENTRY)
      evas_object_hide(wd->entry);
@@ -766,6 +766,9 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
 
    if ((wd->add_callback) && !wd->add_callback(obj, str, data, wd->add_callback_data)) return NULL;
 
+   //entry is cleared when text is made to button
+   elm_entry_entry_set(wd->entry, "");
+
    // add button
    btn = edje_object_add(evas_object_evas_get(obj));
    str_utf8 = elm_entry_markup_to_utf8(str);
@@ -894,9 +897,6 @@ _add_button(Evas_Object *obj, char *str)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-
-   //remove entry text
-   elm_entry_entry_set(wd->entry, "");
 
    // add button
    _add_button_item(obj, str, MULTIBUTONENTRY_POS_END, NULL, NULL);
