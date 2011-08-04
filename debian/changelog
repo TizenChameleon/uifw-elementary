@@ -1,11 +1,3 @@
-elementary (1.0.0+svn.61256slp2+build11) unstable; urgency=low
-
-  * Upload Package
-  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
-  * Tag: elementary_1.0.0+svn.61256slp2+build11
-
- -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 04 Aug 2011 12:41:32 +0900
-
 elementary (1.0.0+svn.61256slp2+build10) unstable; urgency=low
 
   * Upload Package
