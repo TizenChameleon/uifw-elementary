@@ -1,3 +1,16 @@
+elementary (1.0.0+svn.61256slp2+build11) unstable; urgency=low
+
+  * Package Upload.
+  * [Genlist] Upstream merge r61980, 61981. Fixed item addition routine for group child items.
+  * [Genlist] Add barrier at evas_object_del in sel cb. 
+  * [Multibuttonentry] fix logic: Multibuttonentry remains a text basically except to succeed making button.
+  * [Datefield] Changed callback is called during ctxpopup item selection.
+  * [Entry] Prevent defect fix, free return value from markup_to_text.
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build11
+
+ -- DanielJuyungSeo <juyung.seo@samsung.com>  Thu, 04 Aug 2011 15:18:55 +0900
+
 elementary (1.0.0+svn.61256slp2+build10) unstable; urgency=low
 
   * Upload Package
