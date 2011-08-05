@@ -140,6 +140,7 @@ void test_glview_simple(void *data, Evas_Object *obj, void *event_info);
 void test_glview(void *data, Evas_Object *obj, void *event_info);
 void test_3d(void *data, Evas_Object *obj, void *event_info);
 void test_naviframe(void *data, Evas_Object *obj, void *event_info);
+void test_factory(void *data, Evas_Object *obj, void *event_info);
 #ifdef HAVE_EIO
 void test_eio(void *data, Evas_Object *obj, void *event_info);
 #endif
@@ -424,6 +425,7 @@ my_win_main(char *autorun, Eina_Bool test_win_only)
 #ifdef HAVE_ELEMENTARY_WEB
    ADD_TEST("Web", test_web);
 #endif
+   ADD_TEST("Factory", test_factory);
 #undef ADD_TEST
 
    if (autorun)
