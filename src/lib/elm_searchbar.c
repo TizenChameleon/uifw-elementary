@@ -16,13 +16,14 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
 {
-   Evas_Object *base, *eb, *cancel_btn;
+   Evas_Object *base, *ef, *cancel_btn;
    Eina_Bool cancel_btn_ani_flag;
    Eina_Bool cancel_btn_show_mode;
    Eina_Bool boundary_mode;
    Ecore_Idler *idler;
 };
 
+static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _on_focus_hook(void *data, Evas_Object *obj);
@@ -50,13 +51,13 @@ static void _theme_hook(Evas_Object *obj)
 
    _elm_theme_object_set(obj, wd->base, "searchbar", "base", elm_widget_style_get(obj));
 
-   if (wd->eb)
-     edje_object_part_swallow(wd->base, "search_textfield", wd->eb);
+   if (wd->ef)
+     edje_object_part_swallow(wd->base, "search_textfield", wd->ef);
    if (wd->cancel_btn)
      edje_object_part_swallow(wd->base, "button_cancel", wd->cancel_btn);
 
    snprintf(buf, sizeof(buf), "searchbar/%s", elm_widget_style_get(obj));
-   elm_object_style_set(wd->eb, buf);
+   elm_object_style_set(wd->ef, buf);
 
    snprintf(buf, sizeof(buf), "searchbar/%s", elm_widget_style_get(obj));
    elm_object_style_set(wd->cancel_btn, buf);
@@ -134,9 +135,9 @@ static void _cancel_clicked(void *data, Evas_Object *obj __UNUSED__,
    if (!wd) return;
 
    const char* text;
-   text = elm_entry_entry_get(elm_editfield_entry_get(wd->eb));
+   text = elm_entry_entry_get(elm_editfield_entry_get(wd->ef));
    if (text != NULL && strlen(text) > 0)
-     elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
+     elm_entry_entry_set(elm_editfield_entry_get(wd->ef), NULL);
 
    evas_object_smart_callback_call(data, "cancel,clicked", NULL);
    elm_object_unfocus(data);
@@ -179,11 +180,9 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    Widget_Data *wd;
    char buf[4096];
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (e == NULL) return NULL;
-   obj = elm_widget_add(e);
-   if (obj == NULL) return NULL;
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
+
+   ELM_SET_WIDTYPE(widtype, "searchbar");
    elm_widget_type_set(obj, "searchbar");
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
@@ -198,20 +197,19 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default");
 
    // Add Entry
-   wd->eb = elm_editfield_add(parent);
-   snprintf(buf, sizeof(buf), "searchbar/%s", elm_widget_style_get(obj));
-   elm_object_style_set(wd->eb, buf);
+   wd->ef = elm_editfield_add(parent);
+   elm_object_style_set(wd->ef, "searchbar/default");
 
-   edje_object_part_swallow(wd->base, "search_textfield", wd->eb);
-//   elm_editfield_guide_text_set(wd->eb, "Search");
-   elm_editfield_entry_single_line_set(wd->eb, EINA_TRUE);
-   elm_editfield_eraser_set(wd->eb, EINA_TRUE);
-   evas_object_smart_callback_add(wd->eb, "clicked", _clicked, obj);
-   evas_object_smart_callback_add(elm_editfield_entry_get(wd->eb), "changed", _changed, obj);
+   edje_object_part_swallow(wd->base, "search_textfield", wd->ef);
+//   elm_editfield_guide_text_set(wd->ef, "Search");
+   elm_editfield_entry_single_line_set(wd->ef, EINA_TRUE);
+   elm_editfield_eraser_set(wd->ef, EINA_TRUE);
+   evas_object_smart_callback_add(wd->ef, "clicked", _clicked, obj);
+   evas_object_smart_callback_add(elm_editfield_entry_get(wd->ef), "changed", _changed, obj);
    edje_object_signal_callback_add(wd->base, "mouse,up,1", "*", _basebg_clicked, obj);
    edje_object_signal_callback_add(wd->base, "elm,action,click", "", _searchsymbol_clicked, obj);
 
-   elm_widget_sub_object_add(obj, wd->eb);
+   elm_widget_sub_object_add(obj, wd->ef);
 
    // Add Button
    wd->cancel_btn = elm_button_add(parent);
@@ -245,10 +243,11 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
  */
 EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   elm_entry_entry_set(elm_editfield_entry_get(wd->eb), entry);
+   elm_entry_entry_set(elm_editfield_entry_get(wd->ef), entry);
 }
 
 /**
@@ -261,10 +260,11 @@ EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
  */
 EAPI const char* elm_searchbar_text_get(Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   return elm_entry_entry_get(elm_editfield_entry_get(wd->eb));
+   return elm_entry_entry_get(elm_editfield_entry_get(wd->ef));
 }
 
 /**
@@ -277,10 +277,28 @@ EAPI const char* elm_searchbar_text_get(Evas_Object *obj)
  */
 EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   return elm_editfield_entry_get(wd->eb);
+   return elm_editfield_entry_get(wd->ef);
+}
+
+/**
+ * get the pointer of editfield
+ *
+ * @param obj The searchbar object
+ * @return the editfield object
+ *
+ * @ingroup Searchbar
+ */
+EAPI Evas_Object *elm_searchbar_editfield_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd || !wd->ef) return NULL;
+
+   return wd->ef;
 }
 
 /**
@@ -294,6 +312,7 @@ EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
  */
 EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
@@ -312,6 +331,7 @@ EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool 
  */
 EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
@@ -338,6 +358,7 @@ EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
  */
 EAPI void elm_searchbar_clear(Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
@@ -348,7 +369,7 @@ EAPI void elm_searchbar_clear(Evas_Object *obj)
         else
            edje_object_signal_emit(wd->base, "CANCELHIDE", "PROG");
      }
-//   elm_entry_entry_set(elm_editfield_entry_get(wd->eb), NULL);
+//   elm_entry_entry_set(elm_editfield_entry_get(wd->ef), NULL);
 }
 
 /**
@@ -362,6 +383,7 @@ EAPI void elm_searchbar_clear(Evas_Object *obj)
  */
 EAPI void elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
