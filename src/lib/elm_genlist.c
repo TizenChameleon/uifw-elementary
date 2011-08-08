@@ -1,263 +1,11 @@
+#include <assert.h>
 #include <Elementary.h>
 #include <Elementary_Cursor.h>
 #include "elm_priv.h"
 
 #define SWIPE_MOVES         12
 #define MAX_ITEMS_PER_BLOCK 32
-
-/**
- * @defgroup Genlist Genlist
- *
- * The aim was to have more expansive list than the simple list in
- * Elementary that could have more flexible items and allow many more entries
- * while still being fast and low on memory usage. At the same time it was
- * also made to be able to do tree structures. But the price to pay is more
- * complex when it comes to usage. If all you want is a simple list with
- * icons and a single label, use the normal List object.
- *
- * Genlist has a fairly large API, mostly because it's relatively complex,
- * trying to be both expansive, powerful and efficient. First we will begin
- * an overview on the theory behind genlist.
- *
- * Evas tracks every object you create. Every time it processes an event
- * (mouse move, down, up etc.) it needs to walk through objects and find out
- * what event that affects. Even worse every time it renders display updates,
- * in order to just calculate what to re-draw, it needs to walk through many
- * many many objects. Thus, the more objects you keep active, the more
- * overhead Evas has in just doing its work. It is advisable to keep your
- * active objects to the minimum working set you need. Also remember that
- * object creation and deletion carries an overhead, so there is a
- * middle-ground, which is not easily determined. But don't keep massive lists
- * of objects you can't see or use. Genlist does this with list objects. It
- * creates and destroys them dynamically as you scroll around. It groups them
- * into blocks so it can determine the visibility etc. of a whole block at
- * once as opposed to having to walk the whole list. This 2-level list allows
- * for very large numbers of items to be in the list (tests have used up to
- * 2,000,000 items). Also genlist employs a queue for adding items. As items
- * may be different sizes, every item added needs to be calculated as to its
- * size and thus this presents a lot of overhead on populating the list, this
- * genlist employs a queue. Any item added is queued and spooled off over
- * time, actually appearing some time later, so if your list has many members
- * you may find it takes a while for them to all appear, with your process
- * consuming a lot of CPU while it is busy spooling.
- *
- * Genlist also implements a tree structure, but it does so with callbacks to
- * the application, with the application filling in tree structures when
- * requested (allowing for efficient building of a very deep tree that could
- * even be used for file-management). See the above smart signal callbacks for
- * details.
- *
- * An item in the genlist world can have 0 or more text labels (they can be
- * regular text or textblock - that's up to the style to determine), 0 or
- * more icons (which are simply objects swallowed into the genlist item) and
- * 0 or more boolean states that can be used for check, radio or other
- * indicators by the edje theme style. An item may be one of several styles
- * (Elementary provides 4 by default - "default", "double_label", "group_index"
- * and "icon_top_text_bottom", but this can be extended by system or
- * application custom themes/overlays/extensions).
- *
- * In order to implement the ability to add and delete items on the fly,
- * Genlist implements a class/callback system where the application provides
- * a structure with information about that type of item (genlist may contain
- * multiple different items with different classes, states and styles).
- * Genlist will call the functions in this struct (methods) when an item is
- * "realized" (that is created dynamically while scrolling). All objects will
- * simply be deleted  when no longer needed with evas_object_del(). The
- * Elm_Genlist_Item_Class structure contains the following members:
- *
- * item_style - This is a constant string and simply defines the name of the
- * item style. It must be specified and the default should be "default".
- *
- * func.label_get - This function is called when an actual item object is
- * created. The data parameter is the data parameter passed to
- * elm_genlist_item_append() and related item creation functions. The obj
- * parameter is the genlist object and the part parameter is the string name
- * of the text part in the edje design that is listed as one of the possible
- * labels that can be set. This function must return a strudup()'ed string as
- * the caller will free() it when done.
- *
- * func.icon_get - This function is called when an actual item object is
- * created. The data parameter is the data parameter passed to
- * elm_genlist_item_append() and related item creation functions. The obj
- * parameter is the genlist object and the part parameter is the string name
- * of the icon part in the edje design that is listed as one of the possible
- * icons that can be set. This must return NULL for no object or a valid
- * object. The object will be deleted by genlist on shutdown or when the item
- * is unrealized.
- *
- * func.state_get - This function is called when an actual item object is
- * created. The data parameter is the data parameter passed to
- * elm_genlist_item_append() and related item creation functions. The obj
- * parameter is the genlist object and the part parameter is the string name
- * of the state part in the edje design that is listed as one of the possible
- * states that can be set. Return 0 for false or 1 for true. Genlist will
- * emit a signal to the edje object with "elm,state,XXX,active" "elm" when
- * true (the default is false), where XXX is the name of the part.
- *
- * func.del - This is called when elm_genlist_item_del() is called on an
- * item, elm_genlist_clear() is called on the genlist, or
- * elm_genlist_item_subitems_clear() is called to clear sub-items. This is
- * intended for use when actual genlist items are deleted, so any backing
- * data attached to the item (e.g. its data parameter on creation) can be
- * deleted.
- *
- * Items can be added by several calls. All of them return a Elm_Genlist_Item
- * handle that is an internal member inside the genlist. They all take a data
- * parameter that is meant to be used for a handle to the applications
- * internal data (eg the struct with the original item data). The parent
- * parameter is the parent genlist item this belongs to if it is a tree or
- * an indexed group, and NULL if there is no parent. The flags can be a bitmask
- * of ELM_GENLIST_ITEM_NONE, ELM_GENLIST_ITEM_SUBITEMS and
- * ELM_GENLIST_ITEM_GROUP. If ELM_GENLIST_ITEM_SUBITEMS is set then this item
- * is displayed as an item that is able to expand and have child items.
- * If ELM_GENLIST_ITEM_GROUP is set then this item is group idex item that is
- * displayed at the top until the next group comes. The func parameter is a
- * convenience callback that is called when the item is selected and the data
- * parameter will be the func_data parameter, obj be the genlist object and
- * event_info will be the genlist item.
- *
- * elm_genlist_item_append() appends an item to the end of the list, or if
- * there is a parent, to the end of all the child items of the parent.
- * elm_genlist_item_prepend() is the same but prepends to the beginning of
- * the list or children list. elm_genlist_item_insert_before() inserts at
- * item before another item and elm_genlist_item_insert_after() inserts after
- * the indicated item.
- *
- * The application can clear the list with elm_genlist_clear() which deletes
- * all the items in the list and elm_genlist_item_del() will delete a specific
- * item. elm_genlist_item_subitems_clear() will clear all items that are
- * children of the indicated parent item.
- *
- * If the application wants multiple items to be able to be selected,
- * elm_genlist_multi_select_set() can enable this. If the list is
- * single-selection only (the default), then elm_genlist_selected_item_get()
- * will return the selected item, if any, or NULL I none is selected. If the
- * list is multi-select then elm_genlist_selected_items_get() will return a
- * list (that is only valid as long as no items are modified (added, deleted,
- * selected or unselected)).
- *
- * To help inspect list items you can jump to the item at the top of the list
- * with elm_genlist_first_item_get() which will return the item pointer, and
- * similarly elm_genlist_last_item_get() gets the item at the end of the list.
- * elm_genlist_item_next_get() and elm_genlist_item_prev_get() get the next
- * and previous items respectively relative to the indicated item. Using
- * these calls you can walk the entire item list/tree. Note that as a tree
- * the items are flattened in the list, so elm_genlist_item_parent_get() will
- * let you know which item is the parent (and thus know how to skip them if
- * wanted).
- *
- * There are also convenience functions. elm_genlist_item_genlist_get() will
- * return the genlist object the item belongs to. elm_genlist_item_show()
- * will make the scroller scroll to show that specific item so its visible.
- * elm_genlist_item_data_get() returns the data pointer set by the item
- * creation functions.
- *
- * If an item changes (state of boolean changes, label or icons change),
- * then use elm_genlist_item_update() to have genlist update the item with
- * the new state. Genlist will re-realize the item thus call the functions
- * in the _Elm_Genlist_Item_Class for that item.
- *
- * To programmatically (un)select an item use elm_genlist_item_selected_set().
- * To get its selected state use elm_genlist_item_selected_get(). Similarly
- * to expand/contract an item and get its expanded state, use
- * elm_genlist_item_expanded_set() and elm_genlist_item_expanded_get(). And
- * again to make an item disabled (unable to be selected and appear
- * differently) use elm_genlist_item_disabled_set() to set this and
- * elm_genlist_item_disabled_get() to get the disabled state.
- *
- * In general to indicate how the genlist should expand items horizontally to
- * fill the list area, use elm_genlist_horizontal_mode_set(). Valid modes are
- * ELM_LIST_LIMIT and ELM_LIST_SCROLL . The default is ELM_LIST_SCROLL. This
- * mode means that if items are too wide to fit, the scroller will scroll
- * horizontally. Otherwise items are expanded to fill the width of the
- * viewport of the scroller. If it is ELM_LIST_LIMIT, items will be expanded
- * to the viewport width and limited to that size. This can be combined with
- * a different style that uses edjes' ellipsis feature (cutting text off like
- * this: "tex...").
- *
- * Items will only call their selection func and callback when first becoming
- * selected. Any further clicks will do nothing, unless you enable always
- * select with elm_genlist_always_select_mode_set(). This means even if
- * selected, every click will make the selected callbacks be called.
- * elm_genlist_no_select_mode_set() will turn off the ability to select
- * items entirely and they will neither appear selected nor call selected
- * callback functions.
- *
- * Remember that you can create new styles and add your own theme augmentation
- * per application with elm_theme_extension_add(). If you absolutely must
- * have a specific style that overrides any theme the user or system sets up
- * you can use elm_theme_overlay_add() to add such a file.
- *
- * Signals that you can add callbacks for are:
- *
- * "clicked,double" - This is called when a user has double-clicked an item. The
- *                    event_info parameter is the genlist item that was double-c
- *                    licked.
- * "selected" - This is called when a user has made an item selected. The
- *              event_info parameter is the genlist item that was selected.
- * "unselected" - This is called when a user has made an item unselected. The
- *                 event_info parameter is the genlist item that was unselected.
- * "expanded" - This is called when elm_genlist_item_expanded_set() is called
- *              and the item is now meant to be expanded. The event_info
- *              parameter is the genlist item that was indicated to expand. It
- *       	is the job of this callback to then fill in the child items.
- * "contracted" - This is called when elm_genlist_item_expanded_set() is called
- *                and the item is now meant to be contracted. The event_info
- *                parameter is the genlist item that was indicated to contract.
- *                It is the job of this callback to then delete the child items.
- * "expand,request" - This is called when a user has indicated they want to
- *                    expand a tree branch item. The callback should decide if
- *                    the item can expand (has any children) and then call
- *                    elm_genlist_item_expanded_set() appropriately to set the
- *                    state. The event_info parameter is the genlist item that
- *                    was indicated to expand.
- * "contract,request" - This is called when a user has indicated they want to
- *                      contract a tree branch item. The callback should decide
- *                      if the item can contract (has any children) and then
- *                      call elm_genlist_item_expanded_set() appropriately to
- *                      set the state. The event_info parameter is the genlist
- *                      item that was indicated to contract.
- * "realized" - This is called when the item in the list is created as a real
- *              evas object. event_info parameter is the genlist item that was
- *              created. The object may be deleted at any time, so it is up to
- *              the caller to not use the object pointer from
- *              elm_genlist_item_object_get() in a way  where it may point to
- *              freed objects.
- * "unrealized" - This is called just before an item is unrealized. After this
- *                call icon objects provided will be deleted and the item object
- *                itself delete or be put into a floating cache.
- * "drag,start,up" - This is called when the item in the list has been dragged
- *                   (not scrolled) up.
- * "drag,start,down" - This is called when the item in the list has been dragged
- *                     (not scrolled) down.
- * "drag,start,left" - This is called when the item in the list has been dragged
- *                     (not scrolled) left.
- * "drag,start,right" - This is called when the item in the list has been
- *                      dragged (not scrolled) right.
- * "drag,stop" - This is called when the item in the list has stopped being
- *               dragged.
- * "drag" - This is called when the item in the list is being dragged.
- * "longpressed" - This is called when the item is pressed for a certain amount
- *                 of time. By default it's 1 second.
- * "scroll,edge,top" - This is called when the genlist is scrolled until the
- *                     top edge.
- * "scroll,edge,bottom" - This is called when the genlist is scrolled until the
- *                         bottom edge.
- * "scroll,edge,left" - This is called when the genlist is scrolled until the
- *                      left edge.
- * "scroll,edge,right" - This is called when the genlist is scrolled until the
- *                       right edge.
- * "multi,swipe,left" - This is called when the genlist is multi-touch swiped
- *                       left.
- * "multi,swipe,right" - This is called when the genlist is multi-touch swiped
- *                       right.
- * "multi,swipe,up" - This is called when the genlist is multi-touch swiped up.
- * "multi,swipe,down" - This is called when the genlist is multi-touch swiped
- *                      down.
- * "multi,pinch,out" - This is called when the genlist is multi-touch pinched
- *                     out.
- * "multi,pinch,in" - This is called when the genlist is multi-touch pinched in.
- */
+#define REORDER_EFFECT_TIME 0.5
 
 typedef struct _Widget_Data Widget_Data;
 typedef struct _Item_Block  Item_Block;
@@ -282,13 +30,13 @@ struct _Widget_Data
    Ecore_Idle_Enterer *queue_idle_enterer;
    Ecore_Idler        *must_recalc_idler;
    Eina_List        *queue, *selected;
-   Elm_Genlist_Item *show_item;
-   Elm_Genlist_Item *last_selected_item;
+   Elm_Genlist_Item *show_item, *last_selected_item, *anchor_item, *mode_item, *reorder_it, *reorder_rel, *expand_item;
    Eina_Inlist      *item_cache;
-   Elm_Genlist_Item *anchor_item;
-   Evas_Coord        anchor_y;
+   Evas_Coord        anchor_y, reorder_start_y;
    Elm_List_Mode     mode;
-   Ecore_Timer      *multi_timer;
+   Ecore_Timer      *multi_timer, *scr_hold_timer;
+   const char       *mode_type;
+   unsigned int      start_time;
    Evas_Coord        prev_x, prev_y, prev_mx, prev_my;
    Evas_Coord        cur_x, cur_y, cur_mx, cur_my;
    Eina_Bool         mouse_down : 1;
@@ -307,6 +55,8 @@ struct _Widget_Data
    Eina_Bool         homogeneous : 1;
    Eina_Bool         clear_me : 1;
    Eina_Bool         swipe : 1;
+   Eina_Bool         reorder_mode : 1;
+   Eina_Bool         reorder_pan_move : 1;
    struct
    {
       Evas_Coord x, y;
@@ -324,27 +74,17 @@ struct _Widget_Data
    double            longpress_timeout;
 
    // TODO : refactoring
-   Eina_Bool         reorder_mode : 1;
-   Eina_Bool         reorder_pan_move : 1;
    Eina_Bool         reorder_deleted : 1;
    Eina_Bool         effect_mode : 1;
    Eina_Bool         auto_scrolled : 1;
    int               edit_mode;
-   int               total_num;
-   Elm_Genlist_Item *reorder_it, *reorder_rel;
-   Evas_Coord        reorder_start_y;
    Ecore_Animator   *item_moving_effect_timer;
    Evas_Object      *alpha_bg;
-   Elm_Genlist_Item *expand_item;
    Evas_Coord        expand_item_end;
    Evas_Coord        expand_item_gap;
    int               move_effect_mode;
-   unsigned int      start_time;
    Ecore_Job        *changed_job;
    Elm_Genlist_Item *rename_it;
-   const char       *mode_type;
-   Elm_Genlist_Item *mode_item;
-   Ecore_Timer      *scr_hold_timer;
 };
 
 struct _Item_Block
@@ -352,6 +92,7 @@ struct _Item_Block
    EINA_INLIST;
    int          count;
    int          num;
+   int          reorder_offset;
    Widget_Data *wd;
    Eina_List   *items;
    Evas_Coord   x, y, w, h, minw, minh;
@@ -361,7 +102,6 @@ struct _Item_Block
    Eina_Bool    updateme : 1;
    Eina_Bool    showme : 1;
    Eina_Bool    must_recalc : 1;
-   int          reorder_offset;
 };
 
 struct _Elm_Genlist_Item
@@ -475,7 +215,11 @@ static void      _theme_hook(Evas_Object *obj);
 static void      _show_region_hook(void        *data,
                                    Evas_Object *obj);
 static void      _sizing_eval(Evas_Object *obj);
-static void      _item_unrealize(Elm_Genlist_Item *it, Eina_Bool calc);
+static void      _item_realize(Elm_Genlist_Item *it,
+                               int               in,
+                               Eina_Bool         calc);
+static void      _item_unrealize(Elm_Genlist_Item *it,
+                                 Eina_Bool         calc);
 static void      _item_block_unrealize(Item_Block *itb);
 static void      _calc_job(void *data);
 static void      _on_focus_hook(void        *data,
@@ -500,6 +244,7 @@ static void      _mode_item_realize(Elm_Genlist_Item *it);
 static void      _mode_item_unrealize(Elm_Genlist_Item *it);
 static void      _item_mode_set(Elm_Genlist_Item *it);
 static void      _item_mode_unset(Widget_Data *wd);
+static void      _group_items_recalc(void *data);
 
 // TODO : refactoring
 static Evas_Object* _create_tray_alpha_bg(const Evas_Object *obj);
@@ -511,10 +256,70 @@ static void _effect_item_realize(Elm_Genlist_Item *it, Eina_Bool effect_on);
 static void _effect_item_unrealize(Elm_Genlist_Item *it);
 static void _effect_item_move_after(Elm_Genlist_Item *it, Elm_Genlist_Item *after);
 static void _effect_item_move_before(Elm_Genlist_Item *it, Elm_Genlist_Item *before);
-static void _group_items_recalc(void *data);
 static void _item_auto_scroll(void *data);
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_VERSION;
+
+static const char SIG_ACTIVATED[] = "activated";
+static const char SIG_CLICKED_DOUBLE[] = "clicked,double";
+static const char SIG_SELECTED[] = "selected";
+static const char SIG_UNSELECTED[] = "unselected";
+static const char SIG_EXPANDED[] = "expanded";
+static const char SIG_CONTRACTED[] = "contracted";
+static const char SIG_EXPAND_REQUEST[] = "expand,request";
+static const char SIG_CONTRACT_REQUEST[] = "contract,request";
+static const char SIG_REALIZED[] = "realized";
+static const char SIG_UNREALIZED[] = "unrealized";
+static const char SIG_DRAG_START_UP[] = "drag,start,up";
+static const char SIG_DRAG_START_DOWN[] = "drag,start,down";
+static const char SIG_DRAG_START_LEFT[] = "drag,start,left";
+static const char SIG_DRAG_START_RIGHT[] = "drag,start,right";
+static const char SIG_DRAG_STOP[] = "drag,stop";
+static const char SIG_DRAG[] = "drag";
+static const char SIG_LONGPRESSED[] = "longpressed";
+static const char SIG_SCROLL_EDGE_TOP[] = "scroll,edge,top";
+static const char SIG_SCROLL_EDGE_BOTTOM[] = "scroll,edge,bottom";
+static const char SIG_SCROLL_EDGE_LEFT[] = "scroll,edge,left";
+static const char SIG_SCROLL_EDGE_RIGHT[] = "scroll,edge,right";
+static const char SIG_MULTI_SWIPE_LEFT[] = "multi,swipe,left";
+static const char SIG_MULTI_SWIPE_RIGHT[] = "multi,swipe,right";
+static const char SIG_MULTI_SWIPE_UP[] = "multi,swipe,up";
+static const char SIG_MULTI_SWIPE_DOWN[] = "multi,swipe,down";
+static const char SIG_MULTI_PINCH_OUT[] = "multi,pinch,out";
+static const char SIG_MULTI_PINCH_IN[] = "multi,pinch,in";
+static const char SIG_SWIPE[] = "swipe";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_CLICKED_DOUBLE, ""},
+   {SIG_ACTIVATED, ""},
+   {SIG_SELECTED, ""},
+   {SIG_UNSELECTED, ""},
+   {SIG_EXPANDED, ""},
+   {SIG_CONTRACTED, ""},
+   {SIG_EXPAND_REQUEST, ""},
+   {SIG_CONTRACT_REQUEST, ""},
+   {SIG_REALIZED, ""},
+   {SIG_UNREALIZED, ""},
+   {SIG_DRAG_START_UP, ""},
+   {SIG_DRAG_START_DOWN, ""},
+   {SIG_DRAG_START_LEFT, ""},
+   {SIG_DRAG_START_RIGHT, ""},
+   {SIG_DRAG_STOP, ""},
+   {SIG_DRAG, ""},
+   {SIG_LONGPRESSED, ""},
+   {SIG_SCROLL_EDGE_TOP, ""},
+   {SIG_SCROLL_EDGE_BOTTOM, ""},
+   {SIG_SCROLL_EDGE_LEFT, ""},
+   {SIG_SCROLL_EDGE_RIGHT, ""},
+   {SIG_MULTI_SWIPE_LEFT, ""},
+   {SIG_MULTI_SWIPE_RIGHT, ""},
+   {SIG_MULTI_SWIPE_UP, ""},
+   {SIG_MULTI_SWIPE_DOWN, ""},
+   {SIG_MULTI_PINCH_OUT, ""},
+   {SIG_MULTI_PINCH_IN, ""},
+   {SIG_SWIPE, ""},
+   {NULL, NULL}
+};
 
 static Eina_Bool
 _event_hook(Evas_Object       *obj,
@@ -610,14 +415,15 @@ _event_hook(Evas_Object       *obj,
         else
           y += page_y;
      }
-   else if(((!strcmp(ev->keyname, "Return")) ||
+   else if (((!strcmp(ev->keyname, "Return")) ||
             (!strcmp(ev->keyname, "KP_Enter")) ||
             (!strcmp(ev->keyname, "space")))
            && (!wd->multi) && (wd->selected))
      {
-        Elm_Genlist_Item *it = elm_genlist_selected_item_get(obj);
+        it = elm_genlist_selected_item_get(obj);
         elm_genlist_item_expanded_set(it,
                                       !elm_genlist_item_expanded_get(it));
+        evas_object_smart_callback_call(it->base.widget, SIG_ACTIVATED, it);
      }
    else if (!strcmp(ev->keyname, "Escape"))
      {
@@ -636,7 +442,7 @@ static Eina_Bool
 _deselect_all_items(Widget_Data *wd)
 {
    if (!wd->selected) return EINA_FALSE;
-   while(wd->selected)
+   while (wd->selected)
      elm_genlist_item_selected_set(wd->selected->data, EINA_FALSE);
 
    return EINA_TRUE;
@@ -738,14 +544,14 @@ _on_focus_hook(void        *data __UNUSED__,
    if (!wd) return;
    if (elm_widget_focus_get(obj))
      {
-        edje_object_signal_emit(wd->obj, "elm,action,focus", "elm");
+        elm_object_signal_emit(wd->obj, "elm,action,focus", "elm");
         evas_object_focus_set(wd->obj, EINA_TRUE);
         if ((wd->selected) && (!wd->last_selected_item))
           wd->last_selected_item = eina_list_data_get(wd->selected);
      }
    else
      {
-        edje_object_signal_emit(wd->obj, "elm,action,unfocus", "elm");
+        elm_object_signal_emit(wd->obj, "elm,action,unfocus", "elm");
         evas_object_focus_set(wd->obj, EINA_FALSE);
      }
 }
@@ -762,7 +568,6 @@ _del_hook(Evas_Object *obj)
    if (wd->changed_job) ecore_job_del(wd->changed_job);
    if (wd->must_recalc_idler) ecore_idler_del(wd->must_recalc_idler);
    if (wd->multi_timer) ecore_timer_del(wd->multi_timer);
-   if (wd->scr_hold_timer) ecore_timer_del(wd->scr_hold_timer);
    if (wd->mode_type) eina_stringshare_del(wd->mode_type);
    if (wd->scr_hold_timer) ecore_timer_del(wd->scr_hold_timer);
    if (wd->walking > 0)
@@ -1050,7 +855,6 @@ _item_del(Elm_Genlist_Item *it)
    evas_event_thaw_eval(evas_object_evas_get(tob));
 
    elm_widget_item_del(it);
-   it->wd->total_num--;  // todo : remove
 }
 
 static void
@@ -1076,7 +880,7 @@ call:
         if ((!objtype) || (!strcmp(objtype,""))) return;
      }
    if (!it->delete_me)
-     evas_object_smart_callback_call(it->base.widget, "selected", it);
+     evas_object_smart_callback_call(it->base.widget, SIG_SELECTED, it);
    it->walking--;
    it->wd->walking--;
    if ((it->wd->clear_me) && (!it->wd->walking))
@@ -1091,7 +895,7 @@ call:
              if (!it->relcount) _item_del(it);
           }
      }
-   if (it && it->wd) it->wd->last_selected_item = it;
+   if (it && it->wd) it->wd->last_selected_item = it; // TODO: Remove 'if'?
 }
 
 static void
@@ -1114,7 +918,7 @@ _item_unselect(Elm_Genlist_Item *it)
      {
         it->selected = EINA_FALSE;
         it->wd->selected = eina_list_remove(it->wd->selected, it);
-        evas_object_smart_callback_call(it->base.widget, "unselected", it);
+        evas_object_smart_callback_call(it->base.widget, SIG_UNSELECTED, it);
      }
 }
 
@@ -1161,7 +965,7 @@ _mouse_move(void        *data,
              ecore_timer_del(it->long_timer);
              it->long_timer = NULL;
           }
-        evas_object_smart_callback_call(it->base.widget, "drag", it);
+        evas_object_smart_callback_call(it->base.widget, SIG_DRAG, it);
         return;
      }
    if ((!it->down) /* || (it->wd->on_hold)*/ || (it->wd->longpressed))
@@ -1171,7 +975,7 @@ _mouse_move(void        *data,
              ecore_timer_del(it->long_timer);
              it->long_timer = NULL;
           }
-        if (it->wd->reorder_mode && it->wd->reorder_it)
+        if ((it->wd->reorder_mode) && (it->wd->reorder_it))
           {
              Evas_Coord	ox,oy,oh,ow;
              evas_object_geometry_get(it->wd->pan_smart, &ox, &oy, &ow, &oh);
@@ -1214,30 +1018,30 @@ _mouse_move(void        *data,
           {
              if (ady > adx)
                evas_object_smart_callback_call(it->base.widget,
-                                               "drag,start,up", it);
+                                               SIG_DRAG_START_UP, it);
              else
                {
                   if (dx < 0)
                     evas_object_smart_callback_call(it->base.widget,
-                                                    "drag,start,left", it);
+                                                    SIG_DRAG_START_LEFT, it);
                   else
                     evas_object_smart_callback_call(it->base.widget,
-                                                    "drag,start,right", it);
+                                                    SIG_DRAG_START_RIGHT, it);
                }
           }
         else
           {
              if (ady > adx)
                evas_object_smart_callback_call(it->base.widget,
-                                               "drag,start,down", it);
+                                               SIG_DRAG_START_DOWN, it);
              else
                {
                   if (dx < 0)
                     evas_object_smart_callback_call(it->base.widget,
-                                                    "drag,start,left", it);
+                                                    SIG_DRAG_START_LEFT, it);
                   else
                     evas_object_smart_callback_call(it->base.widget,
-                                                    "drag,start,right", it);
+                                                    SIG_DRAG_START_RIGHT, it);
                }
           }
      }
@@ -1257,7 +1061,7 @@ _long_press(void *data)
    if ((it->disabled) || (it->dragging) || (it->display_only) || (it->wd->rename_it))
      return ECORE_CALLBACK_CANCEL;
    it->wd->longpressed = EINA_TRUE;
-   evas_object_smart_callback_call(it->base.widget, "longpressed", it);
+   evas_object_smart_callback_call(it->base.widget, SIG_LONGPRESSED, it);
    if ((it->wd->reorder_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP))
      {
         it->wd->reorder_it = it;
@@ -1321,7 +1125,7 @@ _swipe(Elm_Genlist_Item *it)
 
    sum /= it->wd->movements;
    if (abs(sum - it->wd->history[0].x) <= 10) return;
-   evas_object_smart_callback_call(it->base.widget, "swipe", it);
+   evas_object_smart_callback_call(it->base.widget, SIG_SWIPE, it);
 }
 
 static Eina_Bool
@@ -1377,31 +1181,31 @@ _multi_touch_gesture_eval(void *data)
           {
              if ((it->wd->cur_x > it->wd->prev_x) && (it->wd->cur_mx > it->wd->prev_mx))
                evas_object_smart_callback_call(it->base.widget,
-                                               "multi,swipe,right", it);
+                                               SIG_MULTI_SWIPE_RIGHT, it);
              else if ((it->wd->cur_x < it->wd->prev_x) && (it->wd->cur_mx < it->wd->prev_mx))
                evas_object_smart_callback_call(it->base.widget,
-                                               "multi,swipe,left", it);
+                                               SIG_MULTI_SWIPE_LEFT, it);
              else if (abs(it->wd->cur_x - it->wd->cur_mx) > abs(it->wd->prev_x - it->wd->prev_mx))
                evas_object_smart_callback_call(it->base.widget,
-                                               "multi,pinch,out", it);
+                                               SIG_MULTI_PINCH_OUT, it);
              else
                evas_object_smart_callback_call(it->base.widget,
-                                               "multi,pinch,in", it);
+                                               SIG_MULTI_PINCH_IN, it);
           }
         else
           {
              if ((it->wd->cur_y > it->wd->prev_y) && (it->wd->cur_my > it->wd->prev_my))
                evas_object_smart_callback_call(it->base.widget,
-                                               "multi,swipe,down", it);
+                                               SIG_MULTI_SWIPE_DOWN, it);
              else if ((it->wd->cur_y < it->wd->prev_y) && (it->wd->cur_my < it->wd->prev_my))
                evas_object_smart_callback_call(it->base.widget,
-                                               "multi,swipe,up", it);
+                                               SIG_MULTI_SWIPE_UP, it);
              else if (abs(it->wd->cur_y - it->wd->cur_my) > abs(it->wd->prev_y - it->wd->prev_my))
                evas_object_smart_callback_call(it->base.widget,
-                                               "multi,pinch,out", it);
+                                               SIG_MULTI_PINCH_OUT, it);
              else
                evas_object_smart_callback_call(it->base.widget,
-                                               "multi,pinch,in", it);
+                                               SIG_MULTI_PINCH_IN, it);
           }
      }
    it->wd->multi_timeout = EINA_FALSE;
@@ -1433,7 +1237,7 @@ _multi_down(void        *data,
    if (it->dragging)
      {
         it->dragging = EINA_FALSE;
-        evas_object_smart_callback_call(it->base.widget, "drag,stop", it);
+        evas_object_smart_callback_call(it->base.widget, SIG_DRAG_STOP, it);
      }
    if (it->swipe_timer)
      {
@@ -1515,7 +1319,10 @@ _mouse_down(void        *data,
    _item_highlight(it);
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
      if ((!it->disabled) && (!it->display_only))
-       evas_object_smart_callback_call(it->base.widget, "clicked,double", it);
+       {
+          evas_object_smart_callback_call(it->base.widget, SIG_CLICKED_DOUBLE, it);
+          evas_object_smart_callback_call(it->base.widget, SIG_ACTIVATED, it);
+       }
    if (it->long_timer) ecore_timer_del(it->long_timer);
    if (it->swipe_timer) ecore_timer_del(it->swipe_timer);
    it->swipe_timer = ecore_timer_add(0.4, _swipe_cancel, it);
@@ -1560,7 +1367,7 @@ _mouse_up(void        *data,
    if (it->dragging)
      {
         it->dragging = EINA_FALSE;
-        evas_object_smart_callback_call(it->base.widget, "drag,stop", it);
+        evas_object_smart_callback_call(it->base.widget, SIG_DRAG_STOP, it);
         dragged = 1;
      }
    if (it->swipe_timer)
@@ -1668,9 +1475,9 @@ _signal_expand_toggle(void        *data,
    Elm_Genlist_Item *it = data;
 
    if (it->expanded)
-     evas_object_smart_callback_call(it->base.widget, "contract,request", it);
+     evas_object_smart_callback_call(it->base.widget, SIG_CONTRACT_REQUEST, it);
    else
-     evas_object_smart_callback_call(it->base.widget, "expand,request", it);
+     evas_object_smart_callback_call(it->base.widget, SIG_EXPAND_REQUEST, it);
 }
 
 static void
@@ -1682,7 +1489,7 @@ _signal_expand(void        *data,
    Elm_Genlist_Item *it = data;
 
    if (!it->expanded)
-     evas_object_smart_callback_call(it->base.widget, "expand,request", it);
+     evas_object_smart_callback_call(it->base.widget, SIG_EXPAND_REQUEST, it);
 }
 
 static void
@@ -1694,7 +1501,7 @@ _signal_contract(void        *data,
    Elm_Genlist_Item *it = data;
 
    if (it->expanded)
-     evas_object_smart_callback_call(it->base.widget, "contract,request", it);
+     evas_object_smart_callback_call(it->base.widget, SIG_CONTRACT_REQUEST, it);
 }
 
 static Eina_Bool
@@ -2024,7 +1831,9 @@ _item_realize(Elm_Genlist_Item *it,
           }
      }
 
-   if ((calc) && (it->wd->homogeneous) && ((it->wd->item_width) || ((it->wd->item_width) && (it->wd->group_item_width))))
+   if ((calc) && (it->wd->homogeneous) &&
+       ((it->wd->item_width) ||
+        ((it->wd->item_width) && (it->wd->group_item_width))))
      {
         /* homogenous genlist shortcut */
         if (!it->mincalcd)
@@ -2137,7 +1946,7 @@ _item_realize(Elm_Genlist_Item *it,
           {
              Evas_Coord mw = -1, mh = -1;
 
-             if (it->wd->height_for_width) mw = it->wd->w;
+             if (it->wd->height_for_width) mw = it->wd->w; // TODO: Removed this. This was removed from upstream.
 
              if (!it->display_only)
                elm_coords_finger_size_adjust(1, &mw, 1, &mh);
@@ -2182,7 +1991,7 @@ _item_realize(Elm_Genlist_Item *it,
    evas_event_thaw(evas_object_evas_get(it->wd->obj));
    evas_event_thaw_eval(evas_object_evas_get(it->wd->obj));
    if (!calc)
-     evas_object_smart_callback_call(it->base.widget, "realized", it);
+     evas_object_smart_callback_call(it->base.widget, SIG_REALIZED, it);
    if ((!calc) && (it->wd->edit_mode) && (it->flags != ELM_GENLIST_ITEM_GROUP))
      {
         if (it->itc->edit_item_style)
@@ -2195,14 +2004,16 @@ _item_realize(Elm_Genlist_Item *it,
 }
 
 static void
-_item_unrealize(Elm_Genlist_Item *it, Eina_Bool calc)
+_item_unrealize(Elm_Genlist_Item *it,
+                Eina_Bool         calc)
 {
    Evas_Object *icon;
 
    if (!it->realized) return;
-   if (it->wd->reorder_it && it->wd->reorder_it == it) return;
+   if (it->wd->reorder_it == it) return;
    evas_event_freeze(evas_object_evas_get(it->wd->obj));
-   if (!calc) evas_object_smart_callback_call(it->base.widget, "unrealized", it);
+   if (!calc)
+     evas_object_smart_callback_call(it->base.widget, SIG_UNREALIZED, it);
    if (it->long_timer)
      {
         ecore_timer_del(it->long_timer);
@@ -2241,7 +2052,7 @@ _item_unrealize(Elm_Genlist_Item *it, Eina_Bool calc)
 static Eina_Bool
 _item_block_recalc(Item_Block *itb,
                    int         in,
-                   int         qadd)
+                   Eina_Bool   qadd)
 {
    const Eina_List *l;
    Elm_Genlist_Item *it;
@@ -2330,7 +2141,7 @@ _item_block_unrealize(Item_Block *itb)
                   it->want_unrealize = EINA_TRUE;
                }
              else
-                _item_unrealize(it, EINA_FALSE);
+               _item_unrealize(it, EINA_FALSE);
           }
      }
    if (!dragging)
@@ -2459,7 +2270,7 @@ _item_block_position(Item_Block *itb,
    EINA_LIST_FOREACH(itb->items, l, it)
      {
         if (it->delete_me) continue;
-        else if (it->wd->reorder_it && it->wd->reorder_it == it) continue;
+        else if (it->wd->reorder_it == it) continue;
 
         it->x = 0;
         it->y = y;
@@ -2487,14 +2298,14 @@ _item_block_position(Item_Block *itb,
                {
                   if (vis)
                     {
-                       if(it->wd->reorder_mode)
+                       if (it->wd->reorder_mode)
                           y += _get_space_for_reorder_item(it);
                        git = it->group_item;
                        if (git)
                          {
                             git->scrl_x = it->scrl_x;
                             if (git->scrl_y < oy)
-                               git->scrl_y = oy;
+                              git->scrl_y = oy;
                             if ((git->scrl_y + git->h) > (it->scrl_y + it->h))
                               git->scrl_y = (it->scrl_y + it->h) - git->h;
                             git->want_realize = EINA_TRUE;
@@ -2608,9 +2419,8 @@ static void
 _calc_job(void *data)
 {
    Widget_Data *wd = data;
-   Item_Block *itb;
+   Item_Block *itb, *chb = NULL;
    Evas_Coord minw = -1, minh = 0, y = 0, ow;
-   Item_Block *chb = NULL;
    int in = 0, minw_change = 0;
    Eina_Bool changed = EINA_FALSE;
    double t0, t;
@@ -2620,10 +2430,7 @@ _calc_job(void *data)
    t0 = ecore_time_get();
    evas_object_geometry_get(wd->pan_smart, NULL, NULL, &ow, &wd->h);
    if (wd->w != ow)
-     {
-        wd->w = ow;
-//        if (wd->height_for_width) changed = EINA_TRUE;
-     }
+     wd->w = ow;
 
    evas_event_freeze(evas_object_evas_get(wd->obj));
    EINA_INLIST_FOREACH(wd->blocks, itb)
@@ -2651,7 +2458,7 @@ _calc_job(void *data)
                   itb->must_recalc = EINA_FALSE;
                }
              if (itb->realized) _item_block_unrealize(itb);
-             showme = _item_block_recalc(itb, in, 0);
+             showme = _item_block_recalc(itb, in, EINA_FALSE);
              chb = itb;
           }
         itb->y = y;
@@ -2661,7 +2468,7 @@ _calc_job(void *data)
         else if ((!itb->must_recalc) && (minw < itb->minw))
           {
              minw = itb->minw;
-             minw_change = 1;
+             minw_change = EINA_TRUE;
           }
         itb->w = minw;
         itb->h = itb->minh;
@@ -2746,7 +2553,8 @@ _update_job(void *data)
    Widget_Data *wd = data;
    Eina_List *l2;
    Item_Block *itb;
-   int num, num0, position = 0, recalc = 0;
+   int num, num0;
+   Eina_Bool position = EINA_FALSE, recalc = EINA_FALSE;
    if (!wd) return;
    wd->update_job = NULL;
    num = 0;
@@ -2765,7 +2573,7 @@ _update_job(void *data)
              continue;
           }
         num0 = num;
-        recalc = 0;
+        recalc = EINA_FALSE;
         EINA_LIST_FOREACH(itb->items, l2, it)
           {
              if (it->updateme)
@@ -2778,7 +2586,7 @@ _update_job(void *data)
                     {
                        _item_unrealize(it, EINA_FALSE);
                        _item_realize(it, num, EINA_FALSE);
-                       position = 1;
+                       position = EINA_TRUE;
                     }
                   else
                     {
@@ -2786,16 +2594,16 @@ _update_job(void *data)
                        _item_unrealize(it, EINA_TRUE);
                     }
                   if ((it->minw != itminw) || (it->minh != itminh))
-                    recalc = 1;
+                    recalc = EINA_TRUE;
                }
              num++;
           }
         itb->updateme = EINA_FALSE;
         if (recalc)
           {
-             position = 1;
+             position = EINA_TRUE;
              itb->changed = EINA_TRUE;
-             _item_block_recalc(itb, num0, 0);
+             _item_block_recalc(itb, num0, EINA_FALSE);
              _item_block_position(itb, num0);
           }
      }
@@ -2903,39 +2711,39 @@ _pan_set(Evas_Object *obj,
    Item_Block *itb;
 #endif
 
-//   Evas_Coord ow, oh;
-//   evas_object_geometry_get(obj, NULL, NULL, &ow, &oh);
-//   ow = sd->wd->minw - ow;
-//   if (ow < 0) ow = 0;
-//   oh = sd->wd->minh - oh;
-//   if (oh < 0) oh = 0;
-//   if (x < 0) x = 0;
-//   if (y < 0) y = 0;
-//   if (x > ow) x = ow;
-//   if (y > oh) y = oh;
+   //   Evas_Coord ow, oh;
+   //   evas_object_geometry_get(obj, NULL, NULL, &ow, &oh);
+   //   ow = sd->wd->minw - ow;
+   //   if (ow < 0) ow = 0;
+   //   oh = sd->wd->minh - oh;
+   //   if (oh < 0) oh = 0;
+   //   if (x < 0) x = 0;
+   //   if (y < 0) y = 0;
+   //   if (x > ow) x = ow;
+   //   if (y > oh) y = oh;
    if ((x == sd->wd->pan_x) && (y == sd->wd->pan_y)) return;
    sd->wd->pan_x = x;
    sd->wd->pan_y = y;
 
 #ifdef ANCHOR_ITEM
    EINA_INLIST_FOREACH(sd->wd->blocks, itb)
-   {
-      if ((itb->y + itb->h) > y)
-        {
-           Elm_Genlist_Item *it;
-           Eina_List *l2;
+     {
+        if ((itb->y + itb->h) > y)
+          {
+             Elm_Genlist_Item *it;
+             Eina_List *l2;
 
-           EINA_LIST_FOREACH(itb->items, l2, it)
-             {
-                if ((itb->y + it->y) >= y)
-                  {
-                     sd->wd->anchor_item = it;
-                     sd->wd->anchor_y = -(itb->y + it->y - y);
-                     goto done;
-                  }
-             }
-        }
-   }
+             EINA_LIST_FOREACH(itb->items, l2, it)
+               {
+                  if ((itb->y + it->y) >= y)
+                    {
+                       sd->wd->anchor_item = it;
+                       sd->wd->anchor_y = -(itb->y + it->y - y);
+                       goto done;
+                    }
+               }
+          }
+     }
 done:
 #endif
    if(!sd->wd->item_moving_effect_timer) evas_object_smart_changed(obj);
@@ -3064,27 +2872,27 @@ _pan_calculate(Evas_Object *obj)
         git->want_realize = EINA_FALSE;
      }
    EINA_INLIST_FOREACH(sd->wd->blocks, itb)
-   {
-      itb->w = sd->wd->minw;
-      if (ELM_RECTS_INTERSECT(itb->x - sd->wd->pan_x + ox,
-                              itb->y - sd->wd->pan_y + oy,
-                              itb->w, itb->h,
-                              cvx, cvy, cvw, cvh))
-        {
-           if ((!itb->realized) || (itb->changed))
-             _item_block_realize(itb, in, 0);
-           _item_block_position(itb, in);
-        }
-      else
-        {
-           if (itb->realized) _item_block_unrealize(itb);
-        }
-      in += itb->count;
-   }
-   if (!sd->wd->reorder_it || sd->wd->reorder_pan_move)
+     {
+        itb->w = sd->wd->minw;
+        if (ELM_RECTS_INTERSECT(itb->x - sd->wd->pan_x + ox,
+                                itb->y - sd->wd->pan_y + oy,
+                                itb->w, itb->h,
+                                cvx, cvy, cvw, cvh))
+          {
+             if ((!itb->realized) || (itb->changed))
+               _item_block_realize(itb, in, 0);
+             _item_block_position(itb, in);
+          }
+        else
+          {
+             if (itb->realized) _item_block_unrealize(itb);
+          }
+        in += itb->count;
+     }
+   if ((!sd->wd->reorder_it) || (sd->wd->reorder_pan_move))
       _group_items_recalc(sd->wd);
 
-   if (sd->wd->reorder_mode && sd->wd->reorder_it)
+   if ((sd->wd->reorder_mode) && (sd->wd->reorder_it))
      {
         if (sd->wd->pan_y != old_pan_y) sd->wd->reorder_pan_move = EINA_TRUE;
         else sd->wd->reorder_pan_move = EINA_FALSE;
@@ -3112,7 +2920,7 @@ _pan_calculate(Evas_Object *obj)
       else _item_auto_scroll(sd->wd);
    evas_event_thaw(evas_object_evas_get(obj));
    evas_event_thaw_eval(evas_object_evas_get(obj));
- }
+}
 
 static void
 _pan_move(Evas_Object *obj,
@@ -3171,7 +2979,7 @@ _scroll_edge_left(void        *data,
                   void        *event_info __UNUSED__)
 {
    Evas_Object *obj = data;
-   evas_object_smart_callback_call(obj, "scroll,edge,left", NULL);
+   evas_object_smart_callback_call(obj, SIG_SCROLL_EDGE_LEFT, NULL);
 }
 
 static void
@@ -3180,7 +2988,7 @@ _scroll_edge_right(void        *data,
                    void        *event_info __UNUSED__)
 {
    Evas_Object *obj = data;
-   evas_object_smart_callback_call(obj, "scroll,edge,right", NULL);
+   evas_object_smart_callback_call(obj, SIG_SCROLL_EDGE_RIGHT, NULL);
 }
 
 static void
@@ -3189,7 +2997,7 @@ _scroll_edge_top(void        *data,
                  void        *event_info __UNUSED__)
 {
    Evas_Object *obj = data;
-   evas_object_smart_callback_call(obj, "scroll,edge,top", NULL);
+   evas_object_smart_callback_call(obj, SIG_SCROLL_EDGE_TOP, NULL);
 }
 
 static void
@@ -3198,7 +3006,7 @@ _scroll_edge_bottom(void        *data,
                     void        *event_info __UNUSED__)
 {
    Evas_Object *obj = data;
-   evas_object_smart_callback_call(obj, "scroll,edge,bottom", NULL);
+   evas_object_smart_callback_call(obj, SIG_SCROLL_EDGE_BOTTOM, NULL);
 }
 
 static void
@@ -3226,14 +3034,14 @@ _mode_item_realize(Elm_Genlist_Item *it)
 
    _elm_theme_object_set(it->base.widget, it->mode_view, "genlist", buf,
                          elm_widget_style_get(it->base.widget));
-   //edje_object_mirrored_set(it->mode_view,
-   //                         elm_widget_mirrored_get(it->base.widget));
+   edje_object_mirrored_set(it->mode_view,
+                            elm_widget_mirrored_get(it->base.widget));
 
    /* signal callback add */
    evas_object_event_callback_add(it->mode_view, EVAS_CALLBACK_MOUSE_DOWN,
                                   _mouse_down, it);
    evas_object_event_callback_add(it->mode_view, EVAS_CALLBACK_MOUSE_UP,
-                                 _mouse_up, it);
+                                  _mouse_up, it);
    evas_object_event_callback_add(it->mode_view, EVAS_CALLBACK_MOUSE_MOVE,
                                   _mouse_move, it);
 
@@ -3389,14 +3197,6 @@ _item_mode_unset(Widget_Data *wd)
    wd->mode_item = NULL;
 }
 
-/**
- * Add a new Genlist object
- *
- * @param parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup Genlist
- */
 EAPI Evas_Object *
 elm_genlist_add(Evas_Object *parent)
 {
@@ -3476,6 +3276,7 @@ elm_genlist_add(Evas_Object *parent)
                              &minw, &minh);
    evas_object_size_hint_min_set(obj, minw, minh);
 
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
    return obj;
@@ -3503,7 +3304,6 @@ _item_new(Widget_Data                  *wd,
    it->func.data = func_data;
    it->mouse_cursor = NULL;
    it->expanded_depth = 0;
-   it->num = ++wd->total_num;   // todo : remove
 
    if (it->parent)
      {
@@ -3668,7 +3468,7 @@ _queue_process(Widget_Data *wd)
    double t0, t;
 
    t0 = ecore_time_get();
-   evas_event_freeze(evas_object_evas_get(wd->obj));
+   //evas_event_freeze(evas_object_evas_get(wd->obj));
    for (n = 0; (wd->queue) && (n < 128); n++)
      {
         Elm_Genlist_Item *it;
@@ -3680,7 +3480,7 @@ _queue_process(Widget_Data *wd)
         t = ecore_time_get();
         if (it->block->changed)
           {
-             showme = _item_block_recalc(it->block, it->block->num, 1);
+             showme = _item_block_recalc(it->block, it->block->num, EINA_TRUE);
              it->block->changed = 0;
           }
         if (showme) it->block->showme = EINA_TRUE;
@@ -3689,8 +3489,8 @@ _queue_process(Widget_Data *wd)
              if ((t - t0) > (ecore_animator_frametime_get())) break;
           }
      }
-   evas_event_thaw(evas_object_evas_get(wd->obj));
-   evas_event_thaw_eval(evas_object_evas_get(wd->obj));
+   //evas_event_thaw(evas_object_evas_get(wd->obj));
+   //evas_event_thaw_eval(evas_object_evas_get(wd->obj));
    return n;
 }
 
@@ -3753,26 +3553,9 @@ _item_queue(Widget_Data      *wd,
 //   evas_event_thaw(evas_object_evas_get(wd->obj));
 //   evas_event_thaw_eval(evas_object_evas_get(wd->obj));
    if (!wd->queue_idle_enterer)
-      wd->queue_idle_enterer = ecore_idle_enterer_add(_item_idle_enterer, wd);
+     wd->queue_idle_enterer = ecore_idle_enterer_add(_item_idle_enterer, wd);
 }
 
-/**
- * Append item to the end of the genlist
- *
- * This appends the given item to the end of the list or the end of
- * the children if the parent is given.
- *
- * @param obj The genlist object
- * @param itc The item class for the item
- * @param data The item data
- * @param parent The parent item, or NULL if none
- * @param flags Item flags
- * @param func Convenience function called when item selected
- * @param func_data Data passed to @p func above.
- * @return A handle to the item added or NULL if not possible
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_item_append(Evas_Object                  *obj,
                         const Elm_Genlist_Item_Class *itc,
@@ -3815,23 +3598,6 @@ elm_genlist_item_append(Evas_Object                  *obj,
    return it;
 }
 
-/**
- * Prepend item at start of the genlist
- *
- * This adds an item to the beginning of the list or beginning of the
- * children of the parent if given.
- *
- * @param obj The genlist object
- * @param itc The item class for the item
- * @param data The item data
- * @param parent The parent item, or NULL if none
- * @param flags Item flags
- * @param func Convenience function called when item selected
- * @param func_data Data passed to @p func above.
- * @return A handle to the item added or NULL if not possible
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_item_prepend(Evas_Object                  *obj,
                          const Elm_Genlist_Item_Class *itc,
@@ -3874,81 +3640,6 @@ elm_genlist_item_prepend(Evas_Object                  *obj,
    return it;
 }
 
-/**
- * Insert item before another in the genlist
- *
- * This inserts an item before another in the list. It will be in the
- * same tree level or group as the item it is inseted before.
- *
- * @param obj The genlist object
- * @param itc The item class for the item
- * @param data The item data
- * @param before The item to insert before
- * @param flags Item flags
- * @param func Convenience function called when item selected
- * @param func_data Data passed to @p func above.
- * @return A handle to the item added or NULL if not possible
- *
- * @ingroup Genlist
- */
-EAPI Elm_Genlist_Item *
-elm_genlist_item_insert_before(Evas_Object                  *obj,
-                               const Elm_Genlist_Item_Class *itc,
-                               const void                   *data,
-                               Elm_Genlist_Item             *parent,
-                               Elm_Genlist_Item             *before,
-                               Elm_Genlist_Item_Flags        flags,
-                               Evas_Smart_Cb                 func,
-                               const void                   *func_data)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   EINA_SAFETY_ON_NULL_RETURN_VAL(before, NULL);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func,
-                                    func_data);
-   if (!it) return NULL;
-   /* It makes no sense to insert before in an empty list with before != NULL, something really bad is happening in your app. */
-   EINA_SAFETY_ON_NULL_RETURN_VAL(wd->items, NULL);
-
-   if (!it->parent)
-     {
-        if ((flags & ELM_GENLIST_ITEM_GROUP) &&
-            (before->flags & ELM_GENLIST_ITEM_GROUP))
-          wd->group_items = eina_list_prepend_relative(wd->group_items, it,
-                                                       before);
-     }
-   else
-     {
-        it->parent->items = eina_list_prepend_relative(it->parent->items, it,
-                                                       before);
-     }
-   wd->items = eina_inlist_prepend_relative(wd->items, EINA_INLIST_GET(it),
-                                            EINA_INLIST_GET(before));
-   it->rel = before;
-   it->rel->relcount++;
-   it->before = EINA_TRUE;
-   _item_queue(wd, it);
-   return it;
-}
-
-/**
- * Insert an item after another in the genlst
- *
- * This inserts an item after another in the list. It will be in the
- * same tree level or group as the item it is inseted after.
- *
- * @param obj The genlist object
- * @param itc The item class for the item
- * @param data The item data
- * @param after The item to insert after
- * @param flags Item flags
- * @param func Convenience function called when item selected
- * @param func_data Data passed to @p func above.
- * @return A handle to the item added or NULL if not possible
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_item_insert_after(Evas_Object                  *obj,
                               const Elm_Genlist_Item_Class *itc,
@@ -3990,15 +3681,47 @@ elm_genlist_item_insert_after(Evas_Object                  *obj,
    return it;
 }
 
-/**
- * Clear the genlist
- *
- * This clears all items in the list, leaving it empty.
- *
- * @param obj The genlist object
- *
- * @ingroup Genlist
- */
+EAPI Elm_Genlist_Item *
+elm_genlist_item_insert_before(Evas_Object                  *obj,
+                               const Elm_Genlist_Item_Class *itc,
+                               const void                   *data,
+                               Elm_Genlist_Item             *parent,
+                               Elm_Genlist_Item             *before,
+                               Elm_Genlist_Item_Flags        flags,
+                               Evas_Smart_Cb                 func,
+                               const void                   *func_data)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   EINA_SAFETY_ON_NULL_RETURN_VAL(before, NULL);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func,
+                                    func_data);
+   if (!it) return NULL;
+   /* It makes no sense to insert before in an empty list with before != NULL, something really bad is happening in your app. */
+   EINA_SAFETY_ON_NULL_RETURN_VAL(wd->items, NULL);
+
+   if (!it->parent)
+     {
+        if ((flags & ELM_GENLIST_ITEM_GROUP) &&
+            (before->flags & ELM_GENLIST_ITEM_GROUP))
+          wd->group_items = eina_list_prepend_relative(wd->group_items, it,
+                                                       before);
+     }
+   else
+     {
+        it->parent->items = eina_list_prepend_relative(it->parent->items, it,
+                                                       before);
+     }
+   wd->items = eina_inlist_prepend_relative(wd->items, EINA_INLIST_GET(it),
+                                            EINA_INLIST_GET(before));
+   it->rel = before;
+   it->rel->relcount++;
+   it->before = EINA_TRUE;
+   _item_queue(wd, it);
+   return it;
+}
+
 EAPI void
 elm_genlist_clear(Evas_Object *obj)
 {
@@ -4102,17 +3825,6 @@ elm_genlist_clear(Evas_Object *obj)
    evas_event_thaw_eval(evas_object_evas_get(wd->obj));
 }
 
-/**
- * Enable or disable multi-select in the genlist
- *
- * This enables (EINA_TRUE) or disables (EINA_FALSE) multi-select in
- * the list. This allows more than 1 item to be selected.
- *
- * @param obj The genlist object
- * @param multi Multi-select enable/disable
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_multi_select_set(Evas_Object *obj,
                              Eina_Bool    multi)
@@ -4123,15 +3835,6 @@ elm_genlist_multi_select_set(Evas_Object *obj,
    wd->multi = multi;
 }
 
-/**
- * Gets if multi-select in genlist is enable or disable
- *
- * @param obj The genlist object
- * @return Multi-select enable/disable
- * (EINA_TRUE = enabled/EINA_FALSE = disabled)
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_multi_select_get(const Evas_Object *obj)
 {
@@ -4141,21 +3844,6 @@ elm_genlist_multi_select_get(const Evas_Object *obj)
    return wd->multi;
 }
 
-/**
- * Get the selectd item in the genlist
- *
- * This gets the selected item in the list (if multi-select is enabled
- * only the first item in the list is selected - which is not very
- * useful, so see elm_genlist_selected_items_get() for when
- * multi-select is used).
- *
- * If no item is selected, NULL is returned.
- *
- * @param obj The genlist object
- * @return The selected item, or NULL if none.
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_selected_item_get(const Evas_Object *obj)
 {
@@ -4166,19 +3854,6 @@ elm_genlist_selected_item_get(const Evas_Object *obj)
    return NULL;
 }
 
-/**
- * Get a list of selected items in the genlist
- *
- * This returns a list of the selected items. This list pointer is
- * only valid so long as no items are selected or unselected (or
- * unselected implicitly by deletion). The list contains
- * Elm_Genlist_Item pointers.
- *
- * @param obj The genlist object
- * @return The list of selected items, nor NULL if none are selected.
- *
- * @ingroup Genlist
- */
 EAPI const Eina_List *
 elm_genlist_selected_items_get(const Evas_Object *obj)
 {
@@ -4188,20 +3863,6 @@ elm_genlist_selected_items_get(const Evas_Object *obj)
    return wd->selected;
 }
 
-/**
- * Get a list of realized items in genlist
- *
- * This returns a list of the realized items in the genlist. The list
- * contains Elm_Genlist_Item pointers. The list must be freed by the
- * caller when done with eina_list_free(). The item pointers in the
- * list are only valid so long as those items are not deleted or the
- * genlist is not deleted.
- *
- * @param obj The genlist object
- * @return The list of realized items, nor NULL if none are realized.
- *
- * @ingroup Genlist
- */
 EAPI Eina_List *
 elm_genlist_realized_items_get(const Evas_Object *obj)
 {
@@ -4232,27 +3893,6 @@ elm_genlist_realized_items_get(const Evas_Object *obj)
    return list;
 }
 
-/**
- * Get the item that is at the x, y canvas coords
- *
- * This returns the item at the given coordinates (which are canvas
- * relative not object-relative). If an item is at that coordinate,
- * that item handle is returned, and if @p posret is not NULL, the
- * integer pointed to is set to a value of -1, 0 or 1, depending if
- * the coordinate is on the upper portion of that item (-1), on the
- * middle section (0) or on the lower part (1). If NULL is returned as
- * an item (no item found there), then posret may indicate -1 or 1
- * based if the coordinate is above or below all items respectively in
- * the genlist.
- *
- * @param it The item
- * @param x The input x coordinate
- * @param y The input y coordinate
- * @param posret The position relative to the item returned here
- * @return The item at the coordinates or NULL if none
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_at_xy_item_get(const Evas_Object *obj,
                            Evas_Coord         x,
@@ -4304,16 +3944,6 @@ elm_genlist_at_xy_item_get(const Evas_Object *obj,
    return NULL;
 }
 
-/**
- * Get the first item in the genlist
- *
- * This returns the first item in the list.
- *
- * @param obj The genlist object
- * @return The first item, or NULL if none
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_first_item_get(const Evas_Object *obj)
 {
@@ -4327,15 +3957,6 @@ elm_genlist_first_item_get(const Evas_Object *obj)
    return it;
 }
 
-/**
- * Get the last item in the genlist
- *
- * This returns the last item in the list.
- *
- * @return The last item, or NULL if none
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_last_item_get(const Evas_Object *obj)
 {
@@ -4349,16 +3970,6 @@ elm_genlist_last_item_get(const Evas_Object *obj)
    return it;
 }
 
-/**
- * Get the next item in the genlist
- *
- * This returns the item after the item @p it.
- *
- * @param it The item
- * @return The item after @p it, or NULL if none
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_item_next_get(const Elm_Genlist_Item *it)
 {
@@ -4371,16 +3982,6 @@ elm_genlist_item_next_get(const Elm_Genlist_Item *it)
    return (Elm_Genlist_Item *)it;
 }
 
-/**
- * Get the previous item in the genlist
- *
- * This returns the item before the item @p it.
- *
- * @param it The item
- * @return The item before @p it, or NULL if none
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_item_prev_get(const Elm_Genlist_Item *it)
 {
@@ -4393,16 +3994,6 @@ elm_genlist_item_prev_get(const Elm_Genlist_Item *it)
    return (Elm_Genlist_Item *)it;
 }
 
-/**
- * Get the genlist object from an item
- *
- * This returns the genlist object itself that an item belongs to.
- *
- * @param it The item
- * @return The genlist object
- *
- * @ingroup Genlist
- */
 EAPI Evas_Object *
 elm_genlist_item_genlist_get(const Elm_Genlist_Item *it)
 {
@@ -4410,16 +4001,6 @@ elm_genlist_item_genlist_get(const Elm_Genlist_Item *it)
    return it->base.widget;
 }
 
-/**
- * Get the parent item of the given item
- *
- * This returns the parent item of the item @p it given.
- *
- * @param it The item
- * @return The parent of the item or NULL if none
- *
- * @ingroup Genlist
- */
 EAPI Elm_Genlist_Item *
 elm_genlist_item_parent_get(const Elm_Genlist_Item *it)
 {
@@ -4427,16 +4008,6 @@ elm_genlist_item_parent_get(const Elm_Genlist_Item *it)
    return it->parent;
 }
 
-/**
- * Clear all sub-items (children) of the given item
- *
- * This clears all items that are children (or their descendants) of the
- * given item @p it.
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
 {
@@ -4477,17 +4048,6 @@ elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
      }
 }
 
-/**
- * Set the selected state of an item
- *
- * This sets the selected state (1 selected, 0 not selected) of the given
- * item @p it.
- *
- * @param it The item
- * @param selected The selected state
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_selected_set(Elm_Genlist_Item *it,
                               Eina_Bool         selected)
@@ -4513,16 +4073,6 @@ elm_genlist_item_selected_set(Elm_Genlist_Item *it,
      _item_unselect(it);
 }
 
-/**
- * Get the selected state of an item
- *
- * This gets the selected state of an item (1 selected, 0 not selected).
- *
- * @param it The item
- * @return The selected state
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_item_selected_get(const Elm_Genlist_Item *it)
 {
@@ -4530,17 +4080,6 @@ elm_genlist_item_selected_get(const Elm_Genlist_Item *it)
    return it->selected;
 }
 
-/**
- * Sets the expanded state of an item (if it's a parent)
- *
- * This expands or contracts a parent item (thus showing or hiding the
- * children).
- *
- * @param it The item
- * @param expanded The expanded state (1 expanded, 0 not expanded).
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
                               Eina_Bool         expanded)
@@ -4571,16 +4110,6 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
      }
 }
 
-/**
- * Get the expanded state of an item
- *
- * This gets the expanded state of an item
- *
- * @param it The item
- * @return Thre expanded state
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_item_expanded_get(const Elm_Genlist_Item *it)
 {
@@ -4588,14 +4117,6 @@ elm_genlist_item_expanded_get(const Elm_Genlist_Item *it)
    return it->expanded;
 }
 
-/**
- * Get the depth of expanded item
- *
- * @param it The genlist item object
- * @return The depth of expanded item
- *
- * @ingroup Genlist
- */
 EAPI int
 elm_genlist_item_expanded_depth_get(const Elm_Genlist_Item *it)
 {
@@ -4603,18 +4124,6 @@ elm_genlist_item_expanded_depth_get(const Elm_Genlist_Item *it)
    return it->expanded_depth;
 }
 
-/**
- * Sets the disabled state of an item.
- *
- * A disabled item cannot be selected or unselected. It will also
- * change appearance to appear disabled. This sets the disabled state
- * (1 disabled, 0 not disabled).
- *
- * @param it The item
- * @param disabled The disabled state
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_disabled_set(Elm_Genlist_Item *it,
                               Eina_Bool         disabled)
@@ -4646,16 +4155,6 @@ elm_genlist_item_disabled_set(Elm_Genlist_Item *it,
      }
 }
 
-/**
- * Get the disabled state of an item
- *
- * This gets the disabled state of the given item.
- *
- * @param it The item
- * @return The disabled state
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_item_disabled_get(const Elm_Genlist_Item *it)
 {
@@ -4664,19 +4163,6 @@ elm_genlist_item_disabled_get(const Elm_Genlist_Item *it)
    return it->disabled;
 }
 
-/**
- * Sets the display only state of an item.
- *
- * A display only item cannot be selected or unselected. It is for
- * display only and not selecting or otherwise clicking, dragging
- * etc. by the user, thus finger size rules will not be applied to
- * this item.
- *
- * @param it The item
- * @param display_only The display only state
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_display_only_set(Elm_Genlist_Item *it,
                                   Eina_Bool         display_only)
@@ -4692,16 +4178,6 @@ elm_genlist_item_display_only_set(Elm_Genlist_Item *it,
    it->wd->update_job = ecore_job_add(_update_job, it->wd);
 }
 
-/**
- * Get the display only state of an item
- *
- * This gets the display only state of the given item.
- *
- * @param it The item
- * @return The display only state
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_item_display_only_get(const Elm_Genlist_Item *it)
 {
@@ -4710,16 +4186,6 @@ elm_genlist_item_display_only_get(const Elm_Genlist_Item *it)
    return it->display_only;
 }
 
-/**
- * Show the given item
- *
- * This causes genlist to jump to the given item @p it and show it (by
- * scrolling), if it is not fully visible.
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_show(Elm_Genlist_Item *it)
 {
@@ -4746,17 +4212,6 @@ elm_genlist_item_show(Elm_Genlist_Item *it)
                                         it->block->w, it->h);
 }
 
-/**
- * Bring in the given item
- *
- * This causes genlist to jump to the given item @p it and show it (by
- * scrolling), if it is not fully visible. This may use animation to
- * do so and take a period of time
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_bring_in(Elm_Genlist_Item *it)
 {
@@ -4783,16 +4238,6 @@ elm_genlist_item_bring_in(Elm_Genlist_Item *it)
                                       it->block->w, it->h);
 }
 
-/**
- * Show the given item at the top
- *
- * This causes genlist to jump to the given item @p it and show it (by
- * scrolling), if it is not fully visible.
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_top_show(Elm_Genlist_Item *it)
 {
@@ -4821,17 +4266,6 @@ elm_genlist_item_top_show(Elm_Genlist_Item *it)
                                         it->block->w, oh);
 }
 
-/**
- * Bring in the given item at the top
- *
- * This causes genlist to jump to the given item @p it and show it (by
- * scrolling), if it is not fully visible. This may use animation to
- * do so and take a period of time
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_top_bring_in(Elm_Genlist_Item *it)
 {
@@ -4860,16 +4294,6 @@ elm_genlist_item_top_bring_in(Elm_Genlist_Item *it)
                                       it->block->w, oh);
 }
 
-/**
- * Show the given item at the middle
- *
- * This causes genlist to jump to the given item @p it and show it (by
- * scrolling), if it is not fully visible.
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_middle_show(Elm_Genlist_Item *it)
 {
@@ -4896,17 +4320,6 @@ elm_genlist_item_middle_show(Elm_Genlist_Item *it)
                                         it->h / 2, it->block->w, oh);
 }
 
-/**
- * Bring in the given item at the middle
- *
- * This causes genlist to jump to the given item @p it and show it (by
- * scrolling), if it is not fully visible. This may use animation to
- * do so and take a period of time
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_middle_bring_in(Elm_Genlist_Item *it)
 {
@@ -4933,17 +4346,6 @@ elm_genlist_item_middle_bring_in(Elm_Genlist_Item *it)
                                       it->block->w, oh);
 }
 
-/**
- * Delete a given item
- *
- * This deletes the item from genlist and calls the genlist item del
- * class callback defined in the item class, if it is set. This clears all
- * subitems if it is a tree.
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_del(Elm_Genlist_Item *it)
 {
@@ -4971,19 +4373,6 @@ elm_genlist_item_del(Elm_Genlist_Item *it)
    _item_del(it);
 }
 
-/**
- * Set the data item from the genlist item
- *
- * This set the data value passed on the elm_genlist_item_append() and
- * related item addition calls. This function will also call
- * elm_genlist_item_update() so the item will be updated to reflect the
- * new data.
- *
- * @param it The item
- * @param data The new data pointer to set
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_data_set(Elm_Genlist_Item *it,
                           const void       *data)
@@ -4993,17 +4382,6 @@ elm_genlist_item_data_set(Elm_Genlist_Item *it,
    elm_genlist_item_update(it);
 }
 
-/**
- * Get the data item from the genlist item
- *
- * This returns the data value passed on the elm_genlist_item_append()
- * and related item addition calls and elm_genlist_item_data_set().
- *
- * @param it The item
- * @return The data pointer provided when created
- *
- * @ingroup Genlist
- */
 EAPI void *
 elm_genlist_item_data_get(const Elm_Genlist_Item *it)
 {
@@ -5011,18 +4389,6 @@ elm_genlist_item_data_get(const Elm_Genlist_Item *it)
    return elm_widget_item_data_get(it);
 }
 
-/**
- * Tells genlist to "orphan" icons fetchs by the item class
- *
- * This instructs genlist to release references to icons in the item,
- * meaning that they will no longer be managed by genlist and are
- * floating "orphans" that can be re-used elsewhere if the user wants
- * to.
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_icons_orphan(Elm_Genlist_Item *it)
 {
@@ -5036,21 +4402,6 @@ elm_genlist_item_icons_orphan(Elm_Genlist_Item *it)
      }
 }
 
-/**
- * Get the real evas object of the genlist item
- *
- * This returns the actual evas object used for the specified genlist
- * item. This may be NULL as it may not be created, and may be deleted
- * at any time by genlist. Do not modify this object (move, resize,
- * show, hide etc.) as genlist is controlling it. This function is for
- * querying, emitting custom signals or hooking lower level callbacks
- * for events. Do not delete this object under any circumstances.
- *
- * @param it The item
- * @return The object pointer
- *
- * @ingroup Genlist
- */
 EAPI const Evas_Object *
 elm_genlist_item_object_get(const Elm_Genlist_Item *it)
 {
@@ -5058,17 +4409,6 @@ elm_genlist_item_object_get(const Elm_Genlist_Item *it)
    return it->base.view;
 }
 
-/**
- * Update the contents of an item
- *
- * This updates an item by calling all the item class functions again
- * to get the icons, labels and states. Use this when the original
- * item data has changed and the changes are desired to be reflected.
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_update(Elm_Genlist_Item *it)
 {
@@ -5082,14 +4422,6 @@ elm_genlist_item_update(Elm_Genlist_Item *it)
    it->wd->update_job = ecore_job_add(_update_job, it->wd);
 }
 
-/**
- * Update the item class of an item
- *
- * @param it The item
- * @parem itc The item class for the item
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_item_class_update(Elm_Genlist_Item             *it,
                                    const Elm_Genlist_Item_Class *itc)
@@ -5103,6 +4435,13 @@ elm_genlist_item_item_class_update(Elm_Genlist_Item             *it,
    elm_genlist_item_update(it);
 }
 
+EAPI const Elm_Genlist_Item_Class *
+elm_genlist_item_item_class_get(const Elm_Genlist_Item *it)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it, NULL);
+   if (it->delete_me) return NULL;
+   return it->itc;
+}
 static Evas_Object *
 _elm_genlist_item_label_create(void        *data,
                                Evas_Object *obj,
@@ -5124,17 +4463,6 @@ _elm_genlist_item_label_del_cb(void        *data,
    eina_stringshare_del(data);
 }
 
-/**
- * Set the text to be shown in the genlist item.
- *
- * @param item Target item
- * @param text The text to set in the content
- *
- * Setup the text as tooltip to object. The item can have only one
- * tooltip, so any previous tooltip data is removed.
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_tooltip_text_set(Elm_Genlist_Item *item,
                                   const char       *text)
@@ -5146,26 +4474,6 @@ elm_genlist_item_tooltip_text_set(Elm_Genlist_Item *item,
                                            _elm_genlist_item_label_del_cb);
 }
 
-/**
- * Set the content to be shown in the tooltip item
- *
- * Setup the tooltip to item. The item can have only one tooltip, so
- * any previous tooltip data is removed. @p func(with @p data) will be
- * called every time that need to show the tooltip and it should return a
- * valid Evas_Object. This object is then managed fully by tooltip
- * system and is deleted when the tooltip is gone.
- *
- * @param item the genlist item being attached by a tooltip.
- * @param func the function used to create the tooltip contents.
- * @param data what to provide to @a func as callback data/context.
- * @param del_cb called when data is not needed anymore, either when
- *        another callback replaces @func, the tooltip is unset with
- *        elm_genlist_item_tooltip_unset() or the owner @a item
- *        dies. This callback receives as the first parameter the
- *        given @a data, and @c event_info is the item.
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_tooltip_content_cb_set(Elm_Genlist_Item           *item,
                                         Elm_Tooltip_Item_Content_Cb func,
@@ -5199,19 +4507,6 @@ error:
    if (del_cb) del_cb((void *)data, NULL, NULL);
 }
 
-/**
- * Unset tooltip from item
- *
- * @param item genlist item to remove previously set tooltip.
- *
- * Remove tooltip from item. The callback provided as del_cb to
- * elm_genlist_item_tooltip_content_cb_set() will be called to notify
- * it is not used anymore.
- *
- * @see elm_genlist_item_tooltip_content_cb_set()
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_tooltip_unset(Elm_Genlist_Item *item)
 {
@@ -5228,18 +4523,6 @@ elm_genlist_item_tooltip_unset(Elm_Genlist_Item *item)
      elm_genlist_item_tooltip_style_set(item, NULL);
 }
 
-/**
- * Sets a different style for this item tooltip.
- *
- * @note before you set a style you should define a tooltip with
- *       elm_genlist_item_tooltip_content_cb_set() or
- *       elm_genlist_item_tooltip_text_set()
- *
- * @param item genlist item with tooltip already set.
- * @param style the theme style to use (default, transparent, ...)
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_tooltip_style_set(Elm_Genlist_Item *item,
                                    const char       *style)
@@ -5249,15 +4532,6 @@ elm_genlist_item_tooltip_style_set(Elm_Genlist_Item *item,
    if (item->base.view) elm_widget_item_tooltip_style_set(item, style);
 }
 
-/**
- * Get the style for this item tooltip.
- *
- * @param item genlist item with tooltip already set.
- * @return style the theme style in use, defaults to "default". If the
- *         object does not have a tooltip set, then NULL is returned.
- *
- * @ingroup Genlist
- */
 EAPI const char *
 elm_genlist_item_tooltip_style_get(const Elm_Genlist_Item *item)
 {
@@ -5265,15 +4539,6 @@ elm_genlist_item_tooltip_style_get(const Elm_Genlist_Item *item)
    return item->tooltip.style;
 }
 
-/**
- * Set the cursor to be shown when mouse is over the genlist item
- *
- * @param item Target item
- * @param cursor the cursor name to be used.
- *
- * @see elm_object_cursor_set()
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_cursor_set(Elm_Genlist_Item *item,
                             const char       *cursor)
@@ -5283,14 +4548,6 @@ elm_genlist_item_cursor_set(Elm_Genlist_Item *item,
    if (item->base.view) elm_widget_item_cursor_set(item, cursor);
 }
 
-/**
- * Get the cursor to be shown when mouse is over the genlist item
- *
- * @param item genlist item with cursor already set.
- * @return the cursor name.
- *
- * @ingroup Genlist
- */
 EAPI const char *
 elm_genlist_item_cursor_get(const Elm_Genlist_Item *item)
 {
@@ -5298,14 +4555,6 @@ elm_genlist_item_cursor_get(const Elm_Genlist_Item *item)
    return elm_widget_item_cursor_get(item);
 }
 
-/**
- * Unset the cursor to be shown when mouse is over the genlist item
- *
- * @param item Target item
- *
- * @see elm_object_cursor_unset()
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_cursor_unset(Elm_Genlist_Item *item)
 {
@@ -5320,17 +4569,6 @@ elm_genlist_item_cursor_unset(Elm_Genlist_Item *item)
    item->mouse_cursor = NULL;
 }
 
-/**
- * Sets a different style for this item cursor.
- *
- * @note before you set a style you should define a cursor with
- *       elm_genlist_item_cursor_set()
- *
- * @param item genlist item with cursor already set.
- * @param style the theme style to use (default, transparent, ...)
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_cursor_style_set(Elm_Genlist_Item *item,
                                   const char       *style)
@@ -5339,15 +4577,6 @@ elm_genlist_item_cursor_style_set(Elm_Genlist_Item *item,
    elm_widget_item_cursor_style_set(item, style);
 }
 
-/**
- * Get the style for this item cursor.
- *
- * @param item genlist item with cursor already set.
- * @return style the theme style in use, defaults to "default". If the
- *         object does not have a cursor set, then NULL is returned.
- *
- * @ingroup Genlist
- */
 EAPI const char *
 elm_genlist_item_cursor_style_get(const Elm_Genlist_Item *item)
 {
@@ -5355,21 +4584,6 @@ elm_genlist_item_cursor_style_get(const Elm_Genlist_Item *item)
    return elm_widget_item_cursor_style_get(item);
 }
 
-/**
- * Set if the cursor set should be searched on the theme or should use
- * the provided by the engine, only.
- *
- * @note before you set if should look on theme you should define a
- * cursor with elm_object_cursor_set(). By default it will only look
- * for cursors provided by the engine.
- *
- * @param item widget item with cursor already set.
- * @param engine_only boolean to define it cursors should be looked
- * only between the provided by the engine or searched on widget's
- * theme as well.
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_cursor_engine_only_set(Elm_Genlist_Item *item,
                                         Eina_Bool         engine_only)
@@ -5378,17 +4592,6 @@ elm_genlist_item_cursor_engine_only_set(Elm_Genlist_Item *item,
    elm_widget_item_cursor_engine_only_set(item, engine_only);
 }
 
-/**
- * Get the cursor engine only usage for this item cursor.
- *
- * @param item widget item with cursor already set.
- * @return engine_only boolean to define it cursors should be looked
- * only between the provided by the engine or searched on widget's
- * theme as well. If the object does not have a cursor set, then
- * EINA_FALSE is returned.
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_item_cursor_engine_only_get(const Elm_Genlist_Item *item)
 {
@@ -5396,22 +4599,6 @@ elm_genlist_item_cursor_engine_only_get(const Elm_Genlist_Item *item)
    return elm_widget_item_cursor_engine_only_get(item);
 }
 
-/**
- * This sets the horizontal stretching mode
- *
- * This sets the mode used for sizing items horizontally. Valid modes
- * are ELM_LIST_LIMIT and ELM_LIST_SCROLL. The default is
- * ELM_LIST_SCROLL. This mode means that if items are too wide to fit,
- * the scroller will scroll horizontally. Otherwise items are expanded
- * to fill the width of the viewport of the scroller. If it is
- * ELM_LIST_LIMIT, Items will be expanded to the viewport width and
- * limited to that size.
- *
- * @param obj The genlist object
- * @param mode The mode to use
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_horizontal_mode_set(Evas_Object  *obj,
                                 Elm_List_Mode mode)
@@ -5424,15 +4611,6 @@ elm_genlist_horizontal_mode_set(Evas_Object  *obj,
    _sizing_eval(obj);
 }
 
-/**
- * Gets the horizontal stretching mode
- *
- * @param obj The genlist object
- * @return The mode to use
- * (ELM_LIST_LIMIT, ELM_LIST_SCROLL)
- *
- * @ingroup Genlist
- */
 EAPI Elm_List_Mode
 elm_genlist_horizontal_mode_get(const Evas_Object *obj)
 {
@@ -5442,21 +4620,6 @@ elm_genlist_horizontal_mode_get(const Evas_Object *obj)
    return wd->mode;
 }
 
-/**
- * Set the always select mode.
- *
- * Items will only call their selection func and callback when first
- * becoming selected. Any further clicks will do nothing, unless you
- * enable always select with elm_genlist_always_select_mode_set().
- * This means even if selected, every click will make the selected
- * callbacks be called.
- *
- * @param obj The genlist object
- * @param always_select The always select mode
- * (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_always_select_mode_set(Evas_Object *obj,
                                    Eina_Bool    always_select)
@@ -5467,15 +4630,6 @@ elm_genlist_always_select_mode_set(Evas_Object *obj,
    wd->always_select = always_select;
 }
 
-/**
- * Get the always select mode.
- *
- * @param obj The genlist object
- * @return The always select mode
- * (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_always_select_mode_get(const Evas_Object *obj)
 {
@@ -5485,18 +4639,6 @@ elm_genlist_always_select_mode_get(const Evas_Object *obj)
    return wd->always_select;
 }
 
-/**
- * Set no select mode
- *
- * This will turn off the ability to select items entirely and they
- * will neither appear selected nor call selected callback functions.
- *
- * @param obj The genlist object
- * @param no_select The no select mode
- * (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_no_select_mode_set(Evas_Object *obj,
                                Eina_Bool    no_select)
@@ -5507,15 +4649,6 @@ elm_genlist_no_select_mode_set(Evas_Object *obj,
    wd->no_select = no_select;
 }
 
-/**
- * Gets no select mode
- *
- * @param obj The genlist object
- * @return The no select mode
- * (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_no_select_mode_get(const Evas_Object *obj)
 {
@@ -5525,21 +4658,6 @@ elm_genlist_no_select_mode_get(const Evas_Object *obj)
    return wd->no_select;
 }
 
-/**
- * Set compress mode
- *
- * This will enable the compress mode where items are "compressed"
- * horizontally to fit the genlist scrollable viewport width. This is
- * special for genlist.  Do not rely on
- * elm_genlist_horizontal_mode_set() being set to ELM_LIST_COMPRESS to
- * work as genlist needs to handle it specially.
- *
- * @param obj The genlist object
- * @param compress The compress mode
- * (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_compress_mode_set(Evas_Object *obj,
                               Eina_Bool    compress)
@@ -5550,15 +4668,6 @@ elm_genlist_compress_mode_set(Evas_Object *obj,
    wd->compress = compress;
 }
 
-/**
- * Get the compress mode
- *
- * @param obj The genlist object
- * @return The compress mode
- * (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_compress_mode_get(const Evas_Object *obj)
 {
@@ -5568,29 +4677,6 @@ elm_genlist_compress_mode_get(const Evas_Object *obj)
    return wd->compress;
 }
 
-/**
- * Set height-for-width mode
- *
- * With height-for-width mode the item width will be fixed (restricted
- * to a minimum of) to the list width when calculating its size in
- * order to allow the height to be calculated based on it. This allows,
- * for instance, text block to wrap lines if the Edje part is
- * configured with "text.min: 0 1".
- *
- * @note This mode will make list resize slower as it will have to
- *       recalculate every item height again whenever the list width
- *       changes!
- *
- * @note When height-for-width mode is enabled, it also enables
- *       compress mode (see elm_genlist_compress_mode_set()) and
- *       disables homogeneous (see elm_genlist_homogeneous_set()).
- *
- * @param obj The genlist object
- * @param setting The height-for-width mode (EINA_TRUE = on,
- * EINA_FALSE = off)
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_height_for_width_mode_set(Evas_Object *obj,
                                       Eina_Bool    height_for_width)
@@ -5606,15 +4692,6 @@ elm_genlist_height_for_width_mode_set(Evas_Object *obj,
      }
 }
 
-/**
- * Get the height-for-width mode
- *
- * @param obj The genlist object
- * @return The height-for-width mode (EINA_TRUE = on, EINA_FALSE =
- * off)
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_height_for_width_mode_get(const Evas_Object *obj)
 {
@@ -5624,18 +4701,6 @@ elm_genlist_height_for_width_mode_get(const Evas_Object *obj)
    return wd->height_for_width;
 }
 
-/**
- * Set bounce mode
- *
- * This will enable or disable the scroller bounce mode for the
- * genlist. See elm_scroller_bounce_set() for details
- *
- * @param obj The genlist object
- * @param h_bounce Allow bounce horizontally
- * @param v_bounce Allow bounce vertically
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_bounce_set(Evas_Object *obj,
                        Eina_Bool    h_bounce,
@@ -5647,15 +4712,6 @@ elm_genlist_bounce_set(Evas_Object *obj,
    elm_smart_scroller_bounce_allow_set(wd->scr, h_bounce, v_bounce);
 }
 
-/**
- * Get the bounce mode
- *
- * @param obj The genlist object
- * @param h_bounce Allow bounce horizontally
- * @param v_bounce Allow bounce vertically
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_bounce_get(const Evas_Object *obj,
                        Eina_Bool         *h_bounce,
@@ -5667,19 +4723,6 @@ elm_genlist_bounce_get(const Evas_Object *obj,
    elm_smart_scroller_bounce_allow_get(obj, h_bounce, v_bounce);
 }
 
-/**
- * Set homogenous mode
- *
- * This will enable the homogeneous mode where items are of the same
- * height and width so that genlist may do the lazy-loading at its
- * maximum. This implies 'compressed' mode.
- *
- * @param obj The genlist object
- * @param homogeneous Assume the items within the genlist are of the
- * same height and width (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_homogeneous_set(Evas_Object *obj,
                             Eina_Bool    homogeneous)
@@ -5691,15 +4734,6 @@ elm_genlist_homogeneous_set(Evas_Object *obj,
    wd->homogeneous = homogeneous;
 }
 
-/**
- * Get the homogenous mode
- *
- * @param obj The genlist object
- * @return Assume the items within the genlist are of the same height
- * and width (EINA_TRUE = on, EINA_FALSE = off)
- *
- * @ingroup Genlist
- */
 EAPI Eina_Bool
 elm_genlist_homogeneous_get(const Evas_Object *obj)
 {
@@ -5709,17 +4743,6 @@ elm_genlist_homogeneous_get(const Evas_Object *obj)
    return wd->homogeneous;
 }
 
-/**
- * Set the maximum number of items within an item block
- *
- * This will configure the block count to tune to the target with
- * particular performance matrix.
- *
- * @param obj The genlist object
- * @param n   Maximum number of items within an item block
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_block_count_set(Evas_Object *obj,
                             int          n)
@@ -5732,14 +4755,6 @@ elm_genlist_block_count_set(Evas_Object *obj,
    _item_cache_clean(wd);
 }
 
-/**
- * Get the maximum number of items within an item block
- *
- * @param obj The genlist object
- * @return Maximum number of items within an item block
- *
- * @ingroup Genlist
- */
 EAPI int
 elm_genlist_block_count_get(const Evas_Object *obj)
 {
@@ -5749,14 +4764,6 @@ elm_genlist_block_count_get(const Evas_Object *obj)
    return wd->max_items_per_block;
 }
 
-/**
- * Set the timeout in seconds for the longpress event
- *
- * @param obj The genlist object
- * @param timeout timeout in seconds
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_longpress_timeout_set(Evas_Object *obj,
                                   double       timeout)
@@ -5767,14 +4774,6 @@ elm_genlist_longpress_timeout_set(Evas_Object *obj,
    wd->longpress_timeout = timeout;
 }
 
-/**
- * Get the timeout in seconds for the longpress event
- *
- * @param obj The genlist object
- * @return timeout in seconds
- *
- * @ingroup Genlist
- */
 EAPI double
 elm_genlist_longpress_timeout_get(const Evas_Object *obj)
 {
@@ -5784,22 +4783,6 @@ elm_genlist_longpress_timeout_get(const Evas_Object *obj)
    return wd->longpress_timeout;
 }
 
-/**
- * Set the scrollbar policy
- *
- * This sets the scrollbar visibility policy for the given genlist
- * scroller. ELM_SMART_SCROLLER_POLICY_AUTO means the scrollbar is
- * made visible if it is needed, and otherwise kept hidden.
- * ELM_SMART_SCROLLER_POLICY_ON turns it on all the time, and
- * ELM_SMART_SCROLLER_POLICY_OFF always keeps it off. This applies
- * respectively for the horizontal and vertical scrollbars.
- *
- * @param obj The genlist object
- * @param policy_h Horizontal scrollbar policy
- * @param policy_v Vertical scrollbar policy
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_scroller_policy_set(Evas_Object        *obj,
                                 Elm_Scroller_Policy policy_h,
@@ -5815,15 +4798,6 @@ elm_genlist_scroller_policy_set(Evas_Object        *obj,
      elm_smart_scroller_policy_set(wd->scr, policy_h, policy_v);
 }
 
-/**
- * Get the scrollbar policy
- *
- * @param obj The genlist object
- * @param policy_h Horizontal scrollbar policy
- * @param policy_v Vertical scrollbar policy
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_scroller_policy_get(const Evas_Object   *obj,
                                 Elm_Scroller_Policy *policy_h,
@@ -5838,10 +4812,105 @@ elm_genlist_scroller_policy_get(const Evas_Object   *obj,
    if (policy_v) *policy_v = (Elm_Scroller_Policy)s_policy_v;
 }
 
-/****************************************************************************/
+EAPI void
+elm_genlist_realized_items_update(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   Eina_List *list, *l;
+   Elm_Genlist_Item *it;
+
+   list = elm_genlist_realized_items_get(obj);
+   EINA_LIST_FOREACH(list, l, it)
+     elm_genlist_item_update(it);
+}
+
+/**
+ * Set genlist item mode
+ *
+ * @param item The genlist item
+ * @param mode Mode name
+ * @param mode_set Boolean to define set or unset mode.
+ *
+ * @ingroup Genlist
+ */
+EAPI void
+elm_genlist_item_mode_set(Elm_Genlist_Item *it,
+                          const char       *mode_type,
+                          Eina_Bool         mode_set)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
+   Widget_Data *wd = it->wd;
+   Eina_List *l;
+   Elm_Genlist_Item *it2;
+
+   if (!wd) return;
+   if (!mode_type) return;
+   if ((it->delete_me) || (it->disabled)) return;
+   if (wd->edit_mode) return;
+
+   if ((wd->mode_item == it) &&
+       (!strcmp(mode_type, wd->mode_type)) &&
+       (mode_set))
+      return;
+   if (!it->itc->mode_item_style) return;
+
+   if (wd->multi)
+     {
+        EINA_LIST_FOREACH(wd->selected, l, it2)
+          if (it2->realized)
+            elm_genlist_item_selected_set(it2, EINA_FALSE);
+     }
+   else
+     {
+        it2 = elm_genlist_selected_item_get(wd->obj);
+        if ((it2) && (it2->realized))
+          elm_genlist_item_selected_set(it2, EINA_FALSE);
+     }
+
+   if (((wd->mode_type) && (strcmp(mode_type, wd->mode_type))) ||
+       (mode_set) ||
+       ((it == wd->mode_item) && (!mode_set)))
+     _item_mode_unset(wd);
+
+   eina_stringshare_replace(&wd->mode_type, mode_type);
+   if (mode_set) _item_mode_set(it);
+}
+
+/**
+ * Get active genlist mode type
+ *
+ * @param obj The genlist object
+ *
+ * @ingroup Genlist
+ */
+EAPI const char *
+elm_genlist_mode_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->mode_type;
+}
+
+/**
+ * Get active genlist mode item
+ *
+ * @param obj The genlist object
+ *
+ * @ingroup Genlist
+ */
+EAPI const Elm_Genlist_Item *
+elm_genlist_mode_item_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->mode_item;
+}
+
 /**
  * Set reorder mode
- *
  *
  * @param obj The genlist object
  * @param reorder_mode The reorder mode
@@ -6516,112 +5585,4 @@ _item_auto_scroll(void *data)
               }
           }
      }
-}
-
-/**
- * Update the contents of all realized items
- *
- * This updates all realized items by calling all the item class functions again
- * to get the icons, labels and states. Use this when the original
- * item data has changed and the changes are desired to be reflected.
- *
- * @param it The item
- *
- * @ingroup Genlist
- */
-EAPI void
-elm_genlist_realized_items_update(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-
-   Eina_List *list, *l;
-   Elm_Genlist_Item *it;
-
-   list = elm_genlist_realized_items_get(obj);
-   EINA_LIST_FOREACH(list, l, it)
-     elm_genlist_item_update(it);
-}
-
-/**
- * Set genlist item mode
- *
- * @param item The genlist item
- * @param mode Mode name
- * @param mode_set Boolean to define set or unset mode.
- *
- * @ingroup Genlist
- */
-EAPI void
-elm_genlist_item_mode_set(Elm_Genlist_Item *it,
-                          const char       *mode_type,
-                          Eina_Bool         mode_set)
-{
-   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
-   Widget_Data *wd = it->wd;
-   Eina_List *l;
-   Elm_Genlist_Item *it2;
-
-   if (!wd) return;
-   if (!mode_type) return;
-   if ((it->delete_me) || (it->disabled)) return;
-   if (wd->edit_mode) return;
-
-   if ((wd->mode_item == it) &&
-       (!strcmp(mode_type, wd->mode_type)) &&
-       (mode_set))
-      return;
-   if (!it->itc->mode_item_style) return;
-
-   if (wd->multi)
-     {
-        EINA_LIST_FOREACH(wd->selected, l, it2)
-          if (it2->realized)
-            elm_genlist_item_selected_set(it2, EINA_FALSE);
-     }
-   else
-     {
-        it2 = elm_genlist_selected_item_get(wd->obj);
-        if ((it2) && (it2->realized))
-          elm_genlist_item_selected_set(it2, EINA_FALSE);
-     }
-
-   if (((wd->mode_type) && (strcmp(mode_type, wd->mode_type))) ||
-       (mode_set) ||
-       ((it == wd->mode_item) && (!mode_set)))
-     _item_mode_unset(wd);
-
-   eina_stringshare_replace(&wd->mode_type, mode_type);
-   if (mode_set) _item_mode_set(it);
-}
-
-/**
- * Get active genlist mode type
- *
- * @param obj The genlist object
- *
- * @ingroup Genlist
- */
-EAPI const char *
-elm_genlist_mode_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->mode_type;
-}
-
-/**
- * Get active genlist mode item
- *
- * @param obj The genlist object
- *
- * @ingroup Genlist
- */
-EAPI const Elm_Genlist_Item *
-elm_genlist_mode_item_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-  return wd->mode_item;
 }
