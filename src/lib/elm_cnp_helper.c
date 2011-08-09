@@ -1036,9 +1036,10 @@ _convert_to_html(Eina_List* nodes)
                          }
                        switch(trail->tagPosType)
                          {
+                            /* closed tag does not need in HTML
                           case TAGPOS_ALONE:
                              eina_strbuf_append(html, " />");
-                             break;
+                             break;*/
                           default:
                              eina_strbuf_append(html, ">");
                              break;
@@ -1532,7 +1533,7 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
      {
         Elm_Selection_Data ddata;
 
-        str = mark_up((char *)data->data, data->length, NULL);
+        str = strdup(data->data);
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_TEXT;
         ddata.data = str;
@@ -1822,7 +1823,12 @@ edje_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **
    if (size_ret) *size_ret = strlen(sel->selbuf);*/
    char *edje = NULL;
 
-   if (data_ret && (sel->format & ELM_SEL_FORMAT_HTML))
+   if (data_ret && (sel->format == ELM_SEL_FORMAT_TEXT))
+     {
+        if (sel->selbuf && sel->selbuf[0] != '\0')
+          edje = mark_up(sel->selbuf, strlen(sel->selbuf), NULL);
+     }
+   else if (data_ret && ((sel->format & ELM_SEL_FORMAT_HTML)))
      {
         Eina_List *nodeList = NULL;
         Eina_List *trail;
@@ -1878,13 +1884,25 @@ html_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **
    sel = selections + *(int *)data;
 
    char *html = NULL;
-   if (data_ret && (sel->format & ELM_SEL_FORMAT_MARKUP))
+   char *convert_target = sel->selbuf;
+   Eina_Bool convert_edje = EINA_FALSE;
+
+   if (data_ret && (sel->format == ELM_SEL_FORMAT_TEXT))
+     {
+        if (sel->selbuf && sel->selbuf[0] != '\0')
+          {
+             convert_target = mark_up(sel->selbuf, strlen(sel->selbuf), NULL);
+             convert_edje = EINA_TRUE;
+          }
+     }
+
+   if (data_ret && ((sel->format & ELM_SEL_FORMAT_MARKUP) || convert_edje))
      {
         Eina_List *nodeList = NULL;
         Eina_List *trail;
         PTagNode nodeData;
 
-        nodeData = _get_start_node(sel->selbuf);
+        nodeData = _get_start_node(convert_target);
 
         while (nodeData)
           {
@@ -1922,6 +1940,8 @@ html_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **
         else
           *size_ret = strlen(sel->selbuf);
      }
+   if (convert_target != sel->selbuf)
+     free(convert_target);
 
    return EINA_TRUE;
 }
