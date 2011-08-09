@@ -1,6 +1,11 @@
 #include <Elementary.h>
 #include "elm_priv.h"
-#include <langinfo.h>
+
+#ifdef HAVE_ELEMENTARY_X
+# include <langinfo.h>
+#else
+# include <evil_langinfo.h>
+#endif
 
 /**
  * @defgroup Datefield Datefield
