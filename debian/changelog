@@ -1,3 +1,16 @@
+elementary (1.0.0+svn.61256slp2+build12) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+    Merge "   [searchbar] elm_searchbar_editfield_get func added Change-Id: If9c5ac42ffafe804bdd89859f9b672f81ca8a8c4"
+       [searchbar] elm_searchbar_editfield_get func added
+    Merge "   [Genlist] Upstream partial merge. Reduced diff lines from 4185 to 2325."
+       [Genlist] Upstream partial merge. Reduced diff lines from 4185 to 2325.
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build12
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Tue, 09 Aug 2011 10:32:47 +0900
+
 elementary (1.0.0+svn.61256slp2+build11) unstable; urgency=low
 
   * Package Upload.
