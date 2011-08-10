@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build13) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [window] focus will be changed following the focus state of the canvas : 62247
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build13
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 10 Aug 2011 10:22:01 +0900
+
 elementary (1.0.0+svn.61256slp2+build12) unstable; urgency=low
 
   * Package Upload
