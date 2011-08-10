@@ -162,15 +162,23 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 
    if (elm_widget_focus_get(obj))
      {
-        if (wd->imf_context) ecore_imf_context_input_panel_show(wd->imf_context);
-        evas_object_focus_set(obj, EINA_TRUE);
+        if ((wd->imf_context) && (wd->current))
+          {
+             ecore_imf_context_input_panel_show(wd->imf_context);
+             evas_object_focus_set(obj, EINA_TRUE);
+          }
+        else if ((wd->imf_context) && (!wd->current))
+          {
+             ecore_imf_context_input_panel_show(wd->imf_context);
+             elm_object_focus(wd->entry);
+          }
      }
    else
      {
         wd->focused = EINA_FALSE;
         _view_update(obj);
-        evas_object_smart_callback_call(obj, "unfocused", NULL);
         if (wd->imf_context) ecore_imf_context_input_panel_hide(wd->imf_context);
+        evas_object_smart_callback_call(obj, "unfocused", NULL);
         evas_object_focus_set(obj, EINA_FALSE);
      }
 }
