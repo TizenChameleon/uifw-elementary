@@ -17,6 +17,7 @@ sky_04.jpg \
 wood_01.jpg \
 logo.png \
 logo_small.png \
+animated_logo.gif \
 parking.png \
 icon_00.png \
 icon_01.png \
