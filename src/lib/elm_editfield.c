@@ -240,12 +240,12 @@ _signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emiss
      }
    else if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "eraser"))
      {
+        edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
+
         if(wd->editing == EINA_FALSE)
            elm_entry_cursor_end_set(wd->entry);
 
         wd->editing = EINA_TRUE;
-
-        edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
 
         if (!wd->single_line)        //FIXME : after fixing TEXTBLOCK, this should be deleted
           elm_object_focus(wd->entry);
