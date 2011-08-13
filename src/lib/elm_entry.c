@@ -930,7 +930,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
         evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
         _check_enable_returnkey(obj);
-        wd->mgf_type = _ENTRY_MAGNIFIER_FILLWIDTH;
+        wd->mgf_type = _ENTRY_MAGNIFIER_FIXEDSIZE;
      }
    else
      {
@@ -1189,15 +1189,13 @@ _copy(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   wd->selmode = EINA_FALSE;
+   wd->selmode = EINA_TRUE;
    if (!_elm_config->desktop_entry)
      {
-        edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
         edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
         elm_widget_scroll_hold_pop(data);
      }
    _store_selection(ELM_SEL_CLIPBOARD, data);
-   //   edje_object_part_text_select_none(wd->ent, "elm.text");
 }
 
 static void
