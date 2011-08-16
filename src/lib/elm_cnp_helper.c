@@ -1367,7 +1367,7 @@ targets_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void
    Cnp_Selection *sel;
 
    if (!data_ret) return EINA_FALSE;
-   if (data && (*((int *)data) >= ELM_SEL_MAX))
+   if (!data || (*((unsigned int *)data) >= ELM_SEL_MAX))
      return EINA_FALSE;
 
    sel = selections + *((int *)data);
