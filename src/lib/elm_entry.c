@@ -152,6 +152,7 @@ struct _Widget_Data
    int cursor_pos;
    Elm_Scroller_Policy policy_h, policy_v;
    Elm_Wrap_Type linewrap;
+   Elm_Input_Panel_Layout input_panel_layout;
    Eina_Bool changed : 1;
    Eina_Bool single_line : 1;
    Eina_Bool password : 1;
@@ -175,7 +176,6 @@ struct _Widget_Data
    Eina_Bool autoreturnkey : 1;
    Eina_Bool input_panel_enable : 1;
    Eina_Bool autocapital : 1;
-   Elm_Input_Panel_Layout input_panel_layout;
    Eina_Bool autoperiod : 1;
    Eina_Bool matchlist_list_clicked : 1;
    Eina_Bool matchlist_case_sensitive : 1;
