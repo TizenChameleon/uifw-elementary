@@ -147,6 +147,7 @@ struct _Widget_Data
    Eina_List *text_filters;
    Eina_List *match_list;
    Ecore_Job *matchlist_job;
+   int matchlist_threshold;
    Ecore_Job *hovdeljob;
    Mod_Api *api; // module api if supplied
    int cursor_pos;
@@ -179,7 +180,6 @@ struct _Widget_Data
    Eina_Bool autoperiod : 1;
    Eina_Bool matchlist_list_clicked : 1;
    Eina_Bool matchlist_case_sensitive : 1;
-   int matchlist_threshold;
 };
 
 struct _Elm_Entry_Context_Menu_Item
