@@ -7963,7 +7963,10 @@ extern "C" {
    EAPI void         elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Object *icon);
    EAPI Evas_Object *elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content);
 
-     /* NavigationBar */
+   /* NavigationBar */
+   #define NAVIBAR_EX_TITLEOBJ_INSTANT_HIDE "elm,state,hide,noanimate,title", "elm"
+   #define NAVIBAR_EX_TITLEOBJ_INSTANT_SHOW "elm,state,show,noanimate,title", "elm"
+
    typedef enum
      {
         ELM_NAVIGATIONBAR_EX_BACK_BUTTON,
