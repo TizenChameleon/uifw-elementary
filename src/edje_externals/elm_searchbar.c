@@ -16,8 +16,6 @@ external_searchbar_state_set(void *data __UNUSED__, Evas_Object *obj, const void
    else if (from_params) p = from_params;
    else return;
 
-   //if (p->base.label)
-   //  elm_searchbar_text_set(obj, p->base.label);
    if (p->cancel_button_animation_exists)
       elm_searchbar_cancel_button_animation_set(obj, p->cancel_button_animation);
 }
@@ -25,15 +23,8 @@ external_searchbar_state_set(void *data __UNUSED__, Evas_Object *obj, const void
 static Eina_Bool
 external_searchbar_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_External_Param *param)
 {
-   if (!strcmp(param->name, "label"))
-     {
-        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
-          {
-             elm_searchbar_text_set(obj, param->s);
-             return EINA_TRUE;
-          }
-     }
-   else if (!strcmp(param->name, "cancel_button_animation"))
+
+   if (!strcmp(param->name, "cancel_button_animation"))
      {
      	 if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
      	   {
@@ -51,15 +42,7 @@ external_searchbar_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje
 static Eina_Bool
 external_searchbar_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_External_Param *param)
 {
-   if (!strcmp(param->name, "label"))
-     {
-        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
-          {
-             param->s = elm_searchbar_text_get((Evas_Object *)obj);
-             return EINA_TRUE;
-          }
-     }
-   else if (!strcmp(param->name, "cancel_button_animation"))
+   if (!strcmp(param->name, "cancel_button_animation"))
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
           {
@@ -82,7 +65,7 @@ external_searchbar_params_parse(void *data __UNUSED__,
    Edje_External_Param *param;
    const Eina_List *l;
 
-   //mem = external_common_params_parse(Elm_Params_Searchbar, data, obj, params);
+   mem = calloc(1, sizeof(Elm_Params_Searchbar));
    if (!mem)
       return NULL;
 
@@ -90,7 +73,7 @@ external_searchbar_params_parse(void *data __UNUSED__,
      {
         if (!strcmp(param->name, "cancel_button_animation"))
           {
-             mem->cancel_button_animation = param->i;
+             mem->cancel_button_animation = !!param->i;
              mem->cancel_button_animation_exists = EINA_TRUE;
           }
      }
@@ -109,7 +92,8 @@ static Evas_Object *external_searchbar_content_get(void *data __UNUSED__,
 static void
 external_searchbar_params_free(void *params)
 {
-   external_common_params_free(params);
+   Elm_Params_Searchbar *mem = params;
+   free(params);
 }
 
 static Edje_External_Param_Info external_searchbar_params[] = {

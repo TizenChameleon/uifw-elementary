@@ -158,7 +158,7 @@ static void
 _show_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   if ((!wd) && (!wd->entry)) return;
+   if (!wd) return;
    if (wd->editing && wd->single_line)  // FIXME : single_line is not needed for this conditional state after TEXTBLOCK fixing
      elm_object_focus(wd->entry);
 }
