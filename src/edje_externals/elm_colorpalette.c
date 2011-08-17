@@ -147,10 +147,12 @@ static Evas_Object *external_colorpalette_content_get(void *data __UNUSED__,
 static void
 external_colorpalette_params_free(void *params)
 {
- 	Elm_Params_colorpalette *mem = params;
-    if(mem->color)free(mem->color);
- 	if(mem->color_set)free(mem->color_set) ;
- 	if(mem)free(mem);
+   Elm_Params_colorpalette *mem = params;
+   if (mem->color)
+     free(mem->color);
+   if (mem->color_set)
+     free(mem->color_set) ;
+   free(params);
 }
 
 static Edje_External_Param_Info external_colorpalette_params[] = {

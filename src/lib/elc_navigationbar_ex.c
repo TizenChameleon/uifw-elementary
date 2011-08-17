@@ -530,12 +530,13 @@ elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const cha
 {
    ELM_CHECK_WIDTYPE(obj, widtype)NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   Elm_Navigationbar_ex_Item *it = ELM_NEW(Elm_Navigationbar_ex_Item);
+   Elm_Navigationbar_ex_Item *it;
    Evas_Coord x, y, w, h;
    char buf[1024];
    if (!wd) return NULL;
    if (!content) return NULL;
    if (!item_style) return NULL;
+   it = ELM_NEW(Elm_Navigationbar_ex_Item);
    if (!it) return NULL;
    it->obj = obj;
    it->content = content;
