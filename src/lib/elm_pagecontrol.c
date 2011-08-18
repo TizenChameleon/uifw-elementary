@@ -62,16 +62,14 @@ _item_free(Evas_Object *obj, Page_Item *it)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   if (!it) return;
 
    if (wd->page_list)
      wd->page_list = eina_list_remove(wd->page_list, it);
 
    if (it->base) evas_object_del(it->base);
 
-   if (it) free(it);
-   it = NULL;
-
-   return;
+   free(it);
 }
 
 static void
@@ -80,14 +78,11 @@ _del_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Page_Item *it;
    Eina_List *l, *clear = NULL;
+   if (!wd) return;
 
    EINA_LIST_FOREACH(wd->page_list, l, it) clear = eina_list_append(clear, it);
    EINA_LIST_FREE(clear, it) _item_free(obj, it);
-
-   if (wd) free(wd);
-   wd = NULL;
-
-   return;
+   free(wd);
 }
 
 static Page_Item *

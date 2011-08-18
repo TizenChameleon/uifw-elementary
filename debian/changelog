@@ -1,3 +1,21 @@
+elementary (1.0.0+svn.61256slp2+build16) unstable; urgency=low
+
+  * Package Upload
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build16
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 18 Aug 2011 21:28:05 +0900
+
+elementary (1.0.0+svn.61256slp2+build15) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [Store] Removed item list inside store and group item append method changed
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build15
+
+ -- Ilkook Yun <ilkook.yun@samsung.com>  Thu, 18 Aug 2011 17:19:19 +0900
+
 elementary (1.0.0+svn.61256slp2+build14) unstable; urgency=low
 
   * Package Upload
