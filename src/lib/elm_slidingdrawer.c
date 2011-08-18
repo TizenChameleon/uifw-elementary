@@ -251,27 +251,13 @@ EAPI Evas_Object *
 elm_slidingdrawer_add(Evas_Object *parent)
 {
    Evas_Object *obj;
-
    Evas *e;
-
    Widget_Data *wd;
 
-   wd = ELM_NEW(Widget_Data);
-   if (!wd)
-     return NULL;
-
-   ELM_SET_WIDTYPE(widtype, "slidingdrawer");
-
-   wd->max_drag_w = 1;
-   wd->max_drag_h = 1;
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
    wd->parent = parent;
-   e = evas_object_evas_get(parent);
-
-   if (!e) return NULL;
-
-   //widget
-   obj = elm_widget_add(e);
+   ELM_SET_WIDTYPE(widtype, "slidingdrawer");
    elm_widget_type_set(obj, "slidingdrawer");
    elm_widget_can_focus_set(obj, EINA_FALSE);
    elm_widget_sub_object_add(parent, obj);
@@ -292,6 +278,8 @@ elm_slidingdrawer_add(Evas_Object *parent)
    wd->dragable_rect = evas_object_rectangle_add(e);
    elm_widget_sub_object_add(obj, wd->dragable_rect);
    edje_object_part_swallow(wd->base, "elm.swallow.dragable_rect", wd->dragable_rect);
+   wd->max_drag_w = 1;
+   wd->max_drag_h = 1;
 
    //handler
    wd->handler = evas_object_rectangle_add(e);

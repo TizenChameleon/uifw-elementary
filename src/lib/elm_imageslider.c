@@ -242,7 +242,7 @@ _imageslider_resize(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *eve
      return;
 
    wd = elm_widget_data_get((Evas_Object *) data);
-   if (!wd || !wd->ly)
+   if (!wd)
      return;
 
    evas_object_geometry_get(obj, NULL, NULL, &w, &h);
@@ -307,9 +307,10 @@ _imageslider_update_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord y, Evas_Coord
 static void
 _imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord my __UNUSED__, Evas_Coord y, Evas_Coord w)
 {
-   Evas_Coord ix, iy, iw, ih;
+   Evas_Coord ix = 0, iy = 0, iw = 0, ih = 0;
    const Evas_Object *eo = elm_layout_content_get((const Evas_Object*)(wd->ly[BLOCK_CENTER]), "swl.photo");
-   evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
+   if (eo)
+     evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
    if ((ix > 0) || (ix + iw < wd->w))
      {
         edje_object_signal_emit(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "block.on", "block");
@@ -395,7 +396,7 @@ static void
 _ev_imageslider_down_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = data;
-   Evas_Coord ix, iy, iw, ih;
+   Evas_Coord ix = 0, iy = 0, iw = 0, ih = 0;
    Evas_Event_Mouse_Down *ev = event_info;
    Evas_Object *eo = NULL;
 
@@ -620,9 +621,9 @@ _check_drag(int state, void *data)
 
    Elm_Imageslider_Item *it;
 
-   Evas_Coord ix, iy, iw, ih;
+   Evas_Coord ix = 0, iy = 0, iw = 0, ih = 0;
 
-   double dx, dy = 0;
+   double dx = 0, dy = 0;
 
    Eina_List *l[BLOCK_MAX];
 
@@ -656,9 +657,9 @@ _check_zoom(void *data)
 
    Elm_Imageslider_Item *it;
 
-   Evas_Coord ix, iy, iw, ih;
+   Evas_Coord ix = 0, iy = 0, iw = 0, ih = 0;
 
-   double dx, dy = 0;
+   double dx = 0, dy = 0;
 
    Evas_Object *eo = NULL;
 
@@ -667,7 +668,6 @@ _check_zoom(void *data)
    eo = (Evas_Object*)elm_layout_content_get(wd->ly[BLOCK_CENTER], "swl.photo");
    if (eo)
       evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
-   evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
    edje_object_part_drag_value_get(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "swl.photo", &dx, &dy);
 
    if ((iw != wd->w) || ((dx != 0) || (dy != 0)))
@@ -851,20 +851,12 @@ elm_imageslider_add(Evas_Object *parent)
 {
    int i;
 
-   Evas_Object *obj = NULL;
-
-   Widget_Data *wd = NULL;
-
+   Evas_Object *obj;
    Evas *e;
+   Widget_Data *wd;
 
-   if (!parent)
-     return NULL;
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (e == NULL) return NULL;
-
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "imageslider");
    elm_widget_type_set(obj, "imageslider");
    elm_widget_sub_object_add(parent, obj);
