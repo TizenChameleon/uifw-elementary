@@ -381,7 +381,7 @@ _datefield_focus_set(Evas_Object *data)
    if (wd->date_focusedpart == ENTRY_YEAR)
      {
         edje_object_signal_emit(wd->base, "elm,state,year,focus,in", "elm");
-        value =(char *)edje_object_part_text_get(wd->base,"elm.text.date.year");
+        value = edje_object_part_text_get(wd->base,"elm.text.date.year");
         edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
                                                    "elm.rect.date.year.over");
         count_start = wd->y_min;
@@ -394,7 +394,7 @@ _datefield_focus_set(Evas_Object *data)
    else if (wd->date_focusedpart == ENTRY_MON)
      {
         edje_object_signal_emit(wd->base, "elm,state,month,focus,in", "elm");
-        value=(char *)edje_object_part_text_get(wd->base,"elm.text.date.month");
+        value= edje_object_part_text_get(wd->base,"elm.text.date.month");
         edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
                                                    "elm.rect.date.month.over");
         count_start = 0;
@@ -403,8 +403,8 @@ _datefield_focus_set(Evas_Object *data)
    else if (wd->date_focusedpart == ENTRY_DAY)
      {
         edje_object_signal_emit(wd->base, "elm,state,day,focus,in", "elm");
-        value = (char *)edje_object_part_text_get(wd->base,"elm.text.date.day");
-        edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
+        value = edje_object_part_text_get(wd->base,"elm.text.date.day");
+        edj_part =(Evas_Object *) edje_object_part_object_get(wd->base,
                                                    "elm.rect.date.day.over");
         count_start = 1;
         count_end = _maximum_day_get(wd->year, wd->month);
@@ -412,7 +412,7 @@ _datefield_focus_set(Evas_Object *data)
    else if (wd->date_focusedpart == ENTRY_HOUR)
      {
         edje_object_signal_emit(wd->base, "elm,state,hour,focus,in", "elm");
-        value =(char *)edje_object_part_text_get(wd->base,"elm.text.time.hour");
+        value = edje_object_part_text_get(wd->base,"elm.text.time.hour");
         edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
                                                    "elm.rect.time.hour.over");
         if (wd->time_mode)
@@ -429,7 +429,7 @@ _datefield_focus_set(Evas_Object *data)
    else if (wd->date_focusedpart == ENTRY_MIN)
      {
         edje_object_signal_emit(wd->base, "elm,state,min,focus,in", "elm");
-        value = (char *)edje_object_part_text_get(wd->base,"elm.text.time.min");
+        value = edje_object_part_text_get(wd->base,"elm.text.time.min");
         edj_part = (Evas_Object *)edje_object_part_object_get(wd->base,
                                                    "elm.rect.time.min.over");
         count_start = 0;
@@ -444,7 +444,7 @@ _datefield_focus_set(Evas_Object *data)
         else
           snprintf(str, sizeof(str), "%02d", idx);
         item_list[idx] = eina_stringshare_add(str);
-        if (strcmp(value, item_list[idx]) == 0)
+        if ((value) && (strcmp(value, item_list[idx]) == 0))
           item = elm_diskselector_item_append(diskselector,item_list[idx],NULL,
                                               _diskselector_cb, data);
         else
@@ -681,10 +681,6 @@ elm_datefield_add(Evas_Object *parent)
 
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   wd = ELM_NEW(Widget_Data);
-   obj = elm_widget_add(e);
    ELM_SET_WIDTYPE(widtype, "datefield");
    elm_widget_type_set(obj, "datefield");
    elm_widget_sub_object_add(parent, obj);
@@ -1032,12 +1028,13 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
 
    if (wd->time_mode != mode)
      {
-   wd->time_mode = mode;
-   if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h",
-                                               "elm");
-   else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
-   edje_object_message_signal_process(wd->base);
-   _date_update(obj);
+        wd->time_mode = mode;
+        if (!wd->time_mode)
+          edje_object_signal_emit(wd->base, "elm,state,mode,24h","elm");
+        else
+          edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
+        edje_object_message_signal_process(wd->base);
+        _date_update(obj);
      }
 }
 
