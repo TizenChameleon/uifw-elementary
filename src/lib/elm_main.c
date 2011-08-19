@@ -2208,3 +2208,9 @@ elm_object_item_signal_emit(Elm_Object_Item *it, const char *emission, const cha
 {
    elm_widget_item_signal_emit(it, emission, source);
 }
+
+EAPI void
+elm_object_access_info_set(Evas_Object *obj, const char *txt)
+{
+   elm_widget_access_info_set(obj, txt);
+}
