@@ -76,6 +76,9 @@ extern const char *_elm_engines[];
 
 #define ELM_FONT_TOKEN_STYLE ":style="
 
+#define ELM_ACCESS_MODE_OFF 0
+#define ELM_ACCESS_MODE_ON 1
+
 struct _Elm_Config
 {
    int            config_version;

@@ -1669,6 +1669,8 @@ _env_get(void)
 
    s = getenv("ELM_DESKTOP_ENTRY");
    if (s) _elm_config->desktop_entry = !!atoi(s);
+   s = getenv("ELM_ACCESS_MODE");
+   if (s) _elm_config->access_mode = ELM_ACCESS_MODE_ON;
 }
 
 EAPI Eina_Bool
