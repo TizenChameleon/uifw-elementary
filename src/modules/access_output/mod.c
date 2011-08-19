@@ -39,7 +39,7 @@ _exe_del(void *data __UNUSED__, int type __UNUSED__, void *event)
 EAPI int
 elm_modapi_init(void *m __UNUSED__)
 {
-   exe_exit_handler =
+   exe_exit_handler = 
       ecore_event_handler_add(ECORE_EXE_EVENT_DEL,
                               _exe_del, NULL);
    return 1; // succeed always

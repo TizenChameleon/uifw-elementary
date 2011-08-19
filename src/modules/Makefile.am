@@ -6,4 +6,5 @@ test_entry \
 ctxpopup_copypasteUI \
 ctxpopup_copypasteshareUI \
 popup_copypasteUI \
-test_map
+test_map \
+access_output
