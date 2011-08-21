@@ -76,7 +76,7 @@ external_multibuttonentry_param_get(void *data __UNUSED__, const Evas_Object *ob
 static void *
 external_multibuttonentry_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, const Eina_List *params)
 {
-   Elm_Params_Multibuttonentry *mem;
+   Elm_Params_Multibuttonentry *mem = NULL;
    Edje_External_Param *param;
    const Eina_List *l;
 
@@ -96,7 +96,7 @@ external_multibuttonentry_params_parse(void *data __UNUSED__, Evas_Object *obj _
 }
 
 static Evas_Object *external_multibuttonentry_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
 	ERR("so content");
 	return NULL;

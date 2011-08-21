@@ -25,7 +25,7 @@ external_colorpalette_state_set(void *data __UNUSED__, Evas_Object *obj, const v
 }
 
 static Eina_Bool
-external_colorpalette_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_External_Param *param)
+external_colorpalette_param_set(void *data __UNUSED__, Evas_Object *obj __UNUSED__, const Edje_External_Param *param)
 {
    if (!strcmp(param->name, "row"))
      {
@@ -58,14 +58,14 @@ external_colorpalette_param_set(void *data __UNUSED__, Evas_Object *obj, const E
 }
 
 static Eina_Bool
-external_colorpalette_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_External_Param *param)
+external_colorpalette_param_get(void *data __UNUSED__, const Evas_Object *obj __UNUSED__, Edje_External_Param *param __UNUSED__)
 {
 	return EINA_FALSE;
    //FIX ME:getter functions not provided
 }
 
 static void *
-external_colorpalette_params_parse(void *data __UNUSED__, Evas_Object *obj, const Eina_List *params)
+external_colorpalette_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, const Eina_List *params)
 {
    Elm_Params_colorpalette *mem;
    Edje_External_Param *param;
@@ -98,7 +98,7 @@ external_colorpalette_params_parse(void *data __UNUSED__, Evas_Object *obj, cons
          {
            mem->color = (Elm_Colorpalette_Color*) calloc (mem->color_num, sizeof(Elm_Colorpalette_Color));
            s = (char*)param->i;
-           while(k <(mem->color_num) && (ll <= strlen(s)))
+           while(k <(mem->color_num) && (ll <= (int)strlen(s)))
              {
                   if(d == 0)
                    {

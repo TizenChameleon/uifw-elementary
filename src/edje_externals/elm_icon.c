@@ -163,7 +163,7 @@ external_icon_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Exte
 }
 
 static Eina_Bool
-external_icon_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_External_Param *param)
+external_icon_param_get(void *data __UNUSED__, const Evas_Object *obj __UNUSED__, Edje_External_Param *param)
 {
    if (!strcmp(param->name, "file")
 		   && param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)

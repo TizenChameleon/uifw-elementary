@@ -40,7 +40,7 @@ external_searchbar_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje
 }
 
 static Eina_Bool
-external_searchbar_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_External_Param *param)
+external_searchbar_param_get(void *data __UNUSED__, const Evas_Object *obj __UNUSED__, Edje_External_Param *param)
 {
    if (!strcmp(param->name, "cancel_button_animation"))
      {
@@ -92,7 +92,6 @@ static Evas_Object *external_searchbar_content_get(void *data __UNUSED__,
 static void
 external_searchbar_params_free(void *params)
 {
-   Elm_Params_Searchbar *mem = params;
    free(params);
 }
 

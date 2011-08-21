@@ -165,7 +165,7 @@ external_calendar_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_
 }
 
 static void *
-external_calendar_params_parse(void *data __UNUSED__, Evas_Object *obj, const Eina_List *params)
+external_calendar_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, const Eina_List *params)
 {
    Elm_Params_Calendar *mem;
    Edje_External_Param *param;
