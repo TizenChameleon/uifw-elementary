@@ -789,32 +789,36 @@ elm_navigationbar_pop(Evas_Object *obj)
    cb = ELM_NEW(Transit_Cb_Data);
 
    //Previous page is exist.
-   if (prev_it && it)
+   if (prev_it)
      {
-        cb->prev_it = prev_it;
-        cb->it = it;
-        cb->pop = EINA_TRUE;
-        if (prev_it->title_obj)
-          edje_object_part_unswallow(wd->base, prev_it->title_obj);
-        if (prev_it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON])
-          edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON]);
-        if (prev_it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON])
-          edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON]);
-        if (prev_it->icon)
-          edje_object_part_unswallow(wd->base, prev_it->icon);
-        _item_sizing_eval(it);
+        if (it)
+          {
+             cb->prev_it = prev_it;
+             cb->it = it;
+             cb->pop = EINA_TRUE;
+             if (prev_it->title_obj)
+               edje_object_part_unswallow(wd->base, prev_it->title_obj);
+             if (prev_it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON])
+               edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_PREV_BUTTON]);
+             if (prev_it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON])
+               edje_object_part_unswallow(wd->base, prev_it->title_btns[ELM_NAVIGATIONBAR_NEXT_BUTTON]);
+             if (prev_it->icon)
+               edje_object_part_unswallow(wd->base, prev_it->icon);
+             _item_sizing_eval(it);
+          }
+        else
+          {
+             cb->prev_it = prev_it;
+             cb->it = NULL;
+             cb->pop = EINA_TRUE;
+             //TODO: seems that flag is inverted.
+             cb->first_page = EINA_FALSE;
+          }
+
+        if (prev_it->content)
+          elm_object_tree_unfocusable_set(prev_it->content, EINA_TRUE);
      }
-   //This case, it's the last page.
-   else if (prev_it)
-     {
-        cb->prev_it = prev_it;
-        cb->it = NULL;
-        cb->pop = EINA_TRUE;
-        //TODO: seems that flag is inverted.
-        cb->first_page = EINA_FALSE;
-     }
-   if (prev_it->content)
-     elm_object_tree_unfocusable_set(prev_it->content, EINA_TRUE);
+
    cb->navibar = obj;
    _transition_complete_cb(cb);
    wd->popping = EINA_TRUE;
