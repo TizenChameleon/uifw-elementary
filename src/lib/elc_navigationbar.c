@@ -856,6 +856,9 @@ elm_navigationbar_to_content_pop(Evas_Object *obj, Evas_Object *content)
    //find item to be popped and to be shown
    it = prev_it = NULL;
    ll = eina_list_last(wd->stack);
+
+   if (elm_navigationbar_content_top_get(obj) == content) return;
+
    if (ll)
      {
         prev_it = ll->data;
