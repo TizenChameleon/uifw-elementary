@@ -101,6 +101,7 @@ struct _Item_Block
    Eina_Bool    realized : 1;
    Eina_Bool    changed : 1;
    Eina_Bool    updateme : 1;
+   Eina_Bool    changeme : 1;
    Eina_Bool    showme : 1;
    Eina_Bool    must_recalc : 1;
 };
@@ -2373,7 +2374,7 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
    Elm_Genlist_Item *it = data;
    if (!it) return;
    it->mincalcd = EINA_FALSE;
-   it->block->updateme = EINA_TRUE;
+   it->block->changeme = EINA_TRUE;
    if (it->wd->changed_job) ecore_job_del(it->wd->changed_job);
    it->wd->changed_job = ecore_job_add(_changed_job, it->wd);
 }
@@ -2633,7 +2634,7 @@ _changed_job(void *data)
         Evas_Coord itminw, itminh;
         Elm_Genlist_Item *it;
 
-        if (!itb->updateme)
+        if (!itb->changeme)
           {
              num += itb->count;
              if (position)
@@ -2682,7 +2683,7 @@ _changed_job(void *data)
                }
              num++;
           }
-        itb->updateme = EINA_FALSE;
+        itb->changeme = EINA_FALSE;
         // TODO: why this is separated.
         if (height_changed)
           {
