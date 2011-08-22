@@ -164,6 +164,7 @@ _theme_hook(Evas_Object *obj)
           }
      }
    edje_object_signal_emit(wd->base, sig, "elm");
+   edje_object_message_signal_process(wd->base);
 
    _date_update(obj);
    _sizing_eval(obj);
@@ -1035,6 +1036,7 @@ elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode)
    if (!wd->time_mode) edje_object_signal_emit(wd->base, "elm,state,mode,24h",
                                                "elm");
    else edje_object_signal_emit(wd->base, "elm,state,mode,12h", "elm");
+   edje_object_message_signal_process(wd->base);
    _date_update(obj);
      }
 }
@@ -1083,6 +1085,7 @@ elm_datefield_date_format_set(Evas_Object *obj, const char *fmt)
      }
    if (j < 32) sig[j] = '\0';
    edje_object_signal_emit(wd->base, sig, "elm");
+   edje_object_message_signal_process(wd->base);
 
    if (strstr(sig, "yymmdd")) wd->date_format = DATE_FORMAT_YYMMDD;
    else if (strstr(sig, "yyddmm")) wd->date_format = DATE_FORMAT_YYDDMM;
