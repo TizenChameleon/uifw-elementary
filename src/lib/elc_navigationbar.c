@@ -1147,7 +1147,7 @@ elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content
    }
    _item_sizing_eval(it);
 }
-/*
+
 EAPI Evas_Object *
 elm_navigationbar_title_object_get(Evas_Object *obj, Evas_Object *content)
 {
@@ -1165,7 +1165,7 @@ elm_navigationbar_title_object_get(Evas_Object *obj, Evas_Object *content)
 
    return it->title_obj;
 }
-*/
+
 /**
  * Return the list of title objects of the pushed content.
  *
