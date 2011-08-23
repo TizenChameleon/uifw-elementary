@@ -159,8 +159,12 @@ _show_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *even
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   if (wd->editing && wd->single_line)  // FIXME : single_line is not needed for this conditional state after TEXTBLOCK fixing
-     elm_object_focus(wd->entry);
+   if ((wd->single_line) && (!wd->editing))  // FIXME : single_line is not needed for this conditional state after TEXTBLOCK fixing
+     {
+        elm_object_focus(wd->entry);
+        elm_entry_cursor_end_set(wd->entry);
+        wd->editing = EINA_TRUE;
+     }
 }
 
 static Eina_Bool
@@ -242,13 +246,12 @@ _signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emiss
      {
         edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
 
-        if(wd->editing == EINA_FALSE)
-           elm_entry_cursor_end_set(wd->entry);
-
-        wd->editing = EINA_TRUE;
-
-        if (!wd->single_line)        //FIXME : after fixing TEXTBLOCK, this should be deleted
-          elm_object_focus(wd->entry);
+        if ((!wd->single_line) && (!wd->editing)) //FIXME : after fixing TEXTBLOCK, this should be deleted
+          {
+             elm_object_focus(wd->entry);
+             elm_entry_cursor_end_set(wd->entry);
+             wd->editing = EINA_TRUE;
+          }
 
         if(!(_empty_entry(wd->entry)) && (wd->eraser_show))
            edje_object_signal_emit(wd->base, "elm,state,eraser,show", "elm");
