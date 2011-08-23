@@ -234,7 +234,16 @@ icon_arrow_down_right.png \
 icon_arrow_up_left.png \
 icon_arrow_up_right.png \
 thumb_shadow.png \
-group_index.png
+group_index.png \
+mp_forward.png \
+mp_info.png \
+mp_next.png \
+mp_pause.png \
+mp_play.png \
+mp_prev.png \
+mp_rewind.png \
+mp_stop.png \
+access_glow.png
 
 default.edj: Makefile $(EXTRA_DIST)
 	$(EDJE_CC) $(EDJE_FLAGS) \
