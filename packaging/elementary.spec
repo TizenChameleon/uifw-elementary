@@ -5,7 +5,7 @@ Release:    1
 Group:      TO_BE/FILLED_IN
 License:    LGPL
 URL:        http://trac.enlightenment.org/e/wiki/Elementary
-Source0:    elementary-%{version}.tar.bz2
+Source0:    %{name}-%{version}.tar.bz2
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(ecore)
@@ -50,7 +50,7 @@ EFL toolkit for small touchscreens (devel)
 
 
 %prep
-%setup -q -n %{name}
+%setup -q
 
 %build
 
