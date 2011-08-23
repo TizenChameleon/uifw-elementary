@@ -899,6 +899,8 @@ elm_navigationbar_to_content_pop(Evas_Object *obj, Evas_Object *content)
         _transition_complete_cb(cb);
 
         elm_pager_to_content_pop(wd->pager, content);
+
+        free(cb);
      }
 }
 
