@@ -153,7 +153,8 @@ _del_hook(Evas_Object *obj)
    wd->files_list = NULL;
    wd->files_grid = NULL;
 
-   EINA_REFCOUNT_UNREF(wd, _widget_data_free);
+   EINA_REFCOUNT_UNREF(wd)
+      _widget_data_free(wd);
 }
 
 static void
@@ -674,7 +675,8 @@ _main_cb(void *data, Eio_File *handler, const Eina_File_Direct_Info *info __UNUS
 static void
 _widget_request_cleanup(Widget_Request *wr)
 {
-   EINA_REFCOUNT_UNREF(wr->wd, _widget_data_free);
+   EINA_REFCOUNT_UNREF(wr->wd)
+     _widget_data_free(wr->wd);
 
    eina_stringshare_del(wr->path);
    free(wr);
