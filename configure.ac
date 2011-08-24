@@ -175,6 +175,7 @@ dnl managed by evil
       have_socket="yes"
       ;;
 esac
+AC_CHECK_FUNCS(strcasestr, AC_DEFINE(HAVE_STRCASESTR))
 AM_CONDITIONAL([BUILD_RUN], [test "x$have_socket" = "xyes"])
 
 m4_ifdef([v_mic],
