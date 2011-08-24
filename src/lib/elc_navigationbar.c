@@ -165,7 +165,7 @@ _create_back_btn(Evas_Object *parent, const char *title, void *data)
    Evas_Object *btn = elm_button_add(parent);
    if (!btn) return NULL;
    elm_object_text_set(btn, title);
-   evas_object_smart_callback_add(btn, "clicked", _back_button_clicked, data);
+   evas_object_smart_callback_priority_add(btn, "clicked", EVAS_CALLBACK_PRIORITY_AFTER, _back_button_clicked, data);
    return btn;
 }
 
