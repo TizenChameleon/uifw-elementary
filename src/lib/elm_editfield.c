@@ -30,6 +30,7 @@ struct _Widget_Data
    Eina_Bool needs_size_calc:1;
    Eina_Bool show_guide_text:1;
    Eina_Bool editing:1;
+   Eina_Bool clicked:1;
    Eina_Bool single_line:1;
    Eina_Bool eraser_show:1;
 };
@@ -62,6 +63,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      {
         evas_object_smart_callback_call(obj, "unfocused", NULL);
         wd->editing = EINA_FALSE;
+        wd->clicked = EINA_FALSE;
         edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
 
         if (!wd->single_line) // FIXME : if textblock works well, delete
@@ -159,11 +161,12 @@ _show_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *even
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   if ((wd->single_line) && (!wd->editing))  // FIXME : single_line is not needed for this conditional state after TEXTBLOCK fixing
+   if ((wd->single_line) && (wd->clicked) && (!wd->editing))  // FIXME : single_line is not needed for this conditional state after TEXTBLOCK fixing
      {
         elm_object_focus(wd->entry);
         elm_entry_cursor_end_set(wd->entry);
         wd->editing = EINA_TRUE;
+        wd->clicked = EINA_FALSE;
      }
 }
 
@@ -245,6 +248,7 @@ _signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    else if(strcmp(source, "left_icon") && strcmp(source, "right_icon") && strcmp(source, "eraser"))
      {
         edje_object_signal_emit(wd->base, "elm,state,over,hide", "elm");
+        wd->clicked = EINA_TRUE;
 
         if ((!wd->single_line) && (!wd->editing)) //FIXME : after fixing TEXTBLOCK, this should be deleted
           {
@@ -325,6 +329,7 @@ elm_editfield_add(Evas_Object *parent)
    evas_object_event_callback_add(wd->base, EVAS_CALLBACK_RESIZE, _resize_cb, obj);
 
    wd->editing = EINA_FALSE;
+   wd->clicked = EINA_FALSE;
    wd->single_line = EINA_FALSE;
    wd->eraser_show = EINA_TRUE;
 
