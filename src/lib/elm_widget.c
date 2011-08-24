@@ -2698,7 +2698,7 @@ _elm_widget_item_del(Elm_Widget_Item *item)
 
    if (item->view)
      evas_object_del(item->view);
-   
+
    if (item->access)
      {
         _elm_access_clear(item->access);
