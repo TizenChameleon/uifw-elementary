@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build20) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [editfield] single lined entry should be focused only when clicked   * Important Changes show
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build20
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 24 Aug 2011 17:08:52 +0900
+
 elementary (1.0.0+svn.61256slp2+build19) unstable; urgency=low
 
   * Recorver elm_navigationbar_title_object_get
