@@ -114,7 +114,7 @@ _tt_item_icon(void *data   __UNUSED__,
    Evas_Object *ic = elm_icon_add(obj);
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png",
-            PACKAGE_DATA_DIR);
+            elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
    elm_icon_scale_set(ic, 0, 0);
    evas_object_resize(ic, 64, 64);
@@ -189,7 +189,7 @@ _tt_icon(void *data   __UNUSED__,
    Evas_Object *ic = elm_icon_add(obj);
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png",
-            PACKAGE_DATA_DIR);
+            elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
    elm_icon_scale_set(ic, 0, 0);
    evas_object_resize(ic, 64, 64);
@@ -202,7 +202,7 @@ _tt_icon2(void *data   __UNUSED__,
 {
    Evas_Object *ic = elm_icon_add(obj);
    char buf[PATH_MAX];
-   snprintf(buf, sizeof(buf), "%s/images/icon_00.png", PACKAGE_DATA_DIR);
+   snprintf(buf, sizeof(buf), "%s/images/icon_00.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
    elm_icon_scale_set(ic, 0, 0);
    evas_object_resize(ic, 64, 64);
@@ -498,7 +498,7 @@ test_tooltip2(void *data       __UNUSED__,
    n = 0;
    for (i = 0; i < 9; i++)
      {
-        snprintf(buf, sizeof(buf), "%s/images/%s", PACKAGE_DATA_DIR,
+        snprintf(buf, sizeof(buf), "%s/images/%s", elm_app_data_dir_get(),
                  img[n]);
         n++;
         ti[i].mode = i;
