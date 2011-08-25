@@ -2714,6 +2714,7 @@ _pan_set(Evas_Object *obj,
    Item_Block *itb;
 #endif
 
+   if (!sd) return;
    //   Evas_Coord ow, oh;
    //   evas_object_geometry_get(obj, NULL, NULL, &ow, &oh);
    //   ow = sd->wd->minw - ow;
@@ -2759,6 +2760,7 @@ _pan_get(Evas_Object *obj,
 {
    Pan *sd = evas_object_smart_data_get(obj);
 
+   if (!sd) return;
    if (x) *x = sd->wd->pan_x;
    if (y) *y = sd->wd->pan_y;
 }
@@ -2771,6 +2773,7 @@ _pan_max_get(Evas_Object *obj,
    Pan *sd = evas_object_smart_data_get(obj);
    Evas_Coord ow, oh;
 
+   if (!sd) return;
    evas_object_geometry_get(obj, NULL, NULL, &ow, &oh);
    ow = sd->wd->minw - ow;
    if (ow < 0) ow = 0;
@@ -2796,6 +2799,7 @@ _pan_child_size_get(Evas_Object *obj,
 {
    Pan *sd = evas_object_smart_data_get(obj);
 
+   if (!sd) return;
    if (w) *w = sd->wd->minw;
    if (h) *h = sd->wd->minh;
 }
@@ -2833,6 +2837,7 @@ static void
 _pan_resize_job(void *data)
 {
    Pan *sd = data;
+   if (!sd) return;
    _sizing_eval(sd->wd->obj);
    sd->resize_job = NULL;
 }
@@ -2845,6 +2850,7 @@ _pan_resize(Evas_Object *obj,
    Pan *sd = evas_object_smart_data_get(obj);
    Evas_Coord ow, oh;
 
+   if (!sd) return;
    evas_object_geometry_get(obj, NULL, NULL, &ow, &oh);
    if ((ow == w) && (oh == h)) return;
    if ((sd->wd->height_for_width) && (ow != w))
@@ -2867,6 +2873,7 @@ _pan_calculate(Evas_Object *obj)
    Elm_Genlist_Item *git;
    Eina_List *l;
 
+   if (!sd) return;
    evas_event_freeze(evas_object_evas_get(obj));
    evas_object_geometry_get(obj, &ox, &oy, &ow, &oh);
    evas_output_viewport_get(evas_object_evas_get(obj), &cvx, &cvy, &cvw, &cvh);
@@ -2932,6 +2939,7 @@ _pan_move(Evas_Object *obj,
 {
    Pan *sd = evas_object_smart_data_get(obj);
 
+   if (!sd) return;
    if (sd->wd->calc_job) ecore_job_del(sd->wd->calc_job);
    sd->wd->calc_job = ecore_job_add(_calc_job, sd->wd);
 }
