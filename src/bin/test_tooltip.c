@@ -121,6 +121,49 @@ _tt_item_icon(void *data   __UNUSED__,
    return ic;
 }
 
+static Evas_Object *
+_tt_item_icon2(void *data   __UNUSED__,
+              Evas_Object *obj __UNUSED__,
+              Evas_Object *tt,
+              void *item   __UNUSED__)
+{
+   Evas_Object *ic = elm_icon_add(tt);
+   char buf[PATH_MAX];
+   snprintf(buf, sizeof(buf), "%s/images/logo.png", elm_app_data_dir_get());
+   elm_icon_file_set(ic, buf, NULL);
+   elm_icon_scale_set(ic, 0, 0);
+   return ic;
+}
+
+static Evas_Object *
+_tt_item_icon3(void *data   __UNUSED__,
+              Evas_Object *obj __UNUSED__,
+              Evas_Object *tt,
+              void *item   __UNUSED__)
+{
+   Evas_Object *ic = elm_icon_add(tt);
+   char buf[PATH_MAX];
+   snprintf(buf, sizeof(buf), "%s/images/insanely_huge_test_image.jpg", elm_app_data_dir_get());
+   elm_icon_file_set(ic, buf, NULL);
+   elm_icon_scale_set(ic, 0, 0);
+   return ic;
+}
+
+static Evas_Object *
+_tt_item_label(void *data   __UNUSED__,
+              Evas_Object *obj __UNUSED__,
+              Evas_Object *tt,
+              void *item   __UNUSED__)
+{
+   Evas_Object *l = elm_label_add(tt);
+   elm_object_text_set(l, "Something useful here?<ps>"
+                          "No probably not, but this is a super long label<ps>"
+                          "which probably breaks on your system, now doesn't it?<ps>"
+                          "Yeah, I thought so.");
+   elm_label_line_wrap_set(l, ELM_WRAP_MIXED);
+   return l;
+}
+
 static void
 _tt_item_icon_del(void            *data,
                   Evas_Object *obj __UNUSED__,
