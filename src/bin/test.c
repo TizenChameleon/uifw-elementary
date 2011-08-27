@@ -461,7 +461,7 @@ my_win_main(char *autorun, Eina_Bool test_win_only)
 /* this is your elementary main function - it MUST be called IMMEDIATELY
  * after elm_init() and MUST be passed argc and argv, and MUST be called
  * elm_main and not be static - must be a visible symbol with EAPI infront */
-EAPI int
+EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
    Eina_Bool test_win_only = EINA_FALSE;
