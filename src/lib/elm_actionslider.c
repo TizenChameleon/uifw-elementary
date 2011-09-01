@@ -332,7 +332,7 @@ _icon_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info _
              else
                wd->final_position = _FINAL_POS_BY_ORIENTATION(0);
           }
-        wd->icon_animator = ecore_animator_add(_icon_animation, wd);
+        wd->icon_animator = ecore_animator_add(_icon_animation, as);
 
         #undef _FINAL_POS_BY_ORIENTATION
      }
@@ -341,20 +341,16 @@ _icon_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info _
 static Eina_Bool
 _icon_animation(void *data)
 {
-   Evas_Object *as = data;
-   Widget_Data *wd = (Widget_Data *)data;
-   if (!wd)
-     {
-        wd->icon_animator = NULL;
-        return ECORE_CALLBACK_CANCEL;
-     }
+   Widget_Data *wd = elm_widget_data_get(data);
    double cur_position = 0.0, new_position = 0.0;
    double move_amount = 0.05;
    double adjusted_final;
    Eina_Bool flag_finish_animation = EINA_FALSE;
 
+   if (!wd) return ECORE_CALLBACK_CANCEL;
+
    edje_object_part_drag_value_get(wd->as, "elm.swallow.icon", &cur_position, NULL);
-   adjusted_final = (!elm_widget_mirrored_get(as)) ? wd->final_position : 1.0 - wd->final_position;
+   adjusted_final = (!elm_widget_mirrored_get(data)) ? wd->final_position : 1.0 - wd->final_position;
 
    if ( (adjusted_final == 0.0) ||(adjusted_final == 0.5 && cur_position >= adjusted_final) )
      {
