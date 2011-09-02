@@ -1,3 +1,14 @@
+elementary (1.0.0+svn.61256slp2+build23) unstable; urgency=low
+
+  * Upload Package
+  * Important Changes
+       [Genlist] Applied genlist upstream patch r62823. [elementary] genlist_nastiness--
+       [Genlist] Applied upstream r62821 commit. fix bug if pan has been deleted -
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build23
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Fri, 02 Sep 2011 13:57:10 +0900
+
 elementary (1.0.0+svn.61256slp2+build22) unstable; urgency=low
 
   * Upload Package
