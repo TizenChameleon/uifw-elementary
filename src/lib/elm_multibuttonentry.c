@@ -69,7 +69,6 @@ struct _Widget_Data {
    int  contracted;
    Eina_Bool focused: 1;
    Eina_Bool last_btn_select: 1;
-   Ecore_IMF_Context *imf_context;
    Elm_Multibuttonentry_Item_Verify_Callback add_callback;
    void *add_callback_data;
 };
@@ -160,16 +159,18 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 
    if (!wd) return;
 
+   Ecore_IMF_Context *imf_context = elm_entry_imf_context_get(wd->entry);
+
    if (elm_widget_focus_get(obj))
      {
-        if ((wd->imf_context) && (wd->current))
+        if ((imf_context) && (wd->current))
           {
-             ecore_imf_context_input_panel_show(wd->imf_context);
+             ecore_imf_context_input_panel_show(imf_context);
              evas_object_focus_set(obj, EINA_TRUE);
           }
-        else if ((wd->imf_context) && (!wd->current))
+        else if ((imf_context) && (!wd->current))
           {
-             ecore_imf_context_input_panel_show(wd->imf_context);
+             ecore_imf_context_input_panel_show(imf_context);
              elm_object_focus(wd->entry);
           }
      }
@@ -177,7 +178,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      {
         wd->focused = EINA_FALSE;
         _view_update(obj);
-        if (wd->imf_context) ecore_imf_context_input_panel_hide(wd->imf_context);
+        if (imf_context) ecore_imf_context_input_panel_hide(imf_context);
         evas_object_smart_callback_call(obj, "unfocused", NULL);
         evas_object_focus_set(obj, EINA_FALSE);
      }
@@ -226,7 +227,9 @@ _signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    wd->focused = EINA_TRUE;
    _view_update(data);
 
-   if (wd->imf_context) ecore_imf_context_input_panel_show(wd->imf_context);
+   Ecore_IMF_Context *imf_context = elm_entry_imf_context_get(wd->entry);
+
+   if (imf_context) ecore_imf_context_input_panel_show(imf_context);
    evas_object_smart_callback_call(data, "clicked", NULL);
 }
 
@@ -1051,7 +1054,6 @@ _view_init(Evas_Object *obj)
         if (wd->box)   elm_box_pack_end (wd->box, wd->entry);
         evas_object_show(wd->entry);
         wd->view_state = MULTIBUTTONENTRY_VIEW_ENTRY;
-        wd->imf_context = elm_entry_imf_context_get(wd->entry);
      }
 
    if (!wd->end)
@@ -1306,7 +1308,6 @@ elm_multibuttonentry_add(Evas_Object *parent)
    wd->last_btn_select = EINA_TRUE;
    wd->n_str = 0;
    wd->rectForEnd = NULL;
-   wd->imf_context = NULL;
    wd->add_callback = NULL;
    wd->add_callback_data = NULL;
 
