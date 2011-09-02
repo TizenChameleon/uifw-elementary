@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build25) unstable; urgency=low
+
+  * Upload Package for EFL core migration
+  * Important Changes
+       [Patch for EFL core migration] Merge branch 'efl_core'
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build25
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Fri, 02 Sep 2011 18:47:06 +0900
+
 elementary (1.0.0+svn.61256slp2+build24) unstable; urgency=low
 
   * Upload Package
