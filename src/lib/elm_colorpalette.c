@@ -108,7 +108,7 @@ _sizing_eval(Evas_Object *obj)
 }
 
 
-static void _colorpalette_object_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
+static void _colorpalette_object_move(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    DBG("%s", __func__);
 
@@ -132,7 +132,7 @@ static void _colorpalette_object_move(void *data, Evas *e, Evas_Object *obj, voi
 }
 
 
-static void _colorpalette_object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
+static void _colorpalette_object_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd;
    Colorpalette_Item *item = NULL;
@@ -180,7 +180,7 @@ static void _colorpalette_object_resize(void *data, Evas *e, Evas_Object *obj, v
 }
 
 
-static void _colorpalette_object_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
+static void _colorpalette_object_show(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    DBG("%s", __func__);
 
@@ -200,7 +200,7 @@ static void _colorpalette_object_show(void *data, Evas *e, Evas_Object *obj, voi
    }
 }
 
-static void _colorpalette_object_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
+static void _colorpalette_object_hide(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    DBG("%s", __func__);
 
@@ -219,7 +219,7 @@ static void _colorpalette_object_hide(void *data, Evas *e, Evas_Object *obj, voi
    }
 }
 
-static void _color_select_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+static void _color_select_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Colorpalette_Item *item = (Colorpalette_Item *) data;
    Elm_Colorpalette_Color *color;
@@ -236,7 +236,7 @@ static void _color_select_cb(void *data, Evas *e, Evas_Object *obj, void *event_
 }
 
 
-static void _color_release_cb(void *data, Evas *e, Evas_Object *obj, void *event_info)
+static void _color_release_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Colorpalette_Item *item = (Colorpalette_Item *) data;
    edje_object_signal_emit(elm_layout_edje_get(item->lo), "focus_invisible", "elm");
