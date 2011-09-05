@@ -581,7 +581,7 @@ _insert_item_in_bar(Elm_Controlbar_Item * it, int order)
    const Eina_List *l;
    Elm_Controlbar_Item * item;
    Widget_Data * wd = elm_widget_data_get(it->obj);
-   if (!wd) return NULL;
+   if (!wd) return;
    int check = 0;
 
    if (order == 0) return;
