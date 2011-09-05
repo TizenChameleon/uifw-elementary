@@ -1395,7 +1395,7 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
 
    // items container
    wd->box = elm_table_add(wd->edje);
-   elm_table_homogenous_set(wd->box, EINA_TRUE);
+   elm_table_homogeneous_set(wd->box, EINA_TRUE);
    evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND,
                                     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
