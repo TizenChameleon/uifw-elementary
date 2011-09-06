@@ -168,10 +168,10 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
              ecore_imf_context_input_panel_show(imf_context);
              evas_object_focus_set(obj, EINA_TRUE);
           }
-        else if ((imf_context) && (!wd->current))
+        else if ((imf_context) && (!wd->current) || (!eina_list_count(wd->items)))
           {
+             _view_update(obj);
              ecore_imf_context_input_panel_show(imf_context);
-             elm_object_focus(wd->entry);
           }
      }
    else
