@@ -37,6 +37,7 @@ typedef enum
 struct _Widget_Data
 {
    Eina_List *stack;
+   Evas_Object *rect;
    Evas_Object *base;
    Evas_Object *pager;
    Eina_Bool title_visible : 1;
@@ -349,7 +350,34 @@ _item_sizing_eval(Elm_Navigationbar_Item *it)
 static void
 _resize(void *data __UNUSED__, Evas *e  __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   Evas_Coord w, h;
+   evas_object_geometry_get(obj, NULL, NULL, &w, &h);
+   evas_object_resize(wd->rect, w, h);
+
    _sizing_eval(obj);
+}
+
+static void
+_hide(void *data __UNUSED__, Evas *e  __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   evas_object_hide(wd->rect);
+}
+
+static void
+_move(void *data __UNUSED__, Evas *e  __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   Evas_Coord x, y;
+   evas_object_geometry_get(obj, &x, &y, NULL, NULL);
+   evas_object_move(wd->rect, x, y);
 }
 
 static void
@@ -457,6 +485,7 @@ _transition_complete_cb(void *data)
              else
                edje_object_signal_emit(wd->base, "elm,action,push", "elm");
              evas_object_pass_events_set(wd->base, EINA_TRUE);
+             evas_object_show(wd->rect);
           }
         if (it->title_obj)
           {
@@ -517,6 +546,7 @@ _hide_finished(void *data, Evas_Object *obj __UNUSED__, void *event_info)
    wd->popping = EINA_FALSE;
    evas_object_smart_callback_call(navi_bar, SIG_HIDE_FINISHED, event_info);
    evas_object_pass_events_set(wd->base, EINA_FALSE);
+   evas_object_hide(wd->rect);
 }
 
 static void
@@ -655,10 +685,17 @@ elm_navigationbar_add(Evas_Object *parent)
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->pager);
    evas_object_smart_callback_add(wd->pager, "hide,finished", _hide_finished, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, NULL);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, NULL);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
 
    wd->title_visible = EINA_TRUE;
 
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
+
+   //Rect
+   wd->rect = evas_object_rectangle_add(e);
+   evas_object_color_set(wd->rect, 0, 0, 0, 0);
+   elm_widget_sub_object_add(obj, wd->rect);
 
    //TODO: apply elm_object_disabled_set
 
