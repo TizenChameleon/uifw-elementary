@@ -52,6 +52,7 @@ struct _Widget_Data
    Eina_Bool         bring_in : 1;
    Eina_Bool         compress : 1;
    Eina_Bool         height_for_width : 1;
+   Eina_Bool         pan_resize : 1;
    Eina_Bool         homogeneous : 1;
    Eina_Bool         clear_me : 1;
    Eina_Bool         swipe : 1;
@@ -1945,7 +1946,7 @@ _item_realize(Elm_Genlist_Item *it,
                     }
                }
           }
-        if (!it->mincalcd)
+        if (!it->mincalcd || it->wd->pan_resize)
           {
              Evas_Coord mw = -1, mh = -1;
 
@@ -2264,6 +2265,7 @@ _item_block_position(Item_Block *itb,
    Elm_Genlist_Item *it;
    Elm_Genlist_Item *git;
    Evas_Coord y = 0, ox, oy, ow, oh, cvx, cvy, cvw, cvh;
+   Evas_Coord minh = 0;
    int vis = 0;
 
    evas_event_freeze(evas_object_evas_get(itb->wd->obj));
@@ -2363,7 +2365,9 @@ _item_block_position(Item_Block *itb,
              it->old_scrl_y = it->scrl_y;
           }
         y += it->h;
+        minh += it->minh;
      }
+   itb->minh = minh;
    evas_event_thaw(evas_object_evas_get(itb->wd->obj));
    evas_event_thaw_eval(evas_object_evas_get(itb->wd->obj));
 }
@@ -2855,6 +2859,7 @@ _pan_resize(Evas_Object *obj,
    if ((ow == w) && (oh == h)) return;
    if ((sd->wd->height_for_width) && (ow != w))
      {
+        sd->wd->pan_resize = EINA_TRUE;
         if (sd->resize_job) ecore_job_del(sd->resize_job);
         sd->resize_job = ecore_job_add(_pan_resize_job, sd);
      }
@@ -2876,6 +2881,7 @@ _pan_calculate(Evas_Object *obj)
    if (!sd) return;
    evas_event_freeze(evas_object_evas_get(obj));
    evas_object_geometry_get(obj, &ox, &oy, &ow, &oh);
+   sd->wd->prev_viewport_w = ow;
    evas_output_viewport_get(evas_object_evas_get(obj), &cvx, &cvy, &cvw, &cvh);
    EINA_LIST_FOREACH(sd->wd->group_items, l, git)
      {
@@ -2928,6 +2934,7 @@ _pan_calculate(Evas_Object *obj)
              }
         }
       else _item_auto_scroll(sd->wd);
+   sd->wd->pan_resize = EINA_FALSE;
    evas_event_thaw(evas_object_evas_get(obj));
    evas_event_thaw_eval(evas_object_evas_get(obj));
 }
