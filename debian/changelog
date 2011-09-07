@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build26) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [elm_util] fix bug in _mkup_to_text function
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build26
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 07 Sep 2011 09:51:12 +0900
+
 elementary (1.0.0+svn.61256slp2+build25) unstable; urgency=low
 
   * Upload Package for EFL core migration
