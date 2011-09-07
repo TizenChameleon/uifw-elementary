@@ -1983,6 +1983,30 @@ _elm_widget_top_win_focused_get(const Evas_Object *obj)
    return sd->top_win_focused;
 }
 
+void
+_elm_widget_top_win_focused_set(Evas_Object *obj, Eina_Bool top_win_focused)
+{
+   const Eina_List *l;
+   Evas_Object *child;
+   API_ENTRY return;
+
+   if (sd->top_win_focused == top_win_focused) return;
+   if (sd->resize_obj)
+     _elm_widget_top_win_focused_set(sd->resize_obj, top_win_focused);
+   EINA_LIST_FOREACH(sd->subobjs, l, child)
+     {
+        _elm_widget_top_win_focused_set(child, top_win_focused);
+     }
+   sd->top_win_focused = top_win_focused;
+}
+
+Eina_Bool
+_elm_widget_top_win_focused_get(const Evas_Object *obj)
+{
+   API_ENTRY return EINA_FALSE;
+   return sd->top_win_focused;
+}
+
 EAPI void
 elm_widget_activate(Evas_Object *obj)
 {

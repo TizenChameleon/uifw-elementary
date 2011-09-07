@@ -337,7 +337,7 @@ _elm_win_focus_out(Ecore_Evas *ee)
    if (!obj) return;
    win = elm_widget_data_get(obj);
    if (!win) return;
-   elm_object_unfocus(win->win_obj);
+   elm_object_focus_set(win->win_obj, EINA_FALSE);
    _elm_widget_top_win_focused_set(win->win_obj, EINA_FALSE);
    evas_object_smart_callback_call(win->win_obj, SIG_FOCUS_OUT, NULL);
    win->focus_highlight.cur.visible = EINA_FALSE;
