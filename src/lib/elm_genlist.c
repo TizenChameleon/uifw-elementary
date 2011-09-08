@@ -2367,7 +2367,7 @@ _item_block_position(Item_Block *itb,
         y += it->h;
         minh += it->minh;
      }
-   itb->minh = minh;
+   if (!itb->wd->reorder_it) itb->minh = minh;
    evas_event_thaw(evas_object_evas_get(itb->wd->obj));
    evas_event_thaw_eval(evas_object_evas_get(itb->wd->obj));
 }
