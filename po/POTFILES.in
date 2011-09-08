@@ -143,6 +143,7 @@
 ./src/lib/elm_progressbar.c
 ./src/lib/elm_radio.c
 ./src/lib/elm_scroller.c
+./src/lib/elm_searchbar.c
 ./src/lib/elm_separator.c
 ./src/lib/elm_slider.c
 ./src/lib/elm_slideshow.c

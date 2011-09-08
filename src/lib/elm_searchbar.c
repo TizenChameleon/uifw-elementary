@@ -218,7 +218,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    snprintf(buf, sizeof(buf), "searchbar/%s", elm_widget_style_get(obj));
    elm_object_style_set(wd->cancel_btn, buf);
 
-   elm_object_text_set(wd->cancel_btn, "Cancel");
+   elm_object_text_set(wd->cancel_btn, E_("Cancel"));
    evas_object_smart_callback_add(wd->cancel_btn, "clicked", _cancel_clicked, obj);
    elm_widget_sub_object_add(obj, wd->cancel_btn);
 
