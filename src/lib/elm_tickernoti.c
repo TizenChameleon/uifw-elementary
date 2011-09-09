@@ -31,6 +31,13 @@ static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 
+static const char SIG_CLICKED[] = "clicked";
+static const char SIG_HIDDEN[] = "hide";
+static const Evas_Smart_Cb_Description _signals[] = {
+       {SIG_CLICKED, ""},
+       {SIG_HIDDEN, ""},
+       {NULL, NULL}
+};
 static void
 _del_job(void *data)
 {
@@ -103,11 +110,12 @@ static void
 _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
+   Evas_Coord minw = -1, minh = -1;
 
    if (!wd) return;
-   edje_object_size_min_calc(wd->win, &minw, &minh);
-//TODO:
+   elm_coords_finger_size_adjust(1, &minw, 1, &minh);
+   edje_object_size_min_restricted_calc(wd->edje_obj, &minw, &minh, minw, minh);
+   evas_object_size_hint_min_set(obj, minw, minh);
 }
 
 #ifdef HAVE_ELEMENTARY_X
@@ -142,7 +150,17 @@ static void _hide_cb (void *data, Evas_Object *obj __UNUSED__,
 
    if (!wd) return;
    evas_object_hide (wd->win);
-   evas_object_smart_callback_call (data, "hide", NULL);
+   evas_object_smart_callback_call (data, SIG_HIDDEN, NULL);
+}
+
+static void _clicked_cb (void *data, Evas_Object *obj __UNUSED__,
+                             const char *emission __UNUSED__,
+                             const char *source __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+
+   if (!wd) return;
+   evas_object_smart_callback_call (data, SIG_CLICKED, NULL);
 }
 
 static Evas_Object
@@ -193,6 +211,7 @@ _create_tickernoti (Evas_Object *obj)
 #endif
 
    edje_object_signal_callback_add(wd->edje_obj, "request,hide", "", _hide_cb, obj);
+   edje_object_signal_callback_add(wd->edje_obj, "clicked", "", _clicked_cb, obj);
    evas_object_show (wd->edje_obj);
 }
 
@@ -278,7 +297,7 @@ elm_tickernoti_add(Evas_Object *parent)
 
    evas_object_event_callback_add (obj, EVAS_CALLBACK_SHOW, _show, NULL);
    evas_object_event_callback_add (obj, EVAS_CALLBACK_HIDE, _hide, NULL);
-
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
    return obj;
 }
 
@@ -431,7 +450,7 @@ elm_tickernoti_rotation_set (Evas_Object *obj, int angle)
 
    /*
    * manual calculate win_tickernoti_indi window position & size
-   *  - win_indi is not full size window (480 x 27)
+   *  - win_indi is not full size window
    */
    ecore_x_window_size_get (ecore_x_window_root_first_get(), &root_w, &root_h);
 

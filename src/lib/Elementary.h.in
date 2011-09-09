@@ -8227,6 +8227,12 @@ typedef enum
    EAPI void                      elm_tickernoti_mode_set (Evas_Object *obj, Elm_Tickernoti_Mode mode) EINA_ARG_NONNULL(1);
    EAPI Elm_Tickernoti_Mode       elm_tickernoti_mode_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /* ############################################################################### */
+   /* smart callbacks called:
+    * @li "clicked" - emitted when tickernoti is clicked, except at the
+    * swallow/button region, if any.
+    * @li "hide" - emitted when the tickernoti is completelyhidden. In case of
+    * any hide animation, this signal is raised after the animation.
+    */
 
    /* colorpalette */
    typedef struct _Colorpalette_Color Elm_Colorpalette_Color;
