@@ -138,23 +138,29 @@ _item_select(Elm_Toolbar_Item *it)
    Elm_Toolbar_Item *it2;
    Widget_Data *wd = elm_widget_data_get(WIDGET(it));
    Evas_Object *obj2;
+   Eina_Bool sel;
 
    if (!wd) return;
-   if ((it->selected) || (it->disabled) || (it->separator)) return;
+   if ((it->disabled) || (it->separator)) return;
+   sel = it->selected;
 
    if (!wd->no_select)
      {
-        it2 = elm_toolbar_selected_item_get(WIDGET(it));
-        _item_unselect(it2);
+        if (sel) _item_unselect(it);
+        else
+          {
+             it2 = elm_toolbar_selected_item_get(WIDGET(it));
+             _item_unselect(it2);
 
-        it->selected = EINA_TRUE;
-        wd->selected_item = it;
-        edje_object_signal_emit(VIEW(it), "elm,state,selected", "elm");
-        elm_widget_signal_emit(it->icon, "elm,state,selected", "elm");
-        _item_show(it);
+             it->selected = EINA_TRUE;
+             wd->selected_item = it;
+             edje_object_signal_emit(VIEW(it), "elm,state,selected", "elm");
+             elm_widget_signal_emit(it->icon, "elm,state,selected", "elm");
+             _item_show(it);
+          }
      }
    obj2 = WIDGET(it);
-   if (it->menu)
+   if (it->menu && (!sel))
      {
         evas_object_show(it->o_menu);
         evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_RESIZE,
