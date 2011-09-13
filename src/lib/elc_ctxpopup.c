@@ -1625,3 +1625,24 @@ elm_ctxpopup_direction_priority_get(Evas_Object *obj,
    if (third) *third = wd->dir_priority[2];
    if (fourth) *fourth = wd->dir_priority[3];
 }
+
+/**
+ * @brief Get the current direction of a ctxpopup.
+ *
+ * @param obj Ctxpopup object
+ * @return current direction of a ctxpopup
+ *
+ * @warning Once the ctxpopup showed up, the direction would be determined
+ */
+
+EAPI Elm_Ctxpopup_Direction
+elm_ctxpopup_direction_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_CTXPOPUP_DIRECTION_UNKNOWN;
+   Widget_Data *wd;
+
+   wd = elm_widget_data_get(obj);
+   if (!wd) return ELM_CTXPOPUP_DIRECTION_UNKNOWN;
+   return wd->dir;
+}
+
