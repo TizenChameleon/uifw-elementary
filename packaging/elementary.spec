@@ -1,3 +1,4 @@
+#sbs-git:slp/pkgs/e/elementary elementary_1.0.0+svn.61256slp2+build26 7a9d4e37a3eaef2856850022c0127a6e3738b0f2
 Name:       elementary
 Summary:    EFL toolkit for small touchscreens
 Version:    0.7.0.svn61256
@@ -23,9 +24,9 @@ BuildRequires:  pkgconfig(ethumb)
 BuildRequires:  pkgconfig(evas)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(x11)
-BuildRequires:  edje-bin
-BuildRequires:  embryo-bin
-BuildRequires:  eet-bin
+BuildRequires:  edje-tools
+BuildRequires:  embryo
+BuildRequires:  eet-tools
 BuildRequires:  libjpeg-devel
 BuildRequires:  desktop-file-utils
 
@@ -40,13 +41,15 @@ Requires:   %{name} = %{version}-%{release}
 %description devel
 EFL toolkit for small touchscreens (devel)
 
-%package bin
-Summary:    EFL toolkit (devel)
-Group:      Development/Libraries
+%package tools
+Summary:    EFL toolkit (tools)
+Group:      Development/Tools
 Requires:   %{name} = %{version}-%{release}
+Provides:   %{name}-bin
+Obsoletes:  %{name}-bin
 
-%description bin
-EFL toolkit for small touchscreens (devel)
+%description tools
+EFL toolkit for small touchscreens (tools)
 
 
 %prep
@@ -94,7 +97,7 @@ desktop-file-install --delete-original       \
 /usr/lib/libelementary.so
 /usr/lib/pkgconfig/elementary.pc
 
-%files bin
+%files tools
 %defattr(-,root,root,-)
 /usr/bin/elementary_*
 /usr/lib/elementary_testql.so
