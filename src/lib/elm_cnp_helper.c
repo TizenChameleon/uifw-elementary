@@ -163,6 +163,7 @@ static int vcard_receive(Cnp_Selection *sed, Ecore_X_Event_Selection_Notify *not
 static Paste_Image *pasteimage_alloc(const char *file, int pathlen);
 static Eina_Bool pasteimage_append(Paste_Image *pi, Evas_Object *entry);
 static void pasteimage_free(Paste_Image *pi);
+static void entry_insert_filter(Evas_Object* entry, char* str);
 
 /* Optimisation: Turn this into a 256 byte table:
  *	then can lookup in one index, not N checks */
@@ -1520,6 +1521,69 @@ found:
    return 0;
 }
 
+static void
+entry_insert_filter(Evas_Object* entry, char* str)
+{
+   if (!entry || !str)
+     return;
+
+   char *insertStr = str;
+   // if entry has text only set then remove item tags
+   if (elm_entry_cnp_textonly_get(entry))
+     {
+        while (EINA_TRUE)
+          {
+             char *startTag = NULL;
+             char *endTag = NULL;
+
+             startTag = strstr(insertStr, "<item");
+             if (!startTag)
+               startTag = strstr(insertStr, "</item");
+             if (startTag)
+               endTag = strstr(insertStr, ">");
+             else
+               break;
+             if (!endTag || startTag > endTag)
+               {
+                  cnp_debug("Broken tag: %s\n", str);
+                  break;
+               }
+
+             size_t sindex = startTag - insertStr;
+             size_t eindex = endTag - insertStr + 1;
+
+             Eina_Strbuf *buf = eina_strbuf_new();
+             if (buf)
+               {
+                  eina_strbuf_append(buf, insertStr);
+                  eina_strbuf_remove(buf, sindex, eindex);
+                  insertStr = eina_strbuf_string_steal(buf);
+                  eina_strbuf_free(buf);
+               }
+          }
+     }
+   cnp_debug("remove item tag: %s\n", insertStr);
+
+   // if entry has single line set then remove <br> & <ps> tags
+   if (elm_entry_single_line_get(entry))
+     {
+        Eina_Strbuf *buf = eina_strbuf_new();
+        if (buf)
+          {
+             eina_strbuf_append(buf, insertStr);
+             eina_strbuf_replace_all(buf, "<br>", "");
+             eina_strbuf_replace_all(buf, "<ps>", "");
+             insertStr = eina_strbuf_string_steal(buf);
+             eina_strbuf_free(buf);
+          }
+     }
+   cnp_debug("remove break tag: %s\n", insertStr);
+
+   elm_entry_entry_insert(entry, insertStr);
+
+   if (insertStr != str)
+     free(insertStr);
+}
 
 static int
 notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
@@ -1546,7 +1610,8 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    cnp_debug("Notify handler text %d %d %p\n", data->format,data->length, data->data);
    str = mark_up((char *)data->data, data->length, NULL);
    cnp_debug("String is %s (from %s)\n", str, data->data);
-   elm_entry_entry_insert(sel->requestwidget, str);
+   entry_insert_filter(sel->requestwidget, str);
+   //elm_entry_entry_insert(sel->requestwidget, str);
    free(str);
    return 0;
 }
@@ -1740,7 +1805,8 @@ notify_handler_edje(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
         sel->datacb(sel->udata, sel->widget, &ddata);
      }
    else
-     elm_entry_entry_insert(sel->requestwidget, stripstr);
+     entry_insert_filter(sel->requestwidget, stripstr);
+     //elm_entry_entry_insert(sel->requestwidget, stripstr);
 
    cnp_debug("String is %s (%d bytes)\n", stripstr, data->length);
    free(stripstr);
@@ -1775,7 +1841,8 @@ notify_handler_html(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
         sel->datacb(sel->udata, sel->widget, &ddata);
      }
    else
-     elm_entry_entry_insert(sel->requestwidget, stripstr);
+     entry_insert_filter(sel->requestwidget, stripstr);
+     //elm_entry_entry_insert(sel->requestwidget, stripstr);
 
    cnp_debug("String is %s (%d bytes)\n", stripstr, data->length);
    free(stripstr);
@@ -2064,6 +2131,7 @@ pasteimage_append(Paste_Image *pi, Evas_Object *entry)
 
    if (!pi) return EINA_FALSE;
    if (!entry) return EINA_FALSE;
+   if (elm_entry_cnp_textonly_get(entry)) return EINA_FALSE;
 
    pasteimage_provider_set(entry);
 
