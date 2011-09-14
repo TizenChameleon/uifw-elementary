@@ -2,6 +2,9 @@
 #include "elm_priv.h"
 
 typedef struct _Widget_Data Widget_Data;
+typedef struct _Elm_Naviframe_Item Elm_Naviframe_Item;
+typedef struct _Elm_Naviframe_Content_Item_Pair Elm_Naviframe_Content_Item_Pair;
+typedef struct _Elm_Naviframe_Text_Item_Pair Elm_Naviframe_Text_Item_Pair;
 
 struct _Widget_Data
 {
@@ -11,17 +14,27 @@ struct _Widget_Data
    Eina_Bool     pass_events: 1;
 };
 
+struct _Elm_Naviframe_Content_Item_Pair
+{
+   const char *part;
+   Evas_Object *content;
+   Elm_Naviframe_Item *it;
+};
+
+struct _Elm_Naviframe_Text_Item_Pair
+{
+   const char *part;
+   const char *text;
+};
+
 struct _Elm_Naviframe_Item
 {
    Elm_Widget_Item    base;
-   Evas_Object       *title;
+   Eina_List         *content_list;
+   Eina_List         *text_list;
    Evas_Object       *content;
-   const char        *title_label;
-   const char        *title_sublabel;
    Evas_Object       *title_prev_btn;
    Evas_Object       *title_next_btn;
-   Evas_Object       *title_icon;
-   Evas_Object       *extension;
    const char        *style;
    Eina_Bool          back_btn: 1;
    Eina_Bool          title_visible: 1;
@@ -38,13 +51,21 @@ static const Evas_Smart_Cb_Description _signals[] = {
        {NULL, NULL}
 };
 
-#define ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, ...) \
-   ELM_WIDGET_ITEM_CHECK_OR_RETURN((Elm_Widget_Item *) it, __VA_ARGS__); \
-   ELM_CHECK_WIDTYPE(it->base.widget, widtype) __VA_ARGS__;
-
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _disable_hook(Evas_Object *obj);
+static void _text_set_hook(Elm_Object_Item *it,
+                           const char *part,
+                           const char *label);
+static const char *_text_get_hook(const Elm_Object_Item *it,
+                                   const char *part);
+static void _content_set_hook(Elm_Object_Item *it,
+                              const char *part,
+                              Evas_Object *content);
+static Evas_Object *_content_get_hook(const Elm_Object_Item *it,
+                                      const char *part);
+static Evas_Object *_content_unset_hook(Elm_Object_Item *it,
+                                        const char *part);
 static void _sizing_eval(Evas_Object *obj);
 static void _item_sizing_eval(Elm_Naviframe_Item *it);
 static void _move(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -59,6 +80,14 @@ static void _back_btn_clicked(void *data,
                               Evas_Object *obj,
                               void *event_info);
 static Evas_Object *_back_btn_new(Evas_Object *obj);
+static void _item_content_del(void *data,
+                              Evas *e,
+                              Evas_Object *obj,
+                              void *event_info);
+static void _title_content_del(void *data,
+                               Evas *e,
+                               Evas_Object *obj,
+                               void *event_info);
 static void _title_prev_btn_del(void *data,
                                 Evas *e,
                                 Evas_Object *obj,
@@ -67,18 +96,10 @@ static void _title_next_btn_del(void *data,
                                 Evas *e,
                                 Evas_Object *obj,
                                 void *event_info);
-static void _title_icon_del(void *data,
-                            Evas *e,
-                            Evas_Object *obj,
-                            void *event_info);
-static void _content_del(void *data,
-                         Evas *e,
-                         Evas_Object *obj,
-                         void *event_info);
-static void _extension_del(void *data,
-                           Evas *e,
-                           Evas_Object *obj,
-                           void *event_info);
+static void _title_content_set(Elm_Naviframe_Item *it,
+                               Elm_Naviframe_Content_Item_Pair *pair,
+                               const char *part,
+                               Evas_Object *content);
 static void _title_prev_btn_set(Elm_Naviframe_Item *it,
                                 Evas_Object *btn,
                                 Eina_Bool back_btn);
@@ -96,6 +117,8 @@ static void _show_finished(void *data,
                            Evas_Object *obj,
                            const char *emission,
                            const char *source);
+static void _item_content_set(Elm_Naviframe_Item *navi_it,
+                              Evas_Object *content);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -123,6 +146,187 @@ static void
 _disable_hook(Evas_Object *obj __UNUSED__)
 {
    //FIXME:
+}
+
+static void
+_text_set_hook(Elm_Object_Item *it, const char *part, const char *label)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+
+   Eina_List *l = NULL;
+   Elm_Naviframe_Text_Item_Pair *pair = NULL;
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+   char buf[1024];
+
+   if (!part) return;
+
+   EINA_LIST_FOREACH(navi_it->text_list, l, pair)
+     {
+        if (!strcmp(part, pair->part))
+          {
+             if (pair->text)
+               {
+                  if (!strcmp(pair->text, label))
+                    return;
+               }
+             break;
+          }
+     }
+
+   if (!pair)
+     {
+        pair = ELM_NEW(Elm_Naviframe_Text_Item_Pair);
+        if (!pair)
+          {
+             ERR("Failed to allocate new text part of the item! : naviframe=%p", navi_it->base.widget);
+             return;
+          }
+        eina_stringshare_replace(&pair->part, part);
+        navi_it->text_list = eina_list_append(navi_it->text_list, pair);
+     }
+
+   eina_stringshare_replace(&pair->text, label);
+   edje_object_part_text_set(navi_it->base.view, part, label);
+
+   snprintf(buf, sizeof(buf), "elm,state,%s,show", part);
+
+   if (label)
+     edje_object_signal_emit(navi_it->base.view, buf, "elm");
+   else
+     edje_object_signal_emit(navi_it->base.view, buf, "elm");
+
+   _item_sizing_eval(navi_it);
+}
+
+static const char *
+_text_get_hook(const Elm_Object_Item *it, const char *part)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
+   Eina_List *l = NULL;
+   Elm_Naviframe_Text_Item_Pair *pair = NULL;
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+
+   if (!part) return NULL;
+
+   EINA_LIST_FOREACH(navi_it->text_list, l, pair)
+     {
+        if (!strcmp(part, pair->part))
+          return pair->text;
+     }
+   return NULL;
+}
+
+static void
+_content_set_hook(Elm_Object_Item *it,
+                  const char *part,
+                  Evas_Object *content)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+
+   Elm_Naviframe_Content_Item_Pair *pair = NULL;
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+
+   if (!part) return;
+
+   //specified parts
+   if (!strcmp(part, "elm.swallow.content"))
+     {
+       _item_content_set(navi_it, content);
+       return;
+     }
+   else if (!strcmp(part, "elm.swallow.prev_btn"))
+     {
+       _title_prev_btn_set(navi_it, content, EINA_FALSE);
+       return;
+     }
+   else if(!strcmp(part, "elm.swallow.next_btn"))
+     {
+       _title_next_btn_set(navi_it, content);
+       return;
+     }
+
+   //common part
+   _title_content_set(navi_it, pair, part, content);
+}
+
+/*
+   */
+static Evas_Object *
+_content_get_hook(const Elm_Object_Item *it,
+                  const char *part)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
+   Eina_List *l = NULL;
+   Elm_Naviframe_Content_Item_Pair *pair = NULL;
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+
+   //specified parts
+   if (!strcmp(part, "elm.swallow.content"))
+     return navi_it->content;
+   else if (!strcmp(part, "elm.swallow.prev_btn"))
+     return navi_it->title_prev_btn;
+   else if(!strcmp(part, "elm.swallow.next_btn"))
+     return navi_it->title_next_btn;
+
+   //common parts
+   EINA_LIST_FOREACH(navi_it->content_list, l, pair)
+     {
+        if (!strcmp(part, pair->part))
+          return pair->content;
+     }
+   return NULL;
+}
+
+static Evas_Object *
+_content_unset_hook(Elm_Object_Item *it __UNUSED__,
+                    const char *part __UNUSED__)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
+   Eina_List *l = NULL;
+   Elm_Naviframe_Content_Item_Pair *pair = NULL;
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+   Evas_Object *content = NULL;
+   char buf[1028];
+
+  if (!part) return NULL;
+
+  //specified parts
+  //FIXME: could be unset the below specified contents also.
+   if (!strcmp(part, "elm.swallow.content") ||
+       !strcmp(part, "elm.swallow.prev_btn") ||
+       !strcmp(part, "elm.swallow.next_btn"))
+     {
+        WRN("You can not unset the content! : naviframe=%p",
+            navi_it->base.widget);
+        return NULL;
+     }
+
+  //common parts
+   EINA_LIST_FOREACH(navi_it->content_list, l, pair)
+     {
+        if (!strcmp(part, pair->part))
+          {
+             content = pair->content;
+             eina_stringshare_del(pair->part);
+             navi_it->content_list = eina_list_remove(navi_it->content_list,
+                                                      pair);
+             free(pair);
+             break;
+          }
+     }
+
+   if (!content) return NULL;
+
+   elm_widget_sub_object_del(navi_it->base.widget, content);
+   edje_object_part_unswallow(navi_it->base.view, content);
+   snprintf(buf, sizeof(buf), "elm,state,%s,hide", part);
+   edje_object_signal_emit(navi_it->base.view, buf, "elm");
+   evas_object_event_callback_del(content,
+                                  EVAS_CALLBACK_DEL,
+                                  _title_content_del);
+   _item_sizing_eval(navi_it);
+
+   return content;
 }
 
 static void
@@ -196,13 +400,29 @@ static Evas_Object *
 _back_btn_new(Evas_Object *obj)
 {
    Evas_Object *btn;
-   char buf[256];   //FIXME: How to guarantee the size of style name?
+   char buf[1024];
    btn = elm_button_add(obj);
    if (!btn) return NULL;
    evas_object_smart_callback_add(btn, "clicked", _back_btn_clicked, obj);
    snprintf(buf, sizeof(buf), "naviframe/back_btn/%s", elm_widget_style_get(obj));
    elm_object_style_set(btn, buf);
    return btn;
+}
+
+static void
+_title_content_del(void *data,
+                   Evas *e __UNUSED__,
+                   Evas_Object *obj __UNUSED__,
+                   void *event_info __UNUSED__)
+{
+   char buf[1024];
+   Elm_Naviframe_Content_Item_Pair *pair = data;
+   Elm_Naviframe_Item *it = pair->it;
+   snprintf(buf, sizeof(buf), "elm,state,%s,hide", pair->part);
+   edje_object_signal_emit(it->base.view, buf, "elm");
+   it->content_list = eina_list_remove(it->content_list, pair);
+   eina_stringshare_del(pair->part);
+   free(pair);
 }
 
 static void
@@ -227,21 +447,10 @@ _title_next_btn_del(void *data,
 }
 
 static void
-_title_icon_del(void *data,
-                Evas *e __UNUSED__,
-                Evas_Object *obj __UNUSED__,
-                void *event_info __UNUSED__)
-{
-   Elm_Naviframe_Item *it = data;
-   it->title_icon = NULL;
-   edje_object_signal_emit(it->base.view, "elm,state,icon,hide", "elm");
-}
-
-static void
-_content_del(void *data,
-             Evas *e __UNUSED__,
-             Evas_Object *obj __UNUSED__,
-             void *event_info __UNUSED__)
+_item_content_del(void *data,
+                  Evas *e __UNUSED__,
+                  Evas_Object *obj __UNUSED__,
+                  void *event_info __UNUSED__)
 {
    Elm_Naviframe_Item *it = data;
    it->content = NULL;
@@ -249,19 +458,61 @@ _content_del(void *data,
 }
 
 static void
-_extension_del(void *data,
-               Evas *e,
-               Evas_Object *obj __UNUSED__,
-               void *event_info __UNUSED__)
+_title_content_set(Elm_Naviframe_Item *it,
+                   Elm_Naviframe_Content_Item_Pair *pair,
+                   const char *part,
+                   Evas_Object *content)
 {
-   Elm_Naviframe_Item *it = data;
-   it->extension = NULL;
+   Eina_List *l = NULL;
+   char buf[1024];
+
+   EINA_LIST_FOREACH(it->content_list, l, pair)
+     {
+        if (!strcmp(part, pair->part))
+          {
+             if (pair->content == content) return;
+             break;
+          }
+     }
+
+   if (!pair)
+     {
+        pair = ELM_NEW(Elm_Naviframe_Content_Item_Pair);
+        if (!pair)
+          {
+             ERR("Failed to allocate new content part of the item! : naviframe=%p", it->base.widget);
+             return;
+          }
+        pair->it = it;
+        eina_stringshare_replace(&pair->part, part);
+        it->content_list = eina_list_append(it->content_list, pair);
+     }
+
+   if (pair->content) evas_object_del(pair->content);
+   pair->content = content;
+
+   if (!content)
+     {
+        snprintf(buf, sizeof(buf), "elm,state,%s,hide", part);
+        edje_object_signal_emit(it->base.view, buf, "elm");
+        return;
+     }
+
+   elm_widget_sub_object_add(it->base.widget, content);
+   edje_object_part_swallow(it->base.view, part, content);
+   snprintf(buf, sizeof(buf), "elm,state,%s,show", part);
+   edje_object_signal_emit(it->base.view, buf, "elm");
+   evas_object_event_callback_add(content,
+                                  EVAS_CALLBACK_DEL,
+                                  _title_content_del,
+                                  pair);
+   _item_sizing_eval(it);
 }
 
 static void
 _title_prev_btn_set(Elm_Naviframe_Item *it, Evas_Object *btn, Eina_Bool back_btn)
 {
-   char buf[256];   //FIXME: How to guarantee the size of style name?
+   char buf[1024];
 
    if (it->title_prev_btn == btn) return;
 
@@ -272,27 +523,21 @@ _title_prev_btn_set(Elm_Naviframe_Item *it, Evas_Object *btn, Eina_Bool back_btn
 
    if (!btn) return;
 
-   if (!back_btn)
-     {
-        snprintf(buf,
-                 sizeof(buf),
-                 "naviframe/prev_btn/%s",
-                 elm_widget_style_get(it->base.widget));
-        elm_object_style_set(btn, buf);
-     }
    elm_widget_sub_object_add(it->base.widget, btn);
    evas_object_event_callback_add(btn,
                                   EVAS_CALLBACK_DEL,
                                   _title_prev_btn_del,
                                   it);
-   edje_object_part_swallow(it->title, "elm.swallow.prev_btn", btn);
+   edje_object_part_swallow(it->base.view, "elm.swallow.prev_btn", btn);
    it->back_btn = back_btn;
+
+   _item_sizing_eval(it);
 }
 
 static void
 _title_next_btn_set(Elm_Naviframe_Item *it, Evas_Object *btn)
 {
-   char buf[256];   //FIXME: How to guarantee the size of style name?
+   char buf[1024];
 
    if (it->title_next_btn == btn) return;
 
@@ -303,23 +548,24 @@ _title_next_btn_set(Elm_Naviframe_Item *it, Evas_Object *btn)
 
    if (!btn) return;
 
-   snprintf(buf,
-            sizeof(buf),
-            "naviframe/next_btn/%s",
-            elm_widget_style_get(it->base.widget));
    elm_object_style_set(btn, buf);
    elm_widget_sub_object_add(it->base.widget, btn);
    evas_object_event_callback_add(btn,
                                   EVAS_CALLBACK_DEL,
                                   _title_next_btn_del,
                                   it);
-   edje_object_part_swallow(it->title, "elm.swallow.next_btn", btn);
+   edje_object_part_swallow(it->base.view, "elm.swallow.next_btn", btn);
+
+   _item_sizing_eval(it);
 }
 
 static void
 _item_del(Elm_Naviframe_Item *it)
 {
    Widget_Data *wd;
+   Eina_List *l;
+   Elm_Naviframe_Content_Item_Pair *content_pair;
+   Elm_Naviframe_Text_Item_Pair *text_pair;
 
    if (!it) return;
 
@@ -330,14 +576,21 @@ _item_del(Elm_Naviframe_Item *it)
      evas_object_del(it->title_prev_btn);
    if (it->title_next_btn)
      evas_object_del(it->title_next_btn);
-   if (it->title_icon)
-     evas_object_del(it->title_icon);
-   if ((it->content) && (!wd->preserve))
+      if ((it->content) && (!wd->preserve))
      evas_object_del(it->content);
-   if (it->extension)
-     evas_object_del(it->extension);
 
-   evas_object_del(it->title);
+   EINA_LIST_FOREACH(it->content_list, l, content_pair)
+     evas_object_del(content_pair->content);
+
+   EINA_LIST_FOREACH(it->text_list, l, text_pair)
+     {
+        eina_stringshare_del(text_pair->part);
+        eina_stringshare_del(text_pair->text);
+     }
+
+   eina_list_free(it->content_list);
+   eina_list_free(it->text_list);
+
    evas_object_del(it->base.view);
 
    wd->stack = eina_list_remove(wd->stack, it);
@@ -386,6 +639,29 @@ _show_finished(void *data,
      evas_object_pass_events_set(wd->base, EINA_FALSE);
 }
 
+static void
+_item_content_set(Elm_Naviframe_Item *navi_it, Evas_Object *content)
+{
+   if (navi_it->content == content) return;
+   if (navi_it->content) evas_object_del(navi_it->content);
+   elm_widget_sub_object_add(navi_it->base.widget, content);
+   edje_object_part_swallow(navi_it->base.view, "elm.swallow.content", content);
+   if (content)
+     edje_object_signal_emit(navi_it->base.view,
+                             "elm,state,content,show",
+                             "elm");
+   else
+     edje_object_signal_emit(navi_it->base.view,
+                             "elm,state,content,hide",
+                             "elm");
+   evas_object_event_callback_add(content,
+                                  EVAS_CALLBACK_DEL,
+                                  _item_content_del,
+                                  navi_it);
+   navi_it->content = content;
+   _item_sizing_eval(navi_it);
+}
+
 EAPI Evas_Object *
 elm_naviframe_add(Evas_Object *parent)
 {
@@ -416,7 +692,7 @@ elm_naviframe_add(Evas_Object *parent)
    return obj;
 }
 
-EAPI Elm_Naviframe_Item *
+EAPI Elm_Object_Item *
 elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -433,6 +709,13 @@ elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *
         ERR("Failed to allocate new item! : naviframe=%p", obj);
         return NULL;
      }
+
+   elm_widget_item_text_set_hook_set(it, _text_set_hook);
+   elm_widget_item_text_get_hook_set(it, _text_get_hook);
+   elm_widget_item_content_set_hook_set(it, _content_set_hook);
+   elm_widget_item_content_get_hook_set(it, _content_get_hook);
+   elm_widget_item_content_unset_hook_set(it, _content_unset_hook);
+
    //item base layout
    it->base.view = edje_object_add(evas_object_evas_get(obj));
    evas_object_smart_member_add(it->base.view, wd->base);
@@ -449,21 +732,15 @@ elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *
                                    "elm,action,popped,finished",
                                    "",
                                    _popped_finished, it);
-   elm_naviframe_item_style_set(it, item_style);
+   elm_naviframe_item_style_set(ELM_CAST(it), item_style);
 
    //title
-   it->title = edje_object_add(evas_object_evas_get(obj));
-   elm_widget_sub_object_add(obj, it->title);
-   _elm_theme_object_set(obj,
-                         it->title, "naviframe",
-                         "title",
-                         elm_widget_style_get(obj));
-   edje_object_signal_callback_add(it->title,
-                                   "elm,action,clicked",
+   edje_object_signal_callback_add(it->base.view,
+                                   "elm,title,clicked",
                                    "elm",
                                    _title_clicked, it);
 
-   elm_naviframe_item_title_label_set(it, title_label);
+   _text_set_hook(ELM_CAST(it), "elm.text.title", title_label);
 
    //title buttons
    if ((!prev_btn) && (eina_list_count(wd->stack)))
@@ -475,14 +752,13 @@ elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *
      _title_prev_btn_set(it, prev_btn, EINA_FALSE);
 
    _title_next_btn_set(it, next_btn);
-   edje_object_part_swallow(it->base.view, "elm.swallow.title", it->title);
 
-   elm_naviframe_item_content_set(it, content);
+   _item_content_set(it, content);
 
    _item_sizing_eval(it);
    evas_object_show(it->base.view);
 
-   prev_it = elm_naviframe_top_item_get(obj);
+   prev_it = ELM_CAST(elm_naviframe_top_item_get(obj));
    if (prev_it)
      {
         if (wd->pass_events)
@@ -498,7 +774,7 @@ elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *
      edje_object_signal_emit(it->base.view, "elm,state,visible", "elm");
    it->title_visible = EINA_TRUE;
    wd->stack = eina_list_append(wd->stack, it);
-   return it;
+   return ELM_CAST(it);
 }
 
 EAPI Evas_Object *
@@ -512,14 +788,14 @@ elm_naviframe_item_pop(Evas_Object *obj)
    wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   it = elm_naviframe_top_item_get(obj);
+   it = ELM_CAST(elm_naviframe_top_item_get(obj));
    if (!it) return NULL;
    wd->stack = eina_list_remove(wd->stack, it);
 
    if (wd->preserve)
      content = it->content;
 
-   prev_it = elm_naviframe_top_item_get(obj);
+   prev_it = ELM_CAST(elm_naviframe_top_item_get(obj));
    if (prev_it)
      {
         if (wd->pass_events)
@@ -555,83 +831,7 @@ elm_naviframe_content_preserve_on_pop_get(const Evas_Object *obj)
    return wd->preserve;
 }
 
-EAPI void
-elm_naviframe_item_content_set(Elm_Naviframe_Item *it, Evas_Object *content)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it);
-
-   if (it->content == content) return;
-   if (it->content) evas_object_del(it->content);
-   elm_widget_sub_object_add(it->base.widget, content);
-   edje_object_part_swallow(it->base.view, "elm.swallow.content", content);
-   if (content)
-     edje_object_signal_emit(it->base.view,
-                             "elm,state,content,show",
-                             "elm");
-   else
-     edje_object_signal_emit(it->base.view,
-                             "elm,state,content,hide",
-                             "elm");
-   evas_object_event_callback_add(content,
-                                  EVAS_CALLBACK_DEL,
-                                  _content_del,
-                                  it);
-   it->content = content;
-   _item_sizing_eval(it);
-}
-
-EAPI Evas_Object *
-elm_naviframe_item_content_get(const Elm_Naviframe_Item *it)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, NULL);
-   return it->content;
-}
-
-EAPI void
-elm_naviframe_item_title_label_set(Elm_Naviframe_Item *it, const char *label)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it);
-
-   edje_object_part_text_set(it->title, "elm.text.title", label);
-   if (label)
-     edje_object_signal_emit(it->title, "elm,state,title,show", "elm");
-   else
-     edje_object_signal_emit(it->title, "elm,state,title,hidew", "elm");
-
-   eina_stringshare_replace(&it->title_label, label);
-   _item_sizing_eval(it);
-}
-
-EAPI const char *
-elm_naviframe_item_title_label_get(const Elm_Naviframe_Item *it)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, NULL);
-   return it->title_label;
-}
-
-EAPI void
-elm_naviframe_item_subtitle_label_set(Elm_Naviframe_Item *it, const char *label)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it);
-
-   edje_object_part_text_set(it->title, "elm.text.subtitle", label);
-   if (label)
-     edje_object_signal_emit(it->title, "elm,state,subtitle,show", "elm");
-   else
-     edje_object_signal_emit(it->title, "elm,state,subtitle,hide", "elm");
-
-   eina_stringshare_replace(&it->title_sublabel, label);
-   _item_sizing_eval(it);
-}
-
-EAPI const char *
-elm_naviframe_item_subtitle_label_get(const Elm_Naviframe_Item *it)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, NULL);
-   return it->title_sublabel;
-}
-
-EAPI Elm_Naviframe_Item*
+EAPI Elm_Object_Item*
 elm_naviframe_top_item_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -640,7 +840,7 @@ elm_naviframe_top_item_get(const Evas_Object *obj)
    return eina_list_last(wd->stack)->data;
 }
 
-EAPI Elm_Naviframe_Item*
+EAPI Elm_Object_Item*
 elm_naviframe_bottom_item_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -650,80 +850,10 @@ elm_naviframe_bottom_item_get(const Evas_Object *obj)
 }
 
 EAPI void
-elm_naviframe_item_button_set(Elm_Naviframe_Item *it, Evas_Object *btn, Elm_Naviframe_Button_Type btn_type)
+elm_naviframe_item_style_set(Elm_Object_Item *it, const char *item_style)
 {
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it);
-
-   switch(btn_type)
-     {
-        case ELM_NAVIFRAME_PREV_BUTTON:
-          _title_prev_btn_set(it, btn, EINA_FALSE);
-          break;
-        case ELM_NAVIFRAME_NEXT_BUTTON:
-          _title_next_btn_set(it, btn);
-          break;
-        default:
-          WRN("Button type is invalid! : naviframe=%p", it->base.widget);
-          break;
-     }
-   _item_sizing_eval(it);
-}
-
-EAPI Evas_Object *
-elm_naviframe_item_button_get(const Elm_Naviframe_Item *it, Elm_Naviframe_Button_Type btn_type)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, NULL);
-
-   switch(btn_type)
-     {
-        case ELM_NAVIFRAME_PREV_BUTTON:
-           return it->title_prev_btn;
-        case ELM_NAVIFRAME_NEXT_BUTTON:
-           return it->title_next_btn;
-        default:
-           WRN("Button type is invalid! : naviframe=%p", it->base.widget);
-           break;
-     }
-   return NULL;
-}
-
-EAPI void
-elm_naviframe_item_icon_set(Elm_Naviframe_Item *it, Evas_Object *icon)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it);
-
-   Widget_Data *wd = elm_widget_data_get(it->base.widget);
-   if (!wd) return;
-
-   if (it->title_icon == icon) return;
-   if (it->title_icon) evas_object_del(it->title_icon);
-   it->title_icon = icon;
-   if (!icon)
-     {
-        edje_object_signal_emit(it->title,
-                                "elm,state,icon,hide",
-                                "elm");
-        return;
-     }
-   elm_widget_sub_object_add(it->base.widget, icon);
-   edje_object_part_swallow(it->title, "elm.swallow.icon", icon);
-   edje_object_signal_emit(it->title, "elm,state,icon,show", "elm");
-
-   evas_object_event_callback_add(icon, EVAS_CALLBACK_DEL, _title_icon_del, it);
-   _item_sizing_eval(it);
-}
-
-EAPI Evas_Object *
-elm_naviframe_item_icon_get(const Elm_Naviframe_Item *it)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, NULL);
-   return it->title_icon;
-}
-
-EAPI void
-elm_naviframe_item_style_set(Elm_Naviframe_Item *it, const char *item_style)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it);
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
 
    char buf[256];
 
@@ -731,91 +861,47 @@ elm_naviframe_item_style_set(Elm_Naviframe_Item *it, const char *item_style)
    else
      {
         if (strlen(item_style) > sizeof(buf))
-          WRN("too much long style name! : naviframe=%p", it->base.widget);
+          WRN("too much long style name! : naviframe=%p", navi_it->base.widget);
         else
           sprintf(buf, "item/%s", item_style);
      }
-   _elm_theme_object_set(it->base.widget,
-                         it->base.view,
+   _elm_theme_object_set(navi_it->base.widget,
+                         navi_it->base.view,
                          "naviframe",
                          buf,
-                         elm_widget_style_get(it->base.widget));
+                         elm_widget_style_get(navi_it->base.widget));
 }
 
 EAPI const char *
-elm_naviframe_item_style_get(const Elm_Naviframe_Item *it)
+elm_naviframe_item_style_get(const Elm_Object_Item *it)
 {
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, NULL);
-   return it->style;
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+   return navi_it->style;
 }
 
 EAPI void
-elm_naviframe_item_title_visible_set(Elm_Naviframe_Item *it, Eina_Bool visible)
+elm_naviframe_item_title_visible_set(Elm_Object_Item *it, Eina_Bool visible)
 {
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it);
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
 
    visible = !!visible;
-   if (it->title_visible == visible) return;
+   if (navi_it->title_visible == visible) return;
 
    if (visible)
-     edje_object_signal_emit(it->base.view, "elm,state,title,show", "elm");
+     edje_object_signal_emit(navi_it->base.view, "elm,state,title,show", "elm");
    else
-     edje_object_signal_emit(it->base.view, "elm,state,title,hide", "elm");
+     edje_object_signal_emit(navi_it->base.view, "elm,state,title,hide", "elm");
 
-   it->title_visible = visible;
+   navi_it->title_visible = visible;
 }
 
 EAPI Eina_Bool
-elm_naviframe_item_title_visible_get(const Elm_Naviframe_Item *it)
+elm_naviframe_item_title_visible_get(const Elm_Object_Item *it)
 {
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, EINA_FALSE);
-   return it->title_visible;
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+   return navi_it->title_visible;
 }
 
-EAPI void
-elm_naviframe_item_extension_set(Elm_Naviframe_Item *it, const char *swallow, Evas_Object *extension)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it);
-   Evas_Object *prev;
-   if (!swallow)
-     {
-        WRN("swallow part should not be NULL! : naviframe=%p", it->base.widget);
-        return;
-     }
-   if (it->extension) evas_object_del(it->extension);
-   it->extension = extension;
-   if (!extension) return;
-   evas_object_event_callback_add(extension, EVAS_CALLBACK_DEL, _extension_del, it);
-   if (!edje_object_part_swallow(it->base.view, swallow, extension))
-     return;
-   elm_widget_sub_object_add(it->base.widget, extension);
-   edje_object_signal_emit(it->base.view,
-                           "elm,state,extension,show",
-                           "elm");
-   _sizing_eval(it->base.view);
-}
-
-EAPI Evas_Object *
-elm_naviframe_item_extension_unset(Elm_Naviframe_Item *it, const char *swallow)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, NULL);
-
-   Evas_Object *extension = it->extension;
-   if (!extension) return NULL;
-   edje_object_part_unswallow(it->base.view, extension);
-   elm_widget_sub_object_del(it->base.widget, extension);
-   evas_object_event_callback_del(extension, EVAS_CALLBACK_DEL, _extension_del);
-   edje_object_signal_emit(it->base.view,
-                           "elm,state,extension,hide",
-                           "elm");
-   _sizing_eval(it->base.widget);
-   it->extension = NULL;
-   return extension;
-}
-
-EAPI Evas_Object *
-elm_naviframe_item_extension_get(const Elm_Naviframe_Item *it, const char *swallow)
-{
-   ELM_NAVIFRAME_ITEM_CHECK_RETURN(it, NULL);
-   return edje_object_part_swallow_get(it->base.view, swallow);
-}
