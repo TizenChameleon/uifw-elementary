@@ -94,7 +94,6 @@ struct _Elm_Win
    } shot;
    Eina_Bool autodel : 1;
    int *autodel_clear, rot;
-   int show_count;
    struct {
       int x, y;
    } screen;
@@ -375,13 +374,7 @@ _elm_win_focus_in(Ecore_Evas *ee)
    if (!obj) return;
    win = elm_widget_data_get(obj);
    if (!win) return;
-   _elm_widget_top_win_focused_set(win->win_obj, EINA_TRUE);
-   if (win->show_count == 1)
-     {
-        elm_object_focus(win->win_obj);
-        win->show_count++;
-     }
-   else
+   if (!elm_widget_focus_get(win->win_obj))
      elm_widget_focus_restore(win->win_obj);
    evas_object_smart_callback_call(win->win_obj, SIG_FOCUS_IN, NULL);
    win->focus_highlight.cur.visible = EINA_TRUE;
@@ -405,7 +398,6 @@ _elm_win_focus_out(Ecore_Evas *ee)
    win = elm_widget_data_get(obj);
    if (!win) return;
    elm_object_unfocus(win->win_obj);
-   _elm_widget_top_win_focused_set(win->win_obj, EINA_FALSE);
    evas_object_smart_callback_call(win->win_obj, SIG_FOCUS_OUT, NULL);
    win->focus_highlight.cur.visible = EINA_FALSE;
    _elm_win_focus_highlight_reconfigure_job_start(win);
@@ -489,11 +481,11 @@ _deferred_ecore_evas_free(void *data)
 }
 
 static void
-_elm_win_obj_callback_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_elm_win_obj_callback_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Elm_Win *win = data;
 
-   if (!win->show_count) win->show_count++;
+   elm_object_focus(obj);
    if (win->shot.info) _shot_handle(win);
 }
 

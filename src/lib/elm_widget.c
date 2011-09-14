@@ -96,7 +96,6 @@ struct _Smart_Data
    Eina_Bool    can_focus : 1;
    Eina_Bool    child_can_focus : 1;
    Eina_Bool    focused : 1;
-   Eina_Bool    top_win_focused : 1;
    Eina_Bool    tree_unfocusable : 1;
    Eina_Bool    highlight_ignore : 1;
    Eina_Bool    highlight_in_theme : 1;
@@ -324,13 +323,12 @@ _parent_focus(Evas_Object *obj)
 
    focus_order++;
    sd->focus_order = focus_order;
-   if (sd->top_win_focused)
-     {
-        sd->focused = EINA_TRUE;
-        if (sd->on_focus_func) sd->on_focus_func(sd->on_focus_data, obj);
-        if (sd->focus_func) sd->focus_func(obj);
-        _elm_widget_focus_region_show(obj);
-     }
+   sd->focused = EINA_TRUE;
+   if (sd->on_focus_func) sd->on_focus_func(sd->on_focus_data, obj);
+   if (sd->focus_func) sd->focus_func(obj);
+
+   _elm_widget_focus_region_show(obj);
+
    sd->focus_order_on_calc = EINA_FALSE;
 }
 
@@ -844,7 +842,6 @@ elm_widget_sub_object_add(Evas_Object *obj,
              if (sd2->parent_obj)
                elm_widget_sub_object_del(sd2->parent_obj, sobj);
              sd2->parent_obj = obj;
-             sd2->top_win_focused = sd->top_win_focused;
              if (!sd->child_can_focus && (_is_focusable(sobj)))
                sd->child_can_focus = EINA_TRUE;
           }
@@ -989,11 +986,7 @@ elm_widget_resize_object_set(Evas_Object *obj,
         if (_elm_widget_is(sd->resize_obj))
           {
              Smart_Data *sd2 = evas_object_smart_data_get(sd->resize_obj);
-             if (sd2)
-               {
-                  sd2->parent_obj = obj;
-                  sd2->top_win_focused = sd->top_win_focused;
-               }
+             if (sd2) sd2->parent_obj = obj;
              evas_object_event_callback_add(sobj, EVAS_CALLBACK_HIDE,
                                             _sub_obj_hide, sd);
           }
@@ -1861,30 +1854,6 @@ elm_widget_focus_restore(Evas_Object *obj)
         elm_object_unfocus(newest);
         elm_object_focus(newest);
      }
-}
-
-void
-_elm_widget_top_win_focused_set(Evas_Object *obj, Eina_Bool top_win_focused)
-{
-   const Eina_List *l;
-   Evas_Object *child;
-   API_ENTRY return;
-
-   if (sd->top_win_focused == top_win_focused) return;
-   if (sd->resize_obj)
-     _elm_widget_top_win_focused_set(sd->resize_obj, top_win_focused);
-   EINA_LIST_FOREACH(sd->subobjs, l, child)
-     {
-        _elm_widget_top_win_focused_set(child, top_win_focused);
-     }
-   sd->top_win_focused = top_win_focused;
-}
-
-Eina_Bool
-_elm_widget_top_win_focused_get(const Evas_Object *obj)
-{
-   API_ENTRY return EINA_FALSE;
-   return sd->top_win_focused;
 }
 
 EAPI void
