@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build30) unstable; urgency=low
+
+  * Package Upload.
+  * Important Changes
+       [Button] Applied upstream commit r63378. This fixes conference call
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build30
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Thu, 15 Sep 2011 10:33:43 +0900
+
 elementary (1.0.0+svn.61256slp2+build29) unstable; urgency=low
 
   * Package Upload
