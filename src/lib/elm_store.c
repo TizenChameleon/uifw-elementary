@@ -28,7 +28,7 @@
 #define ELM_STORE_FILESYSTEM_MAGIC 0x3f89ea57
 #define ELM_STORE_DBSYSTEM_MAGIC   0x3f89ea58
 #define ELM_STORE_ITEM_MAGIC       0x5afe8c1d
-#define CACHE_COUNT                128
+#define CACHE_COUNT                1024
 
 struct _Elm_Store
 {
@@ -879,12 +879,18 @@ _item_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
                   switch (m->type)
                     {
                      case ELM_STORE_ITEM_MAPPING_LABEL:
+                        LKU(sti->lock);
                         s = *(char **)(((unsigned char *)sti->data) + m->offset);
+                        LKL(sti->lock);
                         break;
 
                      case ELM_STORE_ITEM_MAPPING_CUSTOM:
                         if (m->details.custom.func)
-                          s = m->details.custom.func(sti->data, sti, part);
+                          {
+                             LKU(sti->lock);
+                             s = m->details.custom.func(sti->data, sti, part);
+                             LKL(sti->lock);
+                          }
                         break;
 
                      default:
@@ -909,7 +915,11 @@ _item_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
              if (m->type == ELM_STORE_ITEM_MAPPING_CUSTOM)
                {
                   if (m->details.custom.func)
-                    s = m->details.custom.func(NULL, sti, part);
+                    {
+                       LKU(sti->lock);
+                       s = m->details.custom.func(sti->item_info, sti, part);
+                       LKL(sti->lock);
+                    }
 
                   if (s)
                     {
