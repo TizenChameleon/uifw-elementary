@@ -3300,6 +3300,8 @@ extern "C" {
     * changed - An item has been added, removed, resized or moved,
     * or gengrid has been resized or horizontal property has been changed.
     * scroll - the content has been scrolled (moved).
+    * "scroll,anim,start" - This is called when scrolling animation has started.
+    * "scroll,anim,stop" - This is called when scrolling animation has stopped.
     * "scroll,drag,start" - dragging the contents around has started.
     * "scroll,drag,stop" - dragging the contents around has stopped.
     * drag - Gengrid is being dragged.
@@ -5634,6 +5636,10 @@ extern "C" {
     * "drag" - This is called when the item in the list is being dragged.
     * "longpressed" - This is called when the item is pressed for a certain amount
     *                 of time. By default it's 1 second.
+    * "scroll,anim,start" - This is called when scrolling animation has started.
+    * "scroll,anim,stop" - This is called when scrolling animation has stopped.
+    * "scroll,drag,start" - This is called when dragging the content has started.
+    * "scroll,drag,stop" - This is called when dragging the content has stopped.
     * "scroll,edge,top" - This is called when the genlist is scrolled until the
     *                     top edge.
     * "scroll,edge,bottom" - This is called when the genlist is scrolled until the
