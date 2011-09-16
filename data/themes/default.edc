@@ -33690,6 +33690,16 @@ collections {
      }
   }
 
+  group { name: "elm/conformant/layout/content";
+   parts {
+      part { name: "elm.swallow.content";
+         type: SWALLOW;
+         description { state: "default" 0.0;
+         }
+      }
+   }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CALENDAR
 /////////////////////////////////////////////////////////////////////////////
