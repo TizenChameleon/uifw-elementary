@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build33) unstable; urgency=low
+
+  * Package Upload.
+  * Important Changes
+       Rollback to elementary_1.0.0+svn.61256slp2+build29
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build33
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Fri, 16 Sep 2011 11:13:07 +0900
+
 elementary (1.0.0+svn.61256slp2+build32) unstable; urgency=low
 
   * Package Upload.
