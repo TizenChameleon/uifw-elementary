@@ -329,6 +329,14 @@ extern "C" {
 
 
    /**
+    * @typedef Elm_Object_Item
+    * An Elementary Object item handle.
+    * @ingroup General
+    */
+   typedef struct _Elm_Object_Item Elm_Object_Item;
+
+
+   /**
     * Called back when a widget's tooltip is activated and needs content.
     * @param data user-data given to elm_object_tooltip_content_cb_set()
     * @param obj owner widget.
@@ -680,14 +688,14 @@ extern "C" {
     * Set a label of an object
     *
     * @param obj The Elementary object
-    * @param item The label id to set (NULL for the default label)
+    * @param part The text part name to set (NULL for the default label)
     * @param label The new text of the label
     *
     * @note Elementary objects may have many labels (e.g. Action Slider)
     *
     * @ingroup General
     */
-   EAPI void         elm_object_text_part_set(Evas_Object *obj, const char *item, const char *label);
+   EAPI void         elm_object_text_part_set(Evas_Object *obj, const char *part, const char *label);
 
 #define elm_object_text_set(obj, label) elm_object_text_part_set((obj), NULL, (label))
 
@@ -695,17 +703,173 @@ extern "C" {
     * Get a label of an object
     *
     * @param obj The Elementary object
-    * @param item The label id to get (NULL for the default label)
-    * @return text of the label or
-    *         NULL for any error
+    * @param part The text part name to get (NULL for the default label)
+    * @return text of the label or NULL for any error
     *
     * @note Elementary objects may have many labels (e.g. Action Slider)
     *
     * @ingroup General
     */
-   EAPI const char  *elm_object_text_part_get(const Evas_Object *obj, const char *item);
+   EAPI const char  *elm_object_text_part_get(const Evas_Object *obj, const char *part);
 
 #define elm_object_text_get(obj) elm_object_text_part_get((obj), NULL)
+
+   /**
+    * Set a content of an object
+    *
+    * @param obj The Elementary object
+    * @param part The content part name to set (NULL for the default content)
+    * @param content The new content of the object
+    *
+    * @note Elementary objects may have many contents
+    *
+    * @ingroup General
+    */
+   EAPI void elm_object_content_part_set(Evas_Object *obj, const char *part, Evas_Object *content);
+
+#define elm_object_content_set(obj, content) elm_object_content_part_set((obj), NULL, (content))
+
+   /**
+    * Get a content of an object
+    *
+    * @param obj The Elementary object
+    * @param item The content part name to get (NULL for the default content)
+    * @return content of the object or NULL for any error
+    *
+    * @note Elementary objects may have many contents
+    *
+    * @ingroup General
+    */
+   EAPI Evas_Object *elm_object_content_part_get(const Evas_Object *obj, const char *part);
+
+#define elm_object_content_get(obj) elm_object_content_part_get((obj), NULL)
+
+   /**
+    * Unset a content of an object
+    *
+    * @param obj The Elementary object
+    * @param item The content part name to unset (NULL for the default content)
+    *
+    * @note Elementary objects may have many contents
+    *
+    * @ingroup General
+    */
+   EAPI Evas_Object *elm_object_content_part_unset(Evas_Object *obj, const char *part);
+
+#define elm_object_content_unset(obj) elm_object_content_part_unset((obj), NULL)
+
+   /**
+    * Set a content of an object item
+    *
+    * @param it The Elementary object item
+    * @param part The content part name to set (NULL for the default content)
+    * @param content The new content of the object item
+    *
+    * @note Elementary object items may have many contents
+    *
+    * @ingroup General
+    */
+   EAPI void elm_object_item_content_part_set(Elm_Object_Item *it, const char *part, Evas_Object *content);
+
+#define elm_object_item_content_set(it, content) elm_object_item_content_part_set((it), NULL, (content))
+
+   /**
+    * Get a content of an object item
+    *
+    * @param it The Elementary object item
+    * @param part The content part name to unset (NULL for the default content)
+    * @return content of the object item or NULL for any error
+    *
+    * @note Elementary object items may have many contents
+    *
+    * @ingroup General
+    */
+   EAPI Evas_Object *elm_object_item_content_part_get(const Elm_Object_Item *it, const char *item);
+
+#define elm_object_item_content_get(it) elm_object_item_content_part_get((it), NULL)
+
+   /**
+    * Unset a content of an object item
+    *
+    * @param it The Elementary object item
+    * @param part The content part name to unset (NULL for the default content)
+    *
+    * @note Elementary object items may have many contents
+    *
+    * @ingroup General
+    */
+   EAPI Evas_Object *elm_object_item_content_part_unset(Elm_Object_Item *it, const char *part);
+
+#define elm_object_item_content_unset(it, content) elm_object_item_content_part_unset((it), (content))
+
+   /**
+    * Set a label of an objec itemt
+    *
+    * @param it The Elementary object item
+    * @param part The text part name to set (NULL for the default label)
+    * @param label The new text of the label
+    *
+    * @note Elementary object items may have many labels
+    *
+    * @ingroup General
+    */
+   EAPI void elm_object_item_text_part_set(Elm_Object_Item *it, const char *part, const char *label);
+
+#define elm_object_item_text_set(it, label) elm_object_item_text_part_set((it), NULL, (label))
+
+   /**
+    * Get a label of an object
+    *
+    * @param it The Elementary object item
+    * @param part The text part name to get (NULL for the default label)
+    * @return text of the label or NULL for any error
+    *
+    * @note Elementary object items may have many labels
+    *
+    * @ingroup General
+    */
+   EAPI const char *elm_object_item_text_part_get(const Elm_Object_Item *it, const char *part);
+
+   /**
+    * Set the text to read out when in accessibility mode
+    *
+    * @param obj The object which is to be described
+    * @param txt The text that describes the widget to people with poor or no vision
+    *
+    * @ingroup General
+    */
+   EAPI void elm_object_access_info_set(Evas_Object *obj, const char *txt);
+
+   /**
+    * Set the text to read out when in accessibility mode
+    *
+    * @param it The object item which is to be described
+    * @param txt The text that describes the widget to people with poor or no vision
+    *
+    * @ingroup General
+    */
+   EAPI void elm_object_item_access_info_set(Elm_Object_Item *it, const char *txt);
+
+
+#define elm_object_item_text_get(it) elm_object_item_text_part_get((it), NULL)
+
+   /**
+    * Get the data associated with an object item
+    * @param it The object item
+    * @return The data associated with @p it
+    *
+    * @ingroup General
+    */
+   EAPI void *elm_object_item_data_get(const Elm_Object_Item *it);
+
+   /**
+    * Set the data associated with an object item
+    * @param it The object item
+    * @param data The data to be associated with @p it
+    *
+    * @ingroup General
+    */
+   EAPI void elm_object_item_data_set(Elm_Object_Item *it, void *data);
 
    /**
     * @}
@@ -8070,41 +8234,22 @@ extern "C" {
    Eina_Bool         elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item);
 
   /* naviframe */
-  #define NAVIFRAME_OPTIONHEADER "elm.swallow.optionheader"
-
-   typedef struct _Elm_Naviframe_Item Elm_Naviframe_Item;
-
-   typedef enum
-     {
-        ELM_NAVIFRAME_PREV_BUTTON,
-        ELM_NAVIFRAME_NEXT_BUTTON
-     } Elm_Naviframe_Button_Type;
+  #define ELM_NAVIFRAME_ITEM_ICON "elm.swallow.icon"
+  #define ELM_NAVIFRAME_ITEM_OPTIONHEADER "elm.swallow.optionheader"
+  #define ELM_NAVIFRAME_ITEM_TITLE_LABEL "elm.text.title"
+  #define ELM_NAVIFRAME_ITEM_PREV_BTN "elm.swallow.prev_btn"
 
    EAPI Evas_Object        *elm_naviframe_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-   EAPI Elm_Naviframe_Item *elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style) EINA_ARG_NONNULL(1, 5);
+   EAPI Elm_Object_Item    *elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style) EINA_ARG_NONNULL(1, 5);
    EAPI Evas_Object        *elm_naviframe_item_pop(Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void                elm_naviframe_content_preserve_on_pop_set(Evas_Object *obj, Eina_Bool preserve) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool           elm_naviframe_content_preserve_on_pop_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                elm_naviframe_item_content_set(Elm_Naviframe_Item *item, Evas_Object *content) EINA_ARG_NONNULL(1, 2);
-   EAPI Evas_Object        *elm_naviframe_item_content_get(const Elm_Naviframe_Item *item) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object        *elm_naviframe_item_content_unset(Elm_Naviframe_Item *it) EINA_ARG_NONNULL(1);
-   EAPI void                elm_naviframe_item_title_label_set(Elm_Naviframe_Item *it, const char *label) EINA_ARG_NONNULL(1);
-   EAPI const char         *elm_naviframe_item_title_label_get(const Elm_Naviframe_Item *it) EINA_ARG_NONNULL(1);
-   EAPI void                elm_naviframe_item_subtitle_label_set(Elm_Naviframe_Item *it, const char *label) EINA_ARG_NONNULL(1);
-   EAPI const char         *elm_naviframe_item_subtitle_label_get(const Elm_Naviframe_Item *it) EINA_ARG_NONNULL(1);
-   EAPI Elm_Naviframe_Item *elm_naviframe_top_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI Elm_Naviframe_Item *elm_naviframe_bottom_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                elm_naviframe_item_button_set(Elm_Naviframe_Item *it, Evas_Object *btn, Elm_Naviframe_Button_Type btn_type) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object        *elm_naviframe_item_button_get(const Elm_Naviframe_Item *it, Elm_Naviframe_Button_Type btn_type) EINA_ARG_NONNULL(1);
-   EAPI void                elm_naviframe_item_icon_set(Elm_Naviframe_Item *it, Evas_Object *icon) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object        *elm_naviframe_item_icon_get(const Elm_Naviframe_Item *it) EINA_ARG_NONNULL(1);
-   EAPI void                elm_naviframe_item_style_set(Elm_Naviframe_Item *it, const char *item_style) EINA_ARG_NONNULL(1);
-   EAPI const char         *elm_naviframe_item_style_get(const Elm_Naviframe_Item *it) EINA_ARG_NONNULL(1);
-   EAPI void                elm_naviframe_item_title_visible_set(Elm_Naviframe_Item *it, Eina_Bool visible) EINA_ARG_NONNULL(1);
-   EAPI Eina_Bool           elm_naviframe_item_title_visible_get(const Elm_Naviframe_Item *it) EINA_ARG_NONNULL(1);
-   EAPI void                elm_naviframe_item_extension_set(Elm_Naviframe_Item *it, const char *swallow, Evas_Object *extension) EINA_ARG_NONNULL(1, 2);
-   EAPI Evas_Object        *elm_naviframe_item_extension_unset(Elm_Naviframe_Item *it, const char *swallow) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object        *elm_naviframe_item_extension_get(const Elm_Naviframe_Item *it, const char *swallow) EINA_ARG_NONNULL(1);
+   EAPI Elm_Object_Item    *elm_naviframe_top_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Object_Item    *elm_naviframe_bottom_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                elm_naviframe_item_style_set(Elm_Object_Item *it, const char *item_style) EINA_ARG_NONNULL(1);
+   EAPI const char         *elm_naviframe_item_style_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   EAPI void                elm_naviframe_item_title_visible_set(Elm_Object_Item *it, Eina_Bool visible) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool           elm_naviframe_item_title_visible_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
 
    /* Control Bar */
    #define CONTROLBAR_SYSTEM_ICON_ALBUMS "controlbar_albums"
@@ -8227,6 +8372,12 @@ typedef enum
    EAPI void                      elm_tickernoti_mode_set (Evas_Object *obj, Elm_Tickernoti_Mode mode) EINA_ARG_NONNULL(1);
    EAPI Elm_Tickernoti_Mode       elm_tickernoti_mode_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /* ############################################################################### */
+   /* smart callbacks called:
+    * @li "clicked" - emitted when tickernoti is clicked, except at the
+    * swallow/button region, if any.
+    * @li "hide" - emitted when the tickernoti is completelyhidden. In case of
+    * any hide animation, this signal is raised after the animation.
+    */
 
    /* colorpalette */
    typedef struct _Colorpalette_Color Elm_Colorpalette_Color;
