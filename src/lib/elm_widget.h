@@ -197,6 +197,7 @@ typedef void (*Elm_Widget_On_Content_Set_Cb)(void *data, const char *part, Evas_
 typedef const char *(*Elm_Widget_On_Text_Get_Cb)(const void *data, const char *part);
 typedef Evas_Object *(*Elm_Widget_On_Content_Get_Cb)(const void *data, const char *part);
 typedef Evas_Object *(*Elm_Widget_On_Content_Unset_Cb)(const void *data, const char *part);
+typedef void (*Elm_Widget_On_Signal_Emit_Cb)(void *data, const char *emission, const char *source);
 
 struct _Elm_Widget_Item
 {
@@ -213,6 +214,7 @@ struct _Elm_Widget_Item
    Elm_Widget_On_Content_Unset_Cb on_content_unset_func;
    Elm_Widget_On_Text_Set_Cb on_text_set_func;
    Elm_Widget_On_Text_Get_Cb on_text_get_func;
+   Elm_Widget_On_Signal_Emit_Cb on_signal_emit_func;
    /* widget variations should have data from here and on */
    /* @todo: TODO check if this is enough for 1.0 release, maybe add padding! */
 };
@@ -394,6 +396,7 @@ EAPI void             _elm_widget_item_content_get_hook_set(Elm_Widget_Item *ite
 EAPI void             _elm_widget_item_content_unset_hook_set(Elm_Widget_Item *item, Elm_Widget_On_Content_Unset_Cb func);
 EAPI void             _elm_widget_item_text_set_hook_set(Elm_Widget_Item *item, Elm_Widget_On_Text_Set_Cb func);
 EAPI void             _elm_widget_item_text_get_hook_set(Elm_Widget_Item *item, Elm_Widget_On_Text_Get_Cb func);
+EAPI void             _elm_widget_item_signal_emit_hook_set(Elm_Widget_Item *it, Elm_Widget_On_Signal_Emit_Cb func);
 
 /* debug function. don't use it unless you are tracking parenting issues */
 EAPI void             elm_widget_tree_dump(const Evas_Object *top);
@@ -544,6 +547,12 @@ EAPI void             elm_widget_tree_dot_dump(const Evas_Object *top, FILE *out
 #define elm_widget_item_text_part_get(item, part) \
   _elm_widget_item_text_part_get((const Elm_Widget_Item *)item, part)
 /**
+ * Convenience function to query item's signal emit.
+ * @see _elm_widget_item_signal_emit()
+ */
+#define elm_widget_item_signal_emit(item, emission, source) \
+  _elm_widget_item_signal_emit((Elm_Widget_Item *)item, emission, source)
+/**
  * Convenience function to query item's content set hook.
  * @see _elm_widget_item_content_set_hook_set()
  */
@@ -573,6 +582,12 @@ EAPI void             elm_widget_tree_dot_dump(const Evas_Object *top, FILE *out
  */
 #define elm_widget_item_text_get_hook_set(item, func) \
   _elm_widget_item_text_get_hook_set((Elm_Widget_Item *)item, (Elm_Widget_On_Text_Get_Cb)func)
+/**
+ * Convenience function to query item's signal emit hook.
+ * @see _elm_widget_item_signal_emit_hook_set()
+ */
+#define elm_widget_item_signal_emit_hook_set(item, func) \
+  _elm_widget_item_signal_emit_hook_set((Elm_Widget_Item *)item, (Elm_Widget_On_Signal_Emit_Cb)func)
 
 /**
  * Cast and ensure the given pointer is an Elm_Widget_Item or return NULL.
