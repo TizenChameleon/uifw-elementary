@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build34) unstable; urgency=low
+
+  * temporal disable smart calc of elm_factory
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build34
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Fri, 16 Sep 2011 13:11:49 +0900
+
 elementary (1.0.0+svn.61256slp2+build33) unstable; urgency=low
 
   * Package Upload.
