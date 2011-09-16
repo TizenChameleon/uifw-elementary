@@ -168,10 +168,10 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
              ecore_imf_context_input_panel_show(imf_context);
              evas_object_focus_set(obj, EINA_TRUE);
           }
-        else if ((imf_context) && (!wd->current) || (!eina_list_count(wd->items)))
+        else if ((imf_context) && (!wd->current))
           {
-             _view_update(obj);
              ecore_imf_context_input_panel_show(imf_context);
+             elm_object_focus(wd->entry);
           }
      }
    else
@@ -737,12 +737,9 @@ _resize_button(Evas_Object *btn, Evas_Coord *realw, Evas_Coord *vieww)
    Evas_Coord w_text, h_btn, padding_outer, padding_inner;
    Evas_Coord w_btn = 0, button_max_width = 0;
    const char *size_str;
-   const char *ellipsis = "<ellipsis=1.0>";
 
    size_str = edje_object_data_get(btn, "button_max_size");
    if (size_str) button_max_width = (Evas_Coord)atoi(size_str);
-
-   const char *button_text = edje_object_part_text_get(btn, "elm.btn.text");
 
    // decide the size of button
    edje_object_part_geometry_get(btn, "elm.base", NULL, NULL, NULL, &h_btn);
@@ -752,15 +749,7 @@ _resize_button(Evas_Object *btn, Evas_Coord *realw, Evas_Coord *vieww)
    w_btn = w_text + 2*padding_outer + 2*padding_inner;
 
    rw = w_btn;
-
-   if (button_max_width < w_btn)
-     {
-        vw = button_max_width;
-        edje_object_part_text_set(btn, "elm.btn.text", ellipsis);
-        edje_object_part_text_append(btn, "elm.btn.text", button_text);
-     }
-   else
-     vw = w_btn;
+   vw = (button_max_width < w_btn) ? button_max_width : w_btn;
 
    //resize btn
    evas_object_resize(btn, vw, h_btn);

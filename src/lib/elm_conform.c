@@ -25,7 +25,6 @@ struct _Widget_Data
    Evas_Object *shelf, *panel, *virtualkeypad;
    Evas_Object *content;
    Evas_Object *scroller;
-   Evas_Object *layout;
 #ifdef HAVE_ELEMENTARY_X
    Ecore_Event_Handler *prop_hdl;
    Ecore_X_Virtual_Keyboard_State vkb_state;
@@ -113,7 +112,10 @@ _theme_hook(Evas_Object *obj)
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _elm_theme_object_set(obj, wd->base, "conformant", "base",
                          elm_widget_style_get(obj));
+   _swallow_conformant_parts(obj);
 
+   if (wd->content)
+     edje_object_part_swallow(wd->base, "elm.swallow.content", wd->content);
    edje_object_scale_set(wd->base, elm_widget_scale_get(obj)
                          * _elm_config->scale);
    _sizing_eval(obj);
@@ -250,9 +252,9 @@ _changed_size_hints(void *data, Evas *e __UNUSED__,
 }
 
 static void
-_sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
+   Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *sub = event_info;
 
    if (!wd) return;
@@ -260,12 +262,11 @@ _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
      {
         evas_object_event_callback_del_full(sub,
                                             EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                            _changed_size_hints, data);
+                                            _changed_size_hints, obj);
         wd->content = NULL;
-        _sizing_eval(data);
+        _sizing_eval(obj);
      }
 }
-
 
 /* unused now - but meant to be for making sure the focused widget is always
  * visible when the vkbd comes and goes by moving the conformant obj (and thus
@@ -478,12 +479,6 @@ elm_conformant_add(Evas_Object *parent)
    _elm_theme_object_set(obj, wd->base, "conformant", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
 
-   wd->layout = elm_layout_add(obj);
-   edje_object_part_swallow(wd->base, "elm.swallow.content", wd->layout);
-   elm_layout_theme_set(wd->layout, "conformant", "layout", "content");
-
-   _swallow_conformant_parts(obj);
-
 #ifdef HAVE_ELEMENTARY_X
    Evas_Object *top = elm_widget_top_get(obj);
    Ecore_X_Window xwin = elm_win_xwindow_get(top);
@@ -502,7 +497,7 @@ elm_conformant_add(Evas_Object *parent)
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE,
                                        _conformant_move_resize_event_cb, obj);
 #endif
-   evas_object_smart_callback_add(wd->layout, "sub-object-del", _sub_del, obj);
+   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
@@ -531,12 +526,13 @@ elm_conformant_content_set(Evas_Object *obj, Evas_Object *content)
    if (wd->content == content) return;
    if (wd->content) evas_object_del(wd->content);
    wd->content = content;
-   if (wd->content)
+   if (content)
      {
-        elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content);
-        evas_object_event_callback_add( wd->content,
+        elm_widget_sub_object_add(obj, content);
+        evas_object_event_callback_add(content,
                                        EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                        _changed_size_hints, obj);
+        edje_object_part_swallow(wd->base, "elm.swallow.content", content);
      }
    _sizing_eval(obj);
 }
@@ -581,7 +577,8 @@ elm_conformant_content_unset(Evas_Object *obj)
    if (!wd) return NULL;
    if (!wd->content) return NULL;
    content = wd->content;
-   elm_layout_content_unset(wd->layout, "elm.swallow.content");
+   elm_widget_sub_object_del(obj, wd->content);
+   edje_object_part_unswallow(wd->base, wd->content);
    wd->content = NULL;
    return content;
 }
@@ -605,6 +602,6 @@ elm_conformant_content_area_get(const Evas_Object *obj)
    /*Finger waggle warning*/
    _elm_dangerous_call_check(__FUNCTION__);
 
-   return wd->layout;
+   return (Evas_Object *)edje_object_part_object_get(wd->base, "elm.swallow.content");
 }
 

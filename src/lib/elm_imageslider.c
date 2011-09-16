@@ -49,9 +49,9 @@ struct _Imageslider_Item
    const char *photo_file;
    void (*func) (void *data, Evas_Object *obj, void *event_info);
    void *data;
-   //Evas_Coord x, y, w, h;
-   //Evas_Coord ox, oy, ow, oh;
-   //int moving:1;
+   Evas_Coord x, y, w, h;
+   Evas_Coord ox, oy, ow, oh;
+   int moving:1;
 };
 
 // Image Slider Widget Data.
@@ -78,6 +78,7 @@ struct _Widget_Data
    int moving:1;
 
    Eina_Bool on_zoom:1;
+   Eina_Bool on_hold:1;
    int dx, dy, mx, my;
    int mdx, mdy, mmx, mmy;
    int dratio;
@@ -178,7 +179,7 @@ _theme_hook(Evas_Object *obj)
    for (i = 0; i < BLOCK_MAX; i++)
      {
         if (wd->ly[i])
-           elm_layout_theme_set(wd->ly[i], "imageslider", "base",
+          _elm_theme_object_set(obj, wd->ly[i], "imageslider", "base",
                                 elm_object_style_get(obj));
         evas_object_show(wd->ly[i]);
      }
@@ -358,9 +359,9 @@ _imageslider_obj_move(Widget_Data * wd, Evas_Coord step)
           {
              wd->step = -ANI_STEP;
              wd->move_x += wd->w;
-             _imageslider_obj_shift(wd, EINA_FALSE);
+             _imageslider_obj_shift(wd, 0);
           }
-        wd->moving = EINA_TRUE;
+        wd->moving = 1;
      }
    else if (step < 0)
      {
@@ -374,9 +375,9 @@ _imageslider_obj_move(Widget_Data * wd, Evas_Coord step)
           {
              wd->step = ANI_STEP;
              wd->move_x -= wd->w;
-             _imageslider_obj_shift(wd, EINA_TRUE);
+             _imageslider_obj_shift(wd, 1);
           }
-        wd->moving = EINA_TRUE;
+        wd->moving = 1;
      }
    else
      {
@@ -384,7 +385,7 @@ _imageslider_obj_move(Widget_Data * wd, Evas_Coord step)
           wd->step = ANI_STEP;
         else
           wd->step = -ANI_STEP;
-        wd->moving = EINA_FALSE;
+        wd->moving = 0;
      }
 
    _imageslider_update(wd);
@@ -406,7 +407,7 @@ _ev_imageslider_down_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void 
    wd->timestamp = ev->timestamp;
    wd->move_cnt = MOVE_STEP;
 
-   /*wd->dx = ev->canvas.x;
+   wd->dx = ev->canvas.x;
    wd->dy = ev->canvas.y;
    wd->mx = ev->canvas.x;
    wd->my = ev->canvas.y;
@@ -420,10 +421,10 @@ _ev_imageslider_down_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void 
 
    if (iw != wd->w)
      {
-        printf("Zooming\n");
         wd->on_zoom = EINA_TRUE;
         edje_object_signal_emit(elm_layout_edje_get(obj), "block.off", "block");
-     }*/
+     }
+
 }
 
 // Whenever MOUSE UP event occurs, Call this function.
@@ -501,7 +502,7 @@ _ev_imageslider_up_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj __UNUSED
 
 }
 
-// Whenever MOUSE MOVE event occurs, Call this
+// Whenever MOUSE MOVE event occurs, Call this API.
 static void
 _ev_imageslider_move_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *event_info)
 {
@@ -522,27 +523,51 @@ _ev_imageslider_move_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void 
 
    if (wd->move_cnt == MOVE_STEP)
      {
-        wd->move_cnt = 0;
-
-        if (ev->buttons)
+        if (wd->on_hold == EINA_FALSE)
           {
-             step = ev->cur.canvas.x - wd->down_pos.x;
-             if (step > 0)
-               idx = BLOCK_LEFT;
-             else
-               idx = BLOCK_RIGHT;
+             wd->move_cnt = 0;
 
-             wd->move_x = wd->x + ((ev->cur.canvas.x - wd->down_pos.x));
-             wd->move_y = wd->y + ((ev->cur.canvas.y - wd->down_pos.y));
-
-             /*if (wd->on_zoom)
+             if (ev->buttons)
                {
-                  _imageslider_update_center_pos(wd, wd->move_x, wd->move_y, wd->y, wd->w);
+                  step = ev->cur.canvas.x - wd->down_pos.x;
+                  if (step > 0)
+                    idx = BLOCK_LEFT;
+                  else
+                    idx = BLOCK_RIGHT;
+
+                  wd->move_x = wd->x + ((ev->cur.canvas.x - wd->down_pos.x));
+                  wd->move_y = wd->y + ((ev->cur.canvas.y - wd->down_pos.y));
+
+                  if (wd->on_zoom)
+                    {
+                       _imageslider_update_center_pos(wd, wd->move_x, wd->move_y, wd->y, wd->w);
+                    }
+                  else
+                    {
+                       _imageslider_update_pos(wd, wd->move_x, wd->y, wd->w);
+                    }
                }
-             else
-               {*/
-                  _imageslider_update_pos(wd, wd->move_x, wd->y, wd->w);
-               //}
+          }
+        else
+          {
+             wd->mx = ev->cur.canvas.x;
+             wd->my = ev->cur.canvas.y;
+
+             wd->ratio =
+             sqrt((wd->mx - wd->mmx) * (wd->mx - wd->mmx) + (wd->my - wd->mmy) * (wd->my - wd->mmy));
+
+             eo = (Evas_Object*)elm_layout_content_get((const Evas_Object*)obj, "swl.photo");
+             if (eo)
+               {
+                  it = eina_list_data_get(wd->cur);
+                  if (((it->w * wd->ratio / wd->dratio) / it->ow) < MAX_ZOOM_SIZE)
+                    {
+                       edje_object_part_unswallow(elm_layout_edje_get(obj), eo);
+                       evas_object_resize(eo, it->w * wd->ratio / wd->dratio, it->h * wd->ratio / wd->dratio);
+                       evas_object_size_hint_min_set(eo, it->w * wd->ratio / wd->dratio, it->h * wd->ratio / wd->dratio);
+                       elm_layout_content_set(obj, "swl.photo", eo);
+                    }
+               }
           }
      }
    wd->move_cnt++;
@@ -648,7 +673,7 @@ _check_zoom(void *data)
    if ((iw != wd->w) || ((dx != 0) || (dy != 0)))
      {
         wd->on_zoom = EINA_TRUE;
-        //edje_object_signal_emit(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "block.off", "block");
+        edje_object_signal_emit(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "block.off", "block");
      }
    else
      {
@@ -671,8 +696,8 @@ _timer_cb(void *data)
    int ret;
 
    wd = data;
-   if (wd->ani_lock == EINA_FALSE)
-      return EINA_FALSE;
+   if (wd->ani_lock == 0)
+      return 0;
 
    gettimeofday(&tv, NULL);
 
@@ -696,7 +721,7 @@ _timer_cb(void *data)
 
    if (wd->move_x == wd->x)
      {
-        wd->ani_lock = EINA_FALSE;
+        wd->ani_lock = 0;
         if (wd->cur)
           {
              it = eina_list_data_get(wd->cur);
@@ -711,7 +736,7 @@ _timer_cb(void *data)
 
         ret = _check_drag(BLOCK_LEFT, wd);
         ret = _check_drag(BLOCK_RIGHT, wd);
-        //_check_zoom(wd);
+        _check_zoom(wd);
 
         if (!wd->queue_idler)
           wd->queue_idler = ecore_idler_add(_icon_to_image, wd);
@@ -739,7 +764,7 @@ _anim(Widget_Data * wd)
         return;
      }
 
-   wd->ani_lock = EINA_TRUE;
+   wd->ani_lock = 1;
 
    w = wd->move_x;
    gettimeofday(&wd->tv, NULL);
@@ -785,15 +810,17 @@ _imageslider_update(Widget_Data * wd)
              if (!eo)
                {
                   eo = elm_image_add(wd->obj);
+                  elm_layout_content_set(wd->ly[i], "swl.photo", eo);
                   //elm_image_prescale_set(eo, wd->w);
                   elm_image_file_set(eo, it->photo_file, NULL);
+                  elm_image_object_size_get(eo, &it->w, &it->h);
+                  evas_object_geometry_get(eo, &it->ox, &it->oy, &it->ow, &it->oh);
+                  it->ow = it->w;
+                  it->oh = it->h;
                   elm_layout_content_set(wd->ly[i], "swl.photo", eo);
-                  //elm_image_object_size_get(eo, &it->w, &it->h);
-                  //evas_object_geometry_get(eo, &it->ox, &it->oy, &it->ow, &it->oh);
-                  //it->ow = it->w;
-                  //it->oh = it->h;
                }
-             /*if (wd->moving != it->moving)
+
+             if (wd->moving != it->moving)
                {
                   it->moving = wd->moving;
                   if (wd->moving)
@@ -804,7 +831,7 @@ _imageslider_update(Widget_Data * wd)
                     {
                        //elm_image_prescale_set(eo, it->w > it->h ? it->w : it->h);
                     }
-               }*/
+               }
           }
      }
 
@@ -814,8 +841,8 @@ _imageslider_update(Widget_Data * wd)
 /**
 * Add an Image Slider widget
 *
-* @param        parent  The parent object
-* @return       The new Image slider object or NULL if it cannot be created
+* @param 	parent	The parent object
+* @return	The new Image slider object or NULL if it cannot be created
 *
 * @ingroup Imageslider
 */
@@ -838,7 +865,6 @@ elm_imageslider_add(Evas_Object *parent)
    elm_widget_theme_hook_set(obj, _theme_hook);
 
    wd->clip = evas_object_rectangle_add(e);
-   elm_widget_sub_object_add(obj, wd->clip);
    elm_widget_resize_object_set(obj, wd->clip);
 
    for (i = 0; i < BLOCK_MAX; i++)
@@ -871,11 +897,11 @@ elm_imageslider_add(Evas_Object *parent)
 /**
 * Append an Image Slider item
 *
-* @param        obj          The Image Slider object
-* @param        photo_file   photo file path
-* @param        func         callback function
-* @param        data         callback data
-* @return       The Image Slider item handle or NULL
+* @param 	obj          The Image Slider object
+* @param	photo_file   photo file path
+* @param	func         callback function
+* @param	data         callback data
+* @return	The Image Slider item handle or NULL
 *
 * @ingroup Imageslider
 */
@@ -910,14 +936,14 @@ elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Images
 /**
 * Insert an Image Slider item into the Image Slider Widget by using the given index.
 *
-* @param        obj                     The Image Slider object
-* @param        photo_file      photo file path
-* @param        func            callback function
-* @param        index           required position
-* @param        data            callback data
-* @return       The Image Slider item handle or NULL
+* @param 	obj			The Image Slider object
+* @param 	photo_file 	photo file path
+* @param 	func		callback function
+* @param 	index		required position
+* @param 	data 		callback data
+* @return 	The Image Slider item handle or NULL
 *
-* @ingroup      Imageslider
+* @ingroup	Imageslider
 */
 EAPI Elm_Imageslider_Item *
 elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, unsigned int index, void *data)
@@ -955,11 +981,11 @@ elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, E
 /**
 * Prepend Image Slider item
 *
-* @param        obj          The Image Slider object
-* @param        photo_file   photo file path
-* @param        func         callback function
-* @param        data         callback data
-* @return       The imageslider item handle or NULL
+* @param 	obj          The Image Slider object
+* @param	photo_file   photo file path
+* @param	func         callback function
+* @param	data         callback data
+* @return	The imageslider item handle or NULL
 *
 * @ingroup Imageslider
 */
@@ -992,7 +1018,7 @@ elm_imageslider_item_prepend(Evas_Object *obj, const char *photo_file, Elm_Image
 /**
 * Delete the selected Image Slider item
 *
-* @param it             The selected Image Slider item handle
+* @param it		The selected Image Slider item handle
 *
 * @ingroup Imageslider
 */
@@ -1028,7 +1054,7 @@ elm_imageslider_item_del(Elm_Imageslider_Item * it)
 /**
 * Get the selected Image Slider item
 *
-* @param obj            The Image Slider object
+* @param obj 		The Image Slider object
 * @return The selected Image Slider item or NULL
 *
 * @ingroup Imageslider
@@ -1051,7 +1077,7 @@ elm_imageslider_selected_item_get(Evas_Object *obj)
 /**
 * Get whether an Image Slider item is selected or not
 *
-* @param it              the selected Image Slider item
+* @param it		 the selected Image Slider item
 * @return EINA_TRUE or EINA_FALSE
 *
 * @ingroup Imageslider
@@ -1077,7 +1103,7 @@ elm_imageslider_item_selected_get(Elm_Imageslider_Item * it)
 /**
 * Set the selected Image Slider item
 *
-* @param it             The Imaga Slider item
+* @param it 		The Imaga Slider item
 *
 * @ingroup Imageslider
 */
@@ -1119,7 +1145,7 @@ elm_imageslider_item_selected_set(Elm_Imageslider_Item * it)
 /**
 * Get the photo file path of given Image Slider item
 *
-* @param it             The Image Slider item
+* @param it 		The Image Slider item
 * @return The photo file path or NULL;
 *
 * @ingroup Imageslider
@@ -1156,7 +1182,7 @@ elm_imageslider_item_photo_file_set(Elm_Imageslider_Item *it, const char *photo_
 /**
 * Get the previous Image Slider item
 *
-* @param it             The Image Slider item
+* @param it 		The Image Slider item
 * @return The previous Image Slider item or NULL
 *
 * @ingroup Imageslider
@@ -1190,7 +1216,7 @@ elm_imageslider_item_prev(Elm_Imageslider_Item * it)
 /**
 * Get the next Image Slider item
 *
-* @param it             The Image Slider item
+* @param it 		The Image Slider item
 * @return The next Image Slider item or NULL
 *
 * @ingroup Imageslider
@@ -1224,7 +1250,7 @@ elm_imageslider_item_next(Elm_Imageslider_Item * it)
 /**
 * Move to the previous Image Slider item
 *
-* @param obj    The Image Slider object
+* @param obj 	The Image Slider object
 *
 * @ingroup Imageslider
 */
@@ -1281,12 +1307,12 @@ elm_imageslider_item_update(Elm_Imageslider_Item *it)
    if (!it || (!(wd = elm_widget_data_get(it->obj)))) return;
    ELM_CHECK_WIDTYPE(it->obj, widtype);
 
-   if (wd->ani_lock == EINA_TRUE) return;
    if (it == eina_list_data_get(eina_list_prev(wd->cur)))
      elm_layout_content_set(wd->ly[BLOCK_LEFT], "swl.photo", NULL);
    else if (it == eina_list_data_get(wd->cur))
      elm_layout_content_set(wd->ly[BLOCK_CENTER], "swl.photo", NULL);
-   else if (it == eina_list_data_get(eina_list_next(wd->cur)))
+   else if (it == eina_list_data_get(eina_list_prev(wd->cur)))
      elm_layout_content_set(wd->ly[BLOCK_RIGHT], "swl.photo", NULL);
+
    _imageslider_update(wd);
 }

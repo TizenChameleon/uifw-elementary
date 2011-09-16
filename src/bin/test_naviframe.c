@@ -28,13 +28,13 @@ _page4(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *bt, *bt2, *ic, *nf = data;
    char buf[PATH_MAX];
-   Elm_Object_Item *it;
+   Elm_Naviframe_Item *it;
 
    bt = elm_button_add(nf);
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    ic = elm_icon_add(nf);
-   snprintf(buf, sizeof(buf), "%s/images/icon_right_arrow.png", elm_app_data_dir_get());
+   snprintf(buf, sizeof(buf), "%s/images/icon_right_arrow.png", PACKAGE_DATA_DIR);
    elm_icon_file_set(ic, buf, NULL);
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    elm_button_icon_set(bt, ic);
@@ -44,7 +44,7 @@ _page4(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    elm_object_text_set(bt2, "Naviframe Test");
 
    ic = elm_icon_add(nf);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
    elm_icon_file_set(ic, buf, NULL);
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 
@@ -54,8 +54,8 @@ _page4(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
                                 bt,
                                 bt2,
                                 NULL);
-   elm_object_item_text_part_set(it, "elm.text.subtitle", "Here is sub-title part!");
-   elm_object_item_content_part_set(it, "elm.swallow.icon", ic);
+   elm_naviframe_item_subtitle_label_set(it, "Here is sub-title part!");
+   elm_naviframe_item_icon_set(it, ic);
    elm_naviframe_item_title_visible_set(it, EINA_FALSE);
    evas_object_smart_callback_add(bt2, "clicked", _title_visible, it);
 }
@@ -65,7 +65,7 @@ _page3(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *bt, *bt2, *bt3, *ic, *nf = data;
    char buf[PATH_MAX];
-   Elm_Object_Item *it;
+   Elm_Naviframe_Item *it;
 
    bt = elm_button_add(nf);
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -82,7 +82,7 @@ _page3(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    elm_object_text_set(bt3, "Naviframe Test");
 
    ic = elm_icon_add(nf);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
    elm_icon_file_set(ic, buf, NULL);
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 
@@ -92,8 +92,8 @@ _page3(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
                                 bt2,
                                 bt3,
                                 NULL);
-   elm_object_item_text_part_set(it, "elm.text.subtitle", "Here is sub-title part!");
-   elm_object_item_content_part_set(it, "elm.swallow.icon", ic);
+   elm_naviframe_item_subtitle_label_set(it, "Here is sub-title part!");
+   elm_naviframe_item_icon_set(it, ic);
 }
 
 void
@@ -101,7 +101,7 @@ _page2(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *bt, *bt2, *ic, *nf = data;
    char buf[PATH_MAX];
-   Elm_Object_Item *it;
+   Elm_Naviframe_Item *it;
 
    bt = elm_button_add(nf);
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -112,7 +112,7 @@ _page2(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    elm_object_text_set(bt2, "Naviframe Test");
 
    ic = elm_icon_add(nf);
-   snprintf(buf, sizeof(buf), "%s/images/icon_right_arrow.png", elm_app_data_dir_get());
+   snprintf(buf, sizeof(buf), "%s/images/icon_right_arrow.png", PACKAGE_DATA_DIR);
    elm_icon_file_set(ic, buf, NULL);
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    elm_button_icon_set(bt, ic);
@@ -123,7 +123,7 @@ _page2(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
                                 bt,
                                 bt2,
                                 NULL);
-   elm_object_item_text_part_set(it, "elm.text.subtitle", "Here is sub-title part!");
+   elm_naviframe_item_subtitle_label_set(it, "Here is sub-title part!");
 }
 
 void

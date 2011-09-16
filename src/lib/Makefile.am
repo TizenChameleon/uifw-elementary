@@ -77,7 +77,6 @@ elm_dialoguegroup.c \
 elm_diskselector.c \
 elm_editfield.c \
 elm_entry.c \
-elm_factory.c \
 elm_flip.c \
 elm_flipselector.c \
 elm_font.c \
