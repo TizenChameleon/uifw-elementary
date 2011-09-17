@@ -1842,6 +1842,7 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
    Evas_Event_Mouse_Down *ev;
    Smart_Data *sd;
    Evas_Coord x = 0, y = 0, ox = 0, oy = 0;
+   Evas_Coord vw, vh, aw, ah;
 
    sd = data;
    ev = event_info;
@@ -1935,6 +1936,19 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                                    }
                                  else
                                    sd->down.extra_time = 0.0;
+                                 elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &vw, &vh);
+                                 aw = abs(sd->down.dx);
+                                 if (aw  > vw*3)
+                                   {
+                                      if (sd->down.dx > 0) sd->down.dx = vw*3;
+                                      else sd->down.dx = -(vw*3);
+                                   }
+                                 ah = abs(sd->down.dy);
+                                 if (ah  > vh*3)
+                                   {
+                                      if (sd->down.dy > 0) sd->down.dy = vh*3;
+                                      else sd->down.dy = -(vh*3);
+                                   }
                                  sd->down.pdx = sd->down.dx;
                                  sd->down.pdy = sd->down.dy;
                                  ox = -sd->down.dx;
