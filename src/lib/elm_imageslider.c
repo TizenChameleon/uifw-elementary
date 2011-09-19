@@ -49,9 +49,6 @@ struct _Imageslider_Item
    const char *photo_file;
    void (*func) (void *data, Evas_Object *obj, void *event_info);
    void *data;
-   //Evas_Coord x, y, w, h;
-   //Evas_Coord ox, oy, ow, oh;
-   //int moving:1;
 };
 
 // Image Slider Widget Data.
@@ -76,12 +73,6 @@ struct _Widget_Data
    int move_cnt;
    int ani_lock:1;
    int moving:1;
-
-   Eina_Bool on_zoom:1;
-   int dx, dy, mx, my;
-   int mdx, mdy, mmx, mmy;
-   int dratio;
-   int ratio;
 };
 
 // Global value declaration.
@@ -103,7 +94,6 @@ static void _imageslider_hide(void *data, Evas * e, Evas_Object *obj, void *even
 static void _imageslider_update(Widget_Data * wd);
 
 static void _imageslider_update_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord y, Evas_Coord w);
-static void _imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord my, Evas_Coord y, Evas_Coord w);
 
 static void _imageslider_obj_shift(Widget_Data * wd, Eina_Bool left);
 
@@ -113,13 +103,10 @@ static Eina_Bool _icon_to_image(void *data);
 
 static int _check_drag(int state, void *data);
 
-static void _check_zoom(void *data);
-
 static void _anim(Widget_Data * wd);
 
 static Eina_Bool _timer_cb(void *data);
 
-//static void _signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _ev_imageslider_down_cb(void *data, Evas * e, Evas_Object *obj, void *event_info);
 static void _ev_imageslider_up_cb(void *data, Evas * e, Evas_Object *obj, void *event_info);
 static void _ev_imageslider_move_cb(void *data, Evas * e, Evas_Object *obj, void *event_info);
@@ -134,14 +121,7 @@ _del_hook(Evas_Object *obj)
 
    wd = elm_widget_data_get(obj);
 
-   if (!wd)
-      return;
-
-   for (i = 0; i < BLOCK_MAX; i++)
-     {
-       elm_widget_sub_object_del(wd->obj, wd->ly[i]);
-       evas_object_del(wd->ly[i]);
-     }
+   if (!wd) return;
 
    if (wd->its)
      {
@@ -161,8 +141,7 @@ _del_hook(Evas_Object *obj)
         wd->anim_timer = NULL;
      }
 
-   if (wd)
-      free(wd);
+   if (wd) free(wd);
 
 }
 
@@ -245,7 +224,7 @@ _imageslider_resize(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *eve
      return;
 
    evas_object_geometry_get(obj, NULL, NULL, &w, &h);
-   fprintf(stderr, "%d %d -resize\n", w, h);
+   DBG("%d %d -resize\n", w, h);
    wd->w = w;
    wd->h = h;
 
@@ -292,30 +271,9 @@ _imageslider_hide(void *data, Evas * e __UNUSED__, Evas_Object *obj __UNUSED__, 
 static void
 _imageslider_update_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord y, Evas_Coord w)
 {
-   int i = 0;
    evas_object_move(wd->ly[BLOCK_LEFT], x - (w + INTERVAL_WIDTH), y);
    evas_object_move(wd->ly[BLOCK_CENTER], x, y);
    evas_object_move(wd->ly[BLOCK_RIGHT], x + (w + INTERVAL_WIDTH), y);
-   //making sure that the clipping happens for all three layouts based on clipper's geometry
-   for (i = 0; i < BLOCK_MAX; i++)
-     evas_object_clip_set(wd->ly[i], wd->clip);
-   evas_render_idle_flush(evas_object_evas_get(wd->obj));
-}
-
-// Update the center position of Image Slider item.
-static void
-_imageslider_update_center_pos(Widget_Data * wd, Evas_Coord x, Evas_Coord my __UNUSED__, Evas_Coord y, Evas_Coord w)
-{
-   Evas_Coord ix = 0, iy = 0, iw = 0, ih = 0;
-   const Evas_Object *eo = elm_layout_content_get((const Evas_Object*)(wd->ly[BLOCK_CENTER]), "swl.photo");
-   if (eo)
-     evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
-   if ((ix > 0) || (ix + iw < wd->w))
-     {
-        edje_object_signal_emit(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "block.on", "block");
-        _imageslider_update_pos(wd, x, y, w);
-        wd->on_zoom = EINA_FALSE;
-     }
 }
 
 // Shift next/previous Image Slider item in layouts.
@@ -406,24 +364,6 @@ _ev_imageslider_down_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void 
    wd->timestamp = ev->timestamp;
    wd->move_cnt = MOVE_STEP;
 
-   /*wd->dx = ev->canvas.x;
-   wd->dy = ev->canvas.y;
-   wd->mx = ev->canvas.x;
-   wd->my = ev->canvas.y;
-
-   wd->dratio = 1;
-   wd->ratio = 1;
-
-   eo = (Evas_Object*)elm_layout_content_get((const Evas_Object*)obj, "swl.photo");
-   if (eo)
-      evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
-
-   if (iw != wd->w)
-     {
-        printf("Zooming\n");
-        wd->on_zoom = EINA_TRUE;
-        edje_object_signal_emit(elm_layout_edje_get(obj), "block.off", "block");
-     }*/
 }
 
 // Whenever MOUSE UP event occurs, Call this function.
@@ -439,63 +379,56 @@ _ev_imageslider_up_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj __UNUSED
 
    int interval;
 
-   if (wd->ani_lock)
-      return;
+   if (wd->ani_lock) return;
 
-   if (wd->on_zoom)
+   step = wd->down_pos.x - ev->canvas.x;
+   interval = ev->timestamp - wd->timestamp;
+   if (step == 0 || interval == 0)
      {
+        DBG("case1: emit CLICK event\n");
+        evas_object_smart_callback_call(wd->obj, SIG_CLICKED, NULL);
+        return;
      }
-   else
+   if (interval < CLICK_TIME_MAX)
      {
-        step = wd->down_pos.x - ev->canvas.x;
-        interval = ev->timestamp - wd->timestamp;
-        if (step == 0 || interval == 0)
+        if (step < CLICK_WIDTH_MIN && step > CLICK_WIDTH_MIN)
           {
-             fprintf(stderr, "[[[ DEBUG ]]]: case1: emit CLICK event\n");
+             DBG("case2: emit CLICK event\n");
              evas_object_smart_callback_call(wd->obj, SIG_CLICKED, NULL);
              return;
           }
-        if (interval < CLICK_TIME_MAX)
+     }
+
+   if (interval < FLICK_TIME_MAX)
+     {
+        if (step < FLICK_WIDTH_MIN && step > FLICK_WIDTH_MIN)
           {
-             if (step < CLICK_WIDTH_MIN && step > CLICK_WIDTH_MIN)
-               {
-                  fprintf(stderr, "[[[ DEBUG ]]]: case2: emit CLICK event\n");
-                  evas_object_smart_callback_call(wd->obj, SIG_CLICKED, NULL);
-                  return;
-               }
-          }
+             DBG("ev_imageslider_up_cb-black zone (1)\n");
 
-        if (interval < FLICK_TIME_MAX)
-          {
-             if (step < FLICK_WIDTH_MIN && step > FLICK_WIDTH_MIN)
-               {
-                  fprintf(stderr, "[[[ DEBUG ]]]:_ev_imageslider_up_cb-black zone (1)\n");
-
-                   _imageslider_obj_move(wd, 0);
-               }
-             else
-               {
-                  fprintf(stderr, "[[[ DEBUG ]]]:_ev_imageslider_up_cb-black zone (2)\n");
-
-                  _imageslider_obj_move(wd, step);
-               }
-
+             _imageslider_obj_move(wd, 0);
           }
         else
           {
-             step = (wd->x - wd->move_x) << 1;
-             if (step <= wd->w && step >= -(wd->w))
-               {
-                  fprintf(stderr, "[[[ DEBUG ]]]:_ev_imageslider_up_cb-white zone (1)\n");
+             DBG("ev_imageslider_up_cb-black zone (2)\n");
 
-                  _imageslider_obj_move(wd, 0);
-               }
-             else
-               {
-                  fprintf(stderr, "[[[ DEBUG ]]]:_ev_imageslider_up_cb-white zone (2)\n");
+             _imageslider_obj_move(wd, step);
+          }
 
-                  _imageslider_obj_move(wd, step);
-               }
+     }
+   else
+     {
+        step = (wd->x - wd->move_x) << 1;
+        if (step <= wd->w && step >= -(wd->w))
+          {
+             DBG("ev_imageslider_up_cb-white zone (1)\n");
+
+             _imageslider_obj_move(wd, 0);
+          }
+        else
+          {
+             DBG("ev_imageslider_up_cb-white zone (2)\n");
+
+             _imageslider_obj_move(wd, step);
           }
      }
 
@@ -534,31 +467,12 @@ _ev_imageslider_move_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void 
 
              wd->move_x = wd->x + ((ev->cur.canvas.x - wd->down_pos.x));
              wd->move_y = wd->y + ((ev->cur.canvas.y - wd->down_pos.y));
-
-             /*if (wd->on_zoom)
-               {
-                  _imageslider_update_center_pos(wd, wd->move_x, wd->move_y, wd->y, wd->w);
-               }
-             else
-               {*/
-                  _imageslider_update_pos(wd, wd->move_x, wd->y, wd->w);
-               //}
+             _imageslider_update_pos(wd, wd->move_x, wd->y, wd->w);
           }
      }
    wd->move_cnt++;
 
 }
-
-#if 0
-// Whenever CLICK event occurs, Call this API
-// But, DONOT emit CLICK event.
-// DO NOT use this callback function. Remove later.
-static void
-_signal_clicked(void *data, Evas_Object *obj, const char *emission, const char *source)
-{
-   fprintf(stderr, "[[[ DEBUG ]]]: Call the callback function about Click event!, But DONOT emit CLICK event in the callback function!\n");
-}
-#endif
 
 static inline double
 time_get(Evas_Coord x, Evas_Coord w)
@@ -582,10 +496,7 @@ _icon_to_image(void *data)
    _imageslider_update(wd);
 
    if (wd->queue_idler)
-     {
-        ecore_idler_del(wd->queue_idler);
-        wd->queue_idler = NULL;
-     }
+     wd->queue_idler = NULL;
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -623,38 +534,6 @@ _check_drag(int state, void *data)
      return 1;
 
    return 0;
-}
-
-static void
-_check_zoom(void *data)
-{
-   Widget_Data *wd = data;
-
-   Elm_Imageslider_Item *it;
-
-   Evas_Coord ix = 0, iy = 0, iw = 0, ih = 0;
-
-   double dx = 0, dy = 0;
-
-   Evas_Object *eo = NULL;
-
-   it = eina_list_data_get(wd->cur);
-
-   eo = (Evas_Object*)elm_layout_content_get(wd->ly[BLOCK_CENTER], "swl.photo");
-   if (eo)
-      evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
-   edje_object_part_drag_value_get(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "swl.photo", &dx, &dy);
-
-   if ((iw != wd->w) || ((dx != 0) || (dy != 0)))
-     {
-        wd->on_zoom = EINA_TRUE;
-        //edje_object_signal_emit(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "block.off", "block");
-     }
-   else
-     {
-        wd->on_zoom = EINA_FALSE;
-        edje_object_signal_emit(elm_layout_edje_get(wd->ly[BLOCK_CENTER]), "block.on", "block");
-     }
 }
 
 static Eina_Bool
@@ -711,16 +590,12 @@ _timer_cb(void *data)
 
         ret = _check_drag(BLOCK_LEFT, wd);
         ret = _check_drag(BLOCK_RIGHT, wd);
-        //_check_zoom(wd);
 
         if (!wd->queue_idler)
           wd->queue_idler = ecore_idler_add(_icon_to_image, wd);
 
         if (wd->anim_timer)
-          {
-             ecore_timer_del(wd->anim_timer);
-             wd->anim_timer = NULL;
-          }
+          wd->anim_timer = NULL;
 
         return ECORE_CALLBACK_CANCEL;
      }
@@ -788,23 +663,7 @@ _imageslider_update(Widget_Data * wd)
                   //elm_image_prescale_set(eo, wd->w);
                   elm_image_file_set(eo, it->photo_file, NULL);
                   elm_layout_content_set(wd->ly[i], "swl.photo", eo);
-                  //elm_image_object_size_get(eo, &it->w, &it->h);
-                  //evas_object_geometry_get(eo, &it->ox, &it->oy, &it->ow, &it->oh);
-                  //it->ow = it->w;
-                  //it->oh = it->h;
                }
-             /*if (wd->moving != it->moving)
-               {
-                  it->moving = wd->moving;
-                  if (wd->moving)
-                    {
-                       //elm_image_prescale_set(eo, MOVING_IMAGE_SIZE);
-                    }
-                  else
-                    {
-                       //elm_image_prescale_set(eo, it->w > it->h ? it->w : it->h);
-                    }
-               }*/
           }
      }
 
@@ -848,7 +707,6 @@ elm_imageslider_add(Evas_Object *parent)
         elm_widget_sub_object_add(obj, wd->ly[i]);
         evas_object_smart_member_add(wd->ly[i], obj);
 
-        //edje_object_signal_callback_add(elm_layout_edje_get(wd->ly[i]), "elm,photo,clicked", "", _signal_clicked, obj);
         evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_DOWN, _ev_imageslider_down_cb, wd);
         evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_UP, _ev_imageslider_up_cb, wd);
         evas_object_event_callback_add(wd->ly[i], EVAS_CALLBACK_MOUSE_MOVE, _ev_imageslider_move_cb, wd);
@@ -927,7 +785,7 @@ elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, E
 
    Elm_Imageslider_Item *it;
 
-   fprintf(stderr, "[[[ DEBUG ]]]:: New elm_imageslider_item_append_relative()\n");
+   DBG("New elm_imageslider_item_append_relative()\n");
 
    if (!obj || !(wd = elm_widget_data_get(obj)))
      return NULL;
