@@ -872,6 +872,20 @@ extern "C" {
    EAPI void elm_object_item_data_set(Elm_Object_Item *it, void *data);
 
    /**
+    * Send a signal to the edje object of the widget item.
+    *
+    * This function sends a signal to the edje object of the obj item. An
+    * edje program can respond to a signal by specifying matching
+    * 'signal' and 'source' fields.
+    *
+    * @param it The Elementary object item
+    * @param emission The signal's name.
+    * @param source The signal's source.
+    * @ingroup General
+    */
+   EAPI void             elm_object_item_signal_emit(Elm_Object_Item *it, const char *emission, const char *source) EINA_ARG_NONNULL(1);
+
+   /**
     * @}
     */
 
@@ -8238,6 +8252,8 @@ extern "C" {
   #define ELM_NAVIFRAME_ITEM_OPTIONHEADER "elm.swallow.optionheader"
   #define ELM_NAVIFRAME_ITEM_TITLE_LABEL "elm.text.title"
   #define ELM_NAVIFRAME_ITEM_PREV_BTN "elm.swallow.prev_btn"
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_CLOSE "elm,state,optionheader,instant_close", ""
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_OPEN "elm,state,optionheader,instant_open", ""
 
    EAPI Evas_Object        *elm_naviframe_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
    EAPI Elm_Object_Item    *elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style) EINA_ARG_NONNULL(1, 5);

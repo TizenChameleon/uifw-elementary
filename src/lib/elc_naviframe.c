@@ -53,19 +53,25 @@ static const Evas_Smart_Cb_Description _signals[] = {
 
 static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
+static void _emit_hook(Evas_Object *obj,
+                       const char *emission,
+                       const char *source);
 static void _disable_hook(Evas_Object *obj);
-static void _text_set_hook(Elm_Object_Item *it,
-                           const char *part,
-                           const char *label);
-static const char *_text_get_hook(const Elm_Object_Item *it,
-                                   const char *part);
-static void _content_set_hook(Elm_Object_Item *it,
-                              const char *part,
-                              Evas_Object *content);
-static Evas_Object *_content_get_hook(const Elm_Object_Item *it,
-                                      const char *part);
-static Evas_Object *_content_unset_hook(Elm_Object_Item *it,
-                                        const char *part);
+static void _item_text_set_hook(Elm_Object_Item *it,
+                                const char *part,
+                                const char *label);
+static const char *_item_text_get_hook(const Elm_Object_Item *it,
+                                       const char *part);
+static void _item_content_set_hook(Elm_Object_Item *it,
+                                   const char *part,
+                                   Evas_Object *content);
+static Evas_Object *_item_content_get_hook(const Elm_Object_Item *it,
+                                           const char *part);
+static Evas_Object *_item_content_unset_hook(Elm_Object_Item *it,
+                                             const char *part);
+static void _item_signal_emit_hook(Elm_Object_Item *it,
+                                   const char *emission,
+                                   const char *source);
 static void _sizing_eval(Evas_Object *obj);
 static void _item_sizing_eval(Elm_Naviframe_Item *it);
 static void _move(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -142,6 +148,18 @@ _theme_hook(Evas_Object *obj __UNUSED__)
    //FIXME:
 }
 
+static void _emit_hook(Evas_Object *obj,
+                       const char *emission,
+                       const char *source)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   edje_object_signal_emit(wd->base, emission, source);
+}
+
 static void
 _disable_hook(Evas_Object *obj __UNUSED__)
 {
@@ -149,7 +167,9 @@ _disable_hook(Evas_Object *obj __UNUSED__)
 }
 
 static void
-_text_set_hook(Elm_Object_Item *it, const char *part, const char *label)
+_item_text_set_hook(Elm_Object_Item *it,
+                    const char *part,
+                    const char *label)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
 
@@ -202,7 +222,7 @@ _text_set_hook(Elm_Object_Item *it, const char *part, const char *label)
 }
 
 static const char *
-_text_get_hook(const Elm_Object_Item *it, const char *part)
+_item_text_get_hook(const Elm_Object_Item *it, const char *part)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
    Eina_List *l = NULL;
@@ -224,9 +244,9 @@ _text_get_hook(const Elm_Object_Item *it, const char *part)
 }
 
 static void
-_content_set_hook(Elm_Object_Item *it,
-                  const char *part,
-                  Evas_Object *content)
+_item_content_set_hook(Elm_Object_Item *it,
+                       const char *part,
+                       Evas_Object *content)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
 
@@ -257,8 +277,7 @@ _content_set_hook(Elm_Object_Item *it,
 /*
    */
 static Evas_Object *
-_content_get_hook(const Elm_Object_Item *it,
-                  const char *part)
+_item_content_get_hook(const Elm_Object_Item *it, const char *part)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
    Eina_List *l = NULL;
@@ -283,8 +302,7 @@ _content_get_hook(const Elm_Object_Item *it,
 }
 
 static Evas_Object *
-_content_unset_hook(Elm_Object_Item *it __UNUSED__,
-                    const char *part __UNUSED__)
+_item_content_unset_hook(Elm_Object_Item *it, const char *part)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
    Eina_List *l = NULL;
@@ -293,8 +311,8 @@ _content_unset_hook(Elm_Object_Item *it __UNUSED__,
    Evas_Object *content = NULL;
    char buf[1028];
 
-  //specified parts
-  //FIXME: could be unset the below specified contents also.
+   //specified parts
+   //FIXME: could be unset the below specified contents also.
    if (!part ||
        !strcmp(part, "elm.swallow.content") ||
        !strcmp(part, "elm.swallow.prev_btn") ||
@@ -305,7 +323,7 @@ _content_unset_hook(Elm_Object_Item *it __UNUSED__,
         return NULL;
      }
 
-  //common parts
+   //common parts
    EINA_LIST_FOREACH(navi_it->content_list, l, pair)
      {
         if (!strcmp(part, pair->part))
@@ -331,6 +349,16 @@ _content_unset_hook(Elm_Object_Item *it __UNUSED__,
    _item_sizing_eval(navi_it);
 
    return content;
+}
+
+static void
+_item_signal_emit_hook(Elm_Object_Item *it,
+                       const char *emission,
+                       const char *source)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+   edje_object_signal_emit(navi_it->base.view, emission, source);
 }
 
 static void
@@ -676,6 +704,7 @@ elm_naviframe_add(Evas_Object *parent)
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_disable_hook_set(obj, _disable_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
+   elm_widget_signal_emit_hook_set(obj, _emit_hook);
 
    //base
    wd->base = edje_object_add(e);
@@ -709,11 +738,12 @@ elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *
         return NULL;
      }
 
-   elm_widget_item_text_set_hook_set(it, _text_set_hook);
-   elm_widget_item_text_get_hook_set(it, _text_get_hook);
-   elm_widget_item_content_set_hook_set(it, _content_set_hook);
-   elm_widget_item_content_get_hook_set(it, _content_get_hook);
-   elm_widget_item_content_unset_hook_set(it, _content_unset_hook);
+   elm_widget_item_text_set_hook_set(it, _item_text_set_hook);
+   elm_widget_item_text_get_hook_set(it, _item_text_get_hook);
+   elm_widget_item_content_set_hook_set(it, _item_content_set_hook);
+   elm_widget_item_content_get_hook_set(it, _item_content_get_hook);
+   elm_widget_item_content_unset_hook_set(it, _item_content_unset_hook);
+   elm_widget_item_signal_emit_hook_set(it, _item_signal_emit_hook);
 
    //item base layout
    it->base.view = edje_object_add(evas_object_evas_get(obj));
@@ -735,11 +765,11 @@ elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *
 
    //title
    edje_object_signal_callback_add(it->base.view,
-                                   "elm,title,clicked",
+                                   "elm,action,title,clicked",
                                    "elm",
                                    _title_clicked, it);
 
-   _text_set_hook(ELM_CAST(it), "elm.text.title", title_label);
+   _item_text_set_hook(ELM_CAST(it), "elm.text.title", title_label);
 
    //title buttons
    if ((!prev_btn) && (eina_list_count(wd->stack)))
