@@ -17,7 +17,7 @@ TARGETS = utc_UIFW_elm_controlbar_add_func \
 		  utc_UIFW_elm_controlbar_item_select_func \
 		  utc_UIFW_elm_controlbar_item_visible_set_func \
 		  utc_UIFW_elm_controlbar_item_visible_get_func \
-		  utc_UIFW_elm_controlbar_item_disable_set_func \
+		  utc_UIFW_elm_controlbar_item_disabled_set_func \
 		  utc_UIFW_elm_controlbar_item_icon_set_func \
 		  utc_UIFW_elm_controlbar_item_icon_get_func \
 		  utc_UIFW_elm_controlbar_item_label_set_func \
