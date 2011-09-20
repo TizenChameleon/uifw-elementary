@@ -1301,7 +1301,7 @@ elm_datefield_item_max_is_absolute(const Evas_Object *obj,
 }
 
 
-#define DATE_FORMAT_TYPE_COUNT = 6
+#define DATE_FORMAT_TYPE_COUNT  6
 
 typedef struct _format_mapper
 {
