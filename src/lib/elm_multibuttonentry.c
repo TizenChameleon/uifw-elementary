@@ -168,7 +168,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
              ecore_imf_context_input_panel_show(imf_context);
              evas_object_focus_set(obj, EINA_TRUE);
           }
-        else if ((imf_context) && (!wd->current) || (!eina_list_count(wd->items)))
+        else if ((imf_context) && ((!wd->current) || (!eina_list_count(wd->items))))
           {
              _view_update(obj);
              ecore_imf_context_input_panel_show(imf_context);
@@ -1292,12 +1292,9 @@ elm_multibuttonentry_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-   if (!parent) return NULL;
 
-   wd = ELM_NEW(Widget_Data);
-   e = evas_object_evas_get(parent);
-   if (!e) return NULL;
-   obj = elm_widget_add(e);
+   ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
+
    ELM_SET_WIDTYPE(widtype, "multibuttonentry");
    elm_widget_type_set(obj, "multibuttonentry");
    elm_widget_sub_object_add(parent, obj);
