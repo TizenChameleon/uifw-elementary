@@ -1,27 +1,25 @@
 CC ?= gcc
 
-TARGETS = uts_elm_ctxpopup_add_func \
-	  uts_elm_ctxpopup_horizontal_set \
-	  uts_elm_ctxpopup_horizontal_get \
-	  uts_elm_ctxpopup_item_append \
-	  uts_elm_ctxpopup_item_icon_set \
-	  uts_elm_ctxpopup_item_label_set \
-	  uts_elm_ctxpopup_item_del \
-	  uts_elm_ctxpopup_item_disabled_set \
-     uts_elm_ctxpopup_item_disabled_get \
-     uts_elm_ctxpopup_clear \
-	  uts_elm_ctxpopup_item_label_get \
-	  uts_elm_ctxpopup_item_icon_get \
-     uts_elm_ctxpopup_direction_priority_set \
-     uts_elm_ctxpopup_direction_priority_get \
-	  uts_elm_ctxpopup_content_set \
-     uts_elm_ctxpopup_content_unset \
-	  uts_elm_ctxpopup_hover_parent_set \
-	  uts_elm_ctxpopup_hover_parent_get
-	    
+TARGETS = utc_UIFW_elm_ctxpopup_add_func \
+	  utc_UIFW_elm_ctxpopup_horizontal_set_func \
+	  utc_UIFW_elm_ctxpopup_horizontal_get_func \
+	  utc_UIFW_elm_ctxpopup_item_append_func \
+	  utc_UIFW_elm_ctxpopup_item_icon_set_func \
+	  utc_UIFW_elm_ctxpopup_item_label_set_func \
+	  utc_UIFW_elm_ctxpopup_item_del_func \
+	  utc_UIFW_elm_ctxpopup_item_disabled_set_func \
+	  utc_UIFW_elm_ctxpopup_item_disabled_get_func \
+	  utc_UIFW_elm_ctxpopup_clear_func \
+	  utc_UIFW_elm_ctxpopup_item_label_get_func \
+	  utc_UIFW_elm_ctxpopup_item_icon_get_func \
+	  utc_UIFW_elm_ctxpopup_direction_priority_set_func \
+	  utc_UIFW_elm_ctxpopup_direction_priority_get_func \
+	  utc_UIFW_elm_ctxpopup_content_set_func \
+	  utc_UIFW_elm_ctxpopup_content_unset_func \
+	  utc_UIFW_elm_ctxpopup_hover_parent_set_func \
+	  utc_UIFW_elm_ctxpopup_hover_parent_get_func
 
-
-PKGS = elementary
+PKGS = elementary evas
 
 LDFLAGS = `pkg-config --libs $(PKGS)`
 LDFLAGS += $(TET_ROOT)/lib/tet3/tcm_s.o
@@ -34,8 +32,8 @@ CFLAGS += -Wall
 
 all: $(TARGETS)
 
-$(TARGET): %: %.c
-	$(CC) -o $@ $< $(CFLAGS) $(LDFLAGS)
+$(TARGETS): %: %.c
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 clean:
 	rm -f $(TARGETS)
