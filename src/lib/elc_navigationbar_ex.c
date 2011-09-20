@@ -561,7 +561,7 @@ elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const cha
 
    strncpy(buf, "item/", sizeof(buf));
    strncat(buf, item_style, sizeof(buf) - strlen(buf));
-   if (!eina_stringshare_replace(&it->item_style, item_style)) return NULL;
+   eina_stringshare_replace(&it->item_style, item_style);
    _elm_theme_object_set(obj, it->base,  "navigationbar_ex", buf, elm_widget_style_get(obj));
 
 
