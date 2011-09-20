@@ -115,8 +115,6 @@ static void _ev_imageslider_move_cb(void *data, Evas * e, Evas_Object *obj, void
 static void
 _del_hook(Evas_Object *obj)
 {
-   int i;
-
    Widget_Data *wd;
 
    wd = elm_widget_data_get(obj);
@@ -350,12 +348,10 @@ _imageslider_obj_move(Widget_Data * wd, Evas_Coord step)
 
 // Whenever MOUSE DOWN event occurs, Call this function.
 static void
-_ev_imageslider_down_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *event_info)
+_ev_imageslider_down_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = data;
-   Evas_Coord ix = 0, iy = 0, iw = 0, ih = 0;
    Evas_Event_Mouse_Down *ev = event_info;
-   Evas_Object *eo = NULL;
 
    if (wd->ani_lock)
       return;
@@ -363,7 +359,6 @@ _ev_imageslider_down_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void 
    wd->down_pos = ev->canvas;
    wd->timestamp = ev->timestamp;
    wd->move_cnt = MOVE_STEP;
-
 }
 
 // Whenever MOUSE UP event occurs, Call this function.
@@ -431,28 +426,18 @@ _ev_imageslider_up_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj __UNUSED
              _imageslider_obj_move(wd, step);
           }
      }
-
 }
 
 // Whenever MOUSE MOVE event occurs, Call this
 static void
-_ev_imageslider_move_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void *event_info)
+_ev_imageslider_move_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
-   int idx;
-
-   Evas_Object *eo;
-
+   int idx = 0;
    Evas_Coord step;
-
    Widget_Data *wd = data;
-
    Evas_Event_Mouse_Move *ev = event_info;
 
-   Elm_Imageslider_Item *it;
-
-   if (wd->ani_lock)
-      return;
-
+   if (wd->ani_lock) return;
    if (wd->move_cnt == MOVE_STEP)
      {
         wd->move_cnt = 0;
@@ -464,14 +449,12 @@ _ev_imageslider_move_cb(void *data, Evas * e __UNUSED__, Evas_Object *obj, void 
                idx = BLOCK_LEFT;
              else
                idx = BLOCK_RIGHT;
-
              wd->move_x = wd->x + ((ev->cur.canvas.x - wd->down_pos.x));
              wd->move_y = wd->y + ((ev->cur.canvas.y - wd->down_pos.y));
              _imageslider_update_pos(wd, wd->move_x, wd->y, wd->w);
           }
      }
    wd->move_cnt++;
-
 }
 
 static inline double
@@ -545,14 +528,16 @@ _timer_cb(void *data)
 
    struct timeval tv;
 
-   int t;
-
-   int ret;
+   int t = 0;
+   int ret = 0;
 
    wd = data;
-   if (wd->ani_lock == EINA_FALSE)
-      return EINA_FALSE;
-
+   if (!wd->ani_lock)
+     {
+        if (wd->anim_timer)
+          wd->anim_timer = NULL;
+        return ECORE_CALLBACK_CANCEL;
+     }
    gettimeofday(&tv, NULL);
 
    t = (tv.tv_sec - wd->tv.tv_sec) * 1000 + (tv.tv_usec - wd->tv.tv_usec) / 1000;
@@ -635,8 +620,7 @@ _imageslider_update(Widget_Data * wd)
 
    Evas_Object *eo;
 
-   if (!wd)
-     return;
+   if (!wd) return;
 
    if (!wd->cur) return;
 
@@ -666,7 +650,6 @@ _imageslider_update(Widget_Data * wd)
                }
           }
      }
-
    _anim(wd);
 }
 
@@ -715,14 +698,12 @@ elm_imageslider_add(Evas_Object *parent)
      }
 
    wd->obj = obj;
-
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _imageslider_resize, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _imageslider_move, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _imageslider_show, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _imageslider_hide, obj);
 
    _sizing_eval(obj);
-
    return obj;
 }
 
@@ -759,9 +740,7 @@ elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Images
 
    if (!wd->cur)
       wd->cur = wd->its;
-
    _imageslider_update(wd);
-
    return it;
 }
 
@@ -799,14 +778,12 @@ elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, E
    it->func = func;
    it->data = data;
 
-   wd->its =
-      eina_list_append_relative(wd->its, it, eina_list_nth(wd->its, index - 2));
+   wd->its = eina_list_append_relative(wd->its, it, eina_list_nth(wd->its,
+                                                                  index - 2));
 
    if (!wd->cur)
       wd->cur = wd->its;
-
    _imageslider_update(wd);
-
    return it;
 }
 
@@ -838,12 +815,9 @@ elm_imageslider_item_prepend(Evas_Object *obj, const char *photo_file, Elm_Image
    it->data = data;
    it->obj = obj;
    wd->its = eina_list_prepend(wd->its, it);
-
    if (!wd->cur)
       wd->cur = wd->its;
-
    _imageslider_update(wd);
-
    return it;
 }
 
@@ -878,9 +852,7 @@ elm_imageslider_item_del(Elm_Imageslider_Item * it)
              break;
           }
      }
-
    _imageslider_update(wd);
-
 }
 
 /**
@@ -929,7 +901,6 @@ elm_imageslider_item_selected_get(Elm_Imageslider_Item * it)
       return EINA_TRUE;
    else
       return EINA_FALSE;
-
 }
 
 /**
@@ -965,13 +936,9 @@ elm_imageslider_item_selected_set(Elm_Imageslider_Item * it)
      {
        eo = (Evas_Object*)elm_layout_content_get(wd->ly[i], "swl.photo");
        if (eo)
-          {
-             elm_layout_content_set(wd->ly[i], "swl.photo", NULL);
-          }
+         elm_layout_content_set(wd->ly[i], "swl.photo", NULL);
      }
-
    _imageslider_update(wd);
-
 }
 
 /**
@@ -1041,7 +1008,6 @@ elm_imageslider_item_prev(Elm_Imageslider_Item * it)
              return eina_list_data_get(l);
           }
      }
-
    return NULL;
 }
 
@@ -1075,7 +1041,6 @@ elm_imageslider_item_next(Elm_Imageslider_Item * it)
              return eina_list_data_get(l);
           }
      }
-
    return NULL;
 }
 
@@ -1094,10 +1059,8 @@ elm_imageslider_prev(Evas_Object *obj)
 
    if (!obj || (!(wd = elm_widget_data_get(obj))))
      return;
-
    if (wd->ani_lock)
      return;
-
    _imageslider_obj_move(wd, -1);
 }
 
@@ -1116,12 +1079,9 @@ elm_imageslider_next(Evas_Object * obj)
 
    if (!obj || (!(wd = elm_widget_data_get(obj))))
      return;
-
    if (wd->ani_lock)
      return;
-
    _imageslider_obj_move(wd, 1);
-
 }
 
 /**
@@ -1139,7 +1099,7 @@ elm_imageslider_item_update(Elm_Imageslider_Item *it)
    if (!it || (!(wd = elm_widget_data_get(it->obj)))) return;
    ELM_CHECK_WIDTYPE(it->obj, widtype);
 
-   if (wd->ani_lock == EINA_TRUE) return;
+   if (wd->ani_lock) return;
    if (it == eina_list_data_get(eina_list_prev(wd->cur)))
      elm_layout_content_set(wd->ly[BLOCK_LEFT], "swl.photo", NULL);
    else if (it == eina_list_data_get(wd->cur))
