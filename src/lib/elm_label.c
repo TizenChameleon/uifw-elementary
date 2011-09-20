@@ -938,7 +938,6 @@ elm_label_background_color_set(Evas_Object *obj,
    if (!wd) return;
    evas_object_color_set(wd->bg, r, g, b, a);
 
-   if (!wd) return;
    _elm_dangerous_call_check(__FUNCTION__);
    if (wd->bgcolor == EINA_FALSE)
      {

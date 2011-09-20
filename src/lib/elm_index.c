@@ -866,7 +866,13 @@ _index_process(Evas_Object *obj)
    if (extraIndex < 0) return;
 
    group_count = _group_count(obj, extraIndex, adj_pos, N);
-   if (group_count <= 0) return;
+   if (group_count <= 0)
+     {
+        if (indx)
+          free(indx);
+        indx = NULL;
+        return;
+     }
 
    PlacementPart place[adj_pos];
    remainder = extraIndex%group_count;
@@ -1090,6 +1096,8 @@ elm_index_item_append_relative(Evas_Object *obj, const char *letter, const void 
         return;
      }
    it = _item_new(obj, letter, item);
+   if (!it) return;
+
    it_rel = _item_find(obj, relative);
    if (!it_rel)
      {
@@ -1097,7 +1105,7 @@ elm_index_item_append_relative(Evas_Object *obj, const char *letter, const void 
         wd->tot_items_count[wd->level]++;
         return;
      }
-   if (!it) return;
+
    wd->items = eina_list_append_relative(wd->items, it, it_rel);
    wd->tot_items_count[wd->level]++;
    _index_box_clear(obj, wd->bx[wd->level], wd->level);
@@ -1127,6 +1135,8 @@ elm_index_item_prepend_relative(Evas_Object *obj, const char *letter, const void
         return;
      }
    it = _item_new(obj, letter, item);
+   if (!it) return;
+
    it_rel = _item_find(obj, relative);
    if (!it_rel)
      {
@@ -1134,7 +1144,7 @@ elm_index_item_prepend_relative(Evas_Object *obj, const char *letter, const void
         wd->tot_items_count[wd->level]++;
         return;
      }
-   if (!it) return;
+
    wd->items = eina_list_prepend_relative(wd->items, it, it_rel);
    wd->tot_items_count[wd->level]++;
    _index_box_clear(obj, wd->bx[wd->level], wd->level);
