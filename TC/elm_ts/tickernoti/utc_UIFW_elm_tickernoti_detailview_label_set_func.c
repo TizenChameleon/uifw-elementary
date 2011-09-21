@@ -94,12 +94,9 @@ static void utc_UIFW_elm_tickernoti_detailview_label_set_func_01(void)
  */
 static void utc_UIFW_elm_tickernoti_detailview_label_set_func_02(void)
 {
-   const char *text;
-
    elm_tickernoti_detailview_label_set(tickernoti, NULL);
-   text = elm_tickernoti_detailview_label_get(tickernoti);
 
-   if (strcmp(text, "")) {
+   if (elm_tickernoti_detailview_label_get(tickernoti)) {
       tet_infoline("elm_tickernoti_detailview_label_set() failed in negative test case");
       tet_result(TET_FAIL);
       return;
