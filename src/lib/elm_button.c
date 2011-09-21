@@ -344,7 +344,7 @@ _signal_unpressed(void *data, Evas_Object *obj __UNUSED__, const char *emission 
 }
 
 static void
-_signal_default_text_set(void *data, Evas_Object *obj, const char *emission, const char *source)
+_signal_default_text_set(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -352,6 +352,7 @@ _signal_default_text_set(void *data, Evas_Object *obj, const char *emission, con
      _set_label(data, wd->statelabel[DEFAULT]);
 }
 
+static void
 _elm_button_label_set(Evas_Object *obj, const char *item, const char *label)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
