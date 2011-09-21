@@ -99,13 +99,7 @@ static void utc_UIFW_elm_datefield_date_format_set_func_01(void)
 static void utc_UIFW_elm_datefield_date_format_set_func_02(void)
 {
 	datefield = elm_datefield_add(main_win);
-	elm_datefield_date_format_set(datefield, "dmydmy");
-
-	if (strcmp(elm_datefield_date_format_get(datefield), "mmddyy")) {
-		tet_infoline("elm_datefield_date_format_set() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
+	elm_datefield_date_format_set(NULL, "ddmmyy");
 
 	evas_object_resize(datefield, 480, 80);
 	evas_object_move(datefield, 0, 40);

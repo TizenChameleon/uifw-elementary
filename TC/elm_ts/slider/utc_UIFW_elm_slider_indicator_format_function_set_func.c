@@ -67,10 +67,18 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-static const char *format_func (double val)
+static char*
+_indicator_format(double val)
 {
-   const char *format = "%1.0f";
-   return format;
+   char *indicator = malloc(sizeof(char) * 32);
+   snprintf(indicator, 32, "%1.0f u", val);
+   return indicator;
+}
+
+static void
+_indicator_free(char *str)
+{
+   free(str);
 }
 
 /**
@@ -79,18 +87,11 @@ static const char *format_func (double val)
 static void utc_UIFW_elm_slider_indicator_format_function_set_func_01(void)
 {
         Evas_Object *slider;
-        const char *ret_for = NULL;
 
         slider = elm_slider_add(main_win);
 
-        elm_slider_indicator_format_function_set(slider, format_func);
-        ret_for = elm_slider_indicator_format_get(slider);
+        elm_slider_indicator_format_function_set(slider, _indicator_format, _indicator_free);
 
-	if (!slider) {
-		tet_infoline("elm_slider_indicator_format_function_set() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
 	tet_result(TET_PASS);
 }
 
@@ -104,13 +105,7 @@ static void utc_UIFW_elm_slider_indicator_format_function_set_func_02(void)
 
         slider = elm_slider_add(main_win);
 
-        elm_slider_indicator_format_function_set(NULL, format_func);
-        ret_for = elm_slider_indicator_format_get(slider);
+        elm_slider_indicator_format_function_set(NULL, _indicator_format, _indicator_free);
 
-        if (!slider) {
-		tet_infoline("elm_slider_indicator_format_function_set() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-	tet_result(TET_PASS);
+        tet_result(TET_PASS);
 }
