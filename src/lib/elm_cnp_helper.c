@@ -772,7 +772,11 @@ _get_tag_value(const char *tag_str, const char *tag_name)
              char *valueEnd = strchr(value, '\0');
 
              int i;
-             for (i = 0; i < spCnt; i++)
+             int start = 0;
+             if (!strcmp(tag_str, "item") && !strcmp(tag_name, "href"))
+               start = 1;
+
+             for (i = start; i < spCnt; i++)
                {
                   if (spArray[i] && spArray[i] < valueEnd)
                     valueEnd = spArray[i];
@@ -1624,7 +1628,7 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    Ecore_X_Selection_Data *data;
    Ecore_X_Selection_Data_Files *files;
    Paste_Image *pi;
-   char *p;
+   char *p, *stripstr;
 
    data = notify->data;
    cnp_debug("data->format is %d %p %p\n", data->format, notify, data);
@@ -1638,11 +1642,11 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
              cnp_debug("more then one file: Bailing\n");
              return 0;
           }
-        p = files->files[0];
+        stripstr = p = strdup(files->files[0]);
      }
    else
      {
-        p = (char *)data->data;
+        stripstr = p = strndup((char *)data->data, data->length);
      }
 
    if (!p)
@@ -1660,12 +1664,17 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
         ddata.data = p;
         ddata.len = data->length;
         sel->datacb(sel->udata, sel->widget, &ddata);
+        free(p);
         return 0;
      }
    if (strncmp(p, "file://", 7))
      {
         /* Try and continue if it looks sane */
-        if (*p != '/') return 0;
+        if (*p != '/')
+          {
+             free(p);
+             return 0;
+          }
      }
    else
      {
@@ -1684,6 +1693,7 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
         pasteimage_append(pi, sel->requestwidget);
         savedtypes.pi = NULL;
      }
+   free(stripstr);
    return 0;
 }
 
