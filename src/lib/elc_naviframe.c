@@ -136,7 +136,7 @@ _del_hook(Evas_Object *obj)
    wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   EINA_LIST_FOREACH(wd->stack, list, it)
+   EINA_LIST_REVERSE_FOREACH(wd->stack, list, it)
      _item_del(it);
    eina_list_free(wd->stack);
    free(wd);
@@ -618,11 +618,9 @@ _item_del(Elm_Naviframe_Item *it)
    eina_list_free(it->content_list);
    eina_list_free(it->text_list);
 
-   evas_object_del(it->base.view);
-
    wd->stack = eina_list_remove(wd->stack, it);
 
-   free(it);
+   elm_widget_item_del(it);
 }
 
 static void
@@ -761,13 +759,12 @@ elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *
                                    "elm,action,popped,finished",
                                    "",
                                    _popped_finished, it);
-   elm_naviframe_item_style_set(ELM_CAST(it), item_style);
-
-   //title
    edje_object_signal_callback_add(it->base.view,
                                    "elm,action,title,clicked",
-                                   "elm",
+                                   "",
                                    _title_clicked, it);
+
+   elm_naviframe_item_style_set(ELM_CAST(it), item_style);
 
    _item_text_set_hook(ELM_CAST(it), "elm.text.title", title_label);
 
@@ -840,6 +837,29 @@ elm_naviframe_item_pop(Evas_Object *obj)
      _item_del(it);
 
    return content;
+}
+
+EAPI void
+elm_naviframe_item_pop_to(Elm_Object_Item *it)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+   Widget_Data *wd = elm_widget_data_get(navi_it->base.widget);
+   Eina_List *l, *prev_l;
+
+   if (it == elm_naviframe_top_item_get(navi_it->base.widget)) return;
+
+   l = eina_list_last(wd->stack)->prev;
+
+   while(l)
+     {
+        if (l->data == it) break;
+        prev_l = l->prev;
+        _item_del(l->data);
+        wd->stack = eina_list_remove(wd->stack, l);
+        l = prev_l;
+     }
+   elm_naviframe_item_pop(navi_it->base.widget);
 }
 
 EAPI void
