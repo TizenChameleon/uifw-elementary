@@ -125,7 +125,6 @@ struct _Widget_Data
    Ecore_Job *deferred_recalc_job;
    Ecore_Event_Handler *sel_notify_handler;
    Ecore_Event_Handler *sel_clear_handler;
-   Ecore_Timer *longpress_timer;
    Ecore_Timer *delay_write;
    /* for deferred appending */
    Ecore_Idler *append_text_idler;
@@ -601,7 +600,6 @@ _del_hook(Evas_Object *obj)
         wd->append_text_idler = NULL;
      }
    if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
-   if (wd->longpress_timer) ecore_timer_del(wd->longpress_timer);
    if (wd->mgf_proxy) evas_object_del(wd->mgf_proxy);
    if (wd->mgf_bg) evas_object_del(wd->mgf_bg);
    if (wd->mgf_clip) evas_object_del(wd->mgf_clip);
@@ -1475,18 +1473,12 @@ _magnifier_create(void *data)
 }
 
 static Eina_Bool
-_long_press(void *data)
+_signal_long_pressed(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return ECORE_CALLBACK_CANCEL;
 
    wd->long_pressed = EINA_TRUE;
-
-   if (wd->longpress_timer)
-     {
-        ecore_timer_del(wd->longpress_timer);
-        wd->longpress_timer = NULL;
-     }
 
    _cancel(data, NULL, NULL);
 
@@ -1495,7 +1487,6 @@ _long_press(void *data)
    _magnifier_show(data);
    elm_object_scroll_freeze_push(data);
 
-   wd->longpress_timer = NULL;
    evas_object_smart_callback_call(data, SIG_LONGPRESSED, NULL);
    return ECORE_CALLBACK_CANCEL;
 }
@@ -1511,11 +1502,6 @@ _mouse_down(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
    wd->downx = ev->canvas.x;
    wd->downy = ev->canvas.y;
    wd->long_pressed = EINA_FALSE;
-   if (ev->button == 1)
-     {
-        if (wd->longpress_timer) ecore_timer_del(wd->longpress_timer);
-        wd->longpress_timer = ecore_timer_add(_elm_config->longpress_timeout, _long_press, data);
-     }
 }
 
 static void
@@ -1530,25 +1516,13 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
         if (!wd->double_clicked)
           {
              if ((wd->api) && (wd->api->obj_mouseup))
-               {
-                  wd->api->obj_mouseup(data);
-               }
+               wd->api->obj_mouseup(data);
           }
-
-        if (wd->longpress_timer)
-          {
-             ecore_timer_del(wd->longpress_timer);
-             wd->longpress_timer = NULL;
-          }
-
         _magnifier_hide(data);
         elm_object_scroll_freeze_pop(data);
 
         if (wd->long_pressed)
-          {
-             _menu_press(data);
-          }
-
+          _menu_press(data);
      }
    else if (ev->button == 3)
      {
@@ -1564,49 +1538,6 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
    Evas_Event_Mouse_Move *ev = event_info;
    if (!wd) return;
    if (wd->disabled) return;
-   if (!wd->selmode)
-     {
-        if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
-          {
-             if (wd->longpress_timer)
-               {
-                  ecore_timer_del(wd->longpress_timer);
-                  wd->longpress_timer = NULL;
-               }
-          }
-        else if (wd->longpress_timer)
-          {
-             Evas_Coord dx, dy;
-
-             dx = wd->downx - ev->cur.canvas.x;
-             dx *= dx;
-             dy = wd->downy - ev->cur.canvas.y;
-             dy *= dy;
-             if ((dx + dy) >
-                 ((_elm_config->finger_size / 2) *
-                  (_elm_config->finger_size / 2)))
-               {
-                  ecore_timer_del(wd->longpress_timer);
-                  wd->longpress_timer = NULL;
-               }
-          }
-     }
-   else if (wd->longpress_timer)
-     {
-        Evas_Coord dx, dy;
-
-        dx = wd->downx - ev->cur.canvas.x;
-        dx *= dx;
-        dy = wd->downy - ev->cur.canvas.y;
-        dy *= dy;
-        if ((dx + dy) >
-            ((_elm_config->finger_size / 2) *
-             (_elm_config->finger_size / 2)))
-          {
-             ecore_timer_del(wd->longpress_timer);
-             wd->longpress_timer = NULL;
-          }
-     }
 
    if (ev->buttons == 1)
      {
@@ -1880,11 +1811,12 @@ _signal_preedit_changed(void *data, Evas_Object *obj __UNUSED__, const char *emi
    _entry_changed_common_handling(data, SIG_PREEDIT_CHANGED);
 }
 
-
 static void
 _signal_handler_move_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
    elm_object_scroll_freeze_push(data);
 
    if ((wd->api) && (wd->api->obj_hidemenu))
@@ -1901,6 +1833,8 @@ static void
 _signal_handler_move_end(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
    elm_object_scroll_freeze_pop(data);
 
    if (wd->have_selection)
@@ -1915,6 +1849,39 @@ _signal_handler_moving(void *data, Evas_Object *obj __UNUSED__, const char *emis
 {
    _magnifier_move(data);
    _magnifier_show(data);
+}
+
+static Evas_Object *
+_viewport_obj_get(Evas_Object *data)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return NULL;
+
+   if(!data || !strlen(elm_widget_type_get(data)))
+     return NULL;
+
+   Evas_Coord x, y, w, h;
+   x = y = w = h = -1;
+
+   if (wd->scroll)
+     {
+        //evas_object_geometry_get(wd->scroller, &x, &y, &w, &h);
+        //printf(">>> wd->scroller (%d, %d, %d, %d) \n", x, y, w, h);
+        return wd->scroller;
+     }
+
+   Evas_Object *parent_obj = data;
+
+   while(parent_obj = elm_widget_parent_get(parent_obj))
+     {
+        //evas_object_geometry_get(parent_obj, &x, &y, &w, &h);
+        //printf(">>> %s (%d, %d, %d, %d) \n", elm_widget_type_get(parent_obj), x, y, w, h);
+        if (!strcmp(elm_widget_type_get(parent_obj), "scroller") ||
+            !strcmp(elm_widget_type_get(parent_obj), "genlist"))
+          return parent_obj;
+     }
+
+   return NULL;
 }
 
 static void
@@ -1949,6 +1916,9 @@ _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emi
           elm_selection_set(ELM_SEL_PRIMARY, data, ELM_SEL_FORMAT_MARKUP, txt);
      }
 #endif
+
+   if (!_elm_config->desktop_entry)
+     edje_object_part_text_viewport_object_set(wd->ent, "elm.text", _viewport_obj_get(data));
 }
 
 static void
@@ -2199,9 +2169,7 @@ _signal_mouse_down(void *data, Evas_Object *obj __UNUSED__, const char *emission
    evas_object_smart_callback_call(data, SIG_PRESS, NULL);
 
    if ((wd->api) && (wd->api->obj_hidemenu))
-     {
-        wd->api->obj_hidemenu(data);
-     }
+     wd->api->obj_hidemenu(data);
 }
 
 static void
@@ -2210,6 +2178,9 @@ _signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+
+   if (!_elm_config->desktop_entry && !wd->double_clicked)
+     _cancel(data, NULL, NULL);
 }
 
 static void
@@ -2820,6 +2791,8 @@ elm_entry_add(Evas_Object *parent)
                                    _signal_selection_start, obj);
    edje_object_signal_callback_add(wd->ent, "selection,end", "elm.text",
                                    _signal_selection_end, obj);
+   edje_object_signal_callback_add(wd->ent, "long,pressed", "elm.text",
+                                   _signal_long_pressed, obj);
    edje_object_signal_callback_add(wd->ent, "magnifier,changed", "elm.text",
                                    _signal_magnifier_changed, obj);
    edje_object_signal_callback_add(wd->ent, "selection,changed", "elm.text",
@@ -2905,7 +2878,6 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->selectall = _selectall;
    ext_mod->ent = wd->ent;
    ext_mod->items = wd->items;
-   ext_mod->longpress_timer = wd->longpress_timer;
    ext_mod->editable = wd->editable;
    ext_mod->have_selection = wd->have_selection;
    ext_mod->password = wd->password;

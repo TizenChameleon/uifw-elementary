@@ -110,9 +110,9 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
    ext_mod->cnpinit(data,obj,event_info);
    elm_cbhm_helper_init(obj);
    if (ext_mod->textonly)
-      elm_cbhm_send_raw_data("show0");
+     elm_cbhm_send_raw_data("show0");
    else
-      elm_cbhm_send_raw_data("show1");
+     elm_cbhm_send_raw_data("show1");
    evas_object_hide(obj);
    // end for cbhm
 }
@@ -206,7 +206,7 @@ obj_longpress(Evas_Object *obj)
            (ext_mod->ent, "context_menu_orientation");
         if ((context_menu_orientation) &&
             (!strcmp(context_menu_orientation, "horizontal")))
-           elm_ctxpopup_horizontal_set(ext_mod->popup, EINA_TRUE);
+          elm_ctxpopup_horizontal_set(ext_mod->popup, EINA_TRUE);
 
         elm_widget_sub_object_add(obj, ext_mod->popup);
         if (!ext_mod->selmode)
@@ -222,7 +222,7 @@ obj_longpress(Evas_Object *obj)
              if (1) // need way to detect if someone has a selection
                {
                   if (ext_mod->editable)
-                     elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+                    elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
                }
              //elm_ctxpopup_item_append(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
              // start for cbhm
@@ -244,9 +244,9 @@ obj_longpress(Evas_Object *obj)
                     {
                        elm_ctxpopup_item_append(ext_mod->popup, "Copy", NULL, _copy, obj );
                        if (ext_mod->editable)
-                          elm_ctxpopup_item_append(ext_mod->popup, "Cut", NULL, _cut, obj );
+                         elm_ctxpopup_item_append(ext_mod->popup, "Cut", NULL, _cut, obj );
                        if (ext_mod->editable)
-                          elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+                         elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
                     }
                   else
                     {
@@ -259,7 +259,7 @@ obj_longpress(Evas_Object *obj)
                        if (1) // need way to detect if someone has a selection
                          {
                             if (ext_mod->editable)
-                               elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+                              elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
                          }
                     }
                   // start for cbhm
@@ -291,28 +291,16 @@ obj_longpress(Evas_Object *obj)
 EAPI void
 obj_mouseup(Evas_Object *obj)
 {
-   if (!obj || !ext_mod) {
-        return;
-   }
-
-   /*update*/
-   elm_entry_extension_module_data_get(obj,ext_mod);
-   if (ext_mod->longpress_timer)
-     {
-        if (ext_mod->have_selection )
-          {
-             _cancel(obj,ext_mod->popup,NULL);
-          }
-     }
+   if (!obj || !ext_mod)
+     return;
 }
 
 
 EAPI void
 obj_hidemenu(Evas_Object *obj)
 {
-   if (!obj || !ext_mod) {
-        return;
-   }
+   if (!obj || !ext_mod)
+     return;
 
    evas_object_hide(ext_mod->popup);
    // if (ext_mod->popup) evas_object_del(ext_mod->popup);
