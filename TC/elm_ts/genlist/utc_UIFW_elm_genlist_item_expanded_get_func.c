@@ -87,7 +87,7 @@ static void utc_UIFW_elm_genlist_item_expanded_get_func_01(void)
 	Eina_Bool ret = EINA_FALSE;
 
 	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
-			ELM_GENLIST_ITEM_NONE, NULL, NULL);
+			ELM_GENLIST_ITEM_SUBITEMS, NULL, NULL);
 	elm_genlist_item_expanded_set(item, 1);
 
 	ret = elm_genlist_item_expanded_get(item);
