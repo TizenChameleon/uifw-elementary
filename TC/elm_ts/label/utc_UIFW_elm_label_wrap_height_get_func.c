@@ -151,14 +151,19 @@ cleanup()
  */
 static void utc_UIFW_elm_label_wrap_height_get_func_01(void)
 {
-	test_eo = elm_label_add(test_win);
-	elm_label_wrap_height_set(test_eo, 10);
-	int ret = 0;
-	ret = elm_label_wrap_height_get(test_eo);
-	TET_CHECK_PASS(NULL, ret);
+   test_eo = elm_label_add(test_win);
+   elm_label_wrap_height_set(test_eo, 10);
+   int ret = 0;
+   ret = elm_label_wrap_height_get(test_eo);
 
-	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, Label height get/set is success.");
+   if (!ret) {
+        tet_infoline("elm_label_wrap_height_get() failed in positive test case");
+        tet_result(TET_FAIL);
+        return;
+   }
+   tet_result(TET_PASS);
+
+
 }
 
 /**
@@ -166,12 +171,15 @@ static void utc_UIFW_elm_label_wrap_height_get_func_01(void)
  */
 static void utc_UIFW_elm_label_wrap_height_get_func_02(void)
 {
-	test_eo = elm_label_add(test_win);
-	elm_label_wrap_height_set(test_eo, 0);
-	int ret = 0;
-	ret = elm_label_wrap_height_get(test_eo);
-	TET_CHECK_FAIL(NULL, ret);
+   test_eo = elm_label_add(test_win);
+   elm_label_wrap_height_set(test_eo, 0);
+   int ret = 0;
+   ret = elm_label_wrap_height_get(test_eo);
 
-	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Label height get/set is failed.");
+   if(ret) {
+        tet_result(TET_FAIL);
+        tet_infoline("elm_label_wrap_height_get() failed in negative test case");
+        return;
+   }
+   tet_result(TET_PASS);
 }

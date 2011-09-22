@@ -151,14 +151,17 @@ cleanup()
  */
 static void utc_UIFW_elm_label_slide_duration_get_func_01(void)
 {
-	test_eo = elm_label_add(test_win);
-	elm_label_label_set(test_eo, "test string");
-	elm_label_slide_duration_set(test_eo, 10);
-	int r = elm_label_slide_duration_get(test_eo);
-	TET_CHECK_PASS(0, r);
+   test_eo = elm_label_add(test_win);
+   elm_object_text_set(test_eo, "test string");
+   elm_label_slide_duration_set(test_eo, 10);
+   int r = elm_label_slide_duration_get(test_eo);
 
-	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, A Label slide duration get is success.");
+   if (!r) {
+        tet_infoline("elm_label_slide_duration_get() failed in positive test case");
+        tet_result(TET_FAIL);
+        return;
+   }
+   tet_result(TET_PASS);
 }
 
 /**
@@ -166,12 +169,15 @@ static void utc_UIFW_elm_label_slide_duration_get_func_01(void)
  */
 static void utc_UIFW_elm_label_slide_duration_get_func_02(void)
 {
-	test_eo = elm_label_add(test_win);
-	elm_label_label_set(test_eo, NULL);
-	elm_label_slide_duration_set(test_eo, 10);
-	int r = elm_label_slide_duration_get(NULL);
-	TET_CHECK_FAIL(1, r);
+   test_eo = elm_label_add(test_win);
+   elm_object_text_set(test_eo, NULL);
+   elm_label_slide_duration_set(test_eo, 10);
+   int r = elm_label_slide_duration_get(NULL);
 
-	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, A Label slide duration get is failed.");
+   if(r) {
+        tet_result(TET_FAIL);
+        tet_infoline("elm_label_slide_duration_get() failed in negative test case");
+        return;
+   }
+   tet_result(TET_PASS);
 }
