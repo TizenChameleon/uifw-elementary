@@ -201,7 +201,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    elm_object_style_set(wd->ef, "searchbar/default");
 
    edje_object_part_swallow(wd->base, "search_textfield", wd->ef);
-//   elm_editfield_guide_text_set(wd->ef, "Search");
+   elm_editfield_guide_text_set(wd->ef, E_("Search"));
    elm_editfield_entry_single_line_set(wd->ef, EINA_TRUE);
    elm_editfield_eraser_set(wd->ef, EINA_TRUE);
    evas_object_smart_callback_add(wd->ef, "clicked", _clicked, obj);

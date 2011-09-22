@@ -11,3 +11,4 @@ debian/tmp/usr/share/elementary/config/slp/*
 debian/tmp/usr/share/elementary/config/standard/*
 debian/tmp/usr/share/icons/elementary.png
 debian/tmp/usr/lib/elementary/*
+debian/tmp/usr/share/locale/*
