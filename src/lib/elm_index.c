@@ -523,18 +523,38 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
 
         if(view_level == 0)
           {
-             if (wd->popup_str[1]) wd->popup_str[1][0] = '\0';
-             wd->popup_str[0] = (char *)realloc(wd->popup_str[0], (sizeof(char) * strlen(last) + 1));
+             if(wd->tot_items_count[0])
+               {
+                  if (wd->popup_str[1]) wd->popup_str[1][0] = '\0';
+                  wd->popup_str[0] = (char *)realloc(wd->popup_str[0], (sizeof(char) * strlen(last) + 1));
 
-             strcpy(wd->popup_str[0], last);
-             edje_object_signal_emit(wd->base, "hide_2nd_level", "");
+                  strcpy(wd->popup_str[0], last);
+                  edje_object_signal_emit(wd->base, "hide_2nd_level", "");
+               }
+             else
+               {
+                  edje_object_signal_emit(wd->base, "button.image.hidden", "");
+                  if(label)free(label);
+                  if(last) free(last);
+                  return;
+               }
           }
         if (view_level == 1 && wd->level_active[1])
           {
-             wd->popup_str[1] = (char *)realloc(wd->popup_str[1], (sizeof(char) * strlen(last) + 1));
+             if(wd->tot_items_count[1])
+               {
+                  wd->popup_str[1] = (char *)realloc(wd->popup_str[1], (sizeof(char) * strlen(last) + 1));
 
-             strcpy(wd->popup_str[1], last);
-             edje_object_signal_emit(wd->base, "hide_first_level", "");
+                  strcpy(wd->popup_str[1], last);
+                  edje_object_signal_emit(wd->base, "hide_first_level", "");
+               }
+             else
+               {
+                  edje_object_signal_emit(wd->base, "button.image.hidden", "");
+                  if(label)free(label);
+                  if(last) free(last);
+                  return;
+               }
           }
         popup_text = (char *)malloc(sizeof(char) * (strlen(wd->popup_str[0]) + strlen(wd->popup_str[1]) + 1));
         sprintf(popup_text, "%s%s", wd->popup_str[0], wd->popup_str[1]);
@@ -946,7 +966,10 @@ elm_index_active_set(Evas_Object *obj, Eina_Bool active)
         _index_box_clear(obj, wd->bx[1], 1);
         _index_process(obj);
         _index_box_auto_fill(obj, wd->bx[0], 0);
-        edje_object_signal_emit(wd->base, "elm,state,active", "elm");
+        if(wd->tot_items_count[wd->level])
+          edje_object_signal_emit(wd->base, "elm,state,active", "elm");
+        else
+          edje_object_signal_emit(wd->base, "button.image.hidden", "");
      }
    else
      edje_object_signal_emit(wd->base, "elm,state,inactive", "elm");
