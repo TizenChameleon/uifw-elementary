@@ -1253,7 +1253,7 @@ _item_realized(void *data , Evas_Object *obj __UNUSED__, void *event_info)
    Elm_Store_Item *sti = elm_genlist_item_data_get(gli);
    if (!sti) return;
 
-   if (st->live && sti->item)
+   if (st->live)
      {
         if (!sti->data) _item_job_add(sti);
      }
@@ -1269,7 +1269,7 @@ _item_unrealized(void *data , Evas_Object *obj __UNUSED__, void *event_info)
    Elm_Store_Item *sti = elm_genlist_item_data_get(gli);
    if (!sti) return;
 
-   if (st->live && sti->item)
+   if (st->live)
      {
         if (sti->eval_job)
           {
