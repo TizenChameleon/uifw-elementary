@@ -114,6 +114,7 @@
 ./src/lib/elm_colorselector.c
 ./src/lib/elm_config.c
 ./src/lib/elm_conform.c
+./src/lib/elm_datefield.c
 ./src/lib/elm_diskselector.c
 ./src/lib/elm_entry.c
 ./src/lib/elm_flip.c

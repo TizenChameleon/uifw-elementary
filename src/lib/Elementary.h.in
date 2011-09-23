@@ -8095,12 +8095,6 @@ extern "C" {
     */
 
    /* datefield */
-   typedef enum _Elm_Datefield_Layout
-     {
-        ELM_DATEFIELD_LAYOUT_TIME,
-        ELM_DATEFIELD_LAYOUT_DATE,
-        ELM_DATEFIELD_LAYOUT_DATEANDTIME
-     } Elm_Datefield_Layout;
 
    typedef enum _Elm_Datefield_ItemType
      {
@@ -8113,12 +8107,10 @@ extern "C" {
      } Elm_Datefield_ItemType;
 
    EAPI Evas_Object *elm_datefield_add(Evas_Object *parent);
-   EAPI void         elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
-   EAPI Elm_Datefield_Layout elm_datefield_layout_get(const Evas_Object *obj);
-   EAPI void         elm_datefield_date_format_set(Evas_Object *obj, const char *fmt);
-   EAPI const char  *elm_datefield_date_format_get(const Evas_Object *obj);
-   EAPI void         elm_datefield_item_enable_set(Evas_Object *obj, Elm_Datefield_ItemType itemtype, Eina_Bool enable);
-   EAPI Eina_Bool    elm_datefield_item_enable_get(Evas_Object *obj, Elm_Datefield_ItemType itemtype);
+   EAPI void         elm_datefield_format_set(Evas_Object *obj, const char *fmt);
+   EAPI char        *elm_datefield_format_get(const Evas_Object *obj);
+   EAPI void         elm_datefield_item_enabled_set(Evas_Object *obj, Elm_Datefield_ItemType itemtype, Eina_Bool enable);
+   EAPI Eina_Bool    elm_datefield_item_enabled_get(const Evas_Object *obj, Elm_Datefield_ItemType itemtype);
    EAPI void         elm_datefield_item_value_set(Evas_Object *obj, Elm_Datefield_ItemType itemtype, int value);
    EAPI int          elm_datefield_item_value_get(const Evas_Object *obj, Elm_Datefield_ItemType itemtype);
    EAPI void         elm_datefield_item_min_set(Evas_Object *obj, Elm_Datefield_ItemType itemtype, int value, Eina_Bool abs_limit);
@@ -8127,14 +8119,26 @@ extern "C" {
    EAPI void         elm_datefield_item_max_set(Evas_Object *obj, Elm_Datefield_ItemType itemtype, int value, Eina_Bool abs_limit);
    EAPI int          elm_datefield_item_max_get(const Evas_Object *obj, Elm_Datefield_ItemType itemtype);
    EAPI Eina_Bool    elm_datefield_item_max_is_absolute(const Evas_Object *obj, Elm_Datefield_ItemType itemtype);
-   EAPI void         elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);
-   EAPI Eina_Bool    elm_datefield_time_mode_get(const Evas_Object *obj);
  
    /* smart callbacks called:
    * "changed" - when datefield value is changed, this signal is sent.
    */
 
 ////////////////////// DEPRECATED ///////////////////////////////////
+
+   typedef enum _Elm_Datefield_Layout
+     {
+        ELM_DATEFIELD_LAYOUT_TIME,
+        ELM_DATEFIELD_LAYOUT_DATE,
+        ELM_DATEFIELD_LAYOUT_DATEANDTIME
+     } Elm_Datefield_Layout;
+
+   EINA_DEPRECATED EAPI void         elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
+   EINA_DEPRECATED EAPI Elm_Datefield_Layout elm_datefield_layout_get(const Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_datefield_date_format_set(Evas_Object *obj, const char *fmt);
+   EINA_DEPRECATED EAPI const char  *elm_datefield_date_format_get(const Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);
+   EINA_DEPRECATED EAPI Eina_Bool    elm_datefield_time_mode_get(const Evas_Object *obj);
    EINA_DEPRECATED EAPI void         elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour, int min);
    EINA_DEPRECATED EAPI void         elm_datefield_date_get(const Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min);
    EINA_DEPRECATED EAPI Eina_Bool    elm_datefield_date_max_set(Evas_Object *obj, int year, int month, int day);
