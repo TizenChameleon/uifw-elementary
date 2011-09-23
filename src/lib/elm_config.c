@@ -963,9 +963,8 @@ sys:
              continue;
           }
      }
-   return flist;
-
    eina_iterator_free(file_it);
+   return flist;
 
 list_free:
    EINA_LIST_FREE(flist, dir)

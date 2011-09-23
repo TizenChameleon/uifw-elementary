@@ -31,7 +31,7 @@ _list_horizontal_mode_setting_get(const char *horizontal_mode_str)
 
    assert(sizeof(list_horizontal_mode_choices)/sizeof(list_horizontal_mode_choices[0]) == ELM_LIST_LAST + 1);
 
-   for (i = 0; i < sizeof(list_horizontal_mode_choices); i++)
+   for (i = 0; i < ELM_LIST_LAST; i++)
      {
 	if (!strcmp(horizontal_mode_str, list_horizontal_mode_choices[i]))
 	  return i;
