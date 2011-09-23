@@ -44,6 +44,13 @@ static void _show_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _on_focus_hook(void *data, Evas_Object *obj);
 static Eina_Bool _empty_entry(Evas_Object *entry);
 
+static const char SIG_FOCUSED[] = "focused";
+
+static const Evas_Smart_Cb_Description _signals[] = {
+   {SIG_FOCUSED, ""},
+   {NULL, NULL}
+};
+
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -59,7 +66,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd || !wd->base)
       return;
-   if (!elm_widget_focus_get(obj) && !(elm_widget_disabled_get(obj)) )
+   if (!elm_widget_focus_get(obj))
      {
         evas_object_smart_callback_call(obj, "unfocused", NULL);
         wd->editing = EINA_FALSE;
@@ -79,6 +86,10 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
                   wd->show_guide_text = EINA_TRUE;
                }
           }
+     }
+   else
+     {
+        evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
      }
 }
 
@@ -343,6 +354,7 @@ elm_editfield_add(Evas_Object *parent)
    evas_object_smart_callback_add(wd->entry, "changed", _entry_changed_cb, obj);
    elm_widget_sub_object_add(obj, wd->entry);
    evas_object_show(wd->entry);
+   evas_object_smart_callbacks_descriptions_set(obj, _signals);
    _sizing_eval(obj);
 
    return obj;

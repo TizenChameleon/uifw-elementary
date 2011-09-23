@@ -171,6 +171,7 @@ struct _Elm_Genlist_Item
    Eina_Bool                     updateme : 1;
    Eina_Bool                     nocache : 1;
    Eina_Bool                     move_effect_enabled : 1;
+   Eina_Bool                     defer_unrealize : 1;
 
    // TODO: refactoring
    Eina_Bool   effect_done : 1;
@@ -1685,6 +1686,20 @@ _item_cache_free(Item_Cache *itc)
 }
 
 static void
+_icon_focused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Elm_Genlist_Item *it = data;
+   if (it) it->defer_unrealize = EINA_TRUE;
+}
+
+static void
+_icon_unfocused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Elm_Genlist_Item *it = data;
+   if (it) it->defer_unrealize = EINA_FALSE;
+}
+
+static void
 _item_realize(Elm_Genlist_Item *it,
               int               in,
               Eina_Bool         calc)
@@ -1920,6 +1935,10 @@ _item_realize(Elm_Genlist_Item *it,
                              edje_object_part_swallow(it->base.view, key, ic);
                              evas_object_show(ic);
                              elm_widget_sub_object_add(it->base.widget, ic);
+                             // FIXME: if entry calcuates its cursor position correctly and conformant works,
+                             //        genlist does not need to handle this focus thing.
+                             evas_object_smart_callback_add(ic, "focused", _icon_focused, it);
+                             evas_object_smart_callback_add(ic, "unfocused", _icon_unfocused, it);
                          }
                     }
               }
@@ -2018,6 +2037,7 @@ _item_unrealize(Elm_Genlist_Item *it,
 
    if (!it->realized) return;
    if (it->wd->reorder_it == it) return;
+   if (it->defer_unrealize) return;
    evas_event_freeze(evas_object_evas_get(it->wd->obj));
    if (!calc)
      evas_object_smart_callback_call(it->base.widget, SIG_UNREALIZED, it);
@@ -4491,6 +4511,7 @@ elm_genlist_item_update(Elm_Genlist_Item *it)
    it->block->updateme = EINA_TRUE;
    if (it->wd->update_job) ecore_job_del(it->wd->update_job);
    it->wd->update_job = ecore_job_add(_update_job, it->wd);
+   it->defer_unrealize = EINA_FALSE;
 }
 
 EAPI void
