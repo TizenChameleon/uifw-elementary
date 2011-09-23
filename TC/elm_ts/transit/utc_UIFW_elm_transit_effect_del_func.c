@@ -52,7 +52,7 @@ struct effect_context {
 
 };
 
-static _custom_op(Elm_Transit_Effect *effect, Elm_Transit *transit, double progress)
+static void _custom_op(Elm_Transit_Effect *effect, Elm_Transit *transit, double progress)
 {
 
 }

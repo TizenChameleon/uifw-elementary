@@ -93,7 +93,7 @@ static void utc_UIFW_elm_transit_effect_image_animation_add_func_01(void)
 		"/opt/apps/com.samsung.elm-demo-slp/res/images/animatedicon/calendar_11.png"
 	};
 
-	Eina_List *images;
+	Eina_List *images = NULL;
 	int i;
 	for(i = 0; i < 12; ++i)
 	  images = eina_list_append(images, eina_stringshare_add(image[i]));

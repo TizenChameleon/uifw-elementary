@@ -37,7 +37,6 @@ void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
 static void utc_UIFW_elm_transit_add_func_01(void);
-static void utc_UIFW_elm_transit_add_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,

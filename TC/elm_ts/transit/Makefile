@@ -17,6 +17,7 @@ TARGETS = utc_UIFW_elm_transit_add_func \
 	  utc_UIFW_elm_transit_repeat_times_set_func \
 	  utc_UIFW_elm_transit_repeat_times_get_func \
 	  utc_UIFW_elm_transit_tween_mode_set_func \
+	  utc_UIFW_elm_transit_tween_mode_get_func \
 	  utc_UIFW_elm_transit_duration_set_func \
 	  utc_UIFW_elm_transit_duration_get_func \
 	  utc_UIFW_elm_transit_go_func \
