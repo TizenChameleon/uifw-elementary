@@ -158,6 +158,7 @@ _conformant_part_sizing_eval(Evas_Object *obj, Conformant_Part_Type part_type)
 {
    Ecore_X_Window zone, xwin;
    Evas_Object *top;
+   Eina_Bool ret;
    int sx = -1, sy = -1, sw = -1, sh = -1;
    Widget_Data *wd = elm_widget_data_get(obj);
 
@@ -170,18 +171,27 @@ _conformant_part_sizing_eval(Evas_Object *obj, Conformant_Part_Type part_type)
 
    if (part_type & ELM_CONFORM_INDICATOR_PART)
      {
-        ecore_x_e_illume_indicator_geometry_get(zone, &sx, &sy, &sw, &sh);
-        _conformant_part_size_set(obj, wd->shelf, sx, sy, sw, sh);
+        ret = ecore_x_e_illume_indicator_geometry_get(zone, &sx, &sy, &sw, &sh);
+        if (!ret) //There is NO information of the indicator geometry, reset the geometry.
+           _conformant_part_size_set(obj, wd->shelf, 0, 0, 0, 0);
+        else
+           _conformant_part_size_set(obj, wd->shelf, sx, sy, sw, sh);
      }
    if (part_type & ELM_CONFORM_VIRTUAL_KEYPAD_PART)
      {
-        ecore_x_e_illume_keyboard_geometry_get(zone, &sx, &sy, &sw, &sh);
-        _conformant_part_size_set(obj,wd->virtualkeypad, sx, sy, sw, sh);
+        ret = ecore_x_e_illume_keyboard_geometry_get(zone, &sx, &sy, &sw, &sh);
+        if (!ret) //There is NO information of the keyboard geometry, reset the geometry.
+          _conformant_part_size_set(obj, wd->virtualkeypad, 0, 0, 0, 0);
+        else
+          _conformant_part_size_set(obj,wd->virtualkeypad, sx, sy, sw, sh);
      }
    if (part_type & ELM_CONFORM_SOFTKEY_PART)
      {
-        ecore_x_e_illume_softkey_geometry_get(zone, &sx, &sy, &sw, &sh);
-        _conformant_part_size_set(obj, wd->panel, sx, sy, sw, sh);
+        ret = ecore_x_e_illume_softkey_geometry_get(zone, &sx, &sy, &sw, &sh);
+        if (!ret) //There is NO information of the softkey geometry, reset the geometry.
+          _conformant_part_size_set(obj,wd->panel, 0, 0, 0, 0);
+        else
+          _conformant_part_size_set(obj, wd->panel, sx, sy, sw, sh);
      }
 }
 #endif
