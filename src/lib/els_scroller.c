@@ -2031,8 +2031,6 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                {
                   ecore_animator_del(sd->down.hold_animator);
                   sd->down.hold_animator = NULL;
-                  if (sd->child.resized)
-                    _elm_smart_scroller_wanted_region_set(sd->smart_obj);
                }
              if (sd->down.scroll)
                {
