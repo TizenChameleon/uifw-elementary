@@ -1,3 +1,16 @@
+elementary (1.0.0+svn.61256slp2+build40) unstable; urgency=low
+
+  * Package Upload.
+  * Important Changes
+       [Genlist] elm genlist: Added genlist event hook boundary check
+       [els_scroller.c] Always check and delete hold_animator on mouse up.
+       [Genlist] Do not unrealize the item if any icon object is focused.
+       [store] Fixed the unrealize problem of added a item
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build40
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Fri, 23 Sep 2011 13:14:21 +0900
+
 elementary (1.0.0+svn.61256slp2+build39) unstable; urgency=low
 
   * Package Upload.
