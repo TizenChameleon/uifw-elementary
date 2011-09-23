@@ -91,7 +91,7 @@ _theme_hook(Evas_Object *obj)
    unsigned int counter = 0;
    unsigned int i = 1;
    unsigned int length = 0;
-   char *str = NULL;
+   const char *str = NULL;
    char labels[128] ;
    char buffer[PATH_MAX]={'\0',};
    char s1[PATH_MAX] = {'\0',};
