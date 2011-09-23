@@ -1,4 +1,3 @@
-#sbs-git:slp/pkgs/e/elementary elementary_1.0.0+svn.61256slp2+build26 7a9d4e37a3eaef2856850022c0127a6e3738b0f2
 Name:       elementary
 Summary:    EFL toolkit for small touchscreens
 Version:    0.7.0.svn61256
@@ -24,6 +23,7 @@ BuildRequires:  pkgconfig(ethumb)
 BuildRequires:  pkgconfig(evas)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(x11)
+BuildRequires:  pkgconfig(icu-i18n)
 BuildRequires:  edje-tools
 BuildRequires:  embryo
 BuildRequires:  eet-tools
