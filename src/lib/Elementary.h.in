@@ -8534,32 +8534,26 @@ extern "C" {
    EAPI void         elm_nocontents_custom_set(const Evas_Object *obj, Evas_Object *custom);
    EAPI Evas_Object *elm_nocontents_custom_get(const Evas_Object *obj);
 
-/* TickerNoti */
-typedef enum
-  {
-     ELM_TICKERNOTI_DEFAULT,
-     ELM_TICKERNOTI_DETAILVIEW
-  } Elm_Tickernoti_Mode;
-
-typedef enum
-  {
-     ELM_TICKERNOTI_ORIENT_TOP,
-     ELM_TICKERNOTI_ORIENT_BOTTOM
-  } Elm_Tickernoti_Orient;
+   /* TickerNoti */
+   typedef enum
+     {
+        ELM_TICKERNOTI_ORIENT_TOP = 0,
+        ELM_TICKERNOTI_ORIENT_BOTTOM,
+        ELM_TICKERNOTI_ORIENT_LAST
+     }  Elm_Tickernoti_Orient;
 
    EAPI Evas_Object              *elm_tickernoti_add (Evas_Object *parent);
-   EAPI void                      elm_tickernoti_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object              *elm_tickernoti_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   EAPI const char               *elm_tickernoti_label_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object              *elm_tickernoti_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_orientation_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
-   EAPI Elm_Tickernoti_Orient     elm_tickernoti_orientation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_orient_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
+   EAPI Elm_Tickernoti_Orient     elm_tickernoti_orient_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI int                       elm_tickernoti_rotation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void                      elm_tickernoti_rotation_set (Evas_Object *obj, int angle) EINA_ARG_NONNULL(1);
-   /* #### Below APIs are going to be deprecated, announcment will be made soon ####*/
    EAPI Evas_Object              *elm_tickernoti_win_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /* #### Below APIs and data structures are going to be deprecated, announcment will be made soon ####*/
+   typedef enum
+    {
+       ELM_TICKERNOTI_DEFAULT,
+       ELM_TICKERNOTI_DETAILVIEW
+    } Elm_Tickernoti_Mode;
    EAPI void                      elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
    EAPI const char               *elm_tickernoti_detailview_label_get (const Evas_Object *obj)EINA_ARG_NONNULL(1);
    EAPI void                      elm_tickernoti_detailview_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(2);
@@ -8569,12 +8563,32 @@ typedef enum
    EAPI Evas_Object              *elm_tickernoti_detailview_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EAPI void                      elm_tickernoti_mode_set (Evas_Object *obj, Elm_Tickernoti_Mode mode) EINA_ARG_NONNULL(1);
    EAPI Elm_Tickernoti_Mode       elm_tickernoti_mode_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_orientation_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
+   EAPI Elm_Tickernoti_Orient     elm_tickernoti_orientation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EAPI const char               *elm_tickernoti_label_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object              *elm_tickernoti_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object              *elm_tickernoti_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /* ############################################################################### */
-   /* smart callbacks called:
+   /*
+    * Parts which can be used with elm_object_text_part_set() and
+    * elm_object_text_part_get():
+    *
+    * @li NULL/"default" - Operates on tickernoti content-text
+    *
+    * Parts which can be used with elm_object_content_part_set() and
+    * elm_object_content_part_get():
+    *
+    * @li "icon" - Operates on tickernoti's icon
+    * @li "button" - Operates on tickernoti's button
+    *
+    * smart callbacks called:
     * @li "clicked" - emitted when tickernoti is clicked, except at the
     * swallow/button region, if any.
-    * @li "hide" - emitted when the tickernoti is completelyhidden. In case of
-    * any hide animation, this signal is raised after the animation.
+    * @li "hide" - emitted when the tickernoti is completely hidden. In case of
+    * any hide animation, this signal is emitted after the animation.
     */
 
    /* colorpalette */
