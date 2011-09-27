@@ -287,7 +287,6 @@ external_icon_params_free(void *params)
 
    if (mem->file)
      eina_stringshare_del(mem->file);
-   free(mem);
 
    if (param_icon->file)
      eina_stringshare_del(param_icon->file);
@@ -295,7 +294,7 @@ external_icon_params_free(void *params)
 
    if (mem->icon)
      eina_stringshare_del(mem->icon);
-   external_common_params_free(params);
+   free(mem);
 }
 
 static Edje_External_Param_Info external_icon_params[] = {
