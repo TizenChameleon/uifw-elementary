@@ -144,9 +144,8 @@ static void _cancel_clicked(void *data, Evas_Object *obj __UNUSED__,
    text = elm_entry_entry_get(elm_editfield_entry_get(wd->ef));
    if (text != NULL && strlen(text) > 0)
      elm_entry_entry_set(elm_editfield_entry_get(wd->ef), NULL);
-
-   evas_object_smart_callback_call(data, "cancel,clicked", NULL);
    elm_object_unfocus(data);
+   evas_object_smart_callback_call(data, "cancel,clicked", NULL);
 }
 
 static void
