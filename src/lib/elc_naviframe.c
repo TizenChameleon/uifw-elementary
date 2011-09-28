@@ -189,7 +189,7 @@ _item_text_set_hook(Elm_Object_Item *it,
      {
         if (!strcmp(buf, pair->part))
           {
-             if (pair->text)
+             if ((pair->text) && label)
                {
                   if (!strcmp(pair->text, label))
                     return;
@@ -213,12 +213,16 @@ _item_text_set_hook(Elm_Object_Item *it,
    eina_stringshare_replace(&pair->text, label);
    edje_object_part_text_set(navi_it->base.view, buf, label);
 
-   snprintf(buf, sizeof(buf), "elm,state,%s,show", buf);
-
    if (label)
-     edje_object_signal_emit(navi_it->base.view, buf, "elm");
+     {
+        snprintf(buf, sizeof(buf), "elm,state,%s,show", buf);
+        edje_object_signal_emit(navi_it->base.view, buf, "elm");
+     }
    else
-     edje_object_signal_emit(navi_it->base.view, buf, "elm");
+     {
+        snprintf(buf, sizeof(buf), "elm,state,%s,hide", buf);
+        edje_object_signal_emit(navi_it->base.view, buf, "elm");
+     }
 
    _item_sizing_eval(navi_it);
 }
