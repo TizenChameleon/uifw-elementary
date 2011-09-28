@@ -10,6 +10,7 @@ struct _Widget_Data
 {
    Eina_List    *stack;
    Evas_Object  *base;
+   Evas_Object  *rect;
    Eina_Bool     preserve: 1;
    Eina_Bool     pass_events: 1;
 };
@@ -79,6 +80,7 @@ static void _resize(void *data,
                     Evas *e,
                     Evas_Object *obj,
                     void *event_info);
+static void _hide(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _title_clicked(void *data, Evas_Object *obj,
                            const char *emission,
                            const char *source);
@@ -256,26 +258,24 @@ _item_content_set_hook(Elm_Object_Item *it,
    //specified parts
    if ((!part) || (!strcmp(part, "elm.swallow.content")))
      {
-       _item_content_set(navi_it, content);
-       return;
+        _item_content_set(navi_it, content);
+        return;
      }
    else if (!strcmp(part, "elm.swallow.prev_btn"))
      {
-       _title_prev_btn_set(navi_it, content, EINA_FALSE);
-       return;
+        _title_prev_btn_set(navi_it, content, EINA_FALSE);
+        return;
      }
    else if(!strcmp(part, "elm.swallow.next_btn"))
      {
-       _title_next_btn_set(navi_it, content);
-       return;
+        _title_next_btn_set(navi_it, content);
+        return;
      }
 
    //common part
    _title_content_set(navi_it, pair, part, content);
 }
 
-/*
-   */
 static Evas_Object *
 _item_content_get_hook(const Elm_Object_Item *it, const char *part)
 {
@@ -398,6 +398,13 @@ _move(void *data __UNUSED__,
       Evas_Object *obj,
       void *event_info __UNUSED__)
 {
+   Evas_Coord x, y;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   evas_object_geometry_get(obj, &x, &y, NULL, NULL);
+   evas_object_move(wd->rect, x, y);
+
    _sizing_eval(obj);
 }
 
@@ -407,7 +414,26 @@ _resize(void *data __UNUSED__,
         Evas_Object *obj,
         void *event_info __UNUSED__)
 {
+   Evas_Coord w, h;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   evas_object_geometry_get(obj, NULL, NULL, &w, &h);
+   evas_object_resize(wd->rect, w, h);
+
    _sizing_eval(obj);
+}
+
+static void
+_hide(void *data __UNUSED__,
+      Evas *e __UNUSED__,
+      Evas_Object *obj,
+      void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->pass_events)
+     evas_object_hide(wd->rect);
 }
 
 static void
@@ -542,7 +568,9 @@ _title_content_set(Elm_Naviframe_Item *it,
 }
 
 static void
-_title_prev_btn_set(Elm_Naviframe_Item *it, Evas_Object *btn, Eina_Bool back_btn)
+_title_prev_btn_set(Elm_Naviframe_Item *it,
+                    Evas_Object *btn,
+                    Eina_Bool back_btn)
 {
    if (it->title_prev_btn == btn) return;
 
@@ -603,7 +631,7 @@ _item_del(Elm_Naviframe_Item *it)
      evas_object_del(it->title_prev_btn);
    if (it->title_next_btn)
      evas_object_del(it->title_next_btn);
-      if ((it->content) && (!wd->preserve))
+   if ((it->content) && (!wd->preserve))
      evas_object_del(it->content);
 
    EINA_LIST_FOREACH(it->content_list, l, content_pair)
@@ -661,7 +689,11 @@ _show_finished(void *data,
                                    SIG_TRANSITION_FINISHED,
                                    (void *) EINA_TRUE);
    if (wd->pass_events)
-     evas_object_pass_events_set(wd->base, EINA_FALSE);
+     {
+        evas_object_hide(wd->rect);
+        //FIXME:
+        evas_object_pass_events_set(wd->base, EINA_FALSE);
+     }
 }
 
 static void
@@ -670,7 +702,9 @@ _item_content_set(Elm_Naviframe_Item *navi_it, Evas_Object *content)
    if (navi_it->content == content) return;
    if (navi_it->content) evas_object_del(navi_it->content);
    elm_widget_sub_object_add(navi_it->base.widget, content);
-   edje_object_part_swallow(navi_it->base.view, "elm.swallow.content", content);
+   edje_object_part_swallow(navi_it->base.view,
+                            "elm.swallow.content",
+                            content);
    if (content)
      edje_object_signal_emit(navi_it->base.view,
                              "elm,state,content,show",
@@ -709,8 +743,14 @@ elm_naviframe_add(Evas_Object *parent)
    elm_widget_resize_object_set(obj, wd->base);
    _elm_theme_object_set(obj, wd->base, "naviframe", "base", "default");
 
+   //rect:
+   wd->rect = evas_object_rectangle_add(e);
+   evas_object_color_set(wd->rect, 0, 0, 0, 0);
+   elm_widget_sub_object_add(obj, wd->rect);
+
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _move, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _resize, obj);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, obj);
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    wd->pass_events = EINA_TRUE;
@@ -719,7 +759,12 @@ elm_naviframe_add(Evas_Object *parent)
 }
 
 EAPI Elm_Object_Item *
-elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style)
+elm_naviframe_item_push(Evas_Object *obj,
+                        const char *title_label,
+                        Evas_Object *prev_btn,
+                        Evas_Object *next_btn,
+                        Evas_Object *content,
+                        const char *item_style)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd;
@@ -788,7 +833,11 @@ elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *
    if (prev_it)
      {
         if (wd->pass_events)
-          evas_object_pass_events_set(wd->base, EINA_TRUE);
+          {
+             evas_object_show(wd->rect);
+             //FIXME:
+             evas_object_pass_events_set(wd->base, EINA_TRUE);
+          }
         edje_object_signal_emit(prev_it->base.view,
                                 "elm,state,pushed",
                                 "elm");
@@ -825,7 +874,11 @@ elm_naviframe_item_pop(Evas_Object *obj)
    if (prev_it)
      {
         if (wd->pass_events)
-          evas_object_pass_events_set(wd->base, EINA_TRUE);
+          {
+             evas_object_show(wd->rect);
+             //FIXME:
+             evas_object_pass_events_set(wd->base, EINA_TRUE);
+          }
         evas_object_show(prev_it->base.view);
         evas_object_raise(prev_it->base.view);
         edje_object_signal_emit(prev_it->base.view,
@@ -910,7 +963,8 @@ elm_naviframe_item_style_set(Elm_Object_Item *it, const char *item_style)
    else
      {
         if (strlen(item_style) > sizeof(buf))
-          WRN("too much long style name! : naviframe=%p", navi_it->base.widget);
+          WRN("too much long style name! : naviframe=%p",
+              navi_it->base.widget);
         else
           sprintf(buf, "item/%s", item_style);
      }
