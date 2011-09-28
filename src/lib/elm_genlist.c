@@ -2499,8 +2499,8 @@ _calc_job(void *data)
                   itb->changed = EINA_TRUE;
                   if (itb->must_recalc) did_must_recalc = EINA_TRUE;
                   itb->must_recalc = EINA_FALSE;
+                  if (itb->realized) _item_block_unrealize(itb);
                }
-             if (itb->realized) _item_block_unrealize(itb);
              showme = _item_block_recalc(itb, in, EINA_FALSE);
              chb = itb;
           }
