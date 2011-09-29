@@ -793,10 +793,13 @@ elm_toolbar_item_append(Evas_Object *obj, const char *icon, const char *label, E
 
    Elm_Toolbar_Item *it = _item_new(obj, icon, label, func, data);
    if (!it) return NULL;
+   double scale = (elm_widget_scale_get(obj) * _elm_config->scale);
 
    wd->items = eina_inlist_append(wd->items, EINA_INLIST_GET(it));
    evas_object_box_append(wd->bx, VIEW(it));
    evas_object_show(VIEW(it));
+
+   _theme_hook_item(obj, it, scale, wd->icon_size);
    _sizing_eval(obj);
 
    return it;
@@ -1020,10 +1023,12 @@ elm_toolbar_item_prepend(Evas_Object *obj, const char *icon, const char *label, 
 
    Elm_Toolbar_Item *it = _item_new(obj, icon, label, func, data);
    if (!it) return NULL;
+   double scale = (elm_widget_scale_get(obj) * _elm_config->scale);
 
    wd->items = eina_inlist_prepend(wd->items, EINA_INLIST_GET(it));
    evas_object_box_prepend(wd->bx, VIEW(it));
    evas_object_show(VIEW(it));
+   _theme_hook_item(obj, it, scale, wd->icon_size);
    _sizing_eval(obj);
 
    return it;
@@ -1039,11 +1044,13 @@ elm_toolbar_item_insert_before(Evas_Object *obj, Elm_Toolbar_Item *before, const
 
    Elm_Toolbar_Item *it = _item_new(obj, icon, label, func, data);
    if (!it) return NULL;
+   double scale = (elm_widget_scale_get(obj) * _elm_config->scale);
 
    wd->items = eina_inlist_prepend_relative(wd->items, EINA_INLIST_GET(it),
                                             EINA_INLIST_GET(before));
    evas_object_box_insert_before(wd->bx, VIEW(it), VIEW(before));
    evas_object_show(VIEW(it));
+   _theme_hook_item(obj, it, scale, wd->icon_size);
    _sizing_eval(obj);
 
    return it;
@@ -1059,11 +1066,13 @@ elm_toolbar_item_insert_after(Evas_Object *obj, Elm_Toolbar_Item *after, const c
 
    Elm_Toolbar_Item *it = _item_new(obj, icon, label, func, data);
    if (!it) return NULL;
+   double scale = (elm_widget_scale_get(obj) * _elm_config->scale);
 
    wd->items = eina_inlist_append_relative(wd->items, EINA_INLIST_GET(it),
                                            EINA_INLIST_GET(after));
    evas_object_box_insert_after(wd->bx, VIEW(it), VIEW(after));
    evas_object_show(VIEW(it));
+   _theme_hook_item(obj, it, scale, wd->icon_size);
    _sizing_eval(obj);
 
    return it;
