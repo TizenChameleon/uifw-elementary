@@ -189,7 +189,7 @@ _empty_entry(Evas_Object *entry)
    int len = 0;
 
    text = elm_entry_entry_get(entry);
-   if(!text) return EINA_FALSE;
+   if(!text) return EINA_TRUE;
    strip_text = elm_entry_markup_to_utf8(text);
    if (strip_text) {
         len = strlen(strip_text);
