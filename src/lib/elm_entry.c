@@ -1790,10 +1790,10 @@ _entry_changed_common_handling(void *data, const char *event)
      }
 
    if ((wd->single_line) && (wd->match_list))
-   {
-	if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
-	wd->matchlist_job = ecore_job_add(_matchlist_show, data);
-   }
+     {
+        if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
+        wd->matchlist_job = ecore_job_add(_matchlist_show, data);
+     }
    if ((!wd->autosave) || (!wd->file)) return;
    wd->delay_write = ecore_timer_add(2.0, _delay_write, data);
 }
@@ -1801,13 +1801,25 @@ _entry_changed_common_handling(void *data, const char *event)
 static void
 _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
    _entry_changed_common_handling(data, SIG_CHANGED);
+
+   if ((wd->api) && (wd->api->obj_hidemenu))
+     wd->api->obj_hidemenu(data);
 }
 
 static void
 _signal_preedit_changed(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
    _entry_changed_common_handling(data, SIG_PREEDIT_CHANGED);
+
+   if ((wd->api) && (wd->api->obj_hidemenu))
+     wd->api->obj_hidemenu(data);
 }
 
 static void
@@ -1819,9 +1831,7 @@ _signal_handler_move_start(void *data, Evas_Object *obj __UNUSED__, const char *
    elm_object_scroll_freeze_push(data);
 
    if ((wd->api) && (wd->api->obj_hidemenu))
-     {
-        wd->api->obj_hidemenu(data);
-     }
+     wd->api->obj_hidemenu(data);
 
    _magnifier_create(data);
    _magnifier_move(data);
