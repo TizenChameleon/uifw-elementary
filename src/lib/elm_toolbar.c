@@ -18,6 +18,8 @@ struct _Widget_Data
    double align;
    Eina_Bool homogeneous : 1;
    Eina_Bool no_select : 1;
+   Eina_Bool always_select : 1;
+   Eina_Bool vertical : 1;
    Ecore_Job *resize_job;
 };
 
@@ -146,7 +148,11 @@ _item_select(Elm_Toolbar_Item *it)
 
    if (!wd->no_select)
      {
-        if (sel) _item_unselect(it);
+        if (sel)
+          {
+             if (wd->always_select) return;
+             _item_unselect(it);
+          }
         else
           {
              it2 = elm_toolbar_selected_item_get(WIDGET(it));
@@ -698,6 +704,7 @@ _item_new(Evas_Object *obj, const char *icon, const char *label, Evas_Smart_Cb f
    evas_object_size_hint_min_set(VIEW(it), mw, mh);
    evas_object_event_callback_add(it->base.view, EVAS_CALLBACK_RESIZE,
                                   _resize_item, obj);
+   if ((!wd->items) && wd->always_select) _item_select(it);
    return it;
 }
 
@@ -1332,12 +1339,16 @@ elm_toolbar_item_del(Elm_Toolbar_Item *item)
 {
    Widget_Data *wd;
    Evas_Object *obj2;
+   Elm_Toolbar_Item *next;
 
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item);
    wd = elm_widget_data_get(WIDGET(item));
    if (!wd) return;
    obj2 = WIDGET(item);
+   next = ELM_TOOLBAR_ITEM_FROM_INLIST(EINA_INLIST_GET(item)->next);
    wd->items = eina_inlist_remove(wd->items, EINA_INLIST_GET(item));
+   if (!next) next = ELM_TOOLBAR_ITEM_FROM_INLIST(wd->items);
+   if (wd->always_select && item->selected && next) _item_select(next);
    _item_del(item);
    _theme_hook(obj2);
 }
@@ -1646,6 +1657,26 @@ elm_toolbar_item_data_get(const Elm_Toolbar_Item *item)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, NULL);
    return elm_widget_item_data_get(item);
+}
+
+EAPI void
+elm_toolbar_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (always_select && (!wd->always_select) && wd->items)
+     _item_select(ELM_TOOLBAR_ITEM_FROM_INLIST(wd->items));
+   wd->always_select = always_select;
+}
+
+EAPI Eina_Bool
+elm_toolbar_always_select_mode_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return wd->always_select;
 }
 
 EAPI void
