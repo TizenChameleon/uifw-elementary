@@ -142,6 +142,9 @@ void test_naviframe(void *data, Evas_Object *obj, void *event_info);
 #ifdef HAVE_EIO
 void test_eio(void *data, Evas_Object *obj, void *event_info);
 #endif
+#ifdef HAVE_ELEMENTARY_WEB
+void test_web(void *data, Evas_Object *obj, void *event_info);
+#endif
 
 struct elm_test
 {
@@ -416,6 +419,9 @@ my_win_main(char *autorun, Eina_Bool test_win_only)
    ADD_TEST("3D", test_3d);
    ADD_TEST("Gesture Layer", test_gesture_layer);
    ADD_TEST("Naviframe", test_naviframe);
+#ifdef HAVE_ELEMENTARY_WEB
+   ADD_TEST("Web", test_web);
+#endif
 #undef ADD_TEST
 
    if (autorun)
@@ -460,6 +466,8 @@ elm_main(int argc, char **argv)
 {
    Eina_Bool test_win_only = EINA_FALSE;
    char *autorun = NULL;
+
+   elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
 
    /* tell elm about our app so it can figure out where to get files */
    elm_app_compile_bin_dir_set(PACKAGE_BIN_DIR);

@@ -312,6 +312,7 @@ contact with the developers and maintainers.
 @ELM_EDBUS_DEF@ ELM_EDBUS
 @ELM_EFREET_DEF@ ELM_EFREET
 @ELM_ETHUMB_DEF@ ELM_ETHUMB
+@ELM_WEB_DEF@ ELM_WEB
 @ELM_EMAP_DEF@ ELM_EMAP
 @ELM_DEBUG_DEF@ ELM_DEBUG
 @ELM_ALLOCA_H_DEF@ ELM_ALLOCA_H
@@ -894,6 +895,14 @@ extern "C" {
    EAPI Eina_Bool    elm_need_efreet(void);
    EAPI Eina_Bool    elm_need_e_dbus(void);
    EAPI Eina_Bool    elm_need_ethumb(void);
+
+   /**
+    * This must be called before any other function that handle with
+    * elm_web objects or ewk_view instances.
+    *
+    * @ingroup Web
+    */
+   EAPI Eina_Bool    elm_need_web(void);
 
    /**
     * Set a new policy's value (for a given policy group/identifier).
@@ -13155,7 +13164,6 @@ extern "C" {
     * @}
     */
 
-#if 0
    /**
     * @defgroup Web Web
     *
@@ -14006,7 +14014,6 @@ extern "C" {
    /**
     * @}
     */
-#endif
 
    /**
     * @defgroup Hoversel Hoversel
