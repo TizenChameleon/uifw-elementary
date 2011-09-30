@@ -1977,7 +1977,7 @@ _item_realize(Elm_Genlist_Item *it,
                     }
                }
           }
-        if (!it->mincalcd || it->wd->pan_resize)
+        if (!it->mincalcd || it->wd->pan_resize || ((it->wd->height_for_width) && (it->w != it->minw)))
           {
              Evas_Coord mw = -1, mh = -1;
 
