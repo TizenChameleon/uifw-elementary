@@ -2046,7 +2046,7 @@ _item_unrealize(Elm_Genlist_Item *it,
 
    if (!it->realized) return;
    if (it->wd->reorder_it == it) return;
-   if (it->defer_unrealize) return;
+   if (it->defer_unrealize && !it->updateme) return;
    evas_event_freeze(evas_object_evas_get(it->wd->obj));
    if (!calc)
      evas_object_smart_callback_call(it->base.widget, SIG_UNREALIZED, it);
@@ -2624,7 +2624,6 @@ _update_job(void *data)
                   itminw = it->minw;
                   itminh = it->minh;
 
-                  it->updateme = EINA_FALSE;
                   if (it->realized)
                     {
                        _item_unrealize(it, EINA_FALSE);
@@ -2638,6 +2637,7 @@ _update_job(void *data)
                     }
                   if ((it->minw != itminw) || (it->minh != itminh))
                     recalc = EINA_TRUE;
+                  it->updateme = EINA_FALSE;
                }
              num++;
           }
