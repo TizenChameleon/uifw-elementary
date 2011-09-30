@@ -8,7 +8,7 @@ struct _Elm_Entry_Extension_data
 {
 	Evas_Object *popup;
 	Evas_Object *ent;
-	Ecore_Timer *longpress_timer;
+	Evas_Object *viewport_obj;
 	Eina_List *items;
 	cpfunc select;
 	cpfunc copy;

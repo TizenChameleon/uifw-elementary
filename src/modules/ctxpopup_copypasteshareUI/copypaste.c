@@ -275,7 +275,6 @@ obj_longpress(Evas_Object *obj)
 				evas_object_show(ext_mod->popup);
 			}
 		}
-	ext_mod->longpress_timer = NULL;
 	}
 
 EAPI void
@@ -287,13 +286,6 @@ obj_mouseup(Evas_Object *obj)
 
 /*update*/
 	elm_entry_extension_module_data_get(obj,ext_mod);
-   if (ext_mod->longpress_timer)
-     {
-		if (ext_mod->have_selection )
-			{
-				_cancel(obj,ext_mod->popup,NULL);
-			}
-     }
 }
 
 

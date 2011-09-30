@@ -2886,6 +2886,7 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->select = _select;
    ext_mod->selectall = _selectall;
    ext_mod->ent = wd->ent;
+   ext_mod->viewport_obj = _viewport_obj_get(obj);
    ext_mod->items = wd->items;
    ext_mod->editable = wd->editable;
    ext_mod->have_selection = wd->have_selection;

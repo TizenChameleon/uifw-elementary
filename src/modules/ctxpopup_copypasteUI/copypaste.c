@@ -22,23 +22,45 @@ _ctxpopup_position(Evas_Object *obj)
 {
    if(!ext_mod) return;
 
-   Evas_Coord cx, cy, cw, ch, x, y, mw, mh;
-   evas_object_geometry_get(ext_mod->ent, &x, &y, NULL, NULL);
-   edje_object_part_text_cursor_geometry_get(ext_mod->ent, "elm.text",
-                                             &cx, &cy, &cw, &ch);
-   evas_object_size_hint_min_get(ext_mod->popup, &mw, &mh);
-   if (cw < mw)
+   Evas_Coord cx, cy, cw, ch, x, y, w, h;
+   if (!edje_object_part_text_selection_geometry_get(ext_mod->ent, "elm.text", &x, &y, &w, &h))
      {
-        cx += (cw - mw) / 2;
-        cw = mw;
+        evas_object_geometry_get(ext_mod->ent, &x, &y, NULL, NULL);
+        edje_object_part_text_cursor_geometry_get(ext_mod->ent, "elm.text",
+                                                  &cx, &cy, &cw, &ch);
+        evas_object_size_hint_min_get(ext_mod->popup, &w, &h);
+        if (cw < w)
+          {
+             cx += (cw - w) / 2;
+             cw = w;
+          }
+        if (ch < h)
+          {
+             cy += (ch - h) / 2;
+             ch = h;
+          }
+        evas_object_move(ext_mod->popup, x + cx, y + cy);
+        evas_object_resize(ext_mod->popup, cw, ch);
      }
-   if (ch < mh)
+   else
      {
-        cy += (ch - mh) / 2;
-        ch = mh;
+        if (ext_mod->viewport_obj)
+          {
+             Evas_Coord vx, vy, vw, vh, x2, y2;
+             x2 = x + w;
+             y2 = y + h;
+             evas_object_geometry_get(ext_mod->viewport_obj, &vx, &vy, &vw, &vh);
+             if (x < vx) x = vx;
+             if (y < vy) y = vy;
+             if (x2 > vx + vw) x2 = vx + vw;
+             if (y2 > vy + vh) y2 = vy + vh;
+             w = x2 - x;
+             h = y2 - y;
+          }
+        cx = x + (w / 2);
+        cy = y + (h / 2);
+        evas_object_move(ext_mod->popup, cx, cy);
      }
-   evas_object_move(ext_mod->popup, x + cx, y + cy);
-   evas_object_resize(ext_mod->popup, cw, ch);
 }
 
 static void
@@ -285,7 +307,6 @@ obj_longpress(Evas_Object *obj)
              evas_object_show(ext_mod->popup);
           }
      }
-   ext_mod->longpress_timer = NULL;
 }
 
 EAPI void
