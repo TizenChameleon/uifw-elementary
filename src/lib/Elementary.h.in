@@ -8277,6 +8277,7 @@ extern "C" {
   #define ELM_NAVIFRAME_ITEM_CONTENT "elm.swallow.content"
   #define ELM_NAVIFRAME_ITEM_ICON "elm.swallow.icon"
   #define ELM_NAVIFRAME_ITEM_OPTIONHEADER "elm.swallow.optionheader"
+  #define ELM_NAVIFRAME_ITEM_OPTIONHEADER2 "elm.swallow.optionheader2"
   #define ELM_NAVIFRAME_ITEM_TITLE_LABEL "elm.text.title"
   #define ELM_NAVIFRAME_ITEM_PREV_BTN "elm.swallow.prev_btn"
   #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_CLOSE "elm,state,optionheader,close", ""
