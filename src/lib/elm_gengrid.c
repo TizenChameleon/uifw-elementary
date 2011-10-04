@@ -957,11 +957,12 @@ _mouse_up(void            *data,
      }
    if ((item->wd->reorder_mode) && (item->wd->reorder_item))
      {
+        evas_object_smart_callback_call(item->wd->self, SIG_MOVED, item->wd->reorder_item);
+        item->wd->reorder_item = NULL;
+        item->wd->move_effect_enabled = EINA_FALSE;
         if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
           item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
 
-        evas_object_smart_callback_call(item->wd->self, SIG_MOVED, item->wd->reorder_item);
-        item->wd->reorder_item = NULL;
         elm_smart_scroller_hold_set(item->wd->scr, EINA_FALSE);
         elm_smart_scroller_bounce_allow_set(item->wd->scr, item->wd->h_bounce, item->wd->v_bounce);
         edje_object_signal_emit(item->base.view, "elm,state,reorder,disabled", "elm");
@@ -1292,81 +1293,90 @@ _item_place(Elm_Gengrid_Item *item,
         _item_realize(item);
         if (!was_realized)
           evas_object_smart_callback_call(item->wd->self, SIG_REALIZED, item);
-        if ((item->wd->reorder_mode) && (item->wd->reorder_item))
+        if (item->wd->reorder_mode)
           {
-             if (item->moving) return;
+             if (item->wd->reorder_item)
+               {
+                  if (item->moving) return;
 
-             if (!item->wd->move_effect_enabled)
-               {
-                  item->ox = x;
-                  item->oy = y;
-               }
-             if (item->wd->reorder_item == item)
-               {
-                  evas_object_move(item->base.view,
-                                   item->wd->reorder_item_x, item->wd->reorder_item_y);
-                  evas_object_resize(item->base.view,
-                                     item->wd->item_width, item->wd->item_height);
-                  return;
-               }
-             else
-               {
-                  if (item->wd->move_effect_enabled)
+                  if (!item->wd->move_effect_enabled)
                     {
-                       if ((item->ox != x) || (item->oy != y))
-                         {
-                            if (((item->wd->old_pan_x == item->wd->pan_x) && (item->wd->old_pan_y == item->wd->pan_y)) ||
-                                ((item->wd->old_pan_x != item->wd->pan_x) && !(item->ox - item->wd->pan_x + item->wd->old_pan_x == x)) ||
-                                ((item->wd->old_pan_y != item->wd->pan_y) && !(item->oy - item->wd->pan_y + item->wd->old_pan_y == y)))
-                              {
-                                 item->tx = x;
-                                 item->ty = y;
-                                 item->rx = item->ox;
-                                 item->ry = item->oy;
-                                 item->moving = EINA_TRUE;
-                                 item->moving_effect_start_time = ecore_loop_time_get();
-                                 item->item_moving_effect_timer = ecore_animator_add(_reorder_item_moving_effect_timer_cb, item);
-                                 return;
-                              }
-                         }
+                       item->ox = x;
+                       item->oy = y;
                     }
-
-                  if (ELM_RECTS_INTERSECT(item->wd->reorder_item_x, item->wd->reorder_item_y,
-                                          item->wd->item_width, item->wd->item_height,
-                                          x+(item->wd->item_width/2), y+(item->wd->item_height/2),
-                                          1, 1))
+                  if (item->wd->reorder_item == item)
                     {
-                       if (item->wd->horizontal)
-                         {
-                            if ((item->wd->nmax * item->wd->reorder_item->x + item->wd->reorder_item->y) >
-                                (item->wd->nmax * item->x + item->y))
-                              reorder_item_move_forward = EINA_TRUE;
-                         }
-                       else
-                         {
-                            if ((item->wd->nmax * item->wd->reorder_item->y + item->wd->reorder_item->x) >
-                                (item->wd->nmax * item->y + item->x))
-                              reorder_item_move_forward = EINA_TRUE;
-                         }
-
-                       item->wd->items = eina_inlist_remove(item->wd->items,
-                                                            EINA_INLIST_GET(item->wd->reorder_item));
-                       if (reorder_item_move_forward)
-                         item->wd->items = eina_inlist_prepend_relative(item->wd->items,
-                                                                        EINA_INLIST_GET(item->wd->reorder_item),
-                                                                        EINA_INLIST_GET(item));
-                       else
-                         item->wd->items = eina_inlist_append_relative(item->wd->items,
-                                                                       EINA_INLIST_GET(item->wd->reorder_item),
-                                                                       EINA_INLIST_GET(item));
-
-                       item->wd->reorder_item_changed = EINA_TRUE;
-                       item->wd->move_effect_enabled = EINA_TRUE;
-                       if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
-                         item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
-
+                       evas_object_move(item->base.view,
+                                        item->wd->reorder_item_x, item->wd->reorder_item_y);
+                       evas_object_resize(item->base.view,
+                                          item->wd->item_width, item->wd->item_height);
                        return;
                     }
+                  else
+                    {
+                       if (item->wd->move_effect_enabled)
+                         {
+                            if ((item->ox != x) || (item->oy != y))
+                              {
+                                 if (((item->wd->old_pan_x == item->wd->pan_x) && (item->wd->old_pan_y == item->wd->pan_y)) ||
+                                     ((item->wd->old_pan_x != item->wd->pan_x) && !(item->ox - item->wd->pan_x + item->wd->old_pan_x == x)) ||
+                                     ((item->wd->old_pan_y != item->wd->pan_y) && !(item->oy - item->wd->pan_y + item->wd->old_pan_y == y)))
+                                   {
+                                      item->tx = x;
+                                      item->ty = y;
+                                      item->rx = item->ox;
+                                      item->ry = item->oy;
+                                      item->moving = EINA_TRUE;
+                                      item->moving_effect_start_time = ecore_loop_time_get();
+                                      item->item_moving_effect_timer = ecore_animator_add(_reorder_item_moving_effect_timer_cb, item);
+                                      return;
+                                   }
+                              }
+                         }
+
+                       if (ELM_RECTS_INTERSECT(item->wd->reorder_item_x, item->wd->reorder_item_y,
+                                               item->wd->item_width, item->wd->item_height,
+                                               x+(item->wd->item_width/2), y+(item->wd->item_height/2),
+                                               1, 1))
+                         {
+                            if (item->wd->horizontal)
+                              {
+                                 if ((item->wd->nmax * item->wd->reorder_item->x + item->wd->reorder_item->y) >
+                                     (item->wd->nmax * item->x + item->y))
+                                   reorder_item_move_forward = EINA_TRUE;
+                              }
+                            else
+                              {
+                                 if ((item->wd->nmax * item->wd->reorder_item->y + item->wd->reorder_item->x) >
+                                     (item->wd->nmax * item->y + item->x))
+                                   reorder_item_move_forward = EINA_TRUE;
+                              }
+
+                            item->wd->items = eina_inlist_remove(item->wd->items,
+                                                                 EINA_INLIST_GET(item->wd->reorder_item));
+                            if (reorder_item_move_forward)
+                              item->wd->items = eina_inlist_prepend_relative(item->wd->items,
+                                                                             EINA_INLIST_GET(item->wd->reorder_item),
+                                                                             EINA_INLIST_GET(item));
+                            else
+                              item->wd->items = eina_inlist_append_relative(item->wd->items,
+                                                                            EINA_INLIST_GET(item->wd->reorder_item),
+                                                                            EINA_INLIST_GET(item));
+
+                            item->wd->reorder_item_changed = EINA_TRUE;
+                            item->wd->move_effect_enabled = EINA_TRUE;
+                            if (item->wd->calc_job) ecore_job_del(item->wd->calc_job);
+                              item->wd->calc_job = ecore_job_add(_calc_job, item->wd);
+
+                            return;
+                         }
+                    }
+               }
+             else if (item->item_moving_effect_timer)
+               {
+                  ecore_animator_del(item->item_moving_effect_timer);
+                  item->item_moving_effect_timer = NULL;
+                  item->moving = EINA_FALSE;
                }
           }
         evas_object_move(item->base.view, x, y);
