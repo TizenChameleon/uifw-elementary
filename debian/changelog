@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build43) unstable; urgency=low
+
+  * Repackaging 
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build43
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Tue, 04 Oct 2011 21:54:21 +0900
+
 elementary (1.0.0+svn.61256slp2+build42) unstable; urgency=low
 
   * EFL NBeat HD Black Theme Release.
