@@ -773,7 +773,8 @@ _get_tag_value(const char *tag_str, const char *tag_name)
 
              int i;
              int start = 0;
-             if (!strcmp(tag_str, "item") && !strcmp(tag_name, "href"))
+             if ((!strncmp(tag_str, "<item", 5) && !strcmp(tag_name, "href")) // EFL img tag
+               || (!strncmp(tag_str, "<img", 4) && !strcmp(tag_name, "src"))) // HTML img tag
                start = 1;
 
              for (i = start; i < spCnt; i++)
@@ -1542,7 +1543,7 @@ entry_insert_filter(Evas_Object* entry, char* str)
              if (!startTag)
                startTag = strstr(insertStr, "</item");
              if (startTag)
-               endTag = strstr(insertStr, ">");
+               endTag = strstr(startTag, ">");
              else
                break;
              if (!endTag || startTag > endTag)
