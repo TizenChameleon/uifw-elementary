@@ -954,7 +954,6 @@ elm_diskselector_round_set(Evas_Object * obj, Eina_Bool round)
         wd->r_items = NULL;
      }
 
-   _selected_item_indicate(wd->selected_item);
    _sizing_eval(obj);
 }
 
