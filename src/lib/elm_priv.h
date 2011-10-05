@@ -217,9 +217,6 @@ struct _Elm_Config
    Eina_Bool      is_mirrored : 1;
    Eina_Bool      password_show_last;
    double         password_show_last_timeout;
-   int            input_panel_enable;
-   int            autocapital_allow;
-   int            autoperiod_allow;
 };
 
 struct _Elm_Module

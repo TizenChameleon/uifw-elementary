@@ -74,7 +74,7 @@ static size_t _elm_user_dir_snprintf(char       *dst,
 #ifdef HAVE_ELEMENTARY_X
 static Ecore_Event_Handler *_prop_change_handler = NULL;
 static Ecore_X_Window _root_1st = 0;
-#define ATOM_COUNT 25
+#define ATOM_COUNT 22
 static Ecore_X_Atom _atom[ATOM_COUNT];
 static Ecore_X_Atom _atom_config = 0;
 static const char *_atom_names[ATOM_COUNT] =
@@ -100,9 +100,6 @@ static const char *_atom_names[ATOM_COUNT] =
    "ENLIGHTENMENT_THUMBSCROLL_PAGE_SCROLL_FRICTION",
    "ENLIGHTENMENT_THUMBSCROLL_BRING_IN_SCROLL_FRICTION",
    "ENLIGHTENMENT_THUMBSCROLL_ZOOM_FRICTION",
-   "ENLIGHTENMENT_INPUT_PANEL",
-   "ENLIGHTENMENT_AUTOCAPITAL_ALLOW",
-   "ENLIGHTENMENT_AUTOPERIOD_ALLOW",
    "ENLIGHTENMENT_CONFIG"
 };
 #define ATOM_E_SCALE                                0
@@ -127,9 +124,6 @@ static const char *_atom_names[ATOM_COUNT] =
 #define ATOM_E_THUMBSCROLL_BRING_IN_SCROLL_FRICTION 19
 #define ATOM_E_THUMBSCROLL_ZOOM_FRICTION            20
 #define ATOM_E_CONFIG                               21
-#define ATOM_E_INPUT_PANEL                          22
-#define ATOM_E_AUTOCAPITAL_ALLOW                    23
-#define ATOM_E_AUTOPERIOD_ALLOW                     24
 
 static Eina_Bool _prop_config_get(void);
 static Eina_Bool _prop_change(void *data  __UNUSED__,
@@ -507,60 +501,6 @@ _prop_change(void *data  __UNUSED__,
                     _elm_config->zoom_friction = (double)val / 1000.0;
                }
           }
-        else if (event->atom == _atom[ATOM_E_INPUT_PANEL])
-          {
-             unsigned int val = 0;
-
-             if (ecore_x_window_prop_card32_get(event->win,
-                                                event->atom,
-                                                &val, 1) > 0)
-               {
-                   int input_panel_enable;
-
-                   input_panel_enable = _elm_config->input_panel_enable;
-                   _elm_config->input_panel_enable = val;
-                   if (input_panel_enable != _elm_config->input_panel_enable)
-                     {
-                        edje_input_panel_enabled_set(_elm_config->input_panel_enable);
-                     }
-               }
-          }
-        else if (event->atom == _atom[ATOM_E_AUTOCAPITAL_ALLOW])
-          {
-             unsigned int val = 0;
-
-             if (ecore_x_window_prop_card32_get(event->win,
-                                                event->atom,
-                                                &val, 1) > 0)
-               {
-                   int autocapital_allow;
-
-                   autocapital_allow = _elm_config->autocapital_allow;
-                   _elm_config->autocapital_allow = val;
-                   if (autocapital_allow != _elm_config->autocapital_allow)
-                     {
-                        edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
-                     }
-               }
-          }
-        else if (event->atom == _atom[ATOM_E_AUTOPERIOD_ALLOW])
-          {
-             unsigned int val = 0;
-
-             if (ecore_x_window_prop_card32_get(event->win,
-                                                event->atom,
-                                                &val, 1) > 0)
-               {
-                  int autoperiod_allow;
-
-                  autoperiod_allow = _elm_config->autoperiod_allow;
-                  _elm_config->autoperiod_allow = val;
-                  if (autoperiod_allow != _elm_config->autoperiod_allow)
-                    {
-                       edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
-                    }
-               }
-          }
         else if (((_atom_config > 0) && (event->atom == _atom_config)) ||
                  (event->atom == _atom[ATOM_E_CONFIG]))
           {
@@ -660,7 +600,6 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, longpress_timeout, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, effect_enable, T_UCHAR);
    ELM_CONFIG_VAL(D, T, desktop_entry, T_UCHAR);
-   ELM_CONFIG_VAL(D, T, input_panel_enable, T_INT);
    ELM_CONFIG_VAL(D, T, password_show_last, T_UCHAR);
    ELM_CONFIG_VAL(D, T, password_show_last_timeout, T_DOUBLE);
 #undef T
@@ -1066,10 +1005,6 @@ _config_sub_apply(void)
    edje_scale_set(_elm_config->scale);
    edje_password_show_last_set(_elm_config->password_show_last);
    edje_password_show_last_timeout_set(_elm_config->password_show_last_timeout);
-   if (_elm_config->modules) _elm_module_parse(_elm_config->modules);
-   edje_input_panel_enabled_set(_elm_config->input_panel_enable);
-   edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
-   edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
    if (_elm_config->modules) _elm_module_parse(_elm_config->modules);
 }
 
@@ -1675,9 +1610,6 @@ _env_get(void)
    s = getenv("ELM_ICON_SIZE");
    if (s) _elm_config->icon_size = atoi(s);
 
-   s = getenv("ELM_INPUT_PANEL");
-   if (s) _elm_config->input_panel_enable = atoi(s);
-
    s = getenv("ELM_LONGPRESS_TIMEOUT");
    if (s) _elm_config->longpress_timeout = atof(s);
    if (_elm_config->longpress_timeout < 0.0)
@@ -1824,39 +1756,6 @@ _elm_config_sub_init(void)
                   if (changed) _prop_config_get();
 	       }
 	  }
-        if (!getenv("ELM_INPUT_PANEL"))
-          {
-             if (ecore_x_window_prop_card32_get(_root_1st,
-                                                _atom[ATOM_E_INPUT_PANEL],
-                                                &val, 1) > 0)
-               {
-                  if (val > 0)
-                    {
-                       _elm_config->input_panel_enable = val;
-                       edje_input_panel_enabled_set(_elm_config->input_panel_enable);
-                    }
-               }
-          }
-        if (ecore_x_window_prop_card32_get(_root_1st,
-                                           _atom[ATOM_E_AUTOCAPITAL_ALLOW],
-                                           &val, 1) > 0)
-          {
-             if (val > 0)
-               {
-                  _elm_config->autocapital_allow = val;
-                  edje_autocapitalization_allow_set(_elm_config->autocapital_allow);
-               }
-          }
-        if (ecore_x_window_prop_card32_get(_root_1st,
-                                           _atom[ATOM_E_AUTOPERIOD_ALLOW],
-                                           &val, 1) > 0)
-          {
-             if (val > 0)
-               {
-                  _elm_config->autoperiod_allow = val;
-                  edje_autoperiod_allow_set(_elm_config->autoperiod_allow);
-               }
-          }
 #endif
      }
    _config_sub_apply();

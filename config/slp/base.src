@@ -40,7 +40,6 @@ group "Elm_Config" struct {
   value "inwin_dialogs_enable" uchar: 0;
   value "icon_size" int: 32;
   value "longpress_timeout" double: 0.5;
-  value "input_panel_enable" int: 1;
   value "password_show_last" uchar: 1;
   value "password_show_last_timeout" double: 2.0;
   value "effect_enable" uchar: 1;
