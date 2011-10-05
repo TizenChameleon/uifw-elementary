@@ -1156,12 +1156,47 @@ _store_selection(Elm_Sel_Type seltype, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *sel;
+   char *sel_str;
 
    if (!wd) return;
    sel = edje_object_part_text_selection_get(wd->ent, "elm.text");
-   elm_selection_set(seltype, obj, ELM_SEL_FORMAT_MARKUP, sel);
+   sel_str = strdup(sel);
+   if (!sel_str)
+     return;
+   if (wd->textonly)
+     {
+        while (EINA_TRUE)
+          {
+             char *startTag = NULL;
+             char *endTag = NULL;
+
+             startTag = strstr(sel_str, "<item");
+             if (!startTag)
+               startTag = strstr(sel_str, "</item");
+             if (startTag)
+               endTag = strstr(startTag, ">");
+             else
+               break;
+             if (!endTag || startTag > endTag)
+               break;
+
+             size_t sindex = startTag - sel_str;
+             size_t eindex = endTag - sel_str + 1;
+
+             Eina_Strbuf *buf = eina_strbuf_new();
+             if (buf)
+               {
+                  eina_strbuf_append(buf, sel_str);
+                  eina_strbuf_remove(buf, sindex, eindex);
+                  sel_str = eina_strbuf_string_steal(buf);
+                  eina_strbuf_free(buf);
+               }
+          }
+     }
+   elm_selection_set(seltype, obj, ELM_SEL_FORMAT_MARKUP, sel_str);
    if (seltype == ELM_SEL_CLIPBOARD)
-     eina_stringshare_replace(&wd->cut_sel, sel);
+     eina_stringshare_replace(&wd->cut_sel, sel_str);
+   free(sel_str);
 }
 
 static void
