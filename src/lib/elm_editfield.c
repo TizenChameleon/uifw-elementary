@@ -107,6 +107,10 @@ _theme_hook(Evas_Object *obj)
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->entry);
    if(!wd->editing)
       edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
+   if(wd->single_line)
+     edje_object_signal_emit(wd->base, "elm,state,text,singleline", "elm");
+   else
+     edje_object_signal_emit(wd->base, "elm,state,text,multiline", "elm");
    if(wd->show_guide_text)
      {
         if(_empty_entry(wd->entry))
