@@ -32,7 +32,7 @@ CFLAGS += -Wall
 
 all: $(TARGETS)
 
-$(TARGET): %: %.c
+$(TARGETS): %: %.c
 	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 clean:
