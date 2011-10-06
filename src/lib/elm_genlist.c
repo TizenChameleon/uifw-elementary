@@ -80,6 +80,7 @@ struct _Widget_Data
    Eina_Bool         reorder_deleted : 1;
    Eina_Bool         effect_mode : 1;
    Eina_Bool         auto_scrolled : 1;
+   Eina_Bool         pan_changed : 1;
    int               edit_mode;
    Ecore_Animator   *item_moving_effect_timer;
    Evas_Object      *alpha_bg;
@@ -2899,8 +2900,10 @@ _pan_resize(Evas_Object *obj,
         if (sd->resize_job) ecore_job_del(sd->resize_job);
         sd->resize_job = ecore_job_add(_pan_resize_job, sd);
      }
+   sd->wd->pan_changed = EINA_TRUE;
+   evas_object_smart_changed(obj);
    if (sd->wd->calc_job) ecore_job_del(sd->wd->calc_job);
-   sd->wd->calc_job = ecore_job_add(_calc_job, sd->wd);
+   sd->wd->calc_job = NULL;
 }
 
 static void
@@ -2915,6 +2918,13 @@ _pan_calculate(Evas_Object *obj)
 
    if (!sd) return;
    evas_event_freeze(evas_object_evas_get(obj));
+
+   if (sd->wd->pan_changed)
+     {
+        _calc_job(sd->wd);
+        sd->wd->pan_changed = EINA_FALSE;
+     }
+
    evas_object_geometry_get(obj, &ox, &oy, &ow, &oh);
    sd->wd->prev_viewport_w = ow;
    evas_output_viewport_get(evas_object_evas_get(obj), &cvx, &cvy, &cvw, &cvh);
@@ -2984,8 +2994,11 @@ _pan_move(Evas_Object *obj,
    Pan *sd = evas_object_smart_data_get(obj);
 
    if (!sd) return;
+
+   sd->wd->pan_changed = EINA_TRUE;
+   evas_object_smart_changed(obj);
    if (sd->wd->calc_job) ecore_job_del(sd->wd->calc_job);
-   sd->wd->calc_job = ecore_job_add(_calc_job, sd->wd);
+   sd->wd->calc_job = NULL;
 }
 
 static void
