@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build44) unstable; urgency=low
+
+  * Package Upload.
+  * Important Changes
+       [Genlist] Fixed a unnecessary item block unrealize work
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build44
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Thu, 06 Oct 2011 15:23:32 +0900
+
 elementary (1.0.0+svn.61256slp2+build43) unstable; urgency=low
 
   * Repackaging 
