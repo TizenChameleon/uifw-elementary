@@ -847,8 +847,6 @@ elm_naviframe_item_push(Evas_Object *obj,
                                 "elm,state,new,pushed",
                                 "elm");
      }
-   else
-     edje_object_signal_emit(it->base.view, "elm,state,visible", "elm");
    it->title_visible = EINA_TRUE;
    wd->stack = eina_list_append(wd->stack, it);
    return ELM_CAST(it);
@@ -914,6 +912,24 @@ elm_naviframe_item_pop_to(Elm_Object_Item *it)
         l = prev_l;
      }
    elm_naviframe_item_pop(navi_it->base.widget);
+}
+
+EAPI void
+elm_naviframe_item_del(Elm_Object_Item *it)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   Elm_Naviframe_Item *navi_it = ELM_CAST(it);
+   Widget_Data *wd = elm_widget_data_get(navi_it->base.widget);
+   if (it == elm_naviframe_top_item_get(navi_it->base.widget))
+     {
+        _item_del(navi_it);
+        navi_it = ELM_CAST(eina_list_last(wd->stack)->data);
+        evas_object_show(navi_it->base.view);
+        evas_object_raise(navi_it->base.view);
+        edje_object_signal_emit(navi_it->base.view, "elm,state,visible", "elm");
+     }
+   else
+     _item_del(navi_it);
 }
 
 EAPI void
