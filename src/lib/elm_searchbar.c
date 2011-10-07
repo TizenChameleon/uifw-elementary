@@ -28,7 +28,8 @@ static void _del_hook(Evas_Object *obj);
 static void _theme_hook(Evas_Object *obj);
 static void _on_focus_hook(void *data, Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-static void _clicked(void *data, Evas_Object *obj, void *event_info);
+static void _clicked(void *data, Evas_Object *obj,
+                     const char *emission, const char *source);
 static void _changed(void *data, Evas_Object *obj, void *event_info);
 static void _cancel_clicked(void *data, Evas_Object *obj, void *event_info);
 
@@ -105,11 +106,8 @@ static void _sizing_eval(Evas_Object *obj)
 }
 
 static void _clicked(void *data, Evas_Object *obj __UNUSED__,
-                     void *event_info __UNUSED__)
+                     const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return;
-
    evas_object_smart_callback_call(data, "clicked", NULL);
 }
 
@@ -149,18 +147,6 @@ static void _cancel_clicked(void *data, Evas_Object *obj __UNUSED__,
 }
 
 static void
-_basebg_clicked(void *data, Evas_Object *obj, const char *emission __UNUSED__,
-                const char *source)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-
-   if (!wd) return;
-
-   if (!strcmp(source, "base_bg"))
-      _clicked(data, obj, NULL);
-}
-
-static void
 _searchsymbol_clicked(void *data, Evas_Object *obj __UNUSED__,
                       const char *emission __UNUSED__,
                       const char *source __UNUSED__)
@@ -170,6 +156,27 @@ _searchsymbol_clicked(void *data, Evas_Object *obj __UNUSED__,
    if (!wd) return;
    evas_object_smart_callback_call(data, "searchsymbol,clicked", NULL);
 }
+
+static void
+_elm_searchbar_text_set(Evas_Object *obj, const char *item, const char *text)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return;
+   if (!wd) return;
+   elm_entry_entry_set(elm_editfield_entry_get(wd->ef), text);
+}
+
+static const char *
+_elm_searchbar_text_get(const Evas_Object *obj, const char *item)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (item && strcmp(item, "default")) return NULL;
+   if (!wd) return NULL;
+   return elm_entry_entry_get(elm_editfield_entry_get(wd->ef));
+}
+
 
 /**
  * Add a new searchbar to the parent
@@ -193,45 +200,38 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
-   elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL );
-   elm_widget_can_focus_set(obj, 1 );
+   elm_widget_on_focus_hook_set( obj, _on_focus_hook, NULL);
+   elm_widget_can_focus_set(obj, EINA_TRUE);
+   elm_widget_text_set_hook_set(obj, _elm_searchbar_text_set);
+   elm_widget_text_get_hook_set(obj, _elm_searchbar_text_get);
 
    wd->base = edje_object_add(e);
-   if (wd->base == NULL) return NULL;
-
    _elm_theme_object_set(obj, wd->base, "searchbar", "base", "default");
+   elm_widget_resize_object_set(obj, wd->base);
 
    // Add Entry
-   wd->ef = elm_editfield_add(parent);
+   wd->ef = elm_editfield_add(obj);
    elm_object_style_set(wd->ef, "searchbar/default");
 
    edje_object_part_swallow(wd->base, "search_textfield", wd->ef);
    elm_editfield_guide_text_set(wd->ef, E_("Search"));
    elm_editfield_entry_single_line_set(wd->ef, EINA_TRUE);
    elm_editfield_eraser_set(wd->ef, EINA_TRUE);
-   evas_object_smart_callback_add(wd->ef, "clicked", _clicked, obj);
    evas_object_smart_callback_add(elm_editfield_entry_get(wd->ef), "changed", _changed, obj);
-   edje_object_signal_callback_add(wd->base, "mouse,up,1", "*", _basebg_clicked, obj);
+   edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "*", _clicked, obj);
    edje_object_signal_callback_add(wd->base, "elm,action,click", "", _searchsymbol_clicked, obj);
 
-   elm_widget_sub_object_add(obj, wd->ef);
-
    // Add Button
-   wd->cancel_btn = elm_button_add(parent);
+   wd->cancel_btn = elm_button_add(obj);
    edje_object_part_swallow(wd->base, "button_cancel", wd->cancel_btn);
-
    snprintf(buf, sizeof(buf), "searchbar/%s", elm_widget_style_get(obj));
    elm_object_style_set(wd->cancel_btn, buf);
-
    elm_object_text_set(wd->cancel_btn, E_("Cancel"));
    evas_object_smart_callback_add(wd->cancel_btn, "clicked", _cancel_clicked, obj);
-   elm_widget_sub_object_add(obj, wd->cancel_btn);
 
    wd->cancel_btn_ani_flag = EINA_FALSE;
    wd->cancel_btn_show_mode = EINA_TRUE;
    wd->boundary_mode = EINA_TRUE;
-
-   elm_widget_resize_object_set(obj, wd->base);
 
    _sizing_eval(obj);
 
@@ -248,11 +248,7 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
  */
 EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   elm_entry_entry_set(elm_editfield_entry_get(wd->ef), entry);
+   _elm_searchbar_text_set(obj, NULL, entry);
 }
 
 /**
@@ -265,11 +261,7 @@ EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
  */
 EAPI const char* elm_searchbar_text_get(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-
-   return elm_entry_entry_get(elm_editfield_entry_get(wd->ef));
+   return _elm_searchbar_text_get(obj, NULL);
 }
 
 /**
