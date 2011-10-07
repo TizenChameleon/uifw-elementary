@@ -1,6 +1,7 @@
 #include <Elementary.h>
 #include <Elementary_Cursor.h>
 #include "elm_priv.h"
+#include "els_scroller.h"
 
  typedef struct _Widget_Data Widget_Data;
  typedef struct _Pan         Pan;

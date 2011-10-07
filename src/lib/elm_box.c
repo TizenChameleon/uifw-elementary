@@ -1,5 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
+#include "els_box.h"
 
 #define SIG_CHILD_ADDED "child,added"
 #define SIG_CHILD_REMOVED "child,removed"

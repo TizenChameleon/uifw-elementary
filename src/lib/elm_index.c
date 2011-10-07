@@ -3,6 +3,7 @@
  */
 #include <Elementary.h>
 #include "elm_priv.h"
+#include "els_box.h"
 
 /**
  * @defgroup Index Index
