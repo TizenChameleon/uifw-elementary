@@ -243,6 +243,15 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info __UNUSED__)
      {
         if(wd->eraser_show)
            edje_object_signal_emit(wd->base, "elm,state,eraser,hidden", "elm");
+        if(!elm_object_focus_get(wd->entry))
+          {
+             if(wd->guide_text)
+               {
+                  edje_object_part_text_set(wd->base, "elm.guidetext", wd->guide_text);
+                  edje_object_signal_emit(wd->base, "elm,state,guidetext,visible", "elm");
+                  wd->show_guide_text = EINA_TRUE;
+               }
+          }
      }
 
    if (!wd->editing && wd->single_line)
