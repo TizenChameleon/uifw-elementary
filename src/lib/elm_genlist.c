@@ -875,6 +875,8 @@ _item_del(Elm_Genlist_Item *it)
 static void
 _item_select(Elm_Genlist_Item *it)
 {
+   Eina_List *l;
+   Evas_Object *obj;
    if ((it->wd->no_select) || (it->delete_me) || (it->mode_view)) return;
    if (it->selected)
      {
@@ -887,6 +889,11 @@ call:
    evas_object_ref(it->base.widget);
    it->walking++;
    it->wd->walking++;
+   if (it->wd->last_selected_item && (it != it->wd->last_selected_item))
+     {
+        EINA_LIST_FOREACH(it->wd->last_selected_item->icon_objs, l, obj)
+          elm_widget_focused_object_clear(obj);
+     }
    if (it->func.func) it->func.func((void *)it->func.data, it->base.widget, it);
    if (!it->delete_me)
      evas_object_smart_callback_call(it->base.widget, SIG_SELECTED, it);
