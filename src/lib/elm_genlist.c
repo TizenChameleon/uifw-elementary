@@ -1707,6 +1707,100 @@ _icon_unfocused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUS
 }
 
 static void
+_item_label_realize(Elm_Genlist_Item *it,
+                    Evas_Object *target,
+                    Eina_List **source)
+{
+   if (it->itc->func.label_get)
+     {
+        const Eina_List *l;
+        const char *key;
+
+        *source = elm_widget_stringlist_get(edje_object_data_get(target, "labels"));
+        EINA_LIST_FOREACH(*source, l, key)
+          {
+             char *s = it->itc->func.label_get
+                ((void *)it->base.data, it->base.widget, key);
+
+             if (s)
+               {
+                  edje_object_part_text_set(target, key, s);
+                  free(s);
+               }
+             else
+               {
+                  edje_object_part_text_set(target, key, "");
+               }
+          }
+     }
+}
+
+static Eina_List *
+_item_icon_realize(Elm_Genlist_Item *it,
+                   Evas_Object *target,
+                   Eina_List **source)
+{
+   Eina_List *res = NULL;
+
+   if (it->itc->func.icon_get)
+     {
+        const Eina_List *l;
+        const char *key;
+
+        *source = elm_widget_stringlist_get(edje_object_data_get(target, "icons"));
+        EINA_LIST_FOREACH(*source, l, key)
+          {
+             Evas_Object *ic = it->itc->func.icon_get
+                ((void *)it->base.data, it->base.widget, key);
+
+             if (ic)
+               {
+                  res = eina_list_append(res, ic);
+                  edje_object_part_swallow(target, key, ic);
+                  evas_object_show(ic);
+                  elm_widget_sub_object_add(it->base.widget, ic);
+                  evas_object_event_callback_add(ic, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
+                  if (it->disabled)
+                    elm_widget_disabled_set(ic, EINA_TRUE);
+               }
+          }
+     }
+
+   return res;
+}
+
+static void
+_item_state_realize(Elm_Genlist_Item *it,
+                    Evas_Object *target,
+                    Eina_List **source)
+{
+   if (it->itc->func.state_get)
+     {
+        const Eina_List *l;
+        const char *key;
+        char buf[4096];
+
+        *source = elm_widget_stringlist_get(edje_object_data_get(target, "states"));
+        EINA_LIST_FOREACH(*source, l, key)
+          {
+             Eina_Bool on = it->itc->func.state_get
+                ((void *)it->base.data, it->base.widget, key);
+
+             if (on)
+               {
+                  snprintf(buf, sizeof(buf), "elm,state,%s,active", key);
+                  edje_object_signal_emit(target, buf, "elm");
+               }
+             else
+               {
+                  snprintf(buf, sizeof(buf), "elm,state,%s,passive", key);
+                  edje_object_signal_emit(target, buf, "elm");
+               }
+          }
+     }
+}
+
+static void
 _item_realize(Elm_Genlist_Item *it,
               int               in,
               Eina_Bool         calc)
@@ -1882,96 +1976,32 @@ _item_realize(Elm_Genlist_Item *it,
      }
    else
      {
-        if (it->itc->func.label_get)
+        _item_label_realize(it, it->base.view, &it->labels);
+        it->icon_objs = _item_icon_realize(it, it->base.view, &it->icons);
+        _item_state_realize(it, it->base.view, &it->states);
+        if (it->itc->func.icon_get) // for rename mode
           {
              const Eina_List *l;
              const char *key;
-
-             it->labels =
-               elm_widget_stringlist_get(edje_object_data_get(it->base.view,
-                                                              "labels"));
-             EINA_LIST_FOREACH(it->labels, l, key)
-               {
-                  char *s = it->itc->func.label_get
-                      ((void *)it->base.data, it->base.widget, l->data);
-
-                  if (s)
-                    {
-                       edje_object_part_text_set(it->base.view, l->data, s);
-                       free(s);
-                    }
-                  else if (itc)
-                    edje_object_part_text_set(it->base.view, l->data, "");
-               }
-          }
-        if (it->itc->func.icon_get)
-          {
-             const Eina_List *l;
-             const char *key;
-
-             it->icons =
-               elm_widget_stringlist_get(edje_object_data_get(it->base.view,
-                                                              "icons"));
-             EINA_LIST_FOREACH(it->icons, l, key)
-               {
-                  Evas_Object *ic = it->itc->func.icon_get
-                      ((void *)it->base.data, it->base.widget, l->data);
-
-                  if (ic)
-                    {
-                       it->icon_objs = eina_list_append(it->icon_objs, ic);
-                       edje_object_part_swallow(it->base.view, key, ic);
-                       evas_object_show(ic);
-                       elm_widget_sub_object_add(it->base.widget, ic);
-                       evas_object_event_callback_add(ic, EVAS_CALLBACK_CHANGED_SIZE_HINTS, _changed_size_hints, it);
-                       if (it->disabled)
-                         elm_widget_disabled_set(ic, EINA_TRUE);
-                    }
-               }
              if (it->renamed)
                {
                   it->icons =
-                      elm_widget_stringlist_get(edje_object_data_get(it->base.view, "renames"));
+                     elm_widget_stringlist_get(edje_object_data_get(it->base.view, "renames"));
                   EINA_LIST_FOREACH(it->icons, l, key)
                     {
                        Evas_Object *ic = it->itc->func.icon_get
-                                         ((void *)it->base.data, it->base.widget, l->data);
+                          ((void *)it->base.data, it->base.widget, l->data);
                        if (ic)
                          {
-                             it->icon_objs = eina_list_append(it->icon_objs, ic);
-                             edje_object_part_swallow(it->base.view, key, ic);
-                             evas_object_show(ic);
-                             elm_widget_sub_object_add(it->base.widget, ic);
-                             // FIXME: if entry calcuates its cursor position correctly and conformant works,
-                             //        genlist does not need to handle this focus thing.
-                             evas_object_smart_callback_add(ic, "focused", _icon_focused, it);
-                             evas_object_smart_callback_add(ic, "unfocused", _icon_unfocused, it);
+                            it->icon_objs = eina_list_append(it->icon_objs, ic);
+                            edje_object_part_swallow(it->base.view, key, ic);
+                            evas_object_show(ic);
+                            elm_widget_sub_object_add(it->base.widget, ic);
+                            // FIXME: if entry calcuates its cursor position correctly and conformant works,
+                            //        genlist does not need to handle this focus thing.
+                            evas_object_smart_callback_add(ic, "focused", _icon_focused, it);
+                            evas_object_smart_callback_add(ic, "unfocused", _icon_unfocused, it);
                          }
-                    }
-              }
-          }
-        if (it->itc->func.state_get)
-          {
-             const Eina_List *l;
-             const char *key;
-
-             it->states =
-               elm_widget_stringlist_get(edje_object_data_get(it->base.view,
-                                                              "states"));
-             EINA_LIST_FOREACH(it->states, l, key)
-               {
-                  Eina_Bool on = it->itc->func.state_get
-                      ((void *)it->base.data, it->base.widget, l->data);
-
-                  if (on)
-                    {
-                       snprintf(buf, sizeof(buf), "elm,state,%s,active", key);
-                       edje_object_signal_emit(it->base.view, buf, "elm");
-                    }
-                  else if (itc)
-                    {
-                       snprintf(buf, sizeof(buf), "elm,state,%s,passive", key);
-                       edje_object_signal_emit(it->base.view, buf, "elm");
                     }
                }
           }
@@ -3111,26 +3141,7 @@ _mode_item_realize(Elm_Genlist_Item *it)
                                   _mouse_move, it);
 
    /* label_get, icon_get, state_get */
-   if (it->itc->func.label_get)
-     {
-        const Eina_List *l;
-        const char *key;
-
-        it->mode_labels =
-           elm_widget_stringlist_get(edje_object_data_get(it->mode_view,
-                                                          "labels"));
-        EINA_LIST_FOREACH(it->mode_labels, l, key)
-          {
-             char *s = it->itc->func.label_get
-                ((void *)it->base.data, it->base.widget, l->data);
-
-             if (s)
-               {
-                  edje_object_part_text_set(it->mode_view, l->data, s);
-                  free(s);
-               }
-          }
-     }
+   _item_label_realize(it, it->mode_view, &it->mode_labels);
    if (it->itc->func.icon_get)
      {
         const Eina_List *l;
@@ -3155,27 +3166,7 @@ _mode_item_realize(Elm_Genlist_Item *it)
                }
           }
      }
-   if (it->itc->func.state_get)
-     {
-        const Eina_List *l;
-        const char *key;
-
-        it->mode_states =
-           elm_widget_stringlist_get(edje_object_data_get(it->mode_view,
-                                                          "states"));
-        EINA_LIST_FOREACH(it->mode_states, l, key)
-          {
-             Eina_Bool on = it->itc->func.state_get
-                ((void *)it->base.data, it->base.widget, l->data);
-
-             if (on)
-               {
-                  snprintf(buf, sizeof(buf), "elm,state,%s,active", key);
-                  edje_object_signal_emit(it->mode_view, buf, "elm");
-               }
-          }
-     }
-
+   _item_state_realize(it, it->mode_view, &it->mode_states);
    edje_object_part_swallow(it->mode_view,
                             edje_object_data_get(it->mode_view, "mode_part"),
                             it->base.view);
