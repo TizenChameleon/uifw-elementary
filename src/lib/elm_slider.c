@@ -420,11 +420,11 @@ _drag(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, 
 {
    Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
    if (elm_widget_disabled_get(data)) return;
-   edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
-   edje_object_message_signal_process(wd->slider);
    _val_fetch(data);
    _units_set(data);
    _indicator_set(data);
+   edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
+   edje_object_message_signal_process(wd->slider);
 }
 
 static void
@@ -434,11 +434,11 @@ _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUS
    if (elm_widget_disabled_get(data)) return;
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_START, NULL);
-   edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
-   edje_object_message_signal_process(wd->slider);
    _units_set(data);
    _indicator_set(data);
    elm_widget_scroll_freeze_push(data);
+   edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
+   edje_object_message_signal_process(wd->slider);
 }
 
 static void
