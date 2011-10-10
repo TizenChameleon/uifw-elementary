@@ -877,6 +877,7 @@ _item_select(Elm_Genlist_Item *it)
 {
    Eina_List *l;
    Evas_Object *obj;
+   Evas_Object *parent = it->base.widget;
    if ((it->wd->no_select) || (it->delete_me) || (it->mode_view)) return;
    if (it->selected)
      {
@@ -886,7 +887,7 @@ _item_select(Elm_Genlist_Item *it)
    it->selected = EINA_TRUE;
    it->wd->selected = eina_list_append(it->wd->selected, it);
 call:
-   evas_object_ref(it->base.widget);
+   evas_object_ref(parent);
    it->walking++;
    it->wd->walking++;
    if (it->wd->last_selected_item && (it != it->wd->last_selected_item))
@@ -894,25 +895,27 @@ call:
         EINA_LIST_FOREACH(it->wd->last_selected_item->icon_objs, l, obj)
           elm_widget_focused_object_clear(obj);
      }
-   if (it->func.func) it->func.func((void *)it->func.data, it->base.widget, it);
+   if (it->func.func) it->func.func((void *)it->func.data, parent, it);
    if (!it->delete_me)
-     evas_object_smart_callback_call(it->base.widget, SIG_SELECTED, it);
+     evas_object_smart_callback_call(parent, SIG_SELECTED, it);
    it->walking--;
    it->wd->walking--;
    if ((it->wd->clear_me) && (!it->wd->walking))
      {
-        elm_genlist_clear(it->base.widget);
-        return;
+        elm_genlist_clear(parent);
+        goto end;
      }
    else
      {
         if ((!it->walking) && (it->delete_me))
           {
              if (!it->relcount) _item_del(it);
+             goto end;
           }
      }
    if (it && it->wd) it->wd->last_selected_item = it; // TODO: Remove 'if'?
-   evas_object_unref(it->base.widget);
+end:
+   evas_object_unref(parent);
 }
 
 static void
@@ -1079,7 +1082,6 @@ _long_press(void *data)
 {
    Elm_Genlist_Item *it = data, *it_tmp;
    Eina_List *list, *l;
-   //static Eina_Bool contracted = EINA_FALSE;
 
    it->long_timer = NULL;
    if ((it->disabled) || (it->dragging) || (it->display_only) || (it->wd->rename_it))
@@ -1692,6 +1694,13 @@ _item_cache_free(Item_Cache *itc)
    free(itc);
 }
 
+static const char *
+_item_label_hook(Elm_Genlist_Item *it, const char *part)
+{
+   if (!it->itc->func.label_get) return NULL;
+   return edje_object_part_text_get(it->base.view, part);
+}
+
 static void
 _icon_focused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -2092,7 +2101,11 @@ _item_unrealize(Elm_Genlist_Item *it,
      }
    else
      {
-        edje_object_mirrored_set(it->base.view, elm_widget_mirrored_get(it->base.widget));
+        edje_object_mirrored_set(it->base.view,
+                                 elm_widget_mirrored_get(it->base.widget));
+        edje_object_scale_set(it->base.view,
+                              elm_widget_scale_get(it->base.widget)
+                              * _elm_config->scale);
         _item_cache_add(it);
      }
    elm_widget_stringlist_free(it->labels);
@@ -2165,25 +2178,11 @@ _item_block_recalc(Item_Block *itb,
 }
 
 static void
-_item_block_realize(Item_Block *itb,
-                    int         in,
-                    int         full)
+_item_block_realize(Item_Block *itb)
 {
-   const Eina_List *l;
-   Elm_Genlist_Item *it;
-
    if (itb->realized) return;
-   evas_event_freeze(evas_object_evas_get(itb->wd->obj));
-   EINA_LIST_FOREACH(itb->items, l, it)
-     {
-        if (it->delete_me) continue;
-        if (full) _item_realize(it, in, EINA_FALSE);
-        in++;
-     }
    itb->realized = EINA_TRUE;
    itb->want_unrealize = EINA_FALSE;
-   evas_event_thaw(evas_object_evas_get(itb->wd->obj));
-   evas_event_thaw_eval(evas_object_evas_get(itb->wd->obj));
 }
 
 static void
@@ -2237,7 +2236,8 @@ _get_space_for_reorder_item(Elm_Genlist_Item *it)
         if (it->block->count == 1)
           it->wd->reorder_rel = it;
      }
-   else if ((it->wd->reorder_start_y >= it->block->y) && (roy - oy + roh/2  <=  it->block->y -  it->wd->pan_y))
+   else if ((it->wd->reorder_start_y >= it->block->y) &&
+            (roy - oy + (roh / 2) <= it->block->y - it->wd->pan_y))
      {
         it->block->reorder_offset = it->wd->reorder_it->h;
      }
@@ -2492,9 +2492,9 @@ _calc_job(void *data)
    Widget_Data *wd = data;
    Item_Block *itb, *chb = NULL;
    Evas_Coord minw = -1, minh = 0, y = 0, ow;
-   int in = 0, minw_change = 0;
-   Eina_Bool changed = EINA_FALSE;
+   int in = 0;
    double t0, t;
+   Eina_Bool minw_change = EINA_FALSE;
    Eina_Bool did_must_recalc = EINA_FALSE;
    if (!wd) return;
 
@@ -2515,10 +2515,9 @@ _calc_job(void *data)
           {
              if (itb->realized) _item_block_unrealize(itb);
           }
-        if ((itb->changed) || (changed) ||
-            ((itb->must_recalc) && (!did_must_recalc)))
+        if ((itb->changed) || ((itb->must_recalc) && (!did_must_recalc)))
           {
-             if ((changed) || (itb->must_recalc))
+             if (itb->must_recalc)
                {
                   Eina_List *l;
                   Elm_Genlist_Item *it;
@@ -2968,7 +2967,7 @@ _pan_calculate(Evas_Object *obj)
                                 cvx, cvy, cvw, cvh))
           {
              if ((!itb->realized) || (itb->changed))
-               _item_block_realize(itb, in, 0);
+               _item_block_realize(itb);
              _item_block_position(itb, in);
           }
         else
@@ -3253,6 +3252,30 @@ _item_mode_unset(Widget_Data *wd)
    wd->mode_item = NULL;
 }
 
+
+static void
+_item_auto_scroll(void *data)
+{
+   Widget_Data *wd = data;
+   if (!wd) return;
+
+   if ((wd->expand_item) && (!wd->auto_scrolled))
+     {
+        Elm_Genlist_Item  *it;
+        Eina_List *l;
+        Evas_Coord ox, oy, ow, oh;
+        evas_object_geometry_get(wd->obj, &ox, &oy, &ow, &oh);
+
+        wd->auto_scrolled = EINA_TRUE;
+        if (wd->expand_item->scrl_y > (oh + oy) / 2)
+          {
+            EINA_LIST_FOREACH(wd->expand_item->items, l, it)
+              {
+                 elm_genlist_item_bring_in(it);
+              }
+          }
+     }
+}
 EAPI Evas_Object *
 elm_genlist_add(Evas_Object *parent)
 {
@@ -3360,6 +3383,7 @@ _item_new(Widget_Data                  *wd,
    it->func.data = func_data;
    it->mouse_cursor = NULL;
    it->expanded_depth = 0;
+   elm_widget_item_text_get_hook_set(it, _item_label_hook);
 
    if (it->parent)
      {
@@ -4234,7 +4258,7 @@ elm_genlist_item_disabled_set(Elm_Genlist_Item *it,
    Evas_Object *obj;
    if (it->disabled == disabled) return;
    if (it->delete_me) return;
-   it->disabled = disabled;
+   it->disabled = !!disabled;
    if (it->selected)
      elm_genlist_item_selected_set(it, EINA_FALSE);
    if (it->realized)
@@ -4546,10 +4570,11 @@ elm_genlist_item_item_class_get(const Elm_Genlist_Item *it)
 }
 static Evas_Object *
 _elm_genlist_item_label_create(void        *data,
-                               Evas_Object *obj,
+                               Evas_Object *obj __UNUSED__,
+                               Evas_Object *tooltip,
                                void        *item __UNUSED__)
 {
-   Evas_Object *label = elm_label_add(obj);
+   Evas_Object *label = elm_label_add(tooltip);
    if (!label)
      return NULL;
    elm_object_style_set(label, "tooltip");
@@ -4822,7 +4847,7 @@ elm_genlist_bounce_get(const Evas_Object *obj,
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   elm_smart_scroller_bounce_allow_get(obj, h_bounce, v_bounce);
+   elm_smart_scroller_bounce_allow_get(wd->scr, h_bounce, v_bounce);
 }
 
 EAPI void
@@ -4892,12 +4917,11 @@ elm_genlist_scroller_policy_set(Evas_Object        *obj,
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   if ((!wd) || (!wd->scr)) return;
    if ((policy_h >= ELM_SCROLLER_POLICY_LAST) ||
        (policy_v >= ELM_SCROLLER_POLICY_LAST))
      return;
-   if (wd->scr)
-     elm_smart_scroller_policy_set(wd->scr, policy_h, policy_v);
+   elm_smart_scroller_policy_set(wd->scr, policy_h, policy_v);
 }
 
 EAPI void
@@ -4927,15 +4951,6 @@ elm_genlist_realized_items_update(Evas_Object *obj)
      elm_genlist_item_update(it);
 }
 
-/**
- * Set genlist item mode
- *
- * @param item The genlist item
- * @param mode Mode name
- * @param mode_set Boolean to define set or unset mode.
- *
- * @ingroup Genlist
- */
 EAPI void
 elm_genlist_item_mode_set(Elm_Genlist_Item *it,
                           const char       *mode_type,
@@ -4979,13 +4994,6 @@ elm_genlist_item_mode_set(Elm_Genlist_Item *it,
    if (mode_set) _item_mode_set(it);
 }
 
-/**
- * Get active genlist mode type
- *
- * @param obj The genlist object
- *
- * @ingroup Genlist
- */
 EAPI const char *
 elm_genlist_mode_get(const Evas_Object *obj)
 {
@@ -4995,13 +5003,6 @@ elm_genlist_mode_get(const Evas_Object *obj)
    return wd->mode_type;
 }
 
-/**
- * Get active genlist mode item
- *
- * @param obj The genlist object
- *
- * @ingroup Genlist
- */
 EAPI const Elm_Genlist_Item *
 elm_genlist_mode_item_get(const Evas_Object *obj)
 {
@@ -5604,28 +5605,4 @@ elm_genlist_item_rename_mode_get(Elm_Genlist_Item *item)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, EINA_FALSE);
    return item->renamed;
-}
-
-static void
-_item_auto_scroll(void *data)
-{
-   Widget_Data *wd = data;
-   if (!wd) return;
-
-   if ((wd->expand_item) && (!wd->auto_scrolled))
-     {
-        Elm_Genlist_Item  *it;
-        Eina_List *l;
-        Evas_Coord ox, oy, ow, oh;
-        evas_object_geometry_get(wd->obj, &ox, &oy, &ow, &oh);
-
-        wd->auto_scrolled = EINA_TRUE;
-        if (wd->expand_item->scrl_y > (oh + oy) / 2)
-          {
-            EINA_LIST_FOREACH(wd->expand_item->items, l, it)
-              {
-                 elm_genlist_item_bring_in(it);
-              }
-          }
-     }
 }
