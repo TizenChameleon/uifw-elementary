@@ -83,7 +83,7 @@ static void utc_UIFW_elm_entry_selection_get_func_01(void)
 	const char *str = NULL;
 	str = elm_entry_selection_get(entry);
 
-	if (!ret) {
+	if (!str) {
 		tet_infoline("elm_entry_selection_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
@@ -99,7 +99,7 @@ static void utc_UIFW_elm_entry_selection_get_func_02(void)
 	const char *str = NULL;
 	str = elm_entry_selection_get(NULL);
 
-	if (ret) {
+	if (str) {
 		tet_infoline("elm_entry_selection_get() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
