@@ -583,6 +583,23 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
    evas_object_move(wd->arrow, arrow_size.x, arrow_size.y);
 }
 
+//TODO: compress item - different from opensource
+static void
+_compress_item(Evas_Object *obj)
+{
+   Widget_Data *wd;
+   Eina_List *elist;
+   Elm_Ctxpopup_Item *item;
+
+   wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   EINA_LIST_FOREACH(wd->items, elist, item)
+     {
+           edje_object_signal_emit(item->base.view, "elm,state,compress", "elm");
+     }
+}
+
 static void
 _sizing_eval(Evas_Object *obj)
 {
@@ -625,6 +642,11 @@ _sizing_eval(Evas_Object *obj)
 
    //Base
    wd->dir = _calc_base_geometry(obj, &rect);
+
+   //TODO: compress item - different from opensource
+   if (!wd->horizontal && !wd->content)
+      _compress_item(obj);
+
    _update_arrow(obj, wd->dir);
    _shift_base_by_arrow(wd->arrow, wd->dir, &rect);
 
