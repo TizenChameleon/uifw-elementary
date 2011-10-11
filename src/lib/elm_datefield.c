@@ -633,13 +633,23 @@ _datefield_clicked_cb(void *data, Evas_Object *obj __UNUSED__,
    //Load the options list
    _load_field_options(data, diskselector, wd->selected_it);
 
+   elm_ctxpopup_direction_priority_set(wd->ctxpopup, ELM_CTXPOPUP_DIRECTION_DOWN,
+               ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_LEFT,
+               ELM_CTXPOPUP_DIRECTION_RIGHT);
    elm_ctxpopup_content_set(wd->ctxpopup, diskselector);
    snprintf(buf,sizeof(buf), EDC_PART_ITEM_STR, wd->selected_it->location);
    edj_part = edje_object_part_object_get(wd->base, buf);
    evas_object_geometry_get(edj_part, &x, &y, &w, &h);
    evas_object_move(wd->ctxpopup, (x+w/2), (y+h));
+
+   //If arrow direction is downwards, move ctxpopup to the top of datefield
    if (elm_ctxpopup_direction_get (wd->ctxpopup) == ELM_CTXPOPUP_DIRECTION_DOWN)
-     evas_object_move(wd->ctxpopup, (x+w/2), y);
+     {
+        elm_ctxpopup_direction_priority_set(wd->ctxpopup, ELM_CTXPOPUP_DIRECTION_UP,
+               ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_LEFT,
+               ELM_CTXPOPUP_DIRECTION_RIGHT);
+        evas_object_move(wd->ctxpopup, (x+w/2), y);
+     }
    evas_object_show(wd->ctxpopup);
 
    evas_object_geometry_get(diskselector, NULL, NULL, &disksel_width, NULL);
@@ -872,9 +882,6 @@ elm_datefield_add(Evas_Object *parent)
    wd->ctxpopup = elm_ctxpopup_add(elm_widget_top_get(obj));
    elm_object_style_set(wd->ctxpopup, "datefield/default");
    elm_ctxpopup_horizontal_set(wd->ctxpopup, EINA_TRUE);
-   elm_ctxpopup_direction_priority_set(wd->ctxpopup,ELM_CTXPOPUP_DIRECTION_DOWN,
-               ELM_CTXPOPUP_DIRECTION_UP,ELM_CTXPOPUP_DIRECTION_LEFT,
-               ELM_CTXPOPUP_DIRECTION_RIGHT);
    evas_object_size_hint_weight_set(wd->ctxpopup, EVAS_HINT_EXPAND,
                                     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->ctxpopup, EVAS_HINT_FILL,EVAS_HINT_FILL);
@@ -1138,6 +1145,8 @@ elm_datefield_item_min_set(Evas_Object *obj, Elm_Datefield_ItemType itemtype,
       it->min = it->default_min;
    else
       it->min = value;
+
+   if(it->min > it->max ) it->max = it->min;
    it->abs_min = abs_limit;
    _field_value_set(obj, it->type, *(it->value), EINA_FALSE);  // Trigger the validation
 }
@@ -1235,6 +1244,8 @@ elm_datefield_item_max_set(Evas_Object *obj, Elm_Datefield_ItemType itemtype,
       it->max = it->default_max;
    else
       it->max = value;
+
+   if(it->max < it->min) it->min = it->max;
    it->abs_max = abs_limit;
 
    _field_value_set(obj, it->type, *(it->value), EINA_FALSE);  // Trigger the validation
