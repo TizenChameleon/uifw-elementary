@@ -190,9 +190,9 @@ _win_rotated(Evas_Object *obj)
 
    if (!wd) return;
    angle = elm_win_rotation_get(wd->win);
-   while (angle < 0) angle += 360;
-   while (angle >= 360) angle -= 360;
-   if (angle%90 != 0) return;
+   if (angle % 90) return;
+   angle %= 360;
+   if (angle < 0) angle += 360;
    wd->angle = angle;
    _update_geometry_on_rotation(obj, wd->angle, &x, &y, &w);
    evas_object_move(wd->win, x, y);
@@ -315,7 +315,7 @@ _update_geometry_on_rotation(Evas_Object *obj, int angle, int *x, int *y, int *w
    Evas_Coord root_w, root_h;
 
    /*
-   * manual calculate win_tickernoti_indi window position & size
+   * manually calculate win_tickernoti_indi window position & size
    *  - win_indi is not full size window
    */
    ecore_x_window_size_get(ecore_x_window_root_first_get(), &root_w, &root_h);
@@ -325,12 +325,12 @@ _update_geometry_on_rotation(Evas_Object *obj, int angle, int *x, int *y, int *w
       case 90:
          *w = root_h;
          if (wd->orient == ELM_TICKERNOTI_ORIENT_BOTTOM)
-           *x = root_w-wd->noti_height;
+           *x = root_w - wd->noti_height;
          break;
       case 270:
          *w = root_h;
          if (!(wd->orient == ELM_TICKERNOTI_ORIENT_BOTTOM))
-           *x = root_w-wd->noti_height;
+           *x = root_w - wd->noti_height;
          break;
       case 180:
          *w = root_w;
@@ -520,10 +520,10 @@ elm_tickernoti_rotation_set(Evas_Object *obj, int angle)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-   if (angle%90 != 0) return;
-
-   while (angle < 0) angle += 360;
-   while (angle >= 360) angle -= 360;
+   if (angle % 90) return;
+   angle %= 360;
+   if (angle < 0) angle += 360;
+   wd->angle = angle;
    elm_win_rotation_with_resize_set (wd->win, angle);
 }
 
