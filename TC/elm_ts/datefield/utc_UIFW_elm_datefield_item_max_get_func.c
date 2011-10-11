@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_datefield_add_func_01(void);
-static void utc_UIFW_elm_datefield_add_func_02(void);
+static void utc_UIFW_elm_datefield_item_max_get_func_01(void);
+static void utc_UIFW_elm_datefield_item_max_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,8 +45,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_datefield_add_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_datefield_add_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_datefield_item_max_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_datefield_item_max_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -73,14 +73,18 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_datefield_add()
+ * @brief Positive test case of elm_datefield_item_max_get()
  */
-static void utc_UIFW_elm_datefield_add_func_01(void)
+static void utc_UIFW_elm_datefield_item_max_get_func_01(void)
 {
-	datefield = elm_datefield_add(main_win);
+	int year_max;
 
-	if (!datefield) {
-		tet_infoline("elm_datefield_add() failed in positive test case");
+	datefield = elm_datefield_add(main_win);
+	elm_datefield_item_max_set(datefield, ELM_DATEFIELD_YEAR, 120, EINA_FALSE);
+	year_max = elm_datefield_item_max_get(datefield, ELM_DATEFIELD_YEAR);
+
+	if (!(year_max == 120)) {
+		tet_infoline("elm_datefield_item_max_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -91,17 +95,14 @@ static void utc_UIFW_elm_datefield_add_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_datefield_add()
+ * @brief Negative test case of ug_init elm_datefield_item_max_get()
  */
-static void utc_UIFW_elm_datefield_add_func_02(void)
+static void utc_UIFW_elm_datefield_item_max_get_func_02(void)
 {
-	datefield = elm_datefield_add(NULL);
+	int year_max;
 
-	if (datefield) {
-		tet_infoline("elm_datefield_add() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
+	datefield = elm_datefield_add(main_win);
+	year_max = elm_datefield_item_max_get(NULL, ELM_DATEFIELD_YEAR);
 
 	evas_object_show(datefield);
 

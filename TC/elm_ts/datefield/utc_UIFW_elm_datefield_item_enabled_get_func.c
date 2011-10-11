@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_datefield_layout_get_func_01(void);
-static void utc_UIFW_elm_datefield_layout_get_func_02(void);
+static void utc_UIFW_elm_datefield_item_enabled_get_func_01(void);
+static void utc_UIFW_elm_datefield_item_enabled_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,9 +45,9 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_datefield_layout_get_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_datefield_layout_get_func_02, NEGATIVE_TC_IDX },
-    { NULL, 0 }
+	{ utc_UIFW_elm_datefield_item_enabled_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_datefield_item_enabled_get_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -66,53 +66,46 @@ static void cleanup(void)
 	}
 	if ( NULL != main_win ) {
 		evas_object_del(main_win);
-	       	main_win = NULL;
+		main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_datefield_layout_get()
+ * @brief Positive test case of elm_datefield_item_enabled_get()
  */
-static void utc_UIFW_elm_datefield_layout_get_func_01(void)
+static void utc_UIFW_elm_datefield_item_enabled_get_func_01(void)
 {
-	int r = 0;
+	Eina_Bool y_enable = EINA_FALSE, h_enable = EINA_FALSE;
 
 	datefield = elm_datefield_add(main_win);
-   	r = elm_datefield_layout_get(datefield);
+	elm_datefield_format_set(datefield, "%B %d, %Y");
+	elm_datefield_item_enabled_set(datefield, ELM_DATEFIELD_YEAR, EINA_FALSE);
+	y_enable = elm_datefield_item_enabled_get(datefield, ELM_DATEFIELD_YEAR);
+	h_enable = elm_datefield_item_enabled_get(datefield, ELM_DATEFIELD_HOUR);
 
-	if (r != ELM_DATEFIELD_LAYOUT_DATEANDTIME) {
-		tet_infoline("elm_datefield_layout_get() failed in positive test case");
+	if (!((!y_enable) && (h_enable))) {
+		tet_infoline("elm_datefield_item_enabled_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
 
-	evas_object_resize(datefield, 480, 80);
-	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
 
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_datefield_layout_get()
+ * @brief Negative test case of ug_init elm_datefield_item_enabled_get()
  */
-static void utc_UIFW_elm_datefield_layout_get_func_02(void)
+static void utc_UIFW_elm_datefield_item_enabled_get_func_02(void)
 {
-	int r = 0;
+	Eina_Bool y_enable;
 
 	datefield = elm_datefield_add(main_win);
-	r = elm_datefield_layout_get(NULL);
+	y_enable = elm_datefield_item_enabled_get(NULL, ELM_DATEFIELD_YEAR);
 
-	if (r == ELM_DATEFIELD_LAYOUT_DATEANDTIME) {
-		tet_infoline("elm_datefield_layout_get() failed in negative test case");
-		tet_result(TET_FAIL);
-		return;
-	}
-
-	evas_object_resize(datefield, 480, 80);
-	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
 
 	tet_result(TET_PASS);

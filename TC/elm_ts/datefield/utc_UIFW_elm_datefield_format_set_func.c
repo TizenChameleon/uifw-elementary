@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_datefield_date_set_func_01(void);
-static void utc_UIFW_elm_datefield_date_set_func_02(void);
+static void utc_UIFW_elm_datefield_format_set_func_01(void);
+static void utc_UIFW_elm_datefield_format_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,9 +45,9 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_datefield_date_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_datefield_date_set_func_02, NEGATIVE_TC_IDX },
-    { NULL, 0 }
+	{ utc_UIFW_elm_datefield_format_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_datefield_format_set_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -60,61 +60,57 @@ static void startup(void)
 
 static void cleanup(void)
 {
-	if ( NULL != datefield) {
+	if ( NULL != datefield ) {
 		evas_object_del(datefield);
 		datefield = NULL;
 	}
 	if ( NULL != main_win ) {
 		evas_object_del(main_win);
-	       	main_win = NULL;
+		main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_datefield_date_set()
+ * @brief Positive test case of elm_datefield_format_set()
  */
-static void utc_UIFW_elm_datefield_date_set_func_01(void)
+static void utc_UIFW_elm_datefield_format_set_func_01(void)
 {
-	int year, month, day, hour, min;
+	char *fmt = "%B %d, %Y";
 
 	datefield = elm_datefield_add(main_win);
-	elm_datefield_date_set(datefield, 2010, 10, 14, 1, 36);
-	elm_datefield_date_get(datefield, &year, &month, &day, &hour, &min);
+	elm_datefield_format_set(datefield, fmt);
 
-	if (!(year == 2010 && month == 10 && day == 14 && hour == 1 && min == 36)) {
-		tet_infoline("elm_datefield_date_set() failed in positive test case");
+	if (strncmp(elm_datefield_format_get(datefield), fmt, strlen(fmt))) {
+		tet_infoline("elm_datefield_format_set() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
 
-	evas_object_resize(datefield, 480, 80);
-	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
 
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_datefield_date_set()
+ * @brief Negative test case of ug_init elm_datefield_format_set()
  */
-static void utc_UIFW_elm_datefield_date_set_func_02(void)
+static void utc_UIFW_elm_datefield_format_set_func_02(void)
 {
-	int year, month, day, hour, min;
+	char *fmt1, *fmt2;
 
 	datefield = elm_datefield_add(main_win);
-   	elm_datefield_date_set(NULL, 2010, 10, 14, 1, 36);
-	elm_datefield_date_get(datefield, &year, &month, &day, &hour, &min);
+	fmt1 = elm_datefield_format_get(datefield);
+	elm_datefield_format_set(datefield, NULL);
+	fmt2 = elm_datefield_format_get(datefield);
 
-	if ((year == 2010 && month == 10 && day == 14 && hour == 1 && min <= 36)) {
-		tet_infoline("elm_datefield_date_set() failed in negative test case");
+	if (strncmp(fmt1, fmt2, strlen(fmt1))) {
+		tet_infoline("elm_datefield_format_set() failed in negative test case");
 		tet_result(TET_FAIL);
 		return;
 	}
 
-	evas_object_resize(datefield, 480, 80);
-	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
 
 	tet_result(TET_PASS);
