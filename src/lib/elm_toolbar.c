@@ -609,6 +609,18 @@ _resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event
 }
 
 static void
+_select_filter(Elm_Toolbar_Item *it, Evas_Object *obj __UNUSED__, const char *emission, const char *source __UNUSED__)
+{
+   int button;
+   char buf[sizeof("mouse,clicked,") + 1];
+
+   button = atoi(emission + sizeof("mouse,clicked,") - 1);
+   if (button == 1) return; /* regular left click event */
+   snprintf(buf, sizeof(buf), "elm,action,click,%d", button);
+   edje_object_signal_emit(it->base.view, buf, "elm");
+}
+
+static void
 _select(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    _item_select(data);
@@ -679,6 +691,8 @@ _item_new(Evas_Object *obj, const char *icon, const char *label, Evas_Smart_Cb f
                          elm_widget_style_get(obj));
    edje_object_signal_callback_add(VIEW(it), "elm,action,click", "elm",
                                    _select, it);
+   edje_object_signal_callback_add(VIEW(it), "mouse,clicked,*", "*",
+                                   (Edje_Signal_Cb)_select_filter, it);
    edje_object_signal_callback_add(VIEW(it), "elm,mouse,in", "elm",
                                    _mouse_in, it);
    edje_object_signal_callback_add(VIEW(it), "elm,mouse,out", "elm",
