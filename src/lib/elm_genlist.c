@@ -2417,7 +2417,7 @@ _item_block_position(Item_Block *itb,
                     }
                   else
                     {
-                       if (!it->dragging) _item_unrealize(it, EINA_FALSE);
+                       if (!it->dragging && (!it->wd->item_moving_effect_timer)) _item_unrealize(it, EINA_FALSE);
                     }
                }
              in++;
@@ -5213,6 +5213,8 @@ _item_moving_effect_timer_cb(void *data)
                   it = elm_genlist_item_prev_get(it);
                }
           }
+        if (wd->calc_job) ecore_job_del(wd->calc_job);
+        wd->calc_job = ecore_job_add(_calc_job, wd);
      }
    else
      {
@@ -5265,8 +5267,6 @@ _item_moving_effect_timer_cb(void *data)
         _item_auto_scroll(wd);
         evas_object_lower(wd->alpha_bg);
         evas_object_hide(wd->alpha_bg);
-        if (wd->calc_job) ecore_job_del(wd->calc_job);
-        wd->calc_job = ecore_job_add(_calc_job, wd);
         elm_smart_scroller_bounce_animator_disabled_set(wd->scr, EINA_FALSE);
         wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_NONE;
 
