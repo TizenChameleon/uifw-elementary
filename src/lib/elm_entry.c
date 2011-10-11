@@ -2323,6 +2323,7 @@ _event_selection_clear(void *data __UNUSED__, int type __UNUSED__, void *event _
 
    if (cnpwidgetdata == data)
      {
+        evas_object_smart_callback_call(data, SIG_SELECTION_PASTE, NULL);
         elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data,NULL,NULL);
      }
 
