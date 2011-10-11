@@ -669,7 +669,7 @@ _parse_format( Evas_Object *obj )
 {
    Widget_Data *wd;
    Datefield_Item *it = NULL;
-   unsigned int len, idx, location = 0;
+   unsigned int len = 0, idx, location = 0;
    char separator[MAX_SEPARATOR_LEN];
    char *fmt_ptr;
    char cur;
