@@ -216,7 +216,6 @@ PKG_CHECK_MODULES([ELEMENTARY],
     ecore-file >= 1.0.0
     ecore-imf >= 1.0.0
     edje >= 1.0.999
-    icu-i18n >= 4.6.0
    ]
 )
 
@@ -251,7 +250,7 @@ PKG_CHECK_MODULES([EMOTION],
 
 AM_CONDITIONAL([HAVE_EMOTION], [test "x${have_emotion}" = "xyes"])
 
-requirement_elm="edje >= 1.0.0 ecore-file >= 1.0.0 ecore-evas >= 1.0.0 ecore >= 1.0.0 evas >= 1.0.0 eet >= 1.4.0 eina >= 1.0.0 icu-i18n >= 4.6.0 ${requirement_elm}"
+requirement_elm="edje >= 1.0.0 ecore-file >= 1.0.0 ecore-evas >= 1.0.0 ecore >= 1.0.0 evas >= 1.0.0 eet >= 1.4.0 eina >= 1.0.0 ${requirement_elm}"
 
 have_elementary_x="no"
 want_elementary_x="auto"
