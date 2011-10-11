@@ -1,3 +1,15 @@
+elementary (1.0.0+svn.61256slp2+build49) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [Genlist] Fixed datefield style item double realize problem when added for item moving animation.
+       [ctxpopup] compress item
+       [Genlist] Upstream merge r63898. Raise genlist group index when the
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build49
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Wed, 12 Oct 2011 01:26:00 +0900
+
 elementary (1.0.0+svn.61256slp2+build48) unstable; urgency=low
 
   * Package Upload.
