@@ -69,6 +69,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_entry_imf_context_get_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_entry_imf_context_get_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -127,7 +128,7 @@ static void utc_UIFW_elm_entry_imf_context_get_func_01(void)
 	test_eo = elm_entry_add(test_win);
 	ctx = elm_entry_imf_context_get(test_eo);
 
-	TET_CHECK_FAIL(NULL, ctx);
+	TET_CHECK_PASS(NULL, ctx);
 
 	tet_result(TET_PASS);
 	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_entry_imf_context_get");

@@ -508,8 +508,7 @@ elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
       elm_widget_sub_object_del(obj, wd->licon);
    if (icon)
      {
-        if (!(edje_object_part_swallow(wd->base, "left_icon", icon)))
-           return;
+        edje_object_part_swallow(wd->base, "left_icon", icon);
         wd->licon = icon;
         elm_widget_sub_object_add(obj, icon);
         evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
@@ -558,8 +557,7 @@ elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
       elm_widget_sub_object_del(obj, wd->ricon);
    if (icon)
      {
-        if ( !(edje_object_part_swallow(wd->base, "right_icon", icon)) )
-           return;
+        edje_object_part_swallow(wd->base, "right_icon", icon);
         wd->ricon = icon;
         elm_widget_sub_object_add(obj, icon);
         evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,

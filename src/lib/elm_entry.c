@@ -4870,6 +4870,7 @@ EAPI void
 elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
    if (wd->wrap_w == w) return;
    wd->wrap_w = w;
    _sizing_eval(obj);
@@ -4886,6 +4887,7 @@ EAPI Evas_Coord
 elm_entry_wrap_width_get(const Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
    return wd->wrap_w;
 }
 

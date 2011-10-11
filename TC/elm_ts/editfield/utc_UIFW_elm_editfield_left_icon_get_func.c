@@ -48,6 +48,7 @@ enum {
 struct tet_testlist tet_testlist[] = {
 	{ utc_UIFW_elm_editfield_left_icon_get_func_01, POSITIVE_TC_IDX },
 	{ utc_UIFW_elm_editfield_left_icon_get_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -103,7 +104,7 @@ static void utc_UIFW_elm_editfield_left_icon_get_func_01(void)
 static void utc_UIFW_elm_editfield_left_icon_get_func_02(void)
 {
 	Evas_Object *r = NULL;
-   	r = elm_editfield_left_icon_get(ef);
+   	r = elm_editfield_left_icon_get(NULL);
 
 	if (r) {
 		tet_infoline("elm_editfield_left_icon_get() failed in negative test case");
