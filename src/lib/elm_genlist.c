@@ -659,7 +659,8 @@ _show_region_hook(void        *data,
    //x & y are screen coordinates, Add with pan coordinates
    x += wd->pan_x;
    y += wd->pan_y;
-   elm_smart_scroller_child_region_show(wd->scr, x, y, w, h);
+   if(wd->rename_it) elm_genlist_item_bring_in(wd->rename_it);
+   else elm_smart_scroller_child_region_show(wd->scr, x, y, w, h);
 }
 
 static void

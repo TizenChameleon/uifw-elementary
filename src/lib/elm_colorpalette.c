@@ -249,9 +249,10 @@ EAPI Evas_Object *elm_colorpalette_add(Evas_Object *parent)
    Eina_List *colors;
    const Eina_List *l;
    const char *color_code;
-   int color_num = 0;
-   int row = 0;
-   int col = 0;
+   const char *rowstr, *colstr, *color_numstr;
+   int color_num = 10;
+   int row = 2;
+   int col = 5;
    int index = 0;
 
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
@@ -267,10 +268,13 @@ EAPI Evas_Object *elm_colorpalette_add(Evas_Object *parent)
    _elm_theme_object_set(obj, wd->base, "colorpalette", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
 
-   color_num = atoi(edje_object_data_get(wd->base, "color_num")); /* Need to get this value
+   color_numstr = edje_object_data_get(wd->base, "color_num");
+   if (color_numstr) color_num = atoi(color_numstr); /* Need to get this value
    from edc inorder to allocate memory in advance: Think of a better way*/
-   row = atoi(edje_object_data_get(wd->base, "row"));
-   col = atoi(edje_object_data_get(wd->base, "col"));
+   rowstr = edje_object_data_get(wd->base, "row");
+   if (rowstr) row = atoi(rowstr);
+   colstr = edje_object_data_get(wd->base, "col");
+   if (colstr) col = atoi(colstr);
    wd->color = (Elm_Colorpalette_Color*) calloc (color_num, sizeof(Elm_Colorpalette_Color));
    colors = elm_widget_stringlist_get(edje_object_data_get(wd->base, "colors"));
    EINA_LIST_FOREACH(colors, l, color_code)
