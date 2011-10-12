@@ -506,6 +506,7 @@ _title_prev_btn_del(void *data,
    Elm_Naviframe_Item *it = data;
    it->back_btn = EINA_FALSE;
    it->title_prev_btn = NULL;
+   edje_object_signal_emit(it->base.view, "elm,state,prev_btn,hide", "elm");
 }
 
 static void
@@ -516,6 +517,7 @@ _title_next_btn_del(void *data,
 {
    Elm_Naviframe_Item *it = data;
    it->title_next_btn = NULL;
+   edje_object_signal_emit(it->base.view, "elm,state,next_btn,hide", "elm");
 }
 
 static void
@@ -594,7 +596,13 @@ _title_prev_btn_set(Elm_Naviframe_Item *it,
 
    it->title_prev_btn = btn;
 
-   if (!btn) return;
+   if (!btn)
+     {
+        edje_object_signal_emit(it->base.view,
+                                "elm,state,prev_btn,hide",
+                                "elm");
+        return;
+     }
 
    elm_widget_sub_object_add(it->base.widget, btn);
    evas_object_event_callback_add(btn,
@@ -602,6 +610,7 @@ _title_prev_btn_set(Elm_Naviframe_Item *it,
                                   _title_prev_btn_del,
                                   it);
    edje_object_part_swallow(it->base.view, "elm.swallow.prev_btn", btn);
+   edje_object_signal_emit(it->base.view, "elm,state,prev_btn,show", "elm");
    it->back_btn = back_btn;
 
    _item_sizing_eval(it);
@@ -617,7 +626,13 @@ _title_next_btn_set(Elm_Naviframe_Item *it, Evas_Object *btn)
 
    it->title_next_btn = btn;
 
-   if (!btn) return;
+   if (!btn)
+     {
+        edje_object_signal_emit(it->base.view,
+                                "elm,state,next_btn,hide",
+                                "elm");
+        return;
+     }
 
    elm_widget_sub_object_add(it->base.widget, btn);
    evas_object_event_callback_add(btn,
@@ -625,6 +640,7 @@ _title_next_btn_set(Elm_Naviframe_Item *it, Evas_Object *btn)
                                   _title_next_btn_del,
                                   it);
    edje_object_part_swallow(it->base.view, "elm.swallow.next_btn", btn);
+   edje_object_signal_emit(it->base.view, "elm,state,next_btn,show", "elm");
 
    _item_sizing_eval(it);
 }
