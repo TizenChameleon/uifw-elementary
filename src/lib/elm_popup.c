@@ -202,6 +202,7 @@ _elm_popup_add_button(Evas_Object *obj, const char *text, int response_id)
    btn = elm_button_add(obj);
    snprintf(buf, sizeof(buf), "popup_button/%s", elm_widget_style_get(obj));
    elm_object_style_set(btn, buf);
+   elm_object_focus_allow_set(btn, EINA_FALSE);
    elm_object_text_set(btn, text);
    adata->response_id = response_id;
    adata->obj = obj;
