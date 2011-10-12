@@ -654,7 +654,11 @@ _move_scroller(void *data)
      }
 
    evas_object_geometry_get(wd->scroller, NULL, &y, &w, &h);
-   elm_smart_scroller_child_region_show(wd->scroller, w / wd->display_item_num * i, y, w, h);
+   //move scroller in two steps for getting smooth launching effect.
+   if (i > 2)
+     elm_smart_scroller_child_region_show(wd->scroller, w / wd->display_item_num * (i-2), y, w, h);
+   elm_smart_scroller_region_bring_in(wd->scroller, w / wd->display_item_num * i, y, w, h);
+
    _select_item(dit);
    if (wd->idler)
      {
