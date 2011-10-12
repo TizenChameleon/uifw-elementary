@@ -28,6 +28,8 @@ void elm_smart_scroller_object_theme_set        (Evas_Object *parent, Evas_Objec
 void elm_smart_scroller_mirrored_set            (Evas_Object *obj, Eina_Bool mirrored);
 void elm_smart_scroller_hold_set                (Evas_Object *obj, Eina_Bool hold);
 void elm_smart_scroller_freeze_set              (Evas_Object *obj, Eina_Bool freeze);
+void elm_smart_scroller_gravity_set             (Evas_Object *obj, double x, double y);
+void elm_smart_scroller_gravity_get             (Evas_Object *obj, double *x, double *y);
 void elm_smart_scroller_bounce_allow_set        (Evas_Object *obj, Eina_Bool horiz, Eina_Bool vert);
 void elm_smart_scroller_bounce_allow_get        (const Evas_Object *obj, Eina_Bool *horiz, Eina_Bool *vert);
 void elm_smart_scroller_paging_set              (Evas_Object *obj, double pagerel_h, double pagerel_v, Evas_Coord pagesize_h, Evas_Coord pagesize_v);
