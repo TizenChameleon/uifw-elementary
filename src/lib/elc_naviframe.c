@@ -13,7 +13,7 @@ struct _Widget_Data
    Evas_Object  *rect;
    Eina_Bool     preserve: 1;
    Eina_Bool     auto_pushed: 1;
-   Eina_Bool     pass_events: 1;
+   Eina_Bool     freeze_events: 1;
 };
 
 struct _Elm_Naviframe_Content_Item_Pair
@@ -446,7 +446,7 @@ _hide(void *data __UNUSED__,
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (wd->pass_events)
+   if (wd->freeze_events)
      evas_object_hide(wd->rect);
 }
 
@@ -725,7 +725,7 @@ _show_finished(void *data,
    evas_object_smart_callback_call(it->base.widget,
                                    SIG_TRANSITION_FINISHED,
                                    (void *) EINA_TRUE);
-   if (wd->pass_events)
+   if (wd->freeze_events)
      {
         evas_object_hide(wd->rect);
         //FIXME:
@@ -792,7 +792,7 @@ elm_naviframe_add(Evas_Object *parent)
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
    wd->auto_pushed = EINA_TRUE;
-   wd->pass_events = EINA_TRUE;
+   wd->freeze_events = EINA_TRUE;
 
    return obj;
 }
@@ -872,7 +872,7 @@ elm_naviframe_item_push(Evas_Object *obj,
    prev_it = ELM_CAST(elm_naviframe_top_item_get(obj));
    if (prev_it)
      {
-        if (wd->pass_events)
+        if (wd->freeze_events)
           {
              evas_object_show(wd->rect);
              //FIXME:
@@ -911,7 +911,7 @@ elm_naviframe_item_pop(Evas_Object *obj)
    prev_it = ELM_CAST(elm_naviframe_top_item_get(obj));
    if (prev_it)
      {
-        if (wd->pass_events)
+        if (wd->freeze_events)
           {
              evas_object_show(wd->rect);
              //FIXME:
@@ -1061,6 +1061,14 @@ elm_naviframe_item_style_set(Elm_Object_Item *it, const char *item_style)
 
    navi_it->title_visible = EINA_TRUE;
    _item_sizing_eval(navi_it);
+
+   wd = elm_widget_data_get(navi_it->base.widget);
+   if (wd && wd->freeze_events)
+     {
+        evas_object_hide(wd->rect);
+        //FIXME:
+        evas_object_pass_events_set(wd->base, EINA_FALSE);
+     }
 }
 
 EAPI const char *
@@ -1099,18 +1107,18 @@ elm_naviframe_item_title_visible_get(const Elm_Object_Item *it)
 EAPI void
 elm_naviframe_prev_btn_auto_pushed_set(Evas_Object *obj, Eina_Bool auto_pushed)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
+   if (!wd) return;
    wd->auto_pushed = !!auto_pushed;
 }
 
 EAPI Eina_Bool
 elm_naviframe_prev_btn_auto_pushed_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
+   if (!wd) return EINA_FALSE;
    return wd->auto_pushed;
 }
 
