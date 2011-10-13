@@ -1718,6 +1718,7 @@ _icon_unfocused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUS
    if (it) it->defer_unrealize = EINA_FALSE;
 }
 
+static void
 _item_del_hook(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Elm_Genlist_Item *it = event_info;
@@ -4584,11 +4585,10 @@ elm_genlist_item_item_class_get(const Elm_Genlist_Item *it)
 }
 static Evas_Object *
 _elm_genlist_item_label_create(void        *data,
-                               Evas_Object *obj __UNUSED__,
-                               Evas_Object *tooltip,
+                               Evas_Object *obj,
                                void        *item __UNUSED__)
 {
-   Evas_Object *label = elm_label_add(tooltip);
+   Evas_Object *label = elm_label_add(obj);
    if (!label)
      return NULL;
    elm_object_style_set(label, "tooltip");
