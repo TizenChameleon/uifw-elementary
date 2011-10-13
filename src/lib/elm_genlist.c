@@ -81,6 +81,7 @@ struct _Widget_Data
    Eina_Bool         effect_mode : 1;
    Eina_Bool         auto_scrolled : 1;
    Eina_Bool         pan_changed : 1;
+   Eina_Bool         drag_started : 1;
    int               edit_mode;
    Ecore_Animator   *item_moving_effect_timer;
    Evas_Object      *alpha_bg;
@@ -1047,7 +1048,7 @@ _mouse_move(void        *data,
           _item_unselect(it);
         if (dy < 0)
           {
-             if (ady > adx)
+             if ((ady > adx) && (!it->wd->drag_started))
                evas_object_smart_callback_call(it->base.widget,
                                                SIG_DRAG_START_UP, it);
              else
@@ -1062,7 +1063,7 @@ _mouse_move(void        *data,
           }
         else
           {
-             if (ady > adx)
+             if ((ady > adx) && (!it->wd->drag_started))
                evas_object_smart_callback_call(it->base.widget,
                                                SIG_DRAG_START_DOWN, it);
              else
@@ -1481,6 +1482,65 @@ _mouse_up(void        *data,
           }
         _item_highlight(it);
         _item_select(it);
+     }
+}
+
+static void
+_mouse_down_scroller(void        *data,
+                     Evas        *evas __UNUSED__,
+                     Evas_Object *obj __UNUSED__,
+                     void        *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+
+   if (!wd) return;
+   wd->drag_started = EINA_FALSE;
+}
+
+static void
+_mouse_up_scroller(void        *data,
+                   Evas        *evas __UNUSED__,
+                   Evas_Object *obj __UNUSED__,
+                   void        *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+
+   if (!wd) return;
+   wd->drag_started = EINA_FALSE;
+}
+
+static void
+_mouse_move_scroller(void        *data,
+                     Evas        *evas __UNUSED__,
+                     Evas_Object *obj __UNUSED__,
+                     void        *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Event_Mouse_Move *ev = event_info;
+   Evas_Coord minw = 0, minh = 0, dx, dy, adx, ady;
+
+   if (!wd) return;
+   if (wd->dragging_queue || wd->drag_started) return;
+
+   elm_coords_finger_size_adjust(1, &minw, 1, &minh);
+   dx = ev->cur.canvas.x - ev->prev.canvas.x;
+   dy = ev->cur.canvas.y - ev->prev.canvas.y;
+   adx = dx;
+   ady = dy;
+   if (adx < 0) adx = -dx;
+   if (ady < 0) ady = -dy;
+   if (((ady < minh) && (ady > minh / 2)) && (ady > adx))
+     {
+        if (dy < 0)
+          {
+             evas_object_smart_callback_call(data, SIG_DRAG_START_UP, NULL);
+             wd->drag_started = EINA_TRUE;
+          }
+        else
+          {
+             evas_object_smart_callback_call(data, SIG_DRAG_START_DOWN, NULL);
+             wd->drag_started = EINA_TRUE;
+          }
      }
 }
 
@@ -3331,6 +3391,12 @@ elm_genlist_add(Evas_Object *parent)
    elm_widget_on_show_region_hook_set(obj, _show_region_hook, obj);
 
    wd->scr = elm_smart_scroller_add(e);
+   evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_MOUSE_DOWN,
+                                  _mouse_down_scroller, obj);
+   evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_MOUSE_UP,
+                                  _mouse_up_scroller, obj);
+   evas_object_event_callback_add(wd->scr, EVAS_CALLBACK_MOUSE_MOVE,
+                                  _mouse_move_scroller, obj);
    elm_smart_scroller_widget_set(wd->scr, obj);
    elm_smart_scroller_object_theme_set(obj, wd->scr, "genlist", "base",
                                        elm_widget_style_get(obj));
