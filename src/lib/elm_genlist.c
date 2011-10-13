@@ -59,7 +59,6 @@ struct _Widget_Data
    Eina_Bool         swipe : 1;
    Eina_Bool         reorder_mode : 1;
    Eina_Bool         reorder_pan_move : 1;
-   Eina_List        *dragging_queue;
    struct
    {
       Evas_Coord x, y;
@@ -1038,7 +1037,6 @@ _mouse_move(void        *data,
    if ((adx > minw) || (ady > minh))
      {
         it->dragging = EINA_TRUE;
-        it->wd->dragging_queue = eina_list_append(it->wd->dragging_queue, it);
         if (it->long_timer)
           {
              ecore_timer_del(it->long_timer);
@@ -1385,19 +1383,10 @@ _mouse_up(void        *data,
         ecore_timer_del(it->long_timer);
         it->long_timer = NULL;
      }
-   while (it->wd->dragging_queue)
+   if (it->dragging)
      {
-        Elm_Genlist_Item *dragging_it = NULL;
-        dragging_it = eina_list_data_get(it->wd->dragging_queue);
-        dragging_it->dragging = EINA_FALSE;
-        evas_object_smart_callback_call(dragging_it->base.widget, SIG_DRAG_STOP, dragging_it);
-        if (dragging_it->want_unrealize)
-          {
-             _item_unrealize(dragging_it, EINA_FALSE);
-             if (dragging_it->block->want_unrealize)
-               _item_block_unrealize(it->block);
-          }
-        it->wd->dragging_queue = eina_list_remove_list(it->wd->dragging_queue,it->wd->dragging_queue);
+        it->dragging = EINA_FALSE;
+        evas_object_smart_callback_call(it->base.widget, SIG_DRAG_STOP, it);
         dragged = 1;
      }
    if (it->swipe_timer)
@@ -1448,6 +1437,15 @@ _mouse_up(void        *data,
           _item_unselect(it);
         it->wd->wasselected = EINA_FALSE;
         return;
+     }
+   if (dragged)
+     {
+        if (it->want_unrealize)
+          {
+             _item_unrealize(it, EINA_FALSE);
+             if (it->block->want_unrealize)
+               _item_block_unrealize(it->block);
+          }
      }
    if ((it->disabled) || (dragged) || (it->display_only)) return;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return;
@@ -1520,7 +1518,7 @@ _mouse_move_scroller(void        *data,
    Evas_Coord minw = 0, minh = 0, dx, dy, adx, ady;
 
    if (!wd) return;
-   if (wd->dragging_queue || wd->drag_started) return;
+   if (wd->drag_started) return;
 
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
    dx = ev->cur.canvas.x - ev->prev.canvas.x;
