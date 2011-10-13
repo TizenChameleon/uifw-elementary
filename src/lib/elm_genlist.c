@@ -1718,6 +1718,14 @@ _icon_unfocused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUS
    if (it) it->defer_unrealize = EINA_FALSE;
 }
 
+_item_del_hook(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+{
+   Elm_Genlist_Item *it = event_info;
+   if (!it) return;
+   if (it->wd->last_selected_item == it)
+     it->wd->last_selected_item = NULL;
+}
+
 static void
 _item_label_realize(Elm_Genlist_Item *it,
                     Evas_Object *target,
@@ -3389,6 +3397,7 @@ _item_new(Widget_Data                  *wd,
    it->mouse_cursor = NULL;
    it->expanded_depth = 0;
    elm_widget_item_text_get_hook_set(it, _item_label_hook);
+   elm_widget_item_del_cb_set(it, _item_del_hook);
 
    if (it->parent)
      {
