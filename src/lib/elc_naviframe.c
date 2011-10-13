@@ -1014,6 +1014,7 @@ elm_naviframe_item_style_set(Elm_Object_Item *it, const char *item_style)
    Eina_List *l;
    Elm_Naviframe_Content_Item_Pair *content_pair;
    Elm_Naviframe_Text_Item_Pair *text_pair;
+   Widget_Data *wd;
 
    char buf[256];
 
