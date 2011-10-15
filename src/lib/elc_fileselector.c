@@ -476,7 +476,10 @@ _home(void            *data,
       void *event_info __UNUSED__)
 {
    Evas_Object *fs = data;
-   _populate(fs, getenv("HOME"), NULL);
+   const char *path = getenv("HOME");
+   if (!path) path = "./";
+   _populate(fs, path, NULL);
+
 }
 
 static void
@@ -1128,12 +1131,14 @@ elm_fileselector_selected_get(const Evas_Object *obj)
      {
         const char *name;
         char buf[PATH_MAX];
+        char *dir;
 
+        dir = wd->only_folder ? ecore_file_dir_get(wd->path) : strdup(wd->path);
         name = elm_entry_entry_get(wd->filename_entry);
         snprintf(buf, sizeof(buf), "%s/%s",
-                 wd->only_folder ? ecore_file_dir_get(wd->path) : wd->path,
-                 name);
+                 dir, name);
         eina_stringshare_replace(&wd->selection, buf);
+        if (dir) free(dir);
         return wd->selection;
      }
 
