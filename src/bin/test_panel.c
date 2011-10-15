@@ -89,14 +89,22 @@ _fill_list(Evas_Object *obj)
    struct dirent *de;
    Eina_List *dirs = NULL, *l;
    char *real;
+   const char *home;
 
-   if (!(d = opendir(getenv("HOME")))) return;
+#ifdef _WIN32
+   home = evil_homedir_get();
+#else
+   home = getenv("HOME");
+#endif
+   if (!home)
+     home = "./";
+   if (!(d = opendir(home))) return;
    while ((de = readdir(d)))
      {
         char buff[PATH_MAX];
 
         if (de->d_name[0] == '.') continue;
-        snprintf(buff, sizeof(buff), "%s/%s", getenv("HOME"), de->d_name);
+        snprintf(buff, sizeof(buff), "%s/%s", home, de->d_name);
         if (!ecore_file_is_dir(buff)) continue;
         real = ecore_file_realpath(buff);
         dirs = eina_list_append(dirs, real);

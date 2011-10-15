@@ -147,6 +147,7 @@ _shot_file_get(Elm_Win *win)
                        sprintf(repname + (dotptr - tmp), "%03i",
                                win->shot.shot_counter + 1);
                        strcat(repname, dotptr);
+                       free(tmp);
                        return repname;
                     }
                }
@@ -2642,7 +2643,6 @@ _elm_ee_win_get(const Evas_Object *obj)
 EAPI Ecore_X_Window
 elm_win_xwindow_get(const Evas_Object *obj)
 {
-   Ecore_X_Window xwin = 0;
    Elm_Win *win;
    const char *type;
 
@@ -2652,10 +2652,9 @@ elm_win_xwindow_get(const Evas_Object *obj)
    if (type != widtype) return _elm_ee_win_get(obj);
 #ifdef HAVE_ELEMENTARY_X
    win = elm_widget_data_get(obj);
-   if (!win) return xwin;
+   if (!win) return 0;
    if (win->xwin) return win->xwin;
    if (win->parent) return elm_win_xwindow_get(win->parent);
 #endif
-   return xwin;
-   win = NULL;
+   return 0;
 }
