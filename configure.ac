@@ -182,6 +182,7 @@ dnl managed by evil
 esac
 AC_CHECK_FUNCS(strcasestr, AC_DEFINE(HAVE_STRCASESTR))
 AM_CONDITIONAL([BUILD_RUN], [test "x$have_socket" = "xyes"])
+AM_CONDITIONAL([BUILD_MODULES], [test "x$have_dlopen" = "xyes"])
 
 m4_ifdef([v_mic],
    [
