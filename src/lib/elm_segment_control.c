@@ -243,7 +243,7 @@ _segment_on(Elm_Segment_Item *it)
 static void
 _position_items(Widget_Data *wd)
 {
-   Eina_List *l;
+   Eina_List *l, *ll;
    Elm_Segment_Item *it;
    Eina_Bool rtl;
    int bx, by, bw, bh, pos;
@@ -253,6 +253,7 @@ _position_items(Widget_Data *wd)
 
    evas_object_geometry_get(wd->base, &bx, &by, &bw, &bh);
    wd->item_width = bw / wd->item_count;
+
    rtl = elm_widget_mirrored_get(wd->obj);
 
    if (rtl)
@@ -269,6 +270,11 @@ _position_items(Widget_Data *wd)
         else
           pos += wd->item_width;
      }
+   ll = eina_list_last(wd->seg_items);
+   it = ll->data;
+   evas_object_resize(it->base.view,
+                        (bw - ((wd->item_count - 1) * wd->item_width)),
+                        bh);
    _sizing_eval(wd->obj);
 }
 
