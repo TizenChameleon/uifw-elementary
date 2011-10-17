@@ -922,6 +922,54 @@ elm_scroller_propagate_events_get(const Evas_Object *obj)
    return elm_smart_scroller_propagate_events_get(wd->scr);
 }
 
+/**
+ * Set scrolling gravity on a scroller
+ *
+ * It set scrolling gravity. It adds scrolling weight values
+ * to the scroller. Usually it uses for stopping the scroller.
+ * To set y as 0.0 for lower growing child objects,
+ * even though child objects are added to bottom, the scroller doesn't move.
+ * To set y as 1.0 for upper growing child objects. And x is horizontal gravity.
+ * By default 0.0
+ *
+ * @param obj The scroller object
+ * @param x The scrolling horizontal gravity
+ * @param y The scrolling vertical gravity
+ *
+ * @ingroup Scroller
+ */
+EAPI void
+elm_scroller_gravity_set(Evas_Object *obj, double x, double y)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   elm_smart_scroller_gravity_set(wd->scr, x, y);
+}
+
+/**
+ * Get scrolling gravity values for a scroller
+ *
+ * This gets gravity values for a scroller. See
+ * elm_scroller_gravity_set() for more information
+ *
+ * @param obj The scroller object
+ * @param x The scrolling horizontal gravity
+ * @param y The scrolling vertical gravity
+ *
+ * @ingroup Scroller
+ */
+EAPI void
+elm_scroller_gravity_get(const Evas_Object *obj, double *x, double *y)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   elm_smart_scroller_gravity_get(wd->scr, x, y);
+}
+
 EAPI void
 elm_scroller_page_move_set(Evas_Object *obj, Eina_Bool set)
 {
