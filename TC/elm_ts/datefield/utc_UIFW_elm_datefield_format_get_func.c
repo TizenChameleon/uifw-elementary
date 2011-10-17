@@ -36,8 +36,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_datefield_time_mode_set_func_01(void);
-static void utc_UIFW_elm_datefield_time_mode_set_func_02(void);
+static void utc_UIFW_elm_datefield_format_get_func_01(void);
+static void utc_UIFW_elm_datefield_format_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -45,9 +45,9 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_datefield_time_mode_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_datefield_time_mode_set_func_02, NEGATIVE_TC_IDX },
-    { NULL, 0 }
+	{ utc_UIFW_elm_datefield_format_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_datefield_format_get_func_02, NEGATIVE_TC_IDX },
+	{ NULL, 0 }
 };
 
 static void startup(void)
@@ -66,42 +66,50 @@ static void cleanup(void)
 	}
 	if ( NULL != main_win ) {
 		evas_object_del(main_win);
-	       	main_win = NULL;
+		main_win = NULL;
 	}
 	elm_shutdown();
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
 /**
- * @brief Positive test case of elm_datefield_time_mode_set()
+ * @brief Positive test case of elm_datefield_format_get()
  */
-static void utc_UIFW_elm_datefield_time_mode_set_func_01(void)
+static void utc_UIFW_elm_datefield_format_get_func_01(void)
 {
-	datefield = elm_datefield_add(main_win);
-	elm_datefield_time_mode_set(datefield, EINA_FALSE);
+	const char *format = NULL;
 
-	if (elm_datefield_time_mode_get(datefield) != EINA_FALSE) {
-		tet_infoline("elm_datefield_time_mode_set() failed in positive test case");
+	datefield = elm_datefield_add(main_win);
+	elm_datefield_format_set(datefield, "%B %d, %Y");
+	format = elm_datefield_format_get(datefield);
+
+	if (strncmp(format, "%B %d, %Y", strlen(format))) {
+		tet_infoline("elm_datefield_format_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
 
-	evas_object_resize(datefield, 480, 80);
-	evas_object_move(datefield, 0, 40);
 	evas_object_show(datefield);
 
 	tet_result(TET_PASS);
 }
 
 /**
- * @brief Negative test case of ug_init elm_datefield_time_mode_set()
+ * @brief Negative test case of ug_init elm_datefield_format_get()
  */
-static void utc_UIFW_elm_datefield_time_mode_set_func_02(void)
+static void utc_UIFW_elm_datefield_format_get_func_02(void)
 {
+	const char *format = NULL;
+
 	datefield = elm_datefield_add(main_win);
-	elm_datefield_time_mode_set(NULL, EINA_TRUE);
-	evas_object_resize(datefield, 480, 80);
-	evas_object_move(datefield, 0, 40);
+	format = elm_datefield_format_get(NULL);
+
+	if (format) {
+		tet_infoline("elm_datefield_format_get() failed in negative test case");
+		tet_result(TET_FAIL);
+		return;
+	}
+
 	evas_object_show(datefield);
 
 	tet_result(TET_PASS);
