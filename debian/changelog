@@ -1,3 +1,15 @@
+elementary (1.0.0+svn.61256slp2+build53) unstable; urgency=low
+
+  * Package Uplaod.
+  * Important Changes
+       [Scroller] merge from upstream revision 64051, but didn't accept data/theme/widgets/ctxpopup.edc
+       [Genlist] Fixed show hook event of smart scroller position received by entry was focused and smart pan resized
+       [Genlist] Revert "[genlist] Added dragging queue for unrealize items that dragging option set by mouse move event"
+  * Git: 165.213.180.234:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build53
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Mon, 17 Oct 2011 19:35:43 +0900
+
 elementary (1.0.0+svn.61256slp2+build52) unstable; urgency=low
 
   * Package Upload.
