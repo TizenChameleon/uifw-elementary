@@ -182,6 +182,7 @@ struct _Elm_Config
    double         zoom_friction;
    unsigned char  thumbscroll_bounce_enable;
    double         thumbscroll_border_friction;
+   double         thumbscroll_sensitivity_friction;
    double         scroll_smooth_time_interval;
    double         scroll_smooth_amount;
    double         scroll_smooth_history_weight;
