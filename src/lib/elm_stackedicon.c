@@ -336,10 +336,11 @@ _icon_move_map(void *data, int interval_x, int interval_y)
 {
    Widget_Data *wd = (Widget_Data *)data;
    int i = 0;
-   int num = eina_list_count(wd->list);
+   int num;
    int x = 0, y = 0;
    if (!wd) return;
-   
+   num = eina_list_count(wd->list);
+
    for (i =0; i  < num; i++)
      {
         Elm_Stackedicon_Item *it = NULL;
@@ -526,8 +527,11 @@ _create_fake_image(Evas_Object *obj)
    // add shown icons
    EINA_LIST_REVERSE_FOREACH(wd->list, l, it) 
      {
-        if (it->index >= MAX_SHOWN_ITEM) continue;
-        if (it) _add_image_to_buffer(obj, e, it);
+        if (it)
+          {
+             if (it->index >= MAX_SHOWN_ITEM) continue;
+             _add_image_to_buffer(obj, e, it);
+          }
      }
    ecore_evas_show( ee );
 
