@@ -28,7 +28,7 @@ group "Elm_Config" struct {
   value "font_cache" int: 512;
   value "edje_cache" int: 32;
   value "edje_collection_cache" int: 64;
-  value "finger_size" int: 40;
+  value "finger_size" int: 60;
   value "fps" double: 6000.0;
   value "theme" string: "default";
   value "modules" string: "ctxpopup_copypasteUI>entry/api:decarta>map/api";
