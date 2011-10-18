@@ -372,7 +372,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                  continue;
               _adjust_pos_x(&pos, &base_size, &hover_area);
               pos.y -= base_size.y;
-              arrow = ELM_CTXPOPUP_DIRECTION_DOWN;
+              arrow = ELM_CTXPOPUP_DIRECTION_UP;
               break;
            case ELM_CTXPOPUP_DIRECTION_LEFT:
               temp.x = (pos.x - base_size.x);
@@ -380,7 +380,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                  continue;
               _adjust_pos_y(&pos, &base_size, &hover_area);
               pos.x -= base_size.x;
-              arrow = ELM_CTXPOPUP_DIRECTION_RIGHT;
+              arrow = ELM_CTXPOPUP_DIRECTION_LEFT;
               break;
            case ELM_CTXPOPUP_DIRECTION_RIGHT:
               temp.x = (pos.x + base_size.x);
@@ -388,7 +388,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                   (hover_area.x + hover_area.w))
                  continue;
               _adjust_pos_y(&pos, &base_size, &hover_area);
-              arrow = ELM_CTXPOPUP_DIRECTION_LEFT;
+              arrow = ELM_CTXPOPUP_DIRECTION_RIGHT;
               break;
            case ELM_CTXPOPUP_DIRECTION_DOWN:
               temp.y = (pos.y + base_size.y);
@@ -396,7 +396,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                   (hover_area.y + hover_area.h))
                  continue;
               _adjust_pos_x(&pos, &base_size, &hover_area);
-              arrow = ELM_CTXPOPUP_DIRECTION_UP;
+              arrow = ELM_CTXPOPUP_DIRECTION_DOWN;
               break;
            default:
               break;
@@ -500,7 +500,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
 
    switch (dir)
      {
-      case ELM_CTXPOPUP_DIRECTION_LEFT:
+      case ELM_CTXPOPUP_DIRECTION_RIGHT:
          edje_object_signal_emit(wd->arrow, "elm,state,left", "elm");
 
          // if user does not use dragable part
@@ -520,7 +520,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
                                               (double) (y) / (double) (base_size.h - arrow_size.h));
            }
          break;
-      case ELM_CTXPOPUP_DIRECTION_RIGHT:
+      case ELM_CTXPOPUP_DIRECTION_LEFT:
          edje_object_signal_emit(wd->arrow, "elm,state,right", "elm");
 
          // if user does not use dragable part
@@ -539,7 +539,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
                                               (double) (y) / (double) (base_size.h - arrow_size.h));
             }
          break;
-      case ELM_CTXPOPUP_DIRECTION_UP:
+      case ELM_CTXPOPUP_DIRECTION_DOWN:
          edje_object_signal_emit(wd->arrow, "elm,state,top", "elm");
 
          // if user does not use dragable part
@@ -559,7 +559,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
                                               (double) (x) / (double) (base_size.w - arrow_size.w), 1);
            }
          break;
-      case ELM_CTXPOPUP_DIRECTION_DOWN:
+      case ELM_CTXPOPUP_DIRECTION_UP:
          edje_object_signal_emit(wd->arrow, "elm,state,bottom", "elm");
 
          // if user does not use dragable part
@@ -671,16 +671,16 @@ _shift_base_by_arrow(Evas_Object *arrow, Elm_Ctxpopup_Direction dir,
 
    switch (dir)
      {
-      case ELM_CTXPOPUP_DIRECTION_LEFT:
+      case ELM_CTXPOPUP_DIRECTION_RIGHT:
          rect->x += arrow_w;
          break;
-      case ELM_CTXPOPUP_DIRECTION_RIGHT:
+      case ELM_CTXPOPUP_DIRECTION_LEFT:
          rect->x -= arrow_w;
          break;
-      case ELM_CTXPOPUP_DIRECTION_UP:
+      case ELM_CTXPOPUP_DIRECTION_DOWN:
          rect->y += arrow_h;
          break;
-      case ELM_CTXPOPUP_DIRECTION_DOWN:
+      case ELM_CTXPOPUP_DIRECTION_UP:
          rect->y -= arrow_h;
          break;
       default:
