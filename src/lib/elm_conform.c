@@ -200,6 +200,10 @@ _conformant_part_sizing_eval(Evas_Object *obj, Conformant_Part_Type part_type)
      }
    if (part_type & ELM_CONFORM_SLIDING_WIN_PART)
      {
+        //If the virtual keypad uses the swallow area
+        ret = ecore_x_e_illume_keyboard_geometry_get(zone, &sx, &sy, &sw, &sh);
+        if (ret && sh > 0) return;
+
         edje_object_part_swallow(wd->base, "elm.swallow.virtualkeypad",
                                wd->sliding_win);
         ret = ecore_x_e_illume_sliding_win_geometry_get(zone, &sx, &sy, &sw, &sh);
