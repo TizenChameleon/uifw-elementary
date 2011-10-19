@@ -566,9 +566,9 @@ _elm_tooltip_label_create(void *data, Evas_Object *obj __UNUSED__, Evas_Object *
 }
 
 static Evas_Object *
-_elm_tooltip_trans_label_create(void *data, Evas_Object *obj)
+_elm_tooltip_trans_label_create(void *data, Evas_Object *obj __UNUSED__, Evas_Object *tooltip)
 {
-   Evas_Object *label = elm_label_add(obj);
+   Evas_Object *label = elm_label_add(tooltip);
    const char **text = data;
    if (!label)
      return NULL;
