@@ -3590,6 +3590,18 @@ elm_object_item_text_part_get(const Elm_Object_Item *it, const char *part)
    return elm_widget_item_text_part_get(it, part);
 }
 
+EAPI void *
+elm_object_item_data_get(const Elm_Object_Item *it)
+{
+   return elm_widget_item_data_get(it);
+}
+
+EAPI void
+elm_object_item_data_set(Elm_Object_Item *it, void *data)
+{
+   elm_widget_item_data_set(it, data);
+}
+
 EAPI void
 elm_object_item_signal_emit(Elm_Object_Item *it, const char *emission, const char *source)
 {
