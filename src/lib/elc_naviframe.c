@@ -930,6 +930,7 @@ elm_naviframe_item_pop(Evas_Object *obj)
 
    it = ELM_CAST(elm_naviframe_top_item_get(obj));
    if (!it) return NULL;
+   elm_widget_tree_unfocusable_set(it->content, EINA_TRUE);
    if (wd->preserve)
      content = it->content;
 
