@@ -634,20 +634,18 @@ _datefield_clicked_cb(void *data, Evas_Object *obj __UNUSED__,
    _load_field_options(data, diskselector, wd->selected_it);
 
    elm_ctxpopup_direction_priority_set(wd->ctxpopup, ELM_CTXPOPUP_DIRECTION_DOWN,
-               ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_LEFT,
-               ELM_CTXPOPUP_DIRECTION_RIGHT);
+                                       ELM_CTXPOPUP_DIRECTION_UP, -1, -1);
    elm_ctxpopup_content_set(wd->ctxpopup, diskselector);
    snprintf(buf,sizeof(buf), EDC_PART_ITEM_STR, wd->selected_it->location);
    edj_part = edje_object_part_object_get(wd->base, buf);
    evas_object_geometry_get(edj_part, &x, &y, &w, &h);
    evas_object_move(wd->ctxpopup, (x+w/2), (y+h));
 
-   //If arrow direction is downwards, move ctxpopup to the top of datefield
-   if (elm_ctxpopup_direction_get (wd->ctxpopup) == ELM_CTXPOPUP_DIRECTION_DOWN)
+   //If the direction of Ctxpopup is upwards, move it to the top of datefield
+   if (elm_ctxpopup_direction_get (wd->ctxpopup) == ELM_CTXPOPUP_DIRECTION_UP)
      {
         elm_ctxpopup_direction_priority_set(wd->ctxpopup, ELM_CTXPOPUP_DIRECTION_UP,
-               ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_LEFT,
-               ELM_CTXPOPUP_DIRECTION_RIGHT);
+                                            ELM_CTXPOPUP_DIRECTION_DOWN, -1, -1);
         evas_object_move(wd->ctxpopup, (x+w/2), y);
      }
    evas_object_show(wd->ctxpopup);
