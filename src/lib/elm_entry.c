@@ -225,6 +225,9 @@ static void _theme_hook(Evas_Object *obj);
 static void _disable_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
 static void _on_focus_hook(void *data, Evas_Object *obj);
+static void _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content);
+static Evas_Object *_content_unset_hook(Evas_Object *obj, const char *part);
+static Evas_Object *_content_get_hook(const Evas_Object *obj, const char *part);
 static void _resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static const char *_getbase(Evas_Object *obj);
 static void _signal_entry_changed(void *data, Evas_Object *obj, const char *emission, const char *source);
@@ -945,6 +948,88 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
      }
 }
 
+
+static void
+_content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *edje;
+   if ((!wd) || (!content)) return;
+
+   edje = elm_smart_scroller_edje_object_get(wd->scroller);
+   if (!strcmp(part, "elm.swallow.icon"))
+     {
+        if (wd->icon)
+          evas_object_del(wd->icon);
+        wd->icon = content;
+        edje_object_signal_emit(edje, "elm,action,show,icon", "elm");
+     }
+   else if (!strcmp(part, "elm.swallow.end"))
+     {
+        if (wd->end)
+          evas_object_del(wd->end);
+        wd->end = content;
+        edje_object_signal_emit(edje, "elm,action,show,end", "elm");
+     }
+   evas_event_freeze(evas_object_evas_get(obj));
+   elm_widget_sub_object_add(obj, content);
+   edje_object_part_swallow(edje, part, content);
+   _sizing_eval(obj);
+   evas_event_thaw(evas_object_evas_get(obj));
+   evas_event_thaw_eval(evas_object_evas_get(obj));
+}
+
+static Evas_Object *
+_content_unset_hook(Evas_Object *obj, const char *part)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *content, *edje;
+   if (!wd) return NULL;
+
+   edje = elm_smart_scroller_edje_object_get(wd->scroller);
+   if (!strcmp(part, "elm.swallow.icon"))
+     {
+        wd->icon = NULL;
+        edje_object_signal_emit(edje, "elm,action,hide,icon", "elm");
+     }
+   else if (!strcmp(part, "elm.swallow.end"))
+     {
+        wd->end = NULL;
+        edje_object_signal_emit(edje, "elm,action,hide,end", "elm");
+     }
+
+   content = edje_object_part_swallow_get(edje, part);
+   edje_object_part_swallow(edje, part, NULL);
+   if (!content) return NULL;
+   evas_event_freeze(evas_object_evas_get(obj));
+   elm_widget_sub_object_del(obj, content);
+   edje_object_part_unswallow(wd->ent, content);
+   _sizing_eval(obj);
+   evas_event_thaw(evas_object_evas_get(obj));
+   evas_event_thaw_eval(evas_object_evas_get(obj));
+
+   return content;
+}
+
+static Evas_Object *
+_content_get_hook(const Evas_Object *obj, const char *part)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *content = NULL, *edje;
+   if (!wd) return NULL;
+
+   if (!strcmp(part, "elm.swallow.icon"))
+     return wd->icon;
+   if (!strcmp(part, "elm.swallow.end"))
+     return wd->end;
+
+   edje = elm_smart_scroller_edje_object_get(wd->scroller);
+   if (edje)
+     content = edje_object_part_swallow_get(edje, part);
+   return content;
+}
+
+
 static void
 _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
 {
@@ -1002,6 +1087,29 @@ _show_region_hook(void *data, Evas_Object *obj)
    elm_widget_show_region_get(obj, &x, &y, &w, &h);
    if (wd->scroll)
      elm_smart_scroller_child_region_show(wd->scroller, x, y, w, h);
+}
+
+static void
+_sub_del(void *data, Evas_Object *obj, void *event_info)
+{
+   Widget_Data *wd = data;
+   Evas_Object *sub = event_info;
+   Evas_Object *edje;
+
+   edje = elm_smart_scroller_edje_object_get(wd->scroller);
+   if (sub == wd->icon)
+     {
+        wd->icon = NULL;
+        if (edje)
+          edje_object_signal_emit(edje, "elm,action,hide,icon", "elm");
+     }
+   else if (sub == wd->end)
+     {
+        wd->end = NULL;
+        if (edje)
+          edje_object_signal_emit(edje, "elm,action,hide,end", "elm");
+     }
+   _sizing_eval(obj);
 }
 
 static void
@@ -2790,7 +2898,11 @@ elm_entry_add(Evas_Object *parent)
    elm_widget_highlight_ignore_set(obj, EINA_TRUE);
    elm_widget_text_set_hook_set(obj, _elm_entry_text_set);
    elm_widget_text_get_hook_set(obj, _elm_entry_text_get);
+   elm_widget_content_set_hook_set(obj, _content_set_hook);
+   elm_widget_content_unset_hook_set(obj, _content_unset_hook);
+   elm_widget_content_get_hook_set(obj, _content_get_hook);
 
+   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, wd);
    wd->scroller = elm_smart_scroller_add(e);
    elm_widget_sub_object_add(obj, wd->scroller);
    elm_smart_scroller_widget_set(wd->scroller, obj);
