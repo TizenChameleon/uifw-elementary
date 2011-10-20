@@ -711,7 +711,7 @@ _index_box_refill_job(void *data)
      }
 }
 
-static void _index_object_resize(void *data, Evas *e, Evas_Object *obj, void *event_info)
+static void _index_object_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd;
    if(!data) return;
