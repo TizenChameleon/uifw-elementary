@@ -671,7 +671,7 @@ static Eina_Bool
 _smart_bounce_x_animator(void *data)
 {
    Smart_Data *sd;
-   Evas_Coord x, y, dx, px, w, odx, ed, md;
+   Evas_Coord x, y, dx, w, odx, ed, md;
    double t, p, dt, pd, r;
 
    sd = data;
@@ -681,9 +681,8 @@ _smart_bounce_x_animator(void *data)
      {
         dt = dt / _elm_config->thumbscroll_bounce_friction;
         odx = sd->down.b2x - sd->down.bx;
-        sd->pan_func.get(sd->pan_obj, &px, NULL);
         elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &w, NULL);
-        if (!sd->down.momentum_animator && ((w - px) > 0) && ((-px) < w))
+        if (!sd->down.momentum_animator && (w > abs(odx)))
           {
              pd = (double)odx / (double)w;
              pd = (pd > 0) ? pd : -pd;
@@ -725,7 +724,7 @@ static Eina_Bool
 _smart_bounce_y_animator(void *data)
 {
    Smart_Data *sd;
-   Evas_Coord x, y, dy, py, h, ody, ed, md;
+   Evas_Coord x, y, dy, h, ody, ed, md;
    double t, p, dt, pd, r;
 
    sd = data;
@@ -735,9 +734,8 @@ _smart_bounce_y_animator(void *data)
      {
         dt = dt / _elm_config->thumbscroll_bounce_friction;
         ody = sd->down.b2y - sd->down.by;
-        sd->pan_func.get(sd->pan_obj, NULL, &py);
         elm_smart_scroller_child_viewport_size_get(sd->smart_obj, NULL, &h);
-        if (!sd->down.momentum_animator && ((h - py) > 0) && ((-py) < h))
+        if (!sd->down.momentum_animator && (h > abs(ody)))
           {
              pd = (double)ody / (double)h;
              pd = (pd > 0) ? pd : -pd;
