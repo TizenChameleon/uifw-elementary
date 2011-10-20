@@ -553,6 +553,7 @@ _add_colorbar(Evas_Object *obj)
    Widget_Data *wd;
    Evas *e;
    int i = 0;
+   char buf[1024];
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -583,7 +584,7 @@ _add_colorbar(Evas_Object *obj)
         /* load colorbar area */
         wd->cp[i]->colorbar = edje_object_add(e);
         _elm_theme_object_set(obj, wd->cp[i]->colorbar, "colorselector", "base",
-                              "default");
+                              elm_widget_style_get(obj));
         snprintf(colorbar_name, sizeof(colorbar_name), "colorbar_%d", i);
         snprintf(colorbar_s, sizeof(colorbar_s), "elm.colorbar_%d", i);
         edje_object_signal_callback_add(wd->cp[i]->colorbar, "drag", "*",
@@ -593,8 +594,9 @@ _add_colorbar(Evas_Object *obj)
 
         /* load colorbar image */
         wd->cp[i]->bar = edje_object_add(e);
+        snprintf(buf, sizeof(buf), "%s/%s", colorbar_name, elm_widget_style_get(obj));
         _elm_theme_object_set(obj, wd->cp[i]->bar, "colorselector", "image",
-                              colorbar_name);
+                              buf);
         edje_object_part_swallow(wd->cp[i]->colorbar, "elm.bar",
                                  wd->cp[i]->bar);
         elm_widget_sub_object_add(obj, wd->cp[i]->bar);
@@ -624,8 +626,9 @@ _add_colorbar(Evas_Object *obj)
         if (i == 3)
           {
              wd->cp[i]->bg_rect = edje_object_add(e);
+             snprintf(buf, sizeof(buf), "%s/%s", colorbar_name, elm_widget_style_get(obj));
              _elm_theme_object_set(obj, wd->cp[i]->bg_rect, "colorselector",
-                                   "bg_image", colorbar_name);
+                                   "bg_image", buf);
              edje_object_part_swallow(wd->cp[i]->colorbar, "elm.bar_bg",
                                       wd->cp[i]->bg_rect);
              elm_widget_sub_object_add(obj, wd->cp[i]->bg_rect);
@@ -633,8 +636,8 @@ _add_colorbar(Evas_Object *obj)
           }
         /* load arrow image, pointing the colorbar */
         wd->cp[i]->arrow = edje_object_add(e);
-        _elm_theme_object_set(obj, wd->cp[i]->arrow, "colorselector", "image",
-                              "updown");
+        _elm_theme_object_set(obj, wd->cp[i]->arrow, "colorselector", "arrow",
+                              elm_widget_style_get(obj));
         edje_object_part_swallow(wd->cp[i]->colorbar, "elm.arrow_icon",
                                  wd->cp[i]->arrow);
         elm_widget_sub_object_add(obj, wd->cp[i]->arrow);
@@ -645,26 +648,28 @@ _add_colorbar(Evas_Object *obj)
 
         /* load left button */
         wd->cp[i]->lbt = elm_button_add(obj);
-        elm_object_style_set(wd->cp[i]->lbt, "picker_left");
+        snprintf(buf, sizeof(buf), "colorselector/left/%s", elm_widget_style_get(obj));
+        elm_object_style_set(wd->cp[i]->lbt, buf);
         elm_widget_sub_object_add(obj, wd->cp[i]->lbt);
         edje_object_part_swallow(wd->cp[i]->colorbar, "elm.l_button",
                                  wd->cp[i]->lbt);
         evas_object_smart_callback_add(wd->cp[i]->lbt, "clicked", _left_button_clicked_cb, wd->cp[i]);
         elm_button_autorepeat_set(wd->cp[i]->lbt, EINA_TRUE);
         elm_button_autorepeat_initial_timeout_set(wd->cp[i]->lbt, _elm_config->longpress_timeout);
-        elm_button_autorepeat_gap_timeout_set(wd->cp[i]->lbt, 0.01);
+        elm_button_autorepeat_gap_timeout_set(wd->cp[i]->lbt, (1.0 / _elm_config->fps));
         evas_object_smart_callback_add(wd->cp[i]->lbt, "repeated",_left_button_repeat_cb, wd->cp[i]);
 
         /* load right button */
         wd->cp[i]->rbt = elm_button_add(obj);
-        elm_object_style_set(wd->cp[i]->rbt, "picker_right");
+        snprintf(buf, sizeof(buf), "colorselector/right/%s", elm_widget_style_get(obj));
+        elm_object_style_set(wd->cp[i]->rbt, buf);
         elm_widget_sub_object_add(obj, wd->cp[i]->rbt);
         edje_object_part_swallow(wd->cp[i]->colorbar, "elm.r_button",
                                  wd->cp[i]->rbt);
         evas_object_smart_callback_add(wd->cp[i]->rbt, "clicked", _right_button_clicked_cb, wd->cp[i]);
         elm_button_autorepeat_set(wd->cp[i]->rbt, EINA_TRUE);
         elm_button_autorepeat_initial_timeout_set(wd->cp[i]->rbt, _elm_config->longpress_timeout);
-        elm_button_autorepeat_gap_timeout_set(wd->cp[i]->rbt, 0.01);
+        elm_button_autorepeat_gap_timeout_set(wd->cp[i]->rbt, (1.0 / _elm_config->fps));
         evas_object_smart_callback_add(wd->cp[i]->rbt, "repeated",_right_button_repeat_cb, wd->cp[i]);
      }
 }
