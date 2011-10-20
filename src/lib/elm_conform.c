@@ -396,7 +396,7 @@ _update_autoscroll_objs(void *data)
 }
 
 static Eina_Bool
-_prop_change(void *data, int type, void *event)
+_prop_change(void *data, int type __UNUSED__, void *event)
 {
    Ecore_X_Event_Window_Property *ev;
    Widget_Data *wd = elm_widget_data_get(data);
