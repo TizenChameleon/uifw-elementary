@@ -1560,6 +1560,7 @@ _magnifier_create(void *data)
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord x, y, w, h, mw, mh;
    const char* key_data = NULL;
+   double elm_scale;
 
    if (!wd) return;
 
@@ -1599,6 +1600,9 @@ _magnifier_create(void *data)
    if (key_data) wd->mgf_height = atoi(key_data);
    key_data = edje_object_data_get(wd->mgf_bg, "scale");
    if (key_data) wd->mgf_scale = atof(key_data);
+
+   elm_scale = elm_scale_get();
+   wd->mgf_height = (int)((float)wd->mgf_height * elm_scale);
 
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
      evas_object_resize(wd->mgf_bg, w, wd->mgf_height);
