@@ -148,7 +148,10 @@ _del_hook(Evas_Object *obj)
    if (!wd) return;
 
    EINA_INLIST_REVERSE_FOREACH(wd->stack, it)
-     _item_del(it);
+     {
+        wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(it));
+        _item_del(it);
+     }
    free(wd);
 }
 
@@ -716,8 +719,6 @@ _item_del(Elm_Naviframe_Item *it)
 
    eina_stringshare_del(it->style);
 
-   wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(it));
-
    elm_widget_item_del(it);
 }
 
@@ -1033,6 +1034,7 @@ elm_naviframe_item_pop(Evas_Object *obj)
    if (wd->stack->last->prev)
      prev_it = EINA_INLIST_CONTAINER_GET(wd->stack->last->prev,
                                          Elm_Naviframe_Item);
+   wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(it));
    if (prev_it)
      {
         if (wd->freeze_events)
@@ -1071,10 +1073,39 @@ elm_naviframe_item_pop_to(Elm_Object_Item *it)
         if (EINA_INLIST_CONTAINER_GET(l, Elm_Naviframe_Item) ==
             ((Elm_Naviframe_Item *) it)) break;
         prev_l = l->prev;
+        wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET((Elm_Naviframe_Item *) it));
         _item_del(EINA_INLIST_CONTAINER_GET(l, Elm_Naviframe_Item));
         l = prev_l;
      }
    elm_naviframe_item_pop(navi_it->base.widget);
+}
+
+EAPI void
+elm_naviframe_item_promote(Elm_Object_Item *it)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   Elm_Naviframe_Item *navi_it = (Elm_Naviframe_Item *) it;
+   Elm_Naviframe_Item *prev_it = NULL;
+   Widget_Data *wd = elm_widget_data_get(navi_it->base.widget);
+   if (it == elm_naviframe_top_item_get(navi_it->base.widget)) return;
+   wd->stack = eina_inlist_demote(wd->stack, EINA_INLIST_GET(navi_it));
+   prev_it = EINA_INLIST_CONTAINER_GET(wd->stack->last->prev,
+                                         Elm_Naviframe_Item);
+   if (wd->freeze_events)
+     {
+        evas_object_show(wd->rect);
+        //FIXME:
+        evas_object_pass_events_set(wd->base, EINA_TRUE);
+     }
+   edje_object_signal_emit(prev_it->base.view,
+                           "elm,state,cur,pushed",
+                           "elm");
+   evas_object_show(navi_it->base.view);
+   evas_object_raise(navi_it->base.view);
+   edje_object_signal_emit(navi_it->base.view,
+                           "elm,state,new,pushed",
+                           "elm");
+
 }
 
 EAPI void
@@ -1085,6 +1116,7 @@ elm_naviframe_item_del(Elm_Object_Item *it)
    Widget_Data *wd = elm_widget_data_get(navi_it->base.widget);
    if (it == elm_naviframe_top_item_get(navi_it->base.widget))
      {
+        wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(navi_it));
         _item_del(navi_it);
         navi_it = EINA_INLIST_CONTAINER_GET(wd->stack->last,
                                             Elm_Naviframe_Item);
@@ -1093,7 +1125,10 @@ elm_naviframe_item_del(Elm_Object_Item *it)
         edje_object_signal_emit(navi_it->base.view, "elm,state,visible", "elm");
      }
    else
-     _item_del(navi_it);
+     {
+        wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(navi_it));
+        _item_del(navi_it);
+     }
 }
 
 EAPI void
