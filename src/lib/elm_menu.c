@@ -5,7 +5,7 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Elm_Menu_Item
 {
-   Elm_Widget_Item base;
+   ELM_WIDGET_ITEM;
    Elm_Menu_Item *parent;
    Evas_Object *icon;
    const char *icon_str;

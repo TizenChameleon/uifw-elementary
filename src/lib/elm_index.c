@@ -49,7 +49,7 @@ struct _Widget_Data
 
 struct _Elm_Index_Item
 {
-   Elm_Widget_Item base;
+   ELM_WIDGET_ITEM;
    const char *letter, *vis_letter;
    int level, size;
    Eina_Bool selected : 1;

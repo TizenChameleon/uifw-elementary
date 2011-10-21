@@ -199,6 +199,7 @@ typedef Evas_Object *(*Elm_Widget_On_Content_Get_Cb)(const void *data, const cha
 typedef Evas_Object *(*Elm_Widget_On_Content_Unset_Cb)(const void *data, const char *part);
 typedef void (*Elm_Widget_On_Signal_Emit_Cb)(void *data, const char *emission, const char *source);
 
+#define ELM_WIDGET_ITEM Elm_Widget_Item base /**< put this as the first member in your widget item struct */
 struct _Elm_Widget_Item
 {
    /* ef1 ~~ efl, el3 ~~ elm */
@@ -221,7 +222,7 @@ struct _Elm_Widget_Item
 
 struct _Elm_Object_Item
 {
-   Elm_Widget_Item it;
+   ELM_WIDGET_ITEM;
 };
 
 #define ELM_NEW(t) calloc(1, sizeof(t))
@@ -230,7 +231,7 @@ struct _Elm_Object_Item
 
 #define ELM_OBJ_ITEM_CHECK_OR_RETURN(it, ...)                               \
    ELM_WIDGET_ITEM_CHECK_OR_RETURN((Elm_Widget_Item *) (it), __VA_ARGS__);  \
-   ELM_CHECK_WIDTYPE(it->it.widget, widtype) __VA_ARGS__;
+   ELM_CHECK_WIDTYPE(it->base.widget, widtype) __VA_ARGS__;
 
 EAPI Eina_Bool        elm_widget_api_check(int ver);
 EAPI Evas_Object     *elm_widget_add(Evas *evas);
@@ -590,12 +591,6 @@ EAPI void             elm_widget_tree_dot_dump(const Evas_Object *top, FILE *out
 #define elm_widget_item_signal_emit_hook_set(item, func) \
   _elm_widget_item_signal_emit_hook_set((Elm_Widget_Item *)item, (Elm_Widget_On_Signal_Emit_Cb)func)
 
-/**
- * Cast and ensure the given pointer is an Elm_Widget_Item or return NULL.
- */
-#define ELM_WIDGET_ITEM(item) \
-   (((item) && (EINA_MAGIC_CHECK(item, ELM_WIDGET_ITEM_MAGIC))) ? \
-       ((Elm_Widget_Item *)(item)) : NULL)
 
 #define ELM_WIDGET_ITEM_CHECK_OR_RETURN(item, ...) \
    do { \

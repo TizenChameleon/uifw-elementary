@@ -11,7 +11,7 @@
 
  struct _Elm_Gengrid_Item
 {
-   Elm_Widget_Item               base;
+   ELM_WIDGET_ITEM;
    EINA_INLIST;
    Evas_Object                  *spacer;
    const Elm_Gengrid_Item_Class *gic;
