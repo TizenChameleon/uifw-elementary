@@ -942,7 +942,7 @@ _profile_change_do(Evas_Object *win,
                                              "edje_collection_cache_slider"),
                         edje_col_c);
 
-   elm_scroll_bounce_enabled_all_set(s_bounce);
+//   elm_scroll_bounce_enabled_all_set(s_bounce);
    elm_check_state_set(evas_object_data_get(win, "scroll_bounce_check"),
                        s_bounce);
    elm_scroll_bounce_friction_all_set(s_bounce_friction);
