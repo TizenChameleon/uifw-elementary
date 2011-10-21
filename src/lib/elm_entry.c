@@ -956,21 +956,26 @@ _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
    Evas_Object *edje;
    if ((!wd) || (!content)) return;
 
-   edje = elm_smart_scroller_edje_object_get(wd->scroller);
-   if (!strcmp(part, "elm.swallow.icon"))
+   if (wd->scroll)
      {
-        if (wd->icon)
-          evas_object_del(wd->icon);
-        wd->icon = content;
-        edje_object_signal_emit(edje, "elm,action,show,icon", "elm");
+        edje = elm_smart_scroller_edje_object_get(wd->scroller);
+        if (!strcmp(part, "elm.swallow.icon"))
+          {
+             if (wd->icon)
+               evas_object_del(wd->icon);
+             wd->icon = content;
+             edje_object_signal_emit(edje, "elm,action,show,icon", "elm");
+          }
+        else if (!strcmp(part, "elm.swallow.end"))
+          {
+             if (wd->end)
+               evas_object_del(wd->end);
+             wd->end = content;
+             edje_object_signal_emit(edje, "elm,action,show,end", "elm");
+          }
      }
-   else if (!strcmp(part, "elm.swallow.end"))
-     {
-        if (wd->end)
-          evas_object_del(wd->end);
-        wd->end = content;
-        edje_object_signal_emit(edje, "elm,action,show,end", "elm");
-     }
+   else
+     edje = wd->ent;
    evas_event_freeze(evas_object_evas_get(obj));
    elm_widget_sub_object_add(obj, content);
    edje_object_part_swallow(edje, part, content);
@@ -986,17 +991,22 @@ _content_unset_hook(Evas_Object *obj, const char *part)
    Evas_Object *content, *edje;
    if (!wd) return NULL;
 
-   edje = elm_smart_scroller_edje_object_get(wd->scroller);
-   if (!strcmp(part, "elm.swallow.icon"))
+   if (wd->scroll)
      {
-        wd->icon = NULL;
-        edje_object_signal_emit(edje, "elm,action,hide,icon", "elm");
+        edje = elm_smart_scroller_edje_object_get(wd->scroller);
+        if (!strcmp(part, "elm.swallow.icon"))
+          {
+             wd->icon = NULL;
+             edje_object_signal_emit(edje, "elm,action,hide,icon", "elm");
+          }
+        else if (!strcmp(part, "elm.swallow.end"))
+          {
+             wd->end = NULL;
+             edje_object_signal_emit(edje, "elm,action,hide,end", "elm");
+          }
      }
-   else if (!strcmp(part, "elm.swallow.end"))
-     {
-        wd->end = NULL;
-        edje_object_signal_emit(edje, "elm,action,hide,end", "elm");
-     }
+   else
+     edje = wd->ent;
 
    content = edje_object_part_swallow_get(edje, part);
    edje_object_part_swallow(edje, part, NULL);
@@ -1018,12 +1028,18 @@ _content_get_hook(const Evas_Object *obj, const char *part)
    Evas_Object *content = NULL, *edje;
    if (!wd) return NULL;
 
-   if (!strcmp(part, "elm.swallow.icon"))
-     return wd->icon;
-   if (!strcmp(part, "elm.swallow.end"))
-     return wd->end;
+   if (wd->scroll)
+     {
+        if (!strcmp(part, "elm.swallow.icon"))
+          return wd->icon;
+        if (!strcmp(part, "elm.swallow.end"))
+          return wd->end;
 
-   edje = elm_smart_scroller_edje_object_get(wd->scroller);
+        edje = elm_smart_scroller_edje_object_get(wd->scroller);
+     }
+   else
+     edje = wd->ent;
+
    if (edje)
      content = edje_object_part_swallow_get(edje, part);
    return content;
@@ -2783,10 +2799,14 @@ _elm_entry_text_set(Evas_Object *obj, const char *item, const char *entry)
 {
    int len = 0;
    ELM_CHECK_WIDTYPE(obj, widtype);
-   if (item && strcmp(item, "default")) return;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (!entry) entry = "";
+   if (item && strcmp(item, "default"))
+     {
+        edje_object_part_text_set(wd->ent, item, entry);
+        return;
+     }
    if (wd->text) eina_stringshare_del(wd->text);
    wd->text = NULL;
    if (wd->password_text) eina_stringshare_del(wd->password_text);
