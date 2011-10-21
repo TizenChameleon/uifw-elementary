@@ -265,8 +265,7 @@ _item_find(Evas_Object *obj, const void *item)
 static void
 _item_free(Elm_Index_Item *it)
 {
-/* Automatically filling the box with index item*/
-   Widget_Data *wd = elm_widget_data_get(it->base.widget);
+   Widget_Data *wd = elm_widget_data_get(WIDGET(it));
    if (!wd) return;
 
    wd->items = eina_list_remove(wd->items, it);
@@ -299,8 +298,8 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
         if(i > wd->max_supp_items_count) break;
 
         o = edje_object_add(evas_object_evas_get(obj));
-        it->base.view = o;
-        edje_object_mirrored_set(it->base.view, rtl);
+        VIEW(it) = o;
+        edje_object_mirrored_set(VIEW(it), rtl);
         if (i & 0x1)
           _elm_theme_object_set(obj, o, "index", "item_odd/vertical", elm_widget_style_get(obj));
         else
@@ -352,10 +351,10 @@ _index_box_clear(Evas_Object *obj, Evas_Object *box __UNUSED__, int level)
    if (!wd->level_active[level]) return;
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-        if (!it->base.view) continue;
+        if (!VIEW(it)) continue;
         if (it->level != level) continue;
-        evas_object_del(it->base.view);
-        it->base.view = NULL;
+        evas_object_del(VIEW(it));
+        VIEW(it) = NULL;
      }
    wd->level_active[level] = 0;
 }
@@ -403,13 +402,13 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
         dmax = 1.0-dmin-0.08;
         EINA_LIST_FOREACH(wd->items, l, it)
           {
-             if (!((it->level == i) && (it->base.view))) continue;
+             if (!((it->level == i) && (VIEW(it)))) continue;
              if (it->selected)
                {
                   it_last = it;
                   it->selected = 0;
                }
-             evas_object_geometry_get(it->base.view, &x, &y, &w, &h);
+             evas_object_geometry_get(VIEW(it), &x, &y, &w, &h);
              xx = x + (w / 2);
              yy = y + (h / 2);
              x = evx - xx;
@@ -454,13 +453,13 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
 
                   it = it_last;
                   if(view_level == it->level)
-                  edje_object_signal_emit(it->base.view, "elm,state,inactive", "elm");
-                  stacking = edje_object_data_get(it->base.view, "stacking");
-                  selectraise = edje_object_data_get(it->base.view, "selectraise");
+                  edje_object_signal_emit(VIEW(it), "elm,state,inactive", "elm");
+                  stacking = edje_object_data_get(VIEW(it), "stacking");
+                  selectraise = edje_object_data_get(VIEW(it), "selectraise");
                   if ((selectraise) && (!strcmp(selectraise, "on")))
                     {
                        if ((stacking) && (!strcmp(stacking, "below")))
-                         evas_object_lower(it->base.view);
+                         evas_object_lower(VIEW(it));
                     }
                }
              if (it_closest)
@@ -469,10 +468,10 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
 
                   it = it_closest;
                   if(view_level == it->level)
-                  edje_object_signal_emit(it->base.view, "elm,state,active", "elm");
-                  selectraise = edje_object_data_get(it->base.view, "selectraise");
+                  edje_object_signal_emit(VIEW(it), "elm,state,active", "elm");
+                  selectraise = edje_object_data_get(VIEW(it), "selectraise");
                   if ((selectraise) && (!strcmp(selectraise, "on")))
-                    evas_object_raise(it->base.view);
+                    evas_object_raise(VIEW(it));
                   evas_object_smart_callback_call((void *)obj, SIG_CHANGED, (void *)it->base.data);
                   if (wd->delay) ecore_timer_del(wd->delay);
                   wd->delay = ecore_timer_add(0.2, _delay_change, obj);
