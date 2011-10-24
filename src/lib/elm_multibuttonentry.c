@@ -105,6 +105,7 @@ static void _set_vis_guidetext(Evas_Object *obj);
 static void _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv);
 static Evas_Coord _calculate_item_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj_index);
 static void _box_layout_cb(Evas_Object *o, Evas_Object_Box_Data *priv, void *data);
+static void _recalc_entry_geometry(Evas_Object *obj);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -905,6 +906,7 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
           }
      }
    evas_object_smart_callback_call(obj, "item,added", item);
+   _recalc_entry_geometry(obj);
 
    free(str_utf8);
 
@@ -1111,6 +1113,20 @@ _view_init(Evas_Object *obj)
              elm_widget_sub_object_add(obj, wd->end);
           }
      }
+}
+
+static void
+_recalc_entry_geometry(Evas_Object *obj)
+{
+   Evas_Coord cx, cy, cw, ch;
+
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (!elm_object_focus_get(obj)) return;
+
+   evas_object_geometry_get(wd->entry, &cx, &cy, &cw, &ch);
+   elm_widget_show_region_set(obj, cx, cy, cw, ch, EINA_FALSE);
 }
 
 static void
