@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build57) unstable; urgency=low
+
+  * Upload Package
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build57
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Mon, 24 Oct 2011 18:56:44 +0900
+
 elementary (1.0.0+svn.61256slp2+build56) unstable; urgency=low
 
   * revert naviframe patch
