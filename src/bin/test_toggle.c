@@ -67,8 +67,8 @@ test_toggle(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    tg = elm_toggle_add(win);
    elm_object_text_set(tg, "Label Only");
-   elm_toggle_states_labels_set(tg, "Big long fun times label",
-                                "Small long happy fun label");
+   elm_object_text_part_set(tg, "on", "Big long fun times label");
+   elm_object_text_part_set(tg, "off", "Small long happy fun label");
    elm_box_pack_end(bx, tg);
    evas_object_show(tg);
 
