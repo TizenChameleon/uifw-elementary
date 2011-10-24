@@ -143,12 +143,20 @@ _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd;
    Elm_Naviframe_Item *it;
+   Eina_Inlist *l, *prev_l;
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   EINA_INLIST_REVERSE_FOREACH(wd->stack, it)
-     _item_del(it);
+   l = wd->stack->last;
+   while (l)
+     {
+        it = EINA_INLIST_CONTAINER_GET(l, Elm_Naviframe_Item);
+        prev_l = l->prev;
+        wd->stack = eina_inlist_remove(wd->stack, l);
+        _item_del(it);
+        l = prev_l;
+     }
    free(wd);
 }
 
@@ -692,31 +700,32 @@ _item_del(Elm_Naviframe_Item *it)
    if ((it->content) && (!wd->preserve))
      evas_object_del(it->content);
 
-   EINA_INLIST_REVERSE_FOREACH(it->content_list, content_pair)
+   while (it->content_list)
      {
+        content_pair = EINA_INLIST_CONTAINER_GET(it->content_list,
+                                                 Elm_Naviframe_Content_Item_Pair);
         evas_object_event_callback_del(content_pair->content,
-                                       EVAS_CALLBACK_DEL,
-                                       _title_content_del);
+                                        EVAS_CALLBACK_DEL,
+                                        _title_content_del);
         evas_object_del(content_pair->content);
         eina_stringshare_del(content_pair->part);
-        it->content_list =
-           eina_inlist_remove(it->content_list,
-                              EINA_INLIST_GET(content_pair));
+        it->content_list = eina_inlist_remove(it->content_list,
+                                              it->content_list);
         free(content_pair);
      }
 
-   EINA_INLIST_REVERSE_FOREACH(it->text_list, text_pair)
+   while (it->text_list)
      {
+        text_pair = EINA_INLIST_CONTAINER_GET(it->text_list,
+                                              Elm_Naviframe_Text_Item_Pair);
         eina_stringshare_del(text_pair->part);
         eina_stringshare_del(text_pair->text);
         it->text_list = eina_inlist_remove(it->text_list,
-                                           EINA_INLIST_GET(text_pair));
+                                           it->text_list);
         free(text_pair);
      }
 
    eina_stringshare_del(it->style);
-
-   wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(it));
 
    elm_widget_item_del(it);
 }
@@ -799,6 +808,7 @@ _item_content_set(Elm_Naviframe_Item *navi_it, Evas_Object *content)
    _item_sizing_eval(navi_it);
 }
 
+//FIXME: need to handle if this function is called while transition
 static void
 _item_style_set(Elm_Naviframe_Item *navi_it, const char *item_style)
 {
@@ -1033,6 +1043,7 @@ elm_naviframe_item_pop(Evas_Object *obj)
    if (wd->stack->last->prev)
      prev_it = EINA_INLIST_CONTAINER_GET(wd->stack->last->prev,
                                          Elm_Naviframe_Item);
+   wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(it));
    if (prev_it)
      {
         if (wd->freeze_events)
@@ -1071,6 +1082,7 @@ elm_naviframe_item_pop_to(Elm_Object_Item *it)
         if (EINA_INLIST_CONTAINER_GET(l, Elm_Naviframe_Item) ==
             ((Elm_Naviframe_Item *) it)) break;
         prev_l = l->prev;
+        wd->stack = eina_inlist_remove(wd->stack, l);
         _item_del(EINA_INLIST_CONTAINER_GET(l, Elm_Naviframe_Item));
         l = prev_l;
      }
@@ -1113,6 +1125,7 @@ elm_naviframe_item_del(Elm_Object_Item *it)
    Widget_Data *wd = elm_widget_data_get(navi_it->base.widget);
    if (it == elm_naviframe_top_item_get(navi_it->base.widget))
      {
+        wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(navi_it));
         _item_del(navi_it);
         navi_it = EINA_INLIST_CONTAINER_GET(wd->stack->last,
                                             Elm_Naviframe_Item);
@@ -1121,7 +1134,10 @@ elm_naviframe_item_del(Elm_Object_Item *it)
         edje_object_signal_emit(navi_it->base.view, "elm,state,visible", "elm");
      }
    else
-     _item_del(navi_it);
+     {
+        wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(navi_it));
+        _item_del(navi_it);
+     }
 }
 
 EAPI void
