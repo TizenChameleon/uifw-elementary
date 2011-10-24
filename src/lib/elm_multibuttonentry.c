@@ -99,6 +99,7 @@ static void _entry_key_up_cb(void *data, Evas *e, Evas_Object *obj, void *event_
 static void _entry_key_down_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _entry_focus_in_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_focus_out_cb(void *data, Evas_Object *obj, void *event_info);
+static void _entry_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static void _view_init(Evas_Object *obj);
 static void _set_vis_guidetext(Evas_Object *obj);
 static void _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv);
@@ -163,10 +164,10 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 
    if (elm_widget_focus_get(obj))
      {
+        wd->focused = EINA_TRUE;
         if ((imf_context) && (wd->current))
           {
              ecore_imf_context_input_panel_show(imf_context);
-             evas_object_focus_set(obj, EINA_TRUE);
           }
         else if ((imf_context) && ((!wd->current) || (!eina_list_count(wd->items))))
           {
@@ -180,7 +181,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         _view_update(obj);
         if (imf_context) ecore_imf_context_input_panel_hide(imf_context);
         evas_object_smart_callback_call(obj, "unfocused", NULL);
-        evas_object_focus_set(obj, EINA_FALSE);
      }
 }
 
@@ -286,6 +286,7 @@ _event_init(Evas_Object *obj)
         evas_object_smart_callback_add(wd->entry, "changed", _entry_changed_cb, obj);
         evas_object_smart_callback_add(wd->entry, "focused", _entry_focus_in_cb, obj);
         evas_object_smart_callback_add(wd->entry, "unfocused", _entry_focus_out_cb, obj);
+        evas_object_smart_callback_add(wd->entry, "clicked", _entry_clicked_cb, obj);
      }
 }
 
@@ -991,12 +992,28 @@ _entry_key_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, vo
 }
 
 static void
-_entry_focus_in_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_entry_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
    _change_current_button_state(data, MULTIBUTONENTRY_BUTTON_STATE_DEFAULT);
+   elm_object_focus(wd->entry);
+}
+
+static void
+_entry_focus_in_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   Elm_Multibuttonentry_Item *item = NULL;
+   if (!wd) return;
+
+   if (wd->current)
+     {
+        item = eina_list_data_get(wd->current);
+        elm_object_unfocus(wd->entry);
+        evas_object_focus_set(item->button, EINA_TRUE);
+     }
 }
 
 static void
