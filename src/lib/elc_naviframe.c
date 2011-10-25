@@ -143,19 +143,20 @@ _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd;
    Elm_Naviframe_Item *it;
-   Eina_Inlist *l, *prev_l;
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   l = wd->stack->last;
-   while (l)
+   if (wd->stack)
      {
-        it = EINA_INLIST_CONTAINER_GET(l, Elm_Naviframe_Item);
-        prev_l = l->prev;
-        wd->stack = eina_inlist_remove(wd->stack, l);
-        _item_del(it);
-        l = prev_l;
+        while (wd->stack->last)
+          {
+             it = EINA_INLIST_CONTAINER_GET(wd->stack->last,
+                                            Elm_Naviframe_Item);
+             wd->stack = eina_inlist_remove(wd->stack, wd->stack->last);
+             _item_del(it);
+             if (!wd->stack) break;
+          }
      }
    free(wd);
 }
