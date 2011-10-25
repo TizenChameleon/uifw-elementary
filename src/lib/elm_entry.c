@@ -1523,7 +1523,7 @@ _magnifier_move(void *data)
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
-   Evas_Coord x, y, w, h, fs;
+   Evas_Coord x, y, w, h;
    Evas_Coord cx, cy, cw, ch, ox, oy;
 
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
@@ -1539,19 +1539,18 @@ _magnifier_move(void *data)
      evas_object_geometry_get(data, &x, &y, &w, &h);
 
    ox = oy = 0;
-   fs = elm_finger_size_get();
 
-   if ((cy + y) - wd->mgf_height - fs < 0)
-     oy = -1 * ((cy + y) - wd->mgf_height - fs);
+   if ((cy + y) - wd->mgf_height < 0)
+     oy = -1 * ((cy + y) - wd->mgf_height);
 
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FIXEDSIZE)
-     evas_object_move(wd->mgf_bg, (cx + x + cw/2) + ox, (cy + y) - wd->mgf_height - fs + oy);
+     evas_object_move(wd->mgf_bg, (cx + x + cw/2) + ox, (cy + y) - wd->mgf_height + oy);
    else if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
-     evas_object_move(wd->mgf_bg, x, (cy + y) - wd->mgf_height - fs + oy);
+     evas_object_move(wd->mgf_bg, x, (cy + y) - wd->mgf_height + oy);
    else
      return;
 
-   evas_object_move(wd->mgf_proxy, (1 - wd->mgf_scale) * cx + x + ox, (1 - wd->mgf_scale) * cy + y - wd->mgf_height/2 - ch/2 - fs + oy);
+   evas_object_move(wd->mgf_proxy, (1 - wd->mgf_scale) * cx + x + ox, (1 - wd->mgf_scale) * cy + y - wd->mgf_height/2 - ch/2 + oy);
 }
 
 static void
@@ -2110,7 +2109,7 @@ _signal_magnifier_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
         wd->cx = cx;
         wd->cy = cy;
         wd->cw = cw;
-        wd->ch = ch + elm_finger_size_get();
+        wd->ch = ch;
      }
 }
 
@@ -2128,14 +2127,14 @@ _signal_selection_changed(void *data, Evas_Object *obj __UNUSED__, const char *e
 
    edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text", &cx, &cy, &cw, &ch);
    if (!wd->deferred_recalc_job)
-     elm_widget_show_region_set(data, cx, cy, cw, ch + elm_finger_size_get(), EINA_FALSE);
+     elm_widget_show_region_set(data, cx, cy, cw, ch, EINA_FALSE);
    else
      {
         wd->deferred_cur = EINA_TRUE;
         wd->cx = cx;
         wd->cy = cy;
         wd->cw = cw;
-        wd->ch = ch + elm_finger_size_get();
+        wd->ch = ch;
      }
 }
 
