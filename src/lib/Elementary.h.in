@@ -6168,7 +6168,7 @@ extern "C" {
     * @param obj The button object
     * @param icon The icon object for the button
     */
-   EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
     * Get the icon used for the button
     *
@@ -6181,7 +6181,7 @@ extern "C" {
     *
     * @see elm_button_icon_unset()
     */
-   EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Remove the icon set without deleting it and return the object
     *
@@ -6193,7 +6193,7 @@ extern "C" {
     * @param obj The button object
     * @return The icon object that was being used
     */
-   EAPI Evas_Object *elm_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Turn on/off the autorepeat event generated when the button is kept pressed
     *
