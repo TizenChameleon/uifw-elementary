@@ -1945,7 +1945,6 @@ _entry_changed_common_handling(void *data, const char *event)
    if (wd->password_text) eina_stringshare_del(wd->password_text);
    wd->password_text = NULL;
    _check_enable_returnkey(data);
-   evas_object_smart_callback_call(data, event, NULL);
    if (wd->delay_write)
      {
         ecore_timer_del(wd->delay_write);
@@ -1957,8 +1956,16 @@ _entry_changed_common_handling(void *data, const char *event)
         if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
         wd->matchlist_job = ecore_job_add(_matchlist_show, data);
      }
-   if ((!wd->autosave) || (!wd->file)) return;
-   wd->delay_write = ecore_timer_add(2.0, _delay_write, data);
+
+   if ((wd->api) && (wd->api->obj_hidemenu))
+     wd->api->obj_hidemenu(data);
+
+   if ((wd->autosave) && (wd->file))
+     wd->delay_write = ecore_timer_add(2.0, _delay_write, data);
+
+   /* callback - this could call callbacks that delete the entry... thus...
+    * any access to wd after this could be invalid */
+   evas_object_smart_callback_call(data, event, NULL);
 }
 
 static void
@@ -1968,9 +1975,6 @@ _signal_entry_changed(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    if (!wd) return;
 
    _entry_changed_common_handling(data, SIG_CHANGED);
-
-   if ((wd->api) && (wd->api->obj_hidemenu))
-     wd->api->obj_hidemenu(data);
 }
 
 static void
@@ -1980,9 +1984,6 @@ _signal_preedit_changed(void *data, Evas_Object *obj __UNUSED__, const char *emi
    if (!wd) return;
 
    _entry_changed_common_handling(data, SIG_PREEDIT_CHANGED);
-
-   if ((wd->api) && (wd->api->obj_hidemenu))
-     wd->api->obj_hidemenu(data);
 }
 
 static void
