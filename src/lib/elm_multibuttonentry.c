@@ -447,7 +447,7 @@ _contracted_state_set(Evas_Object *obj, int contracted)
                                  wd->rectForEnd = evas_object_rectangle_add(e);
                                  evas_object_color_set(wd->rectForEnd, 0, 0, 0, 0);
                               }
-                            evas_object_size_hint_min_set(wd->rectForEnd, rectSize, closed_height);
+                            evas_object_size_hint_min_set(wd->rectForEnd, rectSize * elm_scale_get(), closed_height * elm_scale_get());
                             elm_box_pack_end(wd->box, wd->rectForEnd);
                             evas_object_show(wd->rectForEnd);
 
@@ -1109,7 +1109,7 @@ _view_init(Evas_Object *obj)
              if(size_str) button_min_height = (Evas_Coord)atoi(size_str);
 
              wd->end_type = MULTIBUTTONENTRY_CLOSED_IMAGE;
-             evas_object_size_hint_min_set(wd->end, button_min_width, button_min_height);
+             evas_object_size_hint_min_set(wd->end, button_min_width * elm_scale_get(), button_min_height * elm_scale_get());
              elm_widget_sub_object_add(obj, wd->end);
           }
      }
