@@ -9742,7 +9742,7 @@ extern "C" {
     *
     * @ingroup Layout
     */
-   EAPI void               elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void               elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * Get the child object in the given content part.
     *
@@ -9755,7 +9755,7 @@ extern "C" {
     *
     * @ingroup Layout
     */
-   EAPI Evas_Object       *elm_layout_content_get(const Evas_Object *obj, const char *swallow) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object       *elm_layout_content_get(const Evas_Object *obj, const char *swallow) EINA_ARG_NONNULL(1);
    /**
     * Unset the layout content.
     *
@@ -9769,7 +9769,7 @@ extern "C" {
     *
     * @ingroup Layout
     */
-   EAPI Evas_Object       *elm_layout_content_unset(Evas_Object *obj, const char *swallow) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object       *elm_layout_content_unset(Evas_Object *obj, const char *swallow) EINA_ARG_NONNULL(1);
    /**
     * Set the text of the given part
     *
@@ -10169,7 +10169,7 @@ extern "C" {
 #define elm_layout_icon_set(_ly, _obj) \
   do { \
     const char *sig; \
-    elm_layout_content_set((_ly), "elm.swallow.icon", (_obj)); \
+    elm_object_content_part_set((_ly), "elm.swallow.icon", (_obj)); \
     if ((_obj)) sig = "elm,state,icon,visible"; \
     else sig = "elm,state,icon,hidden"; \
     elm_object_signal_emit((_ly), sig, "elm"); \
@@ -10183,7 +10183,7 @@ extern "C" {
  * @ingroup Layout
  */
 #define elm_layout_icon_get(_ly) \
-  elm_layout_content_get((_ly), "elm.swallow.icon")
+  elm_object_content_part_get((_ly), "elm.swallow.icon")
 
 /**
  * @def elm_layout_end_set
@@ -10195,7 +10195,7 @@ extern "C" {
 #define elm_layout_end_set(_ly, _obj) \
   do { \
     const char *sig; \
-    elm_layout_content_set((_ly), "elm.swallow.end", (_obj)); \
+    elm_object_content_part_set((_ly), "elm.swallow.end", (_obj)); \
     if ((_obj)) sig = "elm,state,end,visible"; \
     else sig = "elm,state,end,hidden"; \
     elm_object_signal_emit((_ly), sig, "elm"); \
@@ -10209,7 +10209,7 @@ extern "C" {
  * @ingroup Layout
  */
 #define elm_layout_end_get(_ly) \
-  elm_layout_content_get((_ly), "elm.swallow.end")
+  elm_object_content_part_get((_ly), "elm.swallow.end")
 
 /**
  * @def elm_layout_label_set
