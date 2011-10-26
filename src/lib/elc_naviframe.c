@@ -8,12 +8,12 @@ typedef struct _Elm_Naviframe_Text_Item_Pair Elm_Naviframe_Text_Item_Pair;
 
 struct _Widget_Data
 {
-   Eina_Inlist  *stack;
-   Evas_Object  *base;
-   Evas_Object  *rect;
-   Eina_Bool     preserve: 1;
-   Eina_Bool     auto_pushed: 1;
-   Eina_Bool     freeze_events: 1;
+   Eina_Inlist     *stack;
+   Evas_Object     *base;
+   Evas_Object     *rect;
+   Eina_Bool        preserve: 1;
+   Eina_Bool        auto_pushed: 1;
+   Eina_Bool        freeze_events: 1;
 };
 
 struct _Elm_Naviframe_Content_Item_Pair
@@ -498,9 +498,10 @@ _title_clicked(void *data,
 
 static void
 _back_btn_clicked(void *data,
-                  Evas_Object *obj __UNUSED__,
+                  Evas_Object *obj,
                   void *event_info __UNUSED__)
 {
+   evas_object_smart_callback_del(obj, "clicked", _back_btn_clicked);
    elm_naviframe_item_pop(data);
 }
 
@@ -777,11 +778,7 @@ _show_finished(void *data,
                                    SIG_TRANSITION_FINISHED,
                                    data);
    if (wd->freeze_events)
-     {
-        evas_object_hide(wd->rect);
-        //FIXME:
-        evas_object_pass_events_set(wd->base, EINA_FALSE);
-     }
+     evas_object_hide(wd->rect);
 }
 
 static void
@@ -885,11 +882,7 @@ _item_style_set(Elm_Naviframe_Item *navi_it, const char *item_style)
 
    wd = elm_widget_data_get(navi_it->base.widget);
    if (wd && wd->freeze_events)
-     {
-        evas_object_hide(wd->rect);
-        //FIXME:
-        evas_object_pass_events_set(wd->base, EINA_FALSE);
-     }
+     evas_object_hide(wd->rect);
 }
 
 EAPI Evas_Object *
@@ -1007,11 +1000,8 @@ elm_naviframe_item_push(Evas_Object *obj,
    if (prev_it)
      {
         if (wd->freeze_events)
-          {
-             evas_object_show(wd->rect);
-             //FIXME:
-             evas_object_pass_events_set(wd->base, EINA_TRUE);
-          }
+          evas_object_show(wd->rect);
+
         edje_object_signal_emit(prev_it->base.view,
                                 "elm,state,cur,pushed",
                                 "elm");
@@ -1048,17 +1038,13 @@ elm_naviframe_item_pop(Evas_Object *obj)
    if (prev_it)
      {
         if (wd->freeze_events)
-          {
-             evas_object_show(wd->rect);
-             //FIXME:
-             evas_object_pass_events_set(wd->base, EINA_TRUE);
-          }
-        edje_object_signal_emit(it->base.view, "elm,state,cur,popped", "elm");
+          evas_object_show(wd->rect);
         evas_object_show(prev_it->base.view);
         evas_object_raise(prev_it->base.view);
         edje_object_signal_emit(prev_it->base.view,
                                 "elm,state,prev,popped",
                                 "elm");
+        edje_object_signal_emit(it->base.view, "elm,state,cur,popped", "elm");
      }
    else
      _item_del(it);
@@ -1102,11 +1088,7 @@ elm_naviframe_item_promote(Elm_Object_Item *it)
    prev_it = EINA_INLIST_CONTAINER_GET(wd->stack->last->prev,
                                          Elm_Naviframe_Item);
    if (wd->freeze_events)
-     {
-        evas_object_show(wd->rect);
-        //FIXME:
-        evas_object_pass_events_set(wd->base, EINA_TRUE);
-     }
+     evas_object_show(wd->rect);
    edje_object_signal_emit(prev_it->base.view,
                            "elm,state,cur,pushed",
                            "elm");
