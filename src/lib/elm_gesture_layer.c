@@ -174,7 +174,6 @@ struct _Momentum_Type
    unsigned int t_st_y;  /* Time start on Y */
    unsigned int t_end;   /* Time end        */
    unsigned int t_up; /* Recent up event time */
-   int n_fingers;
    int xdir, ydir;
 };
 typedef struct _Momentum_Type Momentum_Type;
@@ -1409,8 +1408,8 @@ _compute_taps_center(Long_Tap_Type *st,
  */
 static void
 _n_long_tap_test(Evas_Object *obj, Pointer_Event *pe,
-      void *event_info, Evas_Callback_Type event_type,
-      Elm_Gesture_Types g_type)
+                 void *event_info, Evas_Callback_Type event_type,
+                 Elm_Gesture_Types g_type)
 {  /* Here we fill Recent_Taps struct and fire-up click/tap timers */
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -1433,91 +1432,91 @@ _n_long_tap_test(Evas_Object *obj, Pointer_Event *pe,
      {
       case EVAS_CALLBACK_MULTI_DOWN:
       case EVAS_CALLBACK_MOUSE_DOWN:
-         st->touched = _add_touched_device(st->touched, pe);
-         st->info.n = eina_list_count(st->touched);
-         if (st->info.n > st->max_touched)
-           st->max_touched = st->info.n;
-         else
-           {  /* User removed finger from touch, then put back - ABORT */
-              if ((gesture->state == ELM_GESTURE_STATE_START) ||
-                    (gesture->state == ELM_GESTURE_STATE_MOVE))
-                {
-                   ev_flag =_set_state(gesture, ELM_GESTURE_STATE_ABORT,
-                         &st->info, EINA_FALSE);
-                   consume_event(wd, event_info, event_type, ev_flag);
-                }
-           }
+        st->touched = _add_touched_device(st->touched, pe);
+        st->info.n = eina_list_count(st->touched);
+        if (st->info.n > st->max_touched)
+          st->max_touched = st->info.n;
+        else
+          {  /* User removed finger from touch, then put back - ABORT */
+             if ((gesture->state == ELM_GESTURE_STATE_START) ||
+                 (gesture->state == ELM_GESTURE_STATE_MOVE))
+               {
+                  ev_flag =_set_state(gesture, ELM_GESTURE_STATE_ABORT,
+                                      &st->info, EINA_FALSE);
+                  consume_event(wd, event_info, event_type, ev_flag);
+               }
+          }
 
-         if ((pe->device == 0) && (eina_list_count(st->touched) == 1))
-           {  /* This is the first mouse down we got */
-              st->info.timestamp = pe->timestamp;
+        if ((pe->device == 0) && (eina_list_count(st->touched) == 1))
+          {  /* This is the first mouse down we got */
+             st->info.timestamp = pe->timestamp;
 
-              /* To test long tap */
-              /* When this timer expires, gesture STARTED */
-              if (!st->timeout)
-                st->timeout = ecore_timer_add(wd->long_tap_start_timeout,
-                      _long_tap_timeout, gesture);
-           }
+             /* To test long tap */
+             /* When this timer expires, gesture STARTED */
+             if (!st->timeout)
+               st->timeout = ecore_timer_add(wd->long_tap_start_timeout,
+                                             _long_tap_timeout, gesture);
+          }
 
-         consume_event(wd, event_info, event_type, ev_flag);
-         _compute_taps_center(st, &st->info.x, &st->info.y, pe);
-         st->center_x = st->info.x;
-         st->center_y = st->info.y;
-         break;
+        consume_event(wd, event_info, event_type, ev_flag);
+        _compute_taps_center(st, &st->info.x, &st->info.y, pe);
+        st->center_x = st->info.x;
+        st->center_y = st->info.y;
+        break;
 
       case EVAS_CALLBACK_MULTI_UP:
       case EVAS_CALLBACK_MOUSE_UP:
-         st->touched = _remove_touched_device(st->touched, pe);
-         _compute_taps_center(st, &st->center_x, &st->center_y, pe);
-         if (st->info.n &&
-               ((gesture->state == ELM_GESTURE_STATE_START) ||
+        st->touched = _remove_touched_device(st->touched, pe);
+        _compute_taps_center(st, &st->center_x, &st->center_y, pe);
+        if (st->info.n &&
+            ((gesture->state == ELM_GESTURE_STATE_START) ||
                 (gesture->state == ELM_GESTURE_STATE_MOVE)))
-           {  /* Report END only for gesture that STARTed */
-              if (eina_list_count(st->touched) == 0)
-                {  /* Report END only at last release event */
-                   ev_flag =_set_state(gesture, ELM_GESTURE_STATE_END,
-                         &st->info, EINA_FALSE);
-                   consume_event(wd, event_info, event_type, ev_flag);
-                }
-           }
-         else
-           {  /* Stop test, user lifts finger before long-start */
-              if (st->timeout) ecore_timer_del(st->timeout);
-              st->timeout = NULL;
-              ev_flag =_set_state(gesture, ELM_GESTURE_STATE_ABORT,
-                    &st->info, EINA_FALSE);
-              consume_event(wd, event_info, event_type, ev_flag);
-           }
+          {  /* Report END only for gesture that STARTed */
+             if (eina_list_count(st->touched) == 0)
+               {  /* Report END only at last release event */
+                  ev_flag =_set_state(gesture, ELM_GESTURE_STATE_END,
+                                      &st->info, EINA_FALSE);
+                  consume_event(wd, event_info, event_type, ev_flag);
+               }
+          }
+        else
+          {  /* Stop test, user lifts finger before long-start */
+             if (st->timeout) ecore_timer_del(st->timeout);
+             st->timeout = NULL;
+             ev_flag =_set_state(gesture, ELM_GESTURE_STATE_ABORT,
+                                 &st->info, EINA_FALSE);
+             consume_event(wd, event_info, event_type, ev_flag);
+          }
 
-         break;
+        break;
 
       case EVAS_CALLBACK_MULTI_MOVE:
       case EVAS_CALLBACK_MOUSE_MOVE:
-         if(st->info.n &&
-               ((gesture->state == ELM_GESTURE_STATE_START) ||
-                (gesture->state == ELM_GESTURE_STATE_MOVE)))
-           {  /* Report MOVE only if STARTED */
-              Evas_Coord x;
-              Evas_Coord y;
-              Elm_Gesture_State state_to_report = ELM_GESTURE_STATE_MOVE;
+        if(st->info.n &&
+           ((gesture->state == ELM_GESTURE_STATE_START) ||
+               (gesture->state == ELM_GESTURE_STATE_MOVE)))
+          {  /* Report MOVE only if STARTED */
+             Evas_Coord x = 0;
+             Evas_Coord y = 0;
+             Elm_Gesture_State state_to_report = ELM_GESTURE_STATE_MOVE;
 
-              _compute_taps_center(st, &x, &y, pe);
-              /* ABORT if user moved fingers out of tap area */
+             _compute_taps_center(st, &x, &y, pe);
+             /* ABORT if user moved fingers out of tap area */
 #if defined(DEBUG_GESTURE_LAYER)
-              printf("%s x,y=(%d,%d) st->info.x,st->info.y=(%d,%d)\n",__func__,x,y,st->info.x,st->info.y);
+             printf("%s x,y=(%d,%d) st->info.x,st->info.y=(%d,%d)\n",__func__,x,y,st->info.x,st->info.y);
 #endif
-              if (!_inside(x, y, st->center_x, st->center_y))
-                state_to_report = ELM_GESTURE_STATE_ABORT;
+             if (!_inside(x, y, st->center_x, st->center_y))
+               state_to_report = ELM_GESTURE_STATE_ABORT;
 
-              /* Report MOVE if gesture started */
-              ev_flag = _set_state(gesture, state_to_report,
-                    &st->info, EINA_TRUE);
-              consume_event(wd, event_info, event_type, ev_flag);
-           }
-         break;
+             /* Report MOVE if gesture started */
+             ev_flag = _set_state(gesture, state_to_report,
+                                  &st->info, EINA_TRUE);
+             consume_event(wd, event_info, event_type, ev_flag);
+          }
+        break;
 
       default:
-         return;
+        return;
      }
 }
 
@@ -1713,8 +1712,8 @@ _momentum_test(Evas_Object *obj, Pointer_Event *pe,
    /* First make avarage of all touched devices to determine center point */
    Eina_List *l;
    Pointer_Event *p;
-   Pointer_Event pe_local = *pe;  /* Copy pe event info to local */
-   int cnt = 1;    /* We start counter counting current pe event */
+   Pointer_Event pe_local = *pe;           /* Copy pe event info to local */
+   unsigned int cnt = 1;    /* We start counter counting current pe event */
    EINA_LIST_FOREACH(wd->touched, l, p)
       if (p->device != pe_local.device)
         {
@@ -1729,10 +1728,11 @@ _momentum_test(Evas_Object *obj, Pointer_Event *pe,
    pe_local.y /= cnt;
 
    /* If user added finger - reset gesture */
-   if ((st->n_fingers) && (st->n_fingers < cnt))
+   if ((st->info.n) && (st->info.n < cnt))
      state_to_report = ELM_GESTURE_STATE_ABORT;
 
-   st->n_fingers = cnt;
+   if (st->info.n < cnt)
+     st->info.n = cnt;
 
    Evas_Event_Flags ev_flag = EVAS_EVENT_FLAG_NONE;
    switch (event_type)
@@ -2089,7 +2089,7 @@ _n_line_test(Evas_Object *obj, Pointer_Event *pe, void *event_info,
           }
      }
 
-   st->info.n = started;
+   st->info.momentum.n = started;
 
 
    if (ended &&
