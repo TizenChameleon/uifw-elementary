@@ -5426,6 +5426,13 @@ extern "C" {
         ELM_GENLIST_ITEM_SUBITEMS = (1 << 0),
         ELM_GENLIST_ITEM_GROUP = (1 << 1)
      } Elm_Genlist_Item_Flags;
+   typedef enum _Elm_Genlist_Item_Field_Flags
+     {
+        ELM_GENLIST_ITEM_FIELD_ALL = 0,
+        ELM_GENLIST_ITEM_FIELD_LABEL = (1 << 0),
+        ELM_GENLIST_ITEM_FIELD_ICON = (1 << 1),
+        ELM_GENLIST_ITEM_FIELD_STATE = (1 << 2)
+     } Elm_Genlist_Item_Field_Flags;
    typedef struct _Elm_Genlist_Item_Class Elm_Genlist_Item_Class;
    typedef struct _Elm_Genlist_Item       Elm_Genlist_Item; /**< Item of Elm_Genlist. Sub-type of Elm_Widget_Item */
    typedef struct _Elm_Genlist_Item_Class_Func Elm_Genlist_Item_Class_Func;
@@ -5517,6 +5524,7 @@ extern "C" {
    EAPI void               elm_genlist_item_icons_orphan(Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
    EAPI const Evas_Object *elm_genlist_item_object_get(const Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
    EAPI void               elm_genlist_item_update(Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_item_fields_update(Elm_Genlist_Item *it, const char *parts, Elm_Genlist_Item_Field_Flags itf) EINA_ARG_NONNULL(1);
    EAPI void               elm_genlist_item_item_class_update(Elm_Genlist_Item *it, const Elm_Genlist_Item_Class *itc) EINA_ARG_NONNULL(1, 2);
    EAPI const Elm_Genlist_Item_Class *elm_genlist_item_item_class_get(const Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
    EAPI void               elm_genlist_item_tooltip_text_set(Elm_Genlist_Item *item, const char *text) EINA_ARG_NONNULL(1);
