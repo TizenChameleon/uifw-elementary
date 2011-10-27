@@ -186,7 +186,6 @@ _theme_hook(Evas_Object *obj)
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
 
    evas_object_hide(wd->rect);
-
 }
 
 static void _emit_hook(Evas_Object *obj,
@@ -707,8 +706,8 @@ _item_del(Elm_Naviframe_Item *it)
         content_pair = EINA_INLIST_CONTAINER_GET(it->content_list,
                                                  Elm_Naviframe_Content_Item_Pair);
         evas_object_event_callback_del(content_pair->content,
-                                        EVAS_CALLBACK_DEL,
-                                        _title_content_del);
+                                       EVAS_CALLBACK_DEL,
+                                       _title_content_del);
         evas_object_del(content_pair->content);
         eina_stringshare_del(content_pair->part);
         it->content_list = eina_inlist_remove(it->content_list,
@@ -1039,12 +1038,12 @@ elm_naviframe_item_pop(Evas_Object *obj)
      {
         if (wd->freeze_events)
           evas_object_show(wd->rect);
+        edje_object_signal_emit(it->base.view, "elm,state,cur,popped", "elm");
         evas_object_show(prev_it->base.view);
         evas_object_raise(prev_it->base.view);
         edje_object_signal_emit(prev_it->base.view,
                                 "elm,state,prev,popped",
                                 "elm");
-        edje_object_signal_emit(it->base.view, "elm,state,cur,popped", "elm");
      }
    else
      _item_del(it);
@@ -1167,7 +1166,7 @@ elm_naviframe_item_style_set(Elm_Object_Item *it, const char *item_style)
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
    Elm_Naviframe_Item *navi_it = (Elm_Naviframe_Item *) it;
 
-   //Return if new style is exsiting one.  
+   //Return if new style is exsiting one.
    if (item_style)
      if (!strcmp(item_style, navi_it->style)) return;
 
