@@ -4533,7 +4533,7 @@ extern "C" {
     * @ingroup Bg
     */
 
-   EAPI void          elm_bg_overlay_set(Evas_Object *obj, Evas_Object *overlay) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void          elm_bg_overlay_set(Evas_Object *obj, Evas_Object *overlay) EINA_ARG_NONNULL(1);
 
    /**
     * Get the overlay object used for the background object.
@@ -4545,7 +4545,7 @@ extern "C" {
     *
     * @ingroup Bg
     */
-   EAPI Evas_Object  *elm_bg_overlay_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object  *elm_bg_overlay_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Get the overlay object used for the background object.
@@ -4557,7 +4557,7 @@ extern "C" {
     *
     * @ingroup Bg
     */
-   EAPI Evas_Object  *elm_bg_overlay_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object  *elm_bg_overlay_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the size of the pixmap representation of the image.
@@ -28439,13 +28439,13 @@ extern "C" {
     *
     * Default contents parts for the naviframe items that you can use for are:
     *
-    * @li "elm.swallow.content" - The main content of the page
-    * @li "elm.swallow.prev_btn" - The button to go to the previous page
-    * @li "elm.swallow.next_btn" - The button to go to the next page
+    * @li "elm.swallow.content" - A main content of the page
+    * @li "elm.swallow.prev_btn" - A button to go to the previous page
+    * @li "elm.swallow.next_btn" - A button to go to the next page
     *
     * Default text parts of naviframe items that you can be used are:
     *
-    * @li "elm.text.title" - The title label in the title area
+    * @li "elm.text.title" - Title label in the title area
     *
     * @ref tutorial_naviframe gives a good overview of the usage of the API.
     * @{
