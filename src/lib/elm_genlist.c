@@ -2325,7 +2325,7 @@ _item_block_unrealize(Item_Block *itb)
    evas_event_freeze(evas_object_evas_get(itb->wd->obj));
    EINA_LIST_FOREACH(itb->items, l, it)
      {
-        if (it->flags != ELM_GENLIST_ITEM_GROUP)
+        if (itb->must_recalc || it->flags != ELM_GENLIST_ITEM_GROUP)
           {
              if (it->dragging)
                {
@@ -2654,8 +2654,8 @@ _calc_job(void *data)
                     if (it->mincalcd) it->mincalcd = EINA_FALSE;
                   itb->changed = EINA_TRUE;
                   if (itb->must_recalc) did_must_recalc = EINA_TRUE;
-                  itb->must_recalc = EINA_FALSE;
                   if (itb->realized) _item_block_unrealize(itb);
+                  itb->must_recalc = EINA_FALSE;
                }
              showme = _item_block_recalc(itb, in, EINA_FALSE);
              chb = itb;
