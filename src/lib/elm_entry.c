@@ -153,6 +153,7 @@ struct _Widget_Data
    Elm_Scroller_Policy policy_h, policy_v;
    Elm_Wrap_Type linewrap;
    Elm_Input_Panel_Layout input_panel_layout;
+   Elm_Autocapital_Type autocapital_type;
    Eina_Bool changed : 1;
    Eina_Bool single_line : 1;
    Eina_Bool password : 1;
@@ -173,9 +174,8 @@ struct _Widget_Data
    Eina_Bool textonly : 1;
    Eina_Bool usedown : 1;
    Eina_Bool scroll : 1;
-   Eina_Bool autoreturnkey : 1;
    Eina_Bool input_panel_enable : 1;
-   Eina_Bool autocapital : 1;
+   Eina_Bool autoreturnkey : 1;
    Eina_Bool autoperiod : 1;
    Eina_Bool matchlist_list_clicked : 1;
    Eina_Bool matchlist_case_sensitive : 1;
@@ -638,7 +638,6 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *t;
-   Ecore_IMF_Context *ic;
    _elm_widget_mirrored_reload(obj);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
 
@@ -650,6 +649,8 @@ _theme_hook(Evas_Object *obj)
    eina_stringshare_del(t);
    if (elm_widget_disabled_get(obj))
      edje_object_signal_emit(wd->ent, "elm,state,disabled", "elm");
+   edje_object_part_text_input_panel_layout_set(wd->ent, "elm.text", wd->input_panel_layout);
+   edje_object_part_text_autocapital_type_set(wd->ent, "elm.text", wd->autocapital_type);
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", wd->input_panel_enable);
    elm_entry_cursor_pos_set(obj, wd->cursor_pos);
    if (elm_widget_focus_get(obj))
@@ -671,24 +672,6 @@ _theme_hook(Evas_Object *obj)
         else
            elm_widget_highlight_in_theme_set(obj, EINA_FALSE);
      }
-
-   if (wd->password)
-     {
-        edje_object_part_text_autoperiod_set(wd->ent, "elm.text", EINA_FALSE);
-        edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", EINA_FALSE);
-     }
-   else
-     {
-        edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
-        edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapital);
-     }
-
-   ic = edje_object_part_text_imf_context_get(wd->ent, "elm.text");
-   if (ic)
-     {
-        ecore_imf_context_input_panel_layout_set(ic, (Ecore_IMF_Input_Panel_Layout)wd->input_panel_layout);
-     }
-
    _sizing_eval(obj);
 }
 
@@ -928,7 +911,8 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         printf("[Elm_entry::Focused] obj : %p\n", obj);
         evas_object_focus_set(wd->ent, EINA_TRUE);
         edje_object_signal_emit(wd->ent, "elm,action,focus", "elm");
-        if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
+        if (top && wd->input_panel_enable)
+          elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
         evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
         _check_enable_returnkey(obj);
         wd->mgf_type = _ENTRY_MAGNIFIER_FIXEDSIZE;
@@ -938,7 +922,8 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         printf("[Elm_entry::Unfocused] obj : %p\n", obj);
         edje_object_signal_emit(wd->ent, "elm,action,unfocus", "elm");
         evas_object_focus_set(wd->ent, EINA_FALSE);
-        if (top) elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
+        if (top && wd->input_panel_enable)
+          elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
         evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
 
         if ((wd->api) && (wd->api->obj_hidemenu))
@@ -3015,7 +3000,10 @@ elm_entry_add(Evas_Object *parent)
    elm_widget_resize_object_set(obj, wd->ent);
    _sizing_eval(obj);
 
+   elm_entry_input_panel_layout_set(obj, ELM_INPUT_PANEL_LAYOUT_NORMAL);
+
    wd->input_panel_enable = edje_object_part_text_input_panel_enabled_get(wd->ent, "elm.text");
+   wd->autocapital_type = edje_object_part_text_autocapital_type_get(wd->ent, "elm.text");
 
 #ifdef HAVE_ELEMENTARY_X
    top = elm_widget_top_get(obj);
@@ -4767,6 +4755,60 @@ elm_entry_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_b
    elm_smart_scroller_bounce_allow_get(wd->scroller, h_bounce, v_bounce);
 }
 
+EAPI void
+elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->input_panel_layout = layout;
+
+   edje_object_part_text_input_panel_layout_set(wd->ent, "elm.text", layout);
+}
+
+EAPI Elm_Input_Panel_Layout
+elm_entry_input_panel_layout_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_INPUT_PANEL_LAYOUT_INVALID;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return ELM_INPUT_PANEL_LAYOUT_INVALID;
+
+   return wd->input_panel_layout;
+}
+
+EAPI void
+elm_entry_autocapital_type_set(Evas_Object *obj, Elm_Autocapital_Type autocapital_type)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->autocapital_type = autocapital_type;
+   edje_object_part_text_autocapital_type_set(wd->ent, "elm.text", autocapital_type);
+}
+
+EAPI Elm_Autocapital_Type
+elm_entry_autocapital_type_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_AUTOCAPITAL_TYPE_NONE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return ELM_AUTOCAPITAL_TYPE_NONE;
+
+   return wd->autocapital_type;
+}
+
+EAPI void
+elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->input_panel_enable = enabled;
+   edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", enabled);
+}
+
 EINA_DEPRECATED EAPI void
 elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
 {
@@ -4812,16 +4854,16 @@ elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   if (wd->password)
-     wd->autocapital = EINA_FALSE;
+   if (autocap)
+     wd->autocapital_type = ELM_AUTOCAPITAL_TYPE_SENTENCE;
    else
-     wd->autocapital = autocap;
+     wd->autocapital_type = ELM_AUTOCAPITAL_TYPE_NONE;
 
    if (wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_URL ||
        wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_EMAIL)
-     wd->autocapital = EINA_FALSE;
+     wd->autocapital_type = ELM_AUTOCAPITAL_TYPE_NONE;
 
-   edje_object_part_text_autocapitalization_set(wd->ent, "elm.text", wd->autocapital);
+   edje_object_part_text_autocapital_type_set(wd->ent, "elm.text", wd->autocapital_type);
 }
 
 /**
@@ -4868,48 +4910,6 @@ elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
 
    wd->autoreturnkey = on;
    _check_enable_returnkey(obj);
-}
-
-/**
- * This sets the attribute to show the input panel automatically.
- *
- * @param obj The entry object
- * @param enabled If true, the input panel is appeared when entry is clicked or has a focus
- *
- * @ingroup Entry
- */
-EAPI void
-elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   wd->input_panel_enable = enabled;
-   edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", enabled);
-}
-
-/**
- * Set the input panel layout of the entry
- *
- * @param obj The entry object
- * @param layout the layout to set
- *
- * @ingroup Entry
- */
-EAPI void
-elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   Ecore_IMF_Context *ic = elm_entry_imf_context_get(obj);
-   if (!ic) return;
-
-   wd->input_panel_layout = layout;
-
-   ecore_imf_context_input_panel_layout_set(ic, (Ecore_IMF_Input_Panel_Layout)layout);
 }
 
 /**
