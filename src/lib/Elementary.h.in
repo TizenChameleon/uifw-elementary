@@ -19848,14 +19848,14 @@ extern "C" {
     * If you want to keep that old content object, use the
     * elm_object_content_unset() function.
     */
-   EAPI void         elm_check_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_check_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the icon object of the check object
     *
     * @param obj The check object
     * @return The icon object
     */
-   EAPI Evas_Object *elm_check_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_check_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the icon used for the check object
     *
@@ -19864,7 +19864,7 @@ extern "C" {
     *
     * Unparent and return the icon object which was set for this widget.
     */
-   EAPI Evas_Object *elm_check_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_check_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the on/off state of the check object
     *
