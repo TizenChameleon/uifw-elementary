@@ -24152,6 +24152,7 @@ extern "C" {
     * - @c "default"
     *
     * Default contents parts of the conformant widget that you can use for are:
+    *
     * @li "elm.swallow.content" - A content of the conformant
     *
     * See how to use this widget in this example:
@@ -24196,7 +24197,7 @@ extern "C" {
     *
     * @ingroup Conformant
     */
-   EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
 
    /**
     * Get the content of the conformant widget.
@@ -24213,7 +24214,7 @@ extern "C" {
     *
     * @ingroup Conformant
     */
-   EAPI Evas_Object *elm_conformant_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_conformant_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Unset the content of the conformant widget.
@@ -24227,7 +24228,7 @@ extern "C" {
     *
     * @ingroup Conformant
     */
-   EAPI Evas_Object *elm_conformant_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_conformant_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Returns the Evas_Object that represents the content area.
