@@ -276,45 +276,19 @@ elm_toggle_label_get(const Evas_Object *obj)
 EAPI void
 elm_toggle_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (wd->icon == icon) return;
-   if (wd->icon) evas_object_del(wd->icon);
-   wd->icon = icon;
-   if (icon)
-     {
-        elm_widget_sub_object_add(obj, icon);
-        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, obj);
-        edje_object_part_swallow(wd->tgl, "elm.swallow.content", icon);
-        edje_object_signal_emit(wd->tgl, "elm,state,icon,visible", "elm");
-        edje_object_message_signal_process(wd->tgl);
-     }
-   _sizing_eval(obj);
+   elm_object_content_set(obj, icon);
 }
 
 EAPI Evas_Object *
 elm_toggle_icon_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->icon;
+   return elm_object_content_get(obj);
 }
 
 EAPI Evas_Object *
 elm_toggle_icon_unset(Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   if (!wd->icon) return NULL;
-   Evas_Object *icon = wd->icon;
-   elm_widget_sub_object_del(obj, wd->icon);
-   edje_object_part_unswallow(wd->tgl, wd->icon);
-   wd->icon = NULL;
-   return icon;
+   return elm_object_content_unset(obj);
 }
 
 EAPI void
