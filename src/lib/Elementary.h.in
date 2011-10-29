@@ -6073,6 +6073,12 @@ extern "C" {
     * continuous look across its options.
     * @li hoversel_vertical_entry: Another internal for @ref Hoversel.
     *
+    * Default contents parts of the button widget that you can use for are:
+    * @li "elm.swallow.content" - A icon of the button
+    *
+    * Default text parts of the button widget that you can use for are:
+    * @li "elm.text" - Label of the button
+    *
     * Follow through a complete example @ref button_example_01 "here".
     * @{
     */
@@ -7683,6 +7689,12 @@ extern "C" {
     *
     * Of all this styles only default shows the title. Frame emits no signals.
     *
+    * Default contents parts of the frame widget that you can use for are:
+    * @li "elm.swallow.content" - A content of the frame
+    *
+    * Default text parts of the frame widget that you can use for are:
+    * @li "elm.text" - Label of the frame
+    *
     * For a detailed example see the @ref tutorial_frame.
     *
     * @{
@@ -7723,7 +7735,7 @@ extern "C" {
     * @param obj The frame object
     * @param content The content will be filled in this frame object
     */
-   EAPI void         elm_frame_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_frame_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the content of the frame widget
     *
@@ -7732,7 +7744,7 @@ extern "C" {
     * @param obj The frame object
     * @return The content that is being used
     */
-   EAPI Evas_Object *elm_frame_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_frame_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the content of the frame widget
     *
@@ -7741,7 +7753,7 @@ extern "C" {
     * @param obj The frame object
     * @return The content that was being used
     */
-   EAPI Evas_Object *elm_frame_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_frame_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @}
     */
@@ -10280,7 +10292,7 @@ extern "C" {
     * you want to keep that old content object, use the
     * elm_notify_content_unset() function.
     */
-   EAPI void              elm_notify_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void              elm_notify_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the content of the notify widget
     *
@@ -10291,7 +10303,7 @@ extern "C" {
     *
     * @see elm_notify_content_set()
     */
-   EAPI Evas_Object      *elm_notify_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object      *elm_notify_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Return the content of the notify widget
     *
@@ -10300,7 +10312,7 @@ extern "C" {
     *
     * @see elm_notify_content_set()
     */
-   EAPI Evas_Object      *elm_notify_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object      *elm_notify_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the notify parent
     *
@@ -23497,7 +23509,7 @@ extern "C" {
     * If you want to keep that old content object, use the
     * elm_panel_content_unset() function.
     */
-   EAPI void                  elm_panel_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void                  elm_panel_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the content of the panel.
     *
@@ -23508,7 +23520,7 @@ extern "C" {
     *
     * @see elm_panel_content_set()
     */
-   EAPI Evas_Object          *elm_panel_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object          *elm_panel_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the content of the panel.
     *
@@ -23519,7 +23531,7 @@ extern "C" {
     *
     * @see elm_panel_content_set()
     */
-   EAPI Evas_Object          *elm_panel_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object          *elm_panel_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the state of the panel.
     *
@@ -24289,7 +24301,7 @@ extern "C" {
     *
     * @ingroup Mapbuf
     */
-   EAPI void         elm_mapbuf_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_mapbuf_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
 
    /**
     * Get the content of the mapbuf.
@@ -24303,7 +24315,7 @@ extern "C" {
     *
     * @ingroup Mapbuf
     */
-   EAPI Evas_Object *elm_mapbuf_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_mapbuf_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Unset the content of the mapbuf.
@@ -24317,7 +24329,7 @@ extern "C" {
     *
     * @ingroup Mapbuf
     */
-   EAPI Evas_Object *elm_mapbuf_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_mapbuf_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Enable or disable the map.
@@ -27960,6 +27972,14 @@ extern "C" {
    EAPI Evas_Object *elm_genscroller_add(Evas_Object *parent);
    EAPI void         elm_genscroller_world_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h);
 
+   EAPI Evas_Object *elm_factory_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_factory_content_set(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED EAPI Evas_Object *elm_factory_content_get(const Evas_Object *obj);
+   EAPI void         elm_factory_maxmin_mode_set(Evas_Object *obj, Eina_Bool enabled);
+   EAPI Eina_Bool    elm_factory_maxmin_mode_get(const Evas_Object *obj);
+   EAPI void         elm_factory_maxmin_reset_set(Evas_Object *obj);
+
+
    /**
     * @defgroup Video Video
     *
@@ -28413,7 +28433,6 @@ extern "C" {
     * application.
     *
     * Signals that you can add callback for are:
-    *
     * @li "transition,finished" - When the transition is finished in changing
     *     the item
     * @li "title,clicked" - User clicked title area
