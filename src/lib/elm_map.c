@@ -1209,12 +1209,7 @@ grid_clear(Evas_Object *obj, Grid *g)
           {
              gi->want = EINA_FALSE;
              wd->preload_num--;
-             if (!wd->preload_num)
-               {
-                  edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr),
-                                          "elm,state,busy,stop", "elm");
-                  evas_object_smart_callback_call(obj, SIG_LOADED_DETAIL, NULL);
-               }
+             if (!wd->preload_num) edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr), "elm,state,busy,stop", "elm");
           }
 
         if (gi->job)
@@ -1244,7 +1239,11 @@ _tile_update(Grid_Item *gi)
    gi->download = EINA_FALSE;
    evas_object_image_file_set(gi->img, gi->file, NULL);
    if (evas_object_image_load_error_get(gi->img) != EVAS_LOAD_ERROR_NONE)
-     ecore_file_remove(gi->file);
+     {
+        ERR("Image loading error (%s)", gi->file);
+        ecore_file_remove(gi->file);
+        return;
+     }
 
    obj_rotate_zoom(gi->wd->obj, gi->img);
    evas_object_show(gi->img);
@@ -1253,13 +1252,7 @@ _tile_update(Grid_Item *gi)
    //evas_object_show(gi->txt);
 
    gi->have = EINA_TRUE;
-   gi->wd->preload_num--;
-   if (!gi->wd->preload_num)
-     {
-        edje_object_signal_emit(elm_smart_scroller_edje_object_get(gi->wd->scr),
-                                "elm,state,busy,stop", "elm");
-        evas_object_smart_callback_call(gi->wd->obj, SIG_LOADED_DETAIL, NULL);
-     }
+   evas_object_smart_callback_call(gi->wd->obj, SIG_LOADED_DETAIL, NULL);
 }
 
 static void
@@ -1270,15 +1263,21 @@ _tile_downloaded(void *data, const char *file __UNUSED__, int status)
    gi->download = EINA_FALSE;
    gi->job = NULL;
 
-   if ((gi->want) && (status == 200)) _tile_update(gi);
+   if ((gi->want) && (status == 200))
+     {
+        _tile_update(gi);
+     }
 
    if (status != 200)
      {
-        DBG("Download failed %s (%d) ", gi->file, status);
+        ERR("\nDownload failed %s (%d) ", gi->file, status);
         ecore_file_remove(gi->file);
      }
    else
      gi->wd->finish_num++;
+
+   gi->wd->preload_num--;
+   if (!gi->wd->preload_num) edje_object_signal_emit(elm_smart_scroller_edje_object_get(gi->wd->scr), "elm,state,busy,stop", "elm");
 
    evas_object_smart_callback_call(gi->wd->obj, SIG_DOWNLOADED, NULL);
    DBG("DOWNLOAD done %s", gi->file);
@@ -1385,15 +1384,6 @@ grid_load(Evas_Object *obj, Grid *g)
                        wd->try_num--;
                     }
                   gi->download = EINA_FALSE;
-                  wd->preload_num--;
-                  if (!wd->preload_num)
-                    {
-                       edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr),
-                                               "elm,state,busy,stop", "elm");
-                       evas_object_smart_callback_call(obj, SIG_LOADED_DETAIL,
-                                                       NULL);
-                    }
-
                }
              else if (gi->have)
                {
@@ -1486,24 +1476,27 @@ grid_load(Evas_Object *obj, Grid *g)
                   if ((ecore_file_exists(buf2)) || (g == eina_list_data_get(wd->grids)))
                     {
                        gi->download = EINA_TRUE;
+
+                       edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr), "elm,state,busy,start", "elm");
+                       evas_object_smart_callback_call(obj, SIG_LOAD_DETAIL, NULL);
                        wd->preload_num++;
-                       if (wd->preload_num == 1)
-                         {
-                            edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr),
-                                                    "elm,state,busy,start", "elm");
-                            evas_object_smart_callback_call(obj,
-                                                            SIG_LOAD_DETAIL,
-                                                            NULL);
-                         }
 
                        if (ecore_file_exists(buf2))
-                         _tile_update(gi);
+                         {
+                           _tile_update(gi);
+                           gi->wd->preload_num--;
+                           if (!gi->wd->preload_num) edje_object_signal_emit(elm_smart_scroller_edje_object_get(gi->wd->scr), "elm,state,busy,stop", "elm");
+                         }
                        else
                          {
                             DBG("DOWNLOAD %s \t in %s", source, buf2);
                             ecore_file_download_full(source, buf2, _tile_downloaded, NULL, gi, &(gi->job), wd->ua);
                             if (!gi->job)
-                              DBG("Can't start to download %s", buf);
+                              {
+                                 ERR("\nCan't start to download %s", buf);
+                                 gi->wd->preload_num--;
+                                 if (!gi->wd->preload_num) edje_object_signal_emit(elm_smart_scroller_edje_object_get(gi->wd->scr), "elm,state,busy,stop", "elm");
+                              }
                             else
                               wd->try_num++;
                          }
