@@ -23910,7 +23910,7 @@ extern "C" {
     *
     * @ingroup Panes
     */
-   EAPI void                  elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void                  elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
 
    /**
     * Set the right content of the panes widget.
@@ -23930,7 +23930,7 @@ extern "C" {
     *
     * @ingroup Panes
     */
-   EAPI void                  elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void                  elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
 
    /**
     * Get the left content of the panes.
@@ -23944,7 +23944,7 @@ extern "C" {
     *
     * @ingroup Panes
     */
-   EAPI Evas_Object          *elm_panes_content_left_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object          *elm_panes_content_left_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Get the right content of the panes.
@@ -23958,7 +23958,7 @@ extern "C" {
     *
     * @ingroup Panes
     */
-   EAPI Evas_Object          *elm_panes_content_right_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object          *elm_panes_content_right_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Unset the left content used for the panes.
@@ -23973,7 +23973,7 @@ extern "C" {
     *
     * @ingroup Panes
     */
-   EAPI Evas_Object          *elm_panes_content_left_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object          *elm_panes_content_left_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Unset the right content used for the panes.
@@ -28503,6 +28503,7 @@ extern "C" {
   #define ELM_NAVIFRAME_ITEM_OPTIONHEADER "elm.swallow.optionheader"
   #define ELM_NAVIFRAME_ITEM_TITLE_LABEL "elm.text.title"
   #define ELM_NAVIFRAME_ITEM_PREV_BTN "elm.swallow.prev_btn"
+  #define ELM_NAVIFRAME_ITEM_NEXT_BTN "elm.swallow.next_btn"
   #define ELM_NAVIFRAME_ITEM_TITLE_LEFT_BTN "elm.swallow.left_btn"
   #define ELM_NAVIFRAME_ITEM_TITLE_RIGHT_BTN "elm.swallow.right_btn"
   #define ELM_NAVIFRAME_ITEM_TITLE_MORE_BTN "elm.swallow.more_btn"
