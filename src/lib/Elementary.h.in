@@ -14359,6 +14359,7 @@ extern "C" {
         ELM_TOOLBAR_SHRINK_HIDE,   /**< Hide exceeding items. */
         ELM_TOOLBAR_SHRINK_SCROLL, /**< Allow accessing exceeding items through a scroller. */
         ELM_TOOLBAR_SHRINK_MENU,   /**< Inserts a button to pop up a menu with exceeding items. */
+        ELM_TOOLBAR_SHRINK_LAST    /**< Indicates error if returned by elm_toolbar_shrink_mode_get() */
      } Elm_Toolbar_Shrink_Mode;
 
    typedef struct _Elm_Toolbar_Item Elm_Toolbar_Item; /**< Item of Elm_Toolbar. Sub-type of Elm_Widget_Item. Can be created with elm_toolbar_item_append(), elm_toolbar_item_prepend() and functions to add items in relative positions, like elm_toolbar_item_insert_before(), and deleted with elm_toolbar_item_del(). */
