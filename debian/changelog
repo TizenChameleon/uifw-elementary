@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build64) unstable; urgency=low
+
+  * Upload Package
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build64
+
+ -- Tae-Hwan Kim <the81.kim@samsung.com>  Mon, 31 Oct 2011 09:55:52 +0900
+
 elementary (1.0.0+svn.61256slp2+build63) unstable; urgency=low
 
   * add elm_genlist_item_fields_update func
