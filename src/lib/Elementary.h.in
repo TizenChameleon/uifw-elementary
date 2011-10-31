@@ -7006,7 +7006,7 @@ extern "C" {
     * elm_scroller_content_unset() function.
     * @deprecated See elm_object_content_set()
     */
-   EAPI void         elm_scroller_content_set(Evas_Object *obj, Evas_Object *child) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_scroller_content_set(Evas_Object *obj, Evas_Object *child) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the content of the scroller widget
     *
@@ -7018,7 +7018,7 @@ extern "C" {
     * @see elm_scroller_content_set()
     * @deprecated use elm_object_content_get() instead.
     */
-   EAPI Evas_Object *elm_scroller_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_scroller_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the content of the scroller widget
     *
@@ -7030,7 +7030,7 @@ extern "C" {
     * @see elm_scroller_content_set()
     * @deprecated use elm_object_content_unset() instead.
     */
-   EAPI Evas_Object *elm_scroller_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_scroller_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Set custom theme elements for the scroller
     *
@@ -17067,7 +17067,7 @@ extern "C" {
     * @ingroup Slider
     * @deprecated use elm_object_content_set() instead.
     */
-   EAPI void               elm_slider_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void               elm_slider_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
 
    /**
     * Unset an icon set on a given slider widget.
@@ -17088,7 +17088,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   EAPI Evas_Object       *elm_slider_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object       *elm_slider_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Retrieve the icon object set for a given slider widget.
@@ -17105,7 +17105,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   EAPI Evas_Object       *elm_slider_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object       *elm_slider_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the end object of the slider object.
@@ -17125,7 +17125,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   EAPI void               elm_slider_end_set(Evas_Object *obj, Evas_Object *end) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void               elm_slider_end_set(Evas_Object *obj, Evas_Object *end) EINA_ARG_NONNULL(1);
 
    /**
     * Unset an end object set on a given slider widget.
@@ -17145,7 +17145,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   EAPI Evas_Object       *elm_slider_end_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object       *elm_slider_end_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Retrieve the end object set for a given slider widget.
@@ -17162,7 +17162,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   EAPI Evas_Object       *elm_slider_end_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object       *elm_slider_end_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the (exact) length of the bar region of a given slider widget.
@@ -19603,7 +19603,7 @@ extern "C" {
     &
     * @deprecated use elm_object_content_set() instead.
     */
-   EAPI void         elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the icon object of the radio object
     *
@@ -19612,7 +19612,7 @@ extern "C" {
     *
     * @see elm_radio_icon_set()
     */
-   EAPI Evas_Object *elm_radio_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_radio_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the icon used for the radio object
     *
@@ -19624,7 +19624,7 @@ extern "C" {
     * @see elm_radio_icon_set()
     * @deprecated use elm_object_content_unset() instead.
     */
-   EAPI Evas_Object *elm_radio_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_radio_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Add this radio to a group of other radio objects
     *
@@ -20851,7 +20851,7 @@ extern "C" {
     *
     * @ingroup Progressbar
     */
-   EAPI void         elm_progressbar_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void         elm_progressbar_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
 
    /**
     * Retrieve the icon object set for a given progress bar widget
@@ -20865,7 +20865,7 @@ extern "C" {
     *
     * @ingroup Progressbar
     */
-   EAPI Evas_Object *elm_progressbar_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_progressbar_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Unset an icon set on a given progress bar widget
@@ -20882,7 +20882,7 @@ extern "C" {
     *
     * @ingroup Progressbar
     */
-   EAPI Evas_Object *elm_progressbar_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object *elm_progressbar_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the (exact) length of the bar region of a given progress bar
