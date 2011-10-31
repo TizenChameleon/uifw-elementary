@@ -100,12 +100,12 @@ static void _entry_key_down_cb(void *data, Evas *e, Evas_Object *obj, void *even
 static void _entry_focus_in_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_focus_out_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
+static void _entry_moved_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static void _view_init(Evas_Object *obj);
 static void _set_vis_guidetext(Evas_Object *obj);
 static void _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv);
 static Evas_Coord _calculate_item_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj_index);
 static void _box_layout_cb(Evas_Object *o, Evas_Object_Box_Data *priv, void *data);
-static void _recalc_entry_geometry(Evas_Object *obj);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -284,6 +284,7 @@ _event_init(Evas_Object *obj)
      {
         evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
         evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_DOWN, _entry_key_down_cb, obj);
+        evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_MOVE, _entry_moved_cb, obj);
         evas_object_smart_callback_add(wd->entry, "changed", _entry_changed_cb, obj);
         evas_object_smart_callback_add(wd->entry, "focused", _entry_focus_in_cb, obj);
         evas_object_smart_callback_add(wd->entry, "unfocused", _entry_focus_out_cb, obj);
@@ -906,8 +907,6 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
           }
      }
    evas_object_smart_callback_call(obj, "item,added", item);
-   _recalc_entry_geometry(obj);
-
    free(str_utf8);
 
    return item;
@@ -1048,6 +1047,21 @@ _entry_changed_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UN
 }
 
 static void
+_entry_moved_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Evas_Coord en_x, en_y, en_w, en_h;
+   Evas_Coord bx_x, bx_y;
+
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
+   evas_object_geometry_get(wd->entry, &en_x, &en_y, &en_w, &en_h);
+   evas_object_geometry_get(wd->box, &bx_x, &bx_y, NULL, NULL);
+
+   elm_widget_show_region_set(wd->box, en_x - bx_x, en_y - bx_y, en_w, en_h, EINA_TRUE);
+}
+
+static void
 _view_init(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1113,20 +1127,6 @@ _view_init(Evas_Object *obj)
              elm_widget_sub_object_add(obj, wd->end);
           }
      }
-}
-
-static void
-_recalc_entry_geometry(Evas_Object *obj)
-{
-   Evas_Coord cx, cy, cw, ch;
-
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (!elm_object_focus_get(obj)) return;
-
-   evas_object_geometry_get(wd->entry, &cx, &cy, &cw, &ch);
-   elm_widget_show_region_set(obj, cx, cy, cw, ch, EINA_FALSE);
 }
 
 static void
