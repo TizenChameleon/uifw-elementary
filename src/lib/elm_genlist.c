@@ -5372,8 +5372,6 @@ _item_moving_effect_timer_cb(void *data)
                   it = elm_genlist_item_prev_get(it);
                }
           }
-        if (wd->calc_job) ecore_job_del(wd->calc_job);
-        wd->calc_job = ecore_job_add(_calc_job, wd);
      }
    else
      {
@@ -5431,6 +5429,7 @@ _item_moving_effect_timer_cb(void *data)
 
         evas_object_smart_callback_call(wd->pan_smart, "changed", NULL);
         evas_object_smart_callback_call(wd->obj, "effect_done", NULL);
+        evas_object_smart_changed(wd->pan_smart);
         return ECORE_CALLBACK_CANCEL;
      }
    return ECORE_CALLBACK_RENEW;
