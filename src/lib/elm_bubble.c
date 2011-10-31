@@ -439,6 +439,8 @@ elm_bubble_content_unset(Evas_Object *obj)
    if (!wd->content) return NULL;
    content = wd->content;
    elm_widget_sub_object_del(obj, content);
+   evas_object_event_callback_del_full(content, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                       _changed_size_hints, obj);
    edje_object_part_unswallow(wd->bbl, content);
    wd->content = NULL;
    return content;
@@ -482,16 +484,16 @@ elm_bubble_sweep_layout_unset(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *sweep = NULL;
+   Evas_Object *icon = NULL;
    if (!wd) return NULL;
-#ifdef SWEEP_SUPPORT
-   if (!wd->sweep) return NULL;
-   sweep = wd->sweep;
-   edje_object_part_unswallow(wd->bbl, sweep);
-   evas_object_hide(sweep);
-   wd->sweep = NULL;
-#endif
-   return sweep;
+   if (!wd->icon) return NULL;
+   icon = wd->icon;
+   elm_widget_sub_object_del(obj, icon);
+   evas_object_event_callback_del_full(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                       _changed_size_hints, obj);
+   edje_object_part_unswallow(wd->bbl, icon);
+   wd->icon = NULL;
+   return icon;
 }
 
 EAPI void
