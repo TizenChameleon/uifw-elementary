@@ -28181,7 +28181,7 @@ extern "C" {
     *
     * @ingroup Video
     */
-   EAPI void elm_player_video_set(Evas_Object *player, Evas_Object *video);
+   EINA_DEPRECATED EAPI void elm_player_video_set(Evas_Object *player, Evas_Object *video);
 
    /**
     * @brief Add a new Elm_Video object to the given parent Elementary (container) object.
