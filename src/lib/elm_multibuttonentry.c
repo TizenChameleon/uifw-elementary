@@ -448,7 +448,7 @@ _contracted_state_set(Evas_Object *obj, int contracted)
                                  wd->rectForEnd = evas_object_rectangle_add(e);
                                  evas_object_color_set(wd->rectForEnd, 0, 0, 0, 0);
                               }
-                            evas_object_size_hint_min_set(wd->rectForEnd, rectSize * elm_scale_get(), closed_height * elm_scale_get());
+                            evas_object_size_hint_min_set(wd->rectForEnd, rectSize, closed_height * elm_scale_get());
                             elm_box_pack_end(wd->box, wd->rectForEnd);
                             evas_object_show(wd->rectForEnd);
 
