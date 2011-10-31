@@ -412,16 +412,8 @@ _sizing_eval(Evas_Object *obj)
      }
    else
      {
-      case ELM_TOOLBAR_SHRINK_MENU: /* fallthrough */
-      case ELM_TOOLBAR_SHRINK_HIDE: /* fallthrough */
-      case ELM_TOOLBAR_SHRINK_SCROLL:
         if (wd->vertical) minh = h - vh;
         else minw = w - vw;
-        break;
-      case ELM_TOOLBAR_SHRINK_NONE:
-        if (wd->vertical) minh = minh_bx + (h - vh);
-        else minw = minw_bx + (w - vw);
-        break;
      }
    minh = minh + (h - vh);
    evas_object_size_hint_min_set(obj, minw, minh);
@@ -1947,7 +1939,7 @@ elm_toolbar_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   wd->vertical = vertical;
+   wd->vertical = !horizontal;
    _sizing_eval(obj);
 }
 
@@ -1959,3 +1951,5 @@ elm_toolbar_horizontal_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return !wd->vertical;
 }
+
+
