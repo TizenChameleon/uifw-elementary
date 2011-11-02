@@ -680,7 +680,8 @@ _elm_win_xwindow_get(Elm_Win *win)
             ENGINE_COMPARE(ELM_SOFTWARE_16_WINCE) ||
             ENGINE_COMPARE(ELM_SOFTWARE_SDL) ||
             ENGINE_COMPARE(ELM_SOFTWARE_16_SDL) ||
-            ENGINE_COMPARE(ELM_OPENGL_SDL))
+            ENGINE_COMPARE(ELM_OPENGL_SDL) ||
+	    ENGINE_COMPARE(ELM_OPENGL_COCOA))
      {
      }
    else if (ENGINE_COMPARE(ELM_SOFTWARE_16_X11))
@@ -1471,6 +1472,19 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
           {
              win->ee = ecore_evas_gl_sdl_new(NULL, 1, 1, 0, 0);
              FALLBACK_TRY("OpenGL SDL");
+          }
+        else if (ENGINE_COMPARE(ELM_OPENGL_COCOA))
+          {
+             win->ee = ecore_evas_cocoa_new(NULL, 1, 1, 0, 0);
+             FALLBACK_TRY("OpenGL Cocoa");
+          }
+        else if (ENGINE_COMPARE(ELM_BUFFER))
+          {
+             win->ee = ecore_evas_buffer_new(1, 1);
+          }
+        else if (ENGINE_COMPARE(ELM_EWS))
+          {
+             win->ee = ecore_evas_ews_new(0, 0, 1, 1);
           }
         else if (!strncmp(_elm_config->engine, "shot:", 5))
           {

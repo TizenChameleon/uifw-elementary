@@ -480,6 +480,7 @@ elm_quicklaunch_sub_shutdown(void)
             ENGINE_COMPARE(ELM_SOFTWARE_SDL) ||
             ENGINE_COMPARE(ELM_SOFTWARE_16_SDL) ||
             ENGINE_COMPARE(ELM_OPENGL_SDL) ||
+            ENGINE_COMPARE(ELM_OPENGL_COCOA) ||
             ENGINE_COMPARE(ELM_SOFTWARE_WIN32) ||
             ENGINE_COMPARE(ELM_SOFTWARE_16_WINCE))
 #undef ENGINE_COMPARE

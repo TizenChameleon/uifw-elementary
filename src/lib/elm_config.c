@@ -30,6 +30,9 @@ const char *_elm_engines[] = {
    "sdl",
    "software_16_sdl",
    "opengl_sdl",
+   "buffer",
+   "ews",
+   "opengl_cocoa",
    NULL
 };
 
@@ -1474,6 +1477,11 @@ _env_get(void)
                  (!strcasecmp(s, "gl-sdl")) ||
                  (!strcasecmp(s, "gl_sdl")))
           eina_stringshare_replace(&_elm_config->engine, ELM_OPENGL_SDL);
+        else if ((!strcasecmp(s, "opengl-cocoa")) ||
+                 (!strcasecmp(s, "opengl_cocoa")) ||
+                 (!strcasecmp(s, "gl-cocoa")) ||
+                 (!strcasecmp(s, "gl_cocoa")))
+          eina_stringshare_replace(&_elm_config->engine, ELM_OPENGL_COCOA);
         else if ((!strcasecmp(s, "gdi")) ||
                  (!strcasecmp(s, "software-gdi")) ||
                  (!strcasecmp(s, "software_gdi")))
@@ -1712,7 +1720,8 @@ _elm_config_sub_init(void)
    if (ENGINE_COMPARE(ELM_SOFTWARE_X11) ||
        ENGINE_COMPARE(ELM_SOFTWARE_16_X11) ||
        ENGINE_COMPARE(ELM_XRENDER_X11) ||
-       ENGINE_COMPARE(ELM_OPENGL_X11))
+       ENGINE_COMPARE(ELM_OPENGL_X11) ||
+       ENGINE_COMPARE(ELM_OPENGL_COCOA))
 #undef ENGINE_COMPARE
      {
 #ifdef HAVE_ELEMENTARY_X
