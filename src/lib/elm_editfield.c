@@ -254,8 +254,6 @@ _entry_changed_cb(void *data, Evas_Object *obj, void* event_info __UNUSED__)
                }
           }
      }
-   if (!wd->editing && wd->single_line)
-     edje_object_signal_emit(wd->base, "elm,state,over,show", "elm");
 }
 
 static void
