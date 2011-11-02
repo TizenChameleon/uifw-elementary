@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build66) unstable; urgency=low
+
+  * Map: ugernt bug fix
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build66
+
+ -- Tae-Hwan Kim <the81.kim@samsung.com>  Wed, 02 Nov 2011 09:45:36 +0900
+
 elementary (1.0.0+svn.61256slp2+build65) unstable; urgency=low
 
   * Upload Package
