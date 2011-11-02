@@ -108,6 +108,7 @@ struct _Smart_Data
    Eina_Bool    disabled : 1;
    Eina_Bool    is_mirrored : 1;
    Eina_Bool    mirrored_auto_mode : 1;   /* This is TRUE by default */
+   Eina_Bool    still_in : 1;
 
    Eina_List   *focus_chain;
    Eina_List   *event_cb;
@@ -231,12 +232,50 @@ _sub_obj_hide(void        *data __UNUSED__,
 }
 
 static void
-_sub_obj_mouse_down(void        *data __UNUSED__,
+_sub_obj_mouse_down(void        *data,
+                    Evas        *e __UNUSED__,
+                    Evas_Object *obj __UNUSED__,
+                    void        *event_info)
+{
+   Smart_Data *sd = data;
+   Evas_Event_Mouse_Down *ev = event_info;
+   if (!(ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD))
+     sd->still_in = EINA_TRUE;
+}
+
+static void
+_sub_obj_mouse_move(void        *data,
                     Evas        *e __UNUSED__,
                     Evas_Object *obj,
-                    void        *event_info __UNUSED__)
+                    void        *event_info)
 {
-   elm_widget_focus_mouse_down_handle(obj);
+   Smart_Data *sd = data;
+   Evas_Event_Mouse_Move *ev = event_info;
+   if (sd->still_in)
+     {
+        if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
+          sd->still_in = EINA_FALSE;
+        else
+          {
+             Evas_Coord x, y, w, h;
+             evas_object_geometry_get(obj, &x, &y, &w, &h);
+             if ((ev->cur.canvas.x < x) || (ev->cur.canvas.y < y) ||
+                 (ev->cur.canvas.x >= (x + w)) || (ev->cur.canvas.y >= (y + h)))
+               sd->still_in = EINA_FALSE;
+          }
+     }
+}
+
+static void
+_sub_obj_mouse_up(void        *data,
+                  Evas        *e __UNUSED__,
+                  Evas_Object *obj,
+                  void        *event_info __UNUSED__)
+{
+   Smart_Data *sd = data;
+   if (sd->still_in)
+     elm_widget_focus_mouse_up_handle(obj);
+   sd->still_in = EINA_FALSE;
 }
 
 static void
@@ -979,6 +1018,10 @@ elm_widget_resize_object_set(Evas_Object *obj,
                                             _sub_obj_del, sd);
         evas_object_event_callback_del_full(sd->resize_obj, EVAS_CALLBACK_MOUSE_DOWN,
                                             _sub_obj_mouse_down, sd);
+        evas_object_event_callback_del_full(sd->resize_obj, EVAS_CALLBACK_MOUSE_MOVE,
+                                            _sub_obj_mouse_move, sd);
+        evas_object_event_callback_del_full(sd->resize_obj, EVAS_CALLBACK_MOUSE_UP,
+                                            _sub_obj_mouse_up, sd);
         evas_object_smart_member_del(sd->resize_obj);
         if (_elm_widget_is(sd->resize_obj))
           {
@@ -1000,6 +1043,10 @@ elm_widget_resize_object_set(Evas_Object *obj,
                                             _sub_obj_del, sd);
         evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_MOUSE_DOWN,
                                             _sub_obj_mouse_down, sd);
+        evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_MOUSE_MOVE,
+                                            _sub_obj_mouse_move, sd);
+        evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_MOUSE_UP,
+                                            _sub_obj_mouse_up, sd);
         evas_object_smart_member_del(sobj);
         if (_elm_widget_is(sobj))
           {
@@ -1023,6 +1070,10 @@ elm_widget_resize_object_set(Evas_Object *obj,
                                        _sub_obj_del, sd);
         evas_object_event_callback_add(sobj, EVAS_CALLBACK_MOUSE_DOWN,
                                        _sub_obj_mouse_down, sd);
+        evas_object_event_callback_add(sobj, EVAS_CALLBACK_MOUSE_MOVE,
+                                       _sub_obj_mouse_move, sd);
+        evas_object_event_callback_add(sobj, EVAS_CALLBACK_MOUSE_UP,
+                                       _sub_obj_mouse_up, sd);
         _smart_reconfigure(sd);
         evas_object_data_set(sobj, "elm-parent", obj);
         evas_object_smart_callback_call(obj, "sub-object-add", sobj);
@@ -2386,7 +2437,7 @@ elm_widget_focus_hide_handle(Evas_Object *obj)
 }
 
 EAPI void
-elm_widget_focus_mouse_down_handle(Evas_Object *obj)
+elm_widget_focus_mouse_up_handle(Evas_Object *obj)
 {
    Evas_Object *o = obj;
    do
