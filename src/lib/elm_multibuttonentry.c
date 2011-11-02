@@ -165,7 +165,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 
    if (elm_widget_focus_get(obj))
      {
-        wd->focused = EINA_TRUE;
         if ((imf_context) && (wd->current))
           {
              ecore_imf_context_input_panel_show(imf_context);
@@ -175,6 +174,8 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
              _view_update(obj);
              ecore_imf_context_input_panel_show(imf_context);
           }
+        wd->focused = EINA_TRUE;
+        evas_object_smart_callback_call(obj, "focused", NULL);
      }
    else
      {
@@ -270,7 +271,6 @@ _event_init(Evas_Object *obj)
    if (wd->base)
      {
         edje_object_signal_callback_add(wd->base, "mouse,clicked,1", "*", _signal_mouse_clicked, obj);
-        edje_object_signal_callback_add(wd->base, "clicked", "*", _signal_mouse_clicked, obj);
         evas_object_event_callback_add(wd->base, EVAS_CALLBACK_KEY_UP, _evas_mbe_key_up_cb, obj);
      }
 
