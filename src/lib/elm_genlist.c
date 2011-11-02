@@ -2131,6 +2131,7 @@ _item_realize(Elm_Genlist_Item *it,
              const char *key;
              if (it->renamed)
                {
+                  edje_object_signal_emit(it->base.view, "elm,state,rename,enabled", "elm");
                   it->icons =
                      elm_widget_stringlist_get(edje_object_data_get(it->base.view, "renames"));
                   EINA_LIST_FOREACH(it->icons, l, key)
@@ -2490,11 +2491,6 @@ _item_block_position(Item_Block *itb,
                   if (vis)
                     {
                        if (!it->realized) _item_realize(it, in, EINA_FALSE);
-                       if (it->renamed)
-                         {
-                            if (it->wd->edit_mode) edje_object_signal_emit(it->edit_obj, "elm,state,rename,enabled", "elm");
-                            edje_object_signal_emit(it->base.view, "elm,state,rename,enabled", "elm");
-                         }
                     }
                }
              if (it->realized)
@@ -5631,6 +5627,7 @@ _effect_item_realize(Elm_Genlist_Item *it, Eina_Bool effect_on)
              const Eina_List *l;
              const char *key;
 
+             if (it->renamed) edje_object_signal_emit(it->edit_obj, "elm,state,rename,enabled", "elm");
              it->icons = elm_widget_stringlist_get(edje_object_data_get(it->edit_obj, "edit_icons"));
              EINA_LIST_FOREACH(it->icons, l, key)
                {
