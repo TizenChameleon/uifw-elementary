@@ -24,12 +24,12 @@ external_datepicker_state_set(void *data __UNUSED__, Evas_Object *obj, const voi
    if ((p->year_exists) || (p->mon_exists) || (p->day_exists))
      {
         int year, mon, day;
-	 elm_datepicker_date_get(obj, &year, &mon, &day);
+        elm_datepicker_date_get(obj, &year, &mon, &day);
 
-	 if (p->year_exists) year = p->year;
-	 if (p->mon_exists) mon = p->mon;
-	 if (p->day_exists) day = p->day;
-	 elm_datepicker_date_set(obj, year, mon, day);
+        if (p->year_exists) year = p->year;
+        if (p->mon_exists) mon = p->mon;
+        if (p->day_exists) day = p->day;
+        elm_datepicker_date_set(obj, year, mon, day);
      }
 }
 
@@ -38,41 +38,41 @@ external_datepicker_param_set(void *data __UNUSED__, Evas_Object *obj, const Edj
 {
    if (!strcmp(param->name, "format"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
-	  {
-	     elm_datepicker_date_format_set(obj, param->s);
-	     return EINA_TRUE;
-	  }
+        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
+          {
+             elm_datepicker_date_format_set(obj, param->s);
+             return EINA_TRUE;
+          }
      }
    else if (!strcmp(param->name, "years"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-	     int mon, day;
-	     elm_datepicker_date_get(obj, NULL, &mon, &day);
-	     elm_datepicker_date_set(obj, param->i, mon, day);
-	     return EINA_TRUE;
-	  }
+        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+          {
+             int mon, day;
+             elm_datepicker_date_get(obj, NULL, &mon, &day);
+             elm_datepicker_date_set(obj, param->i, mon, day);
+             return EINA_TRUE;
+          }
      }
    else if (!strcmp(param->name, "months"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-	     int year, day;
-	     elm_datepicker_date_get(obj, &year, NULL, &day);
-	     elm_datepicker_date_set(obj, year, param->i, day);
-	     return EINA_TRUE;
-	  }
+        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+          {
+             int year, day;
+             elm_datepicker_date_get(obj, &year, NULL, &day);
+             elm_datepicker_date_set(obj, year, param->i, day);
+             return EINA_TRUE;
+          }
      }
    else if (!strcmp(param->name, "days"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-	     int year, mon;
-	     elm_datepicker_date_get(obj, &year, &mon, NULL);
-	     elm_datepicker_date_set(obj, year, mon, param->i);
-	     return EINA_TRUE;
-	  }
+        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+          {
+             int year, mon;
+             elm_datepicker_date_get(obj, &year, &mon, NULL);
+             elm_datepicker_date_set(obj, year, mon, param->i);
+             return EINA_TRUE;
+          }
      }
 
    ERR("unknown parameter '%s' of type '%s'",
@@ -86,35 +86,35 @@ external_datepicker_param_get(void *data __UNUSED__, const Evas_Object *obj, Edj
 {
    if (!strcmp(param->name, "format"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
-	  {
-	     param->s = elm_datepicker_date_format_get(obj);
-	     return EINA_TRUE;
-	  }
+        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
+          {
+             param->s = elm_datepicker_date_format_get(obj);
+             return EINA_TRUE;
+          }
      }
    else if (!strcmp(param->name, "years"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-	     elm_datepicker_date_get(obj, &(param->i), NULL, NULL);
-	     return EINA_TRUE;
-	  }
+        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+          {
+             elm_datepicker_date_get(obj, &(param->i), NULL, NULL);
+             return EINA_TRUE;
+          }
      }
    else if (!strcmp(param->name, "months"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-	     elm_datepicker_date_get(obj, NULL, &(param->i), NULL);
-	     return EINA_TRUE;
-	  }
+        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+          {
+             elm_datepicker_date_get(obj, NULL, &(param->i), NULL);
+             return EINA_TRUE;
+          }
      }
    else if (!strcmp(param->name, "days"))
      {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-	     elm_datepicker_date_get(obj, NULL, NULL, &(param->i));
-	     return EINA_TRUE;
-	  }
+        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+          {
+             elm_datepicker_date_get(obj, NULL, NULL, &(param->i));
+             return EINA_TRUE;
+          }
      }
 
    ERR("unknown parameter '%s' of type '%s'",
@@ -136,33 +136,33 @@ external_datepicker_params_parse(void *data, Evas_Object *obj, const Eina_List *
 
    EINA_LIST_FOREACH(params, l, param)
      {
-	if (!strcmp(param->name, "format"))
-	  mem->format = eina_stringshare_add(param->s);
-	else if (!strcmp(param->name, "years"))
-	{
-	   mem->year = param->i;
-	   mem->year_exists = EINA_TRUE;
-	}
-	else if (!strcmp(param->name, "months"))
-	{
-	   mem->mon = param->i;
-	   mem->mon_exists = EINA_TRUE;
-	}
-	else if (!strcmp(param->name, "days"))
-	{
-	  mem->day = param->i;
-	  mem->day_exists = EINA_TRUE;
-	}
+        if (!strcmp(param->name, "format"))
+          mem->format = eina_stringshare_add(param->s);
+        else if (!strcmp(param->name, "years"))
+          {
+             mem->year = param->i;
+             mem->year_exists = EINA_TRUE;
+          }
+        else if (!strcmp(param->name, "months"))
+          {
+             mem->mon = param->i;
+             mem->mon_exists = EINA_TRUE;
+          }
+        else if (!strcmp(param->name, "days"))
+          {
+             mem->day = param->i;
+             mem->day_exists = EINA_TRUE;
+          }
      }
 
    return mem;
 }
 
 static Evas_Object *external_datepicker_content_get(void *data __UNUSED__,
-		const Evas_Object *obj, const char *content)
+                const Evas_Object *obj, const char *content)
 {
-	ERR("so content");
-	return NULL;
+   ERR("so content");
+   return NULL;
 }
 
 static void
@@ -186,5 +186,3 @@ static Edje_External_Param_Info external_datepicker_params[] = {
 
 DEFINE_EXTERNAL_ICON_ADD(datepicker, "datepicker");
 DEFINE_EXTERNAL_TYPE_SIMPLE(datepicker, "Datepicker");
-
-
