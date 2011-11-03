@@ -75,10 +75,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
       return;
    if (elm_widget_focus_get(obj))
      {
-        /*FIXME: Sending clicked signal to focus editfield once open source is merged
-         * remove the below call
-         */
-        elm_object_signal_emit(wd->ef, "clicked", "elm");
+        elm_object_focus(wd->ef);
         if (wd->cancel_btn_show_mode)
           {
              if (wd->cancel_btn_ani_flag) edje_object_signal_emit(wd->base, "CANCELIN", "PROG");
