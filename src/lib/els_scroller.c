@@ -399,13 +399,13 @@ _update_wanted_coordinates(Smart_Data *sd, Evas_Coord x, Evas_Coord y)
     * adjust a bit. */
    elm_smart_scroller_child_viewport_size_get(sd->smart_obj, &sd->ww, &sd->wh);
    if (x < 0)
-      sd->wx = 0;
+     sd->wx = 0;
    else if ((x + sd->ww) > cw)
-      sd->wx = cw - sd->ww;
+     sd->wx = cw - sd->ww;
    else if (sd->is_mirrored)
-      sd->wx = _elm_smart_scroller_x_mirrored_get(sd->smart_obj, x);
+     sd->wx = _elm_smart_scroller_x_mirrored_get(sd->smart_obj, x);
    else
-      sd->wx = x;
+     sd->wx = x;
    if (y < 0) sd->wy = 0;
    else if ((y + sd->wh) > ch) sd->wy = ch - sd->wh;
    else sd->wy = y;
@@ -448,7 +448,7 @@ _smart_scrollto_x_animator(void *data)
    tt = 1.0 - (tt * tt);
    sd->pan_func.get(sd->pan_obj, &px, &py);
    px = (sd->scrollto.x.start * (1.0 - tt)) +
-     (sd->scrollto.x.end * tt);
+      (sd->scrollto.x.end * tt);
    if (t >= sd->scrollto.x.t_end)
      {
         px = sd->scrollto.x.end;
@@ -536,7 +536,7 @@ _smart_scrollto_y_animator(void *data)
    tt = 1.0 - (tt * tt);
    sd->pan_func.get(sd->pan_obj, &px, &py);
    py = (sd->scrollto.y.start * (1.0 - tt)) +
-     (sd->scrollto.y.end * tt);
+      (sd->scrollto.y.end * tt);
    if (t >= sd->scrollto.y.t_end)
      {
         py = sd->scrollto.y.end;
@@ -701,10 +701,10 @@ _smart_bounce_x_animator(void *data)
         if (sd->down.momentum_animator)
           {
              ed = abs(sd->down.dx * (_elm_config->thumbscroll_friction + sd->down.extra_time) - sd->down.b0x);
-             md = abs(_elm_config->thumbscroll_friction*5*w);
+             md = abs(_elm_config->thumbscroll_friction * 5 * w);
              if (ed > md) r = (double)(md)/(double)ed;
           }
-        x = sd->down.b2x + (int)((double)(dx - odx)*r);
+        x = sd->down.b2x + (int)((double)(dx - odx) * r);
         if (!sd->down.cancelled)
           elm_smart_scroller_child_pos_set(sd->smart_obj, x, y);
         if (dt >= 1.0)
@@ -754,10 +754,10 @@ _smart_bounce_y_animator(void *data)
         if (sd->down.momentum_animator)
           {
              ed = abs(sd->down.dy * (_elm_config->thumbscroll_friction + sd->down.extra_time) - sd->down.b0y);
-             md = abs(_elm_config->thumbscroll_friction*5*h);
+             md = abs(_elm_config->thumbscroll_friction * 5 * h);
              if (ed > md) r = (double)(md)/(double)ed;
           }
-        y = sd->down.b2y + (int)((double)(dy - ody)*r);
+        y = sd->down.b2y + (int)((double)(dy - ody) * r);
         if (!sd->down.cancelled)
           elm_smart_scroller_child_pos_set(sd->smart_obj, x, y);
         if (dt >= 1.0)
@@ -791,19 +791,19 @@ can_scroll(Smart_Data *sd, int dir)
    sd->pan_func.get(sd->pan_obj, &px, &py);
    switch (dir)
      {
-     case LEFT:
+      case LEFT:
         if (px > minx) return EINA_TRUE;
         break;
-     case RIGHT:
+      case RIGHT:
         if ((px - minx) < mx) return EINA_TRUE;
         break;
-     case UP:
+      case UP:
         if (py > miny) return EINA_TRUE;
         break;
-     case DOWN:
+      case DOWN:
         if ((py - miny) < my) return EINA_TRUE;
         break;
-     default:
+      default:
         break;
      }
    return EINA_FALSE;
