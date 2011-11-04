@@ -181,7 +181,6 @@ AM_CONDITIONAL([BUILD_RUN], [test "x$have_socket" = "xyes"])
 m4_ifdef([v_mic],
    [
     EFL_COMPILER_FLAG([-Wall])
-    EFL_COMPILER_FLAG([-W])
    ])
 
 have_fork="no"
