@@ -12112,11 +12112,18 @@ extern "C" {
    /**
     * @defgroup Bubble Bubble
     *
-    * @brief The Bubble is a widget to show text similarly to how speech is
+    * @image html img/widget/bubble/preview-00.png
+    * @image latex img/widget/bubble/preview-00.eps
+    * @image html img/widget/bubble/preview-01.png
+    * @image latex img/widget/bubble/preview-01.eps
+    * @image html img/widget/bubble/preview-02.png
+    * @image latex img/widget/bubble/preview-02.eps
+    *
+    * @brief The Bubble is a widget to show text similar to how speech is
     * represented in comics.
     *
     * The bubble widget contains 5 important visual elements:
-    * @li The frame is a rectangle with rounded rectangles and an "arrow".
+    * @li The frame is a rectangle with rounded edjes and an "arrow".
     * @li The @p icon is an image to which the frame's arrow points to.
     * @li The @p label is a text which appears to the right of the icon if the
     * corner is "top_left" or "bottom_left" and is right aligned to the frame
@@ -12166,7 +12173,7 @@ extern "C" {
     * @return The string of set in the label
     *
     * This function gets the title of the bubble.
-    * @deprecated use elm_object_text_set() instead.
+    * @deprecated use elm_object_text_get() instead.
     */
    EINA_DEPRECATED EAPI const char  *elm_bubble_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -12177,7 +12184,7 @@ extern "C" {
     *
     * This function sets the info of the bubble. Where this appears depends on
     * the selected corner.
-    * @deprecated use elm_object_text_set() instead.
+    * @deprecated use elm_object_text_part_set() instead. (with "info" as the parameter).
     */
    EINA_DEPRECATED EAPI void         elm_bubble_info_set(Evas_Object *obj, const char *info) EINA_ARG_NONNULL(1);
    /**
@@ -12188,7 +12195,7 @@ extern "C" {
     * @return The "info" string of the bubble
     *
     * This function gets the info text.
-    * @deprecated use elm_object_text_set() instead.
+    * @deprecated use elm_object_text_part_get() instead. (with "info" as the parameter).
     */
    EINA_DEPRECATED EAPI const char  *elm_bubble_info_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -12259,7 +12266,7 @@ extern "C" {
     *
     * This function sets the corner of the bubble. The corner will be used to
     * determine where the arrow in the frame points to and where label, icon and
-    * info arre shown.
+    * info are shown.
     *
     * Possible values for corner are:
     * @li "top_left" - Default
