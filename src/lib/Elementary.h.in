@@ -11,7 +11,237 @@
 /**
 @mainpage Elementary
 @image html  elementary.png
-@version @PACKAGE_VERSION@
+@version 0.8.0
+@date 2008-2011
+
+@section intro What is Elementary?
+
+This is a VERY SIMPLE toolkit. It is not meant for writing extensive desktop
+applications (yet). Small simple ones with simple needs.
+
+It is meant to make the programmers work almost brainless but give them lots
+of flexibility.
+
+@li @ref Start - Go here to quickly get started with writing Apps
+
+@section organization Organization
+
+One can divide Elemementary into three main groups:
+@li @ref infralist - These are modules that deal with Elementary as a whole.
+@li @ref widgetslist - These are the widgets you'll compose your UI out of.
+@li @ref containerslist - These are the containers which hold the widgets.
+
+@section license License
+
+LGPL v2 (see COPYING in the base of Elementary's source). This applies to
+all files in the source tree.
+
+@section ack Acknowledgements
+There is a lot that goes into making a widget set, and they don't happen out of
+nothing. It's like trying to make everyone everywhere happy, regardless of age,
+gender, race or nationality - and that is really tough. So thanks to people and
+organisations behind this, as listed in the @ref authors page.
+*/
+
+
+/**
+ * @defgroup Start Getting Started
+ *
+ * To write an Elementary app, you can get started with the following:
+ *
+@code
+#include <Elementary.h>
+EAPI_MAIN int
+elm_main(int argc, char **argv)
+{
+   // create window(s) here and do any application init
+   elm_run(); // run main loop
+   elm_shutdown(); // after mainloop finishes running, shutdown
+   return 0; // exit 0 for exit code
+}
+ELM_MAIN()
+@endcode
+ *
+ * To use autotools (which helps in many ways in the long run, like being able
+ * to immediately create releases of your software directly from your tree
+ * and ensure everything needed to build it is there) you will need a
+ * configure.ac, Makefile.am and autogen.sh file.
+ *
+ * configure.ac:
+ *
+@verbatim
+AC_INIT(myapp, 0.0.0, myname@mydomain.com)
+AC_PREREQ(2.52)
+AC_CONFIG_SRCDIR(configure.ac)
+AM_CONFIG_HEADER(config.h)
+AC_PROG_CC
+AM_INIT_AUTOMAKE(1.6 dist-bzip2)
+PKG_CHECK_MODULES([ELEMENTARY], elementary)
+AC_OUTPUT(Makefile)
+@endverbatim
+ *
+ * Makefile.am:
+ *
+@verbatim
+AUTOMAKE_OPTIONS = 1.4 foreign
+MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.h.in configure depcomp install-sh missing
+
+INCLUDES = -I$(top_srcdir)
+
+bin_PROGRAMS = myapp
+
+myapp_SOURCES = main.c
+myapp_LDADD = @ELEMENTARY_LIBS@
+myapp_CFLAGS = @ELEMENTARY_CFLAGS@
+@endverbatim
+ *
+ * autogen.sh:
+ *
+@verbatim
+#!/bin/sh
+echo "Running aclocal..." ; aclocal $ACLOCAL_FLAGS || exit 1
+echo "Running autoheader..." ; autoheader || exit 1
+echo "Running autoconf..." ; autoconf || exit 1
+echo "Running automake..." ; automake --add-missing --copy --gnu || exit 1
+./configure "$@"
+@endverbatim
+ *
+ * To generate all the things needed to bootstrap just run:
+ *
+@verbatim
+./autogen.sh
+@endverbatim
+ *
+ * This will generate Makefile.in's, the confgure script and everything else.
+ * After this it works like all normal autotools projects:
+@verbatim
+./configure
+make
+sudo make install
+@endverbatim
+ *
+ * Note sudo was assumed to get root permissions, as this would install in
+ * /usr/local which is system-owned. Use any way you like to gain root, or
+ * specify a different prefix with configure:
+ *
+@verbatim
+./confiugre --prefix=$HOME/mysoftware
+@endverbatim
+ *
+ * Also remember that autotools buys you some useful commands like:
+@verbatim
+make uninstall
+@endverbatim
+ *
+ * This uninstalls the software after it was installed with "make install".
+ * It is very useful to clear up what you built if you wish to clean the
+ * system.
+ *
+@verbatim
+make distcheck
+@endverbatim
+ *
+ * This firstly checks if your build tree is "clean" and ready for
+ * distribution. It also builds a tarball (myapp-0.0.0.tar.gz) that is
+ * ready to upload and distribute to the world, that contains the generated
+ * Makefile.in's and configure script. The users do not need to run
+ * autogen.sh - just configure and on. They don't need autotools installed.
+ * This tarball also builds cleanly, has all the sources it needs to build
+ * included (that is sources for your application, not libraries it depends
+ * on like Elementary). It builds cleanly in a buildroot and does not
+ * contain any files that are temporarily generated like binaries and other
+ * build-generated files, so the tarball is clean, and no need to worry
+ * about cleaning up your tree before packaging.
+ *
+@verbatim
+make clean
+@endverbatim
+ *
+ * This cleans up all build files (binaries, objects etc.) from the tree.
+ *
+@verbatim
+make distclean
+@endverbatim
+ *
+ * This cleans out all files from the build and from configure's output too.
+ *
+@verbatim
+make maintainer-clean
+@endverbatim
+ *
+ * This deletes all the files autogen.sh will produce so the tree is clean
+ * to be put into a revision-control system (like CVS, SVN or GIT for example).
+ *
+ * There is a more advanced way of making use of the quicklaunch infrastructure
+ * in Elementary (which will not be covered here due to its more advanced
+ * nature).
+ *
+ * Now let's actually create an interactive "Hello World" gui that you can
+ * click the ok button to exit. It's more code because this now does something
+ * much more significant, but it's still very simple:
+ *
+@code
+#include <Elementary.h>
+
+static void
+on_done(void *data, Evas_Object *obj, void *event_info)
+{
+   // quit the mainloop (elm_run function will return)
+   elm_exit();
+}
+
+EAPI_MAIN int
+elm_main(int argc, char **argv)
+{
+   Evas_Object *win, *bg, *box, *lab, *btn;
+
+   // new window - do the usual and give it a name (hello) and title (Hello)
+   win = elm_win_util_standard_add("hello", "Hello");
+   // when the user clicks "close" on a window there is a request to delete
+   evas_object_smart_callback_add(win, "delete,request", on_done, NULL);
+
+   // add a box object - default is vertical. a box holds children in a row,
+   // either horizontally or vertically. nothing more.
+   box = elm_box_add(win);
+   // make the box hotizontal
+   elm_box_horizontal_set(box, EINA_TRUE);
+   // add object as a resize object for the window (controls window minimum
+   // size as well as gets resized if window is resized)
+   elm_win_resize_object_add(win, box);
+   evas_object_show(box);
+
+   // add a label widget, set the text and put it in the pad frame
+   lab = elm_label_add(win);
+   // set default text of the label
+   elm_object_text_set(lab, "Hello out there world!");
+   // pack the label at the end of the box
+   elm_box_pack_end(box, lab);
+   evas_object_show(lab);
+
+   // add an ok button
+   btn = elm_button_add(win);
+   // set default text of button to "OK"
+   elm_object_text_set(btn, "OK");
+   // pack the button at the end of the box
+   elm_box_pack_end(box, btn);
+   evas_object_show(btn);
+   // call on_done when button is clicked
+   evas_object_smart_callback_add(btn, "clicked", on_done, NULL);
+
+   // now we are done, show the window
+   evas_object_show(win);
+
+   // run the mainloop and process events and callbacks
+   elm_run();
+   return 0;
+}
+ELM_MAIN()
+@endcode
+   *
+   */
+
+/**
+@page authors Authors
 @author Carsten Haitzler <raster@@rasterman.com>
 @author Gustavo Sverzut Barbieri <barbieri@@profusion.mobi>
 @author Cedric Bail <cedric.bail@@free.fr>
@@ -54,29 +284,17 @@
 @author Shinwoo Kim <kimcinoo@@gmail.com>
 @author Govindaraju SM <govi.sm@@samsung.com> <govism@@gmail.com>
 @author Prince Kumar Dubey <prince.dubey@@samsung.com> <prince.dubey@@gmail.com>
-@date 2008-2011
+@author Sung W. Park <sungwoo@gmail.com>
+@author Thierry el Borgi <thierry@substantiel.fr>
+@author Shilpa Singh <shilpa.singh@samsung.com> <shilpasingh.o@gmail.com>
+@author Chanwook Jung <joey.jung@samsung.com>
+@author Hyoyoung Chang <hyoyoung.chang@samsung.com>
+@author Guillaume "Kuri" Friloux <guillaume.friloux@asp64.com>
+@author Kim Yunhan <spbear@gmail.com>
 
-@section intro What is Elementary?
-
-This is a VERY SIMPLE toolkit. It is not meant for writing extensive desktop
-applications (yet). Small simple ones with simple needs.
-
-It is meant to make the programmers work almost brainless but give them lots
-of flexibility.
-
-License: LGPL v2 (see COPYING in the base of Elementary's source). This
-applies to all files in the source here.
-
-Acknowledgements: There is a lot that goes into making a widget set, and
-they don't happen out of nothing. It's like trying to make everyone
-everywhere happy, regardless of age, gender, race or nationality - and
-that is really tough. So thanks to people and organisations behind this,
-aslisted in the Authors section above.
-
-@verbatim
-Pants
-@endverbatim
-*/
+Please contact <enlightenment-devel@lists.sourceforge.net> to get in
+contact with the developers and maintainers.
+ */
 
 #ifndef ELEMENTARY_H
 #define ELEMENTARY_H
@@ -286,7 +504,7 @@ extern "C" {
     */
     typedef enum _Elm_Policy
     {
-        ELM_POLICY_QUIT, /**< under which circunstances the application
+        ELM_POLICY_QUIT, /**< under which circumstances the application
                           * should quit automatically. @see
                           * Elm_Policy_Quit.
                           */
@@ -321,7 +539,7 @@ extern "C" {
    typedef enum _Elm_Wrap_Type
      {
         ELM_WRAP_NONE = 0, /**< No wrap - value is zero */
-        ELM_WRAP_CHAR, /**< Char wrap - wrap between graphmes */
+        ELM_WRAP_CHAR, /**< Char wrap - wrap between characters */
         ELM_WRAP_WORD, /**< Word wrap - wrap in allowed wrapping points (as defined in the unicode standard) */
         ELM_WRAP_MIXED, /**< Mixed wrap - Word wrap, and if that fails, char wrap. */
         ELM_WRAP_LAST
@@ -391,7 +609,7 @@ extern "C" {
     * @return The init counter value.
     *
     * This function initializes Elementary and increments a counter of
-    * the number of calls to it. It returs the new counter's value.
+    * the number of calls to it. It returns the new counter's value.
     *
     * @warning This call is exported only for use by the @c ELM_MAIN()
     * macro. There is no need to use this if you use this macro (which
@@ -453,8 +671,8 @@ extern "C" {
     * @see elm_init() for an example. There, just after a request to
     * close the window comes, the main loop will be left.
     *
-    * @note By using the #ELM_POLICY_QUIT on your Elementary
-    * applications, you'll this function called automatically for you.
+    * @note By using the appropriate #ELM_POLICY_QUIT on your Elementary
+    * applications, you'll be able to get this function called automatically for you.
     *
     * @ingroup General
     */
@@ -516,7 +734,7 @@ extern "C" {
     * shared data directory for data files. For example, if the system
     * directory is @c /usr/local/share, then this directory name is
     * appended, creating @c /usr/local/share/myapp, if it @p was @c
-    * "myapp". It is expected the application installs data files in
+    * "myapp". It is expected that the application installs data files in
     * this directory.
     *
     * The @p checkfile is a file name or path of something inside the
@@ -540,7 +758,7 @@ extern "C" {
 
    /**
     * Provide information on the @b fallback application's binaries
-    * directory, on scenarios where they get overriden by
+    * directory, in scenarios where they get overriden by
     * elm_app_info_set().
     *
     * @param dir The path to the default binaries directory (compile time
@@ -610,7 +828,7 @@ extern "C" {
     * elm_app_info_set() and the way (environment) the application was
     * run from.
     *
-    * @return The directory prefix the application is actually using
+    * @return The directory prefix the application is actually using.
     */
    EAPI const char  *elm_app_prefix_dir_get(void);
 
@@ -620,7 +838,7 @@ extern "C" {
     * was run from.
     *
     * @return The binaries directory prefix the application is actually
-    * using
+    * using.
     */
    EAPI const char  *elm_app_bin_dir_get(void);
 
@@ -630,7 +848,7 @@ extern "C" {
     * was run from.
     *
     * @return The libraries directory prefix the application is actually
-    * using
+    * using.
     */
    EAPI const char  *elm_app_lib_dir_get(void);
 
@@ -640,7 +858,7 @@ extern "C" {
     * was run from.
     *
     * @return The data directory prefix the application is actually
-    * using
+    * using.
     */
    EAPI const char  *elm_app_data_dir_get(void);
 
@@ -650,7 +868,7 @@ extern "C" {
     * was run from.
     *
     * @return The locale directory prefix the application is actually
-    * using
+    * using.
     */
    EAPI const char  *elm_app_locale_dir_get(void);
 
