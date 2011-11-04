@@ -91,4 +91,16 @@ tags
 /doc/widget_preview_button1
 /doc/widget_preview_button2
 /doc/widget_preview_button3
-
+/config.guess.cdbs-orig
+/config.sub.cdbs-orig
+/config/slp/base.cfg
+/debian/files
+/debian/*.log
+/debian/*.substvars
+/debian/libelm-bin/
+/debian/libelm-dbg/
+/debian/libelm-dev/
+/debian/*.debhelper
+/debian/libelm/
+/debian/stamp-*
+/debian/tmp/
