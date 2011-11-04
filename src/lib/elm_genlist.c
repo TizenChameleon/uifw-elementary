@@ -90,9 +90,7 @@ struct _Widget_Data
    Evas_Coord        expand_item_gap;
    int               move_effect_mode;
    Ecore_Job        *changed_job;
-   Elm_Genlist_Item *focused_rename_it;
-   Evas_Coord        current_scrl_x;
-   Evas_Coord        current_scrl_y;
+   Elm_Genlist_Item *rename_it;
 };
 
 struct _Item_Block
@@ -666,20 +664,13 @@ _show_region_hook(void        *data,
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord x, y, w, h;
-   Evas_Coord px, py, pw, ph;
-   Evas_Coord new_x, new_y;
    if (!wd) return;
    elm_widget_show_region_get(obj, &x, &y, &w, &h);
-   evas_object_geometry_get(wd->pan_smart, &px, &py, &pw, &ph);
-
    //x & y are screen coordinates, Add with pan coordinates
-   new_x = wd->current_scrl_x + x - pw + w;
-   new_y = wd->current_scrl_y + y - ph + h;
-
-   if (((new_y > 0) && wd->pan_changed && (y > ph)) || ((new_x > 0) && wd->pan_changed && (x > pw)))
-     elm_smart_scroller_child_pos_set(wd->scr, new_x, new_y);
-   else
-     elm_smart_scroller_child_pos_set(wd->scr, wd->current_scrl_x, wd->current_scrl_y);
+   x += wd->pan_x;
+   y += wd->pan_y;
+   if(wd->rename_it) elm_genlist_item_bring_in(wd->rename_it);
+   else elm_smart_scroller_child_region_show(wd->scr, x, y, w, h);
 }
 
 static void
@@ -1111,7 +1102,7 @@ _long_press(void *data)
    Eina_List *list, *l;
 
    it->long_timer = NULL;
-   if ((it->disabled) || (it->dragging) || (it->display_only) || (it->wd->focused_rename_it))
+   if ((it->disabled) || (it->dragging) || (it->display_only) || (it->wd->rename_it))
      return ECORE_CALLBACK_CANCEL;
    it->wd->longpressed = EINA_TRUE;
    evas_object_smart_callback_call(WIDGET(it), SIG_LONGPRESSED, it);
@@ -1795,7 +1786,6 @@ _icon_focused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED
 {
    Elm_Genlist_Item *it = data;
    if (it) it->defer_unrealize = EINA_TRUE;
-   if (it->renamed && (it->wd->focused_rename_it != it)) it->wd->focused_rename_it = it;
 }
 
 static void
@@ -1803,7 +1793,6 @@ _icon_unfocused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUS
 {
    Elm_Genlist_Item *it = data;
    if (it) it->defer_unrealize = EINA_FALSE;
-   if (it->renamed && (it->wd->focused_rename_it == it)) it->wd->focused_rename_it = NULL;
 }
 
 static void
@@ -3081,16 +3070,13 @@ _pan_calculate(Evas_Object *obj)
    Pan *sd = evas_object_smart_data_get(obj);
    Item_Block *itb;
    Evas_Coord ox, oy, ow, oh, cvx, cvy, cvw, cvh;
-   Evas_Coord scr_x, scr_y;
    int in = 0;
    Elm_Genlist_Item *git;
    Eina_List *l;
 
    if (!sd) return;
    evas_event_freeze(evas_object_evas_get(obj));
-   elm_smart_scroller_child_pos_get(sd->wd->scr, &scr_x, &scr_y);
-   sd->wd->current_scrl_x = scr_x;
-   sd->wd->current_scrl_y = scr_y;
+
    if (sd->wd->pan_changed)
      {
         _calc_job(sd->wd);
@@ -5802,6 +5788,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, Eina_Bool renamed)
      {
         _item_unrealize(it, EINA_FALSE);
         it->renamed = EINA_TRUE;
+        it->wd->rename_it = it;
         it->nocache = EINA_TRUE;
         if (it->selected)  _item_unselect(it);
 
@@ -5814,6 +5801,7 @@ elm_genlist_item_rename_mode_set(Elm_Genlist_Item *it, Eina_Bool renamed)
           {
              it->renamed = EINA_FALSE;
              it->nocache = EINA_TRUE;
+             it->wd->rename_it = NULL;
              _item_cache_zero(it->wd);
              elm_genlist_item_update(it);
           }
