@@ -2410,35 +2410,357 @@ extern "C" {
     */
    EAPI Eina_Bool        elm_object_tree_unfocusable_get(const Evas_Object *obj); EINA_ARG_NONNULL(1);
 
+   /**
+    * @defgroup Scrolling Scrolling
+    *
+    * These are functions setting how scrollable views in Elementary
+    * widgets should behave on user interaction.
+    *
+    * @{
+    */
+
+   /**
+    * Get whether scrollers should bounce when they reach their
+    * viewport's edge during a scroll.
+    *
+    * @return the thumb scroll bouncing state
+    *
+    * This is the default behavior for touch screens, in general.
+    * @ingroup Scrolling
+    */
    EAPI Eina_Bool        elm_scroll_bounce_enabled_get(void);
+
+   /**
+    * Set whether scrollers should bounce when they reach their
+    * viewport's edge during a scroll.
+    *
+    * @param enabled the thumb scroll bouncing state
+    *
+    * @see elm_thumbscroll_bounce_enabled_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_bounce_enabled_set(Eina_Bool enabled);
+
+   /**
+    * Set whether scrollers should bounce when they reach their
+    * viewport's edge during a scroll, for all Elementary application
+    * windows.
+    *
+    * @param enabled the thumb scroll bouncing state
+    *
+    * @see elm_thumbscroll_bounce_enabled_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_bounce_enabled_all_set(Eina_Bool enabled);
+
+   /**
+    * Get the amount of inertia a scroller will impose at bounce
+    * animations.
+    *
+    * @return the thumb scroll bounce friction
+    *
+    * @ingroup Scrolling
+    */
    EAPI double           elm_scroll_bounce_friction_get(void);
+
+   /**
+    * Set the amount of inertia a scroller will impose at bounce
+    * animations.
+    *
+    * @param friction the thumb scroll bounce friction
+    *
+    * @see elm_thumbscroll_bounce_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_bounce_friction_set(double friction);
+
+   /**
+    * Set the amount of inertia a scroller will impose at bounce
+    * animations, for all Elementary application windows.
+    *
+    * @param friction the thumb scroll bounce friction
+    *
+    * @see elm_thumbscroll_bounce_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_bounce_friction_all_set(double friction);
+
+   /**
+    * Get the amount of inertia a <b>paged</b> scroller will impose at
+    * page fitting animations.
+    *
+    * @return the page scroll friction
+    *
+    * @ingroup Scrolling
+    */
    EAPI double           elm_scroll_page_scroll_friction_get(void);
+
+   /**
+    * Set the amount of inertia a <b>paged</b> scroller will impose at
+    * page fitting animations.
+    *
+    * @param friction the page scroll friction
+    *
+    * @see elm_thumbscroll_page_scroll_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_page_scroll_friction_set(double friction);
+
+   /**
+    * Set the amount of inertia a <b>paged</b> scroller will impose at
+    * page fitting animations, for all Elementary application windows.
+    *
+    * @param friction the page scroll friction
+    *
+    * @see elm_thumbscroll_page_scroll_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_page_scroll_friction_all_set(double friction);
+
+   /**
+    * Get the amount of inertia a scroller will impose at region bring
+    * animations.
+    *
+    * @return the bring in scroll friction
+    *
+    * @ingroup Scrolling
+    */
    EAPI double           elm_scroll_bring_in_scroll_friction_get(void);
+
+   /**
+    * Set the amount of inertia a scroller will impose at region bring
+    * animations.
+    *
+    * @param friction the bring in scroll friction
+    *
+    * @see elm_thumbscroll_bring_in_scroll_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_bring_in_scroll_friction_set(double friction);
+
+   /**
+    * Set the amount of inertia a scroller will impose at region bring
+    * animations, for all Elementary application windows.
+    *
+    * @param friction the bring in scroll friction
+    *
+    * @see elm_thumbscroll_bring_in_scroll_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_bring_in_scroll_friction_all_set(double friction);
+
+   /**
+    * Get the amount of inertia scrollers will impose at animations
+    * triggered by Elementary widgets' zooming API.
+    *
+    * @return the zoom friction
+    *
+    * @ingroup Scrolling
+    */
    EAPI double           elm_scroll_zoom_friction_get(void);
+
+   /**
+    * Set the amount of inertia scrollers will impose at animations
+    * triggered by Elementary widgets' zooming API.
+    *
+    * @param friction the zoom friction
+    *
+    * @see elm_thumbscroll_zoom_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_zoom_friction_set(double friction);
+
+   /**
+    * Set the amount of inertia scrollers will impose at animations
+    * triggered by Elementary widgets' zooming API, for all Elementary
+    * application windows.
+    *
+    * @param friction the zoom friction
+    *
+    * @see elm_thumbscroll_zoom_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_zoom_friction_all_set(double friction);
+
+   /**
+    * Get whether scrollers should be draggable from any point in their
+    * views.
+    *
+    * @return the thumb scroll state
+    *
+    * @note This is the default behavior for touch screens, in general.
+    * @note All other functions namespaced with "thumbscroll" will only
+    *       have effect if this mode is enabled.
+    *
+    * @ingroup Scrolling
+    */
    EAPI Eina_Bool        elm_scroll_thumbscroll_enabled_get(void);
+
+   /**
+    * Set whether scrollers should be draggable from any point in their
+    * views.
+    *
+    * @param enabled the thumb scroll state
+    *
+    * @see elm_thumbscroll_enabled_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_enabled_set(Eina_Bool enabled);
+
+   /**
+    * Set whether scrollers should be draggable from any point in their
+    * views, for all Elementary application windows.
+    *
+    * @param enabled the thumb scroll state
+    *
+    * @see elm_thumbscroll_enabled_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_enabled_all_set(Eina_Bool enabled);
+
+   /**
+    * Get the number of pixels one should travel while dragging a
+    * scroller's view to actually trigger scrolling.
+    *
+    * @return the thumb scroll threshould
+    *
+    * One would use higher values for touch screens, in general, because
+    * of their inherent imprecision.
+    * @ingroup Scrolling
+    */
    EAPI unsigned int     elm_scroll_thumbscroll_threshold_get(void);
+
+   /**
+    * Set the number of pixels one should travel while dragging a
+    * scroller's view to actually trigger scrolling.
+    *
+    * @param threshold the thumb scroll threshould
+    *
+    * @see elm_thumbscroll_threshould_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_threshold_set(unsigned int threshold);
+
+   /**
+    * Set the number of pixels one should travel while dragging a
+    * scroller's view to actually trigger scrolling, for all Elementary
+    * application windows.
+    *
+    * @param threshold the thumb scroll threshould
+    *
+    * @see elm_thumbscroll_threshould_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_threshold_all_set(unsigned int threshold);
+
+   /**
+    * Get the minimum speed of mouse cursor movement which will trigger
+    * list self scrolling animation after a mouse up event
+    * (pixels/second).
+    *
+    * @return the thumb scroll momentum threshould
+    *
+    * @ingroup Scrolling
+    */
    EAPI double           elm_scroll_thumbscroll_momentum_threshold_get(void);
+
+   /**
+    * Set the minimum speed of mouse cursor movement which will trigger
+    * list self scrolling animation after a mouse up event
+    * (pixels/second).
+    *
+    * @param threshold the thumb scroll momentum threshould
+    *
+    * @see elm_thumbscroll_momentum_threshould_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_momentum_threshold_set(double threshold);
+
+   /**
+    * Set the minimum speed of mouse cursor movement which will trigger
+    * list self scrolling animation after a mouse up event
+    * (pixels/second), for all Elementary application windows.
+    *
+    * @param threshold the thumb scroll momentum threshould
+    *
+    * @see elm_thumbscroll_momentum_threshould_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_momentum_threshold_all_set(double threshold);
+
+   /**
+    * Get the amount of inertia a scroller will impose at self scrolling
+    * animations.
+    *
+    * @return the thumb scroll friction
+    *
+    * @ingroup Scrolling
+    */
    EAPI double           elm_scroll_thumbscroll_friction_get(void);
+
+   /**
+    * Set the amount of inertia a scroller will impose at self scrolling
+    * animations.
+    *
+    * @param friction the thumb scroll friction
+    *
+    * @see elm_thumbscroll_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_friction_set(double friction);
+
+   /**
+    * Set the amount of inertia a scroller will impose at self scrolling
+    * animations, for all Elementary application windows.
+    *
+    * @param friction the thumb scroll friction
+    *
+    * @see elm_thumbscroll_friction_get()
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_friction_all_set(double friction);
+
+   /**
+    * Get the amount of lag between your actual mouse cursor dragging
+    * movement and a scroller's view movement itself, while pushing it
+    * into bounce state manually.
+    *
+    * @return the thumb scroll border friction
+    *
+    * @ingroup Scrolling
+    */
    EAPI double           elm_scroll_thumbscroll_border_friction_get(void);
+
+   /**
+    * Set the amount of lag between your actual mouse cursor dragging
+    * movement and a scroller's view movement itself, while pushing it
+    * into bounce state manually.
+    *
+    * @param friction the thumb scroll border friction. @c 0.0 for
+    *        perfect synchrony between two movements, @c 1.0 for maximum
+    *        lag.
+    *
+    * @see elm_thumbscroll_border_friction_get()
+    * @note parameter value will get bound to 0.0 - 1.0 interval, always
+    *
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_border_friction_set(double friction);
+
+   /**
+    * Set the amount of lag between your actual mouse cursor dragging
+    * movement and a scroller's view movement itself, while pushing it
+    * into bounce state manually, for all Elementary application windows.
+    *
+    * @param friction the thumb scroll border friction. @c 0.0 for
+    *        perfect synchrony between two movements, @c 1.0 for maximum
+    *        lag.
+    *
+    * @see elm_thumbscroll_border_friction_get()
+    * @note parameter value will get bound to 0.0 - 1.0 interval, always
+    *
+    * @ingroup Scrolling
+    */
    EAPI void             elm_scroll_thumbscroll_border_friction_all_set(double friction);
 
    /**
@@ -2485,20 +2807,240 @@ extern "C" {
     * @}
     */
 
+   /**
+    * @defgroup Scrollhints Scrollhints
+    *
+    * Objects when inside a scroller can scroll, but this may not always be
+    * desirable in certain situations. This allows an object to hint to itself
+    * and parents to "not scroll" in one of 2 ways. If any child object of a
+    * scroller has pushed a scroll freeze or hold then it affects all parent
+    * scrollers until all children have released them.
+    *
+    * 1. To hold on scrolling. This means just flicking and dragging may no
+    * longer scroll, but pressing/dragging near an edge of the scroller will
+    * still scroll. This is automatically used by the entry object when
+    * selecting text.
+    *
+    * 2. To totally freeze scrolling. This means it stops. until
+    * popped/released.
+    *
+    * @{
+    */
+
+   /**
+    * Push the scroll hold by 1
+    *
+    * This increments the scroll hold count by one. If it is more than 0 it will
+    * take effect on the parents of the indicated object.
+    *
+    * @param obj The object
+    * @ingroup Scrollhints
+    */
    EAPI void             elm_object_scroll_hold_push(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Pop the scroll hold by 1
+    *
+    * This decrements the scroll hold count by one. If it is more than 0 it will
+    * take effect on the parents of the indicated object.
+    *
+    * @param obj The object
+    * @ingroup Scrollhints
+    */
    EAPI void             elm_object_scroll_hold_pop(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Push the scroll freeze by 1
+    *
+    * This increments the scroll freeze count by one. If it is more
+    * than 0 it will take effect on the parents of the indicated
+    * object.
+    *
+    * @param obj The object
+    * @ingroup Scrollhints
+    */
    EAPI void             elm_object_scroll_freeze_push(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Pop the scroll freeze by 1
+    *
+    * This decrements the scroll freeze count by one. If it is more
+    * than 0 it will take effect on the parents of the indicated
+    * object.
+    *
+    * @param obj The object
+    * @ingroup Scrollhints
+    */
    EAPI void             elm_object_scroll_freeze_pop(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Lock the scrolling of the given widget (and thus all parents)
+    *
+    * This locks the given object from scrolling in the X axis (and implicitly
+    * also locks all parent scrollers too from doing the same).
+    *
+    * @param obj The object
+    * @param lock The lock state (1 == locked, 0 == unlocked)
+    * @ingroup Scrollhints
+    */
    EAPI void             elm_object_scroll_lock_x_set(Evas_Object *obj, Eina_Bool lock) EINA_ARG_NONNULL(1);
+
+   /**
+    * Lock the scrolling of the given widget (and thus all parents)
+    *
+    * This locks the given object from scrolling in the Y axis (and implicitly
+    * also locks all parent scrollers too from doing the same).
+    *
+    * @param obj The object
+    * @param lock The lock state (1 == locked, 0 == unlocked)
+    * @ingroup Scrollhints
+    */
    EAPI void             elm_object_scroll_lock_y_set(Evas_Object *obj, Eina_Bool lock) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the scrolling lock of the given widget
+    *
+    * This gets the lock for X axis scrolling.
+    *
+    * @param obj The object
+    * @ingroup Scrollhints
+    */
    EAPI Eina_Bool        elm_object_scroll_lock_x_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the scrolling lock of the given widget
+    *
+    * This gets the lock for X axis scrolling.
+    *
+    * @param obj The object
+    * @ingroup Scrollhints
+    */
    EAPI Eina_Bool        elm_object_scroll_lock_y_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
+   /**
+    * @}
+    */
+
+   /**
+    * Send a signal to the widget edje object.
+    *
+    * This function sends a signal to the edje object of the obj. An
+    * edje program can respond to a signal by specifying matching
+    * 'signal' and 'source' fields.
+    *
+    * @param obj The object
+    * @param emission The signal's name.
+    * @param source The signal's source.
+    * @ingroup General
+    */
    EAPI void             elm_object_signal_emit(Evas_Object *obj, const char *emission, const char *source) EINA_ARG_NONNULL(1);
    EAPI void             elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data) EINA_ARG_NONNULL(1, 4);
    EAPI void            *elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source)) EINA_ARG_NONNULL(1, 4);
 
+   /**
+    * Add a callback for a signal emitted by widget edje object.
+    *
+    * This function connects a callback function to a signal emitted by the
+    * edje object of the obj.
+    * Globs can occur in either the emission or source name.
+    *
+    * @param obj The object
+    * @param emission The signal's name.
+    * @param source The signal's source.
+    * @param func The callback function to be executed when the signal is
+    * emitted.
+    * @param data A pointer to data to pass in to the callback function.
+    * @ingroup General
+    */
+   EAPI void             elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func, void *data) EINA_ARG_NONNULL(1, 4);
+
+   /**
+    * Remove a signal-triggered callback from a widget edje object.
+    *
+    * This function removes a callback, previoulsy attached to a
+    * signal emitted by the edje object of the obj.  The parameters
+    * emission, source and func must match exactly those passed to a
+    * previous call to elm_object_signal_callback_add(). The data
+    * pointer that was passed to this call will be returned.
+    *
+    * @param obj The object
+    * @param emission The signal's name.
+    * @param source The signal's source.
+    * @param func The callback function to be executed when the signal is
+    * emitted.
+    * @return The data pointer
+    * @ingroup General
+    */
+   EAPI void            *elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func) EINA_ARG_NONNULL(1, 4);
+
+   /**
+    * Add a callback for input events (key up, key down, mouse wheel)
+    * on a given Elementary widget
+    *
+    * @param obj The widget to add an event callback on
+    * @param func The callback function to be executed when the event
+    * happens
+    * @param data Data to pass in to @p func
+    *
+    * Every widget in an Elementary interface set to receive focus,
+    * with elm_object_focus_allow_set(), will propagate @b all of its
+    * key up, key down and mouse wheel input events up to its parent
+    * object, and so on. All of the focusable ones in this chain which
+    * had an event callback set, with this call, will be able to treat
+    * those events. There are two ways of making the propagation of
+    * these event upwards in the tree of widgets to @b cease:
+    * - Just return @c EINA_TRUE on @p func. @c EINA_FALSE will mean
+    *   the event was @b not processed, so the propagation will go on.
+    * - The @c event_info pointer passed to @p func will contain the
+    *   event's structure and, if you OR its @c event_flags inner
+    *   value to @c EVAS_EVENT_FLAG_ON_HOLD, you're telling Elementary
+    *   one has already handled it, thus killing the event's
+    *   propagation, too.
+    *
+    * @note Your event callback will be issued on those events taking
+    * place only if no other child widget of @obj has consumed the
+    * event already.
+    *
+    * @note Not to be confused with @c
+    * evas_object_event_callback_add(), which will add event callbacks
+    * per type on general Evas objects (no event propagation
+    * infrastructure taken in account).
+    *
+    * @note Not to be confused with @c
+    * elm_object_signal_callback_add(), which will add callbacks to @b
+    * signals coming from a widget's theme, not input events.
+    *
+    * @note Not to be confused with @c
+    * edje_object_signal_callback_add(), which does the same as
+    * elm_object_signal_callback_add(), but directly on an Edje
+    * object.
+    *
+    * @note Not to be confused with @c
+    * evas_object_smart_callback_add(), which adds callbacks to smart
+    * objects' <b>smart events</b>, and not input events.
+    *
+    * @see elm_object_event_callback_del()
+    *
+    * @ingroup General
+    */
    EAPI void             elm_object_event_callback_add(Evas_Object *obj, Elm_Event_Cb func, const void *data) EINA_ARG_NONNULL(1, 2);
+
+   /**
+    * Remove an event callback from a widget.
+    *
+    * This function removes a callback, previoulsy attached to event emission
+    * by the @p obj.
+    * The parameters func and data must match exactly those passed to
+    * a previous call to elm_object_event_callback_add(). The data pointer that
+    * was passed to this call will be returned.
+    *
+    * @param obj The object
+    * @param func The callback function to be executed when the event is
+    * emitted.
+    * @param data Data to pass in to the callback function.
+    * @return The data pointer
+    * @ingroup General
+    */
    EAPI void            *elm_object_event_callback_del(Evas_Object *obj, Elm_Event_Cb func, const void *data) EINA_ARG_NONNULL(1, 2);
 
    /**
