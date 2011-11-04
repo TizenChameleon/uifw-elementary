@@ -1821,9 +1821,8 @@ elm_store_item_index_get(const Elm_Store_Item *sti)
                   index++;
                }
           }
-        else return -1;
      }
-   else return -1;
+   return -1;
 }
 
 /**
@@ -1854,9 +1853,8 @@ elm_store_item_data_index_get(const Elm_Store_Item *sti)
                }
              gen_item = elm_genlist_item_next_get(gen_item);
           }
-        return -1;
      }
-   else return -1;
+   return -1;
 }
 
 /**
