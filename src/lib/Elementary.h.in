@@ -29039,8 +29039,8 @@ extern "C" {
     *
     * @li NULL/"default" - Operates on tickernoti content-text
     *
-    * Parts which can be used with elm_object_content_part_set() and
-    * elm_object_content_part_get():
+    * Parts which can be used with elm_object_content_part_set(),
+    * elm_object_content_part_get() and elm_object_content_part_unset():
     *
     * @li "icon" - Operates on tickernoti's icon
     * @li "button" - Operates on tickernoti's button

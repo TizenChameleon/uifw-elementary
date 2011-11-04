@@ -348,6 +348,18 @@ _update_geometry_on_rotation(Evas_Object *obj, int angle, int *x, int *y, int *w
 }
 
 static void
+_sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Evas_Object *sub = event_info;
+   if (!wd) return;
+   if (sub == wd->icon)
+     wd->icon = NULL;
+   if (sub == wd->button)
+     wd->button = NULL;
+}
+
+static void
 _elm_tickernoti_label_set(Evas_Object *obj, const char *part, const char *label)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -378,9 +390,14 @@ _elm_tickernoti_icon_set(Evas_Object *obj, Evas_Object *icon)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-   if (!icon) return;
-   edje_object_part_swallow(wd->edje_obj, "icon", icon);
+   if (wd->icon == icon) return;
+   if (wd->icon) evas_object_del(wd->icon);
    wd->icon = icon;
+   if (icon)
+     {
+        elm_widget_sub_object_add(obj, icon);
+        edje_object_part_swallow(wd->edje_obj, "icon", icon);
+     }
 }
 
 static void
@@ -388,11 +405,17 @@ _elm_tickernoti_button_set(Evas_Object *obj, Evas_Object *button)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
+
    if (!wd) return;
-   if (!button) return;
-   edje_object_part_swallow(wd->edje_obj, "button", button);
+   if (wd->button == button) return;
+   if (wd->button) evas_object_del(wd->button);
    wd->button = button;
-   evas_object_smart_callback_add(wd->button, "clicked", _tickernoti_hide_cb, wd);
+   if (button)
+     {
+        elm_widget_sub_object_add(obj, button);
+        edje_object_part_swallow(wd->edje_obj, "button", button);
+        evas_object_smart_callback_add(wd->button, "clicked", _tickernoti_hide_cb, wd);
+     }
 }
 
 static void
@@ -446,6 +469,50 @@ _elm_tickernoti_content_part_get_hook(Evas_Object *obj, const char *part)
    return NULL;
 }
 
+static Evas_Object *
+_elm_tickernoti_icon_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Evas_Object *icon;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd || !wd->icon) return NULL;
+   icon = wd->icon;
+   elm_widget_sub_object_del(obj, wd->icon);
+   edje_object_part_unswallow(wd->edje_obj, icon);
+   wd->icon = NULL;
+   return icon;
+}
+
+static Evas_Object *
+_elm_tickernoti_button_unset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Evas_Object *button;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd || !wd->button) return NULL;
+   button = wd->button;
+   elm_widget_sub_object_del(obj, wd->button);
+   edje_object_part_unswallow(wd->edje_obj, button);
+   wd->button = NULL;
+   return button;
+}
+
+static Evas_Object *
+_elm_tickernoti_content_part_unset_hook(Evas_Object *obj, const char *part)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd || !part) return NULL;
+   if (!strcmp(part, "icon"))
+     return _elm_tickernoti_icon_unset(obj);
+   else if (!strcmp(part, "button"))
+     return _elm_tickernoti_button_unset(obj);
+   return NULL;
+}
+
 /**
  * Add a tickernoti object to @p parent
  *
@@ -483,6 +550,8 @@ elm_tickernoti_add(Evas_Object *parent)
    elm_widget_text_get_hook_set(obj, _elm_tickernoti_label_get);
    elm_widget_content_set_hook_set(obj, _elm_tickernoti_content_part_set_hook);
    elm_widget_content_get_hook_set(obj, _elm_tickernoti_content_part_get_hook);
+   elm_widget_content_unset_hook_set(obj, _elm_tickernoti_content_part_unset_hook);
+   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, NULL);
 
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, NULL);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
