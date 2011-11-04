@@ -10516,13 +10516,14 @@ extern "C" {
         Elm_Store_Item_Mapping_Type     type;
         const char                     *part;
         int                             offset;
-        union {
+        union
+          {
              Elm_Store_Item_Mapping_Empty  empty;
              Elm_Store_Item_Mapping_Icon   icon;
              Elm_Store_Item_Mapping_Photo  photo;
              Elm_Store_Item_Mapping_Custom custom;
              // add more types here
-        } details;
+          } details;
      };
 
    struct _Elm_Store_Item_Info
