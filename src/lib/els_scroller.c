@@ -1021,7 +1021,7 @@ elm_smart_scroller_child_pos_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
              bounce_eval(sd);
           }
         else
-           sd->bouncemex = 0;
+          sd->bouncemex = 0;
      }
    if (!sd->down.bounce_y_animator)
      {
@@ -1032,7 +1032,7 @@ elm_smart_scroller_child_pos_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
              bounce_eval(sd);
           }
         else
-           sd->bouncemey = 0;
+          sd->bouncemey = 0;
      }
    if ((x != px) || (y != py))
      {
@@ -1147,7 +1147,7 @@ void
 elm_smart_scroller_child_region_set(Evas_Object *obj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
 {
    if (_elm_smart_scroller_child_region_show_internal(obj, &x, &y, w, h))
-      elm_smart_scroller_child_pos_set(obj, x, y);
+     elm_smart_scroller_child_pos_set(obj, x, y);
 }
 
 /* Set should be used for setting the wanted position, for example a user scroll
@@ -1161,7 +1161,7 @@ elm_smart_scroller_child_region_show(Evas_Object *obj, Evas_Coord x, Evas_Coord 
    sd->ww = w;
    sd->wh = h;
    if (_elm_smart_scroller_child_region_show_internal(obj, &x, &y, w, h))
-      elm_smart_scroller_child_pos_set(obj, x, y);
+     elm_smart_scroller_child_pos_set(obj, x, y);
 }
 
 void
@@ -1300,7 +1300,7 @@ elm_smart_scroller_object_theme_set(Evas_Object *parent, Evas_Object *obj, const
              edje_object_part_swallow(sd->edje_obj, "elm.scrollbar.base", base);
           }
         if (!_elm_config->thumbscroll_enable)
-           evas_object_size_hint_min_set(base, mw, mh);
+          evas_object_size_hint_min_set(base, mw, mh);
      }
    sd->vbar_visible = !sd->vbar_visible;
    sd->hbar_visible = !sd->hbar_visible;
@@ -1397,7 +1397,7 @@ _elm_smart_scroller_wanted_region_set(Evas_Object *obj)
        sd->down.hold_animator || sd->down.onhold_animator) return;
 
    /* Flip to RTL cords only if init in RTL mode */
-   if(sd->is_mirrored)
+   if (sd->is_mirrored)
      wx = _elm_smart_scroller_x_mirrored_get(obj, sd->wx);
 
    if (sd->ww == -1)
@@ -1732,20 +1732,20 @@ _down_coord_eval(Smart_Data *sd, Evas_Coord *x, Evas_Coord *y)
    sd->pan_func.min_get(sd->pan_obj, &minx, &miny);
 
    if (*x < minx)
-      *x += (minx - *x) * _elm_config->thumbscroll_border_friction;
+     *x += (minx - *x) * _elm_config->thumbscroll_border_friction;
    else if (sd->child.w <= sd->w)
-      *x += (sd->down.sx - *x) * _elm_config->thumbscroll_border_friction;
+     *x += (sd->down.sx - *x) * _elm_config->thumbscroll_border_friction;
    else if ((sd->child.w - sd->w + minx) < *x)
-      *x += (sd->child.w - sd->w + minx - *x) *
-      _elm_config->thumbscroll_border_friction;
+     *x += (sd->child.w - sd->w + minx - *x) *
+        _elm_config->thumbscroll_border_friction;
 
    if (*y < miny)
-      *y += (miny - *y) * _elm_config->thumbscroll_border_friction;
+     *y += (miny - *y) * _elm_config->thumbscroll_border_friction;
    else if (sd->child.h <= sd->h)
-      *y += (sd->down.sy - *y) * _elm_config->thumbscroll_border_friction;
+     *y += (sd->down.sy - *y) * _elm_config->thumbscroll_border_friction;
    else if ((sd->child.h - sd->h + miny) < *y)
-      *y += (sd->child.h - sd->h + miny - *y) *
-      _elm_config->thumbscroll_border_friction;
+     *y += (sd->child.h - sd->h + miny - *y) *
+        _elm_config->thumbscroll_border_friction;
 }
 
 static Eina_Bool
@@ -1829,18 +1829,15 @@ _smart_hold_animator(void *data)
      {
         if ((!sd->widget) ||
             (!elm_widget_drag_child_locked_x_get(sd->widget)))
-          {
-             ox = fx;
-          }
+          ox = fx;
      }
    if (sd->down.dir_y)
      {
         if ((!sd->widget) ||
             (!elm_widget_drag_child_locked_y_get(sd->widget)))
-          {
-             oy = fy;
-          }
+          oy = fy;
      }
+
    elm_smart_scroller_child_pos_set(sd->smart_obj, ox, oy);
    return ECORE_CALLBACK_RENEW;
 }
