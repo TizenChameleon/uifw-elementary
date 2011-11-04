@@ -1431,7 +1431,7 @@ extern "C" {
     * Last show feature of password mode enables user to view
     * the last input entered for few seconds before masking it.
     * These functions allow to set this feature in password mode
-    * of entry widget and also allow to manipulate the duration 
+    * of entry widget and also allow to manipulate the duration
     * for which the input has to be visible.
     *
     * @{
@@ -1440,7 +1440,7 @@ extern "C" {
    /**
     * Get show last setting of password mode.
     *
-    * This gets the show last input setting of password mode which might be 
+    * This gets the show last input setting of password mode which might be
     * enabled or disabled.
     *
     * @return @c EINA_TRUE, if the last input show setting is enabled, @c EINA_FALSE
@@ -1502,9 +1502,11 @@ extern "C" {
     * @param style The style name to use
     *
     * @see elm_theme_extension_add()
+    * @see elm_theme_extension_del()
     * @see elm_theme_overlay_add()
+    * @see elm_theme_overlay_del()
     *
-    * @ingroup Theme
+    * @ingroup Styles
     */
    EAPI void         elm_object_style_set(Evas_Object *obj, const char *style) EINA_ARG_NONNULL(1);
    /**
@@ -1519,7 +1521,7 @@ extern "C" {
     *
     * @see elm_object_style_set()
     *
-    * @ingroup Theme
+    * @ingroup Styles
     */
    EAPI const char  *elm_object_style_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
@@ -1578,6 +1580,14 @@ extern "C" {
     * some of these functions.
     */
 
+   /**
+    * Check if the given Evas Object is an Elementary widget.
+    *
+    * @param obj the object to query.
+    * @return @c EINA_TRUE if it is an elementary widget variant,
+    *         @c EINA_FALSE otherwise
+    * @ingroup WidgetNavigation
+    */
    EAPI Eina_Bool    elm_object_widget_check(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
@@ -1720,9 +1730,40 @@ extern "C" {
     * some of these functions.
     */
 
+   /**
+    * Get the enable status of the focus highlight
+    *
+    * This gets whether the highlight on focused objects is enabled or not
+    * @ingroup Focus
+    */
    EAPI Eina_Bool        elm_focus_highlight_enabled_get(void);
+
+   /**
+    * Set the enable status of the focus highlight
+    *
+    * Set whether to show or not the highlight on focused objects
+    * @param enable Enable highlight if EINA_TRUE, disable otherwise
+    * @ingroup Focus
+    */
    EAPI void             elm_focus_highlight_enabled_set(Eina_Bool enable);
+
+   /**
+    * Get the enable status of the highlight animation
+    *
+    * Get whether the focus highlight, if enabled, will animate its switch from
+    * one object to the next
+    * @ingroup Focus
+    */
    EAPI Eina_Bool        elm_focus_highlight_animate_get(void);
+
+   /**
+    * Set the enable status of the highlight animation
+    *
+    * Set whether the focus highlight, if enabled, will animate its switch from
+    * one object to the next
+    * @param animate Enable animation if EINA_TRUE, disable otherwise
+    * @ingroup Focus
+    */
    EAPI void             elm_focus_highlight_animate_set(Eina_Bool animate);
 
    /**
@@ -1800,23 +1841,109 @@ extern "C" {
     */
    EAPI Eina_Bool        elm_object_focus_allow_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
+   /**
+    * Set custom focus chain.
+    *
+    * This function overwrites any previous custom focus chain within
+    * the list of objects. The previous list will be deleted and this list
+    * will be managed by elementary. After it is set, don't modify it.
+    *
+    * @note On focus cycle, only will be evaluated children of this container.
+    *
+    * @param obj The container object
+    * @param objs Chain of objects to pass focus
+    * @ingroup Focus
+    */
    EAPI void             elm_object_focus_custom_chain_set(Evas_Object *obj, Eina_List *objs) EINA_ARG_NONNULL(1);
+
+   /**
+    * Unset a custom focus chain on a given Elementary widget
+    *
+    * @param obj The container object to remove focus chain from
+    *
+    * Any focus chain previously set on @p obj (for its child objects)
+    * is removed entirely after this call.
+    *
+    * @ingroup Focus
+    */
    EAPI void             elm_object_focus_custom_chain_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get custom focus chain
+    *
+    * @param obj The container object
+    * @ingroup Focus
+    */
    EAPI const Eina_List *elm_object_focus_custom_chain_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Append object to custom focus chain.
+    *
+    * @note If relative_child equal to NULL or not in custom chain, the object
+    * will be added in end.
+    *
+    * @note On focus cycle, only will be evaluated children of this container.
+    *
+    * @param obj The container object
+    * @param child The child to be added in custom chain
+    * @param relative_child The relative object to position the child
+    * @ingroup Focus
+    */
    EAPI void             elm_object_focus_custom_chain_append(Evas_Object *obj, Evas_Object *child, Evas_Object *relative_child) EINA_ARG_NONNULL(1, 2);
+
+   /**
+    * Prepend object to custom focus chain.
+    *
+    * @note If relative_child equal to NULL or not in custom chain, the object
+    * will be added in begin.
+    *
+    * @note On focus cycle, only will be evaluated children of this container.
+    *
+    * @param obj The container object
+    * @param child The child to be added in custom chain
+    * @param relative_child The relative object to position the child
+    * @ingroup Focus
+    */
    EAPI void             elm_object_focus_custom_chain_prepend(Evas_Object *obj, Evas_Object *child, Evas_Object *relative_child) EINA_ARG_NONNULL(1, 2);
+
+   /**
+    * Give focus to next object in object tree.
+    *
+    * Give focus to next object in focus chain of one object sub-tree.
+    * If the last object of chain already have focus, the focus will go to the
+    * first object of chain.
+    *
+    * @param obj The object root of sub-tree
+    * @param dir Direction to cycle the focus
+    *
+    * @ingroup Focus
+    */
    EAPI void             elm_object_focus_cycle(Evas_Object *obj, Elm_Focus_Direction dir) EINA_ARG_NONNULL(1);
+
+   /**
+    * Give focus to near object in one direction.
+    *
+    * Give focus to near object in direction of one object.
+    * If none focusable object in given direction, the focus will not change.
+    *
+    * @param obj The reference object
+    * @param x Horizontal component of direction to focus
+    * @param y Vertical component of direction to focus
+    *
+    * @ingroup Focus
+    */
    EAPI void             elm_object_focus_direction_go(Evas_Object *obj, int x, int y) EINA_ARG_NONNULL(1);
 
    /**
-    * Make the elementary object and its children to be unfocusable (or focusable).
+    * Make the elementary object and its children to be unfocusable
+    * (or focusable).
     *
     * @param obj The Elementary object to operate on
     * @param tree_unfocusable @c EINA_TRUE for unfocusable,
     *        @c EINA_FALSE for focusable.
     *
     * This sets whether the object @p obj and its children objects
-    * able to take focus or not. If the tree is unfocusable,
+    * are able to take focus or not. If the tree is set as unfocusable,
     * newest focused object which is not in this tree will get focus.
     * This API can be helpful for an object to be deleted.
     * When an object will be deleted soon, it and its children may not
