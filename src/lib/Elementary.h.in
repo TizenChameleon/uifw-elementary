@@ -1657,29 +1657,248 @@ extern "C" {
     * @ingroup WidgetNavigation
     */
    EAPI Evas_Object *elm_object_parent_widget_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the top level parent of an Elementary widget.
+    *
+    * @param obj The object to query.
+    * @return The top level Elementary widget, or @c NULL if parent cannot be
+    * found.
+    * @ingroup WidgetNavigation
+    */
    EAPI Evas_Object *elm_object_top_widget_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+    * Get the string that represents this Elementary widget.
+    *
+    * @note Elementary is weird and exposes itself as a single
+    *       Evas_Object_Smart_Class of type "elm_widget", so
+    *       evas_object_type_get() always return that, making debug and
+    *       language bindings hard. This function tries to mitigate this
+    *       problem, but the solution is to change Elementary to use
+    *       proper inheritance.
+    *
+    * @param obj the object to query.
+    * @return Elementary widget name, or @c NULL if not a valid widget.
+    * @ingroup WidgetNavigation
+    */
    EAPI const char  *elm_object_widget_type_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
+   /**
+    * @defgroup Config Elementary Config
+    *
+    * Elementary configuration is formed by a set options bounded to a
+    * given @ref Profile profile, like @ref Theme theme, @ref Fingers
+    * "finger size", etc. These are functions with which one syncronizes
+    * changes made to those values to the configuration storing files, de
+    * facto. You most probably don't want to use the functions in this
+    * group unlees you're writing an elementary configuration manager.
+    *
+    * @{
+    */
    EAPI double       elm_scale_get(void);
    EAPI void         elm_scale_set(double scale);
    EAPI void         elm_scale_all_set(double scale);
 
+   /**
+    * Save back Elementary's configuration, so that it will persist on
+    * future sessions.
+    *
+    * @return @c EINA_TRUE, when sucessful. @c EINA_FALSE, otherwise.
+    * @ingroup Config
+    *
+    * This function will take effect -- thus, do I/O -- immediately. Use
+    * it when you want to apply all configuration changes at once. The
+    * current configuration set will get saved onto the current profile
+    * configuration file.
+    *
+    */
    EAPI Eina_Bool    elm_mirrored_get(void);
    EAPI void         elm_mirrored_set(Eina_Bool mirrored);
 
+   /**
+    * Reload Elementary's configuration, bounded to current selected
+    * profile.
+    *
+    * @return @c EINA_TRUE, when sucessful. @c EINA_FALSE, otherwise.
+    * @ingroup Config
+    *
+    * Useful when you want to force reloading of configuration values for
+    * a profile. If one removes user custom configuration directories,
+    * for example, it will force a reload with system values insted.
+    *
+    */
    EAPI Eina_Bool    elm_config_save(void);
    EAPI void         elm_config_reload(void);
 
+   /**
+    * @}
+    */
+
+   /**
+    * @defgroup Profile Elementary Profile
+    *
+    * Profiles are pre-set options that affect the whole look-and-feel of
+    * Elementary-based applications. There are, for example, profiles
+    * aimed at desktop computer applications and others aimed at mobile,
+    * touchscreen-based ones. You most probably don't want to use the
+    * functions in this group unlees you're writing an elementary
+    * configuration manager.
+    *
+    * @{
+    */
+
+   /**
+    * Get Elementary's profile in use.
+    *
+    * This gets the global profile that is applied to all Elementary
+    * applications.
+    *
+    * @return The profile's name
+    * @ingroup Profile
+    */
    EAPI const char  *elm_profile_current_get(void);
+
+   /**
+    * Get an Elementary's profile directory path in the filesystem. One
+    * may want to fetch a system profile's dir or an user one (fetched
+    * inside $HOME).
+    *
+    * @param profile The profile's name
+    * @param is_user Whether to lookup for an user profile (@c EINA_TRUE)
+    *                or a system one (@c EINA_FALSE)
+    * @return The profile's directory path.
+    * @ingroup Profile
+    *
+    * @note You must free it with elm_profile_dir_free().
+    */
    EAPI const char  *elm_profile_dir_get(const char *profile, Eina_Bool is_user);
+
+   /**
+    * Free an Elementary's profile directory path, as returned by
+    * elm_profile_dir_get().
+    *
+    * @param p_dir The profile's path
+    * @ingroup Profile
+    *
+    */
    EAPI void         elm_profile_dir_free(const char *p_dir);
+
+   /**
+    * Get Elementary's list of available profiles.
+    *
+    * @return The profiles list. List node data are the profile name
+    *         strings.
+    * @ingroup Profile
+    *
+    * @note One must free this list, after usage, with the function
+    *       elm_profile_list_free().
+    */
    EAPI Eina_List   *elm_profile_list_get(void);
+
+   /**
+    * Free Elementary's list of available profiles.
+    *
+    * @param l The profiles list, as returned by elm_profile_list_get().
+    * @ingroup Profile
+    *
+    */
    EAPI void         elm_profile_list_free(Eina_List *l);
+
+   /**
+    * Set Elementary's profile.
+    *
+    * This sets the global profile that is applied to Elementary
+    * applications. Just the process the call comes from will be
+    * affected.
+    *
+    * @param profile The profile's name
+    * @ingroup Profile
+    *
+    */
    EAPI void         elm_profile_set(const char *profile);
+
+   /**
+    * Set Elementary's profile.
+    *
+    * This sets the global profile that is applied to all Elementary
+    * applications. All running Elementary windows will be affected.
+    *
+    * @param profile The profile's name
+    * @ingroup Profile
+    *
+    */
    EAPI void         elm_profile_all_set(const char *profile);
 
+   /**
+    * @}
+    */
+
+   /**
+    * @defgroup Engine Elementary Engine
+    *
+    * These are functions setting and querying which rendering engine
+    * Elementary will use for drawing its windows' pixels.
+    *
+    * The following are the available engines:
+    * @li "software_x11"
+    * @li "fb"
+    * @li "directfb"
+    * @li "software_16_x11"
+    * @li "software_8_x11"
+    * @li "xrender_x11"
+    * @li "opengl_x11"
+    * @li "software_gdi"
+    * @li "software_16_wince_gdi"
+    * @li "sdl"
+    * @li "software_16_sdl"
+    * @li "opengl_sdl"
+    * @li "buffer"
+    * @li "ews"
+    *
+    * @{
+    */
+
+   /**
+    * @brief Get Elementary's rendering engine in use.
+    *
+    * @return The rendering engine's name
+    * @note there's no need to free the returned string, here.
+    *
+    * This gets the global rendering engine that is applied to all Elementary
+    * applications.
+    *
+    * @see elm_engine_set()
+    */
    EAPI const char  *elm_engine_current_get(void);
+
+   /**
+    * @brief Set Elementary's rendering engine for use.
+    *
+    * @param engine The rendering engine's name
+    *
+    * This sets global rendering engine that is applied to all Elementary
+    * applications. Note that it will take effect only to Elementary windows
+    * created after this is called.
+    *
+    * @see elm_win_add()
+    */
    EAPI void         elm_engine_set(const char *engine);
+
+   /**
+    * @}
+    */
+
+   /**
+    * @defgroup Fonts Elementary Fonts
+    *
+    * These are functions dealing with font rendering, selection and the
+    * like for Elementary applications. One might fetch which system
+    * fonts are there to use and set custom fonts for individual classes
+    * of UI items containing text (text classes).
+    *
+    * @{
+    */
 
   typedef struct _Elm_Text_Class
     {
@@ -1700,21 +1919,170 @@ extern "C" {
        Eina_List  *styles;
     } Elm_Font_Properties;
 
+   /**
+    * Get Elementary's list of supported text classes.
+    *
+    * @return The text classes list, with @c Elm_Text_Class blobs as data.
+    * @ingroup Fonts
+    *
+    * Release the list with elm_text_classes_list_free().
+    */
    EAPI const Eina_List     *elm_text_classes_list_get(void);
+
+   /**
+    * Free Elementary's list of supported text classes.
+    *
+    * @ingroup Fonts
+    *
+    * @see elm_text_classes_list_get().
+    */
    EAPI void                 elm_text_classes_list_free(const Eina_List *list);
 
+   /**
+    * Get Elementary's list of font overlays, set with
+    * elm_font_overlay_set().
+    *
+    * @return The font overlays list, with @c Elm_Font_Overlay blobs as
+    * data.
+    *
+    * @ingroup Fonts
+    *
+    * For each text class, one can set a <b>font overlay</b> for it,
+    * overriding the default font properties for that class coming from
+    * the theme in use. There is no need to free this list.
+    *
+    * @see elm_font_overlay_set() and elm_font_overlay_unset().
+    */
    EAPI const Eina_List     *elm_font_overlay_list_get(void);
+
+   /**
+    * Set a font overlay for a given Elementary text class.
+    *
+    * @param text_class Text class name
+    * @param font Font name and style string
+    * @param size Font size
+    *
+    * @ingroup Fonts
+    *
+    * @p font has to be in the format returned by
+    * elm_font_fontconfig_name_get(). @see elm_font_overlay_list_get()
+    * and elm_font_overlay_unset().
+    */
    EAPI void                 elm_font_overlay_set(const char *text_class, const char *font, Evas_Font_Size size);
+
+   /**
+    * Unset a font overlay for a given Elementary text class.
+    *
+    * @param text_class Text class name
+    *
+    * @ingroup Fonts
+    *
+    * This will bring back text elements belonging to text class
+    * @p text_class back to their default font settings.
+    */
    EAPI void                 elm_font_overlay_unset(const char *text_class);
+
+   /**
+    * Apply the changes made with elm_font_overlay_set() and
+    * elm_font_overlay_unset() on the current Elementary window.
+    *
+    * @ingroup Fonts
+    *
+    * This applies all font overlays set to all objects in the UI.
+    */
    EAPI void                 elm_font_overlay_apply(void);
+
+   /**
+    * Apply the changes made with elm_font_overlay_set() and
+    * elm_font_overlay_unset() on all Elementary application windows.
+    *
+    * @ingroup Fonts
+    *
+    * This applies all font overlays set to all objects in the UI.
+    */
    EAPI void                 elm_font_overlay_all_apply(void);
 
+   /**
+    * Translate a font (family) name string in fontconfig's font names
+    * syntax into an @c Elm_Font_Properties struct.
+    *
+    * @param font The font name and styles string
+    * @return the font properties struct
+    *
+    * @ingroup Fonts
+    *
+    * @note The reverse translation can be achived with
+    * elm_font_fontconfig_name_get(), for one style only (single font
+    * instance, not family).
+    */
    EAPI Elm_Font_Properties *elm_font_properties_get(const char *font) EINA_ARG_NONNULL(1);
+
+   /**
+    * Free font properties return by elm_font_properties_get().
+    *
+    * @param efp the font properties struct
+    *
+    * @ingroup Fonts
+    */
    EAPI void                 elm_font_properties_free(Elm_Font_Properties *efp) EINA_ARG_NONNULL(1);
+
+   /**
+    * Translate a font name, bound to a style, into fontconfig's font names
+    * syntax.
+    *
+    * @param name The font (family) name
+    * @param style The given style (may be @c NULL)
+    *
+    * @return the font name and style string
+    *
+    * @ingroup Fonts
+    *
+    * @note The reverse translation can be achived with
+    * elm_font_properties_get(), for one style only (single font
+    * instance, not family).
+    */
    EAPI const char          *elm_font_fontconfig_name_get(const char *name, const char *style) EINA_ARG_NONNULL(1);
+
+   /**
+    * Free the font string return by elm_font_fontconfig_name_get().
+    *
+    * @param efp the font properties struct
+    *
+    * @ingroup Fonts
+    */
    EAPI void                 elm_font_fontconfig_name_free(const char *name) EINA_ARG_NONNULL(1);
+
+   /**
+    * Create a font hash table of available system fonts.
+    *
+    * One must call it with @p list being the return value of
+    * evas_font_available_list(). The hash will be indexed by font
+    * (family) names, being its values @c Elm_Font_Properties blobs.
+    *
+    * @param list The list of available system fonts, as returned by
+    * evas_font_available_list().
+    * @return the font hash.
+    *
+    * @ingroup Fonts
+    *
+    * @note The user is supposed to get it populated at least with 3
+    * default font families (Sans, Serif, Monospace), which should be
+    * present on most systems.
+    */
    EAPI Eina_Hash           *elm_font_available_hash_add(Eina_List *list);
+
+   /**
+    * Free the hash return by elm_font_available_hash_add().
+    *
+    * @param hash the hash to be freed.
+    *
+    * @ingroup Fonts
+    */
    EAPI void                 elm_font_available_hash_del(Eina_Hash *hash);
+
+   /**
+    * @}
+    */
 
    /**
     * @defgroup Fingers Fingers
@@ -1729,6 +2097,8 @@ extern "C" {
     *
     * @ref general_functions_example_page "This" example contemplates
     * some of these functions.
+    *
+    * @{
     */
 
    /**
@@ -1741,8 +2111,31 @@ extern "C" {
     * @ingroup Fingers
     */
    EAPI Evas_Coord       elm_finger_size_get(void);
+
+   /**
+    * Set the configured finger size
+    *
+    * This sets the globally configured finger size in pixels
+    *
+    * @param size The finger size
+    * @ingroup Fingers
+    */
    EAPI void             elm_finger_size_set(Evas_Coord size);
+
+   /**
+    * Set the configured finger size for all applications on the display
+    *
+    * This sets the globally configured finger size in pixels for all
+    * applications on the display
+    *
+    * @param size The finger size
+    * @ingroup Fingers
+    */
    EAPI void             elm_finger_size_all_set(Evas_Coord size);
+
+   /**
+    * @}
+    */
 
    /**
     * @defgroup Focus Focus
@@ -1821,7 +2214,7 @@ extern "C" {
     * @return @c EINA_TRUE, if the object is focused, @c EINA_FALSE if
     *            not (and on errors).
     *
-    * @see elm_object_focus()
+    * @see elm_object_focus_set()
     *
     * @ingroup Focus
     */
