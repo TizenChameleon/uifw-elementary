@@ -943,7 +943,7 @@ elm_scroller_gravity_set(Evas_Object *obj, double x, double y)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
+   if (!wd) return;
 
    elm_smart_scroller_gravity_set(wd->scr, x, y);
 }
@@ -965,7 +965,7 @@ elm_scroller_gravity_get(const Evas_Object *obj, double *x, double *y)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
+   if (!wd) return;
 
    elm_smart_scroller_gravity_get(wd->scr, x, y);
 }
