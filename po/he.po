@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-09-26 21:20+0900\n"
+"POT-Creation-Date: 2011-11-04 11:27+0900\n"
 "PO-Revision-Date: 2011-09-26 21:20+0900\n"
 "Last-Translator: Sumanth Krishna Mannam <sumanth.m@samsung.com>\n"
 "Language-Team: General\n"
@@ -24,8 +24,8 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#: src/lib/elc_fileselector.c:1058 src/lib/elm_entry.c:1309
-#: src/lib/elm_searchbar.c:221
+#: src/lib/elc_fileselector.c:1058 src/lib/elm_entry.c:1454
+#: src/lib/elm_searchbar.c:226
 msgid "Cancel"
 msgstr "בטל"
 
@@ -33,42 +33,42 @@ msgstr "בטל"
 msgid "OK"
 msgstr "אשר"
 
-#: src/lib/elm_config.c:1648
+#: src/lib/elm_config.c:1631
 msgid "default:LTR"
 msgstr "default:RTL"
 
-#: src/lib/elm_datefield.c:416
+#: src/lib/elm_datefield.c:418
 msgid "PM"
 msgstr "PM"
 
-#: src/lib/elm_datefield.c:417
+#: src/lib/elm_datefield.c:419
 msgid "AM"
 msgstr "AM"
 
-#: src/lib/elm_datefield.c:736
+#: src/lib/elm_datefield.c:746
 msgid "DateTimeFormat"
 msgstr "%b %d, %Y %I : %M %p"
 
-#: src/lib/elm_entry.c:1283
+#: src/lib/elm_entry.c:1428
 msgid "Select"
 msgstr "התחל בחירה"
 
-#: src/lib/elm_entry.c:1288
+#: src/lib/elm_entry.c:1433
 msgid "Paste"
 msgstr "הדבק"
 
-#: src/lib/elm_entry.c:1293 src/lib/elm_entry.c:1313
+#: src/lib/elm_entry.c:1438 src/lib/elm_entry.c:1458
 msgid "More"
 msgstr ""
 
-#: src/lib/elm_entry.c:1303
+#: src/lib/elm_entry.c:1448
 msgid "Copy"
 msgstr "העתק"
 
-#: src/lib/elm_entry.c:1306
+#: src/lib/elm_entry.c:1451
 msgid "Cut"
 msgstr "גזור"
 
-#: src/lib/elm_searchbar.c:204
+#: src/lib/elm_searchbar.c:214
 msgid "Search"
 msgstr "לחפש"
