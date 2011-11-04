@@ -4187,25 +4187,164 @@ extern "C" {
     * (blank mouse, private mouse obj, defaultmouse)
     *
     */
+   /**
+    * Sets the keyboard mode of the window.
+    *
+    * @param obj The window object
+    * @param mode The mode to set, one of #Elm_Win_Keyboard_Mode
+    */
    EAPI void                  elm_win_keyboard_mode_set(Evas_Object *obj, Elm_Win_Keyboard_Mode mode) EINA_ARG_NONNULL(1);
+   /**
+    * Gets the keyboard mode of the window.
+    *
+    * @param obj The window object
+    * @return The mode, one of #Elm_Win_Keyboard_Mode
+    */
    EAPI Elm_Win_Keyboard_Mode elm_win_keyboard_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Sets whether the window is a keyboard.
+    *
+    * @param obj The window object
+    * @param is_keyboard If true, the window is a virtual keyboard
+    */
    EAPI void                  elm_win_keyboard_win_set(Evas_Object *obj, Eina_Bool is_keyboard) EINA_ARG_NONNULL(1);
+   /**
+    * Gets whether the window is a keyboard.
+    *
+    * @param obj The window object
+    * @return If the window is a virtual keyboard
+    */
    EAPI Eina_Bool             elm_win_keyboard_win_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
+   /**
+    * Get the screen position of a window.
+    *
+    * @param obj The window object
+    * @param x The int to store the x coordinate to
+    * @param y The int to store the y coordinate to
+    */
    EAPI void                  elm_win_screen_position_get(const Evas_Object *obj, int *x, int *y) EINA_ARG_NONNULL(1);
+   /**
+    * @}
+    */
 
+   /**
+    * @defgroup Inwin Inwin
+    *
+    * @image html img/widget/inwin/preview-00.png
+    * @image latex img/widget/inwin/preview-00.eps
+    * @image html img/widget/inwin/preview-01.png
+    * @image latex img/widget/inwin/preview-01.eps
+    * @image html img/widget/inwin/preview-02.png
+    * @image latex img/widget/inwin/preview-02.eps
+    *
+    * An inwin is a window inside a window that is useful for a quick popup.
+    * It does not hover.
+    *
+    * It works by creating an object that will occupy the entire window, so it
+    * must be created using an @ref Win "elm_win" as parent only. The inwin
+    * object can be hidden or restacked below every other object if it's
+    * needed to show what's behind it without destroying it. If this is done,
+    * the elm_win_inwin_activate() function can be used to bring it back to
+    * full visibility again.
+    *
+    * There are three styles available in the default theme. These are:
+    * @li default: The inwin is sized to take over most of the window it's
+    * placed in.
+    * @li minimal: The size of the inwin will be the minimum necessary to show
+    * its contents.
+    * @li minimal_vertical: Horizontally, the inwin takes as much space as
+    * possible, but it's sized vertically the most it needs to fit its\
+    * contents.
+    *
+    * Some examples of Inwin can be found in the following:
+    * @li @ref inwin_example_01
+    *
+    * @{
+    */
+   /**
+    * Adds an inwin to the current window
+    *
+    * The @p obj used as parent @b MUST be an @ref Win "Elementary Window".
+    * Never call this function with anything other than the top-most window
+    * as its parameter, unless you are fond of undefined behavior.
+    *
+    * After creating the object, the widget will set itself as resize object
+    * for the window with elm_win_resize_object_add(), so when shown it will
+    * appear to cover almost the entire window (how much of it depends on its
+    * content and the style used). It must not be added into other container
+    * objects and it needs not be moved or resized manually.
+    *
+    * @param parent The parent object
+    * @return The new object or NULL if it cannot be created
+    */
    EAPI Evas_Object          *elm_win_inwin_add(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Activates an inwin object, ensuring its visibility
+    *
+    * This function will make sure that the inwin @p obj is completely visible
+    * by calling evas_object_show() and evas_object_raise() on it, to bring it
+    * to the front. It also sets the keyboard focus to it, which will be passed
+    * onto its content.
+    *
+    * The object's theme will also receive the signal "elm,action,show" with
+    * source "elm".
+    *
+    * @param obj The inwin to activate
+    */
    EAPI void                  elm_win_inwin_activate(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Set the content of an inwin object.
+    *
+    * Once the content object is set, a previously set one will be deleted.
+    * If you want to keep that old content object, use the
+    * elm_win_inwin_content_unset() function.
+    *
+    * @param obj The inwin object
+    * @param content The object to set as content
+    */
    EAPI void                  elm_win_inwin_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   /**
+    * Get the content of an inwin object.
+    *
+    * Return the content object which is set for this widget.
+    *
+    * The returned object is valid as long as the inwin is still alive and no
+    * other content is set on it. Deleting the object will notify the inwin
+    * about it and this one will be left empty.
+    *
+    * If you need to remove an inwin's content to be reused somewhere else,
+    * see elm_win_inwin_content_unset().
+    *
+    * @param obj The inwin object
+    * @return The content that is being used
+    */
    EAPI Evas_Object          *elm_win_inwin_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Unset the content of an inwin object.
+    *
+    * Unparent and return the content object which was set for this widget.
+    *
+    * @param obj The inwin object
+    * @return The content that was being used
+    */
    EAPI Evas_Object          *elm_win_inwin_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /* available styles:
-    * default
-    * minimal
-    * minimal_vertical
+   /**
+    * @}
     */
    /* X specific calls - won't work on non-x engines (return 0) */
+
+   /**
+    * Get the Ecore_X_Window of an Evas_Object
+    *
+    * @param obj The object
+    *
+    * @return The Ecore_X_Window of @p obj
+    *
+    * @ingroup Win
+    */
    EAPI Ecore_X_Window elm_win_xwindow_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    /* smart callbacks called:
     * "delete,request" - the user requested to delete the window
     * "focus,in" - window got focus
@@ -4216,6 +4355,9 @@ extern "C" {
    /**
     * @defgroup Bg Bg
     *
+    * @image html img/widget/bg/preview-00.png
+    * @image latex img/widget/bg/preview-00.eps
+    *
     * @brief Background object, used for setting a solid color, image or Edje
     * group as background to a window or any container object.
     *
@@ -4223,6 +4365,9 @@ extern "C" {
     * packing into any container object. It works just like an image, but has
     * some properties useful to a background, like setting it to tiled,
     * centered, scaled or stretched.
+    * 
+    * Default contents parts of the bg widget that you can use for are:
+    * @li "elm.swallow.content" - overlay of the bg
     *
     * Here is some sample code using it:
     * @li @ref bg_01_example_page
@@ -4389,7 +4534,95 @@ extern "C" {
    /* smart callbacks called:
     */
 
-   /* icon */
+   /**
+    * @defgroup Icon Icon
+    *
+    * @image html img/widget/icon/preview-00.png
+    * @image latex img/widget/icon/preview-00.eps
+    *
+    * An object that provides standard icon images (delete, edit, arrows, etc.)
+    * or a custom file (PNG, JPG, EDJE, etc.) used for an icon.
+    *
+    * The icon image requested can be in the elementary theme, or in the
+    * freedesktop.org paths. It's possible to set the order of preference from
+    * where the image will be used.
+    *
+    * This API is very similar to @ref Image, but with ready to use images.
+    *
+    * Default images provided by the theme are described below.
+    *
+    * The first list contains icons that were first intended to be used in
+    * toolbars, but can be used in many other places too:
+    * @li home
+    * @li close
+    * @li apps
+    * @li arrow_up
+    * @li arrow_down
+    * @li arrow_left
+    * @li arrow_right
+    * @li chat
+    * @li clock
+    * @li delete
+    * @li edit
+    * @li refresh
+    * @li folder
+    * @li file
+    *
+    * Now some icons that were designed to be used in menus (but again, you can
+    * use them anywhere else):
+    * @li menu/home
+    * @li menu/close
+    * @li menu/apps
+    * @li menu/arrow_up
+    * @li menu/arrow_down
+    * @li menu/arrow_left
+    * @li menu/arrow_right
+    * @li menu/chat
+    * @li menu/clock
+    * @li menu/delete
+    * @li menu/edit
+    * @li menu/refresh
+    * @li menu/folder
+    * @li menu/file
+    *
+    * And here we have some media player specific icons:
+    * @li media_player/forward
+    * @li media_player/info
+    * @li media_player/next
+    * @li media_player/pause
+    * @li media_player/play
+    * @li media_player/prev
+    * @li media_player/rewind
+    * @li media_player/stop
+    *
+    * Signals that you can add callbacks for are:
+    *
+    * "clicked" - This is called when a user has clicked the icon
+    *
+    * An example of usage for this API follows:
+    * @li @ref tutorial_icon
+    */
+
+   /**
+    * @addtogroup Icon
+    * @{
+    */
+
+   typedef enum _Elm_Icon_Type
+     {
+        ELM_ICON_NONE,
+        ELM_ICON_FILE,
+        ELM_ICON_STANDARD
+     } Elm_Icon_Type;
+   /**
+    * @enum _Elm_Icon_Lookup_Order
+    * @typedef Elm_Icon_Lookup_Order
+    *
+    * Lookup order used by elm_icon_standard_set(). Should look for icons in the
+    * theme, FDO paths, or both?
+    *
+    * @ingroup Icon
+    */
    typedef enum _Elm_Icon_Lookup_Order
      {
         ELM_ICON_LOOKUP_FDO_THEME, /**< icon look up order: freedesktop, theme */
@@ -10691,12 +10924,16 @@ extern "C" {
     * stack will become visible.
     *
     * @see also elm_naviframe_content_preserve_on_pop_get()
+    *
+    * @ingroup Naviframe
     */
    EAPI Evas_Object        *elm_naviframe_item_pop(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Pop the items between the top and the above one on the given item.
     *
     * @param it The naviframe item
+    *
+    * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_item_pop_to(Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
@@ -10719,6 +10956,7 @@ extern "C" {
     * So this would not emit any signals for view transitions but just change
     * the current view if the given item is a top one.
     *
+    * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_item_del(Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
@@ -10728,6 +10966,8 @@ extern "C" {
     * @param preserve Enable the preserve mode if EINA_TRUE, disable otherwise
     *
     * @see also elm_naviframe_content_preserve_on_pop_get()
+    *
+    * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_content_preserve_on_pop_set(Evas_Object *obj, Eina_Bool preserve) EINA_ARG_NONNULL(1);
    /**
@@ -10737,6 +10977,8 @@ extern "C" {
     * @return If @c EINA_TRUE, preserve mode is enabled
     *
     * @see also elm_naviframe_content_preserve_on_pop_set()
+    *
+    * @ingroup Naviframe
     */
    EAPI Eina_Bool           elm_naviframe_content_preserve_on_pop_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -10745,6 +10987,8 @@ extern "C" {
     * @param obj The naviframe object
     * @return The top item on the naviframe stack or @c NULL, if the stack is
     *         empty
+    *
+    * @ingroup Naviframe
     */
    EAPI Elm_Object_Item    *elm_naviframe_top_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -10753,6 +10997,8 @@ extern "C" {
     * @param obj The naviframe object
     * @return The bottom item on the naviframe stack or @c NULL, if the stack is
     *         empty
+    *
+    * @ingroup Naviframe
     */
    EAPI Elm_Object_Item    *elm_naviframe_bottom_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -10765,6 +11011,8 @@ extern "C" {
     * @li @c "default"
     *
     * @see also elm_naviframe_item_style_get()
+    *
+    * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_item_style_set(Elm_Object_Item *it, const char *item_style) EINA_ARG_NONNULL(1);
    /**
@@ -10774,6 +11022,8 @@ extern "C" {
     * @return The current item style name
     *
     * @see also elm_naviframe_item_style_set()
+    *
+    * @ingroup Naviframe
     */
    EAPI const char         *elm_naviframe_item_style_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
@@ -10786,6 +11036,8 @@ extern "C" {
     * When the title area is invisible, then the controls would be hidden so as     * to expand the content area to full-size.
     *
     * @see also elm_naviframe_item_title_visible_get()
+    *
+    * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_item_title_visible_set(Elm_Object_Item *it, Eina_Bool visible) EINA_ARG_NONNULL(1);
    /**
@@ -10795,8 +11047,11 @@ extern "C" {
     * @return If @c EINA_TRUE, title area is visible
     *
     * @see also elm_naviframe_item_title_visible_set()
+    *
+    * @ingroup Naviframe
     */
    EAPI Eina_Bool           elm_naviframe_item_title_visible_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Set creating prev button automatically or not
     *
