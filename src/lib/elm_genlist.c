@@ -3743,6 +3743,13 @@ _queue_process(Widget_Data *wd)
           {
              showme = _item_block_recalc(it->block, it->block->num, EINA_TRUE);
              it->block->changed = 0;
+             if(wd->pan_changed)
+               {
+                  if (wd->calc_job) ecore_job_del(wd->calc_job);
+                  wd->calc_job = NULL;
+                  _calc_job(wd);
+                  wd->pan_changed = EINA_FALSE;
+               }
           }
         if (showme) it->block->showme = EINA_TRUE;
         if (eina_inlist_count(wd->blocks) > 1)
@@ -4080,6 +4087,7 @@ elm_genlist_clear(Evas_Object *obj)
         if (itb->items) eina_list_free(itb->items);
         free(itb);
      }
+   wd->pan_changed = EINA_TRUE;
    if (wd->calc_job)
      {
         ecore_job_del(wd->calc_job);
