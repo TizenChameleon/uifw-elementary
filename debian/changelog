@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build69) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [entry] merged with 64721, for fixing scrolled entry bug in searchbar
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build69
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Fri, 04 Nov 2011 16:06:22 +0900
+
 elementary (1.0.0+svn.61256slp2+build68) unstable; urgency=low
 
   * Package Upload
