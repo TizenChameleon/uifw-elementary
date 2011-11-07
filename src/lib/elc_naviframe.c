@@ -500,6 +500,9 @@ _back_btn_clicked(void *data,
                   Evas_Object *obj,
                   void *event_info __UNUSED__)
 {
+/* Since edje has the event queue, clicked event could be happend multiple times
+   on some heavy environment. This callback del will prevent those  scenario and
+   guarantee only one clicked for it's own page. */
    evas_object_smart_callback_del(obj, "clicked", _back_btn_clicked);
    elm_naviframe_item_pop(data);
 }
@@ -593,32 +596,34 @@ _title_content_set(Elm_Naviframe_Item *it,
                                               EINA_INLIST_GET(pair));
      }
 
-   if ((pair->content) && (pair->content != content))
-     evas_object_del(pair->content);
+   if (pair->content == content) return;
 
-   if (!content)
+   if (pair->content)
      {
-        snprintf(buf, sizeof(buf), "elm,state,%s,hide", part);
-        edje_object_signal_emit(it->base.view, buf, "elm");
-        pair->content = NULL;
-        return;
+        evas_object_event_callback_del(pair->content,
+                                       EVAS_CALLBACK_DEL,
+                                       _title_content_del);
+        evas_object_del(pair->content);
      }
-
-   if (pair->content != content)
+   if (content)
      {
         elm_widget_sub_object_add(it->base.widget, content);
         evas_object_event_callback_add(content,
                                        EVAS_CALLBACK_DEL,
                                        _title_content_del,
                                        pair);
+        edje_object_part_swallow(it->base.view, part, content);
+        snprintf(buf, sizeof(buf), "elm,state,%s,show", part);
+        edje_object_signal_emit(it->base.view, buf, "elm");
+        pair->content = content;
+        _item_sizing_eval(it);
      }
-
-   pair->content = content;
-
-   edje_object_part_swallow(it->base.view, part, content);
-   snprintf(buf, sizeof(buf), "elm,state,%s,show", part);
-   edje_object_signal_emit(it->base.view, buf, "elm");
-   _item_sizing_eval(it);
+   else
+     {
+        snprintf(buf, sizeof(buf), "elm,state,%s,hide", part);
+        edje_object_signal_emit(it->base.view, buf, "elm");
+        pair->content = NULL;
+     }
 }
 
 static void
