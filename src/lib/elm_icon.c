@@ -604,17 +604,8 @@ elm_icon_thumb_set(Evas_Object *obj, const char *file, const char *group)
 #endif
 }
 
-/**
- * Get the flag related with elm icon can support animation
- *
- * @param obj The icon object
- * @return The flag of animation available
- *
- *
- * @ingroup Icon
- */
 EAPI Eina_Bool
-elm_icon_anim_available_get(const Evas_Object *obj)
+elm_icon_animated_available_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Evas_Object *img_obj ;
@@ -626,17 +617,8 @@ elm_icon_anim_available_get(const Evas_Object *obj)
    return evas_object_image_animated_get(img_obj);
 }
 
-/**
- * Set animation mode of the icon.
- *
- * @param obj The icon object
- * @param anim @c EINA_TRUE if the object do animation job,
- * @c EINA_FALSE otherwise. Default is @c EINA_FALSE.
- *
- * @ingroup Icon
- */
 EAPI void
-elm_icon_anim_set(Evas_Object *obj, Eina_Bool anim)
+elm_icon_animated_set(Evas_Object *obj, Eina_Bool anim)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Evas_Object *img_obj ;
@@ -663,16 +645,8 @@ elm_icon_anim_set(Evas_Object *obj, Eina_Bool anim)
    return;
 }
 
-/**
- * Get animation mode of the icon.
- *
- * @param obj The icon object
- * @return The animation mode of the icon object
- *
- * @ingroup Icon
- */
 EAPI Eina_Bool
-elm_icon_anim_get(const Evas_Object *obj)
+elm_icon_animated_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -680,17 +654,8 @@ elm_icon_anim_get(const Evas_Object *obj)
    return wd->anim;
 }
 
-/**
- * Set animation play mode of the icon.
- *
- * @param obj The icon object
- * @param play @c EINA_TRUE the object play animation images,
- * @c EINA_FALSE otherwise. Default is @c EINA_FALSE.
- *
- * @ingroup Icon
- */
 EAPI void
-elm_icon_anim_play_set(Evas_Object *obj, Eina_Bool play)
+elm_icon_animated_play_set(Evas_Object *obj, Eina_Bool play)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -714,21 +679,44 @@ elm_icon_anim_play_set(Evas_Object *obj, Eina_Bool play)
 
 }
 
-/**
- * Get animation play mode of the icon.
- *
- * @param obj The icon object
- * @return The play mode of the icon object
- *
- * @ingroup Icon
- */
 EAPI Eina_Bool
-elm_icon_anim_play_get(const Evas_Object *obj)
+elm_icon_animated_play_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
    return wd->play;
+}
+
+/* compatibility code to prevent ABI break */
+EAPI Eina_Bool
+elm_icon_anim_available_get(const Evas_Object *obj)
+{
+  return elm_icon_animated_available_get(obj);
+}
+
+EAPI void
+elm_icon_anim_set(Evas_Object *obj, Eina_Bool anim)
+{
+  elm_icon_animated_set(obj, anim);
+}
+
+EAPI Eina_Bool
+elm_icon_anim_get(const Evas_Object *obj)
+{
+  return elm_icon_animated_get(obj);
+}
+
+EAPI void
+elm_icon_anim_play_set(Evas_Object *obj, Eina_Bool play)
+{
+  elm_icon_animated_play_set(obj, play);
+}
+
+EAPI Eina_Bool
+elm_icon_anim_play_get(const Evas_Object *obj)
+{
+  return elm_icon_animated_play_get(obj);
 }
 
 static Eina_Bool

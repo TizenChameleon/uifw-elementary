@@ -4938,7 +4938,7 @@ extern "C" {
     * elm_icon_animated_XXX APIs won't work.
     * @ingroup Icon
     */
-   EAPI Eina_Bool             elm_icon_anim_available_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool           elm_icon_animated_available_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Set animation mode of the icon.
     *
@@ -4953,7 +4953,7 @@ extern "C" {
     * Set it to EINA_TRUE when the icon needs to be animated.
     * @ingroup Icon
     */
-   EAPI void                  elm_icon_anim_set(Evas_Object *obj, Eina_Bool anim) EINA_ARG_NONNULL(1);
+   EAPI void                elm_icon_animated_set(Evas_Object *obj, Eina_Bool animated) EINA_ARG_NONNULL(1);
    /**
     * Get animation mode of the icon.
     *
@@ -4962,7 +4962,7 @@ extern "C" {
     * @see elm_icon_animated_set
     * @ingroup Icon
     */
-   EAPI Eina_Bool             elm_icon_anim_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool           elm_icon_animated_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Set animation play mode of the icon.
     *
@@ -4979,7 +4979,7 @@ extern "C" {
     *    Then animation will be stopped and vice versa
     * @ingroup Icon
     */
-   EAPI void                  elm_icon_anim_play_set(Evas_Object *obj, Eina_Bool play) EINA_ARG_NONNULL(1);
+   EAPI void                elm_icon_animated_play_set(Evas_Object *obj, Eina_Bool play) EINA_ARG_NONNULL(1);
    /**
     * Get animation play mode of the icon.
     *
@@ -4989,7 +4989,28 @@ extern "C" {
     * @see elm_icon_animated_play_get
     * @ingroup Icon
     */
-   EAPI Eina_Bool             elm_icon_anim_play_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool           elm_icon_animated_play_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /* compatibility code to avoid API and ABI breaks */
+   EINA_DEPRECATED EAPI extern inline void elm_icon_anim_set(Evas_Object *obj, Eina_Bool animated)
+     {
+        elm_icon_animated_set(obj, animated);
+     }
+
+   EINA_DEPRECATED EAPI extern inline Eina_Bool elm_icon_anim_get(const Evas_Object *obj)
+     {
+        return elm_icon_animated_get(obj);
+     }
+
+   EINA_DEPRECATED EAPI extern inline void elm_icon_anim_play_set(Evas_Object *obj, Eina_Bool play)
+     {
+        elm_icon_animated_play_set(obj, play);
+     }
+
+   EINA_DEPRECATED EAPI extern inline Eina_Bool elm_icon_anim_play_get(const Evas_Object *obj)
+     {
+        return elm_icon_animated_play_get(obj);
+     }
 
    /**
     * @}
