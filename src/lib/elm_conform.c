@@ -9,15 +9,6 @@
 # define MAX(a,b) ((a) < (b)) ? (b) : (a)
 #endif
 
-/**
- * @defgroup Conformant Conformant
- * @ingroup Elementary
- *
- * The aim is to provide a widget that can be used in elementary apps to
- * account for space taken up by the indicator, virtual keypad & softkey windows when running
- * the illume2 module of E17.
- */
-
 typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
@@ -455,14 +446,6 @@ _prop_change(void *data, int type __UNUSED__, void *event)
 }
 #endif
 
-/**
- * Add a new Conformant object
- *
- * @param parent The parent object
- * @return The new conformant object or NULL if it cannot be created
- *
- * @ingroup Conformant
- */
 EAPI Evas_Object *
 elm_conformant_add(Evas_Object *parent)
 {
@@ -515,18 +498,6 @@ elm_conformant_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * Set the content of the conformant widget
- *
- * Once the content object is set, a previously set one will be deleted.
- * If you want to keep that old content object, use the
- * elm_conformat_content_unset() function.
- *
- * @param obj The conformant object
- * @return The content that was being used
- *
- * @ingroup Conformant
- */
 EAPI void
 elm_conformant_content_set(Evas_Object *obj, Evas_Object *content)
 {
@@ -547,16 +518,6 @@ elm_conformant_content_set(Evas_Object *obj, Evas_Object *content)
    _sizing_eval(obj);
 }
 
-/**
- * Get the content of the conformant widget
- *
- * Return the content object which is set for this widget;
- *
- * @param obj The conformant object
- * @return The content that is being used
- *
- * @ingroup Conformant
- */
 EAPI Evas_Object *
 elm_conformant_content_get(const Evas_Object *obj)
 {
@@ -567,16 +528,6 @@ elm_conformant_content_get(const Evas_Object *obj)
    return wd->content;
 }
 
-/**
- * Unset the content of the conformant widget
- *
- * Unparent and return the content object which was set for this widget;
- *
- * @param obj The conformant object
- * @return The content that was being used
- *
- * @ingroup Conformant
- */
 EAPI Evas_Object *
 elm_conformant_content_unset(Evas_Object *obj)
 {
@@ -591,15 +542,6 @@ elm_conformant_content_unset(Evas_Object *obj)
    wd->content = NULL;
    return content;
 }
-
-/**
- * Returns the Evas_Object that represents the content area.
- *
- * @param obj The conformant object.
- * @return The content area of the widget.
- *
- * @ingroup Conformant
- */
 
 EAPI Evas_Object *
 elm_conformant_content_area_get(const Evas_Object *obj)
