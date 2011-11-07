@@ -4996,6 +4996,33 @@ extern "C" {
     */
 
    /**
+    * @defgroup Image Image
+    *
+    * @image html img/widget/image/preview-00.png
+    * @image latex img/widget/image/preview-00.eps
+
+    *
+    * An object that allows one to load an image file to it. It can be used
+    * anywhere like any other elementary widget.
+    *
+    * This widget provides most of the functionality provided from @ref Bg or @ref
+    * Icon, but with a slightly different API (use the one that fits better your
+    * needs).
+    *
+    * The features not provided by those two other image widgets are:
+    * @li allowing to get the basic @c Evas_Object with elm_image_object_get();
+    * @li change the object orientation with elm_image_orient_set();
+    * @li and turning the image editable with elm_image_editable_set().
+    *
+    * Signals that you can add callbacks for are:
+    *
+    * @li @c "clicked" - This is called when a user has clicked the image
+    *
+    * An example of usage for this API follows:
+    * @li @ref tutorial_image
+    */
+
+   /**
     * @addtogroup Image
     * @{
     */
