@@ -5026,7 +5026,7 @@ EAPI Evas_Coord
 elm_entry_wrap_width_get(const Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   if (!wd) return 0;
    return wd->wrap_w;
 }
 
