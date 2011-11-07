@@ -5361,16 +5361,11 @@ extern "C" {
     * @}
     */
 
-   /**
-    * @defgroup GLView
-    *
-    * A simple GLView widget that allows GL rendering.
-    *
-    * Signals that you can add callbacks for are:
-    *
-    * @{
-    */
-   typedef void (*Elm_GLView_Func)(Evas_Object *obj);
+   /* glview */
+   typedef void (*Elm_GLView_Func_Cb)(Evas_Object *obj);
+
+   /* old API compatibility */
+   typedef Elm_GLView_Func_Cb Elm_GLView_Func;
 
    typedef enum _Elm_GLView_Mode
      {
@@ -5379,6 +5374,11 @@ extern "C" {
         ELM_GLVIEW_STENCIL = 4
      } Elm_GLView_Mode;
 
+   /**
+    * Defines a policy for the glview resizing.
+    *
+    * @note Default is ELM_GLVIEW_RESIZE_POLICY_RECREATE
+    */
    typedef enum _Elm_GLView_Resize_Policy
      {
         ELM_GLVIEW_RESIZE_POLICY_RECREATE = 1,      /**< Resize the internal surface along with the image */
@@ -5391,6 +5391,15 @@ extern "C" {
         ELM_GLVIEW_RENDER_POLICY_ALWAYS    = 2      /**< Render always even when it is not visible */
      } Elm_GLView_Render_Policy;
 
+   /**
+    * @defgroup GLView
+    *
+    * A simple GLView widget that allows GL rendering.
+    *
+    * Signals that you can add callbacks for are:
+    *
+    * @{
+    */
 
    /**
     * Add a new glview to the parent
@@ -5494,7 +5503,7 @@ extern "C" {
     *
     * @ingroup GLView
     */
-   EAPI void             elm_glview_init_func_set(Evas_Object *obj, Elm_GLView_Func func) EINA_ARG_NONNULL(1);
+   EAPI void             elm_glview_init_func_set(Evas_Object *obj, Elm_GLView_Func_Cb func) EINA_ARG_NONNULL(1);
 
    /**
     * Set the render function that runs in the main loop.
@@ -5506,7 +5515,7 @@ extern "C" {
     *
     * @ingroup GLView
     */
-   EAPI void             elm_glview_del_func_set(Evas_Object *obj, Elm_GLView_Func func) EINA_ARG_NONNULL(1);
+   EAPI void             elm_glview_del_func_set(Evas_Object *obj, Elm_GLView_Func_Cb func) EINA_ARG_NONNULL(1);
 
    /**
     * Set the resize function that gets called when resize happens.
@@ -5516,7 +5525,7 @@ extern "C" {
     *
     * @ingroup GLView
     */
-   EAPI void             elm_glview_resize_func_set(Evas_Object *obj, Elm_GLView_Func func) EINA_ARG_NONNULL(1);
+   EAPI void             elm_glview_resize_func_set(Evas_Object *obj, Elm_GLView_Func_Cb func) EINA_ARG_NONNULL(1);
 
    /**
     * Set the render function that runs in the main loop.
@@ -5526,7 +5535,7 @@ extern "C" {
     *
     * @ingroup GLView
     */
-   EAPI void             elm_glview_render_func_set(Evas_Object *obj, Elm_GLView_Func func) EINA_ARG_NONNULL(1);
+   EAPI void             elm_glview_render_func_set(Evas_Object *obj, Elm_GLView_Func_Cb func) EINA_ARG_NONNULL(1);
 
    /**
     * Notifies that there has been changes in the GLView.
