@@ -5554,6 +5554,12 @@ extern "C" {
    /**
     * @defgroup Box Box
     *
+    * @image html img/widget/box/preview-00.png
+    * @image latex img/widget/box/preview-00.eps width=\textwidth
+    *
+    * @image html img/box.png
+    * @image latex img/box.eps width=\textwidth
+    *
     * A box arranges objects in a linear fashion, governed by a layout function
     * that defines the details of this arrangement.
     *
@@ -5971,9 +5977,12 @@ extern "C" {
    /**
     * @defgroup Button Button
     *
-    * @image html  widget/button/preview-00.png
-    * @image html  widget/button/preview-01.png
-    * @image html  widget/button/preview-02.png
+    * @image html img/widget/button/preview-00.png
+    * @image latex img/widget/button/preview-00.eps
+    * @image html img/widget/button/preview-01.png
+    * @image latex img/widget/button/preview-01.eps
+    * @image html img/widget/button/preview-02.png
+    * @image latex img/widget/button/preview-02.eps
     *
     * This is a push-button. Press it and run some function. It can contain
     * a simple label and icon object and it also has an autorepeat feature.
@@ -9143,6 +9152,9 @@ extern "C" {
    /**
     * @defgroup Clock Clock
     *
+    * @image html img/widget/clock/preview-00.png
+    * @image latex img/widget/clock/preview-00.eps
+    *
     * This is a @b digital clock widget. In its default theme, it has a
     * vintage "flipping numbers clock" appearance, which will animate
     * sheets of individual algarisms individually as time goes by.
@@ -9232,7 +9244,7 @@ extern "C" {
     * even if the clock is not in "military" mode.
     *
     * @warning The behavior for values set out of those ranges is @b
-    * indefined.
+    * undefined.
     *
     * @ingroup Clock
     */
@@ -11593,9 +11605,15 @@ extern "C" {
     * @}
     */
 
+   /* composite widgets - these basically put together basic widgets above
+    * in convenient packages that do more than basic stuff */
+
    /* anchorview */
    /**
     * @defgroup Anchorview Anchorview
+    *
+    * @image html img/widget/anchorview/preview-00.png
+    * @image latex img/widget/anchorview/preview-00.eps
     *
     * Anchorview is for displaying text that contains markup with anchors
     * like <c>\<a href=1234\>something\</\></c> in it.
@@ -15279,7 +15297,16 @@ extern "C" {
     * @}
     */
 
-   /* tooltip */
+   /**
+    * @defgroup Tooltips Tooltips
+    *
+    * The Tooltip is an (internal, for now) smart object used to show a
+    * content in a frame on mouse hover of objects(or widgets), with
+    * tips/information about them.
+    *
+    * @{
+    */
+
    EAPI double       elm_tooltip_delay_get(void);
    EAPI Eina_Bool    elm_tooltip_delay_set(double delay);
    EAPI void         elm_object_tooltip_show(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -17376,15 +17403,25 @@ extern "C" {
     * @}
     */
 
-   /* actionslider */
-
    /**
     * @addtogroup Actionslider Actionslider
     *
-    * A actionslider is a switcher for 2 or 3 labels with customizable magnet
-    * properties. The indicator is the element the user drags to choose a label.
-    * When the position is set with magnet, when released the indicator will be
-    * moved to it if it's nearest the magnetized position.
+    * @image html img/widget/actionslider/preview-00.png
+    * @image latex img/widget/actionslider/preview-00.eps
+    *
+    * An actionslider is a switcher for 2 or 3 labels with customizable magnet
+    * properties. The user drags and releases the indicator, to choose a label.
+    *
+    * Labels occupy the following positions.
+    * a. Left
+    * b. Right
+    * c. Center
+    *
+    * Positions can be enabled or disabled.
+    *
+    * Magnets can be set on the above positions.
+    *
+    * When the indicator is released, it will move to its nearest "enabled and magnetized" position.
     *
     * @note By default all positions are set as enabled.
     *
@@ -19290,49 +19327,14 @@ extern "C" {
     */
 
    /**
-    * @page tutorial_check Check example
-    * @dontinclude check_example_01.c
-    *
-    * This example will show 2 checkboxes, one with just a label and the second
-    * one with both a label and an icon. This example also ilustrates how to
-    * have the checkbox change the value of a variable and how to react to those
-    * changes.
-    *
-    * We will start with the usual setup code:
-    * @until show(bg)
-    *
-    * And now we create our first checkbox, set its label, tell it to change
-    * the value of @p value when the checkbox stats is changed and ask to be
-    * notified of state changes:
-    * @until show
-    *
-    * For our second checkbox we are going to set an icon so we need to create
-    * and icon:
-    * @until show
-    * @note For simplicity we are using a rectangle as icon, but any evas object
-    * can be used.
-    *
-    * And for our second checkbox we set the label, icon and state to true:
-    * @until show
-    *
-    * We now do some more setup:
-    * @until ELM_MAIN
-    *
-    * And finally implement the callback that will be called when the first
-    * checkbox's state changes. This callback will use @p data to print a
-    * message:
-    * @until }
-    * @note This work because @p data is @p value(from the main function) and @p
-    * value is changed when the checkbox is changed.
-    *
-    * Our example will look like this:
-    * @image html screenshots/check_example_01.png
-    * @image latex screenshots/check_example_01.eps
-    *
-    * @example check_example_01.c
-    */
-   /**
     * @defgroup Check Check
+    *
+    * @image html img/widget/check/preview-00.png
+    * @image latex img/widget/check/preview-00.eps
+    * @image html img/widget/check/preview-01.png
+    * @image latex img/widget/check/preview-01.eps
+    * @image html img/widget/check/preview-02.png
+    * @image latex img/widget/check/preview-02.eps
     *
     * @brief The check widget allows for toggling a value between true and
     * false.
@@ -19349,7 +19351,14 @@ extern "C" {
     * "changed" - This is called whenever the user changes the state of one of
     *             the check object(event_info is NULL).
     *
-    * @ref tutorial_check should give you a firm grasp of how to use this widget.
+    * Default contents parts of the check widget that you can use for are:
+    * @li "elm.swallow.content" - A icon of the check
+    *
+    * Default text parts of the check widget that you can use for are:
+    * @li "elm.text" - Label of the check
+    *
+    * @ref tutorial_check should give you a firm grasp of how to use this widget
+    * .
     * @{
     */
    /**
@@ -20966,6 +20975,42 @@ extern "C" {
    EAPI Eina_Bool    elm_separator_horizontal_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @}
+    */
+
+   /**
+    * @defgroup Spinner Spinner
+    * @ingroup Elementary
+    *
+    * @image html img/widget/spinner/preview-00.png
+    * @image latex img/widget/spinner/preview-00.eps
+    *
+    * A spinner is a widget which allows the user to increase or decrease
+    * numeric values using arrow buttons, or edit values directly, clicking
+    * over it and typing the new value.
+    *
+    * By default the spinner will not wrap and has a label
+    * of "%.0f" (just showing the integer value of the double).
+    *
+    * A spinner has a label that is formatted with floating
+    * point values and thus accepts a printf-style format string, like
+    * “%1.2f units”.
+    *
+    * It also allows specific values to be replaced by pre-defined labels.
+    *
+    * Smart callbacks one can register to:
+    *
+    * - "changed" - Whenever the spinner value is changed.
+    * - "delay,changed" - A short time after the value is changed by the user.
+    *    This will be called only when the user stops dragging for a very short
+    *    period or when they release their finger/mouse, so it avoids possibly
+    *    expensive reactions to the value change.
+    *
+    * Available styles for it:
+    * - @c "default";
+    * - @c "vertical": up/down buttons at the right side and text left aligned.
+    *
+    * Here is an example on its usage:
+    * @ref spinner_example
     */
 
    /**
@@ -23312,6 +23357,7 @@ extern "C" {
    EAPI double elm_route_lat_min_get(Evas_Object *obj);
    EAPI double elm_route_lon_max_get(Evas_Object *obj);
    EAPI double elm_route_lat_max_get(Evas_Object *obj);
+
 
    /**
     * @defgroup Panel Panel
@@ -26135,37 +26181,12 @@ extern "C" {
     */
 
    /**
-    * @page tutorial_colorselector Color selector example
-    * @dontinclude colorselector_example_01.c
-    *
-    * This example shows how to change the color of a rectangle using a color
-    * selector. We aren't going to explain a lot of the code since it's the
-    * usual setup code:
-    * @until show(rect)
-    *
-    * Now that we have a window with background and a rectangle we can create
-    * our color_selector and set it's initial color to fully opaque blue:
-    * @until show
-    *
-    * Next we tell ask to be notified whenever the color changes:
-    * @until changed
-    *
-    * We follow that we some more run of the mill setup code:
-    * @until ELM_MAIN()
-    *
-    * And now get to the callback that sets the color of the rectangle:
-    * @until }
-    *
-    * This example will look like this:
-    * @image html screenshots/colorselector_example_01.png
-    * @image latex screenshots/colorselector_example_01.eps
-    *
-    * @example colorselector_example_01.c
-    */
-   /**
     * @defgroup Colorselector Colorselector
     *
     * @{
+    *
+    * @image html img/widget/colorselector/preview-00.png
+    * @image latex img/widget/colorselector/preview-00.eps
     *
     * @brief Widget for user to select a color.
     *
@@ -27403,13 +27424,16 @@ extern "C" {
    EAPI void                    elm_store_filesystem_directory_set(Elm_Store *st, const char *dir) EINA_ARG_NONNULL(1);
    EAPI const char             *elm_store_filesystem_directory_get(const Elm_Store *st) EINA_ARG_NONNULL(1);
    EAPI const char             *elm_store_item_filesystem_path_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
+
    EAPI void                    elm_store_target_genlist_set(Elm_Store *st, Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    EAPI void                    elm_store_cache_set(Elm_Store *st, int max) EINA_ARG_NONNULL(1);
    EAPI int                     elm_store_cache_get(const Elm_Store *st) EINA_ARG_NONNULL(1);
    EAPI void                    elm_store_list_func_set(Elm_Store *st, Elm_Store_Item_List_Cb func, const void *data) EINA_ARG_NONNULL(1, 2);
    EAPI void                    elm_store_fetch_func_set(Elm_Store *st, Elm_Store_Item_Fetch_Cb func, const void *data) EINA_ARG_NONNULL(1, 2);
    EAPI void                    elm_store_fetch_thread_set(Elm_Store *st, Eina_Bool use_thread) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool               elm_store_fetch_thread_get(const Elm_Store *st) EINA_ARG_NONNULL(1);
+
    EAPI void                    elm_store_unfetch_func_set(Elm_Store *st, Elm_Store_Item_Unfetch_Cb func, const void *data) EINA_ARG_NONNULL(1, 2);
    EAPI void                    elm_store_sorted_set(Elm_Store *st, Eina_Bool sorted) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool               elm_store_sorted_get(const Elm_Store *st) EINA_ARG_NONNULL(1);
