@@ -118,7 +118,7 @@ _st_store_list(void *data __UNUSED__, Elm_Store_Item_Info *item_info)
 ////   * This function runs inside a thread outside efl mainloop. Be careful! *
 //     ************************************************************************
 static void
-_st_store_fetch(void *data __UNUSED__, Elm_Store_Item *sti)
+_st_store_fetch(void *data __UNUSED__, Elm_Store_Item *sti, Elm_Store_Item_Info *info __UNUSED__)
 {
   const char *path = elm_store_item_filesystem_path_get(sti);
   My_Item *myit;
@@ -210,7 +210,7 @@ _st_store_fetch(void *data __UNUSED__, Elm_Store_Item *sti)
 ////// ************************************************************************
 
 static void
-_st_store_unfetch(void *data __UNUSED__, Elm_Store_Item *sti)
+_st_store_unfetch(void *data __UNUSED__, Elm_Store_Item *sti, Elm_Store_Item_Info *info __UNUSED__)
 {
   My_Item *myit = elm_store_item_data_get(sti);
   if (!myit) return;
