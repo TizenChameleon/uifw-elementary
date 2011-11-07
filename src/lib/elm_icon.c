@@ -577,7 +577,7 @@ elm_icon_file_get(const Evas_Object *obj, const char **file, const char **group)
 }
 
 EAPI void
-elm_icon_thumb_set(const Evas_Object *obj, const char *file, const char *group)
+elm_icon_thumb_set(Evas_Object *obj, const char *file, const char *group)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
