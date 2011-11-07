@@ -140,7 +140,7 @@ _del_hook(Evas_Object *obj)
    wd->files_grid = NULL;
 
    EINA_REFCOUNT_UNREF(wd)
-      _widget_data_free(wd);
+     _widget_data_free(wd);
 }
 
 static void
@@ -796,14 +796,6 @@ _populate(Evas_Object      *obj,
 
 /***  API  ***/
 
-/**
- * Add a new Fileselector object
- *
- * @param parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup Fileselector
- */
 EAPI Evas_Object *
 elm_fileselector_add(Evas_Object *parent)
 {

@@ -898,9 +898,9 @@ _scroller_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj,
      }
 
    if (wd->max_sc_w < w)
-      wd->max_sc_w = w;
+     wd->max_sc_w = w;
    if (wd->max_sc_h < h)
-      wd->max_sc_h = h;
+     wd->max_sc_h = h;
 
    _sizing_eval(data);
 }
@@ -916,7 +916,7 @@ _ctxpopup_move(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
    if (!wd) return;
 
    if (wd->visible)
-      evas_object_show(wd->arrow);
+     evas_object_show(wd->arrow);
 
    _scroller_size_reset(wd);
    _sizing_eval(obj);
@@ -1318,7 +1318,7 @@ elm_ctxpopup_item_append(Evas_Object *obj, const char *label,
         _sizing_eval(obj);
      }
 
-   return (Elm_Object_Item*) item;
+   return (Elm_Object_Item *) item;
 }
 
 EAPI void
@@ -1453,7 +1453,7 @@ elm_ctxpopup_direction_priority_set(Evas_Object *obj,
    wd->dir_priority[3] = fourth;
 
    if (wd->visible)
-      _sizing_eval(obj);
+     _sizing_eval(obj);
 }
 
 EAPI void
@@ -1485,4 +1485,3 @@ elm_ctxpopup_direction_get(const Evas_Object *obj)
    if (!wd) return ELM_CTXPOPUP_DIRECTION_UNKNOWN;
    return wd->dir;
 }
-
