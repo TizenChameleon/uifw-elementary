@@ -1,3 +1,10 @@
+elementary (1.0.0+svn.61256slp2+build71) unstable; urgency=low
+
+  * Remove deprecated macro from elm_genlist_item_selected_set/get
+  * Sync documentation with upstream
+
+ -- Mike McCormack <mj.mccormack@samsung.com>  Mon, 07 Nov 2011 19:10:30 +0900
+
 elementary (1.0.0+svn.61256slp2+build70) unstable; urgency=low
 
   * Package Upload
