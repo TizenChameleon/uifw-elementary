@@ -1,23 +1,10 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-/**
- * @defgroup Ctxpopup
- *
- * A ctxpopup is a widget that, when shown, pops up a list of items.
- * It automatically chooses an area inside its parent object's view
- * (set via elm_ctxpopup_add() and elm_ctxpopup_hover_parent_set()) to
- * optimally fit into it. In the default theme, it will also point an
- * arrow to the cursor position at the time one shows it. Ctxpopup
- * items have a label and/or an icon. It is intended for a small
- * number of items (hence the use of list, not genlist).
- *
- * Signals that you can add callbacks for are:
- *
- * "dismissed" - the ctxpopup was dismissed
- */
+#undef Elm_Ctxpopup_Item
 
 typedef struct _Widget_Data Widget_Data;
+typedef struct _Elm_Ctxpopup_Item Elm_Ctxpopup_Item;
 
 struct _Elm_Ctxpopup_Item
 {
@@ -1134,9 +1121,10 @@ elm_ctxpopup_add(Evas_Object *parent)
  * @ingroup Ctxpopup
  */
 EAPI Evas_Object *
-elm_ctxpopup_item_icon_get(const Elm_Ctxpopup_Item *item)
+elm_ctxpopup_item_icon_get(const Elm_Object_Item *it)
 {
-   ELM_CTXPOPUP_ITEM_CHECK_RETURN(item, NULL);
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
+   Elm_Ctxpopup_Item *item = (Elm_Ctxpopup_Item *) it;
    return item->icon;
 }
 
@@ -1154,11 +1142,12 @@ elm_ctxpopup_item_icon_get(const Elm_Ctxpopup_Item *item)
  * @ingroup Ctxpopup
  */
 EAPI void
-elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
+elm_ctxpopup_item_icon_set(Elm_Object_Item *it, Evas_Object *icon)
 {
-   ELM_CTXPOPUP_ITEM_CHECK_RETURN(item);
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
 
    Widget_Data *wd;
+   Elm_Ctxpopup_Item *item = (Elm_Ctxpopup_Item *) it;
 
    wd = elm_widget_data_get(item->base.widget);
    if (!wd) return;
@@ -1182,9 +1171,10 @@ elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
  *
  */
 EAPI const char *
-elm_ctxpopup_item_label_get(const Elm_Ctxpopup_Item *item)
+elm_ctxpopup_item_label_get(const Elm_Object_Item *it)
 {
-   ELM_CTXPOPUP_ITEM_CHECK_RETURN(item, NULL);
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
+   Elm_Ctxpopup_Item *item = (Elm_Ctxpopup_Item *) it;
    return item->label;
 }
 
@@ -1197,11 +1187,12 @@ elm_ctxpopup_item_label_get(const Elm_Ctxpopup_Item *item)
  * @ingroup Ctxpopup
  */
 EAPI void
-elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label)
+elm_ctxpopup_item_label_set(Elm_Object_Item *it, const char *label)
 {
-   ELM_CTXPOPUP_ITEM_CHECK_RETURN(item);
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
 
    Widget_Data *wd;
+   Elm_Ctxpopup_Item *item = (Elm_Ctxpopup_Item *) it;
 
    wd = elm_widget_data_get(item->base.widget);
    if (!wd) return;
@@ -1387,7 +1378,7 @@ elm_ctxpopup_horizontal_get(const Evas_Object *obj)
  *
  * @ingroup Ctxpopup
  */
-EAPI Elm_Ctxpopup_Item *
+EAPI Elm_Object_Item *
 elm_ctxpopup_item_append(Evas_Object *obj, const char *label,
                          Evas_Object *icon, Evas_Smart_Cb func,
                          const void *data)
@@ -1431,7 +1422,7 @@ elm_ctxpopup_item_append(Evas_Object *obj, const char *label,
         _sizing_eval(obj);
      }
 
-   return item;
+   return (Elm_Object_Item*) item;
 }
 
 /**
@@ -1442,11 +1433,12 @@ elm_ctxpopup_item_append(Evas_Object *obj, const char *label,
  * @ingroup Ctxpopup
  */
 EAPI void
-elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item)
+elm_ctxpopup_item_del(Elm_Object_Item *it)
 {
-   ELM_CTXPOPUP_ITEM_CHECK_RETURN(item);
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
 
    Widget_Data *wd;
+   Elm_Ctxpopup_Item *item = (Elm_Ctxpopup_Item *) it;
 
    wd = elm_widget_data_get(item->base.widget);
    if (!wd) return;
@@ -1478,11 +1470,12 @@ elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item)
  * @ingroup Ctxpopup
  */
 EAPI void
-elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item *item, Eina_Bool disabled)
+elm_ctxpopup_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled)
 {
-   ELM_CTXPOPUP_ITEM_CHECK_RETURN(item);
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
 
    Widget_Data *wd;
+   Elm_Ctxpopup_Item *item = (Elm_Ctxpopup_Item *) it;
 
    wd = elm_widget_data_get(item->base.widget);
    if (!wd) return;
@@ -1507,9 +1500,10 @@ elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item *item, Eina_Bool disabled)
  * @ingroup Ctxpopup
  */
 EAPI Eina_Bool
-elm_ctxpopup_item_disabled_get(const Elm_Ctxpopup_Item *item)
+elm_ctxpopup_item_disabled_get(const Elm_Object_Item *it)
 {
-   ELM_CTXPOPUP_ITEM_CHECK_RETURN(item, EINA_FALSE);
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
+   Elm_Ctxpopup_Item *item = (Elm_Ctxpopup_Item *) it;
    return item->disabled;
 }
 

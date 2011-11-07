@@ -26175,8 +26175,6 @@ extern "C" {
     * @}
     */
 
-   typedef struct _Elm_Ctxpopup_Item Elm_Ctxpopup_Item;
-
    /**
     * @defgroup Ctxpopup Ctxpopup
     *
@@ -26216,6 +26214,7 @@ extern "C" {
                                         area */
         ELM_CTXPOPUP_DIRECTION_UNKNOWN, /**< ctxpopup does not determine it's direction yet*/
      } Elm_Ctxpopup_Direction;
+#define Elm_Ctxpopup_Item Elm_Object_Item
 
    /**
     * @brief Add a new Ctxpopup object to the parent.
@@ -26284,7 +26283,7 @@ extern "C" {
     *
     * @see elm_ctxpopup_content_set()
     */
-   Elm_Ctxpopup_Item *elm_ctxpopup_item_append(Evas_Object *obj, const char *label, Evas_Object *icon, Evas_Smart_Cb func, const void *data) EINA_ARG_NONNULL(1);
+   Elm_Object_Item *elm_ctxpopup_item_append(Evas_Object *obj, const char *label, Evas_Object *icon, Evas_Smart_Cb func, const void *data) EINA_ARG_NONNULL(1);
    /**
     * @brief Delete the given item in a ctxpopup object.
     *
@@ -26292,7 +26291,7 @@ extern "C" {
     *
     * @see elm_ctxpopup_item_append()
     */
-   EAPI void          elm_ctxpopup_item_del(Elm_Ctxpopup_Item *item) EINA_ARG_NONNULL(1);
+   EAPI void          elm_ctxpopup_item_del(Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the ctxpopup item's state as disabled or enabled.
     *
@@ -26301,7 +26300,7 @@ extern "C" {
     *
     * When disabled the item is greyed out to indicate it's state.
     */
-   EAPI void          elm_ctxpopup_item_disabled_set(Elm_Ctxpopup_Item *item, Eina_Bool disabled) EINA_ARG_NONNULL(1);
+   EAPI void          elm_ctxpopup_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the ctxpopup item's disabled/enabled state.
     *
@@ -26310,7 +26309,7 @@ extern "C" {
     *
     * @see elm_ctxpopup_item_disabled_set()
     */
-   EAPI Eina_Bool     elm_ctxpopup_item_disabled_get(const Elm_Ctxpopup_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool     elm_ctxpopup_item_disabled_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the icon object for the given ctxpopup item.
     *
@@ -26321,7 +26320,7 @@ extern "C" {
     * @see elm_ctxpopup_item_append()
     * @see elm_ctxpopup_item_icon_set()
     */
-   EAPI Evas_Object  *elm_ctxpopup_item_icon_get(const Elm_Ctxpopup_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object  *elm_ctxpopup_item_icon_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
     * @brief Sets the side icon associated with the ctxpopup item
     *
@@ -26334,7 +26333,7 @@ extern "C" {
     *
     * @see elm_ctxpopup_item_append()
     */
-   EAPI void          elm_ctxpopup_item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI void          elm_ctxpopup_item_icon_set(Elm_Object_Item *it, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the label for the given ctxpopup item.
     *
@@ -26345,14 +26344,14 @@ extern "C" {
     * @see elm_ctxpopup_item_append()
     * @see elm_ctxpopup_item_label_set()
     */
-   EAPI const char   *elm_ctxpopup_item_label_get(const Elm_Ctxpopup_Item *item) EINA_ARG_NONNULL(1);
+   EAPI const char   *elm_ctxpopup_item_label_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
     * @brief (Re)set the label on the given ctxpopup item.
     *
     * @param it Ctxpopup item
     * @param label String to set as label
     */
-   EAPI void          elm_ctxpopup_item_label_set(Elm_Ctxpopup_Item *item, const char *label) EINA_ARG_NONNULL(1);
+   EAPI void          elm_ctxpopup_item_label_set(Elm_Object_Item *it, const char *label) EINA_ARG_NONNULL(1);
    /**
     * @brief Set an elm widget as the content of the ctxpopup.
     *
