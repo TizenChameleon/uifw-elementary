@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-11-04 16:16+0900\n"
+"POT-Creation-Date: 2011-11-07 18:21+0900\n"
 "PO-Revision-Date: 2011-09-26 21:20+0900\n"
 "Last-Translator: Sumanth Krishna Mannam <sumanth.m@samsung.com>\n"
 "Language-Team: General\n"
@@ -14,20 +14,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/lib/elc_fileselector.c:855
+#: src/lib/elc_fileselector.c:833
 msgid "Up"
 msgstr "Su"
 
-#: src/lib/elc_fileselector.c:870
+#: src/lib/elc_fileselector.c:848
 msgid "Home"
 msgstr "Home"
 
-#: src/lib/elc_fileselector.c:1058 src/lib/elm_entry.c:1455
+#: src/lib/elc_fileselector.c:992 src/lib/elm_entry.c:1363
 #: src/lib/elm_searchbar.c:226
 msgid "Cancel"
 msgstr "Annulla"
 
-#: src/lib/elc_fileselector.c:1068
+#: src/lib/elc_fileselector.c:1002
 msgid "OK"
 msgstr "OK"
 
@@ -47,23 +47,23 @@ msgstr "m."
 msgid "DateTimeFormat"
 msgstr "%d %b %Y %H : %M"
 
-#: src/lib/elm_entry.c:1429
+#: src/lib/elm_entry.c:1337
 msgid "Select"
 msgstr "Seleziona"
 
-#: src/lib/elm_entry.c:1434
+#: src/lib/elm_entry.c:1342
 msgid "Paste"
 msgstr "Incolla"
 
-#: src/lib/elm_entry.c:1439 src/lib/elm_entry.c:1459
+#: src/lib/elm_entry.c:1347 src/lib/elm_entry.c:1367
 msgid "More"
 msgstr ""
 
-#: src/lib/elm_entry.c:1449
+#: src/lib/elm_entry.c:1357
 msgid "Copy"
 msgstr "Copia"
 
-#: src/lib/elm_entry.c:1452
+#: src/lib/elm_entry.c:1360
 msgid "Cut"
 msgstr "Taglio"
 
