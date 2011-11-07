@@ -3,98 +3,6 @@
 #include "elm_priv.h"
 #include "elm_module_priv.h"
 
-/**
- * @defgroup Entry Entry
- *
- * An entry is a convenience widget which shows
- * a box that the user can enter text into.  Unlike a
- * @ref Scrolled_Entry widget, entries DO NOT scroll with user
- * input.  Entry widgets are capable of expanding past the
- * boundaries of the window, thus resizing the window to its
- * own length.
- *
- * You can also insert "items" in the entry with:
- *
- * \<item size=16x16 vsize=full href=emoticon/haha\>\</item\>
- *
- * for example. sizing can be set bu size=WxH, relsize=WxH or absize=WxH with
- * vsize=ascent or vsize=full. the href=NAME sets the item name. Entry
- * supports a list of emoticon names by default. These are:
- *
- * - emoticon/angry
- * - emoticon/angry-shout
- * - emoticon/crazy-laugh
- * - emoticon/evil-laugh
- * - emoticon/evil
- * - emoticon/goggle-smile
- * - emoticon/grumpy
- * - emoticon/grumpy-smile
- * - emoticon/guilty
- * - emoticon/guilty-smile
- * - emoticon/haha
- * - emoticon/half-smile
- * - emoticon/happy-panting
- * - emoticon/happy
- * - emoticon/indifferent
- * - emoticon/kiss
- * - emoticon/knowing-grin
- * - emoticon/laugh
- * - emoticon/little-bit-sorry
- * - emoticon/love-lots
- * - emoticon/love
- * - emoticon/minimal-smile
- * - emoticon/not-happy
- * - emoticon/not-impressed
- * - emoticon/omg
- * - emoticon/opensmile
- * - emoticon/smile
- * - emoticon/sorry
- * - emoticon/squint-laugh
- * - emoticon/surprised
- * - emoticon/suspicious
- * - emoticon/tongue-dangling
- * - emoticon/tongue-poke
- * - emoticon/uh
- * - emoticon/unhappy
- * - emoticon/very-sorry
- * - emoticon/what
- * - emoticon/wink
- * - emoticon/worried
- * - emoticon/wtf
- *
- * These are built-in currently, but you can add your own item provieer that
- * can create inlined objects in the text and fill the space allocated to the
- * item with a custom object of your own.
- *
- * See the entry test for some more examples of use of this.
- *
- * Entries have functions to load a text file, display it,
- * allowing editing of it and saving of changes back to the file loaded.
- * Changes are written back to the original file after a short delay.
- * The file to load and save to is specified by elm_entry_file_set().
- *
- * Signals that you can add callbacks for are:
- *
- * "changed" - The text within the entry was changed
- * "activated" - The entry has had editing finished and changes are to be committed
-                 (generally when enter key is pressed)
- * "press" - The entry has been clicked
- * "longpressed" - The entry has been clicked for a couple seconds
- * "clicked" - The entry has been clicked
- * "clicked,double" - The entry has been double clicked
- * "focused" - The entry has received focus
- * "unfocused" - The entry has lost focus
- * "selection,paste" - A paste action has occurred
- * "selection,copy" - A copy action has occurred
- * "selection,cut" - A cut action has occurred
- * "selection,start" - A selection has begun
- * "selection,changed" - The selection has changed
- * "selection,cleared" - The selection has been cleared
- * "cursor,changed" - The cursor has changed
- * "anchor,clicked" - The anchor has been clicked
- * "preedit,changed" - The preedit string has changed
- */
-
 /* Maximum chunk size to be inserted to the entry at once
  * FIXME: This size is arbitrary, should probably choose a better size.
  * Possibly also find a way to set it to a low value for weak computers,
@@ -2872,14 +2780,6 @@ _elm_entry_text_get(const Evas_Object *obj, const char *item)
    return wd->text;
 }
 
-/**
- * This adds an entry to @p parent object.
- *
- * @param parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup Entry
- */
 EAPI Evas_Object *
 elm_entry_add(Evas_Object *parent)
 {
@@ -3059,16 +2959,6 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->textonly = wd->textonly;
 }
 
-/**
- * This sets the entry object not to line wrap.  All input will
- * be on a single line, and the entry box will extend with user input.
- *
- * @param obj The entry object
- * @param single_line If true, the text in the entry
- * will be on a single line.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 {
@@ -3106,16 +2996,6 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
      }
 }
 
-/**
- * This returns true if the entry has been set to single line mode.
- * See also elm_entry_single_line_set().
- *
- * @param obj The entry object
- * @return single_line If true, the text in the entry is set to display
- * on a single line.
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_single_line_get(const Evas_Object *obj)
 {
@@ -3125,15 +3005,6 @@ elm_entry_single_line_get(const Evas_Object *obj)
    return wd->single_line;
 }
 
-/**
- * This sets the entry object to password mode.  All text entered
- * and/or displayed within the widget will be replaced with asterisks (*).
- *
- * @param obj The entry object
- * @param password If true, password mode is enabled.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
 {
@@ -3147,16 +3018,6 @@ elm_entry_password_set(Evas_Object *obj, Eina_Bool password)
    _theme_hook(obj);
 }
 
-/**
- * This returns whether password mode is enabled.
- * See also elm_entry_password_set().
- *
- * @param obj The entry object
- * @return If true, the entry is set to display all characters
- * as asterisks (*).
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_password_get(const Evas_Object *obj)
 {
@@ -3166,28 +3027,12 @@ elm_entry_password_get(const Evas_Object *obj)
    return wd->password;
 }
 
-/**
- * This sets the text displayed within the entry to @p entry.
- *
- * @param obj The entry object
- * @param entry The text to be displayed
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_entry_set(Evas_Object *obj, const char *entry)
 {
    _elm_entry_text_set(obj, NULL, entry);
 }
 
-/**
- * This appends @p entry to the text of the entry.
- *
- * @param obj The entry object
- * @param entry The text to be displayed
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_entry_append(Evas_Object *obj, const char *entry)
 {
@@ -3219,30 +3064,12 @@ elm_entry_entry_append(Evas_Object *obj, const char *entry)
      }
 }
 
-/**
- * This returns the text currently shown in object @p entry.
- * See also elm_entry_entry_set().
- *
- * @param obj The entry object
- * @return The currently displayed text or NULL on failure
- *
- * @ingroup Entry
- */
 EAPI const char *
 elm_entry_entry_get(const Evas_Object *obj)
 {
    return _elm_entry_text_get(obj, NULL);
 }
 
-/**
- * This returns EINA_TRUE if the entry is empty/there was an error
- * and EINA_FALSE if it is not empty.
- *
- * @param obj The entry object
- * @return If the entry is empty or not.
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_is_empty(const Evas_Object *obj)
 {
@@ -3279,14 +3106,6 @@ elm_entry_is_empty(const Evas_Object *obj)
    return ret;
 }
 
-/**
- * This returns all selected text within the entry.
- *
- * @param obj The entry object
- * @return The selected text within the entry or NULL on failure
- *
- * @ingroup Entry
- */
 EAPI const char *
 elm_entry_selection_get(const Evas_Object *obj)
 {
@@ -3296,20 +3115,6 @@ elm_entry_selection_get(const Evas_Object *obj)
    return edje_object_part_text_selection_get(wd->ent, "elm.text");
 }
 
-/**
- * This inserts text in @p entry where the current cursor position.
- *
- * This inserts text at the cursor position is as if it was typed
- * by the user (note this also allows markup which a user
- * can't just "type" as it would be converted to escaped text, so this
- * call can be used to insert things like emoticon items or bold push/pop
- * tags, other font and color change tags etc.)
- *
- * @param obj The entry object
- * @param entry The text to insert
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_entry_insert(Evas_Object *obj, const char *entry)
 {
@@ -3327,18 +3132,6 @@ elm_entry_entry_insert(Evas_Object *obj, const char *entry)
    _sizing_eval(obj);
 }
 
-/**
- * This enables word line wrapping in the entry object.  It is the opposite
- * of elm_entry_single_line_set().  Additionally, setting this disables
- * character line wrapping.
- *
- * @param obj The entry object
- * @param wrap If true, the entry will be wrapped once it reaches the end
- * of the object. Wrapping will occur at the end of the word before the end of the
- * object.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_line_wrap_set(Evas_Object *obj, Elm_Wrap_Type wrap)
 {
@@ -3351,15 +3144,6 @@ elm_entry_line_wrap_set(Evas_Object *obj, Elm_Wrap_Type wrap)
    _theme_hook(obj);
 }
 
-/**
- * Get the wrapping behavior of the entry.
- * See also elm_entry_line_wrap_set().
- *
- * @param obj The entry object
- * @return Wrap type
- *
- * @ingroup Entry
- */
 EAPI Elm_Wrap_Type
 elm_entry_line_wrap_get(const Evas_Object *obj)
 {
@@ -3369,15 +3153,6 @@ elm_entry_line_wrap_get(const Evas_Object *obj)
    return wd->linewrap;
 }
 
-/**
- * This sets the editable attribute of the entry.
- *
- * @param obj The entry object
- * @param editable If true, the entry will be editable by the user.
- * If false, it will be set to the disabled state.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_editable_set(Evas_Object *obj, Eina_Bool editable)
 {
@@ -3396,16 +3171,6 @@ elm_entry_editable_set(Evas_Object *obj, Eina_Bool editable)
 #endif
 }
 
-/**
- * This gets the editable attribute of the entry.
- * See also elm_entry_editable_set().
- *
- * @param obj The entry object
- * @return If true, the entry is editable by the user.
- * If false, it is not editable by the user
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_editable_get(const Evas_Object *obj)
 {
@@ -3415,13 +3180,6 @@ elm_entry_editable_get(const Evas_Object *obj)
    return wd->editable;
 }
 
-/**
- * This drops any existing text selection within the entry.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_select_none(Evas_Object *obj)
 {
@@ -3439,13 +3197,6 @@ elm_entry_select_none(Evas_Object *obj)
    edje_object_part_text_select_none(wd->ent, "elm.text");
 }
 
-/**
- * This selects all text within the entry.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_select_all(Evas_Object *obj)
 {
@@ -3463,22 +3214,6 @@ elm_entry_select_all(Evas_Object *obj)
    edje_object_part_text_select_all(wd->ent, "elm.text");
 }
 
-/**
- * This function returns the geometry of the cursor.
- *
- * It's useful if you want to draw something on the cursor (or where it is),
- * or for example in the case of scrolled entry where you want to show the
- * cursor.
- *
- * @param obj The entry object
- * @param x returned geometry
- * @param y returned geometry
- * @param w returned geometry
- * @param h returned geometry
- * @return EINA_TRUE upon success, EINA_FALSE upon failure
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_cursor_geometry_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
 {
@@ -3489,14 +3224,6 @@ elm_entry_cursor_geometry_get(const Evas_Object *obj, Evas_Coord *x, Evas_Coord 
    return EINA_TRUE;
 }
 
-/**
- * This moves the cursor one place to the right within the entry.
- *
- * @param obj The entry object
- * @return EINA_TRUE upon success, EINA_FALSE upon failure
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_cursor_next(Evas_Object *obj)
 {
@@ -3506,14 +3233,6 @@ elm_entry_cursor_next(Evas_Object *obj)
    return edje_object_part_text_cursor_next(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * This moves the cursor one place to the left within the entry.
- *
- * @param obj The entry object
- * @return EINA_TRUE upon success, EINA_FALSE upon failure
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_cursor_prev(Evas_Object *obj)
 {
@@ -3523,14 +3242,6 @@ elm_entry_cursor_prev(Evas_Object *obj)
    return edje_object_part_text_cursor_prev(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * This moves the cursor one line up within the entry.
- *
- * @param obj The entry object
- * @return EINA_TRUE upon success, EINA_FALSE upon failure
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_cursor_up(Evas_Object *obj)
 {
@@ -3540,14 +3251,6 @@ elm_entry_cursor_up(Evas_Object *obj)
    return edje_object_part_text_cursor_up(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * This moves the cursor one line down within the entry.
- *
- * @param obj The entry object
- * @return EINA_TRUE upon success, EINA_FALSE upon failure
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_cursor_down(Evas_Object *obj)
 {
@@ -3557,13 +3260,6 @@ elm_entry_cursor_down(Evas_Object *obj)
    return edje_object_part_text_cursor_down(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * This moves the cursor to the beginning of the entry.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_cursor_begin_set(Evas_Object *obj)
 {
@@ -3573,13 +3269,6 @@ elm_entry_cursor_begin_set(Evas_Object *obj)
    edje_object_part_text_cursor_begin_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * This moves the cursor to the end of the entry.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_cursor_end_set(Evas_Object *obj)
 {
@@ -3595,13 +3284,6 @@ elm_entry_cursor_end_set(Evas_Object *obj)
      }
 }
 
-/**
- * This moves the cursor to the beginning of the current line.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_cursor_line_begin_set(Evas_Object *obj)
 {
@@ -3611,13 +3293,6 @@ elm_entry_cursor_line_begin_set(Evas_Object *obj)
    edje_object_part_text_cursor_line_begin_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * This moves the cursor to the end of the current line.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_cursor_line_end_set(Evas_Object *obj)
 {
@@ -3627,14 +3302,6 @@ elm_entry_cursor_line_end_set(Evas_Object *obj)
    edje_object_part_text_cursor_line_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * This begins a selection within the entry as though
- * the user were holding down the mouse button to make a selection.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_cursor_selection_begin(Evas_Object *obj)
 {
@@ -3644,14 +3311,6 @@ elm_entry_cursor_selection_begin(Evas_Object *obj)
    edje_object_part_text_select_begin(wd->ent, "elm.text");
 }
 
-/**
- * This ends a selection within the entry as though
- * the user had just released the mouse button while making a selection.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_cursor_selection_end(Evas_Object *obj)
 {
@@ -3661,14 +3320,6 @@ elm_entry_cursor_selection_end(Evas_Object *obj)
    edje_object_part_text_select_extend(wd->ent, "elm.text");
 }
 
-/**
- * TODO: fill this in
- *
- * @param obj The entry object
- * @return TODO: fill this in
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_cursor_is_format_get(const Evas_Object *obj)
 {
@@ -3678,14 +3329,6 @@ elm_entry_cursor_is_format_get(const Evas_Object *obj)
    return edje_object_part_text_cursor_is_format_get(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * This returns whether the cursor is visible.
- *
- * @param obj The entry object
- * @return If true, the cursor is visible.
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_cursor_is_visible_format_get(const Evas_Object *obj)
 {
@@ -3695,14 +3338,6 @@ elm_entry_cursor_is_visible_format_get(const Evas_Object *obj)
    return edje_object_part_text_cursor_is_visible_format_get(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * TODO: fill this in
- *
- * @param obj The entry object
- * @return TODO: fill this in
- *
- * @ingroup Entry
- */
 EAPI const char *
 elm_entry_cursor_content_get(const Evas_Object *obj)
 {
@@ -3712,14 +3347,6 @@ elm_entry_cursor_content_get(const Evas_Object *obj)
    return edje_object_part_text_cursor_content_get(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * Sets the cursor position in the entry to the given value
- *
- * @param obj The entry object
- * @param pos The position of the cursor
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_cursor_pos_set(Evas_Object *obj, int pos)
 {
@@ -3730,14 +3357,6 @@ elm_entry_cursor_pos_set(Evas_Object *obj, int pos)
    edje_object_message_signal_process(wd->ent);
 }
 
-/**
- * Retrieves the current position of the cursor in the entry
- *
- * @param obj The entry object
- * @return The cursor position
- *
- * @ingroup Entry
- */
 EAPI int
 elm_entry_cursor_pos_get(const Evas_Object *obj)
 {
@@ -3747,13 +3366,6 @@ elm_entry_cursor_pos_get(const Evas_Object *obj)
    return edje_object_part_text_cursor_pos_get(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
 }
 
-/**
- * This executes a "cut" action on the selected text in the entry.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_selection_cut(Evas_Object *obj)
 {
@@ -3763,13 +3375,6 @@ elm_entry_selection_cut(Evas_Object *obj)
    _cut(obj, NULL, NULL);
 }
 
-/**
- * This executes a "copy" action on the selected text in the entry.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_selection_copy(Evas_Object *obj)
 {
@@ -3779,13 +3384,6 @@ elm_entry_selection_copy(Evas_Object *obj)
    _copy(obj, NULL, NULL);
 }
 
-/**
- * This executes a "paste" action in the entry.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_selection_paste(Evas_Object *obj)
 {
@@ -3795,13 +3393,6 @@ elm_entry_selection_paste(Evas_Object *obj)
    _paste(obj, NULL, NULL);
 }
 
-/**
- * This clears and frees the items in a entry's contextual (right click) menu.
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_context_menu_clear(Evas_Object *obj)
 {
@@ -3818,18 +3409,6 @@ elm_entry_context_menu_clear(Evas_Object *obj)
      }
 }
 
-/**
- * This adds an item to the entry's contextual menu.
- *
- * @param obj The entry object
- * @param label The item's text label
- * @param icon_file The item's icon file
- * @param icon_type The item's icon type
- * @param func The callback to execute when the item is clicked
- * @param data The data to associate with the item for related functions
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_context_menu_item_add(Evas_Object *obj, const char *label, const char *icon_file, Elm_Icon_Type icon_type, Evas_Smart_Cb func, const void *data)
 {
@@ -3848,14 +3427,6 @@ elm_entry_context_menu_item_add(Evas_Object *obj, const char *label, const char 
    it->data = (void *)data;
 }
 
-/**
- * This disables the entry's contextual (right click) menu.
- *
- * @param obj The entry object
- * @param disabled If true, the menu is disabled
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_context_menu_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 {
@@ -3866,14 +3437,6 @@ elm_entry_context_menu_disabled_set(Evas_Object *obj, Eina_Bool disabled)
    wd->context_menu = !disabled;
 }
 
-/**
- * This returns whether the entry's contextual (right click) menu is disabled.
- *
- * @param obj The entry object
- * @return If true, the menu is disabled
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_context_menu_disabled_get(const Evas_Object *obj)
 {
@@ -3883,22 +3446,6 @@ elm_entry_context_menu_disabled_get(const Evas_Object *obj)
    return !wd->context_menu;
 }
 
-/**
- * This appends a custom item provider to the list for that entry
- *
- * This appends the given callback. The list is walked from beginning to end
- * with each function called given the item href string in the text. If the
- * function returns an object handle other than NULL (it should create an
- * and object to do this), then this object is used to replace that item. If
- * not the next provider is called until one provides an item object, or the
- * default provider in entry does.
- *
- * @param obj The entry object
- * @param func The function called to provide the item object
- * @param data The data passed to @p func
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data)
 {
@@ -3913,18 +3460,6 @@ elm_entry_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (void *dat
    wd->item_providers = eina_list_append(wd->item_providers, ip);
 }
 
-/**
- * This prepends a custom item provider to the list for that entry
- *
- * This prepends the given callback. See elm_entry_item_provider_append() for
- * more information
- *
- * @param obj The entry object
- * @param func The function called to provide the item object
- * @param data The data passed to @p func
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data)
 {
@@ -3939,18 +3474,6 @@ elm_entry_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (void *da
    wd->item_providers = eina_list_prepend(wd->item_providers, ip);
 }
 
-/**
- * This removes a custom item provider to the list for that entry
- *
- * This removes the given callback. See elm_entry_item_provider_append() for
- * more information
- *
- * @param obj The entry object
- * @param func The function called to provide the item object
- * @param data The data passed to @p func
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data)
 {
@@ -3971,23 +3494,6 @@ elm_entry_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (void *dat
      }
 }
 
-/**
- * Append a filter function for text inserted in the entry
- *
- * Append the given callback to the list. This functions will be called
- * whenever any text is inserted into the entry, with the text to be inserted
- * as a parameter. The callback function is free to alter the text in any way
- * it wants, but it must remember to free the given pointer and update it.
- * If the new text is to be discarded, the function can free it and set it text
- * parameter to NULL. This will also prevent any following filters from being
- * called.
- *
- * @param obj The entry object
- * @param func The function to use as text filter
- * @param data User data to pass to @p func
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_text_filter_append(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
 {
@@ -4005,18 +3511,6 @@ elm_entry_text_filter_append(Evas_Object *obj, void (*func) (void *data, Evas_Ob
    wd->text_filters = eina_list_append(wd->text_filters, tf);
 }
 
-/**
- * Prepend a filter function for text insdrted in the entry
- *
- * Prepend the given callback to the list. See elm_entry_text_filter_append()
- * for more information
- *
- * @param obj The entry object
- * @param func The function to use as text filter
- * @param data User data to pass to @p func
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_text_filter_prepend(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
 {
@@ -4034,18 +3528,6 @@ elm_entry_text_filter_prepend(Evas_Object *obj, void (*func) (void *data, Evas_O
    wd->text_filters = eina_list_prepend(wd->text_filters, tf);
 }
 
-/**
- * Remove a filter from the list
- *
- * Removes the given callback from the filter list. See elm_entry_text_filter_append()
- * for more information.
- *
- * @param obj The entry object
- * @param func The filter function to remove
- * @param data The user data passed when adding the function
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_text_filter_remove(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
 {
@@ -4069,16 +3551,6 @@ elm_entry_text_filter_remove(Evas_Object *obj, void (*func) (void *data, Evas_Ob
      }
 }
 
-/**
- * This converts a markup (HTML-like) string into UTF-8.
- * Returning string is obtained with malloc.
- * After use the returned string, it should be freed.
- *
- * @param s The string (in markup) to be converted
- * @return The converted string (in UTF-8). It should be freed.
- *
- * @ingroup Entry
- */
 EAPI char *
 elm_entry_markup_to_utf8(const char *s)
 {
@@ -4087,16 +3559,6 @@ elm_entry_markup_to_utf8(const char *s)
    return ss;
 }
 
-/**
- * This converts a UTF-8 string into markup (HTML-like).
- * Returning string is obtained with malloc.
- * After use the returned string, it should be freed.
- *
- * @param s The string (in UTF-8) to be converted
- * @return The converted string (in markup). It should be freed.
- *
- * @ingroup Entry
- */
 EAPI char *
 elm_entry_utf8_to_markup(const char *s)
 {
@@ -4105,27 +3567,6 @@ elm_entry_utf8_to_markup(const char *s)
    return ss;
 }
 
-/**
- * Filter inserted text based on user defined character and byte limits
- *
- * Add this filter to an entry to limit the characters that it will accept
- * based the the contents of the provided Elm_Entry_Filter_Limit_Size.
- * The funtion works on the UTF-8 representation of the string, converting
- * it from the set markup, thus not accounting for any format in it.
- *
- * The user must create an Elm_Entry_Filter_Limit_Size structure and pass
- * it as data when setting the filter. In it it's possible to set limits
- * by character count or bytes (any of them is disabled if 0), and both can
- * be set at the same time. In that case, it first checks for characters,
- * then bytes.
- *
- * The function will cut the inserted text in order to allow only the first
- * number of characters that are still allowed. The cut is made in
- * characters, even when limiting by bytes, in order to always contain
- * valid ones and avoid half unicode characters making it in.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
 {
@@ -4182,15 +3623,6 @@ elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
    free(current);
 }
 
-/**
- * Filter inserted text based on accepted or rejected sets of characters
- *
- * Add this filter to an entry to restrict the set of accepted characters
- * based on the sets in the provided Elm_Entry_Filter_Accept_Set.
- * This structure contains both accepted and rejected sets, but they are
- * mutually exclusive. If accepted is set, it will be used, otherwise it
- * goes on to the rejected set.
- */
 EAPI void
 elm_entry_filter_accept_set(void *data, Evas_Object *entry __UNUSED__, char **text)
 {
@@ -4248,17 +3680,6 @@ elm_entry_filter_accept_set(void *data, Evas_Object *entry __UNUSED__, char **te
    *insert = 0;
 }
 
-/**
- * This sets the file (and implicitly loads it) for the text to display and
- * then edit. All changes are written back to the file after a short delay if
- * the entry object is set to autosave.
- *
- * @param obj The entry object
- * @param file The path to the file to load and save
- * @param format The file format
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format)
 {
@@ -4276,15 +3697,6 @@ elm_entry_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format)
    _load(obj);
 }
 
-/**
- * Gets the file to load and save and the file format
- *
- * @param obj The entry object
- * @param file The path to the file to load and save
- * @param format The file format
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_file_get(const Evas_Object *obj, const char **file, Elm_Text_Format *format)
 {
@@ -4295,14 +3707,6 @@ elm_entry_file_get(const Evas_Object *obj, const char **file, Elm_Text_Format *f
    if (format) *format = wd->format;
 }
 
-/**
- * This function writes any changes made to the file set with
- * elm_entry_file_set()
- *
- * @param obj The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_file_save(Evas_Object *obj)
 {
@@ -4318,14 +3722,6 @@ elm_entry_file_save(Evas_Object *obj)
    wd->delay_write = ecore_timer_add(2.0, _delay_write, obj);
 }
 
-/**
- * This sets the entry object to 'autosave' the loaded text file or not.
- *
- * @param obj The entry object
- * @param autosave Autosave the loaded file or not
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_autosave_set(Evas_Object *obj, Eina_Bool autosave)
 {
@@ -4335,14 +3731,6 @@ elm_entry_autosave_set(Evas_Object *obj, Eina_Bool autosave)
    wd->autosave = !!autosave;
 }
 
-/**
- * This gets the entry object's 'autosave' status.
- *
- * @param obj The entry object
- * @return Autosave the loaded file or not
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_autosave_get(const Evas_Object *obj)
 {
@@ -4352,19 +3740,6 @@ elm_entry_autosave_get(const Evas_Object *obj)
    return wd->autosave;
 }
 
-/**
- * Control pasting of text and images for the widget.
- *
- * Normally the entry allows both text and images to be pasted.  By setting
- * textonly to be true, this prevents images from being pasted.
- *
- * Note this only changes the behaviour of text.
- *
- * @param obj The entry object
- * @param textonly paste mode - EINA_TRUE is text only, EINA_FALSE is text+image+other.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly)
 {
@@ -4381,16 +3756,6 @@ elm_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly)
 #endif
 }
 
-/**
- * Getting elm_entry text paste/drop mode.
- *
- * In textonly mode, only text may be pasted or dropped into the widget.
- *
- * @param obj The entry object
- * @return If the widget only accepts text from pastes.
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_cnp_textonly_get(const Evas_Object *obj)
 {
@@ -4400,16 +3765,6 @@ elm_entry_cnp_textonly_get(const Evas_Object *obj)
    return wd->textonly;
 }
 
-/**
- * Enable or disable scrolling in entry
- *
- * Normally the entry is not scrollable unless you enable it with this call.
- *
- * @param obj The entry object
- * @param scroll EINA_TRUE if it is to be scrollable, EINA_FALSE otherwise
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_scrollable_set(Evas_Object *obj, Eina_Bool scroll)
 {
@@ -4462,17 +3817,6 @@ elm_entry_scrollable_set(Evas_Object *obj, Eina_Bool scroll)
    _theme_hook(obj);
 }
 
-/**
- * Get the scrollable state of the entry
- *
- * Normally the entry is not scrollable. This gets the scrollable state
- * of the entry. See elm_entry_scrollable_set() for more information.
- *
- * @param obj The entry object
- * @return The scrollable state
- *
- * @ingroup Entry
- */
 EAPI Eina_Bool
 elm_entry_scrollable_get(const Evas_Object *obj)
 {
@@ -4482,20 +3826,6 @@ elm_entry_scrollable_get(const Evas_Object *obj)
    return wd->scroll;
 }
 
-/**
- * This sets a widget to be displayed to the left of a scrolled entry.
- *
- * @param obj The scrolled entry object
- * @param icon The widget to display on the left side of the scrolled
- * entry.
- *
- * @note A previously set widget will be destroyed.
- * @note If the object being set does not have minimum size hints set,
- * it won't get properly displayed.
- *
- * @ingroup Entry
- * @see elm_entry_end_set
- */
 EAPI void
 elm_entry_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
@@ -4514,15 +3844,6 @@ elm_entry_icon_set(Evas_Object *obj, Evas_Object *icon)
    _sizing_eval(obj);
 }
 
-/**
- * Gets the leftmost widget of the scrolled entry. This object is
- * owned by the scrolled entry and should not be modified.
- *
- * @param obj The scrolled entry object
- * @return the left widget inside the scroller
- *
- * @ingroup Entry
- */
 EAPI Evas_Object *
 elm_entry_icon_get(const Evas_Object *obj)
 {
@@ -4532,18 +3853,6 @@ elm_entry_icon_get(const Evas_Object *obj)
    return wd->icon;
 }
 
-/**
- * Unset the leftmost widget of the scrolled entry, unparenting and
- * returning it.
- *
- * @param obj The scrolled entry object
- * @return the previously set icon sub-object of this entry, on
- * success.
- *
- * @see elm_entry_icon_set()
- *
- * @ingroup Entry
- */
 EAPI Evas_Object *
 elm_entry_icon_unset(Evas_Object *obj)
 {
@@ -4564,16 +3873,6 @@ elm_entry_icon_unset(Evas_Object *obj)
    return ret;
 }
 
-/**
- * Sets the visibility of the left-side widget of the scrolled entry,
- * set by @elm_entry_icon_set().
- *
- * @param obj The scrolled entry object
- * @param setting EINA_TRUE if the object should be displayed,
- * EINA_FALSE if not.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_icon_visible_set(Evas_Object *obj, Eina_Bool setting)
 {
@@ -4587,20 +3886,6 @@ elm_entry_icon_visible_set(Evas_Object *obj, Eina_Bool setting)
    _sizing_eval(obj);
 }
 
-/**
- * This sets a widget to be displayed to the end of a scrolled entry.
- *
- * @param obj The scrolled entry object
- * @param end The widget to display on the right side of the scrolled
- * entry.
- *
- * @note A previously set widget will be destroyed.
- * @note If the object being set does not have minimum size hints set,
- * it won't get properly displayed.
- *
- * @ingroup Entry
- * @see elm_entry_icon_set
- */
 EAPI void
 elm_entry_end_set(Evas_Object *obj, Evas_Object *end)
 {
@@ -4619,15 +3904,6 @@ elm_entry_end_set(Evas_Object *obj, Evas_Object *end)
    _sizing_eval(obj);
 }
 
-/**
- * Gets the endmost widget of the scrolled entry. This object is owned
- * by the scrolled entry and should not be modified.
- *
- * @param obj The scrolled entry object
- * @return the right widget inside the scroller
- *
- * @ingroup Entry
- */
 EAPI Evas_Object *
 elm_entry_end_get(const Evas_Object *obj)
 {
@@ -4637,18 +3913,6 @@ elm_entry_end_get(const Evas_Object *obj)
    return wd->end;
 }
 
-/**
- * Unset the endmost widget of the scrolled entry, unparenting and
- * returning it.
- *
- * @param obj The scrolled entry object
- * @return the previously set icon sub-object of this entry, on
- * success.
- *
- * @see elm_entry_icon_set()
- *
- * @ingroup Entry
- */
 EAPI Evas_Object *
 elm_entry_end_unset(Evas_Object *obj)
 {
@@ -4669,16 +3933,6 @@ elm_entry_end_unset(Evas_Object *obj)
    return ret;
 }
 
-/**
- * Sets the visibility of the end widget of the scrolled entry, set by
- * @elm_entry_end_set().
- *
- * @param obj The scrolled entry object
- * @param setting EINA_TRUE if the object should be displayed,
- * EINA_FALSE if not.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_end_visible_set(Evas_Object *obj, Eina_Bool setting)
 {
@@ -4692,15 +3946,6 @@ elm_entry_end_visible_set(Evas_Object *obj, Eina_Bool setting)
    _sizing_eval(obj);
 }
 
-/**
- * This sets the scrolled entry's scrollbar policy (ie. enabling/disabling them).
- *
- * @param obj The scrolled entry object
- * @param h The horizontal scrollbar policy to apply
- * @param v The vertical scrollbar policy to apply
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_scrollbar_policy_set(Evas_Object *obj, Elm_Scroller_Policy h, Elm_Scroller_Policy v)
 {
@@ -4720,15 +3965,6 @@ elm_entry_scrollbar_policy_set(Evas_Object *obj, Elm_Scroller_Policy h, Elm_Scro
                                  map[wd->policy_v]);
 }
 
-/**
- * This enables/disables bouncing within the entry.
- *
- * @param obj The scrolled entry object
- * @param h The horizontal bounce state
- * @param v The vertical bounce state
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce)
 {
@@ -4738,15 +3974,6 @@ elm_entry_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce)
    elm_smart_scroller_bounce_allow_set(wd->scroller, h_bounce, v_bounce);
 }
 
-/**
- * Get the bounce mode
- *
- * @param obj The Entry object
- * @param h_bounce Allow bounce horizontally
- * @param v_bounce Allow bounce vertically
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce)
 {
@@ -4816,16 +4043,6 @@ elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
    if (wrap) elm_entry_line_wrap_set(obj, ELM_WRAP_CHAR);
 }
 
-/**
- * Set background color of the entry
- *
- * @param obj The entry object
- * @param r Red property background color of The entry object
- * @param g Green property background color of The entry object
- * @param b Blue property background color of The entry object
- * @param a Alpha property background alpha of The entry object
- * @ingroup Entry
- */
 EAPI void
 elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
 {
@@ -4840,14 +4057,6 @@ elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g,
      }
 }
 
-/**
- * Set whether entry should support auto capitalization
- *
- * @param obj The entry object
- * @param on If true, entry suports auto capitalization.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
 {
@@ -4867,14 +4076,6 @@ elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
    edje_object_part_text_autocapital_type_set(wd->ent, "elm.text", wd->autocapital_type);
 }
 
-/**
- * Set whether entry should support auto period
- *
- * @param obj The entry object
- * @param on If true, entry suports auto period.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
 {
@@ -4894,14 +4095,6 @@ elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
    edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
 }
 
-/**
- * Set whether entry should enable the return key on soft keyboard automatically
- *
- * @param obj The entry object
- * @param on If true, entry enables the return key on soft keyboard automatically.
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
 {
@@ -4913,14 +4106,6 @@ elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
    _check_enable_returnkey(obj);
 }
 
-/**
- * Get the input method context in the entry widget
- *
- * @param obj The entry object
- * @return The input method context
- *
- * @ingroup Entry
- */
 EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -4979,14 +4164,6 @@ elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_
    wd->matchlist_case_sensitive = case_sensitive;
 }
 
-/**
- * Set the magnifier style of the entry
- *
- * @param obj The entry object
- * @param type the magnifier style to set
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_magnifier_type_set(Evas_Object *obj, int type)
 {
@@ -4998,13 +4175,6 @@ elm_entry_magnifier_type_set(Evas_Object *obj, int type)
    _magnifier_create(obj);
 }
 
-/**
- * Set wrap width of the entry
- *
- * @param obj The entry object
- * @param w The wrap width in pixels at a minimum where words need to wrap
- * @ingroup Entry
- */
 EAPI void
 elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w)
 {
@@ -5015,13 +4185,6 @@ elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w)
    _sizing_eval(obj);
 }
 
-/**
- * get wrap width of the entry
- *
- * @param obj The entry object
- * @return The wrap width in pixels at a minimum where words need to wrap
- * @ingroup Entry
- */
 EAPI Evas_Coord
 elm_entry_wrap_width_get(const Evas_Object *obj)
 {
@@ -5030,14 +4193,6 @@ elm_entry_wrap_width_get(const Evas_Object *obj)
    return wd->wrap_w;
 }
 
-/**
- * Set the font size on the entry object
- *
- * @param obj The entry object
- * @param size font size
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_fontsize_set(Evas_Object *obj, int fontsize)
 {
@@ -5064,17 +4219,6 @@ elm_entry_fontsize_set(Evas_Object *obj, int fontsize)
    eina_stringshare_del(t);
 }
 
-/**
- * Set the text color on the entry object
- *
- * @param obj The entry object
- * @param r Red property background color of The entry object
- * @param g Green property background color of The entry object
- * @param b Blue property background color of The entry object
- * @param a Alpha property background alpha of The entry object
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
 {
@@ -5101,14 +4245,6 @@ elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsig
    eina_stringshare_del(t);
 }
 
-/**
- * Set the text align on the entry object
- *
- * @param obj The entry object
- * @param align align mode
- *
- * @ingroup Entry
- */
 EAPI void
 elm_entry_text_align_set(Evas_Object *obj, const char *alignmode)
 {
