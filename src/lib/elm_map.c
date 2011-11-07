@@ -1,68 +1,10 @@
-
-
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
 
-#ifdef HAVE_ECORE_CON
-# include <Ecore_Con.h>
-#endif
-
 #include "Elementary.h"
 #include "elm_priv.h"
-
-/**
- * @defgroup Map Map
- * @ingroup Elementary
- *
- * This is a widget specifically for displaying the map. It uses basically
- * OpenStreetMap provider. but it can be added custom providers.
- *
- * Signals that you can add callbacks for are:
- *
- * "clicked" - This is called when a user has clicked the map without dragging
- *             around.
- *
- * "press" - This is called when a user has pressed down on the map.
- *
- * "longpressed" - This is called when a user has pressed down on the map for
- *                 a long time without dragging around.
- *
- * "clicked,double" - This is called when a user has double-clicked the map.
- *
- * "load,detail" - Map detailed data load begins.
- *
- * "loaded,detail" - This is called when all parts of the map are loaded.
- *
- * "zoom,start" - Zoom animation started.
- *
- * "zoom,stop" - Zoom animation stopped.
- *
- * "zoom,change" - Zoom changed when using an auto zoom mode.
- *
- * "scroll" - the content has been scrolled (moved)
- *
- * "scroll,anim,start" - scrolling animation has started
- *
- * "scroll,anim,stop" - scrolling animation has stopped
- *
- * "scroll,drag,start" - dragging the contents around has started
- *
- * "scroll,drag,stop" - dragging the contents around has stopped
- *
- * "downloaded" - This is called when map images are downloaded
- *
- * "route,load" - This is called when route request begins
- *
- * "route,loaded" - This is called when route request ends
- *
- * "name,load" - This is called when name request begins
- *
- * "name,loaded- This is called when name request ends
- *
- * TODO : doxygen
- */
-
+//#include "els_scroller.h"
 
 typedef struct _Widget_Data Widget_Data;
 typedef struct _Pan Pan;
@@ -577,7 +519,7 @@ static void _group_bubble_place(Marker_Group *group);
 static int _group_bubble_content_update(Marker_Group *group);
 static void _group_bubble_content_free(Marker_Group *group);
 static void marker_place(Evas_Object *obj, Grid *g, Evas_Coord px, Evas_Coord py, Evas_Coord ox, Evas_Coord oy, Evas_Coord ow, Evas_Coord oh);
-static void _bubble_sc_hits_changed_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
+static void _bubble_sc_hints_changed_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static void _mouse_down(void *data, Evas *evas, Evas_Object *obj, void *event_info);
 static void _mouse_up(void *data, Evas *evas, Evas_Object *obj, void *event_info);
@@ -1342,9 +1284,9 @@ _process_download_list(Evas_Object *obj)
         if (gi->wd->download_num >= MAX_CONCURRENT_DOWNLOAD)
           break;
 
-        ecore_file_download_full(gi->source, gi->file, _tile_downloaded, NULL, gi, &(gi->job), wd->ua);
-        if (!gi->job)
-          DBG("Can't start to download %s to %s", gi->source, gi->file);
+        Eina_Bool ret = ecore_file_download_full(gi->source, gi->file, _tile_downloaded, NULL, gi, &(gi->job), wd->ua);
+        if (!ret || !gi->job)
+          WRN("Can't start to download %s to %s", gi->source, gi->file);
         else
           {
              gi->wd->download_num++;
@@ -2079,11 +2021,7 @@ _wheel_timer_cb(void *data)
    Widget_Data *wd = elm_widget_data_get(data);
    int zoom;
 
-   if (!wd)
-     {
-        wd->wheel_timer = NULL;
-        return ECORE_CALLBACK_CANCEL;
-     }
+   if (!wd) return ECORE_CALLBACK_CANCEL;
    if (wd->zoom_method == ZOOM_METHOD_IN) zoom = (int)ceil(wd->wheel_zoom);
    else if (wd->zoom_method == ZOOM_METHOD_OUT) zoom = (int)floor(wd->wheel_zoom);
    else
@@ -2237,7 +2175,7 @@ _del_pre_hook(Evas_Object *obj)
                   EINA_LIST_FREE(group->markers, marker)
                     {
                        evas_object_event_callback_del_full(group->sc, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                                           _bubble_sc_hits_changed_cb, group);
+                                                           _bubble_sc_hints_changed_cb, group);
                        if (free_marker) free(marker);
                     }
                   free(group);
@@ -2551,7 +2489,7 @@ _group_object_create(Marker_Group *group)
         group->obj = elm_layout_add(group->wd->obj);
         elm_layout_theme_set(group->obj, "map/marker", style, elm_widget_style_get(group->wd->obj));
 
-        if (icon) elm_layout_content_set(group->obj, "elm.icon", icon);
+        if (icon) elm_object_content_part_set(group->obj, "elm.icon", icon);
 
         evas_object_smart_member_add(group->obj, group->wd->pan_smart);
         elm_widget_sub_object_add(group->wd->obj, group->obj);
@@ -2643,7 +2581,7 @@ _group_bubble_create(Marker_Group *group)
    _group_bubble_place(group);
 }
 
-static void _bubble_sc_hits_changed_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+static void _bubble_sc_hints_changed_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    _group_bubble_place(data);
 }
@@ -2676,10 +2614,10 @@ _group_bubble_content_update(Marker_Group *group)
         elm_box_horizontal_set(group->bx, EINA_TRUE);
         evas_object_show(group->bx);
 
-        elm_scroller_content_set(group->sc, group->bx);
+        elm_object_content_set(group->sc, group->bx);
 
-        evas_object_event_callback_add(group->sc, EVAS_CALLBACK_RESIZE,
-                                       _bubble_sc_hits_changed_cb, group);
+        evas_object_event_callback_add(group->sc, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                       _bubble_sc_hints_changed_cb, group);
      }
 
    EINA_LIST_FOREACH(group->markers, l, marker)
@@ -2723,7 +2661,7 @@ _group_bubble_free(Marker_Group *group)
    if (!group->bubble) return;
    group->wd->opened_bubbles = eina_list_remove(group->wd->opened_bubbles, group);
    evas_object_event_callback_del_full(group->sc, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _bubble_sc_hits_changed_cb, group);
+                                       _bubble_sc_hints_changed_cb, group);
    evas_object_del(group->bubble);
    evas_object_del(group->rect);
    group->bubble = NULL;
@@ -2964,7 +2902,7 @@ static void
 _parse_kml(void *data)
 {
    Elm_Map_Route *r = (Elm_Map_Route*)data;
-   if (!r && !r->ud.fname) return;
+   if (!r || !r->ud.fname) return;
 
    FILE *f;
    char **str;
@@ -3060,7 +2998,7 @@ static void
 _parse_name(void *data)
 {
    Elm_Map_Name *n = (Elm_Map_Name*)data;
-   if (!n && !n->ud.fname) return;
+   if (!n || !n->ud.fname) return;
 
    FILE *f;
 
@@ -3209,14 +3147,6 @@ _utils_convert_name(const Evas_Object *obj, int method, char *address, double lo
 
 static int idnum = 1;
 
-/**
- * Add a new Map object
- *
- * @param parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup Map
- */
 EAPI Evas_Object *
 elm_map_add(Evas_Object *parent)
 {
@@ -3352,16 +3282,6 @@ elm_map_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * Set the zoom level of the map
- *
- * This sets the zoom level. 0 is the world map and 18 is the maximum zoom.
- *
- * @param obj The map object
- * @param zoom The zoom level to set
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_zoom_set(Evas_Object *obj, int zoom)
 {
@@ -3508,19 +3428,6 @@ elm_map_zoom_set(Evas_Object *obj, int zoom)
    if (zoom_changed) evas_object_smart_callback_call(obj, SIG_ZOOM_CHANGE, NULL);
 }
 
-/**
- * Get the zoom level of the map
- *
- * This returns the current zoom level of the map object. Note that if
- * you set the fill mode to other than ELM_MAP_ZOOM_MODE_MANUAL
- * (which is the default), the zoom level may be changed at any time by the
- * map object itself to account for map size and map viewpoer size
- *
- * @param obj The map object
- * @return The current zoom level
- *
- * @ingroup Map
- */
 EAPI int
 elm_map_zoom_get(const Evas_Object *obj)
 {
@@ -3531,24 +3438,6 @@ elm_map_zoom_get(const Evas_Object *obj)
    return wd->zoom;
 }
 
-/**
- * Set the zoom mode
- *
- * This sets the zoom mode to manual or one of several automatic levels.
- * Manual (ELM_MAP_ZOOM_MODE_MANUAL) means that zoom is set manually by
- * elm_map_zoom_set() and will stay at that level until changed by code
- * or until zoom mode is changed. This is the default mode.
- * The Automatic modes will allow the map object to automatically
- * adjust zoom mode based on properties. ELM_MAP_ZOOM_MODE_AUTO_FIT will
- * adjust zoom so the map fits inside the scroll frame with no pixels
- * outside this area. ELM_MAP_ZOOM_MODE_AUTO_FILL will be similar but
- * ensure no pixels within the frame are left unfilled. Do not forget that the valid sizes are 2^zoom, consequently the map may be smaller than the scroller view.
- *
- * @param obj The map object
- * @param mode The desired mode
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_zoom_mode_set(Evas_Object *obj, Elm_Map_Zoom_Mode mode)
 {
@@ -3567,16 +3456,6 @@ elm_map_zoom_mode_set(Evas_Object *obj, Elm_Map_Zoom_Mode mode)
      }
 }
 
-/**
- * Get the zoom mode
- *
- * This gets the current zoom mode of the map object
- *
- * @param obj The map object
- * @return The current zoom mode
- *
- * @ingroup Map
- */
 EAPI Elm_Map_Zoom_Mode
 elm_map_zoom_mode_get(const Evas_Object *obj)
 {
@@ -3587,15 +3466,6 @@ elm_map_zoom_mode_get(const Evas_Object *obj)
    return wd->mode;
 }
 
-/**
- * Centers the map at @p lon @p lat using an animation to scroll.
- *
- * @param obj The map object
- * @param lon Longitude to center at
- * @param lon Latitude to center at
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_geo_region_bring_in(Evas_Object *obj, double lon, double lat)
 {
@@ -3626,17 +3496,6 @@ elm_map_geo_region_bring_in(Evas_Object *obj, double lon, double lat)
    wd->center_on.lat = lat;
 }
 
-/**
- * Move the map to the current coordinates.
- *
- * This move the map to the current coordinates. The map will be centered on these coordinates.
- *
- * @param obj The map object
- * @param lat The latitude.
- * @param lon The longitude.
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_geo_region_show(Evas_Object *obj, double lon, double lat)
 {
@@ -3666,17 +3525,6 @@ elm_map_geo_region_show(Evas_Object *obj, double lon, double lat)
    wd->center_on.lat = lat;
 }
 
-/**
- * Get the current coordinates of the map.
- *
- * This gets the current coordinates of the map object.
- *
- * @param obj The map object
- * @param lat The latitude.
- * @param lon The longitude.
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_geo_region_get(const Evas_Object *obj, double *lon, double *lat)
 {
@@ -3693,18 +3541,6 @@ elm_map_geo_region_get(const Evas_Object *obj, double *lon, double *lat)
    elm_map_utils_convert_coord_into_geo(obj, sx, sy, wd->size.w, lon, lat);
 }
 
-/**
- * Set the paused state for map
- *
- * This sets the paused state to on (1) or off (0) for map. The default
- * is off. This will stop zooming using animation change zoom levels and
- * change instantly. This will stop any existing animations that are running.
- *
- * @param obj The map object
- * @param paused The pause state to set
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_paused_set(Evas_Object *obj, Eina_Bool paused)
 {
@@ -3726,18 +3562,6 @@ elm_map_paused_set(Evas_Object *obj, Eina_Bool paused)
      }
 }
 
-/**
- * Set the paused state for the markers
- *
- * This sets the paused state to on (1) or off (0) for the markers. The default
- * is off. This will stop displaying the markers during change zoom levels. Set
- * to on if you have a large number of markers.
- *
- * @param obj The map object
- * @param paused The pause state to set
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_paused_markers_set(Evas_Object *obj, Eina_Bool paused)
 {
@@ -3749,16 +3573,6 @@ elm_map_paused_markers_set(Evas_Object *obj, Eina_Bool paused)
    wd->paused_markers = paused;
 }
 
-/**
- * Get the paused state for map
- *
- * This gets the current paused state for the map object.
- *
- * @param obj The map object
- * @return The current paused state
- *
- * @ingroup Map
- */
 EAPI Eina_Bool
 elm_map_paused_get(const Evas_Object *obj)
 {
@@ -3769,16 +3583,6 @@ elm_map_paused_get(const Evas_Object *obj)
    return wd->paused;
 }
 
-/**
- * Get the paused state for the markers
- *
- * This gets the current paused state for the markers object.
- *
- * @param obj The map object
- * @return The current paused state
- *
- * @ingroup Map
- */
 EAPI Eina_Bool
 elm_map_paused_markers_get(const Evas_Object *obj)
 {
@@ -3788,18 +3592,6 @@ elm_map_paused_markers_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return wd->paused_markers;
 }
-
-/**
- * Get the information of downloading status
- *
- * This gets the current downloading status for the map object.
- *
- * @param obj The map object
- * @param try_num the number of download trying map
- * @param finish_num the number of downloaded map
- *
- * @ingroup Map
- */
 
 EAPI void
 elm_map_utils_downloading_status_get(const Evas_Object *obj, int *try_num, int *finish_num)
@@ -3818,18 +3610,7 @@ elm_map_utils_downloading_status_get(const Evas_Object *obj, int *try_num, int *
         *finish_num = wd->finish_num;
      }
 }
-/**
- * Convert a pixel coordinate (x,y) into a geographic coordinate (longitude, latitude).
- *
- * @param obj The map object
- * @param x the coordinate
- * @param y the coordinate
- * @param size the size in pixels of the map. The map is a square and generally his size is : pow(2.0, zoom)*256.
- * @param lon the longitude correspond to x
- * @param lat the latitude correspond to y
- *
- * @ingroup Map
- */
+
 EAPI void
 elm_map_utils_convert_coord_into_geo(const Evas_Object *obj, int x, int y, int size, double *lon, double *lat)
 {
@@ -3854,18 +3635,6 @@ elm_map_utils_convert_coord_into_geo(const Evas_Object *obj, int x, int y, int s
      }
 }
 
-/**
- * Convert a geographic coordinate (longitude, latitude) into a pixel coordinate (x, y).
- *
- * @param obj The map object
- * @param lon the longitude
- * @param lat the latitude
- * @param size the size in pixels of the map. The map is a square and generally his size is : pow(2.0, zoom)*256.
- * @param x the coordinate correspond to the longitude
- * @param y the coordinate correspond to the latitude
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_utils_convert_geo_into_coord(const Evas_Object *obj, double lon, double lat, int size, int *x, int *y)
 {
@@ -3885,17 +3654,6 @@ elm_map_utils_convert_geo_into_coord(const Evas_Object *obj, double lon, double 
      *y = floor((1.0 - log( tan(lat * ELM_PI / 180.0) + 1.0 / cos(lat * ELM_PI / 180.0)) / ELM_PI) / 2.0 * size);
 }
 
-/**
- * Convert a geographic coordinate (longitude, latitude) into a name (address).
- *
- * @param obj The map object
- * @param lon the longitude
- * @param lat the latitude
- *
- * @return name the address
- *
- * @ingroup Map
- */
 EAPI Elm_Map_Name *
 elm_map_utils_convert_coord_into_name(const Evas_Object *obj, double lon, double lat)
 {
@@ -3903,17 +3661,6 @@ elm_map_utils_convert_coord_into_name(const Evas_Object *obj, double lon, double
    return _utils_convert_name(obj, ELM_MAP_NAME_METHOD_REVERSE, NULL, lon, lat);
 }
 
-/**
- * Convert a name (address) into a geographic coordinate (longitude, latitude).
- *
- * @param obj The map object
- * @param name the address
- * @param lat the latitude correspond to y
- *
- * @return name the address
- *
- * @ingroup Map
- */
 EAPI Elm_Map_Name *
 elm_map_utils_convert_name_into_coord(const Evas_Object *obj, char *address)
 {
@@ -3922,20 +3669,6 @@ elm_map_utils_convert_name_into_coord(const Evas_Object *obj, char *address)
    return _utils_convert_name(obj, ELM_MAP_NAME_METHOD_SEARCH, address, 0.0, 0.0);
 }
 
-/**
- * Convert a pixel coordinate into a roated pixcel coordinate.
- *
- * @param obj The map object
- * @param x x to rotate.
- * @param y y to rotate.
- * @param cx rotation's center horizontal position.
- * @param cy rotation's center vertical position.
- * @param degree amount of degrees from 0.0 to 360.0 to rotate arount Z axis.
- * @param xx rotated x.
- * @param yy rotated y.
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_utils_rotate_coord(const Evas_Object *obj __UNUSED__, const Evas_Coord x, const Evas_Coord y, const Evas_Coord cx, const Evas_Coord cy, const double degree, Evas_Coord *xx, Evas_Coord *yy)
 {
@@ -3956,20 +3689,6 @@ elm_map_utils_rotate_coord(const Evas_Object *obj __UNUSED__, const Evas_Coord x
    *yy = ty + cy;
 }
 
-/**
- * Add a marker on the map
- *
- * @param obj The map object
- * @param lon the longitude
- * @param lat the latitude
- * @param clas the class to use
- * @param clas_group the class group
- * @param data the data passed to the callbacks
- *
- * @return The marker object
- *
- * @ingroup Map
- */
 EAPI Elm_Map_Marker *
 elm_map_marker_add(Evas_Object *obj, double lon, double lat, Elm_Map_Marker_Class *clas, Elm_Map_Group_Class *clas_group, void *data)
 {
@@ -4154,13 +3873,6 @@ elm_map_marker_add(Evas_Object *obj, double lon, double lat, Elm_Map_Marker_Clas
    return marker;
 }
 
-/**
- * Remove a marker from the map
- *
- * @param marker The marker to remove
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_marker_remove(Elm_Map_Marker *marker)
 {
@@ -4228,15 +3940,6 @@ elm_map_marker_remove(Elm_Map_Marker *marker)
      }
 }
 
-/**
- * Get the current coordinates of the marker.
- *
- * @param marker marker.
- * @param lat The latitude.
- * @param lon The longitude.
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_marker_region_get(const Elm_Map_Marker *marker, double *lon, double *lat)
 {
@@ -4245,13 +3948,6 @@ elm_map_marker_region_get(const Elm_Map_Marker *marker, double *lon, double *lat
    if (lat) *lat = marker->latitude;
 }
 
-/**
- * Move the map to the coordinate of the marker.
- *
- * @param marker The marker where the map will be center.
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_marker_bring_in(Elm_Map_Marker *marker)
 {
@@ -4259,13 +3955,6 @@ elm_map_marker_bring_in(Elm_Map_Marker *marker)
    elm_map_geo_region_bring_in(marker->wd->obj, marker->longitude, marker->latitude);
 }
 
-/**
- * Move the map to the coordinate of the marker.
- *
- * @param marker The marker where the map will be center.
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_marker_show(Elm_Map_Marker *marker)
 {
@@ -4273,17 +3962,6 @@ elm_map_marker_show(Elm_Map_Marker *marker)
    elm_map_geo_region_show(marker->wd->obj, marker->longitude, marker->latitude);
 }
 
-/**
- * Move and zoom the map to display a list of markers.
- *
- * The map will be centered on the center point of the markers in the list. Then
- * the map will be zoomed in order to fit the markers using the maximum zoom which
- * allows display of all the markers.
- *
- * @param markers The list of markers (list of Elm_Map_Marker *)
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_markers_list_show(Eina_List *markers)
 {
@@ -4332,18 +4010,6 @@ elm_map_markers_list_show(Eina_List *markers)
    elm_map_zoom_set(wd->obj, zoom);
 }
 
-/**
- * Set the maximum numbers of markers display in a group.
- *
- * A group can have a long list of markers, consequently the creation of the content
- * of the bubble can be very slow. In order to avoid this, a maximum number of items
- * is displayed in a bubble. By default this number is 30.
- *
- * @param obj The map object.
- * @param max The maximum numbers of items displayed in a bubble.
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_max_marker_per_group_set(Evas_Object *obj, int max)
 {
@@ -4354,14 +4020,6 @@ elm_map_max_marker_per_group_set(Evas_Object *obj, int max)
    wd->markers_max_num = max;
 }
 
-/**
- * Return the evas object getting from the ElmMapMarkerGetFunc callback
- *
- * @param marker The marker.
- * @return Return the evas object if it exists, else NULL.
- *
- * @ingroup Map
- */
 EAPI Evas_Object *
 elm_map_marker_object_get(const Elm_Map_Marker *marker)
 {
@@ -4369,13 +4027,6 @@ elm_map_marker_object_get(const Elm_Map_Marker *marker)
    return marker->content;
 }
 
-/**
- * Update the marker
- *
- * @param marker The marker.
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_marker_update(Elm_Map_Marker *marker)
 {
@@ -4391,13 +4042,6 @@ elm_map_marker_update(Elm_Map_Marker *marker)
      }
 }
 
-/**
- * Close all opened bubbles
- *
- * @param obj The map object
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_bubbles_close(Evas_Object *obj)
 {
@@ -4411,17 +4055,6 @@ elm_map_bubbles_close(Evas_Object *obj)
       _group_bubble_free(group);
 }
 
-/**
- * Create a group class.
- *
- * Each marker must be associated to a group class. Marker with the same group are grouped if they are close.
- * The group class defines the style of the marker when a marker is grouped to others markers.
- *
- * @param obj The map object
- * @return Returns the new group class
- *
- * @ingroup Map
- */
 EAPI Elm_Map_Group_Class *
 elm_map_group_class_new(Evas_Object *obj)
 {
@@ -4435,14 +4068,6 @@ elm_map_group_class_new(Evas_Object *obj)
    return clas;
 }
 
-/**
- * Set the style of a group class (radio, radio2 or empty)
- *
- * @param clas the group class
- * @param style the new style
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_group_class_style_set(Elm_Map_Group_Class *clas, const char *style)
 {
@@ -4450,16 +4075,6 @@ elm_map_group_class_style_set(Elm_Map_Group_Class *clas, const char *style)
    eina_stringshare_replace(&clas->style, style);
 }
 
-/**
- * Set the icon callback of a group class.
- *
- * A custom icon can be displayed in a marker. The function @ref icon_get must return this icon.
- *
- * @param clas the group class
- * @param icon_get the callback to create the icon
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_group_class_icon_cb_set(Elm_Map_Group_Class *clas, ElmMapGroupIconGetFunc icon_get)
 {
@@ -4467,14 +4082,6 @@ elm_map_group_class_icon_cb_set(Elm_Map_Group_Class *clas, ElmMapGroupIconGetFun
    clas->func.icon_get = icon_get;
 }
 
-/**
- * Set the data associated to the group class (radio, radio2 or empty)
- *
- * @param clas the group class
- * @param data the new user data
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_group_class_data_set(Elm_Map_Group_Class *clas, void *data)
 {
@@ -4482,16 +4089,6 @@ elm_map_group_class_data_set(Elm_Map_Group_Class *clas, void *data)
    clas->data = data;
 }
 
-/**
- * Set the zoom from where the markers are displayed.
- *
- * Markers will not be displayed for a zoom less than @ref zoom
- *
- * @param clas the group class
- * @param zoom the zoom
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_group_class_zoom_displayed_set(Elm_Map_Group_Class *clas, int zoom)
 {
@@ -4499,14 +4096,6 @@ elm_map_group_class_zoom_displayed_set(Elm_Map_Group_Class *clas, int zoom)
    clas->zoom_displayed = zoom;
 }
 
-/**
- * Set the zoom from where the markers are no more grouped.
- *
- * @param clas the group class
- * @param zoom the zoom
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_group_class_zoom_grouped_set(Elm_Map_Group_Class *clas, int zoom)
 {
@@ -4514,15 +4103,6 @@ elm_map_group_class_zoom_grouped_set(Elm_Map_Group_Class *clas, int zoom)
    clas->zoom_grouped = zoom;
 }
 
-/**
- * Set if the markers associated to the group class @clas are hidden or not.
- * If @ref hide is true the markers will be hidden.
- *
- * @param clas the group class
- * @param hide if true the markers will be hidden, else they will be displayed.
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_group_class_hide_set(Evas_Object *obj, Elm_Map_Group_Class *clas, Eina_Bool hide)
 {
@@ -4541,18 +4121,6 @@ elm_map_group_class_hide_set(Evas_Object *obj, Elm_Map_Group_Class *clas, Eina_B
      }
 }
 
-
-/**
- * Create a marker class.
- *
- * Each marker must be associated to a class.
- * The class defines the style of the marker when a marker is displayed alone (not grouped).
- *
- * @param obj The map object
- * @return Returns the new class
- *
- * @ingroup Map
- */
 EAPI Elm_Map_Marker_Class *
 elm_map_marker_class_new(Evas_Object *obj)
 {
@@ -4565,14 +4133,6 @@ elm_map_marker_class_new(Evas_Object *obj)
    return clas;
 }
 
-/**
- * Set the style of a class (radio, radio2 or empty)
- *
- * @param clas the group class
- * @param style the new style
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_marker_class_style_set(Elm_Map_Marker_Class *clas, const char *style)
 {
@@ -4580,16 +4140,6 @@ elm_map_marker_class_style_set(Elm_Map_Marker_Class *clas, const char *style)
    eina_stringshare_replace(&clas->style, style);
 }
 
-/**
- * Set the icon callback of a class.
- *
- * A custom icon can be displayed in a marker. The function @ref icon_get must return this icon.
- *
- * @param clas the group class
- * @param icon_get the callback to create the icon
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_marker_class_icon_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerIconGetFunc icon_get)
 {
@@ -4597,18 +4147,6 @@ elm_map_marker_class_icon_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerIconGet
    clas->func.icon_get = icon_get;
 }
 
-/**
- *
- * Set the callback of the content of the bubble.
- *
- * When the user click on a marker, a bubble is displayed with a content.
- * The callback @ref get musst return this content. It can be NULL.
- *
- * @param clas the group class
- * @param get the callback to create the content
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_marker_class_get_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerGetFunc get)
 {
@@ -4616,32 +4154,12 @@ elm_map_marker_class_get_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerGetFunc 
    clas->func.get = get;
 }
 
-/**
- * Set the callback of the content of delete the object created by the callback "get".
- *
- * If this callback is defined the user will have to delete (or not) the object inside.
- * If the callback is not defined the object will be destroyed with evas_object_del()
- *
- * @param clas the group class
- * @param del the callback to delete the content
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_marker_class_del_cb_set(Elm_Map_Marker_Class *clas, ElmMapMarkerDelFunc del)
 {
    EINA_SAFETY_ON_NULL_RETURN(clas);
    clas->func.del = del;
 }
-
-/**
- * Get the list of the sources.
- *
- * @param obj The map object
- * @return sources the source list
- *
- * @ingroup Map
- */
 
 EAPI const char **
 elm_map_source_names_get(const Evas_Object *obj)
@@ -4653,18 +4171,6 @@ elm_map_source_names_get(const Evas_Object *obj)
    return wd->source_names;
 }
 
-/**
- * Set the source of the map.
- *
- * Elm_Map retrieves the image which composed the map from a web service. This web service can
- * be set with this method. A different service can return a different maps with different
- * information and it can use different zoom value.
- *
- * @param obj the map object
- * @param source the new source
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_source_name_set(Evas_Object *obj, const char *source_name)
 {
@@ -4676,8 +4182,11 @@ elm_map_source_name_set(Evas_Object *obj, const char *source_name)
    int zoom;
 
    if (!wd) return;
-   if ((wd->src) && (!strcmp(wd->src->name, source_name))) return;
-   if ((wd->src) && (!wd->src->url_cb)) return;
+   if (wd->src)
+     {
+        if (!strcmp(wd->src->name, source_name)) return;
+        if (!wd->src->url_cb) return;
+     }
 
    EINA_LIST_FREE(wd->grids, grid) grid_clear(obj, grid);
    EINA_LIST_FOREACH(wd->map_sources_tab, l, s)
@@ -4691,22 +4200,16 @@ elm_map_source_name_set(Evas_Object *obj, const char *source_name)
    zoom = wd->zoom;
    wd->zoom = -1;
 
-   if (wd->src->zoom_max < zoom)
-     zoom = wd->src->zoom_max;
-   if (wd->src->zoom_min > zoom)
-     zoom = wd->src->zoom_min;
-
+   if (wd->src)
+     {
+        if (wd->src->zoom_max < zoom)
+          zoom = wd->src->zoom_max;
+        if (wd->src->zoom_min > zoom)
+          zoom = wd->src->zoom_min;
+     }
    elm_map_zoom_set(obj, zoom);
 }
 
-/**
- * Get the name of a source.
- *
- * @param source the source
- * @return Returns the name of the source
- *
- * @ingroup Map
- */
 EAPI const char *
 elm_map_source_name_get(const Evas_Object *obj)
 {
@@ -4717,14 +4220,6 @@ elm_map_source_name_get(const Evas_Object *obj)
    return wd->src->name;
 }
 
-/**
- * Set the source of the route.
- *
- * @param clas the group class
- * @param source the new source
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_route_source_set(Evas_Object *obj, Elm_Map_Route_Sources source)
 {
@@ -4735,14 +4230,6 @@ elm_map_route_source_set(Evas_Object *obj, Elm_Map_Route_Sources source)
    wd->route_source = source;
 }
 
-/**
- * Get the current route source
- *
- * @param obj the map object
- * @return Returns the source of the route
- *
- * @ingroup Map
- */
 EAPI Elm_Map_Route_Sources
 elm_map_route_source_get(const Evas_Object *obj)
 {
@@ -4753,13 +4240,6 @@ elm_map_route_source_get(const Evas_Object *obj)
    return wd->route_source;
 }
 
-/**
- * Set the maximum zoom of the source.
- *
- * @param source the source
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_source_zoom_max_set(Evas_Object *obj, int zoom)
 {
@@ -4771,14 +4251,6 @@ elm_map_source_zoom_max_set(Evas_Object *obj, int zoom)
    wd->src->zoom_max = zoom;
 }
 
-/**
- * Get the maximum zoom of the source.
- *
- * @param source the source
- * @return Returns the maximum zoom of the source
- *
- * @ingroup Map
- */
 EAPI int
 elm_map_source_zoom_max_get(const Evas_Object *obj)
 {
@@ -4789,13 +4261,6 @@ elm_map_source_zoom_max_get(const Evas_Object *obj)
    return wd->src->zoom_max;
 }
 
-/**
- * Set the minimum zoom of the source.
- *
- * @param source the source
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_source_zoom_min_set(Evas_Object *obj, int zoom)
 {
@@ -4807,15 +4272,6 @@ elm_map_source_zoom_min_set(Evas_Object *obj, int zoom)
    wd->src->zoom_min = zoom;
 }
 
-
-/**
- * Get the minimum zoom of the source.
- *
- * @param source the source
- * @return Returns the minimum zoom of the source
- *
- * @ingroup Map
- */
 EAPI int
 elm_map_source_zoom_min_get(const Evas_Object *obj)
 {
@@ -4826,14 +4282,6 @@ elm_map_source_zoom_min_get(const Evas_Object *obj)
    return wd->src->zoom_min;
 }
 
-/**
- * Set the user agent of the widget map.
- *
- * @param obj The map object
- * @param user_agent the user agent of the widget map
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_user_agent_set(Evas_Object *obj, const char *user_agent)
 {
@@ -4848,14 +4296,6 @@ elm_map_user_agent_set(Evas_Object *obj, const char *user_agent)
    eina_hash_set(wd->ua, "User-Agent", wd->user_agent);
 }
 
-/**
- * Get the user agent of the widget map.
- *
- * @param obj The map object
- * @return The user agent of the widget map
- *
- * @ingroup Map
- */
 EAPI const char *
 elm_map_user_agent_get(const Evas_Object *obj)
 {
@@ -4866,21 +4306,6 @@ elm_map_user_agent_get(const Evas_Object *obj)
    return wd->user_agent;
 }
 
-/**
- * Add a route on the map
- *
- * @param obj The map object
- * @param type the type if transport
- * @param method the routing method
- * @param flon the start longitude
- * @param flat the start latitude
- * @param tlon the destination longitude
- * @param tlat the destination latitude
- *
- * @return The Route object
- *
- * @ingroup Map
- */
 EAPI Elm_Map_Route *
 elm_map_route_add(Evas_Object *obj,
                   Elm_Map_Route_Type type,
@@ -4972,15 +4397,6 @@ elm_map_route_add(Evas_Object *obj,
    return route;
 }
 
-
-/**
- * Remove a route from the map
- *
- * @param route The route to remove
- *
- * @ingroup Map
- */
-
 EAPI void
 elm_map_route_remove(Elm_Map_Route *route)
 {
@@ -5021,19 +4437,6 @@ elm_map_route_remove(Elm_Map_Route *route)
      }
 }
 
-/**
- * Set the option used for the background color
- *
- * @param route The route object
- * @param r
- * @param g
- * @param b
- * @param a
- *
- * This sets the color used for the route
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_route_color_set(Elm_Map_Route *route, int r, int g , int b, int a)
 {
@@ -5044,17 +4447,6 @@ elm_map_route_color_set(Elm_Map_Route *route, int r, int g , int b, int a)
    route->color.a = a;
 }
 
-/**
- * Get the option used for the background color
- *
- * @param route The route object
- * @param r
- * @param g
- * @param b
- * @param a
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_route_color_get(const Elm_Map_Route *route, int *r, int *g , int *b, int *a)
 {
@@ -5065,29 +4457,12 @@ elm_map_route_color_get(const Elm_Map_Route *route, int *r, int *g , int *b, int
    if (a) *a = route->color.a;
 }
 
-/**
- * Get the information of route distance
- *
- * @param route the route object
- * @return Returns the distance of route (unit : km)
- *
- * @ingroup Map
- */
 EAPI double
 elm_map_route_distance_get(const Elm_Map_Route *route)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(route, 0.0);
    return route->info.distance;
 }
-
-/**
- * Get the information of route nodes
- *
- * @param route the route object
- * @return Returns the nodes of route
- *
- * @ingroup Map
- */
 
 EAPI const char*
 elm_map_route_node_get(const Elm_Map_Route *route)
@@ -5096,15 +4471,6 @@ elm_map_route_node_get(const Elm_Map_Route *route)
    return route->info.nodes;
 }
 
-/**
- * Get the information of route waypoint
- *
- * @param route the route object
- * @return Returns the waypoint of route
- *
- * @ingroup Map
- */
-
 EAPI const char*
 elm_map_route_waypoint_get(const Elm_Map_Route *route)
 {
@@ -5112,14 +4478,6 @@ elm_map_route_waypoint_get(const Elm_Map_Route *route)
    return route->info.waypoints;
 }
 
-/**
- * Get the information of address
- *
- * @param name the name object
- * @return Returns the address of name
- *
- * @ingroup Map
- */
 EAPI const char *
 elm_map_name_address_get(const Elm_Map_Name *name)
 {
@@ -5127,17 +4485,6 @@ elm_map_name_address_get(const Elm_Map_Name *name)
    return name->address;
 }
 
-/**
- * Get the current coordinates of the name.
- *
- * This gets the current coordinates of the name object.
- *
- * @param obj The name object
- * @param lat The latitude
- * @param lon The longitude
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_name_region_get(const Elm_Map_Name *name, double *lon, double *lat)
 {
@@ -5146,13 +4493,6 @@ elm_map_name_region_get(const Elm_Map_Name *name, double *lon, double *lat)
    if (lat) *lat = name->lat;
 }
 
-/**
- * Remove a name from the map
- *
- * @param name The name to remove
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_name_remove(Elm_Map_Name *name)
 {
@@ -5175,16 +4515,6 @@ elm_map_name_remove(Elm_Map_Name *name)
      }
 }
 
-/**
- * Set the rotate degree of the map
- *
- * @param obj The map object
- * @param angle amount of degrees from 0.0 to 360.0 to rotate arount Z axis
- * @param cx rotation's center horizontal position
- * @param cy rotation's center vertical position
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_rotate_set(Evas_Object *obj, double degree, Evas_Coord cx, Evas_Coord cy)
 {
@@ -5198,16 +4528,6 @@ elm_map_rotate_set(Evas_Object *obj, double degree, Evas_Coord cx, Evas_Coord cy
    wd->calc_job = ecore_job_add(_calc_job, wd);
 }
 
-/**
- * Get the rotate degree of the map
- *
- * @param obj The map object
- * @return amount of degrees from 0.0 to 360.0 to rotate arount Z axis
- * @param cx rotation's center horizontal position
- * @param cy rotation's center vertical position
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_rotate_get(const Evas_Object *obj, double *degree, Evas_Coord *cx, Evas_Coord *cy)
 {
@@ -5220,14 +4540,6 @@ elm_map_rotate_get(const Evas_Object *obj, double *degree, Evas_Coord *cx, Evas_
    if (cy) *cy = wd->rotate.cy;
 }
 
-/**
- * Set the wheel control state of the map
- *
- * @param obj The map object
- * @param disabled status of wheel control
- *
- * @ingroup Map
- */
 EAPI void
 elm_map_wheel_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 {
@@ -5242,14 +4554,6 @@ elm_map_wheel_disabled_set(Evas_Object *obj, Eina_Bool disabled)
    wd->wheel_disabled = !!disabled;
 }
 
-/**
- * Get the wheel control state of the map
- *
- * @param obj The map object
- * @return Returns the status of wheel control
- *
- * @ingroup Map
- */
 EAPI Eina_Bool
 elm_map_wheel_disabled_get(const Evas_Object *obj)
 {
@@ -5261,16 +4565,6 @@ elm_map_wheel_disabled_get(const Evas_Object *obj)
 }
 
 #ifdef ELM_EMAP
-/**
- * Add a track on the map
- *
- * @param obj The map object
- * @param emap the emap object
- *
- * @return The Route object. This is a elm object of type Elm_Route
- *
- * @ingroup Map
- */
 EAPI Evas_Object *
 elm_map_track_add(Evas_Object *obj, EMap_Route *emap)
 {
@@ -5286,14 +4580,6 @@ elm_map_track_add(Evas_Object *obj, EMap_Route *emap)
    return route;
 }
 #endif
-
-/**
- * Remove a track from the map
- *
- * @param track The track to remove
- *
- * @ingroup Map
- */
 
 EAPI void
 elm_map_track_remove(Evas_Object *obj, Evas_Object *route)
