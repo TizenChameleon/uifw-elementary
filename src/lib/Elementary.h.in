@@ -15688,11 +15688,11 @@ extern "C" {
     * @see elm_menu_add()
     */
    EAPI const Eina_List   *elm_menu_item_subitems_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1);
-   EAPI const Elm_Menu_Item *elm_menu_selected_item_get(const Evas_Object * obj) EINA_ARG_NONNULL(1);
-   EAPI const Elm_Menu_Item *elm_menu_last_item_get(const Evas_Object * obj) EINA_ARG_NONNULL(1);
-   EAPI const Elm_Menu_Item *elm_menu_first_item_get(const Evas_Object * obj) EINA_ARG_NONNULL(1);
-   EAPI const Elm_Menu_Item *elm_menu_item_next_get(const Elm_Menu_Item *it) EINA_ARG_NONNULL(1);
-   EAPI const Elm_Menu_Item *elm_menu_item_prev_get(const Elm_Menu_Item *it) EINA_ARG_NONNULL(1);
+   EAPI Elm_Menu_Item *elm_menu_selected_item_get(const Evas_Object * obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Menu_Item *elm_menu_last_item_get(const Evas_Object * obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Menu_Item *elm_menu_first_item_get(const Evas_Object * obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Menu_Item *elm_menu_item_next_get(const Elm_Menu_Item *it) EINA_ARG_NONNULL(1);
+   EAPI Elm_Menu_Item *elm_menu_item_prev_get(const Elm_Menu_Item *it) EINA_ARG_NONNULL(1);
 
    /**
     * @}
