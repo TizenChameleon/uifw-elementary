@@ -18673,7 +18673,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   EINA_DEPRECATED EAPI void elm_genlist_item_selected_set(Elm_Genlist_Item *item, Eina_Bool selected) EINA_ARG_NONNULL(1);
+   EAPI void elm_genlist_item_selected_set(Elm_Genlist_Item *item, Eina_Bool selected) EINA_ARG_NONNULL(1);
    /**
     * Get whether a given genlist item is selected or not
     *
@@ -18684,7 +18684,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   EINA_DEPRECATED EAPI Eina_Bool elm_genlist_item_selected_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool elm_genlist_item_selected_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
    /**
     * Sets the expanded state of an item.
     *
