@@ -53,7 +53,6 @@ static void _elm_tooltip_show_timer_stop(Elm_Tooltip *tt);
 static void _elm_tooltip_hide(Elm_Tooltip *tt);
 static void _elm_tooltip_data_clean(Elm_Tooltip *tt);
 
-
 static void
 _elm_tooltip_content_changed_hints_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -263,8 +262,8 @@ _elm_tooltip_reconfigure(Elm_Tooltip *tt)
         evas_object_pass_events_set(tt->tooltip, EINA_TRUE);
         tt->changed_style = EINA_FALSE;
         if (tt->tooltip)
-          edje_object_part_swallow
-            (tt->tooltip, "elm.swallow.content", tt->content);
+          edje_object_part_swallow(tt->tooltip, "elm.swallow.content",
+                                   tt->content);
 
         edje_object_signal_emit(tt->tooltip, "elm,action,show", "elm");
      }
@@ -412,7 +411,6 @@ _elm_tooltip_obj_mouse_out_cb(void *data, Evas *e  __UNUSED__, Evas_Object *obj 
         _elm_tooltip_show_timer_stop(tt);
         return;
      }
-
    _elm_tooltip_hide_anim_start(tt);
 }
 
@@ -523,7 +521,7 @@ elm_tooltip_theme(Elm_Tooltip *tt)
  *        @a Evas_Object parameters will receive @a owner as value.
  * @param data what to provide to @a func as callback data/context.
  * @param del_cb called when data is not needed anymore, either when
- *        another callback replaces @func, the tooltip is unset with
+ *        another callback replaces @p func, the tooltip is unset with
  *        elm_object_tooltip_unset() or the owner object @a obj
  *        dies. This callback receives as the first parameter the
  *        given @a data, and @c event_info is NULL.
