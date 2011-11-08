@@ -117,6 +117,7 @@ void _search_clipboard_window(Ecore_X_Window w)
 	{
 		for(i = 0; i < nchildren; i++)
 			_search_clipboard_window(wchild[i]);
+		XFree(wchild);
 	}
 #endif
 }
@@ -130,7 +131,7 @@ int _send_clipboard_events(char *cmd)
 	Atom atomCBHM_MSG = XInternAtom(cbhm_disp, "CBHM_MSG", False);
 
 	XClientMessageEvent m;
-	memset(&m, sizeof(m), 0);
+	memset(&m, 0, sizeof(m));
 	m.type = ClientMessage;
 	m.display = cbhm_disp;
 	m.window = self_win;

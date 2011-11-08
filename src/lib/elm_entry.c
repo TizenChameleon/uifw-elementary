@@ -1755,14 +1755,23 @@ _matchlist_show(void *data)
 
                   textlen = strlen(str_list) - strlen(str_result);
                   str_front = malloc(textlen + 1);
-                  if (str_front == NULL) return;
+                  if (str_front == NULL)
+                    {
+                       free(str_mkup);
+                       return;
+                    }
 
                   memset(str_front, 0, textlen + 1);
                   strncpy(str_front, str_list, textlen);
 
                   textlen = strlen(text);
                   str_mid = malloc(textlen + 1);
-                  if (str_mid == NULL) return;
+                  if (str_mid == NULL)
+                    {
+                       free(str_mkup);
+                       free(str_front);
+                       return;
+                    }
 
                   memset(str_mid, 0, textlen + 1);
                   strncpy(str_mid, str_list + strlen(str_front), textlen);
@@ -1797,17 +1806,20 @@ static void _matchlist_list_clicked( void *data, Evas_Object *obj, void *event_i
    if ((it == NULL) || (wd == NULL))
      return;
 
+   const char *str = NULL;
    const char *text = elm_list_item_label_get(it);
    evas_object_smart_callback_call((Evas_Object *)data, "selected", (void *)text);
    if (wd->match_list)
      {
         if (text != NULL)
           {
-             elm_entry_entry_set(data, elm_entry_markup_to_utf8(text));
+             str = elm_entry_markup_to_utf8(text);
+             elm_entry_entry_set(data, str);
              elm_entry_cursor_end_set(data);
              wd->matchlist_list_clicked = EINA_TRUE;
 
              evas_object_smart_callback_call(data, SIG_MATCHLIST_CLICKED, elm_entry_markup_to_utf8(text));
+             free(str);
           }
      }
    elm_widget_focus_set(data, EINA_TRUE);
@@ -2420,16 +2432,16 @@ _strbuf_key_value_replace(Eina_Strbuf *srcbuf, char *key, const char *value, int
 {
    const char *srcstring = NULL;
    Eina_Strbuf *repbuf = NULL, *diffbuf = NULL;
-   char *curlocater, *replocater;
+   char *curlocater = NULL, *replocater;
    char *starttag, *endtag;
    int tagtxtlen = 0, insertflag = 0;
 
    srcstring = eina_strbuf_string_get(srcbuf);
-   curlocater = strstr(srcstring, key);
-
+   if (srcstring)
+     curlocater = strstr(srcstring, key);
    if (!curlocater || !srcstring)
      {
-       insertflag = 1;
+        insertflag = 1;
      }
    else
      {
@@ -3104,6 +3116,7 @@ elm_entry_is_empty(const Evas_Object *obj)
 
    ret = (strlen(str) == 0);
 
+   free(str);
    return ret;
 }
 

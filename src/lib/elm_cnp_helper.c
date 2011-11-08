@@ -823,8 +823,7 @@ _set_EFL_item_data(PItemTagData data, const char *tag_str)
         if (path)
           {
              char *modify = malloc(sizeof(char) * (strlen(value) + 1));
-             strncpy(modify, "file://", 7);
-             modify[7] = '\0';
+             strncpy(modify, "file://", 8);
              path += 7;
              while (path[1] && path[0] && path[1] == '/' && path[0] == '/')
                {
@@ -905,8 +904,7 @@ _set_HTML_img_data(PItemTagData data, const char *tag_str)
         if (path)
           {
              char *modify = malloc(sizeof(char) * (strlen(value) + 1));
-             strncpy(modify, "file://", 7);
-             modify[7] = '\0';
+             strncpy(modify, "file://", 8);
              path += 7;
              while (path[1] && path[0] && path[1] == '/' && path[0] == '/')
                {
@@ -1939,14 +1937,20 @@ edje_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **
         if (edje)
           *data_ret = edje;
         else
-          *data_ret = strdup(sel->selbuf);
+           if (sel->selbuf)
+             *data_ret = strdup(sel->selbuf);
+           else
+             *data_ret = strdup("");
      }
    if (size_ret)
      {
         if (edje)
           *size_ret = strlen(edje);
         else
-          *size_ret = strlen(sel->selbuf);
+          if (sel->selbuf)
+            *size_ret = strlen(sel->selbuf);
+          else
+            *size_ret = 0;
      }
 
    return EINA_TRUE;
@@ -2006,7 +2010,10 @@ html_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **
         if (html)
           *data_ret = html;
         else
-          *data_ret = strdup(sel->selbuf);
+          if (sel->selbuf)
+            *data_ret = strdup(sel->selbuf);
+          else
+            *data_ret = strdup("");
      }
 
    if (size_ret)
@@ -2014,7 +2021,10 @@ html_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **
         if (html)
           *size_ret = strlen(html);
         else
-          *size_ret = strlen(sel->selbuf);
+          if (sel->selbuf)
+            *size_ret = strlen(sel->selbuf);
+          else
+            *size_ret = 0;
      }
    if (convert_target != sel->selbuf)
      free(convert_target);
@@ -2700,7 +2710,6 @@ elm_cnp_tempfile_create(int size)
 
    tmppath = getenv("TMP");
    if (!tmppath) tmppath = P_tmpdir;
-   if (!tmppath) tmppath = "/tmp";
    len = snprintf(NULL, 0, "%s/%sXXXXXX", tmppath, "elmcnpitem-");
    if (len < 0)
      {
