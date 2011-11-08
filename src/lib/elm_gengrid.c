@@ -2397,6 +2397,7 @@ elm_gengrid_bounce_get(const Evas_Object *obj,
    *v_bounce = wd->v_bounce;
 }
 
+EAPI void
 elm_gengrid_page_relative_set(Evas_Object *obj,
                               double       h_pagerel,
                               double       v_pagerel)
