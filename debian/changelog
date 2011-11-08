@@ -1,3 +1,9 @@
+elementary (1.0.0+svn.61256slp2+build72) unstable; urgency=low
+
+  * Sync with upstream
+
+ -- Mike McCormack <mj.mccormack@samsung.com>  Tue, 08 Nov 2011 16:26:32 +0900
+
 elementary (1.0.0+svn.61256slp2+build71) unstable; urgency=low
 
   * Remove deprecated macro from elm_genlist_item_selected_set/get
