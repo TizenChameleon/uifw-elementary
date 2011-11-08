@@ -19,13 +19,6 @@
 
 static Elm_Version _version = { VMAJ, VMIN, VMIC, VREV };
 EAPI Elm_Version *elm_version = &_version;
-/**
- * @defgroup Main Main
- * @ingroup Elementary
- *
- * This group includes functions of elm_main.c
- */
-
 
 Eina_Bool
 _elm_dangerous_call_check(const char *call)
@@ -52,247 +45,6 @@ _elm_dangerous_call_check(const char *call)
           call);
    return 1;
 }
-
-/**
- * @defgroup Start Getting Started
- * @ingroup Main
- *
- * To write an Elementary app, you can get started with the following:
- *
- * @code
- * #include <Elementary.h>
- * #ifndef ELM_LIB_QUICKLAUNCH
- * EAPI int
- * elm_main(int argc, char **argv)
- * {
- *    // create window(s) here and do any application init
- *    elm_run(); // run main loop
- *    elm_shutdown(); // after mainloop finishes running, shutdown
- *    return 0; // exit 0 for exit code
- * }
- * #endif
- * ELM_MAIN()
- * @endcode
- *
- * To take full advantage of the quicklaunch architecture for launching
- * processes as quickly as possible (saving time at startup time like
- * connecting to X11, loading and linking shared libraries) you may want to
- * use the following configure.in/configure.ac and Makefile.am and autogen.sh
- * script to generate your files. It is assumed your application uses the
- * main.c file for its code.
- *
- * configure.in/configure.ac:
- *
-@verbatim
-AC_INIT(myapp, 0.0.0, myname@mydomain.com)
-AC_PREREQ(2.52)
-AC_CONFIG_SRCDIR(configure.in)
-
-AM_INIT_AUTOMAKE(1.6 dist-bzip2)
-AM_CONFIG_HEADER(config.h)
-
-AC_C_BIGENDIAN
-AC_ISC_POSIX
-AC_PROG_CC
-AM_PROG_CC_STDC
-AC_HEADER_STDC
-AC_C_CONST
-
-AC_LIBTOOL_WIN32_DLL
-define([AC_LIBTOOL_LANG_CXX_CONFIG], [:])dnl
-define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
-AC_PROG_LIBTOOL
-
-PKG_CHECK_MODULES([ELEMENTARY], elementary)
-
-AC_OUTPUT(Makefile)
-@endverbatim
- *
- * Makefile.am:
- *
-@verbatim
-AUTOMAKE_OPTIONS     = 1.4 foreign
-MAINTAINERCLEANFILES = Makefile.in
-
-INCLUDES = -I$(top_srcdir) @ELEMENTARY_CFLAGS@
-
-bin_PROGRAMS      = myapp
-myapp_LTLIBRARIES = myapp.la
-
-myappdir = $(libdir)
-
-myapp_la_SOURCES = main.c
-myapp_la_LIBADD = @ELEMENTARY_LIBS@
-myapp_la_CFLAGS =
-myapp_la_LDFLAGS = -module -avoid-version -no-undefined
-
-myapp_SOURCES = main.c
-myapp_LDADD = @ELEMENTARY_LIBS@
-myapp_CFLAGS = -DELM_LIB_QUICKLAUNCH=1
-@endverbatim
- *
- * autogen.sh:
- *
-@verbatim
-#!/bin/sh
-rm -rf autom4te.cache
-rm -f aclocal.m4 ltmain.sh
-rm -rf m4
-mkdir m4
-
-touch README
-echo "Running aclocal..." ; aclocal $ACLOCAL_FLAGS -I m4 || exit 1
-echo "Running autoheader..." ; autoheader || exit 1
-echo "Running autoconf..." ; autoconf || exit 1
-echo "Running libtoolize..." ; (libtoolize --copy --automake || glibtoolize --automake) || exit 1
-echo "Running automake..." ; automake --add-missing --copy --gnu || exit 1
-
-if [ -z "$NOCONFIGURE" ]; then
-  ./configure "$@"
-fi
-@endverbatim
- *
- * To gnerate all the things needed to bootstrap just run:
- *
-@verbatim
-./autogen.sh
-@endverbatim
- *
- * This will generate Makefile.in's, the confgure script and everything else.
- * After this it works like all normal autotools projects:
-@verbatim
-./configure
-make
-sudo make install
-@endverbatim
- *
- * Note sudo was assumed to get root permissions, as this would install in
- * /usr/local which is system-owned. Use any way you like to gain root, or
- * specify a different prefix with configure:
- *
-@verbatim
-./confiugre --prefix=$HOME/mysoftware
-@endverbatim
- *
- * Also remember that autotools buys you some useful commands like:
-@verbatim
-make uninstall
-@endverbatim
- *
- * This uninstalls the software after it was installed with "make install".
- * It is very useful to clear up what you built if you wish to clean the
- * system.
- *
-@verbatim
-make distcheck
-@endverbatim
- *
- * This firstly checks if your build tree is "clean" and ready for
- * distribution. It also builds a tarball (myapp-0.0.0.tar.gz) that is
- * ready to upload and distribute to the world, that contains the generated
- * Makefile.in's and configure script. The users do not need to run
- * autogen.sh - just configure and on. They don't need autotools installed.
- * This tarball also builds cleanly, has all the sources it needs to build
- * included (that is sources for your application, not libraries it depends
- * on like Elementary). It builds cleanly in a buildroot and does not
- * contain any files that are temporarily generated like binaries and other
- * build-generated files, so the tarball is clean, and no need to worry
- * about cleaning up your tree before packaging.
- *
-@verbatim
-make clean
-@endverbatim
- *
- * This cleans up all build files (binaries, objects etc.) from the tree.
- *
-@verbatim
-make distclean
-@endverbatim
- *
- * This cleans out all files from the build and from configure's output too.
- *
-@verbatim
-make maintainer-clean
-@endverbatim
- *
- * This deletes all the files autogen.sh will produce so the tree is clean
- * to be put into a revision-control system (like CVS, SVN or GIT for example).
- *
- * The above will build a library - libmyapp.so and install in the target
- * library directory (default is /usr/local/lib). You will also get a
- * myapp.a and myapp.la - these are useless and can be deleted. Libtool likes
- * to generate these all the time. You will also get a binary in the target
- * binary directory (default is /usr/local/bin). This is a "debug binary".
- * This will run and dlopen() the myapp.so and then jump to it's elm_main
- * function. This allows for easy debugging with GDB and Valgrind. When you
- * are ready to go to production do the following:
- *
- * 1. delete the myapp binary. i.e. rm /usr/local/bin/myapp
- *
- * 2. symlink the myapp binary to elementary_run (supplied by elementary).
- * i.e. ln -s elmentary_run /usr/local/bin/myapp
- *
- * 3. run elementary_quicklaunch as part of your graphical login session and
- * keep it running.
- *
- * This will man elementary_quicklaunch does pre-initialization before the
- * application needs to be run, saving the effort at the time the application
- * is needed, thus speeding up the time it takes to appear.
- *
- * If you don't want to use the quicklaunch infrastructure (which is
- * optional), you can execute the old fashioned way by just running the
- * myapp binary loader than will load the myapp.so for you, or you can
- * remove the split-file binary and put it into one binary as things always
- * have been with the following configure.in/configure.ac and Makfile.am
- * files:
- *
- * configure.in/configure.ac:
- *
-@verbatim
-AC_INIT(myapp, 0.0.0, myname@mydomain.com)
-AC_PREREQ(2.52)
-AC_CONFIG_SRCDIR(configure.in)
-
-AM_INIT_AUTOMAKE(1.6 dist-bzip2)
-AM_CONFIG_HEADER(config.h)
-
-AC_C_BIGENDIAN
-AC_ISC_POSIX
-AC_PROG_CC
-AM_PROG_CC_STDC
-AC_HEADER_STDC
-AC_C_CONST
-
-PKG_CHECK_MODULES([ELEMENTARY], elementary)
-
-AC_OUTPUT(Makefile)
-@endverbatim
- *
- * Makefile.am:
- *
-@verbatim
-AUTOMAKE_OPTIONS     = 1.4 foreign
-MAINTAINERCLEANFILES = Makefile.in
-
-INCLUDES = -I$(top_srcdir) @ELEMENTARY_CFLAGS@
-
-bin_PROGRAMS      = myapp
-
-myapp_SOURCES = main.c
-myapp_LDADD = @ELEMENTARY_LIBS@
-myapp_CFLAGS =
-@endverbatim
- *
- * Notice that they are the same as before, just with libtool and library
- * building sections removed. Both ways work for building elementary
- * applications. It is up to you to decide what is best for you. If you just
- * follow the template above, you can do it both ways and can decide at build
- * time. The more advanced of you may suggest making it a configure option.
- * That is perfectly valid, but has been left out here for simplicity, as our
- * aim to have an Elementary (and EFL) tutorial, not an autoconf & automake
- * document.
- *
- */
 
 static Eina_Bool _elm_signal_exit(void *data,
                                   int   ev_type,
@@ -1123,24 +875,6 @@ elm_policy_get(unsigned int policy)
    return _elm_policies[policy];
 }
 
-/**
- * @defgroup UI-Mirroring Selective Widget mirroring
- *
- * These functions allow you to set ui-mirroring on specific widgets or the
- * whole interface. Widgets can be in one of two modes, automatic and manual.
- * Automatic means they'll be changed according to the system mirroring mode
- * and manual means only explicit changes will matter. You are not supposed to
- * change mirroring state of a widget set to automatic, will mostly work, but
- * the behavior is not really defined.
- */
-
-/**
- * Returns the widget's mirrored mode.
- *
- * @param obj The widget.
- * @return mirrored mode of the object.
- *
- **/
 EAPI Eina_Bool
 elm_object_mirrored_get(const Evas_Object *obj)
 {
@@ -1148,12 +882,6 @@ elm_object_mirrored_get(const Evas_Object *obj)
    return elm_widget_mirrored_get(obj);
 }
 
-/**
- * Sets the widget's mirrored mode.
- *
- * @param obj The widget.
- * @param mirrored EINA_TRUE to set mirrored mode. EINA_FALSE to unset.
- */
 EAPI void
 elm_object_mirrored_set(Evas_Object *obj, Eina_Bool mirrored)
 {
@@ -1161,13 +889,6 @@ elm_object_mirrored_set(Evas_Object *obj, Eina_Bool mirrored)
    elm_widget_mirrored_set(obj, mirrored);
 }
 
-/**
- * Returns the widget's mirrored mode setting.
- *
- * @param obj The widget.
- * @return mirrored mode setting of the object.
- *
- **/
 EAPI Eina_Bool
 elm_object_mirrored_automatic_get(const Evas_Object *obj)
 {
@@ -1175,13 +896,6 @@ elm_object_mirrored_automatic_get(const Evas_Object *obj)
    return elm_widget_mirrored_automatic_get(obj);
 }
 
-/**
- * Sets the widget's mirrored mode setting.
- * When widget in automatic mode, it follows the system mirrored mode set by
- * elm_mirrored_set().
- * @param obj The widget.
- * @param automatic EINA_TRUE for auto mirrored mode. EINA_FALSE for manual.
- */
 EAPI void
 elm_object_mirrored_automatic_set(Evas_Object *obj, Eina_Bool automatic)
 {
@@ -1239,30 +953,12 @@ elm_object_content_part_unset(Evas_Object *obj, const char *part)
    return elm_widget_content_part_unset(obj, part);
 }
 
-/**
- * Get the global scaling factor
- *
- * This gets the globally configured scaling factor that is applied to all
- * objects.
- *
- * @return The scaling factor
- * @ingroup Scaling
- */
 EAPI double
 elm_scale_get(void)
 {
    return _elm_config->scale;
 }
 
-/**
- * Set the global scaling factor
- *
- * This sets the globally configured scaling factor that is applied to all
- * objects.
- *
- * @param scale The scaling factor to set
- * @ingroup Scaling
- */
 EAPI void
 elm_scale_set(double scale)
 {
@@ -1271,14 +967,6 @@ elm_scale_set(double scale)
    _elm_rescale();
 }
 
-/**
- * Set the global scaling factor for all applications on the display
- *
- * This sets the globally configured scaling factor that is applied to all
- * objects for all applications.
- * @param scale The scaling factor to set
- * @ingroup Scaling
- */
 EAPI void
 elm_scale_all_set(double scale)
 {
@@ -1350,95 +1038,24 @@ elm_object_disabled_get(const Evas_Object *obj)
    return elm_widget_disabled_get(obj);
 }
 
-/**
- * @defgroup Config Elementary Config
- * @ingroup Main
- *
- * Elementary configuration is formed by a set options bounded to a
- * given @ref Profile profile, like @ref Theme theme, @ref Fingers
- * "finger size", etc. These are functions with which one syncronizes
- * changes made to those values to the configuration storing files, de
- * facto. You most probably don't want to use the functions in this
- * group unlees you're writing an elementary configuration manager.
- */
-
-/**
- * Save back Elementary's configuration, so that it will persist on
- * future sessions.
- *
- * @return @c EINA_TRUE, when sucessful. @c EINA_FALSE, otherwise.
- * @ingroup Config
- *
- * This function will take effect -- thus, do I/O -- immediately. Use
- * it when you want to apply all configuration changes at once. The
- * current configuration set will get saved onto the current profile
- * configuration file.
- *
- */
 EAPI Eina_Bool
 elm_config_save(void)
 {
    return _elm_config_save();
 }
 
-/**
- * Reload Elementary's configuration, bounded to current selected
- * profile.
- *
- * @return @c EINA_TRUE, when sucessful. @c EINA_FALSE, otherwise.
- * @ingroup Config
- *
- * Useful when you want to force reloading of configuration values for
- * a profile. If one removes user custom configuration directories,
- * for example, it will force a reload with system values insted.
- *
- */
 EAPI void
 elm_config_reload(void)
 {
    _elm_config_reload();
 }
 
-/**
- * @defgroup Profile Elementary Profile
- * @ingroup Main
- *
- * Profiles are pre-set options that affect the whole look-and-feel of
- * Elementary-based applications. There are, for example, profiles
- * aimed at desktop computer applications and others aimed at mobile,
- * touchscreen-based ones. You most probably don't want to use the
- * functions in this group unlees you're writing an elementary
- * configuration manager.
- */
-
-/**
- * Get Elementary's profile in use.
- *
- * This gets the global profile that is applied to all Elementary
- * applications.
- *
- * @return The profile's name
- * @ingroup Profile
- */
 EAPI const char *
 elm_profile_current_get(void)
 {
    return _elm_config_current_profile_get();
 }
 
-/**
- * Get an Elementary's profile directory path in the filesystem. One
- * may want to fetch a system profile's dir or an user one (fetched
- * inside $HOME).
- *
- * @param profile The profile's name
- * @param is_user Whether to lookup for an user profile (@c EINA_TRUE)
- *                or a system one (@c EINA_FALSE)
- * @return The profile's directory path.
- * @ingroup Profile
- *
- * @note You must free it with elm_profile_dir_free().
- */
 EAPI const char *
 elm_profile_dir_get(const char *profile,
                     Eina_Bool   is_user)
@@ -1446,43 +1063,18 @@ elm_profile_dir_get(const char *profile,
    return _elm_config_profile_dir_get(profile, is_user);
 }
 
-/**
- * Free an Elementary's profile directory path, as returned by
- * elm_profile_dir_get().
- *
- * @param p_dir The profile's path
- * @ingroup Profile
- *
- */
 EAPI void
 elm_profile_dir_free(const char *p_dir)
 {
    free((void *)p_dir);
 }
 
-/**
- * Get Elementary's list of available profiles.
- *
- * @return The profiles list. List node data are the profile name
- *         strings.
- * @ingroup Profile
- *
- * @note One must free this list, after usage, with the function
- *       elm_profile_list_free().
- */
 EAPI Eina_List *
 elm_profile_list_get(void)
 {
    return _elm_config_profiles_list();
 }
 
-/**
- * Free Elementary's list of available profiles.
- *
- * @param The profiles list, as returned by elm_profile_list_get().
- * @ingroup Profile
- *
- */
 EAPI void
 elm_profile_list_free(Eina_List *l)
 {
@@ -1492,17 +1084,6 @@ elm_profile_list_free(Eina_List *l)
      eina_stringshare_del(dir);
 }
 
-/**
- * Set Elementary's profile.
- *
- * This sets the global profile that is applied to Elementary
- * applications. Just the process the call comes from will be
- * affected.
- *
- * @param profile The profile's name
- * @ingroup Profile
- *
- */
 EAPI void
 elm_profile_set(const char *profile)
 {
@@ -1510,16 +1091,6 @@ elm_profile_set(const char *profile)
    _elm_config_profile_set(profile);
 }
 
-/**
- * Set Elementary's profile.
- *
- * This sets the global profile that is applied to all Elementary
- * applications. All running Elementary windows will be affected.
- *
- * @param profile The profile's name
- * @ingroup Profile
- *
- */
 EAPI void
 elm_profile_all_set(const char *profile)
 {
@@ -1532,43 +1103,12 @@ elm_profile_all_set(const char *profile)
 #endif
 }
 
-/**
- * @defgroup Engine Elementary Engine
- * @ingroup Main
- *
- * These are functions setting and querying which rendering engine
- * Elementary will use for drawing its windows' pixels.
- */
-
-/**
- * Get Elementary's rendering engine in use.
- *
- * This gets the global rendering engine that is applied to all
- * Elementary applications.
- *
- * @return The rendering engine's name
- * @ingroup Engine
- *
- * @note there's no need to free the returned string, here.
- */
 EAPI const char *
 elm_engine_current_get(void)
 {
    return _elm_config->engine;
 }
 
-/**
- * Set Elementary's rendering engine for use.
- *
- * This gets sets global rendering engine that is applied to all
- * Elementary applications. Note that it will take effect only to
- * subsequent Elementary window creations.
- *
- * @param The rendering engine's name
- * @ingroup Engine
- *
- * @note there's no need to free the returned string, here.
- */
 EAPI void
 elm_engine_set(const char *engine)
 {
@@ -1577,77 +1117,24 @@ elm_engine_set(const char *engine)
    _elm_config_engine_set(engine);
 }
 
-/**
- * @defgroup Fonts Elementary Fonts
- * @ingroup Main
- *
- * These are functions dealing with font rendering, selection and the
- * like for Elementary applications. One might fetch which system
- * fonts are there to use and set custom fonts for individual classes
- * of UI items containing text (text classes).
- */
-
-/**
- * Get Elementary's list of supported text classes.
- *
- * @return The text classes list, with @c Elm_Text_Class blobs as data.
- * @ingroup Fonts
- *
- * Release the list with elm_text_classes_list_free().
- */
 EAPI const Eina_List *
 elm_text_classes_list_get(void)
 {
    return _elm_config_text_classes_get();
 }
 
-/**
- * Free Elementary's list of supported text classes.
- *
- * @ingroup Fonts
- *
- * @see elm_text_classes_list_get().
- */
 EAPI void
 elm_text_classes_list_free(const Eina_List *list)
 {
    _elm_config_text_classes_free((Eina_List *)list);
 }
 
-/**
- * Get Elementary's list of font overlays, set with
- * elm_font_overlay_set().
- *
- * @return The font overlays list, with @c Elm_Font_Overlay blobs as
- * data.
- *
- * @ingroup Fonts
- *
- * For each text class, one can set a <b>font overlay</b> for it,
- * overriding the default font properties for that class coming from
- * the theme in use. There is no need to free this list.
- *
- * @see elm_font_overlay_set() and elm_font_overlay_unset().
- */
 EAPI const Eina_List *
 elm_font_overlay_list_get(void)
 {
    return _elm_config_font_overlays_list();
 }
 
-/**
- * Set a font overlay for a given Elementary text class.
- *
- * @param text_class Text class name
- * @param font Font name and style string
- * @param size Font size
- *
- * @ingroup Fonts
- *
- * @p font has to be in the format returned by
- * elm_font_fontconfig_name_get(). @see elm_font_overlay_list_get()
- * and @elm_font_overlay_unset().
- */
 EAPI void
 elm_font_overlay_set(const char    *text_class,
                      const char    *font,
@@ -1656,44 +1143,18 @@ elm_font_overlay_set(const char    *text_class,
    _elm_config_font_overlay_set(text_class, font, size);
 }
 
-/**
- * Unset a font overlay for a given Elementary text class.
- *
- * @param text_class Text class name
- *
- * @ingroup Fonts
- *
- * This will bring back text elements belonging to text class @p
- * text_class back to their default font settings.
- */
 EAPI void
 elm_font_overlay_unset(const char *text_class)
 {
    _elm_config_font_overlay_remove(text_class);
 }
 
-/**
- * Apply the changes made with elm_font_overlay_set() and
- * elm_font_overlay_unset() on the current Elementary window.
- *
- * @ingroup Fonts
- *
- * This applies all font overlays set to all objects in the UI.
- */
 EAPI void
 elm_font_overlay_apply(void)
 {
    _elm_config_font_overlay_apply();
 }
 
-/**
- * Apply the changes made with elm_font_overlay_set() and
- * elm_font_overlay_unset() on all Elementary application windows.
- *
- * @ingroup Fonts
- *
- * This applies all font overlays set to all objects in the UI.
- */
 EAPI void
 elm_font_overlay_all_apply(void)
 {
@@ -1707,19 +1168,6 @@ elm_font_overlay_all_apply(void)
 #endif
 }
 
-/**
- * Translate a font (family) name string in fontconfig's font names
- * syntax into an @c Elm_Font_Properties struct.
- *
- * @param font The font name and styles string
- * @return the font properties struct
- *
- * @ingroup Fonts
- *
- * @note The reverse translation can be achived with
- * elm_font_fontconfig_name_get(), for one style only (single font
- * instance, not family).
- */
 EAPI Elm_Font_Properties *
 elm_font_properties_get(const char *font)
 {
@@ -1727,13 +1175,6 @@ elm_font_properties_get(const char *font)
    return _elm_font_properties_get(NULL, font);
 }
 
-/**
- * Free font properties return by elm_font_properties_get().
- *
- * @param efp the font properties struct
- *
- * @ingroup Fonts
- */
 EAPI void
 elm_font_properties_free(Elm_Font_Properties *efp)
 {
@@ -1746,21 +1187,6 @@ elm_font_properties_free(Elm_Font_Properties *efp)
    free(efp);
 }
 
-/**
- * Translate a font name, bound to a style, into fontconfig's font names
- * syntax.
- *
- * @param name The font (family) name
- * @param style The given style (may be @c NULL)
- *
- * @return the font name and style string
- *
- * @ingroup Fonts
- *
- * @note The reverse translation can be achived with
- * elm_font_properties_get(), for one style only (single font
- * instance, not family).
- */
 EAPI const char *
 elm_font_fontconfig_name_get(const char *name,
                              const char *style)
@@ -1773,36 +1199,12 @@ elm_font_fontconfig_name_get(const char *name,
    return eina_stringshare_add(buf);
 }
 
-/**
- * Free the font string return by elm_font_fontconfig_name_get().
- *
- * @param efp the font properties struct
- *
- * @ingroup Fonts
- */
 EAPI void
 elm_font_fontconfig_name_free(const char *name)
 {
    eina_stringshare_del(name);
 }
 
-/**
- * Create a font hash table of available system fonts.
- *
- * One must call it with @p list being the return value of
- * evas_font_available_list(). The hash will be indexed by font
- * (family) names, being its values @c Elm_Font_Properties blobs.
- *
- * @param list The list of available system fonts, as returned by
- * evas_font_available_list().
- * @return the font hash.
- *
- * @ingroup Fonts
- *
- * @note The user is supposed to get it populated at least with 3
- * default font families (Sans, Serif, Monospace), which should be
- * present on most systems.
- */
 EAPI Eina_Hash *
 elm_font_available_hash_add(Eina_List *list)
 {
@@ -1840,13 +1242,6 @@ elm_font_available_hash_add(Eina_List *list)
    return font_hash;
 }
 
-/**
- * Free the hash return by elm_font_available_hash_add().
- *
- * @param hash the hash to be freed.
- *
- * @ingroup Fonts
- */
 EAPI void
 elm_font_available_hash_del(Eina_Hash *hash)
 {
@@ -1859,14 +1254,6 @@ elm_finger_size_get(void)
    return _elm_config->finger_size;
 }
 
-/**
- * Set the configured finger size
- *
- * This sets the globally configured finger size in pixels
- *
- * @param size The finger size
- * @ingroup Fingers
- */
 EAPI void
 elm_finger_size_set(Evas_Coord size)
 {
@@ -1875,15 +1262,6 @@ elm_finger_size_set(Evas_Coord size)
    _elm_rescale();
 }
 
-/**
- * Set the configured finger size for all applications on the display
- *
- * This sets the globally configured finger size in pixels for all applications
- * on the display
- *
- * @param size The finger size
- * @ingroup Fingers
- */
 EAPI void
 elm_finger_size_all_set(Evas_Coord size)
 {
@@ -1922,20 +1300,7 @@ elm_autoperiod_allow_all_set(Eina_Bool on)
                                   atom, &on_i, 1);
 #endif
 }
-/**
- * Adjust size of an element for finger usage
- *
- * This takes width and height sizes (in pixels) as input and a size multiple
- * (which is how many fingers you want to place within the area), and adjusts
- * the size tobe large enough to accommodate finger. On return the w and h
- * sizes poiner do by these parameters will be modified.
- *
- * @param times_w How many fingers should fit horizontally
- * @param w Pointer to the width size to adjust
- * @param times_h How many fingers should fit vertically
- * @param h Pointer to the height size to adjust
- * @ingroup Fingers
- */
+
 EAPI void
 elm_coords_finger_size_adjust(int         times_w,
                               Evas_Coord *w,
@@ -1948,20 +1313,6 @@ elm_coords_finger_size_adjust(int         times_w,
      *h = _elm_config->finger_size * times_h;
 }
 
-/**
- * @defgroup Caches Caches
- * @ingroup Main
- *
- * These are functions which let one fine-tune some cache values for
- * Elementary applications, thus allowing for performance adjustments.
- */
-
-/**
- * Flush all caches & dump all data that can be to lean down to use
- * less memory
- *
- * @ingroup Caches
- */
 EAPI void
 elm_all_flush(void)
 {
@@ -1980,33 +1331,12 @@ elm_all_flush(void)
      }
 }
 
-/**
- * Get the configured cache flush interval time
- *
- * This gets the globally configured cache flush interval time, in
- * ticks
- *
- * @return The cache flush interval time
- * @ingroup Caches
- *
- * @see elm_all_flush()
- */
 EAPI int
 elm_cache_flush_interval_get(void)
 {
    return _elm_config->cache_flush_poll_interval;
 }
 
-/**
- * Set the configured cache flush interval time
- *
- * This sets the globally configured cache flush interval time, in ticks
- *
- * @param size The cache flush interval time
- * @ingroup Caches
- *
- * @see elm_all_flush()
- */
 EAPI void
 elm_cache_flush_interval_set(int size)
 {
@@ -2016,16 +1346,6 @@ elm_cache_flush_interval_set(int size)
    _elm_recache();
 }
 
-/**
- * Set the configured cache flush interval time for all applications on the
- * display
- *
- * This sets the globally configured cache flush interval time -- in ticks
- * -- for all applications on the display.
- *
- * @param size The cache flush interval time
- * @ingroup Caches
- */
 EAPI void
 elm_cache_flush_interval_all_set(int size)
 {
@@ -2039,38 +1359,12 @@ elm_cache_flush_interval_all_set(int size)
 #endif
 }
 
-/**
- * Get the configured cache flush enabled state
- *
- * This gets the globally configured cache flush state - if it is enabled
- * or not. When cache flushing is enabled, elementary will regularly
- * (see elm_cache_flush_interval_get() ) flush caches and dump data out of
- * memory and allow usage to re-seed caches and data in memory where it
- * can do so. An idle application will thus minimise its memory usage as
- * data will be freed from memory and not be re-loaded as it is idle and
- * not rendering or doing anything graphically right now.
- *
- * @return The cache flush state
- * @ingroup Caches
- *
- * @see elm_all_flush()
- */
 EAPI Eina_Bool
 elm_cache_flush_enabled_get(void)
 {
    return _elm_config->cache_flush_enable;
 }
 
-/**
- * Set the configured cache flush enabled state
- *
- * This sets the globally configured cache flush enabled state
- *
- * @param size The cache flush enabled state
- * @ingroup Caches
- *
- * @see elm_all_flush()
- */
 EAPI void
 elm_cache_flush_enabled_set(Eina_Bool enabled)
 {
@@ -2081,16 +1375,6 @@ elm_cache_flush_enabled_set(Eina_Bool enabled)
    _elm_recache();
 }
 
-/**
- * Set the configured cache flush enabled state for all applications on the
- * display
- *
- * This sets the globally configured cache flush enabled state for all
- * applications on the display.
- *
- * @param size The cache flush enabled state
- * @ingroup Caches
- */
 EAPI void
 elm_cache_flush_enabled_all_set(Eina_Bool enabled)
 {
@@ -2104,28 +1388,12 @@ elm_cache_flush_enabled_all_set(Eina_Bool enabled)
 #endif
 }
 
-/**
- * Get the configured font cache size
- *
- * This gets the globally configured font cache size, in bytes
- *
- * @return The font cache size
- * @ingroup Caches
- */
 EAPI int
 elm_font_cache_get(void)
 {
    return _elm_config->font_cache;
 }
 
-/**
- * Set the configured font cache size
- *
- * This sets the globally configured font cache size, in bytes
- *
- * @param size The font cache size
- * @ingroup Caches
- */
 EAPI void
 elm_font_cache_set(int size)
 {
@@ -2135,16 +1403,6 @@ elm_font_cache_set(int size)
    _elm_recache();
 }
 
-/**
- * Set the configured font cache size for all applications on the
- * display
- *
- * This sets the globally configured font cache size -- in bytes
- * -- for all applications on the display.
- *
- * @param size The font cache size
- * @ingroup Caches
- */
 EAPI void
 elm_font_cache_all_set(int size)
 {
@@ -2158,28 +1416,12 @@ elm_font_cache_all_set(int size)
 #endif
 }
 
-/**
- * Get the configured image cache size
- *
- * This gets the globally configured image cache size, in bytes
- *
- * @return The image cache size
- * @ingroup Caches
- */
 EAPI int
 elm_image_cache_get(void)
 {
    return _elm_config->image_cache;
 }
 
-/**
- * Set the configured image cache size
- *
- * This sets the globally configured image cache size, in bytes
- *
- * @param size The image cache size
- * @ingroup Caches
- */
 EAPI void
 elm_image_cache_set(int size)
 {
@@ -2189,16 +1431,6 @@ elm_image_cache_set(int size)
    _elm_recache();
 }
 
-/**
- * Set the configured image cache size for all applications on the
- * display
- *
- * This sets the globally configured image cache size -- in bytes
- * -- for all applications on the display.
- *
- * @param size The image cache size
- * @ingroup Caches
- */
 EAPI void
 elm_image_cache_all_set(int size)
 {
@@ -2212,30 +1444,12 @@ elm_image_cache_all_set(int size)
 #endif
 }
 
-/**
- * Get the configured edje file cache size.
- *
- * This gets the globally configured edje file cache size, in number
- * of files.
- *
- * @return The edje file cache size
- * @ingroup Caches
- */
 EAPI int
 elm_edje_file_cache_get(void)
 {
    return _elm_config->edje_cache;
 }
 
-/**
- * Set the configured edje file cache size
- *
- * This sets the globally configured edje file cache size, in number
- * of files.
- *
- * @param size The edje file cache size
- * @ingroup Caches
- */
 EAPI void
 elm_edje_file_cache_set(int size)
 {
@@ -2245,16 +1459,6 @@ elm_edje_file_cache_set(int size)
    _elm_recache();
 }
 
-/**
- * Set the configured edje file cache size for all applications on the
- * display
- *
- * This sets the globally configured edje file cache size -- in number
- * of files -- for all applications on the display.
- *
- * @param size The edje file cache size
- * @ingroup Caches
- */
 EAPI void
 elm_edje_file_cache_all_set(int size)
 {
@@ -2268,30 +1472,12 @@ elm_edje_file_cache_all_set(int size)
 #endif
 }
 
-/**
- * Get the configured edje collections (groups) cache size.
- *
- * This gets the globally configured edje collections cache size, in
- * number of collections.
- *
- * @return The edje collections cache size
- * @ingroup Caches
- */
 EAPI int
 elm_edje_collection_cache_get(void)
 {
    return _elm_config->edje_collection_cache;
 }
 
-/**
- * Set the configured edje collections (groups) cache size
- *
- * This sets the globally configured edje collections cache size, in
- * number of collections.
- *
- * @param size The edje collections cache size
- * @ingroup Caches
- */
 EAPI void
 elm_edje_collection_cache_set(int size)
 {
@@ -2301,16 +1487,6 @@ elm_edje_collection_cache_set(int size)
    _elm_recache();
 }
 
-/**
- * Set the configured edje collections (groups) cache size for all
- * applications on the display
- *
- * This sets the globally configured edje collections cache size -- in
- * number of collections -- for all applications on the display.
- *
- * @param size The edje collections cache size
- * @ingroup Caches
- */
 EAPI void
 elm_edje_collection_cache_all_set(int size)
 {
@@ -2364,19 +1540,6 @@ elm_object_focus_allow_get(const Evas_Object *obj)
    return (elm_widget_can_focus_get(obj)) || (elm_widget_child_can_focus_get(obj));
 }
 
-/**
- * Set custom focus chain.
- *
- * This function i set one new and overwrite any previous custom focus chain
- * with the list of objects. The previous list will be deleted and this list
- * will be managed. After setted, don't modity it.
- *
- * @note On focus cycle, only will be evaluated children of this container.
- *
- * @param obj The container object
- * @param objs Chain of objects to pass focus
- * @ingroup Focus
- */
 EAPI void
 elm_object_focus_custom_chain_set(Evas_Object *obj,
                                   Eina_List   *objs)
@@ -2385,12 +1548,6 @@ elm_object_focus_custom_chain_set(Evas_Object *obj,
    elm_widget_focus_custom_chain_set(obj, objs);
 }
 
-/**
- * Unset custom focus chain
- *
- * @param obj The container object
- * @ingroup Focus
- */
 EAPI void
 elm_object_focus_custom_chain_unset(Evas_Object *obj)
 {
@@ -2398,12 +1555,6 @@ elm_object_focus_custom_chain_unset(Evas_Object *obj)
    elm_widget_focus_custom_chain_unset(obj);
 }
 
-/**
- * Get custom focus chain
- *
- * @param obj The container object
- * @ingroup Focus
- */
 EAPI const Eina_List *
 elm_object_focus_custom_chain_get(const Evas_Object *obj)
 {
@@ -2411,19 +1562,6 @@ elm_object_focus_custom_chain_get(const Evas_Object *obj)
    return elm_widget_focus_custom_chain_get(obj);
 }
 
-/**
- * Append object to custom focus chain.
- *
- * @note If relative_child equal to NULL or not in custom chain, the object
- * will be added in end.
- *
- * @note On focus cycle, only will be evaluated children of this container.
- *
- * @param obj The container object
- * @param child The child to be added in custom chain
- * @param relative_child The relative object to position the child
- * @ingroup Focus
- */
 EAPI void
 elm_object_focus_custom_chain_append(Evas_Object *obj,
                                      Evas_Object *child,
@@ -2434,19 +1572,6 @@ elm_object_focus_custom_chain_append(Evas_Object *obj,
    elm_widget_focus_custom_chain_append(obj, child, relative_child);
 }
 
-/**
- * Prepend object to custom focus chain.
- *
- * @note If relative_child equal to NULL or not in custom chain, the object
- * will be added in begin.
- *
- * @note On focus cycle, only will be evaluated children of this container.
- *
- * @param obj The container object
- * @param child The child to be added in custom chain
- * @param relative_child The relative object to position the child
- * @ingroup Focus
- */
 EAPI void
 elm_object_focus_custom_chain_prepend(Evas_Object *obj,
                                       Evas_Object *child,
@@ -2457,18 +1582,6 @@ elm_object_focus_custom_chain_prepend(Evas_Object *obj,
    elm_widget_focus_custom_chain_prepend(obj, child, relative_child);
 }
 
-/**
- * Give focus to next object in object tree.
- *
- * Give focus to next object in focus chain of one object sub-tree.
- * If the last object of chain already have focus, the focus will go to the
- * first object of chain.
- *
- * @param obj The object root of sub-tree
- * @param dir Direction to cycle the focus
- *
- * @ingroup Focus
- */
 EAPI void
 elm_object_focus_cycle(Evas_Object        *obj,
                        Elm_Focus_Direction dir)
@@ -2477,18 +1590,6 @@ elm_object_focus_cycle(Evas_Object        *obj,
    elm_widget_focus_cycle(obj, dir);
 }
 
-/**
- * Give focus to near object in one direction.
- *
- * Give focus to near object in direction of one object.
- * If none focusable object in given direction, the focus will not change.
- *
- * @param obj The reference object
- * @param x Horizontal component of direction to focus
- * @param y Vertical component of direction to focus
- *
- * @ingroup Focus
- */
 EAPI void
 elm_object_focus_direction_go(Evas_Object *obj,
                               int          x,
@@ -2513,106 +1614,42 @@ elm_object_tree_unfocusable_get(const Evas_Object *obj)
    return elm_widget_tree_unfocusable_get(obj);
 }
 
-/**
- * Get the enable status of the focus highlight
- *
- * This gets whether the highlight on focused objects is enabled or not
- * @ingroup Focus
- */
 EAPI Eina_Bool
 elm_focus_highlight_enabled_get(void)
 {
    return _elm_config->focus_highlight_enable;
 }
 
-/**
- * Set the enable status of the focus highlight
- *
- * Set whether to show or not the highlight on focused objects
- * @param enable Enable highlight if EINA_TRUE, disable otherwise
- * @ingroup Focus
- */
 EAPI void
 elm_focus_highlight_enabled_set(Eina_Bool enable)
 {
    _elm_config->focus_highlight_enable = !!enable;
 }
 
-/**
- * Get the enable status of the highlight animation
- *
- * Get whether the focus highlight, if enabled, will animate its switch from
- * one object to the next
- * @ingroup Focus
- */
 EAPI Eina_Bool
 elm_focus_highlight_animate_get(void)
 {
    return _elm_config->focus_highlight_animate;
 }
 
-/**
- * Set the enable status of the highlight animation
- *
- * Set whether the focus highlight, if enabled, will animate its switch from
- * one object to the next
- * @param animate Enable animation if EINA_TRUE, disable otherwise
- * @ingroup Focus
- */
 EAPI void
 elm_focus_highlight_animate_set(Eina_Bool animate)
 {
    _elm_config->focus_highlight_animate = !!animate;
 }
 
-/**
- * @defgroup Scrolling Scrolling
- * @ingroup Main
- *
- * These are functions setting how scrollable views in Elementary
- * widgets should behave on user interaction.
- */
-
-/**
- * Get whether scrollers should bounce when they reach their
- * viewport's edge during a scroll.
- *
- * @return the thumb scroll bouncing state
- *
- * This is the default behavior for touch screens, in general.
- * @ingroup Scrolling
- */
 EAPI Eina_Bool
 elm_scroll_bounce_enabled_get(void)
 {
    return _elm_config->thumbscroll_bounce_enable;
 }
 
-/**
- * Set whether scrollers should bounce when they reach their
- * viewport's edge during a scroll.
- *
- * @param enabled the thumb scroll bouncing state
- *
- * @see elm_thumbscroll_bounce_enabled_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_bounce_enabled_set(Eina_Bool enabled)
 {
    _elm_config->thumbscroll_bounce_enable = enabled;
 }
 
-/**
- * Set whether scrollers should bounce when they reach their
- * viewport's edge during a scroll, for all Elementary application
- * windows.
- *
- * @param enabled the thumb scroll bouncing state
- *
- * @see elm_thumbscroll_bounce_enabled_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_bounce_enabled_all_set(Eina_Bool enabled)
 {
@@ -2627,44 +1664,18 @@ elm_scroll_bounce_enabled_all_set(Eina_Bool enabled)
 #endif
 }
 
-/**
- * Get the amount of inertia a scroller will impose at bounce
- * animations.
- *
- * @return the thumb scroll bounce friction
- *
- * @ingroup Scrolling
- */
 EAPI double
 elm_scroll_bounce_friction_get(void)
 {
    return _elm_config->thumbscroll_bounce_friction;
 }
 
-/**
- * Set the amount of inertia a scroller will impose at bounce
- * animations.
- *
- * @param friction the thumb scroll bounce friction
- *
- * @see elm_thumbscroll_bounce_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_bounce_friction_set(double friction)
 {
    _elm_config->thumbscroll_bounce_friction = friction;
 }
 
-/**
- * Set the amount of inertia a scroller will impose at bounce
- * animations, for all Elementary application windows.
- *
- * @param friction the thumb scroll bounce friction
- *
- * @see elm_thumbscroll_bounce_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_bounce_friction_all_set(double friction)
 {
@@ -2679,44 +1690,18 @@ elm_scroll_bounce_friction_all_set(double friction)
 #endif
 }
 
-/**
- * Get the amount of inertia a <b>paged</b> scroller will impose at
- * page fitting animations.
- *
- * @return the page scroll friction
- *
- * @ingroup Scrolling
- */
 EAPI double
 elm_scroll_page_scroll_friction_get(void)
 {
    return _elm_config->page_scroll_friction;
 }
 
-/**
- * Set the amount of inertia a <b>paged</b> scroller will impose at
- * page fitting animations.
- *
- * @param friction the page scroll friction
- *
- * @see elm_thumbscroll_page_scroll_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_page_scroll_friction_set(double friction)
 {
    _elm_config->page_scroll_friction = friction;
 }
 
-/**
- * Set the amount of inertia a <b>paged</b> scroller will impose at
- * page fitting animations, for all Elementary application windows.
- *
- * @param friction the page scroll friction
- *
- * @see elm_thumbscroll_page_scroll_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_page_scroll_friction_all_set(double friction)
 {
@@ -2731,44 +1716,18 @@ elm_scroll_page_scroll_friction_all_set(double friction)
 #endif
 }
 
-/**
- * Get the amount of inertia a scroller will impose at region bring
- * animations.
- *
- * @return the bring in scroll friction
- *
- * @ingroup Scrolling
- */
 EAPI double
 elm_scroll_bring_in_scroll_friction_get(void)
 {
    return _elm_config->bring_in_scroll_friction;
 }
 
-/**
- * Set the amount of inertia a scroller will impose at region bring
- * animations.
- *
- * @param friction the bring in scroll friction
- *
- * @see elm_thumbscroll_bring_in_scroll_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_bring_in_scroll_friction_set(double friction)
 {
    _elm_config->bring_in_scroll_friction = friction;
 }
 
-/**
- * Set the amount of inertia a scroller will impose at region bring
- * animations, for all Elementary application windows.
- *
- * @param friction the bring in scroll friction
- *
- * @see elm_thumbscroll_bring_in_scroll_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_bring_in_scroll_friction_all_set(double friction)
 {
@@ -2784,45 +1743,18 @@ elm_scroll_bring_in_scroll_friction_all_set(double friction)
 #endif
 }
 
-/**
- * Get the amount of inertia scrollers will impose at animations
- * triggered by Elementary widgets' zooming API.
- *
- * @return the zoom friction
- *
- * @ingroup Scrolling
- */
 EAPI double
 elm_scroll_zoom_friction_get(void)
 {
    return _elm_config->zoom_friction;
 }
 
-/**
- * Set the amount of inertia scrollers will impose at animations
- * triggered by Elementary widgets' zooming API.
- *
- * @param friction the zoom friction
- *
- * @see elm_thumbscroll_zoom_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_zoom_friction_set(double friction)
 {
    _elm_config->zoom_friction = friction;
 }
 
-/**
- * Set the amount of inertia scrollers will impose at animations
- * triggered by Elementary widgets' zooming API, for all Elementary
- * application windows.
- *
- * @param friction the zoom friction
- *
- * @see elm_thumbscroll_zoom_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_zoom_friction_all_set(double friction)
 {
@@ -2837,48 +1769,18 @@ elm_scroll_zoom_friction_all_set(double friction)
 #endif
 }
 
-/**
- * Get whether scrollers should be draggable from any point in their
- * views.
- *
- * @return the thumb scroll state
- *
- * @note This is the default behavior for touch screens, in general.
- * @note All other functions namespaced with "thumbscroll" will only
- *       have effect if this mode is enabled.
- *
- * @ingroup Scrolling
- */
 EAPI Eina_Bool
 elm_scroll_thumbscroll_enabled_get(void)
 {
    return _elm_config->thumbscroll_enable;
 }
 
-/**
- * Set whether scrollers should be draggable from any point in their
- * views.
- *
- * @param enabled the thumb scroll state
- *
- * @see elm_thumbscroll_enabled_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_enabled_set(Eina_Bool enabled)
 {
    _elm_config->thumbscroll_enable = enabled;
 }
 
-/**
- * Set whether scrollers should be draggable from any point in their
- * views, for all Elementary application windows.
- *
- * @param enabled the thumb scroll state
- *
- * @see elm_thumbscroll_enabled_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_enabled_all_set(Eina_Bool enabled)
 {
@@ -2892,47 +1794,18 @@ elm_scroll_thumbscroll_enabled_all_set(Eina_Bool enabled)
 #endif
 }
 
-/**
- * Get the number of pixels one should travel while dragging a
- * scroller's view to actually trigger scrolling.
- *
- * @return the thumb scroll threshould
- *
- * One would use higher values for touch screens, in general, because
- * of their inherent imprecision.
- * @ingroup Scrolling
- */
 EAPI unsigned int
 elm_scroll_thumbscroll_threshold_get(void)
 {
    return _elm_config->thumbscroll_threshold;
 }
 
-/**
- * Set the number of pixels one should travel while dragging a
- * scroller's view to actually trigger scrolling.
- *
- * @param threshold the thumb scroll threshould
- *
- * @see elm_thumbscroll_threshould_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_threshold_set(unsigned int threshold)
 {
    _elm_config->thumbscroll_threshold = threshold;
 }
 
-/**
- * Set the number of pixels one should travel while dragging a
- * scroller's view to actually trigger scrolling, for all Elementary
- * application windows.
- *
- * @param threshold the thumb scroll threshould
- *
- * @see elm_thumbscroll_threshould_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_threshold_all_set(unsigned int threshold)
 {
@@ -2946,47 +1819,18 @@ elm_scroll_thumbscroll_threshold_all_set(unsigned int threshold)
 #endif
 }
 
-/**
- * Get the minimum speed of mouse cursor movement which will trigger
- * list self scrolling animation after a mouse up event
- * (pixels/second).
- *
- * @return the thumb scroll momentum threshould
- *
- * @ingroup Scrolling
- */
 EAPI double
 elm_scroll_thumbscroll_momentum_threshold_get(void)
 {
    return _elm_config->thumbscroll_momentum_threshold;
 }
 
-/**
- * Set the minimum speed of mouse cursor movement which will trigger
- * list self scrolling animation after a mouse up event
- * (pixels/second).
- *
- * @param threshold the thumb scroll momentum threshould
- *
- * @see elm_thumbscroll_momentum_threshould_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_momentum_threshold_set(double threshold)
 {
    _elm_config->thumbscroll_momentum_threshold = threshold;
 }
 
-/**
- * Set the minimum speed of mouse cursor movement which will trigger
- * list self scrolling animation after a mouse up event
- * (pixels/second), for all Elementary application windows.
- *
- * @param threshold the thumb scroll momentum threshould
- *
- * @see elm_thumbscroll_momentum_threshould_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_momentum_threshold_all_set(double threshold)
 {
@@ -3001,44 +1845,18 @@ elm_scroll_thumbscroll_momentum_threshold_all_set(double threshold)
 #endif
 }
 
-/**
- * Get the amount of inertia a scroller will impose at self scrolling
- * animations.
- *
- * @return the thumb scroll friction
- *
- * @ingroup Scrolling
- */
 EAPI double
 elm_scroll_thumbscroll_friction_get(void)
 {
    return _elm_config->thumbscroll_friction;
 }
 
-/**
- * Set the amount of inertia a scroller will impose at self scrolling
- * animations.
- *
- * @param friction the thumb scroll friction
- *
- * @see elm_thumbscroll_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_friction_set(double friction)
 {
    _elm_config->thumbscroll_friction = friction;
 }
 
-/**
- * Set the amount of inertia a scroller will impose at self scrolling
- * animations, for all Elementary application windows.
- *
- * @param friction the thumb scroll friction
- *
- * @see elm_thumbscroll_friction_get()
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_friction_all_set(double friction)
 {
@@ -3052,35 +1870,12 @@ elm_scroll_thumbscroll_friction_all_set(double friction)
 #endif
 }
 
-/**
- * Get the amount of lag between your actual mouse cursor dragging
- * movement and a scroller's view movement itself, while pushing it
- * into bounce state manually.
- *
- * @return the thumb scroll border friction
- *
- * @ingroup Scrolling
- */
 EAPI double
 elm_scroll_thumbscroll_border_friction_get(void)
 {
    return _elm_config->thumbscroll_border_friction;
 }
 
-/**
- * Set the amount of lag between your actual mouse cursor dragging
- * movement and a scroller's view movement itself, while pushing it
- * into bounce state manually.
- *
- * @param friction the thumb scroll border friction. @c 0.0 for
- *        perfect synchrony between two movements, @c 1.0 for maximum
- *        lag.
- *
- * @see elm_thumbscroll_border_friction_get()
- * @note parameter value will get bound to 0.0 - 1.0 interval, always
- *
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_border_friction_set(double friction)
 {
@@ -3093,20 +1888,6 @@ elm_scroll_thumbscroll_border_friction_set(double friction)
    _elm_config->thumbscroll_friction = friction;
 }
 
-/**
- * Set the amount of lag between your actual mouse cursor dragging
- * movement and a scroller's view movement itself, while pushing it
- * into bounce state manually, for all Elementary application windows.
- *
- * @param friction the thumb scroll border friction. @c 0.0 for
- *        perfect synchrony between two movements, @c 1.0 for maximum
- *        lag.
- *
- * @see elm_thumbscroll_border_friction_get()
- * @note parameter value will get bound to 0.0 - 1.0 interval, always
- *
- * @ingroup Scrolling
- */
 EAPI void
 elm_scroll_thumbscroll_border_friction_all_set(double friction)
 {
@@ -3165,30 +1946,6 @@ elm_scroll_thumbscroll_sensitivity_friction_all_set(double friction)
 #endif
 }
 
-/**
- * @defgroup Scrollhints Scrollhints
- * @ingroup Main
- *
- * Objects when inside a scroller can scroll, but this may not always be
- * desirable in certain situations. This allows an object to hint to itself
- * and parents to "not scroll" in one of 2 ways.
- *
- * 1. To hold on scrolling. This means just flicking and dragging may no
- * longer scroll, but pressing/dragging near an edge of the scroller will
- * still scroll. This is automastically used by the entry object when
- * selecting text.
- * 2. To totally freeze scrolling. This means it stops. until popped/released.
- */
-
-/**
- * Push the scroll hold by 1
- *
- * This increments the scroll hold count by one. If it is more than 0 it will
- * take effect on the parents of the indicated object.
- *
- * @param obj The object
- * @ingroup Scrollhints
- */
 EAPI void
 elm_object_scroll_hold_push(Evas_Object *obj)
 {
@@ -3196,15 +1953,6 @@ elm_object_scroll_hold_push(Evas_Object *obj)
    elm_widget_scroll_hold_push(obj);
 }
 
-/**
- * Pop the scroll hold by 1
- *
- * This decrements the scroll hold count by one. If it is more than 0 it will
- * take effect on the parents of the indicated object.
- *
- * @param obj The object
- * @ingroup Scrollhints
- */
 EAPI void
 elm_object_scroll_hold_pop(Evas_Object *obj)
 {
@@ -3212,15 +1960,6 @@ elm_object_scroll_hold_pop(Evas_Object *obj)
    elm_widget_scroll_hold_pop(obj);
 }
 
-/**
- * Push the scroll freeze by 1
- *
- * This increments the scroll freeze count by one. If it is more than 0 it will
- * take effect on the parents of the indicated object.
- *
- * @param obj The object
- * @ingroup Scrollhints
- */
 EAPI void
 elm_object_scroll_freeze_push(Evas_Object *obj)
 {
@@ -3228,16 +1967,6 @@ elm_object_scroll_freeze_push(Evas_Object *obj)
    elm_widget_scroll_freeze_push(obj);
 }
 
-/**
- * Lock the scrolling of the given widget (and thus all parents)
- *
- * This locks the given object from scrolling in the X axis (and implicitly
- * also locks all parent scrollers too from doing the same).
- *
- * @param obj The object
- * @param lock The lock state (1 == locked, 0 == unlocked)
- * @ingroup Scrollhints
- */
 EAPI void
 elm_object_scroll_lock_x_set(Evas_Object *obj,
                              Eina_Bool    lock)
@@ -3246,16 +1975,6 @@ elm_object_scroll_lock_x_set(Evas_Object *obj,
    elm_widget_drag_lock_x_set(obj, lock);
 }
 
-/**
- * Lock the scrolling of the given widget (and thus all parents)
- *
- * This locks the given object from scrolling in the Y axis (and implicitly
- * also locks all parent scrollers too from doing the same).
- *
- * @param obj The object
- * @param lock The lock state (1 == locked, 0 == unlocked)
- * @ingroup Scrollhints
- */
 EAPI void
 elm_object_scroll_lock_y_set(Evas_Object *obj,
                              Eina_Bool    lock)
@@ -3264,14 +1983,6 @@ elm_object_scroll_lock_y_set(Evas_Object *obj,
    elm_widget_drag_lock_y_set(obj, lock);
 }
 
-/**
- * Get the scrolling lock of the given widget
- *
- * This gets the lock for X axis scrolling.
- *
- * @param obj The object
- * @ingroup Scrollhints
- */
 EAPI Eina_Bool
 elm_object_scroll_lock_x_get(const Evas_Object *obj)
 {
@@ -3279,14 +1990,6 @@ elm_object_scroll_lock_x_get(const Evas_Object *obj)
    return elm_widget_drag_lock_x_get(obj);
 }
 
-/**
- * Get the scrolling lock of the given widget
- *
- * This gets the lock for X axis scrolling.
- *
- * @param obj The object
- * @ingroup Scrollhints
- */
 EAPI Eina_Bool
 elm_object_scroll_lock_y_get(const Evas_Object *obj)
 {
@@ -3294,15 +1997,6 @@ elm_object_scroll_lock_y_get(const Evas_Object *obj)
    return elm_widget_drag_lock_y_get(obj);
 }
 
-/**
- * Pop the scroll freeze by 1
- *
- * This decrements the scroll freeze count by one. If it is more than 0 it will
- * take effect on the parents of the indicated object.
- *
- * @param obj The object
- * @ingroup Scrollhints
- */
 EAPI void
 elm_object_scroll_freeze_pop(Evas_Object *obj)
 {
@@ -3310,14 +2004,6 @@ elm_object_scroll_freeze_pop(Evas_Object *obj)
    elm_widget_scroll_freeze_pop(obj);
 }
 
-/**
- * Check if the given Evas Object is an Elementary widget.
- *
- * @param obj the object to query.
- * @return @c EINA_TRUE if it is an elementary widget variant,
- *         @c EINA_FALSE otherwise
- * @ingroup WidgetNavigation
- */
 EAPI Eina_Bool
 elm_object_widget_check(const Evas_Object *obj)
 {
@@ -3332,14 +2018,6 @@ elm_object_parent_widget_get(const Evas_Object *obj)
    return elm_widget_parent_widget_get(obj);
 }
 
-/**
- * Get the top level parent of an Elementary widget.
- *
- * @param obj The object to query.
- * @return The top level Elementary widget, or @c NULL if parent cannot be
- * found.
- * @ingroup WidgetNavigation
- */
 EAPI Evas_Object *
 elm_object_top_widget_get(const Evas_Object *obj)
 {
@@ -3347,20 +2025,6 @@ elm_object_top_widget_get(const Evas_Object *obj)
    return elm_widget_top_get(obj);
 }
 
-/**
- * Get the string that represents this Elementary widget.
- *
- * @note Elementary is weird and exposes itself as a single
- *       Evas_Object_Smart_Class of type "elm_widget", so
- *       evas_object_type_get() always return that, making debug and
- *       language bindings hard. This function tries to mitigate this
- *       problem, but the solution is to change Elementary to use
- *       proper inheritance.
- *
- * @param obj the object to query.
- * @return Elementary widget name, or @c NULL if not a valid widget.
- * @ingroup WidgetNavigation
- */
 EAPI const char *
 elm_object_widget_type_get(const Evas_Object *obj)
 {
@@ -3368,18 +2032,6 @@ elm_object_widget_type_get(const Evas_Object *obj)
    return elm_widget_type_get(obj);
 }
 
-/**
- * Send a signal to the widget edje object.
- *
- * This function sends a signal to the edje object of the obj. An edje program
- * can respond to a signal by specifying matching 'signal' and
- * 'source' fields.
- *
- * @param obj The object
- * @param emission The signal's name.
- * @param source The signal's source.
- * @ingroup General
- */
 EAPI void
 elm_object_signal_emit(Evas_Object *obj,
                        const char  *emission,
@@ -3389,21 +2041,6 @@ elm_object_signal_emit(Evas_Object *obj,
    elm_widget_signal_emit(obj, emission, source);
 }
 
-/**
- * Add a callback for a signal emitted by widget edje object.
- *
- * This function connects a callback function to a signal emitted by the
- * edje object of the obj.
- * Globs can occur in either the emission or source name.
- *
- * @param obj The object
- * @param emission The signal's name.
- * @param source The signal's source.
- * @param func The callback function to be executed when the signal is
- * emitted.
- * @param data A pointer to data to pass in to the callback function.
- * @ingroup General
- */
 EAPI void
 elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
 {
@@ -3412,23 +2049,6 @@ elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const cha
     elm_widget_signal_callback_add(obj, emission, source, func, data);
 }
 
-/**
- * Remove a signal-triggered callback from an widget edje object.
- *
- * This function removes a callback, previoulsy attached to a signal emitted
- * by the edje object of the obj.
- * The parameters emission, source and func must match exactly those passed to
- * a previous call to elm_object_signal_callback_add(). The data pointer that
- * was passed to this call will be returned.
- *
- * @param obj The object
- * @param emission The signal's name.
- * @param source The signal's source.
- * @param func The callback function to be executed when the signal is
- * emitted.
- * @return The data pointer
- * @ingroup General
- */
 EAPI void *
 elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source))
 {
@@ -3437,23 +2057,6 @@ elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const cha
     return elm_widget_signal_callback_del(obj, emission, source, func);
 }
 
-/**
- * Add a callback for a event emitted by widget or their children.
- *
- * This function connects a callback function to any key_down key_up event
- * emitted by the @p obj or their children.
- * This only will be called if no other callback has consumed the event.
- * If you want consume the event, and no other get it, func should return
- * EINA_TRUE and put EVAS_EVENT_FLAG_ON_HOLD in event_flags.
- *
- * @warning Accept duplicated callback addition.
- *
- * @param obj The object
- * @param func The callback function to be executed when the event is
- * emitted.
- * @param data Data to pass in to the callback function.
- * @ingroup General
- */
 EAPI void
 elm_object_event_callback_add(Evas_Object *obj, Elm_Event_Cb func, const void *data)
 {
@@ -3462,22 +2065,6 @@ elm_object_event_callback_add(Evas_Object *obj, Elm_Event_Cb func, const void *d
    elm_widget_event_callback_add(obj, func, data);
 }
 
-/**
- * Remove a event callback from an widget.
- *
- * This function removes a callback, previoulsy attached to event emission
- * by the @p obj.
- * The parameters func and data must match exactly those passed to
- * a previous call to elm_object_event_callback_add(). The data pointer that
- * was passed to this call will be returned.
- *
- * @param obj The object
- * @param func The callback function to be executed when the event is
- * emitted.
- * @param data Data to pass in to the callback function.
- * @return The data pointer
- * @ingroup General
- */
 EAPI void *
 elm_object_event_callback_del(Evas_Object *obj, Elm_Event_Cb func, const void *data)
 {
@@ -3486,18 +2073,6 @@ elm_object_event_callback_del(Evas_Object *obj, Elm_Event_Cb func, const void *d
    return elm_widget_event_callback_del(obj, func, data);
 }
 
-
-/**
- * @defgroup Debug Debug
- * @ingroup Main
- */
-
-/**
- * Print Tree object hierarchy in stdout
- *
- * @param obj The root object
- * @ingroup Debug
- */
 EAPI void
 elm_object_tree_dump(const Evas_Object *top)
 {
@@ -3509,13 +2084,6 @@ elm_object_tree_dump(const Evas_Object *top)
 #endif
 }
 
-/**
- * Print Elm Objects tree hierarchy in file as dot(graphviz) syntax.
- *
- * @param obj The root object
- * @param file The path of output file
- * @ingroup Debug
- */
 EAPI void
 elm_object_tree_dot_dump(const Evas_Object *top,
                          const char        *file)
@@ -3531,24 +2099,12 @@ elm_object_tree_dot_dump(const Evas_Object *top,
 #endif
 }
 
-/**
- * Set the duration for occuring long press event.
- *
- * @param lonpress_timeout Timeout for long press event
- * @ingroup Longpress
- */
 EAPI void
 elm_longpress_timeout_set(double longpress_timeout)
 {
    _elm_config->longpress_timeout = longpress_timeout;
 }
 
-/**
- * Get the duration for occuring long press event.
- *
- * @return Timeout for long press event
- * @ingroup Longpress
- */
 EAPI double
 elm_longpress_timeout_get(void)
 {
