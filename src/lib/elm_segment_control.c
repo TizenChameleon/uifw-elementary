@@ -1,24 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-/**
- * @defgroup SegmentControl SegmentControl
- * @ingroup Elementary
- *
- * SegmentControl Widget is a horizontal control made of multiple segment items,
- * each segment item functioning similar to discrete two state button. A segment
- * control groups the the items together and provides compact single button with
- * multiple equal size segments. Segment item size is determined by base widget
- * size and the number of items added.
- * Only one Segment item can be at selected state. A segment item can display
- * combination of Text and any Evas_Object like Images or other widget.
- *
- * Signals that you can add callbacks for are:
- *
- * "changed" -when the user clicks on a segment item which is not previously
- *            selected and get selected. The event_info parameter is the
- *            segment item index.
- */
 typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
@@ -253,7 +235,6 @@ _position_items(Widget_Data *wd)
 
    evas_object_geometry_get(wd->base, &bx, &by, &bw, &bh);
    wd->item_width = bw / wd->item_count;
-
    rtl = elm_widget_mirrored_get(wd->obj);
 
    if (rtl)
@@ -503,13 +484,6 @@ _item_new(Evas_Object *obj, Evas_Object *icon, const char *label)
    return it;
 }
 
-/**
- * Create new SegmentControl.
- * @param [in] parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup SegmentControl
- */
 EAPI Evas_Object *
 elm_segment_control_add(Evas_Object *parent)
 {
@@ -550,16 +524,6 @@ elm_segment_control_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * Add new segment item to SegmentControl.
- * @param [in] obj The SegmentControl object
- * @param [in] icon Any Objects like icon, Label, layout etc
- * @param [in] label The label for added segment item.
- *             Note that, NULL is different from empty string "".
- * @return The new segment item or NULL if it cannot be created
- *
- * @ingroup SegmentControl
- */
 EAPI Elm_Segment_Item *
 elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon,
                              const char *label)
@@ -580,18 +544,6 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon,
    return it;
 }
 
-/**
- * Insert a new segment item to SegmentControl.
- * @param [in] obj The SegmentControl object
- * @param [in] icon Any Objects like icon, Label, layout etc
- * @param [in] label The label for added segment item.
- *        Note that, NULL is different from empty string "".
- * @param [in] index Segment item location. Value should be between 0 and
- *        Existing total item count( @see elm_segment_control_item_count_get() )
- * @return The new segment item or NULL if it cannot be created
- *
- * @ingroup SegmentControl
- */
 EAPI Elm_Segment_Item *
 elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon,
                                    const char *label, int idx)
@@ -608,7 +560,6 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon,
    if (!it) return NULL;
 
    it_rel = _item_find(obj, idx);
-
    if (it_rel)
      wd->seg_items = eina_list_prepend_relative(wd->seg_items, it, it_rel);
    else
@@ -618,13 +569,6 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon,
    return it;
 }
 
-/**
- * Delete a segment item from SegmentControl
- * @param [in] obj The SegmentControl object
- * @param [in] it The segment item to be deleted
- *
- * @ingroup SegmentControl
- */
 EAPI void
 elm_segment_control_item_del(Elm_Segment_Item *it)
 {
@@ -638,13 +582,6 @@ elm_segment_control_item_del(Elm_Segment_Item *it)
    _update_list(wd);
 }
 
-/**
- * Delete a segment item of given index from SegmentControl
- * @param [in] obj The SegmentControl object
- * @param [in] index The position at which segment item to be deleted.
- *
- * @ingroup SegmentControl
- */
 EAPI void
 elm_segment_control_item_del_at(Evas_Object *obj, int idx)
 {
@@ -656,20 +593,11 @@ elm_segment_control_item_del_at(Evas_Object *obj, int idx)
    if (!wd) return;
 
    it = _item_find(obj, idx);
-
    if (!it) return;
    _item_free(it);
    _update_list(wd);
 }
 
-/**
- * Get the label of a segment item.
- * @param [in] obj The SegmentControl object
- * @param [in] index The index of the segment item
- * @return The label of the segment item
- *
- * @ingroup SegmentControl
- */
 EAPI const char*
 elm_segment_control_item_label_get(const Evas_Object *obj, int idx)
 {
@@ -677,19 +605,11 @@ elm_segment_control_item_label_get(const Evas_Object *obj, int idx)
    Elm_Segment_Item *it;
 
    it = _item_find(obj, idx);
-
    if (it) return it->label;
 
    return NULL;
 }
 
-/**
- * Set the label of a segment item.
- * @param [in] it The SegmentControl Item
- * @param [in] label New label text.
- *
- * @ingroup SegmentControl
- */
 EAPI void
 elm_segment_control_item_label_set(Elm_Segment_Item* it, const char* label)
 {
@@ -709,14 +629,6 @@ elm_segment_control_item_label_set(Elm_Segment_Item* it, const char* label)
    edje_object_part_text_set(it->base.view, "elm.text", it->label);
 }
 
-/**
- * Get the icon of a segment item of SegmentControl
- * @param [in] obj The SegmentControl object
- * @param [in] index The index of the segment item
- * @return The icon object.
- *
- * @ingroup SegmentControl
- */
 EAPI Evas_Object *
 elm_segment_control_item_icon_get(const Evas_Object *obj, int idx)
 {
@@ -724,19 +636,11 @@ elm_segment_control_item_icon_get(const Evas_Object *obj, int idx)
    Elm_Segment_Item *it;
 
    it = _item_find(obj, idx);
-
    if (it) return it->icon;
 
    return NULL;
 }
 
-/**
- * Set the Icon to the segment item
- * @param [in] it The SegmentControl Item
- * @param [in] icon Objects like Layout, Icon, Label etc...
- *
- * @ingroup SegmentControl
- */
 EAPI void
 elm_segment_control_item_icon_set(Elm_Segment_Item *it, Evas_Object *icon)
 {
@@ -761,13 +665,6 @@ elm_segment_control_item_icon_set(Elm_Segment_Item *it, Evas_Object *icon)
      edje_object_signal_emit(it->base.view, "elm,state,icon,hidden", "elm");
 }
 
-/**
- * Get the Segment items count from SegmentControl
- * @param [in] obj The SegmentControl object
- * @return Segment items count.
- *
- * @ingroup SegmentControl
- */
 EAPI int
 elm_segment_control_item_count_get(const Evas_Object *obj)
 {
@@ -780,13 +677,6 @@ elm_segment_control_item_count_get(const Evas_Object *obj)
    return eina_list_count(wd->seg_items);
 }
 
-/**
- * Get the base object of segment item.
- * @param [in] it The Segment item
- * @return obj The base object of the segment item.
- *
- * @ingroup SegmentControl
- */
 EAPI Evas_Object*
 elm_segment_control_item_object_get(const Elm_Segment_Item *it)
 {
@@ -795,13 +685,6 @@ elm_segment_control_item_object_get(const Elm_Segment_Item *it)
    return it->base.view;
 }
 
-/**
- * Get the selected segment item in the SegmentControl
- * @param [in] obj The SegmentControl object
- * @return Selected Segment Item. NULL if none of segment item is selected.
- *
- * @ingroup SegmentControl
- */
 EAPI Elm_Segment_Item*
 elm_segment_control_item_selected_get(const Evas_Object *obj)
 {
@@ -814,14 +697,6 @@ elm_segment_control_item_selected_get(const Evas_Object *obj)
    return wd->selected_item;
 }
 
-/**
- * Select/unselect a particular segment item of SegmentControl
- * @param [in] it The Segment item that is to be selected or unselected.
- * @param [in] select Passing EINA_TRUE will select the segment item and
- *             EINA_FALSE will unselect.
- *
- * @ingroup SegmentControl
- */
 EAPI void
 elm_segment_control_item_selected_set(Elm_Segment_Item *it, Eina_Bool selected)
 {
@@ -845,14 +720,6 @@ elm_segment_control_item_selected_set(Elm_Segment_Item *it, Eina_Bool selected)
    return;
 }
 
-/**
- * Get the Segment Item from the specified Index.
- * @param [in] obj The Segment Control object.
- * @param [in] index The index of the segment item.
- * @return The Segment item.
- *
- * @ingroup SegmentControl
- */
 EAPI Elm_Segment_Item *
 elm_segment_control_item_get(const Evas_Object *obj, int idx)
 {
@@ -864,13 +731,6 @@ elm_segment_control_item_get(const Evas_Object *obj, int idx)
    return it;
 }
 
-/**
- * Get the index of a Segment item in the SegmentControl
- * @param [in] it The Segment Item.
- * @return Segment Item index.
- *
- * @ingroup SegmentControl
- */
 EAPI int
 elm_segment_control_item_index_get(const Elm_Segment_Item *it)
 {
