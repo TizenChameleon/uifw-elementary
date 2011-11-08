@@ -1,20 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-/**
- * @defgroup Menu Menu
- * @ingroup Elementary
- *
- * A menu is a list of items displayed above the window. Each item can
- * have a sub-menu. The menu object can be used to display a menu on right
- * click, in a toolbar, anywhere.
- *
- * Signals that you can add callbacks for are:
- *
- * "clicked" - the user clicked the empty space in the menu to dismiss.
- *             event_info is NULL.
- */
-
 typedef struct _Widget_Data Widget_Data;
 
 struct _Elm_Menu_Item
@@ -442,14 +428,6 @@ _item_submenu_obj_create(Elm_Menu_Item *item)
    evas_object_event_callback_add(item->submenu.bx, EVAS_CALLBACK_RESIZE, _menu_resize, item->base.widget);
 }
 
-/**
- * Add a new menu to the parent
- *
- * @param parent The parent object.
- * @return The new object or NULL if it cannot be created.
- *
- * @ingroup Menu
- */
 EAPI Evas_Object *
 elm_menu_add(Evas_Object *parent)
 {
@@ -498,14 +476,6 @@ elm_menu_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * Set the parent
- *
- * @param obj The menu object.
- * @param parent The new parent.
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_parent_set(Evas_Object *obj, Evas_Object *parent)
 {
@@ -544,14 +514,6 @@ elm_menu_parent_set(Evas_Object *obj, Evas_Object *parent)
    _sizing_eval(obj);
 }
 
-/**
- * Get the parent
- *
- * @param obj The menu object.
- * @return The parent.
- *
- * @ingroup Menu
- */
 EAPI Evas_Object *
 elm_menu_parent_get(const Evas_Object *obj)
 {
@@ -561,15 +523,6 @@ elm_menu_parent_get(const Evas_Object *obj)
    return wd->parent;
 }
 
-/**
- * Move the menu to a new position
- *
- * @param obj The menu object.
- * @param x The new position.
- * @param y The new position.
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_move(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
 {
@@ -581,14 +534,6 @@ elm_menu_move(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
    _sizing_eval(obj);
 }
 
-/**
- * Close a opened menu
- *
- * @param obj the menu object
- * @return void
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_close(Evas_Object *obj)
 {
@@ -597,13 +542,6 @@ elm_menu_close(Evas_Object *obj)
    _menu_hide(obj, wd->hv, NULL);
 }
 
-/**
- * Get the Evas_Object of an Elm_Menu_Item
- *
- * @param item The menu item object.
- *
- * @ingroup Menu
- */
 EAPI Evas_Object *
 elm_menu_item_object_get(const Elm_Menu_Item *item)
 {
@@ -641,18 +579,6 @@ elm_menu_clone(Evas_Object *from_menu, Evas_Object *to_menu, Elm_Menu_Item *pare
       _item_clone(to_menu, parent, item);
 }
 
-/**
- * Add an item at the end
- *
- * @param obj The menu object.
- * @param icon A icon display on the item. The icon will be destryed by the menu.
- * @param label The label of the item.
- * @param func Function called when the user select the item.
- * @param data Data sent by the callback.
- * @return Returns the new item.
- *
- * @ingroup Menu
- */
 EAPI Elm_Menu_Item *
 elm_menu_item_add(Evas_Object *obj, Elm_Menu_Item *parent, const char *icon, const char *label, Evas_Smart_Cb func, const void *data)
 {
@@ -698,14 +624,6 @@ elm_menu_item_add(Evas_Object *obj, Elm_Menu_Item *parent, const char *icon, con
    return subitem;
 }
 
-/**
- * Set the label of a menu item
- *
- * @param item The menu item object.
- * @param label The label to set for @p item
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_item_label_set(Elm_Menu_Item *item, const char *label)
 {
@@ -722,14 +640,6 @@ elm_menu_item_label_set(Elm_Menu_Item *item, const char *label)
    _sizing_eval(item->base.widget);
 }
 
-/**
- * Get the label of a menu item
- *
- * @param item The menu item object.
- * @return The label of @p item
- *
- * @ingroup Menu
- */
 EAPI const char *
 elm_menu_item_label_get(const Elm_Menu_Item *item)
 {
@@ -737,16 +647,6 @@ elm_menu_item_label_get(const Elm_Menu_Item *item)
    return item->label;
 }
 
-/**
- * Set the icon of a menu item
- *
- * Once the icon object is set, a previously set one will be deleted.
- *
- * @param item The menu item object.
- * @param icon The icon object to set for @p item
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_item_icon_set(Elm_Menu_Item *item, const char *icon)
 {
@@ -767,14 +667,6 @@ elm_menu_item_icon_set(Elm_Menu_Item *item, const char *icon)
    _sizing_eval(item->base.widget);
 }
 
-/**
- * Set the disabled state of @p item.
- *
- * @param item The menu item object.
- * @param disabled The enabled/disabled state of the item
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_item_disabled_set(Elm_Menu_Item *item, Eina_Bool disabled)
 {
@@ -791,14 +683,6 @@ elm_menu_item_disabled_set(Elm_Menu_Item *item, Eina_Bool disabled)
    edje_object_message_signal_process(item->base.view);
 }
 
-/**
- * Get the disabled state of @p item.
- *
- * @param item The menu item object.
- * @return The enabled/disabled state of the item
- *
- * @ingroup Menu
- */
 EAPI Eina_Bool
 elm_menu_item_disabled_get(const Elm_Menu_Item *item)
 {
@@ -806,16 +690,6 @@ elm_menu_item_disabled_get(const Elm_Menu_Item *item)
    return item->disabled;
 }
 
-/**
- * Add a separator item to menu @p obj under @p parent.
- *
- * @param obj The menu object
- * @param parent The item to add the separator under
- *
- * @return The created item or NULL on failure
- *
- * @ingroup Menu
- */
 EAPI Elm_Menu_Item *
 elm_menu_item_separator_add(Evas_Object *obj, Elm_Menu_Item *parent)
 {
@@ -850,14 +724,6 @@ elm_menu_item_separator_add(Evas_Object *obj, Elm_Menu_Item *parent)
    return subitem;
 }
 
-/**
- * Get the icon object from a menu item
- *
- * @param item The menu item object
- * @return The icon object or NULL if there's no icon
- *
- * @ingroup Menu
- */
 EAPI const Evas_Object *
 elm_menu_item_object_icon_get(const Elm_Menu_Item *item)
 {
@@ -865,14 +731,6 @@ elm_menu_item_object_icon_get(const Elm_Menu_Item *item)
    return (const Evas_Object *)item->icon;
 }
 
-/**
- * Get the string representation from the icon of a menu item
- *
- * @param item The menu item object.
- * @return The string representation of @p item's icon or NULL
- *
- * @ingroup Menu
- */
 EAPI const char *
 elm_menu_item_icon_get(const Elm_Menu_Item *item)
 {
@@ -880,14 +738,6 @@ elm_menu_item_icon_get(const Elm_Menu_Item *item)
    return item->icon_str;
 }
 
-/**
- * Returns whether @p item is a separator.
- *
- * @param item The item to check
- * @return If true, @p item is a separator
- *
- * @ingroup Menu
- */
 EAPI Eina_Bool
 elm_menu_item_is_separator(Elm_Menu_Item *item)
 {
@@ -895,13 +745,6 @@ elm_menu_item_is_separator(Elm_Menu_Item *item)
    return item->separator;
 }
 
-/**
- * Deletes an item from the menu.
- *
- * @param item The item to delete.
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_item_del(Elm_Menu_Item *item)
 {
@@ -927,14 +770,6 @@ elm_menu_item_del(Elm_Menu_Item *item)
    elm_widget_item_del(item);
 }
 
-/**
- * Set the function called when a menu item is freed.
- *
- * @param item The item to set the callback on
- * @param func The function called
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_item_del_cb_set(Elm_Menu_Item *item, Evas_Smart_Cb func)
 {
@@ -942,14 +777,6 @@ elm_menu_item_del_cb_set(Elm_Menu_Item *item, Evas_Smart_Cb func)
    elm_widget_item_del_cb_set(item, func);
 }
 
-/**
- * Returns the data associated with menu item @p item.
- *
- * @param item The item
- * @return The data associated with @p item
- *
- * @ingroup Menu
- */
 EAPI void *
 elm_menu_item_data_get(const Elm_Menu_Item *item)
 {
@@ -957,14 +784,6 @@ elm_menu_item_data_get(const Elm_Menu_Item *item)
    return elm_widget_item_data_get(item);
 }
 
-/**
- * Sets the data to be associated with menu item @p item.
- *
- * @param item The item
- * @param data The data to be associated with @p item
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_item_data_set(Elm_Menu_Item *item, const void *data)
 {
@@ -972,14 +791,6 @@ elm_menu_item_data_set(Elm_Menu_Item *item, const void *data)
    elm_widget_item_data_set(item, data);
 }
 
-/**
- * Returns a list of @p item's subitems.
- *
- * @param item The item
- * @return An Eina_List* of @p item's subitems
- *
- * @ingroup Menu
- */
 EAPI const Eina_List *
 elm_menu_item_subitems_get(const Elm_Menu_Item *item)
 {
@@ -987,14 +798,6 @@ elm_menu_item_subitems_get(const Elm_Menu_Item *item)
    return item->submenu.items;
 }
 
-/**
- * Returns a list of @p item's items.
- *
- * @param obj The menu object
- * @return An Eina_List* of @p item's items
- *
- * @ingroup Menu
- */
 EAPI const Eina_List *
 elm_menu_items_get(const Evas_Object * obj)
 {
@@ -1003,14 +806,6 @@ elm_menu_items_get(const Evas_Object * obj)
    return wd->items;
 }
 
-/**
- * Set the selected state of @p item.
- *
- * @param item The menu item object.
- * @param selected The selected/unselected state of the item
- *
- * @ingroup Menu
- */
 EAPI void
 elm_menu_item_selected_set(Elm_Menu_Item *item, Eina_Bool selected)
 {
@@ -1030,14 +825,6 @@ elm_menu_item_selected_set(Elm_Menu_Item *item, Eina_Bool selected)
    edje_object_message_signal_process(item->base.view);
 }
 
-/**
- * Get the selected state of @p item.
- *
- * @param item The menu item object.
- * @return The selected/unselected state of the item
- *
- * @ingroup Menu
- */
 EAPI Eina_Bool
 elm_menu_item_selected_get(const Elm_Menu_Item *item)
 {
@@ -1045,14 +832,6 @@ elm_menu_item_selected_get(const Elm_Menu_Item *item)
    return item->selected;
 }
 
-/**
- * Get the previous item in the menu.
- *
- * @param item The menu item object.
- * @return The item before it, or NULL if none
- *
- * @ingroup Menu
- */
 EAPI Elm_Menu_Item *
 elm_menu_item_prev_get(const Elm_Menu_Item *it)
 {
@@ -1076,14 +855,6 @@ elm_menu_item_prev_get(const Elm_Menu_Item *it)
    return NULL;
 }
 
-/**
- * Get the next item in the menu.
- *
- * @param item The menu item object.
- * @return The item after it, or NULL if none
- *
- * @ingroup Menu
- */
 EAPI Elm_Menu_Item *
 elm_menu_item_next_get(const Elm_Menu_Item *it)
 {
@@ -1107,14 +878,6 @@ elm_menu_item_next_get(const Elm_Menu_Item *it)
    return NULL;
 }
 
-/**
- * Get the first item in the menu
- *
- * @param obj The menu object
- * @return The first item, or NULL if none
- *
- * @ingroup Menu
- */
 EAPI Elm_Menu_Item *
 elm_menu_first_item_get(const Evas_Object * obj)
 {
@@ -1125,14 +888,6 @@ elm_menu_first_item_get(const Evas_Object * obj)
    return NULL;
 }
 
-/**
- * Get the last item in the menu
- *
- * @param obj The menu object
- * @return The last item, or NULL if none
- *
- * @ingroup Menu
- */
 EAPI Elm_Menu_Item *
 elm_menu_last_item_get(const Evas_Object * obj)
 {
@@ -1144,14 +899,6 @@ elm_menu_last_item_get(const Evas_Object * obj)
    return NULL;
 }
 
-/**
- * Get the selected item in the menu
- *
- * @param obj The menu object
- * @return The selected item, or NULL if none
- *
- * @ingroup Menu
- */
 EAPI Elm_Menu_Item *
 elm_menu_selected_item_get(const Evas_Object * obj)
 {
