@@ -24,7 +24,7 @@ static void
 _btn_cursors_release_cb(void *data, Evas_Object *btn __UNUSED__, void *ev __UNUSED__)
 {
    App_Data *app = data;
-   elm_button_icon_set(app->mid, app->icon_still);
+   elm_object_content_set(app->mid, app->icon_still);
    app->icon_still = NULL;
 }
 
@@ -37,10 +37,10 @@ _btn_cursors_move_cb(void *data, Evas_Object *btn, void *ev __UNUSED__)
    if (!app->icon_still)
      {
         Evas_Object *icon;
-        app->icon_still = elm_button_icon_unset(app->mid);
+        app->icon_still = elm_object_content_unset(app->mid);
         icon = elm_icon_add(app->mid);
         elm_icon_standard_set(icon, "chat");
-        elm_button_icon_set(app->mid, icon);
+        elm_object_content_set(app->mid, icon);
      }
 
    evas_object_size_hint_align_get(app->mid, &ax, &ay);
@@ -130,19 +130,19 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
    evas_object_show(box2);
 
    btn = elm_button_add(win);
-   elm_button_label_set(btn, "Initial: 0.0");
+   elm_object_text_set(btn, "Initial: 0.0");
    elm_box_pack_end(box2, btn);
    evas_object_show(btn);
    evas_object_smart_callback_add(btn, "clicked", _btn_options_cb, &data);
 
    btn = elm_button_add(win);
-   elm_button_label_set(btn, "Initial: 1.0");
+   elm_object_text_set(btn, "Initial: 1.0");
    elm_box_pack_end(box2, btn);
    evas_object_show(btn);
    evas_object_smart_callback_add(btn, "clicked", _btn_options_cb, &data);
 
    btn = elm_button_add(win);
-   elm_button_label_set(btn, "Initial: 5.0");
+   elm_object_text_set(btn, "Initial: 5.0");
    elm_box_pack_end(box2, btn);
    evas_object_show(btn);
    evas_object_smart_callback_add(btn, "clicked", _btn_options_cb, &data);
@@ -154,19 +154,19 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
    evas_object_show(box2);
 
    btn = elm_button_add(win);
-   elm_button_label_set(btn, "Gap: 0.1");
+   elm_object_text_set(btn, "Gap: 0.1");
    elm_box_pack_end(box2, btn);
    evas_object_show(btn);
    evas_object_smart_callback_add(btn, "clicked", _btn_options_cb, &data);
 
    btn = elm_button_add(win);
-   elm_button_label_set(btn, "Gap: 0.5");
+   elm_object_text_set(btn, "Gap: 0.5");
    elm_box_pack_end(box2, btn);
    evas_object_show(btn);
    evas_object_smart_callback_add(btn, "clicked", _btn_options_cb, &data);
 
    btn = elm_button_add(win);
-   elm_button_label_set(btn, "Gap: 1.0");
+   elm_object_text_set(btn, "Gap: 1.0");
    elm_box_pack_end(box2, btn);
    evas_object_show(btn);
    evas_object_smart_callback_add(btn, "clicked", _btn_options_cb, &data);
@@ -185,7 +185,7 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
 
    icon = elm_icon_add(win);
    elm_icon_standard_set(icon, "arrow_up");
-   elm_button_icon_set(btn, icon);
+   elm_object_content_set(btn, icon);
 
    data.cursors.up = btn;
 
@@ -210,7 +210,7 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
 
    icon = elm_icon_add(win);
    elm_icon_standard_set(icon, "arrow_left");
-   elm_button_icon_set(btn, icon);
+   elm_object_content_set(btn, icon);
 
    data.cursors.left = btn;
 
@@ -221,7 +221,7 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
 
    icon = elm_icon_add(win);
    elm_icon_standard_set(icon, "close");
-   elm_button_icon_set(btn, icon);
+   elm_object_content_set(btn, icon);
 
    data.mid = btn;
 
@@ -239,7 +239,7 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
 
    icon = elm_icon_add(win);
    elm_icon_standard_set(icon, "arrow_right");
-   elm_button_icon_set(btn, icon);
+   elm_object_content_set(btn, icon);
 
    data.cursors.right = btn;
 
@@ -257,7 +257,7 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
 
    icon = elm_icon_add(win);
    elm_icon_standard_set(icon, "arrow_down");
-   elm_button_icon_set(btn, icon);
+   elm_object_content_set(btn, icon);
 
    data.cursors.down = btn;
 

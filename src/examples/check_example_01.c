@@ -8,7 +8,7 @@
 
 static void _print(void *data, Evas_Object *obj, void *event_info);
 
-EAPI int
+EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *cb, *cb2, *icon;
@@ -40,7 +40,7 @@ elm_main(int argc, char **argv)
    cb2 = elm_check_add(win);
    elm_object_text_set(cb2, "another checkbox");
    elm_check_state_set(cb2, EINA_TRUE);
-   elm_check_icon_set(cb2, icon);
+   elm_object_content_set(cb2, icon);
    evas_object_move(cb2, 10, 50);
    evas_object_resize(cb2, 200, 30);
    evas_object_show(cb2);

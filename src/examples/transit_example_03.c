@@ -97,7 +97,7 @@ _checkbox_transition_add(Evas_Object *box, const char *label, Eina_Bool *checked
    Evas_Object *check = elm_check_add(elm_object_parent_widget_get(box));
    evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(check, 0.0, 0.0);
-   elm_check_label_set(check, label);
+   elm_object_text_set(check, label);
    elm_check_state_pointer_set(check, checked);
    elm_box_pack_end(box, check);
    evas_object_show(check);
@@ -195,7 +195,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    win = elm_win_add(NULL, "transit", ELM_WIN_BASIC);
    elm_win_title_set(win, "Transit Example");
    evas_object_smart_callback_add(win, "delete,request", on_done, NULL);
-   elm_win_autodel_set(win, 1);
+   elm_win_autodel_set(win, EINA_TRUE);
 
    /* add a scalable white background to this window */
    bg = elm_bg_add(win);
@@ -223,11 +223,11 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    /* this object isn't packed inside the box because we don't want it to have
     * its size, position, aspect or anything else controled by the container */
    obj = elm_button_add(win);
-   elm_button_label_set(obj, "Transformed object!");
+   elm_object_text_set(obj, "Transformed object!");
    icon = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/icon_07.png", PACKAGE_DATA_DIR);
    elm_icon_file_set(icon, buf, NULL);
-   elm_button_icon_set(obj, icon);
+   elm_object_content_set(obj, icon);
    evas_object_move(obj, 160, 60);
    evas_object_resize(obj, 250, 100);
    evas_object_show(obj);
@@ -239,7 +239,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    /* button to start our transition */
    btn = elm_button_add(win);
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_button_label_set(btn, "Transit!");
+   elm_object_text_set(btn, "Transit!");
    elm_box_pack_end(box, btn);
    evas_object_show(btn);
    evas_object_smart_callback_add(btn, "clicked", _transit_start, &context);
@@ -278,7 +278,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    cbox = elm_check_add(win);
    evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(cbox, 0.0, 0.0);
-   elm_check_label_set(cbox, "Events enabled");
+   elm_object_text_set(cbox, "Events enabled");
    elm_check_state_pointer_set(cbox, &context.events_enabled);
    elm_box_pack_end(vbox2, cbox);
    evas_object_show(cbox);
@@ -286,7 +286,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    cbox = elm_check_add(win);
    evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(cbox, 0.0, 0.0);
-   elm_check_label_set(cbox, "Auto reverse");
+   elm_object_text_set(cbox, "Auto reverse");
    elm_check_state_pointer_set(cbox, &context.auto_reverse);
    elm_box_pack_end(vbox2, cbox);
    evas_object_show(cbox);
@@ -294,7 +294,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    cbox = elm_check_add(win);
    evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(cbox, 0.0, 0.0);
-   elm_check_label_set(cbox, "Keep final state");
+   elm_object_text_set(cbox, "Keep final state");
    elm_check_state_pointer_set(cbox, &context.final_state_keep);
    elm_box_pack_end(vbox2, cbox);
    evas_object_show(cbox);

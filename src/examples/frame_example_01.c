@@ -6,12 +6,11 @@
 # include "elementary_config.h"
 #endif
 
-EAPI int
+EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg;
    Evas_Object *f1, *r1, *f2, *r2, *f3, *r3, *f4, *r4;
-   Elm_Animator *animator;
    char buf[256];
 
    win = elm_win_add(NULL, "frame", ELM_WIN_BASIC);
@@ -28,7 +27,7 @@ elm_main(int argc, char **argv)
    evas_object_show(r1);
 
    f1= elm_frame_add(win);
-   elm_frame_content_set(f1, r1);
+   elm_object_content_set(f1, r1);
    elm_object_text_set(f1, "Default frame");
    evas_object_resize(f1, 100, 100);
    evas_object_move(f1, 25, 25);
@@ -39,7 +38,7 @@ elm_main(int argc, char **argv)
    evas_object_show(r2);
 
    f2 = elm_frame_add(win);
-   elm_frame_content_set(f2, r2);
+   elm_object_content_set(f2, r2);
    elm_object_text_set(f2, "Padding frame");
    evas_object_resize(f2, 100, 100);
    evas_object_move(f2, 150, 25);
@@ -51,7 +50,7 @@ elm_main(int argc, char **argv)
    evas_object_show(r3);
 
    f3 = elm_frame_add(win);
-   elm_frame_content_set(f3, r3);
+   elm_object_content_set(f3, r3);
    elm_object_text_set(f3, "Top outdent frame");
    evas_object_resize(f3, 100, 100);
    evas_object_move(f3, 25, 150);
@@ -63,7 +62,7 @@ elm_main(int argc, char **argv)
    evas_object_show(r4);
 
    f4 = elm_frame_add(win);
-   elm_frame_content_set(f4, r4);
+   elm_object_content_set(f4, r4);
    elm_object_text_set(f4, "Bottom outdent frame");
    evas_object_resize(f4, 100, 100);
    evas_object_move(f4, 150, 150);
