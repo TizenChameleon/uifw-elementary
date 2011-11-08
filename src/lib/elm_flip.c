@@ -551,8 +551,6 @@ _state_update(Widget_Data *st)
 
    nw = 16;
    nh = 16;
-   if (nw < 1) nw = 1;
-   if (nh < 1) nh = 1;
    gszw = w / nw;
    gszh = h / nh;
    if (gszw < 4) gszw = 4;
@@ -1019,6 +1017,7 @@ _flip_do(Evas_Object *obj, double t, Elm_Flip_Mode mode, int lin, int rev)
          break;
       case ELM_FLIP_CUBE_UP:
          p = 1.0 - t;
+         pp = p;
          if (!lin) pp = (p * p);
          p = 1.0 - pp;
          deg = -90.0 * p;

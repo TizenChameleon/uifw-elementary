@@ -1318,13 +1318,22 @@ grid_create(Evas_Object *obj)
 
    if ((!wd) || (!wd->src)) return NULL;
    g = calloc(1, sizeof(Grid));
+   if (!g) return NULL;
 
    g->zoom = wd->zoom;
    g->tsize = wd->tsize;
    g->wd = wd;
 
-   if (g->zoom > wd->src->zoom_max) return NULL;
-   if (g->zoom < wd->src->zoom_min) return NULL;
+   if (g->zoom > wd->src->zoom_max)
+     {
+        free(g);
+        return NULL;
+     }
+   if (g->zoom < wd->src->zoom_min)
+     {
+        free(g);
+        return NULL;
+     }
 
    int size =  pow(2.0, wd->zoom);
    g->gw = size;
@@ -2924,14 +2933,15 @@ _parse_kml(void *data)
              char *buf;
 
              fseek(f, 0, SEEK_SET);
-             buf = malloc(sz);
+             buf = malloc(sz + 1);
              if (buf)
                {
+                  memset(buf, 0, sz + 1);
                   if (fread(buf, 1, sz, f))
                     {
                        eina_simple_xml_parse(buf, sz, EINA_TRUE, cb_route_dump, &dump);
-                       free(buf);
                     }
+                  free(buf);
                }
           }
         fclose(f);
@@ -3016,14 +3026,15 @@ _parse_name(void *data)
              char *buf;
 
              fseek(f, 0, SEEK_SET);
-             buf = malloc(sz);
+             buf = malloc(sz + 1);
              if (buf)
                {
+                  memset(buf, 0, sz + 1);
                   if (fread(buf, 1, sz, f))
                     {
                        eina_simple_xml_parse(buf, sz, EINA_TRUE, cb_name_dump, &dump);
-                       free(buf);
                     }
+                  free(buf);
                }
           }
         fclose(f);
@@ -4693,5 +4704,10 @@ _nominatim_url_cb(Evas_Object *obj, int method, char *name, double lon, double l
    else if (method == ELM_MAP_NAME_METHOD_REVERSE) snprintf(buf, sizeof(buf), "%s/reverse?format=xml&lat=%lf&lon=%lf&zoom=%d&addressdetails=0", NAME_NOMINATIM_URL, lat, lon, wd->zoom);
    else strcpy(buf, "");
 
+   if (str && str[0])
+     {
+       free(str[0]);
+       free(str);
+     }
    return strdup(buf);
 }
