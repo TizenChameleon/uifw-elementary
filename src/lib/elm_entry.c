@@ -179,25 +179,25 @@ static const char SIG_ANCHOR_CLICKED[] = "anchor,clicked";
 static const char SIG_MATCHLIST_CLICKED[] = "matchlist,clicked";
 static const char SIG_PREEDIT_CHANGED[] = "preedit,changed";
 static const Evas_Smart_Cb_Description _signals[] = {
-  {SIG_CHANGED, ""},
-  {SIG_ACTIVATED, ""},
-  {SIG_PRESS, ""},
-  {SIG_LONGPRESSED, ""},
-  {SIG_CLICKED, ""},
-  {SIG_CLICKED_DOUBLE, ""},
-  {SIG_FOCUSED, ""},
-  {SIG_UNFOCUSED, ""},
-  {SIG_SELECTION_PASTE, ""},
-  {SIG_SELECTION_COPY, ""},
-  {SIG_SELECTION_CUT, ""},
-  {SIG_SELECTION_START, ""},
-  {SIG_SELECTION_CHANGED, ""},
-  {SIG_SELECTION_CLEARED, ""},
-  {SIG_CURSOR_CHANGED, ""},
-  {SIG_ANCHOR_CLICKED, ""},
-  {SIG_PREEDIT_CHANGED, ""},
-  {SIG_MATCHLIST_CLICKED, ""},
-  {NULL, NULL}
+       {SIG_CHANGED, ""},
+       {SIG_ACTIVATED, ""},
+       {SIG_PRESS, ""},
+       {SIG_LONGPRESSED, ""},
+       {SIG_CLICKED, ""},
+       {SIG_CLICKED_DOUBLE, ""},
+       {SIG_FOCUSED, ""},
+       {SIG_UNFOCUSED, ""},
+       {SIG_SELECTION_PASTE, ""},
+       {SIG_SELECTION_COPY, ""},
+       {SIG_SELECTION_CUT, ""},
+       {SIG_SELECTION_START, ""},
+       {SIG_SELECTION_CHANGED, ""},
+       {SIG_SELECTION_CLEARED, ""},
+       {SIG_CURSOR_CHANGED, ""},
+       {SIG_ANCHOR_CLICKED, ""},
+       {SIG_PREEDIT_CHANGED, ""},
+       {SIG_MATCHLIST_CLICKED, ""},
+       {NULL, NULL}
 };
 
 typedef enum _Elm_Entry_Magnifier_Type

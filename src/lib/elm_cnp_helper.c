@@ -168,14 +168,14 @@ static void entry_insert_filter(Evas_Object* entry, char* str);
 /* Optimisation: Turn this into a 256 byte table:
  *	then can lookup in one index, not N checks */
 static const Escape escapes[] = {
-       { "<br>",   '\n' },
-       { "<ps>",   '\n' },
-       { "<\t>",   '\t' },
-       { "gt;",    '>'  },
-       { "lt;",    '<'  },
-       { "amp;",   '&'  },
-       { "quot;",  '\'' },
-       { "dquot;", '"'  }
+  { "<br>",   '\n' },
+  { "<ps>",   '\n' },
+  { "<\t>",   '\t' },
+  { "gt;",    '>'  },
+  { "lt;",    '<'  },
+  { "amp;",   '&'  },
+  { "quot;",  '\'' },
+  { "dquot;", '"'  }
 };
 #define N_ESCAPES ((int)(sizeof(escapes) / sizeof(escapes[0])))
 
@@ -1461,11 +1461,13 @@ notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notif
           {
              if ((atoms[j].atom == atomlist[i]) && (atoms[j].notify))
                {
-/*                  if ((j == CNP_ATOM_text_uri) ||
+#if 0
+                  if ((j == CNP_ATOM_text_uri) ||
                       (j == CNP_ATOM_text_urilist))
                     {
                       if(!is_uri_type_data(sel, notify)) continue;
-                    }*/
+                    }
+#endif
                   cnp_debug("Atom %s matches\n",atoms[j].name);
                   goto done;
                }

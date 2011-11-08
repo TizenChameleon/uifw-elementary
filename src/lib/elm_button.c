@@ -1,10 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-/**
- * @ingroup Elementary
- */
-
 typedef struct _Widget_Data Widget_Data;
 
 enum
@@ -112,15 +108,15 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
           {
              _set_label(obj, wd->statelabel[FOCUSED]);
           }
-   edje_object_signal_emit(wd->btn, "elm,action,focus", "elm");
-   evas_object_focus_set(wd->btn, EINA_TRUE);
+        edje_object_signal_emit(wd->btn, "elm,action,focus", "elm");
+        evas_object_focus_set(wd->btn, EINA_TRUE);
      }
    else
      {
         if (wd->statelabel[DEFAULT])
           _set_label(obj, wd->statelabel[DEFAULT]);
-   edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
-   evas_object_focus_set(wd->btn, EINA_FALSE);
+        edje_object_signal_emit(wd->btn, "elm,action,unfocus", "elm");
+        evas_object_focus_set(wd->btn, EINA_FALSE);
      }
 }
 
