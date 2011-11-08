@@ -297,14 +297,14 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    Evas_Coord_Rectangle hover_area;
    Evas_Coord_Rectangle parent_size;
    Evas_Coord_Point arrow_size;
-   Elm_Ctxpopup_Direction arrow = ELM_CTXPOPUP_DIRECTION_DOWN;
+   Elm_Ctxpopup_Direction dir = ELM_CTXPOPUP_DIRECTION_DOWN;
    Evas_Coord_Point temp;
    int idx;
 
    wd = elm_widget_data_get(obj);
 
    if ((!wd) || (!rect))
-      return ELM_CTXPOPUP_DIRECTION_DOWN;
+     return ELM_CTXPOPUP_DIRECTION_DOWN;
 
    edje_object_part_geometry_get(wd->arrow, "ctxpopup_arrow", NULL, NULL,
                                  &arrow_size.x, &arrow_size.y);
@@ -360,7 +360,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                 continue;
               _adjust_pos_x(&pos, &base_size, &hover_area);
               pos.y -= base_size.y;
-              arrow = ELM_CTXPOPUP_DIRECTION_UP;
+              dir = ELM_CTXPOPUP_DIRECTION_UP;
               break;
            case ELM_CTXPOPUP_DIRECTION_LEFT:
               temp.x = (pos.x - base_size.x);
@@ -368,7 +368,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                 continue;
               _adjust_pos_y(&pos, &base_size, &hover_area);
               pos.x -= base_size.x;
-              arrow = ELM_CTXPOPUP_DIRECTION_LEFT;
+              dir = ELM_CTXPOPUP_DIRECTION_LEFT;
               break;
            case ELM_CTXPOPUP_DIRECTION_RIGHT:
               temp.x = (pos.x + base_size.x);
@@ -376,7 +376,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                   (hover_area.x + hover_area.w))
                 continue;
               _adjust_pos_y(&pos, &base_size, &hover_area);
-              arrow = ELM_CTXPOPUP_DIRECTION_RIGHT;
+              dir = ELM_CTXPOPUP_DIRECTION_RIGHT;
               break;
            case ELM_CTXPOPUP_DIRECTION_DOWN:
               temp.y = (pos.y + base_size.y);
@@ -384,7 +384,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                   (hover_area.y + hover_area.h))
                 continue;
               _adjust_pos_x(&pos, &base_size, &hover_area);
-              arrow = ELM_CTXPOPUP_DIRECTION_DOWN;
+              dir = ELM_CTXPOPUP_DIRECTION_DOWN;
               break;
            default:
               break;
@@ -407,7 +407,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                {
                   _adjust_pos_x(&pos, &base_size, &hover_area);
                   pos.y -= base_size.y;
-                  arrow = ELM_CTXPOPUP_DIRECTION_UP;
+                  dir = ELM_CTXPOPUP_DIRECTION_UP;
                   if (pos.y < (hover_area.y + arrow_size.y))
                     {
                        base_size.y -= ((hover_area.y + arrow_size.y) - pos.y);
@@ -418,7 +418,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
              else
                {
                   _adjust_pos_x(&pos, &base_size, &hover_area);
-                  arrow = ELM_CTXPOPUP_DIRECTION_DOWN;
+                  dir = ELM_CTXPOPUP_DIRECTION_DOWN;
                   if ((pos.y + arrow_size.y + base_size.y) >
                       (hover_area.y + hover_area.h))
                      base_size.y -=
@@ -436,7 +436,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
                {
                   _adjust_pos_y(&pos, &base_size, &hover_area);
                   pos.x -= base_size.x;
-                  arrow = ELM_CTXPOPUP_DIRECTION_LEFT;
+                  dir = ELM_CTXPOPUP_DIRECTION_LEFT;
                   if (pos.x < (hover_area.x + arrow_size.x))
                     {
                        base_size.x -= ((hover_area.x + arrow_size.x) - pos.x);
@@ -447,7 +447,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
              else
                {
                   _adjust_pos_y(&pos, &base_size, &hover_area);
-                  arrow = ELM_CTXPOPUP_DIRECTION_RIGHT;
+                  dir = ELM_CTXPOPUP_DIRECTION_RIGHT;
                   if (pos.x + (arrow_size.x + base_size.x) >
                       hover_area.x + hover_area.w)
                      base_size.x -=
@@ -463,7 +463,7 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    rect->w = base_size.x;
    rect->h = base_size.y;
 
-   return arrow;
+   return dir;
 }
 
 static void
