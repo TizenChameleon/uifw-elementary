@@ -73,14 +73,15 @@ external_pager_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, 
 static Evas_Object *external_pager_content_get(void *data __UNUSED__,
 		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-	ERR("so content");
-	return NULL;
+   ERR("No content.");
+   return NULL;
 }
 
 static void
 external_pager_params_free(void *params)
 {
-   Elm_Params_Pager* mem = params;
+   Elm_Params_Pager *mem = params;
+
    free(mem);
 }
 
@@ -89,5 +90,5 @@ static Edje_External_Param_Info external_pager_params[] = {
    EDJE_EXTERNAL_PARAM_INFO_SENTINEL
 };
 
-DEFINE_EXTERNAL_ICON_ADD(pager, "pager");
+DEFINE_EXTERNAL_ICON_ADD(pager, "pager")
 DEFINE_EXTERNAL_TYPE_SIMPLE(pager, "Pager");
