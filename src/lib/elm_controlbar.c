@@ -127,16 +127,6 @@ _controlbar_move(void *data, Evas_Object * obj __UNUSED__)
    evas_object_move(wd->edje, x, y);
    evas_object_geometry_get(elm_layout_content_get(wd->edje, "bg_image"), NULL, NULL, &width, NULL);
    evas_object_geometry_get(wd->edje, &x_, &y_, NULL, NULL);
-   switch(wd->mode)
-     {
-      case ELM_CONTROLBAR_MODE_LEFT:
-         evas_object_move(wd->view, x + width, y);
-         break;
-      case ELM_CONTROLBAR_MODE_RIGHT:
-      default:
-         evas_object_move(wd->view, x, y);
-         break;
-     }
 }
 
 static void
@@ -153,18 +143,6 @@ _controlbar_resize(void *data, Evas_Object * obj __UNUSED__)
    evas_object_resize(wd->edje, w, h);
    evas_object_geometry_get(elm_layout_content_get(wd->edje, "bg_image"), NULL, NULL, &width, &height);
    evas_object_geometry_get(wd->edje, &x_, &y_, NULL, NULL);
-   switch(wd->mode)
-     {
-      case ELM_CONTROLBAR_MODE_LEFT:
-         evas_object_move(wd->view, x + width, y);
-      case ELM_CONTROLBAR_MODE_RIGHT:
-         evas_object_resize(wd->view, w - width, h);
-         break;
-      default:
-         evas_object_resize(wd->view, w, h - height + 1);
-         evas_object_move(wd->view, x, y);
-         break;
-     }
 }
 
 static void
@@ -189,7 +167,6 @@ _controlbar_object_show(void *data, Evas * e __UNUSED__, Evas_Object * obj __UNU
    if (!data) return;
    wd = elm_widget_data_get((Evas_Object *) data);
    if (!wd) return;
-   evas_object_show(wd->view);
    evas_object_show(wd->edje);
    evas_object_show(wd->box);
 }
@@ -202,7 +179,6 @@ _controlbar_object_hide(void *data, Evas * e __UNUSED__, Evas_Object * obj __UNU
    if (!data) return;
    wd = elm_widget_data_get((Evas_Object *) data);
    if (!wd) return;
-   evas_object_hide(wd->view);
    evas_object_hide(wd->edje);
    evas_object_hide(wd->box);
 
@@ -270,11 +246,6 @@ _del_hook(Evas_Object * obj)
         free(wd->ad);
         wd->ad = NULL;
      }
-   if (wd->view)
-     {
-        evas_object_del(wd->view);
-        wd->view = NULL;
-     }
 
    free(wd);
    wd = NULL;
@@ -296,7 +267,6 @@ _theme_hook(Evas_Object * obj)
                          elm_widget_style_get(obj));
    evas_object_color_get(wd->bg, &r, &g, &b, NULL);
    evas_object_color_set(wd->bg, r, g, b, (int)(255 * wd->alpha / 100));
-   elm_layout_theme_set(wd->view, "controlbar", "view", elm_widget_style_get(obj));
    EINA_LIST_FOREACH(wd->items, l, item)
      {
         elm_layout_theme_set(item->base, "controlbar", "item_bg", elm_widget_style_get(obj));
@@ -334,14 +304,7 @@ _sub_del(void *data __UNUSED__, Evas_Object * obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *sub = event_info;
-   Evas_Object *content;
    if (!wd) return;
-
-   if (sub == wd->view)
-     {
-        content = elm_layout_content_unset(wd->view, "elm.swallow.view");
-        evas_object_hide(content);
-     }
 }
 
 static void
@@ -765,7 +728,7 @@ _select_box(Elm_Controlbar_Item * it)
 
    if (it->style == TABBAR)
      {
-        content = elm_layout_content_unset(wd->view, "elm.swallow.view");
+        content = elm_layout_content_unset(wd->edje, "elm.swallow.view");
         if (content) evas_object_hide(content);
 
         EINA_LIST_FOREACH(wd->items, l, item){
@@ -792,7 +755,7 @@ _select_box(Elm_Controlbar_Item * it)
                evas_object_smart_callback_call(it->obj, "view,change,before", it);
           }
 
-        elm_layout_content_set(wd->view, "elm.swallow.view", it->view);
+        elm_layout_content_set(wd->edje, "elm.swallow.view", it->view);
      }
    else if (it->style == TOOLBAR)
      {
@@ -1168,11 +1131,11 @@ _list_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 
    if (item->style == TABBAR)
      {
-        content = elm_layout_content_unset(wd->view, "elm.swallow.view");
+        content = elm_layout_content_unset(wd->edje, "elm.swallow.view");
         evas_object_hide(content);
         item->selected = EINA_TRUE;
         evas_object_smart_callback_call(item->obj, "view,change,before", item);
-        elm_layout_content_set(wd->view, "elm.swallow.view", item->view);
+        elm_layout_content_set(wd->edje, "elm.swallow.view", item->view);
      }
 
    if ((item->style == TOOLBAR) && (item->func))
@@ -1219,7 +1182,7 @@ static void _ctxpopup_cb(void *data, Evas_Object *obj, void *event_info)
 
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-        label = elm_ctxpopup_item_label_get((Elm_Object_Item *) event_info);
+        label = elm_ctxpopup_item_label_get((Elm_Ctxpopup_Item *) event_info);
         if ((label) && (!strcmp(it->text, label))) break;
      }
 
@@ -1351,14 +1314,6 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
    wd->selected_animation = EINA_FALSE;
    wd->pressed_signal = eina_stringshare_add("elm,state,pressed");
    wd->selected_signal = eina_stringshare_add("elm,state,selected");
-   wd->view = elm_layout_add(wd->parent);
-   elm_layout_theme_set(wd->view, "controlbar", "view", "default");
-   if (wd->view == NULL)
-     {
-        printf("Cannot load bg edj\n");
-        return NULL;
-     }
-   evas_object_show(wd->view);
 
    /* load background edj */
    wd->edje = elm_layout_add(obj);
@@ -1404,7 +1359,6 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
-   evas_object_smart_member_add(wd->view, obj);
    elm_widget_resize_object_set(obj, wd->edje);
 
    _sizing_eval(obj);
@@ -2436,9 +2390,9 @@ elm_controlbar_item_view_unset(Elm_Controlbar_Item *it)
    if (!wd) return NULL;
    Evas_Object *content;
 
-   if (it->view == elm_layout_content_get(wd->view, "elm.swallow.view"))
+   if (it->view == elm_layout_content_get(wd->edje, "elm.swallow.view"))
      {
-        content = elm_layout_content_unset(wd->view, "elm.swallow.view");
+        content = elm_layout_content_unset(wd->edje, "elm.swallow.view");
         if (content) evas_object_hide(content);
      }
    else
