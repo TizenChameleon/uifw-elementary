@@ -492,6 +492,7 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
    Evas_Coord_Rectangle arrow_size;
    Evas_Coord_Rectangle base_size;
    Widget_Data *wd;
+   double drag;
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -524,10 +525,11 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
                 y = base_size.h - arrow_size.h;
               else
                 y = y - base_size.y - (arrow_size.h * 0.5);
+              drag = (double) (y) / (double) (base_size.h - arrow_size.h);
               edje_object_part_drag_value_set(wd->base,
                                               "elm.swallow.arrow_left",
                                               1,
-                                              (double) (y) / (double) (base_size.h - arrow_size.h));
+                                              drag);
            }
          break;
       case ELM_CTXPOPUP_DIRECTION_LEFT:
@@ -547,10 +549,11 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
               else if (y > (base_size.y + base_size.h - (arrow_size.h * 0.5)))
                 y = base_size.h - arrow_size.h;
               else y = y - base_size.y - (arrow_size.h * 0.5);
+              drag = (double) (y) / (double) (base_size.h - arrow_size.h);
               edje_object_part_drag_value_set(wd->base,
                                               "elm.swallow.arrow_right",
                                               0,
-                                              (double) (y) / (double) (base_size.h - arrow_size.h));
+                                              drag);
            }
          break;
       case ELM_CTXPOPUP_DIRECTION_DOWN:
@@ -569,9 +572,10 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
                 x = base_size.w - arrow_size.w;
               else
                 x = x - base_size.x - (arrow_size.w * 0.5);
+              drag = (double) (x) / (double) (base_size.w - arrow_size.w);
               edje_object_part_drag_value_set(wd->base,
                                               "elm.swallow.arrow_up",
-                                              (double) (x) / (double) (base_size.w - arrow_size.w),
+                                              drag,
                                               1);
            }
          break;
@@ -590,9 +594,10 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
               else if (x > (base_size.x + base_size.w - (arrow_size.w * 0.5)))
                 x = base_size.w - arrow_size.w;
               else x = x - base_size.x - (arrow_size.w * 0.5);
+              drag = (double) (x) / (double) (base_size.w - arrow_size.w);
               edje_object_part_drag_value_set(wd->base,
                                               "elm.swallow.arrow_down",
-                                              (double) (x) / (double) (base_size.w - arrow_size.w),
+                                              drag,
                                               0);
            }
          break;
