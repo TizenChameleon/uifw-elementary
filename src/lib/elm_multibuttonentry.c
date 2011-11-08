@@ -100,7 +100,7 @@ static void _entry_key_down_cb(void *data, Evas *e, Evas_Object *obj, void *even
 static void _entry_focus_in_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_focus_out_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
-static void _entry_moved_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
+static void _entry_resized_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static void _view_init(Evas_Object *obj);
 static void _set_vis_guidetext(Evas_Object *obj);
 static void _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv);
@@ -284,7 +284,7 @@ _event_init(Evas_Object *obj)
      {
         evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_UP, _entry_key_up_cb, obj);
         evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_KEY_DOWN, _entry_key_down_cb, obj);
-        evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_MOVE, _entry_moved_cb, obj);
+        evas_object_event_callback_add(wd->entry, EVAS_CALLBACK_RESIZE, _entry_resized_cb, obj);
         evas_object_smart_callback_add(wd->entry, "changed", _entry_changed_cb, obj);
         evas_object_smart_callback_add(wd->entry, "focused", _entry_focus_in_cb, obj);
         evas_object_smart_callback_add(wd->entry, "unfocused", _entry_focus_out_cb, obj);
@@ -790,6 +790,9 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
    //entry is cleared when text is made to button
    elm_entry_entry_set(wd->entry, "");
 
+   // initialize entry size to be called entry's EVAS_CALLBACK_RESIZE even entry size's doesn't changed
+   evas_object_resize(wd->entry, 0, 0);
+
    // add button
    btn = edje_object_add(evas_object_evas_get(obj));
    str_utf8 = elm_entry_markup_to_utf8(str);
@@ -1047,7 +1050,7 @@ _entry_changed_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UN
 }
 
 static void
-_entry_moved_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_entry_resized_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Coord en_x, en_y, en_w, en_h;
    Evas_Coord bx_x, bx_y;
@@ -1058,6 +1061,7 @@ _entry_moved_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUS
    evas_object_geometry_get(wd->entry, &en_x, &en_y, &en_w, &en_h);
    evas_object_geometry_get(wd->box, &bx_x, &bx_y, NULL, NULL);
 
+   // should be reconsidered appropriate location to use the function as below.
    elm_widget_show_region_set(wd->box, en_x - bx_x, en_y - bx_y, en_w, en_h, EINA_TRUE);
 }
 
