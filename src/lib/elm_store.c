@@ -1944,7 +1944,11 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
         else _normal_item_append(sti, itc);
         return sti;
      }
-   else return NULL;
+   else
+     {
+        free(sti);
+        return NULL;
+     }
 }
 
 /**

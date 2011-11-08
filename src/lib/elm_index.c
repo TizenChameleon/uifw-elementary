@@ -856,7 +856,12 @@ _index_process(Evas_Object *obj)
         indx[i] = minh;
      }
    extraIndex=n-N;
-   if (extraIndex < 0) return;
+   if (extraIndex < 0)
+     {
+        free(indx);
+        indx = NULL;
+        return;
+     }
 
    group_count = _group_count(obj, extraIndex, adj_pos, N);
    if (group_count <= 0)
@@ -1032,6 +1037,7 @@ elm_index_item_append_relative(Evas_Object *obj, const char *letter, const void 
      {
         elm_index_item_append(obj, letter, item);
         wd->tot_items_count[wd->level]++;
+        _item_free(it);
         return;
      }
 
@@ -1061,6 +1067,7 @@ elm_index_item_prepend_relative(Evas_Object *obj, const char *letter, const void
      {
         elm_index_item_append(obj, letter, item);
         wd->tot_items_count[wd->level]++;
+        _item_free(it);
         return;
      }
 
