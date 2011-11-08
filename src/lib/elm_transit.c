@@ -327,16 +327,16 @@ _transit_animate_cb(void *data)
    switch (transit->tween_mode)
      {
       case ELM_TRANSIT_TWEEN_MODE_ACCELERATE:
-        transit->progress = 1.0 - sin((ELM_PI / 2.0) + (transit->progress * ELM_PI / 2.0));
-        break;
+         transit->progress = 1.0 - sin((ELM_PI / 2.0) + (transit->progress * ELM_PI / 2.0));
+         break;
       case ELM_TRANSIT_TWEEN_MODE_DECELERATE:
-        transit->progress = sin(transit->progress * ELM_PI / 2.0);
-        break;
+         transit->progress = sin(transit->progress * ELM_PI / 2.0);
+         break;
       case ELM_TRANSIT_TWEEN_MODE_SINUSOIDAL:
-        transit->progress = (1.0 - cos(transit->progress * ELM_PI)) / 2.0;
-        break;
+         transit->progress = (1.0 - cos(transit->progress * ELM_PI)) / 2.0;
+         break;
       default:
-        break;
+         break;
      }
 
    /* Reverse? */
@@ -705,7 +705,7 @@ elm_transit_chain_transit_del(Elm_Transit *transit, Elm_Transit *chain_transit)
 
    if (chain_transit->prev_chain_transit != transit)
      {
-        WRN("These two transit does not have the chain relationship! : transit=%p, chain_transit=%p", transit, chain_transit);
+        WRN("A pair of transits does not have the chain relationship! : transit=%p, chain_transit=%p", transit, chain_transit);
         return;
      }
 
@@ -713,16 +713,6 @@ elm_transit_chain_transit_del(Elm_Transit *transit, Elm_Transit *chain_transit)
    transit->next_chain_transits = eina_list_remove(transit->next_chain_transits, chain_transit);
 }
 
-/**
- * Get the current chain transit list.
- *
- * @note @p transit can not be NULL.
- *
- * @param transit The transit object.
- * @return chain transit list.
- *
- * @ingroup Transit
- */
 EAPI Eina_List *
 elm_transit_chain_transits_get(const Elm_Transit * transit)
 {
