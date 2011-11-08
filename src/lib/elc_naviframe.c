@@ -8,12 +8,12 @@ typedef struct _Elm_Naviframe_Text_Item_Pair Elm_Naviframe_Text_Item_Pair;
 
 struct _Widget_Data
 {
-   Eina_Inlist     *stack;
-   Evas_Object     *base;
-   Evas_Object     *rect;
-   Eina_Bool        preserve: 1;
-   Eina_Bool        auto_pushed: 1;
-   Eina_Bool        freeze_events: 1;
+   Eina_Inlist  *stack;
+   Evas_Object  *base;
+   Evas_Object  *rect;
+   Eina_Bool     preserve: 1;
+   Eina_Bool     auto_pushed: 1;
+   Eina_Bool     freeze_events: 1;
 };
 
 struct _Elm_Naviframe_Content_Item_Pair
