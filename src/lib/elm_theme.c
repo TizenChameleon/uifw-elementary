@@ -2,13 +2,6 @@
 #include "elm_priv.h"
 #include "els_icon.h"
 
-/**
- * @defgroup Theme Theme
- * @ingroup Elementary
- *
- * Functions to modify the theme in the currently running app.
- */
-
 static Elm_Theme theme_default =
 {
    NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1
