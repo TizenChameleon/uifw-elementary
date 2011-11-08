@@ -108,6 +108,7 @@ test_fileselector(void *data       __UNUSED__,
                   void *event_info __UNUSED__)
 {
    Evas_Object *win, *fs, *bg, *vbox, *hbox, *bt, *sep;
+   const char *path = NULL;
 
    /* Set the locale according to the system pref.
     * If you dont do so the file selector will order the files list in
@@ -137,7 +138,9 @@ test_fileselector(void *data       __UNUSED__,
    /* make the file list a tree with dir expandable in place */
    elm_fileselector_expandable_set(fs, EINA_FALSE);
    /* start the fileselector in the home dir */
-   elm_fileselector_path_set(fs, getenv("HOME"));
+   path = getenv("HOME");
+   if (!path) path = "./";
+   elm_fileselector_path_set(fs, path);
    /* allow fs to expand in x & y */
    evas_object_size_hint_weight_set(fs, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fs, EVAS_HINT_FILL, EVAS_HINT_FILL);
