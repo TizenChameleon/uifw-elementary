@@ -66,6 +66,19 @@ _del_hook(Evas_Object *obj)
    free(wd);
 }
 
+/**
+ * Return Notification orientation with RTL
+ *
+ * This function switches-sides of notification area when in RTL mode.
+ *
+ * @param obj notification object.
+ *
+ * @param orient Original notification orientation.
+ *
+ * @return notification orientation with respect to the object RTL mode.
+ *
+ * @internal
+ **/
 static Elm_Notify_Orient
 _notify_orientation_with_rtl(Evas_Object *obj, Elm_Notify_Orient orient)
 {
@@ -139,6 +152,18 @@ _notify_theme_apply(Evas_Object *obj)
      }
 }
 
+/**
+ * Moves notification to orientation.
+ *
+ * This fucntion moves notification to orientation
+ * according to object RTL orientation.
+ *
+ * @param obj notification object.
+ *
+ * @param orient notification orientation.
+ *
+ * @internal
+ **/
 static void
 _notify_move_to_orientation(Evas_Object *obj)
 {
