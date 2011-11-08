@@ -1,5 +1,15 @@
 #include <Elementary.h>
 #include "elm_priv.h"
+#include "els_scroller.h"
+
+/*
+ * TODO (maybe - optional future stuff):
+ *
+ * 1. wrap photo in theme edje so u can have styling around photo (like white
+ *    photo bordering).
+ * 2. exif handling
+ * 3. rotation flags in exif handling (nasty! should have rot in evas)
+ */
 
 typedef struct _Widget_Data Widget_Data;
 typedef struct _Pan Pan;
@@ -323,6 +333,7 @@ grid_create(Evas_Object *obj)
              g->grid[tn].wd = wd;
              g->grid[tn].img =
                 evas_object_image_add(evas_object_evas_get(obj));
+             evas_object_image_load_orientation_set(g->grid[tn].img, EINA_TRUE);
              evas_object_image_scale_hint_set
                 (g->grid[tn].img, EVAS_IMAGE_SCALE_HINT_DYNAMIC);
              evas_object_pass_events_set(g->grid[tn].img, EINA_TRUE);
@@ -1101,6 +1112,7 @@ elm_photocam_add(Evas_Object *parent)
    wd->tsize = 512;
 
    wd->img = evas_object_image_add(e);
+   evas_object_image_load_orientation_set(wd->img, EINA_TRUE);
    evas_object_image_scale_hint_set(wd->img, EVAS_IMAGE_SCALE_HINT_DYNAMIC);
    evas_object_event_callback_add(wd->img, EVAS_CALLBACK_MOUSE_DOWN,
                                   _mouse_down, obj);
@@ -1215,7 +1227,7 @@ elm_photocam_zoom_set(Evas_Object *obj, double zoom)
         if ((wd->size.imw < 1) || (wd->size.imh < 1))
           {
              wd->size.nw = 0;
-             wd->size.nw = 0;
+             wd->size.nh = 0;
           }
         else
           {
@@ -1475,7 +1487,7 @@ elm_photocam_image_region_show(Evas_Object *obj, int x, int y, int w, int h __UN
    rx = (x * wd->size.w) / wd->size.imw;
    ry = (y * wd->size.h) / wd->size.imh;
    rw = (w * wd->size.w) / wd->size.imw;
-   rh = (w * wd->size.h) / wd->size.imh;
+   rh = (h * wd->size.h) / wd->size.imh;
    if (rw < 1) rw = 1;
    if (rh < 1) rh = 1;
    if ((rx + rw) > wd->size.w) rx = wd->size.w - rw;
@@ -1502,7 +1514,7 @@ elm_photocam_image_region_bring_in(Evas_Object *obj, int x, int y, int w, int h 
    rx = (x * wd->size.w) / wd->size.imw;
    ry = (y * wd->size.h) / wd->size.imh;
    rw = (w * wd->size.w) / wd->size.imw;
-   rh = (w * wd->size.h) / wd->size.imh;
+   rh = (h * wd->size.h) / wd->size.imh;
    if (rw < 1) rw = 1;
    if (rh < 1) rh = 1;
    if ((rx + rw) > wd->size.w) rx = wd->size.w - rw;
