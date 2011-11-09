@@ -842,7 +842,6 @@ elm_layout_part_cursor_set(Evas_Object *obj, const char *part_name, const char *
    Widget_Data *wd = elm_widget_data_get(obj);
    EINA_SAFETY_ON_NULL_RETURN_VAL(wd, EINA_FALSE);
    Evas_Object *part_obj;
-   Part_Cursor *pc;
 
    part_obj = (Evas_Object *)edje_object_part_object_get(wd->lay, part_name);
    if (!part_obj)
@@ -863,17 +862,7 @@ elm_layout_part_cursor_set(Evas_Object *obj, const char *part_name, const char *
         return EINA_FALSE;
      }
 
-   pc = _parts_cursors_find(wd, part_name);
-   if (pc) eina_stringshare_replace(&pc->cursor, cursor);
-   else
-     {
-        pc = calloc(1, sizeof(*pc));
-        pc->part = eina_stringshare_add(part_name);
-        pc->cursor = eina_stringshare_add(cursor);
-     }
-
-   pc->obj = part_obj;
-   elm_object_sub_cursor_set(part_obj, obj, pc->cursor);
+   elm_object_sub_cursor_set(part_obj, obj, eina_stringshare_add(cursor));
    return EINA_TRUE;
 }
 
