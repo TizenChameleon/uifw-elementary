@@ -4684,7 +4684,7 @@ _nominatim_url_cb(Evas_Object *obj, int method, char *name, double lon, double l
 {
    ELM_CHECK_WIDTYPE(obj, widtype) strdup("");
    Widget_Data *wd = elm_widget_data_get(obj);
-   char **str;
+   char **str = NULL;
    unsigned int ele, idx;
    char search_url[PATH_MAX];
    char buf[PATH_MAX];
