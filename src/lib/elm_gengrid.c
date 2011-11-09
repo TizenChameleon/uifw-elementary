@@ -893,10 +893,9 @@ _item_realize(Elm_Gengrid_Item *it)
    edje_object_scale_set(VIEW(it), elm_widget_scale_get(it->wd->self) *
                          _elm_config->scale);
    edje_object_mirrored_set(VIEW(it), elm_widget_mirrored_get(WIDGET(it)));
-   edje_object_mirrored_set(VIEW(it), elm_widget_mirrored_get(WIDGET(it)));
    evas_object_smart_member_add(VIEW(it), it->wd->pan_smart);
    elm_widget_sub_object_add(it->wd->self, VIEW(it));
-   snprintf(style, sizeof(style), "it/%s",
+   snprintf(style, sizeof(style), "item/%s",
             it->gic->item_style ? it->gic->item_style : "default");
    _elm_theme_object_set(it->wd->self, VIEW(it), "gengrid", style,
                          elm_widget_style_get(it->wd->self));
