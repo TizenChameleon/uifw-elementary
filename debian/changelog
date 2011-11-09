@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build77) unstable; urgency=low
+
+  * revert the drepcated APIs 
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build77
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Wed, 09 Nov 2011 19:52:21 +0900
+
 elementary (1.0.0+svn.61256slp2+build76) unstable; urgency=low
 
   * deprecate naviframe 
