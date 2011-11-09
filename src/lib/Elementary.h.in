@@ -414,6 +414,11 @@ contact with the developers and maintainers.
 # endif
 #endif /* ! _WIN32 */
 
+#ifdef _WIN32
+# define EAPI_MAIN
+#else
+# define EAPI_MAIN EAPI
+#endif
 
 /* allow usage from c++ */
 #ifdef __cplusplus
