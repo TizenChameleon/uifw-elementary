@@ -1598,6 +1598,9 @@ extern "C" {
     * @{
     */
 
+   EAPI Eina_Bool    elm_mirrored_get(void);
+   EAPI void         elm_mirrored_set(Eina_Bool mirrored);
+
    /**
     * Get the system mirrored mode. This determines the default mirrored mode
     * of widgets.
@@ -1807,8 +1810,7 @@ extern "C" {
     * configuration file.
     *
     */
-   EAPI Eina_Bool    elm_mirrored_get(void);
-   EAPI void         elm_mirrored_set(Eina_Bool mirrored);
+   EAPI Eina_Bool    elm_config_save(void);
 
    /**
     * Reload Elementary's configuration, bounded to current selected
@@ -1822,7 +1824,6 @@ extern "C" {
     * for example, it will force a reload with system values insted.
     *
     */
-   EAPI Eina_Bool    elm_config_save(void);
    EAPI void         elm_config_reload(void);
 
    /**
@@ -1949,6 +1950,8 @@ extern "C" {
     * @li "opengl_sdl"
     * @li "buffer"
     * @li "ews"
+    * @li "opengl_cocoa"
+    * @li "psl1ght"
     *
     * @{
     */
