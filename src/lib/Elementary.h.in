@@ -8259,7 +8259,10 @@ extern "C" {
         struct _Elm_Gengrid_Item_Class_Func
           {
              Elm_Gengrid_Item_Label_Get_Cb label_get;
-             Elm_Gengrid_Item_Content_Get_Cb icon_get;
+             union { /* temporary compatibility code */
+               Elm_Gengrid_Item_Content_Get_Cb icon_get EINA_DEPRECATED;
+               Elm_Gengrid_Item_Content_Get_Cb content_get;
+             };
              Elm_Gengrid_Item_State_Get_Cb state_get;
              Elm_Gengrid_Item_Del_Cb       del;
           } func;
