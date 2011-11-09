@@ -176,7 +176,7 @@ _change_item_bg(Dialogue_Item *item, const char *location)
 
    eina_stringshare_replace(&item->location, location);
    _set_item_theme(item, location);
-   elm_layout_content_set(item->bg_layout, "swallow", item->content);
+   elm_object_content_part_set(item->bg_layout, "swallow", item->content);
    if ((item->press == EINA_TRUE) && (item->disabled == EINA_FALSE))
      edje_object_signal_emit(elm_layout_edje_get(item->bg_layout), "elm,state,press,on", "elm");
    else
@@ -217,7 +217,7 @@ _create_item(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style
    evas_object_size_hint_align_set(item->bg_layout, EVAS_HINT_FILL, 0.0);
    evas_object_show(item->bg_layout);
 
-   elm_layout_content_set(item->bg_layout, "swallow", item->content);
+   elm_object_content_part_set(item->bg_layout, "swallow", item->content);
 
    return item;
 }

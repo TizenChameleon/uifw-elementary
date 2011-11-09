@@ -103,9 +103,9 @@ _theme_hook(Evas_Object *obj)
              elm_object_style_set(action_data->btn, buf);
              ++index;
              snprintf(buf, sizeof(buf), "actionbtn%d", index);
-             elm_layout_content_set(wd->action_area, buf, action_data->btn);
+             elm_object_content_part_set(wd->action_area, buf, action_data->btn);
           }
-        elm_layout_content_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);
+        elm_object_content_part_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);
      }
    if (wd->content_area)
      {
@@ -114,13 +114,13 @@ _theme_hook(Evas_Object *obj)
           {
              snprintf(buf, sizeof(buf), "popup_description/%s", elm_widget_style_get(obj));
              elm_object_style_set(wd->desc_label, buf);
-             elm_layout_content_set(wd->content_area, "elm.swallow.content", wd->desc_label);
+             elm_object_content_part_set(wd->content_area, "elm.swallow.content", wd->desc_label);
           }
         else if (wd->content)
           {
-             elm_layout_content_set(wd->content_area, "elm.swallow.content", wd->content);
+             elm_object_content_part_set(wd->content_area, "elm.swallow.content", wd->content);
           }
-        elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);
+        elm_object_content_part_set(wd->layout, "elm.swallow.content", wd->content_area);
      }
    if (wd->title_area)
      {
@@ -231,7 +231,7 @@ _elm_popup_buttons_add_valist(Evas_Object *obj, const char *first_button_text, v
         btn = _elm_popup_add_button(obj, text, response);
         ++index;
         snprintf(buf, sizeof(buf), "actionbtn%d", index);
-        elm_layout_content_set(wd->action_area, buf, btn);
+        elm_object_content_part_set(wd->action_area, buf, btn);
         evas_object_event_callback_add(wd->action_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                        _changed_size_hints, obj);
         text = va_arg(args, char*);
@@ -327,7 +327,7 @@ elm_popup_add(Evas_Object *parent)
    evas_object_size_hint_align_set(wd->layout, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
-   elm_notify_content_set(wd->notify, wd->layout);
+   elm_object_content_set(wd->notify, wd->layout);
 
    edje_object_signal_callback_add(elm_layout_edje_get(wd->layout), "elm,state,title,visible", "elm", _state_set_cb, obj);
    edje_object_signal_callback_add(elm_layout_edje_get(wd->layout), "elm,state,button,visible", "elm", _state_set_cb, obj);
@@ -384,7 +384,7 @@ elm_popup_with_buttons_add(Evas_Object *parent, const char *title, const char *d
         va_list args;
         va_start(args, first_button_text);
         wd->action_area = elm_layout_add(popup);
-        elm_layout_content_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);
+        elm_object_content_part_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);
         snprintf(buf,sizeof(buf), "buttons%d", no_of_buttons);
                                 wd->no_of_buttons = no_of_buttons;
         elm_layout_theme_set(wd->action_area, "popup", buf, elm_widget_style_get(popup));
@@ -433,8 +433,8 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
    evas_object_size_hint_weight_set(wd->desc_label, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(wd->desc_label, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(wd->desc_label);
-   elm_layout_content_set(wd->content_area, "elm.swallow.content", wd->desc_label);
-   elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);
+   elm_object_content_part_set(wd->content_area, "elm.swallow.content", wd->desc_label);
+   elm_object_content_part_set(wd->layout, "elm.swallow.content", wd->content_area);
    evas_object_event_callback_add(wd->content_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                   _changed_size_hints, obj);
    _sizing_eval(obj);
@@ -523,7 +523,7 @@ elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon)
         wd->title_icon = NULL;
      }
    wd->title_icon = icon;
-   elm_layout_content_set(wd->layout, "elm.swallow.title.icon", wd->title_icon);
+   elm_object_content_part_set(wd->layout, "elm.swallow.title.icon", wd->title_icon);
    edje_object_signal_emit(elm_layout_edje_get(wd->layout), "elm,state,title,icon,visible", "elm");
    edje_object_message_signal_process(wd->layout);
    _sizing_eval(obj);
@@ -573,8 +573,8 @@ elm_popup_content_set(Evas_Object *obj, Evas_Object *content)
      {
         wd->content_area = elm_layout_add(obj);
         elm_layout_theme_set(wd->content_area, "popup","content", elm_widget_style_get(obj));
-        elm_layout_content_set(wd->content_area, "elm.swallow.content", content);
-        elm_layout_content_set(wd->layout, "elm.swallow.content", wd->content_area);
+        elm_object_content_part_set(wd->content_area, "elm.swallow.content", content);
+        elm_object_content_part_set(wd->layout, "elm.swallow.content", wd->content_area);
         evas_object_event_callback_add(wd->content_area, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                        _changed_size_hints, obj);
      }
@@ -624,7 +624,7 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, const char *first_butt
         wd->action_area = NULL;
      }
    wd->action_area = elm_layout_add(obj);
-   elm_layout_content_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);
+   elm_object_content_part_set(wd->layout, "elm.swallow.buttonArea", wd->action_area);
    evas_object_size_hint_weight_set(wd->action_area, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->action_area, EVAS_HINT_FILL, EVAS_HINT_FILL);
    snprintf(buf, sizeof(buf), "buttons%d", no_of_buttons);

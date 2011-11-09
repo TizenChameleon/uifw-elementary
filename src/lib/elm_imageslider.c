@@ -285,7 +285,7 @@ _imageslider_obj_shift(Widget_Data * wd, Eina_Bool left)
         wd->ly[BLOCK_LEFT] = wd->ly[BLOCK_CENTER];
         wd->ly[BLOCK_CENTER] = wd->ly[BLOCK_RIGHT];
         wd->ly[BLOCK_RIGHT] = ly_temp;
-        elm_layout_content_set(wd->ly[BLOCK_RIGHT], "swl.photo", NULL);
+        elm_object_content_part_set(wd->ly[BLOCK_RIGHT], "swl.photo", NULL);
      }
    else
      {
@@ -294,7 +294,7 @@ _imageslider_obj_shift(Widget_Data * wd, Eina_Bool left)
         wd->ly[BLOCK_RIGHT] = wd->ly[BLOCK_CENTER];
         wd->ly[BLOCK_CENTER] = wd->ly[BLOCK_LEFT];
         wd->ly[BLOCK_LEFT] = ly_temp;
-        elm_layout_content_set(wd->ly[BLOCK_LEFT], "swl.photo", NULL);
+        elm_object_content_part_set(wd->ly[BLOCK_LEFT], "swl.photo", NULL);
      }
 }
 
@@ -504,14 +504,14 @@ _check_drag(int state, void *data)
 
    it = eina_list_data_get(l[state]);
 
-   eo = (Evas_Object*)elm_layout_content_get(wd->ly[state], "swl.photo");
+   eo = (Evas_Object*)elm_object_content_part_get(wd->ly[state], "swl.photo");
    if (eo)
      evas_object_geometry_get(eo, &ix, &iy, &iw, &ih);
    edje_object_part_drag_value_get(elm_layout_edje_get(wd->ly[state]), "swl.photo", &dx, &dy);
 
    if ((iw != wd->w) || ((dx != 0) || (dy != 0)))
      {
-        elm_layout_content_set(wd->ly[state], "swl.photo", NULL);
+        elm_object_content_part_set(wd->ly[state], "swl.photo", NULL);
      }
    else
      return 1;
@@ -630,10 +630,10 @@ _imageslider_update(Widget_Data * wd)
 
    for (i = 0; i < BLOCK_MAX; i++)
      {
-        eo = (Evas_Object*)elm_layout_content_get((const Evas_Object*)wd->ly[i], "swl.photo");
+        eo = (Evas_Object*)elm_object_content_part_get((const Evas_Object*)wd->ly[i], "swl.photo");
         if (!l[i])
           {
-             elm_layout_content_set(wd->ly[i], "swl.photo", NULL);
+             elm_object_content_part_set(wd->ly[i], "swl.photo", NULL);
           }
         else
           {
@@ -646,7 +646,7 @@ _imageslider_update(Widget_Data * wd)
                   eo = elm_image_add(wd->obj);
                   //elm_image_prescale_set(eo, wd->w);
                   elm_image_file_set(eo, it->photo_file, NULL);
-                  elm_layout_content_set(wd->ly[i], "swl.photo", eo);
+                  elm_object_content_part_set(wd->ly[i], "swl.photo", eo);
                }
           }
      }
@@ -934,9 +934,9 @@ elm_imageslider_item_selected_set(Elm_Imageslider_Item * it)
 
    for (i = 0; i < BLOCK_MAX; i++)
      {
-       eo = (Evas_Object*)elm_layout_content_get(wd->ly[i], "swl.photo");
+       eo = (Evas_Object*)elm_object_content_part_get(wd->ly[i], "swl.photo");
        if (eo)
-         elm_layout_content_set(wd->ly[i], "swl.photo", NULL);
+         elm_object_content_part_set(wd->ly[i], "swl.photo", NULL);
      }
    _imageslider_update(wd);
 }
@@ -1101,10 +1101,10 @@ elm_imageslider_item_update(Elm_Imageslider_Item *it)
 
    if (wd->ani_lock) return;
    if (it == eina_list_data_get(eina_list_prev(wd->cur)))
-     elm_layout_content_set(wd->ly[BLOCK_LEFT], "swl.photo", NULL);
+     elm_object_content_part_set(wd->ly[BLOCK_LEFT], "swl.photo", NULL);
    else if (it == eina_list_data_get(wd->cur))
-     elm_layout_content_set(wd->ly[BLOCK_CENTER], "swl.photo", NULL);
+     elm_object_content_part_set(wd->ly[BLOCK_CENTER], "swl.photo", NULL);
    else if (it == eina_list_data_get(eina_list_next(wd->cur)))
-     elm_layout_content_set(wd->ly[BLOCK_RIGHT], "swl.photo", NULL);
+     elm_object_content_part_set(wd->ly[BLOCK_RIGHT], "swl.photo", NULL);
    _imageslider_update(wd);
 }

@@ -737,7 +737,7 @@ elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char
    if (btn_label)
      elm_object_text_set(btn, btn_label);
    if (icon)
-     elm_button_icon_set(btn, icon);
+     elm_object_content_set(btn, icon);
    elm_object_focus_allow_set(btn, EINA_FALSE);
    evas_object_smart_callback_add(btn, "clicked", func, data);
    edje_object_part_swallow(item->base, buf, btn);

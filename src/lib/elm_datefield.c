@@ -635,7 +635,7 @@ _datefield_clicked_cb(void *data, Evas_Object *obj __UNUSED__,
 
    elm_ctxpopup_direction_priority_set(wd->ctxpopup, ELM_CTXPOPUP_DIRECTION_DOWN,
                                        ELM_CTXPOPUP_DIRECTION_UP, -1, -1);
-   elm_ctxpopup_content_set(wd->ctxpopup, diskselector);
+   elm_object_content_set(wd->ctxpopup, diskselector);
    snprintf(buf,sizeof(buf), EDC_PART_ITEM_STR, wd->selected_it->location);
    edj_part = edje_object_part_object_get(wd->base, buf);
    evas_object_geometry_get(edj_part, &x, &y, &w, &h);
