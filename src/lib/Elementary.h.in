@@ -19963,7 +19963,7 @@ extern "C" {
    EAPI Evas_Object *elm_pager_content_top_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    EAPI void         elm_pager_to_content_pop(Evas_Object *obj, Evas_Object *content); EINA_ARG_NONNULL(1);
-   EAPI void         elm_pager_animation_disabled_set(Evas_Object *obj, Eina_Bool disable); EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED    EAPI void         elm_pager_animation_disabled_set(Evas_Object *obj, Eina_Bool disable); EINA_ARG_NONNULL(1);
 
    /**
     * @}
@@ -28508,28 +28508,28 @@ extern "C" {
         ELM_NAVIGATIONBAR_BACK_BUTTON
      } Elm_Navi_Button_Type;
 
-   EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);
-   EAPI void         elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1, Evas_Object *fn_btn2, Evas_Object *fn_btn3, Evas_Object *content);
-   EAPI void         elm_navigationbar_pop(Evas_Object *obj);
-   EAPI void         elm_navigationbar_to_content_pop(Evas_Object *obj, Evas_Object *content);
-   EAPI void         elm_navigationbar_title_label_set(Evas_Object *obj, Evas_Object *content, const char *title);
-   EAPI const char  *elm_navigationbar_title_label_get(Evas_Object *obj, Evas_Object *content);
-   EAPI void         elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_Object *title_obj);
-   EAPI Evas_Object *elm_navigationbar_title_object_get(Evas_Object *obj, Evas_Object *content);
-   EAPI Eina_List   *elm_navigationbar_title_object_list_get(Evas_Object *obj, Evas_Object *content);
-   EAPI Evas_Object *elm_navigationbar_content_top_get(Evas_Object *obj);
-   EAPI Evas_Object *elm_navigationbar_content_bottom_get(Evas_Object *obj);
-   EAPI void         elm_navigationbar_hidden_set(Evas_Object *obj, Eina_Bool hidden);
-   EAPI void         elm_navigationbar_title_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Elm_Navi_Button_Type button_type);
-   EAPI Evas_Object *elm_navigationbar_title_button_get(Evas_Object *obj, Evas_Object *content, Elm_Navi_Button_Type button_type);
-   EAPI const char  *elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content);
-   EAPI void         elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
-   EAPI void         elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list);
-   EAPI void         elm_navigationbar_animation_disabled_set(Evas_Object *obj, Eina_Bool disable);
-   EAPI void         elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *content, Eina_Bool visible);
-   Eina_Bool         elm_navigationbar_title_object_visible_get(Evas_Object *obj, Evas_Object *content);
-   EAPI void         elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Object *icon);
-   EAPI Evas_Object *elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1, Evas_Object *fn_btn2, Evas_Object *fn_btn3, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_pop(Evas_Object *obj);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_to_content_pop(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_label_set(Evas_Object *obj, Evas_Object *content, const char *title);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_title_label_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_Object *title_obj);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_title_object_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI Eina_List   *elm_navigationbar_title_object_list_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_content_top_get(Evas_Object *obj);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_content_bottom_get(Evas_Object *obj);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_hidden_set(Evas_Object *obj, Eina_Bool hidden);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Elm_Navi_Button_Type button_type);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_title_button_get(Evas_Object *obj, Evas_Object *content, Elm_Navi_Button_Type button_type);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_animation_disabled_set(Evas_Object *obj, Eina_Bool disable);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *content, Eina_Bool visible);
+   EINA_DEPRECATED    Eina_Bool         elm_navigationbar_title_object_visible_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Object *icon);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content);
 
    /* NavigationBar */
    #define NAVIBAR_EX_TITLEOBJ_INSTANT_HIDE "elm,state,hide,noanimate,title", "elm"
@@ -28545,34 +28545,34 @@ extern "C" {
      } Elm_Navi_ex_Button_Type;
    typedef struct _Elm_Navigationbar_ex_Item Elm_Navigationbar_ex_Item;
 
-   EAPI Evas_Object *elm_navigationbar_ex_add(Evas_Object *parent);
-   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const char *item_style);
-   EAPI void         elm_navigationbar_ex_item_pop(Evas_Object *obj);
-   EAPI void         elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_item_title_label_set(Elm_Navigationbar_ex_Item *item, const char *title);
-   EAPI const char  *elm_navigationbar_ex_item_title_label_get(Elm_Navigationbar_ex_Item* item);
-   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_top_get(const Evas_Object *obj);
-   EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_bottom_get(const Evas_Object *obj);
-   EAPI void         elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data);
-   EAPI Evas_Object *elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type);
-   EAPI void         elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item, Evas_Object *title_obj);
-   EAPI Evas_Object *elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item, Eina_Bool hidden);
-   EAPI Evas_Object *elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item);
-   EAPI const char  *elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item, const char *subtitle);
-   EAPI void         elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char* item_style);
-   EAPI const char  *elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item);
-   EAPI Evas_Object *elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item);
-   EAPI Evas_Object *elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop);
-   EAPI Evas_Object *elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item);
-   EAPI void         elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon);
-   EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
-   EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
-   EAPI void         elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, Eina_Bool visible);
-   Eina_Bool         elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_add(Evas_Object *parent);
+   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const char *item_style);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_pop(Evas_Object *obj);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_label_set(Elm_Navigationbar_ex_Item *item, const char *title);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_title_label_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_top_get(const Evas_Object *obj);
+   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_bottom_get(const Evas_Object *obj);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item, Evas_Object *title_obj);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item, Eina_Bool hidden);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item, const char *subtitle);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char* item_style);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, Eina_Bool visible);
+   EINA_DEPRECATED    Eina_Bool         elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item);
 
    /**
     * @defgroup Naviframe Naviframe
