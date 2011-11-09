@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build74) unstable; urgency=low
+
+  * elm_gengrid rollback
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build74
+
+ -- JeongHyun Yun <jh0506.yun@samsung.com>  Tue, 09 Nov 2011 13:15:53 -0500
+
 elementary (1.0.0+svn.61256slp2+build73) unstable; urgency=low
 
   * Package Upload
