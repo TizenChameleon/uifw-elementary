@@ -980,7 +980,7 @@ extern "C" {
 #define elm_object_text_get(obj) elm_object_text_part_get((obj), NULL)
 
    /**
-    * Set the text for an objects part, marking it as translatable
+    * Set the text for an objects' part, marking it as translatable.
     *
     * The string to set as @p text must be the original one. Do not pass the
     * return of @c gettext() here. Elementary will translate the string
@@ -995,7 +995,7 @@ extern "C" {
     * its own translatable strings, that should not be mixed with those of
     * programs using the library.
     *
-    * @param obj The object
+    * @param obj The object containing the text part
     * @param part The name of the part to set
     * @param domain The translation domain to use
     * @param text The original, non-translated text to set
@@ -1071,9 +1071,9 @@ extern "C" {
 #define elm_object_content_unset(obj) elm_object_content_part_unset((obj), NULL)
 
    /**
-    * Get the wiget object's handle which contains a given item
+    * Get the widget object's handle which contains a given item
     *
-    * @param item The Elementary object item 
+    * @param item The Elementary object item
     * @return The widget object
     *
     * @note This returns the widget object itself that an item belongs to.
@@ -1470,6 +1470,38 @@ extern "C" {
     */
 
    /**
+    * Get the global scaling factor
+    *
+    * This gets the globally configured scaling factor that is applied to all
+    * objects.
+    *
+    * @return The scaling factor
+    * @ingroup Scaling
+    */
+   EAPI double       elm_scale_get(void);
+
+   /**
+    * Set the global scaling factor
+    *
+    * This sets the globally configured scaling factor that is applied to all
+    * objects.
+    *
+    * @param scale The scaling factor to set
+    * @ingroup Scaling
+    */
+   EAPI void         elm_scale_set(double scale);
+
+   /**
+    * Set the global scaling factor for all applications on the display
+    *
+    * This sets the globally configured scaling factor that is applied to all
+    * objects for all applications.
+    * @param scale The scaling factor to set
+    * @ingroup Scaling
+    */
+   EAPI void         elm_scale_all_set(double scale);
+
+   /**
     * Set the scaling factor for a given Elementary object
     *
     * @param obj The Elementary to operate on
@@ -1761,9 +1793,6 @@ extern "C" {
     *
     * @{
     */
-   EAPI double       elm_scale_get(void);
-   EAPI void         elm_scale_set(double scale);
-   EAPI void         elm_scale_all_set(double scale);
 
    /**
     * Save back Elementary's configuration, so that it will persist on
