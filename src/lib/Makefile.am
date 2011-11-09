@@ -84,7 +84,6 @@ elm_font.c \
 elm_frame.c \
 elm_gengrid.c \
 elm_genlist.c \
-elm_genscroller.c \
 elm_gesture_layer.c \
 elm_glview.c \
 elm_grid.c \

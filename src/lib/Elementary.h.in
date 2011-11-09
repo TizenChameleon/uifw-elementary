@@ -28124,9 +28124,6 @@ extern "C" {
     * @}
     */
 
-   EAPI Evas_Object *elm_genscroller_add(Evas_Object *parent);
-   EAPI void         elm_genscroller_world_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h);
-
    EAPI Evas_Object *elm_factory_add(Evas_Object *parent);
    EINA_DEPRECATED EAPI void         elm_factory_content_set(Evas_Object *obj, Evas_Object *content);
    EINA_DEPRECATED EAPI Evas_Object *elm_factory_content_get(const Evas_Object *obj);
