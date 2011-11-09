@@ -17,14 +17,14 @@ test_photo(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    const char *img[9] =
      {
         "panel_01.jpg",
-          "mystrale.jpg",
-          "mystrale_2.jpg",
-          "rock_02.jpg",
-          "sky_01.jpg",
-          "sky_02.jpg",
-          "sky_03.jpg",
-          "sky_04.jpg",
-          "wood_01.jpg"
+        "mystrale.jpg",
+        "mystrale_2.jpg",
+        "rock_02.jpg",
+        "sky_01.jpg",
+        "sky_02.jpg",
+        "sky_03.jpg",
+        "sky_04.jpg",
+        "wood_01.jpg"
      };
 
    win = elm_win_add(NULL, "photo", ELM_WIN_BASIC);
@@ -51,22 +51,23 @@ test_photo(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
              if (n >= 9) n = 0;
              elm_photo_size_set(ph, 80);
              elm_photo_file_set(ph, buf);
-	     elm_photo_editable_set(ph, 1);
+             elm_photo_editable_set(ph, 1);
              evas_object_size_hint_weight_set(ph, EVAS_HINT_EXPAND,
                                               EVAS_HINT_EXPAND);
              evas_object_size_hint_align_set(ph, EVAS_HINT_FILL,
                                              EVAS_HINT_FILL);
-	     evas_object_smart_callback_add(ph, "drop",
+             evas_object_smart_callback_add(ph, "drop",
                                             drop_cb, NULL);
              evas_object_smart_callback_add(ph, "drag,start",
                                             drag_start_cb, NULL);
              evas_object_smart_callback_add(ph, "drag,stop",
                                             drag_stop_cb, NULL);
 
-             if((n == 2) || (n == 3)) {
-            	 elm_photo_fill_inside_set(ph, EINA_TRUE);
-            	 elm_object_style_set(ph, "shadow");
-             }
+             if ((n == 2) || (n == 3))
+               {
+                  elm_photo_fill_inside_set(ph, EINA_TRUE);
+                  elm_object_style_set(ph, "shadow");
+               }
              elm_table_pack(tb, ph, i, j, 1, 1);
              evas_object_show(ph);
           }
@@ -86,17 +87,20 @@ test_photo(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
 /* Never called, elm_photo never call "drop" smart cb */
 static void
-drop_cb(void *mydata __UNUSED__, Evas_Object *obj, void *evdata __UNUSED__){
+drop_cb(void *mydata __UNUSED__, Evas_Object *obj, void *evdata __UNUSED__)
+{
    printf("Drop on obj %p\n", obj);
 }
 
 static void
-drag_start_cb(void *mydata __UNUSED__, Evas_Object *obj __UNUSED__, void *evdata __UNUSED__){
+drag_start_cb(void *mydata __UNUSED__, Evas_Object *obj __UNUSED__, void *evdata __UNUSED__)
+{
 
 }
 
 static void
-drag_stop_cb(void *mydata __UNUSED__, Evas_Object *obj __UNUSED__, void *evdata __UNUSED__){
+drag_stop_cb(void *mydata __UNUSED__, Evas_Object *obj __UNUSED__, void *evdata __UNUSED__)
+{
 
 }
 
