@@ -3606,6 +3606,8 @@ extern "C" {
     * @li "sdl-16", "software-16-sdl", "software_16_sdl" (Rendering to SDL
     * buffer with 16bit software renderer)
     * @li "ews" (rendering to EWS - Ecore + Evas Single Process Windowing System)
+    * @li "gl-cocoa", "gl_cocoa", "opengl-cocoa", "opengl_cocoa" (OpenGL rendering in Cocoa)
+    * @li "psl1ght" (PS3 rendering using PSL1GHT)
     *
     * All engines use a simple string to select the engine to render, EXCEPT
     * the "shot" engine. This actually encodes the output of the virtual
@@ -3771,8 +3773,10 @@ extern "C" {
     * background with elm_bg_add(), as well as setting the window title to
     * @p title. The window type created is of type ELM_WIN_BASIC, with NULL
     * as the parent widget.
-    *
+    * 
     * @return The created object, or NULL on failure
+    *
+    * @see elm_win_add()
     */
    EAPI Evas_Object *elm_win_util_standard_add(const char *name, const char *title);
    /**
@@ -4593,6 +4597,8 @@ extern "C" {
     * deleted, even if you set the new one to NULL. If you want to keep that
     * old content object, use the elm_bg_overlay_unset() function.
     *
+    * @deprecated use elm_object_content_set() instead
+    *
     * @ingroup Bg
     */
 
@@ -4606,6 +4612,8 @@ extern "C" {
     *
     * Return the content object which is set for this widget
     *
+    * @deprecated use elm_object_content_get() instead
+    *
     * @ingroup Bg
     */
    EINA_DEPRECATED EAPI Evas_Object  *elm_bg_overlay_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -4617,6 +4625,8 @@ extern "C" {
     * @return The content that was being used
     *
     * Unparent and return the overlay object which was set for this widget
+    *
+    * @deprecated use elm_object_content_unset() instead
     *
     * @ingroup Bg
     */
@@ -5809,7 +5819,7 @@ extern "C" {
     * Get the horizontal orientation
     *
     * @param obj The box object
-    * @return EINA_TRUE if the box is set to horizintal mode, EINA_FALSE otherwise
+    * @return EINA_TRUE if the box is set to horizontal mode, EINA_FALSE otherwise
     */
    EAPI Eina_Bool           elm_box_horizontal_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -6255,6 +6265,7 @@ extern "C" {
     *
     * @param obj The button object
     * @param icon The icon object for the button
+    * @deprecated use elm_object_content_set() instead.
     */
    EINA_DEPRECATED EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
@@ -6267,7 +6278,7 @@ extern "C" {
     * @param obj The button object
     * @return The icon object that is being used
     *
-    * @see elm_button_icon_unset()
+    * @deprecated use elm_button_icon_unset() instead
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -6280,6 +6291,7 @@ extern "C" {
     *
     * @param obj The button object
     * @return The icon object that was being used
+    * @deprecated use elm_object_content_unset() instead.
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -7097,7 +7109,7 @@ extern "C" {
     * Once the content object is set, a previously set one will be deleted.
     * If you want to keep that old content object, use the
     * elm_scroller_content_unset() function.
-    * @deprecated See elm_object_content_set()
+    * @deprecated use elm_object_content_set() instead
     */
    EINA_DEPRECATED EAPI void         elm_scroller_content_set(Evas_Object *obj, Evas_Object *child) EINA_ARG_NONNULL(1);
    /**
@@ -7270,39 +7282,39 @@ extern "C" {
     * @brief Get scroll current page number.
     *
     * @param obj The scroller object
-    * @param h_pagenumber The horizoptal page number
+    * @param h_pagenumber The horizontal page number
     * @param v_pagenumber The vertical page number
     *
     * The page number starts from 0. 0 is the first page.
-    * Current page means the page which meet the top-left of the viewport.
-    * If there are two or more pages in the viewport, it returns the number of page
-    * which meet the top-left of the viewport.
-    * 
-    * @see elm_scroller_last_page_get() 
-    * @see elm_scroller_page_show() 
-    * @see elm_scroller_page_brint_in() 
+    * Current page means the page which meets the top-left of the viewport.
+    * If there are two or more pages in the viewport, it returns the number of the page
+    * which meets the top-left of the viewport.
+    *
+    * @see elm_scroller_last_page_get()
+    * @see elm_scroller_page_show()
+    * @see elm_scroller_page_brint_in()
     */
-   EAPI void         elm_scroller_current_page_get(Evas_Object *obj, int *h_pagenumber, int *v_pagenumber) EINA_ARG_NONNULL(1);
+   EAPI void         elm_scroller_current_page_get(const Evas_Object *obj, int *h_pagenumber, int *v_pagenumber) EINA_ARG_NONNULL(1);
    /**
     * @brief Get scroll last page number.
     *
     * @param obj The scroller object
-    * @param h_pagenumber The horizoptal page number
+    * @param h_pagenumber The horizontal page number
     * @param v_pagenumber The vertical page number
     *
     * The page number starts from 0. 0 is the first page.
     * This returns the last page number among the pages.
     *
-    * @see elm_scroller_current_page_get() 
-    * @see elm_scroller_page_show() 
-    * @see elm_scroller_page_brint_in() 
+    * @see elm_scroller_current_page_get()
+    * @see elm_scroller_page_show()
+    * @see elm_scroller_page_brint_in()
     */
-   EAPI void         elm_scroller_last_page_get(Evas_Object *obj, int *h_pagenumber, int *v_pagenumber) EINA_ARG_NONNULL(1);
+   EAPI void         elm_scroller_last_page_get(const Evas_Object *obj, int *h_pagenumber, int *v_pagenumber) EINA_ARG_NONNULL(1);
    /**
     * Show a specific virtual region within the scroller content object by page number.
     *
     * @param obj The scroller object
-    * @param h_pagenumber The horizoptal page number
+    * @param h_pagenumber The horizontal page number
     * @param v_pagenumber The vertical page number
     *
     * 0, 0 of the indicated page is located at the top-left of the viewport.
@@ -7325,7 +7337,7 @@ extern "C" {
     * Show a specific virtual region within the scroller content object by page number.
     *
     * @param obj The scroller object
-    * @param h_pagenumber The horizoptal page number
+    * @param h_pagenumber The horizontal page number
     * @param v_pagenumber The vertical page number
     *
     * 0, 0 of the indicated page is located at the top-left of the viewport.
@@ -7791,60 +7803,10 @@ extern "C" {
     */
 
    /**
-    * @page tutorial_frame Frame example
-    * @dontinclude frame_example_01.c
-    *
-    * In this example we are going to create 4 Frames with different styles and
-    * add a rectangle of different color in each.
-    *
-    * We start we the usual setup code:
-    * @until show(bg)
-    *
-    * And then create one rectangle:
-    * @until show
-    *
-    * To add it in our first frame, which since it doesn't have it's style
-    * specifically set uses the default style:
-    * @until show
-    *
-    * And then create another rectangle:
-    * @until show
-    *
-    * To add it in our second frame, which uses the "pad_small" style, note that
-    * even tough we are setting a text for this frame it won't be show, only the
-    * default style shows the Frame's title:
-    * @until show
-    * @note The "pad_small", "pad_medium", "pad_large" and "pad_huge" styles are
-    * very similar, their only difference is the size of the empty area around
-    * the content of the frame.
-    *
-    * And then create yet another rectangle:
-    * @until show
-    *
-    * To add it in our third frame, which uses the "outdent_top" style, note
-    * that even tough we are setting a text for this frame it won't be show,
-    * only the default style shows the Frame's title:
-    * @until show
-    *
-    * And then create one last rectangle:
-    * @until show
-    *
-    * To add it in our fourth and final frame, which uses the "outdent_bottom"
-    * style, note that even tough we are setting a text for this frame it won't
-    * be show, only the default style shows the Frame's title:
-    * @until show
-    *
-    * And now we are left with just some more setup code:
-    * @until ELM_MAIN()
-    *
-    * Our example will look like this:
-    * @image html screenshots/frame_example_01.png
-    * @image latex screenshots/frame_example_01.eps
-    *
-    * @example frame_example_01.c
-    */
-   /**
     * @defgroup Frame Frame
+    *
+    * @image html img/widget/frame/preview-00.png
+    * @image latex img/widget/frame/preview-00.eps
     *
     * @brief Frame is a widget that holds some content and has a title.
     *
@@ -7905,6 +7867,8 @@ extern "C" {
     *
     * @param obj The frame object
     * @param content The content will be filled in this frame object
+    *
+    * @deprecated use elm_object_content_set() instead.
     */
    EINA_DEPRECATED EAPI void         elm_frame_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
@@ -7914,6 +7878,8 @@ extern "C" {
     *
     * @param obj The frame object
     * @return The content that is being used
+    *
+    * @deprecated use elm_object_content_get() instead.
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_frame_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -7923,6 +7889,8 @@ extern "C" {
     *
     * @param obj The frame object
     * @return The content that was being used
+    *
+    * @deprecated use elm_object_content_unset() instead.
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_frame_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
