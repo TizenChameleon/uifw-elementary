@@ -282,11 +282,9 @@ _elm_tooltip_reconfigure(Elm_Tooltip *tt)
         evas_object_pass_events_set(tt->content, EINA_TRUE);
         edje_object_part_swallow
           (tt->tooltip, "elm.swallow.content", tt->content);
-        evas_object_event_callback_add
-          (tt->content, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+        evas_object_event_callback_add(tt->content, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
            _elm_tooltip_content_changed_hints_cb, tt);
-        evas_object_event_callback_add
-          (tt->content, EVAS_CALLBACK_DEL,
+        evas_object_event_callback_add(tt->content, EVAS_CALLBACK_DEL,
            _elm_tooltip_content_del_cb, tt);
 
      }
@@ -601,14 +599,12 @@ elm_object_sub_tooltip_content_cb_set(Evas_Object *eventarea, Evas_Object *owner
 
         just_created = EINA_TRUE;
 
-        evas_object_event_callback_add
-          (eventarea, EVAS_CALLBACK_MOUSE_IN,
+        evas_object_event_callback_add(eventarea, EVAS_CALLBACK_MOUSE_IN,
            _elm_tooltip_obj_mouse_in_cb, tt);
-        evas_object_event_callback_add
-          (eventarea, EVAS_CALLBACK_MOUSE_OUT,
+        evas_object_event_callback_add(eventarea, EVAS_CALLBACK_MOUSE_OUT,
            _elm_tooltip_obj_mouse_out_cb, tt);
-        evas_object_event_callback_add
-          (eventarea, EVAS_CALLBACK_FREE, _elm_tooltip_obj_free_cb, tt);
+        evas_object_event_callback_add(eventarea, EVAS_CALLBACK_FREE,
+            _elm_tooltip_obj_free_cb, tt);
 
         if (owner != eventarea)
           evas_object_event_callback_add
