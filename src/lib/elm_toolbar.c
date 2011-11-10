@@ -628,7 +628,7 @@ _select_filter(Elm_Toolbar_Item *it, Evas_Object *obj __UNUSED__, const char *em
    button = atoi(emission + sizeof("mouse,clicked,") - 1);
    if (button == 1) return; /* regular left click event */
    snprintf(buf, sizeof(buf), "elm,action,click,%d", button);
-   edje_object_signal_emit(it->base.view, buf, "elm");
+   edje_object_signal_emit(VIEW(it), buf, "elm");
 }
 
 static void
@@ -640,21 +640,21 @@ _select(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__
 static Eina_Bool
 _long_press(Elm_Toolbar_Item *it)
 {
-   Widget_Data *wd = elm_widget_data_get(it->base.widget);
+   Widget_Data *wd = elm_widget_data_get(WIDGET(it));
    wd->long_timer = NULL;
    wd->long_press = EINA_TRUE;
-   evas_object_smart_callback_call(it->base.widget, SIG_LONGPRESSED, it);
+   evas_object_smart_callback_call(WIDGET(it), SIG_LONGPRESSED, it);
    return ECORE_CALLBACK_CANCEL;
 }
 
 static void
 _mouse_down(Elm_Toolbar_Item *it, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, Evas_Event_Mouse_Down *ev)
 {
-   Widget_Data *wd = elm_widget_data_get(it->base.widget);
+   Widget_Data *wd = elm_widget_data_get(WIDGET(it));
    if (!wd) return;
    if (ev->button != 1) return;
    if (ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
-     evas_object_smart_callback_call(it->base.widget, SIG_CLICKED_DOUBLE, it);
+     evas_object_smart_callback_call(WIDGET(it), SIG_CLICKED_DOUBLE, it);
    wd->long_press = EINA_FALSE;
    if (wd->long_timer) ecore_timer_interval_set(wd->long_timer, _elm_config->longpress_timeout);
    else wd->long_timer = ecore_timer_add(_elm_config->longpress_timeout, (Ecore_Task_Cb)_long_press, it);
@@ -663,7 +663,7 @@ _mouse_down(Elm_Toolbar_Item *it, Evas *evas __UNUSED__, Evas_Object *obj __UNUS
 static void
 _mouse_up(Elm_Toolbar_Item *it, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, Evas_Event_Mouse_Up *ev)
 {
-   Widget_Data *wd = elm_widget_data_get(it->base.widget);
+   Widget_Data *wd = elm_widget_data_get(WIDGET(it));
    if (!wd) return;
    if (ev->button != 1) return;
    if (wd->long_timer)
@@ -768,7 +768,7 @@ _item_new(Evas_Object *obj, const char *icon, const char *label, Evas_Smart_Cb f
    evas_object_size_hint_weight_set(VIEW(it), -1.0, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(VIEW(it), 0.5, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(VIEW(it), mw, mh);
-   evas_object_event_callback_add(it->base.view, EVAS_CALLBACK_RESIZE,
+   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_RESIZE,
                                   _resize_item, obj);
    if ((!wd->items) && wd->always_select) _item_select(it);
    return it;
@@ -1445,13 +1445,13 @@ EAPI Evas_Object *
 elm_toolbar_item_object_get(const Elm_Toolbar_Item *item)
 {
    Widget_Data *wd;
-   Evas_Object *obj = item->base.widget;
+   Evas_Object *obj = WIDGET(item);
 
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, NULL);
    wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   return item->base.view;
+   return VIEW(item);
 }
 
 EAPI Evas_Object *
@@ -1515,7 +1515,7 @@ elm_toolbar_item_separator_set(Elm_Toolbar_Item *item, Eina_Bool separator)
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item);
    if (item->separator == separator) return;
    item->separator = separator;
-   _theme_hook(item->base.view);
+   _theme_hook(VIEW(item));
 }
 
 EAPI Eina_Bool
