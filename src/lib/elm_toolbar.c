@@ -387,7 +387,7 @@ static void
 _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Coord minw = -1, minh = -1, minw_bx;
+   Evas_Coord minw = -1, minh = -1, minw_bx, minh_bx;
    Evas_Coord vw = 0, vh = 0;
    Evas_Coord w, h;
 
@@ -402,7 +402,9 @@ _sizing_eval(Evas_Object *obj)
 
    evas_object_size_hint_min_get(wd->bx, &minw, &minh);
    minw_bx = minw;
-   if (w > minw) minw = w;
+   minh_bx = minh;
+   if (wd->vertical && (h > minh)) minh = h;
+   if ((!wd->vertical) && (w > minw)) minw = w;
    evas_object_resize(wd->bx, minw, minh);
    elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, &vh);
    if (wd->shrink_mode == ELM_TOOLBAR_SHRINK_NONE)
