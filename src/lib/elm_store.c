@@ -33,9 +33,9 @@
 struct _Elm_Store
 {
    EINA_MAGIC;
-   void         (*free)(Elm_Store *store);
+   void           (*free)(Elm_Store *store);
    struct {
-        void        (*free)(Elm_Store_Item *item);
+      void        (*free)(Elm_Store_Item *item);
    } item;
    Evas_Object   *genlist;
    Ecore_Thread  *list_th;
@@ -47,30 +47,30 @@ struct _Elm_Store
    int            type;
    Eina_List     *always_fetched;
    struct {
-        struct {
-             Elm_Store_Item_List_Cb     func;
-             void                      *data;
-        } list;
-        struct {
-             Elm_Store_Item_Fetch_Cb    func;
-             void                      *data;
-        } fetch;
-        struct {
-             Elm_Store_Item_Unfetch_Cb  func;
-             void                      *data;
-        } unfetch;
-        struct {
-             Elm_Store_Item_Select_Cb func;
-             void                    *data;
-        } item_select;
-        struct {
-             Elm_Store_Item_Sort_Cb func;
-             void                  *data;
-        } item_sort;
-        struct {
-             Elm_Store_Item_Free_Cb func;
-             void                  *data;
-        } item_free;
+      struct {
+         Elm_Store_Item_List_Cb     func;
+         void                      *data;
+      } list;
+      struct {
+         Elm_Store_Item_Fetch_Cb    func;
+         void                      *data;
+      } fetch;
+      struct {
+         Elm_Store_Item_Unfetch_Cb  func;
+         void                      *data;
+      } unfetch;
+      struct {
+         Elm_Store_Item_Select_Cb   func;
+         void                      *data;
+      } item_select;
+      struct {
+         Elm_Store_Item_Sort_Cb     func;
+         void                      *data;
+      } item_sort;
+      struct {
+         Elm_Store_Item_Free_Cb     func;
+         void                      *data;
+      } item_free;
    } cb;
    Eina_Bool      sorted : 1;
    Eina_Bool      fetch_thread : 1;
@@ -99,7 +99,7 @@ struct _Elm_Store_Item
 
 struct _Elm_Store_Filesystem
 {
-   Elm_Store   base;
+   Elm_Store base;
    EINA_MAGIC;
    const char *dir;
 };
@@ -107,7 +107,7 @@ struct _Elm_Store_Filesystem
 struct _Elm_Store_Item_Filesystem
 {
    Elm_Store_Item base;
-   const char    *path;
+   const char *path;
 };
 
 struct _Elm_Store_DBsystem
