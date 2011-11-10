@@ -413,6 +413,7 @@ elm_radio_icon_get(const Evas_Object *obj)
 EAPI Evas_Object *
 elm_radio_icon_unset(Evas_Object *obj)
 {
+   return _content_unset_hook(obj, NULL);
 }
 
 EAPI void
