@@ -517,15 +517,15 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
    switch (dir)
      {
       case ELM_CTXPOPUP_DIRECTION_RIGHT:
-         edje_object_signal_emit(wd->arrow,
-                                 "elm,state,left",
-                                 "elm");
+         edje_object_signal_emit(wd->arrow, "elm,state,left", "elm");
+         edje_object_part_swallow(wd->base,
+                                  "elm.swallow.arrow_left",
+                                  wd->arrow);
 
          // if user does not use dragable part
          arrow_size.y = (y - (arrow_size.h * 0.5));
          arrow_size.x = x;
 
-         edje_object_part_swallow(wd->base, "elm.swallow.arrow_left", wd->arrow);
          if (base_size.h > 0)
            {
               if (y < ((arrow_size.h * 0.5) + base_size.y))
@@ -542,22 +542,23 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
            }
          break;
       case ELM_CTXPOPUP_DIRECTION_LEFT:
-         edje_object_signal_emit(wd->arrow,
-                                 "elm,state,right",
-                                 "elm");
+         edje_object_signal_emit(wd->arrow, "elm,state,right", "elm");
+         edje_object_part_swallow(wd->base,
+                                  "elm.swallow.arrow_right",
+                                  wd->arrow);
 
          // if user does not use dragable part
          arrow_size.y = (y - (arrow_size.h * 0.5));
          arrow_size.x = (x - arrow_size.w);
 
-         edje_object_part_swallow(wd->base, "elm.swallow.arrow_right", wd->arrow);
          if (base_size.h > 0)
            {
               if (y < ((arrow_size.h * 0.5) + base_size.y))
                 y = 0;
               else if (y > (base_size.y + base_size.h - (arrow_size.h * 0.5)))
                 y = base_size.h - arrow_size.h;
-              else y = y - base_size.y - (arrow_size.h * 0.5);
+              else
+                y = y - base_size.y - (arrow_size.h * 0.5);
               drag = (double) (y) / (double) (base_size.h - arrow_size.h);
               edje_object_part_drag_value_set(wd->base,
                                               "elm.swallow.arrow_right",
@@ -567,12 +568,12 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
          break;
       case ELM_CTXPOPUP_DIRECTION_DOWN:
          edje_object_signal_emit(wd->arrow, "elm,state,top", "elm");
+         edje_object_part_swallow(wd->base, "elm.swallow.arrow_up", wd->arrow);
 
          // if user does not use dragable part
          arrow_size.x = (x - (arrow_size.w * 0.5));
          arrow_size.y = y;
 
-         edje_object_part_swallow(wd->base, "elm.swallow.arrow_up", wd->arrow);
          if (base_size.w > 0)
            {
               if (x < ((arrow_size.w * 0.5) + base_size.x))
@@ -590,12 +591,14 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
          break;
       case ELM_CTXPOPUP_DIRECTION_UP:
          edje_object_signal_emit(wd->arrow, "elm,state,bottom", "elm");
+         edje_object_part_swallow(wd->base,
+                                  "elm.swallow.arrow_down",
+                                  wd->arrow);
 
          // if user does not use dragable part
          arrow_size.x = (x - (arrow_size.w * 0.5));
          arrow_size.y = (y - arrow_size.h);
 
-         edje_object_part_swallow(wd->base, "elm.swallow.arrow_down", wd->arrow);
          if (base_size.w > 0)
            {
               if (x < ((arrow_size.w * 0.5) + base_size.x))
@@ -646,7 +649,8 @@ _sizing_eval(Evas_Object *obj)
    Evas_Coord_Point _box_size = { 0, 0 };
 
    wd = elm_widget_data_get(obj);
-   if ((!wd) || (!wd->parent)) return;
+   if (!wd) return;
+   if (!wd->parent) return;
 
    //Box, Scroller
    EINA_LIST_FOREACH(wd->items, elist, item)
@@ -851,7 +855,7 @@ _content_set_hook(Evas_Object *obj, const char *part __UNUSED__,
 }
 
 static Evas_Object *
-_content_unset_hook(Evas_Object *obj, const char *item __UNUSED__)
+_content_unset_hook(Evas_Object *obj, const char *part __UNUSED__)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 
@@ -876,7 +880,7 @@ _content_unset_hook(Evas_Object *obj, const char *item __UNUSED__)
 }
 
 static Evas_Object *
-_content_get_hook(const Evas_Object *obj, const char *item __UNUSED__)
+_content_get_hook(const Evas_Object *obj, const char *part __UNUSED__)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 
@@ -1441,27 +1445,27 @@ elm_ctxpopup_item_del(Elm_Object_Item *it)
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
 
    Widget_Data *wd;
-   Elm_Ctxpopup_Item *item = (Elm_Ctxpopup_Item *) it;
+   Elm_Ctxpopup_Item *ctxpopup_it = (Elm_Ctxpopup_Item *) it;
 
-   wd = elm_widget_data_get(WIDGET(item));
+   wd = elm_widget_data_get(WIDGET(ctxpopup_it));
    if (!wd) return;
 
-   if (item->icon)
-     evas_object_del(item->icon);
-   if (VIEW(item))
-     evas_object_del(VIEW(item));
+   if (ctxpopup_it->icon)
+     evas_object_del(ctxpopup_it->icon);
+   if (VIEW(ctxpopup_it))
+     evas_object_del(VIEW(ctxpopup_it));
 
-   eina_stringshare_del(item->label);
+   eina_stringshare_del(ctxpopup_it->label);
 
-   wd->items = eina_list_remove(wd->items, item);
+   wd->items = eina_list_remove(wd->items, ctxpopup_it);
 
    if (eina_list_count(wd->items) < 1)
      wd->items = NULL;
 
    if (wd->visible)
-     _sizing_eval(WIDGET(item));
+     _sizing_eval(WIDGET(ctxpopup_it));
 
-   free(item);
+   free(ctxpopup_it);
 }
 
 EAPI void
