@@ -1356,10 +1356,10 @@ void
 elm_smart_scroller_paging_get(Evas_Object *obj, double *pagerel_h, double *pagerel_v, Evas_Coord *pagesize_h, Evas_Coord *pagesize_v)
 {
    API_ENTRY return;
-   if(pagerel_h) *pagerel_h = sd->pagerel_h;
-   if(pagerel_v) *pagerel_v = sd->pagerel_v;
-   if(pagesize_h) *pagesize_h = sd->pagesize_h;
-   if(pagesize_v) *pagesize_v = sd->pagesize_v;
+   if (pagerel_h) *pagerel_h = sd->pagerel_h;
+   if (pagerel_v) *pagerel_v = sd->pagerel_v;
+   if (pagesize_h) *pagesize_h = sd->pagesize_h;
+   if (pagesize_v) *pagesize_v = sd->pagesize_v;
 }
 
 void
@@ -1381,16 +1381,16 @@ elm_smart_scroller_last_page_get(Evas_Object *obj, int *pagenumber_h, int *pagen
    if (pagenumber_h)
      {
         if (sd->pagesize_h > 0)
-           *pagenumber_h = cw / sd->pagesize_h + 1;
+          *pagenumber_h = cw / sd->pagesize_h + 1;
         else
-           *pagenumber_h = 0;
+          *pagenumber_h = 0;
      }
    if (pagenumber_v)
      {
         if (sd->pagesize_v > 0)
-           *pagenumber_v = ch / sd->pagesize_v + 1;
+          *pagenumber_v = ch / sd->pagesize_v + 1;
         else
-           *pagenumber_v = 0;
+          *pagenumber_v = 0;
      }
 }
 
@@ -1403,7 +1403,7 @@ elm_smart_scroller_page_show(Evas_Object *obj, int pagenumber_h, int pagenumber_
    if (pagenumber_h) x = sd->pagesize_h * pagenumber_h;
    if (pagenumber_v) y = sd->pagesize_v * pagenumber_v;
    if (_elm_smart_scroller_child_region_show_internal(obj, &x, &y, w, h))
-      elm_smart_scroller_child_pos_set(obj, x, y);
+     elm_smart_scroller_child_pos_set(obj, x, y);
 }
 
 void
