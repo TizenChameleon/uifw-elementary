@@ -1,3 +1,9 @@
+elementary (1.0.0+svn.61256slp2+build78) unstable; urgency=low
+
+  * Further incremental merge of upstream changes
+
+ -- Mike McCormack <mj.mccormack@samsung.com>  Thu, 10 Nov 2011 15:27:10 +0900
+
 elementary (1.0.0+svn.61256slp2+build77) unstable; urgency=low
 
   * revert the drepcated APIs 
