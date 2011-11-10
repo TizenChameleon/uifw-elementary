@@ -4323,6 +4323,8 @@ EAPI void
 elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
+   Widget_Data *wd = elm_widget_data_get(WIDGET(it));
+   if (!wd) return;
    Elm_Genlist_Item *it2;
    Evas_Coord y, h;
 
@@ -4344,7 +4346,12 @@ elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
                   if (!it2) break;
              } while (it2->expanded_depth > it->expanded_depth);
              if (it2)
-                it->wd->expand_item_gap = it->wd->expand_item_end - it2->old_scrl_y;
+               {
+                  Evas_Coord vy, vh;
+                  evas_output_viewport_get(evas_object_evas_get(wd->pan_smart), NULL, &vy, NULL, &vh);
+                  it2->old_scrl_y = ((it2->old_scrl_y > vy + vh) ? vy + vh : it2->old_scrl_y);
+                  it->wd->expand_item_gap = it->wd->expand_item_end - it2->old_scrl_y;
+               }
              else
                 it->wd->expand_item_gap = 0;
 
@@ -5303,7 +5310,7 @@ _item_moving_effect_timer_cb(void *data)
    Evas_Coord ox, oy, ow, oh, cvx, cvy, cvw, cvh;
    Elm_Genlist_Item *it = NULL, *it2;
    const Eina_List *l;
-   double time = 0.3, t;
+   double time = 0.5, t;
    int y, dy;
    Eina_Bool check, end = EINA_FALSE;
    int in = 0;
@@ -5324,7 +5331,7 @@ _item_moving_effect_timer_cb(void *data)
    if (it2)
      {
         if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
-          dy = it2->scrl_y - it2->old_scrl_y;
+          dy = ((it2->scrl_y > cvy + cvh) ? cvy + cvh : it2->scrl_y) - it2->old_scrl_y;
         else if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
           dy = wd->expand_item_gap;
 
