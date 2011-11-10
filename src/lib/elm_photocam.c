@@ -289,7 +289,7 @@ grid_create(Evas_Object *obj)
 
    if (!wd) return NULL;
    g = calloc(1, sizeof(Grid));
-   if (!g) return;
+   if (!g) return NULL;
 
    g->zoom = grid_zoom_calc(wd->zoom);
    g->tsize = wd->tsize;
