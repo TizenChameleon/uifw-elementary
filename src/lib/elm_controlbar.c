@@ -302,9 +302,6 @@ _disable_hook(Evas_Object * obj)
 static void
 _sub_del(void *data __UNUSED__, Evas_Object * obj, void *event_info)
 {
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *sub = event_info;
-   if (!wd) return;
 }
 
 static void
