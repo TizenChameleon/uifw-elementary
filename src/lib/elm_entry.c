@@ -1957,7 +1957,7 @@ _viewport_obj_get(Evas_Object *data)
 
    Evas_Object *parent_obj = data;
 
-   while(parent_obj = elm_widget_parent_get(parent_obj))
+   while ((parent_obj = elm_widget_parent_get(parent_obj)))
      {
         //evas_object_geometry_get(parent_obj, &x, &y, &w, &h);
         //printf(">>> %s (%d, %d, %d, %d) \n", elm_widget_type_get(parent_obj), x, y, w, h);
