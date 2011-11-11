@@ -260,7 +260,7 @@ _elm_signal_exit(void *data __UNUSED__, int ev_type __UNUSED__, void *ev __UNUSE
 static void
 response_cb(void *data, Evas_Object *obj, void *event_info)
 {
-   int res_id = event_info;
+   int res_id = (int) event_info;
    int *id = data;
 
    *id = res_id;

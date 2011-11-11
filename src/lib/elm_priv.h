@@ -214,6 +214,7 @@ Elm_Font_Properties *_elm_font_properties_get(Eina_Hash **font_hash, const char 
 Eina_Hash           *_elm_font_available_hash_add(Eina_Hash *font_hash, const char *full_name);
 void                 _elm_font_available_hash_del(Eina_Hash *hash);
 
+void                _els_box_layout(Evas_Object *o, Evas_Object_Box_Data *priv, int horizontal, int homogeneous, int rtl);
 void                 elm_tooltip_theme(Elm_Tooltip *tt);
 void                 elm_object_sub_tooltip_content_cb_set(Evas_Object *eventarea, Evas_Object *owner, Elm_Tooltip_Content_Cb func, const void *data, Evas_Smart_Cb del_cb);
 void                 elm_cursor_theme(Elm_Cursor *cur);
