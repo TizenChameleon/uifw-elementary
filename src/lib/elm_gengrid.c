@@ -926,7 +926,7 @@ _item_realize(Elm_Gengrid_Item *it)
           }
      }
 
-   if (it->gic->func.icon_get)
+   if (it->gic->func.content_get)
      {
         const Eina_List *l;
         const char *key;
@@ -936,7 +936,7 @@ _item_realize(Elm_Gengrid_Item *it)
                                                           "icons"));
         EINA_LIST_FOREACH(it->icons, l, key)
           {
-             Evas_Object *ic = it->gic->func.icon_get
+             Evas_Object *ic = it->gic->func.content_get
                 ((void *)it->base.data, it->wd->self, l->data);
              if (ic)
                {

@@ -26,9 +26,9 @@ grdt_lbl_get(void            *data,
 }
 
 Evas_Object *
-grdt_icon_get(void        *data,
-              Evas_Object *obj,
-              const char  *part)
+grdt_content_get(void        *data,
+                 Evas_Object *obj,
+                 const char  *part)
 {
    const Testitem *ti = data;
    if (!strcmp(part, "elm.swallow.icon"))
@@ -493,7 +493,7 @@ test_tooltip2(void *data       __UNUSED__,
 
    gic.item_style = "default";
    gic.func.label_get = grdt_lbl_get;
-   gic.func.icon_get = grdt_icon_get;
+   gic.func.content_get = grdt_content_get;
 
    n = 0;
    for (i = 0; i < 9; i++)
