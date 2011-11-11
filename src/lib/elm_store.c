@@ -1144,8 +1144,9 @@ _item_eval(void *data)
 }
 
 static void
-_item_realize(Elm_Store_Item *sti)
+_item_realize(void *data)
 {
+   Elm_Store_Item *sti = data;
    Elm_Store *st = sti->store;
    sti->eval_job = NULL;
    if (st->live)
