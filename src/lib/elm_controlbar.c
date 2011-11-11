@@ -322,7 +322,7 @@ _sizing_eval(Evas_Object * obj)
 static Eina_Bool
 _move_evas_object(void *data)
 {
-   Evas_Object *bg_image;
+   const Evas_Object *bg_image;
    double t = 0.0, vx = 0.0, vy = 0.0, vw = 0.0, vh = 0.0;
    int dx = 0 , dy = 0, dw = 0, dh = 0;
    int px = 0, py = 0, pw = 0, ph = 0;
@@ -1174,7 +1174,7 @@ static void _ctxpopup_cb(void *data, Evas_Object *obj, void *event_info)
    Elm_Controlbar_Item *it;
    const Eina_List *l;
    Evas_Object *ctxpopup = obj;
-   char * label;
+   const char *label;
    Widget_Data *wd = (Widget_Data *)data;
 
    EINA_LIST_FOREACH(wd->items, l, it)
