@@ -985,7 +985,7 @@ _mouse_move(void        *data,
         if (!it->wd->on_hold)
           {
              it->wd->on_hold = EINA_TRUE;
-             if (!it->wd->wasselected)
+             if ((!it->wd->wasselected) && (!it->renamed))
                _item_unselect(it);
           }
      }
@@ -1069,7 +1069,7 @@ _mouse_move(void        *data,
              ecore_timer_del(it->long_timer);
              it->long_timer = NULL;
           }
-        if (!it->wd->wasselected)
+        if ((!it->wd->wasselected) && (!it->renamed))
           _item_unselect(it);
         if (dy < 0)
           {
@@ -1461,7 +1461,7 @@ _mouse_up(void        *data,
    if (it->wd->longpressed)
      {
         it->wd->longpressed = EINA_FALSE;
-        if (!it->wd->wasselected)
+        if ((!it->wd->wasselected) && (!it->renamed))
           _item_unselect(it);
         it->wd->wasselected = EINA_FALSE;
         return;
