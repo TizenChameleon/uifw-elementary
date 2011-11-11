@@ -907,7 +907,14 @@ call:
    if (it->wd->last_selected_item && (it != it->wd->last_selected_item))
      {
         EINA_LIST_FOREACH(it->wd->last_selected_item->icon_objs, l, obj)
-          elm_widget_focused_object_clear(obj);
+          {
+             //elm_widget_focused_object_clear(obj);
+             // FIXME:it prevents to focusable items can get focus
+             //       if another genlist item is selected.
+             //       when genlist items can receive focus, it should be removed
+             elm_genlist_item_fields_update(it->wd->last_selected_item,
+                                            "*", ELM_GENLIST_ITEM_FIELD_ICON);
+          }
      }
    if (it->func.func) it->func.func((void *)it->func.data, parent, it);
    if (!it->delete_me)
