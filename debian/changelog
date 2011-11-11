@@ -1,8 +1,8 @@
-elementary (1.0.0+svn.61256slp2+build80) unstable; urgency=low
+elementary (1.0.0+svn.61256slp2+build81) unstable; urgency=low
 
   * Package Upload
   * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
-  * Tag: elementary_1.0.0+svn.61256slp2+build80
+  * Tag: elementary_1.0.0+svn.61256slp2+build81
 
  -- Myungjae Lee <mjae.lee@samsung.com>  Fri, 11 Nov 2011 20:17:24 +0900
 
