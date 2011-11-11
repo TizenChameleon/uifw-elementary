@@ -2804,10 +2804,9 @@ _elm_widget_item_tooltip_label_create(void        *data,
 static Evas_Object *
 _elm_widget_item_tooltip_trans_label_create(void        *data,
                                             Evas_Object *obj __UNUSED__,
-                                            Evas_Object *tooltip,
                                             void        *item __UNUSED__)
 {
-   Evas_Object *label = elm_label_add(tooltip);
+   Evas_Object *label = elm_label_add(obj);
    if (!label)
      return NULL;
    elm_object_style_set(label, "tooltip");
