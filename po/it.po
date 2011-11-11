@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-11-08 18:51+0900\n"
+"POT-Creation-Date: 2011-11-11 16:12+0900\n"
 "PO-Revision-Date: 2011-09-26 21:20+0900\n"
 "Last-Translator: Sumanth Krishna Mannam <sumanth.m@samsung.com>\n"
 "Language-Team: General\n"
@@ -66,18 +66,6 @@ msgstr "Copia"
 #: src/lib/elm_entry.c:1367
 msgid "Cut"
 msgstr "Taglio"
-
-#: src/lib/elm_radio.c:289
-msgid "State: Disabled"
-msgstr ""
-
-#: src/lib/elm_radio.c:291
-msgid "State: On"
-msgstr ""
-
-#: src/lib/elm_radio.c:292
-msgid "State: Off"
-msgstr ""
 
 #: src/lib/elm_searchbar.c:214
 msgid "Search"
