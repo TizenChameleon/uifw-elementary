@@ -160,6 +160,8 @@ static void _magnifier_create(void *data);
 static void _magnifier_show(void *data);
 static void _magnifier_hide(void *data);
 static void _magnifier_move(void *data);
+static Evas_Coord_Rectangle _layout_region_get(Evas_Object *data);
+static Evas_Coord_Rectangle _viewport_region_get(Evas_Object *data);
 
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_ACTIVATED[] = "activated";
@@ -1070,6 +1072,12 @@ _move(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    Widget_Data *wd = elm_widget_data_get(data);
 
    if (wd->hoversel) _hoversel_position(data);
+
+   if (!_elm_config->desktop_entry)
+     edje_object_part_text_viewport_region_set(wd->ent, "elm.text", _viewport_region_get(data));
+
+   if (!_elm_config->desktop_entry)
+     edje_object_part_text_layout_region_set(wd->ent, "elm.text", _layout_region_get(data));
 }
 
 static void
@@ -1936,37 +1944,67 @@ _signal_handler_moving(void *data, Evas_Object *obj __UNUSED__, const char *emis
    _magnifier_show(data);
 }
 
-static Evas_Object *
-_viewport_obj_get(Evas_Object *data)
+static Evas_Coord_Rectangle
+_layout_region_get(Evas_Object *data)
 {
+   Evas_Coord_Rectangle geometry;
+   geometry.x = geometry.y = geometry.w = geometry.h = -1;
+
    Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return NULL;
+   if (!wd) return geometry;
 
-   if(!data || !strlen(elm_widget_type_get(data)))
-     return NULL;
+   if (!data || !strlen(elm_widget_type_get(data)))
+     return geometry;
 
-   Evas_Coord x, y, w, h;
-   x = y = w = h = -1;
+   Evas_Object *child_obj = data;
+   Evas_Object *parent_obj;
+
+   while (parent_obj = elm_widget_parent_get(child_obj))
+     {
+        if (!strcmp(elm_widget_type_get(parent_obj), "conformant"))
+          {
+             evas_object_geometry_get(child_obj, &geometry.x, &geometry.y, &geometry.w, &geometry.h);
+             return geometry;
+          }
+        child_obj = parent_obj;
+     }
+
+   return geometry;
+}
+
+static Evas_Coord_Rectangle
+_viewport_region_get(Evas_Object *data)
+{
+   Evas_Coord_Rectangle geometry;
+   geometry.x = geometry.y = geometry.w = geometry.h = -1;
+
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return geometry;
+
+   if (!data || !strlen(elm_widget_type_get(data)))
+     return geometry;
 
    if (wd->scroll)
      {
-        //evas_object_geometry_get(wd->scroller, &x, &y, &w, &h);
-        //printf(">>> wd->scroller (%d, %d, %d, %d) \n", x, y, w, h);
-        return wd->scroller;
+        evas_object_geometry_get(wd->scroller, &geometry.x, &geometry.y, NULL, NULL);
+        elm_smart_scroller_child_viewport_size_get(wd->scroller, &geometry.w, &geometry.h);
+
+        return geometry;
      }
 
    Evas_Object *parent_obj = data;
 
-   while ((parent_obj = elm_widget_parent_get(parent_obj)))
+   while (parent_obj = elm_widget_parent_get(parent_obj))
      {
-        //evas_object_geometry_get(parent_obj, &x, &y, &w, &h);
-        //printf(">>> %s (%d, %d, %d, %d) \n", elm_widget_type_get(parent_obj), x, y, w, h);
         if (!strcmp(elm_widget_type_get(parent_obj), "scroller") ||
             !strcmp(elm_widget_type_get(parent_obj), "genlist"))
-          return parent_obj;
+          {
+             evas_object_geometry_get(parent_obj, &geometry.x, &geometry.y, &geometry.w, &geometry.h);
+             return geometry;
+          }
      }
 
-   return NULL;
+   return geometry;
 }
 
 static void
@@ -2002,8 +2040,6 @@ _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emi
      }
 #endif
 
-   if (!_elm_config->desktop_entry)
-     edje_object_part_text_viewport_object_set(wd->ent, "elm.text", _viewport_obj_get(data));
 }
 
 static void
@@ -2970,7 +3006,6 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->select = _select;
    ext_mod->selectall = _selectall;
    ext_mod->ent = wd->ent;
-   ext_mod->viewport_obj = _viewport_obj_get(obj);
    ext_mod->items = wd->items;
    ext_mod->editable = wd->editable;
    ext_mod->have_selection = wd->have_selection;
