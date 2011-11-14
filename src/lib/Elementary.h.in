@@ -894,10 +894,17 @@ extern "C" {
 
    EAPI Eina_Bool    elm_need_efreet(void);
    EAPI Eina_Bool    elm_need_e_dbus(void);
+
+   /**
+    * This must be called before any other function that deals with
+    * elm_thumb objects or ethumb_client instances.
+    *
+    * @ingroup Thumb
+    */
    EAPI Eina_Bool    elm_need_ethumb(void);
 
    /**
-    * This must be called before any other function that handle with
+    * This must be called before any other function that deals with
     * elm_web objects or ewk_view instances.
     *
     * @ingroup Web
@@ -2325,6 +2332,7 @@ extern "C" {
     * @ingroup Focus
     */
    EAPI Eina_Bool        elm_object_focus_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    /**
     * Set/unset focus to a given Elementary object.
     *
@@ -9940,7 +9948,7 @@ extern "C" {
     * @param text The text to set
     *
     * @ingroup Layout
-    * @deprecated use elm_object_text_* instead.
+    * @deprecated use elm_object_text_part_set() instead.
     */
    EINA_DEPRECATED EAPI void               elm_layout_text_set(Evas_Object *obj, const char *part, const char *text) EINA_ARG_NONNULL(1);
    /**
@@ -9952,7 +9960,7 @@ extern "C" {
     * @return The text set in @p part
     *
     * @ingroup Layout
-    * @deprecated use elm_object_text_* instead.
+    * @deprecated use elm_object_text_part_get() instead.
     */
    EINA_DEPRECATED EAPI const char        *elm_layout_text_get(const Evas_Object *obj, const char *part) EINA_ARG_NONNULL(1);
    /**
@@ -10379,7 +10387,7 @@ extern "C" {
  * Elementary naming convention for its parts.
  *
  * @ingroup Layout
- * @deprecated use elm_object_text_* instead.
+ * @deprecated use elm_object_text_set() instead.
  */
 #define elm_layout_label_set(_ly, _txt) \
   elm_layout_text_set((_ly), "elm.text", (_txt))
@@ -10390,7 +10398,7 @@ extern "C" {
  * Elementary naming convention for its parts.
  *
  * @ingroup Layout
- * @deprecated use elm_object_text_* instead.
+ * @deprecated use elm_object_text_set() instead.
  */
 #define elm_layout_label_get(_ly) \
   elm_layout_text_get((_ly), "elm.text")
@@ -12763,7 +12771,6 @@ extern "C" {
    struct _Elm_Gesture_Line_Info
      {  /* Report line ends, timestamps, and momentum computed      */
         Elm_Gesture_Momentum_Info momentum; /**< Line momentum info */
-        /* FIXME should be radians, bot degrees */
         double angle;              /**< Angle (direction) of lines  */
      };
 
@@ -24441,7 +24448,6 @@ extern "C" {
     * - @c "default"
     *
     * Default contents parts of the conformant widget that you can use for are:
-    *
     * @li "elm.swallow.content" - A content of the conformant
     *
     * See how to use this widget in this example:
@@ -24728,6 +24734,9 @@ extern "C" {
    /**
     * @defgroup Flipselector Flip Selector
     *
+    * @image html img/widget/flipselector/preview-00.png
+    * @image latex img/widget/flipselector/preview-00.eps
+    *
     * A flip selector is a widget to show a set of @b text items, one
     * at a time, with the same sheet switching style as the @ref Clock
     * "clock" widget, when one changes the current displaying sheet
@@ -24856,13 +24865,13 @@ extern "C" {
     * Get the internal list of items in a given flip selector widget.
     *
     * @param obj The flipselector object
-    * @return The list of items (#Elm_Flipselector_Item as data) or @c
-    * NULL on errors.
+    * @return The list of items (#Elm_Flipselector_Item as data) or
+    * @c NULL on errors.
     *
     * This list is @b not to be modified in any way and must not be
     * freed. Use the list members with functions like
     * elm_flipselector_item_label_set(),
-    * elm_flipselector_item_label_get(), elm_flipselector_item_del(),
+    * elm_flipselector_item_label_get(),
     * elm_flipselector_item_del(),
     * elm_flipselector_item_selected_get(),
     * elm_flipselector_item_selected_set().
@@ -28265,7 +28274,6 @@ extern "C" {
    EAPI void         elm_factory_maxmin_mode_set(Evas_Object *obj, Eina_Bool enabled);
    EAPI Eina_Bool    elm_factory_maxmin_mode_get(const Evas_Object *obj);
    EAPI void         elm_factory_maxmin_reset_set(Evas_Object *obj);
-
 
    /**
     * @defgroup Video Video
