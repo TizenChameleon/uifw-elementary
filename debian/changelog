@@ -1,3 +1,9 @@
+elementary (1.0.0+svn.61256slp2+build82) unstable; urgency=low
+
+  * Merge menu changes from upstream
+
+ -- Mike McCormack <mj.mccormack@samsung.com>  Mon, 14 Nov 2011 14:43:08 +0900
+
 elementary (1.0.0+svn.61256slp2+build81) unstable; urgency=low
 
   * Package Upload
