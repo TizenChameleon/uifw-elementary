@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-11-11 16:12+0900\n"
+"POT-Creation-Date: 2011-11-14 14:13+0900\n"
 "PO-Revision-Date: 2011-09-26 21:20+0900\n"
 "Last-Translator: Sumanth Krishna Mannam <sumanth.m@samsung.com>\n"
 "Language-Team: General\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#: src/lib/elc_fileselector.c:995 src/lib/elm_entry.c:1370
+#: src/lib/elc_fileselector.c:995 src/lib/elm_entry.c:1378
 #: src/lib/elm_searchbar.c:226
 msgid "Cancel"
 msgstr ""
@@ -50,23 +50,23 @@ msgstr "上午"
 msgid "DateTimeFormat"
 msgstr "%Y年 %m月 %d日 %p %I : %M"
 
-#: src/lib/elm_entry.c:1344
+#: src/lib/elm_entry.c:1352
 msgid "Select"
 msgstr ""
 
-#: src/lib/elm_entry.c:1349
+#: src/lib/elm_entry.c:1357
 msgid "Paste"
 msgstr ""
 
-#: src/lib/elm_entry.c:1354 src/lib/elm_entry.c:1374
+#: src/lib/elm_entry.c:1362 src/lib/elm_entry.c:1382
 msgid "More"
 msgstr ""
 
-#: src/lib/elm_entry.c:1364
+#: src/lib/elm_entry.c:1372
 msgid "Copy"
 msgstr ""
 
-#: src/lib/elm_entry.c:1367
+#: src/lib/elm_entry.c:1375
 msgid "Cut"
 msgstr ""
 
