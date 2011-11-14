@@ -1371,7 +1371,7 @@ elm_multibuttonentry_add(Evas_Object *parent)
  * @ingroup Multibuttonentry
  */
 EAPI Evas_Object *
-elm_multibuttonentry_entry_get(Evas_Object *obj)
+elm_multibuttonentry_entry_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1389,7 +1389,7 @@ elm_multibuttonentry_entry_get(Evas_Object *obj)
  * @ingroup Multibuttonentry
  */
 EAPI const char *
-elm_multibuttonentry_label_get(Evas_Object *obj)
+elm_multibuttonentry_label_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1427,7 +1427,7 @@ elm_multibuttonentry_label_set(Evas_Object *obj, const char *label)
  * @ingroup Multibuttonentry
  */
 EAPI const char *
-elm_multibuttonentry_guide_text_get(Evas_Object *obj)
+elm_multibuttonentry_guide_text_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1466,7 +1466,7 @@ elm_multibuttonentry_guide_text_set(Evas_Object *obj, const char *guidetext)
  * @ingroup Multibuttonentry
  */
 EAPI int
-elm_multibuttonentry_contracted_state_get(Evas_Object *obj)
+elm_multibuttonentry_contracted_state_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) -1;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1588,7 +1588,7 @@ elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Mul
  * @ingroup Multibuttonentry
  */
 EAPI const Eina_List *
-elm_multibuttonentry_items_get(Evas_Object *obj)
+elm_multibuttonentry_items_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1605,7 +1605,7 @@ elm_multibuttonentry_items_get(Evas_Object *obj)
  * @ingroup Multibuttonentry
  */
 EAPI Elm_Multibuttonentry_Item *
-elm_multibuttonentry_item_first_get(Evas_Object *obj)
+elm_multibuttonentry_item_first_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1622,7 +1622,7 @@ elm_multibuttonentry_item_first_get(Evas_Object *obj)
  * @ingroup Multibuttonentry
  */
 EAPI Elm_Multibuttonentry_Item *
-elm_multibuttonentry_item_last_get(Evas_Object *obj)
+elm_multibuttonentry_item_last_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1639,7 +1639,7 @@ elm_multibuttonentry_item_last_get(Evas_Object *obj)
  * @ingroup Multibuttonentry
  */
 EAPI Elm_Multibuttonentry_Item *
-elm_multibuttonentry_item_selected_get(Evas_Object *obj)
+elm_multibuttonentry_item_selected_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1742,7 +1742,7 @@ elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item)
  * @ingroup Multibuttonentry
  */
 EAPI const char *
-elm_multibuttonentry_item_label_get(Elm_Multibuttonentry_Item *item)
+elm_multibuttonentry_item_label_get(const Elm_Multibuttonentry_Item *item)
 {
    Widget_Data *wd;
    Eina_List *l;
@@ -1856,7 +1856,7 @@ elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item)
  * @ingroup Multibuttonentry
  */
 EAPI void *
-elm_multibuttonentry_item_data_get(Elm_Multibuttonentry_Item *item)
+elm_multibuttonentry_item_data_get(const Elm_Multibuttonentry_Item *item)
 {
    if (!item) return NULL;
    return item->data;
