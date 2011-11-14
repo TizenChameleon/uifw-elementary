@@ -1959,7 +1959,7 @@ _layout_region_get(Evas_Object *data)
    Evas_Object *child_obj = data;
    Evas_Object *parent_obj;
 
-   while (parent_obj = elm_widget_parent_get(child_obj))
+   while ((parent_obj = elm_widget_parent_get(child_obj)))
      {
         if (!strcmp(elm_widget_type_get(parent_obj), "conformant"))
           {
@@ -1994,7 +1994,7 @@ _viewport_region_get(Evas_Object *data)
 
    Evas_Object *parent_obj = data;
 
-   while (parent_obj = elm_widget_parent_get(parent_obj))
+   while ((parent_obj = elm_widget_parent_get(parent_obj)))
      {
         if (!strcmp(elm_widget_type_get(parent_obj), "scroller") ||
             !strcmp(elm_widget_type_get(parent_obj), "genlist"))
