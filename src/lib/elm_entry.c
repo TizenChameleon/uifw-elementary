@@ -3338,13 +3338,8 @@ elm_entry_cursor_end_set(Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   int x, y, w, h;
    edje_object_part_text_cursor_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
-   if (wd->scroll)
-     {
-        elm_widget_show_region_get(wd->ent, &x, &y, &w, &h);
-        elm_smart_scroller_child_region_show(wd->scroller, x, y, w, h);
-     }
+   edje_object_message_signal_process(wd->ent);
 }
 
 EAPI void
