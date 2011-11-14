@@ -213,6 +213,11 @@ obj_longpress(Evas_Object *obj)
    elm_entry_extension_module_data_get(obj,ext_mod);
    if (ext_mod->context_menu)
      {
+#ifdef HAVE_ELEMENTARY_X
+        int cbhm_count = -1;
+        if (elm_cbhm_helper_init(obj))
+          cbhm_count = elm_cbhm_get_count();
+#endif
         if (ext_mod->popup) evas_object_del(ext_mod->popup);
         //else elm_widget_scroll_freeze_push(obj);
         top = elm_widget_top_get(obj);
@@ -248,7 +253,11 @@ obj_longpress(Evas_Object *obj)
                }
              //elm_ctxpopup_item_append(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
              // start for cbhm
+#ifdef HAVE_ELEMENTARY_X
+             if ((!ext_mod->password) && (ext_mod->editable) && (cbhm_count))
+#else
              if ((!ext_mod->password) && (ext_mod->editable))
+#endif
                {
                   icon = elm_icon_add(ext_mod->popup);
                   snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
@@ -285,7 +294,11 @@ obj_longpress(Evas_Object *obj)
                          }
                     }
                   // start for cbhm
+#ifdef HAVE_ELEMENTARY_X
+                  if (ext_mod->editable && cbhm_count)
+#else
                   if (ext_mod->editable)
+#endif
                     {
                        icon = elm_icon_add(ext_mod->popup);
                        snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
