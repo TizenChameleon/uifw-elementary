@@ -16045,13 +16045,65 @@ extern "C" {
     * @see elm_menu_add()
     */
    EAPI const Eina_List   *elm_menu_item_subitems_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the position of a menu item
+    *
+    * @param item The menu item
+    * @return The item's index
+    *
+    * This function returns the index position of a menu item in a menu.
+    * For a sub-menu, this number is relative to the first item in the sub-menu.
+    *
+    * @note Index values begin with 0
+    */
    EAPI unsigned int       elm_menu_item_index_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1) EINA_PURE;
+   /**
+    * @brief @brief Return a menu item's owner menu
+    *
+    * @param item The menu item
+    * @return The menu object owning @p item, or NULL on failure
+    *
+    * Use this function to get the menu object owning an item.
+    */
+   EAPI Evas_Object       *elm_menu_item_menu_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1) EINA_PURE;
+   /**
+    * @brief Get the selected item in the menu
+    *
+    * @param obj The menu object
+    * @return The selected item, or NULL if none
+    *
+    * @see elm_menu_item_selected_get()
+    * @see elm_menu_item_selected_set()
+    */
    EAPI Elm_Menu_Item *elm_menu_selected_item_get(const Evas_Object * obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the last item in the menu
+    *
+    * @param obj The menu object
+    * @return The last item, or NULL if none
+    */
    EAPI Elm_Menu_Item *elm_menu_last_item_get(const Evas_Object * obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the first item in the menu
+    *
+    * @param obj The menu object
+    * @return The first item, or NULL if none
+    */
    EAPI Elm_Menu_Item *elm_menu_first_item_get(const Evas_Object * obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the next item in the menu.
+    *
+    * @param item The menu item object.
+    * @return The item after it, or NULL if none
+    */
    EAPI Elm_Menu_Item *elm_menu_item_next_get(const Elm_Menu_Item *it) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the previous item in the menu.
+    *
+    * @param item The menu item object.
+    * @return The item before it, or NULL if none
+    */
    EAPI Elm_Menu_Item *elm_menu_item_prev_get(const Elm_Menu_Item *it) EINA_ARG_NONNULL(1);
-
    /**
     * @}
     */
