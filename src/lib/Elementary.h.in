@@ -15856,6 +15856,19 @@ extern "C" {
     * @return Returns the new item.
     */
    EAPI Elm_Menu_Item     *elm_menu_item_add(Evas_Object *obj, Elm_Menu_Item *parent, const char *icon, const char *label, Evas_Smart_Cb func, const void *data) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Add an object swallowed in an item at the end of the given menu
+    * widget
+    *
+    * @param obj The menu object.
+    * @param parent The parent menu item (optional)
+    * @param subobj The object to swallow
+    * @param func Function called when the user select the item.
+    * @param data Data sent by the callback.
+    * @return Returns the new item.
+    *
+    * Add an evas object as an item to the menu.
+    */
    EAPI Elm_Menu_Item     *elm_menu_item_add_object(Evas_Object *obj, Elm_Menu_Item *parent, Evas_Object *subobj, Evas_Smart_Cb func, const void *data) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the label of a menu item
@@ -15874,9 +15887,46 @@ extern "C" {
     * @return The label of @p item
     */
    EAPI const char        *elm_menu_item_label_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Set the icon of a menu item to the standard icon with name @p icon
+    *
+    * @param item The menu item object.
+    * @param icon The icon object to set for the content of @p item
+    *
+    * Once this icon is set, any previously set icon will be deleted.
+    */
    EAPI void               elm_menu_item_object_icon_name_set(Elm_Menu_Item *item, const char *icon) EINA_ARG_NONNULL(1, 2);
+   /**
+    * @brief Get the string representation from the icon of a menu item
+    *
+    * @param item The menu item object.
+    * @return The string representation of @p item's icon or NULL
+    *
+    * @see elm_menu_item_object_icon_name_set()
+    */
    EAPI const char        *elm_menu_item_object_icon_name_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Set the content object of a menu item
+    *
+    * @param item The menu item object
+    * @param The content object or NULL
+    * @return EINA_TRUE on success, else EINA_FALSE
+    *
+    * Use this function to change the object swallowed by a menu item, deleting
+    * any previously swallowed object.
+    */
    EAPI Eina_Bool          elm_menu_item_object_content_set(Elm_Menu_Item *item, Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Get the content object of a menu item
+    *
+    * @param item The menu item object
+    * @return The content object or NULL
+    * @note If @p item was added with elm_menu_item_add_object, this
+    * function will return the object passed, else it will return the
+    * icon object.
+    *
+    * @see elm_menu_item_object_content_set()
+    */
    EAPI Evas_Object *elm_menu_item_object_content_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1);
 
    EINA_DEPRECATED extern inline void elm_menu_item_icon_set(Elm_Menu_Item *item, const char *icon) EINA_ARG_NONNULL(1, 2)
