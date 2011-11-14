@@ -3196,7 +3196,7 @@ elm_entry_is_empty(const Evas_Object *obj)
    Eina_Bool ret;
    if (!wd) return EINA_TRUE;
 
-if (0) {
+   if (0) {
    /* It's a hack until we get the support suggested above.
     * We just create a cursor, point it to the begining, and then
     * try to advance it, if it can advance, the tb is not empty,
@@ -3210,7 +3210,7 @@ if (0) {
    evas_textblock_cursor_free(cur);
 
    return !ret;
-}
+   }
 
    char *str = elm_entry_markup_to_utf8(elm_entry_entry_get(obj));
    if (!str) return EINA_TRUE;
@@ -3220,6 +3220,27 @@ if (0) {
    free(str);
    return ret;
 }
+
+EAPI const Evas_Object *
+elm_entry_textblock_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+
+   return edje_object_part_object_get(wd->ent, "elm.text");
+}
+
+EAPI void
+elm_entry_calc_force(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   edje_object_calc_force(wd->ent);
+}
+
 
 EAPI const char *
 elm_entry_selection_get(const Evas_Object *obj)
