@@ -100,7 +100,7 @@ static void _entry_key_down_cb(void *data, Evas *e, Evas_Object *obj, void *even
 static void _entry_focus_in_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_focus_out_cb(void *data, Evas_Object *obj, void *event_info);
 static void _entry_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
-static void _entry_resized_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
+static void _entry_resized_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 static void _view_init(Evas_Object *obj);
 static void _set_vis_guidetext(Evas_Object *obj);
 static void _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv);
@@ -1050,7 +1050,7 @@ _entry_changed_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UN
 }
 
 static void
-_entry_resized_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_entry_resized_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Coord en_x, en_y, en_w, en_h;
    Evas_Coord bx_x, bx_y;
