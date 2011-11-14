@@ -654,9 +654,9 @@ elm_menu_item_add_object(Evas_Object *obj, Elm_Menu_Item *parent, Evas_Object *s
 
    _item_obj_create(subitem);
 
-   elm_widget_sub_object_add(subitem->base.widget, subitem->content);
-   edje_object_part_swallow(subitem->base.view, "elm.swallow.content", subobj);
-   _sizing_eval(subitem->base.widget);
+   elm_widget_sub_object_add(WIDGET(subitem), subitem->content);
+   edje_object_part_swallow(VIEW(subitem), "elm.swallow.content", subobj);
+   _sizing_eval(WIDGET(subitem));
 
    _elm_menu_item_add_helper(obj, parent, subitem, wd);
 
@@ -783,15 +783,15 @@ elm_menu_item_object_content_set(Elm_Menu_Item *item, Evas_Object *obj)
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, EINA_FALSE);
    if (item->content)
      {
-        elm_widget_sub_object_del(item->base.widget, item->content);
+        elm_widget_sub_object_del(WIDGET(item), item->content);
         evas_object_del(item->content);
      }
 
    item->content = obj;
 
-   elm_widget_sub_object_add(item->base.widget, item->content);
-   edje_object_part_swallow(item->base.view, "elm.swallow.content", item->content);
-   _sizing_eval(item->base.widget);
+   elm_widget_sub_object_add(WIDGET(item), item->content);
+   edje_object_part_swallow(VIEW(item), "elm.swallow.content", item->content);
+   _sizing_eval(WIDGET(item));
    return EINA_TRUE;
 }
 
@@ -965,7 +965,7 @@ EAPI Evas_Object *
 elm_menu_item_menu_get(const Elm_Menu_Item *item)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, NULL);
-   return item->base.widget;
+   return WIDGET(item);
 }
 
 EAPI Elm_Menu_Item *
