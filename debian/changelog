@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build85) unstable; urgency=low
+
+  * reverted elm_check.(it doesn't work. i don't know now) 
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build85
+
+ -- ChunEon Park <chuneon.park@samsung.com>  Tue, 15 Nov 2011 11:21:37 +0900
+
 elementary (1.0.0+svn.61256slp2+build84) unstable; urgency=low
 
   * Package Upload
