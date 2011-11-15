@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-11-14 17:07+0900\n"
+"POT-Creation-Date: 2011-11-15 15:41+0900\n"
 "PO-Revision-Date: 2011-09-26 21:20+0900\n"
 "Last-Translator: Sumanth Krishna Mannam <sumanth.m@samsung.com>\n"
 "Language-Team: General\n"
@@ -37,7 +37,7 @@ msgstr "אשר"
 msgid "Clicked"
 msgstr ""
 
-#: src/lib/elm_button.c:447 src/lib/elm_check.c:348 src/lib/elm_toolbar.c:731
+#: src/lib/elm_button.c:447 src/lib/elm_check.c:383 src/lib/elm_toolbar.c:731
 msgid "State: Disabled"
 msgstr ""
 
@@ -45,15 +45,19 @@ msgstr ""
 msgid "Button"
 msgstr ""
 
-#: src/lib/elm_check.c:294 src/lib/elm_check.c:350
+#: src/lib/elm_check.c:300 src/lib/elm_check.c:303 src/lib/elm_check.c:394
 msgid "State: On"
 msgstr ""
 
-#: src/lib/elm_check.c:299 src/lib/elm_check.c:351
+#: src/lib/elm_check.c:313 src/lib/elm_check.c:316 src/lib/elm_check.c:403
 msgid "State: Off"
 msgstr ""
 
-#: src/lib/elm_check.c:401
+#: src/lib/elm_check.c:390 src/lib/elm_check.c:400
+msgid "State"
+msgstr ""
+
+#: src/lib/elm_check.c:453
 msgid "Check"
 msgstr ""
 
@@ -96,6 +100,14 @@ msgstr "גזור"
 #: src/lib/elm_searchbar.c:214
 msgid "Search"
 msgstr "לחפש"
+
+#: src/lib/elm_toggle.c:11
+msgid "ON"
+msgstr ""
+
+#: src/lib/elm_toggle.c:12
+msgid "OFF"
+msgstr ""
 
 #: src/lib/elm_toolbar.c:648
 #, fuzzy
