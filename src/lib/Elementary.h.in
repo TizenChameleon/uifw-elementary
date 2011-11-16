@@ -973,12 +973,38 @@ extern "C" {
     * @param label The new text of the label
     *
     * @note Elementary objects may have many labels (e.g. Action Slider)
+    * @deprecated Use elm_object_part_text_set() instead.
+    * @ingroup General
+    */
+   EINA_DEPRECATED EAPI void elm_object_text_part_set(Evas_Object *obj, const char *part, const char *label);
+
+   /**
+    * Set a label of an object
+    *
+    * @param obj The Elementary object
+    * @param part The text part name to set (NULL for the default label)
+    * @param label The new text of the label
+    *
+    * @note Elementary objects may have many labels (e.g. Action Slider)
     *
     * @ingroup General
     */
-   EAPI void         elm_object_text_part_set(Evas_Object *obj, const char *part, const char *label);
+   EAPI void elm_object_part_text_set(Evas_Object *obj, const char *part, const char *label);
 
-#define elm_object_text_set(obj, label) elm_object_text_part_set((obj), NULL, (label))
+#define elm_object_text_set(obj, label) elm_object_part_text_set((obj), NULL, (label))
+
+   /**
+    * Get a label of an object
+    *
+    * @param obj The Elementary object
+    * @param part The text part name to get (NULL for the default label)
+    * @return text of the label or NULL for any error
+    *
+    * @note Elementary objects may have many labels (e.g. Action Slider)
+    * @deprecated Use elm_object_part_text_get() instead.
+    * @ingroup General
+    */
+   EINA_DEPRECATED EAPI const char  *elm_object_text_part_get(const Evas_Object *obj, const char *part);
 
    /**
     * Get a label of an object
@@ -991,16 +1017,16 @@ extern "C" {
     *
     * @ingroup General
     */
-   EAPI const char  *elm_object_text_part_get(const Evas_Object *obj, const char *part);
+   EAPI const char  *elm_object_part_text_get(const Evas_Object *obj, const char *part);
 
-#define elm_object_text_get(obj) elm_object_text_part_get((obj), NULL)
+#define elm_object_text_get(obj) elm_object_part_text_get((obj), NULL)
 
    /**
     * Set the text for an objects' part, marking it as translatable.
     *
     * The string to set as @p text must be the original one. Do not pass the
     * return of @c gettext() here. Elementary will translate the string
-    * internally and set it on the object using elm_object_text_part_set(),
+    * internally and set it on the object using elm_object_part_text_set(),
     * also storing the original string so that it can be automatically
     * translated when the language is changed with elm_language_set().
     *
@@ -10046,7 +10072,7 @@ extern "C" {
     * @see elm_object_signal_callback_add()
     * @see elm_object_signal_emit()
     * @see elm_object_part_text_set()
-    * @see elm_object_part_content_set()
+    * @see elm_object_content_part_set()
     * @see elm_layout_box_append()
     * @see elm_layout_table_pack()
     * @see elm_layout_data_get()
