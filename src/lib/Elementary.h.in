@@ -4651,7 +4651,7 @@ extern "C" {
     * deleted, even if you set the new one to NULL. If you want to keep that
     * old content object, use the elm_bg_overlay_unset() function.
     *
-    * @deprecated use elm_object_content_set() instead
+    * @deprecated use elm_object_content_part_set() instead
     *
     * @ingroup Bg
     */
@@ -4680,7 +4680,7 @@ extern "C" {
     *
     * Unparent and return the overlay object which was set for this widget
     *
-    * @deprecated use elm_object_content_unset() instead
+    * @deprecated use elm_object_content_part_unset() instead
     *
     * @ingroup Bg
     */
@@ -6231,10 +6231,10 @@ extern "C" {
     * @li hoversel_vertical_entry: Another internal for @ref Hoversel.
     *
     * Default contents parts of the button widget that you can use for are:
-    * @li "elm.swallow.content" - A icon of the button
+    * @li "icon" - A icon of the button
     *
     * Default text parts of the button widget that you can use for are:
-    * @li "elm.text" - Label of the button
+    * @li "default" - Label of the button
     *
     * Follow through a complete example @ref button_example_01 "here".
     * @{
@@ -6319,7 +6319,7 @@ extern "C" {
     *
     * @param obj The button object
     * @param icon The icon object for the button
-    * @deprecated use elm_object_content_set() instead.
+    * @deprecated use elm_object_content_part_set() instead.
     */
    EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
@@ -6332,7 +6332,7 @@ extern "C" {
     * @param obj The button object
     * @return The icon object that is being used
     *
-    * @deprecated use elm_button_icon_unset() instead
+    * @deprecated use elm_object_content_part_get() instead
     */
    EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -6345,7 +6345,7 @@ extern "C" {
     *
     * @param obj The button object
     * @return The icon object that was being used
-    * @deprecated use elm_object_content_unset() instead.
+    * @deprecated use elm_object_content_part_unset() instead.
     */
    EAPI Evas_Object *elm_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -10295,7 +10295,7 @@ extern "C" {
     * @li "block,clicked" - when a click outside of the notify happens
     *
     * Default contents parts of the notify widget that you can use for are:
-    * @li "elm.swallow.content" - A content of the notify
+    * @li "default" - A content of the notify
     *
     * @ref tutorial_notify show usage of the API.
     *
@@ -12227,12 +12227,17 @@ extern "C" {
     * Signals that you can add callbacks for are:
     * @li "clicked" - This is called when a user has clicked the bubble.
     *
-    * For an example of using a buble see @ref bubble_01_example_page "this".
+    * Default contents parts of the bubble that you can use for are:
+    * @li "default" - A content of the bubble
+    * @li "icon" - An icon of the bubble
+    *
+    * Default text parts of the button widget that you can use for are:
+    * @li NULL - Label of the bubble
+    * 
+	 * For an example of using a buble see @ref bubble_01_example_page "this".
     *
     * @{
     */
-
-#define ELM_BUBBLE_CONTENT_ICON "elm.swallow.icon"
 
    /**
     * Add a new bubble to the parent
@@ -17218,15 +17223,14 @@ extern "C" {
     * - @c "default"
     *
     * Default contents parts of the slider widget that you can use for are:
-    * @li "elm.swallow.icon" - A icon of the slider
-    * @li "elm.swallow.end" - A end part content of the slider
+    * @li "icon" - A icon of the slider
+    * @li "end" - A end part content of the slider
     * 
+    * Default text parts of the silder widget that you can use for are:
+    * @li "default" - Label of the silder
     * Here is an example on its usage:
     * @li @ref slider_example
     */
-
-#define ELM_SLIDER_CONTENT_ICON "elm.swallow.icon"
-#define ELM_SLIDER_CONTENT_END "elm.swallow.end"
 
    /**
     * @addtogroup Slider
@@ -17285,7 +17289,7 @@ extern "C" {
     * it won't get properly displayed.
     *
     * @ingroup Slider
-    * @deprecated use elm_object_content_set() instead.
+    * @deprecated use elm_object_content_part_set() instead.
     */
    EAPI void               elm_slider_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
 
@@ -17304,7 +17308,7 @@ extern "C" {
     *
     * @see elm_slider_icon_set() for more details
     * @see elm_slider_icon_get()
-    * @deprecated use elm_object_content_unset() instead.
+    * @deprecated use elm_object_content_part_unset() instead.
     *
     * @ingroup Slider
     */
@@ -17322,6 +17326,8 @@ extern "C" {
     *
     * @see elm_slider_icon_set() for more details
     * @see elm_slider_icon_unset()
+    *
+    * @deprecated use elm_object_content_part_get() instead.
     *
     * @ingroup Slider
     */
@@ -17343,6 +17349,8 @@ extern "C" {
     * @warning If the object being set does not have minimum size hints set,
     * it won't get properly displayed.
     *
+    * @deprecated use elm_object_content_part_set() instead.
+    *
     * @ingroup Slider
     */
    EAPI void               elm_slider_end_set(Evas_Object *obj, Evas_Object *end) EINA_ARG_NONNULL(1);
@@ -17363,6 +17371,9 @@ extern "C" {
     * @see elm_slider_end_set() for more details.
     * @see elm_slider_end_get()
     *
+    * @deprecated use elm_object_content_part_unset() instead
+    * instead.
+    *
     * @ingroup Slider
     */
    EAPI Evas_Object       *elm_slider_end_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -17379,6 +17390,10 @@ extern "C" {
     *
     * @see elm_slider_end_set() for more details.
     * @see elm_slider_end_unset()
+    *
+    *
+    * @deprecated use elm_object_content_part_get() instead 
+    * instead.
     *
     * @ingroup Slider
     */
@@ -19686,7 +19701,7 @@ extern "C" {
     * If you want to keep that old content object, use the
     * elm_object_content_unset() function.
     *
-    * @deprecated use elm_object_part_content_set() instead.
+    * @deprecated use elm_object_content_part_set() instead.
     *
     */
    EINA_DEPRECATED EAPI void         elm_check_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
@@ -19696,7 +19711,7 @@ extern "C" {
     * @param obj The check object
     * @return The icon object
     *
-    * @deprecated use elm_object_part_content_get() instead.
+    * @deprecated use elm_object_content_part_get() instead.
     *  
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_check_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -19708,7 +19723,7 @@ extern "C" {
     *
     * Unparent and return the icon object which was set for this widget.
     *
-    * @deprecated use elm_object_part_content_unset() instead.
+    * @deprecated use elm_object_content_part_unset() instead.
     *
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_check_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -19882,7 +19897,7 @@ extern "C" {
     * want to keep that old content object, use the elm_radio_icon_unset()
     * function.
     *
-    * @deprecated use elm_object_part_content_set() instead.
+    * @deprecated use elm_object_content_part_set() instead.
     *
     */
    EAPI void         elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
@@ -19893,6 +19908,9 @@ extern "C" {
     * @return The icon object
     *
     * @see elm_radio_icon_set()
+    *
+    * @deprecated use elm_object_content_part_get() instead.
+    *
     */
    EAPI Evas_Object *elm_radio_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -19904,7 +19922,8 @@ extern "C" {
     * Unparent and return the icon object which was set for this widget.
     *
     * @see elm_radio_icon_set()
-    * @deprecated use elm_object_content_unset() instead.
+    * @deprecated use elm_object_content_part_unset() instead.
+    *
     */
    EAPI Evas_Object *elm_radio_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -21129,7 +21148,7 @@ extern "C" {
     * elm_progressbar_icon_unset() function.
     *
     * @see elm_progressbar_icon_get()
-    * @deprecated use elm_object_content_set() instead.
+    * @deprecated use elm_object_content_part_set() instead.
     *
     * @ingroup Progressbar
     */
@@ -21143,7 +21162,7 @@ extern "C" {
     * otherwise (and on errors)
     *
     * @see elm_progressbar_icon_set() for more details
-    * @deprecated use elm_object_content_set() instead.
+    * @deprecated use elm_object_content_part_get() instead.
     *
     * @ingroup Progressbar
     */
@@ -21160,7 +21179,7 @@ extern "C" {
     * for this widget, previously, on success.
     *
     * @see elm_progressbar_icon_set() for more details
-    * @deprecated use elm_object_content_unset() instead.
+    * @deprecated use elm_object_content_part_unset() instead.
     *
     * @ingroup Progressbar
     */
@@ -23861,8 +23880,8 @@ extern "C" {
     * - @c "default"
     *
     * Default contents parts of the panes widget that you can use for are:
-    * @li "elm.swallow.left" - A leftside content of the panes
-    * @li "elm.swallow.right" - A rightside content of the panes
+    * @li "left" - A leftside content of the panes
+    * @li "right" - A rightside content of the panes
     *
     * If panes is displayed vertically, left content will be displayed at
     * top.
@@ -23870,9 +23889,6 @@ extern "C" {
     * Here is an example on its usage:
     * @li @ref panes_example
     */
-
-#define ELM_PANES_CONTENT_LEFT "elm.swallow.left"
-#define ELM_PANES_CONTENT_RIGHT "elm.swallow.right"
 
    /**
     * @addtogroup Panes
@@ -26392,12 +26408,6 @@ extern "C" {
     * Default contents parts of the ctxpopup widget that you can use for are:
     * @li "default" - A content of the ctxpopup
     *
-    * Default contents parts of the naviframe items that you can use for are:
-    * @li "icon" - A icon in the title area
-    * 
-    * Default text parts of the naviframe items that you can use for are:
-    * @li "default" - Title label in the title area
-    *
     * @ref tutorial_ctxpopup shows the usage of a good deal of the API.
     * @{
     */
@@ -28078,7 +28088,7 @@ extern "C" {
     *
     * This function inserts a new player widget on the canvas.
     *
-    * @see elm_object_part_content_set()
+    * @see elm_object_content_part_set()
     *
     * @ingroup Video
     */
@@ -28096,7 +28106,7 @@ extern "C" {
     *
     * @see elm_player_add()
     * @see elm_video_add()
-    * @deprecated use elm_object_part_content_set() instead
+    * @deprecated use elm_object_content_part_set() instead
     *
     * @ingroup Video
     */
@@ -28485,40 +28495,17 @@ extern "C" {
     * @li "title,clicked" - User clicked title area
     *
     * Default contents parts of the naviframe items that you can use for are:
-    * @li "elm.swallow.content" - A main content of the page
-    * @li "elm.swallow.icon" - A icon in the title area
-    * @li "elm.swallow.prev_btn" - A button to go to the previous page
-    * @li "elm.swallow.next_btn" - A button to go to the next page
+    * @li "default" - A main content of the page
+    * @li "icon" - A icon in the title area
+    * @li "prev_btn" - A button to go to the previous page
+    * @li "next_btn" - A button to go to the next page
     *
     * Default text parts of the naviframe items that you can use for are:
-    * @li "elm.text.title" - Title label in the title area
-    * @li "elm.text.subtitle" - Sub-title label in the title area
+    * @li "default" - Title label in the title area
+    * @li "subtitle" - Sub-title label in the title area
     *
     * @ref tutorial_naviframe gives a good overview of the usage of the API.
     */
-
-  //Available commonly
-  #define ELM_NAVIFRAME_ITEM_CONTENT "elm.swallow.content"
-  #define ELM_NAVIFRAME_ITEM_ICON "elm.swallow.icon"
-  #define ELM_NAVIFRAME_ITEM_OPTIONHEADER "elm.swallow.optionheader"
-  #define ELM_NAVIFRAME_ITEM_TITLE_LABEL "elm.text.title"
-  #define ELM_NAVIFRAME_ITEM_PREV_BTN "elm.swallow.prev_btn"
-  #define ELM_NAVIFRAME_ITEM_NEXT_BTN "elm.swallow.next_btn"
-  #define ELM_NAVIFRAME_ITEM_TITLE_LEFT_BTN "elm.swallow.left_btn"
-  #define ELM_NAVIFRAME_ITEM_TITLE_RIGHT_BTN "elm.swallow.right_btn"
-  #define ELM_NAVIFRAME_ITEM_TITLE_MORE_BTN "elm.swallow.more_btn"
-  #define ELM_NAVIFRAME_ITEM_CONTROLBAR "elm.swallow.controlbar"
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_CLOSE "elm,state,optionheader,close", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_OPEN "elm,state,optionheader,open", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_INSTANT_CLOSE "elm,state,optionheader,instant_close", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_INSTANT_OPEN "elm,state,optionheader,instant_open", ""
-
-   //Available only in a style - "2line"
-  #define ELM_NAVIFRAME_ITEM_OPTIONHEADER2 "elm.swallow.optionheader2"
-
-  //Available only in a style - "segment"
-  #define ELM_NAVIFRAME_ITEM_SEGMENT2 "elm.swallow.segment2"
-  #define ELM_NAVIFRAME_ITEM_SEGMENT3 "elm.swallow.segment3"
 
    /**
     * @addtogroup Naviframe

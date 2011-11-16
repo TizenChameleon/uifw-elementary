@@ -37,7 +37,11 @@ _page4(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    snprintf(buf, sizeof(buf), "%s/images/icon_right_arrow.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
-   elm_object_content_set(bt, ic);
+
+   bt = elm_button_add(nf);
+   evas_object_smart_callback_add(bt, "clicked", _page5, nf);
+   evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_content_part_set(bt, "icon", ic);
 
    bt2 = elm_button_add(nf);
    evas_object_size_hint_align_set(bt2, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -54,8 +58,12 @@ _page4(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
                                 bt,
                                 bt2,
                                 NULL);
-   elm_object_item_text_part_set(it, "elm.text.subtitle", "Here is sub-title part!");
-   elm_object_item_content_part_set(it, "elm.swallow.icon", ic);
+   ic = elm_icon_add(nf);
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png",
+            elm_app_data_dir_get());
+   elm_icon_file_set(ic, buf, NULL);
+   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+   elm_object_item_content_part_set(it, "icon", ic);
    elm_naviframe_item_title_visible_set(it, EINA_FALSE);
    evas_object_smart_callback_add(bt2, "clicked", _title_visible, it);
 }
@@ -86,14 +94,7 @@ _page3(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    elm_icon_file_set(ic, buf, NULL);
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 
-   it = elm_naviframe_item_push(nf,
-                                "Page 3",
-                                bt,
-                                bt2,
-                                bt3,
-                                NULL);
-   elm_object_item_text_part_set(it, "elm.text.subtitle", "Here is sub-title part!");
-   elm_object_item_content_part_set(it, "elm.swallow.icon", ic);
+   elm_object_item_content_part_set(it, "icon", ic);
 }
 
 void
@@ -115,15 +116,12 @@ _page2(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    snprintf(buf, sizeof(buf), "%s/images/icon_right_arrow.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
-   elm_object_content_set(bt, ic);
+   elm_object_content_part_set(bt, "icon", ic);
 
-   it = elm_naviframe_item_push(nf,
-                                "Page 2",
-                                NULL,
-                                bt,
-                                bt2,
-                                NULL);
-   elm_object_item_text_part_set(it, "elm.text.subtitle", "Here is sub-title part!");
+   content = _content_new(nf, img2);
+
+   it = elm_naviframe_item_push(nf, "Page 2", NULL, bt, content,  NULL);
+   elm_object_item_text_part_set(it, "subtitle", "Here is sub-title part!");
 }
 
 void
