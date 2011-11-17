@@ -1,3 +1,12 @@
+elementary (1.0.0+svn.61256slp2+build87) unstable; urgency=low
+
+  * genlist - removing item update when item data set
+  * entry - merged with 65225 for fixing filter problem
+  * Git: slp-scm.sec.samsung.net:slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build87
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Thu, 17 Nov 2011 20:41:49 +0900
+
 elementary (1.0.0+svn.61256slp2+build86) unstable; urgency=low
 
   * Merge toggle changes from upstream
