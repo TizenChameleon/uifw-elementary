@@ -32,7 +32,7 @@ test_toggle(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_size_hint_weight_set(tg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(tg, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(tg, "Icon sized to toggle");
-   elm_object_content_part_set(tg, "icon", ic);
+   elm_object_part_content_set(tg, "icon", ic);
    elm_check_state_set(tg, 1);
    elm_object_part_text_set(tg, "on", "Yes");
    elm_object_part_text_set(tg, "off", "No");
@@ -47,7 +47,7 @@ test_toggle(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    tg = elm_toggle_add(win);
    elm_object_text_set(tg, "Icon no scale");
-   elm_object_content_part_set(tg, "icon", ic);
+   elm_object_part_content_set(tg, "icon", ic);
    elm_box_pack_end(bx, tg);
    evas_object_show(tg);
    evas_object_show(ic);
@@ -59,7 +59,7 @@ test_toggle(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    tg = elm_toggle_add(win);
    elm_object_text_set(tg, "Icon no scale");
-   elm_object_content_part_set(tg, "icon", ic);
+   elm_object_part_content_set(tg, "icon", ic);
    elm_object_disabled_set(tg, 1);
    elm_box_pack_end(bx, tg);
    evas_object_show(tg);
@@ -79,7 +79,7 @@ test_toggle(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    tg = elm_check_add(win);
    elm_object_style_set(tg, "toggle");
-   elm_object_content_part_set(tg, "icon", ic);
+   elm_object_part_content_set(tg, "icon", ic);
    elm_box_pack_end(bx, tg);
    evas_object_show(tg);
    evas_object_show(ic);

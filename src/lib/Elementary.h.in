@@ -1076,12 +1076,38 @@ extern "C" {
     * @param content The new content of the object
     *
     * @note Elementary objects may have many contents
+    * @deprecated Use elm_object_part_content_set instead.
+    * @ingroup General
+    */
+   EINA_DEPRECATED EAPI void elm_object_content_part_set(Evas_Object *obj, const char *part, Evas_Object *content);
+
+   /**
+    * Set a content of an object
+    *
+    * @param obj The Elementary object
+    * @param part The content part name to set (NULL for the default content)
+    * @param content The new content of the object
+    *
+    * @note Elementary objects may have many contents
     *
     * @ingroup General
     */
-   EAPI void elm_object_content_part_set(Evas_Object *obj, const char *part, Evas_Object *content);
+   EAPI void elm_object_part_content_set(Evas_Object *obj, const char *part, Evas_Object *content);
 
-#define elm_object_content_set(obj, content) elm_object_content_part_set((obj), NULL, (content))
+#define elm_object_content_set(obj, content) elm_object_part_content_set((obj), NULL, (content))
+
+   /**
+    * Get a content of an object
+    *
+    * @param obj The Elementary object
+    * @param item The content part name to get (NULL for the default content)
+    * @return content of the object or NULL for any error
+    *
+    * @note Elementary objects may have many contents
+    * @deprecated Use elm_object_part_content_get instead.
+    * @ingroup General
+    */
+   EINA_DEPRECATED EAPI Evas_Object *elm_object_content_part_get(const Evas_Object *obj, const char *part);
 
    /**
     * Get a content of an object
@@ -1094,9 +1120,21 @@ extern "C" {
     *
     * @ingroup General
     */
-   EAPI Evas_Object *elm_object_content_part_get(const Evas_Object *obj, const char *part);
+   EAPI Evas_Object *elm_object_part_content_get(const Evas_Object *obj, const char *part);
 
-#define elm_object_content_get(obj) elm_object_content_part_get((obj), NULL)
+#define elm_object_content_get(obj) elm_object_part_content_get((obj), NULL)
+
+   /**
+    * Unset a content of an object
+    *
+    * @param obj The Elementary object
+    * @param item The content part name to unset (NULL for the default content)
+    *
+    * @note Elementary objects may have many contents
+    * @deprecated Use elm_object_part_content_unset instead.
+    * @ingroup General
+    */
+   EINA_DEPRECATED EAPI Evas_Object *elm_object_content_part_unset(Evas_Object *obj, const char *part);
 
    /**
     * Unset a content of an object
@@ -1108,9 +1146,9 @@ extern "C" {
     *
     * @ingroup General
     */
-   EAPI Evas_Object *elm_object_content_part_unset(Evas_Object *obj, const char *part);
+   EAPI Evas_Object *elm_object_part_content_unset(Evas_Object *obj, const char *part);
 
-#define elm_object_content_unset(obj) elm_object_content_part_unset((obj), NULL)
+#define elm_object_content_unset(obj) elm_object_part_content_unset((obj), NULL)
 
    /**
     * Get the widget object's handle which contains a given item
@@ -4677,7 +4715,7 @@ extern "C" {
     * deleted, even if you set the new one to NULL. If you want to keep that
     * old content object, use the elm_bg_overlay_unset() function.
     *
-    * @deprecated use elm_object_content_part_set() instead
+    * @deprecated use elm_object_part_content_set() instead
     *
     * @ingroup Bg
     */
@@ -4706,7 +4744,7 @@ extern "C" {
     *
     * Unparent and return the overlay object which was set for this widget
     *
-    * @deprecated use elm_object_content_part_unset() instead
+    * @deprecated use elm_object_part_content_unset() instead
     *
     * @ingroup Bg
     */
@@ -6345,7 +6383,7 @@ extern "C" {
     *
     * @param obj The button object
     * @param icon The icon object for the button
-    * @deprecated use elm_object_content_part_set() instead.
+    * @deprecated use elm_object_part_content_set() instead.
     */
    EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
@@ -6358,7 +6396,7 @@ extern "C" {
     * @param obj The button object
     * @return The icon object that is being used
     *
-    * @deprecated use elm_object_content_part_get() instead
+    * @deprecated use elm_object_part_content_get() instead
     */
    EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -6371,7 +6409,7 @@ extern "C" {
     *
     * @param obj The button object
     * @return The icon object that was being used
-    * @deprecated use elm_object_content_part_unset() instead.
+    * @deprecated use elm_object_part_content_unset() instead.
     */
    EAPI Evas_Object *elm_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -9804,9 +9842,10 @@ extern "C" {
     * elm_layout_box_append().
     *
     * @see elm_layout_box_append()
-    * @see elm_object_content_part_get()
-    * @see elm_object_content_part_unset()
+    * @see elm_object_part_content_get()
+    * @see elm_object_part_content_unset()
     * @see @ref secBox
+    * @deprecated use elm_object_part_content_set() instead
     *
     * @ingroup Layout
     */
@@ -9819,7 +9858,7 @@ extern "C" {
     *
     * @return The swallowed object or NULL if none or an error occurred
     *
-    * @see elm_object_content_part_set()
+    * @deprecated use elm_object_part_content_get() instead
     *
     * @ingroup Layout
     */
@@ -9833,7 +9872,7 @@ extern "C" {
     *
     * Unparent and return the content object which was set for this part.
     *
-    * @see elm_object_content_part_set()
+    * @deprecated use elm_object_part_content_unset() instead
     *
     * @ingroup Layout
     */
@@ -10072,7 +10111,7 @@ extern "C" {
     * @see elm_object_signal_callback_add()
     * @see elm_object_signal_emit()
     * @see elm_object_part_text_set()
-    * @see elm_object_content_part_set()
+    * @see elm_object_part_content_set()
     * @see elm_layout_box_append()
     * @see elm_layout_table_pack()
     * @see elm_layout_data_get()
@@ -10237,7 +10276,7 @@ extern "C" {
 #define elm_layout_icon_set(_ly, _obj) \
   do { \
     const char *sig; \
-    elm_object_content_part_set((_ly), "elm.swallow.icon", (_obj)); \
+    elm_object_part_content_set((_ly), "elm.swallow.icon", (_obj)); \
     if ((_obj)) sig = "elm,state,icon,visible"; \
     else sig = "elm,state,icon,hidden"; \
     elm_object_signal_emit((_ly), sig, "elm"); \
@@ -10251,7 +10290,7 @@ extern "C" {
  * @ingroup Layout
  */
 #define elm_layout_icon_get(_ly) \
-  elm_object_content_part_get((_ly), "elm.swallow.icon")
+  elm_object_part_content_get((_ly), "elm.swallow.icon")
 
 /**
  * @def elm_layout_end_set
@@ -10263,7 +10302,7 @@ extern "C" {
 #define elm_layout_end_set(_ly, _obj) \
   do { \
     const char *sig; \
-    elm_object_content_part_set((_ly), "elm.swallow.end", (_obj)); \
+    elm_object_part_content_set((_ly), "elm.swallow.end", (_obj)); \
     if ((_obj)) sig = "elm,state,end,visible"; \
     else sig = "elm,state,end,hidden"; \
     elm_object_signal_emit((_ly), sig, "elm"); \
@@ -10277,7 +10316,7 @@ extern "C" {
  * @ingroup Layout
  */
 #define elm_layout_end_get(_ly) \
-  elm_object_content_part_get((_ly), "elm.swallow.end")
+  elm_object_part_content_get((_ly), "elm.swallow.end")
 
 /**
  * @def elm_layout_label_set
@@ -17315,7 +17354,7 @@ extern "C" {
     * it won't get properly displayed.
     *
     * @ingroup Slider
-    * @deprecated use elm_object_content_part_set() instead.
+    * @deprecated use elm_object_part_content_set() instead.
     */
    EAPI void               elm_slider_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
 
@@ -17334,7 +17373,7 @@ extern "C" {
     *
     * @see elm_slider_icon_set() for more details
     * @see elm_slider_icon_get()
-    * @deprecated use elm_object_content_part_unset() instead.
+    * @deprecated use elm_object_part_content_unset() instead.
     *
     * @ingroup Slider
     */
@@ -17353,7 +17392,7 @@ extern "C" {
     * @see elm_slider_icon_set() for more details
     * @see elm_slider_icon_unset()
     *
-    * @deprecated use elm_object_content_part_get() instead.
+    * @deprecated use elm_object_part_content_get() instead.
     *
     * @ingroup Slider
     */
@@ -17375,7 +17414,7 @@ extern "C" {
     * @warning If the object being set does not have minimum size hints set,
     * it won't get properly displayed.
     *
-    * @deprecated use elm_object_content_part_set() instead.
+    * @deprecated use elm_object_part_content_set() instead.
     *
     * @ingroup Slider
     */
@@ -17397,7 +17436,7 @@ extern "C" {
     * @see elm_slider_end_set() for more details.
     * @see elm_slider_end_get()
     *
-    * @deprecated use elm_object_content_part_unset() instead
+    * @deprecated use elm_object_part_content_unset() instead
     * instead.
     *
     * @ingroup Slider
@@ -17418,7 +17457,7 @@ extern "C" {
     * @see elm_slider_end_unset()
     *
     *
-    * @deprecated use elm_object_content_part_get() instead 
+    * @deprecated use elm_object_part_content_get() instead 
     * instead.
     *
     * @ingroup Slider
@@ -19727,7 +19766,7 @@ extern "C" {
     * If you want to keep that old content object, use the
     * elm_object_content_unset() function.
     *
-    * @deprecated use elm_object_content_part_set() instead.
+    * @deprecated use elm_object_part_content_set() instead.
     *
     */
    EINA_DEPRECATED EAPI void         elm_check_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
@@ -19737,7 +19776,7 @@ extern "C" {
     * @param obj The check object
     * @return The icon object
     *
-    * @deprecated use elm_object_content_part_get() instead.
+    * @deprecated use elm_object_part_content_get() instead.
     *  
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_check_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -19749,7 +19788,7 @@ extern "C" {
     *
     * Unparent and return the icon object which was set for this widget.
     *
-    * @deprecated use elm_object_content_part_unset() instead.
+    * @deprecated use elm_object_part_content_unset() instead.
     *
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_check_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -19923,7 +19962,7 @@ extern "C" {
     * want to keep that old content object, use the elm_radio_icon_unset()
     * function.
     *
-    * @deprecated use elm_object_content_part_set() instead.
+    * @deprecated use elm_object_part_content_set() instead.
     *
     */
    EAPI void         elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
@@ -19935,7 +19974,7 @@ extern "C" {
     *
     * @see elm_radio_icon_set()
     *
-    * @deprecated use elm_object_content_part_get() instead.
+    * @deprecated use elm_object_part_content_get() instead.
     *
     */
    EAPI Evas_Object *elm_radio_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -19948,7 +19987,7 @@ extern "C" {
     * Unparent and return the icon object which was set for this widget.
     *
     * @see elm_radio_icon_set()
-    * @deprecated use elm_object_content_part_unset() instead.
+    * @deprecated use elm_object_part_content_unset() instead.
     *
     */
    EAPI Evas_Object *elm_radio_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -21174,7 +21213,7 @@ extern "C" {
     * elm_progressbar_icon_unset() function.
     *
     * @see elm_progressbar_icon_get()
-    * @deprecated use elm_object_content_part_set() instead.
+    * @deprecated use elm_object_part_content_set() instead.
     *
     * @ingroup Progressbar
     */
@@ -21188,7 +21227,7 @@ extern "C" {
     * otherwise (and on errors)
     *
     * @see elm_progressbar_icon_set() for more details
-    * @deprecated use elm_object_content_part_get() instead.
+    * @deprecated use elm_object_part_content_get() instead.
     *
     * @ingroup Progressbar
     */
@@ -21205,7 +21244,7 @@ extern "C" {
     * for this widget, previously, on success.
     *
     * @see elm_progressbar_icon_set() for more details
-    * @deprecated use elm_object_content_part_unset() instead.
+    * @deprecated use elm_object_part_content_unset() instead.
     *
     * @ingroup Progressbar
     */
@@ -23950,6 +23989,8 @@ extern "C" {
     * @see elm_panes_content_left_get()
     * @see elm_panes_content_right_set() to set content on the other side.
     *
+    * @deprecated use elm_object_part_content_set() instead
+    *
     * @ingroup Panes
     */
    EINA_DEPRECATED EAPI void                  elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
@@ -23970,6 +24011,8 @@ extern "C" {
     * @see elm_panes_content_right_get()
     * @see elm_panes_content_left_set() to set content on the other side.
     *
+    * @deprecated use elm_object_part_content_set() instead
+    *
     * @ingroup Panes
     */
    EINA_DEPRECATED EAPI void                  elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
@@ -23984,6 +24027,8 @@ extern "C" {
     *
     * @see elm_panes_content_left_set() for details.
     *
+    * @deprecated use elm_object_part_content_get() instead
+    *
     * @ingroup Panes
     */
    EINA_DEPRECATED EAPI Evas_Object          *elm_panes_content_left_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -23997,6 +24042,8 @@ extern "C" {
     * Return the right content object which is set for this widget.
     *
     * @see elm_panes_content_right_set() for details.
+    *
+    * @deprecated use elm_object_part_content_get() instead
     *
     * @ingroup Panes
     */
@@ -24013,6 +24060,8 @@ extern "C" {
     * @see elm_panes_content_left_set() for details.
     * @see elm_panes_content_left_get().
     *
+    * @deprecated use elm_object_part_content_unset() instead
+    *
     * @ingroup Panes
     */
    EINA_DEPRECATED EAPI Evas_Object          *elm_panes_content_left_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -24028,6 +24077,8 @@ extern "C" {
     *
     * @see elm_panes_content_right_set() for details.
     * @see elm_panes_content_right_get().
+    *
+    * @deprecated use elm_object_part_content_unset() instead
     *
     * @ingroup Panes
     */
@@ -28111,7 +28162,7 @@ extern "C" {
     *
     * This function inserts a new player widget on the canvas.
     *
-    * @see elm_object_content_part_set()
+    * @see elm_object_part_content_set()
     *
     * @ingroup Video
     */
@@ -28129,7 +28180,7 @@ extern "C" {
     *
     * @see elm_player_add()
     * @see elm_video_add()
-    * @deprecated use elm_object_content_part_set() instead
+    * @deprecated use elm_object_part_content_set() instead
     *
     * @ingroup Video
     */
