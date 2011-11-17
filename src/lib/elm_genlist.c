@@ -4699,7 +4699,6 @@ elm_genlist_item_data_set(Elm_Genlist_Item *it,
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    elm_widget_item_data_set(it, data);
-   elm_genlist_item_update(it);
 }
 
 EAPI void *
