@@ -29,7 +29,6 @@ struct _Widget_Data
       Evas_Coord auto_x, auto_y; // desired delta
       Evas_Coord x, y; // current delta
    } delta;
-   Ecore_Job *show_region_job;
 };
 
 /* Enum to identify conformant swallow parts */
@@ -378,14 +377,20 @@ _conformant_move_resize_event_cb(void *data __UNUSED__, Evas *e __UNUSED__,
 }
 #endif
 
+// showing the focused/important region.
 static void
-_show_region_job(void *data)
+_content_resize_event_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj
+                         __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *focus_obj;
    Evas_Object *conformant = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get(conformant);
 
    if (!wd) return;
+#ifdef HAVE_ELEMENTARY_X
+   if ((wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF)
+            && (!wd->is_visible)) return;
+#endif
 
    focus_obj = elm_widget_focused_object_get(conformant);
    if (focus_obj)
@@ -399,26 +404,6 @@ _show_region_job(void *data)
 
         elm_widget_show_region_set(focus_obj, x, y, w, h, EINA_TRUE);
      }
-
-   wd->show_region_job = NULL;
-}
-
-// showing the focused/important region.
-static void
-_content_resize_event_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj
-                         __UNUSED__, void *event_info __UNUSED__)
-{
-   Evas_Object *conformant = (Evas_Object *)data;
-   Widget_Data *wd = elm_widget_data_get(conformant);
-
-   if (!wd) return;
-#ifdef HAVE_ELEMENTARY_X
-   if ((wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF)
-            && (!wd->is_visible)) return;
-#endif
-
-   if (wd->show_region_job) ecore_job_del(wd->show_region_job);
-   wd->show_region_job = ecore_job_add(_show_region_job, conformant);
 }
 
 #ifdef HAVE_ELEMENTARY_X
