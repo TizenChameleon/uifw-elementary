@@ -175,6 +175,7 @@ struct _Elm_Genlist_Item
    Eina_Bool                     nocache : 1;
    Eina_Bool                     move_effect_enabled : 1;
    Eina_Bool                     defer_unrealize : 1;
+   Eina_Bool                     can_focus : 1;
 
    // TODO: refactoring
    Eina_Bool   effect_done : 1;
@@ -907,7 +908,11 @@ call:
    if (it->wd->last_selected_item && (it != it->wd->last_selected_item))
      {
         EINA_LIST_FOREACH(it->wd->last_selected_item->icon_objs, l, obj)
-          elm_widget_focused_object_clear(obj);
+          {
+             elm_widget_focused_object_clear(obj);
+             elm_widget_tree_unfocusable_set(obj, EINA_TRUE);
+          }
+        it->wd->last_selected_item->can_focus = EINA_FALSE;
      }
    if (it->func.func) it->func.func((void *)it->func.data, parent, it);
    if (!it->delete_me)
@@ -1325,8 +1330,18 @@ _mouse_down(void        *data,
    Elm_Genlist_Item *it = data;
    Evas_Event_Mouse_Down *ev = event_info;
    Evas_Coord x, y;
+   Eina_List *l;
+   Evas_Object *iobj;
 
    if (ev->button != 1) return;
+   if (!it->can_focus)
+     {
+        EINA_LIST_FOREACH(it->icon_objs, l, iobj)
+          {
+             elm_widget_tree_unfocusable_set(iobj, EINA_FALSE);
+          }
+        it->can_focus = EINA_TRUE;
+     }
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
      {
         it->wd->on_hold = EINA_TRUE;
@@ -3556,6 +3571,7 @@ _item_new(Widget_Data                  *wd,
    it->func.data = func_data;
    it->mouse_cursor = NULL;
    it->expanded_depth = 0;
+   it->can_focus = EINA_TRUE;
    elm_widget_item_text_get_hook_set(it, _item_label_hook);
    elm_widget_item_del_cb_set(it, _item_del_hook);
 
