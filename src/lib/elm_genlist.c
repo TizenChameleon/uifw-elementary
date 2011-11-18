@@ -937,7 +937,7 @@ _item_unselect(Elm_Genlist_Item *it)
 {
    const char *stacking, *selectraise;
 
-   if ((it->delete_me) || (!it->highlighted)) return;
+   if ((it->delete_me) || ((!it->highlighted) && (!it->selected))) return;
    edje_object_signal_emit(VIEW(it), "elm,state,unselected", "elm");
    if (it->edit_obj) edje_object_signal_emit(it->edit_obj, "elm,state,unselected", "elm");
    stacking = edje_object_data_get(VIEW(it), "stacking");
@@ -4692,7 +4692,6 @@ elm_genlist_item_data_set(Elm_Genlist_Item *it,
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    elm_widget_item_data_set(it, data);
-   elm_genlist_item_update(it);
 }
 
 EAPI void *
