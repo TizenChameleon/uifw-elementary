@@ -907,14 +907,7 @@ call:
    if (it->wd->last_selected_item && (it != it->wd->last_selected_item))
      {
         EINA_LIST_FOREACH(it->wd->last_selected_item->icon_objs, l, obj)
-          {
-             //elm_widget_focused_object_clear(obj);
-             // FIXME:it prevents to focusable items can get focus
-             //       if another genlist item is selected.
-             //       when genlist items can receive focus, it should be removed
-             elm_genlist_item_fields_update(it->wd->last_selected_item,
-                                            "*", ELM_GENLIST_ITEM_FIELD_ICON);
-          }
+          elm_widget_focused_object_clear(obj);
      }
    if (it->func.func) it->func.func((void *)it->func.data, parent, it);
    if (!it->delete_me)
@@ -944,7 +937,7 @@ _item_unselect(Elm_Genlist_Item *it)
 {
    const char *stacking, *selectraise;
 
-   if ((it->delete_me) || ((!it->highlighted) && (!it->selected))) return;
+   if ((it->delete_me) || (!it->highlighted)) return;
    edje_object_signal_emit(VIEW(it), "elm,state,unselected", "elm");
    if (it->edit_obj) edje_object_signal_emit(it->edit_obj, "elm,state,unselected", "elm");
    stacking = edje_object_data_get(VIEW(it), "stacking");
@@ -4699,6 +4692,7 @@ elm_genlist_item_data_set(Elm_Genlist_Item *it,
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    elm_widget_item_data_set(it, data);
+   elm_genlist_item_update(it);
 }
 
 EAPI void *
