@@ -1027,7 +1027,7 @@ extern "C" {
    /**
     * Gets the original string set as translatable for an object
     *
-    * When setting translated strings, the function elm_object_text_part_get()
+    * When setting translated strings, the function elm_object_part_text_get()
     * will return the translation returned by @c gettext(). To get the
     * original string use this function.
     *
@@ -1215,7 +1215,7 @@ extern "C" {
 
    /**
     * Get the data associated with an object item
-    * @param it The object item
+    * @param it The Elementary object item
     * @return The data associated with @p it
     *
     * @ingroup General
@@ -1224,7 +1224,7 @@ extern "C" {
 
    /**
     * Set the data associated with an object item
-    * @param it The object item
+    * @param it The Elementary object item
     * @param data The data to be associated with @p it
     *
     * @ingroup General
@@ -1858,7 +1858,7 @@ extern "C" {
     *
     * Useful when you want to force reloading of configuration values for
     * a profile. If one removes user custom configuration directories,
-    * for example, it will force a reload with system values insted.
+    * for example, it will force a reload with system values instead.
     *
     */
    EAPI void         elm_config_reload(void);
@@ -4536,7 +4536,7 @@ extern "C" {
     * centered, scaled or stretched.
     * 
     * Default contents parts of the bg widget that you can use for are:
-    * @li "elm.swallow.content" - overlay of the bg
+    * @li "overlay" - overlay of the bg
     *
     * Here is some sample code using it:
     * @li @ref bg_01_example_page
@@ -4666,7 +4666,7 @@ extern "C" {
     *
     * Return the content object which is set for this widget
     *
-    * @deprecated use elm_object_content_get() instead
+    * @deprecated use elm_object_part_content_get() instead
     *
     * @ingroup Bg
     */
@@ -7125,11 +7125,8 @@ extern "C" {
     * @note When Elementary is in desktop mode the thumbscroll(a.k.a.
     * fingerscroll) won't work.
     *
-    * To set/get/unset the content of the panel, you can use
-    * elm_object_content_set/get/unset APIs.
-    * Once the content object is set, a previously set one will be deleted.
-    * If you want to keep that old content object, use the
-    * elm_object_content_unset() function
+    * Default contents parts of the scroller widget that you can use for are:
+    * @li "default" - A content of the scroller
     *
     * In @ref tutorial_scroller you'll find an example of how to use most of
     * this API.
@@ -7731,7 +7728,7 @@ extern "C" {
     * Of all this styles only default shows the title. Frame emits no signals.
     *
     * Default contents parts of the frame widget that you can use for are:
-    * @li "elm.swallow.content" - A content of the frame
+    * @li "default" - A content of the frame
     *
     * Default text parts of the frame widget that you can use for are:
     * @li "elm.text" - Label of the frame
@@ -9677,7 +9674,7 @@ extern "C" {
     * column or row span if necessary.
     *
     * Again, we could have this design by adding a @ref Table widget to the @c
-    * SWALLOW part using elm_object_content_part_set(). The same difference happens
+    * SWALLOW part using elm_object_part_content_set(). The same difference happens
     * here when choosing to use the Layout Table (a @c TABLE part) instead of
     * the @ref Table plus @c SWALLOW part. It's just a matter of convenience.
     *
@@ -9773,7 +9770,7 @@ extern "C" {
     *
     * Once the content object is set, a previously set one will be deleted.
     * If you want to keep that old content object, use the
-    * elm_object_content_part_unset() function.
+    * elm_object_part_content_unset() function.
     *
     * @note In an Edje theme, the part used as a content container is called @c
     * SWALLOW. This is why the parameter name is called @p swallow, but it is
@@ -9823,7 +9820,7 @@ extern "C" {
     * @param text The text to set
     *
     * @ingroup Layout
-    * @deprecated use elm_object_text_part_set() instead.
+    * @deprecated use elm_object_part_text_set() instead.
     */
    EINA_DEPRECATED EAPI void               elm_layout_text_set(Evas_Object *obj, const char *part, const char *text) EINA_ARG_NONNULL(1);
    /**
@@ -9835,7 +9832,7 @@ extern "C" {
     * @return The text set in @p part
     *
     * @ingroup Layout
-    * @deprecated use elm_object_text_part_get() instead.
+    * @deprecated use elm_object_part_text_get() instead.
     */
    EINA_DEPRECATED EAPI const char        *elm_layout_text_get(const Evas_Object *obj, const char *part) EINA_ARG_NONNULL(1);
    /**
@@ -9930,7 +9927,7 @@ extern "C" {
     *
     * The object will be removed from the box part and its lifetime will
     * not be handled by the layout anymore. This is equivalent to
-    * elm_object_content_part_unset() for box.
+    * elm_object_part_content_unset() for box.
     *
     * @see elm_layout_box_append()
     * @see elm_layout_box_remove_all()
@@ -10001,7 +9998,7 @@ extern "C" {
     *
     * The object will be unpacked from the table part and its lifetime
     * will not be handled by the layout anymore. This is equivalent to
-    * elm_object_content_part_unset() for table.
+    * elm_object_part_content_unset() for table.
     *
     * @see elm_layout_table_pack()
     * @see elm_layout_table_clear()
@@ -10038,7 +10035,7 @@ extern "C" {
     *
     * This returns the edje object. It is not expected to be used to then
     * swallow objects via edje_object_part_swallow() for example. Use
-    * elm_object_content_part_set() instead so child object handling and sizing is
+    * elm_object_part_content_set() instead so child object handling and sizing is
     * done properly.
     *
     * @note This function should only be used if you really need to call some
@@ -10048,8 +10045,8 @@ extern "C" {
     *
     * @see elm_object_signal_callback_add()
     * @see elm_object_signal_emit()
-    * @see elm_object_text_part_set()
-    * @see elm_object_content_part_set()
+    * @see elm_object_part_text_set()
+    * @see elm_object_part_content_set()
     * @see elm_layout_box_append()
     * @see elm_layout_table_pack()
     * @see elm_layout_data_get()
@@ -12275,7 +12272,7 @@ extern "C" {
     *
     * This function sets the info of the bubble. Where this appears depends on
     * the selected corner.
-    * @deprecated use elm_object_text_part_set() instead. (with "info" as the parameter).
+    * @deprecated use elm_object_part_text_set() instead. (with "info" as the parameter).
     */
    EINA_DEPRECATED EAPI void         elm_bubble_info_set(Evas_Object *obj, const char *info) EINA_ARG_NONNULL(1);
    /**
@@ -12286,7 +12283,7 @@ extern "C" {
     * @return The "info" string of the bubble
     *
     * This function gets the info text.
-    * @deprecated use elm_object_text_part_get() instead. (with "info" as the parameter).
+    * @deprecated use elm_object_part_text_get() instead. (with "info" as the parameter).
     */
    EINA_DEPRECATED EAPI const char  *elm_bubble_info_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -12330,7 +12327,7 @@ extern "C" {
     * @param obj The bubble object
     * @param icon The given icon for the bubble
     *
-    * @deprecated use elm_object_content_part_set() instead
+    * @deprecated use elm_object_part_content_set() instead
     *
     */
    EINA_DEPRECATED EAPI void         elm_bubble_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
@@ -12342,7 +12339,7 @@ extern "C" {
     *
     * This function gets the icon shown on the top left of bubble.
     *
-    * @deprecated use elm_object_content_part_get() instead
+    * @deprecated use elm_object_part_content_get() instead
     *
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_bubble_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -12354,7 +12351,7 @@ extern "C" {
     * @param obj The bubble object
     * @return The icon that was being used
     *
-    * @deprecated use elm_object_content_part_unset() instead
+    * @deprecated use elm_object_part_content_unset() instead
     *
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_bubble_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
@@ -17868,21 +17865,8 @@ extern "C" {
     * @deprecated use elm_object_text_get() instead.
     */
    EINA_DEPRECATED EAPI const char           *elm_actionslider_indicator_label_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
-
    /**
-   * Hold actionslider object movement.
-   *
-   * @param[in] obj The actionslider object
-   * @param[in] flag Actionslider hold/release
-   * (EINA_TURE = hold/EIN_FALSE = release)
-   *
-   * @ingroup Actionslider
-   */
-   EAPI void                             elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag) EINA_ARG_NONNULL(1);
-
-
-   /**
-    *
+    * @}
     */
 
    /**
@@ -18017,7 +18001,7 @@ extern "C" {
     * item before another item and elm_genlist_item_insert_after() inserts after
     * the indicated item.
     *
-    * The application can clear the list with elm_genlist_clear() which deletes
+    * The application can clear the list with elm_gen_clear() which deletes
     * all the items in the list and elm_genlist_item_del() will delete a specific
     * item. elm_genlist_item_subitems_clear() will clear all items that are
     * children of the indicated parent item.
@@ -18044,7 +18028,7 @@ extern "C" {
     *
     * @section Genlist_Usage_Hints Usage hints
     *
-    * There are also convenience functions. elm_genlist_item_genlist_get() will
+    * There are also convenience functions. elm_gen_item_genlist_get() will
     * return the genlist object the item belongs to. elm_genlist_item_show()
     * will make the scroller scroll to show that specific item so its visible.
     * elm_genlist_item_data_get() returns the data pointer set by the item
@@ -18075,7 +18059,7 @@ extern "C" {
     *
     * Items will only call their selection func and callback when first becoming
     * selected. Any further clicks will do nothing, unless you enable always
-    * select with elm_genlist_always_select_mode_set(). This means even if
+    * select with elm_gen_always_select_mode_set(). This means even if
     * selected, every click will make the selected callbacks be called.
     * elm_genlist_no_select_mode_set() will turn off the ability to select
     * items entirely and they will neither appear selected nor call selected
@@ -18282,7 +18266,7 @@ extern "C" {
     *
     * @see elm_genlist_item_append()
     * @see elm_genlist_item_del()
-    * @see elm_genlist_clear()
+    * @see elm_gen_clear()
     *
     * @ingroup Genlist
     */
@@ -19658,7 +19642,7 @@ extern "C" {
     *             the check object(event_info is NULL).
     *
     * Default contents parts of the check widget that you can use for are:
-    * @li "elm.swallow.content" - A icon of the check
+    * @li "icon" - A icon of the check
     *
     * Default text parts of the check widget that you can use for are:
     * @li "elm.text" - Label of the check
@@ -19701,6 +19685,9 @@ extern "C" {
     * Once the icon object is set, a previously set one will be deleted.
     * If you want to keep that old content object, use the
     * elm_object_content_unset() function.
+    *
+    * @deprecated use elm_object_part_content_set() instead.
+    *
     */
    EINA_DEPRECATED EAPI void         elm_check_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
@@ -19708,6 +19695,9 @@ extern "C" {
     *
     * @param obj The check object
     * @return The icon object
+    *
+    * @deprecated use elm_object_part_content_get() instead.
+    *  
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_check_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -19717,6 +19707,9 @@ extern "C" {
     * @return The icon object that was being used
     *
     * Unparent and return the icon object which was set for this widget.
+    *
+    * @deprecated use elm_object_part_content_unset() instead.
+    *
     */
    EINA_DEPRECATED EAPI Evas_Object *elm_check_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -19849,7 +19842,7 @@ extern "C" {
     * the radio objects within the group of radio objects that work together.
     *
     * Default contents parts of the radio widget that you can use for are:
-    * @li "elm.swallow.content" - A icon of the radio
+    * @li "icon" - A icon of the radio
     *
     * @ref tutorial_radio show most of this API in action.
     * @{
@@ -19888,8 +19881,9 @@ extern "C" {
     * Once the icon object is set, a previously set one will be deleted. If you
     * want to keep that old content object, use the elm_radio_icon_unset()
     * function.
-    &
-    * @deprecated use elm_object_content_set() instead.
+    *
+    * @deprecated use elm_object_part_content_set() instead.
+    *
     */
    EAPI void         elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
@@ -20997,7 +20991,7 @@ extern "C" {
     *      "pulse" effect is available)
     *
     * Default contents parts of the progressbar widget that you can use for are:
-    * @li "elm.swallow.content" - A icon of the progressbar
+    * @li "icon" - A icon of the progressbar
     * 
     * Here is an example on its usage:
     * @li @ref progressbar_example
@@ -23744,11 +23738,8 @@ extern "C" {
     * @li ELM_PANEL_ORIENT_LEFT
     * @li ELM_PANEL_ORIENT_RIGHT
     *
-    * To set/get/unset the content of the panel, you can use
-    * elm_object_content_set/get/unset APIs.
-    * Once the content object is set, a previously set one will be deleted.
-    * If you want to keep that old content object, use the
-    * elm_object_content_unset() function
+    * Default contents parts of the panel widget that you can use for are:
+    * @li "default" - A content of the panel
     *
     * @ref tutorial_panel shows one way to use this widget.
     * @{
@@ -24440,7 +24431,7 @@ extern "C" {
     * - @c "default"
     *
     * Default contents parts of the conformant widget that you can use for are:
-    * @li "elm.swallow.content" - A content of the conformant
+    * @li "default" - A content of the conformant
     *
     * See how to use this widget in this example:
     * @ref conformant_example
@@ -24545,11 +24536,8 @@ extern "C" {
     * need to resize or move it frequently (the content object and its
     * children).
     *
-    * To set/get/unset the content of the mapbuf, you can use 
-    * elm_object_content_set/get/unset APIs. 
-    * Once the content object is set, a previously set one will be deleted.
-    * If you want to keep that old content object, use the
-    * elm_object_content_unset() function.
+    * Default contents parts of the mapbuf widget that you can use for are:
+    * @li "default" - A content of the mapbuf
     *
     * To enable map, elm_mapbuf_enabled_set() should be used.
     * 
@@ -24750,6 +24738,10 @@ extern "C" {
     * Available styles for it:
     * - @c "default"
     *
+	 * To set/get the label of the flipselector item, you can use
+	 * elm_object_item_text_set/get APIs.
+	 * Once the text is set, a previously set one will be deleted.
+	 * 
     * Here is an example on its usage:
     * @li @ref flipselector_example
     */
@@ -25053,7 +25045,6 @@ extern "C" {
     * @ingroup Flipselector
     */
    EAPI double                     elm_flipselector_interval_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-
    /**
     * @}
     */
@@ -26399,7 +26390,13 @@ extern "C" {
     * "dismissed" - the ctxpopup was dismissed
     *
     * Default contents parts of the ctxpopup widget that you can use for are:
-    * @li "elm.swallow.content" - A content of the ctxpopup
+    * @li "default" - A content of the ctxpopup
+    *
+    * Default contents parts of the naviframe items that you can use for are:
+    * @li "icon" - A icon in the title area
+    * 
+    * Default text parts of the naviframe items that you can use for are:
+    * @li "default" - Title label in the title area
     *
     * @ref tutorial_ctxpopup shows the usage of a good deal of the API.
     * @{
@@ -26510,6 +26507,7 @@ extern "C" {
     * @return disabled @c EINA_TRUE, if disabled, @c EINA_FALSE otherwise
     *
     * @see elm_ctxpopup_item_disabled_set()
+    * @deprecated use elm_object_item_disabled_get() instead
     */
    EAPI Eina_Bool     elm_ctxpopup_item_disabled_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
@@ -28067,7 +28065,8 @@ extern "C" {
     * "rewind,clicked" - the user clicked the rewind button.
     * "stop,clicked" - the user clicked the stop button.
     * 
-    * To set the video of the player, you can use elm_object_content_set() API.
+    * Default contents parts of the player widget that you can use for are:
+    * @li "video" - A video of the player
     * 
     */
 
@@ -28079,7 +28078,7 @@ extern "C" {
     *
     * This function inserts a new player widget on the canvas.
     *
-    * @see elm_object_content_set()
+    * @see elm_object_part_content_set()
     *
     * @ingroup Video
     */
@@ -28097,6 +28096,7 @@ extern "C" {
     *
     * @see elm_player_add()
     * @see elm_video_add()
+    * @deprecated use elm_object_part_content_set() instead
     *
     * @ingroup Video
     */
