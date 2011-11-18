@@ -25426,9 +25426,6 @@ extern "C" {
     * @ingroup Calendar
     */
    EAPI void               elm_calendar_marks_draw(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI void               elm_calendar_text_saturday_color_set(Evas_Object *obj, int pos) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI void               elm_calendar_text_sunday_color_set(Evas_Object *obj, int pos) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI void               elm_calendar_text_weekday_color_set(Evas_Object *obj, int pos) EINA_ARG_NONNULL(1);
 
    /**
     * Set a day text color to the same that represents Saturdays.
@@ -25448,7 +25445,7 @@ extern "C" {
     *
     * @ingroup Calendar
     */
-   EAPI void               elm_calendar_text_saturday_color_set(Evas_Object *obj, int pos) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void               elm_calendar_text_saturday_color_set(Evas_Object *obj, int pos) EINA_ARG_NONNULL(1);
 
    /**
     * Set a day text color to the same that represents Sundays.
@@ -25468,7 +25465,7 @@ extern "C" {
     *
     * @ingroup Calendar
     */
-   EAPI void               elm_calendar_text_sunday_color_set(Evas_Object *obj, int pos) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void               elm_calendar_text_sunday_color_set(Evas_Object *obj, int pos) EINA_ARG_NONNULL(1);
 
    /**
     * Set a day text color to the same that represents Weekdays.
@@ -25497,7 +25494,7 @@ extern "C" {
     *
     * @ingroup Calendar
     */
-   EAPI void               elm_calendar_text_weekday_color_set(Evas_Object *obj, int pos) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI void               elm_calendar_text_weekday_color_set(Evas_Object *obj, int pos) EINA_ARG_NONNULL(1);
 
    /**
     * Set the interval on time updates for an user mouse button hold
