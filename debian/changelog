@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build88) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [genlist] rollback to previous package for fixing lockup
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build88
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Fri, 18 Nov 2011 10:16:35 +0900
+
 elementary (1.0.0+svn.61256slp2+build87) unstable; urgency=low
 
   * genlist - removing item update when item data set
