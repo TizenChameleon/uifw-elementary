@@ -28521,6 +28521,10 @@ extern "C" {
   #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_OPEN "elm,state,optionheader,open", ""
   #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_INSTANT_CLOSE "elm,state,optionheader,instant_close", ""
   #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_INSTANT_OPEN "elm,state,optionheader,instant_open", ""
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_CONTROLBAR_CLOSE "elm,state,controlbar,close", ""
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_CONTROLBAR_OPEN "elm,state,controlbar,open", ""
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_CONTROLBAR_INSTANT_CLOSE "elm,state,controlbar,instant_close", ""
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_CONTROLBAR_INSTANT_OPEN "elm,state,controlbar,instant_open", ""
 
    //Available only in a style - "2line"
   #define ELM_NAVIFRAME_ITEM_OPTIONHEADER2 "elm.swallow.optionheader2"
