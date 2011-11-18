@@ -403,6 +403,8 @@ _sizing_eval(Evas_Object *obj)
    evas_object_size_hint_min_get(wd->bx, &minw, &minh);
    minw_bx = minw;
    minh_bx = minh;
+   if (wd->vertical && (h > minh)) minh = h;
+   if ((!wd->vertical) && (w > minw)) minw = w;
    evas_object_resize(wd->bx, minw, minh);
    elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, &vh);
    if (wd->shrink_mode == ELM_TOOLBAR_SHRINK_NONE)
@@ -1276,7 +1278,7 @@ static void
 _elm_toolbar_item_label_update(Elm_Toolbar_Item *item)
 {
    Evas_Coord mw = -1, mh = -1;
-   Widget_Data *wd = elm_widget_data_get(item->base.widget);
+   Widget_Data *wd = elm_widget_data_get(WIDGET(item));
    edje_object_part_text_set(VIEW(item), "elm.text", item->label);
 
    elm_coords_finger_size_adjust(1, &mw, 1, &mh);
@@ -1340,7 +1342,7 @@ _elm_toolbar_item_icon_update(Elm_Toolbar_Item *item)
    Elm_Toolbar_Item_State *it_state;
    Eina_List *l;
    Evas_Coord mw = -1, mh = -1;
-   Widget_Data *wd = elm_widget_data_get(item->base.widget);
+   Widget_Data *wd = elm_widget_data_get(WIDGET(item));
    Evas_Object *old_icon = edje_object_part_swallow_get(VIEW(item),
                                                         "elm.swallow.icon");
    elm_widget_sub_object_del(VIEW(item), old_icon);
@@ -1351,8 +1353,8 @@ _elm_toolbar_item_icon_update(Elm_Toolbar_Item *item)
    elm_coords_finger_size_adjust(1, &mw, 1, &mh);
    if (wd->vertical)
      {
-        evas_object_size_hint_weight_set(VIEW(item), -1.0, EVAS_HINT_EXPAND);
-        evas_object_size_hint_align_set(VIEW(item), 0.5, EVAS_HINT_FILL);
+        evas_object_size_hint_weight_set(VIEW(item), EVAS_HINT_EXPAND, -1.0);
+        evas_object_size_hint_align_set(VIEW(item), EVAS_HINT_FILL, 0.5);
      }
    else
      {
@@ -1515,9 +1517,10 @@ EAPI Evas_Object *
 elm_toolbar_item_object_get(const Elm_Toolbar_Item *item)
 {
    Widget_Data *wd;
-   Evas_Object *obj = WIDGET(item);
+   Evas_Object *obj;
 
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, NULL);
+   obj = WIDGET(item);
    wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
@@ -1583,9 +1586,13 @@ EAPI void
 elm_toolbar_item_separator_set(Elm_Toolbar_Item *item, Eina_Bool separator)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item);
+   Evas_Object *obj = WIDGET(item);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   double scale;
    if (item->separator == separator) return;
    item->separator = separator;
-   _theme_hook(VIEW(item));
+   scale = (elm_widget_scale_get(obj) * _elm_config->scale);
+   _theme_hook_item(obj, item, scale, wd->icon_size);
 }
 
 EAPI Eina_Bool
