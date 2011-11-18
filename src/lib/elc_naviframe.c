@@ -10,7 +10,7 @@ struct _Widget_Data
 {
    Eina_Inlist  *stack;
    Evas_Object  *base;
-   Evas_Object     *rect;
+   Evas_Object  *rect;
    Eina_Bool     preserve: 1;
    Eina_Bool     auto_pushed: 1;
    Eina_Bool     freeze_events: 1;
@@ -318,17 +318,17 @@ _item_content_set_hook(Elm_Object_Item *it,
    Elm_Naviframe_Item *navi_it = (Elm_Naviframe_Item *) it;
 
    //specified parts
-   if (!part || !strcmp("default", part))
+   if ((!part) || (!strcmp(part, "elm.swallow.content")))
      {
         _item_content_set(navi_it, content);
         return;
      }
-   else if (!strcmp(part, "prev_btn"))
+   else if (!strcmp(part, "elm.swallow.prev_btn"))
      {
         _title_prev_btn_set(navi_it, content, EINA_FALSE);
         return;
      }
-   else if (!strcmp(part, "next_btn"))
+   else if (!strcmp(part, "elm.swallow.next_btn"))
      {
         _title_next_btn_set(navi_it, content);
         return;
@@ -351,11 +351,11 @@ _item_content_get_hook(const Elm_Object_Item *it, const char *part)
    Elm_Naviframe_Item *navi_it = (Elm_Naviframe_Item *) it;
 
    //specified parts
-   if (!part || !strcmp("default", part))
+   if ((!part) || (!strcmp(part, "elm.swallow.content")))
      return navi_it->content;
-   else if (!strcmp(part, "prev_btn"))
+   else if (!strcmp(part, "elm.swallow.prev_btn"))
      return navi_it->title_prev_btn;
-   else if (!strcmp(part, "next_btn"))
+   else if (!strcmp(part, "elm.swallow.next_btn"))
      return navi_it->title_next_btn;
    else if (!strcmp(part, "icon"))
      return navi_it->icon;
@@ -381,9 +381,9 @@ _item_content_unset_hook(Elm_Object_Item *it, const char *part)
    //specified parts
    //FIXME: could be unset the below specified contents also.
    if (!part ||
-       !strcmp(part, "default") ||
-       !strcmp(part, "prev_btn") ||
-       !strcmp(part, "next_btn") ||
+       !strcmp(part, "elm.swallow.content") ||
+       !strcmp(part, "elm.swallow.prev_btn") ||
+       !strcmp(part, "elm.swallow.next_btn") ||
        !strcmp(part, "icon"))
      {
         WRN("You can not unset the content! : naviframe=%p",

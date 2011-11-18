@@ -28507,6 +28507,28 @@ extern "C" {
     * @ref tutorial_naviframe gives a good overview of the usage of the API.
     */
 
+  //Available commonly
+  #define ELM_NAVIFRAME_ITEM_CONTENT "elm.swallow.content"
+  #define ELM_NAVIFRAME_ITEM_ICON "elm.swallow.icon"
+  #define ELM_NAVIFRAME_ITEM_OPTIONHEADER "elm.swallow.optionheader"
+  #define ELM_NAVIFRAME_ITEM_TITLE_LABEL "elm.text.title"
+  #define ELM_NAVIFRAME_ITEM_PREV_BTN "elm.swallow.prev_btn"
+  #define ELM_NAVIFRAME_ITEM_TITLE_LEFT_BTN "elm.swallow.left_btn"
+  #define ELM_NAVIFRAME_ITEM_TITLE_RIGHT_BTN "elm.swallow.right_btn"
+  #define ELM_NAVIFRAME_ITEM_TITLE_MORE_BTN "elm.swallow.more_btn"
+  #define ELM_NAVIFRAME_ITEM_CONTROLBAR "elm.swallow.controlbar"
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_CLOSE "elm,state,optionheader,close", ""
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_OPEN "elm,state,optionheader,open", ""
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_INSTANT_CLOSE "elm,state,optionheader,instant_close", ""
+  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_INSTANT_OPEN "elm,state,optionheader,instant_open", ""
+
+   //Available only in a style - "2line"
+  #define ELM_NAVIFRAME_ITEM_OPTIONHEADER2 "elm.swallow.optionheader2"
+
+  //Available only in a style - "segment"
+  #define ELM_NAVIFRAME_ITEM_SEGMENT2 "elm.swallow.segment2"
+  #define ELM_NAVIFRAME_ITEM_SEGMENT3 "elm.swallow.segment3"
+
    /**
     * @addtogroup Naviframe
     * @{
