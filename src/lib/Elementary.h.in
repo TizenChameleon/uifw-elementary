@@ -4430,6 +4430,12 @@ extern "C" {
     */
    EAPI Evas_Object *elm_win_inlined_image_object_get(Evas_Object *obj);
    /**
+    * Determine whether a window has focus
+    * @param obj The window to query
+    * @return EINA_TRUE if the window exists and has focus, else EINA_FALSE
+    */
+   EAPI Eina_Bool    elm_win_focus_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
     * Get screen geometry details for the screen that a window is on
     * @param obj The window to query
     * @param x where to return the horizontal offset value. May be NULL.
