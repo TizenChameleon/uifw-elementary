@@ -33,7 +33,6 @@ struct _Widget_Data
    float mgf_scale;
    int mgf_type;
    Ecore_Job *deferred_recalc_job;
-   Ecore_Job *region_get_job;
    Ecore_Event_Handler *sel_notify_handler;
    Ecore_Event_Handler *sel_clear_handler;
    Ecore_Timer *delay_write;
@@ -163,7 +162,6 @@ static void _magnifier_hide(void *data);
 static void _magnifier_move(void *data);
 static Evas_Coord_Rectangle _layout_region_get(Evas_Object *data);
 static Evas_Coord_Rectangle _viewport_region_get(Evas_Object *data);
-static void _elm_win_region_get_job(void *data);
 
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_ACTIVATED[] = "activated";
@@ -509,7 +507,6 @@ _del_hook(Evas_Object *obj)
    if (wd->password_text) eina_stringshare_del(wd->password_text);
    if (wd->bg) evas_object_del(wd->bg);
    if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
-   if (wd->region_get_job) ecore_job_del(wd->region_get_job);
    if (wd->append_text_idler)
      {
         ecore_idler_del(wd->append_text_idler);
@@ -1073,15 +1070,14 @@ static void
 _move(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord_Rectangle ret_rect;
 
    if (wd->hoversel) _hoversel_position(data);
 
    if (!_elm_config->desktop_entry)
-     {
-        if (wd->region_get_job) ecore_job_del(wd->region_get_job);
-        wd->region_get_job = ecore_job_add(_elm_win_region_get_job, data);
-     }
+     edje_object_part_text_viewport_region_set(wd->ent, "elm.text", _viewport_region_get(data));
+
+   if (!_elm_config->desktop_entry)
+     edje_object_part_text_layout_region_set(wd->ent, "elm.text", _layout_region_get(data));
 }
 
 static void
@@ -1949,68 +1945,6 @@ _signal_handler_moving(void *data, Evas_Object *obj __UNUSED__, const char *emis
 }
 
 static Evas_Coord_Rectangle
-_intersection_region_get(Evas_Coord_Rectangle rect1, Evas_Coord_Rectangle rect2)
-{
-   Evas_Coord_Rectangle ret_rect;
-   Evas_Coord_Point l1, l2, r1, r2, p1, p2;
-
-   l1.x = rect1.x;
-   l1.y = rect1.y;
-   r1.x = rect1.x + rect1.w;
-   r1.y = rect1.y + rect1.h;
-
-   l2.x = rect2.x;
-   l2.y = rect2.y;
-   r2.x = rect2.x + rect2.w;
-   r2.y = rect2.y + rect2.h;
-
-   p1.x = (l1.x > l2.x) ? l1.x : l2.x;
-   p1.y = (l1.y > l2.y) ? l1.y : l2.y;
-   p2.x = (r1.x < r2.x) ? r1.x : r2.x;
-   p2.y = (r1.y < r2.y) ? r1.y : r2.y;
-
-   ret_rect.x = p1.x;
-   ret_rect.y = p1.y;
-   ret_rect.w = (p2.x > p1.x) ? p2.x - p1.x : -1;
-   ret_rect.h = (p2.y > p1.y) ? p2.y - p1.y : -1;
-
-   return ret_rect;
-}
-
-static Evas_Coord_Rectangle
-_viewport_region_get(Evas_Object *data)
-{
-   Evas_Coord_Rectangle geometry, ret_rect;
-   geometry.x = geometry.y = geometry.w = geometry.h = -1;
-   ret_rect = geometry;
-
-   Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return geometry;
-   if (!data || !strlen(elm_widget_type_get(data))) return geometry;
-
-   if (wd->scroll)
-     {
-        evas_object_geometry_get(wd->scroller, &geometry.x, &geometry.y, &geometry.w, &geometry.h);
-        ret_rect = geometry;
-     }
-
-   Evas_Object *parent_obj = data;
-
-   while ((parent_obj = elm_widget_parent_get(parent_obj)))
-     {
-        if (!strcmp(elm_widget_type_get(parent_obj), "scroller") ||
-            !strcmp(elm_widget_type_get(parent_obj), "genlist"))
-          {
-             evas_object_geometry_get(parent_obj, &geometry.x, &geometry.y, &geometry.w, &geometry.h);
-             if (ret_rect.w == -1 && ret_rect.h == -1) ret_rect = geometry;
-             ret_rect = _intersection_region_get(geometry, ret_rect);
-          }
-     }
-
-   return ret_rect;
-}
-
-static Evas_Coord_Rectangle
 _layout_region_get(Evas_Object *data)
 {
    Evas_Coord_Rectangle geometry;
@@ -2018,7 +1952,9 @@ _layout_region_get(Evas_Object *data)
 
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return geometry;
-   if (!data || !strlen(elm_widget_type_get(data))) return geometry;
+
+   if (!data || !strlen(elm_widget_type_get(data)))
+     return geometry;
 
    Evas_Object *child_obj = data;
    Evas_Object *parent_obj;
@@ -2036,23 +1972,40 @@ _layout_region_get(Evas_Object *data)
    return geometry;
 }
 
-static void
-_elm_win_region_get_job(void *data)
+static Evas_Coord_Rectangle
+_viewport_region_get(Evas_Object *data)
 {
+   Evas_Coord_Rectangle geometry;
+   geometry.x = geometry.y = geometry.w = geometry.h = -1;
+
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord_Rectangle ret_rect;
-   if (!wd) return;
-   wd->region_get_job = NULL;
+   if (!wd) return geometry;
 
-   if (!_elm_config->desktop_entry)
+   if (!data || !strlen(elm_widget_type_get(data)))
+     return geometry;
+
+   if (wd->scroll)
      {
-        ret_rect = _viewport_region_get(data);
-        edje_object_part_text_viewport_region_set(wd->ent, "elm.text", ret_rect.x, ret_rect.y, ret_rect.w, ret_rect.h);
-        ret_rect = _layout_region_get(data);
-        edje_object_part_text_layout_region_set(wd->ent, "elm.text", ret_rect.x, ret_rect.y, ret_rect.w, ret_rect.h);
-     }
-}
+        evas_object_geometry_get(wd->scroller, &geometry.x, &geometry.y, NULL, NULL);
+        elm_smart_scroller_child_viewport_size_get(wd->scroller, &geometry.w, &geometry.h);
 
+        return geometry;
+     }
+
+   Evas_Object *parent_obj = data;
+
+   while ((parent_obj = elm_widget_parent_get(parent_obj)))
+     {
+        if (!strcmp(elm_widget_type_get(parent_obj), "scroller") ||
+            !strcmp(elm_widget_type_get(parent_obj), "genlist"))
+          {
+             evas_object_geometry_get(parent_obj, &geometry.x, &geometry.y, &geometry.w, &geometry.h);
+             return geometry;
+          }
+     }
+
+   return geometry;
+}
 
 static void
 _signal_selection_end(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
@@ -3008,12 +2961,6 @@ elm_entry_add(Evas_Object *parent)
    edje_object_part_text_set(wd->ent, "elm.text", "");
    if (_elm_config->desktop_entry)
      edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_TRUE);
-   else
-     {
-        edje_object_part_text_copy_paste_disabled_set(wd->ent, "elm.text", EINA_FALSE);
-        edje_object_part_text_viewport_region_set(wd->ent, "elm.text", -1, -1, -1, -1);
-        edje_object_part_text_layout_region_set(wd->ent, "elm.text", -1, -1, -1, -1);
-     }
    elm_widget_resize_object_set(obj, wd->ent);
    _sizing_eval(obj);
 
@@ -3546,9 +3493,6 @@ elm_entry_context_menu_disabled_set(Evas_Object *obj, Eina_Bool disabled)
    if (!wd) return;
    if (wd->context_menu == !disabled) return;
    wd->context_menu = !disabled;
-
-   if (!_elm_config->desktop_entry)
-     edje_object_part_text_copy_paste_disabled_set(wd->ent, "elm.text", disabled);
 }
 
 EAPI Eina_Bool
