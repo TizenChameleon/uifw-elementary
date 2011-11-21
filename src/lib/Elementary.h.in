@@ -17945,6 +17945,19 @@ extern "C" {
     * @deprecated use elm_object_text_get() instead.
     */
    EINA_DEPRECATED EAPI const char           *elm_actionslider_indicator_label_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
+   /**
+   * Hold actionslider object movement.
+   *
+   * @param[in] obj The actionslider object
+   * @param[in] flag Actionslider hold/release
+   * (EINA_TURE = hold/EIN_FALSE = release)
+   *
+   * @ingroup Actionslider
+   */
+   EAPI void                             elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag) EINA_ARG_NONNULL(1);
+
+
    /**
     * @}
     */
