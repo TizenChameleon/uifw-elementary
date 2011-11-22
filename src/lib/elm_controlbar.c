@@ -789,25 +789,21 @@ _cancel_selected_box(Widget_Data *wd)
 }
 
 static void
-_unpress_box_cb(void *data, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info)
+_unpress_box_cb(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data * wd = (Widget_Data *) data;
-   Evas_Event_Mouse_Up * ev = event_info;
-   Evas_Coord x, y, w, h;
-
-   evas_object_event_callback_del(obj, EVAS_CALLBACK_MOUSE_UP, _unpress_box_cb);
+   if (!wd) return;
 
    _cancel_selected_box(wd);
+}
 
-   if (_check_item(wd, wd->pre_item))
-     {
-        evas_object_geometry_get(wd->pre_item->base, &x, &y, &w, &h);
-        if ((ev->output.x > x) && (ev->output.x < x+w) && (ev->output.y > y) && (ev->output.y < y+h))
-          {
-             _select_box(wd->pre_item);
-          }
-     }
-   return;
+static void
+_clicked_box_cb(void *data, Evas_Object *obj, void *event_info)
+{
+   Widget_Data * wd = (Widget_Data *) data;
+   if (!wd) return;
+
+   _select_box(wd->pre_item);
 }
 
 static Eina_Bool
@@ -835,7 +831,6 @@ _press_box(Elm_Controlbar_Item * it)
                {
                   edje_object_signal_emit(_EDJ(it->base), "elm,state,toolbar_pressed", "elm");
                }
-             evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_UP, _unpress_box_cb, (void *)wd);
 
              check = EINA_TRUE;
           }
@@ -898,7 +893,7 @@ _create_item_layout(Evas_Object * parent, Elm_Controlbar_Item * it, Evas_Object 
 }
 
 static void
-_bar_item_down_cb(void *data, Evas * evas __UNUSED__, Evas_Object * obj, void *event_info __UNUSED__)
+_bar_item_down_cb(void *data, Evas_Object * obj, void *event_info __UNUSED__)
 {
    Widget_Data * wd = (Widget_Data *) data;
    const Eina_List *l;
@@ -906,7 +901,7 @@ _bar_item_down_cb(void *data, Evas * evas __UNUSED__, Evas_Object * obj, void *e
    if (wd->animating) return;
 
    EINA_LIST_FOREACH(wd->items, l, item)
-      if (item->base == obj) break;
+      if (item->base_item == obj) break;
 
    if (item == NULL) return;
 
@@ -941,8 +936,10 @@ _create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
    it->view = view;
    it->style = TABBAR;
    it->base = _create_item_layout(wd->edje, it, &(it->base_item), &(it->icon));
-   evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN,
+   evas_object_smart_callback_add(it->base_item, "pressed",
                                   _bar_item_down_cb, wd);
+   evas_object_smart_callback_add(it->base_item, "unpressed", _unpress_box_cb, wd);
+   evas_object_smart_callback_add(it->base_item, "clicked", _clicked_box_cb, wd);
    evas_object_show(it->base);
 
    return it;
@@ -980,8 +977,10 @@ _create_tool_item(Evas_Object * obj, const char *icon_path, const char *label,
    it->data = data;
    it->style = TOOLBAR;
    it->base = _create_item_layout(wd->edje, it, &(it->base_item), &(it->icon));
-   evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN,
+   evas_object_smart_callback_add(it->base_item, "pressed",
                                   _bar_item_down_cb, wd);
+   evas_object_smart_callback_add(it->base_item, "unpressed", _unpress_box_cb, wd);
+   evas_object_smart_callback_add(it->base_item, "clicked", _clicked_box_cb, wd);
    evas_object_show(it->base);
 
    return it;
@@ -1250,8 +1249,10 @@ _create_more_item(Widget_Data *wd, int style)
    it->func = _create_more_func;
    it->style = style;
    it->base = _create_item_layout(wd->edje, it, &(it->base_item), &(it->icon));
-   evas_object_event_callback_add(it->base, EVAS_CALLBACK_MOUSE_DOWN,
+   evas_object_smart_callback_add(it->base_item, "pressed",
                                   _bar_item_down_cb, wd);
+   evas_object_smart_callback_add(it->base_item, "unpressed", _unpress_box_cb, wd);
+   evas_object_smart_callback_add(it->base_item, "clicked", _clicked_box_cb, wd);
    evas_object_show(it->base);
 
    _set_items_position(it->obj, it, NULL, EINA_TRUE);
