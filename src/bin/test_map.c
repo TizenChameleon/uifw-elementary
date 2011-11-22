@@ -348,7 +348,6 @@ static void
 map_track_add(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *fs, *bg, *vbox, *hbox, *sep;
-   const char *path = NULL;
 
    fs_win = elm_win_add(NULL, "fileselector", ELM_WIN_BASIC);
    elm_win_title_set(fs_win, "File Selector");
@@ -367,9 +366,7 @@ map_track_add(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED
    fs = elm_fileselector_add(fs_win);
    elm_fileselector_is_save_set(fs, EINA_TRUE);
    elm_fileselector_expandable_set(fs, EINA_FALSE);
-   path = getenv("HOME");
-   if (!path) path = "./";
-   elm_fileselector_path_set(fs, path);
+   elm_fileselector_path_set(fs, getenv("HOME"));
    evas_object_size_hint_weight_set(fs, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fs, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(vbox, fs);
