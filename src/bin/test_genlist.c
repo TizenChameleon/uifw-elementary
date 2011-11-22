@@ -1796,10 +1796,9 @@ _reorder_tg_changed_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__
  * gl_moved is called after an item was reordered.
  * This is only called when reorder mode is enabled.
  *
+ * @param data         :  the genlist object passed as data.
  * @param obj          :  the genlist object.
  * @param item         :  the moved item.
- * @param rel_item     :  the relative item.
- * @param move_after   :  whether or not the rel_item is after item.
  *
  * If the move_after is true,
  *  the item(*item) had been moved after the given relative item(*rel_item) in list.
