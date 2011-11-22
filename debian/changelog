@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build93) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [elm_panes] This should be rollback git commit -m ! evas_object_hide should be done by application side
+  * Git: 165.213.180.234:/slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build93
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Tue, 22 Nov 2011 11:14:14 +0900
+
 elementary (1.0.0+svn.61256slp2+build92) unstable; urgency=low
 
   * Package Upload
