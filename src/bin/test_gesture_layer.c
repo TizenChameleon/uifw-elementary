@@ -173,9 +173,6 @@ zoom_start(void *_po, void *event_info)
         po->zoom_out = NULL;
      }
 
-
-   po->dx = p->x - po->bx;
-   po->dy = p->y - po->by;
    /* Give it a "lift" effect right from the start */
    po->base_zoom = BASE_ZOOM * LIFT_FACTOR;
    po->zoom = po->base_zoom;
@@ -192,8 +189,6 @@ zoom_move(void *_po, void *event_info)
    Elm_Gesture_Zoom_Info *p = (Elm_Gesture_Zoom_Info *) event_info;
    printf("zoom move <%d,%d> <%f>\n", p->x, p->y, p->zoom);
    po->zoom = po->base_zoom * p->zoom;
-   po->bx = p->x - po->dx;
-   po->by = p->y - po->dy;
    apply_changes(po);
    return EVAS_EVENT_FLAG_NONE;
 }
@@ -205,6 +200,52 @@ zoom_end(void *_po, void *event_info)
    Elm_Gesture_Zoom_Info *p = (Elm_Gesture_Zoom_Info *) event_info;
    printf("zoom end/abort <%d,%d> <%f>\n", p->x, p->y, p->zoom);
 
+   /* Apply the zoom out animator */
+   po->shadow_zoom = 1.3;
+   po->base_zoom = po->zoom;
+   po->zoom_out = elm_transit_add();
+   elm_transit_duration_set(po->zoom_out, zoom_out_animation_duration);
+   elm_transit_effect_add(po->zoom_out, zoom_out_animation_operation, po, zoom_out_animation_end);
+   elm_transit_go(po->zoom_out);
+   return EVAS_EVENT_FLAG_NONE;
+}
+
+static Evas_Event_Flags
+momentum_start(void *_po, void *event_info)
+{
+   Photo_Object *po = (Photo_Object *) _po;
+   Elm_Gesture_Momentum_Info *p = (Elm_Gesture_Momentum_Info *) event_info;
+   printf("momentum_start <%d,%d>\n", p->x2, p->y2);
+
+   po->dx = p->x2 - po->bx;
+   po->dy = p->y2 - po->by;
+   apply_changes(po);
+
+   return EVAS_EVENT_FLAG_NONE;
+}
+
+static Evas_Event_Flags
+momentum_move(void *_po, void *event_info)
+{
+   Photo_Object *po = (Photo_Object *) _po;
+   Elm_Gesture_Momentum_Info *p = (Elm_Gesture_Momentum_Info *) event_info;
+   printf("momentum move <%d,%d>\n", p->x2, p->y2);
+
+   po->bx = p->x2 - po->dx;
+   po->by = p->y2 - po->dy;
+   apply_changes(po);
+
+   return EVAS_EVENT_FLAG_NONE;
+}
+
+static Evas_Event_Flags
+momentum_end(void *_po, void *event_info)
+{
+   Photo_Object *po = (Photo_Object *) _po;
+   Elm_Gesture_Momentum_Info *p = (Elm_Gesture_Momentum_Info *) event_info;
+   printf("momentum end/abort <%d,%d> <%d,%d>\n", p->x2, p->y2, p->mx, p->my);
+   (void) po;
+   (void) p;
    /* Make sure middle is in the screen, if not, fix it. */
      {
         /* FIXME: Use actual window sizes instead of the hardcoded
@@ -222,16 +263,28 @@ zoom_end(void *_po, void *event_info)
         else if (my > 800)
            po->by = 800 - (po->bh / 2);
      }
+   apply_changes(po);
 
-   /* Apply the zoom out animator */
-   po->shadow_zoom = 1.3;
-   po->base_zoom = po->zoom;
-   po->zoom_out = elm_transit_add();
-   elm_transit_duration_set(po->zoom_out, zoom_out_animation_duration);
-   elm_transit_effect_add(po->zoom_out, zoom_out_animation_operation, po, zoom_out_animation_end);
-   elm_transit_go(po->zoom_out);
    return EVAS_EVENT_FLAG_NONE;
 }
+
+static void
+_win_del_req(void *data, Evas_Object *obj __UNUSED__,
+      void *event_info __UNUSED__)
+{
+   Photo_Object **photo_array = (Photo_Object **) data;
+
+   if (!photo_array)
+      return;
+
+   /* The content of the photo object is automatically deleted when the win
+    * is deleted. */
+   for ( ; *photo_array ; photo_array++)
+      free(*photo_array);
+
+   free(data);
+}
+
 
 Photo_Object *
 photo_object_add(Evas_Object *parent, Evas_Object *ic, const char *icon, Evas_Coord x,
@@ -288,6 +341,10 @@ photo_object_add(Evas_Object *parent, Evas_Object *ic, const char *icon, Evas_Co
    elm_gesture_layer_cb_set(po->gl, ELM_GESTURE_ZOOM, ELM_GESTURE_STATE_MOVE, zoom_move, po);
    elm_gesture_layer_cb_set(po->gl, ELM_GESTURE_ZOOM, ELM_GESTURE_STATE_END, zoom_end, po);
    elm_gesture_layer_cb_set(po->gl, ELM_GESTURE_ZOOM, ELM_GESTURE_STATE_ABORT, zoom_end, po);
+   elm_gesture_layer_cb_set(po->gl, ELM_GESTURE_MOMENTUM, ELM_GESTURE_STATE_START, momentum_start, po);
+   elm_gesture_layer_cb_set(po->gl, ELM_GESTURE_MOMENTUM, ELM_GESTURE_STATE_MOVE, momentum_move, po);
+   elm_gesture_layer_cb_set(po->gl, ELM_GESTURE_MOMENTUM, ELM_GESTURE_STATE_END, momentum_end, po);
+   elm_gesture_layer_cb_set(po->gl, ELM_GESTURE_MOMENTUM, ELM_GESTURE_STATE_ABORT, momentum_end, po);
 
    po->rotate = po->base_rotate = angle;
    po->shadow_zoom = 1.3;
@@ -303,6 +360,9 @@ test_gesture_layer(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
    Evas_Coord w, h;
    Evas_Object *win, *bg;
    char buf[PATH_MAX];
+   int ind = 0;
+   Photo_Object **photo_array;
+   photo_array = calloc(sizeof(*photo_array), 4);
 
    w = 480;
    h = 800;
@@ -315,14 +375,14 @@ test_gesture_layer(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
    bg = elm_bg_add(win);
    snprintf(buf, sizeof(buf), "%s/images/wood_01.jpg", elm_app_data_dir_get());
    elm_bg_file_set(bg, buf, NULL);
-   elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
-    snprintf(buf, sizeof(buf), "%s/images/pol_sky.png", elm_app_data_dir_get());
-   photo_object_add(win, NULL, buf, 200, 200, 365, 400, 0);
+   snprintf(buf, sizeof(buf), "%s/images/pol_sky.png", elm_app_data_dir_get());
+   photo_array[ind++] = photo_object_add(win, NULL, buf, 200, 200, 365, 400, 0);
    snprintf(buf, sizeof(buf), "%s/images/pol_twofish.png", elm_app_data_dir_get());
-   photo_object_add(win, NULL, buf, 40, 300, 365, 400, 45);
+   photo_array[ind++] = photo_object_add(win, NULL, buf, 40, 300, 365, 400, 45);
 
    Evas_Object *en = elm_entry_add(win);
    elm_entry_entry_set(en, "You can use whatever object you want, "
@@ -334,8 +394,11 @@ test_gesture_layer(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
    elm_layout_file_set(postit, buf, "main");
    elm_object_part_content_set(postit, "ent", en);
 
-   photo_object_add(win, postit, NULL, 50, 50, 382, 400, 355);
+   photo_array[ind++] = photo_object_add(win, postit, NULL, 50, 50, 382, 400, 355);
 
+   photo_array[ind] = NULL;
+   evas_object_smart_callback_add(win, "delete,request", _win_del_req,
+         photo_array);
    evas_object_show(win);
 }
 

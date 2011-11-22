@@ -27,8 +27,8 @@ grdt_lbl_get(void            *data,
 
 Evas_Object *
 grdt_content_get(void        *data,
-                 Evas_Object *obj,
-                 const char  *part)
+              Evas_Object *obj,
+              const char  *part)
 {
    const Testitem *ti = data;
    if (!strcmp(part, "elm.swallow.icon"))

@@ -32,7 +32,6 @@ _navi_it_del(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED_
    elm_naviframe_item_del(data);
 }
 
-
 void
 _title_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
