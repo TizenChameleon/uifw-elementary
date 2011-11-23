@@ -1073,7 +1073,6 @@ static void
 _move(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord_Rectangle ret_rect;
 
    if (wd->hoversel) _hoversel_position(data);
 

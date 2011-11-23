@@ -1610,7 +1610,8 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
      {
         Elm_Selection_Data ddata;
 
-        str = strdup(data->data);
+        str = malloc(data->length);
+        memcpy(str, data->data, data->length);
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_TEXT;
         ddata.data = str;
