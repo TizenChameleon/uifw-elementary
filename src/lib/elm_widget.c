@@ -1652,7 +1652,7 @@ elm_widget_focus_list_next_get(const Evas_Object  *obj,
                                Elm_Focus_Direction dir,
                                Evas_Object       **next)
 {
-   Eina_List *(*list_next)(const Eina_List * list);
+   Eina_List *(*list_next)(const Eina_List * list) = NULL;
 
    if (!next)
      return EINA_FALSE;
@@ -1959,8 +1959,8 @@ elm_widget_focus_restore(Evas_Object *obj)
    newest = _newest_focus_order_get(obj, &newest_focus_order, EINA_TRUE);
    if (newest)
      {
-        elm_object_unfocus(newest);
-        elm_object_focus(newest);
+        elm_object_focus_set(newest, EINA_FALSE);
+        elm_object_focus_set(newest, EINA_TRUE);
      }
 }
 
@@ -2229,25 +2229,25 @@ elm_widget_theme_set(Evas_Object *obj,
 }
 
 EAPI void
-elm_widget_text_part_set(Evas_Object *obj, const char *item, const char *label)
+elm_widget_text_part_set(Evas_Object *obj, const char *part, const char *label)
 {
    API_ENTRY return;
 
    if (!sd->on_text_set_func)
      return;
 
-   sd->on_text_set_func(obj, item, label);
+   sd->on_text_set_func(obj, part, label);
 }
 
 EAPI const char *
-elm_widget_text_part_get(const Evas_Object *obj, const char *item)
+elm_widget_text_part_get(const Evas_Object *obj, const char *part)
 {
    API_ENTRY return NULL;
 
    if (!sd->on_text_get_func)
      return NULL;
 
-   return sd->on_text_get_func(obj, item);
+   return sd->on_text_get_func(obj, part);
 }
 
 EAPI void
@@ -2386,7 +2386,6 @@ elm_widget_access_info_get(Evas_Object *obj)
    API_ENTRY return NULL;
    return sd->access_info;
 }
-
 
 EAPI Elm_Theme *
 elm_widget_theme_get(const Evas_Object *obj)
@@ -3395,6 +3394,7 @@ _smart_del(Evas_Object *obj)
         evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_DEL, _sub_obj_del, sd);
         evas_object_smart_callback_call(sd->obj, "sub-object-del", sobj);
         evas_object_del(sobj);
+        sd->resize_obj = NULL;
      }
    if (sd->hover_obj)
      {
@@ -3403,6 +3403,7 @@ _smart_del(Evas_Object *obj)
         evas_object_event_callback_del_full(sobj, EVAS_CALLBACK_DEL, _sub_obj_del, sd);
         evas_object_smart_callback_call(sd->obj, "sub-object-del", sobj);
         evas_object_del(sobj);
+        sd->hover_obj = NULL;
      }
    EINA_LIST_FREE(sd->subobjs, sobj)
      {
