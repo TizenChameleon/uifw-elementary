@@ -26737,7 +26737,7 @@ extern "C" {
     * When disabled the item is greyed out to indicate it's state.
     * @deprecated use elm_object_item_disabled_set() instead
     */
-   EINA_DEPRECATED EAPI void          elm_ctxpopup_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled) EINA_ARG_NONNULL(1);
+   /*EINA_DEPRECATED*/ EAPI void          elm_ctxpopup_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the ctxpopup item's disabled/enabled state.
     *
@@ -26760,7 +26760,7 @@ extern "C" {
     *
     * @deprecated use elm_object_item_content_part_get() instead
     */
-   EINA_DEPRECATED EAPI Evas_Object  *elm_ctxpopup_item_icon_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   /*EINA_DEPRECATED*/ EAPI Evas_Object  *elm_ctxpopup_item_icon_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
     * @brief Sets the side icon associated with the ctxpopup item
     *
@@ -26776,7 +26776,7 @@ extern "C" {
     * @deprecated use elm_object_item_content_part_set() instead
     *
     */
-   EINA_DEPRECATED EAPI void          elm_ctxpopup_item_icon_set(Elm_Object_Item *it, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   /*EINA_DEPRECATED*/ EAPI void          elm_ctxpopup_item_icon_set(Elm_Object_Item *it, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the label for the given ctxpopup item.
     *
@@ -26789,7 +26789,7 @@ extern "C" {
     *
     * @deprecated use elm_object_item_text_get() instead
     */
-   EINA_DEPRECATED EAPI const char   *elm_ctxpopup_item_label_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   /*EINA_DEPRECATED*/ EAPI const char   *elm_ctxpopup_item_label_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
     * @brief (Re)set the label on the given ctxpopup item.
     *
@@ -26798,7 +26798,7 @@ extern "C" {
     *
     * @deprecated use elm_object_item_text_set() instead
     */
-   EINA_DEPRECATED EAPI void          elm_ctxpopup_item_label_set(Elm_Object_Item *it, const char *label) EINA_ARG_NONNULL(1);
+   /*EINA_DEPRECATED*/ EAPI void          elm_ctxpopup_item_label_set(Elm_Object_Item *it, const char *label) EINA_ARG_NONNULL(1);
    /**
     * @brief Set an elm widget as the content of the ctxpopup.
     *
