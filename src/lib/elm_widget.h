@@ -462,7 +462,6 @@ EAPI void             _elm_widget_item_disabled_set(Elm_Widget_Item *item, Eina_
 EAPI Eina_Bool        _elm_widget_item_disabled_get(const Elm_Widget_Item *item);
 EAPI void             _elm_widget_item_disable_set_hook_set(Elm_Widget_Item *item, Elm_Widget_On_Disable_Set_Cb func);
 
-
 /* debug function. don't use it unless you are tracking parenting issues */
 EAPI void             elm_widget_tree_dump(const Evas_Object *top);
 EAPI void             elm_widget_tree_dot_dump(const Evas_Object *top, FILE *output);
@@ -766,7 +765,7 @@ typedef enum _Elm_Sel_Format
    /** Edje textblock markup, including inline images */
    ELM_SEL_FORMAT_MARKUP = 0x02,
    /** Images */
-   ELM_SEL_FORMAT_IMAGE	 = 0x04,
+   ELM_SEL_FORMAT_IMAGE = 0x04,
    /** Vcards */
    ELM_SEL_FORMAT_VCARD =  0x08,
    /** Raw HTMLish things for widgets that want that stuff (hello webkit!) */
