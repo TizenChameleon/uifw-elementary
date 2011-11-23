@@ -599,7 +599,7 @@ extern "C" {
     */
    typedef Evas_Object *(*Elm_Tooltip_Item_Content_Cb) (void *data, Evas_Object *obj, Evas_Object *tooltip, void *item);
 
-   typedef Eina_Bool (*Elm_Event_Cb) (void *data, Evas_Object *obj, Evas_Object *src, Evas_Callback_Type type, void *event_info);
+   typedef Eina_Bool (*Elm_Event_Cb) (void *data, Evas_Object *obj, Evas_Object *src, Evas_Callback_Type type, void *event_info); /**< Function prototype definition for callbacks on input events happening on Elementary widgets. @a data will receive the user data pointer passed to elm_object_event_callback_add(). @a src will be a pointer to the widget on which the input event took place. @a type will get the type of this event and @a event_info, the struct with details on this event. */
 
 #ifndef ELM_LIB_QUICKLAUNCH
 #define ELM_MAIN() int main(int argc, char **argv) {elm_init(argc, argv); return elm_main(argc, argv);} /**< macro to be used after the elm_main() function */
@@ -7570,7 +7570,7 @@ extern "C" {
     *
     * The Label widget @b doesn't allow text to overflow its boundaries, if the
     * text doesn't fit the geometry of the label it will be ellipsized or be
-    * cut. Elementary provides several themes for this widget:
+    * cut. Elementary provides several styles for this widget:
     * @li default - No animation
     * @li marker - Centers the text in the label and make it bold by default
     * @li slide_long - The entire text appears from the right of the screen and
@@ -7682,8 +7682,7 @@ extern "C" {
     * @param size font size
     *
     * @warning NEVER use this. It is for hyper-special cases only. use styles
-    * instead. e.g. "big", "medium", "small" - or better name them by use:
-    * "title", "footnote", "quote" etc.
+    * instead. e.g. "default", "marker", "slide_long" etc.
     */
    EAPI void         elm_label_fontsize_set(Evas_Object *obj, int fontsize) EINA_ARG_NONNULL(1);
    /**
@@ -7696,8 +7695,7 @@ extern "C" {
     * @param a Alpha property background color of The label object
     *
     * @warning NEVER use this. It is for hyper-special cases only. use styles
-    * instead. e.g. "big", "medium", "small" - or better name them by use:
-    * "title", "footnote", "quote" etc.
+    * instead. e.g. "default", "marker", "slide_long" etc.
     */
    EAPI void         elm_label_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a) EINA_ARG_NONNULL(1);
    /**
@@ -7707,8 +7705,7 @@ extern "C" {
     * @param align align mode ("left", "center", "right")
     *
     * @warning NEVER use this. It is for hyper-special cases only. use styles
-    * instead. e.g. "big", "medium", "small" - or better name them by use:
-    * "title", "footnote", "quote" etc.
+    * instead. e.g. "default", "marker", "slide_long" etc.
     */
    EAPI void         elm_label_text_align_set(Evas_Object *obj, const char *alignmode) EINA_ARG_NONNULL(1);
    /**
@@ -7721,8 +7718,7 @@ extern "C" {
     * @param a Alpha property background alpha of The label object
     *
     * @warning NEVER use this. It is for hyper-special cases only. use styles
-    * instead. e.g. "big", "medium", "small" - or better name them by use:
-    * "title", "footnote", "quote" etc.
+    * instead. e.g. "default", "marker", "slide_long" etc.
     */
    EAPI void         elm_label_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a) EINA_ARG_NONNULL(1);
    /**
@@ -12398,6 +12394,9 @@ extern "C" {
     * @param content The given content of the bubble
     *
     * This function sets the content shown on the middle of the bubble.
+    * 
+    * @deprecated use elm_object_content_set() instead
+    *
     */
    EAPI void         elm_bubble_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
@@ -12407,6 +12406,9 @@ extern "C" {
     *
     * @param obj The bubble object
     * @return The content that is being used
+    *
+    * @deprecated use elm_object_content_get() instead
+    *
     */
    EAPI Evas_Object *elm_bubble_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -12416,6 +12418,9 @@ extern "C" {
     *
     * @param obj The bubble object
     * @return The content that was being used
+    *
+    * @deprecated use elm_object_content_unset() instead
+    *
     */
    EAPI Evas_Object *elm_bubble_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -18052,7 +18057,7 @@ extern "C" {
     *   theme. It must return @c NULL, when no content is desired, or a valid
     *   object handle, otherwise.  The object will be deleted by the genlist on
     *   its deletion or when the item is "unrealized".  See
-    *   #Elm_Genlist_Item_Icon_Get_Cb.
+    *   #Elm_Genlist_Item_Content_Get_Cb.
     * - @c func.state_get - The @c part parameter is the name string of one of
     *   the state parts in the Edje group implementing the item's theme. Return
     *   @c EINA_FALSE for false/off or @c EINA_TRUE for true/on. Genlists will
@@ -18151,7 +18156,7 @@ extern "C" {
     * If the application wants multiple items to be able to be selected,
     * elm_genlist_multi_select_set() can enable this. If the list is
     * single-selection only (the default), then elm_genlist_selected_item_get()
-    * will return the selected item, if any, or NULL I none is selected. If the
+    * will return the selected item, if any, or NULL if none is selected. If the
     * list is multi-select then elm_genlist_selected_items_get() will return a
     * list (that is only valid as long as no items are modified (added, deleted,
     * selected or unselected)).
@@ -18408,6 +18413,8 @@ extern "C" {
     *
     * This removes (and deletes) all items in @p obj, leaving it empty.
     *
+    * This is deprecated. Please use elm_gen_clear() instead.
+    * 
     * @see elm_genlist_item_del(), to remove just one item.
     *
     * @ingroup Genlist
@@ -20154,6 +20161,7 @@ extern "C" {
     * @ingroup Pager
     */
    EAPI Evas_Object *elm_pager_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Push an object to the top of the pager stack (and show it).
     *
@@ -20169,6 +20177,7 @@ extern "C" {
     * undefined behavior.
     */
    EAPI void         elm_pager_content_push(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Pop the object that is on top of the stack
     *
@@ -20179,6 +20188,7 @@ extern "C" {
     * the stack will become visible.
     */
    EAPI void         elm_pager_content_pop(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Moves an object already in the pager stack to the top of the stack.
     *
@@ -20194,6 +20204,7 @@ extern "C" {
     * results in undefined behavior.
     */
    EAPI void         elm_pager_content_promote(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Return the object at the bottom of the pager stack
     *
@@ -20201,6 +20212,7 @@ extern "C" {
     * @return The bottom object or NULL if none
     */
    EAPI Evas_Object *elm_pager_content_bottom_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    /**
     * @brief  Return the object at the top of the pager stack
     *
@@ -26553,6 +26565,12 @@ extern "C" {
     *
     * Default contents parts of the ctxpopup widget that you can use for are:
     * @li "default" - A content of the ctxpopup
+    *
+    * Default contents parts of the naviframe items that you can use for are:
+    * @li "icon" - A icon in the title area
+    * 
+    * Default text parts of the naviframe items that you can use for are:
+    * @li "default" - Title label in the title area
     *
     * @ref tutorial_ctxpopup shows the usage of a good deal of the API.
     * @{
