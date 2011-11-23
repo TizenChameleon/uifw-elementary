@@ -1088,8 +1088,10 @@ elm_naviframe_item_push(Evas_Object *obj,
    if (prev_it)
      {
         if (wd->freeze_events)
-          evas_object_show(wd->rect);
-
+          {
+             evas_object_raise(wd->rect);
+             evas_object_show(wd->rect);
+          }
         edje_object_signal_emit(VIEW(prev_it),
                                 "elm,state,cur,pushed",
                                 "elm");
@@ -1182,7 +1184,10 @@ elm_naviframe_item_pop(Evas_Object *obj)
    if (prev_it)
      {
         if (wd->freeze_events)
-          evas_object_show(wd->rect);
+          {
+             evas_object_raise(wd->rect);
+             evas_object_show(wd->rect);
+          }
         edje_object_signal_emit(VIEW(it), "elm,state,cur,popped", "elm");
         evas_object_show(VIEW(prev_it));
         evas_object_raise(VIEW(prev_it));
@@ -1243,7 +1248,10 @@ elm_naviframe_item_promote(Elm_Object_Item *it)
    prev_it = EINA_INLIST_CONTAINER_GET(wd->stack->last->prev,
                                          Elm_Naviframe_Item);
    if (wd->freeze_events)
-     evas_object_show(wd->rect);
+     {
+        evas_object_raise(wd->rect);
+        evas_object_show(wd->rect);
+     }
    edje_object_signal_emit(VIEW(prev_it),
                            "elm,state,cur,pushed",
                            "elm");
