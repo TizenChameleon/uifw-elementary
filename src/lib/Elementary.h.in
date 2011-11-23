@@ -1255,6 +1255,7 @@ extern "C" {
     * @ingroup General
     */
    EAPI Evas_Object *elm_object_item_part_content_unset(Elm_Object_Item *it, const char *part);
+
 #define elm_object_item_content_unset(it) elm_object_item_part_content_unset((it), NULL)
 
    /**
@@ -11254,6 +11255,12 @@ extern "C" {
     * functions; The former will either not work at all, or break the correct
     * functionality.
     *
+    * IMPORTANT: Many functions may change (i.e delete and create a new one)
+    * the internal textblock object. Do NOT cache the returned object, and try
+    * not to mix calls on this object with regular elm_entry calls (which may
+    * change the internal textblock object). This applies to all cursors
+    * returned from textblock calls, and all the other derivative values.
+    *
     * @param obj The entry object
     * @return The textblock object.
     */
@@ -17104,7 +17111,6 @@ extern "C" {
     * @ingroup List
     */
    EAPI void             elm_list_item_end_set(Elm_List_Item *item, Evas_Object *end) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object     *elm_list_item_base_get(const Elm_List_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Gets the base object of the item.
@@ -17117,6 +17123,7 @@ extern "C" {
     * @ingroup List
     */
    EAPI Evas_Object     *elm_list_item_object_get(const Elm_List_Item *item) EINA_ARG_NONNULL(1);
+   EINA_DEPRECATED EAPI Evas_Object     *elm_list_item_base_get(const Elm_List_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Get the label of item.
