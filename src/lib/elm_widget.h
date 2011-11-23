@@ -593,42 +593,6 @@ EAPI void             elm_widget_tree_dot_dump(const Evas_Object *top, FILE *out
 #define elm_widget_item_cursor_engine_only_get(item) \
   _elm_widget_item_cursor_engine_only_get((const Elm_Widget_Item *)item)
 /**
- * Convenience function to query item's content part set.
- * @see _elm_widget_item_content_part_set()
- */
-#define elm_widget_item_content_part_set(item, part, content) \
-  _elm_widget_item_content_part_set((Elm_Widget_Item *)item, part, content)
-/**
- * Convenience function to query item's content part get.
- * @see _elm_widget_item_content_part_get()
- */
-#define elm_widget_item_content_part_get(item, part) \
-  _elm_widget_item_content_part_get((const Elm_Widget_Item *)item, part)
-/**
- * Convenience function to query item's content part unset.
- * @see _elm_widget_item_content_part_unset()
- */
-#define elm_widget_item_content_part_unset(item, part) \
-  _elm_widget_item_content_part_unset((Elm_Widget_Item *)item, part)
-/**
- * Convenience function to query item's text part set.
- * @see _elm_widget_item_text_part_set()
- */
-#define elm_widget_item_text_part_set(item, part, label) \
-  _elm_widget_item_text_part_set((Elm_Widget_Item *)item, part, label)
-/**
- * Convenience function to query item's text part get.
- * @see _elm_widget_item_text_part_get()
- */
-#define elm_widget_item_text_part_get(item, part) \
-  _elm_widget_item_text_part_get((const Elm_Widget_Item *)item, part)
-/**
- * Convenience function to query item's signal emit.
- * @see _elm_widget_item_signal_emit()
- */
-#define elm_widget_item_signal_emit(item, emission, source) \
-  _elm_widget_item_signal_emit((Elm_Widget_Item *)item, emission, source)
-/**
  * Convenience function to query item's content set hook.
  * @see _elm_widget_item_content_set_hook_set()
  */
@@ -716,7 +680,7 @@ EAPI Eina_Bool        _elm_widget_item_disabled_get(const Elm_Widget_Item *item)
    if (!elm_widget_is_check(obj)) return
 
 #define ELM_CHECK_WIDTYPE(obj, widtype) \
-   if (!elm_widget_type_check((obj), (widtype), __func__)) return
+   if (!obj || !elm_widget_type_check((obj), (widtype), __func__)) return
 
 #define ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it, ...)                \
    ELM_WIDGET_ITEM_CHECK_OR_RETURN((Elm_Widget_Item *)it, __VA_ARGS__); \

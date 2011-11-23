@@ -918,6 +918,10 @@ elm_object_mirrored_automatic_set(Evas_Object *obj, Eina_Bool automatic)
    elm_widget_mirrored_automatic_set(obj, automatic);
 }
 
+/**
+ * @}
+ */
+
 EAPI void
 elm_object_scale_set(Evas_Object *obj,
                      double       scale)
@@ -2121,7 +2125,7 @@ elm_object_signal_emit(Evas_Object *obj,
 }
 
 EAPI void
-elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data)
+elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func, void *data)
 {
     EINA_SAFETY_ON_NULL_RETURN(obj);
     EINA_SAFETY_ON_NULL_RETURN(func);
@@ -2129,7 +2133,7 @@ elm_object_signal_callback_add(Evas_Object *obj, const char *emission, const cha
 }
 
 EAPI void *
-elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source))
+elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func)
 {
     EINA_SAFETY_ON_NULL_RETURN_VAL(obj, NULL);
     EINA_SAFETY_ON_NULL_RETURN_VAL(func, NULL);
@@ -2201,7 +2205,7 @@ elm_object_item_content_part_set(Elm_Object_Item *it,
                                  const char *part,
                                  Evas_Object *content)
 {
-   elm_widget_item_content_part_set(it, part, content);
+   _elm_widget_item_content_part_set((Elm_Widget_Item *) it, part, content);
 }
 
 EAPI void
@@ -2216,7 +2220,7 @@ EAPI Evas_Object *
 elm_object_item_content_part_get(const Elm_Object_Item *it,
                                  const char *part)
 {
-   return elm_widget_item_content_part_get(it, part);
+   return _elm_widget_item_content_part_get((Elm_Widget_Item *) it, part);
 }
 
 EAPI Evas_Object *
@@ -2229,7 +2233,7 @@ elm_object_item_part_content_get(const Elm_Object_Item *it,
 EAPI Evas_Object *
 elm_object_item_content_part_unset(Elm_Object_Item *it, const char *part)
 {
-   return elm_widget_item_content_part_unset(it, part);
+   return _elm_widget_item_content_part_unset((Elm_Widget_Item *) it, part);
 }
 
 EAPI Evas_Object *
@@ -2243,7 +2247,7 @@ elm_object_item_text_part_set(Elm_Object_Item *it,
                               const char *part,
                               const char *label)
 {
-   elm_widget_item_text_part_set(it, part, label);
+   _elm_widget_item_text_part_set((Elm_Widget_Item *) it, part, label);
 }
 
 EAPI void
@@ -2257,13 +2261,25 @@ elm_object_item_part_text_set(Elm_Object_Item *it,
 EAPI const char *
 elm_object_item_text_part_get(const Elm_Object_Item *it, const char *part)
 {
-   return elm_widget_item_text_part_get(it, part);
+   return _elm_widget_item_text_part_get((Elm_Widget_Item *) it, part);
 }
 
 EAPI const char *
 elm_object_item_part_text_get(const Elm_Object_Item *it, const char *part)
 {
    return _elm_widget_item_text_part_get((Elm_Widget_Item *) it, part);
+}
+
+EAPI void
+elm_object_access_info_set(Evas_Object *obj, const char *txt)
+{
+   elm_widget_access_info_set(obj, txt);
+}
+
+EAPI void
+elm_object_item_access_info_set(Elm_Object_Item *it, const char *txt)
+{
+   _elm_widget_item_access_info_set((Elm_Widget_Item *) it, txt);
 }
 
 EAPI void *
@@ -2281,19 +2297,7 @@ elm_object_item_data_set(Elm_Object_Item *it, void *data)
 EAPI void
 elm_object_item_signal_emit(Elm_Object_Item *it, const char *emission, const char *source)
 {
-   elm_widget_item_signal_emit(it, emission, source);
-}
-
-EAPI void
-elm_object_access_info_set(Evas_Object *obj, const char *txt)
-{
-   elm_widget_access_info_set(obj, txt);
-}
-
-EAPI void
-elm_object_item_access_info_set(Elm_Object_Item *it, const char *txt)
-{
-   _elm_widget_item_access_info_set((Elm_Widget_Item *)it, txt);
+   _elm_widget_item_signal_emit((Elm_Widget_Item *) it, emission, source);
 }
 
 EAPI void elm_object_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled)
