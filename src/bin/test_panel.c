@@ -9,7 +9,7 @@ static Elm_Genlist_Item_Class itc;
 static void _bstatus(void *data, Evas_Object *obj, void *event_info);
 static void _tstatus(void *data, Evas_Object *obj, void *event_info);
 static char *_label_get(void *data, Evas_Object *obj, const char *source);
-static Evas_Object *_icon_get(void *data, Evas_Object *obj, const char *source);
+static Evas_Object *_content_get(void *data, Evas_Object *obj, const char *source);
 static Eina_Bool _state_get(void *data, Evas_Object *obj, const char *source);
 static void _item_del(void *data, Evas_Object *obj);
 static void _fill_list(Evas_Object *obj);
@@ -52,7 +52,7 @@ _label_get(void *data, Evas_Object *obj __UNUSED__, const char *source __UNUSED_
 }
 
 static Evas_Object *
-_icon_get(void *data, Evas_Object *obj, const char *source)
+_content_get(void *data, Evas_Object *obj, const char *source)
 {
    if (!strcmp(source, "elm.swallow.icon"))
      {
@@ -89,22 +89,14 @@ _fill_list(Evas_Object *obj)
    struct dirent *de;
    Eina_List *dirs = NULL, *l;
    char *real;
-   const char *home;
 
-#ifdef _WIN32
-   home = evil_homedir_get();
-#else
-   home = getenv("HOME");
-#endif
-   if (!home)
-     home = "./";
-   if (!(d = opendir(home))) return;
+   if (!(d = opendir(getenv("HOME")))) return;
    while ((de = readdir(d)))
      {
         char buff[PATH_MAX];
 
         if (de->d_name[0] == '.') continue;
-        snprintf(buff, sizeof(buff), "%s/%s", home, de->d_name);
+        snprintf(buff, sizeof(buff), "%s/%s", getenv("HOME"), de->d_name);
         if (!ecore_file_is_dir(buff)) continue;
         real = ecore_file_realpath(buff);
         dirs = eina_list_append(dirs, real);
@@ -207,7 +199,7 @@ test_panel(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
    itc.item_style = "default";
    itc.func.label_get = _label_get;
-   itc.func.icon_get = _icon_get;
+   itc.func.icon_get = _content_get;
    itc.func.state_get = _state_get;
    itc.func.del = _item_del;
 
