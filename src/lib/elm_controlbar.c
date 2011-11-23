@@ -125,7 +125,7 @@ _controlbar_move(void *data, Evas_Object * obj __UNUSED__)
    wd->x = x;
    wd->y = y;
    evas_object_move(wd->edje, x, y);
-   evas_object_geometry_get(elm_object_content_part_get(wd->edje, "bg_image"), NULL, NULL, &width, NULL);
+   evas_object_geometry_get(elm_object_part_content_get(wd->edje, "bg_image"), NULL, NULL, &width, NULL);
    evas_object_geometry_get(wd->edje, &x_, &y_, NULL, NULL);
 }
 
@@ -141,7 +141,7 @@ _controlbar_resize(void *data, Evas_Object * obj __UNUSED__)
    wd->w = w;
    wd->h = h;
    evas_object_resize(wd->edje, w, h);
-   evas_object_geometry_get(elm_object_content_part_get(wd->edje, "bg_image"), NULL, NULL, &width, &height);
+   evas_object_geometry_get(elm_object_part_content_get(wd->edje, "bg_image"), NULL, NULL, &width, &height);
    evas_object_geometry_get(wd->edje, &x_, &y_, NULL, NULL);
 }
 
@@ -725,7 +725,7 @@ _select_box(Elm_Controlbar_Item * it)
 
    if (it->style == TABBAR)
      {
-        content = elm_object_content_part_unset(wd->edje, "elm.swallow.view");
+        content = elm_object_part_content_unset(wd->edje, "elm.swallow.view");
         if (content) evas_object_hide(content);
 
         EINA_LIST_FOREACH(wd->items, l, item){
@@ -752,7 +752,7 @@ _select_box(Elm_Controlbar_Item * it)
                evas_object_smart_callback_call(it->obj, "view,change,before", it);
           }
 
-        elm_object_content_part_set(wd->edje, "elm.swallow.view", it->view);
+        elm_object_part_content_set(wd->edje, "elm.swallow.view", it->view);
      }
    else if (it->style == TOOLBAR)
      {
@@ -882,7 +882,7 @@ _create_item_layout(Evas_Object * parent, Elm_Controlbar_Item * it, Evas_Object 
    *item = elm_button_add(parent);
    if (*item == NULL) return NULL;
    elm_object_style_set(*item, "controlbar/vertical");
-   elm_object_content_part_set(obj, "item", *item);
+   elm_object_part_content_set(obj, "item", *item);
 
    if (it->text)
      elm_object_text_set(*item, it->text);
@@ -1015,7 +1015,7 @@ _create_object_item(Evas_Object * obj, Evas_Object * obj_item, const int sel)
    evas_object_size_hint_weight_set(it->base, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(it->base, EVAS_HINT_FILL, EVAS_HINT_FILL);
    it->base_item = obj_item;
-   elm_object_content_part_set(it->base, "item", it->base_item);
+   elm_object_part_content_set(it->base, "item", it->base_item);
    evas_object_show(it->base);
    return it;
 }
@@ -1127,11 +1127,11 @@ _list_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 
    if (item->style == TABBAR)
      {
-        content = elm_object_content_part_unset(wd->edje, "elm.swallow.view");
+        content = elm_object_part_content_unset(wd->edje, "elm.swallow.view");
         evas_object_hide(content);
         item->selected = EINA_TRUE;
         evas_object_smart_callback_call(item->obj, "view,change,before", item);
-        elm_object_content_part_set(wd->edje, "elm.swallow.view", item->view);
+        elm_object_part_content_set(wd->edje, "elm.swallow.view", item->view);
      }
 
    if ((item->style == TOOLBAR) && (item->func))
@@ -1330,7 +1330,7 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
         printf("Cannot load bg edj\n");
         return NULL;
      }
-   elm_object_content_part_set(wd->edje, "bg_image", wd->bg);
+   elm_object_part_content_set(wd->edje, "bg_image", wd->bg);
 
    // initialization
    evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_RESIZE,
@@ -1342,7 +1342,7 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
    evas_object_event_callback_add(wd->edje, EVAS_CALLBACK_HIDE,
                                   _controlbar_object_hide, obj);
 
-   bg = elm_object_content_part_get(wd->edje, "bg_image");
+   bg = elm_object_part_content_get(wd->edje, "bg_image");
    evas_object_event_callback_add(bg, EVAS_CALLBACK_MOVE, _controlbar_object_move, obj);
    evas_object_event_callback_add(bg, EVAS_CALLBACK_RESIZE, _controlbar_object_resize, obj);
 
@@ -1352,7 +1352,7 @@ EAPI Evas_Object * elm_controlbar_add(Evas_Object * parent)
    evas_object_size_hint_weight_set(wd->box, EVAS_HINT_EXPAND,
                                     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(wd->box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_object_content_part_set(wd->edje, "elm.swallow.items", wd->box);
+   elm_object_part_content_set(wd->edje, "elm.swallow.items", wd->box);
    evas_object_show(wd->box);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
@@ -2388,9 +2388,9 @@ elm_controlbar_item_view_unset(Elm_Controlbar_Item *it)
    if (!wd) return NULL;
    Evas_Object *content;
 
-   if (it->view == elm_object_content_part_get(wd->edje, "elm.swallow.view"))
+   if (it->view == elm_object_part_content_get(wd->edje, "elm.swallow.view"))
      {
-        content = elm_object_content_part_unset(wd->edje, "elm.swallow.view");
+        content = elm_object_part_content_unset(wd->edje, "elm.swallow.view");
         if (content) evas_object_hide(content);
      }
    else
@@ -2441,7 +2441,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
          edje_object_signal_emit(_EDJ(wd->edje), "elm,state,small", "elm");
          break;
       case ELM_CONTROLBAR_MODE_LEFT:
-         selected_box = elm_object_content_part_get(wd->edje, "elm.dragable.box");
+         selected_box = elm_object_part_content_get(wd->edje, "elm.dragable.box");
          if (selected_box) edje_object_signal_emit(_EDJ(selected_box), "elm,state,left", "elm");
          wd->selected_signal = eina_stringshare_add("elm,state,selected_left");
          wd->pressed_signal = eina_stringshare_add("elm,state,pressed_left");
@@ -2450,7 +2450,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
          _sizing_eval(obj);
          return;
       case ELM_CONTROLBAR_MODE_RIGHT:
-         selected_box = elm_object_content_part_get(wd->edje, "elm.dragable.box");
+         selected_box = elm_object_part_content_get(wd->edje, "elm.dragable.box");
          if (selected_box) edje_object_signal_emit(_EDJ(selected_box), "elm,state,right", "elm");
          wd->selected_signal = eina_stringshare_add("elm,state,selected_right");
          wd->pressed_signal = eina_stringshare_add("elm,state,pressed_right");
@@ -2461,7 +2461,7 @@ elm_controlbar_mode_set(Evas_Object *obj, int mode)
       default:
          break;
      }
-   selected_box = elm_object_content_part_get(wd->edje, "elm.dragable.box");
+   selected_box = elm_object_part_content_get(wd->edje, "elm.dragable.box");
    if (selected_box) edje_object_signal_emit(_EDJ(selected_box), "elm,state,default", "elm");
    wd->selected_signal = eina_stringshare_add("elm,state,selected");
    wd->pressed_signal = eina_stringshare_add("elm,state,pressed");
