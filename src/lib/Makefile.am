@@ -117,7 +117,6 @@ elm_segment_control.c \
 elm_separator.c \
 elm_slider.c \
 elm_slideshow.c \
-elm_slidingdrawer.c \
 elm_spinner.c \
 elm_stackedicon.c \
 elm_store.c \

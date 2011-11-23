@@ -29379,27 +29379,6 @@ extern "C" {
     */
 
 
-   /* Sliding Drawer */
-   typedef enum _Elm_SlidingDrawer_Pos
-     {
-        ELM_SLIDINGDRAWER_BOTTOM,
-        ELM_SLIDINGDRAWER_LEFT,
-        ELM_SLIDINGDRAWER_RIGHT,
-        ELM_SLIDINGDRAWER_TOP
-     } Elm_SlidingDrawer_Pos;
-
-   typedef struct _Elm_SlidingDrawer_Drag_Value
-     {
-        double x, y;
-     } Elm_SlidingDrawer_Drag_Value;
-
-   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_content_unset(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy);
-
    /* multibuttonentry */
    typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
    typedef Eina_Bool (*Elm_Multibuttonentry_Item_Verify_Callback) (Evas_Object *obj, const char *item_label, void *item_data, void *data);
