@@ -48,8 +48,8 @@ elc_fileselector_button.c \
 elc_fileselector.c \
 elc_fileselector_entry.c \
 elc_hoversel.c \
+elc_multibuttonentry.c \
 elc_naviframe.c \
-elc_navigationbar.c \
 elc_navigationbar_ex.c\
 elc_player.c \
 elc_scrolled_entry.c \
@@ -99,7 +99,6 @@ elm_mapbuf.c \
 elm_map.c \
 elm_menu.c \
 elm_module.c \
-elm_multibuttonentry.c \
 elm_nocontents.c \
 elm_notify.c \
 elm_pagecontrol.c \
