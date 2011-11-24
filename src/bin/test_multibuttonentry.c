@@ -48,7 +48,7 @@ _mbe_clicked_cb(void *data __UNUSED__,
                 void *event_info __UNUSED__ )
 {
    //Unset the multibuttonentry to contracted mode of single line
-   elm_multibuttonentry_shrink_mode_set(obj, 0);
+   elm_multibuttonentry_contracted_state_set(obj, 0);
    printf("A multibuttonentry is clicked!\n");
    Evas_Object *entry;
    entry = elm_multibuttonentry_entry_get(obj);
@@ -71,7 +71,7 @@ _mbe_unfocused_cb(void *data __UNUSED__,
                   void *event_info __UNUSED__ )
 {
    //Set the multibuttonentry to contracted mode of single line
-   elm_multibuttonentry_shrink_mode_set(obj, 1);
+   elm_multibuttonentry_contracted_state_set(obj, 1);
    printf("multibuttonentry unfocused!\n");
 }
 
@@ -150,7 +150,7 @@ _add_multibuttonentry(Evas_Object *parent)
    elm_object_content_set(scr, mbe);
 
    // Add item verify callback to Multibuttonentry
-   elm_multibuttonentry_item_filter_append(mbe, _item_filter_cb, data);
+   elm_multibuttonentry_item_verify_callback_set(mbe, _item_filter_cb, data);
 
    // Add "item,selected","item,added", "item,deleted", "clicked", "unfocused",
    // "expanded", "contracted" and "contracted,state,changed" smart callback
