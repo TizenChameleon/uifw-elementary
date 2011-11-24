@@ -136,10 +136,11 @@ _theme_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Eina_List *l;
    Elm_Multibuttonentry_Item *item;
+
    if (!wd) return;
 
    _elm_theme_object_set(obj, wd->base, "multibuttonentry", "base", elm_widget_style_get(obj));
-   if (wd->box)   edje_object_part_swallow (wd->base, "box.swallow", wd->box);
+   if (wd->box) edje_object_part_swallow (wd->base, "box.swallow", wd->box);
    edje_object_scale_set(wd->base, elm_widget_scale_get(obj) * _elm_config->scale);
 
    EINA_LIST_FOREACH(wd->items, l, item)
@@ -190,7 +191,6 @@ _event_hook(Evas_Object *obj __UNUSED__, Evas_Object *src __UNUSED__, Evas_Callb
    return EINA_TRUE;
 }
 
-
 static void
 _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
 {
@@ -222,7 +222,7 @@ static void
 _signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   if(!wd || !wd->base) return;
+   if (!wd || !wd->base) return;
 
    wd->focused = EINA_TRUE;
    _view_update(data);
@@ -356,7 +356,6 @@ _contracted_state_set(Evas_Object *obj, int contracted)
                   item->visible = EINA_FALSE;
                }
           }
-
         // pack buttons only 1line
         w = wd->w_box;
 
@@ -376,10 +375,10 @@ _contracted_state_set(Evas_Object *obj, int contracted)
           {
              const char *size_str;
              size_str = edje_object_data_get(wd->end, "closed_button_width");
-             if(size_str) button_min_width = (Evas_Coord)atoi(size_str);
+             if (size_str) button_min_width = (Evas_Coord)atoi(size_str);
              /* it use for later
              size_str = edje_object_data_get(wd->end, "closed_button_height");
-             if(size_str) button_min_width = (Evas_Coord)atoi(size_str);
+             if (size_str) button_min_width = (Evas_Coord)atoi(size_str);
               */
           }
 
