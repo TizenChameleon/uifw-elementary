@@ -28782,49 +28782,6 @@ extern "C" {
    EAPI void         elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
    EAPI int          elm_popup_run(Evas_Object *obj);
 
-   /* NavigationBar */
-   #define NAVIBAR_EX_TITLEOBJ_INSTANT_HIDE "elm,state,hide,noanimate,title", "elm"
-   #define NAVIBAR_EX_TITLEOBJ_INSTANT_SHOW "elm,state,show,noanimate,title", "elm"
-
-   typedef enum
-     {
-        ELM_NAVIGATIONBAR_EX_BACK_BUTTON,
-        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1,
-        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON2,
-        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON3,
-        ELM_NAVIGATIONBAR_EX_MAX
-     } Elm_Navi_ex_Button_Type;
-   typedef struct _Elm_Navigationbar_ex_Item Elm_Navigationbar_ex_Item;
-
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_add(Evas_Object *parent);
-   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const char *item_style);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_pop(Evas_Object *obj);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_label_set(Elm_Navigationbar_ex_Item *item, const char *title);
-   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_title_label_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_top_get(const Evas_Object *obj);
-   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_bottom_get(const Evas_Object *obj);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item, Evas_Object *title_obj);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item, Eina_Bool hidden);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item, const char *subtitle);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char* item_style);
-   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, Eina_Bool visible);
-   EINA_DEPRECATED    Eina_Bool         elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item);
-
    /**
     * @defgroup Naviframe Naviframe
     * @ingroup Elementary
