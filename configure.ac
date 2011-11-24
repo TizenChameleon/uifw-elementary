@@ -220,10 +220,22 @@ PKG_CHECK_MODULES([ELEMENTARY],
     ecore-evas >= 1.0.999
     ecore-file >= 1.0.999
     ecore-imf >= 1.0.999
-    ecore-con >= 1.0.999
     edje >= 1.0.999
    ]
 )
+
+PKG_CHECK_MODULES([ELEMENTARY_ECORE_CON],
+   [ecore-con >= 1.0.999],
+   [
+    ELEMENTARY_ECORE_CON_INC="#include <Ecore_Con.h>"
+    AC_DEFINE(HAVE_ELEMENTARY_ECORE_CON, 1, [Have Ecore_Con support])
+    have_ecore_con="yes"
+    requirement_elm="ecore-con >= 1.0.999 ${requirement_elm}"
+   ],
+   [have_ecore_con="no"])
+AC_SUBST(ELEMENTARY_ECORE_CON_INC)
+
+AM_CONDITIONAL([HAVE_ECORE_CON], [test "x${have_ecore_con}" = "xyes"])
 
 PKG_CHECK_MODULES([EIO],
         [eio],
@@ -735,6 +747,7 @@ echo "    Windows XP.............: ${have_elementary_win32}"
 echo "    Windows CE.............: ${have_elementary_wince}"
 echo
 echo "  Features:"
+echo "    Ecore_Con..............: ${have_ecore_con}"
 echo "    EDBus..................: ${have_elementary_edbus}"
 echo "    EFreet.................: ${have_elementary_efreet}"
 echo "    EWeather...............: ${have_elementary_eweather}"
