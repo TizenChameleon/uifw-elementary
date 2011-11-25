@@ -29186,6 +29186,8 @@ extern "C" {
 
    /**
     * @defgroup Searchbar Searchbar
+    * @addtogroup TickerNoti
+    * @{
     * @ingroup Elementary
     *
     * This is Searchbar.
@@ -29273,45 +29275,13 @@ extern "C" {
    EAPI void         elm_nocontents_custom_set(const Evas_Object *obj, Evas_Object *custom);
    EAPI Evas_Object *elm_nocontents_custom_get(const Evas_Object *obj);
 
-   /* TickerNoti */
-   typedef enum
-     {
-        ELM_TICKERNOTI_ORIENT_TOP = 0,
-        ELM_TICKERNOTI_ORIENT_BOTTOM,
-        ELM_TICKERNOTI_ORIENT_LAST
-     }  Elm_Tickernoti_Orient;
-
-   EAPI Evas_Object              *elm_tickernoti_add (Evas_Object *parent);
-   EAPI void                      elm_tickernoti_orient_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
-   EAPI Elm_Tickernoti_Orient     elm_tickernoti_orient_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI int                       elm_tickernoti_rotation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_rotation_set (Evas_Object *obj, int angle) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object              *elm_tickernoti_win_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /* #### Below APIs and data structures are going to be deprecated, announcment will be made soon ####*/
-   typedef enum
-    {
-       ELM_TICKERNOTI_DEFAULT,
-       ELM_TICKERNOTI_DETAILVIEW
-    } Elm_Tickernoti_Mode;
-   EAPI void                      elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   EAPI const char               *elm_tickernoti_detailview_label_get (const Evas_Object *obj)EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_detailview_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(2);
-   EAPI Evas_Object              *elm_tickernoti_detailview_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_detailview_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object              *elm_tickernoti_detailview_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object              *elm_tickernoti_detailview_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_mode_set (Evas_Object *obj, Elm_Tickernoti_Mode mode) EINA_ARG_NONNULL(1);
-   EAPI Elm_Tickernoti_Mode       elm_tickernoti_mode_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_orientation_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
-   EAPI Elm_Tickernoti_Orient     elm_tickernoti_orientation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   EAPI const char               *elm_tickernoti_label_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object              *elm_tickernoti_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EAPI void                      elm_tickernoti_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(1);
-   EAPI Evas_Object              *elm_tickernoti_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /* ############################################################################### */
-   /*
+   /**
+    * @defgroup TickerNoti TickerNoti
+    * @addtogroup TickerNoti
+    * @{
+    *
+    * This is a notification widget which can be used to display some short information.
+    *
     * Parts which can be used with elm_object_text_part_set() and
     * elm_object_text_part_get():
     *
@@ -29328,6 +29298,203 @@ extern "C" {
     * swallow/button region, if any.
     * @li "hide" - emitted when the tickernoti is completely hidden. In case of
     * any hide animation, this signal is emitted after the animation.
+    */
+   typedef enum
+     {
+        ELM_TICKERNOTI_ORIENT_TOP = 0,
+        ELM_TICKERNOTI_ORIENT_BOTTOM,
+        ELM_TICKERNOTI_ORIENT_LAST
+     }  Elm_Tickernoti_Orient;
+
+   /**
+    * Add a tickernoti object to @p parent
+    *
+    * @param parent The parent object
+    *
+    * @return The tickernoti object, or NULL upon failure
+    */
+   EAPI Evas_Object              *elm_tickernoti_add (Evas_Object *parent);
+   /**
+    * Set the orientation of the tickernoti object
+    *
+    * @param obj The tickernoti object
+    * @param orient The orientation of tickernoti object
+    */
+   EAPI void                      elm_tickernoti_orient_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
+   /**
+    * Get the orientation of the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The orientation of tickernotil object
+    */
+   EAPI Elm_Tickernoti_Orient     elm_tickernoti_orient_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Get the rotation of tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The rotation angle
+    */
+   EAPI int                       elm_tickernoti_rotation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Set the rotation angle for the tickernoti object
+    *
+    * @param obj The tickernoti object
+    * @param angle The rotation angle(in degree) will be used on the tickernoti object
+    */
+   EAPI void                      elm_tickernoti_rotation_set (Evas_Object *obj, int angle) EINA_ARG_NONNULL(1);
+   /**
+    * Get the view window(elm_win) on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return internal view window(elm_win) object
+    */
+   EAPI Evas_Object              *elm_tickernoti_win_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /* #### Below APIs and data structures are going to be deprecated, announcment will be made soon ####*/
+   /**
+    * @deprecated
+    */
+   typedef enum
+    {
+       ELM_TICKERNOTI_DEFAULT,
+       ELM_TICKERNOTI_DETAILVIEW
+    } Elm_Tickernoti_Mode;
+   /**
+    * Set the detail label on the tickernoti object
+    *
+    * @param obj The tickernoti object
+    * @param label The label will be used on the tickernoti object
+    * @deprecated use elm_object_text_set() instead
+    */
+   WILL_DEPRECATE  EAPI void                      elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   /**
+    * Get the detail label used on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The string inside the label
+    * @deprecated use elm_object_text_get() instead
+    */
+   WILL_DEPRECATE  EAPI const char               *elm_tickernoti_detailview_label_get (const Evas_Object *obj)EINA_ARG_NONNULL(1);
+   /**
+    * Set the button object used on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @param button The button object will be used on the tickernoti object
+    * @deprecated use elm_object_content_part_set() instead with "icon" as part name
+    */
+   WILL_DEPRECATE  EAPI void                      elm_tickernoti_detailview_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(2);
+   /**
+    * Get the button object used on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The button object inside the tickernoti
+    * @deprecated use elm_object_content_part_get() instead with "button" as part name
+    */
+   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_detailview_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Set the detail icon object used on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @param icon The icon object will be used on the tickernoti object
+    * @deprecated use elm_object_content_part_set() instead with "icon" as part name
+    */
+   WILL_DEPRECATE  EAPI void                      elm_tickernoti_detailview_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   /**
+    * Get the detail icon object used on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The icon object inside the tickernoti
+    * @deprecated use elm_object_content_part_get() instead with "icon" as part name
+    */
+   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_detailview_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Get the view mode on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The view mode
+    * @deprecated removed as now styles are used instead
+    */
+   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_detailview_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Set the view mode used on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @param mode The view mode will be used on the tickernoti object
+    * @deprecated removed as now styles are used instead
+    */
+   WILL_DEPRECATE  EAPI void                      elm_tickernoti_mode_set (Evas_Object *obj, Elm_Tickernoti_Mode mode) EINA_ARG_NONNULL(1);
+   /**
+    * Get the detail view window(elm_win) on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return detail view window(elm_win) object
+    */
+   WILL_DEPRECATE  EAPI Elm_Tickernoti_Mode       elm_tickernoti_mode_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Set the orientation of the tickernoti object
+    *
+    * @param obj The tickernoti object
+    * @param orient The orientation of tickernoti object
+    * @deprecated use elm_tickernoti_orient_set() instead
+    */
+   WILL_DEPRECATE  EAPI void                      elm_tickernoti_orientation_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
+   /**
+    * Get the orientation of the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The orientation of tickernotil object
+    * @deprecated use elm_tickernoti_orient_get() instead
+    */
+   WILL_DEPRECATE  EAPI Elm_Tickernoti_Orient     elm_tickernoti_orientation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Set the label on the tickernoti object
+    *
+    * @param obj The tickernoti object
+    * @param label The label will be used on the tickernoti object
+    * @deprecated use elm_object_text_get()
+    */
+   WILL_DEPRECATE  EAPI void                      elm_tickernoti_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   /**
+    * Get the label used on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The string inside the label
+    * @deprecated use elm_object_text_get() instead
+    */
+   WILL_DEPRECATE  EAPI const char               *elm_tickernoti_label_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Set the icon object of the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @param icon The icon object will be used on the tickernoti object
+    * @deprecated use elm_object_content_part_set() instead with "icon" as part name
+    */
+   WILL_DEPRECATE  EAPI void                      elm_tickernoti_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   /**
+    * Get the icon object of the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The icon object inside the tickernoti
+    * @deprecated use elm_object_content_part_get() instead with "icon" as part name
+    */
+   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * Set the action button object used on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @param button The button object will be used on the tickernoti object
+    * @deprecated use elm_object_content_part_set() instead with "button" as part name
+    */
+   WILL_DEPRECATE  EAPI void                      elm_tickernoti_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(1);
+   /**
+    * Get the action button object used on the tickernoti object
+    *
+    * @param obj The tickernotil object
+    * @return The button object inside the tickernoti
+    * @deprecated use elm_object_content_part_get() instead with "button" as part name
+    */
+   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /**
+    * @}
     */
 
    /* colorpalette */
@@ -29407,8 +29574,6 @@ extern "C" {
     *
     * @param parent The parent object
     * @return The new object or NULL if it cannot be created
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI Evas_Object               *elm_multibuttonentry_add(Evas_Object *parent);
    /**
@@ -29416,8 +29581,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @return The label, or NULL if none
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI const char                *elm_multibuttonentry_label_get(const Evas_Object *obj);
    /**
@@ -29425,8 +29588,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @param label The text label string
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI void                       elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
    /**
@@ -29434,8 +29595,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @return The entry object, or NULL if none
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI Evas_Object               *elm_multibuttonentry_entry_get(const Evas_Object *obj);
    /**
@@ -29443,8 +29602,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @return The guide text, or NULL if none
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI const char *               elm_multibuttonentry_guide_text_get(const Evas_Object *obj);
    /**
@@ -29452,8 +29609,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @param label The guide text string
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI void                       elm_multibuttonentry_guide_text_set(Evas_Object *obj, const char *guidetext);
    /**
@@ -29461,8 +29616,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @param the value of shrink mode state.
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI int                        elm_multibuttonentry_contracted_state_get(const Evas_Object *obj);
    /**
@@ -29470,8 +29623,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @param the value of shrink_mode state. set this to 1 to set the multibuttonentry to shrink state of single line. set this to 0 to unset the contracted state.
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI void                       elm_multibuttonentry_contracted_state_set(Evas_Object *obj, int contracted);
    /**
@@ -29481,8 +29632,6 @@ extern "C" {
     * @param label The label of new item
     * @param data The ponter to the data to be attached
     * @return A handle to the item added or NULL if not possible
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data);
    /**
@@ -29492,8 +29641,6 @@ extern "C" {
     * @param label The label of new item
     * @param data The ponter to the data to be attached
     * @return A handle to the item added or NULL if not possible
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data);
    /**
@@ -29505,8 +29652,6 @@ extern "C" {
     * @param label The label of new item
     * @param data The ponter to the data to be attached
     * @return A handle to the item added or NULL if not possible
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data);
    /**
@@ -29517,8 +29662,6 @@ extern "C" {
     * @param label The label of new item
     * @param data The ponter to the data to be attached
     * @return A handle to the item added or NULL if not possible
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *after, void *data);
    /**
@@ -29526,8 +29669,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @return The list of items, or NULL if none
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI const Eina_List           *elm_multibuttonentry_items_get(const Evas_Object *obj);
    /**
@@ -29535,8 +29676,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @return The first item, or NULL if none
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_first_get(const Evas_Object *obj);
    /**
@@ -29544,8 +29683,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @return The last item, or NULL if none
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_last_get(const Evas_Object *obj);
    /**
@@ -29553,8 +29690,6 @@ extern "C" {
     *
     * @param obj The multibuttonentry object
     * @return The selected item, or NULL if none
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_selected_get(const Evas_Object *obj);
    /**
@@ -29562,32 +29697,24 @@ extern "C" {
     *
     * @param item The item
     * @param selected if it's EINA_TRUE, select the item otherwise, unselect the item
-    *
-    * @ingroup Multibuttonentry
     */
    EAPI void                       elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item);
    /**
    * unselect all of items.
    *
    * @param obj The multibuttonentry object
-   *
-   * @ingroup Multibuttonentry
    */
    EAPI void                       elm_multibuttonentry_item_unselect_all(Evas_Object *obj);
   /**
    * Delete a given item
    *
    * @param item The item
-   *
-   * @ingroup Multibuttonentry
    */
    EAPI void                       elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item);
   /**
    * Remove all items in the multibuttonentry.
    *
    * @param obj The multibuttonentry object
-   *
-   * @ingroup Multibuttonentry
    */
    EAPI void                       elm_multibuttonentry_items_del(Evas_Object *obj);
   /**
@@ -29595,8 +29722,6 @@ extern "C" {
    *
    * @param item The item
    * @return The label of a given item, or NULL if none
-   *
-   * @ingroup Multibuttonentry
    */
    EAPI const char                *elm_multibuttonentry_item_label_get(const Elm_Multibuttonentry_Item *item);
   /**
@@ -29604,8 +29729,6 @@ extern "C" {
    *
    * @param item The item
    * @param label The text label string
-   *
-   * @ingroup Multibuttonentry
    */
    EAPI void                       elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char *str);
   /**
@@ -29613,8 +29736,6 @@ extern "C" {
    *
    * @param item The item
    * @return The item before the item @p item
-   *
-   * @ingroup Multibuttonentry
    */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_prev(Elm_Multibuttonentry_Item *item);
   /**
@@ -29622,8 +29743,6 @@ extern "C" {
    *
    * @param item The item
    * @return The item after the item @p item
-   *
-   * @ingroup Multibuttonentry
    */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item);
 
