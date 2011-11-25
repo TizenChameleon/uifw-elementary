@@ -638,8 +638,12 @@ _elm_win_recalc_job(void *data)
    wd->deferred_recalc_job = NULL;
 
    evas_object_geometry_get(wd->ent, NULL, NULL, &resw, NULL);
-   edje_object_size_min_restricted_calc(wd->ent, &minw, &minh, resw, 0);
+   /* This is a hack to workaround to avoid the cursor geometry bug
+    * in a char-wrap or a mixed-mode textblock in a scroller.
+    * The order of calling next 2 functions affects to the size of the textblock cursor.
+    * when the textblock core issue is fixed these comments will be removed. */
    edje_object_size_min_restricted_calc(wd->ent, &fw, &fh, 0, 0);
+   edje_object_size_min_restricted_calc(wd->ent, &minw, &minh, resw, 0);
    elm_coords_finger_size_adjust(1, &fw, 1, &minh);
    wd->entmw = fw;
    wd->entmh = minh;
