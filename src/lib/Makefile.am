@@ -109,6 +109,7 @@ elm_photocam.c \
 elm_popup.c \
 elm_progressbar.c \
 elm_radio.c \
+elm_route.c \
 elm_scroller.c \
 elm_searchbar.c \
 elm_segment_control.c \
@@ -139,7 +140,8 @@ els_pan.c \
 els_pan.h \
 els_scroller.c \
 els_scroller.h \
-els_tooltip.c
+els_tooltip.c \
+elu_ews_wm.c
 
 libelementary_la_CFLAGS =
 libelementary_la_LIBADD = \
