@@ -27880,18 +27880,95 @@ extern "C" {
 #define ELM_STORE_ITEM_MAPPING_END { ELM_STORE_ITEM_MAPPING_NONE, NULL, 0, { .empty = { EINA_TRUE } } }
 #define ELM_STORE_ITEM_MAPPING_OFFSET(st, it) offsetof(st, it)
 
+   /**
+    * dbsystem Store object
+    *
+    * @addtogroup DBStore
+    * @{
+    *
+    * @return The new object or NULL if it cannot be created
+    */
    EAPI Elm_Store              *elm_store_dbsystem_new(void);
+   /**
+    * Sets the item count of a store
+    *
+    * @param st The store object
+    * @param count The item count of an store
+    */
    EAPI void                    elm_store_item_count_set(Elm_Store *st, int count) EINA_ARG_NONNULL(1);
+   /**
+    * Set the select func that select the state of a list item whether true or false
+    *
+    * @param st The store object
+    * @param func The select cb function of an store
+    * @param data The new data pointer to set
+    */
    EAPI void                    elm_store_item_select_func_set(Elm_Store *st, Elm_Store_Item_Select_Cb func, const void *data) EINA_ARG_NONNULL(1);
+   /**
+    * Sets the sort func that sort the item with a next in the list
+    *
+    * @param st The store object
+    * @param func The sort cb function of an store
+    * @param data The new data pointer to set
+    */
    EAPI void                    elm_store_item_sort_func_set(Elm_Store *st, Elm_Store_Item_Sort_Cb func, const void *data) EINA_ARG_NONNULL(1);
+   /**
+    * Set the store item free func
+    *
+    * @param st The store object
+    * @param func The free cb function of an store
+    * @param data The new data pointer to set
+    */
    EAPI void                    elm_store_item_free_func_set(Elm_Store *st, Elm_Store_Item_Free_Cb func, const void *data) EINA_ARG_NONNULL(1);
+   /**
+    * Get the item index that included header items
+    *
+    * @param sti The store item object
+    * @return The item index in genlist
+    */
    EAPI int                     elm_store_item_data_index_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
+   /**
+    * Get the DB pointer of an item
+    *
+    * @param sti The store item object
+    * @return The DB pointer of item
+    */
    EAPI void                   *elm_store_dbsystem_db_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
+   /**
+    * Set the DB pointer of an item
+    *
+    * @param sti The store item object
+    * @parm p_db The DB pointer of item
+    */
    EAPI void                    elm_store_dbsystem_db_set(Elm_Store *store, void *pDB) EINA_ARG_NONNULL(1);
+   /**
+    */
    EAPI int                     elm_store_item_index_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
+   /**
+    * Append the item to the genlist
+    *
+    * @param st The store object
+    * @param info The store item info dbsystem object
+    * @return The item of store
+    */
    EAPI Elm_Store_Item         *elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info) EINA_ARG_NONNULL(1);
+   /**
+    * Realize the visible items to the screen
+    *
+    * @param st The store object
+    */
    EAPI void                    elm_store_item_update(Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
+   /**
+    * Realize the item to the screen
+    *
+    * @param sti The store item object
+    */
    EAPI void                    elm_store_visible_items_update(Elm_Store *st) EINA_ARG_NONNULL(1);
+   /**
+    * Delete the item of genlist
+    *
+    * @param sti The store item object
+    */
    EAPI void                    elm_store_item_del(Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI void                    elm_store_free(Elm_Store *st);
    EAPI Elm_Store              *elm_store_filesystem_new(void);
@@ -27915,6 +27992,9 @@ extern "C" {
    EAPI void                   *elm_store_item_data_get(Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI const Elm_Store        *elm_store_item_store_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI const Elm_Genlist_Item *elm_store_item_genlist_item_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
+   /**
+    * @}
+    */
 
    /**
     * @defgroup SegmentControl SegmentControl
