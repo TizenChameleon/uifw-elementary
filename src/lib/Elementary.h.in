@@ -9843,7 +9843,7 @@ extern "C" {
     * elm_object_content_set/get/unset functions to set, retrieve and unset 
     * objects as content of the @c SWALLOW. After being set to this part, the 
     * object size, position, visibility, clipping and other description 
-    * properties will be totally controled by the description of the given part 
+    * properties will be totally controlled by the description of the given part
     * (inside the Edje theme file).
     *
     * One can use @c evas_object_size_hint_* functions on the child to have some
@@ -9871,12 +9871,12 @@ extern "C" {
     * itself).
     *
     * A similar effect for having a box with its position, size and other things
-    * controled by the Layout theme would be to create an Elementary @ref Box
+    * controlled by the Layout theme would be to create an Elementary @ref Box
     * widget and add it as a Content in the @c SWALLOW part.
     *
     * The main difference of using the Layout Box is that its behavior, the box
     * properties like layouting format, padding, align, etc. will be all
-    * controled by the theme. This means, for example, that a signal could be
+    * controlled by the theme. This means, for example, that a signal could be
     * sent to the Layout theme (with elm_object_signal_emit()) and the theme
     * handled the signal by changing the box padding, or align, or both. Using
     * the Elementary @ref Box widget is not necessarily harder or easier, it
@@ -10162,7 +10162,7 @@ extern "C" {
     */
    EAPI Evas_Object       *elm_layout_box_remove(Evas_Object *obj, const char *part, Evas_Object *child) EINA_ARG_NONNULL(1, 2, 3);
    /**
-    * Remove all child of the given part box.
+    * Remove all children of the given part box.
     *
     * @param obj The layout object
     * @param part The box part name to remove child.
@@ -10233,7 +10233,7 @@ extern "C" {
     */
    EAPI Evas_Object       *elm_layout_table_unpack(Evas_Object *obj, const char *part, Evas_Object *child_obj) EINA_ARG_NONNULL(1, 2, 3);
    /**
-    * Remove all child of the given part table.
+    * Remove all the child objects of the given part table.
     *
     * @param obj The layout object
     * @param part The table part name to remove child.
@@ -10405,8 +10405,8 @@ extern "C" {
     *
     * @param obj The layout object.
     * @param part_name a part from loaded edje group.
-    * @param engine_only if cursors should be just provided by the engine
-    *        or should also search on widget's theme as well
+    * @param engine_only if cursors should be just provided by the engine (EINA_TRUE)
+    *        or should also search on widget's theme as well (EINA_FALSE)
     *
     * @return EINA_TRUE on success or EINA_FALSE on failure, that may be
     *         part not exists or it did not had a cursor set.
@@ -10429,7 +10429,7 @@ extern "C" {
 
 /**
  * @def elm_layout_icon_set
- * Convienience macro to set the icon object in a layout that follows the
+ * Convenience macro to set the icon object in a layout that follows the
  * Elementary naming convention for its parts.
  *
  * @ingroup Layout
@@ -10568,7 +10568,7 @@ extern "C" {
     * @deprecated use elm_object_content_set() instead
     *
     */
-   WILL_DEPRECATE EAPI void              elm_notify_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   WILL_DEPRECATE  EAPI void              elm_notify_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the content of the notify widget
     *
@@ -10581,7 +10581,7 @@ extern "C" {
     * @deprecated use elm_object_content_unset() instead
     *
     */
-   WILL_DEPRECATE EAPI Evas_Object      *elm_notify_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   WILL_DEPRECATE  EAPI Evas_Object      *elm_notify_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Return the content of the notify widget
     *
@@ -10592,7 +10592,7 @@ extern "C" {
     * @deprecated use elm_object_content_get() instead
     *
     */
-   WILL_DEPRECATE EAPI Evas_Object      *elm_notify_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   WILL_DEPRECATE  EAPI Evas_Object      *elm_notify_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the notify parent
     *
@@ -10746,7 +10746,7 @@ extern "C" {
     * @brief Sets the target object for the hover.
     *
     * @param obj The hover object
-    * @param target The object to center the hover onto. The hover
+    * @param target The object to center the hover onto.
     *
     * This function will cause the hover to be centered on the target object.
     */
@@ -10755,7 +10755,7 @@ extern "C" {
     * @brief Gets the target object for the hover.
     *
     * @param obj The hover object
-    * @param parent The object to locate the hover over.
+    * @return The target object for the hover.
     *
     * @see elm_hover_target_set()
     */
@@ -10799,9 +10799,9 @@ extern "C" {
     * "smart". This is a special placement hint and its use case
     * independs of the calculations coming from
     * elm_hover_best_content_location_get(). Its use is for cases when
-    * one desires only one hover content, but with a dinamic special
+    * one desires only one hover content, but with a dynamic special
     * placement within the hover area. The content's geometry, whenever
-    * it changes, will be used to decide on a best location not
+    * it changes, will be used to decide on a best location, not
     * extrapolating the hover's parent object view to show it in (still
     * being the hover's target determinant of its medium part -- move and
     * resize it to simulate finger sizes, for example). If one of the
@@ -10966,8 +10966,8 @@ extern "C" {
     * @li full: Items will be placed between the descent and ascent, or the
     * lowest point in the line and its highest.
     *
-    * The next image shows different configurations of items and how they
-    * are the previously mentioned options affect their sizes. In all cases,
+    * The next image shows different configurations of items and how
+    * the previously mentioned options affect their sizes. In all cases,
     * the green line indicates the ascent, blue for the baseline and red for
     * the descent.
     *
@@ -13535,7 +13535,7 @@ extern "C" {
     */
    typedef enum _Elm_Web_Zoom_Mode
      {
-        ELM_WEB_ZOOM_MODE_MANUAL = 0, /**< Zoom controled normally by elm_web_zoom_set */
+        ELM_WEB_ZOOM_MODE_MANUAL = 0, /**< Zoom controlled normally by elm_web_zoom_set */
         ELM_WEB_ZOOM_MODE_AUTO_FIT, /**< Zoom until content fits in web object */
         ELM_WEB_ZOOM_MODE_AUTO_FILL, /**< Zoom until content fills web object */
         ELM_WEB_ZOOM_MODE_LAST
