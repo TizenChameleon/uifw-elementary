@@ -321,8 +321,8 @@ EAPI void             elm_widget_sub_object_del(Evas_Object *obj, Evas_Object *s
 EAPI void             elm_widget_resize_object_set(Evas_Object *obj, Evas_Object *sobj);
 EAPI void             elm_widget_hover_object_set(Evas_Object *obj, Evas_Object *sobj);
 EAPI void             elm_widget_signal_emit(Evas_Object *obj, const char *emission, const char *source);
-EAPI void             elm_widget_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source), void *data);
-EAPI void            *elm_widget_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, void (*func) (void *data, Evas_Object *o, const char *emission, const char *source));
+EAPI void             elm_widget_signal_callback_add(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func, void *data);
+EAPI void            *elm_widget_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func);
 EAPI void             elm_widget_can_focus_set(Evas_Object *obj, Eina_Bool can_focus);
 EAPI Eina_Bool        elm_widget_can_focus_get(const Evas_Object *obj);
 EAPI Eina_Bool        elm_widget_child_can_focus_get(const Evas_Object *obj);
