@@ -652,14 +652,10 @@ _button_clicked(void *data, Evas_Object *obj, const char *emission __UNUSED__, c
    Elm_Multibuttonentry_Item *item = NULL;
    if (!wd || wd->view_state == MULTIBUTTONENTRY_VIEW_CONTRACTED) return;
 
-   _change_current_button(data, obj);
+   _select_button(data, obj);
 
-   if (wd->current)
-     if ((item = eina_list_data_get(wd->current)) != NULL)
-       {
-          evas_object_smart_callback_call(data, "item,clicked", item);
-          _select_button(data, item->button);
-       }
+   if ((wd->current) && ((item = eina_list_data_get(wd->current)) != NULL))
+     evas_object_smart_callback_call(data, "item,clicked", item);
 }
 
 static void
