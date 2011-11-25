@@ -4,14 +4,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-/**
- * @defgroup Searchbar Searchbar
- * @ingroup Elementary
- *
- * This is Searchbar.
- * It can contain a simple entry and button object.
- */
-
 typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
@@ -175,13 +167,6 @@ _elm_searchbar_text_get(const Evas_Object *obj, const char *item)
 }
 
 
-/**
- * Add a new searchbar to the parent
- * @param parent The parent object
- * @return The new object or NULL if it cannot be created
- *
- * @ingroup Searchbar
- */
 EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
 {
    Evas_Object *obj;
@@ -235,40 +220,16 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * set the text of entry
- *
- * @param obj The searchbar object
- * @return void
- *
- * @ingroup Searchbar
- */
 EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
 {
    _elm_searchbar_text_set(obj, NULL, entry);
 }
 
-/**
- * get the text of entry
- *
- * @param obj The searchbar object
- * @return string pointer of entry
- *
- * @ingroup Searchbar
- */
 EAPI const char* elm_searchbar_text_get(Evas_Object *obj)
 {
    return _elm_searchbar_text_get(obj, NULL);
 }
 
-/**
- * get the pointer of entry
- *
- * @param obj The searchbar object
- * @return the entry object
- *
- * @ingroup Searchbar
- */
 EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -278,14 +239,6 @@ EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
    return elm_editfield_entry_get(wd->ef);
 }
 
-/**
- * get the pointer of editfield
- *
- * @param obj The searchbar object
- * @return the editfield object
- *
- * @ingroup Searchbar
- */
 EAPI Evas_Object *elm_searchbar_editfield_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -295,15 +248,6 @@ EAPI Evas_Object *elm_searchbar_editfield_get(Evas_Object *obj)
    return wd->ef;
 }
 
-/**
- * set the cancel button animation flag
- *
- * @param obj The searchbar object
- * @param cancel_btn_ani_flag The flag of animating cancen button or not
- * @return void
- *
- * @ingroup Searchbar
- */
 EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -314,15 +258,6 @@ EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool 
    else wd->cancel_btn_ani_flag = cancel_btn_ani_flag;
 }
 
-/**
- * set the cancel button show mode
- *
- * @param obj The searchbar object
- * @param visible The flag of cancen button show or not
- * @return void
- *
- * @ingroup Searchbar
- */
 EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -342,14 +277,6 @@ EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
    _sizing_eval(obj);
 }
 
-/**
- * clear searchbar status
- *
- * @param obj The searchbar object
- * @return void
- *
- * @ingroup Searchbar
- */
 EAPI void elm_searchbar_clear(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -366,15 +293,6 @@ EAPI void elm_searchbar_clear(Evas_Object *obj)
 //   elm_entry_entry_set(elm_editfield_entry_get(wd->ef), NULL);
 }
 
-/**
- * set the searchbar boundary rect mode(with bg rect) set
- *
- * @param obj The searchbar object
- * @param boundary The present flag of boundary rect or not
- * @return void
- *
- * @ingroup Searchbar
- */
 EAPI void elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
