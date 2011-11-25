@@ -54,18 +54,18 @@ _cancel(void *data, Evas_Object *obj, void *event_info)
 static void
 _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
 {
-	// start for cbhm
+   // start for cbhm
 #ifdef HAVE_ELEMENTARY_X
-	ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+   ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
 #endif
-	ext_mod->cnpinit(data,obj,event_info);
-	elm_cbhm_helper_init(obj);
-        if (ext_mod->textonly)
-		elm_cbhm_send_raw_data("show0");
-	else
-		elm_cbhm_send_raw_data("show1");
-	evas_object_hide(ext_mod->popup);
-	// end for cbhm
+   ext_mod->cnpinit(data,obj,event_info);
+   elm_cbhm_helper_init(obj);
+   if (ext_mod->cnp_mode != ELM_CNP_MODE_MARKUP)
+     elm_cbhm_send_raw_data("show0");
+   else
+     elm_cbhm_send_raw_data("show1");
+   evas_object_hide(ext_mod->popup);
+   // end for cbhm
 }
 
 static void

@@ -1542,7 +1542,7 @@ entry_insert_filter(Evas_Object* entry, char* str)
 
    char *insertStr = str;
    // if entry has text only set then remove item tags
-   if (elm_entry_cnp_textonly_get(entry))
+   if (elm_entry_cnp_mode_get(entry) != ELM_CNP_MODE_MARKUP)
      {
         while (EINA_TRUE)
           {
@@ -2163,7 +2163,7 @@ pasteimage_append(Paste_Image *pi, Evas_Object *entry)
 
    if (!pi) return EINA_FALSE;
    if (!entry) return EINA_FALSE;
-   if (elm_entry_cnp_textonly_get(entry)) return EINA_FALSE;
+   if (elm_entry_cnp_mode_get(entry) != ELM_CNP_MODE_MARKUP) return EINA_FALSE;
 
    pasteimage_provider_set(entry);
 
