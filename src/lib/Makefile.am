@@ -49,8 +49,7 @@ elc_fileselector.c \
 elc_fileselector_entry.c \
 elc_hoversel.c \
 elc_naviframe.c \
-elc_navigationbar.c \
-elc_navigationbar_ex.c\
+elc_multibuttonentry.c \
 elc_player.c \
 elc_scrolled_entry.c \
 elm_access.c \
@@ -99,7 +98,6 @@ elm_mapbuf.c \
 elm_map.c \
 elm_menu.c \
 elm_module.c \
-elm_multibuttonentry.c \
 elm_nocontents.c \
 elm_notify.c \
 elm_pagecontrol.c \
@@ -111,13 +109,13 @@ elm_photocam.c \
 elm_popup.c \
 elm_progressbar.c \
 elm_radio.c \
+elm_route.c \
 elm_scroller.c \
 elm_searchbar.c \
 elm_segment_control.c \
 elm_separator.c \
 elm_slider.c \
 elm_slideshow.c \
-elm_slidingdrawer.c \
 elm_spinner.c \
 elm_stackedicon.c \
 elm_store.c \
@@ -142,7 +140,8 @@ els_pan.c \
 els_pan.h \
 els_scroller.c \
 els_scroller.h \
-els_tooltip.c
+els_tooltip.c \
+elu_ews_wm.c
 
 libelementary_la_CFLAGS =
 libelementary_la_LIBADD = \

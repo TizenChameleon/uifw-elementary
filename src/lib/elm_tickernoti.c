@@ -1,13 +1,6 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-/**
- * @defgroup TickerNoti TickerNoti
- * @ingroup Elementary
- *
- * This is a notification widget which can be used to display some short information.
- */
-
 typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
@@ -513,15 +506,6 @@ _elm_tickernoti_content_part_unset_hook(Evas_Object *obj, const char *part)
    return NULL;
 }
 
-/**
- * Add a tickernoti object to @p parent
- *
- * @param parent The parent object
- *
- * @return The tickernoti object, or NULL upon failure
- *
- * @ingroup TickerNoti
- */
 EAPI Evas_Object *
 elm_tickernoti_add(Evas_Object *parent)
 {
@@ -559,13 +543,6 @@ elm_tickernoti_add(Evas_Object *parent)
    return obj;
 }
 
-/**
- * Get the rotation of tickernoti object
- *
- * @param obj The tickernotil object
- * @return The rotation angle
- * @ingroup TickerNoti
- */
 EAPI int
 elm_tickernoti_rotation_get(const Evas_Object *obj)
 {
@@ -575,13 +552,6 @@ elm_tickernoti_rotation_get(const Evas_Object *obj)
    return wd->angle;
 }
 
-/**
- * Set the rotation angle for the tickernoti object
- *
- * @param obj The tickernoti object
- * @param angle The rotation angle(in degree) will be used on the tickernoti object
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_rotation_set(Evas_Object *obj, int angle)
 {
@@ -596,13 +566,6 @@ elm_tickernoti_rotation_set(Evas_Object *obj, int angle)
    elm_win_rotation_with_resize_set (wd->win, angle);
 }
 
-/**
- * Set the orientation of the tickernoti object
- *
- * @param obj The tickernoti object
- * @param orient The orientation of tickernoti object
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_orient_set(Evas_Object *obj, Elm_Tickernoti_Orient orient)
 {
@@ -640,14 +603,6 @@ elm_tickernoti_orient_set(Evas_Object *obj, Elm_Tickernoti_Orient orient)
 #endif
 }
 
-/**
- * Get the orientation of the tickernoti object
- *
- * @param obj The tickernotil object
- * @return The orientation of tickernotil object
- *
- * @ingroup TickerNoti
- */
 EAPI Elm_Tickernoti_Orient
 elm_tickernoti_orient_get(const Evas_Object *obj)
 {
@@ -658,14 +613,6 @@ elm_tickernoti_orient_get(const Evas_Object *obj)
    return wd->orient;
 }
 
-/**
- * Get the view window(elm_win) on the tickernoti object
- *
- * @param obj The tickernotil object
- * @return internal view window(elm_win) object
- *
- * @ingroup TickerNoti
- */
 EAPI Evas_Object *
 elm_tickernoti_win_get(const Evas_Object *obj)
 {
@@ -675,107 +622,42 @@ elm_tickernoti_win_get(const Evas_Object *obj)
    return wd->win;
 }
 
-// ################### Below APIs are going to be removed. ###########################
-/**
- * Set the detail label on the tickernoti object
- *
- * @param obj The tickernoti object
- * @param label The label will be used on the tickernoti object
- * @deprecated use elm_object_text_set() instead
- *
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_detailview_label_set(Evas_Object *obj, const char *label)
 {
    _elm_tickernoti_label_set(obj, NULL, label);
 }
 
-/**
- * Get the detail label used on the tickernoti object
- *
- * @param obj The tickernotil object
- * @return The string inside the label
- * @deprecated use elm_object_text_get() instead
- *
- * @ingroup TickerNoti
- */
 EAPI const char *
 elm_tickernoti_detailview_label_get(const Evas_Object *obj)
 {
    return _elm_tickernoti_label_get(obj, NULL);
 }
 
-/**
- * Set the button object used on the tickernoti object
- *
- * @param obj The tickernotil object
- * @param button The button object will be used on the tickernoti object
- * @deprecated use elm_object_content_part_set() instead with "icon" as part name
- *
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_detailview_button_set(Evas_Object *obj, Evas_Object *button)
 {
    _elm_tickernoti_button_set(obj, button);
 }
 
-
-/**
- * Get the button object used on the tickernoti object
- *
- * @param obj The tickernotil object
- * @return The button object inside the tickernoti
- * @deprecated use elm_object_content_part_get() instead with "button" as part name
- *
- * @ingroup TickerNoti
- */
 EAPI Evas_Object *
 elm_tickernoti_detailview_button_get(const Evas_Object *obj)
 {
    return _elm_tickernoti_button_get(obj);
 }
 
-/**
- * Set the detail icon object used on the tickernoti object
- *
- * @param obj The tickernotil object
- * @param icon The icon object will be used on the tickernoti object
- * @deprecated use elm_object_content_part_set() instead with "icon" as part name
- *
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_detailview_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    _elm_tickernoti_icon_set(obj, icon);
 }
 
-/**
- * Get the detail icon object used on the tickernoti object
- *
- * @param obj The tickernotil object
- * @return The icon object inside the tickernoti
- * @deprecated use elm_object_content_part_get() instead with "icon" as part name
- *
- * @ingroup TickerNoti
- */
 EAPI Evas_Object *
 elm_tickernoti_detailview_icon_get(const Evas_Object *obj)
 {
    return _elm_tickernoti_icon_get(obj);
 }
 
-/**
- * Get the view mode on the tickernoti object
- *
- * @param obj The tickernotil object
- * @return The view mode
- * @deprecated removed as now styles are used instead
- *
- * @ingroup TickerNoti
- */
 EAPI Elm_Tickernoti_Mode
 elm_tickernoti_mode_get(const Evas_Object *obj)
 {
@@ -785,15 +667,6 @@ elm_tickernoti_mode_get(const Evas_Object *obj)
    return wd->mode;
 }
 
-/**
- * Set the view mode used on the tickernoti object
- *
- * @param obj The tickernotil object
- * @param mode The view mode will be used on the tickernoti object
- * @deprecated removed as now styles are used instead
- *
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_mode_set(Evas_Object *obj, Elm_Tickernoti_Mode mode)
 {
@@ -811,133 +684,54 @@ elm_tickernoti_mode_set(Evas_Object *obj, Elm_Tickernoti_Mode mode)
    }
 }
 
-/**
- * Get the detail view window(elm_win) on the tickernoti object
- *
- * @param obj The tickernotil object
- * @return detail view window(elm_win) object
- * @ingroup TickerNoti
- */
 EAPI Evas_Object *
 elm_tickernoti_detailview_get(const Evas_Object *obj)
 {
    return elm_tickernoti_win_get(obj);
 }
 
-/**
- * Set the orientation of the tickernoti object
- *
- * @param obj The tickernoti object
- * @param orient The orientation of tickernoti object
- * @deprecated use elm_tickernoti_orient_set() instead
- *
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_orientation_set(Evas_Object *obj, Elm_Tickernoti_Orient orient)
 {
    elm_tickernoti_orient_set(obj, orient);
 }
 
-/**
- * Get the orientation of the tickernoti object
- *
- * @param obj The tickernotil object
- * @return The orientation of tickernotil object
- * @deprecated use elm_tickernoti_orient_get() instead
- *
- * @ingroup TickerNoti
- */
 EAPI Elm_Tickernoti_Orient
 elm_tickernoti_orientation_get(const Evas_Object *obj)
 {
    return elm_tickernoti_orient_get(obj);
 }
 
-/**
- * Set the label on the tickernoti object
- *
- * @param obj The tickernoti object
- * @param label The label will be used on the tickernoti object
- * @deprecated use elm_object_text_get()
- *
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_label_set(Evas_Object *obj, const char *label)
 {
    _elm_tickernoti_label_set(obj, NULL, label);
 }
 
-/**
- * Get the label used on the tickernoti object
- *
- * @param obj The tickernotil object
- * @return The string inside the label
- * @deprecated use elm_object_text_get() instead
- *
- * @ingroup TickerNoti
- */
 EAPI const char *
 elm_tickernoti_label_get(const Evas_Object *obj)
 {
    return _elm_tickernoti_label_get(obj, NULL);
 }
 
-/**
- * Set the action button object used on the tickernoti object
- *
- * @param obj The tickernotil object
- * @param button The button object will be used on the tickernoti object
- * @deprecated use elm_object_content_part_set() instead with "button" as part name
- *
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_button_set(Evas_Object *obj, Evas_Object *button)
 {
    _elm_tickernoti_button_set(obj, button);
 }
 
-/**
- * Get the action button object used on the tickernoti object
- *
- * @param obj The tickernotil object
- * @return The button object inside the tickernoti
- * @deprecated use elm_object_content_part_get() instead with "button" as part name
- *
- * @ingroup TickerNoti
- */
 EAPI Evas_Object *
 elm_tickernoti_button_get(const Evas_Object *obj)
 {
    return _elm_tickernoti_button_get(obj);
 }
 
-/**
- * Set the icon object of the tickernoti object
- *
- * @param obj The tickernotil object
- * @param icon The icon object will be used on the tickernoti object
- * @deprecated use elm_object_content_part_set() instead with "icon" as part name
- *
- * @ingroup TickerNoti
- */
 EAPI void
 elm_tickernoti_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    _elm_tickernoti_icon_set(obj, icon);
 }
 
-/**
- * Get the icon object of the tickernoti object
- *
- * @param obj The tickernotil object
- * @return The icon object inside the tickernoti
- * @deprecated use elm_object_content_part_get() instead with "icon" as part name
- *
- * @ingroup TickerNoti
- */
 EAPI Evas_Object *
 elm_tickernoti_icon_get(const Evas_Object *obj)
 {

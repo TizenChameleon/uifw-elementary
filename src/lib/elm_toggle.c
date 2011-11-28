@@ -50,7 +50,6 @@ elm_toggle_states_labels_set(Evas_Object *obj, const char *onlabel, const char *
    elm_object_part_text_set(obj, "off", offlabel);
 }
 
-
 EAPI void
 elm_toggle_states_labels_get(const Evas_Object *obj, const char **onlabel, const char **offlabel)
 {

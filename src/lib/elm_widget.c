@@ -26,6 +26,7 @@ struct _Smart_Data
    Evas_Object *obj;
    const char  *type;
    Evas_Object *parent_obj;
+   Evas_Object *parent2;
    Evas_Coord   x, y, w, h;
    Eina_List   *subobjs;
    Evas_Object *resize_obj;
@@ -1219,6 +1220,47 @@ elm_widget_tree_unfocusable_get(const Evas_Object *obj)
    return sd->tree_unfocusable;
 }
 
+/**
+ * @internal
+ *
+ * Get the list of focusable child objects.
+ *
+ * This function retruns list of child objects which can get focus.
+ *
+ * @param obj The parent widget
+ * @retrun list of focusable child objects.
+ *
+ * @ingroup Widget
+ */
+EAPI Eina_List *
+elm_widget_can_focus_child_list_get(const Evas_Object *obj)
+{
+   API_ENTRY return NULL;
+
+   const Eina_List *l;
+   Eina_List *child_list = NULL;
+   Evas_Object *child;
+
+   if (sd->subobjs)
+     {
+        EINA_LIST_FOREACH(sd->subobjs, l, child)
+          {
+             if ((elm_widget_can_focus_get(child)) &&
+                 (evas_object_visible_get(child)) &&
+                 (!elm_widget_disabled_get(child)))
+               child_list = eina_list_append(child_list, child);
+             else if (elm_widget_is(child))
+               {
+                  Eina_List *can_focus_list;
+                  can_focus_list = elm_widget_can_focus_child_list_get(child);
+                  if (can_focus_list)
+                    child_list = eina_list_merge(child_list, can_focus_list);
+               }
+          }
+     }
+   return child_list;
+}
+
 EAPI void
 elm_widget_highlight_ignore_set(Evas_Object *obj,
                                 Eina_Bool    ignore)
@@ -1313,6 +1355,24 @@ elm_widget_parent_widget_get(const Evas_Object *obj)
         else parent = evas_object_smart_parent_get(parent);
      }
    return parent;
+}
+
+EAPI Evas_Object *
+elm_widget_parent2_get(const Evas_Object *obj)
+{
+   if (_elm_widget_is(obj))
+     {
+        Smart_Data *sd = evas_object_smart_data_get(obj);
+        if (sd) return sd->parent2;
+     }
+   return NULL;
+}
+
+EAPI void
+elm_widget_parent2_set(Evas_Object *obj, Evas_Object *parent)
+{
+   API_ENTRY return;
+   sd->parent2 = parent;
 }
 
 EAPI void
@@ -1906,7 +1966,7 @@ elm_widget_focused_object_clear(Evas_Object *obj)
 EAPI void
 elm_widget_focus_steal(Evas_Object *obj)
 {
-   Evas_Object *parent, *o;
+   Evas_Object *parent, *parent2, *o;
    API_ENTRY return;
 
    if (sd->focused) return;
@@ -1923,24 +1983,30 @@ elm_widget_focus_steal(Evas_Object *obj)
         if (sd->focused) break;
         parent = o;
      }
-   if (!elm_widget_parent_get(parent))
-     elm_widget_focused_object_clear(parent);
+   if ((!elm_widget_parent_get(parent)) &&
+       (!elm_widget_parent2_get(parent)))
+      elm_widget_focused_object_clear(parent);
    else
      {
-        parent = elm_widget_parent_get(parent);
+        parent2 = elm_widget_parent_get(parent);
+        if (!parent2) parent2 = elm_widget_parent2_get(parent);
+        parent = parent2;
         sd = evas_object_smart_data_get(parent);
-        if ((sd->resize_obj) && (elm_widget_focus_get(sd->resize_obj)))
-          elm_widget_focused_object_clear(sd->resize_obj);
-        else
+        if (sd)
           {
-             const Eina_List *l;
-             Evas_Object *child;
-             EINA_LIST_FOREACH(sd->subobjs, l, child)
+             if ((sd->resize_obj) && (elm_widget_focus_get(sd->resize_obj)))
+                elm_widget_focused_object_clear(sd->resize_obj);
+             else
                {
-                  if (elm_widget_focus_get(child))
+                  const Eina_List *l;
+                  Evas_Object *child;
+                  EINA_LIST_FOREACH(sd->subobjs, l, child)
                     {
-                       elm_widget_focused_object_clear(child);
-                       break;
+                       if (elm_widget_focus_get(child))
+                         {
+                            elm_widget_focused_object_clear(child);
+                            break;
+                         }
                     }
                }
           }
@@ -2547,7 +2613,8 @@ elm_widget_is_check(const Evas_Object *obj)
 
 EAPI Eina_Bool
 elm_widget_type_check(const Evas_Object *obj,
-                      const char        *type)
+                      const char        *type,
+                      const char        *func)
 {
    const char *provided, *expected = "(unknown)";
    static int abort_on_warn = -1;
@@ -2560,7 +2627,7 @@ elm_widget_type_check(const Evas_Object *obj,
         if ((!provided) || (!provided[0]))
           provided = "(unknown)";
      }
-   ERR("Passing Object: %p, of type: '%s' when expecting type: '%s'", obj, provided, expected);
+   ERR("Passing Object: %p in function: %s, of type: '%s' when expecting type: '%s'", obj, func, provided, expected);
    if (abort_on_warn == -1)
      {
         if (getenv("ELM_ERROR_ABORT")) abort_on_warn = 1;
@@ -2828,6 +2895,31 @@ _elm_widget_item_data_get(const Elm_Widget_Item *item)
 {
    ELM_WIDGET_ITEM_CHECK_OR_RETURN(item, NULL);
    return (void *)item->data;
+}
+
+EAPI void
+_elm_widget_item_disabled_set(Elm_Widget_Item *item, Eina_Bool disabled)
+{
+   ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
+
+   if (item->disabled == disabled) return;
+   item->disabled = !!disabled;
+   if (item->disable_func) item->disable_func(item);
+}
+
+EAPI Eina_Bool
+_elm_widget_item_disabled_get(const Elm_Widget_Item *item)
+{
+   ELM_WIDGET_ITEM_CHECK_OR_RETURN(item, EINA_FALSE);
+   return item->disabled;
+}
+
+EAPI void
+_elm_widget_item_disable_set_hook_set(Elm_Widget_Item *item,
+                                      Elm_Widget_On_Disable_Set_Cb func)
+{
+   ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
+   item->disable_func = func;
 }
 
 typedef struct _Elm_Widget_Item_Tooltip Elm_Widget_Item_Tooltip;

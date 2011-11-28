@@ -1,7 +1,18 @@
-#include <Elementary.h>
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
+
+#include <Elementary.h>
+
+#ifndef ENABLE_NLS
+# ifndef setlocale
+#  define setlocale(c, l)
+# endif
+# ifndef libintl_setlocale
+#  define libintl_setlocale(c, l)
+# endif
+#endif
+
 #ifndef ELM_LIB_QUICKLAUNCH
 static void
 my_fileselector_done(void            *data,
@@ -108,7 +119,6 @@ test_fileselector(void *data       __UNUSED__,
                   void *event_info __UNUSED__)
 {
    Evas_Object *win, *fs, *bg, *vbox, *hbox, *bt, *sep;
-   const char *path = NULL;
 
    /* Set the locale according to the system pref.
     * If you dont do so the file selector will order the files list in
@@ -138,9 +148,7 @@ test_fileselector(void *data       __UNUSED__,
    /* make the file list a tree with dir expandable in place */
    elm_fileselector_expandable_set(fs, EINA_FALSE);
    /* start the fileselector in the home dir */
-   path = getenv("HOME");
-   if (!path) path = "./";
-   elm_fileselector_path_set(fs, path);
+   elm_fileselector_path_set(fs, getenv("HOME"));
    /* allow fs to expand in x & y */
    evas_object_size_hint_weight_set(fs, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(fs, EVAS_HINT_FILL, EVAS_HINT_FILL);

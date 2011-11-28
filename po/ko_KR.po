@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-11-21 18:14+0900\n"
+"POT-Creation-Date: 2011-11-28 17:27+0900\n"
 "PO-Revision-Date: 2011-09-26 21:20+0900\n"
 "Last-Translator: Sumanth Krishna Mannam <sumanth.m@samsung.com>\n"
 "Language-Team: General\n"
@@ -24,8 +24,8 @@ msgstr "위로"
 msgid "Home"
 msgstr "홈"
 
-#: src/lib/elc_fileselector.c:995 src/lib/elm_entry.c:1382
-#: src/lib/elm_searchbar.c:226
+#: src/lib/elc_fileselector.c:995 src/lib/elm_entry.c:1396
+#: src/lib/elm_searchbar.c:211
 msgid "Cancel"
 msgstr "취소"
 
@@ -77,27 +77,27 @@ msgstr "오전"
 msgid "DateTimeFormat"
 msgstr "%Y년 %m월 %d일  %p %I : %M"
 
-#: src/lib/elm_entry.c:1356
+#: src/lib/elm_entry.c:1370
 msgid "Select"
 msgstr "선택"
 
-#: src/lib/elm_entry.c:1361
+#: src/lib/elm_entry.c:1375
 msgid "Paste"
 msgstr "붙여넣기"
 
-#: src/lib/elm_entry.c:1366 src/lib/elm_entry.c:1386
+#: src/lib/elm_entry.c:1380 src/lib/elm_entry.c:1400
 msgid "More"
 msgstr ""
 
-#: src/lib/elm_entry.c:1376
+#: src/lib/elm_entry.c:1390
 msgid "Copy"
 msgstr "복사"
 
-#: src/lib/elm_entry.c:1379
+#: src/lib/elm_entry.c:1393
 msgid "Cut"
 msgstr "잘라내기"
 
-#: src/lib/elm_searchbar.c:214
+#: src/lib/elm_searchbar.c:199
 msgid "Search"
 msgstr "검색"
 

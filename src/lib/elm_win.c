@@ -311,7 +311,7 @@ _elm_win_focus_in(Ecore_Evas *ee)
    _elm_widget_top_win_focused_set(win->win_obj, EINA_TRUE);
    if (win->show_count == 1)
      {
-        elm_object_focus(win->win_obj);
+        elm_object_focus_set(win->win_obj, EINA_TRUE);
         win->show_count++;
      }
    else
@@ -408,6 +408,26 @@ _elm_win_event_cb(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_T
                elm_widget_focus_cycle(obj, ELM_FOCUS_NEXT);
              ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
              return EINA_TRUE;
+          }
+        else if ((!strcmp(ev->keyname, "Left")) ||
+                 (!strcmp(ev->keyname, "KP_Left")))
+          {
+             //TODO : woohyun jung
+          }
+        else if ((!strcmp(ev->keyname, "Right")) ||
+                 (!strcmp(ev->keyname, "KP_Right")))
+          {
+             //TODO : woohyun jung
+          }
+        else if ((!strcmp(ev->keyname, "Up")) ||
+                 (!strcmp(ev->keyname, "KP_Up")))
+          {
+             //TODO : woohyun jung
+          }
+        else if ((!strcmp(ev->keyname, "Down")) ||
+                 (!strcmp(ev->keyname, "KP_Down")))
+          {
+             //TODO : woohyun jung
           }
      }
 
@@ -1342,43 +1362,35 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
 
 #define FALLBACK_TRY(engine)                                            \
    if (!win->ee)                                                        \
-   do {                                                               \
-        CRITICAL(engine " engine creation failed. Trying software X11."); \
-        win->ee = ecore_evas_software_x11_new(NULL, 0, 0, 0, 1, 1);      \
-        elm_engine_set(ELM_SOFTWARE_X11);      \
+      do {                                                              \
+         CRITICAL(engine " engine creation failed. Trying default.");   \
+         win->ee = ecore_evas_new(NULL, 0, 0, 1, 1, NULL);              \
+         if (win->ee)                                                   \
+            elm_engine_set(ecore_evas_engine_name_get(win->ee));        \
    } while (0)
 #define ENGINE_COMPARE(name) (!strcmp(_elm_config->engine, name))
 
    switch (type)
      {
       case ELM_WIN_INLINED_IMAGE:
-          {
-             if (parent)
-               {
-                  Evas *e = evas_object_evas_get(parent);
-                  if (e)
-                    {
-                       Ecore_Evas *ee = ecore_evas_ecore_evas_get(e);
-                       if (ee)
-                         {
-                            win->img_obj = ecore_evas_object_image_new(ee);
-                            if (win->img_obj)
-                              {
-                                 win->ee = ecore_evas_object_ecore_evas_get(win->img_obj);
-                                 if (win->ee)
-                                   {
-                                      _win_inlined_image_set(win);
-                                   }
-                                 else
-                                   {
-                                      evas_object_del(win->img_obj);
-                                      win->img_obj = NULL;
-                                   }
-                              }
-                         }
-                    }
-               }
-          }
+        if (!parent) break;
+        {
+           Evas *e = evas_object_evas_get(parent);
+           Ecore_Evas *ee;
+           if (!e) break;
+           ee = ecore_evas_ecore_evas_get(e);
+           if (!ee) break;
+           win->img_obj = ecore_evas_object_image_new(ee);
+           if (!win->img_obj) break;
+           win->ee = ecore_evas_object_ecore_evas_get(win->img_obj);
+           if (win->ee)
+             {
+                _win_inlined_image_set(win);
+                break;
+             }
+           evas_object_del(win->img_obj);
+           win->img_obj = NULL;
+        }
         break;
       default:
         if (ENGINE_COMPARE(ELM_SOFTWARE_X11))
@@ -1388,6 +1400,7 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
              win->client_message_handler = ecore_event_handler_add
                 (ECORE_X_EVENT_CLIENT_MESSAGE, _elm_win_client_message, win);
 #endif
+             FALLBACK_TRY("Sofware X11");
           }
         else if (ENGINE_COMPARE(ELM_SOFTWARE_FB))
           {
@@ -1541,6 +1554,8 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
    evas_object_layer_set(win->win_obj, 50);
    evas_object_pass_events_set(win->win_obj, EINA_TRUE);
 
+   if (type == ELM_WIN_INLINED_IMAGE)
+      elm_widget_parent2_set(win->win_obj, parent);
    ecore_evas_object_associate(win->ee, win->win_obj,
                                ECORE_EVAS_OBJECT_ASSOCIATE_BASE |
                                ECORE_EVAS_OBJECT_ASSOCIATE_STACK |
@@ -2149,6 +2164,16 @@ elm_win_screen_position_get(const Evas_Object *obj, int *x, int *y)
    if (!win) return;
    if (x) *x = win->screen.x;
    if (y) *y = win->screen.y;
+}
+
+EAPI Eina_Bool
+elm_win_focus_get(const Evas_Object *obj)
+{
+   Elm_Win *win;
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   win = elm_widget_data_get(obj);
+   if (!win) return EINA_FALSE;
+   return ecore_evas_focus_get(win->ee);
 }
 
 EAPI void

@@ -82,7 +82,6 @@ struct _Widget_Data
    Eina_Bool bgcolor : 1;
    Eina_Bool can_write : 1;
    Eina_Bool autosave : 1;
-   Eina_Bool textonly : 1;
    Eina_Bool usedown : 1;
    Eina_Bool scroll : 1;
    Eina_Bool input_panel_enable : 1;
@@ -90,6 +89,7 @@ struct _Widget_Data
    Eina_Bool autoperiod : 1;
    Eina_Bool matchlist_list_clicked : 1;
    Eina_Bool matchlist_case_sensitive : 1;
+   Elm_CNP_Mode cnp_mode : 2;
 };
 
 struct _Elm_Entry_Context_Menu_Item
@@ -613,7 +613,6 @@ _recalc_cursor_geometry(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    evas_object_smart_callback_call(obj, SIG_CURSOR_CHANGED, NULL);
-   if (!elm_object_focus_get(obj)) return;
    if (!wd->deferred_recalc_job)
      {
         Evas_Coord cx, cy, cw, ch;
@@ -638,8 +637,12 @@ _elm_win_recalc_job(void *data)
    wd->deferred_recalc_job = NULL;
 
    evas_object_geometry_get(wd->ent, NULL, NULL, &resw, NULL);
-   edje_object_size_min_restricted_calc(wd->ent, &minw, &minh, resw, 0);
+   /* This is a hack to workaround to avoid the cursor geometry bug
+    * in a char-wrap or a mixed-mode textblock in a scroller.
+    * The order of calling next 2 functions affects to the size of the textblock cursor.
+    * when the textblock core issue is fixed these comments will be removed. */
    edje_object_size_min_restricted_calc(wd->ent, &fw, &fh, 0, 0);
+   edje_object_size_min_restricted_calc(wd->ent, &minw, &minh, resw, 0);
    elm_coords_finger_size_adjust(1, &fw, 1, &minh);
    wd->entmw = fw;
    wd->entmh = minh;
@@ -686,7 +689,7 @@ _elm_win_recalc_job(void *data)
           }
      }
 
-   if ((wd->deferred_cur) && (elm_object_focus_get(data)))
+   if (wd->deferred_cur)
      {
         Evas_Coord cx, cy, cw, ch;
         edje_object_part_text_cursor_geometry_get(wd->ent, "elm.text",
@@ -1073,7 +1076,6 @@ static void
 _move(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord_Rectangle ret_rect;
 
    if (wd->hoversel) _hoversel_position(data);
 
@@ -1179,10 +1181,11 @@ _paste(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (wd->sel_notify_handler)
      {
 #ifdef HAVE_ELEMENTARY_X
-        Elm_Sel_Format formats;
+        Elm_Sel_Format formats = ELM_SEL_FORMAT_MARKUP;
         wd->selection_asked = EINA_TRUE;
-        formats = ELM_SEL_FORMAT_MARKUP;
-        if (!wd->textonly)
+        if (wd->cnp_mode == ELM_CNP_MODE_PLAINTEXT)
+          formats = ELM_SEL_FORMAT_TEXT;
+        else if (wd->cnp_mode != ELM_CNP_MODE_NO_IMAGE)
           formats |= ELM_SEL_FORMAT_IMAGE;
         elm_selection_get(ELM_SEL_CLIPBOARD, formats, data, NULL, NULL);
 #endif
@@ -1194,46 +1197,57 @@ _store_selection(Elm_Sel_Type seltype, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *sel;
-   char *sel_str;
+   char *sel_str = NULL;
+   Elm_Sel_Format formats = ELM_SEL_FORMAT_MARKUP;
 
    if (!wd) return;
    sel = edje_object_part_text_selection_get(wd->ent, "elm.text");
-   sel_str = strdup(sel);
-   if (!sel_str)
-     return;
-   if (wd->textonly)
+   if (wd->cnp_mode == ELM_CNP_MODE_PLAINTEXT)
      {
-        while (EINA_TRUE)
+        sel_str = elm_entry_markup_to_utf8(sel);
+        if (!sel_str)
+          return;
+        formats = ELM_SEL_FORMAT_TEXT;
+     }
+   else
+     {
+        sel_str = strdup(sel);
+        if (!sel_str)
+          return;
+        if (wd->cnp_mode == ELM_CNP_MODE_NO_IMAGE)
           {
-             char *startTag = NULL;
-             char *endTag = NULL;
-
-             startTag = strstr(sel_str, "<item");
-             if (!startTag)
-               startTag = strstr(sel_str, "</item");
-             if (startTag)
-               endTag = strstr(startTag, ">");
-             else
-               break;
-             if (!endTag || startTag > endTag)
-               break;
-
-             size_t sindex = startTag - sel_str;
-             size_t eindex = endTag - sel_str + 1;
-
-             Eina_Strbuf *buf = eina_strbuf_new();
-             if (buf)
+             while (EINA_TRUE)
                {
-                  eina_strbuf_append(buf, sel_str);
-                  eina_strbuf_remove(buf, sindex, eindex);
-                  sel_str = eina_strbuf_string_steal(buf);
-                  eina_strbuf_free(buf);
+                  char *startTag = NULL;
+                  char *endTag = NULL;
+
+                  startTag = strstr(sel_str, "<item");
+                  if (!startTag)
+                    startTag = strstr(sel_str, "</item");
+                  if (startTag)
+                    endTag = strstr(startTag, ">");
+                  else
+                    break;
+                  if (!endTag || startTag > endTag)
+                    break;
+
+                  size_t sindex = startTag - sel_str;
+                  size_t eindex = endTag - sel_str + 1;
+
+                  Eina_Strbuf *buf = eina_strbuf_new();
+                  if (buf)
+                    {
+                       eina_strbuf_append(buf, sel_str);
+                       eina_strbuf_remove(buf, sindex, eindex);
+                       sel_str = eina_strbuf_string_steal(buf);
+                       eina_strbuf_free(buf);
+                    }
                }
           }
      }
-   elm_selection_set(seltype, obj, ELM_SEL_FORMAT_MARKUP, sel_str);
+   elm_selection_set(seltype, obj, formats, sel_str);
    if (seltype == ELM_SEL_CLIPBOARD)
-     eina_stringshare_replace(&wd->cut_sel, sel_str);
+     eina_stringshare_replace(&wd->cut_sel, sel);
    free(sel_str);
 }
 
@@ -1294,7 +1308,7 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 #endif
    cnpwidgetdata = data;
    elm_cbhm_helper_init(obj);
-   if (elm_entry_cnp_textonly_get(obj))
+   if (elm_entry_cnp_mode_get(obj) != ELM_CNP_MODE_MARKUP)
      elm_cbhm_send_raw_data("show0");
    else
      elm_cbhm_send_raw_data("show1");
@@ -2447,8 +2461,14 @@ _event_selection_clear(void *data __UNUSED__, int type __UNUSED__, void *event _
 
    if (cnpwidgetdata == data)
      {
+        Widget_Data *wd = elm_widget_data_get(data);
+        Elm_Sel_Format formats = ELM_SEL_FORMAT_MARKUP;
         evas_object_smart_callback_call(data, SIG_SELECTION_PASTE, NULL);
-        elm_selection_get(ELM_SEL_SECONDARY,ELM_SEL_FORMAT_MARKUP,data,NULL,NULL);
+        if (wd->cnp_mode == ELM_CNP_MODE_PLAINTEXT)
+          formats = ELM_SEL_FORMAT_TEXT;
+        else if (wd->cnp_mode != ELM_CNP_MODE_NO_IMAGE)
+          formats |= ELM_SEL_FORMAT_IMAGE;
+        elm_selection_get(ELM_SEL_SECONDARY, formats ,data, NULL, NULL);
      }
 
    // end for cbhm
@@ -2938,7 +2958,7 @@ elm_entry_add(Evas_Object *parent)
    wd->disabled     = EINA_FALSE;
    wd->context_menu = EINA_TRUE;
    wd->autosave     = EINA_TRUE;
-   wd->textonly     = EINA_FALSE;
+   wd->cnp_mode     = ELM_CNP_MODE_MARKUP;
    wd->autoperiod   = EINA_TRUE;
 
    wd->ent = edje_object_add(e);
@@ -3071,7 +3091,7 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->selmode = wd->selmode;
    ext_mod->cnpinit = _cnpinit;
    ext_mod->context_menu = wd->context_menu;
-   ext_mod->textonly = wd->textonly;
+   ext_mod->cnp_mode = wd->cnp_mode;
 }
 
 EAPI void
@@ -3083,7 +3103,7 @@ elm_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
    if (wd->single_line == single_line) return;
    wd->single_line = single_line;
    wd->linewrap = ELM_WRAP_NONE;
-   elm_entry_cnp_textonly_set(obj, EINA_TRUE);
+   elm_entry_cnp_mode_set(obj, ELM_CNP_MODE_NO_IMAGE);
    _theme_hook(obj);
    if (wd->scroller)
      {
@@ -3197,7 +3217,7 @@ elm_entry_is_empty(const Evas_Object *obj)
    Eina_Bool ret;
    if (!wd) return EINA_TRUE;
 
-if (0) {
+   if (0) {
    /* It's a hack until we get the support suggested above.
     * We just create a cursor, point it to the begining, and then
     * try to advance it, if it can advance, the tb is not empty,
@@ -3211,7 +3231,7 @@ if (0) {
    evas_textblock_cursor_free(cur);
 
    return !ret;
-}
+   }
 
    char *str = elm_entry_markup_to_utf8(elm_entry_entry_get(obj));
    if (!str) return EINA_TRUE;
@@ -3221,6 +3241,27 @@ if (0) {
    free(str);
    return ret;
 }
+
+EAPI const Evas_Object *
+elm_entry_textblock_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+
+   return edje_object_part_object_get(wd->ent, "elm.text");
+}
+
+EAPI void
+elm_entry_calc_force(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   edje_object_calc_force(wd->ent);
+}
+
 
 EAPI const char *
 elm_entry_selection_get(const Evas_Object *obj)
@@ -3857,26 +3898,41 @@ elm_entry_autosave_get(const Evas_Object *obj)
 EAPI void
 elm_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly)
 {
-   Elm_Sel_Format format = ELM_SEL_FORMAT_MARKUP;
    ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   textonly = !!textonly;
-   if (wd->textonly == textonly) return;
-   wd->textonly = !!textonly;
-   if (!textonly) format |= ELM_SEL_FORMAT_IMAGE;
-#ifdef HAVE_ELEMENTARY_X
-   elm_drop_target_add(obj, format, _drag_drop_cb, NULL);
-#endif
+   elm_entry_cnp_mode_set(obj, textonly ? ELM_CNP_MODE_NO_IMAGE : ELM_CNP_MODE_MARKUP);
 }
 
 EAPI Eina_Bool
 elm_entry_cnp_textonly_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   return elm_entry_cnp_mode_get(obj) != ELM_CNP_MODE_MARKUP;
+}
+
+EAPI void
+elm_entry_cnp_mode_set(Evas_Object *obj, Elm_CNP_Mode cnp_mode)
+{
+   Elm_Sel_Format format = ELM_SEL_FORMAT_MARKUP;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->cnp_mode == cnp_mode) return;
+   wd->cnp_mode = cnp_mode;
+   if (wd->cnp_mode == ELM_CNP_MODE_PLAINTEXT)
+     format = ELM_SEL_FORMAT_TEXT;
+   else if (cnp_mode == ELM_CNP_MODE_MARKUP) format |= ELM_SEL_FORMAT_IMAGE;
+#ifdef HAVE_ELEMENTARY_X
+   elm_drop_target_add(obj, format, _drag_drop_cb, NULL);
+#endif
+}
+
+EAPI Elm_CNP_Mode
+elm_entry_cnp_mode_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
-   return wd->textonly;
+   return wd->cnp_mode;
 }
 
 EAPI void

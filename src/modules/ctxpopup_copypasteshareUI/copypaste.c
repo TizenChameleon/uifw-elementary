@@ -117,7 +117,7 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
 #endif
 	ext_mod->cnpinit(data,obj,event_info);
 	elm_cbhm_helper_init(obj);
-	if (ext_mod->textonly)
+	if (ext_mod->cnp_mode != ELM_CNP_MODE_MARKUP)
 		elm_cbhm_send_raw_data("show0");
 	else
 		elm_cbhm_send_raw_data("show1");

@@ -4336,41 +4336,52 @@ elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    Widget_Data *wd = elm_widget_data_get(WIDGET(it));
    if (!wd) return;
-   Elm_Genlist_Item *it2;
+   Elm_Genlist_Item *it2, *it3;
    Evas_Coord y, h;
 
-   if (!it->wd->effect_mode || !it->wd->move_effect_mode)
+   if (!wd->effect_mode || !wd->move_effect_mode)
       _item_subitems_clear(it);
    else
      {
-        if ((!it->wd->item_moving_effect_timer) && (it->flags != ELM_GENLIST_ITEM_GROUP) &&
-             it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE	)
+        if ((!wd->item_moving_effect_timer) && (it->flags != ELM_GENLIST_ITEM_GROUP) &&
+             wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE)
           {
-             it->wd->expand_item = it;
+             wd->expand_item = it;
              _item_flip_effect_show(it);
              evas_object_geometry_get(VIEW(it), NULL, &y, NULL, &h);
-             it->wd->expand_item_end = y + h;
+             wd->expand_item_end = y + h;
 
-              it2= it;
+             it2= it;
              do {
                   it2 = elm_genlist_item_next_get(it2);
                   if (!it2) break;
              } while (it2->expanded_depth > it->expanded_depth);
              if (it2)
                {
+                  int diff;
                   Evas_Coord vy, vh;
                   evas_output_viewport_get(evas_object_evas_get(wd->pan_smart), NULL, &vy, NULL, &vh);
-                  it2->old_scrl_y = ((it2->old_scrl_y > vy + vh) ? vy + vh : it2->old_scrl_y);
-                  it->wd->expand_item_gap = it->wd->expand_item_end - it2->old_scrl_y;
+                  diff = it2->old_scrl_y - (vy + vh);
+                  if (diff > 0)
+                    {
+                       it3 = it2;
+                       while (it3)
+                         {
+                            it3->old_scrl_y = it3->old_scrl_y - diff;
+                            it3 = elm_genlist_item_next_get(it3);
+                         }
+                    }
+
+                  wd->expand_item_gap = wd->expand_item_end - it2->old_scrl_y;
                }
              else
-                it->wd->expand_item_gap = 0;
+                wd->expand_item_gap = 0;
 
-             evas_object_raise(it->wd->alpha_bg);
-             evas_object_show(it->wd->alpha_bg);
+             evas_object_raise(wd->alpha_bg);
+             evas_object_show(wd->alpha_bg);
 
-             it->wd->start_time = current_time_get();
-             it->wd->item_moving_effect_timer = ecore_animator_add(_item_moving_effect_timer_cb, it->wd);
+             wd->start_time = current_time_get();
+             wd->item_moving_effect_timer = ecore_animator_add(_item_moving_effect_timer_cb, wd);
           }
         else
            _item_subitems_clear(it);
@@ -5517,7 +5528,6 @@ _emit_contract(Elm_Genlist_Item *it)
    Elm_Genlist_Item *it2;
    Eina_List *l;
 
-   //   printf("%p is emited contract\n", it);
    edje_object_signal_emit(VIEW(it), "elm,state,contract_flip", "");
    it->effect_done = EINA_FALSE;
 
@@ -5533,14 +5543,7 @@ _item_flip_effect_show(Elm_Genlist_Item *it)
    Elm_Genlist_Item *it2;
    Eina_List *l;
    Widget_Data *wd = it->wd;
-   Eina_Bool check = EINA_FALSE;
 
-   it2 = elm_genlist_item_next_get(it);
-   while (it2)
-     {
-        if (it2->expanded_depth <= it->expanded_depth) check = EINA_TRUE;
-        it2 = elm_genlist_item_next_get(it2);
-     }
    EINA_LIST_FOREACH(it->items, l, it2)
      {
         if (it2->parent && it == it2->parent)
