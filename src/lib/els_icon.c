@@ -2,12 +2,6 @@
 #include "elm_priv.h"
 #include "els_icon.h"
 
-#ifdef _WIN32
-# define FMT_SIZE_T "%Iu"
-#else
-# define FMT_SIZE_T "%zu"
-#endif
-
 typedef struct _Smart_Data Smart_Data;
 
 struct _Smart_Data
@@ -82,21 +76,23 @@ _els_smart_icon_file_helper(Evas_Object *obj)
    /* smart code here */
    /* NOTE: Do not merge upstream for the if (sd->edje) { } statements
       But wonder whether the edje resource icons have no problem. */
-   if (!sd->edje) goto out;
+   if (sd->edje)
+     {
+        if (sd->prev) evas_object_del(sd->prev);
+        pclip = evas_object_clip_get(sd->obj);
+        if (sd->obj) sd->prev = sd->obj;
+        sd->obj = evas_object_image_add(evas_object_evas_get(obj));
+        evas_object_event_callback_add(sd->obj,
+                                       EVAS_CALLBACK_IMAGE_PRELOADED,
+                                       _preloaded, sd);
+        evas_object_smart_member_add(sd->obj, obj);
+        if (sd->prev) evas_object_smart_member_add(sd->prev, obj);
+        evas_object_image_scale_hint_set(sd->obj,
+                                         EVAS_IMAGE_SCALE_HINT_STATIC);
+        evas_object_clip_set(sd->obj, pclip);
 
-   if (sd->prev) evas_object_del(sd->prev);
-   pclip = evas_object_clip_get(sd->obj);
-   if (sd->obj) sd->prev = sd->obj;
-   sd->obj = evas_object_image_add(evas_object_evas_get(obj));
-   evas_object_event_callback_add(sd->obj, EVAS_CALLBACK_IMAGE_PRELOADED,
-                                  _preloaded, sd);
-   evas_object_smart_member_add(sd->obj, obj);
-   if (sd->prev) evas_object_smart_member_add(sd->prev, obj);
-   evas_object_image_scale_hint_set(sd->obj, EVAS_IMAGE_SCALE_HINT_STATIC);
-   evas_object_clip_set(sd->obj, pclip);
-
-   sd->edje = EINA_FALSE;
-out:
+        sd->edje = EINA_FALSE;
+     }
 
    if (!sd->size)
      evas_object_image_load_size_set(sd->obj, sd->size, sd->size);
@@ -118,7 +114,7 @@ _els_smart_icon_memfile_set(Evas_Object *obj, const void *img, size_t size, cons
    evas_object_image_preload(sd->obj, EINA_FALSE);
    if (evas_object_image_load_error_get(sd->obj) != EVAS_LOAD_ERROR_NONE)
      {
-        ERR("Things are going bad for some random " FMT_SIZE_T " byte chunk of memory (%p)", size, sd->obj);
+        ERR("Things are going bad for some random %zu byte chunk of memory (%p)", size, sd->obj);
         return EINA_FALSE;
      }
    _smart_reconfigure(sd);

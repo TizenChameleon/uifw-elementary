@@ -1,11 +1,14 @@
+
+
 #include "private.h"
 
 typedef struct _Elm_Params_colorpalette
 {
    unsigned int row, col;
    Elm_Colorpalette_Color *color;
-   char *color_set;
-   int color_num;
+   char *color_set ;
+   int color_num ;
+
 } Elm_Params_colorpalette;
 
 static void
@@ -15,10 +18,10 @@ external_colorpalette_state_set(void *data __UNUSED__, Evas_Object *obj, const v
    if (to_params) p = to_params;
    else if (from_params) p = from_params;
    else return;
-   if ((p->row > 0)&&( p->col > 0))
-     elm_colorpalette_row_column_set(obj, p->row, p->col);
-   if (p->color_num)
-     elm_colorpalette_color_set(obj, p->color_num, p->color);
+   if((p->row > 0)&&( p->col > 0))
+	   elm_colorpalette_row_column_set(obj,p->row,p->col) ;
+   if(p->color_num)
+   elm_colorpalette_color_set(obj,p->color_num, p->color) ;
 }
 
 static Eina_Bool
@@ -27,27 +30,27 @@ external_colorpalette_param_set(void *data __UNUSED__, Evas_Object *obj __UNUSED
    if (!strcmp(param->name, "row"))
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-          {
-             //No EAPI for row set
-             return EINA_FALSE;
-          }
+	  {
+		//No EAPI for row set
+	     return EINA_FALSE;
+	  }
      }
    else if (!strcmp(param->name, "col"))
      {
-        if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-          {
-             //No EAPI for column set
-             return EINA_FALSE;
-          }
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+	  {
+		//No EAPI for column set
+		return EINA_FALSE;
+	  }
      }
    else if (!strcmp(param->name,"color_num"))
      {
-       if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
-         {
-            //No EAPI for colour_number set
-            return EINA_FALSE;
-         }
-     }
+   	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
+   	  {
+		//No EAPI for colour_number set
+		return EINA_FALSE;
+   	  }
+        }
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
 
@@ -57,8 +60,8 @@ external_colorpalette_param_set(void *data __UNUSED__, Evas_Object *obj __UNUSED
 static Eina_Bool
 external_colorpalette_param_get(void *data __UNUSED__, const Evas_Object *obj __UNUSED__, Edje_External_Param *param __UNUSED__)
 {
-   //FIXME:getter functions not provided
-   return EINA_FALSE;
+	return EINA_FALSE;
+   //FIX ME:getter functions not provided
 }
 
 static void *
@@ -67,79 +70,78 @@ external_colorpalette_params_parse(void *data __UNUSED__, Evas_Object *obj __UNU
    Elm_Params_colorpalette *mem;
    Edje_External_Param *param;
    const Eina_List *l;
-   int k,m,ll;
+   int k,m,ll ;
    k = m = ll = 0;
-   char test[5];
+   char test[5] ;
    int d = 0;
-   char *s = NULL;
+   char *s = NULL ;
    mem = calloc(1, sizeof(Elm_Params_colorpalette));
    if (!mem)
      return NULL;
 
    EINA_LIST_FOREACH(params, l, param)
      {
-       if (!strcmp(param->name, "row"))
-         {
-            mem->row = param->i;
-         }
+        if (!strcmp(param->name, "row"))
+          {
+             mem->row = param->i;
+          }
        else if (!strcmp(param->name, "col"))
+	     {
+	        mem->col = param->i;
+	     }
+	   else if (!strcmp(param->name, "color_num"))
+	     {
+	        mem->color_num = param->i ;
+	     }
+
+	   else if (!strcmp(param->name, "color_set"))
          {
-            mem->col = param->i;
-         }
-       else if (!strcmp(param->name, "color_num"))
-         {
-            mem->color_num = param->i;
-         }
-       else if (!strcmp(param->name, "color_set"))
-         {
-           mem->color = calloc(mem->color_num, sizeof(Elm_Colorpalette_Color));
+           mem->color = (Elm_Colorpalette_Color*) calloc (mem->color_num, sizeof(Elm_Colorpalette_Color));
            s = (char*)param->i;
-           while (k < (mem->color_num) && (ll <= (int)strlen(s)))
+           while(k <(mem->color_num) && (ll <= (int)strlen(s)))
              {
-                if (d == 0)
-                  {
-                     while(s[ll]!=':')
-                       test[m++] = s[ll++];
-                     test[m] = 0;
-                     ll++;
-                     m = 0;
-                     mem->color[k].r = atoi(test);
-                     d++;
-                  }
-                if (d == 1)
-                  {
-                     while(s[ll]!=':')
-                       test[m++] = s[ll++];
-                     test[m] = 0;
-                     ll++;
-                     m = 0;
-                     mem->color[k].g = atoi(test);
-                     d++;
-                  }
-                if (d == 2)
-                  {
-                     while(s[ll]!='/' &&  m<3)
-                       test[m++] = s[ll++];
-                     test[m] = 0;
-	             ll++;
-                     m = 0;
-                     mem->color[k].b = atoi(test);
-                     d = 0;
-                  }
-             }
+                  if(d == 0)
+                   {
+            	      while(s[ll]!=':')
+            		    test[m++] = s[ll++];
+            	      test[m]= 0 ;
+            	      ll++ ;
+		      m = 0 ;
+            	      mem->color[k].r = atoi(test) ;
+            	      d++ ;
+                   }
+                  if(d == 1)
+                   {
+            	     while(s[ll]!=':')
+            		   test[m++] = s[ll++];
+            	     test[m]= 0 ;
+		     ll++ ;
+                     m = 0 ;
+                     mem->color[k].g = atoi(test) ;
+                     d++ ;
+                   }
+                  if(d == 2)
+                   {
+            	      while(s[ll]!='/' &&  m<3)
+            		    test[m++] = s[ll++];
+            	      test[m]= 0 ;
+		      ll++ ;
+                      m = 0 ;
+                      mem->color[k].b = atoi(test) ;
+                      d = 0 ;
+                   }
+                }
            k++;
          }
-     }
-   return mem;
+       }
+    return mem;
 }
 
-static Evas_Object *
-external_colorpalette_content_get(void *data __UNUSED__,
-                                  const Evas_Object *obj __UNUSED__,
-                                  const char *content __UNUSED__)
+static Evas_Object *external_colorpalette_content_get(void *data __UNUSED__,
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-   ERR("No content.");
-   return NULL;
+	ERR("No content.");
+	return NULL;
 }
 
 static void
@@ -149,7 +151,7 @@ external_colorpalette_params_free(void *params)
    if (mem->color)
      free(mem->color);
    if (mem->color_set)
-     free(mem->color_set);
+     free(mem->color_set) ;
    free(params);
 }
 

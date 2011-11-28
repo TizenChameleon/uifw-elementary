@@ -13,9 +13,7 @@ typedef struct _Elm_Params_Calendar
 } Elm_Params_Calendar;
 
 static void
-external_calendar_state_set(void *data __UNUSED__, Evas_Object *obj,
-                            const void *from_params, const void *to_params,
-                            float pos __UNUSED__)
+external_calendar_state_set(void *data __UNUSED__, Evas_Object *obj, const void *from_params, const void *to_params, float pos __UNUSED__)
 {
    const Elm_Params_Calendar *p;
    int min,max;
@@ -25,28 +23,27 @@ external_calendar_state_set(void *data __UNUSED__, Evas_Object *obj,
    else return;
 
    if (p->year_min)
-     {
-        elm_calendar_min_max_year_get(obj, NULL, &max);
-        elm_calendar_min_max_year_set(obj, p->year_min, max);
-     }
+    {
+      elm_calendar_min_max_year_get(obj, NULL, &max);
+      elm_calendar_min_max_year_set(obj, p->year_min, max);
+    }
    if (p->year_max)
-     {
-        elm_calendar_min_max_year_get(obj, &min, NULL);
-        elm_calendar_min_max_year_set(obj, min, p->year_max);
-     }
+    {
+      elm_calendar_min_max_year_get(obj, &min, NULL);
+      elm_calendar_min_max_year_set(obj, min, p->year_max);
+    }
    if (p->sel_exists)
-     elm_calendar_day_selection_enabled_set(obj, p->sel_enable);
+      elm_calendar_day_selection_enabled_set(obj, p->sel_enable);
    if (p->weekday_color)
-     elm_calendar_text_weekday_color_set(obj,p->weekday_color);
+      elm_calendar_text_weekday_color_set(obj,p->weekday_color);
    if (p->saturday_color)
-     elm_calendar_text_weekday_color_set(obj,p->saturday_color);
+      elm_calendar_text_weekday_color_set(obj,p->saturday_color);
    if (p->sunday_color)
-     elm_calendar_text_weekday_color_set(obj,p->sunday_color);
+      elm_calendar_text_weekday_color_set(obj,p->sunday_color);
 }
 
 static Eina_Bool
-external_calendar_param_set(void *data __UNUSED__, Evas_Object *obj,
-                            const Edje_External_Param *param)
+external_calendar_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_External_Param *param)
 {
    int min,max;
 
@@ -108,10 +105,9 @@ external_calendar_param_set(void *data __UNUSED__, Evas_Object *obj,
 }
 
 static Eina_Bool
-external_calendar_param_get(void *data __UNUSED__, const Evas_Object *obj,
-                            Edje_External_Param *param)
+external_calendar_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_External_Param *param)
 {
-   int min, max;
+   int min,max;
 
    if (!strcmp(param->name, "year_min"))
      {
@@ -169,9 +165,7 @@ external_calendar_param_get(void *data __UNUSED__, const Evas_Object *obj,
 }
 
 static void *
-external_calendar_params_parse(void *data __UNUSED__,
-                               Evas_Object *obj __UNUSED__,
-                               const Eina_List *params)
+external_calendar_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__, const Eina_List *params)
 {
    Elm_Params_Calendar *mem;
    Edje_External_Param *param;
@@ -183,38 +177,36 @@ external_calendar_params_parse(void *data __UNUSED__,
 
    EINA_LIST_FOREACH(params, l, param)
      {
-        if (!strcmp(param->name, "year_min"))
-	  mem->year_min = param->i;
+	if (!strcmp(param->name, "year_min"))
+	   mem->year_min = param->i;
 
 	else if(!strcmp(param->name, "year_max"))
-          mem->year_max = param->i;
+           mem->year_max = param->i;
 
 	else if (!strcmp(param->name, "sel_enable"))
           {
-	     mem->sel_enable = param->i;
-	     mem->sel_exists = EINA_TRUE;
+	   mem->sel_enable = param->i;
+	   mem->sel_exists = EINA_TRUE;
           }
 
-        else if (!strcmp(param->name, "weekday_color"))
-          mem->weekday_color = param->i;
+	else if (!strcmp(param->name, "weekday_color"))
+	   mem->weekday_color = param->i;
 
-        else if (!strcmp(param->name, "saturday_color"))
-          mem->saturday_color = param->i;
+	else if (!strcmp(param->name, "saturday_color"))
+	   mem->saturday_color = param->i;
 
 	else if (!strcmp(param->name, "sunday_color"))
-          mem->sunday_color = param->i;
+	   mem->sunday_color = param->i;
      }
 
    return mem;
 }
 
-static Evas_Object *
-external_calendar_content_get(void *data __UNUSED__,
-                              const Evas_Object *obj __UNUSED__,
-                              const char *content __UNUSED__)
+static Evas_Object *external_calendar_content_get(void *data __UNUSED__,
+		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
-   ERR("No content.");
-   return NULL;
+	ERR("No content.");
+	return NULL;
 }
 
 static void

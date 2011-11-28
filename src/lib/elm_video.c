@@ -279,13 +279,14 @@ elm_video_add(Evas_Object *parent)
    wd->layout = edje_object_add(e);
    _elm_theme_object_set(obj, wd->layout, "video", "base", "default");
    elm_widget_resize_object_set(obj, wd->layout);
+   elm_widget_sub_object_add(obj, wd->layout);
    evas_object_show(wd->layout);
    evas_object_size_hint_weight_set(wd->layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
    wd->emotion = emotion_object_add(e);
    emotion_object_init(wd->emotion, NULL);
-   elm_widget_sub_object_add(obj, wd->emotion);
    edje_object_part_swallow(wd->layout, "elm.swallow.video", wd->emotion);
+   elm_widget_sub_object_add(obj, wd->emotion);
 
    evas_object_smart_callback_add(wd->emotion, "open_done", _open_done, obj);
    evas_object_smart_callback_add(wd->emotion, "playback_started", _playback_started, obj);

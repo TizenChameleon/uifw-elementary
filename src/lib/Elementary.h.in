@@ -254,7 +254,7 @@ ELM_MAIN()
 @author Michael Bouchaud <michael.bouchaud@@gmail.com>
 @author Jonathan Atton (Watchwolf) <jonathan.atton@@gmail.com>
 @author Brian Wang <brian.wang.0721@@gmail.com>
-@author Mike Blumenkrantz (discomfitor/zmike) <michael.blumenkrantz@@gmail.com>
+@author Mike Blumenkrantz (zmike) <mike@@zentific.com>
 @author Samsung Electronics <tbd>
 @author Samsung SAIT <tbd>
 @author Brett Nash <nash@@nash.id.au>
@@ -284,16 +284,13 @@ ELM_MAIN()
 @author Shinwoo Kim <kimcinoo@@gmail.com>
 @author Govindaraju SM <govi.sm@@samsung.com> <govism@@gmail.com>
 @author Prince Kumar Dubey <prince.dubey@@samsung.com> <prince.dubey@@gmail.com>
-@author Sung W. Park <sungwoo@@gmail.com>
-@author Thierry el Borgi <thierry@@substantiel.fr>
-@author Shilpa Singh <shilpa.singh@@samsung.com> <shilpasingh.o@@gmail.com>
-@author Chanwook Jung <joey.jung@@samsung.com>
-@author Hyoyoung Chang <hyoyoung.chang@@samsung.com>
-@author Guillaume "Kuri" Friloux <guillaume.friloux@@asp64.com>
-@author Kim Yunhan <spbear@@gmail.com>
-@author Bluezery <ohpowel@@gmail.com>
-@author Nicolas Aguirre <aguirre.nicolas@@gmail.com>
-@author Sanjeev BA <iamsanjeev@@gmail.com>
+@author Sung W. Park <sungwoo@gmail.com>
+@author Thierry el Borgi <thierry@substantiel.fr>
+@author Shilpa Singh <shilpa.singh@samsung.com> <shilpasingh.o@gmail.com>
+@author Chanwook Jung <joey.jung@samsung.com>
+@author Hyoyoung Chang <hyoyoung.chang@samsung.com>
+@author Guillaume "Kuri" Friloux <guillaume.friloux@asp64.com>
+@author Kim Yunhan <spbear@gmail.com>
 
 Please contact <enlightenment-devel@lists.sourceforge.net> to get in
 contact with the developers and maintainers.
@@ -371,7 +368,7 @@ contact with the developers and maintainers.
 #include <Ecore_Evas.h>
 #include <Ecore_File.h>
 #include <Ecore_IMF.h>
-@ELEMENTARY_ECORE_CON_INC@
+#include <Ecore_Con.h>
 #include <Edje.h>
 
 #ifdef ELM_EDBUS
@@ -423,8 +420,6 @@ contact with the developers and maintainers.
 #else
 # define EAPI_MAIN EAPI
 #endif
-
-#define WILL_DEPRECATE /* API is deprecated in upstream EFL, will be deprecated in SLP soon */
 
 /* allow usage from c++ */
 #ifdef __cplusplus
@@ -604,7 +599,7 @@ extern "C" {
     */
    typedef Evas_Object *(*Elm_Tooltip_Item_Content_Cb) (void *data, Evas_Object *obj, Evas_Object *tooltip, void *item);
 
-   typedef Eina_Bool (*Elm_Event_Cb) (void *data, Evas_Object *obj, Evas_Object *src, Evas_Callback_Type type, void *event_info); /**< Function prototype definition for callbacks on input events happening on Elementary widgets. @a data will receive the user data pointer passed to elm_object_event_callback_add(). @a src will be a pointer to the widget on which the input event took place. @a type will get the type of this event and @a event_info, the struct with details on this event. */
+   typedef Eina_Bool (*Elm_Event_Cb) (void *data, Evas_Object *obj, Evas_Object *src, Evas_Callback_Type type, void *event_info);
 
 #ifndef ELM_LIB_QUICKLAUNCH
 #define ELM_MAIN() int main(int argc, char **argv) {elm_init(argc, argv); return elm_main(argc, argv);} /**< macro to be used after the elm_main() function */
@@ -1158,16 +1153,6 @@ extern "C" {
 #define elm_object_content_unset(obj) elm_object_part_content_unset((obj), NULL)
 
    /**
-    * Set the text to read out when in accessibility mode
-    *
-    * @param obj The object which is to be described
-    * @param txt The text that describes the widget to people with poor or no vision
-    *
-    * @ingroup General
-    */
-   EAPI void elm_object_access_info_set(Evas_Object *obj, const char *txt);
-
-   /**
     * Get the widget object's handle which contains a given item
     *
     * @param item The Elementary object item
@@ -1187,25 +1172,12 @@ extern "C" {
     * @param content The new content of the object item
     *
     * @note Elementary object items may have many contents
-    * @deprecated Use elm_object_item_part_content_set instead.
-    * @ingroup General
-    */
-   EINA_DEPRECATED EAPI void elm_object_item_content_part_set(Elm_Object_Item *it, const char *part, Evas_Object *content);
-
-   /**
-    * Set a content of an object item
-    *
-    * @param it The Elementary object item
-    * @param part The content part name to set (NULL for the default content)
-    * @param content The new content of the object item
-    *
-    * @note Elementary object items may have many contents
     *
     * @ingroup General
     */
-   EAPI void elm_object_item_part_content_set(Elm_Object_Item *it, const char *part, Evas_Object *content);
+   EAPI void elm_object_item_content_part_set(Elm_Object_Item *it, const char *part, Evas_Object *content);
 
-#define elm_object_item_content_set(it, content) elm_object_item_part_content_set((it), NULL, (content))
+#define elm_object_item_content_set(it, content) elm_object_item_content_part_set((it), NULL, (content))
 
    /**
     * Get a content of an object item
@@ -1215,37 +1187,12 @@ extern "C" {
     * @return content of the object item or NULL for any error
     *
     * @note Elementary object items may have many contents
-    * @deprecated Use elm_object_item_part_content_get instead.
+    *
     * @ingroup General
     */
    EAPI Evas_Object *elm_object_item_content_part_get(const Elm_Object_Item *it, const char *part);
 
-   /**
-    * Get a content of an object item
-    *
-    * @param it The Elementary object item
-    * @param part The content part name to unset (NULL for the default content)
-    * @return content of the object item or NULL for any error
-    *
-    * @note Elementary object items may have many contents
-    *
-    * @ingroup General
-    */
-   EAPI Evas_Object *elm_object_item_part_content_get(const Elm_Object_Item *it, const char *part);
-
-#define elm_object_item_content_get(it) elm_object_item_part_content_get((it), NULL)
-
-   /**
-    * Unset a content of an object item
-    *
-    * @param it The Elementary object item
-    * @param part The content part name to unset (NULL for the default content)
-    *
-    * @note Elementary object items may have many contents
-    * @deprecated Use elm_object_item_part_content_unset instead.
-    * @ingroup General
-    */
-   EINA_DEPRECATED EAPI Evas_Object *elm_object_item_content_part_unset(Elm_Object_Item *it, const char *part);
+#define elm_object_item_content_get(it) elm_object_item_content_part_get((it), NULL)
 
    /**
     * Unset a content of an object item
@@ -1257,22 +1204,9 @@ extern "C" {
     *
     * @ingroup General
     */
-   EAPI Evas_Object *elm_object_item_part_content_unset(Elm_Object_Item *it, const char *part);
+   EAPI Evas_Object *elm_object_item_content_part_unset(Elm_Object_Item *it, const char *part);
 
-#define elm_object_item_content_unset(it) elm_object_item_part_content_unset((it), NULL)
-
-   /**
-    * Set a label of an object item
-    *
-    * @param it The Elementary object item
-    * @param part The text part name to set (NULL for the default label)
-    * @param label The new text of the label
-    *
-    * @note Elementary object items may have many labels
-    * @deprecated Use elm_object_item_part_text_set instead.
-    * @ingroup General
-    */
-   WILL_DEPRECATE  EAPI void elm_object_item_text_part_set(Elm_Object_Item *it, const char *part, const char *label);
+#define elm_object_item_content_unset(it, content) elm_object_item_content_part_unset((it), (content))
 
    /**
     * Set a label of an object item
@@ -1285,22 +1219,10 @@ extern "C" {
     *
     * @ingroup General
     */
-   EAPI void elm_object_item_part_text_set(Elm_Object_Item *it, const char *part, const char *label);
+   EAPI void elm_object_item_text_part_set(Elm_Object_Item *it, const char *part, const char *label);
 
-#define elm_object_item_text_set(it, label) elm_object_item_part_text_set((it), NULL, (label))
+#define elm_object_item_text_set(it, label) elm_object_item_text_part_set((it), NULL, (label))
 
-   /**
-    * Get a label of an object item
-    *
-    * @param it The Elementary object item
-    * @param part The text part name to get (NULL for the default label)
-    * @return text of the label or NULL for any error
-    *
-    * @note Elementary object items may have many labels
-    * @deprecated Use elm_object_item_part_text_get instead.
-    * @ingroup General
-    */
-   WILL_DEPRECATE  EAPI const char *elm_object_item_text_part_get(const Elm_Object_Item *it, const char *part);
    /**
     * Get a label of an object item
     *
@@ -1312,7 +1234,7 @@ extern "C" {
     *
     * @ingroup General
     */
-   EAPI const char *elm_object_item_part_text_get(const Elm_Object_Item *it, const char *part);
+   EAPI const char *elm_object_item_text_part_get(const Elm_Object_Item *it, const char *part);
 
    /**
     * Set the text to read out when in accessibility mode
@@ -1334,7 +1256,18 @@ extern "C" {
     */
    EAPI void elm_object_item_access_info_set(Elm_Object_Item *it, const char *txt);
 
-#define elm_object_item_text_get(it) elm_object_item_part_text_get((it), NULL)
+
+#define elm_object_item_text_get(it) elm_object_item_text_part_get((it), NULL)
+
+   /**
+    * Set the text to read out when in accessibility mode
+    *
+    * @param obj The object which is to be described
+    * @param txt The text that describes the widget to people with poor or no vision
+    *
+    * @ingroup General
+    */
+   EAPI void elm_object_access_info_set(Evas_Object *obj, const char *txt);
 
    /**
     * Set the text to read out when in accessibility mode
@@ -1376,40 +1309,7 @@ extern "C" {
     * @param source The signal's source.
     * @ingroup General
     */
-   EAPI void elm_object_item_signal_emit(Elm_Object_Item *it, const char *emission, const char *source) EINA_ARG_NONNULL(1);
-
-   /**
-    * Set the disabled state of an widget item.
-    *
-    * @param obj The Elementary object item
-    * @param disabled The state to put in in: @c EINA_TRUE for
-    *        disabled, @c EINA_FALSE for enabled
-    *
-    * Elementary object item can be @b disabled, in which state they won't
-    * receive input and, in general, will be themed differently from
-    * their normal state, usually greyed out. Useful for contexts
-    * where you don't want your users to interact with some of the
-    * parts of you interface.
-    *
-    * This sets the state for the widget item, either disabling it or
-    * enabling it back.
-    *
-    * @ingroup Styles
-    */
-   EAPI void elm_object_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled) EINA_ARG_NONNULL(1);
-
-   /**
-    * Get the disabled state of an widget item.
-    *
-    * @param obj The Elementary object
-    * @return @c EINA_TRUE, if the widget item is disabled, @c EINA_FALSE
-    *            if it's enabled (or on errors)
-    *
-    * This gets the state of the widget, which might be enabled or disabled.
-    *
-    * @ingroup Styles
-    */
-   EAPI Eina_Bool    elm_object_item_disabled_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   EAPI void             elm_object_item_signal_emit(Elm_Object_Item *it, const char *emission, const char *source) EINA_ARG_NONNULL(1);
 
    /**
     * @}
@@ -2549,11 +2449,10 @@ extern "C" {
     * the one receiving input events.
     *
     * @see elm_object_focus_get()
-    * @deprecated use elm_object_focus_set() instead.
     *
     * @ingroup Focus
     */
-   WILL_DEPRECATE  EAPI void             elm_object_focus(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void             elm_object_focus(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Remove the focus from an Elementary object
@@ -2564,11 +2463,10 @@ extern "C" {
     * previous element in the focus chain list.
     *
     * @see elm_object_focus() and elm_object_focus_custom_chain_get()
-    * @deprecated use elm_object_focus_set() instead.
     *
     * @ingroup Focus
     */
-   WILL_DEPRECATE  EAPI void             elm_object_unfocus(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void             elm_object_unfocus(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the ability for an Element object to be focused
@@ -2716,7 +2614,7 @@ extern "C" {
     *
     * @ingroup Focus
     */
-   EAPI void             elm_object_tree_unfocusable_set(Evas_Object *obj, Eina_Bool tree_unfocusable) EINA_ARG_NONNULL(1);
+   EAPI void             elm_object_tree_unfocusable_set(Evas_Object *obj, Eina_Bool tree_unfocusable); EINA_ARG_NONNULL(1);
 
    /**
     * Get whether an Elementary object and its children are unfocusable or not.
@@ -2729,7 +2627,7 @@ extern "C" {
     *
     * @ingroup Focus
     */
-   EAPI Eina_Bool        elm_object_tree_unfocusable_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool        elm_object_tree_unfocusable_get(const Evas_Object *obj); EINA_ARG_NONNULL(1);
 
    /**
     * @defgroup Scrolling Scrolling
@@ -4471,12 +4369,6 @@ extern "C" {
     */
    EAPI Evas_Object *elm_win_inlined_image_object_get(Evas_Object *obj);
    /**
-    * Determine whether a window has focus
-    * @param obj The window to query
-    * @return EINA_TRUE if the window exists and has focus, else EINA_FALSE
-    */
-   EAPI Eina_Bool    elm_win_focus_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
     * Get screen geometry details for the screen that a window is on
     * @param obj The window to query
     * @param x where to return the horizontal offset value. May be NULL.
@@ -4839,7 +4731,7 @@ extern "C" {
     * @ingroup Bg
     */
 
-   WILL_DEPRECATE  EAPI void          elm_bg_overlay_set(Evas_Object *obj, Evas_Object *overlay) EINA_ARG_NONNULL(1);
+   EAPI void          elm_bg_overlay_set(Evas_Object *obj, Evas_Object *overlay) EINA_ARG_NONNULL(1);
 
    /**
     * Get the overlay object used for the background object.
@@ -4867,7 +4759,7 @@ extern "C" {
     *
     * @ingroup Bg
     */
-   WILL_DEPRECATE  EAPI Evas_Object  *elm_bg_overlay_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object  *elm_bg_overlay_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the size of the pixmap representation of the image.
@@ -5033,7 +4925,7 @@ extern "C" {
     *
     * @ingroup Icon
     */
-   EAPI Eina_Bool             elm_icon_memfile_set(Evas_Object *obj, const void *img, size_t size, const char *format, const char *key) EINA_ARG_NONNULL(1, 2);
+   EAPI Eina_Bool             elm_icon_memfile_set(Evas_Object *obj, const void *img, size_t size, const char *format, const char *key);  EINA_ARG_NONNULL(1, 2);
    /**
     * Get the file that will be used as icon.
     *
@@ -6504,7 +6396,7 @@ extern "C" {
     * @param icon The icon object for the button
     * @deprecated use elm_object_part_content_set() instead.
     */
-   WILL_DEPRECATE  EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI void         elm_button_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
     * Get the icon used for the button
     *
@@ -6517,7 +6409,7 @@ extern "C" {
     *
     * @deprecated use elm_object_part_content_get() instead
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Remove the icon set without deleting it and return the object
     *
@@ -6530,7 +6422,7 @@ extern "C" {
     * @return The icon object that was being used
     * @deprecated use elm_object_part_content_unset() instead.
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_button_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Turn on/off the autorepeat event generated when the button is kept pressed
     *
@@ -7345,7 +7237,7 @@ extern "C" {
     * elm_scroller_content_unset() function.
     * @deprecated use elm_object_content_set() instead
     */
-   WILL_DEPRECATE  EAPI void elm_scroller_content_set(Evas_Object *obj, Evas_Object *child) EINA_ARG_NONNULL(1);
+   EAPI void         elm_scroller_content_set(Evas_Object *obj, Evas_Object *child) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the content of the scroller widget
     *
@@ -7357,7 +7249,7 @@ extern "C" {
     * @see elm_scroller_content_set()
     * @deprecated use elm_object_content_get() instead.
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_scroller_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_scroller_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the content of the scroller widget
     *
@@ -7369,7 +7261,7 @@ extern "C" {
     * @see elm_scroller_content_set()
     * @deprecated use elm_object_content_unset() instead.
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_scroller_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_scroller_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Set custom theme elements for the scroller
     *
@@ -7678,7 +7570,7 @@ extern "C" {
     *
     * The Label widget @b doesn't allow text to overflow its boundaries, if the
     * text doesn't fit the geometry of the label it will be ellipsized or be
-    * cut. Elementary provides several styles for this widget:
+    * cut. Elementary provides several themes for this widget:
     * @li default - No animation
     * @li marker - Centers the text in the label and make it bold by default
     * @li slide_long - The entire text appears from the right of the screen and
@@ -7790,7 +7682,8 @@ extern "C" {
     * @param size font size
     *
     * @warning NEVER use this. It is for hyper-special cases only. use styles
-    * instead. e.g. "default", "marker", "slide_long" etc.
+    * instead. e.g. "big", "medium", "small" - or better name them by use:
+    * "title", "footnote", "quote" etc.
     */
    EAPI void         elm_label_fontsize_set(Evas_Object *obj, int fontsize) EINA_ARG_NONNULL(1);
    /**
@@ -7803,7 +7696,8 @@ extern "C" {
     * @param a Alpha property background color of The label object
     *
     * @warning NEVER use this. It is for hyper-special cases only. use styles
-    * instead. e.g. "default", "marker", "slide_long" etc.
+    * instead. e.g. "big", "medium", "small" - or better name them by use:
+    * "title", "footnote", "quote" etc.
     */
    EAPI void         elm_label_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a) EINA_ARG_NONNULL(1);
    /**
@@ -7813,7 +7707,8 @@ extern "C" {
     * @param align align mode ("left", "center", "right")
     *
     * @warning NEVER use this. It is for hyper-special cases only. use styles
-    * instead. e.g. "default", "marker", "slide_long" etc.
+    * instead. e.g. "big", "medium", "small" - or better name them by use:
+    * "title", "footnote", "quote" etc.
     */
    EAPI void         elm_label_text_align_set(Evas_Object *obj, const char *alignmode) EINA_ARG_NONNULL(1);
    /**
@@ -7826,7 +7721,8 @@ extern "C" {
     * @param a Alpha property background alpha of The label object
     *
     * @warning NEVER use this. It is for hyper-special cases only. use styles
-    * instead. e.g. "default", "marker", "slide_long" etc.
+    * instead. e.g. "big", "medium", "small" - or better name them by use:
+    * "title", "footnote", "quote" etc.
     */
    EAPI void         elm_label_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a) EINA_ARG_NONNULL(1);
    /**
@@ -7954,7 +7850,7 @@ extern "C" {
     *
     * @deprecated use elm_object_content_set() instead.
     */
-   WILL_DEPRECATE  EAPI void         elm_frame_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI void         elm_frame_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the content of the frame widget
     *
@@ -7965,7 +7861,7 @@ extern "C" {
     *
     * @deprecated use elm_object_content_get() instead.
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_frame_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_frame_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the content of the frame widget
     *
@@ -7976,7 +7872,7 @@ extern "C" {
     *
     * @deprecated use elm_object_content_unset() instead.
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_frame_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_frame_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @}
     */
@@ -8320,36 +8216,10 @@ extern "C" {
    typedef struct _Elm_Gengrid_Item_Class Elm_Gengrid_Item_Class; /**< Gengrid item class definition structs */
    typedef struct _Elm_Gengrid_Item Elm_Gengrid_Item; /**< Gengrid item handles */
    typedef struct _Elm_Gengrid_Item_Class_Func Elm_Gengrid_Item_Class_Func; /**< Class functions for gengrid item classes. */
-   /**
-    * Label fetching class function for Elm_Gen_Item_Class.
-    * @param data The data passed in the item creation function
-    * @param obj The base widget object
-    * @param part The part name of the swallow
-    * @return The allocated (NOT stringshared) string to set as the label
-    */
-   typedef char        *(*Elm_Gengrid_Item_Label_Get_Cb) (void *data, Evas_Object *obj, const char *part);
-   /**
-    * Content (swallowed object) fetching class function for Elm_Gen_Item_Class.
-    * @param data The data passed in the item creation function
-    * @param obj The base widget object
-    * @param part The part name of the swallow
-    * @return The content object to swallow
-    */
-   typedef Evas_Object *(*Elm_Gengrid_Item_Content_Get_Cb)  (void *data, Evas_Object *obj, const char *part);
-   /**
-    * State fetching class function for Elm_Gen_Item_Class.
-    * @param data The data passed in the item creation function
-    * @param obj The base widget object
-    * @param part The part name of the swallow
-    * @return The hell if I know
-    */
-   typedef Eina_Bool    (*Elm_Gengrid_Item_State_Get_Cb) (void *data, Evas_Object *obj, const char *part);
-   /**
-    * Deletion class function for Elm_Gen_Item_Class.
-    * @param data The data passed in the item creation function
-    * @param obj The base widget object
-    */
-   typedef void         (*Elm_Gengrid_Item_Del_Cb)      (void *data, Evas_Object *obj);
+   typedef char        *(*Elm_Gengrid_Item_Label_Get_Cb) (void *data, Evas_Object *obj, const char *part); /**< Label fetching class function for gengrid item classes. */
+   typedef Evas_Object *(*Elm_Gengrid_Item_Content_Get_Cb)  (void *data, Evas_Object *obj, const char *part); /**< Content (swallowed object) fetching class function for gengrid item classes. */
+   typedef Eina_Bool    (*Elm_Gengrid_Item_State_Get_Cb) (void *data, Evas_Object *obj, const char *part); /**< State fetching class function for gengrid item classes. */
+   typedef void         (*Elm_Gengrid_Item_Del_Cb)      (void *data, Evas_Object *obj); /**< Deletion class function for gengrid item classes. */
 
    /* temporary compatibility code */
    typedef Elm_Gengrid_Item_Label_Get_Cb GridItemLabelGetFunc EINA_DEPRECATED;
@@ -8669,7 +8539,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE  EAPI void               elm_gengrid_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select) EINA_ARG_NONNULL(1);
+   EAPI void               elm_gengrid_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select) EINA_ARG_NONNULL(1);
 
    /**
     * Get whether items on a given gengrid widget have their selection
@@ -8684,7 +8554,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE  EAPI Eina_Bool          elm_gengrid_always_select_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool          elm_gengrid_always_select_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set whether items on a given gengrid widget can be selected or not.
@@ -8702,7 +8572,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE  EAPI void               elm_gengrid_no_select_mode_set(Evas_Object *obj, Eina_Bool no_select) EINA_ARG_NONNULL(1);
+   EAPI void               elm_gengrid_no_select_mode_set(Evas_Object *obj, Eina_Bool no_select) EINA_ARG_NONNULL(1);
 
    /**
     * Get whether items on a given gengrid widget can be selected or
@@ -8716,7 +8586,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE  EAPI Eina_Bool          elm_gengrid_no_select_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool          elm_gengrid_no_select_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Enable or disable multi-selection in a given gengrid widget
@@ -8774,7 +8644,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE  EAPI void               elm_gengrid_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce) EINA_ARG_NONNULL(1);
+   EAPI void               elm_gengrid_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce) EINA_ARG_NONNULL(1);
 
    /**
     * Get whether bouncing effects are enabled or disabled, for a
@@ -8790,7 +8660,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE  EAPI void               elm_gengrid_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce) EINA_ARG_NONNULL(1);
+   EAPI void               elm_gengrid_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce) EINA_ARG_NONNULL(1);
 
    /**
     * Set a given gengrid widget's scrolling page size, relative to
@@ -8824,7 +8694,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE  EAPI void               elm_gengrid_page_relative_set(Evas_Object *obj, double h_pagerel, double v_pagerel) EINA_ARG_NONNULL(1);
+   EAPI void               elm_gengrid_page_relative_set(Evas_Object *obj, double h_pagerel, double v_pagerel) EINA_ARG_NONNULL(1);
 
    /**
     * Get a given gengrid widget's scrolling page size, relative to
@@ -8840,7 +8710,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE  EAPI void               elm_gengrid_page_relative_get(const Evas_Object *obj, double *h_pagerel, double *v_pagerel) EINA_ARG_NONNULL(1);
+   EAPI void               elm_gengrid_page_relative_get(const Evas_Object *obj, double *h_pagerel, double *v_pagerel) EINA_ARG_NONNULL(1);
 
    /**
     * Set a given gengrid widget's scrolling page size
@@ -8920,7 +8790,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE EAPI Elm_Gengrid_Item  *elm_gengrid_first_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Gengrid_Item  *elm_gengrid_first_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Get the last item in a given gengrid widget
@@ -8936,7 +8806,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE EAPI Elm_Gengrid_Item  *elm_gengrid_last_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Gengrid_Item  *elm_gengrid_last_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Get the @b next item in a gengrid widget's internal list of items,
@@ -8953,7 +8823,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE EAPI Elm_Gengrid_Item  *elm_gengrid_item_next_get(const Elm_Gengrid_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Elm_Gengrid_Item  *elm_gengrid_item_next_get(const Elm_Gengrid_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Get the @b previous item in a gengrid widget's internal list of items,
@@ -8970,7 +8840,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE EAPI Elm_Gengrid_Item  *elm_gengrid_item_prev_get(const Elm_Gengrid_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Elm_Gengrid_Item  *elm_gengrid_item_prev_get(const Elm_Gengrid_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Get the gengrid object's handle which contains a given gengrid
@@ -8983,7 +8853,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE EAPI Evas_Object       *elm_gengrid_item_gengrid_get(const Elm_Gengrid_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object       *elm_gengrid_item_gengrid_get(const Elm_Gengrid_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Remove a gengrid item from its parent, deleting it.
@@ -9104,7 +8974,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE EAPI void elm_gengrid_item_selected_set(Elm_Gengrid_Item *item, Eina_Bool selected) EINA_ARG_NONNULL(1);
+   EAPI void               elm_gengrid_item_selected_set(Elm_Gengrid_Item *item, Eina_Bool selected) EINA_ARG_NONNULL(1);
 
    /**
     * Get whether a given gengrid item is selected or not
@@ -9118,7 +8988,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE EAPI Eina_Bool elm_gengrid_item_selected_get(const Elm_Gengrid_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool          elm_gengrid_item_selected_get(const Elm_Gengrid_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Get the real Evas object created to implement the view of a
@@ -9461,7 +9331,7 @@ extern "C" {
     *
     * @ingroup Gengrid
     */
-   WILL_DEPRECATE EAPI void elm_gengrid_clear(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void               elm_gengrid_clear(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Get the selected item in a given gengrid widget
@@ -9843,7 +9713,7 @@ extern "C" {
     * elm_object_content_set/get/unset functions to set, retrieve and unset 
     * objects as content of the @c SWALLOW. After being set to this part, the 
     * object size, position, visibility, clipping and other description 
-    * properties will be totally controlled by the description of the given part
+    * properties will be totally controled by the description of the given part 
     * (inside the Edje theme file).
     *
     * One can use @c evas_object_size_hint_* functions on the child to have some
@@ -9871,12 +9741,12 @@ extern "C" {
     * itself).
     *
     * A similar effect for having a box with its position, size and other things
-    * controlled by the Layout theme would be to create an Elementary @ref Box
+    * controled by the Layout theme would be to create an Elementary @ref Box
     * widget and add it as a Content in the @c SWALLOW part.
     *
     * The main difference of using the Layout Box is that its behavior, the box
     * properties like layouting format, padding, align, etc. will be all
-    * controlled by the theme. This means, for example, that a signal could be
+    * controled by the theme. This means, for example, that a signal could be
     * sent to the Layout theme (with elm_object_signal_emit()) and the theme
     * handled the signal by changing the box padding, or align, or both. Using
     * the Elementary @ref Box widget is not necessarily harder or easier, it
@@ -10010,7 +9880,7 @@ extern "C" {
     *
     * @ingroup Layout
     */
-   WILL_DEPRECATE EAPI void               elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI void               elm_layout_content_set(Evas_Object *obj, const char *swallow, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * Get the child object in the given content part.
     *
@@ -10023,7 +9893,7 @@ extern "C" {
     *
     * @ingroup Layout
     */
-   WILL_DEPRECATE EAPI Evas_Object       *elm_layout_content_get(const Evas_Object *obj, const char *swallow) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object       *elm_layout_content_get(const Evas_Object *obj, const char *swallow) EINA_ARG_NONNULL(1);
    /**
     * Unset the layout content.
     *
@@ -10037,7 +9907,7 @@ extern "C" {
     *
     * @ingroup Layout
     */
-   WILL_DEPRECATE EAPI Evas_Object       *elm_layout_content_unset(Evas_Object *obj, const char *swallow) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object       *elm_layout_content_unset(Evas_Object *obj, const char *swallow) EINA_ARG_NONNULL(1);
    /**
     * Set the text of the given part
     *
@@ -10162,7 +10032,7 @@ extern "C" {
     */
    EAPI Evas_Object       *elm_layout_box_remove(Evas_Object *obj, const char *part, Evas_Object *child) EINA_ARG_NONNULL(1, 2, 3);
    /**
-    * Remove all children of the given part box.
+    * Remove all child of the given part box.
     *
     * @param obj The layout object
     * @param part The box part name to remove child.
@@ -10233,7 +10103,7 @@ extern "C" {
     */
    EAPI Evas_Object       *elm_layout_table_unpack(Evas_Object *obj, const char *part, Evas_Object *child_obj) EINA_ARG_NONNULL(1, 2, 3);
    /**
-    * Remove all the child objects of the given part table.
+    * Remove all child of the given part table.
     *
     * @param obj The layout object
     * @param part The table part name to remove child.
@@ -10405,8 +10275,8 @@ extern "C" {
     *
     * @param obj The layout object.
     * @param part_name a part from loaded edje group.
-    * @param engine_only if cursors should be just provided by the engine (EINA_TRUE)
-    *        or should also search on widget's theme as well (EINA_FALSE)
+    * @param engine_only if cursors should be just provided by the engine
+    *        or should also search on widget's theme as well
     *
     * @return EINA_TRUE on success or EINA_FALSE on failure, that may be
     *         part not exists or it did not had a cursor set.
@@ -10429,7 +10299,7 @@ extern "C" {
 
 /**
  * @def elm_layout_icon_set
- * Convenience macro to set the icon object in a layout that follows the
+ * Convienience macro to set the icon object in a layout that follows the
  * Elementary naming convention for its parts.
  *
  * @ingroup Layout
@@ -10564,11 +10434,8 @@ extern "C" {
     * Once the content object is set, a previously set one will be deleted. If
     * you want to keep that old content object, use the
     * elm_notify_content_unset() function.
-    *
-    * @deprecated use elm_object_content_set() instead
-    *
     */
-   WILL_DEPRECATE  EAPI void              elm_notify_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI void              elm_notify_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the content of the notify widget
     *
@@ -10578,10 +10445,8 @@ extern "C" {
     * Unparent and return the content object which was set for this widget
     *
     * @see elm_notify_content_set()
-    * @deprecated use elm_object_content_unset() instead
-    *
     */
-   WILL_DEPRECATE  EAPI Evas_Object      *elm_notify_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object      *elm_notify_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Return the content of the notify widget
     *
@@ -10589,10 +10454,8 @@ extern "C" {
     * @return The content that is being used
     *
     * @see elm_notify_content_set()
-    * @deprecated use elm_object_content_get() instead
-    *
     */
-   WILL_DEPRECATE  EAPI Evas_Object      *elm_notify_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object      *elm_notify_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the notify parent
     *
@@ -10746,7 +10609,7 @@ extern "C" {
     * @brief Sets the target object for the hover.
     *
     * @param obj The hover object
-    * @param target The object to center the hover onto.
+    * @param target The object to center the hover onto. The hover
     *
     * This function will cause the hover to be centered on the target object.
     */
@@ -10755,7 +10618,7 @@ extern "C" {
     * @brief Gets the target object for the hover.
     *
     * @param obj The hover object
-    * @return The target object for the hover.
+    * @param parent The object to locate the hover over.
     *
     * @see elm_hover_target_set()
     */
@@ -10799,9 +10662,9 @@ extern "C" {
     * "smart". This is a special placement hint and its use case
     * independs of the calculations coming from
     * elm_hover_best_content_location_get(). Its use is for cases when
-    * one desires only one hover content, but with a dynamic special
+    * one desires only one hover content, but with a dinamic special
     * placement within the hover area. The content's geometry, whenever
-    * it changes, will be used to decide on a best location, not
+    * it changes, will be used to decide on a best location not
     * extrapolating the hover's parent object view to show it in (still
     * being the hover's target determinant of its medium part -- move and
     * resize it to simulate finger sizes, for example). If one of the
@@ -10966,8 +10829,8 @@ extern "C" {
     * @li full: Items will be placed between the descent and ascent, or the
     * lowest point in the line and its highest.
     *
-    * The next image shows different configurations of items and how
-    * the previously mentioned options affect their sizes. In all cases,
+    * The next image shows different configurations of items and how they
+    * are the previously mentioned options affect their sizes. In all cases,
     * the green line indicates the ascent, blue for the baseline and red for
     * the descent.
     *
@@ -11240,45 +11103,6 @@ extern "C" {
     * @return The selected text within the entry or NULL on failure
     */
    EAPI const char  *elm_entry_selection_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Returns the actual textblock object of the entry.
-    *
-    * This function exposes the internal textblock object that actually
-    * contains and draws the text. This should be used for low-level
-    * manipulations that are otherwise not possible.
-    *
-    * Changing the textblock directly from here will not notify edje/elm to
-    * recalculate the textblock size automatically, so any modifications
-    * done to the textblock returned by this function should be followed by
-    * a call to elm_entry_calc_force().
-    *
-    * The return value is marked as const as an additional warning.
-    * One should not use the returned object with any of the generic evas
-    * functions (geometry_get/resize/move and etc), but only with the textblock
-    * functions; The former will either not work at all, or break the correct
-    * functionality.
-    *
-    * IMPORTANT: Many functions may change (i.e delete and create a new one)
-    * the internal textblock object. Do NOT cache the returned object, and try
-    * not to mix calls on this object with regular elm_entry calls (which may
-    * change the internal textblock object). This applies to all cursors
-    * returned from textblock calls, and all the other derivative values.
-    *
-    * @param obj The entry object
-    * @return The textblock object.
-    */
-   EAPI const Evas_Object *elm_entry_textblock_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Forces calculation of the entry size and text layouting.
-    *
-    * This should be used after modifying the textblock object directly. See
-    * elm_entry_textblock_get() for more information.
-    *
-    * @param obj The entry object
-    *
-    * @see elm_entry_textblock_get()
-    */
-   EAPI void elm_entry_calc_force(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Inserts the given text into the entry at the current cursor position.
     *
@@ -11707,47 +11531,6 @@ extern "C" {
     * @see elm_entry_file_set()
     */
    EAPI Eina_Bool    elm_entry_autosave_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-
-   /**
-    * @enum _Elm_CNP_Mode
-    * @typedef Elm_CNP_Mode
-    * Enum of entry's copy & paste policy.
-    *
-    * @see elm_entry_cnp_mode_set()
-    * @see elm_entry_cnp_mode_get()
-    */
-   typedef enum _Elm_CNP_Mode {
-      ELM_CNP_MODE_MARKUP = 0,       /**< copy & paste text with markup tag */
-      ELM_CNP_MODE_NO_IMAGE = 1,     /**< copy & paste text without item(image) tag */
-      ELM_CNP_MODE_PLAINTEXT = 2     /**< copy & paste text without markup tag */
-   } Elm_CNP_Mode;
-
-   /**
-    * Control pasting of text and images for the widget.
-    *
-    * Normally the entry allows both text and images to be pasted.
-    * By setting textonly to be ELM_CNP_MODE_NO_IMAGE, this prevents images from being copy or past.
-    * By setting textonly to be ELM_CNP_MODE_PLAINTEXT, this remove all tags in text .
-    *
-    * @note this only changes the behaviour of text.
-    *
-    * @param obj The entry object
-    * @param mode One of #Elm_CNP_Mode: #ELM_CNP_MODE_MARKUP,
-    * #ELM_CNP_MODE_NO_IMAGE, #ELM_CNP_MODE_PLAINTEXT.
-    */
-   EAPI void         elm_entry_cnp_mode_set(Evas_Object *obj, Elm_CNP_Mode cnp_mode) EINA_ARG_NONNULL(1);
-   /**
-    * Getting elm_entry text paste/drop mode.
-    *
-    * Normally the entry allows both text and images to be pasted.
-    * This gets the copy & paste mode of the entry.
-    *
-    * @param obj The entry object
-    * @return mode One of #Elm_CNP_Mode: #ELM_CNP_MODE_MARKUP,
-    * #ELM_CNP_MODE_NO_IMAGE, #ELM_CNP_MODE_PLAINTEXT.
-    */
-   EAPI Elm_CNP_Mode elm_entry_cnp_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-
    /**
     * Control pasting of text and images for the widget.
     *
@@ -12615,11 +12398,8 @@ extern "C" {
     * @param content The given content of the bubble
     *
     * This function sets the content shown on the middle of the bubble.
-    * 
-    * @deprecated use elm_object_content_set() instead
-    *
     */
-   WILL_DEPRECATE  EAPI void         elm_bubble_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI void         elm_bubble_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * Get the content shown in the bubble
     *
@@ -12627,11 +12407,8 @@ extern "C" {
     *
     * @param obj The bubble object
     * @return The content that is being used
-    *
-    * @deprecated use elm_object_content_get() instead
-    *
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_bubble_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_bubble_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Unset the content shown in the bubble
     *
@@ -12639,11 +12416,8 @@ extern "C" {
     *
     * @param obj The bubble object
     * @return The content that was being used
-    *
-    * @deprecated use elm_object_content_unset() instead
-    *
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_bubble_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_bubble_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Set the icon of the bubble
     *
@@ -13576,7 +13350,7 @@ extern "C" {
     */
    typedef enum _Elm_Web_Zoom_Mode
      {
-        ELM_WEB_ZOOM_MODE_MANUAL = 0, /**< Zoom controlled normally by elm_web_zoom_set */
+        ELM_WEB_ZOOM_MODE_MANUAL = 0, /**< Zoom controled normally by elm_web_zoom_set */
         ELM_WEB_ZOOM_MODE_AUTO_FIT, /**< Zoom until content fits in web object */
         ELM_WEB_ZOOM_MODE_AUTO_FILL, /**< Zoom until content fills web object */
         ELM_WEB_ZOOM_MODE_LAST
@@ -17155,6 +16929,7 @@ extern "C" {
     * @ingroup List
     */
    EAPI void             elm_list_item_end_set(Elm_List_Item *item, Evas_Object *end) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object     *elm_list_item_base_get(const Elm_List_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Gets the base object of the item.
@@ -17167,7 +16942,6 @@ extern "C" {
     * @ingroup List
     */
    EAPI Evas_Object     *elm_list_item_object_get(const Elm_List_Item *item) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI Evas_Object     *elm_list_item_base_get(const Elm_List_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Get the label of item.
@@ -17598,7 +17372,7 @@ extern "C" {
     * @ingroup Slider
     * @deprecated use elm_object_text_get() instead.
     */
-   WILL_DEPRECATE  EAPI const char        *elm_slider_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI const char        *elm_slider_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the icon object of the slider object.
@@ -17619,7 +17393,7 @@ extern "C" {
     * @ingroup Slider
     * @deprecated use elm_object_part_content_set() instead.
     */
-   WILL_DEPRECATE  EAPI void               elm_slider_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI void               elm_slider_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
 
    /**
     * Unset an icon set on a given slider widget.
@@ -17640,7 +17414,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   WILL_DEPRECATE  EAPI Evas_Object       *elm_slider_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object       *elm_slider_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Retrieve the icon object set for a given slider widget.
@@ -17659,7 +17433,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   WILL_DEPRECATE  EAPI Evas_Object       *elm_slider_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object       *elm_slider_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the end object of the slider object.
@@ -17681,7 +17455,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   WILL_DEPRECATE  EAPI void               elm_slider_end_set(Evas_Object *obj, Evas_Object *end) EINA_ARG_NONNULL(1);
+   EAPI void               elm_slider_end_set(Evas_Object *obj, Evas_Object *end) EINA_ARG_NONNULL(1);
 
    /**
     * Unset an end object set on a given slider widget.
@@ -17704,7 +17478,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   WILL_DEPRECATE  EAPI Evas_Object       *elm_slider_end_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object       *elm_slider_end_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Retrieve the end object set for a given slider widget.
@@ -17725,7 +17499,7 @@ extern "C" {
     *
     * @ingroup Slider
     */
-   WILL_DEPRECATE  EAPI Evas_Object       *elm_slider_end_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object       *elm_slider_end_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the (exact) length of the bar region of a given slider widget.
@@ -18278,7 +18052,7 @@ extern "C" {
     *   theme. It must return @c NULL, when no content is desired, or a valid
     *   object handle, otherwise.  The object will be deleted by the genlist on
     *   its deletion or when the item is "unrealized".  See
-    *   #Elm_Genlist_Item_Content_Get_Cb.
+    *   #Elm_Genlist_Item_Icon_Get_Cb.
     * - @c func.state_get - The @c part parameter is the name string of one of
     *   the state parts in the Edje group implementing the item's theme. Return
     *   @c EINA_FALSE for false/off or @c EINA_TRUE for true/on. Genlists will
@@ -18377,7 +18151,7 @@ extern "C" {
     * If the application wants multiple items to be able to be selected,
     * elm_genlist_multi_select_set() can enable this. If the list is
     * single-selection only (the default), then elm_genlist_selected_item_get()
-    * will return the selected item, if any, or NULL if none is selected. If the
+    * will return the selected item, if any, or NULL I none is selected. If the
     * list is multi-select then elm_genlist_selected_items_get() will return a
     * list (that is only valid as long as no items are modified (added, deleted,
     * selected or unselected)).
@@ -18634,13 +18408,11 @@ extern "C" {
     *
     * This removes (and deletes) all items in @p obj, leaving it empty.
     *
-    * This is deprecated. Please use elm_gen_clear() instead.
-    * 
     * @see elm_genlist_item_del(), to remove just one item.
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI void elm_genlist_clear(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void elm_genlist_clear(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Enable or disable multi-selection in the genlist
     *
@@ -18709,17 +18481,15 @@ extern "C" {
     *
     * Items will only call their selection func and callback when first
     * becoming selected. Any further clicks will do nothing, unless you
-    * enable always select with elm_gen_always_select_mode_set().
+    * enable always select with elm_genlist_always_select_mode_set().
     * This means that, even if selected, every click will make the selected
     * callbacks be called.
-    * 
-    * This function is deprecated. please see elm_gen_always_select_mode_set()
     *
     * @see elm_genlist_always_select_mode_get()
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI void              elm_genlist_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select) EINA_ARG_NONNULL(1);
+   EAPI void              elm_genlist_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select) EINA_ARG_NONNULL(1);
    /**
     * Get the always select mode.
     *
@@ -18731,7 +18501,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI Eina_Bool         elm_genlist_always_select_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool         elm_genlist_always_select_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Enable/disable the no select mode.
     *
@@ -18746,7 +18516,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI void              elm_genlist_no_select_mode_set(Evas_Object *obj, Eina_Bool no_select) EINA_ARG_NONNULL(1);
+   EAPI void              elm_genlist_no_select_mode_set(Evas_Object *obj, Eina_Bool no_select) EINA_ARG_NONNULL(1);
    /**
     * Gets whether the no select mode is enabled.
     *
@@ -18758,7 +18528,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI Eina_Bool         elm_genlist_no_select_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool         elm_genlist_no_select_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Enable/disable compress mode.
     *
@@ -18840,7 +18610,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI void              elm_genlist_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce) EINA_ARG_NONNULL(1);
+   EAPI void              elm_genlist_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce) EINA_ARG_NONNULL(1);
    /**
     * Get whether the horizontal and vertical bouncing effect is enabled.
     *
@@ -18854,7 +18624,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI void              elm_genlist_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce) EINA_ARG_NONNULL(1);
+   EAPI void              elm_genlist_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce) EINA_ARG_NONNULL(1);
    /**
     * Enable/disable homogenous mode.
     *
@@ -19172,7 +18942,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI Elm_Genlist_Item *elm_genlist_first_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Genlist_Item *elm_genlist_first_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Get the last item in the genlist
     *
@@ -19182,7 +18952,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI Elm_Genlist_Item *elm_genlist_last_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Genlist_Item *elm_genlist_last_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * Set the scrollbar policy
     *
@@ -19230,7 +19000,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI Elm_Genlist_Item  *elm_genlist_item_next_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Elm_Genlist_Item  *elm_genlist_item_next_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
    /**
     * Get the @b previous item in a genlist widget's internal list of items,
     * given a handle to one of those items.
@@ -19246,7 +19016,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI Elm_Genlist_Item  *elm_genlist_item_prev_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Elm_Genlist_Item  *elm_genlist_item_prev_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
    /**
     * Get the genlist object's handle which contains a given genlist
     * item
@@ -19256,11 +19026,9 @@ extern "C" {
     *
     * This returns the genlist object itself that an item belongs to.
     *
-    * This function is deprecated. Please use elm_gen_item_widget_get()
-    * 
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI Evas_Object       *elm_genlist_item_genlist_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object       *elm_genlist_item_genlist_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
    /**
     * Get the parent item of the given item
     *
@@ -19303,7 +19071,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI void elm_genlist_item_selected_set(Elm_Genlist_Item *item, Eina_Bool selected) EINA_ARG_NONNULL(1);
+   EAPI void elm_genlist_item_selected_set(Elm_Genlist_Item *item, Eina_Bool selected) EINA_ARG_NONNULL(1);
    /**
     * Get whether a given genlist item is selected or not
     *
@@ -19314,7 +19082,7 @@ extern "C" {
     *
     * @ingroup Genlist
     */
-   WILL_DEPRECATE  EAPI Eina_Bool elm_genlist_item_selected_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool elm_genlist_item_selected_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
    /**
     * Sets the expanded state of an item.
     *
@@ -19577,7 +19345,7 @@ extern "C" {
     * @ingroup Genlist
     */
    EAPI void               elm_genlist_item_contents_orphan(Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
-   WILL_DEPRECATE  EAPI void               elm_genlist_item_icons_orphan(Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
+   EAPI void               elm_genlist_item_icons_orphan(Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
    /**
     * Get the real Evas object created to implement the view of a
     * given genlist item
@@ -19727,26 +19495,6 @@ extern "C" {
     * @ingroup Genlist
     */
    EAPI const char        *elm_genlist_item_tooltip_style_get(const Elm_Genlist_Item *item) EINA_ARG_NONNULL(1);
-   /**
-    * @brief Disable size restrictions on an object's tooltip
-    * @param item The tooltip's anchor object
-    * @param disable If EINA_TRUE, size restrictions are disabled
-    * @return EINA_FALSE on failure, EINA_TRUE on success
-    *
-    * This function allows a tooltip to expand beyond its parant window's canvas.
-    * It will instead be limited only by the size of the display.
-    */
-   EAPI Eina_Bool          elm_genlist_item_tooltip_size_restrict_disable(Elm_Genlist_Item *item, Eina_Bool disable);
-   /**
-    * @brief Retrieve size restriction state of an object's tooltip
-    * @param item The tooltip's anchor object
-    * @return If EINA_TRUE, size restrictions are disabled
-    *
-    * This function returns whether a tooltip is allowed to expand beyond
-    * its parant window's canvas.
-    * It will instead be limited only by the size of the display.
-    */
-   EAPI Eina_Bool          elm_genlist_item_tooltip_size_restrict_disabled_get(const Elm_Genlist_Item *item);
    /**
     * Set the type of mouse pointer/cursor decoration to be shown,
     * when the mouse pointer is over the given genlist widget item
@@ -20267,7 +20015,7 @@ extern "C" {
     * @deprecated use elm_object_part_content_set() instead.
     *
     */
-   WILL_DEPRECATE  EAPI void         elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI void         elm_radio_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the icon object of the radio object
     *
@@ -20279,7 +20027,7 @@ extern "C" {
     * @deprecated use elm_object_part_content_get() instead.
     *
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_radio_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_radio_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the icon used for the radio object
     *
@@ -20292,7 +20040,7 @@ extern "C" {
     * @deprecated use elm_object_part_content_unset() instead.
     *
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_radio_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_radio_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Add this radio to a group of other radio objects
     *
@@ -20366,47 +20114,37 @@ extern "C" {
     * @image html img/widget/pager/preview-00.png
     * @image latex img/widget/pager/preview-00.eps
     *
-    * @brief Widget that allows flipping between one or more “pages”
-    * of objects.
+    * @brief Widget that allows flipping between 1 or more “pages” of objects.
     *
-    * The flipping between pages of objects is animated. All content
-    * in the pager is kept in a stack, being the last content added
-    * (visible one) on the top of that stack.
+    * The flipping between “pages” of objects is animated. All content in pager
+    * is kept in a stack, the last content to be added will be on the top of the
+    * stack(be visible).
     *
-    * Objects can be pushed or popped from the stack or deleted as
-    * well. Pushes and pops will animate the widget accordingly to its
-    * style (a pop will also delete the child object once the
-    * animation is finished). Any object already in the pager can be
-    * promoted to the top (from its current stacking position) through
-    * the use of elm_pager_content_promote(). New objects are pushed
-    * to the top with elm_pager_content_push(). When the top item is
-    * no longer wanted, simply pop it with elm_pager_content_pop() and
-    * it will also be deleted. If an object is no longer needed and is
-    * not the top item, just delete it as normal. You can query which
-    * objects are the top and bottom with
+    * Objects can be pushed or popped from the stack or deleted as normal.
+    * Pushes and pops will animate (and a pop will delete the object once the
+    * animation is finished). Any object already in the pager can be promoted to
+    * the top(from its current stacking position) through the use of
+    * elm_pager_content_promote(). Objects are pushed to the top with
+    * elm_pager_content_push() and when the top item is no longer wanted, simply
+    * pop it with elm_pager_content_pop() and it will also be deleted. If an
+    * object is no longer needed and is not the top item, just delete it as
+    * normal. You can query which objects are the top and bottom with
     * elm_pager_content_bottom_get() and elm_pager_content_top_get().
     *
     * Signals that you can add callbacks for are:
-    * - @c "show,finished" - when a new page is actually shown on the top
-    * - @c "hide,finished" - when a previous page is hidden
-    *
-    * Only after the first of that signals the child object is
-    * guaranteed to be visible, as in @c evas_object_visible_get().
+    * "hide,finished" - when the previous page is hided
     *
     * This widget has the following styles available:
-    * - @c "default"
-    * - @c "fade"
-    * - @c "fade_translucide"
-    * - @c "fade_invisible"
-    *
-    * @note These styles affect only the flipping animations on the
-    * default theme; the appearance when not animating is unaffected
-    * by them.
+    * @li default
+    * @li fade
+    * @li fade_translucide
+    * @li fade_invisible
+    * @note This styles affect only the flipping animations, the appearance when
+    * not animating is unaffected by styles.
     *
     * @ref tutorial_pager gives a good overview of the usage of the API.
     * @{
     */
-
    /**
     * Add a new pager to the parent
     *
@@ -20416,7 +20154,6 @@ extern "C" {
     * @ingroup Pager
     */
    EAPI Evas_Object *elm_pager_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-
    /**
     * @brief Push an object to the top of the pager stack (and show it).
     *
@@ -20432,7 +20169,6 @@ extern "C" {
     * undefined behavior.
     */
    EAPI void         elm_pager_content_push(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
-
    /**
     * @brief Pop the object that is on top of the stack
     *
@@ -20443,7 +20179,6 @@ extern "C" {
     * the stack will become visible.
     */
    EAPI void         elm_pager_content_pop(Evas_Object *obj) EINA_ARG_NONNULL(1);
-
    /**
     * @brief Moves an object already in the pager stack to the top of the stack.
     *
@@ -20459,7 +20194,6 @@ extern "C" {
     * results in undefined behavior.
     */
    EAPI void         elm_pager_content_promote(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
-
    /**
     * @brief Return the object at the bottom of the pager stack
     *
@@ -20467,7 +20201,6 @@ extern "C" {
     * @return The bottom object or NULL if none
     */
    EAPI Evas_Object *elm_pager_content_bottom_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-
    /**
     * @brief  Return the object at the top of the pager stack
     *
@@ -21534,7 +21267,7 @@ extern "C" {
     *
     * @ingroup Progressbar
     */
-   WILL_DEPRECATE  EAPI void         elm_progressbar_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI void         elm_progressbar_icon_set(Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
 
    /**
     * Retrieve the icon object set for a given progress bar widget
@@ -21548,7 +21281,7 @@ extern "C" {
     *
     * @ingroup Progressbar
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_progressbar_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_progressbar_icon_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Unset an icon set on a given progress bar widget
@@ -21565,7 +21298,7 @@ extern "C" {
     *
     * @ingroup Progressbar
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_progressbar_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_progressbar_icon_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set the (exact) length of the bar region of a given progress bar
@@ -22989,6 +22722,28 @@ extern "C" {
     */
    EAPI void                  elm_map_geo_region_get(const Evas_Object *obj, double *lon, double *lat) EINA_ARG_NONNULL(1);
 
+
+   /**
+    * @brief Disable size restrictions on an object's tooltip
+    * @param item The tooltip's anchor object
+    * @param disable If EINA_TRUE, size restrictions are disabled
+    * @return EINA_FALSE on failure, EINA_TRUE on success
+    *
+    * This function allows a tooltip to expand beyond its parant window's canvas.
+    * It will instead be limited only by the size of the display.
+    */
+   EAPI Eina_Bool        elm_list_item_tooltip_size_restrict_disable(Elm_List_Item *item, Eina_Bool disable) EINA_ARG_NONNULL(1);
+   /**
+    * @brief Retrieve size restriction state of an object's tooltip
+    * @param obj The tooltip's anchor object
+    * @return If EINA_TRUE, size restrictions are disabled
+    *
+    * This function returns whether a tooltip is allowed to expand beyond
+    * its parant window's canvas.
+    * It will instead be limited only by the size of the display.
+    */
+   EAPI Eina_Bool        elm_list_item_tooltip_size_restrict_disabled_get(const Elm_List_Item *item) EINA_ARG_NONNULL(1);
+
    /**
     * Animatedly bring in given coordinates to the center of the map.
     *
@@ -24188,11 +23943,8 @@ extern "C" {
     * Once the content object is set, a previously set one will be deleted.
     * If you want to keep that old content object, use the
     * elm_panel_content_unset() function.
-    *
-    * @deprecated use elm_object_content_set() instead
-    *
     */
-   WILL_DEPRECATE  EAPI void                  elm_panel_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI void                  elm_panel_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the content of the panel.
     *
@@ -24202,11 +23954,8 @@ extern "C" {
     * Return the content object which is set for this widget.
     *
     * @see elm_panel_content_set()
-    * 
-    * @deprecated use elm_object_content_get() instead
-    *
     */
-   WILL_DEPRECATE  EAPI Evas_Object          *elm_panel_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object          *elm_panel_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Unset the content of the panel.
     *
@@ -24216,11 +23965,8 @@ extern "C" {
     * Unparent and return the content object which was set for this widget.
     *
     * @see elm_panel_content_set()
-    *
-    * @deprecated use elm_object_content_unset() instead
-    *
     */
-   WILL_DEPRECATE  EAPI Evas_Object          *elm_panel_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object          *elm_panel_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the state of the panel.
     *
@@ -24408,7 +24154,7 @@ extern "C" {
     *
     * @ingroup Panes
     */
-   WILL_DEPRECATE  EAPI Evas_Object          *elm_panes_content_right_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object          *elm_panes_content_right_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Get the size proportion of panes widget's left side.
@@ -24892,11 +24638,9 @@ extern "C" {
     * @see elm_object_content_unset()
     * @see elm_object_content_get()
     *
-    * @deprecated use elm_object_content_set() instead
-    *
     * @ingroup Conformant
     */
-   WILL_DEPRECATE  EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
 
    /**
     * Get the content of the conformant widget.
@@ -24911,11 +24655,9 @@ extern "C" {
     * @see elm_object_content_set().
     * @see elm_object_content_unset()
     *
-    * @deprecated use elm_object_content_get() instead
-    *
     * @ingroup Conformant
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_conformant_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_conformant_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Unset the content of the conformant widget.
@@ -24927,11 +24669,9 @@ extern "C" {
     *
     * @see elm_object_content_set().
     *
-    * @deprecated use elm_object_content_unset() instead
-    *
     * @ingroup Conformant
     */
-   EINA_DEPRECATED EAPI Evas_Object *elm_conformant_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_conformant_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Returns the Evas_Object that represents the content area.
@@ -25000,11 +24740,9 @@ extern "C" {
     *
     * To enable map, elm_mapbuf_enabled_set() should be used.
     *
-    * @deprecated use elm_object_content_set() instead
-    *
     * @ingroup Mapbuf
     */
-   WILL_DEPRECATE  EAPI void         elm_mapbuf_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
+   EAPI void         elm_mapbuf_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1);
 
    /**
     * Get the content of the mapbuf.
@@ -25016,11 +24754,9 @@ extern "C" {
     *
     * @see elm_mapbuf_content_set() for details.
     *
-    * @deprecated use elm_object_content_get() instead
-    *
     * @ingroup Mapbuf
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_mapbuf_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_mapbuf_content_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Unset the content of the mapbuf.
@@ -25032,11 +24768,9 @@ extern "C" {
     *
     * @see elm_mapbuf_content_set() for details.
     *
-    * @deprecated use elm_object_content_unset() instead
-    *
     * @ingroup Mapbuf
     */
-   WILL_DEPRECATE  EAPI Evas_Object *elm_mapbuf_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object *elm_mapbuf_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Enable or disable the map.
@@ -25182,6 +24916,8 @@ extern "C" {
     * @{
     */
 
+   typedef struct _Elm_Flipselector_Item Elm_Flipselector_Item; /**< Item handle for a flip selector widget. */
+
    /**
     * Add a new flip selector widget to the given parent Elementary
     * (container) widget
@@ -25246,7 +24982,7 @@ extern "C" {
     *
     * @ingroup Flipselector
     */
-   EAPI Elm_Object_Item     *elm_flipselector_item_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, void *data) EINA_ARG_NONNULL(1);
+   EAPI Elm_Flipselector_Item     *elm_flipselector_item_append(Evas_Object *obj, const char *label, Evas_Smart_Cb func, void *data) EINA_ARG_NONNULL(1);
 
    /**
     * Prepend a (text) item to a flip selector widget
@@ -25272,19 +25008,19 @@ extern "C" {
     *
     * @ingroup Flipselector
     */
-   EAPI Elm_Object_Item     *elm_flipselector_item_prepend(Evas_Object *obj, const char *label, Evas_Smart_Cb func, void *data) EINA_ARG_NONNULL(1);
+   EAPI Elm_Flipselector_Item     *elm_flipselector_item_prepend(Evas_Object *obj, const char *label, Evas_Smart_Cb func, void *data) EINA_ARG_NONNULL(1);
 
    /**
     * Get the internal list of items in a given flip selector widget.
     *
     * @param obj The flipselector object
-    * @return The list of items (#Elm_Object_Item as data) or
+    * @return The list of items (#Elm_Flipselector_Item as data) or
     * @c NULL on errors.
     *
     * This list is @b not to be modified in any way and must not be
     * freed. Use the list members with functions like
-    * elm_object_item_text_set(),
-    * elm_object_item_text_get(),
+    * elm_flipselector_item_label_set(),
+    * elm_flipselector_item_label_get(),
     * elm_flipselector_item_del(),
     * elm_flipselector_item_selected_get(),
     * elm_flipselector_item_selected_set().
@@ -25310,7 +25046,7 @@ extern "C" {
     *
     * @ingroup Flipselector
     */
-   EAPI Elm_Object_Item     *elm_flipselector_first_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Flipselector_Item     *elm_flipselector_first_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Get the last item in the given flip selector widget's list of
@@ -25325,7 +25061,7 @@ extern "C" {
     *
     * @ingroup Flipselector
     */
-   EAPI Elm_Object_Item     *elm_flipselector_last_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Flipselector_Item     *elm_flipselector_last_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Get the currently selected item in a flip selector widget.
@@ -25336,13 +25072,13 @@ extern "C" {
     *
     * @ingroup Flipselector
     */
-   EAPI Elm_Object_Item     *elm_flipselector_selected_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Elm_Flipselector_Item     *elm_flipselector_selected_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * Set whether a given flip selector widget's item should be the
     * currently selected one.
     *
-    * @param it The flip selector item
+    * @param item The flip selector item
     * @param selected @c EINA_TRUE to select it, @c EINA_FALSE to unselect.
     *
     * This sets whether @p item is or not the selected (thus, under
@@ -25355,13 +25091,13 @@ extern "C" {
     *
     * @ingroup Flipselector
     */
-   EAPI void                       elm_flipselector_item_selected_set(Elm_Object_Item *it, Eina_Bool selected) EINA_ARG_NONNULL(1);
+   EAPI void                       elm_flipselector_item_selected_set(Elm_Flipselector_Item *item, Eina_Bool selected) EINA_ARG_NONNULL(1);
 
    /**
     * Get whether a given flip selector widget's item is the currently
     * selected one.
     *
-    * @param it The flip selector item
+    * @param item The flip selector item
     * @return @c EINA_TRUE, if it's selected, @c EINA_FALSE otherwise
     * (or on errors).
     *
@@ -25369,48 +25105,46 @@ extern "C" {
     *
     * @ingroup Flipselector
     */
-   EAPI Eina_Bool                  elm_flipselector_item_selected_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool                  elm_flipselector_item_selected_get(const Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Delete a given item from a flip selector widget.
     *
-    * @param it The item to delete
+    * @param item The item to delete
     *
     * @ingroup Flipselector
     */
-   EAPI void                       elm_flipselector_item_del(Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   EAPI void                       elm_flipselector_item_del(Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Get the label of a given flip selector widget's item.
     *
-    * @param it The item to get label from
+    * @param item The item to get label from
     * @return The text label of @p item or @c NULL, on errors
     *
-    * @see elm_object_item_text_set()
+    * @see elm_flipselector_item_label_set()
     *
-    * @deprecated see elm_object_item_text_get() instead
     * @ingroup Flipselector
     */
-   EINA_DEPRECATED EAPI const char                *elm_flipselector_item_label_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   EAPI const char                *elm_flipselector_item_label_get(const Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Set the label of a given flip selector widget's item.
     *
-    * @param it The item to set label on
+    * @param item The item to set label on
     * @param label The text label string, in UTF-8 encoding
     *
-    * @see elm_object_item_text_get()
+    * @see elm_flipselector_item_label_get()
     *
-	 * @deprecated see elm_object_item_text_set() instead
     * @ingroup Flipselector
     */
-   EINA_DEPRECATED EAPI void                       elm_flipselector_item_label_set(Elm_Object_Item *it, const char *label) EINA_ARG_NONNULL(1);
+   EAPI void                       elm_flipselector_item_label_set(Elm_Flipselector_Item *item, const char *label) EINA_ARG_NONNULL(1);
 
    /**
     * Gets the item before @p item in a flip selector widget's
     * internal list of items.
     *
-    * @param it The item to fetch previous from
+    * @param item The item to fetch previous from
     * @return The item before the @p item, in its parent's list. If
     *         there is no previous item for @p item or there's an
     *         error, @c NULL is returned.
@@ -25419,13 +25153,13 @@ extern "C" {
     *
     * @ingroup Flipselector
     */
-   EAPI Elm_Object_Item     *elm_flipselector_item_prev_get(Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   EAPI Elm_Flipselector_Item     *elm_flipselector_item_prev_get(Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Gets the item after @p item in a flip selector widget's
     * internal list of items.
     *
-    * @param it The item to fetch next from
+    * @param item The item to fetch next from
     * @return The item after the @p item, in its parent's list. If
     *         there is no next item for @p item or there's an
     *         error, @c NULL is returned.
@@ -25434,7 +25168,7 @@ extern "C" {
     *
     * @ingroup Flipselector
     */
-   EAPI Elm_Object_Item     *elm_flipselector_item_next_get(Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   EAPI Elm_Flipselector_Item     *elm_flipselector_item_next_get(Elm_Flipselector_Item *item) EINA_ARG_NONNULL(1);
 
    /**
     * Set the interval on time updates for an user mouse button hold
@@ -26820,12 +26554,6 @@ extern "C" {
     * Default contents parts of the ctxpopup widget that you can use for are:
     * @li "default" - A content of the ctxpopup
     *
-    * Default contents parts of the naviframe items that you can use for are:
-    * @li "icon" - A icon in the title area
-    * 
-    * Default text parts of the naviframe items that you can use for are:
-    * @li "default" - Title label in the title area
-    *
     * @ref tutorial_ctxpopup shows the usage of a good deal of the API.
     * @{
     */
@@ -26926,9 +26654,8 @@ extern "C" {
     * @param disabled @c EINA_TRUE to disable it, @c EINA_FALSE to enable it
     *
     * When disabled the item is greyed out to indicate it's state.
-    * @deprecated use elm_object_item_disabled_set() instead
     */
-   WILL_DEPRECATE  EAPI void          elm_ctxpopup_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled) EINA_ARG_NONNULL(1);
+   EAPI void          elm_ctxpopup_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the ctxpopup item's disabled/enabled state.
     *
@@ -26948,10 +26675,8 @@ extern "C" {
     *
     * @see elm_ctxpopup_item_append()
     * @see elm_ctxpopup_item_icon_set()
-    *
-    * @deprecated use elm_object_item_part_content_get() instead
     */
-   WILL_DEPRECATE  EAPI Evas_Object  *elm_ctxpopup_item_icon_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object  *elm_ctxpopup_item_icon_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
     * @brief Sets the side icon associated with the ctxpopup item
     *
@@ -26963,11 +26688,8 @@ extern "C" {
     * dissapear from the first item.
     *
     * @see elm_ctxpopup_item_append()
-    *  
-    * @deprecated use elm_object_item_part_content_set() instead
-    *
     */
-   WILL_DEPRECATE  EAPI void          elm_ctxpopup_item_icon_set(Elm_Object_Item *it, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI void          elm_ctxpopup_item_icon_set(Elm_Object_Item *it, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
     * @brief Get the label for the given ctxpopup item.
     *
@@ -26977,19 +26699,15 @@ extern "C" {
     *
     * @see elm_ctxpopup_item_append()
     * @see elm_ctxpopup_item_label_set()
-    *
-    * @deprecated use elm_object_item_text_get() instead
     */
-   WILL_DEPRECATE  EAPI const char   *elm_ctxpopup_item_label_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+   EAPI const char   *elm_ctxpopup_item_label_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
    /**
     * @brief (Re)set the label on the given ctxpopup item.
     *
     * @param it Ctxpopup item
     * @param label String to set as label
-    *
-    * @deprecated use elm_object_item_text_set() instead
     */
-   WILL_DEPRECATE  EAPI void          elm_ctxpopup_item_label_set(Elm_Object_Item *it, const char *label) EINA_ARG_NONNULL(1);
+   EAPI void          elm_ctxpopup_item_label_set(Elm_Object_Item *it, const char *label) EINA_ARG_NONNULL(1);
    /**
     * @brief Set an elm widget as the content of the ctxpopup.
     *
@@ -27000,13 +26718,12 @@ extern "C" {
     * you want to keep that old content object, use the
     * elm_ctxpopup_content_unset() function.
     *
+    * @deprecated use elm_object_content_set()
+    *
     * @warning Ctxpopup can't hold both a item list and a content at the same
     * time. When a content is set, any previous items will be removed.
-    * 
-    * @deprecated use elm_object_content_set() instead
-    *
     */
-   WILL_DEPRECATE  EAPI void          elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1, 2);
+   EAPI void          elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content) EINA_ARG_NONNULL(1, 2);
    /**
     * @brief Unset the ctxpopup content
     *
@@ -27018,11 +26735,8 @@ extern "C" {
     * @deprecated use elm_object_content_unset()
     *
     * @see elm_ctxpopup_content_set()
-    *
-    * @deprecated use elm_object_content_unset() instead
-    *
     */
-   WILL_DEPRECATE  EAPI Evas_Object  *elm_ctxpopup_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object  *elm_ctxpopup_content_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the direction priority of a ctxpopup.
     *
@@ -27991,95 +27705,18 @@ extern "C" {
 #define ELM_STORE_ITEM_MAPPING_END { ELM_STORE_ITEM_MAPPING_NONE, NULL, 0, { .empty = { EINA_TRUE } } }
 #define ELM_STORE_ITEM_MAPPING_OFFSET(st, it) offsetof(st, it)
 
-   /**
-    * dbsystem Store object
-    *
-    * @addtogroup DBStore
-    * @{
-    *
-    * @return The new object or NULL if it cannot be created
-    */
    EAPI Elm_Store              *elm_store_dbsystem_new(void);
-   /**
-    * Sets the item count of a store
-    *
-    * @param st The store object
-    * @param count The item count of an store
-    */
    EAPI void                    elm_store_item_count_set(Elm_Store *st, int count) EINA_ARG_NONNULL(1);
-   /**
-    * Set the select func that select the state of a list item whether true or false
-    *
-    * @param st The store object
-    * @param func The select cb function of an store
-    * @param data The new data pointer to set
-    */
    EAPI void                    elm_store_item_select_func_set(Elm_Store *st, Elm_Store_Item_Select_Cb func, const void *data) EINA_ARG_NONNULL(1);
-   /**
-    * Sets the sort func that sort the item with a next in the list
-    *
-    * @param st The store object
-    * @param func The sort cb function of an store
-    * @param data The new data pointer to set
-    */
    EAPI void                    elm_store_item_sort_func_set(Elm_Store *st, Elm_Store_Item_Sort_Cb func, const void *data) EINA_ARG_NONNULL(1);
-   /**
-    * Set the store item free func
-    *
-    * @param st The store object
-    * @param func The free cb function of an store
-    * @param data The new data pointer to set
-    */
    EAPI void                    elm_store_item_free_func_set(Elm_Store *st, Elm_Store_Item_Free_Cb func, const void *data) EINA_ARG_NONNULL(1);
-   /**
-    * Get the item index that included header items
-    *
-    * @param sti The store item object
-    * @return The item index in genlist
-    */
    EAPI int                     elm_store_item_data_index_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
-   /**
-    * Get the DB pointer of an item
-    *
-    * @param sti The store item object
-    * @return The DB pointer of item
-    */
    EAPI void                   *elm_store_dbsystem_db_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
-   /**
-    * Set the DB pointer of an item
-    *
-    * @param sti The store item object
-    * @parm p_db The DB pointer of item
-    */
    EAPI void                    elm_store_dbsystem_db_set(Elm_Store *store, void *pDB) EINA_ARG_NONNULL(1);
-   /**
-    */
    EAPI int                     elm_store_item_index_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
-   /**
-    * Append the item to the genlist
-    *
-    * @param st The store object
-    * @param info The store item info dbsystem object
-    * @return The item of store
-    */
    EAPI Elm_Store_Item         *elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info) EINA_ARG_NONNULL(1);
-   /**
-    * Realize the visible items to the screen
-    *
-    * @param st The store object
-    */
    EAPI void                    elm_store_item_update(Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
-   /**
-    * Realize the item to the screen
-    *
-    * @param sti The store item object
-    */
    EAPI void                    elm_store_visible_items_update(Elm_Store *st) EINA_ARG_NONNULL(1);
-   /**
-    * Delete the item of genlist
-    *
-    * @param sti The store item object
-    */
    EAPI void                    elm_store_item_del(Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI void                    elm_store_free(Elm_Store *st);
    EAPI Elm_Store              *elm_store_filesystem_new(void);
@@ -28103,9 +27740,6 @@ extern "C" {
    EAPI void                   *elm_store_item_data_get(Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI const Elm_Store        *elm_store_item_store_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
    EAPI const Elm_Genlist_Item *elm_store_item_genlist_item_get(const Elm_Store_Item *sti) EINA_ARG_NONNULL(1);
-   /**
-    * @}
-    */
 
    /**
     * @defgroup SegmentControl SegmentControl
@@ -28906,6 +28540,84 @@ extern "C" {
    EAPI void         elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
    EAPI int          elm_popup_run(Evas_Object *obj);
 
+   /* NavigationBar */
+   #define NAVIBAR_TITLEOBJ_INSTANT_HIDE "elm,state,hide,noanimate,title", "elm"
+   #define NAVIBAR_TITLEOBJ_INSTANT_SHOW "elm,state,show,noanimate,title", "elm"
+
+   typedef enum
+     {
+        ELM_NAVIGATIONBAR_FUNCTION_BUTTON1,
+        ELM_NAVIGATIONBAR_FUNCTION_BUTTON2,
+        ELM_NAVIGATIONBAR_FUNCTION_BUTTON3,
+        ELM_NAVIGATIONBAR_BACK_BUTTON
+     } Elm_Navi_Button_Type;
+
+   EINA_DEPRECATED EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1, Evas_Object *fn_btn2, Evas_Object *fn_btn3, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_pop(Evas_Object *obj);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_to_content_pop(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_label_set(Evas_Object *obj, Evas_Object *content, const char *title);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_title_label_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_Object *title_obj);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_title_object_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI Eina_List   *elm_navigationbar_title_object_list_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_content_top_get(Evas_Object *obj);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_content_bottom_get(Evas_Object *obj);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_hidden_set(Evas_Object *obj, Eina_Bool hidden);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Elm_Navi_Button_Type button_type);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_title_button_get(Evas_Object *obj, Evas_Object *content, Elm_Navi_Button_Type button_type);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_animation_disabled_set(Evas_Object *obj, Eina_Bool disable);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *content, Eina_Bool visible);
+   EINA_DEPRECATED    Eina_Bool         elm_navigationbar_title_object_visible_get(Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Object *icon);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content);
+
+   /* NavigationBar */
+   #define NAVIBAR_EX_TITLEOBJ_INSTANT_HIDE "elm,state,hide,noanimate,title", "elm"
+   #define NAVIBAR_EX_TITLEOBJ_INSTANT_SHOW "elm,state,show,noanimate,title", "elm"
+
+   typedef enum
+     {
+        ELM_NAVIGATIONBAR_EX_BACK_BUTTON,
+        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1,
+        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON2,
+        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON3,
+        ELM_NAVIGATIONBAR_EX_MAX
+     } Elm_Navi_ex_Button_Type;
+   typedef struct _Elm_Navigationbar_ex_Item Elm_Navigationbar_ex_Item;
+
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_add(Evas_Object *parent);
+   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const char *item_style);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_pop(Evas_Object *obj);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_label_set(Elm_Navigationbar_ex_Item *item, const char *title);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_title_label_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_top_get(const Evas_Object *obj);
+   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_bottom_get(const Evas_Object *obj);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item, Evas_Object *title_obj);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item, Eina_Bool hidden);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item, const char *subtitle);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char* item_style);
+   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon);
+   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
+   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, Eina_Bool visible);
+   EINA_DEPRECATED    Eina_Bool         elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item);
+
    /**
     * @defgroup Naviframe Naviframe
     * @ingroup Elementary
@@ -29246,16 +28958,6 @@ extern "C" {
     * @}
     */
 
-   /**
-    * @defgroup Controlbar Controlbar
-    * @ingroup Elementary
-    * @addtogroup Controlbar
-    * @{
-    *
-    * This is a Controlbar. It can contain label and icon objects.
-    * In edit mode, you can change the location of items.
-    */
-
    /* Control Bar */
    #define CONTROLBAR_SYSTEM_ICON_ALBUMS "controlbar_albums"
    #define CONTROLBAR_SYSTEM_ICON_ARTISTS "controlbar_artists"
@@ -29279,398 +28981,55 @@ extern "C" {
      } Elm_Controlbar_Mode_Type;
 
    typedef struct _Elm_Controlbar_Item Elm_Controlbar_Item;
-   /**
-    * Add a new controlbar object
-    *
-    * @param parent The parent object
-    * @return The new object or NULL if it cannot be created
-    */
    EAPI Evas_Object *elm_controlbar_add(Evas_Object *parent);
-   /**
-    * Append new tab item
-    *
-    * @param	obj The controlbar object
-    * @param	icon_path The icon path of item
-    * @param	label The label of item
-    * @param	view The view of item
-    * @return	The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_append(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
-   /**
-    * Prepend new tab item
-    *
-    * @param	obj The controlbar object
-    * @param	icon_path The icon path of item
-    * @param	label The label of item
-    * @param	view The view of item
-    * @return	The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, Evas_Object *view);
-   /**
-    * Insert new tab item before given item
-    *
-    * @param	obj The controlbar object
-    * @param	before The given item
-    * @param	icon_path The icon path of item
-    * @param	label The label of item
-    * @param	view The view of item
-    * @return	The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, Evas_Object *view);
-   /**
-    * Insert new tab item after given item
-    *
-    * @param	obj The controlbar object
-    * @param	after The given item
-    * @param	icon_path The icon path of item
-    * @param	label The label of item
-    * @param	view The view of item
-    * @return	The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_tab_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, Evas_Object *view);
-   /**
-    * Append new tool item
-    *
-    * @param	obj The controlbar object
-    * @param	icon_path The icon path of item
-    * @param	label The label of item
-    * @param	func Callback function of item
-    * @param	data The data of callback function
-    * @return	The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_append(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   /**
-    * Prepend new tool item
-    *
-    * @param	obj The controlbar object
-    * @param	icon_path The icon path of item
-    * @param	label The label of item
-    * @param	func Callback function of item
-    * @param	data The data of callback function
-    * @return	The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_prepend(Evas_Object *obj, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   /**
-    * Insert new tool item before given item
-    *
-    * @param	obj The controlbar object
-    * @param	before The given item
-    * @param	icon_path The icon path of item
-    * @param	label The label of item
-    * @param	func Callback function of item
-    * @param	data The data of callback function
-    * @return	The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   /**
-    * Insert new tool item after given item
-    *
-    * @param	obj The controlbar object
-    * @param	after The given item
-    * @param	icon_path The icon path of item
-    * @param	label The label of item
-    * @param	func Callback function of item
-    * @param	data The data of callback function
-    * @return	The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_tool_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, const char *icon_path, const char *label, void (*func) (void *data, Evas_Object *obj, void *event_info), void *data);
-   /**
-    * Append new object item
-    *
-    * @param	obj The controlbar object
-    * @param	obj_item The object of item
-    * @param	sel The number of sel occupied
-    * @return  The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_append(Evas_Object *obj, Evas_Object *obj_item, const int sel);
-   /**
-    * Prepend new object item
-    *
-    * @param	obj The controlbar object
-    * @param	obj_item The object of item
-    * @param	sel The number of sel occupied
-    * @return  The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_prepend(Evas_Object *obj, Evas_Object *obj_item, const int sel);
-   /**
-    * Insert new object item before given item
-    *
-    * @param	obj The controlbar object
-    * @param	before The given item
-    * @param	obj_item The object of item
-    * @param	sel The number of sel occupied
-    * @return  The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_before(Evas_Object *obj, Elm_Controlbar_Item *before, Evas_Object *obj_item, const int sel);
-   /**
-    * Insert new object item after given item
-    *
-    * @param	obj The controlbar object
-    * @param	after The given item
-    * @param	obj_item The object of item
-    * @param	sel The number of sel occupied
-    * @return  The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_object_item_insert_after(Evas_Object *obj, Elm_Controlbar_Item *after, Evas_Object *obj_item, const int sel);
-   /**
-    * Get the object of the object item
-    *
-    * @param       it The item of controlbar
-    * @return      The object of the object item
-    */
    EAPI Evas_Object *elm_controlbar_object_item_object_get(const Elm_Controlbar_Item *it);
-   /**
-    * Delete item from controlbar
-    *
-    * @param	it The item of controlbar
-    */
    EAPI void         elm_controlbar_item_del(Elm_Controlbar_Item *it);
-   /**
-    * Select item in controlbar
-    *
-    * @param	it The item of controlbar
-    */
    EAPI void         elm_controlbar_item_select(Elm_Controlbar_Item *it);
-   /**
-    * Set the visible status of item in bar
-    *
-    * @param	it The item of controlbar
-    * @param	bar EINA_TRUE or EINA_FALSE
-    */
    EAPI void         elm_controlbar_item_visible_set(Elm_Controlbar_Item *it, Eina_Bool bar);
-   /**
-    * Get the result which or not item is visible in bar
-    *
-    * @param	it The item of controlbar
-    * @return	EINA_TRUE or EINA_FALSE
-    */
    EAPI Eina_Bool    elm_controlbar_item_visible_get(const Elm_Controlbar_Item * it);
-   /**
-    * Set item disable
-    *
-    * @param	it The item of controlbar
-    * @param	bar EINA_TRUE or EINA_FALSE
-    */
    EAPI void         elm_controlbar_item_disabled_set(Elm_Controlbar_Item * it, Eina_Bool disabled);
-   /**
-    * Get item disable
-    *
-    * @param	it The item of controlbar
-    * @return 	EINA_TRUE or EINA_FALSE
-    */
    EAPI Eina_Bool    elm_controlbar_item_disabled_get(const Elm_Controlbar_Item * it);
-   /**
-    * Set the icon of item
-    *
-    * @param	it The item of controlbar
-    * @param	icon_path The icon path of the item
-    * @return	The icon object
-    */
    EAPI void         elm_controlbar_item_icon_set(Elm_Controlbar_Item *it, const char *icon_path);
-   /**
-    * Get the icon of item
-    *
-    * @param	it The item of controlbar
-    * @return	The icon object
-    */
    EAPI Evas_Object *elm_controlbar_item_icon_get(const Elm_Controlbar_Item *it);
-   /**
-    * Set the label of item
-    *
-    * @param	it The item of controlbar
-    * @param	label The label of item
-    */
    EAPI void         elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label);
-   /**
-    * Get the label of item
-    *
-    * @param	it The item of controlbar
-    * @return The label of item
-    */
    EAPI const char  *elm_controlbar_item_label_get(const Elm_Controlbar_Item *it);
-   /**
-    * Get the selected item
-    *
-    * @param	obj The controlbar object
-    * @return		The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_selected_item_get(const Evas_Object *obj);
-   /**
-    * Get the first item
-    *
-    * @param	obj The controlbar object
-    * @return		The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_first_item_get(const Evas_Object *obj);
-   /**
-    * Get the last item
-    *
-    * @param	obj The controlbar object
-    * @return		The item of controlbar
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_last_item_get(const Evas_Object *obj);
-   /**
-    * Get the items
-    *
-    * @param	obj The controlbar object
-    * @return	The list of the items
-    */
    EAPI const Eina_List   *elm_controlbar_items_get(const Evas_Object *obj);
-   /**
-    * Get the previous item
-    *
-    * @param	it The item of controlbar
-    * @return	The previous item of the parameter item
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_item_prev(Elm_Controlbar_Item *it);
-   /**
-    * Get the next item
-    *
-    * @param	obj The controlbar object
-    * @return	The next item of the parameter item
-    */
    EAPI Elm_Controlbar_Item *elm_controlbar_item_next(Elm_Controlbar_Item *it);
-   /**
-    * Set the view of the item
-    *
-    * @param	it The item of controlbar
-    * @param	view The view for the item
-    */
    EAPI void         elm_controlbar_item_view_set(Elm_Controlbar_Item *it, Evas_Object * view);
-   /**
-    * Get the view of the item
-    *
-    * @param	it The item of controlbar
-    * @return	The view for the item
-    */
    EAPI Evas_Object *elm_controlbar_item_view_get(const Elm_Controlbar_Item *it);
-   /**
-    * Unset the view of the item
-    *
-    * @param	it The item of controlbar
-    * @return	The view for the item
-    */
    EAPI Evas_Object *elm_controlbar_item_view_unset(Elm_Controlbar_Item *it);
-   /**
-    * Set the vertical mode of the controlbar
-    *
-    * @param	obj The object of the controlbar
-    * @param	vertical The vertical mode of the controlbar (TRUE = vertical, FALSE = horizontal)
-    */
    EAPI Evas_Object *elm_controlbar_item_button_get(const Elm_Controlbar_Item *it);
-   /**
-    * Set the mode of the controlbar
-    *
-    * @param	obj The object of the controlbar
-    * @param	mode The mode of the controlbar
-    */
    EAPI void         elm_controlbar_mode_set(Evas_Object *obj, int mode);
-   /**
-    * Set the alpha of the controlbar
-    *
-    * @param	obj The object of the controlbar
-    * @param	alpha The alpha value of the controlbar (0-100)
-    */
    EAPI void         elm_controlbar_alpha_set(Evas_Object *obj, int alpha);
-   /**
-    * Set auto-align mode of the controlbar(It's not prepared yet)
-    * If you set the auto-align and add items more than 5,
-    * the "more" item will be made and the items more than 5 will be unvisible.
-    *
-    * @param	obj The object of the controlbar
-    * @param	auto_align The dicision that the controlbar use the auto-align
-    */
    EAPI void         elm_controlbar_item_auto_align_set(Evas_Object *obj, Eina_Bool auto_align);
-   /**
-    * Get the button object of the item
-    *
-    * @param	it The item of controlbar
-    * @return  button object of the item
-    */
    EAPI void         elm_controlbar_vertical_set(Evas_Object *obj, Eina_Bool vertical);
-   /**
-    * @}
-    */
 
-
-   /**
-    * @defgroup Searchbar Searchbar
-    * @addtogroup TickerNoti
-    * @{
-    * @ingroup Elementary
-    *
-    * This is Searchbar.
-    * It can contain a simple entry and button object.
-    */
-
-   /**
-    * Add a new searchbar to the parent
-    * @param parent The parent object
-    * @return The new object or NULL if it cannot be created
-    */
+   /* SearchBar */
    EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent);
-   /**
-    * set the text of entry
-    *
-    * @param obj The searchbar object
-    * @return void
-    */
    EAPI void         elm_searchbar_text_set(Evas_Object *obj, const char *entry);
-   /**
-    * get the text of entry
-    *
-    * @param obj The searchbar object
-    * @return string pointer of entry
-    */
    EAPI const char  *elm_searchbar_text_get(Evas_Object *obj);
-   /**
-    * get the pointer of entry
-    *
-    * @param obj The searchbar object
-    * @return the entry object
-    */
    EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj);
-   /**
-    * get the pointer of editfield
-    *
-    * @param obj The searchbar object
-    * @return the editfield object
-    */
    EAPI Evas_Object *elm_searchbar_editfield_get(Evas_Object *obj);
-   /**
-    * set the cancel button animation flag
-    *
-    * @param obj The searchbar object
-    * @param cancel_btn_ani_flag The flag of animating cancen button or not
-    * @return void
-    */
    EAPI void         elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag);
-   /**
-    * set the cancel button show mode
-    *
-    * @param obj The searchbar object
-    * @param visible The flag of cancen button show or not
-    * @return void
-    */
    EAPI void         elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible);
-   /**
-    * clear searchbar status
-    *
-    * @param obj The searchbar object
-    * @return void
-    */
    EAPI void         elm_searchbar_clear(Evas_Object *obj);
-   /**
-    * set the searchbar boundary rect mode(with bg rect) set
-    *
-    * @param obj The searchbar object
-    * @param boundary The present flag of boundary rect or not
-    * @return void
-    */
    EAPI void         elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary);
-   /**
-    * @}
-    */
 
    EAPI Evas_Object *elm_page_control_add(Evas_Object *parent);
    EAPI void         elm_page_control_page_count_set(Evas_Object *obj, unsigned int page_count);
@@ -29684,13 +29043,45 @@ extern "C" {
    EAPI void         elm_nocontents_custom_set(const Evas_Object *obj, Evas_Object *custom);
    EAPI Evas_Object *elm_nocontents_custom_get(const Evas_Object *obj);
 
-   /**
-    * @defgroup TickerNoti TickerNoti
-    * @addtogroup TickerNoti
-    * @{
-    *
-    * This is a notification widget which can be used to display some short information.
-    *
+   /* TickerNoti */
+   typedef enum
+     {
+        ELM_TICKERNOTI_ORIENT_TOP = 0,
+        ELM_TICKERNOTI_ORIENT_BOTTOM,
+        ELM_TICKERNOTI_ORIENT_LAST
+     }  Elm_Tickernoti_Orient;
+
+   EAPI Evas_Object              *elm_tickernoti_add (Evas_Object *parent);
+   EAPI void                      elm_tickernoti_orient_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
+   EAPI Elm_Tickernoti_Orient     elm_tickernoti_orient_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI int                       elm_tickernoti_rotation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_rotation_set (Evas_Object *obj, int angle) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object              *elm_tickernoti_win_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /* #### Below APIs and data structures are going to be deprecated, announcment will be made soon ####*/
+   typedef enum
+    {
+       ELM_TICKERNOTI_DEFAULT,
+       ELM_TICKERNOTI_DETAILVIEW
+    } Elm_Tickernoti_Mode;
+   EAPI void                      elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EAPI const char               *elm_tickernoti_detailview_label_get (const Evas_Object *obj)EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_detailview_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(2);
+   EAPI Evas_Object              *elm_tickernoti_detailview_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_detailview_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object              *elm_tickernoti_detailview_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object              *elm_tickernoti_detailview_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_mode_set (Evas_Object *obj, Elm_Tickernoti_Mode mode) EINA_ARG_NONNULL(1);
+   EAPI Elm_Tickernoti_Mode       elm_tickernoti_mode_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_orientation_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
+   EAPI Elm_Tickernoti_Orient     elm_tickernoti_orientation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
+   EAPI const char               *elm_tickernoti_label_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object              *elm_tickernoti_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   EAPI void                      elm_tickernoti_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(1);
+   EAPI Evas_Object              *elm_tickernoti_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
+   /* ############################################################################### */
+   /*
     * Parts which can be used with elm_object_text_part_set() and
     * elm_object_text_part_get():
     *
@@ -29708,251 +29099,20 @@ extern "C" {
     * @li "hide" - emitted when the tickernoti is completely hidden. In case of
     * any hide animation, this signal is emitted after the animation.
     */
-   typedef enum
-     {
-        ELM_TICKERNOTI_ORIENT_TOP = 0,
-        ELM_TICKERNOTI_ORIENT_BOTTOM,
-        ELM_TICKERNOTI_ORIENT_LAST
-     }  Elm_Tickernoti_Orient;
 
-   /**
-    * Add a tickernoti object to @p parent
-    *
-    * @param parent The parent object
-    *
-    * @return The tickernoti object, or NULL upon failure
-    */
-   EAPI Evas_Object              *elm_tickernoti_add (Evas_Object *parent);
-   /**
-    * Set the orientation of the tickernoti object
-    *
-    * @param obj The tickernoti object
-    * @param orient The orientation of tickernoti object
-    */
-   EAPI void                      elm_tickernoti_orient_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
-   /**
-    * Get the orientation of the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The orientation of tickernotil object
-    */
-   EAPI Elm_Tickernoti_Orient     elm_tickernoti_orient_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Get the rotation of tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The rotation angle
-    */
-   EAPI int                       elm_tickernoti_rotation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Set the rotation angle for the tickernoti object
-    *
-    * @param obj The tickernoti object
-    * @param angle The rotation angle(in degree) will be used on the tickernoti object
-    */
-   EAPI void                      elm_tickernoti_rotation_set (Evas_Object *obj, int angle) EINA_ARG_NONNULL(1);
-   /**
-    * Get the view window(elm_win) on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return internal view window(elm_win) object
-    */
-   EAPI Evas_Object              *elm_tickernoti_win_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /* #### Below APIs and data structures are going to be deprecated, announcment will be made soon ####*/
-   /**
-    * @deprecated
-    */
-   typedef enum
-    {
-       ELM_TICKERNOTI_DEFAULT,
-       ELM_TICKERNOTI_DETAILVIEW
-    } Elm_Tickernoti_Mode;
-   /**
-    * Set the detail label on the tickernoti object
-    *
-    * @param obj The tickernoti object
-    * @param label The label will be used on the tickernoti object
-    * @deprecated use elm_object_text_set() instead
-    */
-   WILL_DEPRECATE  EAPI void                      elm_tickernoti_detailview_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   /**
-    * Get the detail label used on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The string inside the label
-    * @deprecated use elm_object_text_get() instead
-    */
-   WILL_DEPRECATE  EAPI const char               *elm_tickernoti_detailview_label_get (const Evas_Object *obj)EINA_ARG_NONNULL(1);
-   /**
-    * Set the button object used on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @param button The button object will be used on the tickernoti object
-    * @deprecated use elm_object_content_part_set() instead with "icon" as part name
-    */
-   WILL_DEPRECATE  EAPI void                      elm_tickernoti_detailview_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(2);
-   /**
-    * Get the button object used on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The button object inside the tickernoti
-    * @deprecated use elm_object_content_part_get() instead with "button" as part name
-    */
-   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_detailview_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Set the detail icon object used on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @param icon The icon object will be used on the tickernoti object
-    * @deprecated use elm_object_content_part_set() instead with "icon" as part name
-    */
-   WILL_DEPRECATE  EAPI void                      elm_tickernoti_detailview_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
-   /**
-    * Get the detail icon object used on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The icon object inside the tickernoti
-    * @deprecated use elm_object_content_part_get() instead with "icon" as part name
-    */
-   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_detailview_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Get the view mode on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The view mode
-    * @deprecated removed as now styles are used instead
-    */
-   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_detailview_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Set the view mode used on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @param mode The view mode will be used on the tickernoti object
-    * @deprecated removed as now styles are used instead
-    */
-   WILL_DEPRECATE  EAPI void                      elm_tickernoti_mode_set (Evas_Object *obj, Elm_Tickernoti_Mode mode) EINA_ARG_NONNULL(1);
-   /**
-    * Get the detail view window(elm_win) on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return detail view window(elm_win) object
-    */
-   WILL_DEPRECATE  EAPI Elm_Tickernoti_Mode       elm_tickernoti_mode_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Set the orientation of the tickernoti object
-    *
-    * @param obj The tickernoti object
-    * @param orient The orientation of tickernoti object
-    * @deprecated use elm_tickernoti_orient_set() instead
-    */
-   WILL_DEPRECATE  EAPI void                      elm_tickernoti_orientation_set (Evas_Object *obj, Elm_Tickernoti_Orient orient) EINA_ARG_NONNULL(1);
-   /**
-    * Get the orientation of the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The orientation of tickernotil object
-    * @deprecated use elm_tickernoti_orient_get() instead
-    */
-   WILL_DEPRECATE  EAPI Elm_Tickernoti_Orient     elm_tickernoti_orientation_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Set the label on the tickernoti object
-    *
-    * @param obj The tickernoti object
-    * @param label The label will be used on the tickernoti object
-    * @deprecated use elm_object_text_get()
-    */
-   WILL_DEPRECATE  EAPI void                      elm_tickernoti_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
-   /**
-    * Get the label used on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The string inside the label
-    * @deprecated use elm_object_text_get() instead
-    */
-   WILL_DEPRECATE  EAPI const char               *elm_tickernoti_label_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Set the icon object of the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @param icon The icon object will be used on the tickernoti object
-    * @deprecated use elm_object_content_part_set() instead with "icon" as part name
-    */
-   WILL_DEPRECATE  EAPI void                      elm_tickernoti_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
-   /**
-    * Get the icon object of the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The icon object inside the tickernoti
-    * @deprecated use elm_object_content_part_get() instead with "icon" as part name
-    */
-   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Set the action button object used on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @param button The button object will be used on the tickernoti object
-    * @deprecated use elm_object_content_part_set() instead with "button" as part name
-    */
-   WILL_DEPRECATE  EAPI void                      elm_tickernoti_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(1);
-   /**
-    * Get the action button object used on the tickernoti object
-    *
-    * @param obj The tickernotil object
-    * @return The button object inside the tickernoti
-    * @deprecated use elm_object_content_part_get() instead with "button" as part name
-    */
-   WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * @}
-    */
-
-   /**
-    * @defgroup Colorpalette Colorpalette
-    * @ingroup Elementary
-    * @addtogroup Colorpalette
-    * @{
-    *
-    * Using colorpalette, you can select a color by clicking
-    * a color rectangle on the colorpalette.
-    *
-    * Smart callbacks that you can add are:
-    *
-    * clicked - This signal is sent when a color rectangle is clicked.
-    */
+   /* colorpalette */
    typedef struct _Colorpalette_Color Elm_Colorpalette_Color;
+
    struct _Colorpalette_Color
      {
         unsigned int r, g, b;
      };
 
-   /**
-    * Add a new colorpalette to the parent.
-    *
-    * @param parent The parent object
-    * @return The new object or NULL if it cannot be created
-    *
-    * @ingroup Colorpalette
-    */
    EAPI Evas_Object *elm_colorpalette_add(Evas_Object *parent);
-   /**
-    * Set colors to the colorpalette.
-    *
-    * @param obj   Colorpalette object
-    * @param color_num     number of the colors on the colorpalette
-    * @param color     Color lists
-    */
    EAPI void         elm_colorpalette_color_set(Evas_Object *obj, int color_num, Elm_Colorpalette_Color *color);
-   /**
-    * Set row/column value for the colorpalette.
-    *
-    * @param obj   Colorpalette object
-    * @param row   row value for the colorpalette
-    * @param col   column value for the colorpalette
-    */
    EAPI void         elm_colorpalette_row_column_set(Evas_Object *obj, int row, int col);
-
-   /**
-    * @}
+   /* smart callbacks called:
+    * "clicked" - when image clicked
     */
 
    /* editfield */
@@ -29977,281 +29137,89 @@ extern "C" {
     */
 
 
-   /**
-    * @defgroup Multibuttonenetry Multibuttonenetry
-    *
-    * @image html img/widget/flipselector/preview-00.png
-    * @image latex img/widget/flipselector/preview-00.eps
-    *
-    * A Multibuttonentry is a widget to allow a user to insert a text button.
-    * the text button is inserted by pressing the "return" key. If there is no space in the current row,
-    * the new button is entered in the next row. If the button is pressed, it will become focused. 
-    * The focus can be removed by pressing the "backspace" key.
-    * when items are added over 1 lines, if Multibuttonentry lost focus, it becase shrink mode ( made it 1 line)
-    *
-    * Smart callbacks one can register to:
-    * - @c "item,selected" - when item is selected . it can be called by backspace key.                       
-    * - @c "item,added" - when a new multibuttonentry item is added. 
-    * - @c "item,deleted" -when a multibuttonentry item is deleted. 
-    * - @c "item,clicked" - selected item of multibuttonentry is clicked.                  
-    * - @c "clicked" - when multibuttonentry is clicked. 
-    * - @c "focused" - when multibuttonentry is focused. 
-    * - @c "unfocused" - when multibuttonentry is unfocused. 
-    * - @c "expanded" - when multibuttonentry is expanded . 
-    * - @c "shrank" - when multibuttonentry is shrank. 
-    * - @c "shrank,state,changed" - when shrink mode state of multibuttonentry is changed. 
-    *
-    * Here is an example on its usage:
-    * @li @ref multibuttonentry_example
-    */
-    /**
-    * @addtogroup Multibuttonentry
-    * @{
-    */
+   /* Sliding Drawer */
+   typedef enum _Elm_SlidingDrawer_Pos
+     {
+        ELM_SLIDINGDRAWER_BOTTOM,
+        ELM_SLIDINGDRAWER_LEFT,
+        ELM_SLIDINGDRAWER_RIGHT,
+        ELM_SLIDINGDRAWER_TOP
+     } Elm_SlidingDrawer_Pos;
 
+   typedef struct _Elm_SlidingDrawer_Drag_Value
+     {
+        double x, y;
+     } Elm_SlidingDrawer_Drag_Value;
+
+   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
+   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_content_unset(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh);
+   EINA_DEPRECATED EAPI void         elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy);
+
+   /* multibuttonentry */
    typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
    typedef Eina_Bool (*Elm_Multibuttonentry_Item_Verify_Callback) (Evas_Object *obj, const char *item_label, void *item_data, void *data);
-
-   /**
-    * @brief Add a new multibuttonentry to the parent
-    *
-    * @param parent The parent object
-    * @return The new object or NULL if it cannot be created
-    */
    EAPI Evas_Object               *elm_multibuttonentry_add(Evas_Object *parent);
-   /**
-    * Get the label
-    *
-    * @param obj The multibuttonentry object
-    * @return The label, or NULL if none
-    */
    EAPI const char                *elm_multibuttonentry_label_get(const Evas_Object *obj);
-   /**
-    * Set the label
-    *
-    * @param obj The multibuttonentry object
-    * @param label The text label string
-    */
    EAPI void                       elm_multibuttonentry_label_set(Evas_Object *obj, const char *label);
-   /**
-    * Get the entry of the multibuttonentry object
-    *
-    * @param obj The multibuttonentry object
-    * @return The entry object, or NULL if none
-    */
    EAPI Evas_Object               *elm_multibuttonentry_entry_get(const Evas_Object *obj);
-   /**
-    * Get the guide text
-    *
-    * @param obj The multibuttonentry object
-    * @return The guide text, or NULL if none
-    */
    EAPI const char *               elm_multibuttonentry_guide_text_get(const Evas_Object *obj);
-   /**
-    * Set the guide text
-    *
-    * @param obj The multibuttonentry object
-    * @param label The guide text string
-    */
    EAPI void                       elm_multibuttonentry_guide_text_set(Evas_Object *obj, const char *guidetext);
-   /**
-    * Get the value of shrink_mode state.
-    *
-    * @param obj The multibuttonentry object
-    * @param the value of shrink mode state.
-    */
    EAPI int                        elm_multibuttonentry_contracted_state_get(const Evas_Object *obj);
-   /**
-    * Set/Unset the multibuttonentry to shrink mode state of single line
-    *
-    * @param obj The multibuttonentry object
-    * @param the value of shrink_mode state. set this to 1 to set the multibuttonentry to shrink state of single line. set this to 0 to unset the contracted state.
-    */
    EAPI void                       elm_multibuttonentry_contracted_state_set(Evas_Object *obj, int contracted);
-   /**
-    * Prepend a new item to the multibuttonentry
-    *
-    * @param obj The multibuttonentry object
-    * @param label The label of new item
-    * @param data The ponter to the data to be attached
-    * @return A handle to the item added or NULL if not possible
-    */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_start(Evas_Object *obj, const char *label, void *data);
-   /**
-    * Append a new item to the multibuttonentry
-    *
-    * @param obj The multibuttonentry object
-    * @param label The label of new item
-    * @param data The ponter to the data to be attached
-    * @return A handle to the item added or NULL if not possible
-    */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_end(Evas_Object *obj, const char *label, void *data);
-   /**
-    * Add a new item to the multibuttonentry before the indicated object
-    *
-    * reference.
-    * @param obj The multibuttonentry object
-    * @param before The item before which to add it
-    * @param label The label of new item
-    * @param data The ponter to the data to be attached
-    * @return A handle to the item added or NULL if not possible
-    */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_before(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *before, void *data);
-   /**
-    * Add a new item to the multibuttonentry after the indicated object
-    *
-    * @param obj The multibuttonentry object
-    * @param after The item after which to add it
-    * @param label The label of new item
-    * @param data The ponter to the data to be attached
-    * @return A handle to the item added or NULL if not possible
-    */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_add_after(Evas_Object *obj, const char *label, Elm_Multibuttonentry_Item *after, void *data);
-   /**
-    * Get a list of items in the multibuttonentry
-    *
-    * @param obj The multibuttonentry object
-    * @return The list of items, or NULL if none
-    */
    EAPI const Eina_List           *elm_multibuttonentry_items_get(const Evas_Object *obj);
-   /**
-    * Get the first item in the multibuttonentry
-    *
-    * @param obj The multibuttonentry object
-    * @return The first item, or NULL if none
-    */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_first_get(const Evas_Object *obj);
-   /**
-    * Get the last item in the multibuttonentry
-    *
-    * @param obj The multibuttonentry object
-    * @return The last item, or NULL if none
-    */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_last_get(const Evas_Object *obj);
-   /**
-    * Get the selected item in the multibuttonentry
-    *
-    * @param obj The multibuttonentry object
-    * @return The selected item, or NULL if none
-    */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_selected_get(const Evas_Object *obj);
-   /**
-    * Set the selected state of an item
-    *
-    * @param item The item
-    * @param selected if it's EINA_TRUE, select the item otherwise, unselect the item
-    */
    EAPI void                       elm_multibuttonentry_item_selected_set(Elm_Multibuttonentry_Item *item);
-   /**
-   * unselect all of items.
-   *
-   * @param obj The multibuttonentry object
-   */
    EAPI void                       elm_multibuttonentry_item_unselect_all(Evas_Object *obj);
-  /**
-   * Delete a given item
-   *
-   * @param item The item
-   */
    EAPI void                       elm_multibuttonentry_item_del(Elm_Multibuttonentry_Item *item);
-  /**
-   * Remove all items in the multibuttonentry.
-   *
-   * @param obj The multibuttonentry object
-   */
    EAPI void                       elm_multibuttonentry_items_del(Evas_Object *obj);
-  /**
-   * Get the label of a given item
-   *
-   * @param item The item
-   * @return The label of a given item, or NULL if none
-   */
    EAPI const char                *elm_multibuttonentry_item_label_get(const Elm_Multibuttonentry_Item *item);
-  /**
-   * Set the label of a given item
-   *
-   * @param item The item
-   * @param label The text label string
-   */
    EAPI void                       elm_multibuttonentry_item_label_set(Elm_Multibuttonentry_Item *item, const char *str);
-  /**
-   * Get the previous item in the multibuttonentry
-   *
-   * @param item The item
-   * @return The item before the item @p item
-   */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_prev(Elm_Multibuttonentry_Item *item);
-  /**
-   * Get the next item in the multibuttonentry
-   *
-   * @param item The item
-   * @return The item after the item @p item
-   */
    EAPI Elm_Multibuttonentry_Item *elm_multibuttonentry_item_next(Elm_Multibuttonentry_Item *item);
-
    EAPI void                      *elm_multibuttonentry_item_data_get(const Elm_Multibuttonentry_Item *item);
    EAPI void                       elm_multibuttonentry_item_data_set(Elm_Multibuttonentry_Item *item, void *data);
    EAPI void                       elm_multibuttonentry_item_verify_callback_set(Evas_Object *obj, Elm_Multibuttonentry_Item_Verify_Callback func, void *data);
-
-   /**
-    * @}
+   /* smart callback called:
+    * "selected" - This signal is emitted when the selected item of multibuttonentry is changed.
+    * "added" - This signal is emitted when a new multibuttonentry item is added.
+    * "deleted" - This signal is emitted when a multibuttonentry item is deleted.
+    * "expanded" - This signal is emitted when a multibuttonentry is expanded.
+    * "contracted" - This signal is emitted when a multibuttonentry is contracted.
+    * "contracted,state,changed" - This signal is emitted when the contracted state of multibuttonentry is changed.
+    * "item,selected" - This signal is emitted when the selected item of multibuttonentry is changed.
+    * "item,added" - This signal is emitted when a new multibuttonentry item is added.
+    * "item,deleted" - This signal is emitted when a multibuttonentry item is deleted.
+    * "item,clicked" - This signal is emitted when a multibuttonentry item is clicked.
+    * "clicked" - This signal is emitted when a multibuttonentry is clicked.
+    * "unfocused" - This signal is emitted when a multibuttonentry is unfocused.
     */
-
-   /**
-    * @defgroup Stackedicon Stackedicon
-    * @ingroup Elementary
-    * @addtogroup Stackedicon
-    * @{
-    *
-    * This is a Stackedicon.
-    * smart callback called:
-    * "expanded" - This signal is emitted when a stackedicon is expanded.
-    * "clicked" - This signal is emitted when a stackedicon is clicked.
-    *
-    * available styles:
+   /* available styles:
     * default
     */
-   typedef struct _Stackedicon_Item Elm_Stackedicon_Item;
-   /**
-    * Add a new stackedicon to the parent
-    *
-    * @param parent The parent object
-    * @return The new object or NULL if it cannot be created
-    */
-   EAPI Evas_Object          *elm_stackedicon_add(Evas_Object *parent);
-   /**
-    * This appends a path to the stackedicon
-    *
-    * @param    obj   The stackedicon object
-    * @param    path   The image full path
-    * @return   The new item or NULL if it cannot be created
-    */
-   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const char *path);
-   /**
-    * This prepends a path to the stackedicon
-    *
-    * @param    obj   The stackedicon object
-    * @param    path   The image full path
-    * @return   The new item or NULL if it cannot be created
-    */
-   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const char *path);
-   /**
-    * This delete a path at the stackedicon
-    *
-    * @param    Elm_Stackedicon_Item   The delete item
-    */
-   EAPI void                  elm_stackedicon_item_del(Elm_Stackedicon_Item *it);
-   /**
-    * Get item list from the stackedicon
-    *
-    * @param    obj   The stackedicon object
-    * @return   The item list or NULL if it cannot be created
-    */
-   EAPI Eina_List            *elm_stackedicon_item_list_get(Evas_Object *obj);
-   /**
-    * @}
-    */
 
+   /* stackedicon */
+   typedef struct _Stackedicon_Item Elm_Stackedicon_Item;
+   EAPI Evas_Object          *elm_stackedicon_add(Evas_Object *parent);
+   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const char *path);
+   EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const char *path);
+   EAPI void                  elm_stackedicon_item_del(Elm_Stackedicon_Item *it);
+   EAPI Eina_List            *elm_stackedicon_item_list_get(Evas_Object *obj);
+   /* smart callback called:
+    * "expanded" - This signal is emitted when a stackedicon is expanded.
+    * "clicked" - This signal is emitted when a stackedicon is clicked.
+    */
+   /* available styles:
+    * default
+    */
 
    /* dialoguegroup */
    typedef struct _Dialogue_Item Dialogue_Item;
@@ -30304,131 +29272,24 @@ extern "C" {
    EAPI Eina_Bool    elm_dayselector_check_state_get(Evas_Object *obj, Elm_DaySelector_Day day);
    EAPI void         elm_dayselector_check_state_set(Evas_Object *obj, Elm_DaySelector_Day day, Eina_Bool checked);
 
-   /**
-    * @defgroup Imageslider Imageslider
-    * @ingroup Elementary
-    * @addtogroup Imageslider
-    * @{
-    *
-    * By flicking images on the screen,
-    * you can see the images in specific path.
-    */
+   /* Image Slider */
    typedef struct _Imageslider_Item Elm_Imageslider_Item;
    typedef void (*Elm_Imageslider_Cb)(void *data, Evas_Object *obj, void *event_info);
-
-   /**
-    * Add an Image Slider widget
-    *
-    * @param        parent  The parent object
-    * @return       The new Image slider object or NULL if it cannot be created
-    */
    EAPI Evas_Object           *elm_imageslider_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
-   /**
-    * Append an Image Slider item
-    *
-    * @param        obj          The Image Slider object
-    * @param        photo_file   photo file path
-    * @param        func         callback function
-    * @param        data         callback data
-    * @return       The Image Slider item handle or NULL
-    */
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_append(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data) EINA_ARG_NONNULL(1);
-   /**
-    * Insert an Image Slider item into the Image Slider Widget by using the given index.
-    *
-    * @param        obj                     The Image Slider object
-    * @param        photo_file      photo file path
-    * @param        func            callback function
-    * @param        index           required position
-    * @param        data            callback data
-    * @return       The Image Slider item handle or NULL
-    */
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_append_relative(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, unsigned int index, void *data) EINA_ARG_NONNULL(1);
-   /**
-    * Prepend Image Slider item
-    *
-    * @param        obj          The Image Slider object
-    * @param        photo_file   photo file path
-    * @param        func         callback function
-    * @param        data         callback data
-    * @return       The imageslider item handle or NULL
-    */
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_prepend(Evas_Object *obj, const char *photo_file, Elm_Imageslider_Cb func, void *data) EINA_ARG_NONNULL(1);
-   /**
-    * Delete the selected Image Slider item
-    *
-    * @param it             The selected Image Slider item handle
-    */
    EAPI void                   elm_imageslider_item_del(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   /**
-    * Get the selected Image Slider item
-    *
-    * @param obj            The Image Slider object
-    * @return The selected Image Slider item or NULL
-    */
    EAPI Elm_Imageslider_Item  *elm_imageslider_selected_item_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Get whether an Image Slider item is selected or not
-    *
-    * @param it              the selected Image Slider item
-    * @return EINA_TRUE or EINA_FALSE
-    */
    EAPI Eina_Bool              elm_imageslider_item_selected_get(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   /**
-    * Set the selected Image Slider item
-    *
-    * @param it             The Imaga Slider item
-    */
    EAPI void                   elm_imageslider_item_selected_set(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   /**
-    * Get the photo file path of given Image Slider item
-    *
-    * @param it             The Image Slider item
-    * @return The photo file path or NULL;
-    */
    EAPI const char            *elm_imageslider_item_photo_file_get(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   /**
-    * Sets the photo file path of given Image Slider item
-    *
-    * @param it         The Image Slider item
-    * @param photo_file The photo file path or NULL;
-    */
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_prev(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   /**
-    * Get the previous Image Slider item
-    *
-    * @param it             The Image Slider item
-    * @return The previous Image Slider item or NULL
-    */
    EAPI Elm_Imageslider_Item  *elm_imageslider_item_next(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   /**
-    * Get the next Image Slider item
-    *
-    * @param it             The Image Slider item
-    * @return The next Image Slider item or NULL
-    */
    EAPI void                   elm_imageslider_prev(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Move to the previous Image Slider item
-    *
-    * @param obj    The Image Slider object
-    */
    EAPI void                   elm_imageslider_next(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Move to the next Image Slider item
-    *
-    * @param obj The Image Slider object
-    */
    EAPI void                   elm_imageslider_item_photo_file_set(Elm_Imageslider_Item *it, const char *photo_file) EINA_ARG_NONNULL(1,2);
-   /**
-    * Updates an Image Slider item
-    *
-    * @param it The Image Slider item
-    */
    EAPI void                   elm_imageslider_item_update(Elm_Imageslider_Item *it) EINA_ARG_NONNULL(1);
-   /**
-    * @}
-    */
 #ifdef __cplusplus
 }
 #endif

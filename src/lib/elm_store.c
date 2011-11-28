@@ -1686,6 +1686,13 @@ _store_free(Elm_Store *st)
    if(std->p_db) eina_stringshare_del(std->p_db);
 }
 
+/**
+ * Add a new dbsystem Store object
+ *
+ * @return The new object or NULL if it cannot be created
+ *
+ * @ingroup Store
+ */
 EAPI Elm_Store *
 elm_store_dbsystem_new(void)
 {
@@ -1698,6 +1705,14 @@ elm_store_dbsystem_new(void)
    return &std->base;
 }
 
+/**
+ * Sets the item count of a store
+ *
+ * @param st The store object
+ * @param count The item count of an store
+ *
+ * @ingroup Store
+ */
 EAPI void
 elm_store_item_count_set(Elm_Store *st, int count)
 {
@@ -1706,6 +1721,15 @@ elm_store_item_count_set(Elm_Store *st, int count)
 }
 
 
+/**
+ * Set the select func that select the state of a list item whether true or false
+ *
+ * @param st The store object
+ * @param func The select cb function of an store
+ * @param data The new data pointer to set
+ *
+ * @ingroup Store
+ */
 EAPI void
 elm_store_item_select_func_set(Elm_Store *st, Elm_Store_Item_Select_Cb func, const void *data)
 {
@@ -1714,6 +1738,15 @@ elm_store_item_select_func_set(Elm_Store *st, Elm_Store_Item_Select_Cb func, con
    st->cb.item_select.data = (void *)data;
 }
 
+/**
+ * Sets the sort func that sort the item with a next in the list
+ *
+ * @param st The store object
+ * @param func The sort cb function of an store
+ * @param data The new data pointer to set
+ *
+ * @ingroup Store
+ */
 EAPI void
 elm_store_item_sort_func_set(Elm_Store *st, Elm_Store_Item_Sort_Cb func, const void *data)
 {
@@ -1722,6 +1755,15 @@ elm_store_item_sort_func_set(Elm_Store *st, Elm_Store_Item_Sort_Cb func, const v
    st->cb.item_sort.data = (void *)data;
 }
 
+/**
+ * Set the store item free func
+ *
+ * @param st The store object
+ * @param func The free cb function of an store
+ * @param data The new data pointer to set
+ *
+ * @ingroup Store
+ */
 EAPI void
 elm_store_item_free_func_set(Elm_Store *st, Elm_Store_Item_Free_Cb func, const void *data)
 {
@@ -1730,6 +1772,14 @@ elm_store_item_free_func_set(Elm_Store *st, Elm_Store_Item_Free_Cb func, const v
    st->cb.item_free.data = (void *)data;
 }
 
+/**
+ * Get the item index that included header items
+ *
+ * @param sti The store item object
+ * @return The item index in genlist
+ *
+ * @ingroup Store
+ */
 EAPI int
 elm_store_item_index_get(const Elm_Store_Item *sti)
 {
@@ -1754,6 +1804,14 @@ elm_store_item_index_get(const Elm_Store_Item *sti)
    return -1;
 }
 
+/**
+ * Get the item index of real data that don't included header items
+ *
+ * @param sti The store item object
+ * @return The real item index
+ *
+ * @ingroup Store
+ */
 EAPI int
 elm_store_item_data_index_get(const Elm_Store_Item *sti)
 {
@@ -1778,6 +1836,14 @@ elm_store_item_data_index_get(const Elm_Store_Item *sti)
    return -1;
 }
 
+/**
+ * Get the DB pointer of an item
+ *
+ * @param sti The store item object
+ * @return The DB pointer of item
+ *
+ * @ingroup Store
+ */
 EAPI void *
 elm_store_dbsystem_db_get(const Elm_Store_Item *sti)
 {
@@ -1789,6 +1855,14 @@ elm_store_dbsystem_db_get(const Elm_Store_Item *sti)
    return std->p_db;
 }
 
+/**
+ * Set the DB pointer of an item
+ *
+ * @param sti The store item object
+ * @parm p_db The DB pointer of item
+ *
+ * @ingroup Store
+ */
 EAPI void
 elm_store_dbsystem_db_set(Elm_Store *store, void *p_db)
 {
@@ -1808,6 +1882,15 @@ elm_store_dbsystem_db_set(Elm_Store *store, void *p_db)
                                               store, EINA_TRUE);
 }
 
+/**
+ * Append the item to the genlist
+ *
+ * @param st The store object
+ * @param info The store item info dbsystem object
+ * @return The item of store
+ *
+ * @ingroup Store
+ */
 EAPI Elm_Store_Item *
 elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
 {
@@ -1847,6 +1930,13 @@ elm_store_item_add(Elm_Store *st, Elm_Store_Item_Info *info)
      }
 }
 
+/**
+ * Realize the visible items to the screen
+ *
+ * @param st The store object
+ *
+ * @ingroup Store
+ */
 EAPI void
 elm_store_visible_items_update(Elm_Store *st)
 {
@@ -1863,6 +1953,13 @@ elm_store_visible_items_update(Elm_Store *st)
      }
 }
 
+/**
+ * Realize the item to the screen
+ *
+ * @param sti The store item object
+ *
+ * @ingroup Store
+ */
 EAPI void
 elm_store_item_update(Elm_Store_Item *sti)
 {
@@ -1883,6 +1980,13 @@ elm_store_item_update(Elm_Store_Item *sti)
      }
 }
 
+/**
+ * Delete the item of genlist
+ *
+ * @param sti The store item object
+ *
+ * @ingroup Store
+ */
 EAPI void
 elm_store_item_del(Elm_Store_Item *sti)
 {
@@ -1937,3 +2041,6 @@ elm_store_item_del(Elm_Store_Item *sti)
         if(!deleted) printf(" Not deleted because it does not existed in the genlist \n");
      }
 }
+
+// TODO: END -DBsystem store
+

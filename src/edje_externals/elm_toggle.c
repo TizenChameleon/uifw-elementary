@@ -32,7 +32,7 @@ external_toggle_state_set(void *data __UNUSED__, Evas_Object *obj, const void *f
      elm_object_part_text_set(obj, "off", p->off);
 
    if (p->state_exists)
-     elm_check_state_set(obj, p->state);
+     elm_toggle_state_set(obj, p->state);
 }
 
 static Eina_Bool
@@ -76,7 +76,7 @@ external_toggle_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Ex
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
 	  {
-	     elm_check_state_set(obj, param->i);
+	     elm_toggle_state_set(obj, param->i);
 	     return EINA_TRUE;
 	  }
      }
@@ -123,7 +123,7 @@ external_toggle_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_Ex
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
 	  {
-	     param->i = elm_check_state_get(obj);
+	     param->i = elm_toggle_state_get(obj);
 	     return EINA_TRUE;
 	  }
      }
@@ -194,21 +194,4 @@ static Edje_External_Param_Info external_toggle_params[] = {
 };
 
 DEFINE_EXTERNAL_ICON_ADD(toggle, "toggle")
-#undef DEFINE_EXTERNAL_TYPE_SIMPLE
-#define DEFINE_EXTERNAL_TYPE_SIMPLE(type_name, name)    \
-static Evas_Object *                                \
-external_##type_name##_add(void *data __UNUSED__, Evas *evas __UNUSED__, Evas_Object *edje, const Eina_List *params __UNUSED__, const char *part_name) \
-{									\
-   Evas_Object *parent, *obj;						\
-   external_elm_init();                                                 \
-   parent = elm_widget_parent_widget_get(edje);			\
-   if (!parent) parent = edje;						\
-   obj = elm_check_add(parent);				\
-   elm_object_style_set(obj, "toggle"); \
-   external_signals_proxy(obj, edje, part_name);			\
-   return obj;								\
-}									\
-									\
-DEFINE_EXTERNAL_TYPE(type_name, name)
-
 DEFINE_EXTERNAL_TYPE_SIMPLE(toggle, "Toggle")

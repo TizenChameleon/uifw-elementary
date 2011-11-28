@@ -670,7 +670,14 @@ _title_prev_btn_set(Elm_Naviframe_Item *it,
      evas_object_del(it->title_prev_btn);
 
    it->title_prev_btn = btn;
-   if (!btn) return;
+
+   if (!btn)
+     {
+        edje_object_signal_emit(VIEW(it),
+                                "elm,state,prev_btn,hide",
+                                "elm");
+        return;
+     }
 
    elm_widget_sub_object_add(WIDGET(it), btn);
    evas_object_event_callback_add(btn,
@@ -693,7 +700,14 @@ _title_next_btn_set(Elm_Naviframe_Item *it, Evas_Object *btn)
      evas_object_del(it->title_next_btn);
 
    it->title_next_btn = btn;
-   if (!btn) return;
+
+   if (!btn)
+     {
+        edje_object_signal_emit(VIEW(it),
+                                "elm,state,next_btn,hide",
+                                "elm");
+        return;
+     }
 
    elm_widget_sub_object_add(WIDGET(it), btn);
    evas_object_event_callback_add(btn,
@@ -715,7 +729,14 @@ _title_icon_set(Elm_Naviframe_Item *it, Evas_Object *icon)
      evas_object_del(it->icon);
 
    it->icon = icon;
-   if (!icon) return;
+
+   if (!icon)
+     {
+        edje_object_signal_emit(VIEW(it),
+                                "elm,state,icon,hide",
+                                "elm");
+        return;
+     }
 
    elm_widget_sub_object_add(WIDGET(it), icon);
    evas_object_event_callback_add(icon,

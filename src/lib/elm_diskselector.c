@@ -181,6 +181,15 @@ _theme_data_get(Widget_Data *wd)
 }
 
 static void
+_default_display_item_num_set(Widget_Data *wd)
+{
+   const char* str;
+   str = edje_object_data_get(wd->right_blank, "display_item_num");
+   if (str) wd->display_item_num = MAX(DISPLAY_ITEM_NUM_MIN, atoi(str));
+   else wd->display_item_num = DISPLAY_ITEM_NUM_MIN;
+}
+
+static void
 _del_hook(Evas_Object * obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1372,13 +1381,4 @@ elm_diskselector_display_item_num_set(Evas_Object *obj, int num)
    if (num < DISPLAY_ITEM_NUM_MIN) num = DISPLAY_ITEM_NUM_MIN;
    wd->display_item_num = num;
    wd->display_item_num_by_api = EINA_TRUE;
-}
-
-EAPI int
-elm_diskselector_display_item_num_get(const Evas_Object *item)
-{
-   ELM_CHECK_WIDTYPE(item, widtype) (-1);
-   Widget_Data *wd = elm_widget_data_get(item);
-   if (!wd) return -1;
-   return wd->display_item_num;
 }

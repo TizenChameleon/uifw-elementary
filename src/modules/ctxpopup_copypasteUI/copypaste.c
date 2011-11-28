@@ -131,7 +131,7 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
 #endif
    ext_mod->cnpinit(data,obj,event_info);
    elm_cbhm_helper_init(obj);
-   if (ext_mod->cnp_mode != ELM_CNP_MODE_MARKUP)
+   if (ext_mod->textonly)
      elm_cbhm_send_raw_data("show0");
    else
      elm_cbhm_send_raw_data("show1");
@@ -208,7 +208,6 @@ obj_longpress(Evas_Object *obj)
    const char *context_menu_orientation;
    char buf[255];
    Evas_Object* icon;
-   Elm_Object_Item *added_item = NULL;
 
    /*update*/
    elm_entry_extension_module_data_get(obj,ext_mod);
@@ -243,19 +242,14 @@ obj_longpress(Evas_Object *obj)
                {
                   if (!elm_entry_is_empty(obj))
                     {
-                       added_item = elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
-                       added_item = elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
+                       elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
+                       elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
                     }
                }
-
-#ifdef HAVE_ELEMENTARY_X
-             if (cbhm_count)
-#else
              if (1) // need way to detect if someone has a selection
-#endif
                {
                   if (ext_mod->editable)
-                    added_item = elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+                    elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
                }
              //elm_ctxpopup_item_append(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
              // start for cbhm
@@ -268,7 +262,7 @@ obj_longpress(Evas_Object *obj)
                   icon = elm_icon_add(ext_mod->popup);
                   snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
                   elm_icon_file_set(icon, buf, NULL);
-                  added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
+                  elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
                   //elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
                }
              // end for cbhm
@@ -279,32 +273,24 @@ obj_longpress(Evas_Object *obj)
                {
                   if (ext_mod->have_selection)
                     {
-                       added_item = elm_ctxpopup_item_append(ext_mod->popup, "Copy", NULL, _copy, obj );
+                       elm_ctxpopup_item_append(ext_mod->popup, "Copy", NULL, _copy, obj );
                        if (ext_mod->editable)
-                         added_item = elm_ctxpopup_item_append(ext_mod->popup, "Cut", NULL, _cut, obj );
-#ifdef HAVE_ELEMENTARY_X
-                       if (ext_mod->editable && cbhm_count)
-#else
+                         elm_ctxpopup_item_append(ext_mod->popup, "Cut", NULL, _cut, obj );
                        if (ext_mod->editable)
-#endif
-                         added_item = elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+                         elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
                     }
                   else
                     {
                        _cancel(obj,ext_mod->popup,NULL);
                        if (!elm_entry_is_empty(obj))
                          {
-                            added_item = elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
-                            added_item = elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
+                            elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
+                            elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
                          }
-#ifdef HAVE_ELEMENTARY_X
-                       if (cbhm_count)
-#else
                        if (1) // need way to detect if someone has a selection
-#endif
                          {
                             if (ext_mod->editable)
-                              added_item = elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+                              elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
                          }
                     }
                   // start for cbhm
@@ -317,7 +303,7 @@ obj_longpress(Evas_Object *obj)
                        icon = elm_icon_add(ext_mod->popup);
                        snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
                        elm_icon_file_set(icon, buf, NULL);
-                       added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
+                       elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
                        //elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
                     }
                   // end for cbhm
@@ -325,9 +311,9 @@ obj_longpress(Evas_Object *obj)
           }
         EINA_LIST_FOREACH(ext_mod->items, l, it)
           {
-             added_item = elm_ctxpopup_item_append(ext_mod->popup, it->label, NULL, _item_clicked, it );
+             elm_ctxpopup_item_append(ext_mod->popup, it->label, NULL, _item_clicked, it );
           }
-        if (ext_mod->popup && added_item)
+        if (ext_mod->popup)
           {
              elm_object_scroll_freeze_push(ext_mod->popup);
              _ctxpopup_position(obj);

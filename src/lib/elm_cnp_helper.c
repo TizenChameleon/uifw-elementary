@@ -1181,16 +1181,6 @@ _convert_to_edje(Eina_List* nodes)
 }
 
 Eina_Bool
-elm_selection_selection_has_owner(void)
-{
-#ifdef HAVE_ELEMENTARY_X
-   return !!ecore_x_selection_owner_get(clipboard_atom);
-#else
-   return EINA_FALSE;
-#endif
-}
-
-Eina_Bool
 elm_selection_set(Elm_Sel_Type selection, Evas_Object *widget, Elm_Sel_Format format, const char *selbuf)
 {
 #ifdef HAVE_ELEMENTARY_X
@@ -1542,7 +1532,7 @@ entry_insert_filter(Evas_Object* entry, char* str)
 
    char *insertStr = str;
    // if entry has text only set then remove item tags
-   if (elm_entry_cnp_mode_get(entry) != ELM_CNP_MODE_MARKUP)
+   if (elm_entry_cnp_textonly_get(entry))
      {
         while (EINA_TRUE)
           {
@@ -1610,8 +1600,7 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
      {
         Elm_Selection_Data ddata;
 
-        str = malloc(data->length);
-        memcpy(str, data->data, data->length);
+        str = strdup(data->data);
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_TEXT;
         ddata.data = str;
@@ -2163,7 +2152,7 @@ pasteimage_append(Paste_Image *pi, Evas_Object *entry)
 
    if (!pi) return EINA_FALSE;
    if (!entry) return EINA_FALSE;
-   if (elm_entry_cnp_mode_get(entry) != ELM_CNP_MODE_MARKUP) return EINA_FALSE;
+   if (elm_entry_cnp_textonly_get(entry)) return EINA_FALSE;
 
    pasteimage_provider_set(entry);
 

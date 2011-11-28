@@ -2,6 +2,13 @@
 #include "elm_priv.h"
 
 
+/**
+ * @defgroup Stackedicon Stackedicon
+ * @ingroup Elementary
+ *
+ * This is a Stackedicon.
+ */
+
 
 #define MAX_ITEM_NUM      (9)
 #define MAX_MOVE_INTERVAL   (0.2)
@@ -686,6 +693,14 @@ _event_init(Evas_Object *obj)
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide_cb, obj);
 }
 
+/**
+ * Add a new stackedicon to the parent
+ *
+ * @param parent The parent object
+ * @return The new object or NULL if it cannot be created
+ *
+ * @ingroup Stackedicon
+ */
 EAPI Evas_Object *
 elm_stackedicon_add(Evas_Object *parent)
 {
@@ -717,6 +732,15 @@ elm_stackedicon_add(Evas_Object *parent)
    return obj;
 }
 
+/**
+ * This appends a path to the stackedicon
+ *
+ * @param    obj   The stackedicon object
+ * @param    path   The image full path
+ * @return   The new item or NULL if it cannot be created
+ *
+ * @ingroup Stackedicon
+ */
 EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const char *path)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -744,6 +768,15 @@ EAPI Elm_Stackedicon_Item *elm_stackedicon_item_append(Evas_Object *obj, const c
    return it;
 }
 
+/**
+ * This prepends a path to the stackedicon
+ *
+ * @param    obj   The stackedicon object
+ * @param    path   The image full path
+ * @return   The new item or NULL if it cannot be created
+ *
+ * @ingroup Stackedicon
+ */
 EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const char *path)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -771,9 +804,16 @@ EAPI Elm_Stackedicon_Item *elm_stackedicon_item_prepend(Evas_Object *obj, const 
    return it;
 }
 
+/**
+ * This delete a path at the stackedicon
+ *
+ * @param    Elm_Stackedicon_Item   The delete item
+ *
+ * @ingroup Stackedicon
+ */
 EAPI void elm_stackedicon_item_del(Elm_Stackedicon_Item *it)
 {
-   if (!it) return;
+   if (!it)return;
    ELM_CHECK_WIDTYPE(it->parent, widtype);
    Evas_Object *obj = it->parent;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -794,6 +834,14 @@ EAPI void elm_stackedicon_item_del(Elm_Stackedicon_Item *it)
    _update_stackedicon(obj);
 }
 
+/**
+ * Get item list from the stackedicon
+ *
+ * @param    obj   The stackedicon object
+ * @return   The item list or NULL if it cannot be created
+ *
+ * @ingroup Stackedicon
+ */
 EAPI Eina_List *elm_stackedicon_item_list_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -801,3 +849,4 @@ EAPI Eina_List *elm_stackedicon_item_list_get(Evas_Object *obj)
    if (!wd) return NULL;
    return wd->list;
 }
+

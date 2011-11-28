@@ -2212,7 +2212,7 @@ _transit_effect_image_animation_op(Elm_Transit_Effect *effect, Elm_Transit *tran
 
    EINA_LIST_FOREACH(transit->objs, elist, obj)
      {
-        if (elm_widget_type_check(obj, type, __func__))
+        if (elm_widget_type_check(obj, type))
           elm_icon_file_set(obj,
                             eina_list_nth(image_animation->images, count), NULL);
      }
