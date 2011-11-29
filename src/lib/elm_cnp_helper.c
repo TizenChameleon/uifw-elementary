@@ -1478,6 +1478,18 @@ notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notif
                       if(!is_uri_type_data(sel, notify)) continue;
                     }
 #endif
+                  /*
+                   * temporary patch for elm_selection_get with ELM_SEL_FORMAT_HTML
+                   * it will be removed after cbhm refactoring
+                   */
+                  if ((j == CNP_ATOM_XELM)
+                      && (!(sel->requestformat & ELM_SEL_FORMAT_MARKUP)))
+                    {
+                       cnp_debug("Atom %s matched, but selection request is not ELM_SEL_FORMAT_MARKUP\n",
+                                 atoms[j].name);
+                       continue;
+                    }
+
                   cnp_debug("Atom %s matches\n",atoms[j].name);
                   goto done;
                }
