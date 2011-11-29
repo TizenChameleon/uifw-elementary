@@ -5348,7 +5348,7 @@ _item_moving_effect_timer_cb(void *data)
    const Eina_List *l;
    double time = 0.5, t;
    int y, dy;
-   Eina_Bool check, end = EINA_FALSE;
+   Eina_Bool check, end = EINA_FALSE, vis = EINA_TRUE;
    int in = 0;
 
    t = ((0.0 > (t = current_time_get() - wd->start_time)) ? 0.0 : t) / 1000;
@@ -5357,6 +5357,15 @@ _item_moving_effect_timer_cb(void *data)
    evas_output_viewport_get(evas_object_evas_get(wd->pan_smart), &cvx, &cvy, &cvw, &cvh);
    if (t > time) end = EINA_TRUE;
 
+   // Below while statement is needed, when the genlist is resized.
+   it2 = wd->expand_item;
+   while (it2 && vis)
+     {
+        evas_object_move(VIEW(it2), it2->scrl_x, it2->scrl_y);
+        vis = (ELM_RECTS_INTERSECT(it2->scrl_x, it2->scrl_y, it2->w, it2->h,
+                                   cvx, cvy, cvw, cvh));
+        it2 = elm_genlist_item_prev_get(it2);
+     }
    it2 = elm_genlist_item_next_get(wd->expand_item);
    while (it2)
      {
