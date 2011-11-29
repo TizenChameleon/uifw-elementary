@@ -1850,6 +1850,91 @@ _item_label_realize(Elm_Genlist_Item *it,
 }
 
 static Eina_List *
+_item_mode_icon_unrealize(Elm_Genlist_Item *it,
+                          Evas_Object *target,
+                          Eina_List **source,
+                          const char *parts,
+                          Eina_List **icons_list)
+{
+   Eina_List *res = *icons_list;
+
+   if (it->itc->func.icon_get)
+     {
+        const Eina_List *l;
+        const char *key;
+        Evas_Object *ic = NULL;
+
+        EINA_LIST_FOREACH(*source, l, key)
+          {
+             if (parts && fnmatch(parts, key, FNM_PERIOD))
+               continue;
+
+             ic = edje_object_part_swallow_get(target, key);
+             if (ic)
+               {
+                  res = eina_list_remove(res, ic);
+                  edje_object_part_unswallow(target, ic);
+                  evas_object_del(ic);
+               }
+          }
+     }
+
+   return res;
+}
+
+static Eina_List *
+_item_mode_icon_realize(Elm_Genlist_Item *it,
+                        Evas_Object *target,
+                        Eina_List **source,
+                        const char *parts,
+                        Eina_List **icons_list,
+                        const char *icons_part)
+
+{
+   Eina_List *res = NULL;
+
+   if (it->itc->func.icon_get)
+     {
+        const Eina_List *l;
+        const char *key;
+
+        *source = elm_widget_stringlist_get(edje_object_data_get(target, icons_part));
+        if (parts && (eina_list_count(*source) != eina_list_count(*icons_list)))
+             res = *icons_list;
+        EINA_LIST_FOREACH(*source, l, key)
+          {
+             if (parts && fnmatch(parts, key, FNM_PERIOD))
+               continue;
+
+             Evas_Object *ic = it->itc->func.icon_get
+                ((void *)it->base.data, WIDGET(it), l->data);
+
+             if (ic)
+               {
+                  res = eina_list_append(res, ic);
+                  edje_object_part_swallow(target, key, ic);
+                  evas_object_show(ic);
+                  elm_widget_sub_object_add(WIDGET(it), ic);
+                  if (it->mode_view || it->wd->edit_mode)
+                    {
+                       if (it->disabled)
+                         elm_widget_disabled_set(ic, EINA_TRUE);
+                    }
+                  else if (it->renamed)
+                    {
+                       // FIXME: if entry calcuates its cursor position correctly and conformant works,
+                       //        genlist does not need to handle this focus thing.
+                       evas_object_smart_callback_add(ic, "focused", _icon_focused, it);
+                       evas_object_smart_callback_add(ic, "unfocused", _icon_unfocused, it);
+                    }
+               }
+          }
+     }
+
+   return res;
+}
+
+static Eina_List *
 _item_icon_unrealize(Elm_Genlist_Item *it,
                      Evas_Object *target,
                      Eina_List **source,
@@ -4779,6 +4864,30 @@ elm_genlist_item_fields_update(Elm_Genlist_Item *it,
                                              &it->icons, parts);
         it->icon_objs = _item_icon_realize(it, VIEW(it),
                                            &it->icons, parts);
+
+        if (it->renamed)
+          {
+             it->icon_objs = _item_mode_icon_unrealize(it, VIEW(it),
+                                                       &it->icons, parts, &it->icon_objs);
+             it->icon_objs = _item_mode_icon_realize(it, VIEW(it),
+                                                     &it->icons, parts, &it->icon_objs, "renames");
+          }
+
+        if (it->mode_view)
+          {
+             it->mode_icon_objs = _item_mode_icon_unrealize(it, it->mode_view,
+                                                            &it->mode_icons, parts, &it->mode_icon_objs);
+             it->mode_icon_objs = _item_mode_icon_realize(it, it->mode_view,
+                                                          &it->mode_icons, parts, &it->mode_icon_objs, "icons");
+          }
+
+        if (it->wd->edit_mode)
+          {
+             it->edit_icon_objs = _item_mode_icon_unrealize(it, it->edit_obj,
+                                                            &it->icons, parts, &it->edit_icon_objs);
+             it->edit_icon_objs = _item_mode_icon_realize(it, it->edit_obj,
+                                                     &it->icons, parts, &it->edit_icon_objs, "edit_icons");
+          }
      }
    if ((!itf) || (itf & ELM_GENLIST_ITEM_FIELD_STATE))
      _item_state_realize(it, VIEW(it), &it->states, parts);
