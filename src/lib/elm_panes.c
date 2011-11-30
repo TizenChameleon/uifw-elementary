@@ -223,12 +223,15 @@ _content_left_set(Evas_Object *obj, Evas_Object *content)
      {
         evas_object_del(wd->contents.left);
         wd->contents.left = NULL;
+        edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
      }
    if (content)
      {
         wd->contents.left = content;
         elm_widget_sub_object_add(obj, content);
         edje_object_part_swallow(wd->panes, "elm.swallow.left", content);
+        if (wd->contents.right)
+          edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
      }
 }
 
@@ -240,12 +243,15 @@ _content_right_set(Evas_Object *obj, Evas_Object *content)
      {
         evas_object_del(wd->contents.right);
         wd->contents.right = NULL;
+        edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
      }
    if (content)
      {
         wd->contents.right = content;
         elm_widget_sub_object_add(obj, content);
         edje_object_part_swallow(wd->panes, "elm.swallow.right", content);
+        if (wd->contents.left)
+          edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
      }
 }
 
@@ -259,6 +265,7 @@ _content_left_unset(Evas_Object *obj)
    edje_object_part_unswallow(wd->panes, content);
    evas_object_hide(content);
    wd->contents.left = NULL;
+   edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
    return content;
 }
 
@@ -272,6 +279,7 @@ _content_right_unset(Evas_Object *obj)
    edje_object_part_unswallow(wd->panes, content);
    evas_object_hide(content);
    wd->contents.right = NULL;
+   edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
    return content;
 }
 
