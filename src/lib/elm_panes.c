@@ -104,9 +104,7 @@ static Eina_Bool
 _elm_panes_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
-   if (!wd)
-     return EINA_FALSE;
+   if (!wd) return EINA_FALSE;
 
    double w, h;
    edje_object_part_drag_value_get(wd->panes, "elm.bar", &w, &h);
@@ -332,7 +330,6 @@ elm_panes_add(Evas_Object *parent)
 
    ELM_SET_WIDTYPE(widtype, "panes");
    elm_widget_type_set(obj, "panes");
-   elm_widget_can_focus_set(obj, EINA_FALSE);
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
    elm_widget_del_hook_set(obj, _del_hook);
@@ -413,6 +410,7 @@ elm_panes_content_left_size_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    double w, h;
 
+   if (!wd) return 0;
    edje_object_part_drag_value_get(wd->panes, "elm.bar", &w, &h);
    if (wd->horizontal) return h;
    else return w;
@@ -424,6 +422,7 @@ elm_panes_content_left_size_set(Evas_Object *obj, double size)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
+   if (!wd) return;
    if (size < 0.0) size = 0.0;
    else if (size > 1.0) size = 1.0;
    if (wd->horizontal)
@@ -438,6 +437,7 @@ elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
+   if (!wd) return;
    wd->horizontal = horizontal;
    _theme_hook(obj);
    elm_panes_content_left_size_set(obj, 0.5);
@@ -448,6 +448,7 @@ elm_panes_horizontal_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
    return wd->horizontal;
 }
 
@@ -456,7 +457,8 @@ elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-   wd->fixed = fixed;
+   if (!wd) return;
+   wd->fixed = !!fixed;
    if (wd->fixed == EINA_TRUE)
      edje_object_signal_emit(wd->panes, "elm.panes.fixed", "elm");
    else
@@ -468,5 +470,6 @@ elm_panes_fixed_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
    return wd->fixed;
 }
