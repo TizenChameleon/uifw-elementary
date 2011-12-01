@@ -191,22 +191,3 @@ elm_scrolled_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly)
 EINA_DEPRECATED EAPI Eina_Bool
 elm_scrolled_entry_cnp_textonly_get(Evas_Object *obj)
 {return elm_entry_cnp_textonly_get(obj);}
-//////////////////////////////////////////////////////////// ONLY in our git
-EINA_DEPRECATED EAPI void
-elm_scrolled_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
-{elm_entry_line_char_wrap_set(obj, wrap);}
-EINA_DEPRECATED EAPI void
-elm_scrolled_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
-{elm_entry_input_panel_enabled_set(obj, enabled);}
-EINA_DEPRECATED EAPI void
-elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout)
-{elm_entry_input_panel_layout_set(obj, layout);}
-EINA_DEPRECATED EAPI Ecore_IMF_Context *
-elm_scrolled_entry_imf_context_get(Evas_Object *obj)
-{return elm_entry_imf_context_get(obj);}
-EINA_DEPRECATED EAPI void
-elm_scrolled_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
-{elm_entry_autocapitalization_set(obj, autocap);}
-EINA_DEPRECATED EAPI void
-elm_scrolled_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
-{elm_entry_autoperiod_set(obj, autoperiod);}

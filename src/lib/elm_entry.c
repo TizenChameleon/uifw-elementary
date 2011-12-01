@@ -46,7 +46,6 @@ struct _Widget_Data
    const char *cut_sel;
    const char *text;
    const char *password_text;
-   Evas_Coord wrap_w;
    const char *file;
    Elm_Text_Format format;
    Evas_Coord lastw, entmw, entmh;
@@ -4345,95 +4344,4 @@ elm_entry_magnifier_type_set(Evas_Object *obj, int type)
 
    wd->mgf_type = type;
    _magnifier_create(obj);
-}
-
-EAPI void
-elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (wd->wrap_w == w) return;
-   wd->wrap_w = w;
-   _sizing_eval(obj);
-}
-
-EAPI Evas_Coord
-elm_entry_wrap_width_get(const Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return 0;
-   return wd->wrap_w;
-}
-
-EAPI void
-elm_entry_fontsize_set(Evas_Object *obj, int fontsize)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Eina_Strbuf *fontbuf = NULL;
-   int removeflag = 0;
-   const char *t;
-
-   if (!wd) return;
-   t = eina_stringshare_add(elm_entry_entry_get(obj));
-   fontbuf = eina_strbuf_new();
-   eina_strbuf_append_printf(fontbuf, "%d", fontsize);
-
-   if (fontsize == 0) removeflag = 1; // remove fontsize tag
-
-   if (_stringshare_key_value_replace(&t, "font_size", eina_strbuf_string_get(fontbuf), removeflag) == 0)
-     {
-       elm_entry_entry_set(obj, t);
-       wd->changed = 1;
-       _sizing_eval(obj);
-     }
-   eina_strbuf_free(fontbuf);
-   eina_stringshare_del(t);
-}
-
-EAPI void
-elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Eina_Strbuf *colorbuf = NULL;
-   const char *t;
-   int len;
-
-   if (!wd) return;
-   t = eina_stringshare_add(elm_entry_entry_get(obj));
-   len = strlen(t);
-   if (len <= 0) return;
-   colorbuf = eina_strbuf_new();
-   eina_strbuf_append_printf(colorbuf, "#%02X%02X%02X%02X", r, g, b, a);
-
-   if (_stringshare_key_value_replace(&t, "color", eina_strbuf_string_get(colorbuf), 0) == 0)
-     {
-       elm_entry_entry_set(obj, t);
-       wd->changed = 1;
-       _sizing_eval(obj);
-     }
-   eina_strbuf_free(colorbuf);
-   eina_stringshare_del(t);
-}
-
-EAPI void
-elm_entry_text_align_set(Evas_Object *obj, const char *alignmode)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   int len;
-   const char *t;
-
-   if (!wd) return;
-   t = eina_stringshare_add(elm_entry_entry_get(obj));
-   len = strlen(t);
-   if (len <= 0) return;
-
-   if (_stringshare_key_value_replace(&t, "align", alignmode, 0) == 0)
-     elm_entry_entry_set(obj, t);
-
-   wd->changed = 1;
-   _sizing_eval(obj);
-   eina_stringshare_del(t);
 }

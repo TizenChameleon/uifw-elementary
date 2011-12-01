@@ -664,37 +664,6 @@ elm_icon_animated_play_get(const Evas_Object *obj)
    return wd->play;
 }
 
-/* compatibility code to prevent ABI break */
-EAPI Eina_Bool
-elm_icon_anim_available_get(const Evas_Object *obj)
-{
-  return elm_icon_animated_available_get(obj);
-}
-
-EAPI void
-elm_icon_anim_set(Evas_Object *obj, Eina_Bool anim)
-{
-  elm_icon_animated_set(obj, anim);
-}
-
-EAPI Eina_Bool
-elm_icon_anim_get(const Evas_Object *obj)
-{
-  return elm_icon_animated_get(obj);
-}
-
-EAPI void
-elm_icon_anim_play_set(Evas_Object *obj, Eina_Bool play)
-{
-  elm_icon_animated_play_set(obj, play);
-}
-
-EAPI Eina_Bool
-elm_icon_anim_play_get(const Evas_Object *obj)
-{
-  return elm_icon_animated_play_get(obj);
-}
-
 static Eina_Bool
 _icon_standard_set(Widget_Data *wd, Evas_Object *obj, const char *name)
 {

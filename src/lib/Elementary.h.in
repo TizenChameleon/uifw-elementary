@@ -5366,27 +5366,6 @@ extern "C" {
     */
    EAPI Eina_Bool           elm_icon_animated_play_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
-   /* compatibility code to avoid API and ABI breaks */
-   EINA_DEPRECATED EAPI extern inline void elm_icon_anim_set(Evas_Object *obj, Eina_Bool animated)
-     {
-        elm_icon_animated_set(obj, animated);
-     }
-
-   EINA_DEPRECATED EAPI extern inline Eina_Bool elm_icon_anim_get(const Evas_Object *obj)
-     {
-        return elm_icon_animated_get(obj);
-     }
-
-   EINA_DEPRECATED EAPI extern inline void elm_icon_anim_play_set(Evas_Object *obj, Eina_Bool play)
-     {
-        elm_icon_animated_play_set(obj, play);
-     }
-
-   EINA_DEPRECATED EAPI extern inline Eina_Bool elm_icon_anim_play_get(const Evas_Object *obj)
-     {
-        return elm_icon_animated_play_get(obj);
-     }
-
    /**
     * @}
     */
@@ -6464,35 +6443,6 @@ extern "C" {
     * @deprecated use elm_object_text_set() instead.
     */
    EINA_DEPRECATED EAPI const char  *elm_button_label_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-   /**
-    * Set the label for each state of button
-    *
-    * The passed @p label can be NULL to clean any existing text in it and
-    * leave the button as an icon only object for the state.
-    *
-    * @param obj The button object
-    * @param label The text will be written on the button
-    * @param state The state of button
-    *
-    * @ingroup Button
-    */
-   EINA_DEPRECATED EAPI void         elm_button_label_set_for_state(Evas_Object *obj, const char *label, UIControlState state) EINA_ARG_NONNULL(1);
-   /**
-    * Get the label of button for each state
-    *
-    * The string returned is an internal pointer and should not be freed or
-    * altered. It will also become invalid when the button is destroyed.
-    * The string returned, if not NULL, is a stringshare, so if you need to
-    * keep it around even after the button is destroyed, you can use
-    * eina_stringshare_ref().
-    *
-    * @param obj The button object
-    * @param state The state of button
-    * @return The title of button for state
-    *
-    * @ingroup Button
-    */
-   EINA_DEPRECATED EAPI const char  *elm_button_label_get_for_state(const Evas_Object *obj, UIControlState state) EINA_ARG_NONNULL(1);
    /**
     * Set the icon used for the button
     *
@@ -7842,7 +7792,6 @@ extern "C" {
     * choosen wrap method was ELM_WRAP_WORD.
     */
    EAPI void         elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI void elm_label_wrap_mode_set(Evas_Object *obj, Eina_Bool wrapmode) EINA_ARG_NONNULL(1);
    /**
     * @brief Set the text slide of the label
     *
@@ -12036,12 +11985,6 @@ extern "C" {
    EAPI void         elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_sensitive);
    EAPI void         elm_entry_magnifier_type_set(Evas_Object *obj, int type) EINA_ARG_NONNULL(1);
 
-   EINA_DEPRECATED EAPI void         elm_entry_wrap_width_set(Evas_Object *obj, Evas_Coord w);
-   EINA_DEPRECATED EAPI Evas_Coord   elm_entry_wrap_width_get(const Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_entry_fontsize_set(Evas_Object *obj, int fontsize);
-   EINA_DEPRECATED EAPI void         elm_entry_text_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
-   EINA_DEPRECATED EAPI void         elm_entry_text_align_set(Evas_Object *obj, const char *alignmode);
-
    /**
     * @}
     */
@@ -12708,9 +12651,6 @@ extern "C" {
     * This function gets the selected corner of the bubble.
     */
    EAPI const char  *elm_bubble_corner_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
-
-   EINA_DEPRECATED EAPI void         elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI Evas_Object *elm_bubble_sweep_layout_unset(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    /**
     * @}
@@ -16140,22 +16080,6 @@ extern "C" {
     * @see elm_menu_item_object_content_set()
     */
    EAPI Evas_Object *elm_menu_item_object_content_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1);
-
-   EINA_DEPRECATED extern inline void elm_menu_item_icon_set(Elm_Menu_Item *item, const char *icon) EINA_ARG_NONNULL(1, 2)
-     {
-        elm_menu_item_object_icon_name_set(item, icon);
-     }
-
-   EINA_DEPRECATED extern inline Evas_Object *elm_menu_item_object_icon_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1)
-     {
-        return elm_menu_item_object_content_get(item);
-     }
-
-   EINA_DEPRECATED extern inline const char *elm_menu_item_icon_get(const Elm_Menu_Item *item) EINA_ARG_NONNULL(1)
-     {
-        return elm_menu_item_object_icon_name_get(item);
-     }
-
    /**
     * @brief Set the selected state of @p item.
     *
@@ -20477,7 +20401,6 @@ extern "C" {
    EAPI Evas_Object *elm_pager_content_top_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
    EAPI void         elm_pager_to_content_pop(Evas_Object *obj, Evas_Object *content); EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED    EAPI void         elm_pager_animation_disabled_set(Evas_Object *obj, Eina_Bool disable); EINA_ARG_NONNULL(1);
 
    /**
     * @}
@@ -24821,12 +24744,6 @@ extern "C" {
    EINA_DEPRECATED EAPI Eina_Bool    elm_scrolled_entry_autosave_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
    EINA_DEPRECATED EAPI void         elm_scrolled_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly) EINA_ARG_NONNULL(1);
    EINA_DEPRECATED EAPI Eina_Bool    elm_scrolled_entry_cnp_textonly_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI void         elm_scrolled_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap) EINA_ARG_NONNULL(1);
-   EINA_DEPRECATED EAPI void         elm_scrolled_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled);
-   EINA_DEPRECATED EAPI void         elm_scrolled_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout);
-   EINA_DEPRECATED EAPI Ecore_IMF_Context *elm_scrolled_entry_imf_context_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_scrolled_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
-   EINA_DEPRECATED EAPI void         elm_scrolled_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
 
    /**
     * @defgroup Conformant Conformant
@@ -28826,35 +28743,10 @@ extern "C" {
    EAPI void         elm_datefield_item_max_set(Evas_Object *obj, Elm_Datefield_ItemType itemtype, int value, Eina_Bool abs_limit);
    EAPI int          elm_datefield_item_max_get(const Evas_Object *obj, Elm_Datefield_ItemType itemtype);
    EAPI Eina_Bool    elm_datefield_item_max_is_absolute(const Evas_Object *obj, Elm_Datefield_ItemType itemtype);
- 
+
    /* smart callbacks called:
    * "changed" - when datefield value is changed, this signal is sent.
    */
-
-////////////////////// DEPRECATED ///////////////////////////////////
-
-   typedef enum _Elm_Datefield_Layout
-     {
-        ELM_DATEFIELD_LAYOUT_TIME,
-        ELM_DATEFIELD_LAYOUT_DATE,
-        ELM_DATEFIELD_LAYOUT_DATEANDTIME
-     } Elm_Datefield_Layout;
-
-   EINA_DEPRECATED EAPI void         elm_datefield_layout_set(Evas_Object *obj, Elm_Datefield_Layout layout);
-   EINA_DEPRECATED EAPI Elm_Datefield_Layout elm_datefield_layout_get(const Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_datefield_date_format_set(Evas_Object *obj, const char *fmt);
-   EINA_DEPRECATED EAPI const char  *elm_datefield_date_format_get(const Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_datefield_time_mode_set(Evas_Object *obj, Eina_Bool mode);
-   EINA_DEPRECATED EAPI Eina_Bool    elm_datefield_time_mode_get(const Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_datefield_date_set(Evas_Object *obj, int year, int month, int day, int hour, int min);
-   EINA_DEPRECATED EAPI void         elm_datefield_date_get(const Evas_Object *obj, int *year, int *month, int *day, int *hour, int *min);
-   EINA_DEPRECATED EAPI Eina_Bool    elm_datefield_date_max_set(Evas_Object *obj, int year, int month, int day);
-   EINA_DEPRECATED EAPI void         elm_datefield_date_max_get(const Evas_Object *obj, int *year, int *month, int *day);
-   EINA_DEPRECATED EAPI Eina_Bool    elm_datefield_date_min_set(Evas_Object *obj, int year, int month, int day);
-   EINA_DEPRECATED EAPI void         elm_datefield_date_min_get(const Evas_Object *obj, int *year, int *month, int *day);
-   EINA_DEPRECATED EAPI void         elm_datefield_input_panel_state_callback_add(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value), void *data);
-   EINA_DEPRECATED EAPI void         elm_datefield_input_panel_state_callback_del(Evas_Object *obj, void (*pEventCallbackFunc) (void *data, Evas_Object *obj, int value));
-/////////////////////////////////////////////////////////////////////
 
    /* popup */
    typedef enum _Elm_Popup_Response
@@ -28905,84 +28797,6 @@ extern "C" {
    EAPI void         elm_popup_response(Evas_Object *obj, int  response_id);
    EAPI void         elm_popup_orient_set(Evas_Object *obj, Elm_Popup_Orient orient);
    EAPI int          elm_popup_run(Evas_Object *obj);
-
-   /* NavigationBar */
-   #define NAVIBAR_TITLEOBJ_INSTANT_HIDE "elm,state,hide,noanimate,title", "elm"
-   #define NAVIBAR_TITLEOBJ_INSTANT_SHOW "elm,state,show,noanimate,title", "elm"
-
-   typedef enum
-     {
-        ELM_NAVIGATIONBAR_FUNCTION_BUTTON1,
-        ELM_NAVIGATIONBAR_FUNCTION_BUTTON2,
-        ELM_NAVIGATIONBAR_FUNCTION_BUTTON3,
-        ELM_NAVIGATIONBAR_BACK_BUTTON
-     } Elm_Navi_Button_Type;
-
-   EINA_DEPRECATED EAPI Evas_Object *elm_navigationbar_add(Evas_Object *parent);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_push(Evas_Object *obj, const char *title, Evas_Object *fn_btn1, Evas_Object *fn_btn2, Evas_Object *fn_btn3, Evas_Object *content);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_pop(Evas_Object *obj);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_to_content_pop(Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_label_set(Evas_Object *obj, Evas_Object *content, const char *title);
-   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_title_label_get(Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_object_add(Evas_Object *obj, Evas_Object *content, Evas_Object *title_obj);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_title_object_get(Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED    EAPI Eina_List   *elm_navigationbar_title_object_list_get(Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_content_top_get(Evas_Object *obj);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_content_bottom_get(Evas_Object *obj);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_hidden_set(Evas_Object *obj, Eina_Bool hidden);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_button_set(Evas_Object *obj, Evas_Object *content, Evas_Object *button, Elm_Navi_Button_Type button_type);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_title_button_get(Evas_Object *obj, Evas_Object *content, Elm_Navi_Button_Type button_type);
-   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_subtitle_label_get(Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_subtitle_label_set(Evas_Object *obj, Evas_Object *content, const char *subtitle);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_object_list_unset(Evas_Object *obj, Evas_Object *content, Eina_List **list);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_animation_disabled_set(Evas_Object *obj, Eina_Bool disable);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_object_visible_set(Evas_Object *obj, Evas_Object *content, Eina_Bool visible);
-   EINA_DEPRECATED    Eina_Bool         elm_navigationbar_title_object_visible_get(Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_title_icon_set(Evas_Object *obj, Evas_Object *content, Evas_Object *icon);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_title_icon_get(Evas_Object *obj, Evas_Object *content);
-
-   /* NavigationBar */
-   #define NAVIBAR_EX_TITLEOBJ_INSTANT_HIDE "elm,state,hide,noanimate,title", "elm"
-   #define NAVIBAR_EX_TITLEOBJ_INSTANT_SHOW "elm,state,show,noanimate,title", "elm"
-
-   typedef enum
-     {
-        ELM_NAVIGATIONBAR_EX_BACK_BUTTON,
-        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON1,
-        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON2,
-        ELM_NAVIGATIONBAR_EX_FUNCTION_BUTTON3,
-        ELM_NAVIGATIONBAR_EX_MAX
-     } Elm_Navi_ex_Button_Type;
-   typedef struct _Elm_Navigationbar_ex_Item Elm_Navigationbar_ex_Item;
-
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_add(Evas_Object *parent);
-   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_push(Evas_Object *obj, Evas_Object *content, const char *item_style);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_pop(Evas_Object *obj);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_promote(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_to_item_pop(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_label_set(Elm_Navigationbar_ex_Item *item, const char *title);
-   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_title_label_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_top_get(const Evas_Object *obj);
-   EINA_DEPRECATED    EAPI Elm_Navigationbar_ex_Item *elm_navigationbar_ex_item_bottom_get(const Evas_Object *obj);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_button_set(Elm_Navigationbar_ex_Item* item, char *btn_label, Evas_Object *icon, int button_type, Evas_Smart_Cb func, const void *data);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_get(Elm_Navigationbar_ex_Item* item, int button_type);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_object_set(Elm_Navigationbar_ex_Item* item, Evas_Object *title_obj);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_object_unset(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_title_hidden_set(Elm_Navigationbar_ex_Item* item, Eina_Bool hidden);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_object_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_subtitle_label_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_subtitle_label_set( Elm_Navigationbar_ex_Item* item, const char *subtitle);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_style_set(Elm_Navigationbar_ex_Item* item, const char* item_style);
-   EINA_DEPRECATED    EAPI const char  *elm_navigationbar_ex_item_style_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_content_unset(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_content_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_delete_on_pop_set(Evas_Object *obj, Eina_Bool del_on_pop);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_icon_get(Elm_Navigationbar_ex_Item* item);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_item_icon_set(Elm_Navigationbar_ex_Item* item, Evas_Object *icon);
-   EINA_DEPRECATED    EAPI Evas_Object *elm_navigationbar_ex_item_title_button_unset(Elm_Navigationbar_ex_Item* item, int button_type);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_animation_disable_set(Evas_Object *obj, Eina_Bool disable);
-   EINA_DEPRECATED    EAPI void         elm_navigationbar_ex_title_object_visible_set(Elm_Navigationbar_ex_Item* item, Eina_Bool visible);
-   EINA_DEPRECATED    Eina_Bool         elm_navigationbar_ex_title_object_visible_get(Elm_Navigationbar_ex_Item* item);
 
    /**
     * @defgroup Naviframe Naviframe
@@ -30087,27 +29901,6 @@ extern "C" {
     * @{
     */
 
-   /* Sliding Drawer */
-   typedef enum _Elm_SlidingDrawer_Pos
-     {
-        ELM_SLIDINGDRAWER_BOTTOM,
-        ELM_SLIDINGDRAWER_LEFT,
-        ELM_SLIDINGDRAWER_RIGHT,
-        ELM_SLIDINGDRAWER_TOP
-     } Elm_SlidingDrawer_Pos;
-
-   typedef struct _Elm_SlidingDrawer_Drag_Value
-     {
-        double x, y;
-     } Elm_SlidingDrawer_Drag_Value;
-
-   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_content_set (Evas_Object *obj, Evas_Object *content);
-   EINA_DEPRECATED EAPI Evas_Object *elm_slidingdrawer_content_unset(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_pos_set(Evas_Object *obj, Elm_SlidingDrawer_Pos pos);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_max_drag_value_set(Evas_Object *obj, double dw,  double dh);
-   EINA_DEPRECATED EAPI void         elm_slidingdrawer_drag_value_set(Evas_Object *obj, double dx, double dy);
-
    /* multibuttonentry */
    typedef struct _Multibuttonentry_Item Elm_Multibuttonentry_Item;
    typedef Eina_Bool (*Elm_Multibuttonentry_Item_Verify_Callback) (Evas_Object *obj, const char *item_label, void *item_data, void *data);
@@ -30351,42 +30144,6 @@ extern "C" {
    /**
     * @}
     */
-
-
-   /* dialoguegroup */
-   typedef struct _Dialogue_Item Dialogue_Item;
-
-   typedef enum _Elm_Dialoguegourp_Item_Style
-     {
-        ELM_DIALOGUEGROUP_ITEM_STYLE_DEFAULT = 0,
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD = (1 << 0),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDITFIELD_WITH_TITLE = (1 << 1),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_TITLE = (1 << 2),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_HIDDEN = (1 << 3),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_DATAVIEW = (1 << 4),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_NO_BG = (1 << 5),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_SUB = (1 << 6),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT = (1 << 7),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_EDIT_MERGE = (1 << 8),
-        ELM_DIALOGUEGROUP_ITEM_STYLE_LAST = (1 << 9)
-     } Elm_Dialoguegroup_Item_Style;
-
-   EINA_DEPRECATED EAPI Evas_Object   *elm_dialoguegroup_add(Evas_Object *parent);
-   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_append(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_prepend(Evas_Object *obj, Evas_Object *subobj, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_insert_after(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *after, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI Dialogue_Item *elm_dialoguegroup_insert_before(Evas_Object *obj, Evas_Object *subobj, Dialogue_Item *before, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_remove(Dialogue_Item *item);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_remove_all(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_title_set(Evas_Object *obj, const char *title);
-   EINA_DEPRECATED EAPI const char    *elm_dialoguegroup_title_get(Evas_Object *obj);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_press_effect_set(Dialogue_Item *item, Eina_Bool press);
-   EINA_DEPRECATED EAPI Eina_Bool      elm_dialoguegroup_press_effect_get(Dialogue_Item *item);
-   EINA_DEPRECATED EAPI Evas_Object   *elm_dialoguegroup_item_content_get(Dialogue_Item *item);
-   EINA_DEPRECATED EAPI void	       elm_dialoguegroup_item_style_set(Dialogue_Item *item, Elm_Dialoguegroup_Item_Style style);
-   EINA_DEPRECATED EAPI Elm_Dialoguegroup_Item_Style	elm_dialoguegroup_item_style_get(Dialogue_Item *item);
-   EINA_DEPRECATED EAPI void           elm_dialoguegroup_item_disabled_set(Dialogue_Item *item, Eina_Bool disabled);
-   EINA_DEPRECATED EAPI Eina_Bool      elm_dialoguegroup_item_disabled_get(Dialogue_Item *item);
 
    /* Dayselector */
    typedef enum

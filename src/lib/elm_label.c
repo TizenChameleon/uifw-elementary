@@ -830,13 +830,6 @@ elm_label_background_color_set(Evas_Object *obj,
 }
 
 EAPI void
-elm_label_wrap_mode_set(Evas_Object *obj,
-                        Eina_Bool    wrapmode)
-{
-   return;
-}
-
-EAPI void
 elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);

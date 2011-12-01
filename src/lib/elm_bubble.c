@@ -3,23 +3,12 @@
 
 typedef struct _Widget_Data Widget_Data;
 
-#define SWEEP_SUPPORT 1
-
 struct _Widget_Data
 {
    Evas_Object *bbl;
    Evas_Object *content, *icon;
    const char *label, *info, *corner;
-#ifdef SWEEP_SUPPORT
-   Evas_Object *sweep;
-   Eina_Bool down:1;
-   Evas_Coord_Point down_point;
-#endif
 };
-
-#ifdef SWEEP_SUPPORT
-#define SWEEP_THRESHOLD	100
-#endif
 
 static const char *widtype = NULL;
 static void _del_hook(Evas_Object *obj);
@@ -250,40 +239,13 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
    _sizing_eval(obj);
 }
 
-#ifdef SWEEP_SUPPORT
-static void
-_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Event_Mouse_Down *ev = event_info;
-
-   wd->down = EINA_TRUE;
-   wd->down_point.x = ev->canvas.x;
-   wd->down_point.y = ev->canvas.y;
-}
-#endif
-
 static void
 _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Evas_Event_Mouse_Up *ev = event_info;
-   Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd->down) return;
    if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
-     {
-#ifdef SWEEP_SUPPORT
-	if (ev->canvas.x - wd->down_point.x > SWEEP_THRESHOLD)
-	  evas_object_smart_callback_call(data, "sweep,left,right", NULL);
-	else if (wd->down_point.x - ev->canvas.x > SWEEP_THRESHOLD)
-	  evas_object_smart_callback_call(data, "sweep,right,left", NULL);
-
-	wd->down = EINA_FALSE;
-	wd->down_point.x = 0;
-	wd->down_point.y = 0;
-#endif
-     }
-   else if (!wd->sweep)
-     evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
+     return;
+   evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
 }
 
 static void
@@ -360,14 +322,6 @@ elm_bubble_add(Evas_Object *parent)
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
    evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_UP,
                                   _mouse_up, obj);
-#ifdef SWEEP_SUPPORT
-   evas_object_event_callback_add(wd->bbl, EVAS_CALLBACK_MOUSE_DOWN,
-                                  _mouse_down, obj);
-
-   wd->down = EINA_FALSE;
-   wd->down_point.x = 0;
-   wd->down_point.y = 0;
-#endif
 
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
@@ -462,38 +416,6 @@ EAPI Evas_Object *
 elm_bubble_icon_unset(Evas_Object *obj)
 {
    return _content_unset_hook(obj, "elm.swallow.icon");
-}
-
-EAPI void
-elm_bubble_sweep_layout_set(Evas_Object *obj, Evas_Object *sweep)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-#ifdef SWEEP_SUPPORT
-   if (wd->sweep == sweep) return;
-   if (wd->sweep) evas_object_del(wd->sweep);
-   wd->sweep = sweep;
-   if (sweep)
-      edje_object_part_swallow(wd->bbl, "elm.swallow.sweep", sweep);
-#endif
-}
-
-EAPI Evas_Object *
-elm_bubble_sweep_layout_unset(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   Evas_Object *icon = NULL;
-   if (!wd) return NULL;
-   if (!wd->icon) return NULL;
-   icon = wd->icon;
-   elm_widget_sub_object_del(obj, icon);
-   evas_object_event_callback_del_full(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, obj);
-   edje_object_part_unswallow(wd->bbl, icon);
-   wd->icon = NULL;
-   return icon;
 }
 
 EAPI void

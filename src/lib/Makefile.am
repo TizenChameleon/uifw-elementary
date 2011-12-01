@@ -49,8 +49,6 @@ elc_fileselector.c \
 elc_fileselector_entry.c \
 elc_hoversel.c \
 elc_naviframe.c \
-elc_navigationbar.c \
-elc_navigationbar_ex.c\
 elc_multibuttonentry.c \
 elc_player.c \
 elc_scrolled_entry.c \
@@ -73,7 +71,6 @@ elm_conform.c \
 elm_controlbar.c \
 elm_datefield.c \
 elm_dayselector.c \
-elm_dialoguegroup.c \
 elm_diskselector.c \
 elm_editfield.c \
 elm_entry.c \
@@ -118,7 +115,6 @@ elm_segment_control.c \
 elm_separator.c \
 elm_slider.c \
 elm_slideshow.c \
-elm_slidingdrawer.c \
 elm_spinner.c \
 elm_stackedicon.c \
 elm_store.c \
