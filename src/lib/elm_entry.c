@@ -2060,6 +2060,8 @@ _elm_win_region_get_job(void *data)
 
    if (!_elm_config->desktop_entry)
      {
+        evas_smart_objects_calculate(evas_object_evas_get(data));
+
         ret_rect = _viewport_region_get(data);
         edje_object_part_text_viewport_region_set(wd->ent, "elm.text", ret_rect.x, ret_rect.y, ret_rect.w, ret_rect.h);
         ret_rect = _layout_region_get(data);
