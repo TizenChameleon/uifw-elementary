@@ -3093,6 +3093,7 @@ EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extensi
    ext_mod->cnpinit = _cnpinit;
    ext_mod->context_menu = wd->context_menu;
    ext_mod->cnp_mode = wd->cnp_mode;
+   ext_mod->viewport_rect = _viewport_region_get(obj);
 }
 
 EAPI void

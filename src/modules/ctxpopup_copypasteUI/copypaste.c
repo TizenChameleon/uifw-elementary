@@ -44,16 +44,35 @@ _ctxpopup_position(Evas_Object *obj)
      }
    else
      {
-        if (ext_mod->viewport_obj)
+        if (ext_mod->viewport_rect.x != -1 || ext_mod->viewport_rect.y != -1
+            || ext_mod->viewport_rect.w != -1 || ext_mod->viewport_rect.h != -1)
           {
              Evas_Coord vx, vy, vw, vh, x2, y2;
              x2 = x + w;
              y2 = y + h;
-             evas_object_geometry_get(ext_mod->viewport_obj, &vx, &vy, &vw, &vh);
+             vx = ext_mod->viewport_rect.x;
+             vy = ext_mod->viewport_rect.y;
+             vw = ext_mod->viewport_rect.w;
+             vh = ext_mod->viewport_rect.h;
+
              if (x < vx) x = vx;
              if (y < vy) y = vy;
              if (x2 > vx + vw) x2 = vx + vw;
              if (y2 > vy + vh) y2 = vy + vh;
+             w = x2 - x;
+             h = y2 - y;
+          }
+        else
+          {
+             Evas_Coord sw, sh, x2, y2;
+             x2 = x + w;
+             y2 = y + h;
+             ecore_x_window_size_get(ecore_x_window_root_first_get(), &sw, &sh);
+
+             if (x < 0) x = 0;
+             if (y < 0) y = 0;
+             if (x2 > sw) x2 = sw;
+             if (y2 > sh) y2 = sh;
              w = x2 - x;
              h = y2 - y;
           }
