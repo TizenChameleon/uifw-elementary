@@ -1056,6 +1056,7 @@ _convert_to_html(Eina_List* nodes)
           eina_strbuf_append(html, trail->str);
      }
 
+   eina_strbuf_replace_all(html, "  ", " &nbsp;");
    char *ret = eina_strbuf_string_steal(html);
    eina_strbuf_free(html);
    return ret;
@@ -1174,6 +1175,7 @@ _convert_to_edje(Eina_List* nodes)
           eina_strbuf_append(html, trail->str);
      }
 
+   eina_strbuf_replace_all(html, "&nbsp;", " ");
    char *ret = eina_strbuf_string_steal(html);
    eina_strbuf_free(html);
    return ret;
@@ -1891,10 +1893,23 @@ text_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **
    sel = selections + *((int *)data);
    if (!sel->active) return EINA_TRUE;
 
-   if ((sel->format & ELM_SEL_FORMAT_MARKUP) ||
-       (sel->format & ELM_SEL_FORMAT_HTML))
+   if (sel->format & ELM_SEL_FORMAT_MARKUP)
+     *data_ret = remove_tags(sel->selbuf, size_ret);
+   else if (sel->format & ELM_SEL_FORMAT_HTML)
      {
-        *data_ret = remove_tags(sel->selbuf, size_ret);
+        char *text = NULL;
+        Eina_Strbuf *buf = eina_strbuf_new();
+        if (buf)
+          {
+             eina_strbuf_append(buf, sel->selbuf);
+             eina_strbuf_replace_all(buf, "&nbsp;", " ");
+             text = eina_strbuf_string_steal(buf);
+             eina_strbuf_free(buf);
+             *data_ret = remove_tags(text, size_ret);
+             free(text);
+          }
+        else
+          *data_ret = remove_tags(sel->selbuf, size_ret);
      }
    else if (sel->format & ELM_SEL_FORMAT_TEXT)
      {
