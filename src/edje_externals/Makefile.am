@@ -53,6 +53,7 @@ elm_label.c \
 elm_list.c \
 elm_map.c \
 elm_multibuttonentry.c \
+elm_naviframe.c \
 elm_nocontents.c \
 elm_notify.c \
 elm_page_control.c \
