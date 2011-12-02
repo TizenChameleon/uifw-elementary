@@ -90,7 +90,7 @@ _fill_list(Evas_Object *obj)
    Eina_List *dirs = NULL, *l;
    char *real;
 
-   if (!(d = opendir(getenv("HOME")))) return;
+   if ((!(getenv("HOME")))||(!(d = opendir(getenv("HOME"))))) return;
    while ((de = readdir(d)))
      {
         char buff[PATH_MAX];

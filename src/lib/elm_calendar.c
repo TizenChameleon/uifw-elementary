@@ -711,6 +711,7 @@ elm_calendar_add(Evas_Object *parent)
    Widget_Data *wd;
    int i, t;
    Evas *e;
+   struct tm weekday_time;
 
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
@@ -758,7 +759,8 @@ elm_calendar_add(Evas_Object *parent)
          * just make it larger. :| */
         char buf[20];
         /* I don't know of a better way of doing it */
-        if (strftime(buf, sizeof(buf), "%a", gmtime(&weekday)))
+        gmtime_r(&weekday, &weekday_time);
+        if (strftime(buf, sizeof(buf), "%a", &weekday_time))
           {
              wd->weekdays[i] = eina_stringshare_add(buf);
           }
