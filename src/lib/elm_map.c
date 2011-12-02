@@ -3012,9 +3012,15 @@ _route_complete_cb(void *data, int ev_type __UNUSED__, void *event)
 
    if (wd->grids)
      {
+        Eina_List *l;
+        Grid *g;
         Evas_Coord ox, oy, ow, oh;
         evas_object_geometry_get(wd->obj, &ox, &oy, &ow, &oh);
-        route_place(wd->obj, eina_list_data_get(wd->grids), wd->pan_x, wd->pan_y, ox, oy, ow, oh);
+        EINA_LIST_FOREACH(wd->grids, l, g)
+          {
+             if (wd->zoom == g->zoom) break;
+          }
+        route_place(wd->obj, g, wd->pan_x, wd->pan_y, ox, oy, ow, oh);
      }
    edje_object_signal_emit(elm_smart_scroller_edje_object_get(wd->scr),
                            "elm,state,busy,stop", "elm");
@@ -3915,9 +3921,15 @@ elm_map_marker_add(Evas_Object *obj, double lon, double lat, Elm_Map_Marker_Clas
 
    if (wd->grids)
      {
+        Eina_List *l;
+        Grid *g;
         Evas_Coord ox, oy, ow, oh;
         evas_object_geometry_get(obj, &ox, &oy, &ow, &oh);
-        marker_place(obj, eina_list_data_get(wd->grids), wd->pan_x, wd->pan_y, ox, oy, ow, oh);
+        EINA_LIST_FOREACH(wd->grids, l, g)
+          {
+             if (wd->zoom == g->zoom) break;
+          }
+        marker_place(obj, g, wd->pan_x, wd->pan_y, ox, oy, ow, oh);
      }
 
    return marker;
@@ -3994,9 +4006,15 @@ elm_map_marker_remove(Elm_Map_Marker *marker)
 
    if (wd->grids)
      {
+        Eina_List *l;
+        Grid *g;
         Evas_Coord ox, oy, ow, oh;
         evas_object_geometry_get(wd->obj, &ox, &oy, &ow, &oh);
-        marker_place(wd->obj, eina_list_data_get(wd->grids), wd->pan_x, wd->pan_y, ox, oy, ow, oh);
+        EINA_LIST_FOREACH(wd->grids, l, g)
+          {
+             if (wd->zoom == g->zoom) break;
+          }
+        marker_place(wd->obj, g, wd->pan_x, wd->pan_y, ox, oy, ow, oh);
      }
 #else
    (void) marker;
@@ -4245,9 +4263,15 @@ elm_map_group_class_hide_set(Evas_Object *obj, Elm_Map_Group_Class *clas, Eina_B
    clas->hide = hide;
    if (wd->grids)
      {
+        Eina_List *l;
+        Grid *g;
         Evas_Coord ox, oy, ow, oh;
         evas_object_geometry_get(obj, &ox, &oy, &ow, &oh);
-        marker_place(obj, eina_list_data_get(wd->grids), wd->pan_x, wd->pan_y, ox, oy, ow, oh);
+        EINA_LIST_FOREACH(wd->grids, l, g)
+          {
+             if (wd->zoom == g->zoom) break;
+          }
+        marker_place(obj, g, wd->pan_x, wd->pan_y, ox, oy, ow, oh);
      }
 #else
    (void) obj;
