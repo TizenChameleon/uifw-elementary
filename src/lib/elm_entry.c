@@ -77,6 +77,7 @@ struct _Widget_Data
    Eina_Bool double_clicked : 1;
    Eina_Bool long_pressed : 1;
    Eina_Bool context_menu : 1;
+   Eina_Bool magnifier_enabled : 1;
    Eina_Bool drag_selection_asked : 1;
    Eina_Bool bgcolor : 1;
    Eina_Bool can_write : 1;
@@ -1570,10 +1571,13 @@ _signal_long_pressed(void *data)
 
    _cancel(data, NULL, NULL);
 
-   _magnifier_create(data);
-   _magnifier_move(data);
-   _magnifier_show(data);
-   elm_object_scroll_freeze_push(data);
+   if (wd->magnifier_enabled)
+     {
+        _magnifier_create(data);
+        _magnifier_move(data);
+        _magnifier_show(data);
+        elm_object_scroll_freeze_push(data);
+     }
 
    evas_object_smart_callback_call(data, SIG_LONGPRESSED, NULL);
    return ECORE_CALLBACK_CANCEL;
@@ -1606,8 +1610,11 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
              if ((wd->api) && (wd->api->obj_mouseup))
                wd->api->obj_mouseup(data);
           }
-        _magnifier_hide(data);
-        elm_object_scroll_freeze_pop(data);
+        if (wd->magnifier_enabled)
+          {
+             _magnifier_hide(data);
+             elm_object_scroll_freeze_pop(data);
+          }
 
         if (wd->long_pressed)
           _menu_press(data);
@@ -1629,7 +1636,7 @@ _mouse_move(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void
 
    if (ev->buttons == 1)
      {
-        if (wd->long_pressed)
+        if ((wd->long_pressed) && (wd->magnifier_enabled))
           {
              _magnifier_show(data);
              _magnifier_move(data);
@@ -1934,9 +1941,12 @@ _signal_handler_move_start(void *data, Evas_Object *obj __UNUSED__, const char *
    if ((wd->api) && (wd->api->obj_hidemenu))
      wd->api->obj_hidemenu(data);
 
-   _magnifier_create(data);
-   _magnifier_move(data);
-   _magnifier_show(data);
+   if (wd->magnifier_enabled)
+     {
+        _magnifier_create(data);
+        _magnifier_move(data);
+        _magnifier_show(data);
+     }
 }
 
 static void
@@ -1957,8 +1967,14 @@ _signal_handler_move_end(void *data, Evas_Object *obj __UNUSED__, const char *em
 static void
 _signal_handler_moving(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-   _magnifier_move(data);
-   _magnifier_show(data);
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
+   if (wd->magnifier_enabled)
+     {
+        _magnifier_move(data);
+        _magnifier_show(data);
+     }
 }
 
 static Evas_Coord_Rectangle
@@ -2015,7 +2031,7 @@ _viewport_region_get(Evas_Object *data)
             !strcmp(elm_widget_type_get(parent_obj), "genlist"))
           {
              evas_object_geometry_get(parent_obj, &geometry.x, &geometry.y, &geometry.w, &geometry.h);
-             if (ret_rect.w == -1 && ret_rect.h == -1) ret_rect = geometry;
+             if ((ret_rect.w == -1) && (ret_rect.h == -1)) ret_rect = geometry;
              ret_rect = _intersection_region_get(geometry, ret_rect);
           }
      }
@@ -2072,7 +2088,11 @@ _elm_win_region_get_job(void *data)
 static void
 _signal_selection_end(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-   _magnifier_hide(data);
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
+   if (wd->magnifier_enabled)
+     _magnifier_hide(data);
    _menu_press(data);
 }
 
@@ -2958,6 +2978,7 @@ elm_entry_add(Evas_Object *parent)
    wd->editable     = EINA_TRUE;
    wd->disabled     = EINA_FALSE;
    wd->context_menu = EINA_TRUE;
+   wd->magnifier_enabled = EINA_TRUE;
    wd->autosave     = EINA_TRUE;
    wd->cnp_mode     = ELM_CNP_MODE_MARKUP;
    wd->autoperiod   = EINA_TRUE;
@@ -3601,6 +3622,25 @@ elm_entry_context_menu_disabled_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
    return !wd->context_menu;
+}
+
+EAPI void
+elm_entry_magnifier_disabled_set(Evas_Object *obj, Eina_Bool disabled)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->magnifier_enabled == !disabled) return;
+   wd->magnifier_enabled = !disabled;
+}
+
+EAPI Eina_Bool
+elm_entry_magnifier_disabled_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return !wd->magnifier_enabled;
 }
 
 EAPI void
