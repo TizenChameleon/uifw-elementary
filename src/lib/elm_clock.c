@@ -142,9 +142,12 @@ _timediff_set(Widget_Data *wd)
    gettimeofday(&timev, NULL);
    tt = (time_t)(timev.tv_sec);
    tzset();
-   tm = localtime(&tt);
+   tm = calloc(1, sizeof(struct tm));
+   if (!tm) return;
+   localtime_r(&tt, tm);
    wd->timediff = (((wd->hrs - tm->tm_hour) * 60 +
                     wd->min - tm->tm_min) * 60) + wd->sec - tm->tm_sec;
+   free(tm);
 }
 
 static Eina_Bool
@@ -163,14 +166,15 @@ _ticker(void *data)
      {
         tt = (time_t)(timev.tv_sec) + wd->timediff;
         tzset();
-        tm = localtime(&tt);
-        if (tm)
-          {
-             wd->hrs = tm->tm_hour;
-             wd->min = tm->tm_min;
-             wd->sec = tm->tm_sec;
-             _time_update(data);
-          }
+        tm = calloc(1, sizeof(struct tm));
+        if (!tm) return ECORE_CALLBACK_CANCEL;
+        localtime_r(&tt, tm);
+        wd->hrs = tm->tm_hour;
+        wd->min = tm->tm_min;
+        wd->sec = tm->tm_sec;
+        _time_update(data);
+
+        free(tm);
      }
    return ECORE_CALLBACK_CANCEL;
 }
