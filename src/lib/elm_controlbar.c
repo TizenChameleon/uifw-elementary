@@ -69,6 +69,8 @@ struct _Widget_Data
 
    const char *pressed_signal;
    const char *selected_signal;
+
+   Ecore_Job *del_callback_job;
 };
 
 struct _Elm_Controlbar_Item
@@ -94,6 +96,8 @@ static const char *widtype = NULL;
 
 static void _sizing_eval(Evas_Object * obj);
 static int _check_bar_item_number(Widget_Data *wd);
+static void _unpress_box_cb(void *data, Evas_Object *obj, void *event_info);
+static void _clicked_box_cb(void *data, Evas_Object *obj, void *event_info);
 static void _select_box(Elm_Controlbar_Item * it);
 static void _cancel_selected_box(Widget_Data *wd);
 static void _check_toolbar_line(Widget_Data *wd);
@@ -231,6 +235,11 @@ _del_hook(Evas_Object * obj)
         wd->ad->timer = NULL;
         free(wd->ad);
         wd->ad = NULL;
+     }
+   if (wd->del_callback_job)
+     {
+        if (wd->del_callback_job) ecore_job_del(wd->del_callback_job);
+        wd->del_callback_job = NULL;
      }
 
    free(wd);
@@ -757,10 +766,33 @@ _cancel_selected_box(Widget_Data *wd)
 }
 
 static void
+_del_button_callback(void *data)
+{
+   Elm_Controlbar_Item *it = (Elm_Controlbar_Item *)data;
+
+   evas_object_smart_callback_del(it->base_item, "unpressed", _unpress_box_cb);
+   evas_object_smart_callback_del(it->base_item, "clicked", _clicked_box_cb);
+
+   it->wd->del_callback_job = NULL;
+}
+
+static void
 _unpress_box_cb(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data * wd = (Widget_Data *) data;
    if (!wd) return;
+   const Eina_List *l;
+   Elm_Controlbar_Item * it;
+
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+        if (it->base_item == obj) break;
+     }
+   if (it)
+     {
+        if (wd->del_callback_job) ecore_job_del(wd->del_callback_job);
+        wd->del_callback_job = ecore_job_add(_del_button_callback, it);
+     }
 
    _cancel_selected_box(wd);
 }
@@ -770,8 +802,19 @@ _clicked_box_cb(void *data, Evas_Object *obj, void *event_info)
 {
    Widget_Data * wd = (Widget_Data *) data;
    if (!wd) return;
+   const Eina_List *l;
+   Elm_Controlbar_Item * it;
 
-   _select_box(wd->pre_item);
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+        if (it->base_item == obj) break;
+     }
+   if (it)
+     {
+        if (wd->del_callback_job) ecore_job_del(wd->del_callback_job);
+        wd->del_callback_job = ecore_job_add(_del_button_callback, it);
+        _select_box(it);
+     }
 }
 
 static Eina_Bool
@@ -799,6 +842,8 @@ _press_box(Elm_Controlbar_Item * it)
                {
                   edje_object_signal_emit(_EDJ(it->base), "elm,state,toolbar_pressed", "elm");
                }
+             evas_object_smart_callback_add(it->base_item, "unpressed", _unpress_box_cb, wd);
+             evas_object_smart_callback_add(it->base_item, "clicked", _clicked_box_cb, wd);
 
              check = EINA_TRUE;
           }
@@ -906,8 +951,6 @@ _create_tab_item(Evas_Object * obj, const char *icon_path, const char *label,
    it->base = _create_item_layout(wd->edje, it, &(it->base_item), &(it->icon));
    evas_object_smart_callback_add(it->base_item, "pressed",
                                   _bar_item_down_cb, wd);
-   evas_object_smart_callback_add(it->base_item, "unpressed", _unpress_box_cb, wd);
-   evas_object_smart_callback_add(it->base_item, "clicked", _clicked_box_cb, wd);
    evas_object_show(it->base);
 
    return it;
@@ -947,8 +990,6 @@ _create_tool_item(Evas_Object * obj, const char *icon_path, const char *label,
    it->base = _create_item_layout(wd->edje, it, &(it->base_item), &(it->icon));
    evas_object_smart_callback_add(it->base_item, "pressed",
                                   _bar_item_down_cb, wd);
-   evas_object_smart_callback_add(it->base_item, "unpressed", _unpress_box_cb, wd);
-   evas_object_smart_callback_add(it->base_item, "clicked", _clicked_box_cb, wd);
    evas_object_show(it->base);
 
    return it;
@@ -1221,8 +1262,6 @@ _create_more_item(Widget_Data *wd, int style)
    it->base = _create_item_layout(wd->edje, it, &(it->base_item), &(it->icon));
    evas_object_smart_callback_add(it->base_item, "pressed",
                                   _bar_item_down_cb, wd);
-   evas_object_smart_callback_add(it->base_item, "unpressed", _unpress_box_cb, wd);
-   evas_object_smart_callback_add(it->base_item, "clicked", _clicked_box_cb, wd);
    evas_object_show(it->base);
 
    _set_items_position(it->obj, it, NULL, EINA_TRUE);
