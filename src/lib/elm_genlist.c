@@ -176,6 +176,8 @@ struct _Elm_Genlist_Item
    Eina_Bool                     move_effect_enabled : 1;
    Eina_Bool                     defer_unrealize : 1;
    Eina_Bool                     can_focus : 1;
+   Eina_Bool                     no_select : 1;
+
 
    // TODO: refactoring
    Eina_Bool   effect_done : 1;
@@ -744,7 +746,7 @@ static void
 _item_highlight(Elm_Genlist_Item *it)
 {
    const char *selectraise;
-   if ((it->wd->no_select) || (it->delete_me) || (it->highlighted) ||
+   if ((it->wd->no_select) || (it->no_select) || (it->delete_me) || (it->highlighted) ||
        (it->disabled) || (it->display_only) || (it->mode_view))
      return;
    edje_object_signal_emit(VIEW(it), "elm,state,selected", "elm");
@@ -893,7 +895,8 @@ _item_select(Elm_Genlist_Item *it)
    Evas_Object *obj;
    Evas_Object *parent = WIDGET(it);
 
-   if ((it->wd->no_select) || (it->delete_me) || (it->mode_view)) return;
+   if ((it->wd->no_select) || (it->no_select) ||
+       (it->delete_me) || (it->mode_view)) return;
    if (it->selected)
      {
         if (it->wd->always_select) goto call;
@@ -5965,4 +5968,19 @@ elm_genlist_item_rename_mode_get(Elm_Genlist_Item *item)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(item, EINA_FALSE);
    return item->renamed;
+}
+
+EAPI void
+elm_genlist_item_no_select_mode_set(Elm_Genlist_Item *it,
+                                    Eina_Bool    no_select)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
+   it->no_select = no_select;
+}
+
+EAPI Eina_Bool
+elm_genlist_item_no_select_mode_get(const Elm_Genlist_Item *it)
+{
+   ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it, EINA_FALSE);
+   return it->no_select;
 }
