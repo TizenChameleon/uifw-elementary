@@ -19932,6 +19932,9 @@ extern "C" {
    EAPI void               elm_genlist_pinch_zoom_mode_set(Evas_Object *obj, Eina_Bool emode) EINA_ARG_NONNULL(1);
    EAPI Eina_Bool          elm_genlist_pinch_zoom_mode_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
+   EAPI void               elm_genlist_item_no_select_mode_set(Elm_Genlist_Item *it, Eina_Bool no_select) EINA_ARG_NONNULL(1);
+   EAPI Eina_Bool          elm_genlist_item_no_select_mode_get(const Elm_Genlist_Item *it) EINA_ARG_NONNULL(1);
+
    /**
     * @}
     */
