@@ -1345,7 +1345,7 @@ elm_finger_size_all_set(Evas_Coord size)
 #endif
 }
 
-EAPI void
+EINA_DEPRECATED EAPI void
 elm_autocapitalization_allow_all_set(Eina_Bool on)
 {
 #ifdef HAVE_ELEMENTARY_X
@@ -1358,7 +1358,7 @@ elm_autocapitalization_allow_all_set(Eina_Bool on)
 #endif
 }
 
-EAPI void
+EINA_DEPRECATED EAPI void
 elm_autoperiod_allow_all_set(Eina_Bool on)
 {
 #ifdef HAVE_ELEMENTARY_X
