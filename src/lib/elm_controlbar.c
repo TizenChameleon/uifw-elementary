@@ -191,7 +191,11 @@ _item_del(Elm_Controlbar_Item *it)
    if (it->base)
      evas_object_del(it->base);
    if (it->base_item)
-     evas_object_del(it->base_item);
+     {
+        evas_object_smart_callback_del(it->base_item, "unpressed", _unpress_box_cb);
+        evas_object_smart_callback_del(it->base_item, "clicked", _clicked_box_cb);
+        evas_object_del(it->base_item);
+     }
    if (it->view)
      evas_object_del(it->view);
 }
@@ -768,12 +772,18 @@ _cancel_selected_box(Widget_Data *wd)
 static void
 _del_button_callback(void *data)
 {
-   Elm_Controlbar_Item *it = (Elm_Controlbar_Item *)data;
+   Widget_Data *wd = (Widget_Data *)data;
+   if (!wd) return;
+   const Eina_List *l;
+   Elm_Controlbar_Item * it;
 
-   evas_object_smart_callback_del(it->base_item, "unpressed", _unpress_box_cb);
-   evas_object_smart_callback_del(it->base_item, "clicked", _clicked_box_cb);
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+        evas_object_smart_callback_del(it->base_item, "unpressed", _unpress_box_cb);
+        evas_object_smart_callback_del(it->base_item, "clicked", _clicked_box_cb);
+     }
 
-   it->wd->del_callback_job = NULL;
+   wd->del_callback_job = NULL;
 }
 
 static void
@@ -791,7 +801,7 @@ _unpress_box_cb(void *data, Evas_Object *obj, void *event_info)
    if (it)
      {
         if (wd->del_callback_job) ecore_job_del(wd->del_callback_job);
-        wd->del_callback_job = ecore_job_add(_del_button_callback, it);
+        wd->del_callback_job = ecore_job_add(_del_button_callback, wd);
      }
 
    _cancel_selected_box(wd);
@@ -812,7 +822,7 @@ _clicked_box_cb(void *data, Evas_Object *obj, void *event_info)
    if (it)
      {
         if (wd->del_callback_job) ecore_job_del(wd->del_callback_job);
-        wd->del_callback_job = ecore_job_add(_del_button_callback, it);
+        wd->del_callback_job = ecore_job_add(_del_button_callback, wd);
         _select_box(it);
      }
 }
