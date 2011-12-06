@@ -18,6 +18,13 @@ struct _Elm_Entry_Context_Menu_Item
 };
 
 static void
+_ctxpopup_hide(Evas_Object *popup)
+{
+   evas_object_hide(popup);
+   ext_mod->caller = NULL;
+}
+
+static void
 _ctxpopup_position(Evas_Object *obj)
 {
    if(!ext_mod) return;
@@ -88,7 +95,7 @@ _select_all(void *data, Evas_Object *obj, void *event_info)
    if(!ext_mod) return;
 
    ext_mod->selectall(data,obj,event_info);
-   evas_object_hide(obj);
+   _ctxpopup_hide(obj);
 }
 
 static void
@@ -97,7 +104,7 @@ _select(void *data, Evas_Object *obj, void *event_info)
    if(!ext_mod) return;
 
    ext_mod->select(data,obj,event_info);
-   evas_object_hide(obj);
+   _ctxpopup_hide(obj);
 }
 
 static void
@@ -106,7 +113,7 @@ _paste(void *data, Evas_Object *obj, void *event_info)
    if(!ext_mod) return;
 
    ext_mod->paste(data,obj,event_info);
-   evas_object_hide(obj);
+   _ctxpopup_hide(obj);
 }
 
 static void
@@ -115,7 +122,7 @@ _cut(void *data, Evas_Object *obj, void *event_info)
    if(!ext_mod) return;
 
    ext_mod->cut(data,obj,event_info);
-   evas_object_hide(obj);
+   _ctxpopup_hide(obj);
    elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
@@ -125,7 +132,7 @@ _copy(void *data, Evas_Object *obj, void *event_info)
    if(!ext_mod) return;
 
    ext_mod->copy(data,obj,event_info);
-   evas_object_hide(obj);
+   _ctxpopup_hide(obj);
    elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
@@ -135,7 +142,7 @@ _cancel(void *data, Evas_Object *obj, void *event_info)
    if(!ext_mod) return;
 
    ext_mod->cancel(data,obj,event_info);
-   evas_object_hide(obj);
+   _ctxpopup_hide(obj);
    elm_object_scroll_freeze_pop(ext_mod->popup);
 }
 
@@ -154,7 +161,7 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
      elm_cbhm_send_raw_data("show0");
    else
      elm_cbhm_send_raw_data("show1");
-   evas_object_hide(obj);
+   _ctxpopup_hide(obj);
    // end for cbhm
 }
 
@@ -165,7 +172,7 @@ _item_clicked(void *data, Evas_Object *obj, void *event_info)
    Evas_Object *obj2 = it->obj;
 
    if (it->func) it->func(it->data, obj2, NULL);
-   evas_object_hide(obj);
+   _ctxpopup_hide(obj);
 }
 
 static void
@@ -351,7 +358,10 @@ obj_longpress(Evas_Object *obj)
              elm_object_scroll_freeze_push(ext_mod->popup);
              _ctxpopup_position(obj);
              evas_object_show(ext_mod->popup);
+             ext_mod->caller = obj;
           }
+        else
+          ext_mod->caller = NULL;
      }
 }
 
@@ -366,11 +376,9 @@ obj_mouseup(Evas_Object *obj)
 EAPI void
 obj_hidemenu(Evas_Object *obj)
 {
-   if (!obj || !ext_mod)
+   if (!obj || !ext_mod || obj != ext_mod->caller)
      return;
 
-   evas_object_hide(ext_mod->popup);
+   _ctxpopup_hide(ext_mod->popup);
    // if (ext_mod->popup) evas_object_del(ext_mod->popup);
 }
-
-
