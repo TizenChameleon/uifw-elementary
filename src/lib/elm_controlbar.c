@@ -1888,11 +1888,9 @@ elm_controlbar_item_label_set(Elm_Controlbar_Item *it, const char *label)
         eina_stringshare_del(it->text);
         it->text = NULL;
      }
-   if (label != NULL)
-     {
-        it->text = eina_stringshare_add(label);
-        elm_object_text_set(it->base_item, it->text);
-     }
+   it->text = eina_stringshare_add(label);
+   elm_object_text_set(it->base_item, it->text);
+
    if (it->wd->disabled || it->disabled)
      elm_widget_disabled_set(it->base_item, EINA_TRUE);
    else
