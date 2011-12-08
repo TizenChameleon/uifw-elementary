@@ -3418,8 +3418,6 @@ extern "C" {
    EAPI void             elm_object_tree_dump(const Evas_Object *top);
    EAPI void             elm_object_tree_dot_dump(const Evas_Object *top, const char *file);
 
-   EINA_DEPRECATED EAPI void elm_autocapitalization_allow_all_set(Eina_Bool autocap);
-   EINA_DEPRECATED EAPI void elm_autoperiod_allow_all_set(Eina_Bool autoperiod);
    /**
     * Print Elm Objects tree hierarchy in file as dot(graphviz) syntax.
     *

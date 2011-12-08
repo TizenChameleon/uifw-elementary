@@ -1345,32 +1345,6 @@ elm_finger_size_all_set(Evas_Coord size)
 #endif
 }
 
-EINA_DEPRECATED EAPI void
-elm_autocapitalization_allow_all_set(Eina_Bool on)
-{
-#ifdef HAVE_ELEMENTARY_X
-   static Ecore_X_Atom atom = 0;
-   unsigned int on_i = (unsigned int)on;
-
-   if (!atom) atom = ecore_x_atom_get("ENLIGHTENMENT_AUTOCAPITAL_ALLOW");
-   ecore_x_window_prop_card32_set(ecore_x_window_root_first_get(),
-                                  atom, &on_i, 1);
-#endif
-}
-
-EINA_DEPRECATED EAPI void
-elm_autoperiod_allow_all_set(Eina_Bool on)
-{
-#ifdef HAVE_ELEMENTARY_X
-   static Ecore_X_Atom atom = 0;
-   unsigned int on_i = (unsigned int)on;
-
-   if (!atom) atom = ecore_x_atom_get("ENLIGHTENMENT_AUTOPERIOD_ALLOW");
-   ecore_x_window_prop_card32_set(ecore_x_window_root_first_get(),
-                                  atom, &on_i, 1);
-#endif
-}
-
 EAPI void
 elm_coords_finger_size_adjust(int         times_w,
                               Evas_Coord *w,
