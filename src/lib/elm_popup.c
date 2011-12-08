@@ -51,6 +51,7 @@ static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 static void _state_set_cb(void *data, Evas_Object *obj __UNUSED__,
                            const char *emission __UNUSED__,
                            const char *source __UNUSED__);
+static void _restack(void *data, Evas *e, Evas_Object *obj, void *event_info);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -167,6 +168,7 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
    if (!wd) return;
    elm_layout_theme_set(wd->layout, "popup", "base", elm_widget_style_get(obj));
    _sizing_eval(obj);
+   evas_object_show(wd->notify);
    evas_object_show(obj);
 }
 
@@ -176,6 +178,7 @@ _hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
+   evas_object_hide(wd->notify);
    evas_object_hide(obj);
 }
 
@@ -285,6 +288,14 @@ _state_set_cb(void *data, Evas_Object *obj __UNUSED__,
    if (wd->layout) elm_layout_sizing_eval(wd->layout);
 }
 
+static void
+_restack(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   evas_object_layer_set(wd->notify,
+                         evas_object_layer_get(obj));
+}
 /**
  * Add a new Popup object.
  *
@@ -314,7 +325,6 @@ elm_popup_add(Evas_Object *parent)
 
    wd->notify = elm_notify_add(parent);
    elm_widget_sub_object_add(obj, wd->notify);
-   elm_widget_resize_object_set(obj, wd->notify);
    elm_notify_orient_set(wd->notify, ELM_NOTIFY_ORIENT_CENTER);
    wd->notify_orient = ELM_NOTIFY_ORIENT_CENTER;
    elm_notify_repeat_events_set(wd->notify, EINA_FALSE);
@@ -335,6 +345,7 @@ elm_popup_add(Evas_Object *parent)
 
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _show, NULL);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _hide, NULL);
+   evas_object_event_callback_add(obj, EVAS_CALLBACK_RESTACK, _restack, NULL);
    wd->mode = ELM_POPUP_TYPE_NONE;
    evas_object_smart_callback_add(wd->notify, "block,clicked", _block_clicked_cb, obj);
 #ifdef HAVE_ELEMENTARY_X
