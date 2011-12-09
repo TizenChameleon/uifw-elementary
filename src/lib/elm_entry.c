@@ -1108,6 +1108,12 @@ _resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event
         evas_object_resize(wd->ent, vw, vh);
      }
    if (wd->hoversel) _hoversel_position(data);
+
+   if (!_elm_config->desktop_entry)
+     {
+        if (wd->region_get_job) ecore_job_del(wd->region_get_job);
+        wd->region_get_job = ecore_job_add(_elm_win_region_get_job, data);
+     }
 }
 
 static void
