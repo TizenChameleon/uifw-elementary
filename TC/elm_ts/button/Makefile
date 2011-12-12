@@ -2,9 +2,7 @@ CC ?= gcc
 
 TARGETS = utc_UIFW_elm_button_add_func \
 		utc_UIFW_elm_button_label_set_func \
-		utc_UIFW_elm_button_label_set_for_state_func \
 		utc_UIFW_elm_button_label_get_func \
-		utc_UIFW_elm_button_label_get_for_state_func \
 		utc_UIFW_elm_button_icon_set_func \
 		utc_UIFW_elm_button_icon_get_func \
 		utc_UIFW_elm_button_autorepeat_set_func \
