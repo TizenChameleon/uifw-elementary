@@ -99,7 +99,13 @@ _get(void *data, Evas_Object *obj)
    return photo;
 }
 
-
+static void
+_slide_transition(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Elm_Object_Item *slide_it = (Elm_Object_Item *) event_info;
+   if (data == slide_it)
+     printf("Reaches to End of slides\n");
+}
 
 void
 test_slideshow(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
@@ -107,6 +113,7 @@ test_slideshow(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    Evas_Object *win, *bg, *notify, *bx, *bt, *hv, *spin;
    const Eina_List *l;
    const char *transition, *layout;
+   Elm_Object_Item *slide_last_it;
 
    win = elm_win_add(NULL, "slideshow", ELM_WIN_BASIC);
    elm_win_title_set(win, "Slideshow");
@@ -134,7 +141,8 @@ test_slideshow(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    elm_slideshow_item_add(slideshow, &itc, img5);
    elm_slideshow_item_add(slideshow, &itc, img6);
    elm_slideshow_item_add(slideshow, &itc, img7);
-   elm_slideshow_item_add(slideshow, &itc, img8);
+   slide_last_it = elm_slideshow_item_add(slideshow, &itc, img8);
+   evas_object_smart_callback_add(slideshow, "transition,end", _slide_transition, slide_last_it);
 
    notify = elm_notify_add(win);
    elm_notify_orient_set(notify, ELM_NOTIFY_ORIENT_BOTTOM);
