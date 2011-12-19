@@ -3223,12 +3223,15 @@ elm_map_add(Evas_Object *parent)
                                   _mouse_move, obj);
    evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MOUSE_UP,
                                   _mouse_up, obj);
-   evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MULTI_DOWN,
-                                  _mouse_multi_down, obj);
-   evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MULTI_MOVE,
-                                  _mouse_multi_move, obj);
-   evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MULTI_UP,
-                                  _mouse_multi_up, obj);
+   if (_elm_config->glayer_zoom_finger_enable)
+     {
+        evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MULTI_DOWN,
+                                       _mouse_multi_down, obj);
+        evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MULTI_MOVE,
+                                       _mouse_multi_move, obj);
+        evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MULTI_UP,
+                                       _mouse_multi_up, obj);
+     }
    evas_object_event_callback_add(wd->rect, EVAS_CALLBACK_MOUSE_WHEEL,
                                   _mouse_wheel_cb, obj);
 
