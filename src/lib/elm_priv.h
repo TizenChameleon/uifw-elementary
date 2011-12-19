@@ -135,6 +135,7 @@ struct _Elm_Config
    Eina_Bool      is_mirrored : 1;
    Eina_Bool      password_show_last;
    double         password_show_last_timeout;
+   Eina_Bool      glayer_zoom_finger_enable;
    double         glayer_zoom_finger_factor;
    double         glayer_zoom_wheel_factor;
    double         glayer_zoom_distance_tolerance;
