@@ -28837,7 +28837,7 @@ extern "C" {
     *
     * Default contents parts of the naviframe items that you can use for are:
     * @li "default" - A main content of the page
-    * @li "icon" - A icon in the title area
+    * @li "icon" - An icon in the title area
     * @li "prev_btn" - A button to go to the previous page
     * @li "next_btn" - A button to go to the next page
     *
@@ -28888,6 +28888,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI Evas_Object        *elm_naviframe_add(Evas_Object *parent) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Push a new item to the top of the naviframe stack (and show it).
     *
@@ -28918,7 +28919,8 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI Elm_Object_Item    *elm_naviframe_item_push(Evas_Object *obj, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style) EINA_ARG_NONNULL(1, 5);
-    /**
+
+   /**
     * @brief Insert a new item into the naviframe before item @p before.
     *
     * @param before The naviframe item to insert before.
@@ -28948,6 +28950,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI Elm_Object_Item    *elm_naviframe_item_insert_before(Elm_Object_Item *before, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style) EINA_ARG_NONNULL(1, 5);
+
    /**
     * @brief Insert a new item into the naviframe after item @p after.
     *
@@ -28978,6 +28981,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI Elm_Object_Item    *elm_naviframe_item_insert_after(Elm_Object_Item *after, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style) EINA_ARG_NONNULL(1, 5);
+
    /**
     * @brief Pop an item that is on top of the stack
     *
@@ -28994,6 +28998,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI Evas_Object        *elm_naviframe_item_pop(Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Pop the items between the top and the above one on the given item.
     *
@@ -29002,17 +29007,19 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_item_pop_to(Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+
    /**
-   * Promote an item already in the naviframe stack to the top of the stack
-   *
-   * @param it The naviframe item
-   *
-   * This will take the indicated item and promote it to the top of the stack
-   * as if it had been pushed there. The item must already be inside the
-   * naviframe stack to work.
-   *
-   */
+    * Promote an item already in the naviframe stack to the top of the stack
+    *
+    * @param it The naviframe item
+    *
+    * This will take the indicated item and promote it to the top of the stack
+    * as if it had been pushed there. The item must already be inside the
+    * naviframe stack to work.
+    *
+    */
    EAPI void                elm_naviframe_item_promote(Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Delete the given item instantly.
     *
@@ -29025,6 +29032,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_item_del(Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+
    /**
     * @brief preserve the content objects when items are popped.
     *
@@ -29036,6 +29044,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_content_preserve_on_pop_set(Evas_Object *obj, Eina_Bool preserve) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Get a value whether preserve mode is enabled or not.
     *
@@ -29047,6 +29056,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI Eina_Bool           elm_naviframe_content_preserve_on_pop_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Get a top item on the naviframe stack
     *
@@ -29057,6 +29067,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI Elm_Object_Item    *elm_naviframe_top_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Get a bottom item on the naviframe stack
     *
@@ -29067,6 +29078,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI Elm_Object_Item    *elm_naviframe_bottom_item_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Set an item style
     *
@@ -29081,6 +29093,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_item_style_set(Elm_Object_Item *it, const char *item_style) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Get an item style
     *
@@ -29092,6 +29105,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI const char         *elm_naviframe_item_style_get(const Elm_Object_Item *it) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Show/Hide the title area
     *
@@ -29106,6 +29120,7 @@ extern "C" {
     * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_item_title_visible_set(Elm_Object_Item *it, Eina_Bool visible) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Get a value whether title area is visible or not.
     *
@@ -29127,8 +29142,11 @@ extern "C" {
     *        parameter in elm_naviframe_item_push
     *
     * @see also elm_naviframe_item_push()
+    *
+    * @ingroup Naviframe
     */
    EAPI void                elm_naviframe_prev_btn_auto_pushed_set(Evas_Object *obj, Eina_Bool auto_pushed) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Get a value whether prev button(back button) will be auto pushed or
     *        not.
@@ -29138,14 +29156,19 @@ extern "C" {
     *
     * @see also elm_naviframe_item_push()
     *           elm_naviframe_prev_btn_auto_pushed_set()
+    *
+    * @ingroup Naviframe
     */
    EAPI Eina_Bool           elm_naviframe_prev_btn_auto_pushed_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
+
    /**
     * @brief Get a list of all the naviframe items.
     *
     * @param obj The naviframe object
     * @return An Eina_Inlist* of naviframe items, #Elm_Object_Item,
     * or @c NULL on failure.
+    *
+    * @ingroup Naviframe
     */
    EAPI Eina_Inlist        *elm_naviframe_items_get(const Evas_Object *obj) EINA_ARG_NONNULL(1);
 
