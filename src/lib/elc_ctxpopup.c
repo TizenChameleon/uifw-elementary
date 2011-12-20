@@ -23,7 +23,6 @@ struct _Widget_Data
    Evas_Object *arrow;
    Evas_Object *scr;
    Evas_Object *bg;
-   Evas_Object *hover_parent;
    Eina_List *items;
    Elm_Ctxpopup_Direction dir;
    Elm_Ctxpopup_Direction dir_priority[4];
@@ -40,20 +39,19 @@ static void _freeze_off(void *data, Evas_Object *obj, void *event_info);
 static void _hold_on(void *data, Evas_Object *obj, void *event_info);
 static void _hold_off(void *data, Evas_Object *obj, void *event_info);
 static void _scroller_size_reset(Widget_Data *wd);
-static void _hover_parent_callbacks_del(Evas_Object *obj);
+static void _parent_cut_off(Evas_Object *obj);
 static void _parent_resize(void *data,
                            Evas *e,
                            Evas_Object *obj,
                            void *event_info);
-static void _hover_parent_resize(void *data, Evas *e __UNUSED__,
-                                 Evas_Object *obj __UNUSED__,
-                                 void *event_info __UNUSED__);
-static void _hover_parent_move(void *data, Evas *e __UNUSED__,
-                               Evas_Object *obj __UNUSED__,
-                               void *event_info __UNUSED__);
-static void _hover_parent_del(void *data, Evas *e __UNUSED__,
-                              Evas_Object *obj __UNUSED__,
-                              void *event_info __UNUSED__);
+static void _parent_move(void *data,
+                         Evas *e,
+                         Evas_Object *obj,
+                         void *event_info);
+static void _parent_del(void *data,
+                        Evas *e,
+                        Evas_Object *obj,
+                        void *event_info);
 static void _item_sizing_eval(Elm_Ctxpopup_Item *item);
 static void _adjust_pos_x(Evas_Coord_Point *pos,
                           Evas_Coord_Point *base_size,
@@ -98,8 +96,6 @@ static void _item_signal_emit_hook(Elm_Object_Item *it,
 static void _bg_clicked_cb(void *data, Evas_Object *obj,
                            const char *emission,
                            const char *source);
-static void _parent_resize(void *data, Evas *e, Evas_Object *obj,
-                           void *event_info __UNUSED__);
 static void _ctxpopup_show(void *data,
                            Evas *e,
                            Evas_Object *obj,
@@ -149,8 +145,7 @@ _freeze_on(void *data __UNUSED__, Evas_Object *obj,
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if ((!wd) || (!wd->scr)) return;
-
-   elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_FALSE);
+   elm_object_scroll_freeze_push(wd->scr);
 }
 
 static void
@@ -160,11 +155,7 @@ _freeze_off(void *data __UNUSED__, Evas_Object *obj,
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if ((!wd) || (!wd->scr)) return;
-
-   if (wd->horizontal)
-      elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_TRUE);
-   else
-      elm_scroller_bounce_set(wd->scr, EINA_TRUE, EINA_FALSE);
+   elm_object_scroll_freeze_pop(wd->scr);
 }
 
 static void
@@ -173,8 +164,7 @@ _hold_on(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if ((!wd) || (!wd->scr)) return;
-
-   elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_FALSE);
+   elm_object_scroll_hold_push(wd->scr);
 }
 
 static void
@@ -183,11 +173,7 @@ _hold_off(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if ((!wd) || (!wd->scr)) return;
-
-   if (wd->horizontal)
-      elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_TRUE);
-   else
-      elm_scroller_bounce_set(wd->scr, EINA_TRUE, EINA_FALSE);
+   elm_object_scroll_hold_pop(wd->scr);
 }
 
 static void
@@ -199,53 +185,53 @@ _scroller_size_reset(Widget_Data *wd)
 }
 
 static void
-_hover_parent_callbacks_del(Evas_Object *obj)
+_parent_cut_off(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
-   if ((!wd) || (!wd->hover_parent))
-      return;
+   if (!wd) return;
 
-   evas_object_event_callback_del_full(wd->hover_parent,
+   evas_object_event_callback_del_full(wd->parent,
                                        EVAS_CALLBACK_DEL,
-                                       _hover_parent_del,
+                                       _parent_del,
                                        obj);
-   evas_object_event_callback_del_full(wd->hover_parent,
+   evas_object_event_callback_del_full(wd->parent,
                                        EVAS_CALLBACK_MOVE,
-                                       _hover_parent_move,
+                                       _parent_move,
                                        obj);
-   evas_object_event_callback_del_full(wd->hover_parent,
+   evas_object_event_callback_del_full(wd->parent,
                                        EVAS_CALLBACK_RESIZE,
-                                       _hover_parent_resize,
+                                       _parent_resize,
                                        obj);
+
+   elm_widget_sub_object_del(wd->parent, obj);
 }
 
 static void
-_hover_parent_resize(void *data,
-                     Evas *e __UNUSED__,
-                     Evas_Object *obj __UNUSED__,
-                     void *event_info __UNUSED__)
+_parent_resize(void *data,
+               Evas *e __UNUSED__,
+               Evas_Object *obj __UNUSED__,
+               void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+
+   wd->dir = ELM_CTXPOPUP_DIRECTION_UNKNOWN;
+
+   _hide(data);
+}
+
+static void
+_parent_move(void *data,
+             Evas *e __UNUSED__,
+             Evas_Object *obj __UNUSED__,
+             void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
 
    if (!wd) return;
 
-   if (wd->visible)
-     {
-        _scroller_size_reset(wd);
-        _sizing_eval(data);
-     }
-}
-
-static void
-_hover_parent_move(void *data,
-                   Evas *e __UNUSED__,
-                   Evas_Object *obj __UNUSED__,
-                   void *event_info __UNUSED__)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-
-   if (!wd) return;
+   wd->dir = ELM_CTXPOPUP_DIRECTION_UNKNOWN;
 
    if (wd->visible)
      {
@@ -255,14 +241,12 @@ _hover_parent_move(void *data,
 }
 
 static void
-_hover_parent_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
-                  void *event_info __UNUSED__)
+_parent_del(void *data,
+            Evas *e __UNUSED__,
+            Evas_Object *obj __UNUSED__,
+            void *event_info __UNUSED__)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
-
-   if (!wd) return;
-
-   wd->hover_parent = NULL;
+   evas_object_del(data);
 }
 
 static void
@@ -336,7 +320,6 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    Evas_Coord_Point max_size;
    Evas_Coord_Point min_size;
    Evas_Coord_Rectangle hover_area;
-   Evas_Coord_Rectangle parent_size;
    Evas_Coord_Point arrow_size;
    Elm_Ctxpopup_Direction dir = ELM_CTXPOPUP_DIRECTION_DOWN;
    Evas_Coord_Point temp;
@@ -352,18 +335,11 @@ _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
    evas_object_resize(wd->arrow, arrow_size.x, arrow_size.y);
 
    //Initialize Area Rectangle.
-   if (wd->hover_parent)
-      evas_object_geometry_get(wd->hover_parent, &hover_area.x, &hover_area.y,
-                               &hover_area.w, &hover_area.h);
-   else
-     {
-        evas_object_geometry_get(wd->parent, &parent_size.x, &parent_size.y,
-                                 &parent_size.w, &parent_size.h);
-        hover_area.x = parent_size.x;
-        hover_area.y = parent_size.y;
-        hover_area.w = parent_size.w;
-        hover_area.h = parent_size.h;
-     }
+   evas_object_geometry_get(wd->parent,
+                            &hover_area.x,
+                            &hover_area.y,
+                            &hover_area.w,
+                            &hover_area.h);
 
    evas_object_geometry_get(obj, &pos.x, &pos.y, NULL, NULL);
 
@@ -748,7 +724,7 @@ _del_pre_hook(Evas_Object *obj)
    evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE,
                                        _parent_resize, obj);
 
-   _hover_parent_callbacks_del(obj);
+   _parent_cut_off(obj);
 }
 
 static void
@@ -765,7 +741,7 @@ _del_hook(Evas_Object *obj)
    free(wd);
 }
 
-//FIXME: lost the content size when theme hook is called. 
+//FIXME: lost the content size when theme hook is called.
 static void
 _theme_hook(Evas_Object *obj)
 {
@@ -1010,24 +986,6 @@ _bg_clicked_cb(void *data, Evas_Object *obj __UNUSED__,
                const char *emission __UNUSED__, const char *source __UNUSED__)
 {
    evas_object_hide(data);
-}
-
-static void
-_parent_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj,
-               void *event_info __UNUSED__)
-{
-   Evas_Coord w, h;
-   Widget_Data *wd;
-
-   wd = elm_widget_data_get(data);
-   if (!wd) return;
-
-   evas_object_geometry_get(obj, NULL, NULL, &w, &h);
-   evas_object_resize(wd->bg, w, h);
-
-   if (!wd->visible) return;
-
-   _hide(data);
 }
 
 static void
@@ -1287,8 +1245,6 @@ elm_ctxpopup_add(Evas_Object *parent)
    elm_widget_content_unset_hook_set(obj, _content_unset_hook);
    elm_widget_content_get_hook_set(obj, _content_get_hook);
 
-   wd->parent = parent;
-
    //Background
    wd->bg = edje_object_add(e);
    elm_widget_sub_object_add(obj, wd->bg);
@@ -1331,6 +1287,9 @@ elm_ctxpopup_add(Evas_Object *parent)
 
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
 
+   //default parent is to be hover parent
+   elm_ctxpopup_hover_parent_set(obj, parent);
+
    return obj;
 }
 
@@ -1359,34 +1318,43 @@ elm_ctxpopup_item_label_set(Elm_Object_Item *it, const char *label)
 }
 
 EAPI void
-elm_ctxpopup_hover_parent_set(Evas_Object *obj, Evas_Object *hover_parent)
+elm_ctxpopup_hover_parent_set(Evas_Object *obj, Evas_Object *parent)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
 
    Widget_Data *wd;
+   Evas_Coord x, y, w, h;
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   _hover_parent_callbacks_del(obj);
+   _parent_cut_off(obj);
 
-   if (hover_parent)
+   if (parent)
      {
-        evas_object_event_callback_add(hover_parent,
+        evas_object_event_callback_add(parent,
                                        EVAS_CALLBACK_DEL,
-                                       _hover_parent_del,
+                                       _parent_del,
                                        obj);
-        evas_object_event_callback_add(hover_parent,
+        evas_object_event_callback_add(parent,
                                        EVAS_CALLBACK_MOVE,
-                                       _hover_parent_move,
+                                       _parent_move,
                                        obj);
-        evas_object_event_callback_add(hover_parent,
+        evas_object_event_callback_add(parent,
                                        EVAS_CALLBACK_RESIZE,
-                                       _hover_parent_resize,
+                                       _parent_resize,
                                        obj);
      }
 
-   wd->hover_parent = hover_parent;
+   elm_widget_sub_object_add(parent, obj);
+   wd->parent = parent;
+
+   //Update Background
+   evas_object_geometry_get(parent, &x, &y, &w, &h);
+   evas_object_move(wd->bg, x, y);
+   evas_object_resize(wd->bg, w, h);
+
+   if (wd->visible) _sizing_eval(obj);
 }
 
 EAPI Evas_Object *
@@ -1399,7 +1367,7 @@ elm_ctxpopup_hover_parent_get(const Evas_Object *obj)
    wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   return wd->hover_parent;
+   return wd->parent;
 }
 
 EAPI void
