@@ -167,7 +167,7 @@ _theme_data_get(Widget_Data *wd)
      }
 
    str = edje_object_data_get(wd->right_blank, "min_width");
-   if (str) wd->minw = MAX(-1, atoi(str));
+   if (str) wd->minw = MAX(-1, atoi(str)) * elm_scale_get();
    else
      {
         parent = elm_widget_parent_widget_get(wd->self);
@@ -176,7 +176,7 @@ _theme_data_get(Widget_Data *wd)
      }
 
    str = edje_object_data_get(wd->right_blank, "min_height");
-   if (str) wd->minh = MAX(-1, atoi(str));
+   if (str) wd->minh = MAX(-1, atoi(str)) * elm_scale_get();
    else wd->minh = -1;
 }
 
