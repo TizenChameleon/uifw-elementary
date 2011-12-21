@@ -854,7 +854,6 @@ _item_del(Elm_Genlist_Item *it)
    elm_genlist_item_subitems_clear(it);
    it->wd->walking -= it->walking;
    if (it->wd->show_item == it) it->wd->show_item = NULL;
-   if (it->selected) it->wd->selected = eina_list_remove(it->wd->selected, it);
    if (it->realized) _item_unrealize(it, EINA_FALSE);
    if (it->effect_item_realized) _effect_item_unrealize(it);
    if (it->block) _item_block_del(it);
@@ -1814,6 +1813,7 @@ _item_del_hook(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 {
    Elm_Genlist_Item *it = event_info;
    if (!it) return;
+   if (it->selected) it->wd->selected = eina_list_remove(it->wd->selected, it);
    if (it->wd->last_selected_item == it)
      it->wd->last_selected_item = NULL;
 }
