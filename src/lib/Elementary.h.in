@@ -29567,7 +29567,7 @@ extern "C" {
 
    /**
     * @defgroup Searchbar Searchbar
-    * @addtogroup TickerNoti
+    * @addtogroup Searchbar
     * @{
     * @ingroup Elementary
     *
@@ -29658,27 +29658,33 @@ extern "C" {
 
    /**
     * @defgroup TickerNoti TickerNoti
-    * @addtogroup TickerNoti
-    * @{
+    * @ingroup Elementary
     *
     * This is a notification widget which can be used to display some short information.
     *
-    * Parts which can be used with elm_object_text_part_set() and
-    * elm_object_text_part_get():
-    *
-    * @li NULL/"default" - Operates on tickernoti content-text
-    *
-    * Parts which can be used with elm_object_content_part_set(),
-    * elm_object_content_part_get() and elm_object_content_part_unset():
-    *
-    * @li "icon" - Operates on tickernoti's icon
-    * @li "button" - Operates on tickernoti's button
-    *
-    * smart callbacks called:
-    * @li "clicked" - emitted when tickernoti is clicked, except at the
-    * swallow/button region, if any.
-    * @li "hide" - emitted when the tickernoti is completely hidden. In case of
+    * Signals that you can add callback for are:
+    * @li "clicked" - tickernoti object has been clicked, except at the
+    * swallow/button region
+    * @li "hide" - tickernoti is completely hidden. In case of
     * any hide animation, this signal is emitted after the animation.
+    *
+    * Default contents parts of a tickernoti object that you can use for are:
+    * @li "icon" - The icon in tickernoti object
+    * @li "button" - The button in tickernoti object
+    *
+    * Default text parts of the tickernoti object that you can use for are:
+    * @li "default" - textual content in the tickernoti object
+    *
+    * Supported elm_object common APIs.
+    * @li elm_object_text_set
+    * @li elm_object_part_text_set
+    * @li elm_object_part_content_set
+    *
+    */
+
+   /**
+    * @addtogroup Tickernoti
+    * @{
     */
    typedef enum
      {
@@ -29760,7 +29766,7 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @param button The button object will be used on the tickernoti object
-    * @deprecated use elm_object_content_part_set() instead with "icon" as part name
+    * @deprecated use elm_object_part_content_set() instead with "icon" as part name
     */
    WILL_DEPRECATE  EAPI void                      elm_tickernoti_detailview_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(2);
    /**
@@ -29768,7 +29774,7 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @return The button object inside the tickernoti
-    * @deprecated use elm_object_content_part_get() instead with "button" as part name
+    * @deprecated use elm_object_part_content_get() instead with "button" as part name
     */
    WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_detailview_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -29776,7 +29782,7 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @param icon The icon object will be used on the tickernoti object
-    * @deprecated use elm_object_content_part_set() instead with "icon" as part name
+    * @deprecated use elm_object_part_content_set() instead with "icon" as part name
     */
    WILL_DEPRECATE  EAPI void                      elm_tickernoti_detailview_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
@@ -29784,7 +29790,7 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @return The icon object inside the tickernoti
-    * @deprecated use elm_object_content_part_get() instead with "icon" as part name
+    * @deprecated use elm_object_part_content_get() instead with "icon" as part name
     */
    WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_detailview_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -29847,7 +29853,7 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @param icon The icon object will be used on the tickernoti object
-    * @deprecated use elm_object_content_part_set() instead with "icon" as part name
+    * @deprecated use elm_object_part_content_set() instead with "icon" as part name
     */
    WILL_DEPRECATE  EAPI void                      elm_tickernoti_icon_set (Evas_Object *obj, Evas_Object *icon) EINA_ARG_NONNULL(1);
    /**
@@ -29855,7 +29861,7 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @return The icon object inside the tickernoti
-    * @deprecated use elm_object_content_part_get() instead with "icon" as part name
+    * @deprecated use elm_object_part_content_get() instead with "icon" as part name
     */
    WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_icon_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -29863,7 +29869,7 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @param button The button object will be used on the tickernoti object
-    * @deprecated use elm_object_content_part_set() instead with "button" as part name
+    * @deprecated use elm_object_part_content_set() instead with "button" as part name
     */
    WILL_DEPRECATE  EAPI void                      elm_tickernoti_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(1);
    /**
@@ -29871,7 +29877,7 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @return The button object inside the tickernoti
-    * @deprecated use elm_object_content_part_get() instead with "button" as part name
+    * @deprecated use elm_object_part_content_get() instead with "button" as part name
     */
    WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_button_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
