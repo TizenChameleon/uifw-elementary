@@ -17,10 +17,18 @@ struct _Elm_Entry_Context_Menu_Item
    void *data;
 };
 
+static void _ctxpopup_hide(Evas_Object *popup);
+static void
+_entry_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
+{
+   _ctxpopup_hide(ext_mod->popup);
+}
+
 static void
 _ctxpopup_hide(Evas_Object *popup)
 {
    evas_object_hide(popup);
+   evas_object_event_callback_del(ext_mod->caller, EVAS_CALLBACK_MOVE, _entry_move);
    ext_mod->caller = NULL;
 }
 
@@ -359,6 +367,7 @@ obj_longpress(Evas_Object *obj)
              _ctxpopup_position(obj);
              evas_object_show(ext_mod->popup);
              ext_mod->caller = obj;
+             evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _entry_move, ext_mod->popup);
           }
         else
           ext_mod->caller = NULL;
