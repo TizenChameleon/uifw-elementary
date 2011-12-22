@@ -872,10 +872,8 @@ _create_item_icon(Evas_Object *obj, Elm_Controlbar_Item * it, char *part)
 
    Evas_Object *icon;
    icon = elm_icon_add(obj);
-   if (!elm_icon_standard_set(icon, it->icon_path))
-     {
-        elm_icon_file_set(icon, it->icon_path, NULL);
-     }
+
+   elm_icon_file_set(icon, it->icon_path, NULL);
 
    evas_object_size_hint_min_set(icon, 40, 40);
    evas_object_size_hint_max_set(icon, 100, 100);

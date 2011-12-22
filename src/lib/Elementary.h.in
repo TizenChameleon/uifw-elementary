@@ -29189,15 +29189,6 @@ extern "C" {
     */
 
    /* Control Bar */
-   #define CONTROLBAR_SYSTEM_ICON_ALBUMS "controlbar_albums"
-   #define CONTROLBAR_SYSTEM_ICON_ARTISTS "controlbar_artists"
-   #define CONTROLBAR_SYSTEM_ICON_SONGS "controlbar_songs"
-   #define CONTROLBAR_SYSTEM_ICON_PLAYLIST "controlbar_playlist"
-   #define CONTROLBAR_SYSTEM_ICON_MORE "controlbar_more"
-   #define CONTROLBAR_SYSTEM_ICON_CONTACTS "controlbar_contacts"
-   #define CONTROLBAR_SYSTEM_ICON_DIALER "controlbar_dialer"
-   #define CONTROLBAR_SYSTEM_ICON_FAVORITES "controlbar_favorites"
-   #define CONTROLBAR_SYSTEM_ICON_LOGS "controlbar_logs"
 
    typedef enum _Elm_Controlbar_Mode_Type
      {
