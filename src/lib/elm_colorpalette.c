@@ -92,6 +92,12 @@ static void _colorpalette_object_resize(void *data, Evas *e __UNUSED__, Evas_Obj
 
 static void _color_select_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
+   Colorpalette_Item *item = (Colorpalette_Item *) data;
+   edje_object_signal_emit(elm_layout_edje_get(item->lo), "focus_visible", "elm");
+}
+
+static void _color_release_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
    Elm_Colorpalette_Color *color;
    Colorpalette_Item *item = (Colorpalette_Item *) data;
    color = ELM_NEW(Elm_Colorpalette_Color);
@@ -99,14 +105,8 @@ static void _color_select_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __
    color->r = item->r;
    color->g = item->g;
    color->b = item->b;
-   evas_object_smart_callback_call(item->obj, "clicked", color);
-   edje_object_signal_emit(elm_layout_edje_get(item->lo), "focus_visible", "elm");
-}
-
-static void _color_release_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   Colorpalette_Item *item = (Colorpalette_Item *) data;
    edje_object_signal_emit(elm_layout_edje_get(item->lo), "focus_invisible", "elm");
+   evas_object_smart_callback_call(item->obj, "clicked", color);
 }
 
 static void _color_table_delete(Evas_Object *obj)
