@@ -1,3 +1,17 @@
+elementary (1.0.0+svn.61256slp2+build107) unstable; urgency=low
+
+  * [Map] Upstream sync (r66413, r66459)
+  * gengrid small bug patch
+  * [elm_gesutre] Upstream sync related with elm_gesture config
+  * removed navigationbar
+  * [copypaste] hide copypaste ctxpopup when entry is scrolled
+  * Merge with upstream r66368
+  * [*][ctxpopup] Opensource Merge(r66269): hide ctxpopup when parent size is changed
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build107
+
+ -- Tae-Hwan Kim <the81.kim@samsung.com>  Fri, 23 Dec 2011 18:01:12 +0900
+
 elementary (1.0.0+svn.61256slp2+build106) unstable; urgency=low
 
   * Package upload.
