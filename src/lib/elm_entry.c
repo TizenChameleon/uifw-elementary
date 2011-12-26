@@ -4262,7 +4262,7 @@ elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
    if (wrap) elm_entry_line_wrap_set(obj, ELM_WRAP_CHAR);
 }
 
-EAPI void
+EINA_DEPRECATED EAPI void
 elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);

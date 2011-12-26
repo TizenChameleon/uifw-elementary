@@ -11989,7 +11989,7 @@ extern "C" {
     */
    EAPI Eina_Bool elm_entry_input_panel_enabled_get(Evas_Object *obj) EINA_ARG_NONNULL(1);
 
-   EAPI void         elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
+   EINA_DEPRECATED EAPI void elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
    EAPI void         elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
    EAPI void         elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
    EAPI void         elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
@@ -29895,10 +29895,10 @@ extern "C" {
    EAPI const char  *elm_editfield_guide_text_get(Evas_Object *obj);
    EAPI Evas_Object *elm_editfield_entry_get(Evas_Object *obj);
 //   EAPI Evas_Object *elm_editfield_clear_button_show(Evas_Object *obj, Eina_Bool show);
-   EAPI void         elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object *elm_editfield_right_icon_get(Evas_Object *obj);
-   EAPI void         elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon);
-   EAPI Evas_Object *elm_editfield_left_icon_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon);
+   EINA_DEPRECATED EAPI Evas_Object *elm_editfield_right_icon_get(Evas_Object *obj);
+   EINA_DEPRECATED EAPI void elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon);
+   EINA_DEPRECATED EAPI Evas_Object *elm_editfield_left_icon_get(Evas_Object *obj);
    EAPI void         elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
    EAPI Eina_Bool    elm_editfield_entry_single_line_get(Evas_Object *obj);
    EAPI void         elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible);

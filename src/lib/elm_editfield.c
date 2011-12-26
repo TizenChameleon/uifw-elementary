@@ -452,7 +452,7 @@ elm_editfield_entry_get(Evas_Object *obj)
  *
  * @ingroup Editfield
  */
-EAPI void
+EINA_DEPRECATED EAPI void
 elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -481,7 +481,7 @@ elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
  *
  * @ingroup Editfield
  */
-EAPI Evas_Object *
+EINA_DEPRECATED EAPI Evas_Object *
 elm_editfield_left_icon_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -498,7 +498,7 @@ elm_editfield_left_icon_get(Evas_Object *obj)
  *
  * @ingroup Editfield
  */
-EAPI void
+EINA_DEPRECATED EAPI void
 elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -526,7 +526,7 @@ elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
  *
  * @ingroup Editfield
  */
-EAPI Evas_Object *
+EINA_DEPRECATED EAPI Evas_Object *
 elm_editfield_right_icon_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
