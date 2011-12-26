@@ -3976,6 +3976,7 @@ elm_genlist_item_append(Evas_Object                  *obj,
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
+   if (flags == ELM_GENLIST_ITEM_GROUP) flags = ELM_GENLIST_ITEM_NONE;
    Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func,
                                     func_data);
    if (!it) return NULL;
@@ -4018,6 +4019,7 @@ elm_genlist_item_prepend(Evas_Object                  *obj,
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
+   if (flags == ELM_GENLIST_ITEM_GROUP) flags = ELM_GENLIST_ITEM_NONE;
    Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func,
                                     func_data);
 
@@ -4064,6 +4066,7 @@ elm_genlist_item_insert_after(Evas_Object                  *obj,
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    EINA_SAFETY_ON_NULL_RETURN_VAL(wd->items, NULL);
+   if (flags == ELM_GENLIST_ITEM_GROUP) flags = ELM_GENLIST_ITEM_NONE;
    Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func,
                                     func_data);
    if (!it) return NULL;
@@ -4104,6 +4107,7 @@ elm_genlist_item_insert_before(Evas_Object                  *obj,
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    EINA_SAFETY_ON_NULL_RETURN_VAL(wd->items, NULL);
+   if (flags == ELM_GENLIST_ITEM_GROUP) flags = ELM_GENLIST_ITEM_NONE;
    Elm_Genlist_Item *it = _item_new(wd, itc, data, parent, flags, func,
                                     func_data);
    if (!it) return NULL;
