@@ -802,6 +802,8 @@ _title_content_unset(Elm_Naviframe_Item *it, const char *part)
           }
      }
 
+   if (!content) return NULL;
+
    elm_widget_sub_object_del(WIDGET(it), content);
    edje_object_part_unswallow(VIEW(it), content);
    snprintf(buf, sizeof(buf), "elm,state,%s,hide", part);
@@ -1361,6 +1363,8 @@ elm_naviframe_item_del(Elm_Object_Item *it)
      {
         wd->stack = eina_inlist_remove(wd->stack, EINA_INLIST_GET(navi_it));
         _item_del(navi_it);
+        //If the item is only one, the stack will be empty
+        if (!wd->stack) return;
         navi_it = EINA_INLIST_CONTAINER_GET(wd->stack->last,
                                             Elm_Naviframe_Item);
         evas_object_show(VIEW(navi_it));
@@ -1482,4 +1486,24 @@ elm_naviframe_items_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
    return wd->stack;
+}
+
+EAPI void
+elm_naviframe_event_enabled_set(Evas_Object *obj, Eina_Bool enabled)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   enabled = !!enabled;
+   if (wd->freeze_events == !enabled) return;
+   wd->freeze_events = !enabled;
+}
+
+EAPI Eina_Bool
+elm_naviframe_event_enabled_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return !wd->freeze_events;
 }
