@@ -873,7 +873,10 @@ _create_item_icon(Evas_Object *obj, Elm_Controlbar_Item * it, char *part)
    Evas_Object *icon;
    icon = elm_icon_add(obj);
 
-   elm_icon_file_set(icon, it->icon_path, NULL);
+   if (it->wd->more_item == it)
+     elm_icon_standard_set(icon, it->icon_path);
+   else
+     elm_icon_file_set(icon, it->icon_path, NULL);
 
    evas_object_size_hint_min_set(icon, 40, 40);
    evas_object_size_hint_max_set(icon, 100, 100);
@@ -1259,9 +1262,10 @@ _create_more_item(Widget_Data *wd, int style)
 
    it = ELM_NEW(Elm_Controlbar_Item);
    if (!it) return NULL;
+   wd->more_item = it;
    it->obj = wd->object;
    it->text = eina_stringshare_add("more");
-   it->icon_path = eina_stringshare_add(CONTROLBAR_SYSTEM_ICON_MORE);
+   it->icon_path = eina_stringshare_add("controlbar_more");
    it->selected = EINA_FALSE;
    it->sel = 1;
    it->view = _create_more_view(wd);
@@ -1274,7 +1278,6 @@ _create_more_item(Widget_Data *wd, int style)
 
    _set_items_position(it->obj, it, NULL, EINA_TRUE);
    wd->items = eina_list_append(wd->items, it);
-   wd->more_item = it;
    wd->items = eina_list_sort(wd->items, eina_list_count(wd->items), _sort_cb);
 
    return it;
