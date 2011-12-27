@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build110) unstable; urgency=low
+
+  * [Genlist] Fixed genlist item positioning issue with group index.
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build110
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Tue, 27 Dec 2011 11:31:36 +0900
+
 elementary (1.0.0+svn.61256slp2+build109) unstable; urgency=low
 
   * [*][Genlist] Disabled group index floating behavior.
