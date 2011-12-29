@@ -747,7 +747,7 @@ _item_highlight(Elm_Genlist_Item *it)
 {
    const char *selectraise;
    if ((it->wd->no_select) || (it->no_select) || (it->delete_me) || (it->highlighted) ||
-       (it->disabled) || (it->display_only) || (it->mode_view))
+       (it->disabled) || (it->display_only))
      return;
    edje_object_signal_emit(VIEW(it), "elm,state,selected", "elm");
    if (it->edit_obj) edje_object_signal_emit(it->edit_obj, "elm,state,selected", "elm");
@@ -894,8 +894,7 @@ _item_select(Elm_Genlist_Item *it)
    Evas_Object *obj;
    Evas_Object *parent = WIDGET(it);
 
-   if ((it->wd->no_select) || (it->no_select) ||
-       (it->delete_me) || (it->mode_view)) return;
+   if ((it->wd->no_select) || (it->no_select) || (it->delete_me)) return;
    if (it->selected)
      {
         if (it->wd->always_select) goto call;
