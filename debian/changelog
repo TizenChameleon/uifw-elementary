@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.61256slp2+build111) unstable; urgency=low
+
+  * Package Upload
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build111
+
+ -- Shinwoo Kim <cinoo.kim@samsung.com>  Mon, 02 Jan 2012 12:11:37 +0900
+
 elementary (1.0.0+svn.61256slp2+build110) unstable; urgency=low
 
   * [Genlist] Fixed genlist item positioning issue with group index.
@@ -8,7 +16,7 @@ elementary (1.0.0+svn.61256slp2+build110) unstable; urgency=low
 
 elementary (1.0.0+svn.61256slp2+build109) unstable; urgency=low
 
-  * [*][Genlist] Disabled group index floating behavior.
+  *    [Genlist] Disabled group index floating behavior.
   * Git: slp/pkgs/e/elementary
   * Tag: elementary_1.0.0+svn.61256slp2+build109
 
@@ -30,7 +38,7 @@ elementary (1.0.0+svn.61256slp2+build107) unstable; urgency=low
   * removed navigationbar
   * [copypaste] hide copypaste ctxpopup when entry is scrolled
   * Merge with upstream r66368
-  * [*][ctxpopup] Opensource Merge(r66269): hide ctxpopup when parent size is changed
+  *    [ctxpopup] Opensource Merge(r66269): hide ctxpopup when parent size is changed
   * Git: slp/pkgs/e/elementary
   * Tag: elementary_1.0.0+svn.61256slp2+build107
 
