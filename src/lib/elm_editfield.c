@@ -5,7 +5,7 @@
  * @defgroup Editfield Editfield
  * @ingroup Elementary
  *
- * This is a editfield. It can contain a simple label and icon objects.
+ * This is an editfield. It supports guide text and eraser feature.
  *
  * Smart callbacks that you can add are:
  *
@@ -23,8 +23,6 @@ struct _Widget_Data
 {
    Evas_Object *base;
    Evas_Object *entry;
-   Evas_Object *ricon;
-   Evas_Object *licon;
    const char *label;
    const char *guide_text;
    Eina_Bool needs_size_calc:1;
@@ -132,10 +130,6 @@ _theme_hook(Evas_Object *obj)
                }
           }
      }
-   if(wd->ricon)
-      edje_object_part_swallow(wd->base, "right_icon", wd->ricon);
-   if(wd->licon)
-      edje_object_part_swallow(wd->base, "left_icon", wd->licon);
    _sizing_eval(obj);
 }
 
@@ -353,13 +347,11 @@ elm_editfield_label_set(Evas_Object *obj, const char *label)
      {
         wd->label = eina_stringshare_add(label);
         edje_object_signal_emit(wd->base, "elm,state,text,visible", "elm");
-        edje_object_signal_emit(wd->base, "elm,state,left,icon,hide", "elm");
      }
    else
      {
         wd->label = NULL;
         edje_object_signal_emit(wd->base, "elm,state,text,hidden", "elm");
-        edje_object_signal_emit(wd->base, "elm,state,left,icon,show", "elm");
      }
    edje_object_message_signal_process(wd->base);
    edje_object_part_text_set(wd->base, "elm.text", label);
@@ -442,97 +434,6 @@ elm_editfield_entry_get(Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    if (!wd) return NULL;
    return wd->entry;
-}
-
-/**
- * Set the left side icon.
- *
- * @param obj The editfield object
- * @param icon The icon object
- *
- * @ingroup Editfield
- */
-EINA_DEPRECATED EAPI void
-elm_editfield_left_icon_set(Evas_Object *obj, Evas_Object *icon)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype) ;
-   if (!wd || !wd->base || !icon) return;
-   if ((wd->licon != icon) && (wd->licon))
-      elm_widget_sub_object_del(obj, wd->licon);
-   if (icon)
-     {
-        edje_object_part_swallow(wd->base, "left_icon", icon);
-        wd->licon = icon;
-        elm_widget_sub_object_add(obj, icon);
-        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, obj);
-        edje_object_signal_emit(wd->base, "elm,state,left,icon,show", "elm");
-        edje_object_signal_emit(wd->base, "elm,state,text,hidden", "elm");
-        _sizing_eval(obj);
-     }
-}
-
-/**
- * Get the left side icon
- *
- * @param obj The editfield object
- * @return icon object
- *
- * @ingroup Editfield
- */
-EINA_DEPRECATED EAPI Evas_Object *
-elm_editfield_left_icon_get(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   if (!wd || !wd->base || !wd->licon) return NULL;
-   return wd->licon;
-}
-
-/**
- * Set the right side icon.
- *
- * @param obj The editfield object
- * @param icon The icon object
- *
- * @ingroup Editfield
- */
-EINA_DEPRECATED EAPI void
-elm_editfield_right_icon_set(Evas_Object *obj, Evas_Object *icon)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype) ;
-   if (!wd || !wd->base || !icon) return;
-   if ((wd->ricon != icon) && (wd->ricon))
-      elm_widget_sub_object_del(obj, wd->ricon);
-   if (icon)
-     {
-        edje_object_part_swallow(wd->base, "right_icon", icon);
-        wd->ricon = icon;
-        elm_widget_sub_object_add(obj, icon);
-        evas_object_event_callback_add(icon, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, obj);
-        edje_object_signal_emit(wd->base, "elm,state,right,icon,show", "elm");
-        _sizing_eval(obj);
-     }
-}
-
-/**
- * Get the right side icon
- *
- * @param obj The editfield object
- * @return icon object
- *
- * @ingroup Editfield
- */
-EINA_DEPRECATED EAPI Evas_Object *
-elm_editfield_right_icon_get(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   if (!wd || !wd->base || !wd->ricon) return NULL;
-   return wd->ricon;
 }
 
 /**

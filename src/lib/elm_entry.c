@@ -21,7 +21,6 @@ typedef struct _Elm_Entry_Text_Filter Elm_Entry_Text_Filter;
 struct _Widget_Data
 {
    Evas_Object *ent, *scroller, *end, *icon;
-   Evas_Object *bg;
    Evas_Object *hoversel;
    Evas_Object *hover;
    Evas_Object *layout;
@@ -79,7 +78,6 @@ struct _Widget_Data
    Eina_Bool context_menu : 1;
    Eina_Bool magnifier_enabled : 1;
    Eina_Bool drag_selection_asked : 1;
-   Eina_Bool bgcolor : 1;
    Eina_Bool can_write : 1;
    Eina_Bool autosave : 1;
    Eina_Bool usedown : 1;
@@ -509,7 +507,6 @@ _del_hook(Evas_Object *obj)
    if (wd->cut_sel) eina_stringshare_del(wd->cut_sel);
    if (wd->text) eina_stringshare_del(wd->text);
    if (wd->password_text) eina_stringshare_del(wd->password_text);
-   if (wd->bg) evas_object_del(wd->bg);
    if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
    if (wd->region_get_job) ecore_job_del(wd->region_get_job);
    if (wd->append_text_idler)
@@ -4260,20 +4257,6 @@ EINA_DEPRECATED EAPI void
 elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
 {
    if (wrap) elm_entry_line_wrap_set(obj, ELM_WRAP_CHAR);
-}
-
-EINA_DEPRECATED EAPI void
-elm_entry_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   evas_object_color_set(wd->bg, r, g, b, a);
-
-   if (wd->bgcolor == EINA_FALSE)
-     {
-       wd->bgcolor = 1;
-       edje_object_part_swallow(wd->ent, "entry.swallow.background", wd->bg);
-     }
 }
 
 EAPI void
