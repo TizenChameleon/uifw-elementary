@@ -29765,7 +29765,7 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @param button The button object will be used on the tickernoti object
-    * @deprecated use elm_object_part_content_set() instead with "icon" as part name
+    * @deprecated use elm_object_part_content_set() instead with "button" as part name
     */
    WILL_DEPRECATE  EAPI void                      elm_tickernoti_detailview_button_set (Evas_Object *obj, Evas_Object *button) EINA_ARG_NONNULL(2);
    /**
@@ -29796,8 +29796,8 @@ extern "C" {
     * Get the view mode on the tickernoti object
     *
     * @param obj The tickernotil object
-    * @return The view mode
-    * @deprecated removed as now styles are used instead
+    * @return The internal window used
+    * @deprecated use elm_tickernoti_win_get instead when internal window object is needed
     */
    WILL_DEPRECATE  EAPI Evas_Object              *elm_tickernoti_detailview_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -29805,14 +29805,14 @@ extern "C" {
     *
     * @param obj The tickernotil object
     * @param mode The view mode will be used on the tickernoti object
-    * @deprecated removed as now styles are used instead
+    * @deprecated removed as now styles are used. Use elm_object_style_set instead.
     */
    WILL_DEPRECATE  EAPI void                      elm_tickernoti_mode_set (Evas_Object *obj, Elm_Tickernoti_Mode mode) EINA_ARG_NONNULL(1);
    /**
-    * Get the detail view window(elm_win) on the tickernoti object
+    * Get the current mode of the tickernoti object
     *
     * @param obj The tickernotil object
-    * @return detail view window(elm_win) object
+    * @return the mode of the object. Can be ELM_TICKERNOTI_DEFAULT/ELM_TICKERNOTI_DETAILVIEW
     */
    WILL_DEPRECATE  EAPI Elm_Tickernoti_Mode       elm_tickernoti_mode_get (const Evas_Object *obj) EINA_ARG_NONNULL(1);
    /**
@@ -29836,7 +29836,7 @@ extern "C" {
     *
     * @param obj The tickernoti object
     * @param label The label will be used on the tickernoti object
-    * @deprecated use elm_object_text_get()
+    * @deprecated use elm_object_text_set()
     */
    WILL_DEPRECATE  EAPI void                      elm_tickernoti_label_set (Evas_Object *obj, const char *label) EINA_ARG_NONNULL(1);
    /**
