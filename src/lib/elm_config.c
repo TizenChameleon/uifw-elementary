@@ -1749,24 +1749,6 @@ _elm_config_sub_init(void)
                                ECORE_X_EVENT_MASK_WINDOW_PROPERTY);
         _prop_change_handler = ecore_event_handler_add
             (ECORE_X_EVENT_WINDOW_PROPERTY, _prop_change, NULL);
-        if (!getenv("ELM_SCALE"))
-          {
-             if (ecore_x_window_prop_card32_get(_root_1st,
-                                                _atom[ATOM_E_SCALE],
-                                                &val, 1) > 0)
-               {
-                  if (val > 0)
-                    {
-                       _elm_config->scale = (double)val / 1000.0;
-     // FIXME: hack until e export finger size too
-                       if (!getenv("ELM_FINGER_SIZE"))
-                         {
-                            _elm_config->finger_size = 40.0 * _elm_config->scale;
-                         }
-                       edje_scale_set(_elm_config->scale);
-                    }
-               }
-          }
         if (!getenv("ELM_FINGER_SIZE"))
           {
              if (ecore_x_window_prop_card32_get(_root_1st,
