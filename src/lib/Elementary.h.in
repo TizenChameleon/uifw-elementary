@@ -29950,16 +29950,16 @@ extern "C" {
 
 
    /**
-    * @defgroup Multibuttonenetry Multibuttonenetry
+    * @defgroup Multibuttonentry Multibuttonentry
     *
-    * @image html img/widget/flipselector/preview-00.png
-    * @image latex img/widget/flipselector/preview-00.eps
+    * @image html img/widget/Multibuttonentry/preview-00.png
+    * @image latex img/widget/Multibuttonentry/preview-00.eps
     *
     * A Multibuttonentry is a widget to allow a user to insert a text button.
-    * the text button is inserted by pressing the "return" key. If there is no space in the current row,
-    * the new button is entered in the next row. If the button is pressed, it will become focused. 
-    * The focus can be removed by pressing the "backspace" key.
-    * when items are added over 1 lines, if Multibuttonentry lost focus, it becase shrink mode ( made it 1 line)
+    * The text button is inserted by pressing the "return" key. If there is no space in the current row,
+    * a new button is entered in the next row. If the button is pressed, it will get a focus.
+    * The focused button can be removed by pressing the "backspace" key.
+    * when items are added over 1 lines, if Multibuttonentry lost focus, it becomes a shrink mode. ( made it as 1 line.)
     *
     * Smart callbacks one can register to:
     * - @c "item,selected" - when item is selected . it can be called by backspace key.                       
@@ -30024,7 +30024,7 @@ extern "C" {
     * Set the guide text
     *
     * @param obj The multibuttonentry object
-    * @param label The guide text string
+    * @param guidetext The guide text string
     */
    EAPI void                       elm_multibuttonentry_guide_text_set(Evas_Object *obj, const char *guidetext);
    /**
