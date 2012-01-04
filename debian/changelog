@@ -1,3 +1,14 @@
+elementary (1.0.0+svn.61256slp2+build112) unstable; urgency=low
+
+  * Package Upload.
+  * Important Changes
+       [Genlist] Enabled group index feature but removed floating effect.
+       [editfield & entry] Removed some deprecated APIs
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build112
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Wed, 04 Jan 2012 12:12:53 +0900
+
 elementary (1.0.0+svn.61256slp2+build111) unstable; urgency=low
 
   * Package Upload
