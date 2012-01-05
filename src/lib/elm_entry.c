@@ -33,6 +33,7 @@ struct _Widget_Data
    int mgf_type;
    Ecore_Job *deferred_recalc_job;
    Ecore_Job *region_get_job;
+   Ecore_Job *region_recalc_job;
    Ecore_Event_Handler *sel_notify_handler;
    Ecore_Event_Handler *sel_clear_handler;
    Ecore_Timer *delay_write;
@@ -163,7 +164,8 @@ static void _magnifier_hide(void *data);
 static void _magnifier_move(void *data);
 static Evas_Coord_Rectangle _layout_region_get(Evas_Object *data);
 static Evas_Coord_Rectangle _viewport_region_get(Evas_Object *data);
-static void _elm_win_region_get_job(void *data);
+static void _region_get_job(void *data);
+static void _region_recalc_job(void *data);
 
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_ACTIVATED[] = "activated";
@@ -509,6 +511,7 @@ _del_hook(Evas_Object *obj)
    if (wd->password_text) eina_stringshare_del(wd->password_text);
    if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
    if (wd->region_get_job) ecore_job_del(wd->region_get_job);
+   if (wd->region_recalc_job) ecore_job_del(wd->region_recalc_job);
    if (wd->append_text_idler)
      {
         ecore_idler_del(wd->append_text_idler);
@@ -1081,7 +1084,7 @@ _move(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    if (!_elm_config->desktop_entry)
      {
         if (wd->region_get_job) ecore_job_del(wd->region_get_job);
-        wd->region_get_job = ecore_job_add(_elm_win_region_get_job, data);
+        wd->region_get_job = ecore_job_add(_region_get_job, data);
      }
 }
 
@@ -1109,7 +1112,7 @@ _resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    if (!_elm_config->desktop_entry)
      {
         if (wd->region_get_job) ecore_job_del(wd->region_get_job);
-        wd->region_get_job = ecore_job_add(_elm_win_region_get_job, data);
+        wd->region_get_job = ecore_job_add(_region_get_job, data);
      }
 }
 
@@ -2071,7 +2074,7 @@ _layout_region_get(Evas_Object *data)
 }
 
 static void
-_elm_win_region_get_job(void *data)
+_region_get_job(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord_Rectangle ret_rect;
@@ -2080,15 +2083,29 @@ _elm_win_region_get_job(void *data)
 
    if (!_elm_config->desktop_entry)
      {
-        evas_smart_objects_calculate(evas_object_evas_get(data));
+        if (wd->region_recalc_job) ecore_job_del(wd->region_recalc_job);
+        wd->region_recalc_job = ecore_job_add(_region_recalc_job, data);
 
+        evas_smart_objects_calculate(evas_object_evas_get(data));
+     }
+}
+
+static void
+_region_recalc_job(void *data)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   Evas_Coord_Rectangle ret_rect;
+   if (!wd) return;
+   wd->region_recalc_job = NULL;
+
+   if (!_elm_config->desktop_entry)
+     {
         ret_rect = _viewport_region_get(data);
         edje_object_part_text_viewport_region_set(wd->ent, "elm.text", ret_rect.x, ret_rect.y, ret_rect.w, ret_rect.h);
         ret_rect = _layout_region_get(data);
         edje_object_part_text_layout_region_set(wd->ent, "elm.text", ret_rect.x, ret_rect.y, ret_rect.w, ret_rect.h);
      }
 }
-
 
 static void
 _signal_selection_end(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
