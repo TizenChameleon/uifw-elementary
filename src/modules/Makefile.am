@@ -4,7 +4,5 @@ MAINTAINERCLEANFILES = Makefile.in
 SUBDIRS = \
 test_entry \
 ctxpopup_copypasteUI \
-ctxpopup_copypasteshareUI \
-popup_copypasteUI \
 test_map \
 access_output
