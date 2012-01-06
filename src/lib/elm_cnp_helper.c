@@ -35,6 +35,8 @@ typedef int       (*Notify_Handler_Cb)   (Cnp_Selection *sel, Ecore_X_Event_Sele
 enum
 {
    CNP_ATOM_TARGETS = 0,
+   CNP_ATOM_ATOM,
+   CNP_ATOM_LISTING_ATOMS = CNP_ATOM_ATOM,
    CNP_ATOM_text_uri,
    CNP_ATOM_text_urilist,
    CNP_ATOM_text_x_vcard,
@@ -89,7 +91,7 @@ struct _Cnp_Selection
 struct _Escape
 {
    const char *escape;
-   const char  value;
+   const char  *value;
 };
 
 struct _Tmp_Info
@@ -144,9 +146,7 @@ static void entry_deleted(void *images, Evas *e, Evas_Object *entry, void *unuse
 
 static Eina_Bool targets_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
 static Eina_Bool text_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
-static Eina_Bool html_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
-static Eina_Bool edje_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
-static Eina_Bool uri_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
+static Eina_Bool general_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
 static Eina_Bool image_converter(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
 static Eina_Bool vcard_send(char *target, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize);
 
@@ -165,17 +165,19 @@ static Eina_Bool pasteimage_append(Paste_Image *pi, Evas_Object *entry);
 static void pasteimage_free(Paste_Image *pi);
 static void entry_insert_filter(Evas_Object* entry, char* str);
 
+#define _PARAGRAPH_SEPARATOR "\xE2\x80\xA9"
+
 /* Optimisation: Turn this into a 256 byte table:
  *	then can lookup in one index, not N checks */
 static const Escape escapes[] = {
-  { "<br>",   '\n' },
-  { "<ps>",   '\n' },
-  { "<\t>",   '\t' },
-  { "gt;",    '>'  },
-  { "lt;",    '<'  },
-  { "amp;",   '&'  },
-  { "quot;",  '\'' },
-  { "dquot;", '"'  }
+  { "<ps>",  _PARAGRAPH_SEPARATOR },
+  { "<br>",  "\n" },
+  { "<\t>",  "\t" },
+  { "&gt;",   ">" },
+  { "&lt;",    "<" },
+  { "&amp;",   "&" },
+  { "&quot;",  "'" },
+  { "&dquot;", "\"" }
 };
 #define N_ESCAPES ((int)(sizeof(escapes) / sizeof(escapes[0])))
 
@@ -188,18 +190,26 @@ static Cnp_Atom atoms[CNP_N_ATOMS] = {
           notify_handler_targets,
           0
      },
+     [CNP_ATOM_ATOM] = {
+          "ATOM",
+          (Elm_Sel_Format) -1, // everything
+          targets_converter,
+          response_handler_targets,
+          notify_handler_targets,
+          0
+     },
      [CNP_ATOM_XELM] =  {
           "application/x-elementary-markup",
-          ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_HTML,
-          edje_converter,
+          ELM_SEL_FORMAT_MARKUP,
+          general_converter,
           NULL,
           notify_handler_edje,
           0
      },
      [CNP_ATOM_text_uri] = {
           "text/uri",
-          ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_IMAGE, /* Either images or entries */
-          uri_converter,
+          ELM_SEL_FORMAT_IMAGE, /* Either images or entries */
+          general_converter,
           NULL,
           notify_handler_uri,
           0
@@ -207,7 +217,7 @@ static Cnp_Atom atoms[CNP_N_ATOMS] = {
      [CNP_ATOM_text_urilist] = {
           "text/uri-list",
           ELM_SEL_FORMAT_IMAGE,
-          uri_converter,
+          general_converter,
           NULL,
           notify_handler_uri,
           0
@@ -293,7 +303,7 @@ static Cnp_Atom atoms[CNP_N_ATOMS] = {
      [CNP_ATOM_text_html_utf8] = {
           "text/html;charset=utf-8",
           ELM_SEL_FORMAT_HTML,
-          html_converter,
+          general_converter,
           NULL,
           notify_handler_html,
           0
@@ -301,7 +311,7 @@ static Cnp_Atom atoms[CNP_N_ATOMS] = {
      [CNP_ATOM_text_html] = {
           "text/html",
           ELM_SEL_FORMAT_HTML,
-          html_converter,
+          general_converter,
           NULL,
           notify_handler_html, /* No encoding: Webkit only */
           0
@@ -384,8 +394,6 @@ static void (*dragdonecb) (void *data, Evas_Object *obj) = NULL;
 static void *dragdonedata = NULL;
 
 static int _elm_cnp_init_count = 0;
-/* FIXME: who left this out of XAtoms.h */
-static Ecore_X_Atom clipboard_atom;
 
 static Eina_List *pastedimages = NULL;
 
@@ -407,786 +415,11 @@ static Ecore_Event_Handler *handler_status = NULL;
 /* Stringshared, so I can just compare pointers later */
 static const char *text_uri;
 
-/* For convert EFL to HTML */
-
-#define TAGPOS_START    0x00000001
-#define TAGPOS_END      0x00000002
-#define TAGPOS_ALONE    0x00000003
-
-/* TEXTBLOCK tag using stack but close tag word has no mean maybe bug...
- * TEXTBLOCK <b>bold<font>font</b>bold</font>
- * HTML <b>bold<font>font bold</b>font</font> */
-
-typedef struct _TagTable {
-     char *src;
-     char *dst;
-     char tagType;
-}TagTable;
-
-TagTable _EFLtoHTMLConvertTable[] = {
-       {"font", "font", 0},
-       {"underline", "del", 0},
-       {"strikethrough", "ins", 0},
-       {"br", "br", 1},
-       {"ps", "br", 1},
-       {"b", "b", 1},
-       {"item", "img", 1}
-};
-
-TagTable _HTMLtoEFLConvertTable[] = {
-       {"font", "", 0},
-       {"del", "underline", 0},
-       {"u", "underline", 0},
-       {"ins", "strikethrough", 0},
-       {"s", "strikethrough", 0},
-       {"br", "br", 1},
-       {"b", "b", 1},
-       {"strong", "b", 1},
-       {"img", "item", 1}
-};
-
-
-typedef struct _TagNode TagNode, *PTagNode;
-struct _TagNode {
-     char *tag;  //EINA_STRINGSHARE if NULL just str
-     char *tag_str;
-     char *str;
-     char *pos_in_ori_str;
-     PTagNode matchTag;
-     void *tagData;
-     unsigned char tagPosType;
-};
-
-typedef struct _FontTagData FontTagData, *PFontTagData;
-struct _FontTagData {
-     char *name;
-     char *color;
-     char *size;
-     char *bg_color;
-};
-
-
-typedef struct _ItemTagData ItemTagData, *PItemTagData;
-struct _ItemTagData {
-     char *href;
-     char *width;
-     char *height;
-};
-
-#define SAFEFREE(ptr) \
-   do\
-{\
-   if (ptr)\
-   free(ptr);\
-   ptr = NULL;\
-} while(0);\
-
-#define freeAndAssign(dst, value) \
-   do\
-{\
-   if (value)\
-     {\
-        SAFEFREE(dst);\
-        dst = value;\
-     }\
-} while(0);
-
-
-static PTagNode _new_tag_node(char *tag, char *tag_str, char* str, char *pos_in_ori_str);
-static PTagNode _get_start_node(char *str);
-static PTagNode _get_next_node(PTagNode prev);
-static void _delete_node(PTagNode node);
-static void _link_match_tags(Eina_List *nodes);
-static char *_get_tag_value(const char *tag_str, const char *tag_name);
-static char *_convert_to_html(Eina_List* nodes);
-static void _set_EFL_tag_data(Eina_List* nodes);
-static char *_convert_to_edje(Eina_List* nodes);
-static void _set_HTML_tag_data(Eina_List* nodes);
-static PFontTagData _set_EFL_font_data(PFontTagData data, const char *tag_str);
-static PItemTagData _set_EFL_item_data(PItemTagData data, const char *tag_str);
-static PFontTagData _set_HTML_font_data(PFontTagData data, const char *tag_str);
-static PItemTagData _set_HTML_img_data(PItemTagData data, const char *tag_str);
-
-#ifdef DEBUGON
-static void _dumpNode(Eina_List* nodes);
-#endif
-
-static PTagNode
-_new_tag_node(char *tag, char *tag_str, char* str, char *pos_in_ori_str)
-{
-   PTagNode newNode = calloc(1, sizeof(TagNode));
-   if (tag)
-     eina_str_tolower(&tag);
-   newNode->tag = tag;
-   if (tag_str)
-     eina_str_tolower(&tag_str);
-   newNode->tag_str = tag_str;
-   newNode->str = str;
-   newNode->pos_in_ori_str = pos_in_ori_str;
-   return newNode;
-}
-
-static PTagNode
-_get_start_node(char *str)
-{
-   char *startStr = NULL;
-   if (!str || str[0] == '\0')
-     return NULL;
-
-   if (str[0] != '<')
-     {
-        char *tagStart = strchr(str, '<');
-        if (!tagStart)
-          startStr = strdup(str);
-        else
-          {
-             int strLength = tagStart - str;
-             startStr = malloc(sizeof(char) * (strLength + 1));
-             strncpy(startStr, str, strLength);
-             startStr[strLength] = '\0';
-          }
-     }
-
-   return _new_tag_node(NULL, NULL, startStr, str);
-}
-
-static PTagNode
-_get_next_node(PTagNode prev)
-{
-   PTagNode retTag = NULL;
-   char *tagStart;
-   char *tagEnd;
-   char *tagNameEnd = NULL;
-   char *nextTagStart;
-
-   if (prev->tag == NULL)
-     tagStart = strchr(prev->pos_in_ori_str, '<');
-   else
-     tagStart = strchr(prev->pos_in_ori_str + 1, '<');
-
-   if (!tagStart)
-     return retTag;
-
-   tagEnd = strchr(tagStart, '>');
-   nextTagStart = strchr(tagStart + 1, '<');
-
-   if (!tagEnd || (nextTagStart && (nextTagStart < tagEnd)))
-        return _get_start_node(tagStart + 1);
-
-   int spCnt = 5;
-   char *spArray[spCnt];
-   spArray[0] = strchr(tagStart, '=');
-   spArray[1] = strchr(tagStart, '_');
-   spArray[2] = strchr(tagStart, ' ');
-   spArray[3] = strchr(tagStart, '\t');
-   spArray[4] = strchr(tagStart, '\n');
-   tagNameEnd = tagEnd;
-
-   int i;
-   for (i = 0; i < spCnt; i++)
-     {
-        if (spArray[i] && spArray[i] < tagNameEnd)
-          tagNameEnd = spArray[i];
-     }
-
-   int tagLength = tagNameEnd - tagStart - 1;
-   char *tagName = NULL;
-   if (!strncmp(&tagStart[1], "color", tagLength))
-     tagName = strndup("font", 4);
-   else if (!strncmp(&tagStart[1], "/color", tagLength))
-     tagName = strndup("/font", 5);
-   else if (!strncmp(&tagStart[1], "/item", tagLength))
-     tagName = strdup("");
-   else
-     tagName = strndup(&tagStart[1], tagLength);
-
-   int tagStrLength = 0;
-   char *tagStr = NULL;
-   if (tagName)
-     {
-        tagStrLength = tagEnd - tagStart + 1;
-        tagStr = strndup(tagStart, tagStrLength);
-     }
-
-   unsigned int strLength = nextTagStart ? (unsigned int)(nextTagStart - tagEnd - 1) : strlen(&tagEnd[1]);
-   char *str = strndup(&tagEnd[1], strLength);
-
-   retTag = _new_tag_node(tagName, tagStr, str, tagStart);
-   return retTag;
-}
-
-
-static void
-_delete_node(PTagNode node)
-{
-   if (node)
-     {
-        SAFEFREE(node->tag_str);
-        SAFEFREE(node->str);
-
-        if (node->tagData)
-          {
-             if (node->tag)
-               {
-                  if (!strcmp("font", node->tag))
-                    {
-                       PFontTagData data = node->tagData;
-                       SAFEFREE(data->name);
-                       SAFEFREE(data->color);
-                       SAFEFREE(data->size);
-                       SAFEFREE(data->bg_color);
-                    }
-                  if (!strcmp("item", node->tag))
-                    {
-                       PItemTagData data = node->tagData;
-                       SAFEFREE(data->href);
-                       SAFEFREE(data->width);
-                       SAFEFREE(data->height);
-                    }
-
-               }
-             SAFEFREE(node->tagData);
-          }
-        SAFEFREE(node->tag);
-        SAFEFREE(node);
-     }
-}
-
-static void
-_link_match_tags(Eina_List *nodes)
-{
-   Eina_List *stack = NULL;
-
-   PTagNode trail, popData;
-   Eina_List *l, *r;
-
-   EINA_LIST_FOREACH(nodes, l, trail)
-     {
-        if (!trail->tag || trail->tag[0] == '\0')
-          continue;
-        if (!strcmp("br", trail->tag))
-          {
-             trail->tagPosType = TAGPOS_ALONE;
-             continue;
-          }
-        else if (!strcmp("item", trail->tag) || !strcmp("img", trail->tag))
-          {
-             trail->tagPosType = TAGPOS_ALONE;
-             continue;
-          }
-
-        if (trail->tag[0] != '/') // PUSH
-          {
-             stack = eina_list_append(stack, trail);
-/*             eina_array_push(stack, trail);
-             cnp_debug("stack: %d, tag %s\n", eina_array_count_get(stack), trail->tag);*/
-             cnp_debug("stack: %d, tag %s\n", eina_list_count(stack), trail->tag);
-          }
-        else // POP
-          {
-             if (!eina_list_count(stack))
-               {
-                  cnp_debug("tag not matched %s\n", trail->tag);
-                  continue;
-               }
-
-             EINA_LIST_REVERSE_FOREACH(stack, r, popData)
-               {
-                  if (popData->tag && !strcmp(popData->tag, &trail->tag[1]))
-                    {
-                       popData->tagPosType = TAGPOS_START;
-                       trail->tagPosType = TAGPOS_END;
-                       popData->matchTag = trail;
-                       trail->matchTag = popData;
-                       stack = eina_list_remove_list(stack, r);
-                       break;
-                    }
-               }
-/*             popData = eina_array_pop(stack);
-
-             popData->tagPosType = TAGPOS_START;
-             trail->tagPosType = TAGPOS_END;
-             popData->matchTag = trail;
-             trail->matchTag = popData;
-             cnp_debug("pop stack: %d, tag %s\n", eina_array_count_get(stack), trail->tag);
-             */
-          }
-     }
-
-/*   if (eina_array_count_get(stack))
-     cnp_debug("stack state: %d, tag %s\n", eina_array_count_get(stack), trail->tag);*/
-
-   /* Make Dummy close tag */
-/*   while ((popData = eina_array_pop(stack)))  */
-
-   EINA_LIST_REVERSE_FOREACH(stack, r, popData)
-     {
-        PTagNode newData;
-        int tagLength = strlen(popData->tag);
-        char *tagName = malloc(sizeof(char) * (tagLength + 2));
-
-        tagName[0] = '/';
-        tagName[1] = '\0';
-        strcat(tagName, popData->tag);
-
-        newData = _new_tag_node(tagName, NULL, NULL, NULL);
-        popData->tagPosType = TAGPOS_START;
-        newData->tagPosType = TAGPOS_END;
-        popData->matchTag = newData;
-        newData->matchTag = popData;
-        nodes = eina_list_append(nodes, newData);
-/*        cnp_debug("stack: %d, tag %s\n", eina_array_count_get(stack), popData->tag);*/
-     }
-/*   cnp_debug("stack_top: %d\n", eina_array_count_get(stack));
-   eina_array_free(stack);*/
-   eina_list_free(stack);
-}
-
-static char *
-_get_tag_value(const char *tag_str, const char *tag_name)
-{
-   if (!tag_name || !tag_str)
-     return NULL;
-
-   char *tag;
-   if ((tag = strstr(tag_str, tag_name)))
-     {
-        if (tag[strlen(tag_name)] == '_')
-          return NULL;
-        char *value = strchr(tag, '=');
-        if (value)
-          {
-             do
-               {
-                  value++;
-               } while (!isalnum(*value) && *value != '#');
-
-             int spCnt = 6;
-             char *spArray[spCnt];
-             spArray[0] = strchr(value, ' ');
-             spArray[1] = strchr(value, '>');
-             spArray[2] = strchr(value, '\"');
-             spArray[3] = strchr(value, '\'');
-             spArray[4] = strchr(value, '\t');
-             spArray[5] = strchr(value, '\n');
-             char *valueEnd = strchr(value, '\0');
-
-             int i;
-             int start = 0;
-             if ((!strncmp(tag_str, "<item", 5) && !strcmp(tag_name, "href")) // EFL img tag
-               || (!strncmp(tag_str, "<img", 4) && !strcmp(tag_name, "src"))) // HTML img tag
-               start = 1;
-
-             for (i = start; i < spCnt; i++)
-               {
-                  if (spArray[i] && spArray[i] < valueEnd)
-                    valueEnd = spArray[i];
-               }
-
-             int valueLength = valueEnd - value;
-             return strndup(value, valueLength);
-          }
-     }
-   return NULL;
-}
-
-static PFontTagData
-_set_EFL_font_data(PFontTagData data, const char *tag_str)
-{
-   char *value;
-
-   if (!data)
-     data = calloc(1, sizeof(FontTagData));
-   value = _get_tag_value(tag_str, "font_size");
-   freeAndAssign(data->size, value);
-   value = _get_tag_value(tag_str, "color");
-   freeAndAssign(data->color, value);
-   value = _get_tag_value(tag_str, "bgcolor");
-   freeAndAssign(data->bg_color, value);
-   value = _get_tag_value(tag_str, "font");
-   freeAndAssign(data->name, value);
-
-   return data;
-}
-
-static PItemTagData
-_set_EFL_item_data(PItemTagData data, const char *tag_str)
-{
-   char *value;
-
-   if (!data)
-     data = calloc(1, sizeof(ItemTagData));
-   value = _get_tag_value(tag_str, "href");
-   if (value)
-     {
-        char *path = strstr(value, "file://");
-        if (path)
-          {
-             char *modify = malloc(sizeof(char) * (strlen(value) + 1));
-             strncpy(modify, "file://", 8);
-             path += 7;
-             while (path[1] && path[0] && path[1] == '/' && path[0] == '/')
-               {
-                  path++;
-               }
-             strcat(modify, path);
-             data->href = modify;
-             cnp_debug("image href ---%s---\n", data->href);
-             free(value);
-          }
-        else
-          freeAndAssign(data->href, value);
-     }
-
-   value = _get_tag_value(tag_str, "absize");
-   if (value)
-     {
-        char *xpos = strchr(value, 'x');
-        if (xpos)
-          {
-             int absizeLen = strlen(value);
-             freeAndAssign(data->width, strndup(value, xpos - value));
-             freeAndAssign(data->height, strndup(xpos + 1, absizeLen - (xpos - value) - 1));
-             cnp_debug("image width: -%s-, height: -%s-\n", data->width, data->height);
-          }
-        free(value);
-     }
-   return data;
-}
-
-static void
-_set_EFL_tag_data(Eina_List* nodes)
-{
-   PTagNode trail;
-   Eina_List *l;
-
-   EINA_LIST_FOREACH(nodes, l, trail)
-     {
-        if (!trail->tag)
-          continue;
-        if (!strcmp("font", trail->tag))
-             trail->tagData = _set_EFL_font_data(trail->tagData, trail->tag_str);
-        else if (!strcmp("item", trail->tag))
-             trail->tagData = _set_EFL_item_data(trail->tagData, trail->tag_str);
-     }
-}
-
-static PFontTagData
-_set_HTML_font_data(PFontTagData data, const char *tag_str)
-{
-   char *value;
-
-   if (!data)
-     data = calloc(1, sizeof(FontTagData));
-   value = _get_tag_value(tag_str, "size");
-   freeAndAssign(data->size, value);
-   value = _get_tag_value(tag_str, "color");
-   freeAndAssign(data->color, value);
-   value = _get_tag_value(tag_str, "bgcolor");
-   freeAndAssign(data->bg_color, value);
-   value = _get_tag_value(tag_str, "face");
-   freeAndAssign(data->name, value);
-
-   return data;
-}
-
-static PItemTagData
-_set_HTML_img_data(PItemTagData data, const char *tag_str)
-{
-   char *value;
-
-   if (!data)
-     data = calloc(1, sizeof(ItemTagData));
-   value = _get_tag_value(tag_str, "src");
-   if (value)
-     {
-        char *path = strstr(value, "file://");
-        if (path)
-          {
-             char *modify = malloc(sizeof(char) * (strlen(value) + 1));
-             strncpy(modify, "file://", 8);
-             path += 7;
-             while (path[1] && path[0] && path[1] == '/' && path[0] == '/')
-               {
-                  path++;
-               }
-             strcat(modify, path);
-             data->href = modify;
-             cnp_debug("image src ---%s---\n", data->href);
-             free(value);
-          }
-        else
-          freeAndAssign(data->href, value);
-     }
-
-   value = _get_tag_value(tag_str, "width");
-   freeAndAssign(data->width, value);
-   value = _get_tag_value(tag_str, "height");
-   freeAndAssign(data->height, value);
-   return data;
-}
-
-static void
-_set_HTML_tag_data(Eina_List* nodes)
-{
-   PTagNode trail;
-   Eina_List *l;
-
-   EINA_LIST_FOREACH(nodes, l, trail)
-     {
-        if (!trail->tag)
-          continue;
-        if (!strcmp("font", trail->tag))
-             trail->tagData = _set_HTML_font_data(trail->tagData, trail->tag_str);
-        else if (!strcmp("img", trail->tag))
-             trail->tagData = _set_HTML_img_data(trail->tagData, trail->tag_str);
-     }
-}
-
-#ifdef DEBUGON
-static void
-_dumpNode(Eina_List* nodes)
-{
-   PTagNode trail;
-   Eina_List *l;
-
-   EINA_LIST_FOREACH(nodes, l, trail)
-     {
-        cnp_debug("tag: %s, tag_str: %s, str: %s, tagPosType: %d\n",
-               trail->tag, trail->tag_str, trail->str, trail->tagPosType);
-        cnp_debug("matchTag: %x ", (unsigned int)trail->matchTag);
-        if (trail->matchTag)
-          cnp_debug("matchTag->tag_str: %s", trail->matchTag->tag_str);
-        if (trail->tagData)
-          {
-             if (!strcmp(trail->tag, "font"))
-               {
-                  PFontTagData data = trail->tagData;
-                  cnp_debug(" tagData->name: %s, tagData->color: %s, tagData->size: %s, tagData->bg_color: %s",
-                         data->name, data->color, data->size, data->bg_color);
-               }
-             else if (!strcmp(trail->tag, "item") || !strcmp(trail->tag, "img"))
-               {
-                  PItemTagData data = trail->tagData;
-                  cnp_debug(" tagData->href: %s, tagData->width: %s, tagData->height: %s",
-                         data->href, data->width, data->height);
-               }
-             else
-               cnp_debug("\nERROR!!!! not need tagData");
-          }
-        cnp_debug("\n");
-     }
-}
-#endif
-
-static char *
-_convert_to_html(Eina_List* nodes)
-{
-   PTagNode trail;
-   Eina_List *l;
-
-   Eina_Strbuf *html = eina_strbuf_new();
-
-   int tableCnt = sizeof(_EFLtoHTMLConvertTable) / sizeof(TagTable);
-
-   EINA_LIST_FOREACH(nodes, l, trail)
-     {
-        if (trail->tag)
-          {
-             char *tagName = trail->tagPosType == TAGPOS_END ?
-                trail->matchTag->tag : trail->tag;
-             int j;
-             for(j = 0; j < tableCnt; j++)
-               {
-                  if (!strcmp(_EFLtoHTMLConvertTable[j].src, tagName))
-                    {
-                       switch(trail->tagPosType)
-                         {
-                          case TAGPOS_END:
-                             eina_strbuf_append(html, "</");
-                             break;
-                          default:
-                             eina_strbuf_append(html, "<");
-                             break;
-                         }
-
-                       eina_strbuf_append(html, _EFLtoHTMLConvertTable[j].dst);
-                       if (trail->tagPosType != TAGPOS_END)
-                         {
-                            if (!strcmp(_EFLtoHTMLConvertTable[j].src, "font"))
-                              {
-                                 PFontTagData data = trail->tagData;
-                                 if (data->name)
-                                   {
-                                   }
-                                 if (data->color)
-                                   eina_strbuf_append_printf(html, " color=\"%s\"", data->color);
-                                 if (data->size)
-                                   eina_strbuf_append_printf(html, " size=\"%s\"", data->size);
-                                 if (data->bg_color)
-                                   {
-                                   }
-                              }
-                            else if (!strcmp(_EFLtoHTMLConvertTable[j].src, "item"))
-                              {
-                                 PItemTagData data = trail->tagData;
-                                 if (data->href)
-                                   eina_strbuf_append_printf(html, " src=\"%s\"", data->href);
-                                 if (data->width)
-                                   eina_strbuf_append_printf(html, " width=\"%s\"", data->width);
-                                 if (data->height)
-                                   eina_strbuf_append_printf(html, " height=\"%s\"", data->height);
-                              }
-                         }
-                       switch(trail->tagPosType)
-                         {
-                            /* closed tag does not need in HTML
-                          case TAGPOS_ALONE:
-                             eina_strbuf_append(html, " />");
-                             break;*/
-                          default:
-                             eina_strbuf_append(html, ">");
-                             break;
-                         }
-                       break;
-                    }
-               }
-          }
-        if (trail->str)
-          eina_strbuf_append(html, trail->str);
-     }
-
-   eina_strbuf_replace_all(html, "  ", " &nbsp;");
-   char *ret = eina_strbuf_string_steal(html);
-   eina_strbuf_free(html);
-   return ret;
-}
-
-#define IMAGE_DEFAULT_WIDTH "240"
-#define IMAGE_DEFAULT_HEIGHT "180"
-
-
-static char *
-_convert_to_edje(Eina_List* nodes)
-{
-   PTagNode trail;
-   Eina_List *l;
-
-   Eina_Strbuf *html = eina_strbuf_new();
-
-   int tableCnt = sizeof(_HTMLtoEFLConvertTable) / sizeof(TagTable);
-
-   EINA_LIST_FOREACH(nodes, l, trail)
-     {
-        if (trail->tag)
-          {
-             char *tagName = trail->tagPosType == TAGPOS_END ?
-                trail->matchTag->tag : trail->tag;
-             int j;
-             for(j = 0; j < tableCnt; j++)
-               {
-                  if (!strcmp(_HTMLtoEFLConvertTable[j].src, tagName))
-                    {
-                       if (_HTMLtoEFLConvertTable[j].dst[0] != '\0')
-                         {
-                            switch(trail->tagPosType)
-                              {
-                               case TAGPOS_END:
-                                  eina_strbuf_append(html, "</");
-                                  break;
-                               default:
-                                  eina_strbuf_append(html, "<");
-                                  break;
-                              }
-
-                            eina_strbuf_append(html, _HTMLtoEFLConvertTable[j].dst);
-                         }
-                       if (trail->tagPosType != TAGPOS_END)
-                         {
-                            if (!strcmp(_HTMLtoEFLConvertTable[j].src, "font"))
-                              {
-                                 PFontTagData data = trail->tagData;
-                                 if (data->name)
-                                   {
-                                   }
-                                 if (data->color)
-                                   eina_strbuf_append_printf(html, "<color=%s>", data->color);
-                                 if (data->size)
-                                   eina_strbuf_append_printf(html, "<font_size=%s>", data->size);
-                                 if (data->bg_color)
-                                   {
-                                   }
-                                 break;
-                              }
-                            else if (!strcmp(_HTMLtoEFLConvertTable[j].src, "img"))
-                              {
-                                 PItemTagData data = trail->tagData;
-                                 char *width = IMAGE_DEFAULT_WIDTH, *height = IMAGE_DEFAULT_HEIGHT;
-                                 if (data->width)
-                                   width = data->width;
-                                 if (data->height)
-                                   height = data->height;
-                                 eina_strbuf_append_printf(html, " absize=%sx%s", width, height);
-                                 if (data->href)
-                                   eina_strbuf_append_printf(html, " href=%s></item>", data->href);
-                                 break;
-                              }
-                         }
-                       else
-                         {
-                            if (_HTMLtoEFLConvertTable[j].dst[0] == '\0')
-                              {
-                                 if (!strcmp(_HTMLtoEFLConvertTable[j].src, "font"))
-                                   {
-                                      if (trail->matchTag->tagData)
-                                        {
-                                           PFontTagData data = trail->matchTag->tagData;
-                                           if (data->name)
-                                             {
-                                             }
-                                           if (data->color)
-                                             eina_strbuf_append_printf(html, "</color>");
-                                           if (data->size)
-                                             eina_strbuf_append_printf(html, "</font>");
-                                           if (data->bg_color)
-                                             {
-                                             }
-                                           break;
-                                        }
-                                   }
-                              }
-                         }
-                       switch(trail->tagPosType)
-                         {
-                            /* not support in efl
-                          case TAGPOS_ALONE:
-                             eina_strbuf_append(html, " />");
-                             break;
-                             */
-                          default:
-                             eina_strbuf_append(html, ">");
-                             break;
-                         }
-                       break;
-                    }
-               }/* for(j = 0; j < tableCnt; j++) end */
-          }
-        if (trail->str)
-          eina_strbuf_append(html, trail->str);
-     }
-
-   eina_strbuf_replace_all(html, "&nbsp;", " ");
-   char *ret = eina_strbuf_string_steal(html);
-   eina_strbuf_free(html);
-   return ret;
-
-}
-
 Eina_Bool
 elm_selection_selection_has_owner(void)
 {
 #ifdef HAVE_ELEMENTARY_X
-   return !!ecore_x_selection_owner_get(clipboard_atom);
+   return !!ecore_x_selection_owner_get(ECORE_X_ATOM_SELECTION_CLIPBOARD);
 #else
    return EINA_FALSE;
 #endif
@@ -1288,7 +521,6 @@ _elm_cnp_init(void)
         ecore_x_selection_converter_atom_add(atoms[i].atom,
                                              atoms[i].converter);
      }
-   clipboard_atom = ecore_x_atom_get("CLIPBOARD");
 
    ecore_event_handler_add(ECORE_X_EVENT_SELECTION_CLEAR, selection_clear, NULL);
    ecore_event_handler_add(ECORE_X_EVENT_SELECTION_NOTIFY, selection_notify, NULL);
@@ -1376,16 +608,28 @@ selection_notify(void *udata __UNUSED__, int type __UNUSED__, void *event)
 
 
 static Eina_Bool
-targets_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize)
+targets_converter(char *target __UNUSED__, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize)
 {
    int i,count;
    Ecore_X_Atom *aret;
    Cnp_Selection *sel;
 
    if (!data_ret) return EINA_FALSE;
+
+   if (size != sizeof(int))
+     {
+        if (data_ret)
+          {
+             *data_ret = malloc(size * sizeof(char) + 1);
+             memcpy(*data_ret, data, size);
+             ((char**)(data_ret))[0][size] = 0;
+          }
+        if (size_ret) *size_ret = size;
+        return EINA_TRUE;
+     }
+
    if (!data || (*((unsigned int *)data) >= ELM_SEL_MAX))
      return EINA_FALSE;
-
    sel = selections + *((int *)data);
 
    for (i = 0, count = 0; i < CNP_N_ATOMS ; i++)
@@ -1421,6 +665,8 @@ vcard_send(char *target __UNUSED__, void *data __UNUSED__, int size __UNUSED__, 
 
    cnp_debug("Vcard send called\n");
 
+   if (!data || (*((unsigned int *)data) >= ELM_SEL_MAX))
+     return EINA_FALSE;
    sel = selections + *((int *)data);
 
    if (data_ret) *data_ret = strdup(sel->selbuf);
@@ -1429,6 +675,7 @@ vcard_send(char *target __UNUSED__, void *data __UNUSED__, int size __UNUSED__, 
    return EINA_TRUE;
 }
 
+#if 0
 static Eina_Bool
 is_uri_type_data(Cnp_Selection *sel __UNUSED__, Ecore_X_Event_Selection_Notify *notify)
 {
@@ -1449,7 +696,7 @@ is_uri_type_data(Cnp_Selection *sel __UNUSED__, Ecore_X_Event_Selection_Notify *
 
    return EINA_TRUE;
 }
-
+#endif
 /*
  * Callback to handle a targets response on a selection request:
  * So pick the format we'd like; and then request it.
@@ -1465,7 +712,7 @@ notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notif
    targets = notify->data;
    atomlist = (Ecore_X_Atom *)(targets->data.data);
 
-   for (j = 1; j < CNP_N_ATOMS; j++)
+   for (j = (CNP_ATOM_LISTING_ATOMS+1); j < CNP_N_ATOMS; j++)
      {
         cnp_debug("\t%s %d\n", atoms[j].name, atoms[j].atom);
         if (!(atoms[j].formats & sel->requestformat)) continue;
@@ -1480,18 +727,6 @@ notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notif
                       if(!is_uri_type_data(sel, notify)) continue;
                     }
 #endif
-                  /*
-                   * temporary patch for elm_selection_get with ELM_SEL_FORMAT_HTML
-                   * it will be removed after cbhm refactoring
-                   */
-                  if ((j == CNP_ATOM_XELM)
-                      && (!(sel->requestformat & ELM_SEL_FORMAT_MARKUP)))
-                    {
-                       cnp_debug("Atom %s matched, but selection request is not ELM_SEL_FORMAT_MARKUP\n",
-                                 atoms[j].name);
-                       continue;
-                    }
-
                   cnp_debug("Atom %s matches\n",atoms[j].name);
                   goto done;
                }
@@ -1607,6 +842,8 @@ entry_insert_filter(Evas_Object* entry, char* str)
    cnp_debug("remove break tag: %s\n", insertStr);
 
    elm_entry_entry_insert(entry, insertStr);
+   // TODO:
+   //_elm_entry_entry_paste//
 
    if (insertStr != str)
      free(insertStr);
@@ -1623,9 +860,11 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    if (sel->datacb)
      {
         Elm_Selection_Data ddata;
+        char *str = NULL;
+        str = malloc(sizeof(char) * (data->length + 1));
+        strncpy(str, (char *)data->data, data->length);
+        str[data->length] = '\0';
 
-        str = malloc(data->length);
-        memcpy(str, data->data, data->length);
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_TEXT;
         ddata.data = str;
@@ -1672,7 +911,9 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
      }
    else
      {
-        stripstr = p = strndup((char *)data->data, data->length);
+        stripstr = p = malloc(data->length * sizeof(char) + 1);
+        memcpy(stripstr, data->data, data->length);
+        stripstr[data->length] = 0;
      }
 
    if (!p)
@@ -1686,7 +927,7 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
         Elm_Selection_Data ddata;
 
         ddata.x = ddata.y = 0;
-        ddata.format = ELM_SEL_FORMAT_MARKUP;
+        ddata.format = ELM_SEL_FORMAT_IMAGE;
         ddata.data = p;
         ddata.len = data->length;
         sel->datacb(sel->udata, sel->widget, &ddata);
@@ -1778,7 +1019,6 @@ vcard_receive(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    return 0;
 
 }
-
 
 static int
 notify_handler_image(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
@@ -1885,11 +1125,24 @@ notify_handler_html(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
 
 
 static Eina_Bool
-text_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **data_ret, int *size_ret, Ecore_X_Atom *ttype __UNUSED__, int *typesize __UNUSED__)
+text_converter(char *target __UNUSED__, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype __UNUSED__, int *typesize __UNUSED__)
 {
    Cnp_Selection *sel;
 
    cnp_debug("text converter\n");
+   if (size != sizeof(int))
+     {
+        if (data_ret)
+          {
+             *data_ret = malloc(size * sizeof(char) + 1);
+             memcpy(*data_ret, data, size);
+             ((char**)(data_ret))[0][size] = 0;
+          }
+        if (size_ret) *size_ret = size;
+        return EINA_TRUE;
+     }
+   if (!data || (*((unsigned int *)data) >= ELM_SEL_MAX))
+     return EINA_FALSE;
    sel = selections + *((int *)data);
    if (!sel->active) return EINA_TRUE;
 
@@ -1929,157 +1182,28 @@ text_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **
 }
 
 static Eina_Bool
-edje_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **data_ret, int *size_ret, Ecore_X_Atom *ttype __UNUSED__, int *typesize __UNUSED__)
+general_converter(char *target __UNUSED__, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype __UNUSED__, int *typesize __UNUSED__)
 {
-   Cnp_Selection *sel;
-   sel = selections + *((int *)data);
-/*   if (data_ret) *data_ret = strdup(sel->selbuf);
-   if (size_ret) *size_ret = strlen(sel->selbuf);*/
-   char *edje = NULL;
-
-   if (data_ret && (sel->format == ELM_SEL_FORMAT_TEXT))
+   if (size == sizeof(int))
      {
-        if (sel->selbuf && sel->selbuf[0] != '\0')
-          edje = mark_up(sel->selbuf, strlen(sel->selbuf), NULL);
+        Cnp_Selection *sel;
+        if (!data || (*((unsigned int *)data) >= ELM_SEL_MAX))
+          return EINA_FALSE;
+
+        sel = selections + *((int *)data);
+        if (data_ret) *data_ret = strdup(sel->selbuf);
+        if (size_ret) *size_ret = strlen(sel->selbuf);
      }
-   else if (data_ret && ((sel->format & ELM_SEL_FORMAT_HTML)))
+   else if (size)
      {
-        Eina_List *nodeList = NULL;
-        Eina_List *trail;
-        PTagNode nodeData;
-
-        nodeData = _get_start_node(sel->selbuf);
-
-        while (nodeData)
+        if (data_ret)
           {
-             nodeList = eina_list_append(nodeList, nodeData);
-             nodeData = _get_next_node(nodeData);
+             *data_ret = malloc(size * sizeof(char) + 1);
+             memcpy(*data_ret, data, size);
+             ((char**)(data_ret))[0][size] = 0;
           }
-
-        _link_match_tags(nodeList);
-
-        _set_HTML_tag_data(nodeList);
-
-#ifdef DEBUGON
-        _dumpNode(nodeList);
-#endif
-        edje = _convert_to_edje(nodeList);
-
-        cnp_debug("convert edje: %s\n", edje);
-
-        EINA_LIST_FOREACH(nodeList, trail, nodeData)
-           _delete_node(nodeData);
-        eina_list_free(nodeList);
-
+        if (size_ret) *size_ret = size;
      }
-   if (data_ret)
-     {
-        if (edje)
-          *data_ret = edje;
-        else
-           if (sel->selbuf)
-             *data_ret = strdup(sel->selbuf);
-           else
-             *data_ret = strdup("");
-     }
-   if (size_ret)
-     {
-        if (edje)
-          *size_ret = strlen(edje);
-        else
-          if (sel->selbuf)
-            *size_ret = strlen(sel->selbuf);
-          else
-            *size_ret = 0;
-     }
-
-   return EINA_TRUE;
-}
-
-static Eina_Bool
-html_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **data_ret, int *size_ret, Ecore_X_Atom *ttype __UNUSED__, int *typesize __UNUSED__)
-{
-   Cnp_Selection *sel;
-
-   sel = selections + *(int *)data;
-
-   char *html = NULL;
-   char *convert_target = sel->selbuf;
-   Eina_Bool convert_edje = EINA_FALSE;
-
-   if (data_ret && (sel->format == ELM_SEL_FORMAT_TEXT))
-     {
-        if (sel->selbuf && sel->selbuf[0] != '\0')
-          {
-             convert_target = mark_up(sel->selbuf, strlen(sel->selbuf), NULL);
-             convert_edje = EINA_TRUE;
-          }
-     }
-
-   if (data_ret && ((sel->format & ELM_SEL_FORMAT_MARKUP) || convert_edje))
-     {
-        Eina_List *nodeList = NULL;
-        Eina_List *trail;
-        PTagNode nodeData;
-
-        nodeData = _get_start_node(convert_target);
-
-        while (nodeData)
-          {
-             nodeList = eina_list_append(nodeList, nodeData);
-             nodeData = _get_next_node(nodeData);
-          }
-
-        _link_match_tags(nodeList);
-
-        _set_EFL_tag_data(nodeList);
-
-#ifdef DEBUGON
-        _dumpNode(nodeList);
-#endif
-        html = _convert_to_html(nodeList);
-
-        cnp_debug("convert html: %s\n", html);
-
-        EINA_LIST_FOREACH(nodeList, trail, nodeData)
-           _delete_node(nodeData);
-        eina_list_free(nodeList);
-     }
-   if (data_ret)
-     {
-        if (html)
-          *data_ret = html;
-        else
-          if (sel->selbuf)
-            *data_ret = strdup(sel->selbuf);
-          else
-            *data_ret = strdup("");
-     }
-
-   if (size_ret)
-     {
-        if (html)
-          *size_ret = strlen(html);
-        else
-          if (sel->selbuf)
-            *size_ret = strlen(sel->selbuf);
-          else
-            *size_ret = 0;
-     }
-   if (convert_target != sel->selbuf)
-     free(convert_target);
-
-   return EINA_TRUE;
-}
-
-static Eina_Bool
-uri_converter(char *target __UNUSED__, void *data, int size __UNUSED__, void **data_ret, int *size_ret, Ecore_X_Atom *ttype __UNUSED__, int *typesize __UNUSED__)
-{
-   Cnp_Selection *sel;
-   sel = selections + *((int *)data);
-   cnp_debug("Uri converter\n");
-   if (data_ret) *data_ret = strdup(sel->selbuf);
-   if (size_ret) *size_ret = strlen(sel->selbuf);
    return EINA_TRUE;
 }
 
@@ -2231,29 +1355,63 @@ remove_tags(const char *p, int *len)
 
    while (*p)
      {
-        if ((*p != '<') && (*p != '&')) *q++ = *p++;
-        else if (*p == '<')
+        Eina_Bool esc = EINA_TRUE;
+        const char *x;
+        switch (p[0])
           {
-             if ((p[1] == 'b') && (p[2] == 'r') &&
-                 ((p[3] == ' ') || (p[3] == '/') || (p[3] == '>')))
-               *q++ = '\n';
-             while ((*p) && (*p != '>')) p++;
-             p++;
-          }
-        else if (*p == '&')
-          {
-             p++;
-             for (i = 0 ; i < N_ESCAPES ; i++)
+           case '<':
+             x = strchr(p + 3, '>');
+             if (!x)
                {
-                  if (!strncmp(p,escapes[i].escape, strlen(escapes[i].escape)))
+                  strcpy(q, p);
+                  if (len) *len = strlen(ret);
+                  return ret;
+               }
+             if (memcmp(p + 1, "br", 2) && memcmp(p + 1, "ps", 2))
+               {
+                  strncpy(q, p, x - p + 1);
+                  p = x + 1;
+                  break;
+               }
+             i = x - p - 1;
+             if (p[i] == '/') i--;
+             for (; i > 2; i++)
+               {
+                  if (p[i] != ' ')
                     {
-                       p += strlen(escapes[i].escape);
-                       *q = escapes[i].value;
-                       q++;
+                       esc = EINA_FALSE;
                        break;
                     }
                }
+             if (!esc)
+               {
+                  strncpy(q, p, x - p + 1);
+                  p = x + 1;
+                  break;
+               }
+             if (p[1] == 'b')
+               *q++ = '\n';
+             else
+               {
+                  strcpy(q, _PARAGRAPH_SEPARATOR);
+                  q += sizeof(_PARAGRAPH_SEPARATOR) - 1;
+               }
+             p = x + 1;
+             break;
+           case '&':
+             for (i = 3 ; i < N_ESCAPES ; i++)
+               {
+                  if (strncmp(p, escapes[i].escape, strlen(escapes[i].escape)))
+                    continue;
+                  p += strlen(escapes[i].escape);
+                  strcpy(q, escapes[i].value);
+                  q += strlen(escapes[i].value);
+                  break;
+               }
              if (i == N_ESCAPES) *q ++= '&';
+             break;
+           default:
+             *q++ = *p++;
           }
      }
    *q = 0;
@@ -2277,10 +1435,10 @@ mark_up(const char *start, int inlen, int *lenp)
      {
         for (i = 0 ; i < N_ESCAPES ; i ++)
           {
-             if (*p == escapes[i].value)
+             if (*p == escapes[i].value[0])
                {
-                  if (!iscntrl(escapes[i].value)) l++;
-                  l += strlen(escapes[i].escape);
+                  if (!strncmp(p, escapes[i].value, strlen(escapes[i].value)))
+                    l += strlen(escapes[i].escape);
                   break;
                }
           }
@@ -2294,12 +1452,14 @@ mark_up(const char *start, int inlen, int *lenp)
      {
         for (i = 0; i < N_ESCAPES; i++)
           {
-             if (*p == escapes[i].value)
+             if (*p == escapes[i].value[0])
                {
-                  if (!iscntrl(escapes[i].value)) *q++ = '&';
-                  strcpy(q, escapes[i].escape);
-                  q += strlen(escapes[i].escape);
-                  p ++;
+                  if (!strncmp(p, escapes[i].value, strlen(escapes[i].value)))
+                    {
+                       strcpy(q, escapes[i].escape);
+                       q += strlen(escapes[i].escape);
+                       p += strlen(escapes[i].value);
+                    }
                   break;
                }
           }
@@ -2544,8 +1704,11 @@ elm_drop_target_add(Evas_Object *obj, Elm_Sel_Type format, Elm_Drop_Cb dropcb, v
    Ecore_X_Window xwin;
    Eina_List *item;
    int first;
+   Evas_Object *top;
 
    if (!obj) return EINA_FALSE;
+   top = elm_widget_top_get(obj);
+   if (!top || !elm_win_xwindow_get(top)) return EINA_FALSE;
    if (!_elm_cnp_init_count) _elm_cnp_init();
 
    /* Is this the first? */

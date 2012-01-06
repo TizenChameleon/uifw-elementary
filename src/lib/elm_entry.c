@@ -2248,8 +2248,12 @@ _signal_entry_paste_request(void *data, Evas_Object *obj __UNUSED__, const char 
         if ((top) && (elm_win_xwindow_get(top)))
           {
              wd->selection_asked = EINA_TRUE;
-             elm_selection_get(ELM_SEL_CLIPBOARD, ELM_SEL_FORMAT_MARKUP, data,
-                               NULL, NULL);
+             Elm_Sel_Format formats = ELM_SEL_FORMAT_MARKUP;
+             if (wd->cnp_mode == ELM_CNP_MODE_PLAINTEXT)
+               formats = ELM_SEL_FORMAT_TEXT;
+             else if (wd->cnp_mode != ELM_CNP_MODE_NO_IMAGE)
+               formats |= ELM_SEL_FORMAT_IMAGE;
+             elm_selection_get(ELM_SEL_CLIPBOARD, formats ,data, NULL, NULL);
           }
 #endif
      }
