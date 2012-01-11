@@ -5288,6 +5288,29 @@ elm_genlist_item_mode_set(Elm_Genlist_Item *it,
 }
 
 EAPI const char *
+elm_genlist_mode_item_style_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->mode_item->itc->mode_item_style;
+}
+
+EAPI void
+elm_genlist_mode_item_style_set(Evas_Object *obj, const char *style)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if ((style == wd->mode_item->itc->mode_item_style) ||
+       (style && wd->mode_item->itc->mode_item_style &&
+       (!strcmp(style, wd->mode_item->itc->mode_item_style))))
+     return;
+   eina_stringshare_replace(&wd->mode_item->itc->mode_item_style, style);
+   elm_genlist_realized_items_update(obj);
+}
+
+EAPI const char *
 elm_genlist_mode_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
