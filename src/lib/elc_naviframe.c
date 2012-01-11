@@ -154,6 +154,9 @@ static Elm_Naviframe_Item * _item_new(Evas_Object *obj,
                                       Evas_Object *next_btn,
                                       Evas_Object *content,
                                       const char *item_style);
+static Eina_Bool _focus_next_hook(const Evas_Object *obj,
+                                  Elm_Focus_Direction dir,
+                                  Evas_Object **next);
 
 static void
 _del_hook(Evas_Object *obj)
@@ -987,6 +990,16 @@ _item_new(Evas_Object *obj,
    return it;
 }
 
+static Eina_Bool
+_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd || !wd->stack) return EINA_FALSE;
+   return elm_widget_focus_next_get(VIEW(elm_naviframe_top_item_get(obj)),
+                                    dir,
+                                    next);
+}
+
 EAPI Evas_Object *
 elm_naviframe_add(Evas_Object *parent)
 {
@@ -1003,6 +1016,8 @@ elm_naviframe_add(Evas_Object *parent)
    elm_widget_disable_hook_set(obj, _disable_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
    elm_widget_signal_emit_hook_set(obj, _emit_hook);
+   elm_widget_can_focus_set(obj, EINA_FALSE);
+   elm_widget_focus_next_hook_set(obj, _focus_next_hook);
 
    //base
    wd->base = elm_layout_add(parent);
