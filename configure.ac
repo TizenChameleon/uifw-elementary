@@ -707,8 +707,6 @@ src/modules/access_output/Makefile
 src/modules/test_entry/Makefile
 src/modules/test_map/Makefile
 src/modules/ctxpopup_copypasteUI/Makefile
-src/modules/ctxpopup_copypasteshareUI/Makefile
-src/modules/popup_copypasteUI/Makefile
 src/edje_externals/Makefile
 src/examples/Makefile
 data/Makefile
