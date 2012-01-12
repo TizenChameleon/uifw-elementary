@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.61256slp2+build114) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       change default theme to 'blue-hd'
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.61256slp2+build114
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Thu, 12 Jan 2012 16:17:39 +0900
+
 elementary (1.0.0+svn.61256slp2+build113) unstable; urgency=low
 
   * [Config] Remove code related with ATOM_E_SCALE property get.
