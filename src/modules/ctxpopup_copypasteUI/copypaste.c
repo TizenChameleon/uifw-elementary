@@ -1,6 +1,7 @@
 #include <Elementary.h>
 #include "elm_module_priv.h"
 #include "elm_priv.h"
+#include <appsvc/appsvc.h>
 
 Elm_Entry_Extension_data *ext_mod;
 static int _mod_hook_count = 0;
@@ -155,6 +156,31 @@ _cancel(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
+_search_menu(void *data, Evas_Object *obj, void *event_info)
+{
+   if(!ext_mod) return;
+
+   int ret;
+   bundle *b = bundle_create();
+   if (!b)
+     {
+        //printf("bundle_create() failed\n");
+        return;
+     }
+
+   appsvc_set_operation(b, APPSVC_OPERATION_SEARCH);
+   if (ext_mod->selmode)
+     {
+        char *selection = elm_entry_selection_get(ext_mod->caller);
+        if (selection)
+          appsvc_add_data(b, APPSVC_DATA_KEYWORD, selection);
+     }
+   appsvc_run_service(b, 0, NULL, NULL);
+   bundle_free(b);
+   _ctxpopup_hide(obj);
+}
+
+static void
 _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
 {
    if(!ext_mod) return;
@@ -299,13 +325,14 @@ obj_longpress(Evas_Object *obj)
              if ((!ext_mod->password) && (ext_mod->editable))
 #endif
                {
-                  icon = elm_icon_add(ext_mod->popup);
-                  snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
-                  elm_icon_file_set(icon, buf, NULL);
-                  added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
+                  added_item = elm_ctxpopup_item_append(ext_mod->popup, "Clipboard", NULL, _clipboard_menu, obj);  // Clipboard
                   //elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
                }
              // end for cbhm
+             icon = elm_icon_add(ext_mod->popup);
+             snprintf(buf, sizeof(buf), "%s/images/copy&paste_icon_search.png", PACKAGE_DATA_DIR);
+             elm_icon_file_set(icon, buf, NULL);
+             added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _search_menu, obj);  // Search
           }
         else
           {
@@ -348,13 +375,14 @@ obj_longpress(Evas_Object *obj)
                   if (ext_mod->editable)
 #endif
                     {
-                       icon = elm_icon_add(ext_mod->popup);
-                       snprintf(buf, sizeof(buf), "%s/images/copypaste_icon_clipboard.png", PACKAGE_DATA_DIR);
-                       elm_icon_file_set(icon, buf, NULL);
-                       added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _clipboard_menu, obj);
+                       added_item = elm_ctxpopup_item_append(ext_mod->popup, "Clipboard", NULL, _clipboard_menu, obj);  // Clipboard
                        //elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
                     }
                   // end for cbhm
+                  icon = elm_icon_add(ext_mod->popup);
+                  snprintf(buf, sizeof(buf), "%s/images/copy&paste_icon_search.png", PACKAGE_DATA_DIR);
+                  elm_icon_file_set(icon, buf, NULL);
+                  added_item = elm_ctxpopup_item_append(ext_mod->popup, NULL, icon, _search_menu, obj);  // Search
                }
           }
         EINA_LIST_FOREACH(ext_mod->items, l, it)
