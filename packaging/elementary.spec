@@ -24,6 +24,7 @@ BuildRequires:  pkgconfig(evas)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(icu-i18n)
+BuildRequires:  pkgconfig(appsvc)
 BuildRequires:  edje-tools
 BuildRequires:  embryo
 BuildRequires:  eet-tools
