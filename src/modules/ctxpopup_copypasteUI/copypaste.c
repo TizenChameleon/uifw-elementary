@@ -3,6 +3,15 @@
 #include "elm_priv.h"
 #include <appsvc/appsvc.h>
 
+#define MULTI_(id) dgettext("sys_string", #id)
+#define S_SELECT MULTI_(IDS_COM_SK_SELECT)
+#define S_SELECT_ALL MULTI_(IDS_COM_BODY_SELECT_ALL)
+#define S_COPY MULTI_(IDS_COM_BODY_COPY)
+#define S_CUT MULTI_(IDS_COM_BODY_CUT)
+#define S_PASTE MULTI_(IDS_COM_BODY_PASTE)
+#define S_CLIPBOARD MULTI_(IDS_COM_BODY_CLIPBOARD)
+
+
 Elm_Entry_Extension_data *ext_mod;
 static int _mod_hook_count = 0;
 
@@ -303,8 +312,8 @@ obj_longpress(Evas_Object *obj)
                {
                   if (!elm_entry_is_empty(obj))
                     {
-                       added_item = elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
-                       added_item = elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
+                       added_item = elm_ctxpopup_item_append(ext_mod->popup, S_SELECT, NULL, _select, obj );
+                       added_item = elm_ctxpopup_item_append(ext_mod->popup, S_SELECT_ALL, NULL, _select_all, obj );
                     }
                }
 
@@ -315,7 +324,7 @@ obj_longpress(Evas_Object *obj)
 #endif
                {
                   if (ext_mod->editable)
-                    added_item = elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+                    added_item = elm_ctxpopup_item_append(ext_mod->popup, S_PASTE, NULL, _paste, obj );
                }
              //elm_ctxpopup_item_append(wd->ctxpopup, NULL, "Selectall",_select_all, obj );
              // start for cbhm
@@ -325,7 +334,7 @@ obj_longpress(Evas_Object *obj)
              if ((!ext_mod->password) && (ext_mod->editable))
 #endif
                {
-                  added_item = elm_ctxpopup_item_append(ext_mod->popup, "Clipboard", NULL, _clipboard_menu, obj);  // Clipboard
+                  added_item = elm_ctxpopup_item_append(ext_mod->popup, S_CLIPBOARD, NULL, _clipboard_menu, obj);  // Clipboard
                   //elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
                }
              // end for cbhm
@@ -340,23 +349,23 @@ obj_longpress(Evas_Object *obj)
                {
                   if (ext_mod->have_selection)
                     {
-                       added_item = elm_ctxpopup_item_append(ext_mod->popup, "Copy", NULL, _copy, obj );
+                       added_item = elm_ctxpopup_item_append(ext_mod->popup, S_COPY, NULL, _copy, obj );
                        if (ext_mod->editable)
-                         added_item = elm_ctxpopup_item_append(ext_mod->popup, "Cut", NULL, _cut, obj );
+                         added_item = elm_ctxpopup_item_append(ext_mod->popup, S_CUT, NULL, _cut, obj );
 #ifdef HAVE_ELEMENTARY_X
                        if (ext_mod->editable && cbhm_count)
 #else
                        if (ext_mod->editable)
 #endif
-                         added_item = elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+                         added_item = elm_ctxpopup_item_append(ext_mod->popup, S_PASTE, NULL, _paste, obj );
                     }
                   else
                     {
                        _cancel(obj,ext_mod->popup,NULL);
                        if (!elm_entry_is_empty(obj))
                          {
-                            added_item = elm_ctxpopup_item_append(ext_mod->popup, "Select", NULL, _select, obj );
-                            added_item = elm_ctxpopup_item_append(ext_mod->popup, "Select All", NULL, _select_all, obj );
+                            added_item = elm_ctxpopup_item_append(ext_mod->popup, S_SELECT, NULL, _select, obj );
+                            added_item = elm_ctxpopup_item_append(ext_mod->popup, S_SELECT_ALL, NULL, _select_all, obj );
                          }
 #ifdef HAVE_ELEMENTARY_X
                        if (cbhm_count)
@@ -365,7 +374,7 @@ obj_longpress(Evas_Object *obj)
 #endif
                          {
                             if (ext_mod->editable)
-                              added_item = elm_ctxpopup_item_append(ext_mod->popup, "Paste", NULL, _paste, obj );
+                              added_item = elm_ctxpopup_item_append(ext_mod->popup, S_PASTE, NULL, _paste, obj );
                          }
                     }
                   // start for cbhm
@@ -375,7 +384,7 @@ obj_longpress(Evas_Object *obj)
                   if (ext_mod->editable)
 #endif
                     {
-                       added_item = elm_ctxpopup_item_append(ext_mod->popup, "Clipboard", NULL, _clipboard_menu, obj);  // Clipboard
+                       added_item = elm_ctxpopup_item_append(ext_mod->popup, S_CLIPBOARD, NULL, _clipboard_menu, obj);  // Clipboard
                        //elm_ctxpopup_item_append(ext_mod->popup, "More", NULL, _clipboard_menu, obj );
                     }
                   // end for cbhm
