@@ -2044,11 +2044,10 @@ _item_realize(Elm_Genlist_Item *it,
               int               in,
               Eina_Bool         calc)
 {
-   Elm_Genlist_Item *it2;
    const char *stacking;
    const char *treesize;
    char buf[1024];
-   int depth, tsize = 20;
+   int tsize = 20;
    Item_Cache *itc = NULL;
 
    if ((it->realized) || (it->delete_me)) return;
@@ -2094,15 +2093,11 @@ _item_realize(Elm_Genlist_Item *it,
         evas_object_color_set(it->spacer, 0, 0, 0, 0);
         elm_widget_sub_object_add(WIDGET(it), it->spacer);
      }
-   for (it2 = it, depth = 0; it2->parent; it2 = it2->parent)
-     {
-        if (it2->parent->flags != ELM_GENLIST_ITEM_GROUP) depth += 1;
-     }
-   it->expanded_depth = depth;
+
    treesize = edje_object_data_get(VIEW(it), "treesize");
    if (treesize) tsize = atoi(treesize);
    evas_object_size_hint_min_set(it->spacer,
-                                 (depth * tsize) * _elm_config->scale, 1);
+                                 (it->expanded_depth * tsize) * _elm_config->scale, 1);
    edje_object_part_swallow(VIEW(it), "elm.swallow.pad", it->spacer);
    if (!calc)
      {
@@ -3591,7 +3586,8 @@ _item_new(Widget_Data                  *wd,
           Evas_Smart_Cb                 func,
           const void                   *func_data)
 {
-   Elm_Genlist_Item *it;
+   Elm_Genlist_Item *it, *it2;
+   int depth = 0;
 
    it = elm_widget_item_new(wd->obj, Elm_Genlist_Item);
    if (!it) return NULL;
@@ -3615,6 +3611,11 @@ _item_new(Widget_Data                  *wd,
         else if (it->parent->group_item)
           it->group_item = it->parent->group_item;
      }
+   for (it2 = it, depth = 0; it2->parent; it2 = it2->parent)
+     {
+        if (it2->parent->flags != ELM_GENLIST_ITEM_GROUP) depth += 1;
+     }
+   it->expanded_depth = depth;
    return it;
 }
 
