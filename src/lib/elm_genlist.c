@@ -2903,6 +2903,10 @@ _changed_job(void *data)
                   edje_object_size_min_restricted_calc(VIEW(it), &mw, &mh, mw, mh);
                   if (!it->display_only)
                     elm_coords_finger_size_adjust(1, &mw, 1, &mh);
+                  if (mw > itb->w)
+                    width_changed = EINA_TRUE;
+                  else
+                    mw = itb->w;
                   it->w = it->minw = mw;
                   it->h = it->minh = mh;
                   it->mincalcd = EINA_TRUE;
