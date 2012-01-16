@@ -32,7 +32,7 @@ struct _Widget_Data
    Ecore_Idle_Enterer *queue_idle_enterer;
    Ecore_Idler        *must_recalc_idler;
    Eina_List        *queue, *selected;
-   Elm_Genlist_Item *show_item, *last_selected_item, *anchor_item, *mode_item, *reorder_it, *reorder_rel, *expand_item;
+   Elm_Genlist_Item *show_item, *last_selected_item, *anchor_item, *mode_item, *reorder_it, *reorder_rel, *expanded_item;
    Eina_Inlist      *item_cache;
    Evas_Coord        anchor_y, reorder_start_y;
    Elm_List_Mode     mode;
@@ -2594,7 +2594,7 @@ _item_block_position(Item_Block *itb,
                          }
                     }
                   if (!it->move_effect_enabled)
-                    if (!it->wd->effect_mode || it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE || ((it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) && it->parent == it->wd->expand_item))
+                    if (!it->wd->effect_mode || it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE || ((it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) && it->parent == it->wd->expanded_item))
                       {
                          if (it->wd->edit_mode && it->itc->edit_item_style)
                            {
@@ -2626,7 +2626,7 @@ _item_block_position(Item_Block *itb,
                }
           }
         in++;
-        if (!it->wd->effect_mode || it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE || ((it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) && it->parent == it->wd->expand_item))
+        if (!it->wd->effect_mode || it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE || ((it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) && it->parent == it->wd->expanded_item))
           {
              it->old_scrl_y = it->scrl_y;
           }
@@ -3168,7 +3168,7 @@ _pan_calculate(Evas_Object *obj)
            if (!sd->wd->item_moving_effect_timer)
              {
                 if (sd->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE)
-                   _item_flip_effect_show(sd->wd->expand_item);
+                   _item_flip_effect_show(sd->wd->expanded_item);
 
                 evas_object_raise(sd->wd->alpha_bg);
                 evas_object_show(sd->wd->alpha_bg);
@@ -4380,7 +4380,7 @@ elm_genlist_item_subitems_clear(Elm_Genlist_Item *it)
         if ((!wd->item_moving_effect_timer) && (it->flags != ELM_GENLIST_ITEM_GROUP) &&
              wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE)
           {
-             wd->expand_item = it;
+             wd->expanded_item = it;
              _item_flip_effect_show(it);
              evas_object_geometry_get(VIEW(it), NULL, &y, NULL, &h);
              wd->expand_item_end = y + h;
@@ -4462,7 +4462,7 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
    if (it->flags != ELM_GENLIST_ITEM_SUBITEMS) return;
    if (it->expanded == expanded) return;
    it->expanded = expanded;
-   it->wd->expand_item = it;
+   it->wd->expanded_item = it;
 
    if (it->wd->effect_mode && !it->wd->alpha_bg)
       it->wd->alpha_bg = _create_tray_alpha_bg(WIDGET(it));
@@ -4473,14 +4473,14 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
         it->wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND;
         if (it->realized)
           edje_object_signal_emit(VIEW(it), "elm,state,expanded", "elm");
-        evas_object_smart_callback_call(WIDGET(it), "expanded", it);
+        evas_object_smart_callback_call(WIDGET(it), SIG_EXPANDED, it);
      }
    else
      {
         it->wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT;
         if (it->realized)
           edje_object_signal_emit(VIEW(it), "elm,state,contracted", "elm");
-        evas_object_smart_callback_call(WIDGET(it), "contracted", it);
+        evas_object_smart_callback_call(WIDGET(it), SIG_CONTRACTED, it);
      }
 }
 
@@ -5429,7 +5429,7 @@ _item_moving_effect_timer_cb(void *data)
    if (t > time) end = EINA_TRUE;
 
    // Below while statement is needed, when the genlist is resized.
-   it2 = wd->expand_item;
+   it2 = wd->expanded_item;
    while (it2 && vis)
      {
         evas_object_move(VIEW(it2), it2->scrl_x, it2->scrl_y);
@@ -5437,10 +5437,10 @@ _item_moving_effect_timer_cb(void *data)
                                    cvx, cvy, cvw, cvh));
         it2 = elm_genlist_item_prev_get(it2);
      }
-   it2 = elm_genlist_item_next_get(wd->expand_item);
+   it2 = elm_genlist_item_next_get(wd->expanded_item);
    while (it2)
      {
-        if (wd->expand_item->expanded_depth >= it2->expanded_depth) break;
+        if (wd->expanded_item->expanded_depth >= it2->expanded_depth) break;
         it2 = elm_genlist_item_next_get(it2);
      }
    dy = 0;
@@ -5544,17 +5544,17 @@ _item_moving_effect_timer_cb(void *data)
      {
         int expand_num = 0;
         int expand_order = 0;
-        if (wd->expand_item) it = elm_genlist_item_next_get(wd->expand_item);
+        if (wd->expanded_item) it = elm_genlist_item_next_get(wd->expanded_item);
         while (it)
           {
              expand_num++;
              it = elm_genlist_item_next_get(it);
           }
-        if (wd->expand_item) it = elm_genlist_item_next_get(wd->expand_item);
+        if (wd->expanded_item) it = elm_genlist_item_next_get(wd->expanded_item);
         while (it)
           {
              expand_order++;
-             if (wd->expand_item->expanded_depth >= it->expanded_depth) break;
+             if (wd->expanded_item->expanded_depth >= it->expanded_depth) break;
              if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND)
                {
                   if (!it->effect_done)
@@ -5576,7 +5576,7 @@ _item_moving_effect_timer_cb(void *data)
         if (wd->item_moving_effect_timer)
           {
              if (wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT)
-                _item_subitems_clear(wd->expand_item);
+                _item_subitems_clear(wd->expanded_item);
              EINA_INLIST_FOREACH(wd->blocks, itb)
                {
                   EINA_LIST_FOREACH(itb->items, l, it)
