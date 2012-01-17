@@ -3464,7 +3464,7 @@ _item_auto_scroll(void *data)
    Widget_Data *wd = data;
    if (!wd) return;
 
-   if ((wd->expand_item) && (!wd->auto_scrolled))
+   if ((wd->expanded_item) && (!wd->auto_scrolled))
      {
         Elm_Genlist_Item  *it;
         Eina_List *l;
@@ -3472,9 +3472,9 @@ _item_auto_scroll(void *data)
         evas_object_geometry_get(wd->obj, &ox, &oy, &ow, &oh);
 
         wd->auto_scrolled = EINA_TRUE;
-        if (wd->expand_item->scrl_y > (oh + oy) / 2)
+        if (wd->expanded_item->scrl_y > (oh + oy) / 2)
           {
-            EINA_LIST_FOREACH(wd->expand_item->items, l, it)
+            EINA_LIST_FOREACH(wd->expanded_item->items, l, it)
               {
                  elm_genlist_item_bring_in(it);
               }
