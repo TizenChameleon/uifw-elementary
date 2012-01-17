@@ -170,6 +170,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
           }
         else if ((imf_context) && ((!wd->current) || (!eina_list_count(wd->items))))
           {
+             if (wd->entry) elm_entry_cursor_end_set(wd->entry);
              _view_update(obj);
              ecore_imf_context_input_panel_show(imf_context);
           }
@@ -1050,15 +1051,14 @@ static void
 _entry_resized_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Coord en_x, en_y, en_w, en_h;
-   Evas_Coord bx_x, bx_y;
 
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
 
    evas_object_geometry_get(wd->entry, &en_x, &en_y, &en_w, &en_h);
-   evas_object_geometry_get(wd->box, &bx_x, &bx_y, NULL, NULL);
 
-   elm_widget_show_region_set(wd->box, en_x - bx_x, en_y - bx_y, en_w, en_h, EINA_TRUE);
+   if (wd->focused)
+     elm_widget_show_region_set(wd->entry, en_x, en_y, en_w, en_h, EINA_TRUE);
 }
 
 static void
@@ -1092,7 +1092,6 @@ _view_init(Evas_Object *obj)
         elm_entry_scrollable_set(wd->entry, EINA_TRUE);
         elm_entry_single_line_set(wd->entry, EINA_TRUE);
         elm_entry_entry_set(wd->entry, "");
-        elm_entry_cursor_end_set(wd->entry);
         elm_entry_input_panel_enabled_set(wd->entry, EINA_FALSE);
         evas_object_size_hint_min_set(wd->entry, MIN_W_ENTRY, 0);
         evas_object_size_hint_weight_set(wd->entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
