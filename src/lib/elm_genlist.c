@@ -21,6 +21,14 @@ typedef enum _Elm_Genlist_Item_Move_effect_Mode
    ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE       = (1 << 2),
 } Elm_Genlist_Item_Move_effect_Mode;
 
+typedef enum _Elm_Genlist_Item_Scrollto_Type
+{
+   ELM_GENLIST_ITEM_SCROLLTO_NONE = 0, /**< no scrollto */
+   ELM_GENLIST_ITEM_SCROLLTO_IN = (1 << 0), /**< show, bring in */
+   ELM_GENLIST_ITEM_SCROLLTO_TOP = (1 << 1), /**< top show, top bring in */
+   ELM_GENLIST_ITEM_SCROLLTO_MIDDLE = (1 << 2) /**< middle show, middle bring in */
+} Elm_Genlist_Item_Scrollto_Type;
+
 struct _Widget_Data
 {
    Evas_Object      *obj, *scr, *pan_smart;
@@ -52,7 +60,7 @@ struct _Widget_Data
    Eina_Bool         longpressed : 1;
    Eina_Bool         wasselected : 1;
    Eina_Bool         no_select : 1;
-   Eina_Bool         bring_in : 1;
+   Eina_Bool         bring_in : 1; /* a flag to describe the scroll animation. (show, bring in) */
    Eina_Bool         compress : 1;
    Eina_Bool         height_for_width : 1;
    Eina_Bool         pan_resize : 1;
@@ -80,10 +88,12 @@ struct _Widget_Data
    // TODO : refactoring
    Eina_Bool         reorder_deleted : 1;
    Eina_Bool         effect_mode : 1;
-   Eina_Bool         auto_scrolled : 1;
+   Eina_Bool         auto_scroll_enabled : 1;
    Eina_Bool         pan_changed : 1;
    Eina_Bool         drag_started : 1;
+   Eina_Bool         check_scroll : 1; /* this flag means genlist is supposed to be scrolled. if this flag is set to EINA_TRUE, genlist checks whether it's ok to scroll genlist now or not. */
    int               edit_mode;
+   Elm_Genlist_Item_Scrollto_Type scrollto_type; /* a scrollto type which remembers where to scroll ex) in, top, middle */
    Ecore_Animator   *item_moving_effect_timer;
    Evas_Object      *alpha_bg;
    Evas_Coord        expand_item_end;
@@ -273,7 +283,10 @@ static int _item_flip_effect_show(Elm_Genlist_Item *it);
 static void _effect_item_controls(Elm_Genlist_Item *it, int itx, int ity);
 static void _effect_item_realize(Elm_Genlist_Item *it, Eina_Bool effect_on);
 static void _effect_item_unrealize(Elm_Genlist_Item *it);
-static void _item_auto_scroll(void *data);
+static void      _item_auto_scroll(Widget_Data *wd);
+static void      _pan_child_size_get(Evas_Object *obj,
+                                     Evas_Coord  *w,
+                                     Evas_Coord  *h);
 
 static Evas_Smart_Class _pan_sc = EVAS_SMART_CLASS_INIT_VERSION;
 
@@ -2660,11 +2673,59 @@ _must_recalc_idler(void *data)
 }
 
 static void
+_scroll_item(Widget_Data *wd)
+{
+   Elm_Genlist_Item *it = NULL;
+   Evas_Coord ow, oh, dx = 0, dy = 0, dw = 0, dh = 0;
+
+   evas_object_geometry_get(wd->pan_smart, NULL, NULL, &ow, &oh);
+   it = wd->show_item;
+   dx = it->x + it->block->x;
+   dy = it->y + it->block->y;
+   dw = it->block->w;
+   dh = oh;
+   switch (wd->scrollto_type)
+     {
+      case ELM_GENLIST_ITEM_SCROLLTO_TOP:
+         break;
+      case ELM_GENLIST_ITEM_SCROLLTO_MIDDLE:
+         dy += (it->h / 2 - oh / 2);
+         break;
+      case ELM_GENLIST_ITEM_SCROLLTO_IN:
+      default:
+         if ((wd->expanded_item) &&
+             ((wd->show_item->y + wd->show_item->block->y + wd->show_item->h)
+              - (wd->expanded_item->y + wd->expanded_item->block->y) > oh))
+           {
+              it = wd->expanded_item;
+              dx = it->x + it->block->x;
+              dy = it->y + it->block->y;
+              dw = it->block->w;
+           }
+         else
+           {
+              dh = it->h;
+           }
+         break;
+     }
+   if (wd->bring_in)
+     elm_smart_scroller_region_bring_in(wd->scr, dx, dy, dw, dh);
+   else
+     elm_smart_scroller_child_region_show(wd->scr, dx, dy, dw, dh);
+
+   it->showme = EINA_FALSE;
+   wd->show_item = NULL;
+   wd->auto_scroll_enabled = EINA_FALSE;
+   wd->check_scroll = EINA_FALSE;
+}
+
+static void
 _calc_job(void *data)
 {
    Widget_Data *wd = data;
    Item_Block *itb, *chb = NULL;
-   Evas_Coord minw = -1, minh = 0, y = 0, ow;
+   Evas_Coord minw = -1, minh = 0, y = 0, ow, dy = 0;
+   Evas_Coord pan_w = 0, pan_h = 0;
    int in = 0;
    double t0, t;
    Eina_Bool minw_change = EINA_FALSE;
@@ -2718,26 +2779,7 @@ _calc_job(void *data)
         y += itb->h;
         in += itb->count;
         if ((showme) && (wd->show_item) && (!wd->show_item->queued))
-          {
-             wd->show_item->showme = EINA_FALSE;
-             if (wd->bring_in)
-               elm_smart_scroller_region_bring_in(wd->scr,
-                                                  wd->show_item->x +
-                                                  wd->show_item->block->x,
-                                                  wd->show_item->y +
-                                                  wd->show_item->block->y,
-                                                  wd->show_item->block->w,
-                                                  wd->show_item->h);
-             else
-               elm_smart_scroller_child_region_show(wd->scr,
-                                                    wd->show_item->x +
-                                                    wd->show_item->block->x,
-                                                    wd->show_item->y +
-                                                    wd->show_item->block->y,
-                                                    wd->show_item->block->w,
-                                                    wd->show_item->h);
-             wd->show_item = NULL;
-          }
+          wd->check_scroll = EINA_TRUE;
      }
    if (minw_change)
      {
@@ -2764,7 +2806,7 @@ _calc_job(void *data)
            evas_object_smart_callback_call(wd->pan_smart, "changed", NULL);
         _sizing_eval(wd->obj);
 #ifdef ANCHOR_ITEM
-        if ((wd->anchor_item) && (wd->anchor_item->block) && (!wd->auto_scrolled))
+        if ((wd->anchor_item) && (wd->anchor_item->block) && (wd->auto_scroll_enabled))
           {
              Elm_Genlist_Item *it;
              Evas_Coord it_y;
@@ -2783,6 +2825,30 @@ _calc_job(void *data)
      {
         if (!wd->must_recalc_idler)
           wd->must_recalc_idler = ecore_idler_add(_must_recalc_idler, wd);
+     }
+   if (wd->check_scroll)
+     {
+        _pan_child_size_get(wd->pan_smart, &pan_w, &pan_h);
+        if (EINA_INLIST_GET(wd->show_item) == wd->items->last)
+          wd->scrollto_type = ELM_GENLIST_ITEM_SCROLLTO_IN;
+       switch (wd->scrollto_type)
+          {
+           case ELM_GENLIST_ITEM_SCROLLTO_TOP:
+              dy = wd->h;
+              break;
+           case ELM_GENLIST_ITEM_SCROLLTO_MIDDLE:
+              dy = wd->h / 2;
+              break;
+           case ELM_GENLIST_ITEM_SCROLLTO_IN:
+           default:
+              dy = 0;
+              break;
+          }
+        if ((pan_w > (wd->show_item->x + wd->show_item->block->x)) &&
+            (pan_h > (wd->show_item->y + wd->show_item->block->y + dy)))
+          {
+             _scroll_item(wd);
+          }
      }
    wd->calc_job = NULL;
    evas_object_smart_changed(wd->pan_smart);
@@ -3457,30 +3523,29 @@ _item_mode_unset(Widget_Data *wd)
    wd->mode_item = NULL;
 }
 
-
 static void
-_item_auto_scroll(void *data)
+_item_auto_scroll(Widget_Data *wd)
 {
-   Widget_Data *wd = data;
    if (!wd) return;
+   Elm_Genlist_Item  *tmp_item = NULL;
 
-   if ((wd->expanded_item) && (!wd->auto_scrolled))
+   if ((wd->expanded_item) && (wd->auto_scroll_enabled))
      {
-        Elm_Genlist_Item  *it;
-        Eina_List *l;
-        Evas_Coord ox, oy, ow, oh;
-        evas_object_geometry_get(wd->obj, &ox, &oy, &ow, &oh);
-
-        wd->auto_scrolled = EINA_TRUE;
-        if (wd->expanded_item->scrl_y > (oh + oy) / 2)
+        tmp_item = eina_list_data_get(eina_list_last(wd->expanded_item->items));
+        if (!tmp_item) return;
+        wd->show_item = tmp_item;
+        wd->bring_in = EINA_TRUE;
+        wd->scrollto_type = ELM_GENLIST_ITEM_SCROLLTO_IN;
+        if ((wd->show_item->queued) || (!wd->show_item->mincalcd))
           {
-            EINA_LIST_FOREACH(wd->expanded_item->items, l, it)
-              {
-                 elm_genlist_item_bring_in(it);
-              }
+             wd->show_item->showme = EINA_TRUE;
+             wd->auto_scroll_enabled = EINA_FALSE;
           }
+        else
+          _scroll_item(wd);
      }
 }
+
 EAPI Evas_Object *
 elm_genlist_add(Evas_Object *parent)
 {
@@ -4469,11 +4534,11 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
 
    if (it->expanded)
      {
-        it->wd->auto_scrolled = EINA_FALSE;
         it->wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND;
         if (it->realized)
           edje_object_signal_emit(VIEW(it), "elm,state,expanded", "elm");
         evas_object_smart_callback_call(WIDGET(it), SIG_EXPANDED, it);
+        it->wd->auto_scroll_enabled = EINA_TRUE;
      }
    else
      {
@@ -4481,6 +4546,7 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
         if (it->realized)
           edje_object_signal_emit(VIEW(it), "elm,state,contracted", "elm");
         evas_object_smart_callback_call(WIDGET(it), SIG_CONTRACTED, it);
+        it->wd->auto_scroll_enabled = EINA_FALSE;
      }
 }
 
@@ -4568,7 +4634,8 @@ elm_genlist_item_show(Elm_Genlist_Item *it)
    if ((it->queued) || (!it->mincalcd))
      {
         it->wd->show_item = it;
-        it->wd->bring_in = EINA_TRUE;
+        it->wd->bring_in = EINA_FALSE;
+        it->wd->scrollto_type = ELM_GENLIST_ITEM_SCROLLTO_IN;
         it->showme = EINA_TRUE;
         return;
      }
@@ -4592,6 +4659,7 @@ elm_genlist_item_bring_in(Elm_Genlist_Item *it)
      {
         it->wd->show_item = it;
         it->wd->bring_in = EINA_TRUE;
+        it->wd->scrollto_type = ELM_GENLIST_ITEM_SCROLLTO_IN;
         it->showme = EINA_TRUE;
         return;
      }
@@ -4611,12 +4679,24 @@ elm_genlist_item_top_show(Elm_Genlist_Item *it)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    Evas_Coord ow, oh;
+   Evas_Coord pan_w = 0, pan_h = 0;
+   Eina_Bool pan_size_ready = EINA_FALSE;
 
    if (it->delete_me) return;
-   if ((it->queued) || (!it->mincalcd))
+   evas_object_geometry_get(it->wd->pan_smart, NULL, NULL, &ow, &oh);
+   if (it->block)
+     {
+        _pan_child_size_get(it->wd->pan_smart, &pan_w, &pan_h);
+        if ((pan_w > (it->x + it->block->x)) && (pan_h > (it->y + it->block->y + oh)))
+          {
+             pan_size_ready = EINA_TRUE;
+          }
+     }
+   if ((it->queued) || (!it->mincalcd) || (!pan_size_ready))
      {
         it->wd->show_item = it;
-        it->wd->bring_in = EINA_TRUE;
+        it->wd->bring_in = EINA_FALSE;
+        it->wd->scrollto_type = ELM_GENLIST_ITEM_SCROLLTO_TOP;
         it->showme = EINA_TRUE;
         return;
      }
@@ -4625,7 +4705,6 @@ elm_genlist_item_top_show(Elm_Genlist_Item *it)
         it->wd->show_item->showme = EINA_FALSE;
         it->wd->show_item = NULL;
      }
-   evas_object_geometry_get(it->wd->pan_smart, NULL, NULL, &ow, &oh);
    elm_smart_scroller_child_region_show(it->wd->scr,
                                         it->x + it->block->x,
                                         it->y + it->block->y,
@@ -4637,12 +4716,24 @@ elm_genlist_item_top_bring_in(Elm_Genlist_Item *it)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    Evas_Coord ow, oh;
+   Evas_Coord pan_w = 0, pan_h = 0;
+   Eina_Bool pan_size_ready = EINA_FALSE;
 
    if (it->delete_me) return;
-   if ((it->queued) || (!it->mincalcd))
+   evas_object_geometry_get(it->wd->pan_smart, NULL, NULL, &ow, &oh);
+   if (it->block)
+     {
+        _pan_child_size_get(it->wd->pan_smart, &pan_w, &pan_h);
+        if ((pan_w > (it->x + it->block->x)) && (pan_h > (it->y + it->block->y + oh)))
+          {
+             pan_size_ready = EINA_TRUE;
+          }
+     }
+   if ((it->queued) || (!it->mincalcd) || (!pan_size_ready))
      {
         it->wd->show_item = it;
         it->wd->bring_in = EINA_TRUE;
+        it->wd->scrollto_type = ELM_GENLIST_ITEM_SCROLLTO_TOP;
         it->showme = EINA_TRUE;
         return;
      }
@@ -4651,7 +4742,6 @@ elm_genlist_item_top_bring_in(Elm_Genlist_Item *it)
         it->wd->show_item->showme = EINA_FALSE;
         it->wd->show_item = NULL;
      }
-   evas_object_geometry_get(it->wd->pan_smart, NULL, NULL, &ow, &oh);
    elm_smart_scroller_region_bring_in(it->wd->scr,
                                       it->x + it->block->x,
                                       it->y + it->block->y,
@@ -4663,12 +4753,24 @@ elm_genlist_item_middle_show(Elm_Genlist_Item *it)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    Evas_Coord ow, oh;
+   Evas_Coord pan_w = 0, pan_h = 0;
+   Eina_Bool pan_size_ready = EINA_FALSE;
 
    if (it->delete_me) return;
-   if ((it->queued) || (!it->mincalcd))
+   evas_object_geometry_get(it->wd->pan_smart, NULL, NULL, &ow, &oh);
+   if (it->block)
+     {
+        _pan_child_size_get(it->wd->pan_smart, &pan_w, &pan_h);
+        if ((pan_w > (it->x + it->block->x)) && (pan_h > (it->y + it->block->y + oh / 2)))
+          {
+             pan_size_ready = EINA_TRUE;
+          }
+     }
+   if ((it->queued) || (!it->mincalcd) || (!pan_size_ready))
      {
         it->wd->show_item = it;
-        it->wd->bring_in = EINA_TRUE;
+        it->wd->bring_in = EINA_FALSE;
+        it->wd->scrollto_type = ELM_GENLIST_ITEM_SCROLLTO_MIDDLE;
         it->showme = EINA_TRUE;
         return;
      }
@@ -4677,7 +4779,6 @@ elm_genlist_item_middle_show(Elm_Genlist_Item *it)
         it->wd->show_item->showme = EINA_FALSE;
         it->wd->show_item = NULL;
      }
-   evas_object_geometry_get(it->wd->pan_smart, NULL, NULL, &ow, &oh);
    elm_smart_scroller_child_region_show(it->wd->scr,
                                         it->x + it->block->x,
                                         it->y + it->block->y - oh / 2 +
@@ -4689,12 +4790,24 @@ elm_genlist_item_middle_bring_in(Elm_Genlist_Item *it)
 {
    ELM_WIDGET_ITEM_WIDTYPE_CHECK_OR_RETURN(it);
    Evas_Coord ow, oh;
+   Evas_Coord pan_w = 0, pan_h = 0;
+   Eina_Bool pan_size_ready = EINA_FALSE;
 
    if (it->delete_me) return;
-   if ((it->queued) || (!it->mincalcd))
+   evas_object_geometry_get(it->wd->pan_smart, NULL, NULL, &ow, &oh);
+   if (it->block)
+     {
+        _pan_child_size_get(it->wd->pan_smart, &pan_w, &pan_h);
+        if ((pan_w > (it->x + it->block->x)) && (pan_h > (it->y + it->block->y + oh / 2)))
+          {
+             pan_size_ready = EINA_TRUE;
+          }
+     }
+   if ((it->queued) || (!it->mincalcd) || (!pan_size_ready))
      {
         it->wd->show_item = it;
         it->wd->bring_in = EINA_TRUE;
+        it->wd->scrollto_type = ELM_GENLIST_ITEM_SCROLLTO_MIDDLE;
         it->showme = EINA_TRUE;
         return;
      }
@@ -4703,7 +4816,6 @@ elm_genlist_item_middle_bring_in(Elm_Genlist_Item *it)
         it->wd->show_item->showme = EINA_FALSE;
         it->wd->show_item = NULL;
      }
-   evas_object_geometry_get(it->wd->pan_smart, NULL, NULL, &ow, &oh);
    elm_smart_scroller_region_bring_in(it->wd->scr,
                                       it->x + it->block->x,
                                       it->y + it->block->y - oh / 2 + it->h / 2,
