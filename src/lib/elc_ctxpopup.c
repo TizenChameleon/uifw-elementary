@@ -1,6 +1,5 @@
 #include <Elementary.h>
 #include "elm_priv.h"
-#include "els_scroller.h"
 
 #undef Elm_Ctxpopup_Item
 
@@ -152,7 +151,7 @@ _freeze_on(void *data __UNUSED__, Evas_Object *obj,
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if ((!wd) || (!wd->scr)) return;
-   elm_smart_scroller_freeze_set(wd->scr, EINA_TRUE);
+   elm_object_scroll_freeze_push(wd->scr);
 }
 
 static void
@@ -162,7 +161,7 @@ _freeze_off(void *data __UNUSED__, Evas_Object *obj,
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if ((!wd) || (!wd->scr)) return;
-   elm_smart_scroller_freeze_set(wd->scr, EINA_FALSE);
+   elm_object_scroll_freeze_pop(wd->scr);
 }
 
 static void
