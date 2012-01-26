@@ -6,10 +6,6 @@ TARGETS = utc_UIFW_elm_editfield_add_func \
   	  utc_UIFW_elm_editfield_guide_text_set_func\
   	  utc_UIFW_elm_editfield_guide_text_get_func\
   	  utc_UIFW_elm_editfield_entry_get_func\
-  	  utc_UIFW_elm_editfield_right_icon_set_func\
-  	  utc_UIFW_elm_editfield_right_icon_get_func\
-  	  utc_UIFW_elm_editfield_left_icon_set_func\
-  	  utc_UIFW_elm_editfield_left_icon_get_func\
   	  utc_UIFW_elm_editfield_entry_single_line_set_func\
   	  utc_UIFW_elm_editfield_entry_single_line_get_func\
   	  utc_UIFW_elm_editfield_entry_eraser_set_func\
