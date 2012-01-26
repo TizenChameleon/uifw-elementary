@@ -1447,7 +1447,8 @@ _elm_smart_scroller_wanted_region_set(Evas_Object *obj)
 
    if (sd->down.now || sd->down.momentum_animator ||
        sd->down.bounce_x_animator || sd->down.bounce_y_animator ||
-       sd->down.hold_animator || sd->down.onhold_animator) return;
+       sd->down.hold_animator || sd->down.onhold_animator ||
+       sd->scrollto.x.animator || sd->scrollto.y.animator) return;
 
    /* Flip to RTL cords only if init in RTL mode */
    if (sd->is_mirrored)
