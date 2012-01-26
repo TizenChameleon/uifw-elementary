@@ -92,6 +92,7 @@ struct _Widget_Data
    Eina_Bool         pan_changed : 1;
    Eina_Bool         drag_started : 1;
    Eina_Bool         check_scroll : 1; /* this flag means genlist is supposed to be scrolled. if this flag is set to EINA_TRUE, genlist checks whether it's ok to scroll genlist now or not. */
+   Eina_Bool         expanded_move_effect_set : 1;
    int               edit_mode;
    Elm_Genlist_Item_Scrollto_Type scrollto_type; /* a scrollto type which remembers where to scroll ex) in, top, middle */
    Ecore_Animator   *item_moving_effect_timer;
@@ -100,7 +101,7 @@ struct _Widget_Data
    Evas_Coord        expand_item_gap;
    int               move_effect_mode;
    Ecore_Job        *changed_job;
-   Elm_Genlist_Item *rename_it;
+   Elm_Genlist_Item *rename_it, *expanded_next_item;
 };
 
 struct _Item_Block
@@ -778,6 +779,7 @@ _item_block_del(Elm_Genlist_Item *it)
 {
    Eina_Inlist *il;
    Item_Block *itb = it->block;
+   Eina_Bool block_changed;
 
    itb->items = eina_list_remove(itb->items, it);
    itb->count--;
@@ -819,6 +821,7 @@ _item_block_del(Elm_Genlist_Item *it)
                   it->wd->blocks = eina_inlist_remove(it->wd->blocks,
                                                       EINA_INLIST_GET(itb));
                   free(itb);
+                  block_changed = EINA_TRUE;
                }
              else if ((itbn) && ((itbn->count + itb->count) < itb->wd->max_items_per_block + itb->wd->max_items_per_block/2))
                {
@@ -836,8 +839,16 @@ _item_block_del(Elm_Genlist_Item *it)
                   it->wd->blocks =
                     eina_inlist_remove(it->wd->blocks, EINA_INLIST_GET(itb));
                   free(itb);
+                  block_changed = EINA_TRUE;
                }
           }
+     }
+   if (block_changed)
+     {
+        it->wd->pan_changed = EINA_TRUE;
+        evas_object_smart_changed(it->wd->pan_smart);
+        if (it->wd->calc_job) ecore_job_del(it->wd->calc_job);
+        it->wd->calc_job = NULL;
      }
 }
 
@@ -2635,7 +2646,7 @@ _item_block_position(Item_Block *itb,
                }
              else
                {
-                  if (!it->dragging && (!it->wd->item_moving_effect_timer)) _item_unrealize(it, EINA_FALSE);
+                  if (!it->dragging && (!it->wd->item_moving_effect_timer) || (it->wd->expanded_item->block != itb)) _item_unrealize(it, EINA_FALSE);
                }
           }
         in++;
@@ -4540,6 +4551,8 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
    if (it->expanded)
      {
         it->wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_EXPAND;
+        it->wd->expanded_move_effect_set = EINA_TRUE;
+        it->wd->expanded_next_item = elm_genlist_item_next_get(it);
         if (it->realized)
           edje_object_signal_emit(VIEW(it), "elm,state,expanded", "elm");
         evas_object_smart_callback_call(WIDGET(it), SIG_EXPANDED, it);
@@ -4548,6 +4561,7 @@ elm_genlist_item_expanded_set(Elm_Genlist_Item *it,
    else
      {
         it->wd->move_effect_mode = ELM_GENLIST_ITEM_MOVE_EFFECT_CONTRACT;
+        it->wd->expanded_next_item = NULL;
         if (it->realized)
           edje_object_signal_emit(VIEW(it), "elm,state,contracted", "elm");
         evas_object_smart_callback_call(WIDGET(it), SIG_CONTRACTED, it);
@@ -5554,7 +5568,24 @@ _item_moving_effect_timer_cb(void *data)
                                    cvx, cvy, cvw, cvh));
         it2 = elm_genlist_item_prev_get(it2);
      }
-   it2 = elm_genlist_item_next_get(wd->expanded_item);
+   if (wd->expanded_next_item)
+     {
+        Item_Block *itb2;
+        it2 = wd->expanded_next_item;
+        itb2 = wd->expanded_next_item->block;
+        if ((wd->expanded_move_effect_set) && (!(ELM_RECTS_INTERSECT(itb2->x - wd->pan_x + ox,
+                                                                     itb2->y - wd->pan_y + oy,
+                                                                     itb2->w, itb2->h,
+                                                                     cvx, cvy, cvw, cvh))))
+          {
+             _item_block_position(itb2, 0);
+             wd->expanded_move_effect_set = EINA_FALSE;
+          }
+     }
+   else
+     {
+        it2 = elm_genlist_item_next_get(wd->expanded_item);
+     }
    while (it2)
      {
         if (wd->expanded_item->expanded_depth >= it2->expanded_depth) break;
@@ -5626,7 +5657,7 @@ _item_moving_effect_timer_cb(void *data)
              while (it)
                {
                   if (it->expanded_depth <= it2->expanded_depth) break;
-                  if ((it->scrl_y < it2->old_scrl_y + y) && (it->expanded_depth > it2->expanded_depth))
+                  if (it->scrl_y && (it->scrl_y < it2->old_scrl_y + y) && (it->expanded_depth > it2->expanded_depth))
                     {
                        if (!it->effect_done)
                          {
@@ -5704,6 +5735,7 @@ _item_moving_effect_timer_cb(void *data)
                }
           }
         wd->item_moving_effect_timer = NULL;
+        wd->expanded_move_effect_set = EINA_FALSE;
 
         _item_auto_scroll(wd);
         evas_object_lower(wd->alpha_bg);
