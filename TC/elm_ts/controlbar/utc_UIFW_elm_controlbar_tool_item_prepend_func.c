@@ -1,5 +1,6 @@
 #include <tet_api.h>
 #include <Elementary.h>
+#define ICON_DIR "usr/share/elementary/images"
 
 // Definitions
 // For checking the result of the positive test case.
@@ -80,8 +81,11 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_controlbar_tool_item_prepend_func_01(void)
 {
+	char buf[255];
+
 	Elm_Controlbar_Item *item = NULL;
-   	item = elm_controlbar_tool_item_prepend(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Songs", NULL, NULL);
+	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
+   	item = elm_controlbar_tool_item_prepend(controlbar, buf, "Songs", NULL, NULL);
 
 	if (!item) {
 		tet_infoline("elm_controlbar_tool_item_prepend() failed in positive test case");
@@ -96,8 +100,11 @@ static void utc_UIFW_elm_controlbar_tool_item_prepend_func_01(void)
  */
 static void utc_UIFW_elm_controlbar_tool_item_prepend_func_02(void)
 {
+	char buf[255];
+
 	Elm_Controlbar_Item *item = NULL;
-   	item = elm_controlbar_tool_item_prepend(NULL, CONTROLBAR_SYSTEM_ICON_SONGS, "Songs", NULL, NULL);
+	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
+   	item = elm_controlbar_tool_item_prepend(NULL, buf, "Songs", NULL, NULL);
 
 	if (item) {
 		tet_infoline("elm_controlbar_tool_item_prepend() failed in negative test case");

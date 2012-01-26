@@ -1,5 +1,6 @@
 #include <tet_api.h>
 #include <Elementary.h>
+#define ICON_DIR "usr/share/elementary/images"
 
 // Definitions
 // For checking the result of the positive test case.
@@ -87,10 +88,13 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_controlbar_tab_item_insert_before_func_01(void)
 {
+	char buf[255];
+
 	Elm_Controlbar_Item *item = NULL;
 	Elm_Controlbar_Item *item2 = NULL;
-   	item = elm_controlbar_tab_item_append(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Songs", view);
-   	item2 = elm_controlbar_tab_item_insert_before(controlbar, item, CONTROLBAR_SYSTEM_ICON_SONGS, "Songs", view);
+	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
+   	item = elm_controlbar_tab_item_append(controlbar, buf, "Songs", view);
+   	item2 = elm_controlbar_tab_item_insert_before(controlbar, item, buf, "Songs", view);
 
 	if (!item2) {
 		tet_infoline("elm_controlbar_tab_item_insert_before() failed in positive test case");
@@ -105,10 +109,13 @@ static void utc_UIFW_elm_controlbar_tab_item_insert_before_func_01(void)
  */
 static void utc_UIFW_elm_controlbar_tab_item_insert_before_func_02(void)
 {
+	char buf[255];
+
 	Elm_Controlbar_Item *item = NULL;
 	Elm_Controlbar_Item *item2 = NULL;
-   	item = elm_controlbar_tab_item_append(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Songs", view);
-   	item2 = elm_controlbar_tab_item_insert_before(controlbar, NULL, CONTROLBAR_SYSTEM_ICON_SONGS, "Songs", view);
+	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
+   	item = elm_controlbar_tab_item_append(controlbar, buf, "Songs", view);
+   	item2 = elm_controlbar_tab_item_insert_before(controlbar, NULL, buf, "Songs", view);
 
 	if (item2) {
 		tet_infoline("elm_controlbar_tab_item_insert_before() failed in negative test case");
