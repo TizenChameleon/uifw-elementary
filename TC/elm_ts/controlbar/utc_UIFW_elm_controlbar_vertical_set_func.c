@@ -1,5 +1,6 @@
 #include <tet_api.h>
 #include <Elementary.h>
+#define ICON_DIR "usr/share/elementary/images"
 
 // Definitions
 // For checking the result of the positive test case.
@@ -52,16 +53,19 @@ struct tet_testlist tet_testlist[] = {
 
 static void startup(void)
 {
+	char buf[255];
+
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	evas_object_show(main_win);
 
 	controlbar = elm_controlbar_add(main_win);
-	elm_controlbar_tab_item_append(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Controlbar", NULL);
-	elm_controlbar_tab_item_append(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Controlbar", NULL);
-	elm_controlbar_tab_item_append(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Controlbar", NULL);
-	elm_controlbar_tab_item_append(controlbar, CONTROLBAR_SYSTEM_ICON_SONGS, "Controlbar", NULL);
+	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
+	elm_controlbar_tab_item_append(controlbar, buf, "Controlbar", NULL);
+	elm_controlbar_tab_item_append(controlbar, buf, "Controlbar", NULL);
+	elm_controlbar_tab_item_append(controlbar, buf, "Controlbar", NULL);
+	elm_controlbar_tab_item_append(controlbar, buf, "Controlbar", NULL);
 }
 
 static void cleanup(void)

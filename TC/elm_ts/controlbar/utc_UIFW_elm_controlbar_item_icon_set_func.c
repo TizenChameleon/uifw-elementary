@@ -1,5 +1,6 @@
 #include <tet_api.h>
 #include <Elementary.h>
+#define ICON_DIR "usr/share/elementary/images"
 
 // Definitions
 // For checking the result of the positive test case.
@@ -79,9 +80,12 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_controlbar_item_icon_set_func_01(void)
 {
+	char buf[255];
+
 	Evas_Object *icon = NULL;
 
-	elm_controlbar_item_icon_set(item1, CONTROLBAR_SYSTEM_ICON_SONGS);
+	snprintf(buf, sizeof(buf), "%s/logo_small.png", ICON_DIR);
+	elm_controlbar_item_icon_set(item1, buf);
 
 	icon = elm_controlbar_item_icon_get(item1);
 
