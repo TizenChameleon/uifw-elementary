@@ -16,8 +16,7 @@ TARGETS = utc_UIFW_elm_entry_add_func \
 	  utc_UIFW_elm_entry_password_get_func \
 	  utc_UIFW_elm_entry_selection_get_func \
 	  utc_UIFW_elm_entry_single_line_get_func \
-	  utc_UIFW_elm_entry_utf8_to_markup_func \
-	  utc_UIFW_elm_entry_wrap_width_get_func
+	  utc_UIFW_elm_entry_utf8_to_markup_func
 
 PKGS = elementary evas
 
