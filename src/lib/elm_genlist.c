@@ -2774,6 +2774,11 @@ _calc_job(void *data)
              minw = itb->minw;
              minw_change = EINA_TRUE;
           }
+        if (minw > wd->w)
+          {
+             minw = wd->w;
+             minw_change = EINA_TRUE;
+          }
         itb->w = minw;
         itb->h = itb->minh;
         y += itb->h;
