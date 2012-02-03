@@ -4274,6 +4274,16 @@ elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", enabled);
 }
 
+EAPI Eina_Bool
+elm_entry_input_panel_enabled_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_TRUE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_TRUE;
+
+   return wd->input_panel_enable;
+}
+
 EINA_DEPRECATED EAPI void
 elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
 {
