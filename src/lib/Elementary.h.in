@@ -28798,6 +28798,8 @@ extern "C" {
     */
 
    EAPI Evas_Object *elm_popup_add(Evas_Object *parent);
+   EAPI void         elm_popup_repeat_events_set(Evas_Object *obj, Eina_Bool repeat);
+   EAPI Eina_Bool    elm_popup_repeat_events_get(Evas_Object *obj);
    EAPI void         elm_popup_desc_set(Evas_Object *obj, const char *text);
    EAPI const char  *elm_popup_desc_get(Evas_Object *obj);
    EAPI void         elm_popup_title_label_set(Evas_Object *obj, const char *text);
