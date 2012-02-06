@@ -66,6 +66,7 @@ struct _Widget_Data
      int  contracted;
      Eina_Bool focused: 1;
      Eina_Bool last_btn_select: 1;
+     Eina_Bool view_mode;
      Elm_Multibuttonentry_Item_Verify_Callback add_callback;
      void *add_callback_data;
   };
@@ -313,8 +314,11 @@ _set_vis_guidetext(Evas_Object *obj)
    else
      {
         evas_object_hide(wd->guidetext);
-        elm_box_pack_end(wd->box, wd->entry);
-        evas_object_show(wd->entry);
+        if (!wd->view_mode)
+          {
+             elm_box_pack_end(wd->box, wd->entry);
+             evas_object_show(wd->entry);
+          }
         if (elm_widget_focus_get(obj) || wd->focused)
           if (!wd->current)
             elm_object_focus_set(wd->entry, EINA_TRUE);
@@ -845,7 +849,7 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
                      if (wd->view_state == MULTIBUTTONENTRY_VIEW_GUIDETEXT)
                        _set_vis_guidetext(obj);
                      if (wd->entry)
-                       elm_box_pack_before(wd->box, btn, wd->entry);
+                       if (!wd->view_mode) elm_box_pack_before(wd->box, btn, wd->entry);
                      else
                        elm_box_pack_end(wd->box, btn);
                   }
@@ -870,7 +874,7 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
                           if (wd->view_state == MULTIBUTTONENTRY_VIEW_GUIDETEXT)
                             _set_vis_guidetext(obj);
                           if (wd->entry)
-                            elm_box_pack_before(wd->box, btn, wd->entry);
+                            if (!wd->view_mode) elm_box_pack_before(wd->box, btn, wd->entry);
                           else
                             elm_box_pack_end(wd->box, btn);
                        }
@@ -895,7 +899,7 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
                           if (wd->view_state == MULTIBUTTONENTRY_VIEW_GUIDETEXT)
                             _set_vis_guidetext(obj);
                           if (wd->entry)
-                            elm_box_pack_before(wd->box, btn, wd->entry);
+                            if (!wd->view_mode) elm_box_pack_before(wd->box, btn, wd->entry);
                           else
                             elm_box_pack_end(wd->box, btn);
                        }
@@ -1683,4 +1687,18 @@ elm_multibuttonentry_item_verify_callback_set(Evas_Object *obj, Elm_Multibuttone
 
    wd->add_callback = func;
    wd->add_callback_data = data;
+}
+
+EAPI void
+elm_multibuttonentry_view_mode(Evas_Object *obj, Eina_Bool view_mode)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   wd->view_mode = view_mode;
+
+   if (view_mode)
+     {
+        elm_box_unpack(wd->box, wd->entry);
+        evas_object_hide(wd->entry);
+     }
 }
