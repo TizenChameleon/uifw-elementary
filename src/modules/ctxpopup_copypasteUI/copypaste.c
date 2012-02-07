@@ -28,10 +28,14 @@ struct _Elm_Entry_Context_Menu_Item
 };
 
 static void _ctxpopup_hide(Evas_Object *popup);
+static void _ctxpopup_position(Evas_Object *obj);
 static void
 _entry_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-   _ctxpopup_hide(ext_mod->popup);
+   if (evas_pointer_button_down_mask_get(e))
+     _ctxpopup_hide(ext_mod->popup);
+   else
+     _ctxpopup_position(data);
 }
 
 static void
