@@ -1701,4 +1701,6 @@ elm_multibuttonentry_view_mode(Evas_Object *obj, Eina_Bool view_mode)
         elm_box_unpack(wd->box, wd->entry);
         evas_object_hide(wd->entry);
      }
+   else
+     _view_update(obj);
 }
