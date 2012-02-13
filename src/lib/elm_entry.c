@@ -4473,6 +4473,26 @@ elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
    edje_object_part_text_autocapital_type_set(wd->ent, "elm.text", wd->autocapital_type);
 }
 
+EAPI void
+elm_entry_input_panel_show(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   edje_object_part_text_input_panel_show(wd->ent, "elm.text");
+}
+
+EAPI void
+elm_entry_input_panel_hide(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   edje_object_part_text_input_panel_hide(wd->ent, "elm.text");
+}
+
 EINA_DEPRECATED EAPI void
 elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
 {
