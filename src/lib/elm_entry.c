@@ -4384,6 +4384,16 @@ elm_entry_autocapital_type_get(Evas_Object *obj)
 }
 
 EAPI void
+elm_entry_imf_context_reset(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   edje_object_part_text_imf_context_reset(wd->ent, "elm.text");
+}
+
+EAPI void
 elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -4529,3 +4539,4 @@ elm_entry_magnifier_type_set(Evas_Object *obj, int type)
    wd->mgf_type = type;
    _magnifier_create(obj);
 }
+
