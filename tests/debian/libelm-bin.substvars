@@ -1,0 +1,2 @@
+shlibs:Depends=libc6 (>= 2.4), libecore, libecore-evas, libecore-file, libedje (>= 0.9.9.060+svn20100304), libefreet, libeina (>= 1.0.0.001+svn20100831), libelm, libevas (>= 0.9.9.060+svn20100203), libgcc1 (>= 1:4.4.0)
+misc:Depends=

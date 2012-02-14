@@ -2,53 +2,61 @@
 # This file is distributed under the same license as the Elementary package.
 # FIRST AUTHOR <tom.hacohen@partner.samsung.com>, 2010.
 #
+#: src/lib/elm_config.c:1417
 msgid ""
 msgstr ""
 "Project-Id-Version: elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2011-11-28 17:27+0900\n"
-"PO-Revision-Date: 2011-09-26 21:20+0900\n"
-"Last-Translator: Sumanth Krishna Mannam <sumanth.m@samsung.com>\n"
+"POT-Creation-Date: 2012-02-05 10:59+0900\n"
+"PO-Revision-Date: 2010-12-26 10:05+0200\n"
+"Last-Translator: Tom Hacohen <tom.hacohen@partner.samsung.com>\n"
 "Language-Team: General\n"
-"Language: yi\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/lib/elc_fileselector.c:836
+#: src/lib/elc_fileselector.c:842
 msgid "Up"
 msgstr ""
 
-#: src/lib/elc_fileselector.c:851
+#: src/lib/elc_fileselector.c:857
 msgid "Home"
 msgstr ""
 
-#: src/lib/elc_fileselector.c:995 src/lib/elm_entry.c:1396
+#: src/lib/elc_fileselector.c:1001 src/lib/elm_entry.c:1468
 #: src/lib/elm_searchbar.c:211
 msgid "Cancel"
 msgstr ""
 
-#: src/lib/elc_fileselector.c:1005
+#: src/lib/elc_fileselector.c:1011
 msgid "OK"
 msgstr ""
 
-#: src/lib/elm_button.c:320
+#: src/lib/elm_button.c:287
 msgid "Clicked"
 msgstr ""
 
-#: src/lib/elm_button.c:454 src/lib/elm_check.c:392 src/lib/elm_toolbar.c:731
+#: src/lib/elm_button.c:408 src/lib/elm_check.c:392 src/lib/elm_radio.c:295
+#: src/lib/elm_toolbar.c:759
 msgid "State: Disabled"
 msgstr ""
 
-#: src/lib/elm_button.c:518
+#: src/lib/elm_button.c:462
 msgid "Button"
 msgstr ""
 
+#: src/lib/elm_calendar.c:158
+msgid "%B %Y"
+msgstr ""
+
 #: src/lib/elm_check.c:309 src/lib/elm_check.c:312 src/lib/elm_check.c:403
+#: src/lib/elm_radio.c:231 src/lib/elm_radio.c:297
 msgid "State: On"
 msgstr ""
 
 #: src/lib/elm_check.c:322 src/lib/elm_check.c:325 src/lib/elm_check.c:412
+#: src/lib/elm_radio.c:298
 msgid "State: Off"
 msgstr ""
 
@@ -60,40 +68,40 @@ msgstr ""
 msgid "Check"
 msgstr ""
 
-#: src/lib/elm_config.c:1642
+#: src/lib/elm_config.c:1354
 msgid "default:LTR"
 msgstr "default:RTL"
 
-#: src/lib/elm_datefield.c:418
+#: src/lib/elm_datefield.c:412
 msgid "PM"
-msgstr "PM"
+msgstr ""
 
-#: src/lib/elm_datefield.c:419
+#: src/lib/elm_datefield.c:413
 msgid "AM"
-msgstr "AM"
+msgstr ""
 
-#: src/lib/elm_datefield.c:746
+#: src/lib/elm_datefield.c:740
 msgid "DateTimeFormat"
-msgstr "%b %d, %Y %I : %M %p"
-
-#: src/lib/elm_entry.c:1370
-msgid "Select"
 msgstr ""
 
-#: src/lib/elm_entry.c:1375
-msgid "Paste"
-msgstr ""
-
-#: src/lib/elm_entry.c:1380 src/lib/elm_entry.c:1400
-msgid "More"
-msgstr ""
-
-#: src/lib/elm_entry.c:1390
+#: src/lib/elm_entry.c:1462
 msgid "Copy"
 msgstr ""
 
-#: src/lib/elm_entry.c:1393
+#: src/lib/elm_entry.c:1465
 msgid "Cut"
+msgstr ""
+
+#: src/lib/elm_entry.c:1479
+msgid "Select"
+msgstr ""
+
+#: src/lib/elm_entry.c:1485
+msgid "Paste"
+msgstr ""
+
+#: src/lib/elm_radio.c:404
+msgid "Radio"
 msgstr ""
 
 #: src/lib/elm_searchbar.c:199
@@ -108,22 +116,22 @@ msgstr ""
 msgid "OFF"
 msgstr ""
 
-#: src/lib/elm_toolbar.c:648
+#: src/lib/elm_toolbar.c:676
 msgid "Selected"
 msgstr ""
 
-#: src/lib/elm_toolbar.c:729
+#: src/lib/elm_toolbar.c:757
 msgid "Separator"
 msgstr ""
 
-#: src/lib/elm_toolbar.c:733
+#: src/lib/elm_toolbar.c:761
 msgid "State: Selected"
 msgstr ""
 
-#: src/lib/elm_toolbar.c:735
+#: src/lib/elm_toolbar.c:763
 msgid "Has menu"
 msgstr ""
 
-#: src/lib/elm_toolbar.c:765
+#: src/lib/elm_toolbar.c:821
 msgid "Tool Item"
 msgstr ""

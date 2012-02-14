@@ -143,13 +143,13 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void
-_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    _sizing_eval(data);
 }
 
 static void
-_block_clicked_cb(void *data, Evas_Object *obj, void *event_info)
+_block_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
 
@@ -161,7 +161,7 @@ _block_clicked_cb(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
@@ -173,7 +173,7 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
@@ -183,7 +183,7 @@ _hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_action_area_clicked(void *data, Evas_Object *obj, void *event_info)
+_action_area_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Action_Area_Data *adata = data;
 
@@ -244,7 +244,7 @@ _elm_popup_buttons_add_valist(Evas_Object *obj, const char *first_button_text, v
 }
 
 static void
-_elm_popup_timeout(void *data, Evas_Object *obj, void *event_info)
+_elm_popup_timeout(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    evas_object_hide((Evas_Object*)data);
    evas_object_smart_callback_call((Evas_Object *)data, "response", (void *)ELM_POPUP_RESPONSE_TIMEOUT);
@@ -261,7 +261,7 @@ _elm_signal_exit(void *data __UNUSED__, int ev_type __UNUSED__, void *ev __UNUSE
 }
 
 static void
-response_cb(void *data, Evas_Object *obj, void *event_info)
+response_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 {
    int res_id = (int) event_info;
    int *id = data;
@@ -412,9 +412,48 @@ elm_popup_with_buttons_add(Evas_Object *parent, const char *title, const char *d
    return popup;
 }
 
+/**
+ * Enables/Disables the touch events pass through to below layer Objects.
+ *
+ * @param[in] obj The popup object
+ * @param[in] repeat EINA_TRUE Events are passed to lower objects, else no
+ *
+ * Enabling repeat event will remove the Blocked event area and events will
+ * pass to the lowever layer objects otherwise it is blocked.
+ *
+ * @note The default value is EINA_FALSE.
+ * @ingroup Popup
+ */
+EAPI void
+elm_popup_repeat_events_set(Evas_Object *obj, Eina_Bool repeat)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Eina_Bool repeat_events = !!repeat;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return;
+   elm_notify_repeat_events_set(wd->notify, repeat_events);
+}
 
 /**
- * This Set's the description text in content area of Popup widget.
+ * Returns value indicating whether repeat event is enabled or not
+ * @param[in] obj the popup object
+ * @return EINA_FALSE if Blocked event area is present else EINA_TRUE
+ *
+ * @ingroup Popup
+ */
+EAPI Eina_Bool
+elm_popup_repeat_events_get(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+
+   if (!wd) return EINA_FALSE;
+   return elm_notify_repeat_events_get(wd->notify);
+}
+
+/**
+ * This sets the description text in content area of Popup widget.
  *
  * @param[in] obj The Popup object
  * @param[in] text description text.
@@ -452,7 +491,7 @@ elm_popup_desc_set(Evas_Object *obj, const char *text)
 }
 
 /**
- * This Get's the description text packed in content area of popup object.
+ * This returns the description text packed in content area of popup object.
  *
  * @param[in] obj The Popup object
  * @return  description text.
@@ -470,7 +509,7 @@ elm_popup_desc_get(Evas_Object *obj)
 }
 
 /**
- * This Set's the title text in title area of popup object.
+ * This sets the title text in title area of popup object.
  *
  * @param[in] obj The popup object
  * @param[in] text The title text
@@ -496,7 +535,7 @@ elm_popup_title_label_set(Evas_Object *obj, const char *text)
 }
 
 /**
- * This Get's the title text packed in title area of popup object.
+ * This returns the title text packed in title area of popup object.
  *
  * @param[in] obj The Popup object
  * @return title text
@@ -514,7 +553,7 @@ elm_popup_title_label_get(Evas_Object *obj)
 }
 
 /**
- * This Set's the icon in the title area of Popup object.
+ * This sets the icon in the title area of Popup object.
  *
  * @param[in] obj The popup object
  * @param[in] icon The title icon
@@ -541,7 +580,7 @@ elm_popup_title_icon_set(Evas_Object *obj, Evas_Object *icon)
 }
 
 /**
- * This Get's the icon packed in title area of Popup object.
+ * This returns the icon packed in title area of Popup object.
  *
  * @param[in] obj The Popup object
  * @return title icon
@@ -559,7 +598,7 @@ elm_popup_title_icon_get(Evas_Object *obj)
 }
 
 /**
- * This Set's the content widget in content area of Popup object.
+ * This sets the content widget in content area of Popup object.
  *
  * @param[in] obj The popup object
  * @param[in] content The content widget
@@ -593,7 +632,7 @@ elm_popup_content_set(Evas_Object *obj, Evas_Object *content)
 }
 
 /**
- * This Get's the content widget packed in content area of Popup object.
+ * This returns the content widget packed in content area of Popup object.
  *
  * @param[in] obj The Popup object
  * @return content packed in popup widget
@@ -651,7 +690,7 @@ elm_popup_buttons_add(Evas_Object *obj,int no_of_buttons, const char *first_butt
 }
 
 /**
- * This Set's the time before the popup window is hidden,
+ * This sets the time before the popup window is hidden,
  * and ELM_POPUP_RESPONSE_TIMEOUT is sent along with response signal.
  *
  * @param[in] obj The popup object
@@ -671,7 +710,7 @@ elm_popup_timeout_set(Evas_Object *obj, double timeout)
 }
 
 /**
- * This Set's the mode of popup, by default ELM_POPUP_TYPE_NONE is set i.e, popup
+ * This sets the mode of popup, by default ELM_POPUP_TYPE_NONE is set i.e, popup
  * will not close when clicked outside. if ELM_POPUP_TYPE_ALERT is set, popup will close
  * when clicked outside, and ELM_POPUP_RESPONSE_NONE is sent along with response signal.
  *
@@ -692,7 +731,7 @@ elm_popup_mode_set(Evas_Object *obj, Elm_Popup_Mode mode)
 }
 
 /**
- * This Hides the popup by emitting response signal.
+ * This hides the popup by emitting response signal.
  *
  * @param[in] obj The popup object
  * @param[in] response_id  response ID of the signal to be emitted along with response signal

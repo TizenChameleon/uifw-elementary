@@ -259,8 +259,10 @@ _content_left_unset(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd->contents.left) return NULL;
    Evas_Object *content = wd->contents.left;
-   elm_widget_sub_object_del(obj, content);
+
    edje_object_part_unswallow(wd->panes, content);
+   evas_object_hide(wd->contents.left);
+   elm_widget_sub_object_del(obj, content);
    wd->contents.left = NULL;
    edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
    return content;
@@ -272,8 +274,10 @@ _content_right_unset(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd->contents.right) return NULL;
    Evas_Object *content = wd->contents.right;
-   elm_widget_sub_object_del(obj, content);
+
    edje_object_part_unswallow(wd->panes, content);
+   evas_object_hide(wd->contents.right);
+   elm_widget_sub_object_del(obj, content);
    wd->contents.right = NULL;
    edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
    return content;
@@ -285,10 +289,11 @@ _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (!part || !strcmp(part, "right"))
-     _content_right_set(obj, content);
-   else if(!strcmp(part, "left"))
+   if (part && (!strncmp(part, "elm.swallow.", 12))) part += 12;
+   if (!part || !strcmp(part, "left"))
      _content_left_set(obj, content);
+   else if(!strcmp(part, "right"))
+     _content_right_set(obj, content);
 }
 
 static Evas_Object *
@@ -297,10 +302,11 @@ _content_get_hook(const Evas_Object *obj, const char *part)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
-   if (!part || !strcmp(part, "right"))
-     return wd->contents.right;
-   else if (!strcmp(part, "left"))
+   if (part && (!strncmp(part, "elm.swallow.", 12))) part += 12;
+   if (!part || !strcmp(part, "left"))
      return wd->contents.left;
+   else if (!strcmp(part, "right"))
+     return wd->contents.right;
    return NULL;
 }
 
@@ -310,10 +316,11 @@ _content_unset_hook(Evas_Object *obj, const char *part)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
-   if (!part || !strcmp(part, "right"))
-     return _content_right_unset(obj);
-   else if (!strcmp(part, "left"))
+   if (part && (!strncmp(part, "elm.swallow.", 12))) part += 12;
+   if (!part || !strcmp(part, "left"))
      return _content_left_unset(obj);
+   else if (!strcmp(part, "right"))
+     return _content_right_unset(obj);
    return NULL;
 }
 
@@ -419,7 +426,6 @@ elm_panes_content_left_size_set(Evas_Object *obj, double size)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd) return;
    if (size < 0.0) size = 0.0;
    else if (size > 1.0) size = 1.0;
@@ -434,7 +440,6 @@ elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd) return;
    wd->horizontal = horizontal;
    _theme_hook(obj);
