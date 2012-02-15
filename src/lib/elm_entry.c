@@ -4346,7 +4346,7 @@ elm_entry_input_panel_layout_set(Evas_Object *obj, Elm_Input_Panel_Layout layout
 }
 
 EAPI Elm_Input_Panel_Layout
-elm_entry_input_panel_layout_get(Evas_Object *obj)
+elm_entry_input_panel_layout_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) ELM_INPUT_PANEL_LAYOUT_INVALID;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -4367,13 +4367,34 @@ elm_entry_autocapital_type_set(Evas_Object *obj, Elm_Autocapital_Type autocapita
 }
 
 EAPI Elm_Autocapital_Type
-elm_entry_autocapital_type_get(Evas_Object *obj)
+elm_entry_autocapital_type_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) ELM_AUTOCAPITAL_TYPE_NONE;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return ELM_AUTOCAPITAL_TYPE_NONE;
 
    return wd->autocapital_type;
+}
+
+EAPI void
+elm_entry_prediction_allow_set(Evas_Object *obj, Eina_Bool prediction)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->prediction_allow = prediction;
+   edje_object_part_text_prediction_allow_set(wd->ent, "elm.text", prediction);
+}
+
+EAPI Eina_Bool
+elm_entry_prediction_allow_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_TRUE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_TRUE;
+
+   return wd->prediction_allow;
 }
 
 EAPI void
@@ -4398,7 +4419,7 @@ elm_entry_input_panel_enabled_set(Evas_Object *obj, Eina_Bool enabled)
 }
 
 EAPI Eina_Bool
-elm_entry_input_panel_enabled_get(Evas_Object *obj)
+elm_entry_input_panel_enabled_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_TRUE;
    Widget_Data *wd = elm_widget_data_get(obj);

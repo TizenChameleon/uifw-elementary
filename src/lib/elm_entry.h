@@ -1165,7 +1165,7 @@ EAPI void                   elm_entry_input_panel_layout_set(Evas_Object *obj, E
  *
  * @see elm_entry_input_panel_layout_set
  */
-EAPI Elm_Input_Panel_Layout elm_entry_input_panel_layout_get(Evas_Object *obj);
+EAPI Elm_Input_Panel_Layout elm_entry_input_panel_layout_get(const Evas_Object *obj);
 
 /**
  * Set the autocapitalization type on the immodule.
@@ -1181,7 +1181,7 @@ EAPI void                   elm_entry_autocapital_type_set(Evas_Object *obj, Elm
  * @param obj The entry object
  * @return autocapitalization type
  */
-EAPI Elm_Autocapital_Type   elm_entry_autocapital_type_get(Evas_Object *obj);
+EAPI Elm_Autocapital_Type   elm_entry_autocapital_type_get(const Evas_Object *obj);
 
 /**
  * Sets the attribute to show the input panel automatically.
@@ -1197,7 +1197,7 @@ EAPI void                   elm_entry_input_panel_enabled_set(Evas_Object *obj, 
  * @param obj The entry object
  * @return EINA_TRUE if input panel will be appeared when the entry is clicked or has a focus, EINA_FALSE otherwise
  */
-EAPI Eina_Bool              elm_entry_input_panel_enabled_get(Evas_Object *obj);
+EAPI Eina_Bool              elm_entry_input_panel_enabled_get(const Evas_Object *obj);
 
 /**
  * Show the input panel (virtual keyboard) based on the input panel property of entry such as layout, autocapital types, and so on.
@@ -1307,6 +1307,22 @@ EAPI Eina_Bool              elm_entry_input_panel_return_key_disabled_get(const 
  * @param obj The entry object
  */
 EAPI void                   elm_entry_imf_context_reset(Evas_Object *obj);
+
+/**
+ * Set whether the entry should allow to use the text prediction.
+ *
+ * @param obj The entry object
+ * @param prediction Whether the entry should allow to use the text prediction.
+ */
+EAPI void                   elm_entry_prediction_allow_set(Evas_Object *obj, Eina_Bool prediction);
+
+/**
+ * Get whether the entry should allow to use the text prediction.
+ *
+ * @param obj The entry object
+ * @return EINA_TRUE if it allows to use the text prediction, otherwise EINA_FALSE.
+ */
+EAPI Eina_Bool              elm_entry_prediction_allow_get(const Evas_Object *obj);
 
 /* pre-made filters for entries */
 
