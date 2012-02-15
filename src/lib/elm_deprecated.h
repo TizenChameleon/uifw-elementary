@@ -1740,6 +1740,102 @@ EINA_DEPRECATED EAPI void                          elm_genlist_horizontal_set(Ev
  */
 EAPI Elm_List_Mode                 elm_genlist_horizontal_get(const Evas_Object *obj);
 
+/**
+ * Return the data associated to a given genlist item
+ *
+ * @param it The genlist item.
+ * @return the data associated to this item.
+ *
+ * This returns the @c data value passed on the
+ * elm_genlist_item_append() and related item addition calls.
+ *
+ * @see elm_genlist_item_append()
+ * @see elm_genlist_item_data_set()
+ *
+ * @deprecated Use elm_object_item_data_get() instead
+ * @ingroup Genlist
+ */
+EINA_DEPRECATED EAPI void                         *elm_genlist_item_data_get(const Elm_Object_Item *it);
+
+/**
+ * Set the data associated to a given genlist item
+ *
+ * @param it The genlist item
+ * @param data The new data pointer to set on it
+ *
+ * This @b overrides the @c data value passed on the
+ * elm_genlist_item_append() and related item addition calls. This
+ * function @b won't call elm_genlist_item_update() automatically,
+ * so you'd issue it afterwards if you want to hove the item
+ * updated to reflect the that new data.
+ *
+ * @see elm_genlist_item_data_get()
+ *
+ * @deprecated Use elm_object_item_data_set() instead
+ * @ingroup Genlist
+ */
+EINA_DEPRECATED EAPI void                          elm_genlist_item_data_set(Elm_Object_Item *it, const void *data);
+
+/**
+ * Set whether a given genlist item is disabled or not.
+ *
+ * @param it The item
+ * @param disabled Use @c EINA_TRUE, true disable it, @c EINA_FALSE
+ * to enable it back.
+ *
+ * A disabled item cannot be selected or unselected. It will also
+ * change its appearance, to signal the user it's disabled.
+ *
+ * @see elm_genlist_item_disabled_get()
+ * @deprecated Use elm_object_item_disabled_set() instead
+ *
+ * @ingroup Genlist
+ */
+EINA_DEPRECATED EAPI void                          elm_genlist_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled);
+
+/**
+ * Get whether a given genlist item is disabled or not.
+ *
+ * @param it The item
+ * @return @c EINA_TRUE, if it's disabled, @c EINA_FALSE otherwise
+ * (and on errors).
+ *
+ * @see elm_genlist_item_disabled_set() for more details
+ * @deprecated Use elm_object_item_disabled_get() instead
+ *
+ * @ingroup Genlist
+ */
+EINA_DEPRECATED EAPI Eina_Bool                     elm_genlist_item_disabled_get(const Elm_Object_Item *it);
+
+/**
+ * Remove a genlist item from the its parent, deleting it.
+ *
+ * @param it The item to be removed.
+ * @return @c EINA_TRUE on success or @c EINA_FALSE, otherwise.
+ *
+ * @see elm_genlist_clear(), to remove all items in a genlist at
+ * once.
+ *
+ * @deprecated Use elm_object_item_del() instead
+ * @ingroup Genlist
+ */
+EINA_DEPRECATED EAPI void                          elm_genlist_item_del(Elm_Object_Item *it);
+
+/**
+ * Get the genlist object's handle which contains a given genlist
+ * item
+ *
+ * @param it The item to fetch the container from
+ * @return The genlist (parent) object
+ *
+ * This returns the genlist object itself that an item belongs to.
+ * @deprecated Use elm_object_item_widget_get() instead
+ *
+ * @ingroup Genlist
+ */
+EINA_DEPRECATED EAPI Evas_Object                  *elm_genlist_item_genlist_get(const Elm_Object_Item *it);
+
+
 #define ELM_IMAGE_ROTATE_90_CW 1
 #define ELM_IMAGE_ROTATE_180_CW 2
 #define ELM_IMAGE_ROTATE_90_CCW 3
