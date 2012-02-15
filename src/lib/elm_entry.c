@@ -48,6 +48,10 @@ struct _Widget_Data
    Elm_Wrap_Type linewrap;
    Elm_Input_Panel_Layout input_panel_layout;
    Elm_Autocapital_Type autocapital_type;
+   Elm_Input_Panel_Lang input_panel_lang;
+   Elm_Input_Panel_Return_Key_Type input_panel_return_key_type;
+   void *input_panel_imdata;
+   int input_panel_imdata_len;
    Eina_Bool changed : 1;
    Eina_Bool single_line : 1;
    Eina_Bool password : 1;
@@ -68,6 +72,8 @@ struct _Widget_Data
    Eina_Bool h_bounce : 1;
    Eina_Bool v_bounce : 1;
    Eina_Bool input_panel_enable : 1;
+   Eina_Bool prediction_allow : 1;
+   Eina_Bool input_panel_return_key_disabled : 1;
 //// TIZEN ONLY
    Evas_Object *hoversel;
    Evas_Object *hover;
@@ -561,6 +567,7 @@ _del_hook(Evas_Object *obj)
         _filter_free(tf);
      }
    if (wd->delay_write) ecore_timer_del(wd->delay_write);
+   if (wd->input_panel_imdata) free(wd->input_panel_imdata);
    free(wd);
 
    evas_event_thaw(evas_object_evas_get(obj));
@@ -595,6 +602,10 @@ _theme_hook(Evas_Object *obj)
    edje_object_part_text_input_panel_layout_set(wd->ent, "elm.text", wd->input_panel_layout);
    edje_object_part_text_autocapital_type_set(wd->ent, "elm.text", wd->autocapital_type);
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", wd->input_panel_enable);
+   edje_object_part_text_input_panel_imdata_set(wd->ent, "elm.text", wd->input_panel_imdata, wd->input_panel_imdata_len);
+   edje_object_part_text_input_panel_return_key_type_set(wd->ent, "elm.text", wd->input_panel_return_key_type);
+   edje_object_part_text_input_panel_return_key_disabled_set(wd->ent, "elm.text", wd->input_panel_return_key_disabled);
+
    if (wd->cursor_pos != 0)
      elm_entry_cursor_pos_set(obj, wd->cursor_pos);
    if (elm_widget_focus_get(obj))
@@ -3064,6 +3075,7 @@ elm_entry_add(Evas_Object *parent)
    wd->autosave     = EINA_TRUE;
    wd->textonly     = EINA_FALSE;
    wd->scroll       = EINA_FALSE;
+   wd->input_panel_imdata = NULL;
 //TIZEN ONLY
    wd->cnp_mode     = ELM_CNP_MODE_MARKUP;
    wd->magnifier_enabled = EINA_TRUE;
@@ -4438,6 +4450,98 @@ elm_entry_input_panel_hide(Evas_Object *obj)
    if (!wd) return;
 
    edje_object_part_text_input_panel_hide(wd->ent, "elm.text");
+}
+
+EAPI void
+elm_entry_input_panel_language_set(Evas_Object *obj, Elm_Input_Panel_Lang lang)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->input_panel_lang = lang;
+   edje_object_part_text_input_panel_language_set(wd->ent, "elm.text", lang);
+}
+
+EAPI Elm_Input_Panel_Lang
+elm_entry_input_panel_language_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_INPUT_PANEL_LANG_AUTOMATIC;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return ELM_INPUT_PANEL_LANG_AUTOMATIC;
+
+   return wd->input_panel_lang;
+}
+
+EAPI void
+elm_entry_input_panel_imdata_set(Evas_Object *obj, const void *data, int len)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   if (wd->input_panel_imdata)
+     free(wd->input_panel_imdata);
+
+   wd->input_panel_imdata = calloc(1, len);
+   wd->input_panel_imdata_len = len;
+   memcpy(wd->input_panel_imdata, data, len);
+
+   edje_object_part_text_input_panel_imdata_set(wd->ent, "elm.text", wd->input_panel_imdata, wd->input_panel_imdata_len);
+}
+
+EAPI void
+elm_entry_input_panel_imdata_get(const Evas_Object *obj, void *data, int *len)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   edje_object_part_text_input_panel_imdata_get(wd->ent, "elm.text", data, len);
+}
+
+EAPI void
+elm_text_input_panel_return_key_type_set(Evas_Object *obj, Elm_Input_Panel_Return_Key_Type return_key_type)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->input_panel_return_key_type = return_key_type;
+
+   edje_object_part_text_input_panel_return_key_type_set(wd->ent, "elm.text", return_key_type);
+}
+
+EAPI Elm_Input_Panel_Return_Key_Type
+elm_entry_input_panel_return_key_type_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_INPUT_PANEL_RETURN_KEY_TYPE_DEFAULT;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return ELM_INPUT_PANEL_RETURN_KEY_TYPE_DEFAULT;
+
+   return wd->input_panel_return_key_type;
+}
+
+EAPI void
+elm_entry_input_panel_return_key_disabled_set(Evas_Object *obj, Eina_Bool disabled)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->input_panel_return_key_disabled = disabled;
+
+   edje_object_part_text_input_panel_return_key_disabled_set(wd->ent, "elm.text", disabled);
+}
+
+EAPI Eina_Bool
+elm_entry_input_panel_return_key_disabled_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   return wd->input_panel_return_key_disabled;
 }
 
 EINA_DEPRECATED EAPI void
