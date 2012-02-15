@@ -143,13 +143,13 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void
-_changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    _sizing_eval(data);
 }
 
 static void
-_block_clicked_cb(void *data, Evas_Object *obj, void *event_info)
+_block_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
 
@@ -161,7 +161,7 @@ _block_clicked_cb(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
-_show(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
@@ -173,7 +173,7 @@ _show(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
 
@@ -183,7 +183,7 @@ _hide(void *data, Evas *e, Evas_Object *obj, void *event_info)
 }
 
 static void
-_action_area_clicked(void *data, Evas_Object *obj, void *event_info)
+_action_area_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Action_Area_Data *adata = data;
 
@@ -244,7 +244,7 @@ _elm_popup_buttons_add_valist(Evas_Object *obj, const char *first_button_text, v
 }
 
 static void
-_elm_popup_timeout(void *data, Evas_Object *obj, void *event_info)
+_elm_popup_timeout(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    evas_object_hide((Evas_Object*)data);
    evas_object_smart_callback_call((Evas_Object *)data, "response", (void *)ELM_POPUP_RESPONSE_TIMEOUT);
@@ -261,7 +261,7 @@ _elm_signal_exit(void *data __UNUSED__, int ev_type __UNUSED__, void *ev __UNUSE
 }
 
 static void
-response_cb(void *data, Evas_Object *obj, void *event_info)
+response_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 {
    int res_id = (int) event_info;
    int *id = data;

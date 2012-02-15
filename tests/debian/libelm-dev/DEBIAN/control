@@ -1,0 +1,12 @@
+Package: libelm-dev
+Source: elementary
+Version: 1.0.0+svn.61256slp2+build117
+Architecture: armel
+Maintainer: Jaehwan Kim <jae.hwan.kim@samsung.com>, Chuneon Park <chuneon.park@samsung.com>, Juyung Seo <juyung.seo@samsung.com>, Myungjae Lee <mjae.lee@samsung.com>, Woohyun Jung <wh0705.jung@samsung.com>, Jihoon Kim <jihoon48.kim@samsung.com>, Jeonghyun Yun <jh0506.yun@samsung.com>, Seunggyun Kim <sgyun.kim@samsung.com>, Shinwoo Kim <cinoo.kim@samsung.com>
+Installed-Size: 5640
+Depends: libelm (= 1.0.0+svn.61256slp2+build117), libecore-dev, libevas-dev, libeet-dev, libedje-dev, libedbus-dev, libefreet-dev, libethumb-dev
+Section: libdevel
+Priority: optional
+Homepage: http://www.enlightenment.org
+Description: Elementary - a basic widget set that is easy to use based on EFL for mobile
+ This package contains devel content.

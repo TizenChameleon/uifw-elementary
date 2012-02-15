@@ -35,22 +35,21 @@ static void _ellipsis_label_to_width(Evas_Object *obj);
 static void _label_sliding_change(Evas_Object *obj);
 
 static void
-_elm_win_recalc_job(void *data)
+_elm_recalc_job(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord minw = -1, minh = -1;
    Evas_Coord resw, resh;
-
    if (!wd) return;
+   evas_event_freeze(evas_object_evas_get(data));
    wd->deferred_recalc_job = NULL;
-
    evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
    if (wd->wrap_w > resw)
      resw = wd->wrap_w;
    if (wd->wrap_h > resh)
      resh = wd->wrap_h;
 
-   if (wd->wrap_h == -1) /* open source routine */
+   if (wd->wrap_h == -1) /* open source routine  */
      {
         edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, resw, 0);
         /* This is a hack to workaround the way min size hints are treated.
@@ -72,19 +71,20 @@ _elm_win_recalc_job(void *data)
              evas_object_size_hint_min_get(data, NULL, &ominh);
              minh = ominh;
           }
+        evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
+        minw = resw;
+        if (minh > wd->wrap_h)
+          minh = wd->wrap_h;
 
-		evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
-		minw = resw;
-		if (minh > wd->wrap_h)
-			minh = wd->wrap_h;
      }
-
    evas_object_size_hint_min_set(data, minw, minh);
    evas_object_size_hint_max_set(data, wd->wrap_w, wd->wrap_h);
 
    if ((wd->ellipsis) && (wd->linewrap) && (wd->wrap_h > 0) &&
        (_is_width_over(data) == 1))
      _ellipsis_label_to_width(data);
+   evas_event_thaw(evas_object_evas_get(data));
+   evas_event_thaw_eval(evas_object_evas_get(data));
 }
 
 static void
@@ -92,10 +92,13 @@ _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   evas_event_freeze(evas_object_evas_get(obj));
    if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
    if (wd->label) eina_stringshare_del(wd->label);
    if (wd->bg) evas_object_del(wd->bg);
    free(wd);
+   evas_event_thaw(evas_object_evas_get(obj));
+   evas_event_thaw_eval(evas_object_evas_get(obj));
 }
 
 static void
@@ -121,15 +124,18 @@ _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+   evas_event_freeze(evas_object_evas_get(obj));
    _elm_widget_mirrored_reload(obj);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _theme_change(obj);
-   edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-   edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+   edje_object_part_text_style_user_set(wd->lbl, "elm.text", wd->format);
+   edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    edje_object_scale_set(wd->lbl, elm_widget_scale_get(obj) *
                          _elm_config->scale);
    _label_sliding_change(obj);
    _sizing_eval(obj);
+   evas_event_thaw(evas_object_evas_get(obj));
+   evas_event_thaw_eval(evas_object_evas_get(obj));
 }
 
 static void
@@ -146,13 +152,14 @@ _sizing_eval(Evas_Object *obj)
         if ((resw == wd->lastw) && (!wd->changed)) return;
         wd->changed = EINA_FALSE;
         wd->lastw = resw;
-        _elm_win_recalc_job(obj);
+        _elm_recalc_job(obj);
         // FIXME: works ok. but NOT for genlist. what should genlist do?
         //        if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
-        //        wd->deferred_recalc_job = ecore_job_add(_elm_win_recalc_job, obj);
+        //        wd->deferred_recalc_job = ecore_job_add(_elm_recalc_job, obj);
      }
    else
      {
+        evas_event_freeze(evas_object_evas_get(obj));
         evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
         edje_object_size_min_calc(wd->lbl, &minw, &minh);
         if (wd->wrap_w > 0 && minw > wd->wrap_w) minw = wd->wrap_w;
@@ -161,6 +168,8 @@ _sizing_eval(Evas_Object *obj)
         evas_object_size_hint_max_set(obj, wd->wrap_w, wd->wrap_h);
         if ((wd->ellipsis) && (_is_width_over(obj) == 1))
           _ellipsis_label_to_width(obj);
+        evas_event_thaw(evas_object_evas_get(obj));
+        evas_event_thaw_eval(evas_object_evas_get(obj));
      }
 }
 
@@ -236,106 +245,48 @@ _get_value_in_key_string(const char *oldstring, const char *key, char **value)
    return -1;
 }
 
-
 static int
 _strbuf_key_value_replace(Eina_Strbuf *srcbuf, const char *key, const char *value, int deleteflag)
 {
+   char *kvalue;
    const char *srcstring = NULL;
-   Eina_Strbuf *repbuf = NULL, *diffbuf = NULL;
-   char *curlocater, *replocater;
-   char *starttag, *endtag;
-   int tagtxtlen = 0, insertflag = 0;
 
    srcstring = eina_strbuf_string_get(srcbuf);
-   curlocater = strstr(srcstring, key);
 
-   if (!curlocater)
-     insertflag = 1;
-   else
+   if (_get_value_in_key_string(srcstring, key, &kvalue) == 0)
      {
-        int key_len = strlen(key);
-        do
-          {
-             starttag = strchr(srcstring, '<');
-             endtag = strchr(srcstring, '>');
-             tagtxtlen = endtag - starttag;
-             if (tagtxtlen <= 0) tagtxtlen = 0;
-             if ((starttag < curlocater) && (curlocater < endtag)) break;
-             if ((endtag) && ((endtag + 1)))
-               srcstring = endtag + 1;
-             else
-               break;
-          } while (strlen(srcstring) > 1);
+        const char *val_end;
+        int val_end_idx = 0;
+        int key_start_idx = 0;
+        val_end = strchr(kvalue, ' ');
 
-        if ((starttag) && (endtag) && (tagtxtlen > key_len))
-          {
-             char *eqchar = NULL;
-             repbuf = eina_strbuf_new();
-             diffbuf = eina_strbuf_new();
-             eina_strbuf_append_n(repbuf, starttag, tagtxtlen);
-             srcstring = eina_strbuf_string_get(repbuf);
-             curlocater = strstr(srcstring, key);
-             // key=value
-             //    ^ : move to here
-             eqchar = curlocater + key_len;
-             if ((curlocater) && (eqchar))
-               {
-                  // some case at useless many whitespaces (key  =value)
-                  // find the separator(=) position
-                  eqchar = strchr(curlocater + key_len, '=');
-                  if (eqchar)
-                    {
-                       // key=value
-                       //     ^ : move to here
-                       replocater = eqchar + 1;
-                       while ((*replocater) &&
-                              (*replocater != ' ') &&
-                              (*replocater != '>'))
-                         replocater++;
-
-                       if ((replocater - curlocater) > key_len)
-                         eina_strbuf_append_n(diffbuf, curlocater,
-                                              replocater-curlocater);
-                       else
-                         insertflag = 1;
-                    }
-                  else
-                    insertflag = 1;
-               }
-             else
-               insertflag = 1;
-             eina_strbuf_reset(repbuf);
-          }
+        if (val_end)
+           val_end_idx = val_end - srcstring;
         else
-          insertflag = 1;
-     }
+           val_end_idx = kvalue - srcstring + strlen(kvalue) - 1;
 
-   if (!repbuf) repbuf = eina_strbuf_new();
-   if (!diffbuf) diffbuf = eina_strbuf_new();
-
-   if (insertflag)
-     {
-        eina_strbuf_append_printf(repbuf, "<%s=%s>", key, value);
-        eina_strbuf_prepend(srcbuf, eina_strbuf_string_get(repbuf));
-     }
-   else
-     {
-        if (deleteflag)
+        /* -1 is because of the '=' */
+        key_start_idx = kvalue - srcstring - 1 - strlen(key);
+        eina_strbuf_remove(srcbuf, key_start_idx, val_end_idx);
+        if (!deleteflag)
           {
-             eina_strbuf_prepend(diffbuf, "<");
-             eina_strbuf_append(diffbuf, ">");
-             eina_strbuf_replace_first(srcbuf, eina_strbuf_string_get(diffbuf), "");
+             eina_strbuf_insert_printf(srcbuf, "%s=%s", key_start_idx, key,
+                   value);
+          }
+     }
+   else if (!deleteflag)
+     {
+        if (*srcstring)
+          {
+             /* -1 because we want it before the ' */
+             eina_strbuf_insert_printf(srcbuf, " %s=%s",
+                   eina_strbuf_length_get(srcbuf) - 1, key, value);
           }
         else
           {
-             eina_strbuf_append_printf(repbuf, "%s=%s", key, value);
-             eina_strbuf_replace_first(srcbuf, eina_strbuf_string_get(diffbuf), eina_strbuf_string_get(repbuf));
+             eina_strbuf_append_printf(srcbuf, "DEFAULT='%s=%s'", key, value);
           }
      }
-
-   if (repbuf) eina_strbuf_free(repbuf);
-   if (diffbuf) eina_strbuf_free(diffbuf);
-
    return 0;
 }
 
@@ -362,6 +313,7 @@ _is_width_over(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return 0;
 
+   evas_event_freeze(evas_object_evas_get(obj));
    edje_object_part_geometry_get(wd->lbl, "elm.text", &x, &y, NULL, NULL);
    /* Calc the formatted size with ellipsis turned off */
    if (wd->ellipsis)
@@ -379,8 +331,9 @@ _is_width_over(Evas_Object *obj)
         if (_stringshare_key_value_replace(&wd->format,
                  "ellipsis", NULL, 1) == 0)
           {
-             edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-             edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+             edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+                   wd->format);
+             edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
           }
 
         tb = edje_object_part_object_get(wd->lbl, "elm.text");
@@ -394,8 +347,9 @@ _is_width_over(Evas_Object *obj)
              if (_stringshare_key_value_replace(&wd->format, "ellipsis",
                       eina_strbuf_string_get(elpbuf), 0) == 0)
                {
-                  edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-                  edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+                  edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+                        wd->format);
+                  edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
                }
              eina_strbuf_free(elpbuf);
           }
@@ -407,6 +361,8 @@ _is_width_over(Evas_Object *obj)
         evas_object_textblock_size_formatted_get(tb, &w, &h);
      }
    evas_object_geometry_get(obj, &vx, &vy, &vw, &vh);
+   evas_event_thaw(evas_object_evas_get(obj));
+   evas_event_thaw_eval(evas_object_evas_get(obj));
 
    if (w > wd->wrap_w || h > wd->wrap_h)
       return 1;
@@ -428,8 +384,9 @@ _ellipsis_fontsize_set(Evas_Object *obj, int fontsize)
 
    if (_stringshare_key_value_replace(&wd->format, "font_size", eina_strbuf_string_get(fontbuf), removeflag) == 0)
      {
-        edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-        edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+              wd->format);
+        edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
      }
    eina_strbuf_free(fontbuf);
 }
@@ -444,6 +401,7 @@ _ellipsis_label_to_width(Evas_Object *obj)
    const char *minfont, *deffont, *maxfont;
    int minfontsize, maxfontsize;
 
+   evas_event_freeze(evas_object_evas_get(obj));
    minfont = edje_object_data_get(wd->lbl, "min_font_size");
    if (minfont) minfontsize = atoi(minfont);
    else minfontsize = 1;
@@ -461,25 +419,8 @@ _ellipsis_label_to_width(Evas_Object *obj)
         if (kvalue != NULL) cur_fontsize = atoi(kvalue);
      }
 
-   /* TODO : Remove ellipsis logic in elm_lable and use ellipsis feature in evas textblock */
-   _ellipsis_fontsize_set(obj, cur_fontsize);
-   return;
-
-/*
-   while (_is_width_over(obj))
-     {
-        if (cur_fontsize > minfontsize)
-          {
-             cur_fontsize -= 3;
-             if (cur_fontsize < minfontsize) cur_fontsize = minfontsize;
-             _ellipsis_fontsize_set(obj, cur_fontsize);
-          }
-        else
-          {
-             break;
-          }
-     }
-*/
+   evas_event_thaw(evas_object_evas_get(obj));
+   evas_event_thaw_eval(evas_object_evas_get(obj));
 }
 
 static void
@@ -546,8 +487,9 @@ _elm_label_label_set(Evas_Object *obj, const char *item, const char *label)
    if (item && strcmp(item, "default")) return;
    if (!label) label = "";
    eina_stringshare_replace(&wd->label, label);
-   edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-   edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+   edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+         wd->format);
+   edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    wd->changed = 1;
    _sizing_eval(obj);
 }
@@ -604,11 +546,11 @@ elm_label_add(Evas_Object *parent)
    _elm_theme_object_set(obj, wd->lbl, "label", "base", "default");
    wd->format = eina_stringshare_add("");
    wd->label = eina_stringshare_add("<br>");
-   edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-   edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
 
+   edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+         wd->format);
+   edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    elm_widget_resize_object_set(obj, wd->lbl);
-
    evas_object_event_callback_add(wd->lbl, EVAS_CALLBACK_RESIZE, _lbl_resize, obj);
 
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
@@ -662,8 +604,9 @@ elm_label_line_wrap_set(Evas_Object *obj, Elm_Wrap_Type wrap)
    if (_stringshare_key_value_replace(&wd->format,
             "wrap", wrap_str, 0) == 0)
      {
-        edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-        edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+              wd->format);
+        edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
         _sizing_eval(obj);
      }
@@ -688,8 +631,9 @@ elm_label_wrap_width_set(Evas_Object *obj, Evas_Coord w)
    if (wd->wrap_w == w) return;
    if (wd->ellipsis)
      {
-        edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-        edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+              wd->format);
+        edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
      }
    wd->wrap_w = w;
    _sizing_eval(obj);
@@ -715,8 +659,9 @@ elm_label_wrap_height_set(Evas_Object *obj,
    if (wd->wrap_h == h) return;
    if (wd->ellipsis)
      {
-        edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-        edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+              wd->format);
+        edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
      }
    wd->wrap_h = h;
    _sizing_eval(obj);
@@ -750,8 +695,9 @@ elm_label_fontsize_set(Evas_Object *obj, int fontsize)
 
    if (_stringshare_key_value_replace(&wd->format, "font_size", eina_strbuf_string_get(fontbuf), removeflag) == 0)
      {
-        edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-        edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+              wd->format);
+        edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
         _sizing_eval(obj);
      }
@@ -772,8 +718,9 @@ elm_label_text_align_set(Evas_Object *obj, const char *alignmode)
 
    if (_stringshare_key_value_replace(&wd->format, "align", alignmode, 0) == 0)
      {
-        edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-        edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+              wd->format);
+        edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
      }
 
    wd->changed = 1;
@@ -801,8 +748,9 @@ elm_label_text_color_set(Evas_Object *obj,
 
    if (_stringshare_key_value_replace(&wd->format, "color", eina_strbuf_string_get(colorbuf), 0) == 0)
      {
-        edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-        edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+              wd->format);
+        edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
         _sizing_eval(obj);
      }
@@ -821,6 +769,7 @@ elm_label_background_color_set(Evas_Object *obj,
    if (!wd) return;
    evas_object_color_set(wd->bg, r, g, b, a);
 
+   if (!wd) return;
    _elm_dangerous_call_check(__FUNCTION__);
    if (wd->bgcolor == EINA_FALSE)
      {
@@ -851,8 +800,9 @@ elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
    if (_stringshare_key_value_replace(&wd->format,
             "ellipsis", eina_strbuf_string_get(fontbuf), removeflag) == 0)
      {
-        edje_object_part_text_set(wd->lbl, "elm.text", wd->format);
-        edje_object_part_text_append(wd->lbl, "elm.text", wd->label);
+        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+              wd->format);
+        edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
         _sizing_eval(obj);
      }

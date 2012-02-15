@@ -1,0 +1,15 @@
+cde8b26676ee680fef2c89af5d49ef1f  usr/lib/debug/usr/bin/elementary_config
+bf35ca30554a39b08314e67cc98e9ab4  usr/lib/debug/usr/bin/elementary_test
+096ee58011471a8790beba4105d78467  usr/lib/debug/usr/lib/edje/modules/elm/linux-gnueabi-arm-1.0.0/module.so
+b2960400fdb2a977c6c17391cb215b0d  usr/lib/debug/usr/lib/elementary/modules/access_output/linux-gnueabi-arm-0.8.0/module.so
+937c823668488244a3cd6e50d36f176b  usr/lib/debug/usr/lib/elementary/modules/ctxpopup_copypasteUI/linux-gnueabi-arm-0.8.0/module.so
+6569b46b005d9b0358d1b7f0ce2d7766  usr/lib/debug/usr/lib/elementary/modules/test_entry/linux-gnueabi-arm-0.8.0/module.so
+60ae76fa773e8c64c69c8ef71012a710  usr/lib/debug/usr/lib/elementary/modules/test_map/linux-gnueabi-arm-0.8.0/module.so
+f27f84780504cca903a7b3da17c7929e  usr/lib/debug/usr/lib/elementary_testql.so
+eb50b298715271d69a6703bad3501392  usr/lib/debug/usr/lib/libelementary-ver-pre-svn-09.so.0.8.0
+4d72ab4c86a86e73145deda182c91f58  usr/share/doc/libelm-dbg/AUTHORS
+d761c4dc50ab66bbbfcd959baf9f8ccb  usr/share/doc/libelm-dbg/README
+c7a3cfd3d84b2425d6de76209ad2fdce  usr/share/doc/libelm-dbg/TODO
+52554f792dc66f2b43a80fec480f84c0  usr/share/doc/libelm-dbg/buildinfo.gz
+da035c3284087b16fe43d065c92d76dc  usr/share/doc/libelm-dbg/changelog.gz
+bde499ea7659680a723e2ff29cdc8b68  usr/share/doc/libelm-dbg/copyright

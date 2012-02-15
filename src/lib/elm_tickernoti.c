@@ -76,8 +76,6 @@ _theme_hook(Evas_Object *obj)
    _elm_theme_object_set(wd->win, wd->edje_obj, "tickernoti",
                           "base", elm_widget_style_get(obj));
 
-   edje_object_scale_set(wd->edje_obj, elm_widget_scale_get(obj) * _elm_config->scale);
-
    /* tickernoti detail height set */
    data_win_height = (char *)edje_object_data_get(wd->edje_obj, "height");
    if (data_win_height != NULL && elm_scale_get() > 0.0)
@@ -86,14 +84,9 @@ _theme_hook(Evas_Object *obj)
    evas_object_geometry_get(wd->win, NULL, NULL, &w, NULL);
    evas_object_resize(wd->win, w, wd->noti_height);
 
-   if (wd->label)
-     edje_object_part_text_set(wd->edje_obj, "elm.text", wd->label);
-   if (wd->icon)
-     edje_object_part_swallow(wd->edje_obj, "icon", wd->icon);
-   if (wd->button)
-     edje_object_part_swallow(wd->edje_obj, "button", wd->button);
-   edje_object_signal_emit(wd->edje_obj, "effect,show", "elm");
+   edje_object_signal_emit(wd->edje_obj, "effect,show", "elm");/*goes too late*/
    edje_object_message_signal_process(wd->edje_obj);
+   edje_object_scale_set(wd->edje_obj, elm_widget_scale_get(obj) * _elm_config->scale);
 
    _sizing_eval(obj);
 }
@@ -563,7 +556,8 @@ elm_tickernoti_rotation_set(Evas_Object *obj, int angle)
    angle %= 360;
    if (angle < 0) angle += 360;
    wd->angle = angle;
-   elm_win_rotation_with_resize_set (wd->win, angle);
+   elm_win_rotation_set(wd->win, angle);
+   _win_rotated(obj);
 }
 
 EAPI void

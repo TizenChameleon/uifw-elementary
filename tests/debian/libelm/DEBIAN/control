@@ -1,0 +1,12 @@
+Package: libelm
+Source: elementary
+Version: 1.0.0+svn.61256slp2+build117
+Architecture: armel
+Maintainer: Jaehwan Kim <jae.hwan.kim@samsung.com>, Chuneon Park <chuneon.park@samsung.com>, Juyung Seo <juyung.seo@samsung.com>, Myungjae Lee <mjae.lee@samsung.com>, Woohyun Jung <wh0705.jung@samsung.com>, Jihoon Kim <jihoon48.kim@samsung.com>, Jeonghyun Yun <jh0506.yun@samsung.com>, Seunggyun Kim <sgyun.kim@samsung.com>, Shinwoo Kim <cinoo.kim@samsung.com>
+Installed-Size: 7512
+Depends: libappsvc-0, libc6 (>= 2.4), libecore, libecore-con, libecore-evas, libecore-file, libecore-imf, libecore-x, libedbus (>= 0.5.0.060+svn20100304), libedje (>= 0.9.9.060+svn20100304), libeet1 (>= 1.5.0+svn.66958slp2+build01), libefreet, libeina (>= 1.0.0.001+svn20100831), libethumb, libevas (>= 0.9.9.060+svn20100203), libgcc1 (>= 1:4.4.0)
+Section: x11
+Priority: optional
+Homepage: http://www.enlightenment.org
+Description: Elementary - a basic widget set that is easy to use based on EFL for mobile
+ This package contains a widget toolkit.

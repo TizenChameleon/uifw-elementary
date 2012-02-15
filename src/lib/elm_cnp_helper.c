@@ -4,7 +4,9 @@
 #include <Elementary.h>
 #include "elm_priv.h"
 
-#include <sys/mman.h>
+#ifdef HAVE_MMAN_H
+# include <sys/mman.h>
+#endif
 
 #ifdef HAVE_ELEMENTARY_X
 
@@ -71,19 +73,19 @@ struct _Paste_Image
 
 struct _Cnp_Selection
 {
-   const char      *debug;
-   Evas_Object     *widget;
-   char            *selbuf;
-   Evas_Object     *requestwidget;
-   void            *udata;
-   Elm_Sel_Format   requestformat;
-   Elm_Drop_Cb      datacb;
+   const char          *debug;
+   Evas_Object         *widget;
+   char                *selbuf;
+   Evas_Object         *requestwidget;
+   void                *udata;
+   Elm_Sel_Format  requestformat;
+   Elm_Drop_Cb          datacb;
    Eina_Bool      (*set)     (Ecore_X_Window, const void *data, int size);
    Eina_Bool      (*clear)   (void);
    void           (*request) (Ecore_X_Window, const char *target);
 
-   Elm_Sel_Format    format;
-   Ecore_X_Selection ecore_sel;
+   Elm_Sel_Format  format;
+   Ecore_X_Selection    ecore_sel;
 
    Eina_Bool         active : 1;
 };
@@ -91,7 +93,7 @@ struct _Cnp_Selection
 struct _Escape
 {
    const char *escape;
-   const char  *value;
+   const char *value;
 };
 
 struct _Tmp_Info
@@ -105,7 +107,7 @@ struct _Tmp_Info
 struct _Cnp_Atom
 {
    const char          *name;
-   Elm_Sel_Format       formats;
+   Elm_Sel_Format  formats;
    /* Called by ecore to do conversion */
    Converter_Fn_Cb      converter;
    Response_Handler_Cb  response;
@@ -125,11 +127,11 @@ struct _Saved_Type
 
 struct _Dropable
 {
-   Evas_Object     *obj;
+   Evas_Object         *obj;
    /* FIXME: Cache window */
-   Elm_Sel_Format   types;
-   Elm_Drop_Cb      dropcb;
-   void            *cbdata;
+   Elm_Sel_Format  types;
+   Elm_Drop_Cb          dropcb;
+   void                *cbdata;
 };
 
 static Tmp_Info *elm_cnp_tempfile_create(int size);
@@ -170,9 +172,9 @@ static void entry_insert_filter(Evas_Object* entry, char* str);
 /* Optimisation: Turn this into a 256 byte table:
  *	then can lookup in one index, not N checks */
 static const Escape escapes[] = {
-  { "<ps>",  _PARAGRAPH_SEPARATOR },
-  { "<br>",  "\n" },
-  { "<\t>",  "\t" },
+  { "<ps/>",  _PARAGRAPH_SEPARATOR },
+  { "<br/>",  "\n" },
+  { "<\t/>",  "\t" },
   { "&gt;",   ">" },
   { "&lt;",    "<" },
   { "&amp;",   "&" },
@@ -184,7 +186,15 @@ static const Escape escapes[] = {
 static Cnp_Atom atoms[CNP_N_ATOMS] = {
      [CNP_ATOM_TARGETS] = {
           "TARGETS",
-          (Elm_Sel_Format) -1, // everything
+          ELM_SEL_FORMAT_TARGETS,
+          targets_converter,
+          response_handler_targets,
+          notify_handler_targets,
+          0
+     },
+     [CNP_ATOM_ATOM] = {
+          "ATOM", // for opera browser
+          ELM_SEL_FORMAT_TARGETS,
           targets_converter,
           response_handler_targets,
           notify_handler_targets,
@@ -358,29 +368,29 @@ static Cnp_Atom atoms[CNP_N_ATOMS] = {
      },
 };
 
-static Cnp_Selection selections[ELM_SEL_MAX] = {
-     ARRAYINIT(ELM_SEL_PRIMARY) {
+static Cnp_Selection selections[ELM_SEL_TYPE_MAX] = {
+     ARRAYINIT(ELM_SEL_TYPE_PRIMARY) {
           .debug = "Primary",
           .ecore_sel = ECORE_X_SELECTION_PRIMARY,
           .set = ecore_x_selection_primary_set,
           .clear = ecore_x_selection_primary_clear,
           .request = ecore_x_selection_primary_request,
      },
-     ARRAYINIT(ELM_SEL_SECONDARY) {
+     ARRAYINIT(ELM_SEL_TYPE_SECONDARY) {
           .debug = "Secondary",
           .ecore_sel = ECORE_X_SELECTION_SECONDARY,
           .set = ecore_x_selection_secondary_set,
           .clear = ecore_x_selection_secondary_clear,
           .request = ecore_x_selection_secondary_request,
      },
-     ARRAYINIT(ELM_SEL_CLIPBOARD) {
+     ARRAYINIT(ELM_SEL_TYPE_CLIPBOARD) {
           .debug = "Clipboard",
           .ecore_sel = ECORE_X_SELECTION_CLIPBOARD,
           .set = ecore_x_selection_clipboard_set,
           .clear = ecore_x_selection_clipboard_clear,
           .request = ecore_x_selection_clipboard_request,
      },
-     ARRAYINIT(ELM_SEL_XDND) {
+     ARRAYINIT(ELM_SEL_TYPE_XDND) {
           .debug = "XDnD",
           .ecore_sel = ECORE_X_SELECTION_XDND,
           .request = ecore_x_selection_xdnd_request,
@@ -426,7 +436,8 @@ elm_selection_selection_has_owner(void)
 }
 
 Eina_Bool
-elm_selection_set(Elm_Sel_Type selection, Evas_Object *widget, Elm_Sel_Format format, const char *selbuf)
+elm_cnp_selection_set(Elm_Sel_Type selection, Evas_Object *widget,
+                      Elm_Sel_Format format, const void *selbuf, size_t buflen)
 {
 #ifdef HAVE_ELEMENTARY_X
    Evas_Object *top = elm_widget_top_get(widget);
@@ -435,20 +446,31 @@ elm_selection_set(Elm_Sel_Type selection, Evas_Object *widget, Elm_Sel_Format fo
 
    if (top) xwin = elm_win_xwindow_get(top);
    else xwin = elm_win_xwindow_get(widget);
-   if (!xwin) return EINA_FALSE;
-   if ((unsigned int)selection >= (unsigned int)ELM_SEL_MAX) return EINA_FALSE;
+   if ((!xwin) || (selection >= ELM_SEL_TYPE_MAX))
+     return EINA_FALSE;
    if (!_elm_cnp_init_count) _elm_cnp_init();
    if ((!selbuf) && (format != ELM_SEL_FORMAT_IMAGE))
-     return elm_selection_clear(selection, widget);
+     return elm_cnp_selection_clear(selection, widget);
 
    sel = selections + selection;
 
-   sel->active = 1;
+   sel->active = EINA_TRUE;
    sel->widget = widget;
-
    sel->set(xwin, &selection, sizeof(Elm_Sel_Type));
    sel->format = format;
-   sel->selbuf = selbuf ? strdup(selbuf) : NULL;
+
+   if (selbuf)
+     {
+        if (format == ELM_SEL_FORMAT_IMAGE)
+          {
+             sel->selbuf = malloc(buflen+1);
+             memcpy(sel->selbuf, selbuf, buflen);
+          }
+        else
+          sel->selbuf = strdup((char*)selbuf);
+     }
+   else
+     sel->selbuf = NULL;
 
    return EINA_TRUE;
 #else
@@ -457,12 +479,13 @@ elm_selection_set(Elm_Sel_Type selection, Evas_Object *widget, Elm_Sel_Format fo
 }
 
 Eina_Bool
-elm_selection_clear(Elm_Sel_Type selection, Evas_Object *widget)
+elm_cnp_selection_clear(Elm_Sel_Type selection, Evas_Object *widget)
 {
 #ifdef HAVE_ELEMENTARY_X
    Cnp_Selection *sel;
 
-   if ((unsigned int)selection >= (unsigned int)ELM_SEL_MAX) return EINA_FALSE;
+   if ((unsigned int)selection >= (unsigned int)ELM_SEL_TYPE_MAX)
+     return EINA_FALSE;
    if (!_elm_cnp_init_count) _elm_cnp_init();
 
    sel = selections + selection;
@@ -470,8 +493,13 @@ elm_selection_clear(Elm_Sel_Type selection, Evas_Object *widget)
    /* No longer this selection: Consider it gone! */
    if ((!sel->active) || (sel->widget != widget)) return EINA_TRUE;
 
-   sel->active = 0;
+   sel->active = EINA_FALSE;
    sel->widget = NULL;
+   if (sel->selbuf)
+     {
+        free(sel->selbuf);
+        sel->selbuf = NULL;
+     }
    sel->clear();
 
    return EINA_TRUE;
@@ -481,14 +509,15 @@ elm_selection_clear(Elm_Sel_Type selection, Evas_Object *widget)
 }
 
 Eina_Bool
-elm_selection_get(Elm_Sel_Type selection, Elm_Sel_Format format,
-                  Evas_Object *widget, Elm_Drop_Cb datacb, void *udata)
+elm_cnp_selection_get(Elm_Sel_Type selection, Elm_Sel_Format format,
+                      Evas_Object *widget, Elm_Drop_Cb datacb, void *udata)
 {
 #ifdef HAVE_ELEMENTARY_X
    Evas_Object *top;
    Cnp_Selection *sel;
 
-   if ((unsigned int)selection >= (unsigned int)ELM_SEL_MAX) return EINA_FALSE;
+   if (selection >= ELM_SEL_TYPE_MAX)
+     return EINA_FALSE;
    if (!_elm_cnp_init_count) _elm_cnp_init();
 
    sel = selections + selection;
@@ -521,7 +550,6 @@ _elm_cnp_init(void)
         ecore_x_selection_converter_atom_add(atoms[i].atom,
                                              atoms[i].converter);
      }
-
    ecore_event_handler_add(ECORE_X_EVENT_SELECTION_CLEAR, selection_clear, NULL);
    ecore_event_handler_add(ECORE_X_EVENT_SELECTION_NOTIFY, selection_notify, NULL);
 
@@ -536,18 +564,22 @@ selection_clear(void *udata __UNUSED__, int type __UNUSED__, void *event)
    Cnp_Selection *sel;
    int i;
 
-   for (i = 0; i < ELM_SEL_MAX; i++)
+   for (i = 0; i < ELM_SEL_TYPE_MAX; i++)
      {
         if (selections[i].ecore_sel == ev->selection) break;
      }
    cnp_debug("selection %d clear\n", i);
    /* Not me... Don't care */
-   if (i == ELM_SEL_MAX) return ECORE_CALLBACK_PASS_ON;
+   if (i == ELM_SEL_TYPE_MAX) return ECORE_CALLBACK_PASS_ON;
 
    sel = selections + i;
-   sel->active = 0;
+   sel->active = EINA_FALSE;
    sel->widget = NULL;
-   sel->selbuf = NULL;
+   if (sel->selbuf)
+     {
+        free(sel->selbuf);
+        sel->selbuf = NULL;
+     }
 
    return ECORE_CALLBACK_PASS_ON;
 }
@@ -570,16 +602,16 @@ selection_notify(void *udata __UNUSED__, int type __UNUSED__, void *event)
    switch (ev->selection)
      {
       case ECORE_X_SELECTION_CLIPBOARD:
-         sel = selections + ELM_SEL_CLIPBOARD;
+         sel = selections + ELM_SEL_TYPE_CLIPBOARD;
          break;
       case ECORE_X_SELECTION_PRIMARY:
-         sel = selections + ELM_SEL_PRIMARY;
+         sel = selections + ELM_SEL_TYPE_PRIMARY;
          break;
       case ECORE_X_SELECTION_SECONDARY:
-         sel = selections + ELM_SEL_SECONDARY;
+         sel = selections + ELM_SEL_TYPE_SECONDARY;
          break;
       case ECORE_X_SELECTION_XDND:
-         sel = selections + ELM_SEL_XDND;
+         sel = selections + ELM_SEL_TYPE_XDND;
          break;
       default:
          return ECORE_CALLBACK_PASS_ON;
@@ -605,7 +637,19 @@ selection_notify(void *udata __UNUSED__, int type __UNUSED__, void *event)
    return ECORE_CALLBACK_PASS_ON;
 }
 
-
+static Elm_Sel_Format
+_get_selection_type(void *data, int size)
+{
+   if (size == sizeof(Elm_Sel_Type))
+     {
+        Cnp_Selection *sel = selections + *((int *)data);
+        if (sel->active &&
+            (sel->format >= ELM_SEL_FORMAT_TARGETS) &&
+            (sel->format < ELM_SEL_FORMAT_MAX))
+          return sel->format;
+     }
+   return ELM_SEL_FORMAT_NONE;
+}
 
 static Eina_Bool
 targets_converter(char *target __UNUSED__, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype, int *typesize)
@@ -613,34 +657,33 @@ targets_converter(char *target __UNUSED__, void *data, int size, void **data_ret
    int i,count;
    Ecore_X_Atom *aret;
    Cnp_Selection *sel;
+   Elm_Sel_Format seltype;
 
    if (!data_ret) return EINA_FALSE;
 
-   if (size != sizeof(int))
-     {
-        if (data_ret)
-          {
-             *data_ret = malloc(size * sizeof(char) + 1);
-             memcpy(*data_ret, data, size);
-             ((char**)(data_ret))[0][size] = 0;
-          }
-        if (size_ret) *size_ret = size;
-        return EINA_TRUE;
-     }
-
-   if (!data || (*((unsigned int *)data) >= ELM_SEL_MAX))
+   if (!data || (*((unsigned int *)data) >= ELM_SEL_TYPE_MAX))
      return EINA_FALSE;
-   sel = selections + *((int *)data);
+
+   if (_get_selection_type(data, size) == ELM_SEL_FORMAT_NONE)
+     {
+        /* TODO : fallback into precise type */
+        seltype = ELM_SEL_FORMAT_TEXT;
+     }
+   else
+     {
+        sel = selections + *((int *)data);
+        seltype = sel->format;
+     }
 
    for (i = 0, count = 0; i < CNP_N_ATOMS ; i++)
      {
-        if (sel->format & atoms[i].formats) count++;
+        if (seltype & atoms[i].formats) count++;
      }
 
    aret = malloc(sizeof(Ecore_X_Atom) * count);
    for (i = 0, count = 0; i < CNP_N_ATOMS; i++)
      {
-        if (sel->format & atoms[i].formats) aret[count ++] = atoms[i].atom;
+        if (seltype & atoms[i].formats) aret[count ++] = atoms[i].atom;
      }
 
    *data_ret = aret;
@@ -665,7 +708,7 @@ vcard_send(char *target __UNUSED__, void *data __UNUSED__, int size __UNUSED__, 
 
    cnp_debug("Vcard send called\n");
 
-   if (!data || (*((unsigned int *)data) >= ELM_SEL_MAX))
+   if (!data || (*((unsigned int *)data) >= ELM_SEL_TYPE_MAX))
      return EINA_FALSE;
    sel = selections + *((int *)data);
 
@@ -685,9 +728,9 @@ is_uri_type_data(Cnp_Selection *sel __UNUSED__, Ecore_X_Event_Selection_Notify *
    data = notify->data;
    cnp_debug("data->format is %d %p %p\n", data->format, notify, data);
    if (data->content == ECORE_X_SELECTION_CONTENT_FILES) return EINA_TRUE;
-   else p = (char *)data->data;
-
+   p = (char *)data->data;
    if (!p) return EINA_TRUE;
+
    cnp_debug("Got %s\n", p);
    if (strncmp(p, "file://", 7))
      {
@@ -756,8 +799,7 @@ response_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *not
    targets = notify->data;
    atomlist = (Ecore_X_Atom *)(targets->data.data);
 
-   /* Start from 1: Skip targets */
-   for (j = 1 ; j < CNP_N_ATOMS ; j ++)
+   for (j = (CNP_ATOM_LISTING_ATOMS+1); j < CNP_N_ATOMS; j++)
      {
         if (!(atoms[j].formats & sel->requestformat)) continue;
         for (i = 0 ; i < targets->data.length ; i ++)
@@ -769,13 +811,10 @@ response_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *not
                }
           }
      }
-found:
-   if (j == CNP_N_ATOMS)
-     {
-        cnp_debug("No matching type found\n");
-        return 0;
-     }
+   cnp_debug("No matching type found\n");
+   return 0;
 
+found:
    top = elm_widget_top_get(sel->requestwidget);
    if (!top) return 0;
 
@@ -841,9 +880,7 @@ entry_insert_filter(Evas_Object* entry, char* str)
      }
    cnp_debug("remove break tag: %s\n", insertStr);
 
-   elm_entry_entry_insert(entry, insertStr);
-   // TODO:
-   //_elm_entry_entry_paste//
+   _elm_entry_entry_paste(entry, insertStr);
 
    if (insertStr != str)
      free(insertStr);
@@ -860,7 +897,6 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    if (sel->datacb)
      {
         Elm_Selection_Data ddata;
-        char *str = NULL;
         str = malloc(sizeof(char) * (data->length + 1));
         strncpy(str, (char *)data->data, data->length);
         str[data->length] = '\0';
@@ -878,7 +914,7 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    str = mark_up((char *)data->data, data->length, NULL);
    cnp_debug("String is %s (from %s)\n", str, data->data);
    entry_insert_filter(sel->requestwidget, str);
-   //elm_entry_entry_insert(sel->requestwidget, str);
+   //_elm_entry_entry_paste(sel->requestwidget, str);
    free(str);
    return 0;
 }
@@ -977,7 +1013,7 @@ vcard_receive(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    data = notify->data;
    cnp_debug("vcard receive\n");
 
-   if (sel == (selections + ELM_SEL_XDND))
+   if (sel == (selections + ELM_SEL_TYPE_XDND))
      {
         Elm_Selection_Data ddata;
 
@@ -1027,7 +1063,7 @@ notify_handler_image(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    Tmp_Info *tmp;
    Paste_Image *pi;
 
-   cnp_debug("got a png (or a jpeg)!\n");
+   cnp_debug("got a image file!\n");
    data = notify->data;
 
    cnp_debug("Size if %d\n", data->length);
@@ -1047,7 +1083,7 @@ notify_handler_image(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    /* generate tmp name */
    tmp = elm_cnp_tempfile_create(data->length);
    memcpy(tmp->map, data->data, data->length);
-   munmap(tmp->map,data->length);
+   munmap(tmp->map, data->length);
 
    /* FIXME: Add to paste image data to clean up */
    pi = pasteimage_alloc(tmp->filename, strlen(tmp->filename));
@@ -1080,7 +1116,7 @@ notify_handler_edje(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
      }
    else
      entry_insert_filter(sel->requestwidget, stripstr);
-     //elm_entry_entry_insert(sel->requestwidget, stripstr);
+     //_elm_entry_entry_paste(sel->requestwidget, stripstr);
 
    cnp_debug("String is %s (%d bytes)\n", stripstr, data->length);
    free(stripstr);
@@ -1116,7 +1152,7 @@ notify_handler_html(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
      }
    else
      entry_insert_filter(sel->requestwidget, stripstr);
-     //elm_entry_entry_insert(sel->requestwidget, stripstr);
+   //_elm_entry_entry_paste(sel->requestwidget, stripstr);
 
    cnp_debug("String is %s (%d bytes)\n", stripstr, data->length);
    free(stripstr);
@@ -1130,7 +1166,9 @@ text_converter(char *target __UNUSED__, void *data, int size, void **data_ret, i
    Cnp_Selection *sel;
 
    cnp_debug("text converter\n");
-   if (size != sizeof(int))
+   if (!data || (*((unsigned int *)data) >= ELM_SEL_TYPE_MAX))
+     return EINA_FALSE;
+   if (_get_selection_type(data, size) == ELM_SEL_FORMAT_NONE)
      {
         if (data_ret)
           {
@@ -1141,8 +1179,6 @@ text_converter(char *target __UNUSED__, void *data, int size, void **data_ret, i
         if (size_ret) *size_ret = size;
         return EINA_TRUE;
      }
-   if (!data || (*((unsigned int *)data) >= ELM_SEL_MAX))
-     return EINA_FALSE;
    sel = selections + *((int *)data);
    if (!sel->active) return EINA_TRUE;
 
@@ -1173,7 +1209,8 @@ text_converter(char *target __UNUSED__, void *data, int size, void **data_ret, i
      {
         cnp_debug("Image %s\n", evas_object_type_get(sel->widget));
         cnp_debug("Elm type: %s\n", elm_object_widget_type_get(sel->widget));
-        evas_object_image_file_get(elm_photocam_internal_image_get(sel->widget), (const char **)data_ret, NULL);
+        evas_object_image_file_get(elm_photocam_internal_image_get(sel->widget),
+                                   (const char **)data_ret, NULL);
         if (!*data_ret) *data_ret = strdup("No file");
         else *data_ret = strdup(*data_ret);
         *size_ret = strlen(*data_ret);
@@ -1184,17 +1221,7 @@ text_converter(char *target __UNUSED__, void *data, int size, void **data_ret, i
 static Eina_Bool
 general_converter(char *target __UNUSED__, void *data, int size, void **data_ret, int *size_ret, Ecore_X_Atom *ttype __UNUSED__, int *typesize __UNUSED__)
 {
-   if (size == sizeof(int))
-     {
-        Cnp_Selection *sel;
-        if (!data || (*((unsigned int *)data) >= ELM_SEL_MAX))
-          return EINA_FALSE;
-
-        sel = selections + *((int *)data);
-        if (data_ret) *data_ret = strdup(sel->selbuf);
-        if (size_ret) *size_ret = strlen(sel->selbuf);
-     }
-   else if (size)
+   if (_get_selection_type(data, size) == ELM_SEL_FORMAT_NONE)
      {
         if (data_ret)
           {
@@ -1203,6 +1230,16 @@ general_converter(char *target __UNUSED__, void *data, int size, void **data_ret
              ((char**)(data_ret))[0][size] = 0;
           }
         if (size_ret) *size_ret = size;
+     }
+   else
+     {
+        Cnp_Selection *sel;
+        if (!data || (*((unsigned int *)data) >= ELM_SEL_TYPE_MAX))
+          return EINA_FALSE;
+
+        sel = selections + *((int *)data);
+        if (data_ret) *data_ret = strdup(sel->selbuf);
+        if (size_ret) *size_ret = strlen(sel->selbuf);
      }
    return EINA_TRUE;
 }
@@ -1324,6 +1361,7 @@ pasteimage_append(Paste_Image *pi, Evas_Object *entry)
    entrytag = alloca(len + 1);
    snprintf(entrytag, len + 1, tagstring, pi->file);
    elm_entry_entry_insert(entry, entrytag);
+   //_elm_entry_entry_paste(entry, entrytag);
 
    return EINA_TRUE;
 }
@@ -1340,7 +1378,6 @@ entry_deleted(void *images __UNUSED__, Evas *e __UNUSED__, Evas_Object *entry, v
           pastedimages = eina_list_remove_list(pastedimages, l);
      }
 }
-
 
 static char *
 remove_tags(const char *p, int *len)
@@ -1498,7 +1535,7 @@ _dnd_enter(void *data __UNUSED__, int etype __UNUSED__, void *ev)
              cnp_debug("Sending uri request\n");
              savedtypes.textreq = 1;
              if (savedtypes.pi) pasteimage_free(savedtypes.pi);
-             savedtypes.pi = NULL; /* FIXME: Free? */
+             savedtypes.pi = NULL;
              ecore_x_selection_xdnd_request(enter->win, text_uri);
           }
      }
@@ -1642,9 +1679,9 @@ found:
      }
 
    cnp_debug("doing a request then\n");
-   selections[ELM_SEL_XDND].requestwidget = dropable->obj;
-   selections[ELM_SEL_XDND].requestformat = ELM_SEL_FORMAT_MARKUP;
-   selections[ELM_SEL_XDND].active = EINA_TRUE;
+   selections[ELM_SEL_TYPE_XDND].requestwidget = dropable->obj;
+   selections[ELM_SEL_TYPE_XDND].requestformat = ELM_SEL_FORMAT_MARKUP;
+   selections[ELM_SEL_TYPE_XDND].active = EINA_TRUE;
 
    ecore_x_selection_xdnd_request(xwin, atoms[i].name);
 
@@ -1812,13 +1849,15 @@ elm_drop_target_del(Evas_Object *obj)
 
 
 static void
-_drag_mouse_up(void *un __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *data __UNUSED__)
+_drag_mouse_up(void *un __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *data)
 {
+   Ecore_X_Window xwin = *((Ecore_X_Window *)data);
    evas_object_event_callback_del(obj, EVAS_CALLBACK_MOUSE_UP, _drag_mouse_up);
    ecore_x_dnd_drop();
+   ecore_x_dnd_aware_set(xwin, EINA_FALSE);
    if (dragdonecb)
      {
-        dragdonecb(dragdonecb,selections[ELM_SEL_XDND].widget);
+        dragdonecb(dragdonedata, selections[ELM_SEL_TYPE_XDND].widget);
         dragdonecb = NULL;
      }
    if (dragwin)
@@ -1842,7 +1881,7 @@ elm_drag_start(Evas_Object *obj, Elm_Sel_Format format, const char *data, void (
 {
    Ecore_X_Window xwin;
    Cnp_Selection *sel;
-   Elm_Sel_Type xdnd = ELM_SEL_XDND;
+   Elm_Sel_Type xdnd = ELM_SEL_TYPE_XDND;
    Ecore_Evas *ee;
    int x, y, x2, y2, x3, y3;
    Evas_Object *icon;
@@ -1854,30 +1893,37 @@ elm_drag_start(Evas_Object *obj, Elm_Sel_Format format, const char *data, void (
 
    cnp_debug("starting drag...\n");
 
-   ecore_x_dnd_type_set(xwin, "text/uri-list", 1);
-   sel = selections + ELM_SEL_XDND;
-   sel->active = 1;
+   if (dragwin)
+     {
+        cnp_debug("another obj is dragging...\n");
+        return EINA_FALSE;
+     }
+
+   ecore_x_dnd_type_set(xwin, "text/uri-list", EINA_TRUE);
+   sel = selections + ELM_SEL_TYPE_XDND;
+   sel->active = EINA_TRUE;
    sel->widget = obj;
    sel->format = format;
    sel->selbuf = data ? strdup(data) : NULL;
    dragdonecb = dragdone;
    dragdonedata = donecbdata;
 
+   ecore_x_dnd_aware_set(xwin, EINA_TRUE);
    ecore_x_dnd_callback_pos_update_set(_drag_move, NULL);
    ecore_x_dnd_begin(xwin, (unsigned char *)&xdnd, sizeof(Elm_Sel_Type));
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOUSE_UP,
-                                  _drag_mouse_up, NULL);
+                                  _drag_mouse_up, (uintptr_t *)xwin);
 
    handler_status = ecore_event_handler_add(ECORE_X_EVENT_XDND_STATUS,
                                             _dnd_status, NULL);
 
    dragwin = elm_win_add(NULL, "Elm Drag Object", ELM_WIN_UTILITY);
-   elm_win_override_set(dragwin, 1);
+   elm_win_override_set(dragwin, EINA_TRUE);
 
    /* FIXME: Images only */
    icon = elm_icon_add(dragwin);
    elm_icon_file_set(icon, data + 7, NULL); /* 7!? "file://" */
-   elm_win_resize_object_add(dragwin,icon);
+   elm_win_resize_object_add(dragwin, icon);
    evas_object_size_hint_weight_set(icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(icon, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
@@ -1904,6 +1950,7 @@ elm_drag_start(Evas_Object *obj, Elm_Sel_Format format, const char *data, void (
 static Tmp_Info *
 elm_cnp_tempfile_create(int size)
 {
+#ifdef HAVE_MMAN_H
    Tmp_Info *info;
    const char *tmppath;
    int len;
@@ -1980,6 +2027,10 @@ elm_cnp_tempfile_create(int size)
      }
 
    return info;
+#else
+   (void) size;
+   return NULL;
+#endif
 }
 
 
