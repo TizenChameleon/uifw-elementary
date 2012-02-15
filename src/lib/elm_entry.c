@@ -2425,7 +2425,7 @@ _signal_entry_paste_request(void *data, Evas_Object *obj __UNUSED__, const char 
                formats = ELM_SEL_FORMAT_TEXT;
              else if (wd->cnp_mode != ELM_CNP_MODE_NO_IMAGE)
                formats |= ELM_SEL_FORMAT_IMAGE;
-             elm_cnp_selection_get(ELM_SEL_CLIPBOARD, formats, data,
+             elm_cnp_selection_get(ELM_SEL_TYPE_CLIPBOARD, formats, data,
                                NULL, NULL);
           }
 #endif
