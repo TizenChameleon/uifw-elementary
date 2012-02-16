@@ -51,7 +51,7 @@ struct tet_testlist tet_testlist[] = {
 	{ NULL, 0 }
 };
 
-static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part )
+static char *_gl_text_get( const void *data, Evas_Object *obj, const char *part )
 {
 	int index = (int) data;
 
@@ -62,7 +62,7 @@ static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part
 }
 static void startup(void)
 {
-	Elm_Genlist_Item *item = NULL;
+	Elm_Object_Item *item = NULL;
 	int index = 0;
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
@@ -75,8 +75,8 @@ static void startup(void)
 	evas_object_size_hint_weight_set(genlist, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	elm_genlist_multi_select_set(genlist, EINA_TRUE);
 	itc.item_style = "1line_textonly";
-	itc.func.label_get = _gl_label_get;
-	itc.func.icon_get = NULL;
+	itc.func.text_get = _gl_text_get;
+	itc.func.content_get = NULL;
 	itc.func.state_get = NULL;
 	itc.func.del = NULL;
 	for (index = 0; index < 8; index++) {

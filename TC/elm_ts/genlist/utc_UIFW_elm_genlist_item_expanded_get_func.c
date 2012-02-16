@@ -62,8 +62,8 @@ static void startup(void)
 	evas_object_size_hint_align_set(genlist, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	evas_object_size_hint_weight_set(genlist, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	itc.item_style = "1line_textonly";
-	itc.func.label_get = NULL;
-	itc.func.icon_get = NULL;
+	itc.func.text_get = NULL;
+	itc.func.content_get = NULL;
 	itc.func.state_get = NULL;
 	itc.func.del = NULL;
 }
@@ -83,7 +83,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_item_expanded_get_func_01(void)
 {
-	Elm_Genlist_Item *item = NULL;
+	Elm_Object_Item *item = NULL;
 	Eina_Bool ret = EINA_FALSE;
 
 	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,
@@ -105,7 +105,7 @@ static void utc_UIFW_elm_genlist_item_expanded_get_func_01(void)
  */
 static void utc_UIFW_elm_genlist_item_expanded_get_func_02(void)
 {
-	Elm_Genlist_Item *item = NULL;
+	Elm_Object_Item *item = NULL;
 	Eina_Bool ret = EINA_FALSE;
 
 	item = elm_genlist_item_append(genlist, &itc, (void *) 0, NULL,

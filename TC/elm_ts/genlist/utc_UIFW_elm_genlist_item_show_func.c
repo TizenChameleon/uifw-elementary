@@ -52,7 +52,7 @@ struct tet_testlist tet_testlist[] = {
 	{ NULL, 0 }
 };
 
-static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part )
+static char *_gl_text_get( const void *data, Evas_Object *obj, const char *part )
 {
 	int index = (int) data;
 
@@ -64,7 +64,7 @@ static char *_gl_label_get( const void *data, Evas_Object *obj, const char *part
 
 static void startup(void)
 {
-	Elm_Genlist_Item *item = NULL;
+	Elm_Object_Item *item = NULL;
 	int index = 0;
 	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
@@ -76,8 +76,8 @@ static void startup(void)
 	evas_object_size_hint_align_set(genlist, EVAS_HINT_FILL, EVAS_HINT_FILL);
 	evas_object_size_hint_weight_set(genlist, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 	itc.item_style = "1line_textonly";
-	itc.func.label_get = _gl_label_get;
-	itc.func.icon_get = NULL;
+	itc.func.text_get = _gl_text_get;
+	itc.func.content_get = NULL;
 	itc.func.state_get = NULL;
 	itc.func.del = NULL;
 	for (index = 0; index < 5; index++) {
@@ -101,7 +101,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_genlist_item_show_func_01(void)
 {
-	Elm_Genlist_Item *it = NULL;
+	Elm_Object_Item *it = NULL;
 
 	it = elm_genlist_item_append(genlist, &itc, NULL, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
 	elm_genlist_item_show(it);
@@ -113,7 +113,7 @@ static void utc_UIFW_elm_genlist_item_show_func_01(void)
  */
 static void utc_UIFW_elm_genlist_item_show_func_02(void)
 {
-	Elm_Genlist_Item *it = NULL;
+	Elm_Object_Item *it = NULL;
 
 	it = elm_genlist_item_append(genlist, &itc, NULL, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
 	elm_genlist_item_show(NULL);
