@@ -1203,13 +1203,16 @@ _calculate_box_min_size(Evas_Object *box, Evas_Object_Box_Data *priv)
 
         if (wx)
           {
+             if ((elm_widget_is(opt->obj)) && (!(strcmp(elm_widget_type_get(opt->obj), "entry"))) && (mnw == -1))
+               mnw = MIN_W_ENTRY;
+
              if (mnw != -1 && (w - cw) >= mnw)
                ww = w - cw;
              else
                ww = w;
           }
         else
-           ww = mnw;
+          ww = mnw;
 
         if ((cw + mnw) > w)
           {
@@ -1244,13 +1247,16 @@ _calculate_item_max_height(Evas_Object *box, Evas_Object_Box_Data *priv, int obj
 
         if (wx)
           {
+             if ((elm_widget_is(opt->obj)) && (!(strcmp(elm_widget_type_get(opt->obj), "entry"))) && (mnw == -1))
+               mnw = MIN_W_ENTRY;
+
              if (mnw != -1 && (w - cw) >= mnw)
-                ww = w - cw;
+               ww = w - cw;
              else
-                ww = w;
+               ww = w;
           }
         else
-           ww = mnw;
+          ww = mnw;
 
         if ((cw + ww) > w)
           {
@@ -1318,13 +1324,16 @@ _box_layout_cb(Evas_Object *o, Evas_Object_Box_Data *priv, void *data __UNUSED__
 
         if (wx)
           {
+             if ((elm_widget_is(obj)) && (!(strcmp(elm_widget_type_get(obj), "entry"))) && (mnw == -1))
+               mnw = MIN_W_ENTRY;
+
              if (mnw != -1 && (w - cw) >= mnw)
-                ww = w - cw;
+               ww = w - cw;
              else
-                ww = w;
+               ww = w;
           }
         else
-           ww = mnw;
+          ww = mnw;
         hh = _calculate_item_max_height(o, priv, obj_index);
 
         ow = mnw;
