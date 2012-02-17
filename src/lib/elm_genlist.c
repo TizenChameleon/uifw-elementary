@@ -184,6 +184,8 @@ struct _Elm_Genlist_Item
    Eina_Bool                     dragging : 1;
    Eina_Bool                     updateme : 1;
    Eina_Bool                     nocache : 1;
+   Eina_Bool                     stacking_even : 1;
+   Eina_Bool                     nostacking : 1;
    Eina_Bool                     move_effect_enabled : 1;
    Eina_Bool                     defer_unrealize : 1;
    Eina_Bool                     can_focus : 1;
@@ -211,7 +213,6 @@ struct _Item_Cache
    const char  *item_style; // it->itc->item_style
    Eina_Bool    tree : 1; // it->flags & ELM_GENLIST_ITEM_SUBITEMS
    Eina_Bool    compress : 1; // it->wd->compress
-   Eina_Bool    odd : 1; // in & 0x1
 
    Eina_Bool    selected : 1; // it->selected
    Eina_Bool    disabled : 1; // it->disabled
@@ -952,17 +953,13 @@ end:
 static void
 _item_unselect(Elm_Genlist_Item *it)
 {
-   const char *stacking, *selectraise;
-
    if ((it->delete_me) || ((!it->highlighted) && (!it->selected))) return;
    edje_object_signal_emit(VIEW(it), "elm,state,unselected", "elm");
    if (it->edit_obj) edje_object_signal_emit(it->edit_obj, "elm,state,unselected", "elm");
-   stacking = edje_object_data_get(VIEW(it), "stacking");
-   selectraise = edje_object_data_get(VIEW(it), "selectraise");
-   if ((selectraise) && (!strcmp(selectraise, "on")))
+   if (!it->nostacking)
      {
-        if ((stacking) && (!strcmp(stacking, "below")))
-          evas_object_lower(VIEW(it));
+        if ((it->order_num_in & 0x1) ^ it->stacking_even) evas_object_lower(VIEW(it));
+        else evas_object_raise(VIEW(it));
      }
    it->highlighted = EINA_FALSE;
    if (it->selected)
@@ -1723,7 +1720,6 @@ _item_cache_add(Elm_Genlist_Item *it)
    itc->item_style = eina_stringshare_add(it->itc->item_style);
    if (it->flags & ELM_GENLIST_ITEM_SUBITEMS) itc->tree = 1;
    itc->compress = (it->wd->compress);
-   itc->odd = (it->order_num_in & 0x1);
    itc->selected = it->selected;
    itc->disabled = elm_widget_item_disabled_get(it);
    itc->expanded = it->expanded;
@@ -1767,16 +1763,14 @@ static Item_Cache *
 _item_cache_find(Elm_Genlist_Item *it)
 {
    Item_Cache *itc;
-   Eina_Bool tree = 0, odd;
+   Eina_Bool tree = 0;
 
    if (it->flags & ELM_GENLIST_ITEM_SUBITEMS) tree = 1;
-   odd = (it->order_num_in & 0x1);
    EINA_INLIST_FOREACH(it->wd->item_cache, itc)
      {
         if ((itc->selected) || (itc->disabled) || (itc->expanded))
           continue;
         if ((itc->tree == tree) &&
-            (itc->odd == odd) &&
             (itc->compress == it->wd->compress) &&
             (!strcmp(it->itc->item_style, itc->item_style)))
           {
@@ -1787,6 +1781,23 @@ _item_cache_find(Elm_Genlist_Item *it)
           }
      }
    return NULL;
+}
+
+static void
+_elm_genlist_item_odd_even_update(Elm_Genlist_Item *it)
+{
+   if (!it->nostacking)
+     {
+        if ((it->order_num_in & 0x1) ^ it->stacking_even)
+          evas_object_lower(VIEW(it));
+        else
+          evas_object_raise(VIEW(it));
+     }
+
+   if (it->order_num_in & 0x1)
+     edje_object_signal_emit(VIEW(it), "elm,state,odd", "elm");
+   else
+     edje_object_signal_emit(VIEW(it), "elm,state,even", "elm");
 }
 
 static void
@@ -2113,7 +2124,6 @@ _item_realize(Elm_Genlist_Item *it,
               int               in,
               Eina_Bool         calc)
 {
-   const char *stacking;
    const char *treesize;
    char buf[1024];
    int tsize = 20;
@@ -2121,6 +2131,18 @@ _item_realize(Elm_Genlist_Item *it,
 
    if ((it->realized) || (it->delete_me)) return;
    evas_event_freeze(evas_object_evas_get(it->wd->obj));
+   if (it->realized)
+     {
+        if (it->order_num_in != in)
+          {
+             it->order_num_in = in;
+             _elm_genlist_item_odd_even_update(it);
+             _elm_genlist_item_state_update(it, NULL);
+          }
+        evas_event_thaw(evas_object_evas_get(it->wd->obj));
+        evas_event_thaw_eval(evas_object_evas_get(it->wd->obj));
+        return;
+     }
    it->order_num_in = in;
    if (it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) calc = EINA_FALSE;
    if ((it->nocache) && (!it->renamed))
@@ -2136,6 +2158,9 @@ _item_realize(Elm_Genlist_Item *it,
      }
    else
      {
+        const char *stacking_even;
+        const char *stacking;
+
         VIEW(it) = edje_object_add(evas_object_evas_get(WIDGET(it)));
         edje_object_scale_set(VIEW(it),
                               elm_widget_scale_get(WIDGET(it)) *
@@ -2149,12 +2174,20 @@ _item_realize(Elm_Genlist_Item *it,
         if (it->wd->compress)
           strncat(buf, "_compress", sizeof(buf) - strlen(buf));
 
-        if (in & 0x1) strncat(buf, "_odd", sizeof(buf) - strlen(buf));
         strncat(buf, "/", sizeof(buf) - strlen(buf));
         strncat(buf, it->itc->item_style, sizeof(buf) - strlen(buf));
 
         _elm_theme_object_set(WIDGET(it), VIEW(it), "genlist", buf,
                               elm_widget_style_get(WIDGET(it)));
+
+        stacking_even = edje_object_data_get(VIEW(it), "stacking_even");
+        if (!stacking_even) stacking_even = "above";
+        it->stacking_even = !!strcmp("above", stacking_even);
+
+        stacking = edje_object_data_get(VIEW(it), "stacking");
+        if (!stacking) stacking = "yes";
+        it->nostacking = !!strcmp("yes", stacking);
+
         edje_object_mirrored_set(VIEW(it),
                                  elm_widget_mirrored_get(WIDGET(it)));
         it->spacer =
@@ -2162,6 +2195,8 @@ _item_realize(Elm_Genlist_Item *it,
         evas_object_color_set(it->spacer, 0, 0, 0, 0);
         elm_widget_sub_object_add(WIDGET(it), it->spacer);
      }
+
+   _elm_genlist_item_odd_even_update(it);
 
    treesize = edje_object_data_get(VIEW(it), "treesize");
    if (treesize) tsize = atoi(treesize);
@@ -2177,13 +2212,6 @@ _item_realize(Elm_Genlist_Item *it,
                                         "elm", _signal_expand, it);
         edje_object_signal_callback_add(VIEW(it), "elm,action,contract",
                                         "elm", _signal_contract, it);
-        stacking = edje_object_data_get(VIEW(it), "stacking");
-        if (stacking)
-          {
-             if (!strcmp(stacking, "below")) evas_object_lower(VIEW(it));
-             else if (!strcmp(stacking, "above"))
-               evas_object_raise(VIEW(it));
-          }
         evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_DOWN,
                                        _mouse_down, it);
         evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_UP,
