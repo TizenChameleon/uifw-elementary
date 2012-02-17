@@ -2,6 +2,7 @@
 #include "elm_module_priv.h"
 #include "elm_priv.h"
 #include <appsvc/appsvc.h>
+#include "cbhm_helper.h"
 
 #define MULTI_(id) dgettext("sys_string", #id)
 #define S_SELECT MULTI_(IDS_COM_SK_SELECT)
@@ -203,11 +204,10 @@ _clipboard_menu(void *data, Evas_Object *obj, void *event_info)
    ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
 #endif
    ext_mod->cnpinit(data,obj,event_info);
-   elm_cbhm_helper_init(obj);
    if (ext_mod->cnp_mode != ELM_CNP_MODE_MARKUP)
-     elm_cbhm_send_raw_data("show0");
+     _cbhm_msg_send(obj, "show0");
    else
-     elm_cbhm_send_raw_data("show1");
+     _cbhm_msg_send(obj, "show1");
    _ctxpopup_hide(obj);
    // end for cbhm
 }
@@ -288,9 +288,7 @@ obj_longpress(Evas_Object *obj)
    if (ext_mod->context_menu)
      {
 #ifdef HAVE_ELEMENTARY_X
-        int cbhm_count = -1;
-        if (elm_cbhm_helper_init(obj))
-          cbhm_count = elm_cbhm_get_count();
+        int cbhm_count = _cbhm_item_count_get(obj);
 #endif
         if (ext_mod->popup) evas_object_del(ext_mod->popup);
         //else elm_widget_scroll_freeze_push(obj);

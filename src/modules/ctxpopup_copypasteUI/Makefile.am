@@ -26,7 +26,8 @@ endif
 pkgdir = $(libdir)/elementary/modules/ctxpopup_copypasteUI/$(MODULE_ARCH)
 pkg_LTLIBRARIES = module.la
 
-module_la_SOURCES = copypaste.c
+module_la_SOURCES = copypaste.c \
+                    cbhm_helper.c
 
 module_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
 module_la_LDFLAGS = -no-undefined @lt_enable_auto_import@ -module -avoid-version -lappsvc

@@ -169,7 +169,6 @@ elm_box.c \
 elm_bubble.c \
 elm_button.c \
 elm_calendar.c \
-elm_cbhm_helper.c \
 elm_check.c \
 elm_clock.c \
 elm_cnp_helper.c \
