@@ -777,6 +777,20 @@ _item_highlight(Elm_Genlist_Item *it)
 }
 
 static void
+_item_unhighlight(Elm_Genlist_Item *it)
+{
+   if ((it->delete_me) || (!it->highlighted)) return;
+   edje_object_signal_emit(VIEW(it), "elm,state,unselected", "elm");
+   if (it->edit_obj) edje_object_signal_emit(it->edit_obj, "elm,state,unselected", "elm");
+   if (!it->nostacking)
+     {
+       if ((it->order_num_in & 0x1) ^ it->stacking_even) evas_object_lower(VIEW(it));
+       else evas_object_raise(VIEW(it));
+     }
+   it->highlighted = EINA_FALSE;
+}
+
+static void
 _item_block_del(Elm_Genlist_Item *it)
 {
    Eina_Inlist *il;
@@ -953,21 +967,10 @@ end:
 static void
 _item_unselect(Elm_Genlist_Item *it)
 {
-   if ((it->delete_me) || ((!it->highlighted) && (!it->selected))) return;
-   edje_object_signal_emit(VIEW(it), "elm,state,unselected", "elm");
-   if (it->edit_obj) edje_object_signal_emit(it->edit_obj, "elm,state,unselected", "elm");
-   if (!it->nostacking)
-     {
-        if ((it->order_num_in & 0x1) ^ it->stacking_even) evas_object_lower(VIEW(it));
-        else evas_object_raise(VIEW(it));
-     }
-   it->highlighted = EINA_FALSE;
-   if (it->selected)
-     {
-        it->selected = EINA_FALSE;
-        it->wd->selected = eina_list_remove(it->wd->selected, it);
-        evas_object_smart_callback_call(WIDGET(it), SIG_UNSELECTED, it);
-     }
+   if ((it->delete_me) || (!it->selected)) return;
+   it->selected = EINA_FALSE;
+   it->wd->selected = eina_list_remove(it->wd->selected, it);
+   evas_object_smart_callback_call(WIDGET(it), SIG_UNSELECTED, it);
 }
 
 static void
@@ -987,7 +990,10 @@ _mouse_move(void        *data,
           {
              it->wd->on_hold = EINA_TRUE;
              if ((!it->wd->wasselected) && (!it->renamed))
-               _item_unselect(it);
+               {
+                  _item_unhighlight(it);
+                  _item_unselect(it);
+               }
           }
      }
    if (it->wd->multitouched)
@@ -1071,7 +1077,10 @@ _mouse_move(void        *data,
              it->long_timer = NULL;
           }
         if ((!it->wd->wasselected) && (!it->renamed))
-          _item_unselect(it);
+          {
+             _item_unhighlight(it);
+             _item_unselect(it);
+          }
         if (dy < 0)
           {
              if ((ady > adx) && (!it->wd->drag_started))
@@ -1275,7 +1284,11 @@ _multi_down(void        *data,
    it->wd->multitouched = EINA_TRUE;
    it->wd->prev_mx = ev->canvas.x;
    it->wd->prev_my = ev->canvas.y;
-   if (!it->wd->wasselected) _item_unselect(it);
+   if (!it->wd->wasselected)
+     {
+        _item_unhighlight(it);
+        _item_unselect(it);
+     }
    it->wd->wasselected = EINA_FALSE;
    it->wd->longpressed = EINA_FALSE;
    if (it->long_timer)
@@ -1412,7 +1425,7 @@ _mouse_up(void        *data,
      {
         // in single selection modes, some multi touching can make multi highlighted items.
         // if a item not selected and highlighted, it should be unhighlighted.
-        if ((!it->wd->multi) && (!it->selected) && (it->highlighted)) _item_unselect(it);
+        if ((!it->wd->multi) && (!it->selected) && (it->highlighted)) _item_unhighlight(it);
         if (it->wd->multi_down) return;
         _multi_touch_gesture_eval(data);
         return;
@@ -1475,7 +1488,10 @@ _mouse_up(void        *data,
      {
         it->wd->longpressed = EINA_FALSE;
         if ((!it->wd->wasselected) && (!it->renamed))
-          _item_unselect(it);
+          {
+             _item_unhighlight(it);
+             _item_unselect(it);
+          }
         it->wd->wasselected = EINA_FALSE;
         return;
      }
@@ -1498,7 +1514,11 @@ _mouse_up(void        *data,
              _item_highlight(it);
              _item_select(it);
           }
-        else _item_unselect(it);
+        else
+          {
+             _item_unhighlight(it);
+             _item_unselect(it);
+          }
      }
    else
      {
@@ -1507,7 +1527,11 @@ _mouse_up(void        *data,
              Widget_Data *wd = it->wd;
              if (wd)
                {
-                  while (wd->selected) _item_unselect(wd->selected->data);
+                  while (wd->selected)
+                    {
+                       _item_unhighlight(wd->selected->data);
+                       _item_unselect(wd->selected->data);
+                    }
                }
           }
         else
@@ -1516,7 +1540,11 @@ _mouse_up(void        *data,
              Elm_Genlist_Item *it2;
 
              EINA_LIST_FOREACH_SAFE(it->wd->selected, l, l_next, it2)
-               if (it2 != it) _item_unselect(it2);
+               if (it2 != it)
+                  {
+                     _item_unhighlight(it2);
+                     _item_unselect(it2);
+                  }
              //_item_highlight(it);
              //_item_select(it);
           }
@@ -2225,11 +2253,11 @@ _item_realize(Elm_Genlist_Item *it,
         evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_MOVE,
                                        _multi_move, it);
 
-        _elm_genlist_item_state_update(it, itc);
-
         if ((!it->edit_obj) &&(it->wd->edit_mode) &&
             (it->flags != ELM_GENLIST_ITEM_GROUP) && (it->itc->edit_item_style))
           _effect_item_realize(it, EINA_FALSE);
+
+        _elm_genlist_item_state_update(it, itc);
      }
 
    if ((calc) && (it->wd->homogeneous) &&
@@ -4663,7 +4691,7 @@ elm_genlist_item_selected_set(Elm_Object_Item *it,
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
    Elm_Genlist_Item *_it = (Elm_Genlist_Item *) it;
-   Widget_Data *wd = elm_widget_data_get(WIDGET(_it));
+   Widget_Data *wd = _it->wd;
    if (!wd) return;
    if ((_it->delete_me) || elm_widget_item_disabled_get(_it))
      return;
@@ -4675,13 +4703,17 @@ elm_genlist_item_selected_set(Elm_Object_Item *it,
         if (!wd->multi)
           {
              while (wd->selected)
-               _item_unselect(wd->selected->data);
+               {
+                  _item_unhighlight(wd->selected->data);
+                  _item_unselect(wd->selected->data);
+               }
           }
         _item_highlight(_it);
         _item_select(_it);
+        return;
      }
-   else
-     _item_unselect(_it);
+   _item_unhighlight(_it);
+   _item_unselect(_it);
 }
 
 EAPI Eina_Bool
