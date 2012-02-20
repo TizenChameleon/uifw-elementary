@@ -1372,6 +1372,24 @@ EAPI const Evas_Object            *elm_genlist_item_object_get(const Elm_Object_
 EAPI void                          elm_genlist_item_update(Elm_Object_Item *it);
 
 /**
+ * Promote an item to the top of the list
+ *
+ * @param it The item
+ *
+ * @ingroup Genlist
+ */
+EAPI void                          elm_genlist_item_promote(Elm_Object_Item *it);
+
+/**
+ * Demote an item to the end of the list
+ *
+ * @param it The item
+ *
+ * @ingroup Genlist
+ */
+EAPI void                          elm_genlist_item_demote(Elm_Object_Item *it);
+
+/**
  * Update the part of an item
  *
  * @param it The item
