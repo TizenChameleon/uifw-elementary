@@ -264,9 +264,6 @@ Evas_Object         *_elm_scroller_edje_object_get(Evas_Object *obj);
 
 char                *_elm_util_mkup_to_text(const char *mkup);
 char                *_elm_util_text_to_mkup(const char *text);
-/* do not use except clipboard history module */
-EAPI Eina_Bool    elm_cbhm_helper_init(Evas_Object *self);
-EAPI void         elm_cbhm_send_raw_data(char *cmd);
 
 Eina_Bool            _elm_video_check(Evas_Object *video);
 

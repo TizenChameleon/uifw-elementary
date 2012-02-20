@@ -1360,25 +1360,6 @@ _cancel(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    edje_object_part_text_select_none(wd->ent, "elm.text");
 }
 
-static void
-_clipboard_menu(void *data, Evas_Object *obj, void *event_info __UNUSED__)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   if (!wd) return;
-
-   // start for cbhm
-#ifdef HAVE_ELEMENTARY_X
-   ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
-#endif
-   cnpwidgetdata = data;
-   elm_cbhm_helper_init(obj);
-   if (elm_entry_cnp_mode_get(obj) != ELM_CNP_MODE_MARKUP)
-     elm_cbhm_send_raw_data("show0");
-   else
-     elm_cbhm_send_raw_data("show1");
-   // end for cbhm
-}
-
 // start for cbhm
 static void
 _cnpinit(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
