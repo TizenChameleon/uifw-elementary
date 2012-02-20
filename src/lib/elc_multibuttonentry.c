@@ -872,8 +872,10 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
                        _set_vis_guidetext(obj);
                      if (wd->entry)
                        {
-                         if (!wd->view_mode)
-                           elm_box_pack_before(wd->box, btn, wd->entry);
+                          if (!wd->view_mode)
+                            elm_box_pack_before(wd->box, btn, wd->entry);
+                          else
+                            elm_box_pack_end(wd->box, btn);
                        }
                      else
                        elm_box_pack_end(wd->box, btn);
@@ -902,6 +904,8 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
                             {
                                if (!wd->view_mode)
                                  elm_box_pack_before(wd->box, btn, wd->entry);
+                               else
+                                 elm_box_pack_end(wd->box, btn);
                             }
                           else
                             elm_box_pack_end(wd->box, btn);
@@ -930,6 +934,8 @@ _add_button_item(Evas_Object *obj, const char *str, Multibuttonentry_Pos pos, co
                             {
                                if (!wd->view_mode)
                                  elm_box_pack_before(wd->box, btn, wd->entry);
+                               else
+                                 elm_box_pack_end(wd->box, btn);
                             }
                           else
                             elm_box_pack_end(wd->box, btn);
