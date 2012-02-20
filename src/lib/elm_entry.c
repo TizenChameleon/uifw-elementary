@@ -89,7 +89,6 @@ struct _Widget_Data
    Eina_Bool double_clicked : 1;
    Eina_Bool long_pressed : 1;
    Eina_Bool magnifier_enabled : 1;
-   Eina_Bool autoperiod : 1;
    Eina_Bool matchlist_list_clicked : 1;
    Eina_Bool matchlist_case_sensitive : 1;
    Elm_CNP_Mode cnp_mode : 2;
@@ -3087,7 +3086,6 @@ elm_entry_add(Evas_Object *parent)
 //TIZEN ONLY
    wd->cnp_mode     = ELM_CNP_MODE_MARKUP;
    wd->magnifier_enabled = EINA_TRUE;
-   wd->autoperiod   = EINA_TRUE;
 //
 
    wd->ent = edje_object_add(e);
@@ -4452,22 +4450,9 @@ elm_entry_input_panel_hide(Evas_Object *obj)
 }
 
 EINA_DEPRECATED EAPI void
-elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
+elm_entry_autoperiod_set(Evas_Object *obj __UNUSED__, Eina_Bool autoperiod __UNUSED__)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (wd->password)
-     wd->autoperiod = EINA_FALSE;
-   else
-     wd->autoperiod = autoperiod;
-
-   if (wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_URL ||
-       wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_EMAIL)
-     wd->autoperiod = EINA_FALSE;
-
-   edje_object_part_text_autoperiod_set(wd->ent, "elm.text", wd->autoperiod);
+   // will be deleted
 }
 
 EINA_DEPRECATED EAPI void
