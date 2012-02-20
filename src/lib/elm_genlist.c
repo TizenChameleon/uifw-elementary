@@ -955,18 +955,16 @@ _item_select(Elm_Genlist_Item *it)
 {
    Eina_List *l;
    Evas_Object *obj;
-   Evas_Object *parent = WIDGET(it);
 
    if ((it->wd->no_select) || (it->no_select) || (it->delete_me)) return;
-   if (it->selected)
+   if (!it->selected)
      {
-        if (it->wd->always_select) goto call;
-        return;
+        it->selected = EINA_TRUE;
+        it->wd->selected = eina_list_append(it->wd->selected, it);
      }
-   it->selected = EINA_TRUE;
-   it->wd->selected = eina_list_append(it->wd->selected, it);
-call:
-   evas_object_ref(parent);
+   else if (!it->wd->always_select) return;
+
+   evas_object_ref(WIDGET(it));
    it->walking++;
    it->wd->walking++;
    if (it->wd->last_selected_item &&
@@ -979,28 +977,27 @@ call:
           }
         ((Elm_Genlist_Item *)it->wd->last_selected_item)->can_focus = EINA_FALSE;
      }
-   if (it->func.func) it->func.func((void *)it->func.data, parent, it);
+   if (it->func.func) it->func.func((void *)it->func.data, WIDGET(it), it);
    if (!it->delete_me)
-     evas_object_smart_callback_call(parent, SIG_SELECTED, it);
+     evas_object_smart_callback_call(WIDGET(it), SIG_SELECTED, it);
    it->walking--;
    it->wd->walking--;
+   evas_object_unref(WIDGET(it));
    if ((it->wd->clear_me) && (!it->wd->walking))
-     {
-        _elm_genlist_clear(WIDGET(it), EINA_TRUE);
-        goto end;
-     }
+     _elm_genlist_clear(WIDGET(it), EINA_TRUE);
    else
      {
         if ((!it->walking) && (it->delete_me))
           {
-             if (!it->relcount) _item_del(it);
-             goto end;
+             if (!it->relcount)
+               {
+                  _item_del(it);
+                  elm_widget_item_free(it);
+               }
           }
+        else
+          it->wd->last_selected_item = (Elm_Object_Item *) it;
      }
-   // TODO: Remove 'if'?
-   if (it && it->wd) it->wd->last_selected_item = (Elm_Object_Item *) it;
-end:
-   evas_object_unref(parent);
 }
 
 static void
