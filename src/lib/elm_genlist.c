@@ -106,24 +106,6 @@ struct _Widget_Data
    Elm_Genlist_Item *rename_it, *expanded_next_item;
 };
 
-struct _Item_Block
-{
-   EINA_INLIST;
-   int          count;
-   int          num;
-   int          reorder_offset;
-   Widget_Data *wd;
-   Eina_List   *items;
-   Evas_Coord   x, y, w, h, minw, minh;
-   Eina_Bool    want_unrealize : 1;
-   Eina_Bool    realized : 1;
-   Eina_Bool    changed : 1;
-   Eina_Bool    updateme : 1;
-   Eina_Bool    changeme : 1;
-   Eina_Bool    showme : 1;
-   Eina_Bool    must_recalc : 1;
-};
-
 struct _Elm_Genlist_Item
 {
    ELM_WIDGET_ITEM;
@@ -167,7 +149,9 @@ struct _Elm_Genlist_Item
    int                           walking;
    int                           expanded_depth;
    int                           order_num_in;
+   int                           position;
 
+   Eina_Bool                     position_update : 1;
    Eina_Bool                     before : 1;
 
    Eina_Bool                     want_unrealize : 1;
@@ -202,6 +186,28 @@ struct _Elm_Genlist_Item
    int         num;
    Ecore_Animator *item_moving_effect_timer;
    Evas_Coord  old_scrl_y;
+};
+
+struct _Item_Block
+{
+   EINA_INLIST;
+   int          count;
+   int          num;
+   int          reorder_offset;
+   Widget_Data *wd;
+   Eina_List   *items;
+   Evas_Coord   x, y, w, h, minw, minh;
+   int          position;
+   int          item_position_stamp;
+
+   Eina_Bool    position_update : 1;
+   Eina_Bool    want_unrealize : 1;
+   Eina_Bool    realized : 1;
+   Eina_Bool    changed : 1;
+   Eina_Bool    updateme : 1;
+   Eina_Bool    changeme : 1;
+   Eina_Bool    showme : 1;
+   Eina_Bool    must_recalc : 1;
 };
 
 struct _Item_Cache
@@ -329,6 +335,7 @@ static const char SIG_MULTI_SWIPE_DOWN[] = "multi,swipe,down";
 static const char SIG_MULTI_PINCH_OUT[] = "multi,pinch,out";
 static const char SIG_MULTI_PINCH_IN[] = "multi,pinch,in";
 static const char SIG_SWIPE[] = "swipe";
+static const char SIG_INDEX_UPDATE[] = "index,update";
 
 static const Evas_Smart_Cb_Description _signals[] = {
    {SIG_CLICKED_DOUBLE, ""},
@@ -791,6 +798,31 @@ _item_unhighlight(Elm_Genlist_Item *it)
 }
 
 static void
+_item_block_position_update(Eina_Inlist *list, int idx)
+{
+   Item_Block *tmp;
+
+   EINA_INLIST_FOREACH(list, tmp)
+     {
+        tmp->position = idx++;
+        tmp->position_update = EINA_TRUE;
+     }
+}
+
+static void
+_item_position_update(Eina_List *list, int idx)
+{
+   Elm_Genlist_Item *it;
+   Eina_List *l;
+
+   EINA_LIST_FOREACH(list, l, it)
+     {
+        it->position = idx++;
+        it->position_update = EINA_TRUE;
+     }
+}
+
+static void
 _item_block_del(Elm_Genlist_Item *it)
 {
    Eina_Inlist *il;
@@ -812,7 +844,10 @@ _item_block_del(Elm_Genlist_Item *it)
         if (it->parent)
           it->parent->items = eina_list_remove(it->parent->items, it);
         else
-          it->wd->blocks = eina_inlist_remove(it->wd->blocks, il);
+          {
+             _item_block_position_update(il->next, itb->position);
+             it->wd->blocks = eina_inlist_remove(it->wd->blocks, il);
+          }
         free(itb);
         if (itbn) itbn->changed = EINA_TRUE;
      }
@@ -834,6 +869,8 @@ _item_block_del(Elm_Genlist_Item *it)
                        itbp->count++;
                        itbp->changed = EINA_TRUE;
                     }
+                  _item_block_position_update(EINA_INLIST_GET(itb)->next,
+                                              itb->position);
                   it->wd->blocks = eina_inlist_remove(it->wd->blocks,
                                                       EINA_INLIST_GET(itb));
                   free(itb);
@@ -852,6 +889,8 @@ _item_block_del(Elm_Genlist_Item *it)
                        itbn->count++;
                        itbn->changed = EINA_TRUE;
                     }
+                  _item_block_position_update(EINA_INLIST_GET(itb)->next,
+                                              itb->position);
                   it->wd->blocks =
                     eina_inlist_remove(it->wd->blocks, EINA_INLIST_GET(itb));
                   free(itb);
@@ -1812,6 +1851,16 @@ _item_cache_find(Elm_Genlist_Item *it)
 }
 
 static void
+_elm_genlist_item_index_update(Elm_Genlist_Item *it)
+{
+   if (it->position_update || it->block->position_update)
+     {
+        evas_object_smart_callback_call(WIDGET(it), SIG_INDEX_UPDATE, it);
+        it->position_update = EINA_FALSE;
+     }
+}
+
+static void
 _elm_genlist_item_odd_even_update(Elm_Genlist_Item *it)
 {
    if (!it->nostacking)
@@ -2166,6 +2215,7 @@ _item_realize(Elm_Genlist_Item *it,
              it->order_num_in = in;
              _elm_genlist_item_odd_even_update(it);
              _elm_genlist_item_state_update(it, NULL);
+             _elm_genlist_item_index_update(it);
           }
         evas_event_thaw(evas_object_evas_get(it->wd->obj));
         evas_event_thaw_eval(evas_object_evas_get(it->wd->obj));
@@ -2258,6 +2308,7 @@ _item_realize(Elm_Genlist_Item *it,
           _effect_item_realize(it, EINA_FALSE);
 
         _elm_genlist_item_state_update(it, itc);
+        _elm_genlist_item_index_update(it);
      }
 
    if ((calc) && (it->wd->homogeneous) &&
@@ -2471,6 +2522,7 @@ _item_block_recalc(Item_Block *itb,
    itb->minw = minw;
    itb->minh = minh;
    itb->changed = EINA_FALSE;
+   itb->position_update = EINA_FALSE;
    evas_event_thaw(evas_object_evas_get(itb->wd->obj));
    evas_event_thaw_eval(evas_object_evas_get(itb->wd->obj));
    return showme;
@@ -3884,16 +3936,36 @@ newblock:
                   wd->blocks =
                     eina_inlist_append(wd->blocks, EINA_INLIST_GET(itb));
                   itb->items = eina_list_append(itb->items, it);
+                  itb->position_update = EINA_TRUE;
+                  it->position = eina_list_count(itb->items);
+                  it->position_update = EINA_TRUE;
+
+                  if (wd->blocks != EINA_INLIST_GET(itb))
+                    {
+                       itb->position = ((Item_Block *) (EINA_INLIST_GET(itb)->prev))->position + 1;
+                    }
+                  else
+                    {
+                       itb->position = 0;
+                    }
                }
              else
                {
+                  Eina_List *tmp;
+
+                  tmp = eina_list_data_find_list(itb->items, it->rel);
                   if (it->before)
                     {
                        wd->blocks = eina_inlist_prepend_relative
                            (wd->blocks, EINA_INLIST_GET(itb),
                            EINA_INLIST_GET(it->rel->block));
                        itb->items =
-                         eina_list_prepend_relative(itb->items, it, it->rel);
+                         eina_list_prepend_relative_list(itb->items, it, tmp);
+
+                       /* Update index from where we prepended */
+                       _item_position_update(eina_list_prev(tmp), it->rel->position);
+                       _item_block_position_update(EINA_INLIST_GET(itb),
+                                                   it->rel->block->position);
                     }
                   else
                     {
@@ -3901,7 +3973,12 @@ newblock:
                            (wd->blocks, EINA_INLIST_GET(itb),
                            EINA_INLIST_GET(it->rel->block));
                        itb->items =
-                         eina_list_append_relative(itb->items, it, it->rel);
+                         eina_list_append_relative_list(itb->items, it, tmp);
+
+                       /* Update block index from where we appended */
+                       _item_position_update(eina_list_next(tmp), it->rel->position + 1);
+                       _item_block_position_update(EINA_INLIST_GET(itb),
+                                                   it->rel->block->position + 1);
                     }
                }
           }
@@ -3920,6 +3997,7 @@ newblock:
                             wd->blocks =
                               eina_inlist_prepend(wd->blocks,
                                                   EINA_INLIST_GET(itb));
+                            _item_block_position_update(wd->blocks, 0);
                          }
                     }
                   else
@@ -3929,8 +4007,11 @@ newblock:
                        itb->wd = wd;
                        wd->blocks =
                          eina_inlist_prepend(wd->blocks, EINA_INLIST_GET(itb));
+                       _item_block_position_update(wd->blocks, 0);
                     }
                   itb->items = eina_list_prepend(itb->items, it);
+
+                  _item_position_update(itb->items, 0);
                }
              else
                {
@@ -3945,6 +4026,15 @@ newblock:
                             wd->blocks =
                               eina_inlist_append(wd->blocks,
                                                  EINA_INLIST_GET(itb));
+                            itb->position_update = EINA_TRUE;
+                            if (wd->blocks != EINA_INLIST_GET(itb))
+                              {
+                                 itb->position = ((Item_Block *) (EINA_INLIST_GET(itb)->prev))->position + 1;
+                              }
+                            else
+                              {
+                                 itb->position = 0;
+                              }
                          }
                     }
                   else
@@ -3954,19 +4044,38 @@ newblock:
                        itb->wd = wd;
                        wd->blocks =
                          eina_inlist_append(wd->blocks, EINA_INLIST_GET(itb));
+                       itb->position_update = EINA_TRUE;
+                       if (wd->blocks != EINA_INLIST_GET(itb))
+                         {
+                            itb->position = ((Item_Block *) (EINA_INLIST_GET(itb)->prev))->position + 1;
+                         }
+                       else
+                         {
+                            itb->position = 0;
+                         }
                     }
                   itb->items = eina_list_append(itb->items, it);
+                  it->position = eina_list_count(itb->items);
                }
           }
      }
    else
      {
+        Eina_List *tmp;
+
         itb = it->rel->block;
+        tmp = eina_list_data_find_list(itb->items, it->rel);
         if (!itb) goto newblock;
         if (it->before)
-          itb->items = eina_list_prepend_relative(itb->items, it, it->rel);
+          {
+             itb->items = eina_list_prepend_relative_list(itb->items, it, tmp);
+             _item_position_update(eina_list_prev(tmp), it->rel->position);
+          }
         else
-          itb->items = eina_list_append_relative(itb->items, it, it->rel);
+          {
+             itb->items = eina_list_append_relative_list(itb->items, it, tmp);
+             _item_position_update(eina_list_next(tmp), it->rel->position + 1);
+          }
      }
    itb->count++;
    itb->changed = EINA_TRUE;
@@ -5328,7 +5437,7 @@ elm_genlist_item_index_get(Elm_Object_Item *it)
    Elm_Genlist_Item *_it = (Elm_Genlist_Item *) it;
 
    if (_it->block)
-     return 0; //_it->position + _it->block->position; //upstream
+     return _it->position + (_it->block->position * _it->wd->max_items_per_block);
    return -1;
 }
 
