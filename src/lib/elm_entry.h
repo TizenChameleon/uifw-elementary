@@ -1264,8 +1264,8 @@ struct _Elm_Entry_Filter_Accept_Set
 EAPI void                   elm_entry_filter_accept_set(void *data, Evas_Object *entry, char **text);
 
 EAPI void                   elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
-EAPI void                   elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
-EAPI void                   elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
+EINA_DEPRECATED EAPI void   elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
+EINA_DEPRECATED EAPI void   elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
 EAPI Ecore_IMF_Context     *elm_entry_imf_context_get(Evas_Object *obj);
 EAPI void                   elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_sensitive);
 EAPI void                   elm_entry_magnifier_type_set(Evas_Object *obj, int type);
