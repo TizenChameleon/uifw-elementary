@@ -424,6 +424,17 @@ elm_quicklaunch_sub_init(int    argc,
         edje_init();
         _elm_module_init();
         _elm_config_sub_init();
+#define ENGINE_COMPARE(name) (!strcmp(_elm_config->engine, name))
+        if (ENGINE_COMPARE(ELM_SOFTWARE_X11) ||
+            ENGINE_COMPARE(ELM_SOFTWARE_16_X11) ||
+            ENGINE_COMPARE(ELM_XRENDER_X11) ||
+            ENGINE_COMPARE(ELM_OPENGL_X11))
+#undef ENGINE_COMPARE
+          {
+#ifdef HAVE_ELEMENTARY_X
+             ecore_x_init(NULL);
+#endif
+          }
         ecore_evas_init(); // FIXME: check errors
 #ifdef HAVE_ELEMENTARY_ECORE_IMF
         ecore_imf_init();
