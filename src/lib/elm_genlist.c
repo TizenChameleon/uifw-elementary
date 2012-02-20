@@ -4944,6 +4944,26 @@ elm_genlist_item_show(Elm_Object_Item *it)
 }
 
 EAPI void
+elm_genlist_item_promote(Elm_Object_Item *it)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   Elm_Genlist_Item *_it = (Elm_Genlist_Item *) it;
+   if (_it->delete_me) return;
+   _item_move_before(_it,
+                     (Elm_Genlist_Item *) elm_genlist_first_item_get(WIDGET(_it)));
+}
+
+EAPI void
+elm_genlist_item_demote(Elm_Object_Item *it)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   Elm_Genlist_Item *_it = (Elm_Genlist_Item *) it;
+   if (_it->delete_me) return;
+   _item_move_after(_it,
+                    (Elm_Genlist_Item *) elm_genlist_last_item_get(WIDGET(_it)));
+}
+
+EAPI void
 elm_genlist_item_bring_in(Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
