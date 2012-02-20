@@ -89,7 +89,6 @@ struct _Widget_Data
    Eina_Bool double_clicked : 1;
    Eina_Bool long_pressed : 1;
    Eina_Bool magnifier_enabled : 1;
-   Eina_Bool autoreturnkey : 1;
    Eina_Bool autoperiod : 1;
    Eina_Bool matchlist_list_clicked : 1;
    Eina_Bool matchlist_case_sensitive : 1;
@@ -156,7 +155,6 @@ static void _signal_entry_cut_notify(void *data, Evas_Object *obj, const char *e
 static void _signal_cursor_changed(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _add_chars_till_limit(Evas_Object *obj, char **text, int can_add, Length_Unit unit);
 //// TIZEN ONLY
-static int _entry_length_get(Evas_Object *obj);   ////////////// ???????
 static void _signal_selection_end(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_handler_move_start(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_handler_move_end(void *data, Evas_Object *obj, const char *emission, const char *source);
@@ -843,27 +841,6 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void
-_check_enable_returnkey(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   Ecore_IMF_Context *ic = elm_entry_imf_context_get(obj);
-   if (!ic) return;
-
-   if (!wd->autoreturnkey) return;
-
-   if (_entry_length_get(obj) == 0)
-     {
-        ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_TRUE);
-     }
-   else
-     {
-        ecore_imf_context_input_panel_key_disabled_set(ic, ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL, ECORE_IMF_INPUT_PANEL_KEY_ENTER, EINA_FALSE);
-     }
-}
-
-static void
 _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -878,7 +855,6 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         if (top && wd->input_panel_enable)
           elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
         evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
-        _check_enable_returnkey(obj);
         wd->mgf_type = _ENTRY_MAGNIFIER_FIXEDSIZE;
      }
    else
@@ -1841,23 +1817,6 @@ _getbase(Evas_Object *obj)
    return "base";
 }
 
-
-static int
-_entry_length_get(Evas_Object *obj)
-{
-   int len;
-   const char *str = elm_entry_entry_get(obj);
-   if (!str) return 0;
-
-   char *plain_str = _elm_util_mkup_to_text(str);
-   if (!plain_str) return 0;
-
-   len = strlen(plain_str);
-   free(plain_str);
-
-   return len;
-}
-
 #ifndef HAVE_STRCASESTR
 char* _strcasestr(const char *s, const char *find)
 {
@@ -2024,7 +1983,6 @@ _entry_changed_common_handling(void *data, const char *event)
    wd->text = NULL;
    if (wd->password_text) eina_stringshare_del(wd->password_text);
    wd->password_text = NULL;
-   _check_enable_returnkey(data);
    if (wd->delay_write)
      {
         ecore_timer_del(wd->delay_write);
@@ -4513,14 +4471,9 @@ elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod)
 }
 
 EINA_DEPRECATED EAPI void
-elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on)
+elm_entry_autoenable_returnkey_set(Evas_Object *obj __UNUSED__, Eina_Bool on __UNUSED__)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   wd->autoreturnkey = on;
-   _check_enable_returnkey(obj);
+   // will be deleted
 }
 
 EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
