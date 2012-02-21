@@ -2741,7 +2741,9 @@ _item_block_position(Item_Block *itb,
                }
              else
                {
-                  if ((!it->dragging && (!it->wd->item_moving_effect_timer)) || (it->wd->expanded_item->block != itb)) _item_unrealize(it, EINA_FALSE);
+                  if ((!it->dragging && (!it->wd->item_moving_effect_timer)) ||
+                      (it->wd->expanded_item && (it->wd->expanded_item->block != itb)))
+                    _item_unrealize(it, EINA_FALSE);
                }
           }
         in++;
