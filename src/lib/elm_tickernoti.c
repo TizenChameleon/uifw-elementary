@@ -234,6 +234,7 @@ _create_tickernoti(Evas_Object *obj)
 
 #ifdef HAVE_ELEMENTARY_X
    ecore_x_window_size_get(ecore_x_window_root_first_get(), &w, NULL);
+   evas_object_size_hint_min_set(wd->edje_obj, w, wd->noti_height);
    evas_object_resize(wd->win, w, wd->noti_height);
    wd->rotation_event_handler = ecore_event_handler_add(
             ECORE_X_EVENT_WINDOW_PROPERTY, _prop_change, obj);
