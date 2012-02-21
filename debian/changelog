@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.67547slp2+build06) unstable; urgency=low
+
+  * Upload Package
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.67547slp2+build06
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Tue, 21 Feb 2012 19:28:59 +0900
+
 elementary (1.0.0+svn.67547slp2+build05) unstable; urgency=low
 
   * add some input panel APIs
