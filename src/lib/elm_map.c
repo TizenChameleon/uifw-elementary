@@ -2943,7 +2943,7 @@ rotate_cb(void *data, void *event_info)
         Elm_Gesture_Rotate_Info *ei = event_info;
         evas_object_geometry_get(wd->obj, &x, &y, &w, &h);
 
-        wd->rotate.d = wd->rotate.a + (ei->base_angle-ei->angle)*50;
+        wd->rotate.d = wd->rotate.a + ei->angle - ei->base_angle;
         wd->rotate.cx = x + ((double)w * 0.5);
         wd->rotate.cy = y + ((double)h * 0.5);
 
