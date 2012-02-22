@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.67547slp2+build07) unstable; urgency=low
+
+  * [Map] Tunnig rotate callback because of gesture layer merge
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.67547slp2+build07
+
+ -- Tae-Hwan Kim <the81.kim@samsung.com>  Wed, 22 Feb 2012 16:55:20 +0900
+
 elementary (1.0.0+svn.67547slp2+build06) unstable; urgency=low
 
   * Upload Package
