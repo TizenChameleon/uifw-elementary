@@ -777,8 +777,6 @@ _item_highlight(Elm_Genlist_Item *it)
      {
         if (it->edit_obj) evas_object_raise(it->edit_obj);
         else evas_object_raise(VIEW(it));
-        if ((it->group_item) && (it->group_item->realized))
-          evas_object_raise(it->VIEW(group_item));
      }
    it->highlighted = EINA_TRUE;
 }
@@ -3326,7 +3324,13 @@ _pan_calculate(Evas_Object *obj)
                                 cvx, cvy, cvw, cvh))
           {
              if ((!itb->realized) || (itb->changed))
-               _item_block_realize(itb);
+               {
+                  _item_block_realize(itb);
+
+                  if (sd->wd->calc_job) ecore_job_del(sd->wd->calc_job);
+                  sd->wd->calc_job = NULL;
+                  _calc_job(sd->wd);
+               }
              _item_block_position(itb, in);
           }
         else
