@@ -1516,7 +1516,6 @@ _mouse_up(void        *data,
         it->wd->reorder_it = it->wd->reorder_rel = NULL;
         elm_smart_scroller_hold_set(it->wd->scr, EINA_FALSE);
         elm_smart_scroller_bounce_allow_set(it->wd->scr, EINA_FALSE, EINA_TRUE);
-
      }
    if (it->wd->longpressed)
      {
@@ -5981,6 +5980,8 @@ _elm_genlist_item_del_notserious(Elm_Genlist_Item *it)
    elm_widget_item_pre_notify_del(it);
    it->delete_me = EINA_TRUE;
    //it->generation = it->wd->generation - 1; /* This means that the item is deleted */ //upstream
+
+   if (it->walking) return; /* func.del is called twice when it->func.func is _elm_widget_item_del*/
    if (it->selected) it->wd->selected = eina_list_remove(it->wd->selected, it);
 
    if (it->itc->func.del)
