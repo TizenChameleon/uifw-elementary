@@ -1,5 +1,0 @@
-OLD_PARM="--build=arm-linux-gnueabi --prefix=/usr --includedir=${prefix}/include --mandir=${prefix}/share/man --infodir=${prefix}/share/info --sysconfdir=/etc --localstatedir=/var --libexecdir=${prefix}/lib/elementary --disable-maintainer-mode --disable-dependency-tracking --disable-silent-rules --srcdir=. --enable-dependency-tracking --disable-doc --disable-web"
-OLD_CFLAGS="-g -O2 -g -Wall -O2 -fPIC -Wall"
-OLD_PATH="/usr/lib/ccache:/sb2/wrappers:/sb2/scripts:/home/jaehwan/.scratchbox2/sbs-armel_home_jaehwan_sbs/bin:/home/jaehwan/sbs-install/bin:/home/jaehwan/sbs-install/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/home/jaehwan/sbs-install/bin:/home/jaehwan/sbs/target-i386/opt/apps/com.samsung.elm-demo-slp/bin:/usr/local/sbin:/usr/sbin:/sbin:/sbin:/usr/sbin:/home/jaehwan/sbs/target-armel/bin:/home/jaehwan/sbs/target-armel/usr/bin:/home/jaehwan/sbs/target-armel/usr/local/bin"
-OLD_PKG_CONFIG_PATH="/home/jaehwan/sbs/target-armel/usr/lib/pkgconfig:/home/jaehwan/sbs/target-armel/usr/share/pkgconfig:/home/jaehwan/sbs/tools/usr/share/pkgconfig"
-OLD_LDFLAGS=" -Wl,--hash-style=both -Wl,--as-needed"
