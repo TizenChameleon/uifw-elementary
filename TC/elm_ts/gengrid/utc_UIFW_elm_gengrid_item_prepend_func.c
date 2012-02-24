@@ -91,8 +91,8 @@ static void startup(void)
 
 	test_eo = elm_gengrid_add(test_win);
 	gic.item_style = "default_grid";
-	gic.func.label_get = NULL;
-	gic.func.icon_get = NULL;
+	gic.func.text_get = NULL;
+	gic.func.content_get = NULL;
 
 	tet_infoline("[[ TET_MSG ]]:: Completing startup");
 }
@@ -126,7 +126,7 @@ static void cleanup(void)
 
 static void utc_UIFW_elm_gengrid_item_prepend_func_01(void)
 {
-	Elm_Gengrid_Item *item = NULL;
+	Elm_Object_Item *item = NULL;
 
 	item = elm_gengrid_item_prepend(test_eo, &gic, NULL, NULL, NULL);
 	TET_CHECK_PASS(NULL, item);
@@ -137,7 +137,7 @@ static void utc_UIFW_elm_gengrid_item_prepend_func_01(void)
 
 static void utc_UIFW_elm_gengrid_item_prepend_func_02(void)
 {
-	Elm_Gengrid_Item *item = NULL;
+	Elm_Object_Item *item = NULL;
 
 	item = elm_gengrid_item_prepend(NULL, NULL, NULL, NULL, NULL);
 	TET_CHECK_FAIL(NULL, item);
