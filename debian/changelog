@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.67547slp2+build09) unstable; urgency=low
+
+  * add checking widtype in calc_job
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.67547slp2+build09
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Fri, 24 Feb 2012 13:43:35 +0900
+
 elementary (1.0.0+svn.67547slp2+build08) unstable; urgency=low
 
   * bugfix genlist showitem, calc_job and misc
