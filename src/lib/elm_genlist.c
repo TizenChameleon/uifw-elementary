@@ -2837,6 +2837,7 @@ _calc_job(void *data)
    Eina_Bool minw_change = EINA_FALSE;
    Eina_Bool did_must_recalc = EINA_FALSE;
    if (!wd) return;
+   ELM_CHECK_WIDTYPE(wd->obj, widtype);
 
    t0 = ecore_time_get();
    evas_object_geometry_get(wd->pan_smart, NULL, NULL, &ow, &wd->h);
