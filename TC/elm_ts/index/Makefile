@@ -4,9 +4,6 @@ TARGETS = utc_UIFW_elm_index_add_func \
 		utc_UIFW_elm_index_active_set_func \
 		utc_UIFW_elm_index_item_append_func \
 		utc_UIFW_elm_index_item_append_relative_func \
-		utc_UIFW_elm_index_item_data_get_func \
-		utc_UIFW_elm_index_item_data_set_func \
-		utc_UIFW_elm_index_item_del_func \
 		utc_UIFW_elm_index_item_find_func \
 		utc_UIFW_elm_index_item_go_func \
 		utc_UIFW_elm_index_item_letter_get_func \

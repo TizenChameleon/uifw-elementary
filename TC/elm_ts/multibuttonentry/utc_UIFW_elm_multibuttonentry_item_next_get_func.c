@@ -5,9 +5,8 @@
 // For checking the result of the positive test case.
 #define TET_CHECK_PASS(x1, y...) \
 { \
-	Elm_Multibuttonentry_Item *err = y; \
-	Elm_Multibuttonentry_Item *val = x1; \
-	if (err == val) \
+	Evas_Object *err = y; \
+	if (err == (x1)) \
 		{ \
 			tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
 			tet_result(TET_FAIL); \
@@ -18,9 +17,8 @@
 // For checking the result of the negative test case.
 #define TET_CHECK_FAIL(x1, y...) \
 { \
-	Elm_Multibuttonentry_Item *err = y; \
-	Elm_Multibuttonentry_Item *val = x1; \
-	if (err != val) \
+	Evas_Object *err = y; \
+	if (err != (x1)) \
 		{ \
 			tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
 			tet_result(TET_FAIL); \
@@ -37,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_multibuttonentry_item_add_end_func_01(void);
-static void utc_UIFW_elm_multibuttonentry_item_add_end_func_02(void);
+static void utc_UIFW_elm_multibuttonentry_item_next_get_func_01(void);
+static void utc_UIFW_elm_multibuttonentry_item_next_get_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -46,8 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_multibuttonentry_item_add_end_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_multibuttonentry_item_add_end_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_multibuttonentry_item_next_get_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_multibuttonentry_item_next_get_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -69,8 +67,8 @@ static void _win_del(void *data, Evas_Object *obj, void *event_info)
 // Do precondition.
 void _elm_precondition(void)
 {
+	tet_infoline("[[ TET_MSG ]]:: ============ Startup ============ ");
 	elm_init(0, NULL);
-
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	elm_win_title_set(main_win, "Elementary Unit Test Suite");
 	evas_object_smart_callback_add(main_win, "delete,request", _win_del, NULL);
@@ -83,8 +81,6 @@ void _elm_precondition(void)
 	evas_object_resize(main_win, 320, 480);
 	// show the window
 	evas_object_show(main_win);
-
-	//elm_run();
 }
 
 // Start up function for each test purpose
@@ -150,43 +146,26 @@ cleanup()
 	tet_infoline("[[ TET_MSG ]]:: ========= TC COMPLETE  ========== ");
 }
 
-
 /**
- * @brief Positive test case of elm_multibuttonentry_item_add_end()
+ * @brief Positive test case of elm_multibuttonentry_item_next_get()
  */
-static void utc_UIFW_elm_multibuttonentry_item_add_end_func_01(void)
+static void utc_UIFW_elm_multibuttonentry_item_next_get_func_01(void)
 {
-	Elm_Multibuttonentry_Item *added_item = NULL, *last_item = NULL;
-
 	test_eo = elm_multibuttonentry_add(test_win);
-	added_item = elm_multibuttonentry_item_add_end(test_eo, "item1", NULL);
-	TET_CHECK_PASS(NULL, added_item);
-
-	last_item = elm_multibuttonentry_item_last_get(test_eo);
-	if (added_item != last_item) {
-		tet_infoline("elm_multibuttonentry_item_add_end() failed in positive test case");
-		tet_result(TET_FAIL);
-		return;
-	}
+	TET_CHECK_PASS(NULL, test_eo);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_multibuttonentry_item_add_end().");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, An Multi Button Entry is added successfully.");
 }
-
 
 /**
- * @brief Negative test case of ug_init elm_multibuttonentry_item_add_end()
+ * @brief Negative test case of ug_init elm_multibuttonentry_item_next_get()
  */
-static void utc_UIFW_elm_multibuttonentry_item_add_end_func_02(void)
+static void utc_UIFW_elm_multibuttonentry_item_next_get_func_02(void)
 {
-
-	Elm_Multibuttonentry_Item *added_item = NULL;
-
-	test_eo = elm_multibuttonentry_add(test_win);
-	added_item = elm_multibuttonentry_item_add_end(test_eo, NULL, NULL);
-	TET_CHECK_FAIL(NULL, added_item);
+	test_eo = elm_multibuttonentry_add(NULL);
+	TET_CHECK_FAIL(NULL, test_eo);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_multibuttonentry_item_add_end().");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, Adding an Multi Button Entry has failed.");
 }
-

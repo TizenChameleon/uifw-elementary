@@ -68,7 +68,7 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-char *gli_label_get(const void *data, Evas_Object *obj, const char *part)
+char *gli_label_get(void *data, Evas_Object *obj, const char *part)
 {
    char buf[256];
    int j = (int)data;
@@ -84,9 +84,9 @@ char *gli_label_get(const void *data, Evas_Object *obj, const char *part)
 static void utc_UIFW_elm_index_item_letter_get_func_01(void)
 {
 	Evas_Object *idx = NULL;
-	Elm_Genlist_Item *it = NULL,*it_gl = NULL;
+	Elm_Object_Item *it = NULL,*it_gl = NULL;
 	Evas_Object *gl = NULL;
-	Elm_Index_Item *item = NULL;
+	Elm_Object_Item *item = NULL;
 	const char *ptr = NULL;
 	int i = 0, j = 0;
 
@@ -94,10 +94,10 @@ static void utc_UIFW_elm_index_item_letter_get_func_01(void)
    	idx= elm_index_add(main_win);
     	evas_object_show(gl);
 	evas_object_show(idx);
-    	itci.item_style     = "default";
-    	itci.func.label_get = gli_label_get;
-    	itci.func.icon_get  = NULL;
-    	itci.func.state_get = NULL;
+       itci.item_style     = "default";
+       itci.func.text_get = gli_label_get;
+       itci.func.content_get  = NULL;
+       itci.func.state_get = NULL;
     	itci.func.del       = NULL;
     	for (i = 0; i < 40; i++) {
       		it = elm_genlist_item_append(gl, &itci,(void *)j, NULL, ELM_GENLIST_ITEM_NONE, NULL,NULL);
@@ -126,8 +126,8 @@ static void utc_UIFW_elm_index_item_letter_get_func_01(void)
 static void utc_UIFW_elm_index_item_letter_get_func_02(void)
 {
 	Evas_Object *idx = NULL;
-	Elm_Genlist_Item *it = NULL,*it_gl = NULL;
-	Elm_Index_Item *item = NULL;
+	Elm_Object_Item *it = NULL,*it_gl = NULL;
+	Elm_Object_Item *item = NULL;
 	Evas_Object *gl = NULL;
 	const char *ptr = NULL;
 	int i = 0, j = 0;
@@ -137,9 +137,9 @@ static void utc_UIFW_elm_index_item_letter_get_func_02(void)
     	evas_object_show(gl);
 	evas_object_show(idx);
     	itci.item_style     = "default";
-    	itci.func.label_get = gli_label_get;
-    	itci.func.icon_get  = NULL;
-    	itci.func.state_get = NULL;
+       itci.func.text_get = gli_label_get;
+       itci.func.content_get  = NULL;
+       itci.func.state_get = NULL;
     	itci.func.del       = NULL;
     	for (i = 0; i < 40; i++) {
       		it = elm_genlist_item_append(gl, &itci,(void *)j, NULL, ELM_GENLIST_ITEM_NONE, NULL,NULL);

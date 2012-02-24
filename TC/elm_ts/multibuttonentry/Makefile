@@ -1,21 +1,18 @@
 CC ?= gcc
 
 TARGETS = utc_UIFW_elm_multibuttonentry_add_func \
-	  utc_UIFW_elm_multibuttonentry_label_get_func \
 	  utc_UIFW_elm_multibuttonentry_entry_get_func \
-	  utc_UIFW_elm_multibuttonentry_item_add_start_func \
-	  utc_UIFW_elm_multibuttonentry_item_add_end_func \
-	  utc_UIFW_elm_multibuttonentry_item_add_before_func \
-	  utc_UIFW_elm_multibuttonentry_item_add_after_func \
+	  utc_UIFW_elm_multibuttonentry_item_prepend_func \
+	  utc_UIFW_elm_multibuttonentry_item_append_func \
+	  utc_UIFW_elm_multibuttonentry_item_insert_before_func \
+	  utc_UIFW_elm_multibuttonentry_item_insert_after_func \
 	  utc_UIFW_elm_multibuttonentry_items_get_func \
-	  utc_UIFW_elm_multibuttonentry_item_first_get_func \
-	  utc_UIFW_elm_multibuttonentry_item_last_get_func \
-	  utc_UIFW_elm_multibuttonentry_item_selected_get_func \
-	  utc_UIFW_elm_multibuttonentry_item_del_func \
+	  utc_UIFW_elm_multibuttonentry_first_item_get_func \
+	  utc_UIFW_elm_multibuttonentry_last_item_get_func \
+	  utc_UIFW_elm_multibuttonentry_selected_item_get_func \
 	  utc_UIFW_elm_multibuttonentry_items_del_func \
-	  utc_UIFW_elm_multibuttonentry_item_label_get_func \
-	  utc_UIFW_elm_multibuttonentry_item_prev_func \
-	  utc_UIFW_elm_multibuttonentry_item_next_func \
+	  utc_UIFW_elm_multibuttonentry_item_prev_get_func \
+	  utc_UIFW_elm_multibuttonentry_item_next_get_func \
 	  utc_UIFW_elm_multibuttonentry_item_data_get_func
 
 PKGS = elementary evas

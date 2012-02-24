@@ -171,12 +171,12 @@ static void utc_UIFW_elm_multibuttonentry_items_get_func_01(void)
 	}
 
 	for(i=0; i< 5; i++){
-		elm_multibuttonentry_item_add_end(test_eo, "item", NULL);
+		elm_multibuttonentry_item_append(test_eo, "item", NULL);
 	}
 
 	// test 2
 	items = elm_multibuttonentry_items_get(test_eo);
-	TET_CHECK_PASS(NULL, items);
+	TET_CHECK_PASS(NULL, (Eina_List*)items);
 
 	// test 3
 	count = eina_list_count(items);
@@ -196,12 +196,12 @@ static void utc_UIFW_elm_multibuttonentry_items_get_func_01(void)
  */
 static void utc_UIFW_elm_multibuttonentry_items_get_func_02(void)
 {
-	Eina_List *items = NULL;
+	const Eina_List *items = NULL;
 	int i=0;
 
 	test_eo = elm_multibuttonentry_add(NULL);
 	for(i=0; i< 5; i++){
-		elm_multibuttonentry_item_add_end(test_eo, "item", NULL);
+		elm_multibuttonentry_item_prepend(test_eo, "item", NULL);
 	}
 	items = elm_multibuttonentry_items_get(NULL);
 	TET_CHECK_FAIL(NULL, items);

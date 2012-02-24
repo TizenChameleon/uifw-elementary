@@ -68,7 +68,7 @@ static void cleanup(void)
 	tet_infoline("[[ TET_MSG ]]:: ============ Cleanup ============ ");
 }
 
-char *gli_label_get(const void *data, Evas_Object *obj, const char *part)
+char *gli_label_get(void *data, Evas_Object *obj, const char *part)
 {
    char buf[256];
    int j = (int)data;
@@ -85,8 +85,8 @@ static void utc_UIFW_elm_index_item_del_func_01(void)
 {
 	Evas_Object *idx = NULL;
 	Evas_Object *gl = NULL;
-	Elm_Genlist_Item *it = NULL, *it_gl=NULL;
-	Elm_Index_Item *it_idx = NULL;
+	Elm_Object_Item *it = NULL, *it_gl=NULL;
+	Elm_Object_Item *it_idx = NULL;
 	int i = 0, j = 0;
 
 	gl = elm_genlist_add(main_win);
@@ -126,8 +126,8 @@ static void utc_UIFW_elm_index_item_del_func_02(void)
 {
 	Evas_Object *idx = NULL;
 	Evas_Object *gl = NULL;
-	Elm_Genlist_Item *it = NULL, *it_gl=NULL;
-	Elm_Index_Item *it_idx = NULL;
+	Elm_Object_Item *it = NULL, *it_gl=NULL;
+	Elm_Object_Item *it_idx = NULL;
 	int i = 0, j = 0;
 
 	gl = elm_genlist_add(main_win);

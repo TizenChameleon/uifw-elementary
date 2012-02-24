@@ -5,8 +5,9 @@
 // For checking the result of the positive test case.
 #define TET_CHECK_PASS(x1, y...) \
 { \
-	Elm_Multibuttonentry_Item *err = y; \
-	if (err == (x1)) \
+	Elm_Object_Item *err = y; \
+	Elm_Object_Item *val = x1; \
+	if (err == val) \
 		{ \
 			tet_printf("[TET_CHECK_PASS]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
 			tet_result(TET_FAIL); \
@@ -17,8 +18,9 @@
 // For checking the result of the negative test case.
 #define TET_CHECK_FAIL(x1, y...) \
 { \
-	Elm_Multibuttonentry_Item *err = y; \
-	if (err != (x1)) \
+	Elm_Object_Item *err = y; \
+	Elm_Object_Item *val = x1; \
+	if (err != val) \
 		{ \
 			tet_printf("[TET_CHECK_FAIL]:: %s[%d] : Test has failed..", __FILE__,__LINE__); \
 			tet_result(TET_FAIL); \
@@ -35,8 +37,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_multibuttonentry_item_add_after_func_01(void);
-static void utc_UIFW_elm_multibuttonentry_item_add_after_func_02(void);
+static void utc_UIFW_elm_multibuttonentry_item_prepend_func_01(void);
+static void utc_UIFW_elm_multibuttonentry_item_prepend_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +46,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_multibuttonentry_item_add_after_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_multibuttonentry_item_add_after_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_multibuttonentry_item_prepend_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_multibuttonentry_item_prepend_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -68,7 +70,6 @@ static void _win_del(void *data, Evas_Object *obj, void *event_info)
 void _elm_precondition(void)
 {
 	elm_init(0, NULL);
-
 	main_win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
 	elm_win_title_set(main_win, "Elementary Unit Test Suite");
 	evas_object_smart_callback_add(main_win, "delete,request", _win_del, NULL);
@@ -81,8 +82,6 @@ void _elm_precondition(void)
 	evas_object_resize(main_win, 320, 480);
 	// show the window
 	evas_object_show(main_win);
-
-	//elm_run();
 }
 
 // Start up function for each test purpose
@@ -119,7 +118,7 @@ cleanup()
 	// Clean up the used resources.
 	if ( NULL != main_win ) {
 		evas_object_del(main_win);
-		main_win = NULL;
+	       	main_win = NULL;
 	}
 
 	if ( NULL != main_bg ) {
@@ -148,44 +147,38 @@ cleanup()
 	tet_infoline("[[ TET_MSG ]]:: ========= TC COMPLETE  ========== ");
 }
 
-
 /**
- * @brief Positive test case of elm_multibuttonentry_item_add_after()
+ * @brief Positive test case of elm_multibuttonentry_item_prepend()
  */
-static void utc_UIFW_elm_multibuttonentry_item_add_after_func_01(void)
+static void utc_UIFW_elm_multibuttonentry_item_prepend_func_01(void)
 {
-	Elm_Multibuttonentry_Item *added_item1 = NULL, *added_item2 = NULL, *after_item = NULL;
+	Elm_Object_Item  *added_item = NULL, *first_item = NULL;
 
 	test_eo = elm_multibuttonentry_add(test_win);
-	added_item1 = elm_multibuttonentry_item_add_start(test_eo, "item1", NULL);
-	added_item2 = elm_multibuttonentry_item_add_after(test_eo, "item2", added_item1, NULL);
-	TET_CHECK_PASS(NULL, added_item2);
+	added_item = elm_multibuttonentry_item_prepend(test_eo, "item1", NULL);
+	TET_CHECK_PASS(NULL, added_item);
 
-	after_item = elm_multibuttonentry_item_next(added_item1);
-	if (added_item2 != after_item) {
-		tet_infoline("elm_multibuttonentry_item_add_after() failed in positive test case");
+	first_item = elm_multibuttonentry_first_item_get(test_eo);
+	if (added_item != first_item) {
+		tet_infoline("elm_multibuttonentry_item_prepend() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
-
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_multibuttonentry_item_add_after().");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]:PASS, elm_multibuttonentry_item_prepend().");
 }
-
 
 /**
- * @brief Negative test case of ug_init elm_multibuttonentry_item_add_after()
+ * @brief Negative test case of ug_init elm_multibuttonentry_item_prepend()
  */
-static void utc_UIFW_elm_multibuttonentry_item_add_after_func_02(void)
+static void utc_UIFW_elm_multibuttonentry_item_prepend_func_02(void)
 {
-	Elm_Multibuttonentry_Item *added_item1 = NULL, *added_item2 = NULL;
+	Elm_Object_Item  *added_item = NULL;
 
-	test_eo = elm_multibuttonentry_add(NULL);
-	added_item1 = elm_multibuttonentry_item_add_start(test_eo, "item1", NULL);
-	added_item2 = elm_multibuttonentry_item_add_after(test_eo, NULL, added_item1, NULL);
-	TET_CHECK_FAIL(NULL, added_item2);
+	test_eo = elm_multibuttonentry_add(test_win);
+	added_item = elm_multibuttonentry_first_item_get(test_eo);
+	TET_CHECK_FAIL(NULL, added_item);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_multibuttonentry_item_add_after().");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Negative, [RESULT]:PASS, elm_multibuttonentry_item_prepend().");
 }
-
