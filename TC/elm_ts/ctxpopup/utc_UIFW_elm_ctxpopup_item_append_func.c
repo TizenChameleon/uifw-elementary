@@ -76,7 +76,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_ctxpopup_item_append_func_01(void)
 {
-	Elm_Ctxpopup_Item * item = elm_ctxpopup_item_append(ctxpopup, "TEST", NULL, NULL, NULL );
+	Elm_Object_Item * item = elm_ctxpopup_item_append(ctxpopup, "TEST", NULL, NULL, NULL );
 
 	if (!item)
 	{
@@ -92,7 +92,7 @@ static void utc_UIFW_elm_ctxpopup_item_append_func_01(void)
  */
 static void utc_UIFW_elm_ctxpopup_item_append_func_02(void)
 {
-	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append( NULL, "TEST", NULL, NULL, NULL );
+	Elm_Object_Item *item = elm_ctxpopup_item_append( NULL, "TEST", NULL, NULL, NULL );
 
 	if (item)
 	{

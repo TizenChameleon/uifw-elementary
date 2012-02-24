@@ -35,8 +35,8 @@ static void cleanup(void);
 void (*tet_startup)(void) = startup;
 void (*tet_cleanup)(void) = cleanup;
 
-static void utc_UIFW_elm_box_homogenous_set_func_01(void);
-static void utc_UIFW_elm_box_homogenous_set_func_02(void);
+static void utc_UIFW_elm_box_homogeneous_set_func_01(void);
+static void utc_UIFW_elm_box_homogeneous_set_func_02(void);
 
 enum {
 	POSITIVE_TC_IDX = 0x01,
@@ -44,8 +44,8 @@ enum {
 };
 
 struct tet_testlist tet_testlist[] = {
-	{ utc_UIFW_elm_box_homogenous_set_func_01, POSITIVE_TC_IDX },
-	{ utc_UIFW_elm_box_homogenous_set_func_02, NEGATIVE_TC_IDX },
+	{ utc_UIFW_elm_box_homogeneous_set_func_01, POSITIVE_TC_IDX },
+	{ utc_UIFW_elm_box_homogeneous_set_func_02, NEGATIVE_TC_IDX },
 	{ NULL, 0 }
 };
 
@@ -68,35 +68,35 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_box_homogenous_set()
+ * @brief Positive test case of elm_box_homogeneous_set()
  */
-static void utc_UIFW_elm_box_homogenous_set_func_01(void)
+static void utc_UIFW_elm_box_homogeneous_set_func_01(void)
 {
 	Evas_Object *test_eo = NULL;
 
 	test_eo = elm_box_add(main_win);
 
 	// Current return tyep of this API is "Void"
-	elm_box_homogenous_set(test_eo, EINA_TRUE);
+	elm_box_homogeneous_set(test_eo, EINA_TRUE);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]: PASS, Set homogenous layout ON.");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_01, [TYPE]: Positive, [RESULT]: PASS, Set homogeneous layout ON.");
 
 }
 
 /**
- * @brief Positive test case of ug_init elm_box_homogenous_set()
+ * @brief Positive test case of ug_init elm_box_homogeneous_set()
  */
-static void utc_UIFW_elm_box_homogenous_set_func_02(void)
+static void utc_UIFW_elm_box_homogeneous_set_func_02(void)
 {
 	Evas_Object *test_eo = NULL;
 
 	test_eo = elm_box_add(main_win);
 
 	// Current return tyep of this API is "Void"
-	elm_box_homogenous_set(test_eo, EINA_FALSE);
+	elm_box_homogeneous_set(test_eo, EINA_FALSE);
 
 	tet_result(TET_PASS);
-	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Positive, [RESULT]: PASS, Set homogenous layout OFF.");
+	tet_infoline("[[ TET_MSG ]]::[ID]:TC_02, [TYPE]: Positive, [RESULT]: PASS, Set homogeneous layout OFF.");
 
 }
