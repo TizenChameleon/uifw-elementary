@@ -28,7 +28,7 @@ Evas_Object *main_win, *main_bg;
 Evas_Object *test_win, *test_bg;
 Evas_Object *test_eo = NULL;
 Elm_Gengrid_Item_Class gic;
-Elm_Gengrid_Item *item;
+Elm_Object_Item *item;
 
 void _elm_precondition(void);
 static void _win_del(void *data, Evas_Object *obj, void *event_info);
@@ -93,8 +93,8 @@ static void startup(void)
 
 	test_eo = elm_gengrid_add(test_win);
 	gic.item_style = "default_grid";
-	gic.func.label_get = NULL;
-	gic.func.icon_get = NULL;
+	gic.func.text_get = NULL;
+	gic.func.content_get = NULL;
 
 	item = elm_gengrid_item_append(test_eo, &gic, test_bg, NULL, NULL);
 	elm_gengrid_item_selected_set(item, EINA_TRUE);
@@ -131,7 +131,7 @@ static void cleanup(void)
 
 static void utc_UIFW_elm_gengrid_selected_item_get_func_01(void)
 {
-	Elm_Gengrid_Item *temp_item = NULL;
+	Elm_Object_Item *temp_item = NULL;
 
 	temp_item = elm_gengrid_selected_item_get(test_eo);
 
@@ -143,7 +143,7 @@ static void utc_UIFW_elm_gengrid_selected_item_get_func_01(void)
 
 static void utc_UIFW_elm_gengrid_selected_item_get_func_02(void)
 {
-	Elm_Gengrid_Item *temp_item = NULL;
+	Elm_Object_Item *temp_item = NULL;
 
 	temp_item = elm_gengrid_selected_item_get(NULL);
 

@@ -28,7 +28,7 @@ Evas_Object *main_win, *main_bg;
 Evas_Object *test_win, *test_bg;
 Evas_Object *test_eo = NULL;
 Elm_Gengrid_Item_Class gic;
-Elm_Gengrid_Item *item;
+Elm_Object_Item *item;
 
 void _elm_precondition(void);
 static void _win_del(void *data, Evas_Object *obj, void *event_info);
@@ -72,7 +72,7 @@ struct tet_testlist tet_testlist[] = {
 	{ NULL, 0 }
 };
 
-static Evas_Object * _icon_get(const void *data, Evas_Object *obj, const char *part)
+static Evas_Object * _content_get(void *data, Evas_Object *obj, const char *part)
 {
 	if (!strcmp(part, "elm.swallow.icon"))
 	{
@@ -112,8 +112,8 @@ static void startup(void)
 	elm_gengrid_multi_select_set(test_eo, EINA_TRUE);
 
 	gic.item_style = "default_grid";
-	gic.func.label_get = NULL;
-	gic.func.icon_get = _icon_get;
+	gic.func.text_get = NULL;
+	gic.func.content_get = _content_get;
 
 	item = elm_gengrid_item_append(test_eo, &gic, NULL, NULL, NULL);
 
