@@ -68,19 +68,19 @@ static void cleanup(void)
 }
 
 /**
- * @brief Positive test case of elm_ctxpopup_item_disabled_get()
+ * @brief Positive test case of elm_object_item_disabled_get()
  */
 static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_01(void)
 {
 	Evas_Object *obj = elm_ctxpopup_add(main_win);
-	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
+	Elm_Object_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
 	elm_ctxpopup_item_disabled_set(item, EINA_TRUE);
 	evas_object_show(obj);
 
-   Eina_Bool r = elm_ctxpopup_item_disabled_get(item);
+   Eina_Bool r = elm_object_item_disabled_get(item);
 
 	if (r != EINA_TRUE) {
-		tet_infoline("elm_ctxpopup_item_disabled_get() failed in positive test case");
+		tet_infoline("elm_object_item_disabled_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}
@@ -89,18 +89,18 @@ static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_01(void)
 }
 
 /**
- * @brief Negative test case of ug_init elm_ctxpopup_item_disabled_get()
+ * @brief Negative test case of ug_init elm_object_item_disabled_get()
  */
 static void utc_UIFW_elm_ctxpopup_item_disabled_get_func_02(void)
 {
    Evas_Object *obj = elm_ctxpopup_add(main_win);
-	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
+	Elm_Object_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
 	evas_object_show(obj);
 
-   Eina_Bool r = elm_ctxpopup_item_disabled_get(item);
+   Eina_Bool r = elm_object_item_disabled_get(item);
 
 	if (r == EINA_TRUE) {
-		tet_infoline("elm_ctxpopup_item_disabled_get() failed in positive test case");
+		tet_infoline("elm_object_item_disabled_get() failed in positive test case");
 		tet_result(TET_FAIL);
 		return;
 	}

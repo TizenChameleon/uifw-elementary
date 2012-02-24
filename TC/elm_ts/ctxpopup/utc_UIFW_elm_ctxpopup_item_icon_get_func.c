@@ -80,7 +80,7 @@ static void utc_UIFW_elm_ctxpopup_item_icon_get_func_01(void)
 	evas_object_size_hint_min_set(icon, 50, 50);
 	evas_object_show(icon);
 
-	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append( ctxpopup, "TEST", icon, NULL, NULL );
+	Elm_Object_Item *item = elm_ctxpopup_item_append( ctxpopup, "TEST", icon, NULL, NULL );
 	Evas_Object *icon2 = elm_ctxpopup_item_icon_get(item);
 
 	if ( icon != icon2 )
@@ -101,7 +101,7 @@ static void utc_UIFW_elm_ctxpopup_item_icon_get_func_02(void)
 	evas_object_size_hint_min_set(icon, 50, 50);
 	evas_object_show(icon);
 
-	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append( ctxpopup, "TEST", icon, NULL, NULL );
+	Elm_Object_Item *item = elm_ctxpopup_item_append( ctxpopup, "TEST", icon, NULL, NULL );
 
 	Evas_Object *icon2 = elm_ctxpopup_item_icon_get(NULL);
 

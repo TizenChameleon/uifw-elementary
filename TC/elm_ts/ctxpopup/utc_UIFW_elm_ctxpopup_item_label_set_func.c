@@ -74,7 +74,7 @@ static void utc_UIFW_elm_ctxpopup_item_label_set_func_01(void)
 	Evas_Object *obj = elm_ctxpopup_add(main_win);
 	evas_object_show(obj);
 
-	Elm_Ctxpopup_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
+	Elm_Object_Item *item = elm_ctxpopup_item_append(obj, "TEST", NULL, NULL, NULL);
 	elm_ctxpopup_item_label_set( item, "NONE");
 
 	tet_result(TET_PASS);

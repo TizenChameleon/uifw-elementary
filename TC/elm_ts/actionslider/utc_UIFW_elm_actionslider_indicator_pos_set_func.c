@@ -77,7 +77,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_actionslider_indicator_pos_set_func_01(void)
 {
-   	elm_actionslider_indicator_pos_set(actionslider, ELM_ACTIONSLIDER_INDICATOR_LEFT);
+   	elm_actionslider_indicator_pos_set(actionslider, ELM_ACTIONSLIDER_LEFT);
 
 	tet_result(TET_PASS);
 }
