@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.67547slp2+build08) unstable; urgency=low
+
+  * bugfix genlist showitem, calc_job and misc
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.67547slp2+build08
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Fri, 24 Feb 2012 09:07:49 +0900
+
 elementary (1.0.0+svn.67547slp2+build07) unstable; urgency=low
 
   * [Map] Tunnig rotate callback because of gesture layer merge
