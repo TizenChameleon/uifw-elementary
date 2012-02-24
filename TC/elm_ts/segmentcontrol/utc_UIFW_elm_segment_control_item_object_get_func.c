@@ -77,7 +77,7 @@ static void cleanup(void)
  */
 static void utc_UIFW_elm_segment_control_item_object_get_func_01(void)
 {
-   Elm_Segment_Item *item = NULL;
+   Elm_Object_Item *item = NULL;
    Evas_Object *it = NULL;
    Evas_Object *segment = NULL;
    segment = elm_segment_control_add(main_win);
@@ -97,7 +97,7 @@ static void utc_UIFW_elm_segment_control_item_object_get_func_01(void)
  */
 static void utc_UIFW_elm_segment_control_item_object_get_func_02(void)
 {
-   Elm_Segment_Item *item = NULL;
+   Elm_Object_Item *item = NULL;
    Evas_Object *it = NULL;
    Evas_Object *segment = NULL;
    segment = elm_segment_control_add(main_win);
