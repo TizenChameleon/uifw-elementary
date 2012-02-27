@@ -192,7 +192,6 @@ EAPI extern Elm_Version *elm_version;
 #include <elm_dayselector.h>
 #include <elm_debug.h>
 #include <elm_diskselector.h>
-#include <elm_editfield.h>
 #include <elm_engine.h>
 #include <elm_factory.h>
 #include <elm_finger.h>
@@ -235,7 +234,6 @@ EAPI extern Elm_Version *elm_version;
 #include <elm_route.h>
 #include <elm_scale.h>
 #include <elm_scroll.h>
-#include <elm_searchbar.h>
 #include <elm_segment_control.h>
 #include <elm_separator.h>
 #include <elm_slider.h>

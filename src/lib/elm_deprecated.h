@@ -3846,3 +3846,93 @@ EINA_DEPRECATED EAPI Evas_Object       *elm_entry_end_unset(Evas_Object *obj);
  */
 EINA_DEPRECATED EAPI void                  elm_map_utils_rotate_coord(const Evas_Object *obj, const Evas_Coord x, const Evas_Coord y, const Evas_Coord cx, const Evas_Coord cy, const double degree, Evas_Coord *xx, Evas_Coord *yy);
 
+// All elm_editfield APIs were deprecated.
+EINA_DEPRECATED Evas_Object *elm_editfield_add(Evas_Object *parent);
+EINA_DEPRECATED void         elm_editfield_label_set(Evas_Object *obj, const char *label);
+EINA_DEPRECATED const char  *elm_editfield_label_get(Evas_Object *obj);
+EINA_DEPRECATED void         elm_editfield_guide_text_set(Evas_Object *obj, const char *text);
+EINA_DEPRECATED const char  *elm_editfield_guide_text_get(Evas_Object *obj);
+EINA_DEPRECATED Evas_Object *elm_editfield_entry_get(Evas_Object *obj);
+EINA_DEPRECATED void         elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line);
+EINA_DEPRECATED Eina_Bool    elm_editfield_entry_single_line_get(Evas_Object *obj);
+EINA_DEPRECATED void         elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible);
+EINA_DEPRECATED Eina_Bool    elm_editfield_eraser_get(Evas_Object *obj);
+
+/**
+    * @defgroup Searchbar Searchbar
+    * @addtogroup Searchbar
+    * @{
+    * @ingroup Elementary
+    *
+    * This is Searchbar.
+    * It can contain a simple entry and button object.
+    */
+
+   /**
+    * Add a new searchbar to the parent
+    * @param parent The parent object
+    * @return The new object or NULL if it cannot be created
+    */
+   EINA_DEPRECATED Evas_Object *elm_searchbar_add(Evas_Object *parent);
+   /**
+    * set the text of entry
+    *
+    * @param obj The searchbar object
+    * @return void
+    */
+   EINA_DEPRECATED void         elm_searchbar_text_set(Evas_Object *obj, const char *entry);
+   /**
+    * get the text of entry
+    *
+    * @param obj The searchbar object
+    * @return string pointer of entry
+    */
+   EINA_DEPRECATED const char  *elm_searchbar_text_get(Evas_Object *obj);
+   /**
+    * get the pointer of entry
+    *
+    * @param obj The searchbar object
+    * @return the entry object
+    */
+   EINA_DEPRECATED Evas_Object *elm_searchbar_entry_get(Evas_Object *obj);
+   /**
+    * get the pointer of editfield
+    *
+    * @param obj The searchbar object
+    * @return the editfield object
+    */
+   EINA_DEPRECATED Evas_Object *elm_searchbar_editfield_get(Evas_Object *obj);
+   /**
+    * set the cancel button animation flag
+    *
+    * @param obj The searchbar object
+    * @param cancel_btn_ani_flag The flag of animating cancen button or not
+    * @return void
+    */
+   EINA_DEPRECATED void         elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag);
+   /**
+    * set the cancel button show mode
+    *
+    * @param obj The searchbar object
+    * @param visible The flag of cancen button show or not
+    * @return void
+    */
+   EINA_DEPRECATED void         elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible);
+   /**
+    * clear searchbar status
+    *
+    * @param obj The searchbar object
+    * @return void
+    */
+   EINA_DEPRECATED void         elm_searchbar_clear(Evas_Object *obj);
+   /**
+    * set the searchbar boundary rect mode(with bg rect) set
+    *
+    * @param obj The searchbar object
+    * @param boundary The present flag of boundary rect or not
+    * @return void
+    */
+   EINA_DEPRECATED void         elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary);
+   /**
+    * @}
+    */

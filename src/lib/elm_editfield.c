@@ -279,7 +279,7 @@ _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
  *
  * @ingroup Editfield
  */
-EAPI Evas_Object *
+EINA_DEPRECATED Evas_Object *
 elm_editfield_add(Evas_Object *parent)
 {
    Evas_Object *obj;
@@ -334,7 +334,7 @@ elm_editfield_add(Evas_Object *parent)
  *
  * @ingroup Editfield
  */
-EAPI void
+EINA_DEPRECATED void
 elm_editfield_label_set(Evas_Object *obj, const char *label)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -366,7 +366,7 @@ elm_editfield_label_set(Evas_Object *obj, const char *label)
  *
  * @ingroup Editfield
  */
-EAPI const char*
+EINA_DEPRECATED const char*
 elm_editfield_label_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -383,7 +383,7 @@ elm_editfield_label_get(Evas_Object *obj)
  *
  * @ingroup Editfield
  */
-EAPI void
+EINA_DEPRECATED void
 elm_editfield_guide_text_set(Evas_Object *obj, const char *text)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -409,7 +409,7 @@ elm_editfield_guide_text_set(Evas_Object *obj, const char *text)
  *
  * @ingroup Editfield
  */
-EAPI const char*
+EINA_DEPRECATED const char*
 elm_editfield_guide_text_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -427,7 +427,7 @@ elm_editfield_guide_text_get(Evas_Object *obj)
  *
  * @ingroup Editfield
  */
-EAPI Evas_Object *
+EINA_DEPRECATED Evas_Object *
 elm_editfield_entry_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -444,7 +444,7 @@ elm_editfield_entry_get(Evas_Object *obj)
  *
  * @ingroup Editfield
  */
-EAPI void
+EINA_DEPRECATED void
 elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -477,7 +477,7 @@ elm_editfield_entry_single_line_set(Evas_Object *obj, Eina_Bool single_line)
  *
  * @ingroup Editfield
  */
-EAPI Eina_Bool
+EINA_DEPRECATED Eina_Bool
 elm_editfield_entry_single_line_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -495,7 +495,7 @@ elm_editfield_entry_single_line_get(Evas_Object *obj)
  *
  * @ingroup Editfield
  */
-EAPI void
+EINA_DEPRECATED void
 elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -514,7 +514,7 @@ elm_editfield_eraser_set(Evas_Object *obj, Eina_Bool visible)
  *
  * @ingroup Editfield
  */
-EAPI Eina_Bool
+EINA_DEPRECATED Eina_Bool
 elm_editfield_eraser_get(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);

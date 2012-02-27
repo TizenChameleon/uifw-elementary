@@ -78,7 +78,6 @@ elm_debug.h \
 elm_deprecated.h \
 elm_deprecated_before.h \
 elm_diskselector.h \
-elm_editfield.h \
 elm_engine.h \
 elm_entry.h \
 elm_factory.h \
@@ -129,7 +128,6 @@ elm_route.h \
 elm_scale.h \
 elm_scroller.h \
 elm_scroll.h \
-elm_searchbar.h \
 elm_segment_control.h \
 elm_separator.h \
 elm_slider.h \

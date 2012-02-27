@@ -167,7 +167,7 @@ _elm_searchbar_text_get(const Evas_Object *obj, const char *item)
 }
 
 
-EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
+EINA_DEPRECATED Evas_Object *elm_searchbar_add(Evas_Object *parent)
 {
    Evas_Object *obj;
    Evas *e;
@@ -220,17 +220,17 @@ EAPI Evas_Object *elm_searchbar_add(Evas_Object *parent)
    return obj;
 }
 
-EAPI void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
+EINA_DEPRECATED void elm_searchbar_text_set(Evas_Object *obj, const char *entry)
 {
    _elm_searchbar_text_set(obj, NULL, entry);
 }
 
-EAPI const char* elm_searchbar_text_get(Evas_Object *obj)
+EINA_DEPRECATED const char* elm_searchbar_text_get(Evas_Object *obj)
 {
    return _elm_searchbar_text_get(obj, NULL);
 }
 
-EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
+EINA_DEPRECATED Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -239,7 +239,7 @@ EAPI Evas_Object *elm_searchbar_entry_get(Evas_Object *obj)
    return elm_editfield_entry_get(wd->ef);
 }
 
-EAPI Evas_Object *elm_searchbar_editfield_get(Evas_Object *obj)
+EINA_DEPRECATED Evas_Object *elm_searchbar_editfield_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -248,7 +248,7 @@ EAPI Evas_Object *elm_searchbar_editfield_get(Evas_Object *obj)
    return wd->ef;
 }
 
-EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag)
+EINA_DEPRECATED void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool cancel_btn_ani_flag)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -258,7 +258,7 @@ EAPI void elm_searchbar_cancel_button_animation_set(Evas_Object *obj, Eina_Bool 
    else wd->cancel_btn_ani_flag = cancel_btn_ani_flag;
 }
 
-EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
+EINA_DEPRECATED void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -277,7 +277,7 @@ EAPI void elm_searchbar_cancel_button_set(Evas_Object *obj, Eina_Bool visible)
    _sizing_eval(obj);
 }
 
-EAPI void elm_searchbar_clear(Evas_Object *obj)
+EINA_DEPRECATED void elm_searchbar_clear(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -293,7 +293,7 @@ EAPI void elm_searchbar_clear(Evas_Object *obj)
 //   elm_entry_entry_set(elm_editfield_entry_get(wd->ef), NULL);
 }
 
-EAPI void elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary)
+EINA_DEPRECATED void elm_searchbar_boundary_rect_set(Evas_Object *obj, Eina_Bool boundary)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
