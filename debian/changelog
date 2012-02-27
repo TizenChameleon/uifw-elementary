@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.67547slp2+build10) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [editfield   * Important Changes searchbar] deprecated
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.67547slp2+build10
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Mon, 27 Feb 2012 21:46:46 +0900
+
 elementary (1.0.0+svn.67547slp2+build09) unstable; urgency=low
 
   * add checking widtype in calc_job
