@@ -28,6 +28,50 @@ struct _Elm_Entry_Context_Menu_Item
    void *data;
 };
 
+static char *
+_remove_tags(const char *str)
+{
+   char *ret;
+   if (!str)
+     return NULL;
+
+   Eina_Strbuf *buf = eina_strbuf_new();
+   if (!buf)
+     return NULL;
+
+   if (!eina_strbuf_append(buf, str))
+     return NULL;
+
+   eina_strbuf_replace_all(buf, "<br>", " ");
+   eina_strbuf_replace_all(buf, "<br/>", " ");
+   eina_strbuf_replace_all(buf, "<ps>", " ");
+   eina_strbuf_replace_all(buf, "<ps/>", " ");
+
+   while (EINA_TRUE)
+     {
+        const char *temp = eina_strbuf_string_get(buf);
+
+        char *startTag = NULL;
+        char *endTag = NULL;
+
+        startTag = strstr(temp, "<");
+        if (startTag)
+          endTag = strstr(startTag, ">");
+        else
+          break;
+        if (!endTag || startTag > endTag)
+          break;
+
+        size_t sindex = startTag - temp;
+        size_t eindex = endTag - temp + 1;
+        if (!eina_strbuf_remove(buf, sindex, eindex))
+          break;
+     }
+   ret = eina_strbuf_string_steal(buf);
+   eina_strbuf_free(buf);
+   return ret;
+}
+
 static void _ctxpopup_hide(Evas_Object *popup);
 static void _ctxpopup_position(Evas_Object *obj);
 static void
@@ -185,9 +229,18 @@ _search_menu(void *data, Evas_Object *obj, void *event_info)
    appsvc_set_operation(b, APPSVC_OPERATION_SEARCH);
    if (ext_mod->selmode)
      {
-        char *selection = elm_entry_selection_get(ext_mod->caller);
+        const char *selection = elm_entry_selection_get(ext_mod->caller);
         if (selection)
-          appsvc_add_data(b, APPSVC_DATA_KEYWORD, selection);
+          {
+             char *str = _remove_tags(selection);
+             if (str)
+               {
+                  appsvc_add_data(b, APPSVC_DATA_KEYWORD, str);
+                  free(str);
+               }
+             else
+               appsvc_add_data(b, APPSVC_DATA_KEYWORD, selection);
+          }
      }
    appsvc_run_service(b, 0, NULL, NULL);
    bundle_free(b);
