@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.67547slp2+build12) unstable; urgency=low
+
+  * Package upload
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.67547slp2+build12
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Tue, 28 Feb 2012 15:04:22 +0900
+
 elementary (1.0.0+svn.67547slp2+build11) unstable; urgency=low
 
   * Merge opensource els_icon.c bug fix to resolve GUI Builder issue
