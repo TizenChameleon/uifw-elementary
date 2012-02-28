@@ -76,9 +76,6 @@ struct _Widget_Data
    Eina_Bool input_panel_return_key_disabled : 1;
 //// TIZEN ONLY
    Evas_Object *hoversel;
-   Evas_Object *hover;
-   Evas_Object *layout;
-   Evas_Object *list;
    Evas_Object *mgf_proxy;
    Evas_Object *mgf_clip;
    Evas_Object *mgf_bg;
@@ -89,14 +86,9 @@ struct _Widget_Data
    Ecore_Job *region_recalc_job;
    const char *password_text;
    Evas_Coord cx, cy, cw, ch;
-   Eina_List *match_list;
-   Ecore_Job *matchlist_job;
-   int matchlist_threshold;
    Eina_Bool double_clicked : 1;
    Eina_Bool long_pressed : 1;
    Eina_Bool magnifier_enabled : 1;
-   Eina_Bool matchlist_list_clicked : 1;
-   Eina_Bool matchlist_case_sensitive : 1;
    Elm_CNP_Mode cnp_mode : 2;
 //
 };
@@ -199,9 +191,6 @@ static const char SIG_ANCHOR_OUT[] = "anchor,out";
 static const char SIG_PREEDIT_CHANGED[] = "preedit,changed";
 static const char SIG_UNDO_REQUEST[] = "undo,request";
 static const char SIG_REDO_REQUEST[] = "redo,request";
-// TIZEN ONLY
-static const char SIG_MATCHLIST_CLICKED[] = "matchlist,clicked";
-//
 static const Evas_Smart_Cb_Description _signals[] = {
        {SIG_CHANGED, ""},
        {SIG_ACTIVATED, ""},
@@ -229,7 +218,6 @@ static const Evas_Smart_Cb_Description _signals[] = {
        {SIG_CHANGED_USER, ""},
        {SIG_UNDO_REQUEST, ""},
        {SIG_REDO_REQUEST, ""},
-       {SIG_MATCHLIST_CLICKED, ""},  // TIZEN ONLY
        {NULL, NULL}
 };
 
@@ -546,7 +534,6 @@ _del_hook(Evas_Object *obj)
         wd->append_text_left = NULL;
         wd->append_text_idler = NULL;
      }
-   if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
    if (wd->mgf_proxy) evas_object_del(wd->mgf_proxy);
    if (wd->mgf_bg) evas_object_del(wd->mgf_bg);
    if (wd->mgf_clip) evas_object_del(wd->mgf_clip);
@@ -1830,133 +1817,6 @@ char* _strcasestr(const char *s, const char *find)
 #endif
 
 static void
-_matchlist_show(void *data)
-{
-   Widget_Data *wd = elm_widget_data_get(data);
-   const char *text = NULL;
-   int textlen = 0;
-   char *str_list = NULL, *str_result = NULL;
-   char *str_mkup = NULL, *str_front = NULL, *str_mid = NULL;
-
-   Eina_List *l;
-   Eina_Bool textfound = EINA_FALSE;
-
-   if (!wd) return;
-   if (elm_widget_disabled_get(data)) return;
-
-   wd->matchlist_job = NULL;
-
-   if (wd->matchlist_list_clicked)
-     {
-        evas_object_hide(wd->hover);
-        wd->matchlist_list_clicked = EINA_FALSE;
-        return;
-     }
-   text = elm_entry_entry_get(data);
-   if (text == NULL)
-     return;
-   textlen = strlen(text);
-
-   if (textlen < wd->matchlist_threshold)
-     {
-        evas_object_hide(wd->hover);
-        return;
-     }
-
-   evas_object_hide(wd->hover);
-
-   if (wd->match_list)
-     {
-        elm_list_clear(wd->list);
-        EINA_LIST_FOREACH(wd->match_list, l, str_list)
-          {
-             if (wd->matchlist_case_sensitive)
-               str_result = strstr(str_list, text);
-             else
-#ifdef HAVE_STRCASESTR
-                str_result = strcasestr(str_list, text);
-#else
-                str_result = _strcasestr(str_list, text);
-#endif
-
-             if (str_result)
-               {
-                  str_mkup = malloc(strlen(str_list) + 16);
-                  if (str_mkup == NULL) return;
-
-                  textlen = strlen(str_list) - strlen(str_result);
-                  str_front = malloc(textlen + 1);
-                  if (str_front == NULL)
-                    {
-                       free(str_mkup);
-                       return;
-                    }
-
-                  memset(str_front, 0, textlen + 1);
-                  strncpy(str_front, str_list, textlen);
-
-                  textlen = strlen(text);
-                  str_mid = malloc(textlen + 1);
-                  if (str_mid == NULL)
-                    {
-                       free(str_mkup);
-                       free(str_front);
-                       return;
-                    }
-
-                  memset(str_mid, 0, textlen + 1);
-                  strncpy(str_mid, str_list + strlen(str_front), textlen);
-
-                  sprintf(str_mkup, "%s<match>%s</match>%s", str_front, str_mid, str_result + strlen(text));
-
-                  elm_list_item_append(wd->list, str_mkup, NULL, NULL, NULL, NULL);
-
-                  if (str_mkup) free(str_mkup);
-                  if (str_front) free(str_front);
-                  if (str_mid) free(str_mid);
-
-                  textfound=EINA_TRUE;
-               }
-          }
-     }
-   else
-     return;
-
-   if (textfound)
-     {
-        elm_list_go(wd->list);
-        evas_object_show(wd->hover);
-        evas_object_raise(wd->hover);
-     }
-}
-
-static void _matchlist_list_clicked( void *data, Evas_Object *obj, void *event_info )
-{
-   Elm_Object_Item *it = (Elm_Object_Item *) elm_list_selected_item_get(obj);
-   Widget_Data *wd = elm_widget_data_get(data);
-   if ((it == NULL) || (wd == NULL))
-     return;
-
-   const char *str = NULL;
-   const char *text = elm_list_item_label_get(it);
-   evas_object_smart_callback_call((Evas_Object *)data, "selected", (void *)text);
-   if (wd->match_list)
-     {
-        if (text != NULL)
-          {
-             str = elm_entry_markup_to_utf8(text);
-             elm_entry_entry_set(data, str);
-             elm_entry_cursor_end_set(data);
-             wd->matchlist_list_clicked = EINA_TRUE;
-
-             evas_object_smart_callback_call(data, SIG_MATCHLIST_CLICKED, elm_entry_markup_to_utf8(text));
-             free(str);
-          }
-     }
-   elm_widget_focus_set(data, EINA_TRUE);
-}
-
-static void
 _entry_changed_common_handling(void *data, const char *event)
 {
    Widget_Data *wd = elm_widget_data_get(data);
@@ -1978,12 +1838,6 @@ _entry_changed_common_handling(void *data, const char *event)
      {
         ecore_timer_del(wd->delay_write);
         wd->delay_write = NULL;
-     }
-
-   if ((wd->single_line) && (wd->match_list))
-     {
-        if (wd->matchlist_job) ecore_job_del(wd->matchlist_job);
-        wd->matchlist_job = ecore_job_add(_matchlist_show, data);
      }
 
    if ((wd->api) && (wd->api->obj_hidemenu))
@@ -4584,55 +4438,6 @@ EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
    if (!wd || !wd->ent) return NULL;
 
    return edje_object_part_text_imf_context_get(wd->ent, "elm.text");
-}
-
-EAPI void
-elm_entry_matchlist_set(Evas_Object *obj, Eina_List *match_list, Eina_Bool case_sensitive)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (match_list)
-     {
-        Evas_Coord max_w = 9999, max_h = 9999;
-        const char* key_data = NULL;
-
-        wd->matchlist_threshold = 1;
-        wd->hover = elm_hover_add(elm_widget_parent_get(obj));
-        elm_hover_parent_set(wd->hover, elm_widget_parent_get(obj));
-        elm_hover_target_set(wd->hover, obj);
-        elm_object_style_set(wd->hover, "matchlist");
-
-        wd->layout = elm_layout_add(wd->hover);
-        elm_layout_theme_set(wd->layout, "entry", "matchlist", "default");
-        wd->list = elm_list_add(wd->layout);
-        evas_object_size_hint_weight_set(wd->list, EVAS_HINT_EXPAND, 0.0);
-        evas_object_size_hint_align_set(wd->list, EVAS_HINT_FILL, EVAS_HINT_FILL);
-        elm_list_mode_set(wd->list, ELM_LIST_EXPAND);
-        elm_object_style_set(wd->list, "matchlist");
-
-        key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_width");
-        if (key_data) max_w = atoi(key_data);
-        key_data = edje_object_data_get(elm_layout_edje_get(wd->layout), "max_height");
-        if (key_data) max_h = atoi(key_data);
-
-        elm_list_go(wd->list);
-        evas_object_size_hint_max_set(wd->list, max_w, max_h);
-        evas_object_smart_callback_add(wd->list, "selected", _matchlist_list_clicked, obj);
-        elm_layout_content_set(wd->layout, "elm.swallow.content", wd->list);
-        elm_hover_content_set(wd->hover, "bottom", wd->layout);
-
-        wd->match_list = match_list;
-     }
-   else
-     {
-        if (wd->hover)
-          evas_object_del(wd->hover);
-
-        wd->match_list = NULL;
-     }
-
-   wd->matchlist_case_sensitive = case_sensitive;
 }
 
 EAPI void
