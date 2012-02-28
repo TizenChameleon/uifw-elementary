@@ -36,7 +36,7 @@ struct _Widget_Data
    Eina_Inlist      *items, *blocks;
    Eina_List        *group_items;
    Pan              *pan;
-   Evas_Coord        pan_x, pan_y, old_pan_y, w, h, minw, minh, realminw, prev_viewport_w;
+   Evas_Coord        pan_x, pan_y, reorder_old_pan_y, w, h, minw, minh, realminw, prev_viewport_w;
    Ecore_Job        *calc_job, *update_job;
    Ecore_Idle_Enterer *queue_idle_enterer;
    Ecore_Idler        *must_recalc_idler;
@@ -947,6 +947,38 @@ _item_del(Elm_Genlist_Item *it)
    _elm_genlist_item_del_serious(it);
    evas_event_thaw(evas_object_evas_get(obj));
    evas_event_thaw_eval(evas_object_evas_get(obj));
+}
+
+static void
+_clear_cb(Widget_Data *wd)
+{
+   wd->anchor_item = NULL;
+   while (wd->blocks)
+     {
+        Item_Block *itb = (Item_Block *)(wd->blocks);
+
+        wd->blocks = eina_inlist_remove(wd->blocks, wd->blocks);
+        if (itb->items) eina_list_free(itb->items);
+        free(itb);
+     }
+   if (wd->queue_idle_enterer)
+     {
+        ecore_idle_enterer_del(wd->queue_idle_enterer);
+        wd->queue_idle_enterer = NULL;
+     }
+   if (wd->must_recalc_idler)
+     {
+        ecore_idler_del(wd->must_recalc_idler);
+        wd->must_recalc_idler = NULL;
+     }
+   if (wd->queue) wd->queue = eina_list_free(wd->queue);
+   if (wd->reorder_move_animator)
+     {
+        ecore_animator_del(wd->reorder_move_animator);
+        wd->reorder_move_animator = NULL;
+     }
+   wd->show_item = NULL;
+   wd->reorder_old_pan_y = 0;
 }
 
 static void
@@ -3343,11 +3375,11 @@ _pan_calculate(Evas_Object *obj)
 
    if ((sd->wd->reorder_mode) && (sd->wd->reorder_it))
      {
-        if (sd->wd->pan_y != sd->wd->old_pan_y)
+        if (sd->wd->pan_y != sd->wd->reorder_old_pan_y)
           sd->wd->reorder_pan_move = EINA_TRUE;
         else sd->wd->reorder_pan_move = EINA_FALSE;
         evas_object_raise(sd->wd->reorder_it->edit_obj);
-        sd->wd->old_pan_y = sd->wd->pan_y;
+        sd->wd->reorder_old_pan_y = sd->wd->pan_y;
         sd->wd->start_time = ecore_loop_time_get();
      }
 
@@ -4488,50 +4520,16 @@ _elm_genlist_clear(Evas_Object *obj, Eina_Bool standby)
           }
      }
    wd->clear_me = EINA_FALSE;
-   wd->anchor_item = NULL;
-   while (wd->blocks)
-     {
-        Item_Block *itb = (Item_Block *)(wd->blocks);
-
-        wd->blocks = eina_inlist_remove(wd->blocks, wd->blocks);
-        if (itb->items) eina_list_free(itb->items);
-        free(itb);
-     }
    wd->pan_changed = EINA_TRUE;
    if (wd->calc_job)
      {
         ecore_job_del(wd->calc_job);
         wd->calc_job = NULL;
      }
-   if (wd->queue_idle_enterer)
-     {
-        ecore_idle_enterer_del(wd->queue_idle_enterer);
-        wd->queue_idle_enterer = NULL;
-     }
-   if (wd->must_recalc_idler)
-     {
-        ecore_idler_del(wd->must_recalc_idler);
-        wd->must_recalc_idler = NULL;
-     }
-   if (wd->queue)
-     {
-        eina_list_free(wd->queue);
-        wd->queue = NULL;
-     }
-   if (wd->selected)
-     {
-        eina_list_free(wd->selected);
-        wd->selected = NULL;
-     }
-   if (wd->reorder_move_animator)
-     {
-        ecore_animator_del(wd->reorder_move_animator);
-        wd->reorder_move_animator = NULL;
-     }
-   wd->show_item = NULL;
+   if (wd->selected) wd->selected = eina_list_free(wd->selected);
+   _clear_cb(wd);
    wd->pan_x = 0;
    wd->pan_y = 0;
-   wd->old_pan_y = 0;
    wd->minw = 0;
    wd->minh = 0;
 
