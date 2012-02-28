@@ -26,6 +26,6 @@ struct _Elm_Entry_Extension_data
 	Elm_CNP_Mode cnp_mode : 2;
 };
 
-EAPI void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extension_data *ext_mod);
+void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extension_data *ext_mod);
 
 #endif
