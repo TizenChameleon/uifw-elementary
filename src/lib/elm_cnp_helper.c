@@ -140,8 +140,6 @@ static int tmpinfo_free(Tmp_Info *tmp);
 static Eina_Bool _elm_cnp_init(void);
 static Eina_Bool selection_clear(void *udata __UNUSED__, int type, void *event);
 static Eina_Bool selection_notify(void *udata __UNUSED__, int type, void *event);
-static char *remove_tags(const char *p, int *len);
-static char *mark_up(const char *start, int inlen, int *lenp);
 
 static Evas_Object *image_provider(void *images, Evas_Object *entry, const char *item);
 static void entry_deleted(void *images, Evas *e, Evas_Object *entry, void *unused);
@@ -167,21 +165,6 @@ static Eina_Bool pasteimage_append(Paste_Image *pi, Evas_Object *entry);
 static void pasteimage_free(Paste_Image *pi);
 static void entry_insert_filter(Evas_Object* entry, char* str);
 
-#define _PARAGRAPH_SEPARATOR "\xE2\x80\xA9"
-
-/* Optimisation: Turn this into a 256 byte table:
- *	then can lookup in one index, not N checks */
-static const Escape escapes[] = {
-  { "<ps/>",  _PARAGRAPH_SEPARATOR },
-  { "<br/>",  "\n" },
-  { "<\t/>",  "\t" },
-  { "&gt;",   ">" },
-  { "&lt;",    "<" },
-  { "&amp;",   "&" },
-  { "&quot;",  "'" },
-  { "&dquot;", "\"" }
-};
-#define N_ESCAPES ((int)(sizeof(escapes) / sizeof(escapes[0])))
 
 static Cnp_Atom atoms[CNP_N_ATOMS] = {
      [CNP_ATOM_TARGETS] = {
@@ -911,7 +894,7 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
      }
 
    cnp_debug("Notify handler text %d %d %p\n", data->format,data->length, data->data);
-   str = mark_up((char *)data->data, data->length, NULL);
+   str = _elm_util_text_to_mkup((const char *) data->data);
    cnp_debug("String is %s (from %s)\n", str, data->data);
    entry_insert_filter(sel->requestwidget, str);
    //_elm_entry_entry_paste(sel->requestwidget, str);
@@ -1183,7 +1166,7 @@ text_converter(char *target __UNUSED__, void *data, int size, void **data_ret, i
    if (!sel->active) return EINA_TRUE;
 
    if (sel->format & ELM_SEL_FORMAT_MARKUP)
-     *data_ret = remove_tags(sel->selbuf, size_ret);
+     *data_ret = _elm_util_mkup_to_text(sel->selbuf);
    else if (sel->format & ELM_SEL_FORMAT_HTML)
      {
         char *text = NULL;
@@ -1194,11 +1177,11 @@ text_converter(char *target __UNUSED__, void *data, int size, void **data_ret, i
              eina_strbuf_replace_all(buf, "&nbsp;", " ");
              text = eina_strbuf_string_steal(buf);
              eina_strbuf_free(buf);
-             *data_ret = remove_tags(text, size_ret);
+             *data_ret = _elm_util_mkup_to_text(text);
              free(text);
           }
         else
-          *data_ret = remove_tags(sel->selbuf, size_ret);
+          *data_ret = _elm_util_mkup_to_text(sel->selbuf);
      }
    else if (sel->format & ELM_SEL_FORMAT_TEXT)
      {
@@ -1378,136 +1361,6 @@ entry_deleted(void *images __UNUSED__, Evas *e __UNUSED__, Evas_Object *entry, v
           pastedimages = eina_list_remove_list(pastedimages, l);
      }
 }
-
-static char *
-remove_tags(const char *p, int *len)
-{
-   char *q,*ret;
-   int i;
-   if (!p) return NULL;
-
-   q = malloc(strlen(p) + 1);
-   if (!q) return NULL;
-   ret = q;
-
-   while (*p)
-     {
-        Eina_Bool esc = EINA_TRUE;
-        const char *x;
-        switch (p[0])
-          {
-           case '<':
-             x = strchr(p + 3, '>');
-             if (!x)
-               {
-                  strcpy(q, p);
-                  if (len) *len = strlen(ret);
-                  return ret;
-               }
-             if (memcmp(p + 1, "br", 2) && memcmp(p + 1, "ps", 2))
-               {
-                  strncpy(q, p, x - p + 1);
-                  p = x + 1;
-                  break;
-               }
-             i = x - p - 1;
-             if (p[i] == '/') i--;
-             for (; i > 2; i++)
-               {
-                  if (p[i] != ' ')
-                    {
-                       esc = EINA_FALSE;
-                       break;
-                    }
-               }
-             if (!esc)
-               {
-                  strncpy(q, p, x - p + 1);
-                  p = x + 1;
-                  break;
-               }
-             if (p[1] == 'b')
-               *q++ = '\n';
-             else
-               {
-                  strcpy(q, _PARAGRAPH_SEPARATOR);
-                  q += sizeof(_PARAGRAPH_SEPARATOR) - 1;
-               }
-             p = x + 1;
-             break;
-           case '&':
-             for (i = 3 ; i < N_ESCAPES ; i++)
-               {
-                  if (strncmp(p, escapes[i].escape, strlen(escapes[i].escape)))
-                    continue;
-                  p += strlen(escapes[i].escape);
-                  strcpy(q, escapes[i].value);
-                  q += strlen(escapes[i].value);
-                  break;
-               }
-             if (i == N_ESCAPES) *q ++= '&';
-             break;
-           default:
-             *q++ = *p++;
-          }
-     }
-   *q = 0;
-   if (len) *len = q - ret;
-   return ret;
-}
-
-/* Mark up */
-static char *
-mark_up(const char *start, int inlen, int *lenp)
-{
-   int l, i;
-   const char *p;
-   char *q, *ret;
-   const char *endp = NULL;
-
-   if (!start) return NULL;
-   if (inlen >= 0) endp = start + inlen;
-   /* First pass: Count characters */
-   for (l = 0, p = start; ((!endp) || (p < endp)) && (*p); p++)
-     {
-        for (i = 0 ; i < N_ESCAPES ; i ++)
-          {
-             if (*p == escapes[i].value[0])
-               {
-                  if (!strncmp(p, escapes[i].value, strlen(escapes[i].value)))
-                    l += strlen(escapes[i].escape);
-                  break;
-               }
-          }
-        if (i == N_ESCAPES) l++;
-     }
-
-   q = ret = malloc(l + 1);
-
-   /* Second pass: Change characters */
-   for (p = start; ((!endp) || (p < endp)) && (*p); )
-     {
-        for (i = 0; i < N_ESCAPES; i++)
-          {
-             if (*p == escapes[i].value[0])
-               {
-                  if (!strncmp(p, escapes[i].value, strlen(escapes[i].value)))
-                    {
-                       strcpy(q, escapes[i].escape);
-                       q += strlen(escapes[i].escape);
-                       p += strlen(escapes[i].value);
-                    }
-                  break;
-               }
-          }
-        if (i == N_ESCAPES) *q++ = *p++;
-     }
-   *q = 0;
-
-   if (lenp) *lenp = l;
-   return ret;
-}
-
 
 static Eina_Bool
 _dnd_enter(void *data __UNUSED__, int etype __UNUSED__, void *ev)
