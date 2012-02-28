@@ -74,6 +74,7 @@ struct _Widget_Data
    Eina_Bool input_panel_enable : 1;
    Eina_Bool prediction_allow : 1;
    Eina_Bool input_panel_return_key_disabled : 1;
+   Eina_Bool autoreturnkey : 1;
 //// TIZEN ONLY
    Evas_Object *hoversel;
    Evas_Object *mgf_proxy;
@@ -838,6 +839,21 @@ _sizing_eval(Evas_Object *obj)
 }
 
 static void
+_check_enable_return_key(Evas_Object *obj)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Eina_Bool return_key_disabled = EINA_FALSE;
+   if (!wd) return;
+
+   if (!wd->autoreturnkey) return;
+
+   if (elm_entry_is_empty(obj) == EINA_TRUE)
+     return_key_disabled = EINA_TRUE;
+
+   elm_entry_input_panel_return_key_disabled_set(obj, return_key_disabled);
+}
+
+static void
 _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -852,6 +868,7 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
         if (top && wd->input_panel_enable)
           elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
         evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
+        _check_enable_return_key(obj);
         wd->mgf_type = _ENTRY_MAGNIFIER_FIXEDSIZE;
      }
    else
@@ -1850,6 +1867,7 @@ _entry_changed_common_handling(void *data, const char *event)
    /* callback - this could call callbacks that delete the entry... thus...
     * any access to wd after this could be invalid */
    evas_object_smart_callback_call(data, event, NULL);
+   _check_enable_return_key(data);
 }
 
 static void
@@ -4417,6 +4435,17 @@ elm_entry_input_panel_return_key_disabled_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
 
    return wd->input_panel_return_key_disabled;
+}
+
+EAPI void
+elm_entry_input_panel_return_key_autoenable_set(Evas_Object *obj, Eina_Bool on)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->autoreturnkey = on;
+   _check_enable_return_key(obj);
 }
 
 EINA_DEPRECATED EAPI void
