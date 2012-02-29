@@ -3830,6 +3830,30 @@ EAPI Evas_Object       *elm_entry_end_get(const Evas_Object *obj);
 EINA_DEPRECATED EAPI Evas_Object       *elm_entry_end_unset(Evas_Object *obj);
 
 /**
+ * Set the autocapitalization on the immodule.
+ *
+ * @param obj The entry object
+ * @param autocap EINA_TRUE if autocapitalization is needed
+ * @deprecated Use elm_entry_autocapital_type_set() instead
+ */
+EINA_DEPRECATED EAPI void   elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap);
+
+EINA_DEPRECATED EAPI void   elm_entry_autoperiod_set(Evas_Object *obj, Eina_Bool autoperiod);
+
+/**
+ * Set whether the return key on the input panel is disabled automatically when entry has no text.
+ *
+ * If @p on is EINA_TRUE, The return key on input panel is disabled when the entry has no text.
+ * The return Key on the input panel is automatically enabled when the entry has text.
+ * The default value is EINA_FALSE.
+ *
+ * @param obj The entry object
+ * @param on If @p on is EINA_TRUE, the return key is automatically disabled when the entry has no text.
+ * @deprecated Use elm_entry_input_panel_return_key_autoenabled_set() instead
+ */
+EINA_DEPRECATED EAPI void   elm_entry_autoenable_returnkey_set(Evas_Object *obj, Eina_Bool on);
+
+/**
  * Convert a pixel coordinate into a rotated pixel coordinate.
  *
  * @param obj The map object.
