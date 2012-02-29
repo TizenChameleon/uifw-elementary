@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.67547slp2+build13) unstable; urgency=low
+
+  * [entry] deprecated some APIs
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.67547slp2+build13
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Wed, 29 Feb 2012 20:53:38 +0900
+
 elementary (1.0.0+svn.67547slp2+build12) unstable; urgency=low
 
   * Package upload
