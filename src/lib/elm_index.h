@@ -63,14 +63,10 @@
 EAPI Evas_Object          *elm_index_add(Evas_Object *parent);
 
 /**
- * Set whether a given index widget is or not visible,
- * programatically.
+ * Enable or disable auto hiding feature for a given index widget.
  *
  * @param obj The index object
- * @param active @c EINA_TRUE to show it, @c EINA_FALSE to hide it
- *
- * Not to be confused with visible as in @c evas_object_show() --
- * visible with regard to the widget's auto hiding feature.
+ * @param active @c EINA_TRUE to enable auto hiding, @c EINA_FALSE to disable
  *
  * @see elm_index_active_get()
  *
@@ -79,10 +75,10 @@ EAPI Evas_Object          *elm_index_add(Evas_Object *parent);
 EAPI void                  elm_index_active_set(Evas_Object *obj, Eina_Bool active);
 
 /**
- * Get whether a given index widget is currently visible or not.
+ * Get whether auto hiding feature is enabled or not for a given index widget.
  *
  * @param obj The index object
- * @return @c EINA_TRUE, if it's shown, @c EINA_FALSE otherwise
+ * @return @c EINA_TRUE, if auto hiding is enabled, @c EINA_FALSE otherwise
  *
  * @see elm_index_active_set() for more details
  *
@@ -275,7 +271,7 @@ EAPI void                  elm_index_item_go(Evas_Object *obj, int level);
 /**
  * Get the letter (string) set on a given index widget item.
  *
- * @param it The index item handle
+ * @param item The index item handle
  * @return The letter string set on @p it
  *
  * @ingroup Index
@@ -283,7 +279,31 @@ EAPI void                  elm_index_item_go(Evas_Object *obj, int level);
 EAPI const char           *elm_index_item_letter_get(const Elm_Object_Item *item);
 
 /**
+ * Set the indicator as to be disabled.
+ *
+ * @param obj The index object
+ * @param disabled  @c EINA_TRUE to disable it, @c EINA_FALSE to enable it
+ *
+ * In Index widget, Indicator notes popup text, which shows a letter has been selecting.
+ *
+ * @see elm_index_indicator_disabled_get()
+ *
+ * @ingroup Index
  */
+EAPI void                 elm_index_indicator_disabled_set(Evas_Object *obj, Eina_Bool disabled);
+
+/**
+ * Get the value of indicator's disabled status.
+ *
+ * @param obj The index object
+ * @return EINA_TRUE if the indicator is disabled.
+ *
+ * @see elm_index_indicator_disabled_set()
+ *
+ * @ingroup Index
+ */
+EAPI Eina_Bool                 elm_index_indicator_disabled_get(const Evas_Object *obj);
+
 EAPI void                  elm_index_button_image_invisible_set(Evas_Object *obj, Eina_Bool invisible);
 
 /**
