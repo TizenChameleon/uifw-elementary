@@ -1666,14 +1666,14 @@ elm_win_add(Evas_Object *parent, const char *name, Elm_Win_Type type)
           }
         else if (ENGINE_COMPARE(ELM_WAYLAND_SHM)) 
           {
-             win->ee = ecore_evas_wayland_shm_new(NULL, 0, 0, 1, 1, 0);
+             win->ee = ecore_evas_wayland_shm_new(NULL, 0, 0, 0, 1, 1, 0);
              win->evas = ecore_evas_get(win->ee);
 
              _elm_win_frame_add(win, "default");
           }
         else if (ENGINE_COMPARE(ELM_WAYLAND_EGL)) 
           {
-             win->ee = ecore_evas_wayland_egl_new(NULL, 0, 0, 1, 1, 0);
+             win->ee = ecore_evas_wayland_egl_new(NULL, 0, 0, 0, 1, 1, 0);
              win->evas = ecore_evas_get(win->ee);
 
              _elm_win_frame_add(win, "default");
