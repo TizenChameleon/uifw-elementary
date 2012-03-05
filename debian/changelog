@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.67547slp2+build14) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+       [entry] elm_entry_extension_module_data_get is set as none EAPI
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.67547slp2+build14
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Mon, 05 Mar 2012 02:23:36 -0500
+
 elementary (1.0.0+svn.67547slp2+build13) unstable; urgency=low
 
   * [entry] deprecated some APIs
