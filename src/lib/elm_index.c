@@ -5,15 +5,6 @@
 #define MIN_GRP_SIZE 2 //for symmetry it is 2, otherwise it can be 1 and zero have no meaning.
 #define MIN_PIXEL_VALUE 1 //Min pixel value is highly dependent on touch sensitivity support.
 #define MIN_OBJ_HEIGHT 24 //should be taken from .edc file.
-/*
- *  use for find view toplevel
- */
-#define SET_VIEW_LEVEL(wd, view_level)\
-   view_level = wd->level;\
-   while ((!wd->tot_items_count[view_level]) && view_level)\
-     {\
-        view_level--; \
-     }
 
 typedef struct _Widget_Data Widget_Data;
 
@@ -26,9 +17,7 @@ struct _Widget_Data
    Evas_Object *event[2];
    Evas_Object *bx[2]; // 2 - for now all that's supported
    Eina_List *items; // 1 list. yes N levels, but only 2 for now and # of items will be small
-   char *popup_str[2];
    int level;
-   int max_supp_items_count;
    int tot_items_count[2];
    int min_obj_height, max_grp_size;
    int min_1st_level_obj_height;
@@ -41,8 +30,7 @@ struct _Widget_Data
    Eina_Bool horizontal : 1;
    Eina_Bool active : 1;
    Eina_Bool down : 1;
-   Eina_Bool hide_button : 1;
-   double scale_factor;
+   Eina_Bool indicator_disabled : 1;
 };
 
 struct _Elm_Index_Item
@@ -85,8 +73,6 @@ static const Evas_Smart_Cb_Description _signals[] = {
    {NULL, NULL}
 };
 
-/* Free a block allocated by `malloc', `realloc' or `calloc' one by one*/
-
 static void
 _del_pre_hook(Evas_Object *obj)
 {
@@ -102,8 +88,6 @@ _del_pre_hook(Evas_Object *obj)
         elm_widget_item_free(it);
      }
    if (wd->delay) ecore_timer_del(wd->delay);
-   if(wd->popup_str[0]) free(wd->popup_str[0]);
-   if(wd->popup_str[1]) free(wd->popup_str[1]);
 }
 
 static void
@@ -230,7 +214,6 @@ _sizing_eval(Evas_Object *obj)
 static Eina_Bool
 _item_del_pre_hook(Elm_Object_Item *it)
 {
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
    Widget_Data *wd = elm_widget_data_get(WIDGET(it));
    if (!wd) return EINA_FALSE;
    _item_free((Elm_Index_Item *) it);
@@ -246,7 +229,7 @@ _item_new(Evas_Object *obj, const char *letter, const void *item)
    if (!wd) return NULL;
    it = elm_widget_item_new(obj, Elm_Index_Item);
    if (!it) return NULL;
-
+   elm_widget_item_del_pre_hook_set(it, _item_del_pre_hook);
    it->base.data = item;
    it->level = wd->level;
    if(wd->level == 0)
@@ -258,13 +241,6 @@ _item_new(Evas_Object *obj, const char *letter, const void *item)
         it->letter = eina_stringshare_add(letter);
         it->vis_letter = eina_stringshare_add(letter);
      }
-   else
-     {
-        _item_free(it);
-        return NULL;
-     }
-   elm_widget_item_del_pre_hook_set(it, _item_del_pre_hook);
-
    return it;
 }
 
@@ -285,9 +261,7 @@ _item_free(Elm_Index_Item *it)
 {
    Widget_Data *wd = elm_widget_data_get(WIDGET(it));
    if (!wd) return;
-
    wd->items = eina_list_remove(wd->items, it);
-   elm_widget_item_pre_notify_del(it);
    if (it->letter) eina_stringshare_del(it->letter);
    if (it->vis_letter) eina_stringshare_del(it->vis_letter);
 }
@@ -312,9 +286,6 @@ _index_box_auto_fill(Evas_Object *obj, Evas_Object *box, int level)
         const char *stacking;
 
         if (it->level != level) continue;
-
-        if(i > wd->max_supp_items_count) break;
-
         o = edje_object_add(evas_object_evas_get(obj));
         VIEW(it) = o;
         edje_object_mirrored_set(VIEW(it), rtl);
@@ -381,13 +352,10 @@ _delay_change(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Elm_Object_Item *item;
-   int view_level;
    if (!wd) return ECORE_CALLBACK_CANCEL;
    wd->delay = NULL;
-   SET_VIEW_LEVEL(wd, view_level);
-   item = elm_index_item_selected_get(data, view_level);
+   item = elm_index_item_selected_get(data, wd->level);
    if (item) evas_object_smart_callback_call(data, SIG_DELAY_CHANGED, item);
-
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -399,18 +367,13 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
    Eina_List *l;
    Evas_Coord x, y, w, h, bx, by, bw, bh, xx, yy;
    double cdv = 0.5;
-   double cdvv = 0.0;
    double dmax = 0.0;
    double dmin = 0.0;
    Evas_Coord dist;
-   Eina_Bool change = EINA_FALSE;
    char *label = NULL, *last = NULL;
    int i;
-   int view_level;
    if (!wd) return;
-
-   SET_VIEW_LEVEL(wd, view_level);
-   for (i = 0; i <= view_level; i++)
+   for (i = 0; i <= wd->level; i++)
      {
         it_last = NULL;
         it_closest  = NULL;
@@ -452,35 +415,17 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
                   dist = x;
                }
           }
-          if ((i == 0) && (view_level == 0))
-            {
-               if(cdv > dmax || cdv < dmin)
-                 {
-                    if(cdv > dmax)
-                      {
-                         cdvv = dmax;
-                      }
-                    else
-                      {
-                         cdvv = dmin;
-                      }
-                    edje_object_part_drag_value_set(wd->base, "elm.dragable.index.1", cdv, cdvv);
-                 }
-               else
-                 {
-                    edje_object_part_drag_value_set(wd->base, "elm.dragable.index.1", cdv, cdv);
-                 }
-            }
+        if ((i == 0) && (wd->level == 0))
+          edje_object_part_drag_value_set(wd->base, "elm.dragable.index.1",
+                                          cdv, cdv);
         if (it_closest) it_closest->selected = 1;
         if (it_closest != it_last)
           {
-             change = 1;
              if (it_last)
                {
                   const char *stacking, *selectraise;
 
                   it = it_last;
-                  if(view_level == it->level)
                   edje_object_signal_emit(VIEW(it), "elm,state,inactive", "elm");
                   stacking = edje_object_data_get(VIEW(it), "stacking");
                   selectraise = edje_object_data_get(VIEW(it), "selectraise");
@@ -495,7 +440,6 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
                   const char *selectraise;
 
                   it = it_closest;
-                  if(view_level == it->level)
                   edje_object_signal_emit(VIEW(it), "elm,state,active", "elm");
                   selectraise = edje_object_data_get(VIEW(it), "selectraise");
                   if ((selectraise) && (!strcmp(selectraise, "on")))
@@ -526,56 +470,11 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
      }
    if (!label) label = strdup("");
    if (!last) last = strdup("");
-   if(!wd->hide_button)
-     {
-        char *popup_text;
-
-        if(view_level == 0)
-          {
-             if(wd->tot_items_count[0])
-               {
-                  if (wd->popup_str[1]) wd->popup_str[1][0] = '\0';
-                  wd->popup_str[0] = (char *)realloc(wd->popup_str[0], (sizeof(char) * strlen(last) + 1));
-
-                  strcpy(wd->popup_str[0], last);
+   edje_object_part_text_set(wd->base, "elm.text.body", label);
+   edje_object_part_text_set(wd->base, "elm.text", last);
                   edje_object_signal_emit(wd->base, "hide_2nd_level", "");
-               }
-             else
-               {
-                  edje_object_signal_emit(wd->base, "button.image.hidden", "");
-                  if(label)free(label);
-                  if(last) free(last);
-                  return;
-               }
-          }
-        if (view_level == 1 && wd->level_active[1])
-          {
-             if(wd->tot_items_count[1])
-               {
-                  wd->popup_str[1] = (char *)realloc(wd->popup_str[1], (sizeof(char) * strlen(last) + 1));
-
-                  strcpy(wd->popup_str[1], last);
-                  edje_object_signal_emit(wd->base, "hide_first_level", "");
-               }
-             else
-               {
-                  edje_object_signal_emit(wd->base, "button.image.hidden", "");
-                  if(label)free(label);
-                  if(last) free(last);
-                  return;
-               }
-          }
-        popup_text = (char *)malloc(sizeof(char) * (strlen(wd->popup_str[0]) + strlen(wd->popup_str[1]) + 1));
-        sprintf(popup_text, "%s%s", wd->popup_str[0], wd->popup_str[1]);
-        edje_object_part_text_set(wd->base, "elm.text", popup_text);
-
-        free(popup_text);
-     }
-
-   if(label)
-     free(label);
-   if(last)
-     free(last);
+   free(label);
+   free(last);
 }
 
 static void
@@ -603,8 +502,8 @@ _mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *eve
    _sel_eval(data, ev->canvas.x, ev->canvas.y);
    edje_object_part_drag_value_set(wd->base, "elm.dragable.pointer",
                                    (!edje_object_mirrored_get(wd->base)) ? wd->dx : (wd->dx - w), wd->dy);
-   if (wd->items)
-      edje_object_signal_emit(wd->base, "elm,indicator,state,active", "elm");
+   if (wd->items && !wd->indicator_disabled)
+     edje_object_signal_emit(wd->base, "elm,indicator,state,active", "elm");
 }
 
 static void
@@ -613,24 +512,17 @@ _mouse_up(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *event
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Up *ev = event_info;
    Elm_Object_Item *item;
-   Eina_List *l;
-   int view_level;
-
    if (!wd) return;
    if (ev->button != 1) return;
    if (wd->level == 1 && wd->delay) ecore_timer_del(wd->delay);
    wd->delay = NULL;
    wd->down = 0;
-   SET_VIEW_LEVEL(wd, view_level);
-   item = elm_index_item_selected_get(data, view_level);
-   EINA_LIST_FOREACH(wd->items, l, item)
-     {
-        edje_object_signal_emit(item->base.view, "elm,state,inactive", "elm");
-     }
+   item = elm_index_item_selected_get(data, wd->level);
    if (item) evas_object_smart_callback_call(data, SIG_SELECTED, item);
    elm_index_active_set(data, 0);
    edje_object_signal_emit(wd->base, "elm,state,level,0", "elm");
-   edje_object_signal_emit(wd->base, "elm,indicator,state,inactive", "elm");
+   if (wd->items && !wd->indicator_disabled)
+     edje_object_signal_emit(wd->base, "elm,indicator,state,inactive", "elm");
 }
 
 static void
@@ -639,7 +531,6 @@ _mouse_move(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *eve
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Move *ev = event_info;
    Evas_Coord minw = 0, minh = 0, x, y, dx, adx, w;
-   void *d;
    Elm_Object_Item *item;
    char buf[1024];
    if (!wd) return;
@@ -673,7 +564,7 @@ _mouse_move(void *data, Evas *e __UNUSED__, Evas_Object *o __UNUSED__, void *eve
                   snprintf(buf, sizeof(buf), "elm,state,level,%i", wd->level);
                   edje_object_signal_emit(wd->base, buf, "elm");
                   item = elm_index_item_selected_get(data, wd->level);
-                  evas_object_smart_callback_call(data, "changed", d);
+                  evas_object_smart_callback_call(data, SIG_CHANGED, NULL);
                   if (wd->delay) ecore_timer_del(wd->delay);
                   wd->delay = ecore_timer_add(0.2, _delay_change, data);
                   evas_object_smart_callback_call(data, SIG_LEVEL_DOWN, NULL);
@@ -693,20 +584,11 @@ _index_box_refill_job(void *data)
    Evas_Coord pw, ph;
 
    evas_object_geometry_get(wd->base, NULL, NULL, &pw, &ph);
-   wd->scale_factor = elm_scale_get();
-   if ( wd->scale_factor == 0.0 ) {
-     wd->scale_factor = 1.0;
-   }
    string = edje_object_data_get(wd->base, "min_obj_height");
-   if(string)
-     wd->min_obj_height = (int) (atoi(string))*wd->scale_factor;
-   else
-     wd->min_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
-   if(!wd->min_obj_height) return;
+   wd->min_obj_height = MIN_OBJ_HEIGHT;
 
    wd->max_grp_size = wd->min_obj_height - 2*MIN_GRP_SIZE;
    wd->items_count = ph/wd->min_obj_height;
-   wd->max_supp_items_count = wd->max_grp_size*(int)((wd->items_count-1)*0.5)+wd->items_count;
 
    if(pw != wd->pwidth && ph != wd->pheight)
      {
@@ -740,7 +622,6 @@ elm_index_add(Evas_Object *parent)
    Evas *e;
    Widget_Data *wd;
    Evas_Coord minw, minh;
-   const char *string;
 
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
@@ -756,16 +637,15 @@ elm_index_add(Evas_Object *parent)
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
    elm_widget_can_focus_set(obj, EINA_FALSE);
 
+   wd->indicator_disabled = EINA_FALSE;
    wd->horizontal = EINA_FALSE;
    wd->min_obj_height = 0;
    wd->max_grp_size = 0;
    wd->items_count = 0;
-   wd->max_supp_items_count = 0;
    wd->tot_items_count[0] = 0;
    wd->tot_items_count[1] = 0;
-   wd->hide_button = 0;
    wd->special_char = edje_object_data_get(wd->base, "special_char");
-   if(wd->special_char == NULL)  wd->special_char = eina_stringshare_add("*");
+   if(!wd->special_char)  wd->special_char = eina_stringshare_add("*");
 
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "index", "base/vertical", "default");
@@ -811,16 +691,7 @@ elm_index_add(Evas_Object *parent)
      }
 
    evas_object_smart_callbacks_descriptions_set(obj, _signals);
-   wd->scale_factor = elm_scale_get();
-   if ( wd->scale_factor == 0.0 )
-		wd->scale_factor = 1.0;
-   string = edje_object_data_get(wd->base, "min_1st_level_obj_height");
-   if(string)
-     wd->min_1st_level_obj_height = (int) (atoi(string))*wd->scale_factor;
-   else
-     wd->min_1st_level_obj_height = MIN_OBJ_HEIGHT*wd->scale_factor;
-   wd->popup_str[0] = calloc(1, sizeof(char) * 1);
-   wd->popup_str[1] = calloc(1, sizeof(char) * 1);
+   wd->min_1st_level_obj_height = MIN_OBJ_HEIGHT;
 
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
@@ -828,7 +699,7 @@ elm_index_add(Evas_Object *parent)
 }
 
 static int
-_group_count(Evas_Object *obj, int extraIndex, int adj_pos, int vis_pos)
+_group_count(Evas_Object *obj, int extraIndex, int adj_pos)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return 0;
@@ -863,10 +734,7 @@ _index_process(Evas_Object *obj)
    if (wd->items_count == 0) return;
 
    const int adj_pos = (wd->items_count-1)*0.5;
-   if(wd->tot_items_count[wd->level] <= wd->max_supp_items_count)
-      n = wd->tot_items_count[wd->level];
-   else
-      n = wd->max_supp_items_count;
+   n = wd->tot_items_count[wd->level];
    group_count = MIN_GRP_SIZE;
 
    int *indx = (int*)calloc(n, sizeof(int));
@@ -894,7 +762,7 @@ _index_process(Evas_Object *obj)
         return;
      }
 
-   group_count = _group_count(obj, extraIndex, adj_pos, N);
+   group_count = _group_count(obj, extraIndex, adj_pos);
    if (group_count <= 0)
      {
         if (indx)
@@ -944,7 +812,7 @@ _index_process(Evas_Object *obj)
              eina_stringshare_del(it->vis_letter);
              it->vis_letter = eina_stringshare_add(wd->special_char);
           }
-        it->size = size*wd->scale_factor;
+        it->size = size;
      }
    if (indx)
      {
@@ -967,10 +835,7 @@ elm_index_active_set(Evas_Object *obj, Eina_Bool active)
         _index_box_clear(obj, wd->bx[1], 1);
         _index_process(obj);
         _index_box_auto_fill(obj, wd->bx[0], 0);
-        if(wd->tot_items_count[wd->level])
-          edje_object_signal_emit(wd->base, "elm,state,active", "elm");
-        else
-          edje_object_signal_emit(wd->base, "button.image.hidden", "");
+        edje_object_signal_emit(wd->base, "elm,state,active", "elm");
      }
    else
      edje_object_signal_emit(wd->base, "elm,state,inactive", "elm");
@@ -1084,7 +949,6 @@ elm_index_item_prepend_relative(Evas_Object *obj, const char *letter, const void
      }
    it = _item_new(obj, letter, item);
    if (!it) return;
-
    wd->items = eina_list_prepend_relative(wd->items, it, relative);
    wd->tot_items_count[wd->level]++;
    _index_box_clear(obj, wd->bx[wd->level], wd->level);
@@ -1124,6 +988,7 @@ elm_index_item_sorted_insert(Evas_Object *obj, const char *letter, const void *i
              Elm_Index_Item *p_it = eina_list_data_get(lnear);
              if (cmp_data_func(p_it->base.data, it->base.data) >= 0)
                p_it->base.data = it->base.data;
+             _item_free(it);
              elm_widget_item_free(it);
           }
      }
@@ -1143,7 +1008,6 @@ elm_index_item_find(Evas_Object *obj, const void *item)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
-
    return (Elm_Object_Item *) _item_find(obj, item);
 }
 
@@ -1164,7 +1028,8 @@ elm_index_item_clear(Evas_Object *obj)
    EINA_LIST_FREE(clear, it)
      {
         wd->tot_items_count[wd->level]--;
-        elm_widget_item_del(it);
+        _item_free(it);
+        elm_widget_item_free(it);
      }
 }
 
@@ -1174,8 +1039,7 @@ elm_index_item_go(Evas_Object *obj, int level)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if(level == 0)
-     _index_process(obj);
+   if(level == 0) _index_process(obj);
    _index_box_auto_fill(obj, wd->bx[0], 0);
    if (wd->level == 1) _index_box_auto_fill(obj, wd->bx[1], 1);
 }
@@ -1187,20 +1051,36 @@ elm_index_item_data_get(const Elm_Object_Item *it)
 }
 
 EAPI void
-elm_index_button_image_invisible_set(Evas_Object *obj, Eina_Bool invisible)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   wd->hide_button = invisible;
-
-   edje_object_signal_emit(wd->base, "elm,state,button,image,hide", "elm");
-   return;
-}
-
-EAPI void
 elm_index_item_data_set(Elm_Object_Item *it, const void *data)
 {
    elm_object_item_data_set(it, (void *) data);
+}
+
+EAPI void
+elm_index_indicator_disabled_set(Evas_Object *obj, Eina_Bool disabled)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   disabled = !!disabled;
+   if (wd->indicator_disabled == disabled) return;
+   wd->indicator_disabled = disabled;
+   if (!wd->items) return;
+   if (disabled)
+     edje_object_signal_emit(wd->base, "elm,indicator,state,inactive", "elm");
+   else
+     edje_object_signal_emit(wd->base, "elm,indicator,state,active", "elm");
+}
+
+EAPI Eina_Bool
+elm_index_indicator_disabled_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+
+   return wd->indicator_disabled;
 }
 
 EAPI void
