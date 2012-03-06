@@ -745,29 +745,23 @@ static void
 _resize_button(Evas_Object *btn, Evas_Coord *realw, Evas_Coord *vieww)
 {
    Evas_Coord rw, vw;
-   Evas_Coord w_text, h_btn, padding_outer, padding_inner = 0;
+   Evas_Coord w_text, h_btn, padding_outer = 0;
    Evas_Coord w_btn = 0, button_max_width = 0;
    const char *size_str;
-   const char *ellipsis = "<ellipsis=1.0>";
 
    size_str = edje_object_data_get(btn, "button_max_size");
    if (size_str) button_max_width = (Evas_Coord)atoi(size_str);
-   const char *button_text = edje_object_part_text_get(btn, "elm.btn.text");
 
    // decide the size of button
    edje_object_part_geometry_get(btn, "elm.base", NULL, NULL, NULL, &h_btn);
    edje_object_part_geometry_get(btn, "elm.btn.text", NULL, NULL, &w_text, NULL);
    edje_object_part_geometry_get(btn, "right.padding", NULL, NULL, &padding_outer, NULL);
-   w_btn = w_text + 2*padding_outer + 2*padding_inner;
+   w_btn = w_text + 2*padding_outer;
 
    rw = w_btn;
 
    if (button_max_width < w_btn)
-     {
-        vw = button_max_width;
-        edje_object_part_text_set(btn, "elm.btn.text", ellipsis);
-        edje_object_part_text_append(btn, "elm.btn.text", button_text);
-     }
+     vw = button_max_width;
    else
      vw = w_btn;
 
