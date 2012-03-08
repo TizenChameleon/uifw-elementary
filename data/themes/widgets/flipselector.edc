@@ -379,10 +379,7 @@ group { name: "elm/flipselector/base/default";
 
       part { name: "arrow_top";
          mouse_events: 0;
-<<<<<<< HEAD
-=======
          clip_to: "disclip";
->>>>>>> remotes/origin/upstream
          scale: 1;
          description { state: "default" 0.0;
             min: 15 15;
@@ -399,10 +396,7 @@ group { name: "elm/flipselector/base/default";
       }
       part { name: "arrow_bottom";
          mouse_events: 0;
-<<<<<<< HEAD
-=======
          clip_to: "disclip";
->>>>>>> remotes/origin/upstream
          scale: 1;
          description { state: "default" 0.0;
             min: 15 15;
@@ -422,10 +416,7 @@ group { name: "elm/flipselector/base/default";
          type: RECT;
          mouse_events: 0;
          name: "top_clipper";
-<<<<<<< HEAD
-=======
          clip_to: "disclip";
->>>>>>> remotes/origin/upstream
          description {
             state: "default" 0.0;
             rel1.to: "t";
@@ -438,10 +429,7 @@ group { name: "elm/flipselector/base/default";
          type: RECT;
          mouse_events: 0;
          name: "bottom_clipper";
-<<<<<<< HEAD
-=======
          clip_to: "disclip";
->>>>>>> remotes/origin/upstream
          description {
             state: "default" 0.0;
             rel1.to: "b";
@@ -449,8 +437,6 @@ group { name: "elm/flipselector/base/default";
             visible: 1;
          }
       }
-<<<<<<< HEAD
-=======
 
       part {
          type: RECT;
@@ -480,7 +466,6 @@ group { name: "elm/flipselector/base/default";
          }
       }
 
->>>>>>> remotes/origin/upstream
    }
 
    programs {
@@ -535,8 +520,6 @@ group { name: "elm/flipselector/base/default";
          source: "b";
          action: SIGNAL_EMIT "elm,action,down,stop" "";
       }
-<<<<<<< HEAD
-=======
       program { name: "disable";
          signal: "elm,state,disabled";
          source: "elm";
@@ -551,6 +534,5 @@ group { name: "elm/flipselector/base/default";
          target: "disclip";
          target: "event_blocker";
        }
->>>>>>> remotes/origin/upstream
    }
 }

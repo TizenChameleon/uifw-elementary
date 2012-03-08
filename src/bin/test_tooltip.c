@@ -6,11 +6,7 @@
 
 typedef struct _Testitem
 {
-<<<<<<< HEAD
    Elm_Object_Item *item;
-=======
-   Elm_Object_Item  *item;
->>>>>>> remotes/origin/upstream
    const char       *path;
    int               mode;
    int               onoff;
@@ -56,19 +52,6 @@ gltt_exp(void *data       __UNUSED__,
          void            *event_info)
 {
    Elm_Object_Item *glit = event_info;
-<<<<<<< HEAD
-   Evas_Object *gl = elm_genlist_item_genlist_get(glit);
-   int val = (int) elm_object_item_data_get(glit);
-   Elm_Object_Item *glit1, *glit2, *glit3;
-
-   val *= 10;
-   glit1 = elm_genlist_item_append(gl, &itct, (void *)(long)(val + 1), glit,
-                                   ELM_GENLIST_ITEM_NONE, NULL, NULL);
-   glit2 = elm_genlist_item_append(gl, &itct, (void *)(long)(val + 2), glit,
-                                   ELM_GENLIST_ITEM_NONE, NULL, NULL);
-   glit3 = elm_genlist_item_append(gl, &itct, (void *)(long)(val + 3), glit,
-                                   ELM_GENLIST_ITEM_SUBITEMS, NULL, NULL);
-=======
    Evas_Object *gl = elm_object_item_widget_get(glit);
    int val = (int)(long) elm_object_item_data_get(glit);
    Elm_Object_Item *glit1, *glit2, *glit3;
@@ -80,7 +63,6 @@ gltt_exp(void *data       __UNUSED__,
                                    ELM_GENLIST_ITEM_NONE, NULL, NULL);
    glit3 = elm_genlist_item_append(gl, &itct, (void *)(long) (val + 3), glit,
                                    ELM_GENLIST_ITEM_TREE, NULL, NULL);
->>>>>>> remotes/origin/upstream
 
    elm_genlist_item_tooltip_text_set(glit1, "Testing A");
    elm_genlist_item_tooltip_text_set(glit2, "Testing B");
@@ -135,11 +117,7 @@ _tt_item_icon(void *data   __UNUSED__,
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png",
             elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_resize(ic, 64, 64);
    return ic;
 }
@@ -154,11 +132,7 @@ _tt_item_icon2(void *data   __UNUSED__,
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf), "%s/images/logo.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    return ic;
 }
 
@@ -274,11 +248,7 @@ _tt_icon(void *data   __UNUSED__,
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png",
             elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_resize(ic, 64, 64);
    return ic;
 }
@@ -292,11 +262,7 @@ _tt_icon2(void *data   __UNUSED__,
    char buf[PATH_MAX];
    snprintf(buf, sizeof(buf), "%s/images/icon_00.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_resize(ic, 64, 64);
    return ic;
 }
@@ -515,11 +481,7 @@ test_tooltip(void *data       __UNUSED__,
                                            ELM_SCROLLER_POLICY_OFF);
    elm_object_text_set(se, "Hello, some scrolled entry here!");
    elm_object_tooltip_text_set(se, "Type something here!");
-<<<<<<< HEAD
-   elm_entry_single_line_set(se, 1);
-=======
    elm_entry_single_line_set(se, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, se);
    evas_object_show(se);
 
@@ -630,15 +592,9 @@ test_tooltip2(void *data       __UNUSED__,
    itct.func.text_get = gltt_text_get;
 
    glit1 = elm_genlist_item_append(gl, &itct, (void *)1, NULL,
-<<<<<<< HEAD
-                                   ELM_GENLIST_ITEM_SUBITEMS, NULL, NULL);
-   glit2 = elm_genlist_item_append(gl, &itct, (void *)2, NULL,
-                                   ELM_GENLIST_ITEM_SUBITEMS, NULL, NULL);
-=======
                                    ELM_GENLIST_ITEM_TREE, NULL, NULL);
    glit2 = elm_genlist_item_append(gl, &itct, (void *)2, NULL,
                                    ELM_GENLIST_ITEM_TREE, NULL, NULL);
->>>>>>> remotes/origin/upstream
    glit3 = elm_genlist_item_append(gl, &itct, (void *)3, NULL,
                                    ELM_GENLIST_ITEM_NONE, NULL, NULL);
 

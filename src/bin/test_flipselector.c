@@ -23,15 +23,6 @@ _unsel_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 }
 
 void
-<<<<<<< HEAD
-_third_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   Elm_Object_Item *it;
-   Evas_Object *fp = data;
-   it = elm_flipselector_first_item_get(fp);
-   it = elm_flipselector_item_next_get(it);
-   it = elm_flipselector_item_next_get(it);
-=======
 _last_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Elm_Object_Item *it;
@@ -48,7 +39,6 @@ _third_from_end_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __U
    it = elm_flipselector_last_item_get(fp);
    it = elm_flipselector_item_prev_get(it);
    it = elm_flipselector_item_prev_get(it);
->>>>>>> remotes/origin/upstream
    elm_flipselector_item_selected_set(it, EINA_TRUE);
 }
 
@@ -65,8 +55,6 @@ _overflow_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 }
 
 void
-<<<<<<< HEAD
-=======
 slider_change_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
     Evas_Object *fl = (Evas_Object *)data;
@@ -90,16 +78,11 @@ flip_prev_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED_
 }
 
 void
->>>>>>> remotes/origin/upstream
 test_flipselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    char buf[8];
    unsigned int i;
-<<<<<<< HEAD
-   Evas_Object *win, *bg, *bx, *fp, *bt;
-=======
    Evas_Object *win, *bg, *bx, *fp, *bt, *bx2, *sl;
->>>>>>> remotes/origin/upstream
    static const char *lbl[] = {
      "Elementary",
      "Evas",
@@ -135,36 +118,21 @@ test_flipselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    elm_box_pack_end(bx, fp);
    evas_object_show(fp);
 
-<<<<<<< HEAD
-=======
    bx2 = elm_box_add(win);
    evas_object_size_hint_weight_set(bx2, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_box_horizontal_set(bx2, EINA_TRUE);
    elm_box_pack_end(bx, bx2);
    evas_object_show(bx2);
 
->>>>>>> remotes/origin/upstream
    fp = elm_flipselector_add(win);
    evas_object_smart_callback_add(fp, "underflowed", _overflow_cb, NULL);
    evas_object_smart_callback_add(fp, "overflowed", _underflow_cb, NULL);
    evas_object_size_hint_weight_set(fp, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-<<<<<<< HEAD
-   for (i = 2099; i >= 1990; i--)
-=======
    for (i = 1990; i <= 2099; i++)
->>>>>>> remotes/origin/upstream
      {
 	snprintf(buf, 8, "%d", i);
 	elm_flipselector_item_append(fp, buf, _sel_cb, NULL);
      }
-<<<<<<< HEAD
-   elm_box_pack_end(bx, fp);
-   evas_object_show(fp);
-
-   bt = elm_button_add(win);
-   elm_object_text_set(bt, "Select 2097");
-   evas_object_smart_callback_add(bt, "clicked", _third_cb, fp);
-=======
 
    bt = elm_button_add(win);
    elm_object_text_set(bt, "Flip Prev");
@@ -202,7 +170,6 @@ test_flipselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    bt = elm_button_add(win);
    elm_object_text_set(bt, "Select 2097");
    evas_object_smart_callback_add(bt, "clicked", _third_from_end_cb, fp);
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
 

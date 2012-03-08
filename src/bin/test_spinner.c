@@ -55,11 +55,7 @@ test_spinner(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 
    sp = elm_spinner_add(win);
    elm_spinner_label_format_set(sp, "Disabled %.0f");
-<<<<<<< HEAD
-   elm_object_disabled_set(sp, 1);
-=======
    elm_object_disabled_set(sp, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_spinner_min_max_set(sp, -50.0, 250.0);
    evas_object_size_hint_align_set(sp, EVAS_HINT_FILL, 0.5);
    evas_object_size_hint_weight_set(sp, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -67,11 +63,6 @@ test_spinner(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    evas_object_show(sp);
 
    sp = elm_spinner_add(win);
-<<<<<<< HEAD
-   elm_spinner_min_max_set(sp, 1, 12);
-   elm_spinner_label_format_set(sp, "%.0f");
-   elm_spinner_step_set(sp, 1.0);
-=======
    elm_spinner_wrap_set(sp, EINA_TRUE);
    elm_spinner_min_max_set(sp, 1, 12);
    elm_spinner_value_set(sp, 1);
@@ -79,7 +70,6 @@ test_spinner(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    elm_spinner_base_set(sp, 1);
    elm_spinner_round_set(sp, 1);
    elm_spinner_label_format_set(sp, "%.0f");
->>>>>>> remotes/origin/upstream
    elm_spinner_editable_set(sp, EINA_FALSE);
    elm_spinner_special_value_add(sp, 1, "January");
    elm_spinner_special_value_add(sp, 2, "February");

@@ -1,15 +1,10 @@
 #include <Elementary.h>
-<<<<<<< HEAD
-=======
 #include "test.h"
 #include <Elementary_Cursor.h>
->>>>>>> remotes/origin/upstream
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
-<<<<<<< HEAD
-=======
 struct _api_data
 {
    unsigned int state;  /* What state we are testing       */
@@ -146,7 +141,6 @@ _api_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    elm_object_text_set(obj, str);
    elm_object_disabled_set(obj, a->state == API_STATE_LAST);
 }
->>>>>>> remotes/origin/upstream
 
 static void
 _disk_sel(void *data __UNUSED__, Evas_Object * obj __UNUSED__, void *event_info)
@@ -173,11 +167,7 @@ _print_disk_info_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
 }
 
 static Evas_Object *
-<<<<<<< HEAD
-_disk_create(Evas_Object *win, Eina_Bool round)
-=======
 _disk_create(Evas_Object *win, Eina_Bool rnd)
->>>>>>> remotes/origin/upstream
 {
    Elm_Object_Item *ds_it;
    Evas_Object *di;
@@ -198,23 +188,11 @@ _disk_create(Evas_Object *win, Eina_Bool rnd)
    elm_diskselector_item_append(di, "December", NULL, NULL, NULL);
 
    elm_diskselector_item_selected_set(ds_it, EINA_TRUE);
-<<<<<<< HEAD
-   elm_diskselector_round_set(di, round);
-=======
    elm_diskselector_round_enabled_set(di, rnd);
->>>>>>> remotes/origin/upstream
 
    return di;
 }
 
-<<<<<<< HEAD
-void
-test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   Evas_Object *win, *bg, *bx, *disk, *ic;
-   Elm_Object_Item *ds_it;
-   char buf[PATH_MAX];
-=======
 static void
 _cleanup_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -228,7 +206,6 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    Elm_Object_Item *ds_it;
    char buf[PATH_MAX];
    api_data *api = calloc(1, sizeof(api_data));
->>>>>>> remotes/origin/upstream
    int idx = 0;
 
    char *month_list[] = {
@@ -242,10 +219,7 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    win = elm_win_add(NULL, "diskselector", ELM_WIN_BASIC);
    elm_win_title_set(win, "Disk Selector");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-=======
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
@@ -253,22 +227,15 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-=======
    bxx = elm_box_add(win);
    elm_win_resize_object_add(win, bxx);
    evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bxx);
 
->>>>>>> remotes/origin/upstream
    bx = elm_box_add(win);
    elm_win_resize_object_add(win, bx);
    evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bx, EVAS_HINT_FILL, EVAS_HINT_FILL);
-<<<<<<< HEAD
-   evas_object_show(bx);
-
-=======
    api->box = bx;
    evas_object_show(bx);
 
@@ -281,7 +248,6 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
 
    elm_box_pack_end(bxx, bx);
 
->>>>>>> remotes/origin/upstream
    disk = _disk_create(win, EINA_TRUE);
    evas_object_size_hint_weight_set(disk, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(disk, EVAS_HINT_FILL, 0.5);
@@ -307,21 +273,13 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    elm_box_pack_end(bx, disk);
    evas_object_show(disk);
    evas_object_smart_callback_add(disk, "selected", _print_disk_info_cb, NULL);
-<<<<<<< HEAD
-   elm_diskselector_side_label_length_set(disk, 4);
-=======
    elm_diskselector_side_text_max_length_set(disk, 4);
->>>>>>> remotes/origin/upstream
 
    disk = elm_diskselector_add(win);
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 1, 1);
-=======
    elm_icon_resizable_set(ic, 1, 1);
->>>>>>> remotes/origin/upstream
    elm_diskselector_item_append(disk, "Sunday", ic, NULL, NULL);
    elm_diskselector_item_append(disk, "Monday", NULL, NULL, NULL);
    elm_diskselector_item_append(disk, "Tuesday", NULL, NULL, NULL);
@@ -329,11 +287,7 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    elm_diskselector_item_append(disk, "Thursday", NULL, NULL, NULL);
    elm_diskselector_item_append(disk, "Friday", NULL, NULL, NULL);
    elm_diskselector_item_append(disk, "Saturday", NULL, NULL, NULL);
-<<<<<<< HEAD
-   elm_diskselector_round_set(disk, EINA_TRUE);
-=======
    elm_diskselector_round_enabled_set(disk, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_weight_set(disk, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(disk, EVAS_HINT_FILL, 0.5);
    elm_box_pack_end(bx, disk);
@@ -344,11 +298,7 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 1, 1);
-=======
    elm_icon_resizable_set(ic, 1, 1);
->>>>>>> remotes/origin/upstream
    elm_diskselector_item_append(disk, "머리스타일", ic, NULL, NULL);
    elm_diskselector_item_append(disk, "プロが伝授する", NULL, NULL, NULL);
    elm_diskselector_item_append(disk, "生上访要求政府", NULL, NULL, NULL);
@@ -356,11 +306,7 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
    elm_diskselector_item_append(disk, "والشريعة", NULL, NULL, NULL);
    elm_diskselector_item_append(disk, "עִבְרִית", NULL, NULL, NULL);
    elm_diskselector_item_append(disk, "Grüßen", NULL, NULL, NULL);
-<<<<<<< HEAD
-   elm_diskselector_round_set(disk, EINA_TRUE);
-=======
    elm_diskselector_round_enabled_set(disk, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_weight_set(disk, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(disk, EVAS_HINT_FILL, 0.5);
    elm_box_pack_end(bx, disk);
@@ -380,11 +326,7 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
      }
 
    elm_diskselector_item_selected_set(ds_it, EINA_TRUE);
-<<<<<<< HEAD
-   elm_diskselector_round_set(disk, EINA_TRUE);
-=======
    elm_diskselector_round_enabled_set(disk, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_weight_set(disk, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(disk, EVAS_HINT_FILL, 0.5);
    elm_box_pack_end(bx, disk);
@@ -404,11 +346,7 @@ test_diskselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *even
      }
 
    elm_diskselector_item_selected_set(ds_it, EINA_TRUE);
-<<<<<<< HEAD
-   elm_diskselector_round_set(disk, EINA_TRUE);
-=======
    elm_diskselector_round_enabled_set(disk, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_weight_set(disk, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(disk, EVAS_HINT_FILL, 0.5);
    elm_box_pack_end(bx, disk);
