@@ -15,10 +15,7 @@ Elm_Config *_elm_config = NULL;
 char *_elm_profile = NULL;
 static Eet_Data_Descriptor *_config_edd = NULL;
 static Eet_Data_Descriptor *_config_font_overlay_edd = NULL;
-<<<<<<< HEAD
-=======
 const char *_elm_preferred_engine = NULL;
->>>>>>> remotes/origin/upstream
 
 static Ecore_Poller *_elm_cache_flush_poller = NULL;
 
@@ -291,10 +288,7 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, bring_in_scroll_friction, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, zoom_friction, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, thumbscroll_bounce_enable, T_UCHAR);
-<<<<<<< HEAD
    ELM_CONFIG_VAL(D, T, scroll_smooth_time_interval, T_DOUBLE);
-=======
->>>>>>> remotes/origin/upstream
    ELM_CONFIG_VAL(D, T, scroll_smooth_amount, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, scroll_smooth_history_weight, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, scroll_smooth_future_time, T_DOUBLE);
@@ -341,12 +335,9 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, glayer_long_tap_start_timeout, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, access_mode, T_INT);
    ELM_CONFIG_VAL(D, T, glayer_continues_enable, T_UCHAR);
-<<<<<<< HEAD
-=======
    ELM_CONFIG_VAL(D, T, week_start, T_INT);
    ELM_CONFIG_VAL(D, T, weekend_start, T_INT);
    ELM_CONFIG_VAL(D, T, weekend_len, T_INT);
->>>>>>> remotes/origin/upstream
 #undef T
 #undef D
 #undef T_INT
@@ -551,10 +542,7 @@ _elm_config_text_classes_get(void)
      {
         Elm_Text_Class *tc;
         tc = malloc(sizeof(*tc));
-<<<<<<< HEAD
-=======
         if (!tc) continue;
->>>>>>> remotes/origin/upstream
 
         *tc = _elm_text_classes[i];
 
@@ -576,11 +564,7 @@ _elm_config_text_classes_free(Eina_List *l)
 Eina_List *
 _elm_config_profiles_list(void)
 {
-<<<<<<< HEAD
-   const Eina_File_Direct_Info *info;
-=======
    Eina_File_Direct_Info *info;
->>>>>>> remotes/origin/upstream
    Eina_List *flist = NULL;
    Eina_Iterator *file_it;
    char buf[PATH_MAX];
@@ -600,8 +584,6 @@ _elm_config_profiles_list(void)
 
    EINA_ITERATOR_FOREACH(file_it, info)
      {
-<<<<<<< HEAD
-=======
         Eina_Stat st;
 
         if (eina_file_statat(eina_iterator_container_get(file_it), info, &st))
@@ -609,7 +591,6 @@ _elm_config_profiles_list(void)
              ERR("this is bad.");
              continue;
           }
->>>>>>> remotes/origin/upstream
         if (info->name_length >= len)
           continue;
 
@@ -774,11 +755,7 @@ _config_sub_apply(void)
 static Eina_Bool
 _elm_cache_flush_cb(void *data __UNUSED__)
 {
-<<<<<<< HEAD
-   elm_all_flush();
-=======
    elm_cache_all_flush();
->>>>>>> remotes/origin/upstream
    return ECORE_CALLBACK_RENEW;
 }
 
@@ -791,11 +768,7 @@ _elm_recache(void)
    Eina_List *l;
    Evas_Object *win;
 
-<<<<<<< HEAD
-   elm_all_flush();
-=======
    elm_cache_all_flush();
->>>>>>> remotes/origin/upstream
 
    EINA_LIST_FOREACH(_elm_win_list, l, win)
      {
@@ -881,13 +854,8 @@ _config_load(void)
     * profile. Fallback to default before moving on */
 
    // config load fail - defaults
-<<<<<<< HEAD
-   /* XXX: do these make sense? Only if it's valid to install the lib
-    * without the config, but do we want that? */
-=======
    // why are these here? well if they are, it means you can make a gui
    // config recovery app i guess...
->>>>>>> remotes/origin/upstream
    _elm_config = ELM_NEW(Elm_Config);
    _elm_config->config_version = ELM_CONFIG_VERSION;
    _elm_config->engine = eina_stringshare_add("software_x11");
@@ -903,10 +871,7 @@ _config_load(void)
    _elm_config->zoom_friction = 0.5;
    _elm_config->thumbscroll_border_friction = 0.5;
    _elm_config->thumbscroll_sensitivity_friction = 0.25; // magic number! just trial and error shows this makes it behave "nicer" and not run off at high speed all the time
-<<<<<<< HEAD
    _elm_config->scroll_smooth_time_interval = 0.008;
-=======
->>>>>>> remotes/origin/upstream
    _elm_config->scroll_smooth_amount = 1.0;
    _elm_config->scroll_smooth_history_weight = 0.3;
    _elm_config->scroll_smooth_future_time = 0.0;
@@ -952,12 +917,9 @@ _config_load(void)
    _elm_config->glayer_flick_time_limit_ms = 120;              /* ms to finish flick */
    _elm_config->glayer_long_tap_start_timeout = 1.2;   /* 1.2 second to start long-tap */
    _elm_config->glayer_continues_enable = EINA_TRUE;      /* Continue gestures default */
-<<<<<<< HEAD
-=======
    _elm_config->week_start = 1; /* monday */
    _elm_config->weekend_start = 6; /* saturday */
    _elm_config->weekend_len = 2;
->>>>>>> remotes/origin/upstream
 }
 
 static const char *
@@ -1088,11 +1050,7 @@ _elm_config_save(void)
    ok = ecore_file_mkpath(buf);
    if (!ok)
      {
-<<<<<<< HEAD
-        ERR("Problem acessing Elementary's user configuration directory: %s",
-=======
         ERR("Problem accessing Elementary's user configuration directory: %s",
->>>>>>> remotes/origin/upstream
             buf);
         return EINA_FALSE;
      }
@@ -1314,11 +1272,8 @@ _env_get(void)
 
         _elm_config->thumbscroll_sensitivity_friction = friction;
      }
-<<<<<<< HEAD
    s = getenv("ELM_SCROLL_SMOOTH_TIME_INTERVAL");
    if (s) _elm_config->scroll_smooth_time_interval = atof(s);
-=======
->>>>>>> remotes/origin/upstream
    s = getenv("ELM_SCROLL_SMOOTH_AMOUNT");
    if (s) _elm_config->scroll_smooth_amount = atof(s);
    s = getenv("ELM_SCROLL_SMOOTH_HISTORY_WEIGHT");
@@ -1457,28 +1412,18 @@ _env_get(void)
 }
 
 EAPI Eina_Bool
-<<<<<<< HEAD
-elm_mirrored_get(void)
-=======
 elm_config_mirrored_get(void)
->>>>>>> remotes/origin/upstream
 {
    return _elm_config->is_mirrored;
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_mirrored_set(Eina_Bool mirrored)
-=======
 elm_config_mirrored_set(Eina_Bool mirrored)
->>>>>>> remotes/origin/upstream
 {
    _elm_config->is_mirrored = mirrored;
    _elm_rescale();
 }
 
-<<<<<<< HEAD
-=======
 EAPI Eina_Bool
 elm_config_cursor_engine_only_get(void)
 {
@@ -2001,7 +1946,6 @@ elm_config_all_flush(void)
 #endif
 }
 
->>>>>>> remotes/origin/upstream
 static void
 _translation_init()
 {
@@ -2030,14 +1974,11 @@ _elm_config_init(void)
    _desc_init();
    _profile_fetch_from_conf();
    _config_load();
-<<<<<<< HEAD
-=======
    if (_elm_preferred_engine) eina_stringshare_del(_elm_preferred_engine);
    if (_elm_config->engine)
      _elm_preferred_engine = eina_stringshare_add(_elm_config->engine);
    else
      _elm_preferred_engine = NULL;
->>>>>>> remotes/origin/upstream
    _translation_init();
    _env_get();
    _config_apply();
@@ -2133,18 +2074,6 @@ _elm_config_engine_set(const char *engine)
    _elm_config->engine = eina_stringshare_add(engine);
 }
 
-<<<<<<< HEAD
-void
-_elm_config_all_update(void)
-{
-#ifdef HAVE_ELEMENTARY_X
-   if (_prop_all_update_timer) ecore_timer_del(_prop_all_update_timer);
-   _prop_all_update_timer = ecore_timer_add(0.1, _prop_all_update_cb, NULL);
-   _prop_config_set();
-   ecore_x_window_prop_string_set(_root_1st, _atom[ATOM_E_PROFILE],
-                                  _elm_profile);
-#endif
-=======
 EAPI const char *
 elm_config_preferred_engine_get(void)
 {
@@ -2161,7 +2090,6 @@ elm_config_preferred_engine_set(const char *engine)
         if (_elm_preferred_engine) eina_stringshare_del(_elm_preferred_engine);
         _elm_preferred_engine = eina_stringshare_add(_elm_config->engine);
      }
->>>>>>> remotes/origin/upstream
 }
 
 void
@@ -2196,15 +2124,9 @@ _elm_config_shutdown(void)
    if (_prop_all_update_timer)
      {
         ecore_timer_del(_prop_all_update_timer);
-<<<<<<< HEAD
-        _prop_all_update_cb(NULL);
-     }
-   _prop_all_update_timer = NULL;
-=======
         _prop_all_update_timer = NULL;
         _prop_all_update_cb(NULL);
      }
->>>>>>> remotes/origin/upstream
    if (_prop_change_delay_timer) ecore_timer_del(_prop_change_delay_timer);
    _prop_change_delay_timer = NULL;
 #endif
@@ -2222,14 +2144,11 @@ _elm_config_shutdown(void)
 #endif
      }
    _config_free();
-<<<<<<< HEAD
-=======
    if (_elm_preferred_engine)
      {
         eina_stringshare_del(_elm_preferred_engine);
         _elm_preferred_engine = NULL;
      }
->>>>>>> remotes/origin/upstream
    if (_elm_profile)
      {
         free(_elm_profile);

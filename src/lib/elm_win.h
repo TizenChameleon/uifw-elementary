@@ -52,11 +52,7 @@
  * window is shown before doing the virtual "in memory" rendering and then
  * save the output to the file specified by the file option (and then exit).
  * If no delay is given, the default is 0.5 seconds. If no file is given the
-<<<<<<< HEAD
- * default output file is "out.png". Repeat option is for continous
-=======
  * default output file is "out.png". Repeat option is for continuous
->>>>>>> remotes/origin/upstream
  * capturing screenshots. Repeat range is from 1 to 999 and filename is
  * fixed to "out001.png" Some examples of using the shot engine:
  *
@@ -73,8 +69,6 @@
  * @li "focus,in": window got focus
  * @li "focus,out": window lost focus
  * @li "moved": window that holds the canvas was moved
-<<<<<<< HEAD
-=======
  * @li "withdrawn": window is still managed normally but removed from view
  * @li "iconified": window is minimized (perhaps into an icon or taskbar)
  * @li "normal": window is in a normal state (not withdrawn or iconified)
@@ -84,7 +78,6 @@
  * @li "unfullscreen": window has stopped being fullscreen
  * @li "maximized": window has been maximized
  * @li "unmaximized": window has stopped being maximized
->>>>>>> remotes/origin/upstream
  *
  * Examples:
  * @li @ref win_example_01
@@ -115,11 +108,7 @@ typedef enum
                        similar. */
    ELM_WIN_MENU, /**< Similar to #ELM_WIN_TOOLBAR. */
    ELM_WIN_UTILITY, /**< A persistent utility window, like a toolbox or
-<<<<<<< HEAD
-                       pallete. */
-=======
                        palette. */
->>>>>>> remotes/origin/upstream
    ELM_WIN_SPLASH, /**< Splash window for a starting up application. */
    ELM_WIN_DROPDOWN_MENU, /**< The window is a dropdown menu, as when an
                              entry in a menubar is clicked. Typically used
@@ -155,11 +144,7 @@ typedef enum
                              Evas_Object. */
    ELM_WIN_SOCKET_IMAGE,/**< The window is rendered onto an image buffer
 			     and can be shown other process's plug image object.
-<<<<<<< HEAD
-			     No actural window is created for this type, 
-=======
 			     No actual window is created for this type, 
->>>>>>> remotes/origin/upstream
 			     instead the window and all of its contents will be
 			     rendered to an image buffer and can be shown 
 			     other process's plug image object*/
@@ -171,10 +156,6 @@ typedef enum
  * When the application window is being managed by Illume, it may request
  * any of the following layouts for the virtual keyboard.
  */
-<<<<<<< HEAD
-// XXX: remove this as it conflicts with input panel
-=======
->>>>>>> remotes/origin/upstream
 typedef enum
 {
    ELM_WIN_KEYBOARD_UNKNOWN, /**< Unknown keyboard state */
@@ -185,11 +166,7 @@ typedef enum
    ELM_WIN_KEYBOARD_PIN, /**< PIN keyboard layout */
    ELM_WIN_KEYBOARD_PHONE_NUMBER, /**< Phone keyboard layout */
    ELM_WIN_KEYBOARD_HEX, /**< Hexadecimal numeric keyboard layout */
-<<<<<<< HEAD
-   ELM_WIN_KEYBOARD_TERMINAL, /**< Full (QUERTY) keyboard layout */
-=======
    ELM_WIN_KEYBOARD_TERMINAL, /**< Full (QWERTY) keyboard layout */
->>>>>>> remotes/origin/upstream
    ELM_WIN_KEYBOARD_PASSWORD, /**< Password keyboard layout */
    ELM_WIN_KEYBOARD_IP, /**< IP keyboard layout */
    ELM_WIN_KEYBOARD_HOST, /**< Host keyboard layout */
@@ -200,8 +177,6 @@ typedef enum
 } Elm_Win_Keyboard_Mode;
 
 /**
-<<<<<<< HEAD
-=======
  * In some environments, like phones, you may have an indicator that
  * shows battery status, reception, time etc. This is the indicator.
  * 
@@ -230,7 +205,6 @@ typedef enum
 } Elm_Win_Indicator_Opacity_Mode;
 
 /**
->>>>>>> remotes/origin/upstream
  * Available commands that can be sent to the Illume manager.
  *
  * When running under an Illume session, a window may send commands to the
@@ -241,11 +215,7 @@ typedef enum
    ELM_ILLUME_COMMAND_FOCUS_BACK, /**< Reverts focus to the previous window */
    ELM_ILLUME_COMMAND_FOCUS_FORWARD, /**< Sends focus to the next window in the list */
    ELM_ILLUME_COMMAND_FOCUS_HOME, /**< Hides all windows to show the Home screen */
-<<<<<<< HEAD
-   ELM_ILLUME_COMMAND_CLOSE /**< Closes the currently active window */
-=======
    ELM_ILLUME_COMMAND_CLOSE, /**< Closes the currently active window */
->>>>>>> remotes/origin/upstream
 } Elm_Illume_Command;
 
 /**
@@ -256,11 +226,7 @@ typedef enum
  * @param name The name of the window
  * @param type The window type, one of #Elm_Win_Type.
  *
-<<<<<<< HEAD
- * The @p parent paramter can be @c NULL for every window @p type except
-=======
  * The @p parent parameter can be @c NULL for every window @p type except
->>>>>>> remotes/origin/upstream
  * #ELM_WIN_INLINED_IMAGE, which needs a parent to retrieve the canvas on
  * which the image object will be created.
  *
@@ -348,8 +314,6 @@ EAPI void                  elm_win_title_set(Evas_Object *obj, const char *title
 EAPI const char           *elm_win_title_get(const Evas_Object *obj);
 
 /**
-<<<<<<< HEAD
-=======
  * Set the icon name of the window
  *
  * @param obj The window object
@@ -416,7 +380,6 @@ EAPI void                  elm_win_icon_object_set(Evas_Object *obj, Evas_Object
 EAPI const Evas_Object    *elm_win_icon_object_get(const Evas_Object *obj);
 
 /**
->>>>>>> remotes/origin/upstream
  * Set the window's autodel state.
  *
  * When closing the window in any way outside of the program control, like
@@ -491,11 +454,7 @@ EAPI void                  elm_win_raise(Evas_Object *obj);
  * Center a window on its screen
  *
  * This function centers window @p obj horizontally and/or vertically based on the values
-<<<<<<< HEAD
- * of @p h and @v.
-=======
  * of @p h and @p v.
->>>>>>> remotes/origin/upstream
  * @param obj The window object
  * @param h If true, center horizontally. If false, do not change horizontal location.
  * @param v If true, center vertically. If false, do not change vertical location.
@@ -527,11 +486,7 @@ EAPI Eina_Bool             elm_win_borderless_get(const Evas_Object *obj);
  * Shaped windows, when supported, will render the parts of the window that
  * has no content, transparent.
  *
-<<<<<<< HEAD
- * If @p shaped is EINA_FALSE, then it is strongly adviced to have some
-=======
  * If @p shaped is EINA_FALSE, then it is strongly advised to have some
->>>>>>> remotes/origin/upstream
  * background object or cover the entire window in any other way, or the
  * parts of the canvas that have no data will show framebuffer artifacts.
  *
@@ -570,33 +525,6 @@ EAPI Eina_Bool             elm_win_shaped_get(const Evas_Object *obj);
 EAPI void                  elm_win_alpha_set(Evas_Object *obj, Eina_Bool alpha);
 
 /**
-<<<<<<< HEAD
- * Get the transparency state of a window.
- *
- * @param obj The window object
- * @return If true, the window is transparent
- *
- * @see elm_win_transparent_set()
- */
-// XXX: deprecate this
-EAPI Eina_Bool             elm_win_transparent_get(const Evas_Object *obj);
-
-/**
- * Set the transparency state of a window.
- *
- * Use elm_win_alpha_set() instead.
- *
- * @param obj The window object
- * @param transparent If true, the window is transparent
- *
- * @see elm_win_alpha_set()
- */
-// XXX: deprecate this
-EAPI void                  elm_win_transparent_set(Evas_Object *obj, Eina_Bool transparent);
-
-/**
-=======
->>>>>>> remotes/origin/upstream
  * Get the alpha channel state of a window.
  *
  * @param obj The window object
@@ -681,8 +609,6 @@ EAPI void                  elm_win_iconified_set(Evas_Object *obj, Eina_Bool ico
 EAPI Eina_Bool             elm_win_iconified_get(const Evas_Object *obj);
 
 /**
-<<<<<<< HEAD
-=======
  * Set the withdrawn state of a window.
  *
  * @param obj The window object
@@ -764,7 +690,6 @@ EAPI void                  elm_win_aspect_set(Evas_Object *obj, double aspect);
 EAPI double                elm_win_aspect_get(const Evas_Object *obj);
 
 /**
->>>>>>> remotes/origin/upstream
  * Set the layer of the window.
  *
  * What this means exactly will depend on the underlying engine used.
@@ -1052,11 +977,7 @@ EAPI void                  elm_win_focus_highlight_style_set(Evas_Object *obj, c
 /**
  * Get the style set for the focus highlight object
  *
-<<<<<<< HEAD
- * Gets the style set for this windows highilght object, or NULL if none
-=======
  * Gets the style set for this windows highlight object, or NULL if none
->>>>>>> remotes/origin/upstream
  * is set.
  *
  * @param obj The window to retrieve the highlights style from
@@ -1064,24 +985,6 @@ EAPI void                  elm_win_focus_highlight_style_set(Evas_Object *obj, c
  * @return The style set or NULL if none was. Default is used in that case.
  */
 EAPI const char           *elm_win_focus_highlight_style_get(const Evas_Object *obj);
-<<<<<<< HEAD
-EAPI void                  elm_win_indicator_state_set(Evas_Object *obj, int show_state);
-EAPI int                   elm_win_indicator_state_get(Evas_Object *obj);
-/*...
- * ecore_x_icccm_hints_set -> accepts_focus (add to ecore_evas)
- * ecore_x_icccm_hints_set -> window_group (add to ecore_evas)
- * ecore_x_icccm_size_pos_hints_set -> request_pos (add to ecore_evas)
- * ecore_x_icccm_client_leader_set -> l (add to ecore_evas)
- * ecore_x_icccm_window_role_set -> role (add to ecore_evas)
- * ecore_x_icccm_transient_for_set -> forwin (add to ecore_evas)
- * ecore_x_netwm_window_type_set -> type (add to ecore_evas)
- *
- * (add to ecore_x) set netwm argb icon! (add to ecore_evas)
- * (blank mouse, private mouse obj, defaultmouse)
- *
- */
-=======
->>>>>>> remotes/origin/upstream
 
 /**
  * Sets the keyboard mode of the window.
@@ -1116,8 +1019,6 @@ EAPI void                  elm_win_keyboard_win_set(Evas_Object *obj, Eina_Bool 
 EAPI Eina_Bool             elm_win_keyboard_win_get(const Evas_Object *obj);
 
 /**
-<<<<<<< HEAD
-=======
  * Sets the indicator mode of the window.
  *
  * @param obj The window object
@@ -1150,7 +1051,6 @@ EAPI void                  elm_win_indicator_opacity_set(Evas_Object *obj, Elm_W
 EAPI Elm_Win_Indicator_Opacity_Mode elm_win_indicator_opacity_get(const Evas_Object *obj);
 
 /**
->>>>>>> remotes/origin/upstream
  * Get the screen position of a window.
  *
  * @param obj The window object
@@ -1164,13 +1064,8 @@ EAPI void                  elm_win_screen_position_get(const Evas_Object *obj, i
  *
  * @param obj The window object
  * @param svcname The name of the service to be advertised. ensure that it is unique (when combined with @p svcnum) otherwise creation may fail.
-<<<<<<< HEAD
- * @param svcnum A number (any value, 0 beig the common default) to differentiate multiple instances of services with the same name.
- * @param svcsys A boolean that if true, specifies to create a system-wide service all users can connect to, otherwise the service is private to the user ide that created the service.
-=======
  * @param svcnum A number (any value, 0 being the common default) to differentiate multiple instances of services with the same name.
  * @param svcsys A boolean that if true, specifies to create a system-wide service all users can connect to, otherwise the service is private to the user id that created the service.
->>>>>>> remotes/origin/upstream
  * @return If socket creation is successful
  */
 EAPI Eina_Bool             elm_win_socket_listen(Evas_Object *obj, const char *svcname, int svcnum, Eina_Bool svcsys);
@@ -1230,10 +1125,6 @@ EAPI Eina_Bool             elm_win_socket_listen(Evas_Object *obj, const char *s
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
  */
-<<<<<<< HEAD
-// XXX: deprecate this
-=======
->>>>>>> remotes/origin/upstream
 EAPI Evas_Object *elm_win_inwin_add(Evas_Object *parent);
 
 /**
@@ -1249,10 +1140,6 @@ EAPI Evas_Object *elm_win_inwin_add(Evas_Object *parent);
  *
  * @param obj The inwin to activate
  */
-<<<<<<< HEAD
-// XXX: deprecate this
-=======
->>>>>>> remotes/origin/upstream
 EAPI void         elm_win_inwin_activate(Evas_Object *obj);
 
 /**
@@ -1265,20 +1152,12 @@ EAPI void         elm_win_inwin_activate(Evas_Object *obj);
  * @param obj The inwin object
  * @param content The object to set as content
  */
-<<<<<<< HEAD
-// XXX: deprecate this
-=======
->>>>>>> remotes/origin/upstream
 EAPI void         elm_win_inwin_content_set(Evas_Object *obj, Evas_Object *content);
 
 /**
  * Get the content of an inwin object.
  *
-<<<<<<< HEAD
- * Return the content object which is set for this widget.
-=======
  * Return the content object for this widget.
->>>>>>> remotes/origin/upstream
  *
  * The returned object is valid as long as the inwin is still alive and no
  * other content is set on it. Deleting the object will notify the inwin
@@ -1290,10 +1169,6 @@ EAPI void         elm_win_inwin_content_set(Evas_Object *obj, Evas_Object *conte
  * @param obj The inwin object
  * @return The content that is being used
  */
-<<<<<<< HEAD
-// XXX: deprecate this
-=======
->>>>>>> remotes/origin/upstream
 EAPI Evas_Object *elm_win_inwin_content_get(const Evas_Object *obj);
 
 /**
@@ -1304,10 +1179,6 @@ EAPI Evas_Object *elm_win_inwin_content_get(const Evas_Object *obj);
  * @param obj The inwin object
  * @return The content that was being used
  */
-<<<<<<< HEAD
-// XXX: deprecate this
-=======
->>>>>>> remotes/origin/upstream
 EAPI Evas_Object *elm_win_inwin_content_unset(Evas_Object *obj);
 
 /**
