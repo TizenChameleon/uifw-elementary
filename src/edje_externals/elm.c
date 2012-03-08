@@ -36,41 +36,6 @@ _external_obj_del(void *data __UNUSED__, Evas *evas __UNUSED__, Evas_Object *obj
 }
 
 void
-<<<<<<< HEAD
-external_signal(void *data __UNUSED__, Evas_Object *obj, const char *signal, const char *source)
-{
-	char *_signal = strdup(signal);
-	char *p = _signal;
-	Evas_Object *content;
-
-	while((*p!='\0') && (*p!=']'))
-		p++;
-
-
-	if((*p=='\0') || (*(p+1)!=':'))
-	{
-		ERR("Invalid External Signal received: '%s' '%s'\n", signal, source);
-		free(_signal);
-		return ;
-	}
-
-	*p = '\0';
-	p+=2; //jump ']' and ':'
-
-	Edje_External_Type *type = evas_object_data_get(obj, "Edje_External_Type");
-	if (!type->content_get)
-	{
-		ERR("external type '%s' from module '%s' does not provide content_get()",
-				type->module_name, type->module);
-		free(_signal);
-		return ;
-	}
-
-	content = type->content_get(type->data, obj, _signal);
-	free(_signal);
-	if(content)
-		edje_object_signal_emit(content, signal + (p - _signal), source);
-=======
 external_signal(void *data __UNUSED__, Evas_Object *obj, const char *sig, const char *source)
 {
    char *_signal = strdup(sig);
@@ -104,7 +69,6 @@ external_signal(void *data __UNUSED__, Evas_Object *obj, const char *sig, const 
    free(_signal);
    if(content)
      edje_object_signal_emit(content, sig + (p - _signal), source);
->>>>>>> remotes/origin/upstream
 }
 
 const char *

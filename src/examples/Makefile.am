@@ -34,10 +34,6 @@ EDJE_FLAGS = $(EDJE_FLAGS_$(V))
 
 SRCS = \
 	actionslider_example_01.c \
-<<<<<<< HEAD
-	anchorblock_example_01.c \
-=======
->>>>>>> remotes/origin/upstream
 	bubble_example_01.c \
 	button_example_01.c \
 	check_example_01.c \
@@ -64,10 +60,7 @@ SRCS = \
 	calendar_example_04.c \
 	calendar_example_05.c \
 	calendar_example_06.c \
-<<<<<<< HEAD
-=======
 	datetime_example.c \
->>>>>>> remotes/origin/upstream
 	map_example_01.c \
 	map_example_02.c \
 	map_example_03.c \
@@ -76,10 +69,7 @@ SRCS = \
 	toolbar_example_03.c \
 	spinner_example.c \
 	clock_example.c \
-<<<<<<< HEAD
-=======
 	dayselector_example.c \
->>>>>>> remotes/origin/upstream
 	mapbuf_example.c \
 	conformant_example_01.c \
 	conformant_example_02.c \
@@ -110,10 +100,6 @@ SRCS = \
 	slider_example.c \
 	panes_example.c \
 	ctxpopup_example_01.c \
-<<<<<<< HEAD
-	pager_example_01.c \
-=======
->>>>>>> remotes/origin/upstream
 	separator_example_01.c \
 	radio_example_01.c \
 	panel_example_01.c \
@@ -123,12 +109,9 @@ SRCS = \
 	progressbar_example.c \
 	notify_example_01.c \
 	photocam_example_01.c \
-<<<<<<< HEAD
-=======
 	popup_example_01.c \
 	popup_example_02.c \
 	popup_example_03.c \
->>>>>>> remotes/origin/upstream
 	inwin_example.c \
 	scroller_example_01.c \
 	table_example_01.c \
@@ -164,10 +147,6 @@ clean-local:
 
 examples_PROGRAMS += \
 	actionslider_example_01 \
-<<<<<<< HEAD
-	anchorblock_example_01 \
-=======
->>>>>>> remotes/origin/upstream
 	bubble_example_01 \
 	button_example_01 \
 	check_example_01 \
@@ -194,10 +173,7 @@ examples_PROGRAMS += \
 	calendar_example_04 \
 	calendar_example_05 \
 	calendar_example_06 \
-<<<<<<< HEAD
-=======
 	datetime_example \
->>>>>>> remotes/origin/upstream
 	map_example_01 \
 	map_example_02 \
 	map_example_03 \
@@ -206,10 +182,7 @@ examples_PROGRAMS += \
 	toolbar_example_03 \
 	spinner_example \
 	clock_example \
-<<<<<<< HEAD
-=======
 	dayselector_example \
->>>>>>> remotes/origin/upstream
 	mapbuf_example \
 	conformant_example_01 \
 	conformant_example_02 \
@@ -233,10 +206,6 @@ examples_PROGRAMS += \
 	fileselector_entry_example \
 	index_example_01 \
 	index_example_02 \
-<<<<<<< HEAD
-	pager_example_01 \
-=======
->>>>>>> remotes/origin/upstream
 	separator_example_01 \
 	radio_example_01 \
 	toggle_example_01 \
@@ -252,12 +221,9 @@ examples_PROGRAMS += \
 	progressbar_example \
 	notify_example_01 \
 	photocam_example_01 \
-<<<<<<< HEAD
-=======
 	popup_example_01 \
 	popup_example_02 \
 	popup_example_03 \
->>>>>>> remotes/origin/upstream
 	inwin_example \
 	scroller_example_01 \
 	table_example_01 \
@@ -301,10 +267,7 @@ SCREENSHOTS = \
 	calendar_example_04:calendar_example_04.png:0.0 \
 	calendar_example_05:calendar_example_05.png:0.0 \
 	calendar_example_06:calendar_example_06.png:0.0 \
-<<<<<<< HEAD
-=======
 	datetime_example:datetime_example.png:0.0 \
->>>>>>> remotes/origin/upstream
 	map_example_01:map_example_01.png:2 \
 	map_example_02:map_example_02.png:2.5 \
 	map_example_03:map_example_03.png:2 \
@@ -313,10 +276,7 @@ SCREENSHOTS = \
 	toolbar_example_03:toolbar_example_03.png:1 \
 	spinner_example:spinner_example.png:0.0 \
 	clock_example:clock_example.png:0.5 \
-<<<<<<< HEAD
-=======
 	dayselector_example:dayselector_example.png:0.0 \
->>>>>>> remotes/origin/upstream
 	mapbuf_example:mapbuf_example.png:0.0 \
 	image_example_01:image_example_01.png:0.0 \
 	diskselector_example_01:diskselector_example_01.png:0.2 \
@@ -335,10 +295,6 @@ SCREENSHOTS = \
 	slider_example:slider_example.png:0.0 \
 	panes_example:panes_example.png:0.0 \
 	ctxpopup_example_01:ctxpopup_example_01.png:0.0 \
-<<<<<<< HEAD
-	pager_example_01:pager_example_01.png:0.0 \
-=======
->>>>>>> remotes/origin/upstream
 	separator_example_01:separator_example_01.png:0.0 \
 	radio_example_01:radio_example_01.png:0.0 \
 	toggle_example_01:toggle_example_01.png:0.0 \
@@ -354,13 +310,10 @@ SCREENSHOTS = \
 	progressbar_example:progressbar_example.png:0.0 \
 	notify_example_01:notify_example_01.png:0.0 \
 	notify_example_01:notify_example_01_a.png:6.0 \
-<<<<<<< HEAD
-=======
 	popup_example_01:popup_example_01.png:1.0 \
 	popup_example_01:popup_example_01_a.png:6.0 \
 	popup_example_02:popup_example_02.png:0.2 \
 	popup_example_03:popup_example_03.png:0.2 \
->>>>>>> remotes/origin/upstream
 	slideshow_example:slideshow_example.png:1.0 \
 	photocam_example_01:photocam_example_01.png:3 \
 	scroller_example_01:scroller_example_01.png:0.0 \

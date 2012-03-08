@@ -1,18 +1,9 @@
 #include <Elementary.h>
-<<<<<<< HEAD
-=======
 #include "test.h"
->>>>>>> remotes/origin/upstream
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
-<<<<<<< HEAD
-void
-test_inwin(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   Evas_Object *win, *bg, *inwin, *lb;
-=======
 struct _api_data
 {
    unsigned int state;  /* What state we are testing       */
@@ -72,15 +63,11 @@ test_inwin(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 {
    Evas_Object *win, *bg, *inwin, *lb, *bxx, *bt;
    api_data *api = calloc(1, sizeof(api_data));
->>>>>>> remotes/origin/upstream
 
    win = elm_win_add(NULL, "inwin", ELM_WIN_BASIC);
    elm_win_title_set(win, "Inwin");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-=======
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
@@ -88,10 +75,6 @@ test_inwin(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    evas_object_show(bg);
 
    inwin = elm_win_inwin_add(win);
-<<<<<<< HEAD
-   evas_object_show(inwin);
-
-=======
    api->inwin = inwin;
    evas_object_show(inwin);
 
@@ -106,7 +89,6 @@ test_inwin(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    elm_object_disabled_set(bt, api->state == API_STATE_LAST);
    evas_object_show(bt);
 
->>>>>>> remotes/origin/upstream
    lb = elm_label_add(win);
    elm_object_text_set(lb,
 		       "This is an \"inwin\" - a window in a<br/>"
@@ -114,12 +96,8 @@ test_inwin(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 		       "you want centered, taking over the window<br/>"
 		       "until dismissed somehow. Unlike hovers they<br/>"
 		       "don't hover over their target.");
-<<<<<<< HEAD
-   elm_win_inwin_content_set(inwin, lb);
-=======
    elm_box_pack_end(bxx, lb);
    elm_win_inwin_content_set(inwin, bxx);
->>>>>>> remotes/origin/upstream
    evas_object_show(lb);
 
    evas_object_resize(win, 320, 240);
