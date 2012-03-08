@@ -66,15 +66,6 @@ EAPI Evas_Object          *elm_index_add(Evas_Object *parent);
  * Enable or disable auto hiding feature for a given index widget.
  *
  * @param obj The index object
-<<<<<<< HEAD
- * @param active @c EINA_TRUE to enable auto hiding, @c EINA_FALSE to disable
- *
- * @see elm_index_active_get()
- *
- * @ingroup Index
- */
-EAPI void                  elm_index_active_set(Evas_Object *obj, Eina_Bool active);
-=======
  * @param disabled @c EINA_TRUE to disable auto hiding, @c EINA_FALSE to enable
  *
  * @see elm_index_autohide_disabled_get()
@@ -82,27 +73,18 @@ EAPI void                  elm_index_active_set(Evas_Object *obj, Eina_Bool acti
  * @ingroup Index
  */
 EAPI void                  elm_index_autohide_disabled_set(Evas_Object *obj, Eina_Bool disabled);
->>>>>>> remotes/origin/upstream
 
 /**
  * Get whether auto hiding feature is enabled or not for a given index widget.
  *
  * @param obj The index object
-<<<<<<< HEAD
- * @return @c EINA_TRUE, if auto hiding is enabled, @c EINA_FALSE otherwise
-=======
  * @return @c EINA_TRUE, if auto hiding is disabled, @c EINA_FALSE otherwise
->>>>>>> remotes/origin/upstream
  *
  * @see elm_index_active_set() for more details
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI Eina_Bool             elm_index_active_get(const Evas_Object *obj);
-=======
 EAPI Eina_Bool             elm_index_autohide_disabled_get(const Evas_Object *obj);
->>>>>>> remotes/origin/upstream
 
 /**
  * Set the items level for a given index widget.
@@ -129,8 +111,6 @@ EAPI void                  elm_index_item_level_set(Evas_Object *obj, int level)
 EAPI int                   elm_index_item_level_get(const Evas_Object *obj);
 
 /**
-<<<<<<< HEAD
-=======
  * Set the selected state of an item.
  *
  * @param it The index item
@@ -153,7 +133,6 @@ EAPI int                   elm_index_item_level_get(const Evas_Object *obj);
 EAPI void                  elm_index_item_selected_set(Elm_Object_Item *it, Eina_Bool selected);
 
 /**
->>>>>>> remotes/origin/upstream
  * Returns the last selected item, for a given index widget.
  *
  * @param obj The index object.
@@ -161,24 +140,16 @@ EAPI void                  elm_index_item_selected_set(Elm_Object_Item *it, Eina
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI Elm_Object_Item      *elm_index_item_selected_get(const Evas_Object *obj, int level);
-=======
 EAPI Elm_Object_Item      *elm_index_selected_item_get(const Evas_Object *obj, int level);
->>>>>>> remotes/origin/upstream
 
 /**
  * Append a new item on a given index widget.
  *
  * @param obj The index object.
  * @param letter Letter under which the item should be indexed
-<<<<<<< HEAD
- * @param item The item data to set for the index's item
-=======
  * @param func The function to call when the item is selected.
  * @param data The item data to set for the index's item
  * @return A handle to the item added or @c NULL, on errors 
->>>>>>> remotes/origin/upstream
  *
  * Despite the most common usage of the @p letter argument is for
  * single char strings, one could use arbitrary strings as index
@@ -189,24 +160,16 @@ EAPI Elm_Object_Item      *elm_index_selected_item_get(const Evas_Object *obj, i
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI void                  elm_index_item_append(Evas_Object *obj, const char *letter, const void *item);
-=======
 EAPI Elm_Object_Item      *elm_index_item_append(Evas_Object *obj, const char *letter, Evas_Smart_Cb func, const void *data);
->>>>>>> remotes/origin/upstream
 
 /**
  * Prepend a new item on a given index widget.
  *
  * @param obj The index object.
  * @param letter Letter under which the item should be indexed
-<<<<<<< HEAD
- * @param item The item data to set for the index's item
-=======
  * @param func The function to call when the item is selected.
  * @param data The item data to set for the index's item
  * @return A handle to the item added or @c NULL, on errors 
->>>>>>> remotes/origin/upstream
  *
  * Despite the most common usage of the @p letter argument is for
  * single char strings, one could use arbitrary strings as index
@@ -217,18 +180,6 @@ EAPI Elm_Object_Item      *elm_index_item_append(Evas_Object *obj, const char *l
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI void                  elm_index_item_prepend(Evas_Object *obj, const char *letter, const void *item);
-
-/**
- * Append a new item, on a given index widget, <b>after the item
- * having @p relative as data</b>.
- *
- * @param obj The index object.
- * @param letter Letter under which the item should be indexed
- * @param item The item data to set for the index's item
- * @param relative The index item to be the predecessor of this new one
-=======
 EAPI Elm_Object_Item      *elm_index_item_prepend(Evas_Object *obj, const char *letter, Evas_Smart_Cb func, const void *data);
 
 /**
@@ -240,7 +191,6 @@ EAPI Elm_Object_Item      *elm_index_item_prepend(Evas_Object *obj, const char *
  * @param func The function to call when the item is clicked.
  * @param data The item data to set for the index's item
  * @return A handle to the item added or @c NULL, on errors 
->>>>>>> remotes/origin/upstream
  *
  * Despite the most common usage of the @p letter argument is for
  * single char strings, one could use arbitrary strings as index
@@ -254,18 +204,6 @@ EAPI Elm_Object_Item      *elm_index_item_prepend(Evas_Object *obj, const char *
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI void                  elm_index_item_append_relative(Evas_Object *obj, const char *letter, const void *item, const Elm_Object_Item *relative);
-
-/**
- * Prepend a new item, on a given index widget, <b>after the item
- * having @p relative as data</b>.
- *
- * @param obj The index object.
- * @param letter Letter under which the item should be indexed
- * @param item The item data to set for the index's item
- * @param relative The index item to be the successor of this new one
-=======
 EAPI Elm_Object_Item      *elm_index_item_insert_after(Evas_Object *obj, Elm_Object_Item *after, const char *letter, Evas_Smart_Cb func, const void *data);
 
 /**
@@ -277,7 +215,6 @@ EAPI Elm_Object_Item      *elm_index_item_insert_after(Evas_Object *obj, Elm_Obj
  * @param func The function to call when the item is clicked.
  * @param data The item data to set for the index's item
  * @return A handle to the item added or @c NULL, on errors 
->>>>>>> remotes/origin/upstream
  *
  * Despite the most common usage of the @p letter argument is for
  * single char strings, one could use arbitrary strings as index
@@ -291,11 +228,7 @@ EAPI Elm_Object_Item      *elm_index_item_insert_after(Evas_Object *obj, Elm_Obj
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI void                  elm_index_item_prepend_relative(Evas_Object *obj, const char *letter, const void *item, const Elm_Object_Item *relative);
-=======
 EAPI Elm_Object_Item      *elm_index_item_insert_before(Evas_Object *obj, Elm_Object_Item *before, const char *letter, Evas_Smart_Cb func, const void *data);
->>>>>>> remotes/origin/upstream
 
 /**
  * Insert a new item into the given index widget, using @p cmp_func
@@ -303,12 +236,8 @@ EAPI Elm_Object_Item      *elm_index_item_insert_before(Evas_Object *obj, Elm_Ob
  *
  * @param obj The index object.
  * @param letter Letter under which the item should be indexed
-<<<<<<< HEAD
- * @param item The item data to set for the index's item
-=======
  * @param func The function to call when the item is clicked.
  * @param data The item data to set for the index's item
->>>>>>> remotes/origin/upstream
  * @param cmp_func The comparing function to be used to sort index
  * items <b>by #index item handles</b>
  * @param cmp_data_func A @b fallback function to be called for the
@@ -323,10 +252,7 @@ EAPI Elm_Object_Item      *elm_index_item_insert_before(Evas_Object *obj, Elm_Ob
  * because all references to it will be lost. If this function is
  * not provided (@c NULL is given), index items will be @b
  * duplicated, if @p cmp_func returns @c 0.
-<<<<<<< HEAD
-=======
  * @return A handle to the item added or @c NULL, on errors 
->>>>>>> remotes/origin/upstream
  *
  * Despite the most common usage of the @p letter argument is for
  * single char strings, one could use arbitrary strings as index
@@ -337,30 +263,18 @@ EAPI Elm_Object_Item      *elm_index_item_insert_before(Evas_Object *obj, Elm_Ob
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI void                  elm_index_item_sorted_insert(Evas_Object *obj, const char *letter, const void *item, Eina_Compare_Cb cmp_func, Eina_Compare_Cb cmp_data_func);
-=======
 EAPI Elm_Object_Item      *elm_index_item_sorted_insert(Evas_Object *obj, const char *letter, Evas_Smart_Cb func, const void *data, Eina_Compare_Cb cmp_func, Eina_Compare_Cb cmp_data_func);
->>>>>>> remotes/origin/upstream
 
 /**
  * Find a given index widget's item, <b>using item data</b>.
  *
  * @param obj The index object
-<<<<<<< HEAD
- * @param item The item data pointed to by the desired index item
-=======
  * @param data The item data pointed to by the desired index item
->>>>>>> remotes/origin/upstream
  * @return The index item handle, if found, or @c NULL otherwise
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI Elm_Object_Item      *elm_index_item_find(Evas_Object *obj, const void *item);
-=======
 EAPI Elm_Object_Item      *elm_index_item_find(Evas_Object *obj, const void *data);
->>>>>>> remotes/origin/upstream
 
 /**
  * Removes @b all items from a given index widget.
@@ -382,11 +296,7 @@ EAPI void                  elm_index_item_clear(Evas_Object *obj);
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI void                  elm_index_item_go(Evas_Object *obj, int level);
-=======
 EAPI void                  elm_index_level_go(Evas_Object *obj, int level);
->>>>>>> remotes/origin/upstream
 
 /**
  * Get the letter (string) set on a given index widget item.
@@ -422,11 +332,6 @@ EAPI void                 elm_index_indicator_disabled_set(Evas_Object *obj, Ein
  *
  * @ingroup Index
  */
-<<<<<<< HEAD
-EAPI Eina_Bool                 elm_index_indicator_disabled_get(const Evas_Object *obj);
-
-EAPI void                  elm_index_button_image_invisible_set(Evas_Object *obj, Eina_Bool invisible);
-=======
 EAPI Eina_Bool            elm_index_indicator_disabled_get(const Evas_Object *obj);
 
 /**
@@ -461,7 +366,6 @@ EAPI void                      elm_index_horizontal_set(Evas_Object *obj, Eina_B
  * @ingroup Index
  */
 EAPI Eina_Bool                 elm_index_horizontal_get(const Evas_Object *obj);
->>>>>>> remotes/origin/upstream
 
 /**
  * @}
