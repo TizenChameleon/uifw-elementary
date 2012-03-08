@@ -1,10 +1,4 @@
 #include <Elementary.h>
-<<<<<<< HEAD
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
-#ifndef ELM_LIB_QUICKLAUNCH
-=======
 #include "test.h"
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
@@ -85,7 +79,6 @@ _api_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    elm_object_disabled_set(obj, a->state == API_STATE_LAST);
 }
 
->>>>>>> remotes/origin/upstream
 static void
 _ch_grid(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
@@ -95,15 +88,12 @@ _ch_grid(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
    elm_grid_pack_set(obj, x - 1, y - 1, w + 2, h + 2);
 }
 
-<<<<<<< HEAD
-=======
 static void
 _cleanup_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    free(data);
 }
 
->>>>>>> remotes/origin/upstream
 void
 test_grid(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -112,55 +102,36 @@ test_grid(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info _
    win = elm_win_add(NULL, "grid", ELM_WIN_BASIC);
    elm_win_title_set(win, "Grid");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-=======
    api_data *api = calloc(1, sizeof(api_data));
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
-<<<<<<< HEAD
-=======
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    gd = elm_grid_add(win);
    elm_grid_size_set(gd, 100, 100);
    elm_win_resize_object_add(win, gd);
    evas_object_size_hint_weight_set(gd, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-<<<<<<< HEAD
-=======
    api->data.grid = gd;
->>>>>>> remotes/origin/upstream
    evas_object_show(gd);
 
    en = elm_entry_add(win);
    elm_entry_scrollable_set(en, EINA_TRUE);
    elm_object_text_set(en, "Entry text");
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_grid_pack(gd, en, 50, 10, 40, 10);
    evas_object_show(en);
 
    en = elm_entry_add(win);
    elm_entry_scrollable_set(en, EINA_TRUE);
    elm_object_text_set(en, "Entry text 2");
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_grid_pack(gd, en, 60, 20, 30, 10);
    evas_object_show(en);
 
    bt = elm_button_add(win);
-<<<<<<< HEAD
-=======
    elm_object_text_set(bt, "Next API function");
    evas_object_smart_callback_add(bt, "clicked", _api_bt_clicked, (void *) api);
    elm_grid_pack(gd, bt, 30, 0, 40, 10);
@@ -168,7 +139,6 @@ test_grid(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info _
    evas_object_show(bt);
 
    bt = elm_button_add(win);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(bt, "Button");
    elm_grid_pack(gd, bt,  0,  0, 20, 20);
    evas_object_show(bt);
@@ -176,10 +146,7 @@ test_grid(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info _
    bt = elm_button_add(win);
    elm_object_text_set(bt, "Button");
    elm_grid_pack(gd, bt, 10, 10, 40, 20);
-<<<<<<< HEAD
-=======
    api->data.child = bt;
->>>>>>> remotes/origin/upstream
    evas_object_show(bt);
 
    bt = elm_button_add(win);
