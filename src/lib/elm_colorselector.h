@@ -14,8 +14,6 @@
  * See @ref tutorial_colorselector.
  */
 
-<<<<<<< HEAD
-=======
 typedef enum
 {
    ELM_COLORSELECTOR_PALETTE = 0,
@@ -23,7 +21,6 @@ typedef enum
    ELM_COLORSELECTOR_BOTH
 } Elm_Colorselector_Mode;
 
->>>>>>> remotes/origin/upstream
 /**
  * @brief Add a new colorselector to the parent
  *
@@ -61,8 +58,6 @@ EAPI void elm_colorselector_color_set(Evas_Object *obj, int r, int g, int b, int
 EAPI void elm_colorselector_color_get(const Evas_Object *obj, int *r, int *g, int *b, int *a);
 
 /**
-<<<<<<< HEAD
-=======
  * Set a Colorselector mode.
  * Colorselector 
  *
@@ -169,6 +164,5 @@ EAPI void                    elm_colorselector_palette_name_set(Evas_Object *obj
 EAPI const char             *elm_colorselector_palette_name_get(const Evas_Object *obj);
 
 /**
->>>>>>> remotes/origin/upstream
  * @}
  */

@@ -13,30 +13,17 @@
  * value</b>. Label, icon and unit strings/objects are @b optional
  * for progress bars.
  *
-<<<<<<< HEAD
- * A progress bar may be @b inverted, in which state it gets its
- * values inverted, with high values being on the left or top and
- * low values on the right or bottom, as opposed to normally have
- * the low values on the former and high values on the latter,
- * respectively, for horizontal and vertical modes.
-=======
  * A progress bar may be @b inverted, in which case it gets its
  * values inverted, i.e., high values being on the left or top and
  * low values on the right or bottom, for horizontal and vertical modes
  * respectively.
->>>>>>> remotes/origin/upstream
  *
  * The @b span of the progress, as set by
  * elm_progressbar_span_size_set(), is its length (horizontally or
  * vertically), unless one puts size hints on the widget to expand
  * on desired directions, by any container. That length will be
-<<<<<<< HEAD
- * scaled by the object or applications scaling factor. At any
- * point code can query the progress bar for its value with
-=======
  * scaled by the object or applications scaling factor.
  * Applications can query the progress bar for its value with
->>>>>>> remotes/origin/upstream
  * elm_progressbar_value_get().
  *
  * Available widget styles for progress bars:
@@ -45,15 +32,9 @@
  *      "pulse" effect is available)
  *
  * Default text parts of the progressbar widget that you can use for are:
-<<<<<<< HEAD
- * @li "default" - Label of the progressabar
- *
- * Default contents parts of the progressbar widget that you can use for are:
-=======
  * @li "default" - Label of the progressbar
  *
  * Default content parts of the progressbar widget that you can use for are:
->>>>>>> remotes/origin/upstream
  * @li "icon" - An icon of the progressbar
  *
  * Supported elm_object common APIs.
@@ -90,17 +71,10 @@ EAPI Evas_Object                 *elm_progressbar_add(Evas_Object *parent);
  *
  * By default, progress bars will display values from the low to
  * high value boundaries. There are, though, contexts in which the
-<<<<<<< HEAD
- * state of progression of a given task is @b unknown.  For those,
- * one can set a progress bar widget to a "pulsing state", to give
- * the user an idea that some computation is being held, but
- * without exact progress values. In the default theme it will
-=======
  * progress of a given task is @b unknown.  For such cases,
  * one can set a progress bar widget to a "pulsing state", to give
  * the user an idea that some computation is being held, but
  * without exact progress values. In the default theme, it will
->>>>>>> remotes/origin/upstream
  * animate its bar with the contents filling in constantly and back
  * to non-filled, in a loop. To start and stop this pulsing
  * animation, one has to explicitly call elm_progressbar_pulse().
@@ -220,11 +194,7 @@ EAPI Evas_Coord                   elm_progressbar_span_size_get(const Evas_Objec
  * area to be hidden completely. If not, it'll set the <b>format
  * string</b> for the units label's @b text. The units label is
  * provided a floating point value, so the units text is up display
-<<<<<<< HEAD
- * at most one floating point falue. Note that the units label is
-=======
  * at most one floating point value. Note that the units label is
->>>>>>> remotes/origin/upstream
  * optional. Use a format string such as "%1.2f meters" for
  * example.
  *
