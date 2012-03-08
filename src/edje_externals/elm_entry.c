@@ -338,17 +338,10 @@ external_entry_params_parse(void *data __UNUSED__, Evas_Object *obj, const Eina_
 }
 
 static Evas_Object *external_entry_content_get(void *data __UNUSED__,
-<<<<<<< HEAD
-		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
-{
-	ERR("No content.");
-	return NULL;
-=======
                                                const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
    ERR("No content.");
    return NULL;
->>>>>>> remotes/origin/upstream
 }
 
 static void

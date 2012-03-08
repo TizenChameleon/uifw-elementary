@@ -163,15 +163,6 @@ elm_scrolled_entry_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (
 {elm_entry_item_provider_remove(obj, func, data);}
 EINA_DEPRECATED EAPI void
 elm_scrolled_entry_text_filter_append(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
-<<<<<<< HEAD
-{elm_entry_text_filter_append(obj, func, data);}
-EINA_DEPRECATED EAPI void
-elm_scrolled_entry_text_filter_prepend(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
-{elm_entry_text_filter_prepend(obj, func, data);}
-EINA_DEPRECATED EAPI void
-elm_scrolled_entry_text_filter_remove(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
-{elm_entry_text_filter_remove(obj, func, data);}
-=======
 {elm_entry_markup_filter_append(obj, func, data);}
 EINA_DEPRECATED EAPI void
 elm_scrolled_entry_text_filter_prepend(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
@@ -179,7 +170,6 @@ elm_scrolled_entry_text_filter_prepend(Evas_Object *obj, void (*func) (void *dat
 EINA_DEPRECATED EAPI void
 elm_scrolled_entry_text_filter_remove(Evas_Object *obj, void (*func) (void *data, Evas_Object *entry, char **text), void *data)
 {elm_entry_markup_filter_remove(obj, func, data);}
->>>>>>> remotes/origin/upstream
 EINA_DEPRECATED EAPI void
 elm_scrolled_entry_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format)
 {elm_entry_file_set(obj, file, format);}
@@ -197,14 +187,7 @@ elm_scrolled_entry_autosave_get(const Evas_Object *obj)
 {return elm_entry_autosave_get(obj);}
 EINA_DEPRECATED EAPI void
 elm_scrolled_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly)
-<<<<<<< HEAD
-{elm_entry_cnp_textonly_set(obj, textonly);}
-EINA_DEPRECATED EAPI Eina_Bool
-elm_scrolled_entry_cnp_textonly_get(Evas_Object *obj)
-{return elm_entry_cnp_textonly_get(obj);}
-=======
 {Elm_Cnp_Mode cnp_mode = ELM_CNP_MODE_MARKUP; if (textonly) cnp_mode = ELM_CNP_MODE_NO_IMAGE; elm_entry_cnp_mode_set(obj, cnp_mode);}
 EINA_DEPRECATED EAPI Eina_Bool
 elm_scrolled_entry_cnp_textonly_get(Evas_Object *obj)
 {return elm_entry_cnp_mode_get(obj) != ELM_CNP_MODE_MARKUP;}
->>>>>>> remotes/origin/upstream

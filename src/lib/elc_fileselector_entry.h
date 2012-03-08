@@ -14,19 +14,11 @@
  * This file selector may appear in an Elementary window or in an
  * inner window. When a file is chosen from it, the (inner) window
  * is closed and the selected file's path string is exposed both as
-<<<<<<< HEAD
- * an smart event and as the new text on the entry.
- *
- * This widget encapsulates operations on its internal file
- * selector on its own API. There is less control over its file
- * selector than that one would have instatiating one directly.
-=======
  * a smart event and as the new text on the entry.
  *
  * This widget encapsulates operations on its internal file
  * selector on its own API. There is less control over its file
  * selector than that one would have instantiating one directly.
->>>>>>> remotes/origin/upstream
  *
  * Smart callbacks one can register to:
  * - @c "changed" - The text within the entry was changed
@@ -53,11 +45,7 @@
  * are:
  * @li "default" - Label of the fileselector_button
  *
-<<<<<<< HEAD
- * Default contents parts of the fileselector_entry widget that you can use for
-=======
  * Default content parts of the fileselector_entry widget that you can use for
->>>>>>> remotes/origin/upstream
  * are:
  * @li "button icon" - Button icon of the fileselector_entry
  *

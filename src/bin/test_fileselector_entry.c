@@ -1,15 +1,10 @@
 #include <Elementary.h>
-<<<<<<< HEAD
-=======
 #include "test.h"
->>>>>>> remotes/origin/upstream
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
 
 #ifndef ELM_LIB_QUICKLAUNCH
-<<<<<<< HEAD
-=======
 struct _api_data
 {
    unsigned int state;  /* What state we are testing       */
@@ -88,7 +83,6 @@ create_dir_struct(void)
    if (fp) fclose(fp);
 }
 
->>>>>>> remotes/origin/upstream
 static void
 _file_chosen(void            *data,
              Evas_Object *obj __UNUSED__,
@@ -155,47 +149,30 @@ _disabled_toggle(void            *data,
    printf("Disabled flag set to: %s\n", value ? "false" : "true");
 }
 
-<<<<<<< HEAD
-=======
 static void
 _cleanup_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    free(data);
 }
 
->>>>>>> remotes/origin/upstream
 void
 test_fileselector_entry(void *data       __UNUSED__,
                         Evas_Object *obj __UNUSED__,
                         void *event_info __UNUSED__)
 {
-<<<<<<< HEAD
-   Evas_Object *win, *bg, *vbox, *hbox, *ic, *bt, *fs_en, *en, *lb;
-=======
    Evas_Object *win, *bg, *vbox, *hbox, *ic, *bt, *fs_en, *en, *lb, *bxx;
    api_data *api = calloc(1, sizeof(api_data));
->>>>>>> remotes/origin/upstream
 
    win = elm_win_add(NULL, "fileselector-entry", ELM_WIN_BASIC);
    elm_win_title_set(win, "File Selector Entry");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-=======
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-   vbox = elm_box_add(win);
-   evas_object_size_hint_weight_set(vbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, vbox);
-   evas_object_show(vbox);
-
-=======
    bxx = elm_box_add(win);
    elm_win_resize_object_add(win, bxx);
    evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -217,16 +194,12 @@ test_fileselector_entry(void *data       __UNUSED__,
 
    create_dir_struct(); /* Create a dir struct in /tmp */
 
->>>>>>> remotes/origin/upstream
    /* file selector entry */
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "file");
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    fs_en = elm_fileselector_entry_add(win);
-<<<<<<< HEAD
-=======
    elm_fileselector_entry_path_set(fs_en, "/tmp/test_fs_bt");
->>>>>>> remotes/origin/upstream
    elm_object_text_set(fs_en, "Select a file");
    elm_object_part_content_set(fs_en, "button icon", ic);
    evas_object_size_hint_weight_set(fs_en, EVAS_HINT_EXPAND, 0.0);

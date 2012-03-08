@@ -17,11 +17,7 @@ typedef struct
 typedef struct
 {
    Evas_Object *inwin;
-<<<<<<< HEAD
-   Evas_Object *pager;
-=======
    Evas_Object *naviframe;
->>>>>>> remotes/origin/upstream
    Evas_Object *grid;
    Evas_Object *settings;
 
@@ -38,30 +34,18 @@ static void
 _edit_buffer_insert(Evas_Object *e, const char *text)
 {
    elm_entry_entry_insert(e, text);
-<<<<<<< HEAD
-   elm_object_focus(e);
-=======
    elm_object_focus_set(e, EINA_TRUE);
->>>>>>> remotes/origin/upstream
 }
 
 static void
 _it_sel_cb(void *data, Evas_Object *obj __UNUSED__, void *event)
 {
    App_Inwin_Data *aid = data;
-<<<<<<< HEAD
-   Elm_Gengrid_Item *it = event;
-
-   aid->emo = elm_gengrid_item_data_get(it);
-
-   elm_pager_content_promote(aid->pager, aid->settings);
-=======
    Elm_Object_Item *gg_it = event;
 
    aid->emo = elm_object_item_data_get(gg_it);
 
    elm_naviframe_item_simple_promote(aid->naviframe, aid->settings);
->>>>>>> remotes/origin/upstream
 }
 
 static char *
@@ -266,15 +250,9 @@ _page_settings_add(Evas_Object *parent, App_Inwin_Data *aid)
    snprintf(buf, sizeof(buf), "%d", aid->width);
    ewidth = elm_entry_add(parent);
    elm_entry_single_line_set(ewidth, EINA_TRUE);
-<<<<<<< HEAD
-   elm_entry_text_filter_append(ewidth, elm_entry_filter_accept_set,
-                                &accept_set);
-   elm_entry_text_filter_append(ewidth, elm_entry_filter_limit_size,
-=======
    elm_entry_markup_filter_append(ewidth, elm_entry_filter_accept_set,
                                 &accept_set);
    elm_entry_markup_filter_append(ewidth, elm_entry_filter_limit_size,
->>>>>>> remotes/origin/upstream
                                 &limit_size);
    elm_object_text_set(ewidth, buf);
    evas_object_size_hint_weight_set(ewidth, EVAS_HINT_EXPAND, 0.0);
@@ -294,15 +272,9 @@ _page_settings_add(Evas_Object *parent, App_Inwin_Data *aid)
    snprintf(buf, sizeof(buf), "%d", aid->height);
    eheight = elm_entry_add(parent);
    elm_entry_single_line_set(eheight, EINA_TRUE);
-<<<<<<< HEAD
-   elm_entry_text_filter_append(eheight, elm_entry_filter_accept_set,
-                                &accept_set);
-   elm_entry_text_filter_append(eheight, elm_entry_filter_limit_size,
-=======
    elm_entry_markup_filter_append(eheight, elm_entry_filter_accept_set,
                                 &accept_set);
    elm_entry_markup_filter_append(eheight, elm_entry_filter_limit_size,
->>>>>>> remotes/origin/upstream
                                 &limit_size);
    elm_object_text_set(eheight, buf);
    evas_object_size_hint_weight_set(eheight, EVAS_HINT_EXPAND, 0.0);
@@ -341,11 +313,7 @@ _image_insert_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__
 {
    App_Data *ad = data;
    App_Inwin_Data *aid;
-<<<<<<< HEAD
-   Evas_Object *inwin, *box, *box2, *pager, *o;
-=======
    Evas_Object *inwin, *box, *box2, *naviframe, *o;
->>>>>>> remotes/origin/upstream
 
    aid = calloc(1, sizeof(App_Inwin_Data));
    if (!aid) return;
@@ -370,23 +338,6 @@ _image_insert_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__
    elm_win_inwin_content_set(inwin, box);
    evas_object_show(box);
 
-<<<<<<< HEAD
-   pager = elm_pager_add(ad->win);
-   evas_object_size_hint_weight_set(pager, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(pager, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(box, pager);
-   evas_object_show(pager);
-
-   o = _page_grid_add(ad->win, aid);
-   elm_pager_content_push(pager, o);
-   aid->grid = o;
-
-   o = _page_settings_add(ad->win, aid);
-   elm_pager_content_push(pager, o);
-   aid->settings = o;
-
-   elm_pager_content_promote(pager, aid->grid);
-=======
    naviframe = elm_naviframe_add(ad->win);
    evas_object_size_hint_weight_set(naviframe, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(naviframe, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -402,7 +353,6 @@ _image_insert_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__
    aid->settings = o;
 
    elm_naviframe_item_simple_promote(naviframe, aid->grid);
->>>>>>> remotes/origin/upstream
 
    box2 = elm_box_add(ad->win);
    elm_box_horizontal_set(box2, EINA_TRUE);
@@ -421,11 +371,7 @@ _image_insert_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__
    evas_object_smart_callback_add(o, "clicked", _insert_cancel_cb, aid);
 
    aid->inwin = inwin;
-<<<<<<< HEAD
-   aid->pager = pager;
-=======
    aid->naviframe = naviframe;
->>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -629,11 +575,7 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
 
    evas_object_smart_callback_add(win, "delete,request", _win_del_cb, &app);
 
-<<<<<<< HEAD
-   elm_object_focus(app.edit_buffer);
-=======
    elm_object_focus_set(app.edit_buffer, EINA_TRUE);
->>>>>>> remotes/origin/upstream
 
    evas_object_resize(win, 300, 780);
 
