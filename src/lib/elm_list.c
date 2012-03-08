@@ -15,30 +15,18 @@ struct _Widget_Data
    Elm_List_Mode mode;
    Elm_List_Mode h_mode;
    Evas_Coord minw[2], minh[2];
-<<<<<<< HEAD
-   Eina_Bool scr_minw : 1;
-   Eina_Bool scr_minh : 1;
-=======
    Elm_Object_Select_Mode select_mode;
->>>>>>> remotes/origin/upstream
    int walking;
    int movements;
    struct {
         Evas_Coord x, y;
    } history[SWIPE_MOVES];
-<<<<<<< HEAD
-=======
    Eina_Bool scr_minw : 1;
    Eina_Bool scr_minh : 1;
->>>>>>> remotes/origin/upstream
    Eina_Bool swipe : 1;
    Eina_Bool fix_pending : 1;
    Eina_Bool on_hold : 1;
    Eina_Bool multi : 1;
-<<<<<<< HEAD
-   Eina_Bool always_select : 1;
-=======
->>>>>>> remotes/origin/upstream
    Eina_Bool longpressed : 1;
    Eina_Bool wasselected : 1;
 };
@@ -115,11 +103,7 @@ static const Evas_Smart_Cb_Description _signals[] = {
 
 #define ELM_LIST_ITEM_CHECK_DELETED_RETURN(it, ...)                      \
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, __VA_ARGS__);                        \
-<<<<<<< HEAD
-if (((Elm_List_Item *) it)->deleted)                                     \
-=======
 if (((Elm_List_Item *)it)->deleted)                                     \
->>>>>>> remotes/origin/upstream
 {                                                                        \
    ERR("ERROR: "#it" has been DELETED.\n");                              \
    return __VA_ARGS__;                                                   \
@@ -240,11 +224,7 @@ _event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type ty
             (!strcmp(ev->keyname, "KP_Home")))
      {
         it = eina_list_data_get(wd->items);
-<<<<<<< HEAD
-        elm_list_item_bring_in((Elm_Object_Item *) it);
-=======
         elm_list_item_bring_in((Elm_Object_Item *)it);
->>>>>>> remotes/origin/upstream
         ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
         return EINA_TRUE;
      }
@@ -252,11 +232,7 @@ _event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type ty
             (!strcmp(ev->keyname, "KP_End")))
      {
         it = eina_list_data_get(eina_list_last(wd->items));
-<<<<<<< HEAD
-        elm_list_item_bring_in((Elm_Object_Item *) it);
-=======
         elm_list_item_bring_in((Elm_Object_Item *)it);
->>>>>>> remotes/origin/upstream
         ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
         return EINA_TRUE;
      }
@@ -726,12 +702,8 @@ _item_highlight(Elm_List_Item *it)
 
    if (!wd) return;
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it);
-<<<<<<< HEAD
-   if ((it->highlighted) || (it->base.disabled)) return;
-=======
    if ((it->highlighted) || (it->base.disabled) ||
        (wd->select_mode == ELM_OBJECT_SELECT_MODE_NONE)) return;
->>>>>>> remotes/origin/upstream
 
    evas_object_ref(obj);
    _elm_list_walk(wd);
@@ -754,17 +726,10 @@ _item_select(Elm_List_Item *it)
 
    if (!wd) return;
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it);
-<<<<<<< HEAD
-   if (it->base.disabled) return;
-   if (it->selected)
-     {
-        if (wd->always_select) goto call;
-=======
    if (it->base.disabled || (wd->select_mode == ELM_OBJECT_SELECT_MODE_NONE)) return;
    if (it->selected)
      {
         if (wd->select_mode == ELM_OBJECT_SELECT_MODE_ALWAYS) goto call;
->>>>>>> remotes/origin/upstream
         return;
      }
    it->selected = EINA_TRUE;
@@ -776,11 +741,7 @@ call:
 
    if (it->func) it->func((void *)it->base.data, WIDGET(it), it);
    evas_object_smart_callback_call(obj, SIG_SELECTED, it);
-<<<<<<< HEAD
-   it->wd->last_selected_item = (Elm_Object_Item *) it;
-=======
    it->wd->last_selected_item = (Elm_Object_Item *)it;
->>>>>>> remotes/origin/upstream
 
    _elm_list_unwalk(wd);
    evas_object_unref(obj);
@@ -1063,11 +1024,7 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
 static void
 _item_disable(Elm_Object_Item *it)
 {
-<<<<<<< HEAD
-   Elm_List_Item *item = (Elm_List_Item *) it;
-=======
    Elm_List_Item *item = (Elm_List_Item *)it;
->>>>>>> remotes/origin/upstream
    if (item->base.disabled)
      edje_object_signal_emit(VIEW(item), "elm,state,disabled", "elm");
    else
@@ -1077,12 +1034,7 @@ _item_disable(Elm_Object_Item *it)
 static void
 _item_content_set(Elm_Object_Item *it, const char *part, Evas_Object *content)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-   Elm_List_Item *item = (Elm_List_Item *) it;
-=======
    Elm_List_Item *item = (Elm_List_Item *)it;
->>>>>>> remotes/origin/upstream
    Evas_Object **icon_p = NULL;
    Eina_Bool dummy = EINA_FALSE;
 
@@ -1124,12 +1076,7 @@ _item_content_set(Elm_Object_Item *it, const char *part, Evas_Object *content)
 static Evas_Object *
 _item_content_get(const Elm_Object_Item *it, const char *part)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   Elm_List_Item *item = (Elm_List_Item *) it;
-=======
    Elm_List_Item *item = (Elm_List_Item *)it;
->>>>>>> remotes/origin/upstream
 
    if ((!part) || (!strcmp(part, "start")))
      {
@@ -1147,30 +1094,18 @@ _item_content_get(const Elm_Object_Item *it, const char *part)
 static Evas_Object *
 _item_content_unset(const Elm_Object_Item *it, const char *part)
 {
-<<<<<<< HEAD
-   Elm_List_Item *item = (Elm_List_Item *) it;
-=======
    Elm_List_Item *item = (Elm_List_Item *)it;
->>>>>>> remotes/origin/upstream
 
    if ((!part) || (!strcmp(part, "start")))
      {
         Evas_Object *obj = item->icon;
-<<<<<<< HEAD
-        _item_content_set((Elm_Object_Item *) it, part, NULL);
-=======
         _item_content_set((Elm_Object_Item *)it, part, NULL);
->>>>>>> remotes/origin/upstream
         return obj;
      }
    else if (!strcmp(part, "end"))
      {
         Evas_Object *obj = item->end;
-<<<<<<< HEAD
-        _item_content_set((Elm_Object_Item *) it, part, NULL);
-=======
         _item_content_set((Elm_Object_Item *)it, part, NULL);
->>>>>>> remotes/origin/upstream
         return obj;
      }
    return NULL;
@@ -1179,12 +1114,7 @@ _item_content_unset(const Elm_Object_Item *it, const char *part)
 static void
 _item_text_set(Elm_Object_Item *it, const char *part, const char *text)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-   Elm_List_Item *list_it = (Elm_List_Item *) it;
-=======
    Elm_List_Item *list_it = (Elm_List_Item *)it;
->>>>>>> remotes/origin/upstream
    if (part && strcmp(part, "default")) return;
    if (!eina_stringshare_replace(&list_it->label, text)) return;
    if (VIEW(list_it))
@@ -1194,28 +1124,15 @@ _item_text_set(Elm_Object_Item *it, const char *part, const char *text)
 static const char *
 _item_text_get(const Elm_Object_Item *it, const char *part)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   if (part && strcmp(part, "default")) return NULL;
-   return ((Elm_List_Item *) it)->label;
-=======
    if (part && strcmp(part, "default")) return NULL;
    return ((Elm_List_Item *)it)->label;
->>>>>>> remotes/origin/upstream
 }
 
 static Eina_Bool
 _item_del_pre_hook(Elm_Object_Item *it)
 {
-<<<<<<< HEAD
-  ELM_LIST_ITEM_CHECK_DELETED_RETURN(it, EINA_FALSE);
-
-   Evas_Object *obj = WIDGET(it);
-   Elm_List_Item *item = (Elm_List_Item *) it;
-=======
    Evas_Object *obj = WIDGET(it);
    Elm_List_Item *item = (Elm_List_Item *)it;
->>>>>>> remotes/origin/upstream
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
 
@@ -1706,21 +1623,11 @@ elm_list_horizontal_get(const Evas_Object *obj)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_list_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select)
-=======
 elm_list_select_mode_set(Evas_Object *obj, Elm_Object_Select_Mode mode)
->>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-<<<<<<< HEAD
-   wd->always_select = always_select;
-}
-
-EAPI Eina_Bool
-=======
    if (mode >= ELM_OBJECT_SELECT_MODE_MAX)
      return;
    if (wd->select_mode != mode)
@@ -1754,20 +1661,15 @@ elm_list_always_select_mode_set(Evas_Object *obj,
 }
 
 EINA_DEPRECATED EAPI Eina_Bool
->>>>>>> remotes/origin/upstream
 elm_list_always_select_mode_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
-<<<<<<< HEAD
-   return wd->always_select;
-=======
    Elm_Object_Select_Mode oldmode = elm_list_select_mode_get(obj);
    if (oldmode == ELM_OBJECT_SELECT_MODE_ALWAYS)
      return EINA_TRUE;
    return EINA_FALSE;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -1893,11 +1795,7 @@ elm_list_item_append(Evas_Object *obj, const char *label, Evas_Object *icon, Eva
    wd->items = eina_list_append(wd->items, it);
    it->node = eina_list_last(wd->items);
    elm_box_pack_end(wd->box, VIEW(it));
-<<<<<<< HEAD
-   return (Elm_Object_Item *) it;
-=======
    return (Elm_Object_Item *)it;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Elm_Object_Item *
@@ -1910,11 +1808,7 @@ elm_list_item_prepend(Evas_Object *obj, const char *label, Evas_Object *icon, Ev
    wd->items = eina_list_prepend(wd->items, it);
    it->node = wd->items;
    elm_box_pack_start(wd->box, VIEW(it));
-<<<<<<< HEAD
-   return (Elm_Object_Item *) it;
-=======
    return (Elm_Object_Item *)it;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Elm_Object_Item *
@@ -1936,11 +1830,7 @@ elm_list_item_insert_before(Evas_Object *obj, Elm_Object_Item *before, const cha
    wd->items = eina_list_prepend_relative_list(wd->items, it, before_it->node);
    it->node = before_it->node->prev;
    elm_box_pack_before(wd->box, VIEW(it), VIEW(before_it));
-<<<<<<< HEAD
-   return (Elm_Object_Item *) it;
-=======
    return (Elm_Object_Item *)it;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Elm_Object_Item *
@@ -1962,11 +1852,7 @@ elm_list_item_insert_after(Evas_Object *obj, Elm_Object_Item *after, const char 
    wd->items = eina_list_append_relative_list(wd->items, it, after_it->node);
    it->node = after_it->node->next;
    elm_box_pack_after(wd->box, VIEW(it), VIEW(after_it));
-<<<<<<< HEAD
-   return (Elm_Object_Item *) it;
-=======
    return (Elm_Object_Item *)it;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Elm_Object_Item *
@@ -1991,33 +1877,21 @@ elm_list_item_sorted_insert(Evas_Object *obj, const char *label, Evas_Object *ic
         it->node = before->node->prev;
         elm_box_pack_before(wd->box, VIEW(it), VIEW(before));
      }
-<<<<<<< HEAD
-   return (Elm_Object_Item *) it;
-=======
    return (Elm_Object_Item *)it;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
 elm_list_item_separator_set(Elm_Object_Item *it, Eina_Bool setting)
 {
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it);
-<<<<<<< HEAD
-   ((Elm_List_Item *) it)->is_separator = !!setting;
-=======
    ((Elm_List_Item *)it)->is_separator = !!setting;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Eina_Bool
 elm_list_item_separator_get(const Elm_Object_Item *it)
 {
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it, EINA_FALSE);
-<<<<<<< HEAD
-   return ((Elm_List_Item *) it)->is_separator;
-=======
    return ((Elm_List_Item *)it)->is_separator;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -2026,11 +1900,7 @@ elm_list_item_selected_set(Elm_Object_Item *it, Eina_Bool selected)
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it);
    Evas_Object *obj = WIDGET(it);
    Widget_Data *wd = elm_widget_data_get(obj);
-<<<<<<< HEAD
-   Elm_List_Item *item = (Elm_List_Item *) it;
-=======
    Elm_List_Item *item = (Elm_List_Item *)it;
->>>>>>> remotes/origin/upstream
    if (!wd) return;
 
    selected = !!selected;
@@ -2060,11 +1930,7 @@ EAPI Eina_Bool
 elm_list_item_selected_get(const Elm_Object_Item *it)
 {
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it, EINA_FALSE);
-<<<<<<< HEAD
-   return ((Elm_List_Item *) it)->selected;
-=======
    return ((Elm_List_Item *)it)->selected;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -2110,11 +1976,7 @@ EAPI Elm_Object_Item *
 elm_list_item_prev(const Elm_Object_Item *it)
 {
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it, NULL);
-<<<<<<< HEAD
-   Elm_List_Item *item = (Elm_List_Item *) it;
-=======
    Elm_List_Item *item = (Elm_List_Item *)it;
->>>>>>> remotes/origin/upstream
    if (item->node->prev) return item->node->prev->data;
    else return NULL;
 }
@@ -2123,11 +1985,7 @@ EAPI Elm_Object_Item *
 elm_list_item_next(const Elm_Object_Item *it)
 {
    ELM_LIST_ITEM_CHECK_DELETED_RETURN(it, NULL);
-<<<<<<< HEAD
-   Elm_List_Item *item = (Elm_List_Item *) it;
-=======
    Elm_List_Item *item = (Elm_List_Item *)it;
->>>>>>> remotes/origin/upstream
    if (item->node->next) return item->node->next->data;
    else return NULL;
 }
