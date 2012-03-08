@@ -89,13 +89,9 @@ _theme_hook(Evas_Object *obj)
      edje_object_part_swallow(wd->panes, "elm.swallow.left", wd->contents.left);
    if (wd->contents.right)
      edje_object_part_swallow(wd->panes, "elm.swallow.right", wd->contents.right);
-<<<<<<< HEAD
-   if(wd->contents.left && wd->contents.right)
+   if (wd->contents.left && wd->contents.right)
      edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
-   if(wd->fixed)
-=======
    if (wd->fixed)
->>>>>>> remotes/origin/upstream
      edje_object_signal_emit(wd->panes, "elm.panes.fixed", "elm");
 
    edje_object_scale_set(wd->panes, elm_widget_scale_get(obj) *
@@ -184,10 +180,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
      }
 }
 
-<<<<<<< HEAD
-=======
 
->>>>>>> remotes/origin/upstream
 static void
 _clicked(void *data, Evas_Object *obj __UNUSED__ , const char *emission __UNUSED__, const char *source __UNUSED__)
 {
@@ -229,21 +222,15 @@ _content_left_set(Evas_Object *obj, Evas_Object *content)
      {
         evas_object_del(wd->contents.left);
         wd->contents.left = NULL;
-<<<<<<< HEAD
         edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
-=======
->>>>>>> remotes/origin/upstream
      }
    if (content)
      {
         wd->contents.left = content;
         elm_widget_sub_object_add(obj, content);
         edje_object_part_swallow(wd->panes, "elm.swallow.left", content);
-<<<<<<< HEAD
         if (wd->contents.right)
           edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
-=======
->>>>>>> remotes/origin/upstream
      }
 }
 
@@ -255,21 +242,15 @@ _content_right_set(Evas_Object *obj, Evas_Object *content)
      {
         evas_object_del(wd->contents.right);
         wd->contents.right = NULL;
-<<<<<<< HEAD
         edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
-=======
->>>>>>> remotes/origin/upstream
      }
    if (content)
      {
         wd->contents.right = content;
         elm_widget_sub_object_add(obj, content);
         edje_object_part_swallow(wd->panes, "elm.swallow.right", content);
-<<<<<<< HEAD
         if (wd->contents.left)
           edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
-=======
->>>>>>> remotes/origin/upstream
      }
 }
 
@@ -279,18 +260,12 @@ _content_left_unset(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd->contents.left) return NULL;
    Evas_Object *content = wd->contents.left;
-<<<<<<< HEAD
 
    edje_object_part_unswallow(wd->panes, content);
    evas_object_hide(wd->contents.left);
    elm_widget_sub_object_del(obj, content);
    wd->contents.left = NULL;
    edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
-=======
-   elm_widget_sub_object_del(obj, content);
-   edje_object_part_unswallow(wd->panes, content);
-   wd->contents.left = NULL;
->>>>>>> remotes/origin/upstream
    return content;
 }
 
@@ -300,18 +275,12 @@ _content_right_unset(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd->contents.right) return NULL;
    Evas_Object *content = wd->contents.right;
-<<<<<<< HEAD
 
    edje_object_part_unswallow(wd->panes, content);
    evas_object_hide(wd->contents.right);
    elm_widget_sub_object_del(obj, content);
    wd->contents.right = NULL;
    edje_object_signal_emit(wd->panes, "elm.panes.unpair", "elm");
-=======
-   elm_widget_sub_object_del(obj, content);
-   edje_object_part_unswallow(wd->panes, content);
-   wd->contents.right = NULL;
->>>>>>> remotes/origin/upstream
    return content;
 }
 
@@ -404,61 +373,37 @@ elm_panes_add(Evas_Object *parent)
    return obj;
 }
 
-<<<<<<< HEAD
-EAPI void
-=======
 EINA_DEPRECATED EAPI void
->>>>>>> remotes/origin/upstream
 elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content)
 {
    _content_set_hook(obj, "left", content);
 }
 
-<<<<<<< HEAD
-EAPI void
-=======
 EINA_DEPRECATED EAPI void
->>>>>>> remotes/origin/upstream
 elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
 {
    _content_set_hook(obj, "right", content);
 }
 
-<<<<<<< HEAD
-EAPI Evas_Object *
-=======
 EINA_DEPRECATED EAPI Evas_Object *
->>>>>>> remotes/origin/upstream
 elm_panes_content_left_get(const Evas_Object *obj)
 {
    return _content_get_hook(obj, "left");
 }
 
-<<<<<<< HEAD
-EAPI Evas_Object *
-=======
 EINA_DEPRECATED EAPI Evas_Object *
->>>>>>> remotes/origin/upstream
 elm_panes_content_right_get(const Evas_Object *obj)
 {
    return _content_get_hook(obj, "right");
 }
 
-<<<<<<< HEAD
-EAPI Evas_Object *
-=======
 EINA_DEPRECATED EAPI Evas_Object *
->>>>>>> remotes/origin/upstream
 elm_panes_content_left_unset(Evas_Object *obj)
 {
    return _content_unset_hook(obj, "left");
 }
 
-<<<<<<< HEAD
-EAPI Evas_Object *
-=======
 EINA_DEPRECATED EAPI Evas_Object *
->>>>>>> remotes/origin/upstream
 elm_panes_content_right_unset(Evas_Object *obj)
 {
    return _content_unset_hook(obj, "right");
@@ -491,8 +436,6 @@ elm_panes_content_left_size_set(Evas_Object *obj, double size)
      edje_object_part_drag_value_set(wd->panes, "elm.bar", size, 0.0);
 }
 
-<<<<<<< HEAD
-=======
 EAPI double
 elm_panes_content_right_size_get(const Evas_Object *obj)
 {
@@ -505,7 +448,6 @@ elm_panes_content_right_size_set(Evas_Object *obj, double size)
    elm_panes_content_left_size_set(obj, (1.0 - size));
 }
 
->>>>>>> remotes/origin/upstream
 EAPI void
 elm_panes_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 {

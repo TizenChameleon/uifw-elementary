@@ -8,13 +8,8 @@
  * @image html img/panes.png
  * @image latex img/panes.eps width=\textwidth
  *
-<<<<<<< HEAD
- * The panes adds a dragable bar between two contents. When dragged
- * this bar will resize contents size.
-=======
  * The panes widget adds a draggable bar between two contents. When dragged
  * this bar will resize contents' size.
->>>>>>> remotes/origin/upstream
  *
  * Panes can be displayed vertically or horizontally, and contents
  * size proportion can be customized (homogeneous by default).
@@ -28,15 +23,6 @@
  * Available styles for it:
  * - @c "default"
  *
-<<<<<<< HEAD
- * Default contents parts of the panes widget that you can use for are:
- * @li "left" - A leftside content of the panes
- * @li "right" - A rightside content of the panes
- *
- * If panes is displayed vertically, left content will be displayed at
- * top.
- *
-=======
  * Default content parts of the panes widget that you can use are:
  * @li "left" - A leftside content of the panes
  * @li "right" - A rightside content of the panes
@@ -49,7 +35,6 @@
  * @li elm_object_part_content_get
  * @li elm_object_part_content_unset
  *
->>>>>>> remotes/origin/upstream
  * Here is an example on its usage:
  * @li @ref panes_example
  */
@@ -73,8 +58,6 @@
 EAPI Evas_Object                 *elm_panes_add(Evas_Object *parent);
 
 /**
-<<<<<<< HEAD
-=======
  * Set whether the left and right panes resize homogeneously or not.
  *
  * @param obj The panes object.
@@ -110,7 +93,6 @@ EAPI void                         elm_panes_fixed_set(Evas_Object *obj, Eina_Boo
 EAPI Eina_Bool                    elm_panes_fixed_get(const Evas_Object *obj);
 
 /**
->>>>>>> remotes/origin/upstream
  * Get the size proportion of panes widget's left side.
  *
  * @param obj The panes object.
@@ -149,8 +131,6 @@ EAPI double                       elm_panes_content_left_size_get(const Evas_Obj
 EAPI void                         elm_panes_content_left_size_set(Evas_Object *obj, double size);
 
 /**
-<<<<<<< HEAD
-=======
  * Get the size proportion of panes widget's right side.
  *
  * @param obj The panes object.
@@ -190,7 +170,6 @@ EAPI void                         elm_panes_content_right_size_set(Evas_Object *
 
 
 /**
->>>>>>> remotes/origin/upstream
  * Set the orientation of a given panes widget.
  *
  * @param obj The panes object.
@@ -220,11 +199,6 @@ EAPI void                         elm_panes_horizontal_set(Evas_Object *obj, Ein
  * @ingroup Panes
  */
 EAPI Eina_Bool                    elm_panes_horizontal_get(const Evas_Object *obj);
-<<<<<<< HEAD
-EAPI void                         elm_panes_fixed_set(Evas_Object *obj, Eina_Bool fixed);
-EAPI Eina_Bool                    elm_panes_fixed_get(const Evas_Object *obj);
-=======
->>>>>>> remotes/origin/upstream
 
 /**
  * @}
