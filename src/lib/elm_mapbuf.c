@@ -161,11 +161,7 @@ _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
    if (content)
      {
         evas_object_data_set(content, "_elm_leaveme", (void *)1);
-<<<<<<< HEAD
-        elm_widget_sub_object_add(content, obj);
-=======
         elm_widget_sub_object_add(obj, content);
->>>>>>> remotes/origin/upstream
         evas_object_smart_member_add(content, obj);
         evas_object_clip_set(content, wd->clip);
         evas_object_color_set(wd->clip, 255, 255, 255, 255);

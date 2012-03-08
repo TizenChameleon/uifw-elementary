@@ -16,42 +16,6 @@
  */
 
 /**
-<<<<<<< HEAD
- * Get the configured "finger size"
- *
- * @return The finger size
- *
- * This gets the globally configured finger size, <b>in pixels</b>
- *
- * @ingroup Fingers
- */
-EAPI Evas_Coord elm_finger_size_get(void);
-
-/**
- * Set the configured finger size
- *
- * This sets the globally configured finger size in pixels
- *
- * @param size The finger size
- * @ingroup Fingers
- */
-EAPI void       elm_finger_size_set(Evas_Coord size);
-
-/**
- * Set the configured finger size for all applications on the display
- *
- * This sets the globally configured finger size in pixels for all
- * applications on the display
- *
- * @param size The finger size
- * @ingroup Fingers
- */
-// XXX: deprecate and replace with elm_config_all_flush()
-EAPI void       elm_finger_size_all_set(Evas_Coord size);
-
-/**
-=======
->>>>>>> remotes/origin/upstream
  * Adjust size of an element for finger usage.
  *
  * @param times_w How many fingers should fit horizontally
@@ -67,11 +31,7 @@ EAPI void       elm_finger_size_all_set(Evas_Coord size);
  * accommodate it. On return the @p w and @p h sizes pointed to by
  * these parameters will be modified, on those conditions.
  *
-<<<<<<< HEAD
- * @note This is kind of a low level Elementary call, most useful
-=======
  * @note This is kind of low level Elementary call, most useful
->>>>>>> remotes/origin/upstream
  * on size evaluation times for widgets. An external user wouldn't
  * be calling, most of the time.
  *

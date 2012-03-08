@@ -79,11 +79,7 @@ _event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type ty
      }
    if (!strcmp(ev->keyname, "space"))
      {
-<<<<<<< HEAD
-        if (elm_video_is_playing(obj))
-=======
         if (elm_video_is_playing_get(obj))
->>>>>>> remotes/origin/upstream
           elm_video_pause(obj);
         else
           elm_video_play(obj);
@@ -314,35 +310,15 @@ elm_video_add(Evas_Object *parent)
 #endif
 }
 
-<<<<<<< HEAD
-EAPI void
-elm_video_file_set(Evas_Object *video, const char *filename)
-{
-#ifdef HAVE_EMOTION
-   ELM_CHECK_WIDTYPE(video, widtype);
-=======
 EAPI Eina_Bool
 elm_video_file_set(Evas_Object *video, const char *filename)
 {
 #ifdef HAVE_EMOTION
    ELM_CHECK_WIDTYPE(video, widtype) EINA_FALSE;
->>>>>>> remotes/origin/upstream
    Widget_Data *wd = elm_widget_data_get(video);
 
    if (wd->remember) emotion_object_last_position_save(wd->emotion);
    wd->stop = EINA_FALSE;
-<<<<<<< HEAD
-   emotion_object_file_set(wd->emotion, filename);
-   emotion_object_last_position_load(wd->emotion);
-   edje_object_signal_emit(wd->layout, "elm,video,load", "elm");
-#else
-   (void) video;
-   (void) filename;
-#endif
-}
-
-EAPI void
-=======
    if (!emotion_object_file_set(wd->emotion, filename)) return EINA_FALSE;
 
    if ((!strncmp(filename, "file://", 7)) || (!strstr(filename, "://")))
@@ -360,7 +336,6 @@ EAPI void
 }
 
 EINA_DEPRECATED EAPI void
->>>>>>> remotes/origin/upstream
 elm_video_uri_set(Evas_Object *video, const char *uri)
 {
 #ifdef HAVE_EMOTION
@@ -453,11 +428,7 @@ elm_video_stop(Evas_Object *video)
 }
 
 EAPI Eina_Bool
-<<<<<<< HEAD
-elm_video_is_playing(const Evas_Object *video)
-=======
 elm_video_is_playing_get(const Evas_Object *video)
->>>>>>> remotes/origin/upstream
 {
 #ifdef HAVE_EMOTION
    ELM_CHECK_WIDTYPE(video, widtype) EINA_FALSE;
@@ -471,11 +442,7 @@ elm_video_is_playing_get(const Evas_Object *video)
 }
 
 EAPI Eina_Bool
-<<<<<<< HEAD
-elm_video_is_seekable(const Evas_Object *video)
-=======
 elm_video_is_seekable_get(const Evas_Object *video)
->>>>>>> remotes/origin/upstream
 {
 #ifdef HAVE_EMOTION
    ELM_CHECK_WIDTYPE(video, widtype) EINA_FALSE;

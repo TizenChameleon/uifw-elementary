@@ -8,19 +8,11 @@
  * This holds one content object and uses an Evas Map of transformation
  * points to be later used with this content. So the content will be
  * moved, resized, etc as a single image. So it will improve performance
-<<<<<<< HEAD
- * when you have a complex interafce, with a lot of elements, and will
- * need to resize or move it frequently (the content object and its
- * children).
- *
- * Default contents parts of the mapbuf widget that you can use for are:
-=======
  * when you have a complex interface, with a lot of elements, and will
  * need to resize or move it frequently (the content object and its
  * children).
  *
  * Default content parts of the mapbuf widget that you can use for are:
->>>>>>> remotes/origin/upstream
  * @li "default" - A content of the mapbuf
  *
  * Supported elm_object common APIs.
@@ -64,11 +56,7 @@ EAPI Evas_Object                 *elm_mapbuf_add(Evas_Object *parent);
  *
  * Also, when enabled, alpha and smooth states will be used, so if the
  * content isn't solid, alpha should be enabled, for example, otherwise
-<<<<<<< HEAD
- * a black retangle will fill the content.
-=======
  * a black rectangle will fill the content.
->>>>>>> remotes/origin/upstream
  *
  * When disabled, the stored map will be freed and geometry prior to
  * enabling the map will be restored.

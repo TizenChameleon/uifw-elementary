@@ -24,10 +24,7 @@ _elm_font_properties_get(Eina_Hash **font_hash,
 
         len = s1 - font;
         name = calloc(sizeof(char), len + 1);
-<<<<<<< HEAD
-=======
         if (!name) return NULL;
->>>>>>> remotes/origin/upstream
         strncpy(name, font, len);
 
         /* get subname (should be english)  */
@@ -36,16 +33,11 @@ _elm_font_properties_get(Eina_Hash **font_hash,
           {
              len = s2 - name;
              name = realloc(name, sizeof(char) * len + 1);
-<<<<<<< HEAD
-             memset(name, 0, sizeof(char) * len + 1);
-             strncpy(name, font, len);
-=======
              if (name)
                {
                   memset(name, 0, sizeof(char) * len + 1);
                   strncpy(name, font, len);
                }
->>>>>>> remotes/origin/upstream
           }
 
         if (!strncmp(s1, ELM_FONT_TOKEN_STYLE, strlen(ELM_FONT_TOKEN_STYLE)))
@@ -56,14 +48,6 @@ _elm_font_properties_get(Eina_Hash **font_hash,
              if (!efp)
                {
                   efp = calloc(1, sizeof(Elm_Font_Properties));
-<<<<<<< HEAD
-                  efp->name = eina_stringshare_add(name);
-                  if (font_hash)
-                    {
-                       if (!*font_hash)
-                         *font_hash = eina_hash_string_superfast_new(NULL);
-                       eina_hash_add(*font_hash, name, efp);
-=======
                   if (efp)
                     {
                        efp->name = eina_stringshare_add(name);
@@ -72,7 +56,6 @@ _elm_font_properties_get(Eina_Hash **font_hash,
                             *font_hash = eina_hash_string_superfast_new(NULL);
                             eina_hash_add(*font_hash, name, efp);
                          }
->>>>>>> remotes/origin/upstream
                     }
                }
              s2 = strchr(style, ',');
@@ -83,12 +66,6 @@ _elm_font_properties_get(Eina_Hash **font_hash,
                   len = s2 - style;
                   style_old = style;
                   style = calloc(sizeof(char), len + 1);
-<<<<<<< HEAD
-                  strncpy(style, style_old, len);
-                  efp->styles = eina_list_append(efp->styles,
-                                                 eina_stringshare_add(style));
-                  free(style);
-=======
                   if (style)
                     {
                        strncpy(style, style_old, len);
@@ -96,7 +73,6 @@ _elm_font_properties_get(Eina_Hash **font_hash,
                                                    eina_stringshare_add(style));
                        free(style);
                     }
->>>>>>> remotes/origin/upstream
                }
              else
                efp->styles = eina_list_append(efp->styles,
@@ -110,14 +86,6 @@ _elm_font_properties_get(Eina_Hash **font_hash,
         if (!efp)
           {
              efp = calloc(1, sizeof(Elm_Font_Properties));
-<<<<<<< HEAD
-             efp->name = eina_stringshare_add(font);
-             if (font_hash)
-               {
-                  if (!*font_hash)
-                    *font_hash = eina_hash_string_superfast_new(NULL);
-                  eina_hash_add(*font_hash, font, efp);
-=======
              if (efp)
                {
                   efp->name = eina_stringshare_add(font);
@@ -126,17 +94,12 @@ _elm_font_properties_get(Eina_Hash **font_hash,
                        *font_hash = eina_hash_string_superfast_new(NULL);
                        eina_hash_add(*font_hash, font, efp);
                     }
->>>>>>> remotes/origin/upstream
                }
           }
      }
    return efp;
 }
 
-<<<<<<< HEAD
-/* FIXME: do we really need it? */
-=======
->>>>>>> remotes/origin/upstream
 Eina_Hash *
 _elm_font_available_hash_add(Eina_Hash  *font_hash,
                              const char *full_name)
@@ -170,11 +133,6 @@ _font_hash_free_cb(const Eina_Hash *hash __UNUSED__, const void *key __UNUSED__,
 void
 _elm_font_available_hash_del(Eina_Hash *hash)
 {
-<<<<<<< HEAD
-   if (!hash) return ;
-
-   eina_hash_foreach(hash, _font_hash_free_cb, NULL);
-=======
    if (!hash) return;
 
    eina_hash_foreach(hash, _font_hash_free_cb, NULL);
@@ -260,5 +218,4 @@ EAPI void
 elm_font_available_hash_del(Eina_Hash *hash)
 {
    _elm_font_available_hash_del(hash);
->>>>>>> remotes/origin/upstream
 }

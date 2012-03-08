@@ -435,8 +435,6 @@ elm_theme_overlay_del(Elm_Theme *th, const char *item)
    elm_theme_flush(th);
 }
 
-<<<<<<< HEAD
-=======
 EAPI const Eina_List *
 elm_theme_overlay_list_get(const Elm_Theme *th)
 {
@@ -444,7 +442,6 @@ elm_theme_overlay_list_get(const Elm_Theme *th)
    return th->overlay;
 }
 
->>>>>>> remotes/origin/upstream
 EAPI void
 elm_theme_extension_add(Elm_Theme *th, const char *item)
 {
@@ -474,8 +471,6 @@ elm_theme_extension_del(Elm_Theme *th, const char *item)
    elm_theme_flush(th);
 }
 
-<<<<<<< HEAD
-=======
 EAPI const Eina_List *
 elm_theme_extension_list_get(const Elm_Theme *th)
 {
@@ -483,7 +478,6 @@ elm_theme_extension_list_get(const Elm_Theme *th)
    return th->extension;
 }
 
->>>>>>> remotes/origin/upstream
 EAPI void
 elm_theme_set(Elm_Theme *th, const char *theme)
 {
@@ -495,11 +489,8 @@ elm_theme_set(Elm_Theme *th, const char *theme)
         th->theme = NULL;
      }
    elm_theme_flush(th);
-<<<<<<< HEAD
-=======
    if (th == &(theme_default))
      eina_stringshare_replace(&_elm_config->theme, theme);
->>>>>>> remotes/origin/upstream
 }
 
 EAPI const char *
@@ -619,20 +610,11 @@ elm_theme_full_flush(void)
    elm_theme_flush(&(theme_default));
 }
 
-<<<<<<< HEAD
-EAPI void
-elm_theme_all_set(const char *theme)
-{
-   eina_stringshare_replace(&_elm_config->theme, theme);
-   elm_theme_set(NULL, theme);
-   _elm_config_all_update();
-=======
 EINA_DEPRECATED EAPI void
 elm_theme_all_set(const char *theme)
 {
    elm_theme_set(NULL, theme);
    elm_config_all_flush();
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Eina_List *
@@ -678,37 +660,21 @@ elm_theme_name_available_list_new(void)
              s = strchr(file, '.');
              if ((s) && (!strcasecmp(s, ".edj")))
                {
-<<<<<<< HEAD
-                  int dup;
-=======
                   int dupp;
->>>>>>> remotes/origin/upstream
 
                   th = strdup(file);
                   s = strchr(th, '.');
                   *s = 0;
-<<<<<<< HEAD
-                  dup = 0;
-=======
                   dupp = 0;
->>>>>>> remotes/origin/upstream
                   EINA_LIST_FOREACH(list, l, s)
                     {
                        if (!strcmp(s, th))
                          {
-<<<<<<< HEAD
-                            dup = 1;
-                            break;
-                         }
-                    }
-                  if (dup) free(th);
-=======
                             dupp = 1;
                             break;
                          }
                     }
                   if (dupp) free(th);
->>>>>>> remotes/origin/upstream
                   else list = eina_list_append(list, th);
                }
           }

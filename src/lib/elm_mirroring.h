@@ -1,9 +1,5 @@
 /**
-<<<<<<< HEAD
- * @defgroup UI-Mirroring Selective Widget mirroring
-=======
  * @defgroup Mirroring Mirroring
->>>>>>> remotes/origin/upstream
  *
  * These functions allow you to set ui-mirroring on specific
  * widgets or the whole interface. Widgets can be in one of two
@@ -16,34 +12,18 @@
  * @{
  */
 
-<<<<<<< HEAD
-EAPI Eina_Bool elm_mirrored_get(void);
-EAPI void      elm_mirrored_set(Eina_Bool mirrored);
-
-/**
- * Get the system mirrored mode. This determines the default mirrored mode
- * of widgets.
- *
-=======
 /**
  * Get the widget's mirrored mode.
  *
  * @param obj The widget.
->>>>>>> remotes/origin/upstream
  * @return EINA_TRUE if mirrored is set, EINA_FALSE otherwise
  */
 EAPI Eina_Bool elm_object_mirrored_get(const Evas_Object *obj);
 
 /**
-<<<<<<< HEAD
- * Set the system mirrored mode. This determines the default mirrored mode
- * of widgets.
- *
-=======
  * Set the widget's mirrored mode.
  *
  * @param obj The widget.
->>>>>>> remotes/origin/upstream
  * @param mirrored EINA_TRUE to set mirrored mode, EINA_FALSE to unset it.
  */
 EAPI void      elm_object_mirrored_set(Evas_Object *obj, Eina_Bool mirrored);

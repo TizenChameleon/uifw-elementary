@@ -22,11 +22,7 @@
  * by setting the @c ELM_THEME environment variable before running an
  * application, or globally for all programs using the @c elementary_config
  * utility. Applications can change the default theme using elm_theme_set(),
-<<<<<<< HEAD
- * but this can go against the user wishes, so it's not an adviced practice.
-=======
  * but this can go against the user wishes, so it's not an advised practice.
->>>>>>> remotes/origin/upstream
  *
  * Ideally, applications should find everything they need in the already
  * provided theme, but there may be occasions when that's not enough and
@@ -53,11 +49,7 @@
  * theme for the application and will probably clash with the end user
  * options, not to mention the risk of ending up with not matching styles
  * across the program. Unless there's a very special reason to use them,
-<<<<<<< HEAD
- * overlays should be avoided for the resons exposed before.
-=======
  * overlays should be avoided for the reasons exposed before.
->>>>>>> remotes/origin/upstream
  *
  * All these theme lists are handled by ::Elm_Theme instances. Elementary
  * keeps one default internally and every function that receives one of
@@ -112,11 +104,7 @@ EAPI Elm_Theme       *elm_theme_new(void);
 EAPI void             elm_theme_free(Elm_Theme *th);
 
 /**
-<<<<<<< HEAD
- * Copy the theme fom the source to the destination theme
-=======
  * Copy the theme from the source to the destination theme
->>>>>>> remotes/origin/upstream
  *
  * @param th The source theme to copy from
  * @param thdst The destination theme to copy data to
@@ -173,11 +161,7 @@ EAPI Elm_Theme       *elm_theme_default_get(void);
  * new styles, or changing system theme configuration is not possible. Do
  * NOT use this instead of a proper system theme configuration. Use proper
  * configuration files, profiles, environment variables etc. to set a theme
-<<<<<<< HEAD
- * so that the theme can be altered by simple confiugration by a user. Using
-=======
  * so that the theme can be altered by simple configuration by a user. Using
->>>>>>> remotes/origin/upstream
  * this call to achieve that effect is abusing the API and will create lots
  * of trouble.
  *
@@ -196,8 +180,6 @@ EAPI void             elm_theme_overlay_add(Elm_Theme *th, const char *item);
 EAPI void             elm_theme_overlay_del(Elm_Theme *th, const char *item);
 
 /**
-<<<<<<< HEAD
-=======
  * Get the list of registered overlays for the given theme
  *
  * @param th The theme from which to get the overlays
@@ -208,7 +190,6 @@ EAPI void             elm_theme_overlay_del(Elm_Theme *th, const char *item);
 EAPI const Eina_List *elm_theme_overlay_list_get(const Elm_Theme *th);
 
 /**
->>>>>>> remotes/origin/upstream
  * Appends a theme extension to the list of extensions.
  *
  * @param th The theme to add to, or if NULL, the default theme
@@ -240,8 +221,6 @@ EAPI void             elm_theme_extension_add(Elm_Theme *th, const char *item);
 EAPI void             elm_theme_extension_del(Elm_Theme *th, const char *item);
 
 /**
-<<<<<<< HEAD
-=======
  * Get the list of registered extensions for the given theme
  *
  * @param th The theme from which to get the extensions
@@ -252,7 +231,6 @@ EAPI void             elm_theme_extension_del(Elm_Theme *th, const char *item);
 EAPI const Eina_List *elm_theme_extension_list_get(const Elm_Theme *th);
 
 /**
->>>>>>> remotes/origin/upstream
  * Set the theme search order for the given theme
  *
  * @param th The theme to set the search order, or if NULL, the default theme
@@ -298,11 +276,7 @@ EAPI const char      *elm_theme_get(Elm_Theme *th);
  *
  * A theme element can consist of a full or relative path to a .edj file,
  * or a name, without extension, for a theme to be searched in the known
-<<<<<<< HEAD
- * theme paths for Elemementary.
-=======
  * theme paths for Elementary.
->>>>>>> remotes/origin/upstream
  *
  * @see elm_theme_set()
  * @see elm_theme_get()
@@ -310,11 +284,7 @@ EAPI const char      *elm_theme_get(Elm_Theme *th);
 EAPI const Eina_List *elm_theme_list_get(const Elm_Theme *th);
 
 /**
-<<<<<<< HEAD
- * Return the full patrh for a theme element
-=======
  * Return the full path for a theme element
->>>>>>> remotes/origin/upstream
  *
  * @param f The theme element name
  * @param in_search_path Pointer to a boolean to indicate if item is in the search path or not
@@ -322,19 +292,11 @@ EAPI const Eina_List *elm_theme_list_get(const Elm_Theme *th);
  *
  * This returns a string you should free with free() on success, NULL on
  * failure. This will search for the given theme element, and if it is a
-<<<<<<< HEAD
- * full or relative path element or a simple searchable name. The returned
- * path is the full path to the file, if searched, and the file exists, or it
- * is simply the full path given in the element or a resolved path if
- * relative to home. The @p in_search_path boolean pointed to is set to
- * EINA_TRUE if the file was a searchable file andis in the search path,
-=======
  * full or relative path element or a simple search-able name. The returned
  * path is the full path to the file, if searched, and the file exists, or it
  * is simply the full path given in the element or a resolved path if
  * relative to home. The @p in_search_path boolean pointed to is set to
  * EINA_TRUE if the file was a search-able file and is in the search path,
->>>>>>> remotes/origin/upstream
  * and EINA_FALSE otherwise.
  */
 EAPI char            *elm_theme_list_item_path_get(const char *f, Eina_Bool *in_search_path);
@@ -360,17 +322,6 @@ EAPI void             elm_theme_flush(Elm_Theme *th);
 EAPI void             elm_theme_full_flush(void);
 
 /**
-<<<<<<< HEAD
- * Set the theme for all elementary using applications on the current display
- *
- * @param theme The name of the theme to use. Format same as the ELM_THEME
- * environment variable.
- */
-EAPI void             elm_theme_all_set(const char *theme);
-
-/**
-=======
->>>>>>> remotes/origin/upstream
  * Return a list of theme elements in the theme search path
  *
  * @return A list of strings that are the theme element names.
@@ -412,11 +363,7 @@ EAPI void             elm_object_theme_set(Evas_Object *obj, Elm_Theme *th);
  * Get the specific theme to be used
  *
  * @param obj The object to get the specific theme from
-<<<<<<< HEAD
- * @return The specifc theme set.
-=======
  * @return The specific theme set.
->>>>>>> remotes/origin/upstream
  *
  * This will return a specific theme set, or NULL if no specific theme is
  * set on that object. It will not return inherited themes from parents, only

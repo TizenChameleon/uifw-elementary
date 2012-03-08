@@ -265,40 +265,6 @@ elm_route_emap_set(Evas_Object *obj, EMap_Route *emap)
 }
 #endif
 
-<<<<<<< HEAD
-EAPI double
-elm_route_lon_min_get(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   return wd->lon_min;
-}
-
-EAPI double
-elm_route_lat_min_get(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   return wd->lat_min;
-}
-
-EAPI double
-elm_route_lon_max_get(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   return wd->lon_max;
-}
-
-EAPI double
-elm_route_lat_max_get(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   return wd->lat_max;
-}
-
-=======
 EINA_DEPRECATED EAPI double
 elm_route_lon_min_get(Evas_Object *obj)
 {
@@ -350,5 +316,4 @@ elm_route_latitude_min_max_get(const Evas_Object *obj, double *min, double *max)
    if (min) *min = wd->lat_min;
    if (max) *max = wd->lat_max;
 }
->>>>>>> remotes/origin/upstream
 /* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-3f0^-2{2(0W1st0 :*/

@@ -409,11 +409,7 @@ _thumb_show(Widget_Data *wd)
 {
    evas_object_show(wd->frame);
 
-<<<<<<< HEAD
-   if (elm_thumb_ethumb_client_connected())
-=======
    if (elm_thumb_ethumb_client_connected_get())
->>>>>>> remotes/origin/upstream
      {
         _thumb_apply(wd);
         return;
@@ -632,11 +628,8 @@ elm_thumb_file_set(Evas_Object *obj, const char *file, const char *key)
 #ifdef HAVE_ELEMENTARY_ETHUMB
    if (((file_replaced) || (key_replaced)) && (evas_object_visible_get(obj)))
      _thumb_show(wd);
-<<<<<<< HEAD
-=======
 #else
    (void)key_replaced;
->>>>>>> remotes/origin/upstream
 #endif
 }
 
@@ -697,11 +690,7 @@ elm_thumb_ethumb_client_get(void)
 }
 
 EAPI Eina_Bool
-<<<<<<< HEAD
-elm_thumb_ethumb_client_connected(void)
-=======
 elm_thumb_ethumb_client_connected_get(void)
->>>>>>> remotes/origin/upstream
 {
    return _elm_ethumb_connected;
 }

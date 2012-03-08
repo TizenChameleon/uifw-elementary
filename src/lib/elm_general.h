@@ -94,8 +94,6 @@ typedef enum
    ELM_FOCUS_NEXT
 } Elm_Focus_Direction;
 
-<<<<<<< HEAD
-=======
 typedef enum
 {
    ELM_OBJECT_SELECT_MODE_DEFAULT = 0, /**< default select mode */
@@ -105,7 +103,6 @@ typedef enum
    ELM_OBJECT_SELECT_MODE_MAX
 } Elm_Object_Select_Mode;
 
->>>>>>> remotes/origin/upstream
 /**
  * @typedef Elm_Object_Item
  * An Elementary Object item handle.

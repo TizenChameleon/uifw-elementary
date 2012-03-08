@@ -1,9 +1,5 @@
 /**
-<<<<<<< HEAD
- * Request that your elementary application needs efreet
-=======
  * Request that your elementary application needs Efreet
->>>>>>> remotes/origin/upstream
  *
  * This initializes the Efreet library when called and if support exists
  * it returns EINA_TRUE, otherwise returns EINA_FALSE. This must be called

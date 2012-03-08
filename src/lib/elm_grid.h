@@ -32,11 +32,7 @@ EAPI Evas_Object *elm_grid_add(Evas_Object *parent);
  *
  * @ingroup Grid
  */
-<<<<<<< HEAD
-EAPI void         elm_grid_size_set(Evas_Object *obj, int w, int h);
-=======
 EAPI void         elm_grid_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h);
->>>>>>> remotes/origin/upstream
 
 /**
  * Get the virtual size of the grid
@@ -47,11 +43,7 @@ EAPI void         elm_grid_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h
  *
  * @ingroup Grid
  */
-<<<<<<< HEAD
-EAPI void         elm_grid_size_get(Evas_Object *obj, int *w, int *h);
-=======
 EAPI void         elm_grid_size_get(const Evas_Object *obj, Evas_Coord *w, Evas_Coord *h);
->>>>>>> remotes/origin/upstream
 
 /**
  * Pack child at given position and size
@@ -65,11 +57,7 @@ EAPI void         elm_grid_size_get(const Evas_Object *obj, Evas_Coord *w, Evas_
  *
  * @ingroup Grid
  */
-<<<<<<< HEAD
-EAPI void         elm_grid_pack(Evas_Object *obj, Evas_Object *subobj, int x, int y, int w, int h);
-=======
 EAPI void         elm_grid_pack(Evas_Object *obj, Evas_Object *subobj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
->>>>>>> remotes/origin/upstream
 
 /**
  * Unpack a child from a grid object
@@ -102,17 +90,10 @@ EAPI void         elm_grid_clear(Evas_Object *obj, Eina_Bool clear);
  *
  * @ingroup Grid
  */
-<<<<<<< HEAD
-EAPI void         elm_grid_pack_set(Evas_Object *subobj, int x, int y, int w, int h);
-
-/**
- * get packing of a child
-=======
 EAPI void         elm_grid_pack_set(Evas_Object *subobj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
 
 /**
  * Get packing of a child
->>>>>>> remotes/origin/upstream
  *
  * @param subobj The child to query
  * @param x Pointer to integer to store the virtual x coord
@@ -122,9 +103,6 @@ EAPI void         elm_grid_pack_set(Evas_Object *subobj, Evas_Coord x, Evas_Coor
  *
  * @ingroup Grid
  */
-<<<<<<< HEAD
-EAPI void         elm_grid_pack_get(Evas_Object *subobj, int *x, int *y, int *w, int *h);
-=======
 EAPI void         elm_grid_pack_get(Evas_Object *subobj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h);
 
 /**
@@ -140,7 +118,6 @@ EAPI void         elm_grid_pack_get(Evas_Object *subobj, Evas_Coord *x, Evas_Coo
  * @ingroup Grid
  */
 EAPI Eina_List *elm_grid_children_get(const Evas_Object *obj);
->>>>>>> remotes/origin/upstream
 
 /**
  * @}

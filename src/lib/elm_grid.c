@@ -51,11 +51,7 @@ _elm_grid_focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_
                                                   dir, next);
 
    if (list_free)
-<<<<<<< HEAD
-      list_free((Eina_List *)items);
-=======
      list_free((Eina_List *)items);
->>>>>>> remotes/origin/upstream
 
    return ret;
 }
@@ -83,13 +79,7 @@ elm_grid_add(Evas_Object *parent)
    Widget_Data *wd;
 
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
-<<<<<<< HEAD
-
    ELM_SET_WIDTYPE(widtype, "grid");
-   wd->obj = obj;
-=======
-   ELM_SET_WIDTYPE(widtype, "grid");
->>>>>>> remotes/origin/upstream
    elm_widget_type_set(obj, "grid");
    elm_widget_sub_object_add(parent, obj);
    elm_widget_data_set(obj, wd);
@@ -107,11 +97,7 @@ elm_grid_add(Evas_Object *parent)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_grid_size_set(Evas_Object *obj, int w, int h)
-=======
 elm_grid_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h)
->>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -120,11 +106,7 @@ elm_grid_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_grid_size_get(Evas_Object *obj, int *w, int *h)
-=======
 elm_grid_size_get(const Evas_Object *obj, Evas_Coord *w, Evas_Coord *h)
->>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -133,11 +115,7 @@ elm_grid_size_get(const Evas_Object *obj, Evas_Coord *w, Evas_Coord *h)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_grid_pack(Evas_Object *obj, Evas_Object *subobj, int x, int y, int w, int h)
-=======
 elm_grid_pack(Evas_Object *obj, Evas_Object *subobj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
->>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -170,11 +148,7 @@ elm_grid_clear(Evas_Object *obj, Eina_Bool clear)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_grid_pack_set(Evas_Object *subobj, int x, int y, int w, int h)
-=======
 elm_grid_pack_set(Evas_Object *subobj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h)
->>>>>>> remotes/origin/upstream
 {
    Evas_Object *obj = elm_widget_parent_widget_get(subobj);
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -192,8 +166,6 @@ elm_grid_pack_get(Evas_Object *subobj, int *x, int *y, int *w, int *h)
    if (!wd) return;
    evas_object_grid_pack_get(wd->grd, subobj, x, y, w, h);
 }
-<<<<<<< HEAD
-=======
 
 EAPI Eina_List *
 elm_grid_children_get(const Evas_Object *obj)
@@ -203,4 +175,3 @@ elm_grid_children_get(const Evas_Object *obj)
    if (!wd) return NULL;
    return evas_object_grid_children_get(wd->grd);
 }
->>>>>>> remotes/origin/upstream

@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 typedef void (*Elm_Object_Item_Smart_Cb) (void *data, Elm_Object_Item *it, void *event_info);
 
->>>>>>> remotes/origin/upstream
 /**
  * Get the widget object's handle which contains a given item
  *
@@ -136,11 +133,7 @@ EAPI void                         elm_object_item_signal_emit(Elm_Object_Item *i
 /**
  * Set the disabled state of an widget item.
  *
-<<<<<<< HEAD
- * @param obj The Elementary object item
-=======
  * @param it The Elementary object item
->>>>>>> remotes/origin/upstream
  * @param disabled The state to put in in: @c EINA_TRUE for
  *        disabled, @c EINA_FALSE for enabled
  *
@@ -160,11 +153,7 @@ EAPI void                         elm_object_item_disabled_set(Elm_Object_Item *
 /**
  * Get the disabled state of an widget item.
  *
-<<<<<<< HEAD
- * @param obj The Elementary object
-=======
  * @param it The Elementary object item
->>>>>>> remotes/origin/upstream
  * @return @c EINA_TRUE, if the widget item is disabled, @c EINA_FALSE
  *            if it's enabled (or on errors)
  *
@@ -179,11 +168,7 @@ EAPI Eina_Bool                    elm_object_item_disabled_get(const Elm_Object_
  * freed.
  *
  * @param it The item to set the callback on
-<<<<<<< HEAD
- * @param func The function called
-=======
  * @param del_cb The function called
->>>>>>> remotes/origin/upstream
  *
  * That function will receive these parameters:
  * @li void * item data
@@ -209,11 +194,7 @@ EAPI void                       elm_object_item_del(Elm_Object_Item *it);
 /**
  * Set the text to be shown in a given object item's tooltips.
  *
-<<<<<<< HEAD
- * @param item Target item.
-=======
  * @param it Target item.
->>>>>>> remotes/origin/upstream
  * @param text The text to set in the content.
  *
  * Setup the text as tooltip to object. The item can have only one tooltip,
@@ -224,31 +205,6 @@ EAPI void                       elm_object_item_del(Elm_Object_Item *it);
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI void                         elm_object_item_tooltip_text_set(Elm_Object_Item *item, const char *text);
-
-/**
- * @brief Disable size restrictions on an object's tooltip
- * @param item The tooltip's anchor object
- * @param disable If EINA_TRUE, size restrictions are disabled
- * @return EINA_FALSE on failure, EINA_TRUE on success
- *
- * This function allows a tooltip to expand beyond its parant window's canvas.
- * It will instead be limited only by the size of the display.
- */
-EAPI Eina_Bool                    elm_object_item_tooltip_window_mode_set(Elm_Object_Item *item, Eina_Bool disable);
-
-/**
- * @brief Retrieve size restriction state of an object's tooltip
- * @param obj The tooltip's anchor object
- * @return If EINA_TRUE, size restrictions are disabled
- *
- * This function returns whether a tooltip is allowed to expand beyond
- * its parant window's canvas.
- * It will instead be limited only by the size of the display.
- */
-EAPI Eina_Bool                    elm_object_item_tooltip_window_mode_get(const Elm_Object_Item *item);
-=======
 EAPI void                         elm_object_item_tooltip_text_set(Elm_Object_Item *it, const char *text);
 
 /**
@@ -272,7 +228,6 @@ EAPI Eina_Bool                    elm_object_item_tooltip_window_mode_set(Elm_Ob
  * It will instead be limited only by the size of the display.
  */
 EAPI Eina_Bool                    elm_object_item_tooltip_window_mode_get(const Elm_Object_Item *it);
->>>>>>> remotes/origin/upstream
 
 /**
  * Set the content to be shown in the tooltip item.
@@ -283,11 +238,7 @@ EAPI Eina_Bool                    elm_object_item_tooltip_window_mode_get(const 
  * return a valid Evas_Object. This object is then managed fully by
  * tooltip system and is deleted when the tooltip is gone.
  *
-<<<<<<< HEAD
- * @param item the object item being attached a tooltip.
-=======
  * @param it the object item being attached a tooltip.
->>>>>>> remotes/origin/upstream
  * @param func the function used to create the tooltip contents.
  * @param data what to provide to @a func as callback data/context.
  * @param del_cb called when data is not needed anymore, either when
@@ -300,20 +251,12 @@ EAPI Eina_Bool                    elm_object_item_tooltip_window_mode_get(const 
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI void                         elm_object_item_tooltip_content_cb_set(Elm_Object_Item *item, Elm_Tooltip_Item_Content_Cb func, const void *data, Evas_Smart_Cb del_cb);
-=======
 EAPI void                         elm_object_item_tooltip_content_cb_set(Elm_Object_Item *it, Elm_Tooltip_Item_Content_Cb func, const void *data, Evas_Smart_Cb del_cb);
->>>>>>> remotes/origin/upstream
 
 /**
  * Unset tooltip from item.
  *
-<<<<<<< HEAD
- * @param item object item to remove previously set tooltip.
-=======
  * @param it object item to remove previously set tooltip.
->>>>>>> remotes/origin/upstream
  *
  * Remove tooltip from item. The callback provided as del_cb to
  * elm_object_item_tooltip_content_cb_set() will be called to notify
@@ -324,11 +267,7 @@ EAPI void                         elm_object_item_tooltip_content_cb_set(Elm_Obj
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI void                         elm_object_item_tooltip_unset(Elm_Object_Item *item);
-=======
 EAPI void                         elm_object_item_tooltip_unset(Elm_Object_Item *it);
->>>>>>> remotes/origin/upstream
 
 /**
  * Sets a different style for this item tooltip.
@@ -337,31 +276,19 @@ EAPI void                         elm_object_item_tooltip_unset(Elm_Object_Item 
  *       elm_object_item_tooltip_content_cb_set() or
  *       elm_object_item_tooltip_text_set()
  *
-<<<<<<< HEAD
- * @param item object item with tooltip already set.
-=======
  * @param it object item with tooltip already set.
->>>>>>> remotes/origin/upstream
  * @param style the theme style to use (default, transparent, ...)
  *
  * @see elm_object_tooltip_style_set() for more details.
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI void                         elm_object_item_tooltip_style_set(Elm_Object_Item *item, const char *style);
-=======
 EAPI void                         elm_object_item_tooltip_style_set(Elm_Object_Item *it, const char *style);
->>>>>>> remotes/origin/upstream
 
 /**
  * Get the style for this item tooltip.
  *
-<<<<<<< HEAD
- * @param item object item with tooltip already set.
-=======
  * @param it object item with tooltip already set.
->>>>>>> remotes/origin/upstream
  * @return style the theme style in use, defaults to "default". If the
  *         object does not have a tooltip set, then NULL is returned.
  *
@@ -370,23 +297,13 @@ EAPI void                         elm_object_item_tooltip_style_set(Elm_Object_I
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI const char                  *elm_object_item_tooltip_style_get(const Elm_Object_Item *item);
-
- 
-=======
 EAPI const char                  *elm_object_item_tooltip_style_get(const Elm_Object_Item *it);
 
->>>>>>> remotes/origin/upstream
 /**
   * Set the type of mouse pointer/cursor decoration to be shown,
   * when the mouse pointer is over the given item
   *
-<<<<<<< HEAD
-  * @param ite, item to customize cursor on
-=======
   * @param it item to customize cursor on
->>>>>>> remotes/origin/upstream
   * @param cursor the cursor type's name
   *
   * This function works analogously as elm_object_cursor_set(), but
@@ -404,21 +321,13 @@ EAPI const char                  *elm_object_item_tooltip_style_get(const Elm_Ob
   *
   * @ingroup General
   */
-<<<<<<< HEAD
-EAPI void                         elm_object_item_cursor_set(Elm_Object_Item *item, const char *cursor);
-=======
 EAPI void                         elm_object_item_cursor_set(Elm_Object_Item *it, const char *cursor);
->>>>>>> remotes/origin/upstream
 
 /*
  * Get the type of mouse pointer/cursor decoration set to be shown,
  * when the mouse pointer is over the given item
  *
-<<<<<<< HEAD
- * @param item item with custom cursor set
-=======
  * @param it item with custom cursor set
->>>>>>> remotes/origin/upstream
  * @return the cursor type's name or @c NULL, if no custom cursors
  * were set to @p item (and on errors)
  *
@@ -428,22 +337,14 @@ EAPI void                         elm_object_item_cursor_set(Elm_Object_Item *it
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI const char                  *elm_object_item_cursor_get(const Elm_Object_Item *item);
-=======
 EAPI const char                  *elm_object_item_cursor_get(const Elm_Object_Item *it);
->>>>>>> remotes/origin/upstream
 
 /**
  * Unset any custom mouse pointer/cursor decoration set to be
  * shown, when the mouse pointer is over the given
  * item, thus making it show the @b default cursor again.
  *
-<<<<<<< HEAD
- * @param item the item
-=======
  * @param it the item
->>>>>>> remotes/origin/upstream
  *
  * Use this call to undo any custom settings on this item's cursor
  * decoration, bringing it back to defaults (no custom style set).
@@ -453,21 +354,13 @@ EAPI const char                  *elm_object_item_cursor_get(const Elm_Object_It
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI void                         elm_object_item_cursor_unset(Elm_Object_Item *item);
-=======
 EAPI void                         elm_object_item_cursor_unset(Elm_Object_Item *it);
->>>>>>> remotes/origin/upstream
 
 /**
  * Set a different @b style for a given custom cursor set for an
  * item.
  *
-<<<<<<< HEAD
- * @param item item with custom cursor set
-=======
  * @param it item with custom cursor set
->>>>>>> remotes/origin/upstream
  * @param style the <b>theme style</b> to use (e.g. @c "default",
  * @c "transparent", etc)
  *
@@ -475,15 +368,9 @@ EAPI void                         elm_object_item_cursor_unset(Elm_Object_Item *
  * cursor decorations <b>defined in a theme file</b>, which can have,
  * given a cursor name/type, <b>alternate styles</b> on it. It
  * works analogously as elm_object_cursor_style_set(), but here
-<<<<<<< HEAD
- * applyed only to item objects.
- *
- * @warning Before you set a cursor style you should have definen a
-=======
  * applies only to item objects.
  *
  * @warning Before you set a cursor style you should have defined a
->>>>>>> remotes/origin/upstream
  *       custom cursor previously on the item, with
  *       elm_object_item_cursor_set()
  *
@@ -492,21 +379,13 @@ EAPI void                         elm_object_item_cursor_unset(Elm_Object_Item *
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI void                         elm_object_item_cursor_style_set(Elm_Object_Item *item, const char *style);
-=======
 EAPI void                         elm_object_item_cursor_style_set(Elm_Object_Item *it, const char *style);
->>>>>>> remotes/origin/upstream
 
 /**
  * Get the current @b style set for a given item's custom
  * cursor
  *
-<<<<<<< HEAD
- * @param item item with custom cursor set.
-=======
  * @param it item with custom cursor set.
->>>>>>> remotes/origin/upstream
  * @return style the cursor style in use. If the object does not
  *         have a cursor set, then @c NULL is returned.
  *
@@ -514,22 +393,14 @@ EAPI void                         elm_object_item_cursor_style_set(Elm_Object_It
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI const char                  *elm_object_item_cursor_style_get(const Elm_Object_Item *item);
-=======
 EAPI const char                  *elm_object_item_cursor_style_get(const Elm_Object_Item *it);
->>>>>>> remotes/origin/upstream
 
 /**
  * Set if the (custom)cursor for a given item should be
  * searched in its theme, also, or should only rely on the
  * rendering engine.
  *
-<<<<<<< HEAD
- * @param item item with custom (custom) cursor already set on
-=======
  * @param it item with custom (custom) cursor already set on
->>>>>>> remotes/origin/upstream
  * @param engine_only Use @c EINA_TRUE to have cursors looked for
  * only on those provided by the rendering engine, @c EINA_FALSE to
  * have them searched on the widget's theme, as well.
@@ -542,22 +413,14 @@ EAPI const char                  *elm_object_item_cursor_style_get(const Elm_Obj
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI void                         elm_object_item_cursor_engine_only_set(Elm_Object_Item *item, Eina_Bool engine_only);
-=======
 EAPI void                         elm_object_item_cursor_engine_only_set(Elm_Object_Item *it, Eina_Bool engine_only);
->>>>>>> remotes/origin/upstream
 
 /**
  * Get if the (custom) cursor for a given item is being
  * searched in its theme, also, or is only relying on the rendering
  * engine.
  *
-<<<<<<< HEAD
- * @param item an item
-=======
  * @param it an object item
->>>>>>> remotes/origin/upstream
  * @return @c EINA_TRUE, if cursors are being looked for only on
  * those provided by the rendering engine, @c EINA_FALSE if they
  * are being searched on the widget's theme, as well.
@@ -566,10 +429,6 @@ EAPI void                         elm_object_item_cursor_engine_only_set(Elm_Obj
  *
  * @ingroup General
  */
-<<<<<<< HEAD
-EAPI Eina_Bool                    elm_object_item_cursor_engine_only_get(const Elm_Object_Item *item);
-    
-=======
 EAPI Eina_Bool                    elm_object_item_cursor_engine_only_get(const Elm_Object_Item *it);
 
 /**
@@ -623,4 +482,3 @@ EAPI Eina_Bool                    elm_object_item_cursor_engine_only_get(const E
  */
 //Don't use this APIs
 //EAPI void                        *elm_object_item_smart_callback_del(Elm_Object_Item *it, const char *event, Elm_Object_Item_Smart_Cb func);
->>>>>>> remotes/origin/upstream
