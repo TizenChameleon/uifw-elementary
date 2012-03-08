@@ -3,6 +3,12 @@
 # include "elementary_config.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
+<<<<<<< HEAD
+=======
+
+static Eina_Bool eb;
+
+>>>>>>> remotes/origin/upstream
 static void
 changed_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
@@ -12,6 +18,15 @@ changed_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    printf("ck2 %p is now %i\n", ck2, elm_check_state_get(ck2));
 }
 
+<<<<<<< HEAD
+=======
+static void
+state_changed_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   printf("State Pointer Value: %d\n", eb);
+}
+
+>>>>>>> remotes/origin/upstream
 void
 test_check(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -51,7 +66,11 @@ test_check(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
+<<<<<<< HEAD
    elm_icon_scale_set(ic, 0, 0);
+=======
+   elm_icon_resizable_set(ic, 0, 0);
+>>>>>>> remotes/origin/upstream
    ck = elm_check_add(win);
    elm_object_text_set(ck, "Icon no scale");
    elm_object_part_content_set(ck, "icon", ic);
@@ -66,6 +85,21 @@ test_check(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    elm_box_pack_end(bx, ck);
    evas_object_show(ck);
 
+<<<<<<< HEAD
+=======
+   ck = elm_check_add(win);
+   elm_object_text_set(ck, "Using State Pointer");
+   elm_check_state_pointer_set(ck, &eb);
+   elm_box_pack_end(bx, ck);
+   evas_object_show(ck);
+
+   ck = elm_check_add(win);
+   elm_object_text_set(ck, "Check State Pointer Value");
+   elm_box_pack_end(bx, ck);
+   evas_object_show(ck);
+   evas_object_smart_callback_add(ck, "changed", state_changed_cb, NULL);
+
+>>>>>>> remotes/origin/upstream
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
@@ -84,7 +118,11 @@ test_check(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
+<<<<<<< HEAD
    elm_icon_scale_set(ic, 0, 0);
+=======
+   elm_icon_resizable_set(ic, 0, 0);
+>>>>>>> remotes/origin/upstream
    ck = elm_check_add(win);
    elm_object_part_content_set(ck, "icon", ic);
    elm_box_pack_end(bx, ck);

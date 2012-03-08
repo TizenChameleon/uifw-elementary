@@ -13,11 +13,17 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *base;
+<<<<<<< HEAD
    Evas_Object *shelf, *panel, *virtualkeypad, *sliding_win;
    Evas_Object *content;
    Evas_Object *scroller;
    Evas_Object *layout;
    int is_sliding_win_visible;
+=======
+   Evas_Object *shelf, *panel, *virtualkeypad;
+   Evas_Object *content;
+   Evas_Object *scroller;
+>>>>>>> remotes/origin/upstream
 #ifdef HAVE_ELEMENTARY_X
    Ecore_Event_Handler *prop_hdl;
    Ecore_X_Virtual_Keyboard_State vkb_state;
@@ -38,8 +44,12 @@ enum _Conformant_Part_Type
 {
    ELM_CONFORM_INDICATOR_PART      = 1,
    ELM_CONFORM_SOFTKEY_PART        = 2,
+<<<<<<< HEAD
    ELM_CONFORM_VIRTUAL_KEYPAD_PART = 4,
    ELM_CONFORM_SLIDING_WIN_PART    = 8
+=======
+   ELM_CONFORM_VIRTUAL_KEYPAD_PART = 4
+>>>>>>> remotes/origin/upstream
 };
 
 #define SUB_TYPE_COUNT 2
@@ -233,7 +243,10 @@ _conformant_part_geometry_env_get(const char *part, int *sx, int *sy, int *sw, i
    return EINA_TRUE;
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 _conformant_part_size_set(Evas_Object *obj, Evas_Object *sobj, Evas_Coord sx,
                           Evas_Coord sy, Evas_Coord sw, Evas_Coord sh)
@@ -350,6 +363,7 @@ _swallow_conformant_parts(Evas_Object *obj)
    edje_object_part_swallow(wd->base, "elm.swallow.virtualkeypad",
                             wd->virtualkeypad);
 
+<<<<<<< HEAD
    if (!wd->sliding_win)
      {
         wd->sliding_win = evas_object_rectangle_add(evas_object_evas_get(obj));
@@ -363,6 +377,8 @@ _swallow_conformant_parts(Evas_Object *obj)
 #endif
    evas_object_color_set(wd->sliding_win, 0, 0, 0, 0);
 
+=======
+>>>>>>> remotes/origin/upstream
    if (!wd->panel)
      {
         wd->panel = evas_object_rectangle_add(evas_object_evas_get(obj));
@@ -388,18 +404,30 @@ _changed_size_hints(void *data, Evas *e __UNUSED__,
 }
 
 static void
+<<<<<<< HEAD
 _sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+=======
+_sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+>>>>>>> remotes/origin/upstream
    Evas_Object *sub = event_info;
 if (!wd) return;
    if (sub == wd->content)
      {
         evas_object_event_callback_del_full(sub,
                                             EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+<<<<<<< HEAD
                                             _changed_size_hints, data);
         wd->content = NULL;
         _sizing_eval(data);
+=======
+                                            _changed_size_hints, obj);
+        wd->content = NULL;
+        _sizing_eval(obj);
+>>>>>>> remotes/origin/upstream
      }
 }
 
@@ -465,8 +493,12 @@ _conformant_move_resize_event_cb(void *data __UNUSED__, Evas *e __UNUSED__,
    if (!wd) return;
    part_type =  (ELM_CONFORM_INDICATOR_PART |
                  ELM_CONFORM_SOFTKEY_PART |
+<<<<<<< HEAD
                  ELM_CONFORM_VIRTUAL_KEYPAD_PART |
                  ELM_CONFORM_SLIDING_WIN_PART);
+=======
+                 ELM_CONFORM_VIRTUAL_KEYPAD_PART);
+>>>>>>> remotes/origin/upstream
    _conformant_part_sizing_eval(obj, part_type);
 }
 
@@ -480,8 +512,12 @@ _content_resize_event_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj
 
    if (!wd) return;
 #ifdef HAVE_ELEMENTARY_X
+<<<<<<< HEAD
    if ((wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF)
             && (!wd->is_sliding_win_visible)) return;
+=======
+   if (wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF) return;
+>>>>>>> remotes/origin/upstream
 #endif
 
    if (wd->show_region_job) ecore_job_del(wd->show_region_job);
@@ -569,8 +605,12 @@ _prop_change(void *data, int type __UNUSED__, void *event)
 
         part_type =  (ELM_CONFORM_INDICATOR_PART |
                       ELM_CONFORM_SOFTKEY_PART |
+<<<<<<< HEAD
                       ELM_CONFORM_VIRTUAL_KEYPAD_PART |
                       ELM_CONFORM_SLIDING_WIN_PART);
+=======
+                      ELM_CONFORM_VIRTUAL_KEYPAD_PART);
+>>>>>>> remotes/origin/upstream
         _conformant_part_sizing_eval(data, part_type);
      }
    else if (ev->atom == ECORE_X_ATOM_E_ILLUME_INDICATOR_GEOMETRY)
@@ -579,12 +619,19 @@ _prop_change(void *data, int type __UNUSED__, void *event)
      _conformant_part_sizing_eval(data, ELM_CONFORM_SOFTKEY_PART);
    else if (ev->atom == ECORE_X_ATOM_E_ILLUME_KEYBOARD_GEOMETRY)
      _conformant_part_sizing_eval(data, ELM_CONFORM_VIRTUAL_KEYPAD_PART);
+<<<<<<< HEAD
    else if (ev->atom == ECORE_X_ATOM_E_ILLUME_SLIDING_WIN_GEOMETRY)
      _conformant_part_sizing_eval(data, ELM_CONFORM_SLIDING_WIN_PART);
+=======
+>>>>>>> remotes/origin/upstream
    else if (ev->atom == ECORE_X_ATOM_E_VIRTUAL_KEYBOARD_STATE)
      {
         Ecore_X_Window zone;
 
+<<<<<<< HEAD
+=======
+        printf("Keyboard Geometry Changed\n");
+>>>>>>> remotes/origin/upstream
         zone = ecore_x_e_illume_zone_get(ev->win);
         wd->vkb_state = ecore_x_e_virtual_keyboard_state_get(zone);
         if (wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF)
@@ -595,6 +642,7 @@ _prop_change(void *data, int type __UNUSED__, void *event)
         else
           _update_autoscroll_objs(data);
      }
+<<<<<<< HEAD
    else if (ev->atom == ECORE_X_ATOM_E_ILLUME_SLIDING_WIN_STATE)
      {
         Ecore_X_Window zone;
@@ -610,6 +658,8 @@ _prop_change(void *data, int type __UNUSED__, void *event)
         else
           _update_autoscroll_objs(data);
      }
+=======
+>>>>>>> remotes/origin/upstream
 
    return ECORE_CALLBACK_PASS_ON;
 }
@@ -640,11 +690,16 @@ elm_conformant_add(Evas_Object *parent)
    _elm_theme_object_set(obj, wd->base, "conformant", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
 
+<<<<<<< HEAD
    wd->layout = elm_layout_add(obj);
    edje_object_part_swallow(wd->base, "elm.swallow.content", wd->layout);
    elm_layout_theme_set(wd->layout, "conformant", "layout", "content");
 
    _swallow_conformant_parts(obj);
+=======
+   _swallow_conformant_parts(obj);
+
+>>>>>>> remotes/origin/upstream
 #ifdef HAVE_ELEMENTARY_X
    Evas_Object *top = elm_widget_top_get(obj);
    Ecore_X_Window xwin = elm_win_xwindow_get(top);
@@ -656,19 +711,30 @@ elm_conformant_add(Evas_Object *parent)
         wd->vkb_state = ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF;
      }
    // FIXME: get kbd region prop
+<<<<<<< HEAD
 
 #endif
+=======
+#endif
+
+>>>>>>> remotes/origin/upstream
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE,
                                        _conformant_move_resize_event_cb, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE,
                                        _conformant_move_resize_event_cb, obj);
+<<<<<<< HEAD
    evas_object_smart_callback_add(wd->layout, "sub-object-del", _sub_del, obj);
+=======
+
+   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
+>>>>>>> remotes/origin/upstream
 
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
    return obj;
 }
 
+<<<<<<< HEAD
 EAPI void
 elm_conformant_content_set(Evas_Object *obj, Evas_Object *content)
 {
@@ -688,6 +754,9 @@ elm_conformant_content_unset(Evas_Object *obj)
 }
 
 EAPI Evas_Object *
+=======
+EINA_DEPRECATED EAPI Evas_Object *
+>>>>>>> remotes/origin/upstream
 elm_conformant_content_area_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
@@ -696,5 +765,9 @@ elm_conformant_content_area_get(const Evas_Object *obj)
    if (!wd) return NULL;
    /*Finger waggle warning*/
    _elm_dangerous_call_check(__FUNCTION__);
+<<<<<<< HEAD
    return wd->layout;
+=======
+   return (Evas_Object *)edje_object_part_object_get(wd->base, "elm.swallow.content");
+>>>>>>> remotes/origin/upstream
 }

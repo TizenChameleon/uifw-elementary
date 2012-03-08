@@ -2,11 +2,20 @@
 #include <Elementary_Cursor.h>
 #include "elm_priv.h"
 
+<<<<<<< HEAD
 #define ELM_STORE_MAGIC            0x3f89ea56
 #define ELM_STORE_FILESYSTEM_MAGIC 0x3f89ea57
 #define ELM_STORE_DBSYSTEM_MAGIC   0x3f89ea58
 #define ELM_STORE_ITEM_MAGIC       0x5afe8c1d
 #define CACHE_COUNT                1024
+=======
+typedef struct _Elm_Store_Filesystem           Elm_Store_Filesystem;
+typedef struct _Elm_Store_Item_Filesystem      Elm_Store_Item_Filesystem;
+
+#define ELM_STORE_MAGIC            0x3f89ea56
+#define ELM_STORE_FILESYSTEM_MAGIC 0x3f89ea57
+#define ELM_STORE_ITEM_MAGIC       0x5afe8c1d
+>>>>>>> remotes/origin/upstream
 
 struct _Elm_Store
 {
@@ -21,9 +30,12 @@ struct _Elm_Store
    Eina_List     *realized;
    int            realized_count;
    int            cache_max;
+<<<<<<< HEAD
    int            item_count;
    int            type;
    Eina_List     *always_fetched;
+=======
+>>>>>>> remotes/origin/upstream
    struct {
       struct {
          Elm_Store_Item_List_Cb     func;
@@ -37,6 +49,7 @@ struct _Elm_Store
          Elm_Store_Item_Unfetch_Cb  func;
          void                      *data;
       } unfetch;
+<<<<<<< HEAD
       struct {
          Elm_Store_Item_Select_Cb   func;
          void                      *data;
@@ -53,6 +66,11 @@ struct _Elm_Store
    Eina_Bool      sorted : 1;
    Eina_Bool      fetch_thread : 1;
    Eina_Bool      live : 1;
+=======
+   } cb;
+   Eina_Bool sorted : 1;
+   Eina_Bool fetch_thread : 1;
+>>>>>>> remotes/origin/upstream
 };
 
 struct _Elm_Store_Item
@@ -60,14 +78,21 @@ struct _Elm_Store_Item
    EINA_INLIST;
    EINA_MAGIC;
    Elm_Store                    *store;
+<<<<<<< HEAD
    Elm_Object_Item             *item;
+=======
+   Elm_Object_Item              *item;
+>>>>>>> remotes/origin/upstream
    Ecore_Thread                 *fetch_th;
    Ecore_Job                    *eval_job;
    const Elm_Store_Item_Mapping *mapping;
    void                         *data;
+<<<<<<< HEAD
    Elm_Store_Item_Info          *item_info;
    Elm_Object_Item             *first_item;
    Elm_Object_Item             *last_item;
+=======
+>>>>>>> remotes/origin/upstream
    Eina_Lock                     lock;
    Eina_Bool                     live : 1;
    Eina_Bool                     was_live : 1;
@@ -88,6 +113,7 @@ struct _Elm_Store_Item_Filesystem
    const char *path;
 };
 
+<<<<<<< HEAD
 struct _Elm_Store_DBsystem
 {
    Elm_Store   base;
@@ -111,6 +137,10 @@ static void _item_realized(void *data, Evas_Object *obj __UNUSED__, void *event_
 static void _item_unrealized(void *data, Evas_Object *obj __UNUSED__, void *event_info);
 static void _genlist_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__);
 
+=======
+static Elm_Genlist_Item_Class _store_item_class;
+
+>>>>>>> remotes/origin/upstream
 static void
 _store_cache_trim(Elm_Store *st)
 {
@@ -136,10 +166,18 @@ _store_cache_trim(Elm_Store *st)
              eina_lock_take(&sti->lock);
           }
         sti->fetched = EINA_FALSE;
+<<<<<<< HEAD
         eina_lock_release(&sti->lock);
         if (st->cb.unfetch.func)
           st->cb.unfetch.func(st->cb.unfetch.data, sti, NULL);
         eina_lock_take(&sti->lock);
+=======
+//// let fetch/unfetch do the locking   
+//        eina_lock_release(&sti->lock);
+        if (st->cb.unfetch.func)
+          st->cb.unfetch.func(st->cb.unfetch.data, sti);
+//        eina_lock_take(&sti->lock);
+>>>>>>> remotes/origin/upstream
         sti->data = NULL;
         eina_lock_release(&sti->lock);
      }
@@ -166,12 +204,23 @@ _store_genlist_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, 
              sti->fetch_th = NULL;
           }
         if (sti->store->item.free) sti->store->item.free(sti);
+<<<<<<< HEAD
         if (sti->data)
           {
              if (st->cb.unfetch.func)
                st->cb.unfetch.func(st->cb.unfetch.data, sti, NULL);
              sti->data = NULL;
           }
+=======
+        eina_lock_take(&sti->lock);
+        if (sti->data)
+          {
+             if (st->cb.unfetch.func)
+               st->cb.unfetch.func(st->cb.unfetch.data, sti);
+             sti->data = NULL;
+          }
+        eina_lock_release(&sti->lock);
+>>>>>>> remotes/origin/upstream
         eina_lock_free(&sti->lock);
 	st->items = NULL;
         free(sti);
@@ -195,10 +244,18 @@ _store_filesystem_fetch_do(void *data, Ecore_Thread *th __UNUSED__)
      }
    if (!sti->fetched)
      {
+<<<<<<< HEAD
         eina_lock_release(&sti->lock);
         if (sti->store->cb.fetch.func)
           sti->store->cb.fetch.func(sti->store->cb.fetch.data, sti, NULL);
         eina_lock_take(&sti->lock);
+=======
+//// let fetch/unfetch do the locking   
+//        eina_lock_release(&sti->lock);
+        if (sti->store->cb.fetch.func)
+          sti->store->cb.fetch.func(sti->store->cb.fetch.data, sti);
+//        eina_lock_take(&sti->lock);
+>>>>>>> remotes/origin/upstream
         sti->fetched = EINA_TRUE;
      }
    eina_lock_release(&sti->lock);
@@ -212,7 +269,11 @@ _store_filesystem_fetch_end(void *data, Ecore_Thread *th)
 {
    Elm_Store_Item *sti = data;
    eina_lock_take(&sti->lock);
+<<<<<<< HEAD
    if (sti->data) elm_genlist_item_update((Elm_Object_Item *) sti->item);
+=======
+   if (sti->data) elm_genlist_item_update(sti->item);
+>>>>>>> remotes/origin/upstream
    eina_lock_release(&sti->lock);
    if (th == sti->fetch_th) sti->fetch_th = NULL;
 }
@@ -224,7 +285,11 @@ _store_filesystem_fetch_cancel(void *data, Ecore_Thread *th)
    Elm_Store_Item *sti = data;
    eina_lock_take(&sti->lock);
    if (th == sti->fetch_th) sti->fetch_th = NULL;
+<<<<<<< HEAD
    if (sti->data) elm_genlist_item_update((Elm_Object_Item *) sti->item);
+=======
+   if (sti->data) elm_genlist_item_update(sti->item);
+>>>>>>> remotes/origin/upstream
    eina_lock_release(&sti->lock);
 }
 
@@ -269,7 +334,11 @@ _store_genlist_item_realized(void *data, Evas_Object *obj __UNUSED__, void *even
 {
    Elm_Store *st = data;
    Elm_Object_Item *gli = event_info;
+<<<<<<< HEAD
    Elm_Store_Item *sti = (Elm_Store_Item *) elm_genlist_item_data_get(gli);
+=======
+   Elm_Store_Item *sti = elm_object_item_data_get(gli);
+>>>>>>> remotes/origin/upstream
    if (!sti) return;
    st->realized_count++;
    sti->live = EINA_TRUE;
@@ -282,7 +351,11 @@ _store_genlist_item_unrealized(void *data, Evas_Object *obj __UNUSED__, void *ev
 {
    Elm_Store *st = data;
    Elm_Object_Item *gli = event_info;
+<<<<<<< HEAD
    Elm_Store_Item *sti = (Elm_Store_Item *) elm_genlist_item_data_get(gli);
+=======
+   Elm_Store_Item *sti = elm_object_item_data_get(gli);
+>>>>>>> remotes/origin/upstream
    if (!sti) return;
    st->realized_count--;
    sti->live = EINA_FALSE;
@@ -357,7 +430,11 @@ _store_item_content_get(void *data, Evas_Object *obj, const char *part)
                                                     m->details.icon.h);
                    elm_icon_smooth_set(ic, m->details.icon.smooth);
                    elm_icon_no_scale_set(ic, m->details.icon.no_scale);
+<<<<<<< HEAD
                    elm_icon_scale_set(ic,
+=======
+                   elm_icon_resizable_set(ic,
+>>>>>>> remotes/origin/upstream
                                       m->details.icon.scale_up,
                                       m->details.icon.scale_down);
                    if (s)
@@ -495,10 +572,17 @@ _store_filesystem_list_update(void *data, Ecore_Thread *th __UNUSED__, void *msg
    if (!itc) itc = &_store_item_class;
    else
      {
+<<<<<<< HEAD
         itc->func.text_get = (GenlistItemTextGetFunc)_store_item_text_get;
         itc->func.content_get  = (GenlistItemContentGetFunc)_store_item_content_get;
         itc->func.state_get = NULL; // FIXME: support state gets later
         itc->func.del = (GenlistItemDelFunc)_store_item_del;
+=======
+        itc->func.text_get = _store_item_text_get;
+        itc->func.content_get  = _store_item_content_get;
+        itc->func.state_get = NULL; // FIXME: support state gets later
+        itc->func.del       = _store_item_del;
+>>>>>>> remotes/origin/upstream
      }
 
    // FIXME: handle being a parent (tree)
@@ -527,16 +611,26 @@ _elm_store_new(size_t size)
    eina_magic_string_set(ELM_STORE_ITEM_MAGIC, "Elm_Store_Item");
    // setup default item class (always the same) if list cb doesnt provide one
    _store_item_class.item_style = "default";
+<<<<<<< HEAD
    _store_item_class.func.text_get = (GenlistItemTextGetFunc)_store_item_text_get;
    _store_item_class.func.content_get  = (GenlistItemContentGetFunc)_store_item_content_get;
    _store_item_class.func.state_get = NULL; // FIXME: support state gets later
    _store_item_class.func.del       = (GenlistItemDelFunc)_store_item_del;
+=======
+   _store_item_class.func.text_get = _store_item_text_get;
+   _store_item_class.func.content_get  = _store_item_content_get;
+   _store_item_class.func.state_get = NULL; // FIXME: support state gets later
+   _store_item_class.func.del       = _store_item_del;
+>>>>>>> remotes/origin/upstream
    // TODO: END - move to elm_store_init()
 
    EINA_MAGIC_SET(st, ELM_STORE_MAGIC);
    st->cache_max = 128;
    st->fetch_thread = EINA_TRUE;
+<<<<<<< HEAD
    st->type = 0;
+=======
+>>>>>>> remotes/origin/upstream
    return st;
 }
 #define elm_store_new(type) (type*)_elm_store_new(sizeof(type))
@@ -578,6 +672,7 @@ elm_store_free(Elm_Store *st)
         ecore_thread_cancel(st->list_th);
         st->list_th = NULL;
      }
+<<<<<<< HEAD
 
    if (!st->type)
      {
@@ -638,6 +733,40 @@ elm_store_free(Elm_Store *st)
         if (st->free) st->free(st);
         st->live = EINA_FALSE;
      }
+=======
+   eina_list_free(st->realized);
+   item_free = st->item.free;
+   while (st->items)
+     {
+        Elm_Store_Item *sti = (Elm_Store_Item *)st->items;
+        if (sti->eval_job) ecore_job_del(sti->eval_job);
+        if (sti->fetch_th)
+          {
+             ecore_thread_cancel(sti->fetch_th);
+             sti->fetch_th = NULL;
+          }
+        if (item_free) item_free(sti);
+        eina_lock_take(&sti->lock);
+        if (sti->data)
+          {
+             if (st->cb.unfetch.func)
+               st->cb.unfetch.func(st->cb.unfetch.data, sti);
+             sti->data = NULL;
+          }
+        eina_lock_release(&sti->lock);
+        eina_lock_free(&sti->lock);
+        free(sti);
+     }
+   if (st->genlist)
+     {
+        evas_object_event_callback_del_full(st->genlist, EVAS_CALLBACK_DEL, _store_genlist_del, st);
+        evas_object_smart_callback_del(st->genlist, "realized", _store_genlist_item_realized);
+        evas_object_smart_callback_del(st->genlist, "unrealized", _store_genlist_item_unrealized);
+        elm_genlist_clear(st->genlist);
+        st->genlist = NULL;
+     }
+   if (st->free) st->free(st);
+>>>>>>> remotes/origin/upstream
    free(st);
 }
 
@@ -648,6 +777,7 @@ elm_store_target_genlist_set(Elm_Store *st, Evas_Object *obj)
    if (st->genlist == obj) return;
    if (st->genlist)
      {
+<<<<<<< HEAD
         if (!st->type)
           {
              evas_object_event_callback_del_full(st->genlist, EVAS_CALLBACK_DEL, _store_genlist_del, st);
@@ -660,10 +790,16 @@ elm_store_target_genlist_set(Elm_Store *st, Evas_Object *obj)
              evas_object_smart_callback_del(st->genlist, "realized", _item_realized);
              evas_object_smart_callback_del(st->genlist, "unrealized", _item_unrealized);
           }
+=======
+        evas_object_event_callback_del_full(st->genlist, EVAS_CALLBACK_DEL, _store_genlist_del, st);
+        evas_object_smart_callback_del(st->genlist, "realized", _store_genlist_item_realized);
+        evas_object_smart_callback_del(st->genlist, "unrealized", _store_genlist_item_unrealized);
+>>>>>>> remotes/origin/upstream
         elm_genlist_clear(st->genlist);
      }
    st->genlist = obj;
    if (!st->genlist) return;
+<<<<<<< HEAD
    if (!st->type)
      {
         evas_object_smart_callback_add(st->genlist, "realized", _store_genlist_item_realized, st);
@@ -676,6 +812,11 @@ elm_store_target_genlist_set(Elm_Store *st, Evas_Object *obj)
         evas_object_smart_callback_add(st->genlist, "unrealized", _item_unrealized, st);
         evas_object_event_callback_add(st->genlist, EVAS_CALLBACK_DEL, _genlist_del, st);
      }
+=======
+   evas_object_smart_callback_add(st->genlist, "realized", _store_genlist_item_realized, st);
+   evas_object_smart_callback_add(st->genlist, "unrealized", _store_genlist_item_unrealized, st);
+   evas_object_event_callback_add(st->genlist, EVAS_CALLBACK_DEL, _store_genlist_del, st);
+>>>>>>> remotes/origin/upstream
    elm_genlist_clear(st->genlist);
 }
 
@@ -713,7 +854,11 @@ elm_store_cache_set(Elm_Store *st, int max)
    if (!EINA_MAGIC_CHECK(st, ELM_STORE_MAGIC)) return;
    if (max < 0) max = 0;
    st->cache_max = max;
+<<<<<<< HEAD
    if(!st->type) _store_cache_trim(st);
+=======
+   _store_cache_trim(st);
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI int
@@ -779,9 +924,16 @@ EAPI void
 elm_store_item_data_set(Elm_Store_Item *sti, void *data)
 {
    if (!EINA_MAGIC_CHECK(sti, ELM_STORE_ITEM_MAGIC)) return;
+<<<<<<< HEAD
    eina_lock_take(&sti->lock);
    sti->data = data;
    eina_lock_release(&sti->lock);
+=======
+//// let fetch/unfetch do the locking   
+//   eina_lock_take(&sti->lock);
+   sti->data = data;
+//   eina_lock_release(&sti->lock);
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI void *
@@ -789,9 +941,16 @@ elm_store_item_data_get(Elm_Store_Item *sti)
 {
    if (!EINA_MAGIC_CHECK(sti, ELM_STORE_ITEM_MAGIC)) return NULL;
    void *d;
+<<<<<<< HEAD
    eina_lock_take(&sti->lock);
    d = sti->data;
    eina_lock_release(&sti->lock);
+=======
+//// let fetch/unfetch do the locking   
+//   eina_lock_take(&sti->lock);
+   d = sti->data;
+//   eina_lock_release(&sti->lock);
+>>>>>>> remotes/origin/upstream
    return d;
 }
 
@@ -824,6 +983,7 @@ elm_store_item_filesystem_path_get(const Elm_Store_Item *item)
    // dont need lock
    return sti->path;
 }
+<<<<<<< HEAD
 
 // TODO: BEGIN -DBsystem store
 
@@ -2047,3 +2207,5 @@ elm_store_item_del(Elm_Store_Item *sti)
 
 // TODO: END -DBsystem store
 
+=======
+>>>>>>> remotes/origin/upstream

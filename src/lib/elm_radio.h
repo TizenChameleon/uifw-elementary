@@ -9,8 +9,20 @@
  *
  * A radio object contains an indicator, an optional Label and an optional
  * icon object. While it's possible to have a group of only one radio they,
+<<<<<<< HEAD
  * are normally used in groups of 2 or more. To add a radio to a group use
  * elm_radio_group_add(). The radio object(s) will select from one of a set
+=======
+ * are normally used in groups of 2 or more. 
+ *
+ * elm_radio objects are grouped in a slightly different, compared to other
+ * UI toolkits. There is no seperate group name/id to remember or manage.
+ * The members represent the group, there are the group. To make a group,
+ * use elm_radio_group_add() and pass existing radio object and the new radio 
+ * object. 
+ *
+ * The radio object(s) will select from one of a set
+>>>>>>> remotes/origin/upstream
  * of integer values, so any value they are configuring needs to be mapped to
  * a set of integers. To configure what value that radio object represents,
  * use  elm_radio_state_value_set() to set the integer it represents. To set
@@ -29,7 +41,11 @@
  * Default text parts of the radio widget that you can use for are:
  * @li "default" - Label of the radio
  *
+<<<<<<< HEAD
  * Default contents parts of the radio widget that you can use for are:
+=======
+ * Default content parts of the radio widget that you can use for are:
+>>>>>>> remotes/origin/upstream
  * @li "icon" - An icon of the radio
  *
  * Supported elm_object common APIs.
@@ -89,9 +105,15 @@ EAPI void                         elm_radio_state_value_set(Evas_Object *obj, in
 EAPI int                          elm_radio_state_value_get(const Evas_Object *obj);
 
 /**
+<<<<<<< HEAD
  * @brief Set the value of the radio.
  *
  * @param obj The radio object
+=======
+ * @brief Set the value of the radio group.
+ *
+ * @param obj The radio object (any radio object of the group).
+>>>>>>> remotes/origin/upstream
  * @param value The value to use for the group
  *
  * This sets the value of the radio group and will also set the value if
@@ -100,17 +122,30 @@ EAPI int                          elm_radio_state_value_get(const Evas_Object *o
 EAPI void                         elm_radio_value_set(Evas_Object *obj, int value);
 
 /**
+<<<<<<< HEAD
  * @brief Get the state of the radio object
  *
  * @param obj The radio object
+=======
+ * @brief Get the value of the radio group
+ *
+ * @param obj The radio object (any radio object of the group).
+>>>>>>> remotes/origin/upstream
  * @return The integer state
  */
 EAPI int                          elm_radio_value_get(const Evas_Object *obj);
 
 /**
+<<<<<<< HEAD
  * @brief Set a convenience pointer to a integer to change
  *
  * @param obj The radio object
+=======
+ * @brief Set a convenience pointer to a integer to change when radio group
+ * value changes.
+ *
+ * @param obj The radio object (any object of a group)
+>>>>>>> remotes/origin/upstream
  * @param valuep Pointer to the integer to modify
  *
  * This sets a pointer to a integer, that, in addition to the radio objects
@@ -123,5 +158,16 @@ EAPI int                          elm_radio_value_get(const Evas_Object *obj);
 EAPI void                         elm_radio_value_pointer_set(Evas_Object *obj, int *valuep);
 
 /**
+<<<<<<< HEAD
+=======
+ * @brief Get the selected radio object.
+ *
+ * @param obj Any radio object (any object of a group)
+ * @return The selected radio object
+ */
+EAPI Evas_Object                 *elm_radio_selected_object_get(Evas_Object *obj);
+
+/**
+>>>>>>> remotes/origin/upstream
  * @}
  */

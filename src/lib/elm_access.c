@@ -237,7 +237,11 @@ _elm_access_callback_set(Elm_Access_Info *ac, int type, Elm_Access_Content_Cb fu
 }
 
 EAPI char *
+<<<<<<< HEAD
 _elm_access_text_get(Elm_Access_Info *ac, int type, Evas_Object *obj, Elm_Widget_Item *item)
+=======
+_elm_access_text_get(const Elm_Access_Info *ac, int type, Evas_Object *obj, Elm_Widget_Item *item)
+>>>>>>> remotes/origin/upstream
 {
    Elm_Access_Item *ai;
    Eina_List *l;
@@ -304,13 +308,21 @@ _elm_access_say(const char *txt)
 }
 
 EAPI Elm_Access_Info *
+<<<<<<< HEAD
 _elm_access_object_get(Evas_Object *obj)
+=======
+_elm_access_object_get(const Evas_Object *obj)
+>>>>>>> remotes/origin/upstream
 {
    return evas_object_data_get(obj, "_elm_access");
 }
 
 EAPI Elm_Access_Info *
+<<<<<<< HEAD
 _elm_access_item_get(Elm_Widget_Item *it)
+=======
+_elm_access_item_get(const Elm_Widget_Item *it)
+>>>>>>> remotes/origin/upstream
 {
    return it->access;
 }

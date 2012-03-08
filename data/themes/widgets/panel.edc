@@ -48,9 +48,12 @@ group {
          {
             state: "default" 0.0;
             color: 255 255 255 0;
+<<<<<<< HEAD
             rel1.relative: 0.0 0.0;
             rel1.offset: 0 0;
             rel2.relative: 1.0 1.0;
+=======
+>>>>>>> remotes/origin/upstream
             rel2.offset: -1 -1;
          }
          description
@@ -65,6 +68,7 @@ group {
       }
       part
       {
+<<<<<<< HEAD
          name: "base";
          type: IMAGE;
          mouse_events: 0;
@@ -83,6 +87,8 @@ group {
       }
       part
       {
+=======
+>>>>>>> remotes/origin/upstream
          name: "clipper";
          type: RECT;
          mouse_events: 0;
@@ -103,6 +109,7 @@ group {
       }
       part
       {
+<<<<<<< HEAD
          name: "elm.swallow.content";
          type: SWALLOW;
          clip_to: "clipper";
@@ -115,6 +122,8 @@ group {
       }
       part
       {
+=======
+>>>>>>> remotes/origin/upstream
          name: "btn";
          type: IMAGE;
          mouse_events: 1;
@@ -233,6 +242,39 @@ group {
             image.normal: "icon_arrow_right.png";
          }
       }
+<<<<<<< HEAD
+=======
+      part
+      {
+         name: "base";
+         type: IMAGE;
+         mouse_events: 0;
+         description
+         {
+            state: "default" 0.0;
+            rel1.to: "bg";
+            rel2.to: "bg";
+            rel2.offset: -20 -1;
+            image
+            {
+               normal: "bt_dis_base.png";
+               border: 4 4 4 4;
+            }
+         }
+      }
+      part
+      {
+         name: "elm.swallow.content";
+         type: SWALLOW;
+         clip_to: "clipper";
+         description
+         {
+            state: "default" 0.0;
+            rel1.to: "clipper";
+            rel2.to: "clipper";
+         }
+      }
+>>>>>>> remotes/origin/upstream
    }
    programs
    {
@@ -370,13 +412,18 @@ group {
             state: "hidden" 0.0;
             inherit: "default" 0.0;
             rel1.relative: 0.0 -1.0;
+<<<<<<< HEAD
             rel1.offset: 0 21;
+=======
+            rel1.offset: 0 -21;
+>>>>>>> remotes/origin/upstream
             rel2.relative: 1.0 0.0;
             rel2.offset: -1 20;
          }
       }
       part
       {
+<<<<<<< HEAD
          name: "base";
          type: IMAGE;
          mouse_events: 0;
@@ -395,6 +442,8 @@ group {
       }
       part
       {
+=======
+>>>>>>> remotes/origin/upstream
          name: "clipper";
          type: RECT;
          mouse_events: 0;
@@ -415,6 +464,7 @@ group {
       }
       part
       {
+<<<<<<< HEAD
          name: "elm.swallow.content";
          type: SWALLOW;
          clip_to: "clipper";
@@ -427,12 +477,15 @@ group {
       }
       part
       {
+=======
+>>>>>>> remotes/origin/upstream
          name: "btn";
          type: IMAGE;
          mouse_events: 1;
          description
          {
             state: "default" 0.0;
+<<<<<<< HEAD
             max: 32 48;
             fixed: 1 1;
             align: 0.5 1.0;
@@ -440,13 +493,26 @@ group {
             {
                relative: 0.0 1.0;
                offset: -2 2;
+=======
+            max: 48 32;
+            fixed: 1 1;
+            align: 0.5 0.0;
+            rel1
+            {
+               relative: 0.0 1.0;
+               offset: 0 -6;
+>>>>>>> remotes/origin/upstream
                to_y: "base";
             }
             rel2.to_y: "bg";
             image
             {
                normal: "bt_base1.png";
+<<<<<<< HEAD
                border: 12 4 5 0;
+=======
+               border: 12 4 0 5;
+>>>>>>> remotes/origin/upstream
             }
             fill.smooth: 0;
          }
@@ -545,6 +611,39 @@ group {
             image.normal: "icon_arrow_down.png";
          }
       }
+<<<<<<< HEAD
+=======
+      part
+      {
+         name: "base";
+         type: IMAGE;
+         mouse_events: 0;
+         description
+         {
+            state: "default" 0.0;
+            rel1.to: "bg";
+            rel2.to: "bg";
+            rel2.offset: -1 -20;
+            image
+            {
+               normal: "bt_dis_base.png";
+               border: 4 4 4 4;
+            }
+         }
+      }
+      part
+      {
+         name: "elm.swallow.content";
+         type: SWALLOW;
+         clip_to: "clipper";
+         description
+         {
+            state: "default" 0.0;
+            rel1.to: "clipper";
+            rel2.to: "clipper";
+         }
+      }
+>>>>>>> remotes/origin/upstream
    }
    programs
    {
@@ -682,6 +781,7 @@ group {
             state: "hidden" 0.0;
             inherit: "default" 0.0;
             rel1.relative: 0.0 1.0;
+<<<<<<< HEAD
             rel1.offset: 0 20;
             rel2.relative: 1.0 2.0;
             rel2.offset: -1 21;
@@ -703,6 +803,11 @@ group {
                normal: "bt_dis_base.png";
                border: 4 4 4 4;
             }
+=======
+            rel1.offset: -1 -24;
+            rel2.relative: 1.0 2.0;
+            rel2.offset: 0 -21;
+>>>>>>> remotes/origin/upstream
          }
       }
       part
@@ -727,6 +832,7 @@ group {
       }
       part
       {
+<<<<<<< HEAD
          name: "elm.swallow.content";
          type: SWALLOW;
          clip_to: "clipper";
@@ -739,12 +845,15 @@ group {
       }
       part
       {
+=======
+>>>>>>> remotes/origin/upstream
          name: "btn";
          type: IMAGE;
          mouse_events: 1;
          description
          {
             state: "default" 0.0;
+<<<<<<< HEAD
             max: 32 48;
             fixed: 1 1;
             align: 0.5 0.0;
@@ -759,6 +868,21 @@ group {
             {
                normal: "bt_base1.png";
                border: 12 4 0 5;
+=======
+            max: 48 32;
+            fixed: 1 1;
+            align: 0.5 0.0;
+            rel1.to_y: "bg";
+            rel2{
+               relative: 1.0 0.0;
+               offset: 0 5;
+               to_y: "base";
+            }
+            image
+            {
+               normal: "bt_base1.png";
+               border: 4 12 5 0;
+>>>>>>> remotes/origin/upstream
             }
             fill.smooth: 0;
          }
@@ -857,6 +981,39 @@ group {
             image.normal: "icon_arrow_up.png";
          }
       }
+<<<<<<< HEAD
+=======
+      part
+      {
+         name: "base";
+         type: IMAGE;
+         mouse_events: 0;
+         description
+         {
+            state: "default" 0.0;
+            rel1.to: "bg";
+            rel1.offset: -1 20;
+            rel2.to: "bg";
+            image
+            {
+               normal: "bt_dis_base.png";
+               border: 4 4 4 4;
+            }
+         }
+      }
+      part
+      {
+         name: "elm.swallow.content";
+         type: SWALLOW;
+         clip_to: "clipper";
+         description
+         {
+            state: "default" 0.0;
+            rel1.to: "clipper";
+            rel2.to: "clipper";
+         }
+      }
+>>>>>>> remotes/origin/upstream
    }
    programs
    {
@@ -1001,6 +1158,7 @@ group {
       }
       part
       {
+<<<<<<< HEAD
          name: "base";
          type: IMAGE;
          mouse_events: 0;
@@ -1019,6 +1177,8 @@ group {
       }
       part
       {
+=======
+>>>>>>> remotes/origin/upstream
          name: "clipper";
          type: RECT;
          mouse_events: 0;
@@ -1039,6 +1199,7 @@ group {
       }
       part
       {
+<<<<<<< HEAD
          name: "elm.swallow.content";
          type: SWALLOW;
          clip_to: "clipper";
@@ -1051,6 +1212,8 @@ group {
       }
       part
       {
+=======
+>>>>>>> remotes/origin/upstream
          name: "btn";
          type: IMAGE;
          mouse_events: 1;
@@ -1172,6 +1335,39 @@ group {
             image.normal: "icon_arrow_left.png";
          }
       }
+<<<<<<< HEAD
+=======
+      part
+      {
+         name: "base";
+         type: IMAGE;
+         mouse_events: 0;
+         description
+         {
+            state: "default" 0.0;
+            rel1.to: "bg";
+            rel1.offset: 20 0;
+            rel2.to: "bg";
+            image
+            {
+               normal: "bt_dis_base.png";
+               border: 4 4 4 4;
+            }
+         }
+      }
+      part
+      {
+         name: "elm.swallow.content";
+         type: SWALLOW;
+         clip_to: "clipper";
+         description
+         {
+            state: "default" 0.0;
+            rel1.to: "clipper";
+            rel2.to: "clipper";
+         }
+      }
+>>>>>>> remotes/origin/upstream
    }
    programs
    {

@@ -6,17 +6,25 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *lbl;
+<<<<<<< HEAD
    Evas_Object *bg;
+=======
+>>>>>>> remotes/origin/upstream
    const char *label;
    const char *format;
    Ecore_Job *deferred_recalc_job;
    double slide_duration;
    Evas_Coord lastw;
    Evas_Coord wrap_w;
+<<<<<<< HEAD
    Evas_Coord wrap_h;
    Elm_Wrap_Type linewrap;
    Eina_Bool changed : 1;
    Eina_Bool bgcolor : 1;
+=======
+   Elm_Wrap_Type linewrap;
+   Eina_Bool changed : 1;
+>>>>>>> remotes/origin/upstream
    Eina_Bool ellipsis : 1;
    Eina_Bool slidingmode : 1;
    Eina_Bool slidingellipsis : 1;
@@ -30,15 +38,21 @@ static void _sizing_eval(Evas_Object *obj);
 static int _get_value_in_key_string(const char *oldstring, const char *key, char **value);
 static int _strbuf_key_value_replace(Eina_Strbuf *srcbuf, const char *key, const char *value, int deleteflag);
 static int _stringshare_key_value_replace(const char **srcstring, const char *key, const char *value, int deleteflag);
+<<<<<<< HEAD
 static int _is_width_over(Evas_Object *obj);
 static void _ellipsis_label_to_width(Evas_Object *obj);
 static void _label_sliding_change(Evas_Object *obj);
+=======
+static void _label_sliding_change(Evas_Object *obj);
+static void _label_format_set(Evas_Object *obj, const char *format);
+>>>>>>> remotes/origin/upstream
 
 static void
 _elm_recalc_job(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord minw = -1, minh = -1;
+<<<<<<< HEAD
    Evas_Coord resw, resh;
    if (!wd) return;
    evas_event_freeze(evas_object_evas_get(data));
@@ -83,6 +97,27 @@ _elm_recalc_job(void *data)
    if ((wd->ellipsis) && (wd->linewrap) && (wd->wrap_h > 0) &&
        (_is_width_over(data) == 1))
      _ellipsis_label_to_width(data);
+=======
+   Evas_Coord resw;
+   if (!wd) return;
+   evas_event_freeze(evas_object_evas_get(data));
+   wd->deferred_recalc_job = NULL;
+   evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, NULL);
+   if (wd->wrap_w > resw)
+      resw = wd->wrap_w;
+
+   edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, resw, 0);
+   /* This is a hack to workaround the way min size hints are treated.
+    * If the minimum width is smaller than the restricted width, it means
+    * the mininmum doesn't matter. */
+   if ((minw <= resw) && (minw != wd->wrap_w))
+     {
+        Evas_Coord ominw = -1;
+        evas_object_size_hint_min_get(data, &ominw, NULL);
+        minw = ominw;
+     }
+   evas_object_size_hint_min_set(data, minw, minh);
+>>>>>>> remotes/origin/upstream
    evas_event_thaw(evas_object_evas_get(data));
    evas_event_thaw_eval(evas_object_evas_get(data));
 }
@@ -95,7 +130,10 @@ _del_hook(Evas_Object *obj)
    evas_event_freeze(evas_object_evas_get(obj));
    if (wd->deferred_recalc_job) ecore_job_del(wd->deferred_recalc_job);
    if (wd->label) eina_stringshare_del(wd->label);
+<<<<<<< HEAD
    if (wd->bg) evas_object_del(wd->bg);
+=======
+>>>>>>> remotes/origin/upstream
    free(wd);
    evas_event_thaw(evas_object_evas_get(obj));
    evas_event_thaw_eval(evas_object_evas_get(obj));
@@ -128,7 +166,11 @@ _theme_hook(Evas_Object *obj)
    _elm_widget_mirrored_reload(obj);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _theme_change(obj);
+<<<<<<< HEAD
    edje_object_part_text_style_user_set(wd->lbl, "elm.text", wd->format);
+=======
+   _label_format_set(wd->lbl, wd->format);
+>>>>>>> remotes/origin/upstream
    edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    edje_object_scale_set(wd->lbl, elm_widget_scale_get(obj) *
                          _elm_config->scale);
@@ -163,11 +205,15 @@ _sizing_eval(Evas_Object *obj)
         evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
         edje_object_size_min_calc(wd->lbl, &minw, &minh);
         if (wd->wrap_w > 0 && minw > wd->wrap_w) minw = wd->wrap_w;
+<<<<<<< HEAD
         if (wd->wrap_h > 0 && minh > wd->wrap_h) minh = wd->wrap_h;
         evas_object_size_hint_min_set(obj, minw, minh);
         evas_object_size_hint_max_set(obj, wd->wrap_w, wd->wrap_h);
         if ((wd->ellipsis) && (_is_width_over(obj) == 1))
           _ellipsis_label_to_width(obj);
+=======
+        evas_object_size_hint_min_set(obj, minw, minh);
+>>>>>>> remotes/origin/upstream
         evas_event_thaw(evas_object_evas_get(obj));
         evas_event_thaw_eval(evas_object_evas_get(obj));
      }
@@ -181,17 +227,36 @@ _lbl_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *e
    if (wd->linewrap) _sizing_eval(data);
 }
 
+<<<<<<< HEAD
 static int
 _get_value_in_key_string(const char *oldstring, const char *key, char **value)
 {
    char *curlocater, *starttag, *endtag;
+=======
+static void
+_label_format_set(Evas_Object *obj, const char *format)
+{
+   if (format)
+      edje_object_part_text_style_user_push(obj, "elm.text", format);
+   else
+      edje_object_part_text_style_user_pop(obj, "elm.text");
+}
+
+static int
+_get_value_in_key_string(const char *oldstring, const char *key, char **value)
+{
+   char *curlocater, *endtag;
+>>>>>>> remotes/origin/upstream
    int firstindex = 0, foundflag = -1;
 
    curlocater = strstr(oldstring, key);
    if (curlocater)
      {
         int key_len = strlen(key);
+<<<<<<< HEAD
         starttag = curlocater;
+=======
+>>>>>>> remotes/origin/upstream
         endtag = curlocater + key_len;
         if ((!endtag) || (*endtag != '='))
           {
@@ -202,6 +267,7 @@ _get_value_in_key_string(const char *oldstring, const char *key, char **value)
         firstindex += key_len + 1; // strlen("key") + strlen("=")
         *value = (char *)oldstring + firstindex;
 
+<<<<<<< HEAD
         while (oldstring != starttag)
           {
              if (*starttag == '>')
@@ -234,6 +300,9 @@ _get_value_in_key_string(const char *oldstring, const char *key, char **value)
           foundflag = 1;
         else
           foundflag = 0;
+=======
+        foundflag = 1;
+>>>>>>> remotes/origin/upstream
      }
    else
      {
@@ -245,6 +314,10 @@ _get_value_in_key_string(const char *oldstring, const char *key, char **value)
    return -1;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> remotes/origin/upstream
 static int
 _strbuf_key_value_replace(Eina_Strbuf *srcbuf, const char *key, const char *value, int deleteflag)
 {
@@ -305,6 +378,7 @@ _stringshare_key_value_replace(const char **srcstring, const char *key, const ch
    return 0;
 }
 
+<<<<<<< HEAD
 static int
 _is_width_over(Evas_Object *obj)
 {
@@ -423,6 +497,8 @@ _ellipsis_label_to_width(Evas_Object *obj)
    evas_event_thaw_eval(evas_object_evas_get(obj));
 }
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 _label_sliding_change(Evas_Object *obj)
 {
@@ -487,8 +563,12 @@ _elm_label_label_set(Evas_Object *obj, const char *item, const char *label)
    if (item && strcmp(item, "default")) return;
    if (!label) label = "";
    eina_stringshare_replace(&wd->label, label);
+<<<<<<< HEAD
    edje_object_part_text_style_user_set(wd->lbl, "elm.text",
          wd->format);
+=======
+   _label_format_set(wd->lbl, wd->format);
+>>>>>>> remotes/origin/upstream
    edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    wd->changed = 1;
    _sizing_eval(obj);
@@ -530,27 +610,41 @@ elm_label_add(Evas_Object *parent)
    elm_widget_text_get_hook_set(obj, _elm_label_label_get);
    elm_widget_translate_hook_set(obj, _translate_hook);
 
+<<<<<<< HEAD
    wd->bgcolor = EINA_FALSE;
    wd->bg = evas_object_rectangle_add(e);
    evas_object_color_set(wd->bg, 0, 0, 0, 0);
 
+=======
+>>>>>>> remotes/origin/upstream
    wd->linewrap = ELM_WRAP_NONE;
    wd->ellipsis = EINA_FALSE;
    wd->slidingmode = EINA_FALSE;
    wd->slidingellipsis = EINA_FALSE;
    wd->wrap_w = -1;
+<<<<<<< HEAD
    wd->wrap_h = -1;
+=======
+>>>>>>> remotes/origin/upstream
    wd->slide_duration = 10;
 
    wd->lbl = edje_object_add(e);
    _elm_theme_object_set(obj, wd->lbl, "label", "base", "default");
    wd->format = eina_stringshare_add("");
    wd->label = eina_stringshare_add("<br>");
+<<<<<<< HEAD
 
    edje_object_part_text_style_user_set(wd->lbl, "elm.text",
          wd->format);
    edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    elm_widget_resize_object_set(obj, wd->lbl);
+=======
+   _label_format_set(wd->lbl, wd->format);
+   edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
+
+   elm_widget_resize_object_set(obj, wd->lbl);
+
+>>>>>>> remotes/origin/upstream
    evas_object_event_callback_add(wd->lbl, EVAS_CALLBACK_RESIZE, _lbl_resize, obj);
 
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
@@ -604,8 +698,12 @@ elm_label_line_wrap_set(Evas_Object *obj, Elm_Wrap_Type wrap)
    if (_stringshare_key_value_replace(&wd->format,
             "wrap", wrap_str, 0) == 0)
      {
+<<<<<<< HEAD
         edje_object_part_text_style_user_set(wd->lbl, "elm.text",
               wd->format);
+=======
+        _label_format_set(wd->lbl, wd->format);
+>>>>>>> remotes/origin/upstream
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
         _sizing_eval(obj);
@@ -631,8 +729,12 @@ elm_label_wrap_width_set(Evas_Object *obj, Evas_Coord w)
    if (wd->wrap_w == w) return;
    if (wd->ellipsis)
      {
+<<<<<<< HEAD
         edje_object_part_text_style_user_set(wd->lbl, "elm.text",
               wd->format);
+=======
+        _label_format_set(wd->lbl, wd->format);
+>>>>>>> remotes/origin/upstream
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
      }
    wd->wrap_w = w;
@@ -648,6 +750,7 @@ elm_label_wrap_width_get(const Evas_Object *obj)
    return wd->wrap_w;
 }
 
+<<<<<<< HEAD
 EAPI void
 elm_label_wrap_height_set(Evas_Object *obj,
                           Evas_Coord   h)
@@ -776,6 +879,53 @@ elm_label_background_color_set(Evas_Object *obj,
         wd->bgcolor = 1;
         edje_object_part_swallow(wd->lbl, "label.swallow.background", wd->bg);
      }
+=======
+EINA_DEPRECATED EAPI void
+elm_label_wrap_height_set(Evas_Object *obj __UNUSED__,
+                          Evas_Coord   h __UNUSED__)
+{
+   return;
+}
+
+EINA_DEPRECATED EAPI Evas_Coord
+elm_label_wrap_height_get(const Evas_Object *obj __UNUSED__)
+{
+   return 0;
+}
+
+EINA_DEPRECATED EAPI void
+elm_label_fontsize_set(Evas_Object *obj __UNUSED__,
+                       int fontsize __UNUSED__)
+{
+   return;
+}
+
+EINA_DEPRECATED EAPI void
+elm_label_text_align_set(Evas_Object *obj __UNUSED__,
+                         const char *alignmode __UNUSED__)
+{
+   return;
+}
+
+EINA_DEPRECATED EAPI void
+elm_label_text_color_set(Evas_Object *obj __UNUSED__,
+                         unsigned int r __UNUSED__,
+                         unsigned int g __UNUSED__,
+                         unsigned int b __UNUSED__,
+                         unsigned int a __UNUSED__)
+{
+   return;
+}
+
+EINA_DEPRECATED EAPI void
+elm_label_background_color_set(Evas_Object *obj __UNUSED__,
+                               unsigned int r __UNUSED__,
+                               unsigned int g __UNUSED__,
+                               unsigned int b __UNUSED__,
+                               unsigned int a __UNUSED__)
+{
+   return;
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -800,8 +950,12 @@ elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
    if (_stringshare_key_value_replace(&wd->format,
             "ellipsis", eina_strbuf_string_get(fontbuf), removeflag) == 0)
      {
+<<<<<<< HEAD
         edje_object_part_text_style_user_set(wd->lbl, "elm.text",
               wd->format);
+=======
+        _label_format_set(wd->lbl, wd->format);
+>>>>>>> remotes/origin/upstream
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
         _sizing_eval(obj);
@@ -810,6 +964,18 @@ elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
 
 }
 
+<<<<<<< HEAD
+=======
+EAPI Eina_Bool
+elm_label_ellipsis_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return wd->ellipsis;
+}
+
+>>>>>>> remotes/origin/upstream
 EAPI void
 elm_label_slide_set(Evas_Object *obj,
                     Eina_Bool    slide)
@@ -826,7 +992,11 @@ elm_label_slide_set(Evas_Object *obj,
 }
 
 EAPI Eina_Bool
+<<<<<<< HEAD
 elm_label_slide_get(Evas_Object *obj)
+=======
+elm_label_slide_get(const Evas_Object *obj)
+>>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -849,7 +1019,11 @@ elm_label_slide_duration_set(Evas_Object *obj, double duration)
 }
 
 EAPI double
+<<<<<<< HEAD
 elm_label_slide_duration_get(Evas_Object *obj)
+=======
+elm_label_slide_duration_get(const Evas_Object *obj)
+>>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype) 0.0;
    Widget_Data *wd = elm_widget_data_get(obj);

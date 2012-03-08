@@ -74,10 +74,17 @@ typedef void                                (*SlideshowItemDelFunc)(void *data, 
 struct _Elm_Slideshow_Item_Class
 {
    struct _Elm_Slideshow_Item_Class_Func
+<<<<<<< HEAD
    {
       SlideshowItemGetFunc get;
       SlideshowItemDelFunc del;
    } func;
+=======
+     {
+        SlideshowItemGetFunc get;
+        SlideshowItemDelFunc del;
+     } func;
+>>>>>>> remotes/origin/upstream
 };   /**< #Elm_Slideshow_Item_Class member definitions */
 
 /**
@@ -153,7 +160,11 @@ EAPI Elm_Object_Item      *elm_slideshow_item_sorted_insert(Evas_Object *obj, co
  *
  * @ingroup Slideshow
  */
+<<<<<<< HEAD
 EAPI void                  elm_slideshow_show(Elm_Object_Item *it);
+=======
+EAPI void                  elm_slideshow_item_show(Elm_Object_Item *it);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Slide to the @b next item, in a given slideshow widget
@@ -215,7 +226,14 @@ EAPI void                  elm_slideshow_previous(Evas_Object *obj);
  * @warning The stringshared strings get no new references
  * exclusive to the user grabbing the list, here, so if you'd like
  * to use them out of this call's context, you'd better @c
+<<<<<<< HEAD
  * eina_stringshare_ref() them.
+=======
+ * eina_stringshare_ref() them. Also the list is an internal list and
+ * so is only valid for as long as the slideshow object is valid and
+ * has not internally changed its list for some reason, so make a
+ * copy if you need it around.
+>>>>>>> remotes/origin/upstream
  *
  * @see elm_slideshow_transition_set()
  *
@@ -373,7 +391,11 @@ EAPI Elm_Object_Item      *elm_slideshow_item_current_get(const Evas_Object *obj
  * Get the real Evas object created to implement the view of a
  * given slideshow item
  *
+<<<<<<< HEAD
  * @param item The slideshow item.
+=======
+ * @param it The slideshow item.
+>>>>>>> remotes/origin/upstream
  * @return the Evas object implementing this item's view.
  *
  * This returns the actual Evas object used to implement the
@@ -451,7 +473,11 @@ EAPI const char           *elm_slideshow_layout_get(const Evas_Object *obj);
  *
  * The available layouts for slideshows on the default theme are:
  * - @c "fullscreen" - item images with original aspect, scaled to
+<<<<<<< HEAD
  *   touch top and down slideshow borders or, if the image's heigh
+=======
+ *   touch top and down slideshow borders or, if the image's height
+>>>>>>> remotes/origin/upstream
  *   is not enough, left and right slideshow borders.
  * - @c "not_fullscreen" - the same behavior as the @c "fullscreen"
  *   one, but always leaving 10% of the slideshow's dimensions of

@@ -37,6 +37,13 @@
  *
  * @ref clock_example
  *
+<<<<<<< HEAD
+=======
+ * @ref datetime_example
+ *
+ * @ref dayselector_example
+ *
+>>>>>>> remotes/origin/upstream
  * @ref mapbuf_example
 
  * @ref map_example_01
@@ -1698,6 +1705,94 @@
  */
 
 /**
+<<<<<<< HEAD
+=======
+ * @page datetime_example Datetime widget example
+ *
+ * This code places three Elementary Datetime widgets on a window, each of
+ * them exemplifying the widget's different usage.
+ *
+ * The first of them is <b>"only Date display"</b>:
+ * @dontinclude datetime_example.c
+ * @skip only DATE
+ * @until evas_object_show
+ *
+ * For <b>"only Time display"</b>, see the second datetime:
+ * @dontinclude datetime_example.c
+ * @skip only TIME
+ * @until evas_object_show
+ *
+ * The third one will display datetime shows both <b>Date and Time</b>, corresponding format will be
+ * taken from system @b locale. Note, besides, that the strings are different
+ *  for different language settings.
+ *
+ * <b>Datetime format</b> can be programmatically set by using 
+ * elm_datetime_format_set():
+ * @dontinclude datetime_example.c
+ * @skip DATE and TIME
+ * @until evas_object_show
+ * The default format of any locale consists:
+ * - Year Field
+ * - Month Field
+ * - Date Field
+ * - Hour Field(12hr/24hr format)
+ * - Minute Field
+ * - AM/PM (if exists).
+ *
+ * This is how the example program's window looks like with the datetime widget
+ * showing only date, only time and both date & time:
+ *
+ * @image html screenshots/datetime_example.png
+ * @image latex screenshots/datetime_example.eps width=\textwidth
+ *
+ * See the full @ref datetime_example_c "source code" for
+ * this example.
+ *
+ * @example datetime_example.c
+ */
+
+/**
+ * @page dayselector_example Dayselector widget example
+ *
+ * This code places two Elementary dayselector widgets on a window, each of
+ * them exemplifying the different widget styles.
+ *
+ * The first of them is the dayselector in default style:
+ * @dontinclude dayselector_example.c
+ * @skip weekdays starting from Sunday
+ * @until evas_object_show
+ *
+ * As you see, the default style displays the weekdays starting from Sunday.
+ *
+ * One can select/unselect a day just by clicking on the day object.
+ * The selection toggles once it is being pressed.
+ *
+ *
+ * For showing weekdays starting from Monday, see the second dayselector:
+ * @dontinclude dayselector_example.c
+ * @skip weekdays starting from Monday
+ * @until evas_object_show
+ *
+ *
+ * The following code exemplifies the selection APIs of Dayselector:
+ * @dontinclude dayselector_example.c
+ * @skip Callback function
+ * @until End of clicked callback
+ *
+ *
+ * See the full @ref dayselector_example.c "example", whose window should
+ * look like this picture:
+ *
+ * @image html screenshots/dayselector_example.png
+ * @image latex screenshots/dayselector_example.eps width=\textwidth
+ *
+ * See the full @ref dayselector_example_c "source code" for this example.
+ *
+ * @example dayselector_example.c
+ */
+
+/**
+>>>>>>> remotes/origin/upstream
  * @page mapbuf_example Mapbuf Widget Example
  *
  * This code places a Elementary mapbuf widget on a window,
@@ -1855,18 +1950,28 @@
  */
 
 /**
+<<<<<<< HEAD
  * @page map_example_02 Map Example - Markers Usage
  *
  * This code places a Elementary map widget on a window,
  * to exemplify part of the widget's API, related to markers.
  *
  * We'll start this example the same way
+=======
+ * @page map_example_02 Map Example - Overlay Usage
+ *
+ * This code places a Elementary map widget on a window,
+ * to exemplify part of the widget's API, related to overlays.
+ *
+ * We'll start this example in the same way
+>>>>>>> remotes/origin/upstream
  * @ref map_example_01 "Map Example 1". Adding a map with buttons to control
  * zoom, so if you didn't read it yet, just do it now.
  * @dontinclude map_example_02.c
  * @skipline elm_map_add
  * @until zoom_fill
  *
+<<<<<<< HEAD
  * Markers can be placed over the map to represent anything we want. Let's
  * say we want to represent some countries and cities with markers. To add
  * a mark we need a marker class and also a group class.
@@ -1907,17 +2012,63 @@
  * @skipline marker_add
  * @until data_chile
  * @until append
+=======
+ * Overlays can be placed over the map to represent anything we want. Let's
+ * say we want to represent some countries and cities with overlays. 
+ * 
+ * Before we create city or country overlays, let's create class overlays. 
+ *
+ * @skipline elm_map_overlay_class_add
+ * @until elm_map_overlay_icon_set
+ * These lines create a class overlay which represents cities.
+ * This class overlay will be used for grouping city overlays. 
+ * Later city overlays in the same class are appended to this class overlay. 
+ * if city overlays are near each other, they will be grouped.
+ *
+ * We can set the icon for the class so that the icon will be displayed 
+ * when city overlays are grouped.
+ * We can set the zoom required to display the overlays that belongs
+ * to this class, so if the zoom is less than this value, nothing
+ * will be shown. 
+ * 
+ * Country class can be created in the same way.
+ * @skipline elm_map_overlay_class_add
+ * @until elm_map_overlay_icon_set
+ *
+ * Next we'll create some overlays representing cities and coutries.
+ * We set the data for the overlay so that can be used later when 
+ * clicked callback is called.
+ * We'll append them into city class to be grouped.
+ * We'll append them in a list, to close up them later. 
+ * To create a default overlay, we need to pass the coordinates.
+ * @skipline elm_map_overlay_add
+ * @until eina_list_append
+ *
+ * We subscribe a smart callback "overlay,clicked" to create bubble on 
+ * the clicked overlay.
+ * @dontinclude map_example_02.c
+ * @skipline "overlay,clicked"
+ *
+ * Finally, on our @c main function, we ask the map to show all the overlays
+ * with the biggest zoom possible, passing the list of overlays added.
+ * @skipline elm_map_overlays_show
+>>>>>>> remotes/origin/upstream
  *
  * We have created a specific structure for this example to store the name
  * of the place and a path to a image file to represent it.
  * @dontinclude map_example_02.c
  * @skipline typedef
+<<<<<<< HEAD
  * @until Marker_Data;
+=======
+ * @until Overlay_Data;
+>>>>>>> remotes/origin/upstream
  *
  * We'll create instances for each place:
  * @skipline argentina
  * @until sky_03
  *
+<<<<<<< HEAD
  * Finally, on our @c main function, we ask the map to show all the markers
  * with the biggest zoom possible, passing the list of markers added:
  * @skipline list_show
@@ -1948,6 +2099,16 @@
  * For the content, let's return something more elaboreate. We will return
  * a box with an image representing the place, and the name of this place:
  * @skipline static Evas_Object
+=======
+  * To return an icon, all we need to do is to add a elm_icon and return it:
+ * @dontinclude map_example_02.c
+ * @skipline _icon_get(
+ * @until }
+ *
+ * For the content, let's return something more elaborate. We will return
+ * a box with an image representing the place, and the name of this place:
+ * @skipline _box_get(
+>>>>>>> remotes/origin/upstream
  * @until }
  *
  * See @ref map_example_02.c "map_example_02.c" for full source,
@@ -1972,7 +2133,11 @@
  * start point, and would like that he enters the address of his
  * destination in a entry, and we'll trace a route on the map.
  *
+<<<<<<< HEAD
  * We'll start this example the same way
+=======
+ * We'll start this example in the same way
+>>>>>>> remotes/origin/upstream
  * @ref map_example_01 "Map Example 1". Adding a map with buttons to control
  * zoom, so if you didn't read it yet, just do it now. Actually there is
  * a change, that we're aligning buttons to the top, since we wan't a
@@ -2093,10 +2258,17 @@
  * diskselector will display first item after last, and last previous to
  * the first one. So, as you can see, @b Sa will appears on left side
  * of selected @b Sunday. This property is set with
+<<<<<<< HEAD
  * elm_diskselector_round_set().
  *
  * Also, we decide to display only 2 character for side labels, instead of 3.
  * For this we call elm_diskselector_side_label_length_set(). As result,
+=======
+ * elm_diskselector_round_enabled_set().
+ *
+ * Also, we decide to display only 2 character for side labels, instead of 3.
+ * For this we call elm_diskselector_side_text_max_length_set(). As result,
+>>>>>>> remotes/origin/upstream
  * we'll see @b Mo displayed instead of @b Mon, when @b Monday is on a
  * side position.
  *
@@ -3462,7 +3634,11 @@
   * elm_image_no_scale_set() is used just to set this value to true (we
   * don't want to scale our image anyway, just resize it).
   *
+<<<<<<< HEAD
   * elm_image_scale_set() is used to allow the image to be resized to a size
+=======
+  * elm_image_resizable_set() is used to allow the image to be resized to a size
+>>>>>>> remotes/origin/upstream
   * smaller than the original one, but not to a size bigger than it.
   *
   * elm_elm_image_smooth_set() will disable the smooth scaling, so the scale
@@ -3531,7 +3707,11 @@
   * elm_icon_no_scale_set() is used just to set this value to true (we
   * don't want to scale our icon anyway, just resize it).
   *
+<<<<<<< HEAD
   * elm_icon_scale_set() is used to allow the icon to be resized to a size
+=======
+  * elm_icon_resizable_set() is used to allow the icon to be resized to a size
+>>>>>>> remotes/origin/upstream
   * smaller than the original one, but not to a size bigger than it.
   *
   * elm_elm_icon_smooth_set() will disable the smooth scaling, so the scale
@@ -3925,6 +4105,7 @@
  */
 
 /**
+<<<<<<< HEAD
  * @page tutorial_pager
  * @dontinclude pager_example_01.c
  *
@@ -3970,6 +4151,8 @@
  */
 
 /**
+=======
+>>>>>>> remotes/origin/upstream
  * @page tutorial_separator Separator example
  * @dontinclude separator_example_01.c
  *
@@ -4492,7 +4675,11 @@
  * and the entry itself doesn't, yet, support all the needed capabilities to
  * make this simpler. We begin by getting the format we are using in our
  * function from the button pressed.
+<<<<<<< HEAD
  * @skip aid->pager = pager;
+=======
+ * @skip aid->naviframe = naviframe;
+>>>>>>> remotes/origin/upstream
  * @until sizeof(fmt_close)
  *
  * Next we need to find out if we need to insert an opening or a closing tag.
@@ -4677,7 +4864,11 @@
  * elm_genlist_bounce_set().
  *
  * We also want our list to compress items if they are wider than the list
+<<<<<<< HEAD
  * width (thus we call elm_genlist_compress_mode_set().
+=======
+ * width (thus we call elm_genlist_mode_set(obj, ELM_LIST_COMPRESS).
+>>>>>>> remotes/origin/upstream
  *
  * The items have different width, so they are not homogeneous:
  * elm_genlist_homogeneous_set() is set to false.
@@ -4956,7 +5147,11 @@
  * However, if the @c item1 didn't have any child previously, we have to change
  * it to a parent item now. It would be easy to just change its item class to
  * the parent type, but there's no way to change the item flags and make it be
+<<<<<<< HEAD
  * of the type #ELM_GENLIST_ITEM_SUBITEMS. Thus, we have to delete it and create
+=======
+ * of the type #ELM_GENLIST_ITEM_TREE. Thus, we have to delete it and create
+>>>>>>> remotes/origin/upstream
  * a new item, and add this new item to the same position that the deleted one
  * was. That's the reason of the checks inside the bigger @c if.
  *
@@ -5208,6 +5403,49 @@
  */
 
 /**
+<<<<<<< HEAD
+=======
+ * @page popup_example_01_c popup_example_01.c
+ * @include popup_example_01.c
+ *
+ * This example will initially look like this:
+ *
+ * @image html screenshots/popup_example_01.png
+ * @image latex screenshots/popup_example_01.eps width=\textwidth
+ *
+ * Once the popup is hidden after timeout:
+ *
+ * @image html screenshots/popup_example_01_a.png
+ * @image latex screenshots/popup_example_01_a.eps width=\textwidth
+ *
+ * @example popup_example_01.c
+ */
+
+ /** @page popup_example_02_c popup_example_02.c
+ * @include popup_example_02.c
+ *
+ * This example will look like this:
+ *
+ * @image html screenshots/popup_example_02.png
+ * @image latex screenshots/popup_example_02.eps width=\textwidth
+ *
+ * @example popup_example_02.c
+ */
+
+/**
+ * @page popup_example_03_c popup_example_03.c
+ * @include popup_example_03.c
+ *
+ * This example will look like this:
+ *
+ * @image html screenshots/popup_example_03.png
+ * @image latex screenshots/popup_example_03.eps width=\textwidth
+ *
+ * @example popup_example_03.c
+ */
+
+/**
+>>>>>>> remotes/origin/upstream
  * @page tutorial_frame Frame example
  * @dontinclude frame_example_01.c
  *
@@ -5987,7 +6225,11 @@
  * accordingly and the URL bar needs to show the right address.
  *
  * @skip static void
+<<<<<<< HEAD
  * @until pager_content_promote
+=======
+ * @until naviframe_item_simple_promote
+>>>>>>> remotes/origin/upstream
  * @until }
  *
  * Other updates happen based on events from the web object, like title change
@@ -6232,6 +6474,21 @@
  * @example clock_example.c
  */
 
+<<<<<<< HEAD
+=======
+ /**
+ * @page datetime_example_c Datetime example
+ * @include datetime_example.c
+ * @example datetime_example.c
+ */
+
+/**
+ * @page dayselector_example_c Dayselector example
+ * @include dayselector_example.c
+ * @example dayselector_example.c
+ */
+
+>>>>>>> remotes/origin/upstream
 /**
  * @page flipselector_example_c Flipselector example
  * @include flipselector_example.c

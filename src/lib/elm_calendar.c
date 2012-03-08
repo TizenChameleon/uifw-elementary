@@ -26,7 +26,11 @@ struct _Widget_Data
    int year_min, year_max, spin_speed;
    int today_it, selected_it, first_day_it;
    Ecore_Timer *spin, *update_timer;
+<<<<<<< HEAD
    char * (*format_func) (struct tm *selected_time);
+=======
+   Elm_Calendar_Format_Cb format_func;
+>>>>>>> remotes/origin/upstream
    const char *weekdays[7];
    struct tm current_time, selected_time;
    Day_Color day_color[42]; // EINA_DEPRECATED
@@ -39,7 +43,11 @@ struct _Elm_Calendar_Mark
    Eina_List *node;
    struct tm mark_time;
    const char *mark_type;
+<<<<<<< HEAD
    Elm_Calendar_Mark_Repeat repeat;
+=======
+   Elm_Calendar_Mark_Repeat_Type repeat;
+>>>>>>> remotes/origin/upstream
 };
 
 static const char *widtype = NULL;
@@ -69,7 +77,11 @@ static int _days_in_month[2][12] =
 };
 
 static Elm_Calendar_Mark *
+<<<<<<< HEAD
 _mark_new(Evas_Object *obj, const char *mark_type, struct tm *mark_time, Elm_Calendar_Mark_Repeat repeat)
+=======
+_mark_new(Evas_Object *obj, const char *mark_type, struct tm *mark_time, Elm_Calendar_Mark_Repeat_Type repeat)
+>>>>>>> remotes/origin/upstream
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Elm_Calendar_Mark *mark;
@@ -197,6 +209,7 @@ _text_day_color_update(Widget_Data *wd, int pos)
    edje_object_signal_emit(wd->calendar, emission, "elm");
 }
 
+<<<<<<< HEAD
 // EINA_DEPRECATED
 static void
 _text_day_color_set(Widget_Data *wd, Day_Color col, int pos)
@@ -207,6 +220,8 @@ _text_day_color_set(Widget_Data *wd, Day_Color col, int pos)
    _text_day_color_update(wd, pos);
 }
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 _set_month_year(Widget_Data *wd)
 {
@@ -226,7 +241,11 @@ _set_month_year(Widget_Data *wd)
 static void
 _populate(Evas_Object *obj)
 {
+<<<<<<< HEAD
    int maxdays, day, mon, year, i;
+=======
+   int maxdays, day, mon, yr, i;
+>>>>>>> remotes/origin/upstream
    Elm_Calendar_Mark *mark;
    char part[12], day_s[3];
    struct tm first_day;
@@ -240,7 +259,11 @@ _populate(Evas_Object *obj)
 
    maxdays = _maxdays_get(&wd->selected_time);
    mon = wd->selected_time.tm_mon;
+<<<<<<< HEAD
    year = wd->selected_time.tm_year;
+=======
+   yr = wd->selected_time.tm_year;
+>>>>>>> remotes/origin/upstream
 
    _set_month_year(wd);
 
@@ -300,7 +323,11 @@ _populate(Evas_Object *obj)
 
         if ((day == wd->current_time.tm_mday)
             && (mon == wd->current_time.tm_mon)
+<<<<<<< HEAD
             && (year == wd->current_time.tm_year))
+=======
+            && (yr == wd->current_time.tm_year))
+>>>>>>> remotes/origin/upstream
           _today(wd, i);
 
         if (day == wd->selected_time.tm_mday)
@@ -718,7 +745,10 @@ elm_calendar_add(Evas_Object *parent)
    Widget_Data *wd;
    int i, t;
    Evas *e;
+<<<<<<< HEAD
    struct tm weekday_time;
+=======
+>>>>>>> remotes/origin/upstream
 
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
@@ -766,8 +796,12 @@ elm_calendar_add(Evas_Object *parent)
          * just make it larger. :| */
         char buf[20];
         /* I don't know of a better way of doing it */
+<<<<<<< HEAD
         gmtime_r(&weekday, &weekday_time);
         if (strftime(buf, sizeof(buf), "%a", &weekday_time))
+=======
+        if (strftime(buf, sizeof(buf), "%a", gmtime(&weekday)))
+>>>>>>> remotes/origin/upstream
           {
              wd->weekdays[i] = eina_stringshare_add(buf);
           }
@@ -870,6 +904,7 @@ elm_calendar_min_max_year_get(const Evas_Object *obj, int *min, int *max)
    if (max) *max = wd->year_max + 1900;
 }
 
+<<<<<<< HEAD
 EAPI void
 elm_calendar_day_selection_enabled_set(Evas_Object *obj, Eina_Bool enabled)
 {
@@ -878,11 +913,28 @@ elm_calendar_day_selection_enabled_set(Evas_Object *obj, Eina_Bool enabled)
    if (!wd) return;
    wd->selection_enabled = enabled;
    if (enabled)
+=======
+EINA_DEPRECATED EAPI void
+elm_calendar_day_selection_enabled_set(Evas_Object *obj, Eina_Bool enabled)
+{
+   elm_calendar_day_selection_disabled_set(obj, !enabled);
+}
+
+EAPI void
+elm_calendar_day_selection_disabled_set(Evas_Object *obj, Eina_Bool disabled)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->selection_enabled = (!disabled);
+   if (!disabled)
+>>>>>>> remotes/origin/upstream
      _select(wd, wd->selected_it);
    else
      _unselect(wd, wd->selected_it);
 }
 
+<<<<<<< HEAD
 EAPI Eina_Bool
 elm_calendar_day_selection_enabled_get(const Evas_Object *obj)
 {
@@ -890,6 +942,21 @@ elm_calendar_day_selection_enabled_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
    return wd->selection_enabled;
+=======
+EINA_DEPRECATED EAPI Eina_Bool
+elm_calendar_day_selection_enabled_get(const Evas_Object *obj)
+{
+   return (!elm_calendar_day_selection_disabled_get(obj));
+}
+
+EAPI Eina_Bool
+elm_calendar_day_selection_disabled_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return (!wd->selection_enabled);
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -917,7 +984,11 @@ elm_calendar_selected_time_get(const Evas_Object *obj, struct tm *selected_time)
 }
 
 EAPI void
+<<<<<<< HEAD
 elm_calendar_format_function_set(Evas_Object *obj, char * (*format_function) (struct tm *selected_time))
+=======
+elm_calendar_format_function_set(Evas_Object *obj, Elm_Calendar_Format_Cb format_function)
+>>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -927,7 +998,11 @@ elm_calendar_format_function_set(Evas_Object *obj, char * (*format_function) (st
 }
 
 EAPI Elm_Calendar_Mark *
+<<<<<<< HEAD
 elm_calendar_mark_add(Evas_Object *obj, const char *mark_type, struct tm *mark_time, Elm_Calendar_Mark_Repeat repeat)
+=======
+elm_calendar_mark_add(Evas_Object *obj, const char *mark_type, struct tm *mark_time, Elm_Calendar_Mark_Repeat_Type repeat)
+>>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -985,6 +1060,7 @@ elm_calendar_marks_draw(Evas_Object *obj)
    if (!wd) return;
    _populate(obj);
 }
+<<<<<<< HEAD
 
 EINA_DEPRECATED EAPI void
 elm_calendar_text_saturday_color_set(Evas_Object *obj, int pos)
@@ -1012,3 +1088,5 @@ elm_calendar_text_weekday_color_set(Evas_Object *obj, int pos)
    if (!wd) return;
    _text_day_color_set(wd, DAY_WEEKDAY, pos);
 }
+=======
+>>>>>>> remotes/origin/upstream

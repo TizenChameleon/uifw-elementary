@@ -9,8 +9,14 @@
  * and Elementary provides functions to choose them (think of X11
  * cursors, as an example).
  *
+<<<<<<< HEAD
  * There's also the possibility of, besides using engine provided
  * cursors, also use ones coming from Edje theming files. Both
+=======
+ * By default, Elementary searches cursors only from engine.
+ * There's also the possibility of, besides using engine provided
+ * cursors, also use the ones coming from Edje theme files. Both
+>>>>>>> remotes/origin/upstream
  * globally and per widget, Elementary makes it possible for one to
  * make the cursors lookup to be held on engines only or on
  * Elementary's theme file, too. To set cursor's hot spot,
@@ -90,17 +96,30 @@ EAPI const char *elm_object_cursor_style_get(const Evas_Object *obj);
  * Set if the cursor set should be searched on the theme or should use
  * the provided by the engine, only.
  *
+<<<<<<< HEAD
  * @note before you set if should look on theme you should define a cursor
  * with elm_object_cursor_set(). By default it will only look for cursors
  * provided by the engine.
  *
  * @param obj an object with cursor already set.
  * @param engine_only boolean to define it cursors should be looked only
+=======
+ * @note before you set engine_only you should define a cursor with
+ * elm_object_cursor_set(). By default it will only look for cursors
+ * provided by the engine.
+ *
+ * @param obj an object with cursor already set.
+ * @param engine_only boolean to define if cursors should be looked only
+>>>>>>> remotes/origin/upstream
  * between the provided by the engine or searched on widget's theme as well.
  *
  * @ingroup Cursors
  */
+<<<<<<< HEAD
 EAPI void        elm_object_cursor_engine_only_set(Evas_Object *obj, Eina_Bool engine_only);
+=======
+EAPI void elm_object_cursor_theme_search_enabled_set(Evas_Object *obj, Eina_Bool theme_search);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Get the cursor engine only usage for this object cursor.
@@ -113,6 +132,7 @@ EAPI void        elm_object_cursor_engine_only_set(Evas_Object *obj, Eina_Bool e
  *
  * @ingroup Cursors
  */
+<<<<<<< HEAD
 EAPI Eina_Bool   elm_object_cursor_engine_only_get(const Evas_Object *obj);
 
 /**
@@ -137,6 +157,9 @@ EAPI int         elm_cursor_engine_only_get(void);
  * @ingroup Cursors
  */
 EAPI Eina_Bool   elm_cursor_engine_only_set(int engine_only);
+=======
+EAPI Eina_Bool elm_object_cursor_theme_search_enabled_get(const Evas_Object *obj);
+>>>>>>> remotes/origin/upstream
 
 /**
  * @}

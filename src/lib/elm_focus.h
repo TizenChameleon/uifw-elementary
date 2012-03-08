@@ -12,7 +12,11 @@
  * objects by input (tab key) or programmatically. The default
  * focus chain for an application is the one define by the order in
  * which the widgets where added in code. One will cycle through
+<<<<<<< HEAD
  * top level widgets, and, for each one containg sub-objects, cycle
+=======
+ * top level widgets, and, for each one containing sub-objects, cycle
+>>>>>>> remotes/origin/upstream
  * through them all, before returning to the level
  * above. Elementary also allows one to set @b custom focus chains
  * for their applications.
@@ -33,6 +37,7 @@
  */
 
 /**
+<<<<<<< HEAD
  * Get the enable status of the focus highlight
  *
  * This gets whether the highlight on focused objects is enabled or not
@@ -75,6 +80,8 @@ EAPI Eina_Bool            elm_focus_highlight_animate_get(void);
 EAPI void                 elm_focus_highlight_animate_set(Eina_Bool animate);
 
 /**
+=======
+>>>>>>> remotes/origin/upstream
  * Get the whether an Elementary object has the focus or not.
  *
  * @param obj The Elementary object to get the information from
@@ -107,7 +114,11 @@ EAPI Eina_Bool            elm_object_focus_get(const Evas_Object *obj);
 EAPI void                 elm_object_focus_set(Evas_Object *obj, Eina_Bool focus);
 
 /**
+<<<<<<< HEAD
  * Set the ability for an Element object to be focused
+=======
+ * Set the ability for an Elementary object to be focused
+>>>>>>> remotes/origin/upstream
  *
  * @param obj The Elementary object to operate on
  * @param enable @c EINA_TRUE if the object can be focused, @c
@@ -212,6 +223,7 @@ EAPI void                 elm_object_focus_custom_chain_prepend(Evas_Object *obj
  * first object of chain.
  *
  * @param obj The object root of sub-tree
+<<<<<<< HEAD
  * @param dir Direction to cycle the focus
  *
  * @ingroup Focus
@@ -239,6 +251,21 @@ EAPI void                 elm_object_focus_direction_go(Evas_Object *obj, int x,
  * @param obj The Elementary object to operate on
  * @param tree_unfocusable @c EINA_TRUE for unfocusable,
  *        @c EINA_FALSE for focusable.
+=======
+ * @param dir Direction to move the focus
+ *
+ * @ingroup Focus
+ */
+EAPI void                 elm_object_focus_next(Evas_Object *obj, Elm_Focus_Direction dir);
+
+/**
+ * Make the elementary object and its children to be focusable
+ * (or unfocusable).
+ *
+ * @param obj The Elementary object to operate on
+ * @param focusable @c EINA_TRUE for focusable,
+ *        @c EINA_FALSE for unfocusable.
+>>>>>>> remotes/origin/upstream
  *
  * This sets whether the object @p obj and its children objects
  * are able to take focus or not. If the tree is set as unfocusable,
@@ -248,6 +275,7 @@ EAPI void                 elm_object_focus_direction_go(Evas_Object *obj, int x,
  * want to get focus (by focus reverting or by other focus controls).
  * Then, just use this API before deleting.
  *
+<<<<<<< HEAD
  * @see elm_object_tree_unfocusable_get()
  *
  * @ingroup Focus
@@ -266,3 +294,24 @@ EAPI void                 elm_object_tree_unfocusable_set(Evas_Object *obj, Eina
  * @ingroup Focus
  */
 EAPI Eina_Bool            elm_object_tree_unfocusable_get(const Evas_Object *obj);
+=======
+ * @see elm_object_tree_focus_allow_get()
+ *
+ * @ingroup Focus
+ *
+ */
+EAPI void                 elm_object_tree_focus_allow_set(Evas_Object *obj, Eina_Bool focusable);
+
+/**
+ * Get whether an Elementary object and its children are focusable or not.
+ *
+ * @param obj The Elementary object to get the information from
+ * @return @c EINA_TRUE, if the tree is focusable,
+ *         @c EINA_FALSE if not (and on errors).
+ *
+ * @see elm_object_tree_focus_allow_set()
+ *
+ * @ingroup Focus
+ */
+EAPI Eina_Bool            elm_object_tree_focus_allow_get(const Evas_Object *obj);
+>>>>>>> remotes/origin/upstream

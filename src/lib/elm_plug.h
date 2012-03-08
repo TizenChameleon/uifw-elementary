@@ -1,6 +1,7 @@
 /**
  * @defgroup Plug Plug
  *
+<<<<<<< HEAD
  *
  * An object that allows one to show an image which other process created. 
  * It can be used anywhere like any other elementary widget.
@@ -10,6 +11,11 @@
  * If more functionality is needed, it will be added. 
  *
  *
+=======
+ * An object that allows one to show an image which other process created. 
+ * It can be used anywhere like any other elementary widget.
+ *
+>>>>>>> remotes/origin/upstream
  */
 
 /**
@@ -23,7 +29,10 @@
  * @param parent The parent object
  * @return The new plug image object or NULL if it cannot be created
  *
+<<<<<<< HEAD
  *
+=======
+>>>>>>> remotes/origin/upstream
  * @ingroup Plug
  */
 EAPI Evas_Object    *elm_plug_add(Evas_Object *parent);
@@ -31,6 +40,7 @@ EAPI Evas_Object    *elm_plug_add(Evas_Object *parent);
 /**
  * Connect a plug widget to service provided by socket image.
  *
+<<<<<<< HEAD
  * @param ee_target The Ecore_Evas containing the canvas in which the new image object will live.
  * @param svcname The service name to connect to set up by the socket.
  * @param svcnum The service number to connect to (set up by socket).
@@ -41,6 +51,16 @@ EAPI Evas_Object    *elm_plug_add(Evas_Object *parent);
  * @ingroup Plug
  */
 
+=======
+ * @param obj The Evas_Object where the new image object will live.
+ * @param svcname The service name to connect to set up by the socket.
+ * @param svcnum The service number to connect to (set up by socket).
+ * @param svcsys Boolean to set if the service is a system one or not (set up by socket).
+ * @return (@c EINA_TRUE = success, @c EINA_FALSE = error)
+ *
+ * @ingroup Plug
+ */
+>>>>>>> remotes/origin/upstream
 EAPI Eina_Bool       elm_plug_connect(Evas_Object *obj, const char *svcname, int svcnum, Eina_Bool svcsys);
 
 /**

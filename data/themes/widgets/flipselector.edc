@@ -379,6 +379,10 @@ group { name: "elm/flipselector/base/default";
 
       part { name: "arrow_top";
          mouse_events: 0;
+<<<<<<< HEAD
+=======
+         clip_to: "disclip";
+>>>>>>> remotes/origin/upstream
          scale: 1;
          description { state: "default" 0.0;
             min: 15 15;
@@ -395,6 +399,10 @@ group { name: "elm/flipselector/base/default";
       }
       part { name: "arrow_bottom";
          mouse_events: 0;
+<<<<<<< HEAD
+=======
+         clip_to: "disclip";
+>>>>>>> remotes/origin/upstream
          scale: 1;
          description { state: "default" 0.0;
             min: 15 15;
@@ -414,6 +422,10 @@ group { name: "elm/flipselector/base/default";
          type: RECT;
          mouse_events: 0;
          name: "top_clipper";
+<<<<<<< HEAD
+=======
+         clip_to: "disclip";
+>>>>>>> remotes/origin/upstream
          description {
             state: "default" 0.0;
             rel1.to: "t";
@@ -426,6 +438,10 @@ group { name: "elm/flipselector/base/default";
          type: RECT;
          mouse_events: 0;
          name: "bottom_clipper";
+<<<<<<< HEAD
+=======
+         clip_to: "disclip";
+>>>>>>> remotes/origin/upstream
          description {
             state: "default" 0.0;
             rel1.to: "b";
@@ -433,6 +449,38 @@ group { name: "elm/flipselector/base/default";
             visible: 1;
          }
       }
+<<<<<<< HEAD
+=======
+
+      part {
+         type: RECT;
+         name: "disclip";
+         description {
+            state: "default" 0.0;
+            color: 255 255 255 255;
+         }
+         description {
+            state: "enabled" 0.0;
+            color: 100 100 100 100;
+         }
+      }
+
+      part {
+         type: RECT;
+         name: "event_blocker";
+         description {
+            state: "default" 0.0;
+            color: 0 0 0 0;
+            visible: 0;
+         }
+         description {
+            state: "enabled" 0.0;
+            inherit: "default" 0.0;
+            visible: 1;
+         }
+      }
+
+>>>>>>> remotes/origin/upstream
    }
 
    programs {
@@ -487,5 +535,22 @@ group { name: "elm/flipselector/base/default";
          source: "b";
          action: SIGNAL_EMIT "elm,action,down,stop" "";
       }
+<<<<<<< HEAD
+=======
+      program { name: "disable";
+         signal: "elm,state,disabled";
+         source: "elm";
+         action: STATE_SET "enabled" 0.0;
+         target: "disclip";
+         target: "event_blocker";
+      }
+       program { name: "enable";
+         signal: "elm,state,enabled";
+         source: "elm";
+         action: STATE_SET "default" 0.0;
+         target: "disclip";
+         target: "event_blocker";
+       }
+>>>>>>> remotes/origin/upstream
    }
 }

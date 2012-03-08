@@ -33,8 +33,11 @@ elementary_test_SOURCES = \
 test.c \
 test_3d.c \
 test_actionslider.c \
+<<<<<<< HEAD
 test_anchorblock.c \
 test_anchorview.c \
+=======
+>>>>>>> remotes/origin/upstream
 test_anim.c \
 test_bg.c \
 test_box.c \
@@ -48,9 +51,18 @@ test_colorselector.c \
 test_conform.c \
 test_ctxpopup.c \
 test_cursor.c \
+<<<<<<< HEAD
 test_diskselector.c \
 test_entry.c \
 test_factory.c \
+=======
+test_datetime.c \
+test_dayselector.c \
+test_diskselector.c \
+test_entry.c \
+test_entry_anchor.c \
+test_entry_anchor2.c \
+>>>>>>> remotes/origin/upstream
 test_fileselector_button.c \
 test_fileselector.c \
 test_fileselector_entry.c \
@@ -86,11 +98,18 @@ test_multi.c \
 test_multibuttonentry.c \
 test_naviframe.c \
 test_notify.c \
+<<<<<<< HEAD
 test_pager.c \
+=======
+>>>>>>> remotes/origin/upstream
 test_panel.c \
 test_panes.c \
 test_photo.c \
 test_photocam.c \
+<<<<<<< HEAD
+=======
+test_popup.c \
+>>>>>>> remotes/origin/upstream
 test_progressbar.c \
 test_radio.c \
 test_scaling.c \
@@ -113,7 +132,12 @@ test_web.c \
 test_win_inline.c \
 test_win_socket.c \
 test_win_plug.c \
+<<<<<<< HEAD
 test_win_state.c
+=======
+test_win_state.c \
+test.h
+>>>>>>> remotes/origin/upstream
 
 if HAVE_EIO
 elementary_test_SOURCES += test_eio.c
@@ -169,8 +193,18 @@ elementary_testql_LTLIBRARIES = elementary_testql.la
 elementary_testql_la_SOURCES = $(elementary_test_SOURCES)
 elementary_testql_la_LIBADD = $(top_builddir)/src/lib/libelementary.la \
 	@ELEMENTARY_EWEATHER_LIBS@ \
+<<<<<<< HEAD
 	@EIO_LIBS@ \
 	@ELEMENTARY_WEB_LIBS@
+=======
+	@ELEMENTARY_EDBUS_LIBS@ \
+	@ELEMENTARY_EFREET_LIBS@ \
+	@ELEMENTARY_EMAP_LIBS@ \
+	@ELEMENTARY_LIBS@ \
+	@EIO_LIBS@ \
+	@ELEMENTARY_WEB_LIBS@ \
+	@my_libs@
+>>>>>>> remotes/origin/upstream
 
 elementary_testql_la_CFLAGS =
 elementary_testql_la_LDFLAGS = -module -avoid-version -no-undefined
@@ -188,3 +222,9 @@ elementary_testql_LDADD = $(top_builddir)/src/lib/libelementary.la \
 elementary_testql_CFLAGS = -DELM_LIB_QUICKLAUNCH=1
 elementary_testql_LDFLAGS =
 endif
+<<<<<<< HEAD
+=======
+
+EXTRA_DIST = \
+test_factory.c
+>>>>>>> remotes/origin/upstream

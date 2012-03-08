@@ -18,6 +18,7 @@ ico_bubble.png \
 ico_button.png \
 ico_check.png \
 ico_clock.png \
+<<<<<<< HEAD
 ico_colorpalette.png\
 ico_datefield.png \
 ico_fileselector.png \
@@ -30,12 +31,23 @@ ico_list.png \
 ico_map.png \
 ico_nocontents.png \
 ico_page_control.png \
+=======
+ico_fileselector.png \
+ico_fileselector_button.png \
+ico_genlist.png \
+ico_hoversel.png \
+ico_list.png \
+ico_map.png \
+>>>>>>> remotes/origin/upstream
 ico_notepad.png \
 ico_photocam.png \
 ico_progressbar.png \
 ico_radio.png \
 ico_scrolled_entry.png \
+<<<<<<< HEAD
 ico_scroller.png \
+=======
+>>>>>>> remotes/origin/upstream
 ico_slider.png \
 ico_slideshow.png \
 ico_spinner.png \

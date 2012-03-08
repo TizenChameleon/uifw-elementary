@@ -94,7 +94,10 @@ test "x$RPM_BUILD_ROOT" != "x/" && rm -rf $RPM_BUILD_ROOT
 %{_datadir}/elementary/config/default/*
 %{_datadir}/elementary/config/illume/*
 %{_datadir}/elementary/config/standard/*
+<<<<<<< HEAD
 %{_datadir}/elementary/config/slp/*
+=======
+>>>>>>> remotes/origin/upstream
 %{_datadir}/elementary/edje_externals/*
 %{_datadir}/elementary/images/*
 %{_datadir}/elementary/objects/*

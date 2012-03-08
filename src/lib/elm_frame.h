@@ -6,7 +6,11 @@
  *
  * @brief Frame is a widget that holds some content and has a title.
  *
+<<<<<<< HEAD
  * The default look is a frame with a title, but Frame supports multple
+=======
+ * The default look is a frame with a title, but Frame supports multiple
+>>>>>>> remotes/origin/upstream
  * styles:
  * @li default
  * @li pad_small
@@ -21,7 +25,11 @@
  * Smart callbacks one can listen to:
  * - @c "clicked" - The user has clicked the frame's label
  *
+<<<<<<< HEAD
  * Default contents parts of the frame widget that you can use for are:
+=======
+ * Default content parts of the frame widget that you can use for are:
+>>>>>>> remotes/origin/upstream
  * @li "default" - A content of the frame
  *
  * Default text parts of the frame widget that you can use for are:
@@ -50,13 +58,21 @@ EAPI Evas_Object                 *elm_frame_add(Evas_Object *parent);
 /**
  * @brief Toggle autocollapsing of a frame
  * @param obj The frame
+<<<<<<< HEAD
  * @param enable Whether to enable autocollapse
+=======
+ * @param autocollapse Whether to enable autocollapse
+>>>>>>> remotes/origin/upstream
  *
  * When @p enable is EINA_TRUE, clicking a frame's label will collapse the frame
  * vertically, shrinking it to the height of the label.
  * By default, this is DISABLED.
  */
+<<<<<<< HEAD
 EAPI void elm_frame_autocollapse_set(Evas_Object *obj, Eina_Bool enable);
+=======
+EAPI void elm_frame_autocollapse_set(Evas_Object *obj, Eina_Bool autocollapse);
+>>>>>>> remotes/origin/upstream
 
 /**
  * @brief Determine autocollapsing of a frame
@@ -67,7 +83,11 @@ EAPI void elm_frame_autocollapse_set(Evas_Object *obj, Eina_Bool enable);
  * vertically, shrinking it to the height of the label.
  * By default, this is DISABLED.
  */
+<<<<<<< HEAD
 EAPI Eina_Bool elm_frame_autocollapse_get(Evas_Object *obj);
+=======
+EAPI Eina_Bool elm_frame_autocollapse_get(const Evas_Object *obj);
+>>>>>>> remotes/origin/upstream
 
 /**
  * @brief Manually collapse a frame without animations
@@ -79,6 +99,7 @@ EAPI Eina_Bool elm_frame_autocollapse_get(Evas_Object *obj);
 EAPI void elm_frame_collapse_set(Evas_Object *obj, Eina_Bool collapse);
 
 /**
+<<<<<<< HEAD
  * @brief Manually collapse a frame with animations
  * @param obj The frame
  * @param collapse true to collapse, false to expand
@@ -96,5 +117,25 @@ EAPI void elm_frame_collapse_go(Evas_Object *obj, Eina_Bool collapse);
  */
 EAPI Eina_Bool elm_frame_collapse_get(Evas_Object *obj);
 /**
+=======
+ * @brief Determine the collapse state of a frame
+ * @param obj The frame
+ * @return true if collapsed, false otherwise
+ *
+ * Use this to determine the collapse state of a frame.
+ */
+EAPI Eina_Bool elm_frame_collapse_get(const Evas_Object *obj);
+
+/**
+ * @brief Manually collapse a frame with animations
+ * @param obj The frame
+ * @param collapse true to collapse, false to expand
+ *
+ * Use this to toggle the collapsed state of a frame, triggering animations.
+ */
+EAPI void elm_frame_collapse_go(Evas_Object *obj, Eina_Bool collapse);
+
+/*
+>>>>>>> remotes/origin/upstream
  * @}
  */

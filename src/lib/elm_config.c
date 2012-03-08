@@ -15,6 +15,10 @@ Elm_Config *_elm_config = NULL;
 char *_elm_profile = NULL;
 static Eet_Data_Descriptor *_config_edd = NULL;
 static Eet_Data_Descriptor *_config_font_overlay_edd = NULL;
+<<<<<<< HEAD
+=======
+const char *_elm_preferred_engine = NULL;
+>>>>>>> remotes/origin/upstream
 
 static Ecore_Poller *_elm_cache_flush_poller = NULL;
 
@@ -287,7 +291,10 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, bring_in_scroll_friction, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, zoom_friction, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, thumbscroll_bounce_enable, T_UCHAR);
+<<<<<<< HEAD
    ELM_CONFIG_VAL(D, T, scroll_smooth_time_interval, T_DOUBLE);
+=======
+>>>>>>> remotes/origin/upstream
    ELM_CONFIG_VAL(D, T, scroll_smooth_amount, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, scroll_smooth_history_weight, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, scroll_smooth_future_time, T_DOUBLE);
@@ -334,6 +341,12 @@ _desc_init(void)
    ELM_CONFIG_VAL(D, T, glayer_long_tap_start_timeout, T_DOUBLE);
    ELM_CONFIG_VAL(D, T, access_mode, T_INT);
    ELM_CONFIG_VAL(D, T, glayer_continues_enable, T_UCHAR);
+<<<<<<< HEAD
+=======
+   ELM_CONFIG_VAL(D, T, week_start, T_INT);
+   ELM_CONFIG_VAL(D, T, weekend_start, T_INT);
+   ELM_CONFIG_VAL(D, T, weekend_len, T_INT);
+>>>>>>> remotes/origin/upstream
 #undef T
 #undef D
 #undef T_INT
@@ -538,6 +551,10 @@ _elm_config_text_classes_get(void)
      {
         Elm_Text_Class *tc;
         tc = malloc(sizeof(*tc));
+<<<<<<< HEAD
+=======
+        if (!tc) continue;
+>>>>>>> remotes/origin/upstream
 
         *tc = _elm_text_classes[i];
 
@@ -559,7 +576,11 @@ _elm_config_text_classes_free(Eina_List *l)
 Eina_List *
 _elm_config_profiles_list(void)
 {
+<<<<<<< HEAD
    const Eina_File_Direct_Info *info;
+=======
+   Eina_File_Direct_Info *info;
+>>>>>>> remotes/origin/upstream
    Eina_List *flist = NULL;
    Eina_Iterator *file_it;
    char buf[PATH_MAX];
@@ -579,6 +600,16 @@ _elm_config_profiles_list(void)
 
    EINA_ITERATOR_FOREACH(file_it, info)
      {
+<<<<<<< HEAD
+=======
+        Eina_Stat st;
+
+        if (eina_file_statat(eina_iterator_container_get(file_it), info, &st))
+          {
+             ERR("this is bad.");
+             continue;
+          }
+>>>>>>> remotes/origin/upstream
         if (info->name_length >= len)
           continue;
 
@@ -743,7 +774,11 @@ _config_sub_apply(void)
 static Eina_Bool
 _elm_cache_flush_cb(void *data __UNUSED__)
 {
+<<<<<<< HEAD
    elm_all_flush();
+=======
+   elm_cache_all_flush();
+>>>>>>> remotes/origin/upstream
    return ECORE_CALLBACK_RENEW;
 }
 
@@ -756,7 +791,11 @@ _elm_recache(void)
    Eina_List *l;
    Evas_Object *win;
 
+<<<<<<< HEAD
    elm_all_flush();
+=======
+   elm_cache_all_flush();
+>>>>>>> remotes/origin/upstream
 
    EINA_LIST_FOREACH(_elm_win_list, l, win)
      {
@@ -842,8 +881,13 @@ _config_load(void)
     * profile. Fallback to default before moving on */
 
    // config load fail - defaults
+<<<<<<< HEAD
    /* XXX: do these make sense? Only if it's valid to install the lib
     * without the config, but do we want that? */
+=======
+   // why are these here? well if they are, it means you can make a gui
+   // config recovery app i guess...
+>>>>>>> remotes/origin/upstream
    _elm_config = ELM_NEW(Elm_Config);
    _elm_config->config_version = ELM_CONFIG_VERSION;
    _elm_config->engine = eina_stringshare_add("software_x11");
@@ -859,7 +903,10 @@ _config_load(void)
    _elm_config->zoom_friction = 0.5;
    _elm_config->thumbscroll_border_friction = 0.5;
    _elm_config->thumbscroll_sensitivity_friction = 0.25; // magic number! just trial and error shows this makes it behave "nicer" and not run off at high speed all the time
+<<<<<<< HEAD
    _elm_config->scroll_smooth_time_interval = 0.008;
+=======
+>>>>>>> remotes/origin/upstream
    _elm_config->scroll_smooth_amount = 1.0;
    _elm_config->scroll_smooth_history_weight = 0.3;
    _elm_config->scroll_smooth_future_time = 0.0;
@@ -905,6 +952,12 @@ _config_load(void)
    _elm_config->glayer_flick_time_limit_ms = 120;              /* ms to finish flick */
    _elm_config->glayer_long_tap_start_timeout = 1.2;   /* 1.2 second to start long-tap */
    _elm_config->glayer_continues_enable = EINA_TRUE;      /* Continue gestures default */
+<<<<<<< HEAD
+=======
+   _elm_config->week_start = 1; /* monday */
+   _elm_config->weekend_start = 6; /* saturday */
+   _elm_config->weekend_len = 2;
+>>>>>>> remotes/origin/upstream
 }
 
 static const char *
@@ -1035,7 +1088,11 @@ _elm_config_save(void)
    ok = ecore_file_mkpath(buf);
    if (!ok)
      {
+<<<<<<< HEAD
         ERR("Problem acessing Elementary's user configuration directory: %s",
+=======
+        ERR("Problem accessing Elementary's user configuration directory: %s",
+>>>>>>> remotes/origin/upstream
             buf);
         return EINA_FALSE;
      }
@@ -1257,8 +1314,11 @@ _env_get(void)
 
         _elm_config->thumbscroll_sensitivity_friction = friction;
      }
+<<<<<<< HEAD
    s = getenv("ELM_SCROLL_SMOOTH_TIME_INTERVAL");
    if (s) _elm_config->scroll_smooth_time_interval = atof(s);
+=======
+>>>>>>> remotes/origin/upstream
    s = getenv("ELM_SCROLL_SMOOTH_AMOUNT");
    if (s) _elm_config->scroll_smooth_amount = atof(s);
    s = getenv("ELM_SCROLL_SMOOTH_HISTORY_WEIGHT");
@@ -1397,18 +1457,551 @@ _env_get(void)
 }
 
 EAPI Eina_Bool
+<<<<<<< HEAD
 elm_mirrored_get(void)
+=======
+elm_config_mirrored_get(void)
+>>>>>>> remotes/origin/upstream
 {
    return _elm_config->is_mirrored;
 }
 
 EAPI void
+<<<<<<< HEAD
 elm_mirrored_set(Eina_Bool mirrored)
+=======
+elm_config_mirrored_set(Eina_Bool mirrored)
+>>>>>>> remotes/origin/upstream
 {
    _elm_config->is_mirrored = mirrored;
    _elm_rescale();
 }
 
+<<<<<<< HEAD
+=======
+EAPI Eina_Bool
+elm_config_cursor_engine_only_get(void)
+{
+   return _elm_config->cursor_engine_only;
+}
+
+EAPI void
+elm_config_cursor_engine_only_set(Eina_Bool engine_only)
+{
+   engine_only = !!engine_only;
+   _elm_config->cursor_engine_only = engine_only;
+}
+
+EINA_DEPRECATED EAPI double
+elm_tooltip_delay_get(void)
+{
+   return elm_config_tooltip_delay_get();
+}
+
+EINA_DEPRECATED EAPI Eina_Bool
+elm_tooltip_delay_set(double delay)
+{
+   elm_config_tooltip_delay_set(delay);
+   return EINA_TRUE;
+}
+
+EAPI double
+elm_config_tooltip_delay_get(void)
+{
+   return _elm_config->tooltip_delay;
+}
+
+EAPI void
+elm_config_tooltip_delay_set(double delay)
+{
+   if (delay < 0.0) return;
+   _elm_config->tooltip_delay = delay;
+}
+
+EAPI double
+elm_config_scale_get(void)
+{
+   return _elm_config->scale;
+}
+
+EAPI void
+elm_config_scale_set(double scale)
+{
+   if (_elm_config->scale == scale) return;
+   _elm_config->scale = scale;
+   _elm_rescale();
+}
+
+EAPI Eina_Bool
+elm_config_password_show_last_get(void)
+{
+   return _elm_config->password_show_last;
+}
+
+EAPI void
+elm_config_password_show_last_set(Eina_Bool password_show_last)
+{
+   if (_elm_config->password_show_last == password_show_last) return;
+   _elm_config->password_show_last = password_show_last;
+   edje_password_show_last_set(_elm_config->password_show_last);
+}
+
+EAPI double
+elm_config_password_show_last_timeout_get(void)
+{
+   return _elm_config->password_show_last_timeout;
+}
+
+EAPI void
+elm_config_password_show_last_timeout_set(double password_show_last_timeout)
+{
+   if (_elm_config->password_show_last_timeout == password_show_last_timeout) return;
+   _elm_config->password_show_last_timeout = password_show_last_timeout;
+   edje_password_show_last_timeout_set(_elm_config->password_show_last_timeout);
+}
+
+EAPI Eina_Bool
+elm_config_save(void)
+{
+   return _elm_config_save();
+}
+
+EAPI void
+elm_config_reload(void)
+{
+   _elm_config_reload();
+}
+
+EAPI const char *
+elm_config_profile_get(void)
+{
+   return _elm_config_current_profile_get();
+}
+
+EAPI const char *
+elm_config_profile_dir_get(const char *profile,
+                    Eina_Bool   is_user)
+{
+   return _elm_config_profile_dir_get(profile, is_user);
+}
+
+EAPI void
+elm_config_profile_dir_free(const char *p_dir)
+{
+   free((void *)p_dir);
+}
+
+EAPI Eina_List *
+elm_config_profile_list_get(void)
+{
+   return _elm_config_profiles_list();
+}
+
+EAPI void
+elm_config_profile_list_free(Eina_List *l)
+{
+   const char *dir;
+
+   EINA_LIST_FREE(l, dir)
+     eina_stringshare_del(dir);
+}
+
+EAPI void
+elm_config_profile_set(const char *profile)
+{
+   EINA_SAFETY_ON_NULL_RETURN(profile);
+   _elm_config_profile_set(profile);
+}
+
+EAPI const char *
+elm_config_engine_get(void)
+{
+   return _elm_config->engine;
+}
+
+EAPI void
+elm_config_engine_set(const char *engine)
+{
+   EINA_SAFETY_ON_NULL_RETURN(engine);
+
+   _elm_config_engine_set(engine);
+}
+
+EAPI Eina_List *
+elm_config_text_classes_list_get(void)
+{
+   return _elm_config_text_classes_get();
+}
+
+EAPI void
+elm_config_text_classes_list_free(Eina_List *list)
+{
+   _elm_config_text_classes_free(list);
+}
+
+EAPI const Eina_List *
+elm_config_font_overlay_list_get(void)
+{
+   return _elm_config_font_overlays_list();
+}
+
+EAPI void
+elm_config_font_overlay_set(const char    *text_class,
+                     const char    *font,
+                     Evas_Font_Size size)
+{
+   EINA_SAFETY_ON_NULL_RETURN(text_class);
+   _elm_config_font_overlay_set(text_class, font, size);
+}
+
+EAPI void
+elm_config_font_overlay_unset(const char *text_class)
+{
+   EINA_SAFETY_ON_NULL_RETURN(text_class);
+   _elm_config_font_overlay_remove(text_class);
+}
+
+EAPI void
+elm_config_font_overlay_apply(void)
+{
+   _elm_config_font_overlay_apply();
+}
+
+EAPI Evas_Coord
+elm_config_finger_size_get(void)
+{
+   return _elm_config->finger_size;
+}
+
+EAPI void
+elm_config_finger_size_set(Evas_Coord size)
+{
+   if (_elm_config->finger_size == size) return;
+   _elm_config->finger_size = size;
+   _elm_rescale();
+}
+
+EAPI int
+elm_config_cache_flush_interval_get(void)
+{
+   return _elm_config->cache_flush_poll_interval;
+}
+
+EAPI void
+elm_config_cache_flush_interval_set(int size)
+{
+   if (_elm_config->cache_flush_poll_interval == size) return;
+   _elm_config->cache_flush_poll_interval = size;
+
+   _elm_recache();
+}
+
+EAPI Eina_Bool
+elm_config_cache_flush_enabled_get(void)
+{
+   return _elm_config->cache_flush_enable;
+}
+
+EAPI void
+elm_config_cache_flush_enabled_set(Eina_Bool enabled)
+{
+   enabled = !!enabled;
+   if (_elm_config->cache_flush_enable == enabled) return;
+   _elm_config->cache_flush_enable = enabled;
+
+   _elm_recache();
+}
+
+EINA_DEPRECATED EAPI int
+elm_font_cache_get(void)
+{
+   return elm_config_cache_font_cache_size_get();
+}
+
+EAPI int
+elm_config_cache_font_cache_size_get(void)
+{
+   return _elm_config->font_cache;
+}
+
+EINA_DEPRECATED EAPI void
+elm_font_cache_set(int size)
+{
+   elm_config_cache_font_cache_size_set(size);
+}
+
+EAPI void 
+elm_config_cache_font_cache_size_set(int size)
+{
+   if (_elm_config->font_cache == size) return;
+   _elm_config->font_cache = size;
+
+   _elm_recache();
+}
+
+EINA_DEPRECATED EAPI int
+elm_image_cache_get(void)
+{
+   return elm_config_cache_image_cache_size_get();
+}
+
+EAPI int
+elm_config_cache_image_cache_size_get(void)
+{
+   return _elm_config->image_cache;
+}
+
+EINA_DEPRECATED EAPI void
+elm_image_cache_set(int size)
+{
+   elm_config_cache_image_cache_size_set(size);
+}
+
+EAPI void
+elm_config_cache_image_cache_size_set(int size)
+{
+   if (_elm_config->image_cache == size) return;
+   _elm_config->image_cache = size;
+
+   _elm_recache();
+}
+
+EINA_DEPRECATED EAPI int
+elm_edje_file_cache_get(void)
+{
+   return elm_config_cache_edje_file_cache_size_get();
+}
+
+EAPI int
+elm_config_cache_edje_file_cache_size_get()
+{
+   return _elm_config->edje_cache;
+}
+
+EINA_DEPRECATED EAPI void
+elm_edje_file_cache_set(int size)
+{
+   elm_config_cache_edje_file_cache_size_set(size);
+}
+
+EAPI void
+elm_config_cache_edje_file_cache_size_set(int size)
+{
+   if (_elm_config->edje_cache == size) return;
+   _elm_config->edje_cache = size;
+
+   _elm_recache();
+}
+
+EINA_DEPRECATED EAPI int
+elm_edje_collection_cache_get(void)
+{
+   return elm_config_cache_edje_collection_cache_size_get();
+}
+
+EAPI int
+elm_config_cache_edje_collection_cache_size_get(void)
+{
+   return _elm_config->edje_collection_cache;
+}
+
+EINA_DEPRECATED EAPI void
+elm_edje_collection_cache_set(int size)
+{
+   elm_config_cache_edje_collection_cache_size_set(size);
+}
+
+EAPI void
+elm_config_cache_edje_collection_cache_size_set(int size)
+{
+   if (_elm_config->edje_collection_cache == size) return;
+   _elm_config->edje_collection_cache = size;
+
+   _elm_recache();
+}
+
+EAPI Eina_Bool
+elm_config_focus_highlight_enabled_get(void)
+{
+   return _elm_config->focus_highlight_enable;
+}
+
+EAPI void
+elm_config_focus_highlight_enabled_set(Eina_Bool enable)
+{
+   _elm_config->focus_highlight_enable = !!enable;
+}
+
+EAPI Eina_Bool
+elm_config_focus_highlight_animate_get(void)
+{
+   return _elm_config->focus_highlight_animate;
+}
+
+EAPI void
+elm_config_focus_highlight_animate_set(Eina_Bool animate)
+{
+   _elm_config->focus_highlight_animate = !!animate;
+}
+
+EAPI Eina_Bool
+elm_config_scroll_bounce_enabled_get(void)
+{
+   return _elm_config->thumbscroll_bounce_enable;
+}
+
+EAPI void
+elm_config_scroll_bounce_enabled_set(Eina_Bool enabled)
+{
+   _elm_config->thumbscroll_bounce_enable = enabled;
+}
+
+EAPI double
+elm_config_scroll_bounce_friction_get(void)
+{
+   return _elm_config->thumbscroll_bounce_friction;
+}
+
+EAPI void
+elm_config_scroll_bounce_friction_set(double friction)
+{
+   _elm_config->thumbscroll_bounce_friction = friction;
+}
+
+EAPI double
+elm_config_scroll_page_scroll_friction_get(void)
+{
+   return _elm_config->page_scroll_friction;
+}
+
+EAPI void
+elm_config_scroll_page_scroll_friction_set(double friction)
+{
+   _elm_config->page_scroll_friction = friction;
+}
+
+EAPI double
+elm_config_scroll_bring_in_scroll_friction_get(void)
+{
+   return _elm_config->bring_in_scroll_friction;
+}
+
+EAPI void
+elm_config_scroll_bring_in_scroll_friction_set(double friction)
+{
+   _elm_config->bring_in_scroll_friction = friction;
+}
+
+EAPI double
+elm_config_scroll_zoom_friction_get(void)
+{
+   return _elm_config->zoom_friction;
+}
+
+EAPI void
+elm_config_scroll_zoom_friction_set(double friction)
+{
+   _elm_config->zoom_friction = friction;
+}
+
+EAPI Eina_Bool
+elm_config_scroll_thumbscroll_enabled_get(void)
+{
+   return _elm_config->thumbscroll_enable;
+}
+
+EAPI void
+elm_config_scroll_thumbscroll_enabled_set(Eina_Bool enabled)
+{
+   _elm_config->thumbscroll_enable = enabled;
+}
+
+EAPI unsigned int
+elm_config_scroll_thumbscroll_threshold_get(void)
+{
+   return _elm_config->thumbscroll_threshold;
+}
+
+EAPI void
+elm_config_scroll_thumbscroll_threshold_set(unsigned int threshold)
+{
+   _elm_config->thumbscroll_threshold = threshold;
+}
+
+EAPI double
+elm_config_scroll_thumbscroll_momentum_threshold_get(void)
+{
+   return _elm_config->thumbscroll_momentum_threshold;
+}
+
+EAPI void
+elm_config_scroll_thumbscroll_momentum_threshold_set(double threshold)
+{
+   _elm_config->thumbscroll_momentum_threshold = threshold;
+}
+
+EAPI double
+elm_config_scroll_thumbscroll_friction_get(void)
+{
+   return _elm_config->thumbscroll_friction;
+}
+
+EAPI void
+elm_config_scroll_thumbscroll_friction_set(double friction)
+{
+   _elm_config->thumbscroll_friction = friction;
+}
+
+EAPI double
+elm_config_scroll_thumbscroll_border_friction_get(void)
+{
+   return _elm_config->thumbscroll_border_friction;
+}
+
+EAPI void
+elm_config_scroll_thumbscroll_border_friction_set(double friction)
+{
+   if (friction < 0.0) friction = 0.0;
+   if (friction > 1.0) friction = 1.0;
+   _elm_config->thumbscroll_friction = friction;
+}
+
+EAPI double
+elm_config_scroll_thumbscroll_sensitivity_friction_get(void)
+{
+   return _elm_config->thumbscroll_sensitivity_friction;
+}
+
+EAPI void
+elm_config_scroll_thumbscroll_sensitivity_friction_set(double friction)
+{
+   if (friction < 0.1) friction = 0.1;
+   if (friction > 1.0) friction = 1.0;
+   _elm_config->thumbscroll_friction = friction;
+}
+
+EAPI void
+elm_config_longpress_timeout_set(double longpress_timeout)
+{
+   _elm_config->longpress_timeout = longpress_timeout;
+}
+
+EAPI double
+elm_config_longpress_timeout_get(void)
+{
+   return _elm_config->longpress_timeout;
+}
+
+EAPI void
+elm_config_all_flush(void)
+{
+#ifdef HAVE_ELEMENTARY_X
+   if (_prop_all_update_timer) ecore_timer_del(_prop_all_update_timer);
+   _prop_all_update_timer = ecore_timer_add(0.1, _prop_all_update_cb, NULL);
+#endif
+}
+
+>>>>>>> remotes/origin/upstream
 static void
 _translation_init()
 {
@@ -1437,6 +2030,14 @@ _elm_config_init(void)
    _desc_init();
    _profile_fetch_from_conf();
    _config_load();
+<<<<<<< HEAD
+=======
+   if (_elm_preferred_engine) eina_stringshare_del(_elm_preferred_engine);
+   if (_elm_config->engine)
+     _elm_preferred_engine = eina_stringshare_add(_elm_config->engine);
+   else
+     _elm_preferred_engine = NULL;
+>>>>>>> remotes/origin/upstream
    _translation_init();
    _env_get();
    _config_apply();
@@ -1532,6 +2133,7 @@ _elm_config_engine_set(const char *engine)
    _elm_config->engine = eina_stringshare_add(engine);
 }
 
+<<<<<<< HEAD
 void
 _elm_config_all_update(void)
 {
@@ -1542,6 +2144,24 @@ _elm_config_all_update(void)
    ecore_x_window_prop_string_set(_root_1st, _atom[ATOM_E_PROFILE],
                                   _elm_profile);
 #endif
+=======
+EAPI const char *
+elm_config_preferred_engine_get(void)
+{
+   return _elm_preferred_engine;
+}
+
+EAPI void
+elm_config_preferred_engine_set(const char *engine)
+{
+   if (engine)
+     eina_stringshare_replace(&(_elm_preferred_engine), engine);
+   else
+     {
+        if (_elm_preferred_engine) eina_stringshare_del(_elm_preferred_engine);
+        _elm_preferred_engine = eina_stringshare_add(_elm_config->engine);
+     }
+>>>>>>> remotes/origin/upstream
 }
 
 void
@@ -1576,9 +2196,15 @@ _elm_config_shutdown(void)
    if (_prop_all_update_timer)
      {
         ecore_timer_del(_prop_all_update_timer);
+<<<<<<< HEAD
         _prop_all_update_cb(NULL);
      }
    _prop_all_update_timer = NULL;
+=======
+        _prop_all_update_timer = NULL;
+        _prop_all_update_cb(NULL);
+     }
+>>>>>>> remotes/origin/upstream
    if (_prop_change_delay_timer) ecore_timer_del(_prop_change_delay_timer);
    _prop_change_delay_timer = NULL;
 #endif
@@ -1596,6 +2222,14 @@ _elm_config_shutdown(void)
 #endif
      }
    _config_free();
+<<<<<<< HEAD
+=======
+   if (_elm_preferred_engine)
+     {
+        eina_stringshare_del(_elm_preferred_engine);
+        _elm_preferred_engine = NULL;
+     }
+>>>>>>> remotes/origin/upstream
    if (_elm_profile)
      {
         free(_elm_profile);

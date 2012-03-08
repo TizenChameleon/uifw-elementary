@@ -92,6 +92,9 @@ test_colorselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
 
    evas_object_resize(win, 320, 480);
    evas_object_show(win);
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
 }
 #endif

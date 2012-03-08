@@ -468,6 +468,7 @@ elm_button_add(Evas_Object *parent)
 }
 
 EAPI void
+<<<<<<< HEAD
 elm_button_label_set(Evas_Object *obj, const char *label)
 {
    _elm_button_label_set(obj, NULL, label);
@@ -499,6 +500,8 @@ elm_button_icon_unset(Evas_Object *obj)
 }
 
 EAPI void
+=======
+>>>>>>> remotes/origin/upstream
 elm_button_autorepeat_set(Evas_Object *obj, Eina_Bool on)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);

@@ -80,10 +80,13 @@ _els_smart_icon_file_helper(Evas_Object *obj)
 
    sd = evas_object_smart_data_get(obj);
    /* smart code here */
+<<<<<<< HEAD
    /* NOTE: Do not merge upstream for the if (sd->edje) { } statements
       But wonder whether the edje resource icons have no problem. */
    if (!sd->edje) goto out;
 
+=======
+>>>>>>> remotes/origin/upstream
    if (sd->prev) evas_object_del(sd->prev);
    pclip = evas_object_clip_get(sd->obj);
    if (sd->obj) sd->prev = sd->obj;
@@ -97,7 +100,10 @@ _els_smart_icon_file_helper(Evas_Object *obj)
    evas_object_clip_set(sd->obj, pclip);
 
    sd->edje = EINA_FALSE;
+<<<<<<< HEAD
 out:
+=======
+>>>>>>> remotes/origin/upstream
 
    if (!sd->size)
      evas_object_image_load_size_set(sd->obj, sd->size, sd->size);
@@ -130,12 +136,17 @@ Eina_Bool
 _els_smart_icon_file_key_set(Evas_Object *obj, const char *file, const char *key)
 {
    Smart_Data *sd;
+<<<<<<< HEAD
+=======
+   Evas_Coord w, h;
+>>>>>>> remotes/origin/upstream
 
    sd = evas_object_smart_data_get(obj);
    if (!sd) return EINA_FALSE;
    _els_smart_icon_file_helper(obj);
 
    evas_object_image_file_set(sd->obj, file, key);
+<<<<<<< HEAD
    // NOTE: Do not merge upstream for sd->preloading.
    sd->preloading = EINA_FALSE; // by default preload off by seok.j.jeong
    sd->show = EINA_TRUE;
@@ -145,6 +156,14 @@ _els_smart_icon_file_key_set(Evas_Object *obj, const char *file, const char *key
    // NOTE: Do not merge upstream for sd->preloading.
    if (sd->preloading) // sd->preloading can be changed by above function. so add "if (sd->preloading)" as below
      evas_object_hide(sd->obj);
+=======
+   sd->preloading = EINA_TRUE;
+   sd->show = EINA_TRUE;
+   evas_object_hide(sd->obj);
+   _els_smart_icon_size_get(obj, &w, &h);
+   evas_object_image_load_size_set(sd->obj, w, h);
+   evas_object_image_preload(sd->obj, EINA_FALSE);
+>>>>>>> remotes/origin/upstream
    if (evas_object_image_load_error_get(sd->obj) != EVAS_LOAD_ERROR_NONE)
      {
         ERR("Things are going bad for '%s' (%p)", file, sd->obj);
@@ -379,7 +398,11 @@ _els_smart_icon_orient_set(Evas_Object *obj, Elm_Image_Orient orient)
       case ELM_IMAGE_FLIP_VERTICAL:
          _els_smart_icon_flip_vertical(sd);
          return;
+<<<<<<< HEAD
       case ELM_IMAGE_ROTATE_180_CW:
+=======
+      case ELM_IMAGE_ROTATE_180:
+>>>>>>> remotes/origin/upstream
          _els_smart_icon_rotate_180(sd);
          return;
       default:
@@ -410,11 +433,19 @@ _els_smart_icon_orient_set(Evas_Object *obj, Elm_Image_Orient orient)
          w = -w;
          hw = hw - 1;
          break;
+<<<<<<< HEAD
       case ELM_IMAGE_ROTATE_90_CW:
          to = data + w - 1;
          hw = -hw - 1;
          break;
       case ELM_IMAGE_ROTATE_90_CCW:
+=======
+      case ELM_IMAGE_ROTATE_90:
+         to = data + w - 1;
+         hw = -hw - 1;
+         break;
+      case ELM_IMAGE_ROTATE_270:
+>>>>>>> remotes/origin/upstream
          to = data + hw - w;
          w = -w;
          hw = hw + 1;

@@ -677,6 +677,7 @@ _elm_hover_sub_obj_placement_eval_cb(void *data, Evas *e __UNUSED__, Evas_Object
    _elm_hover_sub_obj_placement_eval(data);
 }
 
+<<<<<<< HEAD
 EAPI void
 elm_hover_content_set(Evas_Object *obj, const char *swallow, Evas_Object *content)
 {
@@ -689,6 +690,8 @@ elm_hover_content_get(const Evas_Object *obj, const char *swallow)
    return _content_get_hook(obj, swallow);
 }
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 _elm_hover_sub_obj_unparent(Evas_Object *obj)
 {
@@ -705,12 +708,15 @@ _elm_hover_sub_obj_unparent(Evas_Object *obj)
    wd->smt_sub = NULL;
 }
 
+<<<<<<< HEAD
 EAPI Evas_Object *
 elm_hover_content_unset(Evas_Object *obj, const char *swallow)
 {
    return _content_unset_hook(obj, swallow);
 }
 
+=======
+>>>>>>> remotes/origin/upstream
 EAPI const char *
 elm_hover_best_content_location_get(const Evas_Object *obj, Elm_Hover_Axis pref_axis)
 {

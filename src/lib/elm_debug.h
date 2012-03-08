@@ -1,6 +1,10 @@
 /**
  * @defgroup Debug Debug
+<<<<<<< HEAD
  * don't use it unless you are sure
+=======
+ * Don't use it unless you are sure.
+>>>>>>> remotes/origin/upstream
  *
  * @{
  */

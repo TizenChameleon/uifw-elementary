@@ -23,6 +23,7 @@
  *
  * @ingroup Caches
  */
+<<<<<<< HEAD
 // XXX: rename: elm_cache_all_flush()
 EAPI void      elm_all_flush(void);
 
@@ -242,6 +243,9 @@ EAPI void      elm_edje_collection_cache_set(int size);
  */
 // XXX: deprecate and replace with elm_config_all_flush()
 EAPI void      elm_edje_collection_cache_all_set(int size);
+=======
+EAPI void      elm_cache_all_flush(void);
+>>>>>>> remotes/origin/upstream
 
 /**
  * @}

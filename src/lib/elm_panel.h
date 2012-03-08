@@ -12,7 +12,11 @@
  * @li ELM_PANEL_ORIENT_LEFT
  * @li ELM_PANEL_ORIENT_RIGHT
  *
+<<<<<<< HEAD
  * Default contents parts of the panel widget that you can use for are:
+=======
+ * Default content parts of the panel widget that you can use for are:
+>>>>>>> remotes/origin/upstream
  * @li "default" - A content of the panel
  *
  * Supported elm_object common APIs.
@@ -46,7 +50,11 @@ EAPI Evas_Object                 *elm_panel_add(Evas_Object *parent);
 /**
  * @brief Sets the orientation of the panel
  *
+<<<<<<< HEAD
  * @param parent The parent object
+=======
+ * @param obj The panel object
+>>>>>>> remotes/origin/upstream
  * @param orient The panel orientation. Can be one of the following:
  * @li ELM_PANEL_ORIENT_TOP
  * @li ELM_PANEL_ORIENT_LEFT
@@ -68,7 +76,11 @@ EAPI Elm_Panel_Orient             elm_panel_orient_get(const Evas_Object *obj);
  * @brief Set the state of the panel.
  *
  * @param obj The panel object
+<<<<<<< HEAD
  * @param hidden If true, the panel will run the animation to contract
+=======
+ * @param hidden If true, the panel will run the animation to disappear.
+>>>>>>> remotes/origin/upstream
  */
 EAPI void                         elm_panel_hidden_set(Evas_Object *obj, Eina_Bool hidden);
 
@@ -76,7 +88,11 @@ EAPI void                         elm_panel_hidden_set(Evas_Object *obj, Eina_Bo
  * @brief Get the state of the panel.
  *
  * @param obj The panel object
+<<<<<<< HEAD
  * @param hidden If true, the panel is in the "hide" state
+=======
+ * @return EINA_TRUE if it is hidden state
+>>>>>>> remotes/origin/upstream
  */
 EAPI Eina_Bool                    elm_panel_hidden_get(const Evas_Object *obj);
 
@@ -88,5 +104,34 @@ EAPI Eina_Bool                    elm_panel_hidden_get(const Evas_Object *obj);
 EAPI void                         elm_panel_toggle(Evas_Object *obj);
 
 /**
+<<<<<<< HEAD
+=======
+ * @brief Set the content of the panel.
+ *
+ * @param obj The panel object
+ * @param content The content object
+ */
+EAPI void elm_panel_content_set(Evas_Object *obj, Evas_Object *content);
+
+/**
+ * @brief Get the content of the panel.
+ *
+ * @param obj The panel object
+ * @return The content object of the panel or NULL if none is set.
+ *
+ * @see elm_panel_content_set()
+ */
+EAPI Evas_Object * elm_panel_content_get(const Evas_Object *obj);
+
+/**
+ * @brief Remove and return the content from the panel.
+ *
+ * @param obj The panel object
+ * @return The content object of the panel or NULL if none is set.
+ */
+EAPI Evas_Object * elm_panel_content_unset(Evas_Object *obj);
+
+/**
+>>>>>>> remotes/origin/upstream
  * @}
  */

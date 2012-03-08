@@ -9,13 +9,17 @@
   ((it) ? EINA_INLIST_CONTAINER_GET(it, Elm_Gen_Item) : NULL)
 
 #define SWIPE_MOVES 12
+<<<<<<< HEAD
 struct Elm_Genlist_Item;
 struct Elm_Genlist_Item_Class;
+=======
+>>>>>>> remotes/origin/upstream
 
 typedef struct Elm_Gen_Item_Type    Elm_Gen_Item_Type;
 typedef struct Elm_Gen_Item_Tooltip Elm_Gen_Item_Tooltip;
 typedef struct _Widget_Data         Widget_Data;
 
+<<<<<<< HEAD
 typedef enum
 {
    ELM_GENLIST_ITEM_SCROLLTO_NONE = 0,   /**< no scrollto */
@@ -24,6 +28,8 @@ typedef enum
    ELM_GENLIST_ITEM_SCROLLTO_MIDDLE = (1 << 2)   /**< middle show, middle bring in */
 } Elm_Genlist_Item_Scrollto_Type;
 
+=======
+>>>>>>> remotes/origin/upstream
 struct Elm_Gen_Item_Tooltip
 {
    const void                 *data;
@@ -41,12 +47,17 @@ struct Elm_Gen_Item
    Elm_Gen_Item_Type        *item;
    const Elm_Gen_Item_Class *itc;
    Evas_Coord                x, y, dx, dy;
+<<<<<<< HEAD
    Evas_Object              *spacer;
+=======
+   Evas_Object              *spacer, *edit_obj;
+>>>>>>> remotes/origin/upstream
    Elm_Gen_Item             *parent;
    Eina_List                *texts, *contents, *states, *content_objs;
    Ecore_Timer              *long_timer;
    int                       relcount;
    int                       walking;
+<<<<<<< HEAD
    int                       generation; /* a generation of an item. when the item is created, this value is set to the value of genlist generation. this value will be decreased when the item is going to be deleted */
    const char               *mouse_cursor;
 
@@ -55,12 +66,23 @@ struct Elm_Gen_Item
       Evas_Smart_Cb func;
       const void   *data;
    } func;
+=======
+   int                       generation; /**< a generation of an item. when the item is created, this value is set to the value of genlist generation. this value will be decreased when the item is going to be deleted */
+   const char               *mouse_cursor;
+
+   struct
+     {
+        Evas_Smart_Cb func;
+        const void   *data;
+     } func;
+>>>>>>> remotes/origin/upstream
 
    Elm_Gen_Item_Tooltip      tooltip;
    Ecore_Cb                  del_cb, sel_cb, highlight_cb;
    Ecore_Cb                  unsel_cb, unhighlight_cb, unrealize_cb;
 
    int                       position;
+<<<<<<< HEAD
 
    Eina_Bool                 position_update : 1;
    Eina_Bool                 want_unrealize : 1;
@@ -74,6 +96,21 @@ struct Elm_Gen_Item
    Eina_Bool                 group : 1;
    Eina_Bool                 reorder : 1;
    Eina_Bool                 mode_set : 1; /* item uses style mode for highlight/select */
+=======
+   Elm_Object_Select_Mode    select_mode;
+
+   Eina_Bool                 position_update : 1;
+   Eina_Bool                 want_unrealize : 1;
+   Eina_Bool                 realized : 1;
+   Eina_Bool                 selected : 1;
+   Eina_Bool                 highlighted : 1;
+   Eina_Bool                 dragging : 1; /**< this is set true when an item is being dragged. this is set false on multidown/mouseup/mousedown. when this is true, the item should not be unrealized. or evas mouse down/up event will be corrupted. */
+   Eina_Bool                 down : 1;
+   Eina_Bool                 group : 1;
+   Eina_Bool                 reorder : 1;
+   Eina_Bool                 mode_set : 1; /**< item uses style mode for highlight/select */
+   Eina_Bool                 flipped : 1; /**< a flag that shows the flip status of the item. */
+>>>>>>> remotes/origin/upstream
 };
 
 typedef struct _Pan Pan;
@@ -87,6 +124,7 @@ struct _Pan
 struct _Widget_Data
 {
    Eina_Inlist_Sorted_State      *state;
+<<<<<<< HEAD
    Evas_Object                   *obj; /* the genlist object */
    Evas_Object                   *scr; /* a smart scroller object which is used internally in genlist */
    Evas_Object                   *pan_smart; /* "elm_genlist_pan" evas smart object. this is an extern pan of smart scroller(scr). */
@@ -96,11 +134,23 @@ struct _Widget_Data
    Elm_Gen_Item                  *reorder_it; /* item currently being repositioned */
    Elm_Gen_Item                  *last_selected_item;
    Pan                           *pan; /* pan_smart object's smart data */
+=======
+   Evas_Object                   *obj; /**< the genlist object */
+   Evas_Object                   *scr; /**< a smart scroller object which is used internally in genlist */
+   Evas_Object                   *pan_smart; /**< "elm_genlist_pan" evas smart object. this is an extern pan of smart scroller(scr). */
+   Eina_List                     *selected; /**< a list of selected items */
+   Eina_List                     *group_items; /**< a list of groups index items */
+   Eina_Inlist                   *items; /**< an inlist of all items */
+   Elm_Gen_Item                  *reorder_it; /**< item currently being repositioned */
+   Elm_Object_Item               *last_selected_item;
+   Pan                           *pan; /**< pan_smart object's smart data */
+>>>>>>> remotes/origin/upstream
    Ecore_Job                     *calc_job;
    int                            walking;
    int                            item_width, item_height;
    int                            group_item_width, group_item_height;
    int                            minw, minh;
+<<<<<<< HEAD
    long                           count;
    Evas_Coord                     pan_x, pan_y;
    Eina_Bool                      reorder_mode : 1; /* a flag for reorder mode enable/disable */
@@ -110,27 +160,52 @@ struct _Widget_Data
    Eina_Bool                      wasselected : 1;
    Eina_Bool                      always_select : 1;
    Eina_Bool                      clear_me : 1; /* a flag whether genlist is marked as to be cleared or not. if this flag is true, genlist clear was already deferred.  */
+=======
+   unsigned int                   item_count;
+   Evas_Coord                     pan_x, pan_y;
+   Elm_Object_Select_Mode    select_mode;
+   Eina_Bool                      reorder_mode : 1; /**< a flag for reorder mode enable/disable */
+   Eina_Bool                      on_hold : 1;
+   Eina_Bool                      multi : 1; /**< a flag for item multi selection */
+   Eina_Bool                      wasselected : 1;
+   Eina_Bool                      no_highlight : 1;
+   Eina_Bool                      clear_me : 1; /**< a flag whether genlist is marked as to be cleared or not. if this flag is true, genlist clear was already deferred.  */
+>>>>>>> remotes/origin/upstream
    Eina_Bool                      h_bounce : 1;
    Eina_Bool                      v_bounce : 1;
    Ecore_Cb                       del_cb, calc_cb, sizing_cb;
    Ecore_Cb                       clear_cb;
    ////////////////////////////////////
+<<<<<<< HEAD
    Eina_Inlist                   *blocks; /* inlist of all blocks. a block consists of a certain number of items. maximum number of items in a block is 'max_items_per_block'. */
+=======
+   Eina_Inlist                   *blocks; /**< an inlist of all blocks. a block consists of a certain number of items. maximum number of items in a block is 'max_items_per_block'. */
+>>>>>>> remotes/origin/upstream
    Evas_Coord                     reorder_old_pan_y, w, h, realminw, prev_viewport_w;
    Ecore_Job                     *update_job;
    Ecore_Idle_Enterer            *queue_idle_enterer;
    Ecore_Idler                   *must_recalc_idler;
    Eina_List                     *queue;
    Elm_Gen_Item                  *show_item, *anchor_item, *mode_item, *reorder_rel, *expanded_item;
+<<<<<<< HEAD
    Eina_Inlist                   *item_cache; /* an inlist of edje object it cache. */
    Evas_Coord                     anchor_y;
    Evas_Coord                     reorder_start_y; /* reorder it's initial y coordinate in the pan. */
+=======
+   Eina_Inlist                   *item_cache; /**< an inlist of edje object it cache. */
+   Evas_Coord                     anchor_y;
+   Evas_Coord                     reorder_start_y; /**< reorder it's initial y coordinate in the pan. */
+>>>>>>> remotes/origin/upstream
    Elm_List_Mode                  mode;
    Ecore_Timer                   *multi_timer, *scr_hold_timer;
    Ecore_Animator                *reorder_move_animator;
    const char                    *mode_type;
+<<<<<<< HEAD
    const char                    *mode_item_style;
    unsigned int                   start_time;
+=======
+   double                         start_time;
+>>>>>>> remotes/origin/upstream
    Evas_Coord                     prev_x, prev_y, prev_mx, prev_my;
    Evas_Coord                     cur_x, cur_y, cur_mx, cur_my;
    Eina_Bool                      mouse_down : 1;
@@ -138,6 +213,7 @@ struct _Widget_Data
    Eina_Bool                      multi_timeout : 1;
    Eina_Bool                      multitouched : 1;
    Eina_Bool                      longpressed : 1;
+<<<<<<< HEAD
    Eina_Bool                      bring_in : 1; /* a flag to describe the scroll animation. (show, bring in) */
    Eina_Bool                      compress : 1;
    Eina_Bool                      height_for_width : 1;
@@ -162,6 +238,38 @@ struct _Widget_Data
    Eina_Compare_Cb                item_compare_cb;
    Eina_Compare_Cb                item_compare_data_cb;
    Elm_Genlist_Item_Scrollto_Type scrollto_type; /* a scrollto type which remembers where to scroll ex) in, top, middle */
+=======
+   Eina_Bool                      bring_in : 1; /**< a flag to describe the scroll animation. (show, bring in) */
+   Eina_Bool                      height_for_width : 1;
+   Eina_Bool                      homogeneous : 1;
+   Eina_Bool                      swipe : 1;
+   Eina_Bool                      decorate_mode : 1;
+   Eina_Bool                      reorder_pan_move : 1;
+   Eina_Bool                      auto_scroll_enabled : 1;
+   Eina_Bool                      pan_changed : 1;
+   Eina_Bool                      requeued : 1; /**< this is set to EINA_TRUE when the item is re-queued. this happens when the item is un-queued but the rel item is still in the queue. this item will be processed later. */
+   Eina_Bool                      check_scroll : 1; /**< this flag means genlist is supposed to be scrolled. if this flag is set to EINA_TRUE, genlist checks whether it's ok to scroll genlist now or not. */
+   Eina_Bool                      tree_effect_enabled : 1; /**< tree effect */
+   struct
+     {
+        Evas_Coord x, y;
+     } history[SWIPE_MOVES];
+   int                            multi_device;
+   int                            item_cache_count;
+   int                            item_cache_max; /**< maximum number of cached items */
+   int                            movements;
+   int                            max_items_per_block; /**< maximum number of items per block */
+   double                         longpress_timeout; /**< longpress timeout. this value comes from _elm_config by default. this can be changed by elm_genlist_longpress_timeout_set() */
+   int                            generation; /**< a generation of genlist. when genlist is cleared, this value will be increased and a new generation will start */
+   Eina_Compare_Cb                item_compare_cb;
+   Eina_Compare_Cb                item_compare_data_cb;
+   Elm_Genlist_Item_Scrollto_Type scrollto_type; /**< a scrollto type which remembers where to scroll ex) in, top, middle */
+   Evas_Object                   *alpha_bg; /**< not to receive event when tree effect is not finished */
+   Eina_List                     *move_items; /**< items move for tree effect */
+   Elm_Gen_Item                  *expanded_next_item;
+   Ecore_Animator                *item_moving_effect_timer; /**< tree effect */
+   Elm_Genlist_Item_Move_Effect_Mode move_effect_mode;
+>>>>>>> remotes/origin/upstream
 
    /* The stuff below directly come from gengrid without any thinking */
    unsigned int                   nmax;
@@ -176,9 +284,15 @@ struct _Widget_Data
    Eina_Bool                      filled : 1;
 };
 
+<<<<<<< HEAD
 Elm_Genlist_Item *_elm_genlist_item_new(Widget_Data *wd, const Elm_Genlist_Item_Class *itc, const void *data, Elm_Genlist_Item *parent, Evas_Smart_Cb func, const void *func_data);
 
 Evas_Object  *_elm_genlist_item_widget_get(const Elm_Genlist_Item *it);
+=======
+Elm_Gen_Item *_elm_genlist_item_new(Widget_Data *wd, const Elm_Gen_Item_Class *itc, const void *data, Elm_Gen_Item *parent, Evas_Smart_Cb func, const void *func_data);
+
+Evas_Object  *_elm_genlist_item_widget_get(const Elm_Gen_Item *it);
+>>>>>>> remotes/origin/upstream
 
 void          _elm_genlist_page_relative_set(Evas_Object *obj, double h_pagerel, double v_pagerel);
 
@@ -194,6 +308,7 @@ void          _elm_genlist_page_show(const Evas_Object *obj, int h_pagenumber, i
 
 void          _elm_genlist_page_bring_in(const Evas_Object *obj, int h_pagenumber, int v_pagenumber);
 
+<<<<<<< HEAD
 void          _elm_genlist_item_unrealize(Elm_Genlist_Item *it, Eina_Bool calc);
 void          _elm_genlist_item_del_serious(Elm_Genlist_Item *it);
 
@@ -223,5 +338,11 @@ void          _elm_gengrid_item_del_serious(Elm_Gen_Item *it);
 
 void          _elm_gengrid_item_del_notserious(Elm_Gen_Item *it);
 #endif
+=======
+void          _elm_genlist_item_unrealize(Elm_Gen_Item *it, Eina_Bool calc);
+void          _elm_genlist_item_del_serious(Elm_Gen_Item *it);
+
+void          _elm_genlist_item_del_notserious(Elm_Gen_Item *it);
+>>>>>>> remotes/origin/upstream
 
 #endif

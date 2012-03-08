@@ -742,3 +742,7 @@ group { name: "elm/map/marker_bubble/default";
       }
    }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> remotes/origin/upstream

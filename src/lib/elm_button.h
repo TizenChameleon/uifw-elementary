@@ -11,12 +11,20 @@
  * This is a push-button. Press it and run some function. It can contain
  * a simple label and icon object and it also has an autorepeat feature.
  *
+<<<<<<< HEAD
  * This widgets emits the following signals:
+=======
+ * This widget emits the following signals:
+>>>>>>> remotes/origin/upstream
  * @li "clicked": the user clicked the button (press/release).
  * @li "repeated": the user pressed the button without releasing it.
  * @li "pressed": button was pressed.
  * @li "unpressed": button was released after being pressed.
+<<<<<<< HEAD
  * In all three cases, the @c event parameter of the callback will be
+=======
+ * In all cases, the @c event parameter of the callback will be
+>>>>>>> remotes/origin/upstream
  * @c NULL.
  *
  * Also, defined in the default theme, the button has the following styles
@@ -27,8 +35,16 @@
  * @li hoversel_vertical: Internally used by @ref Hoversel to give a
  * continuous look across its options.
  * @li hoversel_vertical_entry: Another internal for @ref Hoversel.
+<<<<<<< HEAD
  *
  * Default contents parts of the button widget that you can use for are:
+=======
+ * @li naviframe: Internally used by @ref Naviframe for its back button.
+ * @li colorselector: Internally used by @ref Colorselector 
+ * for its left and right buttons.
+ *
+ * Default content parts of the button widget that you can use for are:
+>>>>>>> remotes/origin/upstream
  * @li "icon" - An icon of the button
  *
  * Default text parts of the button widget that you can use for are:
@@ -88,7 +104,11 @@ EAPI Eina_Bool                    elm_button_autorepeat_get(const Evas_Object *o
  *
  * Sets the timeout, in seconds, since the button is pressed until the
  * first @c repeated signal is emitted. If @p t is 0.0 or less, there
+<<<<<<< HEAD
  * won't be any delay and the even will be fired the moment the button is
+=======
+ * won't be any delay and the event will be fired the moment the button is
+>>>>>>> remotes/origin/upstream
  * pressed.
  *
  * @param obj The button object

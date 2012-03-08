@@ -39,7 +39,11 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(en, "This is a single line");
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+<<<<<<< HEAD
    elm_entry_single_line_set(en, 1);
+=======
+   elm_entry_single_line_set(en, EINA_TRUE);
+>>>>>>> remotes/origin/upstream
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
@@ -49,14 +53,22 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(en, "Entry 2");
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+<<<<<<< HEAD
    elm_entry_single_line_set(en, 1);
+=======
+   elm_entry_single_line_set(en, EINA_TRUE);
+>>>>>>> remotes/origin/upstream
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
+<<<<<<< HEAD
    elm_icon_scale_set(ic, 0, 0);
+=======
+   elm_icon_resizable_set(ic, 0, 0);
+>>>>>>> remotes/origin/upstream
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_HORIZONTAL, 1, 1);
 
    bb = elm_bubble_add(win);
@@ -66,9 +78,15 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_show(ic);
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bb, EVAS_HINT_FILL, EVAS_HINT_FILL);
+<<<<<<< HEAD
    av = elm_anchorblock_add(win);
    elm_anchorblock_hover_style_set(av, "popout");
    elm_anchorblock_hover_parent_set(av, win);
+=======
+   av = elm_entry_add(win);
+   elm_entry_anchor_hover_style_set(av, "popout");
+   elm_entry_anchor_hover_parent_set(av, win);
+>>>>>>> remotes/origin/upstream
    elm_object_text_set(av,
 			   "Hi there. This is the most recent message in the "
 			   "list of messages. It has one <a href=tel:+614321234>+61 432 1234</a> "
@@ -90,9 +108,15 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_show(ic);
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bb, EVAS_HINT_FILL, EVAS_HINT_FILL);
+<<<<<<< HEAD
    av = elm_anchorblock_add(win);
    elm_anchorblock_hover_style_set(av, "popout");
    elm_anchorblock_hover_parent_set(av, win);
+=======
+   av = elm_entry_add(win);
+   elm_entry_anchor_hover_style_set(av, "popout");
+   elm_entry_anchor_hover_parent_set(av, win);
+>>>>>>> remotes/origin/upstream
    elm_object_text_set(av,
 			   "Hey what are you doing? This is the second last message "
 			   "Hi there. This is the most recent message in the "
@@ -115,7 +139,11 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
+<<<<<<< HEAD
    elm_icon_scale_set(ic, 0, 0);
+=======
+   elm_icon_resizable_set(ic, 0, 0);
+>>>>>>> remotes/origin/upstream
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_HORIZONTAL, 1, 1);
 
    bb = elm_bubble_add(win);
@@ -126,9 +154,15 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bb, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
+<<<<<<< HEAD
    av = elm_anchorblock_add(win);
    elm_anchorblock_hover_style_set(av, "popout");
    elm_anchorblock_hover_parent_set(av, win);
+=======
+   av = elm_entry_add(win);
+   elm_entry_anchor_hover_style_set(av, "popout");
+   elm_entry_anchor_hover_parent_set(av, win);
+>>>>>>> remotes/origin/upstream
    elm_object_text_set(av, "This is a short message. <item relsize=16x16 vsize=full href=emoticon/haha></item>");
    elm_object_content_set(bb, av);
    evas_object_show(av);
@@ -181,8 +215,11 @@ test_win_socket(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
+<<<<<<< HEAD
    
 
+=======
+>>>>>>> remotes/origin/upstream
    evas_object_resize(win, 320, 300);
 
    evas_object_show(bx);
@@ -193,12 +230,21 @@ test_win_socket(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_
    win_socket = elm_win_add(NULL, "Window Socket", ELM_WIN_SOCKET_IMAGE);
 
    if (!elm_win_socket_listen(win_socket, "ello", 0, EINA_FALSE))
+<<<<<<< HEAD
    	{
    	   printf("Fail to elm win socket listen \n");
 	   evas_object_del(win_socket);
 	   evas_object_del(win);
 	   return; 
    	}
+=======
+     {
+        printf("Fail to elm win socket listen \n");
+        evas_object_del(win_socket);
+        evas_object_del(win);
+        return;
+     }
+>>>>>>> remotes/origin/upstream
    elm_win_title_set(win_socket, "Window Socket");
    elm_win_autodel_set(win_socket, EINA_TRUE);
 
@@ -208,6 +254,10 @@ test_win_socket(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_
    evas_object_show(win_socket);
 
    evas_object_event_callback_add(win, EVAS_CALLBACK_DEL, _win_del,
+<<<<<<< HEAD
                                   win_socket);   
+=======
+                                  win_socket);
+>>>>>>> remotes/origin/upstream
 }
 #endif

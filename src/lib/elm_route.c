@@ -265,6 +265,7 @@ elm_route_emap_set(Evas_Object *obj, EMap_Route *emap)
 }
 #endif
 
+<<<<<<< HEAD
 EAPI double
 elm_route_lon_min_get(Evas_Object *obj)
 {
@@ -297,4 +298,57 @@ elm_route_lat_max_get(Evas_Object *obj)
    return wd->lat_max;
 }
 
+=======
+EINA_DEPRECATED EAPI double
+elm_route_lon_min_get(Evas_Object *obj)
+{
+   double val;
+   elm_route_longitude_min_max_get(obj, &val, NULL);
+   return val;
+}
+
+EINA_DEPRECATED EAPI double
+elm_route_lat_min_get(Evas_Object *obj)
+{
+   double val;
+   elm_route_latitude_min_max_get(obj, &val, NULL);
+   return val;
+}
+
+EINA_DEPRECATED EAPI double
+elm_route_lon_max_get(Evas_Object *obj)
+{
+   double val;
+   elm_route_longitude_min_max_get(obj, NULL, &val);
+   return val;
+}
+
+EINA_DEPRECATED EAPI double
+elm_route_lat_max_get(Evas_Object *obj)
+{
+   double val;
+   elm_route_latitude_min_max_get(obj, NULL, &val);
+   return val;
+}
+
+EAPI void
+elm_route_longitude_min_max_get(const Evas_Object *obj, double *min, double *max)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (min) *min = wd->lon_min;
+   if (max) *max = wd->lon_max;
+}
+
+EAPI void
+elm_route_latitude_min_max_get(const Evas_Object *obj, double *min, double *max)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (min) *min = wd->lat_min;
+   if (max) *max = wd->lat_max;
+}
+>>>>>>> remotes/origin/upstream
 /* vim:set ts=8 sw=3 sts=3 expandtab cino=>5n-3f0^-2{2(0W1st0 :*/

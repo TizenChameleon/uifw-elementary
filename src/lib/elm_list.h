@@ -70,7 +70,11 @@
  *
  * @note Default value is #ELM_LIST_SCROLL.
  *
+<<<<<<< HEAD
  * Values <b> don't </b> work as bitmask, only one can be choosen.
+=======
+ * Values <b> don't </b> work as bitmask, only one can be chosen.
+>>>>>>> remotes/origin/upstream
  *
  * @see elm_list_mode_set()
  * @see elm_list_mode_get()
@@ -81,7 +85,11 @@ typedef enum
 {
    ELM_LIST_COMPRESS = 0, /**< Won't set any of its size hints to inform how a possible container should resize it. Then, if it's not created as a "resize object", it might end with zero dimensions. The list will respect the container's geometry and, if any of its items won't fit into its transverse axis, one won't be able to scroll it in that direction. */
    ELM_LIST_SCROLL, /**< Default value. Won't set any of its size hints to inform how a possible container should resize it. Then, if it's not created as a "resize object", it might end with zero dimensions. The list will respect the container's geometry and, if any of its items won't fit into its transverse axis, one will be able to scroll it in that direction (large items will get cropped). */
+<<<<<<< HEAD
    ELM_LIST_LIMIT, /**< Set a minimun size hint on the list object, so that containers may respect it (and resize itself to fit the child properly). More specifically, a minimum size hint will be set for its transverse axis, so that the @b largest item in that direction fits well. Can have effects bounded by setting the list object's maximum size hints. */
+=======
+   ELM_LIST_LIMIT, /**< Set a minimum size hint on the list object, so that containers may respect it (and resize itself to fit the child properly). More specifically, a minimum size hint will be set for its transverse axis, so that the @b largest item in that direction fits well. Can have effects bounded by setting the list object's maximum size hints. */
+>>>>>>> remotes/origin/upstream
    ELM_LIST_EXPAND, /**< Besides setting a minimum size on the transverse axis, just like the previous mode, will set a minimum size on the longitudinal axis too, trying to reserve space to all its children to be visible at a time. Can have effects bounded by setting the list object's maximum size hints. */
    ELM_LIST_LAST /**< Indicates error if returned by elm_list_mode_get() */
 } Elm_List_Mode;
@@ -221,6 +229,7 @@ EAPI void                         elm_list_horizontal_set(Evas_Object *obj, Eina
 EAPI Eina_Bool                    elm_list_horizontal_get(const Evas_Object *obj);
 
 /**
+<<<<<<< HEAD
  * Enable or disable always select mode on the list object.
  *
  * @param obj The list object
@@ -259,6 +268,43 @@ EAPI void                         elm_list_always_select_mode_set(Evas_Object *o
  * @ingroup List
  */
 EAPI Eina_Bool                    elm_list_always_select_mode_get(const Evas_Object *obj);
+=======
+ * Set the list select mode.
+ *
+ * @param obj The list object
+ * @param mode The select mode
+ *
+ * elm_list_select_mode_set() changes item select mode in the list widget.
+ * - ELM_OBJECT_SELECT_MODE_DEFAULT : Items will only call their selection func and
+ *      callback when first becoming selected. Any further clicks will
+ *      do nothing, unless you set always select mode.
+ * - ELM_OBJECT_SELECT_MODE_ALWAYS :  This means that, even if selected,
+ *      every click will make the selected callbacks be called.
+ * - ELM_OBJECT_SELECT_MODE_NONE : This will turn off the ability to select items
+ *      entirely and they will neither appear selected nor call selected
+ *      callback functions.
+ *
+ * @see elm_list_select_mode_get()
+ *
+ * @ingroup List
+ */
+EAPI void
+elm_list_select_mode_set(Evas_Object *obj, Elm_Object_Select_Mode mode);
+
+/**
+ * Get the list select mode.
+ *
+ * @param obj The list object
+ * @return The select mode
+ * (If getting mode is failed, it returns ELM_OBJECT_SELECT_MODE_MAX)
+ *
+ * @see elm_list_select_mode_set()
+ *
+ * @ingroup List
+ */
+EAPI Elm_Object_Select_Mode
+elm_list_select_mode_get(const Evas_Object *obj);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Set bouncing behaviour when the scrolled content reaches an edge.
@@ -283,9 +329,15 @@ EAPI void                         elm_list_bounce_set(Evas_Object *obj, Eina_Boo
  * axis is reached scrolling.
  *
  * @param obj The list object.
+<<<<<<< HEAD
  * @param h_bounce Pointer where to store the bounce state of the horizontal
  * axis.
  * @param v_bounce Pointer where to store the bounce state of the vertical
+=======
+ * @param h_bounce Pointer to store the bounce state of the horizontal
+ * axis.
+ * @param v_bounce Pointer to store the bounce state of the vertical
+>>>>>>> remotes/origin/upstream
  * axis.
  *
  * @see elm_scroller_bounce_get()
@@ -321,8 +373,13 @@ EAPI void                         elm_list_scroller_policy_set(Evas_Object *obj,
  * @see elm_list_scroller_policy_get() for details.
  *
  * @param obj The list object.
+<<<<<<< HEAD
  * @param policy_h Pointer where to store horizontal scrollbar policy.
  * @param policy_v Pointer where to store vertical scrollbar policy.
+=======
+ * @param policy_h Pointer to store horizontal scrollbar policy.
+ * @param policy_v Pointer to store vertical scrollbar policy.
+>>>>>>> remotes/origin/upstream
  *
  * @ingroup List
  */
@@ -346,13 +403,21 @@ EAPI void                         elm_list_scroller_policy_get(const Evas_Object
  * A new item will be created and appended to the list, i.e., will
  * be set as @b last item.
  *
+<<<<<<< HEAD
  * Items created with this method can be deleted with
  * elm_list_item_del().
+=======
+ * Items created with this method can be deleted with elm_object_item_del().
+>>>>>>> remotes/origin/upstream
  *
  * Associated @p data can be properly freed when item is deleted if a
  * callback function is set with elm_widget_item_del_cb_set().
  *
+<<<<<<< HEAD
  * If a function is passed as argument, it will be called everytime this item
+=======
+ * If a function is passed as argument, it will be called every time this item
+>>>>>>> remotes/origin/upstream
  * is selected, i.e., the user clicks over an unselected item.
  * If always select is enabled it will call this function every time
  * user clicks over an item (already selected or not).
@@ -364,14 +429,22 @@ EAPI void                         elm_list_scroller_policy_get(const Evas_Object
  * li = elm_list_add(win);
  * ic = elm_icon_add(win);
  * elm_icon_file_set(ic, "path/to/image", NULL);
+<<<<<<< HEAD
  * elm_icon_scale_set(ic, EINA_TRUE, EINA_TRUE);
+=======
+ * elm_icon_resizable_set(ic, EINA_TRUE, EINA_TRUE);
+>>>>>>> remotes/origin/upstream
  * elm_list_item_append(li, "label", ic, NULL, NULL, NULL);
  * elm_list_go(li);
  * evas_object_show(li);
  * @endcode
  *
  * @see elm_list_always_select_mode_set()
+<<<<<<< HEAD
  * @see elm_list_item_del()
+=======
+ * @see elm_object_item_del()
+>>>>>>> remotes/origin/upstream
  * @see elm_widget_item_del_cb_set()
  * @see elm_list_clear()
  * @see elm_icon_add()
@@ -398,13 +471,21 @@ EAPI Elm_Object_Item               *elm_list_item_append(Evas_Object *obj, const
  * A new item will be created and prepended to the list, i.e., will
  * be set as @b first item.
  *
+<<<<<<< HEAD
  * Items created with this method can be deleted with
  * elm_list_item_del().
+=======
+ * Items created with this method can be deleted with elm_object_item_del().
+>>>>>>> remotes/origin/upstream
  *
  * Associated @p data can be properly freed when item is deleted if a
  * callback function is set with elm_widget_item_del_cb_set().
  *
+<<<<<<< HEAD
  * If a function is passed as argument, it will be called everytime this item
+=======
+ * If a function is passed as argument, it will be called every time this item
+>>>>>>> remotes/origin/upstream
  * is selected, i.e., the user clicks over an unselected item.
  * If always select is enabled it will call this function every time
  * user clicks over an item (already selected or not).
@@ -413,7 +494,11 @@ EAPI Elm_Object_Item               *elm_list_item_append(Evas_Object *obj, const
  *
  * @see elm_list_item_append() for a simple code example.
  * @see elm_list_always_select_mode_set()
+<<<<<<< HEAD
  * @see elm_list_item_del()
+=======
+ * @see elm_object_item_del()
+>>>>>>> remotes/origin/upstream
  * @see elm_widget_item_del_cb_set()
  * @see elm_list_clear()
  * @see elm_icon_add()
@@ -441,13 +526,21 @@ EAPI Elm_Object_Item               *elm_list_item_prepend(Evas_Object *obj, cons
  * A new item will be created and added to the list. Its position in
  * this list will be just before item @p before.
  *
+<<<<<<< HEAD
  * Items created with this method can be deleted with
  * elm_list_item_del().
+=======
+ * Items created with this method can be deleted with elm_object_item_del().
+>>>>>>> remotes/origin/upstream
  *
  * Associated @p data can be properly freed when item is deleted if a
  * callback function is set with elm_widget_item_del_cb_set().
  *
+<<<<<<< HEAD
  * If a function is passed as argument, it will be called everytime this item
+=======
+ * If a function is passed as argument, it will be called every time this item
+>>>>>>> remotes/origin/upstream
  * is selected, i.e., the user clicks over an unselected item.
  * If always select is enabled it will call this function every time
  * user clicks over an item (already selected or not).
@@ -456,7 +549,11 @@ EAPI Elm_Object_Item               *elm_list_item_prepend(Evas_Object *obj, cons
  *
  * @see elm_list_item_append() for a simple code example.
  * @see elm_list_always_select_mode_set()
+<<<<<<< HEAD
  * @see elm_list_item_del()
+=======
+ * @see elm_object_item_del()
+>>>>>>> remotes/origin/upstream
  * @see elm_widget_item_del_cb_set()
  * @see elm_list_clear()
  * @see elm_icon_add()
@@ -484,13 +581,21 @@ EAPI Elm_Object_Item               *elm_list_item_insert_before(Evas_Object *obj
  * A new item will be created and added to the list. Its position in
  * this list will be just after item @p after.
  *
+<<<<<<< HEAD
  * Items created with this method can be deleted with
  * elm_list_item_del().
+=======
+ * Items created with this method can be deleted with elm_object_item_del().
+>>>>>>> remotes/origin/upstream
  *
  * Associated @p data can be properly freed when item is deleted if a
  * callback function is set with elm_widget_item_del_cb_set().
  *
+<<<<<<< HEAD
  * If a function is passed as argument, it will be called everytime this item
+=======
+ * If a function is passed as argument, it will be called every time this item
+>>>>>>> remotes/origin/upstream
  * is selected, i.e., the user clicks over an unselected item.
  * If always select is enabled it will call this function every time
  * user clicks over an item (already selected or not).
@@ -499,7 +604,11 @@ EAPI Elm_Object_Item               *elm_list_item_insert_before(Evas_Object *obj
  *
  * @see elm_list_item_append() for a simple code example.
  * @see elm_list_always_select_mode_set()
+<<<<<<< HEAD
  * @see elm_list_item_del()
+=======
+ * @see elm_object_item_del()
+>>>>>>> remotes/origin/upstream
  * @see elm_widget_item_del_cb_set()
  * @see elm_list_clear()
  * @see elm_icon_add()
@@ -535,13 +644,21 @@ EAPI Elm_Object_Item               *elm_list_item_insert_after(Evas_Object *obj,
  * this list will be found comparing the new item with previously inserted
  * items using function @p cmp_func.
  *
+<<<<<<< HEAD
  * Items created with this method can be deleted with
  * elm_list_item_del().
+=======
+ * Items created with this method can be deleted with elm_object_item_del().
+>>>>>>> remotes/origin/upstream
  *
  * Associated @p data can be properly freed when item is deleted if a
  * callback function is set with elm_widget_item_del_cb_set().
  *
+<<<<<<< HEAD
  * If a function is passed as argument, it will be called everytime this item
+=======
+ * If a function is passed as argument, it will be called every time this item
+>>>>>>> remotes/origin/upstream
  * is selected, i.e., the user clicks over an unselected item.
  * If always select is enabled it will call this function every time
  * user clicks over an item (already selected or not).
@@ -550,7 +667,11 @@ EAPI Elm_Object_Item               *elm_list_item_insert_after(Evas_Object *obj,
  *
  * @see elm_list_item_append() for a simple code example.
  * @see elm_list_always_select_mode_set()
+<<<<<<< HEAD
  * @see elm_list_item_del()
+=======
+ * @see elm_object_item_del()
+>>>>>>> remotes/origin/upstream
  * @see elm_widget_item_del_cb_set()
  * @see elm_list_clear()
  * @see elm_icon_add()
@@ -564,7 +685,11 @@ EAPI Elm_Object_Item               *elm_list_item_sorted_insert(Evas_Object *obj
  *
  * @param obj The list object
  *
+<<<<<<< HEAD
  * @see elm_list_item_del()
+=======
+ * @see elm_object_item_del()
+>>>>>>> remotes/origin/upstream
  * @see elm_list_item_append()
  *
  * @ingroup List
@@ -579,7 +704,11 @@ EAPI void                         elm_list_clear(Evas_Object *obj);
  * or @c NULL on failure.
  *
  * @see elm_list_item_append()
+<<<<<<< HEAD
  * @see elm_list_item_del()
+=======
+ * @see elm_object_item_del()
+>>>>>>> remotes/origin/upstream
  * @see elm_list_clear()
  *
  * @ingroup List
@@ -629,9 +758,15 @@ EAPI const Eina_List             *elm_list_selected_items_get(const Evas_Object 
  * This sets the selected state of the given item @p it.
  * @c EINA_TRUE for selected, @c EINA_FALSE for not selected.
  *
+<<<<<<< HEAD
  * If a new item is selected the previosly selected will be unselected,
  * unless multiple selection is enabled with elm_list_multi_select_set().
  * Previoulsy selected item can be get with function
+=======
+ * If a new item is selected the previously selected will be unselected,
+ * unless multiple selection is enabled with elm_list_multi_select_set().
+ * Previously selected item can be get with function
+>>>>>>> remotes/origin/upstream
  * elm_list_selected_item_get().
  *
  * Selected items will be highlighted.
@@ -695,7 +830,11 @@ EAPI Eina_Bool                    elm_list_item_separator_get(const Elm_Object_I
  * @param it The list item to be shown.
  *
  * It won't animate list until item is visible. If such behavior is wanted,
+<<<<<<< HEAD
  * use elm_list_bring_in() intead.
+=======
+ * use elm_list_bring_in() instead.
+>>>>>>> remotes/origin/upstream
  *
  * @ingroup List
  */
@@ -718,6 +857,7 @@ EAPI void                         elm_list_item_show(Elm_Object_Item *it);
 EAPI void                         elm_list_item_bring_in(Elm_Object_Item *it);
 
 /**
+<<<<<<< HEAD
  * Delete the item from the list.
  *
  * @param it The item of list to be deleted.
@@ -734,6 +874,8 @@ EAPI void                         elm_list_item_bring_in(Elm_Object_Item *it);
 EAPI void                         elm_list_item_del(Elm_Object_Item *it);
 
 /**
+=======
+>>>>>>> remotes/origin/upstream
  * Gets the base object of the item.
  *
  * @param it The list item

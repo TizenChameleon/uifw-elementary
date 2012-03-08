@@ -66,7 +66,11 @@
  * ./autogen.sh
  * @endverbatim
  *
+<<<<<<< HEAD
  * This will generate Makefile.in's, the confgure script and everything else.
+=======
+ * This will generate Makefile.in's, the configure script and everything else.
+>>>>>>> remotes/origin/upstream
  * After this it works like all normal autotools projects:
  * @verbatim
  * ./configure
@@ -79,7 +83,11 @@
  * specify a different prefix with configure:
  *
  * @verbatim
+<<<<<<< HEAD
  * ./confiugre --prefix=$HOME/mysoftware
+=======
+ * ./configure --prefix=$HOME/mysoftware
+>>>>>>> remotes/origin/upstream
  * @endverbatim
  *
  * Also remember that autotools buys you some useful commands like:
@@ -157,7 +165,11 @@
  *    // add a box object - default is vertical. a box holds children in a row,
  *    // either horizontally or vertically. nothing more.
  *    box = elm_box_add(win);
+<<<<<<< HEAD
  *    // make the box hotizontal
+=======
+ *    // make the box horizontal
+>>>>>>> remotes/origin/upstream
  *    elm_box_horizontal_set(box, EINA_TRUE);
  *    // add object as a resize object for the window (controls window minimum
  *    // size as well as gets resized if window is resized)

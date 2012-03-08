@@ -44,14 +44,22 @@ _title_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 }
 
 void
+<<<<<<< HEAD
 _title_visible(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+=======
+_title_visible(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+>>>>>>> remotes/origin/upstream
 {
    elm_naviframe_item_title_visible_set(data,
                                !elm_naviframe_item_title_visible_get(data));
 }
 
 void
+<<<<<<< HEAD
 _promote(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+=======
+_promote(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+>>>>>>> remotes/origin/upstream
 {
    elm_naviframe_item_promote(data);
 }
@@ -73,7 +81,12 @@ _page5(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
                                   evas_object_data_get(nf, "page1"));
 
    content = _content_new(nf, img5);
+<<<<<<< HEAD
    it = elm_naviframe_item_insert_after(elm_naviframe_top_item_get(nf),
+=======
+   it = elm_naviframe_item_insert_after(obj,
+                                        elm_naviframe_top_item_get(nf),
+>>>>>>> remotes/origin/upstream
                                         "Page 5",
                                         bt,
                                         bt2,

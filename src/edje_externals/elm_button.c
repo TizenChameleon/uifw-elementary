@@ -5,6 +5,15 @@ typedef struct _Elm_Params_Button
    Elm_Params base;
    const char *label;
    Evas_Object *icon;
+<<<<<<< HEAD
+=======
+   double autorepeat_initial;
+   double autorepeat_gap;
+   Eina_Bool autorepeat:1;
+   Eina_Bool autorepeat_exists:1;
+   Eina_Bool autorepeat_gap_exists:1;
+   Eina_Bool autorepeat_initial_exists:1;
+>>>>>>> remotes/origin/upstream
 } Elm_Params_Button;
 
 static void
@@ -20,6 +29,15 @@ external_button_state_set(void *data __UNUSED__, Evas_Object *obj, const void *f
      elm_object_text_set(obj, p->label);
    if (p->icon)
      elm_object_part_content_set(obj, "icon", p->icon);
+<<<<<<< HEAD
+=======
+   if (p->autorepeat_gap_exists)
+     elm_button_autorepeat_gap_timeout_set(obj, p->autorepeat_gap);
+   if (p->autorepeat_initial_exists)
+     elm_button_autorepeat_initial_timeout_set(obj, p->autorepeat_initial);
+   if (p->autorepeat_exists)
+     elm_button_autorepeat_set(obj, p->autorepeat);
+>>>>>>> remotes/origin/upstream
 }
 
 static Eina_Bool
@@ -43,6 +61,33 @@ external_button_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Ex
 	     return EINA_TRUE;
 	  }
      }
+<<<<<<< HEAD
+=======
+   else if (!strcmp(param->name, "autorepeat_initial"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
+	  {
+	     elm_button_autorepeat_initial_timeout_set(obj, param->d);
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "autorepeat_gap"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
+	  {
+	     elm_button_autorepeat_gap_timeout_set(obj, param->d);
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "autorepeat"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     elm_button_autorepeat_set(obj, param->i);
+	     return EINA_TRUE;
+	  }
+     }
+>>>>>>> remotes/origin/upstream
 
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -66,6 +111,33 @@ external_button_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_Ex
 	/* not easy to get icon name back from live object */
 	return EINA_FALSE;
      }
+<<<<<<< HEAD
+=======
+   else if (!strcmp(param->name, "autorepeat_initial"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
+	  {
+	     param->d = elm_button_autorepeat_initial_timeout_get(obj);
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "autorepeat_gap"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
+	  {
+	     param->d = elm_button_autorepeat_gap_timeout_get(obj);
+	     return EINA_TRUE;
+	  }
+     }
+   else if (!strcmp(param->name, "autorepeat"))
+     {
+	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+	  {
+	     param->i = elm_button_autorepeat_get(obj);
+	     return EINA_TRUE;
+	  }
+     }
+>>>>>>> remotes/origin/upstream
 
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -88,11 +160,31 @@ external_button_params_parse(void *data __UNUSED__, Evas_Object *obj, const Eina
 
    EINA_LIST_FOREACH(params, l, param)
      {
+<<<<<<< HEAD
         if (!strcmp(param->name, "label"))
           {
              mem->label = eina_stringshare_add(param->s);
              break;
           }
+=======
+	if (!strcmp(param->name, "autorepeat_initial"))
+	  {
+	     mem->autorepeat_initial = param->d;
+	     mem->autorepeat_initial_exists = EINA_TRUE;
+	  }
+        else if (!strcmp(param->name, "autorepeat_gap"))
+	  {
+	     mem->autorepeat_gap = param->d;
+	     mem->autorepeat_gap_exists = EINA_TRUE;
+	  }
+	else if (!strcmp(param->name, "autorepeat"))
+	  {
+	     mem->autorepeat = !!param->i;
+	     mem->autorepeat_exists = EINA_TRUE;
+	  }
+	else if (!strcmp(param->name, "label"))
+	  mem->label = eina_stringshare_add(param->s);
+>>>>>>> remotes/origin/upstream
      }
 
    return mem;
@@ -118,6 +210,12 @@ static Edje_External_Param_Info external_button_params[] = {
    DEFINE_EXTERNAL_COMMON_PARAMS,
    EDJE_EXTERNAL_PARAM_INFO_STRING("label"),
    EDJE_EXTERNAL_PARAM_INFO_STRING("icon"),
+<<<<<<< HEAD
+=======
+   EDJE_EXTERNAL_PARAM_INFO_DOUBLE("autorepeat_initial"),
+   EDJE_EXTERNAL_PARAM_INFO_DOUBLE("autorepeat_gap"),
+   EDJE_EXTERNAL_PARAM_INFO_BOOL("autorepeat"),
+>>>>>>> remotes/origin/upstream
    EDJE_EXTERNAL_PARAM_INFO_SENTINEL
 };
 

@@ -45,15 +45,24 @@ elm_widget.h
 includesunstabledir = $(includedir)/elementary-@VMAJ@
 
 includesub_HEADERS = \
+<<<<<<< HEAD
 elc_anchorblock.h \
 elc_anchorview.h \
 elc_ctxpopup.h \
+=======
+elc_ctxpopup.h \
+elc_dayselector.h \
+>>>>>>> remotes/origin/upstream
 elc_fileselector_button.h \
 elc_fileselector_entry.h \
 elc_fileselector.h \
 elc_hoversel.h \
 elc_multibuttonentry.h \
 elc_naviframe.h \
+<<<<<<< HEAD
+=======
+elc_popup.h \
+>>>>>>> remotes/origin/upstream
 elm_actionslider.h \
 elm_app.h \
 elm_authors.h \
@@ -66,6 +75,7 @@ elm_calendar.h \
 elm_check.h \
 elm_clock.h \
 elm_cnp.h \
+<<<<<<< HEAD
 elm_colorpalette.h \
 elm_colorselector.h \
 elm_config.h \
@@ -81,12 +91,29 @@ elm_diskselector.h \
 elm_engine.h \
 elm_entry.h \
 elm_factory.h \
+=======
+elm_colorselector.h \
+elm_config.h \
+elm_conform.h \
+elm_cursor.h \
+elm_datetime.h \
+elm_debug.h \
+elm_deprecated.h \
+elm_diskselector.h \
+elm_entry.h \
+>>>>>>> remotes/origin/upstream
 elm_finger.h \
 elm_flip.h \
 elm_flipselector.h \
 elm_focus.h \
+<<<<<<< HEAD
 elm_fonts.h \
 elm_frame.h \
+=======
+elm_font.h \
+elm_frame.h \
+elm_gen.h \
+>>>>>>> remotes/origin/upstream
 elm_general.h \
 elm_gengrid.h \
 elm_genlist.h \
@@ -97,7 +124,10 @@ elm_grid.h \
 elm_hover.h \
 elm_icon.h \
 elm_image.h \
+<<<<<<< HEAD
 elm_imageslider.h \
+=======
+>>>>>>> remotes/origin/upstream
 elm_plug.h \
 elm_index.h \
 elm_intro.h \
@@ -110,6 +140,7 @@ elm_map.h \
 elm_menu.h \
 elm_mirroring.h \
 elm_need.h \
+<<<<<<< HEAD
 elm_nocontents.h \
 elm_notify.h \
 elm_object.h \
@@ -122,6 +153,15 @@ elm_password.h \
 elm_photocam.h \
 elm_photo.h \
 elm_popup.h \
+=======
+elm_notify.h \
+elm_object.h \
+elm_object_item.h \
+elm_panel.h \
+elm_panes.h \
+elm_photocam.h \
+elm_photo.h \
+>>>>>>> remotes/origin/upstream
 elm_progressbar.h \
 elm_radio.h \
 elm_route.h \
@@ -133,12 +173,18 @@ elm_separator.h \
 elm_slider.h \
 elm_slideshow.h \
 elm_spinner.h \
+<<<<<<< HEAD
 elm_stackedicon.h \
+=======
+>>>>>>> remotes/origin/upstream
 elm_store.h \
 elm_table.h \
 elm_theme.h \
 elm_thumb.h \
+<<<<<<< HEAD
 elm_tickernoti.h \
+=======
+>>>>>>> remotes/origin/upstream
 elm_toolbar.h \
 elm_tooltip.h \
 elm_transit.h \
@@ -149,9 +195,15 @@ includesubdir = $(includedir)/elementary-@VMAJ@/
 
 libelementary_la_SOURCES = \
 elm_priv.h \
+<<<<<<< HEAD
 elc_anchorblock.c \
 elc_anchorview.c \
 elc_ctxpopup.c \
+=======
+elc_ctxpopup.c \
+elc_dayselector.c \
+elc_popup.c \
+>>>>>>> remotes/origin/upstream
 elc_fileselector_button.c \
 elc_fileselector.c \
 elc_fileselector_entry.c \
@@ -169,6 +221,7 @@ elm_button.c \
 elm_calendar.c \
 elm_check.c \
 elm_clock.c \
+<<<<<<< HEAD
 elm_cnp_helper.c \
 elm_colorpalette.c \
 elm_colorselector.c \
@@ -181,11 +234,23 @@ elm_diskselector.c \
 elm_editfield.c \
 elm_entry.c \
 elm_factory.c \
+=======
+elm_cnp.c \
+elm_colorselector.c \
+elm_config.c \
+elm_conform.c \
+elm_datetime.c \
+elm_diskselector.c \
+elm_entry.c \
+>>>>>>> remotes/origin/upstream
 elm_flip.c \
 elm_flipselector.c \
 elm_font.c \
 elm_frame.c \
+<<<<<<< HEAD
 elm_gen.c \
+=======
+>>>>>>> remotes/origin/upstream
 elm_gengrid.c \
 elm_genlist.c \
 elm_gen_common.h \
@@ -195,7 +260,10 @@ elm_grid.c \
 elm_hover.c \
 elm_icon.c \
 elm_image.c \
+<<<<<<< HEAD
 elm_imageslider.c \
+=======
+>>>>>>> remotes/origin/upstream
 elm_plug.c \
 elm_index.c \
 elm_label.c \
@@ -206,31 +274,47 @@ elm_mapbuf.c \
 elm_map.c \
 elm_menu.c \
 elm_module.c \
+<<<<<<< HEAD
 elm_nocontents.c \
 elm_notify.c \
 elm_pagecontrol.c \
+=======
+elm_notify.c \
+>>>>>>> remotes/origin/upstream
 elm_pager.c \
 elm_panel.c \
 elm_panes.c \
 elm_photo.c \
 elm_photocam.c \
+<<<<<<< HEAD
 elm_popup.c \
+=======
+>>>>>>> remotes/origin/upstream
 elm_progressbar.c \
 elm_radio.c \
 elm_route.c \
 elm_scroller.c \
+<<<<<<< HEAD
 elm_searchbar.c \
+=======
+>>>>>>> remotes/origin/upstream
 elm_segment_control.c \
 elm_separator.c \
 elm_slider.c \
 elm_slideshow.c \
 elm_spinner.c \
+<<<<<<< HEAD
 elm_stackedicon.c \
+=======
+>>>>>>> remotes/origin/upstream
 elm_store.c \
 elm_table.c \
 elm_theme.c \
 elm_thumb.c \
+<<<<<<< HEAD
 elm_tickernoti.c \
+=======
+>>>>>>> remotes/origin/upstream
 elm_toggle.c \
 elm_toolbar.c \
 elm_transit.c \
@@ -275,3 +359,10 @@ libelementary_la_LIBADD = \
 libelementary_la_LDFLAGS = \
 -no-undefined @lt_enable_auto_import@ \
 -version-info @version_info@ @release_info@
+<<<<<<< HEAD
+=======
+
+EXTRA_DIST = \
+elm_factory.h \
+elm_factory.c
+>>>>>>> remotes/origin/upstream

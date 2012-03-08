@@ -14,6 +14,7 @@
  */
 
 /**
+<<<<<<< HEAD
  * Get the global scaling factor
  *
  * This gets the globally configured scaling factor that is applied to all
@@ -47,6 +48,8 @@ EAPI void   elm_scale_set(double scale);
 EAPI void   elm_scale_all_set(double scale);
 
 /**
+=======
+>>>>>>> remotes/origin/upstream
  * Set the scaling factor for a given Elementary object
  *
  * @param obj The Elementary to operate on

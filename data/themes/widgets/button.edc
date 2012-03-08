@@ -1,4 +1,8 @@
 group { name: "elm/button/base/default";
+<<<<<<< HEAD
+=======
+   alias: "elm/button/base/popup_button/default";
+>>>>>>> remotes/origin/upstream
    images {
       image: "bt_base1.png" COMP;
       image: "bt_base2.png" COMP;

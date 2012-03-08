@@ -10,12 +10,21 @@
 
 #define N_ITEMS 300
 
+<<<<<<< HEAD
 static Elm_Genlist_Item_Class _itc;
 static Elm_Genlist_Item_Class _itc_group;
 static int nitems = 0;
 
 static char *
 _item_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
+=======
+static Elm_Genlist_Item_Class *_itc = NULL;
+static Elm_Genlist_Item_Class *_itc_group = NULL;
+static int nitems = 0;
+
+static char *
+_item_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
+>>>>>>> remotes/origin/upstream
 {
    time_t t = (time_t)ecore_time_unix_get();
    char buf[256];
@@ -25,10 +34,17 @@ _item_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
      snprintf(buf, sizeof(buf), "Item # %i", i);
    else
      {
+<<<<<<< HEAD
 	int n;
 	snprintf(buf, sizeof(buf), "realized at %s", ctime(&t));
 	n = strlen(buf);
 	buf[n - 1] = '\0';
+=======
+        int n;
+        snprintf(buf, sizeof(buf), "realized at %s", ctime(&t));
+        n = strlen(buf);
+        buf[n - 1] = '\0';
+>>>>>>> remotes/origin/upstream
      }
 
    return strdup(buf);
@@ -50,11 +66,19 @@ static void
 _item_sel_cb(void *data, Evas_Object *obj, void *event_info)
 {
    printf("sel item data [%p] on genlist obj [%p], item pointer [%p]\n",
+<<<<<<< HEAD
 	  data, obj, event_info);
 }
 
 static char *
 _group_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
+=======
+          data, obj, event_info);
+}
+
+static char *
+_group_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
+>>>>>>> remotes/origin/upstream
 {
    char buf[256];
    int i = (int)(long)data;
@@ -81,10 +105,17 @@ _append_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *list = data;
 
+<<<<<<< HEAD
    elm_genlist_item_append(list, &_itc,
 			   (void *)(long)nitems++, NULL,
 			   ELM_GENLIST_ITEM_NONE,
 			   _item_sel_cb, NULL);
+=======
+   elm_genlist_item_append(list, _itc,
+                           (void *)(long)nitems++, NULL,
+                           ELM_GENLIST_ITEM_NONE,
+                           _item_sel_cb, NULL);
+>>>>>>> remotes/origin/upstream
 
 }
 
@@ -93,10 +124,17 @@ _prepend_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *list = data;
 
+<<<<<<< HEAD
    elm_genlist_item_prepend(list, &_itc,
 			   (void *)(long)nitems++, NULL,
 			   ELM_GENLIST_ITEM_NONE,
 			   _item_sel_cb, NULL);
+=======
+   elm_genlist_item_prepend(list, _itc,
+                            (void *)(long)nitems++, NULL,
+                            ELM_GENLIST_ITEM_NONE,
+                            _item_sel_cb, NULL);
+>>>>>>> remotes/origin/upstream
 
 }
 
@@ -104,6 +142,7 @@ static void
 _insert_before_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *list = data;
+<<<<<<< HEAD
    Elm_Object_Item *it = elm_genlist_selected_item_get(list);
 
    if (!it)
@@ -113,12 +152,24 @@ _insert_before_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUS
 				  (void *)(long)nitems++, NULL,
 				  it, ELM_GENLIST_ITEM_NONE,
 				  _item_sel_cb, NULL);
+=======
+   Elm_Object_Item *glit = elm_genlist_selected_item_get(list);
+
+   if (!glit) return;
+
+   elm_genlist_item_insert_before(list, _itc,
+                                  (void *)(long)nitems++, NULL,
+                                  glit, ELM_GENLIST_ITEM_NONE,
+                                  _item_sel_cb, NULL);
+
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _insert_after_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *list = data;
+<<<<<<< HEAD
    Elm_Object_Item *it = elm_genlist_selected_item_get(list);
 
    if (!it)
@@ -128,12 +179,24 @@ _insert_after_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSE
 				 (void *)(long)nitems++, NULL,
 				 it, ELM_GENLIST_ITEM_NONE,
 				 _item_sel_cb, NULL);
+=======
+   Elm_Object_Item *glit = elm_genlist_selected_item_get(list);
+
+   if (!glit) return;
+
+   elm_genlist_item_insert_after(list, _itc,
+                                 (void *)(long)nitems++, NULL,
+                                 glit, ELM_GENLIST_ITEM_NONE,
+                                 _item_sel_cb, NULL);
+
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _next_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *list = data;
+<<<<<<< HEAD
    Elm_Object_Item *it;
 
    it = elm_genlist_selected_item_get(list);
@@ -145,12 +208,22 @@ _next_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 
    elm_genlist_item_selected_set(it, EINA_TRUE);
    elm_genlist_item_show(it);
+=======
+   Elm_Object_Item *glit = elm_genlist_selected_item_get(list);
+
+   if (glit) glit = elm_genlist_item_next_get(glit);
+   if (!glit) glit = elm_genlist_first_item_get(list);
+
+   elm_genlist_item_selected_set(glit, EINA_TRUE);
+   elm_genlist_item_show(glit, ELM_GENLIST_ITEM_SCROLLTO_IN);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _prev_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *list = data;
+<<<<<<< HEAD
    Elm_Object_Item *it;
 
    it = elm_genlist_selected_item_get(list);
@@ -162,84 +235,142 @@ _prev_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 
    elm_genlist_item_selected_set(it, EINA_TRUE);
    elm_genlist_item_show(it);
+=======
+   Elm_Object_Item *glit = elm_genlist_selected_item_get(list);
+
+   if (glit) glit = elm_genlist_item_prev_get(glit);
+   if (!glit) glit = elm_genlist_last_item_get(list);
+
+   elm_genlist_item_selected_set(glit, EINA_TRUE);
+   elm_genlist_item_show(glit, ELM_GENLIST_ITEM_SCROLLTO_IN);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _bring_in_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    Elm_Object_Item *it = data;
 
    if (!it)
      return;
 
    elm_genlist_item_bring_in(it);
+=======
+   Elm_Object_Item *glit = data;
+   if (!glit) return;
+
+   elm_genlist_item_bring_in(glit, ELM_GENLIST_ITEM_SCROLLTO_IN);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _show_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    Elm_Object_Item *it = data;
 
    if (!it)
      return;
 
    elm_genlist_item_show(it);
+=======
+   Elm_Object_Item *glit = data;
+   if (!glit) return;
+
+   elm_genlist_item_show(glit, ELM_GENLIST_ITEM_SCROLLTO_IN);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _middle_in_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    Elm_Object_Item *it = data;
 
    if (!it)
      return;
 
    elm_genlist_item_middle_bring_in(it);
+=======
+   Elm_Object_Item *glit = data;
+   if (!glit) return;
+
+   elm_genlist_item_bring_in(glit, ELM_GENLIST_ITEM_SCROLLTO_MIDDLE);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _middle_show_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    Elm_Object_Item *it = data;
 
    if (!it)
      return;
 
    elm_genlist_item_middle_show(it);
+=======
+   Elm_Object_Item *glit = data;
+   if (!glit) return;
+
+   elm_genlist_item_show(glit, ELM_GENLIST_ITEM_SCROLLTO_MIDDLE);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _top_in_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    Elm_Object_Item *it = data;
 
    if (!it)
      return;
 
    elm_genlist_item_top_bring_in(it);
+=======
+   Elm_Object_Item *glit = data;
+   if (!glit) return;
+
+   elm_genlist_item_bring_in(glit, ELM_GENLIST_ITEM_SCROLLTO_TOP);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _top_show_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    Elm_Object_Item *it = data;
 
    if (!it)
      return;
 
    elm_genlist_item_top_show(it);
+=======
+   Elm_Object_Item *glit = data;
+   if (!glit) return;
+
+   elm_genlist_item_show(glit, ELM_GENLIST_ITEM_SCROLLTO_TOP);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _realize_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *list = data;
+<<<<<<< HEAD
    Elm_Object_Item *it = elm_genlist_selected_item_get(list);
 
    if (!it)
      return;
 
    elm_genlist_item_update(it);
+=======
+   Elm_Object_Item *glit = elm_genlist_selected_item_get(list);
+   if (!glit) return;
+
+   elm_genlist_item_update(glit);
+>>>>>>> remotes/origin/upstream
 }
 
 static Evas_Object *
@@ -285,6 +416,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    elm_win_resize_object_add(win, box);
    evas_object_show(box);
 
+<<<<<<< HEAD
    _itc.item_style = "double_label";
    _itc.func.text_get = _item_text_get;
    _itc.func.content_get = _item_content_get;
@@ -297,6 +429,27 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    _itc_group.func.state_get = NULL;
    _itc_group.func.del = NULL;
 
+=======
+   if (!_itc)
+     {
+        _itc = elm_genlist_item_class_new();
+        _itc->item_style = "default";
+        _itc->func.text_get = _item_label_get;
+        _itc->func.content_get = _item_content_get;
+        _itc->func.state_get = NULL;
+        _itc->func.del = NULL;
+     }
+
+   if (!_itc_group)
+     {
+        _itc_group = elm_genlist_item_class_new();
+        _itc_group->item_style = "default";
+        _itc_group->func.text_get = _item_label_get;
+        _itc_group->func.content_get = _item_content_get;
+        _itc_group->func.state_get = NULL;
+        _itc_group->func.del = NULL;
+     }
+>>>>>>> remotes/origin/upstream
    list = elm_genlist_add(win);
 
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -306,7 +459,11 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
 
    fbox = elm_box_add(win);
    elm_box_layout_set(fbox, evas_object_box_layout_flow_horizontal,
+<<<<<<< HEAD
 		      NULL, NULL);
+=======
+                      NULL, NULL);
+>>>>>>> remotes/origin/upstream
    evas_object_size_hint_weight_set(fbox, EVAS_HINT_EXPAND, 0);
    evas_object_size_hint_align_set(fbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(box, fbox);
@@ -328,6 +485,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
 
    for (i = 0; i < N_ITEMS; i++)
      {
+<<<<<<< HEAD
 	Elm_Object_Item *gli, *glg;
 
 	if (i % 7 == 0)
@@ -369,6 +527,49 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
 	      evas_object_smart_callback_add(
 		 bt_top_show, "clicked", _top_show_cb, gli);
 	  }
+=======
+        Elm_Object_Item *gli, *glg;
+
+        if (i % 7 == 0)
+          {
+             glg = gli = elm_genlist_item_append(list, _itc_group,
+                                                 (void *)(long)nitems++, NULL,
+                                                 ELM_GENLIST_ITEM_GROUP,
+                                                 _item_sel_cb, NULL);
+             elm_genlist_item_select_mode_set(gli, ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY);
+          }
+        else
+          {
+             gli = elm_genlist_item_append(list, _itc,
+                                           (void *)(long)nitems++, glg,
+                                           ELM_GENLIST_ITEM_NONE,
+                                           _item_sel_cb, NULL);
+          }
+
+        switch (i)
+          {
+           case 3:
+              elm_object_item_disabled_set(gli, EINA_TRUE);
+              break;
+           case 50:
+              evas_object_smart_callback_add(
+                 bt_bring_in, "clicked", _bring_in_cb, gli);
+              evas_object_smart_callback_add(
+                 bt_show, "clicked", _show_cb, gli);
+              break;
+           case 200:
+              evas_object_smart_callback_add(
+                 bt_middle_in, "clicked", _middle_in_cb, gli);
+              evas_object_smart_callback_add(
+                 bt_middle_show, "clicked", _middle_show_cb, gli);
+              break;
+           case 250:
+              evas_object_smart_callback_add(
+                 bt_top_in, "clicked", _top_in_cb, gli);
+              evas_object_smart_callback_add(
+                 bt_top_show, "clicked", _top_show_cb, gli);
+          }
+>>>>>>> remotes/origin/upstream
      }
 
    evas_object_size_hint_min_set(bg, 160, 160);

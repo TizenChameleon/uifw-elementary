@@ -10,9 +10,15 @@
  * text doesn't fit the geometry of the label it will be ellipsized or be
  * cut. Elementary provides several styles for this widget:
  * @li default - No animation
+<<<<<<< HEAD
  * @li marker - Centers the text in the label and make it bold by default
  * @li slide_long - The entire text appears from the right of the screen and
  * slides until it disappears in the left of the screen(reappering on the
+=======
+ * @li marker - Centers the text in the label and makes it bold by default
+ * @li slide_long - The entire text appears from the right of the screen and
+ * slides until it disappears in the left of the screen(reappearing on the
+>>>>>>> remotes/origin/upstream
  * right again).
  * @li slide_short - The text appears in the left of the label and slides to
  * the right to show the overflow. When all of the text has been shown the
@@ -86,6 +92,7 @@ EAPI void                        elm_label_wrap_width_set(Evas_Object *obj, Evas
 EAPI Evas_Coord                  elm_label_wrap_width_get(const Evas_Object *obj);
 
 /**
+<<<<<<< HEAD
  * @brief Set wrap height of the label
  *
  * @param obj The label object
@@ -156,6 +163,8 @@ EAPI void                        elm_label_text_align_set(Evas_Object *obj, cons
 EAPI void                        elm_label_background_color_set(Evas_Object *obj, unsigned int r, unsigned int g, unsigned int b, unsigned int a);
 
 /**
+=======
+>>>>>>> remotes/origin/upstream
  * @brief Set the ellipsis behavior of the label
  *
  * @param obj The label object
@@ -165,15 +174,36 @@ EAPI void                        elm_label_background_color_set(Evas_Object *obj
  * will be shown at the end of the widget.
  *
  * @warning This doesn't work with slide(elm_label_slide_set()) or if the
+<<<<<<< HEAD
  * choosen wrap method was ELM_WRAP_WORD.
+=======
+ * chosen wrap method was ELM_WRAP_WORD.
+>>>>>>> remotes/origin/upstream
  */
 EAPI void                        elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis);
 
 /**
+<<<<<<< HEAD
  * @brief Set the text slide of the label
  *
  * @param obj The label object
  * @param slide To start slide or stop
+=======
+ * @brief Get the ellipsis behavior of the label
+ *
+ * @param obj The label object
+ * @return If true, an ellipsis will be shown at the end of the label area.
+ *
+ * @see elm_label_ellipsis_set()
+ */
+EAPI Eina_Bool                   elm_label_ellipsis_get(const Evas_Object *obj);
+
+/**
+ * @brief Set sliding effect of label widget.
+ *
+ * @param obj The label object
+ * @param slide If true, sliding effect will be shown
+>>>>>>> remotes/origin/upstream
  *
  * If set to true, the text of the label will slide/scroll through the length of
  * label.
@@ -184,6 +214,7 @@ EAPI void                        elm_label_ellipsis_set(Evas_Object *obj, Eina_B
 EAPI void                        elm_label_slide_set(Evas_Object *obj, Eina_Bool slide);
 
 /**
+<<<<<<< HEAD
  * @brief Get the text slide mode of the label
  *
  * @param obj The label object
@@ -192,12 +223,26 @@ EAPI void                        elm_label_slide_set(Evas_Object *obj, Eina_Bool
  * @see elm_label_slide_set()
  */
 EAPI Eina_Bool                   elm_label_slide_get(Evas_Object *obj);
+=======
+ * @brief Get whether sliding effect is shown or not.
+ *
+ * @param obj The label object
+ * @return If true, sliding effect is shown.
+ *
+ * @see elm_label_slide_set()
+ */
+EAPI Eina_Bool                   elm_label_slide_get(const Evas_Object *obj);
+>>>>>>> remotes/origin/upstream
 
 /**
  * @brief Set the slide duration(speed) of the label
  *
  * @param obj The label object
+<<<<<<< HEAD
  * @return The duration in seconds in moving text from slide begin position
+=======
+ * @param duration The duration in seconds in moving text from slide begin position
+>>>>>>> remotes/origin/upstream
  * to slide end position
  */
 EAPI void                        elm_label_slide_duration_set(Evas_Object *obj, double duration);
@@ -210,7 +255,11 @@ EAPI void                        elm_label_slide_duration_set(Evas_Object *obj, 
  *
  * @see elm_label_slide_duration_set()
  */
+<<<<<<< HEAD
 EAPI double                      elm_label_slide_duration_get(Evas_Object *obj);
+=======
+EAPI double                      elm_label_slide_duration_get(const Evas_Object *obj);
+>>>>>>> remotes/origin/upstream
 
 /**
  * @}

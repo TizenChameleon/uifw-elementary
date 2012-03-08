@@ -189,10 +189,13 @@ _theme_hook(Evas_Object *obj)
      _elm_theme_object_set(obj, wd->slider, "slider", "horizontal", elm_widget_style_get(obj));
    else
      _elm_theme_object_set(obj, wd->slider, "slider", "vertical", elm_widget_style_get(obj));
+<<<<<<< HEAD
    if (elm_widget_disabled_get(obj))
      edje_object_signal_emit(wd->slider, "elm,state,disabled", "elm");
    else
      edje_object_signal_emit(wd->slider, "elm,state,enabled", "elm");
+=======
+>>>>>>> remotes/origin/upstream
    if (wd->icon)
      {
         edje_object_part_swallow(wd->slider, "elm.swallow.content", wd->icon);
@@ -205,7 +208,11 @@ _theme_hook(Evas_Object *obj)
    if (wd->labels)
      {
         eina_hash_foreach(wd->labels, _labels_foreach_text_set, wd);
+<<<<<<< HEAD
 	    edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
+=======
+	edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
+>>>>>>> remotes/origin/upstream
      }
 
    if (wd->units)
@@ -393,6 +400,7 @@ _indicator_set(Evas_Object *obj)
 static void
 _drag(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+<<<<<<< HEAD
    Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
    if (elm_widget_disabled_get(data)) return;
    _val_fetch(data);
@@ -400,26 +408,40 @@ _drag(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, 
    _indicator_set(data);
    edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
    edje_object_message_signal_process(wd->slider);
+=======
+   _val_fetch(data);
+   _units_set(data);
+   _indicator_set(data);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _drag_start(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+<<<<<<< HEAD
    Widget_Data *wd = elm_widget_data_get((Evas_Object*)data);
    if (elm_widget_disabled_get(data)) return;
+=======
+>>>>>>> remotes/origin/upstream
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_START, NULL);
    _units_set(data);
    _indicator_set(data);
    elm_widget_scroll_freeze_push(data);
+<<<<<<< HEAD
    edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
    edje_object_message_signal_process(wd->slider);
+=======
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _drag_stop(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+<<<<<<< HEAD
    if (elm_widget_disabled_get(data)) return;
+=======
+>>>>>>> remotes/origin/upstream
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_STOP, NULL);
    _units_set(data);
@@ -430,7 +452,10 @@ _drag_stop(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSE
 static void
 _drag_step(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+<<<<<<< HEAD
    if (elm_widget_disabled_get(data)) return;
+=======
+>>>>>>> remotes/origin/upstream
    _val_fetch(data);
    _units_set(data);
    _indicator_set(data);
@@ -441,7 +466,10 @@ _drag_up(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED_
 {
    double step;
    Widget_Data *wd;
+<<<<<<< HEAD
    if (elm_widget_disabled_get(data)) return;
+=======
+>>>>>>> remotes/origin/upstream
 
    wd = elm_widget_data_get(data);
    step = 0.05;
@@ -456,7 +484,10 @@ _drag_down(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSE
 {
    double step;
    Widget_Data *wd;
+<<<<<<< HEAD
    if (elm_widget_disabled_get(data)) return;
+=======
+>>>>>>> remotes/origin/upstream
 
    wd = elm_widget_data_get(data);
    step = -0.05;
@@ -473,14 +504,20 @@ _spacer_down_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, voi
    Evas_Event_Mouse_Down *ev = event_info;
    Evas_Coord x, y, w, h;
    double button_x = 0.0, button_y = 0.0;
+<<<<<<< HEAD
    if (elm_widget_disabled_get(data)) return;
+=======
+>>>>>>> remotes/origin/upstream
 
    wd->spacer_down = EINA_TRUE;
    wd->val2 = wd->val;
    evas_object_geometry_get(wd->spacer, &x, &y, &w, &h);
    wd->downx = ev->canvas.x - x;
    wd->downy = ev->canvas.y - y;
+<<<<<<< HEAD
    edje_object_part_drag_value_get(wd->slider, "elm.dragable.slider", &button_x, &button_y);
+=======
+>>>>>>> remotes/origin/upstream
    if (wd->horizontal)
      {
         button_x = ((double)ev->canvas.x - (double)x) / (double)w;
@@ -499,8 +536,11 @@ _spacer_down_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, voi
    _units_set(data);
    _indicator_set(data);
    edje_object_signal_emit(wd->slider, "elm,state,indicator,show", "elm");
+<<<<<<< HEAD
    edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
    edje_object_message_signal_process(wd->slider);
+=======
+>>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -508,12 +548,22 @@ _spacer_move_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, voi
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Move *ev = event_info;
+<<<<<<< HEAD
    Evas_Coord x, y, w, h, d = 0;
    double button_x = 0.0, button_y = 0.0;
    if (elm_widget_disabled_get(data)) return;
 
    if  (wd->spacer_down)
      {
+=======
+   Evas_Coord x, y, w, h;
+   double button_x = 0.0, button_y = 0.0;
+
+   if  (wd->spacer_down)
+     {
+        Evas_Coord d = 0;
+        
+>>>>>>> remotes/origin/upstream
         evas_object_geometry_get(wd->spacer, &x, &y, &w, &h);
         if (wd->horizontal) d = abs(ev->cur.canvas.x - x - wd->downx);
         else d = abs(ev->cur.canvas.y - y - wd->downy);
@@ -522,11 +572,19 @@ _spacer_move_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, voi
              if (!wd->frozen)
                {
                   elm_widget_scroll_freeze_push(data);
+<<<<<<< HEAD
                   wd->frozen = EINA_TRUE;
                }
              ev->event_flags &= ~EVAS_EVENT_FLAG_ON_HOLD;
           }
 
+=======
+                  wd->frozen = 1;
+               }
+             ev->event_flags &= ~EVAS_EVENT_FLAG_ON_HOLD;
+          }
+             
+>>>>>>> remotes/origin/upstream
         if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD)
           {
              if (wd->spacer_down) wd->spacer_down = EINA_FALSE;
@@ -537,7 +595,11 @@ _spacer_move_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, voi
              if (wd->frozen)
                {
                   elm_widget_scroll_freeze_pop(data);
+<<<<<<< HEAD
                   wd->frozen = EINA_FALSE;
+=======
+                  wd->frozen = 0;
+>>>>>>> remotes/origin/upstream
                }
              edje_object_signal_emit(wd->slider, "elm,state,indicator,hide", "elm");
              elm_slider_value_set(data, wd->val2);
@@ -559,8 +621,11 @@ _spacer_move_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, voi
         _val_fetch(data);
         _units_set(data);
         _indicator_set(data);
+<<<<<<< HEAD
         edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
         edje_object_message_signal_process(wd->slider);
+=======
+>>>>>>> remotes/origin/upstream
      }
 }
 
@@ -568,10 +633,16 @@ static void
 _spacer_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+<<<<<<< HEAD
    if (elm_widget_disabled_get(data)) return;
    if (!wd->spacer_down) return;
 
    wd->spacer_down = EINA_FALSE;
+=======
+
+   if (!wd->spacer_down) return;
+   if (wd->spacer_down) wd->spacer_down = EINA_FALSE;
+>>>>>>> remotes/origin/upstream
    _val_fetch(data);
    evas_object_smart_callback_call(data, SIG_DRAG_STOP, NULL);
    _units_set(data);
@@ -579,7 +650,11 @@ _spacer_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void 
    if (wd->frozen)
      {
         elm_widget_scroll_freeze_pop(data);
+<<<<<<< HEAD
         wd->frozen = EINA_FALSE;
+=======
+        wd->frozen = 0;
+>>>>>>> remotes/origin/upstream
      }
    edje_object_signal_emit(wd->slider, "elm,state,indicator,hide", "elm");
 }
@@ -634,7 +709,10 @@ _elm_slider_label_get(const Evas_Object *obj, const char *part)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
    if (!wd) return NULL;
    if (!wd->labels) return NULL;
 
@@ -996,7 +1074,10 @@ elm_slider_value_set(Evas_Object *obj, double val)
    wd->val = val;
    if (wd->val < wd->val_min) wd->val = wd->val_min;
    if (wd->val > wd->val_max) wd->val = wd->val_max;
+<<<<<<< HEAD
    edje_object_signal_emit(wd->slider, "elm,state,drag", "elm");
+=======
+>>>>>>> remotes/origin/upstream
    _val_set(obj);
    _units_set(obj);
    _indicator_set(obj);

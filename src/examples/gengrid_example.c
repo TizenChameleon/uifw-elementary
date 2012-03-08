@@ -35,8 +35,13 @@ static const char *imgs[9] =
    "wood_01.jpg",
 };
 
+<<<<<<< HEAD
 static Elm_Gengrid_Item_Class gic;
 Evas_Object *before_bt, *after_bt;
+=======
+static Elm_Gengrid_Item_Class *gic = NULL;
+static Evas_Object *before_bt, *after_bt;
+>>>>>>> remotes/origin/upstream
 
 static void
 _on_done(void        *data __UNUSED__,
@@ -66,7 +71,14 @@ _always_select_change(void        *data,
    Evas_Object *grid = data;
    Eina_Bool always = elm_check_state_get(obj);
 
+<<<<<<< HEAD
    elm_gengrid_always_select_mode_set(grid, always);
+=======
+   if (always)
+     elm_gengrid_select_mode_set(grid, ELM_OBJECT_SELECT_MODE_ALWAYS);
+   else
+     elm_gengrid_select_mode_set(grid, ELM_OBJECT_SELECT_MODE_DEFAULT);
+>>>>>>> remotes/origin/upstream
 
    fprintf(stdout, "\"Always select\" mode for gengrid items is now %s\n",
            always ? "on" : "off");
@@ -122,7 +134,14 @@ _no_sel_change(void        *data,
    Evas_Object *grid = data;
    Eina_Bool no_sel = elm_check_state_get(obj);
 
+<<<<<<< HEAD
    elm_gengrid_no_select_mode_set(grid, no_sel);
+=======
+   if (no_sel)
+     elm_gengrid_select_mode_set(grid, ELM_OBJECT_SELECT_MODE_NONE);
+   else
+     elm_gengrid_select_mode_set(grid, ELM_OBJECT_SELECT_MODE_DEFAULT);
+>>>>>>> remotes/origin/upstream
 
    fprintf(stdout, "Selection for gengrid items is now %s\n",
            no_sel ? "disabled" : "enabled");
@@ -170,7 +189,11 @@ _before_bt_clicked(void        *data,
      return;
 
    it = _item_new();
+<<<<<<< HEAD
    elm_gengrid_item_insert_before(grid, &gic, it, sel, _grid_sel, NULL);
+=======
+   elm_gengrid_item_insert_before(grid, gic, it, sel, _grid_sel, NULL);
+>>>>>>> remotes/origin/upstream
 }
 
 /* "insert after" callback */
@@ -188,7 +211,11 @@ _after_bt_clicked(void        *data,
      return;
 
    it = _item_new();
+<<<<<<< HEAD
    elm_gengrid_item_insert_after(grid, &gic, it, sel, _grid_sel, NULL);
+=======
+   elm_gengrid_item_insert_after(grid, gic, it, sel, _grid_sel, NULL);
+>>>>>>> remotes/origin/upstream
 }
 
 /* prepend an item */
@@ -201,7 +228,11 @@ _prepend_bt_clicked(void        *data,
    Evas_Object *grid = data;
 
    it = _item_new();
+<<<<<<< HEAD
    elm_gengrid_item_prepend(grid, &gic, it, _grid_sel, NULL);
+=======
+   elm_gengrid_item_prepend(grid, gic, it, _grid_sel, NULL);
+>>>>>>> remotes/origin/upstream
 }
 
 /* append an item */
@@ -213,7 +244,11 @@ _append_bt_clicked(void        *data,
    Evas_Object *grid = data;
    Example_Item *it = _item_new();
 
+<<<<<<< HEAD
    elm_gengrid_item_append(grid, &gic, it, _grid_sel, NULL);
+=======
+   elm_gengrid_item_append(grid, gic, it, _grid_sel, NULL);
+>>>>>>> remotes/origin/upstream
 }
 
 /* delete items */
@@ -237,7 +272,11 @@ _bring_1st_clicked(void        *data,
 
    if (!gg_it) return;
 
+<<<<<<< HEAD
    elm_gengrid_item_bring_in(gg_it);
+=======
+   elm_gengrid_item_bring_in(gg_it, ELM_GENGRID_ITEM_SCROLLTO_IN);
+>>>>>>> remotes/origin/upstream
 }
 
 /* show last item */
@@ -250,7 +289,11 @@ _show_last_clicked(void        *data,
 
    if (!gg_it) return;
 
+<<<<<<< HEAD
    elm_gengrid_item_show(gg_it);
+=======
+   elm_gengrid_item_show(gg_it, ELM_GENGRID_ITEM_SCROLLTO_IN);
+>>>>>>> remotes/origin/upstream
 }
 
 /* disable selected item */
@@ -604,11 +647,23 @@ elm_main(int    argc __UNUSED__,
    _page_change_cb(grid, sl, NULL);
    evas_object_smart_callback_add(sl, "changed", _page_change_cb, grid);
 
+<<<<<<< HEAD
    gic.item_style = "default";
    gic.func.text_get = _grid_label_get;
    gic.func.content_get = _grid_content_get;
    gic.func.state_get = _grid_state_get;
    gic.func.del = _grid_del;
+=======
+   if (!gic)
+     {
+        gic = elm_gengrid_item_class_new();
+        gic->item_style = "default";
+        gic->func.text_get = _grid_label_get;
+        gic->func.content_get = _grid_content_get;
+        gic->func.state_get = _grid_state_get;
+        gic->func.del = _grid_del;
+     } // we only create the first time its needed. we dont unref/free
+>>>>>>> remotes/origin/upstream
 
    _append_bt_clicked(grid, NULL, NULL);
    _append_bt_clicked(grid, NULL, NULL);

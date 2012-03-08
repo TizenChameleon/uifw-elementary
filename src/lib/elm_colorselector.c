@@ -52,12 +52,27 @@ static void _hsl_to_rgb(void *data);
 static void _color_with_saturation(void *data);
 static void _color_with_lightness(void *data);
 static void _draw_rects(void *data, double x);
+<<<<<<< HEAD
 static void _arrow_cb(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _colorbar_cb(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _left_button_clicked_cb(void *data, Evas_Object * obj, void *event_info);
 static void _left_button_repeat_cb(void *data, Evas_Object * obj, void *event_info);
 static void _right_button_clicked_cb(void *data, Evas_Object * obj, void *event_info);
 static void _right_button_repeat_cb(void *data, Evas_Object * obj, void *event_info);
+=======
+static void _arrow_cb(void *data, Evas_Object *obj, const char *emission,
+                      const char *source);
+static void _colorbar_cb(void *data, Evas *e, Evas_Object *obj,
+                         void *event_info);
+static void _left_button_clicked_cb(void *data, Evas_Object * obj,
+                                    void *event_info);
+static void _left_button_repeat_cb(void *data, Evas_Object * obj,
+                                   void *event_info);
+static void _right_button_clicked_cb(void *data, Evas_Object * obj,
+                                     void *event_info);
+static void _right_button_repeat_cb(void *data, Evas_Object * obj,
+                                    void *event_info);
+>>>>>>> remotes/origin/upstream
 static void _add_colorbar(Evas_Object *obj);
 static void _set_color(Evas_Object *obj, int r, int g, int b, int a);
 
@@ -419,7 +434,12 @@ _draw_rects(void *data, double x)
 }
 
 static void
+<<<<<<< HEAD
 _arrow_cb(void *data, Evas_Object *obj, const char *emission __UNUSED__, const char *source __UNUSED__)
+=======
+_arrow_cb(void *data, Evas_Object *obj, const char *emission __UNUSED__,
+          const char *source __UNUSED__)
+>>>>>>> remotes/origin/upstream
 {
    Colorselector_Data *cp = data;
    double x, y;
@@ -451,7 +471,12 @@ _colorbar_cb(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *event_info)
 }
 
 static void
+<<<<<<< HEAD
 _left_button_clicked_cb(void *data, Evas_Object * obj __UNUSED__, void *event_info __UNUSED__)
+=======
+_left_button_clicked_cb(void *data, Evas_Object * obj __UNUSED__,
+                        void *event_info __UNUSED__)
+>>>>>>> remotes/origin/upstream
 {
    Colorselector_Data *cp = data;
    double x, y;
@@ -486,7 +511,12 @@ _left_button_clicked_cb(void *data, Evas_Object * obj __UNUSED__, void *event_in
 }
 
 static void
+<<<<<<< HEAD
 _left_button_repeat_cb(void *data, Evas_Object * obj __UNUSED__, void *event_info __UNUSED__)
+=======
+_left_button_repeat_cb(void *data, Evas_Object * obj __UNUSED__,
+                       void *event_info __UNUSED__)
+>>>>>>> remotes/origin/upstream
 {
    Colorselector_Data *cp = data;
    double x, y;
@@ -501,7 +531,12 @@ _left_button_repeat_cb(void *data, Evas_Object * obj __UNUSED__, void *event_inf
 }
 
 static void
+<<<<<<< HEAD
 _right_button_clicked_cb(void *data, Evas_Object * obj __UNUSED__, void *event_info __UNUSED__)
+=======
+_right_button_clicked_cb(void *data, Evas_Object * obj __UNUSED__,
+                         void *event_info __UNUSED__)
+>>>>>>> remotes/origin/upstream
 {
    Colorselector_Data *cp = data;
    double x, y;
@@ -536,7 +571,12 @@ _right_button_clicked_cb(void *data, Evas_Object * obj __UNUSED__, void *event_i
 }
 
 static void
+<<<<<<< HEAD
 _right_button_repeat_cb(void *data, Evas_Object * obj __UNUSED__, void *event_info __UNUSED__)
+=======
+_right_button_repeat_cb(void *data, Evas_Object * obj __UNUSED__,
+                        void *event_info __UNUSED__)
+>>>>>>> remotes/origin/upstream
 {
    Colorselector_Data *cp = data;
    double x, y;
@@ -598,7 +638,12 @@ _add_colorbar(Evas_Object *obj)
 
         /* load colorbar image */
         wd->cp[i]->bar = edje_object_add(e);
+<<<<<<< HEAD
         snprintf(buf, sizeof(buf), "%s/%s", colorbar_name, elm_widget_style_get(obj));
+=======
+        snprintf(buf, sizeof(buf), "%s/%s", colorbar_name,
+                 elm_widget_style_get(obj));
+>>>>>>> remotes/origin/upstream
         _elm_theme_object_set(obj, wd->cp[i]->bar, "colorselector", "image",
                               buf);
         edje_object_part_swallow(wd->cp[i]->colorbar, "elm.bar",
@@ -630,7 +675,12 @@ _add_colorbar(Evas_Object *obj)
         if (i == 3)
           {
              wd->cp[i]->bg_rect = edje_object_add(e);
+<<<<<<< HEAD
              snprintf(buf, sizeof(buf), "%s/%s", colorbar_name, elm_widget_style_get(obj));
+=======
+             snprintf(buf, sizeof(buf), "%s/%s", colorbar_name,
+                      elm_widget_style_get(obj));
+>>>>>>> remotes/origin/upstream
              _elm_theme_object_set(obj, wd->cp[i]->bg_rect, "colorselector",
                                    "bg_image", buf);
              edje_object_part_swallow(wd->cp[i]->colorbar, "elm.bar_bg",
@@ -652,11 +702,17 @@ _add_colorbar(Evas_Object *obj)
 
         /* load left button */
         wd->cp[i]->lbt = elm_button_add(obj);
+<<<<<<< HEAD
         snprintf(buf, sizeof(buf), "colorselector/left/%s", elm_widget_style_get(obj));
+=======
+        snprintf(buf, sizeof(buf), "colorselector/left/%s",
+                 elm_widget_style_get(obj));
+>>>>>>> remotes/origin/upstream
         elm_object_style_set(wd->cp[i]->lbt, buf);
         elm_widget_sub_object_add(obj, wd->cp[i]->lbt);
         edje_object_part_swallow(wd->cp[i]->colorbar, "elm.l_button",
                                  wd->cp[i]->lbt);
+<<<<<<< HEAD
         evas_object_smart_callback_add(wd->cp[i]->lbt, "clicked", _left_button_clicked_cb, wd->cp[i]);
         elm_button_autorepeat_set(wd->cp[i]->lbt, EINA_TRUE);
         elm_button_autorepeat_initial_timeout_set(wd->cp[i]->lbt, _elm_config->longpress_timeout);
@@ -666,15 +722,43 @@ _add_colorbar(Evas_Object *obj)
         /* load right button */
         wd->cp[i]->rbt = elm_button_add(obj);
         snprintf(buf, sizeof(buf), "colorselector/right/%s", elm_widget_style_get(obj));
+=======
+        evas_object_smart_callback_add(wd->cp[i]->lbt, "clicked",
+                                       _left_button_clicked_cb, wd->cp[i]);
+        elm_button_autorepeat_set(wd->cp[i]->lbt, EINA_TRUE);
+        elm_button_autorepeat_initial_timeout_set(wd->cp[i]->lbt,
+                                                  _elm_config->longpress_timeout);
+        elm_button_autorepeat_gap_timeout_set(wd->cp[i]->lbt,
+                                              (1.0 / _elm_config->fps));
+        evas_object_smart_callback_add(wd->cp[i]->lbt, "repeated",
+                                       _left_button_repeat_cb, wd->cp[i]);
+
+        /* load right button */
+        wd->cp[i]->rbt = elm_button_add(obj);
+        snprintf(buf, sizeof(buf), "colorselector/right/%s",
+                 elm_widget_style_get(obj));
+>>>>>>> remotes/origin/upstream
         elm_object_style_set(wd->cp[i]->rbt, buf);
         elm_widget_sub_object_add(obj, wd->cp[i]->rbt);
         edje_object_part_swallow(wd->cp[i]->colorbar, "elm.r_button",
                                  wd->cp[i]->rbt);
+<<<<<<< HEAD
         evas_object_smart_callback_add(wd->cp[i]->rbt, "clicked", _right_button_clicked_cb, wd->cp[i]);
         elm_button_autorepeat_set(wd->cp[i]->rbt, EINA_TRUE);
         elm_button_autorepeat_initial_timeout_set(wd->cp[i]->rbt, _elm_config->longpress_timeout);
         elm_button_autorepeat_gap_timeout_set(wd->cp[i]->rbt, (1.0 / _elm_config->fps));
         evas_object_smart_callback_add(wd->cp[i]->rbt, "repeated",_right_button_repeat_cb, wd->cp[i]);
+=======
+        evas_object_smart_callback_add(wd->cp[i]->rbt, "clicked",
+                                       _right_button_clicked_cb, wd->cp[i]);
+        elm_button_autorepeat_set(wd->cp[i]->rbt, EINA_TRUE);
+        elm_button_autorepeat_initial_timeout_set(wd->cp[i]->rbt,
+                                                  _elm_config->longpress_timeout);
+        elm_button_autorepeat_gap_timeout_set(wd->cp[i]->rbt,
+                                              (1.0 / _elm_config->fps));
+        evas_object_smart_callback_add(wd->cp[i]->rbt, "repeated",
+                                       _right_button_repeat_cb, wd->cp[i]);
+>>>>>>> remotes/origin/upstream
      }
 }
 
@@ -757,7 +841,11 @@ elm_colorselector_color_set(Evas_Object *obj, int r, int g, int b, int a)
 }
 
 EAPI void
+<<<<<<< HEAD
 elm_colorselector_color_get(const Evas_Object *obj, int *r, int *g, int *b, int*a)
+=======
+elm_colorselector_color_get(const Evas_Object *obj, int *r, int *g, int *b, int *a)
+>>>>>>> remotes/origin/upstream
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -767,3 +855,65 @@ elm_colorselector_color_get(const Evas_Object *obj, int *r, int *g, int *b, int*
    if (b) *b = wd->b;
    if (a) *a = wd->a;
 }
+<<<<<<< HEAD
+=======
+
+EAPI void
+elm_colorselector_mode_set(Evas_Object *obj, Elm_Colorselector_Mode mode __UNUSED__)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   //TODO: Implement!
+}
+
+EAPI Elm_Colorselector_Mode
+elm_colorselector_mode_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_COLORSELECTOR_PALETTE;
+   //TODO: Implement!
+   return ELM_COLORSELECTOR_PALETTE;
+}
+
+EAPI void
+elm_colorselector_palette_item_color_get(const Elm_Object_Item *it, int *r __UNUSED__, int *g __UNUSED__, int *b __UNUSED__, int*a __UNUSED__)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   //TODO: Implement!
+}
+
+EAPI void
+elm_colorselector_palette_item_color_set(Elm_Object_Item *it, int r __UNUSED__, int g __UNUSED__, int b __UNUSED__, int a __UNUSED__)
+{
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
+   //TODO: Implement!
+}
+
+EAPI Elm_Object_Item *
+elm_colorselector_palette_color_add(Evas_Object *obj, int r __UNUSED__, int g __UNUSED__, int b __UNUSED__, int a __UNUSED__)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   //TODO: Implement!
+   return NULL;
+}
+
+EAPI void
+elm_colorselector_palette_clear(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   //TODO: Implement!
+}
+
+EAPI void
+elm_colorselector_palette_name_set(Evas_Object *obj, const char *palette_name __UNUSED__)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   //TODO: Implement!
+}
+
+EAPI const char*
+elm_colorselector_palette_name_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   //TODO: Implement!
+   return NULL;
+}
+>>>>>>> remotes/origin/upstream

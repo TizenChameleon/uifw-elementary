@@ -43,6 +43,10 @@
 
 typedef struct _Elm_Config Elm_Config;
 typedef struct _Elm_Module Elm_Module;
+<<<<<<< HEAD
+=======
+typedef struct _Elm_Datetime_Module_Data Elm_Datetime_Module_Data;
+>>>>>>> remotes/origin/upstream
 
 struct _Elm_Theme
 {
@@ -118,7 +122,10 @@ struct _Elm_Config
    unsigned char thumbscroll_bounce_enable;
    double        thumbscroll_border_friction;
    double        thumbscroll_sensitivity_friction;
+<<<<<<< HEAD
    double        scroll_smooth_time_interval;
+=======
+>>>>>>> remotes/origin/upstream
    double        scroll_smooth_amount;
    double        scroll_smooth_history_weight;
    double        scroll_smooth_future_time;
@@ -165,6 +172,12 @@ struct _Elm_Config
    double        glayer_long_tap_start_timeout;
    int           access_mode;
    Eina_Bool     glayer_continues_enable;
+<<<<<<< HEAD
+=======
+   int           week_start;
+   int           weekend_start;
+   int           weekend_len;
+>>>>>>> remotes/origin/upstream
 
    /* Not part of the EET file */
    Eina_Bool     is_mirrored : 1;
@@ -187,6 +200,16 @@ struct _Elm_Module
    int          references;
 };
 
+<<<<<<< HEAD
+=======
+struct _Elm_Datetime_Module_Data
+{
+   Evas_Object *base;
+   void (*field_limit_get)(Evas_Object *obj, Elm_Datetime_Field_Type  field_type, int *range_min, int *range_max);
+   const char *(*field_format_get)(Evas_Object * obj, Elm_Datetime_Field_Type  field_type);
+};
+
+>>>>>>> remotes/origin/upstream
 int                  _elm_ews_wm_init(void);
 void                 _elm_ews_wm_shutdown(void);
 void                 _elm_ews_wm_rescale(Elm_Theme *th, Eina_Bool use_theme);
@@ -274,6 +297,10 @@ extern const char *_elm_lib_dir;
 extern int _elm_log_dom;
 extern Eina_List *_elm_win_list;
 extern int _elm_win_deferred_free;
+<<<<<<< HEAD
+=======
+extern const char *_elm_preferred_engine;
+>>>>>>> remotes/origin/upstream
 
 #ifdef ENABLE_NLS
 /* Our gettext wrapper, used to disable translation of elm if the app

@@ -1,11 +1,52 @@
 /**
+<<<<<<< HEAD
+=======
+ * @defgroup Calendar Calendar
+ *
+ * This is a Calendar widget. Calender widget helps applications to flexibly
+ * display a calender with day of the week, day, year and month. Applications will be
+ * able to choose a specific date that will be reported in the smart_callbacks for
+ * the calendar widget. The APIs of calendar widget let the applications perform 
+ * other functions like,
+ * placing marks on specific dates
+ * Setting the bounds for the calendar (minimum and maximum years)
+ * Setting the day names of the week. ( for ex. Thu. or Thursday)
+ * Setting the year and month format.
+ *
+ * Signals that you can add callbacks for are:
+ * - @c "changed" - emitted when the date in the calendar is changed.
+ *
+ * Supported elm_object common APIs.
+ * @li elm_object_signal_emit
+ * @li elm_object_signal_callback_add
+ * @li elm_object_signal_callback_del
+ *
+ */
+
+/**
+>>>>>>> remotes/origin/upstream
  * @addtogroup Calendar
  * @{
  */
 
+<<<<<<< HEAD
 /**
  * @enum _Elm_Calendar_Mark_Repeat
  * @typedef Elm_Calendar_Mark_Repeat
+=======
+typedef enum
+{
+   ELM_CALENDAR_UNIQUE, /**< Default value. Marks will be displayed only on event day. */
+   ELM_CALENDAR_DAILY, /**< Marks will be displayed every day after event day (inclusive). */
+   ELM_CALENDAR_WEEKLY, /**< Marks will be displayed every week after event day (inclusive) - i.e. each seven days. */
+   ELM_CALENDAR_MONTHLY, /**< Marks will be displayed every month day that coincides to event day. E.g.: if an event is set to 30th Jan, no marks will be displayed on Feb, but will be displayed on 30th Mar*/
+   ELM_CALENDAR_ANNUALLY /**< Marks will be displayed every year that coincides to event day (and month). E.g. an event added to 30th Jan 2012 will be repeated on 30th Jan 2013. */
+} _Elm_Calendar_Mark_Repeat_Type;
+
+/**
+ * @enum _Elm_Calendar_Mark_Repeat_Type
+ * @typedef Elm_Calendar_Mark_Repeat_Type
+>>>>>>> remotes/origin/upstream
  *
  * Event periodicity, used to define if a mark should be repeated
  * @b beyond event's day. It's set when a mark is added.
@@ -14,17 +55,22 @@
  * there will be marks every week after this date. Marks will be displayed
  * at 13th, 20th, 27th, 3rd June ...
  *
+<<<<<<< HEAD
  * Values don't work as bitmask, only one can be choosen.
  *
  * Supported elm_object common APIs.
  * @li elm_object_signal_emit
  * @li elm_object_signal_callback_add
  * @li elm_object_signal_callback_del
+=======
+ * Values don't work as bitmask, only one can be chosen.
+>>>>>>> remotes/origin/upstream
  *
  * @see elm_calendar_mark_add()
  *
  * @ingroup Calendar
  */
+<<<<<<< HEAD
 typedef enum
 {
    ELM_CALENDAR_UNIQUE, /**< Default value. Marks will be displayed only on event day. */
@@ -33,10 +79,29 @@ typedef enum
    ELM_CALENDAR_MONTHLY, /**< Marks will be displayed every month day that coincides to event day. E.g.: if an event is set to 30th Jan, no marks will be displayed on Feb, but will be displayed on 30th Mar*/
    ELM_CALENDAR_ANNUALLY /**< Marks will be displayed every year that coincides to event day (and month). E.g. an event added to 30th Jan 2012 will be repeated on 30th Jan 2013. */
 } Elm_Calendar_Mark_Repeat;
+=======
+typedef _Elm_Calendar_Mark_Repeat_Type Elm_Calendar_Mark_Repeat_Type;
+>>>>>>> remotes/origin/upstream
 
 typedef struct _Elm_Calendar_Mark Elm_Calendar_Mark;    /**< Item handle for a calendar mark. Created with elm_calendar_mark_add() and deleted with elm_calendar_mark_del(). */
 
 /**
+<<<<<<< HEAD
+=======
+ * @typedef Elm_Calendar_Format_Cb
+ *
+ * This callback type is used to format the string that will be used
+ * to display month and year.
+ *
+ * @param stime Struct representing time.
+ * @return String representing time that will be set to calendar's text.
+ *
+ * @see elm_calendar_format_function_set()
+ */
+typedef char * (*Elm_Calendar_Format_Cb)(struct tm *stime);
+
+/**
+>>>>>>> remotes/origin/upstream
  * Add a new calendar widget to the given parent Elementary
  * (container) object.
  *
@@ -107,7 +172,11 @@ EAPI void                 elm_calendar_weekdays_names_set(Evas_Object *obj, cons
  * @param min The minimum year, greater than 1901;
  * @param max The maximum year;
  *
+<<<<<<< HEAD
  * Maximum must be greater than minimum, except if you don't wan't to set
+=======
+ * Maximum must be greater than minimum, except if you don't want to set
+>>>>>>> remotes/origin/upstream
  * maximum year.
  * Default values are 1902 and -1.
  *
@@ -143,8 +212,13 @@ EAPI void                 elm_calendar_min_max_year_get(const Evas_Object *obj, 
  * Enable or disable day selection
  *
  * @param obj The calendar object.
+<<<<<<< HEAD
  * @param enabled @c EINA_TRUE to enable selection or @c EINA_FALSE to
  * disable it.
+=======
+ * @param disabled @c EINA_TRUE to disable selection or @c EINA_FALSE to
+ * enable it.
+>>>>>>> remotes/origin/upstream
  *
  * Enabled by default. If disabled, the user still can select months,
  * but not days. Selected days are highlighted on calendar.
@@ -153,12 +227,17 @@ EAPI void                 elm_calendar_min_max_year_get(const Evas_Object *obj, 
  * When a day is selected, or month is changed, smart callbacks for
  * signal "changed" will be called.
  *
+<<<<<<< HEAD
  * @see elm_calendar_day_selection_enable_get()
+=======
+ * @see elm_calendar_day_selection_disabled_get()
+>>>>>>> remotes/origin/upstream
  *
  * @ref calendar_example_04
  *
  * @ingroup Calendar
  */
+<<<<<<< HEAD
 EAPI void                 elm_calendar_day_selection_enabled_set(Evas_Object *obj, Eina_Bool enabled);
 
 /**
@@ -169,12 +248,28 @@ EAPI void                 elm_calendar_day_selection_enabled_set(Evas_Object *ob
  * @param obj The calendar object.
  * @return EINA_TRUE means day selection is enabled. EINA_FALSE indicates
  * it's disabled. If @p obj is NULL, EINA_FALSE is returned.
+=======
+EAPI void                 elm_calendar_day_selection_disabled_set(Evas_Object *obj, Eina_Bool disabled);
+
+/**
+ * Get a value whether day selection is disabled or not.
+ *
+ * @param obj The calendar object.
+ * @return EINA_TRUE means day selection is disabled. EINA_FALSE indicates
+ * it's enabled. If @p obj is NULL, EINA_FALSE is returned.
+ *
+ * @see elm_calendar_day_selection_disabled_set() for details.
+>>>>>>> remotes/origin/upstream
  *
  * @ref calendar_example_05
  *
  * @ingroup Calendar
  */
+<<<<<<< HEAD
 EAPI Eina_Bool            elm_calendar_day_selection_enabled_get(const Evas_Object *obj);
+=======
+EAPI Eina_Bool            elm_calendar_day_selection_disabled_get(const Evas_Object *obj);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Set selected date to be highlighted on calendar.
@@ -199,7 +294,11 @@ EAPI void                 elm_calendar_selected_time_set(Evas_Object *obj, struc
  *
  * @param obj The calendar object
  * @param selected_time A @b tm struct to point to selected date
+<<<<<<< HEAD
  * @return EINA_FALSE means an error ocurred and returned time shouldn't
+=======
+ * @return EINA_FALSE means an error occurred and returned time shouldn't
+>>>>>>> remotes/origin/upstream
  * be considered.
  *
  * Get date selected by the user or set by function
@@ -245,7 +344,11 @@ EAPI Eina_Bool            elm_calendar_selected_time_get(const Evas_Object *obj,
  *
  * @ingroup Calendar
  */
+<<<<<<< HEAD
 EAPI void                 elm_calendar_format_function_set(Evas_Object *obj, char *(*format_function)(struct tm *stime));
+=======
+EAPI void                 elm_calendar_format_function_set(Evas_Object *obj, Elm_Calendar_Format_Cb format_func);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Add a new mark to the calendar
@@ -296,7 +399,11 @@ EAPI void                 elm_calendar_format_function_set(Evas_Object *obj, cha
  *
  * @ingroup Calendar
  */
+<<<<<<< HEAD
 EAPI Elm_Calendar_Mark   *elm_calendar_mark_add(Evas_Object *obj, const char *mark_type, struct tm *mark_time, Elm_Calendar_Mark_Repeat repeat);
+=======
+EAPI Elm_Calendar_Mark   *elm_calendar_mark_add(Evas_Object *obj, const char *mark_type, struct tm *mark_time, Elm_Calendar_Mark_Repeat_Type repeat);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Delete mark from the calendar.
@@ -351,7 +458,11 @@ EAPI const Eina_List     *elm_calendar_marks_get(const Evas_Object *obj);
  * this function.
  *
  * When the month is changed, i.e. user selects next or previous month,
+<<<<<<< HEAD
  * marks will be drawed.
+=======
+ * marks will be drawn.
+>>>>>>> remotes/origin/upstream
  *
  * @see elm_calendar_mark_add()
  * @see elm_calendar_mark_del()

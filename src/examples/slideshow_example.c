@@ -69,7 +69,11 @@ _first(void        *data,
        Evas_Object *obj __UNUSED__,
        void        *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    elm_slideshow_show(data);
+=======
+   elm_slideshow_item_show(data);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -77,7 +81,11 @@ _last(void        *data,
       Evas_Object *obj __UNUSED__,
       void        *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    elm_slideshow_show(data);
+=======
+   elm_slideshow_item_show(data);
+>>>>>>> remotes/origin/upstream
 }
 
 static void

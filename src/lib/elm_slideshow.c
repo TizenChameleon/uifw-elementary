@@ -2,7 +2,10 @@
 #include "elm_priv.h"
 
 typedef struct _Widget_Data Widget_Data;
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
 typedef struct _Elm_Slideshow_Item Elm_Slideshow_Item;
 
 struct _Elm_Slideshow_Item
@@ -352,9 +355,13 @@ _timer_cb(void *data)
 static Eina_Bool
 _item_del_pre_hook(Elm_Object_Item *it)
 {
+<<<<<<< HEAD
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
 
    Elm_Slideshow_Item *item = (Elm_Slideshow_Item *) it;
+=======
+   Elm_Slideshow_Item *item = (Elm_Slideshow_Item *)it;
+>>>>>>> remotes/origin/upstream
    Widget_Data *wd = elm_widget_data_get(WIDGET(item));
    if (!wd) return EINA_FALSE;
 
@@ -368,11 +375,19 @@ _item_del_pre_hook(Elm_Object_Item *it)
           {
              l2 = eina_list_prev(l);
              if (l2)
+<<<<<<< HEAD
                elm_slideshow_show(eina_list_data_get(l2));
 
           }
         else
           elm_slideshow_show(eina_list_data_get(l2));
+=======
+               elm_slideshow_item_show(eina_list_data_get(l2));
+
+          }
+        else
+          elm_slideshow_item_show(eina_list_data_get(l2));
+>>>>>>> remotes/origin/upstream
      }
 
    wd->items = eina_list_remove_list(wd->items, item->l);
@@ -452,9 +467,15 @@ elm_slideshow_item_add(Evas_Object *obj, const Elm_Slideshow_Item_Class *itc, co
 
    wd->items = eina_list_merge(wd->items, item->l);
 
+<<<<<<< HEAD
    if (!wd->current) elm_slideshow_show((Elm_Object_Item *) item);
 
    return (Elm_Object_Item *) item;
+=======
+   if (!wd->current) elm_slideshow_item_show((Elm_Object_Item *)item);
+
+   return (Elm_Object_Item *)item;
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI Elm_Object_Item*
@@ -474,6 +495,7 @@ elm_slideshow_item_sorted_insert(Evas_Object *obj, const Elm_Slideshow_Item_Clas
 
    wd->items = eina_list_sorted_merge(wd->items, item->l, func);
 
+<<<<<<< HEAD
    if (!wd->current) elm_slideshow_show((Elm_Object_Item *) item);
 
    return (Elm_Object_Item *) item;
@@ -481,13 +503,26 @@ elm_slideshow_item_sorted_insert(Evas_Object *obj, const Elm_Slideshow_Item_Clas
 
 EAPI void
 elm_slideshow_show(Elm_Object_Item *it)
+=======
+   if (!wd->current) elm_slideshow_item_show((Elm_Object_Item *)item);
+
+   return (Elm_Object_Item *)item;
+}
+
+EAPI void
+elm_slideshow_item_show(Elm_Object_Item *it)
+>>>>>>> remotes/origin/upstream
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
 
    char buf[1024];
    Elm_Slideshow_Item *item, *next = NULL;
    Widget_Data *wd;
+<<<<<<< HEAD
    item = (Elm_Slideshow_Item *) it;
+=======
+   item = (Elm_Slideshow_Item *)it;
+>>>>>>> remotes/origin/upstream
    wd = elm_widget_data_get(WIDGET(item));
    if (!wd)  return;
    if (item == wd->current) return;
@@ -507,6 +542,15 @@ elm_slideshow_show(Elm_Object_Item *it)
    evas_object_smart_callback_call(WIDGET(item), SIG_CHANGED, wd->current);
 }
 
+<<<<<<< HEAD
+=======
+EINA_DEPRECATED EAPI void
+elm_slideshow_show(Elm_Object_Item *it)
+{
+   elm_slideshow_item_show(it);
+}
+
+>>>>>>> remotes/origin/upstream
 EAPI void
 elm_slideshow_next(Evas_Object *obj)
 {

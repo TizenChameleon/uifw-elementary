@@ -5,6 +5,11 @@
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
+<<<<<<< HEAD
+=======
+// XXX: show all type of cursors in the elementary_test. this needs to be the first test
+
+>>>>>>> remotes/origin/upstream
 typedef struct _Testitem
 {
    Elm_Object_Item *item;
@@ -46,6 +51,7 @@ static void
 glt_exp(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    Elm_Object_Item *glit = event_info;
+<<<<<<< HEAD
    Evas_Object *gl = elm_genlist_item_genlist_get(glit);
    int val = (int) elm_object_item_data_get(glit);
    Elm_Object_Item *glit1, *glit2, *glit3;
@@ -57,6 +63,19 @@ glt_exp(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
                                    ELM_GENLIST_ITEM_NONE, NULL, NULL);
    glit3 = elm_genlist_item_append(gl, &itct, (void *)(long)(val + 3), glit,
                                    ELM_GENLIST_ITEM_SUBITEMS, NULL, NULL);
+=======
+   Evas_Object *gl = elm_object_item_widget_get(glit);
+   int val = (int)(long) elm_object_item_data_get(glit);
+   Elm_Object_Item *glit1, *glit2, *glit3;
+
+   val *= 10;
+   glit1 = elm_genlist_item_append(gl, &itct, (void *)(long) (val + 1), glit,
+                                   ELM_GENLIST_ITEM_NONE, NULL, NULL);
+   glit2 = elm_genlist_item_append(gl, &itct, (void *)(long) (val + 2), glit,
+                                   ELM_GENLIST_ITEM_NONE, NULL, NULL);
+   glit3 = elm_genlist_item_append(gl, &itct, (void *)(long) (val + 3), glit,
+                                   ELM_GENLIST_ITEM_TREE, NULL, NULL);
+>>>>>>> remotes/origin/upstream
 
    elm_genlist_item_cursor_set(glit1, ELM_CURSOR_HAND2);
    elm_genlist_item_cursor_set(glit2, ELM_CURSOR_HAND2);
@@ -234,9 +253,15 @@ test_cursor2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    itct.func.text_get = glt_text_get;
 
    glit1 = elm_genlist_item_append(gl, &itct, (void *) 1, NULL,
+<<<<<<< HEAD
                                    ELM_GENLIST_ITEM_SUBITEMS, NULL, NULL);
    glit2 = elm_genlist_item_append(gl, &itct, (void *) 2, NULL,
                                    ELM_GENLIST_ITEM_SUBITEMS, NULL, NULL);
+=======
+                                   ELM_GENLIST_ITEM_TREE, NULL, NULL);
+   glit2 = elm_genlist_item_append(gl, &itct, (void *) 2, NULL,
+                                   ELM_GENLIST_ITEM_TREE, NULL, NULL);
+>>>>>>> remotes/origin/upstream
    glit3 = elm_genlist_item_append(gl, &itct, (void *) 3, NULL,
                                    ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
@@ -310,7 +335,11 @@ test_cursor3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, ELM_CURSOR_HAND1);
+<<<<<<< HEAD
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
+=======
+   elm_object_cursor_theme_search_enabled_set(o, EINA_FALSE);
+>>>>>>> remotes/origin/upstream
    elm_object_text_set(o, "hand1");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
@@ -323,21 +352,33 @@ test_cursor3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, ELM_CURSOR_HAND2);
+<<<<<<< HEAD
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
+=======
+   elm_object_cursor_theme_search_enabled_set(o, EINA_FALSE);
+>>>>>>> remotes/origin/upstream
    elm_object_text_set(o, "hand2");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, "hand3");
+<<<<<<< HEAD
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
+=======
+   elm_object_cursor_theme_search_enabled_set(o, EINA_FALSE);
+>>>>>>> remotes/origin/upstream
    elm_object_text_set(o, "hand3");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, "hand3");
+<<<<<<< HEAD
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
+=======
+   elm_object_cursor_theme_search_enabled_set(o, EINA_FALSE);
+>>>>>>> remotes/origin/upstream
    elm_object_cursor_style_set(o, "transparent");
    elm_object_text_set(o, "hand3 transparent");
    elm_box_pack_end(bx, o);
@@ -345,7 +386,11 @@ test_cursor3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, "hand3");
+<<<<<<< HEAD
    elm_object_cursor_engine_only_set(o, EINA_FALSE);
+=======
+   elm_object_cursor_theme_search_enabled_set(o, EINA_FALSE);
+>>>>>>> remotes/origin/upstream
    elm_object_cursor_unset(o);
    elm_object_text_set(o, "unset");
    elm_box_pack_end(bx, o);
@@ -357,14 +402,22 @@ test_cursor3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
+<<<<<<< HEAD
    elm_cursor_engine_only_set(0);
+=======
+   elm_config_cursor_engine_only_set(EINA_FALSE);
+>>>>>>> remotes/origin/upstream
    o = elm_button_add(win);
    elm_object_cursor_set(o, "hand2");
    elm_object_text_set(o, "hand 2 engine only config false");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
 
+<<<<<<< HEAD
    elm_cursor_engine_only_set(1);
+=======
+   elm_config_cursor_engine_only_set(EINA_TRUE);
+>>>>>>> remotes/origin/upstream
    o = elm_button_add(win);
    elm_object_cursor_set(o, "hand2");
    elm_object_text_set(o, "hand 2 engine only config true");

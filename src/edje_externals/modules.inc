@@ -1,4 +1,5 @@
 DEFINE_TYPE(actionslider)
+<<<<<<< HEAD
 DEFINE_TYPE(anchorblock)
 DEFINE_TYPE(anchorview)
 DEFINE_TYPE(bubble)
@@ -8,6 +9,12 @@ DEFINE_TYPE(check)
 DEFINE_TYPE(clock)
 DEFINE_TYPE(colorpalette)
 DEFINE_TYPE(datefield)
+=======
+DEFINE_TYPE(bubble)
+DEFINE_TYPE(button)
+DEFINE_TYPE(check)
+DEFINE_TYPE(clock)
+>>>>>>> remotes/origin/upstream
 DEFINE_TYPE(entry)
 DEFINE_TYPE(fileselector)
 DEFINE_TYPE(fileselector_button)
@@ -20,14 +27,20 @@ DEFINE_TYPE(list)
 DEFINE_TYPE(map)
 DEFINE_TYPE(multibuttonentry)
 DEFINE_TYPE(naviframe)
+<<<<<<< HEAD
 DEFINE_TYPE(nocontents)
 DEFINE_TYPE(page_control)
 DEFINE_TYPE(pager)
+=======
+>>>>>>> remotes/origin/upstream
 DEFINE_TYPE(panes)
 DEFINE_TYPE(photocam)
 DEFINE_TYPE(progressbar)
 DEFINE_TYPE(radio)
+<<<<<<< HEAD
 DEFINE_TYPE(searchbar)
+=======
+>>>>>>> remotes/origin/upstream
 DEFINE_TYPE(slider)
 DEFINE_TYPE(slideshow)
 DEFINE_TYPE(spinner)

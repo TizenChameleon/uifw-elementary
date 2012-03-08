@@ -57,7 +57,11 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
    o = elm_anchorblock_add(win);
    elm_anchorblock_hover_style_set(o, "popout");
    elm_anchorblock_hover_parent_set(o, win);
+<<<<<<< HEAD
    elm_anchorblock_text_set(o, anchortext);
+=======
+   elm_object_text_set(o, anchortext);
+>>>>>>> remotes/origin/upstream
    evas_object_smart_callback_add(o, "anchor,clicked", _anchorblock_clicked_cb,
                                   NULL);
    evas_object_show(o);
@@ -73,7 +77,11 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
    o = elm_anchorview_add(win);
    elm_anchorview_hover_parent_set(o, frame);
    elm_anchorview_bounce_set(o, EINA_FALSE, EINA_TRUE);
+<<<<<<< HEAD
    elm_anchorview_text_set(o, anchortext);
+=======
+   elm_object_text_set(o, anchortext);
+>>>>>>> remotes/origin/upstream
    evas_object_smart_callback_add(o, "anchor,clicked", _anchorview_clicked_cb,
                                   NULL);
    evas_object_show(o);
@@ -118,7 +126,11 @@ _anchorview_clicked_cb(void *data __UNUSED__, Evas_Object *obj, void *event_info
 static void
 _btn_clicked_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    const char *lbl = elm_button_label_get(obj);
+=======
+   const char *lbl = elm_object_text_get(obj);
+>>>>>>> remotes/origin/upstream
    printf("%s: %s\n", lbl, (char *)data);
    eina_stringshare_del(data);
 }

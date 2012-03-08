@@ -33,6 +33,13 @@ WGT_PREVIEW = \
 	frame:preview-00.png:widget_preview_frame:100:50 \
 	label:preview-00.png:widget_preview_label:70:30 \
 	clock:preview-00.png:widget_preview_clock:200:100 \
+<<<<<<< HEAD
+=======
+	datetime:preview-00.png:widget_preview_datetime1:360:60 \
+	datetime:preview-01.png:widget_preview_datetime2:200:60 \
+	datetime:preview-02.png:widget_preview_datetime3:200:60 \
+	dayselector:preview-00.png:widget_preview_dayselector:350:50 \
+>>>>>>> remotes/origin/upstream
 	slider:preview-00.png:widget_preview_slider:200:100 \
 	panes:preview-00.png:widget_preview_panes:200:100 \
 	toolbar:preview-00.png:widget_preview_toolbar:300:100 \
@@ -70,6 +77,10 @@ WGT_PREVIEW = \
 	progressbar:preview-00.png:widget_preview_progressbar:150:50 \
 	box:preview-00.png:widget_preview_box:200:160 \
 	notify:preview-00.png:widget_preview_notify:60:30 \
+<<<<<<< HEAD
+=======
+	popup:preview-00.png:widget_preview_popup:480:400 \
+>>>>>>> remotes/origin/upstream
 	slideshow:preview-00.png:widget_preview_slideshow:50:50 \
 	photocam:preview-00.png:widget_preview_photocam:243:162 \
 	inwin:preview-00.png:widget_preview_inwin1:200:160 \

@@ -18,7 +18,11 @@ external_multibuttonentry_state_set(void *data __UNUSED__, Evas_Object *obj, con
    if (p->label)
      elm_object_text_set(obj, p->label);
    if (p->guide_text)
+<<<<<<< HEAD
      elm_multibuttonentry_guide_text_set(obj, p->guide_text);
+=======
+     elm_object_part_text_set(obj, "guide", p->guide_text);
+>>>>>>> remotes/origin/upstream
 }
 
 static Eina_Bool
@@ -36,7 +40,11 @@ external_multibuttonentry_param_set(void *data __UNUSED__, Evas_Object *obj, con
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
           {
+<<<<<<< HEAD
              elm_multibuttonentry_guide_text_set(obj, param->s);
+=======
+             elm_object_part_text_set(obj, "guide", param->s);
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }
@@ -62,7 +70,11 @@ external_multibuttonentry_param_get(void *data __UNUSED__, const Evas_Object *ob
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
           {
+<<<<<<< HEAD
              param->s = elm_multibuttonentry_guide_text_get(obj);
+=======
+             param->s = elm_object_part_text_get(obj, "guide");
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }

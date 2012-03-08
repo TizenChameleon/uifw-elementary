@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 typedef enum
 {
    ELM_TEXT_FORMAT_PLAIN_UTF8,
@@ -72,6 +73,8 @@ typedef enum
       ELM_CNP_MODE_PLAINTEXT = 2     /**< copy & paste text without markup tag */
    } Elm_CNP_Mode;
 
+=======
+>>>>>>> remotes/origin/upstream
 /**
  * @defgroup Entry Entry
  *
@@ -86,15 +89,26 @@ typedef enum
  *
  * An entry is a convenience widget which shows a box that the user can
  * enter text into. Entries by default don't scroll, so they grow to
+<<<<<<< HEAD
  * accomodate the entire text, resizing the parent window as needed. This
+=======
+ * accommodate the entire text, resizing the parent window as needed. This
+>>>>>>> remotes/origin/upstream
  * can be changed with the elm_entry_scrollable_set() function.
  *
  * They can also be single line or multi line (the default) and when set
  * to multi line mode they support text wrapping in any of the modes
+<<<<<<< HEAD
  * indicated by Elm_Wrap_Type.
  *
  * Other features include password mode, filtering of inserted text with
  * elm_entry_text_filter_append() and related functions, inline "items" and
+=======
+ * indicated by #Elm_Wrap_Type.
+ *
+ * Other features include password mode, filtering of inserted text with
+ * elm_entry_markup_filter_append() and related functions, inline "items" and
+>>>>>>> remotes/origin/upstream
  * formatted markup text.
  *
  * @section entry-markup Formatted text
@@ -111,12 +125,20 @@ typedef enum
  * enclosed text.
  * @li \<b\>...\</b\>: Sets the @b bold style for the enclosed text.
  * @li \<link\>...\</link\>: Underlines the enclosed text.
+<<<<<<< HEAD
  * @li \<hilight\>...\</hilight\>: Hilights the enclosed text.
+=======
+ * @li \<hilight\>...\</hilight\>: Highlights the enclosed text.
+>>>>>>> remotes/origin/upstream
  *
  * @section entry-special Special markups
  *
  * Besides those used to format text, entries support two special markup
+<<<<<<< HEAD
  * tags used to insert clickable portions of text or items inlined within
+=======
+ * tags used to insert click-able portions of text or items inlined within
+>>>>>>> remotes/origin/upstream
  * the text.
  *
  * @subsection entry-anchors Anchors
@@ -161,7 +183,11 @@ typedef enum
  * @li relsize: Size is adjusted for the item to fit within the current
  * line height.
  *
+<<<<<<< HEAD
  * Besides their size, items are specificed a @c vsize value that affects
+=======
+ * Besides their size, items are specified a @c vsize value that affects
+>>>>>>> remotes/origin/upstream
  * how their final size and position are calculated. The possible values
  * are:
  * @li ascent: Item will be placed within the line's baseline and its
@@ -243,7 +269,11 @@ typedef enum
  *
  * @section entry-files Loading and saving files
  *
+<<<<<<< HEAD
  * Entries have convinience functions to load text from a file and save
+=======
+ * Entries have convenience functions to load text from a file and save
+>>>>>>> remotes/origin/upstream
  * changes back to it after a short delay. The automatic saving is enabled
  * by default, but can be disabled with elm_entry_autosave_set() and files
  * can be loaded directly as plain text or have any markup in them
@@ -287,7 +317,11 @@ typedef enum
  * @li "preedit,changed": The preedit string has changed.
  * @li "language,changed": Program language changed.
  *
+<<<<<<< HEAD
  * Default contents parts of the entry items that you can use for are:
+=======
+ * Default content parts of the entry items that you can use for are:
+>>>>>>> remotes/origin/upstream
  * @li "icon" - An icon in the entry
  * @li "end" - A content in the end of the entry
  *
@@ -314,6 +348,114 @@ typedef enum
  */
 
 /**
+<<<<<<< HEAD
+=======
+ * @enum _Elm_Text_Format
+ * @typedef Elm_Text_Format
+ *
+ * Text Format types.
+ * 
+ * @see elm_entry_file_set()
+ */
+typedef enum
+{
+   ELM_TEXT_FORMAT_PLAIN_UTF8,  /**< Plain UTF8 type */
+   ELM_TEXT_FORMAT_MARKUP_UTF8  /**< Markup UTF8 type */
+} Elm_Text_Format;
+
+/**
+ * @enum _Elm_Wrap_Type
+ * @typedef Elm_Wrap_Type
+ *
+ * Line wrapping types.
+ * 
+ * @see elm_entry_line_wrap_set()
+ */
+typedef enum
+{
+   ELM_WRAP_NONE = 0, /**< No wrap - value is zero */
+   ELM_WRAP_CHAR,     /**< Char wrap - wrap between characters */
+   ELM_WRAP_WORD,     /**< Word wrap - wrap in allowed wrapping points (as defined in the unicode standard) */
+   ELM_WRAP_MIXED,    /**< Mixed wrap - Word wrap, and if that fails, char wrap. */
+   ELM_WRAP_LAST
+} Elm_Wrap_Type; /**< Type of word or character wrapping to use */
+
+/**
+ * @enum _Elm_Input_Panel_Layout
+ * @typedef Elm_Input_Panel_Layout
+ *
+ * Input panel (virtual keyboard) layout types.
+ * 
+ * @see elm_entry_input_panel_layout_set()
+ */
+typedef enum
+{
+   ELM_INPUT_PANEL_LAYOUT_NORMAL,      /**< Default layout */
+   ELM_INPUT_PANEL_LAYOUT_NUMBER,      /**< Number layout */
+   ELM_INPUT_PANEL_LAYOUT_EMAIL,       /**< Email layout */
+   ELM_INPUT_PANEL_LAYOUT_URL,         /**< URL layout */
+   ELM_INPUT_PANEL_LAYOUT_PHONENUMBER, /**< Phone Number layout */
+   ELM_INPUT_PANEL_LAYOUT_IP,          /**< IP layout */
+   ELM_INPUT_PANEL_LAYOUT_MONTH,       /**< Month layout */
+   ELM_INPUT_PANEL_LAYOUT_NUMBERONLY,  /**< Number Only layout */
+   ELM_INPUT_PANEL_LAYOUT_INVALID,     /**< Never use this */
+   ELM_INPUT_PANEL_LAYOUT_HEX,         /**< Hexadecimal layout */
+   ELM_INPUT_PANEL_LAYOUT_TERMINAL,    /**< Command-line terminal layout */
+   ELM_INPUT_PANEL_LAYOUT_PASSWORD     /**< Like normal, but no auto-correct, no auto-capitalization etc. */
+} Elm_Input_Panel_Layout; /**< Type of input panel (virtual keyboard) to use - this is a hint and may not provide exactly what is desired. */
+
+/**
+ * @enum _Elm_Input_Panel_Lang
+ * @typedef Elm_Input_Panel_Lang
+ *
+ * Input panel (virtual keyboard) language modes.
+ * 
+ * @see elm_entry_input_panel_language_set()
+ */
+typedef enum
+{
+   ELM_INPUT_PANEL_LANG_AUTOMATIC,    /**< Automatic */
+   ELM_INPUT_PANEL_LANG_ALPHABET      /**< Alphabet */
+} Elm_Input_Panel_Lang;
+
+/**
+ * @enum _Elm_Autocapital_Type
+ * @typedef Elm_Autocapital_Type
+ *
+ * Autocapitalization Types.
+ * 
+ * @see elm_entry_autocapital_type_set()
+ */
+typedef enum
+{
+   ELM_AUTOCAPITAL_TYPE_NONE,         /**< No auto-capitalization when typing */
+   ELM_AUTOCAPITAL_TYPE_WORD,         /**< Autocapitalize each word typed */
+   ELM_AUTOCAPITAL_TYPE_SENTENCE,     /**< Autocapitalize the start of each sentence */
+   ELM_AUTOCAPITAL_TYPE_ALLCHARACTER, /**< Autocapitalize all letters */
+} Elm_Autocapital_Type; /**< Choose method of auto-capitalization */
+
+/**
+ * @enum _Elm_Input_Panel_Return_Key_Type
+ * @typedef Elm_Input_Panel_Return_Key_Type
+ *
+ * "Return" Key types on the input panel (virtual keyboard).
+ * 
+ * @see elm_entry_input_panel_return_key_type_set()
+ */
+typedef enum
+{
+   ELM_INPUT_PANEL_RETURN_KEY_TYPE_DEFAULT, /**< Default */
+   ELM_INPUT_PANEL_RETURN_KEY_TYPE_DONE,    /**< Done */
+   ELM_INPUT_PANEL_RETURN_KEY_TYPE_GO,      /**< Go */
+   ELM_INPUT_PANEL_RETURN_KEY_TYPE_JOIN,    /**< Join */
+   ELM_INPUT_PANEL_RETURN_KEY_TYPE_LOGIN,   /**< Login */
+   ELM_INPUT_PANEL_RETURN_KEY_TYPE_NEXT,    /**< Next */
+   ELM_INPUT_PANEL_RETURN_KEY_TYPE_SEARCH,  /**< Search string or magnifier icon */
+   ELM_INPUT_PANEL_RETURN_KEY_TYPE_SEND     /**< Send */
+} Elm_Input_Panel_Return_Key_Type;
+
+/**
+>>>>>>> remotes/origin/upstream
  * @typedef Elm_Entry_Anchor_Info
  *
  * The info sent in the callback for the "anchor,clicked" signals emitted
@@ -338,14 +480,84 @@ struct _Elm_Entry_Anchor_Info
 };
 
 /**
+<<<<<<< HEAD
+=======
+ * @typedef Elm_Entry_Anchor_Hover_Info
+ *
+ * The info sent in the callback for "anchor,clicked" signals emitted by
+ * the Anchor_Hover widget.
+ */
+typedef struct _Elm_Entry_Anchor_Hover_Info Elm_Entry_Anchor_Hover_Info;
+
+/**
+ * @struct _Elm_Entry_Anchor_Hover_Info
+ *
+ * The info sent in the callback for "anchor,clicked" signals emitted by
+ * the Anchor_Hover widget.
+ */
+struct _Elm_Entry_Anchor_Hover_Info
+{
+   const Elm_Entry_Anchor_Info *anchor_info; /**< The actual anchor info. */
+   Evas_Object *hover; /**< The hover object to use for the popup */
+   struct
+   {
+      Evas_Coord x, y, w, h;
+   } hover_parent; /**< Geometry of the object used as parent by the
+                        hover */
+   Eina_Bool    hover_left : 1; /**< Hint indicating if there's space
+                                     for content on the left side of
+                                     the hover. Before calling the
+                                     callback, the widget will make the
+                                     necessary calculations to check
+                                     which sides are fit to be set with
+                                     content, based on the position the
+                                     hover is activated and its distance
+                                     to the edges of its parent object
+                                 */
+   Eina_Bool    hover_right : 1; /**< Hint indicating content fits on
+                                      the right side of the hover.
+                                      See @ref hover_left */
+   Eina_Bool    hover_top : 1; /**< Hint indicating content fits on top
+                                    of the hover. See @ref hover_left */
+   Eina_Bool    hover_bottom : 1; /**< Hint indicating content fits
+                                       below the hover. See @ref
+                                       hover_left */
+};
+
+/**
+ * @typedef Elm_Entry_Item_Provider_Cb
+ * This callback type is used to provide items.
+ * If it returns an object handle other than NULL (it should create an
+ * object to do this), then this object is used to replace the current item.
+ * If not the next provider is called until one provides an item object, or the
+ * default provider in entry does.
+ * @param data The data specified as the last param when adding the provider
+ * @param entry The entry object
+ * @param text A pointer to the item href string in the text
+ * @return The object to be placed in the entry like an icon, or other element
+ * @see elm_entry_item_provider_append
+ * @see elm_entry_item_provider_prepend
+ * @see elm_entry_item_provider_remove
+ */
+typedef Evas_Object * (*Elm_Entry_Item_Provider_Cb)(void *data, Evas_Object * entry, const char *item);
+
+/**
+>>>>>>> remotes/origin/upstream
  * @typedef Elm_Entry_Filter_Cb
  * This callback type is used by entry filters to modify text.
  * @param data The data specified as the last param when adding the filter
  * @param entry The entry object
+<<<<<<< HEAD
  * @param text A pointer to the location of the text being filtered. This data can be modified,
  * but any additional allocations must be managed by the user.
  * @see elm_entry_text_filter_append
  * @see elm_entry_text_filter_prepend
+=======
+ * @param text A pointer to the location of the text being filtered. The type of text is always markup. This data can be modified, but any additional allocations must be managed by the user.
+ * @see elm_entry_markup_filter_append
+ * @see elm_entry_markup_filter_prepend
+ * @see elm_entry_markup_filter_remove
+>>>>>>> remotes/origin/upstream
  */
 typedef void (*Elm_Entry_Filter_Cb)(void *data, Evas_Object *entry, char **text);
 
@@ -450,7 +662,11 @@ EAPI const char        *elm_entry_entry_get(const Evas_Object *obj);
  * @param obj The entry object
  * @param entry The text to be displayed
  *
+<<<<<<< HEAD
  * @see elm_entry_text_filter_append()
+=======
+ * @see elm_entry_markup_filter_append()
+>>>>>>> remotes/origin/upstream
  */
 EAPI void               elm_entry_entry_append(Evas_Object *obj, const char *entry);
 
@@ -539,7 +755,11 @@ EAPI void               elm_entry_calc_force(Evas_Object *obj);
  * @param obj The entry object
  * @param entry The text to insert
  *
+<<<<<<< HEAD
  * @see elm_entry_text_filter_append()
+=======
+ * @see elm_entry_markup_filter_append()
+>>>>>>> remotes/origin/upstream
  */
 EAPI void               elm_entry_entry_insert(Evas_Object *obj, const char *entry);
 
@@ -834,6 +1054,7 @@ EAPI void               elm_entry_context_menu_disabled_set(Evas_Object *obj, Ei
 EAPI Eina_Bool          elm_entry_context_menu_disabled_get(const Evas_Object *obj);
 
 /**
+<<<<<<< HEAD
  * This disables the entry's magnifer feature.
  *
  * @param obj The entry object
@@ -850,6 +1071,8 @@ EAPI void         elm_entry_magnifier_disabled_set(Evas_Object *obj, Eina_Bool d
 EAPI Eina_Bool    elm_entry_magnifier_disabled_get(const Evas_Object *obj);
 
 /**
+=======
+>>>>>>> remotes/origin/upstream
  * This appends a custom item provider to the list for that entry
  *
  * This appends the given callback. The list is walked from beginning to end
@@ -865,7 +1088,11 @@ EAPI Eina_Bool    elm_entry_magnifier_disabled_get(const Evas_Object *obj);
  *
  * @see @ref entry-items
  */
+<<<<<<< HEAD
 EAPI void               elm_entry_item_provider_append(Evas_Object *obj, Evas_Object * (*func)(void *data, Evas_Object * entry, const char *item), void *data);
+=======
+EAPI void               elm_entry_item_provider_append(Evas_Object *obj, Elm_Entry_Item_Provider_Cb func, void *data);
+>>>>>>> remotes/origin/upstream
 
 /**
  * This prepends a custom item provider to the list for that entry
@@ -877,7 +1104,11 @@ EAPI void               elm_entry_item_provider_append(Evas_Object *obj, Evas_Ob
  * @param func The function called to provide the item object
  * @param data The data passed to @p func
  */
+<<<<<<< HEAD
 EAPI void               elm_entry_item_provider_prepend(Evas_Object *obj, Evas_Object * (*func)(void *data, Evas_Object * entry, const char *item), void *data);
+=======
+EAPI void               elm_entry_item_provider_prepend(Evas_Object *obj, Elm_Entry_Item_Provider_Cb func, void *data);
+>>>>>>> remotes/origin/upstream
 
 /**
  * This removes a custom item provider to the list for that entry
@@ -889,6 +1120,7 @@ EAPI void               elm_entry_item_provider_prepend(Evas_Object *obj, Evas_O
  * @param func The function called to provide the item object
  * @param data The data passed to @p func
  */
+<<<<<<< HEAD
 EAPI void               elm_entry_item_provider_remove(Evas_Object *obj, Evas_Object * (*func)(void *data, Evas_Object * entry, const char *item), void *data);
 
 /**
@@ -898,6 +1130,18 @@ EAPI void               elm_entry_item_provider_remove(Evas_Object *obj, Evas_Ob
  * whenever any text is inserted into the entry, with the text to be inserted
  * as a parameter. The callback function is free to alter the text in any way
  * it wants, but it must remember to free the given pointer and update it.
+=======
+EAPI void               elm_entry_item_provider_remove(Evas_Object *obj, Elm_Entry_Item_Provider_Cb func, void *data);
+
+/**
+ * Append a markup filter function for text inserted in the entry
+ *
+ * Append the given callback to the list. This functions will be called
+ * whenever any text is inserted into the entry, with the text to be inserted
+ * as a parameter. The type of given text is always markup.
+ * The callback function is free to alter the text in any way it wants, but 
+ * it must remember to free the given pointer and update it.
+>>>>>>> remotes/origin/upstream
  * If the new text is to be discarded, the function can free it and set its
  * text parameter to NULL. This will also prevent any following filters from
  * being called.
@@ -906,18 +1150,28 @@ EAPI void               elm_entry_item_provider_remove(Evas_Object *obj, Evas_Ob
  * @param func The function to use as text filter
  * @param data User data to pass to @p func
  */
+<<<<<<< HEAD
 EAPI void               elm_entry_text_filter_append(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data);
 
 /**
  * Prepend a filter function for text insdrted in the entry
  *
  * Prepend the given callback to the list. See elm_entry_text_filter_append()
+=======
+EAPI void               elm_entry_markup_filter_append(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data);
+
+/**
+ * Prepend a markup filter function for text inserted in the entry
+ *
+ * Prepend the given callback to the list. See elm_entry_markup_filter_append()
+>>>>>>> remotes/origin/upstream
  * for more information
  *
  * @param obj The entry object
  * @param func The function to use as text filter
  * @param data User data to pass to @p func
  */
+<<<<<<< HEAD
 EAPI void               elm_entry_text_filter_prepend(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data);
 
 /**
@@ -925,12 +1179,25 @@ EAPI void               elm_entry_text_filter_prepend(Evas_Object *obj, Elm_Entr
  *
  * Removes the given callback from the filter list. See
  * elm_entry_text_filter_append() for more information.
+=======
+EAPI void               elm_entry_markup_filter_prepend(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data);
+
+/**
+ * Remove a markup filter from the list
+ *
+ * Removes the given callback from the filter list. See
+ * elm_entry_markup_filter_append() for more information.
+>>>>>>> remotes/origin/upstream
  *
  * @param obj The entry object
  * @param func The filter function to remove
  * @param data The user data passed when adding the function
  */
+<<<<<<< HEAD
 EAPI void               elm_entry_text_filter_remove(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data);
+=======
+EAPI void               elm_entry_markup_filter_remove(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data);
+>>>>>>> remotes/origin/upstream
 
 /**
  * This converts a markup (HTML-like) string into UTF-8.
@@ -966,8 +1233,14 @@ EAPI char              *elm_entry_utf8_to_markup(const char *s);
  * @param obj The entry object
  * @param file The path to the file to load and save
  * @param format The file format
+<<<<<<< HEAD
  */
 EAPI void               elm_entry_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format);
+=======
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+ */
+EAPI Eina_Bool          elm_entry_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Gets the file being edited by the entry.
@@ -1010,6 +1283,7 @@ EAPI void               elm_entry_autosave_set(Evas_Object *obj, Eina_Bool autos
 EAPI Eina_Bool          elm_entry_autosave_get(const Evas_Object *obj);
 
 /**
+<<<<<<< HEAD
  * Control pasting of text and images for the widget.
  *
  * Normally the entry allows both text and images to be pasted.
@@ -1074,6 +1348,8 @@ EAPI void               elm_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool t
 EAPI Eina_Bool          elm_entry_cnp_textonly_get(const Evas_Object *obj);
 
 /**
+=======
+>>>>>>> remotes/origin/upstream
  * Enable or disable scrolling in entry
  *
  * Normally the entry is not scrollable unless you enable it with this call.
@@ -1095,34 +1371,56 @@ EAPI void               elm_entry_scrollable_set(Evas_Object *obj, Eina_Bool scr
 EAPI Eina_Bool          elm_entry_scrollable_get(const Evas_Object *obj);
 
 /**
+<<<<<<< HEAD
  * Sets the visibility of the left-side widget of the scrolled entry,
  * set by elm_entry_icon_set().
  *
  * @param obj The scrolled entry object
+=======
+ * Sets the visibility of the left-side widget of the entry,
+ * set by elm_entry_icon_set().
+ *
+ * @param obj The entry object
+>>>>>>> remotes/origin/upstream
  * @param setting EINA_TRUE if the object should be displayed,
  * EINA_FALSE if not.
  */
 EAPI void               elm_entry_icon_visible_set(Evas_Object *obj, Eina_Bool setting);
 
 /**
+<<<<<<< HEAD
  * Sets the visibility of the end widget of the scrolled entry, set by
  * elm_object_part_content_set(ent, "end", content).
  *
  * @param obj The scrolled entry object
+=======
+ * Sets the visibility of the end widget of the entry, set by
+ * elm_object_part_content_set(ent, "end", content).
+ *
+ * @param obj The entry object
+>>>>>>> remotes/origin/upstream
  * @param setting EINA_TRUE if the object should be displayed,
  * EINA_FALSE if not.
  */
 EAPI void               elm_entry_end_visible_set(Evas_Object *obj, Eina_Bool setting);
 
 /**
+<<<<<<< HEAD
  * This sets the scrolled entry's scrollbar policy (ie. enabling/disabling
+=======
+ * This sets the entry's scrollbar policy (i.e. enabling/disabling
+>>>>>>> remotes/origin/upstream
  * them).
  *
  * Setting an entry to single-line mode with elm_entry_single_line_set()
  * will automatically disable the display of scrollbars when the entry
  * moves inside its scroller.
  *
+<<<<<<< HEAD
  * @param obj The scrolled entry object
+=======
+ * @param obj The entry object
+>>>>>>> remotes/origin/upstream
  * @param h The horizontal scrollbar policy to apply
  * @param v The vertical scrollbar policy to apply
  */
@@ -1134,7 +1432,11 @@ EAPI void               elm_entry_scrollbar_policy_set(Evas_Object *obj, Elm_Scr
  * This function sets whether the entry will bounce when scrolling reaches
  * the end of the contained entry.
  *
+<<<<<<< HEAD
  * @param obj The scrolled entry object
+=======
+ * @param obj The entry object
+>>>>>>> remotes/origin/upstream
  * @param h_bounce The horizontal bounce state
  * @param v_bounce The vertical bounce state
  */
@@ -1203,7 +1505,11 @@ EAPI Eina_Bool              elm_entry_input_panel_enabled_get(const Evas_Object 
  * Show the input panel (virtual keyboard) based on the input panel property of entry such as layout, autocapital types, and so on.
  *
  * Note that input panel is shown or hidden automatically according to the focus state of entry widget.
+<<<<<<< HEAD
  * This API can be used in the case of manually controling by using elm_entry_input_panel_enabled_set(en, EINA_FALSE)
+=======
+ * This API can be used in the case of manually controlling by using elm_entry_input_panel_enabled_set(en, EINA_FALSE).
+>>>>>>> remotes/origin/upstream
  *
  * @param obj The entry object
  */
@@ -1213,7 +1519,11 @@ EAPI void                   elm_entry_input_panel_show(Evas_Object *obj);
  * Hide the input panel (virtual keyboard).
  *
  * Note that input panel is shown or hidden automatically according to the focus state of entry widget.
+<<<<<<< HEAD
  * This API can be used in the case of manually controling by using elm_entry_input_panel_enabled_set(en, EINA_FALSE)
+=======
+ * This API can be used in the case of manually controlling by using elm_entry_input_panel_enabled_set(en, EINA_FALSE)
+>>>>>>> remotes/origin/upstream
  *
  * @param obj The entry object
  */
@@ -1303,6 +1613,7 @@ EAPI Eina_Bool              elm_entry_input_panel_return_key_disabled_get(const 
 /**
  * Set whether the return key on the input panel is disabled automatically when entry has no text.
  *
+<<<<<<< HEAD
  * If @p on is EINA_TRUE, The return key on input panel is disabled when the entry has no text.
  * The return Key on the input panel is automatically enabled when the entry has text.
  * The default value is EINA_FALSE.
@@ -1311,6 +1622,16 @@ EAPI Eina_Bool              elm_entry_input_panel_return_key_disabled_get(const 
  * @param on If @p on is EINA_TRUE, the return key is automatically disabled when the entry has no text.
  */
 EAPI void                   elm_entry_input_panel_return_key_autoenabled_set(Evas_Object *obj, Eina_Bool on);
+=======
+ * If @p enabled is EINA_TRUE, The return key on input panel is disabled when the entry has no text.
+ * The return key on the input panel is automatically enabled when the entry has text.
+ * The default value is EINA_FALSE.
+ *
+ * @param obj The entry object
+ * @param enabled If @p enabled is EINA_TRUE, the return key is automatically disabled when the entry has no text.
+ */
+EAPI void                   elm_entry_input_panel_return_key_autoenabled_set(Evas_Object *obj, Eina_Bool enabled);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Reset the input method context of the entry if needed. 
@@ -1361,14 +1682,24 @@ struct _Elm_Entry_Filter_Limit_Size
  *
  * Add this filter to an entry to limit the characters that it will accept
  * based the the contents of the provided #Elm_Entry_Filter_Limit_Size.
+<<<<<<< HEAD
  * The funtion works on the UTF-8 representation of the string, converting
+=======
+ * The function works on the UTF-8 representation of the string, converting
+>>>>>>> remotes/origin/upstream
  * it from the set markup, thus not accounting for any format in it.
  *
  * The user must create an #Elm_Entry_Filter_Limit_Size structure and pass
  * it as data when setting the filter. In it, it's possible to set limits
  * by character count or bytes (any of them is disabled if 0), and both can
  * be set at the same time. In that case, it first checks for characters,
+<<<<<<< HEAD
  * then bytes.
+=======
+ * then bytes. The #Elm_Entry_Filter_Limit_Size structure must be alive and
+ * valid for as long as the entry is alive AND the elm_entry_filter_limit_size
+ * filter is set.
+>>>>>>> remotes/origin/upstream
  *
  * The function will cut the inserted text in order to allow only the first
  * number of characters that are still allowed. The cut is made in
@@ -1404,7 +1735,12 @@ struct _Elm_Entry_Filter_Accept_Set
  * Add this filter to an entry to restrict the set of accepted characters
  * based on the sets in the provided #Elm_Entry_Filter_Accept_Set.
  * This structure contains both accepted and rejected sets, but they are
+<<<<<<< HEAD
  * mutually exclusive.
+=======
+ * mutually exclusive. This structure must be available for as long as
+ * the entry is alive AND the elm_entry_filter_accept_set is being used.
+>>>>>>> remotes/origin/upstream
  *
  * The @c accepted set takes preference, so if it is set, the filter will
  * only work based on the accepted characters, ignoring anything in the
@@ -1418,8 +1754,125 @@ struct _Elm_Entry_Filter_Accept_Set
  */
 EAPI void                   elm_entry_filter_accept_set(void *data, Evas_Object *entry, char **text);
 
+<<<<<<< HEAD
 EAPI Ecore_IMF_Context     *elm_entry_imf_context_get(Evas_Object *obj);
 EAPI void                   elm_entry_magnifier_type_set(Evas_Object *obj, int type);
+=======
+/**
+ * Returns the input method context of the entry.
+ *
+ * This function exposes the internal input method context.
+ *
+ * IMPORTANT: Many functions may change (i.e delete and create a new one)
+ * the internal input method context. Do NOT cache the returned object.
+ *
+ * @param obj The entry object
+ * @return The input method context (Ecore_IMF_Context *) in entry.
+ */
+EAPI void                  *elm_entry_imf_context_get(Evas_Object *obj);
+
+/**
+ * @enum _Elm_Cnp_Mode
+ * @typedef Elm_Cnp_Mode
+ * Enum of entry's copy & paste policy.
+ *
+ * @see elm_entry_cnp_mode_set()
+ * @see elm_entry_cnp_mode_get()
+ */
+typedef enum _Elm_Cnp_Mode {
+   ELM_CNP_MODE_MARKUP,   /**< copy & paste text with markup tag */
+   ELM_CNP_MODE_NO_IMAGE, /**< copy & paste text without item(image) tag */
+   ELM_CNP_MODE_PLAINTEXT /**< copy & paste text without markup tag */
+} Elm_Cnp_Mode;
+
+/**
+ * Control pasting of text and images for the widget.
+ *
+ * Normally the entry allows both text and images to be pasted.
+ * By setting cnp_mode to be ELM_CNP_MODE_NO_IMAGE, this prevents images from being copy or past.
+ * By setting cnp_mode to be ELM_CNP_MODE_PLAINTEXT, this remove all tags in text .
+ *
+ * @note this only changes the behaviour of text.
+ *
+ * @param obj The entry object
+ * @param mode One of #Elm_Cnp_Mode: #ELM_CNP_MODE_MARKUP,
+ * #ELM_CNP_MODE_NO_IMAGE, #ELM_CNP_MODE_PLAINTEXT.
+ */
+EAPI void         elm_entry_cnp_mode_set(Evas_Object *obj, Elm_Cnp_Mode cnp_mode);
+
+/**
+ * Getting elm_entry text paste/drop mode.
+ *
+ * Normally the entry allows both text and images to be pasted.
+ * This gets the copy & paste mode of the entry.
+ *
+ * @param obj The entry object
+ * @return mode One of #Elm_Cnp_Mode: #ELM_CNP_MODE_MARKUP,
+ * #ELM_CNP_MODE_NO_IMAGE, #ELM_CNP_MODE_PLAINTEXT.
+ */
+EAPI Elm_Cnp_Mode elm_entry_cnp_mode_get(const Evas_Object *obj);
+
+/**
+ * Set the parent of the hover popup
+ *
+ * Sets the parent object to use by the hover created by the entry
+ * when an anchor is clicked. See @ref Hover for more details on this.
+ *
+ * @param obj The entry object
+ * @param parent The object to use as parent for the hover
+ */
+EAPI void                        elm_entry_anchor_hover_parent_set(Evas_Object *obj, Evas_Object *parent);
+
+/**
+ * Get the parent of the hover popup
+ *
+ * Get the object used as parent for the hover created by the entry
+ * widget. See @ref Hover for more details on this.
+ * If no parent is set, the same entry object will be used.
+ *
+ * @param obj The entry object
+ * @return The object used as parent for the hover, NULL if none is set.
+ */
+EAPI Evas_Object                *elm_entry_anchor_hover_parent_get(const Evas_Object *obj);
+
+/**
+ * Set the style that the hover should use
+ *
+ * When creating the popup hover, entry will request that it's
+ * themed according to @p style.
+ *
+ * Setting style no NULL means disabling automatic hover.
+ *
+ * @param obj The entry object
+ * @param style The style to use for the underlying hover
+ *
+ * @see elm_object_style_set()
+ */
+EAPI void                        elm_entry_anchor_hover_style_set(Evas_Object *obj, const char *style);
+
+/**
+ * Get the style that the hover should use
+ *
+ * Get the style, the hover created by entry will use.
+ *
+ * @param obj The entry object
+ * @return The style to use by the hover. NULL means the default is used.
+ *
+ * @see elm_object_style_set()
+ */
+EAPI const char                 *elm_entry_anchor_hover_style_get(const Evas_Object *obj);
+
+/**
+ * Ends the hover popup in the entry
+ *
+ * When an anchor is clicked, the entry widget will create a hover
+ * object to use as a popup with user provided content. This function
+ * terminates this popup, returning the entry to its normal state.
+ *
+ * @param obj The entry object
+ */
+EAPI void                        elm_entry_anchor_hover_end(Evas_Object *obj);
+>>>>>>> remotes/origin/upstream
 
 /**
  * @}

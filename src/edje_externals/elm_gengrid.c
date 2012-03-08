@@ -43,9 +43,25 @@ external_gengrid_state_set(void *data __UNUSED__, Evas_Object *obj, const void *
    if (p->multi_exists)
      elm_gengrid_multi_select_set(obj, p->multi);
    if (p->no_select_exists)
+<<<<<<< HEAD
      elm_gengrid_no_select_mode_set (obj, p->no_select);
    if (p->always_select_exists)
      elm_gengrid_always_select_mode_set (obj, p->always_select);
+=======
+     {
+        if (p->no_select)
+          elm_gengrid_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_NONE);
+        else
+          elm_gengrid_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+     }
+   if (p->always_select_exists)
+     {
+        if (p->always_select)
+          elm_gengrid_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_ALWAYS);
+        else
+          elm_gengrid_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+     }
+>>>>>>> remotes/origin/upstream
    if (p->h_bounce_exists)
      {
         Eina_Bool h_bounce, v_bounce;
@@ -85,11 +101,19 @@ external_gengrid_state_set(void *data __UNUSED__, Evas_Object *obj, const void *
    else if (p->align_x_exists || p->align_y_exists)
      {
         double x, y;
+<<<<<<< HEAD
 	elm_gengrid_align_get(obj, &x, &y);
 	if (p->align_x_exists)
 	  elm_gengrid_align_set(obj, p->align_x, y);
 	else
 	  elm_gengrid_align_set(obj, x, p->align_y);
+=======
+        elm_gengrid_align_get(obj, &x, &y);
+        if (p->align_x_exists)
+          elm_gengrid_align_set(obj, p->align_x, y);
+        else
+          elm_gengrid_align_set(obj, x, p->align_y);
+>>>>>>> remotes/origin/upstream
      }
    if (p->horizontal_exists)
      {
@@ -112,7 +136,14 @@ external_gengrid_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_E
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
           {
+<<<<<<< HEAD
              elm_gengrid_no_select_mode_set(obj, param->i);
+=======
+             if (param->i)
+               elm_gengrid_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_NONE);
+             else
+               elm_gengrid_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }
@@ -120,7 +151,14 @@ external_gengrid_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_E
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
           {
+<<<<<<< HEAD
              elm_gengrid_always_select_mode_set(obj, param->i);
+=======
+             if (param->i)
+               elm_gengrid_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_ALWAYS);
+             else
+               elm_gengrid_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }
@@ -193,6 +231,7 @@ external_gengrid_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_E
           }
      }
    else if (!strcmp(param->name, "align x")
+<<<<<<< HEAD
 		   && param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
      {
 	double x, y;
@@ -207,6 +246,22 @@ external_gengrid_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_E
 	elm_gengrid_align_get(obj, &x, &y);
 	elm_gengrid_align_set(obj, x, param->d);
 	return EINA_TRUE;
+=======
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
+     {
+        double x, y;
+        elm_gengrid_align_get(obj, &x, &y);
+        elm_gengrid_align_set(obj, param->d, y);
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "align y")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
+     {
+        double x, y;
+        elm_gengrid_align_get(obj, &x, &y);
+        elm_gengrid_align_set(obj, x, param->d);
+        return EINA_TRUE;
+>>>>>>> remotes/origin/upstream
      }
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -229,7 +284,15 @@ external_gengrid_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_E
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
           {
+<<<<<<< HEAD
              param->i = elm_gengrid_no_select_mode_get(obj);
+=======
+             if (elm_gengrid_select_mode_get (obj) ==
+                 ELM_OBJECT_SELECT_MODE_NONE)
+               param->i = EINA_TRUE;
+             else
+               param->i = EINA_FALSE;
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }
@@ -237,7 +300,15 @@ external_gengrid_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_E
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
           {
+<<<<<<< HEAD
              param->i = elm_gengrid_always_select_mode_get(obj);
+=======
+             if (elm_gengrid_select_mode_get (obj) ==
+                 ELM_OBJECT_SELECT_MODE_ALWAYS)
+               param->i = EINA_TRUE;
+             else
+               param->i = EINA_FALSE;
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }
@@ -310,6 +381,7 @@ external_gengrid_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_E
           }
      }
    else if (!strcmp(param->name, "align x")
+<<<<<<< HEAD
 		   && param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
      {
 	double x, y;
@@ -324,6 +396,22 @@ external_gengrid_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_E
 	elm_gengrid_align_get(obj, &x, &y);
 	param->d = y;
 	return EINA_TRUE;
+=======
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
+     {
+        double x, y;
+        elm_gengrid_align_get(obj, &x, &y);
+        param->d = x;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "align y")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_DOUBLE)
+     {
+        double x, y;
+        elm_gengrid_align_get(obj, &x, &y);
+        param->d = y;
+        return EINA_TRUE;
+>>>>>>> remotes/origin/upstream
      }
    ERR("unknown parameter '%s' of type '%s'",
        param->name, edje_external_param_type_str(param->type));
@@ -394,6 +482,7 @@ external_gengrid_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__
              mem->horizontal = !!param->i;
              mem->horizontal_exists = EINA_TRUE;
           }
+<<<<<<< HEAD
 	else if (!strcmp(param->name, "align x"))
 	  {
 	     mem->align_x = param->d;
@@ -404,6 +493,18 @@ external_gengrid_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__
 	     mem->align_y = param->d;
 	     mem->align_y_exists = EINA_TRUE;
 	  }
+=======
+        else if (!strcmp(param->name, "align x"))
+          {
+             mem->align_x = param->d;
+             mem->align_x_exists = EINA_TRUE;
+          }
+        else if (!strcmp(param->name, "align y"))
+          {
+             mem->align_y = param->d;
+             mem->align_y_exists = EINA_TRUE;
+          }
+>>>>>>> remotes/origin/upstream
      }
 
    return mem;

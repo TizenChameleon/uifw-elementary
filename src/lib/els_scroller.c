@@ -70,7 +70,10 @@ struct _Smart_Data
       Eina_Bool bounce_x_hold : 1;
       Eina_Bool bounce_y_hold : 1;
       Eina_Bool scroll : 1;
+<<<<<<< HEAD
       Eina_Bool want_reset : 1;
+=======
+>>>>>>> remotes/origin/upstream
    } down;
 
    struct {
@@ -116,7 +119,10 @@ struct _Smart_Data
    Eina_Bool bounce_animator_disabled :1;
    Eina_Bool is_mirrored : 1;
    Eina_Bool wheel_disabled : 1;
+<<<<<<< HEAD
    Eina_Bool event_propagation :1;
+=======
+>>>>>>> remotes/origin/upstream
 };
 
 /* local subsystem functions */
@@ -1297,6 +1303,7 @@ elm_smart_scroller_single_dir_get(Evas_Object *obj)
 }
 
 void
+<<<<<<< HEAD
 elm_smart_scroller_propagate_events_set(Evas_Object *obj, Eina_Bool propagation)
 {
    API_ENTRY return;
@@ -1313,6 +1320,8 @@ elm_smart_scroller_propagate_events_get(Evas_Object *obj)
 }
 
 void
+=======
+>>>>>>> remotes/origin/upstream
 elm_smart_scroller_object_theme_set(Evas_Object *parent, Evas_Object *obj, const char *clas, const char *group, const char *style)
 {
    API_ENTRY return;
@@ -1792,10 +1801,13 @@ _smart_event_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSE
         sd->down.dragged_began = EINA_FALSE;
         sd->down.hold_parent = EINA_FALSE;
         sd->down.cancelled = EINA_FALSE;
+<<<<<<< HEAD
         if(sd->hold || sd->freeze)
            sd->down.want_reset = EINA_TRUE;
         else
            sd->down.want_reset = EINA_FALSE;
+=======
+>>>>>>> remotes/origin/upstream
      }
 }
 
@@ -1845,6 +1857,7 @@ _smart_hold_animator(void *data)
 
    fx = sd->down.hold_x;
    fy = sd->down.hold_y;
+<<<<<<< HEAD
 
    if ((!sd->hold) && (!sd->freeze) && (_elm_config->scroll_smooth_time_interval > 0.0))
      {
@@ -1911,6 +1924,84 @@ _smart_hold_animator(void *data)
           }
         fx = xsum / dst_index;
         fy = ysum / dst_index;
+=======
+   if (_elm_config->scroll_smooth_amount > 0.0)
+     {
+        int i, count = 0;
+        Evas_Coord basex = 0, basey = 0, x, y;
+        double dt, t, tdiff, tnow, twin;
+        struct {
+             Evas_Coord x, y, dx, dy;
+             double t, dt;
+        } pos[60];
+
+        tdiff = sd->down.hist.est_timestamp_diff;
+        tnow = ecore_time_get() - tdiff;
+        t = tnow;
+        twin = _elm_config->scroll_smooth_time_window;
+        for (i = 0; i < 60; i++)
+          {
+             // oldest point is sd->down.history[i]
+             // newset is sd->down.history[0]
+             dt = t - sd->down.history[i].timestamp;
+             if (dt > twin)
+               {
+                  i--;
+                  break;
+               }
+             x = sd->down.history[i].x;
+             y = sd->down.history[i].y;
+             _down_coord_eval(sd, &x, &y);
+             if (i == 0)
+               {
+                  basex = x;
+                  basey = y;
+               }
+             pos[i].x = x - basex;
+             pos[i].y = y - basey;
+             pos[i].t =
+                sd->down.history[i].timestamp - sd->down.history[0].timestamp;
+             count++;
+          }
+        count = i;
+        if (count >= 2)
+          {
+             double dtsum = 0.0, tadd, maxdt;
+             double dxsum = 0.0, dysum = 0.0, xsum = 0.0, ysum = 0.0;
+
+             for (i = 0; i < (count - 1); i++)
+               {
+                  pos[i].dx = pos[i].x - pos[i + 1].x;
+                  pos[i].dy = pos[i].y - pos[i + 1].y;
+                  pos[i].dt = pos[i].t - pos[i + 1].t;
+                  dxsum += pos[i].dx;
+                  dysum += pos[i].dy;
+                  dtsum += pos[i].dt;
+                  xsum += pos[i].x;
+                  ysum += pos[i].y;
+               }
+             maxdt = pos[i].t;
+             dxsum /= (double)i;
+             dysum /= (double)i;
+             dtsum /= (double)i;
+             xsum /= (double)i;
+             ysum /= (double)i;
+             tadd = tnow - sd->down.history[0].timestamp + _elm_config->scroll_smooth_future_time;
+             tadd = tadd - (maxdt / 2);
+#define WEIGHT(n, o, v) n = (((double)o * (1.0 - v)) + ((double)n * v))
+             WEIGHT(tadd, sd->down.hist.tadd, _elm_config->scroll_smooth_history_weight);
+             WEIGHT(dxsum, sd->down.hist.dxsum, _elm_config->scroll_smooth_history_weight);
+             WEIGHT(dysum, sd->down.hist.dysum, _elm_config->scroll_smooth_history_weight);
+             fx = basex + xsum + ((dxsum * tadd) / dtsum);
+             fy = basey + ysum + ((dysum * tadd) / dtsum);
+             sd->down.hist.tadd = tadd;
+             sd->down.hist.dxsum = dxsum;
+             sd->down.hist.dysum = dysum;
+             WEIGHT(fx, sd->down.hold_x, _elm_config->scroll_smooth_amount);
+             WEIGHT(fy, sd->down.hold_y, _elm_config->scroll_smooth_amount);
+          }
+        //        printf("%3.5f %i %i\n", ecore_time_get(), sd->down.hold_y, fy);
+>>>>>>> remotes/origin/upstream
      }
 
    elm_smart_scroller_child_pos_get(sd->smart_obj, &ox, &oy);
@@ -1952,7 +2043,10 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
    Evas_Event_Mouse_Down *ev;
    Smart_Data *sd;
    Evas_Coord x = 0, y = 0, ox = 0, oy = 0;
+<<<<<<< HEAD
    Evas_Coord vw, vh, aw, ah;
+=======
+>>>>>>> remotes/origin/upstream
 
    sd = data;
    ev = event_info;
@@ -2040,6 +2134,7 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                                      ((sd->down.dy > 0) && (sd->down.pdy > 0)) ||
                                      ((sd->down.dy < 0) && (sd->down.pdy < 0)))
                                    {
+<<<<<<< HEAD
                                       double t = ecore_loop_time_get();
                                       double dt = t - sd->down.anim_start;
 
@@ -2063,6 +2158,18 @@ _smart_event_mouse_up(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *ev
                                       if (sd->down.dy > 0) sd->down.dy = vh*3;
                                       else sd->down.dy = -(vh*3);
                                    }
+=======
+                                      double tt = ecore_loop_time_get();
+                                      double dtt = tt - sd->down.anim_start;
+
+                                      if (dtt < 0.0) dtt = 0.0;
+                                      else if (dtt > _elm_config->thumbscroll_friction)
+                                        dtt = _elm_config->thumbscroll_friction;
+                                      sd->down.extra_time = _elm_config->thumbscroll_friction - dtt;
+                                   }
+                                 else
+                                   sd->down.extra_time = 0.0;
+>>>>>>> remotes/origin/upstream
                                  sd->down.pdx = sd->down.dx;
                                  sd->down.pdy = sd->down.dy;
                                  ox = -sd->down.dx;
@@ -2418,12 +2525,15 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *
                          y = sd->down.sy - (ev->cur.canvas.y - sd->down.y);
                        else
                          y = sd->down.sy;
+<<<<<<< HEAD
                        if(sd->down.want_reset)
                          {
                             sd->down.x = ev->cur.canvas.x;
                             sd->down.y = ev->cur.canvas.y;
                             sd->down.want_reset = EINA_FALSE;
                          }
+=======
+>>>>>>> remotes/origin/upstream
                        if ((sd->down.dir_x) || (sd->down.dir_y))
                          {
                             if (!sd->down.locked)

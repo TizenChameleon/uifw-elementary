@@ -52,10 +52,27 @@ external_toolbar_state_set(void *data __UNUSED__, Evas_Object *obj, const void *
      elm_toolbar_icon_size_set(obj, p->icon_size);
    if (p->align_exists)
      elm_toolbar_align_set(obj, p->align);
+<<<<<<< HEAD
    if (p->always_select_exists)
      elm_toolbar_always_select_mode_set(obj, p->always_select);
    if (p->no_select_exists)
      elm_toolbar_no_select_mode_set(obj, p->no_select);
+=======
+   if (p->no_select_exists)
+     {
+        if (p->no_select)
+          elm_toolbar_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_NONE);
+        else
+          elm_toolbar_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+     }
+   if (p->always_select_exists)
+     {
+        if (p->always_select)
+          elm_toolbar_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_ALWAYS);
+        else
+          elm_toolbar_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+     }
+>>>>>>> remotes/origin/upstream
    if (p->horizontal_exists)
      elm_toolbar_horizontal_set(obj, p->horizontal);
    if (p->homogeneous_exists)
@@ -92,7 +109,14 @@ external_toolbar_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_E
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
           {
+<<<<<<< HEAD
              elm_toolbar_always_select_mode_set(obj, param->i);
+=======
+             if (param->i)
+               elm_toolbar_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_ALWAYS);
+             else
+               elm_toolbar_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }
@@ -100,7 +124,14 @@ external_toolbar_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_E
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
           {
+<<<<<<< HEAD
              elm_toolbar_no_select_mode_set(obj, param->i);
+=======
+             if (param->i)
+               elm_toolbar_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_NONE);
+             else
+               elm_toolbar_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }
@@ -159,7 +190,15 @@ external_toolbar_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_E
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
           {
+<<<<<<< HEAD
              param->d = elm_toolbar_always_select_mode_get(obj);
+=======
+             if (elm_toolbar_select_mode_get (obj) ==
+                 ELM_OBJECT_SELECT_MODE_ALWAYS)
+               param->d = EINA_TRUE;
+             else
+               param->d = EINA_FALSE;
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }
@@ -167,7 +206,15 @@ external_toolbar_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_E
      {
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
           {
+<<<<<<< HEAD
              param->i = elm_toolbar_no_select_mode_get(obj);
+=======
+             if (elm_toolbar_select_mode_get (obj) ==
+                 ELM_OBJECT_SELECT_MODE_NONE)
+               param->i = EINA_TRUE;
+             else
+               param->i = EINA_FALSE;
+>>>>>>> remotes/origin/upstream
              return EINA_TRUE;
           }
      }

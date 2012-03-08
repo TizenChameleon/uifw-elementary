@@ -341,7 +341,10 @@ static const char vertex_shader[] =
    "   gl_FragColor = color + white * dot(light_direction, rotated_normal);\n"
    "}\n";
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 gears_init(GLData *gld)
 {
@@ -388,7 +391,10 @@ gears_init(GLData *gld)
    gld->gear3 = make_gear(gld, 1.3, 2.0, 0.5, 10, 0.7);
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 gldata_init(GLData *gld)
 {
@@ -442,7 +448,10 @@ _del_gl(Evas_Object *obj)
    free(gld);
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 _resize_gl(Evas_Object *obj)
 {
@@ -456,8 +465,11 @@ _resize_gl(Evas_Object *obj)
    gears_reshape(gld, w,h);
 }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 _draw_gl(Evas_Object *obj)
 {
@@ -482,7 +494,10 @@ _on_done(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    evas_object_del((Evas_Object*)data);
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 _del(void *data __UNUSED__, Evas *evas __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
 {
@@ -490,7 +505,10 @@ _del(void *data __UNUSED__, Evas *evas __UNUSED__, Evas_Object *obj, void *event
    ecore_animator_del(ani);
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
 static void
 _key_down(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *event_info)
 {
@@ -561,7 +579,10 @@ _mouse_up(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj, void *eve
    gld->mouse_down = 0;
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
 void
 test_glview(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -578,7 +599,10 @@ test_glview(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    elm_win_title_set(win, "GLView");
    elm_win_autodel_set(win, EINA_TRUE);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
    // add a standard bg
    bg = elm_bg_add(win);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -611,7 +635,10 @@ test_glview(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_event_callback_add(gl, EVAS_CALLBACK_MOUSE_UP, _mouse_up, gl);
    evas_object_event_callback_add(gl, EVAS_CALLBACK_MOUSE_MOVE, _mouse_move, gl);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
    // Animator and other vars
    ani = ecore_animator_add(_anim, gl);
    gld->glapi = elm_glview_gl_api_get(gl);
@@ -619,7 +646,10 @@ test_glview(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_data_set(gl, "gld", gld);
    evas_object_event_callback_add(gl, EVAS_CALLBACK_DEL, _del, gl);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
    /* add an ok button */
    bt = elm_button_add(win);
    elm_object_text_set(bt, "OK");

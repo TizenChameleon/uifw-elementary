@@ -346,6 +346,7 @@ elm_fileselector_entry_add(Evas_Object *parent)
 }
 
 EAPI void
+<<<<<<< HEAD
 elm_fileselector_entry_button_label_set(Evas_Object *obj, const char *label)
 {
    _elm_fileselector_entry_button_label_set(obj, NULL, label);
@@ -358,6 +359,8 @@ elm_fileselector_entry_button_label_get(const Evas_Object *obj)
 }
 
 EAPI void
+=======
+>>>>>>> remotes/origin/upstream
 elm_fileselector_entry_selected_set(Evas_Object *obj, const char *path)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -501,6 +504,7 @@ elm_fileselector_entry_inwin_mode_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
    return elm_fileselector_button_inwin_mode_get(wd->button);
 }
+<<<<<<< HEAD
 
 EAPI void
 elm_fileselector_entry_button_icon_set(Evas_Object *obj, Evas_Object *icon)
@@ -519,3 +523,5 @@ elm_fileselector_entry_button_icon_unset(Evas_Object *obj)
 {
    return _content_unset_hook(obj, NULL);
 }
+=======
+>>>>>>> remotes/origin/upstream
