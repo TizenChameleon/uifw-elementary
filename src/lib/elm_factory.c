@@ -28,10 +28,7 @@ static void _child_change(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object
 static void _child_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__);
 static void _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content);
 static Evas_Object *_content_get_hook(const Evas_Object *obj, const char *part);
-<<<<<<< HEAD
-=======
 static Evas_Object *_content_unset_hook(Evas_Object *obj, const char *part);
->>>>>>> remotes/origin/upstream
 
 static const char SIG_REALIZE[] = "realize";
 static const char SIG_UNREALIZE[] = "unrealize";
@@ -135,26 +132,16 @@ _eval(Evas_Object *obj)
                   if (evas_object_smart_data_get(wd->content))
                      evas_object_smart_calculate(wd->content);
                }
-<<<<<<< HEAD
              //wd->last_calc_count =
              //evas_smart_objects_calculate_count_get(evas_object_evas_get(obj));
-=======
-             wd->last_calc_count =
-                evas_smart_objects_calculate_count_get(evas_object_evas_get(obj));
->>>>>>> remotes/origin/upstream
           }
      }
    else
      {
         if (wd->content)
           {
-<<<<<<< HEAD
              //if (wd->last_calc_count !=
              //evas_smart_objects_calculate_count_get(evas_object_evas_get(obj)))
-=======
-             if (wd->last_calc_count !=
-                evas_smart_objects_calculate_count_get(evas_object_evas_get(obj)))
->>>>>>> remotes/origin/upstream
                 evas_object_smart_callback_call(obj, SIG_UNREALIZE, NULL);
           }
      }
@@ -225,8 +212,6 @@ _child_del(void *data, Evas *e __UNUSED__, Evas_Object *obj, void *event_info __
 //   printf("FAC-- = %i\n", fac);
 }
 
-<<<<<<< HEAD
-=======
 static Evas_Object *
 _content_unset_hook(Evas_Object *obj, const char *part)
 {
@@ -251,52 +236,17 @@ _content_unset_hook(Evas_Object *obj, const char *part)
    return content;
 }
 
->>>>>>> remotes/origin/upstream
 static void
 _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd;
-<<<<<<< HEAD
-=======
    Evas_Object *prev_content;
->>>>>>> remotes/origin/upstream
 
    if (part && strcmp(part, "default")) return;
    wd = elm_widget_data_get(obj);
    if (!wd) return;
    if (wd->content == content) return;
-<<<<<<< HEAD
-   if (wd->content)
-      {
-         Evas_Object *o = wd->content;
-
-         evas_object_event_callback_del_full(wd->content,
-                                             EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                             _child_change, obj);
-         evas_object_event_callback_del_full(wd->content,
-                                             EVAS_CALLBACK_DEL,
-                                             _child_del, obj);
-         wd->content = NULL;
-         evas_object_del(o);
-         fac--;
-//         printf("FAC-- = %i\n", fac);
-      }
-   wd->content = content;
-   if (wd->content)
-     {
-        fac++;
-//        printf("FAC++ = %i\n", fac);
-        elm_widget_resize_object_set(obj, wd->content);
-        evas_object_event_callback_add(wd->content, EVAS_CALLBACK_DEL,
-                                       _child_del, obj);
-        evas_object_event_callback_add(wd->content, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _child_change, obj);
-        wd->eval = EINA_TRUE;
-        wd->szeval = EINA_TRUE;
-        evas_object_smart_changed(obj);
-     }
-=======
 
    prev_content = _content_unset_hook(obj, part);
    if (prev_content) evas_object_del(prev_content);
@@ -312,7 +262,6 @@ _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
    wd->szeval = EINA_TRUE;
    evas_object_smart_changed(obj);
    fac++;
->>>>>>> remotes/origin/upstream
 }
 
 static Evas_Object *
@@ -343,10 +292,7 @@ elm_factory_add(Evas_Object *parent)
    elm_widget_focus_next_hook_set(obj, _focus_next_hook);
    elm_widget_content_set_hook_set(obj, _content_set_hook);
    elm_widget_content_get_hook_set(obj, _content_get_hook);
-<<<<<<< HEAD
-=======
    elm_widget_content_unset_hook_set(obj, _content_unset_hook);
->>>>>>> remotes/origin/upstream
    elm_widget_can_focus_set(obj, EINA_FALSE);
    elm_widget_changed_hook_set(obj, _changed);
 
@@ -361,21 +307,6 @@ elm_factory_add(Evas_Object *parent)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_factory_content_set(Evas_Object *obj, Evas_Object *content)
-{
-   _content_set_hook(obj, NULL, content);
-}
-
-EAPI Evas_Object *
-elm_factory_content_get(const Evas_Object *obj)
-{
-   return _content_get_hook(obj, NULL);
-}
-
-EAPI void
-=======
->>>>>>> remotes/origin/upstream
 elm_factory_maxmin_mode_set(Evas_Object *obj, Eina_Bool enabled)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);

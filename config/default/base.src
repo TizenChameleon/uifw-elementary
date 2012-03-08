@@ -13,13 +13,10 @@ group "Elm_Config" struct {
   value "zoom_friction" double: 0.5;
   value "thumbscroll_border_friction" double: 0.5;
   value "thumbscroll_sensitivity_friction" double: 0.25;
-<<<<<<< HEAD
-=======
   value "scroll_smooth_amount" double: 0.0;
   value "scroll_smooth_history_weight" double: 0.3;
   value "scroll_smooth_future_time" double: 0.0;
   value "scroll_smooth_time_window" double: 0.2;
->>>>>>> remotes/origin/upstream
   value "scale" double: 1.0;
   value "bgpixmap" int: 0;
   value "compositing" int: 1;
@@ -33,11 +30,7 @@ group "Elm_Config" struct {
   value "finger_size" int: 40;
   value "fps" double: 60.0;
   value "theme" string: "default";
-<<<<<<< HEAD
-  value "modules" string: "";
-=======
   value "modules" string: "datetime_input_ctxpopup>datetime/api";
->>>>>>> remotes/origin/upstream
   value "tooltip_delay" double: 1.0;
   value "cursor_engine_only" uchar: 1;
   value "focus_highlight_enable" uchar: 0;
@@ -59,12 +52,6 @@ group "Elm_Config" struct {
   value "glayer_rotate_angular_tolerance" double: 2.0;
   value "glayer_line_min_length" double: 1.0;
   value "glayer_line_distance_tolerance" double: 3.0;
-<<<<<<< HEAD
-  value "glayer_line_angular_tolerance" double: 20.0
-  value "glayer_flick_time_limit_ms" uint: 120; /* ms to finish flick */
-  value "glayer_long_tap_start_timeout" double: 1.2; /* sec to start long-tap */
-  value "glayer_continues_enable" uchar: 1;          /* Continues gesture enabled */
-=======
   value "glayer_line_angular_tolerance" double: 20.0;
   value "glayer_flick_time_limit_ms" uint: 120; /* ms to finish flick */
   value "glayer_long_tap_start_timeout" double: 1.2; /* sec to start long-tap */
@@ -72,5 +59,4 @@ group "Elm_Config" struct {
   value "week_start" int: 1;
   value "weekend_start" int: 6;
   value "weekend_len" int: 2;
->>>>>>> remotes/origin/upstream
 }

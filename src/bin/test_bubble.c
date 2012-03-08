@@ -1,8 +1,5 @@
 #include <Elementary.h>
-<<<<<<< HEAD
-=======
 #include "test.h"
->>>>>>> remotes/origin/upstream
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
@@ -14,17 +11,6 @@ _print_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    printf("bubble clicked\n");
 }
 
-<<<<<<< HEAD
-void
-test_bubble(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   Evas_Object *win, *bg, *bx, *ic, *bb, *ct;
-   char buf[PATH_MAX];
-
-   win = elm_win_add(NULL, "box-vert", ELM_WIN_BASIC);
-   elm_win_title_set(win, "Bubble");
-   elm_win_autodel_set(win, EINA_TRUE);
-=======
 struct _api_data
 {
    unsigned int state;  /* What state we are testing       */
@@ -128,24 +114,12 @@ test_bubble(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    elm_win_title_set(win, "Bubble");
    elm_win_autodel_set(win, EINA_TRUE);
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-   bx = elm_box_add(win);
-   elm_win_resize_object_add(win, bx);
-   evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_show(bx);
-
-   ic = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
-   elm_icon_file_set(ic, buf, NULL);
-   elm_icon_scale_set(ic, 0, 0);
-=======
    bxx = elm_box_add(win);
    elm_win_resize_object_add(win, bxx);
    evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -169,18 +143,13 @@ test_bubble(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_HORIZONTAL, 1, 1);
 
    bb = elm_bubble_add(win);
    elm_object_text_set(bb, "Message 1");
    elm_object_part_text_set(bb, "info", "Corner: bottom_right");
    elm_object_part_content_set(bb, "icon", ic);
-<<<<<<< HEAD
-   elm_bubble_corner_set(bb, "bottom_right");
-=======
    elm_bubble_pos_set(bb, ELM_BUBBLE_POS_BOTTOM_RIGHT);
->>>>>>> remotes/origin/upstream
    evas_object_smart_callback_add(bb, "clicked", _print_clicked, NULL);
    evas_object_show(ic);
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
