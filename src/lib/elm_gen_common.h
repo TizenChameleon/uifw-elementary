@@ -139,6 +139,8 @@ struct _Widget_Data
    Eina_Bool                      requeued : 1; /**< this is set to EINA_TRUE when the item is re-queued. this happens when the item is un-queued but the rel item is still in the queue. this item will be processed later. */
    Eina_Bool                      check_scroll : 1; /**< this flag means genlist is supposed to be scrolled. if this flag is set to EINA_TRUE, genlist checks whether it's ok to scroll genlist now or not. */
    Eina_Bool                      tree_effect_enabled : 1; /**< tree effect */
+   Eina_Bool                      reorder_deleted : 1;
+   Eina_Bool                      drag_started : 1;
    struct
      {
         Evas_Coord x, y;
