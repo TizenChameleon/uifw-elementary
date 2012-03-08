@@ -2205,7 +2205,6 @@ _item_realize(Elm_Gen_Item *it,
         return;
      }
    it->item->order_num_in = in;
-   if (it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) calc = EINA_FALSE;
 
    if ((it->item->nocache_once) && (!it->flipped))
      it->item->nocache_once = EINA_FALSE;
