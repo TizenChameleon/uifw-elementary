@@ -142,10 +142,12 @@ static int notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_No
 static int notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
 static int notify_handler_image(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
 static int notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
+static int notify_handler_edje(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
 static int notify_handler_html(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify);
 static int vcard_receive(Cnp_Selection *sed, Ecore_X_Event_Selection_Notify *notify);
 
 static Eina_Bool pasteimage_append(char *file, Evas_Object *entry);
+static void entry_insert_filter(Evas_Object* entry, char* str);
 
 static Cnp_Atom atoms[CNP_N_ATOMS] = {
      [CNP_ATOM_TARGETS] = {
@@ -169,12 +171,12 @@ static Cnp_Atom atoms[CNP_N_ATOMS] = {
           ELM_SEL_FORMAT_MARKUP,
           general_converter,
           NULL,
-          NULL,
+          notify_handler_edje,
           0
      },
      [CNP_ATOM_text_uri] = {
           "text/uri",
-          ELM_SEL_FORMAT_MARKUP | ELM_SEL_FORMAT_IMAGE, /* Either images or entries */
+          ELM_SEL_FORMAT_IMAGE, /* Either images or entries */
           general_converter,
           NULL,
           notify_handler_uri,
@@ -616,6 +618,9 @@ targets_converter(char *target __UNUSED__, void *data, int size, void **data_ret
 
    if (!data_ret) return EINA_FALSE;
 
+   if (!data || (*((unsigned int *)data) > ELM_SEL_TYPE_CLIPBOARD))
+     return EINA_FALSE;
+
    if (_get_selection_type(data, size) == ELM_SEL_FORMAT_NONE)
      {
         /* TODO : fallback into precise type */
@@ -660,6 +665,8 @@ vcard_send(char *target __UNUSED__, void *data __UNUSED__, int size __UNUSED__, 
 
    cnp_debug("Vcard send called\n");
 
+   if (!data || (*((unsigned int *)data) > ELM_SEL_TYPE_CLIPBOARD))
+     return EINA_FALSE;
    sel = selections + *((int *)data);
 
    if (data_ret) *data_ret = strdup(sel->selbuf);
@@ -668,6 +675,7 @@ vcard_send(char *target __UNUSED__, void *data __UNUSED__, int size __UNUSED__, 
    return EINA_TRUE;
 }
 
+#if 0
 static Eina_Bool
 is_uri_type_data(Cnp_Selection *sel __UNUSED__, Ecore_X_Event_Selection_Notify *notify)
 {
@@ -688,7 +696,7 @@ is_uri_type_data(Cnp_Selection *sel __UNUSED__, Ecore_X_Event_Selection_Notify *
 
    return EINA_TRUE;
 }
-
+#endif
 /*
  * Callback to handle a targets response on a selection request:
  * So pick the format we'd like; and then request it.
@@ -712,11 +720,13 @@ notify_handler_targets(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notif
           {
              if ((atoms[j].atom == atomlist[i]) && (atoms[j].notify))
                {
+#if 0
                   if ((j == CNP_ATOM_text_uri) ||
                       (j == CNP_ATOM_text_urilist))
                     {
                       if(!is_uri_type_data(sel, notify)) continue;
                     }
+#endif
                   cnp_debug("Atom %s matches\n",atoms[j].name);
                   goto done;
                }
@@ -769,6 +779,34 @@ found:
    return 0;
 }
 
+static void
+entry_insert_filter(Evas_Object* entry, char* str)
+{
+   if (!entry || !str)
+     return;
+
+   char *insertStr = str;
+
+   // if entry has single line set then remove <br> & <ps> tags
+   if (elm_entry_single_line_get(entry))
+     {
+        Eina_Strbuf *buf = eina_strbuf_new();
+        if (buf)
+          {
+             eina_strbuf_append(buf, insertStr);
+             eina_strbuf_replace_all(buf, "<br>", "");
+             eina_strbuf_replace_all(buf, "<ps>", "");
+             insertStr = eina_strbuf_string_steal(buf);
+             eina_strbuf_free(buf);
+          }
+     }
+   cnp_debug("remove break tag: %s\n", insertStr);
+
+   _elm_entry_entry_paste(entry, insertStr);
+
+   if (insertStr != str)
+     free(insertStr);
+}
 
 static int
 notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
@@ -781,19 +819,24 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    if (sel->datacb)
      {
         Elm_Selection_Data ddata;
+        str = malloc(sizeof(char) * (data->length + 1));
+        strncpy(str, (char *)data->data, data->length);
+        str[data->length] = '\0';
 
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_TEXT;
-        ddata.data = data->data;
+        ddata.data = str;
         ddata.len = data->length;
         sel->datacb(sel->udata, sel->widget, &ddata);
+        free(str);
         return 0;
      }
 
    cnp_debug("Notify handler text %d %d %p\n", data->format,data->length, data->data);
    str = _elm_util_text_to_mkup((const char *) data->data);
    cnp_debug("String is %s (from %s)\n", str, data->data);
-   _elm_entry_entry_paste(sel->requestwidget, str);
+   entry_insert_filter(sel->requestwidget, str);
+   //_elm_entry_entry_paste(sel->requestwidget, str);
    free(str);
    return 0;
 }
@@ -836,6 +879,18 @@ notify_handler_uri(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
         return 0;
      }
    cnp_debug("Got %s\n",p);
+   if (sel->datacb)
+     {
+        Elm_Selection_Data ddata;
+
+        ddata.x = ddata.y = 0;
+        ddata.format = ELM_SEL_FORMAT_IMAGE;
+        ddata.data = p;
+        ddata.len = data->length;
+        sel->datacb(sel->udata, sel->widget, &ddata);
+        free(p);
+        return 0;
+     }
    if (strncmp(p, "file://", 7))
      {
         /* Try and continue if it looks sane */
@@ -956,6 +1011,35 @@ notify_handler_image(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    return 0;
 }
 
+static int
+notify_handler_edje(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
+{
+   Ecore_X_Selection_Data *data;
+
+   data = notify->data;
+
+   char *stripstr = NULL;
+   stripstr = malloc(sizeof(char) * (data->length + 1));
+   strncpy(stripstr, (char *)data->data, data->length);
+   stripstr[data->length] = '\0';
+
+   if (sel->datacb)
+     {
+        Elm_Selection_Data ddata;
+        ddata.x = ddata.y = 0;
+        ddata.format = ELM_SEL_FORMAT_MARKUP;
+        ddata.data = stripstr;
+        ddata.len = data->length;
+        sel->datacb(sel->udata, sel->widget, &ddata);
+     }
+   else
+     entry_insert_filter(sel->requestwidget, stripstr);
+     //_elm_entry_entry_paste(sel->requestwidget, stripstr);
+
+   cnp_debug("String is %s (%d bytes)\n", stripstr, data->length);
+   free(stripstr);
+   return 0;
+}
 
 /**
  *    Warning: Generic text/html can';t handle it sanely.
@@ -970,22 +1054,25 @@ notify_handler_html(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
    cnp_debug("Got some HTML: Checking encoding is useful\n");
    data = notify->data;
 
+   char *stripstr = NULL;
+   stripstr = malloc(sizeof(char) * (data->length + 1));
+   strncpy(stripstr, (char *)data->data, data->length);
+   stripstr[data->length] = '\0';
+
    if (sel->datacb)
      {
         Elm_Selection_Data ddata;
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_HTML;
-        ddata.data = data->data;
+        ddata.data = stripstr;
         ddata.len = data->length;
         sel->datacb(sel->udata, sel->widget, &ddata);
-        return 0;
      }
+   else
+     entry_insert_filter(sel->requestwidget, stripstr);
+   //_elm_entry_entry_paste(sel->requestwidget, stripstr);
 
-   char *stripstr = malloc(sizeof(char) * (data->length + 1));
-   strncpy(stripstr, (char *)data->data, data->length);
-   stripstr[data->length] = '\0';
    cnp_debug("String is %s (%d bytes)\n", stripstr, data->length);
-   _elm_entry_entry_paste(sel->requestwidget, stripstr);
    free(stripstr);
    return 0;
 }
@@ -997,6 +1084,8 @@ text_converter(char *target __UNUSED__, void *data, int size, void **data_ret, i
    Cnp_Selection *sel;
 
    cnp_debug("text converter\n");
+   if (!data || (*((unsigned int *)data) > ELM_SEL_TYPE_CLIPBOARD))
+     return EINA_FALSE;
    if (_get_selection_type(data, size) == ELM_SEL_FORMAT_NONE)
      {
         if (data_ret)
@@ -1011,11 +1100,23 @@ text_converter(char *target __UNUSED__, void *data, int size, void **data_ret, i
    sel = selections + *((int *)data);
    if (!sel->active) return EINA_TRUE;
 
-   if ((sel->format & ELM_SEL_FORMAT_MARKUP) ||
-       (sel->format & ELM_SEL_FORMAT_HTML))
+   if (sel->format & ELM_SEL_FORMAT_MARKUP)
+     *data_ret = _elm_util_mkup_to_text(sel->selbuf);
+   else if (sel->format & ELM_SEL_FORMAT_HTML)
      {
-        *data_ret = _elm_util_mkup_to_text(sel->selbuf);
-        if (size_ret) *size_ret = strlen(*data_ret);
+        char *text = NULL;
+        Eina_Strbuf *buf = eina_strbuf_new();
+        if (buf)
+          {
+             eina_strbuf_append(buf, sel->selbuf);
+             eina_strbuf_replace_all(buf, "&nbsp;", " ");
+             text = eina_strbuf_string_steal(buf);
+             eina_strbuf_free(buf);
+             *data_ret = _elm_util_mkup_to_text(text);
+             free(text);
+          }
+        else
+          *data_ret = _elm_util_mkup_to_text(sel->selbuf);
      }
    else if (sel->format & ELM_SEL_FORMAT_TEXT)
      {
@@ -1050,7 +1151,11 @@ general_converter(char *target __UNUSED__, void *data, int size, void **data_ret
      }
    else
      {
-        Cnp_Selection *sel = selections + *((int *)data);
+        Cnp_Selection *sel;
+        if (!data || (*((unsigned int *)data) > ELM_SEL_TYPE_CLIPBOARD))
+          return EINA_FALSE;
+
+        sel = selections + *((int *)data);
         if (data_ret) *data_ret = strdup(sel->selbuf);
         if (size_ret) *size_ret = strlen(sel->selbuf);
      }
