@@ -239,10 +239,6 @@ group { name: "elm/toolbar/item/default";
          clip_to: "elm.icon.clipper";
          description { state: "default" 0.0;
             align: 0.5 0.5;
-<<<<<<< HEAD
-            fixed: 0 0;
-=======
->>>>>>> remotes/origin/upstream
             rel1 {
                relative: 0.0 0.0;
                offset: 2 2;
@@ -260,10 +256,6 @@ group { name: "elm/toolbar/item/default";
          clip_to: "elm.icon_new.clipper";
          description { state: "default" 0.0;
             align: 0.5 0.5;
-<<<<<<< HEAD
-            fixed: 0 0;
-=======
->>>>>>> remotes/origin/upstream
             rel1 {
                relative: 0.0 0.0;
                offset: 2 2;
@@ -445,11 +437,7 @@ group { name: "elm/toolbar/item/default";
          transition: LINEAR 0.1;
       }
       program { name: "go";
-<<<<<<< HEAD
-         signal:  "mouse,up,1";
-=======
          signal:  "mouse,clicked,1";
->>>>>>> remotes/origin/upstream
          source:  "event";
          action:  SIGNAL_EMIT "elm,action,click" "elm";
       }
@@ -577,29 +565,6 @@ group { name: "elm/toolbar/item/default";
 }
 
 group { name: "elm/toolbar/item/item_horizontal";
-<<<<<<< HEAD
-    inherit: "elm/toolbar/item/default";
-    parts.part { name: "elm.swallow.icon";
-            description { state: "default" 0.0;
-                align: 0.0 0.5;
-                rel1.offset: 3 3;
-                rel1.relative: 0 0;
-                rel2.offset: -4 -4;
-                rel2.relative: 1 1;
-                color: 0 0 0 0;
-            }
-        }
-    parts.part { name: "elm.text";
-            description { state: "default" 0.0;
-               align: 1 0.5;
-               min: 0 1;
-               rel1.offset: 1 0;
-               rel1.relative: 1 0.5;
-               rel1.to_x: "elm.swallow.icon";
-               text.align: 0 0.5;
-            }
-        }
-=======
    inherit: "elm/toolbar/item/default";
    parts {
       part { name: "elm.swallow.icon";
@@ -685,7 +650,6 @@ group { name: "elm/toolbar/item/item_horizontal";
          }
       }
    }
->>>>>>> remotes/origin/upstream
 }
 
 group { name: "elm/toolbar/separator/default";
@@ -713,19 +677,9 @@ group { name: "elm/toolbar/separator/default";
 group { name: "elm/toolbar/object/default";
    parts {
       part { name: "elm.swallow.object"; // object group
-<<<<<<< HEAD
-	     type: SWALLOW;
-         description {
-			 state: "default" 0.0;
-=======
          type: SWALLOW;
          description { state: "default" 0.0;
->>>>>>> remotes/origin/upstream
          }
       }
    }
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> remotes/origin/upstream
