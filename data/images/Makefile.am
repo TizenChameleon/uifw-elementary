@@ -47,12 +47,9 @@ icon_23.png \
 icon_right_arrow.png \
 bubble.png \
 bubble_sh.png \
-<<<<<<< HEAD
 copy&paste_icon_clipboard.png \
 copy&paste_icon_search.png \
 copy&paste_icon_share.png \
-=======
->>>>>>> remotes/origin/upstream
 mystrale.jpg \
 mystrale_2.jpg \
 twofish.jpg \

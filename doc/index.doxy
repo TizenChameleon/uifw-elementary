@@ -19,11 +19,7 @@
  * @li @ref Start
  * @li @ref Scrolling
  * @li @ref Scrollhints
-<<<<<<< HEAD
- * @li @ref UI-Mirroring
-=======
  * @li @ref Mirroring
->>>>>>> remotes/origin/upstream
  * @li @ref Scaling
  * @li @ref Styles
  * @li @ref Theme
@@ -87,8 +83,6 @@
  *
  * @image html img/widget/ctxpopup/preview-00.png
  * @image latex img/widget/ctxpopup/preview-00.eps
-<<<<<<< HEAD
-=======
  * @li @ref Datetime
  *
  * @image html img/widget/datetime/preview-00.png
@@ -97,7 +91,6 @@
  *
  * @image html img/widget/dayselector/preview-00.png
  * @image latex img/widget/dayselector/preview-00.eps
->>>>>>> remotes/origin/upstream
  * @li @ref Diskselector
  *
  * @image html img/widget/diskselector/preview-00.png
@@ -130,19 +123,6 @@
  *
  * @image html img/widget/frame/preview-00.png
  * @image latex img/widget/frame/preview-00.eps
-<<<<<<< HEAD
- * @li @ref Gengrid
- *
- * @image html img/widget/gengrid/preview-00.png
- * @image latex img/widget/gengrid/preview-00.eps
- * 
- * @li @ref Genlist
- * @image html img/widget/genlist/preview-00.png
- * @image latex img/widget/genlist/preview-00.eps
- * @image html img/genlist.png
- * @image latex img/genlist.eps
-=======
->>>>>>> remotes/origin/upstream
  *
  * @li @ref GLView
  * @li @ref Hover
@@ -195,13 +175,6 @@
  *
  * @image html img/widget/notify/preview-00.png
  * @image latex img/widget/notify/preview-00.eps
-<<<<<<< HEAD
- * @li @ref Pager
- *
- * @image html img/widget/pager/preview-00.png
- * @image latex img/widget/pager/preview-00.eps
-=======
->>>>>>> remotes/origin/upstream
  * @li @ref Panel
  *
  * @image html img/widget/panel/preview-00.png
@@ -211,13 +184,10 @@
  *
  * @image html img/widget/photocam/preview-00.png
  * @image latex img/widget/photocam/preview-00.eps
-<<<<<<< HEAD
-=======
  * @li @ref Popup
  *
  * @image html img/widget/popup/preview-00.png
  * @image latex img/widget/popup/preview-00.eps
->>>>>>> remotes/origin/upstream
  * @li @ref Progressbar
  *
  * @image html img/widget/progressbar/preview-00.png
@@ -285,8 +255,6 @@
  * it provides a number of containers. It's important to note that as containers
  * widgets don't have their own visual identity, so here we show one use for
  * them and a diagram showing their component parts:
-<<<<<<< HEAD
-=======
  * @li @ref Gengrid
  *
  * @image html img/widget/gengrid/preview-00.png
@@ -297,7 +265,6 @@
  * @image latex img/widget/genlist/preview-00.eps
  * @image html img/genlist.png
  * @image latex img/genlist.eps
->>>>>>> remotes/origin/upstream
  * @li @ref Box
  *
  * @image html img/widget/box/preview-00.png

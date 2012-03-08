@@ -32,12 +32,9 @@ widget_preview_spinner \
 widget_preview_bubble1 \
 widget_preview_bubble2 \
 widget_preview_bubble3 \
-<<<<<<< HEAD
-=======
 widget_preview_datetime1 \
 widget_preview_datetime2 \
 widget_preview_datetime3 \
->>>>>>> remotes/origin/upstream
 widget_preview_fileselector_button1 \
 widget_preview_fileselector_button2 \
 widget_preview_fileselector_button3 \
@@ -48,10 +45,7 @@ widget_preview_segment_control \
 widget_preview_conformant \
 widget_preview_index \
 widget_preview_clock \
-<<<<<<< HEAD
-=======
 widget_preview_dayselector \
->>>>>>> remotes/origin/upstream
 widget_preview_label \
 widget_preview_frame \
 widget_preview_slider \
@@ -75,14 +69,7 @@ widget_preview_fileselector_entry \
 widget_preview_flipselector \
 widget_preview_hoversel \
 widget_preview_hover \
-<<<<<<< HEAD
-widget_preview_anchorview \
-widget_preview_anchorblock \
 widget_preview_flip \
-widget_preview_pager \
-=======
-widget_preview_flip \
->>>>>>> remotes/origin/upstream
 widget_preview_separator \
 widget_preview_radio \
 widget_preview_toggle \
@@ -96,10 +83,7 @@ widget_preview_genlist5 \
 widget_preview_progressbar \
 widget_preview_box \
 widget_preview_notify \
-<<<<<<< HEAD
-=======
 widget_preview_popup \
->>>>>>> remotes/origin/upstream
 widget_preview_slideshow \
 widget_preview_photocam \
 widget_preview_inwin1 \
@@ -118,11 +102,6 @@ endif
 
 EXTRA_DIST = \
 	widget_preview_actionslider.c \
-<<<<<<< HEAD
-	widget_preview_anchorblock.c \
-	widget_preview_anchorview.c \
-=======
->>>>>>> remotes/origin/upstream
 	widget_preview_bg.c \
 	widget_preview_bubble1.c \
 	widget_preview_bubble2.c \
@@ -144,13 +123,10 @@ EXTRA_DIST = \
 	widget_preview_mapbuf.c \
 	widget_preview_map.c \
 	widget_preview_ctxpopup.c \
-<<<<<<< HEAD
-=======
 	widget_preview_datetime1.c \
 	widget_preview_datetime2.c \
 	widget_preview_datetime3.c \
 	widget_preview_dayselector.c \
->>>>>>> remotes/origin/upstream
 	widget_preview_diskselector.c \
 	widget_preview_entry1.c \
 	widget_preview_entry2.c \
@@ -173,11 +149,7 @@ EXTRA_DIST = \
 	widget_preview_layout.c \
 	widget_preview_list.c \
 	widget_preview_segment_control.c \
-<<<<<<< HEAD
-	widget_preview_pager.c \
-=======
 	widget_preview_popup.c \
->>>>>>> remotes/origin/upstream
 	widget_preview_separator.c \
 	widget_preview_radio.c \
 	widget_preview_toggle.c \
