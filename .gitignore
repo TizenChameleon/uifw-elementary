@@ -102,24 +102,6 @@ tags
 /po/stamp-po
 /doc/Doxyfile
 /src/examples/actionslider_example_01
-<<<<<<< HEAD
-/doc/widget_preview_button1
-/doc/widget_preview_button2
-/doc/widget_preview_button3
-/config.guess.cdbs-orig
-/config.sub.cdbs-orig
-/config/slp/base.cfg
-/debian/files
-/debian/*.log
-/debian/*.substvars
-/debian/libelm-bin/
-/debian/libelm-dbg/
-/debian/libelm-dev/
-/debian/*.debhelper
-/debian/libelm/
-/debian/stamp-*
-/debian/tmp/
-=======
 /doc/widget_preview_*
 /doc/widgets/widget_preview_*
 src/examples/bg_example_01
@@ -213,4 +195,16 @@ src/examples/transit_example_04
 src/examples/web_example
 src/examples/win_example
 src/examples/dayselector_example
->>>>>>> remotes/origin/upstream
+/config.guess.cdbs-orig
+/config.sub.cdbs-orig
+/config/slp/base.cfg
+/debian/files
+/debian/*.log
+/debian/*.substvars
+/debian/libelm-bin/
+/debian/libelm-dbg/
+/debian/libelm-dev/
+/debian/*.debhelper
+/debian/libelm/
+/debian/stamp-*
+/debian/tmp/
