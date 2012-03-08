@@ -1977,6 +1977,14 @@ _item_content_realize(Elm_Gen_Item *it,
                   evas_object_event_callback_add(ic,
                                                  EVAS_CALLBACK_CHANGED_SIZE_HINTS,
                                                  _changed_size_hints, it);
+                  if (it->flipped)
+                    {
+                       // FIXME: if entry calcuates its cursor position correctly and conformant works,
+                       //        genlist does not need to handle this focus thing.
+                       evas_object_smart_callback_add(ic, "focused", _content_focused, it);
+                       evas_object_smart_callback_add(ic, "unfocused", _content_unfocused, it);
+                    }
+
                   if (elm_widget_item_disabled_get(it))
                     elm_widget_disabled_set(ic, EINA_TRUE);
                }
@@ -2047,6 +2055,10 @@ _item_flips_realize(Elm_Gen_Item *it,
                   edje_object_part_swallow(target, key, ic);
                   evas_object_show(ic);
                   elm_widget_sub_object_add(WIDGET(it), ic);
+                  // FIXME: if entry calcuates its cursor position correctly and conformant works,
+                  //        genlist does not need to handle this focus thing.
+                  evas_object_smart_callback_add(ic, "focused", _content_focused, it);
+                  evas_object_smart_callback_add(ic, "unfocused", _content_unfocused, it);
                   if (elm_widget_item_disabled_get(it))
                     elm_widget_disabled_set(ic, EINA_TRUE);
                }
