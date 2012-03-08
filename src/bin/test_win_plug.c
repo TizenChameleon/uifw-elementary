@@ -89,23 +89,12 @@ test_win_plug(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-
-   plug = elm_plug_add(win);
-   if (!elm_plug_connect(plug, "ello", 0, EINA_FALSE))
-   	{
-   	   printf("Cannot connect plug\n");
-	   return;
-   	}
-
-=======
    plug = elm_plug_add(win);
    if (!elm_plug_connect(plug, "ello", 0, EINA_FALSE))
      {
         printf("Cannot connect plug\n");
         return;
      }
->>>>>>> remotes/origin/upstream
 
    evas_object_resize(plug, 380, 500);
    evas_object_move(plug, 10, 10);

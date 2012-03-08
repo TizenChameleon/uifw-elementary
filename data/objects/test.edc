@@ -770,10 +770,7 @@ collections {
                   relative: 0.7 340/400;
                   to: "bg";
                }
-<<<<<<< HEAD
-=======
                align: 0.5 0.0;
->>>>>>> remotes/origin/upstream
             }
          }
          part { name: "btn1_bottom_padding";

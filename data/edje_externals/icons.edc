@@ -10,15 +10,10 @@ collections { group { name: "ico_"_name;                    \
                image.normal: "ico_"_name".png";             \
 }}}}}
 
-ICON("anchorblock")
-ICON("anchorview")
 ICON("bubble")
 ICON("button")
 ICON("check")
 ICON("clock")
-<<<<<<< HEAD
-ICON("colorpalette")
-ICON("datefield")
 ICON("fileselector")
 ICON("fileselector_button")
 ICON("gengrid")
@@ -29,31 +24,14 @@ ICON("list")
 ICON("map")
 ICON("notepad")
 ICON("multibuttonentry")
-ICON("nocontents")
-ICON("page_control")
-=======
-ICON("fileselector")
-ICON("fileselector_button")
-ICON("genlist")
-ICON("hoversel")
-ICON("list")
-ICON("map")
-ICON("notepad")
->>>>>>> remotes/origin/upstream
 ICON("photocam")
 ICON("progressbar")
 ICON("radio")
 ICON("scrolled_entry")
-<<<<<<< HEAD
 ICON("scroller")
-ICON("searchbar")
-=======
->>>>>>> remotes/origin/upstream
 ICON("slider")
 ICON("slideshow")
 ICON("spinner")
 ICON("thumb")
 ICON("toggle")
 ICON("toolbar")
-ICON("slideshow")
-

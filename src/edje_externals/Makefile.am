@@ -30,21 +30,11 @@ module_la_SOURCES = private.h \
 modules.inc \
 elm.c \
 elm_actionslider.c \
-<<<<<<< HEAD
-elm_anchorblock.c \
-elm_anchorview.c \
-=======
->>>>>>> remotes/origin/upstream
 elm_bubble.c \
 elm_button.c \
 elm_calendar.c \
 elm_check.c \
 elm_clock.c \
-<<<<<<< HEAD
-elm_colorpalette.c \
-elm_datefield.c \
-=======
->>>>>>> remotes/origin/upstream
 elm_entry.c \
 elm_fileselector.c \
 elm_fileselector_button.c \
@@ -60,23 +50,12 @@ elm_list.c \
 elm_map.c \
 elm_multibuttonentry.c \
 elm_naviframe.c \
-<<<<<<< HEAD
-elm_nocontents.c \
 elm_notify.c \
-elm_page_control.c \
-elm_pager.c \
-=======
-elm_notify.c \
->>>>>>> remotes/origin/upstream
 elm_panes.c \
 elm_photocam.c \
 elm_progressbar.c \
 elm_radio.c \
 elm_scroller.c \
-<<<<<<< HEAD
-elm_searchbar.c \
-=======
->>>>>>> remotes/origin/upstream
 elm_segment_control.c \
 elm_slider.c \
 elm_slideshow.c \
@@ -87,9 +66,5 @@ elm_toolbar.c \
 elm_video.c \
 elm_web.c
 
-<<<<<<< HEAD
-module_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
-=======
 module_la_LIBADD = @ELEMENTARY_LIBS@ $(top_builddir)/src/lib/libelementary.la
->>>>>>> remotes/origin/upstream
 module_la_LDFLAGS = -no-undefined -module -avoid-version -shared -fPIC
