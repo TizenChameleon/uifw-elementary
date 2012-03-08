@@ -85,17 +85,10 @@ test_toolbar(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    evas_object_show(bx);
 
    tb = elm_toolbar_add(win);
-<<<<<<< HEAD
-   elm_toolbar_homogeneous_set(tb, 0);
-   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_MENU);
-   evas_object_size_hint_weight_set(tb, 0.0, 0.0);
-   evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
-=======
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_MENU);
    evas_object_size_hint_weight_set(tb, 0.0, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
    elm_object_scale_set(tb, 0.9);
->>>>>>> remotes/origin/upstream
 
    ph1 = elm_photo_add(win);
    ph2 = elm_photo_add(win);
@@ -119,11 +112,7 @@ test_toolbar(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
    elm_toolbar_item_priority_set(tb_it, -200);
 
    tb_it = elm_toolbar_item_append(tb, "refresh", "Menu", NULL, NULL);
-<<<<<<< HEAD
-   elm_toolbar_item_menu_set(tb_it, 1);
-=======
    elm_toolbar_item_menu_set(tb_it, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_toolbar_item_priority_set(tb_it, -999999);
    elm_toolbar_menu_parent_set(tb, win);
    menu = elm_toolbar_item_menu_get(tb_it);
@@ -233,11 +222,7 @@ test_toolbar2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    elm_toolbar_item_priority_set(item, 0);
 
    item = elm_toolbar_item_append(tb, "refresh", "Menu", NULL, NULL);
-<<<<<<< HEAD
-   elm_toolbar_item_menu_set(item, 1);
-=======
    elm_toolbar_item_menu_set(item, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_toolbar_item_priority_set(item, -999999);
    elm_toolbar_menu_parent_set(tb, win);
    menu = elm_toolbar_item_menu_get(item);
@@ -320,11 +305,7 @@ test_toolbar3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    evas_object_show(bx);
 
    tb = elm_toolbar_add(win);
-<<<<<<< HEAD
-   elm_toolbar_homogeneous_set(tb, 0);
-=======
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_NONE);
    evas_object_size_hint_weight_set(tb, 0.0, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
@@ -336,21 +317,13 @@ test_toolbar3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
 
    tb_it = elm_toolbar_item_append(tb, "document-print", "Hello", tb_1, ph1);
    elm_object_item_disabled_set(tb_it, EINA_TRUE);
-<<<<<<< HEAD
-   elm_toolbar_item_priority_set(tb_it, 0);
-=======
    elm_toolbar_item_priority_set(tb_it, EINA_FALSE);
->>>>>>> remotes/origin/upstream
 
    tb_it = elm_toolbar_item_append(tb, "folder-new", "World", tb_2, ph1);
    elm_toolbar_item_priority_set(tb_it, -200);
 
    tb_it = elm_toolbar_item_append(tb, "object-rotate-right", "H", tb_3, ph4);
-<<<<<<< HEAD
-   elm_toolbar_item_priority_set(tb_it, 1);
-=======
    elm_toolbar_item_priority_set(tb_it, EINA_TRUE);
->>>>>>> remotes/origin/upstream
 
    tb_it = elm_toolbar_item_append(tb, "mail-send", "Comes", tb_4, ph4);
    elm_toolbar_item_priority_set(tb_it, -10);
@@ -359,11 +332,7 @@ test_toolbar3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    elm_toolbar_item_priority_set(tb_it, 50);
 
    tb_it = elm_toolbar_item_append(tb, "refresh", "Menu", NULL, NULL);
-<<<<<<< HEAD
-   elm_toolbar_item_menu_set(tb_it, 1);
-=======
    elm_toolbar_item_menu_set(tb_it, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_toolbar_item_priority_set(tb_it, 999999);
    elm_toolbar_menu_parent_set(tb, win);
    menu = elm_toolbar_item_menu_get(tb_it);
@@ -473,11 +442,7 @@ test_toolbar4(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    elm_toolbar_item_priority_set(tb_it, -200);
 
    tb_it = elm_toolbar_item_append(tb, "refresh", "Menu", NULL, NULL);
-<<<<<<< HEAD
-   elm_toolbar_item_menu_set(tb_it, 1);
-=======
    elm_toolbar_item_menu_set(tb_it, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_toolbar_item_priority_set(tb_it, -999999);
    elm_toolbar_menu_parent_set(tb, win);
    menu = elm_toolbar_item_menu_get(tb_it);
@@ -564,11 +529,7 @@ test_toolbar5(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_MENU);
    evas_object_size_hint_weight_set(tb, 0.0, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
-<<<<<<< HEAD
-   elm_toolbar_no_select_mode_set(tb, EINA_TRUE);
-=======
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
->>>>>>> remotes/origin/upstream
 
    ph1 = elm_photo_add(win);
    ph2 = elm_photo_add(win);
@@ -596,11 +557,7 @@ test_toolbar5(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    elm_toolbar_item_priority_set(tb_it, -200);
 
    tb_it = elm_toolbar_item_append(tb, "refresh", "Menu", NULL, NULL);
-<<<<<<< HEAD
-   elm_toolbar_item_menu_set(tb_it, 1);
-=======
    elm_toolbar_item_menu_set(tb_it, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_toolbar_item_priority_set(tb_it, -999999);
    elm_toolbar_menu_parent_set(tb, win);
    menu = elm_toolbar_item_menu_get(tb_it);
@@ -711,11 +668,7 @@ test_toolbar6(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    elm_toolbar_item_priority_set(tb_it, -200);
 
    tb_it = elm_toolbar_item_append(tb, "refresh", "Menu", NULL, NULL);
-<<<<<<< HEAD
-   elm_toolbar_item_menu_set(tb_it, 1);
-=======
    elm_toolbar_item_menu_set(tb_it, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_toolbar_item_priority_set(tb_it, -999999);
    elm_toolbar_menu_parent_set(tb, win);
    menu = elm_toolbar_item_menu_get(tb_it);
