@@ -366,8 +366,6 @@ test_table6(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_show(win);
 }
 
-<<<<<<< HEAD
-=======
 void
 test_table7(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -433,5 +431,4 @@ test_table7(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_show(win);
 }
 
->>>>>>> remotes/origin/upstream
 #endif

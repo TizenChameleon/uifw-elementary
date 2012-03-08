@@ -483,13 +483,6 @@ elm_cursor_theme(Elm_Cursor *cur)
      _elm_cursor_set_hot_spots(cur);
 }
 
-<<<<<<< HEAD
-EAPI void
-elm_object_cursor_engine_only_set(Evas_Object *obj, Eina_Bool engine_only)
-{
-   ELM_CURSOR_GET_OR_RETURN(cur, obj);
-   cur->engine_only = engine_only;
-=======
 EINA_DEPRECATED EAPI void
 elm_object_cursor_engine_only_set(Evas_Object *obj, Eina_Bool engine_only)
 {
@@ -500,7 +493,6 @@ EAPI void elm_object_cursor_theme_search_enabled_set(Evas_Object *obj, Eina_Bool
 {
    ELM_CURSOR_GET_OR_RETURN(cur, obj);
    cur->engine_only = theme_search;
->>>>>>> remotes/origin/upstream
    if (cur->obj)
      {
         evas_object_del(cur->obj);
@@ -509,27 +501,6 @@ EAPI void elm_object_cursor_theme_search_enabled_set(Evas_Object *obj, Eina_Bool
    _elm_cursor_cur_set(cur);
 }
 
-<<<<<<< HEAD
-EAPI Eina_Bool
-elm_object_cursor_engine_only_get(const Evas_Object *obj)
-{
-   ELM_CURSOR_GET_OR_RETURN(cur, obj, EINA_FALSE);
-   return cur->engine_only;
-}
-
-EAPI int
-elm_cursor_engine_only_get(void)
-{
-   return _elm_config->cursor_engine_only;
-}
-
-EAPI Eina_Bool
-elm_cursor_engine_only_set(int engine_only)
-{
-   if ((engine_only < 0) || (engine_only > 1)) return EINA_FALSE;
-   _elm_config->cursor_engine_only = engine_only;
-   return EINA_TRUE;
-=======
 
 EINA_DEPRECATED EAPI Eina_Bool
 elm_object_cursor_engine_only_get(const Evas_Object *obj)
@@ -542,5 +513,4 @@ elm_object_cursor_theme_search_enabled_get(const Evas_Object *obj)
 {
    ELM_CURSOR_GET_OR_RETURN(cur, obj, EINA_FALSE);
    return cur->engine_only;
->>>>>>> remotes/origin/upstream
 }

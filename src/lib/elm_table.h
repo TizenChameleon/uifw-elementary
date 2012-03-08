@@ -2,15 +2,6 @@
  * @defgroup Table Table
  *
  * A container widget to arrange other widgets in a table where items can
-<<<<<<< HEAD
- * also span multiple columns or rows - even overlap (and then be raised or
- * lowered accordingly to adjust stacking if they do overlap).
- *
- * For a Table widget the row/column count is not fixed.
- * The table widget adjusts itself when subobjects are added to it dynamically.
- *
- * The followin are examples of how to use a table:
-=======
  * span multiple columns or rows - even overlap (and then be raised or
  * lowered accordingly to adjust stacking if they do overlap).
  *
@@ -28,7 +19,6 @@
  * @endcode
  *
  * The following are examples of how to use a table:
->>>>>>> remotes/origin/upstream
  * @li @ref tutorial_table_01
  * @li @ref tutorial_table_02
  *
