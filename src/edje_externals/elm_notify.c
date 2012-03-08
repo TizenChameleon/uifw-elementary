@@ -7,13 +7,8 @@ typedef struct _Elm_Params_Notify Elm_Params_Notify;
 struct _Elm_Params_Notify {
 	Elm_Params base;
 	Evas_Object *content; /* part name whose obj is to be set as content */
-<<<<<<< HEAD
-	Eina_Bool repeat_events_exists;
-	Eina_Bool repeat_events;
-=======
 	Eina_Bool allow_events_exists;
 	Eina_Bool allow_events;
->>>>>>> remotes/origin/upstream
 	Eina_Bool timeout_exists;
 	double timeout;
 
@@ -60,13 +55,8 @@ static void external_notify_state_set(void *data __UNUSED__,
 	if (p->content) {
 		elm_object_content_set(obj, p->content);
 	}
-<<<<<<< HEAD
-	if (p->repeat_events_exists)
-		elm_notify_repeat_events_set(obj, p->repeat_events);
-=======
 	if (p->allow_events_exists)
 		elm_notify_allow_events_set(obj, p->allow_events);
->>>>>>> remotes/origin/upstream
 	if (p->timeout_exists)
 		elm_notify_timeout_set(obj, p->timeout);
 	if (p->orient)
@@ -89,17 +79,10 @@ static Eina_Bool external_notify_param_set(void *data __UNUSED__,
 		elm_object_content_set(obj, content);
 		return EINA_TRUE;
 	}
-<<<<<<< HEAD
-	else if ((!strcmp(param->name, "repeat_events"))
-			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
-	{
-		elm_notify_repeat_events_set(obj, param->i);
-=======
 	else if ((!strcmp(param->name, "allow_events"))
 			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
 	{
 		elm_notify_allow_events_set(obj, param->i);
->>>>>>> remotes/origin/upstream
 		return EINA_TRUE;
 	}
 	else if ((!strcmp(param->name, "timeout"))
@@ -131,17 +114,10 @@ static Eina_Bool external_notify_param_get(void *data __UNUSED__,
 		/* not easy to get content name back from live object */
 		return EINA_FALSE;
 	}
-<<<<<<< HEAD
-	else if ((!strcmp(param->name, "repeat_events"))
-			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
-	{
-		param->i = elm_notify_repeat_events_get(obj);
-=======
 	else if ((!strcmp(param->name, "allow_events"))
 			&& (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL))
 	{
 		param->i = elm_notify_allow_events_get(obj);
->>>>>>> remotes/origin/upstream
 		return EINA_TRUE;
 	}
 	else if ((!strcmp(param->name, "timeout"))
@@ -184,17 +160,10 @@ static void * external_notify_params_parse(void *data __UNUSED__, Evas_Object *o
 			mem->timeout = param->d;
 			mem->timeout_exists = EINA_TRUE;
 		}
-<<<<<<< HEAD
-		else if (!strcmp(param->name, "repeat_events"))
-		{
-			mem->repeat_events = param->i;
-			mem->repeat_events_exists = EINA_TRUE;
-=======
 		else if (!strcmp(param->name, "allow_events"))
 		{
 			mem->allow_events = param->i;
 			mem->allow_events_exists = EINA_TRUE;
->>>>>>> remotes/origin/upstream
 		}
 		else if (!strcmp(param->name, "orient"))
 			  mem->orient = eina_stringshare_add(param->s);
@@ -220,11 +189,7 @@ static void external_notify_params_free(void *params) {
 static Edje_External_Param_Info external_notify_params[] = {
 		DEFINE_EXTERNAL_COMMON_PARAMS,
 		EDJE_EXTERNAL_PARAM_INFO_STRING("content"),
-<<<<<<< HEAD
-		EDJE_EXTERNAL_PARAM_INFO_BOOL("repeat_events"),
-=======
 		EDJE_EXTERNAL_PARAM_INFO_BOOL("allow_events"),
->>>>>>> remotes/origin/upstream
 		EDJE_EXTERNAL_PARAM_INFO_DOUBLE("timeout"),
 		EDJE_EXTERNAL_PARAM_INFO_SENTINEL
 };

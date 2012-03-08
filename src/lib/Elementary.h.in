@@ -160,7 +160,6 @@ EAPI extern Elm_Version *elm_version;
 
 /* other includes */
 #include <elm_controlbar.h>
-#include <elm_password.h>
 
 // Tom Hacohen
 #include <elc_ctxpopup.h> // OK

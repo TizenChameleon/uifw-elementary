@@ -4,8 +4,6 @@
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
-<<<<<<< HEAD
-=======
 enum _slide_style
 {
    SLIDE_SHORT,
@@ -14,7 +12,6 @@ enum _slide_style
    SLIDE_STYLE_LAST
 };
 
->>>>>>> remotes/origin/upstream
 void
 test_label(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -79,18 +76,12 @@ test_label(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    elm_box_pack_end(bx, lb);
    evas_object_show(lb);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> remotes/origin/upstream
    evas_object_resize(win, 320, 300);
 
    evas_object_show(bx);
    evas_object_show(win);
    elm_win_resize_object_add(win, bx);
 }
-<<<<<<< HEAD
-=======
 
 static void
 _cb_size_radio_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
@@ -229,5 +220,4 @@ test_label2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_resize(win, 320, 320);
    evas_object_show(win);
 }
->>>>>>> remotes/origin/upstream
 #endif

@@ -13,33 +13,13 @@ struct _Widget_Data
 };
 
 static const char *widtype = NULL;
-<<<<<<< HEAD
-=======
 static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src,
                              Evas_Callback_Type type, void *event_info);
->>>>>>> remotes/origin/upstream
 static void _del_hook(Evas_Object *obj);
 static void _mirrored_set(Evas_Object *obj, Eina_Bool rtl);
 static void _theme_hook(Evas_Object *obj);
 static void _disable_hook(Evas_Object *obj);
 static void _sizing_eval(Evas_Object *obj);
-<<<<<<< HEAD
-static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj, void *event_info);
-static void _sub_del(void *data, Evas_Object *obj, void *event_info);
-static void _signal_check_off(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _signal_check_on(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _signal_check_toggle(void *data, Evas_Object *obj, const char *emission, const char *source);
-static void _on_focus_hook(void *data, Evas_Object *obj);
-static void _activate_hook(Evas_Object *obj);
-static void _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content);
-static Evas_Object *_content_get_hook(const Evas_Object *obj, const char *part);
-static Evas_Object *_content_unset_hook(Evas_Object *obj, const char *part);
-
-static void _activate(Evas_Object *obj);
-static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src,
-                             Evas_Callback_Type type, void *event_info);
-
-=======
 static void _changed_size_hints(void *data, Evas *e, Evas_Object *obj,
                                 void *event_info);
 static void _sub_del(void *data, Evas_Object *obj, void *event_info);
@@ -56,7 +36,6 @@ static void _content_set_hook(Evas_Object *obj, const char *part,
 static Evas_Object *_content_get_hook(const Evas_Object *obj, const char *part);
 static Evas_Object *_content_unset_hook(Evas_Object *obj, const char *part);
 static void _activate(Evas_Object *obj);
->>>>>>> remotes/origin/upstream
 static const char SIG_CHANGED[] = "changed";
 static const Evas_Smart_Cb_Description _signals[] = {
        {SIG_CHANGED, ""},
@@ -64,12 +43,8 @@ static const Evas_Smart_Cb_Description _signals[] = {
 };
 
 static Eina_Bool
-<<<<<<< HEAD
-_event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__, Evas_Callback_Type type, void *event_info)
-=======
 _event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__,
             Evas_Callback_Type type, void *event_info)
->>>>>>> remotes/origin/upstream
 {
    if (type != EVAS_CALLBACK_KEY_DOWN) return EINA_FALSE;
    Evas_Event_Key_Down *ev = event_info;
@@ -84,10 +59,6 @@ _event_hook(Evas_Object *obj, Evas_Object *src __UNUSED__,
    return EINA_TRUE;
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> remotes/origin/upstream
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -127,7 +98,6 @@ _mirrored_set(Evas_Object *obj, Eina_Bool rtl)
 static void
 _theme_hook(Evas_Object *obj)
 {
-<<<<<<< HEAD
    unsigned int counter = 0;
    unsigned int i = 1;
    unsigned int length = 0;
@@ -137,11 +107,6 @@ _theme_hook(Evas_Object *obj)
    char s1[PATH_MAX] = {'\0',};
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-
-=======
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
->>>>>>> remotes/origin/upstream
    _elm_widget_mirrored_reload(obj);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _elm_theme_object_set(obj, wd->chk, "check", "base", elm_widget_style_get(obj));
@@ -164,8 +129,6 @@ _theme_hook(Evas_Object *obj)
      edje_object_signal_emit(wd->chk, "elm,state,disabled", "elm");
    edje_object_message_signal_process(wd->chk);
    edje_object_scale_set(wd->chk, elm_widget_scale_get(obj) * _elm_config->scale);
-<<<<<<< HEAD
-
    //introduced internationalization of additional text parts used in style
    while (1)
      {
@@ -183,8 +146,6 @@ _theme_hook(Evas_Object *obj)
         strncpy(buffer, str + counter, sizeof(buffer));
         edje_object_part_text_set(wd->chk, s1, E_(buffer));
      }
-=======
->>>>>>> remotes/origin/upstream
    _sizing_eval(obj);
 }
 
@@ -273,8 +234,6 @@ _activate_hook(Evas_Object *obj)
 }
 
 static void
-<<<<<<< HEAD
-=======
 _signal_emit_hook(Evas_Object *obj, const char *emission, const char *source)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -300,7 +259,6 @@ _signal_callback_del_hook(Evas_Object *obj, const char *emission, const char *so
 }
 
 static void
->>>>>>> remotes/origin/upstream
 _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -500,12 +458,9 @@ elm_check_add(Evas_Object *parent)
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_activate_hook_set(obj, _activate_hook);
    elm_widget_event_hook_set(obj, _event_hook);
-<<<<<<< HEAD
-=======
    elm_widget_signal_emit_hook_set(obj, _signal_emit_hook);
    elm_widget_signal_callback_add_hook_set(obj, _signal_callback_add_hook);
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
->>>>>>> remotes/origin/upstream
    elm_widget_text_set_hook_set(obj, _elm_check_label_set);
    elm_widget_text_get_hook_set(obj, _elm_check_label_get);
    elm_widget_content_set_hook_set(obj, _content_set_hook);
@@ -542,53 +497,6 @@ elm_check_add(Evas_Object *parent)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_check_label_set(Evas_Object *obj, const char *label)
-{
-   _elm_check_label_set(obj, NULL, label);
-}
-
-EAPI const char *
-elm_check_label_get(const Evas_Object *obj)
-{
-   return _elm_check_label_get(obj, NULL);
-}
-
-EAPI void
-elm_check_states_labels_set(Evas_Object *obj, const char *ontext, const char *offtext)
-{
-   _elm_check_label_set(obj, "on", ontext);
-   _elm_check_label_set(obj, "off", offtext);
-}
-
-EAPI void
-elm_check_states_labels_get(const Evas_Object *obj, const char **ontext, const char **offtext)
-{
-   if (ontext) *ontext = _elm_check_label_get(obj, "on");
-   if (offtext) *offtext = _elm_check_label_get(obj, "off");
-}
-
-EAPI void
-elm_check_icon_set(Evas_Object *obj, Evas_Object *icon)
-{
-   _content_set_hook(obj, "icon", icon);
-}
-
-EAPI Evas_Object *
-elm_check_icon_get(const Evas_Object *obj)
-{
-   return _content_get_hook(obj, "icon");
-}
-
-EAPI Evas_Object *
-elm_check_icon_unset(Evas_Object *obj)
-{
-   return _content_unset_hook(obj, "icon");
-}
-
-EAPI void
-=======
->>>>>>> remotes/origin/upstream
 elm_check_state_set(Evas_Object *obj, Eina_Bool state)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);

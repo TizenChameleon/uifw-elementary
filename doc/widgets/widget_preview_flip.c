@@ -10,19 +10,11 @@ evas_object_show(o);
 Evas_Object *ic = elm_icon_add(win);
 elm_icon_standard_set(ic, "home");
 evas_object_show(ic);
-<<<<<<< HEAD
-elm_flip_content_front_set(o, ic);
-ic = elm_icon_add(win);
-elm_icon_standard_set(ic, "file");
-evas_object_show(ic);
-elm_flip_content_back_set(o, ic);
-=======
 elm_object_part_content_set(o, "front", ic);
 ic = elm_icon_add(win);
 elm_icon_standard_set(ic, "file");
 evas_object_show(ic);
 elm_object_part_content_set(o, "back", ic);
->>>>>>> remotes/origin/upstream
 
 ecore_timer_add(0.35, _func, o);
 
@@ -32,8 +24,4 @@ unsigned char _func(void *data)
 {
    elm_flip_go(data, ELM_FLIP_CUBE_RIGHT);
    return 0;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> remotes/origin/upstream

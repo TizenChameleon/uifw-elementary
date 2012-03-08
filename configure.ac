@@ -124,11 +124,7 @@ ELM_WINCE_DEF="#undef"
 have_windows="no"
 have_dlopen="no"
 case "$host_os" in
-<<<<<<< HEAD
    mingw32ce* | cegcc*)
-=======
-   mingw32ce*)
->>>>>>> remotes/origin/upstream
       PKG_CHECK_MODULES([EVIL], [evil])
       AC_DEFINE(HAVE_EVIL, 1, [Set to 1 if evil package is installed.])
       lt_enable_auto_import="-Wl,--enable-auto-import"
@@ -184,19 +180,12 @@ dnl managed by evil
       have_socket="yes"
       ;;
 esac
-<<<<<<< HEAD
-AC_CHECK_FUNCS(strcasestr, AC_DEFINE(HAVE_STRCASESTR))
-=======
->>>>>>> remotes/origin/upstream
 AM_CONDITIONAL([BUILD_RUN], [test "x$have_socket" = "xyes"])
 AM_CONDITIONAL([BUILD_MODULES], [test "x$have_dlopen" = "xyes"])
 
 m4_ifdef([v_mic],
    [
-<<<<<<< HEAD
-=======
     EFL_COMPILER_FLAG([-Wshadow])
->>>>>>> remotes/origin/upstream
     EFL_COMPILER_FLAG([-Wall])
     EFL_COMPILER_FLAG([-W])
    ])
@@ -315,32 +304,6 @@ fi
 if test "x$want_elementary_x" = "xyes" -a "x$have_elementary_x" = "xno"; then
     AC_MSG_ERROR([ecore-x support requested, but not found by pkg-config.])
 fi
-
-<<<<<<< HEAD
-have_conformant_autoscroll="no"
-want_conformant_autoscroll="yes"
-AC_ARG_ENABLE([ecore-x],
-   [AC_HELP_STRING([--disable-ecore-x], [disable ecore-x support. @<:@default=detect@:>@])],
-   [want_conformant_autoscroll=$enableval], [])
-
-if test "x$want_conformant_autoscroll" != "xno"; then
-   PKG_CHECK_MODULES([ELEMENTARY_X],
-      [ecore-x >= 1.0.0],
-      [
-       AC_DEFINE(HAVE_CONFORMANT_AUTOSCROLL, 1, [autoscroll with conformant])
-       have_conformant_autoscroll="yes"
-       requirement_elm="ecore-x >= 1.0.0 ${requirement_elm}"
-      ],
-      [have_conformant_autoscroll="no"]
-   )
-else
-    have_conformant_autoscroll="no"
-fi
-if test "x$want_conformant_autoscroll" = "xyes" -a "x$have_conformant_autoscroll" = "xno"; then
-    AC_MSG_ERROR([ecore-x support requested, but not found by pkg-config.])
-fi
-=======
->>>>>>> remotes/origin/upstream
 
 have_elementary_fb="no"
 want_elementary_fb="auto"
@@ -688,11 +651,8 @@ if test "x${have_mman}" = "xyes"; then
    AC_DEFINE(HAVE_MMAN_H, 1, [Have sys/mman.h header file])
 fi
 
-<<<<<<< HEAD
-=======
 AC_CHECK_HEADERS([locale.h langinfo.h])
 
->>>>>>> remotes/origin/upstream
 my_libs="-lm"
 AC_SUBST(my_libs)
 AC_SUBST(requirement_elm)
@@ -753,15 +713,10 @@ src/lib/Elementary.h
 src/bin/Makefile
 src/modules/Makefile
 src/modules/access_output/Makefile
-<<<<<<< HEAD
-src/modules/test_entry/Makefile
-src/modules/test_map/Makefile
-src/modules/ctxpopup_copypasteUI/Makefile
-=======
 src/modules/datetime_input_ctxpopup/Makefile
 src/modules/test_entry/Makefile
 src/modules/test_map/Makefile
->>>>>>> remotes/origin/upstream
+src/modules/ctxpopup_copypasteUI/Makefile
 src/edje_externals/Makefile
 src/examples/Makefile
 data/Makefile
@@ -774,10 +729,7 @@ config/Makefile
 config/default/Makefile
 config/standard/Makefile
 config/illume/Makefile
-<<<<<<< HEAD
 config/slp/Makefile
-=======
->>>>>>> remotes/origin/upstream
 $po_makefile_in
 ])
 
