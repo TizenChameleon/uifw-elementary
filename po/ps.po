@@ -2,20 +2,12 @@
 # This file is distributed under the same license as the Elementary package.
 # FIRST AUTHOR <tom.hacohen@partner.samsung.com>, 2010.
 #
-<<<<<<< HEAD
-#: src/lib/elm_config.c:1417
-=======
 #: src/lib/elm_config.c:1943
->>>>>>> remotes/origin/upstream
 msgid ""
 msgstr ""
 "Project-Id-Version: elementary\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2012-02-05 10:59+0900\n"
-=======
 "POT-Creation-Date: 2012-03-08 01:42+0900\n"
->>>>>>> remotes/origin/upstream
 "PO-Revision-Date: 2010-12-26 10:05+0200\n"
 "Last-Translator: Tom Hacohen <tom.hacohen@partner.samsung.com>\n"
 "Language-Team: General\n"
@@ -32,20 +24,11 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/lib/elc_fileselector.c:1001 src/lib/elm_entry.c:1468
-#: src/lib/elm_searchbar.c:211
-msgid "Cancel"
-msgstr ""
-
-#: src/lib/elc_fileselector.c:1011
-=======
 #: src/lib/elc_fileselector.c:1009 src/lib/elm_entry.c:1357
 msgid "Cancel"
 msgstr ""
 
 #: src/lib/elc_fileselector.c:1019
->>>>>>> remotes/origin/upstream
 msgid "OK"
 msgstr ""
 
@@ -53,13 +36,8 @@ msgstr ""
 msgid "Clicked"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/lib/elm_button.c:408 src/lib/elm_check.c:392 src/lib/elm_radio.c:295
-#: src/lib/elm_toolbar.c:759
-=======
 #: src/lib/elm_button.c:408 src/lib/elm_check.c:394 src/lib/elm_radio.c:295
 #: src/lib/elm_toolbar.c:886
->>>>>>> remotes/origin/upstream
 msgid "State: Disabled"
 msgstr ""
 
@@ -71,63 +49,16 @@ msgstr ""
 msgid "%B %Y"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/lib/elm_check.c:309 src/lib/elm_check.c:312 src/lib/elm_check.c:403
-=======
 #: src/lib/elm_check.c:311 src/lib/elm_check.c:314 src/lib/elm_check.c:405
->>>>>>> remotes/origin/upstream
 #: src/lib/elm_radio.c:231 src/lib/elm_radio.c:297
 msgid "State: On"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/lib/elm_check.c:322 src/lib/elm_check.c:325 src/lib/elm_check.c:412
-=======
 #: src/lib/elm_check.c:324 src/lib/elm_check.c:327 src/lib/elm_check.c:414
->>>>>>> remotes/origin/upstream
 #: src/lib/elm_radio.c:298
 msgid "State: Off"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/lib/elm_check.c:399 src/lib/elm_check.c:409
-msgid "State"
-msgstr ""
-
-#: src/lib/elm_check.c:462
-msgid "Check"
-msgstr ""
-
-#: src/lib/elm_config.c:1354
-msgid "default:LTR"
-msgstr "default:RTL"
-
-#: src/lib/elm_datefield.c:412
-msgid "PM"
-msgstr ""
-
-#: src/lib/elm_datefield.c:413
-msgid "AM"
-msgstr ""
-
-#: src/lib/elm_datefield.c:740
-msgid "DateTimeFormat"
-msgstr ""
-
-#: src/lib/elm_entry.c:1462
-msgid "Copy"
-msgstr ""
-
-#: src/lib/elm_entry.c:1465
-msgid "Cut"
-msgstr ""
-
-#: src/lib/elm_entry.c:1479
-msgid "Select"
-msgstr ""
-
-#: src/lib/elm_entry.c:1485
-=======
 #: src/lib/elm_check.c:401 src/lib/elm_check.c:411
 msgid "State"
 msgstr ""
@@ -153,7 +84,6 @@ msgid "Select"
 msgstr ""
 
 #: src/lib/elm_entry.c:1374
->>>>>>> remotes/origin/upstream
 msgid "Paste"
 msgstr ""
 
@@ -161,13 +91,6 @@ msgstr ""
 msgid "Radio"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/lib/elm_searchbar.c:199
-msgid "Search"
-msgstr ""
-
-=======
->>>>>>> remotes/origin/upstream
 #: src/lib/elm_toggle.c:11
 msgid "ON"
 msgstr ""
@@ -176,25 +99,6 @@ msgstr ""
 msgid "OFF"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/lib/elm_toolbar.c:676
-msgid "Selected"
-msgstr ""
-
-#: src/lib/elm_toolbar.c:757
-msgid "Separator"
-msgstr ""
-
-#: src/lib/elm_toolbar.c:761
-msgid "State: Selected"
-msgstr ""
-
-#: src/lib/elm_toolbar.c:763
-msgid "Has menu"
-msgstr ""
-
-#: src/lib/elm_toolbar.c:821
-=======
 #: src/lib/elm_toolbar.c:802
 msgid "Selected"
 msgstr ""
@@ -212,6 +116,5 @@ msgid "Has menu"
 msgstr ""
 
 #: src/lib/elm_toolbar.c:954
->>>>>>> remotes/origin/upstream
 msgid "Tool Item"
 msgstr ""
