@@ -1,15 +1,10 @@
 #include <Elementary.h>
-<<<<<<< HEAD
-=======
 #include "test.h"
 #include <Elementary_Cursor.h>
->>>>>>> remotes/origin/upstream
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
-<<<<<<< HEAD
-=======
 struct _api_data
 {
    unsigned int state;  /* What state we are testing       */
@@ -240,7 +235,6 @@ _api_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    elm_object_disabled_set(obj, a->state == API_STATE_LAST);
 }
 
->>>>>>> remotes/origin/upstream
 static void
 my_show_it(void        *data,
            Evas_Object *obj __UNUSED__,
@@ -281,50 +275,32 @@ scroll_right(void        *data __UNUSED__,
    printf("Right edge!\n");
 }
 
-<<<<<<< HEAD
-=======
 static void
 _cleanup_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    free(data);
 }
 
->>>>>>> remotes/origin/upstream
 void
 test_list(void        *data __UNUSED__,
           Evas_Object *obj __UNUSED__,
           void        *event_info __UNUSED__)
 {
-<<<<<<< HEAD
-   Evas_Object *win, *bg, *li, *ic, *ic2, *bx, *tb2, *bt;
-   char buf[PATH_MAX];
-   Elm_Object_Item *list_it1, *list_it2, *list_it3, *list_it4, *list_it5;
-=======
    Evas_Object *win, *bg, *li, *ic, *ic2, *bx, *tb2, *bt, *bxx;
    char buf[PATH_MAX];
    Elm_Object_Item *list_it1, *list_it2, *list_it3, *list_it4, *list_it5;
    api_data *api = calloc(1, sizeof(api_data));
->>>>>>> remotes/origin/upstream
 
    win = elm_win_add(NULL, "list", ELM_WIN_BASIC);
    elm_win_title_set(win, "List");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-=======
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-   li = elm_list_add(win);
-   elm_win_resize_object_add(win, li);
-   elm_list_mode_set(li, ELM_LIST_LIMIT);
-   evas_object_size_hint_weight_set(li, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-=======
    bxx = elm_box_add(win);
    elm_win_resize_object_add(win, bxx);
    evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -344,48 +320,28 @@ test_list(void        *data __UNUSED__,
    evas_object_show(bt);
 
    elm_box_pack_end(bxx, li);
->>>>>>> remotes/origin/upstream
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 1, 1);
-   list_it1 = elm_list_item_append(li, "Hello", ic, NULL, NULL, NULL);
-   ic = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 1, 1);
    list_it1 = elm_list_item_append(li, "Hello", ic, NULL, NULL, NULL);
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_icon_file_set(ic, buf, NULL);
    elm_list_item_append(li, "world", ic, NULL, NULL, NULL);
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "edit");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_list_item_append(li, ".", ic, NULL, NULL, NULL);
 
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "delete");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-   ic2 = elm_icon_add(win);
-   elm_icon_standard_set(ic2, "clock");
-   elm_icon_scale_set(ic2, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
    ic2 = elm_icon_add(win);
    elm_icon_standard_set(ic2, "clock");
    elm_icon_resizable_set(ic2, 0, 0);
->>>>>>> remotes/origin/upstream
    list_it2 = elm_list_item_append(li, "How", ic, ic2, NULL, NULL);
 
    bx = elm_box_add(win);
@@ -394,11 +350,7 @@ test_list(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.5, 0.5);
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
@@ -406,11 +358,7 @@ test_list(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.5, 0.0);
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
@@ -418,11 +366,7 @@ test_list(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.0, EVAS_HINT_EXPAND);
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
@@ -528,43 +472,24 @@ test_list_horizontal(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 1, 1);
-   list_it1 = elm_list_item_append(li, "Hello", ic, NULL, NULL, NULL);
-   ic = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 1, 1);
    list_it1 = elm_list_item_append(li, "Hello", ic, NULL, NULL, NULL);
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_icon_file_set(ic, buf, NULL);
    elm_list_item_append(li, "world", ic, NULL, NULL, NULL);
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "edit");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_list_item_append(li, ".", ic, NULL, NULL, NULL);
 
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "delete");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-   ic2 = elm_icon_add(win);
-   elm_icon_standard_set(ic2, "clock");
-   elm_icon_scale_set(ic2, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
    ic2 = elm_icon_add(win);
    elm_icon_standard_set(ic2, "clock");
    elm_icon_resizable_set(ic2, 0, 0);
->>>>>>> remotes/origin/upstream
    list_it2 = elm_list_item_append(li, "How", ic, ic2, NULL, NULL);
 
    bx = elm_box_add(win);
@@ -572,11 +497,7 @@ test_list_horizontal(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.5, 0.5);
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
@@ -584,11 +505,7 @@ test_list_horizontal(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.5, 0.0);
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
@@ -713,35 +630,20 @@ test_list2(void        *data __UNUSED__,
    elm_list_item_selected_set(list_it, EINA_TRUE);
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_icon_file_set(ic, buf, NULL);
    elm_list_item_append(li, "world", ic, NULL, NULL, NULL);
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "edit");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_list_item_append(li, ".", ic, NULL, NULL, NULL);
 
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "delete");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-   ic2 = elm_icon_add(win);
-   elm_icon_standard_set(ic2, "clock");
-   elm_icon_scale_set(ic2, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
    ic2 = elm_icon_add(win);
    elm_icon_standard_set(ic2, "clock");
    elm_icon_resizable_set(ic2, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_list_item_append(li, "How", ic, ic2, NULL, NULL);
 
    bx2 = elm_box_add(win);
@@ -750,11 +652,7 @@ test_list2(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.5, 0.5);
    elm_box_pack_end(bx2, ic);
    evas_object_show(ic);
@@ -762,11 +660,7 @@ test_list2(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.5, 0.0);
    elm_box_pack_end(bx2, ic);
    evas_object_show(ic);
@@ -853,11 +747,7 @@ test_list3(void        *data __UNUSED__,
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_icon_file_set(ic, buf, NULL);
    ic2 = elm_button_add(win);
    elm_object_text_set(ic2, "Click me");
@@ -867,11 +757,7 @@ test_list3(void        *data __UNUSED__,
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_icon_file_set(ic, buf, NULL);
    ic2 = elm_button_add(win);
    elm_object_text_set(ic2, "Click me");
@@ -880,26 +766,15 @@ test_list3(void        *data __UNUSED__,
 
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "edit");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_list_item_append(li, ".", ic, NULL, NULL, NULL);
 
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "delete");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-   ic2 = elm_icon_add(win);
-   elm_icon_standard_set(ic2, "clock");
-   elm_icon_scale_set(ic2, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
    ic2 = elm_icon_add(win);
    elm_icon_standard_set(ic2, "clock");
    elm_icon_resizable_set(ic2, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_list_item_append(li, "How", ic, ic2, NULL, NULL);
 
    bx = elm_box_add(win);
@@ -908,11 +783,7 @@ test_list3(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.5, 0.5);
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
@@ -920,11 +791,7 @@ test_list3(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.5, 0.0);
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
@@ -932,11 +799,7 @@ test_list3(void        *data __UNUSED__,
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_align_set(ic, 0.0, EVAS_HINT_EXPAND);
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
@@ -968,11 +831,7 @@ test_list3(void        *data __UNUSED__,
 
 struct Pginfo
 {
-<<<<<<< HEAD
-   Evas_Object *pager, *win;
-=======
    Evas_Object *naviframe, *win;
->>>>>>> remotes/origin/upstream
 };
 
 static void
@@ -983,11 +842,7 @@ test_list4_back_cb(void        *data,
    struct Pginfo *info = data;
    if (!info) return;
 
-<<<<<<< HEAD
-   elm_pager_content_pop(info->pager);
-=======
    elm_naviframe_item_pop(info->naviframe);
->>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -1027,11 +882,7 @@ test_list4_swipe(void        *data,
    elm_box_pack_start(box, entry);
    elm_box_pack_end(box, button);
 
-<<<<<<< HEAD
-   elm_pager_content_push(info->pager, box);
-=======
    elm_naviframe_item_simple_push(info->naviframe, box);
->>>>>>> remotes/origin/upstream
 }
 
 void
@@ -1039,11 +890,7 @@ test_list4(void        *data __UNUSED__,
            Evas_Object *obj __UNUSED__,
            void        *event_info __UNUSED__)
 {
-<<<<<<< HEAD
-   Evas_Object *win, *bg, *li, *ic, *ic2, *pager;
-=======
    Evas_Object *win, *bg, *li, *ic, *ic2, *naviframe;
->>>>>>> remotes/origin/upstream
    static struct Pginfo info = {NULL, NULL};
    char buf[PATH_MAX];
 
@@ -1057,31 +904,18 @@ test_list4(void        *data __UNUSED__,
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-   pager = elm_pager_add(win);
-   elm_win_resize_object_add(win, pager);
-   evas_object_size_hint_weight_set(pager, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(pager, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(pager);
-   info.pager = pager;
-=======
    naviframe = elm_naviframe_add(win);
    elm_win_resize_object_add(win, naviframe);
    evas_object_size_hint_weight_set(naviframe, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(naviframe, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(naviframe);
    info.naviframe = naviframe;
->>>>>>> remotes/origin/upstream
 
    li = elm_list_add(win);
    evas_object_size_hint_weight_set(li, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_list_mode_set(li, ELM_LIST_COMPRESS);
    evas_object_smart_callback_add(li, "swipe", test_list4_swipe, &info);
-<<<<<<< HEAD
-   elm_pager_content_push(pager, li);
-=======
    elm_naviframe_item_simple_push(naviframe, li);
->>>>>>> remotes/origin/upstream
 
    static char pf_data[] = "Pink Floyd were formed in 1965, and originally consisted of university"                       \
                            "students Roger Waters, Nick Mason, Richard Wright, and Syd Barrett. The group were a popular" \
@@ -1095,11 +929,7 @@ test_list4(void        *data __UNUSED__,
                            "conceptalbums The Dark Side of the Moon, Wish You Were Here, Animals, and The Wall.";
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/mystrale.jpg", elm_app_data_dir_get());
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_icon_file_set(ic, buf, NULL);
    elm_list_item_append(li, "Pink Floyd", ic, NULL, NULL, &pf_data);
 
@@ -1116,11 +946,7 @@ test_list4(void        *data __UNUSED__,
                            "their first album going multi-platinum globally.";
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/mystrale_2.jpg", elm_app_data_dir_get());
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_icon_file_set(ic, buf, NULL);
    elm_list_item_append(li, "Dire Straits", ic, NULL, NULL, &ds_data);
 
@@ -1132,11 +958,7 @@ test_list4(void        *data __UNUSED__,
                            "perform at stadium-sized venues.";
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/icon_17.png", elm_app_data_dir_get());
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 1, 1);
-=======
    elm_icon_resizable_set(ic, 1, 1);
->>>>>>> remotes/origin/upstream
    elm_icon_file_set(ic, buf, NULL);
    elm_list_item_append(li, "Uriah Heep", ic, NULL, NULL, &uh_data);
 
@@ -1148,19 +970,11 @@ test_list4(void        *data __UNUSED__,
                           "two weeks before the group's first United States tour.";
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/icon_21.png", elm_app_data_dir_get());
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-   elm_icon_file_set(ic, buf, NULL);
-   ic2 = elm_icon_add(win);
-   elm_icon_standard_set(ic2, "clock");
-   elm_icon_scale_set(ic2, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
    elm_icon_file_set(ic, buf, NULL);
    ic2 = elm_icon_add(win);
    elm_icon_standard_set(ic2, "clock");
    elm_icon_resizable_set(ic2, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_list_item_append(li, "Rush", ic, ic2, NULL, &r_data);
 
    elm_list_go(li);

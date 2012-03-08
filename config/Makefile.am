@@ -1,9 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in
-<<<<<<< HEAD
 SUBDIRS = default standard illume slp
-=======
-SUBDIRS = default standard illume
->>>>>>> remotes/origin/upstream
 
 EET_EET = @eet_eet@
 

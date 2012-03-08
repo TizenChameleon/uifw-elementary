@@ -300,13 +300,8 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    elm_object_text_set(en, "Disabled entry");
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-   elm_object_disabled_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
    elm_object_disabled_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
@@ -316,17 +311,10 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-<<<<<<< HEAD
-   elm_entry_password_set(en, 1);
-   elm_entry_single_line_set(en, 1);
-   elm_object_text_set(en, "Access denied, give up!");
-   elm_object_disabled_set(en, 1);
-=======
    elm_entry_password_set(en, EINA_TRUE);
    elm_entry_single_line_set(en, EINA_TRUE);
    elm_object_text_set(en, "Access denied, give up!");
    elm_object_disabled_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
@@ -336,11 +324,7 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_ON, ELM_SCROLLER_POLICY_ON);
-<<<<<<< HEAD
-   elm_object_disabled_set(en, 1);
-=======
    elm_object_disabled_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_entry_context_menu_item_add(en, "Hello", NULL, ELM_ICON_NONE, NULL, NULL);
    elm_entry_context_menu_item_add(en, "World", NULL, ELM_ICON_NONE, NULL, NULL);
    elm_object_text_set(en,
@@ -353,11 +337,7 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    elm_box_pack_end(bx, en);
 
    sp = elm_separator_add(win);
-<<<<<<< HEAD
-   elm_separator_horizontal_set(sp, 1);
-=======
    elm_separator_horizontal_set(sp, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, sp);
    evas_object_show(sp);
 
@@ -368,11 +348,7 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(en, "This is a single line");
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_entry_select_all(en);
    evas_object_show(en);
    elm_box_pack_end(bx, en);
@@ -384,21 +360,13 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(en, "01234");
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
    digits_filter_data.accepted = "0123456789";
    digits_filter_data.rejected = NULL;
-<<<<<<< HEAD
-   elm_entry_text_filter_append(en, elm_entry_filter_accept_set, &digits_filter_data);
-=======
    elm_entry_markup_filter_append(en, elm_entry_filter_accept_set, &digits_filter_data);
->>>>>>> remotes/origin/upstream
 
    /* No digits entry */
    en = elm_entry_add(win);
@@ -407,21 +375,13 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(en, "No numbers here");
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
    digits_filter_data2.accepted = NULL;
    digits_filter_data2.rejected = "0123456789";
-<<<<<<< HEAD
-   elm_entry_text_filter_append(en, elm_entry_filter_accept_set, &digits_filter_data2);
-=======
    elm_entry_markup_filter_append(en, elm_entry_filter_accept_set, &digits_filter_data2);
->>>>>>> remotes/origin/upstream
 
    /* Size limited entry */
    en = elm_entry_add(win);
@@ -430,21 +390,13 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(en, "Just 20 chars");
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
    limit_filter_data.max_char_count = 20;
    limit_filter_data.max_byte_count = 0;
-<<<<<<< HEAD
-   elm_entry_text_filter_append(en, elm_entry_filter_limit_size, &limit_filter_data);
-=======
    elm_entry_markup_filter_append(en, elm_entry_filter_limit_size, &limit_filter_data);
->>>>>>> remotes/origin/upstream
 
    /* Byte size limited entry */
    en = elm_entry_add(win);
@@ -453,21 +405,13 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(en, "And now only 30 bytes");
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
    limit_filter_data2.max_char_count = 0;
    limit_filter_data2.max_byte_count = 30;
-<<<<<<< HEAD
-   elm_entry_text_filter_append(en, elm_entry_filter_limit_size, &limit_filter_data2);
-=======
    elm_entry_markup_filter_append(en, elm_entry_filter_limit_size, &limit_filter_data2);
->>>>>>> remotes/origin/upstream
 
    /* Single line password entry */
    en_p = elm_entry_add(win);
@@ -476,13 +420,8 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    evas_object_size_hint_align_set(en_p, EVAS_HINT_FILL, 0.5);
    elm_entry_scrollbar_policy_set(en_p, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    elm_object_text_set(en_p, "Password here");
-<<<<<<< HEAD
-   elm_entry_single_line_set(en_p, 1);
-   elm_entry_password_set(en_p, 1);
-=======
    elm_entry_single_line_set(en_p, EINA_TRUE);
    elm_entry_password_set(en_p, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_show(en_p);
    elm_box_pack_end(bx, en_p);
 
@@ -490,11 +429,7 @@ test_entry_scrolled(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev
    en = elm_entry_add(win);
    elm_entry_scrollable_set(en, EINA_TRUE);
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
    bt = elm_icon_add(win);
@@ -805,11 +740,7 @@ test_entry3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    elm_object_text_set(en, "This is a single line");
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, en);
    evas_object_show(en);
 
@@ -1373,11 +1304,7 @@ test_entry4(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    elm_object_text_set(en, "This is a single line");
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_object_part_content_set(ly, "element1", en);
    evas_object_show(en);
 
@@ -1714,8 +1641,6 @@ test_entry5(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_show(win);
 }
 
-<<<<<<< HEAD
-=======
 void
 test_entry6(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -2215,7 +2140,6 @@ test_entry8(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_show(win);
 }
 
->>>>>>> remotes/origin/upstream
 static void
 _scrolled_entry_clear(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -2223,12 +2147,6 @@ _scrolled_entry_clear(void *data, Evas_Object *obj __UNUSED__, void *event_info 
    elm_object_text_set(en, "");
 }
 
-<<<<<<< HEAD
-void
-test_entry_notepad(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   Evas_Object *win, *bg, *bx, *bx2, *bt, *np;
-=======
 static void
 _scrolled_entry_save(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -2249,7 +2167,6 @@ void
 test_entry_notepad(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg, *bx, *bx2, *bt, *np, *ch;
->>>>>>> remotes/origin/upstream
 
    win = elm_win_add(NULL, "entry-notepad", ELM_WIN_BASIC);
    elm_win_title_set(win, "Entry Notepad");
@@ -2287,8 +2204,6 @@ test_entry_notepad(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
    elm_box_pack_end(bx2, bt);
    evas_object_show(bt);
 
-<<<<<<< HEAD
-=======
    bt = elm_button_add(win);
    elm_object_text_set(bt, "Save");
    evas_object_smart_callback_add(bt, "clicked", _scrolled_entry_save, np);
@@ -2306,7 +2221,6 @@ test_entry_notepad(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *eve
    elm_box_pack_end(bx2, ch);
    evas_object_show(ch);
 
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, bx2);
    evas_object_show(bx2);
 
