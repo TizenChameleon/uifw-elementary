@@ -16,11 +16,7 @@
  *
  * This widget encapsulates operations on its internal file
  * selector on its own API. There is less control over its file
-<<<<<<< HEAD
- * selector than that one would have instatiating one directly.
-=======
  * selector than that one would have instantiating one directly.
->>>>>>> remotes/origin/upstream
  *
  * The following styles are available for this button:
  * @li @c "default"
@@ -37,11 +33,7 @@
  * are:
  * @li "default" - Label of the fileselector_button
  *
-<<<<<<< HEAD
- * Default contents parts of the fileselector_button widget that you can use for
-=======
  * Default content parts of the fileselector_button widget that you can use for
->>>>>>> remotes/origin/upstream
  * are:
  * @li "icon" - Icon of the fileselector_button
  *
@@ -77,19 +69,11 @@ EAPI Evas_Object                *elm_fileselector_button_add(Evas_Object *parent
  * @param obj The file selector button widget
  * @param title The title string
  *
-<<<<<<< HEAD
- * This will change the window's title, when the file selector pops
- * out after a click on the button. Those windows have the default
- * (unlocalized) value of @c "Select a file" as titles.
- *
- * @note It will only take any effect if the file selector
-=======
  * This will change the popup window's title, when the file selector pops
  * out after a click on the button. Those windows have the default
  * (unlocalized) value of @c "Select a file" as titles.
  *
  * @note It will only take effect if the file selector
->>>>>>> remotes/origin/upstream
  * button widget is @b not under "inwin mode".
  *
  * @see elm_fileselector_button_window_title_get()
@@ -97,11 +81,7 @@ EAPI Evas_Object                *elm_fileselector_button_add(Evas_Object *parent
 EAPI void                        elm_fileselector_button_window_title_set(Evas_Object *obj, const char *title);
 
 /**
-<<<<<<< HEAD
- * Get the title set for a given file selector button widget's
-=======
  * Get the title for a given file selector button widget's
->>>>>>> remotes/origin/upstream
  * window
  *
  * @param obj The file selector button widget

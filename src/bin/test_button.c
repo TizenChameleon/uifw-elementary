@@ -18,11 +18,7 @@ _bt_repeated(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED_
 static void
 _bt_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-<<<<<<< HEAD
-   int param = (int)(data);
-=======
    int param = (int)(long)(data);
->>>>>>> remotes/origin/upstream
 
    printf("clicked event on Button:%d\n", param);
 }
@@ -30,11 +26,7 @@ _bt_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__
 static void
 _bt_unpressed(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-<<<<<<< HEAD
-   int param = (int)(data);
-=======
    int param = (int)(long)(data);
->>>>>>> remotes/origin/upstream
 
    printf("unpressed event on Button:%d\n", param);
 }
@@ -82,11 +74,7 @@ test_button(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    ic = elm_icon_add(bx);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    bt = elm_button_add(win);
    elm_object_text_set(bt, "Icon no scale");
    elm_object_part_content_set(bt, "icon", ic);
@@ -103,11 +91,7 @@ test_button(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    bt = elm_button_add(win);
    elm_object_text_set(bt, "Disabled Button");
    elm_object_part_content_set(bt, "icon", ic);
-<<<<<<< HEAD
-   elm_object_disabled_set(bt, 1);
-=======
    elm_object_disabled_set(bt, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_smart_callback_add(bt, "clicked", _bt_clicked, (void *)3);
    evas_object_smart_callback_add(bt, "unpressed", _bt_unpressed, (void *)3);
    elm_box_pack_end(bx, bt);
@@ -120,11 +104,7 @@ test_button(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    bt = elm_button_add(win);
    elm_object_part_content_set(bt, "icon", ic);
-<<<<<<< HEAD
-   elm_object_disabled_set(bt, 1);
-=======
    elm_object_disabled_set(bt, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_smart_callback_add(bt, "clicked", _bt_clicked, (void *)4);
    evas_object_smart_callback_add(bt, "unpressed", _bt_unpressed, (void *)4);
    elm_box_pack_end(bx, bt);
@@ -137,11 +117,7 @@ test_button(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_smart_callback_add(bt, "unpressed", _bt_unpressed, (void *)5);
    elm_box_pack_end(bx, bt);
    evas_object_smart_callback_add(bt, "repeated", _bt_repeated, NULL);
-<<<<<<< HEAD
-   elm_button_autorepeat_set(bt, 1);
-=======
    elm_button_autorepeat_set(bt, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_button_autorepeat_initial_timeout_set(bt, 2.0);
    elm_button_autorepeat_gap_timeout_set(bt, 0.5);
    evas_object_show(bt);
@@ -149,11 +125,7 @@ test_button(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    bt = elm_button_add(win);
    elm_object_part_content_set(bt, "icon", ic);
    evas_object_smart_callback_add(bt, "clicked", _bt_clicked, (void *)6);
@@ -191,11 +163,7 @@ test_button(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    elm_object_access_info_set(bt, "This is some custom text describing this widget");
    elm_object_style_set(bt, "anchor");
    elm_object_part_content_set(bt, "icon", ic);
-<<<<<<< HEAD
-   elm_object_disabled_set(bt, 1);
-=======
    elm_object_disabled_set(bt, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_smart_callback_add(bt, "clicked", _bt_clicked, (void *)9);
    evas_object_smart_callback_add(bt, "unpressed", _bt_unpressed, (void *)9);
    elm_box_pack_end(bx, bt);

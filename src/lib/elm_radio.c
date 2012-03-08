@@ -528,8 +528,6 @@ elm_radio_value_pointer_set(Evas_Object *obj, int *valuep)
         wd->group->valuep = NULL;
      }
 }
-<<<<<<< HEAD
-=======
 
 EAPI Evas_Object *
 elm_radio_selected_object_get(Evas_Object *obj)
@@ -550,4 +548,3 @@ elm_radio_selected_object_get(Evas_Object *obj)
      }
    return NULL;
 }
->>>>>>> remotes/origin/upstream
