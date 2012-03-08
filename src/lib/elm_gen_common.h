@@ -64,6 +64,7 @@ struct Elm_Gen_Item
    Eina_Bool                 reorder : 1;
    Eina_Bool                 mode_set : 1; /**< item uses style mode for highlight/select */
    Eina_Bool                 flipped : 1; /**< a flag that shows the flip status of the item. */
+   Eina_Bool                 can_focus : 1;
 };
 
 typedef struct _Pan Pan;
@@ -157,6 +158,7 @@ struct _Widget_Data
    Elm_Gen_Item                  *expanded_next_item;
    Ecore_Animator                *item_moving_effect_timer; /**< tree effect */
    Elm_Genlist_Item_Move_Effect_Mode move_effect_mode;
+   Ecore_Job                     *changed_job;
 
    /* The stuff below directly come from gengrid without any thinking */
    unsigned int                   nmax;
