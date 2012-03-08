@@ -10,17 +10,10 @@
 
 #define N_ITEMS 30
 
-<<<<<<< HEAD
-static Elm_Genlist_Item_Class _itc;
-
-static char *
-_item_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
-=======
 static Elm_Genlist_Item_Class *_itc = NULL;
 
 static char *
 _item_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
->>>>>>> remotes/origin/upstream
 {
    char buf[256];
    snprintf(buf, sizeof(buf), "Item # %i", (int)(long)data);
@@ -64,13 +57,6 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-   _itc.item_style = "default";
-   _itc.func.text_get = _item_text_get;
-   _itc.func.content_get = _item_content_get;
-   _itc.func.state_get = NULL;
-   _itc.func.del = NULL;
-=======
    if (!_itc)
      {
         _itc = elm_genlist_item_class_new();
@@ -80,17 +66,12 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
         _itc->func.state_get = NULL;
         _itc->func.del = NULL;
      }
->>>>>>> remotes/origin/upstream
 
    list = elm_genlist_add(win);
 
    for (i = 0; i < N_ITEMS; i++)
      {
-<<<<<<< HEAD
-	elm_genlist_item_append(list, &_itc,
-=======
 	elm_genlist_item_append(list, _itc,
->>>>>>> remotes/origin/upstream
 				(void *)(long)i, NULL,
 				ELM_GENLIST_ITEM_NONE,
 				_item_sel_cb, NULL);
