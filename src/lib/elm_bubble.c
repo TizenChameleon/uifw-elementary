@@ -8,10 +8,7 @@ struct _Widget_Data
    Evas_Object *bbl;
    Evas_Object *content, *icon;
    const char *label, *info, *corner;
-<<<<<<< HEAD
-=======
    Elm_Bubble_Pos pos;
->>>>>>> remotes/origin/upstream
 };
 
 static const char *widtype = NULL;
@@ -33,8 +30,6 @@ static const Evas_Smart_Cb_Description _signals[] =
      {NULL, NULL}
 };
 
-<<<<<<< HEAD
-=======
 static const char *corner_string[] = 
 {
     "top_left",
@@ -43,7 +38,6 @@ static const char *corner_string[] =
     "bottom_right"
 };
 
->>>>>>> remotes/origin/upstream
 static void
 _del_hook(Evas_Object *obj)
 {
@@ -70,11 +64,7 @@ _theme_hook(Evas_Object *obj)
    if (!wd) return;
    _elm_widget_mirrored_reload(obj);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
-<<<<<<< HEAD
-   _elm_theme_object_set(obj, wd->bbl, "bubble", wd->corner,
-=======
    _elm_theme_object_set(obj, wd->bbl, "bubble", corner_string[wd->pos],
->>>>>>> remotes/origin/upstream
                          elm_widget_style_get(obj));
    edje_object_part_text_set(wd->bbl, "elm.text", wd->label);
    if (wd->label) edje_object_signal_emit(wd->bbl, "elm,state,text,visible", "elm");
@@ -340,10 +330,7 @@ elm_bubble_add(Evas_Object *parent)
    elm_widget_content_unset_hook_set(obj, _content_unset_hook);
 
    wd->corner = eina_stringshare_add("base");
-<<<<<<< HEAD
-=======
    wd->pos = ELM_BUBBLE_POS_TOP_LEFT; //default
->>>>>>> remotes/origin/upstream
 
    wd->bbl = edje_object_add(e);
    elm_widget_resize_object_set(obj, wd->bbl);
@@ -360,70 +347,6 @@ elm_bubble_add(Evas_Object *parent)
    return obj;
 }
 
-<<<<<<< HEAD
-EAPI void
-elm_bubble_label_set(Evas_Object *obj, const char *label)
-{
-   _elm_bubble_label_set(obj, NULL, label);
-}
-
-EAPI const char*
-elm_bubble_label_get(const Evas_Object *obj)
-{
-   return _elm_bubble_label_get(obj, NULL);
-}
-
-EAPI void
-elm_bubble_info_set(Evas_Object *obj, const char *info)
-{
-   _elm_bubble_label_set(obj, "info", info);
-}
-
-EAPI const char *
-elm_bubble_info_get(const Evas_Object *obj)
-{
-   return _elm_bubble_label_get(obj, "info");
-}
-
-EAPI void
-elm_bubble_content_set(Evas_Object *obj, Evas_Object *content)
-{
-   _content_set_hook(obj, NULL, content);
-}
-
-EAPI Evas_Object *
-elm_bubble_content_get(const Evas_Object *obj)
-{
-   return _content_get_hook(obj, NULL);
-}
-
-EAPI Evas_Object *
-elm_bubble_content_unset(Evas_Object *obj)
-{
-   return _content_unset_hook(obj, NULL);
-}
-
-EAPI void
-elm_bubble_icon_set(Evas_Object *obj, Evas_Object *icon)
-{
-   _content_set_hook(obj, "icon", icon);
-}
-
-EAPI Evas_Object *
-elm_bubble_icon_get(const Evas_Object *obj)
-{
-   return _content_get_hook(obj, "icon");
-}
-
-EAPI Evas_Object *
-elm_bubble_icon_unset(Evas_Object *obj)
-{
-   return _content_unset_hook(obj, "icon");
-}
-
-EAPI void
-elm_bubble_corner_set(Evas_Object *obj, const char *corner)
-=======
 EINA_DEPRECATED EAPI void
 elm_bubble_corner_set(Evas_Object *obj, const char *corner)
 {
@@ -437,25 +360,10 @@ elm_bubble_corner_set(Evas_Object *obj, const char *corner)
 
 EAPI void
 elm_bubble_pos_set(Evas_Object *obj, Elm_Bubble_Pos pos)
->>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-<<<<<<< HEAD
-   EINA_SAFETY_ON_NULL_RETURN(corner);
-   eina_stringshare_replace(&wd->corner, corner);
-   _theme_hook(obj);
-}
-
-EAPI const char*
-elm_bubble_corner_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return NULL;
-   return wd->corner;
-=======
    if(pos<ELM_BUBBLE_POS_TOP_LEFT || pos>ELM_BUBBLE_POS_BOTTOM_RIGHT) return;
    wd->pos = pos;
    _theme_hook(obj);
@@ -474,5 +382,4 @@ elm_bubble_pos_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return ELM_BUBBLE_POS_INVALID;
    return wd->pos;
->>>>>>> remotes/origin/upstream
 }
