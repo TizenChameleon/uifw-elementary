@@ -635,6 +635,7 @@ _compress_item(Evas_Object *obj)
    EINA_LIST_FOREACH(wd->items, elist, item)
      {
            edje_object_signal_emit(item->base.view, "elm,state,compress", "elm");
+     }
 }
 
 static void
