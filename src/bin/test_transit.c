@@ -39,10 +39,6 @@ _custom_op(Elm_Transit_Effect *effect, Elm_Transit *transit, double progress)
 
    EINA_LIST_FOREACH(objs, elist, obj)
       evas_object_resize(obj, w, h);
-<<<<<<< HEAD
-
-=======
->>>>>>> remotes/origin/upstream
 }
 
 static Elm_Transit_Effect *
@@ -613,9 +609,4 @@ test_transit9(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    evas_object_resize(win, 400, 400);
    evas_object_show(win);
 }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> remotes/origin/upstream
 #endif

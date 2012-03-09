@@ -121,13 +121,8 @@ EAPI void        elm_spinner_min_max_set(Evas_Object *obj, double min, double ma
  * Get the minimum and maximum values of the spinner.
  *
  * @param obj The spinner object.
-<<<<<<< HEAD
- * @param min Pointer where to store the minimum value.
- * @param max Pointer where to store the maximum value.
-=======
  * @param min Pointer to store the minimum value.
  * @param max Pointer to store the maximum value.
->>>>>>> remotes/origin/upstream
  *
  * @note If only one value is needed, the other pointer can be passed
  * as @c NULL.
@@ -263,11 +258,7 @@ EAPI Eina_Bool   elm_spinner_wrap_get(const Evas_Object *obj);
  * Spinner objects can have edition @b disabled, in which state they will
  * be changed only by arrows.
  * Useful for contexts
-<<<<<<< HEAD
- * where you don't want your users to interact with it writting the value.
-=======
  * where you don't want your users to interact with it writing the value.
->>>>>>> remotes/origin/upstream
  * Specially
  * when using special values, the user can see real value instead
  * of special label on edition.
@@ -358,8 +349,6 @@ EAPI void        elm_spinner_interval_set(Evas_Object *obj, double interval);
 EAPI double      elm_spinner_interval_get(const Evas_Object *obj);
 
 /**
-<<<<<<< HEAD
-=======
  * Set the base for rounding
  *
  * @param obj The spinner object
@@ -433,6 +422,5 @@ EAPI void elm_spinner_round_set(Evas_Object *obj, int rnd);
 EAPI int elm_spinner_round_get(const Evas_Object *obj);
 
 /**
->>>>>>> remotes/origin/upstream
  * @}
  */

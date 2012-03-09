@@ -26,15 +26,6 @@ typedef Evas_Object *(*Elm_Tooltip_Content_Cb)(void *data, Evas_Object *obj, Eva
  */
 typedef Evas_Object *(*Elm_Tooltip_Item_Content_Cb)(void *data, Evas_Object *obj, Evas_Object *tooltip, void *item);
 
-<<<<<<< HEAD
-// XXX: move to config, rename all config things elm_config_*
-EAPI double      elm_tooltip_delay_get(void);
-// XXX: move to config, rename all config things elm_config_*
-EAPI Eina_Bool   elm_tooltip_delay_set(double delay);
-
-EAPI void        elm_object_tooltip_show(Evas_Object *obj);
-EAPI void        elm_object_tooltip_hide(Evas_Object *obj);
-=======
 EINA_DEPRECATED EAPI double      elm_tooltip_delay_get(void);
 EINA_DEPRECATED EAPI Eina_Bool   elm_tooltip_delay_set(double delay);
 
@@ -47,17 +38,11 @@ EAPI void        elm_object_tooltip_hide(Evas_Object *obj);
  * @param obj The tooltip object.
  * @param text The text to be displayed.
  */
->>>>>>> remotes/origin/upstream
 EAPI void        elm_object_tooltip_text_set(Evas_Object *obj, const char *text);
 EAPI void        elm_object_tooltip_domain_translatable_text_set(Evas_Object *obj, const char *domain, const char *text);
 #define elm_object_tooltip_translatable_text_set(obj, text) elm_object_tooltip_domain_translatable_text_set((obj), NULL, (text))
 EAPI void        elm_object_tooltip_content_cb_set(Evas_Object *obj, Elm_Tooltip_Content_Cb func, const void *data, Evas_Smart_Cb del_cb);
 EAPI void        elm_object_tooltip_unset(Evas_Object *obj);
-<<<<<<< HEAD
-EAPI void        elm_object_tooltip_style_set(Evas_Object *obj, const char *style);
-EAPI const char *elm_object_tooltip_style_get(const Evas_Object *obj);
-EAPI Eina_Bool   elm_object_tooltip_window_mode_set(Evas_Object *obj, Eina_Bool disable);
-=======
 
 /**
  * Sets a different style for this object tooltip.
@@ -100,7 +85,6 @@ EAPI Eina_Bool   elm_object_tooltip_window_mode_set(Evas_Object *obj, Eina_Bool 
  * its parent window's canvas.
  * It will instead be limited only by the size of the display.
  */
->>>>>>> remotes/origin/upstream
 EAPI Eina_Bool   elm_object_tooltip_window_mode_get(const Evas_Object *obj);
 
 /**

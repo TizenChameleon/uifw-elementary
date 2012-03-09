@@ -15,11 +15,7 @@
  * Now you need to tell gesture layer what gestures you follow.
  * This is done with @ref elm_gesture_layer_cb_set call.
  * By setting the callback you actually saying to gesture layer:
-<<<<<<< HEAD
- * I would like to know when the gesture @ref Elm_Gesture_Types
-=======
  * I would like to know when the gesture @ref Elm_Gesture_Type
->>>>>>> remotes/origin/upstream
  * switches to state @ref Elm_Gesture_State.
  *
  * Next, you need to implement the actual action that follows the input
@@ -30,11 +26,7 @@
  * (again with @ref elm_gesture_layer_cb_set)
  *
  * The information reported by gesture layer to your callback is depending
-<<<<<<< HEAD
- * on @ref Elm_Gesture_Types:
-=======
  * on @ref Elm_Gesture_Type:
->>>>>>> remotes/origin/upstream
  * @ref Elm_Gesture_Taps_Info is the info reported for tap gestures:
  * @ref ELM_GESTURE_N_TAPS, @ref ELM_GESTURE_N_LONG_TAPS,
  * @ref ELM_GESTURE_N_DOUBLE_TAPS, @ref ELM_GESTURE_N_TRIPLE_TAPS.
@@ -81,11 +73,7 @@ typedef enum
    ELM_GESTURE_N_DOUBLE_TAPS, /**< N fingers double-single taps */
    ELM_GESTURE_N_TRIPLE_TAPS, /**< N fingers triple-single taps */
 
-<<<<<<< HEAD
-   ELM_GESTURE_MOMENTUM, /**< Reports momentum in the dircetion of move */
-=======
    ELM_GESTURE_MOMENTUM, /**< Reports momentum in the direction of move */
->>>>>>> remotes/origin/upstream
 
    ELM_GESTURE_N_LINES, /**< N fingers line gesture */
    ELM_GESTURE_N_FLICKS, /**< N fingers flick gesture */
@@ -94,11 +82,7 @@ typedef enum
    ELM_GESTURE_ROTATE, /**< Rotate */
 
    ELM_GESTURE_LAST
-<<<<<<< HEAD
-} Elm_Gesture_Types;
-=======
 } Elm_Gesture_Type;
->>>>>>> remotes/origin/upstream
 
 /**
  * @enum _Elm_Gesture_State
@@ -111,11 +95,7 @@ typedef enum
    ELM_GESTURE_STATE_START, /**< Gesture STARTed     */
    ELM_GESTURE_STATE_MOVE, /**< Gesture is ongoing  */
    ELM_GESTURE_STATE_END, /**< Gesture completed   */
-<<<<<<< HEAD
-   ELM_GESTURE_STATE_ABORT /**< Onging gesture was ABORTed */
-=======
    ELM_GESTURE_STATE_ABORT /**< Ongoing gesture was ABORTed */
->>>>>>> remotes/origin/upstream
 } Elm_Gesture_State;
 
 /**
@@ -249,11 +229,7 @@ typedef Evas_Event_Flags (*Elm_Gesture_Event_Cb)(void *data, void *event_info);
  * it means user isn't interested in gesture-state
  * and it will not be tested.
  *
-<<<<<<< HEAD
- * @param obj Pointer to gesture-layer.
-=======
  * @param obj gesture-layer.
->>>>>>> remotes/origin/upstream
  * @param idx The gesture you would like to track its state.
  * @param cb callback function pointer.
  * @param cb_type what event this callback tracks: START, MOVE, END, ABORT.
@@ -261,40 +237,17 @@ typedef Evas_Event_Flags (*Elm_Gesture_Event_Cb)(void *data, void *event_info);
  *
  * @ingroup Elm_Gesture_Layer
  */
-<<<<<<< HEAD
-EAPI void         elm_gesture_layer_cb_set(Evas_Object *obj, Elm_Gesture_Types idx, Elm_Gesture_State cb_type, Elm_Gesture_Event_Cb cb, void *data);
-=======
 EAPI void         elm_gesture_layer_cb_set(Evas_Object *obj, Elm_Gesture_Type idx, Elm_Gesture_State cb_type, Elm_Gesture_Event_Cb cb, void *data);
->>>>>>> remotes/origin/upstream
 
 /**
  * Call this function to get repeat-events settings.
  *
-<<<<<<< HEAD
- * @param obj Pointer to gesture-layer.
-=======
  * @param obj gesture-layer.
->>>>>>> remotes/origin/upstream
  *
  * @return repeat events settings.
  * @see elm_gesture_layer_hold_events_set()
  * @ingroup Elm_Gesture_Layer
  */
-<<<<<<< HEAD
-EAPI Eina_Bool    elm_gesture_layer_hold_events_get(Evas_Object *obj);
-
-/**
- * This function called in order to make gesture-layer repeat events.
- * Set this of you like to get the raw events only if gestures were not detected.
- * Clear this if you like gesture layer to fwd events as testing gestures.
- *
- * @param obj Pointer to gesture-layer.
- * @param r Repeat: TRUE/FALSE
- *
- * @ingroup Elm_Gesture_Layer
- */
-EAPI void         elm_gesture_layer_hold_events_set(Evas_Object *obj, Eina_Bool r);
-=======
 EAPI Eina_Bool    elm_gesture_layer_hold_events_get(const Evas_Object *obj);
 
 /**
@@ -309,21 +262,10 @@ EAPI Eina_Bool    elm_gesture_layer_hold_events_get(const Evas_Object *obj);
  * @ingroup Elm_Gesture_Layer
  */
 EAPI void         elm_gesture_layer_hold_events_set(Evas_Object *obj, Eina_Bool hold_events);
->>>>>>> remotes/origin/upstream
 
 /**
  * This function sets step-value for zoom action.
  * Set step to any positive value.
-<<<<<<< HEAD
- * Cancel step setting by setting to 0.0
- *
- * @param obj Pointer to gesture-layer.
- * @param s new zoom step value.
- *
- * @ingroup Elm_Gesture_Layer
- */
-EAPI void         elm_gesture_layer_zoom_step_set(Evas_Object *obj, double s);
-=======
  * Cancel step setting by setting to 0
  *
  * @param obj gesture-layer.
@@ -344,26 +286,10 @@ EAPI void         elm_gesture_layer_zoom_step_set(Evas_Object *obj, double step)
  * @ingroup Elm_Gesture_Layer
  */
 EAPI double       elm_gesture_layer_zoom_step_get(const Evas_Object *obj);
->>>>>>> remotes/origin/upstream
 
 /**
  * This function sets step-value for rotate action.
  * Set step to any positive value.
-<<<<<<< HEAD
- * Cancel step setting by setting to 0.0
- *
- * @param obj Pointer to gesture-layer.
- * @param s new roatate step value.
- *
- * @ingroup Elm_Gesture_Layer
- */
-EAPI void         elm_gesture_layer_rotate_step_set(Evas_Object *obj, double s);
-
-/**
- * This function called to attach gesture-layer to an Evas_Object.
- * @param obj Pointer to gesture-layer.
- * @param t Pointer to underlying object (AKA Target)
-=======
  * Cancel step setting by setting to 0
  *
  * @param obj gesture-layer.
@@ -387,17 +313,12 @@ EAPI double       elm_gesture_layer_rotate_step_get(const Evas_Object *obj);
  * This function called to attach gesture-layer to an Evas_Object.
  * @param obj gesture-layer.
  * @param target Pointer to underlying object (AKA Target)
->>>>>>> remotes/origin/upstream
  *
  * @return TRUE, FALSE on success, failure.
  *
  * @ingroup Elm_Gesture_Layer
  */
-<<<<<<< HEAD
-EAPI Eina_Bool    elm_gesture_layer_attach(Evas_Object *obj, Evas_Object *t);
-=======
 EAPI Eina_Bool    elm_gesture_layer_attach(Evas_Object *obj, Evas_Object *target);
->>>>>>> remotes/origin/upstream
 
 /**
  * Call this function to construct a new gesture-layer object.
@@ -406,11 +327,7 @@ EAPI Eina_Bool    elm_gesture_layer_attach(Evas_Object *obj, Evas_Object *target
  *
  * @param parent the parent object.
  *
-<<<<<<< HEAD
- * @return Pointer to new gesture-layer object.
-=======
  * @return new gesture-layer object.
->>>>>>> remotes/origin/upstream
  *
  * @ingroup Elm_Gesture_Layer
  */

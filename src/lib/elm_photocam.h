@@ -45,11 +45,7 @@ typedef enum
    ELM_PHOTOCAM_ZOOM_MODE_MANUAL = 0, /**< Zoom controlled normally by elm_photocam_zoom_set */
    ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT, /**< Zoom until photo fits in photocam */
    ELM_PHOTOCAM_ZOOM_MODE_AUTO_FILL, /**< Zoom until photo fills photocam */
-<<<<<<< HEAD
-   ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT_IN, /**< Unzoom until photo fits in photocam */
-=======
    ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT_IN, /**< Zoom in until photo fits in photocam */
->>>>>>> remotes/origin/upstream
    ELM_PHOTOCAM_ZOOM_MODE_LAST
 } Elm_Photocam_Zoom_Mode;
 
@@ -96,11 +92,7 @@ EAPI const char            *elm_photocam_file_get(const Evas_Object *obj);
  * This sets the zoom level. 1 will be 1:1 pixel for pixel. 2 will be 2:1
  * (that is 2x2 photo pixels will display as 1 on-screen pixel). 4:1 will be
  * 4x4 photo pixels as 1 screen pixel, and so on. The @p zoom parameter must
-<<<<<<< HEAD
- * be greater than 0. It is usggested to stick to powers of 2. (1, 2, 4, 8,
-=======
  * be greater than 0. It is suggested to stick to powers of 2. (1, 2, 4, 8,
->>>>>>> remotes/origin/upstream
  * 16, 32, etc.).
  */
 EAPI void                   elm_photocam_zoom_set(Evas_Object *obj, double zoom);
@@ -114,11 +106,7 @@ EAPI void                   elm_photocam_zoom_set(Evas_Object *obj, double zoom)
  * This returns the current zoom level of the photocam object. Note that if
  * you set the fill mode to other than ELM_PHOTOCAM_ZOOM_MODE_MANUAL
  * (which is the default), the zoom level may be changed at any time by the
-<<<<<<< HEAD
- * photocam object itself to account for photo size and photocam viewpoer
-=======
  * photocam object itself to account for photo size and photocam viewport
->>>>>>> remotes/origin/upstream
  * size.
  *
  * @see elm_photocam_zoom_set()
@@ -139,11 +127,7 @@ EAPI double                 elm_photocam_zoom_get(const Evas_Object *obj);
  * modes will allow the photocam object to automatically adjust zoom mode
  * based on properties. ELM_PHOTOCAM_ZOOM_MODE_AUTO_FIT) will adjust zoom so
  * the photo fits EXACTLY inside the scroll frame with no pixels outside this
-<<<<<<< HEAD
- * area. ELM_PHOTOCAM_ZOOM_MODE_AUTO_FILL will be similar but ensure no
-=======
  * region. ELM_PHOTOCAM_ZOOM_MODE_AUTO_FILL will be similar but ensure no
->>>>>>> remotes/origin/upstream
  * pixels within the frame are left unfilled.
  */
 EAPI void                   elm_photocam_zoom_mode_set(Evas_Object *obj, Elm_Photocam_Zoom_Mode mode);
@@ -174,11 +158,7 @@ EAPI Elm_Photocam_Zoom_Mode elm_photocam_zoom_mode_get(const Evas_Object *obj);
 EAPI void                   elm_photocam_image_size_get(const Evas_Object *obj, int *w, int *h);
 
 /**
-<<<<<<< HEAD
- * @brief Get the area of the image that is currently shown
-=======
  * @brief Get the region of the image that is currently shown
->>>>>>> remotes/origin/upstream
  *
  * @param obj
  * @param x A pointer to the X-coordinate of region
@@ -189,17 +169,10 @@ EAPI void                   elm_photocam_image_size_get(const Evas_Object *obj, 
  * @see elm_photocam_image_region_show()
  * @see elm_photocam_image_region_bring_in()
  */
-<<<<<<< HEAD
-EAPI void                   elm_photocam_region_get(const Evas_Object *obj, int *x, int *y, int *w, int *h);
-
-/**
- * @brief Set the viewed portion of the image
-=======
 EAPI void                   elm_photocam_image_region_get(const Evas_Object *obj, int *x, int *y, int *w, int *h);
 
 /**
  * @brief Set the viewed region of the image
->>>>>>> remotes/origin/upstream
  *
  * @param obj The photocam object
  * @param x X-coordinate of region in image original pixels
@@ -232,11 +205,7 @@ EAPI void                   elm_photocam_image_region_bring_in(Evas_Object *obj,
  *
  * This sets the paused state to on(EINA_TRUE) or off (EINA_FALSE) for
  * photocam. The default is off. This will stop zooming using animation on
-<<<<<<< HEAD
- * zoom levels changes and change instantly. This will stop any existing
-=======
  * zoom level changes and change instantly. This will stop any existing
->>>>>>> remotes/origin/upstream
  * animations that are running.
  */
 EAPI void                   elm_photocam_paused_set(Evas_Object *obj, Eina_Bool paused);
@@ -269,13 +238,8 @@ EAPI Evas_Object           *elm_photocam_internal_image_get(const Evas_Object *o
  * @brief Set the photocam scrolling bouncing.
  *
  * @param obj The photocam object
-<<<<<<< HEAD
- * @param h_bounce bouncing for horizontal
- * @param v_bounce bouncing for vertical
-=======
  * @param h_bounce set this to @c EINA_TRUE for horizontal bouncing
  * @param v_bounce set this to @c EINA_TRUE for vertical bouncing
->>>>>>> remotes/origin/upstream
  */
 EAPI void                   elm_photocam_bounce_set(Evas_Object *obj, Eina_Bool h_bounce, Eina_Bool v_bounce);
 
@@ -283,21 +247,14 @@ EAPI void                   elm_photocam_bounce_set(Evas_Object *obj, Eina_Bool 
  * @brief Get the photocam scrolling bouncing.
  *
  * @param obj The photocam object
-<<<<<<< HEAD
- * @param h_bounce bouncing for horizontal
- * @param v_bounce bouncing for vertical
-=======
  * @param h_bounce horizontal bouncing
  * @param v_bounce vertical bouncing
->>>>>>> remotes/origin/upstream
  *
  * @see elm_photocam_bounce_set()
  */
 EAPI void                   elm_photocam_bounce_get(const Evas_Object *obj, Eina_Bool *h_bounce, Eina_Bool *v_bounce);
 
 /**
-<<<<<<< HEAD
-=======
  * @brief Set the gesture state for photocam.
  *
  * @param obj The photocam object
@@ -320,6 +277,5 @@ EAPI void		    elm_photocam_gesture_enabled_set(Evas_Object *obj, Eina_Bool gest
  */
 EAPI Eina_Bool		    elm_photocam_gesture_enabled_get(const Evas_Object *obj);
 /**
->>>>>>> remotes/origin/upstream
  * @}
  */

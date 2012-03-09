@@ -4,17 +4,6 @@
  * @image html img/widget/bg/preview-00.png
  * @image latex img/widget/bg/preview-00.eps
  *
-<<<<<<< HEAD
- * @brief Background object, used for setting a solid color, image or Edje
- * group as background to a window or any container object.
- *
- * The bg object is used for setting a solid background to a window or
- * packing into any container object. It works just like an image, but has
- * some properties useful to a background, like setting it to tiled,
- * centered, scaled or stretched.
- *
- * Default contents parts of the bg widget that you can use for are:
-=======
  * @brief Background object, used for setting a solid color, image or
  * Edje group as a background to a window or any container object.
  *
@@ -25,7 +14,6 @@
  * centered, scaled or stretched.
  *
  * Default content parts of the bg widget that you can use for are:
->>>>>>> remotes/origin/upstream
  * @li "overlay" - overlay of the bg
  *
  * Supported elm_object common APIs.
@@ -39,15 +27,6 @@
  * @li @ref bg_03_example_page
  */
 
-<<<<<<< HEAD
-/* bg */
-typedef enum
-{
-   ELM_BG_OPTION_CENTER, /**< center the background */
-   ELM_BG_OPTION_SCALE, /**< scale the background retaining aspect ratio */
-   ELM_BG_OPTION_STRETCH, /**< stretch the background to fill */
-   ELM_BG_OPTION_TILE /**< tile background at its original size */
-=======
 /**
  * Identifiers on how a background widget is to display its image --
  * if it was tset to use an image file.
@@ -62,7 +41,6 @@ typedef enum
    ELM_BG_OPTION_STRETCH, /**< stretch the background image to fill the widget's area */
    ELM_BG_OPTION_TILE, /**< tile background image at its original size */
    ELM_BG_OPTION_LAST /**< sentinel value, also used to indicate errors */
->>>>>>> remotes/origin/upstream
 } Elm_Bg_Option;
 
 /**
@@ -76,31 +54,6 @@ typedef enum
 EAPI Evas_Object                 *elm_bg_add(Evas_Object *parent);
 
 /**
-<<<<<<< HEAD
- * Set the file (image or edje) used for the background
- *
- * @param obj The bg object
- * @param file The file path
- * @param group Optional key (group in Edje) within the file
- *
- * This sets the image file used in the background object. The image (or edje)
- * will be stretched (retaining aspect if its an image file) to completely fill
- * the bg object. This may mean some parts are not visible.
- *
- * @note  Once the image of @p obj is set, a previously set one will be deleted,
- * even if @p file is NULL.
- *
- * @ingroup Bg
- */
-EAPI void                         elm_bg_file_set(Evas_Object *obj, const char *file, const char *group);
-
-/**
- * Get the file (image or edje) used for the background
- *
- * @param obj The bg object
- * @param file The file path
- * @param group Optional key (group in Edje) within the file
-=======
  * Set the file (image or edje collection) to give life for the
  * background
  *
@@ -140,22 +93,12 @@ EAPI Eina_Bool                    elm_bg_file_set(Evas_Object *obj, const char *
  *
  * @note Use @c NULL pointers on the file components you're not
  * interested in: they'll be ignored by the function.
->>>>>>> remotes/origin/upstream
  *
  * @ingroup Bg
  */
 EAPI void                         elm_bg_file_get(const Evas_Object *obj, const char **file, const char **group);
 
 /**
-<<<<<<< HEAD
- * Set the option used for the background image
- *
- * @param obj The bg object
- * @param option The desired background option (TILE, SCALE)
- *
- * This sets the option used for manipulating the display of the background
- * image. The image can be tiled or scaled.
-=======
  * Set the mode of display for a given background widget's image
  *
  * @param obj The background object handle
@@ -167,19 +110,12 @@ EAPI void                         elm_bg_file_get(const Evas_Object *obj, const 
  * centered or stretched.
  *
  * @see elm_bg_option_get()
->>>>>>> remotes/origin/upstream
  *
  * @ingroup Bg
  */
 EAPI void                         elm_bg_option_set(Evas_Object *obj, Elm_Bg_Option option);
 
 /**
-<<<<<<< HEAD
- * Get the option used for the background image
- *
- * @param obj The bg object
- * @return The desired background option (CENTER, SCALE, STRETCH or TILE)
-=======
  * Get the mode of display for a given background widget's image
  *
  * @param obj The background object handle
@@ -187,23 +123,10 @@ EAPI void                         elm_bg_option_set(Evas_Object *obj, Elm_Bg_Opt
  * #ELM_BG_OPTION_LAST, on errors.
  *
  * @see elm_bg_option_set() for more details
->>>>>>> remotes/origin/upstream
  *
  * @ingroup Bg
  */
 EAPI Elm_Bg_Option                elm_bg_option_get(const Evas_Object *obj);
-<<<<<<< HEAD
-/**
- * Set the option used for the background color
- *
- * @param obj The bg object
- * @param r
- * @param g
- * @param b
- *
- * This sets the color used for the background rectangle. Its range goes
- * from 0 to 255.
-=======
 
 /**
  * Set the color on a given background widget
@@ -221,20 +144,10 @@ EAPI Elm_Bg_Option                elm_bg_option_get(const Evas_Object *obj);
  * color background.
  *
  * @see elm_bg_color_get()
->>>>>>> remotes/origin/upstream
  *
  * @ingroup Bg
  */
 EAPI void                         elm_bg_color_set(Evas_Object *obj, int r, int g, int b);
-<<<<<<< HEAD
-/**
- * Get the option used for the background color
- *
- * @param obj The bg object
- * @param r
- * @param g
- * @param b
-=======
 
 /**
  * Get the color set on a given background widget
@@ -248,30 +161,12 @@ EAPI void                         elm_bg_color_set(Evas_Object *obj, int r, int 
  * interested in: they'll be ignored by the function.
  *
  * @see elm_bg_color_get() for more details
->>>>>>> remotes/origin/upstream
  *
  * @ingroup Bg
  */
 EAPI void                         elm_bg_color_get(const Evas_Object *obj, int *r, int *g, int *b);
 
 /**
-<<<<<<< HEAD
- * Set the size of the pixmap representation of the image.
- *
- * This option just makes sense if an image is going to be set in the bg.
- *
- * @param obj The bg object
- * @param w The new width of the image pixmap representation.
- * @param h The new height of the image pixmap representation.
- *
- * This function sets a new size for pixmap representation of the given bg
- * image. It allows the image to be loaded already in the specified size,
- * reducing the memory usage and load time when loading a big image with load
- * size set to a smaller size.
- *
- * NOTE: this is just a hint, the real size of the pixmap may differ
- * depending on the type of image being loaded, being bigger than requested.
-=======
  * Set the size of the pixmap representation of the image set on a
  * given background widget.
  *
@@ -291,7 +186,6 @@ EAPI void                         elm_bg_color_get(const Evas_Object *obj, int *
  * @note This is just a hint for the underlying system. The real size
  * of the pixmap may differ depending on the type of image being
  * loaded, being bigger than requested.
->>>>>>> remotes/origin/upstream
  *
  * @ingroup Bg
  */

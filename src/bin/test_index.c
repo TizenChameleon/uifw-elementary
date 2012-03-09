@@ -1,14 +1,9 @@
 #include <Elementary.h>
-<<<<<<< HEAD
-=======
 #include "test.h"
->>>>>>> remotes/origin/upstream
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
-<<<<<<< HEAD
-=======
 struct _Idx_Data_Type
 {
    Evas_Object *id;  /* Pointer to Index */
@@ -116,7 +111,6 @@ _api_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    elm_object_disabled_set(obj, a->state == API_STATE_LAST);
 }
 
->>>>>>> remotes/origin/upstream
 static Elm_Genlist_Item_Class itci;
 char *gli_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
 {
@@ -130,17 +124,6 @@ char *gli_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part __U
 }
 
 void
-<<<<<<< HEAD
-index_changed2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
-{
-   // called on a change but delayed in case multiple changes happen in a
-   // short timespan
-   elm_genlist_item_top_bring_in(elm_object_item_data_get(event_info));
-}
-
-void
-index_changed(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-=======
 _index_delay_changed_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    // called on a change but delayed in case multiple changes happen in a
@@ -151,19 +134,12 @@ _index_delay_changed_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void
 
 void
 _index_changed_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
->>>>>>> remotes/origin/upstream
 {
    // this is calld on every change, no matter how often
    // elm_genlist_item_bring_in(event_info);
 }
 
 void
-<<<<<<< HEAD
-index_selected(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
-{
-   // called on final select
-   elm_genlist_item_top_bring_in(elm_object_item_data_get(event_info));
-=======
 _index_selected_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    // called on final select
@@ -181,47 +157,26 @@ static void
 id_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    printf("Current Index : %s\n", elm_index_item_letter_get((const Elm_Object_Item *)event_info));
->>>>>>> remotes/origin/upstream
 }
 
 void
 test_index(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-<<<<<<< HEAD
-   Evas_Object *win, *bg, *gl, *id;
-   Elm_Object_Item *glit;
-   int i, j;
-=======
    Evas_Object *win, *bg, *bxx, *gl, *id, *bt;
    Elm_Object_Item *glit;
    int i, j;
    api_data *api = calloc(1, sizeof(api_data));
->>>>>>> remotes/origin/upstream
 
    win = elm_win_add(NULL, "index", ELM_WIN_BASIC);
    elm_win_title_set(win, "Index");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-=======
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-   gl = elm_genlist_add(win);
-   evas_object_size_hint_weight_set(gl, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, gl);
-   evas_object_show(gl);
-
-   id = elm_index_add(win);
-   evas_object_size_hint_weight_set(id, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, id);
-
-=======
    bxx = elm_box_add(win);
    elm_win_resize_object_add(win, bxx);
    evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -246,7 +201,6 @@ test_index(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
    elm_box_pack_end(bxx, gl);
 
->>>>>>> remotes/origin/upstream
    evas_object_show(id);
 
    itci.item_style     = "default";
@@ -268,17 +222,6 @@ test_index(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
              char buf[32];
 
              snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 4) & 0xf));
-<<<<<<< HEAD
-             elm_index_item_append(id, buf, glit);
-          }
-        j += 2;
-     }
-   evas_object_smart_callback_add(id, "delay,changed", index_changed2, NULL);
-   evas_object_smart_callback_add(id, "changed", index_changed, NULL);
-   evas_object_smart_callback_add(id, "selected", index_selected, NULL);
-   elm_index_item_go(id, 0);
-
-=======
              elm_index_item_append(id, buf, id_cb, glit);
              if (*buf == 'G')  /* Just init dt->item later used in API test */
                api->dt.item = glit;
@@ -289,7 +232,6 @@ test_index(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    evas_object_smart_callback_add(id, "changed", _index_changed_cb, NULL);
    evas_object_smart_callback_add(id, "selected", _index_selected_cb, NULL);
    elm_index_level_go(id, 0);
->>>>>>> remotes/origin/upstream
    evas_object_resize(win, 320, 480);
    evas_object_show(win);
 }
@@ -346,11 +288,7 @@ test_index2_it_add(void *data, Evas_Object *obj __UNUSED__, void *event_info __U
    snprintf(letter, sizeof(letter), "%c", label[0]);
    list_it = elm_list_item_sorted_insert(gui->lst, label, NULL, NULL, NULL,
                                          NULL, test_index2_cmp);
-<<<<<<< HEAD
-   elm_index_item_sorted_insert(gui->id, letter, list_it, test_index2_icmp,
-=======
    elm_index_item_sorted_insert(gui->id, letter, NULL, list_it, test_index2_icmp,
->>>>>>> remotes/origin/upstream
                                 test_index2_cmp);
    elm_list_go(gui->lst);
    /* FIXME it's not showing the recently added item */
@@ -362,10 +300,6 @@ test_index2_it_del(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Test_Index2_Elements *gui = data;
    const char *label, *label_next;
-<<<<<<< HEAD
-
-=======
->>>>>>> remotes/origin/upstream
    Elm_Object_Item *list_it, *list_it_next;
    Elm_Object_Item *iit;
 
@@ -376,11 +310,7 @@ test_index2_it_del(void *data, Evas_Object *obj, void *event_info __UNUSED__)
      {
         iit = elm_index_item_find(gui->id, list_it);
         if (iit) elm_object_item_del(iit);
-<<<<<<< HEAD
-        elm_list_item_del(list_it);
-=======
         elm_object_item_del(list_it);
->>>>>>> remotes/origin/upstream
         return;
      }
 
@@ -393,11 +323,7 @@ test_index2_it_del(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    else
      elm_object_item_del(iit);
 
-<<<<<<< HEAD
-   elm_list_item_del(list_it);
-=======
    elm_object_item_del(list_it);
->>>>>>> remotes/origin/upstream
 }
 
 void
@@ -431,17 +357,10 @@ test_index2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    gui->id = elm_index_add(win);
    evas_object_size_hint_weight_set(gui->id, EVAS_HINT_EXPAND,
-<<<<<<< HEAD
-	 EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, gui->id);
-   evas_object_smart_callback_add(gui->id, "delay,changed",
-	 test_index2_id_changed, NULL);
-=======
                                     EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, gui->id);
    evas_object_smart_callback_add(gui->id, "delay,changed",
                                   test_index2_id_changed, NULL);
->>>>>>> remotes/origin/upstream
    evas_object_show(gui->id);
 
    gui->entry = elm_entry_add(win);
@@ -464,25 +383,15 @@ test_index2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    gui->lst = elm_list_add(win);
    elm_box_pack_end(box, gui->lst);
    evas_object_size_hint_weight_set(gui->lst, EVAS_HINT_EXPAND,
-<<<<<<< HEAD
-	 EVAS_HINT_EXPAND);
-   evas_object_size_hint_fill_set(gui->lst, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_smart_callback_add(gui->lst, "selected", test_index2_it_del,
-	 gui);
-=======
                                     EVAS_HINT_EXPAND);
    evas_object_size_hint_fill_set(gui->lst, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_smart_callback_add(gui->lst, "selected", test_index2_it_del,
                                   gui);
->>>>>>> remotes/origin/upstream
    elm_list_go(gui->lst);
    evas_object_show(gui->lst);
 
    evas_object_resize(win, 320, 480);
    evas_object_show(win);
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> remotes/origin/upstream
 #endif
