@@ -403,57 +403,6 @@ EINA_DEPRECATED EAPI void                         elm_hoversel_item_del_cb_set(E
 EINA_DEPRECATED EAPI void                         elm_hoversel_item_del(Elm_Object_Item *it);
 
 /**
- * Set actionslider labels.
- *
- * @param obj The actionslider object
- * @param left_label The label to be set on the left.
- * @param center_label The label to be set on the center.
- * @param right_label The label to be set on the right.
- * @deprecated use elm_object_text_set() instead.
- */
-EINA_DEPRECATED EAPI void        elm_actionslider_labels_set(Evas_Object *obj, const char *left_label, const char *center_label, const char *right_label);
-
-/**
- * Get actionslider labels.
- *
- * @param obj The actionslider object
- * @param left_label A char** to place the left_label of @p obj into.
- * @param center_label A char** to place the center_label of @p obj into.
- * @param right_label A char** to place the right_label of @p obj into.
- * @deprecated use elm_object_text_set() instead.
- */
-EINA_DEPRECATED EAPI void        elm_actionslider_labels_get(const Evas_Object *obj, const char **left_label, const char **center_label, const char **right_label);
-
-/**
- * Set the label used on the indicator.
- *
- * @param obj The actionslider object
- * @param label The label to be set on the indicator.
- * @deprecated use elm_object_text_set() instead.
- */
-EINA_DEPRECATED EAPI void        elm_actionslider_indicator_label_set(Evas_Object *obj, const char *label);
-
-/**
- * Get the label used on the indicator object.
- *
- * @param obj The actionslider object
- * @return The indicator label
- * @deprecated use elm_object_text_get() instead.
- */
-EINA_DEPRECATED EAPI const char *elm_actionslider_indicator_label_get(Evas_Object *obj);
-
-/**
- * Hold actionslider object movement.
- *
- * @param[in] obj The actionslider object
- * @param[in] flag Actionslider hold/release
- * (EINA_TURE = hold/EIN_FALSE = release)
- *
- * @ingroup Actionslider
- */
-EINA_DEPRECATED EAPI void   elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag);
-
-/**
  * Set the overlay object used for the background object.
  *
  * @param obj The bg object
@@ -698,73 +647,6 @@ EINA_DEPRECATED EAPI Evas_Object *elm_button_icon_get(const Evas_Object *obj);
 EINA_DEPRECATED EAPI Evas_Object *elm_button_icon_unset(Evas_Object *obj);
 
 /**
- * Set a day text color to the same that represents Saturdays.
- *
- * @param obj The calendar object.
- * @param pos The text position. Position is the cell counter, from left
- * to right, up to down. It starts on 0 and ends on 41.
- *
- * @deprecated use elm_calendar_mark_add() instead like:
- *
- * @code
- * struct tm t = { 0, 0, 12, 6, 0, 0, 6, 6, -1 };
- * elm_calendar_mark_add(obj, "sat", &t, ELM_CALENDAR_WEEKLY);
- * @endcode
- *
- * @see elm_calendar_mark_add()
- *
- */
-EINA_DEPRECATED EAPI void elm_calendar_text_saturday_color_set(Evas_Object *obj, int pos);
-
-/**
- * Set a day text color to the same that represents Sundays.
- *
- * @param obj The calendar object.
- * @param pos The text position. Position is the cell counter, from left
- * to right, up to down. It starts on 0 and ends on 41.
-
- * @deprecated use elm_calendar_mark_add() instead like:
- *
- * @code
- * struct tm t = { 0, 0, 12, 7, 0, 0, 0, 0, -1 };
- * elm_calendar_mark_add(obj, "sat", &t, ELM_CALENDAR_WEEKLY);
- * @endcode
- *
- * @see elm_calendar_mark_add()
- *
- */
-EINA_DEPRECATED EAPI void elm_calendar_text_sunday_color_set(Evas_Object *obj, int pos);
-
-/**
- * Set a day text color to the same that represents Weekdays.
- *
- * @param obj The calendar object
- * @param pos The text position. Position is the cell counter, from left
- * to right, up to down. It starts on 0 and ends on 41.
- *
- * @deprecated use elm_calendar_mark_add() instead like:
- *
- * @code
- * struct tm t = { 0, 0, 12, 1, 0, 0, 0, 0, -1 };
- *
- * elm_calendar_mark_add(obj, "week", &t, ELM_CALENDAR_WEEKLY); // monday
- * t.tm_tm_mday++; t.tm_wday++; t.tm_yday++;
- * elm_calendar_mark_add(obj, "week", &t, ELM_CALENDAR_WEEKLY); // tuesday
- * t.tm_tm_mday++; t.tm_wday++; t.tm_yday++;
- * elm_calendar_mark_add(obj, "week", &t, ELM_CALENDAR_WEEKLY); // wednesday
- * t.tm_tm_mday++; t.tm_wday++; t.tm_yday++;
- * elm_calendar_mark_add(obj, "week", &t, ELM_CALENDAR_WEEKLY); // thursday
- * t.tm_tm_mday++; t.tm_wday++; t.tm_yday++;
- * elm_calendar_mark_add(obj, "week", &t, ELM_CALENDAR_WEEKLY); // friday
- * @endcode
- *
- * @see elm_calendar_mark_add()
- *
- */
-EINA_DEPRECATED EAPI void elm_calendar_text_weekday_color_set(Evas_Object *obj, int pos);
-
-
-/**
  * @brief Set the text label of the check object
  *
  * @param obj The check object
@@ -884,63 +766,6 @@ EINA_DEPRECATED EAPI Evas_Object *elm_check_icon_unset(Evas_Object *obj);
 
 EINA_DEPRECATED EAPI void         elm_check_states_labels_set(Evas_Object *obj, const char *ontext, const char *offtext);
 EINA_DEPRECATED EAPI void         elm_check_states_labels_get(const Evas_Object *obj, const char **ontext, const char **offtext);
-
-
-/**
- * Set the content of the conformant widget.
- *
- * @param obj The conformant object.
- * @param content The content to be displayed by the conformant.
- *
- * Content will be sized and positioned considering the space required
- * to display a virtual keyboard. So it won't fill all the conformant
- * size. This way is possible to be sure that content won't resize
- * or be re-positioned after the keyboard is displayed.
- *
- * Once the content object is set, a previously set one will be deleted.
- * If you want to keep that old content object, use the
- * elm_object_content_unset() function.
- *
- * @see elm_object_content_unset()
- * @see elm_object_content_get()
- *
- * @deprecated use elm_object_content_set() instead
- *
- */
-EINA_DEPRECATED EAPI void         elm_conformant_content_set(Evas_Object *obj, Evas_Object *content);
-
-/**
- * Get the content of the conformant widget.
- *
- * @param obj The conformant object.
- * @return The content that is being used.
- *
- * Return the content object which is set for this widget.
- * It won't be unparent from conformant. For that, use
- * elm_object_content_unset().
- *
- * @see elm_object_content_set().
- * @see elm_object_content_unset()
- *
- * @deprecated use elm_object_content_get() instead
- *
- */
-EINA_DEPRECATED EAPI Evas_Object *elm_conformant_content_get(const Evas_Object *obj);
-
-/**
- * Unset the content of the conformant widget.
- *
- * @param obj The conformant object.
- * @return The content that was being used.
- *
- * Unparent and return the content object which was set for this widget.
- *
- * @see elm_object_content_set().
- *
- * @deprecated use elm_object_content_unset() instead
- *
- */
-EINA_DEPRECATED EAPI Evas_Object *elm_conformant_content_unset(Evas_Object *obj);
 
 /**
  * Get the side labels max length.
@@ -6020,72 +5845,6 @@ EINA_DEPRECATED EAPI void                         elm_toolbar_no_select_mode_set
  * @ingroup Toolbar
  */
 EINA_DEPRECATED EAPI Eina_Bool                    elm_toolbar_no_select_mode_get(const Evas_Object *obj);
-
-/*
- * Set the interval on time updates for a user mouse button hold
- * on clock widgets' time edition.
- *
- * @param obj The clock object
- * @param interval The (first) interval value in seconds
- *
- * This interval value is @b decreased while the user holds the
- * mouse pointer either incrementing or decrementing a given the
- * clock digit's value.
- *
- * This helps the user to get to a given time distant from the
- * current one easier/faster, as it will start to flip quicker and
- * quicker on mouse button holds.
- *
- * The calculation for the next flip interval value, starting from
- * the one set with this call, is the previous interval divided by
- * 1.05, so it decreases a little bit.
- *
- * The default starting interval value for automatic flips is
- * @b 0.85 seconds.
- *
- * @deprecated elm_clock_first_interval_set()
- *
- */
-EINA_DEPRECATED EAPI void              elm_clock_interval_set(Evas_Object *obj, double interval);
-
-/**
- * Get the interval on time updates for a user mouse button hold
- * on clock widgets' time edition.
- *
- * @param obj The clock object
- * @return The (first) interval value, in seconds, set on it
- *
- * @elm_clock_first_interval_get()
- */
-EINA_DEPRECATED EAPI double            elm_clock_interval_get(const Evas_Object *obj);
-
-/**
- * Set what digits of the given clock widget should be editable
- * when in edition mode.
- *
- * @param obj The clock object
- * @param digedit Bit mask indicating the digits to be editable
- * (values in #Elm_Clock_Edit_Mode).
- *
- * If the @p digedit param is #ELM_CLOCK_NONE, editing will be
- * disabled on @p obj (same effect as elm_clock_edit_set(), with @c
- * EINA_FALSE).
- *
- * @deprecated elm_clock_edit_mode_set()
- */
-EINA_DEPRECATED EAPI void              elm_clock_digit_edit_set(Evas_Object *obj, Elm_Clock_Edit_Mode digedit);
-
-/**
- * Retrieve what digits of the given clock widget should be
- * editable when in edition mode.
- *
- * @param obj The clock object
- * @return Bit mask indicating the digits to be editable
- * (values in #Elm_Clock_Edit_Mode).
- *
- * @deprecated elm_clock_edit_mode_get()
- */
-EINA_DEPRECATED EAPI Elm_Clock_Edit_Mode elm_clock_digit_edit_get(const Evas_Object *obj);
 
 /**
  * Enable or disable always select mode on the list object.

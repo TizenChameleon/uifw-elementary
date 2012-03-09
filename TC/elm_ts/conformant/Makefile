@@ -1,8 +1,6 @@
 CC ?= gcc
 
-TARGETS = utc_UIFW_elm_conformant_add_func \
-	  utc_UIFW_elm_conformant_content_set_func \
-	  utc_UIFW_elm_conformant_content_unset_func
+TARGETS = utc_UIFW_elm_conformant_add_func
 
 PKGS = elementary evas
 
