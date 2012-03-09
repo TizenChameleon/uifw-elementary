@@ -18,7 +18,11 @@
  * Available styles for it:
  * - @c "default"
  *
+<<<<<<< HEAD
  * Default contents parts of the diskseletor items that you can use for are:
+=======
+ * Default content parts of the diskselector items that you can use for are:
+>>>>>>> remotes/origin/upstream
  * @li "icon" - An icon in the diskselector item
  *
  * Default text parts of the diskselector items that you can use for are:
@@ -57,6 +61,7 @@ EAPI Evas_Object           *elm_diskselector_add(Evas_Object *parent);
  * Enable or disable round mode.
  *
  * @param obj The diskselector object.
+<<<<<<< HEAD
  * @param round @c EINA_TRUE to enable round mode or @c EINA_FALSE to
  * disable it.
  *
@@ -69,11 +74,29 @@ EAPI Evas_Object           *elm_diskselector_add(Evas_Object *parent);
  * @ingroup Diskselector
  */
 EAPI void                   elm_diskselector_round_set(Evas_Object *obj, Eina_Bool round);
+=======
+ * @param enabled @c EINA_TRUE to enable round mode or @c EINA_FALSE to
+ * disable it.
+ *
+ * Disabled by default. If round mode is enabled the items list will
+ * work like a circular list, so when the user reaches the last item,
+ * the first one will popup.
+ *
+ * @see elm_diskselector_round_enabled_get()
+ *
+ * @ingroup Diskselector
+ */
+EAPI void                   elm_diskselector_round_enabled_set(Evas_Object *obj, Eina_Bool enabled);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Get a value whether round mode is enabled or not.
  *
+<<<<<<< HEAD
  * @see elm_diskselector_round_set() for details.
+=======
+ * @see elm_diskselector_round_enabled_set() for details.
+>>>>>>> remotes/origin/upstream
  *
  * @param obj The diskselector object.
  * @return @c EINA_TRUE means round mode is enabled. @c EINA_FALSE indicates
@@ -81,12 +104,20 @@ EAPI void                   elm_diskselector_round_set(Evas_Object *obj, Eina_Bo
  *
  * @ingroup Diskselector
  */
+<<<<<<< HEAD
 EAPI Eina_Bool              elm_diskselector_round_get(const Evas_Object *obj);
+=======
+EAPI Eina_Bool              elm_diskselector_round_enabled_get(const Evas_Object *obj);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Get the side labels max length.
  *
+<<<<<<< HEAD
  * @see elm_diskselector_side_label_length_set() for details.
+=======
+ * @see elm_diskselector_side_text_max_length_set() for details.
+>>>>>>> remotes/origin/upstream
  *
  * @param obj The diskselector object.
  * @return The max length defined for side labels, or 0 if not a valid
@@ -94,7 +125,11 @@ EAPI Eina_Bool              elm_diskselector_round_get(const Evas_Object *obj);
  *
  * @ingroup Diskselector
  */
+<<<<<<< HEAD
 EAPI int                    elm_diskselector_side_label_length_get(const Evas_Object *obj);
+=======
+EAPI int                    elm_diskselector_side_text_max_length_get(const Evas_Object *obj);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Set the side labels max length.
@@ -116,12 +151,20 @@ EAPI int                    elm_diskselector_side_label_length_get(const Evas_Ob
  *
  * Default side label max length is 3.
  *
+<<<<<<< HEAD
  * This property will be applyed over all items, included before or
+=======
+ * This property will be applied over all items, included before or
+>>>>>>> remotes/origin/upstream
  * later this function call.
  *
  * @ingroup Diskselector
  */
+<<<<<<< HEAD
 EAPI void                   elm_diskselector_side_label_length_set(Evas_Object *obj, int len);
+=======
+EAPI void                   elm_diskselector_side_text_max_length_set(Evas_Object *obj, int len);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Set the number of items to be displayed.
@@ -129,7 +172,11 @@ EAPI void                   elm_diskselector_side_label_length_set(Evas_Object *
  * @param obj The diskselector object.
  * @param num The number of items the diskselector will display.
  *
+<<<<<<< HEAD
  * Default value is 3, and also it's the minimun. If @p num is less
+=======
+ * Default value is 3, and also it's the minimum. If @p num is less
+>>>>>>> remotes/origin/upstream
  * than 3, it will be set to 3.
  *
  * Also, it can be set on theme, using data item @c display_item_num
@@ -177,9 +224,15 @@ EAPI void                   elm_diskselector_bounce_set(Evas_Object *obj, Eina_B
  * axis is reached scrolling.
  *
  * @param obj The diskselector object.
+<<<<<<< HEAD
  * @param h_bounce Pointer where to store the bounce state of the horizontal
  * axis.
  * @param v_bounce Pointer where to store the bounce state of the vertical
+=======
+ * @param h_bounce Pointer to store the bounce state of the horizontal
+ * axis.
+ * @param v_bounce Pointer to store the bounce state of the vertical
+>>>>>>> remotes/origin/upstream
  * axis.
  *
  * @see elm_scroller_bounce_get()
@@ -195,8 +248,13 @@ EAPI void                   elm_diskselector_bounce_get(const Evas_Object *obj, 
  * @see elm_diskselector_scroller_policy_get() for details.
  *
  * @param obj The diskselector object.
+<<<<<<< HEAD
  * @param policy_h Pointer where to store horizontal scrollbar policy.
  * @param policy_v Pointer where to store vertical scrollbar policy.
+=======
+ * @param policy_h Pointer to store horizontal scrollbar policy.
+ * @param policy_v Pointer to store vertical scrollbar policy.
+>>>>>>> remotes/origin/upstream
  *
  * @ingroup Diskselector
  */
@@ -276,7 +334,11 @@ EAPI const Eina_List       *elm_diskselector_items_get(const Evas_Object *obj);
  * Associated @p data can be properly freed when item is deleted if a
  * callback function is set with elm_object_item_del_cb_set().
  *
+<<<<<<< HEAD
  * If a function is passed as argument, it will be called everytime this item
+=======
+ * If a function is passed as argument, it will be called every time this item
+>>>>>>> remotes/origin/upstream
  * is selected, i.e., the user stops the diskselector with this
  * item on center position. If such function isn't needed, just passing
  * @c NULL as @p func is enough. The same should be done for @p data.
@@ -286,7 +348,11 @@ EAPI const Eina_List       *elm_diskselector_items_get(const Evas_Object *obj);
  * disk = elm_diskselector_add(win);
  * ic = elm_icon_add(win);
  * elm_icon_file_set(ic, "path/to/image", NULL);
+<<<<<<< HEAD
  * elm_icon_scale_set(ic, EINA_TRUE, EINA_TRUE);
+=======
+ * elm_icon_resizable_set(ic, EINA_TRUE, EINA_TRUE);
+>>>>>>> remotes/origin/upstream
  * elm_diskselector_item_append(disk, "label", ic, NULL, NULL);
  * @endcode
  *
@@ -309,9 +375,15 @@ EAPI Elm_Object_Item *elm_diskselector_item_append(Evas_Object *obj, const char 
  * diskselector will be selected.
  *
  * The selected item always will be centered on diskselector, with
+<<<<<<< HEAD
  * full label displayed, i.e., max lenght set to side labels won't
  * apply on the selected item. More details on
  * elm_diskselector_side_label_length_set().
+=======
+ * full label displayed, i.e., max length set to side labels won't
+ * apply on the selected item. More details on
+ * elm_diskselector_side_text_max_length_set().
+>>>>>>> remotes/origin/upstream
  *
  * @ingroup Diskselector
  */
@@ -326,8 +398,13 @@ EAPI Elm_Object_Item *elm_diskselector_selected_item_get(const Evas_Object *obj)
  * This sets the selected state of the given item @p it.
  * @c EINA_TRUE for selected, @c EINA_FALSE for not selected.
  *
+<<<<<<< HEAD
  * If a new item is selected the previosly selected will be unselected.
  * Previoulsy selected item can be get with function
+=======
+ * If a new item is selected the previously selected will be unselected.
+ * Previously selected item can be get with function
+>>>>>>> remotes/origin/upstream
  * elm_diskselector_selected_item_get().
  *
  * If the item @p it is unselected, the first item of diskselector will
@@ -429,6 +506,7 @@ EAPI Elm_Object_Item *elm_diskselector_item_prev_get(const Elm_Object_Item *it);
  */
 EAPI Elm_Object_Item *elm_diskselector_item_next_get(const Elm_Object_Item *it);
 
+<<<<<<< HEAD
 
 /**
  * Set the cursor to be shown when mouse is over the diskselector item
@@ -532,6 +610,8 @@ EAPI void                   elm_diskselector_item_cursor_engine_only_set(Elm_Obj
  */
 EAPI Eina_Bool              elm_diskselector_item_cursor_engine_only_get(const Elm_Object_Item *it);
 
+=======
+>>>>>>> remotes/origin/upstream
 /**
  * @}
  */

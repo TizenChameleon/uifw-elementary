@@ -10,10 +10,10 @@
 
 #define N_ITEMS 30
 
-static Elm_Genlist_Item_Class _itc;
+static Elm_Genlist_Item_Class *_itc = NULL;
 
 static char *
-_item_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
+_item_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part)
 {
    time_t t = (time_t)ecore_time_unix_get();
    char buf[256];
@@ -71,7 +71,7 @@ _genlist_fill(Evas_Object *list)
 
    for (i = 0; i < N_ITEMS; i++)
      {
-	elm_genlist_item_append(list, &_itc,
+	elm_genlist_item_append(list, _itc,
 				(void *)(long)i, NULL,
 				ELM_GENLIST_ITEM_NONE,
 				_item_sel_cb, NULL);
@@ -102,25 +102,25 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    elm_win_resize_object_add(win, box);
    evas_object_show(box);
 
-   _itc.item_style = "double_label";
-   _itc.func.text_get = _item_text_get;
-   _itc.func.content_get = _item_content_get;
-   _itc.func.state_get = NULL;
-   _itc.func.del = NULL;
+   if (!_itc)
+     {
+        _itc = elm_genlist_item_class_new();
+        _itc->item_style = "double_label";
+        _itc->func.text_get = _item_label_get;
+        _itc->func.content_get = _item_content_get;
+        _itc->func.state_get = NULL;
+        _itc->func.del = NULL;
+     }
 
    list = _genlist_add(box);
    _genlist_fill(list);
 
    list = _genlist_add(box);
-   elm_genlist_horizontal_mode_set(list, ELM_LIST_LIMIT);
+   elm_genlist_mode_set(list, ELM_LIST_LIMIT);
    _genlist_fill(list);
 
    list = _genlist_add(box);
-   elm_genlist_compress_mode_set(list, EINA_TRUE);
-   _genlist_fill(list);
-
-   list = _genlist_add(box);
-   elm_genlist_height_for_width_mode_set(list, EINA_TRUE);
+   elm_genlist_mode_set(list, ELM_LIST_COMPRESS);
    _genlist_fill(list);
 
    evas_object_size_hint_min_set(bg, 800, 160);

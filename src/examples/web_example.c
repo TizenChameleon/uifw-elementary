@@ -17,7 +17,11 @@ typedef struct
 {
    Evas_Object *win;
    Evas_Object *main_box;
+<<<<<<< HEAD
    Evas_Object *pager;
+=======
+   Evas_Object *naviframe;
+>>>>>>> remotes/origin/upstream
    Evas_Object *url;
    Evas_Object *default_web;
    Evas_Object *tabs;
@@ -73,7 +77,11 @@ tab_current_set(Tab_Data *td)
    nav_button_update(td->app);
    elm_entry_icon_visible_set(td->app->url, EINA_TRUE);
 
+<<<<<<< HEAD
    elm_pager_content_promote(td->app->pager, td->web);
+=======
+   elm_naviframe_item_simple_promote(td->app->naviframe, td->web);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -151,7 +159,11 @@ tab_add(App_Data *ad)
    evas_object_size_hint_weight_set(td->web, EVAS_HINT_EXPAND,
                                     EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(td->web, EVAS_HINT_FILL, EVAS_HINT_FILL);
+<<<<<<< HEAD
    elm_pager_content_push(ad->pager, td->web);
+=======
+   elm_naviframe_item_simple_push(ad->naviframe, td->web);
+>>>>>>> remotes/origin/upstream
 
    td->app = ad;
    td->tab = elm_toolbar_item_append(td->app->tabs, NULL, "New tab",
@@ -463,7 +475,11 @@ default_content_set(Evas_Object *web)
 int
 elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
 {
+<<<<<<< HEAD
    Evas_Object *win, *bg, *box, *box2, *btn, *ic, *url, *pager, *tabs, *web;
+=======
+   Evas_Object *win, *bg, *box, *box2, *btn, *ic, *url, *naviframe, *tabs, *web;
+>>>>>>> remotes/origin/upstream
    Evas *e;
    Evas_Modifier_Mask ctrl_mask;
    App_Data *ad;
@@ -570,7 +586,11 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
 
    tabs = elm_toolbar_add(win);
    elm_toolbar_align_set(tabs, 0.0);
+<<<<<<< HEAD
    elm_toolbar_always_select_mode_set(tabs, EINA_TRUE);
+=======
+   elm_toolbar_select_mode_set(tabs, ELM_OBJECT_SELECT_MODE_ALWAYS);
+>>>>>>> remotes/origin/upstream
    elm_toolbar_homogeneous_set(tabs, EINA_FALSE);
    elm_toolbar_shrink_mode_set(tabs, ELM_TOOLBAR_SHRINK_MENU);
    evas_object_size_hint_weight_set(tabs, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -588,6 +608,7 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
    elm_icon_standard_set(ic, "close");
    elm_object_part_content_set(btn, "icon", ic);
 
+<<<<<<< HEAD
    pager = elm_pager_add(win);
    evas_object_size_hint_weight_set(pager, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(pager, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -602,12 +623,32 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
    evas_object_size_hint_weight_set(web, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(web, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_pager_content_push(pager, web);
+=======
+   naviframe = elm_naviframe_add(win);
+   evas_object_size_hint_weight_set(naviframe, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(naviframe, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(box, naviframe);
+   evas_object_show(naviframe);
+
+   elm_toolbar_menu_parent_set(tabs, naviframe);
+
+   web = elm_web_add(win);
+   elm_web_window_create_hook_set(web, _web_create_window_cb, ad);
+   elm_web_history_enabled_set(web, EINA_FALSE);
+   evas_object_size_hint_weight_set(web, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(web, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_naviframe_item_simple_push(naviframe, web);
+>>>>>>> remotes/origin/upstream
 
    default_content_set(web);
 
    ad->win = win;
    ad->main_box = box;
+<<<<<<< HEAD
    ad->pager = pager;
+=======
+   ad->naviframe = naviframe;
+>>>>>>> remotes/origin/upstream
    ad->url = url;
    ad->default_web = web;
    ad->tabs = tabs;

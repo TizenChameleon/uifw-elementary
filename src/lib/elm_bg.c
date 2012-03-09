@@ -201,10 +201,17 @@ elm_bg_add(Evas_Object *parent)
    return obj;
 }
 
+<<<<<<< HEAD
 EAPI void
 elm_bg_file_set(Evas_Object *obj, const char *file, const char *group)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
+=======
+EAPI Eina_Bool
+elm_bg_file_set(Evas_Object *obj, const char *file, const char *group)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+>>>>>>> remotes/origin/upstream
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *p;
 
@@ -219,7 +226,11 @@ elm_bg_file_set(Evas_Object *obj, const char *file, const char *group)
         wd->file = NULL;
         eina_stringshare_del(wd->group);
         wd->group = NULL;
+<<<<<<< HEAD
         return;
+=======
+        return EINA_TRUE;
+>>>>>>> remotes/origin/upstream
      }
    eina_stringshare_replace(&wd->file, file);
    eina_stringshare_replace(&wd->group, group);
@@ -239,6 +250,11 @@ elm_bg_file_set(Evas_Object *obj, const char *file, const char *group)
    edje_object_part_swallow(wd->base, "elm.swallow.background", wd->img);
    elm_widget_sub_object_add(obj, wd->img);
    _custom_resize(wd, NULL, NULL, NULL);
+<<<<<<< HEAD
+=======
+
+   return EINA_TRUE;
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -248,6 +264,11 @@ elm_bg_file_get(const Evas_Object *obj, const char **file, const char **group)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (file) *file = wd->file;
    if (group) *group = wd->group;
+<<<<<<< HEAD
+=======
+
+   return;
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -259,12 +280,21 @@ elm_bg_option_set(Evas_Object *obj, Elm_Bg_Option option)
    wd = elm_widget_data_get(obj);
    wd->option = option;
    _custom_resize(wd, NULL, NULL, NULL);
+<<<<<<< HEAD
+=======
+
+   return;
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI Elm_Bg_Option
 elm_bg_option_get(const Evas_Object *obj)
 {
+<<<<<<< HEAD
    ELM_CHECK_WIDTYPE(obj, widtype) 0;
+=======
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_BG_OPTION_LAST;
+>>>>>>> remotes/origin/upstream
    Widget_Data *wd;
 
    wd = elm_widget_data_get(obj);
@@ -286,6 +316,11 @@ elm_bg_color_set(Evas_Object *obj, int r, int g, int b)
         _custom_resize(wd, NULL, NULL, NULL);
      }
    evas_object_color_set(wd->rect, r, g, b, 255);
+<<<<<<< HEAD
+=======
+
+   return;
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -296,6 +331,7 @@ elm_bg_color_get(const Evas_Object *obj, int *r, int *g, int *b)
 
    wd = elm_widget_data_get(obj);
    evas_object_color_get(wd->rect, r, g, b, NULL);
+<<<<<<< HEAD
 }
 
 EAPI void
@@ -314,6 +350,10 @@ EAPI Evas_Object *
 elm_bg_overlay_unset(Evas_Object *obj)
 {
    return _content_unset_hook(obj, "overlay");
+=======
+
+   return;
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -328,5 +368,10 @@ elm_bg_load_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h)
    if (!wd->img) return;
    if (!(((p = strrchr(wd->file, '.'))) && (!strcasecmp(p, ".edj"))))
      evas_object_image_load_size_set(wd->img, w, h);
+<<<<<<< HEAD
+=======
+
+   return;
+>>>>>>> remotes/origin/upstream
 }
 

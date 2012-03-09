@@ -19,37 +19,59 @@
 static void
 _bt_zoom_in(void *data, Evas_Object *obj __UNUSED__, void *ev __UNUSED__)
 {
+<<<<<<< HEAD
    Evas_Object *map = data;
    int zoom;
 
    elm_map_zoom_mode_set(map, ELM_MAP_ZOOM_MODE_MANUAL);
    zoom = elm_map_zoom_get(map);
    elm_map_zoom_set(map, zoom + 1);
+=======
+   int zoom;
+   elm_map_zoom_mode_set(data, ELM_MAP_ZOOM_MODE_MANUAL);
+   zoom = elm_map_zoom_get(data);
+   elm_map_zoom_set(data, zoom + 1);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _bt_zoom_out(void *data, Evas_Object *obj __UNUSED__, void *ev __UNUSED__)
 {
+<<<<<<< HEAD
    Evas_Object *map = data;
    int zoom;
 
    elm_map_zoom_mode_set(map, ELM_MAP_ZOOM_MODE_MANUAL);
    zoom = elm_map_zoom_get(map);
    elm_map_zoom_set(map, zoom - 1);
+=======
+   int zoom;
+   elm_map_zoom_mode_set(data, ELM_MAP_ZOOM_MODE_MANUAL);
+   zoom = elm_map_zoom_get(data);
+   elm_map_zoom_set(data, zoom - 1);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _bt_zoom_fit(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    Evas_Object *map = data;
    elm_map_zoom_mode_set(map, ELM_MAP_ZOOM_MODE_AUTO_FIT);
+=======
+   elm_map_zoom_mode_set(data, ELM_MAP_ZOOM_MODE_AUTO_FIT);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
 _bt_zoom_fill(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    Evas_Object *map = data;
    elm_map_zoom_mode_set(map, ELM_MAP_ZOOM_MODE_AUTO_FILL);
+=======
+   elm_map_zoom_mode_set(data, ELM_MAP_ZOOM_MODE_AUTO_FILL);
+>>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -117,9 +139,14 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(bt);
    evas_object_smart_callback_add(bt, "clicked", _bt_zoom_fill, map);
 
+<<<<<<< HEAD
    elm_map_geo_region_show(map, -43.2, -22.9);
    elm_map_zoom_set(map, 12);
 
+=======
+   elm_map_zoom_set(map, 12);
+   elm_map_region_show(map, -43.2, -22.9);
+>>>>>>> remotes/origin/upstream
    evas_object_resize(win, 512, 512);
    evas_object_show(win);
 

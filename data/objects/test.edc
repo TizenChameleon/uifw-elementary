@@ -770,6 +770,7 @@ collections {
                   relative: 0.7 340/400;
                   to: "bg";
                }
+               align: 0.5 0.0;
             }
          }
          part { name: "btn1_bottom_padding";

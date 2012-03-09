@@ -48,7 +48,7 @@ _mbe_clicked_cb(void *data __UNUSED__,
                 void *event_info __UNUSED__ )
 {
    //Unset the multibuttonentry to contracted mode of single line
-   elm_multibuttonentry_shrink_mode_set(obj, 0);
+   elm_multibuttonentry_expanded_set(obj, EINA_TRUE);
    printf("A multibuttonentry is clicked!\n");
    Evas_Object *entry;
    entry = elm_multibuttonentry_entry_get(obj);
@@ -71,7 +71,7 @@ _mbe_unfocused_cb(void *data __UNUSED__,
                   void *event_info __UNUSED__ )
 {
    //Set the multibuttonentry to contracted mode of single line
-   elm_multibuttonentry_shrink_mode_set(obj, 1);
+   elm_multibuttonentry_expanded_set(obj, EINA_FALSE);
    printf("multibuttonentry unfocused!\n");
 }
 
@@ -94,11 +94,11 @@ _expanded_cb(void *data __UNUSED__,
 
 // "contracted" smart callback
 static void
-_shrank_cb(void *data __UNUSED__,
+_contracted_cb(void *data __UNUSED__,
            Evas_Object *obj __UNUSED__,
            void *event_info __UNUSED__)
 {
-   printf("shrank!\n");
+   printf("contracted!\n");
 }
 
 // "contracted,state,changed" smart callback
@@ -144,7 +144,7 @@ _add_multibuttonentry(Evas_Object *parent)
 
    mbe = elm_multibuttonentry_add(parent);
    elm_object_text_set(mbe, "To: ");
-   elm_multibuttonentry_guide_text_set(mbe, "Tap to add recipient");
+   elm_object_part_text_set(mbe, "guide", "Tap to add recipient");
    evas_object_size_hint_weight_set(mbe, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(mbe, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_content_set(scr, mbe);
@@ -164,7 +164,7 @@ _add_multibuttonentry(Evas_Object *parent)
    evas_object_smart_callback_add(mbe, "unfocused", _mbe_unfocused_cb, NULL);
 
    evas_object_smart_callback_add(mbe, "expanded", _expanded_cb, NULL);
-   evas_object_smart_callback_add(mbe, "shrank", _shrank_cb, NULL);
+   evas_object_smart_callback_add(mbe, "contracted", _contracted_cb, NULL);
    evas_object_smart_callback_add(mbe, "shrink,state,changed", _shrink_state_changed_cb, NULL);
 
    evas_object_resize(mbe, 220, 300);

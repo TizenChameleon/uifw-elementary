@@ -741,7 +741,7 @@ elm_scroller_propagate_events_set(Evas_Object *obj, Eina_Bool propagation)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   elm_smart_scroller_propagate_events_set(wd->scr, propagation);
+   evas_object_propagate_events_set(wd->scr, propagation);
 }
 
 EAPI Eina_Bool
@@ -751,7 +751,7 @@ elm_scroller_propagate_events_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
 
-   return elm_smart_scroller_propagate_events_get(wd->scr);
+   return evas_object_propagate_events_get(wd->scr);
 }
 
 EAPI void
@@ -772,10 +772,4 @@ elm_scroller_gravity_get(const Evas_Object *obj, double *x, double *y)
    if (!wd) return;
 
    elm_smart_scroller_gravity_get(wd->scr, x, y);
-}
-
-EAPI void
-elm_scroller_page_move_set(Evas_Object *obj, Eina_Bool set)
-{
-   return ;
 }

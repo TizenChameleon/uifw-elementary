@@ -26,7 +26,7 @@
  * Available styles for it:
  * - @c "default"
  *
- * Default contents parts of the segment control items that you can use for are:
+ * Default content parts of the segment control items that you can use for are:
  * @li "icon" - An icon in a segment control item
  *
  * Default text parts of the segment control items that you can use for are:
@@ -96,7 +96,7 @@ EAPI Evas_Object      *elm_segment_control_add(Evas_Object *parent);
  * sc = elm_segment_control_add(win);
  * ic = elm_icon_add(win);
  * elm_icon_file_set(ic, "path/to/image", NULL);
- * elm_icon_scale_set(ic, EINA_TRUE, EINA_TRUE);
+ * elm_icon_resizable_set(ic, EINA_TRUE, EINA_TRUE);
  * elm_segment_control_item_add(sc, ic, "label");
  * evas_object_show(sc);
  * @endcode
@@ -273,8 +273,8 @@ EAPI Elm_Object_Item *elm_segment_control_item_selected_get(const Evas_Object *o
  * This sets the selected state of the given item @p it.
  * @c EINA_TRUE for selected, @c EINA_FALSE for not selected.
  *
- * If a new item is selected the previosly selected will be unselected.
- * Previoulsy selected item can be get with function
+ * If a new item is selected the previously selected will be unselected.
+ * Selected item can be got with function
  * elm_segment_control_item_selected_get().
  *
  * The selected item always will be highlighted on segment control.

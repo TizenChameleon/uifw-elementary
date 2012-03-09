@@ -77,18 +77,32 @@ _populate_2(Elm_Object_Item *menu_it)
 }
 
 static void
+<<<<<<< HEAD
 _populate_1(Evas_Object *win, Elm_Object_Item *menu_it)
 {
    Elm_Object_Item *menu_it2;
    Evas_Object *radio;
 
    radio = elm_radio_add(win);
+=======
+_populate_1(Evas_Object *obj, Elm_Object_Item *menu_it)
+{
+   Elm_Object_Item *menu_it2, *menu_it3;
+   Evas_Object *radio;
+
+   radio = elm_radio_add(obj);
+>>>>>>> remotes/origin/upstream
    elm_radio_state_value_set(radio, 0);
    elm_radio_value_set(radio, 0);
    elm_object_text_set(radio, "radio in menu");
    menu_it2 = elm_menu_item_add(menu, menu_it, "object-rotate-left", "menu 1",
                                 NULL, NULL);
+<<<<<<< HEAD
    elm_menu_item_add_object(menu, menu_it, radio, NULL, NULL);
+=======
+   menu_it3 = elm_menu_item_add(menu, menu_it, NULL, NULL, NULL, NULL);
+   elm_object_item_content_set(menu_it3, radio);
+>>>>>>> remotes/origin/upstream
 
    _populate_2(menu_it2);
 }
@@ -109,6 +123,10 @@ test_menu(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info _
 
    rect = evas_object_rectangle_add(evas_object_evas_get(win));
    elm_win_resize_object_add(win, rect);
+<<<<<<< HEAD
+=======
+   evas_object_size_hint_weight_set(rect, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+>>>>>>> remotes/origin/upstream
    evas_object_color_set(rect, 0, 0, 0, 0);
    evas_object_show(rect);
 

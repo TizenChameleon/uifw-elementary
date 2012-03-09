@@ -4,12 +4,12 @@
 # This file is distributed under the same license as the elementary package.
 # Fabian Nowak <timystery@arcor.de>, 2011.
 #
-#: src/lib/elm_config.c:1417
+#: src/lib/elm_config.c:1943
 msgid ""
 msgstr ""
 "Project-Id-Version: elementary 0.7.0.57309\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2012-02-05 10:59+0900\n"
+"POT-Creation-Date: 2012-03-08 01:42+0900\n"
 "PO-Revision-Date: 2011-06-19 16:41+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@gmail.com>\n"
 "Language-Team: Dutch <vistausss@gmail.com>\n"
@@ -29,12 +29,11 @@ msgstr "Omhoog"
 msgid "Home"
 msgstr "Persoonlijke map"
 
-#: src/lib/elc_fileselector.c:1001 src/lib/elm_entry.c:1468
-#: src/lib/elm_searchbar.c:211
+#: src/lib/elc_fileselector.c:1009 src/lib/elm_entry.c:1357
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/lib/elc_fileselector.c:1011
+#: src/lib/elc_fileselector.c:1019
 msgid "OK"
 msgstr "OK"
 
@@ -42,8 +41,8 @@ msgstr "OK"
 msgid "Clicked"
 msgstr ""
 
-#: src/lib/elm_button.c:408 src/lib/elm_check.c:392 src/lib/elm_radio.c:295
-#: src/lib/elm_toolbar.c:759
+#: src/lib/elm_button.c:408 src/lib/elm_check.c:394 src/lib/elm_radio.c:295
+#: src/lib/elm_toolbar.c:886
 msgid "State: Disabled"
 msgstr ""
 
@@ -55,62 +54,46 @@ msgstr ""
 msgid "%B %Y"
 msgstr ""
 
-#: src/lib/elm_check.c:309 src/lib/elm_check.c:312 src/lib/elm_check.c:403
+#: src/lib/elm_check.c:311 src/lib/elm_check.c:314 src/lib/elm_check.c:405
 #: src/lib/elm_radio.c:231 src/lib/elm_radio.c:297
 msgid "State: On"
 msgstr ""
 
-#: src/lib/elm_check.c:322 src/lib/elm_check.c:325 src/lib/elm_check.c:412
+#: src/lib/elm_check.c:324 src/lib/elm_check.c:327 src/lib/elm_check.c:414
 #: src/lib/elm_radio.c:298
 msgid "State: Off"
 msgstr ""
 
-#: src/lib/elm_check.c:399 src/lib/elm_check.c:409
+#: src/lib/elm_check.c:401 src/lib/elm_check.c:411
 msgid "State"
 msgstr ""
 
-#: src/lib/elm_check.c:462
+#: src/lib/elm_check.c:467
 msgid "Check"
 msgstr ""
 
-#: src/lib/elm_config.c:1354
+#: src/lib/elm_config.c:1358
 msgid "default:LTR"
 msgstr "Standaard: LTR"
 
-#: src/lib/elm_datefield.c:412
-msgid "PM"
-msgstr ""
-
-#: src/lib/elm_datefield.c:413
-msgid "AM"
-msgstr ""
-
-#: src/lib/elm_datefield.c:740
-msgid "DateTimeFormat"
-msgstr ""
-
-#: src/lib/elm_entry.c:1462
+#: src/lib/elm_entry.c:1351
 msgid "Copy"
 msgstr "Kopiëren"
 
-#: src/lib/elm_entry.c:1465
+#: src/lib/elm_entry.c:1354
 msgid "Cut"
 msgstr "Knippen"
 
-#: src/lib/elm_entry.c:1479
+#: src/lib/elm_entry.c:1368
 msgid "Select"
 msgstr "Selecteren"
 
-#: src/lib/elm_entry.c:1485
+#: src/lib/elm_entry.c:1374
 msgid "Paste"
 msgstr "Plakken"
 
 #: src/lib/elm_radio.c:404
 msgid "Radio"
-msgstr ""
-
-#: src/lib/elm_searchbar.c:199
-msgid "Search"
 msgstr ""
 
 #: src/lib/elm_toggle.c:11
@@ -121,23 +104,23 @@ msgstr ""
 msgid "OFF"
 msgstr ""
 
-#: src/lib/elm_toolbar.c:676
+#: src/lib/elm_toolbar.c:802
 #, fuzzy
 msgid "Selected"
 msgstr "Selecteren"
 
-#: src/lib/elm_toolbar.c:757
+#: src/lib/elm_toolbar.c:884
 msgid "Separator"
 msgstr ""
 
-#: src/lib/elm_toolbar.c:761
+#: src/lib/elm_toolbar.c:888
 msgid "State: Selected"
 msgstr ""
 
-#: src/lib/elm_toolbar.c:763
+#: src/lib/elm_toolbar.c:890
 msgid "Has menu"
 msgstr ""
 
-#: src/lib/elm_toolbar.c:821
+#: src/lib/elm_toolbar.c:954
 msgid "Tool Item"
 msgstr ""

@@ -5,7 +5,11 @@ typedef struct _Widget_Data Widget_Data;
 
 struct _Widget_Data
 {
+<<<<<<< HEAD
    Evas_Object	            *glview_image;
+=======
+   Evas_Object              *glview_image;
+>>>>>>> remotes/origin/upstream
 
    Elm_GLView_Mode           mode;
    Elm_GLView_Resize_Policy  scale_policy;
@@ -126,6 +130,7 @@ _glview_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
         wd->w = w;
         wd->h = h;
         _glview_update_surface(data);
+<<<<<<< HEAD
         /*
         if (wd->render_func)
           {
@@ -133,6 +138,8 @@ _glview_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
              wd->render_func(data);
           }
           */
+=======
+>>>>>>> remotes/origin/upstream
      }
 }
 
@@ -381,28 +388,47 @@ elm_glview_render_policy_set(Evas_Object *obj, Elm_GLView_Render_Policy policy)
 }
 
 EAPI void
+<<<<<<< HEAD
 elm_glview_size_set(Evas_Object *obj, int width, int height)
+=======
+elm_glview_size_set(Evas_Object *obj, int w, int h)
+>>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
+<<<<<<< HEAD
    if ((width == wd->w) && (height == wd->h)) return;
    wd->w = width;
    wd->h = height;
+=======
+   if ((w == wd->w) && (h == wd->h)) return;
+   wd->w = w;
+   wd->h = h;
+>>>>>>> remotes/origin/upstream
    _glview_update_surface(obj);
    elm_glview_changed_set(obj);
 }
 
 EAPI void
+<<<<<<< HEAD
 elm_glview_size_get(const Evas_Object *obj, int *width, int *height)
+=======
+elm_glview_size_get(const Evas_Object *obj, int *w, int *h)
+>>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
+<<<<<<< HEAD
    if (width) *width = wd->w;
    if (height) *height = wd->h;
+=======
+   if (w) *w = wd->w;
+   if (h) *h = wd->h;
+>>>>>>> remotes/origin/upstream
 }
 
 EAPI void

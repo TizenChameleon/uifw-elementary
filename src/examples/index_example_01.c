@@ -40,7 +40,11 @@ _index_item_del(void        *data,
            data == elm_index_item_data_get(event_info) ? "OK" :
            "FAIL, something went wrong");
 
+<<<<<<< HEAD
    elm_list_item_del(data);
+=======
+   elm_object_item_del(data);
+>>>>>>> remotes/origin/upstream
 }
 
 /* delete an index item */
@@ -117,7 +121,10 @@ elm_main(int    argc __UNUSED__,
 {
    Evas_Object *win, *bg, *hbox, *vbox, *bt, *sep;
    Elm_Object_Item *lit;
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/origin/upstream
    unsigned int i;
    char curr = 0;
 
@@ -162,8 +169,12 @@ elm_main(int    argc __UNUSED__,
              /* indexing by first letters */
 
              snprintf(buf, sizeof(buf), "%c", curr);
+<<<<<<< HEAD
 
              elm_index_item_append(d.index, buf, lit);
+=======
+             elm_index_item_append(d.index, buf, NULL, lit);
+>>>>>>> remotes/origin/upstream
              index_it = elm_index_item_find(d.index, lit);
 
              elm_object_item_del_cb_set(index_it, _index_item_del);

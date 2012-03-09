@@ -41,6 +41,7 @@ external_map_state_set(void *data __UNUSED__, Evas_Object *obj, const void *from
 
    if (p->map_source)
      {
+<<<<<<< HEAD
 	elm_map_source_name_set(obj, p->map_source);
      }
    if (p->zoom_mode)
@@ -48,6 +49,15 @@ external_map_state_set(void *data __UNUSED__, Evas_Object *obj, const void *from
 	Elm_Map_Zoom_Mode set = _zoom_mode_get(p->zoom_mode);
 	if (set == ELM_MAP_ZOOM_MODE_LAST) return;
 	elm_map_zoom_mode_set(obj, set);
+=======
+	    elm_map_source_set(obj, ELM_MAP_SOURCE_TYPE_TILE, p->map_source);
+     }
+   if (p->zoom_mode)
+     {
+	    Elm_Map_Zoom_Mode set = _zoom_mode_get(p->zoom_mode);
+	    if (set == ELM_MAP_ZOOM_MODE_LAST) return;
+	    elm_map_zoom_mode_set(obj, set);
+>>>>>>> remotes/origin/upstream
      }
    if (p->zoom_set) elm_map_zoom_set(obj, p->zoom);
 }
@@ -59,7 +69,11 @@ external_map_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_Exter
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_CHOICE)
 	  {
+<<<<<<< HEAD
 	     elm_map_source_name_set(obj, param->s);
+=======
+	     elm_map_source_set(obj, ELM_MAP_SOURCE_TYPE_TILE, param->s);
+>>>>>>> remotes/origin/upstream
 	     return EINA_TRUE;
 	  }
      }
@@ -95,7 +109,11 @@ external_map_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_Exter
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_CHOICE)
 	  {
+<<<<<<< HEAD
 	     const char *set = elm_map_source_name_get(obj);
+=======
+	     const char *set = elm_map_source_get(obj, ELM_MAP_SOURCE_TYPE_TILE);
+>>>>>>> remotes/origin/upstream
 	     param->s = set;
 	     return EINA_TRUE;
 	  }

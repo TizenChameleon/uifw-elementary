@@ -38,16 +38,25 @@ external_icon_state_set(void *data __UNUSED__, Evas_Object *obj,
    if (p->file)
      {
         elm_icon_file_set(obj, p->file, NULL);
+<<<<<<< HEAD
 	param_icon->file = p->file;
+=======
+        param_icon->file = p->file;
+>>>>>>> remotes/origin/upstream
      }
    if (p->smooth_exists)
      {
         elm_icon_smooth_set(obj, p->smooth);
+<<<<<<< HEAD
 	param_icon->smooth = p->smooth;
+=======
+        param_icon->smooth = p->smooth;
+>>>>>>> remotes/origin/upstream
      }
    if (p->no_scale_exists)
      {
         elm_icon_no_scale_set(obj, p->no_scale);
+<<<<<<< HEAD
 	param_icon->no_scale = p->no_scale;
      }
    if (p->scale_up_exists && p->scale_down_exists)
@@ -68,16 +77,46 @@ external_icon_state_set(void *data __UNUSED__, Evas_Object *obj,
 	     elm_icon_scale_set(obj, param_icon->scale_up, p->scale_down);
 	     param_icon->scale_down = p->scale_down;
 	  }
+=======
+        param_icon->no_scale = p->no_scale;
+     }
+   if (p->scale_up_exists && p->scale_down_exists)
+     {
+        elm_icon_resizable_set(obj, p->scale_up, p->scale_down);
+        param_icon->scale_up = p->scale_up;
+        param_icon->scale_down = p->scale_down;
+     }
+   else if (p->scale_up_exists || p->scale_down_exists)
+     {
+        if (p->scale_up_exists)
+          {
+             elm_icon_resizable_set(obj, p->scale_up, param_icon->scale_down);
+             param_icon->scale_up = p->scale_up;
+          }
+        else
+          {
+             elm_icon_resizable_set(obj, param_icon->scale_up, p->scale_down);
+             param_icon->scale_down = p->scale_down;
+          }
+>>>>>>> remotes/origin/upstream
      }
    if (p->fill_outside_exists)
      {
         elm_icon_fill_outside_set(obj, p->fill_outside);
+<<<<<<< HEAD
 	param_icon->fill_outside = p->fill_outside;
+=======
+        param_icon->fill_outside = p->fill_outside;
+>>>>>>> remotes/origin/upstream
      }
    if (p->prescale_size_exists)
      {
         elm_icon_prescale_set(obj, p->prescale_size);
+<<<<<<< HEAD
 	param_icon->prescale_size = p->prescale_size;
+=======
+        param_icon->prescale_size = p->prescale_size;
+>>>>>>> remotes/origin/upstream
      }
    if (p->icon)
      {
@@ -105,6 +144,7 @@ external_icon_param_set(void *data __UNUSED__, Evas_Object *obj,
 	return ret;
      }
    else if (!strcmp(param->name, "smooth")
+<<<<<<< HEAD
 		   && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
      {
 	elm_icon_smooth_set(obj, param->i);
@@ -145,6 +185,48 @@ external_icon_param_set(void *data __UNUSED__, Evas_Object *obj,
 	elm_icon_prescale_set(obj, param->i);
 	param_icon->prescale_size = param->i;
 	return EINA_TRUE;
+=======
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        elm_icon_smooth_set(obj, param->i);
+        param_icon->smooth = param->i;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "no scale")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        elm_icon_no_scale_set(obj, param->i);
+        param_icon->no_scale = param->i;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "scale up")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        elm_icon_resizable_set(obj, param->i, param_icon->scale_down);
+        param_icon->scale_up = param->i;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "scale down")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        elm_icon_resizable_set(obj, param_icon->scale_up, param->i);
+        param_icon->scale_down = param->i;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "fill outside")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        elm_icon_fill_outside_set(obj, param->i);
+        param_icon->fill_outside = param->i;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "prescale")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+     {
+        elm_icon_prescale_set(obj, param->i);
+        param_icon->prescale_size = param->i;
+        return EINA_TRUE;
+>>>>>>> remotes/origin/upstream
      }
    else if (!strcmp(param->name, "icon"))
      {
@@ -174,6 +256,7 @@ external_icon_param_get(void *data __UNUSED__,
 		   && param->type == EDJE_EXTERNAL_PARAM_TYPE_STRING)
      {
         param->s = param_icon->file;
+<<<<<<< HEAD
 	return EINA_TRUE;
      }
    else if (!strcmp(param->name, "smooth")
@@ -211,6 +294,45 @@ external_icon_param_get(void *data __UNUSED__,
      {
         param->i = param_icon->prescale_size;
 	return EINA_TRUE;
+=======
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "smooth")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        param->i = param_icon->smooth;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "no scale")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        param->i = param_icon->no_scale;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "scale up")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        param->i = param_icon->scale_up;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "scale down")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        param->i = param_icon->scale_down;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "fill outside")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
+     {
+        param->i = param_icon->fill_outside;
+        return EINA_TRUE;
+     }
+   else if (!strcmp(param->name, "prescale")
+            && param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
+     {
+        param->i = param_icon->prescale_size;
+        return EINA_TRUE;
+>>>>>>> remotes/origin/upstream
      }
    else if (!strcmp(param->name, "icon"))
      {
@@ -239,6 +361,7 @@ external_icon_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
    EINA_LIST_FOREACH(params, l, param)
      {
         if (!strcmp(param->name, "file"))
+<<<<<<< HEAD
 	  mem->file = eina_stringshare_add(param->s);
 	else if (!strcmp(param->name, "smooth"))
 	  {
@@ -269,6 +392,38 @@ external_icon_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
 	  {
 	     mem->prescale_size = param->i;
 	     mem->prescale_size_exists = EINA_TRUE;
+=======
+          mem->file = eina_stringshare_add(param->s);
+        else if (!strcmp(param->name, "smooth"))
+          {
+             mem->smooth = param->i;
+             mem->smooth_exists = EINA_TRUE;
+          }
+        else if (!strcmp(param->name, "no scale"))
+          {
+             mem->no_scale = param->i;
+             mem->no_scale_exists = EINA_TRUE;
+          }
+        else if (!strcmp(param->name, "scale up"))
+          {
+             mem->scale_up = param->i;
+             mem->scale_up_exists = EINA_TRUE;
+          }
+        else if (!strcmp(param->name, "scale down"))
+          {
+             mem->scale_down = param->i;
+             mem->scale_down_exists = EINA_TRUE;
+          }
+        else if (!strcmp(param->name, "fill outside"))
+          {
+             mem->fill_outside = param->i;
+             mem->fill_outside_exists = EINA_TRUE;
+          }
+        else if (!strcmp(param->name, "prescale"))
+          {
+             mem->prescale_size = param->i;
+             mem->prescale_size_exists = EINA_TRUE;
+>>>>>>> remotes/origin/upstream
           }
         else if (!strcmp(param->name, "icon"))
           {

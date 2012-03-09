@@ -45,15 +45,15 @@ elm_widget.h
 includesunstabledir = $(includedir)/elementary-@VMAJ@
 
 includesub_HEADERS = \
-elc_anchorblock.h \
-elc_anchorview.h \
 elc_ctxpopup.h \
+elc_dayselector.h \
 elc_fileselector_button.h \
 elc_fileselector_entry.h \
 elc_fileselector.h \
 elc_hoversel.h \
 elc_multibuttonentry.h \
 elc_naviframe.h \
+elc_popup.h \
 elm_actionslider.h \
 elm_app.h \
 elm_authors.h \
@@ -66,27 +66,23 @@ elm_calendar.h \
 elm_check.h \
 elm_clock.h \
 elm_cnp.h \
-elm_colorpalette.h \
 elm_colorselector.h \
 elm_config.h \
 elm_conform.h \
 elm_controlbar.h \
 elm_cursor.h \
-elm_datefield.h \
-elm_dayselector.h \
+elm_datetime.h \
 elm_debug.h \
 elm_deprecated.h \
-elm_deprecated_before.h \
 elm_diskselector.h \
-elm_engine.h \
 elm_entry.h \
-elm_factory.h \
 elm_finger.h \
 elm_flip.h \
 elm_flipselector.h \
 elm_focus.h \
-elm_fonts.h \
+elm_font.h \
 elm_frame.h \
+elm_gen.h \
 elm_general.h \
 elm_gengrid.h \
 elm_genlist.h \
@@ -97,7 +93,6 @@ elm_grid.h \
 elm_hover.h \
 elm_icon.h \
 elm_image.h \
-elm_imageslider.h \
 elm_plug.h \
 elm_index.h \
 elm_intro.h \
@@ -110,18 +105,13 @@ elm_map.h \
 elm_menu.h \
 elm_mirroring.h \
 elm_need.h \
-elm_nocontents.h \
 elm_notify.h \
 elm_object.h \
 elm_object_item.h \
-elm_pagecontrol.h \
-elm_pager.h \
 elm_panel.h \
 elm_panes.h \
-elm_password.h \
 elm_photocam.h \
 elm_photo.h \
-elm_popup.h \
 elm_progressbar.h \
 elm_radio.h \
 elm_route.h \
@@ -133,12 +123,10 @@ elm_separator.h \
 elm_slider.h \
 elm_slideshow.h \
 elm_spinner.h \
-elm_stackedicon.h \
 elm_store.h \
 elm_table.h \
 elm_theme.h \
 elm_thumb.h \
-elm_tickernoti.h \
 elm_toolbar.h \
 elm_tooltip.h \
 elm_transit.h \
@@ -149,9 +137,9 @@ includesubdir = $(includedir)/elementary-@VMAJ@/
 
 libelementary_la_SOURCES = \
 elm_priv.h \
-elc_anchorblock.c \
-elc_anchorview.c \
 elc_ctxpopup.c \
+elc_dayselector.c \
+elc_popup.c \
 elc_fileselector_button.c \
 elc_fileselector.c \
 elc_fileselector_entry.c \
@@ -169,23 +157,18 @@ elm_button.c \
 elm_calendar.c \
 elm_check.c \
 elm_clock.c \
-elm_cnp_helper.c \
-elm_colorpalette.c \
+elm_cnp.c \
 elm_colorselector.c \
 elm_config.c \
 elm_conform.c \
 elm_controlbar.c \
-elm_datefield.c \
-elm_dayselector.c \
+elm_datetime.c \
 elm_diskselector.c \
-elm_editfield.c \
 elm_entry.c \
-elm_factory.c \
 elm_flip.c \
 elm_flipselector.c \
 elm_font.c \
 elm_frame.c \
-elm_gen.c \
 elm_gengrid.c \
 elm_genlist.c \
 elm_gen_common.h \
@@ -195,7 +178,6 @@ elm_grid.c \
 elm_hover.c \
 elm_icon.c \
 elm_image.c \
-elm_imageslider.c \
 elm_plug.c \
 elm_index.c \
 elm_label.c \
@@ -206,31 +188,24 @@ elm_mapbuf.c \
 elm_map.c \
 elm_menu.c \
 elm_module.c \
-elm_nocontents.c \
 elm_notify.c \
-elm_pagecontrol.c \
-elm_pager.c \
 elm_panel.c \
 elm_panes.c \
 elm_photo.c \
 elm_photocam.c \
-elm_popup.c \
 elm_progressbar.c \
 elm_radio.c \
 elm_route.c \
 elm_scroller.c \
-elm_searchbar.c \
 elm_segment_control.c \
 elm_separator.c \
 elm_slider.c \
 elm_slideshow.c \
 elm_spinner.c \
-elm_stackedicon.c \
 elm_store.c \
 elm_table.c \
 elm_theme.c \
 elm_thumb.c \
-elm_tickernoti.c \
 elm_toggle.c \
 elm_toolbar.c \
 elm_transit.c \
@@ -275,3 +250,7 @@ libelementary_la_LIBADD = \
 libelementary_la_LDFLAGS = \
 -no-undefined @lt_enable_auto_import@ \
 -version-info @version_info@ @release_info@
+
+EXTRA_DIST = \
+elm_factory.h \
+elm_factory.c

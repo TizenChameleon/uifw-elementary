@@ -89,9 +89,9 @@ _theme_hook(Evas_Object *obj)
      edje_object_part_swallow(wd->panes, "elm.swallow.left", wd->contents.left);
    if (wd->contents.right)
      edje_object_part_swallow(wd->panes, "elm.swallow.right", wd->contents.right);
-   if(wd->contents.left && wd->contents.right)
+   if (wd->contents.left && wd->contents.right)
      edje_object_signal_emit(wd->panes, "elm.panes.pair", "elm");
-   if(wd->fixed)
+   if (wd->fixed)
      edje_object_signal_emit(wd->panes, "elm.panes.fixed", "elm");
 
    edje_object_scale_set(wd->panes, elm_widget_scale_get(obj) *
@@ -179,6 +179,7 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
         _sizing_eval(obj);
      }
 }
+
 
 static void
 _clicked(void *data, Evas_Object *obj __UNUSED__ , const char *emission __UNUSED__, const char *source __UNUSED__)
@@ -372,37 +373,37 @@ elm_panes_add(Evas_Object *parent)
    return obj;
 }
 
-EAPI void
+EINA_DEPRECATED EAPI void
 elm_panes_content_left_set(Evas_Object *obj, Evas_Object *content)
 {
    _content_set_hook(obj, "left", content);
 }
 
-EAPI void
+EINA_DEPRECATED EAPI void
 elm_panes_content_right_set(Evas_Object *obj, Evas_Object *content)
 {
    _content_set_hook(obj, "right", content);
 }
 
-EAPI Evas_Object *
+EINA_DEPRECATED EAPI Evas_Object *
 elm_panes_content_left_get(const Evas_Object *obj)
 {
    return _content_get_hook(obj, "left");
 }
 
-EAPI Evas_Object *
+EINA_DEPRECATED EAPI Evas_Object *
 elm_panes_content_right_get(const Evas_Object *obj)
 {
    return _content_get_hook(obj, "right");
 }
 
-EAPI Evas_Object *
+EINA_DEPRECATED EAPI Evas_Object *
 elm_panes_content_left_unset(Evas_Object *obj)
 {
    return _content_unset_hook(obj, "left");
 }
 
-EAPI Evas_Object *
+EINA_DEPRECATED EAPI Evas_Object *
 elm_panes_content_right_unset(Evas_Object *obj)
 {
    return _content_unset_hook(obj, "right");
@@ -433,6 +434,18 @@ elm_panes_content_left_size_set(Evas_Object *obj, double size)
      edje_object_part_drag_value_set(wd->panes, "elm.bar", 0.0, size);
    else
      edje_object_part_drag_value_set(wd->panes, "elm.bar", size, 0.0);
+}
+
+EAPI double
+elm_panes_content_right_size_get(const Evas_Object *obj)
+{
+   return (1.0 - elm_panes_content_left_size_get(obj));
+}
+
+EAPI void
+elm_panes_content_right_size_set(Evas_Object *obj, double size)
+{
+   elm_panes_content_left_size_set(obj, (1.0 - size));
 }
 
 EAPI void

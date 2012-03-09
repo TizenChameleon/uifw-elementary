@@ -14,39 +14,6 @@
  */
 
 /**
- * Get the global scaling factor
- *
- * This gets the globally configured scaling factor that is applied to all
- * objects.
- *
- * @return The scaling factor
- * @ingroup Scaling
- */
-EAPI double elm_scale_get(void);
-
-/**
- * Set the global scaling factor
- *
- * This sets the globally configured scaling factor that is applied to all
- * objects.
- *
- * @param scale The scaling factor to set
- * @ingroup Scaling
- */
-EAPI void   elm_scale_set(double scale);
-
-/**
- * Set the global scaling factor for all applications on the display
- *
- * This sets the globally configured scaling factor that is applied to all
- * objects for all applications.
- * @param scale The scaling factor to set
- * @ingroup Scaling
- */
-// XXX: deprecate and replace with elm_config_all_flush()
-EAPI void   elm_scale_all_set(double scale);
-
-/**
  * Set the scaling factor for a given Elementary object
  *
  * @param obj The Elementary to operate on

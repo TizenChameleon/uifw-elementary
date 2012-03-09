@@ -70,7 +70,6 @@ struct _Smart_Data
       Eina_Bool bounce_x_hold : 1;
       Eina_Bool bounce_y_hold : 1;
       Eina_Bool scroll : 1;
-      Eina_Bool want_reset : 1;
    } down;
 
    struct {
@@ -116,7 +115,6 @@ struct _Smart_Data
    Eina_Bool bounce_animator_disabled :1;
    Eina_Bool is_mirrored : 1;
    Eina_Bool wheel_disabled : 1;
-   Eina_Bool event_propagation :1;
 };
 
 /* local subsystem functions */
@@ -1297,22 +1295,6 @@ elm_smart_scroller_single_dir_get(Evas_Object *obj)
 }
 
 void
-elm_smart_scroller_propagate_events_set(Evas_Object *obj, Eina_Bool propagation)
-{
-   API_ENTRY return;
-   sd->event_propagation = propagation;
-
-   evas_object_propagate_events_set(sd->edje_obj, propagation);
-}
-
-Eina_Bool
-elm_smart_scroller_propagate_events_get(Evas_Object *obj)
-{
-   API_ENTRY return EINA_FALSE;
-   return sd->event_propagation;
-}
-
-void
 elm_smart_scroller_object_theme_set(Evas_Object *parent, Evas_Object *obj, const char *clas, const char *group, const char *style)
 {
    API_ENTRY return;
@@ -1792,10 +1774,6 @@ _smart_event_mouse_down(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSE
         sd->down.dragged_began = EINA_FALSE;
         sd->down.hold_parent = EINA_FALSE;
         sd->down.cancelled = EINA_FALSE;
-        if(sd->hold || sd->freeze)
-           sd->down.want_reset = EINA_TRUE;
-        else
-           sd->down.want_reset = EINA_FALSE;
      }
 }
 
@@ -2418,12 +2396,6 @@ _smart_event_mouse_move(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *
                          y = sd->down.sy - (ev->cur.canvas.y - sd->down.y);
                        else
                          y = sd->down.sy;
-                       if(sd->down.want_reset)
-                         {
-                            sd->down.x = ev->cur.canvas.x;
-                            sd->down.y = ev->cur.canvas.y;
-                            sd->down.want_reset = EINA_FALSE;
-                         }
                        if ((sd->down.dir_x) || (sd->down.dir_y))
                          {
                             if (!sd->down.locked)

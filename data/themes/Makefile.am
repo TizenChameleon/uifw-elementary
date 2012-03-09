@@ -29,7 +29,6 @@ widgets/notify.edc \
 widgets/slider.edc \
 widgets/button.edc \
 widgets/gengrid.edc \
-widgets/pager.edc \
 widgets/slideshow.edc \
 widgets/calendar.edc \
 widgets/genlist.edc \
@@ -62,6 +61,10 @@ widgets/win.edc \
 widgets/entry.edc \
 widgets/map.edc \
 widgets/scroller.edc \
+widgets/pointer.edc \
+widgets/datetime.edc \
+widgets/dayselector.edc \
+widgets/popup.edc \
 ews.edc \
 arrow_down.png \
 arrow_up.png \
@@ -313,7 +316,21 @@ mp_play.png \
 mp_prev.png \
 mp_rewind.png \
 mp_stop.png \
-access_glow.png
+access_glow.png \
+pointer_glint_01.png \
+pointer_glint_02.png \
+pointer_glint_03.png \
+pointer_glint_04.png \
+pointer_glint_05.png \
+pointer_glint_06.png \
+pointer_glint_07.png \
+pointer_glint_08.png \
+pointer_glint_09.png \
+pointer_glint_10.png \
+pointer_glint_11.png \
+pointer_glint_12.png \
+pointer_glow.png \
+pointer.png
 
 default.edj: Makefile $(EXTRA_DIST)
 	$(EDJE_CC) $(EDJE_FLAGS) \

@@ -72,7 +72,11 @@
  * sent to the Layout theme (with elm_object_signal_emit()) and the theme
  * handled the signal by changing the box padding, or align, or both. Using
  * the Elementary @ref Box widget is not necessarily harder or easier, it
+<<<<<<< HEAD
  * just depends on the circunstances and requirements.
+=======
+ * just depends on the circumstances and requirements.
+>>>>>>> remotes/origin/upstream
  *
  * The Layout Box can be used through the @c elm_layout_box_* set of
  * functions.
@@ -181,7 +185,11 @@ EAPI Eina_Bool                    elm_layout_file_set(Evas_Object *obj, const ch
  * Set the edje group from the elementary theme that will be used as layout
  *
  * @param obj The layout object
+<<<<<<< HEAD
  * @param clas the clas of the group
+=======
+ * @param clas the class of the group
+>>>>>>> remotes/origin/upstream
  * @param group the group
  * @param style the style to used
  *
@@ -197,6 +205,10 @@ EAPI Eina_Bool                    elm_layout_theme_set(Evas_Object *obj, const c
  * @param obj the layout object
  * @param part the box part to which the object will be appended.
  * @param child the child object to append to box.
+<<<<<<< HEAD
+=======
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+>>>>>>> remotes/origin/upstream
  *
  * Once the object is appended, it will become child of the layout. Its
  * lifetime will be bound to the layout, whenever the layout dies the child
@@ -210,7 +222,11 @@ EAPI Eina_Bool                    elm_layout_theme_set(Evas_Object *obj, const c
  *
  * @ingroup Layout
  */
+<<<<<<< HEAD
 EAPI void                         elm_layout_box_append(Evas_Object *obj, const char *part, Evas_Object *child);
+=======
+EAPI Eina_Bool                    elm_layout_box_append(Evas_Object *obj, const char *part, Evas_Object *child);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Prepend child to layout box part.
@@ -218,6 +234,10 @@ EAPI void                         elm_layout_box_append(Evas_Object *obj, const 
  * @param obj the layout object
  * @param part the box part to prepend.
  * @param child the child object to prepend to box.
+<<<<<<< HEAD
+=======
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+>>>>>>> remotes/origin/upstream
  *
  * Once the object is prepended, it will become child of the layout. Its
  * lifetime will be bound to the layout, whenever the layout dies the child
@@ -231,7 +251,11 @@ EAPI void                         elm_layout_box_append(Evas_Object *obj, const 
  *
  * @ingroup Layout
  */
+<<<<<<< HEAD
 EAPI void                         elm_layout_box_prepend(Evas_Object *obj, const char *part, Evas_Object *child);
+=======
+EAPI Eina_Bool                    elm_layout_box_prepend(Evas_Object *obj, const char *part, Evas_Object *child);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Insert child to layout box part before a reference object.
@@ -240,6 +264,10 @@ EAPI void                         elm_layout_box_prepend(Evas_Object *obj, const
  * @param part the box part to insert.
  * @param child the child object to insert into box.
  * @param reference another reference object to insert before in box.
+<<<<<<< HEAD
+=======
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+>>>>>>> remotes/origin/upstream
  *
  * Once the object is inserted, it will become child of the layout. Its
  * lifetime will be bound to the layout, whenever the layout dies the child
@@ -253,7 +281,11 @@ EAPI void                         elm_layout_box_prepend(Evas_Object *obj, const
  *
  * @ingroup Layout
  */
+<<<<<<< HEAD
 EAPI void                         elm_layout_box_insert_before(Evas_Object *obj, const char *part, Evas_Object *child, const Evas_Object *reference);
+=======
+EAPI Eina_Bool                    elm_layout_box_insert_before(Evas_Object *obj, const char *part, Evas_Object *child, const Evas_Object *reference);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Insert child to layout box part at a given position.
@@ -262,6 +294,10 @@ EAPI void                         elm_layout_box_insert_before(Evas_Object *obj,
  * @param part the box part to insert.
  * @param child the child object to insert into box.
  * @param pos the numeric position >=0 to insert the child.
+<<<<<<< HEAD
+=======
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+>>>>>>> remotes/origin/upstream
  *
  * Once the object is inserted, it will become child of the layout. Its
  * lifetime will be bound to the layout, whenever the layout dies the child
@@ -275,7 +311,11 @@ EAPI void                         elm_layout_box_insert_before(Evas_Object *obj,
  *
  * @ingroup Layout
  */
+<<<<<<< HEAD
 EAPI void                         elm_layout_box_insert_at(Evas_Object *obj, const char *part, Evas_Object *child, unsigned int pos);
+=======
+EAPI Eina_Bool                    elm_layout_box_insert_at(Evas_Object *obj, const char *part, Evas_Object *child, unsigned int pos);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Remove a child of the given part box.
@@ -304,6 +344,10 @@ EAPI Evas_Object                 *elm_layout_box_remove(Evas_Object *obj, const 
  * @param clear If EINA_TRUE, then all objects will be deleted as
  *        well, otherwise they will just be removed and will be
  *        dangling on the canvas.
+<<<<<<< HEAD
+=======
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+>>>>>>> remotes/origin/upstream
  *
  * The objects will be removed from the box part and their lifetime will
  * not be handled by the layout anymore. This is equivalent to
@@ -314,7 +358,11 @@ EAPI Evas_Object                 *elm_layout_box_remove(Evas_Object *obj, const 
  *
  * @ingroup Layout
  */
+<<<<<<< HEAD
 EAPI void                         elm_layout_box_remove_all(Evas_Object *obj, const char *part, Eina_Bool clear);
+=======
+EAPI Eina_Bool                    elm_layout_box_remove_all(Evas_Object *obj, const char *part, Eina_Bool clear);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Insert child to layout table part.
@@ -327,6 +375,10 @@ EAPI void                         elm_layout_box_remove_all(Evas_Object *obj, co
  * @param colspan how many columns should be used to store this object. (>=
  *        1)
  * @param rowspan how many rows should be used to store this object. (>= 1)
+<<<<<<< HEAD
+=======
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+>>>>>>> remotes/origin/upstream
  *
  * Once the object is inserted, it will become child of the table. Its
  * lifetime will be bound to the layout, and whenever the layout dies the
@@ -349,7 +401,11 @@ EAPI void                         elm_layout_box_remove_all(Evas_Object *obj, co
  *
  * @ingroup Layout
  */
+<<<<<<< HEAD
 EAPI void                         elm_layout_table_pack(Evas_Object *obj, const char *part, Evas_Object *child_obj, unsigned short col, unsigned short row, unsigned short colspan, unsigned short rowspan);
+=======
+EAPI Eina_Bool                    elm_layout_table_pack(Evas_Object *obj, const char *part, Evas_Object *child_obj, unsigned short col, unsigned short row, unsigned short colspan, unsigned short rowspan);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Unpack (remove) a child of the given part table.
@@ -378,6 +434,10 @@ EAPI Evas_Object                 *elm_layout_table_unpack(Evas_Object *obj, cons
  * @param clear If EINA_TRUE, then all objects will be deleted as
  *        well, otherwise they will just be removed and will be
  *        dangling on the canvas.
+<<<<<<< HEAD
+=======
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+>>>>>>> remotes/origin/upstream
  *
  * The objects will be removed from the table part and their lifetime will
  * not be handled by the layout anymore. This is equivalent to
@@ -388,7 +448,11 @@ EAPI Evas_Object                 *elm_layout_table_unpack(Evas_Object *obj, cons
  *
  * @ingroup Layout
  */
+<<<<<<< HEAD
 EAPI void                         elm_layout_table_clear(Evas_Object *obj, const char *part, Eina_Bool clear);
+=======
+EAPI Eina_Bool                    elm_layout_table_clear(Evas_Object *obj, const char *part, Eina_Bool clear);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Get the edje layout
@@ -504,10 +568,18 @@ EAPI const char                  *elm_layout_part_cursor_get(const Evas_Object *
  * @param obj The layout object.
  * @param part_name a part from loaded edje group, that had a cursor set
  *        with elm_layout_part_cursor_set().
+<<<<<<< HEAD
  *
  * @ingroup Layout
  */
 EAPI void                         elm_layout_part_cursor_unset(Evas_Object *obj, const char *part_name);
+=======
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+ *
+ * @ingroup Layout
+ */
+EAPI Eina_Bool                    elm_layout_part_cursor_unset(Evas_Object *obj, const char *part_name);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Sets a specific cursor style for an edje part.
@@ -586,7 +658,11 @@ EAPI Eina_Bool                    elm_layout_part_cursor_engine_only_get(const E
 
 /**
  * @def elm_layout_icon_get
+<<<<<<< HEAD
  * Convienience macro to get the icon object from a layout that follows the
+=======
+ * Convenience macro to get the icon object from a layout that follows the
+>>>>>>> remotes/origin/upstream
  * Elementary naming convention for its parts.
  *
  * @ingroup Layout
@@ -596,7 +672,11 @@ EAPI Eina_Bool                    elm_layout_part_cursor_engine_only_get(const E
 
 /**
  * @def elm_layout_end_set
+<<<<<<< HEAD
  * Convienience macro to set the end object in a layout that follows the
+=======
+ * Convenience macro to set the end object in a layout that follows the
+>>>>>>> remotes/origin/upstream
  * Elementary naming convention for its parts.
  *
  * @ingroup Layout
@@ -612,7 +692,11 @@ EAPI Eina_Bool                    elm_layout_part_cursor_engine_only_get(const E
 
 /**
  * @def elm_layout_end_get
+<<<<<<< HEAD
  * Convienience macro to get the end object in a layout that follows the
+=======
+ * Convenience macro to get the end object in a layout that follows the
+>>>>>>> remotes/origin/upstream
  * Elementary naming convention for its parts.
  *
  * @ingroup Layout

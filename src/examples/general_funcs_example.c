@@ -39,7 +39,7 @@ _btn_focus_cb(void        *data __UNUSED__,
               Evas_Object *obj __UNUSED__,
               void        *event __UNUSED__)
 {
-   elm_object_focus(d.btn);
+   elm_object_focus_set(d.btn, EINA_TRUE);
 }
 
 static void
@@ -48,7 +48,7 @@ _btn_unfocus_cb(void        *data __UNUSED__,
               Evas_Object *obj __UNUSED__,
               void        *event __UNUSED__)
 {
-   elm_object_unfocus(d.btn);
+   elm_object_focus_set(d.btn, EINA_FALSE);
 }
 
 static void
@@ -120,7 +120,7 @@ elm_main(int    argc __UNUSED__,
    elm_object_content_set(frame, d.btn);
 
    fprintf(stdout, "Elementary's finger size is set to %d pixels\n.",
-           elm_finger_size_get());
+           elm_config_finger_size_get());
    elm_coords_finger_size_adjust(0, NULL, 3, &h);
    /* so, button will be 3 fingers tall */
    evas_object_size_hint_min_set(d.btn, 0, h);

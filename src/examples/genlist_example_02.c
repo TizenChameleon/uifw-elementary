@@ -11,10 +11,10 @@
 
 #define N_ITEMS 300
 
-static Elm_Genlist_Item_Class _itc;
+static Elm_Genlist_Item_Class *_itc = NULL;
 
 static char *
-_item_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
+_item_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
 {
    time_t t = (time_t)ecore_time_unix_get();
    char buf[256];
@@ -55,30 +55,30 @@ _show_status_cb(void *data, Evas_Object *o __UNUSED__, void *event_info __UNUSED
 {
    Evas_Object *list = data;
    Evas_Coord x, y, w, h, mx, my;
-   Elm_Object_Item *it = elm_genlist_selected_item_get(list);
+   Elm_Object_Item *glit = elm_genlist_selected_item_get(list);
 
    const Eina_List *selected, *l, *realized;
-   printf("\nfirst selected item: %p\n", it);
+   printf("\nfirst selected item: %p\n", glit);
 
    selected = elm_genlist_selected_items_get(list);
    printf("all selected items (%d): ", eina_list_count(selected));
-   EINA_LIST_FOREACH(selected, l, it)
-     printf("%p ", it);
+   EINA_LIST_FOREACH(selected, l, glit)
+     printf("%p ", glit);
    printf("\n");
 
    realized = elm_genlist_realized_items_get(list);
    printf("realized items (%d): ", eina_list_count(realized));
-   EINA_LIST_FOREACH(realized, l, it)
-      printf("%p  ", it);
+   EINA_LIST_FOREACH(realized, l, glit)
+     printf("%p  ", glit);
    printf("\n");
-   printf("genlist mode: %s\n", elm_genlist_mode_get(list));
-   printf("mode item: %p\n", elm_genlist_mode_item_get(list));
+   printf("genlist mode: %s\n", elm_genlist_decorate_mode_get(list));
+   printf("mode item: %p\n", elm_genlist_decorated_item_get(list));
 
    evas_object_geometry_get(list, &x, &y, &w, &h);
    mx = w / 2 + x;
    my = h / 2 + y;
-   it = elm_genlist_at_xy_item_get(list, mx, my, NULL);
-   printf("item in the middle of the screen: %p\n", it);
+   glit = elm_genlist_at_xy_item_get(list, mx, my, NULL);
+   printf("item in the middle of the screen: %p\n", glit);
 }
 
 static void
@@ -114,48 +114,54 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
 
    list = elm_genlist_add(win);
 
-   _itc.item_style = "default";
-   _itc.func.text_get = _item_text_get;
-   _itc.func.content_get = _item_content_get;
-   _itc.func.state_get = NULL;
-   _itc.func.del = NULL;
+   if (!_itc)
+     {
+        _itc = elm_genlist_item_class_new();
+        _itc->item_style = "default";
+        _itc->func.text_get = _item_label_get;
+        _itc->func.content_get = _item_content_get;
+        _itc->func.state_get = NULL;
+        _itc->func.del = NULL;
+     }
 
-   Eina_Bool hbounce, vbounce;
+   Eina_Bool hbounce, vbounce, always, no_sel;
    Elm_Scroller_Policy hp, vp;
+   Elm_Object_Select_Mode sel_mode;
+
+   always = no_sel = EINA_FALSE;
+   sel_mode = elm_genlist_select_mode_get(list);
+   if (sel_mode = ELM_OBJECT_SELECT_MODE_ALWAYS)
+     always = EINA_TRUE;
+   else if (sel_mode = ELM_OBJECT_SELECT_MODE_NONE)
+     no_sel = EINA_TRUE;
 
    printf("default values:\n");
-   printf("always select: %d\n", elm_genlist_always_select_mode_get(list));
+   printf("always select: %d\n", always);
    elm_genlist_bounce_get(list, &hbounce, &vbounce);
    printf("bounce - horizontal: %d, vertical: %d\n", hbounce, vbounce);
-   printf("compress mode: %d\n", elm_genlist_compress_mode_get(list));
    printf("homogeneous: %d\n", elm_genlist_homogeneous_get(list));
-   printf("horizontal mode: %d\n", elm_genlist_horizontal_mode_get(list));
+   printf("horizontal mode: %d\n", elm_genlist_mode_get(list));
    printf("longpress timeout: %0.3f\n",
 	  elm_genlist_longpress_timeout_get(list));
    printf("multi selection: %d\n", elm_genlist_multi_select_get(list));
-   printf("no selection mode: %d\n", elm_genlist_no_select_mode_get(list));
-   printf("height for width enabled: %d\n",
-	  elm_genlist_height_for_width_mode_get(list));
+   printf("no selection mode: %d\n", no_sel);
    elm_genlist_scroller_policy_get(list, &hp, &vp);
    printf("scroller policy - horizontal: %d, vertical: %d\n", hp, vp);
    printf("block count: %d\n", elm_genlist_block_count_get(list));
    printf("\n");
 
-   elm_genlist_always_select_mode_set(list, EINA_FALSE);
    elm_genlist_bounce_set(list, EINA_FALSE, EINA_FALSE);
-   elm_genlist_compress_mode_set(list, EINA_TRUE);
    elm_genlist_homogeneous_set(list, EINA_FALSE);
-   elm_genlist_horizontal_mode_set(list, ELM_LIST_LIMIT);
+   elm_genlist_mode_set(list, ELM_LIST_LIMIT);
    elm_genlist_multi_select_set(list, EINA_TRUE);
-   elm_genlist_no_select_mode_set(list, EINA_FALSE);
-   elm_genlist_height_for_width_mode_set(list, EINA_FALSE);
+   elm_genlist_select_mode_set(list, ELM_OBJECT_SELECT_MODE_DEFAULT);
    elm_genlist_scroller_policy_set(list, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_ON);
    elm_genlist_longpress_timeout_set(list, 0.5);
    elm_genlist_block_count_set(list, 16);
 
    for (i = 0; i < N_ITEMS; i++)
      {
-	elm_genlist_item_append(list, &_itc,
+	elm_genlist_item_append(list, _itc,
 				(void *)(long)i, NULL,
 				ELM_GENLIST_ITEM_NONE,
 				_item_sel_cb, NULL);

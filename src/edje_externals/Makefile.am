@@ -30,15 +30,11 @@ module_la_SOURCES = private.h \
 modules.inc \
 elm.c \
 elm_actionslider.c \
-elm_anchorblock.c \
-elm_anchorview.c \
 elm_bubble.c \
 elm_button.c \
 elm_calendar.c \
 elm_check.c \
 elm_clock.c \
-elm_colorpalette.c \
-elm_datefield.c \
 elm_entry.c \
 elm_fileselector.c \
 elm_fileselector_button.c \
@@ -54,16 +50,12 @@ elm_list.c \
 elm_map.c \
 elm_multibuttonentry.c \
 elm_naviframe.c \
-elm_nocontents.c \
 elm_notify.c \
-elm_page_control.c \
-elm_pager.c \
 elm_panes.c \
 elm_photocam.c \
 elm_progressbar.c \
 elm_radio.c \
 elm_scroller.c \
-elm_searchbar.c \
 elm_segment_control.c \
 elm_slider.c \
 elm_slideshow.c \
@@ -74,5 +66,5 @@ elm_toolbar.c \
 elm_video.c \
 elm_web.c
 
-module_la_LIBADD = $(top_builddir)/src/lib/libelementary.la
+module_la_LIBADD = @ELEMENTARY_LIBS@ $(top_builddir)/src/lib/libelementary.la
 module_la_LDFLAGS = -no-undefined -module -avoid-version -shared -fPIC

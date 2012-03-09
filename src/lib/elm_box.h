@@ -271,7 +271,7 @@ EAPI void                elm_box_unpack_all(Evas_Object *obj);
  *
  * @param obj The box object
  */
-EAPI const Eina_List    *elm_box_children_get(const Evas_Object *obj);
+EAPI Eina_List    *elm_box_children_get(const Evas_Object *obj);
 
 /**
  * Set the space (padding) between the box's elements.
@@ -299,7 +299,7 @@ EAPI void                elm_box_padding_set(Evas_Object *obj, Evas_Coord horizo
 EAPI void                elm_box_padding_get(const Evas_Object *obj, Evas_Coord *horizontal, Evas_Coord *vertical);
 
 /**
- * Set the alignment of the whole bouding box of contents.
+ * Set the alignment of the whole bounding box of contents.
  *
  * Sets how the bounding box containing all the elements of the box, after
  * their sizes and position has been calculated, will be aligned within
@@ -312,7 +312,7 @@ EAPI void                elm_box_padding_get(const Evas_Object *obj, Evas_Coord 
 EAPI void                elm_box_align_set(Evas_Object *obj, double horizontal, double vertical);
 
 /**
- * Get the alignment of the whole bouding box of contents.
+ * Get the alignment of the whole bounding box of contents.
  *
  * @param obj The box object
  * @param horizontal The horizontal alignment of elements
@@ -368,7 +368,7 @@ EAPI void                elm_box_recalculate(Evas_Object *obj);
  *
  * @see elm_box_layout_transition()
  */
-EAPI void                elm_box_layout_set(Evas_Object *obj, Evas_Object_Box_Layout cb, const void *data, void (*free_data)(void *data));
+EAPI void                elm_box_layout_set(Evas_Object *obj, Evas_Object_Box_Layout cb, const void *data, Ecore_Cb free_data);
 
 /**
  * Special layout function that animates the transition from one layout to another
@@ -435,7 +435,7 @@ EAPI void                elm_box_layout_transition(Evas_Object *obj, Evas_Object
  * @see elm_box_transition_new
  * @see elm_box_layout_transition
  */
-EAPI Elm_Box_Transition *elm_box_transition_new(const double duration, Evas_Object_Box_Layout start_layout, void *start_layout_data, void (*start_layout_free_data)(void *data), Evas_Object_Box_Layout end_layout, void *end_layout_data, void (*end_layout_free_data)(void *data), void (*transition_end_cb)(void *data), void *transition_end_data);
+EAPI Elm_Box_Transition *elm_box_transition_new(const double duration, Evas_Object_Box_Layout start_layout, void *start_layout_data, void (*start_layout_free_data)(void *data), Evas_Object_Box_Layout end_layout, void *end_layout_data, Ecore_Cb end_layout_free_data, Ecore_Cb transition_end_cb, void *transition_end_data);
 
 /**
  * Free a Elm_Box_Transition instance created with elm_box_transition_new().

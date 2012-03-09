@@ -271,10 +271,17 @@ EAPI Eina_Bool             elm_icon_smooth_get(const Evas_Object *obj);
  * This function disables scaling of the icon object through the function
  * elm_object_scale_set(). However, this does not affect the object
  * size/resize in any way. For that effect, take a look at
+<<<<<<< HEAD
  * elm_icon_scale_set().
  *
  * @see elm_icon_no_scale_get()
  * @see elm_icon_scale_set()
+=======
+ * elm_icon_resizable_set().
+ *
+ * @see elm_icon_no_scale_get()
+ * @see elm_icon_resizable_set()
+>>>>>>> remotes/origin/upstream
  * @see elm_object_scale_set()
  *
  * @ingroup Icon
@@ -297,6 +304,7 @@ EAPI Eina_Bool             elm_icon_no_scale_get(const Evas_Object *obj);
  * Set if the object is (up/down) resizable.
  *
  * @param obj The icon object
+<<<<<<< HEAD
  * @param scale_up A bool to set if the object is resizable up. Default is
  * @c EINA_TRUE.
  * @param scale_down A bool to set if the object is resizable down. Default
@@ -311,11 +319,28 @@ EAPI Eina_Bool             elm_icon_no_scale_get(const Evas_Object *obj);
  * @ingroup Icon
  */
 EAPI void                  elm_icon_scale_set(Evas_Object *obj, Eina_Bool scale_up, Eina_Bool scale_down);
+=======
+ * @param size_up A bool to set if the object is resizable up. Default is
+ * @c EINA_TRUE.
+ * @param size_down A bool to set if the object is resizable down. Default
+ * is @c EINA_TRUE.
+ *
+ * This function limits the icon object resize ability. If @p size_up is set to
+ * @c EINA_FALSE, the object can't have its height or width resized to a value
+ * higher than the original icon size. Same is valid for @p size_down.
+ *
+ * @see elm_icon_resizable_get()
+ *
+ * @ingroup Icon
+ */
+EAPI void                  elm_icon_resizable_set(Evas_Object *obj, Eina_Bool size_up, Eina_Bool size_down);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Get if the object is (up/down) resizable.
  *
  * @param obj The icon object
+<<<<<<< HEAD
  * @param scale_up A bool to set if the object is resizable up
  * @param scale_down A bool to set if the object is resizable down
  *
@@ -324,6 +349,16 @@ EAPI void                  elm_icon_scale_set(Evas_Object *obj, Eina_Bool scale_
  * @ingroup Icon
  */
 EAPI void                  elm_icon_scale_get(const Evas_Object *obj, Eina_Bool *scale_up, Eina_Bool *scale_down);
+=======
+ * @param size_up A bool to set if the object is resizable up
+ * @param size_down A bool to set if the object is resizable down
+ *
+ * @see elm_icon_resizable_set()
+ *
+ * @ingroup Icon
+ */
+EAPI void                  elm_icon_resizable_get(const Evas_Object *obj, Eina_Bool *size_up, Eina_Bool *size_down);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Get the object's image size
@@ -452,10 +487,17 @@ EAPI Elm_Icon_Lookup_Order elm_icon_order_lookup_get(const Evas_Object *obj);
  * Enable or disable preloading of the icon
  *
  * @param obj The icon object
+<<<<<<< HEAD
  * @param disable If EINA_TRUE, preloading will be disabled
  * @ingroup Icon
  */
 EAPI void                  elm_icon_preload_set(Evas_Object *obj, Eina_Bool disable);
+=======
+ * @param disabled If EINA_TRUE, preloading will be disabled
+ * @ingroup Icon
+ */
+EAPI void                  elm_icon_preload_disabled_set(Evas_Object *obj, Eina_Bool disabled);
+>>>>>>> remotes/origin/upstream
 
 /**
  * Get if the icon supports animation or not.
@@ -466,7 +508,11 @@ EAPI void                  elm_icon_preload_set(Evas_Object *obj, Eina_Bool disa
  *
  * Return if this elm icon's image can be animated. Currently Evas only
  * supports gif animation. If the return value is EINA_FALSE, other
+<<<<<<< HEAD
  * elm_icon_animated_XXX APIs won't work.
+=======
+ * elm_icon_animated_xxx APIs won't work.
+>>>>>>> remotes/origin/upstream
  * @ingroup Icon
  */
 EAPI Eina_Bool             elm_icon_animated_available_get(const Evas_Object *obj);
@@ -475,7 +521,11 @@ EAPI Eina_Bool             elm_icon_animated_available_get(const Evas_Object *ob
  * Set animation mode of the icon.
  *
  * @param obj The icon object
+<<<<<<< HEAD
  * @param anim @c EINA_TRUE if the object do animation job,
+=======
+ * @param animated @c EINA_TRUE if the object do animation job,
+>>>>>>> remotes/origin/upstream
  * @c EINA_FALSE otherwise. Default is @c EINA_FALSE.
  *
  * Since the default animation mode is set to EINA_FALSE,
@@ -504,7 +554,11 @@ EAPI Eina_Bool             elm_icon_animated_get(const Evas_Object *obj);
  * @param play @c EINA_TRUE the object play animation images,
  * @c EINA_FALSE otherwise. Default is @c EINA_FALSE.
  *
+<<<<<<< HEAD
  * To play elm icon's animation, set play to EINA_TURE.
+=======
+ * To play elm icon's animation, set play to EINA_TRUE.
+>>>>>>> remotes/origin/upstream
  * For example, you make gif player using this set/get API and click event.
  * This literally lets you control current play or paused state. To have
  * this work with animated GIF files for example, you first, before
@@ -512,7 +566,11 @@ EAPI Eina_Bool             elm_icon_animated_get(const Evas_Object *obj);
  * at all on the icon.
  *
  * 1. Click event occurs
+<<<<<<< HEAD
  * 2. Check play flag using elm_icon_animaged_play_get
+=======
+ * 2. Check play flag using elm_icon_animated_play_get
+>>>>>>> remotes/origin/upstream
  * 3. If elm icon was playing, set play to EINA_FALSE.
  *    Then animation will be stopped and vice versa
  * @ingroup Icon
@@ -531,5 +589,38 @@ EAPI void                  elm_icon_animated_play_set(Evas_Object *obj, Eina_Boo
 EAPI Eina_Bool             elm_icon_animated_play_get(const Evas_Object *obj);
 
 /**
+<<<<<<< HEAD
+=======
+ * Set whether the original aspect ratio of the icon should be kept on resize.
+ *
+ * @param obj The icon object.
+ * @param fixed @c EINA_TRUE if the icon should retain the aspect,
+ * @c EINA_FALSE otherwise.
+ *
+ * The original aspect ratio (width / height) of the icon is usually
+ * distorted to match the object's size. Enabling this option will retain
+ * this original aspect, and the way that the icon is fit into the object's
+ * area depends on the option set by elm_icon_fill_outside_set().
+ *
+ * @see elm_icon_aspect_fixed_get()
+ * @see elm_icon_fill_outside_set()
+ *
+ * @ingroup Icon
+ */
+EAPI void             elm_icon_aspect_fixed_set(Evas_Object *obj, Eina_Bool fixed);
+
+/**
+ * Get if the object retains the original aspect ratio.
+ *
+ * @param obj The icon object.
+ * @return @c EINA_TRUE if the object keeps the original aspect, @c EINA_FALSE
+ * otherwise.
+ *
+ * @ingroup Icon
+ */
+EAPI Eina_Bool        elm_icon_aspect_fixed_get(const Evas_Object *obj);
+
+/**
+>>>>>>> remotes/origin/upstream
  * @}
  */

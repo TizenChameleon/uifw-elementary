@@ -3,25 +3,178 @@
 # include "elementary_config.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
+<<<<<<< HEAD
+=======
+struct _api_data
+{
+   unsigned int state;  /* What state we are testing       */
+   void *box;           /* box used in set_api_state       */
+};
+typedef struct _api_data api_data;
+
+enum _api_state
+{
+   STATE_MARK_MONTHLY,
+   STATE_MARK_WEEKLY,
+   STATE_SUNDAY_HIGHLIGHT,
+   STATE_SELECT_DATE_DISABLED_WITH_MARKS,
+   STATE_SELECT_DATE_DISABLED_NO_MARKS,
+   API_STATE_LAST
+};
+typedef enum _api_state api_state;
+
+static void
+set_api_state(api_data *api)
+{
+   const Eina_List *items = elm_box_children_get(api->box);
+   static Elm_Calendar_Mark *m = NULL;
+   if(!eina_list_count(items))
+     return;
+
+   switch(api->state)
+     { /* Put all api-changes under switch */
+      case STATE_MARK_MONTHLY:
+           {
+              Evas_Object *cal = eina_list_nth(items, 0);
+              time_t sec_per_day = (60*60*24);
+              time_t sec_per_year = sec_per_day * 365;
+              time_t the_time = (sec_per_year * 41) + (sec_per_day * 9); /* Set date to DEC 31, 2010 */
+              elm_calendar_min_max_year_set(cal, 2010, 2011);
+              m = elm_calendar_mark_add(cal, "checked", gmtime(&the_time), ELM_CALENDAR_MONTHLY);
+              elm_calendar_selected_time_set(cal, gmtime(&the_time));
+           }
+         break;
+      case STATE_MARK_WEEKLY:
+           {
+              Evas_Object *cal = eina_list_nth(items, 0);
+              time_t sec_per_day = (60*60*24);
+              time_t sec_per_year = sec_per_day * 365;
+              time_t the_time = (sec_per_year * 41) + (sec_per_day * 4); /* Set date to DEC 26, 2010 */
+              elm_calendar_mark_del(m);
+              m = elm_calendar_mark_add(cal, "checked", gmtime(&the_time), ELM_CALENDAR_WEEKLY);
+              elm_calendar_selected_time_set(cal, gmtime(&the_time));
+           }
+         break;
+      case STATE_SUNDAY_HIGHLIGHT:
+           {
+              Evas_Object *cal = eina_list_nth(items, 0);
+              time_t sec_per_day = (60*60*24);
+              time_t sec_per_year = sec_per_day * 365;
+              time_t the_time = (sec_per_year * 41) + (sec_per_day * 3); /* Set date to DEC 25, 2010 */
+              /* elm_calendar_mark_del(m); */
+              m = elm_calendar_mark_add(cal, "holiday", gmtime(&the_time), ELM_CALENDAR_WEEKLY);
+              elm_calendar_selected_time_set(cal, gmtime(&the_time));
+           }
+         break;
+      case STATE_SELECT_DATE_DISABLED_WITH_MARKS:
+           {
+              Evas_Object *cal = eina_list_nth(items, 0);
+              time_t sec_per_day = (60*60*24);
+              time_t sec_per_year = sec_per_day * 365;
+              time_t the_time = (sec_per_year * 41) + (sec_per_day * 10); /* Set date to JAN 01, 2011 */
+              elm_calendar_day_selection_disabled_set(cal, EINA_TRUE);
+              elm_calendar_selected_time_set(cal, gmtime(&the_time));
+           }
+         break;
+      case STATE_SELECT_DATE_DISABLED_NO_MARKS:
+           {
+              Evas_Object *cal = eina_list_nth(items, 0);
+              time_t sec_per_day = (60*60*24);
+              time_t sec_per_year = sec_per_day * 365;
+              time_t the_time = (sec_per_year * 41) + (sec_per_day * 40); /* Set date to FEB 01, 2011 */
+              elm_calendar_marks_clear(cal);
+              elm_calendar_day_selection_disabled_set(cal, EINA_TRUE);
+              elm_calendar_selected_time_set(cal, gmtime(&the_time));
+           }
+         break;
+      case API_STATE_LAST:
+         break;
+      default:
+         return;
+     }
+}
+
+static void
+_api_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
+{  /* Will add here a SWITCH command containing code to modify test-object */
+   /* in accordance a->state value. */
+   api_data *a = data;
+   char str[128];
+
+   printf("clicked event on API Button: api_state=<%d>\n", a->state);
+   set_api_state(a);
+   a->state++;
+   sprintf(str, "Next API function (%u)", a->state);
+   elm_object_text_set(obj, str);
+   elm_object_disabled_set(obj, a->state == API_STATE_LAST);
+}
+
+static void
+_cleanup_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   free(data);
+}
+>>>>>>> remotes/origin/upstream
 
 /* A simple test, just displaying calendar in it's default state */
 void
 test_calendar(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
+<<<<<<< HEAD
    Evas_Object *win, *bg, *cal;
+=======
+   Evas_Object *win, *bg, *cal, *bx, *bxx, *bt;
+   api_data *api = calloc(1, sizeof(api_data));
+>>>>>>> remotes/origin/upstream
 
    win = elm_win_add(NULL, "calendar", ELM_WIN_BASIC);
    elm_win_title_set(win, "Calendar");
    elm_win_autodel_set(win, EINA_TRUE);
+<<<<<<< HEAD
+=======
+   evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
+>>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
+<<<<<<< HEAD
    cal = elm_calendar_add(win);
    elm_win_resize_object_add(win, cal);
    evas_object_size_hint_weight_set(cal, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+=======
+   bxx = elm_box_add(win);
+   elm_win_resize_object_add(win, bxx);
+   evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_show(bxx);
+
+   bx = elm_box_add(win);
+   evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   api->box = bx;
+   evas_object_show(bx);
+
+   bt = elm_button_add(win);
+   elm_object_text_set(bt, "Next API function");
+   evas_object_smart_callback_add(bt, "clicked", _api_bt_clicked, (void *) api);
+   elm_box_pack_end(bxx, bt);
+   elm_object_disabled_set(bt, api->state == API_STATE_LAST);
+   evas_object_show(bt);
+
+   elm_box_pack_end(bxx, bx);
+
+   cal = elm_calendar_add(win);
+   evas_object_size_hint_weight_set(cal, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_box_pack_end(bx, cal);
+
+   time_t sec_per_day = (60*60*24);
+   time_t sec_per_year = sec_per_day * 365;
+   time_t the_time = (sec_per_year * 41) + (sec_per_day * 9); /* Set date to DEC 31, 2010 */
+   elm_calendar_selected_time_set(cal, gmtime(&the_time));
+   elm_calendar_min_max_year_set(cal, 2010, 2012);
+
+>>>>>>> remotes/origin/upstream
    evas_object_show(cal);
 
    evas_object_show(win);
@@ -35,13 +188,20 @@ _print_cal_info(Evas_Object *cal, Evas_Object *en)
    int year_min, year_max;
    Eina_Bool sel_enabled;
    const char **wds;
+<<<<<<< HEAD
    struct tm stime;
 
    if (!elm_calendar_selected_time_get(cal, &stime))
+=======
+   struct tm stm;
+
+   if (!elm_calendar_selected_time_get(cal, &stm))
+>>>>>>> remotes/origin/upstream
      return;
 
    interval = elm_calendar_interval_get(cal);
    elm_calendar_min_max_year_get(cal, &year_min, &year_max);
+<<<<<<< HEAD
    sel_enabled = elm_calendar_day_selection_enabled_get(cal);
    wds = elm_calendar_weekdays_names_get(cal);
 
@@ -52,6 +212,18 @@ _print_cal_info(Evas_Object *cal, Evas_Object *en)
 	 stime.tm_mday, stime.tm_mon, stime.tm_year + 1900, stime.tm_wday,
 	 interval, year_min, year_max, sel_enabled,
 	 wds[0], wds[1], wds[2], wds[3], wds[4], wds[5], wds[6]);
+=======
+   sel_enabled = !elm_calendar_day_selection_disabled_get(cal);
+   wds = elm_calendar_weekdays_names_get(cal);
+
+   snprintf(info, sizeof(info),
+            "  Day: %i, Mon: %i, Year %i, WeekDay: %i<br/>"
+            "  Interval: %0.2f, Year_Min: %i, Year_Max %i, Sel Enabled : %i<br/>"
+            "  Weekdays: %s, %s, %s, %s, %s, %s, %s<br/>",
+            stm.tm_mday, stm.tm_mon, stm.tm_year + 1900, stm.tm_wday,
+            interval, year_min, year_max, sel_enabled,
+            wds[0], wds[1], wds[2], wds[3], wds[4], wds[5], wds[6]);
+>>>>>>> remotes/origin/upstream
 
    elm_object_text_set(en, info);
 }
@@ -63,10 +235,17 @@ _print_cal_info_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 }
 
 static char *
+<<<<<<< HEAD
 _format_month_year(struct tm *stime)
 {
    char buf[32];
    if (!strftime(buf, sizeof(buf), "%b %y", stime)) return NULL;
+=======
+_format_month_year(struct tm *stm)
+{
+   char buf[32];
+   if (!strftime(buf, sizeof(buf), "%b %y", stm)) return NULL;
+>>>>>>> remotes/origin/upstream
    return strdup(buf);
 }
 
@@ -115,7 +294,11 @@ test_calendar2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    cal2 = elm_calendar_add(win);
    evas_object_size_hint_weight_set(cal2, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(cal2, EVAS_HINT_FILL, EVAS_HINT_FILL);
+<<<<<<< HEAD
    elm_calendar_day_selection_enabled_set(cal2, EINA_FALSE);
+=======
+   elm_calendar_day_selection_disabled_set(cal2, EINA_TRUE);
+>>>>>>> remotes/origin/upstream
    evas_object_show(cal2);
    elm_box_pack_end(bxh, cal2);
 
@@ -167,7 +350,11 @@ test_calendar2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    current_time = time(NULL) - 5 * 84600;
    localtime_r(&current_time, &selected_time);
    mark = elm_calendar_mark_add(cal, "holiday", &selected_time,
+<<<<<<< HEAD
 	 ELM_CALENDAR_WEEKLY);
+=======
+                                ELM_CALENDAR_WEEKLY);
+>>>>>>> remotes/origin/upstream
 
    current_time = time(NULL) + 1 * 84600;
    localtime_r(&current_time, &selected_time);

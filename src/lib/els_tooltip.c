@@ -282,12 +282,18 @@ _elm_tooltip_reconfigure(Elm_Tooltip *tt)
              if (str && (!strcmp(str, "enabled")))
                {
                   elm_win_alpha_set(tt->tt_win, EINA_TRUE);
+<<<<<<< HEAD
                   elm_win_transparent_set(tt->tt_win, EINA_TRUE);
+=======
+>>>>>>> remotes/origin/upstream
                }
              else
                {
                   elm_win_alpha_set(tt->tt_win, EINA_FALSE);
+<<<<<<< HEAD
                   elm_win_transparent_set(tt->tt_win, EINA_FALSE);
+=======
+>>>>>>> remotes/origin/upstream
                }
           }
 
@@ -896,6 +902,7 @@ elm_object_tooltip_style_get(const Evas_Object *obj)
 }
 
 /**
+<<<<<<< HEAD
  * Get the configured tooltip delay
  *
  * This gets the globally configured tooltip delay in seconds
@@ -927,12 +934,18 @@ elm_tooltip_delay_set(double delay)
 }
 
 /**
+=======
+>>>>>>> remotes/origin/upstream
  * @brief Disable size restrictions on an object's tooltip
  * @param obj The tooltip's anchor object
  * @param disable If EINA_TRUE, size restrictions are disabled
  * @return EINA_FALSE on failure, EINA_TRUE on success
  *
+<<<<<<< HEAD
  * This function allows a tooltip to expand beyond its parant window's canvas.
+=======
+ * This function allows a tooltip to expand beyond its parent window's canvas.
+>>>>>>> remotes/origin/upstream
  * It will instead be limited only by the size of the display.
  */
 EAPI Eina_Bool
@@ -948,7 +961,11 @@ elm_object_tooltip_window_mode_set(Evas_Object *obj, Eina_Bool disable)
  * @return If EINA_TRUE, size restrictions are disabled
  *
  * This function returns whether a tooltip is allowed to expand beyond
+<<<<<<< HEAD
  * its parant window's canvas.
+=======
+ * its parent window's canvas.
+>>>>>>> remotes/origin/upstream
  * It will instead be limited only by the size of the display.
  */
 EAPI Eina_Bool

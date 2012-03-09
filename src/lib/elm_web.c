@@ -138,6 +138,7 @@ static const Evas_Smart_Cb_Description _elm_web_callback_names[] = {
    { NULL, NULL }
 };
 
+<<<<<<< HEAD
 static void
 _theme_hook(Evas_Object *obj)
 {
@@ -150,10 +151,21 @@ _theme_hook(Evas_Object *obj)
 
    themes = elm_theme_list_get(theme);
    EINA_LIST_FOREACH(themes, l, th)
+=======
+#ifdef HAVE_ELEMENTARY_WEB
+static char *
+_webkit_theme_find(const Eina_List *list)
+{
+   const Eina_List *l;
+   const char *th;
+
+   EINA_LIST_FOREACH(list, l, th)
+>>>>>>> remotes/origin/upstream
      {
         char *path = elm_theme_list_item_path_get(th, NULL);
         if (!path) continue;
         if (edje_file_group_exists(path, "webkit/base"))
+<<<<<<< HEAD
           {
              view_theme = path;
              break;
@@ -161,6 +173,37 @@ _theme_hook(Evas_Object *obj)
         free(path);
      }
 
+=======
+          return path;
+        free(path);
+     }
+
+   return NULL;
+}
+#endif
+
+static void
+_theme_hook(Evas_Object *obj)
+{
+#ifdef HAVE_ELEMENTARY_WEB
+   Elm_Theme *theme = elm_object_theme_get(obj);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   const Eina_List *themes;
+   char *view_theme = NULL;
+
+   themes = elm_theme_overlay_list_get(theme);
+   view_theme = _webkit_theme_find(themes);
+   if (view_theme) goto set;
+
+   themes = elm_theme_list_get(theme);
+   view_theme = _webkit_theme_find(themes);
+   if (view_theme) goto set;
+
+   themes = elm_theme_extension_list_get(theme);
+   view_theme = _webkit_theme_find(themes);
+
+set:
+>>>>>>> remotes/origin/upstream
    if (view_theme)
      {
         ewk_view_theme_set(wd->ewk_view, view_theme);
@@ -900,11 +943,19 @@ _ewk_view_popup_create_cb(void *data, Evas_Object *obj, void *event_info)
      return;
 
    notify = elm_notify_add(obj);
+<<<<<<< HEAD
    elm_notify_repeat_events_set(notify, EINA_FALSE);
    elm_notify_orient_set(notify, ELM_NOTIFY_ORIENT_BOTTOM);
 
    list = elm_list_add(obj);
    elm_list_always_select_mode_set(list, EINA_TRUE);
+=======
+   elm_notify_allow_events_set(notify, EINA_FALSE);
+   elm_notify_orient_set(notify, ELM_NOTIFY_ORIENT_BOTTOM);
+
+   list = elm_list_add(obj);
+   elm_list_select_mode_set(data, ELM_OBJECT_SELECT_MODE_ALWAYS);
+>>>>>>> remotes/origin/upstream
    elm_list_bounce_set(list, EINA_FALSE, EINA_FALSE);
    elm_list_mode_set(list, ELM_LIST_EXPAND);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -1532,9 +1583,21 @@ elm_web_navigate(Evas_Object *obj, int steps)
 #endif
 }
 
+<<<<<<< HEAD
 EAPI Eina_Bool
 elm_web_back_possible(Evas_Object *obj)
 {
+=======
+EINA_DEPRECATED EAPI Eina_Bool
+elm_web_back_possible(Evas_Object *obj)
+{
+   return elm_web_back_possible_get(obj);
+}
+
+EAPI Eina_Bool
+elm_web_back_possible_get(Evas_Object *obj)
+{
+>>>>>>> remotes/origin/upstream
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
 #ifdef HAVE_ELEMENTARY_WEB
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1545,9 +1608,21 @@ elm_web_back_possible(Evas_Object *obj)
 #endif
 }
 
+<<<<<<< HEAD
 EAPI Eina_Bool
 elm_web_forward_possible(Evas_Object *obj)
 {
+=======
+EINA_DEPRECATED EAPI Eina_Bool
+elm_web_forward_possible(Evas_Object *obj)
+{
+   return elm_web_forward_possible_get(obj);
+}
+
+EAPI Eina_Bool
+elm_web_forward_possible_get(Evas_Object *obj)
+{
+>>>>>>> remotes/origin/upstream
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
 #ifdef HAVE_ELEMENTARY_WEB
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1572,9 +1647,21 @@ elm_web_navigate_possible(Evas_Object *obj, int steps)
 #endif
 }
 
+<<<<<<< HEAD
 EAPI Eina_Bool
 elm_web_history_enable_get(const Evas_Object *obj)
 {
+=======
+EINA_DEPRECATED EAPI Eina_Bool
+elm_web_history_enable_get(const Evas_Object *obj)
+{
+   return elm_web_history_enabled_get(obj);
+}
+
+EAPI Eina_Bool
+elm_web_history_enabled_get(const Evas_Object *obj)
+{
+>>>>>>> remotes/origin/upstream
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
 #ifdef HAVE_ELEMENTARY_WEB
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1585,9 +1672,21 @@ elm_web_history_enable_get(const Evas_Object *obj)
 #endif
 }
 
+<<<<<<< HEAD
 EAPI void
 elm_web_history_enable_set(Evas_Object *obj, Eina_Bool enable)
 {
+=======
+EINA_DEPRECATED EAPI void
+elm_web_history_enable_set(Evas_Object *obj, Eina_Bool enable)
+{
+   elm_web_history_enabled_set(obj, enable);
+}
+
+EAPI void
+elm_web_history_enabled_set(Evas_Object *obj, Eina_Bool enable)
+{
+>>>>>>> remotes/origin/upstream
    ELM_CHECK_WIDTYPE(obj, widtype);
 #ifdef HAVE_ELEMENTARY_WEB
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -1829,6 +1928,7 @@ elm_web_window_features_unref(Elm_Web_Window_Features *wf)
 #endif
 }
 
+<<<<<<< HEAD
 EAPI void
 elm_web_window_features_bool_property_get(const Elm_Web_Window_Features *wf, Eina_Bool *toolbar_visible, Eina_Bool *statusbar_visible, Eina_Bool *scrollbars_visible, Eina_Bool *menubar_visible, Eina_Bool *locationbar_visible, Eina_Bool *fullscreen)
 {
@@ -1838,6 +1938,55 @@ elm_web_window_features_bool_property_get(const Elm_Web_Window_Features *wf, Ein
                                          scrollbars_visible, menubar_visible,
                                          locationbar_visible, fullscreen);
 #else
+=======
+EAPI Eina_Bool
+elm_web_window_features_property_get(const Elm_Web_Window_Features *wf, Elm_Web_Window_Feature_Flag flag)
+{
+#ifdef HAVE_ELEMENTARY_WEB
+   Eina_Bool toolbar_visible, statusbar_visible;
+   Eina_Bool scrollbars_visible, menubar_visible;
+   Eina_Bool locationbar_visible, fullscreen;
+
+   ewk_window_features_bool_property_get((const Ewk_Window_Features *)wf,
+                                         &toolbar_visible, &statusbar_visible,
+                                         &scrollbars_visible, &menubar_visible,
+                                         &locationbar_visible, &fullscreen);
+
+   //TODO : Improve ewk API usage to get one value.
+   //
+   switch(flag)
+     {
+        case ELM_WEB_WINDOW_FEATURE_TOOLBAR:
+            return toolbar_visible;
+            break;
+        case ELM_WEB_WINDOW_FEATURE_STATUSBAR:
+            return statusbar_visible;
+            break;
+        case ELM_WEB_WINDOW_FEATURE_SCROLLBARS:
+            return scrollbars_visible;
+            break;
+        case ELM_WEB_WINDOW_FEATURE_MENUBAR:
+            return menubar_visible;
+            break;
+        case ELM_WEB_WINDOW_FEATURE_LOCATIONBAR:
+            return locationbar_visible;
+            break;
+        case ELM_WEB_WINDOW_FEATURE_FULLSCREEN:
+            return fullscreen;
+            break;
+     }
+#else
+
+   if (!wf) return EINA_FALSE;
+   if (flag==ELM_WEB_WINDOW_FEATURE_TOOLBAR)
+     {
+        //TODO Handle unused variable warnings when
+        //ewk is not installed.
+     }
+
+   /* What to do with these ?
+    
+>>>>>>> remotes/origin/upstream
    (void)wf;
    (void)toolbar_visible;
    (void)statusbar_visible;
@@ -1845,21 +1994,46 @@ elm_web_window_features_bool_property_get(const Elm_Web_Window_Features *wf, Ein
    (void)menubar_visible;
    (void)locationbar_visible;
    (void)fullscreen;
+<<<<<<< HEAD
 #endif
 }
 
 EAPI void
 elm_web_window_features_int_property_get(const Elm_Web_Window_Features *wf, int *x, int *y, int *w, int *h)
+=======
+
+   */
+
+#endif
+   return EINA_FALSE;
+}
+
+EAPI void
+elm_web_window_features_region_get(const Elm_Web_Window_Features *wf, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h)
+>>>>>>> remotes/origin/upstream
 {
 #ifdef HAVE_ELEMENTARY_WEB
    ewk_window_features_int_property_get((const Ewk_Window_Features *)wf,
                                         x, y, w, h);
 #else
+<<<<<<< HEAD
+=======
+
+   if (!wf || !x || !y || !w || !h) return;
+   /* What to do with these ?
+    
+>>>>>>> remotes/origin/upstream
    (void)wf;
    (void)x;
    (void)y;
    (void)w;
    (void)h;
+<<<<<<< HEAD
+=======
+
+   */
+
+>>>>>>> remotes/origin/upstream
 #endif
 }
 
