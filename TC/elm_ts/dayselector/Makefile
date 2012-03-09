@@ -1,8 +1,6 @@
 CC ?= gcc
 
 TARGETS = utc_UIFW_elm_dayselector_add_func \
-	  utc_UIFW_elm_dayselector_check_state_set_func \
-	  utc_UIFW_elm_dayselector_check_state_get_func \
 
 
 PKGS = elementary evas
