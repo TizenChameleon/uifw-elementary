@@ -9,14 +9,9 @@ struct _Widget_Data
 {
    Evas_Object *spinner, *ent;
    const char *label;
-<<<<<<< HEAD
-   double val, val_min, val_max, orig_val, step;
-   double drag_start_pos, spin_speed, interval, first_interval;
-=======
    double val, val_min, val_max, orig_val, step, base;
    double drag_start_pos, spin_speed, interval, first_interval;
    int round;
->>>>>>> remotes/origin/upstream
    Ecore_Timer *delay, *spin;
    Eina_List *special_values;
    Eina_Bool wrap : 1;
@@ -216,10 +211,6 @@ _write_label(Evas_Object *obj)
    Elm_Spinner_Special_Value *sv;
    Widget_Data *wd = elm_widget_data_get(obj);
    char buf[1024];
-<<<<<<< HEAD
-=======
-   
->>>>>>> remotes/origin/upstream
    if (!wd) return;
    EINA_LIST_FOREACH(wd->special_values, l, sv)
      {
@@ -240,25 +231,16 @@ apply:
 }
 
 static Eina_Bool
-<<<<<<< HEAD
-_value_set(Evas_Object *obj, double delta)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   double new_val;
-   if (!wd) return EINA_FALSE;
-   new_val = wd->val + delta;
-=======
 _value_set(Evas_Object *obj, double new_val)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   
+
    if (!wd) return EINA_FALSE;
 
    if (wd->round > 0)
-     new_val = wd->base + 
+     new_val = wd->base +
      (double)((((int)(new_val - wd->base)) / wd->round) * wd->round);
 
->>>>>>> remotes/origin/upstream
    if (wd->wrap)
      {
         while (new_val < wd->val_min)
@@ -329,22 +311,11 @@ _drag(void *data, Evas_Object *_obj __UNUSED__, const char *emission __UNUSED__,
    if (wd->entry_visible) return;
    edje_object_part_drag_value_get(wd->spinner, "elm.dragable.slider",
                                    &pos, NULL);
-<<<<<<< HEAD
-   offset = wd->step;
-   delta = (pos - wd->drag_start_pos) * offset;
-   /* If we are on rtl mode, change the delta to be negative on such changes */
-   if (elm_widget_mirrored_get(obj))
-     delta *= -1;
-   if (_value_set(data, delta)) _write_label(data);
-   wd->drag_start_pos = pos;
-=======
-
    offset = wd->step * _elm_config->scale;
    delta = (pos - wd->drag_start_pos) * offset;
    /* If we are on rtl mode, change the delta to be negative on such changes */
    if (elm_widget_mirrored_get(obj)) delta *= -1;
    if (_value_set(data, wd->drag_start_pos + delta)) _write_label(data);
->>>>>>> remotes/origin/upstream
    wd->dragging = 1;
 }
 
@@ -432,11 +403,7 @@ _spin_value(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return ECORE_CALLBACK_CANCEL;
-<<<<<<< HEAD
-   if (_value_set(data, wd->spin_speed)) _write_label(data);
-=======
    if (_value_set(data, wd->val + wd->spin_speed)) _write_label(data);
->>>>>>> remotes/origin/upstream
    wd->interval = wd->interval / 1.05;
    ecore_timer_interval_set(wd->spin, wd->interval);
    return ECORE_CALLBACK_RENEW;
@@ -815,8 +782,6 @@ elm_spinner_interval_get(const Evas_Object *obj)
    if (!wd) return 0.0;
    return wd->first_interval;
 }
-<<<<<<< HEAD
-=======
 
 EAPI void
 elm_spinner_base_set(Evas_Object *obj, double base)
@@ -853,4 +818,3 @@ elm_spinner_round_get(const Evas_Object *obj)
    if (!wd) return 0;
    return wd->round;
 }
->>>>>>> remotes/origin/upstream

@@ -7,10 +7,6 @@
 /* TODO: if one ever wants to extend it to receiving generic widgets
    as items, be my guest. in this case, remember to implement the
    items tooltip infra. */
-<<<<<<< HEAD
-/* TODO: implement disabled mode -- disable_hook() and stuff. */
-=======
->>>>>>> remotes/origin/upstream
 /* TODO: fix default theme image borders for looong strings as item
    labels. */
 /* TODO: set text elipsis on labels if one enforces mininum size on
@@ -77,11 +73,6 @@ _item_text_set_hook(Elm_Object_Item *it,
                     const char *part,
                     const char *label)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-
-=======
->>>>>>> remotes/origin/upstream
    Widget_Data *wd;
    Eina_List *l;
    Elm_Flipselector_Item *item;
@@ -90,11 +81,7 @@ _item_text_set_hook(Elm_Object_Item *it,
 
    if (part && strcmp(part ,"default")) return;
 
-<<<<<<< HEAD
-   item = (Elm_Flipselector_Item *) it;
-=======
    item = (Elm_Flipselector_Item *)it;
->>>>>>> remotes/origin/upstream
    wd = elm_widget_data_get(WIDGET(item));
    if ((!wd) || (!wd->items)) return;
 
@@ -117,27 +104,9 @@ _item_text_set_hook(Elm_Object_Item *it,
 static const char *
 _item_text_get_hook(const Elm_Object_Item *it, const char *part)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-
-   Elm_Flipselector_Item *item, *_item;
-   Widget_Data *wd;
-   Eina_List *l;
-
-   if (part && strcmp(part ,"default")) return NULL;
-
-   item = (Elm_Flipselector_Item *) it;
-   wd = elm_widget_data_get(WIDGET(item));
-   if ((!wd) || (!wd->items)) return NULL;
-
-   EINA_LIST_FOREACH(wd->items, l, _item)
-     if (_item == item) return item->label;
-   return NULL;
-=======
    if (part && strcmp(part ,"default")) return NULL;
 
    return ((Elm_Flipselector_Item *)it)->label;
->>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -145,12 +114,7 @@ _item_signal_emit_hook(Elm_Object_Item *it,
                        const char *emission,
                        const char *source)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-   Elm_Flipselector_Item *item = (Elm_Flipselector_Item *) it;
-=======
    Elm_Flipselector_Item *item = (Elm_Flipselector_Item *)it;
->>>>>>> remotes/origin/upstream
    edje_object_signal_emit(VIEW(item), emission, source);
 }
 
@@ -207,8 +171,6 @@ _del_hook(Evas_Object *obj)
 }
 
 static void
-<<<<<<< HEAD
-=======
 _disable_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -221,7 +183,6 @@ _disable_hook(Evas_Object *obj)
 }
 
 static void
->>>>>>> remotes/origin/upstream
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd;
@@ -265,11 +226,7 @@ _sentinel_eval(Widget_Data *wd)
 
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-<<<<<<< HEAD
-        if (strlen(elm_object_item_text_get((Elm_Object_Item *) it)) >
-=======
         if (strlen(elm_object_item_text_get((Elm_Object_Item *)it)) >
->>>>>>> remotes/origin/upstream
             strlen(elm_object_item_text_get(DATA_GET(wd->sentinel))))
           wd->sentinel = l;
      }
@@ -618,19 +575,11 @@ _callbacks_set(Evas_Object *obj)
 static Eina_Bool
 _item_del_pre_hook(Elm_Object_Item *it)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
-=======
->>>>>>> remotes/origin/upstream
    Widget_Data *wd;
    Elm_Flipselector_Item *item, *item2;
    Eina_List *l;
 
-<<<<<<< HEAD
-   item = (Elm_Flipselector_Item *) it;
-=======
    item = (Elm_Flipselector_Item *)it;
->>>>>>> remotes/origin/upstream
    wd = elm_widget_data_get(WIDGET(item));
    if (!wd) return EINA_FALSE;
 
@@ -686,11 +635,7 @@ elm_flipselector_add(Evas_Object *parent)
    wd->self = obj;
    elm_widget_del_hook_set(obj, _del_hook);
    elm_widget_theme_hook_set(obj, _theme_hook);
-<<<<<<< HEAD
-   /* TODO: elm_widget_disable_hook_set(obj, _disable_hook); */
-=======
    elm_widget_disable_hook_set(obj, _disable_hook);
->>>>>>> remotes/origin/upstream
 
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_on_focus_hook_set(obj, _on_focus_hook, NULL);
@@ -761,11 +706,7 @@ elm_flipselector_item_append(Evas_Object *obj, const char *label, void (*func)(v
      }
 
    if (!wd->sentinel ||
-<<<<<<< HEAD
-       (strlen(elm_object_item_text_get((Elm_Object_Item *) item)) >
-=======
        (strlen(elm_object_item_text_get((Elm_Object_Item *)item)) >
->>>>>>> remotes/origin/upstream
         strlen(elm_object_item_text_get(DATA_GET(wd->sentinel)))))
      {
         wd->sentinel = eina_list_last(wd->items);
@@ -775,11 +716,7 @@ elm_flipselector_item_append(Evas_Object *obj, const char *label, void (*func)(v
    if (eina_list_count(wd->items) >= 2)
      edje_object_signal_emit(wd->base, "elm,state,button,visible", "elm");
 
-<<<<<<< HEAD
-   return (Elm_Object_Item *) item;
-=======
    return (Elm_Object_Item *)item;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Elm_Object_Item *
@@ -804,11 +741,7 @@ elm_flipselector_item_prepend(Evas_Object *obj, const char *label, void (*func)(
      }
 
    if (!wd->sentinel ||
-<<<<<<< HEAD
-       (strlen(elm_object_item_text_get((Elm_Object_Item *) item)) >
-=======
        (strlen(elm_object_item_text_get((Elm_Object_Item *)item)) >
->>>>>>> remotes/origin/upstream
         strlen(elm_object_item_text_get(DATA_GET(wd->sentinel)))))
      {
         wd->sentinel = wd->items;
@@ -818,16 +751,9 @@ elm_flipselector_item_prepend(Evas_Object *obj, const char *label, void (*func)(
    if (eina_list_count(wd->items) >= 2)
      edje_object_signal_emit(wd->base, "elm,state,button,visible", "elm");
 
-<<<<<<< HEAD
-   return (Elm_Object_Item *) item;
-}
-
-/* TODO: account for deleted items?  */
-=======
    return (Elm_Object_Item *)item;
 }
 
->>>>>>> remotes/origin/upstream
 EAPI const Eina_List *
 elm_flipselector_items_get(const Evas_Object *obj)
 {
@@ -853,11 +779,7 @@ elm_flipselector_first_item_get(const Evas_Object *obj)
    EINA_LIST_FOREACH(wd->items, l, it)
      {
         if (it->deleted) continue;
-<<<<<<< HEAD
-        return (Elm_Object_Item *) it;
-=======
         return (Elm_Object_Item *)it;
->>>>>>> remotes/origin/upstream
      }
    return NULL;
 }
@@ -877,11 +799,7 @@ elm_flipselector_last_item_get(const Evas_Object *obj)
    EINA_LIST_REVERSE_FOREACH(wd->items, l, it)
      {
         if (it->deleted) continue;
-<<<<<<< HEAD
-        return (Elm_Object_Item *) it;
-=======
         return (Elm_Object_Item *)it;
->>>>>>> remotes/origin/upstream
      }
    return NULL;
 }
@@ -892,11 +810,7 @@ elm_flipselector_selected_item_get(const Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
 
    Widget_Data *wd = elm_widget_data_get(obj);
-<<<<<<< HEAD
-   if (!wd || !wd->current) return NULL;
-=======
    if (!wd) return NULL;
->>>>>>> remotes/origin/upstream
    return DATA_GET(wd->current);
 }
 
@@ -910,11 +824,7 @@ elm_flipselector_item_selected_set(Elm_Object_Item *it, Eina_Bool selected)
    Widget_Data *wd;
    Eina_List *l;
 
-<<<<<<< HEAD
-   item = (Elm_Flipselector_Item *) it;
-=======
    item = (Elm_Flipselector_Item *)it;
->>>>>>> remotes/origin/upstream
    wd = elm_widget_data_get(WIDGET(item));
    if (!wd) return;
 
@@ -960,56 +870,12 @@ elm_flipselector_item_selected_get(const Elm_Object_Item *it)
    Widget_Data *wd;
    Elm_Flipselector_Item *item;
 
-<<<<<<< HEAD
-   item = (Elm_Flipselector_Item *) it;
-=======
    item = (Elm_Flipselector_Item *)it;
->>>>>>> remotes/origin/upstream
    wd = elm_widget_data_get(WIDGET(item));
    if (!wd) return EINA_FALSE;
    return (eina_list_data_get(wd->current) == item);
 }
 
-<<<<<<< HEAD
-EAPI void
-elm_flipselector_item_del(Elm_Object_Item *it)
-{
-   elm_object_item_del(it);
-}
-
-EAPI const char *
-elm_flipselector_item_label_get(const Elm_Object_Item *it)
-{
-   return _item_text_get_hook(it, NULL);
-}
-
-EAPI void
-elm_flipselector_item_label_set(Elm_Object_Item *it, const char *label)
-{
-   _item_text_set_hook(it, NULL, label);
-}
-
-EAPI Elm_Object_Item *
-elm_flipselector_item_prev_get(Elm_Object_Item *it)
-{
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-
-   Elm_Flipselector_Item *item, *_item;
-   Widget_Data *wd;
-   Eina_List *l;
-
-   item = (Elm_Flipselector_Item *) it;
-   wd = elm_widget_data_get(WIDGET(item));
-   if ((!wd) || (!wd->items)) return NULL;
-
-   EINA_LIST_FOREACH(wd->items, l, _item)
-     if (_item == item)
-       {
-          l = eina_list_prev(l);
-          if (!l) return NULL;
-          return DATA_GET(l);
-       }
-=======
 EAPI Elm_Object_Item *
 elm_flipselector_item_prev_get(const Elm_Object_Item *it)
 {
@@ -1025,32 +891,10 @@ elm_flipselector_item_prev_get(const Elm_Object_Item *it)
    l = eina_list_data_find_list(wd->items, it);
    if (l && l->prev) return DATA_GET(l->prev);
 
->>>>>>> remotes/origin/upstream
    return NULL;
 }
 
 EAPI Elm_Object_Item *
-<<<<<<< HEAD
-elm_flipselector_item_next_get(Elm_Object_Item *it)
-{
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-
-   Elm_Flipselector_Item *item, *_item;
-   Widget_Data *wd;
-   Eina_List *l;
-
-   item = (Elm_Flipselector_Item *) it;
-   wd = elm_widget_data_get(WIDGET(item));
-   if ((!wd) || (!wd->items)) return NULL;
-
-   EINA_LIST_FOREACH(wd->items, l, _item)
-     if (_item == item)
-       {
-          l = eina_list_next(l);
-          if (!l) return NULL;
-          return DATA_GET(l);
-       }
-=======
 elm_flipselector_item_next_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
@@ -1065,16 +909,11 @@ elm_flipselector_item_next_get(const Elm_Object_Item *it)
    l = eina_list_data_find_list(wd->items, it);
    if (l && l->next) return DATA_GET(l->next);
 
->>>>>>> remotes/origin/upstream
    return NULL;
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_flipselector_interval_set(Evas_Object *obj, double interval)
-=======
 elm_flipselector_first_interval_set(Evas_Object *obj, double interval)
->>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
 
@@ -1084,22 +923,14 @@ elm_flipselector_first_interval_set(Evas_Object *obj, double interval)
 }
 
 EAPI double
-<<<<<<< HEAD
-elm_flipselector_interval_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) 0.0;
-=======
 elm_flipselector_first_interval_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) 0;
->>>>>>> remotes/origin/upstream
 
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return 0;
    return wd->first_interval;
 }
-<<<<<<< HEAD
-=======
 
 EINA_DEPRECATED EAPI void
 elm_flipselector_interval_set(Evas_Object *obj, double interval)
@@ -1112,5 +943,3 @@ elm_flipselector_interval_get(const Evas_Object *obj)
 {
    return elm_flipselector_first_interval_get(obj);
 }
-
->>>>>>> remotes/origin/upstream
