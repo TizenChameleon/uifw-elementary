@@ -219,11 +219,7 @@ test_focus(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
                                                    EVAS_HINT_EXPAND);
                   evas_object_size_hint_align_set(sc, EVAS_HINT_FILL,
                                                   EVAS_HINT_FILL);
-<<<<<<< HEAD
-                  elm_scroller_bounce_set(sc, 0, 1);
-=======
                   elm_scroller_bounce_set(sc, EINA_FALSE, EINA_TRUE);
->>>>>>> remotes/origin/upstream
                   elm_scroller_content_min_limit(sc, 1, 0);
                   elm_box_pack_end(bx2, sc);
                   my_show(sc);
