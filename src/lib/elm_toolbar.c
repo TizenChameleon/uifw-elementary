@@ -429,6 +429,7 @@ _item_content_set_hook(Elm_Object_Item *it,
 {
    double scale;
 
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
    if (part && strcmp(part, "object")) return;
    Elm_Toolbar_Item *item = (Elm_Toolbar_Item *) it;
    Evas_Object *obj = WIDGET(item);
@@ -444,6 +445,7 @@ _item_content_set_hook(Elm_Object_Item *it,
 static Evas_Object *
 _item_content_get_hook(const Elm_Object_Item *it, const char *part)
 {
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
    if (part && strcmp(part, "object")) return NULL;
    return ((Elm_Toolbar_Item *) it)->object;
 }
@@ -454,6 +456,7 @@ _item_content_unset_hook(Elm_Object_Item *it, const char *part)
    Evas_Object *o;
    double scale;
 
+   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
    if (part && strcmp(part, "object")) return NULL;
    Elm_Toolbar_Item *item = (Elm_Toolbar_Item *) it;
    Evas_Object *obj = WIDGET(item);
@@ -998,10 +1001,15 @@ _item_new(Evas_Object *obj, const char *icon, const char *label, Evas_Smart_Cb f
         evas_object_size_hint_min_set(it->icon, ms, ms);
         evas_object_size_hint_max_set(it->icon, ms, ms);
         edje_object_part_swallow(VIEW(it), "elm.swallow.icon", it->icon);
+        edje_object_signal_emit(VIEW(it), "elm,state,icon,visible", "elm");
         evas_object_show(it->icon);
         elm_widget_sub_object_add(obj, it->icon);
      }
-   edje_object_part_text_set(VIEW(it), "elm.text", it->label);
+   if (it->label)
+     {
+        edje_object_part_text_set(VIEW(it), "elm.text", it->label);
+        edje_object_signal_emit(VIEW(it), "elm,state,text,visible", "elm");
+     }
    mw = mh = -1;
    elm_coords_finger_size_adjust(1, &mw, 1, &mh);
    edje_object_size_min_restricted_calc(VIEW(it), &mw, &mh, mw, mh);
@@ -1039,6 +1047,7 @@ _elm_toolbar_item_label_update(Elm_Toolbar_Item *item)
    Evas_Coord mw = -1, mh = -1;
    Widget_Data *wd = elm_widget_data_get(WIDGET(item));
    edje_object_part_text_set(VIEW(item), "elm.text", item->label);
+   edje_object_signal_emit(VIEW(item), "elm,state,text,visible", "elm");
 
    elm_coords_finger_size_adjust(1, &mw, 1, &mh);
    edje_object_size_min_restricted_calc(VIEW(item), &mw, &mh, mw, mh);
@@ -1108,6 +1117,7 @@ _elm_toolbar_item_icon_update(Elm_Toolbar_Item *item)
    elm_widget_sub_object_del(VIEW(item), old_icon);
    evas_object_hide(old_icon);
    edje_object_part_swallow(VIEW(item), "elm.swallow.icon", item->icon);
+   edje_object_signal_emit(VIEW(item), "elm,state,icon,visible", "elm");
    elm_coords_finger_size_adjust(1, &mw, 1, &mh);
    edje_object_size_min_restricted_calc(VIEW(item), &mw, &mh, mw, mh);
    elm_coords_finger_size_adjust(1, &mw, 1, &mh);
