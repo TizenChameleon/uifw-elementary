@@ -126,11 +126,7 @@ group { name: "elm/index/base/vertical/default";
             }
          }
       }
-<<<<<<< HEAD
-      part {        name: "over1";
-=======
       part { name: "over1";
->>>>>>> remotes/origin/upstream
          mouse_events: 0;
          clip_to: "clip2";
          description { state: "default" 0.0;
@@ -413,8 +409,6 @@ group { name: "elm/index/item_odd/vertical/default";
       }
    }
 }
-<<<<<<< HEAD
-=======
 group { name: "elm/index/base/horizontal/default";
    images {
       image: "bt_base1.png" COMP;
@@ -812,5 +806,4 @@ group { name: "elm/index/item_odd/horizontal/default";
       }
    }
 }
->>>>>>> remotes/origin/upstream
 
