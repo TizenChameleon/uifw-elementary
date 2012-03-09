@@ -443,6 +443,17 @@ EINA_DEPRECATED EAPI void        elm_actionslider_indicator_label_set(Evas_Objec
 EINA_DEPRECATED EAPI const char *elm_actionslider_indicator_label_get(Evas_Object *obj);
 
 /**
+ * Hold actionslider object movement.
+ *
+ * @param[in] obj The actionslider object
+ * @param[in] flag Actionslider hold/release
+ * (EINA_TURE = hold/EIN_FALSE = release)
+ *
+ * @ingroup Actionslider
+ */
+EINA_DEPRECATED EAPI void   elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag);
+
+/**
  * Set the overlay object used for the background object.
  *
  * @param obj The bg object

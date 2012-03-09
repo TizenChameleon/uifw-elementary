@@ -28,11 +28,7 @@
  *                 "right" or "center").
  *
  * Default text parts of the actionslider widget that you can use for are:
-<<<<<<< HEAD
- * @li "indicator" - A indicator label of the actionslider
-=======
  * @li "indicator" - An indicator label of the actionslider
->>>>>>> remotes/origin/upstream
  * @li "left" - A left label of the actionslider
  * @li "right" - A right label of the actionslider
  * @li "center" - A center label of the actionslider
@@ -121,21 +117,8 @@ EAPI void                        elm_actionslider_enabled_pos_set(Evas_Object *o
  */
 EAPI Elm_Actionslider_Pos        elm_actionslider_enabled_pos_get(const Evas_Object *obj);
 
-/**
-<<<<<<< HEAD
- * Hold actionslider object movement.
- *
- * @param[in] obj The actionslider object
- * @param[in] flag Actionslider hold/release
- * (EINA_TURE = hold/EIN_FALSE = release)
- *
- * @ingroup Actionslider
- */
-EAPI void   elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag);
-
-
 /*
- *  Deprecated APIs
+ *  Deprecated API support
  */
 
 typedef enum
@@ -147,7 +130,5 @@ typedef enum
   } Elm_Actionslider_Label_Pos;
 
 /**
-=======
->>>>>>> remotes/origin/upstream
  * @}
  */

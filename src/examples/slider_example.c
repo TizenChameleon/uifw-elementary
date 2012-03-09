@@ -84,20 +84,12 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
 
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "home");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, EINA_FALSE, EINA_FALSE);
-=======
    elm_icon_resizable_set(ic, EINA_FALSE, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_object_part_content_set(sl, "icon", ic);
 
    ic = elm_icon_add(win);
    elm_icon_standard_set(ic, "folder");
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, EINA_FALSE, EINA_FALSE);
-=======
    elm_icon_resizable_set(ic, EINA_FALSE, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_object_part_content_set(sl, "end", ic);
 
    evas_object_size_hint_align_set(sl, EVAS_HINT_FILL, 0.5);

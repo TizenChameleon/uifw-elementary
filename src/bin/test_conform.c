@@ -12,11 +12,7 @@ test_conformant(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event 
    win = elm_win_add(NULL, "conformant", ELM_WIN_BASIC);
    elm_win_title_set(win, "Conformant");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-   elm_win_conformant_set(win, 1);
-=======
    elm_win_conformant_set(win, EINA_TRUE);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
@@ -34,13 +30,8 @@ test_conformant(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event 
 
    en = elm_entry_add(win);
    elm_entry_scrollable_set(en, EINA_TRUE);
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-   elm_entry_bounce_set(en, 1, 0);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
    elm_entry_bounce_set(en, EINA_TRUE, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(en, "This is the top entry here");
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
@@ -56,13 +47,8 @@ test_conformant(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event 
 
    en = elm_entry_add(win);
    elm_entry_scrollable_set(en, EINA_TRUE);
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-   elm_entry_bounce_set(en, 1, 0);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
    elm_entry_bounce_set(en, EINA_TRUE, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(en, "This is the middle entry here");
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
@@ -78,11 +64,7 @@ test_conformant(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event 
 
    en = elm_entry_add(win);
    elm_entry_scrollable_set(en, EINA_TRUE);
-<<<<<<< HEAD
-   elm_entry_bounce_set(en, 0, 1);
-=======
    elm_entry_bounce_set(en, EINA_FALSE, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(en,
                        "This is a multi-line entry at the bottom<br/>"
                        "This can contain more than 1 line of text and be "
@@ -108,11 +90,7 @@ test_conformant(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event 
 static void
 popobj(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
 {
-<<<<<<< HEAD
-  elm_pager_content_pop(data);
-=======
    elm_naviframe_item_pop(data);
->>>>>>> remotes/origin/upstream
 }
 
 void
@@ -123,11 +101,7 @@ test_conformant2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    win = elm_win_add(NULL, "conformant2", ELM_WIN_BASIC);
    elm_win_title_set(win, "Conformant 2");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-   elm_win_conformant_set(win, 1);
-=======
    elm_win_conformant_set(win, EINA_TRUE);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
@@ -142,13 +116,8 @@ test_conformant2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
 
    en = elm_entry_add(win);
    elm_entry_scrollable_set(en, EINA_TRUE);
-<<<<<<< HEAD
-   elm_entry_single_line_set(en, 1);
-   elm_entry_bounce_set(en, 1, 0);
-=======
    elm_entry_single_line_set(en, EINA_TRUE);
    elm_entry_bounce_set(en, EINA_TRUE, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(en, "This is the top entry here");
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
@@ -156,22 +125,14 @@ test_conformant2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    evas_object_show(en);
 
    btn = elm_button_add(win);
-<<<<<<< HEAD
-   elm_object_focus_allow_set(btn, 0);
-=======
    elm_object_focus_allow_set(btn, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(btn, "Delete Below");
    evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(bx, btn);
    evas_object_show(btn);
 
-<<<<<<< HEAD
-   pg = elm_pager_add(win);
-=======
    pg = elm_naviframe_add(win);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_weight_set(pg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(pg, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(bx, pg);
@@ -182,11 +143,7 @@ test_conformant2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    conform = elm_conformant_add(win);
    evas_object_size_hint_weight_set(conform, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(conform, EVAS_HINT_FILL, EVAS_HINT_FILL);
-<<<<<<< HEAD
-   elm_pager_content_push(pg, conform);
-=======
    elm_naviframe_item_simple_push(pg, conform);
->>>>>>> remotes/origin/upstream
    evas_object_show(conform);
 
    bx = elm_box_add(win);
@@ -195,11 +152,7 @@ test_conformant2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
 
    en = elm_entry_add(win);
    elm_entry_scrollable_set(en, EINA_TRUE);
-<<<<<<< HEAD
-   elm_entry_bounce_set(en, 0, 1);
-=======
    elm_entry_bounce_set(en, EINA_FALSE, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(en, "This entry and button below get deleted.");
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -207,11 +160,7 @@ test_conformant2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    elm_box_pack_end(bx, en);
 
    btn = elm_button_add(win);
-<<<<<<< HEAD
-   elm_object_focus_allow_set(btn, 0);
-=======
    elm_object_focus_allow_set(btn, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(btn, "Delete this bottom bit 1");
    evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -226,11 +175,7 @@ test_conformant2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    conform = elm_conformant_add(win);
    evas_object_size_hint_weight_set(conform, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(conform, EVAS_HINT_FILL, EVAS_HINT_FILL);
-<<<<<<< HEAD
-   elm_pager_content_push(pg, conform);
-=======
    elm_naviframe_item_simple_push(pg, conform);
->>>>>>> remotes/origin/upstream
    evas_object_show(conform);
 
    bx = elm_box_add(win);
@@ -239,11 +184,7 @@ test_conformant2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
 
    en = elm_entry_add(win);
    elm_entry_scrollable_set(en, EINA_TRUE);
-<<<<<<< HEAD
-   elm_entry_bounce_set(en, 0, 1);
-=======
    elm_entry_bounce_set(en, EINA_FALSE, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(en, "This entry and button below get deleted.");
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -251,11 +192,7 @@ test_conformant2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    elm_box_pack_end(bx, en);
 
    btn = elm_button_add(win);
-<<<<<<< HEAD
-   elm_object_focus_allow_set(btn, 0);
-=======
    elm_object_focus_allow_set(btn, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(btn, "Delete this bottom bit 2");
    evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, EVAS_HINT_FILL);

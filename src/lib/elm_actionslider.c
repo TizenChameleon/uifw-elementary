@@ -14,10 +14,7 @@ struct _Widget_Data
    Ecore_Animator *button_animator;
    double final_position;
    Eina_Bool mouse_down : 1;
-<<<<<<< HEAD
    Eina_Bool mouse_hold : 1;
-=======
->>>>>>> remotes/origin/upstream
 };
 
 static const char *widtype = NULL;
@@ -235,10 +232,7 @@ _drag_button_up_cb(void *data, Evas_Object *o __UNUSED__, const char *emission _
    if (!wd) return;
 
    wd->mouse_down = EINA_FALSE;
-<<<<<<< HEAD
    if (wd->mouse_hold == EINA_TRUE) return;
-=======
->>>>>>> remotes/origin/upstream
 
    edje_object_part_drag_value_get(wd->as, "elm.drag_button_base",
                                    &position, NULL);
@@ -398,10 +392,7 @@ elm_actionslider_add(Evas_Object *parent)
    elm_widget_text_get_hook_set(obj, _elm_actionslider_label_get);
 
    wd->mouse_down = EINA_FALSE;
-<<<<<<< HEAD
    wd->mouse_hold = EINA_FALSE;
-=======
->>>>>>> remotes/origin/upstream
    wd->enabled_position = ELM_ACTIONSLIDER_ALL;
 
    wd->as = edje_object_add(e);
@@ -515,17 +506,6 @@ elm_actionslider_selected_label_get(const Evas_Object *obj)
 
    return NULL;
 }
-<<<<<<< HEAD
-
-EAPI void
-elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   wd->mouse_hold = flag;
-}
 
 // Deprecated APIs
 
@@ -573,5 +553,12 @@ elm_actionslider_indicator_label_get(Evas_Object *obj)
    return _elm_actionslider_label_get(obj, NULL);
 }
 
-=======
->>>>>>> remotes/origin/upstream
+EAPI void
+elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->mouse_hold = flag;
+}

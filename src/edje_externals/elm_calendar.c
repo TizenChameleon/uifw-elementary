@@ -32,11 +32,7 @@ external_calendar_state_set(void *data __UNUSED__, Evas_Object *obj,
         elm_calendar_min_max_year_set(obj, min, p->year_max);
      }
    if (p->sel_exists)
-<<<<<<< HEAD
-     elm_calendar_day_selection_enabled_set(obj, p->sel_enable);
-=======
      elm_calendar_day_selection_disabled_set(obj, !p->sel_enable);
->>>>>>> remotes/origin/upstream
 }
 
 static Eina_Bool
@@ -47,31 +43,6 @@ external_calendar_param_set(void *data __UNUSED__, Evas_Object *obj,
 
    if (!strcmp(param->name, "year_min"))
      {
-<<<<<<< HEAD
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-             elm_calendar_min_max_year_get(obj, NULL, &max);
-	     elm_calendar_min_max_year_set(obj, param->i, max);
-	     return EINA_TRUE;
-	  }
-     }
-   else if (!strcmp(param->name, "year_max"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-             elm_calendar_min_max_year_get(obj, &min, NULL);
-	     elm_calendar_min_max_year_set(obj, min,param->i);
-	     return EINA_TRUE;
-	  }
-     }
-   else if (!strcmp(param->name, "sel_enable"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
-	  {
-	     elm_calendar_day_selection_enabled_set(obj,param->i );
-	     return EINA_TRUE;
-	  }
-=======
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
           {
              elm_calendar_min_max_year_get(obj, NULL, &max);
@@ -95,7 +66,6 @@ external_calendar_param_set(void *data __UNUSED__, Evas_Object *obj,
              elm_calendar_day_selection_disabled_set(obj,!param->i );
              return EINA_TRUE;
           }
->>>>>>> remotes/origin/upstream
      }
 
    ERR("unknown parameter '%s' of type '%s'",
@@ -112,29 +82,6 @@ external_calendar_param_get(void *data __UNUSED__, const Evas_Object *obj,
 
    if (!strcmp(param->name, "year_min"))
      {
-<<<<<<< HEAD
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-	      elm_calendar_min_max_year_get(obj, &(param->i) ,&max);
-	     return EINA_TRUE;
-	  }
-     }
-   else if (!strcmp(param->name, "year_max"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
-	  {
-	      elm_calendar_min_max_year_get(obj, &min,&(param->i));
-	     return EINA_TRUE;
-	  }
-     }
-   else if (!strcmp(param->name, "sel_enable"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
-	  {
-	     param->i = elm_calendar_day_selection_enabled_get(obj);
-	     return EINA_TRUE;
-	  }
-=======
         if (param->type == EDJE_EXTERNAL_PARAM_TYPE_INT)
           {
              elm_calendar_min_max_year_get(obj, &(param->i) ,&max);
@@ -156,7 +103,6 @@ external_calendar_param_get(void *data __UNUSED__, const Evas_Object *obj,
              param->i = !elm_calendar_day_selection_disabled_get(obj);
              return EINA_TRUE;
           }
->>>>>>> remotes/origin/upstream
      }
 
    ERR("unknown parameter '%s' of type '%s'",
@@ -181,17 +127,6 @@ external_calendar_params_parse(void *data __UNUSED__,
    EINA_LIST_FOREACH(params, l, param)
      {
         if (!strcmp(param->name, "year_min"))
-<<<<<<< HEAD
-	  mem->year_min = param->i;
-
-	else if(!strcmp(param->name, "year_max"))
-          mem->year_max = param->i;
-
-	else if (!strcmp(param->name, "sel_enable"))
-          {
-	     mem->sel_enable = param->i;
-	     mem->sel_exists = EINA_TRUE;
-=======
           mem->year_min = param->i;
 
         else if(!strcmp(param->name, "year_max"))
@@ -201,7 +136,6 @@ external_calendar_params_parse(void *data __UNUSED__,
           {
              mem->sel_enable = param->i;
              mem->sel_exists = EINA_TRUE;
->>>>>>> remotes/origin/upstream
           }
      }
 

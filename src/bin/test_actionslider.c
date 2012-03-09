@@ -6,10 +6,6 @@
 
 static void _pos_selected_cb(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 {
-<<<<<<< HEAD
-   printf("Selection: %s\n", (char *)event_info);
-   printf("Label selected: %s\n", elm_actionslider_selected_label_get(obj));
-=======
    Elm_Actionslider_Pos ipos, mpos, epos;
 
    printf("Selection: %s\n", (char *)event_info);
@@ -70,7 +66,6 @@ static void _pos_selected_cb(void *data __UNUSED__, Evas_Object *obj, void *even
           printf("right ");
         printf("\n");
      }
->>>>>>> remotes/origin/upstream
 }
 
 static void

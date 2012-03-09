@@ -1,15 +1,6 @@
 #include <Elementary.h>
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
-<<<<<<< HEAD
-#endif
-#ifndef ELM_LIB_QUICKLAUNCH
-void
-test_clock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   Evas_Object *win, *bg, *bx, *ck;
-   unsigned int digedit;
-=======
 #include "test.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
@@ -108,28 +99,17 @@ test_clock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    Evas_Object *win, *bg, *bx, *ck, *bt, *bxx;
    unsigned int digedit;
    api_data *api = calloc(1, sizeof(api_data));
->>>>>>> remotes/origin/upstream
 
    win = elm_win_add(NULL, "clock", ELM_WIN_BASIC);
    elm_win_title_set(win, "Clock");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-=======
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-   bx = elm_box_add(win);
-   evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, bx);
-   evas_object_show(bx);
-
-=======
    bxx = elm_box_add(win);
    elm_win_resize_object_add(win, bxx);
    evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -149,20 +129,11 @@ test_clock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
    elm_box_pack_end(bxx, bx);
 
->>>>>>> remotes/origin/upstream
    ck = elm_clock_add(win);
    elm_box_pack_end(bx, ck);
    evas_object_show(ck);
 
    ck = elm_clock_add(win);
-<<<<<<< HEAD
-   elm_clock_show_am_pm_set(ck, 1);
-   elm_box_pack_end(bx, ck);
-   evas_object_show(ck);
-
-   ck = elm_clock_add(win);
-   elm_clock_show_seconds_set(ck, 1);
-=======
    elm_clock_show_am_pm_set(ck, EINA_TRUE);
    elm_box_pack_end(bx, ck);
    elm_clock_time_set(ck, 17, 25, 0);
@@ -170,21 +141,10 @@ test_clock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
 
    ck = elm_clock_add(win);
    elm_clock_show_seconds_set(ck, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, ck);
    evas_object_show(ck);
 
    ck = elm_clock_add(win);
-<<<<<<< HEAD
-   elm_clock_show_seconds_set(ck, 1);
-   elm_clock_show_am_pm_set(ck, 1);
-   elm_box_pack_end(bx, ck);
-   evas_object_show(ck);
-
-   ck = elm_clock_add(win);
-   elm_clock_show_seconds_set(ck, 1);
-   elm_clock_show_am_pm_set(ck, 0);
-=======
    elm_clock_show_seconds_set(ck, EINA_TRUE);
    elm_clock_show_am_pm_set(ck, EINA_TRUE);
    elm_box_pack_end(bx, ck);
@@ -194,40 +154,25 @@ test_clock(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    ck = elm_clock_add(win);
    elm_clock_show_seconds_set(ck, EINA_TRUE);
    elm_clock_show_am_pm_set(ck, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_clock_time_set(ck, 23, 59, 57);
    elm_box_pack_end(bx, ck);
    evas_object_show(ck);
 
    ck = elm_clock_add(win);
-<<<<<<< HEAD
-   elm_clock_edit_set(ck, 1);
-   elm_clock_show_seconds_set(ck, 1);
-   elm_clock_show_am_pm_set(ck, 1);
-=======
    elm_clock_edit_set(ck, EINA_TRUE);
    elm_clock_show_seconds_set(ck, EINA_TRUE);
    elm_clock_show_am_pm_set(ck, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_clock_time_set(ck, 10, 11, 12);
    elm_box_pack_end(bx, ck);
    evas_object_show(ck);
 
    ck = elm_clock_add(win);
-<<<<<<< HEAD
-   elm_clock_show_seconds_set(ck, 1);
-   elm_clock_edit_set(ck, 1);
-   digedit = ELM_CLOCK_HOUR_UNIT | ELM_CLOCK_MIN_UNIT | ELM_CLOCK_SEC_UNIT;
-   elm_clock_digit_edit_set(ck, digedit);
-   elm_box_pack_end(bx, ck);
-=======
    elm_clock_show_seconds_set(ck, EINA_TRUE);
    elm_clock_edit_set(ck, EINA_TRUE);
    digedit = ELM_CLOCK_EDIT_HOUR_UNIT | ELM_CLOCK_EDIT_MIN_UNIT | ELM_CLOCK_EDIT_SEC_UNIT;
    elm_clock_edit_mode_set(ck, digedit);
    elm_box_pack_end(bx, ck);
    elm_clock_time_set(ck, 0, 0, 0);
->>>>>>> remotes/origin/upstream
    evas_object_show(ck);
 
    evas_object_show(win);
@@ -238,15 +183,6 @@ _edit_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Evas_Object *ck = data;
 
-<<<<<<< HEAD
-   if (!elm_clock_edit_get(ck)) {
-	elm_object_text_set(obj, "Done");
-	elm_clock_edit_set(ck, 1);
-	return;
-   }
-   elm_object_text_set(obj, "Edit");
-   elm_clock_edit_set(ck, 0);
-=======
    if (!elm_clock_edit_get(ck))
      {
         elm_object_text_set(obj, "Done");
@@ -255,7 +191,6 @@ _edit_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
      }
    elm_object_text_set(obj, "Edit");
    elm_clock_edit_set(ck, EINA_FALSE);
->>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -263,15 +198,6 @@ _hmode_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Evas_Object *ck = data;
 
-<<<<<<< HEAD
-   if (!elm_clock_show_am_pm_get(ck)) {
-	elm_object_text_set(obj, "24h");
-	elm_clock_show_am_pm_set(ck, 1);
-	return;
-   }
-   elm_object_text_set(obj, "12h");
-   elm_clock_show_am_pm_set(ck, 0);
-=======
    if (!elm_clock_show_am_pm_get(ck))
      {
         elm_object_text_set(obj, "24h");
@@ -280,42 +206,24 @@ _hmode_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
      }
    elm_object_text_set(obj, "12h");
    elm_clock_show_am_pm_set(ck, EINA_FALSE);
->>>>>>> remotes/origin/upstream
 }
 
 void
 test_clock2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-<<<<<<< HEAD
-   Evas_Object *win, *bg, *bx, *hbx, *ck, *bt;
-=======
    Evas_Object *win, *bg, *bx, *hbx, *ck, *bt, *bxx;
    api_data *api = calloc(1, sizeof(api_data));
->>>>>>> remotes/origin/upstream
 
    win = elm_win_add(NULL, "clock2", ELM_WIN_BASIC);
    elm_win_title_set(win, "Clock 2");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-=======
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-   bx = elm_box_add(win);
-   evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, bx);
-   evas_object_show(bx);
-
-   ck = elm_clock_add(win);
-   elm_clock_show_seconds_set(ck, 1);
-   elm_clock_show_am_pm_set(ck, 1);
-=======
    bxx = elm_box_add(win);
    elm_win_resize_object_add(win, bxx);
    evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -341,7 +249,6 @@ test_clock2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    elm_clock_edit_mode_set(ck, ELM_CLOCK_EDIT_DEFAULT);
    elm_clock_show_seconds_set(ck, EINA_TRUE);
    elm_clock_show_am_pm_set(ck, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, ck);
    evas_object_show(ck);
 
@@ -366,8 +273,6 @@ test_clock2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_show(win);
 }
 
-<<<<<<< HEAD
-=======
 void
 test_clock3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -419,5 +324,4 @@ test_clock3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    evas_object_show(win);
 }
->>>>>>> remotes/origin/upstream
 #endif

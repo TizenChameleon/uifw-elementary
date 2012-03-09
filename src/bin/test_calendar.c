@@ -3,8 +3,6 @@
 # include "elementary_config.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
-<<<<<<< HEAD
-=======
 struct _api_data
 {
    unsigned int state;  /* What state we are testing       */
@@ -114,37 +112,24 @@ _cleanup_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *e
 {
    free(data);
 }
->>>>>>> remotes/origin/upstream
 
 /* A simple test, just displaying calendar in it's default state */
 void
 test_calendar(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-<<<<<<< HEAD
-   Evas_Object *win, *bg, *cal;
-=======
    Evas_Object *win, *bg, *cal, *bx, *bxx, *bt;
    api_data *api = calloc(1, sizeof(api_data));
->>>>>>> remotes/origin/upstream
 
    win = elm_win_add(NULL, "calendar", ELM_WIN_BASIC);
    elm_win_title_set(win, "Calendar");
    elm_win_autodel_set(win, EINA_TRUE);
-<<<<<<< HEAD
-=======
    evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
->>>>>>> remotes/origin/upstream
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-   cal = elm_calendar_add(win);
-   elm_win_resize_object_add(win, cal);
-   evas_object_size_hint_weight_set(cal, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-=======
    bxx = elm_box_add(win);
    elm_win_resize_object_add(win, bxx);
    evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -174,7 +159,6 @@ test_calendar(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    elm_calendar_selected_time_set(cal, gmtime(&the_time));
    elm_calendar_min_max_year_set(cal, 2010, 2012);
 
->>>>>>> remotes/origin/upstream
    evas_object_show(cal);
 
    evas_object_show(win);
@@ -188,31 +172,13 @@ _print_cal_info(Evas_Object *cal, Evas_Object *en)
    int year_min, year_max;
    Eina_Bool sel_enabled;
    const char **wds;
-<<<<<<< HEAD
-   struct tm stime;
-
-   if (!elm_calendar_selected_time_get(cal, &stime))
-=======
    struct tm stm;
 
    if (!elm_calendar_selected_time_get(cal, &stm))
->>>>>>> remotes/origin/upstream
      return;
 
    interval = elm_calendar_interval_get(cal);
    elm_calendar_min_max_year_get(cal, &year_min, &year_max);
-<<<<<<< HEAD
-   sel_enabled = elm_calendar_day_selection_enabled_get(cal);
-   wds = elm_calendar_weekdays_names_get(cal);
-
-   snprintf(info, sizeof(info),
-	 "  Day: %i, Mon: %i, Year %i, WeekDay: %i<br/>"
-	 "  Interval: %0.2f, Year_Min: %i, Year_Max %i, Sel Enabled : %i<br/>"
-	 "  Weekdays: %s, %s, %s, %s, %s, %s, %s<br/>",
-	 stime.tm_mday, stime.tm_mon, stime.tm_year + 1900, stime.tm_wday,
-	 interval, year_min, year_max, sel_enabled,
-	 wds[0], wds[1], wds[2], wds[3], wds[4], wds[5], wds[6]);
-=======
    sel_enabled = !elm_calendar_day_selection_disabled_get(cal);
    wds = elm_calendar_weekdays_names_get(cal);
 
@@ -223,7 +189,6 @@ _print_cal_info(Evas_Object *cal, Evas_Object *en)
             stm.tm_mday, stm.tm_mon, stm.tm_year + 1900, stm.tm_wday,
             interval, year_min, year_max, sel_enabled,
             wds[0], wds[1], wds[2], wds[3], wds[4], wds[5], wds[6]);
->>>>>>> remotes/origin/upstream
 
    elm_object_text_set(en, info);
 }
@@ -235,17 +200,10 @@ _print_cal_info_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 }
 
 static char *
-<<<<<<< HEAD
-_format_month_year(struct tm *stime)
-{
-   char buf[32];
-   if (!strftime(buf, sizeof(buf), "%b %y", stime)) return NULL;
-=======
 _format_month_year(struct tm *stm)
 {
    char buf[32];
    if (!strftime(buf, sizeof(buf), "%b %y", stm)) return NULL;
->>>>>>> remotes/origin/upstream
    return strdup(buf);
 }
 
@@ -294,11 +252,7 @@ test_calendar2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    cal2 = elm_calendar_add(win);
    evas_object_size_hint_weight_set(cal2, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(cal2, EVAS_HINT_FILL, EVAS_HINT_FILL);
-<<<<<<< HEAD
-   elm_calendar_day_selection_enabled_set(cal2, EINA_FALSE);
-=======
    elm_calendar_day_selection_disabled_set(cal2, EINA_TRUE);
->>>>>>> remotes/origin/upstream
    evas_object_show(cal2);
    elm_box_pack_end(bxh, cal2);
 
@@ -350,11 +304,7 @@ test_calendar2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    current_time = time(NULL) - 5 * 84600;
    localtime_r(&current_time, &selected_time);
    mark = elm_calendar_mark_add(cal, "holiday", &selected_time,
-<<<<<<< HEAD
-	 ELM_CALENDAR_WEEKLY);
-=======
                                 ELM_CALENDAR_WEEKLY);
->>>>>>> remotes/origin/upstream
 
    current_time = time(NULL) + 1 * 84600;
    localtime_r(&current_time, &selected_time);
