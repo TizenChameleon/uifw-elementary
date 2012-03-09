@@ -4605,3 +4605,33 @@ _entry_hover_anchor_clicked(void *data, Evas_Object *obj, void *event_info)
    evas_object_show(wd->anchor_hover.hover);
 }
 /* END - ANCHOR HOVER */
+
+EAPI void
+elm_entry_magnifier_disabled_set(Evas_Object *obj, Eina_Bool disabled)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->magnifier_enabled == !disabled) return;
+   wd->magnifier_enabled = !disabled;
+}
+
+EAPI Eina_Bool
+elm_entry_magnifier_disabled_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return !wd->magnifier_enabled;
+}
+
+EAPI void
+elm_entry_magnifier_type_set(Evas_Object *obj, int type)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+
+   wd->mgf_type = type;
+   _magnifier_create(obj);
+}

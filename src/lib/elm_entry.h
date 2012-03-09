@@ -1550,5 +1550,23 @@ EAPI const char                 *elm_entry_anchor_hover_style_get(const Evas_Obj
 EAPI void                        elm_entry_anchor_hover_end(Evas_Object *obj);
 
 /**
+ * This disables the entry's magnifer feature.
+ *
+ * @param obj The entry object
+ * @param disabled If true, the magnifier is not displayed
+ */
+
+EAPI void         elm_entry_magnifier_disabled_set(Evas_Object *obj, Eina_Bool disabled);
+/**
+ * This returns whether the entry's magnifier feature is disabled.
+ *
+ * @param obj The entry object
+ * @return If true, the feature is disabled
+ */
+EAPI Eina_Bool    elm_entry_magnifier_disabled_get(const Evas_Object *obj);
+
+EAPI void                   elm_entry_magnifier_type_set(Evas_Object *obj, int type);
+
+/**
  * @}
  */
