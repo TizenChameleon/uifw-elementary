@@ -312,11 +312,7 @@ test_cursor3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 
    o = elm_button_add(win);
    elm_object_cursor_set(o, ELM_CURSOR_HAND1);
-<<<<<<< HEAD
-   elm_object_cursor_engine_only_set(o, EINA_FALSE);
-=======
    elm_object_cursor_theme_search_enabled_set(o, EINA_FALSE);
->>>>>>> remotes/origin/upstream
    elm_object_text_set(o, "hand1");
    elm_box_pack_end(bx, o);
    evas_object_show(o);
