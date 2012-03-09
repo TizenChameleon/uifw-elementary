@@ -14,7 +14,6 @@ struct _Widget_Data
    Ecore_Animator *button_animator;
    double final_position;
    Eina_Bool mouse_down : 1;
-   Eina_Bool mouse_hold : 1;
 };
 
 static const char *widtype = NULL;
@@ -232,7 +231,6 @@ _drag_button_up_cb(void *data, Evas_Object *o __UNUSED__, const char *emission _
    if (!wd) return;
 
    wd->mouse_down = EINA_FALSE;
-   if (wd->mouse_hold == EINA_TRUE) return;
 
    edje_object_part_drag_value_get(wd->as, "elm.drag_button_base",
                                    &position, NULL);
@@ -392,7 +390,6 @@ elm_actionslider_add(Evas_Object *parent)
    elm_widget_text_get_hook_set(obj, _elm_actionslider_label_get);
 
    wd->mouse_down = EINA_FALSE;
-   wd->mouse_hold = EINA_FALSE;
    wd->enabled_position = ELM_ACTIONSLIDER_ALL;
 
    wd->as = edje_object_add(e);
@@ -505,60 +502,4 @@ elm_actionslider_selected_label_get(const Evas_Object *obj)
      return wd->text_right;
 
    return NULL;
-}
-
-// Deprecated APIs
-
-EAPI void
-elm_actionslider_label_set(Evas_Object *obj, Elm_Actionslider_Label_Pos pos, const char *label)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (pos == ELM_ACTIONSLIDER_LABEL_LEFT)
-     _elm_actionslider_label_set(obj, "left", label);
-   else if (pos == ELM_ACTIONSLIDER_LABEL_RIGHT)
-     _elm_actionslider_label_set(obj, "right", label);
-   else if (pos == ELM_ACTIONSLIDER_LABEL_CENTER)
-     _elm_actionslider_label_set(obj, "center", label);
-   else if (pos == ELM_ACTIONSLIDER_LABEL_BUTTON)
-     _elm_actionslider_label_set(obj, NULL, label);
-}
-
-EAPI void
-elm_actionslider_labels_get(const Evas_Object *obj, const char **left_label, const char **center_label, const char **right_label)
-{
-   if (left_label) *left_label= NULL;
-   if (center_label) *center_label= NULL;
-   if (right_label) *right_label= NULL;
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (left_label) *left_label = _elm_actionslider_label_get(obj, "left");
-   if (center_label) *center_label = _elm_actionslider_label_get(obj, "center");
-   if (right_label) *right_label = _elm_actionslider_label_get(obj, "right");
-}
-
-EAPI void
-elm_actionslider_indicator_label_set(Evas_Object *obj, const char *label)
-{
-   _elm_actionslider_label_set(obj, NULL, label);
-}
-
-EAPI const char *
-elm_actionslider_indicator_label_get(Evas_Object *obj)
-{
-   return _elm_actionslider_label_get(obj, NULL);
-}
-
-EAPI void
-elm_actionslider_hold(Evas_Object *obj, Eina_Bool flag)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   wd->mouse_hold = flag;
 }

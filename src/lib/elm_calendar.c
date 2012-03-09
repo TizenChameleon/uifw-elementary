@@ -197,16 +197,6 @@ _text_day_color_update(Widget_Data *wd, int pos)
    edje_object_signal_emit(wd->calendar, emission, "elm");
 }
 
-// EINA_DEPRECATED
-static void
-_text_day_color_set(Widget_Data *wd, Day_Color col, int pos)
-{
-   if ((pos < 0) || (pos >= 42)) return;
-   if (wd->day_color[pos] == col) return;
-   wd->day_color[pos] = col;
-   _text_day_color_update(wd, pos);
-}
-
 static void
 _set_month_year(Widget_Data *wd)
 {
@@ -994,31 +984,4 @@ elm_calendar_marks_draw(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    _populate(obj);
-}
-
-EINA_DEPRECATED EAPI void
-elm_calendar_text_saturday_color_set(Evas_Object *obj, int pos)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   _text_day_color_set(wd, DAY_SATURDAY, pos);
-}
-
-EINA_DEPRECATED EAPI void
-elm_calendar_text_sunday_color_set(Evas_Object *obj, int pos)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   _text_day_color_set(wd, DAY_SUNDAY, pos);
-}
-
-EINA_DEPRECATED EAPI void
-elm_calendar_text_weekday_color_set(Evas_Object *obj, int pos)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   _text_day_color_set(wd, DAY_WEEKDAY, pos);
 }

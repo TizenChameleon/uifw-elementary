@@ -117,18 +117,6 @@ EAPI void                        elm_actionslider_enabled_pos_set(Evas_Object *o
  */
 EAPI Elm_Actionslider_Pos        elm_actionslider_enabled_pos_get(const Evas_Object *obj);
 
-/*
- *  Deprecated API support
- */
-
-typedef enum
-  {
-     ELM_ACTIONSLIDER_LABEL_LEFT,
-     ELM_ACTIONSLIDER_LABEL_RIGHT,
-     ELM_ACTIONSLIDER_LABEL_CENTER,
-     ELM_ACTIONSLIDER_LABEL_BUTTON
-  } Elm_Actionslider_Label_Pos;
-
 /**
  * @}
  */
