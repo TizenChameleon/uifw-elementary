@@ -62,25 +62,16 @@ static void _adjust_pos_x(Evas_Coord_Point *pos,
 static void _adjust_pos_y(Evas_Coord_Point *pos,
                           Evas_Coord_Point *base_size,
                           Evas_Coord_Rectangle *hover_area);
-<<<<<<< HEAD
-static void _ctxpopup_changed_size_hints(void *data __UNUSED__,
-                                         Evas *e __UNUSED__, Evas_Object *obj,
-                                         void *event_info __UNUSED__);
-=======
->>>>>>> remotes/origin/upstream
 static Elm_Ctxpopup_Direction _calc_base_geometry(Evas_Object *obj,
                                                   Evas_Coord_Rectangle *rect);
 static void _update_arrow(Evas_Object *obj,
                           Elm_Ctxpopup_Direction dir,
                           Evas_Coord_Rectangle rect);
 static void _sizing_eval(Evas_Object *obj);
-<<<<<<< HEAD
-=======
 static void _hide_signal_emit(Evas_Object *obj,
                               Elm_Ctxpopup_Direction dir);
 static void _show_signal_emit(Evas_Object *obj,
                               Elm_Ctxpopup_Direction dir);
->>>>>>> remotes/origin/upstream
 static void _shift_base_by_arrow(Evas_Object *arrow,
                                  Elm_Ctxpopup_Direction dir,
                                  Evas_Coord_Rectangle *rect);
@@ -115,13 +106,10 @@ static void _ctxpopup_show(void *data,
                            Evas *e,
                            Evas_Object *obj,
                            void *event_info);
-<<<<<<< HEAD
-=======
 static void _hide_finished(void *data,
                            Evas_Object *obj,
                            const char *emission,
                            const char *source __UNUSED__);
->>>>>>> remotes/origin/upstream
 static void _hide(Evas_Object *obj);
 static void _ctxpopup_hide(void *data,
                            Evas *e,
@@ -358,22 +346,6 @@ _adjust_pos_y(Evas_Coord_Point *pos, Evas_Coord_Point *base_size,
      pos->y = hover_area->y;
 }
 
-<<<<<<< HEAD
-static void
-_ctxpopup_changed_size_hints(void *data __UNUSED__, Evas *e __UNUSED__,
-                             Evas_Object *obj, void *event_info __UNUSED__)
-{
-   Widget_Data *wd;
-
-   wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (wd->visible)
-      _sizing_eval(obj);
-}
-
-=======
->>>>>>> remotes/origin/upstream
 static Elm_Ctxpopup_Direction
 _calc_base_geometry(Evas_Object *obj, Evas_Coord_Rectangle *rect)
 {
@@ -572,14 +544,6 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir,
          edje_object_part_swallow(wd->base,
                                   "elm.swallow.arrow_left",
                                   wd->arrow);
-<<<<<<< HEAD
-
-         // if user does not use dragable part
-         arrow_size.y = (y - (arrow_size.h * 0.5));
-         arrow_size.x = x;
-
-=======
->>>>>>> remotes/origin/upstream
          if (base_size.h > 0)
            {
               if (y < ((arrow_size.h * 0.5) + base_size.y))
@@ -600,14 +564,6 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir,
          edje_object_part_swallow(wd->base,
                                   "elm.swallow.arrow_right",
                                   wd->arrow);
-<<<<<<< HEAD
-
-         // if user does not use dragable part
-         arrow_size.y = (y - (arrow_size.h * 0.5));
-         arrow_size.x = (x - arrow_size.w);
-
-=======
->>>>>>> remotes/origin/upstream
          if (base_size.h > 0)
            {
               if (y < ((arrow_size.h * 0.5) + base_size.y))
@@ -626,14 +582,6 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir,
       case ELM_CTXPOPUP_DIRECTION_DOWN:
          edje_object_signal_emit(wd->arrow, "elm,state,top", "elm");
          edje_object_part_swallow(wd->base, "elm.swallow.arrow_up", wd->arrow);
-<<<<<<< HEAD
-
-         // if user does not use dragable part
-         arrow_size.x = (x - (arrow_size.w * 0.5));
-         arrow_size.y = y;
-
-=======
->>>>>>> remotes/origin/upstream
          if (base_size.w > 0)
            {
               if (x < ((arrow_size.w * 0.5) + base_size.x))
@@ -654,14 +602,6 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir,
          edje_object_part_swallow(wd->base,
                                   "elm.swallow.arrow_down",
                                   wd->arrow);
-<<<<<<< HEAD
-
-         // if user does not use dragable part
-         arrow_size.x = (x - (arrow_size.w * 0.5));
-         arrow_size.y = (y - arrow_size.h);
-
-=======
->>>>>>> remotes/origin/upstream
          if (base_size.w > 0)
            {
               if (x < ((arrow_size.w * 0.5) + base_size.x))
@@ -679,10 +619,6 @@ _update_arrow(Evas_Object *obj, Elm_Ctxpopup_Direction dir,
       default:
          break;
      }
-<<<<<<< HEAD
-
-   // if user does not use dragable part
-   evas_object_move(wd->arrow, arrow_size.x, arrow_size.y);
 }
 
 //TODO: compress item - different from opensource
@@ -699,7 +635,6 @@ _compress_item(Evas_Object *obj)
    EINA_LIST_FOREACH(wd->items, elist, item)
      {
            edje_object_signal_emit(item->base.view, "elm,state,compress", "elm");
-=======
 }
 
 static void
@@ -755,7 +690,6 @@ _show_signal_emit(Evas_Object *obj, Elm_Ctxpopup_Direction dir)
            break;
         default:
            break;
->>>>>>> remotes/origin/upstream
      }
 }
 
@@ -771,10 +705,7 @@ _sizing_eval(Evas_Object *obj)
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
-<<<<<<< HEAD
    if (!wd->parent) return;
-=======
->>>>>>> remotes/origin/upstream
 
    //Box, Scroller
    EINA_LIST_FOREACH(wd->items, elist, item)
@@ -805,15 +736,12 @@ _sizing_eval(Evas_Object *obj)
 
    //Base
    wd->dir = _calc_base_geometry(obj, &rect);
-<<<<<<< HEAD
 
    //TODO: compress item - different from opensource
    if (!wd->horizontal && !wd->content)
      _compress_item(obj);
 
-=======
    _show_signal_emit(obj, wd->dir);
->>>>>>> remotes/origin/upstream
    _update_arrow(obj, wd->dir, rect);
    _shift_base_by_arrow(wd->arrow, wd->dir, &rect);
 
@@ -860,16 +788,11 @@ _del_pre_hook(Evas_Object *obj)
    wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-<<<<<<< HEAD
    evas_object_event_callback_del_full(wd->parent, EVAS_CALLBACK_RESIZE,
                                        _parent_resize, obj);
    evas_object_event_callback_del_full(wd->box, EVAS_CALLBACK_RESIZE,
                                        _content_resize, obj);
 
-=======
-   evas_object_event_callback_del_full(wd->box, EVAS_CALLBACK_RESIZE,
-                                       _content_resize, obj);
->>>>>>> remotes/origin/upstream
    _parent_cut_off(obj);
 }
 
@@ -894,10 +817,7 @@ _theme_hook(Evas_Object *obj)
    Widget_Data *wd;
    Eina_List *elist;
    Elm_Ctxpopup_Item *item;
-<<<<<<< HEAD
    int idx = 0;
-=======
->>>>>>> remotes/origin/upstream
    Eina_Bool rtl;
 
    wd = elm_widget_data_get(obj);
@@ -934,7 +854,6 @@ _theme_hook(Evas_Object *obj)
         if (elm_widget_item_disabled_get(item))
           edje_object_signal_emit(VIEW(item), "elm,state,disabled", "elm");
 
-<<<<<<< HEAD
        /*
         *  For separator, if the first item has visible separator,
         *  then it should be aligned with edge of the base part.
@@ -957,11 +876,6 @@ _theme_hook(Evas_Object *obj)
    if (evas_object_visible_get(wd->bg))
      edje_object_signal_emit(wd->bg, "elm,state,show", "elm");
 
-=======
-        edje_object_message_signal_process(VIEW(item));
-     }
-
->>>>>>> remotes/origin/upstream
    if (wd->scr)
      {
         if (!strncmp(elm_object_style_get(obj), "default", strlen("default")))
@@ -1064,21 +978,12 @@ _content_get_hook(const Evas_Object *obj, const char *part)
 static void
 _item_text_set_hook(Elm_Object_Item *it, const char *part, const char *label)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-
-=======
->>>>>>> remotes/origin/upstream
    Widget_Data *wd;
    Elm_Ctxpopup_Item *ctxpopup_it;
 
    if (part && strcmp(part, "default")) return;
 
-<<<<<<< HEAD
-   ctxpopup_it = (Elm_Ctxpopup_Item *) it;
-=======
    ctxpopup_it = (Elm_Ctxpopup_Item *)it;
->>>>>>> remotes/origin/upstream
 
    wd = elm_widget_data_get(WIDGET(ctxpopup_it));
    if (!wd) return;
@@ -1096,16 +1001,9 @@ _item_text_set_hook(Elm_Object_Item *it, const char *part, const char *label)
 static const char *
 _item_text_get_hook(const Elm_Object_Item *it, const char *part)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   Elm_Ctxpopup_Item *ctxpopup_it;
-   if (part && strcmp(part, "default")) return NULL;
-   ctxpopup_it = (Elm_Ctxpopup_Item *) it;
-=======
    Elm_Ctxpopup_Item *ctxpopup_it;
    if (part && strcmp(part, "default")) return NULL;
    ctxpopup_it = (Elm_Ctxpopup_Item *)it;
->>>>>>> remotes/origin/upstream
    return ctxpopup_it->label;
 }
 
@@ -1114,20 +1012,12 @@ _item_content_set_hook(Elm_Object_Item *it,
                        const char *part,
                        Evas_Object *content)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-=======
->>>>>>> remotes/origin/upstream
    Widget_Data *wd;
    Elm_Ctxpopup_Item *ctxpopup_it;
 
    if (part && strcmp(part, "icon")) return;
 
-<<<<<<< HEAD
-   ctxpopup_it = (Elm_Ctxpopup_Item *) it;
-=======
    ctxpopup_it = (Elm_Ctxpopup_Item *)it;
->>>>>>> remotes/origin/upstream
 
    wd = elm_widget_data_get(WIDGET(ctxpopup_it));
    if (!wd) return;
@@ -1145,31 +1035,17 @@ _item_content_set_hook(Elm_Object_Item *it,
 static Evas_Object *
 _item_content_get_hook(const Elm_Object_Item *it, const char *part)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   Elm_Ctxpopup_Item *ctxpopup_it;
-   if (part && strcmp(part, "icon")) return NULL;
-   ctxpopup_it  = (Elm_Ctxpopup_Item *) it;
-=======
    Elm_Ctxpopup_Item *ctxpopup_it;
    if (part && strcmp(part, "icon")) return NULL;
    ctxpopup_it  = (Elm_Ctxpopup_Item *)it;
->>>>>>> remotes/origin/upstream
    return ctxpopup_it->icon;
 }
 
 static void
 _item_disable_hook(Elm_Object_Item *it)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-
-   Widget_Data *wd;
-   Elm_Ctxpopup_Item *ctxpopup_it = (Elm_Ctxpopup_Item *) it;
-=======
    Widget_Data *wd;
    Elm_Ctxpopup_Item *ctxpopup_it = (Elm_Ctxpopup_Item *)it;
->>>>>>> remotes/origin/upstream
 
    wd = elm_widget_data_get(WIDGET(ctxpopup_it));
    if (!wd) return;
@@ -1184,12 +1060,7 @@ static void
 _item_signal_emit_hook(Elm_Object_Item *it, const char *emission,
                        const char *source)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-   Elm_Ctxpopup_Item *ctxpopup_it = (Elm_Ctxpopup_Item *) it;
-=======
    Elm_Ctxpopup_Item *ctxpopup_it = (Elm_Ctxpopup_Item *)it;
->>>>>>> remotes/origin/upstream
    edje_object_signal_emit(VIEW(ctxpopup_it), emission, source);
 }
 
@@ -1197,13 +1068,9 @@ static void
 _bg_clicked_cb(void *data, Evas_Object *obj __UNUSED__,
                const char *emission __UNUSED__, const char *source __UNUSED__)
 {
-<<<<<<< HEAD
-   evas_object_hide(data);
-=======
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
    _hide_signal_emit(data, wd->dir);
->>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -1211,12 +1078,9 @@ _ctxpopup_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
                void *event_info __UNUSED__)
 {
    Widget_Data *wd;
-<<<<<<< HEAD
    Eina_List *elist;
    Elm_Ctxpopup_Item *item;
    int idx = 0;
-=======
->>>>>>> remotes/origin/upstream
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -1230,7 +1094,6 @@ _ctxpopup_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
    evas_object_show(wd->arrow);
 
    edje_object_signal_emit(wd->bg, "elm,state,show", "elm");
-<<<<<<< HEAD
 
    EINA_LIST_FOREACH(wd->items, elist, item)
      {
@@ -1244,9 +1107,8 @@ _ctxpopup_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
              edje_object_signal_emit(VIEW(item), "elm,state,horizontal", "elm");
          }
      }
-=======
+
    edje_object_signal_emit(wd->base, "elm,state,show", "elm");
->>>>>>> remotes/origin/upstream
 
    _sizing_eval(obj);
 
@@ -1254,12 +1116,6 @@ _ctxpopup_show(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
 }
 
 static void
-<<<<<<< HEAD
-_hide(Evas_Object *obj)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-
-=======
 _hide_finished(void *data, Evas_Object *obj __UNUSED__,
                const char *emission __UNUSED__, const char *source __UNUSED__)
 {
@@ -1278,7 +1134,6 @@ _ctxpopup_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
                void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
->>>>>>> remotes/origin/upstream
    if ((!wd) || (!wd->visible)) return;
 
    evas_object_hide(wd->bg);
@@ -1287,24 +1142,10 @@ _ctxpopup_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
 
    _scroller_size_reset(wd);
 
-<<<<<<< HEAD
-   evas_object_smart_callback_call(obj, SIG_DISMISSED, NULL);
-=======
->>>>>>> remotes/origin/upstream
    wd->visible = EINA_FALSE;
 }
 
 static void
-<<<<<<< HEAD
-_ctxpopup_hide(void *data __UNUSED__, Evas *e __UNUSED__, Evas_Object *obj,
-               void *event_info __UNUSED__)
-{
-   _hide(obj);
-}
-
-static void
-=======
->>>>>>> remotes/origin/upstream
 _content_resize(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
                 void *event_info __UNUSED__)
 {
@@ -1384,25 +1225,14 @@ _item_select_cb(void *data, Evas_Object *obj __UNUSED__,
    if (elm_widget_item_disabled_get(item)) return;
 
    if (item->func)
-<<<<<<< HEAD
-     item->func((void*) item->base.data, WIDGET(item), data);
-=======
      item->func((void*)item->base.data, WIDGET(item), data);
->>>>>>> remotes/origin/upstream
 }
 
 static void
 _item_icon_set(Elm_Ctxpopup_Item *item, Evas_Object *icon)
 {
    if (item->icon)
-<<<<<<< HEAD
-     {
-        elm_widget_sub_object_del(VIEW(item), item->icon);
-        evas_object_del(item->icon);
-     }
-=======
      evas_object_del(item->icon);
->>>>>>> remotes/origin/upstream
 
    item->icon = icon;
    if (!icon) return;
@@ -1505,15 +1335,8 @@ _remove_items(Widget_Data *wd)
 static Eina_Bool
 _item_del_pre_hook(Elm_Object_Item *it)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
-
-   Widget_Data *wd;
-   Elm_Ctxpopup_Item *ctxpopup_it = (Elm_Ctxpopup_Item *) it;
-=======
    Widget_Data *wd;
    Elm_Ctxpopup_Item *ctxpopup_it = (Elm_Ctxpopup_Item *)it;
->>>>>>> remotes/origin/upstream
 
    wd = elm_widget_data_get(WIDGET(ctxpopup_it));
    if (!wd) return EINA_FALSE;
@@ -1547,19 +1370,11 @@ elm_ctxpopup_add(Evas_Object *parent)
    Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
-<<<<<<< HEAD
-   Evas_Coord x, y, w, h;
-=======
->>>>>>> remotes/origin/upstream
 
    ELM_WIDGET_STANDARD_SETUP(wd, Widget_Data, parent, e, obj, NULL);
 
    ELM_SET_WIDTYPE(widtype, "ctxpopup");
    elm_widget_type_set(obj, "ctxpopup");
-<<<<<<< HEAD
-   elm_widget_sub_object_add(parent, obj);
-=======
->>>>>>> remotes/origin/upstream
    elm_widget_data_set(obj, wd);
    elm_widget_del_pre_hook_set(obj, _del_pre_hook);
    elm_widget_del_hook_set(obj, _del_hook);
@@ -1575,29 +1390,17 @@ elm_ctxpopup_add(Evas_Object *parent)
    wd->bg = edje_object_add(e);
    elm_widget_sub_object_add(obj, wd->bg);
    _elm_theme_object_set(obj, wd->bg, "ctxpopup", "bg", "default");
-<<<<<<< HEAD
-   evas_object_geometry_get(parent, &x, &y, &w, &h);
-   evas_object_move(wd->bg, x, y);
-   evas_object_resize(wd->bg, w, h);
-   edje_object_signal_callback_add(wd->bg, "elm,action,click", "",
-                                   _bg_clicked_cb, obj);
-
-=======
    edje_object_signal_callback_add(wd->bg,
                                    "elm,action,click",
                                    "",
                                    _bg_clicked_cb,
                                     obj);
->>>>>>> remotes/origin/upstream
    //Base
    wd->base = edje_object_add(e);
    elm_widget_sub_object_add(obj, wd->base);
    _elm_theme_object_set(obj, wd->base, "ctxpopup", "base", "default");
-<<<<<<< HEAD
-=======
    edje_object_signal_callback_add(wd->base, "elm,action,hide,finished", "",
                                    _hide_finished, obj);
->>>>>>> remotes/origin/upstream
 
    //Arrow
    wd->arrow = edje_object_add(e);
@@ -1608,12 +1411,6 @@ elm_ctxpopup_add(Evas_Object *parent)
    wd->dir_priority[1] = ELM_CTXPOPUP_DIRECTION_LEFT;
    wd->dir_priority[2] = ELM_CTXPOPUP_DIRECTION_RIGHT;
    wd->dir_priority[3] = ELM_CTXPOPUP_DIRECTION_DOWN;
-<<<<<<< HEAD
-
-   evas_object_event_callback_add(parent, EVAS_CALLBACK_RESIZE, _parent_resize,
-                                  obj);
-=======
->>>>>>> remotes/origin/upstream
    wd->dir = ELM_CTXPOPUP_DIRECTION_UNKNOWN;
 
    evas_object_event_callback_add(obj, EVAS_CALLBACK_SHOW, _ctxpopup_show,
@@ -1622,11 +1419,6 @@ elm_ctxpopup_add(Evas_Object *parent)
                                   NULL);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _ctxpopup_move,
                                   NULL);
-<<<<<<< HEAD
-   evas_object_event_callback_add(obj, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                  _ctxpopup_changed_size_hints, NULL);
-=======
->>>>>>> remotes/origin/upstream
    evas_object_event_callback_add(obj, EVAS_CALLBACK_RESTACK, _restack, obj);
    evas_object_smart_callback_add(obj, "scroll-freeze-on", _freeze_on, obj);
    evas_object_smart_callback_add(obj, "scroll-freeze-off", _freeze_off, obj);
@@ -1641,33 +1433,6 @@ elm_ctxpopup_add(Evas_Object *parent)
    return obj;
 }
 
-<<<<<<< HEAD
-EAPI Evas_Object *
-elm_ctxpopup_item_icon_get(const Elm_Object_Item *it)
-{
-   return _item_content_get_hook(it, "icon");
-}
-
-EAPI void
-elm_ctxpopup_item_icon_set(Elm_Object_Item *it, Evas_Object *icon)
-{
-   _item_content_set_hook(it, "icon", icon);
-}
-
-EAPI const char *
-elm_ctxpopup_item_label_get(const Elm_Object_Item *it)
-{
-   return _item_text_get_hook(it, NULL);
-}
-
-EAPI void
-elm_ctxpopup_item_label_set(Elm_Object_Item *it, const char *label)
-{
-   _item_text_set_hook(it, NULL, label);
-}
-
-=======
->>>>>>> remotes/origin/upstream
 EAPI void
 elm_ctxpopup_hover_parent_set(Evas_Object *obj, Evas_Object *parent)
 {
@@ -1740,12 +1505,9 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
    ELM_CHECK_WIDTYPE(obj, widtype);
 
    Widget_Data *wd;
-<<<<<<< HEAD
    Eina_List *elist;
    Elm_Ctxpopup_Item *item;
    int idx = 0;
-=======
->>>>>>> remotes/origin/upstream
 
    wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -1759,7 +1521,6 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
      {
         elm_box_horizontal_set(wd->box, EINA_FALSE);
         elm_scroller_bounce_set(wd->scr, EINA_FALSE, EINA_TRUE);
-<<<<<<< HEAD
 
         EINA_LIST_FOREACH(wd->items, elist, item)
           {
@@ -1768,14 +1529,11 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
              else
                edje_object_signal_emit(VIEW(item), "elm,state,vertical", "elm");
           }
-=======
->>>>>>> remotes/origin/upstream
      }
    else
      {
         elm_box_horizontal_set(wd->box, EINA_TRUE);
         elm_scroller_bounce_set(wd->scr, EINA_TRUE, EINA_FALSE);
-<<<<<<< HEAD
 
         EINA_LIST_FOREACH(wd->items, elist, item)
           {
@@ -1784,8 +1542,6 @@ elm_ctxpopup_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
              else
                edje_object_signal_emit(VIEW(item), "elm,state,horizontal", "elm");
           }
-=======
->>>>>>> remotes/origin/upstream
      }
 
    wd->dir = ELM_CTXPOPUP_DIRECTION_UNKNOWN;
@@ -1861,41 +1617,7 @@ elm_ctxpopup_item_append(Evas_Object *obj, const char *label,
         _sizing_eval(obj);
      }
 
-<<<<<<< HEAD
-   return (Elm_Object_Item *) item;
-}
-
-EAPI void
-elm_ctxpopup_item_del(Elm_Object_Item *it)
-{
-   elm_object_item_del(it);
-}
-
-EAPI void
-elm_ctxpopup_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled)
-{
-   elm_object_item_disabled_set(it, disabled);
-}
-
-EAPI Eina_Bool
-elm_ctxpopup_item_disabled_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_disabled_get(it);
-}
-
-EAPI void
-elm_ctxpopup_content_set(Evas_Object *obj, Evas_Object *content)
-{
-   elm_object_content_set(obj, content);
-}
-
-EAPI Evas_Object *
-elm_ctxpopup_content_unset(Evas_Object *obj)
-{
-   return elm_object_content_unset(obj);
-=======
    return (Elm_Object_Item *)item;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -1949,8 +1671,6 @@ elm_ctxpopup_direction_get(const Evas_Object *obj)
    if (!wd) return ELM_CTXPOPUP_DIRECTION_UNKNOWN;
    return wd->dir;
 }
-<<<<<<< HEAD
-=======
 
 EAPI void
 elm_ctxpopup_dismiss(Evas_Object *obj)
@@ -1960,4 +1680,3 @@ elm_ctxpopup_dismiss(Evas_Object *obj)
    if (!wd) return;
    _hide_signal_emit(obj, wd->dir);
 }
->>>>>>> remotes/origin/upstream
