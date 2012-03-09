@@ -2545,7 +2545,7 @@ _event_selection_clear(void *data __UNUSED__, int type __UNUSED__, void *event _
           formats = ELM_SEL_FORMAT_TEXT;
         else if (wd->cnp_mode != ELM_CNP_MODE_NO_IMAGE)
           formats |= ELM_SEL_FORMAT_IMAGE;
-        elm_cnp_selection_get(ELM_SEL_TYPE_SECONDARY, formats, data, NULL, NULL);
+        elm_cnp_selection_get(data, ELM_SEL_TYPE_SECONDARY, formats, NULL, NULL);
      }
 
    // end for cbhm

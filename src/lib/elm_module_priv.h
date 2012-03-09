@@ -23,7 +23,7 @@ struct _Elm_Entry_Extension_data
 	Eina_Bool have_selection: 1;
 	Eina_Bool selmode :1;
 	Eina_Bool context_menu : 1;
-	Elm_CNP_Mode cnp_mode : 2;
+	Elm_Cnp_Mode cnp_mode : 2;
 };
 
 void elm_entry_extension_module_data_get(Evas_Object *obj,Elm_Entry_Extension_data *ext_mod);
