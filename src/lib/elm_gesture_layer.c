@@ -75,11 +75,7 @@ struct _Gesture_Info
   Evas_Object *obj;
   void *data; /**< Holds gesture intemidiate processing data */
   Func_Data fn[ELM_GESTURE_STATE_ABORT + 1]; /**< Callback info for states */
-<<<<<<< HEAD
-  Elm_Gesture_Types g_type;  /**< gesture type */
-=======
   Elm_Gesture_Type g_type;  /**< gesture type */
->>>>>>> remotes/origin/upstream
   Elm_Gesture_State state;  /**< gesture state */
   void *info;                        /**< Data for the state callback */
   Eina_Bool test; /**< if true this gesture should be tested on input */
@@ -274,11 +270,7 @@ static Eina_Bool _event_history_clear(Evas_Object *obj);
 static void _reset_states(Widget_Data *wd);
 static void _key_down_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info);
 static void _key_up_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info);
-<<<<<<< HEAD
-static void _zoom_with_wheel_test(Evas_Object *obj, void *event_info, Evas_Callback_Type event_type, Elm_Gesture_Types g_type);
-=======
 static void _zoom_with_wheel_test(Evas_Object *obj, void *event_info, Evas_Callback_Type event_type, Elm_Gesture_Type g_type);
->>>>>>> remotes/origin/upstream
 static void _mouse_wheel(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info);
 static void _mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _mouse_move(void *data, Evas *e, Evas_Object *obj, void *event_info);
@@ -594,21 +586,6 @@ _clear_if_finished(Evas_Object *obj)
 }
 
 static Eina_Bool
-<<<<<<< HEAD
-_inside(Evas_Coord x1, Evas_Coord y1, Evas_Coord x2, Evas_Coord y2)
-{
-   int w = elm_finger_size_get() >> 1; /* Finger size devided by 2 */
-   if (x1 < (x2 - w))
-     return EINA_FALSE;
-
-   if (x1 > (x2 + w))
-     return EINA_FALSE;
-
-   if (y1 < (y2 - w))
-     return EINA_FALSE;
-
-   if (y1 > (y2 + w))
-=======
 _inside(Evas_Coord xx1, Evas_Coord yy1, Evas_Coord xx2, Evas_Coord yy2)
 {
    int w = _elm_config->finger_size >> 1; /* Finger size devided by 2 */
@@ -622,7 +599,6 @@ _inside(Evas_Coord xx1, Evas_Coord yy1, Evas_Coord xx2, Evas_Coord yy2)
      return EINA_FALSE;
 
    if (yy1 > (yy2 + w))
->>>>>>> remotes/origin/upstream
      return EINA_FALSE;
 
    return EINA_TRUE;
@@ -670,12 +646,6 @@ _n_long_tap_test_reset(Gesture_Info *gesture)
    Eina_List *l;
    Pointer_Event *p;
    EINA_LIST_FOREACH(st->touched, l, p)
-<<<<<<< HEAD
-      free(p);
-
-   eina_list_free(st->touched);
-   if (st->timeout) ecore_timer_del(st->timeout);
-=======
      free(p);
 
    eina_list_free(st->touched);
@@ -684,7 +654,6 @@ _n_long_tap_test_reset(Gesture_Info *gesture)
         ecore_timer_del(st->timeout);
         st->timeout = NULL;
      }
->>>>>>> remotes/origin/upstream
    memset(gesture->data, 0, sizeof(Long_Tap_Type));
 }
 
@@ -891,15 +860,9 @@ _add_device_pending(Eina_List *list, void *event, Evas_Callback_Type event_type)
      }
 
    if (!eina_list_search_unsorted_list(list, device_in_pending_list,
-<<<<<<< HEAD
-            (intptr_t*) device))
-     {
-        return eina_list_append(list, (intptr_t*) device);
-=======
                                        (void *)(intptr_t)device))
      {
         return eina_list_append(list, (void *)(intptr_t)device);
->>>>>>> remotes/origin/upstream
      }
 
    return list;
@@ -927,11 +890,7 @@ _device_is_pending(Eina_List *list, void *event, Evas_Callback_Type event_type)
      }
 
    return eina_list_search_unsorted_list(list, device_in_pending_list,
-<<<<<<< HEAD
-         (intptr_t *) device);
-=======
                                          (void *)(intptr_t)device);
->>>>>>> remotes/origin/upstream
 }
 
 /**
@@ -958,11 +917,7 @@ _event_history_clear(Evas_Object *obj)
    Gesture_Info *p;
    Evas *e = evas_object_evas_get(obj);
    Eina_Bool gesture_found = EINA_FALSE;
-<<<<<<< HEAD
-   for (i = ELM_GESTURE_FIRST ; i < ELM_GESTURE_LAST; i++)
-=======
    for (i = ELM_GESTURE_FIRST; i < ELM_GESTURE_LAST; i++)
->>>>>>> remotes/origin/upstream
      {
         p = wd->gesture[i];
         if (p)
@@ -1119,11 +1074,7 @@ _del_hook(Evas_Object *obj)
 
    Pointer_Event *data;
    EINA_LIST_FREE(wd->touched, data)
-<<<<<<< HEAD
-      free(data);
-=======
      free(data);
->>>>>>> remotes/origin/upstream
 
    if (!elm_widget_disabled_get(obj))
      _unregister_callbacks(obj);
@@ -1172,10 +1123,6 @@ compare_pe_device(const void *data1, const void *data2)
          (pe1->event_type != EVAS_CALLBACK_MOUSE_DOWN))
      return 1;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> remotes/origin/upstream
    if (pe1->device == pe2->device)
      return 0;
    else if (pe1->device < pe2->device)
@@ -1494,11 +1441,7 @@ _compute_taps_center(Long_Tap_Type *st,
 static void
 _n_long_tap_test(Evas_Object *obj, Pointer_Event *pe,
                  void *event_info, Evas_Callback_Type event_type,
-<<<<<<< HEAD
-                 Elm_Gesture_Types g_type)
-=======
                  Elm_Gesture_Type g_type)
->>>>>>> remotes/origin/upstream
 {  /* Here we fill Recent_Taps struct and fire-up click/tap timers */
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -1627,15 +1570,6 @@ _n_long_tap_test(Evas_Object *obj, Pointer_Event *pe,
  * @ingroup Elm_Gesture_Layer
  */
 static void
-<<<<<<< HEAD
-_set_momentum(Elm_Gesture_Momentum_Info *momentum, Evas_Coord x1, Evas_Coord y1,
-      Evas_Coord x2, Evas_Coord y2, unsigned int t1x, unsigned int t1y,
-      unsigned int t2)
-{
-   Evas_Coord velx = 0, vely = 0, vel;
-   Evas_Coord dx = x2 - x1;
-   Evas_Coord dy = y2 - y1;
-=======
 _set_momentum(Elm_Gesture_Momentum_Info *momentum, 
               Evas_Coord xx1, Evas_Coord yy1,
               Evas_Coord xx2, Evas_Coord yy2, 
@@ -1644,7 +1578,6 @@ _set_momentum(Elm_Gesture_Momentum_Info *momentum,
    Evas_Coord velx = 0, vely = 0, vel;
    Evas_Coord dx = xx2 - xx1;
    Evas_Coord dy = yy2 - yy1;
->>>>>>> remotes/origin/upstream
    int dtx = t2 - t1x;
    int dty = t2 - t1y;
    if (dtx > 0)
@@ -1685,38 +1618,6 @@ _set_momentum(Elm_Gesture_Momentum_Info *momentum,
  * @ingroup Elm_Gesture_Layer
  */
 static double
-<<<<<<< HEAD
-get_angle(Evas_Coord x1, Evas_Coord y1, Evas_Coord x2, Evas_Coord y2)
-{
-   double a, xx, yy, rt = (-1);
-   xx = fabs(x2 - x1);
-   yy = fabs(y2 - y1);
-
-   if (((int) xx) && ((int) yy))
-     {
-        rt = a = RAD2DEG(atan(yy / xx));
-        if (x1 < x2)
-          {
-             if (y1 < y2)
-               {
-                  rt = 360 - a;
-               }
-             else
-               {
-                  rt = (a);
-               }
-          }
-        else
-          {
-             if (y1 < y2)
-               {
-                  rt = 180 + a;
-               }
-             else
-               {
-                  rt = 180 - a;
-               }
-=======
 get_angle(Evas_Coord xx1, Evas_Coord yy1, Evas_Coord xx2, Evas_Coord yy2)
 {
    double a, xx, yy, rt = (-1);
@@ -1735,35 +1636,11 @@ get_angle(Evas_Coord xx1, Evas_Coord yy1, Evas_Coord xx2, Evas_Coord yy2)
           {
              if (yy1 < yy2) rt = 180 + a;
              else rt = 180 - a;
->>>>>>> remotes/origin/upstream
           }
      }
 
    if (rt < 0)
      {  /* Do this only if rt is not set */
-<<<<<<< HEAD
-        if (((int) xx))
-          {  /* Horizontal line */
-             if (x2 < x1)
-               {
-                  rt = 180;
-               }
-             else
-               {
-                  rt = 0.0;
-               }
-          }
-        else
-          {  /* Vertical line */
-             if (y2 < y1)
-               {
-                  rt = 90;
-               }
-             else
-               {
-                  rt = 270;
-               }
-=======
         if (((int)xx))
           {  /* Horizontal line */
              if (xx2 < xx1) rt = 180;
@@ -1773,7 +1650,6 @@ get_angle(Evas_Coord xx1, Evas_Coord yy1, Evas_Coord xx2, Evas_Coord yy2)
           {  /* Vertical line */
              if (yy2 < yy1) rt = 90;
              else rt = 270;
->>>>>>> remotes/origin/upstream
           }
      }
 
@@ -1782,15 +1658,8 @@ get_angle(Evas_Coord xx1, Evas_Coord yy1, Evas_Coord xx2, Evas_Coord yy2)
     * original circle   180   0   We want:  270   90
     *                     270                 180
     */
-<<<<<<< HEAD
-
-   rt = 450 - rt;
-   if (rt >= 360)
-     rt -= 360;
-=======
    rt = 450 - rt;
    if (rt >= 360) rt -= 360;
->>>>>>> remotes/origin/upstream
 
    return rt;
 }
@@ -1811,27 +1680,6 @@ get_angle(Evas_Coord xx1, Evas_Coord yy1, Evas_Coord xx2, Evas_Coord yy2)
  * @ingroup Elm_Gesture_Layer
  */
 static void
-<<<<<<< HEAD
-get_vector(Evas_Coord x1, Evas_Coord y1, Evas_Coord x2, Evas_Coord y2,
-      Evas_Coord *l, double *a)
-{
-   Evas_Coord xx, yy;
-   xx = x2 - x1;
-   yy = y2 - y1;
-   *l = (Evas_Coord) sqrt(xx*xx + yy*yy);
-   *a = get_angle(x1, y1, x2, y2);
-}
-
-static int
-_get_direction(Evas_Coord x1, Evas_Coord x2)
-{
-   if (x2 < x1)
-     return -1;
-
-   if (x2 > x1)
-     return 1;
-
-=======
 get_vector(Evas_Coord xx1, Evas_Coord yy1, Evas_Coord xx2, Evas_Coord yy2,
            Evas_Coord *l, double *a)
 {
@@ -1847,7 +1695,6 @@ _get_direction(Evas_Coord xx1, Evas_Coord xx2)
 {
    if (xx2 < xx1) return -1;
    if (xx2 > xx1) return 1;
->>>>>>> remotes/origin/upstream
    return 0;
 }
 /**
@@ -1864,13 +1711,8 @@ _get_direction(Evas_Coord xx1, Evas_Coord xx2)
  */
 static void
 _momentum_test(Evas_Object *obj, Pointer_Event *pe,
-<<<<<<< HEAD
-      void *event_info, Evas_Callback_Type event_type,
-      Elm_Gesture_Types g_type)
-=======
                void *event_info, Evas_Callback_Type event_type,
                Elm_Gesture_Type g_type)
->>>>>>> remotes/origin/upstream
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -2142,11 +1984,7 @@ _single_line_process(Elm_Gesture_Line_Info *info, Line_Data *st,
  */
 static void
 _n_line_test(Evas_Object *obj, Pointer_Event *pe, void *event_info,
-<<<<<<< HEAD
-      Evas_Callback_Type event_type, Elm_Gesture_Types g_type)
-=======
       Evas_Callback_Type event_type, Elm_Gesture_Type g_type)
->>>>>>> remotes/origin/upstream
 {
    if (!pe)
      return;
@@ -2331,11 +2169,7 @@ _n_line_test(Evas_Object *obj, Pointer_Event *pe, void *event_info,
 
 
    /* We report ABORT if lines length are NOT matching when fingers are up */
-<<<<<<< HEAD
-   if ((longest_line_len - shortest_line_len) > (elm_finger_size_get()*2))
-=======
    if ((longest_line_len - shortest_line_len) > (_elm_config->finger_size * 2))
->>>>>>> remotes/origin/upstream
      {
         ev_flag = _set_state(gesture, ELM_GESTURE_STATE_ABORT, &st->info,
               EINA_FALSE);
@@ -2477,15 +2311,6 @@ rotation_broke_tolerance(Rotate_Type *st)
  * @ingroup Elm_Gesture_Layer
  */
 static Evas_Coord
-<<<<<<< HEAD
-get_finger_gap_length(Evas_Coord x1, Evas_Coord y1, Evas_Coord x2,
-      Evas_Coord y2, Evas_Coord *x, Evas_Coord *y)
-{
-   double a, b, xx, yy, gap;
-   xx = fabs(x2 - x1);
-   yy = fabs(y2 - y1);
-   gap = sqrt(xx*xx + yy*yy);
-=======
 get_finger_gap_length(Evas_Coord xx1, Evas_Coord yy1,
                       Evas_Coord xx2, Evas_Coord yy2,
                       Evas_Coord *x, Evas_Coord *y)
@@ -2494,7 +2319,6 @@ get_finger_gap_length(Evas_Coord xx1, Evas_Coord yy1,
    xx = fabs(xx2 - xx1);
    yy = fabs(yy2 - yy1);
    gap = sqrt((xx * xx) + (yy * yy));
->>>>>>> remotes/origin/upstream
 
    /* START - Compute zoom center point */
    /* The triangle defined as follows:
@@ -2507,11 +2331,7 @@ get_finger_gap_length(Evas_Coord xx1, Evas_Coord yy1,
     *          b
     * http://en.wikipedia.org/wiki/Trigonometric_functions
     *************************************/
-<<<<<<< HEAD
-   if (((int) xx) && ((int) yy))
-=======
    if (((int)xx) && ((int)yy))
->>>>>>> remotes/origin/upstream
      {
         double A = atan((yy / xx));
 #if defined(DEBUG_GESTURE_LAYER)
@@ -2519,49 +2339,27 @@ get_finger_gap_length(Evas_Coord xx1, Evas_Coord yy1,
 #endif
         a = (Evas_Coord) ((gap / 2) * sin(A));
         b = (Evas_Coord) ((gap / 2) * cos(A));
-<<<<<<< HEAD
-        *x = (Evas_Coord) ((x2 > x1) ? (x1 + b) : (x2 + b));
-        *y = (Evas_Coord) ((y2 > y1) ? (y1 + a) : (y2 + a));
-     }
-   else
-     {
-        if ((int) xx)
-=======
         *x = (Evas_Coord) ((xx2 > xx1) ? (xx1 + b) : (xx2 + b));
         *y = (Evas_Coord) ((yy2 > yy1) ? (yy1 + a) : (yy2 + a));
      }
    else
      {
         if ((int)xx)
->>>>>>> remotes/origin/upstream
           {  /* horiz line, take half width */
 #if defined(DEBUG_GESTURE_LAYER)
              printf("==== HORIZ ====\n");
 #endif
-<<<<<<< HEAD
-             *x = (Evas_Coord) (xx / 2);
-             *y = (Evas_Coord) (y1);
-          }
-
-        if ((int) yy)
-=======
              *x = (Evas_Coord) ((xx1 + xx2) / 2);
              *y = (Evas_Coord) (yy1);
           }
 
         if ((int)yy)
->>>>>>> remotes/origin/upstream
           {  /* vert line, take half width */
 #if defined(DEBUG_GESTURE_LAYER)
              printf("==== VERT ====\n");
 #endif
-<<<<<<< HEAD
-             *x = (Evas_Coord) (x1);
-             *y = (Evas_Coord) (yy / 2);
-=======
              *x = (Evas_Coord) (xx1);
              *y = (Evas_Coord) ((yy1 + yy2) / 2);
->>>>>>> remotes/origin/upstream
           }
      }
    /* END   - Compute zoom center point */
@@ -2641,17 +2439,6 @@ _zoom_momentum_get(Zoom_Type *st, unsigned int tm_end, double zoom_val)
  * @ingroup Elm_Gesture_Layer
  */
 static double
-<<<<<<< HEAD
-compute_zoom(Zoom_Type *st, Evas_Coord x1, Evas_Coord y1,
-      Evas_Coord x2, Evas_Coord y2, double zoom_finger_factor)
-{
-   double rt = 1.0;
-   unsigned int tm_end = (st->zoom_mv.timestamp > st->zoom_mv1.timestamp) ?
-      st->zoom_mv.timestamp : st->zoom_mv1.timestamp;
-
-   Evas_Coord diam = get_finger_gap_length(x1, y1, x2, y2,
-         &st->info.x, &st->info.y);
-=======
 compute_zoom(Zoom_Type *st,
              Evas_Coord xx1, Evas_Coord yy1,
              Evas_Coord xx2, Evas_Coord yy2,
@@ -2663,7 +2450,6 @@ compute_zoom(Zoom_Type *st,
 
    Evas_Coord diam = get_finger_gap_length(xx1, yy1, xx2, yy2,
                                            &st->info.x, &st->info.y);
->>>>>>> remotes/origin/upstream
 
    st->info.radius = diam / 2;
 
@@ -2693,11 +2479,7 @@ compute_zoom(Zoom_Type *st,
    /* We use factor only on the difference between gap-base   */
    /* if gap=120, base=100, we get ((120-100)/100)=0.2*factor */
    rt = ((1.0) + ((((float) diam - (float) st->zoom_base) /
-<<<<<<< HEAD
-               (float) st->zoom_base) * zoom_finger_factor));
-=======
                    (float) st->zoom_base) * zoom_finger_factor));
->>>>>>> remotes/origin/upstream
 
    /* Momentum: zoom per second: */
    st->info.momentum = _zoom_momentum_get(st, tm_end, rt);
@@ -2719,11 +2501,7 @@ compute_zoom(Zoom_Type *st,
  */
 static void
 _zoom_with_wheel_test(Evas_Object *obj, void *event_info,
-<<<<<<< HEAD
-      Evas_Callback_Type event_type, Elm_Gesture_Types g_type)
-=======
       Evas_Callback_Type event_type, Elm_Gesture_Type g_type)
->>>>>>> remotes/origin/upstream
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
@@ -2849,11 +2627,7 @@ _zoom_with_wheel_test(Evas_Object *obj, void *event_info,
  */
 static void
 _zoom_test(Evas_Object *obj, Pointer_Event *pe, void *event_info,
-<<<<<<< HEAD
-      Evas_Callback_Type event_type, Elm_Gesture_Types g_type)
-=======
       Evas_Callback_Type event_type, Elm_Gesture_Type g_type)
->>>>>>> remotes/origin/upstream
 {
    if (!pe)
      return;
@@ -3008,18 +2782,6 @@ _zoom_test(Evas_Object *obj, Pointer_Event *pe, void *event_info,
 
 static void
 _get_rotate_properties(Rotate_Type *st,
-<<<<<<< HEAD
-      Evas_Coord x1, Evas_Coord y1,
-      Evas_Coord x2, Evas_Coord y2,
-      double *angle)
-{  /* FIXME: Fix momentum computation, it's wrong */
-   double prev_angle = *angle;
-   st->info.radius = get_finger_gap_length(x1, y1, x2, y2,
-         &st->info.x, &st->info.y) / 2;
-
-   *angle = get_angle(x1, y1, x2, y2);
-
-=======
                        Evas_Coord xx1, Evas_Coord yy1,
                        Evas_Coord xx2, Evas_Coord yy2,
                        double *angle)
@@ -3030,7 +2792,6 @@ _get_rotate_properties(Rotate_Type *st,
 
    *angle = get_angle(xx1, yy1, xx2, yy2);
    
->>>>>>> remotes/origin/upstream
    if (angle == &st->info.angle)
      {  /* Fingers are moving, compute momentum */
         unsigned int tm_start =
@@ -3089,11 +2850,7 @@ _get_rotate_properties(Rotate_Type *st,
  */
 static void
 _rotate_test(Evas_Object *obj, Pointer_Event *pe, void *event_info,
-<<<<<<< HEAD
-      Evas_Callback_Type event_type, Elm_Gesture_Types g_type)
-=======
       Evas_Callback_Type event_type, Elm_Gesture_Type g_type)
->>>>>>> remotes/origin/upstream
 {
    if (!pe)
      return;
@@ -3193,11 +2950,7 @@ _rotate_test(Evas_Object *obj, Pointer_Event *pe, void *event_info,
               if (rotation_broke_tolerance(st))
                 {  /* Rotation broke tolerance, report move */
                    double d = st->info.angle - st->next_step;
-<<<<<<< HEAD
-                   if (d < 0.0)
-=======
                    if (d < 0)
->>>>>>> remotes/origin/upstream
                      d = (-d);
 
                    if (d >= wd->rotate_step)
@@ -3333,12 +3086,8 @@ _make_pointer_event(void *data, void *event_info,
  *
  * @ingroup Elm_Gesture_Layer
  */
-<<<<<<< HEAD
-void continues_gestures_restart(void *data, Eina_Bool states_reset)
-=======
 static void
 continues_gestures_restart(void *data, Eina_Bool states_reset)
->>>>>>> remotes/origin/upstream
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
@@ -3428,10 +3177,6 @@ _event_process(void *data, Evas_Object *obj __UNUSED__,
    Pointer_Event _pe;
    Pointer_Event *pe = NULL;
    Widget_Data *wd = elm_widget_data_get(data);
-<<<<<<< HEAD
-   if (!wd) return;
-=======
->>>>>>> remotes/origin/upstream
 
 #if defined(DEBUG_GESTURE_LAYER)
    int i;
@@ -3615,15 +3360,10 @@ _multi_up(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
 }
 
 EAPI Eina_Bool
-<<<<<<< HEAD
-elm_gesture_layer_hold_events_get(Evas_Object *obj)
-{
-=======
 elm_gesture_layer_hold_events_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
 
->>>>>>> remotes/origin/upstream
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
 
@@ -3631,48 +3371,6 @@ elm_gesture_layer_hold_events_get(const Evas_Object *obj)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_gesture_layer_hold_events_set(Evas_Object *obj, Eina_Bool r)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   wd->repeat_events = !r;
-}
-
-EAPI void
-elm_gesture_layer_zoom_step_set(Evas_Object *obj, double s)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (s < 0.0)
-     return;
-
-   wd->zoom_step = s;
-}
-
-EAPI void
-elm_gesture_layer_rotate_step_set(Evas_Object *obj, double s)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (s < 0.0)
-     return;
-
-   wd->rotate_step = s;
-}
-
-EAPI Eina_Bool
-elm_gesture_layer_attach(Evas_Object *obj, Evas_Object *t)
-{
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-
-   if (!t)
-     return EINA_FALSE;
-=======
 elm_gesture_layer_hold_events_set(Evas_Object *obj, Eina_Bool hold_events)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -3740,34 +3438,23 @@ elm_gesture_layer_attach(Evas_Object *obj, Evas_Object *target)
    if (!wd) return EINA_FALSE;
 
    if (!target) return EINA_FALSE;
->>>>>>> remotes/origin/upstream
 
    /* if was attached before, unregister callbacks first */
    if (wd->target)
      _unregister_callbacks(obj);
 
-<<<<<<< HEAD
-   wd->target = t;
-=======
    wd->target = target;
->>>>>>> remotes/origin/upstream
 
    _register_callbacks(obj);
    return EINA_TRUE;
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_gesture_layer_cb_set(Evas_Object *obj, Elm_Gesture_Types idx,
-      Elm_Gesture_State cb_type, Elm_Gesture_Event_Cb cb, void *data)
-{
-=======
 elm_gesture_layer_cb_set(Evas_Object *obj, Elm_Gesture_Type idx,
       Elm_Gesture_State cb_type, Elm_Gesture_Event_Cb cb, void *data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
 
->>>>>>> remotes/origin/upstream
    Widget_Data *wd = elm_widget_data_get(obj);
    Gesture_Info *p;
    if (!wd) return;
@@ -3811,15 +3498,9 @@ elm_gesture_layer_add(Evas_Object *parent)
    elm_widget_disable_hook_set(obj, _disable_hook);
 
    wd->target = NULL;
-<<<<<<< HEAD
-   wd->line_min_length =_elm_config->glayer_line_min_length * elm_finger_size_get();
-   wd->zoom_distance_tolerance = _elm_config->glayer_zoom_distance_tolerance * elm_finger_size_get();
-   wd->line_distance_tolerance = _elm_config->glayer_line_distance_tolerance * elm_finger_size_get();
-=======
    wd->line_min_length =_elm_config->glayer_line_min_length * _elm_config->finger_size;
    wd->zoom_distance_tolerance = _elm_config->glayer_zoom_distance_tolerance * _elm_config->finger_size;
    wd->line_distance_tolerance = _elm_config->glayer_line_distance_tolerance * _elm_config->finger_size;
->>>>>>> remotes/origin/upstream
    wd->zoom_finger_factor = _elm_config->glayer_zoom_finger_factor;
    wd->zoom_wheel_factor = _elm_config->glayer_zoom_wheel_factor; /* mouse wheel zoom steps */
    wd->rotate_angular_tolerance = _elm_config->glayer_rotate_angular_tolerance;
