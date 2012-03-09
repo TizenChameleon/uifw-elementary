@@ -201,11 +201,7 @@ _activate(Evas_Object *obj)
         if (item->icon_file)
           {
              ic = elm_icon_add(obj);
-<<<<<<< HEAD
-             elm_icon_scale_set(ic, 0, 1);
-=======
              elm_icon_resizable_set(ic, EINA_FALSE, EINA_TRUE);
->>>>>>> remotes/origin/upstream
              if (item->icon_type == ELM_ICON_FILE)
                elm_icon_file_set(ic, item->icon_file, item->icon_group);
              else if (item->icon_type == ELM_ICON_STANDARD)
@@ -308,27 +304,15 @@ _content_unset_hook(Evas_Object *obj, const char *part)
 static const char *
 _item_text_get_hook(const Elm_Object_Item *it, const char *part)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   if (part && strcmp(part, "default")) return NULL;
-   return ((Elm_Hoversel_Item *) it)->label;
-=======
    if (part && strcmp(part, "default")) return NULL;
    return ((Elm_Hoversel_Item *)it)->label;
->>>>>>> remotes/origin/upstream
 }
 
 static Eina_Bool
 _item_del_pre_hook(Elm_Object_Item *it)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
-   Widget_Data *wd;
-   Elm_Hoversel_Item *item = (Elm_Hoversel_Item *) it;
-=======
    Widget_Data *wd;
    Elm_Hoversel_Item *item = (Elm_Hoversel_Item *)it;
->>>>>>> remotes/origin/upstream
    wd = elm_widget_data_get(WIDGET(item));
    if (!wd) return EINA_FALSE;
    elm_hoversel_hover_end(WIDGET(item));
@@ -408,21 +392,6 @@ elm_hoversel_hover_parent_get(const Evas_Object *obj)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_hoversel_label_set(Evas_Object *obj, const char *label)
-{
-   _elm_hoversel_label_set(obj, NULL, label);
-}
-
-EAPI const char *
-elm_hoversel_label_get(const Evas_Object *obj)
-{
-   return _elm_hoversel_label_get(obj, NULL);
-}
-
-EAPI void
-=======
->>>>>>> remotes/origin/upstream
 elm_hoversel_horizontal_set(Evas_Object *obj, Eina_Bool horizontal)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -441,27 +410,6 @@ elm_hoversel_horizontal_get(const Evas_Object *obj)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_hoversel_icon_set(Evas_Object *obj, Evas_Object *icon)
-{
-   _content_set_hook(obj, "icon", icon);
-}
-
-EAPI Evas_Object *
-elm_hoversel_icon_get(const Evas_Object *obj)
-{
-   return _content_get_hook(obj, "icon");
-}
-
-EAPI Evas_Object *
-elm_hoversel_icon_unset(Evas_Object *obj)
-{
-   return _content_unset_hook(obj, "icon");
-}
-
-EAPI void
-=======
->>>>>>> remotes/origin/upstream
 elm_hoversel_hover_begin(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -533,46 +481,14 @@ elm_hoversel_item_add(Evas_Object *obj, const char *label, const char *icon_file
    item->icon_type = icon_type;
    item->func = func;
    item->base.data = data;
-<<<<<<< HEAD
-   return (Elm_Object_Item *) item;
-}
-
-EAPI void
-elm_hoversel_item_del(Elm_Object_Item *it)
-{
-   elm_object_item_del(it);
-}
-
-EAPI void
-elm_hoversel_item_del_cb_set(Elm_Object_Item *it, Evas_Smart_Cb func)
-{
-   elm_object_item_del_cb_set(it, func);
-}
-
-EAPI void *
-elm_hoversel_item_data_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_data_get(it);
-}
-
-EAPI const char *
-elm_hoversel_item_label_get(const Elm_Object_Item *it)
-{
-   return _item_text_get_hook(it, NULL);
-=======
    return (Elm_Object_Item *)item;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
 elm_hoversel_item_icon_set(Elm_Object_Item *it, const char *icon_file, const char *icon_group, Elm_Icon_Type icon_type)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-<<<<<<< HEAD
-   Elm_Hoversel_Item *item = (Elm_Hoversel_Item *) it;
-=======
    Elm_Hoversel_Item *item = (Elm_Hoversel_Item *)it;
->>>>>>> remotes/origin/upstream
    eina_stringshare_replace(&item->icon_file, icon_file);
    eina_stringshare_replace(&item->icon_group, icon_group);
    item->icon_type = icon_type;
@@ -582,11 +498,7 @@ EAPI void
 elm_hoversel_item_icon_get(const Elm_Object_Item *it, const char **icon_file, const char **icon_group, Elm_Icon_Type *icon_type)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-<<<<<<< HEAD
-   Elm_Hoversel_Item *item = (Elm_Hoversel_Item *) it;
-=======
    Elm_Hoversel_Item *item = (Elm_Hoversel_Item *)it;
->>>>>>> remotes/origin/upstream
    if (icon_file) *icon_file = item->icon_file;
    if (icon_group) *icon_group = item->icon_group;
    if (icon_type) *icon_type = item->icon_type;

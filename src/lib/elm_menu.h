@@ -12,11 +12,7 @@
  * Signals that you can add callbacks for are:
  * @li "clicked" - the user clicked the empty space in the menu to dismiss.
  *
-<<<<<<< HEAD
- * Default contents parts of the menu items that you can use for are:
-=======
  * Default content parts of the menu items that you can use for are:
->>>>>>> remotes/origin/upstream
  * @li "default" - A main content of the menu item
  *
  * Default text parts of the menu items that you can use for are:
@@ -107,11 +103,7 @@ EAPI Evas_Object                 *elm_menu_item_object_get(const Elm_Object_Item
  *
  * @param obj The menu object.
  * @param parent The parent menu item (optional)
-<<<<<<< HEAD
- * @param icon An icon display on the item. The icon will be destryed by the menu.
-=======
  * @param icon An icon display on the item. The icon will be destroyed by the menu.
->>>>>>> remotes/origin/upstream
  * @param label The label of the item.
  * @param func Function called when the user select the item.
  * @param data Data sent by the callback.
@@ -120,31 +112,6 @@ EAPI Evas_Object                 *elm_menu_item_object_get(const Elm_Object_Item
 EAPI Elm_Object_Item             *elm_menu_item_add(Evas_Object *obj, Elm_Object_Item *parent, const char *icon, const char *label, Evas_Smart_Cb func, const void *data);
 
 /**
-<<<<<<< HEAD
- * @brief Add an object swallowed in an item at the end of the given menu
- * widget
- *
- * @param obj The menu object.
- * @param parent The parent menu item (optional)
- * @param subobj The object to swallow
- * @param func Function called when the user select the item.
- * @param data Data sent by the callback.
- * @return Returns the new item.
- *
- * Add an evas object as an item to the menu.
- */
-EAPI Elm_Object_Item             *elm_menu_item_add_object(Evas_Object *obj, Elm_Object_Item *parent, Evas_Object *subobj, Evas_Smart_Cb func, const void *data);
-
-/**
- * @brief Set the icon of a menu item to the standard icon with name @p icon
- *
- * @param it The menu item object.
- * @param icon The icon object to set for the content of @p item
- *
- * Once this icon is set, any previously set icon will be deleted.
- */
-EAPI void                         elm_menu_item_object_icon_name_set(Elm_Object_Item *it, const char *icon);
-=======
  * @brief Set the icon of a menu item to the standard icon with name @p icon
  *
  * @param it The menu item object.
@@ -153,7 +120,6 @@ EAPI void                         elm_menu_item_object_icon_name_set(Elm_Object_
  * Once this icon is set, any previously set icon will be deleted.
  */
 EAPI void                         elm_menu_item_icon_name_set(Elm_Object_Item *it, const char *icon);
->>>>>>> remotes/origin/upstream
 
 /**
  * @brief Get the string representation from the icon of a menu item
@@ -161,15 +127,9 @@ EAPI void                         elm_menu_item_icon_name_set(Elm_Object_Item *i
  * @param it The menu item object.
  * @return The string representation of @p item's icon or NULL
  *
-<<<<<<< HEAD
- * @see elm_menu_item_object_icon_name_set()
- */
-EAPI const char                  *elm_menu_item_object_icon_name_get(const Elm_Object_Item *it);
-=======
  * @see elm_menu_item_icon_name_set()
  */
 EAPI const char                  *elm_menu_item_icon_name_get(const Elm_Object_Item *it);
->>>>>>> remotes/origin/upstream
 
 /**
  * @brief Set the selected state of @p item.
@@ -234,19 +194,6 @@ EAPI const Eina_List             *elm_menu_item_subitems_get(const Elm_Object_It
 EAPI unsigned int                 elm_menu_item_index_get(const Elm_Object_Item *it);
 
 /**
-<<<<<<< HEAD
- * @brief @brief Return a menu item's owner menu
- *
- * @param it The menu item
- * @return The menu object owning @p item, or NULL on failure
- *
- * Use this function to get the menu object owning an item.
- */
-EAPI Evas_Object                 *elm_menu_item_menu_get(const Elm_Object_Item *it);
-
-/**
-=======
->>>>>>> remotes/origin/upstream
  * @brief Get the selected item in the menu
  *
  * @param obj The menu object

@@ -115,36 +115,21 @@ _theme_hook(Evas_Object *obj)
                   _elm_theme_object_set
                      (obj, VIEW(item), "menu", "item_with_submenu",
                       elm_widget_style_get(obj));
-<<<<<<< HEAD
-                  elm_object_item_text_set((Elm_Object_Item *) item,
-                                           item->label);
-                  elm_menu_item_object_icon_name_set((Elm_Object_Item *) item,
-=======
                   elm_object_item_text_set((Elm_Object_Item *)item,
                                            item->label);
                   elm_menu_item_icon_name_set((Elm_Object_Item *)item,
->>>>>>> remotes/origin/upstream
                                                      item->icon_str);
                }
              else
                {
                   _elm_theme_object_set(obj, VIEW(item), "menu", "item",
                                         elm_widget_style_get(obj));
-<<<<<<< HEAD
-                  elm_object_item_text_set((Elm_Object_Item *) item,
-                                           item->label);
-                  elm_menu_item_object_icon_name_set((Elm_Object_Item *) item,
-                                                     item->icon_str);
-               }
-             _item_disable_hook((Elm_Object_Item *) item);
-=======
                   elm_object_item_text_set((Elm_Object_Item *)item,
                                            item->label);
                   elm_menu_item_icon_name_set((Elm_Object_Item *)item,
                                                      item->icon_str);
                }
              _item_disable_hook((Elm_Object_Item *)item);
->>>>>>> remotes/origin/upstream
              edje_object_scale_set(VIEW(item), elm_widget_scale_get(obj) *
                                    _elm_config->scale);
           }
@@ -157,19 +142,11 @@ _item_text_set_hook(Elm_Object_Item *it,
                     const char *part,
                     const char *label)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-=======
->>>>>>> remotes/origin/upstream
    Elm_Menu_Item *item;
 
    if (part && strcmp(part, "default")) return;
 
-<<<<<<< HEAD
-   item = (Elm_Menu_Item *) it;
-=======
    item = (Elm_Menu_Item *)it;
->>>>>>> remotes/origin/upstream
 
    eina_stringshare_replace(&item->label, label);
 
@@ -186,14 +163,8 @@ _item_text_set_hook(Elm_Object_Item *it,
 static const char *
 _item_text_get_hook(const Elm_Object_Item *it, const char *part)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   if (part && strcmp(part, "default")) return NULL;
-   return ((Elm_Menu_Item *) it)->label;
-=======
    if (part && strcmp(part, "default")) return NULL;
    return ((Elm_Menu_Item *)it)->label;
->>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -201,19 +172,11 @@ _item_content_set_hook(Elm_Object_Item *it,
                        const char *part,
                        Evas_Object *content)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-=======
->>>>>>> remotes/origin/upstream
    Elm_Menu_Item *item;
 
    if (part && strcmp(part, "default")) return;
 
-<<<<<<< HEAD
-   item = (Elm_Menu_Item *) it;
-=======
    item = (Elm_Menu_Item *)it;
->>>>>>> remotes/origin/upstream
 
    if (item->content)
      {
@@ -231,25 +194,14 @@ _item_content_set_hook(Elm_Object_Item *it,
 static Evas_Object *
 _item_content_get_hook(const Elm_Object_Item *it, const char *part)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   if (part && strcmp(part, "default")) return NULL;
-   return ((Elm_Menu_Item *) it)->content;
-=======
    if (part && strcmp(part, "default")) return NULL;
    return ((Elm_Menu_Item *)it)->content;
->>>>>>> remotes/origin/upstream
 }
 
 static void
 _item_disable_hook(Elm_Object_Item *it)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-   Elm_Menu_Item *item = (Elm_Menu_Item *) it;
-=======
    Elm_Menu_Item *item = (Elm_Menu_Item *)it;
->>>>>>> remotes/origin/upstream
 
    if (elm_widget_item_disabled_get(item))
      {
@@ -451,11 +403,7 @@ _menu_item_activate(void *data, Evas_Object *obj __UNUSED__, const char *emissio
         EINA_LIST_FOREACH(item->parent->submenu.items, l, item2)
           {
              if (item2 != item)
-<<<<<<< HEAD
-               elm_menu_item_selected_set((Elm_Object_Item *) item2, 0);
-=======
                elm_menu_item_selected_set((Elm_Object_Item *)item2, 0);
->>>>>>> remotes/origin/upstream
           }
      }
    else
@@ -464,11 +412,7 @@ _menu_item_activate(void *data, Evas_Object *obj __UNUSED__, const char *emissio
         EINA_LIST_FOREACH(wd->items, l, item2)
           {
              if (item2 != item)
-<<<<<<< HEAD
-               elm_menu_item_selected_set((Elm_Object_Item *) item2, 0);
-=======
                elm_menu_item_selected_set((Elm_Object_Item *)item2, 0);
->>>>>>> remotes/origin/upstream
           }
      }
 }
@@ -487,11 +431,7 @@ _submenu_open(void *data, Evas_Object *obj __UNUSED__, const char *emission __UN
    Elm_Menu_Item *item = data;
    item->submenu.open = EINA_TRUE;
    evas_object_show(item->submenu.hv);
-<<<<<<< HEAD
-   _sizing_eval(WIDGET(item));
-=======
    _submenu_sizing_eval(item);
->>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -555,17 +495,10 @@ _item_submenu_obj_create(Elm_Menu_Item *item)
 
    edje_object_mirrored_set(VIEW(item), elm_widget_mirrored_get(WIDGET(item)));
    _elm_theme_object_set(WIDGET(item), VIEW(item), "menu", "item_with_submenu",  elm_widget_style_get(WIDGET(item)));
-<<<<<<< HEAD
-   elm_object_item_text_set((Elm_Object_Item *) item,
-                            item->label);
-   if (item->icon_str)
-     elm_menu_item_object_icon_name_set((Elm_Object_Item *) item,
-=======
    elm_object_item_text_set((Elm_Object_Item *)item,
                             item->label);
    if (item->icon_str)
      elm_menu_item_icon_name_set((Elm_Object_Item *)item,
->>>>>>> remotes/origin/upstream
                                         item->icon_str);
    edje_object_signal_callback_add(VIEW(item), "elm,action,open", "",
                                    _submenu_open, item);
@@ -692,11 +625,7 @@ elm_menu_close(Evas_Object *obj)
 EAPI Evas_Object *
 elm_menu_item_object_get(const Elm_Object_Item *it)
 {
-<<<<<<< HEAD
-   return VIEW(((Elm_Menu_Item *) it));
-=======
    return VIEW(((Elm_Menu_Item *)it));
->>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -759,12 +688,7 @@ _elm_menu_item_add_helper(Evas_Object *obj, Elm_Menu_Item *parent, Elm_Menu_Item
 static Eina_Bool
 _item_del_pre_hook(Elm_Object_Item *it)
 {
-<<<<<<< HEAD
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
-   Elm_Menu_Item *item = (Elm_Menu_Item *) it;
-=======
    Elm_Menu_Item *item = (Elm_Menu_Item *)it;
->>>>>>> remotes/origin/upstream
    Elm_Object_Item *_item;
 
    EINA_LIST_FREE(item->submenu.items, _item) elm_object_item_del(_item);
@@ -820,22 +744,14 @@ elm_menu_item_add(Evas_Object *obj, Elm_Object_Item *parent, const char *icon, c
    elm_widget_sub_object_add(WIDGET(subitem), subitem->content);
    edje_object_part_swallow(VIEW(subitem), "elm.swallow.content", subitem->content);
    if (icon)
-<<<<<<< HEAD
-     elm_menu_item_object_icon_name_set((Elm_Object_Item *) subitem, icon);
-=======
      elm_menu_item_icon_name_set((Elm_Object_Item *) subitem, icon);
->>>>>>> remotes/origin/upstream
 
    _elm_menu_item_add_helper(obj, (Elm_Menu_Item *) parent, subitem, wd);
 
    return (Elm_Object_Item *) subitem;
 }
 
-<<<<<<< HEAD
-EAPI Elm_Object_Item *
-=======
 EINA_DEPRECATED EAPI Elm_Object_Item *
->>>>>>> remotes/origin/upstream
 elm_menu_item_add_object(Evas_Object *obj, Elm_Object_Item *parent, Evas_Object *subobj, Evas_Smart_Cb func, const void *data)
 {
    Elm_Menu_Item *subitem;
@@ -874,11 +790,7 @@ EAPI unsigned int
 elm_menu_item_index_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, 0);
-<<<<<<< HEAD
-   return ((Elm_Menu_Item *) it)->idx;
-=======
    return ((Elm_Menu_Item *)it)->idx;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -893,15 +805,6 @@ elm_menu_item_label_get(const Elm_Object_Item *it)
    return _item_text_get_hook(it, NULL);
 }
 
-<<<<<<< HEAD
-EAPI void
-elm_menu_item_object_icon_name_set(Elm_Object_Item *it, const char *icon)
-{
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-   EINA_SAFETY_ON_NULL_RETURN(icon);
-   char icon_tmp[512];
-   Elm_Menu_Item *item = (Elm_Menu_Item *) it;
-=======
 EINA_DEPRECATED EAPI void
 elm_menu_item_object_icon_name_set(Elm_Object_Item *it, const char *icon)
 {
@@ -915,7 +818,6 @@ elm_menu_item_icon_name_set(Elm_Object_Item *it, const char *icon)
    EINA_SAFETY_ON_NULL_RETURN(icon);
    char icon_tmp[512];
    Elm_Menu_Item *item = (Elm_Menu_Item *)it;
->>>>>>> remotes/origin/upstream
 
    if (!*icon) return;
    if ((item->icon_str) && (!strcmp(item->icon_str, icon))) return;
@@ -1000,13 +902,6 @@ elm_menu_item_object_content_get(const Elm_Object_Item *it)
    return _item_content_get_hook(it, NULL);
 }
 
-<<<<<<< HEAD
-EAPI const char *
-elm_menu_item_object_icon_name_get(const Elm_Object_Item *it)
-{
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   return ((Elm_Menu_Item *) it)->icon_str;
-=======
 EINA_DEPRECATED EAPI const char *
 elm_menu_item_object_icon_name_get(const Elm_Object_Item *it)
 {
@@ -1018,18 +913,13 @@ elm_menu_item_icon_name_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
    return ((Elm_Menu_Item *)it)->icon_str;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Eina_Bool
 elm_menu_item_is_separator(Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
-<<<<<<< HEAD
-   return ((Elm_Menu_Item *) it)->separator;
-=======
    return ((Elm_Menu_Item *)it)->separator;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -1060,11 +950,7 @@ EAPI const Eina_List *
 elm_menu_item_subitems_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-<<<<<<< HEAD
-   return ((Elm_Menu_Item *) it)->submenu.items;
-=======
    return ((Elm_Menu_Item *)it)->submenu.items;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI const Eina_List *
@@ -1079,11 +965,7 @@ EAPI void
 elm_menu_item_selected_set(Elm_Object_Item *it, Eina_Bool selected)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
-<<<<<<< HEAD
-   Elm_Menu_Item *item = (Elm_Menu_Item *) it;
-=======
    Elm_Menu_Item *item = (Elm_Menu_Item *)it;
->>>>>>> remotes/origin/upstream
 
    if (selected == item->selected) return;
    item->selected = selected;
@@ -1104,22 +986,14 @@ EAPI Eina_Bool
 elm_menu_item_selected_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
-<<<<<<< HEAD
-   return ((Elm_Menu_Item *) it)->selected;
-=======
    return ((Elm_Menu_Item *)it)->selected;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Elm_Object_Item *
 elm_menu_item_prev_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-<<<<<<< HEAD
-   Elm_Menu_Item *item = (Elm_Menu_Item *) it;
-=======
    Elm_Menu_Item *item = (Elm_Menu_Item *)it;
->>>>>>> remotes/origin/upstream
 
    if (item->parent)
      {
@@ -1145,11 +1019,7 @@ EAPI Elm_Object_Item *
 elm_menu_item_next_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-<<<<<<< HEAD
-   Elm_Menu_Item *item = (Elm_Menu_Item *) it;
-=======
    Elm_Menu_Item *item = (Elm_Menu_Item *)it;
->>>>>>> remotes/origin/upstream
 
    if (item->parent)
      {
@@ -1171,11 +1041,7 @@ elm_menu_item_next_get(const Elm_Object_Item *it)
    return NULL;
 }
 
-<<<<<<< HEAD
-EAPI Evas_Object *
-=======
 EINA_DEPRECATED EAPI Evas_Object *
->>>>>>> remotes/origin/upstream
 elm_menu_item_menu_get(const Elm_Object_Item *it)
 {
    return elm_object_item_widget_get(it);
@@ -1212,11 +1078,7 @@ elm_menu_selected_item_get(const Evas_Object * obj)
    Elm_Menu_Item *item;
    EINA_LIST_FOREACH(wd->items, l, item)
      {
-<<<<<<< HEAD
-        if (item->selected) return ((Elm_Object_Item *) item);
-=======
         if (item->selected) return ((Elm_Object_Item *)item);
->>>>>>> remotes/origin/upstream
      }
    return NULL;
 }

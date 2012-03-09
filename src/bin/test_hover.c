@@ -9,8 +9,6 @@ my_hover_bt(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__
    evas_object_show(hv);
 }
 
-<<<<<<< HEAD
-=======
 static void
 _top_bt_clicked(void *data, Evas_Object *obj __UNUSED__,
                 void *event_info __UNUSED__)
@@ -19,7 +17,6 @@ _top_bt_clicked(void *data, Evas_Object *obj __UNUSED__,
    elm_hover_dismiss(hv);
 }
 
->>>>>>> remotes/origin/upstream
 void
 test_hover(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -60,20 +57,13 @@ test_hover(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
 
    bt = elm_button_add(win);
    elm_object_text_set(bt, "Top 1");
-<<<<<<< HEAD
-=======
    evas_object_smart_callback_add(bt, "clicked", _top_bt_clicked, hv);
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, bt);
    evas_object_show(bt);
    bt = elm_button_add(win);
@@ -150,11 +140,7 @@ test_hover2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_box_pack_end(bx, ic);
    evas_object_show(ic);
    bt = elm_button_add(win);

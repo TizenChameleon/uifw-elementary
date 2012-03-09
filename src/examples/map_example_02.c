@@ -1,9 +1,5 @@
 /**
-<<<<<<< HEAD
- * Simple Elementary's <b>map widget</b> example, illustrating markers
-=======
  * Simple Elementary's <b>map widget</b> example, illustrating overlays
->>>>>>> remotes/origin/upstream
  * usage.
  *
  * See stdout/stderr for output. Compile with:
@@ -20,90 +16,6 @@
 # define __UNUSED__
 #endif
 
-<<<<<<< HEAD
-typedef struct _Marker_Data
-{
-   const char *name;
-   const char *file;
-} Marker_Data;
-
-Marker_Data data_argentina = {"Argentina",
-     PACKAGE_DATA_DIR"/images/rock_01.jpg"};
-Marker_Data data_chile = {"Chile",
-     PACKAGE_DATA_DIR"/images/rock_02.jpg"};
-Marker_Data data_sampa = {"São Paulo",
-     PACKAGE_DATA_DIR"/images/sky_01.jpg"};
-Marker_Data data_rio = {"Rio de Janeiro",
-     PACKAGE_DATA_DIR"/images/sky_02.jpg"};
-Marker_Data data_brasilia = {"Brasília",
-     PACKAGE_DATA_DIR"/images/sky_03.jpg"};
-
-static Evas_Object *
-_marker_get(Evas_Object *obj, Elm_Map_Marker *marker __UNUSED__, void *data)
-{
-   Evas_Object *bx, *im, *lbl;
-   Marker_Data *md = data;
-
-   bx = elm_box_add(obj);
-   evas_object_show(bx);
-
-   im = elm_image_add(obj);
-   elm_image_file_set(im, md->file, NULL);
-   evas_object_size_hint_min_set(im, 64, 64);
-   evas_object_show(im);
-   elm_box_pack_end(bx, im);
-
-   lbl = elm_label_add(obj);
-   elm_object_text_set(lbl, md->name);
-   evas_object_show(lbl);
-   elm_box_pack_end(bx, lbl);
-
-   return bx;
-}
-
-static Evas_Object *
-_marker_city_content_get(Evas_Object *obj, Elm_Map_Marker *marker __UNUSED__, void *data __UNUSED__)
-{
-   Evas_Object *icon = elm_icon_add(obj);
-   elm_icon_file_set(icon, PACKAGE_DATA_DIR"/images/icon_07.png", NULL);
-   evas_object_show(icon);
-
-   return icon;
-}
-
-static Evas_Object *
-_group_city_content_get(Evas_Object *obj, void *data __UNUSED__)
-{
-   Evas_Object *icon = elm_icon_add(obj);
-   elm_icon_file_set(icon, PACKAGE_DATA_DIR"/images/icon_05.png", NULL);
-   evas_object_show(icon);
-   return icon;
-}
-
-static Evas_Object *
-_marker_country_content_get(Evas_Object *obj, Elm_Map_Marker *marker __UNUSED__, void *data __UNUSED__)
-{
-   Evas_Object *icon = elm_icon_add(obj);
-   elm_icon_file_set(icon, PACKAGE_DATA_DIR"/images/icon_06.png", NULL);
-   evas_object_show(icon);
-   return icon;
-}
-
-static Evas_Object *
-_group_country_content_get(Evas_Object *obj, void *data __UNUSED__)
-{
-   Evas_Object *icon = elm_icon_add(obj);
-   elm_icon_file_set(icon, PACKAGE_DATA_DIR"/images/icon_04.png", NULL);
-   evas_object_show(icon);
-   return icon;
-}
-
-static void
-_map_downloaded(void *data __UNUSED__, Evas_Object *obj, void *ev __UNUSED__)
-{
-   elm_map_zoom_set(obj, 3);
-   evas_object_smart_callback_del(obj, "downloaded", _map_downloaded);
-=======
 typedef struct _Overlay_Data
 {
    const char *name;
@@ -191,7 +103,6 @@ _overlay_cb(void *data __UNUSED__, Evas_Object *map, void *ev)
    elm_map_overlay_bubble_content_clear(bubble);
    bx = _box_get(map, elm_map_overlay_data_get(overlay));
    elm_map_overlay_bubble_content_append(bubble, bx);
->>>>>>> remotes/origin/upstream
 }
 
 static void
@@ -253,21 +164,11 @@ EAPI_MAIN int
 elm_main(int argc __UNUSED__, char **argv __UNUSED__)
 {
    Evas_Object *win, *bg, *map, *box, *bt;
-<<<<<<< HEAD
-   static Elm_Map_Marker_Class *mc_city, *mc_country;
-   static Elm_Map_Group_Class *gc_city, *gc_country;
-   Eina_List *markers = NULL;
-   Elm_Map_Marker *m;
-
-   win = elm_win_add(NULL, "map", ELM_WIN_BASIC);
-   elm_win_title_set(win, "Map Markers Example");
-=======
    Eina_List *ovls = NULL;
    Elm_Map_Overlay *ovl, *city_clas, *country_clas;
 
    win = elm_win_add(NULL, "map", ELM_WIN_BASIC);
    elm_win_title_set(win, "Map Overlay Example");
->>>>>>> remotes/origin/upstream
    evas_object_smart_callback_add(win, "delete,request", _on_done, NULL);
 
    bg = elm_bg_add(win);
@@ -307,45 +208,6 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(bt);
    evas_object_smart_callback_add(bt, "clicked", _bt_zoom_fill, map);
 
-<<<<<<< HEAD
-   mc_city = elm_map_marker_class_new(map);
-   elm_map_marker_class_get_cb_set(mc_city, _marker_get);
-   elm_map_marker_class_icon_cb_set(mc_city, _marker_city_content_get);
-   elm_map_marker_class_style_set(mc_city, "radio");
-
-   gc_city = elm_map_group_class_new(map);
-   elm_map_group_class_style_set(gc_city, "radio2");
-   elm_map_group_class_icon_cb_set(gc_city, _group_city_content_get);
-   elm_map_group_class_zoom_displayed_set(gc_city, 3);
-
-   mc_country = elm_map_marker_class_new(map);
-   elm_map_marker_class_get_cb_set(mc_country, _marker_get);
-   elm_map_marker_class_icon_cb_set(mc_country, _marker_country_content_get);
-   elm_map_marker_class_style_set(mc_country, "empty");
-
-   gc_country = elm_map_group_class_new(map);
-   elm_map_group_class_style_set(gc_country, "empty");
-   elm_map_group_class_icon_cb_set(gc_country, _group_country_content_get);
-   elm_map_group_class_zoom_displayed_set(gc_country, 1);
-
-   m = elm_map_marker_add(map, -43.2, -22.9, mc_city, gc_city, &data_rio);
-   markers = eina_list_append(markers, m);
-   m = elm_map_marker_add(map, -46.63, -23.55, mc_city, gc_city, &data_sampa);
-   markers = eina_list_append(markers, m);
-   m = elm_map_marker_add(map, -47.88, -15.78, mc_city, gc_city,
-                          &data_brasilia);
-   markers = eina_list_append(markers, m);
-
-   m = elm_map_marker_add(map, -65.23, -35.1, mc_country, gc_country,
-                      &data_argentina);
-   markers = eina_list_append(markers, m);
-   m = elm_map_marker_add(map, -71.3, -31.75, mc_country, gc_country,
-                      &data_chile);
-   markers = eina_list_append(markers, m);
-
-   elm_map_markers_list_show(markers);
-   evas_object_smart_callback_add(map, "downloaded", _map_downloaded, NULL);
-=======
    evas_object_smart_callback_add(map, "overlay,clicked", _overlay_cb, NULL);
 
    city_clas = elm_map_overlay_class_add(map);
@@ -387,7 +249,6 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    ovls = eina_list_append(ovls, ovl);
 
    elm_map_overlays_show(ovls);
->>>>>>> remotes/origin/upstream
 
    evas_object_resize(win, 512, 512);
    evas_object_show(win);
