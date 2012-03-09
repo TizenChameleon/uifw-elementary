@@ -211,11 +211,6 @@ elm_image_no_scale_get(const Evas_Object *obj)
    return wd->no_scale;
 }
 
-<<<<<<< HEAD
-EAPI void
-elm_image_scale_set(Evas_Object *obj, Eina_Bool scale_up, Eina_Bool scale_down)
-{
-=======
 EINA_DEPRECATED EAPI void
 elm_image_scale_set(Evas_Object *obj, Eina_Bool scale_up, Eina_Bool scale_down)
 {
@@ -231,38 +226,23 @@ elm_image_scale_get(const Evas_Object *obj, Eina_Bool *scale_up, Eina_Bool *scal
 EAPI void
 elm_image_resizable_set(Evas_Object *obj, Eina_Bool size_up, Eina_Bool size_down)
 {
->>>>>>> remotes/origin/upstream
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-<<<<<<< HEAD
-   wd->scale_up = scale_up;
-   wd->scale_down = scale_down;
-=======
    wd->scale_up = size_up;
    wd->scale_down = size_down;
->>>>>>> remotes/origin/upstream
    _sizing_eval(obj);
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_image_scale_get(const Evas_Object *obj, Eina_Bool *scale_up, Eina_Bool *scale_down)
-=======
 elm_image_resizable_get(const Evas_Object *obj, Eina_Bool *size_up, Eina_Bool *size_down)
->>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-<<<<<<< HEAD
-   if (scale_up) *scale_up = wd->scale_up;
-   if (scale_down) *scale_down = wd->scale_down;
-=======
    if (size_up) *size_up = wd->scale_up;
    if (size_down) *size_down = wd->scale_down;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -287,8 +267,6 @@ elm_image_fill_outside_get(const Evas_Object *obj)
 }
 
 EAPI void
-<<<<<<< HEAD
-=======
 elm_image_preload_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -299,7 +277,6 @@ elm_image_preload_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 }
 
 EAPI void
->>>>>>> remotes/origin/upstream
 elm_image_prescale_set(Evas_Object *obj, int size)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -372,11 +349,7 @@ elm_image_aspect_fixed_set(Evas_Object *obj, Eina_Bool fixed)
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-<<<<<<< HEAD
-   return _els_smart_icon_aspect_fixed_set(wd->img, fixed);
-=======
    _els_smart_icon_aspect_fixed_set(wd->img, fixed);
->>>>>>> remotes/origin/upstream
 }
 
 EAPI Eina_Bool

@@ -3,8 +3,6 @@
 # include "elementary_config.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
-<<<<<<< HEAD
-=======
 
 static void
 aspect_fixed_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
@@ -127,7 +125,6 @@ test_icon(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info _
    evas_object_show(win);
 }
 
->>>>>>> remotes/origin/upstream
 static void
 icon_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
@@ -135,11 +132,7 @@ icon_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_inf
 }
 
 void
-<<<<<<< HEAD
-test_icon(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-=======
 test_icon_transparent(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
->>>>>>> remotes/origin/upstream
 {
    Evas_Object *win, *ic;
    char buf[PATH_MAX];
@@ -152,11 +145,7 @@ test_icon_transparent(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-<<<<<<< HEAD
-   elm_icon_scale_set(ic, 0, 0);
-=======
    elm_icon_resizable_set(ic, 0, 0);
->>>>>>> remotes/origin/upstream
    elm_icon_no_scale_set(ic, 1);
    evas_object_size_hint_weight_set(ic, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_fill_set(ic, 0.5, 0.5);

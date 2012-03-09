@@ -700,11 +700,7 @@ elm_icon_thumb_set(Evas_Object *obj, const char *file, const char *group)
    eina_stringshare_replace(&wd->thumb.file.path, file);
    eina_stringshare_replace(&wd->thumb.file.key, group);
 
-<<<<<<< HEAD
-   if (elm_thumb_ethumb_client_connected())
-=======
    if (elm_thumb_ethumb_client_connected_get())
->>>>>>> remotes/origin/upstream
      {
         _icon_thumb_apply(wd);
         return ;
@@ -721,10 +717,7 @@ elm_icon_thumb_set(Evas_Object *obj, const char *file, const char *group)
 #endif
 }
 
-<<<<<<< HEAD
-=======
 
->>>>>>> remotes/origin/upstream
 EAPI Eina_Bool
 elm_icon_animated_available_get(const Evas_Object *obj)
 {
@@ -898,11 +891,6 @@ elm_icon_no_scale_get(const Evas_Object *obj)
    return wd->no_scale;
 }
 
-<<<<<<< HEAD
-EAPI void
-elm_icon_scale_set(Evas_Object *obj, Eina_Bool scale_up, Eina_Bool scale_down)
-{
-=======
 EINA_DEPRECATED EAPI void
 elm_icon_scale_set(Evas_Object *obj, Eina_Bool scale_up, Eina_Bool scale_down)
 {
@@ -918,38 +906,23 @@ elm_icon_scale_get(const Evas_Object *obj, Eina_Bool *scale_up, Eina_Bool *scale
 EAPI void
 elm_icon_resizable_set(Evas_Object *obj, Eina_Bool size_up, Eina_Bool size_down)
 {
->>>>>>> remotes/origin/upstream
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-<<<<<<< HEAD
-   wd->scale_up = scale_up;
-   wd->scale_down = scale_down;
-=======
    wd->scale_up = size_up;
    wd->scale_down = size_down;
->>>>>>> remotes/origin/upstream
    if (!wd->in_eval) _sizing_eval(obj);
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_icon_scale_get(const Evas_Object *obj, Eina_Bool *scale_up, Eina_Bool *scale_down)
-=======
 elm_icon_resizable_get(const Evas_Object *obj, Eina_Bool *size_up, Eina_Bool *size_down)
->>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-<<<<<<< HEAD
-   if (scale_up) *scale_up = wd->scale_up;
-   if (scale_down) *scale_down = wd->scale_down;
-=======
    if (size_up) *size_up = wd->scale_up;
    if (size_down) *size_down = wd->scale_down;
->>>>>>> remotes/origin/upstream
 }
 
 EAPI void
@@ -1014,19 +987,12 @@ elm_icon_object_get(Evas_Object *obj)
 }
 
 EAPI void
-<<<<<<< HEAD
-elm_icon_preload_set(Evas_Object *obj, Eina_Bool disable)
-=======
 elm_icon_preload_disabled_set(Evas_Object *obj, Eina_Bool disabled)
->>>>>>> remotes/origin/upstream
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-<<<<<<< HEAD
-   _els_smart_icon_preload_set(wd->img, disable);
-=======
    _els_smart_icon_preload_set(wd->img, !!disabled);
 }
 
@@ -1052,5 +1018,4 @@ elm_icon_aspect_fixed_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return EINA_FALSE;
    return _els_smart_icon_aspect_fixed_get(wd->img);
->>>>>>> remotes/origin/upstream
 }

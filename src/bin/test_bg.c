@@ -5,8 +5,6 @@
 #ifndef ELM_LIB_QUICKLAUNCH
 
 static void
-<<<<<<< HEAD
-=======
 _cb_size_radio_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
 {
    Evas_Object *o_bg = data;
@@ -16,7 +14,6 @@ _cb_size_radio_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
 }
 
 static void
->>>>>>> remotes/origin/upstream
 _cb_radio_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
 {
    Evas_Object *o_bg = data;
@@ -95,11 +92,8 @@ void
 test_bg_image(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *win, *bg;
-<<<<<<< HEAD
-=======
    Evas_Object *box, *hbox, *o_bg;
    Evas_Object *rd, *rdg;
->>>>>>> remotes/origin/upstream
    char buf[PATH_MAX];
 
    win = elm_win_add(NULL, "bg-image", ELM_WIN_BASIC);
@@ -107,17 +101,10 @@ test_bg_image(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    elm_win_autodel_set(win, EINA_TRUE);
 
    bg = elm_bg_add(win);
-<<<<<<< HEAD
-   snprintf(buf, sizeof(buf), "%s/images/plant_01.jpg", elm_app_data_dir_get());
-   elm_bg_file_set(bg, buf, NULL);
-=======
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
-<<<<<<< HEAD
-=======
    box = elm_box_add(win);
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, box);
@@ -168,7 +155,6 @@ test_bg_image(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    evas_object_show(hbox);
 
    evas_object_show(o_bg);
->>>>>>> remotes/origin/upstream
    evas_object_size_hint_min_set(bg, 160, 160);
    evas_object_size_hint_max_set(bg, 640, 640);
    evas_object_resize(win, 320, 320);
