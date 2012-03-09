@@ -64,6 +64,7 @@ struct Elm_Gen_Item
    Eina_Bool                 reorder : 1;
    Eina_Bool                 mode_set : 1; /**< item uses style mode for highlight/select */
    Eina_Bool                 flipped : 1; /**< a flag that shows the flip status of the item. */
+   Eina_Bool                 defer_unrealize : 1;
    Eina_Bool                 can_focus : 1;
 };
 
