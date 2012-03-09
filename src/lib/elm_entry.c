@@ -1597,7 +1597,7 @@ _magnifier_create(void *data)
    key_data = edje_object_data_get(wd->mgf_bg, "scale");
    if (key_data) wd->mgf_scale = atof(key_data);
 
-   elm_scale = elm_scale_get();
+   elm_scale = elm_config_scale_get();
    wd->mgf_height = (int)((float)wd->mgf_height * elm_scale);
 
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
