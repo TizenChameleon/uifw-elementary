@@ -53,17 +53,10 @@ external_segment_control_params_parse(void *data __UNUSED__, Evas_Object *obj __
 }
 
 static Evas_Object *external_segment_control_content_get(void *data __UNUSED__,
-<<<<<<< HEAD
-		const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
-{
-	ERR("No content.");
-	return NULL;
-=======
                                                          const Evas_Object *obj __UNUSED__, const char *content __UNUSED__)
 {
    ERR("No content.");
    return NULL;
->>>>>>> remotes/origin/upstream
 }
 
 static void

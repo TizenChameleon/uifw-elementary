@@ -12,7 +12,6 @@ struct _Widget_Data
    double slide_duration;
    Evas_Coord lastw;
    Evas_Coord wrap_w;
-   Evas_Coord wrap_h;
    Elm_Wrap_Type linewrap;
    Eina_Bool changed : 1;
    Eina_Bool ellipsis : 1;
@@ -36,50 +35,25 @@ _elm_recalc_job(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Coord minw = -1, minh = -1;
-   Evas_Coord resw, resh;
+   Evas_Coord resw;
    if (!wd) return;
    evas_event_freeze(evas_object_evas_get(data));
    wd->deferred_recalc_job = NULL;
-   evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
+   evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, NULL);
    if (wd->wrap_w > resw)
-     resw = wd->wrap_w;
-   if (wd->wrap_h > resh)
-     resh = wd->wrap_h;
+      resw = wd->wrap_w;
 
-   if (wd->wrap_h == -1) /* open source routine  */
+   edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, resw, 0);
+   /* This is a hack to workaround the way min size hints are treated.
+    * If the minimum width is smaller than the restricted width, it means
+    * the mininmum doesn't matter. */
+   if ((minw <= resw) && (minw != wd->wrap_w))
      {
-        edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, resw, 0);
-        /* This is a hack to workaround the way min size hints are treated.
-         * If the minimum width is smaller than the restricted width, it means
-         * the mininmum doesn't matter. */
-        if ((minw <= resw) && (minw != wd->wrap_w))
-          {
-             Evas_Coord ominw = -1;
-             evas_object_size_hint_min_get(data, &ominw, NULL);
-             minw = ominw;
-          }
-     }
-   else /* ellipsis && linewrap && wrap_height_set routine */
-     {
-        edje_object_size_min_restricted_calc(wd->lbl, &minw, &minh, 0, resh);
-        if ((minh <= resh) && (minh != wd->wrap_h))
-          {
-             Evas_Coord ominh = -1;
-             evas_object_size_hint_min_get(data, NULL, &ominh);
-             minh = ominh;
-          }
-        evas_object_geometry_get(wd->lbl, NULL, NULL, &resw, &resh);
-        minw = resw;
-        if (minh > wd->wrap_h)
-          minh = wd->wrap_h;
-
+        Evas_Coord ominw = -1;
+        evas_object_size_hint_min_get(data, &ominw, NULL);
+        minw = ominw;
      }
    evas_object_size_hint_min_set(data, minw, minh);
-   evas_object_size_hint_max_set(data, wd->wrap_w, wd->wrap_h);
-
-   if ((wd->ellipsis) && (wd->linewrap) && (wd->wrap_h > 0) &&
-       (_is_width_over(data) == 1))
-     _ellipsis_label_to_width(data);
    evas_event_thaw(evas_object_evas_get(data));
    evas_event_thaw_eval(evas_object_evas_get(data));
 }
@@ -213,6 +187,7 @@ _get_value_in_key_string(const char *oldstring, const char *key, char **value)
 
    return -1;
 }
+
 
 static int
 _strbuf_key_value_replace(Eina_Strbuf *srcbuf, const char *key, const char *value, int deleteflag)

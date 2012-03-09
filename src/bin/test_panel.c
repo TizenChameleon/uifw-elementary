@@ -4,11 +4,8 @@
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
 
-<<<<<<< HEAD
-=======
 #define LIST_ITEM_MAX 20
 
->>>>>>> remotes/origin/upstream
 static Elm_Genlist_Item_Class itc;
 
 static void _bstatus(void *data, Evas_Object *obj, void *event_info);
@@ -20,11 +17,8 @@ static void _item_del(void *data, Evas_Object *obj);
 static void _fill_list(Evas_Object *obj);
 static Eina_Bool _dir_has_subs(const char *path);
 
-<<<<<<< HEAD
-=======
 static Eina_List *dirs = NULL;
 
->>>>>>> remotes/origin/upstream
 static void
 _tstatus(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
@@ -97,26 +91,6 @@ _fill_list(Evas_Object *obj)
 {
    DIR *d;
    struct dirent *de;
-<<<<<<< HEAD
-   Eina_List *dirs = NULL, *l;
-   char *real;
-
-   if (!(d = opendir(getenv("HOME")))) return;
-   while ((de = readdir(d)))
-     {
-        char buff[PATH_MAX];
-
-        if (de->d_name[0] == '.') continue;
-        snprintf(buff, sizeof(buff), "%s/%s", getenv("HOME"), de->d_name);
-        if (!ecore_file_is_dir(buff)) continue;
-        real = ecore_file_realpath(buff);
-        dirs = eina_list_append(dirs, real);
-     }
-   closedir(d);
-
-   dirs = eina_list_sort(dirs, eina_list_count(dirs), EINA_COMPARE_CB(strcoll));
-
-=======
    Eina_List *l;
    char *real;
    unsigned int x = 0;
@@ -137,7 +111,6 @@ _fill_list(Evas_Object *obj)
           }
         closedir(d);
      }
->>>>>>> remotes/origin/upstream
    EINA_LIST_FOREACH(dirs, l, real)
      {
         Eina_Bool result = EINA_FALSE;
@@ -148,17 +121,9 @@ _fill_list(Evas_Object *obj)
                                   NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
         else
           elm_genlist_item_append(obj, &itc, eina_stringshare_add(real),
-<<<<<<< HEAD
-                                  NULL, ELM_GENLIST_ITEM_SUBITEMS,
-                                  NULL, NULL);
-        free(real);
-     }
-   eina_list_free(dirs);
-=======
                                   NULL, ELM_GENLIST_ITEM_TREE,
                                   NULL, NULL);
      }
->>>>>>> remotes/origin/upstream
 }
 
 static Eina_Bool
@@ -273,14 +238,11 @@ test_panel(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    evas_object_show(panel);
 
    _fill_list(list);
-<<<<<<< HEAD
-=======
    {
       char *dir;
       EINA_LIST_FREE(dirs, dir)
         free(dir);
    }
->>>>>>> remotes/origin/upstream
 
    elm_box_pack_end(vbx, bx);
 

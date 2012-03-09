@@ -1098,9 +1098,9 @@ _long_press(void *data)
           {
              if (it != it_tmp) _item_unselect(it_tmp);
           }
-        if (it->items)
+        if (it->item->items)
           {
-             EINA_LIST_FOREACH(it->items, l, it_tmp)
+             EINA_LIST_FOREACH(it->item->items, l, it_tmp)
                {
                   if (elm_genlist_item_expanded_get((Elm_Object_Item *) it_tmp))
                     {
@@ -1858,7 +1858,6 @@ _elm_genlist_item_state_update(Elm_Gen_Item *it, Item_Cache *itc)
                edje_object_signal_emit(it->edit_obj,
                                        "elm,state,selected", "elm");
           }
-
         if (elm_widget_item_disabled_get(it))
           {
              edje_object_signal_emit(VIEW(it),
@@ -1881,7 +1880,7 @@ _elm_genlist_item_state_update(Elm_Gen_Item *it, Item_Cache *itc)
 static void
 _content_focused(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   Elm_Genlist_Item *it = data;
+   Elm_Gen_Item *it = data;
    if (it) it->defer_unrealize = EINA_TRUE;
 }
 
@@ -1926,7 +1925,7 @@ _item_mode_content_realize(Elm_Gen_Item *it,
                   edje_object_part_swallow(target, key, ic);
                   evas_object_show(ic);
                   elm_widget_sub_object_add(WIDGET(it), ic);
-                  if (it->mode_view || it->wd->edit_mode)
+                  if (it->mode_view || it->wd->decorate_mode)
                     {
                        if (elm_widget_item_disabled_get(it))
                          elm_widget_disabled_set(ic, EINA_TRUE);
@@ -2325,7 +2324,7 @@ _item_realize(Elm_Gen_Item *it,
              it->content_objs = _item_flips_realize(it, VIEW(it), &it->contents);
           }
 
-        if (!it->item->mincalcd)
+        if (!it->item->mincalcd) || it->wd->pan_resize || ((it->wd->mode == ELM_LIST_COMPRESS) && (it->item->w != it->item->minw))
           {
              Evas_Coord mw = -1, mh = -1;
 
@@ -2616,106 +2615,14 @@ _item_block_position(Item_Block *itb,
                      int         in)
 {
    const Eina_List *l;
-   Elm_Genlist_Item *it;
-   Evas_Coord y = 0, ox, oy, ow, oh, cvx, cvy, cvw, cvh;
-   Evas_Coord minh = 0;
-   int vis = 0;
-
-   evas_event_freeze(evas_object_evas_get(itb->wd->obj));
-   evas_object_geometry_get(itb->wd->pan_smart, &ox, &oy, &ow, &oh);
-   evas_output_viewport_get(evas_object_evas_get(itb->wd->obj), &cvx, &cvy,
-                            &cvw, &cvh);
-   EINA_LIST_FOREACH(itb->items, l, it)
-     {
-        if (it->generation < it->wd->generation) continue;
-        else if (it->wd->reorder_it == it) continue;
-
-        it->x = 0;
-        it->y = y;
-        it->w = itb->w;
-        it->scrl_x = itb->x + it->x - it->wd->pan_x + ox;
-        it->scrl_y = itb->y + it->y - it->wd->pan_y + oy;
-
-        vis = (ELM_RECTS_INTERSECT(it->scrl_x, it->scrl_y, it->w, it->h,
-                                   cvx, cvy, cvw, cvh));
-        if ((itb->realized) && (!it->realized))
-          {
-             if (vis) _item_realize(it, in, EINA_FALSE);
-          }
-        if (it->realized)
-          {
-             if (vis)
-               {
-                  if (it->wd->reorder_mode)
-                    y += _get_space_for_reorder_item(it);
-                  if ((it->wd->reorder_it) && (it->old_scrl_y != it->scrl_y))
-                    {
-                       if (!it->move_effect_enabled)
-                         {
-                            it->move_effect_enabled = EINA_TRUE;
-                            it->wd->reorder_move_animator =
-                               ecore_animator_add(
-                                  _reorder_move_animator_cb, it);
-                         }
-                    }
-                  if (!it->move_effect_enabled)
-                    if (!it->wd->effect_mode || it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE || ((it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) && it->parent == it->wd->expanded_item))
-                      {
-                         if (it->wd->edit_mode && it->itc->edit_item_style)
-                           {
-                              _item_position(it, it->edit_obj, it->scrl_x, it->scrl_y);
-                           }
-                         else
-                           {
-                              if((!it->wd->effect_mode || it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE) || ((it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_NONE) && (it->old_scrl_y == it->scrl_y)))
-                                {
-                                   if (it->mode_view)
-                                     _item_position(it, it->mode_view, it->scrl_x,
-                                                    it->scrl_y);
-                                   else
-                                     _item_position(it, VIEW(it), it->scrl_x,
-                                                    it->scrl_y);
-                                }
-                              else
-                                {
-                                   evas_object_resize(VIEW(it), it->w, it->h);
-                                   evas_object_move(VIEW(it), it->scrl_x, it->scrl_y);
-                                   evas_object_hide(VIEW(it));
-                                }
-                           }
-                      }
-               }
-             else
-               {
-                  if ((!it->dragging && (!it->wd->item_moving_effect_timer)) ||
-                      (it->wd->expanded_item && (it->wd->expanded_item->block != itb)))
-                    _item_unrealize(it, EINA_FALSE);
-               }
-          }
-        in++;
-        if (!it->wd->effect_mode || it->wd->move_effect_mode == ELM_GENLIST_ITEM_MOVE_EFFECT_NONE || ((it->wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE) && it->parent == it->wd->expanded_item))
-          {
-             it->old_scrl_y = it->scrl_y;
-          }
-        y += it->h;
-        minh += it->minh;
-     }
-   if (!itb->wd->reorder_it) itb->minh = minh;
-   evas_event_thaw(evas_object_evas_get(itb->wd->obj));
-   evas_event_thaw_eval(evas_object_evas_get(itb->wd->obj));
-}
-
+   Elm_Gen_Item *it;
 //FIXME : group raise
 #if 0
-static void
-_item_block_position(Item_Block *itb,
-                     int         in)
-{
-   const Eina_List *l;
-   Elm_Gen_Item *it;
    Elm_Gen_Item *git;
+#endif
    Evas_Coord y = 0, ox, oy, ow, oh, cvx, cvy, cvw, cvh;
    Eina_Bool vis = EINA_FALSE;
+   Evas_Coord minh = 0;
 
    evas_event_freeze(evas_object_evas_get(itb->wd->obj));
    evas_object_geometry_get(itb->wd->pan_smart, &ox, &oy, &ow, &oh);
@@ -2745,6 +2652,8 @@ _item_block_position(Item_Block *itb,
                     {
                        if (it->wd->reorder_mode)
                          y += _get_space_for_reorder_item(it);
+//FIXME : group raise
+#if 0
                        git = it->item->group_item;
                        if (git)
                          {
@@ -2754,6 +2663,7 @@ _item_block_position(Item_Block *itb,
                               git->item->scrl_y = (it->item->scrl_y + it->item->h) - git->item->h;
                             git->item->want_realize = EINA_TRUE;
                          }
+#endif
                        if ((it->wd->reorder_it) && (it->item->old_scrl_y != it->item->scrl_y))
                          {
                             if (!it->item->move_effect_enabled)
@@ -2790,16 +2700,20 @@ _item_block_position(Item_Block *itb,
                }
              in++;
           }
+//FIXME : group raise
+#if 0
         else
           {
              if (vis) it->item->want_realize = EINA_TRUE;
           }
+#endif
         y += it->item->h;
+        minh += it->item->minh;
      }
+   if (!itb->wd->reorder_it) itb->minh = minh;
    evas_event_thaw(evas_object_evas_get(itb->wd->obj));
    evas_event_thaw_eval(evas_object_evas_get(itb->wd->obj));
 }
-#endif
 
 static void
 _group_items_recalc(void *data)
@@ -2833,10 +2747,10 @@ _group_items_recalc(void *data)
 static void
 _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   Elm_Genlist_Item *it = data;
+   Elm_Gen_Item *it = data;
    if (!it) return;
-   it->mincalcd = EINA_FALSE;
-   it->block->changeme = EINA_TRUE;
+   it->item->mincalcd = EINA_FALSE;
+   it->item->block->changeme = EINA_TRUE;
    if (it->wd->changed_job) ecore_job_del(it->wd->changed_job);
    it->wd->changed_job = ecore_job_add(_changed_job, it->wd);
 }
@@ -3006,8 +2920,7 @@ _calc_job(void *data)
      {
         wd->minw = minw;
         wd->minh = minh;
-        if (wd->move_effect_mode != ELM_GENLIST_ITEM_MOVE_EFFECT_DELETE)
-           evas_object_smart_callback_call(wd->pan_smart, "changed", NULL);
+        evas_object_smart_callback_call(wd->pan_smart, "changed", NULL);
         _sizing_eval(wd->obj);
         if ((wd->anchor_item) && (wd->anchor_item->item->block) && (!wd->auto_scroll_enabled))
           {
@@ -3047,8 +2960,8 @@ _calc_job(void *data)
           }
         if (wd->show_item)
           {
-             if ((pan_w > (wd->show_item->x + wd->show_item->block->x)) &&
-                 (pan_h > (wd->show_item->y + wd->show_item->block->y + dy)))
+             if ((pan_w > (wd->show_item->x + wd->show_item->item->block->x)) &&
+                 (pan_h > (wd->show_item->y + wd->show_item->item->block->y + dy)))
                {
                   _scroll_item(wd);
                }
@@ -3142,7 +3055,7 @@ _changed_job(void *data)
    EINA_INLIST_FOREACH(wd->blocks, itb)
      {
         Evas_Coord itminw, itminh;
-        Elm_Genlist_Item *it;
+        Elm_Gen_Item *it;
 
         if (!itb->changeme)
           {
@@ -3155,41 +3068,41 @@ _changed_job(void *data)
         width_changed = height_changed = EINA_FALSE;
         EINA_LIST_FOREACH(itb->items, l2, it)
           {
-             if ((!it->mincalcd) && (it->realized))
+             if ((!it->item->mincalcd) && (it->realized))
                {
                   Evas_Coord mw = -1, mh = -1;
-                  itminw = it->minw;
-                  itminh = it->minh;
+                  itminw = it->item->minw;
+                  itminh = it->item->minh;
 
-                  if (it->wd->height_for_width) mw = it->wd->w;
-                  if (!it->display_only)
+                  if (it->wd->mode == ELM_LIST_COMPRESS) mw = it->wd->w;
+                  if (it->select_mode != ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY)
                     elm_coords_finger_size_adjust(1, &mw, 1, &mh);
-                  if (it->wd->height_for_width) mw = it->wd->prev_viewport_w;
+                  if (it->wd->mode == ELM_LIST_COMPRESS) mw = it->wd->prev_viewport_w;
                   edje_object_size_min_restricted_calc(VIEW(it), &mw, &mh, mw, mh);
-                  if (!it->display_only)
+                  if (it->select_mode != ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY)
                     elm_coords_finger_size_adjust(1, &mw, 1, &mh);
                   if (mw > itb->w)
                     width_changed = EINA_TRUE;
                   else
                     mw = itb->w;
-                  it->w = it->minw = mw;
-                  it->h = it->minh = mh;
-                  it->mincalcd = EINA_TRUE;
+                  it->item->w = it->item->minw = mw;
+                  it->item->h = it->item->minh = mh;
+                  it->item->mincalcd = EINA_TRUE;
 
-                  //if ((it->minw != itminw) || (it->minh != itminh))
-                  //if ((it->minh != itminh))
+                  //if ((it->item->minw != itminw) || (it->item->minh != itminh))
+                  //if ((it->item->minh != itminh))
                   //  recalc = 1;
-                  if ((it->minw != itminw))
+                  if ((it->item->minw != itminw))
                     width_changed = EINA_TRUE;
-                  if ((it->minh != itminh))
+                  if ((it->item->minh != itminh))
                     height_changed = EINA_TRUE;
 
-                  if ((!it->wd->group_item_width) && (it->flags == ELM_GENLIST_ITEM_GROUP))
+                  if ((!it->wd->group_item_width) && (it->group))
                     {
                        it->wd->group_item_width = mw;
                        it->wd->group_item_height = mh;
                     }
-                  else if ((!it->wd->item_width) && (it->flags == ELM_GENLIST_ITEM_NONE))
+                  else if ((!it->wd->item_width) && (it->item->type == ELM_GENLIST_ITEM_NONE))
                     {
                        it->wd->item_width = mw;
                        it->wd->item_height = mh;
@@ -3977,14 +3890,14 @@ _item_select(Elm_Gen_Item *it)
    it->walking++;
    it->wd->walking++;
    if (it->wd->last_selected_item &&
-       (it != (Elm_Genlist_Item *) it->wd->last_selected_item))
+       (it != (Elm_Gen_Item *) it->wd->last_selected_item))
      {
-        EINA_LIST_FOREACH(((Elm_Genlist_Item *)it->wd->last_selected_item)->content_objs, l, obj)
+        EINA_LIST_FOREACH(((Elm_Gen_Item *)it->wd->last_selected_item)->content_objs, l, obj)
           {
              elm_widget_focused_object_clear(obj);
              elm_widget_tree_unfocusable_set(obj, EINA_TRUE);
           }
-        ((Elm_Genlist_Item *)it->wd->last_selected_item)->can_focus = EINA_FALSE;
+        ((Elm_Gen_Item *)it->wd->last_selected_item)->can_focus = EINA_FALSE;
      }
    if (it->func.func) it->func.func((void *)it->func.data, WIDGET(it), it);
    if (it->generation == it->wd->generation)
@@ -4083,6 +3996,7 @@ _item_del_pre_hook(Elm_Object_Item *it)
 
    if ((_it->relcount > 0) || (_it->walking > 0))
      {
+        if (!_it->block && (_it->relcount == 1)) goto del;
         elm_genlist_item_subitems_clear(it);
         if (_it->wd->show_item == _it) _it->wd->show_item = NULL;
         _elm_genlist_item_del_notserious(_it);
@@ -4101,6 +4015,7 @@ _item_del_pre_hook(Elm_Object_Item *it)
           }
         return EINA_FALSE;
      }
+del:
    _item_del(_it);
    return EINA_TRUE;
 }
@@ -5496,20 +5411,20 @@ elm_genlist_item_fields_update(Elm_Object_Item *it,
                                                             &_it->contents, parts, &_it->content_objs, "flips");
           }
 
-        if (_it->mode_view)
+        if (_it->item->mode_view)
           {
-             _it->mode_content_objs = _item_mode_content_unrealize(_it, _it->mode_view,
-                                                                   &_it->mode_contents, parts, &_it->mode_content_objs);
-             _it->mode_content_objs = _item_mode_content_realize(_it, _it->mode_view,
-                                                                 &_it->mode_contents, parts, &_it->mode_content_objs, "contents");
+             _it->item->mode_content_objs = _item_mode_content_unrealize(_it, _it->item->mode_view,
+                                                                   &_it->item->mode_contents, parts, &_it->item->mode_content_objs);
+             _it->item->mode_content_objs = _item_mode_content_realize(_it, _it->item->mode_view,
+                                                                 &_it->item->mode_contents, parts, &_it->item->mode_content_objs, "contents");
           }
 
-        if (_it->wd->edit_mode)
+        if (_it->wd->decorate_mode)
           {
-             _it->edit_content_objs = _item_mode_content_unrealize(_it, _it->edit_obj,
-                                                                   &_it->contents, parts, &_it->edit_content_objs);
-             _it->edit_content_objs = _item_mode_content_realize(_it, _it->edit_obj,
-                                                                 &_it->contents, parts, &_it->edit_content_objs, "contents"); // FIXME: is it "edit_contents"??
+             _it->item->edit_content_objs = _item_mode_content_unrealize(_it, _it->edit_obj,
+                                                                   &_it->contents, parts, &_it->item->edit_content_objs);
+             _it->item->edit_content_objs = _item_mode_content_realize(_it, _it->edit_obj,
+                                                                 &_it->contents, parts, &_it->item->edit_content_objs, "contents"); // FIXME: is it "edit_contents"??
           }
      }
    if ((!itf) || (itf & ELM_GENLIST_ITEM_FIELD_STATE))
@@ -5989,11 +5904,12 @@ elm_genlist_item_decorate_mode_set(Elm_Object_Item  *it,
 }
 
 EAPI const char *
-elm_genlist_item_decorate_mode_get(const Elm_Object_Item *it)
+elm_genlist_item_decorate_mode_get(const Evas_Object *obj)
 {
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   Elm_Gen_Item *_it = (Elm_Gen_Item *)it;
-   return _it->wd->mode_type;
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->mode_type;
 }
 
 EAPI const Elm_Object_Item *
@@ -6392,7 +6308,23 @@ _elm_genlist_item_del_notserious(Elm_Gen_Item *it)
    elm_widget_item_pre_notify_del(it);
    it->generation = it->wd->generation - 1; /* This means that the item is deleted */
 
-   if (it->walking) return; /* func.del is called twice when it->func.func is _elm_widget_item_del*/
+   if ((it->relcount > 0) || (it->walking > 0))
+     {
+        if (!it->block && (it->relcount == 1))
+          {
+             if (it->rel)
+               {
+                  it->rel->relcount--;
+                  if ((it->rel->generation < it->wd->generation) && (!it->rel->relcount))
+                    {
+                       _item_del(it->rel);
+                       elm_widget_item_free(it->rel);
+                    }
+                  it->rel = NULL;
+               }
+          }
+        else return;
+     }
    if (it->selected) it->wd->selected = eina_list_remove(it->wd->selected, it);
 
    if (it->itc->func.del)
