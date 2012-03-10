@@ -128,7 +128,7 @@ _theme_hook(Evas_Object *obj)
    _elm_widget_mirrored_reload(obj);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _theme_change(obj);
-   edje_object_part_text_style_user_set(wd->lbl, "elm.text", wd->format);
+   edje_object_part_text_style_user_push(wd->lbl, "elm.text", wd->format);
    edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    edje_object_scale_set(wd->lbl, elm_widget_scale_get(obj) *
                          _elm_config->scale);
@@ -331,7 +331,7 @@ _is_width_over(Evas_Object *obj)
         if (_stringshare_key_value_replace(&wd->format,
                  "ellipsis", NULL, 1) == 0)
           {
-             edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+             edje_object_part_text_style_user_push(wd->lbl, "elm.text",
                    wd->format);
              edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
           }
@@ -347,7 +347,7 @@ _is_width_over(Evas_Object *obj)
              if (_stringshare_key_value_replace(&wd->format, "ellipsis",
                       eina_strbuf_string_get(elpbuf), 0) == 0)
                {
-                  edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+                  edje_object_part_text_style_user_push(wd->lbl, "elm.text",
                         wd->format);
                   edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
                }
@@ -384,7 +384,7 @@ _ellipsis_fontsize_set(Evas_Object *obj, int fontsize)
 
    if (_stringshare_key_value_replace(&wd->format, "font_size", eina_strbuf_string_get(fontbuf), removeflag) == 0)
      {
-        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+        edje_object_part_text_style_user_push(wd->lbl, "elm.text",
               wd->format);
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
      }
@@ -487,7 +487,7 @@ _elm_label_label_set(Evas_Object *obj, const char *item, const char *label)
    if (item && strcmp(item, "default")) return;
    if (!label) label = "";
    eina_stringshare_replace(&wd->label, label);
-   edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+   edje_object_part_text_style_user_push(wd->lbl, "elm.text",
          wd->format);
    edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    wd->changed = 1;
@@ -547,7 +547,7 @@ elm_label_add(Evas_Object *parent)
    wd->format = eina_stringshare_add("");
    wd->label = eina_stringshare_add("<br>");
 
-   edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+   edje_object_part_text_style_user_push(wd->lbl, "elm.text",
          wd->format);
    edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
    elm_widget_resize_object_set(obj, wd->lbl);
@@ -604,7 +604,7 @@ elm_label_line_wrap_set(Evas_Object *obj, Elm_Wrap_Type wrap)
    if (_stringshare_key_value_replace(&wd->format,
             "wrap", wrap_str, 0) == 0)
      {
-        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+        edje_object_part_text_style_user_push(wd->lbl, "elm.text",
               wd->format);
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
@@ -631,7 +631,7 @@ elm_label_wrap_width_set(Evas_Object *obj, Evas_Coord w)
    if (wd->wrap_w == w) return;
    if (wd->ellipsis)
      {
-        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+        edje_object_part_text_style_user_push(wd->lbl, "elm.text",
               wd->format);
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
      }
@@ -659,7 +659,7 @@ elm_label_wrap_height_set(Evas_Object *obj,
    if (wd->wrap_h == h) return;
    if (wd->ellipsis)
      {
-        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+        edje_object_part_text_style_user_push(wd->lbl, "elm.text",
               wd->format);
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
      }
@@ -695,7 +695,7 @@ elm_label_fontsize_set(Evas_Object *obj, int fontsize)
 
    if (_stringshare_key_value_replace(&wd->format, "font_size", eina_strbuf_string_get(fontbuf), removeflag) == 0)
      {
-        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+        edje_object_part_text_style_user_push(wd->lbl, "elm.text",
               wd->format);
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
@@ -718,7 +718,7 @@ elm_label_text_align_set(Evas_Object *obj, const char *alignmode)
 
    if (_stringshare_key_value_replace(&wd->format, "align", alignmode, 0) == 0)
      {
-        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+        edje_object_part_text_style_user_push(wd->lbl, "elm.text",
               wd->format);
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
      }
@@ -748,7 +748,7 @@ elm_label_text_color_set(Evas_Object *obj,
 
    if (_stringshare_key_value_replace(&wd->format, "color", eina_strbuf_string_get(colorbuf), 0) == 0)
      {
-        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+        edje_object_part_text_style_user_push(wd->lbl, "elm.text",
               wd->format);
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
@@ -800,7 +800,7 @@ elm_label_ellipsis_set(Evas_Object *obj, Eina_Bool ellipsis)
    if (_stringshare_key_value_replace(&wd->format,
             "ellipsis", eina_strbuf_string_get(fontbuf), removeflag) == 0)
      {
-        edje_object_part_text_style_user_set(wd->lbl, "elm.text",
+        edje_object_part_text_style_user_push(wd->lbl, "elm.text",
               wd->format);
         edje_object_part_text_set(wd->lbl, "elm.text", wd->label);
         wd->changed = 1;
