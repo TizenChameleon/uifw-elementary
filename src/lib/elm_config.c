@@ -1464,9 +1464,21 @@ elm_config_tooltip_delay_set(double delay)
 }
 
 EAPI double
+elm_scale_get(void)
+{
+   return elm_config_scale_get();
+}
+
+EAPI double
 elm_config_scale_get(void)
 {
    return _elm_config->scale;
+}
+
+EAPI void
+elm_scale_set(double scale)
+{
+	elm_config_scale_set(scale);
 }
 
 EAPI void
@@ -1611,11 +1623,24 @@ elm_config_font_overlay_apply(void)
 {
    _elm_config_font_overlay_apply();
 }
+// WRAPPER:: will be removed soon.
+EAPI Evas_Coord
+elm_finger_size_get(void)
+{
+   return elm_config_finger_size_get();
+}
 
 EAPI Evas_Coord
 elm_config_finger_size_get(void)
 {
    return _elm_config->finger_size;
+}
+
+// WRAPPER:: will be removed soon.
+EAPI void
+elm_finger_size_set(Evas_Coord size)
+{
+   elm_config_finger_size_set(size);
 }
 
 EAPI void

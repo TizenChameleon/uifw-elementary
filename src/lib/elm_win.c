@@ -2795,6 +2795,13 @@ elm_win_keyboard_win_get(const Evas_Object *obj)
    return EINA_FALSE;
 }
 
+// WRAPPER: Temperary added.
+EAPI void
+elm_win_indicator_state_set(Evas_Object *obj, Elm_Win_Indicator_Mode mode)
+{
+   elm_win_indicator_mode_set(obj, mode);
+}
+
 EAPI void
 elm_win_indicator_mode_set(Evas_Object *obj, Elm_Win_Indicator_Mode mode)
 {
@@ -2818,6 +2825,13 @@ elm_win_indicator_mode_set(Evas_Object *obj, Elm_Win_Indicator_Mode mode)
           (win->xwin, ECORE_X_ILLUME_INDICATOR_STATE_OFF);
      }
 #endif
+}
+
+// WRAPPER: Temperary added.
+EAPI Elm_Win_Indicator_Mode
+elm_win_indicator_state_get(const Evas_Object *obj)
+{
+   return elm_win_indicator_mode_get(obj);
 }
 
 EAPI Elm_Win_Indicator_Mode

@@ -1026,6 +1026,9 @@ EAPI Eina_Bool             elm_win_keyboard_win_get(const Evas_Object *obj);
  */
 EAPI void                  elm_win_indicator_mode_set(Evas_Object *obj, Elm_Win_Indicator_Mode mode);
 
+// WRAPPER: Temperary added.
+EAPI void                  elm_win_indicator_state_set(Evas_Object *obj, Elm_Win_Indicator_Mode mode);
+
 /**
  * Gets the indicator mode of the window.
  *
@@ -1033,6 +1036,9 @@ EAPI void                  elm_win_indicator_mode_set(Evas_Object *obj, Elm_Win_
  * @return The mode, one of #Elm_Win_Indicator_Mode
  */
 EAPI Elm_Win_Indicator_Mode elm_win_indicator_mode_get(const Evas_Object *obj);
+
+// WRAPPER: Temperary added.
+EAPI Elm_Win_Indicator_Mode elm_win_indicator_state_get(const Evas_Object *obj);
 
 /**
  * Sets the indicator opacity mode of the window.

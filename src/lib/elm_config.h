@@ -464,6 +464,7 @@ EAPI void        elm_config_cursor_engine_only_set(Eina_Bool engine_only);
  * @ingroup Scaling
  */
 EAPI double elm_config_scale_get(void);
+EAPI double elm_scale_get(void);
 
 /**
  * Set the global scaling factor
@@ -475,6 +476,7 @@ EAPI double elm_config_scale_get(void);
  * @ingroup Scaling
  */
 EAPI void   elm_config_scale_set(double scale);
+EAPI void elm_scale_set(double scale);
 
 /**
  * @defgroup Password_last_show Password show last
@@ -714,6 +716,8 @@ EAPI void             elm_config_font_overlay_apply(void);
  * @ingroup Fingers
  */
 EAPI Evas_Coord elm_config_finger_size_get(void);
+// WRAPPER: Temperary Added.
+EAPI Evas_Coord elm_finger_size_get(void);
 
 /**
  * Set the configured finger size
@@ -724,6 +728,8 @@ EAPI Evas_Coord elm_config_finger_size_get(void);
  * @ingroup Fingers
  */
 EAPI void       elm_config_finger_size_set(Evas_Coord size);
+// WRAPPER: Temperary Added.
+EAPI void       elm_finger_size_set(Evas_Coord size);
 
 
 /**
