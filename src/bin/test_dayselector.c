@@ -75,6 +75,7 @@ test_dayselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event
    evas_object_size_hint_align_set(dayselector, EVAS_HINT_FILL, 0.5);
    elm_box_pack_end(bx, dayselector);
    evas_object_show(dayselector);
+   elm_dayselector_week_start_set(dayselector, ELM_DAYSELECTOR_SUN);
    evas_object_smart_callback_add(dayselector, "dayselector,changed", _changed_cb, NULL);
    sunday = elm_object_part_content_get(dayselector, "day0");
    elm_object_signal_emit(sunday, "elm,type,weekend,style1", "");
