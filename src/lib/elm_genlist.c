@@ -1834,27 +1834,21 @@ _elm_genlist_item_state_update(Elm_Gen_Item *it, Item_Cache *itc)
           }
         if (elm_widget_item_disabled_get(it) != itc->disabled)
           {
-             if (it->selected)
-               {
-                  if (elm_widget_item_disabled_get(it))
-                    edje_object_signal_emit(VIEW(it),
-                                            "elm,state,disabled", "elm");
-                  if (it->edit_obj)
-                    edje_object_signal_emit(it->edit_obj,
-                                            "elm,state,disabled", "elm");
-               }
+             if (elm_widget_item_disabled_get(it))
+               edje_object_signal_emit(VIEW(it),
+                                       "elm,state,disabled", "elm");
+             if (it->edit_obj)
+               edje_object_signal_emit(it->edit_obj,
+                                       "elm,state,disabled", "elm");
           }
         if (it->item->expanded != itc->expanded)
           {
-             if (it->selected)
-               {
-                  if (it->item->expanded)
-                    edje_object_signal_emit(VIEW(it),
-                                            "elm,state,expanded", "elm");
-                  if (it->edit_obj)
-                    edje_object_signal_emit(it->edit_obj,
-                                            "elm,state,expanded", "elm");
-               }
+             if (it->item->expanded)
+               edje_object_signal_emit(VIEW(it),
+                                       "elm,state,expanded", "elm");
+             if (it->edit_obj)
+               edje_object_signal_emit(it->edit_obj,
+                                       "elm,state,expanded", "elm");
           }
      }
    else
@@ -2586,7 +2580,7 @@ _reorder_move_animator_cb(void *data)
    else
      _item_position(it, VIEW(it), it->item->scrl_x, it->item->old_scrl_y);
 //FIXME : group raise
-#if 0 
+#if 0
    _group_items_recalc(it->wd);
 #endif
 
@@ -3721,7 +3715,7 @@ _decorate_mode_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
    it->item->edit_content_objs =
      _item_mode_content_realize(it, it->edit_obj, &it->contents, NULL, &it->item->edit_content_objs, "decorate_contents"); //FIXME
    _item_state_realize(it, it->edit_obj, &it->item->edit_states, NULL);
-   edje_object_part_swallow(it->edit_obj, "elm.swallow.decorate.content", VIEW(it)); //FIXME : elm.swallow.decorate.content?
+   edje_object_part_swallow(it->edit_obj, "elm.swallow.decorate.content", VIEW(it)); 
 
    _decorate_mode_item_position(it, it->item->scrl_x, it->item->scrl_y);
    evas_object_show(it->edit_obj);
