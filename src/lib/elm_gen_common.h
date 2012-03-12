@@ -31,7 +31,7 @@ struct Elm_Gen_Item
    Elm_Gen_Item_Type        *item;
    const Elm_Gen_Item_Class *itc;
    Evas_Coord                x, y, dx, dy;
-   Evas_Object              *spacer, *decorate_obj;
+   Evas_Object              *spacer, *edit_obj;
    Elm_Gen_Item             *parent;
    Eina_List                *texts, *contents, *states, *content_objs;
    Ecore_Timer              *long_timer;
@@ -120,7 +120,7 @@ struct _Widget_Data
    Elm_List_Mode                  mode;
    Ecore_Timer                   *multi_timer, *scr_hold_timer;
    Ecore_Animator                *reorder_move_animator;
-   const char                    *mode_type;
+   const char                    *decorate_type;
    double                         start_time;
    Evas_Coord                     prev_x, prev_y, prev_mx, prev_my;
    Evas_Coord                     cur_x, cur_y, cur_mx, cur_my;

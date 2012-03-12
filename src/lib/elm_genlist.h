@@ -1599,7 +1599,7 @@ EAPI void                          elm_genlist_item_fields_update(Elm_Object_Ite
  *
  * @ingroup Genlist
  */
-EAPI void                          elm_genlist_item_decorate_mode_set(Elm_Object_Item *it, const char *mode_type, Eina_Bool mode_set);
+EAPI void                          elm_genlist_item_decorate_mode_set(Elm_Object_Item *it, const char *decorate_type, Eina_Bool mode_set);
 
 /**
  * Get the last (or current) genlist mode used.
