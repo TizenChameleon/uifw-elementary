@@ -3711,11 +3711,15 @@ _decorate_mode_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
                                   _multi_move, it);
 
    _item_text_realize(it, it->edit_obj, &it->item->edit_texts, NULL);
-   if (it->flipped)  edje_object_signal_emit(it->edit_obj, "elm,state,flip,enabled", "elm");
+   if (it->flipped)
+     edje_object_signal_emit(it->edit_obj, "elm,state,flip,enabled", "elm");
    it->item->edit_content_objs =
-     _item_mode_content_realize(it, it->edit_obj, &it->contents, NULL, &it->item->edit_content_objs, "decorate_contents"); //FIXME
+     _item_mode_content_realize(it, it->edit_obj, &it->contents,
+                                NULL, &it->item->edit_content_objs,
+                                "decorate_contents"); //FIXME
    _item_state_realize(it, it->edit_obj, &it->item->edit_states, NULL);
-   edje_object_part_swallow(it->edit_obj, "elm.swallow.decorate.content", VIEW(it)); 
+   edje_object_part_swallow(it->edit_obj, "elm.swallow.decorate.content",
+                            VIEW(it));
 
    _decorate_mode_item_position(it, it->item->scrl_x, it->item->scrl_y);
    evas_object_show(it->edit_obj);
