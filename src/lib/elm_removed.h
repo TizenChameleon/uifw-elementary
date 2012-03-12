@@ -1345,6 +1345,16 @@ EINA_DEPRECATED EAPI Evas_Object *elm_conformant_content_get(const Evas_Object *
 EINA_DEPRECATED EAPI Evas_Object *elm_conformant_content_unset(Evas_Object *obj);
 
 /**
+ * Returns the Evas_Object that represents the content area.
+ *
+ * @param obj The conformant object.
+ * @return The content area of the widget.
+ *
+ * @deprecated use elm_object_content_get() instead
+ */
+EINA_DEPRECATED EAPI Evas_Object                 *elm_conformant_content_area_get(const Evas_Object *obj);
+
+/**
  * Get the side labels max length.
  *
  * @deprecated use elm_diskselector_side_label_length_get() instead:
