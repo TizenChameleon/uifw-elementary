@@ -127,6 +127,7 @@ elm_store.h \
 elm_table.h \
 elm_theme.h \
 elm_thumb.h \
+elm_tickernoti.h \
 elm_toolbar.h \
 elm_tooltip.h \
 elm_transit.h \
@@ -207,6 +208,7 @@ elm_table.c \
 elm_theme.c \
 elm_thumb.c \
 elm_toggle.c \
+elm_tickernoti.c \
 elm_toolbar.c \
 elm_transit.c \
 elm_util.c \
