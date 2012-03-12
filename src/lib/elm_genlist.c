@@ -3700,8 +3700,8 @@ _decorate_mode_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
    _elm_genlist_item_odd_even_update(it);
    _elm_genlist_item_state_update(it, NULL);
 
-   if (effect_on) edje_object_signal_emit(it->edit_obj, "elm,state,edit,enabled,effect", "elm");
-   else edje_object_signal_emit(it->edit_obj, "elm,state,edit,enabled", "elm");
+   if (effect_on) edje_object_signal_emit(it->edit_obj, "elm,state,decorate,enabled,effect", "elm");
+   else edje_object_signal_emit(it->edit_obj, "elm,state,decorate,enabled", "elm");
 
    evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
                                   _mouse_down, it);
