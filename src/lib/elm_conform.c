@@ -386,18 +386,18 @@ _changed_size_hints(void *data, Evas *e __UNUSED__,
 }
 
 static void
-_sub_del(void *data, Evas_Object *obj __UNUSED__, void *event_info)
+_sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 {
-   Widget_Data *wd = elm_widget_data_get(data);
+   Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *sub = event_info;
 if (!wd) return;
    if (sub == wd->content)
      {
         evas_object_event_callback_del_full(sub,
                                             EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                            _changed_size_hints, data);
+                                            _changed_size_hints, obj);
         wd->content = NULL;
-        _sizing_eval(data);
+        _sizing_eval(obj);
      }
 }
 
@@ -617,7 +617,7 @@ _prop_change(void *data, int type __UNUSED__, void *event)
 EAPI Evas_Object *
 elm_conformant_add(Evas_Object *parent)
 {
-   Evas_Object *obj, *content;
+   Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
 
@@ -639,10 +639,6 @@ elm_conformant_add(Evas_Object *parent)
    _elm_theme_object_set(obj, wd->base, "conformant", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
 
-   content = elm_layout_add(obj);
-   elm_layout_theme_set(content, "conformant", "layout", "content");
-   elm_object_content_set(obj, content);
-
    _swallow_conformant_parts(obj);
 
 #ifdef HAVE_ELEMENTARY_X
@@ -662,8 +658,8 @@ elm_conformant_add(Evas_Object *parent)
                                        _conformant_move_resize_event_cb, obj);
    evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE,
                                        _conformant_move_resize_event_cb, obj);
-   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
+   evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
 
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _sizing_eval(obj);
