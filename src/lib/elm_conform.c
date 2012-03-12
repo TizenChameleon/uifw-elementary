@@ -617,7 +617,7 @@ _prop_change(void *data, int type __UNUSED__, void *event)
 EAPI Evas_Object *
 elm_conformant_add(Evas_Object *parent)
 {
-   Evas_Object *obj, *content;
+   Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
 
@@ -638,10 +638,6 @@ elm_conformant_add(Evas_Object *parent)
    wd->base = edje_object_add(e);
    _elm_theme_object_set(obj, wd->base, "conformant", "base", "default");
    elm_widget_resize_object_set(obj, wd->base);
-
-   content = elm_layout_add(obj);
-   elm_layout_theme_set(content, "conformant", "layout", "content");
-   elm_object_content_set(obj, content);
 
    _swallow_conformant_parts(obj);
 
