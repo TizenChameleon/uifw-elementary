@@ -368,8 +368,8 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
         evas_object_geometry_get(wd->bx[i], &bx, &by, &bw, &bh);
         EINA_LIST_FOREACH(wd->items, l, it)
           {
-             if (!((it->level == i) && (VIEW(it)))) continue;
-             if ((VIEW(it)) && (it->level != wd->level))
+             if (it->level != i) continue;
+             if (it->level != wd->level)
                {
                   if (it->selected)
                     {
@@ -436,19 +436,23 @@ _sel_eval(Evas_Object *obj, Evas_Coord evx, Evas_Coord evy)
         if (it_closest)
           {
              it = it_closest;
-             if (!last)
+             if (!last && it->letter)
                last = strdup(it->letter);
              else
                {
-                  if (!label) label = strdup(last);
+                  if (!label && last) label = strdup(last);
                   else
                     {
-                       /* FIXME: realloc return NULL if the request fails */
-                       label = realloc(label, strlen(label) + strlen(last) + 1);
-                       strcat(label, last);
+                       if (label && last)
+                         {
+                            label = realloc(label, strlen(label) +
+                                            strlen(last) + 1);
+                            if (!label) return;
+                            strcat(label, last);
+                         }
                     }
                   free(last);
-                  last = strdup(it->letter);
+                  if (it->letter) last = strdup(it->letter);
                }
           }
      }
