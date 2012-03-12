@@ -2288,7 +2288,7 @@ _item_realize(Elm_Gen_Item *it,
                                        _multi_move, it);
 
         if ((it->wd->decorate_mode) && (!it->decorate_obj) &&
-            (it->item->type != ELM_GENLIST_ITEM_GROUP) && (it->itc->decorate_item_style))
+            (it->item->type != ELM_GENLIST_ITEM_GROUP) && (it->itc->decorate_all_item_style))
           _decorate_mode_item_realize(it, EINA_FALSE);
 
         _elm_genlist_item_state_update(it, itc);
@@ -2382,7 +2382,7 @@ _item_realize(Elm_Gen_Item *it,
 
    if ((!calc) && (it->wd->decorate_mode) && (it->item->type != ELM_GENLIST_ITEM_GROUP))
      {
-        if (it->itc->decorate_item_style)
+        if (it->itc->decorate_all_item_style)
           {
              if (!it->decorate_obj) _decorate_mode_item_realize(it, EINA_FALSE);
              edje_object_message_signal_process(it->decorate_obj);
@@ -2682,7 +2682,7 @@ _item_block_position(Item_Block *itb,
                          }
                        if (!it->item->move_effect_enabled)
                          {
-                            if ((it->wd->decorate_mode) && (it->itc->decorate_item_style))
+                            if ((it->wd->decorate_mode) && (it->itc->decorate_all_item_style))
                               _decorate_mode_item_position(it, it->item->scrl_x,
                                                        it->item->scrl_y);
                             else
@@ -3532,7 +3532,7 @@ _mode_item_realize(Elm_Gen_Item *it)
 
    if (it->item->order_num_in & 0x1) strncat(buf, "_odd", sizeof(buf) - strlen(buf));
    strncat(buf, "/", sizeof(buf) - strlen(buf));
-   strncat(buf, it->itc->mode_item_style, sizeof(buf) - strlen(buf));
+   strncat(buf, it->itc->decorate_item_style, sizeof(buf) - strlen(buf));
 
    _elm_theme_object_set(WIDGET(it), it->item->mode_view, "genlist", buf,
                          elm_widget_style_get(WIDGET(it)));
@@ -3678,7 +3678,7 @@ _decorate_mode_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
       strncat(buf, "_compress", sizeof(buf) - strlen(buf));
 
    strncat(buf, "/", sizeof(buf) - strlen(buf));
-   strncat(buf, it->itc->decorate_item_style, sizeof(buf) - strlen(buf));
+   strncat(buf, it->itc->decorate_all_item_style, sizeof(buf) - strlen(buf));
 
    _elm_theme_object_set(WIDGET(it),  it->decorate_obj, "genlist", buf,
                          elm_widget_style_get(WIDGET(it)));
@@ -5894,7 +5894,7 @@ elm_genlist_item_decorate_mode_set(Elm_Object_Item  *it,
        (!strcmp(mode_type, wd->mode_type)) &&
        (mode_set))
       return;
-   if (!_it->itc->mode_item_style) return;
+   if (!_it->itc->decorate_item_style) return;
    _it->mode_set = mode_set;
 
    if (wd->multi)
@@ -5977,7 +5977,7 @@ elm_genlist_decorate_mode_set(Evas_Object *obj, Eina_Bool decorated)
              if (it->item->type != ELM_GENLIST_ITEM_GROUP)
                {
                   if (it->selected) _item_unselect(it);
-                  if (it->itc->decorate_item_style)
+                  if (it->itc->decorate_all_item_style)
                      _decorate_mode_item_realize(it, EINA_TRUE);
                }
           }
