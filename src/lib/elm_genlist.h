@@ -34,8 +34,8 @@
  * - @c mode_item_style - This is a constant string and simply defines the name
  *   of the mode item style. It is used to specify mode item style. It can be
  *   used to set sweep mode.
- * - @c edit_item_style - This is a constant string and simply defines the name
- *   of the edit item style. It is used to specify edit item style. It can be
+ * - @c decorate_item_style - This is a constant string and simply defines the name
+ *   of the decorate item style. It is used to specify decorate item style. It can be
  *   used to set selection, checking and deletion mode.
  * - @c func - A struct with pointers to functions that will be called when
  *   an item is going to be actually created. All of them receive a @c data
@@ -1702,7 +1702,7 @@ EAPI Eina_Bool          elm_genlist_decorate_mode_get(const Evas_Object *obj);
  * This function sets the flip state of a given genlist item.
  * Flip mode overrides current item object.
  * It can be used for on-the-fly item replace.
- * Flip mode can be used with/without edit mode.
+ * Flip mode can be used with/without decorate mode.
  *
  * @see elm_genlist_item_flip_get()
  *
