@@ -1865,7 +1865,7 @@ test_genlist10(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    evas_object_show(gl);
 
    itc10.item_style     = "default";
-   itc10.mode_item_style = "mode";
+   itc10.decorate_item_style = "mode";
    itc10.func.text_get = gl10_text_get;
    itc10.func.content_get  = gl10_content_get;
    itc10.func.state_get = gl_state_get;
@@ -2351,10 +2351,10 @@ Evas_Object *gl15_content_get(void *data, Evas_Object *obj, const char *part)
    Testitem *tit = data;
    char buf[PATH_MAX];
 
-   // "edit_default" EDC layout is like below. each part is swallow part.
+   // "decorate_default" EDC layout is like below. each part is swallow part.
    // the existing item is swllowed to elm.swallow.edit.content part.
    // ----------------------------------------------------------------
-   // | elm.edit.icon.1 | elm.swallow.edit.content | elm.edit.icon,2 |
+   // | elm.decorate.icon.1 | elm.swallow.decorate.content | elm.decorate.icon,2 |
    // ----------------------------------------------------------------
 
    if (!strcmp(part, "elm.swallow.end"))
@@ -2365,7 +2365,7 @@ Evas_Object *gl15_content_get(void *data, Evas_Object *obj, const char *part)
         evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
         return ic;
      }
-   else if (!strcmp(part, "elm.edit.icon.1"))
+   else if (!strcmp(part, "elm.decorate.icon.1"))
      {
         Evas_Object *ck;
         ck = elm_check_add(obj);
@@ -2374,7 +2374,7 @@ Evas_Object *gl15_content_get(void *data, Evas_Object *obj, const char *part)
         evas_object_show(ck);
         return ck;
      }
-   else if (!strcmp(part, "elm.edit.icon.2"))
+   else if (!strcmp(part, "elm.decorate.icon.2"))
      {
         Evas_Object *icn = elm_icon_add(obj);
         snprintf(buf, sizeof(buf), "%s/images/icon_06.png", PACKAGE_DATA_DIR);
@@ -2444,7 +2444,7 @@ test_genlist15(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    itc15->func.content_get  = gl15_content_get;
    itc15->func.state_get = gl_state_get;
    itc15->func.del       = gl15_del;
-   itc15->edit_item_style = "edit";
+   itc15->decorate_all_item_style = "edit";
 
    for (i = 0; i < 100; i++)
      {
@@ -2522,7 +2522,7 @@ Evas_Object *gl16_content_get(void *data, Evas_Object *obj, const char *part)
         evas_object_show(btn);
         return btn;
      }
-   else if (!strcmp(part, "elm.edit.icon.1"))
+   else if (!strcmp(part, "elm.decorate.icon.1"))
      {
         Evas_Object *icn = elm_icon_add(obj);
         snprintf(buf, sizeof(buf), "%s/images/icon_04.png", PACKAGE_DATA_DIR);
@@ -2531,7 +2531,7 @@ Evas_Object *gl16_content_get(void *data, Evas_Object *obj, const char *part)
         evas_object_size_hint_aspect_set(icn, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
         return icn;
      }
-   else if (!strcmp(part, "elm.edit.icon.2"))
+   else if (!strcmp(part, "elm.decorate.icon.2"))
      {
         Evas_Object *icn = elm_icon_add(obj);
         snprintf(buf, sizeof(buf), "%s/images/icon_09.png", PACKAGE_DATA_DIR);
@@ -2574,7 +2574,7 @@ test_genlist16(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    itc15->func.content_get = gl16_content_get;
    itc15->func.state_get = gl_state_get;
    itc15->func.del       = NULL;
-   itc15->edit_item_style = "edit";
+   itc15->decorate_all_item_style = "decorate";
 
    for (i = 0; i < 100; i++)
      {

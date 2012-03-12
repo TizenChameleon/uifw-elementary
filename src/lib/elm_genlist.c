@@ -549,7 +549,7 @@ _del_hook(Evas_Object *obj)
    if (wd->changed_job) ecore_job_del(wd->changed_job);
    if (wd->must_recalc_idler) ecore_idler_del(wd->must_recalc_idler);
    if (wd->multi_timer) ecore_timer_del(wd->multi_timer);
-   if (wd->mode_type) eina_stringshare_del(wd->mode_type);
+   if (wd->decorate_type) eina_stringshare_del(wd->decorate_type);
    if (wd->scr_hold_timer) ecore_timer_del(wd->scr_hold_timer);
    free(wd);
 }
@@ -1640,7 +1640,7 @@ _mode_finished_signal_cb(void        *data,
    if (it->item->group_item)
      evas_object_raise(it->item->VIEW(group_item));
 #endif
-   snprintf(buf, sizeof(buf), "elm,state,%s,passive,finished", it->wd->mode_type);
+   snprintf(buf, sizeof(buf), "elm,state,%s,passive,finished", it->wd->decorate_type);
    edje_object_signal_callback_del_full(obj, buf, "elm", _mode_finished_signal_cb, it);
    evas_event_thaw(te);
    evas_event_thaw_eval(te);
@@ -1826,6 +1826,7 @@ _elm_genlist_item_state_update(Elm_Gen_Item *it, Item_Cache *itc)
                {
                   edje_object_signal_emit(VIEW(it),
                                           "elm,state,selected", "elm");
+
                   if (it->edit_obj)
                     edje_object_signal_emit(it->edit_obj,
                                             "elm,state,selected", "elm");
@@ -1833,10 +1834,11 @@ _elm_genlist_item_state_update(Elm_Gen_Item *it, Item_Cache *itc)
           }
         if (elm_widget_item_disabled_get(it) != itc->disabled)
           {
-             if (elm_widget_item_disabled_get(it))
+             if (it->selected)
                {
-                  edje_object_signal_emit(VIEW(it),
-                                          "elm,state,disabled", "elm");
+                  if (elm_widget_item_disabled_get(it))
+                    edje_object_signal_emit(VIEW(it),
+                                            "elm,state,disabled", "elm");
                   if (it->edit_obj)
                     edje_object_signal_emit(it->edit_obj,
                                             "elm,state,disabled", "elm");
@@ -1844,10 +1846,11 @@ _elm_genlist_item_state_update(Elm_Gen_Item *it, Item_Cache *itc)
           }
         if (it->item->expanded != itc->expanded)
           {
-             if (it->item->expanded)
+             if (it->selected)
                {
-                  edje_object_signal_emit(VIEW(it),
-                                          "elm,state,expanded", "elm");
+                  if (it->item->expanded)
+                    edje_object_signal_emit(VIEW(it),
+                                            "elm,state,expanded", "elm");
                   if (it->edit_obj)
                     edje_object_signal_emit(it->edit_obj,
                                             "elm,state,expanded", "elm");
@@ -2288,7 +2291,7 @@ _item_realize(Elm_Gen_Item *it,
                                        _multi_move, it);
 
         if ((it->wd->decorate_mode) && (!it->edit_obj) &&
-            (it->item->type != ELM_GENLIST_ITEM_GROUP) && (it->itc->edit_item_style))
+            (it->item->type != ELM_GENLIST_ITEM_GROUP) && (it->itc->decorate_all_item_style))
           _decorate_mode_item_realize(it, EINA_FALSE);
 
         _elm_genlist_item_state_update(it, itc);
@@ -2382,7 +2385,7 @@ _item_realize(Elm_Gen_Item *it,
 
    if ((!calc) && (it->wd->decorate_mode) && (it->item->type != ELM_GENLIST_ITEM_GROUP))
      {
-        if (it->itc->edit_item_style)
+        if (it->itc->decorate_all_item_style)
           {
              if (!it->edit_obj) _decorate_mode_item_realize(it, EINA_FALSE);
              edje_object_message_signal_process(it->edit_obj);
@@ -2682,7 +2685,7 @@ _item_block_position(Item_Block *itb,
                          }
                        if (!it->item->move_effect_enabled)
                          {
-                            if ((it->wd->decorate_mode) && (it->itc->edit_item_style))
+                            if ((it->wd->decorate_mode) && (it->itc->decorate_all_item_style))
                               _decorate_mode_item_position(it, it->item->scrl_x,
                                                        it->item->scrl_y);
                             else
@@ -3532,7 +3535,7 @@ _mode_item_realize(Elm_Gen_Item *it)
 
    if (it->item->order_num_in & 0x1) strncat(buf, "_odd", sizeof(buf) - strlen(buf));
    strncat(buf, "/", sizeof(buf) - strlen(buf));
-   strncat(buf, it->itc->mode_item_style, sizeof(buf) - strlen(buf));
+   strncat(buf, it->itc->decorate_item_style, sizeof(buf) - strlen(buf));
 
    _elm_theme_object_set(WIDGET(it), it->item->mode_view, "genlist", buf,
                          elm_widget_style_get(WIDGET(it)));
@@ -3622,7 +3625,7 @@ _item_mode_set(Elm_Gen_Item *it)
    evas_event_thaw(evas_object_evas_get(it->wd->obj));
    evas_event_thaw_eval(evas_object_evas_get(it->wd->obj));
 
-   snprintf(buf, sizeof(buf), "elm,state,%s,active", wd->mode_type);
+   snprintf(buf, sizeof(buf), "elm,state,%s,active", wd->decorate_type);
    edje_object_signal_emit(it->item->mode_view, buf, "elm");
 }
 
@@ -3637,8 +3640,8 @@ _item_mode_unset(Widget_Data *wd)
    it = wd->mode_item;
    it->item->nocache_once = EINA_TRUE;
 
-   snprintf(buf, sizeof(buf), "elm,state,%s,passive", wd->mode_type);
-   snprintf(buf2, sizeof(buf2), "elm,state,%s,passive,finished", wd->mode_type);
+   snprintf(buf, sizeof(buf), "elm,state,%s,passive", wd->decorate_type);
+   snprintf(buf2, sizeof(buf2), "elm,state,%s,passive,finished", wd->decorate_type);
 
    edje_object_signal_emit(it->item->mode_view, buf, "elm");
    edje_object_signal_callback_add(it->item->mode_view, buf2, "elm", _mode_finished_signal_cb, it);
@@ -3678,7 +3681,7 @@ _decorate_mode_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
       strncat(buf, "_compress", sizeof(buf) - strlen(buf));
 
    strncat(buf, "/", sizeof(buf) - strlen(buf));
-   strncat(buf, it->itc->edit_item_style, sizeof(buf) - strlen(buf));
+   strncat(buf, it->itc->decorate_all_item_style, sizeof(buf) - strlen(buf));
 
    _elm_theme_object_set(WIDGET(it),  it->edit_obj, "genlist", buf,
                          elm_widget_style_get(WIDGET(it)));
@@ -3716,9 +3719,9 @@ _decorate_mode_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
    _item_text_realize(it, it->edit_obj, &it->item->edit_texts, NULL);
    if (it->flipped)  edje_object_signal_emit(it->edit_obj, "elm,state,flip,enabled", "elm");
    it->item->edit_content_objs =
-     _item_content_realize(it, it->edit_obj, &it->item->edit_contents, NULL);
+     _item_mode_content_realize(it, it->edit_obj, &it->contents, NULL, &it->item->edit_content_objs, "decorate_contents"); //FIXME
    _item_state_realize(it, it->edit_obj, &it->item->edit_states, NULL);
-   edje_object_part_swallow(it->edit_obj, "elm.swallow.edit.content", VIEW(it));
+   edje_object_part_swallow(it->edit_obj, "elm.swallow.decorate.content", VIEW(it)); //FIXME : elm.swallow.decorate.content?
 
    _decorate_mode_item_position(it, it->item->scrl_x, it->item->scrl_y);
    evas_object_show(it->edit_obj);
@@ -5440,7 +5443,7 @@ elm_genlist_item_fields_update(Elm_Object_Item *it,
              _it->item->edit_content_objs = _item_mode_content_unrealize(_it, _it->edit_obj,
                                                                    &_it->contents, parts, &_it->item->edit_content_objs);
              _it->item->edit_content_objs = _item_mode_content_realize(_it, _it->edit_obj,
-                                                                 &_it->contents, parts, &_it->item->edit_content_objs, "contents"); // FIXME: is it "edit_contents"??
+                                                                 &_it->contents, parts, &_it->item->edit_content_objs, "decorate_contents"); // FIXME: is it "decorate_contents"??
           }
      }
    if ((!itf) || (itf & ELM_GENLIST_ITEM_FIELD_STATE))
@@ -5874,7 +5877,7 @@ elm_genlist_realized_items_update(Evas_Object *obj)
 
 EAPI void
 elm_genlist_item_decorate_mode_set(Elm_Object_Item  *it,
-                                   const char       *mode_type,
+                                   const char       *decorate_type,
                                    Eina_Bool         mode_set)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
@@ -5885,16 +5888,16 @@ elm_genlist_item_decorate_mode_set(Elm_Object_Item  *it,
    Elm_Object_Item *it2;
 
    if (!wd) return;
-   if (!mode_type) return;
+   if (!decorate_type) return;
    if ((_it->generation < _it->wd->generation) ||
        elm_widget_item_disabled_get(_it)) return;
    if (wd->decorate_mode) return;
 
    if ((wd->mode_item == _it) &&
-       (!strcmp(mode_type, wd->mode_type)) &&
+       (!strcmp(decorate_type, wd->decorate_type)) &&
        (mode_set))
       return;
-   if (!_it->itc->mode_item_style) return;
+   if (!_it->itc->decorate_item_style) return;
    _it->mode_set = mode_set;
 
    if (wd->multi)
@@ -5910,12 +5913,12 @@ elm_genlist_item_decorate_mode_set(Elm_Object_Item  *it,
           elm_genlist_item_selected_set(it2, EINA_FALSE);
      }
 
-   if (((wd->mode_type) && (strcmp(mode_type, wd->mode_type))) ||
+   if (((wd->decorate_type) && (strcmp(decorate_type, wd->decorate_type))) ||
        (mode_set) ||
        ((_it == wd->mode_item) && (!mode_set)))
      _item_mode_unset(wd);
 
-   eina_stringshare_replace(&wd->mode_type, mode_type);
+   eina_stringshare_replace(&wd->decorate_type, decorate_type);
    if (mode_set) _item_mode_set(_it);
 }
 
@@ -5925,7 +5928,7 @@ elm_genlist_item_decorate_mode_get(const Evas_Object *obj)
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
-   return wd->mode_type;
+   return wd->decorate_type;
 }
 
 EAPI const Elm_Object_Item *
@@ -5977,7 +5980,7 @@ elm_genlist_decorate_mode_set(Evas_Object *obj, Eina_Bool decorated)
              if (it->item->type != ELM_GENLIST_ITEM_GROUP)
                {
                   if (it->selected) _item_unselect(it);
-                  if (it->itc->edit_item_style)
+                  if (it->itc->decorate_all_item_style)
                      _decorate_mode_item_realize(it, EINA_TRUE);
                }
           }
