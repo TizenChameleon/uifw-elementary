@@ -3716,9 +3716,9 @@ _decorate_mode_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
    _item_text_realize(it, it->edit_obj, &it->item->edit_texts, NULL);
    if (it->flipped)  edje_object_signal_emit(it->edit_obj, "elm,state,flip,enabled", "elm");
    it->item->edit_content_objs =
-     _item_content_realize(it, it->edit_obj, &it->item->edit_contents, NULL);
+     _item_mode_content_realize(it, it->edit_obj, &it->contents, NULL, &it->item->edit_content_objs, "edit_contents"); //FIXME
    _item_state_realize(it, it->edit_obj, &it->item->edit_states, NULL);
-   edje_object_part_swallow(it->edit_obj, "elm.swallow.edit.content", VIEW(it));
+   edje_object_part_swallow(it->edit_obj, "original_edc", VIEW(it)); //FIXME : elm.swallow.edit.content?
 
    _decorate_mode_item_position(it, it->item->scrl_x, it->item->scrl_y);
    evas_object_show(it->edit_obj);
@@ -5440,7 +5440,7 @@ elm_genlist_item_fields_update(Elm_Object_Item *it,
              _it->item->edit_content_objs = _item_mode_content_unrealize(_it, _it->edit_obj,
                                                                    &_it->contents, parts, &_it->item->edit_content_objs);
              _it->item->edit_content_objs = _item_mode_content_realize(_it, _it->edit_obj,
-                                                                 &_it->contents, parts, &_it->item->edit_content_objs, "contents"); // FIXME: is it "edit_contents"??
+                                                                 &_it->contents, parts, &_it->item->edit_content_objs, "edit_contents"); // FIXME: is it "edit_contents"??
           }
      }
    if ((!itf) || (itf & ELM_GENLIST_ITEM_FIELD_STATE))
