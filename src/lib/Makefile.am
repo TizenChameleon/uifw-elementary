@@ -69,7 +69,6 @@ elm_cnp.h \
 elm_colorselector.h \
 elm_config.h \
 elm_conform.h \
-elm_controlbar.h \
 elm_cursor.h \
 elm_datetime.h \
 elm_debug.h \
@@ -162,7 +161,6 @@ elm_cnp.c \
 elm_colorselector.c \
 elm_config.c \
 elm_conform.c \
-elm_controlbar.c \
 elm_datetime.c \
 elm_diskselector.c \
 elm_entry.c \

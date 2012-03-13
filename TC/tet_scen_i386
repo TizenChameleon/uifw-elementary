@@ -23,7 +23,6 @@ elm
    :include:/elm_ts/radio/tslist
    :include:/elm_ts/toggle/tslist
    :include:/elm_ts/panes/tslist
-   :include:/elm_ts/controlbar/tslist
    :include:/elm_ts/index/tslist
    :include:/elm_ts/nocontents/tslist
    :include:/elm_ts/scroller/tslist
