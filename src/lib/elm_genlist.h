@@ -31,12 +31,13 @@
  * - @c item_style - This is a constant string and simply defines the name
  *   of the item style. It @b must be specified and the default should be @c
  *   "default".
- * - @c mode_item_style - This is a constant string and simply defines the name
- *   of the mode item style. It is used to specify mode item style. It can be
- *   used to set sweep mode.
  * - @c decorate_item_style - This is a constant string and simply defines the name
- *   of the decorate item style. It is used to specify decorate item style. It can be
- *   used to set selection, checking and deletion mode.
+ *   of the decorate mode item style. It is used to specify decorate mode item style. It can be
+ *   used when you call elm_genlist_item_decorate_mode_set().
+ * - @c decorate_all_item_style - This is a constant string and simply defines the name
+ *   of the decorate all item style. It is used to specify decorate all item style. It can be
+ *   used to set selection, checking and deletion mode. This is used when you
+ *   call elm_genlist_decorate_mode_set().
  * - @c func - A struct with pointers to functions that will be called when
  *   an item is going to be actually created. All of them receive a @c data
  *   parameter that will point to the same data passed to
@@ -329,6 +330,7 @@
  * @li elm_object_item_part_text_get()
  * @li elm_object_item_disabled_set()
  * @li elm_object_item_disabled_get()
+ * @li elm_object_item_signal_emit()
  *
  * @section Genlist_Examples Examples
  *
@@ -391,13 +393,6 @@ typedef enum
    ELM_GENLIST_ITEM_SCROLLTO_TOP = (1 << 1),   /**< to the top of viewport */
    ELM_GENLIST_ITEM_SCROLLTO_MIDDLE = (1 << 2)   /**< to the middle of viewport */
 } Elm_Genlist_Item_Scrollto_Type;
-
-typedef enum
-{
-   ELM_GENLIST_TREE_EFFECT_NONE         = 0,
-   ELM_GENLIST_TREE_EFFECT_EXPAND       = 1,
-   ELM_GENLIST_TREE_EFFECT_CONTRACT     = 2
-} Elm_Genlist_Item_Move_Effect_Mode;
 
 /**
  * @see Elm_Gen_Item_Class
@@ -1602,19 +1597,18 @@ EAPI void                          elm_genlist_item_fields_update(Elm_Object_Ite
 EAPI void                          elm_genlist_item_decorate_mode_set(Elm_Object_Item *it, const char *decorate_type, Eina_Bool mode_set);
 
 /**
- * Get the last (or current) genlist mode used.
+ * Get the item's decorate mode.
  *
  * @param obj The genlist object
  *
- * This function just returns the name of the last used genlist mode. It will
- * be the current mode if it's still active.
+ * This function just returns the name of the item's decorate mode.
  *
  * @see elm_genlist_item_decorate_mode_set()
  * @see elm_genlist_decorated_item_get()
  *
  * @ingroup Genlist
  */
-EAPI const char                   *elm_genlist_item_decorate_mode_get(const Evas_Object *obj);
+EAPI const char                   *elm_genlist_item_decorate_mode_get(const Elm_Object_Item *it);
 
 /**
  * Get active genlist mode item

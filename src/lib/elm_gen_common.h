@@ -76,6 +76,13 @@ struct _Pan
    Ecore_Job                     *resize_job;
 };
 
+typedef enum
+{
+   ELM_GENLIST_TREE_EFFECT_NONE         = 0,
+   ELM_GENLIST_TREE_EFFECT_EXPAND       = 1,
+   ELM_GENLIST_TREE_EFFECT_CONTRACT     = 2
+} Elm_Genlist_Item_Move_Effect_Mode;
+
 struct _Widget_Data
 {
    Eina_Inlist_Sorted_State      *state;
@@ -100,7 +107,7 @@ struct _Widget_Data
    Eina_Bool                      on_hold : 1;
    Eina_Bool                      multi : 1; /**< a flag for item multi selection */
    Eina_Bool                      wasselected : 1;
-   Eina_Bool                      no_highlight : 1;
+   Eina_Bool                      highlight : 1; /**< a flag for items can be highlighted or not. by default this flag is true. */
    Eina_Bool                      clear_me : 1; /**< a flag whether genlist is marked as to be cleared or not. if this flag is true, genlist clear was already deferred.  */
    Eina_Bool                      h_bounce : 1;
    Eina_Bool                      v_bounce : 1;
