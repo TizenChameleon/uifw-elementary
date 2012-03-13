@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.69026slp2+build02) unstable; urgency=low
+
+  * Package Upload
+  * Important Changes
+        Remove controlbar
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.69026slp2+build02
+
+ -- Jaehwan Kim <jae.hwan.kim@samsung.com>  Wed, 14 Mar 2012 08:57:11 +0900
+
 elementary (1.0.0+svn.69026slp2+build01) unstable; urgency=low
 
   * Elementary 1.0 Release Package Upload
