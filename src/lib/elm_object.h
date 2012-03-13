@@ -87,7 +87,7 @@ EAPI void                         elm_object_access_info_set(Evas_Object *obj, c
  *
  * @param obj The parent object whose children to look at
  * @param name The name of the child to find
- * @param recurse Set to thge maximum number of levels to recurse (0 == none, 1 is only look at 1 level of children etc.)
+ * @param recurse Set to the maximum number of levels to recurse (0 == none, 1 is only look at 1 level of children etc.)
  * @return The found object of that name, or NULL if none is found
  *
  * This function searches the children (or recursively children of
@@ -116,14 +116,15 @@ EAPI Evas_Object                 *elm_object_name_find(const Evas_Object *obj, c
  */
 
 /**
- * Set the style to use by a widget
- *
- * Sets the style name that will define the appearance of a widget. Styles
- * vary from widget to widget and may also be defined by other themes
- * by means of extensions and overlays.
+ * Set the style to used by a given widget
  *
  * @param obj The Elementary widget to style
- * @param style The style name to use
+ * @param style The name of the style to use on it
+ * @return @c EINA_TRUE on success, @c EINA_FALSE otherwise
+ *
+ * This sets the style (by name) that will define the appearance of a
+ * widget. Styles vary from widget to widget and may also be defined
+ * by other themes by means of extensions and overlays.
  *
  * @see elm_theme_extension_add()
  * @see elm_theme_extension_del()
@@ -132,13 +133,13 @@ EAPI Evas_Object                 *elm_object_name_find(const Evas_Object *obj, c
  *
  * @ingroup Styles
  */
-EAPI void         elm_object_style_set(Evas_Object *obj, const char *style);
+EAPI Eina_Bool    elm_object_style_set(Evas_Object *obj, const char *style);
 
 /**
  * Get the style used by the widget
  *
  * This gets the style being used for that widget. Note that the string
- * pointer is only valid as longas the object is valid and the style doesn't
+ * pointer is only valid as long as the object is valid and the style doesn't
  * change.
  *
  * @param obj The Elementary widget to query for its style
@@ -186,12 +187,9 @@ EAPI Eina_Bool    elm_object_disabled_get(const Evas_Object *obj);
 /**
  * @defgroup WidgetNavigation Widget Tree Navigation.
  *
- * How to check if an Evas Object is an Elementary widget? How to
- * get the first elementary widget that is parent of the given
- * object?  These are all covered in widget tree navigation.
- *
- * @ref general_functions_example_page "This" example contemplates
- * some of these functions.
+ * These functions provide checks for if a Evas_Object is an Elementary widget,
+ * the possibility of getting a widget's parent, top level parent and getting a
+ * string representation of a widget's type.
  */
 
 /**
@@ -284,18 +282,21 @@ EAPI void         elm_object_signal_callback_add(Evas_Object *obj, const char *e
 /**
  * Remove a signal-triggered callback from a widget edje object.
  *
- * This function removes a callback, previoulsy attached to a
- * signal emitted by the edje object of the obj.  The parameters
- * emission, source and func must match exactly those passed to a
- * previous call to elm_object_signal_callback_add(). The data
- * pointer that was passed to this call will be returned.
- *
- * @param obj The object
+ * @param obj The object handle
  * @param emission The signal's name.
  * @param source The signal's source.
  * @param func The callback function to be executed when the signal is
  * emitted.
- * @return The data pointer
+ * @return The data pointer of the signal callback or @c NULL, on
+ * errors.
+ *
+ * This function removes the @b last callback, previously attached to
+ * a signal emitted by an undelying Edje object of @a obj, whose
+ * parameters @a emission, @a source and @c func match exactly with
+ * those passed to a previous call to
+ * elm_object_signal_callback_add(). The data pointer that was passed
+ * to this call will be returned.
+ *
  * @ingroup General
  */
 EAPI void        *elm_object_signal_callback_del(Evas_Object *obj, const char *emission, const char *source, Edje_Signal_Cb func);
@@ -355,7 +356,7 @@ EAPI void         elm_object_event_callback_add(Evas_Object *obj, Elm_Event_Cb f
 /**
  * Remove an event callback from a widget.
  *
- * This function removes a callback, previoulsy attached to event emission
+ * This function removes a callback, previously attached to event emission
  * by the @p obj.
  * The parameters func and data must match exactly those passed to
  * a previous call to elm_object_event_callback_add(). The data pointer that

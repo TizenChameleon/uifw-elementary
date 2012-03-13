@@ -34,7 +34,7 @@ _index_changed(void        *data __UNUSED__,
                Evas_Object *obj __UNUSED__,
                void        *event_info)
 {
-   elm_gengrid_item_bring_in(event_info);
+   elm_gengrid_item_bring_in(event_info, ELM_GENGRID_ITEM_SCROLLTO_IN);
 }
 
 static void
@@ -97,7 +97,7 @@ elm_main(int    argc __UNUSED__,
          char **argv __UNUSED__)
 {
    Evas_Object *win, *bg, *grid, *index;
-   Elm_Gengrid_Item *it;
+   Elm_Object_Item *gg_it;
    unsigned int i;
 
    Elm_Gengrid_Item_Class gic;
@@ -134,11 +134,11 @@ elm_main(int    argc __UNUSED__,
      {
         char buf[32];
 
-        it = elm_gengrid_item_append(grid, &gic, (void *)i, NULL, NULL);
+        gg_it = elm_gengrid_item_append(grid, &gic, (void *)i, NULL, NULL);
 
         /* indexing by first letters */
         snprintf(buf, sizeof(buf), "%c", items[i][0]);
-        elm_index_item_sorted_insert(index, buf, it, _index_icmp, NULL);
+        elm_index_item_sorted_insert(index, buf, NULL, gg_it, _index_icmp, NULL);
      }
 
    evas_object_smart_callback_add(index, "delay,changed", _index_changed, NULL);

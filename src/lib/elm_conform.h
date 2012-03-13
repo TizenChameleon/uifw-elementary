@@ -19,7 +19,7 @@
  * Available styles for it:
  * - @c "default"
  *
- * Default contents parts of the conformant widget that you can use for are:
+ * Default content parts of the conformant widget that you can use for are:
  * @li "default" - A content of the conformant
  *
  * See how to use this widget in this example:
@@ -43,16 +43,6 @@
  * @ingroup Conformant
  */
 EAPI Evas_Object                 *elm_conformant_add(Evas_Object *parent);
-
-/**
- * Returns the Evas_Object that represents the content area.
- *
- * @param obj The conformant object.
- * @return The content area of the widget.
- *
- * @ingroup Conformant
- */
-EAPI Evas_Object                 *elm_conformant_content_area_get(const Evas_Object *obj);
 
 /**
  * @}

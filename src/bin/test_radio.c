@@ -42,7 +42,7 @@ test_radio(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-   elm_icon_scale_set(ic, 0, 0);
+   elm_icon_resizable_set(ic, 0, 0);
 
    rd = elm_radio_add(win);
    elm_radio_state_value_set(rd, 1);
@@ -64,14 +64,14 @@ test_radio(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    elm_radio_state_value_set(rd, 3);
    elm_radio_group_add(rd, rdg);
    elm_object_text_set(rd, "Disabled");
-   elm_object_disabled_set(rd, 1);
+   elm_object_disabled_set(rd, EINA_TRUE);
    elm_box_pack_end(bx, rd);
    evas_object_show(rd);
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-   elm_icon_scale_set(ic, 0, 0);
+   elm_icon_resizable_set(ic, 0, 0);
 
    rd = elm_radio_add(win);
    elm_radio_state_value_set(rd, 4);
@@ -84,13 +84,13 @@ test_radio(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-   elm_icon_scale_set(ic, 0, 0);
+   elm_icon_resizable_set(ic, 0, 0);
 
    rd = elm_radio_add(win);
    elm_radio_state_value_set(rd, 5);
    elm_radio_group_add(rd, rdg);
    elm_object_part_content_set(rd, "icon", ic);
-   elm_object_disabled_set(rd, 1);
+   elm_object_disabled_set(rd, EINA_TRUE);
    elm_box_pack_end(bx, rd);
    evas_object_show(rd);
    evas_object_show(ic);

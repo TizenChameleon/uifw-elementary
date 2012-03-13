@@ -4,7 +4,7 @@
  * @image html img/widget/web/preview-00.png
  * @image latex img/widget/web/preview-00.eps
  *
- * A web object is used for displaying web pages (HTML/CSS/JS)
+ * A web widget is used for displaying web pages (HTML/CSS/JS)
  * using WebKit-EFL. You must have compiled Elementary with
  * ewebkit support.
  *
@@ -109,7 +109,7 @@ typedef struct _Elm_Web_Frame_Load_Error Elm_Web_Frame_Load_Error;
 struct _Elm_Web_Frame_Load_Error
 {
    int          code; /**< Numeric error code */
-   Eina_Bool    is_cancellation; /**< Error produced by cancelling a request */
+   Eina_Bool    is_cancellation; /**< Error produced by canceling a request */
    const char  *domain; /**< Error domain name */
    const char  *description; /**< Error description (already localized) */
    const char  *failing_url; /**< The URL that failed to load */
@@ -210,6 +210,21 @@ typedef enum
  */
 typedef struct _Elm_Web_Window_Features Elm_Web_Window_Features;
 
+
+/**
+ * Definitions of web window features.
+ *
+ */
+typedef enum
+{
+   ELM_WEB_WINDOW_FEATURE_TOOLBAR,
+   ELM_WEB_WINDOW_FEATURE_STATUSBAR,
+   ELM_WEB_WINDOW_FEATURE_SCROLLBARS,
+   ELM_WEB_WINDOW_FEATURE_MENUBAR,
+   ELM_WEB_WINDOW_FEATURE_LOCATIONBAR,
+   ELM_WEB_WINDOW_FEATURE_FULLSCREEN
+} Elm_Web_Window_Feature_Flag;
+
 /**
  * Callback type for the create_window hook.
  *
@@ -257,7 +272,7 @@ typedef Evas_Object *(*Elm_Web_Dialog_Alert)(void *data, Evas_Object *obj, const
  * @li @p data User data pointer set when setting the hook function
  * @li @p obj The elm_web object requesting the new window
  * @li @p message The message to show in the confirm dialog
- * @li @p ret Pointer where to store the user selection. @c EINA_TRUE if
+ * @li @p ret Pointer to store the user selection. @c EINA_TRUE if
  * the user selected @c Ok, @c EINA_FALSE otherwise.
  *
  * The function should return the object representing the confirm dialog.
@@ -279,9 +294,9 @@ typedef Evas_Object *(*Elm_Web_Dialog_Confirm)(void *data, Evas_Object *obj, con
  * @li @p obj The elm_web object requesting the new window
  * @li @p message The message to show in the prompt dialog
  * @li @p def_value The default value to present the user in the entry
- * @li @p value Pointer where to store the value given by the user. Must
- * be a malloc'ed string or @c NULL if the user cancelled the popup.
- * @li @p ret Pointer where to store the user selection. @c EINA_TRUE if
+ * @li @p value Pointer to store the value given by the user. Must
+ * be a malloc'ed string or @c NULL if the user canceled the popup.
+ * @li @p ret Pointer to store the user selection. @c EINA_TRUE if
  * the user selected @c Ok, @c EINA_FALSE otherwise.
  *
  * The function should return the object representing the prompt dialog.
@@ -303,10 +318,10 @@ typedef Evas_Object *(*Elm_Web_Dialog_Prompt)(void *data, Evas_Object *obj, cons
  * @li @p obj The elm_web object requesting the new window
  * @li @p allows_multiple @c EINA_TRUE if multiple files can be selected.
  * @li @p accept_types Mime types accepted
- * @li @p selected Pointer where to store the list of malloc'ed strings
+ * @li @p selected Pointer to store the list of malloc'ed strings
  * containing the path to each file selected. Must be @c NULL if the file
- * dialog is cancelled
- * @li @p ret Pointer where to store the user selection. @c EINA_TRUE if
+ * dialog is canceled
+ * @li @p ret Pointer to store the user selection. @c EINA_TRUE if
  * the user selected @c Ok, @c EINA_FALSE otherwise.
  *
  * The function should return the object representing the file selector
@@ -354,7 +369,7 @@ EAPI Evas_Object      *elm_web_add(Evas_Object *parent);
  * Change useragent of a elm_web object
  * 
  * @param obj The object
- * @param useragent String for useragent
+ * @param user_agent String for useragent
  *
  */
 EAPI void elm_web_useragent_set(Evas_Object *obj, const char *user_agent);
@@ -505,7 +520,7 @@ EAPI void              elm_web_tab_propagate_set(Evas_Object *obj, Eina_Bool pro
  *
  * @param obj The web object
  * @param uri The URI to set
- * @return EINA_TRUE if the URI could be, EINA_FALSE if an error occurred
+ * @return EINA_TRUE if the URI could be set, EINA_FALSE if an error occurred
  */
 EAPI Eina_Bool         elm_web_uri_set(Evas_Object *obj, const char *uri);
 
@@ -570,7 +585,7 @@ EAPI void              elm_web_bg_color_get(const Evas_Object *obj, int *r, int 
  * @return A newly allocated string, or NULL if nothing is selected or an
  * error occurred
  */
-EAPI char             *elm_view_selection_get(const Evas_Object *obj);
+EAPI char             *elm_web_selection_get(const Evas_Object *obj);
 
 /**
  * Tells the web object which index in the currently open popup was selected
@@ -652,7 +667,7 @@ EAPI Eina_Bool         elm_web_text_matches_highlight_set(Evas_Object *obj, Eina
 /**
  * Gets whether highlighting marks is enabled
  *
- * @param The web object
+ * @param obj The web object
  *
  * @return EINA_TRUE is marks are set to be highlighted, EINA_FALSE
  * otherwise
@@ -666,7 +681,7 @@ EAPI Eina_Bool         elm_web_text_matches_highlight_get(const Evas_Object *obj
  * 0.0 and 1.0. This is an estimated progress accounting for all the frames
  * included in the page.
  *
- * @param The web object
+ * @param obj The web object
  *
  * @return A value between 0.0 and 1.0 indicating the progress, or -1.0 on
  * failure
@@ -713,7 +728,7 @@ EAPI Eina_Bool         elm_web_reload_full(Evas_Object *obj);
  *
  * @return EINA_TRUE on success, EINA_FALSE otherwise
  *
- * @see elm_web_history_enable_set()
+ * @see elm_web_history_enabled_set()
  * @see elm_web_back_possible()
  * @see elm_web_forward()
  * @see elm_web_navigate()
@@ -729,8 +744,8 @@ EAPI Eina_Bool         elm_web_back(Evas_Object *obj);
  *
  * @return EINA_TRUE on success, EINA_FALSE otherwise
  *
- * @see elm_web_history_enable_set()
- * @see elm_web_forward_possible()
+ * @see elm_web_history_enabled_set()
+ * @see elm_web_forward_possible_get()
  * @see elm_web_back()
  * @see elm_web_navigate()
  */
@@ -748,8 +763,7 @@ EAPI Eina_Bool         elm_web_forward(Evas_Object *obj);
  * @return EINA_TRUE on success, EINA_FALSE on error or if not enough
  * history exists to jump the given number of steps
  *
- * @see elm_web_history_enable_set()
- * @see elm_web_navigate_possible()
+ * @see elm_web_history_enabled_set()
  * @see elm_web_back()
  * @see elm_web_forward()
  */
@@ -763,7 +777,7 @@ EAPI Eina_Bool         elm_web_navigate(Evas_Object *obj, int steps);
  * @return EINA_TRUE if it's possible to back in history, EINA_FALSE
  * otherwise
  */
-EAPI Eina_Bool         elm_web_back_possible(Evas_Object *obj);
+EAPI Eina_Bool         elm_web_back_possible_get(Evas_Object *obj);
 
 /**
  * Queries whether it's possible to go forward in history
@@ -773,7 +787,7 @@ EAPI Eina_Bool         elm_web_back_possible(Evas_Object *obj);
  * @return EINA_TRUE if it's possible to forward in history, EINA_FALSE
  * otherwise
  */
-EAPI Eina_Bool         elm_web_forward_possible(Evas_Object *obj);
+EAPI Eina_Bool         elm_web_forward_possible_get(Evas_Object *obj);
 
 /**
  * Queries whether it's possible to jump the given number of steps
@@ -787,7 +801,7 @@ EAPI Eina_Bool         elm_web_forward_possible(Evas_Object *obj);
  * @return EINA_TRUE if enough history exists to perform the given jump,
  * EINA_FALSE otherwise
  */
-EAPI Eina_Bool         elm_web_navigate_possible(Evas_Object *obj, int steps);
+EAPI Eina_Bool         elm_web_navigate_possible_get(Evas_Object *obj, int steps);
 
 /**
  * Gets whether browsing history is enabled for the given object
@@ -796,15 +810,15 @@ EAPI Eina_Bool         elm_web_navigate_possible(Evas_Object *obj, int steps);
  *
  * @return EINA_TRUE if history is enabled, EINA_FALSE otherwise
  */
-EAPI Eina_Bool         elm_web_history_enable_get(const Evas_Object *obj);
+EAPI Eina_Bool         elm_web_history_enabled_get(const Evas_Object *obj);
 
 /**
  * Enables or disables the browsing history
  *
  * @param obj The web object
- * @param enable Whether to enable or disable the browsing history
+ * @param enabled Whether to enable or disable the browsing history
  */
-EAPI void              elm_web_history_enable_set(Evas_Object *obj, Eina_Bool enable);
+EAPI void              elm_web_history_enabled_set(Evas_Object *obj, Eina_Bool enabled);
 
 /**
  * Sets the zoom level of the web object
@@ -911,8 +925,27 @@ EAPI Eina_Bool         elm_web_inwin_mode_get(const Evas_Object *obj);
 
 EAPI void              elm_web_window_features_ref(Elm_Web_Window_Features *wf);
 EAPI void              elm_web_window_features_unref(Elm_Web_Window_Features *wf);
-EAPI void              elm_web_window_features_bool_property_get(const Elm_Web_Window_Features *wf, Eina_Bool *toolbar_visible, Eina_Bool *statusbar_visible, Eina_Bool *scrollbars_visible, Eina_Bool *menubar_visible, Eina_Bool *locationbar_visble, Eina_Bool *fullscreen);
-EAPI void              elm_web_window_features_int_property_get(const Elm_Web_Window_Features *wf, int *x, int *y, int *w, int *h);
+
+/**
+ * Gets boolean properties from Elm_Web_Window_Features
+ * (such as statusbar, menubar, etc) that are on a window.
+ *
+ * @param obj The web window features object
+ * @param flag The web window feature flag whose value is required.
+ *
+ * @return EINA_TRUE if the flag is set, EINA_FALSE otherwise
+ */
+EAPI Eina_Bool              elm_web_window_features_property_get(const Elm_Web_Window_Features *wf, Elm_Web_Window_Feature_Flag flag);
+
+/**
+ *
+ * TODO : Add documentation.
+ *
+ * @param obj The web window features object
+ * @param x, y, w, h - the co-ordinates of the web view window.
+ *
+ */
+EAPI void              elm_web_window_features_region_get(const Elm_Web_Window_Features *wf, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h);
 
 /**
  * @}

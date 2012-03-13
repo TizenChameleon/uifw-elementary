@@ -5,4 +5,5 @@ SUBDIRS = \
 test_entry \
 ctxpopup_copypasteUI \
 test_map \
-access_output
+access_output \
+datetime_input_ctxpopup

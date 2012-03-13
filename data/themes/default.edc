@@ -324,6 +324,8 @@ collections {
 #include "widgets/button.edc"
 #include "widgets/toggle.edc"
 #include "widgets/clock.edc"
+#include "widgets/datetime.edc"
+#include "widgets/dayselector.edc"
 #include "widgets/menu.edc"
 #include "widgets/frame.edc"
 #include "widgets/tooltip.edc"
@@ -344,7 +346,6 @@ collections {
 #include "widgets/genlist.edc"
 #include "widgets/check.edc"
 #include "widgets/radio.edc"
-#include "widgets/pager.edc"
 #include "widgets/progressbar.edc"
 #include "widgets/separator.edc"
 #include "widgets/spinner.edc"
@@ -366,6 +367,7 @@ collections {
 #include "widgets/video.edc"
 #include "widgets/naviframe.edc"
 #include "widgets/multibuttonentry.edc"
+#include "widgets/popup.edc"
 #include "ews.edc"
-
+#include "widgets/pointer.edc"
 }

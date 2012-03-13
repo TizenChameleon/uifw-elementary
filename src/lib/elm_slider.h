@@ -5,7 +5,7 @@
  * @image html img/widget/slider/preview-00.png
  * @image latex img/widget/slider/preview-00.eps width=\textwidth
  *
- * The slider adds a dragable “slider” widget for selecting the value of
+ * The slider adds a draggable “slider” widget for selecting the value of
  * something within a range.
  *
  * A slider can be horizontal or vertical. It can contain an Icon and has a
@@ -39,12 +39,12 @@
  * Available styles for it:
  * - @c "default"
  *
- * Default contents parts of the slider widget that you can use for are:
+ * Default content parts of the slider widget that you can use for are:
  * @li "icon" - An icon of the slider
  * @li "end" - A end part content of the slider
  *
- * Default text parts of the silder widget that you can use for are:
- * @li "default" - Label of the silder
+ * Default text parts of the slider widget that you can use for are:
+ * @li "default" - Label of the slider
  *
  * Supported elm_object common APIs.
  * @li elm_object_disabled_set
@@ -287,8 +287,8 @@ EAPI void                         elm_slider_min_max_set(Evas_Object *obj, doubl
  * Get the minimum and maximum values of the slider.
  *
  * @param obj The slider object.
- * @param min Pointer where to store the minimum value.
- * @param max Pointer where to store the maximum value.
+ * @param min Pointer to store the minimum value.
+ * @param max Pointer to store the maximum value.
  *
  * @note If only one value is needed, the other pointer can be passed
  * as @c NULL.

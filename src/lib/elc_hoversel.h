@@ -16,7 +16,7 @@
  * "selected" - an item in the hoversel list is selected. event_info is the item
  * "dismissed" - the hover is dismissed
  *
- * Default contents parts of the hoversel widget that you can use for are:
+ * Default content parts of the hoversel widget that you can use for are:
  * @li "icon" - An icon of the hoversel
  *
  * Default text parts of the hoversel widget that you can use for are:
@@ -78,6 +78,7 @@ EAPI Eina_Bool                    elm_hoversel_horizontal_get(const Evas_Object 
  * in. See @ref Hover objects for more information.
  */
 EAPI void                         elm_hoversel_hover_parent_set(Evas_Object *obj, Evas_Object *parent);
+
 /**
  * @brief Get the Hover parent
  *
@@ -151,10 +152,10 @@ EAPI const Eina_List             *elm_hoversel_items_get(const Evas_Object *obj)
  *
  * This adds an item to the hoversel to show when it is clicked. Note: if you
  * need to use an icon from an edje file then use
- * elm_hoversel_item_icon_set() right after the this function, and set
+ * elm_hoversel_item_icon_set() right after this function, and set
  * icon_file to NULL here.
  *
- * For more information on what @p icon_file and @p icon_type are see the
+ * For more information on what @p icon_file and @p icon_type are, see the
  * @ref Icon "icon documentation".
  */
 EAPI Elm_Object_Item             *elm_hoversel_item_add(Evas_Object *obj, const char *label, const char *icon_file, Elm_Icon_Type icon_type, Evas_Smart_Cb func, const void *data);

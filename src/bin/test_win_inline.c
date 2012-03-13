@@ -32,7 +32,7 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(en, "This is a single line");
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-   elm_entry_single_line_set(en, 1);
+   elm_entry_single_line_set(en, EINA_TRUE);
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
@@ -42,14 +42,14 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, 0.5);
    elm_object_text_set(en, "Entry 2");
    elm_entry_scrollbar_policy_set(en, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-   elm_entry_single_line_set(en, 1);
+   elm_entry_single_line_set(en, EINA_TRUE);
    evas_object_show(en);
    elm_box_pack_end(bx, en);
 
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-   elm_icon_scale_set(ic, 0, 0);
+   elm_icon_resizable_set(ic, 0, 0);
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_HORIZONTAL, 1, 1);
 
    bb = elm_bubble_add(win);
@@ -59,13 +59,13 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_show(ic);
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bb, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   av = elm_anchorblock_add(win);
-   elm_anchorblock_hover_style_set(av, "popout");
-   elm_anchorblock_hover_parent_set(av, win);
+   av = elm_entry_add(win);
+   elm_entry_anchor_hover_style_set(av, "popout");
+   elm_entry_anchor_hover_parent_set(av, win);
    elm_object_text_set(av,
-			   "Hi there. This is the most recent message in the "
-			   "list of messages. It has one <a href=tel:+614321234>+61 432 1234</a> "
-			   "(phone number) to click on.");
+                       "Hi there. This is the most recent message in the "
+                       "list of messages. It has one <a href=tel:+614321234>+61 432 1234</a> "
+                       "(phone number) to click on.");
    elm_object_content_set(bb, av);
    evas_object_show(av);
    elm_box_pack_end(bx, bb);
@@ -83,23 +83,23 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_show(ic);
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bb, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   av = elm_anchorblock_add(win);
-   elm_anchorblock_hover_style_set(av, "popout");
-   elm_anchorblock_hover_parent_set(av, win);
+   av = elm_entry_add(win);
+   elm_entry_anchor_hover_style_set(av, "popout");
+   elm_entry_anchor_hover_parent_set(av, win);
    elm_object_text_set(av,
-			   "Hey what are you doing? This is the second last message "
-			   "Hi there. This is the most recent message in the "
-			   "list. It's a longer one so it can wrap more and "
-			   "contains a <a href=contact:john>John</a> contact "
-			   "link in it to test popups on links. The idea is that "
-			   "all SMS's are scanned for things that look like phone "
-			   "numbers or names that are in your contacts list, and "
-			   "if they are, they become clickable links that pop up "
-			   "a menus of obvious actions to perform on this piece "
-			   "of information. This of course can be later explicitly "
-			   "done by links maybe running local apps or even being "
-			   "web URL's too that launch the web browser and point it "
-			   "to that URL. <item relsize=16x16 vsize=full href=emoticon/omg></item>");
+                       "Hey what are you doing? This is the second last message "
+                       "Hi there. This is the most recent message in the "
+                       "list. It's a longer one so it can wrap more and "
+                       "contains a <a href=contact:john>John</a> contact "
+                       "link in it to test popups on links. The idea is that "
+                       "all SMS's are scanned for things that look like phone "
+                       "numbers or names that are in your contacts list, and "
+                       "if they are, they become clickable links that pop up "
+                       "a menus of obvious actions to perform on this piece "
+                       "of information. This of course can be later explicitly "
+                       "done by links maybe running local apps or even being "
+                       "web URL's too that launch the web browser and point it "
+                       "to that URL. <item relsize=16x16 vsize=full href=emoticon/omg></item>");
    elm_object_content_set(bb, av);
    evas_object_show(av);
    elm_box_pack_end(bx, bb);
@@ -108,7 +108,7 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    ic = elm_icon_add(win);
    snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic, buf, NULL);
-   elm_icon_scale_set(ic, 0, 0);
+   elm_icon_resizable_set(ic, 0, 0);
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_HORIZONTAL, 1, 1);
 
    bb = elm_bubble_add(win);
@@ -119,9 +119,9 @@ fill(Evas_Object *win, Eina_Bool do_bg)
    evas_object_size_hint_weight_set(bb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(bb, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
-   av = elm_anchorblock_add(win);
-   elm_anchorblock_hover_style_set(av, "popout");
-   elm_anchorblock_hover_parent_set(av, win);
+   av = elm_entry_add(win);
+   elm_entry_anchor_hover_style_set(av, "popout");
+   elm_entry_anchor_hover_parent_set(av, win);
    elm_object_text_set(av, "This is a short message. <item relsize=16x16 vsize=full href=emoticon/haha></item>");
    elm_object_content_set(bb, av);
    evas_object_show(av);

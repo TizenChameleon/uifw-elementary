@@ -121,8 +121,8 @@ EAPI void        elm_spinner_min_max_set(Evas_Object *obj, double min, double ma
  * Get the minimum and maximum values of the spinner.
  *
  * @param obj The spinner object.
- * @param min Pointer where to store the minimum value.
- * @param max Pointer where to store the maximum value.
+ * @param min Pointer to store the minimum value.
+ * @param max Pointer to store the maximum value.
  *
  * @note If only one value is needed, the other pointer can be passed
  * as @c NULL.
@@ -258,7 +258,7 @@ EAPI Eina_Bool   elm_spinner_wrap_get(const Evas_Object *obj);
  * Spinner objects can have edition @b disabled, in which state they will
  * be changed only by arrows.
  * Useful for contexts
- * where you don't want your users to interact with it writting the value.
+ * where you don't want your users to interact with it writing the value.
  * Specially
  * when using special values, the user can see real value instead
  * of special label on edition.
@@ -347,6 +347,79 @@ EAPI void        elm_spinner_interval_set(Evas_Object *obj, double interval);
  * @ingroup Spinner
  */
 EAPI double      elm_spinner_interval_get(const Evas_Object *obj);
+
+/**
+ * Set the base for rounding
+ *
+ * @param obj The spinner object
+ * @param base The base value
+ *
+ * Rounding works as follows:
+ * 
+ * rounded_val = base + (double)(((value - base) / round) * round)
+ * 
+ * Where rounded_val, value and base are doubles, and round is an integer.
+ * 
+ * This means that things will be rounded to increments (or decrements) of
+ * "round" starting from value @p base. The default base for rounding is 0.
+ * 
+ * Example: round = 3, base = 2
+ * Values:  3, 6, 9, 12, 15, ...
+ * 
+ * Example: round = 2, base = 5.5
+ * Values: 5.5, 7.5, 9.5, 11.5, ...
+ * 
+ * @see elm_spinner_round_get()
+ * @see elm_spinner_base_get() too.
+ *
+ * @ingroup Spinner
+ */
+EAPI void elm_spinner_base_set(Evas_Object *obj, double base);
+
+/**
+ * Get the base for rounding
+ *
+ * @param obj The spinner object
+ * @return The base rounding value
+ *
+ * This returns the base for rounding.
+ * 
+ * @see elm_spinner_round_set() too.
+ * @see elm_spinner_base_set() too.
+ *
+ * @ingroup Spinner
+ */
+EAPI double elm_spinner_base_get(const Evas_Object *obj);
+
+/**
+ * Set the round value for rounding
+ *
+ * @param obj The spinner object
+ * @param rnd The rounding value
+ *
+ * Sets the rounding value used for value rounding in the spinner.
+ * 
+ * @see elm_spinner_round_get()
+ * @see elm_spinner_base_set()
+ *
+ * @ingroup Spinner
+ */
+EAPI void elm_spinner_round_set(Evas_Object *obj, int rnd);
+
+/**
+ * Get the round value for rounding
+ *
+ * @param obj The spinner object
+ * @return The rounding value
+ *
+ * This returns the round value for rounding.
+ * 
+ * @see elm_spinner_round_set() too.
+ * @see elm_spinner_base_set() too.
+ *
+ * @ingroup Spinner
+ */
+EAPI int elm_spinner_round_get(const Evas_Object *obj);
 
 /**
  * @}

@@ -13,7 +13,7 @@
  * @li "timeout" - when timeout happens on notify and it's hidden
  * @li "block,clicked" - when a click outside of the notify happens
  *
- * Default contents parts of the notify widget that you can use for are:
+ * Default content parts of the notify widget that you can use for are:
  * @li "default" - A content of the notify
  *
  * Supported elm_object common APIs.
@@ -60,7 +60,7 @@ EAPI Evas_Object                 *elm_notify_add(Evas_Object *parent);
  * @brief Set the notify parent
  *
  * @param obj The notify object
- * @param content The new parent
+ * @param parent The new parent
  *
  * Once the parent object is set, a previously set one will be disconnected
  * and replaced.
@@ -104,7 +104,7 @@ EAPI Elm_Notify_Orient            elm_notify_orient_get(const Evas_Object *obj);
  * hidden.
  *
  * @param obj The notify object
- * @param time The timeout in seconds
+ * @param timeout The timeout in seconds
  *
  * This function sets a timeout and starts the timer controlling when the
  * notify is hidden. Since calling evas_object_show() on a notify restarts
@@ -132,22 +132,22 @@ EAPI double                       elm_notify_timeout_get(const Evas_Object *obj)
  * its area.
  *
  * @param obj The notify object
- * @param repeats EINA_TRUE Events are repeats, else no
+ * @param allow EINA_TRUE If events are allowed, otherwise not
  *
  * When true if the user clicks outside the window the events will be caught
  * by the others widgets, else the events are blocked.
  *
  * @note The default value is EINA_TRUE.
  */
-EAPI void                         elm_notify_repeat_events_set(Evas_Object *obj, Eina_Bool repeat);
+EAPI void                         elm_notify_allow_events_set(Evas_Object *obj, Eina_Bool allow);
 
 /**
- * @brief Return true if events are repeat below the notify object
+ * @brief Return true if events are allowed below the notify object
  * @param obj the notify object
  *
- * @see elm_notify_repeat_events_set()
+ * @see elm_notify_allow_events_set()
  */
-EAPI Eina_Bool                    elm_notify_repeat_events_get(const Evas_Object *obj);
+EAPI Eina_Bool                    elm_notify_allow_events_get(const Evas_Object *obj);
 
 /**
  * @}

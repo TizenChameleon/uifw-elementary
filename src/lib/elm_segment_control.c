@@ -437,13 +437,12 @@ _item_find(const Evas_Object *obj, int idx)
 static void
 _item_text_set_hook(Elm_Object_Item *it, const char *part, const char *label)
 {
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
    Widget_Data *wd;
    Elm_Segment_Item *item;
 
    if (part && strcmp(part, "default")) return;
 
-   item = (Elm_Segment_Item *) it;
+   item = (Elm_Segment_Item *)it;
    wd = elm_widget_item_data_get(item);
    if (!wd) return;
 
@@ -460,9 +459,8 @@ _item_text_set_hook(Elm_Object_Item *it, const char *part, const char *label)
 static const char *
 _item_text_get_hook(const Elm_Object_Item *it, const char *part)
 {
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
    if (part && strcmp(part, "default")) return NULL;
-   return ((Elm_Segment_Item *) it)->label;
+   return ((Elm_Segment_Item *)it)->label;
 }
 
 static void
@@ -470,12 +468,11 @@ _item_content_set_hook(Elm_Object_Item *it,
                        const char *part,
                        Evas_Object *content)
 {
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
    Elm_Segment_Item *item;
 
    if (part && strcmp(part, "icon")) return;
 
-   item = (Elm_Segment_Item *) it;
+   item = (Elm_Segment_Item *)it;
 
    //Remove the existing icon
    if (item->icon)
@@ -498,17 +495,15 @@ _item_content_set_hook(Elm_Object_Item *it,
 static Evas_Object *
 _item_content_get_hook(const Elm_Object_Item *it, const char *part)
 {
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
    if (part && strcmp(part, "icon")) return NULL;
-   return ((Elm_Segment_Item *) it)->icon;
+   return ((Elm_Segment_Item *)it)->icon;
 }
 
 static Eina_Bool
 _item_del_pre_hook(Elm_Object_Item *it)
 {
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
    Widget_Data *wd;
-   Elm_Segment_Item *item = (Elm_Segment_Item *) it;
+   Elm_Segment_Item *item = (Elm_Segment_Item *)it;
 
    wd = elm_widget_item_data_get(item);
    if (!wd) return EINA_FALSE;
@@ -626,7 +621,7 @@ elm_segment_control_item_add(Evas_Object *obj, Evas_Object *icon,
    wd->seg_items = eina_list_append(wd->seg_items, it);
    _update_list(wd);
 
-   return (Elm_Object_Item *) it;
+   return (Elm_Object_Item *)it;
 }
 
 EAPI Elm_Object_Item *
@@ -651,7 +646,7 @@ elm_segment_control_item_insert_at(Evas_Object *obj, Evas_Object *icon,
      wd->seg_items = eina_list_append(wd->seg_items, it);
 
    _update_list(wd);
-   return (Elm_Object_Item *) it;
+   return (Elm_Object_Item *)it;
 }
 
 EAPI void
@@ -672,7 +667,7 @@ elm_segment_control_item_del_at(Evas_Object *obj, int idx)
 
    it = _item_find(obj, idx);
    if (!it) return;
-   elm_object_item_del((Elm_Object_Item *) it);
+   elm_object_item_del((Elm_Object_Item *)it);
 }
 
 EAPI const char*
@@ -738,7 +733,7 @@ elm_segment_control_item_selected_set(Elm_Object_Item *it, Eina_Bool selected)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it);
    Widget_Data *wd;
-   Elm_Segment_Item *item = (Elm_Segment_Item *) it;
+   Elm_Segment_Item *item = (Elm_Segment_Item *)it;
 
    wd = elm_widget_item_data_get(item);
    if (!wd) return;
@@ -768,5 +763,5 @@ EAPI int
 elm_segment_control_item_index_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, -1);
-   return ((Elm_Segment_Item *) it)->seg_index;
+   return ((Elm_Segment_Item *)it)->seg_index;
 }

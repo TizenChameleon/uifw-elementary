@@ -1199,7 +1199,7 @@ _ctxpopup_cb(void *data, Evas_Object *obj, void *event_info)
 
    EINA_LIST_FOREACH(wd->items, l, it)
      {
-        label = elm_ctxpopup_item_label_get((Elm_Object_Item *) event_info);
+        label = elm_object_item_text_get((Elm_Object_Item *) event_info);
         if ((label) && (!strcmp(it->text, label))) break;
      }
 

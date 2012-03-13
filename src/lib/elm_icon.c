@@ -700,7 +700,7 @@ elm_icon_thumb_set(Evas_Object *obj, const char *file, const char *group)
    eina_stringshare_replace(&wd->thumb.file.path, file);
    eina_stringshare_replace(&wd->thumb.file.key, group);
 
-   if (elm_thumb_ethumb_client_connected())
+   if (elm_thumb_ethumb_client_connected_get())
      {
         _icon_thumb_apply(wd);
         return ;
@@ -716,6 +716,7 @@ elm_icon_thumb_set(Evas_Object *obj, const char *file, const char *group)
    (void) group;
 #endif
 }
+
 
 EAPI Eina_Bool
 elm_icon_animated_available_get(const Evas_Object *obj)
@@ -890,26 +891,38 @@ elm_icon_no_scale_get(const Evas_Object *obj)
    return wd->no_scale;
 }
 
-EAPI void
+EINA_DEPRECATED EAPI void
 elm_icon_scale_set(Evas_Object *obj, Eina_Bool scale_up, Eina_Bool scale_down)
+{
+   elm_icon_resizable_set(obj, scale_up, scale_down);
+}
+
+EINA_DEPRECATED EAPI void
+elm_icon_scale_get(const Evas_Object *obj, Eina_Bool *scale_up, Eina_Bool *scale_down)
+{
+   elm_icon_resizable_get(obj, scale_up, scale_down);
+}
+
+EAPI void
+elm_icon_resizable_set(Evas_Object *obj, Eina_Bool size_up, Eina_Bool size_down)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-   wd->scale_up = scale_up;
-   wd->scale_down = scale_down;
+   wd->scale_up = size_up;
+   wd->scale_down = size_down;
    if (!wd->in_eval) _sizing_eval(obj);
 }
 
 EAPI void
-elm_icon_scale_get(const Evas_Object *obj, Eina_Bool *scale_up, Eina_Bool *scale_down)
+elm_icon_resizable_get(const Evas_Object *obj, Eina_Bool *size_up, Eina_Bool *size_down)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (scale_up) *scale_up = wd->scale_up;
-   if (scale_down) *scale_down = wd->scale_down;
+   if (size_up) *size_up = wd->scale_up;
+   if (size_down) *size_down = wd->scale_down;
 }
 
 EAPI void
@@ -974,11 +987,35 @@ elm_icon_object_get(Evas_Object *obj)
 }
 
 EAPI void
-elm_icon_preload_set(Evas_Object *obj, Eina_Bool disable)
+elm_icon_preload_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
 
    if (!wd) return;
-   _els_smart_icon_preload_set(wd->img, disable);
+   _els_smart_icon_preload_set(wd->img, !!disabled);
+}
+
+EINA_DEPRECATED EAPI void
+elm_icon_preload_set(Evas_Object *obj, Eina_Bool disable)
+{
+   elm_icon_preload_disabled_set(obj, disable);
+}
+
+EAPI void
+elm_icon_aspect_fixed_set(Evas_Object *obj, Eina_Bool fixed)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   _els_smart_icon_aspect_fixed_set(wd->img, fixed);
+}
+
+EAPI Eina_Bool
+elm_icon_aspect_fixed_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return _els_smart_icon_aspect_fixed_get(wd->img);
 }

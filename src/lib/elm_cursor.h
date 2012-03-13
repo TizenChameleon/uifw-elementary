@@ -9,8 +9,9 @@
  * and Elementary provides functions to choose them (think of X11
  * cursors, as an example).
  *
+ * By default, Elementary searches cursors only from engine.
  * There's also the possibility of, besides using engine provided
- * cursors, also use ones coming from Edje theming files. Both
+ * cursors, also use the ones coming from Edje theme files. Both
  * globally and per widget, Elementary makes it possible for one to
  * make the cursors lookup to be held on engines only or on
  * Elementary's theme file, too. To set cursor's hot spot,
@@ -90,17 +91,17 @@ EAPI const char *elm_object_cursor_style_get(const Evas_Object *obj);
  * Set if the cursor set should be searched on the theme or should use
  * the provided by the engine, only.
  *
- * @note before you set if should look on theme you should define a cursor
- * with elm_object_cursor_set(). By default it will only look for cursors
+ * @note before you set engine_only you should define a cursor with
+ * elm_object_cursor_set(). By default it will only look for cursors
  * provided by the engine.
  *
  * @param obj an object with cursor already set.
- * @param engine_only boolean to define it cursors should be looked only
+ * @param engine_only boolean to define if cursors should be looked only
  * between the provided by the engine or searched on widget's theme as well.
  *
  * @ingroup Cursors
  */
-EAPI void        elm_object_cursor_engine_only_set(Evas_Object *obj, Eina_Bool engine_only);
+EAPI void elm_object_cursor_theme_search_enabled_set(Evas_Object *obj, Eina_Bool theme_search);
 
 /**
  * Get the cursor engine only usage for this object cursor.
@@ -113,30 +114,7 @@ EAPI void        elm_object_cursor_engine_only_set(Evas_Object *obj, Eina_Bool e
  *
  * @ingroup Cursors
  */
-EAPI Eina_Bool   elm_object_cursor_engine_only_get(const Evas_Object *obj);
-
-/**
- * Get the configured cursor engine only usage
- *
- * This gets the globally configured exclusive usage of engine cursors.
- *
- * @return 1 if only engine cursors should be used
- * @ingroup Cursors
- */
-EAPI int         elm_cursor_engine_only_get(void);
-
-/**
- * Set the configured cursor engine only usage
- *
- * This sets the globally configured exclusive usage of engine cursors.
- * It won't affect cursors set before changing this value.
- *
- * @param engine_only If 1 only engine cursors will be enabled, if 0 will
- * look for them on theme before.
- * @return EINA_TRUE if value is valid and setted (0 or 1)
- * @ingroup Cursors
- */
-EAPI Eina_Bool   elm_cursor_engine_only_set(int engine_only);
+EAPI Eina_Bool elm_object_cursor_theme_search_enabled_get(const Evas_Object *obj);
 
 /**
  * @}

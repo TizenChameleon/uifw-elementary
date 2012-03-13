@@ -205,7 +205,7 @@ _theme_hook(Evas_Object *obj)
    if (wd->labels)
      {
         eina_hash_foreach(wd->labels, _labels_foreach_text_set, wd);
-	    edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
+	edje_object_signal_emit(wd->slider, "elm,state,text,visible", "elm");
      }
 
    if (wd->units)
@@ -508,12 +508,14 @@ _spacer_move_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, voi
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Evas_Event_Mouse_Move *ev = event_info;
-   Evas_Coord x, y, w, h, d = 0;
+   Evas_Coord x, y, w, h;
    double button_x = 0.0, button_y = 0.0;
    if (elm_widget_disabled_get(data)) return;
 
    if  (wd->spacer_down)
      {
+        Evas_Coord d = 0;
+        
         evas_object_geometry_get(wd->spacer, &x, &y, &w, &h);
         if (wd->horizontal) d = abs(ev->cur.canvas.x - x - wd->downx);
         else d = abs(ev->cur.canvas.y - y - wd->downy);
@@ -634,7 +636,6 @@ _elm_slider_label_get(const Evas_Object *obj, const char *part)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd) return NULL;
    if (!wd->labels) return NULL;
 

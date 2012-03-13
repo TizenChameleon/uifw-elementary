@@ -2,8 +2,6 @@
 ./src/bin/quicklaunch.c
 ./src/bin/run.c
 ./src/bin/test_actionslider.c
-./src/bin/test_anchorblock.c
-./src/bin/test_anchorview.c
 ./src/bin/test_anim.c
 ./src/bin/test_bg.c
 ./src/bin/test_box.c
@@ -43,7 +41,6 @@
 ./src/bin/test_menu.c
 ./src/bin/test_multi.c
 ./src/bin/test_notify.c
-./src/bin/test_pager.c
 ./src/bin/test_panel.c
 ./src/bin/test_panes.c
 ./src/bin/test_photo.c
@@ -65,8 +62,6 @@
 ./src/bin/test_transit.c
 ./src/bin/test_weather.c
 ./src/bin/test_win_state.c
-./src/edje_externals/elm_anchorblock.c
-./src/edje_externals/elm_anchorview.c
 ./src/edje_externals/elm_bubble.c
 ./src/edje_externals/elm_button.c
 ./src/edje_externals/elm.c
@@ -94,8 +89,6 @@
 ./src/edje_externals/elm_thumb.c
 ./src/edje_externals/elm_toggle.c
 ./src/edje_externals/elm_toolbar.c
-./src/lib/elc_anchorblock.c
-./src/lib/elc_anchorview.c
 ./src/lib/elc_ctxpopup.c
 ./src/lib/elc_fileselector_button.c
 ./src/lib/elc_fileselector.c
@@ -109,11 +102,10 @@
 ./src/lib/elm_calendar.c
 ./src/lib/elm_check.c
 ./src/lib/elm_clock.c
-./src/lib/elm_cnp_helper.c
+./src/lib/elm_cnp.c
 ./src/lib/elm_colorselector.c
 ./src/lib/elm_config.c
 ./src/lib/elm_conform.c
-./src/lib/elm_datefield.c
 ./src/lib/elm_diskselector.c
 ./src/lib/elm_entry.c
 ./src/lib/elm_flip.c
@@ -135,7 +127,6 @@
 ./src/lib/elm_menu.c
 ./src/lib/elm_module.c
 ./src/lib/elm_notify.c
-./src/lib/elm_pager.c
 ./src/lib/elm_panel.c
 ./src/lib/elm_panes.c
 ./src/lib/elm_photo.c
@@ -143,7 +134,6 @@
 ./src/lib/elm_progressbar.c
 ./src/lib/elm_radio.c
 ./src/lib/elm_scroller.c
-./src/lib/elm_searchbar.c
 ./src/lib/elm_separator.c
 ./src/lib/elm_slider.c
 ./src/lib/elm_slideshow.c

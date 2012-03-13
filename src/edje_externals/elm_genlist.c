@@ -12,7 +12,6 @@ typedef struct _Elm_Params_Genlist
    Eina_Bool always_select_exists:1;
    Eina_Bool no_select:1;
    Eina_Bool no_select_exists:1;
-   Eina_Bool compress:1;
    Eina_Bool compress_exists:1;
    Eina_Bool homogeneous:1;
    Eina_Bool homogeneous_exists:1;
@@ -53,16 +52,24 @@ external_genlist_state_set(void *data __UNUSED__, Evas_Object *obj, const void *
 	Elm_List_Mode set = _list_horizontal_setting_get(p->horizontal);
 
 	if (set != ELM_LIST_LAST)
-	   elm_genlist_horizontal_mode_set(obj, set);
+	   elm_genlist_mode_set(obj, set);
      }
    if (p->multi_exists)
      elm_genlist_multi_select_set(obj, p->multi);
-   if (p->always_select_exists)
-     elm_genlist_always_select_mode_set(obj, p->always_select);
    if (p->no_select_exists)
-     elm_genlist_no_select_mode_set(obj, p->no_select);
-   if (p->compress_exists)
-     elm_genlist_compress_mode_set(obj, p->compress);
+     {
+        if (p->no_select)
+          elm_genlist_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_NONE);
+        else
+          elm_genlist_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+     }
+   if (p->always_select_exists)
+     {
+        if (p->always_select)
+          elm_genlist_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_ALWAYS);
+        else
+          elm_genlist_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
+     }
    if (p->homogeneous_exists)
      elm_genlist_homogeneous_set(obj, p->homogeneous);
    if ((p->h_bounce_exists) && (p->v_bounce_exists))
@@ -89,7 +96,7 @@ external_genlist_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_E
 	     Elm_List_Mode set = _list_horizontal_setting_get(param->s);
 
 	     if (set == ELM_LIST_LAST) return EINA_FALSE;
-	     elm_genlist_horizontal_mode_set(obj, set);
+	     elm_genlist_mode_set(obj, set);
 	     return EINA_TRUE;
 	  }
      }
@@ -105,7 +112,10 @@ external_genlist_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_E
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
 	  {
-	     elm_genlist_always_select_mode_set(obj, param->i);
+             if (param->i)
+               elm_genlist_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_ALWAYS);
+             else
+               elm_genlist_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
 	     return EINA_TRUE;
 	  }
      }
@@ -113,15 +123,10 @@ external_genlist_param_set(void *data __UNUSED__, Evas_Object *obj, const Edje_E
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
 	  {
-	     elm_genlist_no_select_mode_set(obj, param->i);
-	     return EINA_TRUE;
-	  }
-     }
-   else if (!strcmp(param->name, "compress"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
-	  {
-	     elm_genlist_compress_mode_set(obj, param->i);
+             if (param->i)
+               elm_genlist_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_NONE);
+             else
+               elm_genlist_select_mode_set (obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
 	     return EINA_TRUE;
 	  }
      }
@@ -167,12 +172,12 @@ external_genlist_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_E
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_CHOICE)
 	  {
-	     Elm_List_Mode list_horizontal_mode_set = elm_genlist_horizontal_mode_get(obj);
+	     Elm_List_Mode list_horizontal_set = elm_genlist_mode_get(obj);
 
-	     if (list_horizontal_mode_set == ELM_LIST_LAST)
+	     if (list_horizontal_set == ELM_LIST_LAST)
 	       return EINA_FALSE;
 
-	     param->s = list_horizontal_choices[list_horizontal_mode_set];
+	     param->s = list_horizontal_choices[list_horizontal_set];
 	     return EINA_TRUE;
 	  }
      }
@@ -188,7 +193,11 @@ external_genlist_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_E
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
 	  {
-	     param->i = elm_genlist_always_select_mode_get(obj);
+             if (elm_genlist_select_mode_get (obj) ==
+                 ELM_OBJECT_SELECT_MODE_ALWAYS)
+               param->i = EINA_TRUE;
+             else
+               param->i = EINA_FALSE;
 	     return EINA_TRUE;
 	  }
      }
@@ -196,15 +205,11 @@ external_genlist_param_get(void *data __UNUSED__, const Evas_Object *obj, Edje_E
      {
 	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
 	  {
-	     param->i = elm_genlist_no_select_mode_get(obj);
-	     return EINA_TRUE;
-	  }
-     }
-   else if (!strcmp(param->name, "compress"))
-     {
-	if (param->type == EDJE_EXTERNAL_PARAM_TYPE_BOOL)
-	  {
-	     param->i = elm_genlist_compress_mode_get(obj);
+             if (elm_genlist_select_mode_get (obj) ==
+                 ELM_OBJECT_SELECT_MODE_NONE)
+               param->i = EINA_TRUE;
+             else
+               param->i = EINA_FALSE;
 	     return EINA_TRUE;
 	  }
      }
@@ -273,11 +278,6 @@ external_genlist_params_parse(void *data __UNUSED__, Evas_Object *obj __UNUSED__
 	     mem->no_select = !!param->i;
 	     mem->no_select_exists = EINA_TRUE;
 	  }
-	else if (!strcmp(param->name, "compress"))
-	  {
-	     mem->compress = !!param->i;
-	     mem->compress_exists = EINA_TRUE;
-	  }
 	else if (!strcmp(param->name, "homogeneous"))
 	  {
 	     mem->homogeneous = !!param->i;
@@ -322,7 +322,6 @@ static Edje_External_Param_Info external_genlist_params[] = {
    EDJE_EXTERNAL_PARAM_INFO_BOOL("multi select"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("always select"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("no select"),
-   EDJE_EXTERNAL_PARAM_INFO_BOOL("compress"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("homogeneous"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("height bounce"),
    EDJE_EXTERNAL_PARAM_INFO_BOOL("width bounce"),

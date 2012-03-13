@@ -20,10 +20,10 @@
  * for it to modify.
  *
  * Signals that you can add callbacks for are:
- * "changed" - This is called whenever the user changes the state of one of
- *             the check object(event_info is NULL).
+ * "changed" - This is called whenever the user changes the state of the check
+ *             objects(event_info is NULL).
  *
- * Default contents parts of the check widget that you can use for are:
+ * Default content parts of the check widget that you can use for are:
  * @li "icon" - An icon of the check
  *
  * Default text parts of the check widget that you can use for are:
@@ -39,6 +39,9 @@
  * @li elm_object_part_content_set
  * @li elm_object_part_content_get
  * @li elm_object_part_content_unset
+ * @li elm_object_signal_emit
+ * @li elm_object_signal_callback_add
+ * @li elm_object_signal_callback_del
  *
  * @ref tutorial_check should give you a firm grasp of how to use this widget.
  * 
@@ -59,9 +62,9 @@ EAPI Evas_Object *                elm_check_add(Evas_Object *parent);
  * @param obj The check object
  * @param state The state to use (1 == on, 0 == off)
  *
- * This sets the state of the check. If set
- * with elm_check_state_pointer_set() the state of that variable is also
- * changed. Calling this @b doesn't cause the "changed" signal to be emited.
+ * This sets the state of the check. If set with elm_check_state_pointer_set()
+ * the state of that variable is also changed. Calling this @b doesn't cause
+ * the "changed" signal to be emitted.
  */
 EAPI void                         elm_check_state_set(Evas_Object *obj, Eina_Bool state);
 

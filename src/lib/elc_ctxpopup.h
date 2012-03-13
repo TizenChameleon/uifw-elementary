@@ -4,7 +4,7 @@
  * @image html img/widget/ctxpopup/preview-00.png
  * @image latex img/widget/ctxpopup/preview-00.eps
  *
- * @brief Context popup widet.
+ * @brief Context popup widget.
  *
  * A ctxpopup is a widget that, when shown, pops up a list of items.
  * It automatically chooses an area inside its parent object's view
@@ -14,15 +14,15 @@
  * items have a label and/or an icon. It is intended for a small
  * number of items (hence the use of list, not genlist).
  *
- * @note Ctxpopup is a especialization of @ref Hover.
+ * @note Ctxpopup is a specialization of @ref Hover.
  *
  * Signals that you can add callbacks for are:
  * "dismissed" - the ctxpopup was dismissed
  *
- * Default contents parts of the ctxpopup widget that you can use for are:
+ * Default content parts of the ctxpopup widget that you can use for are:
  * @li "default" - A content of the ctxpopup
  *
- * Default contents parts of the ctxpopup items that you can use for are:
+ * Default content parts of the ctxpopup items that you can use for are:
  * @li "icon" - An icon in the title area
  *
  * Default text parts of the ctxpopup items that you can use for are:
@@ -138,7 +138,7 @@ EAPI Eina_Bool                    elm_ctxpopup_horizontal_get(const Evas_Object 
  * @warning Ctxpopup can't hold both an item list and a content at the same
  * time. When an item is added, any previous content will be removed.
  *
- * @see elm_ctxpopup_content_set()
+ * @see elm_object_content_set()
  *
  * @ingroup Ctxpopup
  */
@@ -189,6 +189,16 @@ EAPI void                         elm_ctxpopup_direction_priority_get(Evas_Objec
  * @ingroup Ctxpopup
  */
 EAPI Elm_Ctxpopup_Direction       elm_ctxpopup_direction_get(const Evas_Object *obj);
+
+/**
+ * @brief Dismiss a ctxpopup object
+ *
+ * @param obj The ctxpopup object
+ * Use this function to simulate clicking outside the ctxpopup to dismiss it.
+ * In this way, the ctxpopup will be hidden and the "clicked" signal will be
+ * emitted.
+ */
+EAPI void                         elm_ctxpopup_dismiss(Evas_Object *obj);
 
 /**
  * @}

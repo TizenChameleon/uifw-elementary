@@ -32,7 +32,7 @@ EAPI Evas_Object *elm_grid_add(Evas_Object *parent);
  *
  * @ingroup Grid
  */
-EAPI void         elm_grid_size_set(Evas_Object *obj, int w, int h);
+EAPI void         elm_grid_size_set(Evas_Object *obj, Evas_Coord w, Evas_Coord h);
 
 /**
  * Get the virtual size of the grid
@@ -43,7 +43,7 @@ EAPI void         elm_grid_size_set(Evas_Object *obj, int w, int h);
  *
  * @ingroup Grid
  */
-EAPI void         elm_grid_size_get(Evas_Object *obj, int *w, int *h);
+EAPI void         elm_grid_size_get(const Evas_Object *obj, Evas_Coord *w, Evas_Coord *h);
 
 /**
  * Pack child at given position and size
@@ -57,7 +57,7 @@ EAPI void         elm_grid_size_get(Evas_Object *obj, int *w, int *h);
  *
  * @ingroup Grid
  */
-EAPI void         elm_grid_pack(Evas_Object *obj, Evas_Object *subobj, int x, int y, int w, int h);
+EAPI void         elm_grid_pack(Evas_Object *obj, Evas_Object *subobj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
 
 /**
  * Unpack a child from a grid object
@@ -90,10 +90,10 @@ EAPI void         elm_grid_clear(Evas_Object *obj, Eina_Bool clear);
  *
  * @ingroup Grid
  */
-EAPI void         elm_grid_pack_set(Evas_Object *subobj, int x, int y, int w, int h);
+EAPI void         elm_grid_pack_set(Evas_Object *subobj, Evas_Coord x, Evas_Coord y, Evas_Coord w, Evas_Coord h);
 
 /**
- * get packing of a child
+ * Get packing of a child
  *
  * @param subobj The child to query
  * @param x Pointer to integer to store the virtual x coord
@@ -103,7 +103,21 @@ EAPI void         elm_grid_pack_set(Evas_Object *subobj, int x, int y, int w, in
  *
  * @ingroup Grid
  */
-EAPI void         elm_grid_pack_get(Evas_Object *subobj, int *x, int *y, int *w, int *h);
+EAPI void         elm_grid_pack_get(Evas_Object *subobj, Evas_Coord *x, Evas_Coord *y, Evas_Coord *w, Evas_Coord *h);
+
+/**
+ * Get the list of the children for the grid.
+ *
+ * @param obj The grid object
+ *
+ * @note This is a duplicate of the list kept by the grid internally.
+         It's up to the user to destroy it when it no longer needs it.
+			It's possible to remove objects from the grid when walking this
+			list, but these removals won't be reflected on it.
+ *
+ * @ingroup Grid
+ */
+EAPI Eina_List *elm_grid_children_get(const Evas_Object *obj);
 
 /**
  * @}

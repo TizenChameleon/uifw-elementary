@@ -2,9 +2,7 @@ CC ?= gcc
 
 TARGETS = utc_UIFW_elm_actionslider_add_func \
 		  utc_UIFW_elm_actionslider_indicator_pos_set_func \
-		  utc_UIFW_elm_actionslider_magnet_pos_set_func \
-		  utc_UIFW_elm_actionslider_label_set_func \
-		  utc_UIFW_elm_actionslider_hold_func
+		  utc_UIFW_elm_actionslider_magnet_pos_set_func
 
 PKGS = elementary evas
 

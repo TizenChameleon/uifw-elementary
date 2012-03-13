@@ -16,11 +16,12 @@ typedef struct _Mod_Api Mod_Api;
 typedef struct _Widget_Data Widget_Data;
 typedef struct _Elm_Entry_Context_Menu_Item Elm_Entry_Context_Menu_Item;
 typedef struct _Elm_Entry_Item_Provider Elm_Entry_Item_Provider;
-typedef struct _Elm_Entry_Text_Filter Elm_Entry_Text_Filter;
+typedef struct _Elm_Entry_Markup_Filter Elm_Entry_Markup_Filter;
 
 struct _Widget_Data
 {
    Evas_Object *ent, *scroller;
+   Evas_Object *hoversel;
    Ecore_Job *deferred_recalc_job;
    Ecore_Event_Handler *sel_notify_handler;
    Ecore_Event_Handler *sel_clear_handler;
@@ -41,6 +42,7 @@ struct _Widget_Data
    Eina_List *items;
    Eina_List *item_providers;
    Eina_List *text_filters;
+   Eina_List *markup_filters;
    Ecore_Job *hovdeljob;
    Mod_Api *api; // module api if supplied
    int cursor_pos;
@@ -52,6 +54,11 @@ struct _Widget_Data
    Elm_Input_Panel_Return_Key_Type input_panel_return_key_type;
    void *input_panel_imdata;
    int input_panel_imdata_len;
+   struct {
+        Evas_Object *hover_parent;
+        Evas_Object *pop, *hover;
+        const char *hover_style;
+   } anchor_hover;
    Eina_Bool changed : 1;
    Eina_Bool single_line : 1;
    Eina_Bool password : 1;
@@ -66,7 +73,6 @@ struct _Widget_Data
    Eina_Bool drag_selection_asked : 1;
    Eina_Bool can_write : 1;
    Eina_Bool autosave : 1;
-   Eina_Bool textonly : 1;
    Eina_Bool usedown : 1;
    Eina_Bool scroll : 1;
    Eina_Bool h_bounce : 1;
@@ -75,8 +81,8 @@ struct _Widget_Data
    Eina_Bool prediction_allow : 1;
    Eina_Bool input_panel_return_key_disabled : 1;
    Eina_Bool autoreturnkey : 1;
+   Elm_Cnp_Mode cnp_mode : 2;
 //// TIZEN ONLY
-   Evas_Object *hoversel;
    Evas_Object *mgf_proxy;
    Evas_Object *mgf_clip;
    Evas_Object *mgf_bg;
@@ -90,7 +96,6 @@ struct _Widget_Data
    Eina_Bool double_clicked : 1;
    Eina_Bool long_pressed : 1;
    Eina_Bool magnifier_enabled : 1;
-   Elm_CNP_Mode cnp_mode : 2;
 //
 };
 
@@ -111,7 +116,7 @@ struct _Elm_Entry_Item_Provider
    void *data;
 };
 
-struct _Elm_Entry_Text_Filter
+struct _Elm_Entry_Markup_Filter
 {
    Elm_Entry_Filter_Cb func;
    void *data;
@@ -152,6 +157,7 @@ static void _signal_entry_copy_notify(void *data, Evas_Object *obj, const char *
 static void _signal_entry_cut_notify(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_cursor_changed(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _add_chars_till_limit(Evas_Object *obj, char **text, int can_add, Length_Unit unit);
+static void _entry_hover_anchor_clicked(void *data, Evas_Object *obj, void *event_info);
 //// TIZEN ONLY
 static void _signal_selection_end(void *data, Evas_Object *obj, const char *emission, const char *source);
 static void _signal_handler_move_start(void *data, Evas_Object *obj, const char *emission, const char *source);
@@ -166,6 +172,7 @@ static Evas_Coord_Rectangle _viewport_region_get(Evas_Object *data);
 static void _region_get_job(void *data);
 static void _region_recalc_job(void *data);
 //
+
 static const char SIG_CHANGED[] = "changed";
 static const char SIG_CHANGED_USER[] = "changed,user";
 static const char SIG_ACTIVATED[] = "activated";
@@ -185,6 +192,7 @@ static const char SIG_SELECTION_CLEARED[] = "selection,cleared";
 static const char SIG_CURSOR_CHANGED[] = "cursor,changed";
 static const char SIG_CURSOR_CHANGED_MANUAL[] = "cursor,changed,manual";
 static const char SIG_ANCHOR_CLICKED[] = "anchor,clicked";
+static const char SIG_ANCHOR_HOVER_OPENED[] = "anchor,hover,opened";
 static const char SIG_ANCHOR_DOWN[] = "anchor,down";
 static const char SIG_ANCHOR_UP[] = "anchor,up";
 static const char SIG_ANCHOR_IN[] = "anchor,in";
@@ -211,6 +219,7 @@ static const Evas_Smart_Cb_Description _signals[] = {
        {SIG_CURSOR_CHANGED, ""},
        {SIG_CURSOR_CHANGED_MANUAL, ""},
        {SIG_ANCHOR_CLICKED, ""},
+       {SIG_ANCHOR_HOVER_OPENED, ""},
        {SIG_ANCHOR_DOWN, ""},
        {SIG_ANCHOR_UP, ""},
        {SIG_ANCHOR_IN, ""},
@@ -318,16 +327,16 @@ _load_plain(const char *file)
    return NULL;
 }
 
-static void
+static Eina_Bool
 _load(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    char *text;
-   if (!wd) return;
+   if (!wd) return EINA_FALSE;
    if (!wd->file)
      {
         elm_object_text_set(obj, "");
-        return;
+        return EINA_TRUE;
      }
    switch (wd->format)
      {
@@ -345,9 +354,13 @@ _load(Evas_Object *obj)
      {
         elm_object_text_set(obj, text);
         free(text);
+        return EINA_TRUE;
      }
    else
-     elm_object_text_set(obj, "");
+     {
+        elm_object_text_set(obj, "");
+        return EINA_FALSE;
+     }
 }
 
 static void
@@ -411,10 +424,10 @@ _delay_write(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static Elm_Entry_Text_Filter *
+static Elm_Entry_Markup_Filter *
 _filter_new(Elm_Entry_Filter_Cb func, void *data)
 {
-   Elm_Entry_Text_Filter *tf = ELM_NEW(Elm_Entry_Text_Filter);
+   Elm_Entry_Markup_Filter *tf = ELM_NEW(Elm_Entry_Markup_Filter);
    if (!tf) return NULL;
 
    tf->func = func;
@@ -467,7 +480,7 @@ _filter_new(Elm_Entry_Filter_Cb func, void *data)
 }
 
 static void
-_filter_free(Elm_Entry_Text_Filter *tf)
+_filter_free(Elm_Entry_Markup_Filter *tf)
 {
    if (tf->func == elm_entry_filter_limit_size)
      {
@@ -498,6 +511,8 @@ _del_pre_hook(Evas_Object *obj)
         wd->delay_write = NULL;
         if (wd->autosave) _save(obj);
      }
+   elm_entry_anchor_hover_end(obj);
+   elm_entry_anchor_hover_parent_set(obj, NULL);
 }
 
 static void
@@ -506,7 +521,7 @@ _del_hook(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Elm_Entry_Context_Menu_Item *it;
    Elm_Entry_Item_Provider *ip;
-   Elm_Entry_Text_Filter *tf;
+   Elm_Entry_Markup_Filter *tf;
 
    evas_event_freeze(evas_object_evas_get(obj));
 
@@ -554,10 +569,15 @@ _del_hook(Evas_Object *obj)
      {
         _filter_free(tf);
      }
+   EINA_LIST_FREE(wd->markup_filters, tf)
+     {
+        _filter_free(tf);
+     }
    if (wd->delay_write) ecore_timer_del(wd->delay_write);
    if (wd->input_panel_imdata) free(wd->input_panel_imdata);
    free(wd);
 
+   if (wd->anchor_hover.hover_style) eina_stringshare_del(wd->anchor_hover.hover_style);
    evas_event_thaw(evas_object_evas_get(obj));
    evas_event_thaw_eval(evas_object_evas_get(obj));
 }
@@ -567,6 +587,8 @@ _mirrored_set(Evas_Object *obj, Eina_Bool rtl)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    edje_object_mirrored_set(wd->ent, rtl);
+   if (wd->anchor_hover.hover)
+      elm_widget_mirrored_set(wd->anchor_hover.hover, rtl);
 }
 
 static void
@@ -589,6 +611,7 @@ _theme_hook(Evas_Object *obj)
      edje_object_signal_emit(wd->ent, "elm,state,disabled", "elm");
    edje_object_part_text_input_panel_layout_set(wd->ent, "elm.text", wd->input_panel_layout);
    edje_object_part_text_autocapital_type_set(wd->ent, "elm.text", wd->autocapital_type);
+   edje_object_part_text_prediction_allow_set(wd->ent, "elm.text", wd->prediction_allow);
    edje_object_part_text_input_panel_enabled_set(wd->ent, "elm.text", wd->input_panel_enable);
    edje_object_part_text_input_panel_imdata_set(wd->ent, "elm.text", wd->input_panel_imdata, wd->input_panel_imdata_len);
    edje_object_part_text_input_panel_return_key_type_set(wd->ent, "elm.text", wd->input_panel_return_key_type);
@@ -616,7 +639,6 @@ _theme_hook(Evas_Object *obj)
           elm_widget_highlight_in_theme_set(obj, EINA_FALSE);
      }
    _sizing_eval(obj);
-
    evas_event_thaw(evas_object_evas_get(obj));
    evas_event_thaw_eval(evas_object_evas_get(obj));
 }
@@ -804,8 +826,8 @@ _sizing_eval(Evas_Object *obj)
 
              elm_smart_scroller_child_viewport_size_get(wd->scroller, &vw, &vh);
 
-             if ((minw > 0) && (vw < minw)) vw = minw;
-             if (minh > 0) vh = minh;
+             if (minw > vw) vw = minw;
+             if (minh > vh) vh = minh;
 
              evas_object_resize(wd->ent, vw, vh);
              edje_object_size_min_calc
@@ -1226,25 +1248,64 @@ _select(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
       //elm_widget_scroll_hold_push(data);
 }
 
+static char *
+_remove_item_tags(const char *str)
+{
+   char *ret;
+   if (!str)
+     return NULL;
+
+   Eina_Strbuf *buf = eina_strbuf_new();
+   if (!buf)
+     return NULL;
+
+   if (!eina_strbuf_append(buf, str))
+     return NULL;
+
+   while (EINA_TRUE)
+     {
+        const char *temp = eina_strbuf_string_get(buf);
+        
+        char *startTag = NULL;
+        char *endTag = NULL;
+
+        startTag = strstr(temp, "<item");
+        if (!startTag)
+          startTag = strstr(temp, "</item");
+        if (startTag)
+          endTag = strstr(startTag, ">");
+        else
+          break;
+        if (!endTag || startTag > endTag)
+          break;
+
+        size_t sindex = startTag - temp;
+        size_t eindex = endTag - temp + 1;
+        if (!eina_strbuf_remove(buf, sindex, eindex))
+          break;
+     }
+   ret = eina_strbuf_string_steal(buf);
+   eina_strbuf_free(buf);
+   return ret;
+}
+
 void
 _elm_entry_entry_paste(Evas_Object *obj, const char *entry)
 {
-   Elm_Entry_Change_Info info;
-   info.insert = EINA_TRUE;
-   info.change.insert.pos = elm_entry_cursor_pos_get(obj);
-   info.change.insert.content = eina_stringshare_add(entry);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   char *str = NULL;
+   
+   if (wd->cnp_mode == ELM_CNP_MODE_NO_IMAGE)
      {
-        char *tmp;
-        tmp = evas_textblock_text_markup_to_utf8(elm_entry_textblock_get(obj),
-              info.change.insert.content);
-        info.change.insert.plain_length = eina_unicode_utf8_get_len(tmp);
-        free(tmp);
+        str = _remove_item_tags(entry);
+        if (!str) str = strdup(entry);
      }
+   else
+     str = strdup(entry);
+   if (!str) str = (char *)entry;
 
-   elm_entry_entry_insert(obj, entry);
-   evas_object_smart_callback_call(obj, SIG_CHANGED_USER, &info);
-
-   eina_stringshare_del(info.change.insert.content);
+   edje_object_part_text_user_insert(wd->ent, "elm.text", str);
+   if (str != entry) free(str);
 }
 
 static void
@@ -1262,7 +1323,7 @@ _paste(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
           formats = ELM_SEL_FORMAT_TEXT;
         else if (wd->cnp_mode != ELM_CNP_MODE_NO_IMAGE)
           formats |= ELM_SEL_FORMAT_IMAGE;
-        elm_cnp_selection_get(ELM_SEL_TYPE_CLIPBOARD, formats, data, NULL, NULL);
+        elm_cnp_selection_get(data, ELM_SEL_TYPE_CLIPBOARD, formats, NULL, NULL);
 #endif
      }
 }
@@ -1272,59 +1333,13 @@ _store_selection(Elm_Sel_Type seltype, Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    const char *sel;
-   char *sel_str = NULL;
-   Elm_Sel_Format formats = ELM_SEL_FORMAT_MARKUP;
 
    if (!wd) return;
    sel = edje_object_part_text_selection_get(wd->ent, "elm.text");
    if ((!sel) || (!sel[0])) return; /* avoid deleting our own selection */
-   if (wd->cnp_mode == ELM_CNP_MODE_PLAINTEXT)
-     {
-        sel_str = elm_entry_markup_to_utf8(sel);
-        if (!sel_str)
-          return;
-        formats = ELM_SEL_FORMAT_TEXT;
-     }
-   else
-     {
-        sel_str = strdup(sel);
-        if (!sel_str)
-          return;
-        if (wd->cnp_mode == ELM_CNP_MODE_NO_IMAGE)
-          {
-             while (EINA_TRUE)
-               {
-                  char *startTag = NULL;
-                  char *endTag = NULL;
-
-                  startTag = strstr(sel_str, "<item");
-                  if (!startTag)
-                    startTag = strstr(sel_str, "</item");
-                  if (startTag)
-                    endTag = strstr(startTag, ">");
-                  else
-                    break;
-                  if (!endTag || startTag > endTag)
-                    break;
-
-                  size_t sindex = startTag - sel_str;
-                  size_t eindex = endTag - sel_str + 1;
-
-                  Eina_Strbuf *buf = eina_strbuf_new();
-                  if (buf)
-                    {
-                       eina_strbuf_append(buf, sel_str);
-                       eina_strbuf_remove(buf, sindex, eindex);
-                       sel_str = eina_strbuf_string_steal(buf);
-                       eina_strbuf_free(buf);
-                    }
-               }
-          }
-     }
-   elm_cnp_selection_set(seltype, obj, formats, sel_str, strlen(sel_str));
+   elm_cnp_selection_set(obj, seltype, ELM_SEL_FORMAT_MARKUP, sel, strlen(sel));
    if (seltype == ELM_SEL_TYPE_CLIPBOARD)
      eina_stringshare_replace(&wd->cut_sel, sel);
-   free(sel_str);
 }
 
 static void
@@ -1340,8 +1355,7 @@ _cut(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    if (!_elm_config->desktop_entry)
      elm_widget_scroll_hold_pop(data);
    _store_selection(ELM_SEL_TYPE_CLIPBOARD, data);
-   edje_object_part_text_insert(wd->ent, "elm.text", "");
-   edje_object_part_text_select_none(wd->ent, "elm.text");
+   edje_object_part_text_user_insert(wd->ent, "elm.text", "");
    _sizing_eval(data);
 }
 
@@ -1583,7 +1597,7 @@ _magnifier_create(void *data)
    key_data = edje_object_data_get(wd->mgf_bg, "scale");
    if (key_data) wd->mgf_scale = atof(key_data);
 
-   elm_scale = elm_scale_get();
+   elm_scale = elm_config_scale_get();
    wd->mgf_height = (int)((float)wd->mgf_height * elm_scale);
 
    if (wd->mgf_type == _ENTRY_MAGNIFIER_FILLWIDTH)
@@ -1809,29 +1823,7 @@ _getbase(Evas_Object *obj)
                }
           }
      }
-   return "base";
 }
-
-#ifndef HAVE_STRCASESTR
-char* _strcasestr(const char *s, const char *find)
-{
-   char c, sc;
-   size_t len;
-
-   if ((c = *find++) != 0) {
-      c = tolower((unsigned char) c);
-      len = strlen(find);
-      do {
-         do {
-            if( (sc = *s++) == 0)
-               return NULL;
-         } while ((char)tolower((unsigned char)sc) != c);
-      } while (strncasecmp(s, find, len) != 0);
-      s--;
-   }
-   return ((char*) s);
-}
-#endif
 
 static void
 _entry_changed_common_handling(void *data, const char *event)
@@ -2113,7 +2105,7 @@ _signal_selection_start(void *data, Evas_Object *obj __UNUSED__, const char *emi
 
         top = elm_widget_top_get(data);
         if (txt && top && (elm_win_xwindow_get(top)))
-          elm_cnp_selection_set(ELM_SEL_TYPE_PRIMARY, data,
+          elm_cnp_selection_set(data, ELM_SEL_TYPE_PRIMARY,
                                 ELM_SEL_FORMAT_MARKUP, txt, strlen(txt));
      }
 #endif
@@ -2199,7 +2191,7 @@ _signal_selection_cleared(void *data, Evas_Object *obj __UNUSED__, const char *e
 
              top = elm_widget_top_get(data);
              if ((top) && (elm_win_xwindow_get(top)))
-               elm_cnp_selection_set(ELM_SEL_TYPE_PRIMARY, data,
+               elm_cnp_selection_set(data, ELM_SEL_TYPE_PRIMARY,
                                      ELM_SEL_FORMAT_MARKUP, wd->cut_sel,
                                      strlen(wd->cut_sel));
 #endif
@@ -2213,7 +2205,7 @@ _signal_selection_cleared(void *data, Evas_Object *obj __UNUSED__, const char *e
 
              top = elm_widget_top_get(data);
              if ((top) && (elm_win_xwindow_get(top)))
-               elm_cnp_selection_clear(ELM_SEL_TYPE_PRIMARY, data);
+               elm_object_cnp_selection_clear(data, ELM_SEL_TYPE_PRIMARY);
 #endif
           }
      }
@@ -2246,8 +2238,8 @@ _signal_entry_paste_request(void *data, Evas_Object *obj __UNUSED__, const char 
                formats = ELM_SEL_FORMAT_TEXT;
              else if (wd->cnp_mode != ELM_CNP_MODE_NO_IMAGE)
                formats |= ELM_SEL_FORMAT_IMAGE;
-             elm_cnp_selection_get(ELM_SEL_TYPE_CLIPBOARD, formats, data,
-                               NULL, NULL);
+             elm_cnp_selection_get(data, type, formats,
+                                   NULL, NULL);
           }
 #endif
      }
@@ -2256,12 +2248,14 @@ _signal_entry_paste_request(void *data, Evas_Object *obj __UNUSED__, const char 
 static void
 _signal_entry_copy_notify(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+   evas_object_smart_callback_call(data, SIG_SELECTION_COPY, NULL);
    _copy(data, NULL, NULL);
 }
 
 static void
 _signal_entry_cut_notify(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *source __UNUSED__)
 {
+   evas_object_smart_callback_call(data, SIG_SELECTION_CUT, NULL);
    _cut(data, NULL, NULL);
 }
 
@@ -2363,7 +2357,11 @@ _signal_anchor_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emis
    _signal_anchor_geoms_do_things_with(wd, &ei);
 
    if (!wd->disabled)
-     evas_object_smart_callback_call(data, SIG_ANCHOR_CLICKED, &ei);
+     {
+        evas_object_smart_callback_call(data, SIG_ANCHOR_CLICKED, &ei);
+
+        _entry_hover_anchor_clicked(data, data, &ei);
+     }
 }
 
 static void
@@ -2547,7 +2545,7 @@ _event_selection_clear(void *data __UNUSED__, int type __UNUSED__, void *event _
           formats = ELM_SEL_FORMAT_TEXT;
         else if (wd->cnp_mode != ELM_CNP_MODE_NO_IMAGE)
           formats |= ELM_SEL_FORMAT_IMAGE;
-        elm_cnp_selection_get(ELM_SEL_TYPE_SECONDARY, formats, data, NULL, NULL);
+        elm_cnp_selection_get(data, ELM_SEL_TYPE_SECONDARY, formats, NULL, NULL);
      }
 
    // end for cbhm
@@ -2620,12 +2618,27 @@ _text_filter(void *data, Evas_Object *edje __UNUSED__, const char *part __UNUSED
 {
    Widget_Data *wd = elm_widget_data_get(data);
    Eina_List *l;
-   Elm_Entry_Text_Filter *tf;
+   Elm_Entry_Markup_Filter *tf;
 
    if (type == EDJE_TEXT_FILTER_FORMAT)
      return;
 
    EINA_LIST_FOREACH(wd->text_filters, l, tf)
+     {
+        tf->func(tf->data, data, text);
+        if (!*text)
+          break;
+     }
+}
+
+static void
+_markup_filter(void *data, Evas_Object *edje __UNUSED__, const char *part __UNUSED__, char **text)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   Eina_List *l;
+   Elm_Entry_Markup_Filter *tf;
+
+   EINA_LIST_FOREACH(wd->markup_filters, l, tf)
      {
         tf->func(tf->data, data, text);
         if (!*text)
@@ -2870,6 +2883,7 @@ _elm_entry_text_get(const Evas_Object *obj, const char *item)
         ERR("text=NULL for edje %p, part 'elm.text'", wd->ent);
         return NULL;
      }
+
    if (wd->append_text_len > 0)
      {
         char *tmpbuf;
@@ -2945,17 +2959,17 @@ elm_entry_add(Evas_Object *parent)
    wd->disabled     = EINA_FALSE;
    wd->context_menu = EINA_TRUE;
    wd->autosave     = EINA_TRUE;
-   wd->textonly     = EINA_FALSE;
+   wd->cnp_mode     = ELM_CNP_MODE_MARKUP;
    wd->scroll       = EINA_FALSE;
    wd->input_panel_imdata = NULL;
 //TIZEN ONLY
-   wd->cnp_mode     = ELM_CNP_MODE_MARKUP;
    wd->magnifier_enabled = EINA_TRUE;
 //
 
    wd->ent = edje_object_add(e);
    edje_object_item_provider_set(wd->ent, _get_item, obj);
    edje_object_text_insert_filter_callback_add(wd->ent,"elm.text", _text_filter, obj);
+   edje_object_text_markup_filter_callback_add(wd->ent,"elm.text", _markup_filter, obj);
    evas_object_event_callback_add(wd->ent, EVAS_CALLBACK_MOVE, _move, obj);
    evas_object_event_callback_add(wd->ent, EVAS_CALLBACK_MOUSE_DOWN,
                                   _mouse_down, obj);
@@ -3046,7 +3060,9 @@ elm_entry_add(Evas_Object *parent)
 
    elm_entry_input_panel_layout_set(obj, ELM_INPUT_PANEL_LAYOUT_NORMAL);
 
-   wd->input_panel_enable = edje_object_part_text_input_panel_enabled_get(wd->ent, "elm.text");
+   elm_entry_input_panel_enabled_set(obj, EINA_TRUE);
+   elm_entry_prediction_allow_set(obj, EINA_TRUE);
+
    wd->autocapital_type = edje_object_part_text_autocapital_type_get(wd->ent, "elm.text");
 
 #ifdef HAVE_ELEMENTARY_X
@@ -3301,7 +3317,7 @@ elm_entry_textblock_get(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   return edje_object_part_object_get(wd->ent, "elm.text");
+   return (Evas_Object *) edje_object_part_object_get(wd->ent, "elm.text");
 }
 
 EAPI void
@@ -3487,7 +3503,6 @@ elm_entry_cursor_end_set(Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
    edje_object_part_text_cursor_end_set(wd->ent, "elm.text", EDJE_CURSOR_MAIN);
-   edje_object_message_signal_process(wd->ent);
 }
 
 EAPI void
@@ -3642,7 +3657,7 @@ elm_entry_context_menu_disabled_set(Evas_Object *obj, Eina_Bool disabled)
    if (wd->context_menu == !disabled) return;
    wd->context_menu = !disabled;
 
-   if (!_elm_config->desktop_entry)
+   if (!_elm_config->desktop_entry) // TIZEN ONLY : commit ? 
      edje_object_part_text_copy_paste_disabled_set(wd->ent, "elm.text", disabled);
 }
 
@@ -3656,26 +3671,7 @@ elm_entry_context_menu_disabled_get(const Evas_Object *obj)
 }
 
 EAPI void
-elm_entry_magnifier_disabled_set(Evas_Object *obj, Eina_Bool disabled)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (wd->magnifier_enabled == !disabled) return;
-   wd->magnifier_enabled = !disabled;
-}
-
-EAPI Eina_Bool
-elm_entry_magnifier_disabled_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-   return !wd->magnifier_enabled;
-}
-
-EAPI void
-elm_entry_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data)
+elm_entry_item_provider_append(Evas_Object *obj, Elm_Entry_Item_Provider_Cb func, void *data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -3689,7 +3685,7 @@ elm_entry_item_provider_append(Evas_Object *obj, Evas_Object *(*func) (void *dat
 }
 
 EAPI void
-elm_entry_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data)
+elm_entry_item_provider_prepend(Evas_Object *obj, Elm_Entry_Item_Provider_Cb func, void *data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -3703,7 +3699,7 @@ elm_entry_item_provider_prepend(Evas_Object *obj, Evas_Object *(*func) (void *da
 }
 
 EAPI void
-elm_entry_item_provider_remove(Evas_Object *obj, Evas_Object *(*func) (void *data, Evas_Object *entry, const char *item), void *data)
+elm_entry_item_provider_remove(Evas_Object *obj, Elm_Entry_Item_Provider_Cb func, void *data)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
@@ -3726,7 +3722,7 @@ EAPI void
 elm_entry_text_filter_append(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data)
 {
    Widget_Data *wd;
-   Elm_Entry_Text_Filter *tf;
+   Elm_Entry_Markup_Filter *tf;
    ELM_CHECK_WIDTYPE(obj, widtype);
 
    wd = elm_widget_data_get(obj);
@@ -3743,7 +3739,7 @@ EAPI void
 elm_entry_text_filter_prepend(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data)
 {
    Widget_Data *wd;
-   Elm_Entry_Text_Filter *tf;
+   Elm_Entry_Markup_Filter *tf;
    ELM_CHECK_WIDTYPE(obj, widtype);
 
    wd = elm_widget_data_get(obj);
@@ -3761,7 +3757,7 @@ elm_entry_text_filter_remove(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *d
 {
    Widget_Data *wd;
    Eina_List *l;
-   Elm_Entry_Text_Filter *tf;
+   Elm_Entry_Markup_Filter *tf;
    ELM_CHECK_WIDTYPE(obj, widtype);
 
    wd = elm_widget_data_get(obj);
@@ -3773,6 +3769,63 @@ elm_entry_text_filter_remove(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *d
         if ((tf->func == func) && ((!data) || (tf->data == data)))
           {
              wd->text_filters = eina_list_remove_list(wd->text_filters, l);
+             _filter_free(tf);
+             return;
+          }
+     }
+}
+
+EAPI void
+elm_entry_markup_filter_append(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data)
+{
+   Widget_Data *wd;
+   Elm_Entry_Markup_Filter *tf;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   wd = elm_widget_data_get(obj);
+
+   EINA_SAFETY_ON_NULL_RETURN(func);
+
+   tf = _filter_new(func, data);
+   if (!tf) return;
+
+   wd->markup_filters = eina_list_append(wd->markup_filters, tf);
+}
+
+EAPI void
+elm_entry_markup_filter_prepend(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data)
+{
+   Widget_Data *wd;
+   Elm_Entry_Markup_Filter *tf;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   wd = elm_widget_data_get(obj);
+
+   EINA_SAFETY_ON_NULL_RETURN(func);
+
+   tf = _filter_new(func, data);
+   if (!tf) return;
+
+   wd->markup_filters = eina_list_prepend(wd->markup_filters, tf);
+}
+
+EAPI void
+elm_entry_markup_filter_remove(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data)
+{
+   Widget_Data *wd;
+   Eina_List *l;
+   Elm_Entry_Markup_Filter *tf;
+   ELM_CHECK_WIDTYPE(obj, widtype);
+
+   wd = elm_widget_data_get(obj);
+
+   EINA_SAFETY_ON_NULL_RETURN(func);
+
+   EINA_LIST_FOREACH(wd->markup_filters, l, tf)
+     {
+        if ((tf->func == func) && ((!data) || (tf->data == data)))
+          {
+             wd->markup_filters = eina_list_remove_list(wd->markup_filters, l);
              _filter_free(tf);
              return;
           }
@@ -3808,7 +3861,6 @@ elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
    char *current, *utfstr;
    int len, newlen;
    const char *(*text_get)(const Evas_Object *);
-   const char *widget_type;
 
    EINA_SAFETY_ON_NULL_RETURN(data);
    EINA_SAFETY_ON_NULL_RETURN(entry);
@@ -3816,7 +3868,6 @@ elm_entry_filter_limit_size(void *data, Evas_Object *entry, char **text)
 
    /* hack. I don't want to copy the entire function to work with
     * scrolled_entry */
-   widget_type = elm_widget_type_get(entry);
    text_get = _text_get;
 
    current = elm_entry_markup_to_utf8(text_get(entry));
@@ -3915,12 +3966,12 @@ elm_entry_filter_accept_set(void *data, Evas_Object *entry __UNUSED__, char **te
    *insert = 0;
 }
 
-EAPI void
+EAPI Eina_Bool
 elm_entry_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype);
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
+   if (!wd) return EINA_FALSE;
    if (wd->delay_write)
      {
         ecore_timer_del(wd->delay_write);
@@ -3929,7 +3980,7 @@ elm_entry_file_set(Evas_Object *obj, const char *file, Elm_Text_Format format)
    if (wd->autosave) _save(obj);
    eina_stringshare_replace(&wd->file, file);
    wd->format = format;
-   _load(obj);
+   return _load(obj);
 }
 
 EAPI void
@@ -3975,14 +4026,17 @@ elm_entry_autosave_get(const Evas_Object *obj)
    return wd->autosave;
 }
 
-EAPI void
+EINA_DEPRECATED EAPI void
 elm_entry_cnp_textonly_set(Evas_Object *obj, Eina_Bool textonly)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
-   elm_entry_cnp_mode_set(obj, textonly ? ELM_CNP_MODE_NO_IMAGE : ELM_CNP_MODE_MARKUP);
+   Elm_Cnp_Mode cnp_mode = ELM_CNP_MODE_MARKUP;
+   if (textonly)
+     cnp_mode = ELM_CNP_MODE_NO_IMAGE;
+   elm_entry_cnp_mode_set(obj, cnp_mode);
 }
 
-EAPI Eina_Bool
+EINA_DEPRECATED EAPI Eina_Bool
 elm_entry_cnp_textonly_get(const Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
@@ -3990,7 +4044,7 @@ elm_entry_cnp_textonly_get(const Evas_Object *obj)
 }
 
 EAPI void
-elm_entry_cnp_mode_set(Evas_Object *obj, Elm_CNP_Mode cnp_mode)
+elm_entry_cnp_mode_set(Evas_Object *obj, Elm_Cnp_Mode cnp_mode)
 {
    Elm_Sel_Format format = ELM_SEL_FORMAT_MARKUP;
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -4006,12 +4060,12 @@ elm_entry_cnp_mode_set(Evas_Object *obj, Elm_CNP_Mode cnp_mode)
 #endif
 }
 
-EAPI Elm_CNP_Mode
+EAPI Elm_Cnp_Mode
 elm_entry_cnp_mode_get(const Evas_Object *obj)
 {
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   ELM_CHECK_WIDTYPE(obj, widtype) ELM_CNP_MODE_MARKUP;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
+   if (!wd) return ELM_CNP_MODE_MARKUP;
    return wd->cnp_mode;
 }
 
@@ -4300,31 +4354,6 @@ elm_entry_input_panel_enabled_get(const Evas_Object *obj)
    return wd->input_panel_enable;
 }
 
-EINA_DEPRECATED EAPI void
-elm_entry_line_char_wrap_set(Evas_Object *obj, Eina_Bool wrap)
-{
-   if (wrap) elm_entry_line_wrap_set(obj, ELM_WRAP_CHAR);
-}
-
-EAPI void
-elm_entry_autocapitalization_set(Evas_Object *obj, Eina_Bool autocap)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-
-   if (autocap)
-     wd->autocapital_type = ELM_AUTOCAPITAL_TYPE_SENTENCE;
-   else
-     wd->autocapital_type = ELM_AUTOCAPITAL_TYPE_NONE;
-
-   if (wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_URL ||
-       wd->input_panel_layout == ELM_INPUT_PANEL_LAYOUT_EMAIL)
-     wd->autocapital_type = ELM_AUTOCAPITAL_TYPE_NONE;
-
-   edje_object_part_text_autocapital_type_set(wd->ent, "elm.text", wd->autocapital_type);
-}
-
 EAPI void
 elm_entry_input_panel_show(Evas_Object *obj)
 {
@@ -4438,35 +4467,162 @@ elm_entry_input_panel_return_key_disabled_get(const Evas_Object *obj)
 }
 
 EAPI void
-elm_entry_input_panel_return_key_autoenabled_set(Evas_Object *obj, Eina_Bool on)
+elm_entry_input_panel_return_key_autoenabled_set(Evas_Object *obj, Eina_Bool enabled)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
-   wd->autoreturnkey = on;
+   wd->autoreturnkey = enabled;
    _check_enable_return_key(obj);
 }
 
-EINA_DEPRECATED EAPI void
-elm_entry_autoperiod_set(Evas_Object *obj __UNUSED__, Eina_Bool autoperiod __UNUSED__)
-{
-   // will be deleted
-}
-
-EINA_DEPRECATED EAPI void
-elm_entry_autoenable_returnkey_set(Evas_Object *obj __UNUSED__, Eina_Bool on __UNUSED__)
-{
-   // will be deleted
-}
-
-EAPI Ecore_IMF_Context *elm_entry_imf_context_get(Evas_Object *obj)
+EAPI void*
+elm_entry_imf_context_get(Evas_Object *obj)
 {
    ELM_CHECK_WIDTYPE(obj, widtype) NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd || !wd->ent) return NULL;
+   if (!wd) return NULL;
 
    return edje_object_part_text_imf_context_get(wd->ent, "elm.text");
+}
+
+/* START - ANCHOR HOVER */
+static void
+_parent_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   wd->anchor_hover.hover_parent = NULL;
+}
+
+EAPI void
+elm_entry_anchor_hover_parent_set(Evas_Object *obj, Evas_Object *parent)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->anchor_hover.hover_parent)
+     evas_object_event_callback_del_full(wd->anchor_hover.hover_parent, EVAS_CALLBACK_DEL, _parent_del, obj);
+   wd->anchor_hover.hover_parent = parent;
+   if (wd->anchor_hover.hover_parent)
+     evas_object_event_callback_add(wd->anchor_hover.hover_parent, EVAS_CALLBACK_DEL, _parent_del, obj);
+}
+
+EAPI Evas_Object *
+elm_entry_anchor_hover_parent_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->anchor_hover.hover_parent;
+}
+
+EAPI void
+elm_entry_anchor_hover_style_set(Evas_Object *obj, const char *style)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   eina_stringshare_replace(&wd->anchor_hover.hover_style, style);
+}
+
+EAPI const char *
+elm_entry_anchor_hover_style_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   return wd->anchor_hover.hover_style;
+}
+
+EAPI void
+elm_entry_anchor_hover_end(Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->anchor_hover.hover) evas_object_del(wd->anchor_hover.hover);
+   if (wd->anchor_hover.pop) evas_object_del(wd->anchor_hover.pop);
+   wd->anchor_hover.hover = NULL;
+   wd->anchor_hover.pop = NULL;
+}
+
+
+static void
+_anchor_hover_clicked(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   elm_entry_anchor_hover_end(data);
+}
+
+static void
+_entry_hover_anchor_clicked(void *data, Evas_Object *obj, void *event_info)
+{
+   Widget_Data *wd = elm_widget_data_get(obj);
+   Elm_Entry_Anchor_Info *info = event_info;
+   Evas_Object *hover_parent;
+   Elm_Entry_Anchor_Hover_Info ei;
+   Evas_Coord x, w, y, h, px, py;
+   if (!wd) return;
+   ei.anchor_info = event_info;
+   wd->anchor_hover.pop = elm_icon_add(obj);
+   evas_object_move(wd->anchor_hover.pop, info->x, info->y);
+   evas_object_resize(wd->anchor_hover.pop, info->w, info->h);
+   wd->anchor_hover.hover = elm_hover_add(obj);
+   elm_widget_mirrored_set(wd->anchor_hover.hover, elm_widget_mirrored_get(obj));
+   if (wd->anchor_hover.hover_style)
+     elm_object_style_set(wd->anchor_hover.hover, wd->anchor_hover.hover_style);
+   hover_parent = wd->anchor_hover.hover_parent;
+   if (!hover_parent) hover_parent = obj;
+   elm_hover_parent_set(wd->anchor_hover.hover, hover_parent);
+   elm_hover_target_set(wd->anchor_hover.hover, wd->anchor_hover.pop);
+   ei.hover = wd->anchor_hover.hover;
+   evas_object_geometry_get(hover_parent, &x, &y, &w, &h);
+   ei.hover_parent.x = x;
+   ei.hover_parent.y = y;
+   ei.hover_parent.w = w;
+   ei.hover_parent.h = h;
+   px = info->x + (info->w / 2);
+   py = info->y + (info->h / 2);
+   ei.hover_left = 1;
+   if (px < (x + (w / 3))) ei.hover_left = 0;
+   ei.hover_right = 1;
+   if (px > (x + ((w * 2) / 3))) ei.hover_right = 0;
+   ei.hover_top = 1;
+   if (py < (y + (h / 3))) ei.hover_top = 0;
+   ei.hover_bottom = 1;
+   if (py > (y + ((h * 2) / 3))) ei.hover_bottom = 0;
+
+   if (elm_widget_mirrored_get(wd->anchor_hover.hover))
+     {  /* Swap right and left because they switch sides in RTL */
+        Eina_Bool tmp = ei.hover_left;
+        ei.hover_left = ei.hover_right;
+        ei.hover_right = tmp;
+     }
+
+   evas_object_smart_callback_call(data, SIG_ANCHOR_HOVER_OPENED, &ei);
+   evas_object_smart_callback_add(wd->anchor_hover.hover, "clicked", _anchor_hover_clicked, data);
+   evas_object_show(wd->anchor_hover.hover);
+}
+/* END - ANCHOR HOVER */
+
+EAPI void
+elm_entry_magnifier_disabled_set(Evas_Object *obj, Eina_Bool disabled)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   if (wd->magnifier_enabled == !disabled) return;
+   wd->magnifier_enabled = !disabled;
+}
+
+EAPI Eina_Bool
+elm_entry_magnifier_disabled_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   return !wd->magnifier_enabled;
 }
 
 EAPI void
@@ -4479,4 +4635,3 @@ elm_entry_magnifier_type_set(Evas_Object *obj, int type)
    wd->mgf_type = type;
    _magnifier_create(obj);
 }
-

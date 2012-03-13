@@ -92,6 +92,7 @@ static void _transit_obj_remove_cb(void *data, Evas *e __UNUSED__, Evas_Object *
 static void _transit_obj_remove(Elm_Transit *transit, Evas_Object *obj);
 static void _transit_effect_del(Elm_Transit *transit, Elm_Transit_Effect_Module *effect_module);
 static void _transit_remove_dead_effects(Elm_Transit *transit);
+static void _transit_chain_go(Elm_Transit *transit);
 static void _transit_del(Elm_Transit *transit);
 static Eina_Bool _transit_animate_op(Elm_Transit *transit, double progress);
 static Eina_Bool _transit_animate_cb(void *data);
@@ -235,6 +236,14 @@ _transit_remove_dead_effects(Elm_Transit *transit)
 }
 
 static void
+_transit_chain_go(Elm_Transit *transit)
+{
+   ELM_TRANSIT_CHECK_OR_RETURN(transit);
+   elm_transit_go(transit);
+   _transit_animate_cb(transit);
+}
+
+static void
 _transit_del(Elm_Transit *transit)
 {
    Elm_Transit_Effect_Module *effect_module;
@@ -273,7 +282,8 @@ _transit_del(Elm_Transit *transit)
    if (transit->finished && transit->next_chain_transits)
      {
         EINA_LIST_FOREACH_SAFE(transit->next_chain_transits, elist, elist_next, chain_transit)
-          elm_transit_go(chain_transit);
+          _transit_chain_go(chain_transit);
+
      }
 
    eina_list_free(transit->next_chain_transits);
@@ -326,14 +336,24 @@ _transit_animate_cb(void *data)
    transit->progress = elapsed_time / duration;
    switch (transit->tween_mode)
      {
+      case ELM_TRANSIT_TWEEN_MODE_LINEAR:
+         transit->progress = ecore_animator_pos_map(transit->progress,
+                                                    ECORE_POS_MAP_LINEAR,
+                                                    0, 0);
       case ELM_TRANSIT_TWEEN_MODE_ACCELERATE:
-         transit->progress = 1.0 - sin((ELM_PI / 2.0) + (transit->progress * ELM_PI / 2.0));
+         transit->progress = ecore_animator_pos_map(transit->progress,
+                                                    ECORE_POS_MAP_ACCELERATE,
+                                                    0, 0);
          break;
       case ELM_TRANSIT_TWEEN_MODE_DECELERATE:
-         transit->progress = sin(transit->progress * ELM_PI / 2.0);
+         transit->progress = ecore_animator_pos_map(transit->progress,
+                                                    ECORE_POS_MAP_DECELERATE,
+                                                    0, 0);
          break;
       case ELM_TRANSIT_TWEEN_MODE_SINUSOIDAL:
-         transit->progress = (1.0 - cos(transit->progress * ELM_PI)) / 2.0;
+         transit->progress = ecore_animator_pos_map(transit->progress,
+                                                    ECORE_POS_MAP_SINUSOIDAL,
+                                                    0, 0);
          break;
       default:
          break;

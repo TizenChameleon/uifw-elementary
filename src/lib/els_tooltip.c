@@ -282,12 +282,10 @@ _elm_tooltip_reconfigure(Elm_Tooltip *tt)
              if (str && (!strcmp(str, "enabled")))
                {
                   elm_win_alpha_set(tt->tt_win, EINA_TRUE);
-                  elm_win_transparent_set(tt->tt_win, EINA_TRUE);
                }
              else
                {
                   elm_win_alpha_set(tt->tt_win, EINA_FALSE);
-                  elm_win_transparent_set(tt->tt_win, EINA_FALSE);
                }
           }
 
@@ -896,43 +894,12 @@ elm_object_tooltip_style_get(const Evas_Object *obj)
 }
 
 /**
- * Get the configured tooltip delay
- *
- * This gets the globally configured tooltip delay in seconds
- *
- * @return The tooltip delay
- * @ingroup Tooltips
- */
-EAPI double
-elm_tooltip_delay_get(void)
-{
-   return _elm_config->tooltip_delay;
-}
-
-/**
- * Set the configured tooltip delay
- *
- * This sets the globally configured delay to tooltip
- *
- * @param delay The delay to show the tooltip
- * @return EINA_TRUE if value is valid and setted
- * @ingroup Tooltips
- */
-EAPI Eina_Bool
-elm_tooltip_delay_set(double delay)
-{
-   if (delay < 0.0) return EINA_FALSE;
-   _elm_config->tooltip_delay = delay;
-   return EINA_TRUE;
-}
-
-/**
  * @brief Disable size restrictions on an object's tooltip
  * @param obj The tooltip's anchor object
  * @param disable If EINA_TRUE, size restrictions are disabled
  * @return EINA_FALSE on failure, EINA_TRUE on success
  *
- * This function allows a tooltip to expand beyond its parant window's canvas.
+ * This function allows a tooltip to expand beyond its parent window's canvas.
  * It will instead be limited only by the size of the display.
  */
 EAPI Eina_Bool
@@ -948,7 +915,7 @@ elm_object_tooltip_window_mode_set(Evas_Object *obj, Eina_Bool disable)
  * @return If EINA_TRUE, size restrictions are disabled
  *
  * This function returns whether a tooltip is allowed to expand beyond
- * its parant window's canvas.
+ * its parent window's canvas.
  * It will instead be limited only by the size of the display.
  */
 EAPI Eina_Bool

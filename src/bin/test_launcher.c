@@ -15,9 +15,9 @@ mode_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    EINA_LIST_FOREACH(mbs, l, mb)
      {
         if (elm_mapbuf_enabled_get(mb))
-          elm_mapbuf_enabled_set(mb, 0);
+          elm_mapbuf_enabled_set(mb, EINA_FALSE);
         else
-          elm_mapbuf_enabled_set(mb, 1);
+          elm_mapbuf_enabled_set(mb, EINA_TRUE);
      }
 }
 
@@ -217,7 +217,7 @@ test_launcher(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
    elm_box_horizontal_set(bx, EINA_TRUE);
 
    sc = elm_scroller_add(win);
-   elm_scroller_bounce_set(sc, 1, 0);
+   elm_scroller_bounce_set(sc, EINA_TRUE, EINA_FALSE);
    elm_scroller_policy_set(sc, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    evas_object_size_hint_weight_set(sc, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_fill_set(sc, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -265,7 +265,7 @@ test_launcher(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
                   elm_object_scale_set(ic, 0.5);
                   snprintf(buf, sizeof(buf), "%s/images/icon_%02i.png", elm_app_data_dir_get(), n);
                   elm_icon_file_set(ic, buf, NULL);
-                  elm_icon_scale_set(ic, 0, 0);
+                  elm_icon_resizable_set(ic, 0, 0);
                   evas_object_size_hint_weight_set(ic, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
                   evas_object_size_hint_align_set(ic, 0.5, 0.5);
                   elm_table_pack(tb, ic, 1 + i, 1 + (j * 2), 1, 1);
@@ -328,7 +328,7 @@ test_launcher(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "Map");
-   elm_check_state_set(ck, 0);
+   elm_check_state_set(ck, EINA_FALSE);
    evas_object_smart_callback_add(ck, "changed", mode_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.05, 0.99);
@@ -337,7 +337,7 @@ test_launcher(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "A");
-   elm_check_state_set(ck, 1);
+   elm_check_state_set(ck, EINA_TRUE);
    evas_object_smart_callback_add(ck, "changed", alpha_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.20, 0.99);
@@ -346,7 +346,7 @@ test_launcher(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "Smo");
-   elm_check_state_set(ck, 1);
+   elm_check_state_set(ck, EINA_TRUE);
    evas_object_smart_callback_add(ck, "changed", smooth_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.40, 0.99);
@@ -355,7 +355,7 @@ test_launcher(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "FS");
-   elm_check_state_set(ck, 0);
+   elm_check_state_set(ck, EINA_FALSE);
    evas_object_smart_callback_add(ck, "changed", full_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.5, 0.99);
@@ -435,7 +435,7 @@ test_launcher2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    evas_object_data_set(win, "mbs", mbs);
 
    sc = elm_scroller_add(win);
-   elm_scroller_bounce_set(sc, 1, 0);
+   elm_scroller_bounce_set(sc, EINA_TRUE, EINA_FALSE);
    elm_scroller_policy_set(sc, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    evas_object_size_hint_weight_set(sc, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, sc);
@@ -452,7 +452,7 @@ test_launcher2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "Map");
-   elm_check_state_set(ck, 0);
+   elm_check_state_set(ck, EINA_FALSE);
    evas_object_smart_callback_add(ck, "changed", mode_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.05, 0.99);
@@ -461,7 +461,7 @@ test_launcher2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "A");
-   elm_check_state_set(ck, 1);
+   elm_check_state_set(ck, EINA_TRUE);
    evas_object_smart_callback_add(ck, "changed", alpha_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.20, 0.99);
@@ -470,7 +470,7 @@ test_launcher2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "Smo");
-   elm_check_state_set(ck, 1);
+   elm_check_state_set(ck, EINA_TRUE);
    evas_object_smart_callback_add(ck, "changed", smooth_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.40, 0.99);
@@ -479,7 +479,7 @@ test_launcher2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "FS");
-   elm_check_state_set(ck, 0);
+   elm_check_state_set(ck, EINA_FALSE);
    evas_object_smart_callback_add(ck, "changed", full_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.5, 0.99);
@@ -511,7 +511,7 @@ l3_mode_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    EINA_LIST_FOREACH(mbs, l, mb)
      {
         if (elm_mapbuf_enabled_get(mb))
-          elm_mapbuf_enabled_set(mb, 0);
+          elm_mapbuf_enabled_set(mb, EINA_FALSE);
         else
           elm_mapbuf_enabled_set(mb, 1);
      }
@@ -750,7 +750,7 @@ test_launcher3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    elm_box_horizontal_set(bx, EINA_TRUE);
 
    sc = elm_scroller_add(win);
-   elm_scroller_bounce_set(sc, 1, 0);
+   elm_scroller_bounce_set(sc, EINA_TRUE, EINA_FALSE);
    elm_scroller_policy_set(sc, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    evas_object_size_hint_weight_set(sc, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_fill_set(sc, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -809,7 +809,7 @@ test_launcher3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
                   elm_object_scale_set(ic, 0.5);
                   snprintf(buf, sizeof(buf), "%s/images/icon_%02i.png", elm_app_data_dir_get(), n);
                   elm_icon_file_set(ic, buf, NULL);
-                  elm_icon_scale_set(ic, 0, 0);
+                  elm_icon_resizable_set(ic, 0, 0);
                   evas_object_size_hint_weight_set(ic, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
                   evas_object_size_hint_align_set(ic, 0.5, 0.5);
                   elm_object_part_content_set(ly2, "slot", ic);
@@ -863,7 +863,7 @@ test_launcher3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "Map");
-   elm_check_state_set(ck, 0);
+   elm_check_state_set(ck, EINA_FALSE);
    evas_object_smart_callback_add(ck, "changed", l3_mode_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.05, 0.99);
@@ -890,7 +890,7 @@ test_launcher3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "FS");
-   elm_check_state_set(ck, 0);
+   elm_check_state_set(ck, EINA_FALSE);
    evas_object_smart_callback_add(ck, "changed", l3_full_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.5, 0.99);
@@ -899,7 +899,7 @@ test_launcher3(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    ck = elm_check_add(win);
    elm_object_text_set(ck, "Hid");
-   elm_check_state_set(ck, 0);
+   elm_check_state_set(ck, EINA_FALSE);
    evas_object_smart_callback_add(ck, "changed", l3_hidden_cb, win);
    evas_object_size_hint_weight_set(ck, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(ck, 0.5, 0.99);

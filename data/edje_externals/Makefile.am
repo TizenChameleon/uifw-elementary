@@ -12,14 +12,10 @@ files_DATA = icons.edj
 
 EXTRA_DIST = \
 icons.edc \
-ico_anchorblock.png \
-ico_anchorview.png \
 ico_bubble.png \
 ico_button.png \
 ico_check.png \
 ico_clock.png \
-ico_colorpalette.png\
-ico_datefield.png \
 ico_fileselector.png \
 ico_fileselector_button.png \
 ico_gengrid.png \
@@ -28,8 +24,7 @@ ico_hoversel.png \
 ico_icon.png \
 ico_list.png \
 ico_map.png \
-ico_nocontents.png \
-ico_page_control.png \
+ico_multibuttonentry.png \
 ico_notepad.png \
 ico_photocam.png \
 ico_progressbar.png \

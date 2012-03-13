@@ -1,8 +1,116 @@
 #include <Elementary.h>
+#include "test.h"
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
 #ifndef ELM_LIB_QUICKLAUNCH
+struct _Idx_Data_Type
+{
+   Evas_Object *id;  /* Pointer to Index */
+   Elm_Object_Item *item; /* Item we use for search */
+};
+typedef struct _Idx_Data_Type Idx_Data_Type;
+
+struct _api_data
+{
+   unsigned int state;  /* What state we are testing       */
+   Idx_Data_Type dt;
+};
+typedef struct _api_data api_data;
+
+enum _api_state
+{
+   INDEX_LEVEL_SET,
+   INDEX_ACTIVE_SET,
+   INDEX_APPEND_RELATIVE,
+   INDEX_PREPEND,
+   INDEX_ITEM_DEL,
+   INDEX_ITEM_FIND,
+   INDEX_HORIZONTAL,
+   INDEX_INDICATOR_DISABLED,
+   INDEX_CLEAR,
+   API_STATE_LAST
+};
+typedef enum _api_state api_state;
+
+static void
+set_api_state(api_data *api)
+{
+   Idx_Data_Type *d = &api->dt;
+   switch(api->state)
+     { /* Put all api-changes under switch */
+      case INDEX_LEVEL_SET:
+         elm_index_autohide_disabled_set(d->id, EINA_TRUE);
+         elm_index_item_level_set(d->id, (elm_index_item_level_get(d->id) ? 0 : 1));
+         break;
+
+      case INDEX_ACTIVE_SET:
+         elm_index_autohide_disabled_set(d->id, EINA_FALSE);
+         break;
+
+      case INDEX_APPEND_RELATIVE:
+         elm_index_item_insert_after(d->id,
+                                     elm_index_item_find(d->id, d->item),
+                                     "W", NULL, d->item);
+         elm_index_item_insert_before(d->id,
+                                      elm_index_item_find(d->id, d->item),
+                                      "V", NULL, d->item);
+         break;
+
+      case INDEX_PREPEND:
+         elm_index_item_prepend(d->id, "D", NULL, d->item);
+         break;
+
+      case INDEX_ITEM_DEL:
+         elm_object_item_del(elm_index_item_find(d->id, d->item));
+         break;
+
+      case INDEX_ITEM_FIND:
+           {
+              Elm_Object_Item *i = elm_index_item_find(d->id, d->item);
+              if(i)
+                {
+                   printf("Item Find - Found Item.\n");
+                   elm_object_item_del(i);
+                }
+           }
+         break;
+
+      case INDEX_HORIZONTAL:
+         elm_index_horizontal_set(d->id, EINA_TRUE);
+         break;
+
+      case INDEX_INDICATOR_DISABLED:
+         elm_index_indicator_disabled_set(d->id, EINA_TRUE);
+         break;
+
+      case INDEX_CLEAR:
+         elm_index_item_clear(d->id);
+         break;
+
+      case API_STATE_LAST:
+         break;
+
+      default:
+         return;
+     }
+}
+
+static void
+_api_bt_clicked(void *data, Evas_Object *obj, void *event_info __UNUSED__)
+{  /* Will add here a SWITCH command containing code to modify test-object */
+   /* in accordance a->state value. */
+   api_data *a = data;
+   char str[128];
+
+   printf("clicked event on API Button: api_state=<%d>\n", a->state);
+   set_api_state(a);
+   a->state++;
+   sprintf(str, "Next API function (%u)", a->state);
+   elm_object_text_set(obj, str);
+   elm_object_disabled_set(obj, a->state == API_STATE_LAST);
+}
+
 static Elm_Genlist_Item_Class itci;
 char *gli_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
 {
@@ -16,51 +124,82 @@ char *gli_text_get(void *data, Evas_Object *obj __UNUSED__, const char *part __U
 }
 
 void
-index_changed2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_index_delay_changed_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    // called on a change but delayed in case multiple changes happen in a
    // short timespan
-   elm_genlist_item_top_bring_in(elm_object_item_data_get(event_info));
+   elm_genlist_item_bring_in(elm_object_item_data_get(event_info),
+                              ELM_GENLIST_ITEM_SCROLLTO_TOP);
 }
 
 void
-index_changed(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_index_changed_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    // this is calld on every change, no matter how often
    // elm_genlist_item_bring_in(event_info);
 }
 
 void
-index_selected(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_index_selected_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
 {
    // called on final select
-   elm_genlist_item_top_bring_in(elm_object_item_data_get(event_info));
+   elm_genlist_item_bring_in(elm_object_item_data_get(event_info),
+                              ELM_GENLIST_ITEM_SCROLLTO_TOP);
+}
+
+static void
+_cleanup_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   free(data);
+}
+
+static void
+id_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+{
+   printf("Current Index : %s\n", elm_index_item_letter_get((const Elm_Object_Item *)event_info));
 }
 
 void
 test_index(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   Evas_Object *win, *bg, *gl, *id;
+   Evas_Object *win, *bg, *bxx, *gl, *id, *bt;
    Elm_Object_Item *glit;
    int i, j;
+   api_data *api = calloc(1, sizeof(api_data));
 
    win = elm_win_add(NULL, "index", ELM_WIN_BASIC);
    elm_win_title_set(win, "Index");
    elm_win_autodel_set(win, EINA_TRUE);
+   evas_object_event_callback_add(win, EVAS_CALLBACK_FREE, _cleanup_cb, api);
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
+   bxx = elm_box_add(win);
+   elm_win_resize_object_add(win, bxx);
+   evas_object_size_hint_weight_set(bxx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_show(bxx);
+
    gl = elm_genlist_add(win);
    evas_object_size_hint_weight_set(gl, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, gl);
+   evas_object_size_hint_align_set(gl, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(gl);
 
-   id = elm_index_add(win);
+   api->dt.id = id = elm_index_add(win);
    evas_object_size_hint_weight_set(id, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(id, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_win_resize_object_add(win, id);
+
+   bt = elm_button_add(win);
+   elm_object_text_set(bt, "Next API function");
+   evas_object_smart_callback_add(bt, "clicked", _api_bt_clicked, (void *) api);
+   elm_box_pack_end(bxx, bt);
+   elm_object_disabled_set(bt, api->state == API_STATE_LAST);
+   evas_object_show(bt);
+
+   elm_box_pack_end(bxx, gl);
 
    evas_object_show(id);
 
@@ -83,15 +222,16 @@ test_index(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
              char buf[32];
 
              snprintf(buf, sizeof(buf), "%c", 'A' + ((j >> 4) & 0xf));
-             elm_index_item_append(id, buf, glit);
+             elm_index_item_append(id, buf, id_cb, glit);
+             if (*buf == 'G')  /* Just init dt->item later used in API test */
+               api->dt.item = glit;
           }
         j += 2;
      }
-   evas_object_smart_callback_add(id, "delay,changed", index_changed2, NULL);
-   evas_object_smart_callback_add(id, "changed", index_changed, NULL);
-   evas_object_smart_callback_add(id, "selected", index_selected, NULL);
-   elm_index_item_go(id, 0);
-
+   evas_object_smart_callback_add(id, "delay,changed", _index_delay_changed_cb, NULL);
+   evas_object_smart_callback_add(id, "changed", _index_changed_cb, NULL);
+   evas_object_smart_callback_add(id, "selected", _index_selected_cb, NULL);
+   elm_index_level_go(id, 0);
    evas_object_resize(win, 320, 480);
    evas_object_show(win);
 }
@@ -148,7 +288,7 @@ test_index2_it_add(void *data, Evas_Object *obj __UNUSED__, void *event_info __U
    snprintf(letter, sizeof(letter), "%c", label[0]);
    list_it = elm_list_item_sorted_insert(gui->lst, label, NULL, NULL, NULL,
                                          NULL, test_index2_cmp);
-   elm_index_item_sorted_insert(gui->id, letter, list_it, test_index2_icmp,
+   elm_index_item_sorted_insert(gui->id, letter, NULL, list_it, test_index2_icmp,
                                 test_index2_cmp);
    elm_list_go(gui->lst);
    /* FIXME it's not showing the recently added item */
@@ -160,7 +300,6 @@ test_index2_it_del(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 {
    Test_Index2_Elements *gui = data;
    const char *label, *label_next;
-
    Elm_Object_Item *list_it, *list_it_next;
    Elm_Object_Item *iit;
 
@@ -171,7 +310,7 @@ test_index2_it_del(void *data, Evas_Object *obj, void *event_info __UNUSED__)
      {
         iit = elm_index_item_find(gui->id, list_it);
         if (iit) elm_object_item_del(iit);
-        elm_list_item_del(list_it);
+        elm_object_item_del(list_it);
         return;
      }
 
@@ -184,7 +323,7 @@ test_index2_it_del(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    else
      elm_object_item_del(iit);
 
-   elm_list_item_del(list_it);
+   elm_object_item_del(list_it);
 }
 
 void
@@ -218,10 +357,10 @@ test_index2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
 
    gui->id = elm_index_add(win);
    evas_object_size_hint_weight_set(gui->id, EVAS_HINT_EXPAND,
-	 EVAS_HINT_EXPAND);
+                                    EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, gui->id);
    evas_object_smart_callback_add(gui->id, "delay,changed",
-	 test_index2_id_changed, NULL);
+                                  test_index2_id_changed, NULL);
    evas_object_show(gui->id);
 
    gui->entry = elm_entry_add(win);
@@ -244,14 +383,15 @@ test_index2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    gui->lst = elm_list_add(win);
    elm_box_pack_end(box, gui->lst);
    evas_object_size_hint_weight_set(gui->lst, EVAS_HINT_EXPAND,
-	 EVAS_HINT_EXPAND);
+                                    EVAS_HINT_EXPAND);
    evas_object_size_hint_fill_set(gui->lst, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_smart_callback_add(gui->lst, "selected", test_index2_it_del,
-	 gui);
+                                  gui);
    elm_list_go(gui->lst);
    evas_object_show(gui->lst);
 
    evas_object_resize(win, 320, 480);
    evas_object_show(win);
 }
+
 #endif

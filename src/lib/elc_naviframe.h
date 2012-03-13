@@ -6,7 +6,7 @@
  *
  * Naviframe provides functions to switch different pages with stack
  * mechanism. It means if one page(item) needs to be changed to the new one,
- * then naviframe would push the new page to it's internal stack. Of course,
+ * then naviframe would push the new page to its internal stack. Of course,
  * it can be back to the previous page by popping the top page. Naviframe
  * provides some transition effect while the pages are switching (same as
  * pager).
@@ -14,14 +14,26 @@
  * Since each item could keep the different styles, users could keep the
  * same look & feel for the pages or different styles for the items in it's
  * application.
+ * 
+ * Default content parts of the naviframe that you can use content hooks for
+ * are:
+ * @li "default" - The main content of the current page
+ * @li "icon" - An icon in the title area of the current page
+ * @li "prev_btn" - A button of the current page to go to the previous page
+ * @li "next_btn" - A button of the current page to go to the next page
+ * 
+ * Default text parts of the naviframe that you can use for are:
+ * @li "default" - Title label in the title area of the current page
+ * @li "subtitle" - Sub-title label in the title area of the current page
  *
- * Signals that you can add callback for are:
- * @li "transition,finished" - When the transition is finished in changing
- *     the item
+ * Signals that you can add callbacks for are:
+ * @li "transition,finished" - When the transition is finished in changing the
+ * item
  * @li "title,clicked" - User clicked title area
  *
- * Default contents parts of the naviframe items that you can use for are:
- * @li "default" - A main content of the page
+ * Default content parts of the naviframe items that you can use content hooks
+ * for are:
+ * @li "default" - The main content of the page
  * @li "icon" - An icon in the title area
  * @li "prev_btn" - A button to go to the previous page
  * @li "next_btn" - A button to go to the next page
@@ -32,6 +44,11 @@
  *
  * Supported elm_object common APIs.
  * @li elm_object_signal_emit
+ * @li elm_object_part_text_set
+ * @li elm_object_part_text_get
+ * @li elm_object_part_content_set
+ * @li elm_object_part_content_get
+ * @li elm_object_part_content_unset
  *
  * Supported elm_object_item common APIs.
  * @li elm_object_item_part_text_set
@@ -41,32 +58,6 @@
  * @li elm_object_item_part_content_unset
  * @li elm_object_item_signal_emit
  */
-
-  //Available commonly
-  #define ELM_NAVIFRAME_ITEM_CONTENT "elm.swallow.content"
-  #define ELM_NAVIFRAME_ITEM_ICON "elm.swallow.icon"
-  #define ELM_NAVIFRAME_ITEM_OPTIONHEADER "elm.swallow.optionheader"
-  #define ELM_NAVIFRAME_ITEM_TITLE_LABEL "elm.text.title"
-  #define ELM_NAVIFRAME_ITEM_PREV_BTN "elm.swallow.prev_btn"
-  #define ELM_NAVIFRAME_ITEM_TITLE_LEFT_BTN "elm.swallow.left_btn"
-  #define ELM_NAVIFRAME_ITEM_TITLE_RIGHT_BTN "elm.swallow.right_btn"
-  #define ELM_NAVIFRAME_ITEM_TITLE_MORE_BTN "elm.swallow.more_btn"
-  #define ELM_NAVIFRAME_ITEM_CONTROLBAR "elm.swallow.controlbar"
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_CLOSE "elm,state,optionheader,close", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_OPEN "elm,state,optionheader,open", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_INSTANT_CLOSE "elm,state,optionheader,instant_close", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_OPTIONHEADER_INSTANT_OPEN "elm,state,optionheader,instant_open", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_CONTROLBAR_CLOSE "elm,state,controlbar,close", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_CONTROLBAR_OPEN "elm,state,controlbar,open", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_CONTROLBAR_INSTANT_CLOSE "elm,state,controlbar,instant_close", ""
-  #define ELM_NAVIFRAME_ITEM_SIGNAL_CONTROLBAR_INSTANT_OPEN "elm,state,controlbar,instant_open", ""
-
-   //Available only in a style - "2line"
-  #define ELM_NAVIFRAME_ITEM_OPTIONHEADER2 "elm.swallow.optionheader2"
-
-  //Available only in a style - "segment"
-  #define ELM_NAVIFRAME_ITEM_SEGMENT2 "elm.swallow.segment2"
-  #define ELM_NAVIFRAME_ITEM_SEGMENT3 "elm.swallow.segment3"
 
 /**
  * @addtogroup Naviframe
@@ -117,6 +108,7 @@ EAPI Elm_Object_Item *elm_naviframe_item_push(Evas_Object *obj, const char *titl
 /**
  * @brief Insert a new item into the naviframe before item @p before.
  *
+ * @param obj The naviframe object
  * @param before The naviframe item to insert before.
  * @param title_label The label in the title area. The name of the title
  *        label part is "elm.text.title"
@@ -143,11 +135,12 @@ EAPI Elm_Object_Item *elm_naviframe_item_push(Evas_Object *obj, const char *titl
  *
  * @ingroup Naviframe
  */
-EAPI Elm_Object_Item *elm_naviframe_item_insert_before(Elm_Object_Item *before, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style);
+EAPI Elm_Object_Item *elm_naviframe_item_insert_before(Evas_Object *obj, Elm_Object_Item *before, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style);
 
 /**
  * @brief Insert a new item into the naviframe after item @p after.
  *
+ * @param obj The naviframe object
  * @param after The naviframe item to insert after.
  * @param title_label The label in the title area. The name of the title
  *        label part is "elm.text.title"
@@ -174,7 +167,7 @@ EAPI Elm_Object_Item *elm_naviframe_item_insert_before(Elm_Object_Item *before, 
  *
  * @ingroup Naviframe
  */
-EAPI Elm_Object_Item *elm_naviframe_item_insert_after(Elm_Object_Item *after, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style);
+EAPI Elm_Object_Item *elm_naviframe_item_insert_after(Evas_Object *obj, Elm_Object_Item *after, const char *title_label, Evas_Object *prev_btn, Evas_Object *next_btn, Evas_Object *content, const char *item_style);
 
 /**
  * @brief Pop an item that is on top of the stack
@@ -346,12 +339,13 @@ EAPI Eina_Bool        elm_naviframe_prev_btn_auto_pushed_get(const Evas_Object *
  * @brief Get a list of all the naviframe items.
  *
  * @param obj The naviframe object
- * @return An Eina_Inlist* of naviframe items, #Elm_Object_Item,
+ * @return An Eina_List of naviframe items, #Elm_Object_Item,
  * or @c NULL on failure.
+ * @note The returned list MUST be freed.
  *
  * @ingroup Naviframe
  */
-EAPI Eina_Inlist     *elm_naviframe_items_get(const Evas_Object *obj);
+EAPI Eina_List *elm_naviframe_items_get(const Evas_Object *obj) EINA_MALLOC EINA_WARN_UNUSED_RESULT;
 
 /**
  * @brief Set the event enabled when pushing/popping items
@@ -385,6 +379,27 @@ EAPI void             elm_naviframe_event_enabled_set(Evas_Object *obj, Eina_Boo
  * @ingroup Naviframe
  */
 EAPI Eina_Bool        elm_naviframe_event_enabled_get(const Evas_Object *obj);
+
+/**
+ * @brief Simple version of item_push.
+ *
+ * @see elm_naviframe_item_push
+ */
+static inline Elm_Object_Item *
+elm_naviframe_item_simple_push(Evas_Object *obj, Evas_Object *content)
+{
+   Elm_Object_Item *it;
+   it = elm_naviframe_item_push(obj, NULL, NULL, NULL, content, NULL);
+   elm_naviframe_item_title_visible_set(it, EINA_FALSE);
+   return it;
+}
+
+/**
+ * @brief Simple version of item_promote.
+ *
+ * @see elm_naviframe_item_promote
+ */
+EAPI void             elm_naviframe_item_simple_promote(Evas_Object *obj, Evas_Object *content);
 
 /**
  * @}

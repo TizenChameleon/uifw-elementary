@@ -208,6 +208,7 @@ _smart_reconfigure(Smart_Data *sd)
         evas_object_move(sd->child_obj, sd->x - sd->px, sd->y - sd->py);
         sd->px = sd->delta_posx*sd->gravity_x;
         sd->py = sd->delta_posy*sd->gravity_y;
+
      }
    else
      evas_object_move(sd->child_obj, sd->x - sd->px, sd->y - sd->py);

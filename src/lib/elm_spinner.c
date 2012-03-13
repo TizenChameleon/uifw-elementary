@@ -9,8 +9,9 @@ struct _Widget_Data
 {
    Evas_Object *spinner, *ent;
    const char *label;
-   double val, val_min, val_max, orig_val, step;
+   double val, val_min, val_max, orig_val, step, base;
    double drag_start_pos, spin_speed, interval, first_interval;
+   int round;
    Ecore_Timer *delay, *spin;
    Eina_List *special_values;
    Eina_Bool wrap : 1;
@@ -230,12 +231,16 @@ apply:
 }
 
 static Eina_Bool
-_value_set(Evas_Object *obj, double delta)
+_value_set(Evas_Object *obj, double new_val)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-   double new_val;
+
    if (!wd) return EINA_FALSE;
-   new_val = wd->val + delta;
+
+   if (wd->round > 0)
+     new_val = wd->base +
+     (double)((((int)(new_val - wd->base)) / wd->round) * wd->round);
+
    if (wd->wrap)
      {
         while (new_val < wd->val_min)
@@ -306,13 +311,11 @@ _drag(void *data, Evas_Object *_obj __UNUSED__, const char *emission __UNUSED__,
    if (wd->entry_visible) return;
    edje_object_part_drag_value_get(wd->spinner, "elm.dragable.slider",
                                    &pos, NULL);
-   offset = wd->step;
+   offset = wd->step * _elm_config->scale;
    delta = (pos - wd->drag_start_pos) * offset;
    /* If we are on rtl mode, change the delta to be negative on such changes */
-   if (elm_widget_mirrored_get(obj))
-     delta *= -1;
-   if (_value_set(data, delta)) _write_label(data);
-   wd->drag_start_pos = pos;
+   if (elm_widget_mirrored_get(obj)) delta *= -1;
+   if (_value_set(data, wd->drag_start_pos + delta)) _write_label(data);
    wd->dragging = 1;
 }
 
@@ -400,7 +403,7 @@ _spin_value(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return ECORE_CALLBACK_CANCEL;
-   if (_value_set(data, wd->spin_speed)) _write_label(data);
+   if (_value_set(data, wd->val + wd->spin_speed)) _write_label(data);
    wd->interval = wd->interval / 1.05;
    ecore_timer_interval_set(wd->spin, wd->interval);
    return ECORE_CALLBACK_RENEW;
@@ -778,4 +781,40 @@ elm_spinner_interval_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return 0.0;
    return wd->first_interval;
+}
+
+EAPI void
+elm_spinner_base_set(Evas_Object *obj, double base)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->base = base;
+}
+
+EAPI double
+elm_spinner_base_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0.0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return 0.0;
+   return wd->base;
+}
+
+EAPI void
+elm_spinner_round_set(Evas_Object *obj, int rnd)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype);
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return;
+   wd->round = rnd;
+}
+
+EAPI int
+elm_spinner_round_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) 0;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return 0;
+   return wd->round;
 }
