@@ -38,7 +38,6 @@ _ctxpopup_dismissed_cb(void *data __UNUSED__, Evas_Object *obj, void *event_info
 
    diskselector = elm_object_content_unset(obj);
    if (diskselector) evas_object_del(diskselector);
-   evas_object_hide(obj);
 }
 
 static void
