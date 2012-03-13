@@ -1,3 +1,13 @@
+elementary (1.0.0+svn.69026slp2+build01) unstable; urgency=low
+
+  * Elementary 1.0 Release Package Upload
+  * Important Changes
+       [naviframe] fix focus problem
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.69026slp2+build01
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Tue, 13 Mar 2012 19:37:24 +0900
+
 elementary (1.0.0+svn.67547slp2+build16) unstable; urgency=low
 
   * Package upload
