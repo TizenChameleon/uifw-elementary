@@ -2643,7 +2643,10 @@ _item_block_position(Item_Block *itb,
 
         vis = (ELM_RECTS_INTERSECT(it->item->scrl_x, it->item->scrl_y, it->item->w, it->item->h,
                                    cvx, cvy, cvw, cvh));
+//FIXME : group raise
+#if 0
         if (!it->group)
+#endif
           {
              if ((itb->realized) && (!it->realized))
                {
