@@ -31,7 +31,7 @@ group "Elm_Config" struct {
   value "finger_size" int: 60;
   value "fps" double: 6000.0;
   value "theme" string: "blue-hd";
-  value "modules" string: "ctxpopup_copypasteUI>entry/api:decarta>map/api";
+  value "modules" string: "ctxpopup_copypasteUI>entry/api:decarta>map/api:datetime_input_ctxpopup>datetime/api";
   value "tooltip_delay" double: 1.0;
   value "cursor_engine_only" uchar: 1;
   value "focus_highlight_enable" uchar: 0;
