@@ -1168,13 +1168,15 @@ EINA_DEPRECATED EAPI void
 elm_object_tree_unfocusable_set(Evas_Object *obj,
                                 Eina_Bool    unfocusable)
 {
-   elm_object_tree_focus_allow_set(obj, unfocusable);
+   EINA_SAFETY_ON_NULL_RETURN(obj);
+   elm_widget_tree_unfocusable_set(obj, unfocusable);
 }
 
 EINA_DEPRECATED EAPI Eina_Bool
 elm_object_tree_unfocusable_get(const Evas_Object *obj)
 {
-   return elm_object_tree_focus_allow_get(obj);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(obj, EINA_FALSE);
+   return elm_widget_tree_unfocusable_get(obj);
 }
 
 EAPI void
@@ -1189,7 +1191,7 @@ EAPI Eina_Bool
 elm_object_tree_focus_allow_get(const Evas_Object *obj)
 {
    EINA_SAFETY_ON_NULL_RETURN_VAL(obj, EINA_FALSE);
-   return elm_widget_tree_unfocusable_get(obj);
+   return !elm_widget_tree_unfocusable_get(obj);
 }
 
 EAPI void
