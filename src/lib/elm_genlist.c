@@ -2854,7 +2854,6 @@ _calc_job(void *data)
    Eina_Bool minw_change = EINA_FALSE;
    Eina_Bool did_must_recalc = EINA_FALSE;
    if (!wd) return;
-   ELM_CHECK_WIDTYPE(wd->obj,widtype);
 
    evas_object_geometry_get(wd->pan_smart, NULL, NULL, &ow, &wd->h);
    elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, NULL);
