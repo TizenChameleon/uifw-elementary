@@ -1078,11 +1078,12 @@ elm_colorselector_add(Evas_Object *parent)
    _colors_load_apply(obj);
 
    /* load background edj */
-    wd->sel = edje_object_add(e);
-    _elm_theme_object_set(obj, wd->sel, "colorselector", "bg", "default");
-    edje_object_part_swallow(wd->base, "selector", wd->sel);
-    wd->mode = ELM_COLORSELECTOR_BOTH;
+   wd->sel = edje_object_add(e);
+   _elm_theme_object_set(obj, wd->sel, "colorselector", "bg", "default");
+   edje_object_part_swallow(wd->base, "selector", wd->sel);
+   elm_widget_sub_object_add(obj, wd->sel);
 
+   wd->mode = ELM_COLORSELECTOR_BOTH;
    wd->er = 255;
    wd->eg = 0;
    wd->eb = 0;
