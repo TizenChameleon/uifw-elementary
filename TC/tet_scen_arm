@@ -28,7 +28,6 @@ elm
    :include:/elm_ts/segmentcontrol/tslist
    :include:/elm_ts/slider/tslist
    :include:/elm_ts/multibuttonentry/tslist
-   :include:/elm_ts/editfield/tslist
    :include:/elm_ts/box/tslist
    :include:/elm_ts/entry/tslist
    :include:/elm_ts/dayselector/tslist
