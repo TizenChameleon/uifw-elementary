@@ -8,14 +8,12 @@ all
 # EFL 
 elm
    :include:/elm_ts/imageslider/tslist
-   :include:/elm_ts/colorpalette/tslist
    :include:/elm_ts/colorselector/tslist
    :include:/elm_ts/gengrid/tslist
    :include:/elm_ts/genlist/tslist
    :include:/elm_ts/button/tslist
    :include:/elm_ts/popup/tslist
    :include:/elm_ts/label/tslist
-   :include:/elm_ts/searchbar/tslist
    :include:/elm_ts/datefield/tslist
    :include:/elm_ts/calendar/tslist
    :include:/elm_ts/check/tslist
