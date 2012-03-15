@@ -6344,7 +6344,7 @@ _elm_genlist_item_del_notserious(Elm_Gen_Item *it)
      {
         if (!it->item->block && (it->relcount == 1))
           {
-             if (it->item->rel)
+             if (it->item->rel && it->item->rel->item)
                {
                   it->item->rel->relcount--;
                   if ((it->item->rel->generation < it->wd->generation) && (!it->item->rel->relcount))
