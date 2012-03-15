@@ -162,7 +162,7 @@ _cbhm_item_get(Evas_Object *obj, int index, void *data_type, char **buf)
    if (buf)
      *buf = NULL;
    if (data_type)
-     *data_type = 0;
+     *(int *)data_type = 0;
 
 #ifdef HAVE_ELEMENTARY_X
    Ecore_X_Window xwin = ecore_evas_software_x11_window_get(
