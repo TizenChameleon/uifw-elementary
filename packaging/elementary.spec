@@ -1,11 +1,12 @@
+#sbs-git:slp/pkgs/e/elementary elementary 1.0.0+svn.67547slp2+build16 598cc91bf431f150cf48064ab672b1e4df5dc4a2
 Name:       elementary
 Summary:    EFL toolkit for small touchscreens
-Version:    0.7.0.svn61256
+Version:    1.0.0+svn.69026slp2+build02
 Release:    1
 Group:      TO_BE/FILLED_IN
-License:    LGPL
+License:    TO_BE/FILLED_IN
 URL:        http://trac.enlightenment.org/e/wiki/Elementary
-Source0:    %{name}-%{version}.tar.bz2
+Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(ecore)
@@ -21,10 +22,10 @@ BuildRequires:  pkgconfig(efreet)
 BuildRequires:  pkgconfig(eina)
 BuildRequires:  pkgconfig(ethumb)
 BuildRequires:  pkgconfig(evas)
+BuildRequires:  pkgconfig(appsvc)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(icu-i18n)
-BuildRequires:  pkgconfig(appsvc)
 BuildRequires:  edje-tools
 BuildRequires:  embryo
 BuildRequires:  eet-tools
@@ -57,8 +58,14 @@ EFL toolkit for small touchscreens (tools)
 %setup -q
 
 %build
+export CFLAGS+=" -fPIC -Wall"
+export LDFLAGS+=" -Wl,--hash-style=both -Wl,--as-needed"
 
 %autogen --disable-static
+%configure --disable-static \
+	--enable-dependency-tracking \
+	--disable-web
+
 make %{?jobs:-j%jobs}
 
 %install
