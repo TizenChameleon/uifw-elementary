@@ -1952,7 +1952,8 @@ _item_mode_content_unrealize(Elm_Gen_Item *it,
                              Evas_Object *target,
                              Eina_List **source,
                              const char *parts,
-                             Eina_List **contents_list)
+                             Eina_List **contents_list,
+                             const char *contents_part)
 {
    Eina_List *res = *contents_list;
 
@@ -1962,6 +1963,7 @@ _item_mode_content_unrealize(Elm_Gen_Item *it,
         const char *key;
         Evas_Object *ic = NULL;
 
+        *source = elm_widget_stringlist_get(edje_object_data_get(target, contents_part));
         EINA_LIST_FOREACH(*source, l, key)
           {
              if (parts && fnmatch(parts, key, FNM_PERIOD))
@@ -3700,6 +3702,19 @@ _decorate_mode_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
    if (effect_on) edje_object_signal_emit(it->edit_obj, "elm,state,decorate,enabled,effect", "elm");
    else edje_object_signal_emit(it->edit_obj, "elm,state,decorate,enabled", "elm");
 
+   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MOUSE_DOWN,
+                                       _mouse_down, it);
+   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MOUSE_UP,
+                                       _mouse_up, it);
+   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MOUSE_MOVE,
+                                       _mouse_move, it);
+   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MULTI_DOWN,
+                                       _multi_down, it);
+   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MULTI_UP,
+                                       _multi_up, it);
+   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MULTI_MOVE,
+                                       _multi_move, it);
+
    evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
                                   _mouse_down, it);
    evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_UP,
@@ -3765,6 +3780,20 @@ _decorate_mode_item_unrealize(Elm_Gen_Item *it)
                                        _multi_up, it);
    evas_object_event_callback_del_full(it->edit_obj, EVAS_CALLBACK_MULTI_MOVE,
                                        _multi_move, it);
+
+   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_DOWN,
+                                  _mouse_down, it);
+   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_UP,
+                                  _mouse_up, it);
+   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_MOVE,
+                                  _mouse_move, it);
+   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_DOWN,
+                                  _multi_down, it);
+   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_UP,
+                                  _multi_up, it);
+   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_MOVE,
+                                  _multi_move, it);
+
    it->item->decorate_mode_item_realized = EINA_FALSE;
 }
 
@@ -5398,7 +5427,7 @@ elm_genlist_item_fields_update(Elm_Object_Item *it,
         if (_it->flipped)
           {
              _it->content_objs = _item_mode_content_unrealize(_it, VIEW(_it),
-                                                              &_it->contents, parts, &_it->content_objs);
+                                                              &_it->contents, parts, &_it->content_objs, "flips");
              _it->content_objs = _item_mode_content_realize(_it, VIEW(_it),
                                                             &_it->contents, parts, &_it->content_objs, "flips");
           }
@@ -5406,7 +5435,7 @@ elm_genlist_item_fields_update(Elm_Object_Item *it,
         if (_it->item->mode_view)
           {
              _it->item->mode_content_objs = _item_mode_content_unrealize(_it, _it->item->mode_view,
-                                                                   &_it->item->mode_contents, parts, &_it->item->mode_content_objs);
+                                                                         &_it->item->mode_contents, parts, &_it->item->mode_content_objs, "contents");
              _it->item->mode_content_objs = _item_mode_content_realize(_it, _it->item->mode_view,
                                                                  &_it->item->mode_contents, parts, &_it->item->mode_content_objs, "contents");
           }
@@ -5414,7 +5443,7 @@ elm_genlist_item_fields_update(Elm_Object_Item *it,
         if (_it->wd->decorate_mode)
           {
              _it->item->edit_content_objs = _item_mode_content_unrealize(_it, _it->edit_obj,
-                                                                   &_it->contents, parts, &_it->item->edit_content_objs);
+                                                                         &_it->contents, parts, &_it->item->edit_content_objs, "decorate_contents");
              _it->item->edit_content_objs = _item_mode_content_realize(_it, _it->edit_obj,
                                                                  &_it->contents, parts, &_it->item->edit_content_objs, "decorate_contents"); // FIXME: is it "decorate_contents"??
           }
