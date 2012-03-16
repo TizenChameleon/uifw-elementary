@@ -1228,7 +1228,7 @@
  * If isn't required that users could select a day on calendar,
  * only interacting going through months, disabling days selection
  * could be a good idea to avoid confusion. For that:
- * @skipline elm_calendar_day_selection_enabled_set
+ * @skipline elm_calendar_day_selection_disabled_set
  *
  * Also, regarding days selection, you could be interested to set a
  * date to be highlighted on calendar from your code, maybe when
@@ -1329,7 +1329,7 @@
  * Periodicity is how frequently the mark will be displayed over the
  * calendar.  Can be a unique mark (that don't repeat), or it can repeat
  * daily, weekly, monthly or annually. It's enumerated by
- * @c Elm_Calendar_Mark_Repeat.
+ * @c Elm_Calendar_Mark_Repeat_Type.
  *
  * So let's add some marks to our calendar. We will add christmas holiday,
  * set Sundays as holidays, and check current day and day after that.
@@ -1685,7 +1685,7 @@
  *
  * The fifth, besides editable, has only the time @b units editable,
  * for hours, minutes and seconds. This exemplifies
- * elm_clock_digit_edit_set():
+ * elm_clock_edit_mode_set():
  * @dontinclude clock_example.c
  * @skip but only
  * @until evas_object_show
@@ -2096,7 +2096,7 @@
  * conversion
  * util functions, so we could get coordinates for this address. These
  * functions return an #Elm_Map_Name handle for us.
- * Function elm_map_utils_convert_name_into_coord() will do this job for us,
+ * Function elm_map_name_geo_request() will do this job for us,
  * but it's an assyncronous function, since it requires this
  * information from the server.
  *
@@ -2416,7 +2416,7 @@
  * since we'll explain it better on  @ref list_example_03. But if the callback
  * need to be called everytime user clicks an item, even if already selected,
  * it's required to enable this behavior:
- * @skipline elm_list_always_select_mode_set
+ * @skipline elm_list_select_mode_set
  *
  * Finally, if a bounce effect is required, or you would like to see
  * scrollbars, it is possible. But, for default theme, list
@@ -2520,7 +2520,7 @@
  *
  * If you want to free this data, or handle that the way you need when the
  * item is deleted, set a callback function for that, with
- * elm_list_item_del_cb_set().
+ * elm_object_item_del_cb_set().
  *
  * As you can see we check if @c it is not @c NULL after appending it.
  * If an error happens, we won't try to set a function for it.
@@ -3652,7 +3652,7 @@
  * And now we create our hoversel and set some of it's properties. We set @p win
  * as its parent, ask it to not be horizontal(be vertical) and give it a label
  * and icon:
- * @until icon_set
+ * @until "icon", rect)
  *
  * Next we will add our three items, setting a callback to be called for the
  * first and third:
@@ -3826,13 +3826,13 @@
  * item pointed to by that index item. When one releases the mouse
  * button, the second callback takes place. There, we check that the
  * reported item data, on @c event_info, is the same reported by
- * elm_index_item_selected_get(), which gives the last selection's
+ * elm_index_selected_item_get(), which gives the last selection's
  * data on the index widget.
  *
  * The first of the three buttons that follow will call
- * elm_index_active_set(), thus showing the index automatically for
+ * elm_index_autohide_disabled_set(), thus showing the index automatically for
  * you, if it's not already visible, what is checked with
- * elm_index_active_get(). The second button will exercise @b deletion
+ * elm_index_autohide_disabled_get(). The second button will exercise @b deletion
  * of index item objects, by the following code:
  * @dontinclude index_example_01.c
  * @skip delete an index item
@@ -4350,7 +4350,7 @@
  * you'll notice all subsequent clicks on the @b same grid item will
  * still issue the selection callback on it, what is different from
  * when it's not checked. This is the
- * elm_gengrid_always_select_mode_set() behavior:
+ * elm_gengrid_select_mode_set() behavior:
  * @dontinclude gengrid_example.c
  * @skip "always select" callback
  * @until }
@@ -4690,8 +4690,8 @@
  * We are going to change some of the properties of our list.
  *
  * There's no need to call the selected callback at every click, just when the
- * selected item changes, thus we call elm_genlist_always_select_mode_set() with
- * false.
+ * selected item changes, thus we call elm_genlist_select_mode_set() with
+ * ELM_OBJECT_SELECT_MODE_ALWAYS.
  *
  * For this list we don't want bounce animations at all, so we set both the
  * horizontal bounce and the vertical bounce to false with
@@ -4710,7 +4710,7 @@
  * This list will support multiple selection, so we call
  * elm_genlist_multi_select_set() on it.
  *
- * The option elm_genlist_height_for_width_mode_set() would allow text block to
+ * The option elm_genlist_mode_set() would allow text block to
  * wrap lines if the Edje part is configured with "text.min: 0 1", for example.
  * But since we are compressing the elements to the width of the list, this
  * option wouldn't take any effect.

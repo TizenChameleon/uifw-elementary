@@ -380,18 +380,6 @@ elm_label_add(Evas_Object *parent)
 }
 
 EAPI void
-elm_label_label_set(Evas_Object *obj, const char *label)
-{
-  _elm_label_label_set(obj, NULL, label);
-}
-
-EAPI const char *
-elm_label_label_get(const Evas_Object *obj)
-{
-  return _elm_label_label_get(obj, NULL);
-}
-
-EAPI void
 elm_label_line_wrap_set(Evas_Object *obj, Elm_Wrap_Type wrap)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -464,53 +452,6 @@ elm_label_wrap_width_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return 0;
    return wd->wrap_w;
-}
-
-EINA_DEPRECATED EAPI void
-elm_label_wrap_height_set(Evas_Object *obj __UNUSED__,
-                          Evas_Coord   h __UNUSED__)
-{
-   return;
-}
-
-EINA_DEPRECATED EAPI Evas_Coord
-elm_label_wrap_height_get(const Evas_Object *obj __UNUSED__)
-{
-   return 0;
-}
-
-EINA_DEPRECATED EAPI void
-elm_label_fontsize_set(Evas_Object *obj __UNUSED__,
-                       int fontsize __UNUSED__)
-{
-   return;
-}
-
-EINA_DEPRECATED EAPI void
-elm_label_text_align_set(Evas_Object *obj __UNUSED__,
-                         const char *alignmode __UNUSED__)
-{
-   return;
-}
-
-EINA_DEPRECATED EAPI void
-elm_label_text_color_set(Evas_Object *obj __UNUSED__,
-                         unsigned int r __UNUSED__,
-                         unsigned int g __UNUSED__,
-                         unsigned int b __UNUSED__,
-                         unsigned int a __UNUSED__)
-{
-   return;
-}
-
-EINA_DEPRECATED EAPI void
-elm_label_background_color_set(Evas_Object *obj __UNUSED__,
-                               unsigned int r __UNUSED__,
-                               unsigned int g __UNUSED__,
-                               unsigned int b __UNUSED__,
-                               unsigned int a __UNUSED__)
-{
-   return;
 }
 
 EAPI void

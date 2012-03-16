@@ -815,6 +815,14 @@ _item_del(Elm_Naviframe_Item *it)
      }
 
    eina_stringshare_del(it->style);
+
+   if (wd->preserve && it->content)
+     {
+        elm_object_part_content_unset(VIEW(it), "elm.swallow.content");
+        evas_object_event_callback_del(it->content,
+                                       EVAS_CALLBACK_DEL,
+                                       _item_content_del);
+     }
 }
 
 static Eina_Bool
@@ -1064,11 +1072,28 @@ _item_new(Evas_Object *obj,
 static Eina_Bool
 _focus_next_hook(const Evas_Object *obj, Elm_Focus_Direction dir, Evas_Object **next)
 {
+   Eina_Bool ret;
+   Elm_Naviframe_Item *top_it;
+   Eina_List *l = NULL;
    Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd || !wd->stack) return EINA_FALSE;
-   return elm_widget_focus_next_get(VIEW(elm_naviframe_top_item_get(obj)),
-                                    dir,
-                                    next);
+   void *(*list_data_get)(const Eina_List *list);
+   if (!wd) return EINA_FALSE;
+
+   top_it = (Elm_Naviframe_Item *)elm_naviframe_top_item_get(obj);
+   if (!top_it) return EINA_FALSE;
+
+   list_data_get = eina_list_data_get;
+
+   //Forcus order: prev button, next button, contents
+   if (top_it->title_prev_btn)
+     l = eina_list_append(l, top_it->title_prev_btn);
+   if (top_it->title_next_btn)
+     l = eina_list_append(l, top_it->title_next_btn);
+   l = eina_list_append(l, VIEW(top_it));
+
+   ret = elm_widget_focus_list_next_get(obj, l, list_data_get, dir, next);
+   eina_list_free(l);
+   return ret;
 }
 
 EAPI Evas_Object *
@@ -1346,12 +1371,6 @@ elm_naviframe_item_simple_promote(Evas_Object *obj, Evas_Object *content)
      }
 }
 
-
-EAPI void
-elm_naviframe_item_del(Elm_Object_Item *it)
-{
-   elm_object_item_del(it);
-}
 
 EAPI void
 elm_naviframe_content_preserve_on_pop_set(Evas_Object *obj, Eina_Bool preserve)

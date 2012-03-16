@@ -1426,13 +1426,6 @@ elm_toolbar_item_prev_get(const Elm_Object_Item *it)
       EINA_INLIST_GET(((Elm_Toolbar_Item *)it))->prev);
 }
 
-EAPI Evas_Object *
-elm_toolbar_item_toolbar_get(const Elm_Object_Item *it)
-{
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   return elm_object_item_widget_get(it);
-}
-
 EAPI void
 elm_toolbar_item_priority_set(Elm_Object_Item *it, int priority)
 {
@@ -1448,30 +1441,6 @@ elm_toolbar_item_priority_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, 0);
    return ((Elm_Toolbar_Item *)it)->prio.priority;
-}
-
-EAPI const char *
-elm_toolbar_item_label_get(const Elm_Object_Item *it)
-{
-   return _item_text_get_hook(it, NULL);
-}
-
-EAPI void
-elm_toolbar_item_label_set(Elm_Object_Item *it, const char *label)
-{
-   _item_text_set_hook(it, NULL, label);
-}
-
-EAPI void *
-elm_toolbar_item_data_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_data_get(it);
-}
-
-EAPI void
-elm_toolbar_item_data_set(Elm_Object_Item *it, const void *data)
-{
-   elm_object_item_data_set(it, (void *) data);
 }
 
 EAPI Elm_Object_Item *
@@ -1641,30 +1610,6 @@ elm_toolbar_item_icon_file_set(Elm_Object_Item *it, const char *file, const char
    else
      _elm_toolbar_item_icon_obj_set(obj, item, NULL, NULL, 0, "elm,state,icon_set");
    return EINA_TRUE;
-}
-
-EAPI void
-elm_toolbar_item_del(Elm_Object_Item *it)
-{
-   elm_object_item_del(it);
-}
-
-EAPI void
-elm_toolbar_item_del_cb_set(Elm_Object_Item *it, Evas_Smart_Cb func)
-{
-   elm_object_item_del_cb_set(it, func);
-}
-
-EAPI Eina_Bool
-elm_toolbar_item_disabled_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_disabled_get(it);
-}
-
-EAPI void
-elm_toolbar_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled)
-{
-   elm_object_item_disabled_set(it, disabled);
 }
 
 EAPI void
@@ -2040,136 +1985,6 @@ elm_toolbar_item_state_prev(Elm_Object_Item *it)
 }
 
 EAPI void
-elm_toolbar_item_tooltip_text_set(Elm_Object_Item *it, const char *text)
-{
-   elm_object_item_tooltip_text_set(it, text);
-}
-
-EAPI void
-elm_toolbar_item_tooltip_content_cb_set(Elm_Object_Item *it, Elm_Tooltip_Item_Content_Cb func, const void *data, Evas_Smart_Cb del_cb)
-{
-   elm_object_item_tooltip_content_cb_set(it, func, data, del_cb);
-}
-
-EAPI void
-elm_toolbar_item_tooltip_unset(Elm_Object_Item *it)
-{
-   elm_object_item_tooltip_unset(it);
-}
-
-EAPI void
-elm_toolbar_item_tooltip_style_set(Elm_Object_Item *it, const char *style)
-{
-   elm_object_item_tooltip_style_set(it, style);
-}
-
-EAPI const char *
-elm_toolbar_item_tooltip_style_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_tooltip_style_get(it);
-}
-
-EAPI void
-elm_toolbar_item_cursor_set(Elm_Object_Item *it, const char *cursor)
-{
-   elm_object_item_cursor_set(it, cursor);
-}
-
-EAPI const char *
-elm_toolbar_item_cursor_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_cursor_get(it);
-}
-
-EAPI void
-elm_toolbar_item_cursor_unset(Elm_Object_Item *it)
-{
-   elm_object_item_cursor_unset(it);
-}
-
-EAPI void
-elm_toolbar_item_cursor_style_set(Elm_Object_Item *it, const char *style)
-{
-   elm_object_item_cursor_style_set(it, style);
-}
-
-EAPI const char *
-elm_toolbar_item_cursor_style_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_cursor_style_get(it);
-}
-
-EAPI void
-elm_toolbar_item_cursor_engine_only_set(Elm_Object_Item *it, Eina_Bool engine_only)
-{
-   elm_object_item_cursor_engine_only_set(it, engine_only);
-}
-
-EAPI Eina_Bool
-elm_toolbar_item_cursor_engine_only_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_cursor_engine_only_get(it);
-}
-
-EINA_DEPRECATED EAPI void
-elm_toolbar_always_select_mode_set(Evas_Object *obj, Eina_Bool always_select)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (always_select)
-     elm_toolbar_select_mode_set(obj, ELM_OBJECT_SELECT_MODE_ALWAYS);
-   else
-     {
-        Elm_Object_Select_Mode oldmode = elm_toolbar_select_mode_get(obj);
-        if (oldmode == ELM_OBJECT_SELECT_MODE_ALWAYS)
-          elm_toolbar_select_mode_set(obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
-     }
-}
-
-EINA_DEPRECATED EAPI Eina_Bool
-elm_toolbar_always_select_mode_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-   Elm_Object_Select_Mode oldmode = elm_toolbar_select_mode_get(obj);
-   if (oldmode == ELM_OBJECT_SELECT_MODE_ALWAYS)
-     return EINA_TRUE;
-   else
-     return EINA_FALSE;
-}
-
-EINA_DEPRECATED EAPI void
-elm_toolbar_no_select_mode_set(Evas_Object *obj, Eina_Bool no_select)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (no_select)
-     elm_toolbar_select_mode_set(obj, ELM_OBJECT_SELECT_MODE_NONE);
-   else
-     {
-        Elm_Object_Select_Mode oldmode = elm_toolbar_select_mode_get(obj);
-        if (oldmode == ELM_OBJECT_SELECT_MODE_NONE)
-          elm_toolbar_select_mode_set(obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
-     }
-}
-
-EINA_DEPRECATED EAPI Eina_Bool
-elm_toolbar_no_select_mode_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-   Elm_Object_Select_Mode oldmode = elm_toolbar_select_mode_get(obj);
-   if (oldmode == ELM_OBJECT_SELECT_MODE_NONE)
-     return EINA_TRUE;
-   else
-     return EINA_FALSE;
-}
-
-EAPI void
 elm_toolbar_icon_order_lookup_set(Evas_Object *obj, Elm_Icon_Lookup_Order order)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -2191,18 +2006,6 @@ elm_toolbar_icon_order_lookup_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return ELM_ICON_LOOKUP_THEME_FDO;
    return wd->lookup_order;
-}
-
-EINA_DEPRECATED EAPI void
-elm_toolbar_orientation_set(Evas_Object *obj, Eina_Bool vertical)
-{
-   elm_toolbar_horizontal_set(obj, !vertical);
-}
-
-EINA_DEPRECATED EAPI Eina_Bool
-elm_toolbar_orientation_get(const Evas_Object *obj)
-{
-   return !elm_toolbar_horizontal_get(obj);
 }
 
 EAPI void
@@ -2235,18 +2038,6 @@ elm_toolbar_items_count(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return 0;
    return wd->item_count;
-}
-
-EINA_DEPRECATED EAPI void
-elm_toolbar_mode_shrink_set(Evas_Object *obj, Elm_Toolbar_Shrink_Mode shrink_mode)
-{
-   elm_toolbar_shrink_mode_set(obj, shrink_mode);
-}
-
-EINA_DEPRECATED EAPI Elm_Toolbar_Shrink_Mode
-elm_toolbar_mode_shrink_get(const Evas_Object *obj)
-{
-   return elm_toolbar_shrink_mode_get(obj);
 }
 
 EAPI void

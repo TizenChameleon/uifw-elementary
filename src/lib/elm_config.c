@@ -688,7 +688,7 @@ _elm_config_profiles_list(void)
 
    len = _elm_user_dir_snprintf(buf, sizeof(buf), "config");
 
-   file_it = eina_file_direct_ls(buf);
+   file_it = eina_file_stat_ls(buf);
    if (!file_it)
      goto sys;
 
@@ -699,13 +699,6 @@ _elm_config_profiles_list(void)
 
    EINA_ITERATOR_FOREACH(file_it, info)
      {
-        Eina_Stat st;
-
-        if (eina_file_statat(eina_iterator_container_get(file_it), info, &st))
-          {
-             ERR("this is bad.");
-             continue;
-          }
         if (info->name_length >= len)
           continue;
 
@@ -1561,19 +1554,6 @@ elm_config_cursor_engine_only_set(Eina_Bool engine_only)
    _elm_config->cursor_engine_only = engine_only;
 }
 
-EINA_DEPRECATED EAPI double
-elm_tooltip_delay_get(void)
-{
-   return elm_config_tooltip_delay_get();
-}
-
-EINA_DEPRECATED EAPI Eina_Bool
-elm_tooltip_delay_set(double delay)
-{
-   elm_config_tooltip_delay_set(delay);
-   return EINA_TRUE;
-}
-
 EAPI double
 elm_config_tooltip_delay_get(void)
 {
@@ -1806,22 +1786,10 @@ elm_config_cache_flush_enabled_set(Eina_Bool enabled)
    _elm_recache();
 }
 
-EINA_DEPRECATED EAPI int
-elm_font_cache_get(void)
-{
-   return elm_config_cache_font_cache_size_get();
-}
-
 EAPI int
 elm_config_cache_font_cache_size_get(void)
 {
    return _elm_config->font_cache;
-}
-
-EINA_DEPRECATED EAPI void
-elm_font_cache_set(int size)
-{
-   elm_config_cache_font_cache_size_set(size);
 }
 
 EAPI void 
@@ -1833,22 +1801,10 @@ elm_config_cache_font_cache_size_set(int size)
    _elm_recache();
 }
 
-EINA_DEPRECATED EAPI int
-elm_image_cache_get(void)
-{
-   return elm_config_cache_image_cache_size_get();
-}
-
 EAPI int
 elm_config_cache_image_cache_size_get(void)
 {
    return _elm_config->image_cache;
-}
-
-EINA_DEPRECATED EAPI void
-elm_image_cache_set(int size)
-{
-   elm_config_cache_image_cache_size_set(size);
 }
 
 EAPI void
@@ -1860,22 +1816,10 @@ elm_config_cache_image_cache_size_set(int size)
    _elm_recache();
 }
 
-EINA_DEPRECATED EAPI int
-elm_edje_file_cache_get(void)
-{
-   return elm_config_cache_edje_file_cache_size_get();
-}
-
 EAPI int
 elm_config_cache_edje_file_cache_size_get()
 {
    return _elm_config->edje_cache;
-}
-
-EINA_DEPRECATED EAPI void
-elm_edje_file_cache_set(int size)
-{
-   elm_config_cache_edje_file_cache_size_set(size);
 }
 
 EAPI void
@@ -1887,22 +1831,10 @@ elm_config_cache_edje_file_cache_size_set(int size)
    _elm_recache();
 }
 
-EINA_DEPRECATED EAPI int
-elm_edje_collection_cache_get(void)
-{
-   return elm_config_cache_edje_collection_cache_size_get();
-}
-
 EAPI int
 elm_config_cache_edje_collection_cache_size_get(void)
 {
    return _elm_config->edje_collection_cache;
-}
-
-EINA_DEPRECATED EAPI void
-elm_edje_collection_cache_set(int size)
-{
-   elm_config_cache_edje_collection_cache_size_set(size);
 }
 
 EAPI void
@@ -2057,7 +1989,7 @@ elm_config_scroll_thumbscroll_border_friction_set(double friction)
 {
    if (friction < 0.0) friction = 0.0;
    if (friction > 1.0) friction = 1.0;
-   _elm_config->thumbscroll_friction = friction;
+   _elm_config->thumbscroll_border_friction = friction;
 }
 
 EAPI double
@@ -2071,7 +2003,7 @@ elm_config_scroll_thumbscroll_sensitivity_friction_set(double friction)
 {
    if (friction < 0.1) friction = 0.1;
    if (friction > 1.0) friction = 1.0;
-   _elm_config->thumbscroll_friction = friction;
+   _elm_config->thumbscroll_sensitivity_friction = friction;
 }
 
 EAPI void

@@ -13,10 +13,12 @@ typedef struct _Widget_Data Widget_Data;
 struct _Widget_Data
 {
    Evas_Object *base;
-   Evas_Object *shelf, *panel, *virtualkeypad, *sliding_win;
+   Evas_Object *indicator;
+   Evas_Object *softkey;
+   Evas_Object *virtualkeypad;
+   Evas_Object *clipboard;
    Evas_Object *content;
    Evas_Object *scroller;
-   int is_sliding_win_visible;
 #ifdef HAVE_ELEMENTARY_X
    Ecore_Event_Handler *prop_hdl;
    Ecore_X_Virtual_Keyboard_State vkb_state;
@@ -38,7 +40,7 @@ enum _Conformant_Part_Type
    ELM_CONFORM_INDICATOR_PART      = 1,
    ELM_CONFORM_SOFTKEY_PART        = 2,
    ELM_CONFORM_VIRTUAL_KEYPAD_PART = 4,
-   ELM_CONFORM_SLIDING_WIN_PART    = 8
+   ELM_CONFORM_CLIPBOARD_PART    = 8
 };
 
 #define SUB_TYPE_COUNT 2
@@ -120,8 +122,6 @@ _theme_hook(Evas_Object *obj)
 
    if (wd->content)
      edje_object_part_swallow(wd->base, "elm.swallow.content", wd->content);
-   edje_object_scale_set(wd->base, elm_widget_scale_get(obj)
-                         * _elm_config->scale);
    _sizing_eval(obj);
 }
 
@@ -283,7 +283,7 @@ _conformant_part_sizing_eval(Evas_Object *obj, Conformant_Part_Type part_type)
              ;
 #endif
           }
-        _conformant_part_size_set(obj, wd->shelf, sx, sy, sw, sh);
+        _conformant_part_size_set(obj, wd->indicator, sx, sy, sw, sh);
      }
    if (part_type & ELM_CONFORM_VIRTUAL_KEYPAD_PART)
      {
@@ -298,7 +298,7 @@ _conformant_part_sizing_eval(Evas_Object *obj, Conformant_Part_Type part_type)
              ;
 #endif
           }
-        _conformant_part_size_set(obj,wd->virtualkeypad, sx, sy, sw, sh);
+        _conformant_part_size_set(obj, wd->virtualkeypad, sx, sy, sw, sh);
      }
    if (part_type & ELM_CONFORM_SOFTKEY_PART)
      {
@@ -313,7 +313,22 @@ _conformant_part_sizing_eval(Evas_Object *obj, Conformant_Part_Type part_type)
              ;
 #endif
           }
-        _conformant_part_size_set(obj, wd->panel, sx, sy, sw, sh);
+        _conformant_part_size_set(obj, wd->softkey, sx, sy, sw, sh);
+     }
+   if (part_type & ELM_CONFORM_CLIPBOARD_PART)
+     {
+        if ((!_conformant_part_geometry_env_get("ILLUME_CB",
+                                                &sx, &sy, &sw, &sh)) && (xwin))
+          {
+#ifdef HAVE_ELEMENTARY_X
+           //No information of the clipboard geometry, reset the geometry.
+           if (!ecore_x_e_illume_clipboard_geometry_get(zone, &sx, &sy, &sw, &sh))
+             sx = sy = sw = sh = 0;
+#else
+             ;
+#endif
+          }
+        _conformant_part_size_set(obj, wd->clipboard, sx, sy, sw, sh);
      }
 }
 
@@ -321,23 +336,26 @@ static void
 _swallow_conformant_parts(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
+   Evas *e = evas_object_evas_get(obj);
    wd->scroller = NULL;
-   if (!wd->shelf)
+
+   //Indicator
+   if (!wd->indicator)
      {
-        wd->shelf = evas_object_rectangle_add(evas_object_evas_get(obj));
-        elm_widget_sub_object_add(obj, wd->shelf);
-        evas_object_size_hint_min_set(wd->shelf, -1, 0);
-        evas_object_size_hint_max_set(wd->shelf, -1, 0);
+        wd->indicator = evas_object_rectangle_add(e);
+        elm_widget_sub_object_add(obj, wd->indicator);
+        evas_object_size_hint_min_set(wd->indicator, -1, 0);
+        evas_object_size_hint_max_set(wd->indicator, -1, 0);
      }
    else
      _conformant_part_sizing_eval(obj, ELM_CONFORM_INDICATOR_PART);
-   evas_object_color_set(wd->shelf, 0, 0, 0, 0);
-   edje_object_part_swallow(wd->base, "elm.swallow.shelf", wd->shelf);
+   evas_object_color_set(wd->indicator, 0, 0, 0, 0);
+   edje_object_part_swallow(wd->base, "elm.swallow.indicator", wd->indicator);
 
+   //Virtual Keyboard
    if (!wd->virtualkeypad)
      {
-        wd->virtualkeypad = evas_object_rectangle_add(evas_object_evas_get(obj));
+        wd->virtualkeypad = evas_object_rectangle_add(e);
         elm_widget_sub_object_add(obj, wd->virtualkeypad);
         evas_object_size_hint_min_set(wd->virtualkeypad, -1, 0);
         evas_object_size_hint_max_set(wd->virtualkeypad, -1, 0);
@@ -347,31 +365,32 @@ _swallow_conformant_parts(Evas_Object *obj)
    evas_object_color_set(wd->virtualkeypad, 0, 0, 0, 0);
    edje_object_part_swallow(wd->base, "elm.swallow.virtualkeypad",
                             wd->virtualkeypad);
-
-   if (!wd->sliding_win)
+   //Clipboard
+   if (!wd->clipboard)
      {
-        wd->sliding_win = evas_object_rectangle_add(evas_object_evas_get(obj));
-        elm_widget_sub_object_add(obj, wd->sliding_win);
-        evas_object_size_hint_min_set(wd->sliding_win, -1, 0);
-        evas_object_size_hint_max_set(wd->sliding_win, -1, 0);
+        wd->clipboard = evas_object_rectangle_add(e);
+        elm_widget_sub_object_add(obj, wd->clipboard);
+        evas_object_size_hint_min_set(wd->clipboard, -1, 0);
+        evas_object_size_hint_max_set(wd->clipboard, -1, 0);
      }
-#ifdef HAVE_ELEMENTARY_X
    else
-     _conformant_part_sizing_eval(obj, ELM_CONFORM_SLIDING_WIN_PART);
-#endif
-   evas_object_color_set(wd->sliding_win, 0, 0, 0, 0);
+     _conformant_part_sizing_eval(obj, ELM_CONFORM_CLIPBOARD_PART);
+   evas_object_color_set(wd->clipboard, 0, 0, 0, 0);
+   edje_object_part_swallow(wd->base, "elm.swallow.clipboard",
+                            wd->clipboard);
 
-   if (!wd->panel)
+   //Softkey
+   if (!wd->softkey)
      {
-        wd->panel = evas_object_rectangle_add(evas_object_evas_get(obj));
-        elm_widget_sub_object_add(obj, wd->panel);
-        evas_object_size_hint_min_set(wd->panel, -1, 0);
-        evas_object_size_hint_max_set(wd->panel, -1, 0);
+        wd->softkey = evas_object_rectangle_add(e);
+        elm_widget_sub_object_add(obj, wd->softkey);
+        evas_object_size_hint_min_set(wd->softkey, -1, 0);
+        evas_object_size_hint_max_set(wd->softkey, -1, 0);
      }
    else
      _conformant_part_sizing_eval(obj, ELM_CONFORM_SOFTKEY_PART);
-   evas_object_color_set(wd->panel, 0, 0, 0, 0);
-   edje_object_part_swallow(wd->base, "elm.swallow.panel", wd->panel);
+   evas_object_color_set(wd->softkey, 0, 0, 0, 0);
+   edje_object_part_swallow(wd->base, "elm.swallow.softkey", wd->softkey);
 }
 
 static void
@@ -464,7 +483,7 @@ _conformant_move_resize_event_cb(void *data __UNUSED__, Evas *e __UNUSED__,
    part_type =  (ELM_CONFORM_INDICATOR_PART |
                  ELM_CONFORM_SOFTKEY_PART |
                  ELM_CONFORM_VIRTUAL_KEYPAD_PART |
-                 ELM_CONFORM_SLIDING_WIN_PART);
+                 ELM_CONFORM_CLIPBOARD_PART);
    _conformant_part_sizing_eval(obj, part_type);
 }
 
@@ -478,8 +497,7 @@ _content_resize_event_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj
 
    if (!wd) return;
 #ifdef HAVE_ELEMENTARY_X
-   if ((wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF)
-            && (!wd->is_sliding_win_visible)) return;
+   if (wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF) return;
 #endif
 
    if (wd->show_region_job) ecore_job_del(wd->show_region_job);
@@ -568,7 +586,7 @@ _prop_change(void *data, int type __UNUSED__, void *event)
         part_type =  (ELM_CONFORM_INDICATOR_PART |
                       ELM_CONFORM_SOFTKEY_PART |
                       ELM_CONFORM_VIRTUAL_KEYPAD_PART |
-                      ELM_CONFORM_SLIDING_WIN_PART);
+                      ELM_CONFORM_CLIPBOARD_PART);
         _conformant_part_sizing_eval(data, part_type);
      }
    else if (ev->atom == ECORE_X_ATOM_E_ILLUME_INDICATOR_GEOMETRY)
@@ -577,8 +595,8 @@ _prop_change(void *data, int type __UNUSED__, void *event)
      _conformant_part_sizing_eval(data, ELM_CONFORM_SOFTKEY_PART);
    else if (ev->atom == ECORE_X_ATOM_E_ILLUME_KEYBOARD_GEOMETRY)
      _conformant_part_sizing_eval(data, ELM_CONFORM_VIRTUAL_KEYPAD_PART);
-   else if (ev->atom == ECORE_X_ATOM_E_ILLUME_SLIDING_WIN_GEOMETRY)
-     _conformant_part_sizing_eval(data, ELM_CONFORM_SLIDING_WIN_PART);
+   else if (ev->atom == ECORE_X_ATOM_E_ILLUME_CLIPBOARD_GEOMETRY)
+     _conformant_part_sizing_eval(data, ELM_CONFORM_CLIPBOARD_PART);
    else if (ev->atom == ECORE_X_ATOM_E_VIRTUAL_KEYBOARD_STATE)
      {
         Ecore_X_Window zone;
@@ -594,17 +612,18 @@ _prop_change(void *data, int type __UNUSED__, void *event)
         else
           _update_autoscroll_objs(data);
      }
-   else if (ev->atom == ECORE_X_ATOM_E_ILLUME_SLIDING_WIN_STATE)
+   else if (ev->atom == ECORE_X_ATOM_E_ILLUME_CLIPBOARD_STATE)
      {
         Ecore_X_Window zone;
+        Ecore_X_Illume_Clipboard_State state;
 
         zone = ecore_x_e_illume_zone_get(ev->win);
-        wd->is_sliding_win_visible = ecore_x_e_illume_sliding_win_state_get(zone);
+        state = ecore_x_e_illume_clipboard_state_get(zone);
 
-        if (!wd->is_sliding_win_visible)
+        if (state != ECORE_X_ILLUME_CLIPBOARD_STATE_ON)
           {
-             evas_object_size_hint_min_set(wd->sliding_win, -1, 0);
-             evas_object_size_hint_max_set(wd->sliding_win, -1, 0);
+             evas_object_size_hint_min_set(wd->clipboard, -1, 0);
+             evas_object_size_hint_max_set(wd->clipboard, -1, 0);
           }
         else
           _update_autoscroll_objs(data);

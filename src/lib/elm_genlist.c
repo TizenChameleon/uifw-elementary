@@ -634,13 +634,18 @@ _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord minw = -1, minh = -1, maxw = -1, maxh = -1;
+   Evas_Coord vmw = 0, vmh = 0;
    if (!wd) return;
-   evas_object_size_hint_min_get(wd->scr, &minw, &minh);
+
+   evas_object_size_hint_min_get(wd->scr, &minw, NULL);
    evas_object_size_hint_max_get(wd->scr, &maxw, &maxh);
-   minh = -1;
+
+   edje_object_size_min_calc
+      (elm_smart_scroller_edje_object_get(wd->scr), &vmw, &vmh);
+
    if (wd->mode == ELM_LIST_COMPRESS)
      {
-        Evas_Coord vw, vh, vmw, vmh;
+        Evas_Coord vw, vh;
 
         elm_smart_scroller_child_viewport_size_get(wd->scr, &vw, &vh);
         if ((vw != 0) && (vw != wd->prev_viewport_w))
@@ -662,24 +667,15 @@ _sizing_eval(Evas_Object *obj)
      }
    else if (wd->mode == ELM_LIST_LIMIT)
      {
-        Evas_Coord vmw, vmh;
-
-        minw = wd->realminw;
         maxw = -1;
-        elm_smart_scroller_child_viewport_size_get(wd->scr, &vmw, &vmh);
-        edje_object_size_min_calc
-          (elm_smart_scroller_edje_object_get(wd->scr), &vmw, &vmh);
         minw = vmw + minw;
      }
    else
      {
-        Evas_Coord vmw, vmh;
-
-        edje_object_size_min_calc
-          (elm_smart_scroller_edje_object_get(wd->scr), &vmw, &vmh);
         minw = vmw;
         minh = vmh;
      }
+
    evas_object_size_hint_min_set(obj, minw, minh);
    evas_object_size_hint_max_set(obj, maxw, maxh);
 }
@@ -1995,9 +1991,9 @@ _item_cache_free(Item_Cache *itc)
 
 static void
 _item_text_realize(Elm_Gen_Item *it,
-                    Evas_Object *target,
-                    Eina_List **source,
-                    const char *parts)
+                   Evas_Object *target,
+                   Eina_List **source,
+                   const char *parts)
 {
    if (it->itc->func.text_get)
      {
@@ -2028,9 +2024,9 @@ _item_text_realize(Elm_Gen_Item *it,
 
 static Eina_List *
 _item_content_unrealize(Elm_Gen_Item *it,
-                   Evas_Object *target,
-                   Eina_List **source,
-                   const char *parts)
+                        Evas_Object *target,
+                        Eina_List **source,
+                        const char *parts)
 {
    Eina_List *res = it->content_objs;
 
@@ -2060,9 +2056,9 @@ _item_content_unrealize(Elm_Gen_Item *it,
 
 static Eina_List *
 _item_content_realize(Elm_Gen_Item *it,
-                   Evas_Object *target,
-                   Eina_List **source,
-                   const char *parts)
+                      Evas_Object *target,
+                      Eina_List **source,
+                      const char *parts)
 {
    Eina_List *res = NULL;
 
@@ -4815,8 +4811,6 @@ static void
 _elm_genlist_clear(Evas_Object *obj, Eina_Bool standby)
 {
    Eina_Inlist *next, *l;
-
-   ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
 
@@ -4882,6 +4876,7 @@ _elm_genlist_clear(Evas_Object *obj, Eina_Bool standby)
 EAPI void
 elm_genlist_clear(Evas_Object *obj)
 {
+   ELM_CHECK_WIDTYPE(obj, widtype);
    _elm_genlist_clear(obj, EINA_FALSE);
 }
 
@@ -5349,36 +5344,6 @@ elm_genlist_item_bring_in(Elm_Object_Item *it, Elm_Genlist_Item_Scrollto_Type ty
      elm_smart_scroller_region_bring_in(_it->wd->scr,x, y, w, h);
 }
 
-EINA_DEPRECATED EAPI void
-elm_genlist_item_top_show(Elm_Object_Item *it)
-{
-   elm_genlist_item_show(it, ELM_GENLIST_ITEM_SCROLLTO_TOP);
-}
-
-EINA_DEPRECATED EAPI void
-elm_genlist_item_top_bring_in(Elm_Object_Item *it)
-{
-   elm_genlist_item_bring_in(it, ELM_GENLIST_ITEM_SCROLLTO_TOP);
-}
-
-EINA_DEPRECATED EAPI void
-elm_genlist_item_middle_show(Elm_Object_Item *it)
-{
-   elm_genlist_item_show(it, ELM_GENLIST_ITEM_SCROLLTO_MIDDLE);
-}
-
-EINA_DEPRECATED EAPI void
-elm_genlist_item_middle_bring_in(Elm_Object_Item *it)
-{
-   elm_genlist_item_bring_in(it, ELM_GENLIST_ITEM_SCROLLTO_MIDDLE);
-}
-
-EINA_DEPRECATED EAPI void
-elm_genlist_item_contents_orphan(Elm_Object_Item *it)
-{
-   elm_genlist_item_all_contents_unset(it, NULL);
-}
-
 EAPI void
 elm_genlist_item_all_contents_unset(Elm_Object_Item *it, Eina_List **l)
 {
@@ -5393,13 +5358,6 @@ elm_genlist_item_all_contents_unset(Elm_Object_Item *it, Eina_List **l)
         if (l)
           *l = eina_list_append(*l, content);
      }
-}
-
-EINA_DEPRECATED EAPI const Evas_Object *
-elm_genlist_item_object_get(const Elm_Object_Item *it)
-{
-   ELM_OBJ_ITEM_CHECK_OR_RETURN(it, NULL);
-   return VIEW(it);
 }
 
 EAPI void
@@ -5706,64 +5664,6 @@ elm_genlist_mode_get(const Evas_Object *obj)
    return wd->mode;
 }
 
-EINA_DEPRECATED EAPI void
-elm_genlist_always_select_mode_set(Evas_Object *obj,
-                                   Eina_Bool    always_select)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (always_select)
-     elm_genlist_select_mode_set(obj, ELM_OBJECT_SELECT_MODE_ALWAYS);
-   else
-     {
-        Elm_Object_Select_Mode oldmode = elm_genlist_select_mode_get(obj);
-        if (oldmode == ELM_OBJECT_SELECT_MODE_ALWAYS)
-          elm_genlist_select_mode_set(obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
-     }
-}
-
-EINA_DEPRECATED EAPI Eina_Bool
-elm_genlist_always_select_mode_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-   Elm_Object_Select_Mode oldmode = elm_genlist_select_mode_get(obj);
-   if (oldmode == ELM_OBJECT_SELECT_MODE_ALWAYS)
-     return EINA_TRUE;
-   return EINA_FALSE;
-}
-
-EINA_DEPRECATED EAPI void
-elm_genlist_no_select_mode_set(Evas_Object *obj,
-                               Eina_Bool    no_select)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return;
-   if (no_select)
-     elm_genlist_select_mode_set(obj, ELM_OBJECT_SELECT_MODE_NONE);
-   else
-     {
-        Elm_Object_Select_Mode oldmode = elm_genlist_select_mode_get(obj);
-        if (oldmode == ELM_OBJECT_SELECT_MODE_NONE)
-          elm_genlist_select_mode_set(obj, ELM_OBJECT_SELECT_MODE_DEFAULT);
-     }
-}
-
-EINA_DEPRECATED EAPI Eina_Bool
-elm_genlist_no_select_mode_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) EINA_FALSE;
-   Widget_Data *wd = elm_widget_data_get(obj);
-   if (!wd) return EINA_FALSE;
-   Elm_Object_Select_Mode oldmode = elm_genlist_select_mode_get(obj);
-   if (oldmode == ELM_OBJECT_SELECT_MODE_NONE)
-     return EINA_TRUE;
-   return EINA_FALSE;
-}
-
 EAPI void
 elm_genlist_bounce_set(Evas_Object *obj,
                        Eina_Bool    h_bounce,
@@ -6030,12 +5930,6 @@ elm_genlist_item_type_get(const Elm_Object_Item *it)
    return _it->item->type;
 }
 
-EINA_DEPRECATED EAPI Elm_Genlist_Item_Type
-elm_genlist_item_flags_get(const Elm_Object_Item *it)
-{
-   return elm_genlist_item_type_get(it);
-}
-
 EAPI Elm_Genlist_Item_Class *
 elm_genlist_item_class_new(void)
 {
@@ -6152,7 +6046,7 @@ elm_genlist_select_mode_get(const Evas_Object *obj)
 
 EAPI void
 elm_genlist_highlight_mode_set(Evas_Object *obj,
-                             Eina_Bool    highlight)
+                               Eina_Bool    highlight)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);

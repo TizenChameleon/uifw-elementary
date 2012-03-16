@@ -205,8 +205,6 @@ elm_store.c \
 elm_table.c \
 elm_theme.c \
 elm_thumb.c \
-elm_toggle.c \
-elm_tickernoti.c \
 elm_toolbar.c \
 elm_transit.c \
 elm_util.c \

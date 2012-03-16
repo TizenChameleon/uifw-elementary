@@ -513,24 +513,6 @@ elm_notify_add(Evas_Object *parent)
 }
 
 EAPI void
-elm_notify_content_set(Evas_Object *obj, Evas_Object *content)
-{
-   _content_set_hook(obj, NULL, content);
-}
-
-EAPI Evas_Object *
-elm_notify_content_unset(Evas_Object *obj)
-{
-   return _content_unset_hook(obj, NULL);
-}
-
-EAPI Evas_Object *
-elm_notify_content_get(const Evas_Object *obj)
-{
-   return _content_get_hook(obj, NULL);
-}
-
-EAPI void
 elm_notify_parent_set(Evas_Object *obj, Evas_Object *parent)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -618,18 +600,6 @@ elm_notify_timeout_get(const Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return 0.0;
    return wd->timeout;
-}
-
-EINA_DEPRECATED EAPI void
-elm_notify_repeat_events_set(Evas_Object *obj, Eina_Bool repeat)
-{
-   elm_notify_allow_events_set(obj, repeat);
-}
-
-EINA_DEPRECATED EAPI Eina_Bool
-elm_notify_repeat_events_get(const Evas_Object *obj)
-{
-   return elm_notify_allow_events_get(obj);
 }
 
 EAPI void

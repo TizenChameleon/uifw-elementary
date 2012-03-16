@@ -500,7 +500,7 @@ EAPI Eina_Bool                     elm_genlist_multi_select_get(const Evas_Objec
  *       recalculate every item height again whenever the list width
  *       changes!
  * @note When ELM_LIST_COMPRESS mode is enabled, it also enables
- *       compress mode (see elm_genlist_compress_mode_set()) and
+ *       compress mode (see elm_genlist_mode_set()) and
  *       disables homogeneous (see elm_genlist_homogeneous_set()).
  *
  * @see elm_genlist_mode_get()
@@ -772,12 +772,12 @@ EAPI Elm_Object_Item             *elm_genlist_last_item_get(const Evas_Object *o
  * @param policy_v Vertical scrollbar policy.
  *
  * This sets the scrollbar visibility policy for the given genlist
- * scroller. #ELM_SMART_SCROLLER_POLICY_AUTO means the scrollbar is
+ * scroller. #ELM_SCROLLER_POLICY_AUTO means the scrollbar is
  * made visible if it is needed, and otherwise kept hidden.
- * #ELM_SMART_SCROLLER_POLICY_ON turns it on all the time, and
- * #ELM_SMART_SCROLLER_POLICY_OFF always keeps it off. This applies
+ * #ELM_SCROLLER_POLICY_ON turns it on all the time, and
+ * #ELM_SCROLLER_POLICY_OFF always keeps it off. This applies
  * respectively for the horizontal and vertical scrollbars. Default is
- * #ELM_SMART_SCROLLER_POLICY_AUTO
+ * #ELM_SCROLLER_POLICY_AUTO
  *
  * @see elm_genlist_scroller_policy_get()
  *
@@ -1312,7 +1312,7 @@ EAPI Eina_Bool                     elm_genlist_item_cursor_engine_only_get(const
  * maximum (which increases the performance for scrolling the list). This
  * implies 'compressed' mode.
  *
- * @see elm_genlist_compress_mode_set()
+ * @see elm_genlist_mode_set()
  * @see elm_genlist_homogeneous_get()
  *
  * @ingroup Genlist
@@ -1599,7 +1599,7 @@ EAPI void                          elm_genlist_item_decorate_mode_set(Elm_Object
 /**
  * Get the item's decorate mode.
  *
- * @param obj The genlist object
+ * @param it The genlist item
  *
  * This function just returns the name of the item's decorate mode.
  *
@@ -1668,7 +1668,7 @@ EAPI Elm_Genlist_Item_Type        elm_genlist_item_type_get(const Elm_Object_Ite
  * This sets Genlist decorate mode to all items.
  *
  * @param obj The Genlist object
- * @param The decorate mode status
+ * @param decorated The decorate mode status
  * (EINA_TRUE = decorate mode, EINA_FALSE = normal mode
  *
  * @ingroup Genlist
@@ -1724,7 +1724,7 @@ EAPI Eina_Bool elm_genlist_item_flip_get(const Elm_Object_Item *it);
  * Set Genlist tree effect
  *
  * @param obj The genlist object
- * @param The tree effect status
+ * @param enabled The tree effect status
  * (EINA_TRUE = enabled, EINA_FALSE = disabled
  *
  * @ingroup Genlist

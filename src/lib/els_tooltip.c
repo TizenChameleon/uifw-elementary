@@ -42,6 +42,7 @@ struct _Elm_Tooltip
    Ecore_Timer             *show_timer;
    Ecore_Timer             *hide_timer;
    Ecore_Job               *reconfigure_job;
+   Evas_Coord               mouse_x, mouse_y;
    struct {
       Evas_Coord            x, y, bx, by;
    } pad;
@@ -67,6 +68,7 @@ static void
 _elm_tooltip_content_changed_hints_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    _elm_tooltip_reconfigure_job_start(data);
+   TTDBG("HINTS CHANGED\n");
 }
 
 static void
@@ -83,6 +85,7 @@ _elm_tooltip_obj_move_cb(void *data, Evas *e  __UNUSED__, Evas_Object *obj __UNU
 {
    Elm_Tooltip *tt = data;
    _elm_tooltip_reconfigure_job_start(tt);
+   TTDBG("TT MOVED\n");
 }
 
 static void
@@ -90,12 +93,24 @@ _elm_tooltip_obj_resize_cb(void *data, Evas *e  __UNUSED__, Evas_Object *obj __U
 {
    Elm_Tooltip *tt = data;
    _elm_tooltip_reconfigure_job_start(tt);
+   TTDBG("TT RESIZE\n");
 }
 
 static void
-_elm_tooltip_obj_mouse_move_cb(void *data, Evas *e  __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info  __UNUSED__)
+_elm_tooltip_obj_mouse_move_cb(Elm_Tooltip *tt, Evas *e  __UNUSED__, Evas_Object *obj __UNUSED__, Evas_Event_Mouse_Move *ev)
 {
-   Elm_Tooltip *tt = data;
+   if (tt->mouse_x || tt->mouse_y)
+     {
+        if ((abs(ev->cur.output.x - tt->mouse_x) < 3) &&
+            (abs(ev->cur.output.y - tt->mouse_y) < 3))
+          {
+             TTDBG("MOUSE MOVE REJECTED!\n");
+             return;
+          }
+     }
+   tt->mouse_x = ev->cur.output.x;
+   tt->mouse_y = ev->cur.output.y;
+   TTDBG("MOUSE MOVED\n");
    _elm_tooltip_reconfigure_job_start(tt);
 }
 
@@ -105,9 +120,11 @@ _elm_tooltip_show(Elm_Tooltip *tt)
    _elm_tooltip_show_timer_stop(tt);
    _elm_tooltip_hide_anim_stop(tt);
 
+   TTDBG("TT SHOW\n");
    if (tt->tooltip)
      {
         _elm_tooltip_reconfigure_job_start(tt);
+        TTDBG("RECURSIVE JOB\n");
         return;
      }
    if (tt->free_size)
@@ -135,7 +152,7 @@ _elm_tooltip_show(Elm_Tooltip *tt)
    evas_object_event_callback_add
      (tt->eventarea, EVAS_CALLBACK_RESIZE, _elm_tooltip_obj_resize_cb, tt);
    evas_object_event_callback_add
-     (tt->eventarea, EVAS_CALLBACK_MOUSE_MOVE, _elm_tooltip_obj_mouse_move_cb, tt);
+     (tt->eventarea, EVAS_CALLBACK_MOUSE_MOVE, (Evas_Object_Event_Cb)_elm_tooltip_obj_mouse_move_cb, tt);
 
    tt->changed_style = EINA_TRUE;
    _elm_tooltip_reconfigure_job_start(tt);
@@ -146,6 +163,7 @@ _elm_tooltip_content_del(Elm_Tooltip *tt)
 {
    if (!tt->content) return;
 
+   TTDBG("CONTENT DEL\n");
    evas_object_event_callback_del_full
      (tt->content, EVAS_CALLBACK_CHANGED_SIZE_HINTS,
       _elm_tooltip_content_changed_hints_cb, tt);
@@ -162,6 +180,7 @@ static void
 _elm_tooltip_hide(Elm_Tooltip *tt)
 {
    Evas_Object *del;
+   TTDBG("TT HIDE\n");
    _elm_tooltip_show_timer_stop(tt);
    _elm_tooltip_hide_anim_stop(tt);
    _elm_tooltip_reconfigure_job_stop(tt);
@@ -176,7 +195,7 @@ _elm_tooltip_hide(Elm_Tooltip *tt)
    evas_object_event_callback_del_full
      (tt->eventarea, EVAS_CALLBACK_RESIZE, _elm_tooltip_obj_resize_cb, tt);
    evas_object_event_callback_del_full
-     (tt->eventarea, EVAS_CALLBACK_MOUSE_MOVE, _elm_tooltip_obj_mouse_move_cb, tt);
+     (tt->eventarea, EVAS_CALLBACK_MOUSE_MOVE, (Evas_Object_Event_Cb)_elm_tooltip_obj_mouse_move_cb, tt);
 
    del = tt->tt_win ?: tt->tooltip;
 
@@ -223,6 +242,7 @@ _elm_tooltip_hide_anim_start(Elm_Tooltip *tt)
 {
    double extra = 0;
    if (tt->hide_timer) return;
+   TTDBG("HIDE START\n");
    /* hide slightly faster when in window mode to look less stupid */
    if ((tt->hide_timeout > 0) && tt->tt_win) extra = 0.1;
    edje_object_signal_emit(tt->tooltip, "elm,action,hide", "elm");
@@ -445,13 +465,15 @@ _elm_tooltip_reconfigure(Elm_Tooltip *tt)
    else if (ty < 0) ty -= tt->pad.by;
    else if (ty > ch) ty += tt->pad.by;
    TTDBG("PAD (BORDER):  tx=%d,ty=%d\n", tx, ty);
-   if ((tx < 0) || (ty < 0))
+   if (((tx < 0) && (tw < cw)) || ((ty < 0) && (th < ch)))
      {
         TTDBG("POSITIONING FAILED! THIS IS A BUG SOMEWHERE!\n");
+        abort();
         return;
      }
    evas_object_move(tt->tt_win ? : tt->tooltip, tx, ty);
    evas_object_resize(tt->tt_win ? : tt->tooltip, tw, th);
+   TTDBG("FINAL: tx=%d,ty=%d,tw=%d,th=%d\n", tx, ty, tw, th);
    evas_object_show(tt->tooltip);
 
    if (inside_eventarea)
@@ -508,8 +530,8 @@ _elm_tooltip_obj_mouse_in_cb(void *data, Evas *e  __UNUSED__, Evas_Object *obj _
 
    if ((tt->show_timer) || (tt->tooltip)) return;
 
-   tt->show_timer = ecore_timer_add
-     (_elm_config->tooltip_delay, _elm_tooltip_timer_show_cb, tt);
+   tt->show_timer = ecore_timer_add(_elm_config->tooltip_delay, _elm_tooltip_timer_show_cb, tt);
+   TTDBG("MOUSE IN\n");
 }
 
 static void
@@ -523,6 +545,7 @@ _elm_tooltip_obj_mouse_out_cb(Elm_Tooltip *tt, Evas *e  __UNUSED__, Evas_Object 
         return;
      }
    _elm_tooltip_hide_anim_start(tt);
+   TTDBG("MOUSE OUT\n");
 }
 
 static void _elm_tooltip_obj_free_cb(void *data, Evas *e  __UNUSED__, Evas_Object *obj, void *event_info  __UNUSED__);

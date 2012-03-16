@@ -2007,7 +2007,6 @@ static void
 _region_get_job(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-   Evas_Coord_Rectangle ret_rect;
    if (!wd) return;
    wd->region_get_job = NULL;
 
@@ -2223,6 +2222,7 @@ _signal_entry_paste_request(void *data, Evas_Object *obj __UNUSED__, const char 
    Elm_Sel_Type type = (emission[sizeof("ntry,paste,request,")] == '1') ?
      ELM_SEL_TYPE_PRIMARY : ELM_SEL_TYPE_CLIPBOARD;
    if (!wd) return;
+   if (!wd->editable) return;
    evas_object_smart_callback_call(data, SIG_SELECTION_PASTE, NULL);
    if (wd->sel_notify_handler)
      {
@@ -2944,7 +2944,6 @@ elm_entry_add(Evas_Object *parent)
    elm_widget_signal_callback_del_hook_set(obj, _signal_callback_del_hook);
    elm_object_cursor_set(obj, ELM_CURSOR_XTERM);
    elm_widget_can_focus_set(obj, EINA_TRUE);
-   elm_widget_highlight_ignore_set(obj, EINA_TRUE);
    elm_widget_text_set_hook_set(obj, _elm_entry_text_set);
    elm_widget_text_get_hook_set(obj, _elm_entry_text_get);
    elm_widget_content_set_hook_set(obj, _content_set_hook);
@@ -3719,63 +3718,6 @@ elm_entry_item_provider_remove(Evas_Object *obj, Elm_Entry_Item_Provider_Cb func
 }
 
 EAPI void
-elm_entry_text_filter_append(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data)
-{
-   Widget_Data *wd;
-   Elm_Entry_Markup_Filter *tf;
-   ELM_CHECK_WIDTYPE(obj, widtype);
-
-   wd = elm_widget_data_get(obj);
-
-   EINA_SAFETY_ON_NULL_RETURN(func);
-
-   tf = _filter_new(func, data);
-   if (!tf) return;
-
-   wd->text_filters = eina_list_append(wd->text_filters, tf);
-}
-
-EAPI void
-elm_entry_text_filter_prepend(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data)
-{
-   Widget_Data *wd;
-   Elm_Entry_Markup_Filter *tf;
-   ELM_CHECK_WIDTYPE(obj, widtype);
-
-   wd = elm_widget_data_get(obj);
-
-   EINA_SAFETY_ON_NULL_RETURN(func);
-
-   tf = _filter_new(func, data);
-   if (!tf) return;
-
-   wd->text_filters = eina_list_prepend(wd->text_filters, tf);
-}
-
-EAPI void
-elm_entry_text_filter_remove(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data)
-{
-   Widget_Data *wd;
-   Eina_List *l;
-   Elm_Entry_Markup_Filter *tf;
-   ELM_CHECK_WIDTYPE(obj, widtype);
-
-   wd = elm_widget_data_get(obj);
-
-   EINA_SAFETY_ON_NULL_RETURN(func);
-
-   EINA_LIST_FOREACH(wd->text_filters, l, tf)
-     {
-        if ((tf->func == func) && ((!data) || (tf->data == data)))
-          {
-             wd->text_filters = eina_list_remove_list(wd->text_filters, l);
-             _filter_free(tf);
-             return;
-          }
-     }
-}
-
-EAPI void
 elm_entry_markup_filter_append(Evas_Object *obj, Elm_Entry_Filter_Cb func, void *data)
 {
    Widget_Data *wd;
@@ -4137,28 +4079,6 @@ elm_entry_scrollable_get(const Evas_Object *obj)
 }
 
 EAPI void
-elm_entry_icon_set(Evas_Object *obj, Evas_Object *icon)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   EINA_SAFETY_ON_NULL_RETURN(icon);
-   _content_set_hook(obj, NULL, icon);
-}
-
-EAPI Evas_Object *
-elm_entry_icon_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   return _content_get_hook(obj, NULL);
-}
-
-EAPI Evas_Object *
-elm_entry_icon_unset(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   return _content_unset_hook(obj, NULL);
-}
-
-EAPI void
 elm_entry_icon_visible_set(Evas_Object *obj, Eina_Bool setting)
 {
    ELM_CHECK_WIDTYPE(obj, widtype);
@@ -4176,28 +4096,6 @@ elm_entry_icon_visible_set(Evas_Object *obj, Eina_Bool setting)
    else
      edje_object_signal_emit(edje, "elm,action,hide,icon", "elm");
    _sizing_eval(obj);
-}
-
-EAPI void
-elm_entry_end_set(Evas_Object *obj, Evas_Object *end)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype);
-   EINA_SAFETY_ON_NULL_RETURN(end);
-   _content_set_hook(obj, "end", end);
-}
-
-EAPI Evas_Object *
-elm_entry_end_get(const Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   return _content_get_hook(obj, "end");
-}
-
-EAPI Evas_Object *
-elm_entry_end_unset(Evas_Object *obj)
-{
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   return _content_unset_hook(obj, "end");
 }
 
 EAPI void
@@ -4564,19 +4462,24 @@ _entry_hover_anchor_clicked(void *data, Evas_Object *obj, void *event_info)
    Elm_Entry_Anchor_Hover_Info ei;
    Evas_Coord x, w, y, h, px, py;
    if (!wd) return;
+
    ei.anchor_info = event_info;
+
    wd->anchor_hover.pop = elm_icon_add(obj);
    evas_object_move(wd->anchor_hover.pop, info->x, info->y);
    evas_object_resize(wd->anchor_hover.pop, info->w, info->h);
+
    wd->anchor_hover.hover = elm_hover_add(obj);
    elm_widget_mirrored_set(wd->anchor_hover.hover, elm_widget_mirrored_get(obj));
    if (wd->anchor_hover.hover_style)
      elm_object_style_set(wd->anchor_hover.hover, wd->anchor_hover.hover_style);
+
    hover_parent = wd->anchor_hover.hover_parent;
    if (!hover_parent) hover_parent = obj;
    elm_hover_parent_set(wd->anchor_hover.hover, hover_parent);
    elm_hover_target_set(wd->anchor_hover.hover, wd->anchor_hover.pop);
    ei.hover = wd->anchor_hover.hover;
+
    evas_object_geometry_get(hover_parent, &x, &y, &w, &h);
    ei.hover_parent.x = x;
    ei.hover_parent.y = y;

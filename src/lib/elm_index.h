@@ -79,7 +79,7 @@ EAPI void                  elm_index_autohide_disabled_set(Evas_Object *obj, Ein
  * @param obj The index object
  * @return @c EINA_TRUE, if auto hiding is disabled, @c EINA_FALSE otherwise
  *
- * @see elm_index_active_set() for more details
+ * @see elm_index_autohide_disabled_set() for more details
  *
  * @ingroup Index
  */
@@ -124,7 +124,6 @@ EAPI int                   elm_index_item_level_get(const Evas_Object *obj);
  *
  * Selected items will be highlighted.
  *
- * @see elm_index_item_selected_get()
  * @see elm_index_selected_item_get()
  *
  * @ingroup Index

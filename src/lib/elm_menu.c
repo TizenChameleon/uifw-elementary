@@ -751,64 +751,11 @@ elm_menu_item_add(Evas_Object *obj, Elm_Object_Item *parent, const char *icon, c
    return (Elm_Object_Item *) subitem;
 }
 
-EINA_DEPRECATED EAPI Elm_Object_Item *
-elm_menu_item_add_object(Evas_Object *obj, Elm_Object_Item *parent, Evas_Object *subobj, Evas_Smart_Cb func, const void *data)
-{
-   Elm_Menu_Item *subitem;
-   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
-   Widget_Data *wd = elm_widget_data_get(obj);
-
-   if (!wd) return NULL;
-   subitem = elm_widget_item_new(obj, Elm_Menu_Item);
-   if (!subitem) return NULL;
-
-   elm_widget_item_del_pre_hook_set(subitem, _item_del_pre_hook);
-   elm_widget_item_disable_hook_set(subitem, _item_disable_hook);
-   elm_widget_item_text_set_hook_set(subitem, _item_text_set_hook);
-   elm_widget_item_text_get_hook_set(subitem, _item_text_get_hook);
-   elm_widget_item_content_set_hook_set(subitem, _item_content_set_hook);
-   elm_widget_item_content_get_hook_set(subitem, _item_content_get_hook);
-
-   subitem->base.data = data;
-   subitem->func = func;
-   subitem->parent = (Elm_Menu_Item *) parent;
-   subitem->object_item = EINA_TRUE;
-   subitem->content = subobj;
-
-   _item_obj_create(subitem);
-
-   elm_widget_sub_object_add(WIDGET(subitem), subitem->content);
-   edje_object_part_swallow(VIEW(subitem), "elm.swallow.content", subobj);
-   _sizing_eval(WIDGET(subitem));
-
-   _elm_menu_item_add_helper(obj, (Elm_Menu_Item *) parent, subitem, wd);
-
-   return (Elm_Object_Item *) subitem;
-}
-
 EAPI unsigned int
 elm_menu_item_index_get(const Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, 0);
    return ((Elm_Menu_Item *)it)->idx;
-}
-
-EAPI void
-elm_menu_item_label_set(Elm_Object_Item *it, const char *label)
-{
-   _item_text_set_hook(it, NULL, label);
-}
-
-EAPI const char *
-elm_menu_item_label_get(const Elm_Object_Item *it)
-{
-   return _item_text_get_hook(it, NULL);
-}
-
-EINA_DEPRECATED EAPI void
-elm_menu_item_object_icon_name_set(Elm_Object_Item *it, const char *icon)
-{
-   elm_menu_item_icon_name_set(it, icon);
 }
 
 EAPI void
@@ -832,18 +779,6 @@ elm_menu_item_icon_name_set(Elm_Object_Item *it, const char *icon)
      edje_object_signal_emit(VIEW(item), "elm,state,icon,hidden", "elm");
    edje_object_message_signal_process(VIEW(item));
    _sizing_eval(WIDGET(item));
-}
-
-EAPI void
-elm_menu_item_disabled_set(Elm_Object_Item *it, Eina_Bool disabled)
-{
-   elm_object_item_disabled_set(it, disabled);
-}
-
-EAPI Eina_Bool
-elm_menu_item_disabled_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_disabled_get(it);
 }
 
 EAPI Elm_Object_Item *
@@ -889,25 +824,6 @@ elm_menu_item_separator_add(Evas_Object *obj, Elm_Object_Item *parent)
    return (Elm_Object_Item *) subitem;
 }
 
-EAPI Eina_Bool
-elm_menu_item_object_content_set(Elm_Object_Item *it, Evas_Object *obj)
-{
-   _item_content_set_hook(it, NULL, obj);
-   return EINA_TRUE;
-}
-
-EAPI Evas_Object *
-elm_menu_item_object_content_get(const Elm_Object_Item *it)
-{
-   return _item_content_get_hook(it, NULL);
-}
-
-EINA_DEPRECATED EAPI const char *
-elm_menu_item_object_icon_name_get(const Elm_Object_Item *it)
-{
-   return elm_menu_item_icon_name_get(it);
-}
-
 EAPI const char *
 elm_menu_item_icon_name_get(const Elm_Object_Item *it)
 {
@@ -920,30 +836,6 @@ elm_menu_item_is_separator(Elm_Object_Item *it)
 {
    ELM_OBJ_ITEM_CHECK_OR_RETURN(it, EINA_FALSE);
    return ((Elm_Menu_Item *)it)->separator;
-}
-
-EAPI void
-elm_menu_item_del(Elm_Object_Item *it)
-{
-   elm_object_item_del(it);
-}
-
-EAPI void
-elm_menu_item_del_cb_set(Elm_Object_Item *it, Evas_Smart_Cb func)
-{
-   elm_object_item_del_cb_set(it, func);
-}
-
-EAPI void *
-elm_menu_item_data_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_data_get(it);
-}
-
-EAPI void
-elm_menu_item_data_set(Elm_Object_Item *it, const void *data)
-{
-   elm_object_item_data_set(it, (void *) data);
 }
 
 EAPI const Eina_List *
@@ -1039,12 +931,6 @@ elm_menu_item_next_get(const Elm_Object_Item *it)
         return l->data;
      }
    return NULL;
-}
-
-EINA_DEPRECATED EAPI Evas_Object *
-elm_menu_item_menu_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_widget_get(it);
 }
 
 EAPI Elm_Object_Item *

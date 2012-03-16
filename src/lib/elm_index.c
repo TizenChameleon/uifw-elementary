@@ -647,18 +647,6 @@ elm_index_add(Evas_Object *parent)
    return obj;
 }
 
-EINA_DEPRECATED EAPI void
-elm_index_active_set(Evas_Object *obj, Eina_Bool active)
-{
-   elm_index_autohide_disabled_set(obj, !active);
-}
-
-EINA_DEPRECATED EAPI Eina_Bool
-elm_index_active_get(const Evas_Object *obj)
-{
-   return !elm_index_autohide_disabled_get(obj);
-}
-
 EAPI void
 elm_index_autohide_disabled_set(Evas_Object *obj, Eina_Bool disabled)
 {
@@ -729,12 +717,6 @@ elm_index_item_selected_set(Elm_Object_Item *it, Eina_Bool selected)
 
 }
 
-EINA_DEPRECATED EAPI Elm_Object_Item *
-elm_index_item_selected_get(const Evas_Object *obj, int level)
-{
-   return elm_index_selected_item_get(obj, level);
-}
-
 EAPI Elm_Object_Item *
 elm_index_selected_item_get(const Evas_Object *obj, int level)
 {
@@ -778,12 +760,6 @@ elm_index_item_prepend(Evas_Object *obj, const char *letter, Evas_Smart_Cb func,
    wd->items = eina_list_prepend(wd->items, it);
    _index_box_clear(obj, wd->bx[wd->level], wd->level);
    return (Elm_Object_Item *)it;
-}
-
-EINA_DEPRECATED EAPI Elm_Object_Item *
-elm_index_item_append_relative(Evas_Object *obj, const char *letter, const void *item, const Elm_Object_Item *relative)
-{
-   return elm_index_item_insert_after(obj, (Elm_Object_Item *) relative, letter, NULL, item);
 }
 
 EINA_DEPRECATED EAPI Elm_Object_Item *
@@ -861,12 +837,6 @@ elm_index_item_sorted_insert(Evas_Object *obj, const char *letter, Evas_Smart_Cb
    return (Elm_Object_Item *)it;
 }
 
-EAPI void
-elm_index_item_del(Evas_Object *obj __UNUSED__, Elm_Object_Item *it)
-{
-   elm_object_item_del(it);
-}
-
 EAPI Elm_Object_Item *
 elm_index_item_find(Evas_Object *obj, const void *data)
 {
@@ -897,12 +867,6 @@ elm_index_item_clear(Evas_Object *obj)
      }
 }
 
-EINA_DEPRECATED EAPI void
-elm_index_item_go(Evas_Object *obj, int level __UNUSED__)
-{
-   elm_index_level_go(obj, level);
-}
-
 EAPI void
 elm_index_level_go(Evas_Object *obj, int level __UNUSED__)
 {
@@ -911,18 +875,6 @@ elm_index_level_go(Evas_Object *obj, int level __UNUSED__)
    if (!wd) return;
    _index_box_auto_fill(obj, wd->bx[0], 0);
    if (wd->level == 1) _index_box_auto_fill(obj, wd->bx[1], 1);
-}
-
-EAPI void *
-elm_index_item_data_get(const Elm_Object_Item *it)
-{
-   return elm_object_item_data_get(it);
-}
-
-EAPI void
-elm_index_item_data_set(Elm_Object_Item *it, const void *data)
-{
-   elm_object_item_data_set(it, (void *) data);
 }
 
 EAPI void
@@ -950,12 +902,6 @@ elm_index_indicator_disabled_get(const Evas_Object *obj)
    if (!wd) return EINA_FALSE;
 
    return wd->indicator_disabled;
-}
-
-EAPI void
-elm_index_item_del_cb_set(Elm_Object_Item *it, Evas_Smart_Cb func)
-{
-   elm_object_item_del_cb_set(it, func);
 }
 
 EAPI const char *
