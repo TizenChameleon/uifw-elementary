@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.69448slp2+build02) unstable; urgency=low
+
+  * Package Upload
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.69448slp2+build02
+
+ -- Jeonghyun Yun <jh0506.yun@samsung.com>  Sun, 18 Mar 2012 15:08:01 +0900
+
 elementary (1.0.0+svn.69448slp2+build01) unstable; urgency=low
 
   * EFL migration
