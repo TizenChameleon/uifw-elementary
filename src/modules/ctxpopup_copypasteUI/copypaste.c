@@ -349,7 +349,7 @@ obj_longpress(Evas_Object *obj)
         if(top)
           {
              ext_mod->popup = elm_ctxpopup_add(top);
-             elm_object_tree_unfocusable_set(ext_mod->popup, EINA_TRUE);
+             elm_object_focus_allow_set(ext_mod->popup, EINA_FALSE);
              evas_object_smart_callback_add(ext_mod->popup, "dismissed", _ctxpopup_dismissed_cb, NULL);
           }
         /*currently below theme not used,when guideline comes a new theme can be created if required*/
