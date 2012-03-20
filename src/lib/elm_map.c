@@ -641,7 +641,6 @@ static void
 _coord_to_region_convert(Widget_Data *wd, Evas_Coord x, Evas_Coord y, Evas_Coord size, double *lon, double *lat)
 {
    EINA_SAFETY_ON_NULL_RETURN(wd);
-
    int zoom = floor(log(size / wd->size.tile) / log(2));
    if ((wd->src_tile) && (wd->src_tile->coord_to_geo))
      {
@@ -1009,24 +1008,6 @@ _marker_group_create(Widget_Data *wd)
 }
 
 static void
-_marker_bringin_cb(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *soure __UNUSED__)
-{
-   Elm_Map_Marker *marker = data;
-   EINA_SAFETY_ON_NULL_RETURN(marker);
-   elm_map_region_bring_in(marker->wd->obj, marker->longitude, marker->latitude);
-}
-
-static void
-_marker_bubble_open_cb(void *data, Evas_Object *obj __UNUSED__, const char *emission __UNUSED__, const char *soure __UNUSED__)
-{
-   EINA_SAFETY_ON_NULL_RETURN(data);
-   Elm_Map_Marker *marker = data;
-
-   if (!marker->bubble) marker->bubble = _bubble_create(marker->obj, marker->wd);
-   evas_object_smart_changed(marker->wd->pan_smart);
-}
-
-static void
 _marker_update(Elm_Map_Marker *marker)
 {
    EINA_SAFETY_ON_NULL_RETURN(marker);
@@ -1352,7 +1333,7 @@ _download_job(void *data)
 
    EINA_LIST_REVERSE_FOREACH_SAFE(wd->download_list, l, ll, gi)
      {
-        if (gi->g->zoom != wd->zoom || !_grid_item_in_viewport(gi))
+        if ((gi->g->zoom != wd->zoom) || !(_grid_item_in_viewport(gi)))
           {
              wd->download_list = eina_list_remove(wd->download_list, gi);
              continue;
@@ -1630,26 +1611,25 @@ zoom_do(Widget_Data *wd, double zoom)
    // Fix to zooming with (viewport center vx, vy) as the center to prevent
    // from zooming with (0,0) as the cetner. (scroller default behavior)
    _viewport_coord_get(wd, &vx, &vy, &vw, &vh);
-
    if ((vw > 0) && (vh > 0) && (ow > 0) && (oh > 0))
      {
-        Evas_Coord xx, yy;
+        Evas_Coord x, y;
         double sx, sy;
         if (vw > ow) sx = 0.5;
-        else         sx = (double)(vx + (vw / 2)) / ow;
+        else         sx = (double)(vx + (double)(vw / 2)) / ow;
         if (vh > oh) sy = 0.5;
-        else         sy = (double)(vy + (vh / 2)) / oh;
+        else         sy = (double)(vy + (double)(vh / 2)) / oh;
 
         if (sx > 1.0) sx = 1.0;
         if (sy > 1.0) sy = 1.0;
 
-        xx = (sx * wd->size.w) - (vw / 2);
-        yy = (sy * wd->size.h) - (vh / 2);
-        if (xx < 0) xx = 0;
-        else if (xx > (wd->size.w - vw)) xx = wd->size.w - vw;
-        if (yy < 0) yy = 0;
-        else if (yy > (wd->size.h - vh)) yy = wd->size.h - vh;
-        elm_smart_scroller_child_region_show(wd->scr, xx, yy, vw, vh);
+        x = ceil((sx * wd->size.w) - (vw / 2));
+        y = ceil((sy * wd->size.h) - (vh / 2));
+        if (x < 0) x = 0;
+        else if (x > (wd->size.w - vw)) x = wd->size.w - vw;
+        if (y < 0) y = 0;
+        else if (y > (wd->size.h - vh)) y = wd->size.h - vh;
+        elm_smart_scroller_child_region_show(wd->scr, x, y, vw, vh);
      }
    if (wd->zoom_timer) ecore_timer_del(wd->zoom_timer);
    else evas_object_smart_callback_call(wd->obj, SIG_ZOOM_START, NULL);
@@ -3706,45 +3686,6 @@ _region_bring_in(void *data)
    x = x - (w / 2);
    y = y - (h / 2);
    elm_smart_scroller_region_bring_in(dd->wd->scr, x, y, w, h);
-   evas_object_smart_changed(dd->wd->pan_smart);
-}
-
-static void
-_marker_list_show(void *data)
-{
-   EINA_SAFETY_ON_NULL_RETURN(data);
-   Delayed_Data *dd = data;
-   int zoom;
-   double max_lon = -180, min_lon = 180;
-   double max_lat = -90, min_lat = 90;
-   Evas_Coord vw, vh;
-   Elm_Map_Marker *marker;
-
-   EINA_LIST_FREE(dd->markers, marker)
-     {
-        if (marker->longitude > max_lon) max_lon = marker->longitude;
-        if (marker->longitude < min_lon) min_lon = marker->longitude;
-        if (marker->latitude > max_lat) max_lat = marker->latitude;
-        if (marker->latitude < min_lat) min_lat = marker->latitude;
-     }
-   dd->lon = (max_lon + min_lon) / 2;
-   dd->lat = (max_lat + min_lat) / 2;
-
-   zoom = dd->wd->src_tile->zoom_min;
-   _viewport_coord_get(dd->wd, NULL, NULL, &vw, &vh);
-   while (zoom <= dd->wd->src_tile->zoom_max)
-     {
-        Evas_Coord size, max_x, max_y, min_x, min_y;
-        size = pow(2.0, zoom) * dd->wd->tsize;
-        _region_to_coord_convert(dd->wd, min_lon, max_lat, size, &min_x, &max_y);
-        _region_to_coord_convert(dd->wd, max_lon, min_lat, size, &max_x, &min_y);
-        if ((max_x - min_x) > vw || (max_y - min_y) > vh) break;
-        zoom++;
-     }
-   zoom--;
-
-   zoom_do(dd->wd, zoom);
-   _region_show(dd);
    evas_object_smart_changed(dd->wd->pan_smart);
 }
 
