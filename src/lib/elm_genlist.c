@@ -5718,7 +5718,6 @@ elm_genlist_homogeneous_set(Evas_Object *obj,
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
-   if (homogeneous) elm_genlist_mode_set(obj, ELM_LIST_COMPRESS);
    wd->homogeneous = !!homogeneous;
 }
 
