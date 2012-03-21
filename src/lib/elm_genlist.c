@@ -4043,7 +4043,6 @@ _item_del_pre_hook(Elm_Object_Item *it)
 
    if ((_it->relcount > 0) || (_it->walking > 0))
      {
-        if (!_it->item->block && (_it->relcount == 1)) goto del;
         elm_genlist_item_subitems_clear(it);
         if (_it->wd->show_item == _it) _it->wd->show_item = NULL;
         _elm_genlist_item_del_notserious(_it);
@@ -4062,7 +4061,6 @@ _item_del_pre_hook(Elm_Object_Item *it)
           }
         return EINA_FALSE;
      }
-del:
    _item_del(_it);
    return EINA_TRUE;
 }
@@ -6255,23 +6253,8 @@ _elm_genlist_item_del_notserious(Elm_Gen_Item *it)
    elm_widget_item_pre_notify_del(it);
    it->generation = it->wd->generation - 1; /* This means that the item is deleted */
 
-   if ((it->relcount > 0) || (it->walking > 0))
-     {
-        if (!it->item->block && (it->relcount == 1))
-          {
-             if (it->item->rel && it->item->rel->item)
-               {
-                  it->item->rel->relcount--;
-                  if ((it->item->rel->generation < it->wd->generation) && (!it->item->rel->relcount))
-                    {
-                       _item_del(it->item->rel);
-                       elm_widget_item_free(it->item->rel);
-                    }
-                  it->item->rel = NULL;
-               }
-          }
-        else return;
-     }
+   if ((it->relcount > 0) || (it->walking > 0)) return;
+
    if (it->selected) it->wd->selected = eina_list_remove(it->wd->selected, it);
 
    if (it->itc->func.del)
