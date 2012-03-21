@@ -250,6 +250,7 @@ field_create(Elm_Datetime_Module_Data *module_data, Elm_Datetime_Field_Type  fie
    if (field_type == ELM_DATETIME_AMPM)
      {
         field_obj = elm_button_add(ctx_mod->mod_data.base);
+        elm_object_style_set(field_obj, "datetime_ampm/default");
         evas_object_smart_callback_add(field_obj, "clicked", _ampm_clicked_cb, ctx_mod);
      }
    else

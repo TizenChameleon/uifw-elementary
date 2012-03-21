@@ -1,5 +1,6 @@
 group { name: "elm/button/base/default";
    alias: "elm/button/base/popup_button/default";
+   alias: "elm/button/base/datetime_ampm/default";
    images {
       image: "bt_base1.png" COMP;
       image: "bt_base2.png" COMP;
