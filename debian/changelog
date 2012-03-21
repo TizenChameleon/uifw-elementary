@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.69448slp2+build03) unstable; urgency=low
+
+  * [*][edje_external] Removed toggle from modules.inc
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.69448slp2+build03
+
+ -- Daniel Juyung Seo <juyung.seo@samsung.com>  Wed, 21 Mar 2012 12:59:58 +0900
+
 elementary (1.0.0+svn.69448slp2+build02) unstable; urgency=low
 
   * Package Upload
