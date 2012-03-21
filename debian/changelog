@@ -1,6 +1,14 @@
+elementary (1.0.0+svn.69448slp2+build04) unstable; urgency=low
+
+  * Package Upload
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.69448slp2+build04
+
+ -- WooHyun Jung <wh0705.jung@samsung.com>  Wed, 21 Mar 2012 20:38:20 +0900
+
 elementary (1.0.0+svn.69448slp2+build03) unstable; urgency=low
 
-  * [*][edje_external] Removed toggle from modules.inc
+  *    [edje_external] Removed toggle from modules.inc
   * Git: slp/pkgs/e/elementary
   * Tag: elementary_1.0.0+svn.69448slp2+build03
 
