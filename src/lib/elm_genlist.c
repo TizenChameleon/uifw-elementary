@@ -1513,6 +1513,41 @@ _mouse_up(void        *data,
 }
 
 static void
+_item_mouse_callbacks_add(Elm_Gen_Item *it, Evas_Object *view)
+{
+   evas_object_event_callback_add(view, EVAS_CALLBACK_MOUSE_DOWN,
+                                  _mouse_down, it);
+   evas_object_event_callback_add(view, EVAS_CALLBACK_MOUSE_UP,
+                                  _mouse_up, it);
+   evas_object_event_callback_add(view, EVAS_CALLBACK_MOUSE_MOVE,
+                                  _mouse_move, it);
+   evas_object_event_callback_add(view, EVAS_CALLBACK_MULTI_DOWN,
+                                  _multi_down, it);
+   evas_object_event_callback_add(view, EVAS_CALLBACK_MULTI_UP,
+                                  _multi_up, it);
+   evas_object_event_callback_add(view, EVAS_CALLBACK_MULTI_MOVE,
+                                  _multi_move, it);
+}
+
+static void
+_item_mouse_callbacks_del(Elm_Gen_Item *it, Evas_Object *view)
+{
+   evas_object_event_callback_del_full(view, EVAS_CALLBACK_MOUSE_DOWN,
+                                       _mouse_down, it);
+   evas_object_event_callback_del_full(view, EVAS_CALLBACK_MOUSE_UP,
+                                       _mouse_up, it);
+   evas_object_event_callback_del_full(view, EVAS_CALLBACK_MOUSE_MOVE,
+                                       _mouse_move, it);
+   evas_object_event_callback_del_full(view, EVAS_CALLBACK_MULTI_DOWN,
+                                       _multi_down, it);
+   evas_object_event_callback_del_full(view, EVAS_CALLBACK_MULTI_UP,
+                                       _multi_up, it);
+   evas_object_event_callback_del_full(view, EVAS_CALLBACK_MULTI_MOVE,
+                                       _multi_move, it);
+}
+
+
+static void
 _mouse_down_scroller(void        *data,
                      Evas        *evas __UNUSED__,
                      Evas_Object *obj __UNUSED__,
@@ -1910,11 +1945,13 @@ _item_mode_content_realize(Elm_Gen_Item *it,
      {
         const Eina_List *l;
         const char *key;
+        Eina_List *cons = NULL;
 
-        *source = elm_widget_stringlist_get(edje_object_data_get(target, contents_part));
+        cons = elm_widget_stringlist_get(edje_object_data_get(target, contents_part));
+
         if (parts && (eina_list_count(*source) != eina_list_count(*contents_list)))
              res = *contents_list;
-        EINA_LIST_FOREACH(*source, l, key)
+        EINA_LIST_FOREACH(cons, l, key)
           {
              if (parts && fnmatch(parts, key, FNM_PERIOD))
                continue;
@@ -1942,6 +1979,7 @@ _item_mode_content_realize(Elm_Gen_Item *it,
                     }
                }
           }
+        *source = eina_list_merge(*source, cons);
      }
 
    return res;
@@ -1963,7 +2001,6 @@ _item_mode_content_unrealize(Elm_Gen_Item *it,
         const char *key;
         Evas_Object *ic = NULL;
 
-        *source = elm_widget_stringlist_get(edje_object_data_get(target, contents_part));
         EINA_LIST_FOREACH(*source, l, key)
           {
              if (parts && fnmatch(parts, key, FNM_PERIOD))
@@ -2069,13 +2106,14 @@ _item_content_realize(Elm_Gen_Item *it,
         const Eina_List *l;
         const char *key;
         Evas_Object *ic = NULL;
+        Eina_List *cons = NULL;
 
-        *source = elm_widget_stringlist_get(edje_object_data_get(target, "contents"));
+        cons = elm_widget_stringlist_get(edje_object_data_get(target, "contents"));
 
         if (parts && (eina_list_count(*source) != eina_list_count(it->content_objs)))
           res = it->content_objs;
 
-        EINA_LIST_FOREACH(*source, l, key)
+        EINA_LIST_FOREACH(cons, l, key)
           {
              if (parts && fnmatch(parts, key, FNM_PERIOD))
                continue;
@@ -2104,6 +2142,7 @@ _item_content_realize(Elm_Gen_Item *it,
                     elm_widget_disabled_set(ic, EINA_TRUE);
                }
           }
+        *source = eina_list_merge(*source, cons);
      }
 
    return res;
@@ -2156,10 +2195,11 @@ _item_flips_realize(Elm_Gen_Item *it,
         const Eina_List *l;
         const char *key;
         Evas_Object *ic = NULL;
+        Eina_List *cons = NULL;
 
-        *source = elm_widget_stringlist_get(edje_object_data_get(target, "flips"));
+        cons = elm_widget_stringlist_get(edje_object_data_get(target, "flips"));
 
-        EINA_LIST_FOREACH(*source, l, key)
+        EINA_LIST_FOREACH(cons, l, key)
           {
              if (it->itc->func.content_get)
                ic = it->itc->func.content_get
@@ -2178,6 +2218,7 @@ _item_flips_realize(Elm_Gen_Item *it,
                     elm_widget_disabled_set(ic, EINA_TRUE);
                }
           }
+        *source = eina_list_merge(*source, cons);
      }
 
    return res;
@@ -2273,18 +2314,7 @@ _item_realize(Elm_Gen_Item *it,
                                         "elm", _signal_expand, it);
         edje_object_signal_callback_add(VIEW(it), "elm,action,contract",
                                         "elm", _signal_contract, it);
-        evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_DOWN,
-                                       _mouse_down, it);
-        evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_UP,
-                                       _mouse_up, it);
-        evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_MOVE,
-                                       _mouse_move, it);
-        evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_DOWN,
-                                       _multi_down, it);
-        evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_UP,
-                                       _multi_up, it);
-        evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_MOVE,
-                                       _multi_move, it);
+        _item_mouse_callbacks_add(it, VIEW(it));
 
         if ((it->wd->decorate_mode) && (!it->edit_obj) &&
             (it->item->type != ELM_GENLIST_ITEM_GROUP) && (it->itc->decorate_all_item_style))
@@ -3702,31 +3732,8 @@ _decorate_mode_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
    if (effect_on) edje_object_signal_emit(it->edit_obj, "elm,state,decorate,enabled,effect", "elm");
    else edje_object_signal_emit(it->edit_obj, "elm,state,decorate,enabled", "elm");
 
-   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MOUSE_DOWN,
-                                       _mouse_down, it);
-   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MOUSE_UP,
-                                       _mouse_up, it);
-   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MOUSE_MOVE,
-                                       _mouse_move, it);
-   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MULTI_DOWN,
-                                       _multi_down, it);
-   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MULTI_UP,
-                                       _multi_up, it);
-   evas_object_event_callback_del_full(VIEW(it), EVAS_CALLBACK_MULTI_MOVE,
-                                       _multi_move, it);
-
-   evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
-                                  _mouse_down, it);
-   evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_UP,
-                                  _mouse_up, it);
-   evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MOUSE_MOVE,
-                                  _mouse_move, it);
-   evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MULTI_DOWN,
-                                  _multi_down, it);
-   evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MULTI_UP,
-                                  _multi_up, it);
-   evas_object_event_callback_add(it->edit_obj, EVAS_CALLBACK_MULTI_MOVE,
-                                  _multi_move, it);
+   _item_mouse_callbacks_del(it, VIEW(it));
+   _item_mouse_callbacks_add(it, it->edit_obj);
 
    _item_text_realize(it, it->edit_obj, &it->item->edit_texts, NULL);
    if (it->flipped) edje_object_signal_emit(it->edit_obj, "elm,state,flip,enabled", "elm");
@@ -3767,32 +3774,8 @@ _decorate_mode_item_unrealize(Elm_Gen_Item *it)
    EINA_LIST_FREE(it->item->edit_content_objs, icon)
      evas_object_del(icon);
    edje_object_message_signal_process(it->edit_obj);
-
-   evas_object_event_callback_del_full(it->edit_obj, EVAS_CALLBACK_MOUSE_DOWN,
-                                       _mouse_down, it);
-   evas_object_event_callback_del_full(it->edit_obj, EVAS_CALLBACK_MOUSE_UP,
-                                       _mouse_up, it);
-   evas_object_event_callback_del_full(it->edit_obj, EVAS_CALLBACK_MOUSE_MOVE,
-                                       _mouse_move, it);
-   evas_object_event_callback_del_full(it->edit_obj, EVAS_CALLBACK_MULTI_DOWN,
-                                       _multi_down, it);
-   evas_object_event_callback_del_full(it->edit_obj, EVAS_CALLBACK_MULTI_UP,
-                                       _multi_up, it);
-   evas_object_event_callback_del_full(it->edit_obj, EVAS_CALLBACK_MULTI_MOVE,
-                                       _multi_move, it);
-
-   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_DOWN,
-                                  _mouse_down, it);
-   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_UP,
-                                  _mouse_up, it);
-   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MOUSE_MOVE,
-                                  _mouse_move, it);
-   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_DOWN,
-                                  _multi_down, it);
-   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_UP,
-                                  _multi_up, it);
-   evas_object_event_callback_add(VIEW(it), EVAS_CALLBACK_MULTI_MOVE,
-                                  _multi_move, it);
+   _item_mouse_callbacks_del(it, it->edit_obj);
+   _item_mouse_callbacks_add(it, VIEW(it));
 
    it->item->decorate_mode_item_realized = EINA_FALSE;
 }
