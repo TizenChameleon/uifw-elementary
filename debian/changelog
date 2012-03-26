@@ -1,3 +1,11 @@
+elementary (1.0.0+svn.69448slp2+build05) unstable; urgency=low
+
+  * Merge elm_map from upstream
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.69448slp2+build05
+
+ -- Tae-Hwan Kim <the81.kim@samsung.com>  Mon, 26 Mar 2012 14:39:09 +0900
+
 elementary (1.0.0+svn.69448slp2+build04) unstable; urgency=low
 
   * Package Upload
