@@ -444,7 +444,24 @@ static void
 _del_pre_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
+   const Eina_List *l;
+   Elm_List_Item *it;
+
+   evas_object_smart_callback_del(obj, "sub-object-del", _sub_del);
+
    if (!wd) return;
+
+   EINA_LIST_FOREACH(wd->items, l, it)
+     {
+        if (it->icon)
+           evas_object_event_callback_del(it->icon,
+                                          EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                          _changed_size_hints);
+        if (it->end)
+           evas_object_event_callback_del(it->end,
+                                          EVAS_CALLBACK_CHANGED_SIZE_HINTS,
+                                          _changed_size_hints);
+     }
 
    evas_object_event_callback_del(wd->scr,
                                   EVAS_CALLBACK_CHANGED_SIZE_HINTS,
@@ -1042,15 +1059,15 @@ _item_content_set(Elm_Object_Item *it, const char *part, Evas_Object *content)
      {
         icon_p = &(item->icon);
         dummy = item->dummy_icon;
-        if (!content) item->dummy_icon = EINA_FALSE;
-        else item->dummy_icon = EINA_TRUE;
+        if (!content) item->dummy_icon = EINA_TRUE;
+        else item->dummy_icon = EINA_FALSE;
      }
    else if (!strcmp(part, "end"))
      {
         icon_p = &(item->end);
         dummy = item->dummy_end;
-        if (!content) item->dummy_end = EINA_FALSE;
-        else item->dummy_end = EINA_TRUE;
+        if (!content) item->dummy_end = EINA_TRUE;
+        else item->dummy_end = EINA_FALSE;
      }
    else
      return;
