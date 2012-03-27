@@ -343,6 +343,9 @@ _set_vis_guidetext(Evas_Object *obj)
    elm_box_unpack(wd->box, wd->entry);
    if (wd->view_state == MULTIBUTTONENTRY_VIEW_SHRINK) return;
 
+   if(!wd->focused)
+     elm_object_focus_set(wd->entry, EINA_FALSE);
+
    if (wd && (!eina_list_count(wd->items)) && wd->guidetext
        && (!elm_widget_focus_get(obj)) && (!wd->focused) && (!wd->n_str))
      {
@@ -793,7 +796,8 @@ _resize_button(Evas_Object *btn, Evas_Coord *realw, Evas_Coord *vieww)
    edje_object_part_geometry_get(btn, "elm.base", NULL, NULL, NULL, &h_btn);
    edje_object_part_geometry_get(btn, "elm.btn.text", NULL, NULL, &w_text, NULL);
    edje_object_part_geometry_get(btn, "right.padding", NULL, NULL, &padding_outer, NULL);
-   w_btn = w_text + 2*padding_outer;
+   w_btn = w_text + (2 * padding_outer);
+
    rw = w_btn;
 
    if (button_max_width < w_btn)
