@@ -813,31 +813,46 @@ notify_handler_text(Cnp_Selection *sel, Ecore_X_Event_Selection_Notify *notify)
 {
    Ecore_X_Selection_Data *data;
    char *str;
+   char *mkupstr;
 
    data = notify->data;
+   str = malloc(sizeof(char) * (data->length + 1));
+   if (str)
+     {
+        strncpy(str, (char *)data->data, data->length);
+        str[data->length] = '\0';
+     }
+   else
+     str = data->data;
 
    if (sel->datacb)
      {
         Elm_Selection_Data ddata;
-        str = malloc(sizeof(char) * (data->length + 1));
-        strncpy(str, (char *)data->data, data->length);
-        str[data->length] = '\0';
 
         ddata.x = ddata.y = 0;
         ddata.format = ELM_SEL_FORMAT_TEXT;
         ddata.data = str;
         ddata.len = data->length;
         sel->datacb(sel->udata, sel->widget, &ddata);
-        free(str);
-        return 0;
+     }
+   else
+     {
+        cnp_debug("Notify handler text %d %d %p\n", data->format, data->length, data->data);
+        mkupstr = _elm_util_text_to_mkup((const char *) str);
+        if (mkupstr)
+          {
+             entry_insert_filter(sel->requestwidget, mkupstr);
+             free(mkupstr);
+          }
+        else
+          entry_insert_filter(sel->requestwidget, str);
+
+        cnp_debug("String is %s (from %s)\n", str, data->data);
+        //_elm_entry_entry_paste(sel->requestwidget, str);
      }
 
-   cnp_debug("Notify handler text %d %d %p\n", data->format,data->length, data->data);
-   str = _elm_util_text_to_mkup((const char *) data->data);
-   cnp_debug("String is %s (from %s)\n", str, data->data);
-   entry_insert_filter(sel->requestwidget, str);
-   //_elm_entry_entry_paste(sel->requestwidget, str);
-   free(str);
+   if (str != data->data)
+     free(str);
    return 0;
 }
 
