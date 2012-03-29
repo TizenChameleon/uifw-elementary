@@ -28,6 +28,9 @@ struct _Elm_Entry_Context_Menu_Item
    void *data;
 };
 
+static void _ctxpopup_hide(Evas_Object *popup);
+static void _ctxpopup_position(Evas_Object *obj);
+
 static char *
 _remove_tags(const char *str)
 {
@@ -72,22 +75,41 @@ _remove_tags(const char *str)
    return ret;
 }
 
-static void _ctxpopup_hide(Evas_Object *popup);
-static void _ctxpopup_position(Evas_Object *obj);
 static void
-_entry_move(void *data, Evas *e, Evas_Object *obj, void *event_info)
+_entry_del_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   evas_object_del(data);
+}
+
+static void
+_entry_hide_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   evas_object_hide(data);
+}
+
+static void
+_entry_move_cb(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    if (evas_pointer_button_down_mask_get(e))
-     _ctxpopup_hide(ext_mod->popup);
+     _ctxpopup_hide(data);
    else
      _ctxpopup_position(data);
+}
+
+static void
+_entry_resize_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   _ctxpopup_hide(data);
 }
 
 static void
 _ctxpopup_hide(Evas_Object *popup)
 {
    evas_object_hide(popup);
-   evas_object_event_callback_del(ext_mod->caller, EVAS_CALLBACK_MOVE, _entry_move);
+   evas_object_event_callback_del(ext_mod->caller, EVAS_CALLBACK_DEL, _entry_del_cb);
+   evas_object_event_callback_del(ext_mod->caller, EVAS_CALLBACK_HIDE, _entry_hide_cb);
+   evas_object_event_callback_del(ext_mod->caller, EVAS_CALLBACK_MOVE, _entry_move_cb);
+   evas_object_event_callback_del(ext_mod->caller, EVAS_CALLBACK_RESIZE, _entry_resize_cb);
    ext_mod->caller = NULL;
 }
 
@@ -351,6 +373,8 @@ obj_longpress(Evas_Object *obj)
              ext_mod->popup = elm_ctxpopup_add(top);
              elm_object_focus_allow_set(ext_mod->popup, EINA_FALSE);
              evas_object_smart_callback_add(ext_mod->popup, "dismissed", _ctxpopup_dismissed_cb, NULL);
+             evas_object_event_callback_add(obj, EVAS_CALLBACK_DEL, _entry_del_cb, ext_mod->popup);
+             evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _entry_hide_cb, ext_mod->popup);
           }
         /*currently below theme not used,when guideline comes a new theme can be created if required*/
         elm_object_style_set(ext_mod->popup,"extended/entry");
@@ -360,7 +384,6 @@ obj_longpress(Evas_Object *obj)
             (!strcmp(context_menu_orientation, "horizontal")))
           elm_ctxpopup_horizontal_set(ext_mod->popup, EINA_TRUE);
 
-        elm_widget_sub_object_add(obj, ext_mod->popup);
         if (!ext_mod->selmode)
           {
              if (!ext_mod->password)
@@ -459,7 +482,8 @@ obj_longpress(Evas_Object *obj)
              _ctxpopup_position(obj);
              evas_object_show(ext_mod->popup);
              ext_mod->caller = obj;
-             evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _entry_move, ext_mod->popup);
+             evas_object_event_callback_add(obj, EVAS_CALLBACK_MOVE, _entry_move_cb, ext_mod->popup);
+             evas_object_event_callback_add(obj, EVAS_CALLBACK_RESIZE, _entry_resize_cb, ext_mod->popup);
           }
         else
           ext_mod->caller = NULL;
