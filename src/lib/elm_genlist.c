@@ -1960,7 +1960,7 @@ _item_mode_content_realize(Elm_Gen_Item *it,
         cons = elm_widget_stringlist_get(edje_object_data_get(target, contents_part));
 
         if (parts && (eina_list_count(*source) != eina_list_count(*contents_list)))
-             res = *contents_list;
+          res = *contents_list;
         EINA_LIST_FOREACH(cons, l, key)
           {
              if (parts && fnmatch(parts, key, FNM_PERIOD))
@@ -2198,7 +2198,7 @@ _item_flips_realize(Elm_Gen_Item *it,
                     Evas_Object *target,
                     Eina_List **source)
 {
-   Eina_List *res = NULL;
+   Eina_List *res = it->content_objs;
 
    if (it->itc->func.content_get)
      {
@@ -3623,6 +3623,11 @@ _mode_item_realize(Elm_Gen_Item *it)
    it->item->mode_content_objs =
      _item_content_realize(it, it->item->mode_view,
                            &it->item->mode_contents, NULL);
+   /* FIXME : above calling is changed to like below
+     _item_mode_content_realize(it, it->item->mode_view,
+                                &it->item->mode_contents, NULL,
+                                &it->item->mode_content_objs, "contents");
+   */
    _item_state_realize(it, it->item->mode_view, &it->item->mode_states, NULL);
 
    edje_object_part_swallow(it->item->mode_view,
