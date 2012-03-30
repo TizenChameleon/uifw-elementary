@@ -3,8 +3,8 @@ Name:       elementary
 Summary:    EFL toolkit for small touchscreens
 Version:    1.0.0+svn.69448slp2+build05
 Release:    1
-Group:      TO_BE/FILLED_IN
-License:    TO_BE/FILLED_IN
+Group:      System/Libraries
+License:    LGPLv2.1
 URL:        http://trac.enlightenment.org/e/wiki/Elementary
 Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
