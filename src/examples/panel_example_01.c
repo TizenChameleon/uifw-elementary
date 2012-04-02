@@ -1,10 +1,7 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` panel_example_01.c -o panel_example_01
+//gcc -g panel_example_01.c -o panel_example_01 `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 
 EAPI_MAIN int
 elm_main(int argc, char **argv)
@@ -71,6 +68,7 @@ elm_main(int argc, char **argv)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }

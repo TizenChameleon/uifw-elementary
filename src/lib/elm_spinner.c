@@ -211,6 +211,7 @@ _write_label(Evas_Object *obj)
    Elm_Spinner_Special_Value *sv;
    Widget_Data *wd = elm_widget_data_get(obj);
    char buf[1024];
+
    if (!wd) return;
    EINA_LIST_FOREACH(wd->special_values, l, sv)
      {

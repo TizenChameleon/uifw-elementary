@@ -1,16 +1,12 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` separator_example_01.c -o separator_example_01
+//gcc -g separator_example_01.c -o separator_example_01 `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 
 EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *bx, *rect, *separator;
-   char buf[256];
 
    win = elm_win_add(NULL, "separator", ELM_WIN_BASIC);
    elm_win_title_set(win, "Separator");
@@ -52,6 +48,7 @@ elm_main(int argc, char **argv)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }

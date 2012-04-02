@@ -1,10 +1,7 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` hoversel_example_01.c -o hoversel_example_01
+//gcc -o hoversel_example_01 hoversel_example_01.c -g `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 
 static void _print_items(void *data, Evas_Object *obj, void *event_info);
 static void _rm_items(void *data, Evas_Object *obj, void *event_info);
@@ -54,6 +51,7 @@ elm_main(int argc, char **argv)
 
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
@@ -73,14 +71,14 @@ _print_items(void *data, Evas_Object *obj, void *event_info)
 static void
 _rm_items(void *data, Evas_Object *obj, void *event_info)
 {
-   if(!elm_hoversel_expanded_get(obj))
+   if (!elm_hoversel_expanded_get(obj))
      elm_hoversel_clear(obj);
 }
 
 static void
 _sel(void *data, Evas_Object *obj, void *event_info)
 {
-   if(!elm_hoversel_expanded_get(obj) && event_info != data)
+   if (!elm_hoversel_expanded_get(obj) && event_info != data)
      elm_object_item_del(event_info);
 }
 

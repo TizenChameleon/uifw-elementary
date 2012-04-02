@@ -33,10 +33,11 @@ struct _Widget_Data
    double timeout;
    Eina_Bool loop:1;
 
-   struct {
+   struct
+     {
         const char *current;
         Eina_List *list; //list of const char *
-   } layout;
+     } layout;
 };
 
 static const char *widtype = NULL;
@@ -493,6 +494,7 @@ elm_slideshow_item_show(Elm_Object_Item *it)
    _end(WIDGET(item), WIDGET(item), NULL, NULL);
 
    if (wd->timer) ecore_timer_del(wd->timer);
+   wd->timer = NULL;
    if (wd->timeout > 0.0)
      wd->timer = ecore_timer_add(wd->timeout, _timer_cb, WIDGET(item));
    _item_realize(next);
@@ -522,6 +524,7 @@ elm_slideshow_next(Evas_Object *obj)
    _end(obj, obj, NULL, NULL);
 
    if (wd->timer) ecore_timer_del(wd->timer);
+   wd->timer = NULL;
    if (wd->timeout > 0.0)
      wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
 
@@ -555,6 +558,7 @@ elm_slideshow_previous(Evas_Object *obj)
    _end(obj, obj, NULL, NULL);
 
    if (wd->timer) ecore_timer_del(wd->timer);
+   wd->timer = NULL;
    if (wd->timeout > 0.0)
      wd->timer = ecore_timer_add(wd->timeout, _timer_cb, obj);
 

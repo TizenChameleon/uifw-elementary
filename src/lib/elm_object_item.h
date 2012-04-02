@@ -19,6 +19,10 @@ EAPI Evas_Object                 *elm_object_item_widget_get(const Elm_Object_It
  * @param part The content part name to set (NULL for the default content)
  * @param content The new content of the object item
  *
+ * This sets a new object to an item as a content object. If any object was
+ * already set as a content object in the same part, previous object will be
+ * deleted automatically.
+ *
  * @note Elementary object items may have many contents
  *
  * @ingroup General
@@ -448,7 +452,7 @@ EAPI Eina_Bool                    elm_object_item_cursor_engine_only_get(const E
  *
  * A smart callback function must have the Elm_Object_Item_Smart_Cb prototype
  * definition. The first parameter (@p data) in this definition will be a user
- * specific data. The second parameter @p it is a handle to the object item on 
+ * specific data. The second parameter @p it is a handle to the object item on
  * which event occurred. The third parameter, @p event_info, is a pointer to
  * data which is totally dependent on the elementary object item's
  * implementation and semantic for the given event.

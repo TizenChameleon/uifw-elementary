@@ -1,28 +1,24 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` popup_example_02.c -o popup_example_02
+//gcc -o popup_example_02 popup_example_02.c -g `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__ __attribute__((unused))
-# define PACKAGE_DATA_DIR "../../data"
-#endif
 
 static void _response_cb(void *data, Evas_Object *obj, void *event_info);
 
 EAPI_MAIN int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *popup, *btn1, *btn2, *btn3, *icon1;
    char buf[256];
 
+   elm_app_info_set(elm_main, "elementary", "images/logo_small.png");
    win = elm_win_add(NULL, "popup", ELM_WIN_BASIC);
    elm_win_title_set(win, "Popup");
    elm_win_autodel_set(win, EINA_TRUE);
    elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
 
    bg = elm_bg_add(win);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
@@ -38,7 +34,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    elm_object_part_text_set(popup, "title,text", "Title");
 
    icon1 = elm_icon_add(popup);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(icon1, buf, NULL);
    //Setting popup title-icon
    elm_object_part_content_set(popup, "title,icon", icon1);
@@ -72,13 +68,15 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
 ELM_MAIN()
+
 static void
-_response_cb(void *data, Evas_Object *obj __UNUSED__,
-             void *event_info __UNUSED__)
+_response_cb(void *data, Evas_Object *obj,
+             void *event_info)
 {
    evas_object_del(data);
 }

@@ -54,11 +54,12 @@ struct _Widget_Data
    Elm_Input_Panel_Return_Key_Type input_panel_return_key_type;
    void *input_panel_imdata;
    int input_panel_imdata_len;
-   struct {
+   struct
+     {
         Evas_Object *hover_parent;
         Evas_Object *pop, *hover;
         const char *hover_style;
-   } anchor_hover;
+     } anchor_hover;
    Eina_Bool changed : 1;
    Eina_Bool single_line : 1;
    Eina_Bool password : 1;
@@ -575,11 +576,11 @@ _del_hook(Evas_Object *obj)
      }
    if (wd->delay_write) ecore_timer_del(wd->delay_write);
    if (wd->input_panel_imdata) free(wd->input_panel_imdata);
-   free(wd);
 
    if (wd->anchor_hover.hover_style) eina_stringshare_del(wd->anchor_hover.hover_style);
    evas_event_thaw(evas_object_evas_get(obj));
    evas_event_thaw_eval(evas_object_evas_get(obj));
+   free(wd);
 }
 
 static void
@@ -914,6 +915,7 @@ _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *edje;
+   Evas_Object *prev_content;
    if ((!wd) || (!content)) return;
 
    if (wd->scroll)
@@ -921,23 +923,20 @@ _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
    else
       edje = wd->ent;
 
-   /* Delete the currently swallowed object */
-   Evas_Object *cswallow;
-
    if (!part || !strcmp(part, "icon"))
      {
-        cswallow = edje_object_part_swallow_get(edje, "elm.swallow.icon");
+        prev_content = edje_object_part_swallow_get(edje, "elm.swallow.icon");
         edje_object_signal_emit(edje, "elm,action,show,icon", "elm");
      }
    else if (!strcmp(part, "end"))
      {
-        cswallow = edje_object_part_swallow_get(edje, "elm.swallow.end");
+        prev_content = edje_object_part_swallow_get(edje, "elm.swallow.end");
         edje_object_signal_emit(edje, "elm,action,show,end", "elm");
      }
    else
-     cswallow = edje_object_part_swallow_get(edje, part);
+     prev_content = edje_object_part_swallow_get(edje, part);
 
-   if (cswallow) evas_object_del(cswallow);
+   if (prev_content) evas_object_del(prev_content);
 
    evas_event_freeze(evas_object_evas_get(obj));
    elm_widget_sub_object_add(obj, content);
@@ -1265,7 +1264,7 @@ _remove_item_tags(const char *str)
    while (EINA_TRUE)
      {
         const char *temp = eina_strbuf_string_get(buf);
-        
+
         char *startTag = NULL;
         char *endTag = NULL;
 
@@ -1294,7 +1293,7 @@ _elm_entry_entry_paste(Evas_Object *obj, const char *entry)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    char *str = NULL;
-   
+
    if (wd->cnp_mode == ELM_CNP_MODE_NO_IMAGE)
      {
         str = _remove_item_tags(entry);
@@ -1653,7 +1652,8 @@ _long_press(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return ECORE_CALLBACK_CANCEL;
-   //_menu_press(data);  /////// TIZEN ONLY
+   /*if (!_elm_config->desktop_entry)
+     _menu_press(data);*/ /////// TIZEN ONLY
    wd->longpress_timer = NULL;
    evas_object_smart_callback_call(data, SIG_LONGPRESSED, NULL);
    return ECORE_CALLBACK_CANCEL;
@@ -1704,7 +1704,7 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
              wd->longpress_timer = NULL;
           }
      }
-   else if (ev->button == 3)
+   else if ((ev->button == 3) && (!_elm_config->desktop_entry))
      {
         wd->usedown = 1;
         _menu_press(data);
@@ -2219,8 +2219,11 @@ static void
 _signal_entry_paste_request(void *data, Evas_Object *obj __UNUSED__, const char *emission, const char *source __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
+#ifdef HAVE_ELEMENTARY_X
    Elm_Sel_Type type = (emission[sizeof("ntry,paste,request,")] == '1') ?
      ELM_SEL_TYPE_PRIMARY : ELM_SEL_TYPE_CLIPBOARD;
+#endif
+
    if (!wd) return;
    if (!wd->editable) return;
    evas_object_smart_callback_call(data, SIG_SELECTION_PASTE, NULL);
@@ -2360,7 +2363,8 @@ _signal_anchor_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emis
      {
         evas_object_smart_callback_call(data, SIG_ANCHOR_CLICKED, &ei);
 
-        _entry_hover_anchor_clicked(data, data, &ei);
+        if (!_elm_config->desktop_entry)
+          _entry_hover_anchor_clicked(data, data, &ei);
      }
 }
 
@@ -2923,7 +2927,10 @@ _elm_entry_text_get(const Evas_Object *obj, const char *item)
 EAPI Evas_Object *
 elm_entry_add(Evas_Object *parent)
 {
-   Evas_Object *obj, *top;
+#ifdef HAVE_ELEMENTARY_X
+   Evas_Object *top;
+#endif
+   Evas_Object *obj;
    Evas *e;
    Widget_Data *wd;
 

@@ -5,16 +5,11 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` progressbar_example.c -o progressbar_example
+ * gcc -g progressbar_example.c -o progressbar_example `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 typedef struct Progressbar_Example
 {
@@ -33,7 +28,7 @@ typedef struct Progressbar_Example
 static Progressbar_Example example_data;
 
 static Eina_Bool
-_progressbar_example_value_set(void *data __UNUSED__)
+_progressbar_example_value_set(void *data)
 {
    double progress;
 
@@ -54,9 +49,9 @@ _progressbar_example_value_set(void *data __UNUSED__)
 }
 
 static void
-_progressbar_example_start(void        *data __UNUSED__,
-                           Evas_Object *obj __UNUSED__,
-                           void        *event_info __UNUSED__)
+_progressbar_example_start(void        *data,
+                           Evas_Object *obj,
+                           void        *event_info)
 {
    elm_progressbar_pulse(example_data.pb2, EINA_TRUE);
    elm_progressbar_pulse(example_data.pb5, EINA_TRUE);
@@ -72,9 +67,9 @@ _progressbar_example_start(void        *data __UNUSED__,
 
 /* end of show */
 static void
-_progressbar_example_stop(void        *data __UNUSED__,
-                          Evas_Object *obj __UNUSED__,
-                          void        *event_info __UNUSED__)
+_progressbar_example_stop(void        *data,
+                          Evas_Object *obj,
+                          void        *event_info)
 {
    elm_progressbar_pulse(example_data.pb2, EINA_FALSE);
    elm_progressbar_pulse(example_data.pb5, EINA_FALSE);
@@ -88,21 +83,22 @@ _progressbar_example_stop(void        *data __UNUSED__,
 }
 
 static void
-_on_done(void        *data __UNUSED__,
-         Evas_Object *obj __UNUSED__,
-         void        *event_info __UNUSED__)
+_on_done(void        *data,
+         Evas_Object *obj,
+         void        *event_info)
 {
    _progressbar_example_stop(NULL, NULL, NULL);
    elm_exit();
 }
 
-int
-elm_main(int    argc __UNUSED__,
-         char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int    argc,
+         char **argv)
 {
    Evas_Object *win, *bg, *pb, *bx, *hbx, *bt, *bt_bx, *ic1, *ic2;
    char buf[PATH_MAX];
 
+   elm_app_info_set(elm_main, "elementary", "images/logo_small.png");
    win = elm_win_add(NULL, "progressbar", ELM_WIN_BASIC);
    elm_win_title_set(win, "Progress bar example");
    evas_object_smart_callback_add(win, "delete,request", _on_done, NULL);
@@ -136,7 +132,7 @@ elm_main(int    argc __UNUSED__,
    example_data.pb2 = pb;
 
    ic1 = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", PACKAGE_DATA_DIR);
+   snprintf(buf, sizeof(buf), "%s/images/logo_small.png", elm_app_data_dir_get());
    elm_icon_file_set(ic1, buf, NULL);
    evas_object_size_hint_aspect_set(ic1, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 
@@ -236,7 +232,8 @@ elm_main(int    argc __UNUSED__,
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
-
 ELM_MAIN()

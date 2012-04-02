@@ -1,12 +1,7 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` layout_example_02.c -o layout_example_02
+//gcc -g layout_example_02.c -o layout_example_02 `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 #define TABLE "example/table"
 #define BOX "example/box"
@@ -20,7 +15,7 @@ struct _App {
 };
 
 static void
-_signal_cb(void *data, Evas_Object *o, const char *emission, const char *source __UNUSED__)
+_signal_cb(void *data, Evas_Object *o, const char *emission, const char *source)
 {
    struct _App *app = data;
    Evas_Object *icon = elm_object_part_content_get(o, "elm.swallow.content");
@@ -40,8 +35,8 @@ _signal_cb(void *data, Evas_Object *o, const char *emission, const char *source 
    elm_icon_standard_set(icon, images[app->current]);
 }
 
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *layout, *icon;
    struct _App app;
@@ -81,8 +76,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
-
 ELM_MAIN()

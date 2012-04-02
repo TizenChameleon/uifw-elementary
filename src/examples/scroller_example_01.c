@@ -1,10 +1,7 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` scroller_example_01.c -o scroller_example_01
+//gcc -g scroller_example_01.c -o scroller_example_01 `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 
 static const char *text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse bibendum, nibh eget vehicula tempus, libero dui aliquam dui, eget pellentesque nulla est id mi. Sed orci nisl, mattis vitae dignissim scelerisque, imperdiet vel arcu. Integer ut libero id massa commodo dignissim sed at orci. Quisque sollicitudin eleifend malesuada. Donec orci orci, mollis quis euismod vel, tincidunt nec ipsum. Sed ut nulla ligula, ut commodo tellus. Duis non felis in odio fringilla venenatis eget in metus. Mauris molestie ipsum tortor. Suspendisse potenti. Curabitur facilisis ultricies cursus. In euismod viverra risus sit amet pharetra. Sed mauris lorem, volutpat a vehicula quis, interdum nec erat. Suspendisse auctor bibendum fringilla. Curabitur tincidunt sem risus.\
 <br>\
@@ -138,6 +135,7 @@ elm_main(int argc, char **argv)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }

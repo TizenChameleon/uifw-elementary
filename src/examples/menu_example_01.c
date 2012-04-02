@@ -1,15 +1,12 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` menu_example_01.c -o menu_example_01
+//gcc -g menu_example_01.c -o menu_example_01 `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 
 static void
 _del_it(void *data, Evas_Object *obj, void *event_info)
 {
-   Eina_List *l;
+   const Eina_List *l;
    Elm_Object_Item *menu_it = elm_menu_first_item_get(data);
    menu_it = elm_menu_item_next_get(menu_it);
    l = elm_menu_item_subitems_get(menu_it);
@@ -69,6 +66,7 @@ elm_main(int argc, char **argv)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }

@@ -1,7 +1,7 @@
-#include <Elementary.h>
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
+#include <Elementary.h>
 #ifndef ELM_LIB_QUICKLAUNCH
 static void
 my_entry_bt_1(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
@@ -1743,7 +1743,7 @@ item_provider(void *images __UNUSED__, Evas_Object *en, const char *item)
    Evas_Object *o = NULL;;
    char buf[1024];
 
-   if(!strcmp(item, "itemprovider"))
+   if (!strcmp(item, "itemprovider"))
      {
         snprintf(buf, sizeof(buf), "%s/images/icon_00.png",
                  elm_app_data_dir_get());
@@ -1760,7 +1760,7 @@ prepend_item_provider(void *images __UNUSED__, Evas_Object *en, const char *item
    Evas_Object *o = NULL;;
    char buf[1024];
 
-   if(!strcmp(item, "itemprovider"))
+   if (!strcmp(item, "itemprovider"))
      {
         snprintf(buf, sizeof(buf), "%s/images/icon_10.png",
                  elm_app_data_dir_get());

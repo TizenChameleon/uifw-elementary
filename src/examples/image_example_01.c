@@ -1,20 +1,15 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` image_example_01.c -o image_example_01
+//gcc -g image_example_01.c -o image_example_01 `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-# define PACKAGE_DATA_DIR "."
-#endif
 
 int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *image;
    char buf[PATH_MAX];
 
+   elm_app_info_set(elm_main, "elementary", "images/plant_01.jpg");
    win = elm_win_add(NULL, "image", ELM_WIN_BASIC);
    elm_win_title_set(win, "Image");
    elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
@@ -26,7 +21,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
-   snprintf(buf, sizeof(buf), "%s/images/plant_01.jpg", PACKAGE_DATA_DIR);
+   snprintf(buf, sizeof(buf), "%s/images/plant_01.jpg", elm_app_data_dir_get());
 
    image = elm_image_add(win);
    if (!elm_image_file_set(image, buf, NULL))
@@ -53,8 +48,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
-
 ELM_MAIN()

@@ -1,13 +1,7 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` layout_example_01.c -o layout_example_01
+//gcc -g layout_example_01.c -o layout_example_01 `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-# define PACKAGE_DATA_DIR "."
-#endif
 
 #define TABLE "example/table"
 #define BOX "example/box"
@@ -17,7 +11,7 @@
 static int _box_buttons = 0;
 
 static void
-_tbl_btn_cb(void *data, Evas_Object *btn, void *event_info __UNUSED__)
+_tbl_btn_cb(void *data, Evas_Object *btn, void *event_info)
 {
    Evas_Object *layout = data;
 
@@ -26,7 +20,7 @@ _tbl_btn_cb(void *data, Evas_Object *btn, void *event_info __UNUSED__)
 }
 
 static void
-_box_btn_cb(void *data, Evas_Object *btn, void *event_info __UNUSED__)
+_box_btn_cb(void *data, Evas_Object *btn, void *event_info)
 {
    Evas_Object *layout = data;
    Evas_Object *item;
@@ -45,7 +39,7 @@ _box_btn_cb(void *data, Evas_Object *btn, void *event_info __UNUSED__)
 }
 
 static void
-_swallow_btn_cb(void *data, Evas_Object *btn __UNUSED__, void *event_info __UNUSED__)
+_swallow_btn_cb(void *data, Evas_Object *btn, void *event_info)
 {
    Evas_Object *layout = data;
    Evas_Object *item;
@@ -56,13 +50,15 @@ _swallow_btn_cb(void *data, Evas_Object *btn __UNUSED__, void *event_info __UNUS
    evas_object_del(item);
 }
 
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *icon, *icon2, *bt, *bt2, *layout;
-   Evas_Object *clock;
+   Evas_Object *clk;
    Evas_Object *item;
+   char buf[PATH_MAX];
 
+   elm_app_info_set(elm_main, "elementary", "examples/layout_example.edj");
    win = elm_win_add(NULL, "layout", ELM_WIN_BASIC);
    elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
    elm_win_autodel_set(win, EINA_TRUE);
@@ -77,9 +73,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    layout = elm_layout_add(win);
    evas_object_size_hint_weight_set(layout, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, layout);
-   elm_layout_file_set(
-       layout, PACKAGE_DATA_DIR "/examples/layout_example.edj",
-       "example/mylayout");
+   snprintf(buf, sizeof(buf), "%s/examples/layout_example.edj", elm_app_data_dir_get());
+   elm_layout_file_set(layout, buf, "example/mylayout");
    evas_object_show(layout);
 
    // Setting title
@@ -105,11 +100,11 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    elm_layout_table_pack(layout, TABLE, icon2, 1, 0, 1, 1);
    evas_object_show(icon2);
 
-   clock = elm_clock_add(win);
-   evas_object_size_hint_weight_set(clock, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(clock, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_layout_table_pack(layout, TABLE, clock, 2, 0, 1, 1);
-   evas_object_show(clock);
+   clk = elm_clock_add(win);
+   evas_object_size_hint_weight_set(clk, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(clk, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_layout_table_pack(layout, TABLE, clk, 2, 0, 1, 1);
+   evas_object_show(clk);
 
    bt = elm_button_add(win);
    elm_object_text_set(bt, "Click me!");
@@ -148,8 +143,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
-
 ELM_MAIN()

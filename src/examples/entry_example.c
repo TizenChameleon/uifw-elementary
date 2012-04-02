@@ -2,11 +2,6 @@
  * gcc -o entry_example entry_example.c `pkg-config --cflags --libs elementary`
  */
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__ __attribute__((unused))
-#endif
 
 typedef struct
 {
@@ -38,7 +33,7 @@ _edit_buffer_insert(Evas_Object *e, const char *text)
 }
 
 static void
-_it_sel_cb(void *data, Evas_Object *obj __UNUSED__, void *event)
+_it_sel_cb(void *data, Evas_Object *obj, void *event)
 {
    App_Inwin_Data *aid = data;
    Elm_Object_Item *gg_it = event;
@@ -49,7 +44,7 @@ _it_sel_cb(void *data, Evas_Object *obj __UNUSED__, void *event)
 }
 
 static char *
-_emo_label_get(void *data, Evas_Object *obj __UNUSED__, const char *part __UNUSED__)
+_emo_label_get(void *data, Evas_Object *obj, const char *part)
 {
    return strdup(data);
 }
@@ -67,7 +62,7 @@ _emo_content_get(void *data, Evas_Object *obj, const char *part)
 }
 
 static void
-_emo_del(void *data, Evas_Object *obj __UNUSED__)
+_emo_del(void *data, Evas_Object *obj)
 {
    free(data);
 }
@@ -78,15 +73,12 @@ _page_grid_add(Evas_Object *parent, App_Inwin_Data *aid)
    Evas_Object *grid;
    char *theme, *emo;
    Eina_List *emos, *it;
-   static Elm_Gengrid_Item_Class it_class = {
-        "default",
-        {
-           _emo_label_get,
-           _emo_content_get,
-           NULL,
-           _emo_del
-        }
-   };
+   static Elm_Gengrid_Item_Class *it_class;
+   it_class = elm_gengrid_item_class_new();
+   it_class->item_style = "default";
+   it_class->func.text_get = _emo_label_get;
+   it_class->func.content_get = _emo_content_get;
+   it_class->func.del = _emo_del;
 
    theme = elm_theme_list_item_path_get("default", NULL);
    if (!theme) return NULL;
@@ -106,15 +98,16 @@ _page_grid_add(Evas_Object *parent, App_Inwin_Data *aid)
         if (strncmp(emo, "elm/entry/emoticon/", 19))
           continue;
         sscanf(emo, "elm/entry/emoticon/%[^/]/default", name);
-        elm_gengrid_item_append(grid, &it_class, strdup(name), _it_sel_cb, aid);
+        elm_gengrid_item_append(grid, it_class, strdup(name), _it_sel_cb, aid);
      }
    edje_file_collection_list_free(emos);
+   elm_gengrid_item_class_free(it_class);
 
    return grid;
 }
 
 static void
-_btn_insert_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
+_btn_insert_cb(void *data, Evas_Object *obj, void *event)
 {
    App_Inwin_Data *aid = data;
    const char *size[] = {
@@ -137,7 +130,7 @@ _btn_insert_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
 }
 
 static void
-_width_changed_cb(void *data, Evas_Object *obj, void *event __UNUSED__)
+_width_changed_cb(void *data, Evas_Object *obj, void *event)
 {
    App_Inwin_Data *aid = data;
 
@@ -145,7 +138,7 @@ _width_changed_cb(void *data, Evas_Object *obj, void *event __UNUSED__)
 }
 
 static void
-_height_changed_cb(void *data, Evas_Object *obj, void *event __UNUSED__)
+_height_changed_cb(void *data, Evas_Object *obj, void *event)
 {
    App_Inwin_Data *aid = data;
 
@@ -295,7 +288,7 @@ _page_settings_add(Evas_Object *parent, App_Inwin_Data *aid)
 }
 
 static void
-_insert_cancel_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
+_insert_cancel_cb(void *data, Evas_Object *obj, void *event)
 {
    App_Inwin_Data *aid = data;
 
@@ -303,13 +296,13 @@ _insert_cancel_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED_
 }
 
 static void
-_inwin_del_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
+_inwin_del_cb(void *data, Evas *e, Evas_Object *obj, void *event)
 {
    free(data);
 }
 
 static void
-_image_insert_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__)
+_image_insert_cb(void *data, Evas_Object *obj, void *event)
 {
    App_Data *ad = data;
    App_Inwin_Data *aid;
@@ -375,7 +368,7 @@ _image_insert_cb(void *data, Evas_Object *obj __UNUSED__, void *event __UNUSED__
 }
 
 static void
-_format_change_cb(void *data, Evas_Object *obj, void *event __UNUSED__)
+_format_change_cb(void *data, Evas_Object *obj, void *event)
 {
    App_Data *ad = data;
    char fmt_open[5], fmt_close[6];
@@ -436,7 +429,7 @@ all_done:
 }
 
 static void
-_autosave_change_cb(void *data, Evas_Object *obj, void *event __UNUSED__)
+_autosave_change_cb(void *data, Evas_Object *obj, void *event)
 {
    App_Data *ad = data;
    Eina_Bool state = elm_check_state_get(obj);
@@ -446,7 +439,7 @@ _autosave_change_cb(void *data, Evas_Object *obj, void *event __UNUSED__)
 }
 
 static void
-_edit_dblclick_cb(void *data __UNUSED__, Evas_Object *obj, void *event __UNUSED__)
+_edit_dblclick_cb(void *data, Evas_Object *obj, void *event)
 {
    int current_cursor;
 
@@ -481,7 +474,7 @@ _edit_dblclick_cb(void *data __UNUSED__, Evas_Object *obj, void *event __UNUSED_
 }
 
 static void
-_edit_tplclick_cb(void *data __UNUSED__, Evas_Object *obj, void *event __UNUSED__)
+_edit_tplclick_cb(void *data, Evas_Object *obj, void *event)
 {
    elm_entry_cursor_line_begin_set(obj);
    elm_entry_cursor_selection_begin(obj);
@@ -490,14 +483,14 @@ _edit_tplclick_cb(void *data __UNUSED__, Evas_Object *obj, void *event __UNUSED_
 }
 
 static void
-_win_del_cb(void *data __UNUSED__, Evas_Object *obj, void *event __UNUSED__)
+_win_del_cb(void *data, Evas_Object *obj, void *event)
 {
    evas_object_del(obj);
    elm_exit();
 }
 
-int
-elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char *argv[])
 {
    Evas_Object *win, *bg, *box, *tb, *en, *o, *icon;
    App_Data app;
@@ -580,7 +573,8 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
    evas_object_resize(win, 300, 780);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
-ELM_MAIN();
+ELM_MAIN()

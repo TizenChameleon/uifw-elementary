@@ -311,12 +311,19 @@
  * - @c "multi,swipe,down" - This is called when the genlist is multi-touch
  *   swiped down.
  * - @c "multi,pinch,out" - This is called when the genlist is multi-touch
- *   pinched out.  "- @c multi,pinch,in" - This is called when the genlist is
- *   multi-touch pinched in.
+ *   pinched out.
+ * - @c multi,pinch,in" - This is called when the genlist is multi-touch
+ *   pinched in.
  * - @c "swipe" - This is called when the genlist is swiped.
- * - @c "moved" - This is called when a genlist item is moved.
- * - @c "moved,after" - This is called when a genlist item is moved after.
- * - @c "moved,before" - This is called when a genlist item is moved before.
+ * - @c "moved" - This is called when a genlist item is moved in reorder mode.
+ * - @c "moved,after" - This is called when a genlist item is moved after
+ *   another item in reorder mode. The event_info parameter is the reordered
+ *   item. To get the relative previous item, use elm_genlist_item_prev_get().
+ *   This signal is called along with "moved" signal.
+ * - @c "moved,before" - This is called when a genlist item is moved before
+ *   another item in reorder mode. The event_info parameter is the reordered
+ *   item. To get the relative previous item, use elm_genlist_item_next_get().
+ *   This signal is called along with "moved" signal.
  * - @c "language,changed" - This is called when the program's language is
  *   changed.
  * - @c "tree,effect,finished" - This is called when a genlist tree effect is finished.
@@ -497,7 +504,7 @@ EAPI Eina_Bool                     elm_genlist_multi_select_get(const Evas_Objec
  * fixed (restricted to a minimum of) to the list width when calculating its
  * size in order to allow the height to be calculated based on it. This allows,
  * for instance, text block to wrap lines if the Edje part is configured with
- * "text.min: 0 1".  
+ * "text.min: 0 1".
  * @note ELM_LIST_COMPRESS will make list resize slower as it will have to
  *       recalculate every item height again whenever the list width
  *       changes!
@@ -890,7 +897,7 @@ EAPI void                          elm_genlist_item_show(Elm_Object_Item *it, El
  *             @ref Elm_Genlist_Item_Scrollto_Type
  *
  * This causes genlist to jump to the given item @p it and show it (by
- * animatedly scrolling), if it is not fully visible. 
+ * animatedly scrolling), if it is not fully visible.
  * This may use animation and take a some time to do so.
  *
  * @see elm_genlist_item_show()
@@ -936,7 +943,7 @@ EAPI void                          elm_genlist_item_item_class_update(Elm_Object
  *
  * @param it The genlist item
  *
- * This returns the Genlist_Item_Class for the given item. It can be used to 
+ * This returns the Genlist_Item_Class for the given item. It can be used to
  * examine the function pointers and item_style.
  *
  * @ingroup Genlist
@@ -1652,7 +1659,7 @@ EAPI void                          elm_genlist_reorder_mode_set(Evas_Object *obj
 EAPI Eina_Bool                     elm_genlist_reorder_mode_get(const Evas_Object *obj);
 
 /**
- * Get the Item's Type 
+ * Get the Item's Type
  *
  * @param it The genlist item
  * @return The item type.

@@ -1240,8 +1240,8 @@ _config_update(void)
 #define IFCFG(v)   if ((_elm_config->config_version & 0xffff) < (v)) {
 #define IFCFGELSE } else {
 #define IFCFGEND  }
-#define COPYVAL(x) do {_elm_config->x = tcfg->x; } while(0)
-#define COPYPTR(x) do {_elm_config->x = tcfg->x; tcfg->x = NULL; } while(0)
+#define COPYVAL(x) do {_elm_config->x = tcfg->x; } while (0)
+#define COPYPTR(x) do {_elm_config->x = tcfg->x; tcfg->x = NULL; } while (0)
 #define COPYSTR(x) COPYPTR(x)
 
      /* we also need to update for property changes in the root window
@@ -1796,7 +1796,7 @@ elm_config_cache_font_cache_size_get(void)
    return _elm_config->font_cache;
 }
 
-EAPI void 
+EAPI void
 elm_config_cache_font_cache_size_set(int size)
 {
    if (_elm_config->font_cache == size) return;

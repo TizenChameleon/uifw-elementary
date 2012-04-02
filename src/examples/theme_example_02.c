@@ -2,14 +2,9 @@
  * gcc -o theme_example_02 theme_example_02.c `pkg-config --cflags --libs elememntaru`
  */
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
-_btn_clicked_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev __UNUSED__)
+_btn_clicked_cb(void *data, Evas_Object *obj, void *ev)
 {
    static int loaded = 1;
    if (loaded)
@@ -19,8 +14,8 @@ _btn_clicked_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *ev __U
    loaded = 1 - loaded;
 }
 
-int
-elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char *argv[])
 {
    Evas_Object *win, *bg, *box, *btn;
 
@@ -68,7 +63,8 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
    evas_object_smart_callback_add(btn, "clicked", _btn_clicked_cb, NULL);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
-ELM_MAIN();
+ELM_MAIN()

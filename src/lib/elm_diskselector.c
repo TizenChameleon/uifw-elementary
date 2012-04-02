@@ -919,8 +919,7 @@ static void
 _item_icon_set(Elm_Diskselector_Item *it, Evas_Object *icon)
 {
    if (it->icon == icon) return;
-   if (it->icon)
-     evas_object_del(it->icon);
+   if (it->icon) evas_object_del(it->icon);
    it->icon = icon;
    if (VIEW(it))
      {
@@ -977,7 +976,7 @@ _check_identical_item(Elm_Diskselector_Item *it, Evas_Object *icon)
                                   idx - ic + (2 * ac));
           }
 
-        if(dit) _item_icon_set(dit, icon);
+        if (dit) _item_icon_set(dit, icon);
         _sizing_eval(wd->self);
      }
 }

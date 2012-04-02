@@ -5,31 +5,26 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` segment_control_example.c -o segment_control_example
+ * gcc -g segment_control_example.c -o segment_control_example `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
-_on_done(void *data __UNUSED__,
-        Evas_Object *obj __UNUSED__,
-        void *event_info __UNUSED__)
+_on_done(void *data,
+        Evas_Object *obj,
+        void *event_info)
 {
    elm_exit();
 }
 
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *sc, *ic;
    Elm_Object_Item *seg_it;
-   int count, index;
+   int count, idx;
 
    win = elm_win_add(NULL, "segment_control", ELM_WIN_BASIC);
    elm_win_title_set(win, "Segment Control Example");
@@ -75,12 +70,14 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    seg_it = elm_segment_control_item_get(sc, count / 2);
    elm_segment_control_item_selected_set(seg_it, EINA_TRUE);
    seg_it = elm_segment_control_item_selected_get(sc);
-   index = elm_segment_control_item_index_get(seg_it);
-   printf("Item selected: %i\n", index);
+   idx = elm_segment_control_item_index_get(seg_it);
+   printf("Item selected: %i\n", idx);
 
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
 ELM_MAIN()

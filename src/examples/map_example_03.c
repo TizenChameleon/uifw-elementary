@@ -5,16 +5,11 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` map_example_03.c -o map_example_03
+ * gcc -g map_example_03.c -o map_example_03 `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 typedef struct _Example_Data
 {
@@ -28,51 +23,51 @@ typedef struct _Example_Data
 static Example_Data example_data;
 
 static void
-_route_loaded(void *data, Evas_Object *obj, void *ev __UNUSED__)
+_route_loaded(void *data, Evas_Object *obj, void *ev)
 {
-   Example_Data *example_data = data;
+   Example_Data *exam_data = data;
 
-   example_data->route_ovl = elm_map_overlay_route_add(obj, example_data->route);
-   elm_map_overlay_color_set(example_data->route_ovl, 0, 255, 0, 255);
+   exam_data->route_ovl = elm_map_overlay_route_add(obj, exam_data->route);
+   elm_map_overlay_color_set(exam_data->route_ovl, 0, 255, 0, 255);
 }
 
 static void
-_name_loaded(void *data, Evas_Object *obj, void *ev __UNUSED__)
+_name_loaded(void *data, Evas_Object *obj, void *ev)
 {
-   Example_Data *example_data = data;
+   Example_Data *exam_data = data;
    Evas_Object *map = obj;
 
-   if (example_data->route)
-     elm_map_route_remove(example_data->route);
+   if (exam_data->route)
+     elm_map_route_del(exam_data->route);
 
-   elm_map_name_region_get(example_data->name, &(example_data->dest_lon),
-                           &(example_data->dest_lat));
+   elm_map_name_region_get(exam_data->name, &(exam_data->dest_lon),
+                           &(exam_data->dest_lat));
 
-   example_data->route = elm_map_route_add(map, ELM_MAP_ROUTE_TYPE_FOOT,
+   exam_data->route = elm_map_route_add(map, ELM_MAP_ROUTE_TYPE_FOOT,
                      ELM_MAP_ROUTE_METHOD_SHORTEST,
-                     example_data->start_lon, example_data->start_lat,
-                     example_data->dest_lon, example_data->dest_lat,
+                     exam_data->start_lon, exam_data->start_lat,
+                     exam_data->dest_lon, exam_data->dest_lat,
                      NULL, NULL);
 }
 
 static void
-_bt_route(void *data, Evas_Object *obj __UNUSED__, void *ev __UNUSED__)
+_bt_route(void *data, Evas_Object *obj, void *ev)
 {
-   Example_Data *example_data = data;
+   Example_Data *exam_data = data;
    Evas_Object *map;
    char *address;
 
-   map = example_data->map;
-   address = (char *)elm_object_text_get(example_data->entry);
+   map = exam_data->map;
+   address = (char *)elm_object_text_get(exam_data->entry);
 
-   example_data->name = elm_map_name_add(map, address, 0, 0, NULL, NULL);
+   exam_data->name = elm_map_name_add(map, address, 0, 0, NULL, NULL);
 
    evas_object_smart_callback_add(map, "name,loaded", _name_loaded, data);
    evas_object_smart_callback_add(map, "route,loaded", _route_loaded, data);
 }
 
 static void
-_bt_zoom_in(void *data, Evas_Object *obj __UNUSED__, void *ev __UNUSED__)
+_bt_zoom_in(void *data, Evas_Object *obj, void *ev)
 {
    int zoom;
    elm_map_zoom_mode_set(data, ELM_MAP_ZOOM_MODE_MANUAL);
@@ -81,7 +76,7 @@ _bt_zoom_in(void *data, Evas_Object *obj __UNUSED__, void *ev __UNUSED__)
 }
 
 static void
-_bt_zoom_out(void *data, Evas_Object *obj __UNUSED__, void *ev __UNUSED__)
+_bt_zoom_out(void *data, Evas_Object *obj, void *ev)
 {
    int zoom;
    elm_map_zoom_mode_set(data, ELM_MAP_ZOOM_MODE_MANUAL);
@@ -90,19 +85,19 @@ _bt_zoom_out(void *data, Evas_Object *obj __UNUSED__, void *ev __UNUSED__)
 }
 
 static void
-_bt_zoom_fit(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_bt_zoom_fit(void *data, Evas_Object *obj, void *event_info)
 {
    elm_map_zoom_mode_set(data, ELM_MAP_ZOOM_MODE_AUTO_FIT);
 }
 
 static void
-_bt_zoom_fill(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_bt_zoom_fill(void *data, Evas_Object *obj, void *event_info)
 {
    elm_map_zoom_mode_set(data, ELM_MAP_ZOOM_MODE_AUTO_FILL);
 }
 
 static void
-_on_done(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_on_done(void *data, Evas_Object *obj, void *event_info)
 {
    elm_exit();
 }
@@ -121,7 +116,7 @@ _nasty_hack(void *data)
 }
 
 EAPI_MAIN int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *map, *box, *bt, *entry;
 
@@ -206,6 +201,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    ecore_timer_add(0.5, _nasty_hack, win);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
 ELM_MAIN()

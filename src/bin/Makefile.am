@@ -86,6 +86,7 @@ test_menu.c \
 test_multi.c \
 test_multibuttonentry.c \
 test_naviframe.c \
+test_naviframe_complex.c \
 test_notify.c \
 test_panel.c \
 test_panes.c \
@@ -104,7 +105,6 @@ test_spinner.c \
 test_store.c \
 test_table.c \
 test_thumb.c \
-test_toggle.c \
 test_toolbar.c \
 test_tooltip.c \
 test_transit.c \

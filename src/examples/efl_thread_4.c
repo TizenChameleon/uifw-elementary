@@ -1,3 +1,5 @@
+//Compile with:
+//gcc -o efl_thread_4 efl_thread_4.c -g `pkg-config --cflags --libs elementary`
 #include <Elementary.h>
 #include <pthread.h>
 
@@ -27,7 +29,7 @@ my_thread_run(void *arg)
      {
         struct info *inf = malloc(sizeof(struct info));
         int do_exit;
-        
+
         if (inf)
           {
              inf->x = 200 + (200 * sin(t));
@@ -81,19 +83,21 @@ down(void *data, Evas *e, Evas_Object *obj, void *event_info)
    pthread_mutex_unlock(&th_lock);
 }
 
-int
+EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
    Evas_Object *o, *bg;
-   
+
    win = elm_win_add(NULL, "efl-thread-4", ELM_WIN_BASIC);
    elm_win_title_set(win, "EFL Thread 4");
+   elm_win_autodel_set(win, EINA_TRUE);
+   elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
    evas_object_resize(win, 400, 400);
    evas_object_show(win);
-   
+
    bg = elm_bg_add(win);
-   elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
    o = evas_object_rectangle_add(evas_object_evas_get(win));
@@ -104,13 +108,13 @@ elm_main(int argc, char **argv)
    // the thread
    evas_object_event_callback_add(o, EVAS_CALLBACK_MOUSE_DOWN, down, NULL);
    rect = o;
-   
+
    // create custom thread to do some "work on the side"
    my_thread_new();
-   
+
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
-
 ELM_MAIN()
-   

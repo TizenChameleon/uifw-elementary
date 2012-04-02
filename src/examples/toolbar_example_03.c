@@ -5,35 +5,22 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` toolbar_example_03.c -o toolbar_example_03
+ * gcc -g toolbar_example_03.c -o toolbar_example_03 `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
-_on_done(void *data __UNUSED__,
-         Evas_Object *obj __UNUSED__,
-         void *event_info __UNUSED__)
+_on_done(void *data,
+         Evas_Object *obj,
+         void *event_info)
 {
    elm_exit();
 }
 
-static void
-_item_pressed(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   Elm_Object_Item *tb_it = event_info;
-   elm_toolbar_item_state_set(tb_it, elm_toolbar_item_state_next(tb_it));
-   elm_toolbar_item_selected_set(tb_it, EINA_FALSE);
-}
-
 EAPI_MAIN int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *bx, *tb, *bt, *menu;
    Elm_Object_Item *tb_it;
@@ -87,6 +74,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
 ELM_MAIN()

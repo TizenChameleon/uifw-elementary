@@ -30,13 +30,14 @@ void test_transit8(void *data, Evas_Object *obj, void *event_info);
 void test_transit9(void *data, Evas_Object *obj, void *event_info);
 void test_fileselector_button(void *data, Evas_Object *obj, void *event_info);
 void test_fileselector_entry(void *data, Evas_Object *obj, void *event_info);
-void test_toggle(void *data, Evas_Object *obj, void *event_info);
 void test_clock(void *data, Evas_Object *obj, void *event_info);
 void test_clock2(void *data, Evas_Object *obj, void *event_info);
 void test_clock3(void *data, Evas_Object *obj, void *event_info);
 void test_check(void *data, Evas_Object *obj, void *event_info);
+void test_check_toggle(void *data, Evas_Object *obj, void *event_info);
 void test_radio(void *data, Evas_Object *obj, void *event_info);
 void test_layout(void *data, Evas_Object *obj, void *event_info);
+void test_layout2(void *data, Evas_Object *obj, void *event_info);
 void test_hover(void *data, Evas_Object *obj, void *event_info);
 void test_hover2(void *data, Evas_Object *obj, void *event_info);
 void test_entry(void *data, Evas_Object *obj, void *event_info);
@@ -166,6 +167,7 @@ void test_glview_simple(void *data, Evas_Object *obj, void *event_info);
 void test_glview(void *data, Evas_Object *obj, void *event_info);
 void test_3d(void *data, Evas_Object *obj, void *event_info);
 void test_naviframe(void *data, Evas_Object *obj, void *event_info);
+void test_naviframe_complex(void *data, Evas_Object *obj, void *event_info);
 //void test_factory(void *data, Evas_Object *obj, void *event_info);
 void test_datetime(void *data, Evas_Object *obj, void *event_info);
 void test_popup(void *data, Evas_Object *obj, void *event_info);
@@ -368,6 +370,7 @@ add_tests:
    ADD_TEST(NULL, "Containers", "Table 6", test_table6);
    ADD_TEST(NULL, "Containers", "Table 7", test_table7);
    ADD_TEST(NULL, "Containers", "Layout", test_layout);
+   ADD_TEST(NULL, "Containers", "Layout 2", test_layout2);
    ADD_TEST(NULL, "Containers", "Grid", test_grid);
 
    //------------------------------//
@@ -503,8 +506,8 @@ add_tests:
    ADD_TEST(NULL, "Range Values", "Progressbar", test_progressbar);
 
    //------------------------------//
-   ADD_TEST(NULL, "Booleans", "Checks", test_check);
-   ADD_TEST(NULL, "Booleans", "Toggles", test_toggle);
+   ADD_TEST(NULL, "Booleans", "Check", test_check);
+   ADD_TEST(NULL, "Booleans", "Check Toggle", test_check_toggle);
 
    //------------------------------//
    ADD_TEST(NULL, "Popups", "Ctxpopup", test_ctxpopup);
@@ -539,7 +542,8 @@ add_tests:
    ADD_TEST(NULL, "Focus", "Focus 4", test_focus4);
 
    //------------------------------//
-   ADD_TEST(NULL, "Storyboard", "Naviframe", test_naviframe);
+   ADD_TEST(NULL, "Naviframe", "Naviframe", test_naviframe);
+   ADD_TEST(NULL, "Naviframe", "Naviframe: Complex", test_naviframe_complex);
 
    //------------------------------//
    ADD_TEST(NULL, "Geographic", "Map", test_map);

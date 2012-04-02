@@ -1,6 +1,8 @@
+//Compile with:
+//gcc -o efl_thread_5 efl_thread_5.c -g `pkg-config --cflags --libs elementary`
 #include <Elementary.h>
 
-static Ecore_Thread *th = NULL;
+static Ecore_Thread *thr = NULL;
 
 static Evas_Object *win = NULL;
 static Evas_Object *rect = NULL;
@@ -10,18 +12,18 @@ struct info
    double x, y;
 };
 
-// BEGIN - code running in my custom pthread instance
+// BEGIN - code running in my custom thread instance
 //
 static void
 th_do(void *data, Ecore_Thread *th)
 {
    double t = 0.0;
-   
+
    // inside our "do" function for the ecore thread, lets do the real work
    for (;;)
      {
         struct info *inf = malloc(sizeof(struct info));
-        
+
         if (inf)
           {
              inf->x = 200 + (200 * sin(t));
@@ -39,7 +41,7 @@ th_do(void *data, Ecore_Thread *th)
      }
 }
 //
-// END - code running in my custom pthread instance
+// END - code running in my custom thread instance
 
 static void // when mainloop gets feedback from worker
 th_feedback(void *data, Ecore_Thread *th, void *msg)
@@ -58,31 +60,33 @@ static void th_cancel(void *data, Ecore_Thread *th) { printf("thread cancelled\n
 static void
 down(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
-   ecore_thread_cancel(th);
+   ecore_thread_cancel(thr);
 }
 
-int
+EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
    Evas_Object *o, *bg;
-   
+
    win = elm_win_add(NULL, "efl-thread-5", ELM_WIN_BASIC);
    elm_win_title_set(win, "EFL Thread 5");
+   elm_win_autodel_set(win, EINA_TRUE);
+   elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
    evas_object_resize(win, 400, 400);
    evas_object_show(win);
-   
+
    bg = elm_bg_add(win);
-   elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
-   
+
    o = evas_object_rectangle_add(evas_object_evas_get(win));
    evas_object_color_set(o, 50, 80, 180, 255);
    evas_object_resize(o, 100, 100);
    evas_object_show(o);
    evas_object_event_callback_add(o, EVAS_CALLBACK_MOUSE_DOWN, down, NULL);
    rect = o;
-   
+
    // explicitly create ecore thread to do some "work on the side" and pass
    // in NULL as data ptr to callbacks and true at the end means to actually
    // make a new thread and not use the thread pool (there is a thread pool
@@ -90,10 +94,11 @@ elm_main(int argc, char **argv)
    // overload the cpu's with more work than you actually have processing
    // units *IF* your threads do actually spend their time doing actual
    // heavy computation)
-   th = ecore_thread_feedback_run(th_do, th_feedback, th_end, th_cancel, 
-                                  NULL, EINA_TRUE);
+   thr = ecore_thread_feedback_run(th_do, th_feedback, th_end, th_cancel,
+                                   NULL, EINA_TRUE);
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
-
 ELM_MAIN()

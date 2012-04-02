@@ -1,17 +1,12 @@
 /* Compile with:
- * gcc -g `pkg-config --cflags --libs elementary` general_funcs_example.c -o general_funcs_example
+ * gcc -g general_funcs_example.c -o general_funcs_example `pkg-config --cflags --libs elementary`
  */
 
 #include <Elementary.h>
 
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-# define PACKAGE_BIN_DIR  "/usr/bin"
-# define PACKAGE_LIB_DIR  "/usr/lib"
-# define PACKAGE_DATA_DIR "/usr/share/elementary"
-#endif
+#define BIN_DIR  "/usr/bin"
+#define LIB_DIR  "/usr/lib"
+#define DATA_DIR "/usr/local/share/elementary"
 
 #define WIDTH             300
 #define HEIGHT            300
@@ -26,59 +21,59 @@ struct test_data
 struct test_data d = {NULL, EINA_TRUE, EINA_TRUE};
 
 static void
-_btn_enabled_cb(void        *data __UNUSED__,
-                Evas_Object *obj __UNUSED__,
-                void        *event __UNUSED__)
+_btn_enabled_cb(void        *data,
+                Evas_Object *obj,
+                void        *event)
 {
    elm_object_disabled_set(d.btn, !d.btn_enabled);
 }
 
 static void
 /* focus callback */
-_btn_focus_cb(void        *data __UNUSED__,
-              Evas_Object *obj __UNUSED__,
-              void        *event __UNUSED__)
+_btn_focus_cb(void        *data,
+              Evas_Object *obj,
+              void        *event)
 {
    elm_object_focus_set(d.btn, EINA_TRUE);
 }
 
 static void
 /* unfocus callback */
-_btn_unfocus_cb(void        *data __UNUSED__,
-              Evas_Object *obj __UNUSED__,
-              void        *event __UNUSED__)
+_btn_unfocus_cb(void        *data,
+              Evas_Object *obj,
+              void        *event)
 {
    elm_object_focus_set(d.btn, EINA_FALSE);
 }
 
 static void
 /* focus allow callback */
-_btn_focus_allow_cb(void        *data __UNUSED__,
-                    Evas_Object *obj __UNUSED__,
-                    void        *event __UNUSED__)
+_btn_focus_allow_cb(void        *data,
+                    Evas_Object *obj,
+                    void        *event)
 {
    elm_object_focus_allow_set(d.btn, d.btn_gets_focus);
 }
 
 static void /* scaling callback */
-_btn_scale_cb(void        *data __UNUSED__,
+_btn_scale_cb(void        *data,
               Evas_Object *obj,
-              void        *event __UNUSED__)
+              void        *event)
 {
    elm_object_scale_set(d.btn, elm_slider_value_get(obj));
 }
 
-int
-elm_main(int    argc __UNUSED__,
-         char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int    argc,
+         char **argv)
 {
    int h;
    Evas_Object *win, *bg, *box, *frame, *check, *b, *slider;
 
    /* tell elm about our app so it can figure out where to get files */
-   elm_app_compile_bin_dir_set(PACKAGE_BIN_DIR);
-   elm_app_compile_data_dir_set(PACKAGE_DATA_DIR);
-   elm_app_compile_lib_dir_set(PACKAGE_LIB_DIR);
+   elm_app_compile_bin_dir_set(BIN_DIR);
+   elm_app_compile_data_dir_set(DATA_DIR);
+   elm_app_compile_lib_dir_set(LIB_DIR);
    elm_app_info_set(elm_main, "elementary", "images/logo.png");
 
    fprintf(stdout, "prefix was set to: %s\n", elm_app_prefix_dir_get());
@@ -190,5 +185,4 @@ elm_main(int    argc __UNUSED__,
    /* exit code */
    return 0;
 }
-
 ELM_MAIN()

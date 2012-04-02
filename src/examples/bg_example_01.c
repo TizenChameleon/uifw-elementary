@@ -1,22 +1,17 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` bg_example_01.c -o bg_example_01
+//gcc -o bg_example_01 bg_example_01.c -g `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
-on_done(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+on_done(void *data, Evas_Object *obj, void *event_info)
 {
    /* quit the mainloop (elm_run) */
    elm_exit();
 }
 
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg;
 
@@ -52,5 +47,4 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    /* exit code */
    return 0;
 }
-
 ELM_MAIN()
