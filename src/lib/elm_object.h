@@ -35,6 +35,10 @@ EAPI const char                  *elm_object_part_text_get(const Evas_Object *ob
  * @param part The content part name to set (NULL for the default content)
  * @param content The new content of the object
  *
+ * This sets a new object to a widget as a content object. If any object was
+ * already set as a content object in the same part, previous object will be
+ * deleted automatically.
+ *
  * @note Elementary objects may have many contents
  *
  * @ingroup General
@@ -185,7 +189,7 @@ EAPI void         elm_object_disabled_set(Evas_Object *obj, Eina_Bool disabled);
 EAPI Eina_Bool    elm_object_disabled_get(const Evas_Object *obj);
 
 /**
- * @defgroup WidgetNavigation Widget Tree Navigation.
+ * @defgroup WidgetNavigation Widget Tree Navigation
  *
  * These functions provide checks for if a Evas_Object is an Elementary widget,
  * the possibility of getting a widget's parent, top level parent and getting a

@@ -53,6 +53,8 @@
  *
  * @ref diskselector_example_02
  *
+ * @ref entry_example
+ *
  * @ref list_example_01
  *
  * @ref list_example_02
@@ -90,6 +92,8 @@
  * @ref genlist_example_04
  *
  * @ref genlist_example_05
+ *
+ * @ref glview_example_01_page
  *
  * @ref thumb_example_01
  *
@@ -810,6 +814,63 @@
  */
 
  /**
+  * @page button_example_00 Button - Hello, Button!
+  *
+  * @dontinclude button_example_00.c
+  *
+  * Keeping the tradition, this is a simple "Hello, World" button example. We
+  * will show how to create a button and associate and action to be performed
+  * when you click on it.
+  *
+  * In the end, we'll be presented with something that looks like this:
+  *
+  * @image html screenshots/button_00.png
+  * @image latex screenshots/button_00.eps width=\textwidth
+  *
+  * The full code of the example is @ref button_example_00.c "here" and we
+  * will follow here with a rundown of it.
+  *
+  *
+  * There is only one button on the interface which performs a basic action:
+  * close the application. This behavior is described by on_click() function,
+  * that interrupt the program invoking elm_exit().
+  * @skip static void
+  * @until }
+  *
+  *
+  * On the main() function, we set the basic characteristics of the user
+  * interface. First we use the Elementary library to create a window and
+  * set its policies (such as close when the user click on the window close
+  * icon).
+  *
+  * @skip elm_win_add
+  * @until elm_policy_set
+  *
+  * In order to turn it visible on the WM (Window Manager), we also have to
+  * associate it to a canvas through Evas library, and set its dimensions.
+  *
+  * @skip evas_object_resize
+  * @until evas_object_show(win)
+  *
+  * Then we create a background associated to the window, define its dimensions,
+  * and turn it visible on the canvas.
+  * @skip  elm_bg_add
+  * @until evas_object_show(bg)
+  *
+  *
+  * Finally we use Elementary to create a button and Evas to set its
+  * proprieties. Here we have not only to give the button dimensions, but also
+  * its coordinates and the action to be performed on the click event.
+  * @skip elm_button_add
+  * @until evas_object_show(btn)
+  *
+  *
+  * And we are done.
+  *
+  * @example button_example_00.c
+  */
+
+/**
   * @page button_example_01 Button - Complete example
   *
   * @dontinclude button_example_01.c
@@ -1176,11 +1237,11 @@
  *
  * To set weekday names, we should declare them as an array of strings:
  * @dontinclude calendar_example_02.c
- * @skipline weekdays
+ * @skipline weekdays[]
  * @until }
  *
  * And finally set them to calendar:
- * skipline weekdays_names_set
+ * @skipline weekdays_names_set
  *
  * Our example will look like this:
  *
@@ -1232,11 +1293,14 @@
  *
  * Also, regarding days selection, you could be interested to set a
  * date to be highlighted on calendar from your code, maybe when
- * a specific event happens, or after calendar creation. Let's select
- * two days from current day:
+ * a specific event happens, or after calendar creation. As @c time output is
+ * in seconds, we define the number of seconds contained within a day as a
+ * constant:
  * @dontinclude calendar_example_04.c
  * @skipline SECS_DAY
- * @skipline current_time
+ *
+ * Now let's select two days from current day:
+ * @skipline time(NULL)
  * @until elm_calendar_selected_time_set
  *
  * Our example will look like this:
@@ -1318,7 +1382,7 @@
  * be read on @c ctime manpage.
  * If a date relative from current is required, this struct can be set
  * as:
- * @skipline current_time
+ * @skipline time(NULL)
  * @until localtime_r
  *
  * Or if it's an absolute date, you can just declare the struct like:
@@ -1459,8 +1523,8 @@
  * If some decoration is required, a label can be set, and icon before and
  * after the bar as well. On the second slider will add a @c home icon
  * and a @c folder icon at @c end.
- * @skipline text_set
- * @until end_set
+ * @skip elm_object_text_set
+ * @until elm_object_part_content_set(sl, "end", ic)
  *
  * If the bar size need to be changed, it can be done with span set function,
  * that doesn't accounts other widget's parts size. Also the bar can starts
@@ -1821,14 +1885,14 @@
  *
  * By default map is disabled. So just setting content isn't enough.
  * Alpha and smooth settings will be applied when map is enabled.
- * So we'll add a toggle for that. Everytime the map properties
+ * So we'll add a check for that. Everytime the map properties
  * are changed, map will need to be enabled again. So if you
  * want to play a bit with our example, remember to always enable
  * map again after concluding your changes.
- * @skipline toggle_add
+ * @skipline check_add
  * @until show
  *
- * We have added a callback function to this toggle, so it will enable
+ * We have added a callback function to this check, so it will enable
  * or disable map:
  * @dontinclude mapbuf_example.c
  * @skip static
@@ -1844,7 +1908,7 @@
  * By default, mapbuf would enable alpha blending and smooth rendering,
  * so we need to check boxes to be consistent with its behavior.
  *
- * Callback functions look like the one added to the toggle. This way we
+ * Callback functions look like the one added to the check. This way we
  * could enable or disable the both properties:
  * @dontinclude mapbuf_example.c
  * @skip static
@@ -2173,13 +2237,13 @@
  * is enough to call elm_diskselector_display_item_num_set(), as you can
  * see here:
  * @skipline elm_diskselector_add
- * @until evas_object_show
+ * @until elm_diskselector_display_item_num_set
  *
  * @note You can't set less than 3 items to be displayed.
  *
  * You can get the number of items in the diskselector by calling
  * elm_diskselector_display_item_num_get(), as you can see here:
- * @skipline elm_diskselector_add
+ * @skipline elm_diskselector_display_item_num_get
  *
  * Finally, if a bounce effect is required, or you would like to see
  * scrollbars, it is possible. But, for default theme, diskselector
@@ -2281,8 +2345,7 @@
  *
  * <b> Deleting an item: </b>
  * @dontinclude diskselector_example_02.c
- * @skip _del_cb
- * @skipline _del_cb
+ * @skipline _del_cb(void
  * @until }
  *
  * To delete an item we simple need to call elm_object_item_del() with
@@ -2832,7 +2895,8 @@
  * events occur, and they will just print something to @c stdout:
  * @dontinclude flipselector_example.c
  * @skip underflow callback
- * @until static void
+ * @until }
+ * @until }
  * Flip the sheets on the widget while looking at the items list, in
  * the source code, and you'll get the idea of those events.
  *
@@ -2844,7 +2908,8 @@
  *
  * @dontinclude flipselector_example.c
  * @skip unselect the item
- * @until underflow
+ * @until }
+ * @until }
  *
  * Click on them to exercise those flip selector API calls. To
  * interact with the other parts of this API, there's a command line
@@ -3402,6 +3467,11 @@
  *
  * @example hover_example_01.c
  */
+
+/**
+  * @page glview_01_example_page - GLView Example
+  * @include glview_example_01.c
+  */
 
 /**
   * @page tutorial_flip Flip example
@@ -4078,66 +4148,6 @@
  */
 
 /**
- * @page tutorial_toggle Toggle example
- * @dontinclude toggle_example_01.c
- *
- * In this example we'll create 2 toggle widgets. The first will have an icon
- * and the state names will be the default "on"/"off", it will also change the
- * value of a variable directly. The second won't have a icon, the state names
- * will be "Enabled"/"Disabled", it will  start "Enabled" and it won't set the
- * value of a variable.
- *
- * We start with the usual includes and prototype for callback which will be
- * implemented and detailed later on:
- * @until _cb2
- *
- * We then declare a static global variable(the one whose value will be changed
- * by the first toggle):
- * @until static
- *
- * We now have to create our window and all that usual stuff:
- * @until show(bx)
- *
- * The creation of a toggle is no more complicated than that of any other
- * widget:
- * @until add
- *
- * For our first toggle we don't set the states labels so they will stay the
- * default, however we do set a label for the toggle, an icon and the variable
- * whose value it should change:
- * @until show
- *
- * We also set the callback that will be called when the toggles value changes:
- * @until smart_callback
- *
- * For our second toggle it important to note that we set the states labels,
- * don't set an icon or variable, but set the initial state to
- * EINA_TRUE("Enabled"):
- * @until show
- *
- * For the second toggle we will use a different callback:
- * @until smart_callback
- *
- * We then ask the main loop to start:
- * @until ELM_MAIN
- *
- * The callback for our first toggle will look the value of @p val and print it:
- * @until }
- *
- * For our second callback we need to do a little bit more, since the second
- * toggle doesn't change the value of a variable we have to ask it what its
- * state is:
- * @until }
- *
- * This example will look like this:
- *
- * @image html screenshots/toggle_example_01.png
- * @image latex screenshots/toggle_example_01.eps width=\textwidth
- *
- * @example toggle_example_01.c
- */
-
-/**
  * @page tutorial_panel Panel example
  * @dontinclude panel_example_01.c
  *
@@ -4423,7 +4433,7 @@
  * @example gengrid_example.c
  */
 /**
- * @page entry_example_01 Entry - Example of simple editing
+ * @page entry_example Entry - Example of simple editing
  *
  * As a general overview of @ref Entry we are going to write an, albeit simple,
  * functional editor. Although intended to show how elm_entry works, this
@@ -4513,7 +4523,7 @@
  * and the entry itself doesn't, yet, support all the needed capabilities to
  * make this simpler. We begin by getting the format we are using in our
  * function from the button pressed.
- * @skip aid->naviframe = naviframe;
+ * @skip  _format_change_cb(void *data, Evas_Object *obj, void *event __UNUSED__)
  * @until sizeof(fmt_close)
  *
  * Next we need to find out if we need to insert an opening or a closing tag.
@@ -5662,14 +5672,17 @@
  * the photocam to go in to a zoom mode that makes the image fit inside the
  * photocam. Tough this has no effect on the image we also print what region was
  * being viewed before setting the zoom mode:
+ * @skip static
  * @until }
  * @note When in fit mode our slider(explained below) won't work.
  *
  * The second button("Unfit") will bring the photocam back into manual zoom
  * mode:
+ * @skip static
  * @until }
  *
  * Our slider controls the level of zoom of the photocam:
+ * @skip static
  * @until }
  * @note It is important to note that this only works when in manual zoom mode.
  *
@@ -6084,6 +6097,7 @@
  * new window, so we have to handle them by setting a callback function that
  * will ultimately call this very same function to add a new tab.
  *
+ * @skip td->tab = NULL
  * @skip Tab_Data
  * @until }
  *

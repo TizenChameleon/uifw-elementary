@@ -6,21 +6,16 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` calendar_example_04.c -o calendar_example_04
+ * gcc -o calendar_example_04 calendar_example_04.c -g `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 #define SECS_DAY 86400
 
 EAPI_MAIN int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *bx, *cal, *cal2;
    struct tm selected_time;
@@ -29,6 +24,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    win = elm_win_add(NULL, "calendar", ELM_WIN_BASIC);
    elm_win_title_set(win, "Calendar Day Selection Example");
    elm_win_autodel_set(win, EINA_TRUE);
+   elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
@@ -59,6 +55,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
 ELM_MAIN()

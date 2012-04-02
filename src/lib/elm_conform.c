@@ -43,8 +43,10 @@ enum _Conformant_Part_Type
    ELM_CONFORM_CLIPBOARD_PART    = 8
 };
 
+#ifdef HAVE_ELEMENTARY_X
 #define SUB_TYPE_COUNT 2
 static char *sub_type[SUB_TYPE_COUNT] = { "scroller", "genlist" };
+#endif
 
 /* local function prototypes */
 static const char *widtype = NULL;
@@ -73,7 +75,6 @@ static void _conformant_move_resize_event_cb(void *data,
                                              void *event_info);
 static void _sizing_eval(Evas_Object *obj);
 static void _show_region_job(void *data);
-static Eina_Bool _prop_change(void *data, int type, void *event);
 static void _changed_size_hints(void *data, Evas *e,
                                 Evas_Object *obj,
                                 void *event_info);
@@ -84,6 +85,7 @@ _del_pre_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    if (!wd) return;
+
 #ifdef HAVE_ELEMENTARY_X
    if (wd->prop_hdl) ecore_event_handler_del(wd->prop_hdl);
 #endif
@@ -93,8 +95,8 @@ static void
 _del_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd) return;
+
    if (wd->show_region_job) ecore_job_del(wd->show_region_job);
    free(wd);
 }
@@ -103,8 +105,8 @@ static void
 _mirrored_set(Evas_Object *obj, Eina_Bool rtl)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd) return;
+
    edje_object_mirrored_set(wd->base, rtl);
 }
 
@@ -112,8 +114,8 @@ static void
 _theme_hook(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd) return;
+
    _elm_widget_mirrored_reload(obj);
    _mirrored_set(obj, elm_widget_mirrored_get(obj));
    _elm_theme_object_set(obj, wd->base, "conformant", "base",
@@ -169,6 +171,7 @@ _content_unset_hook(Evas_Object *obj, const char *part)
    if (part && strcmp(part, "default")) return NULL;
    wd = elm_widget_data_get(obj);
    if ((!wd) || (!wd->content)) return NULL;
+
    content = wd->content;
    elm_widget_sub_object_del(obj, wd->content);
    evas_object_event_callback_del_full(content,
@@ -184,8 +187,8 @@ _sizing_eval(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Coord mw = -1, mh = -1;
-
    if (!wd) return;
+
    edje_object_size_min_calc(wd->base, &mw, &mh);
    evas_object_size_hint_min_set(obj, mw, mh);
    evas_object_size_hint_max_set(obj, -1, -1);
@@ -256,15 +259,17 @@ _conformant_part_size_set(Evas_Object *obj, Evas_Object *sobj, Evas_Coord sx,
 static void
 _conformant_part_sizing_eval(Evas_Object *obj, Conformant_Part_Type part_type)
 {
-   Ecore_X_Window zone = 0, xwin;
+#ifdef HAVE_ELEMENTARY_X
+   Ecore_X_Window zone = 0;
    Evas_Object *top;
+#endif
+   Ecore_X_Window xwin;
    int sx = -1, sy = -1, sw = -1, sh = -1;
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd) return;
 
-   top = elm_widget_top_get(obj);
 #ifdef HAVE_ELEMENTARY_X
+   top = elm_widget_top_get(obj);
    xwin = elm_win_xwindow_get(top);
    if (xwin)
      zone = ecore_x_e_illume_zone_get(xwin);
@@ -337,6 +342,8 @@ _swallow_conformant_parts(Evas_Object *obj)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas *e = evas_object_evas_get(obj);
+   if (!wd || !e) return;
+
    wd->scroller = NULL;
 
    //Indicator
@@ -399,8 +406,8 @@ _changed_size_hints(void *data, Evas *e __UNUSED__,
                     void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
-
    if (!wd) return;
+
    _sizing_eval(data);
 }
 
@@ -409,7 +416,8 @@ _sub_del(void *data __UNUSED__, Evas_Object *obj, void *event_info)
 {
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *sub = event_info;
-if (!wd) return;
+   if (!wd) return;
+
    if (sub == wd->content)
      {
         evas_object_event_callback_del_full(sub,
@@ -478,8 +486,8 @@ _conformant_move_resize_event_cb(void *data __UNUSED__, Evas *e __UNUSED__,
 {
    Conformant_Part_Type part_type;
    Widget_Data *wd = elm_widget_data_get(obj);
-
    if (!wd) return;
+
    part_type =  (ELM_CONFORM_INDICATOR_PART |
                  ELM_CONFORM_SOFTKEY_PART |
                  ELM_CONFORM_VIRTUAL_KEYPAD_PART |
@@ -488,21 +496,21 @@ _conformant_move_resize_event_cb(void *data __UNUSED__, Evas *e __UNUSED__,
 }
 
 // showing the focused/important region.
+#ifdef HAVE_ELEMENTARY_X
 static void
 _content_resize_event_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj
                          __UNUSED__, void *event_info __UNUSED__)
 {
    Evas_Object *conformant = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get(conformant);
-
    if (!wd) return;
-#ifdef HAVE_ELEMENTARY_X
+
    if (wd->vkb_state == ECORE_X_VIRTUAL_KEYBOARD_STATE_OFF) return;
-#endif
 
    if (wd->show_region_job) ecore_job_del(wd->show_region_job);
    wd->show_region_job = ecore_job_add(_show_region_job, conformant);
 }
+#endif
 
 static void
 _show_region_job(void *data)
@@ -510,7 +518,6 @@ _show_region_job(void *data)
    Evas_Object *focus_obj;
    Evas_Object *conformant = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get(conformant);
-
    if (!wd) return;
 
    focus_obj = elm_widget_focused_object_get(conformant);
@@ -538,7 +545,6 @@ _update_autoscroll_objs(void *data)
    Evas_Object *sub, *top_scroller = NULL;
    Evas_Object *conformant = (Evas_Object *)data;
    Widget_Data *wd = elm_widget_data_get(data);
-
    if (!wd) return;
 
    sub = elm_widget_focused_object_get(conformant);

@@ -1,23 +1,18 @@
 //Compile with:
-//gcc -g -DPACKAGE_DATA_DIR="\"<directory>\"" `pkg-config --cflags --libs elementary` bg_example_03.c -o bg_example_03
-// where directory is the a path where images/plant_01.jpg can be found.
+//gcc -o bg_example_03 bg_example_03.c -g `pkg-config --cflags --libs elementary`
+//where directory is the a path where images/plant_01.jpg can be found.
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
-on_done(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+on_done(void *data, Evas_Object *obj, void *event_info)
 {
    /* quit the mainloop (elm_run) */
    elm_exit();
 }
 
 static void
-_cb_radio_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
+_cb_radio_changed(void *data, Evas_Object *obj, void *event)
 {
    Evas_Object *o_bg = data;
 
@@ -25,7 +20,7 @@ _cb_radio_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
 }
 
 static void
-_cb_overlay_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
+_cb_overlay_changed(void *data, Evas_Object *obj, void *event)
 {
    Evas_Object *o_bg = data;
 
@@ -34,7 +29,7 @@ _cb_overlay_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
         Evas_Object *parent, *over;
         char buff[PATH_MAX];
 
-        snprintf(buff, sizeof(buff), "%s/objects/test.edj", PACKAGE_DATA_DIR);
+        snprintf(buff, sizeof(buff), "%s/objects/test.edj", elm_app_data_dir_get());
         parent = elm_object_parent_widget_get(o_bg);
         over = edje_object_add(evas_object_evas_get(parent));
         edje_object_file_set(over, buff, "bg_overlay");
@@ -45,7 +40,7 @@ _cb_overlay_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
 }
 
 static void
-_cb_color_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
+_cb_color_changed(void *data, Evas_Object *obj, void *event)
 {
    Evas_Object *o_bg = data;
    double val = 0.0;
@@ -61,14 +56,15 @@ _cb_color_changed(void *data, Evas_Object *obj, void *event __UNUSED__)
      elm_bg_color_set(o_bg, 0, 255, 0);
 }
 
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg;
    Evas_Object *box, *hbox, *o_bg;
    Evas_Object *rd, *rdg;
    char buf[PATH_MAX];
 
+   elm_app_info_set(elm_main, "elementary", "objects/test.edj");
    win = elm_win_add(NULL, "bg-options", ELM_WIN_BASIC);
    elm_win_title_set(win, "Bg Options");
    evas_object_smart_callback_add(win, "delete,request", on_done, NULL);
@@ -85,7 +81,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(box);
 
    o_bg = elm_bg_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/plant_01.jpg", PACKAGE_DATA_DIR);
+   snprintf(buf, sizeof(buf), "%s/images/plant_01.jpg", elm_app_data_dir_get());
    elm_bg_file_set(o_bg, buf, NULL);
    evas_object_size_hint_weight_set(o_bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(o_bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -164,10 +160,11 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
 
    evas_object_size_hint_min_set(bg, 160, 160);
    evas_object_size_hint_max_set(bg, 640, 640);
-   evas_object_resize(win, 320, 320);
+   evas_object_resize(win, 460, 320);
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }

@@ -5,27 +5,22 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` calendar_example_05.c -o calendar_example_05
+ * gcc -o calendar_example_05 calendar_example_05.c -g `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
-_print_cal_info_cb(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+_print_cal_info_cb(void *data, Evas_Object *obj, void *event_info)
 {
    int year_min, year_max;
    Eina_Bool sel_enabled;
    const char **wds;
-   struct tm stime;
+   struct tm sel_time;
    double interval;
 
-   if (!elm_calendar_selected_time_get(obj, &stime))
+   if (!elm_calendar_selected_time_get(obj, &sel_time))
      return;
 
    interval = elm_calendar_interval_get(obj);
@@ -36,19 +31,20 @@ _print_cal_info_cb(void *data __UNUSED__, Evas_Object *obj, void *event_info __U
    printf("Day: %i, Mon: %i, Year %i, WeekDay: %i<br>\n"
           "Interval: %0.2f, Year_Min: %i, Year_Max %i, Sel Enabled : %i<br>\n"
           "Weekdays: %s, %s, %s, %s, %s, %s, %s<br>\n\n",
-          stime.tm_mday, stime.tm_mon, stime.tm_year + 1900, stime.tm_wday,
+          sel_time.tm_mday, sel_time.tm_mon, sel_time.tm_year + 1900, sel_time.tm_wday,
           interval, year_min, year_max, sel_enabled,
           wds[0], wds[1], wds[2], wds[3], wds[4], wds[5], wds[6]);
 }
 
 EAPI_MAIN int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *cal;
 
    win = elm_win_add(NULL, "calendar", ELM_WIN_BASIC);
    elm_win_title_set(win, "Calendar Getters Example");
    elm_win_autodel_set(win, EINA_TRUE);
+   elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
@@ -66,6 +62,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
 ELM_MAIN()

@@ -1,10 +1,8 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` -DPACKAGE_DATA_DIR="\"<directory>\"" photocam_example_01.c -o photocam_example_01
+//gcc -o photocam_example_01 photocam_example_01.c -g `pkg-config --cflags --libs elementary` -DDATA_DIR="\"<directory>\""
+//where directory is the path where images/insanely_huge_test_image.jpg can be found.
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 
 static void _fit(void *data, Evas_Object *obj, void *event_info);
 static void _unfit(void *data, Evas_Object *obj, void *event_info);
@@ -14,19 +12,23 @@ static void _bring_in(void *data, Evas_Object *obj, void *event_info);
 EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
-   Evas_Object *win, *bg, *bx, *obj, *photocam;
+   Evas_Object *win, *bg, *obj, *photocam;
+   char buf[PATH_MAX];
 
+   elm_app_info_set(elm_main, "elementary", "images/insanely_huge_test_image.jpg");
    win = elm_win_add(NULL, "photocam", ELM_WIN_BASIC);
    elm_win_title_set(win, "Photocam");
    elm_win_autodel_set(win, EINA_TRUE);
    elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
 
    bg = elm_bg_add(win);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
    photocam = elm_photocam_add(win);
-   elm_photocam_file_set(photocam, PACKAGE_DATA_DIR"/images/insanely_huge_test_image.jpg");
+   snprintf(buf, sizeof(buf), "%s/images/insanely_huge_test_image.jpg", elm_app_data_dir_get());
+   elm_photocam_file_set(photocam, buf);
    elm_photocam_bounce_set(photocam, EINA_FALSE, EINA_TRUE);
    evas_object_smart_callback_add(photocam, "loaded,detail", _bring_in, NULL);
    evas_object_resize(photocam, 500, 400);
@@ -57,6 +59,7 @@ elm_main(int argc, char **argv)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }

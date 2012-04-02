@@ -5,21 +5,16 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` panes_example.c -o panes_example
+ * gcc -g panes_example.c -o panes_example `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
-_on_done(void *data __UNUSED__,
-        Evas_Object *obj __UNUSED__,
-        void *event_info __UNUSED__)
+_on_done(void *data,
+        Evas_Object *obj,
+        void *event_info)
 {
    elm_exit();
 }
@@ -27,25 +22,25 @@ _on_done(void *data __UNUSED__,
 static double size = 0.0;
 
 static void
-_press(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_press(void *data, Evas_Object *obj, void *event_info)
 {
     printf("Pressed\n");
 }
 
 static void
-_unpress(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+_unpress(void *data, Evas_Object *obj, void *event_info)
 {
     printf("Unpressed, size : %f\n", elm_panes_content_left_size_get(obj));
 }
 
 static void
-_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_clicked(void *data, Evas_Object *obj, void *event_info)
 {
     printf("Clicked\n");
 }
 
 static void
-_clicked_double(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSED__)
+_clicked_double(void *data, Evas_Object *obj, void *event_info)
 {
    if (elm_panes_content_left_size_get(obj) > 0)
      {
@@ -60,8 +55,8 @@ _clicked_double(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUS
      }
 }
 
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *panes, *panes_h, *bt;
 
@@ -120,6 +115,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
 ELM_MAIN()

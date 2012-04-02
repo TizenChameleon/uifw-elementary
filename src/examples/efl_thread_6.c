@@ -1,7 +1,8 @@
+//Compile with:
+//gcc -o efl_thread_6 efl_thread_6.c -g `pkg-config --cflags --libs elementary`
 #include <Elementary.h>
 
 static Evas_Object *win = NULL;
-static Evas_Object *rect = NULL;
 
 struct info
 {
@@ -9,7 +10,7 @@ struct info
    int *pix;
 };
 
-// BEGIN - code running in my custom pthread instance
+// BEGIN - code running in my custom thread instance
 //
 static void
 mandel(int *pix, int w, int h)
@@ -46,12 +47,12 @@ mandel(int *pix, int w, int h)
                }
              val = (((x * x) + (y * y)) * 2.55) / 100.0;
              if (val > 255) val = 255;
-             if (iteration >= 99999) 
+             if (iteration >= 99999)
                {
                   rr = (r * val) / 255;
                   gg = (g * val) / 255;
                   bb = (b * val) / 255;
-                  pix[(hy * w) + hx] = 
+                  pix[(hy * w) + hx] =
                      (val  << 24) | (rr << 16) | (gg << 8) | (bb);
                }
              else
@@ -69,7 +70,7 @@ th_do(void *data, Ecore_Thread *th)
    mandel(inf->pix, 256, 256);
 }
 //
-// END - code running in my custom pthread instance
+// END - code running in my custom thread instance
 
 static void // thread job finished - collect results and put in img obj
 th_end(void *data, Ecore_Thread *th)
@@ -116,7 +117,7 @@ anim(void *data)
    return EINA_TRUE;
 }
 
-int
+EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
    Evas_Object *o, *bg;
@@ -124,12 +125,14 @@ elm_main(int argc, char **argv)
 
    win = elm_win_add(NULL, "efl-thread-6", ELM_WIN_BASIC);
    elm_win_title_set(win, "EFL Thread 6");
+   elm_win_autodel_set(win, EINA_TRUE);
+   elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
    evas_object_resize(win, 400, 400);
    evas_object_show(win);
 
    bg = elm_bg_add(win);
-   elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
    // queue up 64 mandel generation thread jobs
@@ -141,8 +144,6 @@ elm_main(int argc, char **argv)
         inf = malloc(sizeof(struct info));
         if (inf)
           {
-             Evas_Object *o;
-
              o = evas_object_image_filled_add(evas_object_evas_get(win));
              evas_object_image_size_set(o, 256, 256);
              evas_object_image_alpha_set(o, EINA_TRUE);
@@ -157,8 +158,8 @@ elm_main(int argc, char **argv)
      }
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
-
 ELM_MAIN()
-

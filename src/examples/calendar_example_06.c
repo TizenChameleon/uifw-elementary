@@ -4,21 +4,16 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` calendar_example_06.c -o calendar_example_06
+ * gcc -o calendar_example_06 calendar_example_06.c -g `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 #define SECS_DAY 86400
 
 static void
-_btn_clear_cb(void *data, Evas_Object *btn __UNUSED__, void *ev __UNUSED__)
+_btn_clear_cb(void *data, Evas_Object *btn, void *ev)
 {
    Evas_Object *cal = data;
    elm_calendar_marks_clear(cal);
@@ -26,13 +21,13 @@ _btn_clear_cb(void *data, Evas_Object *btn __UNUSED__, void *ev __UNUSED__)
 }
 
 EAPI_MAIN int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *bt, *bx, *cal;
    Elm_Calendar_Mark *mark;
    struct tm selected_time;
    time_t current_time;
-   struct tm sunday = {0, 0, 12, 7, 0, 0, 0, 0, -1 };
+   struct tm sunday = { 0, 0, 12, 7, 0, 0, 0, 0, -1, 0, NULL };
    /* tm {sec, min, hour, mday, mon, year, wday, yday, isdst } */
    /* weekdays since Sunday, range 0 to 6 */
    struct tm christmas;
@@ -43,6 +38,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    win = elm_win_add(NULL, "calendar", ELM_WIN_BASIC);
    elm_win_title_set(win, "Calendar Marks Example");
    elm_win_autodel_set(win, EINA_TRUE);
+   elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
 
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
@@ -93,6 +89,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
 ELM_MAIN()

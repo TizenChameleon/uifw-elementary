@@ -5,17 +5,11 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` index_example.c -o index_example
+ * gcc -g index_example.c -o index_example `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-# define PACKAGE_DATA_DIR "../../data"
-#endif
 
 static const char *items[] = \
 {
@@ -30,39 +24,40 @@ static const char *items[] = \
 };
 
 static void
-_index_changed(void        *data __UNUSED__,
-               Evas_Object *obj __UNUSED__,
+_index_changed(void        *data,
+               Evas_Object *obj,
                void        *event_info)
 {
-   elm_gengrid_item_bring_in(event_info, ELM_GENGRID_ITEM_SCROLLTO_IN);
+   Elm_Object_Item *item = elm_object_item_data_get(event_info);
+   elm_gengrid_item_bring_in(item, ELM_GENGRID_ITEM_SCROLLTO_IN);
 }
 
 static void
-_on_done(void        *data __UNUSED__,
-         Evas_Object *obj __UNUSED__,
-         void        *event_info __UNUSED__)
+_on_done(void        *data,
+         Evas_Object *obj,
+         void        *event_info)
 {
    elm_exit();
 }
 
 static char *
 _grid_label_get(void        *data,
-                Evas_Object *obj __UNUSED__,
-                const char  *part __UNUSED__)
+                Evas_Object *obj,
+                const char  *part)
 {
    int idx = (int)data;
    return strdup(items[idx]);
 }
 
 Evas_Object *
-_grid_content_get(void        *data __UNUSED__,
+_grid_content_get(void        *data,
                Evas_Object *obj,
                const char  *part)
 {
    if (!strcmp(part, "elm.swallow.icon"))
      {
         char buf[PATH_MAX];
-        snprintf(buf, sizeof(buf), "%s/images/%s", PACKAGE_DATA_DIR,
+        snprintf(buf, sizeof(buf), "%s/images/%s", elm_app_data_dir_get(),
                  "sky_01.jpg");
 
         Evas_Object *icon = elm_bg_add(obj);
@@ -92,16 +87,17 @@ _index_icmp(const void *data1,
    return strcasecmp(label1, label2);
 }
 
-int
-elm_main(int    argc __UNUSED__,
-         char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int    argc,
+         char **argv)
 {
-   Evas_Object *win, *bg, *grid, *index;
+   Evas_Object *win, *bg, *grid, *idx;
    Elm_Object_Item *gg_it;
    unsigned int i;
 
    Elm_Gengrid_Item_Class gic;
 
+   elm_app_info_set(elm_main, "elementary", "images");
    win = elm_win_add(NULL, "index", ELM_WIN_BASIC);
    elm_win_title_set(win, "Index Example");
    evas_object_smart_callback_add(win, "delete,request", _on_done, NULL);
@@ -124,11 +120,11 @@ elm_main(int    argc __UNUSED__,
    elm_win_resize_object_add(win, grid);
    evas_object_show(grid);
 
-   index = elm_index_add(win);
-   evas_object_size_hint_weight_set(index, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, index);
+   idx = elm_index_add(win);
+   evas_object_size_hint_weight_set(idx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, idx);
 
-   evas_object_show(index);
+   evas_object_show(idx);
 
    for (i = 0; i < (sizeof(items) / sizeof(items[0])); i++)
      {
@@ -138,18 +134,19 @@ elm_main(int    argc __UNUSED__,
 
         /* indexing by first letters */
         snprintf(buf, sizeof(buf), "%c", items[i][0]);
-        elm_index_item_sorted_insert(index, buf, NULL, gg_it, _index_icmp, NULL);
+        elm_index_item_sorted_insert(idx, buf, NULL, gg_it, _index_icmp, NULL);
      }
 
-   evas_object_smart_callback_add(index, "delay,changed", _index_changed, NULL);
+   evas_object_smart_callback_add(idx, "delay,changed", _index_changed, NULL);
 
    evas_object_resize(win, 320, 300);
    evas_object_show(win);
 
-   elm_index_autohide_disabled_set(index, EINA_FALSE);
+   elm_index_autohide_disabled_set(idx, EINA_FALSE);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
-
 ELM_MAIN()

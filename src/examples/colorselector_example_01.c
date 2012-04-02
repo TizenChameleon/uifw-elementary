@@ -1,10 +1,7 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` colorselector_example_01.c -o colorselector_example_01
+//gcc -g colorselector_example_01.c -o colorselector_example_01 `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 
 static void _change_color(void *data, Evas_Object *obj, void *event_info);
 static void _colorpalette_clicked_cb(void *data, Evas_Object *obj, void *event_info);
@@ -65,6 +62,7 @@ elm_main(int argc, char **argv)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }

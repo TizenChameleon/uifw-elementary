@@ -18,9 +18,10 @@ struct _Widget_Data
    Elm_Object_Select_Mode select_mode;
    int walking;
    int movements;
-   struct {
+   struct
+     {
         Evas_Coord x, y;
-   } history[SWIPE_MOVES];
+     } history[SWIPE_MOVES];
    Eina_Bool scr_minw : 1;
    Eina_Bool scr_minh : 1;
    Eina_Bool swipe : 1;
@@ -132,7 +133,9 @@ _elm_list_item_free(Elm_List_Item *it)
    eina_stringshare_del(it->label);
 
    if (it->swipe_timer) ecore_timer_del(it->swipe_timer);
+   it->swipe_timer = NULL;
    if (it->long_timer) ecore_timer_del(it->long_timer);
+   it->long_timer = NULL;
    if (it->icon) evas_object_del(it->icon);
    if (it->end) evas_object_del(it->end);
 }
@@ -1049,7 +1052,7 @@ _item_disable(Elm_Object_Item *it)
 }
 
 static void
-_item_content_set(Elm_Object_Item *it, const char *part, Evas_Object *content)
+_item_content_set_hook(Elm_Object_Item *it, const char *part, Evas_Object *content)
 {
    Elm_List_Item *item = (Elm_List_Item *)it;
    Evas_Object **icon_p = NULL;
@@ -1091,7 +1094,7 @@ _item_content_set(Elm_Object_Item *it, const char *part, Evas_Object *content)
 }
 
 static Evas_Object *
-_item_content_get(const Elm_Object_Item *it, const char *part)
+_item_content_get_hook(const Elm_Object_Item *it, const char *part)
 {
    Elm_List_Item *item = (Elm_List_Item *)it;
 
@@ -1109,20 +1112,20 @@ _item_content_get(const Elm_Object_Item *it, const char *part)
 }
 
 static Evas_Object *
-_item_content_unset(const Elm_Object_Item *it, const char *part)
+_item_content_unset_hook(const Elm_Object_Item *it, const char *part)
 {
    Elm_List_Item *item = (Elm_List_Item *)it;
 
    if ((!part) || (!strcmp(part, "start")))
      {
         Evas_Object *obj = item->icon;
-        _item_content_set((Elm_Object_Item *)it, part, NULL);
+        _item_content_set_hook((Elm_Object_Item *)it, part, NULL);
         return obj;
      }
    else if (!strcmp(part, "end"))
      {
         Evas_Object *obj = item->end;
-        _item_content_set((Elm_Object_Item *)it, part, NULL);
+        _item_content_set_hook((Elm_Object_Item *)it, part, NULL);
         return obj;
      }
    return NULL;
@@ -1213,9 +1216,9 @@ _item_new(Evas_Object *obj, const char *label, Evas_Object *icon, Evas_Object *e
                                        _changed_size_hints, obj);
      }
    elm_widget_item_disable_hook_set(it, _item_disable);
-   elm_widget_item_content_set_hook_set(it, _item_content_set);
-   elm_widget_item_content_get_hook_set(it, _item_content_get);
-   elm_widget_item_content_unset_hook_set(it, _item_content_unset);
+   elm_widget_item_content_set_hook_set(it, _item_content_set_hook);
+   elm_widget_item_content_get_hook_set(it, _item_content_get_hook);
+   elm_widget_item_content_unset_hook_set(it, _item_content_unset_hook);
    elm_widget_item_text_set_hook_set(it, _item_text_set);
    elm_widget_item_text_get_hook_set(it, _item_text_get);
    elm_widget_item_del_pre_hook_set(it, _item_del_pre_hook);
@@ -1930,6 +1933,7 @@ elm_list_item_show(Elm_Object_Item *it)
    Evas_Coord bx, by, bw, bh;
    Evas_Coord x, y, w, h;
 
+   evas_smart_objects_calculate(evas_object_evas_get(wd->box));
    evas_object_geometry_get(wd->box, &bx, &by, &bw, &bh);
    evas_object_geometry_get(VIEW(it), &x, &y, &w, &h);
    x -= bx;
@@ -1946,6 +1950,7 @@ elm_list_item_bring_in(Elm_Object_Item *it)
    Evas_Coord bx, by, bw, bh;
    Evas_Coord x, y, w, h;
 
+   evas_smart_objects_calculate(evas_object_evas_get(wd->box));
    evas_object_geometry_get(wd->box, &bx, &by, &bw, &bh);
    evas_object_geometry_get(VIEW(it), &x, &y, &w, &h);
    x -= bx;
@@ -1976,4 +1981,24 @@ elm_list_item_next(const Elm_Object_Item *it)
    Elm_List_Item *item = (Elm_List_Item *)it;
    if (item->node->next) return item->node->next->data;
    else return NULL;
+}
+
+EAPI Elm_Object_Item *
+elm_list_first_item_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (!wd->items) return NULL;
+   return eina_list_data_get(wd->items);
+}
+
+EAPI Elm_Object_Item *
+elm_list_last_item_get(const Evas_Object *obj)
+{
+   ELM_CHECK_WIDTYPE(obj, widtype) NULL;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return NULL;
+   if (!wd->items) return NULL;
+   return eina_list_data_get(eina_list_last(wd->items));
 }

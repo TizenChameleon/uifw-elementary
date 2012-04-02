@@ -1,8 +1,8 @@
-#include <Elementary.h>
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #include "test.h"
 #endif
+#include <Elementary.h>
 #ifndef ELM_LIB_QUICKLAUNCH
 struct _api_data
 {
@@ -29,7 +29,7 @@ set_api_state(api_data *api)
 {
    const Eina_List *items = elm_box_children_get(api->box);
    Evas_Object *ck = eina_list_nth(items, 0);
-   if(!eina_list_count(items))
+   if (!eina_list_count(items))
      return;
 
    /* use elm_box_children_get() to get list of children */

@@ -43,6 +43,7 @@ struct _Elm_Naviframe_Item
    Evas_Coord         minh;
    Eina_Bool          back_btn: 1;
    Eina_Bool          title_visible: 1;
+   Eina_Bool          content_unfocusable : 1;
 };
 
 static const char *widtype = NULL;
@@ -239,7 +240,7 @@ _item_text_set_hook(Elm_Object_Item *it,
 
    if (!part || !strcmp(part, "default"))
      snprintf(buf, sizeof(buf), "elm.text.title");
-   else if(!strcmp("subtitle", part))
+   else if (!strcmp("subtitle", part))
      snprintf(buf, sizeof(buf), "elm.text.subtitle");
    else
      snprintf(buf, sizeof(buf), "%s", part);
@@ -283,7 +284,7 @@ _item_text_get_hook(const Elm_Object_Item *it, const char *part)
 
    if (!part || !strcmp(part, "default"))
      snprintf(buf, sizeof(buf), "elm.text.title");
-   else if(!strcmp("subtitle", part))
+   else if (!strcmp("subtitle", part))
      snprintf(buf, sizeof(buf), "elm.text.subtitle");
    else
      snprintf(buf, sizeof(buf), "%s", part);
@@ -870,6 +871,10 @@ _pushed_finished(void *data,
    if (!wd) return;
 
    evas_object_hide(VIEW(it));
+
+   if (it->content)
+     elm_widget_tree_unfocusable_set(it->content, it->content_unfocusable);
+
    if (wd->freeze_events)
      evas_object_freeze_events_set(VIEW(it), EINA_FALSE);
 }
@@ -880,9 +885,18 @@ _popped_finished(void *data,
                  const char *emission __UNUSED__,
                  const char *source __UNUSED__)
 {
+   Widget_Data *wd;
    Elm_Naviframe_Item *it = data;
    if (!it) return;
+
+   wd = elm_widget_data_get(WIDGET(it));
+   if (!wd) return;
+
+   if (wd->preserve && it->content)
+     elm_widget_tree_unfocusable_set(it->content, it->content_unfocusable);
+
    _item_del(data);
+
    elm_widget_item_free(data);
 }
 
@@ -900,10 +914,7 @@ _show_finished(void *data,
    wd =  elm_widget_data_get(WIDGET(it));
    if (!wd) return;
 
-   // FIXME : If current top's content is unfocusable, it should be restored as focusable.
-   // Similar cases are should be checked and should call following function.
-   if (elm_widget_tree_unfocusable_get(it->content))
-     elm_widget_tree_unfocusable_set(it->content, EINA_FALSE);
+   elm_widget_tree_unfocusable_set(it->content, it->content_unfocusable);
 
    evas_object_smart_callback_call(WIDGET(it),
                                    SIG_TRANSITION_FINISHED,
@@ -989,8 +1000,6 @@ _item_style_set(Elm_Naviframe_Item *navi_it, const char *item_style)
    if (navi_it->title_next_btn)
      elm_object_signal_emit(VIEW(navi_it), "elm,state,next_btn,show", "elm");
 
-// why does this forcibly enable title? isnt that separate to style?   
-//   navi_it->title_visible = EINA_TRUE;
    _sizing_eval(WIDGET(navi_it));
 
    wd = elm_widget_data_get(WIDGET(navi_it));
@@ -1171,7 +1180,11 @@ elm_naviframe_item_push(Evas_Object *obj,
         elm_object_signal_emit(VIEW(prev_it), "elm,state,cur,pushed", "elm");
         elm_object_signal_emit(VIEW(it), "elm,state,new,pushed", "elm");
         edje_object_message_signal_process(elm_layout_edje_get(VIEW(prev_it)));
-        elm_widget_tree_unfocusable_set(prev_it->content, EINA_TRUE);
+        if (prev_it->content)
+          {
+             prev_it->content_unfocusable = elm_widget_tree_unfocusable_get(prev_it->content);
+             elm_widget_tree_unfocusable_set(prev_it->content, EINA_TRUE);
+          }
         edje_object_message_signal_process(elm_layout_edje_get(VIEW(it)));
      }
    wd->stack = eina_inlist_append(wd->stack, EINA_INLIST_GET(it));
@@ -1196,15 +1209,14 @@ elm_naviframe_item_insert_before(Evas_Object *obj,
    wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   it = _item_new(WIDGET(before), title_label, prev_btn, next_btn, content,
-                  item_style);
+   it = _item_new(obj, title_label, prev_btn, next_btn, content, item_style);
    if (!it) return NULL;
 
    wd->stack =
       eina_inlist_prepend_relative(wd->stack,
                                    EINA_INLIST_GET(it),
                                    EINA_INLIST_GET(((Elm_Naviframe_Item *) before)));
-   _sizing_eval(WIDGET(before));
+   _sizing_eval(obj);
    return (Elm_Object_Item *)it;
 }
 
@@ -1221,24 +1233,28 @@ elm_naviframe_item_insert_after(Evas_Object *obj,
    ELM_OBJ_ITEM_CHECK_OR_RETURN(after, NULL);
    Elm_Naviframe_Item *it;
    Widget_Data *wd;
+   Eina_Bool top_inserted;
 
    wd = elm_widget_data_get(obj);
    if (!wd) return NULL;
 
-   it = _item_new(WIDGET(after), title_label, prev_btn, next_btn, content,
-                  item_style);
+   it = _item_new(obj, title_label, prev_btn, next_btn, content, item_style);
    if (!it) return NULL;
 
-   if (elm_naviframe_top_item_get(WIDGET(after)) == after)
-     {
-        evas_object_hide(VIEW(after));
-        evas_object_show(VIEW(it));
-     }
+   if (elm_naviframe_top_item_get(obj) == after) top_inserted = EINA_TRUE;
+
    wd->stack =
       eina_inlist_append_relative(wd->stack,
                                   EINA_INLIST_GET(it),
                                   EINA_INLIST_GET(((Elm_Naviframe_Item *) after)));
-   _sizing_eval(WIDGET(after));
+   if (top_inserted)
+     {
+        evas_object_show(VIEW(it));
+        evas_object_hide(VIEW(after));
+     }
+
+   _sizing_eval(obj);
+
    return (Elm_Object_Item *)it;
 }
 
@@ -1257,8 +1273,12 @@ elm_naviframe_item_pop(Evas_Object *obj)
    if (!it) return NULL;
    if (wd->preserve)
      content = it->content;
-   else
-     elm_widget_tree_unfocusable_set(it->content, EINA_TRUE);
+
+   if (it->content)
+     {
+        it->content_unfocusable = elm_widget_tree_unfocusable_get(it->content);
+        elm_widget_tree_unfocusable_set(it->content, EINA_TRUE);
+     }
 
    if (wd->stack->last->prev)
      prev_it = EINA_INLIST_CONTAINER_GET(wd->stack->last->prev,
@@ -1273,7 +1293,6 @@ elm_naviframe_item_pop(Evas_Object *obj)
           }
         elm_object_signal_emit(VIEW(it), "elm,state,cur,popped", "elm");
         evas_object_show(VIEW(prev_it));
-        evas_object_raise(VIEW(prev_it));
         elm_object_signal_emit(VIEW(prev_it),
                                "elm,state,prev,popped",
                                "elm");
@@ -1305,7 +1324,7 @@ elm_naviframe_item_pop_to(Elm_Object_Item *it)
 
    l = wd->stack->last->prev;
 
-   while(l)
+   while (l)
      {
         if (EINA_INLIST_CONTAINER_GET(l, Elm_Naviframe_Item) ==
             ((Elm_Naviframe_Item *)it)) break;
@@ -1332,11 +1351,15 @@ elm_naviframe_item_promote(Elm_Object_Item *it)
    if (!wd) return;
 
    if (it == elm_naviframe_top_item_get(navi_it->base.widget)) return;
-   elm_widget_tree_unfocusable_set(navi_it->content, EINA_FALSE);
    wd->stack = eina_inlist_demote(wd->stack, EINA_INLIST_GET(navi_it));
    prev_it = EINA_INLIST_CONTAINER_GET(wd->stack->last->prev,
                                          Elm_Naviframe_Item);
-   elm_widget_tree_unfocusable_set(prev_it->content, EINA_FALSE);
+   if (prev_it->content)
+     {
+        prev_it->content_unfocusable = elm_widget_tree_unfocusable_get(prev_it->content);
+        elm_widget_tree_unfocusable_set(prev_it->content, EINA_TRUE);
+     }
+
    if (wd->freeze_events)
      {
         evas_object_freeze_events_set(VIEW(it), EINA_TRUE);
@@ -1423,6 +1446,7 @@ elm_naviframe_item_style_set(Elm_Object_Item *it, const char *item_style)
      if (!strcmp("basic", navi_it->style)) return;
 
    _item_style_set(navi_it, item_style);
+   _item_title_visible_update(navi_it);
 }
 
 EAPI const char *

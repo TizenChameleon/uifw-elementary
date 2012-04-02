@@ -1,9 +1,9 @@
-#include <Elementary.h>
 #include "test.h"
 #include <Elementary_Cursor.h>
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
+#include <Elementary.h>
 #ifndef ELM_LIB_QUICKLAUNCH
 struct _api_data
 {
@@ -36,7 +36,7 @@ static void
 set_api_state(api_data *api)
 {
    const Eina_List *disks = elm_box_children_get(api->box);
-   if(!eina_list_count(disks))
+   if (!eina_list_count(disks))
      return;
 
    switch(api->state)

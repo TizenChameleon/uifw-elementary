@@ -36,10 +36,11 @@ struct _Elm_Toolbar_Item
    Evas_Object *object;
    Evas_Object *o_menu;
    Evas_Smart_Cb func;
-   struct {
-      int priority;
-      Eina_Bool visible : 1;
-   } prio;
+   struct
+     {
+        int priority;
+        Eina_Bool visible : 1;
+     } prio;
    Eina_Bool selected : 1;
    Eina_Bool separator : 1;
    Eina_Bool menu : 1;
@@ -267,7 +268,7 @@ _del_pre_hook(Evas_Object *obj)
 
    if (!wd) return;
    it = ELM_TOOLBAR_ITEM_FROM_INLIST(wd->items);
-   while(it)
+   while (it)
      {
         next = ELM_TOOLBAR_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->next);
         _item_del(it);
@@ -430,10 +431,14 @@ _item_content_set_hook(Elm_Object_Item *it,
    Elm_Toolbar_Item *item = (Elm_Toolbar_Item *) it;
    Evas_Object *obj = WIDGET(item);
    Widget_Data *wd = elm_widget_data_get(obj);
-
+   if (!wd || !obj) return;
    if (item->object == content) return;
+
+   if (item->object) evas_object_del(item->object);
+
    item->object = content;
-   elm_widget_sub_object_add(obj, item->object);
+   if (item->object)
+     elm_widget_sub_object_add(obj, item->object);
    scale = (elm_widget_scale_get(obj) * _elm_config->scale);
    _theme_hook_item(obj, item, scale, wd->icon_size);
 }

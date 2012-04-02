@@ -1,9 +1,9 @@
-#include <Elementary.h>
 #include <Elementary_Cursor.h>
 #include "test.h"
 #ifdef HAVE_CONFIG_H
 #include "elementary_config.h"
 #endif
+#include <Elementary.h>
 #ifndef ELM_LIB_QUICKLAUNCH
 struct _api_data
 {
@@ -30,7 +30,7 @@ static void
 set_api_state(api_data *api)
 {
    const Eina_List *items = elm_box_children_get(api->box);
-   if(!eina_list_count(items))
+   if (!eina_list_count(items))
      return;
 
    Evas_Object *gl = eina_list_nth(items, 0); /* Genlist is the first item */
@@ -2434,7 +2434,7 @@ gl15_sel(void *data, Evas_Object *obj, void *event_info __UNUSED__)
 }
 
 static void
-gl15_edit_mode(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+gl15_deco_mode(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    elm_genlist_decorate_mode_set(data, EINA_TRUE);
    elm_genlist_select_mode_set(data, ELM_OBJECT_SELECT_MODE_ALWAYS);
@@ -2460,7 +2460,7 @@ test_genlist15(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
    int i;
    static Testitem tit[100];
 
-   win = elm_win_util_standard_add("genlist-edit-mode", "Genlist Edit Mode");
+   win = elm_win_util_standard_add("genlist-decorate-mode", "Genlist Decorate Mode");
    elm_win_autodel_set(win, EINA_TRUE);
 
    bx = elm_box_add(win);
@@ -2503,7 +2503,7 @@ test_genlist15(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_i
 
    bt = elm_button_add(win);
    elm_object_text_set(bt, "Edit mode");
-   evas_object_smart_callback_add(bt, "clicked", gl15_edit_mode, gl);
+   evas_object_smart_callback_add(bt, "clicked", gl15_deco_mode, gl);
    evas_object_size_hint_align_set(bt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(bt, EVAS_HINT_EXPAND, 0.0);
    elm_box_pack_end(bx2, bt);

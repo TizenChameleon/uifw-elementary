@@ -1,8 +1,8 @@
-#include <Elementary.h>
 #include "test.h"
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
+#include <Elementary.h>
 #ifndef ELM_LIB_QUICKLAUNCH
 struct _Idx_Data_Type
 {
@@ -68,7 +68,7 @@ set_api_state(api_data *api)
       case INDEX_ITEM_FIND:
            {
               Elm_Object_Item *i = elm_index_item_find(d->id, d->item);
-              if(i)
+              if (i)
                 {
                    printf("Item Find - Found Item.\n");
                    elm_object_item_del(i);

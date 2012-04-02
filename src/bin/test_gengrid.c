@@ -1,9 +1,9 @@
-#include <Elementary.h>
 #include <Elementary_Cursor.h>
 #include "test.h"
 #ifdef HAVE_CONFIG_H
 # include "elementary_config.h"
 #endif
+#include <Elementary.h>
 #ifndef ELM_LIB_QUICKLAUNCH
 
 static Elm_Gengrid_Item_Class *gic;
@@ -56,7 +56,7 @@ typedef enum _api_state api_state;
 static void
 set_api_state(api_data *api)
 {
-   Evas_Object *grid = api->box;
+   Evas_Object *grid = api->grid;
 
    /* use elm_box_children_get() to get list of children */
    switch(api->state)
@@ -412,7 +412,7 @@ cursor_cb(void *data, Evas_Object *obj, void *event_info __UNUSED__)
    for ((item = elm_gengrid_first_item_get(grid)); item;
         (item = elm_gengrid_item_next_get(item)))
      {
-        if(!elm_check_state_get(obj))
+        if (!elm_check_state_get(obj))
           {
              elm_gengrid_item_cursor_unset(item);
              continue;

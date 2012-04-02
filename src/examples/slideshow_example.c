@@ -5,22 +5,16 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` slideshow_example.c -o slideshow_example
+ * gcc -o slideshow_example slideshow_example.c -g `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-# define PACKAGE_DATA_DIR "../../data"
-#endif
 
 static void
-_on_done(void        *data __UNUSED__,
-         Evas_Object *obj __UNUSED__,
-         void        *event_info __UNUSED__)
+_on_done(void        *data,
+         Evas_Object *obj,
+         void        *event_info)
 {
    elm_exit();
 }
@@ -28,21 +22,13 @@ _on_done(void        *data __UNUSED__,
 static Evas_Object *slideshow, *bt_start, *bt_stop;
 static Elm_Slideshow_Item_Class itc;
 
-static const char *img1 = PACKAGE_DATA_DIR "/images/logo.png";
-static const char *img2 = PACKAGE_DATA_DIR "/images/plant_01.jpg";
-static const char *img3 = PACKAGE_DATA_DIR "/images/rock_01.jpg";
-static const char *img4 = PACKAGE_DATA_DIR "/images/rock_02.jpg";
-static const char *img5 = PACKAGE_DATA_DIR "/images/sky_01.jpg";
-static const char *img6 = PACKAGE_DATA_DIR "/images/sky_04.jpg";
-static const char *img7 = PACKAGE_DATA_DIR "/images/wood_01.jpg";
-static const char *img8 = PACKAGE_DATA_DIR "/images/mystrale.jpg";
-static const char *img9 = PACKAGE_DATA_DIR "/images/mystrale_2.jpg";
+static char img1[256], img2[256], img3[256], img4[256], img5[256], img6[256], img7[256], img8[256], img9[256];
 
 static void
 _notify_show(void        *data,
-             Evas        *e __UNUSED__,
-             Evas_Object *obj __UNUSED__,
-             void        *event_info __UNUSED__)
+             Evas        *e,
+             Evas_Object *obj,
+             void        *event_info)
 {
    evas_object_show(data);
 }
@@ -50,41 +36,41 @@ _notify_show(void        *data,
 /* jump to next item, cyclically */
 static void
 _next(void        *data,
-      Evas_Object *obj __UNUSED__,
-      void        *event_info __UNUSED__)
+      Evas_Object *obj,
+      void        *event_info)
 {
    elm_slideshow_next(data);
 }
 
 static void
 _previous(void        *data,
-          Evas_Object *obj __UNUSED__,
-          void        *event_info __UNUSED__)
+          Evas_Object *obj,
+          void        *event_info)
 {
    elm_slideshow_previous(data);
 }
 
 static void
 _first(void        *data,
-       Evas_Object *obj __UNUSED__,
-       void        *event_info __UNUSED__)
+       Evas_Object *obj,
+       void        *event_info)
 {
    elm_slideshow_item_show(data);
 }
 
 static void
 _last(void        *data,
-      Evas_Object *obj __UNUSED__,
-      void        *event_info __UNUSED__)
+      Evas_Object *obj,
+      void        *event_info)
 {
    elm_slideshow_item_show(data);
 }
 
 static void
 _mouse_in(void        *data,
-          Evas        *e __UNUSED__,
-          Evas_Object *obj __UNUSED__,
-          void        *event_info __UNUSED__)
+          Evas        *e,
+          Evas_Object *obj,
+          void        *event_info)
 {
    elm_notify_timeout_set(data, 0.0);
    evas_object_show(data);
@@ -92,9 +78,9 @@ _mouse_in(void        *data,
 
 static void
 _mouse_out(void        *data,
-           Evas        *e __UNUSED__,
-           Evas_Object *obj __UNUSED__,
-           void        *event_info __UNUSED__)
+           Evas        *e,
+           Evas_Object *obj,
+           void        *event_info)
 {
    elm_notify_timeout_set(data, 3.0);
 }
@@ -103,7 +89,7 @@ _mouse_out(void        *data,
 static void
 _transition_select(void        *data,
            Evas_Object *obj,
-           void        *event_info __UNUSED__)
+           void        *event_info)
 {
    elm_slideshow_transition_set(slideshow, data);
    elm_object_text_set(obj, data);
@@ -112,7 +98,7 @@ _transition_select(void        *data,
 static void
 _layout_select(void        *data,
                Evas_Object *obj,
-               void        *event_info __UNUSED__)
+               void        *event_info)
 {
    elm_slideshow_layout_set(slideshow, data);
    elm_object_text_set(obj, data);
@@ -121,8 +107,8 @@ _layout_select(void        *data,
 /* start the show! */
 static void
 _start(void        *data,
-       Evas_Object *obj __UNUSED__,
-       void        *event_info __UNUSED__)
+       Evas_Object *obj,
+       void        *event_info)
 {
    elm_slideshow_timeout_set(slideshow, elm_spinner_value_get(data));
 
@@ -131,9 +117,9 @@ _start(void        *data,
 }
 
 static void
-_stop(void        *data __UNUSED__,
-      Evas_Object *obj __UNUSED__,
-      void        *event_info __UNUSED__)
+_stop(void        *data,
+      Evas_Object *obj,
+      void        *event_info)
 {
    elm_slideshow_timeout_set(slideshow, 0.0);
    elm_object_disabled_set(bt_start, EINA_FALSE);
@@ -143,8 +129,8 @@ _stop(void        *data __UNUSED__,
 /* slideshow transition time has changed */
 static void
 _spin(void        *data,
-      Evas_Object *obj __UNUSED__,
-      void        *event_info __UNUSED__)
+      Evas_Object *obj,
+      void        *event_info)
 {
    if (elm_slideshow_timeout_get(slideshow) > 0)
      elm_slideshow_timeout_set(slideshow, elm_spinner_value_get(data));
@@ -179,29 +165,46 @@ _cmp_func(const void *data1,
    return strcasecmp(img_path1, img_path2);
 }
 
-int
-elm_main(int    argc __UNUSED__,
-         char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int    argc,
+         char **argv)
 {
    Evas_Object *win, *bg, *notify, *bx, *bt, *hv, *spin;
    Elm_Object_Item *slide_first, *slide_last, *slide_it;
    const char *transition, *layout;
    const Eina_List *l, *list;
+   const char *data_dir;
+
+   elm_app_info_set(elm_main, "elementary", "images");
+   data_dir = elm_app_data_dir_get();
+   snprintf(img1, sizeof(img1), "%s/images/logo.png", data_dir);
+   snprintf(img2, sizeof(img2), "%s/images/plant_01.jpg", data_dir);
+   snprintf(img3, sizeof(img3), "%s/images/rock_01.jpg", data_dir);
+   snprintf(img4, sizeof(img4), "%s/images/rock_02.jpg", data_dir);
+   snprintf(img5, sizeof(img5), "%s/images/sky_01.jpg", data_dir);
+   snprintf(img6, sizeof(img6), "%s/images/sky_04.jpg", data_dir);
+   snprintf(img7, sizeof(img7), "%s/images/wood_01.jpg", data_dir);
+   snprintf(img8, sizeof(img8), "%s/images/mystrale.jpg", data_dir);
+   snprintf(img9, sizeof(img9), "%s/images/mystrale_2.jpg", data_dir);
 
    win = elm_win_add(NULL, "slideshow", ELM_WIN_BASIC);
    elm_win_title_set(win, "Slideshow example");
    evas_object_smart_callback_add(win, "delete,request", _on_done, NULL);
+   elm_win_autodel_set(win, EINA_TRUE);
+   elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
+   evas_object_resize(win, 600, 400);
+   evas_object_show(win);
 
    bg = elm_bg_add(win);
-   elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
    slideshow = elm_slideshow_add(win);
    elm_slideshow_loop_set(slideshow, EINA_TRUE);
-   elm_win_resize_object_add(win, slideshow);
    evas_object_size_hint_weight_set(slideshow,
                                     EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, slideshow);
    evas_object_show(slideshow);
 
    itc.func.get = _get;
@@ -225,6 +228,7 @@ elm_main(int    argc __UNUSED__,
 
    notify = elm_notify_add(win);
    elm_notify_orient_set(notify, ELM_NOTIFY_ORIENT_BOTTOM);
+   evas_object_size_hint_weight_set(notify, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, notify);
    elm_notify_timeout_set(notify, 3.0);
 
@@ -311,11 +315,9 @@ elm_main(int    argc __UNUSED__,
 
    _notify_show(notify, NULL, NULL, NULL);
 
-   evas_object_resize(win, 600, 400);
-   evas_object_show(win);
-
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
-
 ELM_MAIN()

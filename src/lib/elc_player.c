@@ -427,7 +427,7 @@ _player_button_add(Evas_Object *parent, Evas_Object *obj, Evas_Object *layout, c
    return bt;
 }
 
-static const char *
+static char *
 _double_to_time(double value)
 {
    char buf[256];
@@ -447,7 +447,13 @@ _double_to_time(double value)
      snprintf(buf, sizeof(buf), "%02i.%02i",
               ps, pf);
 
-   return eina_stringshare_add(buf);
+   return (char *)eina_stringshare_add(buf);
+}
+
+static void
+_value_free(char *data)
+{
+   eina_stringshare_del(data);
 }
 #endif
 
@@ -458,12 +464,14 @@ _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content)
    if (part && strcmp(part, "video")) return;
    ELM_CHECK_WIDTYPE(obj, widtype);
    Widget_Data *wd = elm_widget_data_get(obj);
-
+   if (!wd) return;
    double pos, length;
    Eina_Bool seekable;
 
    if (!_elm_video_check(content)) return;
+   if (wd->video == content) return;
 
+   if (wd->video) evas_object_del(wd->video);
    _cleanup_callback(wd);
 
    wd->video = content;
@@ -536,6 +544,7 @@ elm_player_add(Evas_Object *parent)
    elm_widget_can_focus_set(obj, EINA_TRUE);
    elm_widget_event_hook_set(obj, _event_hook);
    elm_widget_content_set_hook_set(obj, _content_set_hook);
+   /* TODO: add content_unset and content_get hook */
 
    wd->layout = edje_object_add(e);
    _elm_theme_object_set(obj, wd->layout, "player", "base", "default");
@@ -555,8 +564,8 @@ elm_player_add(Evas_Object *parent)
 
    wd->slider = elm_slider_add(parent);
    elm_widget_sub_object_add(obj, wd->slider);
-   elm_slider_indicator_format_function_set(wd->slider, _double_to_time, eina_stringshare_del);
-   elm_slider_units_format_function_set(wd->slider, _double_to_time, eina_stringshare_del);
+   elm_slider_indicator_format_function_set(wd->slider, _double_to_time, _value_free);
+   elm_slider_units_format_function_set(wd->slider, _double_to_time, _value_free);
    elm_slider_min_max_set(wd->slider, 0, 0);
    elm_slider_value_set(wd->slider, 0);
    elm_object_disabled_set(wd->slider, EINA_TRUE);

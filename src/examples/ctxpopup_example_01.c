@@ -1,13 +1,10 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` ctxpopup_example_01.c -o ctxpopup_example_01
+//gcc -o ctxpopup_example_01 ctxpopup_example_01.c -g `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#endif
 
 static void
-_ctxpopup_item_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info)
+_ctxpopup_item_cb(void *data, Evas_Object *obj, void *event_info)
 {
    printf("ctxpopup item selected: %s\n", elm_object_item_text_get(event_info));
 }
@@ -21,7 +18,7 @@ Elm_Object_Item *item_new(Evas_Object *ctxpopup, const char * label, const char 
 }
 
 static void
-_list_item_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_list_item_cb(void *data, Evas_Object *obj, void *event_info)
 {
    Evas_Object *ctxpopup;
    Elm_Object_Item *it;
@@ -47,7 +44,7 @@ _list_item_cb(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_in
 }
 
 static void
-_list_item_cb2(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+_list_item_cb2(void *data, Evas_Object *obj, void *event_info)
 {
    Evas_Object *ctxpopup;
    Elm_Object_Item *it;
@@ -81,6 +78,8 @@ elm_main(int argc, char **argv)
    elm_win_title_set(win, "Contextual Popup");
    elm_win_autodel_set(win, EINA_TRUE);
    elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
+   evas_object_resize(win, 400, 400);
+   evas_object_show(win);
 
    bg = elm_bg_add(win);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -88,6 +87,7 @@ elm_main(int argc, char **argv)
    evas_object_show(bg);
 
    list = elm_list_add(win);
+   evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, list);
    elm_list_mode_set(list, ELM_LIST_COMPRESS);
 
@@ -98,9 +98,9 @@ elm_main(int argc, char **argv)
    evas_object_show(list);
    elm_list_go(list);
 
-   evas_object_resize(win, 400, 400);
-   evas_object_show(win);
-
    elm_run();
+   elm_shutdown();
+
+   return 0;
 }
 ELM_MAIN()

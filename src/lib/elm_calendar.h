@@ -4,7 +4,7 @@
  * This is a Calendar widget. Calender widget helps applications to flexibly
  * display a calender with day of the week, day, year and month. Applications will be
  * able to choose a specific date that will be reported in the smart_callbacks for
- * the calendar widget. The APIs of calendar widget let the applications perform 
+ * the calendar widget. The APIs of calendar widget let the applications perform
  * other functions like,
  * placing marks on specific dates
  * Setting the bounds for the calendar (minimum and maximum years)
@@ -19,6 +19,13 @@
  * @li elm_object_signal_callback_add
  * @li elm_object_signal_callback_del
  *
+ * Here is some sample code using it:
+ * @li @ref calendar_example_01
+ * @li @ref calendar_example_02
+ * @li @ref calendar_example_03
+ * @li @ref calendar_example_04
+ * @li @ref calendar_example_05
+ * @li @ref calendar_example_06
  */
 
 /**
@@ -53,6 +60,30 @@ typedef enum
  * @ingroup Calendar
  */
 typedef _Elm_Calendar_Mark_Repeat_Type Elm_Calendar_Mark_Repeat_Type;
+
+typedef enum
+{
+   ELM_DAY_SUNDAY,
+   ELM_DAY_MONDAY,
+   ELM_DAY_TUESDAY,
+   ELM_DAY_WEDNESDAY,
+   ELM_DAY_THURSDAY,
+   ELM_DAY_FRIDAY,
+   ELM_DAY_SATURDAY,
+   ELM_DAY_LAST
+} _Elm_Calendar_Weekday;
+
+/**
+ * @enum _Elm_Calendar_Weekday
+ * @typedef Elm_Calendar_Weekday
+ *
+ * a weekday
+ *
+ * @see elm_calendar_first_day_of_week_set()
+ *
+ * @ingroup Calendar
+ */
+typedef _Elm_Calendar_Weekday Elm_Calendar_Weekday;
 
 typedef struct _Elm_Calendar_Mark Elm_Calendar_Mark;    /**< Item handle for a calendar mark. Created with elm_calendar_mark_add() and deleted with elm_calendar_mark_del(). */
 
@@ -435,6 +466,30 @@ EAPI void                 elm_calendar_interval_set(Evas_Object *obj, double int
  * @ingroup Calendar
  */
 EAPI double               elm_calendar_interval_get(const Evas_Object *obj);
+
+/**
+ * Set the first day of week to use on calendar widgets'.
+ *
+ * @param obj The calendar object
+ * @param day An int which correspond to the first day of the week (Sunday = 0, monday = 1,
+ * ..., saturday = 6)
+ *
+ * @ingroup Calendar
+ */
+EAPI void                 elm_calendar_first_day_of_week_set(Evas_Object *obj, Elm_Calendar_Weekday day);
+
+/**
+ * Get the first day of week, who are used on calendar widgets'.
+ *
+ * @param obj The calendar object
+ * @return An int which correspond to the first day of the week (Sunday = 0, monday = 1,
+ * ..., saturday = 6)
+ *
+ * @see elm_calendar_first_day_of_week_set() for more details
+ *
+ * @ingroup Calendar
+ */
+EAPI Elm_Calendar_Weekday elm_calendar_first_day_of_week_get(const Evas_Object *obj);
 
 /**
  * @}

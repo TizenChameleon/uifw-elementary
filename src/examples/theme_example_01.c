@@ -2,14 +2,9 @@
  * gcc -o theme_example_01 theme_example_01.c `pkg-config --cflags --libs elementary`
  */
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
-btn_extension_click_cb(void *data __UNUSED__, Evas_Object *btn, void *ev __UNUSED__)
+btn_extension_click_cb(void *data, Evas_Object *btn, void *ev)
 {
    const char *lbl = elm_object_text_get(btn);
 
@@ -26,7 +21,7 @@ btn_extension_click_cb(void *data __UNUSED__, Evas_Object *btn, void *ev __UNUSE
 }
 
 static void
-btn_style_click_cb(void *data __UNUSED__, Evas_Object *btn, void *ev __UNUSED__)
+btn_style_click_cb(void *data, Evas_Object *btn, void *ev)
 {
    const char *styles[] = {
         "chucknorris",
@@ -39,8 +34,8 @@ btn_style_click_cb(void *data __UNUSED__, Evas_Object *btn, void *ev __UNUSED__)
    elm_object_style_set(btn, styles[sel_style]);
 }
 
-int
-elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char *argv[])
 {
    Evas_Object *win, *bg, *box, *btn;
 
@@ -77,7 +72,8 @@ elm_main(int argc __UNUSED__, char *argv[] __UNUSED__)
    evas_object_smart_callback_add(btn, "clicked", btn_style_click_cb, NULL);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
-ELM_MAIN();
+ELM_MAIN()

@@ -31,22 +31,25 @@ struct _Elm_Transit
    Elm_Transit *prev_chain_transit;
    Eina_List *next_chain_transits;
    Elm_Transit_Tween_Mode tween_mode;
-   struct {
-      Elm_Transit_Del_Cb func;
-      void *arg;
-   } del_data;
-   struct {
-      double delayed;
-      double paused;
-      double duration;
-      double begin;
-      double current;
-   } time;
-   struct {
-      int count;
-      int current;
-      Eina_Bool reverse;
-   } repeat;
+   struct
+     {
+        Elm_Transit_Del_Cb func;
+        void *arg;
+     } del_data;
+   struct
+     {
+        double delayed;
+        double paused;
+        double duration;
+        double begin;
+        double current;
+     } time;
+   struct
+     {
+        int count;
+        int current;
+        Eina_Bool reverse;
+     } repeat;
    double progress;
    unsigned int effects_pending_del;
    int walking;
@@ -145,7 +148,7 @@ _remove_obj_from_list(Elm_Transit *transit, Evas_Object *obj)
 {
    //Remove duplicated objects
    //TODO: Need to consider about optimizing here
-   while(1)
+   while (1)
      {
         if (!eina_list_data_find_list(transit->objs, obj))
           break;
@@ -192,12 +195,8 @@ _transit_obj_data_recover(Elm_Transit *transit, Evas_Object *obj)
              evas_object_color_set(obj, state->r, state->g, state->b, state->a);
              if (state->visible) evas_object_show(obj);
              else evas_object_hide(obj);
-             if (state->map_enabled)
-               evas_object_map_enable_set(obj, EINA_TRUE);
-             else
-               evas_object_map_enable_set(obj, EINA_FALSE);
-             if (state->map)
-               evas_object_map_set(obj, state->map);
+             evas_object_map_enable_set(obj, state->map_enabled);
+             evas_object_map_set(obj, state->map);
           }
         free(state);
      }

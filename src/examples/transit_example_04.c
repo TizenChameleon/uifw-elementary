@@ -1,14 +1,8 @@
 //Compile with:
-//gcc -g -DPACKAGE_DATA_DIR="\"<directory>\"" `pkg-config --cflags --libs elementary` transit_example_04.c -o transit_example_04
-// where directory is the a path where images/plant_01.jpg can be found.
-
+//gcc -o transit_example_04 transit_example_04.c `pkg-config --cflags --libs elementary` -DDATA_DIR="\"<directory>\""
+//where directory is the a path where images/icon_07.png can be found.
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
 _transit_flip(Elm_Transit *trans)
@@ -48,7 +42,7 @@ static struct {
 };
 
 static void
-on_done(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+on_done(void *data, Evas_Object *obj, void *event_info)
 {
    /* quit the mainloop (elm_run) */
    elm_exit();
@@ -91,15 +85,15 @@ _transit_start(void *data, Evas_Object *o, void *event_info)
    elm_transit_go(trans);
 }
 
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
-   Evas_Object *win, *bg, *obj, *icon, *box, *vbox, *btn, *fr, *dummy;
-   Elm_Transit *trans;
+   Evas_Object *win, *bg, *obj, *icon, *box, *vbox, *btn, *dummy;
    Eina_List *objs = NULL;
    char buf[PATH_MAX];
    int i;
 
+   elm_app_info_set(elm_main, "elementary", "images/icon_07.png");
    /* add a window */
    win = elm_win_add(NULL, "transit", ELM_WIN_BASIC);
    elm_win_title_set(win, "Transit Example");
@@ -130,7 +124,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    obj = elm_button_add(win);
    elm_object_text_set(obj, "Transformed object!");
    icon = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/icon_07.png", PACKAGE_DATA_DIR);
+   snprintf(buf, sizeof(buf), "%s/images/icon_07.png", elm_app_data_dir_get());
    elm_icon_file_set(icon, buf, NULL);
    elm_object_part_content_set(obj, "icon", icon);
    evas_object_move(obj, 160, 60);
@@ -143,7 +137,7 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    obj = elm_button_add(win);
    elm_object_text_set(obj, "Another object!");
    icon = elm_icon_add(win);
-   snprintf(buf, sizeof(buf), "%s/images/icon_08.png", PACKAGE_DATA_DIR);
+   snprintf(buf, sizeof(buf), "%s/images/icon_08.png", elm_app_data_dir_get());
    elm_icon_file_set(icon, buf, NULL);
    elm_object_part_content_set(obj, "icon", icon);
    evas_object_move(obj, 160, 60);
@@ -172,10 +166,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
-
-   eina_list_free(objs);
+   elm_shutdown();
 
    return 0;
 }
-
 ELM_MAIN()

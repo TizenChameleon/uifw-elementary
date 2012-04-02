@@ -1,16 +1,10 @@
 //Compile with:
-//gcc -g `pkg-config --cflags --libs elementary` image_example_01.c -o image_example_01
+//gcc -g image_example_01.c -o image_example_01 `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-# define PACKAGE_DATA_DIR "."
-#endif
 
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *icon;
    const char *path, *group, *name;
@@ -52,8 +46,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
-
 ELM_MAIN()

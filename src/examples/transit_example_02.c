@@ -1,23 +1,10 @@
 //Compile with:
-//gcc -g -DPACKAGE_DATA_DIR="\"<directory>\"" `pkg-config --cflags --libs elementary` transit_example_02.c -o transit_example_02
-// where directory is the a path where images/plant_01.jpg can be found.
+//gcc -o transit_example_02 transit_example_02.c `pkg-config --cflags --libs elementary`
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
-static void
-on_done(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
-{
-   /* quit the mainloop (elm_run) */
-   elm_exit();
-}
-
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *bt, *bt2, *bt3, *bt4;
    Elm_Transit *trans, *trans2, *trans3, *trans4;
@@ -26,11 +13,12 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    elm_win_title_set(win, "Transit 9");
    elm_win_autodel_set(win, EINA_TRUE);
    evas_object_resize(win, 400, 400);
+   elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
    evas_object_show(win);
 
    bg = elm_bg_add(win);
-   elm_win_resize_object_add(win, bg);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, bg);
    evas_object_show(bg);
 
    bt = elm_button_add(win);
@@ -90,8 +78,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    elm_transit_chain_transit_add(trans3, trans4);
 
    elm_run();
+   elm_shutdown();
 
    return 0;
 }
-
 ELM_MAIN()

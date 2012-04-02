@@ -5,27 +5,22 @@
  * See stdout/stderr for output. Compile with:
  *
  * @verbatim
- * gcc -g `pkg-config --cflags --libs elementary` dayselector_example.c -o dayselector_example
+ * gcc -g dayselector_example.c -o dayselector_example `pkg-config --cflags --libs elementary`
  * @endverbatim
  */
 
 #include <Elementary.h>
-#ifdef HAVE_CONFIG_H
-# include "elementary_config.h"
-#else
-# define __UNUSED__
-#endif
 
 static void
-_on_done(void *data __UNUSED__,
-        Evas_Object *obj __UNUSED__,
-        void *event_info __UNUSED__)
+_on_done(void *data,
+        Evas_Object *obj,
+        void *event_info)
 {
    elm_exit();
 }
 
 /* Callback function when a day is clicked. */
-static void _changed_cb(void* data __UNUSED__, Evas_Object* obj, void* event_info)
+static void _changed_cb(void* data, Evas_Object* obj, void* event_info)
 {
    char buf[256];
    Elm_Dayselector_Day day;
@@ -50,8 +45,8 @@ static void _changed_cb(void* data __UNUSED__, Evas_Object* obj, void* event_inf
 }
 /* End of clicked callback */
 
-int
-elm_main(int argc __UNUSED__, char **argv __UNUSED__)
+EAPI_MAIN int
+elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *bx, *dayselector;
 
@@ -90,6 +85,8 @@ elm_main(int argc __UNUSED__, char **argv __UNUSED__)
    evas_object_show(win);
 
    elm_run();
+   elm_shutdown();
+
    return 0;
 }
 ELM_MAIN()
