@@ -2,7 +2,7 @@ elementary (1.0.0+svn.69691slp2+build01) unstable; urgency=low
 
   * Repackaging
   * Git: slp/pkgs/e/elementary
-  * Tag: 1.0.0+svn.69691slp2+build01
+  * Tag: elementary_1.0.0+svn.69691slp2+build01
 
  -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Mon, 02 Apr 2012 14:00:41 +0900
 
