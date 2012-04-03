@@ -83,25 +83,14 @@ desktop-file-install --delete-original       \
 
 %files
 %defattr(-,root,root,-)
-/usr/lib/*.so.0
-/usr/share/elementary/images/*
-/usr/share/elementary/config/default/*
-/usr/share/elementary/config/illume/*
-/usr/share/elementary/config/standard/*
-/usr/share/elementary/config/profile.cfg
+/usr/lib/libelementary*
 /usr/lib/elementary/modules/*/*/*.so
-/usr/lib/libelementary*.so.*
-/usr/share/applications/*.desktop
-/usr/share/elementary/objects/*.edj
-/usr/share/elementary/edje_externals/*.edj
-/usr/share/icons/elementary.png
-/usr/share/elementary/themes/*.edj
-/usr/share/elementary/config/slp/*
 /usr/lib/edje/modules/elm/*/module.so
+/usr/share/*
 
 %files devel
 %defattr(-,root,root,-)
-/usr/include/elementary-0/*.h
+/usr/include/*
 /usr/lib/libelementary.so
 /usr/lib/pkgconfig/elementary.pc
 
