@@ -1,3 +1,12 @@
+elementary (1.0.0+svn.69832slp2+build02) unstable; urgency=low
+
+  * Package Upload 
+  *  - bugfix evas ref/unref in item_select
+  * Git: slp/pkgs/e/elementary
+  * Tag: elementary_1.0.0+svn.69832slp2+build02
+
+ -- Hyoyoung Chang <hyoyoung.chang@samsung.com>  Tue, 03 Apr 2012 15:02:34 +0900
+
 elementary (1.0.0+svn.69832slp2+build01) unstable; urgency=low
 
   * Package Upload
