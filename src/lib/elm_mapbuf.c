@@ -89,13 +89,13 @@ _mapbuf(Evas_Object *obj)
         evas_map_smooth_set(m, wd->smooth);
         evas_map_alpha_set(m, wd->alpha);
         evas_object_map_set(wd->content, m);
-        evas_object_map_enable_set(wd->content, wd->enabled);
+        evas_object_map_enable_set(wd->content, EINA_TRUE);
         evas_map_free(m);
      }
    else
      {
         evas_object_map_set(wd->content, NULL);
-        evas_object_map_enable_set(wd->content, 0);
+        evas_object_map_enable_set(wd->content, EINA_FALSE);
         evas_object_move(wd->content, x, y);
         evas_object_resize(wd->content, w, h);
      }
@@ -122,10 +122,8 @@ _configure(Evas_Object *obj)
                   Evas *e = evas_object_evas_get(obj);
                   evas_smart_objects_calculate(e);
                   evas_nochange_push(e);
-                  //                  printf("x-------------------- %i %i\n", x, y);
                   evas_object_move(wd->content, x, y);
                   evas_smart_objects_calculate(e);
-                  //                  printf("y--------------------\n");
                   evas_nochange_pop(e);
                }
           }
@@ -200,14 +198,9 @@ _content_unset_hook(Evas_Object *obj, const char *part)
    if (!wd->content) return NULL;
    content = wd->content;
    elm_widget_sub_object_del(obj, content);
-   evas_object_event_callback_add(content,
-                                  EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                  _changed_size_hints, obj);
    evas_object_smart_member_del(content);
    evas_object_color_set(wd->clip, 0, 0, 0, 0);
-   evas_object_clip_unset(content);
    evas_object_data_del(content, "_elm_leaveme");
-   wd->content = NULL;
    return content;
 }
 

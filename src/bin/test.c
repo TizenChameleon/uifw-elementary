@@ -231,11 +231,60 @@ _frame_clicked(void *data __UNUSED__, Evas_Object *obj, void *event_info __UNUSE
 }
 
 static void
+_menu_create(Evas_Object *win, Evas_Object *tbx, void **tt, Eina_List *tests, const char *option_str __UNUSED__)
+{
+   struct elm_test *t = NULL;
+   const char *pcat = NULL;
+   Evas_Object *cfr = NULL, *tbx2 = NULL, *bt = NULL, *ic = NULL;
+   char buf[PATH_MAX];
+
+   EINA_LIST_FREE(tests, t)
+     {
+        if ((!pcat) || (strcmp(pcat, t->category)))
+          {
+             cfr = elm_frame_add(win);
+             // FIXME: add new style of frame for this
+             evas_object_smart_callback_add(cfr, "clicked", _frame_clicked, NULL);
+             elm_frame_autocollapse_set(cfr, EINA_TRUE);
+             elm_object_text_set(cfr, t->category);
+             evas_object_size_hint_weight_set(cfr, EVAS_HINT_EXPAND, 0.0);
+             evas_object_size_hint_fill_set(cfr, EVAS_HINT_FILL, 0.0);
+             elm_box_pack_end(tbx, cfr);
+             evas_object_show(cfr);
+
+             tbx2 = elm_box_add(win);
+             elm_box_layout_set(tbx2, evas_object_box_layout_flow_horizontal, NULL, NULL);
+             evas_object_size_hint_weight_set(tbx2, EVAS_HINT_EXPAND, 0.0);
+             evas_object_size_hint_align_set(tbx2, EVAS_HINT_FILL, 0.0);
+             elm_box_align_set(tbx2, 0.0, 0.5);
+             elm_object_content_set(cfr, tbx2);
+             evas_object_show(tbx2);
+          }
+        bt = elm_button_add(win);
+        // FIXME: add new style of button for this like efm in e17
+        elm_object_text_set(bt, t->name);
+        if (t->icon)
+          {
+             ic = elm_icon_add(win);
+             snprintf(buf, sizeof(buf), "%s/images/%s", elm_app_data_dir_get(), t->icon);
+             elm_icon_file_set(ic, buf, NULL);
+             elm_object_part_content_set(bt, "icon", ic);
+             evas_object_show(ic);
+          }
+        elm_box_pack_end(tbx2, bt);
+        evas_object_show(bt);
+        evas_object_smart_callback_add(bt, "clicked", t->cb, NULL);
+        pcat = t->category;
+        if (t == *tt) *tt = cfr;
+        free(t);
+     }
+}
+
+static void
 my_win_main(char *autorun, Eina_Bool test_win_only)
 {
    Evas_Object *win = NULL, *bg = NULL, *bx0 = NULL, *lb = NULL;
-   Evas_Object *fr = NULL, *tg = NULL, *sc = NULL, *ic = NULL;
-   Evas_Object *tbx = NULL, *cfr = NULL, *tbx2 = NULL, *bt = NULL;
+   Evas_Object *fr = NULL, *tg = NULL, *sc = NULL, *tbx = NULL;
    Eina_List *tests, *l;
    struct elm_test *t = NULL;
    void *tt;
@@ -252,7 +301,11 @@ my_win_main(char *autorun, Eina_Bool test_win_only)
     * is no parent. "main" is the name of the window - used by the window
     * manager for identifying the window uniquely amongst all the windows
     * within this application (and all instances of the application). The
-    * type is a basic window (the final parameter) */
+    * type is a basic window (the final parameter).
+    * You can call elm_win_util_standard_add() instead. This is a convenient API
+    * for window and bg creation. You don't need to create bg object manually.
+    * You can also set the title of the window at the same time. 
+    *   ex) win = elm_win_util_standard_add("main", "Elementary Tests"); */
    win = elm_win_add(NULL, "main", ELM_WIN_BASIC);
    /* Set the title of the window - This is in the titlebar. */
    elm_win_title_set(win, "Elementary Tests");
@@ -433,7 +486,8 @@ add_tests:
    ADD_TEST(NULL, "Lists", "Genlist Tree", test_genlist6);
    ADD_TEST(NULL, "Lists", "Genlist Group", test_genlist8);
    ADD_TEST(NULL, "Lists", "Genlist Group Tree", test_genlist9);
-   ADD_TEST(NULL, "Lists", "Genlist Mode", test_genlist10);
+   ADD_TEST(NULL, "Lists", "Genlist Decorate Item Mode", test_genlist10);
+   ADD_TEST(NULL, "Lists", "Genlist Decorate All Mode", test_genlist15);
    ADD_TEST(NULL, "Lists", "Genlist Reorder Mode", test_genlist11);
 #ifdef HAVE_EIO
    ADD_TEST(NULL, "Lists", "Genlist Eio", test_eio);
@@ -441,7 +495,6 @@ add_tests:
    ADD_TEST(NULL, "Lists", "Genlist Textblock", test_genlist12);
    ADD_TEST(NULL, "Lists", "Genlist Tree, Insert Sorted", test_genlist13);
    ADD_TEST(NULL, "Lists", "Genlist Tree, Insert Relative", test_genlist14);
-   ADD_TEST(NULL, "Lists", "Genlist Edit Mode", test_genlist15);
    ADD_TEST(NULL, "Lists", "Genlist Flip Mode", test_genlist16);
    ADD_TEST(NULL, "Lists", "Genlist Tree Effect", test_genlist17);
    ADD_TEST(NULL, "Lists", "GenGrid", test_gengrid);
@@ -586,58 +639,13 @@ add_tests:
    if (test_win_only)
      {
         EINA_LIST_FREE(tests, t)
-           free (t);
+          free(t);
 
         return;
      }
 
    if (tests)
-     {
-        const char *pcat = NULL;
-
-        EINA_LIST_FREE(tests, t)
-          {
-             if ((!pcat) || (strcmp(pcat, t->category)))
-               {
-                  cfr = elm_frame_add(win);
-                  // FIXME: add new style of frame for this
-                  evas_object_smart_callback_add(cfr, "clicked", _frame_clicked, NULL);
-                  elm_frame_autocollapse_set(cfr, EINA_TRUE);
-                  elm_object_text_set(cfr, t->category);
-                  evas_object_size_hint_weight_set(cfr, EVAS_HINT_EXPAND, 0.0);
-                  evas_object_size_hint_fill_set(cfr, EVAS_HINT_FILL, 0.0);
-                  elm_box_pack_end(tbx, cfr);
-                  evas_object_show(cfr);
-
-                  tbx2 = elm_box_add(win);
-                  elm_box_layout_set(tbx2, evas_object_box_layout_flow_horizontal, NULL, NULL);
-                  evas_object_size_hint_weight_set(tbx2, EVAS_HINT_EXPAND, 0.0);
-                  evas_object_size_hint_align_set(tbx2, EVAS_HINT_FILL, 0.0);
-                  elm_box_align_set(tbx2, 0.0, 0.5);
-                  elm_object_content_set(cfr, tbx2);
-                  evas_object_show(tbx2);
-               }
-             bt = elm_button_add(win);
-             // FIXME: add new style of button for this like efm in e17
-             elm_object_text_set(bt, t->name);
-             if (t->icon)
-               {
-                  char buf[PATH_MAX];
-
-                  ic = elm_icon_add(win);
-                  snprintf(buf, sizeof(buf), "%s/images/%s", elm_app_data_dir_get(), t->icon);
-                  elm_icon_file_set(ic, buf, NULL);
-                  elm_object_part_content_set(bt, "icon", ic);
-                  evas_object_show(ic);
-               }
-             elm_box_pack_end(tbx2, bt);
-             evas_object_show(bt);
-             evas_object_smart_callback_add(bt, "clicked", t->cb, NULL);
-             pcat = t->category;
-             if (t == tt) tt = cfr;
-             free(t);
-          }
-     }
+     _menu_create(win, tbx, &tt, tests, NULL);
 
    /* set an initial window size */
    evas_object_resize(win, 480, 480);

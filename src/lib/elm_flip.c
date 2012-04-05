@@ -178,7 +178,6 @@ _slice_new(Widget_Data *wd, Evas_Object *obj)
    if (!sl) return NULL;
    sl->obj = evas_object_image_add(evas_object_evas_get(obj));
    elm_widget_sub_object_add(wd->obj, sl->obj);
-   evas_object_clip_set(sl->obj, evas_object_clip_get(wd->obj));
    evas_object_smart_member_add(sl->obj, wd->obj);
    evas_object_image_smooth_scale_set(sl->obj, EINA_FALSE);
    evas_object_pass_events_set(sl->obj, EINA_TRUE);
@@ -1568,6 +1567,7 @@ _flip_content_front_set(Evas_Object *obj, Evas_Object *content)
      {
         elm_widget_sub_object_add(obj, content);
         evas_object_smart_member_add(content, obj);
+        //FIXME: smart member clip could be reset by the obj.
         evas_object_clip_set(content, wd->front.clip);
         evas_object_event_callback_add(content,
                                        EVAS_CALLBACK_CHANGED_SIZE_HINTS,
@@ -1599,6 +1599,7 @@ _flip_content_back_set(Evas_Object *obj, Evas_Object *content)
      {
         elm_widget_sub_object_add(obj, content);
         evas_object_smart_member_add(content, obj);
+        //FIXME: smart member clip could be reset by the obj.
         evas_object_clip_set(content, wd->back.clip);
         evas_object_event_callback_add(content,
                                        EVAS_CALLBACK_CHANGED_SIZE_HINTS,
@@ -1623,13 +1624,8 @@ _content_front_unset(Evas_Object *obj)
    if ((!wd) || (!wd->front.content)) return NULL;
 
    Evas_Object *content = wd->front.content;
-   evas_object_clip_unset(content);
    elm_widget_sub_object_del(obj, content);
-   evas_object_event_callback_del_full(content,
-                                       EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, obj);
    evas_object_smart_member_del(content);
-   wd->front.content = NULL;
    return content;
 }
 
@@ -1640,13 +1636,8 @@ _content_back_unset(Evas_Object *obj)
    if ((!wd) || (!wd->back.content)) return NULL;
 
    Evas_Object *content = wd->back.content;
-   evas_object_clip_unset(content);
    elm_widget_sub_object_del(obj, content);
-   evas_object_event_callback_del_full(content,
-                                       EVAS_CALLBACK_CHANGED_SIZE_HINTS,
-                                       _changed_size_hints, obj);
    evas_object_smart_member_del(content);
-   wd->back.content = NULL;
    return content;
 }
 
@@ -1714,17 +1705,14 @@ elm_flip_add(Evas_Object *parent)
 
    wd->clip = evas_object_rectangle_add(e);
    evas_object_static_clip_set(wd->clip, EINA_TRUE);
-   evas_object_color_set(wd->clip, 255, 255, 255, 255);
    evas_object_move(wd->clip, -49999, -49999);
    evas_object_resize(wd->clip, 99999, 99999);
    elm_widget_sub_object_add(obj, wd->clip);
-   evas_object_clip_set(wd->clip, evas_object_clip_get(obj));
    evas_object_smart_member_add(wd->clip, obj);
 
    wd->front.clip = evas_object_rectangle_add(e);
    evas_object_static_clip_set(wd->front.clip, EINA_TRUE);
    evas_object_data_set(wd->front.clip, "_elm_leaveme", obj);
-   evas_object_color_set(wd->front.clip, 255, 255, 255, 255);
    evas_object_move(wd->front.clip, -49999, -49999);
    evas_object_resize(wd->front.clip, 99999, 99999);
    elm_widget_sub_object_add(obj, wd->front.clip);
@@ -1734,11 +1722,10 @@ elm_flip_add(Evas_Object *parent)
    wd->back.clip = evas_object_rectangle_add(e);
    evas_object_static_clip_set(wd->back.clip, EINA_TRUE);
    evas_object_data_set(wd->back.clip, "_elm_leaveme", obj);
-   evas_object_color_set(wd->back.clip, 255, 255, 255, 255);
    evas_object_move(wd->back.clip, -49999, -49999);
    evas_object_resize(wd->back.clip, 99999, 99999);
-   elm_widget_sub_object_add(wd->back.clip, obj);
-   evas_object_smart_member_add(obj, wd->back.clip);
+   elm_widget_sub_object_add(obj, wd->back.clip);
+   evas_object_smart_member_add(wd->back.clip, obj);
    evas_object_clip_set(wd->back.clip, wd->clip);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, obj);
@@ -1832,6 +1819,7 @@ elm_flip_interaction_set(Evas_Object *obj, Elm_Flip_Interaction mode)
                   Evas *e = evas_object_evas_get(obj);
                   wd->event[i] = evas_object_rectangle_add(e);
                   elm_widget_sub_object_add(obj, wd->event[i]);
+                  evas_object_data_set(wd->event[i], "_elm_leaveme", obj);
                   evas_object_clip_set(wd->event[i], evas_object_clip_get(obj));
                   evas_object_color_set(wd->event[i], 0, 0, 0, 0);
                   evas_object_show(wd->event[i]);
@@ -1881,6 +1869,7 @@ elm_flip_interaction_direction_enabled_set(Evas_Object *obj, Elm_Flip_Direction 
      {
         wd->event[i] = evas_object_rectangle_add(evas_object_evas_get(obj));
         elm_widget_sub_object_add(obj, wd->event[i]);
+        evas_object_data_set(wd->event[i], "_elm_leaveme", obj);
         evas_object_clip_set(wd->event[i], evas_object_clip_get(obj));
         evas_object_color_set(wd->event[i], 0, 0, 0, 0);
         evas_object_show(wd->event[i]);
