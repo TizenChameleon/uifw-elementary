@@ -20,7 +20,6 @@ typedef struct _Smart_Data        Smart_Data;
 typedef struct _Edje_Signal_Data  Edje_Signal_Data;
 typedef struct _Elm_Event_Cb_Data Elm_Event_Cb_Data;
 typedef struct _Elm_Translate_String_Data Elm_Translate_String_Data;
-typedef struct _Elm_Widget_Item_Callback Elm_Widget_Item_Callback;
 
 struct _Smart_Data
 {
@@ -143,16 +142,6 @@ struct _Elm_Translate_String_Data
    const char *string;
 };
 
-struct _Elm_Widget_Item_Callback
-{
-   const char *event;
-   Elm_Object_Item_Smart_Cb func;
-   void *data;
-   int walking : 1;
-   Eina_Bool delete_me : 1;
-};
-
-
 /* local subsystem functions */
 static void _smart_reconfigure(Smart_Data *sd);
 static void _smart_add(Evas_Object *obj);
@@ -175,6 +164,7 @@ static void _smart_clip_set(Evas_Object *obj,
 static void _smart_clip_unset(Evas_Object *obj);
 static void _smart_calculate(Evas_Object *obj);
 static void _smart_member_add(Evas_Object *obj, Evas_Object *child);
+static void _smart_member_del(Evas_Object *obj, Evas_Object *child);
 static void _smart_init(void);
 
 static void _if_focused_revert(Evas_Object *obj,
@@ -2850,18 +2840,9 @@ _elm_widget_item_new(Evas_Object *widget,
 EAPI void
 _elm_widget_item_free(Elm_Widget_Item *item)
 {
-   ELM_WIDGET_ITEM_FREE_OR_RETURN(item);
-   Elm_Object_Item_Smart_Cb cb;
-
-   if (item->walking > 0)
-     {
-        item->delete_me = EINA_TRUE;
-        return;
-     }
+   ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
 
    _elm_access_item_unregister(item);
-   
-   EINA_LIST_FREE(item->callbacks, cb) free(cb);
 
    if (item->del_func)
      item->del_func((void *)item->data, item->widget, item);
@@ -3521,87 +3502,6 @@ _elm_widget_item_access_info_set(Elm_Widget_Item *item, const char *txt)
    else item->access_info = eina_stringshare_add(txt);
 }
 
-EAPI void
-elm_widget_item_smart_callback_add(Elm_Widget_Item *item, const char *event, Elm_Object_Item_Smart_Cb func, const void *data)
-{
-   ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
-   if ((!event) || (!func)) return;
-
-   Elm_Widget_Item_Callback *cb = ELM_NEW(Elm_Widget_Item_Callback);
-   if (!cb) return;
-
-   //TODO: apply MEMPOOL?
-   cb->event = eina_stringshare_add(event);
-   cb->func = func;
-   cb->data = (void *)data;
-   item->callbacks = eina_list_append(item->callbacks, cb);
-}
-
-EAPI void*
-elm_widget_item_smart_callback_del(Elm_Widget_Item *item, const char *event, Elm_Object_Item_Smart_Cb func)
-{
-   ELM_WIDGET_ITEM_CHECK_OR_RETURN(item, NULL);
-
-   Eina_List *l, *l_next;
-   Elm_Widget_Item_Callback *cb;
-
-   if ((!event) || (!func)) return NULL;
-
-   EINA_LIST_FOREACH_SAFE(item->callbacks, l, l_next, cb)
-     {
-        if ((!strcmp(cb->event, event)) && (cb->func == func))
-          {
-             void *data = cb->data;
-             if (!cb->walking)
-               {
-                  item->callbacks = eina_list_remove_list(item->callbacks, l);
-                  free(cb);
-               }
-             else
-               cb->delete_me = EINA_TRUE;
-             return data;
-          }
-     }
-   return NULL;
-}
-
-EAPI void
-_elm_widget_item_smart_callback_call(Elm_Widget_Item *item, const char *event, void *event_info)
-{
-   ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
-
-   Eina_List *l, *l_next;
-   Elm_Widget_Item_Callback *cb;
-   const char *strshare;
-
-   if (!event) return;
-
-   strshare = eina_stringshare_add(event);
-
-   EINA_LIST_FOREACH(item->callbacks, l, cb)
-     {
-        if (strcmp(cb->event, strshare)) continue;
-        if (cb->delete_me) continue;
-        cb->walking++;
-        item->walking++;
-        cb->func(cb->data, (Elm_Object_Item *)item, event_info);
-        item->walking--;
-        cb->walking--;
-        if (item->delete_me) break;
-     }
-
-   //Clear callbacks
-   EINA_LIST_FOREACH_SAFE(item->callbacks, l, l_next, cb)
-     {
-        if (!cb->delete_me) continue;
-        item->callbacks = eina_list_remove_list(item->callbacks, l);
-        free(cb);
-     }
-
-   if (item->delete_me && !item->walking)
-     elm_widget_item_free(item);
-}
-
 static void
 _smart_add(Evas_Object *obj)
 {
@@ -3868,6 +3768,13 @@ _smart_member_add(Evas_Object *obj, Evas_Object *child)
      evas_object_hide(child);
 }
 
+static void
+_smart_member_del(Evas_Object *obj __UNUSED__, Evas_Object *child)
+{
+   if (evas_object_data_get(child, "_elm_leaveme")) return;
+   evas_object_clip_unset(child);
+}
+
 /* never need to touch this */
 static void
 _smart_init(void)
@@ -3889,7 +3796,7 @@ _smart_init(void)
              _smart_clip_unset,
              _smart_calculate,
              _smart_member_add,
-             NULL,
+             _smart_member_del,
              NULL,
              NULL,
              NULL,

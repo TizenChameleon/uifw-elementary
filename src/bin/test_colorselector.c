@@ -59,7 +59,7 @@ _components_cb(void *data, Evas_Object *obj __UNUSED__,
    Evas_Object *cs = data;
    Evas_Object *win = evas_object_data_get(cs, "win");
    elm_colorselector_mode_set(cs, ELM_COLORSELECTOR_COMPONENTS);
-   evas_object_resize(win, 320, 350);
+   evas_object_resize(win, 320, 455);
 }
 
 static void
@@ -68,24 +68,18 @@ _both_cb(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
    Evas_Object *cs = data;
    Evas_Object *win = evas_object_data_get(cs, "win");
    elm_colorselector_mode_set(cs, ELM_COLORSELECTOR_BOTH);
-   evas_object_resize(win, 320, 480);
+   evas_object_resize(win, 320, 535);
 }
 
 void
 test_colorselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
                    void *event_info __UNUSED__)
 {
-   Evas_Object *win, *bg, *bx, *bx2, *cs, *fr, *re, *bt;
+   Evas_Object *win, *bx, *bx2, *cs, *fr, *re, *bt;
    int r, g, b, a;
 
-   win = elm_win_add(NULL, "colorselector", ELM_WIN_BASIC);
-   elm_win_title_set(win, "Color Selector");
+   win = elm_win_util_standard_add("colorselector", "ColorSelector");
    elm_win_autodel_set(win, EINA_TRUE);
-
-   bg = elm_bg_add(win);
-   elm_win_resize_object_add(win, bg);
-   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_show(bg);
 
    bx = elm_box_add(win);
    evas_object_size_hint_weight_set(bx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -180,7 +174,7 @@ test_colorselector(void *data __UNUSED__, Evas_Object *obj __UNUSED__,
    evas_object_show(bt);
    elm_box_pack_end(bx2, bt);
 
-   evas_object_resize(win, 320, 480);
+   evas_object_resize(win, 320, 500);
    evas_object_show(win);
 }
 #endif
