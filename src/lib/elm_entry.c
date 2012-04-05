@@ -1652,8 +1652,8 @@ _long_press(void *data)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return ECORE_CALLBACK_CANCEL;
-   /*if (!_elm_config->desktop_entry)
-     _menu_press(data);*/ /////// TIZEN ONLY
+   if ((!_elm_config->desktop_entry) && (!wd->magnifier_enabled))
+     _menu_press(data); /////// TIZEN ONLY
    wd->longpress_timer = NULL;
    evas_object_smart_callback_call(data, SIG_LONGPRESSED, NULL);
    return ECORE_CALLBACK_CANCEL;
@@ -1695,9 +1695,8 @@ _mouse_up(void *data, Evas *evas __UNUSED__, Evas_Object *obj __UNUSED__, void *
           {
              _magnifier_hide(data);
              elm_object_scroll_freeze_pop(data);
+             if (wd->long_pressed) _menu_press(data);
           }
-        if (wd->long_pressed)
-          _menu_press(data);
         if (wd->longpress_timer)
           {
              ecore_timer_del(wd->longpress_timer);
