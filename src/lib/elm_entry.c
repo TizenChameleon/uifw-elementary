@@ -1305,6 +1305,13 @@ _elm_entry_entry_paste(Evas_Object *obj, const char *entry)
 
    edje_object_part_text_user_insert(wd->ent, "elm.text", str);
    if (str != entry) free(str);
+
+   // start for cbhm
+#ifdef HAVE_ELEMENTARY_X
+   if (cnpwidgetdata == obj)
+      ecore_x_selection_secondary_set(elm_win_xwindow_get(obj), "",1);
+#endif
+   // end for cbhm
 }
 
 static void
