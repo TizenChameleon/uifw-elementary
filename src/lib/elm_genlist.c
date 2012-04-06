@@ -3943,6 +3943,7 @@ _item_select(Elm_Gen_Item *it)
 {
    Eina_List *l;
    Evas_Object *obj = WIDGET(it);
+   Evas_Object *item_obj;
 
    if ((it->generation < it->wd->generation) || (it->mode_set) ||
        (it->select_mode == ELM_OBJECT_SELECT_MODE_NONE) ||
@@ -3961,10 +3962,10 @@ _item_select(Elm_Gen_Item *it)
    if (it->wd->last_selected_item &&
        (it != (Elm_Gen_Item *) it->wd->last_selected_item))
      {
-        EINA_LIST_FOREACH(((Elm_Gen_Item *)it->wd->last_selected_item)->content_objs, l, obj)
+        EINA_LIST_FOREACH(((Elm_Gen_Item *)it->wd->last_selected_item)->content_objs, l, item_obj)
           {
-             elm_widget_focused_object_clear(obj);
-             elm_widget_tree_unfocusable_set(obj, EINA_TRUE);
+             elm_widget_focused_object_clear(item_obj);
+             elm_widget_tree_unfocusable_set(item_obj, EINA_TRUE);
           }
         ((Elm_Gen_Item *)it->wd->last_selected_item)->can_focus = EINA_FALSE;
      }
