@@ -882,7 +882,12 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *top = elm_widget_top_get(obj);
    if (!wd) return;
-   if (!wd->editable) return;
+   if (!wd->editable)
+     {
+        if ((!elm_widget_focus_get(obj)) && (wd->api) && (wd->api->obj_hidemenu))
+          wd->api->obj_hidemenu(obj);
+        return;
+     }
    if (elm_widget_focus_get(obj))
      {
         printf("[Elm_entry::Focused] obj : %p\n", obj);
