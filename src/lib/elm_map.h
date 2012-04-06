@@ -588,6 +588,19 @@ EAPI const char           *elm_map_user_agent_get(const Evas_Object *obj);
 EAPI Elm_Map_Overlay *     elm_map_overlay_add(Evas_Object *obj, double lon, double lat);
 
 /**
+ * Return all overlays in the map object.
+ *
+ * @param obj The map object to return overlays.
+ * @return The list of all overlays or @c NULL upon failure.
+ *
+ * This list includes group overlays also.
+ * So this can be changed dynamically while zooming and panning.
+ *
+ * @ingroup Map
+ */
+EAPI EAPI Eina_List *      elm_map_overlays_get(Evas_Object *obj);
+
+/**
  * Delete a overlay from the map. This function can delete all types
  * of overlays.
  *
@@ -731,6 +744,20 @@ EAPI void                  elm_map_overlay_paused_set(Elm_Map_Overlay *overlay, 
  * @ingroup Map
  */
 EAPI Eina_Bool             elm_map_overlay_paused_get(const Elm_Map_Overlay *overlay);
+
+/**
+ * Get a value whether the overlay is visible or not.
+ *
+ * @param overlay The overlay to return visible state.
+ * @return @c EINA_TRUE means overlay is visible. @c EINA_FALSE indicates
+ * it is not.
+ *
+ * The visible of the overlay can not be set.
+ * This value can be changed dynamically while zooming and panning
+ *
+ * @ingroup Map
+ */
+EAPI Eina_Bool             elm_map_overlay_visible_get(const Elm_Map_Overlay *overlay);
 
 /**
  * Set the content object of the overlay.

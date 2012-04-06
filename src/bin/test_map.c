@@ -206,6 +206,37 @@ _bubble_parking_follow(Evas_Object *map)
 }
 
 static void
+_overlays_num_check(Evas_Object *obj)
+{
+   Evas_Coord x, y, w, h;
+   double lon, lat, max_lon, max_lat, min_lon, min_lat;
+   Eina_List *overlays, *l;
+   Elm_Map_Overlay *ovl;
+   int cnt = 0;
+   int cnt_visible = 0;
+
+   overlays = elm_map_overlays_get(obj);
+   evas_object_geometry_get(obj, &x, &y, &w, &h);
+   elm_map_canvas_to_region_convert(obj, x, y, &min_lon, &max_lat);
+   elm_map_canvas_to_region_convert(obj, x + w, y + h, &max_lon, &min_lat);
+
+   EINA_LIST_FOREACH(overlays, l, ovl)
+     {
+        if (elm_map_overlay_type_get(ovl) == ELM_MAP_OVERLAY_TYPE_CLASS)
+           continue;
+        elm_map_overlay_region_get(ovl, &lon, &lat);
+        if ((min_lon <= lon) && (lon <= max_lon) &&
+            (min_lat <= lat) && (lat <= max_lat))
+          {
+             if (elm_map_overlay_visible_get(ovl)) cnt_visible++;
+             cnt++;
+          }
+     }
+   printf("Number of (visible/total) overlays in viewport: %d/%d\n",
+		   cnt_visible, cnt);
+}
+
+static void
 _map_clicked(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    printf("clicked\n");
@@ -298,6 +329,7 @@ _map_drag_stop(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSE
 {
    printf("scroll,drag,stop\n");
    evas_object_smart_callback_add(data, "longpressed", _map_longpressed, data);
+   _overlays_num_check(obj);
 }
 
 static void
@@ -322,13 +354,20 @@ static void
 _map_zoom_stop(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    printf("zoom,stop\n");
-   _bubble_parking_follow(obj);
+   _overlays_num_check(obj);
 }
 
 static void
 _map_zoom_change(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    printf("zoom,change\n");
+   _bubble_parking_follow(obj);
+}
+
+static void
+_map_loaded(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   printf("loaded\n");
 }
 
 static void
@@ -1025,6 +1064,7 @@ test_map(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __
         evas_object_smart_callback_add(map, "zoom,start", _map_zoom_start, map);
         evas_object_smart_callback_add(map, "zoom,stop", _map_zoom_stop, map);
         evas_object_smart_callback_add(map, "zoom,change", _map_zoom_change, map);
+        evas_object_smart_callback_add(map, "loaded", _map_loaded, map);
         evas_object_smart_callback_add(map, "tile,load", _map_tile_load, map);
         evas_object_smart_callback_add(map, "tile,loaded", _map_tile_loaded, map);
         evas_object_smart_callback_add(map, "tile,loaded,fail", _map_tile_loaded_fail, map);
