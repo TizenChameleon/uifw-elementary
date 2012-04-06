@@ -147,6 +147,7 @@ static void _on_focus_hook(void *data, Evas_Object *obj);
 static void _content_set_hook(Evas_Object *obj, const char *part, Evas_Object *content);
 static Evas_Object *_content_unset_hook(Evas_Object *obj, const char *part);
 static Evas_Object *_content_get_hook(const Evas_Object *obj, const char *part);
+static Eina_Bool _event_hook(Evas_Object *obj, Evas_Object *src, Evas_Callback_Type type, void *event_info);
 static void _resize(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static const char *_getbase(Evas_Object *obj);
 static void _signal_entry_changed(void *data, Evas_Object *obj, const char *emission, const char *source);
@@ -1023,6 +1024,18 @@ static void
 _translate_hook(Evas_Object *obj)
 {
    evas_object_smart_callback_call(obj, "language,changed", NULL);
+}
+
+static Eina_Bool
+_event_hook(Evas_Object *obj, Evas_Object *src, Evas_Callback_Type type, void *event_info)
+{
+   if (type != EVAS_CALLBACK_KEY_DOWN) return EINA_FALSE;
+   Evas_Event_Key_Down *ev = event_info;
+   Widget_Data *wd = elm_widget_data_get(obj);
+   if (!wd) return EINA_FALSE;
+   if (ev->event_flags & EVAS_EVENT_FLAG_ON_HOLD) return EINA_FALSE;
+   if (elm_widget_disabled_get(obj)) return EINA_FALSE;
+   return EINA_TRUE;
 }
 
 static void
@@ -2962,6 +2975,7 @@ elm_entry_add(Evas_Object *parent)
    elm_widget_content_unset_hook_set(obj, _content_unset_hook);
    elm_widget_content_get_hook_set(obj, _content_get_hook);
    elm_widget_translate_hook_set(obj, _translate_hook);
+   elm_widget_event_hook_set(obj, _event_hook);
 
    evas_object_smart_callback_add(obj, "sub-object-del", _sub_del, wd);
 
