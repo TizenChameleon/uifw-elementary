@@ -270,6 +270,7 @@ _signal_mouse_clicked(void *data, Evas_Object *obj __UNUSED__, const char *emiss
    _view_update(data);
 
    elm_entry_input_panel_show(wd->entry);
+   elm_object_focus_set(wd->entry, EINA_TRUE);
 
    evas_object_smart_callback_call(data, SIG_CLICKED, NULL);
 }
