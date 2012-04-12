@@ -110,7 +110,6 @@ _ctxpopup_hide(Evas_Object *popup)
    evas_object_event_callback_del(ext_mod->caller, EVAS_CALLBACK_HIDE, _entry_hide_cb);
    evas_object_event_callback_del(ext_mod->caller, EVAS_CALLBACK_MOVE, _entry_move_cb);
    evas_object_event_callback_del(ext_mod->caller, EVAS_CALLBACK_RESIZE, _entry_resize_cb);
-   ext_mod->caller = NULL;
 }
 
 static void
