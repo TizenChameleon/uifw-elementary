@@ -112,15 +112,15 @@ test_entry(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info 
             "<item size=16x16 vsize=full href=emoticon/happy-panting></item>"
             " (before this)<br/>"
 
-              "And as well (absize + ascent): "
-                 "<item absize=64x64 vsize=ascent href=emoticon/knowing-grin></item>"
-                   " (full) "
-                   "<item absize=64x64 vsize=full href=emoticon/not-impressed></item>"
-                   " or even paths to image files on disk too like: "
-                   "<item absize=96x128 vsize=full href=file://%s/images/sky_01.jpg></item>"
-                   " ... end."
-                   , elm_app_data_dir_get()
-                   );
+            "And as well (absize + ascent): "
+            "<item absize=64x64 vsize=ascent href=emoticon/knowing-grin></item>"
+            " (full) "
+            "<item absize=64x64 vsize=full href=emoticon/not-impressed></item>"
+            " or even paths to image files on disk too like: "
+            "<item absize=96x128 vsize=full href=file://%s/images/sky_01.jpg></item>"
+            " ... end."
+            , elm_app_data_dir_get()
+            );
    elm_object_text_set(en, buf);
    evas_object_size_hint_weight_set(en, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(en, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -2039,13 +2039,13 @@ test_entry8(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    bt = elm_icon_add(win);
    elm_icon_standard_set(bt, "home");
    evas_object_size_hint_min_set(bt, 48, 48);
-   evas_object_color_set(bt, 255, 0, 0, 128);
+   evas_object_color_set(bt, 128, 0, 0, 128);
    evas_object_show(bt);
    elm_object_part_content_set(en3, "icon", bt);
 
    bt = elm_icon_add(win);
    elm_icon_standard_set(bt, "delete");
-   evas_object_color_set(bt, 255, 0, 0, 128);
+   evas_object_color_set(bt, 128, 0, 0, 128);
    evas_object_size_hint_min_set(bt, 48, 48);
    evas_object_show(bt);
    elm_object_part_content_set(en3, "end", bt);
@@ -2074,6 +2074,7 @@ test_entry8(void *data __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info
    evas_object_show(rect);
 
    en4 = elm_entry_add(win);
+   elm_object_part_text_set(en4, "guide", "Type in here");
    elm_entry_scrollable_set(en4, EINA_TRUE);
    elm_entry_bounce_set(en4, EINA_TRUE, EINA_TRUE);
    elm_entry_autocapital_type_set(en4, EINA_TRUE);

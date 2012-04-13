@@ -922,6 +922,7 @@ elm_widget_sub_object_add(Evas_Object *obj,
                           Evas_Object *sobj)
 {
    API_ENTRY return;
+   EINA_SAFETY_ON_TRUE_RETURN(obj == sobj);
    double scale, pscale = elm_widget_scale_get(sobj);
    Elm_Theme *th, *pth = elm_widget_theme_get(sobj);
    Eina_Bool mirrored, pmirrored = elm_widget_mirrored_get(obj);
@@ -3396,59 +3397,74 @@ _smart_reconfigure(Smart_Data *sd)
 }
 
 EAPI void
-_elm_widget_item_content_part_set(Elm_Widget_Item *item,
-                                 const char *part,
-                                 Evas_Object *content)
+_elm_widget_item_part_content_set(Elm_Widget_Item *item,
+                                  const char *part,
+                                  Evas_Object *content)
 {
    ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
-   if (!item->content_set_func) return;
+   if (!item->content_set_func)
+     {
+        ERR("%s does not support elm_object_item_part_content_set() API.",
+            elm_widget_type_get(item->widget));
+        return;
+     }
    item->content_set_func((Elm_Object_Item *)item, part, content);
 }
 
 EAPI Evas_Object *
-_elm_widget_item_content_part_get(const Elm_Widget_Item *item,
+_elm_widget_item_part_content_get(const Elm_Widget_Item *item,
                                   const char *part)
 {
    ELM_WIDGET_ITEM_CHECK_OR_RETURN(item, NULL);
-   if (!item->content_get_func) return NULL;
+   if (!item->content_get_func)
+     {
+        ERR("%s does not support elm_object_item_part_content_get() API.",
+            elm_widget_type_get(item->widget));
+        return NULL;
+     }
    return item->content_get_func((Elm_Object_Item *)item, part);
 }
 
 EAPI Evas_Object *
-_elm_widget_item_content_part_unset(Elm_Widget_Item *item,
+_elm_widget_item_part_content_unset(Elm_Widget_Item *item,
                                     const char *part)
 {
    ELM_WIDGET_ITEM_CHECK_OR_RETURN(item, NULL);
-   if (!item->content_unset_func) return NULL;
+   if (!item->content_unset_func)
+     {
+        ERR("%s does not support elm_object_item_part_content_unset() API.",
+            elm_widget_type_get(item->widget));
+	    return NULL;
+	 }
    return item->content_unset_func((Elm_Object_Item *)item, part);
 }
 
 EAPI void
-_elm_widget_item_text_part_set(Elm_Widget_Item *item,
-                              const char *part,
-                              const char *label)
+_elm_widget_item_part_text_set(Elm_Widget_Item *item,
+                               const char *part,
+                               const char *label)
 {
    ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
-   if (!item->text_set_func) return;
+   if (!item->text_set_func)
+     {
+        ERR("%s does not support elm_object_item_part_text_set() API.",
+            elm_widget_type_get(item->widget));
+        return;
+     }
    item->text_set_func((Elm_Object_Item *)item, part, label);
 }
 
-EAPI void
-_elm_widget_item_signal_emit(Elm_Widget_Item *item,
-                             const char *emission,
-                             const char *source)
-{
-   ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
-   if (item->signal_emit_func)
-     item->signal_emit_func((Elm_Object_Item *)item, emission, source);
-}
-
 EAPI const char *
-_elm_widget_item_text_part_get(const Elm_Widget_Item *item,
+_elm_widget_item_part_text_get(const Elm_Widget_Item *item,
                                const char *part)
 {
    ELM_WIDGET_ITEM_CHECK_OR_RETURN(item, NULL);
-   if (!item->text_get_func) return NULL;
+   if (!item->text_get_func)
+     {
+        ERR("%s does not support elm_object_item_part_text_get() API.",
+            elm_widget_type_get(item->widget));
+        return NULL;
+     }
    return item->text_get_func((Elm_Object_Item *)item, part);
 }
 
@@ -3490,6 +3506,16 @@ _elm_widget_item_text_get_hook_set(Elm_Widget_Item *item,
 {
    ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
    item->text_get_func = func;
+}
+
+EAPI void
+_elm_widget_item_signal_emit(Elm_Widget_Item *item,
+                             const char *emission,
+                             const char *source)
+{
+   ELM_WIDGET_ITEM_CHECK_OR_RETURN(item);
+   if (item->signal_emit_func)
+     item->signal_emit_func((Elm_Object_Item *)item, emission, source);
 }
 
 EAPI void
