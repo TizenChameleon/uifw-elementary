@@ -31,7 +31,7 @@ struct Elm_Gen_Item
    Elm_Gen_Item_Type        *item;
    const Elm_Gen_Item_Class *itc;
    Evas_Coord                x, y, dx, dy;
-   Evas_Object              *spacer, *edit_obj;
+   Evas_Object              *spacer, *deco_all_view;
    Elm_Gen_Item             *parent;
    Eina_List                *texts, *contents, *states, *content_objs;
    Ecore_Timer              *long_timer;
@@ -62,7 +62,7 @@ struct Elm_Gen_Item
    Eina_Bool                 down : 1;
    Eina_Bool                 group : 1;
    Eina_Bool                 reorder : 1;
-   Eina_Bool                 mode_set : 1; /**< item uses style mode for highlight/select */
+   Eina_Bool                 decorate_it_set : 1; /**< item uses style mode for highlight/select */
    Eina_Bool                 flipped : 1; /**< a flag that shows the flip status of the item. */
    Eina_Bool                 defer_unrealize : 1;
    Eina_Bool                 can_focus : 1;
@@ -127,7 +127,7 @@ struct _Widget_Data
    Elm_List_Mode                  mode;
    Ecore_Timer                   *multi_timer, *scr_hold_timer;
    Ecore_Animator                *reorder_move_animator;
-   const char                    *decorate_type;
+   const char                    *decorate_it_type;
    double                         start_time;
    Evas_Coord                     prev_x, prev_y, prev_mx, prev_my;
    Evas_Coord                     cur_x, cur_y, cur_mx, cur_my;
@@ -140,7 +140,7 @@ struct _Widget_Data
    Eina_Bool                      height_for_width : 1;
    Eina_Bool                      homogeneous : 1;
    Eina_Bool                      swipe : 1;
-   Eina_Bool                      decorate_mode : 1;
+   Eina_Bool                      decorate_all_mode : 1;
    Eina_Bool                      reorder_pan_move : 1;
    Eina_Bool                      auto_scroll_enabled : 1;
    Eina_Bool                      pan_changed : 1;
