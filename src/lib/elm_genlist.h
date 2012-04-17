@@ -333,13 +333,18 @@
  *
  * Supported elm_object_item common APIs
  * @li elm_object_item_part_content_get()
- * @li elm_object_item_part_content_set()
- * @li elm_object_item_part_content_unset()
- * @li elm_object_item_part_text_set()
  * @li elm_object_item_part_text_get()
  * @li elm_object_item_disabled_set()
  * @li elm_object_item_disabled_get()
  * @li elm_object_item_signal_emit()
+ *
+ * Unsupported elm_object_item common APIs due to the genlist concept.
+ * Genlist fills content/text according to the appropriate callback functions.
+ * Please use elm_genlist_item_update() or elm_genlist_item_fields_update()
+ * instead.
+ * @li elm_object_item_part_content_set()
+ * @li elm_object_item_part_content_unset()
+ * @li elm_object_item_part_text_set()
  *
  * @section Genlist_Examples Examples
  *
@@ -991,7 +996,7 @@ EAPI void                          elm_genlist_realized_items_update(Evas_Object
 EAPI unsigned int elm_genlist_items_count(const Evas_Object *obj);
 
 /**
- * Add a new genlist item class in a given genlist widget.
+ * Create a new genlist item class in a given genlist widget.
  *
  * @return New allocated a genlist item class.
  *
