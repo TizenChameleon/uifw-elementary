@@ -787,15 +787,15 @@ entry_insert_filter(Evas_Object* entry, char* str)
 
    char *insertStr = str;
 
-   // if entry has single line set then remove <br> & <ps> tags
+   // if entry has single line set then remove <br/> & <ps/> tags
    if (elm_entry_single_line_get(entry))
      {
         Eina_Strbuf *buf = eina_strbuf_new();
         if (buf)
           {
              eina_strbuf_append(buf, insertStr);
-             eina_strbuf_replace_all(buf, "<br>", "");
-             eina_strbuf_replace_all(buf, "<ps>", "");
+             eina_strbuf_replace_all(buf, "<br/>", "");
+             eina_strbuf_replace_all(buf, "<ps/>", "");
              insertStr = eina_strbuf_string_steal(buf);
              eina_strbuf_free(buf);
           }
