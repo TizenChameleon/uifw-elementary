@@ -90,10 +90,7 @@ _entry_hide_cb(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void
 static void
 _entry_move_cb(void *data, Evas *e, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
-   if (evas_pointer_button_down_mask_get(e))
-     _ctxpopup_hide(data);
-   else
-     _ctxpopup_position(data);
+   _ctxpopup_hide(data);
 }
 
 static void
@@ -370,7 +367,7 @@ obj_longpress(Evas_Object *obj)
         if(top)
           {
              ext_mod->popup = elm_ctxpopup_add(top);
-             elm_object_focus_allow_set(ext_mod->popup, EINA_FALSE);
+             elm_object_tree_focus_allow_set(ext_mod->popup, EINA_FALSE);
              evas_object_smart_callback_add(ext_mod->popup, "dismissed", _ctxpopup_dismissed_cb, NULL);
              evas_object_event_callback_add(obj, EVAS_CALLBACK_DEL, _entry_del_cb, ext_mod->popup);
              evas_object_event_callback_add(obj, EVAS_CALLBACK_HIDE, _entry_hide_cb, ext_mod->popup);
