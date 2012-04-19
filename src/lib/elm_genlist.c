@@ -2728,7 +2728,10 @@ _item_block_position(Item_Block *itb,
                   else
                     {
                        if (!it->wd->tree_effect_animator)
-                         _elm_genlist_item_unrealize(it, EINA_FALSE);
+                         {
+                            it->want_unrealize = EINA_TRUE;
+                            _elm_genlist_item_unrealize(it, EINA_FALSE);
+                         }
                     }
                }
              in++;
@@ -2785,6 +2788,7 @@ _changed_size_hints(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__,
 {
    Elm_Gen_Item *it = data;
    if (!it) return;
+   if (it->want_unrealize) return;
    it->item->mincalcd = EINA_FALSE;
    it->item->block->changeme = EINA_TRUE;
    if (it->wd->changed_job) ecore_job_del(it->wd->changed_job);
