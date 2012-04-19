@@ -1335,13 +1335,16 @@ _mouse_down(void        *data,
           {
              elm_widget_tree_unfocusable_set(item_obj, EINA_FALSE);
           }
-        EINA_LIST_FOREACH(it->item->flip_content_objs, l, item_obj)
+        if (elm_widget_type_get(obj) == _genlist)
           {
-             elm_widget_tree_unfocusable_set(item_obj, EINA_FALSE);
-          }
-        EINA_LIST_FOREACH(it->item->deco_all_content_objs, l, item_obj)
-          {
-             elm_widget_tree_unfocusable_set(item_obj, EINA_FALSE);
+             EINA_LIST_FOREACH(it->item->flip_content_objs, l, item_obj)
+               {
+                  elm_widget_tree_unfocusable_set(item_obj, EINA_FALSE);
+               }
+             EINA_LIST_FOREACH(it->item->deco_all_content_objs, l, item_obj)
+               {
+                  elm_widget_tree_unfocusable_set(item_obj, EINA_FALSE);
+               }
           }
         it->can_focus = EINA_TRUE;
      }
@@ -3932,15 +3935,18 @@ _item_select(Elm_Gen_Item *it)
              elm_widget_focused_object_clear(item_obj);
              elm_widget_tree_unfocusable_set(item_obj, EINA_TRUE);
           }
-        EINA_LIST_FOREACH(_lsit->item->flip_content_objs, l, item_obj)
+        if (elm_widget_type_get(obj) == _genlist)
           {
-             elm_widget_focused_object_clear(item_obj);
-             elm_widget_tree_unfocusable_set(item_obj, EINA_TRUE);
-          }
-        EINA_LIST_FOREACH(_lsit->item->deco_all_content_objs, l, item_obj)
-          {
-             elm_widget_focused_object_clear(item_obj);
-             elm_widget_tree_unfocusable_set(item_obj, EINA_TRUE);
+             EINA_LIST_FOREACH(_lsit->item->flip_content_objs, l, item_obj)
+               {
+                  elm_widget_focused_object_clear(item_obj);
+                  elm_widget_tree_unfocusable_set(item_obj, EINA_TRUE);
+               }
+             EINA_LIST_FOREACH(_lsit->item->deco_all_content_objs, l, item_obj)
+               {
+                  elm_widget_focused_object_clear(item_obj);
+                  elm_widget_tree_unfocusable_set(item_obj, EINA_TRUE);
+               }
           }
         _lsit->can_focus = EINA_FALSE;
      }
@@ -6273,10 +6279,13 @@ _elm_genlist_item_unrealize(Elm_Gen_Item *it,
    EINA_LIST_FREE(it->content_objs, content)
      evas_object_del(content);
 
-   elm_widget_stringlist_free(it->item->flip_contents);
-   it->item->flip_contents = NULL;
-   EINA_LIST_FREE(it->item->flip_content_objs, content)
-     evas_object_del(content);
+   if (elm_widget_type_get(WIDGET(it)) == _genlist)
+     {
+        elm_widget_stringlist_free(it->item->flip_contents);
+        it->item->flip_contents = NULL;
+        EINA_LIST_FREE(it->item->flip_content_objs, content)
+          evas_object_del(content);
+     }
 
    it->unrealize_cb(it);
 
