@@ -1,5 +1,6 @@
 /**
  * @defgroup Check Check
+ * @ingroup Elementary
  *
  * @image html img/widget/check/preview-00.png
  * @image latex img/widget/check/preview-00.eps
@@ -32,16 +33,16 @@
  * @li "off" - Off state label of the check
  *
  * Supported elm_object common APIs.
- * @li elm_object_disabled_set
- * @li elm_object_disabled_get
- * @li elm_object_part_text_set
- * @li elm_object_part_text_get
- * @li elm_object_part_content_set
- * @li elm_object_part_content_get
- * @li elm_object_part_content_unset
- * @li elm_object_signal_emit
- * @li elm_object_signal_callback_add
- * @li elm_object_signal_callback_del
+ * @li @ref elm_object_disabled_set
+ * @li @ref elm_object_disabled_get
+ * @li @ref elm_object_part_text_set
+ * @li @ref elm_object_part_text_get
+ * @li @ref elm_object_part_content_set
+ * @li @ref elm_object_part_content_get
+ * @li @ref elm_object_part_content_unset
+ * @li @ref elm_object_signal_emit
+ * @li @ref elm_object_signal_callback_add
+ * @li @ref elm_object_signal_callback_del
  *
  * @ref tutorial_check should give you a firm grasp of how to use this widget.
  *
@@ -53,6 +54,8 @@
  *
  * @param parent The parent object
  * @return The new object or NULL if it cannot be created
+ *
+ * @ingroup Check
  */
 EAPI Evas_Object *                elm_check_add(Evas_Object *parent);
 
@@ -65,6 +68,8 @@ EAPI Evas_Object *                elm_check_add(Evas_Object *parent);
  * This sets the state of the check. If set with elm_check_state_pointer_set()
  * the state of that variable is also changed. Calling this @b doesn't cause
  * the "changed" signal to be emitted.
+ *
+ * @ingroup Check
  */
 EAPI void                         elm_check_state_set(Evas_Object *obj, Eina_Bool state);
 
@@ -73,6 +78,8 @@ EAPI void                         elm_check_state_set(Evas_Object *obj, Eina_Boo
  *
  * @param obj The check object
  * @return The boolean state
+ *
+ * @ingroup Check
  */
 EAPI Eina_Bool                    elm_check_state_get(const Evas_Object *obj);
 
@@ -88,6 +95,8 @@ EAPI Eina_Bool                    elm_check_state_get(const Evas_Object *obj);
  * then when this is called, the check objects state will also be modified to
  * reflect the value of the boolean @p statep points to, just like calling
  * elm_check_state_set().
+ *
+ * @ingroup Check
  */
 EAPI void                         elm_check_state_pointer_set(Evas_Object *obj, Eina_Bool *statep);
 

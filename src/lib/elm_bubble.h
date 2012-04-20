@@ -1,5 +1,6 @@
 /**
  * @defgroup Bubble Bubble
+ * @ingroup Elementary
  *
  * @image html img/widget/bubble/preview-00.png
  * @image latex img/widget/bubble/preview-00.eps
@@ -40,11 +41,11 @@
  * @li "info" - info of the bubble
  *
  * Supported elm_object common APIs.
- * @li elm_object_part_text_set
- * @li elm_object_part_text_get
- * @li elm_object_part_content_set
- * @li elm_object_part_content_get
- * @li elm_object_part_content_unset
+ * @li @ref elm_object_part_text_set
+ * @li @ref elm_object_part_text_get
+ * @li @ref elm_object_part_content_set
+ * @li @ref elm_object_part_content_get
+ * @li @ref elm_object_part_content_unset
  *
  * For an example of using a bubble see @ref bubble_01_example_page "this".
  *
@@ -73,6 +74,8 @@ typedef enum
  * @return The new object or NULL if it cannot be created
  *
  * This function adds a text bubble to the given parent evas object.
+ *
+ * @ingroup Bubble
  */
 EAPI Evas_Object                 *elm_bubble_add(Evas_Object *parent);
 
@@ -86,6 +89,8 @@ EAPI Evas_Object                 *elm_bubble_add(Evas_Object *parent);
  * determine where the arrow in the frame points to and where label, icon and
  * info are shown.
  *
+ *
+ * @ingroup Bubble
  */
 EAPI void  elm_bubble_pos_set(Evas_Object *obj, Elm_Bubble_Pos pos);
 
@@ -96,6 +101,8 @@ EAPI void  elm_bubble_pos_set(Evas_Object *obj, Elm_Bubble_Pos pos);
  * @return The given corner for the bubble.
  *
  * This function gets the selected corner of the bubble.
+ *
+ * @ingroup Bubble
  */
 EAPI Elm_Bubble_Pos elm_bubble_pos_get(const Evas_Object *obj);
 

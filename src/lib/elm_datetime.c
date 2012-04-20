@@ -642,7 +642,7 @@ _parse_format(Evas_Object *obj, char *fmt_ptr)
 {
    Widget_Data *wd;
    Datetime_Field *field = NULL;
-   unsigned int len = 0, idx, location = 0;
+   unsigned int len = 0, idx = 0, location = 0;
    char separator[MAX_SEPARATOR_LEN];
    char cur;
    Eina_Bool fmt_parsing = EINA_FALSE, sep_parsing = EINA_FALSE,
@@ -681,7 +681,7 @@ _parse_format(Evas_Object *obj, char *fmt_ptr)
              if (field) eina_stringshare_replace(&field->separator, separator);
           }
 
-        // ignore the set of chars (global, field specific).
+        // ignore the set of chars (global, field specific) as field separators.
         if (sep_parsing && (len < MAX_SEPARATOR_LEN - 1) &&
             (field->type != ELM_DATETIME_AMPM) && (!strchr(ignore_separators, cur)) &&
             (!strchr(mapping[idx].ignore_sep, cur)))
