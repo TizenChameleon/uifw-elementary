@@ -1,5 +1,6 @@
 /**
  * @defgroup Genlist Genlist
+ * @ingroup Elementary
  *
  * @image html img/widget/genlist/preview-00.png
  * @image latex img/widget/genlist/preview-00.eps
@@ -329,22 +330,22 @@
  * - @c "tree,effect,finished" - This is called when a genlist tree effect is finished.
  *
  * Supported elm_object common APIs
- * @li elm_object_signal_emit()
+ * @li @ref elm_object_signal_emit()
  *
  * Supported elm_object_item common APIs
- * @li elm_object_item_part_content_get()
- * @li elm_object_item_part_text_get()
- * @li elm_object_item_disabled_set()
- * @li elm_object_item_disabled_get()
- * @li elm_object_item_signal_emit()
+ * @li @ref elm_object_item_part_content_get()
+ * @li @ref elm_object_item_part_text_get()
+ * @li @ref elm_object_item_disabled_set()
+ * @li @ref elm_object_item_disabled_get()
+ * @li @ref elm_object_item_signal_emit()
  *
  * Unsupported elm_object_item common APIs due to the genlist concept.
  * Genlist fills content/text according to the appropriate callback functions.
  * Please use elm_genlist_item_update() or elm_genlist_item_fields_update()
  * instead.
- * @li elm_object_item_part_content_set()
- * @li elm_object_item_part_content_unset()
- * @li elm_object_item_part_text_set()
+ * @li @ref elm_object_item_part_content_set()
+ * @li @ref elm_object_item_part_content_unset()
+ * @li @ref elm_object_item_part_text_set()
  *
  * @section Genlist_Examples Examples
  *
@@ -1000,7 +1001,7 @@ EAPI unsigned int elm_genlist_items_count(const Evas_Object *obj);
  *
  * @return New allocated a genlist item class.
  *
- * This adds genlist item class for the genlist widget. When adding a item,
+ * This adds genlist item class for the genlist widget. When adding an item,
  * genlist_item_{append, prepend, insert} function needs item class of the item.
  * Given callback parameters are used at retrieving {text, content} of
  * added item. Set as NULL if it's not used.
@@ -1014,7 +1015,7 @@ EAPI unsigned int elm_genlist_items_count(const Evas_Object *obj);
 EAPI Elm_Genlist_Item_Class *elm_genlist_item_class_new(void);
 
 /**
- * Remove a item class in a given genlist widget.
+ * Remove an item class in a given genlist widget.
  *
  * @param itc The itc to be removed.
  *

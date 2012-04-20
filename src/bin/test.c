@@ -70,6 +70,7 @@ void test_list2(void *data, Evas_Object *obj, void *event_info);
 void test_list3(void *data, Evas_Object *obj, void *event_info);
 void test_list4(void *data, Evas_Object *obj, void *event_info);
 void test_list5(void *data, Evas_Object *obj, void *event_info);
+void test_list6(void *data, Evas_Object *obj, void *event_info);
 void test_inwin(void *data, Evas_Object *obj, void *event_info);
 void test_inwin2(void *data, Evas_Object *obj, void *event_info);
 void test_scaling(void *data, Evas_Object *obj, void *event_info);
@@ -401,8 +402,8 @@ my_win_main(char *autorun, Eina_Bool test_win_only)
 
    lb = elm_label_add(win);
    elm_object_text_set(lb, " Search Menu :");
-   evas_object_size_hint_weight_set(en, 0.0, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(en, 0.0, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(lb, 0.0, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(lb, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(bx1, lb);
    evas_object_show(lb);
 
@@ -532,6 +533,7 @@ add_tests:
    ADD_TEST(NULL, "Lists", "List 3", test_list3);
    ADD_TEST(NULL, "Lists", "List 4", test_list4);
    ADD_TEST(NULL, "Lists", "List 5", test_list5);
+   ADD_TEST(NULL, "Lists", "List 6", test_list6);
    ADD_TEST(NULL, "Lists", "Genlist", test_genlist);
    ADD_TEST(NULL, "Lists", "Genlist 2", test_genlist2);
    ADD_TEST(NULL, "Lists", "Genlist 3", test_genlist3);

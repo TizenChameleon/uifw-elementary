@@ -1,5 +1,6 @@
 /**
  * @defgroup Multibuttonentry Multibuttonentry
+ * @ingroup Elementary
  *
  * A Multibuttonentry is a widget to allow a user enter text and manage it as a number
  * of buttons. Each text button is inserted by pressing the "return" key.
@@ -34,13 +35,13 @@
  * @li "default" - A label of the multibuttonentry item
  *
  * Supported elm_object common APIs.
- * @li elm_object_signal_emit
- * @li elm_object_part_text_set
- * @li elm_object_part_text_get
+ * @li @ref elm_object_signal_emit
+ * @li @ref elm_object_part_text_set
+ * @li @ref elm_object_part_text_get
  *
  * Supported elm_object_item common APIs.
- * @li elm_object_item_part_text_set
- * @li elm_object_item_part_text_get
+ * @li @ref elm_object_item_part_text_set
+ * @li @ref elm_object_item_part_text_get
  *
  */
 
