@@ -175,7 +175,7 @@ _labels_foreach_text_set(const Eina_Hash *hash __UNUSED__, const void *key, void
 {
   Widget_Data *wd = fdata;
 
-  edje_object_part_text_set(wd->slider, key, data);
+  edje_object_part_text_escaped_set(wd->slider, key, data);
 
   return 1;
 }
@@ -356,7 +356,7 @@ _units_set(Evas_Object *obj)
      {
         char *buf;
         buf = wd->units_format_func(wd->val);
-        edje_object_part_text_set(wd->slider, "elm.units", buf);
+        edje_object_part_text_escaped_set(wd->slider, "elm.units", buf);
         if (wd->units_format_free) wd->units_format_free(buf);
      }
    else if (wd->units)
@@ -364,10 +364,10 @@ _units_set(Evas_Object *obj)
         char buf[1024];
 
         snprintf(buf, sizeof(buf), wd->units, wd->val);
-        edje_object_part_text_set(wd->slider, "elm.units", buf);
+        edje_object_part_text_escaped_set(wd->slider, "elm.units", buf);
      }
    else
-     edje_object_part_text_set(wd->slider, "elm.units", NULL);
+     edje_object_part_text_escaped_set(wd->slider, "elm.units", NULL);
 }
 
 static void
@@ -379,17 +379,17 @@ _indicator_set(Evas_Object *obj)
      {
         char *buf;
         buf = wd->indicator_format_func(wd->val);
-        edje_object_part_text_set(wd->slider, "elm.dragable.slider:elm.indicator", buf);
+        edje_object_part_text_escaped_set(wd->slider, "elm.dragable.slider:elm.indicator", buf);
         if (wd->indicator_format_free) wd->indicator_format_free(buf);
      }
    else if (wd->indicator)
      {
         char buf[1024];
         snprintf(buf, sizeof(buf), wd->indicator, wd->val);
-        edje_object_part_text_set(wd->slider, "elm.dragable.slider:elm.indicator", buf);
+        edje_object_part_text_escaped_set(wd->slider, "elm.dragable.slider:elm.indicator", buf);
      }
    else
-     edje_object_part_text_set(wd->slider, "elm.dragable.slider:elm.indicator", NULL);
+     edje_object_part_text_escaped_set(wd->slider, "elm.dragable.slider:elm.indicator", NULL);
 }
 
 static void
@@ -629,7 +629,7 @@ _elm_slider_label_set(Evas_Object *obj, const char *part, const char *label)
         edje_object_message_signal_process(wd->slider);
      }
 
-   edje_object_part_text_set(wd->slider, real_part, label);
+   edje_object_part_text_escaped_set(wd->slider, real_part, label);
    _sizing_eval(obj);
 }
 
@@ -794,8 +794,8 @@ _min_max_set(Evas_Object *obj)
         snprintf((char*) buf_max, length + 128, wd->units, wd->val_max);
      }
 
-   edje_object_part_text_set(wd->slider, "elm.units.min", buf_min);
-   edje_object_part_text_set(wd->slider, "elm.units.max", buf_max);
+   edje_object_part_text_escaped_set(wd->slider, "elm.units.min", buf_min);
+   edje_object_part_text_escaped_set(wd->slider, "elm.units.max", buf_max);
 
    if (wd->units_format_func && wd->units_format_free)
      {

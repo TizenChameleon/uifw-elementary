@@ -336,7 +336,7 @@ _theme_hook_item(Evas_Object *obj, Elm_Toolbar_Item *it, double scale, int icon_
              evas_object_size_hint_max_set(it->icon, ms, ms);
              edje_object_part_swallow(view, "elm.swallow.icon", it->icon);
           }
-        edje_object_part_text_set(view, "elm.text", it->label);
+        edje_object_part_text_escaped_set(view, "elm.text", it->label);
      }
    else
      {
@@ -1007,7 +1007,7 @@ _item_new(Evas_Object *obj, const char *icon, const char *label, Evas_Smart_Cb f
      }
    if (it->label)
      {
-        edje_object_part_text_set(VIEW(it), "elm.text", it->label);
+        edje_object_part_text_escaped_set(VIEW(it), "elm.text", it->label);
         edje_object_signal_emit(VIEW(it), "elm,state,text,visible", "elm");
      }
    mw = mh = -1;
@@ -1047,7 +1047,7 @@ _elm_toolbar_item_label_update(Elm_Toolbar_Item *item)
 {
    Evas_Coord mw = -1, mh = -1;
    Widget_Data *wd = elm_widget_data_get(WIDGET(item));
-   edje_object_part_text_set(VIEW(item), "elm.text", item->label);
+   edje_object_part_text_escaped_set(VIEW(item), "elm.text", item->label);
    edje_object_signal_emit(VIEW(item), "elm,state,text,visible", "elm");
 
    elm_coords_finger_size_adjust(1, &mw, 1, &mh);
@@ -1095,7 +1095,7 @@ _item_label_set(Elm_Toolbar_Item *item, const char *label, const char *sig)
    s = edje_object_data_get(VIEW(item), "transition_animation_on");
    if ((s) && (atoi(s)))
      {
-        edje_object_part_text_set(VIEW(item), "elm.text_new", item->label);
+        edje_object_part_text_escaped_set(VIEW(item), "elm.text_new", item->label);
         edje_object_signal_emit (VIEW(item), sig, "elm");
         edje_object_signal_callback_add(VIEW(item),
                                         "elm,state,label_set,done", "elm",

@@ -881,23 +881,34 @@ static void
 _item_del(Elm_Gen_Item *it)
 {
    Evas_Object *obj = WIDGET(it);
+   Widget_Data *wd = it->wd;
 
    evas_event_freeze(evas_object_evas_get(obj));
    elm_genlist_item_subitems_clear((Elm_Object_Item *)it);
-   if (it->wd->show_item == it) it->wd->show_item = NULL;
+   if (wd->show_item == it) wd->show_item = NULL;
    if (it->realized) _elm_genlist_item_unrealize(it, EINA_FALSE);
    if (it->item->decorate_all_item_realized) _decorate_all_item_unrealize(it);
    if (it->item->block) _item_block_del(it);
    if (it->item->queued)
-     it->wd->queue = eina_list_remove(it->wd->queue, it);
-   if (it->wd->anchor_item == it)
+     wd->queue = eina_list_remove(wd->queue, it);
+   if (wd->anchor_item == it)
      {
-        it->wd->anchor_item = ELM_GEN_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->next);
-        if (!it->wd->anchor_item)
-          it->wd->anchor_item = ELM_GEN_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->prev);
+        wd->anchor_item = ELM_GEN_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->next);
+        if (!wd->anchor_item)
+          wd->anchor_item = ELM_GEN_ITEM_FROM_INLIST(EINA_INLIST_GET(it)->prev);
      }
-   if (it->wd->expanded_item == it) it->wd->expanded_item = NULL;
-   if (it->wd->expanded_next_item == it) it->wd->expanded_next_item = NULL;
+   if (wd->expanded_item == it)
+     {
+        wd->expanded_item = NULL;
+        if (wd->tree_effect_animator)
+          {
+             ecore_animator_del(wd->tree_effect_animator);
+             wd->tree_effect_animator = NULL;
+          }
+        wd->move_effect_mode = ELM_GENLIST_TREE_EFFECT_NONE;
+     }
+   if (wd->expanded_next_item == it) wd->expanded_next_item = NULL;
+   if (wd->move_items) wd->move_items = eina_list_remove(wd->move_items, it);
    if (it->parent)
      it->parent->item->items = eina_list_remove(it->parent->item->items, it);
    if (it->item->swipe_timer)
@@ -2056,7 +2067,7 @@ _item_text_realize(Elm_Gen_Item *it,
 
              if (s)
                {
-                  edje_object_part_text_set(target, key, s);
+                  edje_object_part_text_escaped_set(target, key, s);
                   free(s);
                }
              else
@@ -2405,6 +2416,12 @@ _item_realize(Elm_Gen_Item *it,
 static void
 _item_unrealize_cb(Elm_Gen_Item *it)
 {
+   Evas_Object *content;
+   elm_widget_stringlist_free(it->item->flip_contents);
+   it->item->flip_contents = NULL;
+   EINA_LIST_FREE(it->item->flip_content_objs, content)
+     evas_object_del(content);
+
    if (it->item->nocache_once || it->item->nocache)
      {
         evas_object_del(VIEW(it));
@@ -3753,6 +3770,8 @@ _decorate_all_item_realize(Elm_Gen_Item *it, Eina_Bool effect_on)
 
    _decorate_all_item_position(it, it->item->scrl_x, it->item->scrl_y);
    evas_object_show(it->deco_all_view);
+
+   if (it->selected) edje_object_signal_emit(it->deco_all_view, "elm,state,selected", "elm");
 
    it->item->decorate_all_item_realized = EINA_TRUE;
    it->want_unrealize = EINA_FALSE;
@@ -5178,7 +5197,7 @@ _elm_genlist_expanded_next_item_get(Elm_Gen_Item *it)
 static void
 _elm_genlist_move_items_set(Elm_Gen_Item *it)
 {
-   Eina_List *l;
+   Eina_List *l, *ll;
    Elm_Gen_Item *it2 = NULL;
    Evas_Coord ox, oy, ow, oh, dh = 0;
 
@@ -5187,7 +5206,7 @@ _elm_genlist_move_items_set(Elm_Gen_Item *it)
    if (it->item->expanded)
      {
         it->wd->move_items = elm_genlist_realized_items_get(it->wd->obj);
-        EINA_LIST_FOREACH(it->wd->move_items, l, it2)
+        EINA_LIST_FOREACH_SAFE(it->wd->move_items, l, ll, it2)
           {
              if (it2 == it->wd->expanded_next_item) break;
              it->wd->move_items = eina_list_remove(it->wd->move_items, it2);
@@ -5956,7 +5975,6 @@ elm_genlist_decorate_mode_set(Evas_Object *obj, Eina_Bool decorated)
           {
              if (it->item->type != ELM_GENLIST_ITEM_GROUP)
                {
-                  if (it->selected) _item_unselect(it);
                   if (it->itc->decorate_all_item_style)
                      _decorate_all_item_realize(it, EINA_TRUE);
                }
@@ -6283,14 +6301,6 @@ _elm_genlist_item_unrealize(Elm_Gen_Item *it,
    EINA_LIST_FREE(it->content_objs, content)
      evas_object_del(content);
 
-   if (elm_widget_type_get(WIDGET(it)) == _genlist)
-     {
-        elm_widget_stringlist_free(it->item->flip_contents);
-        it->item->flip_contents = NULL;
-        EINA_LIST_FREE(it->item->flip_content_objs, content)
-          evas_object_del(content);
-     }
-
    it->unrealize_cb(it);
 
    it->realized = EINA_FALSE;
@@ -6470,7 +6480,7 @@ _item_tree_effect_finish(Widget_Data *wd)
    if (wd->tree_effect_animator)
      {
         if (wd->move_effect_mode == ELM_GENLIST_TREE_EFFECT_CONTRACT)
-           _item_subitems_clear(wd->expanded_item);
+          _item_subitems_clear(wd->expanded_item);
         EINA_LIST_FOREACH(wd->expanded_item->item->items, l, it)
           {
              it->item->tree_effect_finished = EINA_TRUE;
@@ -6496,7 +6506,7 @@ static Eina_Bool
 _tree_effect_animator_cb(void *data)
 {
    Widget_Data *wd = data;
-   if (!wd) return EINA_FALSE;
+   if (!wd) return ECORE_CALLBACK_CANCEL;
    Evas_Coord ox, oy, ow, oh, cvx, cvy, cvw, cvh;
    Elm_Gen_Item *it = NULL, *it2, *expanded_next_it;
    const Eina_List *l;
