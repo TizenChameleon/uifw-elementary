@@ -380,7 +380,7 @@ EAPI void elm_datetime_format_set(Evas_Object *obj, const char *fmt);
   * @brief Get the upper boundary of a field.
   *
   * Year: years since 1900. Negative value represents year below 1900 (year
-  * value -30 represents 1870). Year default range is from 70 to 137.
+  * value -30 represents 1870). Year default range is from 2 to 137.
   *
   * Month: default value range is from 0 to 11.
   *
@@ -403,7 +403,9 @@ EAPI Eina_Bool elm_datetime_value_max_get(const Evas_Object *obj, struct tm *max
  * @brief Set the upper boundary of a field.
  *
  * Year: years since 1900. Negative value represents year below 1900 (year
- * value -30 represents 1870). Year default range is from 70 to 137.
+ * value -30 represents 1870). Year default range is from 2 to 137.
+ * To set a max value beyond this range, field limit of Year should be set
+ * accordingly by using elm_datetime_field_limit_set().
  *
  * Month: default value range is from 0 to 11.
  *
@@ -426,7 +428,7 @@ EAPI Eina_Bool elm_datetime_value_max_set(Evas_Object *obj, const struct tm *max
  * @brief Get the lower boundary of a field.
  *
  * Year: years since 1900. Negative value represents year below 1900 (year
- * value -30 represents 1870). Year default range is from 70 to 137.
+ * value -30 represents 1870). Year default range is from 2 to 137.
  *
  * Month: default value range is from 0 to 11.
  *
@@ -449,7 +451,9 @@ EAPI Eina_Bool elm_datetime_value_min_get(const Evas_Object *obj, struct tm *min
  * @brief Set the lower boundary of a field.
  *
  * Year: years since 1900. Negative value represents year below 1900 (year
- * value -30 represents 1870). Year default range is from 70 to 137.
+ * value -30 represents 1870). Year default range is from 2 to 137.
+ * To set a min value beyond this range, field limit of Year should be set
+ * accordingly by using elm_datetime_field_limit_set().
  *
  * Month: default value range is from 0 to 11.
  *
@@ -512,7 +516,7 @@ EAPI void      elm_datetime_field_limit_set(Evas_Object *obj, Elm_Datetime_Field
  * @brief Get the current value of a field.
  *
  * Year: years since 1900. Negative value represents year below 1900 (year
- * value -30 represents 1870). Year default range is from 70 to 137.
+ * value -30 represents 1870). Year default range is from 2 to 137.
  *
  * Month: default value range is from 0 to 11.
  *
@@ -535,7 +539,9 @@ EAPI Eina_Bool elm_datetime_value_get(const Evas_Object *obj, struct tm *currtim
  * @brief Set the current value of a Datetime object.
  *
  * Year: years since 1900. Negative value represents year below 1900 (year
- * value -30 represents 1870). Year default range is from 70 to 137.
+ * value -30 represents 1870). Year default range is from 2 to 137.
+ * To set current value beyond this range, field limit of Year should be set
+ * accordingly by using elm_datetime_field_limit_set().
  *
  * Month: default value range is from 0 to 11.
  *
