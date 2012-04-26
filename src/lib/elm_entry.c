@@ -696,7 +696,7 @@ _elm_deferred_recalc_job(void *data)
    elm_coords_finger_size_adjust(1, &minw, 1, &minh);
    /* This is a hack to workaround the way min size hints are treated.
     * If the minimum width is smaller than the restricted width, it means
-    * the mininmum doesn't matter. */
+    * the minimum doesn't matter. */
    if (minw <= resw)
      {
         Evas_Coord ominw = -1;
@@ -781,7 +781,7 @@ _sizing_eval(Evas_Object *obj)
              elm_coords_finger_size_adjust(1, &minw, 1, &minh);
              /* This is a hack to workaround the way min size hints are treated.
               * If the minimum width is smaller than the restricted width, it means
-              * the mininmum doesn't matter. */
+              * the minimum doesn't matter. */
              if (minw <= vw)
                {
                   Evas_Coord ominw = -1;
@@ -3317,7 +3317,7 @@ elm_entry_is_empty(const Evas_Object *obj)
     * otherwise it is. */
    tb = edje_object_part_object_get(wd->ent, "elm.text");
    cur = evas_object_textblock_cursor_new((Evas_Object *) tb); /* This is
-                                                                  actually, ok for the time being, thsese hackish stuff will be removed
+                                                                  actually, ok for the time being, these hackish stuff will be removed
                                                                   once evas 1.0 is out*/
    evas_textblock_cursor_pos_set(cur, 0);
    ret = evas_textblock_cursor_char_next(cur);
@@ -4420,6 +4420,17 @@ _parent_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *e
    wd->anchor_hover.hover_parent = NULL;
 }
 
+static void
+_anchor_hover_del(void *data, Evas *e __UNUSED__, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
+{
+   Widget_Data *wd = elm_widget_data_get(data);
+   if (!wd) return;
+   if (wd->anchor_hover.pop) evas_object_del(wd->anchor_hover.pop);
+   wd->anchor_hover.pop = NULL;
+   evas_object_event_callback_del_full(wd->anchor_hover.hover, EVAS_CALLBACK_DEL,
+                                       _anchor_hover_del, obj);
+}
+
 EAPI void
 elm_entry_anchor_hover_parent_set(Evas_Object *obj, Evas_Object *parent)
 {
@@ -4496,6 +4507,8 @@ _entry_hover_anchor_clicked(void *data, Evas_Object *obj, void *event_info)
    evas_object_resize(wd->anchor_hover.pop, info->w, info->h);
 
    wd->anchor_hover.hover = elm_hover_add(obj);
+   evas_object_event_callback_add(wd->anchor_hover.hover, EVAS_CALLBACK_DEL,
+                                  _anchor_hover_del, obj);
    elm_widget_mirrored_set(wd->anchor_hover.hover, elm_widget_mirrored_get(obj));
    if (wd->anchor_hover.hover_style)
      elm_object_style_set(wd->anchor_hover.hover, wd->anchor_hover.hover_style);
@@ -4542,11 +4555,10 @@ _entry_hover_anchor_clicked(void *data, Evas_Object *obj, void *event_info)
          !elm_object_part_content_get(wd->anchor_hover.hover, "bottom"))
      {
         evas_object_del(wd->anchor_hover.hover);
+        wd->anchor_hover.hover = NULL;
      }
    else
-     {
-        evas_object_show(wd->anchor_hover.hover);
-     }
+     evas_object_show(wd->anchor_hover.hover);
 }
 /* END - ANCHOR HOVER */
 
