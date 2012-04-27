@@ -883,35 +883,34 @@ _on_focus_hook(void *data __UNUSED__, Evas_Object *obj)
    Widget_Data *wd = elm_widget_data_get(obj);
    Evas_Object *top = elm_widget_top_get(obj);
    if (!wd) return;
-   if (!wd->editable)
-     {
-        if ((!elm_widget_focus_get(obj)) && (wd->api) && (wd->api->obj_hidemenu))
-          wd->api->obj_hidemenu(obj);
-        return;
-     }
+
    if (elm_widget_focus_get(obj))
      {
         printf("[Elm_entry::Focused] obj : %p\n", obj);
         evas_object_focus_set(wd->ent, EINA_TRUE);
         edje_object_signal_emit(wd->ent, "elm,action,focus", "elm");
-        if (top && wd->input_panel_enable)
-          elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
-        evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
-        _check_enable_return_key(obj);
         wd->mgf_type = _ENTRY_MAGNIFIER_FIXEDSIZE;
+        if (wd->editable)
+          {
+             if (top && wd->input_panel_enable)
+               elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_ON);
+             evas_object_smart_callback_call(obj, SIG_FOCUSED, NULL);
+             _check_enable_return_key(obj);
+          }
      }
    else
      {
         printf("[Elm_entry::Unfocused] obj : %p\n", obj);
         edje_object_signal_emit(wd->ent, "elm,action,unfocus", "elm");
         evas_object_focus_set(wd->ent, EINA_FALSE);
-        if (top && wd->input_panel_enable)
-          elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
-        evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
-
         if ((wd->api) && (wd->api->obj_hidemenu))
+          wd->api->obj_hidemenu(obj);
+
+        if (wd->editable)
           {
-             wd->api->obj_hidemenu(obj);
+             if (top && wd->input_panel_enable)
+               elm_win_keyboard_mode_set(top, ELM_WIN_KEYBOARD_OFF);
+             evas_object_smart_callback_call(obj, SIG_UNFOCUSED, NULL);
           }
      }
 }
@@ -1388,10 +1387,10 @@ _copy(void *data, Evas_Object *obj __UNUSED__, void *event_info __UNUSED__)
 {
    Widget_Data *wd = elm_widget_data_get(data);
    if (!wd) return;
-   wd->selmode = EINA_FALSE;
+   wd->selmode = EINA_TRUE;   // TIZEN ONLY
    if (!_elm_config->desktop_entry)
      {
-        edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);
+        //edje_object_part_text_select_allow_set(wd->ent, "elm.text", EINA_FALSE);   // TIZEN ONLY
         edje_object_signal_emit(wd->ent, "elm,state,select,off", "elm");
         elm_widget_scroll_hold_pop(data);
      }
