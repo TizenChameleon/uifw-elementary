@@ -2,7 +2,7 @@
 #include "elm_priv.h"
 
 #define MAX_STR 256
-#define MIN_W_ENTRY 10
+#define MIN_W_ENTRY 160
 
 typedef enum _Multibuttonentry_Pos
   {
